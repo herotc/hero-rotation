@@ -72,6 +72,8 @@ local VarStarfireinSolar
 local VarCritNotUp
 local VarAspPerSec
 local GCDMax
+local PAPValue
+local fightRemains
 
 -- Eclipse Variables
 local InEclipse = false
@@ -224,6 +226,12 @@ local function AP_Check(spell)
     APGen = APGen + 1
   end
 
+  if Player:IsCasting(S.Starfire) then
+    APGen = APGen + 8
+  elseif Player:IsCasting(S.Wrath) then
+    APGen = APGen + 6
+  end
+
   if CurAP + APGen < Player:AstralPowerMax() then
     return true
   else
@@ -282,12 +290,6 @@ local function Fallthru()
 end
 
 local function St()
-  -- Determine amount of AP fed into Primordial Arcanic Pulsar
-  -- TODO: Verify which slot holds the AP value
-  local PAPValue = 0
-  if PAPEquipped then
-    PAPValue = select(16, Player:BuffInfo(S.PAPBuff, false, true))
-  end
   -- starsurge,if=runeforge.timeworn_dreambinder.equipped&(eclipse.in_any&!((buff.timeworn_dreambinder.remains>gcd.max+0.1&(eclipse.in_both|eclipse.in_solar|eclipse.lunar_next)|buff.timeworn_dreambinder.remains>action.starfire.execute_time+0.1&(eclipse.in_lunar|eclipse.solar_next|eclipse.any_next))|!buff.timeworn_dreambinder.up)|(buff.ca_inc.up|variable.convoke_desync)&cooldown.convoke_the_spirits.ready)
   if S.Starsurge:IsReady() and (TimewornEquipped and (InEclipse and not ((Player:BuffRemains(S.TimewornDreambinderBuff) > (GCDMax + 0.1) and (EclipseState == 3 or EclipseState == 1 or EclipseState == 5) or Player:BuffRemains(S.TimewornDreambinderBuff) > (S.Starfire:ExecuteTime() + 0.6) and (EclipseState == 2 or EclipseState == 4 or EclipseState == 0)) or Player:BuffDown(S.TimewornDreambinderBuff)) or (Player:BuffUp(CaInc()) or VarConvokeDesync) and S.ConvoketheSpirits:CooldownUp())) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 2"; end
@@ -396,12 +398,6 @@ local function St()
 end
 
 local function Aoe()
-  -- Determine amount of AP fed into Primordial Arcanic Pulsar
-  -- TODO: Verify which slot holds the AP value
-  local PAPValue = 0
-  if PAPEquipped then
-    PAPValue = select(16, Player:BuffInfo(S.PAPBuff, false, true))
-  end
   -- variable,name=dream_will_fall_off,value=(buff.timeworn_dreambinder.remains<gcd.max+0.1|buff.timeworn_dreambinder.remains<action.starfire.execute_time+0.1&(eclipse.in_lunar|eclipse.solar_next|eclipse.any_next))&buff.timeworn_dreambinder.up&runeforge.timeworn_dreambinder.equipped
   -- Moved TimewornEquipped to the front to abort as quickly as possible if it's not equipped
   VarDreamWillFallOff = (TimewornEquipped and (Player:BuffRemains(S.TimewornDreambinderBuff) < (GCDMax + 0.1) or Player:BuffRemains(S.TimewornDreambinderBuff) < (S.Starfire:ExecuteTime() + 0.1) and (EclipseState == 2 or EclipseState == 4 or EclipseState == 0)) and Player:BuffUp(S.TimewornDreambinderBuff))
@@ -631,7 +627,14 @@ local function APL()
   GCDMax = Player:GCD() + 0.5
 
   -- Length of fight remaining - Used for later variables
-  local fightRemains = max(HL.FightRemains(Enemies8ySplash, false), HL.BossFightRemains())
+  fightRemains = max(HL.FightRemains(Enemies8ySplash, false), HL.BossFightRemains())
+
+  -- Determine amount of AP fed into Primordial Arcanic Pulsar
+  -- TODO: Verify which slot holds the AP value
+  PAPValue = 0
+  if PAPEquipped then
+    PAPValue = select(16, Player:BuffInfo(S.PAPBuff, false, true))
+  end
 
   -- Eclipse Stuffs
   if (Player:PrevGCD(1, S.Wrath) or Player:PrevGCD(1, S.Starfire)) then

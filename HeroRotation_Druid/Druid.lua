@@ -24,6 +24,7 @@ if not Spell.Druid then Spell.Druid = {} end
 Spell.Druid.Balance = {
   -- Racials
   Berserking                            = Spell(26297),
+
   -- Abilities
   Barkskin                              = Spell(22812),
   CelestialAlignment                    = Spell(194223),
@@ -40,6 +41,7 @@ Spell.Druid.Balance = {
   Sunfire                               = Spell(93402),
   SunfireDebuff                         = Spell(164815),
   Wrath                                 = Spell(190984),
+
   -- Talents
   ForceofNature                         = Spell(205636),
   FuryofElune                           = Spell(202770),
@@ -55,10 +57,12 @@ Spell.Druid.Balance = {
   TwinMoons                             = Spell(279620),
   WarriorofElune                        = Spell(202425),
   WarriorofEluneBuff                    = Spell(202425),
+
   -- New Moon Phases
   FullMoon                              = Spell(274283),
   HalfMoon                              = Spell(274282),
   NewMoon                               = Spell(274281),
+
   -- Covenant Abilities
   AdaptiveSwarm                         = Spell(325727),
   AdaptiveSwarmDebuff                   = Spell(325733),
@@ -69,8 +73,10 @@ Spell.Druid.Balance = {
   KindredEmpowermentEnergizeBuff        = Spell(327022),
   RavenousFrenzy                        = Spell(323546),
   RavenousFrenzyBuff                    = Spell(323546),
+
   -- Conduit Effects
   PreciseAlignment                      = Spell(340706),
+
   -- Legendary Effects
   BOATArcaneBuff                        = Spell(339946),
   BOATNatureBuff                        = Spell(339943),
@@ -78,7 +84,9 @@ Spell.Druid.Balance = {
   OnethsPerceptionBuff                  = Spell(339800),
   PAPBuff                               = Spell(338825),
   TimewornDreambinderBuff               = Spell(340049),
+
   -- Item Effects
+
   -- Custom
   Pool                                  = Spell(999910)
 }
