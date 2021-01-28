@@ -82,7 +82,7 @@ local EclipseTable = { [0] = "any_next", [1] = "in_solar", [2] = "in_lunar", [3]
 
 -- Precise Alignment Variables
 local PreciseAlignmentTimeTable = { 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12 }
-local PATime = S.PreciseAlignment:ConduitEnabled() and PreciseAlignmentTimeTable[S.PreciseAlignment:ConduitRank()]
+local PATime = S.PreciseAlignment:ConduitEnabled() and PreciseAlignmentTimeTable[S.PreciseAlignment:ConduitRank()] or 0
 
 -- Legendaries
 local PAPEquipped = Player:HasLegendaryEquipped(51)
