@@ -32,6 +32,8 @@ local OnUseExcludes = {
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
 local no_heal
+local UsingRazorice
+local UsingFallenCrusader
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -337,11 +339,11 @@ local function ColdHeart()
     if HR.Cast(S.ChainsofIce, nil, nil, not TargetIsInRange[30]) then return "chains_of_ice cold_heart 2"; end
   end
   -- chains_of_ice,if=!talent.obliteration&death_knight.runeforge.fallen_crusader&(buff.cold_heart.stack>=16&buff.unholy_strength.up|buff.cold_heart.stack>=19&cooldown.pillar_of_frost.remains>10)
-  if S.ChainsofIce:IsCastable() and (not S.Obliteration:IsAvailable() and (MainHandRuneforge == "3368" or OffHandRuneforge == "3368") and (Player:BuffStack(S.ColdHeartBuff) >= 16 and Player:BuffUp(S.UnholyStrengthBuff) or Player:BuffStack(S.ColdHeartBuff) >= 19 and S.PillarofFrost:CooldownRemains() > 10)) then
+  if S.ChainsofIce:IsCastable() and (not S.Obliteration:IsAvailable() and UsingFallenCrusader and (Player:BuffStack(S.ColdHeartBuff) >= 16 and Player:BuffUp(S.UnholyStrengthBuff) or Player:BuffStack(S.ColdHeartBuff) >= 19 and S.PillarofFrost:CooldownRemains() > 10)) then
     if HR.Cast(S.ChainsofIce, nil, nil, not TargetIsInRange[30]) then return "chains_of_ice cold_heart 3"; end
   end
   -- chains_of_ice,if=!talent.obliteration&!death_knight.runeforge.fallen_crusader&buff.cold_heart.stack>=10&buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains>20
-  if S.ChainsofIce:IsCastable() and (not S.Obliteration:IsAvailable() and not (MainHandRuneforge == "3368" or OffHandRuneforge == "3368") and Player:BuffStack(S.ColdHeartBuff) >= 10 and Player:BuffUp(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() > 20) then
+  if S.ChainsofIce:IsCastable() and (not S.Obliteration:IsAvailable() and not UsingFallenCrusader and Player:BuffStack(S.ColdHeartBuff) >= 10 and Player:BuffUp(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() > 20) then
     if HR.Cast(S.ChainsofIce, nil, nil, not TargetIsInRange[30]) then return "chains_of_ice cold_heart 4"; end
   end
   -- chains_of_ice,if=talent.obliteration&!buff.pillar_of_frost.up&(buff.cold_heart.stack>=16&buff.unholy_strength.up|buff.cold_heart.stack>=19|cooldown.pillar_of_frost.remains<3&buff.cold_heart.stack>=14)
@@ -461,7 +463,7 @@ local function Cooldowns()
     if HR.Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury, nil, not TargetIsInRange[40]) then return "frostwyrms_fury cd 8"; end
   end
   -- frostwyrms_fury,if=talent.obliteration&!buff.pillar_of_frost.up&((buff.unholy_strength.up|!death_knight.runeforge.fallen_crusader)&(debuff.razorice.stack=5|!death_knight.runeforge.razorice))
-  if S.FrostwyrmsFury:IsCastable() and (S.Obliteration:IsAvailable() and not Player:BuffUp(S.PillarofFrostBuff) and (Player:BuffUp(S.UnholyStrengthBuff) and Target:DebuffStack(S.RazoriceDebuff) == 5)) then
+  if S.FrostwyrmsFury:IsCastable() and (S.Obliteration:IsAvailable() and not Player:BuffUp(S.PillarofFrostBuff) and ((Player:BuffUp(S.UnholyStrengthBuff) or not UsingFallenCrusader) and (Target:DebuffStack(S.RazoriceDebuff) == 5 or not UsingRazorice))) then
     if HR.Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury, nil, not TargetIsInRange[40]) then return "frostwyrms_fury cd 9"; end
   end
   -- hypothermic_presence,if=talent.breath_of_sindragosa&runic_power.deficit>40&rune>=3&buff.pillar_of_frost.up|!talent.breath_of_sindragosa&runic_power.deficit>=25
@@ -568,7 +570,7 @@ local function Standard()
     if HR.Cast(S.RemorselessWinter, nil, nil, not TargetIsInRange[8]) then return "remorseless_winter standard 1"; end
   end
   -- glacial_advance,if=!death_knight.runeforge.razorice&(debuff.razorice.stack<5|debuff.razorice.remains<7)
-  if S.GlacialAdvance:IsCastable() and (not (MainHandRuneforge == "3370" or OffHandRuneforge == "3370") and (Target:DebuffStack(S.RazoriceDebuff) < 5 or Target:DebuffRemains(S.RazoriceDebuff) < 7)) then
+  if S.GlacialAdvance:IsCastable() and (not UsingRazorice and (Target:DebuffStack(S.RazoriceDebuff) < 5 or Target:DebuffRemains(S.RazoriceDebuff) < 7)) then
     if HR.Cast(S.GlacialAdvance, nil, nil, TargetIsInRange[100]) then return "glacial_advance standard 2"; end
   end
   -- frost_strike,if=cooldown.remorseless_winter.remains<=2*gcd&talent.gathering_storm
@@ -618,6 +620,10 @@ local function APL()
   EnemiesMeleeCount = #EnemiesMelee
   ComputeTargetRange()
 
+  -- Check Runeforges
+  local UsingRazorice = (MainHandRuneforge == "3370" or OffHandRuneforge == "3370")
+  local UsingFallenCrusader = (MainHandRuneforge == "3368" or OffHandRuneforge == "3368")
+
   -- call precombat
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
@@ -651,7 +657,7 @@ local function APL()
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cold_heart,if=talent.cold_heart&(buff.cold_heart.stack>=10&(debuff.razorice.stack=5|!death_knight.runeforge.razorice)|fight_remains<=gcd)
-    if (S.ColdHeart:IsAvailable() and (Player:BuffStack(S.ColdHeartBuff) >= 10 and (Target:DebuffStack(S.RazoriceDebuff) == 5 or not (MainHandRuneforge == "3370" or OffHandRuneforge == "3370")) or HL.FilteredFightRemains(Enemies10yd, "<=", Player:GCD()))) then
+    if (S.ColdHeart:IsAvailable() and (Player:BuffStack(S.ColdHeartBuff) >= 10 and (Target:DebuffStack(S.RazoriceDebuff) == 5 or not UsingRazorice) or HL.FilteredFightRemains(Enemies10yd, "<=", Player:GCD()))) then
       local ShouldReturn = ColdHeart(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
