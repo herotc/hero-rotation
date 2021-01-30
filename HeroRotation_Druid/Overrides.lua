@@ -16,6 +16,23 @@ local SpellBalance = Spell.Druid.Balance
 
 --- ============================ CONTENT ============================
 -- Balance, ID: 102
+HL.AddCoreOverride ("Player.AstralPowerP",
+  function ()
+    local AP = Player:AstralPower()
+    if not Player:IsCasting() then
+      return AP
+    else
+      if Player:IsCasting(SpellBalance.Wrath) then
+        return AP + 6
+      elseif Player:IsCasting(SpellBalance.Starfire) then
+        return AP + 8
+      else
+        return AP
+      end
+    end
+  end
+, 102)
+
 local BalOldSpellIsCastable
 BalOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
