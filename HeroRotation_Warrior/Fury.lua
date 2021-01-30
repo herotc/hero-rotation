@@ -104,7 +104,7 @@ local function SingleTarget()
   end
   -- bladestorm,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>45)
   if S.Bladestorm:IsCastable() and (Player:BuffUp(S.EnrageBuff) and EnemiesCount8 > 1) then
-    if HR.Cast(S.Bladestorm, nil, nil, not Target:IsInRange(8)) then return "bladestorm"; end
+    if HR.Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm"; end
   end
   -- bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
   if S.Bloodthirst:IsCastable() and (Player:BuffDown(S.EnrageBuff) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35 and not S.Cruelty:IsAvailable()) then
