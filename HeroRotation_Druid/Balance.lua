@@ -240,8 +240,6 @@ local function AP_Check(spell)
 end
 
 local function Precombat()
-  -- Reset EclipseState
-  EclipseState = 0
   -- flask
   -- food
   -- augmentation
