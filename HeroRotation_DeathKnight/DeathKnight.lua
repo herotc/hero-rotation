@@ -150,47 +150,58 @@ Spell.DeathKnight.Frost = {
 
 Spell.DeathKnight.Unholy = {
   -- Abilities
-  RaiseDead                             = Spell(46584),
-  SacrificialPact                       = Spell(327574),
-  ArmyoftheDead                         = Spell(42650),
   Apocalypse                            = Spell(275699),
+  ArmyoftheDead                         = Spell(42650),
+  DarkTransformation                    = Spell(63560),
   DeathAndDecay                         = Spell(43265),
+  DeathCoil                             = Spell(47541),
+  DeathStrike                           = Spell(49998),
   Epidemic                              = Spell(207317),
   FesteringStrike                       = Spell(85948),
-  DeathCoil                             = Spell(47541),
-  ScourgeStrike                         = Spell(55090),
   Outbreak                              = Spell(77575),
-  DeathStrike                           = Spell(49998),
-  DarkTransformation                    = Spell(63560),
+  RaiseDead                             = Spell(46584),
+  SacrificialPact                       = Spell(327574),
+  ScourgeStrike                         = Spell(55090),
+
   -- Talents
+  ArmyoftheDamned                       = Spell(276837),
   Asphyxiate                            = Spell(108194),
-  Defile                                = Spell(152280),
   BurstingSores                         = Spell(207264),
   ClawingShadows                        = Spell(207311),
-  SoulReaper                            = Spell(343294),
-  UnholyBlight                          = Spell(115989),
-  SummonGargoyle                        = MultiSpell(49206, 207349),
+  Defile                                = Spell(152280),
   Pestilence                            = Spell(277234),
-  UnholyPact                            = Spell(319230),
+  SoulReaper                            = Spell(343294),
+  SummonGargoyle                        = MultiSpell(49206, 207349),
   UnholyAssault                         = Spell(207289),
-  ArmyoftheDamned                       = Spell(276837),
+  UnholyBlight                          = Spell(115989),
+  UnholyPact                            = Spell(319230),
+
   -- Covenant Abilities
-  ShackleTheUnworthy                    = Spell(312202),
-  SwarmingMist                          = Spell(311648),
   AbominationLimb                       = Spell(315443),
   DeathsDue                             = Spell(324128),
-  -- Conduit Effects
+  ShackleTheUnworthy                    = Spell(312202),
+  SwarmingMist                          = Spell(311648),
+  SwarmingMistBuff                      = Spell(311648),
+
+  -- Conduit/Soulbind Effects
   ConvocationOfTheDead                  = Spell(338553),
+  LeadByExample                         = Spell(342156),
+
   -- Buffs
   DeathAndDecayBuff                     = Spell(188290),
   DeathStrikeBuff                       = Spell(101568),
+  RunicCorruptionBuff                   = Spell(51460),
   SuddenDoomBuff                        = Spell(81340),
   UnholyAssaultBuff                     = Spell(207289),
   UnholyStrengthBuff                    = Spell(53365),
+
   -- Debuffs
+  BloodPlagueDebuff                     = Spell(55078),
   FesteringWoundDebuff                  = Spell(194310),
-  VirulentPlagueDebuff                  = Spell(191587),
+  FrostFeverDebuff                      = Spell(55095),
   UnholyBlightDebuff                    = Spell(115994),
+  VirulentPlagueDebuff                  = Spell(191587),
+
   -- Racials
   ArcaneTorrent                         = Spell(50613),
   BloodFury                             = Spell(20572),
@@ -200,8 +211,10 @@ Spell.DeathKnight.Unholy = {
   BagofTricks                           = Spell(312411),
   ArcanePulse                           = Spell(260364),
   Fireblood                             = Spell(265221),
+
   -- Interrupts
   MindFreeze                            = Spell(47528),
+
   -- Custom
   PoolResources                         = Spell(999910)
 }
@@ -221,5 +234,10 @@ Item.DeathKnight.Frost = {
 
 Item.DeathKnight.Unholy = {
   -- Potions/Trinkets
+  PotionofSpectralStrength              = Item(171275),
+  DarkmoonDeckVoracity                  = Item(173087),
+  DreadfireVessel                       = Item(184030),
+  InscrutableQuantumDevice              = Item(179350),
+  MacabreSheetMusic                     = Item(184024),
   -- "Other On Use"
 }

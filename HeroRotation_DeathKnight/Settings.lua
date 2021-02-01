@@ -68,7 +68,8 @@ HR.GUISettings.APL.DeathKnight = {
       ArmyoftheDead = true,
       UnholyAssault = true,
       Epidemic = false,
-      Defile = false
+      Defile = false,
+      SummonGargoyle = false
     }
   },
 };
