@@ -125,7 +125,7 @@ local function EvaluateCycleFesteringStrike(TargetUnit)
 end
 
 local function EvaluateCycleSoulReaper(TargetUnit)
-  return (TargetUnit:TimeToX(35) < 5 and TargetUnit:TimeToDie() > 5)
+  return ((TargetUnit:TimeToX(35) < 5 or TargetUnit:HealthPercentage() < 35) and TargetUnit:TimeToDie() > 5)
 end
 
 local function Precombat()
@@ -254,7 +254,11 @@ local function Cooldowns()
   end
   -- soul_reaper,target_if=target.time_to_pct_35<5&target.time_to_die>5
   if S.SoulReaper:IsReady() then
-    if Everyone.CastCycle(S.SoulReaper, EnemiesMelee, EvaluateCycleSoulReaper) then return "soul_reaper cooldowns 6"; end
+    if ((Target:TimeToX(35) < 5 or Target:HealthPercentage() < 35) and Target:TimeToDie() > 5) then
+      if Cast(S.SoulReaper, nil, nil, not Target:IsSpellInRange(S.SoulReaper)) then return "soul_reaper cooldowns 5"; end
+    else
+      if Everyone.CastCycle(S.SoulReaper, EnemiesMelee, EvaluateCycleSoulReaper) then return "soul_reaper cooldowns 6"; end
+    end
   end
   -- unholy_blight,if=variable.st_planning&(cooldown.apocalypse.remains_expected<5|cooldown.apocalypse.remains_expected>10)&(cooldown.dark_transformation.remains<gcd|buff.dark_transformation.up)
   if S.UnholyBlight:IsReady() and (VarSTPlanning and (S.Apocalypse:CooldownRemains() < 5 or S.Apocalypse:CooldownRemains() > 10) and (S.DarkTransformation:CooldownRemains() < Player:GCD() or Pet:BuffUp(S.DarkTransformation))) then
@@ -439,6 +443,10 @@ local function APL()
     VarSTPlanning = (EnemiesMeleeCount == 1)
     -- variable,name=major_cooldowns_active,value=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active|buff.dark_transformation.up
     VarMajorCDsActive = (VarGargoyleActive or Player:BuffUp(S.UnholyAssaultBuff) or S.ArmyoftheDamned:IsAvailable() and VarApocGhoulActive or Pet:BuffUp(S.DarkTransformation))
+    -- Manually added: epidemic,if=!variable.pooling_runic_power&active_enemies=0
+    if S.Epidemic:IsReady() and S.VirulentPlagueDebuff:AuraActiveCount() > 0 and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
+      if Cast(S.Epidemic, nil, nil, not Target:IsInRange(30)) then return "epidemic out_of_range"; end
+    end
     if CDsON() then
       -- arcane_torrent,if=runic_power.deficit>65&(pet.gargoyle.active|!talent.summon_gargoyle.enabled)&rune.deficit>=5
       if S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 65 and (VarGargoyleActive or not S.SummonGargoyle:IsAvailable()) and Player:Rune() <= 1) then
