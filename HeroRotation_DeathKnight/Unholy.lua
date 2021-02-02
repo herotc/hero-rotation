@@ -88,10 +88,6 @@ local function DeathStrikeHeal()
   return (Settings.General.SoloMode and (Player:HealthPercentage() < Settings.Commons.UseDeathStrikeHP or Player:HealthPercentage() < Settings.Commons.UseDarkSuccorHP and Player:BuffUp(S.DeathStrikeBuff)))
 end
 
-local function DisableAOTD()
-  return (S.ArmyoftheDead:CooldownRemains() > 5 or Settings.Unholy.AotDOff)
-end
-
 local function EvaluateTargetIfFilterFWStack(TargetUnit)
   return (TargetUnit:DebuffStack(S.FesteringWoundDebuff))
 end
@@ -270,11 +266,11 @@ local function Cooldowns()
   end
   -- dark_transformation,if=variable.st_planning&(dot.unholy_blight_dot.remains|!talent.unholy_blight)
   if S.DarkTransformation:IsCastable() and (VarSTPlanning and (Target:DebuffUp(S.UnholyBlightDebuff) or not S.UnholyBlight:IsAvailable())) then
-    if Cast(S.DarkTransformation) then return "dark_transformation cooldowns 12"; end
+    if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cooldowns 12"; end
   end
   -- dark_transformation,if=active_enemies>=2|fight_remains<21
   if S.DarkTransformation:IsCastable() and (EnemiesMeleeCount >= 2 or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
-    if Cast(S.DarkTransformation) then return "dark_transformation cooldowns 14"; end
+    if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cooldowns 14"; end
   end
   -- apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4
   if S.Apocalypse:IsCastable() and S.Apocalypse:IsUsable() and (EnemiesMeleeCount == 1 and Target:DebuffStack(S.FesteringWoundDebuff) >= 4) then
@@ -514,7 +510,7 @@ local function APL()
       local ShouldReturn = AOE_Burst(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile|cooldown.defile.remains>10&talent.defile))
-    if (EnemiesMeleeCount >= 2 and (Player:BuffDown(S.DeathAndDecayBuff) and (S.DeathAndDecay:CooldownRemains() > 10 and not S.Defile:IsAvailable() or S.Defile.CooldownRemains() > 10 and S.Defile:IsAvailable()))) then
+    if (EnemiesMeleeCount >= 2 and (Player:BuffDown(S.DeathAndDecayBuff) and (S.DeathAndDecay:CooldownRemains() > 10 and not S.Defile:IsAvailable() or S.Defile:CooldownRemains() > 10 and S.Defile:IsAvailable()))) then
       local ShouldReturn = AOE_Generic(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=generic,if=active_enemies=1

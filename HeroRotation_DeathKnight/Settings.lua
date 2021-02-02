@@ -22,7 +22,6 @@ HR.GUISettings.APL.DeathKnight = {
     UsePotions = true,
     UseTrinkets = true,
     TrinketDisplayStyle = "Suggested",
-    EssenceDisplayStyle = "Suggested",
     CovenantDisplayStyle = "Suggested",
     RaiseDeadDisplayStyle = "Suggested",
     OffGCDasOffGCD = {
@@ -62,14 +61,13 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Unholy = {
-    AotDOff = true,
     GCDasOffGCD = {
       -- Abilities
       ArmyoftheDead = true,
-      UnholyAssault = true,
+      DarkTransformation = true,
       Epidemic = false,
-      Defile = false,
-      SummonGargoyle = false
+      SummonGargoyle = false,
+      UnholyAssault = true,
     }
   },
 };
@@ -88,13 +86,11 @@ CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDarkSucc
 CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UsePotions", "Use Potions", "Use Potions as part of the rotation");
 CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
 CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
 CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style (WIP)", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
 CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.RaiseDeadDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Raise Dead Display Style", "Define which icon display style to use for Raise Dead.");
 CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons");
 
 --Unholy Panels
-CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.AotDOff", "Disable AotD Checks", "Enable this option to remove ability checks against Army of the Dead. This can help smooth out the rotation if not using Army on cooldown.");
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");
 
 --Frost Panels
