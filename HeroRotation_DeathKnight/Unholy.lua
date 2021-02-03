@@ -277,7 +277,7 @@ local function Cooldowns()
     if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cooldowns 14"; end
   end
   -- apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4
-  if S.Apocalypse:IsCastable() and S.Apocalypse:IsUsable() and (EnemiesMeleeCount == 1 and Target:DebuffStack(S.FesteringWoundDebuff) >= 4) then
+  if S.Apocalypse:IsCastable() and S.Apocalypse:IsUsable() and ((EnemiesMeleeCount == 1 or not AoEON()) and Target:DebuffStack(S.FesteringWoundDebuff) >= 4) then
     if Cast(S.Apocalypse, nil, nil, not Target:IsSpellInRange(S.Apocalypse)) then return "apocalypse cooldowns 16"; end
   end
   -- apocalypse,target_if=max:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack>=4&!death_and_decay.ticking
@@ -440,12 +440,16 @@ local function APL()
     -- variable,name=pooling_runes,value=talent.soul_reaper&rune<2&target.time_to_pct_35<5&fight_remains>5
     VarPoolingRunes = (S.SoulReaper:IsAvailable() and Player:Rune() < 2 and Target:TimeToX(35) < 5 and HL.FilteredFightRemains(EnemiesMelee, ">", 5))
     -- variable,name=st_planning,value=active_enemies=1&(!raid_event.adds.exists|raid_event.adds.in>15)
-    VarSTPlanning = (EnemiesMeleeCount == 1)
+    VarSTPlanning = (EnemiesMeleeCount == 1 or not AoEON())
     -- variable,name=major_cooldowns_active,value=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active|buff.dark_transformation.up
     VarMajorCDsActive = (VarGargoyleActive or Player:BuffUp(S.UnholyAssaultBuff) or S.ArmyoftheDamned:IsAvailable() and VarApocGhoulActive or Pet:BuffUp(S.DarkTransformation))
     -- Manually added: epidemic,if=!variable.pooling_runic_power&active_enemies=0
     if S.Epidemic:IsReady() and S.VirulentPlagueDebuff:AuraActiveCount() > 1 and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
       if Cast(S.Epidemic, nil, nil, not Target:IsInRange(30)) then return "epidemic out_of_range"; end
+    end
+    -- Manually added: death_coil,if=!variable.pooling_runic_power&active_enemies=0
+    if S.DeathCoil:IsReady() and S.VirulentPlagueDebuff:AuraActiveCount() < 2 and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
+      if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil out_of_range"; end
     end
     if CDsON() then
       -- arcane_torrent,if=runic_power.deficit>65&(pet.gargoyle.active|!talent.summon_gargoyle.enabled)&rune.deficit>=5
@@ -477,7 +481,7 @@ local function APL()
         if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 14"; end
       end
       -- bag_of_tricks,if=buff.unholy_strength.up&active_enemies=1
-      if S.BagofTricks:IsCastable() and (Player:BuffUp(S.UnholyStrengthBuff) and EnemiesMeleeCount == 1) then
+      if S.BagofTricks:IsCastable() and (Player:BuffUp(S.UnholyStrengthBuff) and (EnemiesMeleeCount == 1 or not AoEON())) then
         if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 16"; end
       end
     end
