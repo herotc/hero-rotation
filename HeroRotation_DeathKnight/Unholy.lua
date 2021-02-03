@@ -444,7 +444,7 @@ local function APL()
     -- variable,name=major_cooldowns_active,value=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active|buff.dark_transformation.up
     VarMajorCDsActive = (VarGargoyleActive or Player:BuffUp(S.UnholyAssaultBuff) or S.ArmyoftheDamned:IsAvailable() and VarApocGhoulActive or Pet:BuffUp(S.DarkTransformation))
     -- Manually added: epidemic,if=!variable.pooling_runic_power&active_enemies=0
-    if S.Epidemic:IsReady() and S.VirulentPlagueDebuff:AuraActiveCount() > 0 and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
+    if S.Epidemic:IsReady() and S.VirulentPlagueDebuff:AuraActiveCount() > 1 and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
       if Cast(S.Epidemic, nil, nil, not Target:IsInRange(30)) then return "epidemic out_of_range"; end
     end
     if CDsON() then
@@ -509,20 +509,22 @@ local function APL()
     if (CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile|cooldown.defile.remains<10&talent.defile)&!death_and_decay.ticking
-    if (EnemiesMeleeCount >= 2 and (S.DeathAndDecay:CooldownRemains() < 10 and not S.Defile:IsAvailable() or S.Defile:CooldownRemains() < 10 and S.Defile:IsAvailable()) and Player:BuffDown(S.DeathAndDecayBuff)) then
-      local ShouldReturn = AOE_Setup(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
-    if (EnemiesMeleeCount >= 2 and Player:BuffUp(S.DeathAndDecayBuff)) then
-      local ShouldReturn = AOE_Burst(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile|cooldown.defile.remains>10&talent.defile))
-    if (EnemiesMeleeCount >= 2 and (Player:BuffDown(S.DeathAndDecayBuff) and (S.DeathAndDecay:CooldownRemains() > 10 and not S.Defile:IsAvailable() or S.Defile:CooldownRemains() > 10 and S.Defile:IsAvailable()))) then
-      local ShouldReturn = AOE_Generic(); if ShouldReturn then return ShouldReturn; end
+    if (AoEON()) then
+      -- run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile|cooldown.defile.remains<10&talent.defile)&!death_and_decay.ticking
+      if (EnemiesMeleeCount >= 2 and (S.DeathAndDecay:CooldownRemains() < 10 and not S.Defile:IsAvailable() or S.Defile:CooldownRemains() < 10 and S.Defile:IsAvailable()) and Player:BuffDown(S.DeathAndDecayBuff)) then
+        local ShouldReturn = AOE_Setup(); if ShouldReturn then return ShouldReturn; end
+      end
+      -- run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
+      if (EnemiesMeleeCount >= 2 and Player:BuffUp(S.DeathAndDecayBuff)) then
+        local ShouldReturn = AOE_Burst(); if ShouldReturn then return ShouldReturn; end
+      end
+      -- run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile|cooldown.defile.remains>10&talent.defile))
+      if (EnemiesMeleeCount >= 2 and (Player:BuffDown(S.DeathAndDecayBuff) and (S.DeathAndDecay:CooldownRemains() > 10 and not S.Defile:IsAvailable() or S.Defile:CooldownRemains() > 10 and S.Defile:IsAvailable()))) then
+        local ShouldReturn = AOE_Generic(); if ShouldReturn then return ShouldReturn; end
+      end
     end
     -- call_action_list,name=generic,if=active_enemies=1
-    if (EnemiesMeleeCount == 1) then
+    if (EnemiesMeleeCount == 1 or not AoEON()) then
       local ShouldReturn = Generic(); if ShouldReturn then return ShouldReturn; end
     end
     -- Add pool resources icon if nothing else to do
