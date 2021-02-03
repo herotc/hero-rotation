@@ -88,7 +88,7 @@ function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, 
       end
     end
     if BestUnit then
-      if (BestUnit:GUID() == Target:GUID()) or (TargetCondition and (BestConditionValue == TargetIfCondition(Target))) then
+      if TargetCondition and (BestUnit:GUID() == Target:GUID() or BestConditionValue == TargetIfCondition(Target)) then
         return HR.Cast(Object, OffGCD, nil, OutofRange)
       elseif ((Condition and Condition(BestUnit)) or not Condition) then
         HR.CastLeftNameplate(BestUnit, Object)
