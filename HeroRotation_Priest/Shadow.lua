@@ -46,7 +46,6 @@ local OnUseExcludes = {
 local ShouldReturn -- Used to get the return string
 local Enemies8yMelee, Enemies30y, Enemies40y, Enemies10ySplash
 local EnemiesCount8ySplash, EnemiesCount10ySplash
-local PetActiveCD
 local UnitsWithoutSWPain
 local UnitsRefreshSWPain
 
@@ -132,7 +131,7 @@ local function EvaluateCycleDamnation200(TargetUnit)
 end
 
 local function EvaluateCycleShadowWordDeath204(TargetUnit)
-  return ((TargetUnit:HealthPercentage() < 20 and EnemiesCount10ySplash < 4) or (S.Mindbender:CooldownRemains() > PetActiveCD and ShadowflamePrismEquipped))
+  return ((TargetUnit:HealthPercentage() < 20 and EnemiesCount10ySplash < 4) or (S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped))
 end
 
 local function EvaluateCycleSurrenderToMadness206(TargetUnit)
@@ -172,12 +171,6 @@ local function EvaluateTargetIfSoullettingRuby232(TargetUnit)
 end
 
 local function Precombat()
-  -- Update point at which the Mindbender drops; this is in Precombat, as it can't change once in combat
-  if S.Mindbender:ID() == 34433 then
-    PetActiveCD = 170
-  else
-    PetActiveCD = 45
-  end
   -- flask
   -- food
   -- augmentation
