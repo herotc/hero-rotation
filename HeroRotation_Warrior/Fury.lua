@@ -69,7 +69,7 @@ local function Precombat()
     end
     -- potion
     if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion 12"; end
+      if HR.CastSuggested(I.PotionofPhantomFire) then return "potion 12"; end
     end
     -- Manually Added: Charge if not in melee. Bloodthirst if in melee
     if S.Charge:IsCastable() and S.Charge:Charges() >= 1 and not Target:IsSpellInRange(S.Bloodthirst) then
