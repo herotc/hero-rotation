@@ -363,16 +363,16 @@ local function St()
   if S.Starsurge:IsReady() and (not TimewornEquipped and (PAPValue < 270 or PAPValue < 250 and S.StellarDrift:IsAvailable()) and Player:BuffRemains(S.EclipseSolar) > 7 and EclipseState == 1 and Player:BuffDown(S.OnethsPerceptionBuff) and not S.Starlord:IsAvailable() and CaInc():CooldownRemains() > 7 and (S.KindredSpirits:CooldownRemains() > 7 or Player:Covenant() ~= "Kyrian")) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 36"; end
   end
-  -- new_moon,if=(buff.eclipse_lunar.up|(charges=2&recharge_time<5)|charges=3)&ap_check&variable.save_for_ca_inc
-  if S.NewMoon:IsCastable() and ((Player:BuffUp(S.EclipseLunar) or (S.NewMoon:Charges() == 2 and S.NewMoon:Recharge() < 5) or S.NewMoon:Charges() == 3) and AP_Check(S.NewMoon) and VarSaveForCAInc) then
+  -- new_moon,if=(buff.eclipse_lunar.remains>execute_time|(charges=2&recharge_time<5)|charges=3)&ap_check&variable.save_for_ca_inc
+  if S.NewMoon:IsCastable() and ((Player:BuffRemains(S.EclipseLunar) > S.NewMoon:ExecuteTime() or (S.NewMoon:Charges() == 2 and S.NewMoon:Recharge() < 5) or S.NewMoon:Charges() == 3) and AP_Check(S.NewMoon) and VarSaveForCAInc) then
     if Cast(S.NewMoon, nil, nil, not Target:IsSpellInRange(S.NewMoon)) then return "new_moon st 38"; end
   end
-  -- half_moon,if=(buff.eclipse_lunar.up&!covenant.kyrian|(buff.kindred_empowerment_energize.up&covenant.kyrian)|(charges=2&recharge_time<5)|charges=3|buff.ca_inc.up)&ap_check&variable.save_for_ca_inc
-  if S.HalfMoon:IsCastable() and ((Player:BuffUp(S.EclipseLunar) and Player:Covenant() ~= "Kyrian" or (Player:BuffUp(S.KindredEmpowermentEnergizeBuff) and Player:Covenant() == "Kyrian") or (S.HalfMoon:Charges() == 2 and S.HalfMoon:Recharge() < 5) or S.HalfMoon:Charges() == 3 or Player:BuffUp(CaInc())) and AP_Check(S.HalfMoon) and VarSaveForCAInc) then
+  -- half_moon,if=(buff.eclipse_lunar.remains>execute_time&!covenant.kyrian|(buff.kindred_empowerment_energize.up&covenant.kyrian)|(charges=2&recharge_time<5)|charges=3|buff.ca_inc.up)&ap_check&variable.save_for_ca_inc
+  if S.HalfMoon:IsCastable() and ((Player:BuffRemains(S.EclipseLunar) > S.HalfMoon:ExecuteTime() and Player:Covenant() ~= "Kyrian" or (Player:BuffUp(S.KindredEmpowermentEnergizeBuff) and Player:Covenant() == "Kyrian") or (S.HalfMoon:Charges() == 2 and S.HalfMoon:Recharge() < 5) or S.HalfMoon:Charges() == 3 or Player:BuffUp(CaInc())) and AP_Check(S.HalfMoon) and VarSaveForCAInc) then
     if Cast(S.HalfMoon, nil, nil, not Target:IsSpellInRange(S.HalfMoon)) then return "half_moon st 40"; end
   end
-  -- full_moon,if=(buff.eclipse_lunar.up&!covenant.kyrian|(buff.kindred_empowerment_energize.up&covenant.kyrian)|(charges=2&recharge_time<5)|charges=3|buff.ca_inc.up)&ap_check&variable.save_for_ca_inc
-  if S.FullMoon:IsCastable() and ((Player:BuffUp(S.EclipseLunar) and Player:Covenant() ~= "Kyrian" or (Player:BuffUp(S.KindredEmpowermentEnergizeBuff) and Player:Covenant() == "Kyrian") or (S.FullMoon:Charges() == 2 and S.FullMoon:Recharge() < 5) or S.FullMoon:Charges() == 3 or Player:BuffUp(CaInc())) and AP_Check(S.FullMoon) and VarSaveForCAInc) then
+  -- full_moon,if=(buff.eclipse_lunar.remains>execute_time&!covenant.kyrian|(buff.kindred_empowerment_energize.up&covenant.kyrian)|(charges=2&recharge_time<5)|charges=3|buff.ca_inc.up)&ap_check&variable.save_for_ca_inc
+  if S.FullMoon:IsCastable() and ((Player:BuffRemains(S.EclipseLunar) > S.FullMoon:ExecuteTime() and Player:Covenant() ~= "Kyrian" or (Player:BuffUp(S.KindredEmpowermentEnergizeBuff) and Player:Covenant() == "Kyrian") or (S.FullMoon:Charges() == 2 and S.FullMoon:Recharge() < 5) or S.FullMoon:Charges() == 3 or Player:BuffUp(CaInc())) and AP_Check(S.FullMoon) and VarSaveForCAInc) then
     if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon st 42"; end
   end
   -- warrior_of_elune
@@ -475,16 +475,16 @@ local function Aoe()
   if S.Starsurge:IsReady() and (Player:BuffUp(S.OnethsClearVisionBuff) or (not AP_Check(S.Starfire) and not VarIgnoreStarsurge or (Player:BuffRemains(CaInc()) < 5 and Player:BuffUp(CaInc()) or (Player:BuffRemains(S.RavenousFrenzyBuff) < GCDMax * ceil(Player:AstralPowerP() % 30) and Player:BuffUp(S.RavenousFrenzyBuff))) and VarStarfallWontFallOff and EnemiesCount40y < 3) and (not TimewornEquipped or EnemiesCount40y < 3)) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge aoe 36"; end
   end
-  -- new_moon,if=(eclipse.in_any&cooldown.ca_inc.remains>50|(charges=2&recharge_time<5)|charges=3)&ap_check
-  if S.NewMoon:IsCastable() and (((EclipseState == 1 or EclipseState == 2 or EclipseState == 3) and CaInc():CooldownRemains() > 50 or (S.NewMoon:Charges() == 2 and S.NewMoon:Recharge() < 5) or S.NewMoon:Charges() == 3) and AP_Check(S.NewMoon)) then
+  -- new_moon,if=(buff.eclipse_solar.remains>execute_time|(charges=2&recharge_time<5)|charges=3)&ap_check
+  if S.NewMoon:IsCastable() and ((Player:BuffRemains(S.EclipseSolar) > S.NewMoon:ExecuteTime() or (S.NewMoon:Charges() == 2 and S.NewMoon:Recharge() < 5) or S.NewMoon:Charges() == 3) and AP_Check(S.NewMoon)) then
     if Cast(S.NewMoon, nil, nil, not Target:IsSpellInRange(S.NewMoon)) then return "new_moon aoe 38"; end
   end
-  -- half_moon,if=(eclipse.in_any&cooldown.ca_inc.remains>50|(charges=2&recharge_time<5)|charges=3)&ap_check
-  if S.HalfMoon:IsCastable() and (((EclipseState == 1 or EclipseState == 2 or EclipseState == 3) and CaInc():CooldownRemains() > 50 or (S.HalfMoon:Charges() == 2 and S.HalfMoon:Recharge() < 5) or S.HalfMoon:Charges() == 3) and AP_Check(S.HalfMoon)) then
+  -- half_moon,if=(buff.eclipse_solar.remains>execute_time|(charges=2&recharge_time<5)|charges=3)&ap_check
+  if S.HalfMoon:IsCastable() and ((Player:BuffRemains(S.EclipseSolar) > S.HalfMoon:ExecuteTime() or (S.HalfMoon:Charges() == 2 and S.HalfMoon:Recharge() < 5) or S.HalfMoon:Charges() == 3) and AP_Check(S.HalfMoon)) then
     if Cast(S.HalfMoon, nil, nil, not Target:IsSpellInRange(S.HalfMoon)) then return "half_moon aoe 40"; end
   end
-  -- full_moon,if=(eclipse.in_any&cooldown.ca_inc.remains>50|(charges=2&recharge_time<5)|charges=3)&ap_check
-  if S.FullMoon:IsCastable() and (((EclipseState == 1 or EclipseState == 2 or EclipseState == 3) and CaInc():CooldownRemains() > 50 or (S.FullMoon:Charges() == 2 and S.FullMoon:Recharge() < 5) or S.FullMoon:Charges() == 3) and AP_Check(S.FullMoon)) then
+  -- full_moon,if=(buff.eclipse_solar.remains>execute_time&(cooldown.ca_inc.remains>50|cooldown.convoke_the_spirits.remains>50)|(charges=2&recharge_time<5)|charges=3)&ap_check
+  if S.FullMoon:IsCastable() and ((Player:BuffRemains(S.EclipseSolar) > S.FullMoon:ExecuteTime() and (CaInc():CooldownRemains() > 50 or S.ConvoketheSpirits:CooldownRemains() > 50) or (S.FullMoon:Charges() == 2 and S.FullMoon:Recharge() < 5) or S.FullMoon:Charges() == 3) and AP_Check(S.FullMoon)) then
     if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon aoe 42"; end
   end
   -- warrior_of_elune
@@ -576,16 +576,16 @@ local function Boat()
   if S.Starsurge:IsReady() and ((fightRemains < 4 or (Player:BuffRemains(S.RavenousFrenzyBuff) < GCDMax * ceil(Player:AstralPowerP() % 30) and Player:BuffUp(S.RavenousFrenzyBuff))) or (Player:AstralPowerP() + VarAspPerSec * Player:BuffRemains(S.EclipseSolar) + FuryTicksRemain * 2.5 > 110 or Player:AstralPowerP() + VarAspPerSec * Player:BuffRemains(S.EclipseLunar) + FuryTicksRemain * 2.5 > 110) and (EclipseState == 1 or EclipseState == 2 or EclipseState == 3) and (Player:BuffDown(CaInc()) or not S.Starlord:IsAvailable()) and ((not CaInc():CooldownUp() or Player:Covenant() == "Kyrian" and not S.EmpowerBond:CooldownUp()) or Player:Covenant() == "Night Fae") and (Player:Covenant() ~= "Venthyr" or Player:BuffDown(CaInc()) or Player:AstralPowerP() > 90) or (S.Starlord:IsAvailable() and Player:BuffUp(CaInc()) and (Player:BuffStack(S.StarlordBuff) < 3 or Player:AstralPowerP() > 90)) or Player:BuffRemains(CaInc()) > 8 and Player:BuffDown(S.RavenousFrenzyBuff) and not S.Starlord:IsAvailable()) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge boat 26"; end
   end
-  -- new_moon,if=(buff.eclipse_lunar.up|(charges=2&recharge_time<5)|charges=3)&ap_check
-  if S.NewMoon:IsCastable() and ((Player:BuffUp(S.EclipseLunar) or (S.NewMoon:Charges() == 2 and S.NewMoon:Recharge() < 5) or S.NewMoon:Charges() == 3) and AP_Check(S.NewMoon)) then
+  -- new_moon,if=(buff.eclipse_lunar.remains>execute_time|(charges=2&recharge_time<5)|charges=3)&ap_check
+  if S.NewMoon:IsCastable() and ((Player:BuffRemains(S.EclipseLunar) > S.NewMoon:ExecuteTime() or (S.NewMoon:Charges() == 2 and S.NewMoon:Recharge() < 5) or S.NewMoon:Charges() == 3) and AP_Check(S.NewMoon)) then
     if Cast(S.NewMoon, nil, nil, not Target:IsSpellInRange(S.NewMoon)) then return "new_moon boat 28"; end
   end
-  -- half_moon,if=(buff.eclipse_lunar.up|(charges=2&recharge_time<5)|charges=3)&ap_check
-  if S.HalfMoon:IsCastable() and ((Player:BuffUp(S.EclipseLunar) or (S.HalfMoon:Charges() == 2 and S.HalfMoon:Recharge() < 5) or S.HalfMoon:Charges() == 3) and AP_Check(S.HalfMoon)) then
+  -- half_moon,if=(buff.eclipse_lunar.remains>execute_time&(cooldown.ca_inc.remains>50|cooldown.convoke_the_spirits.remains>50)|(charges=2&recharge_time<5)|charges=3)&ap_check
+  if S.HalfMoon:IsCastable() and ((Player:BuffRemains(S.EclipseLunar) > S.HalfMoon:ExecuteTime() and (CaInc():CooldownRemains() > 50 or S.ConvoketheSpirits:CooldownRemains() > 50) or (S.HalfMoon:Charges() == 2 and S.HalfMoon:Recharge() < 5) or S.HalfMoon:Charges() == 3) and AP_Check(S.HalfMoon)) then
     if Cast(S.HalfMoon, nil, nil, not Target:IsSpellInRange(S.HalfMoon)) then return "half_moon boat 30"; end
   end
-  -- full_moon,if=(buff.eclipse_lunar.up|(charges=2&recharge_time<5)|charges=3)&ap_check
-  if S.FullMoon:IsCastable() and ((Player:BuffUp(S.EclipseLunar) or (S.FullMoon:Charges() == 2 and S.FullMoon:Recharge() < 5) or S.FullMoon:Charges() == 3) and AP_Check(S.FullMoon)) then
+  -- full_moon,if=(buff.eclipse_lunar.remains>execute_time&(cooldown.ca_inc.remains>50|cooldown.convoke_the_spirits.remains>50)|(charges=2&recharge_time<5)|charges=3)&ap_check
+  if S.FullMoon:IsCastable() and ((Player:BuffRemains(S.EclipseLunar) > S.FullMoon:ExecuteTime() and (CaInc():CooldownRemains() > 50 or S.ConvoketheSpirits:CooldownRemains()) or (S.FullMoon:Charges() == 2 and S.FullMoon:Recharge() < 5) or S.FullMoon:Charges() == 3) and AP_Check(S.FullMoon)) then
     if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon boat 32"; end
   end
   -- warrior_of_elune
