@@ -713,7 +713,7 @@ local function APL()
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=boat,if=runeforge.balance_of_all_things.equipped
-    if (true) then
+    if (BOATEquipped) then
       local ShouldReturn = Boat(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=st
