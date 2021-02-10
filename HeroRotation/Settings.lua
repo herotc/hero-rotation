@@ -33,7 +33,8 @@
       NotEnoughManaEnabled = false,
       RotationDebugOutput = false,
       ScaleUI = 1,
-      ScaleButtons = 1
+      ScaleButtons = 1,
+      ScaleHotkey = 1
     },
     APL = {}
   };

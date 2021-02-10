@@ -160,6 +160,7 @@
     -- Keybind
     if Keybind then
       self.Keybind:SetText(Keybind);
+      self.Keybind:SetScale(HR.GUISettings.General.ScaleHotkey);
     else
       self.Keybind:SetText("");
     end
