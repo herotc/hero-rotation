@@ -8,6 +8,7 @@ move-folders:
      HeroRotation/HeroRotation: HeroRotation
      HeroRotation/HeroRotation_DeathKnight: HeroRotation_DeathKnight
      HeroRotation/HeroRotation_DemonHunter: HeroRotation_DemonHunter
+     HeroRotation/HeroRotation_Druid: HeroRotation_Druid
      HeroRotation/HeroRotation_Hunter: HeroRotation_Hunter
      HeroRotation/HeroRotation_Mage: HeroRotation_Mage
      HeroRotation/HeroRotation_Monk: HeroRotation_Monk
