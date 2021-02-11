@@ -135,6 +135,54 @@ Spell.Warlock.Affliction = {
 
 }
 
+Spell.Warlock.Destruction = {
+  -- Racials
+  Berserking                            = Spell(26297),
+  BloodFury                             = Spell(20572),
+  Fireblood                             = Spell(265221),
+
+  -- Base Abilities
+  BackdraftBuff                         = Spell(117828),
+  ChaosBolt                             = Spell(116858),
+  Conflagrate                           = Spell(17962),
+  Havoc                                 = Spell(80240),
+  HavocDebuff                           = Spell(80240),
+  Immolate                              = Spell(348),
+  ImmolateDebuff                        = Spell(157736),
+  Incinerate                            = Spell(29722),
+  RainofFire                            = Spell(5740),
+  RainofFireDebuff                      = Spell(5740),
+  SummonPet                             = Spell(688),
+  SummonInfernal                        = Spell(1122),
+
+  -- Talents
+  Cataclysm                             = Spell(152108),
+  ChannelDemonfire                      = Spell(196447),
+  DarkSoulInstability                   = Spell(113858),
+  DarkSoulInstabilityBuff               = Spell(113858),
+  Eradication                           = Spell(196412),
+  EradicationDebuff                     = Spell(196414),
+  FireandBrimstone                      = Spell(196408),
+  Flashover                             = Spell(267115),
+  GrimoireofSacrifice                   = Spell(108503),
+  GrimoireofSacrificeBuff               = Spell(196099),
+  InternalCombustion                    = Spell(266134),
+  SoulFire                              = Spell(6353),
+  RoaringBlaze                          = Spell(205184),
+  RoaringBlazeDebuff                    = Spell(205184),
+  Shadowburn                            = Spell(17877),
+  Inferno                               = Spell(270545),
+
+  -- Covenant Abilities
+  DecimatingBolt                        = Spell(325289),
+  ImpendingCatastrophe                  = Spell(321792), -- Splash, 8/10/12/15?
+  ScouringTithe                         = Spell(312321),
+  SoulRot                               = Spell(325640), -- Splash, 15
+
+  -- Legendary Effects
+  -- to be completed
+}
+
 -- Items
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Demonology = {
@@ -142,5 +190,9 @@ Item.Warlock.Demonology = {
 }
 
 Item.Warlock.Affliction = {
+  PotionofSpectralIntellect             = Item(307096)
+}
+
+Item.Warlock.Destruction = {
   PotionofSpectralIntellect             = Item(307096)
 }

@@ -13,7 +13,7 @@ local HR      = HeroRotation
 -- Spells
 local SpellAffli   = Spell.Warlock.Affliction
 local SpellDemo    = Spell.Warlock.Demonology
---local SpellDestro  = Spell.Warlock.Destruction
+local SpellDestro  = Spell.Warlock.Destruction
 -- Lua
 
 --SpellAffli.AbsoluteCorruption = Spell(196103)
@@ -35,7 +35,7 @@ HL.AddCoreOverride ("Player.SoulShardsP",
     end
   end
   , 265)
-  
+
 local AffOldSpellIsCastable
 AffOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
@@ -188,24 +188,62 @@ HL.AddCoreOverride ("Player.SoulShardsP",
 , 266)
 
 -- Destruction, ID: 267
---[[local DestroOldSpellIsCastableP
-DestroOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
+local DestroOldSpellIsCastable
+DestroOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local RangeOK = true
     if Range then
       local RangeUnit = ThisUnit or Target
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
-    local BaseCheck = DestroOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = DestroOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellDestro.SummonPet then
-      return BaseCheck and not Pet:IsActive()
+      return BaseCheck and Player:SoulShardsP() > 0 and not (Pet:IsActive() or Player:BuffUp(SpellDestro.GrimoireofSacrificeBuff))
     elseif self == SpellDestro.Cataclysm then
       return BaseCheck and not Player:IsCasting(SpellDestro.Cataclysm)
     else
       return BaseCheck
     end
   end
-, 267)]]
+, 267)
+
+local DestroOldSpellIsReady
+DestroOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local RangeOK = true
+    if Range then
+      local RangeUnit = ThisUnit or Target
+      RangeOK = RangeUnit:IsInRange( Range, AoESpell )
+    end
+    local BaseCheck = DestroOldSpellIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellDestro.Immolate or self == SpellDestro.DecimatingBolt or self == SpellDestro.ScouringTithe or self == SpellDestro.SoulRot then
+      return BaseCheck and not Player:IsCasting(self)
+    else
+      return BaseCheck
+    end
+  end
+, 267)
+
+HL.AddCoreOverride ("Player.SoulShardsP",
+  function ()
+    local Shard = Player:SoulShards()
+    if not Player:IsCasting() then
+      return Shard
+    else
+      if Player:IsCasting(SpellDestro.ChaosBolt) then
+        return Shard - 2
+      elseif Player:IsCasting(SpellDestro.SummonImp) or Player:IsCasting(SpellDestro.Shadowburn) then
+        return Shard - 1
+      elseif Player:IsCasting(SpellDestro.Incinerate) then
+        return Shard + 0.2
+      elseif Player:IsCasting(SpellDestro.SoulFire) then
+        return Shard + 1
+      else
+        return Shard
+      end
+    end
+  end
+, 267)
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP",
