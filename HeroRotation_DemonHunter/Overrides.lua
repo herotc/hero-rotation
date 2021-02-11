@@ -30,6 +30,17 @@ HavocOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 , 577)
 
 -- Vengeance, ID: 581
+local VengOldSpellIsCastable
+VengOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = VengOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellVengeance.ImmolationAura and IsInJailersTower() then
+      return BaseCheck and Player:BuffDown(SpellVengeance.ImmolationAuraBuff)
+    else
+      return BaseCheck
+    end
+  end
+, 581)
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP", 
