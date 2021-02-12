@@ -444,7 +444,7 @@ local function APL()
     -- variable,name=major_cooldowns_active,value=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active|buff.dark_transformation.up
     VarMajorCDsActive = (VarGargoyleActive or Player:BuffUp(S.UnholyAssaultBuff) or S.ArmyoftheDamned:IsAvailable() and VarApocGhoulActive or Pet:BuffUp(S.DarkTransformation))
     -- Manually added: epidemic,if=!variable.pooling_runic_power&active_enemies=0
-    if S.Epidemic:IsReady() and S.VirulentPlagueDebuff:AuraActiveCount() > 1 and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
+    if S.Epidemic:IsReady() and AoEON() and S.VirulentPlagueDebuff:AuraActiveCount() > 1 and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
       if Cast(S.Epidemic, nil, nil, not Target:IsInRange(30)) then return "epidemic out_of_range"; end
     end
     -- Manually added: death_coil,if=!variable.pooling_runic_power&active_enemies=0
