@@ -267,7 +267,7 @@
 
       PartFrame.Keybind:SetText(Keybinds[i]);
       -- Keybind
-      if Keybind then
+      if Keybinds then
         PartFrame.Keybind:SetText(Keybinds[i]);
       else
         PartFrame.Keybind:SetText("");
@@ -343,6 +343,7 @@
     -- Keybind
     if Keybind then
       IconFrame.Keybind:SetText(Keybind);
+      IconFrame.Keybind:SetScale(HR.GUISettings.General.ScaleHotkey * 0.85);
     else
       IconFrame.Keybind:SetText("");
     end
@@ -390,17 +391,34 @@
       self.Texture:SetTexCoord(.08, .92, .08, .92);
       HR:CreateBackdrop(self);
     end
+    -- Keybind
+    local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+    self.Keybind = KeybindFrame;
+    KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE");
+    KeybindFrame:SetAllPoints(true);
+    KeybindFrame:SetJustifyH("RIGHT");
+    KeybindFrame:SetJustifyV("TOP");
+    KeybindFrame:SetPoint("TOPRIGHT");
+    KeybindFrame:SetTextColor(0.8,0.8,0.8,1);
+    KeybindFrame:SetText("");
     -- Display
     self:Show();
   end
   -- Change Icon
-  function HR.LeftIconFrame:ChangeIcon (Texture)
+  function HR.LeftIconFrame:ChangeIcon (Texture, Keybind)
     -- Texture
     self.Texture:SetTexture(Texture);
     self.Texture:SetAllPoints(self);
     -- Black Border Icon
     if HR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
       self.Backdrop:Show();
+    end
+    -- Keybind
+    if Keybind then
+      self.Keybind:SetText(Keybind);
+      self.Keybind:SetScale(HR.GUISettings.General.ScaleHotkey);
+    else
+      self.Keybind:SetText("");
     end
     -- Display
     if not self:IsVisible() then
@@ -501,17 +519,34 @@
       self.Texture:SetTexCoord(.08, .92, .08, .92);
       HR:CreateBackdrop(self);
     end
+    -- Keybind
+    local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+    self.Keybind = KeybindFrame;
+    KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE");
+    KeybindFrame:SetAllPoints(true);
+    KeybindFrame:SetJustifyH("RIGHT");
+    KeybindFrame:SetJustifyV("TOP");
+    KeybindFrame:SetPoint("TOPRIGHT");
+    KeybindFrame:SetTextColor(0.8,0.8,0.8,1);
+    KeybindFrame:SetText("");
     -- Display
     self:Show();
   end
   -- Change Icon
-  function HR.SuggestedIconFrame:ChangeIcon (Texture)
+  function HR.SuggestedIconFrame:ChangeIcon (Texture, Keybind)
     -- Texture
     self.Texture:SetTexture(Texture);
     self.Texture:SetAllPoints(self);
     -- Black Border Icon
     if HR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
       self.Backdrop:Show();
+    end
+    -- Keybind
+    if Keybind then
+      self.Keybind:SetText(Keybind);
+      self.Keybind:SetScale(HR.GUISettings.General.ScaleHotkey * 0.85);
+    else
+      self.Keybind:SetText("");
     end
     -- Display
     if not self:IsVisible() then
@@ -539,17 +574,34 @@
       self.Texture:SetTexCoord(.08, .92, .08, .92);
       HR:CreateBackdrop(self);
     end
+    -- Keybind
+    local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+    self.Keybind = KeybindFrame;
+    KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE");
+    KeybindFrame:SetAllPoints(true);
+    KeybindFrame:SetJustifyH("RIGHT");
+    KeybindFrame:SetJustifyV("TOP");
+    KeybindFrame:SetPoint("TOPRIGHT");
+    KeybindFrame:SetTextColor(0.8,0.8,0.8,1);
+    KeybindFrame:SetText("");
     -- Display
     self:Show();
   end
   -- Change Icon
-  function HR.RightSuggestedIconFrame:ChangeIcon (Texture)
+  function HR.RightSuggestedIconFrame:ChangeIcon (Texture, Keybind)
     -- Texture
     self.Texture:SetTexture(Texture);
     self.Texture:SetAllPoints(self);
     -- Black Border Icon
     if HR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
       self.Backdrop:Show();
+    end
+    -- Keybind
+    if Keybind then
+      self.Keybind:SetText(Keybind);
+      self.Keybind:SetScale(HR.GUISettings.General.ScaleHotkey * 0.85);
+    else
+      self.Keybind:SetText("");
     end
     -- Display
     if not self:IsVisible() then
