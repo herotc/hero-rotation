@@ -58,6 +58,11 @@ local VarApocGhoulActive
 local WoundSpender
 local AnyDnD
 
+-- Enemies Variables
+local EnemiesMelee, EnemiesMeleeCount
+local Enemies10ySplash
+local EnemiesWithoutVP
+
 -- Legendaries
 local SuperstrainEquipped = Player:HasLegendaryEquipped(30)
 local PhearomonesEquipped = Player:HasLegendaryEquipped(31)
@@ -86,6 +91,16 @@ end
 
 local function DeathStrikeHeal()
   return (Settings.General.SoloMode and (Player:HealthPercentage() < Settings.Commons.UseDeathStrikeHP or Player:HealthPercentage() < Settings.Commons.UseDarkSuccorHP and Player:BuffUp(S.DeathStrikeBuff)))
+end
+
+local function UnitsWithoutVP(enemies)
+  local WithoutVPCount = 0
+  for _, CycleUnit in pairs(enemies) do
+    if CycleUnit:DebuffDown(S.VirulentPlagueDebuff) then
+      WithoutVPCount = WithoutVPCount + 1
+    end
+  end
+  return WithoutVPCount
 end
 
 local function EvaluateTargetIfFilterFWStack(TargetUnit)
@@ -410,8 +425,15 @@ end
 local function APL()
   no_heal = not DeathStrikeHeal()
   EnemiesMelee = Player:GetEnemiesInMeleeRange(8)
-  Enemies30yd = Player:GetEnemiesInRange(30)
-  EnemiesMeleeCount = #EnemiesMelee
+  Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
+  if AoEON() then
+    EnemiesMeleeCount = #EnemiesMelee
+  else
+    EnemiesMeleeCount = 1
+  end
+
+  -- Check which enemies don't have Virulent Plague
+  EnemiesWithoutVP = UnitsWithoutVP(Enemies10ySplash)
 
   -- Is Gargoyle active?
   VarGargoyleActive = S.SummonGargoyle:TimeSinceLastCast() <= 30
@@ -443,6 +465,10 @@ local function APL()
     VarSTPlanning = (EnemiesMeleeCount == 1 or not AoEON())
     -- variable,name=major_cooldowns_active,value=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active|buff.dark_transformation.up
     VarMajorCDsActive = (VarGargoyleActive or Player:BuffUp(S.UnholyAssaultBuff) or S.ArmyoftheDamned:IsAvailable() and VarApocGhoulActive or Pet:BuffUp(S.DarkTransformation))
+    -- Manually added: Outbreak if targets are missing VP and out of range
+    if S.Outbreak:IsReady() and (EnemiesWithoutVP > 0 and EnemiesMeleeCount == 0) then
+      if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak out_of_range"; end
+    end
     -- Manually added: epidemic,if=!variable.pooling_runic_power&active_enemies=0
     if S.Epidemic:IsReady() and AoEON() and S.VirulentPlagueDebuff:AuraActiveCount() > 1 and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
       if Cast(S.Epidemic, nil, nil, not Target:IsInRange(30)) then return "epidemic out_of_range"; end
@@ -486,11 +512,13 @@ local function APL()
       end
     end
     -- outbreak,if=dot.virulent_plague.refreshable&!talent.unholy_blight&!raid_event.adds.exists
-    if S.Outbreak:IsReady() and (Target:DebuffRefreshable(S.VirulentPlagueDebuff) and not S.UnholyBlight:IsAvailable()) then
+    -- Manually added: Use following line's Unholy Blight logic
+    if S.Outbreak:IsReady() and (Target:DebuffRefreshable(S.VirulentPlagueDebuff) and (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and not S.UnholyBlight:CooldownUp())) then
       if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak main 18"; end
     end
     -- outbreak,if=dot.virulent_plague.refreshable&active_enemies>=2&(!talent.unholy_blight|talent.unholy_blight&cooldown.unholy_blight.remains)
-    if S.Outbreak:IsReady() and (Target:DebuffRefreshable(S.VirulentPlagueDebuff) and EnemiesMeleeCount >= 2 and (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and not S.UnholyBlight:CooldownUp())) then
+    -- Manually added: Also suggest if there are targets within splash range that don't have VP
+    if S.Outbreak:IsReady() and ((Target:DebuffRefreshable(S.VirulentPlagueDebuff) or EnemiesWithoutVP > 0) and EnemiesMeleeCount >= 2 and (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and not S.UnholyBlight:CooldownUp())) then
       if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak main 20"; end
     end
     -- outbreak,if=runeforge.superstrain&(dot.frost_fever.refreshable|dot.blood_plague.refreshable)
