@@ -51,7 +51,9 @@ HR.GUISettings.APL.DemonHunter = {
     }
   },
   Havoc = {
-    FelRushDisplayStyle = "Main Icon",
+    DisplayStyle = {
+      FelRush = "Main Icon",
+    },
     BlurHealthThreshold = 65,
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -86,7 +88,6 @@ CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.Conser
 CreateARPanelOptions(CP_Vengeance, "APL.DemonHunter.Vengeance")
 
 -- Havoc
-CreatePanelOption("Dropdown", CP_Havoc, "APL.DemonHunter.Havoc.FelRushDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Fel Rush Display Style", "Define which icon display style to use for Fel Rush.")
 CreatePanelOption("CheckButton", CP_Havoc, "APL.DemonHunter.Havoc.ConserveFelRush", "Conserve Fel Rush", "Save at least 1 Fel Rush charge for mobility.")
 CreatePanelOption("Slider", CP_Havoc, "APL.DemonHunter.Havoc.BlurHealthThreshold", {5, 100, 5}, "Blur Health Threshold", "Suggest Blur when below this health percentage.")
 CreateARPanelOptions(CP_Havoc, "APL.DemonHunter.Havoc")
