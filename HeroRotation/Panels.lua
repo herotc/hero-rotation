@@ -66,7 +66,7 @@
         CreatePanelOption("CheckButton", Panel, Setting, "Show: " .. Name, "Enable if you want to show when to use " .. Name .. ".");
       end,
       DisplayStyle = function(Panel, Setting, Name)
-        CreatePanelOption("Dropdown", Panel, Setting, {"Main Icon", "Suggested", "Cooldown"}, "Display Style: " .. Name, "Define which icon display style to use for " .. Name .. ".");
+        CreatePanelOption("Dropdown", Panel, Setting, {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Display Style: " .. Name, "Define which icon display style to use for " .. Name .. ".");
       end,
       GCDasOffGCD = function(Panel, Setting, Name)
         CreatePanelOption("CheckButton", Panel, Setting, GCDName(Name), GCDDesc(Name));
