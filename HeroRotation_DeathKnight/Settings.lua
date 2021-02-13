@@ -66,7 +66,10 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Unholy = {
-    ArmyDisplayStyle = "SuggestedRight",
+    RaiseDeadCastLeft = false,
+    DisplayStyle = {
+      ArmyoftheDead = "SuggestedRight",
+    },
     GCDasOffGCD = {
       -- Abilities
       Apocalypse = false,
@@ -92,7 +95,7 @@ CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDarkSucc
 CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons");
 
 --Unholy Panels
-CreatePanelOption("Dropdown", CP_Unholy, "APL.DeathKnight.Unholy.ArmyDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Army of the Dead Display Style", "Define which icon display style to use for Army of the Dead.");
+CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.RaiseDeadCastLeft", "Raise Dead in CastLeft", "Enable this to ignore the Raise Dead DisplayStyle option and instead use CastLeft.");
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");
 
 --Frost Panels

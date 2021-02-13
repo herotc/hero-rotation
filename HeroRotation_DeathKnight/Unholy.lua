@@ -150,11 +150,15 @@ local function Precombat()
   -- snapshot_stats
   -- raise_dead
   if S.RaiseDead:IsCastable() then
-    if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead precombat 2"; end
+    if Settings.Unholy.RaiseDeadCastLeft then
+      if HR.CastLeft(S.RaiseDead) then return "raise_dead precombat 2 left"; end
+    else
+      if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead precombat 2 displaystyle"; end
+    end
   end
   -- Manually added: army_of_the_dead
   if S.ArmyoftheDead:IsReady() then
-    if Cast(S.ArmyoftheDead, nil, Settings.Unholy.ArmyDisplayStyle) then return "army_of_the_dead precombat 4"; end
+    if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyoftheDead) then return "army_of_the_dead precombat 4"; end
   end
   -- Manually added: festering_strike if in melee range
   if S.FesteringStrike:IsReady() and Target:IsSpellInRange(S.FesteringStrike) then
@@ -265,7 +269,7 @@ local function Cooldowns()
   end
   -- army_of_the_dead,if=cooldown.unholy_blight.remains<5&cooldown.dark_transformation.remains_expected<5&talent.unholy_blight|!talent.unholy_blight|fight_remains<35
   if S.ArmyoftheDead:IsReady() and (S.UnholyBlight:CooldownRemains() < 5 and S.DarkTransformation:CooldownRemains() < 5 and S.UnholyBlight:IsAvailable() or not S.UnholyBlight:IsAvailable() or HL.FilteredFightRemains(EnemiesMelee, "<", 35)) then
-    if Cast(S.ArmyoftheDead, nil, Settings.Unholy.ArmyDisplayStyle) then return "army_of_the_dead cooldowns 4"; end
+    if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyoftheDead) then return "army_of_the_dead cooldowns 4"; end
   end
   -- soul_reaper,target_if=target.time_to_pct_35<5&target.time_to_die>5
   if S.SoulReaper:IsReady() then
@@ -313,7 +317,11 @@ local function Cooldowns()
   end
   -- raise_dead,if=!pet.ghoul.active
   if S.RaiseDead:IsCastable() then
-    if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead cooldowns 26"; end
+    if Settings.Unholy.RaiseDeadCastLeft then
+      if HR.CastLeft(S.RaiseDead) then return "raise_dead cooldowns 26 left"; end
+    else
+      if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead cooldowns 26 displaystyle"; end
+    end
   end
   -- sacrificial_pact,if=active_enemies>=2&!buff.dark_transformation.up&!cooldown.dark_transformation.ready|fight_remains<gcd
   if S.SacrificialPact:IsReady() and (EnemiesMeleeCount >= 2 and Pet:BuffDown(S.DarkTransformation) and not S.DarkTransformation:CooldownUp() or HL.FilteredFightRemains(EnemiesMelee, "<", Player:GCD())) then
