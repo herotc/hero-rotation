@@ -81,8 +81,8 @@ local CP_Protection = CreateChildPanel(CP_Warrior, "Protection")
 CreateARPanelOptions(CP_Warrior, "APL.Warrior.Commons")
 CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.")
 CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
-CreatePanelOption("Dropdown", CP_Warrior, "APL.Warrior.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
-CreatePanelOption("Dropdown", CP_Warrior, "APL.Warrior.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for Covenant abilities.")
+CreatePanelOption("Dropdown", CP_Warrior, "APL.Warrior.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
+CreatePanelOption("Dropdown", CP_Warrior, "APL.Warrior.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for Covenant abilities.")
 
 -- Arms Settings
 CreateARPanelOptions(CP_Arms, "APL.Warrior.Arms")

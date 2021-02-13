@@ -124,8 +124,8 @@ local CP_Mistweaver = CreateChildPanel(CP_Monk, "Mistweaver");
 CreateARPanelOptions(CP_Monk, "APL.Monk.Commons");
 CreatePanelOption("CheckButton", CP_Monk, "APL.Monk.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
 CreatePanelOption("CheckButton", CP_Monk, "APL.Monk.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
-CreatePanelOption("Dropdown", CP_Monk, "APL.Monk.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-CreatePanelOption("Dropdown", CP_Monk, "APL.Monk.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
+CreatePanelOption("Dropdown", CP_Monk, "APL.Monk.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
+CreatePanelOption("Dropdown", CP_Monk, "APL.Monk.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
 
 -- Windwalker
 CreateARPanelOptions(CP_Windwalker, "APL.Monk.Windwalker");

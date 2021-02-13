@@ -80,8 +80,8 @@ CreateARPanelOptions(CP_Shaman, aplCommons);
 --CreatePanelOption("CheckButton", CP_Mage, "APL.Shaman.Commons.UseTimeWarp", "Use Time Warp (NYI)", "Enable this if you want the addon to show you when to use Time Warp.");
 CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
 CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
-CreatePanelOption("Dropdown", CP_Shaman, "APL.Shaman.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-CreatePanelOption("Dropdown", CP_Shaman, "APL.Shaman.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
+CreatePanelOption("Dropdown", CP_Shaman, "APL.Shaman.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
+CreatePanelOption("Dropdown", CP_Shaman, "APL.Shaman.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
 -- Enhancement
 CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement");
 -- Elemental
