@@ -69,21 +69,24 @@ HR.GUISettings.APL.DemonHunter = {
   }
 }
 
-  HR.GUI.LoadSettingsRecursively(HR.GUISettings)
-  local ARPanel = HR.GUI.Panel
-  local CP_DemonHunter = CreateChildPanel(ARPanel, "DemonHunter")
-  local CP_Havoc = CreateChildPanel(CP_DemonHunter, "Havoc")
-  local CP_Vengeance = CreateChildPanel(CP_DemonHunter, "Vengeance")
+HR.GUI.LoadSettingsRecursively(HR.GUISettings)
+local ARPanel = HR.GUI.Panel
+local CP_DemonHunter = CreateChildPanel(ARPanel, "DemonHunter")
+local CP_Havoc = CreateChildPanel(CP_DemonHunter, "Havoc")
+local CP_Vengeance = CreateChildPanel(CP_DemonHunter, "Vengeance")
 
+-- Commons
 CreateARPanelOptions(CP_DemonHunter, "APL.DemonHunter.Commons")
 
+-- Vengeance
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.MetamorphosisHealthThreshold", {5, 100, 5}, "Metamorphosis Health Threshold", "Suggest Metamorphosis when below this health percentage.")
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.FieryBrandHealthThreshold", {5, 100, 5}, "Fiery Brand Health Threshold", "Suggest Fiery Brand when below this health percentage.")
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.DemonSpikesHealthThreshold", {5, 100, 5}, "Demon Spikes Health Threshold", "Suggest Demon Spikes when below this health percentage.")
 CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.ConserveInfernalStrike", "Conserve Infernal Strike", "Save at least 1 Infernal Strike charge for mobility.")
 CreateARPanelOptions(CP_Vengeance, "APL.DemonHunter.Vengeance")
 
-CreatePanelOption("Dropdown", CP_Havoc, "APL.DemonHunter.Havoc.FelRushDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Fel Rush Display Style", "Define which icon display style to use for Fel Rush.")
+-- Havoc
+CreatePanelOption("Dropdown", CP_Havoc, "APL.DemonHunter.Havoc.FelRushDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Fel Rush Display Style", "Define which icon display style to use for Fel Rush.")
 CreatePanelOption("CheckButton", CP_Havoc, "APL.DemonHunter.Havoc.ConserveFelRush", "Conserve Fel Rush", "Save at least 1 Fel Rush charge for mobility.")
 CreatePanelOption("Slider", CP_Havoc, "APL.DemonHunter.Havoc.BlurHealthThreshold", {5, 100, 5}, "Blur Health Threshold", "Suggest Blur when below this health percentage.")
 CreateARPanelOptions(CP_Havoc, "APL.DemonHunter.Havoc")
