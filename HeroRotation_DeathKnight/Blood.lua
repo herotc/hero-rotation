@@ -207,7 +207,7 @@ local function Standard()
   end
   -- consumption
   if S.Consumption:IsCastable() then
-    if HR.Cast(S.Consumption, nil, nil, not Target:IsSpellInRange(S.Consumption)) then return "consumption"; end
+    if HR.Cast(S.Consumption, nil, Settings.Blood.DisplayStyle.Consumption, not Target:IsSpellInRange(S.Consumption)) then return "consumption"; end
   end
   -- blood_boil,if=charges_fractional>=1.1
   if S.BloodBoil:IsCastable() and (S.BloodBoil:ChargesFractional() >= 1.1) then

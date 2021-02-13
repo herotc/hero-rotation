@@ -452,7 +452,7 @@ local function Cooldowns()
   end
   -- breath_of_sindragosa,if=buff.pillar_of_frost.up
   if S.BreathofSindragosa:IsCastable() and Player:BuffUp(S.PillarofFrostBuff) then
-    if HR.Cast(S.BreathofSindragosa, nil, Settings.Frost.BoSDisplayStyle, not TargetIsInRange[8]) then return "breath_of_sindragosa cd 6"; end
+    if HR.Cast(S.BreathofSindragosa, nil, Settings.Frost.DisplayStyle.BoS, not TargetIsInRange[8]) then return "breath_of_sindragosa cd 6"; end
   end
   -- frostwyrms_fury,if=buff.pillar_of_frost.remains<gcd&buff.pillar_of_frost.up&!talent.obliteration
   if S.FrostwyrmsFury:IsCastable() and (Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() and Player:BuffUp(S.PillarofFrostBuff) and not S.Obliteration:IsAvailable()) then

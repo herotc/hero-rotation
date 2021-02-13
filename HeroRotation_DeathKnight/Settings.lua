@@ -39,7 +39,9 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Blood = {
-    ConsumptionDisplayStyle = "Suggested",
+    DisplayStyle = {
+      Consumption = "Suggested",
+    },
     PoolDuringBlooddrinker = false,
     GCDasOffGCD = {
       DancingRuneWeapon = false,
@@ -54,7 +56,9 @@ HR.GUISettings.APL.DeathKnight = {
   },
   Frost = {
     DisableBoSPooling = false,
-    BoSDisplayStyle = "Suggested",
+    DisplayStyle = {
+      BoS = "Suggested",
+    },
     GCDasOffGCD = {
       -- Abilities
       HornofWinter = true,
@@ -100,10 +104,8 @@ CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");
 
 --Frost Panels
 CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.DisableBoSPooling", "Disable BoS Pooling", "Enable this option to bypass the BoS Pooling function.");
-CreatePanelOption("Dropdown", CP_Frost, "APL.DeathKnight.Frost.BoSDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Breath of Sindragosa Display Style", "Define which icon display style to use for active Breath of Sindragosa.");
 CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost");
 
 --Blood Panels
-CreatePanelOption("Dropdown", CP_Blood, "APL.DeathKnight.Blood.ConsumptionDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Consumption Display Style", "Define which icon display style to use for Consumption.");
 CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBlooddrinker", "Pool: Blooddrinker", "Display the 'Pool' icon whenever you're channeling Blooddrinker as long as you shouldn't interrupt it.");
 CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood");
