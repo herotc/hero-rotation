@@ -88,7 +88,7 @@ local function Precombat()
   -- snapshot_stats
   if Everyone.TargetIsValid() then
     -- potion
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.Enabled.Potions then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion"; end
     end
     -- Manually added: Openers
@@ -237,7 +237,7 @@ local function Covenants()
   -- deaths_due,if=!buff.deaths_due.up|buff.deaths_due.remains<4|buff.crimson_scourge.up
   -- TODO: Fix buff.deaths_due. SimC references spell ID 324165, but no buff is given in-game
   if S.DeathsDue:IsReady() then
-    if HR.Cast(S.DeathsDue, nil, Settings.Commons.CovenantDisplayStyle) then return "deaths_due"; end
+    if HR.Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant) then return "deaths_due"; end
   end
   -- sacrificial_pact,if=(!covenant.night_fae|buff.deaths_due.remains>6)&!buff.dancing_rune_weapon.up&(pet.ghoul.remains<10|target.time_to_die<gcd)
   -- TODO: Fix buff.deaths_due. SimC references spell ID 324165, but no buff is given in-game
@@ -250,7 +250,7 @@ local function Covenants()
   end
   -- swarming_mist,if=!buff.dancing_rune_weapon.up
   if S.SwarmingMist:IsReady() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
-    if HR.Cast(S.SwarmingMist, nil, Settings.Commons.CovenantDisplayStyle) then return "swarming_mist"; end
+    if HR.Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant) then return "swarming_mist"; end
   end
   -- marrowrend,if=covenant.necrolord&buff.bone_shield.stack<=0
   if S.Marrowrend:IsReady() and (Player:Covenant() == "Necrolord" and Player:BuffStack(S.BoneShieldBuff) == 0) then
@@ -258,11 +258,11 @@ local function Covenants()
   end
   -- abomination_limb,if=!buff.dancing_rune_weapon.up
   if S.AbominationLimb:IsCastable() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
-    if HR.Cast(S.AbominationLimb, nil, Settings.Commons.CovenantDisplayStyle) then return "abomination_limb"; end
+    if HR.Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb"; end
   end
   -- shackle_the_unworthy,if=cooldown.dancing_rune_weapon.remains<3|!buff.dancing_rune_weapon.up
   if S.ShackleTheUnworthy:IsCastable() and (S.DancingRuneWeapon:CooldownRemains() < 3 or Player:BuffDown(S.DancingRuneWeaponBuff)) then
-    if HR.Cast(S.ShackleTheUnworthy, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy"; end
+    if HR.Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy"; end
   end
 end
 
@@ -329,19 +329,19 @@ local function APL()
       end
     end
     -- potion,if=buff.dancing_rune_weapon.up
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffUp(S.DancingRuneWeaponBuff)) then
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.DancingRuneWeaponBuff)) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion"; end
     end
     -- use_items
-    if (true) then
+    if (Settings.Commons.Enabled.Trinkets) then
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
-        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+        if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
     -- raise_dead
     if S.RaiseDead:IsCastable() then
-      if HR.Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead"; end
+      if HR.Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead"; end
     end
     -- blooddrinker,if=!buff.dancing_rune_weapon.up&(!covenant.night_fae|buff.deaths_due.remains>7)
     -- TODO: Fix buff.deaths_due. SimC references spell ID 324165, but no buff is given in-game
@@ -354,7 +354,7 @@ local function APL()
     end
     -- raise_dead
     if S.RaiseDead:IsCastable() then
-      if HR.Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead"; end
+      if HR.Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead"; end
     end
     -- death_strike,if=fight_remains<3
     if S.DeathStrike:IsReady() and (HL.BossFilteredFightRemains("<", 3)) then

@@ -355,45 +355,45 @@ end
 local function Covenants()
   -- deaths_due,if=raid_event.adds.in>15|!raid_event.adds.exists|active_enemies>=2
   if S.DeathsDue:IsCastable() then
-    if HR.Cast(S.DeathsDue, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "deaths due covenant"; end
+    if HR.Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "deaths due covenant"; end
   end
   -- swarming_mist,if=active_enemies=1&runic_power.deficit>3&cooldown.pillar_of_frost.remains<3&!talent.breath_of_sindragosa&(!raid_event.adds.exists|raid_event.adds.in>15)
   if S.SwarmingMist:IsCastable() and (EnemiesCount10yd == 1 and Player:RunicPowerDeficit() > 3 and S.PillarofFrost:CooldownRemains() < 3 and not S.BreathofSindragosa:IsAvailable()) then
-    if HR.Cast(S.SwarmingMist, Settings.Commons.CovenantDisplayStyle, nil, not TargetIsInRange[10]) then return "swarming mist st"; end
+    if HR.Cast(S.SwarmingMist, Settings.Commons.DisplayStyle.Covenant, nil, not TargetIsInRange[10]) then return "swarming mist st"; end
   end
   -- swarming_mist,if=active_enemies>=2&!talent.breath_of_sindragosa
   if S.SwarmingMist:IsCastable() and (EnemiesCount10yd >= 2 and not S.BreathofSindragosa:IsAvailable()) then
-    if HR.Cast(S.SwarmingMist, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "swarming mist aoe"; end
+    if HR.Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "swarming mist aoe"; end
   end
   --swarming_mist,if=talent.breath_of_sindragosa&(buff.breath_of_sindragosa.up&(active_enemies=1&runic_power.deficit>40|active_enemies>=2&runic_power.deficit>60)|!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains)
   if S.SwarmingMist:IsCastable() and (S.BreathofSindragosa:IsAvailable() and (Player:BuffUp(S.BreathofSindragosa) and (EnemiesCount10yd == 1 and Player:RunicPowerDeficit() > 40 or EnemiesCount10yd >= 2 and Player:RunicPowerDeficit() > 60) or Player:BuffDown(S.BreathofSindragosa) and not S.BreathofSindragosa:CooldownUp())) then
-    if HR.Cast(S.SwarmingMist, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "swarming mist bos"; end
+    if HR.Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "swarming mist bos"; end
   end
   --abomination_limb,if=active_enemies=1&cooldown.pillar_of_frost.remains<3&(!raid_event.adds.exists|raid_event.adds.in>15)
   if S.AbominationLimb:IsCastable() and (EnemiesCount10yd == 1 and S.PillarofFrost:CooldownRemains() < 3) then
-    if HR.Cast(S.AbominationLimb, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "abomination limb st"; end
+    if HR.Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "abomination limb st"; end
   end
   --abomination_limb,if=active_enemies>=2
   if S.AbominationLimb:IsCastable() and EnemiesCount10yd >= 2 then
-    if HR.Cast(S.AbominationLimb, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "abomination limb aoe"; end
+    if HR.Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "abomination limb aoe"; end
   end
   --shackle_the_unworthy,if=active_enemies=1&cooldown.pillar_of_frost.remains<3&(!raid_event.adds.exists|raid_event.adds.in>15)
   if S.ShackleTheUnworthy:IsCastable() and (EnemiesCount10yd == 1 and S.PillarofFrost:CooldownRemains() < 3) then
-    if HR.Cast(S.ShackleTheUnworthy, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "shackle unworthy st"; end
+    if HR.Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "shackle unworthy st"; end
   end
   --shackle_the_unworthy,if=active_enemies>=2
   if S.ShackleTheUnworthy:IsCastable() and EnemiesCount10yd >= 2 then
-    if HR.Cast(S.ShackleTheUnworthy, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "shackle unworthy aoe"; end
+    if HR.Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "shackle unworthy aoe"; end
   end
 end
 
 
 local function Cooldowns()
   -- use_items,if=cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20
-    if S.PillarofFrost:CooldownUp() or S.PillarofFrost:CooldownRemains() > 20 then
+    if Settings.Commons.Enabled.Trinkets and S.PillarofFrost:CooldownUp() or S.PillarofFrost:CooldownRemains() > 20 then
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
-        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+        if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
   -- potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
@@ -472,7 +472,7 @@ local function Cooldowns()
   end 
   -- raise_dead,if=buff.pillar_of_frost.up
   if S.RaiseDead:IsCastable() and Player:BuffUp(S.PillarofFrostBuff) then
-    if HR.Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead cd 11"; end
+    if HR.Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead cd 11"; end
   end
   -- sacrificial_pact,if=active_enemies>=2&(pet.ghoul.remains<gcd|target.time_to_die<gcd)
   if S.SacrificialPact:IsCastable() and (EnemiesCount10yd >= 2 and ((S.RaiseDead:TimeSinceLastCast() > (55 + Player:GCD()) and S.RaiseDead:TimeSinceLastCast() < (60 - Player:GCD())) or Target:TimeToDie() < Player:GCD())) then

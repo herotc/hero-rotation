@@ -19,11 +19,16 @@ HR.GUISettings.APL.DeathKnight = {
   Commons = {
     UseDeathStrikeHP = 60, -- % HP threshold to try to heal with Death Strike
     UseDarkSuccorHP = 80, -- % HP threshold to use Dark Succor's free Death Strike
-    UsePotions = true,
-    UseTrinkets = true,
-    TrinketDisplayStyle = "Suggested",
-    CovenantDisplayStyle = "Suggested",
-    RaiseDeadDisplayStyle = "Suggested",
+    Enabled = {
+      Potions = true,
+      Trinkets = true,
+    },
+    DisplayStyle = {
+      Potions = "Suggested",
+      Covenant = "Suggested",
+      Trinkets = "Suggested",
+      RaiseDead = "Suggested",
+    },
     OffGCDasOffGCD = {
       Trinkets = true,
       Potions = true,
@@ -84,11 +89,6 @@ local CP_Blood = CreateChildPanel(CP_Deathknight, "Blood");
 --DeathKnight Panels
 CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDeathStrikeHP", { 1, 100, 1 }, "Use Death Strike on Low HP", "Set the HP threshold to use Death Strike (working only if Solo Mode is enabled).");
 CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDarkSuccorHP", { 1, 100, 1 }, "Use Death Strike to Consume Dark Succor", "Set the HP threshold to use Death Strike to Consume Dark Succor (working only if Solo Mode is enabled).");
-CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UsePotions", "Use Potions", "Use Potions as part of the rotation");
-CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
-CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Covenant Display Style (WIP)", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
-CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.RaiseDeadDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Raise Dead Display Style", "Define which icon display style to use for Raise Dead.");
 CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons");
 
 --Unholy Panels

@@ -150,7 +150,7 @@ local function Precombat()
   -- snapshot_stats
   -- raise_dead
   if S.RaiseDead:IsCastable() then
-    if Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead precombat 2"; end
+    if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead precombat 2"; end
   end
   -- Manually added: army_of_the_dead
   if S.ArmyoftheDead:IsReady() then
@@ -170,7 +170,7 @@ local function AOE_Setup()
   -- any_dnd,if=death_knight.fwounded_targets=active_enemies|raid_event.adds.exists&raid_event.adds.remains<=11
   if AnyDnD:IsReady() and (S.FesteringWoundDebuff:AuraActiveCount() == EnemiesMeleeCount) then
     if AnyDnD == S.DeathsDue then
-      if Cast(AnyDnD, nil, Settings.Commons.CovenantDisplayStyle) then return "any_dnd aoe_setup 2"; end
+      if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Covenant) then return "any_dnd aoe_setup 2"; end
     else
       if Cast(AnyDnD, Settings.Commons.OffGCDasOffGCD.DeathAndDecay) then return "any_dnd aoe_setup 4"; end
     end
@@ -178,7 +178,7 @@ local function AOE_Setup()
   -- any_dnd,if=death_knight.fwounded_targets>=5
   if AnyDnD:IsReady() and (S.FesteringWoundDebuff:AuraActiveCount() >= 5) then
     if AnyDnD == S.DeathsDue then
-      if Cast(AnyDnD, nil, Settings.Commons.CovenantDisplayStyle) then return "any_dnd aoe_setup 6"; end
+      if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Covenant) then return "any_dnd aoe_setup 6"; end
     else
       if Cast(AnyDnD, Settings.Commons.OffGCDasOffGCD.DeathAndDecay) then return "any_dnd aoe_setup 8"; end
     end
@@ -260,7 +260,7 @@ end
 
 local function Cooldowns()
   -- potion,if=variable.major_cooldowns_active|fight_remains<26
-  if I.PotionofSpectralStrength:IsReady() and Settings.Commons.UsePotions and (VarMajorCDsActive or HL.FilteredFightRemains(EnemiesMelee, "<", 26)) then
+  if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions and (VarMajorCDsActive or HL.FilteredFightRemains(EnemiesMelee, "<", 26)) then
     if Cast(I.PotionofSpectralStrength, Settings.Commons.OffGCDasOffGCD.Potions) then return "potion cooldowns 2"; end
   end
   -- army_of_the_dead,if=cooldown.unholy_blight.remains<5&cooldown.dark_transformation.remains_expected<5&talent.unholy_blight|!talent.unholy_blight|fight_remains<35
@@ -313,7 +313,7 @@ local function Cooldowns()
   end
   -- raise_dead,if=!pet.ghoul.active
   if S.RaiseDead:IsCastable() then
-    if Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead cooldowns 26"; end
+    if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead cooldowns 26"; end
   end
   -- sacrificial_pact,if=active_enemies>=2&!buff.dark_transformation.up&!cooldown.dark_transformation.ready|fight_remains<gcd
   if S.SacrificialPact:IsReady() and (EnemiesMeleeCount >= 2 and Pet:BuffDown(S.DarkTransformation) and not S.DarkTransformation:CooldownUp() or HL.FilteredFightRemains(EnemiesMelee, "<", Player:GCD())) then
@@ -324,31 +324,31 @@ end
 local function Covenants()
   -- swarming_mist,if=variable.st_planning&runic_power.deficit>16&(cooldown.apocalypse.remains|!talent.army_of_the_damned&cooldown.dark_transformation.remains)|fight_remains<11
   if S.SwarmingMist:IsReady() and (VarSTPlanning and Player:RunicPowerDeficit() > 16 and (not S.Apocalypse:CooldownUp() or not S.ArmyoftheDamned:IsAvailable() and not S.DarkTransformation:CooldownUp()) or HL.FilteredFightRemains(EnemiesMelee, "<", 11)) then
-    if Cast(S.SwarmingMist, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(10)) then return "swarming_mist covenants 2"; end
+    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(10)) then return "swarming_mist covenants 2"; end
   end
   -- swarming_mist,if=cooldown.apocalypse.remains&(active_enemies>=2&active_enemies<=5&runic_power.deficit>10+(active_enemies*6)|active_enemies>5&runic_power.deficit>40)
   if S.SwarmingMist:IsReady() and (not S.Apocalypse:CooldownUp() and (EnemiesMeleeCount >= 2 and EnemiesMeleeCount <= 5 and Player:RunicPowerDeficit() > 10 + (EnemiesMeleeCount * 6) or EnemiesMeleeCount > 5 and Player:RunicPowerDeficit() > 40)) then
-    if Cast(S.SwarmingMist, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(10)) then return "swarming_mist covenants 4"; end
+    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(10)) then return "swarming_mist covenants 4"; end
   end
   -- abomination_limb,if=variable.st_planning&!soulbind.lead_by_example&(cooldown.apocalypse.remains|!talent.army_of_the_damned&cooldown.dark_transformation.remains)&rune.time_to_4>(3+buff.runic_corruption.remains)|fight_remains<21
   if S.AbominationLimb:IsCastable() and (VarSTPlanning and not S.LeadByExample:SoulbindEnabled() and (not S.Apocalypse:CooldownUp() or not S.ArmyoftheDamned:IsAvailable() and not S.DarkTransformation:CooldownUp()) and Player:RuneTimeToX(4) > (3 + Player:BuffRemains(S.RunicCorruptionBuff)) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
-    if Cast(S.AbominationLimb, nil, Settings.Commons.CovenantDisplayStyle) then return "abomination_limb covenants 6"; end
+    if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 6"; end
   end
   -- abomination_limb,if=variable.st_planning&soulbind.lead_by_example&(dot.unholy_blight_dot.remains>11|!talent.unholy_blight&cooldown.dark_transformation.remains)
   if S.AbominationLimb:IsCastable() and (VarSTPlanning and S.LeadByExample:SoulbindEnabled() and (Target:DebuffRemains(S.UnholyBlightDebuff) > 11 or not S.UnholyBlight:IsAvailable() and not S.DarkTransformation:CooldownUp())) then
-    if Cast(S.AbominationLimb, nil, Settings.Commons.CovenantDisplayStyle) then return "abomination_limb covenants 8"; end
+    if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 8"; end
   end
   -- abomination_limb,if=active_enemies>=2&rune.time_to_4>(3+buff.runic_corruption.remains)
   if S.AbominationLimb:IsCastable() and (EnemiesMeleeCount >= 2 and Player:RuneTimeToX(4) > (3 + Player:BuffRemains(S.RunicCorruptionBuff))) then
-    if Cast(S.AbominationLimb, nil, Settings.Commons.CovenantDisplayStyle) then return "abomination_limb covenants 10"; end
+    if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 10"; end
   end
   -- shackle_the_unworthy,if=variable.st_planning&(cooldown.apocalypse.remains|!talent.army_of_the_damned&cooldown.dark_transformation.remains)|fight_remains<15
   if S.ShackleTheUnworthy:IsCastable() and (VarSTPlanning and (not S.Apocalypse:CooldownUp() or not S.ArmyoftheDamned:CooldownUp() and not S.DarkTransformation:CooldownUp()) or HL.FilteredFightRemains(EnemiesMelee, "<", 15)) then
-    if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 12"; end
+    if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 12"; end
   end
   -- shackle_the_unworthy,if=active_enemies>=2&(death_and_decay.ticking|raid_event.adds.remains<=14)
   if S.ShackleTheUnworthy:IsCastable() and (EnemiesMeleeCount >= 2 and (Player:BuffUp(S.DeathAndDecayBuff))) then
-    if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 14"; end
+    if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 14"; end
   end
 end
 
@@ -364,7 +364,7 @@ local function Generic()
   -- any_dnd,if=cooldown.apocalypse.remains&(talent.defile.enabled|covenant.night_fae|runeforge.phearomones)&(!variable.pooling_runes|fight_remains<5)
   if AnyDnD:IsReady() and (not S.Apocalypse:CooldownUp() and (S.Defile:IsAvailable() or Player:Covenant() == "Night Fae" or PhearomonesEquipped) and (not VarPoolingRunes or HL.FilteredFightRemains(EnemiesMelee, "<", 5))) then
     if AnyDnD == S.DeathsDue then
-      if Cast(AnyDnD, nil, Settings.Commons.CovenantDisplayStyle) then return "any_dnd generic 6"; end
+      if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Covenant) then return "any_dnd generic 6"; end
     else
       if Cast(AnyDnD, Settings.Commons.OffGCDasOffGCD.DeathAndDecay) then return "any_dnd generic 8"; end
     end
@@ -397,26 +397,26 @@ end
 
 local function Trinkets()
   -- use_item,name=inscrutable_quantum_device,if=(cooldown.unholy_blight.remains|cooldown.dark_transformation.remains)&(pet.army_ghoul.active|pet.apoc_ghoul.active&!talent.army_of_the_damned|target.time_to_pct_20<5)|fight_remains<21
-  if I.InscrutableQuantumDevice:IsEquippedAndReady() and ((not S.UnholyBlight:CooldownUp() or not S.DarkTransformation:CooldownUp()) and (S.ArmyoftheDead:TimeSinceLastCast() <= 30 or VarApocGhoulActive and not S.ArmyoftheDamned:IsAvailable() or Target:TimeToX(20) < 5) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
-    if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "inscrutable_quantum_device trinkets 2"; end
+  if I.InscrutableQuantumDevice:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and ((not S.UnholyBlight:CooldownUp() or not S.DarkTransformation:CooldownUp()) and (S.ArmyoftheDead:TimeSinceLastCast() <= 30 or VarApocGhoulActive and not S.ArmyoftheDamned:IsAvailable() or Target:TimeToX(20) < 5) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
+    if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device trinkets 2"; end
   end
   -- use_item,name=macabre_sheet_music,if=cooldown.apocalypse.remains<5&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<21
-  if I.MacabreSheetMusic:IsEquippedAndReady() and (S.Apocalypse:CooldownRemains() < 5 and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
-    if Cast(I.MacabreSheetMusic, nil, Settings.Commons.TrinketDisplayStyle) then return "macabre_sheet_music trinkets 4"; end
+  if I.MacabreSheetMusic:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (S.Apocalypse:CooldownRemains() < 5 and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
+    if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music trinkets 4"; end
   end
   -- use_item,name=dreadfire_vessel,if=cooldown.apocalypse.remains&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<3
-  if I.DreadfireVessel:IsEquippedAndReady() and (not S.Apocalypse:CooldownUp() and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 3)) then
-    if Cast(I.DreadfireVessel, nil, Settings.Commons.TrinketDisplayStyle, not Target:IsInRange(50)) then return "dreadfire_vessel trinkets 6"; end
+  if I.DreadfireVessel:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (not S.Apocalypse:CooldownUp() and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 3)) then
+    if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel trinkets 6"; end
   end
   -- use_item,name=darkmoon_deck_voracity,if=cooldown.apocalypse.remains&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<21
-  if I.DarkmoonDeckVoracity:IsEquippedAndReady() and (not S.Apocalypse:CooldownUp() and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
-    if Cast(I.DarkmoonDeckVoracity, nil, Settings.Commons.TrinketDisplayStyle) then return "darkmoon_deck_voracity trinkets 8"; end
+  if I.DarkmoonDeckVoracity:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (not S.Apocalypse:CooldownUp() and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
+    if Cast(I.DarkmoonDeckVoracity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_voracity trinkets 8"; end
   end
   -- use_items,if=(cooldown.apocalypse.remains|buff.dark_transformation.up)&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)
-  if ((not S.Apocalypse:CooldownUp() or Pet:BuffUp(S.DarkTransformation)) and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0)) then
+  if (Settings.Commons.Enabled.Trinkets and (not S.Apocalypse:CooldownUp() or Pet:BuffUp(S.DarkTransformation)) and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0)) then
     local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
   end
 end
@@ -528,7 +528,7 @@ local function APL()
     -- wait_for_cooldown,name=soul_reaper,if=talent.soul_reaper&target.time_to_pct_35<5&fight_remains>5&cooldown.soul_reaper.remains<(gcd*0.75)&active_enemies=1
     -- TODO: Potentially add this wait_for_cooldown
     -- call_action_list,name=trinkets
-    if (Settings.Commons.UseTrinkets) then
+    if (Settings.Commons.Enabled.Trinkets) then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=covenants
