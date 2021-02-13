@@ -293,7 +293,7 @@ local function Cooldowns()
   end
   -- apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4
   if S.Apocalypse:IsCastable() and S.Apocalypse:IsUsable() and ((EnemiesMeleeCount == 1 or not AoEON()) and Target:DebuffStack(S.FesteringWoundDebuff) >= 4) then
-    if Cast(S.Apocalypse, nil, nil, not Target:IsSpellInRange(S.Apocalypse)) then return "apocalypse cooldowns 16"; end
+    if Cast(S.Apocalypse, Settings.Unholy.GCDasOffGCD.Apocalypse, nil, not Target:IsSpellInRange(S.Apocalypse)) then return "apocalypse cooldowns 16"; end
   end
   -- apocalypse,target_if=max:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack>=4&!death_and_decay.ticking
   if S.Apocalypse:IsCastable() and S.Apocalypse:IsUsable() then
@@ -313,7 +313,7 @@ local function Cooldowns()
   end
   -- raise_dead,if=!pet.ghoul.active
   if S.RaiseDead:IsCastable() then
-    if Cast(S.RaiseDead) then return "raise_dead cooldowns 26"; end
+    if Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead cooldowns 26"; end
   end
   -- sacrificial_pact,if=active_enemies>=2&!buff.dark_transformation.up&!cooldown.dark_transformation.ready|fight_remains<gcd
   if S.SacrificialPact:IsReady() and (EnemiesMeleeCount >= 2 and Pet:BuffDown(S.DarkTransformation) and not S.DarkTransformation:CooldownUp() or HL.FilteredFightRemains(EnemiesMelee, "<", Player:GCD())) then

@@ -61,9 +61,10 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Unholy = {
+    ArmyDisplayStyle = "SuggestedRight",
     GCDasOffGCD = {
       -- Abilities
-      ArmyoftheDead = true,
+      Apocalypse = false,
       DarkTransformation = true,
       Epidemic = false,
       SummonGargoyle = false,
@@ -85,20 +86,21 @@ CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDeathStr
 CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDarkSuccorHP", { 1, 100, 1 }, "Use Death Strike to Consume Dark Succor", "Set the HP threshold to use Death Strike to Consume Dark Succor (working only if Solo Mode is enabled).");
 CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UsePotions", "Use Potions", "Use Potions as part of the rotation");
 CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
-CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style (WIP)", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
-CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.RaiseDeadDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Raise Dead Display Style", "Define which icon display style to use for Raise Dead.");
+CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
+CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Covenant Display Style (WIP)", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
+CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.RaiseDeadDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Raise Dead Display Style", "Define which icon display style to use for Raise Dead.");
 CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons");
 
 --Unholy Panels
+CreatePanelOption("Dropdown", CP_Unholy, "APL.DeathKnight.Unholy.ArmyDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Army of the Dead Display Style", "Define which icon display style to use for Army of the Dead.");
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");
 
 --Frost Panels
 CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.DisableBoSPooling", "Disable BoS Pooling", "Enable this option to bypass the BoS Pooling function.");
-CreatePanelOption("Dropdown", CP_Frost, "APL.DeathKnight.Frost.BoSDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Breath of Sindragosa Display Style", "Define which icon display style to use for active Breath of Sindragosa.");
+CreatePanelOption("Dropdown", CP_Frost, "APL.DeathKnight.Frost.BoSDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Breath of Sindragosa Display Style", "Define which icon display style to use for active Breath of Sindragosa.");
 CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost");
 
 --Blood Panels
-CreatePanelOption("Dropdown", CP_Blood, "APL.DeathKnight.Blood.ConsumptionDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Consumption Display Style", "Define which icon display style to use for Consumption.");
+CreatePanelOption("Dropdown", CP_Blood, "APL.DeathKnight.Blood.ConsumptionDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Consumption Display Style", "Define which icon display style to use for Consumption.");
 CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBlooddrinker", "Pool: Blooddrinker", "Display the 'Pool' icon whenever you're channeling Blooddrinker as long as you shouldn't interrupt it.");
 CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood");
