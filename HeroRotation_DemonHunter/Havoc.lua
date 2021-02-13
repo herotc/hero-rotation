@@ -97,6 +97,8 @@ end
 local function CastFelRush()
   if Settings.Havoc.DisplayStyle.FelRush == "Suggested" then
     return CastSuggested(S.FelRush)
+  elseif Settings.Havoc.DisplayStyle.FelRush == "SuggestedRight" then
+    return HR.CastRightSuggested(S.FelRush)
   elseif Settings.Havoc.DisplayStyle.FelRush == "Cooldown" then
     if S.FelRush:TimeSinceLastDisplay() ~= 0 then
       return Cast(S.FelRush, { true, false } )
