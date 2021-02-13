@@ -267,7 +267,7 @@
 
       PartFrame.Keybind:SetText(Keybinds[i]);
       -- Keybind
-      if Keybinds then
+      if Keybind then
         PartFrame.Keybind:SetText(Keybinds[i]);
       else
         PartFrame.Keybind:SetText("");
