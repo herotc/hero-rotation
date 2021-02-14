@@ -301,7 +301,7 @@ local function Cooldowns()
   end
   -- apocalypse,target_if=max:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack>=4&!death_and_decay.ticking
   if S.Apocalypse:IsCastable() and S.Apocalypse:IsUsable() then
-    if Everyone.CastTargetIf(S.Apocalypse, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfApocalypse) then return "apocalypse cooldowns 18"; end
+    if Everyone.CastTargetIf(S.Apocalypse, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfApocalypse, not Target:IsSpellInRange(S.Apocalypse), Settings.Unholy.GCDasOffGCD.Apocalypse) then return "apocalypse cooldowns 18"; end
   end
   -- summon_gargoyle,if=runic_power.deficit<14&(cooldown.unholy_blight.remains<10|dot.unholy_blight_dot.remains)
   if S.SummonGargoyle:IsCastable() and (Player:RunicPowerDeficit() < 14 and (S.UnholyBlight:CooldownRemains() < 10 or Target:DebuffUp(S.UnholyBlightDebuff))) then
