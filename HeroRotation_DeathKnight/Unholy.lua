@@ -271,8 +271,8 @@ local function Cooldowns()
   if S.ArmyoftheDead:IsReady() and (S.UnholyBlight:CooldownRemains() < 5 and S.DarkTransformation:CooldownRemains() < 5 and S.UnholyBlight:IsAvailable() or not S.UnholyBlight:IsAvailable() or HL.FilteredFightRemains(EnemiesMelee, "<", 35)) then
     if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyoftheDead) then return "army_of_the_dead cooldowns 4"; end
   end
-  -- soul_reaper,target_if=target.time_to_pct_35<5&target.time_to_die>5
-  if S.SoulReaper:IsReady() then
+  -- soul_reaper,target_if=target.time_to_pct_35<5&target.time_to_die>5&active_enemies<=3
+  if S.SoulReaper:IsReady() and (EnemiesMeleeCount <= 3) then
     if ((Target:TimeToX(35) < 5 or Target:HealthPercentage() < 35) and Target:TimeToDie() > 5) then
       if Cast(S.SoulReaper, nil, nil, not Target:IsSpellInRange(S.SoulReaper)) then return "soul_reaper cooldowns 5"; end
     else
