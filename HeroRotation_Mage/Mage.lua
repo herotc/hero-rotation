@@ -82,9 +82,11 @@ Spell.Mage.Arcane = {
   ArcaneProdigy                         = Spell(336873),
   -- Legendaries (Shadowlands)
   ExpandedPotentialBuff                 = Spell(327495),
-  DisciplinaryCommandFireBuff           = Spell(327368),
+  SiphonStormBuff                       = Spell(332928),
+  DisciplinaryCommandBuff               = Spell(327365),
   DisciplinaryCommandFrostBuff          = Spell(327366),
-  SiphonStormBuff                       = Spell(327366)
+  DisciplinaryCommandFireBuff           = Spell(327368),
+  DisciplinaryCommandArcaneBuff         = Spell(327369)
 }
 
 Spell.Mage.Fire = {
@@ -100,6 +102,9 @@ Spell.Mage.Fire = {
   -- Abilities
   ArcaneIntellect                       = Spell(1459),
   ArcaneIntellectBuff                   = Spell(1459),
+  ArcaneExplosion                       = Spell(1449),
+  Frostbolt                             = Spell(116),
+  TimeWarp                              = Spell(80353),
   MirrorImage                           = Spell(55342),
   Pyroblast                             = Spell(11366),
   Combustion                            = Spell(190319),
@@ -113,6 +118,8 @@ Spell.Mage.Fire = {
   DragonsBreath                         = Spell(31661),
   Flamestrike                           = Spell(2120),
   Counterspell                          = Spell(2139),
+  FrostNova                             = Spell(122),
+  Ignite                                = Spell(12654),
   -- Talents
   Firestarter                           = Spell(205026),
   SearingTouch                          = Spell(269644),
@@ -120,11 +127,40 @@ Spell.Mage.Fire = {
   RuneofPowerBuff                       = Spell(116014),
   FlameOn                               = Spell(205029),
   AlexstraszasFury                      = Spell(235870),
+  FromTheAshes                          = Spell(342344),
   FlamePatch                            = Spell(205037),
   LivingBomb                            = Spell(44457),
   Kindling                              = Spell(155148),
+  Pyroclasm                             = Spell(269650),
   PyroclasmBuff                         = Spell(269651),
   Meteor                                = Spell(153561),
+  -- Covenant Abilities
+  Deathborne                            = Spell(324220),
+  DoorofShadows                         = Spell(300728),
+  Fleshcraft                            = Spell(324631),
+  MirrorsofTorment                      = Spell(314793),
+  RadiantSpark                          = Spell(307443),
+  RadiantSparkDebuff                    = Spell(307443),
+  RaidantSparkVulnerability             = Spell(307454),
+  ShiftingPower                         = Spell(314791), --Melee 15
+  Soulshape                             = Spell(310143),
+  WastelandPropriety                    = Spell(333251),
+  SiphonedMalice                        = Spell(337090),
+  GroveInvigoration                     = Spell(322721),
+  FieldOfBlossoms                       = Spell(319191),
+  IreOfTheAscended                      = Spell(337058),
+  -- Conduit
+  FlameAccretion                        = Spell(337224),
+  InfernalCascade                       = Spell(336821),
+  InfernalCascadeBuff                   = Spell(336832),
+  -- Legendaries (Shadowlands)
+  FirestormBuff                         = Spell(333100),
+  SunKingsBlessingBuff                  = Spell(333313),
+  GrislyIcicleBuff                      = Spell(333393),
+  DisciplinaryCommandBuff               = Spell(327365),
+  DisciplinaryCommandFrostBuff          = Spell(327366),
+  DisciplinaryCommandFireBuff           = Spell(327368),
+  DisciplinaryCommandArcaneBuff         = Spell(327369)
 }
 
 Spell.Mage.Frost = {
@@ -193,6 +229,9 @@ Spell.Mage.Frost = {
   -- Legendaries (Shadowlands)
   ExpandedPotentialBuff                 = Spell(327495),
   FreezingWindsBuff                     = Spell(327364),
+  SlickIceBuff                          = Spell(327508),
+  DisciplinaryCommandBuff               = Spell(327365),
+  DisciplinaryCommandFrostBuff          = Spell(327366),
   DisciplinaryCommandFireBuff           = Spell(327368),
   DisciplinaryCommandArcaneBuff         = Spell(327369)
 }

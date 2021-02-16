@@ -117,8 +117,8 @@ local function Cooldowns ()
   if S.RuneofPower:IsCastable() and not Player:IsCasting(S.RuneofPower) and Player:BuffDown(S.RuneofPowerBuff) and (S.IcyVeins:CooldownRemains() > S.RuneofPower:BaseDuration() or Target:TimeToDie() < S.RuneofPower:BaseDuration() + S.RuneofPower:CastTime() + Player:GCD()) then
     if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneOfPower) then return "rune_of_power cd 4"; end
   end
-  --icy_veins,if=buff.rune_of_power.down
-  if S.IcyVeins:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) then
+  --icy_veins,if=buff.rune_of_power.down&(buff.icy_veins.down|talent.rune_of_power)&(buff.slick_ice.down|active_enemies>=2)
+  if S.IcyVeins:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (Player:BuffDown(S.IcyVeins) or S.RuneofPower:IsAvailable()) and (Player:BuffDown(S.SlickIceBuff) or EnemiesCount8ySplash >= 2) then
     if HR.Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cd 5"; end
   end
   --time_warp,if=runeforge.temporal_warp.equipped&buff.exhaustion.up&(prev_off_gcd.icy_veins|fight_remains<30)
@@ -236,8 +236,8 @@ local function Single ()
   if S.FrozenOrb:IsCastable() then
     if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb, nil, not Target:IsInRange(40)) then return "frozen_orb single 2"; end
   end
-  --blizzard,if=buff.freezing_rain.up|active_enemies>=2|runeforge.glacial_fragments&remaining_winters_chill=2
-  if S.Blizzard:IsCastable() and (Player:BuffUp(S.FreezingRain) or EnemiesCount16ySplash >= 2 or (GlacialFragmentsEquipped and Target:DebuffStack(S.WintersChillDebuff) == 2)) then
+  --blizzard,if=buff.freezing_rain.up|active_enemies>=2
+  if S.Blizzard:IsCastable() and (Player:BuffUp(S.FreezingRain) or EnemiesCount16ySplash >= 2 then
     if HR.Cast(S.Blizzard, nil, nil, not Target:IsInRange(40)) then return "blizzard single 3"; end
   end
   --ray_of_frost,if=remaining_winters_chill=1&debuff.winters_chill.remains
