@@ -235,9 +235,14 @@ local function Ambush_Condition ()
     and (not S.CountTheOdds:ConduitEnabled() or Rogue.RtBRemains() > 10)
 end
 -- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
--- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
+-- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.remains>1+talent.killing_spree.enabled
 local function Blade_Flurry_Sync ()
-  return not AoEON() or EnemiesBFCount < 2 or Player:BuffUp(S.BladeFlurry)
+  return not AoEON() or EnemiesBFCount < 2 or (Player:BuffRemains(S.BladeFlurry) > 1 + num(S.KillingSpree:IsAvailable()))
+end
+
+-- Determine if we are allowed to use Vanish offensively in the current situation
+local function Vanish_DPS_Condition()
+  return Settings.Outlaw.UseDPSVanish and CDsON() and not (Everyone.IsSoloMode() and Player:IsTanking(Target))
 end
 
 local function CDs ()
@@ -251,7 +256,7 @@ local function CDs ()
   end
   if Target:IsSpellInRange(S.SinisterStrike) then
     -- # Using Ambush is a 2% increase, so Vanish can be sometimes be used as a utility spell unless using Master Assassin or Deathly Shadows
-    if Settings.Outlaw.UseDPSVanish and CDsON() and S.Vanish:IsCastable() and not Player:IsTanking(Target) and not Player:StealthUp(true, true) then
+    if S.Vanish:IsCastable() and Vanish_DPS_Condition() and not Player:StealthUp(true, true) then
       if not MarkoftheMasterAssassinEquipped then
         -- actions.cds+=/vanish,if=!runeforge.mark_of_the_master_assassin&!stealthed.all&variable.ambush_condition&(!runeforge.deathly_shadows|buff.deathly_shadows.down&combo_points<=2)
         if Ambush_Condition() and not Player:BuffUp(S.DeathlyShadowsBuff)
@@ -260,11 +265,19 @@ local function CDs ()
             if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish" end
         end
       else
-        -- actions.cds+=/vanish,if=runeforge.mark_of_the_master_assassin&master_assassin_remains=0&variable.blade_flurry_sync&(!cooldown.between_the_eyes.ready&variable.finish_condition|cooldown.between_the_eyes.ready&variable.ambush_condition)&(!conduit.count_the_odds|buff.roll_the_bones.remains>=10)
-        if Rogue.MasterAssassinsMarkRemains() <= 0 and Blade_Flurry_Sync()
-          and (not S.BetweentheEyes:CooldownUp() and Finish_Condition() or S.BetweentheEyes:CooldownUp() and Ambush_Condition())
-          and (not S.CountTheOdds:ConduitEnabled() or Rogue.RtBRemains() > 10) then
-          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)" end
+        -- actions.cds+=/variable,name=vanish_ma_condition,if=runeforge.mark_of_the_master_assassin&!talent.marked_for_death.enabled,value=(!cooldown.between_the_eyes.ready&variable.finish_condition)|(cooldown.between_the_eyes.ready&variable.ambush_condition)
+        -- actions.cds+=/variable,name=vanish_ma_condition,if=runeforge.mark_of_the_master_assassin&talent.marked_for_death.enabled,value=variable.finish_condition
+        -- actions.cds+=/vanish,if=variable.vanish_ma_condition&master_assassin_remains=0&variable.blade_flurry_sync
+        if Rogue.MasterAssassinsMarkRemains() <= 0 and Blade_Flurry_Sync() then
+          if S.MarkedforDeath:IsAvailable() then
+            if Finish_Condition() then
+              if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (MA+MfD)" end
+            end
+          else
+            if (not S.BetweentheEyes:CooldownUp() and Finish_Condition() or S.BetweentheEyes:CooldownUp() and Ambush_Condition()) then
+              if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (MA)" end
+            end
+          end
         end
       end
     end
@@ -276,25 +289,32 @@ local function CDs ()
     if S.FlagellationCleanse:IsReady() and Target:DebuffUp(S.Flagellation) and Target:DebuffRemains(S.Flagellation) < 2 then
       if HR.Cast(S.FlagellationCleanse, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation Cleanse" end
     end
-    -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!cooldown.killing_spree.up|!talent.killing_spree.enabled)
-    if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush)
-      and (not S.KillingSpree:CooldownUp() or not S.KillingSpree:IsAvailable()) then
+    -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up
+    if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush) then
       if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
     end
     -- actions.cds+=/roll_the_bones,if=master_assassin_remains=0&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
     if S.RolltheBones:IsReady() and Rogue.MasterAssassinsMarkRemains() <= 0 and (Rogue.RtBRemains() <= 3 or RtB_Reroll()) then
       if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones" end
     end
-    if Blade_Flurry_Sync() then
-        -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&(energy.time_to_max>2|spell_targets>2)
-        if CDsON() and S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and (EnergyTimeToMaxStable() > 2 or EnemiesBFCount > 2) then
-        if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree" end
-      end
-        -- blade_rush,if=variable.blade_flurry_sync&(energy.time_to_max>2|spell_targets>2)
-        if S.BladeRush:IsCastable() and Target:IsSpellInRange(S.BladeRush) and (EnergyTimeToMaxStable() > 2 or EnemiesBFCount > 2) then
-        if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
-      end
+  end
+  if Blade_Flurry_Sync() then
+    -- # Attempt to sync Killing Spree with Vanish for Master Assassin
+    -- actions.cds+=/variable,name=killing_spree_vanish_sync,value=!runeforge.mark_of_the_master_assassin|cooldown.vanish.remains>10|master_assassin_remains>2
+    -- # Use in 1-2T if BtE is up and won't cap Energy, or at 3T+ (2T+ with Deathly Shadows) or when Master Assassin is up.
+    -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&variable.killing_spree_vanish_sync&!stealthed.rogue&(debuff.between_the_eyes.up&energy.deficit>(energy.regen*2+15)|spell_targets.blade_flurry>(2-buff.deathly_shadows.up)|master_assassin_remains>0)
+    if CDsON() and S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and not Player:StealthUp(true, false)
+        and (not MarkoftheMasterAssassinEquipped or S.Vanish:CooldownRemains() > 10 or Rogue.MasterAssassinsMarkRemains() > 2 or not Vanish_DPS_Condition())
+        and (Target:DebuffUp(S.BetweentheEyes) and Player:EnergyDeficitPredicted() > (Player:EnergyRegen() * 2 + 10)
+          or EnemiesBFCount > (2 - num(Player:BuffUp(S.DeathlyShadowsBuff))) or Rogue.MasterAssassinsMarkRemains() > 0) then
+      if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree" end
     end
+      -- blade_rush,if=variable.blade_flurry_sync&(energy.time_to_max>2|spell_targets>2)
+      if S.BladeRush:IsCastable() and Target:IsSpellInRange(S.BladeRush) and (EnergyTimeToMaxStable() > 2 or EnemiesBFCount > 2) then
+      if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
+    end
+  end
+  if Target:IsSpellInRange(S.SinisterStrike) then
     if CDsON() then
       -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
       if Settings.Outlaw.UseDPSVanish and S.Shadowmeld:IsCastable() and Ambush_Condition() then
@@ -356,16 +376,17 @@ local function Stealth ()
 end
 
 local function Finish ()
-  -- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&buff.slice_and_dice.remains<(1+combo_points)*1.8
+  -- actions.finish=slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&refreshable
   -- Note: Added Player:BuffRemains(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
   if S.SliceandDice:IsCastable() and (HL.FilteredFightRemains(EnemiesBF, ">", Player:BuffRemains(S.SliceandDice), true) or Player:BuffRemains(S.SliceandDice) == 0)
     and Player:BuffRemains(S.SliceandDice) < (1 + Player:ComboPoints()) * 1.8 then
     if HR.CastPooling(S.SliceandDice) then return "Cast Slice and Dice" end
   end
   -- # BtE on cooldown to keep the Crit debuff up, unless the target is about to die
-  -- actions.finish=between_the_eyes,if=target.time_to_die>3
+  -- actions.finish+=/between_the_eyes,if=target.time_to_die>3
+  -- Note: Increased threshold to 4s to account for player reaction time
   if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes)
-    and (Target:FilteredTimeToDie(">", 3) or Target:TimeToDieIsNotValid()) and Rogue.CanDoTUnit(Target, BetweenTheEyesDMGThreshold) then
+    and (Target:FilteredTimeToDie(">", 4) or Target:TimeToDieIsNotValid()) and Rogue.CanDoTUnit(Target, BetweenTheEyesDMGThreshold) then
     if HR.CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
   end
   -- actions.finish+=/dispatch
@@ -376,7 +397,7 @@ end
 
 local function Build ()
   -- actions.build=sepsis
-  if CDsON() and S.Sepsis:IsReady() and Target:IsSpellInRange(S.Sepsis) then
+  if CDsON() and S.Sepsis:IsReady() and Target:IsSpellInRange(S.Sepsis) and Rogue.MasterAssassinsMarkRemains() <= 0 then
     if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
   end
   -- actions.build+=/ghostly_strike
@@ -472,6 +493,7 @@ local function APL ()
     -- Opener
     if Everyone.TargetIsValid() then
       -- Precombat CDs
+      -- actions.precombat+=/marked_for_death,precombat_seconds=10,if=raid_event.adds.in>25
       if CDsON() and S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1 then
         if Settings.Commons.STMfDAsDPSCD then
           if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
@@ -479,9 +501,11 @@ local function APL ()
           if HR.CastSuggested(S.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
         end
       end
+      -- actions.precombat+=/roll_the_bones,precombat_seconds=2
       if S.RolltheBones:IsReady() and (Rogue.RtBRemains() <= 3 or RtB_Reroll()) then
         if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones (Opener)" end
       end
+      -- actions.precombat+=/slice_and_dice,precombat_seconds=1
       if S.SliceandDice:IsReady() and Player:BuffRemains(S.SliceandDice) < (1 + Player:ComboPoints()) * 1.8 then
         if HR.CastPooling(S.SliceandDice) then return "Cast Slice and Dice (Opener)" end
       end
@@ -568,7 +592,7 @@ end
 HR.SetAPL(260, APL, Init)
 
 --- ======= SIMC =======
--- Last Update: 2021-01-26
+-- Last Update: 2021-02-15
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=apply_poison
@@ -577,9 +601,9 @@ HR.SetAPL(260, APL, Init)
 -- actions.precombat+=/food
 -- # Snapshot raid buffed stats before combat begins and pre-potting is done.
 -- actions.precombat+=/snapshot_stats
--- actions.precombat+=/marked_for_death,precombat_seconds=5,if=raid_event.adds.in>25
--- actions.precombat+=/roll_the_bones,precombat_seconds=1
--- actions.precombat+=/slice_and_dice,precombat_seconds=2
+-- actions.precombat+=/marked_for_death,precombat_seconds=10,if=raid_event.adds.in>25
+-- actions.precombat+=/roll_the_bones,precombat_seconds=2
+-- actions.precombat+=/slice_and_dice,precombat_seconds=1
 -- actions.precombat+=/stealth
 
 -- # Executed every time the actor is available.
@@ -594,7 +618,7 @@ HR.SetAPL(260, APL, Init)
 -- # Finish at maximum CP but avoid wasting Broadside and Quick Draw bonus combo points
 -- actions+=/variable,name=finish_condition,value=combo_points>=cp_max_spend-buff.broadside.up-(buff.opportunity.up*talent.quick_draw.enabled)|combo_points=animacharged_cp
 -- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
--- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
+-- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.remains>1+talent.killing_spree.enabled
 -- actions+=/run_action_list,name=stealth,if=stealthed.all
 -- actions+=/call_action_list,name=cds
 -- actions+=/run_action_list,name=finish,if=variable.finish_condition
@@ -621,16 +645,22 @@ HR.SetAPL(260, APL, Init)
 -- actions.cds=blade_flurry,if=spell_targets>=2&!buff.blade_flurry.up
 -- # Using Ambush is a 2% increase, so Vanish can be sometimes be used as a utility spell unless using Master Assassin or Deathly Shadows
 -- actions.cds+=/vanish,if=!runeforge.mark_of_the_master_assassin&!stealthed.all&variable.ambush_condition&(!runeforge.deathly_shadows|buff.deathly_shadows.down&combo_points<=2)
--- actions.cds+=/vanish,if=runeforge.mark_of_the_master_assassin&master_assassin_remains=0&variable.blade_flurry_sync&(!cooldown.between_the_eyes.ready&variable.finish_condition|cooldown.between_the_eyes.ready&variable.ambush_condition)&(!conduit.count_the_odds|buff.roll_the_bones.remains>=10)
+-- # With Master Asssassin, sync Vanish with a finisher or Ambush depending on BtE cooldown, or always a finisher with MfD
+-- actions.cds+=/variable,name=vanish_ma_condition,if=runeforge.mark_of_the_master_assassin&!talent.marked_for_death.enabled,value=(!cooldown.between_the_eyes.ready&variable.finish_condition)|(cooldown.between_the_eyes.ready&variable.ambush_condition)
+-- actions.cds+=/variable,name=vanish_ma_condition,if=runeforge.mark_of_the_master_assassin&talent.marked_for_death.enabled,value=variable.finish_condition
+-- actions.cds+=/vanish,if=variable.vanish_ma_condition&master_assassin_remains=0&variable.blade_flurry_sync
 -- actions.cds+=/flagellation
 -- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
--- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!cooldown.killing_spree.up|!talent.killing_spree.enabled)
+-- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up
 -- actions.cds+=/roll_the_bones,if=master_assassin_remains=0&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or without any CP.
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP.
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1
--- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&(energy.time_to_max>2|spell_targets>2)
+-- # Attempt to sync Killing Spree with Vanish for Master Assassin
+-- actions.cds+=/variable,name=killing_spree_vanish_sync,value=!runeforge.mark_of_the_master_assassin|cooldown.vanish.remains>10|master_assassin_remains>2
+-- # Use in 1-2T if BtE is up and won't cap Energy, or at 3T+ (2T+ with Deathly Shadows) or when Master Assassin is up.
+-- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&variable.killing_spree_vanish_sync&!stealthed.rogue&(debuff.between_the_eyes.up&energy.deficit>(energy.regen*2+15)|spell_targets.blade_flurry>(2-buff.deathly_shadows.up)|master_assassin_remains>0)
 -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&(energy.time_to_max>2|spell_targets>2)
 -- actions.cds+=/dreadblades,if=!stealthed.all&combo_points<=1
 -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
@@ -645,8 +675,8 @@ HR.SetAPL(260, APL, Init)
 
 -- # Finishers
 -- actions.finish=slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&refreshable
--- # BtE on cooldown to keep the Crit debuff up
--- actions.finish+=/between_the_eyes
+-- # BtE on cooldown to keep the Crit debuff up, unless the target is about to die
+-- actions.finish+=/between_the_eyes,if=target.time_to_die>3
 -- actions.finish+=/dispatch
 
 -- # Stealth
