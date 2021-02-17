@@ -301,8 +301,8 @@ local function St()
   if S.ConvoketheSpirits:IsCastable() and (CDsON() and ((VarConvokeDesync and not CaInc:CooldownUp() or Player:BuffUp(CaInc)) and Player:AstralPowerP() < 40 and (Player:BuffRemains(S.EclipseLunar) > 10 or Player:BuffRemains(S.EclipseSolar) > 10) or fightRemains < 10)) then
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ConvoketheSpirits)) then return "convoke_the_spirits st 6"; end
   end
-  -- variable,name=dot_requirements,value=(buff.ca_inc.remains>5&(buff.ravenous_frenzy.remains>5|!buff.ravenous_frenzy.up)|!buff.ca_inc.up|astral_power<30)&(!buff.kindred_empowerment_energize.up|astral_power<30)&(buff.eclipse_solar.remains>gcd.max|buff.eclipse_lunar.remains>gcd.max)
-  VarDotRequirements = ((Player:BuffRemains(CaInc) > 5 and (Player:BuffRemains(S.RavenousFrenzyBuff) > 5 or Player:BuffDown(S.RavenousFrenzyBuff)) or Player:BuffDown(CaInc) or Player:AstralPowerP() < 30) and (Player:BuffDown(S.KindredEmpowermentEnergizeBuff) or Player:AstralPowerP() < 30) and (Player:BuffRemains(S.EclipseSolar) > GCDMax or Player:BuffRemains(S.EclipseLunar) > GCDMax))
+  -- variable,name=dot_requirements,value=(buff.ravenous_frenzy.remains>5|!buff.ravenous_frenzy.up)&(buff.kindred_empowerment_energize.remains<gcd.max)&(buff.eclipse_solar.remains>gcd.max|buff.eclipse_lunar.remains>gcd.max)
+  VarDotRequirements = ((Player:BuffRemains(S.RavenousFrenzyBuff) > 5 or Player:BuffDown(S.RavenousFrenzyBuff)) and (Player:BuffRemains(S.KindredEmpowermentEnergizeBuff) < GCDMax) and (Player:BuffRemains(S.EclipseSolar) > GCDMax or Player:BuffRemains(S.EclipseLunar) > GCDMax))
   -- moonfire,target_if=refreshable&target.time_to_die>12,if=ap_check&variable.dot_requirements
   if S.Moonfire:IsCastable() and (AP_Check(S.Moonfire) and VarDotRequirements) then
     if Everyone.CastCycle(S.Moonfire, Enemies8ySplash, EvaluateCycleMoonfireST, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire st 8"; end
@@ -535,8 +535,8 @@ local function Boat()
   if S.Starsurge:IsReady() and ((S.ConvoketheSpirits:CooldownRemains() < 5 and CDsON() and (VarConvokeDesync or CaInc:CooldownRemains() < 5) and VarCDCondition) and Player:AstralPowerP() > 40 and Player:Covenant() == "Night Fae" and CDsON() and (EclipseState == 1 or EclipseState == 2 or EclipseState == 3)) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge boat 10"; end
   end
-  -- variable,name=dot_requirements,value=(buff.ca_inc.remains>5&(buff.ravenous_frenzy.remains>5|!buff.ravenous_frenzy.up)|!buff.ca_inc.up)&(!buff.kindred_empowerment_energize.up)&(buff.eclipse_solar.remains>gcd.max|buff.eclipse_lunar.remains>gcd.max)
-  VarDotRequirements = ((Player:BuffRemains(CaInc) > 5 and (Player:BuffRemains(S.RavenousFrenzyBuff) > 5 or Player:BuffDown(S.RavenousFrenzyBuff)) or Player:BuffDown(CaInc)) and Player:BuffDown(S.KindredEmpowermentEnergizeBuff) and (Player:BuffRemains(S.EclipseSolar) > GCDMax or Player:BuffRemains(S.EclipseLunar) > GCDMax))
+  -- variable,name=dot_requirements,value=(buff.ravenous_frenzy.remains>5|!buff.ravenous_frenzy.up)&(!buff.kindred_empowerment_energize.remains<gcd.max)&(buff.eclipse_solar.remains>gcd.max|buff.eclipse_lunar.remains>gcd.max)
+  VarDotRequirements = ((Player:BuffRemains(S.RavenousFrenzyBuff) > 5 or Player:BuffDown(S.RavenousFrenzyBuff)) and (not Player:BuffRemains(S.KindredEmpowermentEnergizeBuff) < GCDMax) and (Player:BuffRemains(S.EclipseSolar) > GCDMax or Player:BuffRemains(S.EclipseLunar) > GCDMax))
   -- sunfire,target_if=refreshable&target.time_to_die>16,if=ap_check&variable.dot_requirements
   if S.Sunfire:IsCastable() and (AP_Check(S.Sunfire) and VarDotRequirements) then
     if Everyone.CastCycle(S.Sunfire, Enemies8ySplash, EvaluateCycleSunfireBOAT, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire boat 12"; end
