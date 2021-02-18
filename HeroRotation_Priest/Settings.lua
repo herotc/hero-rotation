@@ -44,6 +44,7 @@ HR.GUISettings.APL.Priest = {
       -- Abilities
       Mindbender = true,
       Shadowform = true,
+      ShadowWordDeath = false,
       VoidEruption = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
