@@ -107,7 +107,7 @@ local function Hac()
   end
   -- ravager
   if S.Ravager:IsCastable() and CDsON() then
-    if HR.Cast(S.Ravager, nil, nil, not Target:IsInRange(40)) then return "ravager"; end
+    if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager"; end
   end
   -- colossus_smash
   if S.ColossusSmash:IsCastable() then
@@ -243,7 +243,7 @@ local function SingleTarget()
   end
   -- ravager,if=debuff.colossus_smash.up&!covenant.venthyr
   if S.Ravager:IsCastable() and CDsON() and (Target:DebuffUp(S.ColossusSmashDebuff) and Player:Covenant() ~= "Venthyr") then
-    if HR.Cast(S.Ravager, nil, nil, not Target:IsInRange(40)) then return "ravager"; end
+    if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager"; end
   end
   -- overpower,if=charges=2
   if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2) then
