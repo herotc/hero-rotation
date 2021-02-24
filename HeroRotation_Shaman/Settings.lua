@@ -55,7 +55,8 @@ HR.GUISettings.APL.Shaman = {
     GCDasOffGCD = {
       -- Abilities
       Ascendance = true,
-      FireElemental = true
+      FireElemental = true,
+      Stormkeeper = true
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {

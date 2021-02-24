@@ -117,7 +117,7 @@ local function Aoe()
   end
   -- stormkeeper,if=talent.stormkeeper.enabled
   if S.Stormkeeper:IsCastable() and not Player:IsCasting(S.Stormkeeper) then
-    if HR.Cast(S.Stormkeeper) then return "stormkeeper aoe 6"; end
+    if HR.Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper aoe 6"; end
   end
   -- flame_shock,if=active_dot.flame_shock<3&active_enemies<=5,target_if=refreshable
   if S.FlameShock:IsReady() and (EnemiesFlameShockCount < 3 and EnemiesCount10ySplash <= 5) then
@@ -145,7 +145,7 @@ local function Aoe()
   end
   -- earth_elemental,if=runeforge.deeptremor_stone.equipped&(!talent.primal_elementalist.enabled|(!pet.storm_elemental.active&!pet.fire_elemental.active))
   if S.EarthElemental:IsCastable() and (DeeptremorStoneEquipped and (not S.PrimalElementalist:IsAvailable() or (not SEActive and not FEActive))) then
-    if HR.Cast(S.EarthElemental) then return "earth_elemental aoe 20"; end
+    if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental aoe 20"; end
   end
   -- lavaburst,target_if=dot.flame_shock.remains,if=spell_targets.chain_lightning<4|buff.lava_surge.up|(talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&maelstrom>=60)
   if S.LavaBurst:IsReady() and (EnemiesCount10ySplash < 4 or Player:BuffUp(S.LavaSurgeBuff) or (S.MasterOfTheElements:IsAvailable() and Player:BuffDown(S.MasterOfTheElementsBuff) and Player:Maelstrom() >= 60)) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
@@ -204,7 +204,7 @@ local function SESingle()
   end
   -- stormkeeper,if=talent.stormkeeper.enabled&(maelstrom<44)
   if S.Stormkeeper:IsCastable() and (Player:Maelstrom() < 44) then
-    if HR.Cast(S.Stormkeeper) then return "stormkeeper ses 66"; end
+    if HR.Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper ses 66"; end
   end
   -- echoing_shock,if=talent.echoing_shock.enabled
   if S.EchoingShock:IsReady() then
@@ -268,7 +268,7 @@ local function SESingle()
   end
   -- earth_elemental,if=!talent.primal_elementalist.enabled|talent.primal_elementalist.enabled&(!pet.storm_elemental.active)
   if S.EarthElemental:IsCastable() and (not S.PrimalElementalist:IsAvailable() or S.PrimalElementalist:IsAvailable() and (not SEActive)) then
-    if HR.Cast(S.EarthElemental) then return "earth_elemental ses 98"; end
+    if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental ses 98"; end
   end
   -- lightning_bolt
   if S.LightningBolt:IsReady() then
@@ -300,7 +300,7 @@ local function Single()
   end
   -- stormkeeper,if=talent.stormkeeper.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)&(maelstrom<44)
   if S.Stormkeeper:IsCastable() and not Player:IsCasting(S.Stormkeeper) and (Player:Maelstrom() < 44) then
-    if HR.Cast(S.Stormkeeper) then return "stormkeeper single 128"; end
+    if HR.Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper single 128"; end
   end
   -- echoing_shock,if=talent.echoing_shock.enabled&cooldown.lava_burst.remains<=0
   if S.EchoingShock:IsReady() and (S.LavaBurst:CooldownUp()) then
@@ -388,7 +388,7 @@ local function Single()
   end
   -- earth_elemental,if=!talent.primal_elementalist.enabled|!pet.fire_elemental.active
   if S.EarthElemental:IsCastable() and (not S.PrimalElementalist:IsAvailable() or not FEActive) then
-    if HR.Cast(S.EarthElemental) then return "earth_elemental single 172"; end
+    if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental single 172"; end
   end
   -- lightning_bolt
   if S.LightningBolt:IsReady() then
