@@ -148,7 +148,7 @@ local function Aoe()
     if HR.Cast(S.EarthElemental) then return "earth_elemental aoe 20"; end
   end
   -- lavaburst,target_if=dot.flame_shock.remains,if=spell_targets.chain_lightning<4|buff.lava_surge.up|(talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&maelstrom>=60)
-  if S.LavaBurst:IsReady() and (EnemiesCount10ySplash < 4 or Player:BuffUp(S.LavaSurgeBuff) or (S.MasterOfTheElements:IsAvailable() and Player:BuffDown(S.MasterOfTheElementsBuff) and Player:Maelstrom() >= 60)) then
+  if S.LavaBurst:IsReady() and (EnemiesCount10ySplash < 4 or Player:BuffUp(S.LavaSurgeBuff) or (S.MasterOfTheElements:IsAvailable() and Player:BuffDown(S.MasterOfTheElementsBuff) and Player:Maelstrom() >= 60)) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
     if Everyone.CastCycle(S.LavaBurst, Enemies40y, EvaluateCycleLavaBurst200, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 22"; end
   end
   -- earthquake,if=!talent.master_of_the_elements.enabled|buff.stormkeeper.up|maelstrom>=(100-4*spell_targets.chain_lightning)|buff.master_of_the_elements.up|spell_targets.chain_lightning>3
@@ -160,11 +160,11 @@ local function Aoe()
     if HR.Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 26"; end
   end
   -- lava_burst,if=buff.lava_surge.up&spell_targets.chain_lightning<4&(!pet.storm_elemental.active)&dot.flame_shock.ticking
-  if S.LavaBurst:IsReady() and (Player:BuffUp(S.LavaSurgeBuff) and EnemiesCount10ySplash < 4 and (not SEActive) and Target:DebuffUp(S.FlameShockDebuff)) then
+  if S.LavaBurst:IsReady() and (Player:BuffUp(S.LavaSurgeBuff) and EnemiesCount10ySplash < 4 and (not SEActive) and Target:DebuffUp(S.FlameShockDebuff)) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 28"; end
   end
   -- elemental_blast,if=talent.elemental_blast.enabled&spell_targets.chain_lightning<5&(!pet.storm_elemental.active)
-  if S.ElementalBlast:IsReady() and (EnemiesCount10ySplash < 5 and (not SEActive)) then
+  if S.ElementalBlast:IsReady() and (EnemiesCount10ySplash < 5 and (not SEActive)) and not Player:IsCasting(S.ElementalBlast) then
     if HR.Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 30"; end
   end
   -- lava_beam,if=talent.ascendance.enabled
@@ -176,7 +176,7 @@ local function Aoe()
     if HR.Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 34"; end
   end
   -- lava_burst,moving=1,if=buff.lava_surge.up&cooldown_react
-  if S.LavaBurst:IsReady() and Player:IsMoving() and (Player:BuffUp(S.LavaSurgeBuff)) then
+  if S.LavaBurst:IsReady() and Player:IsMoving() and (Player:BuffUp(S.LavaSurgeBuff)) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 36"; end
   end
   -- flame_shock,moving=1,target_if=refreshable
@@ -199,7 +199,7 @@ local function SESingle()
     if HR.Cast(S.Ascendance) then return "ascendance ses 64"; end
   end
   -- elemental_blast,if=talent.elemental_blast.enabled
-  if S.ElementalBlast:IsReady() then
+  if S.ElementalBlast:IsReady() and not Player:IsCasting(S.ElementalBlast) then
     if HR.Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast ses"; end
   end
   -- stormkeeper,if=talent.stormkeeper.enabled&(maelstrom<44)
@@ -211,7 +211,7 @@ local function SESingle()
     if HR.Cast(S.EchoingShock, nil, nil, not Target:IsSpellInRange(S.EchoingShock)) then return "echoing_shock ses 68"; end
   end
   -- lava_burst,if=buff.wind_gust.stack<18|buff.lava_surge.up
-  if S.LavaBurst:IsReady() and (Player:BuffStack(S.WindGustBuff) < 18 or Player:BuffUp(S.LavaSurgeBuff)) then
+  if S.LavaBurst:IsReady() and (Player:BuffStack(S.WindGustBuff) < 18 or Player:BuffUp(S.LavaSurgeBuff)) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst ses 70"; end
   end
   -- lightning_bolt,if=buff.stormkeeper.up
@@ -239,11 +239,11 @@ local function SESingle()
     if HR.Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock ses 82"; end
   end
   -- lava_burst,if=buff.ascendance.up
-  if S.LavaBurst:IsReady() and (Player:BuffUp(S.AscendanceBuff)) then
+  if S.LavaBurst:IsReady() and (Player:BuffUp(S.AscendanceBuff)) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst ses 84"; end
   end
   -- lava_burst,if=cooldown_react&!talent.master_of_the_elements.enabled
-  if S.LavaBurst:IsReady() and (not S.MasterOfTheElements:IsAvailable()) then
+  if S.LavaBurst:IsReady() and (not S.MasterOfTheElements:IsAvailable()) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst ses 86"; end
   end
   -- icefury,if=talent.icefury.enabled&!(maelstrom>75&cooldown.lava_burst.remains<=0)
@@ -251,7 +251,7 @@ local function SESingle()
     if HR.Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury ses 88"; end
   end
   -- lava_burst,if=cooldown_react&charges>talent.echo_of_the_elements.enabled
-  if S.LavaBurst:IsReady() and (S.LavaBurst:Charges() > num(S.EchoOfTheElements:IsAvailable())) then
+  if S.LavaBurst:IsReady() and (S.LavaBurst:Charges() > num(S.EchoOfTheElements:IsAvailable())) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst ses 90"; end
   end
   -- frost_shock,if=talent.icefury.enabled&buff.icefury.up
@@ -295,7 +295,7 @@ local function Single()
     if HR.Cast(S.Ascendance) then return "ascendance single 124"; end
   end
   -- elemental_blast,if=talent.elemental_blast.enabled&(talent.master_of_the_elements.enabled&(buff.master_of_the_elements.up&maelstrom<60|!buff.master_of_the_elements.up)|!talent.master_of_the_elements.enabled)
-  if S.ElementalBlast:IsReady() and (S.MasterOfTheElements:IsAvailable() and (Player:BuffUp(S.MasterOfTheElementsBuff) and Player:Maelstrom() < 60 or Player:BuffDown(S.MasterOfTheElementsBuff)) or not S.MasterOfTheElements:IsAvailable()) then
+  if S.ElementalBlast:IsReady() and not Player:IsCasting(S.ElementalBlast) and (S.MasterOfTheElements:IsAvailable() and (Player:BuffUp(S.MasterOfTheElementsBuff) and Player:Maelstrom() < 60 or Player:BuffDown(S.MasterOfTheElementsBuff)) or not S.MasterOfTheElements:IsAvailable()) then
     if HR.Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 126"; end
   end
   -- stormkeeper,if=talent.stormkeeper.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)&(maelstrom<44)
@@ -307,7 +307,7 @@ local function Single()
     if HR.Cast(S.EchoingShock, nil, nil, not Target:IsSpellInRange(S.EchoingShock)) then return "echoing_shock single 130"; end
   end
   -- lava_burst,if=talent.echoing_shock.enabled&buff.echoing_shock.up
-  if S.LavaBurst:IsReady() and (Player:BuffUp(S.EchoingShockBuff)) then
+  if S.LavaBurst:IsReady() and (Player:BuffUp(S.EchoingShockBuff)) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single 132"; end
   end
   -- liquid_magma_totem,if=talent.liquid_magma_totem.enabled
@@ -339,11 +339,11 @@ local function Single()
     if HR.Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 146"; end
   end
   -- lava_burst,if=buff.ascendance.up
-  if S.LavaBurst:IsReady() and (Player:BuffUp(S.AscendanceBuff)) then
+  if S.LavaBurst:IsReady() and (Player:BuffUp(S.AscendanceBuff)) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single 148"; end
   end
   -- lava_burst,if=cooldown_react&!talent.master_of_the_elements.enabled
-  if S.LavaBurst:IsReady() and (not S.MasterOfTheElements:IsAvailable()) then
+  if S.LavaBurst:IsReady() and (not S.MasterOfTheElements:IsAvailable()) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single 150"; end
   end
   -- icefury,if=talent.icefury.enabled&!(maelstrom>75&cooldown.lava_burst.remains<=0)
@@ -351,7 +351,7 @@ local function Single()
     if HR.Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury single 152"; end
   end
   -- lava_burst,if=cooldown_react&charges>talent.echo_of_the_elements.enabled
-  if S.LavaBurst:IsReady() and (S.LavaBurst:Charges() > num(S.EchoOfTheElements:IsAvailable())) then
+  if S.LavaBurst:IsReady() and (S.LavaBurst:Charges() > num(S.EchoOfTheElements:IsAvailable())) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single 154"; end
   end
   -- frost_shock,if=talent.icefury.enabled&buff.icefury.up&buff.icefury.remains<1.1*gcd*buff.icefury.stack
@@ -359,7 +359,7 @@ local function Single()
     if HR.Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 156"; end
   end
   -- lava_burst,if=cooldown_react
-  if S.LavaBurst:IsReady() then
+  if S.LavaBurst:IsReady() and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single 158"; end
   end
   -- flame_shock,target_if=refreshable
