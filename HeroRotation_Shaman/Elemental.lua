@@ -100,6 +100,22 @@ local function Precombat()
   end
   -- potion
   -- snapshot_stats
+  --earth_elemental,if=!talent.primal_elementalist.enabled
+  if S.EarthElemental:IsCastable() and not S.PrimalElementalist:IsAvailable() then
+    if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental precombat"; end
+  end
+  --stormkeeper,if=talent.stormkeeper.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)
+  if S.Stormkeeper:IsCastable() and not Player:IsCasting(S.Stormkeeper) then
+    if HR.Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper precombat"; end
+  end
+  --elemental_blast,if=talent.elemental_blast.enabled
+  if S.ElementalBlast:IsReady() and not Player:IsCasting(S.ElementalBlast) then
+    if HR.Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast precombat"; end
+  end
+  --lava_burst,if=!talent.elemental_blast.enabled
+  if S.LavaBurst:IsReady() and (not S.ElementalBlast:IsAvailable() or (S.ElementalBlast:IsAvailable() and not S.ElementalBlast:IsReady())) and not (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 1) then
+    if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst precombat"; end
+  end
   -- Manually added: flame_shock
   if S.FlameShock:IsReady() and Target:DebuffDown(S.FlameShockDebuff) then
     if HR.Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "FlameShock precombat"; end
