@@ -35,6 +35,7 @@ local OnUseExcludes = {
 local ShouldReturn -- Used to get the return string
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
+local ExecutePhase
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -86,6 +87,14 @@ local function SingleTarget()
   if S.RagingBlow:IsCastable() and (S.WilloftheBerserker:IsAvailable() and Player:BuffRemains(S.WilloftheBerserker) < Player:GCD()) then
     if HR.Cast(S.RagingBlow, nil, nil, not Target:IsSpellInRange(S.RagingBlow)) then return "raging_blow"; end
   end
+  -- bladestorm,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>45)
+  if S.Bladestorm:IsCastable() and (Player:BuffUp(S.EnrageBuff) and EnemiesCount8 > 1) then
+    if HR.Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm"; end
+  end
+  -- condemn
+  if S.Condemn:IsCastable() and S.Condemn:IsUsable() and (Player:BuffUp(S.EnrageBuff) and ExecutePhase) then
+    if HR.Cast(S.Condemn, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
+  end
   -- siegebreaker
   if S.Siegebreaker:IsCastable() then
     if HR.Cast(S.Siegebreaker, nil, nil, not Target:IsSpellInRange(S.Siegebreaker)) then return "siegebreaker"; end
@@ -101,10 +110,6 @@ local function SingleTarget()
   -- execute
   if S.Execute:IsCastable() and S.Execute:IsUsable() then
     if HR.Cast(S.Execute, nil, nil, not Target:IsSpellInRange(S.Execute)) then return "execute"; end
-  end
-  -- bladestorm,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>45)
-  if S.Bladestorm:IsCastable() and (Player:BuffUp(S.EnrageBuff) and EnemiesCount8 > 1) then
-    if HR.Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm"; end
   end
   -- bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
   if S.Bloodthirst:IsCastable() and (Player:BuffDown(S.EnrageBuff) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35 and not S.Cruelty:IsAvailable()) then
@@ -132,7 +137,7 @@ local function SingleTarget()
   end
   -- crushing_blow,if=charges=2
   if S.CrushingBlow:IsCastable() and (S.RagingBlow:Charges() == 2) then
-    if HR.Cast(S.CrushingBlow, nil, nil, not Target:IsSpellInRange(CrushingBlow)) then return "CrushingBlow"; end
+    if HR.Cast(S.CrushingBlow, nil, nil, not Target:IsSpellInRange(S.CrushingBlow)) then return "CrushingBlow"; end
   end
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
@@ -148,7 +153,7 @@ local function SingleTarget()
   end
   -- crushing_blow
   if S.CrushingBlow:IsCastable() then
-    if HR.Cast(S.CrushingBlow, nil, nil, not Target:IsSpellInRange(CrushingBlow)) then return "CrushingBlow"; end
+    if HR.Cast(S.CrushingBlow, nil, nil, not Target:IsSpellInRange(S.CrushingBlow)) then return "CrushingBlow"; end
   end
   -- whirlwind
   if S.Whirlwind:IsCastable() then
@@ -165,14 +170,20 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
+  ExecutePhase = (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or 
+    Target:HealthPercentage() < 20 or
+    (Target:HealthPercentage() > 80 and Player:Covenant() == 'Venthyr')
   if AoEON() then
     Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
     Enemies12y = Player:GetEnemiesInMeleeRange(12) -- Dragon Roar
+    Enemies20y = Player:GetEnemiesInMeleeRange(25) -- Adds spawned
     EnemiesCount8 = #Enemies8y
     EnemiesCount12 = #Enemies12y
+    EnemiesCount20 = #Enemies20y
   else
     EnemiesCount8 = 1
     EnemiesCount12 = 1
+    EnemiesCount20 = 1
   end
 
   -- call precombat
@@ -207,8 +218,13 @@ local function APL()
     if S.Recklessness:IsCastable() and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable()) or Target:TimeToDie() > 100 or (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20 or Target:TimeToDie() < 15 and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff))) then
       if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 58"; end
     end
+    -- recklessness,use_off_gcd=1,if=runeforge.signet_of_tormented_kings.equipped&gcd.remains&prev_gcd.1.rampage&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|variable.execute_phase|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
+    if S.Recklessness:IsCastable() and Player:PrevGCDP(1, S.Rampage) and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable()) or Target:TimeToDie() > 100 or ExecutePhase or (Target:TimeToDie() < 15 and EnemiesCount20 == 1)) and (EnemiesCount8 > 1 or Player.BuffUp(S.MeatCleaverBuff)) then
+      if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 58"; end
+    end
+    -- This fixes an awkward tick that caused some fast spell flickering where you have casted 2 spells since your last whirlwind but you still have the meatcleaver buff
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
-    if S.Whirlwind:IsCastable("Melee") and (EnemiesCount8 > 1 and Player:BuffDown(S.MeatCleaverBuff)) then
+    if S.Whirlwind:IsCastable("Melee") and (EnemiesCount8 > 1 and (Player:BuffDown(S.MeatCleaverBuff) or (Player:PrevGCD(3, S.Whirlwind) and Player:BuffStack(S.MeatCleaverBuff) == 1))) then
       if HR.Cast(S.Whirlwind) then return "whirlwind 60"; end
     end
     if (Settings.Commons.UseTrinkets) then
@@ -244,9 +260,7 @@ local function APL()
         if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks"; end
       end
     end
-    if (true) then
-      local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
-    end
+    local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
   end
 end
 
