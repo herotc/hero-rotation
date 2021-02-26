@@ -33,8 +33,8 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
-local Enemies8y, Enemies20y
-local EnemiesCount8, EnemiesCount20
+local Enemies8y
+local EnemiesCount8
 local ExecutePhase
 
 -- GUI Settings
@@ -179,11 +179,9 @@ local function APL()
     Enemies20y = Player:GetEnemiesInMeleeRange(25) -- Adds spawned
     EnemiesCount8 = #Enemies8y
     EnemiesCount12 = #Enemies12y
-    EnemiesCount20 = #Enemies20y
   else
     EnemiesCount8 = 1
     EnemiesCount12 = 1
-    EnemiesCount20 = 1
   end
 
   -- call precombat
@@ -216,10 +214,6 @@ local function APL()
     end
     -- recklessness,if=gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
     if S.Recklessness:IsCastable() and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable()) or Target:TimeToDie() > 100 or (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20 or Target:TimeToDie() < 15 and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff))) then
-      if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 58"; end
-    end
-    -- recklessness,use_off_gcd=1,if=runeforge.signet_of_tormented_kings.equipped&gcd.remains&prev_gcd.1.rampage&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|variable.execute_phase|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
-    if S.Recklessness:IsCastable() and Player:PrevGCDP(1, S.Rampage) and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable()) or Target:TimeToDie() > 100 or ExecutePhase or (Target:TimeToDie() < 15 and EnemiesCount20 == 1)) and (EnemiesCount8 > 1 or Player.BuffUp(S.MeatCleaverBuff)) then
       if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 58"; end
     end
     -- This fixes an awkward tick that caused some fast spell flickering where you have casted 2 spells since your last whirlwind but you still have the meatcleaver buff
