@@ -183,6 +183,7 @@ Spell.Monk.Brewmaster = {
   FortifyingBrewBuff           = Spell(115203),
   HighTolerance                = Spell(196737), -- Talent
   PurifyingBrew                = Spell(119582),
+  PurifiedChiBuff              = Spell(325092),
   Shuffle                      = Spell(215479),
 
   -- Utility
