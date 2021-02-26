@@ -103,6 +103,7 @@ end, "LEARNED_SPELL_IN_TAB")
 S.Pyroblast:RegisterInFlight()
 S.Fireball:RegisterInFlight()
 S.Meteor:RegisterInFlight()
+S.PhoenixFlames:RegisterInFlightEffect(257542)
 S.PhoenixFlames:RegisterInFlight()
 S.Pyroblast:RegisterInFlight(S.CombustionBuff)
 S.Fireball:RegisterInFlight(S.CombustionBuff)
@@ -278,6 +279,27 @@ local function combustion_cooldowns()
 end
 
 local function combustion_phase()
+  local function hot_streak_spells_in_flight()
+    local numSpells = 0
+    if (Player:BuffUp(S.HeatingUpBuff)) then
+      -- print("Heating Up")
+      numSpells = numSpells + 1
+    end
+    if (S.Pyroblast:InFlight()) then
+      -- print("Pyroblase")
+      numSpells = numSpells + 1
+    end
+    if (S.Fireball:InFlight()) then
+      -- print("Fireball")
+      numSpells = numSpells + 1
+    end
+    if (S.PhoenixFlames:InFlight()) then
+      -- print("Phoenix")
+      numSpells = numSpells + 1
+    end
+    return numSpells
+  end
+
   --lights_judgment,if=buff.combustion.down
   if S.LightsJudgment:IsCastable() and Player:BuffDown(S.Combustion) then
     if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment combustion_phase 1"; end
@@ -305,7 +327,7 @@ local function combustion_phase()
   --fire_blast,use_off_gcd=1,use_while_casting=1,if=(active_enemies<=active_dot.ignite|!cooldown.phoenix_flames.ready)&!conduit.infernal_cascade&charges>=1
   --&buff.combustion.up&!buff.firestorm.react&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react<2
   if S.FireBlast:IsCastable() and (EnemiesCount8ySplash <= UnitsWithIgniteCount or not S.PhoenixFlames:IsCastable()) and not S.InfernalCascade:ConduitEnabled() and S.FireBlast:Charges() >= 1 
-  and Player:BuffUp(S.Combustion) and Player:BuffDown(S.FirestormBuff) and Player:BuffDown(S.HotStreakBuff) and (num(Player:BuffUp(S.HeatingUpBuff)) + num(S.Pyroblast:InFlight() or S.Fireball:InFlight() or S.PhoenixFlames:InFlight()) < 2) then
+  and Player:BuffUp(S.Combustion) and Player:BuffDown(S.FirestormBuff) and Player:BuffDown(S.HotStreakBuff) and hot_streak_spells_in_flight() < 2 then
     if Settings.Fire.ShowFireBlastLeft then
       if HR.CastLeft(S.FireBlast) then return "fire_blast combustion_phase 6 left"; end
     else
@@ -326,28 +348,12 @@ local function combustion_phase()
   --&buff.combustion.up&(!buff.firestorm.react|buff.infernal_cascade.remains<0.5)&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react<2
   if S.FireBlast:IsCastable() and (EnemiesCount8ySplash <= UnitsWithIgniteCount or not S.PhoenixFlames:IsCastable()) and S.InfernalCascade:ConduitEnabled() and S.FireBlast:Charges() >= 1
   and (var_expected_fire_blasts >= var_needed_fire_blasts or var_extended_combustion_remains <= S.InfernalCascade:BaseDuration() or Player:BuffStack(S.InfernalCascadeBuff) or Player:BuffRemains(S.InfernalCascadeBuff) < Player:GCD() or (Player:Covenant() == "Night Fae" and S.ShiftingPower:CooldownRemains() and EnemiesCount18yMelee >= var_combustion_shifting_power))
-  and Player:BuffUp(S.Combustion) and (Player:BuffDown(S.FirestormBuff) or Player:BuffRemains(S.InfernalCascadeBuff)) and Player:BuffDown(S.HotStreakBuff) and (num(Player:BuffUp(S.HeatingUpBuff)) + num(S.Pyroblast:InFlight() or S.Fireball:InFlight() or S.PhoenixFlames:InFlight()) < 2) then
+  and Player:BuffUp(S.Combustion) and (Player:BuffDown(S.FirestormBuff) or Player:BuffRemains(S.InfernalCascadeBuff)) and Player:BuffDown(S.HotStreakBuff) and hot_streak_spells_in_flight() < 2 then
     if Settings.Fire.ShowFireBlastLeft then
       if HR.CastLeft(S.FireBlast) then return "fire_blast combustion_phase 9 left"; end
     else
       if HR.Cast(S.FireBlast) then return "fire_blast combustion_phase 9"; end
     end
-  end
-  --counterspell,if=runeforge.disciplinary_command&buff.disciplinary_command.down&buff.disciplinary_command_arcane.down&cooldown.buff_disciplinary_command.ready&!talent.rune_of_power
-  if S.Counterspell:IsCastable() and DisciplinaryCommandEquipped and Player:BuffDown(S.DisciplinaryCommandBuff) and Player:BuffDown(S.DisciplinaryCommandArcaneBuff) and S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer() > 30 and not S.RuneofPower:IsAvailable() then
-    if HR.Cast(S.Counterspell) then return "counterspell combustion_phase 10"; end
-  end
-  --arcane_explosion,if=runeforge.disciplinary_command&buff.disciplinary_command.down&buff.disciplinary_command_arcane.down&cooldown.buff_disciplinary_command.ready&!talent.rune_of_power
-  if S.ArcaneExplosion:IsCastable() and DisciplinaryCommandEquipped and Player:BuffDown(S.DisciplinaryCommandBuff) and Player:BuffDown(S.DisciplinaryCommandArcaneBuff) and S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer() > 30 and not S.RuneofPower:IsAvailable()  then
-    if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion combustion_phase 11"; end
-  end
-  --frostbolt,if=runeforge.disciplinary_command&buff.disciplinary_command.down&buff.disciplinary_command_frost.down
-  if S.Frostbolt:IsCastable() and DisciplinaryCommandEquipped and S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFrostBuff) then
-    if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt combustion_phase 12"; end
-  end
-  --frost_nova,if=runeforge.grisly_icicle&buff.combustion.down
-  if S.FrostNova:IsCastable() and GrislyIcicleEquipped and Player:BuffDown(S.Combustion) then
-    if HR.Cast(S.FrostNova, nil, nil, not Target:IsSpellInRange(S.FrostNova)) then return "living_bomb combustion_phase 13"; end
   end
   --call_action_list,name=active_talents
   if (true) then
@@ -398,8 +404,8 @@ local function combustion_phase()
   end
   --phoenix_flames,if=buff.combustion.up&((action.fire_blast.charges<1&talent.pyroclasm&active_enemies=1)|!talent.pyroclasm|active_enemies>1)
   --&buff.heating_up.react+hot_streak_spells_in_flight<2
-  if S.PhoenixFlames:IsCastable() and Player:BuffUp(S.Combustion) and ((S.FireBlast:Charges() < 1 and S.Pyroclasm:IsAvailable() and EnemiesCount8ySplash) or not S.Pyroclasm:IsAvailable() or EnemiesCount8ySplash > 1)
-  and (num(Player:BuffUp(S.HeatingUpBuff)) + num(S.Pyroblast:InFlight() or S.Fireball:InFlight() or S.PhoenixFlames:InFlight()) < 2) then
+  if S.PhoenixFlames:IsCastable() and Player:BuffUp(S.Combustion) and ((S.FireBlast:Charges() < 1 and S.Pyroclasm:IsAvailable() and EnemiesCount8ySplash == 1) or not S.Pyroclasm:IsAvailable() or EnemiesCount8ySplash > 1)
+  and hot_streak_spells_in_flight() < 2 then
     if HR.Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 24"; end
   end
   --flamestrike,if=buff.combustion.down&cooldown.combustion.remains<cast_time&active_enemies>=variable.combustion_flamestrike
