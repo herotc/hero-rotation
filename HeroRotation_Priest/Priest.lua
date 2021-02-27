@@ -147,6 +147,37 @@ Spell.Priest.Discipline = {
   Pool                                  = Spell(999910)
 }
 
+Spell.Priest.Holy = {
+  -- Racials
+  AncestralCall                         = Spell(274738),
+  ArcanePulse                           = Spell(260364),
+  ArcaneTorrent                         = Spell(50613),
+  BagofTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  BerserkingBuff                        = Spell(26297),
+  BloodFury                             = Spell(20572),
+  BloodFuryBuff                         = Spell(20572),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
+
+  -- Base Spells
+  HolyFire                              = Spell(14914),
+  HolyFireDebuff                        = Spell(14914),
+  HolyNova                              = Spell(132157),
+  HolyWordChastise                      = Spell(88625),
+  Smite                                 = Spell(585),
+
+  -- Talents
+  Apotheosis                            = Spell(200183),
+  DivineStar                            = Spell(110744),
+  Halo                                  = Spell(120517),
+
+  -- Covenant Abilities
+
+  -- Other
+  Pool                                  = Spell(999910)
+}
+
 -- Items
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
@@ -165,4 +196,7 @@ Item.Priest.Shadow = {
 }
 
 Item.Priest.Discipline = {
+}
+
+Item.Priest.Holy = {
 }

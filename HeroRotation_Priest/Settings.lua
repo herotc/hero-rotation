@@ -70,6 +70,15 @@ HR.GUISettings.APL.Priest = {
       -- Items
     }
   },
+  Holy = {
+    GCDasOffGCD = {
+      Apotheosis = true,
+      DivineStar = true,
+      Halo = true,
+    },
+    OffGCDasOffGCD = {
+    }
+  },
 }
 
 HR.GUI.LoadSettingsRecursively(HR.GUISettings)
@@ -79,6 +88,7 @@ local ARPanel = HR.GUI.Panel
 local CP_Priest = CreateChildPanel(ARPanel, "Priest")
 local CP_Shadow = CreateChildPanel(CP_Priest, "Shadow")
 local CP_Discipline = CreateChildPanel(CP_Priest, "Discipline")
+local CP_Holy = CreateChildPanel(CP_Priest, "Holy")
 
 CreateARPanelOptions(CP_Priest, "APL.Priest.Commons")
 
@@ -89,3 +99,6 @@ CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow")
 
 --Discipline
 CreateARPanelOptions(CP_Discipline, "APL.Priest.Discipline")
+
+--Holy
+CreateARPanelOptions(CP_Holy, "APL.Priest.Holy")
