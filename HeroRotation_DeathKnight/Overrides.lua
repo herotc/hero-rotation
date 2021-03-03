@@ -48,6 +48,18 @@ OldUHIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   end
 , 252);
 
+local OldUHIsReady
+OldUHIsReady = HL.AddCoreOverride("Spell.IsReady",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = OldUHIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellUnholy.Epidemic then
+      return (SpellUnholy.VirulentPlagueDebuff:AuraActiveCount() > 1) and BaseCheck
+    else
+      return BaseCheck
+    end
+  end
+, 252);
+
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP",
 -- function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)

@@ -231,8 +231,7 @@ local function AOE_Burst()
     if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender aoe_burst 10"; end
   end
   -- epidemic,if=!variable.pooling_runic_power
-  -- Added check to ensure at least 2 targets have Plague
-  if S.Epidemic:IsReady() and (not VarPoolingRunicPower and S.VirulentPlagueDebuff:AuraActiveCount() > 1) then
+  if S.Epidemic:IsReady() and (not VarPoolingRunicPower) then
     if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic aoe_burst 12"; end
   end
 end
@@ -478,7 +477,7 @@ local function APL()
       if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak out_of_range"; end
     end
     -- Manually added: epidemic,if=!variable.pooling_runic_power&active_enemies=0
-    if S.Epidemic:IsReady() and AoEON() and S.VirulentPlagueDebuff:AuraActiveCount() > 1 and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
+    if S.Epidemic:IsReady() and AoEON() and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
       if Cast(S.Epidemic, nil, nil, not Target:IsInRange(30)) then return "epidemic out_of_range"; end
     end
     -- Manually added: death_coil,if=!variable.pooling_runic_power&active_enemies=0
