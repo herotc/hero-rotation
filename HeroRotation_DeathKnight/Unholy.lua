@@ -404,23 +404,23 @@ end
 
 local function Trinkets()
   -- use_item,name=inscrutable_quantum_device,if=(cooldown.unholy_blight.remains|cooldown.dark_transformation.remains)&(pet.army_ghoul.active|pet.apoc_ghoul.active&!talent.army_of_the_damned|target.time_to_pct_20<5)|fight_remains<21
-  if I.InscrutableQuantumDevice:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and ((not S.UnholyBlight:CooldownUp() or not S.DarkTransformation:CooldownUp()) and (S.ArmyoftheDead:TimeSinceLastCast() <= 30 or VarApocGhoulActive and not S.ArmyoftheDamned:IsAvailable() or Target:TimeToX(20) < 5) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
+  if I.InscrutableQuantumDevice:IsEquippedAndReady() and ((not S.UnholyBlight:CooldownUp() or not S.DarkTransformation:CooldownUp()) and (S.ArmyoftheDead:TimeSinceLastCast() <= 30 or VarApocGhoulActive and not S.ArmyoftheDamned:IsAvailable() or Target:TimeToX(20) < 5) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
     if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device trinkets 2"; end
   end
   -- use_item,name=macabre_sheet_music,if=cooldown.apocalypse.remains<5&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<21
-  if I.MacabreSheetMusic:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (S.Apocalypse:CooldownRemains() < 5 and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
+  if I.MacabreSheetMusic:IsEquippedAndReady() and (S.Apocalypse:CooldownRemains() < 5 and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
     if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music trinkets 4"; end
   end
   -- use_item,name=dreadfire_vessel,if=cooldown.apocalypse.remains&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<3
-  if I.DreadfireVessel:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (not S.Apocalypse:CooldownUp() and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 3)) then
+  if I.DreadfireVessel:IsEquippedAndReady() and (not S.Apocalypse:CooldownUp() and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 3)) then
     if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel trinkets 6"; end
   end
   -- use_item,name=darkmoon_deck_voracity,if=cooldown.apocalypse.remains&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<21
-  if I.DarkmoonDeckVoracity:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (not S.Apocalypse:CooldownUp() and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
+  if I.DarkmoonDeckVoracity:IsEquippedAndReady() and (not S.Apocalypse:CooldownUp() and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
     if Cast(I.DarkmoonDeckVoracity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_voracity trinkets 8"; end
   end
   -- use_items,if=(cooldown.apocalypse.remains|buff.dark_transformation.up)&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)
-  if (Settings.Commons.Enabled.Trinkets and (not S.Apocalypse:CooldownUp() or Pet:BuffUp(S.DarkTransformation)) and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0)) then
+  if ((not S.Apocalypse:CooldownUp() or Pet:BuffUp(S.DarkTransformation)) and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0)) then
     local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
