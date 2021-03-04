@@ -299,8 +299,8 @@ local function Fallthru()
 end
 
 local function St()
-  -- ravenous_frenzy,if=buff.ca_inc.up
-  if S.RavenousFrenzy:IsCastable() and (Player:BuffUp(CaInc)) then
+  -- ravenous_frenzy,if=buff.ca_inc.remains>15
+  if S.RavenousFrenzy:IsCastable() and (Player:BuffRemains(CaInc) > 15) then
     if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RavenousFrenzy)) then return "ravenous_frenzy st 2"; end
   end
   -- starsurge,if=runeforge.timeworn_dreambinder.equipped&(eclipse.in_any&!((buff.timeworn_dreambinder.remains>action.wrath.execute_time+0.1&(eclipse.in_both|eclipse.in_solar|eclipse.lunar_next)|buff.timeworn_dreambinder.remains>action.starfire.execute_time+0.1&(eclipse.in_lunar|eclipse.solar_next|eclipse.any_next))|!buff.timeworn_dreambinder.up)|(buff.ca_inc.up|variable.convoke_desync)&cooldown.convoke_the_spirits.ready&covenant.night_fae)&(!covenant.kyrian|cooldown.empower_bond.remains>8)&(buff.ca_inc.up|!cooldown.ca_inc.ready)
@@ -333,16 +333,16 @@ local function St()
   if S.ForceofNature:IsCastable() and (AP_Check(S.ForceofNature)) then
     if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceofNature, nil, not Target:IsInRange(45)) then return "force_of_nature st 16"; end
   end
-  -- kindred_spirits,if=((buff.eclipse_solar.remains>10|buff.eclipse_lunar.remains>10)&cooldown.ca_inc.remains>30&(buff.primordial_arcanic_pulsar.value<240|!runeforge.primordial_arcanic_pulsar.equipped))|buff.primordial_arcanic_pulsar.value>=270|cooldown.ca_inc.ready&(astral_power>90|variable.is_aoe)
-  if S.KindredSpirits:IsCastable() and (((Player:BuffRemains(S.EclipseSolar) > 10 or Player:BuffRemains(S.EclipseLunar) > 10) and CaInc:CooldownRemains() > 30 and (PAPValue < 240 or not PAPEquipped)) or PAPValue >= 270 or CaInc:CooldownUp() and (Player:AstralPowerP() > 90 or VarIsAoe)) then
+  -- kindred_spirits,if=((buff.eclipse_solar.remains>10|buff.eclipse_lunar.remains>10)&cooldown.ca_inc.remains>30&(buff.primordial_arcanic_pulsar.value<240|!runeforge.primordial_arcanic_pulsar.equipped))|buff.primordial_arcanic_pulsar.value>=270|cooldown.ca_inc.ready&astral_power>90
+  if S.KindredSpirits:IsCastable() and (((Player:BuffRemains(S.EclipseSolar) > 10 or Player:BuffRemains(S.EclipseLunar) > 10) and CaInc:CooldownRemains() > 30 and (PAPValue < 240 or not PAPEquipped)) or PAPValue >= 270 or CaInc:CooldownUp() and Player:AstralPowerP() > 90) then
     if Cast(S.KindredSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.KindredSpirits)) then return "kindred_spirits st 18"; end
   end
-  -- celestial_alignment,if=!druid.no_cds&variable.cd_condition&(astral_power>90&(buff.kindred_empowerment_energize.up|!covenant.kyrian)|covenant.night_fae|variable.is_aoe|buff.bloodlust.up&buff.bloodlust.remains<20+((9*runeforge.primordial_arcanic_pulsar.equipped)+(conduit.precise_alignment.time_value)))&!buff.ca_inc.up&(!covenant.night_fae|cooldown.convoke_the_spirits.up|interpolated_fight_remains<cooldown.convoke_the_spirits.remains+6|interpolated_fight_remains%%180<20+(conduit.precise_alignment.time_value))
-  if S.CelestialAlignment:IsCastable() and (CDsON() and VarCDCondition and (Player:AstralPowerP() > 90 and (Player:BuffUp(S.KindredEmpowermentEnergizeBuff) or CovenantID ~= 1) or CovenantID == 3 or VarIsAoe or Player:BloodlustUp() and Player:BloodlustRemains() < 20 + ((9 * num(PAPEquipped)) + PATime)) and Player:BuffDown(CaInc) and (CovenantID ~= 3 or S.ConvoketheSpirits:CooldownUp() or fightRemains < (S.ConvoketheSpirits:CooldownRemains() + 6) or fightRemains % 180 < 20 + PATime)) then
+  -- celestial_alignment,if=!druid.no_cds&variable.cd_condition&(astral_power>90&(buff.kindred_empowerment_energize.up|!covenant.kyrian)|covenant.night_fae|buff.bloodlust.up&buff.bloodlust.remains<20+((9*runeforge.primordial_arcanic_pulsar.equipped)+(conduit.precise_alignment.time_value)))&!buff.ca_inc.up&(!covenant.night_fae|cooldown.convoke_the_spirits.up|interpolated_fight_remains<cooldown.convoke_the_spirits.remains+6|interpolated_fight_remains%%180<20+(conduit.precise_alignment.time_value))
+  if S.CelestialAlignment:IsCastable() and (CDsON() and VarCDCondition and (Player:AstralPowerP() > 90 and (Player:BuffUp(S.KindredEmpowermentEnergizeBuff) or CovenantID ~= 1) or CovenantID == 3 or Player:BloodlustUp() and Player:BloodlustRemains() < 20 + ((9 * num(PAPEquipped)) + PATime)) and Player:BuffDown(CaInc) and (CovenantID ~= 3 or S.ConvoketheSpirits:CooldownUp() or fightRemains < (S.ConvoketheSpirits:CooldownRemains() + 6) or fightRemains % 180 < 20 + PATime)) then
     if Cast(S.CelestialAlignment, Settings.Balance.GCDasOffGCD.CaInc) then return "celestial_alignment st 20"; end
   end
-  -- incarnation,if=!druid.no_cds&variable.cd_condition&(astral_power>90&(buff.kindred_empowerment_energize.up|!covenant.kyrian)|covenant.night_fae|variable.is_aoe|buff.bloodlust.up&buff.bloodlust.remains<30+((9*runeforge.primordial_arcanic_pulsar.equipped)+(conduit.precise_alignment.time_value)))&!buff.ca_inc.up&(!covenant.night_fae|cooldown.convoke_the_spirits.up|interpolated_fight_remains<cooldown.convoke_the_spirits.remains+6|interpolated_fight_remains%%180<30+(conduit.precise_alignment.time_value))
-  if S.Incarnation:IsCastable() and (CDsON() and VarCDCondition and (Player:AstralPowerP() > 90 and (Player:BuffUp(S.KindredEmpowermentEnergizeBuff) or CovenantID ~= 1) or CovenantID == 3 or VarIsAoe or Player:BloodlustUp() and Player:BloodlustRemains() < 30 + ((9 * num(PAPEquipped)) + PATime)) and Player:BuffDown(CaInc) and (CovenantID ~= 3 or S.ConvoketheSpirits:CooldownUp() or fightRemains < (S.ConvoketheSpirits:CooldownRemains() + 6) or fightRemains % 180 < 30 + PATime)) then
+  -- incarnation,if=!druid.no_cds&variable.cd_condition&(astral_power>90&(buff.kindred_empowerment_energize.up|!covenant.kyrian)|covenant.night_fae|buff.bloodlust.up&buff.bloodlust.remains<30+((9*runeforge.primordial_arcanic_pulsar.equipped)+(conduit.precise_alignment.time_value)))&!buff.ca_inc.up&(!covenant.night_fae|cooldown.convoke_the_spirits.up|interpolated_fight_remains<cooldown.convoke_the_spirits.remains+6|interpolated_fight_remains%%180<30+(conduit.precise_alignment.time_value))
+  if S.Incarnation:IsCastable() and (CDsON() and VarCDCondition and (Player:AstralPowerP() > 90 and (Player:BuffUp(S.KindredEmpowermentEnergizeBuff) or CovenantID ~= 1) or CovenantID == 3 or Player:BloodlustUp() and Player:BloodlustRemains() < 30 + ((9 * num(PAPEquipped)) + PATime)) and Player:BuffDown(CaInc) and (CovenantID ~= 3 or S.ConvoketheSpirits:CooldownUp() or fightRemains < (S.ConvoketheSpirits:CooldownRemains() + 6) or fightRemains % 180 < 30 + PATime)) then
     if Cast(S.Incarnation, Settings.Balance.GCDasOffGCD.CaInc) then return "incarnation st 22"; end
   end
   -- variable,name=save_for_ca_inc,value=!cooldown.ca_inc.ready|!variable.convoke_desync&covenant.night_fae|druid.no_cds
@@ -416,8 +416,8 @@ local function Aoe()
   if S.ConvoketheSpirits:IsCastable() and (CDsON() and ((VarConvokeDesync and not CaInc:CooldownUp() or Player:BuffUp(CaInc)) and (Player:AstralPowerP() < 50 or VarIgnoreStarsurge) and (Player:BuffRemains(S.EclipseLunar) > 6 or Player:BuffRemains(S.EclipseSolar) > 6) and (not BOATEquipped or Player:BuffStack(S.BOATNatureBuff) > 3 or Player:BuffStack(S.BOATArcaneBuff) > 3) or fightRemains < 10)) then
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ConvoketheSpirits)) then return "convoke_the_spirits aoe 2"; end
   end
-  -- ravenous_frenzy,if=buff.ca_inc.up
-  if S.RavenousFrenzy:IsCastable() and (Player:BuffUp(CaInc)) then
+  -- ravenous_frenzy,if=buff.ca_inc.remains>15
+  if S.RavenousFrenzy:IsCastable() and (Player:BuffRemains(CaInc) > 15) then
     if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RavenousFrenzy)) then return "ravenous_frenzy aoe 4"; end
   end
   -- sunfire,target_if=(refreshable|buff.eclipse_solar.remains<3&eclipse.in_solar&remains<14&talent.soul_of_the_forest.enabled)&target.time_to_die>14-spell_targets+remains&(eclipse.in_any|remains<gcd.max),if=
@@ -527,8 +527,8 @@ local function Boat()
   local FuryofEluneRemains = S.FuryofElune:CooldownRemains() - 51
   if FuryofEluneRemains < 0 then FuryofEluneRemains = 0 end
   local FuryTicksRemain = FuryofEluneRemains * 2
-  -- ravenous_frenzy,if=buff.ca_inc.up
-  if S.RavenousFrenzy:IsCastable() and (Player:BuffUp(CaInc)) then
+  -- ravenous_frenzy,if=buff.ca_inc.remains>15
+  if S.RavenousFrenzy:IsCastable() and (Player:BuffRemains(CaInc) > 15) then
     if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RavenousFrenzy)) then return "ravenous_frenzy boat 2"; end
   end
   -- variable,name=critnotup,value=!buff.balance_of_all_things_nature.up&!buff.balance_of_all_things_arcane.up
@@ -545,7 +545,7 @@ local function Boat()
   if S.FuryofElune:IsCastable() and (((Player:BuffStack(S.BOATNatureBuff) > 4 or Player:BuffStack(S.BOATArcaneBuff) > 4) and (not CDsON() or CaInc:CooldownRemains() > 50 or (CovenantID == 3 and S.ConvoketheSpirits:CooldownRemains() > 50))) or (Target:DebuffRemains(S.AdaptiveSwarmDebuff) > 8 and CaInc:CooldownRemains() > 10 and CovenantID == 4) or fightRemains < 8 or (CovenantID == 1 and Player:BuffUp(S.KindredEmpowermentEnergizeBuff))) then
     if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryofElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune boat 8"; end
   end
-  -- cancel_buff,name=starlord,if=(buff.balance_of_all_things_nature.remains>4.5|buff.balance_of_all_things_arcane.remains>4.5)&(cooldown.ca_inc.remains>7|(cooldown.empower_bond.remains>7&!buff.kindred_empowerment_energize.up&covenant.kyrian))
+  -- cancel_buff,name=starlord,if=(buff.balance_of_all_things_nature.remains>4.5|buff.balance_of_all_things_arcane.remains>4.5)&(cooldown.ca_inc.remains>7|(cooldown.empower_bond.remains>7&!buff.kindred_empowerment_energize.up&covenant.kyrian))&astral_power>=30
   -- starsurge,if=!variable.critnotup&(covenant.night_fae|cooldown.ca_inc.remains>7|!variable.cd_condition&!covenant.kyrian|(cooldown.empower_bond.remains>7&!buff.kindred_empowerment_energize.up&covenant.kyrian))&(!dot.fury_of_elune.ticking|!cooldown.ca_inc.ready|!cooldown.convoke_the_spirits.ready)
   if S.Starsurge:IsReady() and (not VarCritNotUp and (CovenantID == 3 or CaInc:CooldownRemains() > 7 or not VarCDCondition and CovenantID ~= 1 or (S.EmpowerBond:CooldownRemains() > 7 and Player:BuffDown(S.KindredEmpowermentEnergizeBuff) and CovenantID == 1)) and (FuryofEluneRemains == 0 or not CaInc:CooldownUp() or not S.ConvoketheSpirits:CooldownUp())) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge boat 10"; end
@@ -685,8 +685,8 @@ local function APL()
     if S.Berserking:IsCastable() and ((CovenantID ~= 3 or not S.ConvoketheSpirits:CooldownUp()) and Player:BuffUp(CaInc)) then
       if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 2"; end
     end
-    -- potion,if=buff.ca_inc.remains>10
-    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffRemains(CaInc) > 10) then
+    -- potion,if=buff.ca_inc.remains>15|fight_remains<25
+    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffRemains(CaInc) > 15 or fightRemains < 25) then
       if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion 4"; end
     end
     -- variable,name=convoke_desync,value=ceil((interpolated_fight_remains-15-cooldown.ca_inc.remains)%180)=ceil((interpolated_fight_remains-15-120-cooldown.convoke_the_spirits.remains)%180)|cooldown.ca_inc.remains>interpolated_fight_remains|cooldown.convoke_the_spirits.remains>interpolated_fight_remains-10|!covenant.night_fae
