@@ -198,10 +198,6 @@ local function Cooldowns()
   if S.TheHunt:IsCastable() then
     if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt 76"; end
   end
-  -- fodder_to_the_flame
-  if S.FoddertotheFlame:IsCastable() then
-    if Cast(S.FoddertotheFlame, nil, Settings.Commons.DisplayStyle.Covenant) then return "fodder_to_the_flame 78"; end
-  end
   -- elysian_decree
   if S.ElysianDecree:IsCastable() then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Covenant) then return "elysian_decree 80"; end

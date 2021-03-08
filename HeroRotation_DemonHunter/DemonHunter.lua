@@ -64,7 +64,6 @@ Spell.DemonHunter.Vengeance = {
   DoorofShadows                         = Spell(300728),
   ElysianDecree                         = Spell(306830),
   Fleshcraft                            = Spell(324631),
-  FoddertotheFlame                      = Spell(329554),
   SinfulBrand                           = Spell(317009),
   SinfulBrandDebuff                     = Spell(317009),
   Soulshape                             = Spell(310143),
@@ -124,7 +123,6 @@ Spell.DemonHunter.Havoc = {
 
   -- Covenant Abilities
   ElysianDecree                         = Spell(306830),
-  FoddertotheFlame                      = Spell(329554),
   SinfulBrand                           = Spell(317009),
   SinfulBrandDebuff                     = Spell(317009),
   TheHunt                               = Spell(323639),

@@ -166,10 +166,6 @@ local function Cooldown()
   if S.TheHunt:IsCastable() and (not S.Demonic:IsAvailable() and not VarWaitingForMomentum or Player:BuffUp(S.FuriousGazeBuff)) then
     if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt 28"; end
   end
-  -- fodder_to_the_flame
-  if S.FoddertotheFlame:IsCastable() then
-    if Cast(S.FoddertotheFlame, nil, Settings.Commons.DisplayStyle.Covenant) then return "fodder_to_the_flame 30"; end
-  end
   -- elysian_decree,if=(active_enemies>desired_targets|raid_event.adds.in>30)
   if S.ElysianDecree:IsCastable() and (EnemiesCount8 > 0) then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "elysian_decree 32"; end
