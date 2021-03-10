@@ -134,6 +134,7 @@ Spell.Hunter.Marksmanship = {
   Volley                                = Spell(260243),
   ChimaeraShot                          = Spell(342049),
   DeadEye                               = Spell(321460),
+  Streamline                            = Spell(260367),
   -- Buffs
   VolleyBuff                            = Spell(260243),
   MasterMarksmanBuff                    = Spell(269576),
@@ -145,6 +146,8 @@ Spell.Hunter.Marksmanship = {
   -- Debuffs
   SerpentStingDebuff                    = Spell(271788),
   HuntersMarkDebuff                     = Spell(257284),
+  ResonatingArrowDebuff                 = Spell(308498),
+  WildMarkDebuff                        = Spell(328275),
 }
 
 Spell.Hunter.Survival = {
