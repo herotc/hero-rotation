@@ -35,6 +35,7 @@ local OnUseExcludes = {
 local ShouldReturn -- Used to get the return string
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
+local TargetInMeleeRange
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -84,23 +85,23 @@ end
 local function SingleTarget()
   -- raging_blow,if=runeforge.will_of_the_berserker.equipped&buff.will_of_the_berserker.remains<gcd
   if S.RagingBlow:IsCastable() and (S.WilloftheBerserker:IsAvailable() and Player:BuffRemains(S.WilloftheBerserker) < Player:GCD()) then
-    if HR.Cast(S.RagingBlow, nil, nil, not Target:IsSpellInRange(S.RagingBlow)) then return "raging_blow"; end
+    if HR.Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow"; end
   end
   -- siegebreaker
   if S.Siegebreaker:IsCastable() then
-    if HR.Cast(S.Siegebreaker, nil, nil, not Target:IsSpellInRange(S.Siegebreaker)) then return "siegebreaker"; end
+    if HR.Cast(S.Siegebreaker, nil, nil, not TargetInMeleeRange) then return "siegebreaker"; end
   end
   -- rampage,if=buff.recklessness.up|(buff.enrage.remains<gcd|rage>90)|buff.frenzy.remains<1.5
   if S.Rampage:IsReady() and (Player:BuffUp(S.RecklessnessBuff) or (Player:BuffRemains(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90) or Player:BuffRemains(S.FrenzyBuff) < 1.5) then
-    if HR.Cast(S.Rampage, nil, nil, not Target:IsSpellInRange(S.Rampage)) then return "rampage"; end
+    if HR.Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage"; end
   end
   -- condemn
   if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
-    if HR.Cast(S.Condemn, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
+    if HR.Cast(S.Condemn, nil, Settings.Commons.CovenantDisplayStyle, not TargetInMeleeRange) then return "condemn"; end
   end
   -- execute
   if S.Execute:IsCastable() and S.Execute:IsUsable() then
-    if HR.Cast(S.Execute, nil, nil, not Target:IsSpellInRange(S.Execute)) then return "execute"; end
+    if HR.Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute"; end
   end
   -- bladestorm,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>45)
   if S.Bladestorm:IsCastable() and (Player:BuffUp(S.EnrageBuff) and EnemiesCount8 > 1) then
@@ -108,11 +109,11 @@ local function SingleTarget()
   end
   -- bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
   if S.Bloodthirst:IsCastable() and (Player:BuffDown(S.EnrageBuff) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35 and not S.Cruelty:IsAvailable()) then
-    if HR.Cast(S.Bloodthirst, nil, nil, not Target:IsSpellInRange(S.Bloodthirst)) then return "bloodthirst"; end
+    if HR.Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst"; end
   end
   -- bloodbath,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
   if S.Bloodbath:IsCastable() and (Player:BuffDown(S.EnrageBuff) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35 and not S.Cruelty:IsAvailable()) then
-    if HR.Cast(S.Bloodbath, nil, nil, not Target:IsSpellInRange(S.Bloodbath)) then return "bloodbath"; end
+    if HR.Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath"; end
   end
   -- dragon_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
   if S.DragonRoar:IsCastable() and (Player:BuffUp(S.EnrageBuff) and EnemiesCount8 > 1) then
@@ -124,31 +125,31 @@ local function SingleTarget()
   end
   -- onslaught
   if S.Onslaught:IsCastable() then
-    if HR.Cast(S.Onslaught, nil, nil, not Target:IsSpellInRange(S.Onslaught)) then return "onslaught"; end
+    if HR.Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught"; end
   end
   -- raging_blow,if=charges=2
   if S.RagingBlow:IsCastable() and (S.RagingBlow:Charges() == 2) then
-    if HR.Cast(S.RagingBlow, nil, nil, not Target:IsSpellInRange(S.RagingBlow)) then return "raging_blow"; end
+    if HR.Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow"; end
   end
   -- crushing_blow,if=charges=2
   if S.CrushingBlow:IsCastable() and (S.RagingBlow:Charges() == 2) then
-    if HR.Cast(S.CrushingBlow, nil, nil, not Target:IsSpellInRange(CrushingBlow)) then return "CrushingBlow"; end
+    if HR.Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "CrushingBlow"; end
   end
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
-    if HR.Cast(S.Bloodthirst, nil, nil, not Target:IsSpellInRange(S.Bloodthirst)) then return "bloodthirst"; end
+    if HR.Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst"; end
   end
   -- bloodbath
   if S.Bloodbath:IsCastable() then
-    if HR.Cast(S.Bloodbath, nil, nil, not Target:IsSpellInRange(S.Bloodbath)) then return "bloodbath"; end
+    if HR.Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath"; end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
-    if HR.Cast(S.RagingBlow, nil, nil, not Target:IsSpellInRange(S.RagingBlow)) then return "raging_blow"; end
+    if HR.Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow"; end
   end
   -- crushing_blow
   if S.CrushingBlow:IsCastable() then
-    if HR.Cast(S.CrushingBlow, nil, nil, not Target:IsSpellInRange(CrushingBlow)) then return "CrushingBlow"; end
+    if HR.Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "CrushingBlow"; end
   end
   -- whirlwind
   if S.Whirlwind:IsCastable() then
@@ -174,6 +175,9 @@ local function APL()
     EnemiesCount8 = 1
     EnemiesCount12 = 1
   end
+
+  -- Range check
+  TargetInMeleeRange = Target:IsInMeleeRange(5)
 
   -- call precombat
   if not Player:AffectingCombat() then
@@ -201,7 +205,7 @@ local function APL()
     end
     -- rampage,if=cooldown.recklessness.remains<3&talent.reckless_abandon.enabled
     if S.Rampage:IsReady() and (S.Recklessness:CooldownRemains() < 3 and S.RecklessAbandon:IsAvailable()) then
-      if HR.Cast(S.Rampage, nil, nil, not Target:IsSpellInRange(S.Rampage)) then return "rampage 38"; end
+      if HR.Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage 38"; end
     end
     -- recklessness,if=gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
     if S.Recklessness:IsCastable() and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable()) or Target:TimeToDie() > 100 or (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20 or Target:TimeToDie() < 15 and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff))) then
