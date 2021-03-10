@@ -311,8 +311,8 @@ local function St()
   if S.AdaptiveSwarm:IsCastable() then
     if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmST, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm st 6"; end
   end
-  -- convoke_the_spirits,if=!druid.no_cds&((variable.convoke_desync&!cooldown.ca_inc.ready|buff.ca_inc.up)&astral_power<40&(buff.eclipse_lunar.remains>10|buff.eclipse_solar.remains>10)|fight_remains<10)
-  if S.ConvoketheSpirits:IsCastable() and (CDsON() and ((VarConvokeDesync and not CaInc:CooldownUp() or Player:BuffUp(CaInc)) and Player:AstralPowerP() < 40 and (Player:BuffRemains(S.EclipseLunar) > 10 or Player:BuffRemains(S.EclipseSolar) > 10) or fightRemains < 10)) then
+  -- convoke_the_spirits,if=!druid.no_cds&((variable.convoke_desync&!cooldown.ca_inc.ready&!runeforge.primordial_arcanic_pulsar|buff.ca_inc.up)&astral_power<40&(buff.eclipse_lunar.remains>10|buff.eclipse_solar.remains>10)|fight_remains<10)
+  if S.ConvoketheSpirits:IsCastable() and (CDsON() and ((VarConvokeDesync and not CaInc:CooldownUp() and not PAPEquipped or Player:BuffUp(CaInc)) and Player:AstralPowerP() < 40 and (Player:BuffRemains(S.EclipseLunar) > 10 or Player:BuffRemains(S.EclipseSolar) > 10) or fightRemains < 10)) then
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ConvoketheSpirits)) then return "convoke_the_spirits st 8"; end
   end
   -- variable,name=dot_requirements,value=(buff.ravenous_frenzy.remains>5|!buff.ravenous_frenzy.up)&(buff.kindred_empowerment_energize.remains<gcd.max)&(buff.eclipse_solar.remains>gcd.max|buff.eclipse_lunar.remains>gcd.max)
@@ -681,8 +681,8 @@ local function APL()
     if (HL.CombatTime() < 4 and not Player:PrevGCD(1, S.Starsurge) and not Player:PrevGCD(2, S.Starsurge)) then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
-    -- berserking,if=(!covenant.night_fae|!cooldown.convoke_the_spirits.up)&buff.ca_inc.up
-    if S.Berserking:IsCastable() and ((CovenantID ~= 3 or not S.ConvoketheSpirits:CooldownUp()) and Player:BuffUp(CaInc)) then
+    -- berserking,if=(!covenant.night_fae|!cooldown.convoke_the_spirits.up)&buff.ca_inc.remains>15
+    if S.Berserking:IsCastable() and ((CovenantID ~= 3 or not S.ConvoketheSpirits:CooldownUp()) and Player:BuffRemains(CaInc) > 15) then
       if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 2"; end
     end
     -- potion,if=buff.ca_inc.remains>15|fight_remains<25
@@ -708,8 +708,8 @@ local function APL()
       if I.SoullettingRuby:IsEquippedAndReady() and (CaInc:CooldownRemains() < 6 and not VarConvokeDesync or S.ConvoketheSpirits:CooldownRemains() < 6 and VarConvokeDesync or fightRemains < 25) then
         if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby main 8"; end
       end
-      -- use_item,name=inscrutable_quantum_device,if=buff.ca_inc.up
-      if I.InscrutableQuantumDevice:IsEquippedAndReady() and (Player:BuffUp(CaInc)) then
+      -- use_item,name=inscrutable_quantum_device,if=buff.ca_inc.remains>15
+      if I.InscrutableQuantumDevice:IsEquippedAndReady() and (Player:BuffRemains(CaInc) > 15) then
         if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device main 10"; end
       end
       -- use_items,slots=trinket1,if=(variable.on_use_trinket=1|variable.on_use_trinket=3)&(buff.ca_inc.up|cooldown.ca_inc.remains+2>trinket.1.cooldown.duration&(!covenant.night_fae|!variable.convoke_desync)&!covenant.kyrian|covenant.night_fae&variable.convoke_desync&cooldown.convoke_the_spirits.up&!cooldown.ca_inc.up&((buff.eclipse_lunar.remains>10|buff.eclipse_solar.remains>10)&!runeforge.balance_of_all_things|(buff.balance_of_all_things_nature.stack=5|buff.balance_of_all_things_arcane.stack=5))|buff.kindred_empowerment_energize.up)|fight_remains<20|variable.on_use_trinket=0
