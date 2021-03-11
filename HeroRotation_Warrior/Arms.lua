@@ -10,7 +10,6 @@ local Cache      = HeroCache
 local Unit       = HL.Unit
 local Player     = Unit.Player
 local Target     = Unit.Target
-local Pet        = Unit.Pet
 local Spell      = HL.Spell
 local Item       = HL.Item
 -- HeroRotation
@@ -32,7 +31,6 @@ local OnUseExcludes = {
 }
 
 -- Rotation Var
-local ShouldReturn -- Used to get the return string
 local Enemies8y
 local EnemiesCount8y
 
@@ -49,15 +47,11 @@ local StunInterrupts = {
   {S.StormBolt, "Cast Storm Bolt (Interrupt)", function () return true; end},
 }
 
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
-
 local function Precombat()
+  if Player:BuffRemains(S.BattleShout, true) < 60 then
+    if HR.Cast(S.BattleShout, nil, Settings.Commons.BattleShoutDisplayStyle) then return "battle shout"; end
+  end
+
   -- flask
   -- food
   -- augmentation
@@ -65,7 +59,7 @@ local function Precombat()
   if Everyone.TargetIsValid() then
     -- Manually added opener abilties
     if S.Charge:IsCastable() and S.Charge:Charges() >= 1 and not Target:IsInMeleeRange(5) then
-      if HR.Cast(S.Charge) then return "charge"; end
+      if HR.Cast(S.Charge, nil, Settings.Arms.ChargeDisplayStyle) then return "charge"; end
     end
     if Target:IsInMeleeRange(5) then
       if S.Skullsplitter:IsCastable() then
@@ -149,7 +143,7 @@ local function Hac()
   if S.Whirlwind:IsReady() then
     if HR.Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind"; end
   end
-  
+
 end
 
 local function Execute()
@@ -213,7 +207,7 @@ local function Execute()
   if S.Ravager:IsCastable() and CDsON() and (Player:Rage() < 80) then
     if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager"; end
   end
-    
+
 end
 
 local function SingleTarget()
@@ -293,7 +287,7 @@ local function SingleTarget()
   if S.Slam:IsReady() and (Player:Rage() > 50 and (not S.FervorofBattle:IsAvailable())) then
     if HR.Cast(S.Slam, nil, nil, not Target:IsSpellInRange(S.Slam)) then return "slam"; end
   end
-  
+
 end
 
 --- ======= ACTION LISTS =======
@@ -314,7 +308,7 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- charge
     if S.Charge:IsCastable() and (not Target:IsInMeleeRange(5)) then
-      if HR.Cast(S.Charge, Settings.Arms.GCDasOffGCD.Charge, nil, not Target:IsSpellInRange(S.Charge)) then return "charge"; end
+      if HR.Cast(S.Charge, nil, Settings.Arms.ChargeDisplayStyle, nil, not Target:IsSpellInRange(S.Charge)) then return "charge"; end
     end
     -- auto_attack
     -- potion

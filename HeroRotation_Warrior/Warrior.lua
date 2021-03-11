@@ -32,6 +32,7 @@ Spell.Warrior.Fury = {
   BagofTricks                           = Spell(312411),
 
   -- Abilities
+  BattleShout                           = Spell(6673),
   RecklessnessBuff                      = Spell(1719),
   Recklessness                          = Spell(1719),
   HeroicLeap                            = Spell(6544),
@@ -40,14 +41,15 @@ Spell.Warrior.Fury = {
   Execute                               = MultiSpell(5308, 280735),
   Bloodthirst                           = Spell(23881),
   Bloodbath                             = Spell(335096),
-  CrushingBlow                          = Spell(335097),
   RagingBlow                            = Spell(85288),
+  CrushingBlow                          = Spell(335097),
   Whirlwind                             = Spell(190411),
   Charge                                = Spell(100),
   FujiedasFuryBuff                      = Spell(207775),
   MeatCleaverBuff                       = Spell(85739),
   Pummel                                = Spell(6552),
   IntimidatingShout                     = Spell(5246),
+  VictoryRush                           = Spell(34428),
 
   -- Talents
   Bladestorm                            = Spell(46924),
@@ -65,6 +67,7 @@ Spell.Warrior.Fury = {
   Frenzy                                = Spell(335077),
   FrenzyBuff                            = Spell(335077),
   AngerManagement                       = Spell(152278),
+  ImpendingVictory                      = Spell(202168),
 
   -- Covenant Abilities
   AncientAftershock                     = Spell(325886),
@@ -74,7 +77,7 @@ Spell.Warrior.Fury = {
   ConquerorsFrenzyBuff                  = Spell(343672),
   SpearofBastion                        = Spell(307865),
   SpearofBastionBuff                    = Spell(307871),
-  
+
   -- Legendary Effects
   WilloftheBerserker                    = Spell(335594),
   -- Conduits
@@ -100,6 +103,7 @@ Spell.Warrior.Arms = {
   LightsJudgment                        = Spell(255647),
 
   -- Abilities
+  BattleShout                           = Spell(6673),
   Bladestorm                            = Spell(227847),
   Charge                                = Spell(100),
   ColossusSmash                         = Spell(167105),
@@ -116,6 +120,7 @@ Spell.Warrior.Arms = {
   SweepingStrikes                       = Spell(260708),
   SweepingStrikesBuff                   = Spell(260708),
   Whirlwind                             = Spell(1680),
+  VictoryRush                           = Spell(34428),
 
   -- Talents
   AngerManagement                       = Spell(152278),
@@ -232,4 +237,3 @@ Item.Warrior.Arms = {
 Item.Warrior.Protection = {
   PotionofUnbridledFury            = Item(169299),
 }
-

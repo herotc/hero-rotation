@@ -9,7 +9,6 @@ local HL         = HeroLib
 local Unit       = HL.Unit
 local Player     = Unit.Player
 local Target     = Unit.Target
-local Pet        = Unit.Pet
 local Spell      = HL.Spell
 local Item       = HL.Item
 -- HeroRotation
@@ -26,12 +25,8 @@ local CDsON      = HR.CDsON
 local S = Spell.Warrior.Protection
 local I = Item.Warrior.Protection
 
--- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = {
-}
 
 -- Rotation Var
-local ShouldReturn -- Used to get the return string
 local Enemies8y
 local EnemiesCount8
 local gcdTime
@@ -51,10 +46,6 @@ local StunInterrupts = {
 
 local function num(val)
   if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
 end
 
 local function IsCurrentlyTanking()
@@ -98,6 +89,10 @@ local function SuggestRageDump(rageFromSpell)
 end
 
 local function Precombat()
+  if Player:BuffRemains(S.BattleShout, true) < 60 then
+    if HR.Cast(S.BattleShout, nil, Settings.Commons.BattleShoutDisplayStyle) then return "battle shout"; end
+  end
+
   -- flask
   -- food
   -- augmentation
@@ -113,7 +108,7 @@ local function Precombat()
     end
   else
     if S.Charge:IsCastable() then
-      if HR.Cast(S.Charge, nil, nil, not Target:IsInRange(25)) then return "charge precombat"; end
+      if HR.Cast(S.Charge, nil, Settings.Protection.ChargeDisplayStyle, not Target:IsInRange(25)) then return "charge precombat"; end
     end
   end
 end

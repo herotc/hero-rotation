@@ -10,7 +10,6 @@ local Cache      = HeroCache
 local Unit       = HL.Unit
 local Player     = Unit.Player
 local Target     = Unit.Target
-local Pet        = Unit.Pet
 local Spell      = HL.Spell
 local Item       = HL.Item
 -- HeroRotation
@@ -32,10 +31,9 @@ local OnUseExcludes = {
 }
 
 -- Rotation Var
-local ShouldReturn -- Used to get the return string
-local Enemies8y, Enemies20y
-local EnemiesCount8, EnemiesCount20
 local TargetInMeleeRange
+local Enemies8y, Enemies12y
+local EnemiesCount8, EnemiesCount12
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -50,16 +48,11 @@ local StunInterrupts = {
   {S.StormBolt, "Cast Storm Bolt (Interrupt)", function () return true; end},
 }
 
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
-
 local function Precombat()
-  -- flask
+  if Player:BuffRemains(S.BattleShout, true) < 60 then
+    if HR.Cast(S.BattleShout, nil, Settings.Commons.BattleShoutDisplayStyle) then return "battle shout"; end
+  end
+
   -- food
   -- augmentation
   -- snapshot_stats
@@ -74,10 +67,10 @@ local function Precombat()
     end
     -- Manually Added: Charge if not in melee. Bloodthirst if in melee
     if S.Charge:IsCastable() and S.Charge:Charges() >= 1 and not Target:IsSpellInRange(S.Bloodthirst) then
-      if HR.Cast(S.Charge, nil, nil, not Target:IsSpellInRange(S.Charge)) then return "charge 14"; end
+      if HR.Cast(S.Charge, nil, Settings.Fury.ChargeDisplayStyle, not Target:IsSpellInRange(S.Charge)) then return "charge 14"; end
     end
-    if S.Bloodthirst:IsCastable() and Target:IsSpellInRange(S.Bloodthirst) then
-      if HR.Cast(S.Bloodthirst) then return "bloodthirst 16"; end
+    if S.Bloodthirst:IsCastable() then
+      if HR.Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst 16"; end
     end
   end
 end
@@ -120,11 +113,11 @@ local function SingleTarget()
     if HR.Cast(S.DragonRoar, nil, nil, not Target:IsInRange(12)) then return "dragon_roar"; end
   end
   -- Ancient Aftershock while enraged
-  if S.AncientAftershock:IsCastable() and (Player:BuffUp(S.EnrageBuff) and Player:Covenant() == "Night Fae") then
+  if S.AncientAftershock:IsCastable() and Player:BuffUp(S.EnrageBuff) and Player:Covenant() == "Night Fae" then
     if HR.Cast(S.AncientAftershock, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(8)) then return "AncientAftershock"; end
   end
   -- onslaught
-  if S.Onslaught:IsCastable() then
+  if S.Onslaught:IsCastable() and S.Onslaught:IsUsable() then
     if HR.Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught"; end
   end
   -- raging_blow,if=charges=2
@@ -132,7 +125,7 @@ local function SingleTarget()
     if HR.Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow"; end
   end
   -- crushing_blow,if=charges=2
-  if S.CrushingBlow:IsCastable() and (S.RagingBlow:Charges() == 2) then
+  if S.CrushingBlow:IsCastable() and (S.CrushingBlow:Charges() == 2) then
     if HR.Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "CrushingBlow"; end
   end
   -- bloodthirst
@@ -160,12 +153,14 @@ end
 local function Movement()
   -- heroic_leap
   if S.HeroicLeap:IsCastable() and not Target:IsInMeleeRange(8) then
-    if HR.Cast(S.HeroicLeap, Settings.Fury.GCDasOffGCD.HeroicLeap) then return "heroic_leap 152"; end
+    if HR.Cast(S.HeroicLeap, nil, Settings.Fury.HeroicLeapDisplayStyle) then return "heroic_leap 152"; end
   end
 end
 
 --- ======= ACTION LISTS =======
 local function APL()
+  local PlayerHPPct = Player:HealthPercentage()
+
   if AoEON() then
     Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
     Enemies12y = Player:GetEnemiesInMeleeRange(12) -- Dragon Roar
@@ -183,21 +178,30 @@ local function APL()
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
+
   if Everyone.TargetIsValid() then
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+
+    if S.VictoryRush:IsUsable() and S.VictoryRush:IsReady() and PlayerHPPct < 80 then
+      if HR.Cast(S.VictoryRush, nil, nil, not TargetInMeleeRange) then return "victory_rush defensive" end
+    end
+    if S.ImpendingVictory:IsUsable() and S.ImpendingVictory:IsReady() and PlayerHPPct < 80 then
+      if HR.Cast(S.ImpendingVictory, nil, nil, not TargetInMeleeRange) then return "impending_victory defensive" end
+    end
+
     -- auto_attack
     -- charge
-    if S.Charge:IsCastable() and S.Charge:Charges() >= 1 and (not Target:IsInMeleeRange(5)) then
-      if HR.Cast(S.Charge, Settings.Fury.GCDasOffGCD.Charge, nil, not Target:IsSpellInRange(S.Charge)) then return "charge 32"; end
+    if S.Charge:IsCastable() and S.Charge:Charges() >= 1 and not TargetInMeleeRange then
+      if HR.Cast(S.Charge, nil, Settings.Fury.ChargeDisplayStyle, not Target:IsSpellInRange(S.Charge)) then return "charge 32"; end
     end
     -- run_action_list,name=movement,if=movement.distance>5
-    if (not Target:IsInMeleeRange(5)) then
+    if (not TargetInMeleeRange) then
       local ShouldReturn = Movement(); if ShouldReturn then return ShouldReturn; end
     end
     -- heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
     if S.HeroicLeap:IsCastable() and (not Target:IsInRange(25)) then
-      if HR.Cast(S.HeroicLeap, Settings.Fury.GCDasOffGCD.HeroicLeap) then return "heroic_leap 34"; end
+      if HR.Cast(S.HeroicLeap, nil, Settings.Fury.HeroicLeapDisplayStyle) then return "heroic_leap 34"; end
     end
     -- potion,if=target.time_to_die<60
     if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions and Target:TimeToDie() < 60 then
