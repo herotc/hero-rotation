@@ -74,6 +74,7 @@ HR.GUISettings.APL.Warlock = {
     OffGCDasOffGCD = {
       -- Abilities
       UnendingResolve = true,
+      AxeToss = true,
     }
   },
   Affliction = {
