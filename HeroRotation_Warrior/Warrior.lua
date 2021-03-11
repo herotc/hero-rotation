@@ -102,6 +102,8 @@ Spell.Warrior.Arms = {
   LightsJudgment                        = Spell(255647),
 
   -- Abilities
+  BattleShout                           = Spell(6673),
+  BattleShoutBuff                       = Spell(6673),
   Bladestorm                            = Spell(227847),
   Charge                                = Spell(100),
   ColossusSmash                         = Spell(167105),
@@ -149,13 +151,12 @@ Spell.Warrior.Arms = {
   ConquerorsFrenzyBuff                  = Spell(343672),
   SpearofBastion                        = Spell(307865),
   SpearofBastionBuff                    = Spell(307871),
+
   -- Legendary Effects
 
   -- Conduits
 
   -- Item Buffs/Debuffs
-  RazorCoralDebuff                      = Spell(303568),
-  ConductiveInkDebuff                   = Spell(302565),
 
   -- Pool
   Pool                                  = Spell(999910),
