@@ -178,6 +178,7 @@ Spell.Warrior.Protection = {
   Charge                                = Spell(100),
   DemoralizingShout                     = Spell(1160),
   Devastate                             = Spell(20243),
+  Execute                               = Spell(163201),
   IgnorePain                            = Spell(190456),
   IntimidatingShout                     = Spell(5246),
   LastStand                             = Spell(12975),
