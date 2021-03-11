@@ -66,6 +66,9 @@ HR.GUISettings.APL.Warrior = {
     }
   },
   Protection = {
+    DisplayStyle = {
+      Defensive = "Suggested"
+    },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
