@@ -17,10 +17,17 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.Warrior = {
   Commons = {
-    UsePotions  = true,
-    UseTrinkets = true,
-    TrinketDisplayStyle = "Suggested",
-    CovenantDisplayStyle = "Suggested",
+    Enabled = {
+      Potions = true,
+      Trinkets = true,
+    },
+    DisplayStyle = {
+      Potions = "Suggested",
+      Covenant = "Suggested",
+      Trinkets = "Suggested",
+      Charge = "Suggested",
+    },
+    VictoryRushHP = 80,
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       Racials = true,
@@ -50,12 +57,12 @@ HR.GUISettings.APL.Warrior = {
       -- Abilities
     },
     GCDasOffGCD = {
+      BattleShout = false,
       Bladestorm = false,
       DragonRoar = false,
+      HeroicLeap = false,
       Recklessness = false,
       Siegebreaker = false,
-      HeroicLeap = false,
-      Charge = false,
     }
   },
   Protection = {
@@ -79,10 +86,7 @@ local CP_Fury = CreateChildPanel(CP_Warrior, "Fury")
 local CP_Protection = CreateChildPanel(CP_Warrior, "Protection")
 
 CreateARPanelOptions(CP_Warrior, "APL.Warrior.Commons")
-CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.")
-CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
-CreatePanelOption("Dropdown", CP_Warrior, "APL.Warrior.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
-CreatePanelOption("Dropdown", CP_Warrior, "APL.Warrior.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for Covenant abilities.")
+CreatePanelOption("Slider", CP_Warrior, "APL.Warrior.Commons.VictoryRushHP", {0, 100, 1}, "Victory Rush HP", "Set the Victory Rush/Impending Victory HP threshold. Set to 0 to disable.")
 
 -- Arms Settings
 CreateARPanelOptions(CP_Arms, "APL.Warrior.Arms")

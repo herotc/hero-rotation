@@ -24,47 +24,49 @@ if not Spell.Warrior then Spell.Warrior = {} end
 
 Spell.Warrior.Fury = {
   -- Racials
-  BloodFury                             = Spell(20572),
-  Berserking                            = Spell(26297),
-  LightsJudgment                        = Spell(255647),
-  Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
   BagofTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  BloodFury                             = Spell(20572),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
 
   -- Abilities
-  RecklessnessBuff                      = Spell(1719),
-  Recklessness                          = Spell(1719),
-  HeroicLeap                            = Spell(6544),
-  Rampage                               = Spell(184367),
+  BattleShout                           = Spell(6673),
+  BattleShoutBuff                       = Spell(6673),
+  Bloodbath                             = Spell(335096),
+  Bloodthirst                           = Spell(23881),
+  Charge                                = Spell(100),
+  CrushingBlow                          = Spell(335097),
   EnrageBuff                            = Spell(184362),
   Execute                               = MultiSpell(5308, 280735),
-  Bloodthirst                           = Spell(23881),
-  Bloodbath                             = Spell(335096),
-  CrushingBlow                          = Spell(335097),
-  RagingBlow                            = Spell(85288),
-  Whirlwind                             = Spell(190411),
-  Charge                                = Spell(100),
   FujiedasFuryBuff                      = Spell(207775),
+  IntimidatingShout                     = Spell(5246),
+  HeroicLeap                            = Spell(6544),
   MeatCleaverBuff                       = Spell(85739),
   Pummel                                = Spell(6552),
-  IntimidatingShout                     = Spell(5246),
+  RagingBlow                            = Spell(85288),
+  Rampage                               = Spell(184367),
+  RecklessnessBuff                      = Spell(1719),
+  Recklessness                          = Spell(1719),
+  Whirlwind                             = Spell(190411),
 
   -- Talents
+  AngerManagement                       = Spell(152278),
   Bladestorm                            = Spell(46924),
   Cruelty                               = Spell(335070),
   DragonRoar                            = Spell(118000),
+  Frenzy                                = Spell(335077),
+  FrenzyBuff                            = Spell(335077),
   FrothingBerserker                     = Spell(215571),
   Massacre                              = Spell(206315),
   Onslaught                             = Spell(315720),
   RecklessAbandon                       = Spell(202751),
-  SuddenDeath                           = Spell(280721),
-  SuddenDeathBuff                       = Spell(280776),
   Siegebreaker                          = Spell(280772),
   SiegebreakerDebuff                    = Spell(280773),
   StormBolt                             = Spell(107570),
-  Frenzy                                = Spell(335077),
-  FrenzyBuff                            = Spell(335077),
-  AngerManagement                       = Spell(152278),
+  SuddenDeath                           = Spell(280721),
+  SuddenDeathBuff                       = Spell(280776),
 
   -- Covenant Abilities
   AncientAftershock                     = Spell(325886),
@@ -74,16 +76,16 @@ Spell.Warrior.Fury = {
   ConquerorsFrenzyBuff                  = Spell(343672),
   SpearofBastion                        = Spell(307865),
   SpearofBastionBuff                    = Spell(307871),
-  
+
   -- Legendary Effects
-  WilloftheBerserker                    = Spell(335594),
+  WilloftheBerserkerBuff                = Spell(335594),
+
   -- Conduits
+  MercilessBonegrinder                  = Spell(335260),
+  MercilessBonegrinderBuff              = Spell(346574),
   ViciousContempt                       = Spell(337302),
 
   -- Item Buffs/Debuffs
-  RazorCoralDebuff                      = Spell(303568),
-  ConductiveInkDebuff                   = Spell(302565),
-  NoxiousVenomDebuff                    = Spell(267410),
 
   -- Pool
   Pool                                  = Spell(999910),

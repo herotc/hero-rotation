@@ -131,11 +131,11 @@ local function Hac()
   end
   -- Ancient Aftershock
   if S.AncientAftershock:IsCastable() then
-    if HR.Cast(S.AncientAftershock, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(8)) then return "ancient_aftershock"; end
+    if HR.Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(8)) then return "ancient_aftershock"; end
   end
   -- condemn
   if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
-    if HR.Cast(S.Condemn, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
+    if HR.Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
   end
   -- execute,if=buff.sweeping_strikes.up
   if S.Execute:IsCastable() and S.Execute:IsUsable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
@@ -199,7 +199,7 @@ local function Execute()
   end
   -- condemn
   if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
-    if HR.Cast(S.Condemn, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
+    if HR.Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
   end
   -- execute
   if S.Execute:IsCastable() and S.Execute:IsUsable() then
@@ -267,7 +267,7 @@ local function SingleTarget()
   end
   -- condemn,if=buff.sudden_death.react
   if S.Condemn:IsCastable() and S.Condemn:IsUsable() and (Player:BuffUp(S.SuddenDeathBuff)) then
-    if HR.Cast(S.Condemn, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
+    if HR.Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
   end
   -- execute,if=buff.sudden_death.react
   if S.Execute:IsCastable() and S.Execute:IsUsable() and (Player:BuffUp(S.SuddenDeathBuff)) then
@@ -275,7 +275,7 @@ local function SingleTarget()
   end
   -- Ancient Aftershock
   if S.AncientAftershock:IsCastable() and (Player:Covenant() == "Night Fae") then
-    if HR.Cast(S.AncientAftershock, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(5)) then return "ancient_aftershock"; end
+    if HR.Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(5)) then return "ancient_aftershock"; end
   end
   -- mortal_strike
   if S.MortalStrike:IsReady() then
@@ -355,7 +355,7 @@ local function APL()
       -- use_items
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
-        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+        if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
     -- sweeping_strikes,if=spell_targets.whirlwind>1&cooldown.bladestorm.remains>12

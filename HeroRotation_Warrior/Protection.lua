@@ -119,18 +119,19 @@ local function Precombat()
 end
 
 local function Defensive()
-  local PlayerHPPct = Player:HealthPercentage()
   if ShouldPressShieldBlock() then
     if HR.CastSuggested(S.ShieldBlock) then return "shield_block defensive" end
   end
   if S.LastStand:IsCastable() and (Player:BuffDown(S.ShieldBlockBuff) and S.ShieldBlock:Recharge() > 1) then
     if HR.CastSuggested(S.LastStand) then return "last_stand defensive" end
   end
-  if S.VictoryRush:IsUsable() and S.VictoryRush:IsReady() and PlayerHPPct < 80 then
-    if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
-  end
-  if S.ImpendingVictory:IsReady() and PlayerHPPct < 80 then
-    if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
+  if Player:HealthPercentage() < Settings.Commons.VictoryRushHP then
+    if S.VictoryRush:IsCastable() and S.VictoryRush:IsUsable() then
+      if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
+    end
+    if S.ImpendingVictory:IsReady() and S.ImpendingVictory:IsUsable() then
+      if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
+    end
   end
 end
 
