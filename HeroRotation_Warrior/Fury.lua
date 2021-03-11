@@ -219,6 +219,11 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    -- auto_attack
+    -- charge
+    if S.Charge:IsCastable() and S.Charge:Charges() >= 1 and (not Target:IsInMeleeRange(5)) then
+      if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge, not Target:IsSpellInRange(S.Charge)) then return "charge main 2"; end
+    end
     -- Manually added: VR/IV
     if Player:HealthPercentage() < Settings.Commons.VictoryRushHP then
       if S.VictoryRush:IsCastable() and S.VictoryRush:IsUsable() then
@@ -227,11 +232,6 @@ local function APL()
       if S.ImpendingVictory:IsReady() and S.VictoryRush:IsUsable() then
         if Cast(S.ImpendingVictory, nil, nil, not TargetInMeleeRange) then return "impending_victory heal"; end
       end
-    end
-    -- auto_attack
-    -- charge
-    if S.Charge:IsCastable() and S.Charge:Charges() >= 1 and (not Target:IsInMeleeRange(5)) then
-      if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge, not Target:IsSpellInRange(S.Charge)) then return "charge main 2"; end
     end
     -- variable,name=execute_phase,value=talent.massacre&target.health.pct<35|target.health.pct<20|target.health.pct>80&covenant.venthyr
     VarExecutePhase = (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35 or Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80 and Player:Covenant() == "Venthyr")
