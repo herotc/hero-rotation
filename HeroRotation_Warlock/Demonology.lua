@@ -305,6 +305,7 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(40, S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(30, S.AxeToss, Settings.Demonology.OffGCDasOffGCD.AxeToss, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- Manually added: unending_resolve
     if S.UnendingResolve:IsCastable() and (Player:HealthPercentage() < Settings.Demonology.UnendingResolveHP) then
       if HR.Cast(S.UnendingResolve, Settings.Demonology.OffGCDasOffGCD.UnendingResolve) then return "unending_resolve defensive"; end
