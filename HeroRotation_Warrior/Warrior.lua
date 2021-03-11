@@ -49,6 +49,7 @@ Spell.Warrior.Fury = {
   Rampage                               = Spell(184367),
   RecklessnessBuff                      = Spell(1719),
   Recklessness                          = Spell(1719),
+  VictoryRush                           = Spell(34428),
   Whirlwind                             = Spell(190411),
 
   -- Talents
@@ -59,6 +60,7 @@ Spell.Warrior.Fury = {
   Frenzy                                = Spell(335077),
   FrenzyBuff                            = Spell(335077),
   FrothingBerserker                     = Spell(215571),
+  ImpendingVictory                      = Spell(202168),
   Massacre                              = Spell(206315),
   Onslaught                             = Spell(315720),
   RecklessAbandon                       = Spell(202751),
