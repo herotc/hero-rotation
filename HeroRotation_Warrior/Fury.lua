@@ -266,7 +266,8 @@ local function APL()
       if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 14"; end
     end
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up|raid_event.adds.in<gcd&!buff.meat_cleaver.up
-    if S.Whirlwind:IsCastable("Melee") and (EnemiesCount8 > 1 and Player:BuffDown(S.MeatCleaverBuff)) then
+    -- Manually added PrevGCDP and buff stack check to smooth out Whirlwind usage
+    if S.Whirlwind:IsCastable("Melee") and (EnemiesCount8 > 1 and (Player:BuffDown(S.MeatCleaverBuff) or Player:PrevGCDP(3, S.Whirlwind) and Player:BuffStack(S.MeatCleaverBuff) == 1)) then
       if Cast(S.Whirlwind) then return "whirlwind 60"; end
     end
     if (Settings.Commons.Enabled.Trinkets) then
