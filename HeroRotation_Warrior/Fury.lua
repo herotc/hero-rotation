@@ -246,8 +246,8 @@ local function APL()
     -- sequence,if=active_enemies=1&covenant.venthyr.enabled&runeforge.signet_of_tormented_kings.equipped,name=BT&Reck:bloodthirst:recklessness
     -- sequence,if=active_enemies=1&!covenant.venthyr.enabled&runeforge.signet_of_tormented_kings.equipped,name=BT&Charge:bloodthirst:heroic_charge
     -- potion
-    if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
-      if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 6"; end
+    if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions then
+      if Cast(I.PotionofSpectralStrength, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 6"; end
     end
     -- conquerors_banner,if=rage>74
     if S.ConquerorsBanner:IsCastable() and (Player:Rage() > 74) then

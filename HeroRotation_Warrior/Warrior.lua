@@ -221,18 +221,18 @@ Spell.Warrior.Protection = {
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Fury = {
-  PotionofPhantomFire              = Item(171349),
+  PotionofSpectralStrength         = Item(171275),
   GrimCodex                        = Item(178811, {13, 14}),
   DDVoracity                       = Item(173087, {13, 14}),
 }
 
 Item.Warrior.Arms = {
-  PotionofPhantomFire              = Item(171349),
+  PotionofSpectralStrength         = Item(171275),
   GrimCodex                        = Item(178811, {13, 14}),
   DDVoracity                       = Item(173087, {13, 14}),
 }
 
 Item.Warrior.Protection = {
-  PotionofUnbridledFury            = Item(169299),
+  PotionofPhantomFire              = Item(171349),
 }
 

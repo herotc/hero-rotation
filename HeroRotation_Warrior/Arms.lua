@@ -358,8 +358,8 @@ local function APL()
     end
     -- auto_attack
     -- potion
-    if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
-      if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
+    if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions then
+      if Cast(I.PotionofSpectralStrength, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
     end
     if CDsON() then
       -- arcane_torrent,if=cooldown.mortal_strike.remains>1.5&rage<50
