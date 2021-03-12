@@ -26,6 +26,7 @@ HR.GUISettings.APL.Warrior = {
       Covenant = "Suggested",
       Trinkets = "Suggested",
       Charge = "Suggested",
+      HeroicLeap = "Suggested",
     },
     VictoryRushHP = 80,
     -- {Display OffGCD as OffGCD, ForceReturn}
@@ -60,7 +61,6 @@ HR.GUISettings.APL.Warrior = {
       BattleShout = false,
       Bladestorm = false,
       DragonRoar = false,
-      HeroicLeap = false,
       Recklessness = false,
       Siegebreaker = false,
     }
