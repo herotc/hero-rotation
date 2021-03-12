@@ -206,41 +206,45 @@ local function Execute()
   if S.ColossusSmash:IsCastable() then
     if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash execute 16"; end
   end
+  -- condemn,if=debuff.colossus_smash.up|buff.sudden_death.react|rage>65
+  if S.Condemn:IsCastable() and S.Condemn:IsUsable() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.SuddenDeathBuff) or Player:Rage() > 65) then
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 18"; end
+  end
   -- overpower,if=charges=2
   if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2) then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 18"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 20"; end
   end
-  -- mortal_strike,if=runeforge.enduring_blow|dot.deep_wounds.remains<=gcd
-  if S.MortalStrike:IsReady() and (EnduringBlowEquipped or Target:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD()) then
-    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 20"; end
+  -- mortal_strike,if=runeforge.enduring_blow|dot.deep_wounds.remains<=gcd|((debuff.exploiter.stack=2|buff.battlelord.up)&!covenant.venthyr)
+  if S.MortalStrike:IsReady() and (EnduringBlowEquipped or Target:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD() or ((Target:DebuffStack(S.ExploiterDebuff) == 2 or Player:BuffUp(S.BattlelordBuff)) and Player:Covenant() ~= "Venthyr")) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 22"; end
   end
   -- ancient_aftershock
   if S.AncientAftershock:IsCastable() then
-    if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock execute 22"; end
+    if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock execute 24"; end
   end
   -- spear_of_bastion
   if S.SpearofBastion:IsCastable() then
-    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 24"; end
+    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 26"; end
   end
   -- bladestorm,if=buff.deadly_calm.down&rage<50
   if S.Bladestorm:IsCastable() and CDsON() and (Player:BuffDown(S.DeadlyCalmBuff) and Player:Rage() < 50) then
-    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm execute 26"; end
+    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm execute 28"; end
   end
   -- skullsplitter,if=rage<40
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 40) then
-    if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter execute 28"; end
+    if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter execute 30"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 30"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 32"; end
   end
   -- condemn
   if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 32"; end
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 34"; end
   end
   -- execute
   if S.Execute:IsCastable() and S.Execute:IsUsable() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 34"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 36"; end
   end
 end
 

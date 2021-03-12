@@ -157,6 +157,8 @@ Spell.Warrior.Arms = {
   -- Legendary Effects
 
   -- Conduits
+  BattlelordBuff                        = Spell(346369),
+  ExploiterDebuff                       = Spell(335452),
 
   -- Item Buffs/Debuffs
 
