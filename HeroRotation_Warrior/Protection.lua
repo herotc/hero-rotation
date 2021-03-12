@@ -37,6 +37,9 @@ local TargetInMeleeRange
 local Enemies8y
 local EnemiesCount8
 
+-- Legendaries
+local ReprisalEquipped = Player:HasLegendaryEquipped(193)
+
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
 local Settings = {
@@ -49,6 +52,11 @@ local Settings = {
 local StunInterrupts = {
   {S.IntimidatingShout, "Cast Intimidating Shout (Interrupt)", function () return true; end},
 }
+
+-- Event Registrations
+HL:RegisterForEvent(function()
+  ReprisalEquipped = Player:HasLegendaryEquipped(193)
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -247,7 +255,6 @@ local function APL()
     end
     -- use_items,if=cooldown.avatar.remains<=gcd|buff.avatar.up
     if (Settings.Commons.Enabled.Trinkets and (S.Avatar:CooldownRemains() <= Player:GCD() or Player:BuffUp(S.AvatarBuff))) then
-      -- use_items
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
         if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
@@ -287,9 +294,12 @@ local function APL()
     if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.AvatarBuff) or Target:TimeToDie() < 25) then
       if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
     end
-    -- ignore_pain,if=buff.ignore_pain.down&rage>50
-    if S.IgnorePain:IsReady() and (Player:BuffDown(S.IgnorePain) and Player:Rage() > 50 and IsCurrentlyTanking()) then
-      if Cast(S.IgnorePain, nil, Settings.Protection.DisplayStyle.Defensive) then return "ignore_pain main 6"; end
+    -- ignore_pain,if=target.health.pct>20&!covenant.venthyr,line_cd=15
+    -- ignore_pain,if=target.health.pct>20&target.health.pct<80&covenant.venthyr,line_cd=15
+    -- Handling ignore_pain via SuggestRageDump, so dropping the above two lines
+    -- heroic_charge,if=rage<60&buff.revenge.down&runeforge.reprisal
+    if S.Charge:IsCastable() and (Player:Rage() < 60 and Player:BuffDown(S.RevengeBuff) and ReprisalEquipped) then
+      if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge, not Target:IsSpellInRange(S.Charge)) then return "charge for reprisal"; end
     end
     -- demoralizing_shout,if=talent.booming_voice.enabled
     if S.DemoralizingShout:IsCastable() and (S.BoomingVoice:IsAvailable()) then
