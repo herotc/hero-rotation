@@ -51,12 +51,14 @@ local OnUseExcludeTrinkets = {
 -- Legendaries
 local DashingScoundrelEquipped = Player:HasLegendaryEquipped(118)
 local DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
+local DoombladeEquipped = Player:HasLegendaryEquipped(119)
 local DuskwalkersPatchEquipped = Player:HasLegendaryEquipped(121)
 local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
 local VendettaCDMultiplier = DuskwalkersPatchEquipped and 0.55 or 1.0
 HL:RegisterForEvent(function()
   DashingScoundrelEquipped = Player:HasLegendaryEquipped(118)
   DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
+  DoombladeEquipped = Player:HasLegendaryEquipped(119)
   DuskwalkersPatchEquipped = Player:HasLegendaryEquipped(121)
   MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
   VendettaCDMultiplier = DuskwalkersPatchEquipped and 0.55 or 1.0
@@ -72,7 +74,7 @@ local BleedTickTime, ExsanguinatedBleedTickTime = 2 / Player:SpellHaste(), 1 / P
 local ComboPoints, ComboPointsDeficit
 local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMGThreshold
 local PriorityRotation
-local PoisonedBleeds, RuptureDurationThreshold, EnergyRegenCombined, SingleTarget
+local PoisonedBleeds, EnergyRegenCombined, SingleTarget
 
 -- Interrupts
 local Interrupts = {
@@ -352,15 +354,15 @@ local function CDs ()
   end
 
   if not Player:StealthUp(true, false) then
-    -- !!PTR ONLY!! actions.cds+=/flagellation,if=!stealthed.rogue&(cooldown.vendetta.remains<3&effective_combo_points>=4|debuff.vendetta.up|fight_remains<24)
-    -- !!PTR ONLY!! actions.cds+=/flagellation,if=!stealthed.rogue&(floor((fight_remains-24)%cooldown)>floor((fight_remains-24-cooldown.vendetta.remains*variable.vendetta_cdr)%cooldown))
-    -- actions.cds=flagellation
-    if S.Flagellation:IsCastable() and not Target:DebuffUp(S.Flagellation) then
-      if Cast(S.Flagellation, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation" end
-    end
-    -- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
-    if S.FlagellationCleanse:IsCastable() and Target:DebuffRemains(S.Flagellation) < 2 then
-      if Cast(S.FlagellationCleanse, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation Cleanse" end
+    -- actions.cds+=/flagellation,if=!stealthed.rogue&(cooldown.vendetta.remains<3&effective_combo_points>=4&target.time_to_die>10|debuff.vendetta.up|fight_remains<24)
+    -- actions.cds+=/flagellation,if=!stealthed.rogue&effective_combo_points>=4&(floor((fight_remains-24)%cooldown)>floor((fight_remains-24-cooldown.vendetta.remains*variable.vendetta_cdr)%cooldown))
+    if S.Flagellation:IsReady() then
+      if S.Vendetta:CooldownRemains() < 3 and ComboPoints >= 4 and (Target:FilteredTimeToDie(">", 10) or Target:TimeToDieIsNotValid())
+        or Target:DebuffUp(S.Vendetta) or HL.BossFilteredFightRemains("<=", 24) then
+        if HR.Cast(S.Flagellation, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation (Sync)" end
+      elseif ComboPoints >= 4 and CheckWillWasteCooldown(90, S.Vendetta:CooldownRemains() * VendettaCDMultiplier, 24) then
+        if HR.Cast(S.Flagellation, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation (Burn)" end
+      end
     end
     -- actions.cds+=/sepsis,if=!stealthed.rogue&(cooldown.vendetta.remains<1&target.time_to_die>10|debuff.vendetta.up|fight_remains<10)
     -- actions.cds+=/sepsis,if=!stealthed.rogue&(floor((fight_remains-10)%cooldown)>floor((fight_remains-10-cooldown.vendetta.remains*variable.vendetta_cdr)%cooldown))
@@ -376,13 +378,14 @@ local function CDs ()
     if S.Vendetta:IsCastable() and Target:DebuffUp(S.Rupture) and not Target:DebuffUp(S.Vendetta) then
       -- actions.cds+=/variable,name=vendetta_nightstalker_condition,value=!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled
       local NightstalkerCondition = not S.Nightstalker:IsAvailable() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemains() < 5 - 2 * BoolToInt(S.DeeperStratagem:IsAvailable())
-      -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.kyrian|covenant.necrolord,value=1
+      -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.kyrian|covenant.necrolord|covenant.none,value=1
       -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.venthyr,value=floor((fight_remains-20)%(120*variable.vendetta_cdr))>floor((fight_remains-20-cooldown.flagellation.remains)%(120*variable.vendetta_cdr))|buff.flagellation_buff.up|debuff.flagellation.up|fight_remains<20
       -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.night_fae,value=floor((fight_remains-20)%(120*variable.vendetta_cdr))>floor((fight_remains-20-cooldown.sepsis.remains)%(120*variable.vendetta_cdr))|dot.sepsis.ticking|fight_remains<20
-      local CovenantCondition = HL.BossFilteredFightRemains("<", 20) or Player:Covenant() == "Necrolord" or Player:Covenant() == "Kyrian"
-        or Player:Covenant() == "Venthyr" -- !!PTR ONLY!! or (Player:Covenant() == "Venthyr" and (CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Flagellation:CooldownRemains(), 20) or Target:DebuffUp(S.Flagellation))))
-        or (Player:Covenant() == "Night Fae" and (CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Sepsis:CooldownRemains(), 20) or Target:DebuffUp(S.Sepsis)))
-      if NightstalkerCondition and CovenantCondition then
+      local Covenant = Player:Covenant()
+      if NightstalkerCondition and (HL.BossFilteredFightRemains("<", 20) or Covenant == "Necrolord" or Covenant == "Kyrian" or Covenant == nil
+        or (Covenant == "Venthyr" and (CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Flagellation:CooldownRemains(), 20)
+          or Player:BuffUp(S.FlagellationBuff) or Target:DebuffUp(S.Flagellation)))
+        or (Covenant == "Night Fae" and (CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Sepsis:CooldownRemains(), 20) or Target:DebuffUp(S.Sepsis)))) then
         if Cast(S.Vendetta, Settings.Assassination.OffGCDasOffGCD.Vendetta) then return "Cast Vendetta" end
       end
     end
@@ -537,7 +540,7 @@ local function Dot ()
   end
   -- # Keep up Rupture at 4+ on all targets (when living long enough and not snapshot)
   -- actions.dot+=/rupture,if=!variable.skip_rupture&(effective_combo_points>=4&refreshable|!ticking&(time>10|combo_points>=2))&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>4
-  -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>4
+  -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+runeforge.dashing_scoundrel*9+runeforge.doomblade*6)
   if not SkipRupture and S.Rupture:IsReady() then
     local function Evaluate_Rupture_Target(TargetUnit)
       return TargetUnit:DebuffRefreshable(S.Rupture, RuptureThreshold)
@@ -545,13 +548,14 @@ local function Dot ()
         and (not Rogue.Exsanguinated(TargetUnit, S.Rupture) or TargetUnit:DebuffRemains(S.Rupture) <= ExsanguinatedBleedTickTime * 2 and MeleeEnemies10yCount >= 3)
         and Rogue.CanDoTUnit(TargetUnit, RuptureDMGThreshold)
     end
-    if Target:IsInMeleeRange(5) and ((ComboPoints >= 4 and Target:DebuffRefreshable(S.Rupture, RuptureThreshold)) or (not Target:DebuffUp(S.Rupture) and (HL.CombatTime() > 10 or ComboPoints >= 2)))
+    if Target:IsInMeleeRange(5) and ((ComboPoints >= 4 and Target:DebuffRefreshable(S.Rupture, RuptureThreshold))
+      or (not Target:DebuffUp(S.Rupture) and (HL.CombatTime() > 10 or ComboPoints >= 2)))
       and Evaluate_Rupture_Target(Target)
       and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Rupture)) or Target:TimeToDieIsNotValid()) then
       if Cast(S.Rupture) then return "Cast Rupture (Refresh)" end
     end
     if HR.AoEON() and not SkipCycleRupture and ComboPoints >= 4 then
-      SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, RuptureDurationThreshold, MeleeEnemies5y)
+      SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, 4 + BoolToInt(DashingScoundrelEquipped) * 9 + BoolToInt(DoombladeEquipped) * 6, MeleeEnemies5y)
     end
   end
   -- # Crimson Tempest on ST if in pandemic and nearly max energy and if Envenom won't do more damage due to TB/MA
@@ -570,9 +574,10 @@ end
 -- # Direct damage abilities
 local function Direct ()
   -- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
-  -- actions.direct=envenom,if=effective_combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.shiv.up|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
+  -- actions.direct=envenom,if=effective_combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.shiv.up|debuff.flagellation.up|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
   if S.Envenom:IsReady() and Target:IsInMeleeRange(5) and ComboPoints >= 4 + BoolToInt(S.DeeperStratagem:IsAvailable())
-    and (Target:DebuffUp(S.Vendetta) or Target:DebuffUp(S.ShivDebuff) or Player:EnergyDeficitPredicted() <= 25 + EnergyRegenCombined or not SingleTarget)
+    and (Target:DebuffUp(S.Vendetta) or Target:DebuffUp(S.ShivDebuff) or Target:DebuffUp(S.Flagellation)
+      or Player:EnergyDeficitPredicted() <= 25 + EnergyRegenCombined or not SingleTarget)
     and (not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemains() > 2 or not HR.CDsON()) then
     if Cast(S.Envenom) then return "Cast Envenom" end
   end
@@ -717,9 +722,8 @@ local function APL ()
     if ShouldReturn then return ShouldReturn end
 
     PoisonedBleeds = Rogue.PoisonedBleeds()
-    RuptureDurationThreshold = 4 + BoolToInt(PoisonedBleeds > 2) * 6
     -- actions+=/variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
-    EnergyRegenCombined = Player:EnergyRegen() + PoisonedBleeds * 7 / (2 * Player:SpellHaste())
+    EnergyRegenCombined = Player:EnergyRegen() + PoisonedBleeds * 8 / (2 * Player:SpellHaste())
     -- actions+=/variable,name=single_target,value=spell_targets.fan_of_knives<2
     SingleTarget = MeleeEnemies10yCount < 2
 
@@ -733,9 +737,17 @@ local function APL ()
       ShouldReturn = CDs()
       if ShouldReturn then return ShouldReturn end
     end
-    -- actions+=/slice_and_dice,if=spell_targets.fan_of_knives<=(5-runeforge.dashing_scoundrel)&buff.slice_and_dice.remains<fight_remains&refreshable&combo_points>=3
-    if S.SliceandDice:IsCastable() and MeleeEnemies10yCount <= 5 - BoolToInt(DashingScoundrelEquipped) and Player:BuffRemains(S.SliceandDice) < HL.FightRemains(MeleeEnemies10y, false) and Player:BuffRefreshable(S.SliceandDice) and ComboPoints >= 3 then
-      if Cast(S.SliceandDice) then return "Cast Slice and Dice" end
+    -- # Put SnD up initially for Cut to the Chase, refresh with Envenom if at low duration
+    -- actions+=/slice_and_dice,if=!buff.slice_and_dice.up&combo_points>=3
+    -- actions+=/envenom,if=buff.slice_and_dice.up&buff.slice_and_dice.remains<5&combo_points>=4
+    if not Player:BuffUp(S.SliceandDice) then
+      if S.SliceandDice:IsReady() and ComboPoints >= 3 then
+        if Cast(S.SliceandDice) then return "Cast Slice and Dice" end
+      end
+    else
+      if S.Envenom:IsReady() and Target:IsInMeleeRange(5) and Player:BuffRemains(S.SliceandDice) < 5 and ComboPoints >= 4 then
+        if Cast(S.Envenom) then return "Cast Envenom (CttC)" end
+      end
     end
     -- actions+=/call_action_list,name=dot
     ShouldReturn = Dot()
@@ -803,11 +815,13 @@ HR.SetAPL(259, APL, Init)
 -- actions=stealth
 -- # Interrupt on cooldown to allow simming interactions with that
 -- actions+=/kick
--- actions+=/variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*(7+ptr)%(2*spell_haste)
+-- actions+=/variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*8%(2*spell_haste)
 -- actions+=/variable,name=single_target,value=spell_targets.fan_of_knives<2
 -- actions+=/call_action_list,name=stealthed,if=stealthed.rogue
 -- actions+=/call_action_list,name=cds,if=(!talent.master_assassin.enabled|dot.garrote.ticking)
--- actions+=/slice_and_dice,if=spell_targets.fan_of_knives<=(5-runeforge.dashing_scoundrel)&buff.slice_and_dice.remains<fight_remains&refreshable&combo_points>=3
+-- # Put SnD up initially for Cut to the Chase, refresh with Envenom if at low duration
+-- actions+=/slice_and_dice,if=!buff.slice_and_dice.up&combo_points>=3
+-- actions+=/envenom,if=buff.slice_and_dice.up&buff.slice_and_dice.remains<5&combo_points>=4
 -- actions+=/call_action_list,name=dot
 -- actions+=/call_action_list,name=direct
 -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
@@ -821,16 +835,15 @@ HR.SetAPL(259, APL, Init)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP.
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend
 -- # Sync Flagellation with Vendetta as long as we won't lose a cast over the fight duration
--- actions.cds+=/flagellation,if=!stealthed.rogue&(cooldown.vendetta.remains<3&effective_combo_points>=4|debuff.vendetta.up|fight_remains<24)
--- actions.cds+=/flagellation,if=!stealthed.rogue&(floor((fight_remains-24)%cooldown)>floor((fight_remains-24-cooldown.vendetta.remains*variable.vendetta_cdr)%cooldown))
--- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
+-- actions.cds+=/flagellation,if=!stealthed.rogue&(cooldown.vendetta.remains<3&effective_combo_points>=4&target.time_to_die>10|debuff.vendetta.up|fight_remains<24)
+-- actions.cds+=/flagellation,if=!stealthed.rogue&effective_combo_points>=4&(floor((fight_remains-24)%cooldown)>floor((fight_remains-24-cooldown.vendetta.remains*variable.vendetta_cdr)%cooldown))
 -- # Sync Sepsis with Vendetta as long as we won't lose a cast over the fight duration, but prefer targets that will live at least 10s
 -- actions.cds+=/sepsis,if=!stealthed.rogue&(cooldown.vendetta.remains<1&target.time_to_die>10|debuff.vendetta.up|fight_remains<10)
 -- actions.cds+=/sepsis,if=!stealthed.rogue&(floor((fight_remains-10)%cooldown)>floor((fight_remains-10-cooldown.vendetta.remains*variable.vendetta_cdr)%cooldown))
 -- # Sync Vendetta window with Nightstalker+Exsanguinate if applicable
 -- actions.cds+=/variable,name=vendetta_nightstalker_condition,value=!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled
 -- # Sync Vendetta with Flagellation and Sepsis as long as we won't lose a cast over the fight duration
--- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.kyrian|covenant.necrolord,value=1
+-- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.kyrian|covenant.necrolord|covenant.none,value=1
 -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.venthyr,value=floor((fight_remains-20)%(120*variable.vendetta_cdr))>floor((fight_remains-20-cooldown.flagellation.remains)%(120*variable.vendetta_cdr))|buff.flagellation_buff.up|debuff.flagellation.up|fight_remains<20
 -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.night_fae,value=floor((fight_remains-20)%(120*variable.vendetta_cdr))>floor((fight_remains-20-cooldown.sepsis.remains)%(120*variable.vendetta_cdr))|dot.sepsis.ticking|fight_remains<20
 -- actions.cds+=/vendetta,if=!stealthed.rogue&dot.rupture.ticking&!debuff.vendetta.up&variable.vendetta_nightstalker_condition&variable.vendetta_covenant_condition
@@ -850,7 +863,7 @@ HR.SetAPL(259, APL, Init)
 
 -- # Direct damage abilities
 -- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
--- actions.direct=envenom,if=effective_combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.shiv.up|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
+-- actions.direct=envenom,if=effective_combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.shiv.up|debuff.flagellation.up|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
 -- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target
 -- actions.direct+=/serrated_bone_spike,cycle_targets=1,if=master_assassin_remains=0&(buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75|soulbind.lead_by_example.enabled&!buff.lead_by_example.up)
 -- # Fan of Knives at 19+ stacks of Hidden Blades or against 4+ targets.
@@ -882,7 +895,7 @@ HR.SetAPL(259, APL, Init)
 -- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&effective_combo_points>=4
 -- # Keep up Rupture at 4+ on all targets (when living long enough and not snapshot)
 -- actions.dot+=/rupture,if=!variable.skip_rupture&(effective_combo_points>=4&refreshable|!ticking&(time>10|combo_points>=2))&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>4
--- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>4
+-- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+runeforge.dashing_scoundrel*9+runeforge.doomblade*6)
 -- # Crimson Tempest on ST if in pandemic and nearly max energy and if Envenom won't do more damage due to TB/MA
 -- actions.dot+=/crimson_tempest,if=spell_targets=1&effective_combo_points>=(cp_max_spend-1)&refreshable&!exsanguinated&!debuff.shiv.up&master_assassin_remains=0&(energy.deficit<=25+variable.energy_regen_combined)&target.time_to_die-remains>4
 

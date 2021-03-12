@@ -110,7 +110,7 @@ Spell.Rogue.Assassination = {
   -- Covenants (Shadowlands)
   EchoingReprimand        = Spell(323547),
   Flagellation            = Spell(323654),
-  FlagellationCleanse     = Spell(345569),
+  FlagellationBuff        = Spell(345569),
   Sepsis                  = Spell(328305),
   SepsisBuff              = Spell(347037),
   SerratedBoneSpike       = Spell(328547),
