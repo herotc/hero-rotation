@@ -193,7 +193,7 @@ end
 local function Movement()
   -- heroic_leap
   if S.HeroicLeap:IsCastable() and not Target:IsInMeleeRange(8) then
-    if Cast(S.HeroicLeap, Settings.Fury.GCDasOffGCD.HeroicLeap) then return "heroic_leap 152"; end
+    if Cast(S.HeroicLeap, nil, Settings.Commons.DisplayStyle.HeroicLeap) then return "heroic_leap 152"; end
   end
 end
 
@@ -241,7 +241,7 @@ local function APL()
     end
     -- heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
     if S.HeroicLeap:IsCastable() and (not Target:IsInRange(25)) then
-      if Cast(S.HeroicLeap, Settings.Fury.GCDasOffGCD.HeroicLeap) then return "heroic_leap main 4"; end
+      if Cast(S.HeroicLeap, nil, Settings.Commons.DisplayStyle.HeroicLeap) then return "heroic_leap main 4"; end
     end
     -- sequence,if=active_enemies=1&covenant.venthyr.enabled&runeforge.signet_of_tormented_kings.equipped,name=BT&Reck:bloodthirst:recklessness
     if (S.Bloodthirst:IsCastable() and S.Recklessness:IsCastable()) and (EnemiesCount8 == 1 and Player:Covenant() == "Venthyr" and SignetofTormentedKingsEquipped) then
