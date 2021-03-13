@@ -105,13 +105,15 @@ local function Hac()
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 60 and Player:BuffDown(S.DeadlyCalmBuff)) then
     if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter hac 2"; end
   end
-  -- conquerors_banner
-  if S.ConquerorsBanner:IsCastable() then
-    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner hac 4"; end
-  end
-  -- avatar,if=cooldown.colossus_smash.remains<1
-  if S.Avatar:IsCastable() and CDsON() and (S.ColossusSmash:CooldownRemains() < 1) then
-    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar hac 6"; end
+  if CDsON() then
+    -- conquerors_banner
+    if S.ConquerorsBanner:IsCastable() then
+      if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner hac 4"; end
+    end
+    -- avatar,if=cooldown.colossus_smash.remains<1
+    if S.Avatar:IsCastable() and (S.ColossusSmash:CooldownRemains() < 1) then
+      if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar hac 6"; end
+    end
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
@@ -186,13 +188,15 @@ local function Execute()
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 50 and (not S.DeadlyCalm:IsAvailable() or Player:BuffDown(S.DeadlyCalmBuff))) then
     if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter execute 6"; end
   end
-  -- ravager
-  if S.Ravager:IsCastable() then
-    if Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager execute 8"; end
-  end
-  -- conquerors_banner
-  if S.ConquerorsBanner:IsCastable() then
-    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner execute 10"; end
+  if CDsON() then
+    -- ravager
+    if S.Ravager:IsCastable() then
+      if Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager execute 8"; end
+    end
+    -- conquerors_banner
+    if S.ConquerorsBanner:IsCastable() then
+      if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner execute 10"; end
+    end
   end
   -- cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
   if S.Cleave:IsReady() and (EnemiesCount8y > 1 and Target:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD()) then
@@ -218,17 +222,19 @@ local function Execute()
   if S.MortalStrike:IsReady() and (EnduringBlowEquipped or Target:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD() or ((Target:DebuffStack(S.ExploiterDebuff) == 2 or Player:BuffUp(S.BattlelordBuff)) and Player:Covenant() ~= "Venthyr")) then
     if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 22"; end
   end
-  -- ancient_aftershock
-  if S.AncientAftershock:IsCastable() then
-    if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock execute 24"; end
-  end
-  -- spear_of_bastion
-  if S.SpearofBastion:IsCastable() then
-    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 26"; end
-  end
-  -- bladestorm,if=buff.deadly_calm.down&rage<50
-  if S.Bladestorm:IsCastable() and CDsON() and (Player:BuffDown(S.DeadlyCalmBuff) and Player:Rage() < 50) then
-    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm execute 28"; end
+  if CDsON() then
+    -- ancient_aftershock
+    if S.AncientAftershock:IsCastable() then
+      if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock execute 24"; end
+    end
+    -- spear_of_bastion
+    if S.SpearofBastion:IsCastable() then
+      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 26"; end
+    end
+    -- bladestorm,if=buff.deadly_calm.down&rage<50
+    if S.Bladestorm:IsCastable() and (Player:BuffDown(S.DeadlyCalmBuff) and Player:Rage() < 50) then
+      if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm execute 28"; end
+    end
   end
   -- skullsplitter,if=rage<40
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 40) then
@@ -250,7 +256,7 @@ end
 
 local function SingleTarget()
   -- conquerors_banner,if=target.time_to_die>120
-  if S.ConquerorsBanner:IsCastable() and (Target:TimeToDie() > 120) then
+  if S.ConquerorsBanner:IsCastable() and CDsON() and (Target:TimeToDie() > 120) then
     if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner single_target 2"; end
   end
   -- rend,if=remains<=duration*0.3
@@ -273,13 +279,15 @@ local function SingleTarget()
   if S.ColossusSmash:IsCastable() then
     if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash single_target 12"; end
   end
-  -- ancient_aftershock
-  if S.AncientAftershock:IsCastable() then
-    if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock single_target 14"; end
-  end
-  -- spear_of_bastion
-  if S.SpearofBastion:IsCastable() then
-    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion single_target 16"; end
+  if CDsON() then
+    -- ancient_aftershock
+    if S.AncientAftershock:IsCastable() then
+      if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock single_target 14"; end
+    end
+    -- spear_of_bastion
+    if S.SpearofBastion:IsCastable() then
+      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion single_target 16"; end
+    end
   end
   -- overpower,if=charges=2
   if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2) then

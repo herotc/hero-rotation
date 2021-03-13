@@ -147,7 +147,7 @@ local function Aoe()
     if Cast(S.Ravager, nil, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager aoe 2"; end
   end
   -- dragon_roar
-  if S.DragonRoar:IsCastable() and CDsON() then
+  if S.DragonRoar:IsCastable() then
     SuggestRageDump(20)
     if Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar, nil, not Target:IsInMeleeRange(12)) then return "dragon_roar aoe 4"; end
   end
@@ -174,7 +174,7 @@ local function Generic()
     if Cast(S.Ravager, nil, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager generic 2"; end
   end
   -- dragon_roar
-  if S.DragonRoar:IsCastable() and CDsON() then
+  if S.DragonRoar:IsCastable() then
     SuggestRageDump(20)
     if Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar, nil, not Target:IsInMeleeRange(12)) then return "dragon_roar generic 4"; end
   end
@@ -308,22 +308,24 @@ local function APL()
       end
       if Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout, not Target:IsInRange(10)) then return "demoralizing_shout main 8"; end
     end
-    -- avatar
-    if S.Avatar:IsCastable() and CDsON() and (Player:BuffDown(S.AvatarBuff)) then
-      SuggestRageDump(20)
-      if Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar main 10"; end
-    end
-    -- ancient_aftershock
-    if S.AncientAftershock:IsCastable() then
-      if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock main 12"; end
-    end
-    -- spear_of_bastion
-    if S.SpearofBastion:IsCastable() then
-      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion main 14"; end
-    end
-    -- conquerors_banner
-    if S.ConquerorsBanner:IsCastable() then
-      if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner main 16"; end
+    if CDsON() then
+      -- avatar
+      if S.Avatar:IsCastable() and (Player:BuffDown(S.AvatarBuff)) then
+        SuggestRageDump(20)
+        if Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar main 10"; end
+      end
+      -- ancient_aftershock
+      if S.AncientAftershock:IsCastable() then
+        if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock main 12"; end
+      end
+      -- spear_of_bastion
+      if S.SpearofBastion:IsCastable() then
+        if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion main 14"; end
+      end
+      -- conquerors_banner
+      if S.ConquerorsBanner:IsCastable() then
+        if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner main 16"; end
+      end
     end
     -- shield_block,if=buff.shield_block.down
     -- Handled via Defensive()
