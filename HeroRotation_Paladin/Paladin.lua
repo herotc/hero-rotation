@@ -144,6 +144,79 @@ Spell.Paladin.Retribution = {
   Pool              = Spell(999910),
 }
 
+Spell.Paladin.Holy = {
+  -- Racials
+  AncestralCall                         = Spell(274738),
+  ArcanePulse                           = Spell(260364),
+  ArcaneTorrent                         = Spell(50613),
+  BagofTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  BloodFury                             = Spell(20572),
+  Fireblood                             = Spell(265221),
+  GiftoftheNaaru                        = Spell(59542),
+  LightsJudgment                        = Spell(255647),
+
+  -- Abilities
+  AvengingWrath                         = Spell(31884),
+  AvengingWrathBuff                     = Spell(31884),
+  Consecration                          = Spell(26573),
+  --ConsecrationBuff                      = Spell(188370), -- not used anywhere?
+  CrusaderStrike                        = Spell(35395),
+  DevotionAura                          = Spell(465),
+  DevotionAuraBuff                      = Spell(465),
+  DivineShield                          = Spell(642),
+  DivineSteed                           = Spell(190784),
+  DivineProtection                      = Spell(498),
+  FlashofLight                          = Spell(19750),
+  HammerofJustice                       = Spell(853),
+  HammerofWrath                         = Spell(24275),
+  HandofReckoning                       = Spell(62124),
+  HolyShock                             = Spell(20473),
+  Judgment                              = Spell(275773),
+  JudgmentDebuff                        = Spell(197277),
+  LayonHands                            = Spell(633),
+  ShieldoftheRighteous                  = Spell(53600),
+  ShieldoftheRighteousBuff              = Spell(132403),
+  InfusionofLightBuff                   = Spell(54149),
+  WordofGlory                           = Spell(85673),
+
+  -- Talents
+  CrusadersMight                        = Spell(196926),
+  BestowFaith                           = Spell(223306),
+  LightsHammer                          = Spell(114158),
+  DivinePurpose                         = Spell(223817),
+  DivinePurposeBuff                     = Spell(223819),
+  HolyAvenger                           = Spell(105809),
+  Seraphim                              = Spell(152262),
+  SeraphimBuff                          = Spell(152262),
+  AvengingCrusader                      = Spell(216331),
+  GlimmerofLight                        = Spell(325966),
+  GlimmerofLightDebuff                  = Spell(325966),
+
+
+
+  -- Trinkets
+
+  -- Covenants (Shadowlands)
+  AshenHallow                           = Spell(316958),
+  BlessingofAutumn                      = Spell(328622),
+  BlessingofSpring                      = Spell(328282),
+  BlessingofSummer                      = Spell(328620),
+  BlessingofWinter                      = Spell(328281),
+  DivineToll                            = Spell(304971),
+  DoorofShadows                         = Spell(300728),
+  Fleshcraft                            = Spell(324631),
+  Soulshape                             = Spell(310143),
+  SummonSteward                         = Spell(324739),
+
+  -- Soulbinds/Conduits (Shadowlands)
+  -- TO BE FILLED
+
+  -- Pool
+  Pool                                  = Spell(999910),
+}
+
+
 -- Items
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Protection = {

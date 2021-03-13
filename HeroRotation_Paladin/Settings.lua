@@ -49,6 +49,11 @@ HR.GUISettings.APL.Paladin = {
       AvengingWrath = true,
     },
   },
+  Holy = {
+    OffGCDasOffGCD = {
+      AvengingWrath = true,
+    },
+  },
 }
 -- GUI
 HR.GUI.LoadSettingsRecursively(HR.GUISettings)
@@ -57,6 +62,7 @@ local ARPanel = HR.GUI.Panel
 local CP_Paladin = CreateChildPanel(ARPanel, "Paladin")
 local CP_Protection = CreateChildPanel(CP_Paladin, "Protection")
 local CP_Retribution = CreateChildPanel(CP_Paladin, "Retribution")
+local CP_Holy = CreateChildPanel(CP_Paladin, "Holy")
 
 -- Shared Paladin settings
 CreatePanelOption("CheckButton", CP_Paladin, "APL.Paladin.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.")
@@ -74,3 +80,6 @@ CreateARPanelOptions(CP_Protection, "APL.Paladin.Protection")
 
 -- Retribution
 CreateARPanelOptions(CP_Retribution, "APL.Paladin.Retribution")
+
+-- Holy
+CreateARPanelOptions(CP_Holy, "APL.Paladin.Holy")

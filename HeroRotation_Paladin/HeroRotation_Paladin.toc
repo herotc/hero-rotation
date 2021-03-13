@@ -13,4 +13,5 @@ Paladin.lua
 Events.lua
 Protection.lua
 Retribution.lua
+Holy.lua
 Overrides.lua
