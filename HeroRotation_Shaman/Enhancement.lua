@@ -95,7 +95,7 @@ local function Single()
   end
   -- actions.single+=/primordial_wave,if=!buff.primordial_wave.up
   if S.PrimordialWave:IsReady() and (Player:BuffDown(S.PrimordialWaveBuff)) then
-    if HR.Cast(S.PrimordialWave, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single 2"; end
+    if HR.Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single 2"; end
   end
   -- actions.single+=/stormstrike,if=runeforge.doom_winds.equipped&buff.doom_winds.up
   if S.Stormstrike:IsCastable() and (DoomWindsEquipped and Player:BuffUp(S.DoomWindsBuff)) then
@@ -115,7 +115,7 @@ local function Single()
   end
   -- actions.single+=/vesper_totem
   if S.VesperTotem:IsReady() then
-    if HR.Cast(S.VesperTotem, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(40)) then return "vesper_totem single 8"; end
+    if HR.Cast(S.VesperTotem, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "vesper_totem single 8"; end
   end
   -- actions.single+=/frost_shock,if=buff.hailstorm.up
   if S.FrostShock:IsCastable() and (Player:BuffUp(S.HailstormBuff)) then
@@ -127,7 +127,7 @@ local function Single()
   end
   -- actions.single+=/fae_transfusion
   if S.FaeTransfusion:IsReady() then
-    if HR.Cast(S.FaeTransfusion, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(40)) then return "fae_transfusion single 14"; end
+    if HR.Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "fae_transfusion single 14"; end
   end
   -- actions.single+=/lightning_bolt,if=buff.stormkeeper.up
   if S.LightningBolt:IsCastable() and (Player:BuffUp(S.StormkeeperBuff)) then
@@ -139,7 +139,7 @@ local function Single()
   end
   -- actions.single+=/chain_harvest,if=buff.maelstrom_weapon.stack>=5
   if S.ChainHarvest:IsReady() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
-    if HR.Cast(S.ChainHarvest, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ChainHarvest)) then return "chain_harvest single 20"; end
+    if HR.Cast(S.ChainHarvest, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ChainHarvest)) then return "chain_harvest single 20"; end
   end
   -- actions.single+=/lightning_bolt,if=buff.maelstrom_weapon.stack=10
   if S.LightningBolt:IsCastable() and (Player:BuffStack(S.MaelstromWeaponBuff) == 10) then
@@ -207,7 +207,7 @@ local function Aoe()
   -- actions.aoe+=/fae_transfusion,if=soulbind.grove_invigoration|soulbind.field_of_blossoms
   -- TODO
   if S.FaeTransfusion:IsReady() then
-    if HR.Cast(S.FaeTransfusion, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(40)) then return "fae_transfusion aoe 104"; end
+    if HR.Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "fae_transfusion aoe 104"; end
   end
   -- actions.aoe+=/frost_shock,if=buff.hailstorm.up
   if S.FrostShock:IsCastable() and (Player:BuffUp(S.HailstormBuff)) then
@@ -227,7 +227,7 @@ local function Aoe()
   end
   -- actions.aoe+=/vesper_totem
   if S.VesperTotem:IsReady() then
-    if HR.Cast(S.VesperTotem, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(40)) then return "vesper_totem aoe 72"; end
+    if HR.Cast(S.VesperTotem, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "vesper_totem aoe 72"; end
   end
   -- actions.aoe+=/lightning_bolt,if=buff.primordial_wave.up&(buff.stormkeeper.up|buff.maelstrom_weapon.stack>=5)
   if S.LightningBolt:IsReady() and (Player:BuffUp(S.PrimordialWaveBuff) and (Player:BuffUp(S.StormkeeperBuff) or Player:BuffStack(S.MaelstromWeaponBuff) >= 5)) then
@@ -255,7 +255,7 @@ local function Aoe()
   end
   -- actions.aoe+=/chain_harvest,if=buff.maelstrom_weapon.stack>=5
   if S.ChainHarvest:IsReady() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
-    if HR.Cast(S.ChainHarvest, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ChainHarvest)) then return "chain_harvest aoe 84"; end
+    if HR.Cast(S.ChainHarvest, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ChainHarvest)) then return "chain_harvest aoe 84"; end
   end
   -- actions.aoe+=/elemental_blast,if=buff.maelstrom_weapon.stack>=5
   if S.ElementalBlast:IsCastable() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
@@ -300,7 +300,7 @@ local function Aoe()
   end
   -- actions.aoe+=/fae_transfusion
   if S.FaeTransfusion:IsReady() then
-    if HR.Cast(S.FaeTransfusion, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(40)) then return "fae_transfusion aoe 104"; end
+    if HR.Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "fae_transfusion aoe 104"; end
   end
   -- actions.aoe+=/frost_shock
   if S.FrostShock:IsCastable() then
@@ -375,9 +375,11 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false); if ShouldReturn then return ShouldReturn; end
 
     -- use_items
-    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-    if TrinketToUse then
-      if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    if (Settings.Commons.Enabled.Trinkets) then
+      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+      end
     end
 
     if (CDsON()) then
