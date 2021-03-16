@@ -58,9 +58,9 @@ function Commons.IsSoloMode()
 end
 
 -- Cycle Unit Helper
-function Commons.CastCycle(Object, Enemies, Condition, OutofRange, OffGCD)
+function Commons.CastCycle(Object, Enemies, Condition, OutofRange, OffGCD, DisplayStyle)
   if Condition(Target) then
-    return HR.Cast(Object, OffGCD, nil, OutofRange)
+    return HR.Cast(Object, OffGCD, DisplayStyle, OutofRange)
   end
   if HR.AoEON() then
     local TargetGUID = Target:GUID()
@@ -74,10 +74,10 @@ function Commons.CastCycle(Object, Enemies, Condition, OutofRange, OffGCD)
 end
 
   -- Target If Helper
-function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, Condition, OutofRange, OffGCD)
+function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, Condition, OutofRange, OffGCD, DisplayStyle)
   local TargetCondition = (not Condition or (Condition and Condition(Target)))
   if not HR.AoEON() and TargetCondition then
-    return HR.Cast(Object, OffGCD, nil, OutofRange)
+    return HR.Cast(Object, OffGCD, DisplayStyle, OutofRange)
   end
   if HR.AoEON() then
     local BestUnit, BestConditionValue = nil, nil
@@ -89,7 +89,7 @@ function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, 
     end
     if BestUnit then
       if TargetCondition and (BestUnit:GUID() == Target:GUID() or BestConditionValue == TargetIfCondition(Target)) then
-        return HR.Cast(Object, OffGCD, nil, OutofRange)
+        return HR.Cast(Object, OffGCD, DisplayStyle, OutofRange)
       elseif ((Condition and Condition(BestUnit)) or not Condition) then
         HR.CastLeftNameplate(BestUnit, Object)
       end
