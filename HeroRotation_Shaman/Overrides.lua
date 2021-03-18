@@ -1,22 +1,44 @@
 --- ============================ HEADER ============================
 -- HeroLib
-local HL      = HeroLib
-local Cache   = HeroCache
-local Unit    = HL.Unit
-local Player  = Unit.Player
-local Pet     = Unit.Pet
-local Target  = Unit.Target
-local Spell   = HL.Spell
-local Item    = HL.Item
+local HL       = HeroLib
+local Cache    = HeroCache
+local Unit     = HL.Unit
+local Player   = Unit.Player
+local Pet      = Unit.Pet
+local Target   = Unit.Target
+local Spell    = HL.Spell
+local Item     = HL.Item
 -- HeroRotation
-local HR      = HeroRotation
+local HR       = HeroRotation
 -- Spells
 local SpellEle = Spell.Shaman.Elemental
 local SpellEnh = Spell.Shaman.Enhancement
 -- Lua
+local Enum     = Enum
 
 --- ============================ CONTENT ============================
 -- Elemental, ID: 262
+HL.AddCoreOverride("Player.Maelstrom",
+  function()
+    local Maelstrom = UnitPower("player", Enum.PowerType.Maelstrom)
+    if not Player:IsCasting() then
+      return Maelstrom
+    else
+      if Player:IsCasting(SpellEle.ElementalBlast) then
+        return Maelstrom + 30
+      elseif Player:IsCasting(SpellEle.LightningBolt) then
+        return Maelstrom + 8
+      elseif Player:IsCasting(SpellEle.LavaBurst) then
+        return Maelstrom + 10
+      elseif Player:IsCasting(SpellEle.ChainLightning) then
+        return Maelstrom + (4 * Target:GetEnemiesInSplashRangeCount(10))
+      else
+        return Maelstrom
+      end
+    end
+  end
+, 262)
+
 local OldEleIsCastable
 OldEleIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
