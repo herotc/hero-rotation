@@ -44,7 +44,7 @@ OldEleIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local BaseCheck = OldEleIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellEle.Stormkeeper or self == SpellEle.ElementalBlast or self == SpellEle.Icefury then
-      return BaseCheck and (not Player:IsCasting(self))
+      return BaseCheck and (not Player:IsCasting(self) and not Player:IsMoving())
     elseif self == SpellEle.FlameShock then
       return BaseCheck and not SpellEle.PrimordialWave:InFlight() and (not SpellEle.PrimordialWave:IsAvailable() or not SpellEle.PrimordialWave:CooldownUp())
     else
@@ -58,7 +58,9 @@ OldEleIsReady = HL.AddCoreOverride("Spell.IsReady",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local BaseCheck = OldEleIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellEle.LavaBurst then
-      return BaseCheck and (not (Player:IsCasting(SpellEle.LavaBurst) and SpellEle.LavaBurst:Charges() == 1))
+      return BaseCheck and (not (Player:IsCasting(SpellEle.LavaBurst) and SpellEle.LavaBurst:Charges() == 1)) and (not Player:IsMoving() or Player:BuffUp(SpellEle.LavaSurgeBuff))
+    elseif self == SpellEle.LightningBolt or self == SpellEle.ChainLightning then
+      return BaseCheck and (not Player:IsMoving() or Player:BuffUp(SpellEle.StormkeeperBuff))
     else
       return BaseCheck
     end
