@@ -24,7 +24,7 @@ OldEleIsCastable = HL.AddCoreOverride("Spell.IsCastable",
     if self == SpellEle.Stormkeeper or self == SpellEle.ElementalBlast or self == SpellEle.Icefury then
       return BaseCheck and (not Player:IsCasting(self))
     elseif self == SpellEle.FlameShock then
-      return BaseCheck and (not SpellEle.PrimordialWave:IsAvailable() or not SpellEle.PrimordialWave:CooldownUp())
+      return BaseCheck and not SpellEle.PrimordialWave:InFlight() and (not SpellEle.PrimordialWave:IsAvailable() or not SpellEle.PrimordialWave:CooldownUp())
     else
       return BaseCheck
     end

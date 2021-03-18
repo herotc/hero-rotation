@@ -54,6 +54,11 @@ HL:RegisterForEvent(function()
   EchoesofGreatSunderingEquipped = Player:HasLegendaryEquipped(136)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
+HL:RegisterForEvent(function()
+  S.PrimordialWave:RegisterInFlight()
+end, "LEARNED_SPELL_IN_TAB")
+S.PrimordialWave:RegisterInFlight()
+
 local function num(val)
   if val then return 1 else return 0 end
 end
