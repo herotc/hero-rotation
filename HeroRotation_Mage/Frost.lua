@@ -89,7 +89,9 @@ local function Precombat ()
     if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.UsePotions then
       if HR.CastSuggested(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 4"; end
     end
-    -- frostbolt
+    -- blizzard,if=active_enemies>=2
+    --TODO
+    -- frostbolt,if=active_enemies=1
     if S.Frostbolt:IsCastable() and not Player:IsCasting(S.Frostbolt) then
       if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 5"; end
     end
@@ -121,8 +123,8 @@ local function Cooldowns ()
   if S.IcyVeins:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (Player:BuffDown(S.IcyVeins) or S.RuneofPower:IsAvailable()) and (Player:BuffDown(S.SlickIceBuff) or EnemiesCount8ySplash >= 2) then
     if HR.Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cd 5"; end
   end
-  --time_warp,if=runeforge.temporal_warp.equipped&buff.exhaustion.up&(prev_off_gcd.icy_veins|fight_remains<30)
-  if S.TimeWarp:IsCastable() and Settings.Frost.UseTemporalWarp and TemporalWarpEquipped and Player:BloodlustExhaustUp() and Player:BloodlustDown() and (Player:BuffUp(S.IcyVeins) or Target:TimeToDie() < 30) then
+  --time_warp,if=runeforge.temporal_warp&buff.exhaustion.up&(prev_off_gcd.icy_veins|fight_remains<40)
+  if S.TimeWarp:IsCastable() and Settings.Frost.UseTemporalWarp and TemporalWarpEquipped and Player:BloodlustExhaustUp() and Player:BloodlustDown() and (Player:BuffUp(S.IcyVeins) or Target:TimeToDie() < 40) then
     if HR.Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 6"; end
   end
   --use_items
@@ -264,25 +266,29 @@ local function Single ()
   if HR.CDsON() and S.RadiantSpark:IsCastable() and Player:BuffUp(S.FreezingWindsBuff) and EnemiesCount16ySplash == 1 then
     if HR.Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 9"; end
   end
+  --radiant_spark,if=buff.brain_freeze.react&talent.glacial_spike&conduit.ire_of_the_ascended&buff.icicles.stack>=4
+  if HR.CDsON() and S.RadiantSpark:IsCastable() and Player:BuffUp(S.BrainFreezeBuff) and S.IreOfTheAscended:ConduitEnabled() and Player:BuffStack(S.IciclesBuff) >= 4 then
+    if HR.Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 10"; end
+  end
   --ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time
   if S.IceLance:IsCastable() and (Player:BuffStack(S.FingersofFrostBuff) > 0 or Target:DebuffRemains(S.Freeze) > S.IceLance:TravelTime()) then
-    if HR.Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single 10"; end
+    if HR.Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single 11"; end
   end
   --ebonbolt
   if S.Ebonbolt:IsCastable() then
-    if HR.Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt single 11"; end
+    if HR.Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt single 12"; end
   end
-  --radiant_spark,if=(!runeforge.freezing_winds.equipped|active_enemies>=2)&buff.brain_freeze.react
-  if HR.CDsON() and S.RadiantSpark:IsCastable() and (not FreezingWindsEquipped or EnemiesCount15yMelee >= 2) and Player:BuffUp(S.BrainFreezeBuff) then
-    if HR.Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 12"; end
+  --radiant_spark,if=(!talent.glacial_spike|!conduit.ire_of_the_ascended)&(!runeforge.freezing_winds|active_enemies>=2)&buff.brain_freeze.react
+  if HR.CDsON() and S.RadiantSpark:IsCastable() and (not S.GlacialSpike:IsAvailable() or not S.IreOfTheAscended:ConduitEnabled()) and (not FreezingWindsEquipped or EnemiesCount15yMelee >= 2) and Player:BuffUp(S.BrainFreezeBuff) then
+    if HR.Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 13"; end
   end
   --mirrors_of_torment
   if HR.CDsON() and S.MirrorsofTorment:IsCastable() then
-    if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment single 13"; end
+    if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment single 14"; end
   end
-  --shifting_power,if=buff.rune_of_power.down&(soulbind.grove_invigoration.enabled|soulbind.field_of_blossoms.enabled|active_enemies>=2)
-  if HR.CDsON() and S.ShiftingPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldOfBlossoms:IsAvailable() or EnemiesCount18yMelee >= 2) then
-    if HR.Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant) then return "shifting_power single 14"; end
+  --shifting_power,if=buff.rune_of_power.down&(soulbind.grove_invigoration|soulbind.field_of_blossoms|runeforge.freezing_winds&buff.freezing_winds.down|active_enemies>=2)
+  if HR.CDsON() and S.ShiftingPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldOfBlossoms:IsAvailable() or (FreezingWindsEquipped and Player:BuffDown(S.FreezingWindsBuff)) or EnemiesCount18yMelee >= 2) then
+    if HR.Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant) then return "shifting_power single 15"; end
   end
   --arcane_explosion,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down
   if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandArcaneBuff) then
@@ -327,8 +333,10 @@ local function APL ()
     ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
-    --counterspell
-    ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
+    --counterspell,if=!runeforge.disciplinary_command|cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down
+    if S.Counterspell:IsCastable() and (DisciplinaryCommandEquipped and (S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandArcaneBuff))) then
+      if HR.Cast(S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, nil, not Target:IsSpellInRange(S.Counterspell)) then return "counterspell default"; end
+    end
     --call_action_list,name=cds
     if HR.CDsON() then
       ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
