@@ -476,7 +476,7 @@ local function APL()
       end
       -- storm_elemental
       if S.StormElemental:IsCastable() then
-        if Cast(S.StormElemental) then return "storm_elemental main 206"; end
+        if Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "storm_elemental main 206"; end
       end
       -- blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
       if S.BloodFury:IsCastable() and (not S.Ascendance:IsAvailable() or Player:BuffUp(S.Ascendance) or S.Ascendance:CooldownRemains() > 50) then
