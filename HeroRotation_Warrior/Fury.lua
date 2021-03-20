@@ -245,14 +245,16 @@ local function APL()
     if S.HeroicLeap:IsCastable() and (not Target:IsInRange(25)) then
       if Cast(S.HeroicLeap, nil, Settings.Commons.DisplayStyle.HeroicLeap) then return "heroic_leap main 4"; end
     end
-    -- sequence,if=active_enemies=1&covenant.venthyr.enabled&runeforge.signet_of_tormented_kings.equipped,name=BT&Reck:bloodthirst:recklessness
-    if (S.Bloodthirst:IsCastable() and S.Recklessness:IsCastable()) and (EnemiesCount8 == 1 and Player:Covenant() == "Venthyr" and SignetofTormentedKingsEquipped) then
-      if HR.CastQueue(S.Bloodthirst, S.Recklessness) then return "BT&Reck sequence"; end
+    if (not Settings.Fury.HideCastQueue) then
+      -- sequence,if=active_enemies=1&covenant.venthyr.enabled&runeforge.signet_of_tormented_kings.equipped,name=BT&Reck:bloodthirst:recklessness
+      if (S.Bloodthirst:IsCastable() and S.Recklessness:IsCastable()) and (EnemiesCount8 == 1 and Player:Covenant() == "Venthyr" and SignetofTormentedKingsEquipped) then
+        if HR.CastQueue(S.Bloodthirst, S.Recklessness) then return "BT&Reck sequence"; end
+      end
+      -- sequence,if=active_enemies=1&!covenant.venthyr.enabled&runeforge.signet_of_tormented_kings.equipped,name=BT&Charge:bloodthirst:heroic_charge
+      --if (S.Bloodthirst:IsCastable() and S.HeroicLeap:IsCastable()) and (EnemiesCount8 == 1 and Player:Covenant() ~= "Venthyr" and SignetofTormentedKingsEquipped) then
+        --if HR.CastQueue(S.Bloodthirst, S.HeroicLeap) then return "BT&Charge sequence"; end
+      --end
     end
-    -- sequence,if=active_enemies=1&!covenant.venthyr.enabled&runeforge.signet_of_tormented_kings.equipped,name=BT&Charge:bloodthirst:heroic_charge
-    --if (S.Bloodthirst:IsCastable() and S.HeroicLeap:IsCastable()) and (EnemiesCount8 == 1 and Player:Covenant() ~= "Venthyr" and SignetofTormentedKingsEquipped) then
-      --if HR.CastQueue(S.Bloodthirst, S.HeroicLeap) then return "BT&Charge sequence"; end
-    --end
     -- potion
     if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions then
       if Cast(I.PotionofSpectralStrength, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 6"; end

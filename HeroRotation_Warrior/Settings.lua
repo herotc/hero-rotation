@@ -53,6 +53,7 @@ HR.GUISettings.APL.Warrior = {
     },
   },
   Fury = {
+    HideCastQueue = false,
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
@@ -96,6 +97,7 @@ CreateARPanelOptions(CP_Arms, "APL.Warrior.Arms")
 
 -- Fury Settings
 CreateARPanelOptions(CP_Fury, "APL.Warrior.Fury")
+CreatePanelOption("CheckButton", CP_Fury, "APL.Warrior.Fury.HideCastQueue", "Hide CastQueue Suggestions", "Enable this setting to hide CastQueue suggestions (half-and-half styled icon). NOTE: This will cause HeroRotation to deviate from the Simulationcraft APL.")
 
 -- Protection Settings
 CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection")
