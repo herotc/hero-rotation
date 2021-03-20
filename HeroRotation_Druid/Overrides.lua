@@ -46,6 +46,8 @@ BalOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
       return BaseCheck and Player:BuffDown(self)
     elseif self == SpellBalance.StellarFlare then
       return BaseCheck and not Player:IsCasting(self)
+    elseif self == SpellBalance.Wrath or self == SpellBalance.Starfire then
+      return BaseCheck and not (Player:IsCasting(self) and self:Count() == 1)
     else
       return BaseCheck
     end
