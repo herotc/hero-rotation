@@ -29,7 +29,6 @@ local max = math.max
 --- ======= APL LOCALS =======
 -- Commons
 local Everyone = HR.Commons.Everyone
-local Druid = HR.Commons.Druid
 
 -- GUI Settings
 local Settings = {
