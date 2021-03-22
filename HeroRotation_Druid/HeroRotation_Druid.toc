@@ -12,4 +12,5 @@ Settings.lua
 Druid.lua
 Events.lua
 Balance.lua
+Guardian.lua
 Overrides.lua

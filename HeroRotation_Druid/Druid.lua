@@ -91,13 +91,70 @@ Spell.Druid.Balance = {
   Pool                                  = Spell(999910)
 }
 
+Spell.Druid.Guardian = {
+  -- Racials
+  Berserking                            = Spell(26297),
+
+  -- Abilities
+  Barkskin                              = Spell(22812),
+  BearForm                              = Spell(5487),
+  Berserk                               = Spell(50334),
+  BerserkBuff                           = Spell(50334),
+  FrenziedRegeneration                  = Spell(22842),
+  FrenziedRegenerationBuff              = Spell(22842),
+  Ironfur                               = Spell(192081),
+  IronfurBuff                           = Spell(192081),
+  Mangle                                = Spell(33917),
+  Maul                                  = Spell(6807),
+  Moonfire                              = Spell(8921),
+  MoonfireDebuff                        = Spell(164812),
+  SurvivalInstincts                     = Spell(61336),
+  Swipe                                 = Spell(213771),
+  Thrash                                = Spell(77758),
+  ThrashDebuff                          = Spell(192090),
+
+  -- Talents
+  BristlingFur                          = Spell(155835),
+  GalacticGuardianBuff                  = Spell(213708),
+  Incarnation                           = Spell(102558),
+  IncarnationBuff                       = Spell(102558),
+  Pulverize                             = Spell(80313),
+  ToothandClawBuff                      = Spell(135286),
+  WildCharge                            = Spell(16979),
+
+  -- Covenant Abilities
+  AdaptiveSwarm                         = Spell(325727),
+  AdaptiveSwarmDebuff                   = Spell(325733),
+  AdaptiveSwarmHeal                     = Spell(325748),
+  ConvoketheSpirits                     = Spell(323764),
+  EmpowerBond                           = Spell(326647),
+  KindredSpirits                        = Spell(326434),
+  KindredEmpowermentEnergizeBuff        = Spell(327022),
+  RavenousFrenzy                        = Spell(323546),
+  RavenousFrenzyBuff                    = Spell(323546),
+
+  -- Conduit Effects
+  SavageCombatantBuff                   = Spell(340613), -- Needs verified
+
+  -- Legendary Effects
+
+  -- Item Effects
+
+  -- Other
+  Pool                                  = Spell(999910)
+}
+
 -- Items
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Balance = {
   -- Potion/Trinkets
-  PotionofSpectralIntellect             = Item(307096),
+  PotionofSpectralIntellect             = Item(171273),
   EmpyrealOrdinance                     = Item(180117),
   InscrutableQuantumDevice              = Item(179350),
   SoullettingRuby                       = Item(178809)
   -- Other "On-Use"
+}
+
+Item.Druid.Guardian = {
+  PotionofSpectralAgility               = Item(171270)
 }
