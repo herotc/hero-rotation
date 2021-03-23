@@ -409,7 +409,7 @@ local function Build ()
     if HR.Cast(S.Shiv) then return "Cast Shiv (TTB)" end
   end
   -- actions.build+=/echoing_reprimand
-  if CDsON() and S.EchoingReprimand:IsReady() and (not Settings.Outlaw.Enabled.VanishEchoingReprimand or not Settings.Outlaw.UseDPSVanish or S.Vanish:CooldownRemains() >= 100) and Target:IsSpellInRange(S.EchoingReprimand) then
+  if CDsON() and S.EchoingReprimand:IsReady() and (not Settings.Outlaw.Enabled.VanishEchoingReprimand or not Settings.Outlaw.UseDPSVanish or S.Vanish:CooldownRemains() >= 100 or Player:IsTanking(Target)) and Target:IsSpellInRange(S.EchoingReprimand) then
     if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
   end
   -- actions.build+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75
