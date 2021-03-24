@@ -348,11 +348,11 @@ local function APL()
     if S.BilescourgeBombers:IsReady() then
       if HR.Cast(S.BilescourgeBombers, nil, nil, not Target:IsInRange(40)) then return "bilescourge_bombers 30"; end
     end
-    -- implosion,if=active_enemies>1&!talent.sacrificed_souls.enabled&buff.wild_imps.stack>=8&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains>5
+    -- implosion,if=active_enemies>1&!talent.sacrificed_souls.enabled&buff.wild_imps.stack>=6&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains>5
     if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 1 and not S.SacrificedSouls:IsAvailable() and WildImpsCount() >= 6 and DemonicTyrantTime() == 0 and S.SummonDemonicTyrant:CooldownRemains() > 5) then
       if HR.Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion 31"; end
     end
-    -- implosion,if=active_enemies>2&buff.wild_imps.stack>=8&buff.tyrant.down
+    -- implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.tyrant.down
     if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= 6 and DemonicTyrantTime() == 0) then
       if HR.Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion 32"; end
     end
