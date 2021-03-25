@@ -144,12 +144,22 @@ end
 
 local function OwlConvoke()
   -- moonkin_form
-  -- convoke_the_spirits
+  -- heart_of_the_wild,if=talent.heart_of_the_wild.enabled&!buff.heart_of_the_wild.up
+  -- convoke_the_spirits,if=soulbind.first_strike.enabled&buff.first_strike.up
+  -- starfire,if=eclipse.any_next|eclipse.solar_next
+  -- wrath,if=eclipse.any_next|eclipse.lunar_next
+  -- convoke_the_spirits,if=talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up
+  -- convoke_the_spirits,if=talent.heart_of_the_wild.enabled&cooldown.heart_of_the_wild.remains>15
+  -- convoke_the_spirits,if=!talent.heart_of_the_wild.enabled
 end
 
 local function CatConvoke()
   -- cat_form
-  -- convoke_the_spirits
+  -- heart_of_the_wild,if=talent.heart_of_the_wild.enabled&!buff.heart_of_the_wild.up
+  -- convoke_the_spirits,if=soulbind.first_strike.enabled&buff.first_strike.up
+  -- convoke_the_spirits,if=talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up
+  -- convoke_the_spirits,if=talent.heart_of_the_wild.enabled&cooldown.heart_of_the_wild.remains>15
+  -- convoke_the_spirits,if=!talent.heart_of_the_wild.enabled
 end
 
 local function Bear()
