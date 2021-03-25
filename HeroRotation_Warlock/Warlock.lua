@@ -131,6 +131,9 @@ Spell.Warlock.Affliction = {
   ScouringTithe                         = Spell(312321),
   SoulRot                               = Spell(325640), -- Splash, 15
 
+  -- Conduit Effects
+  CorruptingLeer                        = Spell(339455),
+
   -- Item Effects
 
 }
@@ -142,5 +145,21 @@ Item.Warlock.Demonology = {
 }
 
 Item.Warlock.Affliction = {
-  PotionofSpectralIntellect             = Item(307096)
+  PotionofSpectralIntellect             = Item(307096),
+  DarkmoonDeckPutrescence               = Item(173069),
+  DreadfireVessel                       = Item(184030),
+  EmpyrealOrdnance                      = Item(180117),
+  FlameofBattle                         = Item(181501),
+  GlyphofAssimilation                   = Item(184021),
+  InscrutableQuantumDevice              = Item(179350),
+  InstructorsDivineBell                 = Item(184842),
+  MacabreSheetMusic                     = Item(184024),
+  OverflowingAnimaCage                  = Item(178849),
+  SinfulAspirantsBadgeofFerocity        = Item(175884),
+  SinfulGladiatorsBadgeofFerocity       = Item(175921),
+  SoulIgniter                           = Item(184019),
+  SoullettingRuby                       = Item(178809),
+  SunbloodAmethyst                      = Item(178826),
+  TabletofDespair                       = Item(181357),
+  WakenersFrond                         = Item(181457),
 }
