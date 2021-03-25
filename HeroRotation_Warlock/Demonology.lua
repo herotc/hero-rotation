@@ -188,7 +188,14 @@ local function TyrantPrep()
 end
 
 local function SummonTyrant()
--- Moved from lower in the function so we abort this function right after using Demonic Tyrant
+  -- for proper display of what spell is next while casting tyrant
+  if Player:IsCasting(S.SummonDemonicTyrant) and S.DemonicStrength:IsCastable() and (S.Felstorm:CooldownRemains() < 30 - (5 * (1 - (Player:HastePct() / 100)))) then
+    if HR.Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength summon_tyrant"; end
+  end
+  if Player:IsCasting(S.SummonDemonicTyrant) and S.BilescourgeBombers:IsReady() then
+    if HR.Cast(S.BilescourgeBombers, nil, nil, not Target:IsInRange(40)) then return "bilescourge_bombers summon_tyrant"; end
+  end
+  -- Moved from lower in the function so we abort this function right after using Demonic Tyrant
   if (not S.SummonDemonicTyrant:CooldownUp() or Player:BuffRemains(S.NetherPortalBuff) > 4) then
     VarTyrantReady = false
   end
@@ -349,11 +356,11 @@ local function APL()
       if HR.Cast(S.BilescourgeBombers, nil, nil, not Target:IsInRange(40)) then return "bilescourge_bombers 30"; end
     end
     -- implosion,if=active_enemies>1&!talent.sacrificed_souls.enabled&buff.wild_imps.stack>=6&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains>5
-    if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 1 and not S.SacrificedSouls:IsAvailable() and WildImpsCount() >= 6 and DemonicTyrantTime() == 0 and S.SummonDemonicTyrant:CooldownRemains() > 5) then
+    if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 1 and not S.SacrificedSouls:IsAvailable() and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and DemonicTyrantTime() == 0 and S.SummonDemonicTyrant:CooldownRemains() > 5) then
       if HR.Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion 31"; end
     end
     -- implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.tyrant.down
-    if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= 6 and DemonicTyrantTime() == 0) then
+    if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and DemonicTyrantTime() == 0) then
       if HR.Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion 32"; end
     end
     -- hand_of_guldan,if=soul_shard=5|buff.nether_portal.up
