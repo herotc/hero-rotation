@@ -59,7 +59,7 @@ HR.GUISettings.APL.Warlock = {
     }
   },]]
   Demonology = {
-    ImpsRequiredForImplosion = 8,
+    ImpsRequiredForImplosion = 6,
     UnendingResolveHP = 20,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -114,7 +114,7 @@ CreatePanelOption("Dropdown", CP_Destruction, "APL.Warlock.Destruction.SpellType
 CreateARPanelOptions(CP_Destruction, "APL.Warlock.Destruction")]]
 
 -- Demonology
-CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.ImpsRequiredForImplosion", {3, 12, 1}, "Imps Required for Implosion", "Set the number of Imps required for Implosion.")
+CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.ImpsRequiredForImplosion", {3, 9, 1}, "Imps Required for Implosion", "Set the number of Imps required for Implosion.")
 CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.")
 CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology")
 
