@@ -121,6 +121,7 @@ Spell.Warrior.Arms = {
   Slam                                  = Spell(1464),
   SweepingStrikes                       = Spell(260708),
   SweepingStrikesBuff                   = Spell(260708),
+  VictoryRush                           = Spell(34428),
   Whirlwind                             = Spell(1680),
 
   -- Talents
