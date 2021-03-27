@@ -306,7 +306,7 @@ local function Fallthru()
   end
   -- sunfire,target_if=dot.moonfire.remains>remains*22%18
   if S.Sunfire:IsCastable() then
-    if Everyone.CastCycle(S.Sunfire, Enemies8ySplash, EvaluateCycleSunfireFallthru, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire fallthru 4"; end
+    if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireFallthru, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire fallthru 4"; end
   end
   -- moonfire
   if S.Moonfire:IsCastable() then
@@ -325,7 +325,7 @@ local function St()
   end
   -- adaptive_swarm,target_if=!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>5)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<3&dot.adaptive_swarm_damage.ticking
   if S.AdaptiveSwarm:IsCastable() then
-    if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmST, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm st 6"; end
+    if Everyone.CastCycle(S.AdaptiveSwarm, Enemies40y, EvaluateCycleAdaptiveSwarmST, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm st 6"; end
   end
   -- convoke_the_spirits,if=!druid.no_cds&((variable.convoke_desync&!cooldown.ca_inc.ready&!runeforge.primordial_arcanic_pulsar|buff.ca_inc.up)&astral_power<40&(buff.eclipse_lunar.remains>10|buff.eclipse_solar.remains>10)|fight_remains<10)
   if S.ConvoketheSpirits:IsCastable() and (CDsON() and ((VarConvokeDesync and not CaInc:CooldownUp() and not PAPEquipped or Player:BuffUp(CaInc)) and Player:AstralPowerP() < 40 and (Player:BuffRemains(S.EclipseLunar) > 10 or Player:BuffRemains(S.EclipseSolar) > 10) or fightRemains < 10)) then
@@ -335,15 +335,15 @@ local function St()
   VarDotRequirements = ((Player:BuffRemains(S.RavenousFrenzyBuff) > 5 or Player:BuffDown(S.RavenousFrenzyBuff)) and (Player:BuffRemains(S.KindredEmpowermentEnergizeBuff) < GCDMax) and (Player:BuffRemains(S.EclipseSolar) > GCDMax or Player:BuffRemains(S.EclipseLunar) > GCDMax))
   -- moonfire,target_if=refreshable&target.time_to_die>12,if=ap_check&variable.dot_requirements
   if S.Moonfire:IsCastable() and (AP_Check(S.Moonfire) and VarDotRequirements) then
-    if Everyone.CastCycle(S.Moonfire, Enemies8ySplash, EvaluateCycleMoonfireST, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire st 10"; end
+    if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireST, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire st 10"; end
   end
   -- sunfire,target_if=refreshable&target.time_to_die>12,if=ap_check&variable.dot_requirements
   if S.Sunfire:IsCastable() and (AP_Check(S.Sunfire) and VarDotRequirements) then
-    if Everyone.CastCycle(S.Sunfire, Enemies8ySplash, EvaluateCycleSunfireST, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire st 12"; end
+    if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireST, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire st 12"; end
   end
   -- stellar_flare,target_if=refreshable&target.time_to_die>16,if=ap_check&variable.dot_requirements
   if S.StellarFlare:IsCastable() and (AP_Check(S.StellarFlare) and VarDotRequirements) then
-    if Everyone.CastCycle(S.StellarFlare, Enemies8ySplash, EvaluateCycleStellarFlareST, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare st 14"; end
+    if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareST, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare st 14"; end
   end
   -- force_of_nature,if=ap_check
   if S.ForceofNature:IsCastable() and (AP_Check(S.ForceofNature)) then
@@ -462,7 +462,7 @@ local function Aoe()
   end
   -- moonfire,target_if=refreshable&target.time_to_die>((14+(spell_targets.starfire*2*buff.eclipse_lunar.up))+remains)%(1+talent.twin_moons.enabled),if=(cooldown.ca_inc.ready&!druid.no_cds&(variable.convoke_desync|cooldown.convoke_the_spirits.ready|!covenant.night_fae)|spell_targets.starfire<((6-(buff.eclipse_lunar.up*2))*(1+talent.twin_moons.enabled))&!eclipse.solar_next|(eclipse.in_solar|(eclipse.in_both|eclipse.in_lunar)&!talent.soul_of_the_forest.enabled|buff.primordial_arcanic_pulsar.value>=250)&(spell_targets.starfire<10*(1+talent.twin_moons.enabled))&astral_power>50-buff.starfall.remains*6)&(!buff.kindred_empowerment_energize.up|eclipse.in_solar|!covenant.kyrian)
   if S.Moonfire:IsCastable() and ((CaInc:CooldownUp() and CDsON() and (VarConvokeDesync or S.ConvoketheSpirits:CooldownUp() or CovenantID ~= 3) or EnemiesCount8ySplash < ((6 - (num(Player:BuffUp(S.EclipseLunar)) * 2)) * (1 + num(S.TwinMoons:IsAvailable()))) and not EclipseSolarNext or (EclipseInSolar or (EclipseInBoth or EclipseInLunar) and not S.SouloftheForest:IsAvailable() or PAPValue >= 250) and (EnemiesCount8ySplash < 10 * (1 + num(S.TwinMoons:IsAvailable()))) and Player:AstralPowerP() > 50 - Player:BuffRemains(S.StarfallBuff) * 6) and (Player:BuffDown(S.KindredEmpowermentEnergizeBuff) or EclipseInSolar or CovenantID ~= 1)) then
-    if Everyone.CastCycle(S.Moonfire, Enemies8ySplash, EvaluateCycleMoonfireAoe, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire aoe 16"; end
+    if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireAoe, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire aoe 16"; end
   end
   -- force_of_nature,if=ap_check
   if S.ForceofNature:IsCastable() and (AP_Check(S.ForceofNature)) then
@@ -482,7 +482,7 @@ local function Aoe()
   end
   -- stellar_flare,target_if=refreshable&time_to_die>15,if=spell_targets.starfire<4&ap_check&(buff.ca_inc.remains>10|!buff.ca_inc.up)
   if S.StellarFlare:IsCastable() and (EnemiesCount8ySplash < 4 and AP_Check(S.StellarFlare) and (Player:BuffRemains(CaInc) > 10 or Player:BuffDown(CaInc))) then
-    if Everyone.CastCycle(S.StellarFlare, Enemies8ySplash, EvaluateCycleStellarFlareAoe, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare aoe 26"; end
+    if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareAoe, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare aoe 26"; end
   end
   -- fury_of_elune,if=eclipse.in_any&ap_check&buff.primordial_arcanic_pulsar.value<250&(dot.adaptive_swarm_damage.ticking|!covenant.necrolord|spell_targets>2)
   if S.FuryofElune:IsCastable() and (EclipseInAny and AP_Check(S.FuryofElune) and PAPValue < 250 and (Target:DebuffUp(S.AdaptiveSwarmDebuff) or CovenantID ~= 4 or EnemiesCount8ySplash > 2)) then
@@ -573,15 +573,15 @@ local function Boat()
   VarDotRequirements = ((Player:BuffRemains(S.RavenousFrenzyBuff) > 5 or Player:BuffDown(S.RavenousFrenzyBuff)) and (Player:BuffRemains(S.KindredEmpowermentEnergizeBuff) < GCDMax) and (Player:BuffRemains(S.EclipseSolar) > GCDMax or Player:BuffRemains(S.EclipseLunar) > GCDMax))
   -- sunfire,target_if=refreshable&target.time_to_die>16,if=ap_check&variable.dot_requirements
   if S.Sunfire:IsCastable() and (AP_Check(S.Sunfire) and VarDotRequirements) then
-    if Everyone.CastCycle(S.Sunfire, Enemies8ySplash, EvaluateCycleSunfireBOAT, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire boat 14"; end
+    if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireBOAT, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire boat 14"; end
   end
   -- moonfire,target_if=refreshable&target.time_to_die>13.5,if=ap_check&variable.dot_requirements
   if S.Moonfire:IsCastable() and (AP_Check(S.Moonfire) and VarDotRequirements) then
-    if Everyone.CastCycle(S.Moonfire, Enemies8ySplash, EvaluateCycleMoonfireBOAT, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire boat 16"; end
+    if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireBOAT, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire boat 16"; end
   end
   -- stellar_flare,target_if=refreshable&target.time_to_die>16+remains,if=ap_check&variable.dot_requirements
   if S.StellarFlare:IsCastable() and (AP_Check(S.StellarFlare) and VarDotRequirements) then
-    if Everyone.CastCycle(S.StellarFlare, Enemies8ySplash, EvaluateCycleStellarFlareBOAT, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare boat 18"; end
+    if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareBOAT, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare boat 18"; end
   end
   -- force_of_nature,if=ap_check
   if S.ForceofNature:IsCastable() and (AP_Check(S.ForceofNature)) then
