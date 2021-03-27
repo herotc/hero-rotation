@@ -108,6 +108,7 @@ Spell.Druid.Guardian = {
   Maul                                  = Spell(6807),
   Moonfire                              = Spell(8921),
   MoonfireDebuff                        = Spell(164812),
+  SkullBash                             = Spell(106839),
   SurvivalInstincts                     = Spell(61336),
   Swipe                                 = Spell(213771),
   Thrash                                = Spell(77758),

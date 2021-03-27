@@ -126,7 +126,7 @@ local function Precombat()
   end
   -- Manually added: thrash_bear
   if S.Thrash:IsCastable() and Target:IsInRange(8) then
-    if Cast(S.Thrash) then reutrn "thrash precombat 8"; end
+    if Cast(S.Thrash) then return "thrash precombat 8"; end
   end
   -- Manually added: moonfire
   if S.Moonfire:IsCastable() then
