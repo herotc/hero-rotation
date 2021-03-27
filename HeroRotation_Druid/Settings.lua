@@ -41,6 +41,7 @@ HR.GUISettings.APL.Druid = {
     BarkskinHP = 50,
     RenewalHP = 40,
     ShowMoonkinFormOOC = false,
+    UseBarkskinDefensively = false,
     GCDasOffGCD = {
       MoonkinForm = false,
       CaInc = true,
@@ -94,6 +95,7 @@ CreateARPanelOptions(CP_Balance, "APL.Druid.Balance")
 -- Guardian
 CreateARPanelOptions(CP_Guardian, "APL.Druid.Guardian")
 CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseRageDefensively", "Use Rage Defensively", "Enable this if you want to save rage for defensive use, disabling Maul suggestions.")
+CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseBarkskinDefensively", "Use Barkskin Defensively", "Enable this if you want to save Barkskin for defensive use, disabling offensive Barkskin with Brambles.")
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.BarkskinHP", {0, 100, 1}, "Barkskin Threshold", "Set the HP percentage threshold of when to use Barkskin.")
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.FrenziedRegenHP", {0, 100, 1}, "Frenzied Regen Threshold", "Set the HP percentage threshold of when to use Frenzied Regeneration.")
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.SurvivalInstinctsHP", {0, 100, 1}, "Survival Instincts Threshold", "Set the HP percentage threshold of when to use Survival Instincts.")

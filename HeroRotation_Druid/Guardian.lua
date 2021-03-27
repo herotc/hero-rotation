@@ -192,7 +192,7 @@ local function Bear()
     if Cast(S.EmpowerBond, nil, Settings.Commons.DisplayStyle.Covenant) then return "empower_bond bear 14"; end
   end
   -- barkskin,if=talent.brambles.enabled
-  if S.Barkskin:IsCastable() and IsTanking then
+  if S.Barkskin:IsCastable() and IsTanking and not Settings.Guardian.UseBarkskinDefensively then
     if Cast(S.Barkskin, nil, Settings.Guardian.DisplayStyle.Defensives) then return "barkskin bear 16"; end
   end
   -- adaptive_swarm,if=(!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>3)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<5&dot.adaptive_swarm_damage.ticking)
