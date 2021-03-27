@@ -327,8 +327,8 @@ local function St()
   if S.AdaptiveSwarm:IsCastable() then
     if Everyone.CastCycle(S.AdaptiveSwarm, Enemies40y, EvaluateCycleAdaptiveSwarmST, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm st 6"; end
   end
-  -- convoke_the_spirits,if=!druid.no_cds&((variable.convoke_desync&!cooldown.ca_inc.ready&!runeforge.primordial_arcanic_pulsar|buff.ca_inc.up)&astral_power<40&(buff.eclipse_lunar.remains>10|buff.eclipse_solar.remains>10)|fight_remains<10)
-  if S.ConvoketheSpirits:IsCastable() and (CDsON() and ((VarConvokeDesync and not CaInc:CooldownUp() and not PAPEquipped or Player:BuffUp(CaInc)) and Player:AstralPowerP() < 40 and (Player:BuffRemains(S.EclipseLunar) > 10 or Player:BuffRemains(S.EclipseSolar) > 10) or fightRemains < 10)) then
+  -- convoke_the_spirits,if=!druid.no_cds&((variable.convoke_desync&!cooldown.ca_inc.ready&!runeforge.primordial_arcanic_pulsar|buff.ca_inc.up)&astral_power<40&(buff.eclipse_lunar.remains>10|buff.eclipse_solar.remains>10)|fight_remains<10&!cooldown.ca_inc.ready)
+  if S.ConvoketheSpirits:IsCastable() and (CDsON() and ((VarConvokeDesync and not CaInc:CooldownUp() and not PAPEquipped or Player:BuffUp(CaInc)) and Player:AstralPowerP() < 40 and (Player:BuffRemains(S.EclipseLunar) > 10 or Player:BuffRemains(S.EclipseSolar) > 10) or fightRemains < 10 and not CaInc:CooldownUp())) then
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ConvoketheSpirits)) then return "convoke_the_spirits st 8"; end
   end
   -- variable,name=dot_requirements,value=(buff.ravenous_frenzy.remains>5|!buff.ravenous_frenzy.up)&(buff.kindred_empowerment_energize.remains<gcd.max)&(buff.eclipse_solar.remains>gcd.max|buff.eclipse_lunar.remains>gcd.max)
@@ -428,8 +428,8 @@ local function Aoe()
   VarDreamWillFallOff = (TimewornEquipped and (Player:BuffRemains(S.TimewornDreambinderBuff) < (GCDMax + 0.1) or Player:BuffRemains(S.TimewornDreambinderBuff) < (S.Starfire:ExecuteTime() + 0.1) and (EclipseInLunar or EclipseSolarNext or EclipseAnyNext)) and Player:BuffUp(S.TimewornDreambinderBuff))
   -- variable,name=ignore_starsurge,value=!eclipse.in_solar&(spell_targets.starfire>5&talent.soul_of_the_forest.enabled|spell_targets.starfire>7)
   VarIgnoreStarsurge = (not EclipseInSolar and (EnemiesCount8ySplash > 5 and S.SouloftheForest:IsAvailable() or EnemiesCount8ySplash > 7))
-  -- convoke_the_spirits,if=!druid.no_cds&((variable.convoke_desync&!cooldown.ca_inc.ready|buff.ca_inc.up)&(astral_power<50|variable.ignore_starsurge)&(buff.eclipse_lunar.remains>6|buff.eclipse_solar.remains>6)&(!runeforge.balance_of_all_things|buff.balance_of_all_things_nature.stack>3|buff.balance_of_all_things_arcane.stack>3)|fight_remains<10)
-  if S.ConvoketheSpirits:IsCastable() and (CDsON() and ((VarConvokeDesync and not CaInc:CooldownUp() or Player:BuffUp(CaInc)) and (Player:AstralPowerP() < 50 or VarIgnoreStarsurge) and (Player:BuffRemains(S.EclipseLunar) > 6 or Player:BuffRemains(S.EclipseSolar) > 6) and (not BOATEquipped or Player:BuffStack(S.BOATNatureBuff) > 3 or Player:BuffStack(S.BOATArcaneBuff) > 3) or fightRemains < 10)) then
+  -- convoke_the_spirits,if=!druid.no_cds&((variable.convoke_desync&!cooldown.ca_inc.ready|buff.ca_inc.up)&(astral_power<50|variable.ignore_starsurge)&(buff.eclipse_lunar.remains>6|buff.eclipse_solar.remains>6)&(!runeforge.balance_of_all_things|buff.balance_of_all_things_nature.stack>3|buff.balance_of_all_things_arcane.stack>3)|fight_remains<10&!cooldown.ca_inc.ready)
+  if S.ConvoketheSpirits:IsCastable() and (CDsON() and ((VarConvokeDesync and not CaInc:CooldownUp() or Player:BuffUp(CaInc)) and (Player:AstralPowerP() < 50 or VarIgnoreStarsurge) and (Player:BuffRemains(S.EclipseLunar) > 6 or Player:BuffRemains(S.EclipseSolar) > 6) and (not BOATEquipped or Player:BuffStack(S.BOATNatureBuff) > 3 or Player:BuffStack(S.BOATArcaneBuff) > 3) or fightRemains < 10 and not CaInc:CooldownUp())) then
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ConvoketheSpirits)) then return "convoke_the_spirits aoe 2"; end
   end
   -- ravenous_frenzy,if=buff.ca_inc.remains>15
@@ -556,8 +556,8 @@ local function Boat()
   if S.ConvoketheSpirits:IsCastable() and (CDsON() and ((VarConvokeDesync and not CaInc:CooldownUp() or Player:BuffUp(CaInc)) and (Player:BuffStack(S.BOATNatureBuff) == 5 or Player:BuffStack(S.BOATArcaneBuff) == 5) or fightRemains < 10)) then
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ConvoketheSpirits)) then return "convoke_the_spirits boat 6"; end
   end
-  -- fury_of_elune,if=((buff.balance_of_all_things_nature.stack>4|buff.balance_of_all_things_arcane.stack>4)&(druid.no_cds|cooldown.ca_inc.remains>50|(covenant.night_fae&cooldown.convoke_the_spirits.remains>50)))|(dot.adaptive_swarm_damage.remains>8&cooldown.ca_inc.remains>10&covenant.necrolord)|interpolated_fight_remains<8|(covenant.kyrian&buff.kindred_empowerment.up)
-  if S.FuryofElune:IsCastable() and (((Player:BuffStack(S.BOATNatureBuff) > 4 or Player:BuffStack(S.BOATArcaneBuff) > 4) and (not CDsON() or CaInc:CooldownRemains() > 50 or (CovenantID == 3 and S.ConvoketheSpirits:CooldownRemains() > 50))) or (Target:DebuffRemains(S.AdaptiveSwarmDebuff) > 8 and CaInc:CooldownRemains() > 10 and CovenantID == 4) or fightRemains < 8 or (CovenantID == 1 and Player:BuffUp(S.KindredEmpowermentEnergizeBuff))) then
+  -- fury_of_elune,if=((buff.balance_of_all_things_nature.stack>4|buff.balance_of_all_things_arcane.stack>4)&(druid.no_cds|cooldown.ca_inc.remains>50|(covenant.night_fae&cooldown.convoke_the_spirits.remains>50)))|(dot.adaptive_swarm_damage.remains>8&cooldown.ca_inc.remains>10&covenant.necrolord)|interpolated_fight_remains<8&!cooldown.ca_inc.ready|(covenant.kyrian&buff.kindred_empowerment.up)
+  if S.FuryofElune:IsCastable() and (((Player:BuffStack(S.BOATNatureBuff) > 4 or Player:BuffStack(S.BOATArcaneBuff) > 4) and (not CDsON() or CaInc:CooldownRemains() > 50 or (CovenantID == 3 and S.ConvoketheSpirits:CooldownRemains() > 50))) or (Target:DebuffRemains(S.AdaptiveSwarmDebuff) > 8 and CaInc:CooldownRemains() > 10 and CovenantID == 4) or fightRemains < 8 and not CaInc:CooldownUp() or (CovenantID == 1 and Player:BuffUp(S.KindredEmpowermentEnergizeBuff))) then
     if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryofElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune boat 8"; end
   end
   -- cancel_buff,name=starlord,if=(buff.balance_of_all_things_nature.remains>4.5|buff.balance_of_all_things_arcane.remains>4.5)&(cooldown.ca_inc.remains>7|(cooldown.empower_bond.remains>7&!buff.kindred_empowerment_energize.up&covenant.kyrian))&astral_power>=30
@@ -694,16 +694,16 @@ local function APL()
     if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffRemains(CaInc) > 15 or fightRemains < 25) then
       if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion 4"; end
     end
-    -- variable,name=convoke_desync,value=ceil((interpolated_fight_remains-15-cooldown.ca_inc.remains)%180)=ceil((interpolated_fight_remains-15-120-cooldown.convoke_the_spirits.remains)%180)|cooldown.ca_inc.remains>interpolated_fight_remains|cooldown.convoke_the_spirits.remains>interpolated_fight_remains-10|!covenant.night_fae
+    -- variable,name=convoke_desync,value=ceil((interpolated_fight_remains-15-cooldown.ca_inc.remains)%180)=ceil((interpolated_fight_remains-15-120-cooldown.convoke_the_spirits.remains)%180)&!raid_event.adds.exists|cooldown.ca_inc.remains>interpolated_fight_remains|cooldown.convoke_the_spirits.remains>interpolated_fight_remains-10|!covenant.night_fae
     if (CovenantID == 3) then
       local test1 = ceil((fightRemains - 15 - CaInc:CooldownRemains()) % 180)
       local test2 = ceil((fightRemains - 15 - 120 - S.ConvoketheSpirits:CooldownRemains()) % 180)
-      VarConvokeDesync = test1 == test2 or CaInc:CooldownRemains() > fightRemains or S.ConvoketheSpirits:CooldownRemains() > fightRemains - 10
+      VarConvokeDesync = test1 == test2 and EnemiesCount8ySplash == 1 or CaInc:CooldownRemains() > fightRemains or S.ConvoketheSpirits:CooldownRemains() > fightRemains - 10
     else
       VarConvokeDesync = true
     end
-    -- variable,name=cd_condition,value=(!equipped.empyreal_ordnance|cooldown.empyreal_ordnance.remains<160&!cooldown.empyreal_ordnance.ready)&((variable.on_use_trinket=1|variable.on_use_trinket=3)&(trinket.1.ready_cooldown|trinket.1.cooldown.remains>interpolated_fight_remains-10)|variable.on_use_trinket=2&(trinket.2.ready_cooldown|trinket.2.cooldown.remains>interpolated_fight_remains-10)|variable.on_use_trinket=0)|covenant.kyrian
-    VarCDCondition = (not I.EmpyrealOrdinance:IsEquipped() or I.EmpyrealOrdinance:CooldownRemains() < 160 and not I.EmpyrealOrdinance:IsReady()) and ((VarOnUseTrinket == 1 or VarOnUseTrinket == 3) and (trinket1:IsReady() or trinket1:CooldownRemains() > fightRemains - 10) or VarOnUseTrinket == 2 and (trinket2:IsReady() or trinket2:CooldownRemains() > fightRemains - 10) or VarOnUseTrinket == 0) or CovenantID == 1
+    -- variable,name=cd_condition,value=(target.time_to_die>15|raid_event.adds.in>50)&((!equipped.empyreal_ordnance|cooldown.empyreal_ordnance.remains<160&!cooldown.empyreal_ordnance.ready)&((variable.on_use_trinket=1|variable.on_use_trinket=3)&(trinket.1.ready_cooldown|trinket.1.cooldown.remains>interpolated_fight_remains-10)|variable.on_use_trinket=2&(trinket.2.ready_cooldown|trinket.2.cooldown.remains>interpolated_fight_remains-10)|variable.on_use_trinket=0)|covenant.kyrian)
+    VarCDCondition = (Target:TimeToDie() > 15 and ((not I.EmpyrealOrdinance:IsEquipped() or I.EmpyrealOrdinance:CooldownRemains() < 160 and not I.EmpyrealOrdinance:IsReady()) and ((VarOnUseTrinket == 1 or VarOnUseTrinket == 3) and (trinket1:IsReady() or trinket1:CooldownRemains() > fightRemains - 10) or VarOnUseTrinket == 2 and (trinket2:IsReady() or trinket2:CooldownRemains() > fightRemains - 10) or VarOnUseTrinket == 0) or CovenantID == 1))
     if (Settings.Commons.Enabled.Trinkets) then
       -- use_item,name=empyreal_ordnance,if=cooldown.ca_inc.remains<20&cooldown.convoke_the_spirits.remains<20|fight_remains<37
       if I.EmpyrealOrdinance:IsEquippedAndReady() and (CaInc:CooldownRemains() < 20 and S.ConvoketheSpirits:CooldownRemains() < 20 or fightRemains < 37) then
