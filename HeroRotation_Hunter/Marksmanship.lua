@@ -332,7 +332,7 @@ local function Trickshots()
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot, nil, not TargetInRange40y) then return "trueshot trickshots 11"; end
   end
   -- rapid_fire,if=buff.trick_shots.remains>=execute_time&runeforge.surging_shots&buff.double_tap.down
-  if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime() and SurgingShotsEquipped and Player:BuffDown(S.DoubleTap)) then
+  if S.RapidFire:IsCastable() and not Player:IsCasting(S.AimedShot) and (Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime() and SurgingShotsEquipped and Player:BuffDown(S.DoubleTap)) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire trickshots 12"; end
   end
   -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=buff.trick_shots.remains>=execute_time&(buff.precise_shots.down|full_recharge_time<cast_time+gcd|buff.trueshot.up)
@@ -344,7 +344,7 @@ local function Trickshots()
     if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant) then return "dark_chakram trickshots necrolords covenant"; end
   end
   -- rapid_fire,if=buff.trick_shots.remains>=execute_time
-  if S.RapidFire:IsReady() and (Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime()) then
+  if S.RapidFire:IsReady() and not Player:IsCasting(S.AimedShot) and (Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime()) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire trickshots 14"; end
   end
   -- multishot,if=buff.trick_shots.down|buff.precise_shots.up&focus>cost+action.aimed_shot.cost&(!talent.chimaera_shot|active_enemies>3)
