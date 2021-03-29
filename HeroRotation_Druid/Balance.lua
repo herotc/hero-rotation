@@ -72,6 +72,7 @@ local VarCritNotUp
 local VarAspPerSec
 local GCDMax
 local PAPValue
+local OpenerFinished = false
 local fightRemains
 
 -- Player Covenant
@@ -121,13 +122,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
-  EclipseInAny = false
-  EclipseInBoth = false
-  EclipseInLunar = false
-  EclipseInSolar = false
-  EclipseLunarNext = false
-  EclipseSolarNext = false
-  EclipseAnyNext = false
+  OpenerFinished = false
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -220,8 +215,8 @@ local function EclipseCheck()
   EclipseInBoth = (Player:BuffUp(S.EclipseSolar) and Player:BuffUp(S.EclipseLunar))
   EclipseInLunar = (Player:BuffUp(S.EclipseLunar) and Player:BuffDown(S.EclipseSolar))
   EclipseInSolar = (Player:BuffUp(S.EclipseSolar) and Player:BuffDown(S.EclipseLunar))
-  EclipseLunarNext = (not EclipseInAny and S.Starfire:Count() == 0 and S.Wrath:Count() > 0)
-  EclipseSolarNext = (not EclipseInAny and S.Wrath:Count() == 0 and S.Starfire:Count() > 0)
+  EclipseLunarNext = (not EclipseInAny and (S.Starfire:Count() == 0 and S.Wrath:Count() > 0 or Player:IsCasting(S.Wrath))) or EclipseInSolar
+  EclipseSolarNext = (not EclipseInAny and (S.Wrath:Count() == 0 and S.Starfire:Count() > 0 or Player:IsCasting(S.Starfire))) or EclipseInLunar
   EclipseAnyNext = (not EclipseInAny and S.Wrath:Count() > 0 and S.Starfire:Count() > 0)
 end
 
@@ -288,14 +283,65 @@ local function Precombat()
 end
 
 local function Opener()
+  if (CovenantID == 3) then
+    -- moonfire
+    if S.Moonfire:IsReady() and (Target:DebuffDown(S.MoonfireDebuff)) then
+      if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire opener 4"; end
+    end
+    -- sunfire
+    if S.Sunfire:IsReady() and (Target:DebuffDown(S.SunfireDebuff)) then
+      if Cast(S.Sunfire, nil, nil, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire opener 6"; end
+    end
+    -- stellar_flare
+    if S.StellarFlare:IsReady() and (Target:DebuffDown(S.StellarFlareDebuff)) then
+      if Cast(S.StellarFlare, nil, nil, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare opener 8"; end
+    end
+    -- warrior_of_elune
+    if S.WarriorofElune:IsReady() then
+      if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorofElune) then return "warrior_of_elune opener 10"; end
+    end
+    -- force_of_nature
+    if S.ForceofNature:IsReady() then
+      if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceofNature) then return "force_of_nature opener 12"; end
+    end
+    -- fury_of_elune
+    if S.FuryofElune:IsReady() then
+      if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryofElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune opener 14"; end
+    end
+    -- ca_inc
+    if CaInc:IsReady() then
+      if Cast(CaInc, Settings.Balance.GCDasOffGCD.CaInc) then return "ca_inc opener 16"; end
+    end
+    if (S.NaturesBalance:IsAvailable() and not BOATEquipped) then
+      -- starsurge,if=prev_gcd.1.ca_inc&talent.natures_balance&!runeforge.balance_of_all_things.equipped
+      if S.Starsurge:IsReady() and (not CaInc:CooldownUp()) then
+        if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 18"; end
+      end
+      -- starsurge,if=prev_gcd.1.starsurge&talent.natures_balance&!runeforge.balance_of_all_things.equipped
+      if S.Starsurge:IsReady() and (Player:PrevGCDP(1, S.Starsurge)) then
+        if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 20"; end
+      end
+    end
+    -- convoke_the_spirits
+    if S.ConvoketheSpirits:IsReady() then
+      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "convoke_the_spirits opener 22"; end
+    end
+    -- starsurge,if=astral_power>=30
+    if S.Starsurge:IsReady() then
+      if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 24"; end
+    end
+    -- variable,name=opener_finished,value=1,if=astral_power<30&prev_gcd.1.starsurge
+    if (not S.ConvoketheSpirits:CooldownUp() and not CaInc:CooldownUp() and Player:AstralPowerP() < 30 and Player:PrevGCDP(1, S.Starsurge)) then
+      OpenerFinished = true
+    end
+  end
   -- starfire,if=!runeforge.balance_of_all_things|!covenant.night_fae|!spell_targets.starfall=1|!talent.natures_balance.enabled
   -- Manually added check to ensure we're not in a solar eclipse
   if S.Starfire:IsCastable() and Player:BuffDown(S.EclipseSolar) and not Player:IsCasting(S.Starfire) and (not BOATEquipped or CovenantID ~= 3 or not EnemiesCount40y == 1 or not S.NaturesBalance:IsAvailable()) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire opener 2"; end
   end
-  -- starsurge,if=runeforge.balance_of_all_things&covenant.night_fae&spell_targets.starfall=1
-  if S.Starsurge:IsReady() and (BOATEquipped and CovenantID == 3 and EnemiesCount40y == 1) then
-    if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 4"; end
+  if (CovenantID ~= 3 or Player:PrevGCD(1, S.Starfire) or HL.CombatTime() > 20) then
+    OpenerFinished = true
   end
 end
 
@@ -553,7 +599,8 @@ local function Boat()
     if Cast(S.AdaptiveSwarm, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm boat 4"; end
   end
   -- convoke_the_spirits,if=!druid.no_cds&((variable.convoke_desync&!cooldown.ca_inc.ready|buff.ca_inc.up)&(buff.balance_of_all_things_nature.stack=5|buff.balance_of_all_things_arcane.stack=5)|fight_remains<10)
-  if S.ConvoketheSpirits:IsCastable() and (CDsON() and ((VarConvokeDesync and not CaInc:CooldownUp() or Player:BuffUp(CaInc)) and (Player:BuffStack(S.BOATNatureBuff) == 5 or Player:BuffStack(S.BOATArcaneBuff) == 5) or fightRemains < 10)) then
+  -- Note: Changed BOAT buff stack to >3 for usability
+  if S.ConvoketheSpirits:IsCastable() and (CDsON() and ((VarConvokeDesync and not CaInc:CooldownUp() or Player:BuffUp(CaInc)) and (Player:BuffStack(S.BOATNatureBuff) > 3 or Player:BuffStack(S.BOATArcaneBuff) > 3) or fightRemains < 10)) then
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ConvoketheSpirits)) then return "convoke_the_spirits boat 6"; end
   end
   -- fury_of_elune,if=((buff.balance_of_all_things_nature.stack>4|buff.balance_of_all_things_arcane.stack>4)&(druid.no_cds|cooldown.ca_inc.remains>50|(covenant.night_fae&cooldown.convoke_the_spirits.remains>50)))|(dot.adaptive_swarm_damage.remains>8&cooldown.ca_inc.remains>10&covenant.necrolord)|interpolated_fight_remains<8&!cooldown.ca_inc.ready|(covenant.kyrian&buff.kindred_empowerment.up)
@@ -665,15 +712,14 @@ local function APL()
     PAPValue = select(16, Player:BuffInfo(S.PAPBuff, false, true))
   end
 
-  -- Eclipse Check
-  EclipseCheck()
-
   -- Moonkin Form OOC, if setting is true
   if S.MoonkinForm:IsCastable() and Settings.Balance.ShowMoonkinFormOOC then
     if Cast(S.MoonkinForm) then return "moonkin_form ooc"; end
   end
 
   if Everyone.TargetIsValid() then
+    -- Eclipse Check
+    EclipseCheck()
     -- Precombat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
@@ -683,7 +729,7 @@ local function APL()
     -- variable,name=is_cleave,value=spell_targets.starfire>1
     VarIsCleave = (EnemiesCount8ySplash > 1)
     -- Manually added: Opener function
-    if (HL.CombatTime() < 4 and not Player:PrevGCD(1, S.Starsurge) and not Player:PrevGCD(2, S.Starsurge)) then
+    if (not OpenerFinished and (CaInc:CooldownUp() and S.ConvoketheSpirits:CooldownUp() or CovenantID ~= 3)) then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
     -- berserking,if=(!covenant.night_fae|!cooldown.convoke_the_spirits.up)&buff.ca_inc.remains>15
@@ -698,7 +744,7 @@ local function APL()
     if (CovenantID == 3) then
       local test1 = ceil((fightRemains - 15 - CaInc:CooldownRemains()) % 180)
       local test2 = ceil((fightRemains - 15 - 120 - S.ConvoketheSpirits:CooldownRemains()) % 180)
-      VarConvokeDesync = test1 == test2 and EnemiesCount8ySplash == 1 or CaInc:CooldownRemains() > fightRemains or S.ConvoketheSpirits:CooldownRemains() > fightRemains - 10
+      VarConvokeDesync = (test1 == test2 and EnemiesCount8ySplash == 1 or CaInc:CooldownRemains() > fightRemains or S.ConvoketheSpirits:CooldownRemains() > fightRemains - 10)
     else
       VarConvokeDesync = true
     end
