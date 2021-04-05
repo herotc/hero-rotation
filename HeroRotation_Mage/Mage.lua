@@ -16,6 +16,8 @@ local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
+-- lua
+local GetTime    = GetTime
 
 -- File Locals
 HR.Commons.Mage = {}
@@ -47,6 +49,7 @@ Spell.Mage.Arcane = {
   ClearcastingBuff                      = Spell(263725),
   Counterspell                          = Spell(2139),
   Evocation                             = Spell(12051),
+  FireBlast                             = Spell(319836),
   MirrorImage                           = Spell(55342),
   PresenceofMind                        = Spell(205025),
   TouchoftheMagi                        = Spell(321507), --Splash, 8
@@ -54,7 +57,6 @@ Spell.Mage.Arcane = {
   ConjureManaHem                        = Spell(759),
   FrostNova                             = Spell(122),
   TimeWarp                              = Spell(80353),
-  FireBlast                             = Spell(319836),
   -- Talents
   Amplification                         = Spell(236628),
   RuleofThrees                          = Spell(264354),
@@ -83,10 +85,12 @@ Spell.Mage.Arcane = {
   -- Legendaries (Shadowlands)
   ExpandedPotentialBuff                 = Spell(327495),
   SiphonStormBuff                       = Spell(332928),
-  DisciplinaryCommandBuff               = Spell(327365),
-  DisciplinaryCommandFrostBuff          = Spell(327366),
-  DisciplinaryCommandFireBuff           = Spell(327368),
-  DisciplinaryCommandArcaneBuff         = Spell(327369)
+  DisciplinaryCommandBuff               = Spell(327371),
+  -- Disciplinary Command Filler IDs
+  Fireball                              = Spell(0),
+  Scorch                                = Spell(0),
+  Pyroblast                             = Spell(0),
+  Flamestrike                           = Spell(0),
 }
 
 Spell.Mage.Fire = {
@@ -232,10 +236,12 @@ Spell.Mage.Frost = {
   ExpandedPotentialBuff                 = Spell(327495),
   FreezingWindsBuff                     = Spell(327364),
   SlickIceBuff                          = Spell(327508),
-  DisciplinaryCommandBuff               = Spell(327365),
-  DisciplinaryCommandFrostBuff          = Spell(327366),
-  DisciplinaryCommandFireBuff           = Spell(327368),
-  DisciplinaryCommandArcaneBuff         = Spell(327369)
+  DisciplinaryCommandBuff               = Spell(327371),
+  -- Disciplinary Command Filler IDs
+  Fireball                              = Spell(0),
+  Scorch                                = Spell(0),
+  Pyroblast                             = Spell(0),
+  Flamestrike                           = Spell(0),
 }
 
 -- Items
@@ -352,4 +358,63 @@ function Mage.IFTimeToX(count, direction)
     local ticks_low = (10 + low - buff_position) % 10
     local ticks_high = (10 + high - buff_position) % 10
     return (Mage.IFST.CurrStacksTime - Mage.IFST.OldStacksTime) + math.min(ticks_low, ticks_high) - 1
+end
+
+Mage.DC = {
+  Arcane = 0,
+  ArcaneTime = 0,
+  Fire = 0,
+  FireTime = 0,
+  Frost = 0,
+  FrostTime = 0
+}
+
+function Mage.DCCheck()
+  local CurrentTime = GetTime()
+  local specID = Cache.Persistent.Player.Spec[1]
+  local S
+  if specID == 62 then
+    S = Spell.Mage.Arcane
+  elseif specID == 63 then
+    S = Spell.Mage.Fire
+  elseif specID == 64 then
+    S = Spell.Mage.Frost
+  end
+
+  local M = Mage.DC
+  if Player:BuffDown(S.DisciplinaryCommandBuff) then
+    if M.Arcane == 0 then
+      -- Split Blink (1953)/Shimmer (212653) into unique spell objects, as PrevGCD doesn't like MultiSpell, apparently
+      if Player:PrevGCD(1, S.Counterspell) or Player:PrevGCD(1, S.ArcaneExplosion) or Player:PrevGCD(1, S.RuneofPower) or Player:PrevGCD(1, Spell(212653)) or Player:PrevGCD(1, Spell(1953)) or Player:PrevGCD(1, S.ArcaneIntellect) then
+        M.Arcane = 1
+        M.ArcaneTime = CurrentTime
+      end
+    end
+    if M.Fire == 0 then
+      if Player:PrevGCD(1, S.Fireball) or Player:PrevGCD(1, S.Scorch) or Player:PrevGCD(1, S.Pyroblast) or Player:PrevGCD(1, S.Flamestrike) or Player:PrevGCD(1, S.FireBlast) then
+        M.Fire = 1
+        M.FireTime = CurrentTime
+      end
+    end
+    if M.Frost == 0 then
+      if Player:PrevGCD(1, S.Frostbolt) or Player:PrevGCD(1, S.FrostNova) then
+        M.Frost = 1
+        M.FrostTime = CurrentTime
+      end
+    end
+  end
+  if Player:BuffUp(S.DisciplinaryCommandBuff) then
+    M.Arcane = 0
+    M.Fire = 0
+    M.Frost = 0
+  end
+  if M.ArcaneTime < CurrentTime - 10 then
+    M.Arcane = 0
+  end
+  if M.FireTime < CurrentTime - 10 then
+    M.Fire = 0
+  end
+  if M.FrostTime < CurrentTime - 10 then
+    M.Frost = 0
+  end
 end

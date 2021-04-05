@@ -77,6 +77,8 @@ local var_am_spam
 local var_ap_on_use
 local var_evo_pct
 local var_init = false
+local var_disciplinary_command_cd_remains
+local var_disciplinary_command_last_applied
 local RadiantSparkVulnerabilityMaxStack = 4
 local ClearCastingMaxStack = 3
 
@@ -341,7 +343,7 @@ local function Opener ()
     if HR.Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation opener 1"; end
   end
   --fire_blast,if=runeforge.disciplinary_command&buff.disciplinary_command_frost.up
-  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and Player:BuffUp(S.DisciplinaryCommandFireBuff) then
+  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and Mage.DC.Frost == 1 then
     if HR.Cast(S.FireBlast, nil, nil, not Target:IsSpellInRange(S.FireBlast)) then return "fire_blast opener 2"; end
   end
   --frost_nova,if=runeforge.grisly_icicle.equipped&mana.pct>95
@@ -477,13 +479,13 @@ local function Cooldowns ()
   --frostbolt,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_frost.down
   --&(buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down)&cooldown.touch_of_the_magi.remains=0
   --&(buff.arcane_charge.stack<=variable.totm_max_charges&((talent.rune_of_power&cooldown.rune_of_power.remains<=gcd&cooldown.arcane_power.remains>variable.totm_max_delay_for_ap)|(!talent.rune_of_power&cooldown.arcane_power.remains>variable.totm_max_delay_for_ap)|cooldown.arcane_power.remains<=gcd))
-  if S.Frostbolt:IsReady() and DisciplinaryCommandEquipped and S.DisciplinaryCommandFrostBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFrostBuff) 
+  if S.Frostbolt:IsReady() and DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Frost == 0 
   and (Player:BuffDown(S.ArcanePower) and Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffDown(S.TouchoftheMagi)) and S.TouchoftheMagi:CooldownRemains() == 0
   and (Player:ArcaneCharges() <= var_totm_max_charges and ((S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= Player:GCD() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or (not S.RuneofPower:IsAvailable() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or (S.ArcanePower:CooldownRemains() <= Player:GCD()))) then
     if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt cooldowns 3"; end
   end
   --fire_blast,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down&prev_gcd.1.frostbolt
-  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFireBuff) and Player:PrevGCD(1,S.Frostbolt) then
+  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Fire == 0 and Player:PrevGCD(1,S.Frostbolt) then
     if HR.Cast(S.FireBlast, nil, nil, not Target:IsSpellInRange(S.FireBlast)) then return "fire_blast cooldowns 4"; end
   end
   --mirrors_of_torment,if=cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack<=variable.totm_max_charges&cooldown.arcane_power.remains<=gcd
@@ -715,13 +717,13 @@ local function Aoe ()
   --frostbolt,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_frost.down
   --&(buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down)&cooldown.touch_of_the_magi.remains=0&(buff.arcane_charge.stack<=variable.aoe_totm_max_charges
   --&((talent.rune_of_power&cooldown.rune_of_power.remains<=gcd&cooldown.arcane_power.remains>variable.totm_max_delay_for_ap)|(!talent.rune_of_power&cooldown.arcane_power.remains>variable.totm_max_delay_for_ap)|cooldown.arcane_power.remains<=gcd))
-  if S.Frostbolt:IsReady() and DisciplinaryCommandEquipped and S.DisciplinaryCommandFrostBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFrostBuff) 
+  if S.Frostbolt:IsReady() and DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Frost == 0 
   and (Player:BuffDown(S.ArcanePower) and Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffDown(S.TouchoftheMagi)) and S.TouchoftheMagi:CooldownRemains() == 0 and (Player:ArcaneCharges() <= var_totm_max_charges 
   and ((S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= Player:GCD() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or (not S.RuneofPower:IsAvailable() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or (S.ArcanePower:CooldownRemains() <= Player:GCD()))) then
     if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt Aoe 1"; end
   end
   --fire_blast,if=(runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down&prev_gcd.1.frostbolt)|(runeforge.disciplinary_command&time=0)
-  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFireBuff) and Player:PrevGCD(1,S.Frostbolt) then
+  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Fire == 0 and Player:PrevGCD(1,S.Frostbolt) then
     if HR.Cast(S.FireBlast, nil, nil, not Target:IsSpellInRange(S.FireBlast)) then return "fire_blast Aoe 2"; end
   end
   --frost_nova,if=runeforge.grisly_icicle&cooldown.arcane_power.remains>30&cooldown.touch_of_the_magi.remains=0
@@ -969,6 +971,14 @@ local function APL()
   EnemiesCount30ySplash = Target:GetEnemiesInSplashRangeCount(30)
   Enemies10yMelee = Player:GetEnemiesInMeleeRange(10)
   EnemiesCount10yMelee = #Enemies10yMelee
+
+  -- Check when the Disciplinary Command buff was last applied and its internal CD
+  var_disciplinary_command_last_applied = S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()
+  var_disciplinary_command_cd_remains = 30 - var_disciplinary_command_last_applied
+  if var_disciplinary_command_cd_remains < 0 then var_disciplinary_command_cd_remains = 0 end
+
+  -- Disciplinary Command Check
+  Mage.DCCheck()
 
   -- call precombat
   if not Player:AffectingCombat() and not Player:IsCasting() and Everyone.TargetIsValid() then

@@ -24,7 +24,8 @@ local FBCast
 -- lua
 local max        = math.max
 local ceil       = math.ceil
-local GetTime    = GetTime
+-- Commons
+local Mage       = HR.Commons.Mage
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -97,12 +98,6 @@ local var_sun_kings_blessing_max_stack = 12
 local fightRemains
 local var_disciplinary_command_cd_remains
 local var_disciplinary_command_last_applied
-local var_dc_arcane = 0
-local var_dc_arcane_time = 0
-local var_dc_fire = 0
-local var_dc_fire_time = 0
-local var_dc_frost = 0
-local var_dc_frost_time = 0
 
 local EnemiesCount8ySplash,EnemiesCount10ySplash,EnemiesCount16ySplash
 local EnemiesCount10yMelee,EnemiesCount18yMelee
@@ -481,7 +476,7 @@ local function CombustionPhase()
     local ShouldReturn = ActiveTalents(); if ShouldReturn then return ShouldReturn; end
   end
   -- combustion,use_off_gcd=1,use_while_casting=1,if=buff.combustion.down&variable.time_to_combustion<=0&(!runeforge.disciplinary_command|buff.disciplinary_command.up|buff.disciplinary_command_frost.up&talent.rune_of_power&cooldown.buff_disciplinary_command.ready)&(!runeforge.grisly_icicle|debuff.grisly_icicle.up)&(!covenant.necrolord|cooldown.deathborne.remains|buff.deathborne.up)&(action.meteor.in_flight&action.meteor.in_flight_remains<=variable.combustion_cast_remains|action.scorch.executing&action.scorch.execute_remains<variable.combustion_cast_remains|action.fireball.executing&action.fireball.execute_remains<variable.combustion_cast_remains|action.pyroblast.executing&action.pyroblast.execute_remains<variable.combustion_cast_remains|action.flamestrike.executing&action.flamestrike.execute_remains<variable.combustion_cast_remains)
-  if S.Combustion:IsReady() and (Player:BuffDown(S.CombustionBuff) and var_time_to_combustion <= 0 and (not DisciplinaryCommandEquipped or Player:BuffUp(S.DisciplinaryCommandBuff) or var_dc_frost == 1 and S.RuneofPower:IsAvailable() and var_disciplinary_command_cd_remains <= 0) and (not GrislyIcicleEquipped or Target:DebuffUp(S.GrislyIcicleDebuff)) and (Player:Covenant() ~= "Necrolord" or not S.Deathborne:CooldownUp() or Player:BuffUp(S.DeathborneBuff)) and (S.Meteor:InFlight() or Player:IsCasting(S.Scorch) and S.Scorch:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Fireball) and S.Fireball:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Pyroblast) and S.Pyroblast:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Flamestrike) and S.Flamestrike:ExecuteRemains() < var_combustion_cast_remains)) then
+  if S.Combustion:IsReady() and (Player:BuffDown(S.CombustionBuff) and var_time_to_combustion <= 0 and (not DisciplinaryCommandEquipped or Player:BuffUp(S.DisciplinaryCommandBuff) or Mage.DC.Frost == 1 and S.RuneofPower:IsAvailable() and var_disciplinary_command_cd_remains <= 0) and (not GrislyIcicleEquipped or Target:DebuffUp(S.GrislyIcicleDebuff)) and (Player:Covenant() ~= "Necrolord" or not S.Deathborne:CooldownUp() or Player:BuffUp(S.DeathborneBuff)) and (S.Meteor:InFlight() or Player:IsCasting(S.Scorch) and S.Scorch:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Fireball) and S.Fireball:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Pyroblast) and S.Pyroblast:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Flamestrike) and S.Flamestrike:ExecuteRemains() < var_combustion_cast_remains)) then
     if Cast(S.Combustion, Settings.Fire.OffGCDasOffGCD.Combustion) then return "combustion combustion_phase 15"; end
   end
   -- call_action_list,name=combustion_cooldowns,if=buff.combustion.remains>8|cooldown.combustion.remains<5
@@ -703,9 +698,6 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  -- Get the current time (used in DC school buff checks below)
-  local CurrentTime = GetTime()
-
   -- Check which cast style we should use for Fire Blast
   if Settings.Fire.ShowFireBlastLeft then
     FBCast = CastLeft
@@ -737,47 +729,15 @@ local function APL()
   -- How long is left in the fight?
   fightRemains = max(HL.FightRemains(Enemies8ySplash, false), HL.BossFightRemains())
 
-  -- Checck when the Disciplinary Command buff was last applied and its internal CD
+  -- Check when the Disciplinary Command buff was last applied and its internal CD
   var_disciplinary_command_last_applied = S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()
   var_disciplinary_command_cd_remains = 30 - var_disciplinary_command_last_applied
   if var_disciplinary_command_cd_remains < 0 then var_disciplinary_command_cd_remains = 0 end
 
-  -- Check the individual school buff portions of Disciplinary Command
-  if Player:BuffDown(S.DisciplinaryCommandBuff) then
-    if var_dc_arcane == 0 then
-      if Player:PrevGCD(1, S.Counterspell) or Player:PrevGCD(1, S.ArcaneExplosion) or Player:PrevGCD(1, S.RuneofPower) or Player:PrevGCD(1, S.Blink) then
-        var_dc_arcane = 1
-        var_dc_arcane_time = CurrentTime
-      end
-    end
-    if var_dc_fire == 0 then
-      if Player:PrevGCD(1, S.Fireball) or Player:PrevGCD(1, S.Scorch) or Player:PrevGCD(1, S.Pyroblast) or Player:PrevGCD(1, S.Flamestrike) then
-        var_dc_fire = 1
-        var_dc_fire_time = CurrentTime
-      end
-    end
-    if var_dc_frost == 0 then
-      if Player:PrevGCD(1, S.Frostbolt) or Player:PrevGCD(1, S.FrostNova) then
-        var_dc_frost = 1
-        var_dc_frost_time = CurrentTime
-      end
-    end
-  end
-  if Player:BuffUp(S.DisciplinaryCommandBuff) then
-    var_dc_arcane = 0
-    var_dc_fire = 0
-    var_dc_frost = 0
-  end
-  if var_dc_arcane_time < CurrentTime - 10 then
-    var_dc_arcane = 0
-  end
-  if var_dc_fire_time < CurrentTime - 10 then
-    var_dc_fire = 0
-  end
-  if var_dc_frost_time < CurrentTime - 10 then
-    var_dc_frost = 0
-  end
+  -- Disciplinary Command Check
+  Mage.DCCheck()
 
+  -- Is Searing Touch active?
   var_searing_touch_active = S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30
 
   --variable,name=disable_combustion,op=reset
@@ -902,11 +862,11 @@ local function APL()
       end
     end
     -- counterspell,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.remains<action.frostbolt.cast_time&buff.disciplinary_command_arcane.down&!buff.disciplinary_command.up&(variable.time_to_combustion+action.frostbolt.cast_time>cooldown.buff_disciplinary_command.duration|variable.time_to_combustion<5)
-    if S.Counterspell:IsReady() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains < S.Frostbolt:CastTime() and var_dc_arcane == 0 and Player:BuffDown(S.DisciplinaryCommandBuff) and (var_time_to_combustion + S.Frostbolt:CastTime() > 30 or var_time_to_combustion < 5)) then
+    if S.Counterspell:IsReady() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains < S.Frostbolt:CastTime() and Mage.DC.Arcane == 0 and Player:BuffDown(S.DisciplinaryCommandBuff) and (var_time_to_combustion + S.Frostbolt:CastTime() > 30 or var_time_to_combustion < 5)) then
       if Cast(S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, nil, not Target:IsSpellInRange(S.Counterspell)) then return "counterspell default 27"; end
     end
     -- arcane_explosion,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.remains<execute_time+action.frostbolt.cast_time&buff.disciplinary_command_arcane.down&!buff.disciplinary_command.up&(variable.time_to_combustion+execute_time+action.frostbolt.cast_time>cooldown.buff_disciplinary_command.duration|variable.time_to_combustion<5&!talent.rune_of_power)
-    if S.ArcaneExplosion:IsReady() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains < S.ArcaneExplosion:ExecuteTime() + S.Frostbolt:CastTime() and var_dc_arcane == 0 and Player:BuffDown(S.DisciplinaryCommandBuff) and (var_time_to_combustion + S.ArcaneExplosion:ExecuteTime() + S.Frostbolt:CastTime() > 30 or var_time_to_combustion < 5 and not S.RuneofPower:IsAvailable())) then
+    if S.ArcaneExplosion:IsReady() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains < S.ArcaneExplosion:ExecuteTime() + S.Frostbolt:CastTime() and Mage.DC.Arcane == 0 and Player:BuffDown(S.DisciplinaryCommandBuff) and (var_time_to_combustion + S.ArcaneExplosion:ExecuteTime() + S.Frostbolt:CastTime() > 30 or var_time_to_combustion < 5 and not S.RuneofPower:IsAvailable())) then
       if Settings.Fire.StayDistance and not Target:IsInRange(10) then
         if CastLeft(S.ArcaneExplosion) then return "arcane_explosion default 28 left"; end
       else
@@ -914,11 +874,11 @@ local function APL()
       end
     end
     -- frostbolt,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.remains<cast_time&buff.disciplinary_command_frost.down&!buff.disciplinary_command.up&(variable.time_to_combustion+cast_time>cooldown.buff_disciplinary_command.duration|variable.time_to_combustion<5)
-    if S.Frostbolt:IsReady() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains < S.Frostbolt:CastTime() and var_dc_frost == 0 and Player:BuffDown(S.DisciplinaryCommandBuff) and (var_time_to_combustion + S.Frostbolt:CastTime() > 30 or var_time_to_combustion < 5)) then
+    if S.Frostbolt:IsReady() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains < S.Frostbolt:CastTime() and Mage.DC.Frost == 0 and Player:BuffDown(S.DisciplinaryCommandBuff) and (var_time_to_combustion + S.Frostbolt:CastTime() > 30 or var_time_to_combustion < 5)) then
       if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt default 29"; end
     end
     -- frost_nova,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_frost.down&!buff.disciplinary_command.up&(variable.time_to_combustion>cooldown.buff_disciplinary_command.duration|variable.time_to_combustion<5)
-    if S.FrostNova:IsReady() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and var_dc_frost == 0 and Player:BuffDown(S.DisciplinaryCommandBuff) and (var_time_to_combustion > 30 or var_time_to_combustion < 5)) then
+    if S.FrostNova:IsReady() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Frost == 0 and Player:BuffDown(S.DisciplinaryCommandBuff) and (var_time_to_combustion > 30 or var_time_to_combustion < 5)) then
       if Settings.Fire.StayDistance and not Target:IsInRange(12) then
         if CastLeft(S.FrostNova) then return "frost_nova default 30 left"; end
       else

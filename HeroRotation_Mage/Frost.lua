@@ -16,7 +16,7 @@ local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
-
+local Mage       = HR.Commons.Mage
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -34,7 +34,8 @@ local OnUseExcludes = {
 local ShouldReturn -- Used to get the return string
 local EnemiesCount6ySplash, EnemiesCount8ySplash, EnemiesCount16ySplash, EnemiesCount30ySplash --Enemies arround target
 local EnemiesCount10yMelee, EnemiesCount12yMelee, EnemiesCount15yMelee, EnemiesCount18yMelee  --Enemies arround player
-local Mage = HR.Commons.Mage
+local var_disciplinary_command_cd_remains
+local var_disciplinary_command_last_applied
 local TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
 local GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
 local FreezingWindsEquipped = Player:HasLegendaryEquipped(4)
@@ -196,7 +197,7 @@ local function Aoe ()
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShiftingPower)) then return "shifting_power aoe 9"; end
   end
   --fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
-  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFireBuff) then
+  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Fire == 0 then
     if HR.Cast(S.FireBlast) then return "fire_blast aoe 11"; end
   end
   --arcane_explosion,if=mana.pct>30&active_enemies>=6&!runeforge.glacial_fragments
@@ -291,11 +292,11 @@ local function Single ()
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant) then return "shifting_power single 15"; end
   end
   --arcane_explosion,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down
-  if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandArcaneBuff) then
+  if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Arcane == 0 then
     if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion single 16"; end
   end
   --fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
-  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFireBuff) then
+  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Fire == 0 then
     if HR.Cast(S.FireBlast) then return "fire_blast single 17"; end
   end
   --glacial_spike,if=buff.brain_freeze.react
@@ -328,13 +329,21 @@ local function APL ()
   EnemiesCount18yMelee = #Enemies18yMelee
   Mage.IFTracker()
 
+  -- Check when the Disciplinary Command buff was last applied and its internal CD
+  var_disciplinary_command_last_applied = S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()
+  var_disciplinary_command_cd_remains = 30 - var_disciplinary_command_last_applied
+  if var_disciplinary_command_cd_remains < 0 then var_disciplinary_command_cd_remains = 0 end
+
+  -- Disciplinary Command Check
+  Mage.DCCheck()
+
   --call precombat
   if not Player:AffectingCombat() and (not Player:IsCasting() or Player:IsCasting(S.WaterElemental)) then
     ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
     --counterspell,if=!runeforge.disciplinary_command|cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down
-    if S.Counterspell:IsCastable() and (DisciplinaryCommandEquipped and (S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandArcaneBuff))) then
+    if S.Counterspell:IsCastable() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Arcane == 0) then
       if HR.Cast(S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, nil, not Target:IsSpellInRange(S.Counterspell)) then return "counterspell default"; end
     end
     --call_action_list,name=cds
