@@ -103,6 +103,7 @@ Spell.Mage.Fire = {
   ArcaneIntellect                       = Spell(1459),
   ArcaneIntellectBuff                   = Spell(1459),
   ArcaneExplosion                       = Spell(1449),
+  Blink                                 = MultiSpell(1953, 212653),
   Frostbolt                             = Spell(116),
   TimeWarp                              = Spell(80353),
   MirrorImage                           = Spell(55342),
@@ -159,7 +160,7 @@ Spell.Mage.Fire = {
   SunKingsBlessingBuff                  = Spell(333313),
   GrislyIcicleBuff                      = Spell(333393),
   GrislyIcicleDebuff                    = Spell(348007),
-  DisciplinaryCommandBuff               = Spell(327365),
+  DisciplinaryCommandBuff               = Spell(327371),
   -- Trinkets
   SoulIgnitionBuff                      = Spell(345211)
 }

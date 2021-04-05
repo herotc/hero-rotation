@@ -24,6 +24,7 @@ local FBCast
 -- lua
 local max        = math.max
 local ceil       = math.ceil
+local GetTime    = GetTime
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -97,8 +98,11 @@ local fightRemains
 local var_disciplinary_command_cd_remains
 local var_disciplinary_command_last_applied
 local var_dc_arcane = 0
+local var_dc_arcane_time = 0
 local var_dc_fire = 0
+local var_dc_fire_time = 0
 local var_dc_frost = 0
+local var_dc_frost_time = 0
 
 local EnemiesCount8ySplash,EnemiesCount10ySplash,EnemiesCount16ySplash
 local EnemiesCount10yMelee,EnemiesCount18yMelee
@@ -143,9 +147,6 @@ S.Fireball:RegisterInFlight(S.CombustionBuff)
 HL:RegisterForEvent(function()
   var_init = false
   var_firestarter_combustion = -1
-  var_dc_arcane = 0
-  var_dc_fire = 0
-  var_dc_frost = 0
 end, "PLAYER_REGEN_ENABLED")
 
 function S.Firestarter:ActiveStatus()
@@ -702,12 +703,17 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
+  -- Get the current time (used in DC school buff checks below)
+  local CurrentTime = GetTime()
+
+  -- Check which cast style we should use for Fire Blast
   if Settings.Fire.ShowFireBlastLeft then
     FBCast = CastLeft
   else
     FBCast = Cast
   end
 
+  -- Update our enemy tables
   Enemies8ySplash = Target:GetEnemiesInSplashRange(8)
   Enemies10yMelee = Player:GetEnemiesInMeleeRange(10)
   Enemies18yMelee = Player:GetEnemiesInMeleeRange(18)
@@ -725,34 +731,50 @@ local function APL()
     EnemiesCount18yMelee = 1
   end
 
+  -- Check how many units have ignite
   UnitsWithIgniteCount = UnitsWithIgnite(Enemies8ySplash)
 
+  -- How long is left in the fight?
   fightRemains = max(HL.FightRemains(Enemies8ySplash, false), HL.BossFightRemains())
 
+  -- Checck when the Disciplinary Command buff was last applied and its internal CD
   var_disciplinary_command_last_applied = S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()
   var_disciplinary_command_cd_remains = 30 - var_disciplinary_command_last_applied
   if var_disciplinary_command_cd_remains < 0 then var_disciplinary_command_cd_remains = 0 end
 
+  -- Check the individual school buff portions of Disciplinary Command
   if Player:BuffDown(S.DisciplinaryCommandBuff) then
     if var_dc_arcane == 0 then
       if Player:PrevGCD(1, S.Counterspell) or Player:PrevGCD(1, S.ArcaneExplosion) or Player:PrevGCD(1, S.RuneofPower) or Player:PrevGCD(1, S.Blink) then
         var_dc_arcane = 1
+        var_dc_arcane_time = CurrentTime
       end
     end
     if var_dc_fire == 0 then
       if Player:PrevGCD(1, S.Fireball) or Player:PrevGCD(1, S.Scorch) or Player:PrevGCD(1, S.Pyroblast) or Player:PrevGCD(1, S.Flamestrike) then
         var_dc_fire = 1
+        var_dc_fire_time = CurrentTime
       end
     end
     if var_dc_frost == 0 then
       if Player:PrevGCD(1, S.Frostbolt) or Player:PrevGCD(1, S.FrostNova) then
         var_dc_frost = 1
+        var_dc_frost_time = CurrentTime
       end
     end
   end
   if Player:BuffUp(S.DisciplinaryCommandBuff) then
     var_dc_arcane = 0
     var_dc_fire = 0
+    var_dc_frost = 0
+  end
+  if var_dc_arcane_time < CurrentTime - 10 then
+    var_dc_arcane = 0
+  end
+  if var_dc_fire_time < CurrentTime - 10 then
+    var_dc_fire = 0
+  end
+  if var_dc_frost_time < CurrentTime - 10 then
     var_dc_frost = 0
   end
 
