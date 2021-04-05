@@ -35,7 +35,18 @@ local I = Item.Mage.Fire;
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-
+  I.DreadfireVessel:ID(),
+  I.EmpyrealOrdnance:ID(),
+  I.FlameofBattle:ID(),
+  I.GlyphofAssimilation:ID(),
+  I.InscrutableQuantumDevice:ID(),
+  I.InstructorsDivineBell:ID(),
+  I.MacabreSheetMusic:ID(),
+  I.SinfulAspirantsBadge:ID(),
+  I.SinfulGladiatorsBadge:ID(),
+  I.SoulIgniter:ID(),
+  I.SunbloodAmethyst:ID(),
+  I.WakenersFrond:ID()
 }
 
 -- Rotation Var
