@@ -733,19 +733,21 @@ local function APL()
   var_disciplinary_command_cd_remains = 30 - var_disciplinary_command_last_applied
   if var_disciplinary_command_cd_remains < 0 then var_disciplinary_command_cd_remains = 0 end
 
-  if var_dc_arcane == 0 then
-    if Player:PrevGCD(1, S.Counterspell) or Player:PrevGCD(1, S.ArcaneExplosion) or Player:PrevGCD(1, S.RuneofPower) or Player:PrevGCD(1, S.Blink) then
-      var_dc_arcane = 1
+  if Player:BuffDown(S.DisciplinaryCommandBuff) then
+    if var_dc_arcane == 0 then
+      if Player:PrevGCD(1, S.Counterspell) or Player:PrevGCD(1, S.ArcaneExplosion) or Player:PrevGCD(1, S.RuneofPower) or Player:PrevGCD(1, S.Blink) then
+        var_dc_arcane = 1
+      end
     end
-  end
-  if var_dc_fire == 0 then
-    if Player:PrevGCD(1, S.Fireball) or Player:PrevGCD(1, S.Scorch) or Player:PrevGCD(1, S.Pyroblast) or Player:PrevGCD(1, S.Flamestrike) then
-      var_dc_fire = 1
+    if var_dc_fire == 0 then
+      if Player:PrevGCD(1, S.Fireball) or Player:PrevGCD(1, S.Scorch) or Player:PrevGCD(1, S.Pyroblast) or Player:PrevGCD(1, S.Flamestrike) then
+        var_dc_fire = 1
+      end
     end
-  end
-  if var_dc_frost == 0 then
-    if Player:PrevGCD(1, S.Frostbolt) or Player:PrevGCD(1, S.FrostNova) then
-      var_dc_frost = 1
+    if var_dc_frost == 0 then
+      if Player:PrevGCD(1, S.Frostbolt) or Player:PrevGCD(1, S.FrostNova) then
+        var_dc_frost = 1
+      end
     end
   end
   if Player:BuffUp(S.DisciplinaryCommandBuff) then
