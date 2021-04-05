@@ -178,7 +178,7 @@ end
 local function Cleave()
   -- aspect_of_the_wild
   if CDsON() and S.AspectoftheWild:IsCastable() then
-    if Cast(S.AspectoftheWild, Settings.BeastMastery.OffGCDasOffGCD.AspectoftheWild) then return "Aspect of the Wild (Cleave)"; end
+    if Cast(S.AspectoftheWild, Settings.BeastMastery.OffGCDasOffGCD.AspectOfTheWild) then return "Aspect of the Wild (Cleave)"; end
   end
   -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains<=gcd
   if S.BarbedShot:IsCastable() then
@@ -283,7 +283,7 @@ end
 local function ST()
   -- aspect_of_the_wild
   if CDsON() and S.AspectoftheWild:IsCastable() then
-    if Cast(S.AspectoftheWild, Settings.BeastMastery.OffGCDasOffGCD.AspectoftheWild) then return "Aspect of the Wild (ST)"; end
+    if Cast(S.AspectoftheWild, Settings.BeastMastery.OffGCDasOffGCD.AspectOfTheWild) then return "Aspect of the Wild (ST)"; end
   end
   -- barbed_shot,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains<=gcd
   if S.BarbedShot:IsCastable() and (Pet:BuffUp(S.FrenzyPetBuff) and Pet:BuffRemains(S.FrenzyPetBuff) <= GCDMax) then

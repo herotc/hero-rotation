@@ -57,7 +57,7 @@ HR.GUISettings.APL.Hunter = {
       Stampede = false,
     },
     OffGCDasOffGCD = {
-      AspectoftheWild = true,
+      AspectOfTheWild = true,
     }
   },
   Marksmanship = {
@@ -71,7 +71,7 @@ HR.GUISettings.APL.Hunter = {
     }
   },
   Survival = {
-    AspectoftheEagle = true,
+    AspectOfTheEagle = true,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -83,7 +83,7 @@ HR.GUISettings.APL.Hunter = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
-      AspectoftheEagle = true,
+      AspectOfTheEagle = true,
       Muzzle = true,
       -- Items
       -- Racials

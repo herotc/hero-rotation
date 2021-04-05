@@ -235,7 +235,7 @@ local function Aoe()
   end
   -- horn_of_winter
   if S.HornofWinter:IsCastable() then
-    if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return "horn_of_winter aoe 17"; end
+    if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornOfWinter) then return "horn_of_winter aoe 17"; end
   end
   -- arcane_torrent
   if S.ArcaneTorrent:IsCastable() and HR.CDsON() then
@@ -307,7 +307,7 @@ local function BosTicking()
   end
   -- horn_of_winter,if=runic_power.deficit>=40&rune.time_to_3>gcd
   if S.HornofWinter:IsCastable() and (Player:RunicPowerDeficit() >= 40 and Player:RuneTimeToX(3) > Player:GCD()) then
-    if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return "horn_of_winter bos ticking 6"; end
+    if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornOfWinter) then return "horn_of_winter bos ticking 6"; end
   end
   -- frostscythe,if=spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking|!covenant.night_fae)
   if S.Frostscythe:IsCastable() and (EnemiesCount10yd >= 2 and (Player:BuffStack(S.DeathsDue) == 8 or not Player:BuffUp(S.DeathAndDecayBuff) or not Player:Covenant() == "Night Fae")) then
@@ -440,15 +440,15 @@ local function Cooldowns()
   end
   -- pillar_of_frost,if=talent.breath_of_sindragosa&(cooldown.breath_of_sindragosa.remains|cooldown.breath_of_sindragosa.ready&runic_power.deficit<60)
   if S.PillarofFrost:IsCastable() and (S.BreathofSindragosa:IsAvailable() and (bool(S.BreathofSindragosa:CooldownRemains()) or S.BreathofSindragosa:CooldownUp() and Player:RunicPowerDeficit() < 60)) then
-    if HR.Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarofFrost) then return "pillar_of_frost cd 4"; end
+    if HR.Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cd 4"; end
   end
   -- pillar_of_frost,if=talent.icecap&!buff.pillar_of_frost.up
   if S.PillarofFrost:IsCastable() and (S.Icecap:IsAvailable() and not Player:BuffUp(S.PillarofFrost)) then
-    if HR.Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarofFrost) then return "pillar_of_frost cd 4"; end
+    if HR.Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cd 4"; end
   end
   -- pillar_of_frost,if=talent.obliteration&(talent.gathering_storm.enabled&buff.remorseless_winter.up|!talent.gathering_storm.enabled)
   if S.PillarofFrost:IsCastable() and (S.Obliteration:IsAvailable() and (S.GatheringStorm:IsAvailable() and Player:BuffUp(S.RemorselessWinter) or not S.GatheringStorm:IsAvailable())) then
-    if HR.Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarofFrost) then return "pillar_of_frost cd 5"; end
+    if HR.Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cd 5"; end
   end
   -- breath_of_sindragosa,if=buff.pillar_of_frost.up
   if S.BreathofSindragosa:IsCastable() and Player:BuffUp(S.PillarofFrostBuff) then
@@ -603,7 +603,7 @@ local function Standard()
   end
   -- Horn of Winter
   if S.HornofWinter:IsCastable() then
-    if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return "horn_of_winter standard 10"; end
+    if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornOfWinter) then return "horn_of_winter standard 10"; end
   end
   -- Arcane Torrent
   if S.ArcaneTorrent:IsCastable() and HR.CDsON() then

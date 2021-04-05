@@ -94,10 +94,10 @@ local function Defensives()
     if HR.Cast(S.ArdentDefender) then return "ardent_defender defensive"; end
   end
   if S.WordofGlory:IsReady() and (Player:HealthPercentage() <= Settings.Protection.WordofGloryHP and not Player:HealingAbsorbed()) then
-    if HR.Cast(S.WordofGlory, Settings.Protection.GCDasOffGCD.WordofGlory) then return "word_of_glory defensive"; end
+    if HR.Cast(S.WordofGlory, Settings.Protection.GCDasOffGCD.WordOfGlory) then return "word_of_glory defensive"; end
   end
   if S.ShieldoftheRighteous:IsReady() and (Player:BuffRefreshable(S.ShieldoftheRighteousBuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP)) then
-    if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return "shield_of_the_righteous defensive"; end
+    if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldOfTheRighteous) then return "shield_of_the_righteous defensive"; end
   end
 end
 
@@ -131,18 +131,18 @@ local function Cooldowns()
   end
   -- moment_of_glory,if=prev_gcd.1.avengers_shield&cooldown.avengers_shield.remains
   if S.MomentofGlory:IsCastable() and (Player:PrevGCD(1, S.AvengersShield) and not S.AvengersShield:CooldownUp()) then
-    if HR.Cast(S.MomentofGlory, Settings.Protection.OffGCDasOffGCD.MomentofGlory) then return "moment_of_glory 42"; end
+    if HR.Cast(S.MomentofGlory, Settings.Protection.OffGCDasOffGCD.MomentOfGlory) then return "moment_of_glory 42"; end
   end
 end
 
 local function Standard()
   -- shield_of_the_righteous,if=debuff.judgment.up&(debuff.vengeful_shock.up|!conduit.vengeful_shock.enabled)
   if S.ShieldoftheRighteous:IsReady() and (Target:DebuffUp(S.JudgmentDebuff) and (Target:DebuffUp(S.VengefulShockDebuff) or not S.VengefulShock:ConduitEnabled())) then
-    if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous, nil, not Target:IsSpellInRange(S.ShieldoftheRighteous)) then return "shield_of_the_righteous 62"; end
+    if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldOfTheRighteous, nil, not Target:IsSpellInRange(S.ShieldoftheRighteous)) then return "shield_of_the_righteous 62"; end
   end
   -- shield_of_the_righteous,if=holy_power=5|buff.holy_avenger.up|holy_power=4&talent.sanctified_wrath.enabled&buff.avenging_wrath.up
   if S.ShieldoftheRighteous:IsReady() and (Player:HolyPower() == 5 or Player:BuffUp(S.HolyAvengerBuff) or Player:HolyPower() == 4 and S.SanctifiedWrath:IsAvailable() and Player:BuffUp(S.AvengingWrathBuff)) then
-    if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous, nil, not Target:IsSpellInRange(S.ShieldoftheRighteous)) then return "shield_of_the_righteous 64"; end
+    if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldOfTheRighteous, nil, not Target:IsSpellInRange(S.ShieldoftheRighteous)) then return "shield_of_the_righteous 64"; end
   end
   -- judgment,target_if=min:debuff.judgment.remains,if=charges=2|!talent.crusaders_judgment.enabled
   if S.Judgment:IsReady() and (S.Judgment:Charges() == 2 or not S.CrusadersJudgment:IsAvailable()) then
@@ -191,7 +191,7 @@ local function Standard()
   end
   -- word_of_glory,if=buff.vanquishers_hammer.up
   if S.WordofGlory:IsReady() and (Player:BuffUp(S.VanquishersHammerBuff)) then
-    if HR.Cast(S.WordofGlory, Settings.Protection.GCDasOffGCD.WordofGlory) then return "word_of_glory 88"; end
+    if HR.Cast(S.WordofGlory, Settings.Protection.GCDasOffGCD.WordOfGlory) then return "word_of_glory 88"; end
   end
   -- blessed_hammer,strikes=2.4
   if S.BlessedHammer:IsCastable() then
@@ -215,7 +215,7 @@ local function Standard()
   end
   -- word_of_glory,if=buff.shining_light_free.up&!covenant.necrolord
   if S.WordofGlory:IsReady() and (Player:BuffUp(S.ShiningLightFreeBuff) and not S.VanquishersHammer:IsAvailable()) then
-    if HR.Cast(S.WordofGlory, Settings.Protection.GCDasOffGCD.WordofGlory) then return "word_of_glory 100"; end
+    if HR.Cast(S.WordofGlory, Settings.Protection.GCDasOffGCD.WordOfGlory) then return "word_of_glory 100"; end
   end
 end
 

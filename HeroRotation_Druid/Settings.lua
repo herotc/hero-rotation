@@ -45,9 +45,9 @@ HR.GUISettings.APL.Druid = {
     GCDasOffGCD = {
       MoonkinForm = false,
       CaInc = true,
-      WarriorofElune = true,
-      ForceofNature = true,
-      FuryofElune = true,
+      WarriorOfElune = true,
+      ForceOfNature = true,
+      FuryOfElune = true,
       Starfall = false,
     },
     OffGCDasOffGCD = {

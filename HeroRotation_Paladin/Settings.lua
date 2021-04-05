@@ -36,12 +36,12 @@ HR.GUISettings.APL.Paladin = {
     ShieldoftheRighteousHP = 70,
     GCDasOffGCD = {
       AvengingWrath = true,
-      WordofGlory = true,
+      WordOfGlory = true,
       Seraphim = true,
     },
     OffGCDasOffGCD = {
-      MomentofGlory = true,
-      ShieldoftheRighteous = true,
+      MomentOfGlory = true,
+      ShieldOfTheRighteous = true,
     }
   },
   Retribution = {

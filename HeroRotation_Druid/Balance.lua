@@ -298,15 +298,15 @@ local function Opener()
     end
     -- warrior_of_elune
     if S.WarriorofElune:IsReady() then
-      if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorofElune) then return "warrior_of_elune opener 10"; end
+      if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune opener 10"; end
     end
     -- force_of_nature
     if S.ForceofNature:IsReady() then
-      if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceofNature) then return "force_of_nature opener 12"; end
+      if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature opener 12"; end
     end
     -- fury_of_elune
     if S.FuryofElune:IsReady() then
-      if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryofElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune opener 14"; end
+      if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune opener 14"; end
     end
     -- ca_inc
     if CaInc:IsReady() then
@@ -393,7 +393,7 @@ local function St()
   end
   -- force_of_nature,if=ap_check
   if S.ForceofNature:IsCastable() and (AP_Check(S.ForceofNature)) then
-    if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceofNature, nil, not Target:IsInRange(45)) then return "force_of_nature st 16"; end
+    if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature, nil, not Target:IsInRange(45)) then return "force_of_nature st 16"; end
   end
   -- kindred_spirits,if=((buff.eclipse_solar.remains>10|buff.eclipse_lunar.remains>10)&cooldown.ca_inc.remains>30&(buff.primordial_arcanic_pulsar.value<240|!runeforge.primordial_arcanic_pulsar.equipped))|buff.primordial_arcanic_pulsar.value>=270|cooldown.ca_inc.ready&astral_power>90
   if S.KindredSpirits:IsCastable() and (((Player:BuffRemains(S.EclipseSolar) > 10 or Player:BuffRemains(S.EclipseLunar) > 10) and CaInc:CooldownRemains() > 30 and (PAPValue < 240 or not PAPEquipped)) or PAPValue >= 270 or CaInc:CooldownUp() and Player:AstralPowerP() > 90) then
@@ -411,7 +411,7 @@ local function St()
   VarSaveForCAInc = (not CaInc:CooldownUp() or not VarConvokeDesync and CovenantID == 3 or not CDsON())
   -- fury_of_elune,if=eclipse.in_any&ap_check&buff.primordial_arcanic_pulsar.value<240&(dot.adaptive_swarm_damage.ticking|!covenant.necrolord)&variable.save_for_ca_inc
   if S.FuryofElune:IsCastable() and (EclipseInAny and AP_Check(S.FuryofElune) and PAPValue < 240 and (Target:DebuffUp(S.AdaptiveSwarmDebuff) or CovenantID ~= 4) and VarSaveForCAInc) then
-    if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryofElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune st 24"; end
+    if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune st 24"; end
   end
   -- starfall,if=buff.oneths_perception.up&buff.starfall.refreshable
   if S.Starfall:IsReady() and (Player:BuffUp(S.OnethsPerceptionBuff) and Player:BuffRefreshable(S.StarfallBuff)) then
@@ -452,7 +452,7 @@ local function St()
   end
   -- warrior_of_elune
   if S.WarriorofElune:IsCastable() then
-    if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorofElune) then return "warrior_of_elune st 44"; end
+    if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune st 44"; end
   end
   -- starfire,if=eclipse.in_lunar|eclipse.solar_next|eclipse.any_next|buff.warrior_of_elune.up&buff.eclipse_lunar.up|(buff.ca_inc.remains<action.wrath.execute_time&buff.ca_inc.up)
   if S.Starfire:IsCastable() and (EclipseInLunar or EclipseSolarNext or EclipseAnyNext or Player:BuffUp(S.WarriorofEluneBuff) and Player:BuffUp(S.EclipseLunar) or (Player:BuffRemains(CaInc) < S.Wrath:ExecuteTime() and Player:BuffUp(CaInc))) then
@@ -512,7 +512,7 @@ local function Aoe()
   end
   -- force_of_nature,if=ap_check
   if S.ForceofNature:IsCastable() and (AP_Check(S.ForceofNature)) then
-    if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceofNature) then return "force_of_nature aoe 18"; end
+    if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature aoe 18"; end
   end
   -- celestial_alignment,if=!druid.no_cds&variable.cd_condition&(buff.starfall.up|astral_power>50)&(!buff.solstice.up&!buff.ca_inc.up&(!covenant.night_fae|cooldown.convoke_the_spirits.up&astral_power<50)&target.time_to_die>15+conduit.precise_alignment.time_value|interpolated_fight_remains<20+(conduit.precise_alignment.time_value))
   if S.CelestialAlignment:IsCastable() and (CDsON() and VarCDCondition and (Player:BuffUp(S.StarfallBuff) or Player:AstralPowerP() > 50) and (Player:BuffDown(S.SolsticeBuff) and Player:BuffDown(CaInc) and (CovenantID ~= 3 or S.ConvoketheSpirits:CooldownUp() and Player:AstralPowerP() < 50) and Target:TimeToDie() > 15 + PATime or fightRemains < 20 + PATime)) then
@@ -532,7 +532,7 @@ local function Aoe()
   end
   -- fury_of_elune,if=eclipse.in_any&ap_check&buff.primordial_arcanic_pulsar.value<250&(dot.adaptive_swarm_damage.ticking|!covenant.necrolord|spell_targets>2)
   if S.FuryofElune:IsCastable() and (EclipseInAny and AP_Check(S.FuryofElune) and PAPValue < 250 and (Target:DebuffUp(S.AdaptiveSwarmDebuff) or CovenantID ~= 4 or EnemiesCount8ySplash > 2)) then
-    if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryofElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune aoe 28"; end
+    if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune aoe 28"; end
   end
   -- starfall,if=buff.oneths_perception.up&(buff.starfall.refreshable|astral_power>90)
   if S.Starfall:IsReady() and (Player:BuffUp(S.OnethsPerceptionBuff) and (Player:BuffRefreshable(S.StarfallBuff) or Player:AstralPowerP() > 90)) then
@@ -564,7 +564,7 @@ local function Aoe()
   end
   -- warrior_of_elune
   if S.WarriorofElune:IsCastable() then
-    if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorofElune) then return "warrior_of_elune aoe 44"; end
+    if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune aoe 44"; end
   end
   -- variable,name=starfire_in_solar,value=spell_targets.starfire>4+floor(mastery_value*100%20)+floor(buff.starsurge_empowerment_solar.stack%4)
   -- TODO: Find a way to calculate starsurge_empowerment_solar
@@ -605,7 +605,7 @@ local function Boat()
   end
   -- fury_of_elune,if=((buff.balance_of_all_things_nature.stack>4|buff.balance_of_all_things_arcane.stack>4)&(druid.no_cds|cooldown.ca_inc.remains>50|(covenant.night_fae&cooldown.convoke_the_spirits.remains>50)))|(dot.adaptive_swarm_damage.remains>8&cooldown.ca_inc.remains>10&covenant.necrolord)|interpolated_fight_remains<8&!cooldown.ca_inc.ready|(covenant.kyrian&buff.kindred_empowerment.up)
   if S.FuryofElune:IsCastable() and (((Player:BuffStack(S.BOATNatureBuff) > 4 or Player:BuffStack(S.BOATArcaneBuff) > 4) and (not CDsON() or CaInc:CooldownRemains() > 50 or (CovenantID == 3 and S.ConvoketheSpirits:CooldownRemains() > 50))) or (Target:DebuffRemains(S.AdaptiveSwarmDebuff) > 8 and CaInc:CooldownRemains() > 10 and CovenantID == 4) or fightRemains < 8 and not CaInc:CooldownUp() or (CovenantID == 1 and Player:BuffUp(S.KindredEmpowermentEnergizeBuff))) then
-    if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryofElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune boat 8"; end
+    if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune boat 8"; end
   end
   -- cancel_buff,name=starlord,if=(buff.balance_of_all_things_nature.remains>4.5|buff.balance_of_all_things_arcane.remains>4.5)&(cooldown.ca_inc.remains>7|(cooldown.empower_bond.remains>7&!buff.kindred_empowerment_energize.up&covenant.kyrian))&astral_power>=30
   -- starsurge,if=!variable.critnotup&(covenant.night_fae|cooldown.ca_inc.remains>7|!variable.cd_condition&!covenant.kyrian|(cooldown.empower_bond.remains>7&!buff.kindred_empowerment_energize.up&covenant.kyrian))&(!dot.fury_of_elune.ticking|!cooldown.ca_inc.ready|!cooldown.convoke_the_spirits.ready)
@@ -632,7 +632,7 @@ local function Boat()
   end
   -- force_of_nature,if=ap_check
   if S.ForceofNature:IsCastable() and (AP_Check(S.ForceofNature)) then
-    if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceofNature) then return "force_of_nature boat 20"; end
+    if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature boat 20"; end
   end
   -- kindred_spirits,if=(eclipse.lunar_next|eclipse.solar_next|eclipse.any_next|buff.balance_of_all_things_nature.remains>4.5|buff.balance_of_all_things_arcane.remains>4.5|astral_power>90&cooldown.ca_inc.ready&!druid.no_cds)&(cooldown.ca_inc.remains>30|cooldown.ca_inc.ready)|interpolated_fight_remains<10
   if S.KindredSpirits:IsCastable() and ((EclipseLunarNext or EclipseSolarNext or EclipseAnyNext or Player:BuffRemains(S.BOATNatureBuff) > 4.5 or Player:BuffRemains(S.BOATArcaneBuff) > 4.5 or Player:AstralPowerP() > 90 and CaInc:CooldownUp() and CDsON()) and (CaInc:CooldownRemains() > 30 or CaInc:CooldownUp()) or fightRemains < 10) then
@@ -640,7 +640,7 @@ local function Boat()
   end
   -- fury_of_elune,if=cooldown.ca_inc.ready&variable.cd_condition&(astral_power>90&!covenant.night_fae|covenant.night_fae&astral_power<40)&(!covenant.night_fae|cooldown.convoke_the_spirits.ready)&!druid.no_cds
   if S.FuryofElune:IsCastable() and (CaInc:CooldownUp() and VarCDCondition and (Player:AstralPowerP() > 90 and CovenantID ~= 3 or CovenantID == 3 and Player:AstralPowerP() < 40) and (CovenantID ~= 3 or S.ConvoketheSpirits:CooldownUp()) and CDsON()) then
-    if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryofElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune boat 24"; end
+    if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune boat 24"; end
   end
   -- celestial_alignment,if=!druid.no_cds&variable.cd_condition&((astral_power>90&(buff.kindred_empowerment_energize.up|!covenant.kyrian)|buff.bloodlust.up&buff.bloodlust.remains<20+(conduit.precise_alignment.time_value))|interpolated_fight_remains<20+(conduit.precise_alignment.time_value)|covenant.night_fae)&(!covenant.night_fae|(astral_power<40|dot.fury_of_elune.ticking)&(variable.convoke_desync|cooldown.convoke_the_spirits.ready))
   if S.CelestialAlignment:IsCastable() and (CDsON() and VarCDCondition and ((Player:AstralPowerP() > 90 and (Player:BuffUp(S.KindredEmpowermentEnergizeBuff) or CovenantID ~= 1) or Player:BloodlustUp() and Player:BloodlustRemains() < 20 + PATime) or fightRemains < 20 + PATime or CovenantID == 3) and (CovenantID ~= 3 or (Player:AstralPowerP() < 40 or FuryofEluneRemains > 0) and (VarConvokeDesync or S.ConvoketheSpirits:CooldownUp()))) then
@@ -670,7 +670,7 @@ local function Boat()
   end
   -- warrior_of_elune
   if S.WarriorofElune:IsCastable() then
-    if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorofElune) then return "warrior_of_elune boat 38"; end
+    if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune boat 38"; end
   end
   -- starfire,if=eclipse.in_lunar|eclipse.solar_next|eclipse.any_next|buff.warrior_of_elune.up&buff.eclipse_lunar.up|(buff.ca_inc.remains<action.wrath.execute_time&buff.ca_inc.up)
   if S.Starfire:IsCastable() and (EclipseInLunar or EclipseSolarNext or EclipseAnyNext or Player:BuffUp(S.WarriorofEluneBuff) and Player:BuffUp(S.EclipseLunar) or (Player:BuffRemains(CaInc) < S.Wrath:ExecuteTime() and Player:BuffUp(CaInc))) then
