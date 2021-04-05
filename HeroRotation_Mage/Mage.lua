@@ -160,9 +160,6 @@ Spell.Mage.Fire = {
   GrislyIcicleBuff                      = Spell(333393),
   GrislyIcicleDebuff                    = Spell(348007),
   DisciplinaryCommandBuff               = Spell(327365),
-  DisciplinaryCommandFrostBuff          = Spell(327366),
-  DisciplinaryCommandFireBuff           = Spell(327368),
-  DisciplinaryCommandArcaneBuff         = Spell(327369),
   -- Trinkets
   SoulIgnitionBuff                      = Spell(345211)
 }
