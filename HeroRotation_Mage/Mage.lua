@@ -403,7 +403,7 @@ function Mage.DCCheck()
       end
     end
   end
-  if Player:BuffUp(S.DisciplinaryCommandBuff) then
+  if Player:BuffUp(S.DisciplinaryCommandBuff) and (M.Arcane == 1 or M.Fire == 1 or M.Frost == 1) then
     M.Arcane = 0
     M.Fire = 0
     M.Frost = 0
