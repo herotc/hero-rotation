@@ -321,7 +321,7 @@
       [255]   = "HeroRotation_Hunter",        -- Survival
     -- Mage
       [62]    = "HeroRotation_Mage",          -- Arcane
-      [63]    = false,                        -- Fire
+      [63]    = "HeroRotation_Mage",          -- Fire
       [64]    = "HeroRotation_Mage",          -- Frost
     -- Monk
       [268]   = "HeroRotation_Monk",          -- Brewmaster

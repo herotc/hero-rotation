@@ -141,7 +141,7 @@
     end
     , 63);
 
-    HL.AddCoreOverride("Spell.IsCastable",
+    HL.AddCoreOverride("Spell.IsReady",
     function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
       local MovingOK = true
       if self:CastTime() > 0 and Player:IsMoving() and Settings.Fire.MovingRotation then

@@ -68,7 +68,7 @@ HR.GUISettings.APL.Mage = {
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
-      RuneOfPower = true,
+      RuneofPower = true,
     },
     -- {Display OffGCD as OffGCD}
     OffGCDasOffGCD = {

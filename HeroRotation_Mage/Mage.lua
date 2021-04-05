@@ -136,6 +136,7 @@ Spell.Mage.Fire = {
   Meteor                                = Spell(153561),
   -- Covenant Abilities
   Deathborne                            = Spell(324220),
+  DeathborneBuff                        = Spell(324220),
   DoorofShadows                         = Spell(300728),
   Fleshcraft                            = Spell(324631),
   MirrorsofTorment                      = Spell(314793),
@@ -157,10 +158,13 @@ Spell.Mage.Fire = {
   FirestormBuff                         = Spell(333100),
   SunKingsBlessingBuff                  = Spell(333313),
   GrislyIcicleBuff                      = Spell(333393),
+  GrislyIcicleDebuff                    = Spell(348007),
   DisciplinaryCommandBuff               = Spell(327365),
   DisciplinaryCommandFrostBuff          = Spell(327366),
   DisciplinaryCommandFireBuff           = Spell(327368),
-  DisciplinaryCommandArcaneBuff         = Spell(327369)
+  DisciplinaryCommandArcaneBuff         = Spell(327369),
+  -- Trinkets
+  SoulIgnitionBuff                      = Spell(345211)
 }
 
 Spell.Mage.Frost = {
@@ -245,7 +249,20 @@ Item.Mage.Arcane = {
 
 Item.Mage.Fire = {
   -- Potion,
-  PotionofPhantomFire              = Item(171349),
+  PotionofSpectralIntellect        = Item(171273),
+  -- Trinkets
+  DreadfireVessel                  = Item(184030),
+  EmpyrealOrdnance                 = Item(180117),
+  FlameofBattle                    = Item(181501),
+  GlyphofAssimilation              = Item(184021),
+  InscrutableQuantumDevice         = Item(179350),
+  InstructorsDivineBell            = Item(184842),
+  MacabreSheetMusic                = Item(184024),
+  SinfulAspirantsBadge             = Item(175884),
+  SinfulGladiatorsBadge            = Item(175921),
+  SoulIgniter                      = Item(184019),
+  SunbloodAmethyst                 = Item(178826),
+  WakenersFrond                    = Item(181457),
 }
 
 Item.Mage.Frost = {
