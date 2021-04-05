@@ -408,13 +408,13 @@ function Mage.DCCheck()
     M.Fire = 0
     M.Frost = 0
   end
-  if M.ArcaneTime < CurrentTime - 10 then
+  if M.Arcane == 1 and M.ArcaneTime < CurrentTime - 10 then
     M.Arcane = 0
   end
-  if M.FireTime < CurrentTime - 10 then
+  if M.Fire == 1 and M.FireTime < CurrentTime - 10 then
     M.Fire = 0
   end
-  if M.FrostTime < CurrentTime - 10 then
+  if M.Frost == 1 and M.FrostTime < CurrentTime - 10 then
     M.Frost = 0
   end
 end
