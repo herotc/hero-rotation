@@ -335,11 +335,17 @@
     IconFrame:Show();
   end
   -- Change Icon
-  function HR.SmallIconFrame:ChangeIcon (FrameID, Texture, Keybind)
+  function HR.SmallIconFrame:ChangeIcon (FrameID, Texture, Keybind, OutofRange)
     local IconFrame = self.Icon[FrameID];
     -- Texture
     IconFrame.Texture:SetTexture(Texture);
     IconFrame.Texture:SetAllPoints(IconFrame);
+    -- Out of Range
+    if OutofRange then
+      IconFrame.Texture:SetGradient("HORIZONTAL", 1.0, 0.5, 0.5, 1.0, 0.5, 0.5);
+    else
+      IconFrame.Texture:SetGradient("HORIZONTAL", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+    end
     -- Keybind
     if Keybind then
       IconFrame.Keybind:SetText(Keybind);
@@ -533,10 +539,16 @@
     self:Show();
   end
   -- Change Icon
-  function HR.SuggestedIconFrame:ChangeIcon (Texture, Keybind)
+  function HR.SuggestedIconFrame:ChangeIcon (Texture, Keybind, OutofRange)
     -- Texture
     self.Texture:SetTexture(Texture);
     self.Texture:SetAllPoints(self);
+    -- Out of Range
+    if OutofRange then
+      self.Texture:SetGradient("HORIZONTAL", 1.0, 0.5, 0.5, 1.0, 0.5, 0.5);
+    else
+      self.Texture:SetGradient("HORIZONTAL", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+    end
     -- Black Border Icon
     if HR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
       self.Backdrop:Show();
@@ -588,10 +600,16 @@
     self:Show();
   end
   -- Change Icon
-  function HR.RightSuggestedIconFrame:ChangeIcon (Texture, Keybind)
+  function HR.RightSuggestedIconFrame:ChangeIcon (Texture, Keybind, OutofRange)
     -- Texture
     self.Texture:SetTexture(Texture);
     self.Texture:SetAllPoints(self);
+    -- Out of Range
+    if OutofRange then
+      self.Texture:SetGradient("HORIZONTAL", 1.0, 0.5, 0.5, 1.0, 0.5, 0.5);
+    else
+      self.Texture:SetGradient("HORIZONTAL", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+    end
     -- Black Border Icon
     if HR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
       self.Backdrop:Show();

@@ -135,15 +135,15 @@
     if OffGCD or DisplayStyle == "Cooldown" then
       -- If this is the second cooldown, check to ensure we don't have a duplicate icon in the first slot
       if HR.CastOffGCDOffset == 1 or (HR.CastOffGCDOffset == 2 and HR.SmallIconFrame:GetIcon(1) ~= ObjectTexture) then
-        HR.SmallIconFrame:ChangeIcon(HR.CastOffGCDOffset, ObjectTexture, Keybind);
+        HR.SmallIconFrame:ChangeIcon(HR.CastOffGCDOffset, ObjectTexture, Keybind, OutofRange);
         HR.CastOffGCDOffset = HR.CastOffGCDOffset + 1;
         Object.LastDisplayTime = GetTime();
         return false;
       end
     elseif DisplayStyle == "Suggested" then
-      HR.CastSuggested(Object);
+      HR.CastSuggested(Object, OutofRange);
     elseif DisplayStyle == "SuggestedRight" then
-      HR.CastRightSuggested(Object);
+      HR.CastRightSuggested(Object, OutofRange);
     else
       local PoolResource = 999910
       local Usable = Object.SpellID == PoolResource or Object:IsUsable();
@@ -240,11 +240,11 @@
 
   -- Suggested Icon Cast
   HR.CastSuggestedOffset = 1;
-  function HR.CastSuggested (Object)
+  function HR.CastSuggested (Object, OutofRange)
     if HR.CastSuggestedOffset == 1 then
       local Texture = HR.GetTexture(Object)
       local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.Action.TextureHotKey(Texture);
-      HR.SuggestedIconFrame:ChangeIcon(Texture, Keybind);
+      HR.SuggestedIconFrame:ChangeIcon(Texture, Keybind, OutofRange);
       HR.CastSuggestedOffset = HR.CastSuggestedOffset + 1;
       Object.LastDisplayTime = GetTime();
     end
@@ -253,11 +253,11 @@
 
   -- Suggested Icon (Right) Cast
   HR.CastRightSuggestedOffset = 1;
-  function HR.CastRightSuggested (Object)
+  function HR.CastRightSuggested (Object, OutofRange)
     if HR.CastRightSuggestedOffset == 1 then
       local Texture = HR.GetTexture(Object)
       local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.Action.TextureHotKey(Texture);
-      HR.RightSuggestedIconFrame:ChangeIcon(Texture, Keybind);
+      HR.RightSuggestedIconFrame:ChangeIcon(Texture, Keybind, OutofRange);
       HR.CastRightSuggestedOffset = HR.CastRightSuggestedOffset + 1;
       Object.LastDisplayTime = GetTime();
     end
