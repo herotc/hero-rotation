@@ -902,7 +902,7 @@ local function APL()
     end
     -- variable,name=phoenix_pooling,if=active_enemies>=variable.combustion_flamestrike,value=variable.time_to_combustion<action.phoenix_flames.full_recharge_time-action.shifting_power.full_reduction*variable.shifting_power_before_combustion&variable.time_to_combustion<fight_remains|runeforge.sun_kings_blessing|time<5
     if not var_disable_combustion and (EnemiesCount8ySplash >= var_combustion_flamestrike) then
-      var_phoenix_pooling = var_time_to_combustion < S.PhoenixFlames:FullRechargeTime() - S.ShiftingPower:FullReduction() * var_shifting_power_before_combustion and var_time_to_combustion < fightRemains or SunKingsBlessingEquipped or HL.CombatTime() < 5
+      var_phoenix_pooling = var_time_to_combustion < S.PhoenixFlames:FullRechargeTime() - S.ShiftingPower:FullReduction() * num(var_shifting_power_before_combustion) and var_time_to_combustion < fightRemains or SunKingsBlessingEquipped or HL.CombatTime() < 5
     end
     -- call_action_list,name=rop_phase,if=buff.rune_of_power.up&variable.time_to_combustion>0
     if (Player:BuffUp(S.RuneofPowerBuff) and var_time_to_combustion > 0) then
