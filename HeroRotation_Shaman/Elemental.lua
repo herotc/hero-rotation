@@ -101,9 +101,7 @@ local function Precombat()
   -- food
   -- augmentation
   -- lightning_shield
-  if S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShield) then
-    if Cast(S.LightningShield) then return "lightning_shield precombat"; end
-  end
+  -- Moved shield check to top of APL()
   -- snapshot_stats
   -- earth_elemental,if=!talent.primal_elementalist.enabled
   if S.EarthElemental:IsCastable() and (not S.PrimalElementalist:IsAvailable()) then
@@ -446,6 +444,13 @@ local function APL()
 
   -- In Combat
   if Everyone.TargetIsValid() then
+    -- lightning_shield
+    -- Manually added: earth_shield if available and PreferEarthShield setting is true
+    if Settings.Elemental.PreferEarthShield and S.EarthShield:IsCastable() and (Player:BuffDown(S.EarthShield) or (not Player:AffectingCombat() and Player:BuffStack(S.EarthShield) < 5)) then
+      if Cast(S.EarthShield, Settings.Elemental.GCDasOffGCD.Shield) then return "earth_shield precombat"; end
+    elseif S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShield) then
+      if Cast(S.LightningShield, Settings.Elemental.GCDasOffGCD.Shield) then return "lightning_shield precombat"; end
+    end
     -- Precombat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end

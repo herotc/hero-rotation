@@ -360,8 +360,11 @@ local function APL()
       if HR.Cast(S.FlamentongueWeapon) then return "FlamentongueWeapon enchant"; end
     end
     -- lightning_shield
-    if S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShieldBuff) then
-      if HR.Cast(S.LightningShield) then return "lightning_shield precombat"; end
+    -- Manually added: earth_shield if available and PreferEarthShield setting is true
+    if Settings.Enhancement.PreferEarthShield and S.EarthShield:IsCastable() and (Player:BuffDown(S.EarthShield) or (not Player:AffectingCombat() and Player:BuffStack(S.EarthShield) < 5)) then
+      if Cast(S.EarthShield, Settings.Enhancement.GCDasOffGCD.Shield) then return "earth_shield precombat"; end
+    elseif S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShield) then
+      if Cast(S.LightningShield, Settings.Enhancement.GCDasOffGCD.Shield) then return "lightning_shield precombat"; end
     end
     -- stormkeeper,if=talent.stormkeeper.enabled
     if S.Stormkeeper:IsCastable() then

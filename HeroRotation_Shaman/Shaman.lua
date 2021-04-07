@@ -86,6 +86,7 @@ Spell.Shaman.Enhancement = {
   Stormkeeper                           = Spell(320137),
   StormkeeperBuff                       = Spell(320137),
   EarthenSpike                          = Spell(188089),
+  EarthShield                           = Spell(974),
   FireNova                              = Spell(333974),
   LashingFlames                         = Spell(334046),
   LashingFlamesDebuff                   = Spell(334168),
@@ -164,6 +165,8 @@ Spell.Shaman.Elemental = {
   EchoingShock                          = Spell(320125),
   EchoingShockBuff                      = Spell(320125),
   ElementalBlast                        = Spell(117014),
+
+  EarthShield                           = Spell(974),
 
   MasterOfTheElements                   = Spell(16166),
   MasterOfTheElementsBuff               = Spell(260734),

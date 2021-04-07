@@ -41,11 +41,13 @@ HR.GUISettings.APL.Shaman = {
     }
   },
   Enhancement = {
+    PreferEarthShield = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
+      Ascendance = true,
       FeralSpirit = true,
-      Ascendance = true
+      Shield = false
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -55,12 +57,14 @@ HR.GUISettings.APL.Shaman = {
 
     },
   },
-    Elemental = {
+  Elemental = {
+    PreferEarthShield = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
       Ascendance = true,
       FireElemental = true,
+      Shield = false,
       StormElemental = true,
       Stormkeeper = true
     },
@@ -85,6 +89,8 @@ CreateARPanelOptions(CP_Shaman, "APL.Shaman.Commons")
 
 -- Enhancement
 CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement")
+CreatePanelOption("CheckButton", CP_Enhancement, "APL.Shaman.Enhancement.PreferEarthShield", "Prefer Earth Shield", "Prefer using Earth Shield over Lightning Shield, when it's available.")
 
 -- Elemental
 CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental")
+CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Elemental.PreferEarthShield", "Prefer Earth Shield", "Prefer using Earth Shield over Lightning Shield, when it's available.")
