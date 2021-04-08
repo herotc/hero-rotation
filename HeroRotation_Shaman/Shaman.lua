@@ -102,6 +102,10 @@ Spell.Shaman.Enhancement = {
 
   -- Defensive
 
+  -- Soulbind Abilities
+  FieldofBlossoms                       = Spell(319191),
+  GroveInvigoration                     = Spell(322721),
+
   -- Covenant Abilities
   ChainHarvest                          = Spell(320674),
   FaeTransfusion                        = Spell(328923),
@@ -208,6 +212,7 @@ Spell.Shaman.Elemental = {
 
 if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Enhancement = {
+  PotionofSpectralAgility               = Item(171270)
 }
 
 Item.Shaman.Elemental = {

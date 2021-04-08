@@ -46,6 +46,7 @@ HR.GUISettings.APL.Shaman = {
     GCDasOffGCD = {
       -- Abilities
       Ascendance = true,
+      CrashLightning = false,
       FeralSpirit = true,
       Shield = false
     },
