@@ -448,7 +448,7 @@ local function APL()
     -- Manually added: earth_shield if available and PreferEarthShield setting is true
     if Settings.Elemental.PreferEarthShield and S.EarthShield:IsCastable() and (Player:BuffDown(S.EarthShield) or (not Player:AffectingCombat() and Player:BuffStack(S.EarthShield) < 5)) then
       if Cast(S.EarthShield, Settings.Elemental.GCDasOffGCD.Shield) then return "earth_shield precombat"; end
-    elseif S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShield) then
+    elseif S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShield) and Player:BuffDown(S.EarthShield) then
       if Cast(S.LightningShield, Settings.Elemental.GCDasOffGCD.Shield) then return "lightning_shield precombat"; end
     end
     -- Precombat
