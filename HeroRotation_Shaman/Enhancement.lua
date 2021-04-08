@@ -363,7 +363,7 @@ local function APL()
     -- Manually added: earth_shield if available and PreferEarthShield setting is true
     if Settings.Enhancement.PreferEarthShield and S.EarthShield:IsCastable() and (Player:BuffDown(S.EarthShield) or (not Player:AffectingCombat() and Player:BuffStack(S.EarthShield) < 5)) then
       if HR.Cast(S.EarthShield, Settings.Enhancement.GCDasOffGCD.Shield) then return "earth_shield precombat"; end
-    elseif S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShield) and Player:BuffDown(S.EarthShield) then
+    elseif S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShield) and (Settings.Elemental.PreferEarthShield and Player:BuffDown(S.EarthShield) or not Settings.Elemental.PreferEarthShield) then
       if HR.Cast(S.LightningShield, Settings.Enhancement.GCDasOffGCD.Shield) then return "lightning_shield precombat"; end
     end
     -- stormkeeper,if=talent.stormkeeper.enabled
