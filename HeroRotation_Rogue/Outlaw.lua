@@ -122,7 +122,7 @@ local function EvaluateMfDTargetIfConditionCondition(TargetUnit)
 end
 local function EvaluateMfDCondition(TargetUnit)
   -- Note: Increased the SimC condition by 50% since we are slower.
-  return Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()*1.5) or (not Player:StealthUp(true, false) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1)
+  return TargetUnit:FilteredTimeToDie("<", Player:ComboPointsDeficit()*1.5) or (not Player:StealthUp(true, false) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1)
 end
 
 --- ======= ACTION LISTS =======
