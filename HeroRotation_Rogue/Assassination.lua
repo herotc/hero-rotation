@@ -20,6 +20,8 @@ local HR = HeroRotation
 local AoEON = HR.AoEON
 local CDsON = HR.CDsON
 local Cast = HR.Cast
+local CastPooling = HR.CastPooling
+local CastLeftNameplate = HR.CastLeftNameplate
 -- Lua
 local pairs = pairs
 local mathfloor = math.floor
@@ -48,22 +50,6 @@ local OnUseExcludeTrinkets = {
   --  I.TrinketName:ID(),
 }
 
--- Legendaries
-local DashingScoundrelEquipped = Player:HasLegendaryEquipped(118)
-local DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
-local DoombladeEquipped = Player:HasLegendaryEquipped(119)
-local DuskwalkersPatchEquipped = Player:HasLegendaryEquipped(121)
-local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
-local VendettaCDMultiplier = DuskwalkersPatchEquipped and 0.55 or 1.0
-HL:RegisterForEvent(function()
-  DashingScoundrelEquipped = Player:HasLegendaryEquipped(118)
-  DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
-  DoombladeEquipped = Player:HasLegendaryEquipped(119)
-  DuskwalkersPatchEquipped = Player:HasLegendaryEquipped(121)
-  MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
-  VendettaCDMultiplier = DuskwalkersPatchEquipped and 0.55 or 1.0
-end, "PLAYER_EQUIPMENT_CHANGED")
-
 -- Enemies
 local Enemies30y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y
 
@@ -72,9 +58,27 @@ local ShouldReturn
 local Stealth
 local BleedTickTime, ExsanguinatedBleedTickTime = 2 / Player:SpellHaste(), 1 / Player:SpellHaste()
 local ComboPoints, ComboPointsDeficit
-local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMGThreshold
+local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMGThreshold, RuptureDurationThreshold
 local PriorityRotation
 local PoisonedBleeds, EnergyRegenCombined, SingleTarget
+
+-- Legendaries
+local DashingScoundrelEquipped = Player:HasLegendaryEquipped(118)
+local DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
+local DoombladeEquipped = Player:HasLegendaryEquipped(119)
+local DuskwalkersPatchEquipped = Player:HasLegendaryEquipped(121)
+local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
+local VendettaCDMultiplier = DuskwalkersPatchEquipped and 0.55 or 1.0
+RuptureDurationThreshold = 4 + BoolToInt(DashingScoundrelEquipped) * 9 + BoolToInt(DoombladeEquipped) * 6
+HL:RegisterForEvent(function()
+  DashingScoundrelEquipped = Player:HasLegendaryEquipped(118)
+  DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
+  DoombladeEquipped = Player:HasLegendaryEquipped(119)
+  DuskwalkersPatchEquipped = Player:HasLegendaryEquipped(121)
+  MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
+  VendettaCDMultiplier = DuskwalkersPatchEquipped and 0.55 or 1.0
+  RuptureDurationThreshold = 4 + BoolToInt(DashingScoundrelEquipped) * 9 + BoolToInt(DoombladeEquipped) * 6
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- Interrupts
 local Interrupts = {
@@ -160,7 +164,7 @@ local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD, Enemies)
     end
   end
   if BestUnit then
-    HR.CastLeftNameplate(BestUnit, DoTSpell)
+    CastLeftNameplate(BestUnit, DoTSpell)
   -- Check ranged units next, if the RangedMultiDoT option is enabled
   elseif Settings.Commons.RangedMultiDoT then
     BestUnit, BestUnitTTD = nil, DoTMinTTD
@@ -171,7 +175,7 @@ local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD, Enemies)
       end
     end
     if BestUnit then
-      HR.CastLeftNameplate(BestUnit, DoTSpell)
+      CastLeftNameplate(BestUnit, DoTSpell)
     end
   end
 end
@@ -241,22 +245,34 @@ local function MasterAssassinRemains ()
     return Player:BuffRemains(S.MasterAssassinBuff)
   end
 end
-
 local function CheckWillWasteCooldown(ThisCooldownLength, OtherCooldownRemains, EffectDuration)
-  if HL.BossFightRemainsIsNotValid() then
-    return false
+  local FightRemains = Target:TimeToDie()
+  if not HL.BossFightRemainsIsNotValid() then
+    FightRemains = HL.BossFightRemains()
+  elseif FightRemains < EffectDuration then
+    return false -- Bail out if we are not in a boss encounter and fighting a low-HP target
   end
-  local BossFightRemains = HL.BossFightRemains()
   -- e.g. if=floor((fight_remains-30)%cooldown)>floor((fight_remains-30-cooldown.vendetta.remains)%cooldown)
-  if mathfloor((BossFightRemains - EffectDuration) / ThisCooldownLength) >
-    mathfloor((BossFightRemains - EffectDuration - OtherCooldownRemains) / ThisCooldownLength) then
+  if mathfloor((FightRemains - EffectDuration) / ThisCooldownLength) >
+    mathfloor((FightRemains - EffectDuration - OtherCooldownRemains) / ThisCooldownLength) then
     return true
   end
   return false
 end
 
---- ======= ACTION LISTS =======
+-- Serrated Bone Spike Cycle Targets
+-- actions.direct+=/serrated_bone_spike,target_if=min:target.time_to_die+(dot.serrated_bone_spike_dot.ticking*600),if=variable.use_filler&!dot.serrated_bone_spike_dot.ticking
+local function EvaluateSBSTargetIfConditionCondition(TargetUnit)
+  if TargetUnit:DebuffUp(S.SerratedBoneSpikeDebuff) then
+    return 1000000 -- Random big number
+  end
+  return TargetUnit:TimeToDie()
+end
+local function EvaluateSBSCondition(TargetUnit)
+  return not TargetUnit:DebuffUp(S.SerratedBoneSpikeDebuff)
+end
 
+--- ======= ACTION LISTS =======
 local function Trinkets ()
   -- use_items
   local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludeTrinkets)
@@ -266,7 +282,6 @@ local function Trinkets ()
 
   return false
 end
-
 local function Racials ()
   -- actions.cds+=/blood_fury,if=debuff.vendetta.up
   if S.BloodFury:IsCastable() then
@@ -323,10 +338,13 @@ local function Vanish ()
   end
   -- # Vanish with Master Assasin: Rupture+Garrote not in refresh range, during Vendetta+Shiv. Sync with Sepsis final hit if possible.
   -- actions.vanish+=/vanish,if=(talent.master_assassin.enabled|runeforge.mark_of_the_master_assassin)&!dot.rupture.refreshable&dot.garrote.remains>3&debuff.vendetta.up&(debuff.shiv.up|debuff.vendetta.remains<4|dot.sepsis.ticking)&dot.sepsis.remains<3
-  if (S.MasterAssassin:IsAvailable() or MarkoftheMasterAssassinEquipped)
-    and not Target:DebuffRefreshable(S.Rupture, RuptureThreshold) and Target:DebuffRemains(S.Garrote) > 3 and Target:DebuffUp(S.Vendetta)
-    and (Target:DebuffUp(S.ShivDebuff) or Target:DebuffRemains(S.Vendetta) < 4 or Target:DebuffUp(S.Sepsis)) and Target:DebuffRemains(S.Sepsis) < 3 then
-    if Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)" end
+  if (S.MasterAssassin:IsAvailable() or MarkoftheMasterAssassinEquipped) and S.Vendetta:AnyDebuffUp() then
+    local VendettaUnit = S.Vendetta:MaxDebuffRemainsUnit()
+    if not VendettaUnit:DebuffRefreshable(S.Rupture, RuptureThreshold) and VendettaUnit:DebuffRemains(S.Garrote) > 3
+      and (VendettaUnit:DebuffUp(S.ShivDebuff) or VendettaUnit:DebuffRemains(S.Vendetta) < 4 or S.Sepsis:AnyDebuffUp())
+      and S.Sepsis:MaxDebuffRemains() < 3 then
+      if Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)" end
+    end
   end
 end
 
@@ -344,12 +362,12 @@ local function CDs ()
       if not Settings.Commons.STMfDAsDPSCD then
         HR.CastSuggested(S.MarkedforDeath)
       elseif HR.CDsON() then
-        if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death" end
+        if Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death" end
       end
     end
   end
 
-  if not Target:IsInMeleeRange(5) or not HR.CDsON() then
+  if not Target:IsInMeleeRange(10) or not HR.CDsON() then
     return
   end
 
@@ -359,9 +377,9 @@ local function CDs ()
     if S.Flagellation:IsReady() then
       if S.Vendetta:CooldownRemains() < 3 and ComboPoints >= 4 and (Target:FilteredTimeToDie(">", 10) or Target:TimeToDieIsNotValid())
         or Target:DebuffUp(S.Vendetta) or HL.BossFilteredFightRemains("<=", 24) then
-        if HR.Cast(S.Flagellation, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation (Sync)" end
+        if Cast(S.Flagellation, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation (Sync)" end
       elseif ComboPoints >= 4 and CheckWillWasteCooldown(90, S.Vendetta:CooldownRemains() * VendettaCDMultiplier, 24) then
-        if HR.Cast(S.Flagellation, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation (Burn)" end
+        if Cast(S.Flagellation, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation (Burn)" end
       end
     end
     -- actions.cds+=/sepsis,if=!stealthed.rogue&(cooldown.vendetta.remains<1&target.time_to_die>10|debuff.vendetta.up|fight_remains<10)
@@ -369,9 +387,9 @@ local function CDs ()
     if S.Sepsis:IsReady() then
       if S.Vendetta:CooldownRemains() < 1 and (Target:FilteredTimeToDie(">", 10) or Target:TimeToDieIsNotValid())
         or Target:DebuffUp(S.Vendetta) or HL.BossFilteredFightRemains("<=", 10) then
-        if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis (Sync)" end
+        if Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis (Sync)" end
       elseif CheckWillWasteCooldown(90, S.Vendetta:CooldownRemains() * VendettaCDMultiplier, 10) then
-        if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis (Burn)" end
+        if Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis (Burn)" end
       end
     end
     -- actions.cds+=/vendetta,if=!stealthed.rogue&dot.rupture.ticking&!debuff.vendetta.up&variable.vendetta_nightstalker_condition&variable.vendetta_covenant_condition
@@ -384,7 +402,7 @@ local function CDs ()
       local Covenant = Player:Covenant()
       if NightstalkerCondition and (HL.BossFilteredFightRemains("<", 20) or Covenant == "Necrolord" or Covenant == "Kyrian" or Covenant == nil
         or (Covenant == "Venthyr" and (CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Flagellation:CooldownRemains(), 20)
-          or Player:BuffUp(S.FlagellationBuff) or Target:DebuffUp(S.Flagellation)))
+          or Player:BuffUp(S.Flagellation) or Player:BuffUp(S.FlagellationBuff) or Target:DebuffUp(S.Flagellation)))
         or (Covenant == "Night Fae" and (CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Sepsis:CooldownRemains(), 20) or Target:DebuffUp(S.Sepsis)))) then
         if Cast(S.Vendetta, Settings.Assassination.OffGCDasOffGCD.Vendetta) then return "Cast Vendetta" end
       end
@@ -398,8 +416,8 @@ local function CDs ()
     end
   end
   -- actions.cds+=/shiv,if=dot.rupture.ticking&(!cooldown.sepsis.ready|cooldown.vendetta.remains>12)|dot.sepsis.ticking
-  if S.Shiv:IsCastable() and (Target:DebuffUp(S.Rupture) and (not S.Sepsis:CooldownUp() or S.Vendetta:CooldownRemains() > 12) or Target:DebuffUp(S.Sepsis)) then
-    if Cast(S.Shiv) then ShouldReturn = "Cast Shiv" end
+  if S.Shiv:IsCastable() and (Target:DebuffUp(S.Rupture) and (S.Sepsis:CooldownRemains() > 15 or S.Vendetta:CooldownRemains() > 12) or Target:DebuffUp(S.Sepsis)) then
+    if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then ShouldReturn = "Cast Shiv" end
   end
   -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|debuff.vendetta.up&cooldown.vanish.remains<5
   -- Racials
@@ -460,34 +478,34 @@ local function Stealthed ()
     if HR.AoEON() then
       local TargetIfUnit = CheckTargetIfTarget("min", GarroteTargetIfFunc, GarroteIfFunc)
       if TargetIfUnit and TargetIfUnit:GUID() ~= Target:GUID() then
-        HR.CastLeftNameplate(TargetIfUnit, S.Garrote)
+        CastLeftNameplate(TargetIfUnit, S.Garrote)
       end
     end
     if GarroteIfFunc(Target) then
-      if HR.CastPooling(S.Garrote, nil, not Target:IsInMeleeRange(5)) then return "Cast Garrote (Subterfuge)" end
+      if CastPooling(S.Garrote, nil, not Target:IsInMeleeRange(5)) then return "Cast Garrote (Subterfuge)" end
     end
     -- # Subterfuge + Exsg on 1T: Refresh Garrote at the end of stealth to get max duration before Exsanguinate
     -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&active_enemies=1&buff.subterfuge.remains<1.3
     if S.Exsanguinate:IsAvailable() and MeleeEnemies10yCount == 1 and Player:BuffRemains(S.SubterfugeBuff) < 1.3 then
-      if HR.CastPooling(S.Garrote, nil, not Target:IsInMeleeRange(5)) then return "Pool for Garrote (Exsanguinate Refresh)" end
+      if CastPooling(S.Garrote, nil, not Target:IsInMeleeRange(5)) then return "Pool for Garrote (Exsanguinate Refresh)" end
     end
   end
   -- actions.stealthed+=/mutilate,if=talent.subterfuge.enabled&combo_points<=3
   if S.Subterfuge:IsAvailable() and S.Mutilate:IsCastable() and ComboPoints <= 3 then
-    if HR.CastPooling(S.Mutilate) then return "Cast Mutilate (Subterfurge)" end
+    if CastPooling(S.Mutilate) then return "Cast Mutilate (Subterfurge)" end
   end
 end
 
 -- # Damage over time abilities
 local function Dot ()
   local SkipCycleGarrote, SkipCycleRupture, SkipRupture = false, false, false
-  if PriorityRotation and MeleeEnemies10yCount > 3 then
-    -- # Limit Garrotes on non-primrary targets for the priority rotation if 5+ bleeds are already up
-    -- actions.dot=variable,name=skip_cycle_garrote,value=priority_rotation&spell_targets.fan_of_knives>3&(dot.garrote.remains<cooldown.garrote.duration|poisoned_bleeds>5)
-    SkipCycleGarrote = Target:DebuffRemains(S.Garrote) < 6 or PoisonedBleeds > 5
-    -- # Limit Ruptures on non-primrary targets for the priority rotation if 5+ bleeds are already up
-    -- actions.dot+=/variable,name=skip_cycle_rupture,value=priority_rotation&spell_targets.fan_of_knives>3&(debuff.shiv.up|poisoned_bleeds>5)
-    SkipCycleRupture = Target:DebuffUp(S.ShivDebuff) or PoisonedBleeds > 5
+  if PriorityRotation then
+    -- # Limit secondary Garrotes for priority rotation if we have 35 energy regen or Garrote will expire on the primary target
+    -- actions.dot=variable,name=skip_cycle_garrote,value=priority_rotation&(dot.garrote.remains<cooldown.garrote.duration|energy.regen_combined>35)
+    SkipCycleGarrote = MeleeEnemies10yCount > 3 and (Target:DebuffRemains(S.Garrote) < 6 or EnergyRegenCombined > 35)
+    -- # Limit secondary Ruptures for priority rotation if we have 35 energy regen or Shiv is up on 2T+
+    -- actions.dot+=/variable,name=skip_cycle_rupture,value=priority_rotation&(debuff.shiv.up&spell_targets.fan_of_knives>2|energy.regen_combined>35)
+    SkipCycleRupture = (Target:DebuffUp(S.ShivDebuff) and MeleeEnemies10yCount > 2) or EnergyRegenCombined > 35
   end
   -- # Limit Ruptures if Vendetta+Shiv/Master Assassin is up and we have 2+ seconds left on the Rupture DoT
   -- actions.dot+=/variable,name=skip_rupture,value=debuff.vendetta.up&(debuff.shiv.up|master_assassin_remains>0)&dot.rupture.remains>2
@@ -498,7 +516,7 @@ local function Dot ()
     -- actions.dot+=/garrote,if=talent.exsanguinate.enabled&!exsanguinated.garrote&dot.garrote.pmultiplier<=1&cooldown.exsanguinate.remains<2&spell_targets.fan_of_knives=1&raid_event.adds.in>6&dot.garrote.remains*0.5<target.time_to_die
     if S.Garrote:IsCastable() and Target:IsInMeleeRange(5) and MeleeEnemies10yCount == 1 and S.Exsanguinate:CooldownRemains() < 2 and not Rogue.Exsanguinated(Target, S.Garrote)
       and Target:PMultiplier(S.Garrote) <= 1 and Target:FilteredTimeToDie(">", Target:DebuffRemains(S.Garrote)*0.5) then
-      if HR.CastPooling(S.Garrote) then return "Cast Garrote (Pre-Exsanguinate)" end
+      if CastPooling(S.Garrote) then return "Cast Garrote (Pre-Exsanguinate)" end
     end
     -- actions.dot+=/rupture,if=talent.exsanguinate.enabled&(effective_combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&dot.rupture.remains*0.5<target.time_to_die)
     if S.Rupture:IsReady() and Target:IsInMeleeRange(5) and ComboPoints > 0
@@ -518,50 +536,59 @@ local function Dot ()
           and TargetUnit:DebuffRemains(S.Garrote) <= (Rogue.Exsanguinated(TargetUnit, S.Garrote) and ExsanguinatedBleedTickTime or BleedTickTime)))
         and (not Rogue.Exsanguinated(TargetUnit, S.Garrote) or TargetUnit:DebuffRemains(S.Garrote) <= 1.5 and MeleeEnemies10yCount >= 3)
         and MasterAssassinRemains() <= 0
-        and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold)
     end
-    if Target:IsInMeleeRange(5) and Evaluate_Garrote_Target(Target)
+    if Evaluate_Garrote_Target(Target) and Rogue.CanDoTUnit(Target, GarroteDMGThreshold)
       and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Garrote)) or Target:TimeToDieIsNotValid()) then
-      if HR.CastPooling(S.Garrote) then return "Pool for Garrote (ST)" end
+      if CastPooling(S.Garrote, nil, not Target:IsInMeleeRange(5)) then return "Pool for Garrote (ST)" end
     end
     if HR.AoEON() and not SkipCycleGarrote then
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, 12, MeleeEnemies5y)
     end
   end
-  -- # Crimson Tempest on multiple targets at 4+ CP when running out in 2s (up to 4 targets) or 3s (5+ targets)
+  -- # Crimson Tempest on multiple targets at 4+ CP when running out in 2-3s as long as we have enough regen and aren't setting up for Vendetta
+  -- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&effective_combo_points>=4&energy.regen_combined>20&(!cooldown.vendetta.ready|dot.rupture.ticking)
+  if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 2 and ComboPoints >= 4
+    and EnergyRegenCombined > 20 and (not S.Vendetta:CooldownUp() or Target:DebuffUp(S.Rupture)) then
+    for _, CycleUnit in pairs(MeleeEnemies10y) do
+      -- Note: The APL does not do this due to target_if mechanics, just to determine if any targets are low on duration of the AoE Bleed
+      if CycleUnit:DebuffRemains(S.CrimsonTempest) < 2 + BoolToInt(MeleeEnemies10yCount >= 5) then
+        if Cast(S.CrimsonTempest) then return "Cast Crimson Tempest (AoE)" end
+      end
+    end
+  end
+  -- # Keep up Rupture at 4+ on all targets (when living long enough and not snapshot)
+  -- actions.dot+=/rupture,if=!variable.skip_rupture&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>4
+  -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+runeforge.dashing_scoundrel*9+runeforge.doomblade*6)
+  if not SkipRupture and S.Rupture:IsReady() and ComboPoints >= 4 then
+    local function Evaluate_Rupture_Target(TargetUnit)
+      return TargetUnit:DebuffRefreshable(S.Rupture, RuptureThreshold)
+        and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemains(S.Rupture) <= (Rogue.Exsanguinated(TargetUnit, S.Rupture) and ExsanguinatedBleedTickTime or BleedTickTime) and MeleeEnemies10yCount >= 3)
+        and (not Rogue.Exsanguinated(TargetUnit, S.Rupture) or TargetUnit:DebuffRemains(S.Rupture) <= ExsanguinatedBleedTickTime * 2 and MeleeEnemies10yCount >= 3)
+        and (TargetUnit:FilteredTimeToDie(">", RuptureDurationThreshold, -TargetUnit:DebuffRemains(S.Rupture)) or TargetUnit:TimeToDieIsNotValid())
+    end
+    if Evaluate_Rupture_Target(Target) and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
+      if Cast(S.Rupture, nil, nil, not Target:IsInMeleeRange(5)) then return "Cast Rupture (Refresh)" end
+    end
+    if HR.AoEON() and not SkipCycleRupture then
+      SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, RuptureDurationThreshold, MeleeEnemies5y)
+    end
+  end
+  -- # Fallback AoE Crimson Tempest with the same logic as above, but ignoring the energy conditions if we aren't using Rupture
   -- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&effective_combo_points>=4
   if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 2 and ComboPoints >= 4 then
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       -- Note: The APL does not do this due to target_if mechanics, just to determine if any targets are low on duration of the AoE Bleed
       if CycleUnit:DebuffRemains(S.CrimsonTempest) < 2 + BoolToInt(MeleeEnemies10yCount >= 5) then
-        if Cast(S.CrimsonTempest) then return "Cast Crimson Tempest (AoE 4+)" end
+        if Cast(S.CrimsonTempest) then return "Cast Crimson Tempest (AoE Fallback)" end
       end
     end
   end
-  -- # Keep up Rupture at 4+ on all targets (when living long enough and not snapshot)
-  -- actions.dot+=/rupture,if=!variable.skip_rupture&(effective_combo_points>=4&refreshable|!ticking&(time>10|combo_points>=2))&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>4
-  -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+runeforge.dashing_scoundrel*9+runeforge.doomblade*6)
-  if not SkipRupture and S.Rupture:IsReady() then
-    local function Evaluate_Rupture_Target(TargetUnit)
-      return TargetUnit:DebuffRefreshable(S.Rupture, RuptureThreshold)
-        and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemains(S.Rupture) <= (Rogue.Exsanguinated(TargetUnit, S.Rupture) and ExsanguinatedBleedTickTime or BleedTickTime) and MeleeEnemies10yCount >= 3)
-        and (not Rogue.Exsanguinated(TargetUnit, S.Rupture) or TargetUnit:DebuffRemains(S.Rupture) <= ExsanguinatedBleedTickTime * 2 and MeleeEnemies10yCount >= 3)
-        and Rogue.CanDoTUnit(TargetUnit, RuptureDMGThreshold)
-    end
-    if Target:IsInMeleeRange(5) and ((ComboPoints >= 4 and Target:DebuffRefreshable(S.Rupture, RuptureThreshold))
-      or (not Target:DebuffUp(S.Rupture) and (HL.CombatTime() > 10 or ComboPoints >= 2)))
-      and Evaluate_Rupture_Target(Target)
-      and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Rupture)) or Target:TimeToDieIsNotValid()) then
-      if Cast(S.Rupture) then return "Cast Rupture (Refresh)" end
-    end
-    if HR.AoEON() and not SkipCycleRupture and ComboPoints >= 4 then
-      SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, 4 + BoolToInt(DashingScoundrelEquipped) * 9 + BoolToInt(DoombladeEquipped) * 6, MeleeEnemies5y)
-    end
-  end
   -- # Crimson Tempest on ST if in pandemic and nearly max energy and if Envenom won't do more damage due to TB/MA
-  -- actions.dot+=/crimson_tempest,if=spell_targets=1&effective_combo_points>=(cp_max_spend-1)&refreshable&!exsanguinated&!debuff.shiv.up&master_assassin_remains=0&(energy.deficit<=25+variable.energy_regen_combined)&target.time_to_die-remains>4
-  if S.CrimsonTempest:IsReady() and Target:IsInMeleeRange(5) and MeleeEnemies10yCount == 1 and ComboPoints >= (Rogue.CPMaxSpend() - 1) and Target:DebuffRefreshable(S.CrimsonTempest, CrimsonTempestThreshold)
-    and not Rogue.Exsanguinated(Target, S.CrimsonTempest) and not Target:DebuffUp(S.ShivDebuff) and MasterAssassinRemains() <= 0
+  -- actions.dot+=/crimson_tempest,if=spell_targets=1&!runeforge.dashing_scoundrel&master_assassin_remains=0&effective_combo_points>=(cp_max_spend-1)&refreshable&!exsanguinated&!debuff.shiv.up&(energy.deficit<=25+variable.energy_regen_combined)&target.time_to_die-remains>4
+  if S.CrimsonTempest:IsReady() and Target:IsInMeleeRange(10) and MeleeEnemies10yCount == 1
+    and not DashingScoundrelEquipped and MasterAssassinRemains() <= 0
+    and ComboPoints >= (Rogue.CPMaxSpend() - 1) and Target:DebuffRefreshable(S.CrimsonTempest, CrimsonTempestThreshold)
+    and not Rogue.Exsanguinated(Target, S.CrimsonTempest) and not Target:DebuffUp(S.ShivDebuff)
     and Player:EnergyDeficitPredicted() <= 25 + EnergyRegenCombined
     and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.CrimsonTempest)) or Target:TimeToDieIsNotValid())
     and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
@@ -575,28 +602,12 @@ end
 local function Direct ()
   -- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
   -- actions.direct=envenom,if=effective_combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.shiv.up|debuff.flagellation.up|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
-  if S.Envenom:IsReady() and Target:IsInMeleeRange(5) and ComboPoints >= 4 + BoolToInt(S.DeeperStratagem:IsAvailable())
+  if S.Envenom:IsReady() and ComboPoints >= 4 + BoolToInt(S.DeeperStratagem:IsAvailable())
     and (Target:DebuffUp(S.Vendetta) or Target:DebuffUp(S.ShivDebuff) or Target:DebuffUp(S.Flagellation)
-      or Player:EnergyDeficitPredicted() <= 25 + EnergyRegenCombined or not SingleTarget)
+      or Player:BuffUp(S.Flagellation) or Player:BuffUp(S.MarrowedGemstoneBuff)
+      or Player:EnergyDeficitPredicted() <= (25 + EnergyRegenCombined) or not SingleTarget)
     and (not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemains() > 2 or not HR.CDsON()) then
-    if Cast(S.Envenom) then return "Cast Envenom" end
-  end
-  -- actions.direct+=/serrated_bone_spike,cycle_targets=1,if=master_assassin_remains=0&(buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75|soulbind.lead_by_example.enabled&!buff.lead_by_example.up)
-  if S.SerratedBoneSpike:IsCastable() and MasterAssassinRemains() <= 0 then
-    if Player:BuffUp(S.SliceandDice) and not Target:DebuffUp(S.SerratedBoneSpikeDebuff) then
-      if Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then ShouldReturn = "Cast Serrated Bone Spike" end
-    else
-      if HR.AoEON() and Player:BuffUp(S.SliceandDice) then
-        local function Evaluate_Bone_Spike_Target(TargetUnit)
-          return not TargetUnit:DebuffUp(S.SerratedBoneSpikeDebuff) and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold)
-        end
-        SuggestCycleDoT(S.SerratedBoneSpike, Evaluate_Bone_Spike_Target, 4, Enemies30y)
-      end
-      if HL.FightRemains(MeleeEnemies10y, false) <= 5 or S.SerratedBoneSpike:ChargesFractional() >= 2.75
-        or (S.LeadbyExample:SoulbindEnabled() and not Player:BuffUp(S.LeadbyExampleBuff)) then
-        if Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then ShouldReturn = "Cast Serrated Bone Spike Filler" end
-      end
-    end
+    if Cast(S.Envenom, nil, nil, not Target:IsInMeleeRange(5)) then return "Cast Envenom" end
   end
 
   --- !!!! ---
@@ -607,48 +618,64 @@ local function Direct ()
   end
   --- !!!! ---
 
-  if S.FanofKnives:IsCastable() and Target:IsInMeleeRange(10) then
+  if S.SerratedBoneSpike:IsReady() then
+    -- actions.direct+=/serrated_bone_spike,if=variable.use_filler&!dot.serrated_bone_spike_dot.ticking
+    if not Target:DebuffUp(S.SerratedBoneSpikeDebuff) then
+      if Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInMeleeRange(10)) then return "Cast Serrated Bone Spike" end
+    else
+      -- actions.direct+=/serrated_bone_spike,target_if=min:target.time_to_die+(dot.serrated_bone_spike_dot.ticking*600),if=variable.use_filler&!dot.serrated_bone_spike_dot.ticking
+      if HR.AoEON() then
+        if Everyone.CastTargetIf(S.SerratedBoneSpike, Enemies30y, "min", EvaluateSBSTargetIfConditionCondition, EvaluateSBSCondition) then
+          return "Cast Serrated Bone (AoE)"
+        end
+      end
+      -- actions.direct+=/serrated_bone_spike,if=variable.use_filler&master_assassin_remains<0.8&(fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75|soulbind.lead_by_example.enabled&!buff.lead_by_example.up&debuff.vendetta.up)
+      if MasterAssassinRemains() < 0.8 and (HL.BossFightRemains() <= 5 or S.SerratedBoneSpike:ChargesFractional() >= 2.75
+        or (S.LeadbyExample:SoulbindEnabled() and not Player:BuffUp(S.LeadbyExampleBuff) and Target:DebuffUp(S.Vendetta)) or Player:BuffUp(S.MarrowedGemstoneBuff)) then
+        if Cast(S.SerratedBoneSpike, nil, Settings.Commons.SerratedBoneSpikeDumpDisplayStyle, not Target:IsInMeleeRange(10)) then return "Cast Serrated Bone Spike (Filler)" end
+      end
+    end
+  end
+  if S.FanofKnives:IsCastable() then
     -- # Fan of Knives at 19+ stacks of Hidden Blades or against 4+ targets.
     -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|(!priority_rotation&spell_targets.fan_of_knives>=4+stealthed.rogue))
-    if HR.AoEON() and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or (not PriorityRotation and MeleeEnemies10yCount >= 4 + BoolToInt(Player:StealthUp(true, false)))) then
-      if Cast(S.FanofKnives) then return "Cast Fan of Knives" end
+    if HR.AoEON() and (Player:BuffStack(S.HiddenBladesBuff) >= 19 and MeleeEnemies10yCount >= 1
+      or (not PriorityRotation and MeleeEnemies10yCount >= 4 + BoolToInt(Player:StealthUp(true, false)))) then
+      if CastPooling(S.FanofKnives) then return "Cast Fan of Knives" end
     end
-    -- # Fan of Knives to apply Deadly Poison if inactive on any target at 3 targets.
-    -- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives>=3
+    -- # Fan of Knives to apply poisons if inactive on any target (or any bleeding targets with priority rotation) at 3T
+    -- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking&(!priority_rotation|dot.garrote.ticking|dot.rupture.ticking),if=variable.use_filler&spell_targets.fan_of_knives>=3
     if HR.AoEON() and Player:BuffUp(S.DeadlyPoison) and MeleeEnemies10yCount >= 3 then
       for _, CycleUnit in pairs(MeleeEnemies10y) do
-        -- Note: The APL does not do this due to target_if mechanics, but since we are cycling we should check to see if the unit has a bleed
-        if (CycleUnit:DebuffUp(S.Garrote) or CycleUnit:DebuffUp(S.Rupture)) and not CycleUnit:DebuffUp(S.DeadlyPoisonDebuff) then
-          if HR.CastPooling(S.FanofKnives) then return "Cast Fan of Knives (DP Refresh)" end
+        if not CycleUnit:DebuffUp(S.DeadlyPoisonDebuff, true) and (not PriorityRotation or CycleUnit:DebuffUp(S.Garrote) or CycleUnit:DebuffUp(S.Rupture)) then
+          if CastPooling(S.FanofKnives) then return "Cast Fan of Knives (DP Refresh)" end
         end
       end
     end
   end
-  if Target:IsInMeleeRange(5) then
-    -- actions.direct+=/echoing_reprimand,if=variable.use_filler&cooldown.vendetta.remains>10
-    if CDsON() and S.EchoingReprimand:IsReady() and S.Vendetta:CooldownRemains() > 10 then
-      if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
-    end
-    -- actions.direct+=/ambush,if=variable.use_filler&(master_assassin_remains=0|buff.blindside.up)
-    if S.Ambush:IsCastable() and (MasterAssassinRemains() <= 0 and Player:StealthUp(true, true) or Player:BuffUp(S.BlindsideBuff)) then
-      if HR.CastPooling(S.Ambush) then return "Cast Ambush" end
-    end
-    -- # Tab-Mutilate to apply Deadly Poison at 2 targets
-    -- actions.direct+=/mutilate,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives=2
-    if S.Mutilate:IsCastable() and MeleeEnemies10yCount == 2 and Target:DebuffUp(S.DeadlyPoisonDebuff) then
-      local TargetGUID = Target:GUID()
-      for _, CycleUnit in pairs(MeleeEnemies5y) do
-        -- Note: The APL does not do this due to target_if mechanics, but since we are cycling we should check to see if the unit has a bleed
-        if CycleUnit:GUID() ~= TargetGUID and (CycleUnit:DebuffUp(S.Garrote) or CycleUnit:DebuffUp(S.Rupture)) and not CycleUnit:DebuffUp(S.DeadlyPoisonDebuff) then
-          HR.CastLeftNameplate(CycleUnit, S.Mutilate)
-          break
-        end
+  -- actions.direct+=/echoing_reprimand,if=variable.use_filler&cooldown.vendetta.remains>10
+  if CDsON() and S.EchoingReprimand:IsReady() and S.Vendetta:CooldownRemains() > 10 then
+    if Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInMeleeRange(5)) then return "Cast Echoing Reprimand" end
+  end
+  -- actions.direct+=/ambush,if=variable.use_filler&(master_assassin_remains=0&!runeforge.doomblade|buff.blindside.up)
+  if S.Ambush:IsCastable() and (MasterAssassinRemains() <= 0 and not DoombladeEquipped and Player:StealthUp(true, true) or Player:BuffUp(S.BlindsideBuff)) then
+    if CastPooling(S.Ambush, nil, not Target:IsInMeleeRange(5)) then return "Cast Ambush" end
+  end
+  -- # Tab-Mutilate to apply Deadly Poison at 2 targets
+  -- actions.direct+=/mutilate,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives=2
+  if S.Mutilate:IsCastable() and MeleeEnemies10yCount == 2 and Target:DebuffUp(S.DeadlyPoisonDebuff, true) then
+    local TargetGUID = Target:GUID()
+    for _, CycleUnit in pairs(MeleeEnemies5y) do
+      -- Note: The APL does not do this due to target_if mechanics, but since we are cycling we should check to see if the unit has a bleed
+      if CycleUnit:GUID() ~= TargetGUID and (CycleUnit:DebuffUp(S.Garrote) or CycleUnit:DebuffUp(S.Rupture)) and not CycleUnit:DebuffUp(S.DeadlyPoisonDebuff, true) then
+        CastLeftNameplate(CycleUnit, S.Mutilate)
+        break
       end
     end
-    -- actions.direct+=/mutilate,if=variable.use_filler
-    if S.Mutilate:IsCastable() then
-      if HR.CastPooling(S.Mutilate) then return "Cast Mutilate" end
-    end
+  end
+  -- actions.direct+=/mutilate,if=variable.use_filler
+  if S.Mutilate:IsCastable() then
+    if CastPooling(S.Mutilate, nil, not Target:IsInMeleeRange(5)) then return "Cast Mutilate" end
   end
 
   return false
@@ -672,7 +699,7 @@ local function APL ()
   -- Rotation Variables Update
   Stealth = S.Subterfuge:IsAvailable() and S.Stealth2 or S.Stealth; -- w/ or w/o Subterfuge Talent
   BleedTickTime, ExsanguinatedBleedTickTime = 2 / Player:SpellHaste(), 1 / Player:SpellHaste()
-  ComboPoints = Player:ComboPoints()
+  ComboPoints = Rogue.EffectiveComboPoints()
   ComboPointsDeficit = Player:ComboPointsMax() - ComboPoints
   RuptureThreshold = (4 + ComboPoints * 4) * 0.3
   CrimsonTempestThreshold = (2 + ComboPoints * 2) * 0.3
@@ -739,14 +766,22 @@ local function APL ()
     end
     -- # Put SnD up initially for Cut to the Chase, refresh with Envenom if at low duration
     -- actions+=/slice_and_dice,if=!buff.slice_and_dice.up&combo_points>=3
-    -- actions+=/envenom,if=buff.slice_and_dice.up&buff.slice_and_dice.remains<5&combo_points>=4
     if not Player:BuffUp(S.SliceandDice) then
       if S.SliceandDice:IsReady() and ComboPoints >= 3 then
         if Cast(S.SliceandDice) then return "Cast Slice and Dice" end
       end
     else
-      if S.Envenom:IsReady() and Target:IsInMeleeRange(5) and Player:BuffRemains(S.SliceandDice) < 5 and ComboPoints >= 4 then
-        if Cast(S.Envenom) then return "Cast Envenom (CttC)" end
+      --- !!!! ---
+      -- Special fallback Poisoned Knife Out of Range [EnergyCap] or [PoisonRefresh]
+      -- Only if we are about to cap energy, not stealthed, and completely out of range
+      --- !!!! ---
+      if S.PoisonedKnife:IsCastable() and Target:IsInRange(30) and not Player:StealthUp(true, true)
+        and MeleeEnemies10yCount == 0 and Player:EnergyTimeToMax() <= Player:GCD() * 1.5 then
+        if Cast(S.PoisonedKnife) then return "Cast Poisoned Knife" end
+      end
+      -- actions+=/envenom,if=buff.slice_and_dice.up&buff.slice_and_dice.remains<5&combo_points>=4
+      if S.Envenom:IsReady() and Target:IsInMeleeRange(10) and Player:BuffRemains(S.SliceandDice) < 5 and ComboPoints >= 4 then
+        if Cast(S.Envenom, nil, nil, not Target:IsInMeleeRange(5)) then return "Cast Envenom (CttC)" end
       end
     end
     -- actions+=/call_action_list,name=dot
@@ -774,26 +809,22 @@ local function APL ()
         if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Bag of Tricks" end
       end
     end
-    -- Poisoned Knife Out of Range [EnergyCap] or [PoisonRefresh]
-    if S.PoisonedKnife:IsCastable() and Target:IsInRange(30) and not Player:StealthUp(true, true)
-      and ((not Target:IsInMeleeRange(10) and Player:EnergyTimeToMax() <= Player:GCD()*1.2)
-        or (not Target:IsInMeleeRange(5) and Target:DebuffRefreshable(S.DeadlyPoisonDebuff))) then
-      if Cast(S.PoisonedKnife) then return "Cast Poisoned Knife" end
-    end
     -- Trick to take in consideration the Recovery Setting
-    if S.Mutilate:IsCastable() and Target:IsInMeleeRange(5) then
+    if S.Mutilate:IsCastable() and Target:IsInMeleeRange(10) then
       if Cast(S.PoolEnergy) then return "Normal Pooling" end
     end
   end
 end
 
 local function Init ()
+  S.Vendetta:RegisterAuraTracking()
+  S.Sepsis:RegisterAuraTracking()
 end
 
 HR.SetAPL(259, APL, Init)
 
 --- ======= SIMC =======
--- Last Update: 03/01/2021
+-- Last Update: 04/11/2021
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=apply_poison
@@ -815,7 +846,6 @@ HR.SetAPL(259, APL, Init)
 -- actions=stealth
 -- # Interrupt on cooldown to allow simming interactions with that
 -- actions+=/kick
--- actions+=/variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*8%(2*spell_haste)
 -- actions+=/variable,name=single_target,value=spell_targets.fan_of_knives<2
 -- actions+=/call_action_list,name=stealthed,if=stealthed.rogue
 -- actions+=/call_action_list,name=cds,if=(!talent.master_assassin.enabled|dot.garrote.ticking)
@@ -824,7 +854,7 @@ HR.SetAPL(259, APL, Init)
 -- actions+=/envenom,if=buff.slice_and_dice.up&buff.slice_and_dice.remains<5&combo_points>=4
 -- actions+=/call_action_list,name=dot
 -- actions+=/call_action_list,name=direct
--- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
+-- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen_combined
 -- actions+=/arcane_pulse
 -- actions+=/lights_judgment
 -- actions+=/bag_of_tricks
@@ -863,24 +893,28 @@ HR.SetAPL(259, APL, Init)
 
 -- # Direct damage abilities
 -- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
--- actions.direct=envenom,if=effective_combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.shiv.up|debuff.flagellation.up|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
--- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target
--- actions.direct+=/serrated_bone_spike,cycle_targets=1,if=master_assassin_remains=0&(buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75|soulbind.lead_by_example.enabled&!buff.lead_by_example.up)
+-- actions.direct=envenom,if=effective_combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.shiv.up|debuff.flagellation.up|energy.deficit<=25+energy.regen_combined|!variable.single_target)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
+-- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+energy.regen_combined|!variable.single_target
+-- # Apply SBS to all targets without a debuff as priority, preferring targets dying sooner after the primary target
+-- actions.direct+=/serrated_bone_spike,if=variable.use_filler&!dot.serrated_bone_spike_dot.ticking
+-- actions.direct+=/serrated_bone_spike,target_if=min:target.time_to_die+(dot.serrated_bone_spike_dot.ticking*600),if=variable.use_filler&!dot.serrated_bone_spike_dot.ticking
+-- # When MA is not at high duration, use SBS to apply Lead by Example during Vendetta, otherwise keep from capping charges
+-- actions.direct+=/serrated_bone_spike,if=variable.use_filler&master_assassin_remains<0.8&(fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75|soulbind.lead_by_example.enabled&!buff.lead_by_example.up&debuff.vendetta.up|buff.marrowed_gemstone_enhancement.up)
 -- # Fan of Knives at 19+ stacks of Hidden Blades or against 4+ targets.
 -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|(!priority_rotation&spell_targets.fan_of_knives>=4+stealthed.rogue))
--- # Fan of Knives to apply Deadly Poison if inactive on any target at 3 targets.
--- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives>=3
+-- # Fan of Knives to apply poisons if inactive on any target (or any bleeding targets with priority rotation) at 3T
+-- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking&(!priority_rotation|dot.garrote.ticking|dot.rupture.ticking),if=variable.use_filler&spell_targets.fan_of_knives>=3
 -- actions.direct+=/echoing_reprimand,if=variable.use_filler&cooldown.vendetta.remains>10
--- actions.direct+=/ambush,if=variable.use_filler&(master_assassin_remains=0|buff.blindside.up)
+-- actions.direct+=/ambush,if=variable.use_filler&(master_assassin_remains=0&!runeforge.doomblade|buff.blindside.up)
 -- # Tab-Mutilate to apply Deadly Poison at 2 targets
 -- actions.direct+=/mutilate,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives=2
 -- actions.direct+=/mutilate,if=variable.use_filler
 
 -- # Damage over time abilities
--- # Limit Garrotes on non-primrary targets for the priority rotation if 5+ bleeds are already up
--- actions.dot=variable,name=skip_cycle_garrote,value=priority_rotation&spell_targets.fan_of_knives>3&(dot.garrote.remains<cooldown.garrote.duration|poisoned_bleeds>5)
--- # Limit Ruptures on non-primrary targets for the priority rotation if 5+ bleeds are already up
--- actions.dot+=/variable,name=skip_cycle_rupture,value=priority_rotation&spell_targets.fan_of_knives>3&(debuff.shiv.up|poisoned_bleeds>5)
+-- # Limit secondary Garrotes for priority rotation if we have 35 energy regen or Garrote will expire on the primary target
+-- actions.dot=variable,name=skip_cycle_garrote,value=priority_rotation&(dot.garrote.remains<cooldown.garrote.duration|energy.regen_combined>35)
+-- # Limit secondary Ruptures for priority rotation if we have 35 energy regen or Shiv is up on 2T+
+-- actions.dot+=/variable,name=skip_cycle_rupture,value=priority_rotation&(debuff.shiv.up&spell_targets.fan_of_knives>2|energy.regen_combined>35)
 -- # Limit Ruptures if Vendetta+Shiv/Master Assassin is up and we have 2+ seconds left on the Rupture DoT
 -- actions.dot+=/variable,name=skip_rupture,value=debuff.vendetta.up&(debuff.shiv.up|master_assassin_remains>0)&dot.rupture.remains>2
 -- # Special Garrote and Rupture setup prior to Exsanguinate cast
@@ -891,13 +925,15 @@ HR.SetAPL(259, APL, Init)
 -- actions.dot+=/garrote,if=refreshable&combo_points.deficit>=1&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&(target.time_to_die-remains)>4&master_assassin_remains=0
 -- actions.dot+=/pool_resource,for_next=1
 -- actions.dot+=/garrote,cycle_targets=1,if=!variable.skip_cycle_garrote&target!=self.target&refreshable&combo_points.deficit>=1&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&(target.time_to_die-remains)>12&master_assassin_remains=0
--- # Crimson Tempest on multiple targets at 4+ CP when running out in 2s (up to 4 targets) or 3s (5+ targets)
--- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&effective_combo_points>=4
+-- # Crimson Tempest on multiple targets at 4+ CP when running out in 2-3s as long as we have enough regen and aren't setting up for Vendetta
+-- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&effective_combo_points>=4&energy.regen_combined>20&(!cooldown.vendetta.ready|dot.rupture.ticking)
 -- # Keep up Rupture at 4+ on all targets (when living long enough and not snapshot)
--- actions.dot+=/rupture,if=!variable.skip_rupture&(effective_combo_points>=4&refreshable|!ticking&(time>10|combo_points>=2))&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>4
+-- actions.dot+=/rupture,if=!variable.skip_rupture&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+runeforge.dashing_scoundrel*9+runeforge.doomblade*6)
 -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+runeforge.dashing_scoundrel*9+runeforge.doomblade*6)
+-- # Fallback AoE Crimson Tempest with the same logic as above, but ignoring the energy conditions if we aren't using Rupture
+-- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&effective_combo_points>=4
 -- # Crimson Tempest on ST if in pandemic and nearly max energy and if Envenom won't do more damage due to TB/MA
--- actions.dot+=/crimson_tempest,if=spell_targets=1&effective_combo_points>=(cp_max_spend-1)&refreshable&!exsanguinated&!debuff.shiv.up&master_assassin_remains=0&(energy.deficit<=25+variable.energy_regen_combined)&target.time_to_die-remains>4
+-- actions.dot+=/crimson_tempest,if=spell_targets=1&!runeforge.dashing_scoundrel&master_assassin_remains=0&effective_combo_points>=(cp_max_spend-1)&refreshable&!exsanguinated&!debuff.shiv.up&(energy.deficit<=25+energy.regen_combined)&target.time_to_die-remains>4
 
 -- # Stealthed Actions
 -- # Nighstalker on 3T: Crimson Tempest

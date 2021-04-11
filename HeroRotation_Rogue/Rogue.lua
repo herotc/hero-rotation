@@ -118,6 +118,7 @@ Spell.Rogue.Assassination = {
   -- Soulbinds/Conduits (Shadowlands)
   LeadbyExample           = Spell(342156),
   LeadbyExampleBuff       = Spell(342181),
+  MarrowedGemstoneBuff    = Spell(327069),
   -- Legendaries (Shadowlands)
   -- Misc
   PoolEnergy              = Spell(999910),
@@ -480,6 +481,14 @@ do
     end
 
     return -1
+  end
+
+  function Commons.EffectiveComboPoints()
+    local ComboPoints = Player:ComboPoints()
+    if Commons.AnimachargedCP() == ComboPoints then
+      return 7
+    end
+    return ComboPoints
   end
 end
 

@@ -25,6 +25,7 @@ HR.GUISettings.APL.Rogue = {
     UseTrinkets = true,
     TrinketDisplayStyle = "Suggested",
     CovenantDisplayStyle = "Suggested",
+    SerratedBoneSpikeDumpDisplayStyle = "Suggested",
     ShowPooling = false,
     STMfDAsDPSCD = false, -- Single Target MfD as DPS CD
     GCDasOffGCD = {
@@ -54,6 +55,7 @@ HR.GUISettings.APL.Rogue = {
     MutilateDMGOffset = 3,
     AlwaysSuggestGarrote = false, -- Suggest Garrote even when Vanish is up
     GCDasOffGCD = {
+      Shiv = false,
     },
     OffGCDasOffGCD = {
       Vendetta = true,
@@ -118,7 +120,8 @@ CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.UsePriorityRotation",
 CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
 CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
 CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for Covenants.")
-CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.ShowPooling", "Show Pooling", "Show pooling icon insteand of pooling prediction.")
+CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.SerratedBoneSpikeDumpDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Serrated Bone Spike Burn Display Style", "Define which icon display style to use for Serrated Bone Spike charge burning.")
+CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.ShowPooling", "Show Pooling", "Show pooling icon instead of pooling prediction.")
 CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.STMfDAsDPSCD", "ST Marked for Death as DPS CD", "Enable if you want to put Single Target Marked for Death shown as Off GCD (top icons) instead of Suggested.")
 CreateARPanelOptions(CP_Rogue, "APL.Rogue.Commons")
 -- Rogue 2
