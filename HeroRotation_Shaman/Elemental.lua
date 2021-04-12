@@ -337,8 +337,8 @@ local function Single()
   if S.LightningBolt:IsReady() and (Player:BuffUp(S.StormkeeperBuff) and EnemiesCount10ySplash < 2 and Player:BuffUp(S.MasterOfTheElementsBuff)) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 136"; end
   end
-  -- earthquake,if=buff.echoes_of_great_sundering.up&(!talent.master_of_the_elements.enabled|buff.master_of_the_elements.up)
-  if S.Earthquake:IsReady() and (Player:BuffUp(S.EchoesofGreatSunderingBuff) and (not S.MasterOfTheElements:IsAvailable() or Player:BuffUp(S.MasterOfTheElementsBuff))) then
+  -- earthquake,if=buff.echoes_of_great_sundering.up&(talent.master_of_the_elements.enabled&(buff.master_of_the_elements.up|cooldown.lava_burst.remains>0&maelstrom>=92|spell_targets.chain_lightning<2&buff.stormkeeper.up&cooldown.lava_burst.remains<=gcd)|!talent.master_of_the_elements.enabled|cooldown.elemental_blast.remains<=1.1*gcd*2)
+  if S.Earthquake:IsReady() and (Player:BuffUp(S.EchoesofGreatSunderingBuff) and (S.MasterOfTheElements:IsAvailable() and (Player:BuffUp(S.MasterOfTheElementsBuff) or S.LavaBurst:CooldownRemains() > 0 and Player:Maelstrom() >= 92 or EnemiesCount10ySplash < 2 and Player:BuffUp(S.StormkeeperBuff) and S.LavaBurst:CooldownRemains() <= Player:GCD()) or not S.MasterOfTheElements:IsAvailable() or S.ElementalBlast:CooldownRemains() <= 1.1 * Player:GCD() * 2)) then
     if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single 138"; end
   end
   -- earthquake,if=spell_targets.chain_lightning>1&!dot.flame_shock.refreshable&!runeforge.echoes_of_great_sundering.equipped&(!talent.master_of_the_elements.enabled|buff.master_of_the_elements.up|cooldown.lava_burst.remains>0&maelstrom>=92)
