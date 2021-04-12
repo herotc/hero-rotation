@@ -229,6 +229,8 @@ Item.DeathKnight.Blood = {
 
 Item.DeathKnight.Frost = {
   -- Potions/Trinkets
+  PotionofSpectralStrength              = Item(171275),
+  InscrutableQuantumDevice              = Item(179350),
   -- "Other On Use"
 }
 
