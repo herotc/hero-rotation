@@ -15,9 +15,9 @@ local Spell      = HL.Spell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
+local Cast       = HR.Cast
 local CDsON      = HR.CDsON
 local AoEON      = HR.AoEON
-local Cast       = HR.Cast
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -35,6 +35,17 @@ local OnUseExcludes = {
   I.InscrutableQuantumDevice:ID(),
   I.MacabreSheetMusic:ID(),
 }
+
+-- Trinket Item Objects
+local equip = Player:GetEquipment()
+local trinket1 = Item(0)
+local trinket2 = Item(0)
+if equip[13] then
+  trinket1 = Item(equip[13])
+end
+if equip[14] then
+  trinket2 = Item(equip[14])
+end
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
@@ -57,6 +68,9 @@ local VarGargoyleActive
 local VarApocGhoulActive
 local WoundSpender
 local AnyDnD
+local VarTrinket1Sync, VarTrinket2Sync
+local VarTrinketPriority
+local VarSpecifiedTrinket
 
 -- Enemies Variables
 local EnemiesMelee, EnemiesMeleeCount
@@ -75,6 +89,15 @@ local StunInterrupts = {
 
 -- Event Registrations
 HL:RegisterForEvent(function()
+  equip = Player:GetEquipment()
+  trinket1 = Item(0)
+  trinket2 = Item(0)
+  if equip[13] then
+    trinket1 = Item(equip[13])
+  end
+  if equip[14] then
+    trinket2 = Item(equip[14])
+  end
   SuperstrainEquipped = Player:HasLegendaryEquipped(30)
   PhearomonesEquipped = Player:HasLegendaryEquipped(31)
   DeadliestCoilEquipped = Player:HasLegendaryEquipped(45)
@@ -156,6 +179,10 @@ local function Precombat()
       if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead precombat 2 displaystyle"; end
     end
   end
+  -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(trinket.1.cooldown.duration%%45=0)
+  -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(trinket.2.cooldown.duration%%45=0)
+  -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!trinket.1.has_use_buff&trinket.2.has_use_buff|trinket.2.has_use_buff&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync))
+  -- TODO: Trinket sync/priority stuff. Currently unable to pull trinket CD durations because WoW's API is bad.
   -- Manually added: army_of_the_dead
   if S.ArmyoftheDead:IsReady() then
     if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyoftheDead) then return "army_of_the_dead precombat 4"; end
@@ -359,46 +386,93 @@ local function Covenants()
   end
 end
 
+local function Racials()
+  -- arcane_torrent,if=runic_power.deficit>65&(pet.gargoyle.active|!talent.summon_gargoyle.enabled)&rune.deficit>=5
+  if S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 65 and (VarGargoyleActive or not S.SummonGargoyle:IsAvailable()) and Player:Rune() <= 1) then
+    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent main 2"; end
+  end
+  -- blood_fury,if=variable.major_cooldowns_active|target.time_to_die<=buff.blood_fury.duration
+  if S.BloodFury:IsCastable() and (VarMajorCDsActive or Target:TimeToDie() <= S.BloodFury:BaseDuration()) then
+    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 4"; end
+  end
+  -- berserking,if=variable.major_cooldowns_active|target.time_to_die<=buff.berserking.duration
+  if S.Berserking:IsCastable() and (VarMajorCDsActive or Target:TimeToDie() <= S.Berserking:BaseDuration()) then
+    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 6"; end
+  end
+  -- lights_judgment,if=buff.unholy_strength.up
+  if S.LightsJudgment:IsCastable() and (Player:BuffUp(S.UnholyStrengthBuff)) then
+    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 8"; end
+  end
+  -- ancestral_call,if=variable.major_cooldowns_active|target.time_to_die<=15
+  if S.AncestralCall:IsCastable() and (VarMajorCDsActive or Target:TimeToDie() <= 15) then
+    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD) then return "ancestral_call main 10"; end
+  end
+  -- arcane_pulse,if=active_enemies>=2|(rune.deficit>=5&runic_power.deficit>=60)
+  if S.ArcanePulse:IsCastable() and (EnemiesMeleeCount >= 2 or (Player:Rune() <= 1 and Player:RunicPowerDeficit() >= 60)) then
+    if Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse main 12"; end
+  end
+  -- fireblood,if=variable.major_cooldowns_active|target.time_to_die<=buff.fireblood.duration
+  if S.Fireblood:IsCastable() and (VarMajorCDsActive or Target:TimeToDie() <= S.Fireblood:BaseDuration()) then
+    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 14"; end
+  end
+  -- bag_of_tricks,if=buff.unholy_strength.up&active_enemies=1
+  if S.BagofTricks:IsCastable() and (Player:BuffUp(S.UnholyStrengthBuff) and (EnemiesMeleeCount == 1 or not AoEON())) then
+    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 16"; end
+  end
+end
+
 local function Generic()
   -- death_coil,if=buff.sudden_doom.react&!variable.pooling_runic_power|pet.gargoyle.active
   if S.DeathCoil:IsReady() and (Player:BuffUp(S.SuddenDoomBuff) and not VarPoolingRunicPower or VarGargoyleActive) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil generic 2"; end
   end
-  -- death_coil,if=runic_power.deficit<13|fight_remains<5&!debuff.festering_wound.up
-  if S.DeathCoil:IsReady() and (Player:RunicPowerDeficit() < 13 or HL.FilteredFightRemains(EnemiesMelee, "<", 5) and Target:DebuffDown(S.FesteringWoundDebuff)) then
+  -- death_coil,if=covenant.night_fae&cooldown.deaths_due.remains<3&runic_power.deficit<10
+  if S.DeathCoil:IsReady() and (Player:Covenant() == "Night Fae" and S.DeathsDue:CooldownRemains() < 3 and Player:RunicPowerDeficit() < 10) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil generic 4"; end
   end
-  -- any_dnd,if=cooldown.apocalypse.remains&(talent.defile.enabled|covenant.night_fae|runeforge.phearomones)&(!variable.pooling_runes|fight_remains<5)
-  if AnyDnD:IsReady() and (not S.Apocalypse:CooldownUp() and (S.Defile:IsAvailable() or Player:Covenant() == "Night Fae" or PhearomonesEquipped) and (not VarPoolingRunes or HL.FilteredFightRemains(EnemiesMelee, "<", 5))) then
+  -- any_dnd,if=(talent.defile.enabled|covenant.night_fae|runeforge.phearomones)&(!variable.pooling_runes|fight_remains<5)
+  if AnyDnD:IsReady() and ((S.Defile:IsAvailable() or Player:Covenant() == "Night Fae" or PhearomonesEquipped) and (not VarPoolingRunes or HL.FilteredFightRemains(EnemiesMelee, "<", 5))) then
     if AnyDnD == S.DeathsDue then
       if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Covenant) then return "any_dnd generic 6"; end
     else
       if Cast(AnyDnD, Settings.Commons.OffGCDasOffGCD.DeathAndDecay) then return "any_dnd generic 8"; end
     end
   end
+  -- death_coil,if=covenant.night_fae&runic_power.deficit<20&!variable.pooling_runic_power
+  if S.DeathCoil:IsReady() and (Player:Covenant() == "Night Fae" and Player:RunicPowerDeficit() < 20 and not VarPoolingRunicPower) then
+    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil generic 10"; end
+  end
+  -- festering_strike,if=covenant.night_fae&cooldown.deaths_due.remains<10&debuff.festering_wound.stack<4&!variable.pooling_runes&(!death_and_decay.ticking|buff.deaths_due.stack=4)
+  if S.FesteringStrike:IsReady() and (Player:Covenant() == "Night Fae" and S.DeathsDue:CooldownRemains() < 10 and Target:DebuffStack(S.FesteringWoundDebuff) < 4 and not VarPoolingRunes and (Player:BuffDown(S.DeathAndDecayBuff) or Player:BuffStack(S.DeathsDue) == 4)) then
+    if Cast(S.FesteringStrike, nil, nil, not Target:IsSpellInRange(S.FesteringStrike)) then return "festering_strike generic 12"; end
+  end
+  -- death_coil,if=runic_power.deficit<13|fight_remains<5&!debuff.festering_wound.up
+  if S.DeathCoil:IsReady() and (Player:RunicPowerDeficit() < 13 or HL.FilteredFightRemains(EnemiesMelee, "<", 5) and Target:DebuffDown(S.FesteringWoundDebuff)) then
+    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil generic 14"; end
+  end
   -- wound_spender,if=debuff.festering_wound.stack>4&!variable.pooling_runes
   if WoundSpender:IsReady() and (Target:DebuffStack(S.FesteringWoundDebuff) > 4 and not VarPoolingRunes) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender generic 10"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender generic 16"; end
   end
   -- wound_spender,if=debuff.festering_wound.up&cooldown.apocalypse.remains_expected>5&!variable.pooling_runes
   if WoundSpender:IsReady() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.Apocalypse:CooldownRemains() > 5 and not VarPoolingRunes) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender generic 12"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender generic 18"; end
   end
   -- death_coil,if=runic_power.deficit<20&!variable.pooling_runic_power
   if S.DeathCoil:IsReady() and (Player:RunicPowerDeficit() < 20 and not VarPoolingRunicPower) then
-    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil generic 14"; end
+    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil generic 20"; end
   end
   -- festering_strike,if=debuff.festering_wound.stack<1&!variable.pooling_runes
   if S.FesteringStrike:IsReady() and (Target:DebuffDown(S.FesteringWoundDebuff) and not VarPoolingRunes) then
-    if Cast(S.FesteringStrike, nil, nil, not Target:IsSpellInRange(S.FesteringStrike)) then return "festering_strike generic 16"; end
+    if Cast(S.FesteringStrike, nil, nil, not Target:IsSpellInRange(S.FesteringStrike)) then return "festering_strike generic 22"; end
   end
   -- festering_strike,if=debuff.festering_wound.stack<4&cooldown.apocalypse.remains_expected<5&!variable.pooling_runes
   if S.FesteringStrike:IsReady() and (Target:DebuffStack(S.FesteringWoundDebuff) < 4 and S.Apocalypse:CooldownRemains() < 5 and not VarPoolingRunes) then
-    if Cast(S.FesteringStrike, nil, nil, not Target:IsSpellInRange(S.FesteringStrike)) then return "festering_strike generic 18"; end
+    if Cast(S.FesteringStrike, nil, nil, not Target:IsSpellInRange(S.FesteringStrike)) then return "festering_strike generic 24"; end
   end
   -- death_coil,if=!variable.pooling_runic_power
   if S.DeathCoil:IsReady() and (not VarPoolingRunicPower) then
-    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil generic 20"; end
+    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil generic 26"; end
   end
 end
 
@@ -407,6 +481,11 @@ local function Trinkets()
   if I.InscrutableQuantumDevice:IsEquippedAndReady() and ((not S.UnholyBlight:CooldownUp() or not S.DarkTransformation:CooldownUp()) and (S.ArmyoftheDead:TimeSinceLastCast() <= 30 or VarApocGhoulActive and not S.ArmyoftheDamned:IsAvailable() or Target:TimeToX(20) < 5) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
     if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device trinkets 2"; end
   end
+  -- use_item,slot=trinket1,if=!variable.specified_trinket&((trinket.1.proc.any_dps.duration<=15&cooldown.apocalypse.remains>20|trinket.1.proc.any_dps.duration>15&(cooldown.unholy_blight.remains>20|cooldown.dark_transformation.remains>20))&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1))|trinket.1.proc.any_dps.duration>=fight_remains
+  -- use_item,slot=trinket2,if=!variable.specified_trinket&((trinket.2.proc.any_dps.duration<=15&cooldown.apocalypse.remains>20|trinket.2.proc.any_dps.duration>15&(cooldown.unholy_blight.remains>20|cooldown.dark_transformation.remains>20))&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2))|trinket.2.proc.any_dps.duration>=fight_remains
+  -- use_item,slot=trinket1,if=!trinket.1.has_use_buff&(trinket.2.cooldown.remains|!trinket.2.has_use_buff)
+  -- use_item,slot=trinket2,if=!trinket.2.has_use_buff&(trinket.1.cooldown.remains|!trinket.1.has_use_buff)
+  -- TODO: Add above lines and remove below lines when we can handle the trinket sync/priority variables. For now, keeping the old trinket setup below.
   -- use_item,name=macabre_sheet_music,if=cooldown.apocalypse.remains<5&(!equipped.inscrutable_quantum_device|cooldown.inscrutable_quantum_device.remains)|fight_remains<21
   if I.MacabreSheetMusic:IsEquippedAndReady() and (S.Apocalypse:CooldownRemains() < 5 and (not I.InscrutableQuantumDevice:IsEquipped() or I.InscrutableQuantumDevice:CooldownRemains() > 0) or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
     if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music trinkets 4"; end
@@ -464,6 +543,9 @@ local function APL()
       if Cast(S.DeathStrike) then return "death_strike low hp or proc"; end
     end
     -- auto_attack
+    -- variable,name=specified_trinket,value=(equipped.inscrutable_quantum_device&cooldown.inscrutable_quantum_device.ready)
+    -- TODO: Leaving this commented out until other trinket sync/priority variables can be handled
+    --VarSpecifiedTrinket = (I.InscrutableQuantumDevice:IsEquippedAndReady())
     -- variable,name=pooling_runic_power,value=cooldown.summon_gargoyle.remains<5&talent.summon_gargoyle
     VarPoolingRunicPower = (S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:CooldownRemains() < 5)
     -- variable,name=pooling_runes,value=talent.soul_reaper&rune<2&target.time_to_pct_35<5&fight_remains>5
@@ -477,54 +559,20 @@ local function APL()
       if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak out_of_range"; end
     end
     -- Manually added: epidemic,if=!variable.pooling_runic_power&active_enemies=0
-    if S.Epidemic:IsReady() and AoEON() and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
+    if S.Epidemic:IsReady() and AoEON() and S.VirulentPlagueDebuff:AuraActiveCount() > 1 and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
       if Cast(S.Epidemic, nil, nil, not Target:IsInRange(30)) then return "epidemic out_of_range"; end
     end
     -- Manually added: death_coil,if=!variable.pooling_runic_power&active_enemies=0
     if S.DeathCoil:IsReady() and S.VirulentPlagueDebuff:AuraActiveCount() < 2 and (not VarPoolingRunicPower and EnemiesMeleeCount == 0) then
       if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil out_of_range"; end
     end
-    if CDsON() then
-      -- arcane_torrent,if=runic_power.deficit>65&(pet.gargoyle.active|!talent.summon_gargoyle.enabled)&rune.deficit>=5
-      if S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 65 and (VarGargoyleActive or not S.SummonGargoyle:IsAvailable()) and Player:Rune() <= 1) then
-        if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent main 2"; end
-      end
-      -- blood_fury,if=variable.major_cooldowns_active|target.time_to_die<=buff.blood_fury.duration
-      if S.BloodFury:IsCastable() and (VarMajorCDsActive or Target:TimeToDie() <= S.BloodFury:BaseDuration()) then
-        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 4"; end
-      end
-      -- berserking,if=variable.major_cooldowns_active|target.time_to_die<=buff.berserking.duration
-      if S.Berserking:IsCastable() and (VarMajorCDsActive or Target:TimeToDie() <= S.Berserking:BaseDuration()) then
-        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 6"; end
-      end
-      -- lights_judgment,if=buff.unholy_strength.up
-      if S.LightsJudgment:IsCastable() and (Player:BuffUp(S.UnholyStrengthBuff)) then
-        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 8"; end
-      end
-      -- ancestral_call,if=variable.major_cooldowns_active|target.time_to_die<=15
-      if S.AncestralCall:IsCastable() and (VarMajorCDsActive or Target:TimeToDie() <= 15) then
-        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD) then return "ancestral_call main 10"; end
-      end
-      -- arcane_pulse,if=active_enemies>=2|(rune.deficit>=5&runic_power.deficit>=60)
-      if S.ArcanePulse:IsCastable() and (EnemiesMeleeCount >= 2 or (Player:Rune() <= 1 and Player:RunicPowerDeficit() >= 60)) then
-        if Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse main 12"; end
-      end
-      -- fireblood,if=variable.major_cooldowns_active|target.time_to_die<=buff.fireblood.duration
-      if S.Fireblood:IsCastable() and (VarMajorCDsActive or Target:TimeToDie() <= S.Fireblood:BaseDuration()) then
-        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 14"; end
-      end
-      -- bag_of_tricks,if=buff.unholy_strength.up&active_enemies=1
-      if S.BagofTricks:IsCastable() and (Player:BuffUp(S.UnholyStrengthBuff) and (EnemiesMeleeCount == 1 or not AoEON())) then
-        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 16"; end
-      end
-    end
     -- outbreak,if=dot.virulent_plague.refreshable&!talent.unholy_blight&!raid_event.adds.exists
     -- Manually added: Use following line's Unholy Blight logic
     if S.Outbreak:IsReady() and (Target:DebuffRefreshable(S.VirulentPlagueDebuff) and (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and not S.UnholyBlight:CooldownUp())) then
       if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak main 18"; end
     end
-    -- outbreak,if=dot.virulent_plague.refreshable&active_enemies>=2&(!talent.unholy_blight|talent.unholy_blight&cooldown.unholy_blight.remains)
-    -- Manually added: Also suggest if there are targets within splash range that don't have VP
+    -- outbreak,target_if=dot.virulent_plague.refreshable&active_enemies>=2&(!talent.unholy_blight|talent.unholy_blight&cooldown.unholy_blight.remains)
+    -- Note: target_if handled via the EnemiesWithoutVP check
     if S.Outbreak:IsReady() and ((Target:DebuffRefreshable(S.VirulentPlagueDebuff) or EnemiesWithoutVP > 0) and EnemiesMeleeCount >= 2 and (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and not S.UnholyBlight:CooldownUp())) then
       if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak main 20"; end
     end
@@ -532,8 +580,14 @@ local function APL()
     if S.Outbreak:IsReady() and (SuperstrainEquipped and (Target:DebuffRefreshable(S.FrostFeverDebuff) or Target:DebuffRefreshable(S.BloodPlagueDebuff))) then
       if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak main 22"; end
     end
+    -- wound_spender,if=covenant.night_fae&death_and_decay.active_remains<(gcd*1.5)&death_and_decay.ticking
+    if WoundSpender:IsReady() and (Player:Covenant() == "Night Fae" and Player:BuffRemains(S.DeathAndDecayBuff) < (Player:GCD() * 1.5) and Player:BuffUp(S.DeathAndDecayBuff)) then
+      if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender main 24"; end
+    end
     -- wait_for_cooldown,name=soul_reaper,if=talent.soul_reaper&target.time_to_pct_35<5&fight_remains>5&cooldown.soul_reaper.remains<(gcd*0.75)&active_enemies=1
-    -- TODO: Potentially add this wait_for_cooldown
+    -- wait_for_cooldown,name=deaths_due,if=covenant.night_fae&cooldown.deaths_due.remains<gcd&active_enemies=1
+    -- wait_for_cooldown,name=defile,if=covenant.night_fae&cooldown.defile.remains<gcd&active_enemies=1
+    -- TODO: Potentially add these wait_for_cooldown lines
     -- call_action_list,name=trinkets
     if (Settings.Commons.Enabled.Trinkets) then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
@@ -541,6 +595,10 @@ local function APL()
     -- call_action_list,name=covenants
     if (true) then
       local ShouldReturn = Covenants(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=racials
+    if (CDsON()) then
+      local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
     end
     -- sequence,if=active_enemies=1&!death_knight.disable_aotd,name=opener:army_of_the_dead:festering_strike:festering_strike:potion:unholy_blight:dark_transformation:apocalypse
     -- TODO: Add sequence
