@@ -1,17 +1,17 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, addonTable = ...;
+local addonName, addonTable = ...
 -- HeroRotation
-local HR = HeroRotation;
+local HR = HeroRotation
 -- HeroLib
-local HL = HeroLib;
+local HL = HeroLib
 --File Locals
-local GUI = HL.GUI;
-local CreateChildPanel = GUI.CreateChildPanel;
-local CreatePanelOption = GUI.CreatePanelOption;
-local CreateARPanelOption = HR.GUI.CreateARPanelOption;
-local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
+local GUI = HL.GUI
+local CreateChildPanel = GUI.CreateChildPanel
+local CreatePanelOption = GUI.CreatePanelOption
+local CreateARPanelOption = HR.GUI.CreateARPanelOption
+local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 
 --- ============================ CONTENT ============================
 -- All settings here should be moved into the GUI someday.
@@ -71,6 +71,7 @@ HR.GUISettings.APL.DeathKnight = {
   },
   Unholy = {
     RaiseDeadCastLeft = false,
+    MainTargetOnlyFester = false,
     DisplayStyle = {
       ArmyoftheDead = "SuggestedRight",
     },
@@ -83,29 +84,30 @@ HR.GUISettings.APL.DeathKnight = {
       UnholyAssault = true,
     }
   },
-};
+}
 
-HR.GUI.LoadSettingsRecursively(HR.GUISettings);
+HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Panels
-local ARPanel = HR.GUI.Panel;
-local CP_Deathknight = CreateChildPanel(ARPanel, "DeathKnight");
-local CP_Unholy = CreateChildPanel(CP_Deathknight, "Unholy");
-local CP_Frost = CreateChildPanel(CP_Deathknight, "Frost");
-local CP_Blood = CreateChildPanel(CP_Deathknight, "Blood");
+local ARPanel = HR.GUI.Panel
+local CP_Deathknight = CreateChildPanel(ARPanel, "DeathKnight")
+local CP_Unholy = CreateChildPanel(CP_Deathknight, "Unholy")
+local CP_Frost = CreateChildPanel(CP_Deathknight, "Frost")
+local CP_Blood = CreateChildPanel(CP_Deathknight, "Blood")
 
 --DeathKnight Panels
-CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDeathStrikeHP", { 1, 100, 1 }, "Use Death Strike on Low HP", "Set the HP threshold to use Death Strike (working only if Solo Mode is enabled).");
-CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDarkSuccorHP", { 1, 100, 1 }, "Use Death Strike to Consume Dark Succor", "Set the HP threshold to use Death Strike to Consume Dark Succor (working only if Solo Mode is enabled).");
-CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons");
+CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDeathStrikeHP", { 1, 100, 1 }, "Use Death Strike on Low HP", "Set the HP threshold to use Death Strike (working only if Solo Mode is enabled).")
+CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDarkSuccorHP", { 1, 100, 1 }, "Use Death Strike to Consume Dark Succor", "Set the HP threshold to use Death Strike to Consume Dark Succor (working only if Solo Mode is enabled).")
+CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons")
 
 --Unholy Panels
-CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.RaiseDeadCastLeft", "Raise Dead in CastLeft", "Enable this to ignore the Raise Dead DisplayStyle option and instead use CastLeft.");
-CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");
+CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.RaiseDeadCastLeft", "Raise Dead in CastLeft", "Enable this to ignore the Raise Dead DisplayStyle option and instead use CastLeft.")
+CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.MainTargetOnlyFester", "Only Festering Strike main target", "Enable this if you want Festering Strike to only be suggested on your current target during AoE situations. NOTE: This diverges from the Simulationcraft APL and may cause a DPS decrease.")
+CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy")
 
 --Frost Panels
-CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.DisableBoSPooling", "Disable BoS Pooling", "Enable this option to bypass the BoS Pooling function.");
-CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost");
+CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.DisableBoSPooling", "Disable BoS Pooling", "Enable this option to bypass the BoS Pooling function.")
+CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost")
 
 --Blood Panels
-CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBlooddrinker", "Pool: Blooddrinker", "Display the 'Pool' icon whenever you're channeling Blooddrinker as long as you shouldn't interrupt it.");
-CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood");
+CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBlooddrinker", "Pool: Blooddrinker", "Display the 'Pool' icon whenever you're channeling Blooddrinker as long as you shouldn't interrupt it.")
+CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood")

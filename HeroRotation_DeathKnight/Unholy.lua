@@ -199,19 +199,13 @@ end
 
 local function AOE_Setup()
   -- any_dnd,if=death_knight.fwounded_targets=active_enemies|raid_event.adds.exists&raid_event.adds.remains<=11
-  if AnyDnD:IsReady() and (S.FesteringWoundDebuff:AuraActiveCount() == EnemiesMeleeCount) then
+  -- any_dnd,if=death_knight.fwounded_targets>=5
+  -- Note: Combined both lines and added condition that only requires current target to have wounds if MainTargetOnlyFester is true
+  if AnyDnD:IsReady() and (S.FesteringWoundDebuff:AuraActiveCount() == EnemiesMeleeCount or S.FesteringWoundDebuff:AuraActiveCount() >= 5 or Settings.Unholy.MainTargetOnlyFester and Target:DebuffUp(S.FesteringWoundDebuff)) then
     if AnyDnD == S.DeathsDue then
       if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Covenant) then return "any_dnd aoe_setup 2"; end
     else
       if Cast(AnyDnD, Settings.Commons.OffGCDasOffGCD.DeathAndDecay) then return "any_dnd aoe_setup 4"; end
-    end
-  end
-  -- any_dnd,if=death_knight.fwounded_targets>=5
-  if AnyDnD:IsReady() and (S.FesteringWoundDebuff:AuraActiveCount() >= 5) then
-    if AnyDnD == S.DeathsDue then
-      if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Covenant) then return "any_dnd aoe_setup 6"; end
-    else
-      if Cast(AnyDnD, Settings.Commons.OffGCDasOffGCD.DeathAndDecay) then return "any_dnd aoe_setup 8"; end
     end
   end
   -- death_coil,if=!variable.pooling_runic_power&(buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3|active_enemies=2)
@@ -222,17 +216,23 @@ local function AOE_Setup()
   if S.Epidemic:IsReady() and (not VarPoolingRunicPower) then
     if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic aoe_setup 12"; end
   end
-  -- festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=3&cooldown.apocalypse.remains<3
-  if S.FesteringStrike:IsReady() then
-    if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrike) then return "festering_strike aoe_setup 14"; end
-  end
-  -- festering_strike,target_if=debuff.festering_wound.stack<1
-  if S.FesteringStrike:IsReady() then
-    if Everyone.CastCycle(S.FesteringStrike, EnemiesMelee, EvaluateCycleFesteringStrike) then return "festering_strike aoe_setup 16"; end
-  end
-  -- festering_strike,target_if=min:debuff.festering_wound.stack,if=rune.time_to_4<(cooldown.death_and_decay.remains&!talent.defile|cooldown.defile.remains&talent.defile)
-  if S.FesteringStrike:IsReady() then
-    if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrike2) then return "festering_strike aoe_setup 16"; end
+  if (Settings.Unholy.MainTargetOnlyFester) then
+    if S.FesteringStrike:IsReady() and (Target:DebuffStack(S.FesteringWoundDebuff) <= 3 and S.Apocalypse:CooldownRemains() < 3 or Target:DebuffDown(S.FesteringWoundDebuff) or Player:RuneTimeToX(4) < AnyDnD:CooldownRemains()) then
+      if Cast(S.FesteringStrike, nil, nil, not Target:IsSpellInRange(S.FesteringStrike)) then return "festering_strike aoe_setup MTOnly"; end
+    end
+  else
+    -- festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=3&cooldown.apocalypse.remains<3
+    if S.FesteringStrike:IsReady() then
+      if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrike) then return "festering_strike aoe_setup 14"; end
+    end
+    -- festering_strike,target_if=debuff.festering_wound.stack<1
+    if S.FesteringStrike:IsReady() then
+      if Everyone.CastCycle(S.FesteringStrike, EnemiesMelee, EvaluateCycleFesteringStrike) then return "festering_strike aoe_setup 16"; end
+    end
+    -- festering_strike,target_if=min:debuff.festering_wound.stack,if=rune.time_to_4<(cooldown.death_and_decay.remains&!talent.defile|cooldown.defile.remains&talent.defile)
+    if S.FesteringStrike:IsReady() then
+      if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrike2) then return "festering_strike aoe_setup 16"; end
+    end
   end
 end
 
@@ -278,13 +278,19 @@ local function AOE_Generic()
   if WoundSpender:IsReady() then
     if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfWoundSpender) then return "wound_spender aoe_generic 6"; end
   end
-  -- festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=3&cooldown.apocalypse.remains<3|debuff.festering_wound.stack<1
-  if S.FesteringStrike:IsReady() then
-    if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrike3) then return "festering_strike aoe_generic 8"; end
-  end
-  -- festering_strike,target_if=min:debuff.festering_wound.stack,if=cooldown.apocalypse.remains>5&debuff.festering_wound.stack<1
-  if S.FesteringStrike:IsReady() then
-    if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrike4) then return "festering_strike aoe_generic 10"; end
+  if (Settings.Unholy.MainTargetOnlyFester) then
+    if S.FesteringStrike:IsReady() and (Target:DebuffStack(S.FesteringWoundDebuff) <= 3 and S.Apocalypse:CooldownRemains() < 3 or Target:DebuffDown(S.FesteringWoundDebuff)) then
+      if Cast(S.FesteringStrike, nil, nil, not Target:IsSpellInRange(S.FesteringStrike)) then return "festering_strike aoe_generic MTOnly"; end
+    end
+  else
+    -- festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=3&cooldown.apocalypse.remains<3|debuff.festering_wound.stack<1
+    if S.FesteringStrike:IsReady() then
+      if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrike3) then return "festering_strike aoe_generic 8"; end
+    end
+    -- festering_strike,target_if=min:debuff.festering_wound.stack,if=cooldown.apocalypse.remains>5&debuff.festering_wound.stack<1
+    if S.FesteringStrike:IsReady() then
+      if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrike4) then return "festering_strike aoe_generic 10"; end
+    end
   end
 end
 
@@ -608,7 +614,7 @@ local function APL()
     end
     if (AoEON()) then
       -- run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile|cooldown.defile.remains<10&talent.defile)&!death_and_decay.ticking
-      if (EnemiesMeleeCount >= 2 and (S.DeathAndDecay:CooldownRemains() < 10 and not S.Defile:IsAvailable() or S.Defile:CooldownRemains() < 10 and S.Defile:IsAvailable()) and Player:BuffDown(S.DeathAndDecayBuff)) then
+      if (EnemiesMeleeCount >= 2 and AnyDnD:CooldownRemains() < 10 and Player:BuffDown(S.DeathAndDecayBuff)) then
         local ShouldReturn = AOE_Setup(); if ShouldReturn then return ShouldReturn; end
       end
       -- run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
@@ -616,7 +622,7 @@ local function APL()
         local ShouldReturn = AOE_Burst(); if ShouldReturn then return ShouldReturn; end
       end
       -- run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile|cooldown.defile.remains>10&talent.defile))
-      if (EnemiesMeleeCount >= 2 and (Player:BuffDown(S.DeathAndDecayBuff) and (S.DeathAndDecay:CooldownRemains() > 10 and not S.Defile:IsAvailable() or S.Defile:CooldownRemains() > 10 and S.Defile:IsAvailable()))) then
+      if (EnemiesMeleeCount >= 2 and Player:BuffDown(S.DeathAndDecayBuff) and AnyDnD:CooldownRemains() > 10) then
         local ShouldReturn = AOE_Generic(); if ShouldReturn then return ShouldReturn; end
       end
     end
