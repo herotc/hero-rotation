@@ -71,7 +71,6 @@ HR.GUISettings.APL.DeathKnight = {
   },
   Unholy = {
     RaiseDeadCastLeft = false,
-    MainTargetOnlyFester = false,
     DisplayStyle = {
       ArmyoftheDead = "SuggestedRight",
     },
@@ -101,7 +100,6 @@ CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons")
 
 --Unholy Panels
 CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.RaiseDeadCastLeft", "Raise Dead in CastLeft", "Enable this to ignore the Raise Dead DisplayStyle option and instead use CastLeft.")
-CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.MainTargetOnlyFester", "Only Festering Strike main target", "Enable this if you want Festering Strike to only be suggested on your current target during AoE situations. NOTE: This diverges from the Simulationcraft APL and may cause a DPS decrease.")
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy")
 
 --Frost Panels
