@@ -39,6 +39,9 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Blood = {
+    RuneTapThreshold = 40,
+    IceboundFortitudeThreshold = 50,
+    VampiricBloodThreshold = 65,
     DisplayStyle = {
       Consumption = "Suggested",
     },
@@ -107,5 +110,8 @@ CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.DisableBoSPool
 CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost")
 
 --Blood Panels
-CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBlooddrinker", "Pool: Blooddrinker", "Display the 'Pool' icon whenever you're channeling Blooddrinker as long as you shouldn't interrupt it.")
+CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBlooddrinker", "Show Pool During Blooddrinker", "Display the 'Pool' icon whenever you're channeling Blooddrinker as long as you shouldn't interrupt it.")
+CreatePanelOption("Slider", CP_Blood, "APL.DeathKnight.Blood.RuneTapThreshold", {5, 100, 5}, "Rune Tap Health Threshold", "Suggest Rune Tap when below this health percentage.")
+CreatePanelOption("Slider", CP_Blood, "APL.DeathKnight.Blood.IceboundFortitudeThreshold", {5, 100, 5}, "Icebound Fortitude Health Threshold", "Suggest Icebound Fortitude when below this health percentage.")
+CreatePanelOption("Slider", CP_Blood, "APL.DeathKnight.Blood.VampiricBloodThreshold", {5, 100, 5}, "Vampiric Blood Health Threshold", "Suggest Vampiric Blood when below this health percentage.")
 CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood")
