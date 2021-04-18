@@ -26,7 +26,7 @@ Spell.DeathKnight.Blood = {
   Asphyxiate                            = Spell(221562),
   BloodBoil                             = Spell(50842),
   DancingRuneWeapon                     = Spell(49028),
-  DeathandDecay                         = Spell(43265),
+  DeathAndDecay                         = Spell(43265),
   DeathsCaress                          = Spell(195292),
   DeathStrike                           = Spell(49998),
   HeartStrike                           = Spell(206930),
@@ -36,6 +36,7 @@ Spell.DeathKnight.Blood = {
   RuneTap                               = Spell(194679),
   SacrificialPact                       = Spell(327574),
   VampiricBlood                         = Spell(55233),
+
   -- Talents
   Blooddrinker                          = Spell(206931),
   BloodTap                              = Spell(221699),
@@ -45,107 +46,123 @@ Spell.DeathKnight.Blood = {
   RapidDecomposition                    = Spell(194662),
   RelishinBlood                         = Spell(317610),
   Tombstone                             = Spell(219809),
+
   -- Covenant Abilities
   AbominationLimb                       = Spell(315443),
   AbominationLimbBuff                   = Spell(315443),
   DeathsDue                             = Spell(324128),
   ShackleTheUnworthy                    = Spell(312202),
   SwarmingMist                          = Spell(311648),
+
   -- Conduit Effects
+
   -- Buffs
   BoneShieldBuff                        = Spell(195181),
   CrimsonScourgeBuff                    = Spell(81141),
   DancingRuneWeaponBuff                 = Spell(81256),
+  DeathAndDecayBuff                     = Spell(188290),
   DeathsDueBuff                         = Spell(324165),
   HemostasisBuff                        = Spell(273947),
   IceboundFortitudeBuff                 = Spell(48792),
   RuneTapBuff                           = Spell(194679),
   UnholyStrengthBuff                    = Spell(53365),
   VampiricBloodBuff                     = Spell(55233),
+
   -- Debuffs
   BloodPlagueDebuff                     = Spell(55078),
+
   -- Racials
-  ArcaneTorrent                         = Spell(50613),
-  BloodFury                             = Spell(20572),
-  Berserking                            = Spell(26297),
-  LightsJudgment                        = Spell(255647),
   AncestralCall                         = Spell(274738),
-  BagofTricks                           = Spell(312411),
   ArcanePulse                           = Spell(260364),
+  ArcaneTorrent                         = Spell(50613),
+  BagofTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  BloodFury                             = Spell(20572),
   Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
+
   -- Interrupts
   MindFreeze                            = Spell(47528),
+
   -- Custom
   Pool                                  = Spell(999910)
 }
 
 Spell.DeathKnight.Frost = {
   -- Abilities
-  RaiseDead                             = Spell(46585),
-  SacrificialPact                       = Spell(327574),
+  ChainsofIce                           = Spell(45524),
   DeathAndDecay                         = Spell(43265),
   DeathStrike                           = Spell(49998),
-  RemorselessWinter                     = Spell(196770),
-  FrostStrike                           = Spell(49143),
-  Obliterate                            = Spell(49020),
-  HowlingBlast                          = Spell(49184),
-  ChainsofIce                           = Spell(45524),
-  FrostwyrmsFury                        = Spell(279302),
   EmpowerRuneWeapon                     = Spell(47568),
+  FrostStrike                           = Spell(49143),
+  FrostwyrmsFury                        = Spell(279302),
+  HowlingBlast                          = Spell(49184),
+  Obliterate                            = Spell(49020),
   PillarofFrost                         = Spell(51271),
+  RaiseDead                             = Spell(46585),
+  RemorselessWinter                     = Spell(196770),
+  SacrificialPact                       = Spell(327574),
+
   -- Talents
-  Avalanche                             = Spell(207142),
   Asphyxiate                            = Spell(108194),
+  Avalanche                             = Spell(207142),
+  BreathofSindragosa                    = Spell(152279),
+  ColdHeart                             = Spell(281208),
+  Frostscythe                           = Spell(207230),
+  FrozenPulse                           = Spell(194909),
   GatheringStorm                        = Spell(194912),
   GlacialAdvance                        = Spell(194913),
-  IcyTalons                             = Spell(194878),
-  Frostscythe                           = Spell(207230),
-  RunicAttenuation                      = Spell(207104),
-  FrozenPulse                           = Spell(194909),
   HornofWinter                          = Spell(57330),
-  ColdHeart                             = Spell(281208),
   HypothermicPresence                   = Spell(321995),
   Icecap                                = Spell(207126),
+  IcyTalons                             = Spell(194878),
   Obliteration                          = Spell(281238),
-  BreathofSindragosa                    = Spell(152279),
+  RunicAttenuation                      = Spell(207104),
+
   -- Covenant Abilities
-  ShackleTheUnworthy                    = Spell(312202),
-  SwarmingMist                          = Spell(311648),
   AbominationLimb                       = Spell(315443),
   DeathsDue                             = Spell(324128),
+  ShackleTheUnworthy                    = Spell(312202),
+  SwarmingMist                          = Spell(311648),
+
   -- Conduit Effects
-  EradicatingBlow                       = Spell(337934),
   BitingCold                            = Spell(337988),
-  UnleashedFrenzy                       = Spell(338492),
+  EradicatingBlow                       = Spell(337934),
   Everfrost                             = Spell(337988),
+  UnleashedFrenzy                       = Spell(338492),
+
   -- Buffs
+  ColdHeartBuff                         = Spell(281209),
   DeathAndDecayBuff                     = Spell(188290),
+  DeathStrikeBuff                       = Spell(101568),
   DeathsDueBuff                         = Spell(324165),
-  RimeBuff                              = Spell(59052),
+  EmpowerRuneWeaponBuff                 = Spell(47568),
+  EradicatingBlowBuff                   = Spell(337936),
+  FrozenPulseBuff                       = Spell(194909),
+  IcyTalonsBuff                         = Spell(194879),
   KillingMachineBuff                    = Spell(51124),
   PillarofFrostBuff                     = Spell(51271),
-  ColdHeartBuff                         = Spell(281209),
-  FrozenPulseBuff                       = Spell(194909),
-  EmpowerRuneWeaponBuff                 = Spell(47568),
-  DeathStrikeBuff                       = Spell(101568),
-  IcyTalonsBuff                         = Spell(194879),
+  RimeBuff                              = Spell(59052),
   UnholyStrengthBuff                    = Spell(53365),
-  EradicatingBlowBuff                   = Spell(337936),
   UnleashedFrenzyBuff                   = Spell(338501),
+
   -- Debuffs
-  RazoriceDebuff                        = Spell(51714),
   FrostFeverDebuff                      = Spell(55095),
+  RazoriceDebuff                        = Spell(51714),
+
   -- Racials
-  ArcaneTorrent                         = Spell(50613),
-  BloodFury                             = Spell(20572),
-  Berserking                            = Spell(26297),
-  ArcanePulse                           = Spell(260364),
-  LightsJudgment                        = Spell(255647),
-  Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
+  ArcanePulse                           = Spell(260364),
+  ArcaneTorrent                         = Spell(50613),
   BagofTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  BloodFury                             = Spell(20572),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
+
   -- Interrupts
   MindFreeze                            = Spell(47528),
+
   -- Custom
   PoolRange                             = Spell(999910)
 }
@@ -183,7 +200,6 @@ Spell.DeathKnight.Unholy = {
   DeathsDue                             = Spell(324128),
   ShackleTheUnworthy                    = Spell(312202),
   SwarmingMist                          = Spell(311648),
-  SwarmingMistBuff                      = Spell(311648),
 
   -- Conduit/Soulbind Effects
   ConvocationOfTheDead                  = Spell(338553),
@@ -195,6 +211,7 @@ Spell.DeathKnight.Unholy = {
   DeathsDueBuff                         = Spell(324165),
   RunicCorruptionBuff                   = Spell(51460),
   SuddenDoomBuff                        = Spell(81340),
+  SwarmingMistBuff                      = Spell(311648),
   UnholyAssaultBuff                     = Spell(207289),
   UnholyStrengthBuff                    = Spell(53365),
 
@@ -206,14 +223,14 @@ Spell.DeathKnight.Unholy = {
   VirulentPlagueDebuff                  = Spell(191587),
 
   -- Racials
-  ArcaneTorrent                         = Spell(50613),
-  BloodFury                             = Spell(20572),
-  Berserking                            = Spell(26297),
-  LightsJudgment                        = Spell(255647),
   AncestralCall                         = Spell(274738),
-  BagofTricks                           = Spell(312411),
   ArcanePulse                           = Spell(260364),
+  ArcaneTorrent                         = Spell(50613),
+  BagofTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  BloodFury                             = Spell(20572),
   Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
 
   -- Interrupts
   MindFreeze                            = Spell(47528),
