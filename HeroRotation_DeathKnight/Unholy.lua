@@ -449,7 +449,7 @@ local function Generic()
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil generic 10"; end
   end
   -- festering_strike,if=covenant.night_fae&cooldown.deaths_due.remains<10&debuff.festering_wound.stack<4&!variable.pooling_runes&(!death_and_decay.ticking|buff.deaths_due.stack=4)
-  if S.FesteringStrike:IsReady() and (Player:Covenant() == "Night Fae" and S.DeathsDue:CooldownRemains() < 10 and Target:DebuffStack(S.FesteringWoundDebuff) < 4 and not VarPoolingRunes and (Player:BuffDown(S.DeathAndDecayBuff) or Player:BuffStack(S.DeathsDue) == 4)) then
+  if S.FesteringStrike:IsReady() and (Player:Covenant() == "Night Fae" and S.DeathsDue:CooldownRemains() < 10 and Target:DebuffStack(S.FesteringWoundDebuff) < 4 and not VarPoolingRunes and (Player:BuffDown(S.DeathAndDecayBuff) or Player:BuffStack(S.DeathsDueBuff) == 4)) then
     if Cast(S.FesteringStrike, nil, nil, not Target:IsSpellInRange(S.FesteringStrike)) then return "festering_strike generic 12"; end
   end
   -- death_coil,if=runic_power.deficit<13|fight_remains<5&!debuff.festering_wound.up

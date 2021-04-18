@@ -226,7 +226,7 @@ local function Aoe()
     if Cast(S.HowlingBlast, nil, nil, not TargetIsInRange[30]) then return "howling_blast aoe 4"; end
   end
   -- obliterate,if=death_and_decay.ticking&covenant.night_fae&buff.deaths_due.stack<4
-  if S.Obliterate:IsCastable() and (Player:BuffUp(S.DeathAndDecayBuff) and Player:Covenant() == "Night Fae" and Player:BuffStack(S.DeathsDue) < 4) then
+  if S.Obliterate:IsCastable() and (Player:BuffUp(S.DeathAndDecayBuff) and Player:Covenant() == "Night Fae" and Player:BuffStack(S.DeathsDueBuff) < 4) then
     if Cast(S.Obliterate, nil, nil, not TargetIsInRange[8]) then return "obliterate aoe 4.5"; end
   end
   -- frostscythe,if=buff.killing_machine.react&(!death_and_decay.ticking&covenant.night_fae|!covenant.night_fae)
@@ -293,11 +293,11 @@ local function BosPooling()
     if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, EvaluateTargetIfFrostStrikeBoSPooling) then return "frost_strike bos 5"; end
   end
   -- frostscythe,if=buff.killing_machine.react&runic_power.deficit>(15+talent.runic_attenuation*3)&spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking|!covenant.night_fae)
-  if S.Frostscythe:IsCastable() and (Player:BuffUp(S.KillingMachineBuff) and Player:RunicPowerDeficit() > (15 + num(S.RunicAttenuation:IsAvailable()) * 3) and EnemiesMeleeCount >= 2 and (Player:BuffStack(S.DeathsDue) == 8 or not Player:BuffUp(S.DeathAndDecayBuff) or not Player:Covenant() == "Night Fae")) then
+  if S.Frostscythe:IsCastable() and (Player:BuffUp(S.KillingMachineBuff) and Player:RunicPowerDeficit() > (15 + num(S.RunicAttenuation:IsAvailable()) * 3) and EnemiesMeleeCount >= 2 and (Player:BuffStack(S.DeathsDueBuff) == 8 or not Player:BuffUp(S.DeathAndDecayBuff) or not Player:Covenant() == "Night Fae")) then
     if Cast(S.Frostscythe, nil, nil, not TargetIsInRange[8]) then return "frostscythe bos 6"; end
   end
   -- frostscythe,if=runic_power.deficit>=(35+talent.runic_attenuation*3)&spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking|!covenant.night_fae)
-  if S.Frostscythe:IsCastable() and (Player:RunicPowerDeficit() >= (35 + num(S.RunicAttenuation:IsAvailable()) * 3) and EnemiesMeleeCount >= 2 and (Player:BuffStack(S.DeathsDue) == 8 or not Player:BuffUp(S.DeathAndDecayBuff) or not Player:Covenant() == "Night Fae")) then
+  if S.Frostscythe:IsCastable() and (Player:RunicPowerDeficit() >= (35 + num(S.RunicAttenuation:IsAvailable()) * 3) and EnemiesMeleeCount >= 2 and (Player:BuffStack(S.DeathsDueBuff) == 8 or not Player:BuffUp(S.DeathAndDecayBuff) or not Player:Covenant() == "Night Fae")) then
     if Cast(S.Frostscythe, nil, nil, not TargetIsInRange[8]) then return "frostscythe bos 7"; end
   end
   -- glacial_advance,if=cooldown.pillar_of_frost.remains>rune.time_to_4&runic_power.deficit<40&spell_targets.glacial_advance>=2
@@ -338,7 +338,7 @@ local function BosTicking()
     if Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornOfWinter) then return "horn_of_winter bos ticking 6"; end
   end
   -- frostscythe,if=spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking|!covenant.night_fae)
-  if S.Frostscythe:IsCastable() and (EnemiesCount10yd >= 2 and (Player:BuffStack(S.DeathsDue) == 8 or not Player:BuffUp(S.DeathAndDecayBuff) or not Player:Covenant() == "Night Fae")) then
+  if S.Frostscythe:IsCastable() and (EnemiesCount10yd >= 2 and (Player:BuffStack(S.DeathsDueBuff) == 8 or not Player:BuffUp(S.DeathAndDecayBuff) or not Player:Covenant() == "Night Fae")) then
     if Cast(S.Frostscythe, nil, nil, not TargetIsInRange[8]) then return "frostscythe bos ticking 7"; end
   end
   -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit>25&rune>3
@@ -572,7 +572,7 @@ local function Obliteration()
     if Cast(S.HowlingBlast, nil, nil, not TargetIsInRange[30]) then return "howling_blast obliteration 2"; end
   end
   -- frostscythe,if=buff.killing_machine.react&spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking|!covenant.night_fae)
-  if S.Frostscythe:IsCastable() and (Player:BuffUp(S.KillingMachineBuff) and EnemiesCount10yd >= 2 and (Player:BuffStack(S.DeathsDue) == 8 or not Player:BuffUp(S.DeathAndDecayBuff) or not Player:Covenant() == "Night Fae")) then
+  if S.Frostscythe:IsCastable() and (Player:BuffUp(S.KillingMachineBuff) and EnemiesCount10yd >= 2 and (Player:BuffStack(S.DeathsDueBuff) == 8 or not Player:BuffUp(S.DeathAndDecayBuff) or not Player:Covenant() == "Night Fae")) then
     if Cast(S.Frostscythe, nil, nil, not TargetIsInRange[8]) then return "frostscythe obliteration 3"; end
   end
   -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=buff.killing_machine.react|!buff.rime.up&spell_targets.howling_blast>=3
@@ -631,7 +631,7 @@ local function Standard()
     if Cast(S.HowlingBlast, nil, nil, not TargetIsInRange[30]) then return "howling_blast standard 5"; end
   end
   -- obliterate,if=!buff.frozen_pulse.up&talent.frozen_pulse|buff.killing_machine.react|death_and_decay.ticking&covenant.night_fae&buff.deaths_due.stack>8|rune.time_to_4<=gcd
-  if S.Obliterate:IsCastable() and (Player:BuffDown(S.FrozenPulseBuff) and S.FrozenPulse:IsAvailable() or Player:BuffUp(S.KillingMachineBuff) or Player:BuffUp(S.DeathAndDecayBuff) and Player:Covenant() == "Night Fae" and Player:BuffStack(S.DeathsDue) > 8 or Player:RuneTimeToX(4) <= Player:GCD()) then
+  if S.Obliterate:IsCastable() and (Player:BuffDown(S.FrozenPulseBuff) and S.FrozenPulse:IsAvailable() or Player:BuffUp(S.KillingMachineBuff) or Player:BuffUp(S.DeathAndDecayBuff) and Player:Covenant() == "Night Fae" and Player:BuffStack(S.DeathsDueBuff) > 8 or Player:RuneTimeToX(4) <= Player:GCD()) then
     if Cast(S.Obliterate, nil, nil, not TargetIsInRange[8]) then return "obliterate standard 6"; end
   end
   -- frost_strike,if=runic_power.deficit<(15+talent.runic_attenuation*3)

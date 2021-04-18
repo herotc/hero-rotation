@@ -56,6 +56,7 @@ Spell.DeathKnight.Blood = {
   BoneShieldBuff                        = Spell(195181),
   CrimsonScourgeBuff                    = Spell(81141),
   DancingRuneWeaponBuff                 = Spell(81256),
+  DeathsDueBuff                         = Spell(324165),
   HemostasisBuff                        = Spell(273947),
   IceboundFortitudeBuff                 = Spell(48792),
   RuneTapBuff                           = Spell(194679),
@@ -119,6 +120,7 @@ Spell.DeathKnight.Frost = {
   Everfrost                             = Spell(337988),
   -- Buffs
   DeathAndDecayBuff                     = Spell(188290),
+  DeathsDueBuff                         = Spell(324165),
   RimeBuff                              = Spell(59052),
   KillingMachineBuff                    = Spell(51124),
   PillarofFrostBuff                     = Spell(51271),
@@ -190,6 +192,7 @@ Spell.DeathKnight.Unholy = {
   -- Buffs
   DeathAndDecayBuff                     = Spell(188290),
   DeathStrikeBuff                       = Spell(101568),
+  DeathsDueBuff                         = Spell(324165),
   RunicCorruptionBuff                   = Spell(51460),
   SuddenDoomBuff                        = Spell(81340),
   UnholyAssaultBuff                     = Spell(207289),
@@ -223,7 +226,7 @@ Spell.DeathKnight.Unholy = {
 if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Blood = {
   -- Potions/Trinkets
-  PotionofUnbridledFury                 = Item(169299),
+  PotionofPhantomFire                   = Item(171349),
   -- "Other On Use"
 }
 
