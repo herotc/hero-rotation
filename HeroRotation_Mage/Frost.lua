@@ -87,8 +87,8 @@ local function Precombat ()
       if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 3"; end
     end
     -- potion
-    if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.UsePotions then
-      if HR.CastSuggested(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 4"; end
+    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.UsePotions then
+      if HR.CastSuggested(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 4"; end
     end
     -- blizzard,if=active_enemies>=2
     --TODO
@@ -105,8 +105,8 @@ end
 
 local function Cooldowns ()
   --potion,if=prev_off_gcd.icy_veins|fight_remains<30
-  if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
-    if HR.CastSuggested(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cd 1"; end
+  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
+    if HR.CastSuggested(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cd 1"; end
   end
   --deathborne
   if S.Deathborne:IsCastable() then

@@ -266,8 +266,8 @@ local function Precombat ()
     if HR.Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 3"; end
   end
   --potion
-  if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.UsePotions then
-    if HR.CastSuggested(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 4"; end
+  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.UsePotions then
+    if HR.CastSuggested(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 4"; end
   end
   --frostbolt,if=!variable.prepull_evo=1&runeforge.disciplinary_command
   if not var_prepull_evo and S.Frostbolt:IsReady() and DisciplinaryCommandEquipped then
@@ -289,8 +289,8 @@ local function SharedCds ()
     if HR.CastSuggested(I.ManaGem) then return "use_mana_gem Shared_cd 1"; end
   end
   --potion,if=buff.arcane_power.up
-  if I.PotionofPhantomFire:IsReady() and Player:BuffUp(S.ArcanePower) and Settings.Commons.Enabled.UsePotions then
-    if HR.CastSuggested(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion Shared_cd 2"; end
+  if I.PotionofSpectralIntellect:IsReady() and Player:BuffUp(S.ArcanePower) and Settings.Commons.Enabled.UsePotions then
+    if HR.CastSuggested(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion Shared_cd 2"; end
   end
   --time_warp,if=runeforge.temporal_warp&buff.exhaustion.up&(cooldown.arcane_power.ready|fight_remains<=40)
   if S.TimeWarp:IsCastable() and Settings.Arcane.UseTemporalWarp and TemporalWarpEquipped and Player:BloodlustExhaustUp() and Player:BloodlustDown() and (S.ArcanePower:CooldownRemains() == 0 or Target:TimeToDie() <= 40) then
@@ -375,8 +375,8 @@ local function Opener ()
     if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power opener 10"; end
   end
   --potion,if=variable.inverted_opener=1&!(runeforge.siphon_storm|runeforge.temporal_warp)
-  if I.PotionofPhantomFire:IsReady() and var_inverted_opener and Settings.Commons.Enabled.UsePotions and (SiphonStormEquipped or TemporalWarpEquipped) then
-    if HR.CastSuggested(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion opener 11"; end
+  if I.PotionofSpectralIntellect:IsReady() and var_inverted_opener and Settings.Commons.Enabled.UsePotions and (SiphonStormEquipped or TemporalWarpEquipped) then
+    if HR.CastSuggested(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion opener 11"; end
   end
   --deathborne,if=buff.rune_of_power.down
   if S.Deathborne:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) then

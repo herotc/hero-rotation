@@ -248,7 +248,7 @@ Spell.Mage.Frost = {
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Arcane = {
   ManaGem                          = Item(36799),
-  PotionofPhantomFire              = Item(171349),
+  PotionofSpectralIntellect        = Item(171273),
 }
 
 Item.Mage.Fire = {
@@ -270,7 +270,7 @@ Item.Mage.Fire = {
 }
 
 Item.Mage.Frost = {
-  PotionofPhantomFire              = Item(171349)
+  PotionofSpectralIntellect        = Item(171273),
 }
 
 -- Variables
