@@ -217,6 +217,7 @@ Spell.Mage.Frost = {
   GlacialSpike                          = Spell(199786), --splash, 8 (with splitting ice)
   GlacialSpikeBuff                      = Spell(199844),
   -- Covenant Abilities
+  CombatMeditation                      = Spell(328266),
   Deathborne                            = Spell(324220),
   DoorofShadows                         = Spell(300728),
   Fleshcraft                            = Spell(324631),

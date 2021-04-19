@@ -1,17 +1,17 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, addonTable = ...;
+local addonName, addonTable = ...
 -- HeroRotation
-local HR = HeroRotation;
+local HR = HeroRotation
 -- HeroLib
-local HL = HeroLib;
+local HL = HeroLib
 -- File Locals
-local GUI = HL.GUI;
-local CreateChildPanel = GUI.CreateChildPanel;
-local CreatePanelOption = GUI.CreatePanelOption;
-local CreateARPanelOption = HR.GUI.CreateARPanelOption;
-local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
+local GUI = HL.GUI
+local CreateChildPanel = GUI.CreateChildPanel
+local CreatePanelOption = GUI.CreatePanelOption
+local CreateARPanelOption = HR.GUI.CreateARPanelOption
+local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 
 --- ============================ CONTENT ============================
 -- All settings here should be moved into the GUI someday.
@@ -41,21 +41,19 @@ HR.GUISettings.APL.Mage = {
     }
   },
   Frost = {
-    MirrorImagesBeforePull = false,
     MovingRotation = false,
+    StayDistance = true,
     UseTemporalWarp = true,
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
       RuneOfPower = true,
       IcyVeins = true,
-      MirrorImage = true,
       FrozenOrb = true,
     },
     -- {Display OffGCD as OffGCD}
     OffGCDasOffGCD = {
       -- Abilities
-      IceFloes = true,
     }
   },
   Fire = {
@@ -100,36 +98,39 @@ HR.GUISettings.APL.Mage = {
       PresenceOfMind = true,
     }
   }
-};
+}
 
-HR.GUI.LoadSettingsRecursively(HR.GUISettings);
+HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 
 -- Child Panels
-local ARPanel = HR.GUI.Panel;
-local CP_Mage = CreateChildPanel(ARPanel, "Mage");
-local CP_Arcane = CreateChildPanel(CP_Mage, "Arcane");
-local CP_Fire = CreateChildPanel(CP_Mage, "Fire");
-local CP_Frost = CreateChildPanel(CP_Mage, "Frost");
+local ARPanel = HR.GUI.Panel
+local CP_Mage = CreateChildPanel(ARPanel, "Mage")
+local CP_Arcane = CreateChildPanel(CP_Mage, "Arcane")
+local CP_Fire = CreateChildPanel(CP_Mage, "Fire")
+local CP_Frost = CreateChildPanel(CP_Mage, "Frost")
 
 -- Controls
 -- Mage
-CreateARPanelOptions(CP_Mage, "APL.Mage.Commons");
+CreateARPanelOptions(CP_Mage, "APL.Mage.Commons")
+
 -- Arcane
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AMSpamRotation", "Use AM spam rotation", "Enable the use of the Arcane Missile Spam rotation.");
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).");
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.StayDistance", "Stay at distance", "Only use Arcane Explosion if in range or on the left icon.");
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MovingRotation", "Disable cast abilities when moving", "Don't show abilities where a ca&st is needed (makes the rotation a bit clunky with small steps).");
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseTemporalWarp", "Suggest Time Warp with Temporal Warp legendary", "Show time warp ability when using the Temporal Warp legendary");
-CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane");
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AMSpamRotation", "Use AM spam rotation", "Enable the use of the Arcane Missile Spam rotation.")
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).")
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.StayDistance", "Stay at distance", "Only use Arcane Explosion if in range or on the left icon.")
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MovingRotation", "Disable cast abilities when moving", "Don't show abilities where a ca&st is needed (makes the rotation a bit clunky with small steps).")
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseTemporalWarp", "Suggest Time Warp with Temporal Warp legendary", "Show time warp ability when using the Temporal Warp legendary")
+CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane")
+
 -- Fire
-CreateARPanelOptions(CP_Fire, "APL.Mage.Fire");
-CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.StayDistance", "Stay at distance", "Only use Arcane Explosion/Dragon's Breath if in range or on the left icon.");
-CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.ShowFireBlastLeft", "Show Fire Blast on left icon while casting", "Show Fire Blast on left icon while casting");
-CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).");
-CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.MovingRotation", "Disable cast abilities when moving", "Don't show abilities where a ca&st is needed (makes the rotation a bit clunky with small steps).");
-CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.UseTemporalWarp", "Suggest Time Warp with Temporal Warp legendary", "Show time warp ability when using the Temporal Warp legendary");
+CreateARPanelOptions(CP_Fire, "APL.Mage.Fire")
+CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.StayDistance", "Stay at distance", "Only use Arcane Explosion/Dragon's Breath if in range or on the left icon.")
+CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.ShowFireBlastLeft", "Show Fire Blast on left icon while casting", "Show Fire Blast on left icon while casting")
+CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).")
+CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.MovingRotation", "Disable cast abilities when moving", "Don't show abilities where a ca&st is needed (makes the rotation a bit clunky with small steps).")
+CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.UseTemporalWarp", "Suggest Time Warp with Temporal Warp legendary", "Show time warp ability when using the Temporal Warp legendary")
+
 -- Frost
-CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).");
-CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.MovingRotation", "Disable cast abilities when moving", "Don't show abilities where a ca&st is needed (makes the rotation a bit clunky with small steps).");
-CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.UseTemporalWarp", "Suggest Time Warp with Temporal Warp legendary", "Show time warp ability when using the Temporal Warp legendary");
-CreateARPanelOptions(CP_Frost, "APL.Mage.Frost");
+CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.StayDistance", "Stay at distance", "Only use Arcane Explosion if in range. If out of range, display it on the left icon.")
+CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.UseTemporalWarp", "Suggest Time Warp with Temporal Warp legendary", "Show time warp ability when using the Temporal Warp legendary")
+CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.MovingRotation", "Disable non-instant casts while moving", "Don't show abilities where a cast is needed (makes the rotation a bit clunky with small steps).")
+CreateARPanelOptions(CP_Frost, "APL.Mage.Frost")
