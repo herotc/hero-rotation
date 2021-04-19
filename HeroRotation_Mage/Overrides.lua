@@ -203,6 +203,8 @@ FrostOldSpellIsCastable = HL.AddCoreOverride("Spell.IsCastable",
         return BaseCheck and not Pet:IsActive()
       elseif self == SpellFrost.RuneofPower then
         return BaseCheck and not Player:IsCasting(self) and Player:BuffDown(SpellFrost.RuneofPowerBuff)
+      elseif self == SpellFrost.MirrorsofTorment then
+        return BaseCheck and not Player:IsCasting(self)
       else
         return BaseCheck
       end
