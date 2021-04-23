@@ -397,7 +397,7 @@ local function Main()
   end
   -- shadow_crash,if=raid_event.adds.in>10
   if S.ShadowCrash:IsCastable() then
-    if Cast(S.ShadowCrash, nil, nil, not Target:IsInRange(40)) then return "shadow_crash 114"; end
+    if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash 114"; end
   end
   -- mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff&buff.dark_thought.up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
   if S.MindSear:IsCastable() and (EnemiesCount10ySplash > VarMindSearCutoff and Player:BuffUp(S.DarkThoughtBuff)) then

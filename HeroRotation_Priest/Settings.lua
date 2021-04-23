@@ -43,6 +43,7 @@ HR.GUISettings.APL.Priest = {
     GCDasOffGCD = {
       -- Abilities
       Mindbender = true,
+      ShadowCrash = false,
       Shadowform = true,
       ShadowWordDeath = false,
       VoidEruption = true,
