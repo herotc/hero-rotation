@@ -387,7 +387,7 @@ local function Covenants()
     if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 12"; end
   end
   -- shackle_the_unworthy,if=active_enemies>=2&(death_and_decay.ticking|raid_event.adds.remains<=14)
-  if S.ShackleTheUnworthy:IsCastable() and (EnemiesMeleeCount >= 2 and (Player:BuffUp(S.DeathAndDecayBuff) or Enemies10ySplashCount > 1 and AddsFightRemains(Enemies10ySplashCount) <= 14)) then
+  if S.ShackleTheUnworthy:IsCastable() and (EnemiesMeleeCount >= 2 and (Player:BuffUp(S.DeathAndDecayBuff) or Enemies10ySplashCount > 1 and AddsFightRemains(Enemies10ySplash) <= 14)) then
     if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 14"; end
   end
 end
