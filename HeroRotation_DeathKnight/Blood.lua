@@ -234,7 +234,8 @@ local function Covenants()
     if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DeathsDue)) then return "deaths_due covenants 6"; end
   end
   -- sacrificial_pact,if=(!covenant.night_fae|buff.deaths_due.remains>6)&!buff.dancing_rune_weapon.up&(pet.ghoul.remains<10|target.time_to_die<gcd)
-  if ghoul.active() and S.SacrificialPact:IsReady() and ((Player:Covenant() ~= "Night Fae" or Player:BuffRemains(S.DeathsDueBuff) > 6) and Player:BuffDown(S.DancingRuneWeaponBuff) and (ghoul.remains() < 10 or Target:TimeToDie() < Player:GCD())) then
+  -- Note: Manually changed target.time_to_die to fight_remains to stop suggesting when one mob in a pack is about to die.
+  if ghoul.active() and S.SacrificialPact:IsReady() and ((Player:Covenant() ~= "Night Fae" or Player:BuffRemains(S.DeathsDueBuff) > 6) and Player:BuffDown(S.DancingRuneWeaponBuff) and (ghoul.remains() < 10 or HL.FilteredFightRemains(Enemies10y, "<", Player:GCD()))) then
     if Cast(S.SacrificialPact, Settings.Commons.OffGCDasOffGCD.SacrificialPact) then return "sacrificial_pact covenants 8"; end
   end
   -- death_strike,if=covenant.venthyr&runic_power>70&cooldown.swarming_mist.remains<3
