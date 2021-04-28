@@ -48,7 +48,8 @@ HR.GUISettings.APL.Shaman = {
       Ascendance = true,
       CrashLightning = false,
       FeralSpirit = true,
-      Shield = false
+      Shield = false,
+      WindfuryTotem = false
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {

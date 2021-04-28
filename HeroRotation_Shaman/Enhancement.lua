@@ -125,8 +125,8 @@ local function Precombat()
     if Cast(S.Stormkeeper) then return "Stormkeeper precombat"; end
   end
   -- windfury_totem,if=!runeforge.doom_winds.equipped
-  if S.WindfuryTotem:IsReady() and (not DoomWindsEquipped and (Player:BuffDown(S.WindfuryTotemBuff) or S.WindfuryTotem:TimeSinceLastCast() > 90)) then
-    if Cast(S.WindfuryTotem) then return "windfury_totem precombat"; end
+  if S.WindfuryTotem:IsReady() and (not DoomWindsEquipped and (Player:BuffDown(S.WindfuryTotemBuff, true) or S.WindfuryTotem:TimeSinceLastCast() > 90)) then
+    if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "windfury_totem precombat"; end
   end
   -- potion
   if I.PotionofSpectralAgility:IsReady() and Settings.Commons.Enabled.Potions then
@@ -246,8 +246,8 @@ local function Single()
     if Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental single 56"; end
   end
   -- windfury_totem,if=buff.windfury_totem.remains<30
-  if S.WindfuryTotem:IsReady() and (Player:BuffDown(S.WindfuryTotemBuff) or S.WindfuryTotem:TimeSinceLastCast() > 90) then
-    if Cast(S.WindfuryTotem) then return "windfury_totem single 58"; end
+  if S.WindfuryTotem:IsReady() and (Player:BuffDown(S.WindfuryTotemBuff, true) or S.WindfuryTotem:TimeSinceLastCast() > 90) then
+    if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "windfury_totem single 58"; end
   end
 end
 
@@ -377,8 +377,8 @@ local function Aoe()
     if Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental aoe 62"; end
   end
   -- windfury_totem,if=buff.windfury_totem.remains<30
-  if S.WindfuryTotem:IsReady() and (Player:BuffDown(S.WindfuryTotemBuff) or S.WindfuryTotem:TimeSinceLastCast() > 90) then
-    if Cast(S.WindfuryTotem) then return "windfury_totem aoe 64"; end
+  if S.WindfuryTotem:IsReady() and (Player:BuffDown(S.WindfuryTotemBuff, true) or S.WindfuryTotem:TimeSinceLastCast() > 90) then
+    if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "windfury_totem aoe 64"; end
   end
 end
 
@@ -469,7 +469,7 @@ local function APL()
     -- windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down&(raid_event.adds.in>=60|active_enemies>1)
     -- Note: Added TimeSinceLastCast, as DoomWindsBuff has an internal CD of 60s
     if S.WindfuryTotem:IsReady() and (DoomWindsEquipped and Player:BuffDown(S.DoomWindsBuff) and S.WindfuryTotem:TimeSinceLastCast() > 60) then
-      if Cast(S.WindfuryTotem) then return "windfury_totem default 12"; end
+      if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "windfury_totem default 12"; end
     end
     -- call_action_list,name=single,if=active_enemies=1
     if MeleeEnemies10yCount == 1 then
