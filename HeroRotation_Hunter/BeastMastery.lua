@@ -105,7 +105,7 @@ end
 
 -- if=target.time_to_die<9
 local function EvaluateBarbedShotCycleCondition3(ThisUnit)
-  return ThisUnit:TimeToDie() < 9
+  return ThisUnit:TimeToDie() < 9 and S.Bloodletting:ConduitEnabled()
 end
 
 --- ======= ACTION LISTS =======
@@ -265,7 +265,7 @@ local function Cleave()
   if S.DireBeast:IsReady() then
     if Cast(S.DireBeast, nil, nil, not TargetInRange40y) then return "Dire Beast (Cleave)"; end
   end
-  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=target.time_to_die<9
+  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=target.time_to_die<9|charges_fractional>1.2&conduit.bloodletting
   if S.BarbedShot:IsCastable() then
     if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateBarbedShotCycleTargetIfCondition, EvaluateBarbedShotCycleCondition3) then return "Barbed Shot (Cleave - 3)"; end
     if EvaluateBarbedShotCycleCondition3(Target) then
@@ -339,8 +339,8 @@ local function ST()
   if CDsON() and S.ResonatingArrow:IsCastable() and (Player:BuffUp(S.BestialWrathBuff) or Target:TimeToDie() < 10) then
     if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant) then return "resonating_arrow st"; end
   end
-  -- bestial_wrath,if=cooldown.wild_spirits.remains>15|!covenant.night_fae|target.time_to_die<15
-  if CDsON() and S.BestialWrath:IsCastable() and (not S.WildSpirits:IsAvailable() or S.WildSpirits:CooldownRemains() > 15 or Target:TimeToDie() < 15) then
+  -- bestial_wrath,if=cooldown.wild_spirits.remains>15|covenant.kyrian&(cooldown.resonating_arrow.remains<5|cooldown.resonating_arrow.remains>20)|target.time_to_die<15|(!covenant.night_fae&!covenant.kyrian)
+  if CDsON() and S.BestialWrath:IsCastable() and (not S.WildSpirits:IsAvailable() or S.WildSpirits:CooldownRemains() > 15 or Player:Covenant() == "Kyrian" and (S.ResonatingArrow:CooldownRemains() < 5 or S.ResonatingArrow:CooldownRemains() > 20) or Target:TimeToDie() < 15 or (Player:Covenant() ~= "Night Fae" and Player:Covenant() ~= "Kyrian")) then
     if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "Bestial Wrath (ST)"; end
   end
   -- chimaera_shot
@@ -367,8 +367,8 @@ local function ST()
     or Target:TimeToDie() < 3) then
     if Cast(S.CobraShot, nil, nil, not TargetInRange40y) then return "Cobra Shot (ST)"; end
   end
-  -- barbed_shot,if=buff.wild_spirits.up
-  if S.BarbedShot:IsCastable() and Player:BuffUp(S.WildSpiritsBuff) then
+  -- barbed_shot,if=buff.wild_spirits.up|charges_fractional>1.2&conduit.bloodletting
+  if S.BarbedShot:IsCastable() and (Player:BuffUp(S.WildSpiritsBuff) or S.BarbedShot:ChargesFractional() > 1.2 and S.Bloodletting:ConduitEnabled()) then
     if Cast(S.BarbedShot, nil, nil, not TargetInRange40y) then return "Barbed Shot (ST - 3)"; end
   end
   -- arcane_pulse,if=buff.bestial_wrath.down|target.time_to_die<5
