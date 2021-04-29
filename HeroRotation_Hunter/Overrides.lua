@@ -1,21 +1,21 @@
 --- ============================ HEADER ============================
   -- HeroLib
-  local HL      = HeroLib;
-  local Cache   = HeroCache;
-  local Unit    = HL.Unit;
-  local Player  = Unit.Player;
-  local Pet     = Unit.Pet;
-  local Target  = Unit.Target;
-  local Spell   = HL.Spell;
-  local Item    = HL.Item;
+  local HL      = HeroLib
+  local Cache   = HeroCache
+  local Unit    = HL.Unit
+  local Player  = Unit.Player
+  local Pet     = Unit.Pet
+  local Target  = Unit.Target
+  local Spell   = HL.Spell
+  local Item    = HL.Item
 -- HeroRotation
-  local HR      = HeroRotation;
+  local HR      = HeroRotation
 -- Spells
-  local SpellBM = Spell.Hunter.BeastMastery;
-  local SpellMM = Spell.Hunter.Marksmanship;
-  local SpellSV = Spell.Hunter.Survival;
+  local SpellBM = Spell.Hunter.BeastMastery
+  local SpellMM = Spell.Hunter.Marksmanship
+  local SpellSV = Spell.Hunter.Survival
 -- Lua
-  local mathmax = math.max;
+  local mathmax = math.max
 
 --- ============================ CONTENT ============================
 -- Beast Mastery, ID: 253
@@ -29,7 +29,7 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     return BaseCheck
   end
 end
-, 253);
+, 253)
 
 local BMPetBuffRemains
 BMPetBuffRemains = HL.AddCoreOverride ("Pet.BuffRemains",
@@ -50,7 +50,7 @@ function (self, Spell, AnyCaster, Offset)
   end
   return BaseCheck
 end
-, 253);
+, 253)
 
 -- Marksmanship, ID: 254
 local OldMMIsCastable
@@ -63,7 +63,7 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     return BaseCheck
   end
 end
-, 254);
+, 254)
 
 local OldMMIsReady
 OldMMIsReady = HL.AddCoreOverride("Spell.IsReady",
@@ -79,7 +79,33 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     return BaseCheck
   end
 end
-, 254);
+, 254)
+
+local OldMMBuffRemains
+OldMMBuffRemains = HL.AddCoreOverride("Player.BuffRemains",
+  function(self, Spell, AnyCaster, Offset)
+    if Spell == SpellMM.TrickShotsBuff and (Player:IsCasting(SpellMM.AimedShot) or Player:IsChanneling(SpellMM.RapidFire)) then
+      return 0
+    else
+      return OldMMBuffRemains(self, Spell, AnyCaster, Offset)
+    end
+  end
+, 254)
+
+HL.AddCoreOverride("Player.FocusP",
+  function()
+    local Focus = Player:Focus()
+    if not Player:IsCasting() then
+      return Focus
+    else
+      if Player:IsCasting(SpellMM.SteadyShot) then
+        return Focus + 10
+      elseif Player:IsCasting(SpellMM.AimedShot) then
+        return Focus - 35
+      end
+    end
+  end
+, 254)
 
 -- Survival, ID: 255
 local OldSVIsCastable
@@ -100,7 +126,7 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     end
   end
 end
-, 255);
+, 255)
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP",
