@@ -25,6 +25,7 @@ HR.GUISettings.APL.DemonHunter = {
       Potions = "Suggested",
       Covenant = "Suggested",
       Trinkets = "Suggested",
+      FelRush = "Suggested",
       Metamorphosis = "Suggested",
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
