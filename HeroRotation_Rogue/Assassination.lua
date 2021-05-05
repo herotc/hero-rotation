@@ -692,7 +692,7 @@ local function APL ()
   else
     Enemies30y = {}
     MeleeEnemies10y = {}
-    MeleeEnemies10yCount = 0
+    MeleeEnemies10yCount = 1
     MeleeEnemies5y = {}
   end
 
