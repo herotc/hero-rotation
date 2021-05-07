@@ -66,7 +66,7 @@ local FeralOldSpellIsCastable
 FeralOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local BaseCheck = FeralOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    if self == SpellFeral.CatForm then
+    if self == SpellFeral.CatForm or self == SpellFeral.MoonkinForm then
       return BaseCheck and Player:BuffDown(self)
     elseif self == SpellFeral.Prowl then
       return BaseCheck and self:IsUsable()

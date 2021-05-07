@@ -125,6 +125,8 @@ Spell.Druid.Feral = {
   BloodtalonsBuff                       = Spell(145152),
   BrutalSlash                           = Spell(202028),
   FeralFrenzy                           = Spell(274837),
+  HeartoftheWild                        = Spell(319454),
+  HeartoftheWildBuff                    = Spell(108291),
   Incarnation                           = Spell(102543),
   LunarInspiration                      = Spell(155580),
   MightyBash                            = Spell(5211),
@@ -133,6 +135,12 @@ Spell.Druid.Feral = {
   Sabertooth                            = Spell(202031),
   SavageRoar                            = Spell(52610),
   WildCharge                            = Spell(49376),
+
+  -- Owlweaving Abilities
+  MoonfireOwl                           = Spell(8921),
+  MoonkinForm                           = Spell(197625),
+  Starsurge                             = Spell(197626),
+  Sunfire                               = Spell(197630),
 
   -- Covenant Abilities
   AdaptiveSwarm                         = Spell(325727),

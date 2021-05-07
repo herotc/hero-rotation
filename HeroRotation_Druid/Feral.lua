@@ -297,11 +297,28 @@ local function Precombat()
 end
 
 local function Owlweave()
-  -- starsurge,if=buff.heart_of_the_wild.up
-  -- sunfire,line_cd=4*gcd
-  -- moonfire,line_cd=4*gcd,if=buff.moonkin_form.up&(runeforge.cateye_curio|runeforge.draught_of_deep_focus)&spell_targets.thrash_cat<2&!talent.lunar_inspiration.enabled
+  if (Player:BuffUp(S.MoonkinForm)) then
+    -- starsurge,if=buff.heart_of_the_wild.up
+    if S.Starsurge:IsReady() and (Player:BuffUp(S.HeartoftheWildBuff)) then
+      if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge owlweave 2"; end
+    end
+    -- sunfire,line_cd=4*gcd
+    if S.Sunfire:IsReady() and (S.Sunfire:TimeSinceLastCast() > 4 * Player:GCD()) then
+      if Cast(S.Sunfire, nil, nil, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire owlweave 4"; end
+    end
+    -- moonfire,line_cd=4*gcd,if=buff.moonkin_form.up&(runeforge.cateye_curio|runeforge.draught_of_deep_focus)&spell_targets.thrash_cat<2&!talent.lunar_inspiration.enabled
+    if S.Moonfire:IsReady() and S.Moonfire:TimeSinceLastCast() > 4 * Player:GCD() and ((CateyeCurioEquipped or DeepFocusEquipped) and EnemiesCount8y < 2 and not S.LunarInspiration:IsAvailable()) then
+      if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire owlweave 6"; end
+    end
+  end
   -- heart_of_the_wild,if=energy<30&dot.rip.remains>4.5&(cooldown.tigers_fury.remains>=6.5|runeforge.cateye_curio)&buff.clearcasting.stack<1&!buff.apex_predators_craving.up&!buff.bloodlust.up&!buff.bs_inc.up&(cooldown.convoke_the_spirits.remains>6.5|!covenant.night_fae)&(!covenant.necrolord|cooldown.adaptive_swarm.remains>=5|dot.adaptive_swarm_damage.remains>7)
+  if S.HeartoftheWild:IsCastable() and (Player:Energy() < 30 and Target:DebuffRemains(S.RipDebuff) > 4.5 and (S.TigersFury:CooldownRemains() >= 6.5 or CateyeCurioEquipped) and Player:BuffDown(S.Clearcasting) and Player:BuffDown(S.ApexPredatorsCravingBuff) and Player:BloodlustDown() and Player:BuffDown(BsInc) and (S.ConvoketheSpirits:CooldownRemains() > 6.5 or Player:Covenant() ~= "Night Fae") and (Player:Covenant() ~= "Necrolord" or S.AdaptiveSwarm:CooldownRemains() >= 5 or Target:DebuffRemains(S.AdaptiveSwarmDebuff) > 7)) then
+    if Cast(S.HeartoftheWild) then return "heart_of_the_wild owlweave 8"; end
+  end
   -- moonkin_form,if=energy<30&dot.rip.remains>4.5&(cooldown.tigers_fury.remains>=4.5|runeforge.cateye_curio)&buff.clearcasting.stack<1&!buff.apex_predators_craving.up&!buff.bloodlust.up&!buff.bs_inc.up&(cooldown.convoke_the_spirits.remains>6.5|!covenant.night_fae)&(!covenant.necrolord|cooldown.adaptive_swarm.remains>=5|dot.adaptive_swarm_damage.remains>7)
+  if S.MoonkinForm:IsCastable() and (Player:Energy() < 30 and Target:DebuffRemains(S.RipDebuff) > 4.5 and (S.TigersFury:CooldownRemains() >= 4.5 or CateyeCurioEquipped) and Player:BuffDown(S.Clearcasting) and Player:BuffDown(S.ApexPredatorsCravingBuff) and Player:BloodlustDown() and Player:BuffDown(BsInc) and (S.ConvoketheSpirits:CooldownRemains() > 6.5 or Player:Covenant() ~= "Night Fae") and (Player:Covenant() ~= "Necrolord" or S.AdaptiveSwarm:CooldownRemains() >= 5 or Target:DebuffRemains(S.AdaptiveSwarmDebuff) > 7)) then
+    if Cast(S.MoonkinForm) then return "moonkin_form owlweave 10"; end
+  end
 end
 
 local function Stealth()
@@ -516,7 +533,7 @@ local function APL()
 
   if Everyone.TargetIsValid() then
     -- call_action_list,name=owlweave,if=druid.owlweave_cat
-    if (Settings.Feral.UseOwleave and S.BalanceAffinity:IsAvailable()) then
+    if (Settings.Feral.UseOwlweave and S.BalanceAffinity:IsAvailable()) then
       local ShouldReturn = Owlweave(); if ShouldReturn then return ShouldReturn; end
     end
     -- prowl
