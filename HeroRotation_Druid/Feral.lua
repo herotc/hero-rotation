@@ -102,8 +102,7 @@ local function ComputeRakePMultiplier()
   return Player:StealthUp(true, true) and 1.6 or 1
 end
 S.Rip:RegisterPMultiplier({S.BloodtalonsBuff, 1.2}, {S.SavageRoar, 1.15}, {S.TigersFury, 1.15})
-S.Rake:RegisterPMultiplier(ComputeRakePMultiplier)
-S.RakeDebuff:RegisterPMultiplier(ComputeRakePMultiplier)
+S.Rake:RegisterPMultiplier(S.RakeDebuff, ComputeRakePMultiplier)
 
 local function SwipeBleedMult()
   return (Target:DebuffUp(S.RipDebuff) or Target:DebuffUp(S.RakeDebuff) or Target:DebuffUp(S.ThrashCatDebuff)) and 1.2 or 1;
@@ -586,9 +585,7 @@ local function APL()
     end
     -- pool_resource,for_next=1
     -- rake,target_if=(refreshable|persistent_multiplier>dot.rake.pmultiplier)&druid.rake.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2
-    -- TODO: Fix PMultiplier
-    if S.Rake:IsCastable() and ((Target:DebuffRefreshable(S.RakeDebuff)) and TicksGainedOnRefresh(S.RakeDebuff) > EnemiesCount8y * 2 - 2) then
-      --HR.Print(Player:PMultiplier(S.Rake).." - "..Target:PMultiplier(S.Rake).." - "..Target:PMultiplier(S.RakeDebuff))
+    if S.Rake:IsCastable() and ((Target:DebuffRefreshable(S.RakeDebuff) or Player:PMultiplier(S.Rake) > Target:PMultiplier(S.Rake)) and TicksGainedOnRefresh(S.RakeDebuff) > EnemiesCount8y * 2 - 2) then
       if Player:Energy() >= 35 then
         if Cast(S.Rake, nil, nil, not Target:IsInRange(MeleeRange)) then return "rake target main 14"; end
       else
