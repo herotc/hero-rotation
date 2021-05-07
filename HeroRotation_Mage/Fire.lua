@@ -473,8 +473,8 @@ local function CombustionPhase()
   -- variable,use_off_gcd=1,use_while_casting=1,name=expected_fire_blasts,value=action.fire_blast.charges_fractional+(variable.extended_combustion_remains-buff.infernal_cascade.duration)%cooldown.fire_blast.duration,if=conduit.infernal_cascade
   -- variable,use_off_gcd=1,use_while_casting=1,name=needed_fire_blasts,value=ceil(variable.extended_combustion_remains%(buff.infernal_cascade.duration-gcd.max)),if=conduit.infernal_cascade
   if S.InfernalCascade:ConduitEnabled() then
-    var_expected_fire_blasts = S.FireBlast:ChargesFractional() + (var_extended_combustion_remains - S.InfernalCascadeBuff:BaseDuration()) % S.FireBlast:Cooldown()
-    var_needed_fire_blasts = ceil(var_extended_combustion_remains % (S.InfernalCascadeBuff:BaseDuration() - Player:GCD()))
+    var_expected_fire_blasts = S.FireBlast:ChargesFractional() + (var_extended_combustion_remains - S.InfernalCascadeBuff:BaseDuration()) / S.FireBlast:Cooldown()
+    var_needed_fire_blasts = ceil(var_extended_combustion_remains / (S.InfernalCascadeBuff:BaseDuration() - Player:GCD()))
   else
     var_expected_fire_blasts = 0
     var_needed_fire_blasts = 0
@@ -777,7 +777,7 @@ local function APL()
     end
     -- variable,use_off_gcd=1,use_while_casting=1,name=fire_blast_pooling,value=action.fire_blast.charges_fractional+(variable.time_to_combustion+action.shifting_power.full_reduction*variable.shifting_power_before_combustion)%cooldown.fire_blast.duration-1<cooldown.fire_blast.max_charges+variable.overpool_fire_blasts%cooldown.fire_blast.duration-(buff.combustion.duration%cooldown.fire_blast.duration)%%1&variable.time_to_combustion<fight_remains
     -- Note: Manually moved here from lower in the APL
-    if (not var_disable_combustion) and (S.FireBlast:ChargesFractional() + (var_time_to_combustion + S.ShiftingPower:FullReduction() * num(var_shifting_power_before_combustion)) % S.FireBlast:Cooldown() - 1 < S.FireBlast:FullRechargeTime() + var_overpool_fire_blasts % S.FireBlast:Cooldown() - (10 % S.FireBlast:Cooldown()) % 1 and var_time_to_combustion < fightRemains) then
+    if (not var_disable_combustion) and (S.FireBlast:ChargesFractional() + (var_time_to_combustion + S.ShiftingPower:FullReduction() * num(var_shifting_power_before_combustion)) / S.FireBlast:Cooldown() - 1 < S.FireBlast:FullRechargeTime() + var_overpool_fire_blasts / S.FireBlast:Cooldown() - (10 / S.FireBlast:Cooldown()) % 1 and var_time_to_combustion < fightRemains) then
       var_fire_blast_pooling = true
     else
       var_fire_blast_pooling = false

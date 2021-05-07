@@ -111,7 +111,7 @@ end
 
 -- Target_if
 local function EvaluateTargetIfRazoriceStacks(TargetUnit)
-  return ((TargetUnit:DebuffStack(S.RazoriceDebuff) + 1) % (TargetUnit:DebuffRemains(S.RazoriceDebuff) + 1))
+  return ((TargetUnit:DebuffStack(S.RazoriceDebuff) + 1) / (TargetUnit:DebuffRemains(S.RazoriceDebuff) + 1))
 end
 
 -- Standard
