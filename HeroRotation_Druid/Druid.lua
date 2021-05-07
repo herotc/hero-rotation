@@ -91,6 +91,74 @@ Spell.Druid.Balance = {
   Pool                                  = Spell(999910)
 }
 
+Spell.Druid.Feral = {
+  -- Racials
+  Berserking                            = Spell(26297),
+  Shadowmeld                            = Spell(58984),
+
+  -- Abilties
+  Barkskin                              = Spell(22812),
+  Berserk                               = Spell(106951),
+  CatForm                               = Spell(768),
+  Clearcasting                          = Spell(135700),
+  FerociousBite                         = Spell(22568),
+  Maim                                  = Spell(22570),
+  Moonfire                              = Spell(155625),
+  MoonfireDebuff                        = Spell(155625),
+  Prowl                                 = Spell(5215),
+  Rake                                  = Spell(1822),
+  RakeDebuff                            = Spell(155722),
+  Rip                                   = Spell(1079),
+  RipDebuff                             = Spell(1079),
+  Shred                                 = Spell(5221),
+  SkullBash                             = Spell(106839),
+  SouloftheForest                       = Spell(158476),
+  SurvivalInstincts                     = Spell(61336),
+  Swipe                                 = Spell(106785),
+  Thrash                                = Spell(106830),
+  ThrashDebuff                          = Spell(106830),
+  TigersFury                            = Spell(5217),
+
+  -- Talents
+  BalanceAffinity                       = Spell(197488),
+  Bloodtalons                           = Spell(319439),
+  BloodtalonsBuff                       = Spell(145152),
+  BrutalSlash                           = Spell(202028),
+  FeralFrenzy                           = Spell(274837),
+  Incarnation                           = Spell(102543),
+  LunarInspiration                      = Spell(155580),
+  MightyBash                            = Spell(5211),
+  Predator                              = Spell(202021),
+  PrimalWrath                           = Spell(285381),
+  Sabertooth                            = Spell(202031),
+  SavageRoar                            = Spell(52610),
+  WildCharge                            = Spell(49376),
+
+  -- Covenant Abilities
+  AdaptiveSwarm                         = Spell(325727),
+  AdaptiveSwarmDebuff                   = Spell(325733),
+  AdaptiveSwarmHeal                     = Spell(325748),
+  ConvoketheSpirits                     = Spell(323764),
+  EmpowerBond                           = Spell(326647),
+  KindredSpirits                        = Spell(326434),
+  KindredEmpowermentEnergizeBuff        = Spell(327022),
+  RavenousFrenzy                        = Spell(323546),
+  RavenousFrenzyBuff                    = Spell(323546),
+
+  -- Conduit Effects
+  DeepAllegiance                        = Spell(341378),
+  SuddenAmbushBuff                      = Spell(340698),
+  TasteForBlood                         = Spell(340682),
+
+  -- Legendary Effects
+  ApexPredatorsCravingBuff              = Spell(339140),
+
+  -- Item Effects
+
+  -- Custom
+  Pool                                  = Spell(999910)
+}
+
 Spell.Druid.Guardian = {
   -- Racials
   Berserking                            = Spell(26297),
@@ -154,6 +222,10 @@ Item.Druid.Balance = {
   InscrutableQuantumDevice              = Item(179350),
   SoullettingRuby                       = Item(178809)
   -- Other "On-Use"
+}
+
+Item.Druid.Feral = {
+  PotionofSpectralAgility               = Item(171270)
 }
 
 Item.Druid.Guardian = {

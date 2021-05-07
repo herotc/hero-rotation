@@ -55,6 +55,18 @@ HR.GUISettings.APL.Druid = {
       Barkskin = true,
     }
   },
+  Feral = {
+    FillerSpell = "Shred",
+    ShowCatFormOOC = false,
+    UseOwlweave = false,
+    GCDasOffGCD = {
+      BsInc = true,
+    },
+    OffGCDasOffGCD = {
+      SkullBash = true,
+      TigersFury = true,
+    }
+  },
   Guardian = {
     UseRageDefensively = true,
     BarkskinHP = 50,
@@ -81,6 +93,7 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 local ARPanel = HR.GUI.Panel
 local CP_Druid = CreateChildPanel(ARPanel, "Druid")
 local CP_Balance = CreateChildPanel(CP_Druid, "Balance")
+local CP_Feral = CreateChildPanel(CP_Druid, "Feral")
 local CP_Guardian = CreateChildPanel(CP_Druid, "Guardian")
 
 -- Druid
@@ -91,6 +104,12 @@ CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.BarkskinHP", {0, 100,
 CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.")
 CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMoonkinFormOOC", "Show Moonkin Form Out of Combat", "Enable this if you want the addon to show you the Moonkin Form reminder out of combat.")
 CreateARPanelOptions(CP_Balance, "APL.Druid.Balance")
+
+-- Feral
+CreatePanelOption("Dropdown", CP_Feral, "APL.Druid.Feral.FillerSpell", {"Shred", "Rake Non-Snapshot", "Rake Snapshot", "Moonfire", "Swipe"}, "Preferred Filler Spell", "Select which spell to use as your filler spell. It is suggested to leave this on Shred.")
+CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.ShowCatFormOOC", "Show Cat Form Out of Combat", "Enable this if you want the addon to show you the Cat Form reminder out of combat.")
+CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.UseOwlweave", "Utilize Owleaving", "Enable this if you want Owlweaving spell suggestions when talented into Balance Affinity.")
+CreateARPanelOptions(CP_Feral, "APL.Druid.Feral")
 
 -- Guardian
 CreateARPanelOptions(CP_Guardian, "APL.Druid.Guardian")

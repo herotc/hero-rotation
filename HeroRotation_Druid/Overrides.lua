@@ -12,6 +12,7 @@ local Item    = HL.Item
 local HR      = HeroRotation
 -- Spells
 local SpellBalance = Spell.Druid.Balance
+local SpellFeral = Spell.Druid.Feral
 -- Lua
 
 --- ============================ CONTENT ============================
@@ -61,5 +62,18 @@ BalOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 , 102)
 
 -- Feral, ID: 103
+local FeralOldSpellIsCastable
+FeralOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = FeralOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellFeral.CatForm then
+      return BaseCheck and Player:BuffDown(self)
+    elseif self == SpellFeral.Prowl then
+      return BaseCheck and self:IsUsable()
+    else
+      return BaseCheck
+    end
+  end
+, 103)
 
 -- Guardian, ID: 104
