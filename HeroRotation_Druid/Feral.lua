@@ -257,7 +257,7 @@ end
 
 local function EvaluateTargetIfFeralFrenzyCooldown4(TargetUnit)
   -- if=combo_points<3&target.time_to_die>7&!cooldown.tigers_fury.up|fight_remains<8&fight_remains>2
-  return (ComboPoints < 3 and TargetUnit:TimeToDie() > 7 and not S.TigersFury:CooldownUp() or fightRemains < 8 and FightRemains > 2)
+  return (ComboPoints < 3 and TargetUnit:TimeToDie() > 7 and not S.TigersFury:CooldownUp() or FightRemains < 8 and FightRemains > 2)
 end
 
 local function EvaluateTargetIfDummy(TargetUnit)
