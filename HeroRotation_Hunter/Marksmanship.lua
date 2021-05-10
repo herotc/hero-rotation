@@ -223,6 +223,10 @@ local function St()
   if S.KillShot:IsReady() then
     if Everyone.CastCycle(S.KillShot, Enemies40y, EvaluateCycleKillShot2, not TargetInRange40y) then return "kill_shot st 4"; end
   end
+  -- Manually added: Primary target fallback for kill_shot
+  if S.KillShot:IsCastable() then
+    if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot st 5"; end
+  end
   -- double_tap,if=covenant.kyrian&cooldown.resonating_arrow.remains<gcd|!covenant.kyrian&!covenant.night_fae|covenant.night_fae&(cooldown.wild_spirits.remains<gcd|cooldown.trueshot.remains>55)|target.time_to_die<15
   if S.DoubleTap:IsReady() and (Player:Covenant() == "Kyrian" and S.ResonatingArrow:CooldownRemains() < Player:GCD() + 0.5 or Player:Covenant() ~= "Kyrian" and Player:Covenant() ~= "Night Fae" or Player:Covenant() == "Night Fae" and (S.WildSpirits:CooldownRemains() < Player:GCD() + 0.5 or S.Trueshot:CooldownRemains() > 55) or Target:TimeToDie() < 15) then
     if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap st 6"; end
@@ -369,6 +373,10 @@ local function Trickshots()
   -- kill_shot,if=buff.dead_eye.down
   if S.KillShot:IsReady() then
     if Everyone.CastCycle(S.KillShot, Enemies40y, EvaluateCycleKillShot1, not TargetInRange40y) then return "kill_shot trickshots 34"; end
+  end
+  -- Manually added: Primary target fallback for kill_shot
+  if S.KillShot:IsCastable() and (Player:BuffDown(S.DeadEyeBuff)) then
+    if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot trickshots 35"; end
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsReady() then

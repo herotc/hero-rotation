@@ -59,6 +59,8 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldMMIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellMM.SummonPet then
     return (not Pet:IsActive() and not HR.GUISettings.APL.Hunter.Marksmanship.UseLoneWolf) and BaseCheck
+  elseif self == SpellMM.KillShot then
+    return BaseCheck and self:IsUsable()
   else
     return BaseCheck
   end
