@@ -55,8 +55,10 @@ HL:RegisterForEvent(function()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
+  S.PrimordialWave:RegisterInFlightEffect(327162)
   S.PrimordialWave:RegisterInFlight()
 end, "LEARNED_SPELL_IN_TAB")
+S.PrimordialWave:RegisterInFlightEffect(327162)
 S.PrimordialWave:RegisterInFlight()
 
 local function num(val)
@@ -199,11 +201,11 @@ local function Aoe()
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 36"; end
   end
   -- flame_shock,moving=1,target_if=refreshable
-  if S.FlameShock:IsReady() and Player:IsMoving() and Target:DebuffRefreshable(S.FlameShockDebuff) then
+  if S.FlameShock:IsReady() and Player:IsMoving() and Settings.Elemental.ShowMovementSpells and Target:DebuffRefreshable(S.FlameShockDebuff) then
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 38"; end
   end
   -- frost_shock,moving=1
-  if S.FrostShock:IsReady() and Player:IsMoving() then
+  if S.FrostShock:IsReady() and Player:IsMoving() and Settings.Elemental.ShowMovementSpells then
     if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock aoe 40"; end
   end
 end
@@ -295,11 +297,11 @@ local function SESingle()
   end
   -- flame_shock,moving=1,target_if=refreshable
   -- flame_shock,moving=1,if=movement.distance>6
-  if S.FlameShock:IsReady() and Player:IsMoving() and Target:DebuffRefreshable(S.FlameShockDebuff) then
+  if S.FlameShock:IsReady() and Player:IsMoving() and Settings.Elemental.ShowMovementSpells and Target:DebuffRefreshable(S.FlameShockDebuff) then
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock ses 102"; end
   end
   -- frost_shock,moving=1
-  if S.FrostShock:IsReady() and Player:IsMoving() then
+  if S.FrostShock:IsReady() and Player:IsMoving() and Settings.Elemental.ShowMovementSpells then
     if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock ses 104"; end
   end
 end
@@ -415,11 +417,11 @@ local function Single()
   end
   -- flame_shock,moving=1,target_if=refreshable
   -- flame_shock,moving=1,if=movement.distance>6
-  if S.FlameShock:IsCastable() and Player:IsMoving() and Target:DebuffRefreshable(S.FlameShock) then
+  if S.FlameShock:IsReady() and Player:IsMoving() and Settings.Elemental.ShowMovementSpells and Target:DebuffRefreshable(S.FlameShock) then
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single 176"; end
   end
   -- frost_shock,moving=1
-  if S.FrostShock:IsCastable() and Player:IsMoving() then
+  if S.FrostShock:IsReady() and Player:IsMoving() and Settings.Elemental.ShowMovementSpells then
     if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 178"; end
   end
 end
@@ -470,8 +472,8 @@ local function APL()
       end
     end
     -- flame_shock,if=!ticking
-    -- Manually added checks to bypass if PrimordialWave is available and ready
-    if S.FlameShock:IsCastable() and (Target:DebuffDown(S.FlameShock)) then
+    -- Manually added IsReady override to bypass if PrimordialWave is available and ready
+    if S.FlameShock:IsReady() and (Target:DebuffDown(S.FlameShock)) then
       if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock main 202"; end
     end
     if CDsON() then

@@ -61,6 +61,7 @@ HR.GUISettings.APL.Shaman = {
   },
   Elemental = {
     PreferEarthShield = false,
+    ShowMovementSpells = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -96,3 +97,4 @@ CreatePanelOption("CheckButton", CP_Enhancement, "APL.Shaman.Enhancement.PreferE
 -- Elemental
 CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental")
 CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Elemental.PreferEarthShield", "Prefer Earth Shield", "Prefer using Earth Shield over Lightning Shield, when it's available.")
+CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Elemental.ShowMovementSpells", "Show Movement Spells", "Show Flame Shock and Frost Shock suggestions while moving. Note: This tends to make the rotation choppy when making small movements.")
