@@ -17,6 +17,8 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 local Cast       = HR.Cast
+local CDsON      = HR.CDsON
+local AoEON      = HR.AoEON
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -244,7 +246,7 @@ local function St()
     if Cast(S.ExplosiveShot, nil, nil, not TargetInRange40y) then return "explosive_shot 12"; end
   end
   -- wild_spirits
-  if S.WildSpirits:IsReady() and HR.CDsON() then
+  if S.WildSpirits:IsReady() and CDsON() then
     if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "wild_spirits st 14"; end
   end
   -- flayed_shot
@@ -268,7 +270,7 @@ local function St()
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley st 24 "; end
   end
   -- trueshot,if=buff.precise_shots.down|buff.resonating_arrow.up|buff.wild_spirits.up|buff.volley.up&active_enemies>1
-  if S.Trueshot:IsReady() and HR.CDsON() and (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.ResonatingArrowDebuff) or Target:DebuffUp(S.WildMarkDebuff) or EnemiesCount10ySplash > 1) then
+  if S.Trueshot:IsReady() and CDsON() and (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.ResonatingArrowDebuff) or Target:DebuffUp(S.WildMarkDebuff) or EnemiesCount10ySplash > 1) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot st 26"; end
   end
   -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|buff.trick_shots.remains>execute_time&active_enemies>1
@@ -327,7 +329,7 @@ local function Trickshots()
     if Cast(S.ExplosiveShot, nil, nil, not TargetInRange40y) then return "explosive_shot trickshots 10"; end
   end
   -- wild_spirits
-  if S.WildSpirits:IsReady() and HR.CDsON() then
+  if S.WildSpirits:IsReady() and CDsON() then
     if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "wild_spirits trickshots 12 "; end
   end
   -- resonating_arrow
@@ -343,7 +345,7 @@ local function Trickshots()
     if Cast(S.Barrage, nil, nil, not TargetInRange40y) then return "barrage trickshots 18"; end
   end
   -- trueshot
-  if S.Trueshot:IsReady() and HR.CDsON() then
+  if S.Trueshot:IsReady() and CDsON() then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot, nil, not TargetInRange40y) then return "trueshot trickshots 20"; end
   end
   -- rapid_fire,if=buff.trick_shots.remains>=execute_time&runeforge.surging_shots&buff.double_tap.down
@@ -404,7 +406,7 @@ end
 local function APL()
   Enemies40y = Player:GetEnemiesInRange(S.AimedShot.MaximumRange)
   TargetInRange40y = Target:IsSpellInRange(S.AimedShot) -- Ranged abilities; Distance varies by Mastery
-  if HR.AoEON() then
+  if AoEON() then
     EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10) -- AOE Toogle
   else
     EnemiesCount10ySplash = 1
@@ -426,14 +428,14 @@ local function APL()
     -- use_items,slots=trinket2,if=trinket.2.has_use_buff&(buff.trueshot.up&(!trinket.1.has_use_buff|trinket.1.cooldown.remains|trinket.2.cooldown.duration>=trinket.1.cooldown.duration)|buff.trueshot.down&(trinket.1.has_use_buff&trinket.1.cooldown.duration>=trinket.2.cooldown.duration&trinket.1.cooldown.remains-5<cooldown.trueshot.remains&cooldown.trueshot.remains>20|trinket.2.cooldown.duration-5<cooldown.trueshot.remains)|target.time_to_die<cooldown.trueshot.remains)|!trinket.2.has_use_buff&(trinket.1.has_use_buff&(buff.trueshot.down|trinket.1.cooldown.remains>5)&(cooldown.trueshot.remains>20|trinket.1.cooldown.remains-5>cooldown.trueshot.remains)|!trinket.1.has_use_buff&(!trinket.1.has_cooldown|trinket.1.cooldown.duration>=trinket.2.cooldown.duration|trinket.1.cooldown.remains))
     -- TODO: Handle these trinket lines, then delete the below use_items
     -- use_items,if=prev_gcd.1.trueshot|!talent.calling_the_shots.enabled|target.time_to_die<20
-    if HR.CDsON() and Settings.Commons.Enabled.Trinkets and (Player:PrevGCDP(1, S.Trueshot) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 20) then
+    if CDsON() and Settings.Commons.Enabled.Trinkets and (Player:PrevGCDP(1, S.Trueshot) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 20) then
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
         if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
     -- call_action_list,name=cds
-    if (HR.CDsON()) then
+    if (CDsON()) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=st,if=active_enemies<3

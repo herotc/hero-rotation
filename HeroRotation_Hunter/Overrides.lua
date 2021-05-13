@@ -75,7 +75,7 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if HR.GUISettings.APL.Hunter.Marksmanship.HideAimedWhileMoving then
       return BaseCheck and not Player:IsCasting(SpellMM.AimedShot) and (not Player:IsMoving() or Player:BuffUp(SpellMM.LockandLoadBuff))
     else
-      return BaseCheck and not Player:IsCasting(SpellMM.AimedShot)
+      return BaseCheck and (not Player:IsCasting(SpellMM.AimedShot) and SpellMM.AimedShot:Charges() == 1 or SpellMM.AimedShot:Charges() > 1)
     end
   else
     return BaseCheck
