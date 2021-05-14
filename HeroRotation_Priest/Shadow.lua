@@ -399,6 +399,8 @@ local function Main()
   if S.ShadowWordDeath:IsReady() and (PainbreakerEquipped and VarDotsUp and Target:TimeToX(20) > S.ShadowWordDeath:Cooldown() + Player:GCD()) then
     if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death 112"; end
   end
+  -- shadow_word_death,if=runeforge.bwonsamdis_pact.equipped&buff.fae_guardians.up&!cooldown.void_eruption.up&target.time_to_pct_20>(cooldown.shadow_word_death.duration+gcd)
+  -- TODO: Above line is 9.1 prep
   -- shadow_crash,if=raid_event.adds.in>10
   if S.ShadowCrash:IsCastable() then
     if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash 114"; end
