@@ -276,8 +276,8 @@ local function Cds()
   if S.Silence:IsCastable() and SephuzEquipped then
     if Everyone.CastCycle(S.Silence, Enemies30y, EvaluateCycleSilence228, not Target:IsSpellInRange(S.Silence), Settings.Commons.OffGCDasOffGCD.Silence) then return "silence 51"; end
   end
-  -- Covenant: fae_guardians,if=!buff.voidform.up&(!cooldown.void_torrent.up|!talent.void_torrent.enabled)&(variable.dots_up&spell_targets.vampiric_touch==1|active_dot.vampiric_touch==spell_targets.vampiric_touch)|buff.voidform.up&(soulbind.grove_invigoration.enabled|soulbind.field_of_blossoms.enabled)
-  if S.FaeGuardians:IsReady() and (Player:BuffDown(S.VoidformBuff) and (not S.VoidTorrent:CooldownUp() or not S.VoidTorrent:IsAvailable()) and (VarDotsUp and EnemiesCount10ySplash == 1 or S.VampiricTouchDebuff:AuraActiveCount() == EnemiesCount10ySplash) or Player:BuffUp(S.VoidformBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable())) then
+  -- Covenant: fae_guardians,if=!buff.voidform.up&(!cooldown.void_torrent.up|!talent.void_torrent.enabled)&(variable.dots_up&spell_targets.vampiric_touch==1|active_dot.vampiric_touch==spell_targets.vampiric_touch&spell_targets.vampiric_touch>1)|buff.voidform.up&(soulbind.grove_invigoration.enabled|soulbind.field_of_blossoms.enabled)
+  if S.FaeGuardians:IsReady() and (Player:BuffDown(S.VoidformBuff) and (not S.VoidTorrent:CooldownUp() or not S.VoidTorrent:IsAvailable()) and (VarDotsUp and EnemiesCount10ySplash == 1 or S.VampiricTouchDebuff:AuraActiveCount() == EnemiesCount10ySplash and EnemiesCount10ySplash > 1) or Player:BuffUp(S.VoidformBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable())) then
     if Cast(S.FaeGuardians, Settings.Commons.DisplayStyle.Covenant) then return "fae_guardians 52"; end
   end
   -- Covenant: mindgames,target_if=insanity<90&((variable.all_dots_up&(!cooldown.void_eruption.up|!talent.hungering_void.enabled))|buff.voidform.up)&(!talent.hungering_void.enabled|debuff.hungering_void.up|!buff.voidform.up)&(!talent.searing_nightmare.enabled|spell_targets.mind_sear<5)
