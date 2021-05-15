@@ -59,6 +59,8 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldMMIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellMM.SummonPet then
     return (not Pet:IsActive() and not HR.GUISettings.APL.Hunter.Marksmanship.UseLoneWolf) and BaseCheck
+  elseif self == SpellMM.SteadyShot then
+    return BaseCheck and (not SpellMM.SteadyFocus:IsAvailable() or not Player:PrevGCD(1, self) or (Player:PrevGCD(1, self) and not Player:IsCasting(self)))
   elseif self == SpellMM.KillShot then
     return BaseCheck and self:IsUsable()
   else
@@ -90,6 +92,17 @@ OldMMBuffRemains = HL.AddCoreOverride("Player.BuffRemains",
       return 0
     else
       return OldMMBuffRemains(self, Spell, AnyCaster, Offset)
+    end
+  end
+, 254)
+
+local OldMMBuffDown
+OldMMBuffDown = HL.AddCoreOverride("Player.BuffDown",
+  function(self, Spell, AnyCaster, Offset)
+    if Spell == SpellMM.PreciseShotsBuff and Player:IsCasting(SpellMM.AimedShot) then
+      return false
+    else
+      return OldMMBuffDown(self, Spell, AnyCaster, Offset)
     end
   end
 , 254)

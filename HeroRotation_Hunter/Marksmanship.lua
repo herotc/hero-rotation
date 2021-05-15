@@ -89,9 +89,11 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 HL:RegisterForEvent(function()
   S.SerpentSting:RegisterInFlight()
   S.SteadyShot:RegisterInFlight()
+  S.AimedShot:RegisterInFlight()
 end, "LEARNED_SPELL_IN_TAB")
 S.SerpentSting:RegisterInFlight()
 S.SteadyShot:RegisterInFlight()
+S.AimedShot:RegisterInFlight()
 
 --Functions
 local function num(val)
@@ -144,7 +146,8 @@ end
 
 local function EvaluateTargetIfAimedShot()
   -- if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|buff.trick_shots.remains>execute_time&active_enemies>1
-  return (Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.Trueshot) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime()) and (not S.ChimaeraShot:IsAvailable() or EnemiesCount10ySplash < 2) or Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and EnemiesCount10ySplash > 1)
+  -- Note: Added IsCasting check to smooth out opener when not using SteadyFocus
+  return (Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.Trueshot) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime() and not Player:IsCasting(S.AimedShot)) and (not S.ChimaeraShot:IsAvailable() or EnemiesCount10ySplash < 2) or Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and EnemiesCount10ySplash > 1)
 end
 
 local function EvaluateTargetIfAimedShot2()
@@ -175,7 +178,7 @@ local function Precombat()
       if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap opener"; end
     end
     -- aimed_shot,if=active_enemies<3&(!covenant.kyrian&!talent.volley|active_enemies<2)
-    if S.AimedShot:IsReady() and (EnemiesCount10ySplash < 3 and (Player:Covenant() ~= "Kyrian" and not S.Volley:IsAvailable() or EnemiesCount10ySplash < 2)) then
+    if S.AimedShot:IsReady() and not (Player:IsCasting(S.AimedShot) or S.AimedShot:InFlight()) and (EnemiesCount10ySplash < 3 and (Player:Covenant() ~= "Kyrian" and not S.Volley:IsAvailable() or EnemiesCount10ySplash < 2)) then
       if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot opener"; end
     end
     -- steady_shot,if=active_enemies>2|(covenant.kyrian|talent.volley)&active_enemies=2
@@ -218,7 +221,7 @@ end
 
 local function St()
   -- steady_shot,if=talent.steady_focus&(prev_gcd.1.steady_shot&buff.steady_focus.remains<5|buff.steady_focus.down)
-  if S.SteadyShot:IsReady() and (S.SteadyFocus:IsAvailable() and (Player:PrevGCDP(1, S.SteadyShot) and Player:BuffRemains(S.SteadyFocusBuff) < 5 or Player:BuffDown(S.SteadyFocusBuff))) then
+  if S.SteadyShot:IsCastable() and (S.SteadyFocus:IsAvailable() and (Player:PrevGCDP(1, S.SteadyShot) and Player:BuffRemains(S.SteadyFocusBuff) < 5 or Player:BuffDown(S.SteadyFocusBuff))) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 2"; end
   end
   -- kill_shot
@@ -302,7 +305,7 @@ local function St()
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 40"; end
   end
   -- steady_shot
-  if S.SteadyShot:IsReady() then
+  if S.SteadyShot:IsCastable() then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 42"; end
   end
 end
@@ -397,7 +400,7 @@ local function Trickshots()
     if Cast(S.Multishot, nil, nil, not TargetInRange40y) then return "multishot trickshots 42"; end
   end
   -- steady_shot
-  if S.SteadyShot:IsReady() then
+  if S.SteadyShot:IsCastable() then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot trickshots 44"; end
   end
 end
