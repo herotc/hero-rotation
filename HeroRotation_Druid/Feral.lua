@@ -105,7 +105,7 @@ S.Rip:RegisterPMultiplier({S.BloodtalonsBuff, 1.2}, {S.SavageRoar, 1.15}, {S.Tig
 S.Rake:RegisterPMultiplier(S.RakeDebuff, ComputeRakePMultiplier)
 
 local function SwipeBleedMult()
-  return (Target:DebuffUp(S.RipDebuff) or Target:DebuffUp(S.RakeDebuff) or Target:DebuffUp(S.ThrashCatDebuff)) and 1.2 or 1;
+  return (Target:DebuffUp(S.RipDebuff) or Target:DebuffUp(S.RakeDebuff) or Target:DebuffUp(S.ThrashDebuff)) and 1.2 or 1;
 end
 
 S.Shred:RegisterDamageFormula(
@@ -228,6 +228,11 @@ end
 local function EvaluateCycleThrashBloodtalons6(TargetUnit)
   -- target_if=refreshable&buff.bt_thrash.down&druid.thrash_cat.ticks_gained_on_refresh>(4+spell_targets.thrash_cat*4)%(1+mastery_value)-conduit.taste_for_blood.enabled
   return (TargetUnit:DebuffRefreshable(S.ThrashDebuff) and TicksGainedOnRefresh(S.ThrashDebuff) > (4 + EnemiesCount8y * 4) / (1 + (Player:MasteryPct() / 100)) - num(S.TasteForBlood:ConduitEnabled()))
+end
+
+local function EvaluateCycleThrashMain18(TargetUnit)
+  -- target_if=refreshable&druid.thrash_cat.ticks_gained_on_refresh>(4+spell_targets.thrash_cat*4)%(1+mastery_value)-conduit.taste_for_blood.enabled-covenant.necrolord
+  return (TargetUnit:DebuffRefreshable(S.ThrashDebuff) and TicksGainedOnRefresh(S.ThrashDebuff) > (4 + EnemiesCount8y * 4) / (1 + (Player:MasteryPct() / 100)) - num(S.TasteForBlood:ConduitEnabled()) - num(Player:Covenant() == "Necrolord"))
 end
 
 local function EvaluateCycleAdaptiveSwarmCooldown2(TargetUnit)
