@@ -11,6 +11,7 @@ local Item    = HL.Item
 -- HeroRotation
 local HR      = HeroRotation
 -- Spells
+local SpellGuardian = Spell.Druid.Guardian
 local SpellBalance = Spell.Druid.Balance
 local SpellFeral = Spell.Druid.Feral
 -- Lua
@@ -77,3 +78,14 @@ FeralOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 , 103)
 
 -- Guardian, ID: 104
+local GuardianOldSpellIsCastable
+GuardianOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = GuardianOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellGuardian.Thrash then
+      return BaseCheck and (Player:Rage() <= 95 and Target:DebuffRemains(SpellGuardian.ThrashDebuff) > Player:GCD() * 2 or Target:DebuffStack(SpellGuardian.ThrashDebuff) < 3)
+    else
+      return BaseCheck
+    end
+  end
+, 104)
