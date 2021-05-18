@@ -739,7 +739,7 @@ local function APL()
   UnitsWithIgniteCount = UnitsWithIgnite(Enemies8ySplash)
 
   -- How long is left in the fight?
-  fightRemains = max(HL.FightRemains(Enemies8ySplash, false), HL.BossFightRemains())
+  fightRemains = HL.FightRemains(Enemies8ySplash, false)
 
   -- Check when the Disciplinary Command buff was last applied and its internal CD
   var_disciplinary_command_last_applied = S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()

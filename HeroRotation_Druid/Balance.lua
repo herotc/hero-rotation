@@ -703,7 +703,7 @@ local function APL()
   GCDMax = Player:GCD() + 0.5
 
   -- Length of fight remaining - Used for later variables
-  fightRemains = max(HL.FightRemains(Enemies8ySplash, false), HL.BossFightRemains())
+  fightRemains = HL.FightRemains(Enemies8ySplash, false)
 
   -- Determine amount of AP fed into Primordial Arcanic Pulsar
   -- TODO: Verify which slot holds the AP value

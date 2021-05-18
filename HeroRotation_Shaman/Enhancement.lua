@@ -403,7 +403,7 @@ local function APL()
   end
 
   -- Calculate how long is remaining in the fight
-  fightRemains = max(HL.FightRemains(Enemies8ySplash, false), HL.BossFightRemains())
+  fightRemains = HL.FightRemains(Enemies8ySplash, false)
 
   if Everyone.TargetIsValid() then
     -- lightning_shield
