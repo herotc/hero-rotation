@@ -79,6 +79,10 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     else
       return BaseCheck and (not Player:IsCasting(SpellMM.AimedShot) and SpellMM.AimedShot:Charges() == 1 or SpellMM.AimedShot:Charges() > 1)
     end
+  elseif self == SpellMM.ExplosiveShot then
+    local Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
+    local FightRemains = HL.FightRemains(Enemies10ySplash, false)
+    return BaseCheck and (FightRemains > 3)
   else
     return BaseCheck
   end
