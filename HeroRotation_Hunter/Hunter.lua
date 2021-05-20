@@ -244,5 +244,7 @@ Item.Hunter.Marksmanship = {
 }
 
 Item.Hunter.Survival = {
-  PotionOfSpectralAgility = Item(171270)
+  PotionOfSpectralAgility = Item(171270),
+  -- Trinkets
+  DreadfireVessel         = Item(184030, {13, 14})
 }
