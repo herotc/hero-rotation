@@ -203,7 +203,10 @@ Spell.DeathKnight.Unholy = {
 
   -- Conduit/Soulbind Effects
   ConvocationOfTheDead                  = Spell(338553),
+  FrenziedMonstrosity                   = Spell(334896),
   LeadByExample                         = Spell(342156),
+  MarrowedGemstoneEnhancement           = Spell(327069),
+  ThrillSeeker                          = Spell(331939),
 
   -- Buffs
   DeathAndDecayBuff                     = Spell(188290),

@@ -73,6 +73,7 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Unholy = {
+    DisableAotD = false,
     RaiseDeadCastLeft = false,
     DisplayStyle = {
       ArmyoftheDead = "SuggestedRight",
@@ -113,5 +114,6 @@ CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.DisableBoSPool
 CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost")
 
 --Unholy Panels
+CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.DisableAotD", "Disable AotD", "Disable Army of the Dead suggestions.")
 CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.RaiseDeadCastLeft", "Raise Dead in CastLeft", "Enable this to ignore the Raise Dead DisplayStyle option and instead use CastLeft.")
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy")
