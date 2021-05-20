@@ -407,12 +407,13 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  Enemies40y = Player:GetEnemiesInRange(S.AimedShot.MaximumRange)
   TargetInRange40y = Target:IsSpellInRange(S.AimedShot) -- Ranged abilities; Distance varies by Mastery
   if AoEON() then
     EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10) -- AOE Toogle
+    Enemies40y = Player:GetEnemiesInRange(S.AimedShot.MaximumRange)
   else
     EnemiesCount10ySplash = 1
+    Enemies40y = {}
   end
 
   -- call precombat
