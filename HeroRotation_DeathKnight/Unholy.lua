@@ -310,7 +310,7 @@ end
 
 local function Cooldowns()
   -- potion,if=variable.major_cooldowns_active|pet.gargoyle.active&pet.gargoyle.remains<=26|fight_remains<26
-  if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions and (VarMajorCDsActive or VarGargoyleActive and S.SummonGargoyle:TimeSinceLastCast() >= 4 or HL.FilteredFightRemains(EnemiesMelee, "<", 26)) then
+  if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions and (VarMajorCDsActive or VarGargoyleActive and S.SummonGargoyle:TimeSinceLastCast() >= 9 or HL.FilteredFightRemains(EnemiesMelee, "<", 26)) then
     if Cast(I.PotionofSpectralStrength, Settings.Commons.OffGCDasOffGCD.Potions) then return "potion cooldowns 2"; end
   end
   -- army_of_the_dead,if=cooldown.unholy_blight.remains<7&cooldown.dark_transformation.remains_expected<7&talent.unholy_blight&(cooldown.apocalypse.remains_expected<7&variable.full_cdr|!variable.full_cdr)|!talent.unholy_blight|fight_remains<35
@@ -412,11 +412,11 @@ local function Racials()
     if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent main 2"; end
   end
   -- blood_fury,if=variable.major_cooldowns_active|pet.gargoyle.active&pet.gargoyle.remains<=buff.blood_fury.duration|fight_remains<=buff.blood_fury.duration
-  if S.BloodFury:IsCastable() and (VarMajorCDsActive or VarGargoyleActive and (30 - S.Gargoyle:TimeSinceLastCast()) <= S.BloodFury:BaseDuration() or HL.FilteredFightRemains(EnemiesMelee, "<=", S.BloodFury:BaseDuration())) then
+  if S.BloodFury:IsCastable() and (VarMajorCDsActive or VarGargoyleActive and (35 - S.Gargoyle:TimeSinceLastCast()) <= S.BloodFury:BaseDuration() or HL.FilteredFightRemains(EnemiesMelee, "<=", S.BloodFury:BaseDuration())) then
     if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 4"; end
   end
   -- berserking,if=variable.major_cooldowns_active|pet.gargoyle.active&pet.gargoyle.remains<=buff.berserking.duration|fight_remains<=buff.berserking.duration
-  if S.Berserking:IsCastable() and (VarMajorCDsActive or VarGargoyleActive and (30 - S.Gargoyle:TimeSinceLastCast()) <= S.Berserking:BaseDuration() or HL.FilteredFightRemains(EnemiesMelee, "<=", S.Berserking:BaseDuration())) then
+  if S.Berserking:IsCastable() and (VarMajorCDsActive or VarGargoyleActive and (35 - S.Gargoyle:TimeSinceLastCast()) <= S.Berserking:BaseDuration() or HL.FilteredFightRemains(EnemiesMelee, "<=", S.Berserking:BaseDuration())) then
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 6"; end
   end
   -- lights_judgment,if=buff.unholy_strength.up
@@ -424,7 +424,7 @@ local function Racials()
     if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 8"; end
   end
   -- ancestral_call,if=variable.major_cooldowns_active|pet.gargoyle.active&pet.gargoyle.remains<=15|fight_remains<=15
-  if S.AncestralCall:IsCastable() and (VarMajorCDsActive or VarGargoyleActive and S.Gargoyle:TimeSinceLastCast() >= 15 or HL.FilteredFightRemains(EnemiesMelee, "<=", 15)) then
+  if S.AncestralCall:IsCastable() and (VarMajorCDsActive or VarGargoyleActive and S.Gargoyle:TimeSinceLastCast() >= 20 or HL.FilteredFightRemains(EnemiesMelee, "<=", 15)) then
     if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD) then return "ancestral_call main 10"; end
   end
   -- arcane_pulse,if=active_enemies>=2|(rune.deficit>=5&runic_power.deficit>=60)
@@ -432,7 +432,7 @@ local function Racials()
     if Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse main 12"; end
   end
   -- fireblood,if=variable.major_cooldowns_active|pet.gargoyle.active&pet.gargoyle.remains<=buff.fireblood.duration|fight_remains<=buff.fireblood.duration
-  if S.Fireblood:IsCastable() and (VarMajorCDsActive or VarGargoyleActive and (30 - S.Gargoyle:TimeSinceLastCast()) <= S.Fireblood:BaseDuration() or HL.FilteredFightRemains(EnemiesMelee, "<=", S.Fireblood:BaseDuration())) then
+  if S.Fireblood:IsCastable() and (VarMajorCDsActive or VarGargoyleActive and (35 - S.Gargoyle:TimeSinceLastCast()) <= S.Fireblood:BaseDuration() or HL.FilteredFightRemains(EnemiesMelee, "<=", S.Fireblood:BaseDuration())) then
     if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 14"; end
   end
   -- bag_of_tricks,if=active_enemies=1&(buff.unholy_strength.up|fight_remains<5)
@@ -528,7 +528,7 @@ local function APL()
   EnemiesWithoutVP = UnitsWithoutVP(Enemies10ySplash)
 
   -- Is Gargoyle active?
-  VarGargoyleActive = S.SummonGargoyle:TimeSinceLastCast() <= 30
+  VarGargoyleActive = S.SummonGargoyle:TimeSinceLastCast() <= 35
   VarApocGhoulActive = S.Apocalypse:TimeSinceLastCast() <= 15
 
   -- Set WoundSpender and AnyDnD
