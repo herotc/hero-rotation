@@ -83,6 +83,7 @@ HR.GUISettings.APL.Mage = {
     UseTemporalWarp = true,
     MovingRotation = false,
     MirrorImagesBeforePull = false,
+    UseFishingOpener = false,
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
@@ -115,6 +116,7 @@ CreateARPanelOptions(CP_Mage, "APL.Mage.Commons")
 
 -- Arcane
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AMSpamRotation", "Use AM spam rotation", "Enable the use of the Arcane Missile Spam rotation.")
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseFishingOpener", "Use Fishing Opener", "The fishing opener begins with RoP and fishes for CC procs to use during TotM/AP.")
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).")
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.StayDistance", "Stay at distance", "Only use Arcane Explosion if in range or on the left icon.")
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MovingRotation", "Disable cast abilities when moving", "Don't show abilities where a ca&st is needed (makes the rotation a bit clunky with small steps).")

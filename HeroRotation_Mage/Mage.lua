@@ -86,6 +86,9 @@ Spell.Mage.Arcane = {
   ExpandedPotentialBuff                 = Spell(327495),
   SiphonStormBuff                       = Spell(332928),
   DisciplinaryCommandBuff               = Spell(327371),
+  ArcaneHarmonyBuff                     = Spell(332777),
+  -- Trinket
+  SoulIgniterBuff                       = Spell(345211),
   -- Disciplinary Command Filler IDs
   Fireball                              = Spell(0),
   Scorch                                = Spell(0),
@@ -249,7 +252,21 @@ Spell.Mage.Frost = {
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Arcane = {
   ManaGem                          = Item(36799),
+  -- Potion,
   PotionofSpectralIntellect        = Item(171273),
+  -- Trinkets
+  DarkmoonDeckPutrescence          = Item(173069),
+  DreadfireVessel                  = Item(184030),
+  EmpyrealOrdnance                 = Item(180117),
+  FlameofBattle                    = Item(181501),
+  GlyphofAssimilation              = Item(184021),
+  InscrutableQuantumDevice         = Item(179350),
+  MacabreSheetMusic                = Item(184024),
+  SinfulGladiatorsBadge            = Item(175921),
+  SoulIgniter                      = Item(184019),
+  SoullettingRuby                  = Item(178809),
+  SunbloodAmethyst                 = Item(178826),
+  WakenersFrond                    = Item(181457),
 }
 
 Item.Mage.Fire = {

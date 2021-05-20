@@ -101,8 +101,21 @@ HL.AddCoreOverride("Spell.IsCastable",
     end
 
     local BaseCheck = self:IsLearned() and self:CooldownRemains( BypassRecovery, Offset or "Auto") == 0 and RangeOK and Player:Mana() >= self:Cost()
-
-    return BaseCheck
+    if self == SpellArcane.PresenceofMind then
+      return BaseCheck  and Player:BuffDown(SpellArcane.PresenceofMind)
+    elseif self == SpellArcane.MirrorsofTorment then
+      return BaseCheck and not Player:IsCasting(self)
+    elseif self == SpellArcane.RadiantSpark then
+      return BaseCheck and not Player:IsCasting(self)    
+    elseif self == SpellArcane.ShiftingPower then
+      return BaseCheck and not Player:IsCasting(self)    
+    elseif self == SpellArcane.Deathborne then
+      return BaseCheck and not Player:IsCasting(self)
+    elseif self == SpellArcane.TouchoftheMagi then
+      return BaseCheck and not Player:IsCasting(self)
+    else
+      return BaseCheck
+    end
   end
 , 62)
 
