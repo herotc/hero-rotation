@@ -137,7 +137,7 @@ local function Cds()
     if Cast(S.Harpoon, nil, nil, not Target:IsInRange(30)) then return "[CDs] Harpoon CDs 379"; end
   end
   -- use_item,name=dreadfire_vessel,if=covenant.kyrian&cooldown.resonating_arrow.remains>10|!covenant.kyrian
-  if I.DreadfireVessel:IsEquippedAndReady and (Player:Covenant() == "Kyrian" and S.ResonatingArrow:CooldownRemains() > 10 or Player:Covenant() ~= "Kyrian") then
+  if I.DreadfireVessel:IsEquippedAndReady() and (Player:Covenant() == "Kyrian" and S.ResonatingArrow:CooldownRemains() > 10 or Player:Covenant() ~= "Kyrian") then
     if Cast(I.DreadfireVessel, nil, nil, not Target:IsInRange(50)) then return "[CDs] dreadfire_vessel 284"; end
   end
   -- blood_fury,if=cooldown.coordinated_assault.remains>30
