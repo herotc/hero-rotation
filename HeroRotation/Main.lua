@@ -282,6 +282,7 @@
             CreatePanelOption("Slider", CP_General, "General.ScaleUI", {0.5, 5, 0.1}, "UI Scale", "Scale of the Icons.", function(value) HR.MainFrame:ResizeUI(value); end);
             CreatePanelOption("Slider", CP_General, "General.ScaleButtons", {0.5, 5, 0.1}, "Buttons Scale", "Scale of the Buttons.", function(value) HR.MainFrame:ResizeButtons(value); end);
             CreatePanelOption("Slider", CP_General, "General.ScaleHotkey", {0.5, 5, 0.1}, "Hotkey Scale", "Scale of the Hotkeys.");
+            CreatePanelOption("Slider", CP_General, "General.SetAlpha", {0, 1, 0.05}, "Addon Alpha", "Change the addon's alpha setting.");
             CreatePanelOption("Button", CP_General, "ButtonMove", "Lock/Unlock", "Enable the moving of the frames.", function() HR.MainFrame:ToggleLock(); end);
             CreatePanelOption("Button", CP_General, "ButtonReset", "Reset Buttons", "Resets the anchor of buttons.", function() HR.ToggleIconFrame:ResetAnchor(); end);
           end

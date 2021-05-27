@@ -34,7 +34,8 @@
       RotationDebugOutput = false,
       ScaleUI = 1,
       ScaleButtons = 1,
-      ScaleHotkey = 1
+      ScaleHotkey = 1,
+      SetAlpha = 1
     },
     APL = {}
   };

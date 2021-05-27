@@ -61,6 +61,7 @@
 
     -- Toggle icons
     if HR.GUISettings.General.HideToggleIcons then HR.ToggleIconFrame:Hide(); end
+    if not HR.GUISettings.General.HideToggleIcons then HR.ToggleIconFrame:SetAlpha(HR.GUISettings.General.SetAlpha); end
   end
 
   -- Create a Backdrop
@@ -170,6 +171,8 @@
     if HR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
       self.Backdrop:Show();
     end
+    -- Alpha
+    self:SetAlpha(HR.GUISettings.General.SetAlpha);
     -- Display
     if not self:IsVisible() then
       self:Show();
@@ -353,6 +356,8 @@
     else
       IconFrame.Keybind:SetText("");
     end
+    -- Alpha
+    IconFrame:SetAlpha(HR.GUISettings.General.SetAlpha);
     -- Display
     if not IconFrame:IsVisible() then
       IconFrame:Show();
@@ -426,6 +431,8 @@
     else
       self.Keybind:SetText("");
     end
+    -- Alpha
+    self:SetAlpha(HR.GUISettings.General.SetAlpha);
     -- Display
     if not self:IsVisible() then
       self:Show();
@@ -484,6 +491,7 @@
       IconFrame.Texture:SetAllPoints(IconFrame);
       IconFrame.Texture:SetAlpha(ThisUnit:IsSpellInRange(Object) and 1 or 0.4);
       IconFrame:ClearAllPoints();
+      IconFrame:SetAlpha(HR.GUISettings.General.SetAlpha);
       if not IconFrame:IsVisible() then
         if HR.GUISettings.General.NamePlateIconAnchor == "Life Bar" then
           IconFrame:SetPoint("CENTER", HealthBar);
@@ -560,6 +568,8 @@
     else
       self.Keybind:SetText("");
     end
+    -- Alpha
+    self:SetAlpha(HR.GUISettings.General.SetAlpha);
     -- Display
     if not self:IsVisible() then
       self:Show();
@@ -621,6 +631,8 @@
     else
       self.Keybind:SetText("");
     end
+    -- Alpha
+    self:SetAlpha(HR.GUISettings.General.SetAlpha);
     -- Display
     if not self:IsVisible() then
       self:Show();
