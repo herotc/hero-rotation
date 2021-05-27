@@ -76,7 +76,6 @@ HR.GUISettings.APL.Hunter = {
     GCDasOffGCD = {
       -- Abilities
       Butchery = false,
-      SummonPet = false,
       CoordinatedAssault = true,
       Harpoon = true,
     },

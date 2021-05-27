@@ -130,15 +130,25 @@ HL.AddCoreOverride("Player.FocusP",
 local OldSVIsCastable
 OldSVIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  if self.SpellID == 259387 or self.SpellID == 186270 then
-    return OldSVIsCastable(self, "Melee", AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldSVIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  if self == SpellSV.SummonPet then
+    return (not Pet:IsActive()) and BaseCheck
+  elseif self == SpellSV.AspectoftheEagle then
+    return HR.GUISettings.APL.Hunter.Survival.AspectOfTheEagle and BaseCheck
   else
-    local BaseCheck = OldSVIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    if self == SpellSV.SummonPet then
-      return (not Pet:IsActive()) and BaseCheck
-    elseif self == SpellSV.AspectoftheEagle then
-      return HR.GUISettings.APL.Hunter.Survival.AspectoftheEagle and BaseCheck
-    elseif self == SpellSV.KillShot then
+    return BaseCheck
+  end
+end
+, 255)
+
+local OldSVIsReady
+OldSVIsReady = HL.AddCoreOverride("Spell.IsReady",
+function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  if self == SpellSV.MongooseBite or self == SpellSV.RaptorStrike then
+    return OldSVIsReady(self, "Melee", AoESpell, ThisUnit, BypassRecovery, Offset)
+  else
+    local BaseCheck = OldSVIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellSV.KillShot then
       return BaseCheck and self:IsUsable()
     else
       return BaseCheck

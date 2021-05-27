@@ -153,11 +153,21 @@ Spell.Hunter.Marksmanship = {
 }
 
 Spell.Hunter.Survival = {
+  -- Pet Utility Abilities
+  MendPet                               = Spell(136),
+  RevivePet                             = Spell(982),
   SummonPet                             = Spell(883),
+  SummonPet2                            = Spell(83242),
+  SummonPet3                            = Spell(83243),
+  SummonPet4                            = Spell(83244),
+  SummonPet5                            = Spell(83245),
+  -- Abilities
   Flare                                 = Spell(1543),
   SteelTrapDebuff                       = Spell(162487),
   SteelTrap                             = Spell(162488),
+  FreezingTrap                          = Spell(187650),
   TarTrap                               = Spell(187698),
+  TarTrapDebuff                         = Spell(135299),
   Harpoon                               = Spell(190925),
   MongooseBite                          = MultiSpell(259387, 265888),
   MongooseFuryBuff                      = Spell(259388),
@@ -171,14 +181,16 @@ Spell.Hunter.Survival = {
   WildfireBomb                          = Spell(259495),
   WildfireBombDebuff                    = Spell(269747),
   ShrapnelBomb                          = Spell(270335),
+  ShrapnelBombDebuff                    = Spell(270339),
   PheromoneBomb                         = Spell(270323),
+  PheromoneBombDebuff                   = Spell(270332),
   VolatileBomb                          = Spell(271045),
+  VolatileBombDebuff                    = Spell(271049),
   SerpentSting                          = Spell(259491),
   SerpentStingDebuff                    = Spell(259491),
   AMurderofCrows                        = Spell(131894),
   CoordinatedAssault                    = Spell(266779),
   TipoftheSpearBuff                     = Spell(260286),
-  ShrapnelBombDebuff                    = Spell(270339),
   Chakrams                              = Spell(259391),
   BloodFury                             = Spell(20572),
   AncestralCall                         = Spell(274738),
@@ -227,23 +239,28 @@ Spell.Hunter.Survival = {
   FlayedShot                            = Spell(324149),
   ResonatingArrow                       = Spell(308491),
   WildSpirits                           = Spell(328231),
-  WildSpiritsBuff                       = Spell(328275),
+  WildSpiritsDebuff                       = Spell(328275),
   --legendary_debuffs
+  NessingwarysTrappingBuff              = Spell(336744),
+  SoulforgeEmbersDebuff                 = Spell(336746),
 }
 
 -- Items
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.BeastMastery = {
-  -- Potions/Trinkets
-  -- "Other On Use"
+  -- Potion
   PotionOfSpectralAgility = Item(171270)
+  -- Trinkets
 }
 
 Item.Hunter.Marksmanship = {
+  -- Potion
   PotionOfSpectralAgility = Item(171270)
+  -- Trinkets
 }
 
 Item.Hunter.Survival = {
+  -- Potion
   PotionOfSpectralAgility = Item(171270),
   -- Trinkets
   DreadfireVessel         = Item(184030, {13, 14})
