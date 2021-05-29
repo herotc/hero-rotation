@@ -24,7 +24,7 @@ if not Spell.Warlock then Spell.Warlock = {} end
 Spell.Warlock.Demonology = {
   -- Racials
   Berserking                            = Spell(26297),
-  BloodFury                             = Spell(20572),
+  BloodFury                             = Spell(33702),
   Fireblood                             = Spell(265221),
 
   -- Base Abilities
