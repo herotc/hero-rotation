@@ -78,7 +78,7 @@ Spell.Warlock.Demonology = {
 Spell.Warlock.Affliction = {
   -- Racials
   Berserking                            = Spell(26297),
-  BloodFury                             = Spell(20572),
+  BloodFury                             = Spell(33702),
   Fireblood                             = Spell(265221),
 
   -- Base Abilities
@@ -91,8 +91,6 @@ Spell.Warlock.Affliction = {
   SeedofCorruption                      = Spell(27243),
   SeedofCorruptionDebuff                = Spell(27243),
   ShadowBolt                            = Spell(686),
-  ShadowEmbrace                         = Spell(32388),
-  ShadowEmbraceDebuff                   = Spell(32390),
   SummonDarkglare                       = Spell(205180),
   SummonPet                             = Spell(688),
   UnstableAffliction                    = Spell(316099),
@@ -115,6 +113,8 @@ Spell.Warlock.Affliction = {
   VileTaint                             = Spell(278350),
   VileTaintDebuff                       = Spell(278350),
 
+  ShadowEmbrace                         = Spell(32388),
+  ShadowEmbraceDebuff                   = Spell(32390),
   Haunt                                 = Spell(48181),
   HauntDebuff                           = Spell(48181),
 
