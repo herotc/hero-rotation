@@ -79,14 +79,14 @@ local function EvaluateTargetIfFilterRaptorStrikeLatentStacks(TargetUnit)
   return (TargetUnit:DebuffStack(S.LatentPoisonDebuff))
 end
 
--- if=!dot.serpent_sting.ticking&target.time_to_die>7
-local function EvaluateTargetIfSerpentStingAPST(TargetUnit)
-  return (TargetUnit:DebuffDown(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 7)
+-- if=!dot.serpent_sting.ticking&target.time_to_die>7|buff.vipers_venom.up&buff.vipers_venom.remains<gcd
+local function EvaluateTargetIfSerpentStingST(TargetUnit)
+  return (TargetUnit:DebuffDown(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 7 or Player:BuffUp(S.VipersVenomBuff) and Player:BuffRemains(S.VipersVenomBuff) < Player:GCD())
 end
 
--- if=refreshable&target.time_to_die>7
-local function EvaluateTargetIfSerpentStingAPST2(TargetUnit)
-  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 7 )
+-- if=refreshable&target.time_to_die>7|buff.vipers_venom.up
+local function EvaluateTargetIfSerpentStingST2(TargetUnit)
+  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 7 or Player:BuffUp(S.VipersVenomBuff))
 end
 
 -- if=refreshable&talent.hydras_bite.enabled&target.time_to_die>8
@@ -104,54 +104,29 @@ local function EvaluateKillCommandCycleCondition1(TargetUnit)
   return (S.KillCommand:FullRechargeTime() < Player:GCD() and CheckFocusCap(S.KillCommand:ExecuteTime(), 15))
 end
 
+-- if=full_recharge_time<gcd&focus+cast_regen<focus.max
+local function EvaluateTargetIfKillCommandST(TargetUnit)
+  return (S.KillCommand:FullRechargeTime() < Player:GCD() and CheckFocusCap(S.KillCommand:ExecuteTime(), 15))
+end
+
 -- if=focus+cast_regen<focus.max
-local function EvaluateTargetIfKillCommandAPST(TargetUnit)
+local function EvaluateTargetIfKillCommandST2(TargetUnit)
   return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15))
 end
 
 -- if=buff.tip_of_the_spear.stack=3|dot.shrapnel_bomb.ticking
-local function EvaluateTargetIfRaptorStrikeAPST(TargetUnit)
+local function EvaluateTargetIfRaptorStrikeST(TargetUnit)
   return (Player:BuffStack(S.TipoftheSpearBuff) == 3 or TargetUnit:DebuffUp(S.ShrapnelBombDebuff))
 end
 
--- if=buff.mongoose_fury.up&buff.mongoose_fury.remains<focus%(action.mongoose_bite.cost-cast_regen)*gcd&!buff.wild_spirits.remains|buff.mongoose_fury.remains&next_wi_bomb.pheromone
-local function EvaluateTargetIfMongoostBiteAPST(TargetUnit) 
-  return (Player:BuffUp(S.MongooseFuryBuff) and Player:BuffRemains(S.MongooseFuryBuff) < Player:Focus() / (S.MongooseBite:Cost() - Player:FocusCastRegen(S.MongooseBite:ExecuteTime())) * Player:GCD() and not TargetUnit:DebuffRemains(S.WildSpiritsDebuff) or Player:BuffRemains(S.MongooseFuryBuff) and S.PheromoneBomb:IsCastable())
+-- if=talent.alpha_predator.enabled&(buff.mongoose_fury.up&buff.mongoose_fury.remains<focus%(action.mongoose_bite.cost-cast_regen)*gcd&!buff.wild_spirits.remains|buff.mongoose_fury.remains&next_wi_bomb.pheromone)
+local function EvaluateTargetIfMongooseBiteST(TargetUnit) 
+  return (S.AlphaPredator:IsAvailable() and (Player:BuffUp(S.MongooseFuryBuff) and Player:BuffRemains(S.MongooseFuryBuff) < Player:Focus() / (S.MongooseBite:Cost() - Player:FocusCastRegen(S.MongooseBite:ExecuteTime())) * Player:GCD() and not TargetUnit:DebuffRemains(S.WildSpiritsDebuff) or Player:BuffRemains(S.MongooseFuryBuff) and S.PheromoneBomb:IsCastable()))
 end
 
 -- if=buff.mongoose_fury.up|focus+action.kill_command.cast_regen>focus.max-15|dot.shrapnel_bomb.ticking|buff.wild_spirits.remains
-local function EvaluateTargetIfMongooseBiteAPST2(TargetUnit) 
+local function EvaluateTargetIfMongooseBiteST2(TargetUnit) 
   return (Player:BuffUp(S.MongooseFuryBuff) or Player:Focus() + Player:FocusCastRegen(S.MongooseBite:ExecuteTime()) > Player:FocusMax() - 15 or TargetUnit:DebuffUp(S.ShrapnelBombDebuff) or TargetUnit:DebuffRemains(S.WildSpiritsDebuff))
-end
-
--- if=buff.vipers_venom.up&buff.vipers_venom.remains<gcd|!ticking
-local function EvaluateTargetIfSerpentStingST(TargetUnit)
-  return (Player:BuffUp(S.VipersVenomBuff) and Player:BuffRemains(S.VipersVenomBuff) < Player:GCD() or TargetUnit:DebuffDown(S.SerpentStingDebuff))
-end
-
--- if=buff.tip_of_the_spear.stack=3
-local function EvaluateTargetIfRaptorStrikeST(TargetUnit)
-  return (Player:BuffStack(S.TipoftheSpearBuff) == 3)
-end
-
--- if=refreshable|buff.vipers_venom.up
-local function EvaluateTargetIfSerpentStingST2(TargetUnit)
-  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) or Player:BuffUp(S.VipersVenomBuff))
-end
-
--- if=focus+cast_regen<focus.max&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
-local function EvaluateTargetIfKillCommandST(TargetUnit)
-  return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and (NessingwarysTrappingEquipped and not S.FreezingTrap:CooldownUp() and not S.TarTrap:CooldownUp() or not NessingwarysTrappingEquipped))
-end
-
--- if=dot.shrapnel_bomb.ticking|buff.mongoose_fury.stack=5
-local function EvaluateTargetIfMongooseBiteST(TargetUnit)
-  return (TargetUnit:DebuffUp(S.ShrapnelBombDebuff) or Player:BuffStack(S.MongooseFuryBuff) == 5)
-end
-
--- if=buff.mongoose_fury.up|focus+action.kill_command.cast_regen>focus.max-15|dot.shrapnel_bomb.ticking
-local function EvaluateTargetIfMongooseBiteST2(TargetUnit)
-  return (Player:BuffUp(S.MongooseFuryBuff) or Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) > Player:FocusMax() - 15 or TargetUnit:DebuffUp(S.ShrapnelBombDebuff))
 end
 
 -- if=buff.vipers_venom.remains&(buff.vipers_venom.remains<gcd|refreshable)
@@ -317,229 +292,124 @@ local function NTA()
 end
 
 local function ST()
+  -- death_chakram,if=focus+cast_regen<focus.max
+  if CDsON() and S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "death_chakram st 2"; end
+  end
+  -- serpent_sting,target_if=min:remains,if=!dot.serpent_sting.ticking&target.time_to_die>7|buff.vipers_venom.up&buff.vipers_venom.remains<gcd
+  if S.SerpentSting:IsReady() then
+    if Everyone.CastTargetIf(S.SerpentSting, Enemy8y, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingST) then return "serpent_sting st 4"; end
+  end
   if CDsON() then
     -- flayed_shot
     if S.FlayedShot:IsCastable() then
-      if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "flayed_shot st 2"; end
-    end
-    -- wild_spirits
-    if S.WildSpirits:IsCastable() then
-      if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "wild_spirits st 4"; end
+      if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "flayed_shot st 6"; end
     end
     -- resonating_arrow
     if S.ResonatingArrow:IsCastable() then
-      if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "resonating_arrow st 6"; end
+      if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "resonating_arrow st 8"; end
     end
-  end
-  -- serpent_sting,target_if=min:remains,if=buff.vipers_venom.up&buff.vipers_venom.remains<gcd|!ticking
-  if S.SerpentSting:IsReady() then
-    if Everyone.CastTargetIf(S.SerpentSting, Enemy8y, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingST) then return "serpent_sting st 8"; end
-  end
-  -- death_chakram,if=focus+cast_regen<focus.max
-  if CDsON() and S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "death_chakram st 10"; end
-  end
-  -- raptor_strike,target_if=max:debuff.latent_poison_injection.stack,if=buff.tip_of_the_spear.stack=3
-  if S.RaptorStrike:IsReady() then
-    if Everyone.CastTargetIf(S.RaptorStrike, Enemy8y, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks, EvaluateTargetIfRaptorStrikeST) then return "raptor_strike st 12"; end
-  end
-  -- coordinated_assault
-  if CDsON() and S.CoordinatedAssault:IsCastable() then
-    if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault) then return "coordinated_assault st 14"; end
+    -- wild_spirits
+    if S.WildSpirits:IsCastable() then
+      if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "wild_spirits st 10"; end
+    end
+    -- coordinated_assault
+    if S.CoordinatedAssault:IsCastable() then
+      if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault) then return "coordinated_assault st 12"; end
+    end
   end
   -- kill_shot
   if S.KillShot:IsReady() then
-    if Cast(S.KillShot, nil, nil, not Target:IsInRange(40)) then return "kill_shot st 16"; end
-  end
-  -- wildfire_bomb,if=full_recharge_time<gcd&focus+cast_regen<focus.max|(next_wi_bomb.volatile&dot.serpent_sting.ticking&dot.serpent_sting.refreshable|next_wi_bomb.pheromone&focus+cast_regen<focus.max-action.kill_command.cast_regen*3&!buff.mongoose_fury.remains)
-  if S.VolatileBomb:IsCastable() and (S.WildfireBomb:FullRechargeTime() < Player:GCD() and CheckFocusCap(S.WildfireBomb:ExecuteTime()) or Target:DebuffUp(S.SerpentStingDebuff) and Target:DebuffRefreshable(S.SerpentStingDebuff)) then
-    if Cast(S.VolatileBomb, nil, nil, not Target:IsInRange(40)) then return "volatile_bomb st 18"; end
-  end
-  if S.PheromoneBomb:IsCastable() and (S.WildfireBomb:FullRechargeTime() < Player:GCD() and CheckFocusCap(S.WildfireBomb:ExecuteTime()) or Player:Focus() + Player:FocusCastRegen(S.PheromoneBomb:ExecuteTime()) < Player:FocusMax() - Player:FocusCastRegen(S.KillCommand:ExecuteTime()) * 3 and Player:BuffDown(S.MongooseFuryBuff)) then
-    if Cast(S.PheromoneBomb, nil, nil, not Target:IsInRange(40)) then return "pheromone_bomb st 20"; end
-  end
-  if S.ShrapnelBomb:IsCastable() and (S.WildfireBomb:FullRechargeTime() < Player:GCD() and CheckFocusCap(S.WildfireBomb:ExecuteTime())) then
-    if Cast(S.ShrapnelBomb, nil, nil, not Target:IsInRange(40)) then return "shrapnel_bomb st 22"; end
-  end
-  -- steel_trap,if=focus+cast_regen<focus.max
-  if S.SteelTrap:IsCastable() and (CheckFocusCap(S.SteelTrap:ExecuteTime())) then
-    if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap st 24"; end
+    if Cast(S.KillShot, nil, nil, not Target:IsInRange(40)) then return "kill_shot st 14"; end
   end
   -- flanking_strike,if=focus+cast_regen<focus.max
   if S.FlankingStrike:IsCastable() and (CheckFocusCap(S.FlankingStrike:ExecuteTime())) then
-    if Cast(S.FlankingStrike, nil, nil, not Target:IsInRange(15)) then return "flanking_strike st 26"; end
-  end
-  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
-  if S.KillCommand:IsCastable() then
-    if Everyone.CastTargetIf(S.KillCommand, Enemy8y, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandST) then return "kill_command st 28"; end
-  end
-  -- carve,if=active_enemies>1&!runeforge.rylakstalkers_confounding_strikes.equipped
-  if S.Carve:IsReady() and (EnemyCount8y > 1 and not RylakstalkersConfoundingEquipped) then
-    if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve st 30"; end
-  end
-  -- butchery,if=active_enemies>1&!runeforge.rylakstalkers_confounding_strikes.equipped&cooldown.wildfire_bomb.full_recharge_time>spell_targets&(charges_fractional>2.5|dot.shrapnel_bomb.ticking)
-  if S.Butchery:IsReady() and (EnemyCount8y > 1 and not RylakstalkersConfoundingEquipped and S.WildfireBomb:FullRechargeTime() > EnemyCount8y and (S.Butchery:ChargesFractional() > 2.5 or Target:DebuffUp(S.ShrapnelBombDebuff))) then
-    if Cast(S.Butchery, nil, nil, not Target:IsInRange(8)) then return "butchery st 32"; end
+    if Cast(S.FlankingStrike, nil, nil, not Target:IsInRange(15)) then return "flanking_strike st 16"; end
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsReady() then
-    if Cast(S.AMurderofCrows, Settings.Commons.GCDasOffGCD.AMurderofCrows, nil, not Target:IsInRange(40)) then return "a_murder_of_crows st 34"; end
+    if Cast(S.AMurderofCrows, Settings.Commons.GCDasOffGCD.AMurderofCrows, nil, not Target:IsInRange(40)) then return "a_murder_of_crows st 18"; end
   end
-  -- mongoose_bite,target_if=max:debuff.latent_poison_injection.stack,if=dot.shrapnel_bomb.ticking|buff.mongoose_fury.stack=5
+  -- wildfire_bomb,if=full_recharge_time<gcd|focus+cast_regen<focus.max&(next_wi_bomb.volatile&dot.serpent_sting.ticking&dot.serpent_sting.refreshable|next_wi_bomb.pheromone&!buff.mongoose_fury.up&focus+cast_regen<focus.max-action.kill_command.cast_regen*3)|time_to_die<10
+  if S.PheromoneBomb:IsReady() and (S.WildfireBomb:FullRechargeTime() < Player:GCD() or CheckFocusCap(S.WildfireBomb:ExecuteTime()) and Player:BuffDown(S.MongooseFuryBuff) and Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() - Player:FocusCastRegen(S.KillCommand:ExecuteTime()) * 3 or Target:TimeToDie() < 10) then
+    if Cast(S.PheromoneBomb, nil, nil, not Target:IsInRange(40)) then return "pheromone_bomb st 20"; end
+  end
+  if S.VolatileBomb:IsReady() and (S.WildfireBomb:FullRechargeTime() < Player:GCD() or CheckFocusCap(S.WildfireBomb:ExecuteTime()) and Target:DebuffUp(S.SerpentStingDebuff) and Target:DebuffRefreshable(S.SerpentStingDebuff) or Target:TimeToDie() < 10) then
+    if Cast(S.VolatileBomb, nil, nil, not Target:IsSpellInRange(S.VolatileBomb)) then return "volatile_bomb st 22"; end
+  end
+  -- carve,if=active_enemies>1&!runeforge.rylakstalkers_confounding_strikes.equipped
+  if S.Carve:IsReady() and (EnemyCount8y > 1 and not RylakstalkersConfoundingEquipped) then
+    if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve st 24"; end
+  end
+  -- butchery,if=active_enemies>1&!runeforge.rylakstalkers_confounding_strikes.equipped&cooldown.wildfire_bomb.full_recharge_time>spell_targets&(charges_fractional>2.5|dot.shrapnel_bomb.ticking)
+  if S.Butchery:IsReady() and (EnemyCount8y > 1 and not RylakstalkersConfoundingEquipped and S.WildfireBomb:FullRechargeTime() > EnemyCount8y and (S.Butchery:ChargesFractional() > 2.5 or Target:DebuffUp(S.ShrapnelBombDebuff))) then
+    if Cast(S.Butchery, nil, nil, not Target:IsInRange(8)) then return "butchery st 26"; end
+  end
+  -- steel_trap,if=focus+cast_regen<focus.max
+  if S.SteelTrap:IsCastable() and (CheckFocusCap(S.SteelTrap:ExecuteTime())) then
+    if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap st 28"; end
+  end
+  -- mongoose_bite,target_if=max:debuff.latent_poison_injection.stack,if=talent.alpha_predator.enabled&(buff.mongoose_fury.up&buff.mongoose_fury.remains<focus%(action.mongoose_bite.cost-cast_regen)*gcd&!buff.wild_spirits.remains|buff.mongoose_fury.remains&next_wi_bomb.pheromone)
   if S.MongooseBite:IsReady() then
-    if Everyone.CastTargetIf(S.MongooseBite, Enemy8y, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks, EvaluateTargetIfMongooseBiteST) then return "mongoose_bite st 36"; end
+    if Everyone.CastTargetIf(S.MongooseBite, Enemy8y, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks, EvaluateTargetIfMongooseBiteST) then return "mongoose_bite st 30"; end
   end
-  -- serpent_sting,target_if=min:remains,if=refreshable|buff.vipers_venom.up
+  -- kill_command,target_if=min:bloodseeker.remains,if=full_recharge_time<gcd&focus+cast_regen<focus.max
+  if S.KillCommand:IsCastable() then
+    if Everyone.CastTargetIf(S.KillCommand, Enemy8y, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandST) then return "kill_command st 32"; end
+  end
+  -- raptor_strike,target_if=max:debuff.latent_poison_injection.stack,if=buff.tip_of_the_spear.stack=3|dot.shrapnel_bomb.ticking
+  if S.RaptorStrike:IsReady() then
+    if Everyone.CastTargetIf(S.RaptorStrike, Enemy8y, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks, EvaluateTargetIfRaptorStrikeST) then return "raptor_strike st 34"; end
+  end
+  -- mongoose_bite,if=dot.shrapnel_bomb.ticking
+  if S.MongooseBite:IsReady() and (Target:DebuffUp(S.ShrapnelBombDebuff)) then
+    if Cast(S.MongooseBite, nil, nil, not Target:IsInRange(40)) then return "mongoose_bite st 36"; end
+  end
+  -- serpent_sting,target_if=min:remains,if=refreshable&target.time_to_die>7|buff.vipers_venom.up
   if S.SerpentSting:IsReady() then
     if Everyone.CastTargetIf(S.SerpentSting, Enemy8y, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingST2) then return "serpent_sting st 38"; end
   end
-  -- wildfire_bomb,if=next_wi_bomb.shrapnel&dot.serpent_sting.remains>5*gcd|runeforge.rylakstalkers_confounding_strikes.equipped
-  if S.ShrapnelBomb:IsCastable() and (Target:DebuffRemains(S.SerpentStingDebuff) > 5 * Player:GCD() or RylakstalkersConfoundingEquipped) then
+  -- wildfire_bomb,if=next_wi_bomb.shrapnel&focus>action.mongoose_bite.cost*2&dot.serpent_sting.remains>5*gcd
+  if S.ShrapnelBomb:IsCastable() and (Player:Focus() > S.MongooseBite:Cost() * 2 and Target:DebuffRemains(S.SerpentStingDebuff) > 5 * Player:GCD()) then
     if Cast(S.ShrapnelBomb, nil, nil, not Target:IsInRange(40)) then return "shrapnel_bomb st 40"; end
   end
   -- chakrams
   if S.Chakrams:IsReady() then
     if Cast(S.Chakrams, nil, nil, not Target:IsInRange(40)) then return "chakrams st 42"; end
   end
-  -- mongoose_bite,target_if=max:debuff.latent_poison_injection.stack,if=buff.mongoose_fury.up|focus+action.kill_command.cast_regen>focus.max-15|dot.shrapnel_bomb.ticking
-  if S.MongooseBite:IsReady() then
-    if Everyone.CastTargetIf(S.MongooseBite, Enemy8y, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks, EvaluateTargetIfMongooseBiteST2) then return "mongoose_bite st 44"; end
-  end
-  -- raptor_strike,target_if=max:debuff.latent_poison_injection.stack
-  if S.RaptorStrike:IsReady() then
-    if Everyone.CastTargetIf(S.RaptorStrike, Enemy8y, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks) then return "raptor_strike st 46"; end
-  end
-  -- wildfire_bomb,if=next_wi_bomb.volatile&dot.serpent_sting.ticking|next_wi_bomb.pheromone|next_wi_bomb.shrapnel
-  if S.VolatileBomb:IsCastable() and (Target:DebuffUp(S.SerpentStingDebuff)) then
-    if Cast(S.VolatileBomb, nil, nil, not Target:IsInRange(40)) then return "volatile_bomb st 48"; end
-  end
-  if S.PheromoneBomb:IsCastable() then
-    if Cast(S.PheromoneBomb, nil, nil, not Target:IsInRange(40)) then return "pheromone_bomb st 50"; end
-  end
-  if S.ShrapnelBomb:IsCastable() then
-    if Cast(S.ShrapnelBomb, nil, nil, not Target:IsInRange(40)) then return "shrapnel_bomb st 52"; end
-  end
-end
-
-local function APST()
-  -- death_chakram,if=focus+cast_regen<focus.max
-  if CDsON() and S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "death_chakram apst 2"; end
-  end
-  -- serpent_sting,target_if=min:remains,if=!dot.serpent_sting.ticking&target.time_to_die>7
-  if S.SerpentSting:IsReady() then
-    if Everyone.CastTargetIf(S.SerpentSting, Enemy8y, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingAPST) then return "serpent_sting apst 4"; end
-  end
-  if CDsON() then
-    -- flayed_shot
-    if S.FlayedShot:IsCastable() then
-      if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "flayed_shot apst 6"; end
-    end
-    -- resonating_arrow
-    if S.ResonatingArrow:IsCastable() then
-      if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "resonating_arrow apst 8"; end
-    end
-    -- wild_spirits
-    if S.WildSpirits:IsCastable() then
-      if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "wild_spirits apst 10"; end
-    end
-    -- coordinated_assault
-    if S.CoordinatedAssault:IsCastable() then
-      if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault) then return "coordinated_assault apst 12"; end
-    end
-  end
-  -- kill_shot,if=target.health.pct<=20
-  if S.KillShot:IsReady() and Target:HealthPercentage() <= 20 then
-    if Cast(S.KillShot, nil, nil, not Target:IsInRange(40)) then return "kill_shot apst 14"; end
-  end
-  -- flanking_strike,if=focus+cast_regen<focus.max
-  if S.FlankingStrike:IsCastable() and (CheckFocusCap(S.FlankingStrike:ExecuteTime())) then
-    if Cast(S.FlankingStrike, nil, nil, not Target:IsInRange(15)) then return "flanking_strike apst 16"; end
-  end
-  -- a_murder_of_crows
-  if S.AMurderofCrows:IsCastable() then
-    if Cast(S.AMurderofCrows, Settings.Survival.GCDasOffGCD.AMurderofCrows, nil, not Target:IsInRange(40)) then return "a_murder_of_crows apst 18"; end
-  end
-  -- wildfire_bomb,if=full_recharge_time<gcd|focus+cast_regen<focus.max&(next_wi_bomb.volatile&dot.serpent_sting.ticking&dot.serpent_sting.refreshable|next_wi_bomb.pheromone&!buff.mongoose_fury.up&focus+cast_regen<focus.max-action.kill_command.cast_regen*3)|time_to_die<10
-  if S.PheromoneBomb:IsReady() and (S.WildfireBomb:FullRechargeTime() < Player:GCD() or CheckFocusCap(S.WildfireBomb:ExecuteTime()) and Player:BuffDown(S.MongooseFuryBuff) and Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() - Player:FocusCastRegen(S.KillCommand:ExecuteTime()) * 3 or Target:TimeToDie() < 10) then
-    if Cast(S.PheromoneBomb, nil, nil, not Target:IsInRange(40)) then return "pheromone_bomb apst 20"; end
-  end
-  if S.VolatileBomb:IsReady() and (S.WildfireBomb:FullRechargeTime() < Player:GCD() or CheckFocusCap(S.WildfireBomb:ExecuteTime()) and Target:DebuffUp(S.SerpentStingDebuff) and Target:DebuffRefreshable(S.SerpentStingDebuff) or Target:TimeToDie() < 10) then
-    if Cast(S.VolatileBomb, nil, nil, not Target:IsSpellInRange(S.VolatileBomb)) then return "volatile_bomb apst 22"; end
-  end
-  -- carve,if=active_enemies>1&!runeforge.rylakstalkers_confounding_strikes.equipped
-  if S.Carve:IsReady() and (EnemyCount8y > 1 and not RylakstalkersConfoundingEquipped) then
-    if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve apst 24"; end
-  end
-  -- butchery,if=active_enemies>1&!runeforge.rylakstalkers_confounding_strikes.equipped&cooldown.wildfire_bomb.full_recharge_time>spell_targets&(charges_fractional>2.5|dot.shrapnel_bomb.ticking)
-  if S.Butchery:IsReady() and (EnemyCount8y > 1 and not RylakstalkersConfoundingEquipped and S.WildfireBomb:FullRechargeTime() > EnemyCount8y and (S.Butchery:ChargesFractional() > 2.5 or Target:DebuffUp(S.ShrapnelBombDebuff))) then
-    if Cast(S.Butchery, nil, nil, not Target:IsInRange(8)) then return "butchery apst 26"; end
-  end
-  -- steel_trap,if=focus+cast_regen<focus.max
-  if S.SteelTrap:IsCastable() and (CheckFocusCap(S.SteelTrap:ExecuteTime())) then
-    if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap apst 28"; end
-  end
-  -- mongoose_bite,target_if=max:debuff.latent_poison_injection.stack,if=buff.mongoose_fury.up&buff.mongoose_fury.remains<focus%(action.mongoose_bite.cost-cast_regen)*gcd&!buff.wild_spirits.remains|buff.mongoose_fury.remains&next_wi_bomb.pheromone
-  if S.MongooseBite:IsReady() then
-    if Everyone.CastTargetIf(S.MongooseBite, Enemy8y, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks, EvaluateTargetIfMongooseBiteAPST) then return "mongoose_bite apst 30"; end
-  end
-  -- kill_command,target_if=min:bloodseeker.remains,if=full_recharge_time<gcd&focus+cast_regen<focus.max
-  if S.KillCommand:IsCastable() then
-    if Everyone.CastTargetIf(S.KillCommand, Enemy8y, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateKillCommandCycleCondition1) then return "kill_command apst 32"; end
-  end
-  -- raptor_strike,target_if=max:debuff.latent_poison_injection.stack,if=buff.tip_of_the_spear.stack=3|dot.shrapnel_bomb.ticking
-  if S.RaptorStrike:IsReady() then
-    if Everyone.CastTargetIf(S.RaptorStrike, Enemy8y, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks, EvaluateTargetIfRaptorStrikeAPST) then return "raptor_strike apst 34"; end
-  end
-  -- mongoose_bite,if=dot.shrapnel_bomb.ticking
-  if S.MongooseBite:IsReady() and (Target:DebuffUp(S.ShrapnelBombDebuff)) then
-    if Cast(S.MongooseBite, nil, nil, not Target:IsInRange(40)) then return "mongoose_bite apst 36"; end
-  end
-  -- serpent_sting,target_if=min:remains,if=refreshable&target.time_to_die>7
-  if S.SerpentSting:IsReady() then
-    if Everyone.CastTargetIf(S.SerpentSting, Enemy8y, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingAPST2) then return "serpent_sting apst 38"; end
-  end
-  -- wildfire_bomb,if=next_wi_bomb.shrapnel&focus>action.mongoose_bite.cost*2&dot.serpent_sting.remains>5*gcd
-  if S.ShrapnelBomb:IsCastable() and (Player:Focus() > S.MongooseBite:Cost() * 2 and Target:DebuffRemains(S.SerpentStingDebuff) > 5 * Player:GCD()) then
-    if Cast(S.ShrapnelBomb, nil, nil, not Target:IsInRange(40)) then return "shrapnel_bomb apst 40"; end
-  end
-  -- chakrams
-  if S.Chakrams:IsReady() then
-    if Cast(S.Chakrams, nil, nil, not Target:IsInRange(40)) then return "chakrams apst 42"; end
-  end
   -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max
   if S.KillCommand:IsCastable() then
-    if Everyone.CastTargetIf(S.KillCommand, Enemy8y, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandAPST) then return "kill_command apst 44"; end
+    if Everyone.CastTargetIf(S.KillCommand, Enemy8y, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandST2) then return "kill_command st 44"; end
   end
   -- wildfire_bomb,if=runeforge.rylakstalkers_confounding_strikes.equipped
   if RylakstalkersConfoundingEquipped then
     if S.ShrapnelBomb:IsCastable() then
-      if Cast(S.ShrapnelBomb, nil, nil, not Target:IsInRange(40)) then return "shrapnel_bomb apst 46"; end
+      if Cast(S.ShrapnelBomb, nil, nil, not Target:IsInRange(40)) then return "shrapnel_bomb st 46"; end
     end
     if S.PheromoneBomb:IsCastable() then
-      if Cast(S.PheromoneBomb, nil, nil, not Target:IsInRange(40)) then return "pheromone_bomb apst 48"; end
+      if Cast(S.PheromoneBomb, nil, nil, not Target:IsInRange(40)) then return "pheromone_bomb st 48"; end
     end
     if S.VolatileBomb:IsCastable() then
-      if Cast(S.VolatileBomb, nil, nil, not Target:IsInRange(40)) then return "volatile_bomb apst 50"; end
+      if Cast(S.VolatileBomb, nil, nil, not Target:IsInRange(40)) then return "volatile_bomb st 50"; end
     end
   end
   -- mongoose_bite,target_if=max:debuff.latent_poison_injection.stack,if=buff.mongoose_fury.up|focus+action.kill_command.cast_regen>focus.max-15|dot.shrapnel_bomb.ticking|buff.wild_spirits.remains
   if S.MongooseBite:IsReady() then
-    if Everyone.CastTargetIf(S.MongooseBite, Enemy8y, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks, EvaluateTargetIfMongooseBiteAPST2) then return "mongoose_bite apst 52"; end
+    if Everyone.CastTargetIf(S.MongooseBite, Enemy8y, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks, EvaluateTargetIfMongooseBiteST2) then return "mongoose_bite st 52"; end
   end
   -- raptor_strike,target_if=max:debuff.latent_poison_injection.stack
   if S.RaptorStrike:IsReady() then
-    if Everyone.CastTargetIf(S.RaptorStrike, Enemy8y, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks) then return "raptor_strike apst 54"; end
+    if Everyone.CastTargetIf(S.RaptorStrike, Enemy8y, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks) then return "raptor_strike st 54"; end
   end
   -- wildfire_bomb,if=next_wi_bomb.volatile&dot.serpent_sting.ticking|next_wi_bomb.pheromone|next_wi_bomb.shrapnel&focus>50
   if S.VolatileBomb:IsCastable() and (Target:DebuffUp(S.SerpentStingDebuff)) then
-    if Cast(S.VolatileBomb, nil, nil, not Target:IsInRange(40)) then return "volatile_bomb apst 56"; end
+    if Cast(S.VolatileBomb, nil, nil, not Target:IsInRange(40)) then return "volatile_bomb st 56"; end
   end
   if S.PheromoneBomb:IsCastable() then
-    if Cast(S.PheromoneBomb, nil, nil, not Target:IsInRange(40)) then return "pheromone_bomb apst 58"; end
+    if Cast(S.PheromoneBomb, nil, nil, not Target:IsInRange(40)) then return "pheromone_bomb st 58"; end
   end
   if S.ShrapnelBomb:IsCastable() and (Player:Focus() > 50) then
-    if Cast(S.ShrapnelBomb, nil, nil, not Target:IsInRange(40)) then return "shrapnel_bomb apst 60"; end
+    if Cast(S.ShrapnelBomb, nil, nil, not Target:IsInRange(40)) then return "shrapnel_bomb st 60"; end
   end
 end
 
@@ -656,8 +526,22 @@ local function Cleave()
     end
   end
   -- wildfire_bomb,if=full_recharge_time<gcd
-  if S.WildfireBomb:IsReady() and not S.WildfireInfusion:IsAvailable() and (S.WildfireBomb:FullRechargeTime() < Player:GCD()) then
-    if Cast(S.WildfireBomb, nil, nil, not Target:IsInRange(40)) then return "wildfire_bomb cleave 8"; end
+  if S.WildfireBomb:FullRechargeTime() < Player:GCD() then
+    if S.WildfireInfusion:IsAvailable() then
+      if S.ShrapnelBomb:IsCastable() then
+        if Cast(S.ShrapnelBomb, nil, nil, not Target:IsInRange(40)) then return "shrapnel_bomb cleave 8"; end
+      end
+      if S.PheromoneBomb:IsCastable() then
+        if Cast(S.PheromoneBomb, nil, nil, not Target:IsInRange(40)) then return "pheromone_bomb cleave 8"; end
+      end
+      if S.VolatileBomb:IsCastable() then
+        if Cast(S.VolatileBomb, nil, nil, not Target:IsInRange(40)) then return "volatile_bomb cleave 8"; end
+      end
+    else
+      if S.WildfireBomb:IsCastable() then
+        if Cast(S.WildfireBomb, nil, nil, not Target:IsInRange(40)) then return "wildfire_bomb cleave 8"; end
+      end
+    end
   end
   -- chakrams
   if S.Chakrams:IsReady() then
@@ -788,12 +672,8 @@ local function APL()
     if (EnemyCount8y < 3 and S.BirdsofPrey:IsAvailable()) then
       local ShouldReturn = BOP(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=apst,if=active_enemies<3&talent.alpha_predator.enabled&!talent.birds_of_prey.enabled
-    if (EnemyCount8y < 3 and S.AlphaPredator:IsAvailable() and not S.BirdsofPrey:IsAvailable()) then
-      local ShouldReturn = APST(); if ShouldReturn then return ShouldReturn; end
-    end
     -- call_action_list,name=st,if=active_enemies<3&!talent.birds_of_prey.enabled
-    if (EnemyCount8y < 3 and not S.AlphaPredator:IsAvailable() and not S.BirdsofPrey:IsAvailable()) then
+    if (EnemyCount8y < 3 and not S.BirdsofPrey:IsAvailable()) then
       local ShouldReturn = ST(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cleave,if=active_enemies>2
