@@ -746,6 +746,7 @@ local function APL()
 end
 
 local function Init()
+  HR.Print("Frost DK rotation is currently a work in progress.")
 end
 
 HR.SetAPL(251, APL, Init)

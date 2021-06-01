@@ -689,7 +689,7 @@ local function APL()
 end
 
 local function OnInit ()
-  HL.Print("Survival APL is WIP.")
+  HR.Print("Survival Hunter rotation is currently a work in progress.")
 end
 
 HR.SetAPL(255, APL, OnInit)

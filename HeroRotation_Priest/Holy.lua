@@ -172,7 +172,7 @@ local function APL()
 end
 
 local function Init()
-
+  HR.Print("Holy Priest rotation is currently a work in progress.")
 end
 
 HR.SetAPL(257, APL, Init)

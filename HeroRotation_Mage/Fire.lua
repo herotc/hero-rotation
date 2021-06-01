@@ -954,7 +954,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Fire Mage APL is currently a work in progress.")
+  HR.Print("Fire Mage rotation is currently a work in progress.")
 end
 
 HR.SetAPL(63, APL, Init)

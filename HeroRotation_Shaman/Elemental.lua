@@ -536,7 +536,7 @@ local function APL()
 end
 
 local function Init()
-
+  HR.Print("Elemental Shaman rotation is currently a work in progress.")
 end
 
 HR.SetAPL(262, APL, Init)

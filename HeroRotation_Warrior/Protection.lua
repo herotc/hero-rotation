@@ -343,7 +343,7 @@ local function APL()
 end
 
 local function Init()
-
+  HR.Print("Protection Warrior rotation is currently a work in progress.")
 end
 
 HR.SetAPL(73, APL, Init)

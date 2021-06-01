@@ -454,7 +454,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("MM APL is WIP")
+  HR.Print("Marksmanship Hunter rotation is currently a work in progress.")
 end
 
 HR.SetAPL(254, APL, Init)

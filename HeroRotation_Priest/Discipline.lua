@@ -241,7 +241,7 @@ local function APL()
 end
 
 local function Init()
-
+  HR.Print("Discipline Priest rotation is currently a work in progress.")
 end
 
 HR.SetAPL(256, APL, Init)

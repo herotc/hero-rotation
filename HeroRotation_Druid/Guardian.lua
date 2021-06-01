@@ -359,6 +359,7 @@ local function APL()
 end
 
 local function OnInit()
+  HR.Print("Guardian Druid rotation is currently a work in progress.")
 end
 
 HR.SetAPL(104, APL, OnInit)
