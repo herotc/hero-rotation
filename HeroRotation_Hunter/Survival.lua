@@ -20,15 +20,6 @@ local CDsON      = HR.CDsON
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
--- luacheck: max_line_length 9999
--- Define S/I for spell and item arrays
-local S = Spell.Hunter.Survival
-local I = Item.Hunter.Survival
-
--- Rotation Var
-local SummonPetSpells = { S.SummonPet, S.SummonPet2, S.SummonPet3, S.SummonPet4, S.SummonPet5 }
-local Enemy8y, EnemyCount8y
-
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
 local Settings = {
@@ -38,9 +29,13 @@ local Settings = {
   Survival = HR.GUISettings.APL.Hunter.Survival
 }
 
--- Stuns
-local StunInterrupts = {
-  {S.Intimidation, "Cast Intimidation (Interrupt)", function () return true; end},
+-- Spells
+local S = Spell.Hunter.Survival
+
+-- Items
+local I = Item.Hunter.Survival
+local TrinketsOnUseExcludes = {
+  I.DreadfireVessel:ID(),
 }
 
 -- Legendaries
@@ -52,6 +47,15 @@ HL:RegisterForEvent(function()
   SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
   RylakstalkersConfoundingEquipped = Player:HasLegendaryEquipped(79)
 end, "PLAYER_EQUIPMENT_CHANGED")
+
+-- Rotation Var
+local SummonPetSpells = { S.SummonPet, S.SummonPet2, S.SummonPet3, S.SummonPet4, S.SummonPet5 }
+local Enemy8y, EnemyCount8y
+
+-- Stuns
+local StunInterrupts = {
+  {S.Intimidation, "Cast Intimidation (Interrupt)", function () return true; end},
+}
 
 -- Function to see if we're going to cap focus
 local function CheckFocusCap(SpellCastTime, GenFocus)
@@ -770,24 +774,26 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(5, S.Muzzle, Settings.Survival.OffGCDasOffGCD.Muzzle, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- use_items
+    if CDsON() and Settings.Commons.Enabled.Trinkets then
+      local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
+      if TrinketToUse then
+        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+      end
+    end
     -- call_action_list,name=cds
     if (CDsON()) then
       local ShouldReturn = CDs(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=bop,if=active_enemies<3&!talent.alpha_predator.enabled&!talent.wildfire_infusion.enabled
-    if (EnemyCount8y < 3 and not S.AlphaPredator:IsAvailable() and not S.WildfireInfusion:IsAvailable()) then
+    -- call_action_list,name=bop,if=active_enemies<3&talent.birds_of_prey.enabled
+    if (EnemyCount8y < 3 and S.BirdsofPrey:IsAvailable()) then
       local ShouldReturn = BOP(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=apbop,if=active_enemies<3&talent.alpha_predator.enabled&!talent.wildfire_infusion.enabled
-    if (EnemyCount8y < 3 and S.AlphaPredator:IsAvailable() and not S.WildfireInfusion:IsAvailable()) then
-      local ShouldReturn = BOP(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- call_action_list,name=apst,if=active_enemies<3&talent.alpha_predator.enabled&talent.wildfire_infusion.enabled
-    if (EnemyCount8y < 3 and S.AlphaPredator:IsAvailable() and S.WildfireInfusion:IsAvailable()) then
+    -- call_action_list,name=apst,if=active_enemies<3&talent.alpha_predator.enabled&!talent.birds_of_prey.enabled
+    if (EnemyCount8y < 3 and S.AlphaPredator:IsAvailable() and not S.BirdsofPrey:IsAvailable()) then
       local ShouldReturn = APST(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=st,if=active_enemies<3&!talent.alpha_predator.enabled&talent.wildfire_infusion.enabled
-    if (EnemyCount8y < 3 and not S.AlphaPredator:IsAvailable() and S.WildfireInfusion:IsAvailable()) then
+    -- call_action_list,name=st,if=active_enemies<3&!talent.birds_of_prey.enabled
+    if (EnemyCount8y < 3 and not S.AlphaPredator:IsAvailable() and not S.BirdsofPrey:IsAvailable()) then
       local ShouldReturn = ST(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cleave,if=active_enemies>2
