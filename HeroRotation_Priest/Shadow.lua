@@ -363,8 +363,8 @@ local function Main()
   if S.ShadowWordDeath:IsReady() and (S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and 15 - S.Mindbender:TimeSinceLastCast() <= Player:GCD() + 0.5) then
     if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death 99"; end
   end
-  -- mind_blast,if=(cooldown.mind_blast.charges>1&(debuff.hungering_void.up|!talent.hungering_void.enabled)|pet.fiend.remains<=cast_time+gcd)&pet.fiend.active&runeforge.shadowflame_prism.equipped&pet.fiend.remains>=cast_time
-  if S.MindBlast:IsCastable() and ((S.MindBlast:Charges() > 1 and (Target:DebuffUp(S.HungeringVoidDebuff) or not S.HungeringVoid:IsAvailable()) or 15 - S.Mindbender:TimeSinceLastCast() <= S.MindBlast:CastTime() + Player:GCD() + 0.5) and S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and 15 - S.Mindbender:TimeSinceLastCast() >= S.MindBlast:CastTime()) then
+  -- mind_blast,if=(cooldown.mind_blast.charges>1&(debuff.hungering_void.up|!talent.hungering_void.enabled)|pet.fiend.remains<=cast_time+gcd)&pet.fiend.active&runeforge.shadowflame_prism.equipped&pet.fiend.remains>cast_time
+  if S.MindBlast:IsCastable() and ((S.MindBlast:Charges() > 1 and (Target:DebuffUp(S.HungeringVoidDebuff) or not S.HungeringVoid:IsAvailable()) or 15 - S.Mindbender:TimeSinceLastCast() <= S.MindBlast:CastTime() + Player:GCD() + 0.5) and S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and 15 - S.Mindbender:TimeSinceLastCast() > S.MindBlast:CastTime()) then
     if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 100"; end
   end
   -- void_bolt,if=insanity<=85&talent.hungering_void.enabled&talent.searing_nightmare.enabled&spell_targets.mind_sear<=6|((talent.hungering_void.enabled&!talent.searing_nightmare.enabled)|spell_targets.mind_sear=1)
