@@ -25,6 +25,7 @@ HR.GUISettings.APL.Shaman = {
       Potions = "Suggested",
       Trinkets = "Suggested",
       Covenant = "Suggested",
+      SpiritwalkersGrace = "SuggestedRight",
     },
     UseBloodlust = false,
     -- {Display GCD as OffGCD, ForceReturn}
@@ -61,12 +62,16 @@ HR.GUISettings.APL.Shaman = {
   },
   Elemental = {
     PreferEarthShield = false,
-    ShowMovementSpells = false,
+    DisplayStyle = {
+      Meteor = "Suggested",
+      EyeOfTheStorm = "Suggested",
+    },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-      Ascendance = true,
+      EchoingShock = true,
       FireElemental = true,
+      LiquidMagmaTotem = true,
       Shield = false,
       StormElemental = true,
       Stormkeeper = true

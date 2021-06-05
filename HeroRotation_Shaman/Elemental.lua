@@ -16,6 +16,7 @@ local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
+local Cast       = HR.Cast
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 -- Lua
@@ -299,67 +300,63 @@ local function SelectSpender()
 end
 
 local function Precombat()
-  -- Refresh shields.
-  if S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShield) then
-    if HR.Cast(S.LightningShield) then return "Precombat Lightning Shield" end
-  end
   if IsViable(S.Fleshcraft) then
-    if HR.Cast(S.Fleshcraft) then return "Precombat Fleshcraft" end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "Precombat Fleshcraft" end
   end
   if IsViable(S.Stormkeeper) then
-    if HR.Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "Precombat Stormkeeper" end
+    if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "Precombat Stormkeeper" end
   end
   if IsViable(S.ElementalBlast) then
-    if HR.Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "Precombat Elemental Blast" end
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "Precombat Elemental Blast" end
   end
   if Player:IsCasting(S.ElementalBlast) and IsViable(S.PrimordialWave) then
-    if HR.Cast(S.PrimordialWave, nil, nil, not Target:IsSpellInRange(S.PrimordialWave)) then return "Precombat Primwave" end
+    if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.PrimordialWave)) then return "Precombat Primwave" end
   end
   if Player:IsCasting(S.ElementalBlast) and not IsViable(S.PrimordialWave) and S.FlameShock:CooldownRemains() == 0 then
-    if HR.Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "Precombat Flameshock" end
+    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "Precombat Flameshock" end
   end
   if IsViable(S.LavaBurst) and not Player:IsCasting(S.LavaBurst) and (not S.ElementalBlast:IsAvailable() or (S.ElementalBlast:IsAvailable() and not IsViable(S.ElementalBlast))) then
-    if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "Precombat Lavaburst" end
+    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "Precombat Lavaburst" end
   end
   if Player:IsCasting(S.LavaBurst) and S.FlameShock:CooldownRemains() == 0 then 
-    if HR.Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "Precombat Flameshock" end
+    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "Precombat Flameshock" end
   end
 end
 
 local function Cooldowns()
   local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
   if TrinketToUse then
-    if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Trinket CD" end
+    if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Trinket CD" end
   end
   if Player:IsMoving() and S.SpiritwalkersGrace:IsCastable() then
-    if HR.CastRightSuggested(S.SpiritwalkersGrace) then return "Suggest SWG" end
+    if Cast(S.SpiritwalkersGrace, nil, Settings.Commons.DisplayStyle.SpiritwalkersGrace) then return "Suggest SWG" end
   end
   if IsViable(S.ChainHarvest) then
-    if HR.Cast(S.ChainHarvest, true) then return "Chain Harvest CD" end
+    if Cast(S.ChainHarvest, nil, Settings.Commons.DisplayStyle.Covenant) then return "Chain Harvest CD" end
   end
   if IsViable(S.FaeTransfusion) then
-    if HR.Cast(S.FaeTransfusion, true) then return "Fae Transfusion CD" end
+    if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant) then return "Fae Transfusion CD" end
   end
   if IsViable(S.Stormkeeper) then
-    if HR.Cast(S.Stormkeeper, true) then return "Stormkeeper CD" end
+    if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "Stormkeeper CD" end
   end
   if IsViable(S.EchoingShock) then
-    if HR.Cast(S.EchoingShock, true) then return "Echoing Shock CD" end
+    if Cast(S.EchoingShock, Settings.Elemental.GCDasOffGCD.EchoingShock) then return "Echoing Shock CD" end
   end
   if IsViable(S.LiquidMagmaTotem) then
-    if HR.Cast(S.LiquidMagmaTotem, true) then return "Liquid Magma Totem CD" end
+    if Cast(S.LiquidMagmaTotem, Settings.Elemental.GCDasOffGCD.LiquidMagmaTotem) then return "Liquid Magma Totem CD" end
   end
   if IsViable(S.FireElemental) then
-    if HR.Cast(S.FireElemental, Settings.Elemental.GCDasOffGCD.FireElemental) then return "Fire Elemental CD" end
+    if Cast(S.FireElemental, Settings.Elemental.GCDasOffGCD.FireElemental) then return "Fire Elemental CD" end
   end
   if IsViable(S.StormElemental) then
-    if HR.Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "Storm Elemental CD" end
+    if Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "Storm Elemental CD" end
   end
   if FireElementalRemains > 0 and S.PrimalElementalist:IsAvailable() and S.Meteor:CooldownRemains() == 0 then
-    if HR.CastSuggested(S.Meteor) then return "Meteor CD" end
+    if Cast(S.Meteor, nil, Settings.Elemental.DisplayStyle.Meteor) then return "Meteor CD" end
   end
   if StormElementalRemains > 0 and S.PrimalElementalist:IsAvailable() and Pet:BuffUp(S.CallLightningBuff) and not Pet:IsChanneling(S.EyeOfTheStorm) and S.EyeOfTheStorm:CooldownRemains() == 0 then
-    if HR.CastSuggested(S.EyeOfTheStorm) then return "Eye of the Storm CD" end
+    if Cast(S.EyeOfTheStorm, nil, Settings.Elemental.DisplayStyle.EyeOfTheStorm) then return "Eye of the Storm CD" end
   end
 end
 
@@ -380,7 +377,7 @@ local function ApplyFlameShock()
   end
   if SpellObject == nil or BestFlameshockUnit == nil then return nil end
   if BestFlameshockUnit:GUID() == Target:GUID() then
-    if HR.Cast(SpellObject, nil, nil, not Target:IsInRange(40)) then return "main-target " .. SpellObject.SpellName; end
+    if Cast(SpellObject, nil, nil, not Target:IsInRange(40)) then return "main-target " .. SpellObject.SpellName; end
   else
     if HR.CastLeftNameplate(BestFlameshockUnit, SpellObject) then return "off-target " .. SpellObject.SpellName; end
   end
@@ -390,53 +387,53 @@ end
 local function MoteEmpowerment()
   local n = math.min(NumEnemiesInLargestCluster, 20)
   if Player:BuffUp(S.EchoesofGreatSunderingBuff) and MaelstromP() >= 60 then
-    if HR.Cast(S.Earthquake) then return "MOTE EOGS" end
+    if Cast(S.Earthquake) then return "MOTE EOGS" end
   end 
   local spender = SelectSpender()
   -- Special case handling
   if n >= 4 and MaelstromP() >= 90 then
-    if HR.Cast(spender) then return "Spending Maelstrom despite MOTE because Builder will overcap (AOE)" end
+    if Cast(spender) then return "Spending Maelstrom despite MOTE because Builder will overcap (AOE)" end
   end
 
   if n >= 8 and MaelstromP() >= 60 and spender == S.Earthquake then
-    if HR.Cast(S.Earthquake) then return "MOTE 8t+ EQ" end
+    if Cast(S.Earthquake) then return "MOTE 8t+ EQ" end
   elseif n >= 5 and StormkeeperBuffP() then
-    if HR.Cast(S.ChainLightning) then return "MOTE 5t+ SK CL" end
+    if Cast(S.ChainLightning) then return "MOTE 5t+ SK CL" end
   elseif n >= 5 and MaelstromP() >= 60 and spender == S.Earthquake then
-    if HR.Cast(S.Earthquake) then return "MOTE 5-7t EQ" end
+    if Cast(S.Earthquake) then return "MOTE 5-7t EQ" end
   elseif n >= 4 and StormkeeperBuffP() then
-    if HR.Cast(S.ChainLightning) then return "MOTE 4t SK CL" end
+    if Cast(S.ChainLightning) then return "MOTE 4t SK CL" end
   elseif n >= 3 and MaelstromP() >= 60 and spender == S.Earthquake then
-    if HR.Cast(S.Earthquake) then return "MOTE 3-4t EQ" end
+    if Cast(S.Earthquake) then return "MOTE 3-4t EQ" end
   elseif n >= 3 and StormkeeperBuffP() then
-    if HR.Cast(S.ChainLightning) then return "MOTE 3t SK CL" end
+    if Cast(S.ChainLightning) then return "MOTE 3t SK CL" end
   elseif n >= 2 and MaelstromP() >= 60 and spender == S.Earthquake then
-    if HR.Cast(S.Earthquake) then return "MOTE 2t EQ" end
+    if Cast(S.Earthquake) then return "MOTE 2t EQ" end
   elseif n >= 5 then
-    if HR.Cast(S.ChainLightning) then return "MOTE 5t CL" end
+    if Cast(S.ChainLightning) then return "MOTE 5t CL" end
   elseif n >= 1 and StormkeeperBuffP() then
-    if HR.Cast(S.LightningBolt) then return "MOTE 1t SK LB" end
+    if Cast(S.LightningBolt) then return "MOTE 1t SK LB" end
   elseif n >= 2 and StormkeeperBuffP() then
-    if HR.Cast(S.ChainLightning) then return "MOTE 2t SK CL" end
+    if Cast(S.ChainLightning) then return "MOTE 2t SK CL" end
   elseif n >= 4 then
-    if HR.Cast(S.ChainLightning) then return "MOTE 4t CL" end
+    if Cast(S.ChainLightning) then return "MOTE 4t CL" end
   elseif n >= 1 and MaelstromP() >= 60 and spender == S.EarthShock then
-    if HR.Cast(S.EarthShock) then return "MOTE ES" end
+    if Cast(S.EarthShock) then return "MOTE ES" end
   elseif n >= 3 then
-    if HR.Cast(S.ChainLightning) then return "MOTE 3t CL" end
+    if Cast(S.ChainLightning) then return "MOTE 3t CL" end
   elseif IcefuryBuffP() then
-    if HR.Cast(S.FrostShock) then return "MOTE Frost Shock" end
+    if Cast(S.FrostShock) then return "MOTE Frost Shock" end
   elseif IsViable(S.ElementalBlast) then
-    if HR.Cast(S.ElementalBlast) then return "MOTE EleBlast" end
+    if Cast(S.ElementalBlast) then return "MOTE EleBlast" end
   elseif IsViable(S.Icefury) then
-    if HR.Cast(S.Icefury) then return "MOTE Icefury" end
+    if Cast(S.Icefury) then return "MOTE Icefury" end
   elseif RefreshableFlameshocks > 0 then
     local DebugMessage = ApplyFlameShock()
     if DebugMessage then return "Even with MOTE up, correct move is probably to refresh flameshocks." end;
   elseif n >= 2 then
-    if HR.Cast(S.ChainLightning) then return "MOTE 2t CL" end
+    if Cast(S.ChainLightning) then return "MOTE 2t CL" end
   elseif IsViable(S.LightningBolt) then
-    if HR.Cast(S.LightningBolt) then return "MOTE LB" end
+    if Cast(S.LightningBolt) then return "MOTE LB" end
   end
 
   return nil
@@ -561,25 +558,25 @@ local function CoreRotation()
 
   -- If the maelstrom you'll have at the end of this cast plus the maelstrom from the next suggested spell could overcap you, spend.
   if MaelstromP() + ms_gen_ub > 100 and MaelstromP() >= 60 then
-    if HR.Cast(spender) then return "Spending Maelstrom because the best builder would overcap." end
+    if Cast(spender) then return "Spending Maelstrom because the best builder would overcap." end
   end
 
   -- If you have a non-nil + viable builder, then you should cast it!
   if builder ~= nil and IsViable(builder) then
-    if HR.Cast(builder) then return "Building Maelstrom with optimal Builder (AOE)" end
+    if Cast(builder) then return "Building Maelstrom with optimal Builder (AOE)" end
   end
 
   -- If you can't do a good builder, then you should try to first spend resources, then refresh flame shocks, then frost shock.
   if builder == nil then
     -- Try to spend resources
     if MaelstromP() >= 60 then
-      if HR.Cast(spender) then return "Spending Maelstrom because we cannot build" end
+      if Cast(spender) then return "Spending Maelstrom because we cannot build" end
     end
     -- Try to refresh flameshocks
     DebugMessage = ApplyFlameShock()
     if DebugMessage then return "Refreshing Flame Shock because we cannot build or spend" end
     -- Try to frost shock
-    if HR.Cast(S.FrostShock) then return "Casting Frost Shock because we cannot build or spend or refresh flame shock" end
+    if Cast(S.FrostShock) then return "Casting Frost Shock because we cannot build or spend or refresh flame shock" end
     -- Who the fuck knows, maybe a healing stream totem?
   end
 
@@ -594,6 +591,12 @@ local function APL()
 
   local DebugMessage
   if Everyone.TargetIsValid() then
+    -- Refresh shields.
+    if Settings.Elemental.PreferEarthShield and S.EarthShield:IsCastable() and (Player:BuffDown(S.EarthShield) or (not Player:AffectingCombat() and Player:BuffStack(S.EarthShield) < 5)) then
+      if Cast(S.EarthShield, Settings.Elemental.GCDasOffGCD.Shield) then return "Earth Shield Refresh"; end
+    elseif S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShield) and (Settings.Elemental.PreferEarthShield and Player:BuffDown(S.EarthShield) or not Settings.Elemental.PreferEarthShield) then
+      if Cast(S.LightningShield, Settings.Elemental.GCDasOffGCD.Shield) then return "Lightning Shield Refresh" end
+    end
     if not Player:AffectingCombat() then
       DebugMessage = Precombat();
       if DebugMessage then return DebugMessage end;
@@ -612,6 +615,7 @@ local function APL()
 end
 
 local function Init()
+  HR.Print("Elemental Shaman rotation is currently a work in progress.")
 end
 
 HR.SetAPL(262, APL, Init)
