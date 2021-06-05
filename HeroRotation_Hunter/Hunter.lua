@@ -181,7 +181,7 @@ Spell.Hunter.Survival = {
   KillShot                              = Spell(320976),
   LatentPoison                          = Spell(273283),
   Muzzle                                = Spell(187707),
-  RaptorStrike                          = Spell(186270),
+  RaptorStrike                          = MultiSpell(186270,265189),
   SerpentSting                          = Spell(259491),
   -- Traps
   FreezingTrap                          = Spell(187650),
@@ -207,7 +207,7 @@ Spell.Hunter.Survival = {
   Chakrams                              = Spell(259391),
   FlankingStrike                        = Spell(269751),
   HydrasBite                            = Spell(260241),
-  MongooseBite                          = Spell(259387),
+  MongooseBite                          = MultiSpell(259387, 265888),
   MongooseFuryBuff                      = Spell(259388),
   TermsofEngagement                     = Spell(265895),
   TipoftheSpearBuff                     = Spell(260286),
