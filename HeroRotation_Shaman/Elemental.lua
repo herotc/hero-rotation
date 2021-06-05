@@ -107,60 +107,84 @@ local function BattlefieldSnapshot()
 
   local min_flameshock_duration = 999
   local max_hp = 0
-  for _, Enemy in pairs(Player:GetEnemiesInRange(40)) do
-    -- NOTE: the IsDummy() check will assume that you ARE IN COMBAT with all dummies on screen, so zoom in camera to "work around" for testing.
-    if Enemy:AffectingCombat() or Enemy:IsDummy() then
-      -- Update enemies-in-combat count.
-      NumEnemiesInCombat = NumEnemiesInCombat + 1
+  if AoEON() then
+    for _, Enemy in pairs(Player:GetEnemiesInRange(40)) do
+      -- NOTE: the IsDummy() check will assume that you ARE IN COMBAT with all dummies on screen, so zoom in camera to "work around" for testing.
+      if Enemy:AffectingCombat() or Enemy:IsDummy() then
+        -- Update enemies-in-combat count.
+        NumEnemiesInCombat = NumEnemiesInCombat + 1
 
-      -- Update flameshock data on your targets. 
-      -- Select as "best flameshock unit" the enemy with minimum fs duration remaining, breaking ties by highest remaining health.
-      local fs_duration = Enemy:DebuffRemains(S.FlameShockDebuff)
-      if fs_duration > 0 then
-        ActiveFlameshocks = ActiveFlameshocks + 1
-      end
-      if fs_duration < 5 then
-        RefreshableFlameshocks = RefreshableFlameshocks + 1
-      end
-      if fs_duration < min_flameshock_duration then
-        min_flameshock_duration = fs_duration
-        BestFlameshockUnit = Enemy
-      end
-      if fs_duration == 0 and Enemy:Health() > max_hp then
-        max_hp = Enemy:Health()
-        BestFlameshockUnit = Enemy
-      end
-
-      -- Update splashed enemy data. This actually assigns to each unit a GROUP of splashed units, called a splash_cluster.
-      -- We can use this to choose when to chain lightning; specifically, we want to CL when any one of these
-      -- groups has two or more units in it.
-      -- TODO: sometimes we don't want to CL because the second or third targets are immune or irrelevant, for example third boss halls adds
-      -- double TODO: figure out the spell value of CL's maelstrom gen versus CL's maelstrom gen + damage (squad leader pulls in spires?)
-      -- We can't currently figure out which target is the "center" of the group.
-      -- BUG: If you just call Enemy:GetEnemiesInSplashRange(), chain lightning and earthquake seem to double count?!
-      -- We do a stupid O(N^2) deduplication. This is probably dumb but works okay for small N.
-      local potentially_duplicated_splashes = Enemy:GetEnemiesInSplashRange(10)
-      local splash_cluster = {}
-      for _, potential_dupe in pairs(potentially_duplicated_splashes) do
-        local dupe_found = false
-        for _, unique_guy in pairs(splash_cluster) do
-          if potential_dupe:GUID() == unique_guy:GUID() then
-            dupe_found = true
-            break
-          end
+        -- Update flameshock data on your targets. 
+        -- Select as "best flameshock unit" the enemy with minimum fs duration remaining, breaking ties by highest remaining health.
+        local fs_duration = Enemy:DebuffRemains(S.FlameShockDebuff)
+        if fs_duration > 0 then
+          ActiveFlameshocks = ActiveFlameshocks + 1
         end
-        if not dupe_found then table.insert(splash_cluster, potential_dupe) end
-      end
-      SplashedEnemiesTable[Enemy] = splash_cluster
-      if #splash_cluster > NumEnemiesInLargestCluster then
-        NumEnemiesInLargestCluster = #splash_cluster
-        CoreUnitInLargestCluster = Enemy
-      end
+        if fs_duration < 5 then
+          RefreshableFlameshocks = RefreshableFlameshocks + 1
+        end
+        if fs_duration < min_flameshock_duration then
+          min_flameshock_duration = fs_duration
+          BestFlameshockUnit = Enemy
+        end
+        if fs_duration == 0 and Enemy:Health() > max_hp then
+          max_hp = Enemy:Health()
+          BestFlameshockUnit = Enemy
+        end
 
-      -- Update FightTimeRemaining
-      if not Enemy:TimeToDieIsNotValid() and not Enemy:IsUserCycleBlacklisted() then
-        FightTimeRemaining = math.max(FightTimeRemaining, Enemy:TimeToDie())
+        -- Update splashed enemy data. This actually assigns to each unit a GROUP of splashed units, called a splash_cluster.
+        -- We can use this to choose when to chain lightning; specifically, we want to CL when any one of these
+        -- groups has two or more units in it.
+        -- TODO: sometimes we don't want to CL because the second or third targets are immune or irrelevant, for example third boss halls adds
+        -- double TODO: figure out the spell value of CL's maelstrom gen versus CL's maelstrom gen + damage (squad leader pulls in spires?)
+        -- We can't currently figure out which target is the "center" of the group.
+        -- BUG: If you just call Enemy:GetEnemiesInSplashRange(), chain lightning and earthquake seem to double count?!
+        -- We do a stupid O(N^2) deduplication. This is probably dumb but works okay for small N.
+        local potentially_duplicated_splashes = Enemy:GetEnemiesInSplashRange(10)
+        local splash_cluster = {}
+        for _, potential_dupe in pairs(potentially_duplicated_splashes) do
+          local dupe_found = false
+          for _, unique_guy in pairs(splash_cluster) do
+            if potential_dupe:GUID() == unique_guy:GUID() then
+              dupe_found = true
+              break
+            end
+          end
+          if not dupe_found then table.insert(splash_cluster, potential_dupe) end
+        end
+        SplashedEnemiesTable[Enemy] = splash_cluster
+        if #splash_cluster > NumEnemiesInLargestCluster then
+          NumEnemiesInLargestCluster = #splash_cluster
+          CoreUnitInLargestCluster = Enemy
+        end
+
+        -- Update FightTimeRemaining
+        if not Enemy:TimeToDieIsNotValid() and not Enemy:IsUserCycleBlacklisted() then
+          FightTimeRemaining = math.max(FightTimeRemaining, Enemy:TimeToDie())
+        end
       end
+    end
+  else
+    -- AoEON is disabled, so only care about the primary target
+    NumEnemiesInCombat = 1
+
+    -- Update flameshock data
+    local fs_duration = Target:DebuffRemains(S.FlameShockDebuff)
+    if fs_duration > 0 then
+      ActiveFlameshocks = 1
+    end
+    if fs_duration < 5 then
+      RefreshableFlameshocks = 1
+    end
+    BestFlameshockUnit = Target
+
+    -- Update "splash data"
+    NumEnemiesInLargestCluster = 1
+    CoreUnitInLargestCluster = Target
+
+    -- Update FightTimeRemaining
+    if not Target:TimeToDieIsNotValid() and not Target:IsUserCycleBlacklisted() then
+      FightTimeRemaining = Target:TimeToDie()
     end
   end
 end
@@ -318,6 +342,9 @@ local function Precombat()
   if IsViable(S.LavaBurst) and not Player:IsCasting(S.LavaBurst) and (not S.ElementalBlast:IsAvailable() or (S.ElementalBlast:IsAvailable() and not IsViable(S.ElementalBlast))) then
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "Precombat Lavaburst" end
   end
+  if Player:IsCasting(S.LavaBurst) and IsViable(S.PrimordialWave) then
+    if Cast(S.PrimordialWave, nil, nil, not Target:IsSpellInRange(S.PrimordialWave)) then return "Precombat Primwave"; end
+  end
   if Player:IsCasting(S.LavaBurst) and S.FlameShock:CooldownRemains() == 0 then 
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "Precombat Flameshock" end
   end
@@ -377,6 +404,7 @@ local function ApplyFlameShock()
   end
   if SpellObject == nil or BestFlameshockUnit == nil then return nil end
   if BestFlameshockUnit:GUID() == Target:GUID() then
+    if Player:IsCasting(S.PrimordialWave) or S.PrimordialWave:InFlight() then return nil end
     if Cast(SpellObject, nil, nil, not Target:IsInRange(40)) then return "main-target " .. SpellObject.SpellName; end
   else
     if HR.CastLeftNameplate(BestFlameshockUnit, SpellObject) then return "off-target " .. SpellObject.SpellName; end
