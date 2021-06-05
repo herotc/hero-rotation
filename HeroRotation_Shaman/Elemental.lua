@@ -428,6 +428,8 @@ local function MoteEmpowerment()
     if HR.Cast(S.FrostShock) then return "MOTE Frost Shock" end
   elseif IsViable(S.ElementalBlast) then
     if HR.Cast(S.ElementalBlast) then return "MOTE EleBlast" end
+  elseif IsViable(S.Icefury) then
+    if HR.Cast(S.Icefury) then return "MOTE Icefury" end
   elseif RefreshableFlameshocks > 0 then
     local DebugMessage = ApplyFlameShock()
     if DebugMessage then return "Even with MOTE up, correct move is probably to refresh flameshocks." end;
