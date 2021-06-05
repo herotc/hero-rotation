@@ -145,6 +145,8 @@ Spell.Shaman.Elemental = {
 
   -- Utility
   CapacitorTotem                        = Spell(192058),
+  SpiritwalkersGrace                    = Spell(79206),
+  SpiritwalkersGraceBuff                = Spell(79206),
 
   -- Racials
   BloodFury                             = Spell(33697),
@@ -198,6 +200,16 @@ Spell.Shaman.Elemental = {
   PrimordialWave                        = Spell(326059),
   PrimordialWaveBuff                    = Spell(327164),
   VesperTotem                           = Spell(324386),
+  Fleshcraft                            = Spell(324631),
+
+  -- Conduits
+  CallOfFlame                           = Spell(338303),
+
+  -- Pets
+  Meteor                                = Spell(117588),
+  CallLightning                         = Spell(157348),
+  CallLightningBuff                     = Spell(157348),
+  EyeOfTheStorm                         = Spell(157375),
 
   -- Legendaries
   EchoesofGreatSunderingBuff            = Spell(336217),
