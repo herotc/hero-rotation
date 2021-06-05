@@ -91,8 +91,8 @@ local FightTimeRemaining
 local CoreUnitInLargestCluster
 local BestFlameshockUnit
 local SplashedEnemiesTable
-local StormElementalRemains
-local FireElementalRemains
+local PrimalStormElementalActive
+local PrimalFireElementalActive
 
 -- We keep track of total enemies in combat, as well as a bunch of parameters around the encounter.
 local function BattlefieldSnapshot()
@@ -191,18 +191,16 @@ end
 
 -- Keep track of pet data stuff.
 local function PetUpdates()
-  local call_of_flame_effect = 0.0
-  StormElementalRemains = 0
-  FireElementalRemains = 0
-  if S.CallOfFlame:ConduitEnabled() then call_of_flame_effect = 0.35 + 0.01*(S.CallOfFlame:ConduitRank() - 1) end
-  local elemental_duration = 30*(1.0 + call_of_flame_effect)
-  -- TODO: if you earth ele during storm ele or fire ele, we don't correctly get these set right.
-  -- the right thing to do is probably also have a S.EarthElemental:TimeSinceLastCast() check somewhere in these conditions.
-  if S.StormElemental:IsAvailable() and S.StormElemental:TimeSinceLastCast() < elemental_duration then
-    StormElementalRemains = elemental_duration - S.StormElemental:TimeSinceLastCast()
-  end
-  if not S.StormElemental:IsAvailable() and S.FireElemental:TimeSinceLastCast() < elemental_duration then
-    FireElementalRemains = elemental_duration - S.FireElemental:TimeSinceLastCast()
+  PrimalStormElementalActive = false
+  PrimalFireElementalActive = false
+  local PetActive = Pet:IsActive()
+  local PetName = Pet:Name()
+  if PetActive then
+    if PetName == "Primal Storm Elemental" then
+      PrimalStormElementalActive = true
+    elseif PetName == "Primal Fire Elemental" then
+      PrimalFireElementalActive = true
+    end
   end
 end
 
@@ -379,10 +377,10 @@ local function Cooldowns()
   if IsViable(S.StormElemental) then
     if Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "Storm Elemental CD" end
   end
-  if FireElementalRemains > 0 and S.PrimalElementalist:IsAvailable() and S.Meteor:CooldownRemains() == 0 then
+  if PrimalFireElementalActive and S.Meteor:CooldownRemains() == 0 then
     if Cast(S.Meteor, nil, Settings.Elemental.DisplayStyle.Meteor) then return "Meteor CD" end
   end
-  if StormElementalRemains > 0 and S.PrimalElementalist:IsAvailable() and Pet:BuffUp(S.CallLightningBuff) and not Pet:IsChanneling(S.EyeOfTheStorm) and S.EyeOfTheStorm:CooldownRemains() == 0 then
+  if PrimalStormElementalActive and Pet:BuffUp(S.CallLightningBuff) and not Pet:IsChanneling(S.EyeOfTheStorm) and S.EyeOfTheStorm:CooldownRemains() == 0 then
     if Cast(S.EyeOfTheStorm, nil, Settings.Elemental.DisplayStyle.EyeOfTheStorm) then return "Eye of the Storm CD" end
   end
 end
