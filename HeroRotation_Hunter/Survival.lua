@@ -186,7 +186,7 @@ local function Precombat()
     end
     -- tar_trap,if=runeforge.soulforge_embers
     if S.TarTrap:IsCastable() and (SoulForgeEmbersEquipped) then
-      if Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap) then return "tar_trap precombat 6"; end
+      if Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap precombat 6"; end
     end
     -- Manually added: flare,if=runeforge.soulforge_embers&prev_gcd.1.tar_trap
     if S.Flare:IsCastable() and (SoulForgeEmbersEquipped and Player:PrevGCD(1, S.TarTrap)) then
@@ -251,7 +251,7 @@ local function CDs()
   end
   -- tar_trap,if=focus+cast_regen<focus.max&runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd&(active_enemies>1|active_enemies=1&time_to_die>5*gcd)
   if S.TarTrap:IsCastable() and (CheckFocusCap(S.TarTrap:ExecuteTime()) and SoulForgeEmbersEquipped and Target:DebuffDown(S.SoulforgeEmbersDebuff) and (EnemyCount8ySplash > 1 or EnemyCount8ySplash == 1 and Target:TimeToDie() > 5 * Player:GCD())) then
-    if Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsSpellInRange(S.TarTrap)) then return "tar_trap cds 20"; end
+    if Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap cds 20"; end
   end
   
   -- flare,if=focus+cast_regen<focus.max&tar_trap.up&runeforge.soulforge_embers.equipped&time_to_die>4*gcd
@@ -283,11 +283,11 @@ local function NTA()
   end
   -- freezing_trap,if=!buff.wild_spirits.remains|buff.wild_spirits.remains&cooldown.kill_command.remains&focus<action.mongoose_bite.cost
   if S.FreezingTrap:IsCastable() and (Target:DebuffDown(S.WildSpiritsDebuff) or Target:DebuffUp(S.WildSpiritsDebuff) and not S.KillCommand:CooldownUp() and Player:Focus() < S.MongooseBite:Cost()) then
-    if Cast(S.FreezingTrap, nil, nil, not Target:IsSpellInRange(S.FreezingTrap)) then return "freezing_trap nta 4"; end
+    if Cast(S.FreezingTrap, Settings.Commons.GCDasOffGCD.FreezingTrap, nil, not Target:IsInRange(40)) then return "freezing_trap nta 4"; end
   end
   -- tar_trap,if=!buff.wild_spirits.remains|buff.wild_spirits.remains&cooldown.kill_command.remains&focus<action.mongoose_bite.cost
   if S.TarTrap:IsCastable() and (Target:DebuffDown(S.WildSpiritsDebuff) or Target:DebuffUp(S.WildSpiritsDebuff) and not S.KillCommand:CooldownUp() and Player:Focus() < S.MongooseBite:Cost()) then
-    if Cast(S.TarTrap, nil, nil, not Target:IsSpellInRange(S.TarTrap)) then return "tar_trap nta 6"; end
+    if Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap nta 6"; end
   end
 end
 
