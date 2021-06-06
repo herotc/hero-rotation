@@ -194,7 +194,7 @@ local function Precombat()
     end
     -- steel_trap,precast_time=20
     if S.SteelTrap:IsCastable() and Target:DebuffDown(S.SteelTrapDebuff) then
-      if Cast(S.SteelTrap, nil, nil, not Target:IsSpellInRange(S.SteelTrap)) then return "steel_trap precombat 10"; end
+      if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap precombat 10"; end
     end
     -- Manually added: harpoon
     if S.Harpoon:IsCastable() and not Target:IsInMeleeRange(5) and (Player:BuffDown(S.AspectoftheEagle) or not Target:IsInRange(40)) then
@@ -279,7 +279,7 @@ end
 local function NTA()
   -- steel_trap
   if S.SteelTrap:IsCastable() then
-    if Cast(S.SteelTrap, nil, nil, not Target:IsSpellInRange(S.SteelTrap)) then return "steel_trap nta 2"; end
+    if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap nta 2"; end
   end
   -- freezing_trap,if=!buff.wild_spirits.remains|buff.wild_spirits.remains&cooldown.kill_command.remains&focus<action.mongoose_bite.cost
   if S.FreezingTrap:IsCastable() and (Target:DebuffDown(S.WildSpiritsDebuff) or Target:DebuffUp(S.WildSpiritsDebuff) and not S.KillCommand:CooldownUp() and Player:Focus() < S.MongooseBite:Cost()) then
@@ -347,7 +347,7 @@ local function ST()
   end
   -- steel_trap,if=focus+cast_regen<focus.max
   if S.SteelTrap:IsCastable() and (CheckFocusCap(S.SteelTrap:ExecuteTime())) then
-    if Cast(S.SteelTrap, nil, nil, not Target:IsSpellInRange(S.SteelTrap)) then return "steel_trap st 28"; end
+    if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap st 28"; end
   end
   -- mongoose_bite,target_if=max:debuff.latent_poison_injection.stack,if=talent.alpha_predator.enabled&(buff.mongoose_fury.up&buff.mongoose_fury.remains<focus%(action.mongoose_bite.cost-cast_regen)*gcd&!buff.wild_spirits.remains|buff.mongoose_fury.remains&next_wi_bomb.pheromone)
   if S.MongooseBite:IsReady() then
@@ -440,7 +440,7 @@ local function BOP()
   end
   -- call_action_list,name=nta,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus<action.mongoose_bite.cost 
   if (NessingwarysTrappingEquipped and Player:Focus() < S.MongooseBite:Cost()) then
-    local ShouldReturn = nta(); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = NTA(); if ShouldReturn then return ShouldReturn; end
   end
   -- death_chakram,if=focus+cast_regen<focus.max
   if CDsON() and S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
@@ -472,7 +472,7 @@ local function BOP()
   end
   -- steel_trap,if=focus+cast_regen<focus.max
   if S.SteelTrap:IsCastable() and (CheckFocusCap(S.SteelTrap:ExecuteTime())) then
-    if Cast(S.SteelTrap, nil, nil, not Target:IsSpellInRange(S.SteelTrap)) then return "steel_trap bop 28"; end
+    if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap bop 28"; end
   end
   -- serpent_sting,target_if=min:remains,if=dot.serpent_sting.refreshable&!buff.coordinated_assault.up
   if S.SerpentSting:IsReady() then
@@ -607,7 +607,7 @@ local function Cleave()
   end
   -- steel_trap
   if S.SteelTrap:IsCastable() then
-    if Cast(S.SteelTrap, nil, nil, not Target:IsSpellInRange(S.SteelTrap)) then return "steel_trap cleave 40"; end
+    if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap cleave 40"; end
   end
   -- serpent_sting,target_if=min:remains,if=refreshable&talent.hydras_bite.enabled&target.time_to_die>8
   if S.SerpentSting:IsReady() then
