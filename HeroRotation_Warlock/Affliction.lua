@@ -691,13 +691,15 @@ local function APL()
     if ((CovenantID == 4 or CovenantID == 1 or CovenantID == 0) and S.PhantomSingularity:IsAvailable() and Target:DebuffDown(S.PhantomSingularityDebuff) and S.PhantomSingularity:CooldownRemains() < 4) then
       local ShouldReturn = Dot_prep(); if ShouldReturn then return ShouldReturn; end
     end
-    -- dark_soul,if=dot.phantom_singularity.ticking
-    if S.DarkSoulMisery:IsReady() and (Target:DebuffUp(S.PhantomSingularityDebuff)) then
-      if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul main 2"; end
-    end
-    -- dark_soul,if=!talent.phantom_singularity&(dot.soul_rot.ticking|dot.impending_catastrophe_dot.ticking)
-    if S.DarkSoulMisery:IsReady() and (not S.PhantomSingularity:IsAvailable() and (Target:DebuffUp(S.SoulRot) or Target:DebuffUp(S.ImpendingCatastrophe))) then
-      if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul main 4"; end
+    if CDsON() then
+      -- dark_soul,if=dot.phantom_singularity.ticking
+      if S.DarkSoulMisery:IsReady() and (Target:DebuffUp(S.PhantomSingularityDebuff)) then
+        if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul main 2"; end
+      end
+      -- dark_soul,if=!talent.phantom_singularity&(dot.soul_rot.ticking|dot.impending_catastrophe_dot.ticking)
+      if S.DarkSoulMisery:IsReady() and (not S.PhantomSingularity:IsAvailable() and (Target:DebuffUp(S.SoulRot) or Target:DebuffUp(S.ImpendingCatastrophe))) then
+        if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul main 4"; end
+      end
     end
     -- phantom_singularity,if=covenant.night_fae&time>5&cooldown.soul_rot.remains<1&(trinket.empyreal_ordnance.cooldown.remains<162|!equipped.empyreal_ordnance)
     if S.PhantomSingularity:IsReady() and (CovenantID == 3 and HL.CombatTime() > 5 and S.SoulRot:CooldownRemains() < 1 and (I.EmpyrealOrdnance:CooldownRemains() < 162 or not I.EmpyrealOrdnance:IsEquipped())) then
@@ -772,14 +774,14 @@ local function APL()
       if ((CovenantID == 4 or CovenantID == 1 or CovenantID == 0) and S.SummonDarkglare:CooldownUp()) then
         local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
       end
-    end
-    -- dark_soul,if=cooldown.summon_darkglare.remains>time_to_die&(!talent.phantom_singularity|cooldown.phantom_singularity.remains>time_to_die)
-    if S.DarkSoulMisery:IsReady() and (S.SummonDarkglare:CooldownRemains() > Target:TimeToDie() and (not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownRemains() > Target:TimeToDie())) then
-      if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul main 32"; end
-    end
-    -- dark_soul,if=!talent.phantom_singularity&cooldown.summon_darkglare.remains+cooldown.summon_darkglare.duration<time_to_die
-    if S.DarkSoulMisery:IsReady() and (not S.PhantomSingularity:IsAvailable() and S.SummonDarkglare:CooldownRemains() + 20 < Target:TimeToDie()) then
-      if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul main 34"; end
+      -- dark_soul,if=cooldown.summon_darkglare.remains>time_to_die&(!talent.phantom_singularity|cooldown.phantom_singularity.remains>time_to_die)
+      if S.DarkSoulMisery:IsReady() and (S.SummonDarkglare:CooldownRemains() > Target:TimeToDie() and (not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownRemains() > Target:TimeToDie())) then
+        if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul main 32"; end
+      end
+      -- dark_soul,if=!talent.phantom_singularity&cooldown.summon_darkglare.remains+cooldown.summon_darkglare.duration<time_to_die
+      if S.DarkSoulMisery:IsReady() and (not S.PhantomSingularity:IsAvailable() and S.SummonDarkglare:CooldownRemains() + 20 < Target:TimeToDie()) then
+        if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul main 34"; end
+      end
     end
     -- call_action_list,name=item
     if (Settings.Commons.Enabled.Trinkets) then
