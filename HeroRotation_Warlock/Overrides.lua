@@ -13,7 +13,7 @@ local HR      = HeroRotation
 -- Spells
 local SpellAffli   = Spell.Warlock.Affliction
 local SpellDemo    = Spell.Warlock.Demonology
---local SpellDestro  = Spell.Warlock.Destruction
+local SpellDestro  = Spell.Warlock.Destruction
 -- Lua
 
 --SpellAffli.AbsoluteCorruption = Spell(196103)
@@ -188,8 +188,8 @@ HL.AddCoreOverride ("Player.SoulShardsP",
 , 266)
 
 -- Destruction, ID: 267
---[[local DestroOldSpellIsCastableP
-DestroOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
+local DestroOldSpellIsCastableP
+DestroOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local RangeOK = true
     if Range then
@@ -201,11 +201,28 @@ DestroOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
       return BaseCheck and not Pet:IsActive()
     elseif self == SpellDestro.Cataclysm then
       return BaseCheck and not Player:IsCasting(SpellDestro.Cataclysm)
+    elseif self == SpellDestro.ChannelDemonfire then
+      return BaseCheck and not Player:IsCasting(SpellDestro.ChannelDemonfire)
+    elseif self == SpellDestro.ScourgeStrike then
+      return BaseCheck and not Player:IsCasting(SpellDestro.ScourgeStrike)
+    elseif self == SpellDestro.DecimatingBolt then
+      return BaseCheck and not Player:IsCasting(SpellDestro.DecimatingBolt)
+    elseif self == SpellDestro.SoulRot then
+      return BaseCheck and not Player:IsCasting(SpellDestro.SoulRot)
+    elseif self == SpellDestro.ImpendingCatastrophe then
+      return BaseCheck and not Player:IsCasting(SpellDestro.ImpendingCatastrophe)
     else
       return BaseCheck
     end
   end
-, 267)]]
+, 267)
+
+local DestroOldPlayerAffectingCombat
+DestroOldPlayerAffectingCombat = HL.AddCoreOverride("Player.AffectingCombat",
+  function (self)
+    return SpellDestro.Incinerate:InFlight() or DestroOldPlayerAffectingCombat(self)
+  end
+, 267)
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP",

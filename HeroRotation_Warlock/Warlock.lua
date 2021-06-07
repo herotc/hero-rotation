@@ -138,6 +138,67 @@ Spell.Warlock.Affliction = {
 
 }
 
+Spell.Warlock.Destruction = {
+  -- Racials
+  Berserking                            = Spell(26297),
+  BloodFury                             = Spell(33702),
+  Fireblood                             = Spell(265221),
+
+  -- Base Abilities
+  ChaosBolt                             = Spell(116858),
+  Conflagrate                           = Spell(17962),
+  Backdraft                             = Spell(117828),
+  Havoc                                 = Spell(80240),
+  Immolate                              = Spell(348),
+  ImmolateDebuff                        = Spell(157736),
+  Incinerate                            = Spell(29722),
+  RainofFire                            = Spell(5740),
+  SummonInfernal                        = Spell(1122),
+  ShadowBolt                            = Spell(686),
+  SummonDarkglare                       = Spell(205180),
+  SummonPet                             = Spell(688),
+  UnstableAffliction                    = Spell(316099),
+  UnstableAfflictionDebuff              = Spell(316099),
+
+  -- Talents
+  Flashover                             = Spell(267115),
+  Eradication                           = Spell(196412),
+  EradicationDebuff                     = Spell(196414),
+  SoulFire                              = Spell(6353),
+
+  ReverseEntropy                        = Spell(205148),
+  InternalCombustion                    = Spell(266134),
+  Shadowburn                            = Spell(17877),
+
+  Inferno                               = Spell(270545),
+  FireandBrimstone                      = Spell(196408),
+  Cataclysm                             = Spell(152108),
+
+  RoaringBlaze                          = Spell(205184),
+  RoaringBlazeDebuff                    = Spell(265931),
+  RainofChaos                           = Spell(266086),
+  GrimoireofSacrifice                   = Spell(108503),
+  GrimoireofSacrificeBuff               = Spell(196099),
+
+  SoulConduit                           = Spell(215941),
+  ChannelDemonfire                      = Spell(196447),
+  DarkSoulInstability                   = Spell(113858),
+
+  -- Covenant Abilities
+  DecimatingBolt                        = Spell(325289),
+  DoorofShadows                         = Spell(300728),
+  Fleshcraft                            = Spell(324631),
+  ImpendingCatastrophe                  = Spell(321792),
+  ScouringTithe                         = Spell(312321),
+  SoulRot                               = Spell(325640),
+
+  -- Conduit Effects
+  LeadByExample                         = Spell(342156),
+
+  -- Item Effects
+
+}
+
 -- Items
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Demonology = {
@@ -162,4 +223,8 @@ Item.Warlock.Affliction = {
   SunbloodAmethyst                      = Item(178826),
   TabletofDespair                       = Item(181357),
   WakenersFrond                         = Item(181457),
+}
+
+Item.Warlock.Destruction = {
+  PotionofSpectralIntellect             = Item(307096)
 }

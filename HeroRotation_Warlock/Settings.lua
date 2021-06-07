@@ -38,26 +38,21 @@ HR.GUISettings.APL.Warlock = {
       SpellLock = true,
     }
   },
-  --[[Destruction = {
-    UnendingResolveHP = 20,
-    UseSplashData = true,
-    SpellType="Auto",--Green fire override {"Auto","Orange","Green"}
+  Destruction = {
+    --UnendingResolveHP = 20,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-      DemonicPower = true,
+      SummonPet = false,
       GrimoireOfSacrifice = true,
-      DimensionalRift = true,
-      SummonImp = true,
-      GrimoireImp = true,
+      SummonInfernal = true
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
-      UnendingResolve = true,
-      SoulHarvest = true,
+      DarkSoulInstability = true
     }
-  },]]
+  },
   Demonology = {
     ImpsRequiredForImplosion = 6,
     UnendingResolveHP = 20,
@@ -103,15 +98,15 @@ local CP_Warlock = CreateChildPanel(ARPanel, "Warlock")
 --local CP_Destruction = CreateChildPanel(CP_Warlock, "Destruction")
 local CP_Demonology = CreateChildPanel(CP_Warlock, "Demonology")
 local CP_Affliction = CreateChildPanel(CP_Warlock, "Affliction")
+local CP_Destruction = CreateChildPanel(CP_Warlock, "Destruction")
 
 -- Warlock
 CreateARPanelOptions(CP_Warlock, "APL.Warlock.Commons")
 
---[[ Destruction
-CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.")
-CreatePanelOption("Slider", CP_Destruction, "APL.Warlock.Destruction.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.")
-CreatePanelOption("Dropdown", CP_Destruction, "APL.Warlock.Destruction.SpellType", {"Auto","Orange","Green"}, "Spell icons", "Define what icons you want to appear.")
-CreateARPanelOptions(CP_Destruction, "APL.Warlock.Destruction")]]
+-- Destruction
+--CreatePanelOption("Slider", CP_Destruction, "APL.Warlock.Destruction.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.")
+--CreatePanelOption("Dropdown", CP_Destruction, "APL.Warlock.Destruction.SpellType", {"Auto","Orange","Green"}, "Spell icons", "Define what icons you want to appear.")
+CreateARPanelOptions(CP_Destruction, "APL.Warlock.Destruction")
 
 -- Demonology
 CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.ImpsRequiredForImplosion", {3, 9, 1}, "Imps Required for Implosion", "Set the number of Imps required for Implosion.")

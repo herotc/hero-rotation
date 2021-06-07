@@ -13,4 +13,5 @@ Warlock.lua
 Events.lua
 Demonology.lua
 Affliction.lua
+Destruction.lua
 Overrides.lua
