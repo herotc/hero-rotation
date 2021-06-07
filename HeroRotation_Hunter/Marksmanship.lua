@@ -225,7 +225,7 @@ local function St()
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 2"; end
   end
   -- kill_shot
-  if S.KillShot:IsReady() then
+  if S.KillShot:IsCastable() then
     if Everyone.CastCycle(S.KillShot, Enemies40y, EvaluateCycleKillShot2, not TargetInRange40y) then return "kill_shot st 4"; end
   end
   -- Manually added: Primary target fallback for kill_shot
@@ -376,7 +376,7 @@ local function Trickshots()
     if Cast(S.ChimaeraShot, nil, nil, not TargetInRange40y) then return "chimaera_shot trickshots 32"; end
   end
   -- kill_shot,if=buff.dead_eye.down
-  if S.KillShot:IsReady() then
+  if S.KillShot:IsCastable() then
     if Everyone.CastCycle(S.KillShot, Enemies40y, EvaluateCycleKillShot1, not TargetInRange40y) then return "kill_shot trickshots 34"; end
   end
   -- Manually added: Primary target fallback for kill_shot
