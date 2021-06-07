@@ -35,8 +35,7 @@ local OnUseExcludes = {
 local VarExecutePhase
 
 -- Enemies Variables
-local Enemies8y, Enemies20y
-local EnemiesCount8, EnemiesCount20
+local Enemies8y, EnemiesCount8
 local TargetInMeleeRange
 
 -- Legendaries
@@ -85,7 +84,7 @@ local function Precombat()
       if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat 4"; end
     end
     -- Manually Added: Charge if not in melee. Bloodthirst if in melee
-    if S.Charge:IsCastable() and S.Charge:Charges() >= 1 and not TargetInMeleeRange then
+    if S.Charge:IsCastable() then
       if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge, not Target:IsSpellInRange(S.Charge)) then return "charge precombat 6"; end
     end
     if S.Bloodthirst:IsCastable() then
@@ -202,13 +201,10 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   if AoEON() then
-    Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
-    Enemies12y = Player:GetEnemiesInMeleeRange(12) -- Dragon Roar
+    Enemies8y = Player:GetEnemiesInMeleeRange(8)
     EnemiesCount8 = #Enemies8y
-    EnemiesCount12 = #Enemies12y
   else
     EnemiesCount8 = 1
-    EnemiesCount12 = 1
   end
 
   -- Range check
@@ -223,7 +219,7 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- charge
-    if S.Charge:IsCastable() and S.Charge:Charges() >= 1 and (not Target:IsInMeleeRange(5)) then
+    if S.Charge:IsCastable() then
       if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge, not Target:IsSpellInRange(S.Charge)) then return "charge main 2"; end
     end
     -- Manually added: VR/IV
@@ -278,9 +274,8 @@ local function APL()
       end
     end
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up|raid_event.adds.in<gcd&!buff.meat_cleaver.up
-    -- Manually added PrevGCDP and buff stack check to smooth out Whirlwind usage
-    if S.Whirlwind:IsCastable("Melee") and (EnemiesCount8 > 1 and (Player:BuffDown(S.MeatCleaverBuff) or Player:PrevGCDP(3, S.Whirlwind) and Player:BuffStack(S.MeatCleaverBuff) == 1)) then
-      if Cast(S.Whirlwind) then return "whirlwind 60"; end
+    if S.Whirlwind:IsCastable() and (EnemiesCount8 > 1 and Player:BuffDown(S.MeatCleaverBuff)) then
+      if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind 60"; end
     end
     if (Settings.Commons.Enabled.Trinkets) then
       -- use_items
