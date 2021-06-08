@@ -51,9 +51,6 @@ local OnUseExcludes = {
   I.WakenersFrond:ID()
 }
 
--- Rotation Var
-local EnemiesCount
-
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
 local Settings = {
@@ -289,9 +286,8 @@ local function Precombat()
     if not var_init then
       VarInit()
     end
-    -- snapshot_stats
-    -- use_item,name=soul_igniter
-    if I.SoulIgniter:IsEquippedAndReady() then
+    -- use_item,name=soul_igniter,if=!variable.combustion_on_use&!equipped.dreadfire_vessel&(!talent.firestarter|variable.firestarter_combustion)
+    if I.SoulIgniter:IsEquippedAndReady() and not var_combustion_on_use and I.DreadfireVessel:IsEquipped() and (not S.Firestarter:IsAvailable() or var_firestarter_combustion) then
       if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soul_igniter precombat"; end
     end
     -- mirror_image
@@ -349,8 +345,7 @@ local function CombustionTiming()
   end
   -- variable,name=combustion_time,op=max,value=cooldown.buff_disciplinary_command.remains,if=runeforge.disciplinary_command&buff.disciplinary_command.down
   if DisciplinaryCommandEquipped and Player:BuffDown(S.DisciplinaryCommandBuff) then
-    var_combustion_time = max(S.DisciplinaryCommandBuff:CooldownRemains(), var_combustion_time)
-    -- TODO: Verify S.DisciplinaryCommandBuff:CooldownRemains() works as expected_fire_blasts
+    var_combustion_time = max(var_disciplinary_command_cd_remains, var_combustion_time)
   end
   -- variable,name=combustion_time,op=max,value=raid_event.adds.in,if=raid_event.adds.exists&raid_event.adds.count>=3&raid_event.adds.duration>15
   -- Note: Skipping this, as we don't handle SimC's raid_event
@@ -544,11 +539,11 @@ local function CombustionPhase()
   if S.Scorch:IsReady() and (Player:BuffRemains(S.CombustionBuff) > S.Scorch:CastTime() and Player:BuffUp(S.CombustionBuff) or (Player:BuffDown(S.CombustionBuff) and S.Combustion:CooldownRemains() < S.Scorch:CastTime())) then
     if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch combustion_phase 28"; end
   end
-  --living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1
+  -- living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1
   if S.LivingBomb:IsReady() and AoEON() and (Player:BuffRemains(S.CombustionBuff) < Player:GCD() + 0.5 and EnemiesCount10ySplash > 1) then
     if Cast(S.LivingBomb, nil, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb combustion_phase 29"; end
   end
-  --dragons_breath,if=buff.combustion.remains<gcd.max&buff.combustion.up
+  -- dragons_breath,if=buff.combustion.remains<gcd.max&buff.combustion.up
   if S.DragonsBreath:IsReady() and (Player:BuffRemains(S.CombustionBuff) < Player:GCD() + 0.5 and Player:BuffUp(S.CombustionBuff)) then
     if Settings.Fire.StayDistance and not Target:IsInRange(12) then
       if CastLeft(S.DragonsBreath) then return "dragons_breath combustion_phase 30 left"; end
@@ -702,10 +697,6 @@ local function StandardRotation()
   if S.Fireball:IsReady() then
     if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball standard_rotation 16"; end
   end
-end
-
-local function default()
-  
 end
 
 --- ======= ACTION LISTS =======
@@ -942,7 +933,7 @@ local function APL()
     if S.FireBlast:IsReady() and (Player:IsCasting(S.ShiftingPower) and S.FireBlast:FullRechargeTime() < S.ShiftingPower:TickReduction() and Player:BuffDown(S.HotStreakBuff) and HL.CombatTime() > 10) then
       if FBCast(S.FireBlast) then return "fire_blast default 34"; end
     end
-    --call_action_list,name=standard_rotation,if=variable.time_to_combustion>0&buff.rune_of_power.down
+    -- call_action_list,name=standard_rotation,if=variable.time_to_combustion>0&buff.rune_of_power.down
     if (var_time_to_combustion > 0 and Player:BuffDown(S.RuneofPowerBuff)) then
       local ShouldReturn = StandardRotation(); if ShouldReturn then return ShouldReturn; end
     end
