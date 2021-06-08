@@ -113,6 +113,10 @@ HL.AddCoreOverride("Spell.IsCastable",
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellArcane.TouchoftheMagi then
       return BaseCheck and not Player:IsCasting(self)
+    elseif self == SpellArcane.Frostbolt then
+      return BaseCheck and not Player:IsCasting(self)
+    elseif self == SpellArcane.PresenceofMind then
+      return BaseCheck and Player:BuffDown(SpellArcane.PresenceofMind)
     else
       return BaseCheck
     end
