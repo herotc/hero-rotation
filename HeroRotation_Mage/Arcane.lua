@@ -1170,7 +1170,7 @@ local function APL()
       if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 3"; end
     end
     --time_warp,if=runeforge.temporal_warp&buff.exhaustion.up&(cooldown.arcane_power.ready|fight_remains<=40)
-    if S.TimeWarp:IsReady() and Settings.Fire.UseTemporalWarp and (TemporalWarpEquipped and Player:BloodlustExhaustUp()) and (S.ArcanePower:CooldownRemains() == 0 or fightRemains <= 40) then
+    if S.TimeWarp:IsReady() and Settings.Arcane.UseTemporalWarp and (TemporalWarpEquipped and Player:BloodlustExhaustUp()) and (S.ArcanePower:CooldownRemains() == 0 or fightRemains <= 40) then
       if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp combustion_cooldowns 6"; end
     end
     --lights_judgment,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down
