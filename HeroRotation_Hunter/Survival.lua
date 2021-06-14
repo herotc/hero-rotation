@@ -139,14 +139,17 @@ local function EvaluateTargetIfKillCommandBOP(TargetUnit)
   return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and Player:BuffUp(S.NessingwarysTrappingBuff))
 end
 
--- if=focus+cast_regen<focus.max&!runeforge.nessingwarys_trapping_apparatus.equipped|focus+cast_regen<focus.max&((runeforge.nessingwarys_trapping_apparatus.equipped&!talent.steel_trap.enabled&cooldown.freezing_trap.remains&cooldown.tar_trap.remains)|(runeforge.nessingwarys_trapping_apparatus.equipped&talent.steel_trap.enabled&cooldown.freezing_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd&cooldown.tar_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd&cooldown.steel_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd))|focus<action.mongoose_bite.cost
+-- if=focus+cast_regen<focus.max&!runeforge.nessingwarys_trapping_apparatus|focus+cast_regen<focus.max&runeforge.nessingwarys_trapping_apparatus&((!talent.steel_trap&cooldown.freezing_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd&cooldown.tar_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd)|(talent.steel_trap&cooldown.freezing_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd&cooldown.tar_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd&cooldown.steel_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd))|focus<action.mongoose_bite.cost
 local function EvaluateTargetIfKillCommandBOP2(TargetUnit)
   local FocusCap = CheckFocusCap(S.KillCommand:ExecuteTime(), 15)
   local KCFCR = Player:FocusCastRegen(S.KillCommand:ExecuteTime())
   local CurFocus = Player:Focus()
   local CurGCD = Player:GCD()
   local MongooseCost = S.MongooseBite:Cost()
-  return (FocusCap and not NessingwarysTrappingEquipped or FocusCap and ((NessingwarysTrappingEquipped and not S.SteelTrap:IsAvailable() and not S.FreezingTrap:CooldownUp() and not S.TarTrap:CooldownUp()) or (NessingwarysTrappingEquipped and S.SteelTrap:IsAvailable() and S.FreezingTrap:CooldownRemains() > CurFocus / (MongooseCost - KCFCR) * CurGCD and S.TarTrap:CooldownRemains() > CurFocus / (MongooseCost - KCFCR) * CurGCD and S.SteelTrap:CooldownRemains() > CurFocus / (MongooseCost - KCFCR) * CurGCD)) or CurFocus < MongooseCost)
+  local FreezingTrapCheck = S.FreezingTrap:CooldownRemains() > CurFocus / (MongooseCost - KCFCR) * CurGCD
+  local TarTrapCheck = S.TarTrap:CooldownRemains() > CurFocus / (MongooseCost - KCFCR) * CurGCD
+  local SteelTrapCheck = S.SteelTrap:CooldownRemains() > CurFocus / (MongooseCost - KCFCR) * CurGCD
+  return (FocusCap and not NessingwarysTrappingEquipped or FocusCap and NessingwarysTrappingEquipped and ((not S.SteelTrap:IsAvailable() and FreezingTrapCheck and TarTrapCheck) or (S.SteelTrap:IsAvailable() and FreezingTrapCheck and TarTrapCheck and SteelTrapCheck)) or CurFocus < MongooseCost)
 end
 
 -- if=buff.coordinated_assault.up&buff.coordinated_assault.remains<1.5*gcd
@@ -466,7 +469,7 @@ local function BOP()
   if S.WildfireBomb:IsCastable() and (CheckFocusCap(S.WildfireBomb:ExecuteTime()) and Target:DebuffDown(S.WildfireBombDebuff) and (S.WildfireBomb:FullRechargeTime() < Player:GCD() or Target:DebuffDown(S.WildfireBombDebuff) and Player:BuffRemains(S.MongooseFuryBuff) > S.WildfireBomb:FullRechargeTime() - Player:GCD() or Target:DebuffDown(S.WildfireBombDebuff) and Player:BuffDown(S.MongooseFuryBuff)) or Target:TimeToDie() < 18 and Target:DebuffDown(S.WildfireBombDebuff)) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb bop 24"; end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&!runeforge.nessingwarys_trapping_apparatus.equipped|focus+cast_regen<focus.max&((runeforge.nessingwarys_trapping_apparatus.equipped&!talent.steel_trap.enabled&cooldown.freezing_trap.remains&cooldown.tar_trap.remains)|(runeforge.nessingwarys_trapping_apparatus.equipped&talent.steel_trap.enabled&cooldown.freezing_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd&cooldown.tar_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd&cooldown.steel_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd))|focus<action.mongoose_bite.cost
+  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&!runeforge.nessingwarys_trapping_apparatus|focus+cast_regen<focus.max&runeforge.nessingwarys_trapping_apparatus&((!talent.steel_trap&cooldown.freezing_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd&cooldown.tar_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd)|(talent.steel_trap&cooldown.freezing_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd&cooldown.tar_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd&cooldown.steel_trap.remains>focus%(action.mongoose_bite.cost-cast_regen)*gcd))|focus<action.mongoose_bite.cost
   if S.KillCommand:IsCastable() then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandBOP2, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command bop 26"; end
   end
