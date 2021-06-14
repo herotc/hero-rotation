@@ -219,8 +219,8 @@ local function Bear()
   if S.Swipe:IsCastable() and (Player:BuffDown(S.IncarnationBuff) and Player:BuffDown(S.BerserkBuff) and MeleeEnemies8yCount >= 4) then
     if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(8)) then return "swipe bear 28"; end
   end
-  -- maul,if=buff.incarnation.up&active_enemies<2
-  if S.Maul:IsReady() and UseMaul and (Player:BuffUp(S.IncarnationBuff) and MeleeEnemies8yCount < 2) then
+  -- maul,if=buff.incarnation.up&active_enemies<2|buff.berserk_bear.up&active_enemies<2
+  if S.Maul:IsReady() and UseMaul and (Player:BuffUp(S.IncarnationBuff) and MeleeEnemies8yCount < 2 or Player:BuffUp(S.BerserkBuff) and MeleeEnemies8yCount < 2) then
     if Cast(S.Maul, nil, nil, not Target:IsInMeleeRange(5)) then return "maul bear 30"; end
   end
   -- maul,if=(buff.savage_combatant.stack>=1)&(buff.tooth_and_claw.up)&buff.incarnation.up&active_enemies=2
