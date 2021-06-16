@@ -203,11 +203,11 @@ local function Precombat()
     -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(!talent.breath_of_sindragosa&(trinket.2.cooldown.duration%%cooldown.pillar_of_frost.duration=0)|talent.breath_of_sindragosa&(cooldown.breath_of_sindragosa.duration%%trinket.2.cooldown.duration=0)|talent.icecap)
     -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!trinket.1.has_use_buff&trinket.2.has_use_buff|trinket.2.has_use_buff&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync))
     -- TODO: Trinket sync/priority stuff. Currently unable to pull trinket CD durations because WoW's API is bad.
-    if S.HowlingBlast:IsReady() and (Target:DebuffDown(S.FrostFeverDebuff)) then
+    if S.HowlingBlast:IsReady() and (not Target:IsInRange(8)) then
       if Cast(S.HowlingBlast, nil, nil, not TargetIsInRange[30]) then return "howling_blast precombat"; end
     end
-    if S.Obliterate:IsReady() and (S.BreathofSindragosa:IsAvailable()) then
-      if Cast(S.Obliterate, nil, nil, not TargetIsInRange[8]) then return "obliterate precombat"; end
+    if S.RemorselessWinter:IsReady() and (Target:IsInRange(8)) then
+      if Cast(S.RemorselessWinter, nil, nil, not TargetIsInRange[8]) then return "remorseless_winter precombat"; end
     end
   end
 end
