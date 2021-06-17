@@ -387,9 +387,10 @@ end
 
 local function NumFlameShocksToMaintain()
   if SkybreakersEquipped then return math.min(4, NumEnemiesInCombat) end -- Skybreakers (always be flame shockin')
+  if PrimalStormElementalActive then return 0 end -- don't refresh flameshock during storm ele
   if NumEnemiesInLargestCluster == 1 then return math.min(3, NumEnemiesInCombat) end -- Single Target, Spread Cleave (maintain one FS)
   if (NumEnemiesInCombat == 2 or NumEnemiesInCombat == 3) and (NumEnemiesInLargestCluster == 2 or NumEnemiesInLargestCluster == 3) then return math.min(3, NumEnemiesInCombat) end -- Stacked Cleave
-  if NumEnemiesInLargestCluster >= 4 then return 1 end -- AOE
+  if NumEnemiesInLargestCluster >= 4 then return 0 end -- AOE
   return 1 -- fallthrough when no combat?
 end
 
@@ -468,9 +469,16 @@ end
 local function SingleTargetAndSpreadCleaveBuilder()
   local lavaburst_ms_lb = 10*(1 + num(Player:BuffUp(S.PrimordialWaveBuff))*ActiveFlameshocks)
   local lavaburst_ms_ub = 14*(1 + num(Player:BuffUp(S.PrimordialWaveBuff))*ActiveFlameshocks)
+
+  -- only lightning bolt during storm ele (TODO: mrdmnd - consider case when you won't get a full ele off (combat falling soon) and don't do this)
+  -- Use necro buff even if storm ele is up
+  if IsViable(S.LavaBurst) and Player:BuffUp(S.PrimordialWaveBuff) then
+    return S.LavaBurst, false, lavaburst_ms_ub
+  elseif IsViable(S.LightningBolt) and PrimalStormElementalActive then
+    return S.LightningBolt, false, 11
   
   -- In this top case, we set lavaburst_ms_ub = 8 because we don't actually care that much about overcapping MS to MOTE empower a spender.
-  if MaelstromP() + lavaburst_ms_lb >= 60 and Player:BuffUp(S.LavaSurgeBuff) and S.MasterOfTheElements:IsAvailable() and not MasterOfTheElementsP() then
+  elseif MaelstromP() + lavaburst_ms_lb >= 60 and Player:BuffUp(S.LavaSurgeBuff) and S.MasterOfTheElements:IsAvailable() and not MasterOfTheElementsP() then
     return S.LavaBurst, false, 8
   elseif Player:BuffUp(S.LavaSurgeBuff) and S.LavaBurst:ChargesFractional() >= 1.25 then
     return S.LavaBurst, false, lavaburst_ms_ub
@@ -478,8 +486,6 @@ local function SingleTargetAndSpreadCleaveBuilder()
     return S.ElementalBlast, false, 45
   elseif Player:BuffUp(S.LavaSurgeBuff) then
     return S.LavaBurst, false, lavaburst_ms_ub
-  elseif Player:BuffStack(S.WindGustBuff) > 2 then
-    return S.LightningBolt, false, 11
   elseif IsViable(S.Icefury) then
     return S.Icefury, false, 37
   elseif IsViable(S.LavaBurst) then
@@ -498,9 +504,17 @@ local function StackedCleaveBuilder()
   local lavaburst_ms_ub = 14*(1 + num(Player:BuffUp(S.PrimordialWaveBuff))*ActiveFlameshocks)
   local n = NumEnemiesInLargestCluster
   local chainlightning_ms = 4*n + 3*n*n
+ 
+  -- Top two cases are special-cased.
+  -- Use necro buff with the flame shock legendary
+  if IsViable(S.LavaBurst) and ActiveFlameshocks >= 3 and Player:BuffUp(S.PrimordialWaveBuff) then
+    return S.LavaBurst, false, lavaburst_ms_ub
+  -- only chain lightning during storm ele (TODO: mrdmnd - consider case when you won't get a full ele off (combat falling soon) and don't do this)
+  elseif IsViable(S.ChainLightning) and PrimalStormElementalActive then
+    return S.ChainLightning, false, chainlightning_ms
 
-  -- In this top case, we set lavaburst_ms_ub = 0 because we don't actually care about overcapping MS to MOTE empower a quake.
-  if MaelstromP() + lavaburst_ms_lb >= 60 and Player:BuffUp(S.LavaSurgeBuff) and SelectSpender() == S.Earthquake and S.MasterOfTheElements:IsAvailable() and not MasterOfTheElementsP() then
+  -- In this case, we set lavaburst_ms_ub = 0 because we don't actually care about overcapping MS to MOTE empower a quake.
+  elseif MaelstromP() + lavaburst_ms_lb >= 60 and Player:BuffUp(S.LavaSurgeBuff) and SelectSpender() == S.Earthquake and S.MasterOfTheElements:IsAvailable() and not MasterOfTheElementsP() then
     return S.LavaBurst, false, 0
   elseif Player:BuffUp(S.LavaSurgeBuff) and S.LavaBurst:ChargesFractional() >= 1.5 then
     return S.LavaBurst, false, lavaburst_ms_ub
@@ -508,8 +522,6 @@ local function StackedCleaveBuilder()
     return S.ElementalBlast, false, 45
   elseif Player:BuffUp(S.LavaSurgeBuff) then
     return S.LavaBurst, false, lavaburst_ms_ub
-  elseif Player:BuffStack(S.WindGustBuff) > 18 then
-    return S.ChainLightning, false, chainlightning_ms
   elseif IsViable(S.LavaBurst) then
     return S.LavaBurst, false, lavaburst_ms_ub
   elseif IcefuryBuffP() then 
@@ -530,8 +542,16 @@ local function AOEBuilder()
   local n = NumEnemiesInLargestCluster
   local chainlightning_ms = 4*n + 3*n*n
 
+  -- Top two cases are special-cased.
+  -- Use necro buff with the flame shock legendary
+  if IsViable(S.LavaBurst) and ActiveFlameshocks >= 3 and Player:BuffUp(S.PrimordialWaveBuff) then
+    return S.LavaBurst, false, lavaburst_ms_ub
+  -- only chain lightning during storm ele (TODO: mrdmnd - consider case when you won't get a full ele off (combat falling soon) and don't do this)
+  elseif IsViable(S.ChainLightning) and PrimalStormElementalActive then
+    return S.ChainLightning, false, chainlightning_ms
+
   -- In this top case, we set lavaburst_ms_ub = 0 because we don't actually care about overcapping MS to MOTE empower a quake.
-  if MaelstromP() + lavaburst_ms_lb >= 60 and Player:BuffUp(S.LavaSurgeBuff) and SelectSpender() == S.Earthquake and S.MasterOfTheElements:IsAvailable() and not MasterOfTheElementsP() then
+  elseif MaelstromP() + lavaburst_ms_lb >= 60 and Player:BuffUp(S.LavaSurgeBuff) and SelectSpender() == S.Earthquake and S.MasterOfTheElements:IsAvailable() and not MasterOfTheElementsP() then
     return S.LavaBurst, false, 0
   elseif IsViable(S.ChainLightning) then
     return S.ChainLightning, false, chainlightning_ms
@@ -574,7 +594,7 @@ local function CoreRotation()
 
   -- Refresh flameshocks when the builder is low priority.
   local flame_shock_condition_a = (prefer_fs_refresh and RefreshableFlameshocks > 0 and ActiveFlameshocks <= NumFlameShocksToMaintain())
-  local flame_shock_condition_b = (NumEnemiesInLargestCluster == 1 and S.PrimordialWave:IsAvailable() and IsViable(S.PrimordialWave))
+  local flame_shock_condition_b = (NumEnemiesInLargestCluster == 1 and S.PrimordialWave:IsAvailable() and IsViable(S.PrimordialWave) and not PrimalStormElementalActive)
   if flame_shock_condition_a or flame_shock_condition_b then
     DebugMessage = ApplyFlameShock()
     if DebugMessage then return DebugMessage end;
