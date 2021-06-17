@@ -112,7 +112,7 @@ local function SingleTarget()
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 8"; end
   end
   -- siegebreaker,if=spell_targets.whirlwind>1|raid_event.adds.in>15
-  if S.Siegebreaker:IsCastable() and (EnemiesCount8 > 1) then
+  if S.Siegebreaker:IsCastable() then
     if Cast(S.Siegebreaker, nil, nil, not TargetInMeleeRange) then return "siegebreaker single_target 10"; end
   end
   -- rampage,if=buff.recklessness.up|(buff.enrage.remains<gcd|rage>90)|buff.frenzy.remains<1.5
@@ -125,11 +125,11 @@ local function SingleTarget()
   end
   if CDsON() then
     -- ancient_aftershock,if=buff.enrage.up&cooldown.recklessness.remains>5&(target.time_to_die>95|buff.recklessness.up|target.time_to_die<20)&(spell_targets.whirlwind>1|raid_event.adds.in>75)
-    if S.AncientAftershock:IsCastable() and (Player:BuffUp(S.EnrageBuff) and S.Recklessness:CooldownRemains() > 5 and (Target:TimeToDie() > 95 or Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20) and EnemiesCount8 > 1) then
+    if S.AncientAftershock:IsCastable() and (Player:BuffUp(S.EnrageBuff) and S.Recklessness:CooldownRemains() > 5 and (Target:TimeToDie() > 95 or Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20)) then
       if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(12)) then return "ancient_aftershock single_target 16"; end
     end
     -- spear_of_bastion,if=buff.enrage.up&cooldown.recklessness.remains>5&(target.time_to_die>65|buff.recklessness.up|target.time_to_die<20)&(spell_targets.whirlwind>1|raid_event.adds.in>75)
-    if S.SpearofBastion:IsCastable() and (Player:BuffUp(S.EnrageBuff) and S.Recklessness:CooldownRemains() > 5 and (Target:TimeToDie() > 65 or Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20) and EnemiesCount8 > 1) then
+    if S.SpearofBastion:IsCastable() and (Player:BuffUp(S.EnrageBuff) and S.Recklessness:CooldownRemains() > 5 and (Target:TimeToDie() > 65 or Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20)) then
       if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion single_target 18"; end
     end
   end
@@ -150,7 +150,7 @@ local function SingleTarget()
     if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 26"; end
   end
   -- dragon_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
-  if S.DragonRoar:IsCastable() and (Player:BuffUp(S.EnrageBuff) and EnemiesCount8 > 1) then
+  if S.DragonRoar:IsCastable() and (Player:BuffUp(S.EnrageBuff)) then
     if Cast(S.DragonRoar, nil, nil, not Target:IsInRange(12)) then return "dragon_roar single_target 28"; end
   end
   -- whirlwind,if=buff.merciless_bonegrinder.up&spell_targets.whirlwind>3
