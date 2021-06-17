@@ -390,7 +390,7 @@ local function NumFlameShocksToMaintain()
   if PrimalStormElementalActive then return 0 end -- don't refresh flameshock during storm ele
   if NumEnemiesInLargestCluster == 1 then return math.min(3, NumEnemiesInCombat) end -- Single Target, Spread Cleave (maintain one FS)
   if (NumEnemiesInCombat == 2 or NumEnemiesInCombat == 3) and (NumEnemiesInLargestCluster == 2 or NumEnemiesInLargestCluster == 3) then return math.min(3, NumEnemiesInCombat) end -- Stacked Cleave
-  if NumEnemiesInLargestCluster >= 4 then return 0 end -- AOE
+  if NumEnemiesInLargestCluster >= 4 then return math.max(num(S.MasterOfTheElements:IsAvailable()), 0) end -- AOE: keep a flame shock up if you're playing MOTE, otherwise none.
   return 1 -- fallthrough when no combat?
 end
 
