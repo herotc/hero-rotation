@@ -441,8 +441,8 @@ local function BOP()
   if CDsON() and S.FlayedShot:IsCastable() then
     if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.FlayedShot)) then return "flayed_shot bop 12"; end
   end
-  -- call_action_list,name=nta,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus<action.mongoose_bite.cost 
-  if (NessingwarysTrappingEquipped and Player:Focus() < S.MongooseBite:Cost()) then
+  -- call_action_list,name=nta,if=runeforge.nessingwarys_trapping_apparatus.equipped&(focus<action.mongoose_bite.cost |focus<action.raptor_strike.cost)
+  if (NessingwarysTrappingEquipped and (Player:Focus() < S.MongooseBite:Cost() or Player:Focus() < S.RaptorStrike:Cost()) then
     local ShouldReturn = NTA(); if ShouldReturn then return ShouldReturn; end
   end
   -- death_chakram,if=focus+cast_regen<focus.max
