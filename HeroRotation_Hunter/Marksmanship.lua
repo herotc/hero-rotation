@@ -209,13 +209,9 @@ local function Cds()
   if S.LightsJudgment:IsReady() and (Player:BuffDown(S.Trueshot)) then
     if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cds 10"; end
   end
-  -- bag_of_tricks,if=buff.trueshot.down
-  if S.BagofTricks:IsReady() then
-    if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks cds 12"; end
-  end
   -- potion,if=buff.trueshot.up&buff.bloodlust.up|buff.trueshot.up&target.health.pct<20|target.time_to_die<26
   if I.PotionOfSpectralAgility:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.Trueshot) and Player:BloodlustUp() or Player:BuffUp(S.Trueshot) and Target:HealthPercentage() < 20 or Target:TimeToDie() < 26) then
-    if Cast(I.PotionOfSpectralAgility, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 14"; end
+    if Cast(I.PotionOfSpectralAgility, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 12"; end
   end
 end
 
@@ -304,9 +300,13 @@ local function St()
   if S.RapidFire:IsCastable() and (Player:FocusP() + Player:FocusCastRegen(S.RapidFire:CastTime()) < Player:FocusMax() and (Player:BuffDown(S.DoubleTap) or S.Streamline:IsAvailable())) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 40"; end
   end
+  -- bag_of_tricks,if=buff.trueshot.down
+  if S.BagofTricks:IsReady() then
+    if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks st 42"; end
+  end
   -- steady_shot
   if S.SteadyShot:IsCastable() then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 42"; end
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 44"; end
   end
 end
 
@@ -399,9 +399,13 @@ local function Trickshots()
   if S.Multishot:IsReady() and (Player:FocusP() > S.Multishot:Cost() + S.AimedShot:Cost()) then
     if Cast(S.Multishot, nil, nil, not TargetInRange40y) then return "multishot trickshots 42"; end
   end
+  -- bag_of_tricks,if=buff.trueshot.down
+  if S.BagofTricks:IsReady() then
+    if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks trickshots 44"; end
+  end
   -- steady_shot
   if S.SteadyShot:IsCastable() then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot trickshots 44"; end
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot trickshots 46"; end
   end
 end
 
