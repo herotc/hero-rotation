@@ -139,28 +139,37 @@ local function EvaluateTargetIfKillCommandBOP(TargetUnit)
   return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and Player:BuffUp(S.NessingwarysTrappingBuff))
 end
 
--- if=focus<action.mongoose_bite.cost|focus<action.raptor_strike.cost
+-- if=focus+cast_regen<focus.max&(!runeforge.nessingwarys_trapping_apparatus|focus<action.mongoose_bite.cost|focus<action.raptor_strike.cost)
 local function EvaluateTargetIfKillCommandBOP2(TargetUnit)
-  return (Player:Focus() < S.MongooseBite:Cost() or Player:Focus() < S.RaptorStrike:Cost())
+  return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and (not NessingwarysTrappingEquipped or Player:Focus() < S.MongooseBite:Cost() or Player:Focus() < S.RaptorStrike:Cost()))
 end
 
--- if=focus+cast_regen<focus.max&!runeforge.nessingwarys_trapping_apparatus
+-- if=talent.mongoose_bite&focus+cast_regen<focus.max&runeforge.nessingwarys_trapping_apparatus&cooldown.freezing_trap.remains>(focus%(action.mongoose_bite.cost-cast_regen)*gcd)&cooldown.tar_trap.remains>(focus%(action.mongoose_bite.cost-cast_regen)*gcd)&(!talent.steel_trap|talent.steel_trap&cooldown.steel_trap.remains>(focus%(action.mongoose_bite.cost-cast_regen)*gcd))
 local function EvaluateTargetIfKillCommandBOP3(TargetUnit)
-  return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and not NessingwarysTrappingEquipped)
-end
-
--- if=focus+cast_regen<focus.max&runeforge.nessingwarys_trapping_apparatus&cooldown.freezing_trap.remains>(focus%(action.mongoose_bite.cost-cast_regen)*gcd|focus%(action.raptor_strike.cost-cast_regen)*gcd)&cooldown.tar_trap.remains>(focus%(action.mongoose_bite.cost-cast_regen)*gcd|focus%(action.raptor_strike.cost-cast_regen)*gcd)&(!talent.steel_trap|talent.steel_trap&cooldown.steel_trap.remains>(focus%(action.mongoose_bite.cost-cast_regen)*gcd|focus%(action.raptor_strike.cost-cast_regen)*gcd))
-local function EvaluateTargetIfKillCommandBOP4(TargetUnit)
+  if (not S.MongooseBite:IsAvailable()) then return false end
   local FocusCap = CheckFocusCap(S.KillCommand:ExecuteTime(), 15)
   local KCFCR = Player:FocusCastRegen(S.KillCommand:ExecuteTime())
   local CurFocus = Player:Focus()
   local CurGCD = Player:GCD()
   local MongooseCost = S.MongooseBite:Cost()
+  local FreezingTrapCheck = S.FreezingTrap:CooldownRemains() > (Player:Focus() / (S.MongooseBite:Cost() - KCFCR) * CurGCD)
+  local TarTrapCheck = S.TarTrap:CooldownRemains() > (Player:Focus() / (S.MongooseBite:Cost() - KCFCR) * CurGCD)
+  local SteelTrapCheck = S.SteelTrap:IsAvailable() and (S.SteelTrap:CooldownRemains() > (Player:Focus() / (S.MongooseBite:Cost() - KCFCR) * CurGCD))
+  return (S.MongooseBite:IsAvailable() and FocusCap and NessingwarysTrappingEquipped and FreezingTrapCheck and TarTrapCheck and (not S.SteelTrap:IsAvailable() or SteelTrapCheck))
+end
+
+-- if=!talent.mongoose_bite&focus+cast_regen<focus.max&runeforge.nessingwarys_trapping_apparatus&cooldown.freezing_trap.remains>(focus%(action.raptor_strike.cost-cast_regen)*gcd)&cooldown.tar_trap.remains>(focus%(action.raptor_strike.cost-cast_regen)*gcd)&(!talent.steel_trap|talent.steel_trap&cooldown.steel_trap.remains>(focus%(action.raptor_strike.cost-cast_regen)*gcd))
+local function EvaluateTargetIfKillCommandBOP4(TargetUnit)
+  if (S.MongooseBite:IsAvailable()) then return false end
+  local FocusCap = CheckFocusCap(S.KillCommand:ExecuteTime(), 15)
+  local KCFCR = Player:FocusCastRegen(S.KillCommand:ExecuteTime())
+  local CurFocus = Player:Focus()
+  local CurGCD = Player:GCD()
   local RaptorStrikeCost = S.RaptorStrike:Cost()
-  local FreezingTrapCheck = S.FreezingTrap:CooldownRemains() > (CurFocus / (MongooseCost - KCFCR) * CurGCD) or S.FreezingTrap:CooldownRemains() > (CurFocus / (RaptorStrikeCost - KCFCR) * CurGCD)
-  local TarTrapCheck = S.TarTrap:CooldownRemains() > (CurFocus / (MongooseCost - KCFCR) * CurGCD) or S.TarTrap:CooldownRemains() > (CurFocus / (RaptorStrikeCost - KCFCR) * CurGCD)
-  local SteelTrapCheck = S.SteelTrap:IsAvailable() and (S.SteelTrap:CooldownRemains() > (CurFocus / (MongooseCost - KCFCR) * CurGCD) or S.SteelTrap:CooldownRemains() > (CurFocus / (RaptorStrikeCost - KCFCR) * CurGCD))
-  return (FocusCap and NessingwarysTrappingEquipped and FreezingTrapCheck and TarTrapCheck and (not S.SteelTrap:IsAvailable() or SteelTrapCheck))
+  local FreezingTrapCheck = S.FreezingTrap:CooldownRemains() > (CurFocus / (RaptorStrikeCost - KCFCR) * CurGCD)
+  local TarTrapCheck = S.TarTrap:CooldownRemains() > (CurFocus / (RaptorStrikeCost - KCFCR) * CurGCD)
+  local SteelTrapCheck = S.SteelTrap:IsAvailable() and (S.SteelTrap:CooldownRemains() > (CurFocus / (RaptorStrikeCost - KCFCR) * CurGCD))
+  return (not S.MongooseBite:IsAvailable() and FocusCap and NessingwarysTrappingEquipped and FreezingTrapCheck and TarTrapCheck and (not S.SteelTrap:IsAvailable() or SteelTrapCheck))
 end
 
 -- if=buff.coordinated_assault.up&buff.coordinated_assault.remains<1.5*gcd
@@ -480,15 +489,15 @@ local function BOP()
   if S.WildfireBomb:IsCastable() and (CheckFocusCap(S.WildfireBomb:ExecuteTime()) and Target:DebuffDown(S.WildfireBombDebuff) and (S.WildfireBomb:FullRechargeTime() < Player:GCD() or Target:DebuffDown(S.WildfireBombDebuff) and Player:BuffRemains(S.MongooseFuryBuff) > S.WildfireBomb:FullRechargeTime() - Player:GCD() or Target:DebuffDown(S.WildfireBombDebuff) and Player:BuffDown(S.MongooseFuryBuff)) or Target:TimeToDie() < 18 and Target:DebuffDown(S.WildfireBombDebuff)) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb bop 24"; end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=focus<action.mongoose_bite.cost|focus<action.raptor_strike.cost
+  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&(!runeforge.nessingwarys_trapping_apparatus|focus<action.mongoose_bite.cost|focus<action.raptor_strike.cost)
   if S.KillCommand:IsCastable() then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandBOP2, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command bop 26"; end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&!runeforge.nessingwarys_trapping_apparatus
+  -- kill_command,target_if=min:bloodseeker.remains,if=talent.mongoose_bite&focus+cast_regen<focus.max&runeforge.nessingwarys_trapping_apparatus&cooldown.freezing_trap.remains>(focus%(action.mongoose_bite.cost-cast_regen)*gcd)&cooldown.tar_trap.remains>(focus%(action.mongoose_bite.cost-cast_regen)*gcd)&(!talent.steel_trap|talent.steel_trap&cooldown.steel_trap.remains>(focus%(action.mongoose_bite.cost-cast_regen)*gcd))
   if S.KillCommand:IsCastable() then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandBOP3, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command bop 28"; end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&runeforge.nessingwarys_trapping_apparatus&cooldown.freezing_trap.remains>(focus%(action.mongoose_bite.cost-cast_regen)*gcd|focus%(action.raptor_strike.cost-cast_regen)*gcd)&cooldown.tar_trap.remains>(focus%(action.mongoose_bite.cost-cast_regen)*gcd|focus%(action.raptor_strike.cost-cast_regen)*gcd)&(!talent.steel_trap|talent.steel_trap&cooldown.steel_trap.remains>(focus%(action.mongoose_bite.cost-cast_regen)*gcd|focus%(action.raptor_strike.cost-cast_regen)*gcd))
+  -- kill_command,target_if=min:bloodseeker.remains,if=!talent.mongoose_bite&focus+cast_regen<focus.max&runeforge.nessingwarys_trapping_apparatus&cooldown.freezing_trap.remains>(focus%(action.raptor_strike.cost-cast_regen)*gcd)&cooldown.tar_trap.remains>(focus%(action.raptor_strike.cost-cast_regen)*gcd)&(!talent.steel_trap|talent.steel_trap&cooldown.steel_trap.remains>(focus%(action.raptor_strike.cost-cast_regen)*gcd))
   if S.KillCommand:IsCastable() then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandBOP4, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command bop 30"; end
   end
