@@ -139,9 +139,9 @@ local function EvaluateTargetIfSerpentStingBOP(TargetUnit)
   return (Player:BuffUp(S.VipersVenomBuff) and (Player:BuffRemains(S.VipersVenomBuff) < Player:GCD() or TargetUnit:DebuffRefreshable(S.SerpentStingDebuff)))
 end
 
--- if=focus+cast_regen<focus.max&buff.nesingwarys_trapping_apparatus.up
+-- if=focus+cast_regen<focus.max&buff.nesingwarys_trapping_apparatus.up|focus+cast_regen<focus.max+10&buff.nesingwarys_trapping_apparatus.up&buff.nesingwarys_trapping_apparatus.remains<gcd
 local function EvaluateTargetIfKillCommandBOP(TargetUnit)
-  return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and Player:BuffUp(S.NessingwarysTrappingBuff))
+  return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and Player:BuffUp(S.NessingwarysTrappingBuff) or Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) < Player:FocusMax() + 10 and Player:BuffUp(S.NessingwarysTrappingBuff) and Player:BuffRemains(S.NessingwarysTrappingBuff) < Player:GCD())
 end
 
 -- if=focus+cast_regen<focus.max&(!runeforge.nessingwarys_trapping_apparatus|focus<variable.mb_rs_cost)
@@ -430,13 +430,13 @@ local function BOP()
   if S.SerpentSting:IsReady() then
     if Everyone.CastTargetIf(S.SerpentSting, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingBOP, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting bop 2"; end
   end
+  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&buff.nesingwarys_trapping_apparatus.up|focus+cast_regen<focus.max+10&buff.nesingwarys_trapping_apparatus.up&buff.nesingwarys_trapping_apparatus.remains<gcd
+  if S.KillCommand:IsCastable() then
+    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandBOP, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command bop 6"; end
+  end
   -- kill_shot
   if S.KillShot:IsReady() then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot bop 4"; end
-  end
-  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&buff.nesingwarys_trapping_apparatus.up
-  if S.KillCommand:IsCastable() then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandBOP, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command bop 6"; end
   end
   -- wildfire_bomb,if=focus+cast_regen<focus.max&!ticking&full_recharge_time<gcd
   if S.WildfireBomb:IsCastable() and (CheckFocusCap(S.WildfireBomb:ExecuteTime()) and Target:DebuffDown(S.WildfireBombDebuff) and S.WildfireBomb:FullRechargeTime() < Player:GCD()) then
