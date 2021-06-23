@@ -73,6 +73,7 @@ HR.GUISettings.APL.Rogue = {
     RolltheBonesLeechRerollHP = 40, -- % HP threshold to reroll for Grand Melee while solo.
     UseDPSVanish = false, -- Use Vanish in the rotation for DPS
     KillingSpreeDisplayStyle = "Suggested",
+    DumpSpikes = false, -- don't dump bone spikes at end of boss, useful in M+
     GCDasOffGCD = {
       BladeFlurry = false,
       BladeRush = false,
@@ -139,6 +140,7 @@ CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLogic", {
 CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLeechKeepHP", {1, 100, 1}, "Keep Leech HP Threshold", "Set the HP threshold for keeping the leech buff instead of rerolling normally (working only if Solo Mode is enabled and does not work in dungeons.)")
 CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLeechRerollHP", {1, 100, 1}, "Reroll For Leech HP Threshold", "Set the HP threshold to actively re-roll for the leech buff (working only if Solo Mode is enabled and does not work in dungeons.)")
 CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.UseDPSVanish", "Use Vanish for DPS", "Suggest Vanish -> Ambush for DPS.\nDisable to save Vanish for utility purposes.")
+CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.DumpSpikes", "Dump bonespike charges at end of boss fight", "Useful in raid, perhaps less so in dungeons.")
 CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.KillingSpreeDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Killing Spree Display Style", "Define which icon display style to use for Killing Spree.")
 CreateARPanelOptions(CP_Outlaw, "APL.Rogue.Outlaw")
 -- Subtlety

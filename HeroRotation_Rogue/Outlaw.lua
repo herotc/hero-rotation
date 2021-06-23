@@ -414,7 +414,7 @@ local function Build ()
   end
   -- actions.build+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75
   if S.SerratedBoneSpike:IsReady() then
-    if (Player:BuffUp(S.SliceandDice) and not Target:DebuffUp(S.SerratedBoneSpikeDebuff)) or HL.BossFilteredFightRemains("<", 5) then
+    if (Player:BuffUp(S.SliceandDice) and not Target:DebuffUp(S.SerratedBoneSpikeDebuff)) or (Settings.Outlaw.DumpSpikes and HL.BossFilteredFightRemains("<", 5)) then
       if HR.Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Serrated Bone Spike" end
     end
     if AoEON() then
