@@ -173,7 +173,7 @@ end
 local function Aoe()
   -- frozen_orb
   if S.FrozenOrb:IsCastable() then
-    if Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb, nil, not Target:IsSpellInRange(S.FrozenOrb)) then return "frozen_orb aoe 1"; end
+    if Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb, nil, not Target:IsInRange(40)) then return "frozen_orb aoe 1"; end
   end
   -- blizzard
   if S.Blizzard:IsCastable() then
