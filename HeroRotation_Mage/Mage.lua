@@ -57,6 +57,9 @@ Spell.Mage.Arcane = {
   ConjureManaHem                        = Spell(759),
   FrostNova                             = Spell(122),
   TimeWarp                              = Spell(80353),
+  AlterTime                             = Spell(108978),
+  SpellSteal                            = Spell(30449),
+  RemoveCurse                           = Spell(475),
   -- Talents
   Amplification                         = Spell(236628),
   RuleofThrees                          = Spell(264354),
@@ -94,6 +97,8 @@ Spell.Mage.Arcane = {
   Scorch                                = Spell(0),
   Pyroblast                             = Spell(0),
   Flamestrike                           = Spell(0),
+  Combustion                            = Spell(0),
+  IcyVeins                              = Spell(0),
 }
 
 Spell.Mage.Fire = {
@@ -128,6 +133,9 @@ Spell.Mage.Fire = {
   Counterspell                          = Spell(2139),
   FrostNova                             = Spell(122),
   Ignite                                = Spell(12654),
+  AlterTime                             = Spell(108978),
+  SpellSteal                            = Spell(30449),
+  RemoveCurse                           = Spell(475),
   -- Talents
   Firestarter                           = Spell(205026),
   SearingTouch                          = Spell(269644),
@@ -169,7 +177,10 @@ Spell.Mage.Fire = {
   GrislyIcicleDebuff                    = Spell(348007),
   DisciplinaryCommandBuff               = Spell(327371),
   -- Trinkets
-  SoulIgnitionBuff                      = Spell(345211)
+  SoulIgnitionBuff                      = Spell(345211),
+  -- Disciplinary Command Filler IDs
+  ArcanePower                           = Spell(0),
+  IcyVeins                              = Spell(0),
 }
 
 Spell.Mage.Frost = {
@@ -204,6 +215,9 @@ Spell.Mage.Frost = {
   Freeze                                = Spell(33395), --splash, 8
   MirrorImage                           = Spell(55342),
   TemporalDisplacement                  = Spell(80354),
+  AlterTime                             = Spell(108978),
+  SpellSteal                            = Spell(30449),
+  RemoveCurse                           = Spell(475),
   -- Talents
   IceNova                               = Spell(157997), --splash, 8
   IceFloes                              = Spell(108839),
@@ -246,6 +260,8 @@ Spell.Mage.Frost = {
   Scorch                                = Spell(0),
   Pyroblast                             = Spell(0),
   Flamestrike                           = Spell(0),
+  ArcanePower                           = Spell(0),
+  Combustion                            = Spell(0),
 }
 
 -- Items
@@ -403,7 +419,7 @@ function Mage.DCCheck()
   if Player:BuffDown(S.DisciplinaryCommandBuff) then
     if M.Arcane == 0 then
       -- Split Blink (1953)/Shimmer (212653) into unique spell objects, as PrevGCD doesn't like MultiSpell, apparently
-      if Player:PrevGCD(1, S.Counterspell) or Player:PrevGCD(1, S.ArcaneExplosion) or Player:PrevGCD(1, S.RuneofPower) or Player:PrevGCD(1, Spell(212653)) or Player:PrevGCD(1, Spell(1953)) or Player:PrevGCD(1, S.ArcaneIntellect) or (S.RuneofPower:IsAvailable() and ((specID == 64 and Player:PrevOffGCD(1, S.IcyVeins)) or (specID == 63 and Player:PrevOffGCD(1, S.Combustion)) or (specID == 62 and Player:PrevOffGCD(1, S.ArcanePower)))) then
+      if Player:PrevGCD(1, S.Counterspell) or Player:PrevGCD(1, S.ArcaneExplosion) or Player:PrevGCD(1, S.RuneofPower) or Player:PrevGCD(1, Spell(212653)) or Player:PrevGCD(1, Spell(1953)) or Player:PrevGCD(1, S.ArcaneIntellect) or Player:PrevGCD(1, S.AlterTime) or Player:PrevGCD(1, S.SpellSteal) or Player:PrevGCD(1, S.RemoveCurse) or (S.RuneofPower:IsAvailable() and (Player:PrevOffGCD(1, S.IcyVeins) or Player:PrevOffGCD(1, S.Combustion) or Player:PrevOffGCD(1, S.ArcanePower))) then
         M.Arcane = 1
         M.ArcaneTime = CurrentTime
       end
