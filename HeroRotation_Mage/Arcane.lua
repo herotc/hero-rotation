@@ -1231,40 +1231,42 @@ local function APL()
     if S.AncestralCall:IsCastable() and Player:BuffUp(S.ArcanePower) then
       if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call Shared_cd 9"; end
     end
-    --use_items,if=buff.arcane_power.up
-    if Player:BuffUp(S.ArcanePower) then
-      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    if Settings.Commons.Enabled.Trinkets then
+      --use_items,if=buff.arcane_power.up
+      if Player:BuffUp(S.ArcanePower) then
+        local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+        if TrinketToUse then
+          if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+        end
       end
-    end
-    --use_item,effect_name=gladiators_badge,if=buff.arcane_power.up|cooldown.arcane_power.remains>=55&debuff.touch_of_the_magi.up
-    if I.SinfulGladiatorsBadge:IsEquippedAndReady() and (Player:BuffUp(S.ArcanePower) or (S.ArcanePower:CooldownRemains() >= 55 and Target:DebuffUp(S.TouchoftheMagi))) then
-      if Cast(I.SinfulGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge Shared_cd 11"; end
-    end
-    --use_item,name=empyreal_ordnance,if=cooldown.arcane_power.remains<=(13+7*variable.ap_on_use)&cooldown.touch_of_the_magi.remains<=(13+7*variable.ap_on_use)
-    if I.EmpyrealOrdnance:IsEquippedAndReady() and S.ArcanePower:CooldownRemains() <= (13 + 7 * var_ap_on_use) and Target:DebuffRemains(S.TouchoftheMagi) <= (13 + 7 * var_ap_on_use) then
-      if Cast(I.EmpyrealOrdnance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "empyreal_ordnance Shared_cd 12"; end
-    end
-    --use_item,name=dreadfire_vessel,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use=1|(time=0&variable.fishing_opener=1&runeforge.siphon_storm)
-    if I.DreadfireVessel:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 20 or not var_ap_on_use or (CombatTime() == 0 and var_fishing_opener and SiphonStormEquipped)) then
-      if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel Shared_cd 13"; end
-    end
-    --use_item,name=soul_igniter,if=cooldown.arcane_power.remains>=30|!variable.ap_on_use=1
-    if I.SoulIgniter:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 30 or not var_ap_on_use) and not Player:BuffUp(S.SoulIgniterBuff) then
-      if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soul_igniter Shared_cd 14"; end
-    end
-    --use_item,name=glyph_of_assimilation,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use=1|(time=0&variable.fishing_opener=1&runeforge.siphon_storm)
-    if I.GlyphofAssimilation:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 20 or not var_ap_on_use or (CombatTime() == 0 and var_fishing_opener and SiphonStormEquipped)) then
-      if Cast(I.GlyphofAssimilation, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "glyph_of_assimilation Shared_cd 15"; end
-    end
-    --use_item,name=macabre_sheet_music,if=cooldown.arcane_power.remains<=5&(!variable.fishing_opener=1|time>30)
-    if I.MacabreSheetMusic:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() <= 5 and (not var_ap_on_use or CombatTime() > 30)) then
-      if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music Shared_cd 16"; end
-    end
-    --use_item,name=macabre_sheet_music,if=cooldown.arcane_power.remains<=5&variable.fishing_opener=1&buff.rune_of_power.up&buff.rune_of_power.remains<=(10-5*runeforge.siphon_storm)&time<30
-    if I.MacabreSheetMusic:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() <= 5 and var_ap_on_use and Player:BuffUp(S.RuneofPowerBuff) and Player:BuffRemains(S.RuneofPowerBuff) <= (10 - 5 * num(SiphonStormEquipped)) and CombatTime() < 30) then
-      if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music Shared_cd 17"; end
+      --use_item,effect_name=gladiators_badge,if=buff.arcane_power.up|cooldown.arcane_power.remains>=55&debuff.touch_of_the_magi.up
+      if I.SinfulGladiatorsBadge:IsEquippedAndReady() and (Player:BuffUp(S.ArcanePower) or (S.ArcanePower:CooldownRemains() >= 55 and Target:DebuffUp(S.TouchoftheMagi))) then
+        if Cast(I.SinfulGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge Shared_cd 11"; end
+      end
+      --use_item,name=empyreal_ordnance,if=cooldown.arcane_power.remains<=(13+7*variable.ap_on_use)&cooldown.touch_of_the_magi.remains<=(13+7*variable.ap_on_use)
+      if I.EmpyrealOrdnance:IsEquippedAndReady() and S.ArcanePower:CooldownRemains() <= (13 + 7 * var_ap_on_use) and Target:DebuffRemains(S.TouchoftheMagi) <= (13 + 7 * var_ap_on_use) then
+        if Cast(I.EmpyrealOrdnance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "empyreal_ordnance Shared_cd 12"; end
+      end
+      --use_item,name=dreadfire_vessel,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use=1|(time=0&variable.fishing_opener=1&runeforge.siphon_storm)
+      if I.DreadfireVessel:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 20 or not var_ap_on_use or (CombatTime() == 0 and var_fishing_opener and SiphonStormEquipped)) then
+        if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel Shared_cd 13"; end
+      end
+      --use_item,name=soul_igniter,if=cooldown.arcane_power.remains>=30|!variable.ap_on_use=1
+      if I.SoulIgniter:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 30 or not var_ap_on_use) and not Player:BuffUp(S.SoulIgniterBuff) then
+        if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soul_igniter Shared_cd 14"; end
+      end
+      --use_item,name=glyph_of_assimilation,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use=1|(time=0&variable.fishing_opener=1&runeforge.siphon_storm)
+      if I.GlyphofAssimilation:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 20 or not var_ap_on_use or (CombatTime() == 0 and var_fishing_opener and SiphonStormEquipped)) then
+        if Cast(I.GlyphofAssimilation, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "glyph_of_assimilation Shared_cd 15"; end
+      end
+      --use_item,name=macabre_sheet_music,if=cooldown.arcane_power.remains<=5&(!variable.fishing_opener=1|time>30)
+      if I.MacabreSheetMusic:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() <= 5 and (not var_ap_on_use or CombatTime() > 30)) then
+        if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music Shared_cd 16"; end
+      end
+      --use_item,name=macabre_sheet_music,if=cooldown.arcane_power.remains<=5&variable.fishing_opener=1&buff.rune_of_power.up&buff.rune_of_power.remains<=(10-5*runeforge.siphon_storm)&time<30
+      if I.MacabreSheetMusic:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() <= 5 and var_ap_on_use and Player:BuffUp(S.RuneofPowerBuff) and Player:BuffRemains(S.RuneofPowerBuff) <= (10 - 5 * num(SiphonStormEquipped)) and CombatTime() < 30) then
+        if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music Shared_cd 17"; end
+      end
     end
     --newfound_resolve,use_while_casting=1,if=buff.arcane_power.up|debuff.touch_of_the_magi.up|dot.radiant_spark.ticking
     --TODO : enable with 9.1

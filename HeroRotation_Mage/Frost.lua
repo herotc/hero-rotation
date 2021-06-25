@@ -37,8 +37,8 @@ local OnUseExcludes = {
 }
 
 -- Rotation Var
-local EnemiesCount6ySplash, EnemiesCount8ySplash, EnemiesCount16ySplash, EnemiesCount30ySplash --Enemies arround target
-local EnemiesCount10yMelee, EnemiesCount12yMelee, EnemiesCount15yMelee, EnemiesCount18yMelee  --Enemies arround player
+local EnemiesCount6ySplash, EnemiesCount8ySplash, EnemiesCount16ySplash --Enemies arround target
+local EnemiesCount15yMelee  --Enemies arround player
 local var_disciplinary_command_cd_remains
 local var_disciplinary_command_last_applied
 local TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
@@ -138,7 +138,7 @@ local function Cooldowns()
     if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 6"; end
   end
   -- use_items
-  if (Settings.Commons.Enabled.UseTrinkets) then
+  if (Settings.Commons.Enabled.Trinkets) then
     local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name() .. " cd 7" end
@@ -340,26 +340,16 @@ local function APL()
   -- Enemies Update
   Enemies10yMelee = Player:GetEnemiesInMeleeRange(10)
   Enemies12yMelee = Player:GetEnemiesInMeleeRange(12)
-  Enemies15yMelee = Player:GetEnemiesInMeleeRange(15)
   Enemies18yMelee = Player:GetEnemiesInMeleeRange(18)
   if AoEON() then
-    EnemiesCount10yMelee = #Enemies10yMelee
-    EnemiesCount12yMelee = #Enemies12yMelee
-    EnemiesCount15yMelee = #Enemies15yMelee
-    EnemiesCount18yMelee = #Enemies18yMelee
     EnemiesCount6ySplash = Target:GetEnemiesInSplashRangeCount(6)
     EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
     EnemiesCount16ySplash = Target:GetEnemiesInSplashRangeCount(16)
-    EnemiesCount30ySplash = Target:GetEnemiesInSplashRangeCount(30)
   else
-    EnemiesCount10yMelee = 1
-    EnemiesCount12yMelee = 1
     EnemiesCount15yMelee = 1
-    EnemiesCount18yMelee = 1
     EnemiesCount6ySplash = 1
     EnemiesCount8ySplash = 1
     EnemiesCount16ySplash = 1
-    EnemiesCount30ySplash = 1
   end
 
   -- Check our IF status

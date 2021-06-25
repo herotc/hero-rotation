@@ -287,7 +287,7 @@ local function Precombat()
       VarInit()
     end
     -- use_item,name=soul_igniter,if=!variable.combustion_on_use&!equipped.dreadfire_vessel&(!talent.firestarter|variable.firestarter_combustion)
-    if I.SoulIgniter:IsEquippedAndReady() and not var_combustion_on_use and I.DreadfireVessel:IsEquipped() and (not S.Firestarter:IsAvailable() or var_firestarter_combustion) then
+    if Settings.Commons.Enabled.Trinkets and I.SoulIgniter:IsEquippedAndReady() and not var_combustion_on_use and I.DreadfireVessel:IsEquipped() and (not S.Firestarter:IsAvailable() or var_firestarter_combustion) then
       if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soul_igniter precombat"; end
     end
     -- mirror_image
@@ -407,32 +407,34 @@ local function CombustionCooldowns()
   if S.TimeWarp:IsReady() and Settings.Fire.UseTemporalWarp and (TemporalWarpEquipped and Player:BloodlustExhaustUp()) then
     if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp combustion_cooldowns 6"; end
   end
-  -- use_item,effect_name=gladiators_badge
-  if I.SinfulAspirantsBadge:IsEquippedAndReady() then
-    if Cast(I.SinfulAspirantsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge aspirant combustion_cooldowns 7"; end
-  end
-  if I.SinfulGladiatorsBadge:IsEquippedAndReady() then
-    if Cast(I.SinfulGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge gladiator combustion_cooldowns 8"; end
-  end
-  -- use_item,name=inscrutable_quantum_device
-  if I.InscrutableQuantumDevice:IsEquippedAndReady() then
-    if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device combustion_cooldowns 9"; end
-  end
-  -- use_item,name=flame_of_battle
-  if I.FlameofBattle:IsEquippedAndReady() then
-    if Cast(I.FlameofBattle, nil, Settings.Commons.DisplayStyle.Trinkets) then return "flame_of_battle combustion_cooldowns 10"; end
-  end
-  -- use_item,name=wakeners_frond
-  if I.WakenersFrond:IsEquippedAndReady() then
-    if Cast(I.WakenersFrond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "wakeners_frond combustion_cooldowns 11"; end
-  end
-  -- use_item,name=instructors_divine_bell
-  if I.InstructorsDivineBell:IsEquippedAndReady() then
-    if Cast(I.InstructorsDivineBell, nil, Settings.Commons.DisplayStyle.Trinkets) then return "instructors_divine_bell combustion_cooldowns 12"; end
-  end
-  -- use_item,name=sunblood_amethyst
-  if I.SunbloodAmethyst:IsEquippedAndReady() then
-    if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sunblood_amethyst combustion_cooldowns 13"; end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,effect_name=gladiators_badge
+    if I.SinfulAspirantsBadge:IsEquippedAndReady() then
+      if Cast(I.SinfulAspirantsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge aspirant combustion_cooldowns 7"; end
+    end
+    if I.SinfulGladiatorsBadge:IsEquippedAndReady() then
+      if Cast(I.SinfulGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge gladiator combustion_cooldowns 8"; end
+    end
+    -- use_item,name=inscrutable_quantum_device
+    if I.InscrutableQuantumDevice:IsEquippedAndReady() then
+      if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device combustion_cooldowns 9"; end
+    end
+    -- use_item,name=flame_of_battle
+    if I.FlameofBattle:IsEquippedAndReady() then
+      if Cast(I.FlameofBattle, nil, Settings.Commons.DisplayStyle.Trinkets) then return "flame_of_battle combustion_cooldowns 10"; end
+    end
+    -- use_item,name=wakeners_frond
+    if I.WakenersFrond:IsEquippedAndReady() then
+      if Cast(I.WakenersFrond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "wakeners_frond combustion_cooldowns 11"; end
+    end
+    -- use_item,name=instructors_divine_bell
+    if I.InstructorsDivineBell:IsEquippedAndReady() then
+      if Cast(I.InstructorsDivineBell, nil, Settings.Commons.DisplayStyle.Trinkets) then return "instructors_divine_bell combustion_cooldowns 12"; end
+    end
+    -- use_item,name=sunblood_amethyst
+    if I.SunbloodAmethyst:IsEquippedAndReady() then
+      if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sunblood_amethyst combustion_cooldowns 13"; end
+    end
   end
 end
 
