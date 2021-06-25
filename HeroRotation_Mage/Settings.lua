@@ -20,7 +20,6 @@ HR.GUISettings.APL.Mage = {
     Enabled = {
       Potions = true,
       Trinkets = true,
-      TimeWarp = false,
     },
     DisplayStyle = {
       Potions = "Suggested",
