@@ -268,6 +268,38 @@ FrostOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffStack",
   end
 , 64)
 
+local FrostOldPlayerBuffStack
+FrostOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffUp",
+  function (self, Spell, AnyCaster, Offset)
+    local BaseCheck = FrostOldPlayerBuffStack(self, Spell, AnyCaster, Offset)
+    if Spell == SpellFrost.FingersofFrostBuff then
+      if SpellFrost.IceLance:InFlight() then
+        return Player:BuffStack(self) >= 1
+      else
+        return BaseCheck
+      end
+    else
+      return BaseCheck
+    end
+  end
+, 64)
+
+local FrostOldPlayerBuffStack
+FrostOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffDown",
+  function (self, Spell, AnyCaster, Offset)
+    local BaseCheck = FrostOldPlayerBuffStack(self, Spell, AnyCaster, Offset)
+    if Spell == SpellFrost.FingersofFrostBuff then
+      if SpellFrost.IceLance:InFlight() then
+        return Player:BuffStack(self) == 0
+      else
+        return BaseCheck
+      end
+    else
+      return BaseCheck
+    end
+  end
+, 64)
+
 local FrostOldTargetDebuffStack
 FrostOldTargetDebuffStack = HL.AddCoreOverride("Target.DebuffStack",
   function (self, Spell, AnyCaster, Offset)
