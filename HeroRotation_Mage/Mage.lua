@@ -60,6 +60,11 @@ Spell.Mage.Arcane = {
   AlterTime                             = Spell(108978),
   SpellSteal                            = Spell(30449),
   RemoveCurse                           = Spell(475),
+  Invisibility                          = Spell(66),
+  SlowFall                              = Spell(130),
+  IceBlock                              = Spell(45438),
+  PrismaticBarrier                      = Spell(235450),
+  GreaterInvisibility                   = Spell(110959),
   -- Talents
   Amplification                         = Spell(236628),
   RuleofThrees                          = Spell(264354),
@@ -76,6 +81,8 @@ Spell.Mage.Arcane = {
   Supernova                             = Spell(157980), --Splash, 8
   Overpowered                           = Spell(155147),
   Enlightened                           = Spell(321387),
+  FocusMagic                            = Spell(321358),
+  RingOfFrost                           = Spell(113724),
   -- Covenant Abilities
   RadiantSpark                          = Spell(307443),
   RadiantSparkVulnerability             = Spell(307454),
@@ -92,13 +99,6 @@ Spell.Mage.Arcane = {
   ArcaneHarmonyBuff                     = Spell(332777),
   -- Trinket
   SoulIgniterBuff                       = Spell(345211),
-  -- Disciplinary Command Filler IDs
-  Fireball                              = Spell(0),
-  Scorch                                = Spell(0),
-  Pyroblast                             = Spell(0),
-  Flamestrike                           = Spell(0),
-  Combustion                            = Spell(0),
-  IcyVeins                              = Spell(0),
 }
 
 Spell.Mage.Fire = {
@@ -136,6 +136,10 @@ Spell.Mage.Fire = {
   AlterTime                             = Spell(108978),
   SpellSteal                            = Spell(30449),
   RemoveCurse                           = Spell(475),
+  Invisibility                          = Spell(66),
+  SlowFall                              = Spell(130),
+  IceBlock                              = Spell(45438),
+  BlazingBarrier                        = Spell(235313),
   -- Talents
   Firestarter                           = Spell(205026),
   SearingTouch                          = Spell(269644),
@@ -150,6 +154,9 @@ Spell.Mage.Fire = {
   Pyroclasm                             = Spell(269650),
   PyroclasmBuff                         = Spell(269651),
   Meteor                                = Spell(153561),
+  FocusMagic                            = Spell(321358),
+  RingOfFrost                           = Spell(113724),
+  BlastWave                             = Spell(157981),
   -- Covenant Abilities
   Deathborne                            = Spell(324220),
   DeathborneBuff                        = Spell(324220),
@@ -178,9 +185,6 @@ Spell.Mage.Fire = {
   DisciplinaryCommandBuff               = Spell(327371),
   -- Trinkets
   SoulIgnitionBuff                      = Spell(345211),
-  -- Disciplinary Command Filler IDs
-  ArcanePower                           = Spell(0),
-  IcyVeins                              = Spell(0),
 }
 
 Spell.Mage.Frost = {
@@ -218,6 +222,10 @@ Spell.Mage.Frost = {
   AlterTime                             = Spell(108978),
   SpellSteal                            = Spell(30449),
   RemoveCurse                           = Spell(475),
+  Invisibility                          = Spell(66),
+  SlowFall                              = Spell(130),
+  IceBarrier                            = Spell(11426),
+  IceBlock                              = Spell(45438),
   -- Talents
   IceNova                               = Spell(157997), --splash, 8
   IceFloes                              = Spell(108839),
@@ -233,6 +241,7 @@ Spell.Mage.Frost = {
   RayofFrost                            = Spell(205021),
   GlacialSpike                          = Spell(199786), --splash, 8 (with splitting ice)
   GlacialSpikeBuff                      = Spell(199844),
+  RingOfFrost                           = Spell(113724),
   -- Covenant Abilities
   CombatMeditation                      = Spell(328266),
   Deathborne                            = Spell(324220),
@@ -255,13 +264,6 @@ Spell.Mage.Frost = {
   FreezingWindsBuff                     = Spell(327364),
   SlickIceBuff                          = Spell(327508),
   DisciplinaryCommandBuff               = Spell(327371),
-  -- Disciplinary Command Filler IDs
-  Fireball                              = Spell(0),
-  Scorch                                = Spell(0),
-  Pyroblast                             = Spell(0),
-  Flamestrike                           = Spell(0),
-  ArcanePower                           = Spell(0),
-  Combustion                            = Spell(0),
 }
 
 -- Items
@@ -417,21 +419,26 @@ function Mage.DCCheck()
 
   local M = Mage.DC
   if Player:BuffDown(S.DisciplinaryCommandBuff) then
+    print(M.Arcane,M.Fire,M.Frost)
     if M.Arcane == 0 then
       -- Split Blink (1953)/Shimmer (212653) into unique spell objects, as PrevGCD doesn't like MultiSpell, apparently
-      if Player:PrevGCD(1, S.Counterspell) or Player:PrevGCD(1, S.ArcaneExplosion) or Player:PrevGCD(1, S.RuneofPower) or Player:PrevGCD(1, Spell(212653)) or Player:PrevGCD(1, Spell(1953)) or Player:PrevGCD(1, S.ArcaneIntellect) or Player:PrevGCD(1, S.AlterTime) or Player:PrevGCD(1, S.SpellSteal) or Player:PrevGCD(1, S.RemoveCurse) or (S.RuneofPower:IsAvailable() and (Player:PrevOffGCD(1, S.IcyVeins) or Player:PrevOffGCD(1, S.Combustion) or Player:PrevOffGCD(1, S.ArcanePower))) then
+      if Player:PrevOffGCD(1, S.Counterspell) or Player:PrevGCD(1, S.ArcaneExplosion) or Player:PrevGCD(1, S.RuneofPower) or Player:PrevOffGCD(1, Spell(212653)) or Player:PrevOffGCD(1, Spell(1953)) or Player:PrevGCD(1, S.ArcaneIntellect) or Player:PrevGCD(1, S.AlterTime) or Player:PrevGCD(1, S.SpellSteal) or Player:PrevGCD(1, S.RemoveCurse) or Player:PrevGCD(1, S.MirrorImage) or Player:PrevGCD(1, S.Invisibility) or Player:PrevGCD(1, S.SlowFall) or Player:PrevGCD(1, S.FocusMagic) or Player:PrevOffGCD(1, S.TimeWarp)
+      or (S.RuneofPower:IsAvailable() and ((specID == 64 and Player:PrevOffGCD(1, S.IcyVeins)) or (specID == 63 and Player:PrevOffGCD(1, S.Combustion)) or (specID == 62 and Player:PrevOffGCD(1, S.ArcanePower)))) 
+      or (specID == 62 and (Player:PrevGCD(1, S.ArcaneBarrage) or Player:PrevGCD(1, S.ArcaneBlast) or Player:PrevGCD(1, S.ArcaneMissiles) or Player:PrevGCD(1, S.ArcaneOrb) or Player:PrevOffGCD(1, S.ArcanePower) or Player:PrevGCD(1, S.Evocation) or Player:PrevGCD(1, S.PresenceofMind) or Player:PrevGCD(1, S.GreaterInvisibility) or Player:PrevGCD(1, S.PrismaticBarrier) or Player:PrevGCD(1, S.TouchoftheMagi) or Player:PrevGCD(1, S.ArcaneFamiliar) or Player:PrevGCD(1, S.NetherTempest) or Player:PrevGCD(1, S.Supernova))) then
         M.Arcane = 1
         M.ArcaneTime = CurrentTime
       end
     end
     if M.Fire == 0 then
-      if Player:PrevGCD(1, S.Fireball) or Player:PrevGCD(1, S.Scorch) or Player:PrevGCD(1, S.Pyroblast) or Player:PrevGCD(1, S.Flamestrike) or Player:PrevGCD(1, S.FireBlast) then
+      if Player:PrevGCD(1, S.FireBlast)
+      or (specID == 63 and (Player:PrevOffGCD(1, S.FireBlast) or Player:PrevGCD(1, S.Fireball) or Player:PrevGCD(1, S.Scorch) or Player:PrevGCD(1, S.Pyroblast) or Player:PrevGCD(1, S.Flamestrike) or Player:PrevGCD(1, S.BlazingBarrier) or Player:PrevOffGCD(1, S.Combustion) or Player:PrevGCD(1, S.DragonsBreath) or Player:PrevGCD(1, S.PhoenixFlames) or Player:PrevGCD(1, S.BlastWave) or Player:PrevGCD(1, S.LivingBomb) or Player:PrevGCD(1, S.Meteor))) then
         M.Fire = 1
         M.FireTime = CurrentTime
       end
     end
     if M.Frost == 0 then
-      if Player:PrevGCD(1, S.Frostbolt) or Player:PrevGCD(1, S.FrostNova) then
+      if Player:PrevGCD(1, S.Frostbolt) or Player:PrevGCD(1, S.FrostNova) or Player:PrevGCD(1, S.IceBlock) or Player:PrevGCD(1, S.RingOfFrost) 
+      or (specID == 64 and (Player:PrevGCD(1, S.IceLance) or Player:PrevGCD(1, S.Flurry) or Player:PrevGCD(1, S.Blizzard) or Player:PrevGCD(1, S.ConeofCold) or Player:PrevGCD(1, S.FrozenOrb) or Player:PrevGCD(1, S.IceBarrier) or Player:PrevOffGCD(1, S.IcyVeins) or Player:PrevGCD(1, S.RayofFrost) or Player:PrevGCD(1, S.GlacialSpike) or Player:PrevGCD(1, S.CometStorm) or Player:PrevGCD(1, S.Ebonbolt) or Player:PrevOffGCD(1, S.IceFloes) or Player:PrevOffGCD(1, S.IceNova) or Player:PrevOffGCD(1, S.SummonWaterElemental))) then
         M.Frost = 1
         M.FrostTime = CurrentTime
       end
