@@ -384,7 +384,7 @@ end
 
 local function CombustionCooldowns()
   -- potion
-  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.UsePotions then
+  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
     if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion combustion_cooldowns 1"; end
   end
   -- blood_fury

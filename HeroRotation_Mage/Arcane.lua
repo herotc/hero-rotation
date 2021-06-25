@@ -273,7 +273,7 @@ local function Precombat()
     if Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 3"; end
   end
   --potion
-  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.UsePotions then
+  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
     if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 4"; end
   end
   --frostbolt,if=!variable.prepull_evo=1&runeforge.disciplinary_command
@@ -761,7 +761,7 @@ local function FishingOpener()
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles fishing_opener 11"; end
   end
   --potion,if=!runeforge.temporal_warp&(!runeforge.siphon_storm|variable.prepull_evo=1)
-  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.UsePotions and (not TemporalWarpEquipped and (not SiphonStormEquipped and var_prepull_evo)) then
+  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (not TemporalWarpEquipped and (not SiphonStormEquipped and var_prepull_evo)) then
     if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion fishing_opener 12"; end
   end
   --deathborne,if=buff.rune_of_power.down|prev_gcd.1.arcane_barrage
@@ -1200,7 +1200,7 @@ local function APL()
     --use_mana_gem,if=(talent.enlightened&mana.pct<=80&mana.pct>=65)|(!talent.enlightened&mana.pct<=85)
     --TODO : manage mana_gem
     --potion,if=buff.arcane_power.up
-    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.UsePotions and Player:BuffUp(S.ArcanePower) then
+    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and Player:BuffUp(S.ArcanePower) then
       if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 3"; end
     end
     --time_warp,if=runeforge.temporal_warp&buff.exhaustion.up&(cooldown.arcane_power.ready|fight_remains<=40)

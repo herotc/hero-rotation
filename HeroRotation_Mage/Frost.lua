@@ -114,7 +114,7 @@ end
 
 local function Cooldowns()
   -- potion,if=prev_off_gcd.icy_veins|fight_remains<30
-  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
+  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
     if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cd 1"; end
   end
   -- deathborne
