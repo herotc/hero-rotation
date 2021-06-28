@@ -72,8 +72,10 @@ HL:RegisterForEvent(function()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local var_prepull_evo
+local var_aoe_target_count
 local var_evo_pct
 local var_harmony_stack_time
+local var_always_sync_cooldowns
 local var_rs_max_delay_for_totm
 local var_rs_max_delay_for_rop
 local var_rs_max_delay_for_ap
@@ -131,6 +133,9 @@ local function bool(val)
 end
 
 local function VarInit()
+  --variable,name=aoe_target_count,op=reset,default=3
+  var_aoe_target_count = 3
+
   --variable,name=evo_pct,op=reset,default=15
   var_evo_pct = 15
 
@@ -141,7 +146,7 @@ local function VarInit()
     var_prepull_evo = false
   end
 
-  --variable,name=0+(1*active_enemies>2)
+  --variable,name=have_opened,op=set,value=0+(1*active_enemies>=variable.aoe_target_count)
   -- TODO active_enemies at prepull
   --if var_prepull_evo then
   --  ArcaneOpener:StopOpener()
@@ -152,6 +157,9 @@ local function VarInit()
 
   --variable,name=harmony_stack_time,op=reset,default=9
   var_harmony_stack_time = 9
+
+  --variable,name=always_sync_cooldowns,op=reset,default=0
+  var_always_sync_cooldowns = false
 
   --variable,name=rs_max_delay_for_totm,op=reset,default=5
   var_rs_max_delay_for_totm = 5
@@ -180,7 +188,7 @@ local function VarInit()
   --variable,name=rop_max_delay_for_totm,default=-1,op=set,if=variable.rop_max_delay_for_totm=-1,value=20-(5*conduit.arcane_prodigy)
   var_rop_max_delay_for_totm = 20 - 5 * num(S.ArcaneProdigy:ConduitEnabled())
 
-  --variable,name=totm_max_delay_for_ap,default=-1,op=set,if=variable.totm_max_delay_for_ap=-1,value=5+20*(covenant.night_fae|(conduit.arcane_prodigy&active_enemies<3))+15*(covenant.kyrian&runeforge.arcane_infinity&active_enemies>2)
+  --variable,name=totm_max_delay_for_ap,default=-1,op=set,if=variable.totm_max_delay_for_ap=-1,value=5+20*(covenant.night_fae|(conduit.arcane_prodigy&active_enemies<variable.aoe_target_count))+15*(covenant.kyrian&runeforge.arcane_infinity&active_enemies>=variable.aoe_target_count)
   -- TODO active_enemies at prepull
   var_totm_max_delay_for_ap = 5 + 20 * num(Player:Covenant() == "Night Fae") + 15 * num(Player:Covenant() == "Kyrian" and ArcaneInfinityEquipped)
 
@@ -272,29 +280,33 @@ local function Precombat()
   if S.MirrorImage:IsCastable() and CDsON() and Settings.Arcane.MirrorImagesBeforePull then
     if Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 3"; end
   end
+  --rune_of_power,if=covenant.kyrian&runeforge.arcane_infinity&conduit.arcane_prodigy&variable.always_sync_cooldowns
+  if S.RuneofPower:IsCastable() and Player:Covenant() == "Kyrian" and ArcaneInfinityEquipped and S.ArcaneProdigy:ConduitEnabled() and var_always_sync_cooldowns then
+    if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power precombat 4"; end
+  end
   --potion
   if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
-    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 4"; end
+    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 5"; end
   end
   --frostbolt,if=!variable.prepull_evo=1&runeforge.disciplinary_command
   if not var_prepull_evo and S.Frostbolt:IsReady() and DisciplinaryCommandEquipped then
-    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 5"; end
+    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 6"; end
   end
   --fireblast,if=!variable.prepull_evo=1&runeforge.disciplinary_command
   if not var_prepull_evo and S.FireBlast:IsReady() and DisciplinaryCommandEquipped then
-    if Cast(S.FireBlast, nil, nil, not Target:IsSpellInRange(S.FireBlast)) then return "fireblast precombat 5.5"; end
+    if Cast(S.FireBlast, nil, nil, not Target:IsSpellInRange(S.FireBlast)) then return "fireblast precombat 6.5"; end
   end
   --arcane_blast,if=!variable.prepull_evo=1&!runeforge.disciplinary_command&(!covenant.venthyr|variable.fishing_opener)
   if not var_prepull_evo and S.ArcaneBlast:IsReady() and not DisciplinaryCommandEquipped and (not Player:Covenant() == "Venthyr" or var_fishing_opener) then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast precombat 6"; end
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast precombat 7"; end
   end
   --mirrors_of_torment,if=!variable.prepull_evo=1&!runeforge.disciplinary_command&covenant.venthyr&!variable.fishing_opener
   if S.MirrorsofTorment:IsCastable() and not var_prepull_evo and not DisciplinaryCommandEquipped and Player:Covenant() == "Venthyr" and not var_fishing_opener then
-    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment precombat 7"; end
+    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment precombat 8"; end
   end
   --evocation,if=variable.prepull_evo=1
   if var_prepull_evo and S.Evocation:IsReady() then
-    if Cast(S.Evocation) then return "evocation precombat 8"; end
+    if Cast(S.Evocation) then return "evocation precombat 9"; end
   end
 end
 
@@ -856,8 +868,8 @@ local function Harmony()
   and var_outside_of_cooldowns and (S.RuneOfPower:IsAvailable() and S.RuneOfPower:CooldownRemains() < 10) then
     if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation harmony 2"; end
   end
-  --arcane_missiles,if=(variable.stack_harmony|time<10)&buff.arcane_harmony.stack<buff.arcane_harmony.max_stack,chain=1
-  if S.ArcaneMissiles:IsCastable() and (var_stack_harmony or CombatTime() < 10) and Player:BuffStack(S.ArcaneHarmonyBuff) < ArcaneHarmonyMaxStack then
+  --arcane_missiles,if=(variable.stack_harmony|time<10)&buff.arcane_harmony.stack<16,chain=1
+  if S.ArcaneMissiles:IsCastable() and (var_stack_harmony or CombatTime() < 10) and Player:BuffStack(S.ArcaneHarmonyBuff) < 16 then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles harmony 3"; end
   end
   --arcane_missiles,if=equipped.empyreal_ordnance&time<30&cooldown.empyreal_ordnance.remains>168
@@ -880,8 +892,8 @@ local function Harmony()
   if S.ArcanePower:IsCastable() and Player:IsCasting(S.TouchoftheMagi) then
     if Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power harmony 7"; end
   end
-  --rune_of_power,if=variable.empowered_barrage&cooldown.radiant_spark.remains<=execute_time&variable.time_until_ap>=20
-  if S.RuneofPower:IsCastable() and var_empowered_barrage and S.RadiantSpark:CooldownRemains() <= S.RuneOfPower:ExecuteTime() and var_time_until_ap >= 20 then
+  --rune_of_power,if=variable.empowered_barrage&cooldown.radiant_spark.remains<=execute_time&variable.time_until_ap>=20&(!conduit.arcane_prodigy|!variable.always_sync_cooldowns|cooldown.touch_of_the_magi.remains<=(execute_time*2))
+  if S.RuneofPower:IsCastable() and var_empowered_barrage and S.RadiantSpark:CooldownRemains() <= S.RuneOfPower:ExecuteTime() and var_time_until_ap >= 20 and (not S.ArcaneProdigy:ConduitEnabled() or not var_always_sync_cooldowns or S.TouchoftheMagi:CooldownRemains() <= (S.RuneofPower:ExecuteTime() * 2)) then
     if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power harmony 8"; end
   end
   --radiant_spark,if=variable.empowered_barrage&prev_gcd.1.rune_of_power
@@ -892,14 +904,16 @@ local function Harmony()
   if S.TouchoftheMagi:IsCastable() and var_just_used_spark and not var_holding_totm then
     if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi harmony 10"; end
   end
-  --rune_of_power,if=buff.arcane_power.down&(variable.time_until_ap>30|cooldown.radiant_spark.remains>12)
-  if S.RuneofPower:IsCastable() and Player:BuffDown(S.ArcanePower) and (var_time_until_ap > 30 or S.RadiantSpark:CooldownRemains() > 12) then
+  --rune_of_power,if=buff.arcane_power.down&(variable.time_until_ap>30|cooldown.radiant_spark.remains>12)&(!conduit.arcane_prodigy|!variable.always_sync_cooldowns)
+  if S.RuneofPower:IsCastable() and Player:BuffDown(S.ArcanePower) and (var_time_until_ap > 30 or S.RadiantSpark:CooldownRemains() > 12) and (not S.ArcaneProdigy:ConduitEnabled() or not var_always_sync_cooldowns) then
     if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power harmony 11"; end
   end
   --radiant_spark,if=variable.empowered_barrage&(buff.arcane_charge.stack>=2|cooldown.arcane_orb.ready)
   --&(!talent.rune_of_power|cooldown.rune_of_power.remains>5)&variable.estimated_ap_cooldown>=30
+  --&(!conduit.arcane_prodigy|!variable.always_sync_cooldowns)
   if S.RadiantSpark:IsCastable() and var_empowered_barrage and (Player:ArcaneCharges() >= 2 or S.ArcaneOrb:CooldownRemains() == 0) 
-  and (not S.RuneOfPower:IsAvailable() or S.RuneOfPower:CooldownRemains() > 5) and var_estimated_ap_cooldown >= 30 then
+  and (not S.RuneOfPower:IsAvailable() or S.RuneOfPower:CooldownRemains() > 5) and var_estimated_ap_cooldown >= 30
+  and (not S.ArcaneProdigy:ConduitEnabled() or not var_always_sync_cooldowns) then
     if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark harmony 12"; end
   end
   --touch_of_the_magi,if=variable.time_until_ap<50&variable.time_until_ap>30&(!equipped.soulletting_ruby|conduit.arcane_prodigy.rank>=5)
@@ -926,41 +940,45 @@ local function Harmony()
   if S.ArcaneMissiles:IsCastable() and Player:BuffUp(S.ClearcastingBuff) and Player:BuffUp(S.ArcanePower) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles harmony 18"; end
   end
-  --arcane_blast,if=buff.presence_of_mind.up
-  if S.ArcaneBlast:IsCastable() and Player:BuffUp(S.PresenceofMind) then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast harmony 19"; end
+  --arcane_barrage,if=buff.rune_of_power.up&buff.rune_of_power.remains<=action.arcane_missiles.execute_time&buff.arcane_power.up&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.arcane_harmony.stack&buff.power_infusion.up&buff.bloodlust.up
+  if S.ArcaneBarrage:IsCastable() and Player:BuffUp(S.RuneofPowerBuff) and Player:BuffRemains() <= S.ArcaneMissiles:ExecuteTime() and Player:BuffUp(S.ArcanePower) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffUp(S.ArcaneHarmonyBuff) and Player:PowerInfusionUp() and Player:BloodlustUp() then
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage harmony 19"; end
+  end
+  --arcane_blast,if=buff.presence_of_mind.up&(buff.arcane_charge.stack<buff.arcane_charge.max_stack|!(buff.power_infusion.up&buff.bloodlust.up))
+  if S.ArcaneBlast:IsCastable() and Player:BuffUp(S.PresenceofMind) and (Player:ArcaneCharges() < Player:ArcaneChargesMax() or not (Player:PowerInfusionUp() and Player:BloodlustUp())) then
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast harmony 20"; end
   end
   --presence_of_mind,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack&buff.arcane_power.up
   if S.PresenceofMind:IsCastable() and Player:ArcaneCharges() < Player:ArcaneChargesMax() and Player:BuffUp(S.ArcanePower) then
-    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind harmony 20"; end
+    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind harmony 21"; end
   end
-  --arcane_missiles,if=buff.arcane_harmony.stack<buff.arcane_harmony.max_stack,chain=1,interrupt=1,interrupt_global=1
-  if S.ArcaneMissiles:IsCastable() and Player:BuffStack(S.ArcaneHarmonyBuff) < ArcaneHarmonyMaxStack then
-    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles harmony 21"; end
+  --arcane_missiles,if=buff.arcane_harmony.stack<16,chain=1,interrupt=1,interrupt_global=1
+  if S.ArcaneMissiles:IsCastable() and Player:BuffStack(S.ArcaneHarmonyBuff) < 16 then
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles harmony 22"; end
   end
   --arcane_barrage,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&variable.empowered_barrage
   if S.ArcaneBarrage:IsCastable() and Player:ArcaneCharges() == Player:ArcaneChargesMax() and var_empowered_barrage then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage harmony 22"; end
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage harmony 23"; end
   end
   --evocation,if=mana.pct<15
   if S.Evocation:IsCastable() and Player:ManaPercentage() < 15 then
-    if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation fishing_opener 23"; end
+    if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation fishing_opener 24"; end
   end
   --arcane_blast,if=buff.arcane_charge.stack&buff.arcane_charge.stack<buff.arcane_charge.max_stack
   if S.ArcaneBlast:IsCastable() and Player:ArcaneCharges() > 1 and Player:ArcaneCharges() < Player:ArcaneChargesMax() then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast fishing_opener 24"; end
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast fishing_opener 25"; end
   end
   --arcane_missiles,if=!(variable.time_until_ap<=10&mana.pct<30),chain=1,interrupt=1,interrupt_global=1
   if S.ArcaneMissiles:IsCastable() and not (var_time_until_ap <= 10 and Player:ManaPercentage() < 30) then
-    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles fishing_opener 28"; end
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles fishing_opener 26"; end
   end
   --fire_blast
   if S.FireBlast:IsCastable() then
-    if Cast(S.FireBlast, nil, nil, not Target:IsSpellInRange(S.FireBlast)) then return "fire_blast fishing_opener 26"; end
+    if Cast(S.FireBlast, nil, nil, not Target:IsSpellInRange(S.FireBlast)) then return "fire_blast fishing_opener 27"; end
   end
   --frostbolt
   if S.Frostbolt:IsReady() then
-    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt fishing_opener 27"; end
+    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt fishing_opener 28"; end
   end
 end
 
@@ -1274,8 +1292,8 @@ local function APL()
     if (true) then
       ShouldReturn = Calculations(); if ShouldReturn then return ShouldReturn; end
     end
-    --call_action_list,name=aoe,if=active_enemies>2
-    if AoEON() and EnemiesCount8ySplash > 2 then
+    --call_action_list,name=aoe,if=active_enemies>=variable.aoe_target_count
+    if AoEON() and EnemiesCount8ySplash >= var_aoe_target_count then
       ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=harmony,if=covenant.kyrian&runeforge.arcane_infinity
