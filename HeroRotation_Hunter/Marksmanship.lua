@@ -169,23 +169,47 @@ local function Precombat()
   -- food
   -- snapshot_stats
   if Everyone.TargetIsValid() then
-    -- tar_trap,if=runeforge.soulforge_embers.equipped
+    -- fleshcraft,if=soulbind.pustule_eruption
+    if S.Fleshcraft:IsCastable() and (S.PustuleEruption:IsAvailable()) then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft opener"; end
+    end
+    -- tar_trap,if=runeforge.soulforge_embers
     if S.TarTrap:IsReady() and SoulForgeEmbersEquipped then
       if Cast(S.TarTrap) then return "tar_trap soulforge_embers equipped opener"; end
     end
-    -- double_tap,precast_time=10,if=active_enemies>1|!covenant.kyrian&!talent.volley
+    -- double_tap,precast_time=10,if=active_enemies>1|!covenant.kyrian&!talent.volley|variable.etf_precast
     if S.DoubleTap:IsReady() and (EnemiesCount10ySplash > 1 or Player:Covenant() ~= "Kyrian" and not S.Volley:IsAvailable()) then
       if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap opener"; end
     end
-    -- aimed_shot,if=active_enemies<3&(!covenant.kyrian&!talent.volley|active_enemies<2)
+    -- variable,name=etf_precast,value=0
+    -- trueshot,precast_etf_equip=1,precast_ssf_rank=7,precast_time=2,if=variable.etf_precast
+    -- Note: The above two lines could be added as a settings option in the future
+    -- aimed_shot,if=active_enemies<3&(!covenant.kyrian&!talent.volley|active_enemies<2)&!variable.etf_precast
     if S.AimedShot:IsReady() and not (Player:IsCasting(S.AimedShot) or S.AimedShot:InFlight()) and (EnemiesCount10ySplash < 3 and (Player:Covenant() ~= "Kyrian" and not S.Volley:IsAvailable() or EnemiesCount10ySplash < 2)) then
       if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot opener"; end
     end
-    -- steady_shot,if=active_enemies>2|(covenant.kyrian|talent.volley)&active_enemies=2
+    -- steady_shot,if=active_enemies>2|(covenant.kyrian|talent.volley)&active_enemies=2|variable.etf_precast
     if S.SteadyShot:IsCastable() and (EnemiesCount10ySplash > 2 or (Player:Covenant() == "Kyrian" or S.Volley:IsAvailable()) and EnemiesCount10ySplash == 2) then
       if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot opener"; end
     end
   end
+end
+
+local function Trinkets()
+  -- variable,name=sync_up,value=buff.resonating_arrow.up|buff.trueshot.up
+  -- variable,name=strong_sync_up,value=covenant.kyrian&buff.resonating_arrow.up&buff.trueshot.up|!covenant.kyrian&buff.trueshot.up
+  -- variable,name=strong_sync_remains,op=setif,condition=covenant.kyrian,value=cooldown.resonating_arrow.remains<?cooldown.trueshot.remains,value_else=cooldown.trueshot.remains
+  -- variable,name=sync_remains,op=setif,condition=covenant.kyrian,value=cooldown.resonating_arrow.remains>?cooldown.trueshot.remains,value_else=cooldown.trueshot.remains
+  -- use_items,slots=trinket1,if=(trinket.1.has_use_buff|covenant.kyrian&trinket.1.has_cooldown)&(variable.strong_sync_up&(!covenant.kyrian&!trinket.2.has_use_buff|covenant.kyrian&!trinket.2.has_cooldown|trinket.2.cooldown.remains|trinket.1.has_use_buff&(!trinket.2.has_use_buff|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)|trinket.1.has_cooldown&!trinket.2.has_use_buff&trinket.1.cooldown.duration>=trinket.2.cooldown.duration)|!variable.strong_sync_up&(!trinket.2.has_use_buff&(trinket.1.cooldown.duration-5<variable.sync_remains|variable.sync_remains>trinket.1.cooldown.duration%2)|trinket.2.has_use_buff&(trinket.1.has_use_buff&trinket.1.cooldown.duration>=trinket.2.cooldown.duration&(trinket.1.cooldown.duration-5<variable.sync_remains|variable.sync_remains>trinket.1.cooldown.duration%2)|(!trinket.1.has_use_buff|trinket.2.cooldown.duration>=trinket.1.cooldown.duration)&(trinket.2.cooldown.ready&trinket.2.cooldown.duration-5>variable.sync_remains&variable.sync_remains<trinket.2.cooldown.duration%2|!trinket.2.cooldown.ready&(trinket.2.cooldown.remains-5<variable.strong_sync_remains&variable.strong_sync_remains>20&(trinket.1.cooldown.duration-5<variable.sync_remains|trinket.2.cooldown.remains-5<variable.sync_remains&trinket.2.cooldown.duration-5+variable.sync_remains<variable.strong_sync_remains|variable.sync_remains>trinket.1.cooldown.duration%2|variable.sync_up)|trinket.2.cooldown.remains-5>variable.strong_sync_remains&(trinket.1.cooldown.duration-5<variable.strong_sync_remains|!trinket.1.has_use_buff&(variable.sync_remains>trinket.1.cooldown.duration%2|variable.sync_up))))))|target.time_to_die<variable.sync_remains)|!trinket.1.has_use_buff&!covenant.kyrian&(trinket.2.has_use_buff&((!variable.sync_up|trinket.2.cooldown.remains>5)&(variable.sync_remains>20|trinket.2.cooldown.remains-5>variable.sync_remains))|!trinket.2.has_use_buff&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|trinket.2.cooldown.duration>=trinket.1.cooldown.duration))
+  -- use_items,slots=trinket2,if=(trinket.2.has_use_buff|covenant.kyrian&trinket.2.has_cooldown)&(variable.strong_sync_up&(!covenant.kyrian&!trinket.1.has_use_buff|covenant.kyrian&!trinket.1.has_cooldown|trinket.1.cooldown.remains|trinket.2.has_use_buff&(!trinket.1.has_use_buff|trinket.2.cooldown.duration>=trinket.1.cooldown.duration)|trinket.2.has_cooldown&!trinket.1.has_use_buff&trinket.2.cooldown.duration>=trinket.1.cooldown.duration)|!variable.strong_sync_up&(!trinket.1.has_use_buff&(trinket.2.cooldown.duration-5<variable.sync_remains|variable.sync_remains>trinket.2.cooldown.duration%2)|trinket.1.has_use_buff&(trinket.2.has_use_buff&trinket.2.cooldown.duration>=trinket.1.cooldown.duration&(trinket.2.cooldown.duration-5<variable.sync_remains|variable.sync_remains>trinket.2.cooldown.duration%2)|(!trinket.2.has_use_buff|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)&(trinket.1.cooldown.ready&trinket.1.cooldown.duration-5>variable.sync_remains&variable.sync_remains<trinket.1.cooldown.duration%2|!trinket.1.cooldown.ready&(trinket.1.cooldown.remains-5<variable.strong_sync_remains&variable.strong_sync_remains>20&(trinket.2.cooldown.duration-5<variable.sync_remains|trinket.1.cooldown.remains-5<variable.sync_remains&trinket.1.cooldown.duration-5+variable.sync_remains<variable.strong_sync_remains|variable.sync_remains>trinket.2.cooldown.duration%2|variable.sync_up)|trinket.1.cooldown.remains-5>variable.strong_sync_remains&(trinket.2.cooldown.duration-5<variable.strong_sync_remains|!trinket.2.has_use_buff&(variable.sync_remains>trinket.2.cooldown.duration%2|variable.sync_up))))))|target.time_to_die<variable.sync_remains)|!trinket.2.has_use_buff&!covenant.kyrian&(trinket.1.has_use_buff&((!variable.sync_up|trinket.1.cooldown.remains>5)&(variable.sync_remains>20|trinket.1.cooldown.remains-5>variable.sync_remains))|!trinket.1.has_use_buff&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|trinket.1.cooldown.duration>=trinket.2.cooldown.duration))
+  -- Note: Currently unable to handle some of the checks in the above two lines. As such, including the below fall-through.
+  -- use_items,if=prev_gcd.1.trueshot|!talent.calling_the_shots.enabled|target.time_to_die<20
+    if Settings.Commons.Enabled.Trinkets and (Player:PrevGCDP(1, S.Trueshot) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 20) then
+      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+      end
+    end
 end
 
 local function Cds()
@@ -193,31 +217,31 @@ local function Cds()
   if S.Berserking:IsReady() and (Player:BuffUp(S.Trueshot) or Target:TimeToDie() < 13) then
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 2"; end
   end
-  -- blood_fury,if=buff.trueshot.up|target.time_to_die<16
-  if S.BloodFury:IsReady() and (Player:BuffUp(S.Trueshot) or Target:TimeToDie() < 16) then
+  -- blood_fury,if=buff.trueshot.up|cooldown.trueshot.remains>30|target.time_to_die<16
+  if S.BloodFury:IsReady() and (Player:BuffUp(S.Trueshot) or S.Trueshot:CooldownRemains() > 30 or Target:TimeToDie() < 16) then
     if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 4"; end
   end
-  -- ancestral_call,if=buff.trueshot.up|target.time_to_die<16
-  if S.AncestralCall:IsReady() and (Player:BuffUp(S.Trueshot) or Target:TimeToDie() < 16) then
+  -- ancestral_call,if=buff.trueshot.up|cooldown.trueshot.remains>30|target.time_to_die<16
+  if S.AncestralCall:IsReady() and (Player:BuffUp(S.Trueshot) or S.Trueshot:CooldownRemains() > 30 or Target:TimeToDie() < 16) then
     if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cds 6"; end
   end
-  -- fireblood,if=buff.trueshot.up|target.time_to_die<9
-  if S.Fireblood:IsReady() and (Player:BuffUp(S.Trueshot) or Target:TimeToDie() < 9) then
+  -- fireblood,if=buff.trueshot.up|cooldown.trueshot.remains>30|target.time_to_die<9
+  if S.Fireblood:IsReady() and (Player:BuffUp(S.Trueshot) or S.Trueshot:CooldownRemains() > 30 or Target:TimeToDie() < 9) then
     if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 8"; end
   end
   -- lights_judgment,if=buff.trueshot.down
   if S.LightsJudgment:IsReady() and (Player:BuffDown(S.Trueshot)) then
     if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cds 10"; end
   end
-  -- potion,if=buff.trueshot.up&buff.bloodlust.up|buff.trueshot.up&target.health.pct<20|target.time_to_die<26
-  if I.PotionOfSpectralAgility:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.Trueshot) and Player:BloodlustUp() or Player:BuffUp(S.Trueshot) and Target:HealthPercentage() < 20 or Target:TimeToDie() < 26) then
+  -- potion,if=buff.trueshot.up&(buff.bloodlust.up|target.health.pct<20)|target.time_to_die<26
+  if I.PotionOfSpectralAgility:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.Trueshot) and (Player:BloodlustUp() or Target:HealthPercentage() < 20) or Target:TimeToDie() < 26) then
     if Cast(I.PotionOfSpectralAgility, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 12"; end
   end
 end
 
 local function St()
-  -- steady_shot,if=talent.steady_focus&(prev_gcd.1.steady_shot&buff.steady_focus.remains<5|buff.steady_focus.down)
-  if S.SteadyShot:IsCastable() and (S.SteadyFocus:IsAvailable() and (Player:PrevGCDP(1, S.SteadyShot) and Player:BuffRemains(S.SteadyFocusBuff) < 5 or Player:BuffDown(S.SteadyFocusBuff))) then
+  -- steady_shot,if=talent.steady_focus&(prev_gcd.1.steady_shot&buff.steady_focus.remains<5|buff.steady_focus.down)&(buff.resonating_arrow.down|!covenant.kyrian)
+  if S.SteadyShot:IsCastable() and (S.SteadyFocus:IsAvailable() and (Player:PrevGCDP(1, S.SteadyShot) and Player:BuffRemains(S.SteadyFocusBuff) < 5 or Player:BuffDown(S.SteadyFocusBuff)) and (Target:DebuffDown(S.ResonatingArrowDebuff) or Player:Covenant() ~= "Kyrian")) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 2"; end
   end
   -- kill_shot
@@ -228,8 +252,8 @@ local function St()
   if S.KillShot:IsCastable() then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot st 5"; end
   end
-  -- double_tap,if=covenant.kyrian&cooldown.resonating_arrow.remains<gcd|!covenant.kyrian&!covenant.night_fae|covenant.night_fae&(cooldown.wild_spirits.remains<gcd|cooldown.trueshot.remains>55)|target.time_to_die<15
-  if S.DoubleTap:IsReady() and (Player:Covenant() == "Kyrian" and S.ResonatingArrow:CooldownRemains() < Player:GCD() + 0.5 or Player:Covenant() ~= "Kyrian" and Player:Covenant() ~= "Night Fae" or Player:Covenant() == "Night Fae" and (S.WildSpirits:CooldownRemains() < Player:GCD() + 0.5 or S.Trueshot:CooldownRemains() > 55) or Target:TimeToDie() < 15) then
+  -- double_tap,if=covenant.kyrian&cooldown.resonating_arrow.remains<gcd|!covenant.kyrian&!covenant.night_fae|covenant.night_fae&(cooldown.wild_spirits.remains<gcd|cooldown.wild_spirits.remains>30)|target.time_to_die<15
+  if S.DoubleTap:IsReady() and (Player:Covenant() == "Kyrian" and S.ResonatingArrow:CooldownRemains() < Player:GCD() + 0.5 or Player:Covenant() ~= "Kyrian" and Player:Covenant() ~= "Night Fae" or Player:Covenant() == "Night Fae" and (S.WildSpirits:CooldownRemains() < Player:GCD() + 0.5 or S.WildSpirits:CooldownRemains() > 30) or Target:TimeToDie() < 15) then
     if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap st 6"; end
   end
   -- flare,if=tar_trap.up&runeforge.soulforge_embers
@@ -260,24 +284,36 @@ local function St()
   if S.AMurderofCrows:IsReady() then
     if Cast(S.AMurderofCrows, Settings.Commons.GCDasOffGCD.AMurderofCrows, nil, not TargetInRange40y) then return "a_murder_of_crows st 20"; end
   end
-  -- resonating_arrow
-  if S.ResonatingArrow:IsReady() then
+  -- wailing_arrow,if=cooldown.resonating_arrow.remains<gcd&(!talent.explosive_shot|buff.bloodlust.up)|!covenant.kyrian|cooldown.resonating_arrow.remains|target.time_to_die<5
+  if S.WailingArrow:IsReady() and (S.ResonatingArrow:CooldownRemains() < Player:GCD() and (not S.ExplosiveShot:IsAvailable() or Player:BloodlustUp()) or Player:Covenant() ~= "Kyrian" or not S.ResonatingArrow:CooldownUp() or Target:TimeToDie() < 5) then
+    if Cast(S.WailingArrow, nil, nil, not TargetInRange40y) then return "wailing_arrow st 21"; end
+  end
+  -- resonating_arrow,if=buff.double_tap.up|!talent.double_tap|target.time_to_die<12
+  if S.ResonatingArrow:IsReady() and (Player:BuffUp(S.DoubleTap) or not S.DoubleTap:IsAvailable() or Target:TimeToDie() < 12) then
     if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "resonating_arrow st 22"; end
   end
-  -- volley,if=buff.precise_shots.down|!talent.chimaera_shot|active_enemies<2
-  if S.Volley:IsReady() and (Player:BuffDown(S.PreciseShotsBuff) or not S.ChimaeraShot:IsAvailable() or EnemiesCount10ySplash < 2) then
+  -- volley,if=buff.resonating_arrow.up|!covenant.kyrian&(buff.precise_shots.down|!talent.chimaera_shot|active_enemies<2)
+  if S.Volley:IsReady() and (Target:DebuffUp(S.ResonatingArrowDebuff) or Player:Covenant() ~= "Kyrian" and (Player:BuffDown(S.PreciseShotsBuff) or not S.ChimaeraShot:IsAvailable() or EnemiesCount10ySplash < 2)) then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley st 24 "; end
   end
-  -- trueshot,if=buff.precise_shots.down|buff.resonating_arrow.up|buff.wild_spirits.up|buff.volley.up&active_enemies>1
-  if S.Trueshot:IsReady() and CDsON() and (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.ResonatingArrowDebuff) or Target:DebuffUp(S.WildMarkDebuff) or EnemiesCount10ySplash > 1) then
+  -- steady_shot,if=covenant.kyrian&focus+cast_regen<focus.max&((cooldown.resonating_arrow.remains<gcd*3&(!soulbind.effusive_anima_accelerator|!talent.double_tap))|talent.double_tap&cooldown.double_tap.remains<gcd*2)
+  if S.SteadyShot:IsCastable() and (Player:Covenant() == "Kyrian" and Player:FocusP() + Player:FocusCastRegen(S.SteadyShot:ExecuteTime()) < Player:FocusMax() and ((S.ResonatingArrow:CooldownRemains() < Player:GCD() * 3 and (not S.EffusiveAnimaAccelerator:IsAvailable() or not S.DoubleTap:IsAvailable())) or S.DoubleTap:IsAvailable() and S.DoubleTap:CooldownRemains() < Player:GCD() * 2)) then
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 25"; end
+  end
+  -- trueshot,if=buff.precise_shots.down&(covenant.venthyr|covenant.necrolord|talent.calling_the_shots)|buff.resonating_arrow.up|buff.wild_spirits.up|buff.volley.up&active_enemies>1|target.time_to_die<25
+  if S.Trueshot:IsReady() and CDsON() and (Player:BuffDown(S.PreciseShotsBuff) and (Player:Covenant() == "Venthyr" or Player:Covenant() == "Necrolord" or S.CallingtheShots:IsAvailable()) or Target:DebuffUp(S.ResonatingArrowDebuff) or Target:DebuffUp(S.WildMarkDebuff) or Player:BuffUp(S.VolleyBuff) and EnemiesCount10ySplash > 1 or Target:TimeToDie() < 25) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot st 26"; end
+  end
+  -- rapid_fire,if=runeforge.surging_shots&talent.streamline&(cooldown.double_tap.remains>gcd*5|!covenant.kyrian|!talent.double_tap)
+  if S.RapidFire:IsCastable() and (SurgingShotsEquipped and S.Streamline:IsAvailable() and (S.DoubleTap:CooldownRemains() > Player:GCD() * 5 or Player:Covenant() ~= "Kyrian" or not S.DoubleTap:IsAvailable())) then
+    if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 27"; end
   end
   -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|buff.trick_shots.remains>execute_time&active_enemies>1
   if S.AimedShot:IsReady() then
     if Everyone.CastTargetIf(S.AimedShot, Enemies40y, "min", EvaluateTargetIfFilterAimedShot, EvaluateTargetIfAimedShot, not TargetInRange40y) then return "aimed_shot st 28"; end
   end
-  -- rapid_fire,if=focus+cast_regen<focus.max&(buff.trueshot.down|!runeforge.eagletalons_true_focus)&(buff.double_tap.down|talent.streamline)
-  if S.RapidFire:IsCastable() and (Player:FocusP() + Player:FocusCastRegen(S.RapidFire:CastTime()) < Player:FocusMax() and (Player:BuffDown(S.Trueshot) or not EagletalonsTrueFocusEquipped) and (Player:BuffDown(S.DoubleTap) or S.Streamline:IsAvailable())) then
+  -- rapid_fire,if=(cooldown.double_tap.remains>gcd*5|!covenant.kyrian|!talent.double_tap)&focus+cast_regen<focus.max&buff.eagletalons_true_focus.down&(buff.double_tap.down|talent.streamline)
+  if S.RapidFire:IsCastable() and ((S.DoubleTap:CooldownRemains() > Player:GCD() * 5 or Player:Covenant() ~= "Kyrian" or not S.DoubleTap:IsAvailable()) and Player:FocusP() + Player:FocusCastRegen(S.RapidFire:ExecuteTime()) < Player:FocusMax() and Player:BuffDown(S.EagletalonsTrueFocusBuff) and (Player:BuffDown(S.DoubleTap) or S.Streamline:IsAvailable())) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 30"; end
   end
   -- chimaera_shot,if=buff.precise_shots.up|focus>cost+action.aimed_shot.cost
@@ -296,13 +332,17 @@ local function St()
   if S.Barrage:IsReady() and (EnemiesCount10ySplash > 1) then
     if Cast(S.Barrage, nil, nil, not TargetInRange40y) then return "barrage st 38"; end
   end
-  -- rapid_fire,if=focus+cast_regen<focus.max&(buff.double_tap.down|talent.streamline)
-  if S.RapidFire:IsCastable() and (Player:FocusP() + Player:FocusCastRegen(S.RapidFire:CastTime()) < Player:FocusMax() and (Player:BuffDown(S.DoubleTap) or S.Streamline:IsAvailable())) then
+  -- rapid_fire,if=(cooldown.double_tap.remains>gcd*5&runeforge.surging_shots|!covenant.kyrian|!talent.double_tap)&focus+cast_regen<focus.max&(buff.double_tap.down|talent.streamline)
+  if S.RapidFire:IsCastable() and ((S.DoubleTap:CooldownRemains() > Player:GCD() * 5 and SurgingShotsEquipped or Player:Covenant() ~= "Kyrian" or not S.DoubleTap:IsAvailable()) and Player:FocusP() + Player:FocusCastRegen(S.RapidFire:ExecuteTime()) < Player:FocusMax() and (Player:BuffDown(S.DoubleTap) or S.Streamline:IsAvailable())) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 40"; end
   end
   -- bag_of_tricks,if=buff.trueshot.down
   if S.BagofTricks:IsReady() then
     if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks st 42"; end
+  end
+  -- fleshcraft,if=soulbind.pustule_eruption&buff.trueshot.down
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:IsAvailable() and Player:BuffDown(S.Trueshot)) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft st 43"; end
   end
   -- steady_shot
   if S.SteadyShot:IsCastable() then
@@ -315,8 +355,8 @@ local function Trickshots()
   if S.SteadyShot:IsCastable() and (S.SteadyFocus:IsAvailable() and S.SteadyShot:InFlight() and Player:BuffRemains(S.SteadyFocusBuff) < 5) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot trickshots 2"; end
   end
-  -- double_tap,if=covenant.kyrian&cooldown.resonating_arrow.remains<gcd|!covenant.kyrian&!covenant.night_fae|covenant.night_fae&(cooldown.wild_spirits.remains<gcd|cooldown.trueshot.remains>55)|target.time_to_die<10
-  if S.DoubleTap:IsReady() and (Player:Covenant() == "Kyrian" and S.ResonatingArrow:CooldownRemains() < Player:GCD() + 0.5 or Player:Covenant() ~= "Kyrian" and Player:Covenant() ~= "Night Fae" or Player:Covenant() == "Night Fae" and (S.WildSpirits:CooldownRemains() < Player:GCD() + 0.5 or S.Trueshot:CooldownRemains() > 55) or Target:TimeToDie() < 10) then
+  -- double_tap,if=covenant.kyrian&cooldown.resonating_arrow.remains<gcd|!covenant.kyrian&!covenant.night_fae|covenant.night_fae&(cooldown.wild_spirits.remains<gcd|cooldown.wild_spirits.remains>30)|target.time_to_die<10
+  if S.DoubleTap:IsReady() and (Player:Covenant() == "Kyrian" and S.ResonatingArrow:CooldownRemains() < Player:GCD() + 0.5 or Player:Covenant() ~= "Kyrian" and Player:Covenant() ~= "Night Fae" or Player:Covenant() == "Night Fae" and (S.WildSpirits:CooldownRemains() < Player:GCD() + 0.5 or S.WildSpirits:CooldownRemains() > 30) or Target:TimeToDie() < 10) then
     if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap trickshots 4"; end
   end
   -- tar_trap,if=runeforge.soulforge_embers.equippeds&tar_trap.remains<gcd&cooldown.flare.remains<gcd
@@ -333,14 +373,18 @@ local function Trickshots()
   end
   -- wild_spirits
   if S.WildSpirits:IsReady() and CDsON() then
-    if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "wild_spirits trickshots 12 "; end
+    if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "wild_spirits trickshots 12"; end
   end
-  -- resonating_arrow
-  if S.ResonatingArrow:IsReady() then
+  -- wailing_arrow,if=cooldown.resonating_arrow.remains<gcd&(!talent.explosive_shot|buff.bloodlust.up)|!covenant.kyrian|cooldown.resonating_arrow.remains>10|target.time_to_die<5
+  if S.WailingArrow:IsReady() and (S.ResonatingArrow:CooldownRemains() < Player:GCD() and (not S.ExplosiveShot:IsAvailable() or Player:BloodlustUp()) or Player:Covenant() ~= "Kyrian" or S.ResonatingArrow:CooldownRemains() > 10 or Target:TimeToDie() < 5) then
+    if Cast(S.WailingArrow, nil, nil, not TargetInRange40y) then return "wailing_arrow trickshots 13"; end
+  end
+  -- resonating_arrow,if=buff.double_tap.up|!talent.double_tap|target.time_to_die<12
+  if S.ResonatingArrow:IsReady() and (Player:BuffUp(S.DoubleTap) or not S.DoubleTap:IsAvailable() or Target:TimeToDie() < 12) then
     if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant) then return "resonating_arrow trickshots 14"; end
   end
-  -- volley
-  if S.Volley:IsReady() then
+  -- volley,if=buff.resonating_arrow.up|!covenant.kyrian
+  if S.Volley:IsReady() and (Target:DebuffUp(S.ResonatingArrowDebuff) or Player:Covenant() ~= "Kyrian") then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley)  then return "volley trickshots 16"; end
   end
   -- barrage
@@ -351,8 +395,8 @@ local function Trickshots()
   if S.Trueshot:IsReady() and CDsON() then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot, nil, not TargetInRange40y) then return "trueshot trickshots 20"; end
   end
-  -- rapid_fire,if=buff.trick_shots.remains>=execute_time&runeforge.surging_shots&buff.double_tap.down
-  if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime() and SurgingShotsEquipped and Player:BuffDown(S.DoubleTap)) then
+  -- rapid_fire,if=runeforge.surging_shots&(cooldown.resonating_arrow.remains>10|!covenant.kyrian|!talent.double_tap)&buff.trick_shots.remains>=execute_time
+  if S.RapidFire:IsCastable() and (SurgingShotsEquipped and (S.ResonatingArrow:CooldownRemains() > 10 or Player:Covenant() ~= "Kyrian" or not S.DoubleTap:IsAvailable()) and Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime()) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire trickshots 22"; end
   end
   -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=buff.trick_shots.remains>=execute_time&(buff.precise_shots.down|full_recharge_time<cast_time+gcd|buff.trueshot.up)
@@ -363,8 +407,8 @@ local function Trickshots()
   if S.DeathChakram:IsReady() and (Player:FocusP() + Player:FocusCastRegen(S.DeathChakram:ExecuteTime()) < Player:FocusMax()) then
     if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant) then return "dark_chakram trickshots 26"; end
   end
-  -- rapid_fire,if=buff.trick_shots.remains>=execute_time
-  if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime()) then
+  -- rapid_fire,if=(cooldown.double_tap.remains>gcd*5&runeforge.surging_shots|!covenant.kyrian|!talent.double_tap)&focus+cast_regen<focus.max&(buff.double_tap.down|talent.streamline)
+  if S.RapidFire:IsCastable() and ((S.DoubleTap:CooldownRemains() > Player:GCD() * 5 and SurgingShotsEquipped or Player:Covenant() ~= "Kyrian" or not S.DoubleTap:IsAvailable()) and Player:FocusP() + Player:FocusCastRegen(S.RapidFire:ExecuteTime()) < Player:FocusMax() and (Player:BuffDown(S.DoubleTap) or S.Streamline:IsAvailable())) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire trickshots 28"; end
   end
   -- multishot,if=buff.trick_shots.down|buff.precise_shots.up&focus>cost+action.aimed_shot.cost&(!talent.chimaera_shot|active_enemies>3)
@@ -395,13 +439,19 @@ local function Trickshots()
   if S.SerpentSting:IsReady()  then
     if Everyone.CastCycle(S.SerpentSting, Enemies40y, EvaluateTargetIfFilterSerpentRemains, not TargetInRange40y) then return "serpent_sting trickshots 40"; end
   end
-  -- multishot,if=focus>cost+action.aimed_shot.cost
-  if S.Multishot:IsReady() and (Player:FocusP() > S.Multishot:Cost() + S.AimedShot:Cost()) then
+  -- multishot,if=focus>cost+action.aimed_shot.cost&(cooldown.resonating_arrow.remains>5|!covenant.kyrian|focus+cast_regen>focus.max)
+  if S.Multishot:IsReady() and (Player:FocusP() > S.Multishot:Cost() + S.AimedShot:Cost() and (S.ResonatingArrow:CooldownRemains() > 5 or Player:Covenant() ~= "Kyrian" or Player:FocusP() + Player:FocusCastRegen(S.Multishot:ExecuteTime()) > Player:FocusMax())) then
     if Cast(S.Multishot, nil, nil, not TargetInRange40y) then return "multishot trickshots 42"; end
   end
+  -- tar_trap,if=runeforge.nessingwarys_trapping_apparatus
+  -- freezing_trap,if=runeforge.nessingwarys_trapping_apparatus
   -- bag_of_tricks,if=buff.trueshot.down
   if S.BagofTricks:IsReady() then
     if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks trickshots 44"; end
+  end
+  -- fleshcraft,if=soulbind.pustule_eruption&buff.trueshot.down
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:IsAvailable() and Player:BuffDown(S.Trueshot)) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft trickshots 43"; end
   end
   -- steady_shot
   if S.SteadyShot:IsCastable() then
@@ -432,15 +482,11 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(40, S.CounterShot, Settings.Commons2.OffGCDasOffGCD.CounterShot, false); if ShouldReturn then return ShouldReturn; end
     -- auto_shot
-    -- use_items,slots=trinket1,if=trinket.1.has_use_buff&(buff.trueshot.up&(!trinket.2.has_use_buff|trinket.2.cooldown.remains|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)|buff.trueshot.down&(trinket.2.has_use_buff&trinket.2.cooldown.duration>=trinket.1.cooldown.duration&trinket.2.cooldown.remains-5<cooldown.trueshot.remains&cooldown.trueshot.remains>20|trinket.1.cooldown.duration-5<cooldown.trueshot.remains)|target.time_to_die<cooldown.trueshot.remains)|!trinket.1.has_use_buff&(trinket.2.has_use_buff&(buff.trueshot.down|trinket.2.cooldown.remains>5)&(cooldown.trueshot.remains>20|trinket.2.cooldown.remains-5>cooldown.trueshot.remains)|!trinket.2.has_use_buff&(!trinket.2.has_cooldown|trinket.2.cooldown.duration>=trinket.1.cooldown.duration|trinket.2.cooldown.remains))
-    -- use_items,slots=trinket2,if=trinket.2.has_use_buff&(buff.trueshot.up&(!trinket.1.has_use_buff|trinket.1.cooldown.remains|trinket.2.cooldown.duration>=trinket.1.cooldown.duration)|buff.trueshot.down&(trinket.1.has_use_buff&trinket.1.cooldown.duration>=trinket.2.cooldown.duration&trinket.1.cooldown.remains-5<cooldown.trueshot.remains&cooldown.trueshot.remains>20|trinket.2.cooldown.duration-5<cooldown.trueshot.remains)|target.time_to_die<cooldown.trueshot.remains)|!trinket.2.has_use_buff&(trinket.1.has_use_buff&(buff.trueshot.down|trinket.1.cooldown.remains>5)&(cooldown.trueshot.remains>20|trinket.1.cooldown.remains-5>cooldown.trueshot.remains)|!trinket.1.has_use_buff&(!trinket.1.has_cooldown|trinket.1.cooldown.duration>=trinket.2.cooldown.duration|trinket.1.cooldown.remains))
-    -- TODO: Handle these trinket lines, then delete the below use_items
-    -- use_items,if=prev_gcd.1.trueshot|!talent.calling_the_shots.enabled|target.time_to_die<20
-    if CDsON() and Settings.Commons.Enabled.Trinkets and (Player:PrevGCDP(1, S.Trueshot) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 20) then
-      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
-      end
+    -- newfound_resolve,if=soulbind.newfound_resolve&(buff.resonating_arrow.up|cooldown.resonating_arrow.remains>10|target.time_to_die<16|!covenant.kyrian)
+    -- APL Comment: Delay facing your doubt until you have put Resonating Arrow down, or if the cooldown is too long to delay facing your Doubt. If none of these conditions are able to met within the 10 seconds leeway, the sim faces your Doubt automatically.
+    -- call_action_list,name=trinkets,if=covenant.kyrian&cooldown.trueshot.remains&cooldown.resonating_arrow.remains|!covenant.kyrian&cooldown.trueshot.remains
+    if (Settings.Commons.Enabled.Trinkets and (Player:Covenant() == "Kyrian" and not S.Trueshot:CooldownUp() and not S.ResonatingArrow:CooldownUp() or Player:Covenant() ~= "Kyrian" and not S.Trueshot:CooldownUp())) then
+      local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cds
     if (CDsON()) then

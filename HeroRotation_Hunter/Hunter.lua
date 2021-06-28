@@ -122,6 +122,10 @@ Spell.Hunter.Marksmanship = {
   DeathChakram                          = Spell(325028),
   ResonatingArrow                       = Spell(308491),
   FlayedShot                            = Spell(324149),
+  Fleshcraft                            = Spell(324631),
+  -- Soulbinds
+  EffusiveAnimaAccelerator              = Spell(352188),
+  PustuleEruption                       = Spell(351094),
   -- Racials
   Berserking                            = Spell(26297),
   BloodFury                             = Spell(20572),
@@ -152,6 +156,9 @@ Spell.Hunter.Marksmanship = {
   HuntersMarkDebuff                     = Spell(257284),
   ResonatingArrowDebuff                 = Spell(308498),
   WildMarkDebuff                        = Spell(328275),
+  -- Legendaries
+  EagletalonsTrueFocusBuff              = Spell(336851),
+  WailingArrow                          = Spell(355589),
 }
 
 Spell.Hunter.Survival = {

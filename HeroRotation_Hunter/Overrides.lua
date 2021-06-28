@@ -83,6 +83,8 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
     local FightRemains = HL.FightRemains(Enemies10ySplash, false)
     return BaseCheck and (FightRemains > 3)
+  elseif self == SpellMM.WailingArrow then
+    return BaseCheck and (not Player:IsCasting(self))
   else
     return BaseCheck
   end
