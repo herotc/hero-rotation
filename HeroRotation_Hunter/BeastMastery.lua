@@ -217,21 +217,27 @@ local function Cleave()
       if Cast(S.BarbedShot, nil, nil, not TargetInRange40y) then return "Barbed Shot (Cleave - 2@Target)"; end
     end
   end
-  -- bestial_wrath
-  if CDsON() and S.BestialWrath:IsCastable() then
-    if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "Bestial Wrath (Cleave)"; end
-  end
-  -- resonating_arrow
-  if CDsON() and S.ResonatingArrow:IsCastable() then
-    if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant) then return "resonating_arrow cleave"; end
-  end
-  -- stampede,if=buff.aspect_of_the_wild.up|target.time_to_die<15
-  if CDsON() and S.Stampede:IsCastable() and (Player:BuffUp(S.AspectoftheWildBuff) or Target:TimeToDie() < 15) then
-    if Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, not TargetInRange30y) then return "Stampede (Cleave)"; end
-  end
-  -- flayed_shot
-  if CDsON() and S.FlayedShot:IsCastable() then
-    if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant) then return "flayed_shot cleave"; end
+  if CDsON() then
+    -- bestial_wrath
+    if S.BestialWrath:IsCastable() then
+      if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "Bestial Wrath (Cleave)"; end
+    end
+    -- resonating_arrow
+    if S.ResonatingArrow:IsCastable() then
+      if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant) then return "resonating_arrow cleave"; end
+    end
+    -- stampede,if=buff.aspect_of_the_wild.up|target.time_to_die<15
+    if S.Stampede:IsCastable() and (Player:BuffUp(S.AspectoftheWildBuff) or Target:TimeToDie() < 15) then
+      if Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, not TargetInRange30y) then return "Stampede (Cleave)"; end
+    end
+    -- wailing_arrow
+    if S.WailingArrow:IsReady() then
+      if Cast(S.WailingArrow, nil, nil, not TargetInRange40y) then return "Wailing Arrow (Cleave)"; end
+    end
+    -- flayed_shot
+    if S.FlayedShot:IsCastable() then
+      if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant) then return "flayed_shot cleave"; end
+    end
   end
   -- kill_shot
   if S.KillShot:IsCastable() and S.KillShot:IsUsable() then
@@ -311,9 +317,14 @@ local function ST()
   if CDsON() and S.FlayedShot:IsCastable() then
     if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant) then return "flayed_shot st"; end
   end
-  -- kill_shot,if=buff.flayers_mark.remains<5|target.health.pct<=20
+  -- kill_shot
   if S.KillShot:IsCastable() and S.KillShot:IsUsable() then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "Kill Shot (ST)"; end
+  end
+  -- wailing_arrow,if=cooldown.resonating_arrow.remains<gcd&(!talent.explosive_shot|buff.bloodlust.up)|!covenant.kyrian|cooldown.resonating_arrow.remains|target.time_to_die<5
+  -- Note: Explosive Shot doesn't exist for BM, so ignoring that block
+  if CDsON() and S.WailingArrow:IsReady() and (S.ResonatingArrow:CooldownRemains() < Player:GCD() or Player:Covenant() ~= "Kyrian" or not S.ResonatingArrow:CooldownUp() or Target:TimeToDie() < 5) then
+    if Cast(S.WailingArrow, nil, nil, not TargetInRange40y) then return "Wailing Arrow (ST)"; end
   end
   -- barbed_shot,if=cooldown.bestial_wrath.remains<12*charges_fractional+gcd&talent.scent_of_blood
   --   |full_recharge_time<gcd&cooldown.bestial_wrath.remains
@@ -440,7 +451,8 @@ local function APL()
      if ShouldReturn then return ShouldReturn; end
 
     -- auto_shot
-
+    -- newfound_resolve,if=soulbind.newfound_resolve&(buff.resonating_arrow.up|cooldown.resonating_arrow.remains>10|target.time_to_die<16)
+    -- APL Comment: Delay facing your doubt until you have put Resonating Arrow down, or if the cooldown is too long to delay facing your Doubt. If none of these conditions are able to met within the 10 seconds leeway, the sim faces your Doubt automatically.
     -- use_items,if=prev_gcd.1.aspect_of_the_wild|target.time_to_die<20
     -- NOTE: Above line is very non-optimal and feedback has been given to the SimC APL devs, following logic will be used for now:
     --  if=buff.aspect_of_the_wild.remains>10|cooldown.aspect_of_the_wild.remains>60|target.time_to_die<20

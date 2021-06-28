@@ -73,8 +73,10 @@ Spell.Hunter.BeastMastery = {
   -- Legendaries (Shadowlands)
   NesingwarysTrappingApparatusBuff      = Spell(336744),
   SoulforgeEmbersDebuff                 = Spell(336746),
+  WailingArrow                          = Spell(355589),
   -- Conduits (Shadowlands)
   Bloodletting                          = Spell(341440),
+  NewfoundResolve                       = Spell(351149),
   -- Buffs
   AspectoftheWildBuff                   = Spell(193530),
   BeastCleavePetBuff                    = Spell(118455, "pet"),
