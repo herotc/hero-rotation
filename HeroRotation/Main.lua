@@ -64,6 +64,8 @@
   BINDING_NAME_HEROROTATION_CDS = "Toggle CDs";
   BINDING_NAME_HEROROTATION_AOE = "Toggle AoE";
   BINDING_NAME_HEROROTATION_TOGGLE = "Toggle On/Off";
+  BINDING_NAME_HEROROTATION_UNLOCK = "Unlock the addon to move icons";
+  BINDING_NAME_HEROROTATION_LOCK = "Lock the addon in place";
 
 --- ======= MAIN FRAME =======
   HR.MainFrame = CreateFrame("Frame", "HeroRotation_MainFrame", UIParent);
