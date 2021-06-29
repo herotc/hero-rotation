@@ -524,7 +524,7 @@ local function APL()
   ComboPointsDeficit = Player:ComboPointsDeficit()
 
   -- Determine fight_remains
-  fightRemains = HL.FightRemains(Enemies8ySplash, false)
+  fightRemains = HL.FightRemains(Enemies8y, false)
 
   -- cat_form OOC, if setting is true
   if S.CatForm:IsCastable() and Settings.Feral.ShowCatFormOOC then
