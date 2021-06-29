@@ -268,9 +268,8 @@
         Blackborder and LRy - 0.08 or LRy
       );
 
-      PartFrame.Keybind:SetText(Keybinds[i]);
       -- Keybind
-      if Keybind then
+      if Keybinds then
         PartFrame.Keybind:SetText(Keybinds[i]);
       else
         PartFrame.Keybind:SetText("");
