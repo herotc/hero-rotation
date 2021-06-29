@@ -89,8 +89,8 @@ local function SuggestRageDump(rageFromSpell)
   -- pick a threshold where rage-from-damage-taken doesn't cap you even after the cast.
   -- This threshold is chosen somewhat arbitrarily.
   -- TODO(mrdmnd) - make this config value in options.
-  rageMax = 80
-  shouldPreRageDump = false
+  local rageMax = 80
+  local shouldPreRageDump = false
   -- Make sure we have enough rage to even cast IP, and that it's not on CD.
   -- Make sure that we account for pressing shield block too - don't want to go too low on rage.
   if Player:Rage() >= 40 and S.IgnorePain:IsReady() and not ShouldPressShieldBlock() then

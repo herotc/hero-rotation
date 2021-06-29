@@ -81,7 +81,7 @@ local select = select;
 
   HL:RegisterForSelfCombatEvent(
     function (...)
-      dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
+      DateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
       if SpellID == 116014 and Player:GUID() == DestGUID then --void RuneofPower
         HL.RoPTime = GetTime()
       end
@@ -92,7 +92,7 @@ local select = select;
 
   HL:RegisterForSelfCombatEvent(
     function (...)
-      dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
+      DateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
       if SpellID == 116014 and Player:GUID() == DestGUID then --void erruption
         HL.RoPTime = 0
       end

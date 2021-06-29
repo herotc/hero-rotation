@@ -151,7 +151,7 @@ end
 -- It contains the current-state chi costs of each chi spender (perhaps zero).
 -- Assumption here is that we always want to fists on CD, so we don't bother tracking it here.
 local function ChiSpenderCosts()
-  costs = {}
+  local costs = {}
   costs[S.RisingSunKick] = 2
   costs[S.SpinningCraneKick] = 2
   costs[S.RushingJadeWind] = 1
@@ -205,7 +205,7 @@ local function ChiSpenderValues()
   local armor_reduction_coeff = 0.70
   local mystic_touch_coeff = 1.05
 
-  values = {}
+  local values = {}
   -- RSK
   local rsk_ap_coeff = 1.438
   local rsk_aura_coeff = 0.87 * 1.26 * 1.7
