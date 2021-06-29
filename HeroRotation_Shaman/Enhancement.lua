@@ -36,6 +36,7 @@ local OnUseExcludes = {
 -- Rotation Var
 local hasMainHandEnchant, hasOffHandEnchant
 local Enemies40y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y, Enemies40yCount, EnemiesCount30ySplash
+local fightRemains
 local EnemiesFlameShockCount = 0
 local DoomWindsEquipped = Player:HasLegendaryEquipped(138)
 local PrimalLavaActuatorsEquipped = Player:HasLegendaryEquipped(141)
@@ -403,7 +404,7 @@ local function APL()
   end
 
   -- Calculate how long is remaining in the fight
-  fightRemains = HL.FightRemains(Enemies8ySplash, false)
+  fightRemains = HL.FightRemains(MeleeEnemies10y, false)
 
   if Everyone.TargetIsValid() then
     -- lightning_shield
