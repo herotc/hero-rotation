@@ -823,7 +823,7 @@ local function APL()
       end
       -- use_item,name=shadowed_orb_of_torment,if=(variable.time_to_combustion<=variable.combustion_precast_time+2|fight_remains<variable.time_to_combustion)&buff.combustion.down
       if I.ShadowedOrbofTorment:IsEquippedAndReady() and (var_time_to_combustion <= var_combustion_precast_time + 2 or fightRemains < var_time_to_combustion) and Player:BuffDown(S.CombustionBuff) then
-        if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "empyreal_ordnance default 15"; end
+        if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment default 15"; end
       end
       -- use_item,name=empyreal_ordnance,if=variable.time_to_combustion<=variable.empyreal_ordnance_delay&variable.time_to_combustion>variable.empyreal_ordnance_delay-5
       if I.EmpyrealOrdnance:IsEquippedAndReady() and (var_time_to_combustion <= var_empyreal_ordnance_delay and var_time_to_combustion > var_empyreal_ordnance_delay - 5) then
