@@ -49,10 +49,11 @@ HL.AddCoreOverride ("Player.Insanity",
       elseif Player:IsCasting(SpellShadow.MindFlay) then
         return Insanity + ((18 * FotMMod * STMMod) / SpellShadow.MindFlay:BaseDuration())
       elseif Player:IsCasting(SpellShadow.MindSear) then
+        local targets
         if HR.GUISettings.APL.Priest.Shadow.UseSplashData then
-          local targets = Target:GetEnemiesInSplashRangeCount(10)
+          targets = Target:GetEnemiesInSplashRangeCount(10)
         else
-          local targets = Player:GetEnemiesInRange(15)
+          targets = Player:GetEnemiesInRange(15)
         end
         return Insanity + ((6 * targets * STMMod) / SpellShadow.MindSear:BaseDuration())
       elseif Player:IsCasting(SpellShadow.VoidTorrent) then
