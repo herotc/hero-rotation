@@ -46,6 +46,7 @@ local GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
 local FreezingWindsEquipped = Player:HasLegendaryEquipped(4)
 local GlacialFragmentsEquipped = Player:HasLegendaryEquipped(5)
 local DisciplinaryCommandEquipped = Player:HasLegendaryEquipped(7)
+local HeartoftheFaeEquipped = Player:HasLegendaryEquipped(260)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -71,6 +72,7 @@ HL:RegisterForEvent(function()
   FreezingWindsEquipped = Player:HasLegendaryEquipped(4)
   GlacialFragmentsEquipped = Player:HasLegendaryEquipped(5)
   DisciplinaryCommandEquipped = Player:HasLegendaryEquipped(7)
+  HeartoftheFaeEquipped = Player:HasLegendaryEquipped(260)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
@@ -113,60 +115,64 @@ local function Precombat()
 end
 
 local function Cooldowns()
+  -- use_item,name=shadowed_orb_of_torment,if=buff.rune_of_power.down
+  if I.ShadowedOrbofTorment:IsEquippedAndReady() and Player:BuffDown(S.RuneofPowerBuff) then
+    if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment cd 1"; end
+  end
   -- potion,if=prev_off_gcd.icy_veins|fight_remains<30
   if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
-    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cd 1"; end
+    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cd 2"; end
   end
   -- deathborne
   if S.Deathborne:IsCastable() then
-    if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne cd 2"; end
+    if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne cd 3"; end
   end
   -- mirrors_of_torment,if=active_enemies<3&(conduit.siphoned_malice.enabled|soulbind.wasteland_propriety.enabled)
   if S.MirrorsofTorment:IsCastable() and (EnemiesCount8ySplash < 3 and (S.SiphonedMalice:ConduitEnabled() or S.WastelandPropriety:IsAvailable())) then
-    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment cd 3"; end
+    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment cd 4"; end
   end
   -- rune_of_power,if=cooldown.icy_veins.remains>12&buff.rune_of_power.down
-  if S.RuneofPower:IsCastable() and (S.IcyVeins:CooldownRemains() > 12 or Target:TimeToDie() < S.RuneofPower:BaseDuration() + S.RuneofPower:CastTime() + Player:GCD()) then
-    if Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneOfPower) then return "rune_of_power cd 4"; end
+  if S.RuneofPower:IsCastable() and (S.IcyVeins:CooldownRemains() > S.RuneofPower:BaseDuration() or Target:TimeToDie() < S.RuneofPower:BaseDuration() + S.RuneofPower:CastTime() + Player:GCD()) then
+    if Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneOfPower) then return "rune_of_power cd 5"; end
   end
   -- icy_veins,if=buff.rune_of_power.down&(buff.icy_veins.down|talent.rune_of_power)&(buff.slick_ice.down|active_enemies>=2)
   if S.IcyVeins:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) and (Player:BuffDown(S.IcyVeins) or S.RuneofPower:IsAvailable()) and (Player:BuffDown(S.SlickIceBuff) or EnemiesCount8ySplash >= 2)) then
-    if Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cd 5"; end
+    if Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cd 6"; end
   end
   -- time_warp,if=runeforge.temporal_warp&buff.exhaustion.up&(prev_off_gcd.icy_veins|fight_remains<40)
   if S.TimeWarp:IsCastable() and Settings.Frost.UseTemporalWarp and (TemporalWarpEquipped and Player:BloodlustExhaustUp() and Player:BloodlustDown() and (Player:BuffUp(S.IcyVeins) or Target:TimeToDie() < 40)) then
-    if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 6"; end
+    if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 7"; end
   end
   -- use_items
   if (Settings.Commons.Enabled.Trinkets) then
     local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name() .. " cd 7" end
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name() .. " cd 8" end
     end
   end
   -- blood_fury
   if S.BloodFury:IsCastable() then
-    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cd 8"; end
+    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cd 9"; end
   end
   -- berserking
   if S.Berserking:IsCastable() then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cd 9"; end
+    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cd 10"; end
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cd 10"; end
+    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cd 11"; end
   end
   -- fireblood
   if S.Fireblood:IsCastable() then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cd 11"; end
+    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cd 12"; end
   end
   -- ancestral_call
   if S.AncestralCall:IsCastable() then
-    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cd 12"; end
+    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cd 13"; end
   end
   -- bag_of_tricks
   if S.BagofTricks:IsCastable() then
-    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks cd 13"; end
+    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks cd 14"; end
   end
 end
 
@@ -304,8 +310,8 @@ local function Single()
     if S.MirrorsofTorment:IsCastable() then
       if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment single 14"; end
     end
-    -- shifting_power,if=buff.rune_of_power.down&(soulbind.grove_invigoration|soulbind.field_of_blossoms|runeforge.freezing_winds&buff.freezing_winds.down|active_enemies>=2)
-    if S.ShiftingPower:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldOfBlossoms:IsAvailable() or FreezingWindsEquipped and Player:BuffDown(S.FreezingWindsBuff) or EnemiesCount16ySplash >= 2)) then
+    -- shifting_power,if=buff.rune_of_power.down&(runeforge.heart_of_the_fae|soulbind.grove_invigoration|soulbind.field_of_blossoms|runeforge.freezing_winds&buff.freezing_winds.down|active_enemies>=2)
+    if S.ShiftingPower:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) and (HeartoftheFaeEquipped or S.GroveInvigoration:IsAvailable() or S.FieldOfBlossoms:IsAvailable() or FreezingWindsEquipped and Player:BuffDown(S.FreezingWindsBuff) or EnemiesCount16ySplash >= 2)) then
       if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(18)) then return "shifting_power single 15"; end
     end
   end
