@@ -39,8 +39,10 @@ local OnUseExcludes = {
 -- Rotation Var
 local EnemiesCount6ySplash, EnemiesCount8ySplash, EnemiesCount16ySplash --Enemies arround target
 local EnemiesCount15yMelee  --Enemies arround player
+local Enemies16ySplash
 local var_disciplinary_command_cd_remains
 local var_disciplinary_command_last_applied
+local fightRemains
 local TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
 local GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
 local FreezingWindsEquipped = Player:HasLegendaryEquipped(4)
@@ -120,7 +122,7 @@ local function Cooldowns()
     if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment cd 1"; end
   end
   -- potion,if=prev_off_gcd.icy_veins|fight_remains<30
-  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
+  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (Player:PrevGCDP(1, S.IcyVeins) or fightRemains < 30) then
     if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cd 2"; end
   end
   -- deathborne
@@ -132,7 +134,7 @@ local function Cooldowns()
     if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment cd 4"; end
   end
   -- rune_of_power,if=cooldown.icy_veins.remains>12&buff.rune_of_power.down
-  if S.RuneofPower:IsCastable() and (S.IcyVeins:CooldownRemains() > S.RuneofPower:BaseDuration() or Target:TimeToDie() < S.RuneofPower:BaseDuration() + S.RuneofPower:CastTime() + Player:GCD()) then
+  if S.RuneofPower:IsCastable() and (S.IcyVeins:CooldownRemains() > S.RuneofPower:BaseDuration() or fightRemains < S.RuneofPower:CastTime() + Player:GCD()) then
     if Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneOfPower) then return "rune_of_power cd 5"; end
   end
   -- icy_veins,if=buff.rune_of_power.down&(buff.icy_veins.down|talent.rune_of_power)&(buff.slick_ice.down|active_enemies>=2)
@@ -140,7 +142,7 @@ local function Cooldowns()
     if Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cd 6"; end
   end
   -- time_warp,if=runeforge.temporal_warp&buff.exhaustion.up&(prev_off_gcd.icy_veins|fight_remains<40)
-  if S.TimeWarp:IsCastable() and Settings.Frost.UseTemporalWarp and (TemporalWarpEquipped and Player:BloodlustExhaustUp() and Player:BloodlustDown() and (Player:BuffUp(S.IcyVeins) or Target:TimeToDie() < 40)) then
+  if S.TimeWarp:IsCastable() and Settings.Frost.UseTemporalWarp and (TemporalWarpEquipped and Player:BloodlustExhaustUp() and Player:BloodlustDown() and (Player:BuffUp(S.IcyVeins) or fightRemains < 40)) then
     if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 7"; end
   end
   -- use_items
@@ -344,9 +346,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   -- Enemies Update
-  Enemies10yMelee = Player:GetEnemiesInMeleeRange(10)
-  Enemies12yMelee = Player:GetEnemiesInMeleeRange(12)
-  Enemies18yMelee = Player:GetEnemiesInMeleeRange(18)
+  Enemies16ySplash = Target:GetEnemiesInSplashRange(8)
   if AoEON() then
     EnemiesCount6ySplash = Target:GetEnemiesInSplashRangeCount(6)
     EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
@@ -360,6 +360,9 @@ local function APL()
 
   -- Check our IF status
   Mage.IFTracker()
+
+  -- How long is left in the fight?
+  fightRemains = HL.FightRemains(Enemies16ySplash, false)
 
   -- Check when the Disciplinary Command buff was last applied and its internal CD
   var_disciplinary_command_last_applied = S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()
