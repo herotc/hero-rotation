@@ -303,10 +303,12 @@ Item.Mage.Fire = {
   SoulIgniter                      = Item(184019),
   SunbloodAmethyst                 = Item(178826),
   WakenersFrond                    = Item(181457),
+  ShadowedOrbofTorment             = Item(186428),
 }
 
 Item.Mage.Frost = {
   PotionofSpectralIntellect        = Item(171273),
+  ShadowedOrbofTorment             = Item(186428),
 }
 
 -- Variables

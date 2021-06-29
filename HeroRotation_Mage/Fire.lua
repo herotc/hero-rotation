@@ -108,6 +108,7 @@ local FeveredIncantationEquipped = Player:HasLegendaryEquipped(10)
 local FirestormEquipped = Player:HasLegendaryEquipped(11)
 local MoltenSkyfallEquipped = Player:HasLegendaryEquipped(12)
 local SunKingsBlessingEquipped = Player:HasLegendaryEquipped(13)
+local DeathFathomEquipped = Player:HasLegendaryEquipped(221)
 
 HL:RegisterForEvent(function()
   ExpandedPotentialEquipped = Player:HasLegendaryEquipped(6)
@@ -118,6 +119,7 @@ HL:RegisterForEvent(function()
   FirestormEquipped = Player:HasLegendaryEquipped(11)
   MoltenSkyfallEquipped = Player:HasLegendaryEquipped(12)
   SunKingsBlessingEquipped = Player:HasLegendaryEquipped(13)
+  DeathFathomEquipped = Player:HasLegendaryEquipped(221)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -246,8 +248,8 @@ local function VarInit()
   -- variable,name=skb_duration,op=set,value=dbc.effect.828420.base_value
   var_skb_duration = 6
 
-  -- variable,name=combustion_on_use,op=set,value=equipped.gladiators_badge|equipped.macabre_sheet_music|equipped.inscrutable_quantum_device|equipped.sunblood_amethyst|equipped.empyreal_ordnance|equipped.flame_of_battle|equipped.wakeners_frond|equipped.instructors_divine_bell
-  var_combustion_on_use = (I.SinfulGladiatorsBadge:IsEquipped() or I.SinfulAspirantsBadge:IsEquipped() or I.MacabreSheetMusic:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.EmpyrealOrdnance:IsEquipped() or I.FlameofBattle:IsEquipped() or I.WakenersFrond:IsEquipped() or I.InstructorsDivineBell:IsEquipped())
+  -- variable,name=combustion_on_use,value=equipped.gladiators_badge|equipped.macabre_sheet_music|equipped.inscrutable_quantum_device|equipped.sunblood_amethyst|equipped.empyreal_ordnance|equipped.flame_of_battle|equipped.wakeners_frond|equipped.instructors_divine_bell|equipped.shadowed_orb_of_torment
+  var_combustion_on_use = (I.SinfulGladiatorsBadge:IsEquipped() or I.SinfulAspirantsBadge:IsEquipped() or I.MacabreSheetMusic:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.EmpyrealOrdnance:IsEquipped() or I.FlameofBattle:IsEquipped() or I.WakenersFrond:IsEquipped() or I.InstructorsDivineBell:IsEquipped() or I.ShadowedOrbofTorment:IsEquipped())
 
   -- Manually added: variable,name=on_use_cutoff,value=0
   var_on_use_cutoff = 0
@@ -320,9 +322,17 @@ local function CombustionTiming()
   if Player:Covenant() == "Kyrian" and S.RadiantSpark:CooldownRemains() - 10 < var_combustion_time then
     var_combustion_time = max(S.RadiantSpark:CooldownRemains(), var_combustion_time)
   end
-  -- variable,name=combustion_time,op=max,value=cooldown.deathborne.remains,if=covenant.necrolord&cooldown.deathborne.remains-10<variable.combustion_time
+  -- variable,name=combustion_time,op=max,value=cooldown.mirrors_of_torment.remains,if=covenant.venthyr&cooldown.mirrors_of_torment.remains-25<variable.combustion_time
+  if Player:Covenant() == "Venthyr" and S.MirrorsofTorment:CooldownRemains() - 25 < var_combustion_time then
+    var_combustion_time = max(S.MirrorsofTorment:CooldownRemains(), var_combustion_time)
+  end
+  -- variable,name=combustion_time,op=max,value=cooldown.deathborne.remains+(buff.deathborne.duration-buff.combustion.duration)*runeforge.deaths_fathom,if=covenant.necrolord&cooldown.deathborne.remains-10<variable.combustion_time
   if Player:Covenant() == "Necrolord" and S.Deathborne:CooldownRemains() - 10 < var_combustion_time then
-    var_combustion_time = max(S.Deathborne:CooldownRemains(), var_combustion_time)
+    var_combustion_time = max(S.Deathborne:CooldownRemains() + (S.Deathborne:BaseDuration() - S.Combustion:BaseDuration()) * num(DeathFathomEquipped), var_combustion_time)
+  end
+  -- variable,name=combustion_time,op=max,value=buff.deathborne.remains-buff.combustion.duration,if=runeforge.deaths_fathom&buff.deathborne.up&active_enemies>=2
+  if DeathFathomEquipped and Player:BuffUp(S.Deathborne) and EnemiesCount8ySplash >= 2 then
+    var_combustion_time = max(Player:BuffRemains(S.Deathborne) - S.CombustionBuff:BaseDuration(), var_combustion_time)
   end
   -- variable,name=combustion_time,op=max,value=variable.empyreal_ordnance_delay-(cooldown.empyreal_ordnance.duration-cooldown.empyreal_ordnance.remains)*!cooldown.empyreal_ordnance.ready,if=equipped.empyreal_ordnance
   if I.EmpyrealOrdnance:IsEquipped() then
@@ -484,8 +494,12 @@ local function CombustionPhase()
   if (true) then
     local ShouldReturn = ActiveTalents(); if ShouldReturn then return ShouldReturn; end
   end
-  -- combustion,use_off_gcd=1,use_while_casting=1,if=buff.combustion.down&variable.time_to_combustion<=0&(!runeforge.disciplinary_command|buff.disciplinary_command.up|buff.disciplinary_command_frost.up&talent.rune_of_power&cooldown.buff_disciplinary_command.ready)&(!runeforge.grisly_icicle|debuff.grisly_icicle.up)&(!covenant.necrolord|cooldown.deathborne.remains|buff.deathborne.up)&(action.meteor.in_flight&action.meteor.in_flight_remains<=variable.combustion_cast_remains|action.scorch.executing&action.scorch.execute_remains<variable.combustion_cast_remains|action.fireball.executing&action.fireball.execute_remains<variable.combustion_cast_remains|action.pyroblast.executing&action.pyroblast.execute_remains<variable.combustion_cast_remains|action.flamestrike.executing&action.flamestrike.execute_remains<variable.combustion_cast_remains)
-  if S.Combustion:IsReady() and (Player:BuffDown(S.CombustionBuff) and var_time_to_combustion <= 0 and (not DisciplinaryCommandEquipped or Player:BuffUp(S.DisciplinaryCommandBuff) or Mage.DC.Frost == 1 and S.RuneofPower:IsAvailable() and var_disciplinary_command_cd_remains <= 0) and (not GrislyIcicleEquipped or Target:DebuffUp(S.GrislyIcicleDebuff)) and (Player:Covenant() ~= "Necrolord" or not S.Deathborne:CooldownUp() or Player:BuffUp(S.DeathborneBuff)) and (S.Meteor:InFlight() or Player:IsCasting(S.Scorch) and S.Scorch:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Fireball) and S.Fireball:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Pyroblast) and S.Pyroblast:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Flamestrike) and S.Flamestrike:ExecuteRemains() < var_combustion_cast_remains)) then
+  -- combustion,use_off_gcd=1,use_while_casting=1,if=buff.combustion.down&variable.time_to_combustion<=0&(!runeforge.disciplinary_command|buff.disciplinary_command.up|buff.disciplinary_command_frost.up&talent.rune_of_power&cooldown.buff_disciplinary_command.ready)
+  --&(!runeforge.grisly_icicle|debuff.grisly_icicle.up)&(!covenant.necrolord|cooldown.deathborne.remains|buff.deathborne.up)&(!covenant.venthyr|cooldown.mirrors_of_torment.remains)
+  --&(action.meteor.in_flight&action.meteor.in_flight_remains<=variable.combustion_cast_remains|action.scorch.executing&action.scorch.execute_remains<variable.combustion_cast_remains|action.fireball.executing&action.fireball.execute_remains<variable.combustion_cast_remains|action.pyroblast.executing&action.pyroblast.execute_remains<variable.combustion_cast_remains|action.flamestrike.executing&action.flamestrike.execute_remains<variable.combustion_cast_remains)
+  if S.Combustion:IsReady() and (Player:BuffDown(S.CombustionBuff) and var_time_to_combustion <= 0 and (not DisciplinaryCommandEquipped or Player:BuffUp(S.DisciplinaryCommandBuff) or Mage.DC.Frost == 1 and S.RuneofPower:IsAvailable() and var_disciplinary_command_cd_remains <= 0) 
+  and (not GrislyIcicleEquipped or Target:DebuffUp(S.GrislyIcicleDebuff)) and (Player:Covenant() ~= "Necrolord" or not S.Deathborne:CooldownUp() or Player:BuffUp(S.DeathborneBuff)) and (not Player:Covenant() ~= "Venthyr" or not S.MirrorsofTorment:CooldownUp()) 
+  and (S.Meteor:InFlight() or Player:IsCasting(S.Scorch) and S.Scorch:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Fireball) and S.Fireball:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Pyroblast) and S.Pyroblast:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Flamestrike) and S.Flamestrike:ExecuteRemains() < var_combustion_cast_remains)) then
     if Cast(S.Combustion, Settings.Fire.OffGCDasOffGCD.Combustion) then return "combustion combustion_phase 15"; end
   end
   -- call_action_list,name=combustion_cooldowns,if=buff.combustion.remains>8|cooldown.combustion.remains<5
@@ -560,25 +574,29 @@ local function RoPPhase()
   if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_hot_streak_flamestrike and (Player:BuffUp(S.HotStreakBuff) or Player:BuffUp(S.FirestormBuff))) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike rop_phase 1"; end
   end
+  -- fireball,if=buff.deathborne.up&runeforge.deaths_fathom&variable.time_to_combustion<buff.deathborne.remains&active_enemies>=2
+  if S.Fireball:IsReady() and Player:BuffUp(S.Deathborne) and DeathFathomEquipped and var_time_to_combustion < Player:BuffRemains(S.Deathborne) and EnemiesCount8ySplash >= 2 then
+    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball rop_phase 2"; end
+  end
   -- pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.SunKingsBlessingBuff) and Player:BuffRemains(S.SunKingsBlessingBuff) > S.Pyroblast:CastTime()) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 2"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 3"; end
   end
   -- pyroblast,if=buff.firestorm.react
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.FirestormBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 3"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 4"; end
   end
   -- pyroblast,if=buff.hot_streak.react
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.HotStreakBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 4"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 5"; end
   end
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&buff.sun_kings_blessing_ready.down&active_enemies<variable.hard_cast_flamestrike&!firestarter.active&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(talent.alexstraszas_fury&cooldown.dragons_breath.ready)|searing_touch.active))
   if S.FireBlast:IsReady() and (not var_fire_blast_pooling and Player:BuffDown(S.SunKingsBlessingBuff) and EnemiesCount8ySplash < var_hard_cast_flamestrike and not bool(S.Firestarter:ActiveStatus()) and (Player:BuffDown(S.HeatingUpBuff) and Player:BuffDown(S.HotStreakBuff) and not Player:PrevOffGCDP(1,S.FireBlast) and (S.FireBlast:Charges() >= 2 or (S.AlexstraszasFury:IsAvailable() and S.DragonsBreath:CooldownUp()) or var_searing_touch_active))) then
-    if FBCast(S.FireBlast) then return "fire_blast rop_phase 5"; end
+    if FBCast(S.FireBlast) then return "fire_blast rop_phase 6"; end
   end
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&!firestarter.active&(((action.fireball.executing&(action.fireball.execute_remains<0.5|!runeforge.firestorm)|action.pyroblast.executing&(action.pyroblast.execute_remains<0.5|!runeforge.firestorm))&buff.heating_up.react)|(searing_touch.active&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!hot_streak_spells_in_flight)))
   if S.FireBlast:IsReady() and (not var_fire_blast_pooling and not bool(S.Firestarter:ActiveStatus()) and (((Player:IsCasting(S.Fireball) and (S.Fireball:ExecuteRemains() < 0.5 or not FirestormEquipped) or Player:IsCasting(S.Pyroblast) and (S.Pyroblast:ExecuteRemains() < 0.5 or not FirestormEquipped)) and Player:BuffUp(S.HeatingUpBuff)) or (var_searing_touch_active and (Player:BuffUp(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDown(S.HotStreakBuff) and Player:BuffDown(S.HeatingUpBuff) and Player:IsCasting(S.Scorch) and not (S.Fireball:InFlight() or Player:IsCasting(S.Fireball) or Player:IsCasting(S.Scorch) or S.PhoenixFlames:InFlight()))))) then
-    if FBCast(S.FireBlast) then return "fire_blast rop_phase 6"; end
+    if FBCast(S.FireBlast) then return "fire_blast rop_phase 7"; end
   end
   -- call_action_list,name=active_talents
   if (true) then
@@ -586,43 +604,43 @@ local function RoPPhase()
   end
   -- pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains&cast_time<buff.rune_of_power.remains
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.PyroclasmBuff) and S.Pyroblast:CastTime() < Player:BuffRemains(S.PyroclasmBuff) and S.Pyroblast:CastTime() < Player:BuffRemains(S.RuneofPowerBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 8"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 9"; end
   end
   -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react&searing_touch.active&active_enemies<variable.hot_streak_flamestrike
   if S.Pyroblast:IsReady() and ((Player:IsCasting(S.Scorch) or Player:PrevGCD(1, S.Scorch)) and Player:BuffUp(S.HeatingUpBuff) and var_searing_touch_active and EnemiesCount8ySplash < var_hot_streak_flamestrike) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 9"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 10"; end
   end
   -- phoenix_flames,if=!variable.phoenix_pooling&buff.heating_up.react&!buff.hot_streak.react&(active_dot.ignite<2|active_enemies>=variable.hard_cast_flamestrike|active_enemies>=variable.hot_streak_flamestrike)
   if S.PhoenixFlames:IsCastable() and (not var_phoenix_pooling and Player:BuffUp(S.HeatingUpBuff) and Player:BuffDown(S.HotStreakBuff) and (UnitsWithIgniteCount < 2 or EnemiesCount8ySplash >= var_hard_cast_flamestrike or EnemiesCount8ySplash >= var_hot_streak_flamestrike)) then
-    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames rop_phase 10"; end
+    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames rop_phase 11"; end
   end
   -- scorch,if=searing_touch.active
   if S.Scorch:IsReady() and (var_searing_touch_active) then
-    if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch rop_phase 11"; end
+    if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch rop_phase 12"; end
   end
   -- dragons_breath,if=active_enemies>2
   if S.DragonsBreath:IsReady() and AoEON() and (EnemiesCount16ySplash > 2) then
     if Settings.Fire.StayDistance and not Target:IsInRange(12) then
-      if CastLeft(S.DragonsBreath) then return "dragons_breath rop_phase 12 left"; end
+      if CastLeft(S.DragonsBreath) then return "dragons_breath rop_phase 13 left"; end
     else
-      if Cast(S.DragonsBreath) then return "dragons_breath rop_phase 12"; end
+      if Cast(S.DragonsBreath) then return "dragons_breath rop_phase 13"; end
     end
   end
   -- arcane_explosion,if=active_enemies>=variable.arcane_explosion&mana.pct>=variable.arcane_explosion_mana
   if S.ArcaneExplosion:IsReady() and AoEON() and (EnemiesCount10yMelee >= var_arcane_explosion and Player:ManaPercentageP() >= var_arcane_explosion_mana) then
     if Settings.Fire.StayDistance and not Target:IsInRange(10) then
-      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion rop_phase 13 left"; end
+      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion rop_phase 14 left"; end
     else
-      if Cast(S.ArcaneExplosion) then return "arcane_explosion rop_phase 13"; end
+      if Cast(S.ArcaneExplosion) then return "arcane_explosion rop_phase 14"; end
     end
   end
   -- flamestrike,if=active_enemies>=variable.hard_cast_flamestrike
   if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_hard_cast_flamestrike) then
-    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike rop_phase 14"; end
+    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike rop_phase 15"; end
   end
   -- fireball
   if S.Fireball:IsReady() then
-    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball rop_phase 15"; end
+    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball rop_phase 16"; end
   end
 end
 
@@ -783,8 +801,8 @@ local function APL()
     if S.RadiantSpark:IsReady() and (Player:BuffDown(S.CombustionBuff) and (var_time_to_combustion < var_combustion_precast_time + S.RadiantSpark:ExecuteTime() or var_time_to_combustion > 20)) then
       if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "radiant_spark default 9"; end
     end
-    -- deathborne,if=buff.combustion.down&buff.rune_of_power.down&variable.time_to_combustion<variable.combustion_precast_time+execute_time
-    if S.Deathborne:IsCastable() and CDsON() and (Player:BuffDown(S.CombustionBuff) and Player:BuffDown(S.RuneofPowerBuff) and var_time_to_combustion < var_combustion_precast_time + S.Deathborne:ExecuteTime()) then
+    -- deathborne,if=buff.combustion.down&buff.rune_of_power.down&variable.time_to_combustion<variable.combustion_precast_time+execute_time+(buff.deathborne.duration-buff.combustion.duration)*runeforge.deaths_fathom
+    if S.Deathborne:IsCastable() and CDsON() and (Player:BuffDown(S.CombustionBuff) and Player:BuffDown(S.RuneofPowerBuff) and var_time_to_combustion < var_combustion_precast_time + S.Deathborne:ExecuteTime() + (S.Deathborne:BaseDuration() - S.Combustion:BaseDuration()) * num(DeathFathomEquipped)) then
       if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne default 10"; end
     end
     -- mirrors_of_torment,if=variable.time_to_combustion<variable.combustion_precast_time+execute_time&buff.combustion.down
@@ -803,51 +821,55 @@ local function APL()
       if I.SinfulGladiatorsBadge:IsEquippedAndReady() and (var_time_to_combustion > 55) then
         if Cast(I.SinfulGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge gladiator default 14"; end
       end
+      -- use_item,name=shadowed_orb_of_torment,if=(variable.time_to_combustion<=variable.combustion_precast_time+2|fight_remains<variable.time_to_combustion)&buff.combustion.down
+      if I.ShadowedOrbofTorment:IsEquippedAndReady() and (var_time_to_combustion <= var_combustion_precast_time + 2 or fightRemains < var_time_to_combustion) and Player:BuffDown(S.CombustionBuff) then
+        if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "empyreal_ordnance default 15"; end
+      end
       -- use_item,name=empyreal_ordnance,if=variable.time_to_combustion<=variable.empyreal_ordnance_delay&variable.time_to_combustion>variable.empyreal_ordnance_delay-5
       if I.EmpyrealOrdnance:IsEquippedAndReady() and (var_time_to_combustion <= var_empyreal_ordnance_delay and var_time_to_combustion > var_empyreal_ordnance_delay - 5) then
-        if Cast(I.EmpyrealOrdnance, nil, Settings.Commons.DisplayStyle.Trinkets) then return "empyreal_ordnance default 15"; end
+        if Cast(I.EmpyrealOrdnance, nil, Settings.Commons.DisplayStyle.Trinkets) then return "empyreal_ordnance default 16"; end
       end
       -- use_item,name=glyph_of_assimilation,if=variable.time_to_combustion>=variable.on_use_cutoff
       if I.GlyphofAssimilation:IsEquippedAndReady() and (var_time_to_combustion >= var_on_use_cutoff) then
-        if Cast(I.GlyphofAssimilation, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "glyph_of_assimilation default 16"; end
+        if Cast(I.GlyphofAssimilation, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "glyph_of_assimilation default 17"; end
       end
       -- use_item,name=macabre_sheet_music,if=variable.time_to_combustion<=5
       if I.MacabreSheetMusic:IsEquippedAndReady() and (var_time_to_combustion <= 5) then
-        if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music default 17"; end
+        if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music default 18"; end
       end
       -- use_item,name=dreadfire_vessel,if=variable.time_to_combustion>=variable.on_use_cutoff&(buff.infernal_cascade.stack=buff.infernal_cascade.max_stack|!conduit.infernal_cascade|variable.combustion_on_use|variable.time_to_combustion>interpolated_fight_remains%%(cooldown+10))
       if I.DreadfireVessel:IsEquippedAndReady() and (var_time_to_combustion >= var_on_use_cutoff and (Player:BuffStack(S.InfernalCascadeBuff) == 2 or not S.InfernalCascade:ConduitEnabled() or var_combustion_on_use or var_time_to_combustion > fightRemains % 100)) then
-        if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel default 18"; end
+        if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel default 19"; end
       end
       -- use_item,name=soul_igniter,if=(variable.time_to_combustion>=30*(variable.on_use_cutoff>0)|cooldown.item_cd_1141.remains)&(!equipped.dreadfire_vessel|cooldown.dreadfire_vessel_349857.remains>5)
       -- TODO: Check cooldown.item_cd_1141.remains
       if I.SoulIgniter:IsEquippedAndReady() and (var_time_to_combustion >= 30 * num(var_on_use_cutoff > 0) and (not I.DreadfireVessel:IsEquipped() or I.DreadfireVessel:CooldownRemains() > 5)) then
-        if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soul_igniter default 19"; end
+        if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soul_igniter default 20"; end
       end
       -- cancel_buff,name=soul_ignition,if=!conduit.infernal_cascade&time<5|buff.infernal_cascade.stack=buff.infernal_cascade.max_stack
       if Player:BuffUp(S.SoulIgnitionBuff) and (not S.InfernalCascade:ConduitEnabled() and HL.CombatTime() < 5 or Player:BuffStack(S.InfernalCascadeBuff) == 2) then
-        if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "cancel soul_igniter default 20"; end
+        if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "cancel soul_igniter default 21"; end
       end
       if ((I.SinfulAspirantsBadge:IsEquipped() or I.SinfulGladiatorsBadge:IsEquipped()) and var_time_to_combustion >= var_on_use_cutoff) then
         -- use_item,name=inscrutable_quantum_device,if=equipped.gladiators_badge&variable.time_to_combustion>=variable.on_use_cutoff
         if I.InscrutableQuantumDevice:IsEquippedAndReady() then
-          if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device default 21"; end
+          if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device default 22"; end
         end
         -- use_item,name=flame_of_battle,if=equipped.gladiators_badge&variable.time_to_combustion>=variable.on_use_cutoff
         if I.FlameofBattle:IsEquippedAndReady() then
-          if Cast(I.FlameofBattle, nil, Settings.Commons.DisplayStyle.Trinkets) then return "flame_of_battle default 22"; end
+          if Cast(I.FlameofBattle, nil, Settings.Commons.DisplayStyle.Trinkets) then return "flame_of_battle default 23"; end
         end
         -- use_item,name=wakeners_frond,if=equipped.gladiators_badge&variable.time_to_combustion>=variable.on_use_cutoff
         if I.WakenersFrond:IsEquippedAndReady() then
-          if Cast(I.WakenersFrond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "wakeners_frond default 23"; end
+          if Cast(I.WakenersFrond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "wakeners_frond default 24"; end
         end
         -- use_item,name=instructors_divine_bell,if=equipped.gladiators_badge&variable.time_to_combustion>=variable.on_use_cutoff
         if I.InstructorsDivineBell:IsEquippedAndReady() then
-          if Cast(I.InstructorsDivineBell, nil, Settings.Commons.DisplayStyle.Trinkets) then return "instructors_divine_bell default 24"; end
+          if Cast(I.InstructorsDivineBell, nil, Settings.Commons.DisplayStyle.Trinkets) then return "instructors_divine_bell default 25"; end
         end
         -- use_item,name=sunblood_amethyst,if=equipped.gladiators_badge&variable.time_to_combustion>=variable.on_use_cutoff
         if I.SunbloodAmethyst:IsEquippedAndReady() then
-          if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sunblood_amethyst default 25"; end
+          if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sunblood_amethyst default 26"; end
         end
       end
       -- use_items,if=variable.time_to_combustion>=variable.on_use_cutoff
@@ -861,17 +883,17 @@ local function APL()
     -- frost_nova,if=runeforge.grisly_icicle&buff.combustion.down&(variable.time_to_combustion>cooldown|variable.time_to_combustion<variable.combustion_precast_time+execute_time)
     if S.FrostNova:IsReady() and (GrislyIcicleEquipped and Player:BuffDown(S.CombustionBuff) and (var_time_to_combustion > 30 or var_time_to_combustion < var_combustion_precast_time + S.FrostNova:ExecuteTime())) then
       if Settings.Fire.StayDistance and not Target:IsInRange(12) then
-        if CastLeft(S.FrostNova) then return "frost_nova default 26 left"; end
+        if CastLeft(S.FrostNova) then return "frost_nova default 27 left"; end
       else
-        if Cast(S.FrostNova) then return "frost_nova default 26"; end
+        if Cast(S.FrostNova) then return "frost_nova default 27"; end
       end
     end
     -- counterspell,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down&!buff.disciplinary_command.up&(variable.time_to_combustion+action.frostbolt.cast_time>cooldown.buff_disciplinary_command.duration|variable.time_to_combustion<5)
     if S.Counterspell:IsReady() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains == 0 and Mage.DC.Arcane == 0 and Player:BuffDown(S.DisciplinaryCommandBuff) and (var_time_to_combustion + S.Frostbolt:CastTime() > 30 or var_time_to_combustion < 5)) then
       if Cast(S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, nil, not Target:IsSpellInRange(S.Counterspell)) then return "counterspell default 27"; end
     end
-    -- arcane_explosion,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.remains<execute_time&buff.disciplinary_command_arcane.down&!buff.disciplinary_command.up&(variable.time_to_combustion+execute_time+action.frostbolt.cast_time>cooldown.buff_disciplinary_command.duration|variable.time_to_combustion<5&!talent.rune_of_power)
-    if S.ArcaneExplosion:IsReady() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains < S.ArcaneExplosion:ExecuteTime() and Mage.DC.Arcane == 0 and Player:BuffDown(S.DisciplinaryCommandBuff) and (var_time_to_combustion + S.ArcaneExplosion:ExecuteTime() + S.Frostbolt:CastTime() > 30 or var_time_to_combustion < 5 and not S.RuneofPower:IsAvailable())) then
+    -- arcane_explosion,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down&!buff.disciplinary_command.up&(variable.time_to_combustion+execute_time+action.frostbolt.cast_time>cooldown.buff_disciplinary_command.duration|variable.time_to_combustion<5&!talent.rune_of_power)
+    if S.ArcaneExplosion:IsReady() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains == 0 and Mage.DC.Arcane == 0 and Player:BuffDown(S.DisciplinaryCommandBuff) and (var_time_to_combustion + S.ArcaneExplosion:ExecuteTime() + S.Frostbolt:CastTime() > 30 or var_time_to_combustion < 5 and not S.RuneofPower:IsAvailable())) then
       if Settings.Fire.StayDistance and not Target:IsInRange(10) then
         if CastLeft(S.ArcaneExplosion) then return "arcane_explosion default 28 left"; end
       else
