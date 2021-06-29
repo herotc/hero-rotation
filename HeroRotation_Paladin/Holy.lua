@@ -170,4 +170,8 @@ local function APL()
   end
 end
 
+local function Init()
+
+end
+
 HR.SetAPL(65, APL, Init)
