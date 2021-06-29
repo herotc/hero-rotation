@@ -97,7 +97,7 @@ local var_disciplinary_command_last_applied
 
 local EnemiesCount8ySplash,EnemiesCount10ySplash,EnemiesCount16ySplash
 local EnemiesCount10yMelee,EnemiesCount18yMelee
-local Enemies8ySplash
+local Enemies8ySplash,Enemies10yMelee,Enemies18yMelee
 local UnitsWithIgniteCount
 
 local ExpandedPotentialEquipped = Player:HasLegendaryEquipped(6)
