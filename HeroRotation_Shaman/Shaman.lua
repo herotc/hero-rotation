@@ -34,7 +34,18 @@ Spell.Shaman.Enhancement = {
   FrostShock                            = Spell(196840),
   LightningBolt                         = Spell(188196),
   LightningShield                       = Spell(192106),
+  LightningShieldBuff                   = Spell(192106),
   WindShear                             = Spell(57994),
+  CrashLightning                        = Spell(187874),
+  FeralSpirit                           = Spell(51533),
+  LavaLash                              = Spell(60103),
+  Stormstrike                           = Spell(17364),
+  Windstrike                            = Spell(115356),
+  WindfuryTotem                         = Spell(8512),
+  WindfuryTotemBuff                     = Spell(327942),
+  WindfuryWeapon                        = Spell(33757),
+  MaelstromWeaponBuff                   = Spell(344179),
+  CrashLightningBuff                    = Spell(187878),
 
   -- Defensive
   AstralShift                           = Spell(10871),
@@ -49,33 +60,8 @@ Spell.Shaman.Enhancement = {
   AncestralCall                         = Spell(274738),
   BagofTricks                           = Spell(312411),
 
-  -- Abilities
-  Bloodlust                             = Spell(2825),
-  ChainLightning                        = Spell(188443),
-  EarthElemental                        = Spell(198103),
-  FlamentongueWeapon                    = Spell(318038),
-  FrostShock                            = Spell(196840),
-  LightningBolt                         = Spell(188196),
-  LightningShield                       = Spell(192106),
-  LightningShieldBuff                   = Spell(192106),
-
-  -- Defensive
-  AstralShift                           = Spell(10871),
-
-  -- Utility
-  CapacitorTotem                        = Spell(192058),
 
 
-  CrashLightning                        = Spell(187874),
-  FeralSpirit                           = Spell(51533),
-  LavaLash                              = Spell(60103),
-  Stormstrike                           = Spell(17364),
-  Windstrike                            = Spell(115356),
-  WindfuryTotem                         = Spell(8512),
-  WindfuryTotemBuff                     = Spell(327942),
-  WindfuryWeapon                        = Spell(33757),
-  MaelstromWeaponBuff                   = Spell(344179),
-  CrashLightningBuff                    = Spell(187878),
 
   -- Talents
   Ascendance                            = Spell(114051),
