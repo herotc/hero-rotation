@@ -420,7 +420,8 @@ function Mage.DCCheck()
   end
 
   local M = Mage.DC
-  if Player:BuffDown(S.DisciplinaryCommandBuff) then
+  local var_disciplinary_command_cd_remains = 30 - S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()
+  if Player:BuffDown(S.DisciplinaryCommandBuff) and var_disciplinary_command_cd_remains <= 0 then
     if M.Arcane == 0 then
       -- Split Blink (1953)/Shimmer (212653) into unique spell objects, as PrevGCD doesn't like MultiSpell, apparently
       if Player:PrevOffGCD(1, S.Counterspell) or Player:PrevGCD(1, S.ArcaneExplosion) or Player:PrevGCD(1, S.RuneofPower) or Player:PrevOffGCD(1, Spell(212653)) or Player:PrevOffGCD(1, Spell(1953)) or Player:PrevGCD(1, S.ArcaneIntellect) or Player:PrevGCD(1, S.AlterTime) or Player:PrevGCD(1, S.SpellSteal) or Player:PrevGCD(1, S.RemoveCurse) or Player:PrevGCD(1, S.MirrorImage) or Player:PrevGCD(1, S.Invisibility) or Player:PrevGCD(1, S.SlowFall) or Player:PrevGCD(1, S.FocusMagic) or Player:PrevOffGCD(1, S.TimeWarp)
