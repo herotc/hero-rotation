@@ -271,6 +271,7 @@
       -- Keybind
       if Keybinds then
         PartFrame.Keybind:SetText(Keybinds[i]);
+        PartFrame.Keybind:SetScale(HR.GUISettings.General.ScaleHotkey);
       else
         PartFrame.Keybind:SetText("");
       end
@@ -284,6 +285,7 @@
   function HR.MainIconFrame:HideParts ()
     HR.MainIconPartOverlayFrame:Hide();
     for i = 1, #self.Part do
+      self.Part[i].Keybind:SetText("");
       self.Part[i]:Hide();
     end
   end
