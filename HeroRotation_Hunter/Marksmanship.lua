@@ -170,7 +170,7 @@ local function Precombat()
   -- snapshot_stats
   if Everyone.TargetIsValid() then
     -- fleshcraft,if=soulbind.pustule_eruption
-    if S.Fleshcraft:IsCastable() and (S.PustuleEruption:IsAvailable()) then
+    if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled()) then
       if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft opener"; end
     end
     -- tar_trap,if=runeforge.soulforge_embers
@@ -341,7 +341,7 @@ local function St()
     if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks st 42"; end
   end
   -- fleshcraft,if=soulbind.pustule_eruption&buff.trueshot.down
-  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:IsAvailable() and Player:BuffDown(S.Trueshot)) then
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() and Player:BuffDown(S.Trueshot)) then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft st 43"; end
   end
   -- steady_shot
@@ -450,7 +450,7 @@ local function Trickshots()
     if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks trickshots 44"; end
   end
   -- fleshcraft,if=soulbind.pustule_eruption&buff.trueshot.down
-  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:IsAvailable() and Player:BuffDown(S.Trueshot)) then
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() and Player:BuffDown(S.Trueshot)) then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft trickshots 43"; end
   end
   -- steady_shot
