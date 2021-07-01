@@ -193,6 +193,10 @@ local function Precombat()
       if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead precombat 2 displaystyle"; end
     end
   end
+  -- fleshcraft
+  if S.Fleshcraft:IsCastable() then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
+  end
   -- army_of_the_dead,precombat_time=3,if=!talent.summon_gargoyle
   if S.ArmyoftheDead:IsReady() and not Settings.Unholy.DisableAotD and (not S.SummonGargoyle:IsAvailable()) then
     if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyoftheDead) then return "army_of_the_dead precombat 4"; end
@@ -403,6 +407,10 @@ local function Covenants()
   -- shackle_the_unworthy,if=active_enemies>=2&(death_and_decay.ticking|raid_event.adds.remains<=14)
   if S.ShackleTheUnworthy:IsCastable() and (EnemiesMeleeCount >= 2 and (Player:BuffUp(S.DeathAndDecayBuff) or Enemies10ySplashCount > 1 and AddsFightRemains(Enemies10ySplash) <= 14)) then
     if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 14"; end
+  end
+  -- fleshcraft,if=soulbind.pustule_eruption
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled()) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft covenants 16"; end
   end
 end
 

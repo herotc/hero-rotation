@@ -51,10 +51,12 @@ Spell.DeathKnight.Blood = {
   AbominationLimb                       = Spell(315443),
   AbominationLimbBuff                   = Spell(315443),
   DeathsDue                             = Spell(324128),
+  Fleshcraft                            = Spell(324631),
   ShackleTheUnworthy                    = Spell(312202),
   SwarmingMist                          = Spell(311648),
 
   -- Conduit Effects
+  PustuleEruption                       = Spell(351094),
 
   -- Buffs
   BoneShieldBuff                        = Spell(195181),
@@ -122,6 +124,7 @@ Spell.DeathKnight.Frost = {
   -- Covenant Abilities
   AbominationLimb                       = Spell(315443),
   DeathsDue                             = Spell(324128),
+  Fleshcraft                            = Spell(324631),
   ShackleTheUnworthy                    = Spell(312202),
   SwarmingMist                          = Spell(311648),
 
@@ -129,6 +132,7 @@ Spell.DeathKnight.Frost = {
   BitingCold                            = Spell(337988),
   EradicatingBlow                       = Spell(337934),
   Everfrost                             = Spell(337988),
+  PustuleEruption                       = Spell(351094),
   UnleashedFrenzy                       = Spell(338492),
 
   -- Buffs
@@ -198,6 +202,7 @@ Spell.DeathKnight.Unholy = {
   -- Covenant Abilities
   AbominationLimb                       = Spell(315443),
   DeathsDue                             = Spell(324128),
+  Fleshcraft                            = Spell(324631),
   ShackleTheUnworthy                    = Spell(312202),
   SwarmingMist                          = Spell(311648),
 
@@ -206,6 +211,7 @@ Spell.DeathKnight.Unholy = {
   FrenziedMonstrosity                   = Spell(334896),
   LeadByExample                         = Spell(342156),
   MarrowedGemstoneEnhancement           = Spell(327069),
+  PustuleEruption                       = Spell(351094),
   ThrillSeeker                          = Spell(331939),
 
   -- Buffs

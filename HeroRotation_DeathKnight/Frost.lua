@@ -199,6 +199,10 @@ local function Precombat()
   -- snapshot_stats
   -- opener
   if Everyone.TargetIsValid() then
+    -- fleshcraft
+    if S.Fleshcraft:IsCastable() then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat"; end
+    end
     -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(!talent.breath_of_sindragosa&(trinket.1.cooldown.duration%%cooldown.pillar_of_frost.duration=0)|talent.breath_of_sindragosa&(cooldown.breath_of_sindragosa.duration%%trinket.1.cooldown.duration=0)|talent.icecap)
     -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(!talent.breath_of_sindragosa&(trinket.2.cooldown.duration%%cooldown.pillar_of_frost.duration=0)|talent.breath_of_sindragosa&(cooldown.breath_of_sindragosa.duration%%trinket.2.cooldown.duration=0)|talent.icecap)
     -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!trinket.1.has_use_buff&trinket.2.has_use_buff|trinket.2.has_use_buff&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync))
@@ -413,6 +417,10 @@ local function Covenants()
   if S.ShackleTheUnworthy:IsCastable() and EnemiesCount10yd >= 2 then
     if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "shackle_the_unworthy covenants 16"; end
   end
+  -- fleshcraft,if=soulbind.pustule_eruption&!buff.pillar_of_frost.up
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() and Player:BuffDown(S.PillarofFrostBuff)) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft covenants 18"; end
+  end
 end
 
 local function Racials()
@@ -583,8 +591,8 @@ local function Obliteration()
   if S.GlacialAdvance:IsReady() and (EnemiesCount10yd >= 2  and (Player:RunicPowerDeficit() < 10 or Player:RuneTimeToX(2) > Player:GCD()) or (Target:DebuffStack(S.RazoriceDebuff) < 5 or Target:DebuffRemains(S.RazoriceDebuff) < 15)) then
     if Cast(S.GlacialAdvance, nil, nil, TargetIsInRange[100]) then return "glacial_advance obliteration 10"; end
   end
-  -- frost_strike,if=conduit.eradicating_blow&buff.eradicating_blow.stack=2&active_enemies=1
-  if S.FrostStrike:IsReady() and (S.EradicatingBlow:ConduitEnabled() and Player:BuffStack(S.EradicatingBlowBuff) == 2 and EnemiesCount10yd == 1) then
+  -- frost_strike,if=active_enemies=1&(conduit.eradicating_blow&buff.eradicating_blow.stack=2|conduit.unleashed_frenzy&buff.unleashed_frenzy.remains<gcd)
+  if S.FrostStrike:IsReady() and (EnemiesCount10yd == 1 and (S.EradicatingBlow:ConduitEnabled() and Player:BuffStack(S.EradicatingBlowBuff) == 2 or S.UnleashedFrenzy:ConduitEnabled() and Player:BuffRemains(S.UnleashedFrenzyBuff) < Player:GCD())) then
     if Cast(S.FrostStrike, nil, nil, not TargetIsInRange[8]) then return "frost_strike obliteration 12"; end
   end
   -- howling_blast,if=buff.rime.up&spell_targets.howling_blast>=2
@@ -622,8 +630,8 @@ local function Standard()
   if S.FrostStrike:IsReady() and (S.RemorselessWinter:CooldownRemains() <= 2 * Player:GCD() and S.GatheringStorm:IsAvailable()) then
     if Cast(S.FrostStrike, nil, nil, not TargetIsInRange[8]) then return "frost_strike standard 6"; end
   end
-  -- frost_strike,if=conduit.eradicating_blow&buff.eradicating_blow.stack=2|conduit.unleashed_frenzy&buff.unleashed_frenzy.remains<3&buff.unleashed_frenzy.up
-  if S.FrostStrike:IsReady() and (S.EradicatingBlow:ConduitEnabled() and Player:BuffStack(S.EradicatingBlowBuff) == 2 or S.UnleashedFrenzy:ConduitEnabled() and Player:BuffRemains(S.UnleashedFrenzyBuff) < 3 and Player:BuffUp(S.UnleashedFrenzy)) then
+  -- frost_strike,if=conduit.eradicating_blow&buff.eradicating_blow.stack=2|conduit.unleashed_frenzy&buff.unleashed_frenzy.remains<3
+  if S.FrostStrike:IsReady() and (S.EradicatingBlow:ConduitEnabled() and Player:BuffStack(S.EradicatingBlowBuff) == 2 or S.UnleashedFrenzy:ConduitEnabled() and Player:BuffRemains(S.UnleashedFrenzyBuff) < 3) then
     if Cast(S.FrostStrike, nil, nil, not TargetIsInRange[8]) then return "frost_strike standard 8"; end
   end
   -- howling_blast,if=buff.rime.up

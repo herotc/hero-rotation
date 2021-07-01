@@ -88,6 +88,10 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   if Everyone.TargetIsValid() then
+    -- fleshcraft
+    if S.Fleshcraft:IsCastable() then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 1"; end
+    end
     -- Manually added: Openers
     if S.DeathsCaress:IsReady() and not Target:IsInMeleeRange(5) then
       if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress precombat 2"; end
@@ -257,6 +261,10 @@ local function Covenants()
   -- shackle_the_unworthy,if=cooldown.dancing_rune_weapon.remains<3|!buff.dancing_rune_weapon.up
   if S.ShackleTheUnworthy:IsCastable() and (S.DancingRuneWeapon:CooldownRemains() < 3 or Player:BuffDown(S.DancingRuneWeaponBuff)) then
     if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 18"; end
+  end
+  -- fleshcraft,if=soulbind.pustule_eruption
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled()) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft covenants 20"; end
   end
 end
 
