@@ -158,6 +158,8 @@ Spell.Warrior.Arms = {
   -- Legendary Effects
 
   -- Conduits
+  AshenJuggernaut                       = Spell(335232),
+  AshenJuggernautBuff                   = Spell(335234),
   BattlelordBuff                        = Spell(346369),
   ExploiterDebuff                       = Spell(335452),
 
@@ -227,9 +229,20 @@ Spell.Warrior.Protection = {
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Fury = {
+  -- Potion
   PotionofSpectralStrength         = Item(171275),
-  GrimCodex                        = Item(178811, {13, 14}),
+  -- Trinkets
   DDVoracity                       = Item(173087, {13, 14}),
+  FlameofBattle                    = Item(181501, {13, 14}),
+  GrimCodex                        = Item(178811, {13, 14}),
+  InscrutableQuantumDevice         = Item(179350, {13, 14}),
+  InstructorsDivineBell            = Item(184842, {13, 14}),
+  MacabreSheetMusic                = Item(184024, {13, 14}),
+  OverwhelmingPowerCrystal         = Item(179342, {13, 14}),
+  WakenersFrond                    = Item(181457, {13, 14}),
+  -- Gladiator's Badges
+  SinfulGladiatorsBadge            = Item(175921, {13, 14}),
+  UnchainedGladiatorsBadge         = Item(185197, {13, 14}),
 }
 
 Item.Warrior.Arms = {

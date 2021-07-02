@@ -39,6 +39,8 @@ local Enemies8y
 local EnemiesCount8y
 
 -- Legendaries
+local BattlelordEquipped = Player:HasLegendaryEquipped(183)
+local SinfulSurgeEquipped = Player:HasLegendaryEquipped(215)
 local EnduringBlowEquipped = Player:HasLegendaryEquipped(182)
 local SignetofTormentedKingsEquipped = Player:HasLegendaryEquipped(181)
 
@@ -57,6 +59,8 @@ local StunInterrupts = {
 
 -- Event Registrations
 HL:RegisterForEvent(function()
+  BattlelordEquipped = Player:HasLegendaryEquipped(183)
+  SinfulSurgeEquipped = Player:HasLegendaryEquipped(215)
   EnduringBlowEquipped = Player:HasLegendaryEquipped(182)
   SignetofTormentedKingsEquipped = Player:HasLegendaryEquipped(181)
 end, "PLAYER_EQUIPMENT_CHANGED")
@@ -179,97 +183,107 @@ local function Execute()
   if S.Rend:IsReady() and (Target:DebuffRefreshable(S.RendDebuff)) then
     if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend"; end
   end]]
+  -- conquerors_banner
+  if CDsON() and S.ConquerorsBanner:IsCastable() then
+    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner execute 4"; end
+  end
   -- cancel_buff,name=bladestorm,if=spell_targets.whirlwind=1&gcd.remains=0&(rage>75|rage>50&buff.recklessness.up)
-  -- avatar,if=cooldown.colossus_smash.remains<8&gcd.remains=0
-  if S.Avatar:IsCastable() and CDsON() and (S.ColossusSmash:CooldownRemains() < 8) then
-    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar execute 4"; end
+  -- avatar,if=gcd.remains=0|target.time_to_die<20
+  if S.Avatar:IsCastable() and CDsON() then
+    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar execute 6"; end
   end
-  -- skullsplitter,if=rage<60&(!talent.deadly_calm.enabled|buff.deadly_calm.down)
-  if S.Skullsplitter:IsCastable() and (Player:Rage() < 50 and (not S.DeadlyCalm:IsAvailable() or Player:BuffDown(S.DeadlyCalmBuff))) then
-    if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter execute 6"; end
+  -- condemn,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd&conduit.ashen_juggernaut.rank>1
+  if S.Condemn:IsCastable() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() and S.AshenJuggernaut:ConduitRank() > 1) then
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 8"; end
   end
-  if CDsON() then
-    -- ravager
-    if S.Ravager:IsCastable() then
-      if Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager execute 8"; end
-    end
-    -- conquerors_banner
-    if S.ConquerorsBanner:IsCastable() then
-      if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner execute 10"; end
-    end
+  -- execute,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd&conduit.ashen_juggernaut.rank>1
+  if S.Execute:IsCastable() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() and S.AshenJuggernaut:ConduitRank() > 1) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 10"; end
   end
-  -- cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
-  if S.Cleave:IsReady() and (EnemiesCount8y > 1 and Target:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD()) then
-    if Cast(S.Cleave, nil, nil, not Target:IsInRange(8)) then return "cleave execute 12"; end
+  -- ravager
+  if CDsON() and S.Ravager:IsCastable() then
+    if Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager execute 12"; end
+  end
+  -- rend,if=remains<=gcd&(!talent.warbreaker.enabled&cooldown.colossus_smash.remains<4|talent.warbreaker.enabled&cooldown.warbreaker.remains<4)&target.time_to_die>12
+  if S.Rend:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and (not S.Warbreaker:IsAvailable() and S.ColossusSmash:CooldownRemains() < 4 or S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemains() < 4) and Target:TimeToDie() > 12) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend execute 14"; end
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
-    if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker execute 14"; end
+    if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker execute 16"; end
   end
   -- colossus_smash
   if S.ColossusSmash:IsCastable() then
-    if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash execute 16"; end
-  end
-  -- condemn,if=debuff.colossus_smash.up|buff.sudden_death.react|rage>65
-  if S.Condemn:IsCastable() and S.Condemn:IsUsable() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.SuddenDeathBuff) or Player:Rage() > 65) then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 18"; end
-  end
-  -- overpower,if=charges=2
-  if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2) then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 20"; end
-  end
-  -- mortal_strike,if=runeforge.enduring_blow|dot.deep_wounds.remains<=gcd|((debuff.exploiter.stack=2|buff.battlelord.up)&!covenant.venthyr)
-  if S.MortalStrike:IsReady() and (EnduringBlowEquipped or Target:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD() or ((Target:DebuffStack(S.ExploiterDebuff) == 2 or Player:BuffUp(S.BattlelordBuff)) and Player:Covenant() ~= "Venthyr")) then
-    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 22"; end
+    if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash execute 18"; end
   end
   if CDsON() then
-    -- ancient_aftershock
-    if S.AncientAftershock:IsCastable() then
-      if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock execute 24"; end
+    -- ancient_aftershock,if=debuff.colossus_smash.up
+    if S.AncientAftershock:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
+      if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock execute 20"; end
     end
     -- spear_of_bastion
     if S.SpearofBastion:IsCastable() then
-      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 26"; end
-    end
-    -- bladestorm,if=buff.deadly_calm.down&rage<50
-    if S.Bladestorm:IsCastable() and (Player:BuffDown(S.DeadlyCalmBuff) and Player:Rage() < 50) then
-      if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm execute 28"; end
+      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 22"; end
     end
   end
-  -- skullsplitter,if=rage<40
-  if S.Skullsplitter:IsCastable() and (Player:Rage() < 40) then
-    if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter execute 30"; end
+  -- condemn,if=runeforge.signet_of_tormented_kings&(rage.deficit<25|debuff.colossus_smash.up&rage>40|buff.sudden_death.react|buff.deadly_calm.up)
+  if S.Condemn:IsCastable() and (SignetofTormentedKingsEquipped and (Player:RageDeficit() < 25 or Target:DebuffUp(S.ColossusSmashDebuff) and Player:Rage() > 40 or Player:BuffUp(S.SuddenDeathBuff) or Player:BuffUp(S.DeadlyCalmBuff))) then
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 24"; end
+  end
+  -- overpower,if=charges=2
+  if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2) then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 26"; end
+  end
+  -- cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
+  if S.Cleave:IsReady() and (EnemiesCount8y > 1 and Target:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD()) then
+    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave execute 28"; end
+  end
+  -- mortal_strike,if=dot.deep_wounds.remains<=gcd|runeforge.enduring_blow|buff.overpower.stack=2&debuff.exploiter.stack=2|buff.battlelord.up
+  if S.MortalStrike:IsReady() and (Target:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD() or EnduringBlowEquipped or Player:BuffStack(S.OverpowerBuff) == 2 and Target:DebuffStack(S.ExploiterDebuff) == 2 or Player:BuffUp(S.BattlelordBuff)) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 30"; end
+  end
+  -- condemn,if=rage.deficit<25|buff.deadly_calm.up
+  if S.Condemn:IsCastable() and (Player:RageDeficit() < 25 or Player:BuffUp(S.DeadlyCalmBuff)) then
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 32"; end
+  end
+  -- skullsplitter,if=rage<45
+  if S.Skullsplitter:IsCastable() and (Player:Rage() < 45) then
+    if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter execute 34"; end
+  end
+  -- bladestorm,if=buff.deadly_calm.down&(rage<20|!runeforge.sinful_surge&rage<50)
+  if CDsON() and S.Bladestorm:IsCastable() and (Player:BuffDown(S.DeadlyCalmBuff) and (Player:Rage() < 20 or not SinfulSurgeEquipped and Player:Rage() < 50)) then
+    if Cast(S.Bladestorm, nil, nil, not TargetInMeleeRange) then return "bladestorm execute 36"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 32"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 38"; end
   end
   -- condemn
   if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 34"; end
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 40"; end
   end
   -- execute
   if S.Execute:IsCastable() and S.Execute:IsUsable() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 36"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 42"; end
   end
 end
 
 local function SingleTarget()
-  -- conquerors_banner,if=target.time_to_die>120
-  if S.ConquerorsBanner:IsCastable() and CDsON() and (Target:TimeToDie() > 120) then
-    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner single_target 2"; end
+  -- rend,if=remains<=gcd
+  if S.Rend:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD()) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend single_target 2"; end
   end
-  -- rend,if=remains<=duration*0.3
-  if S.Rend:IsReady() and (Target:DebuffRefreshable(S.RendDebuff)) then
-    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend single_target 4"; end
+  -- conquerors_banner,if=target.time_to_die>140
+  if CDsON() and S.ConquerorsBanner:IsCastable() and (Target:TimeToDie() > 140) then
+    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner single_target 4"; end
   end
-  -- avatar,if=cooldown.colossus_smash.remains<8&gcd.remains=0
-  if S.Avatar:IsCastable() and CDsON() and (S.ColossusSmash:CooldownRemains() < 8) then
+  -- avatar,if=gcd.remains=0
+  if CDsON() and S.Avatar:IsCastable() then
     if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar single_target 6"; end
   end
-  -- cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
-  if S.Cleave:IsReady() and (EnemiesCount8y > 1 and Target:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD()) then
-    if Cast(S.Cleave, nil, nil, not Target:IsInRange(8)) then return "cleave single_target 8"; end
+  -- ravager
+  if S.Ravager:IsCastable() then
+    if Cast(S.Ravager, nil, nil, not Target:IsInRange(40)) then return "ravager single_target 8"; end
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
@@ -280,8 +294,8 @@ local function SingleTarget()
     if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash single_target 12"; end
   end
   if CDsON() then
-    -- ancient_aftershock
-    if S.AncientAftershock:IsCastable() then
+    -- ancient_aftershock,if=debuff.colossus_smash.up
+    if S.AncientAftershock:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
       if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock single_target 14"; end
     end
     -- spear_of_bastion
@@ -293,45 +307,53 @@ local function SingleTarget()
   if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2) then
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower single_target 18"; end
   end
-  -- mortal_strike,if=runeforge.enduring_blow|buff.overpower.stack>=2|(dot.deep_wounds.remains<=gcd&cooldown.colossus_smash.remains>gcd)
-  if S.MortalStrike:IsReady() and (EnduringBlowEquipped or Player:BuffStack(S.OverpowerBuff) >= 2 or (Target:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD() and S.ColossusSmash:CooldownRemains() > Player:GCD() + 0.5)) then
+  -- mortal_strike,if=runeforge.enduring_blow|runeforge.battlelord|buff.overpower.stack>=2
+  if S.MortalStrike:IsReady() and (EnduringBlowEquipped or BattlelordEquipped or Player:BuffStack(S.OverpowerBuff) >= 2) then
     if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike single_target 20"; end
-  end
-  -- bladestorm,if=buff.deadly_calm.down&(debuff.colossus_smash.up&rage<30|rage<50)
-  if S.Bladestorm:IsCastable() and CDsON() and (Player:BuffDown(S.DeadlyCalmBuff) and (Target:DebuffUp(S.ColossusSmashDebuff) and Player:Rage() < 30 or Player:Rage() < 50)) then
-    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm single_target 22"; end
-  end
-  -- deadly_calm
-  if S.DeadlyCalm:IsCastable() and CDsON() then
-    if Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm single_target 24"; end
-  end
-  -- skullsplitter,if=rage<60&buff.deadly_calm.down
-  if S.Skullsplitter:IsCastable() and (Player:Rage() < 60 and Player:BuffDown(S.DeadlyCalmBuff)) then
-    if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter single_target 26"; end
-  end
-  -- overpower
-  if S.Overpower:IsCastable() then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower single_target 28"; end
   end
   -- condemn,if=buff.sudden_death.react
   if S.Condemn:IsCastable() and S.Condemn:IsUsable() and (Player:BuffUp(S.SuddenDeathBuff)) then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 30"; end
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 22"; end
   end
   -- execute,if=buff.sudden_death.react
   if S.Execute:IsCastable() and S.Execute:IsUsable() and (Player:BuffUp(S.SuddenDeathBuff)) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 32"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 24"; end
+  end
+  -- skullsplitter,if=rage.deficit>45&buff.deadly_calm.down
+  if S.Skullsplitter:IsCastable() and (Player:RageDeficit() > 45 and Player:BuffDown(S.DeadlyCalmBuff)) then
+    if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter single_target 26"; end
+  end
+  -- bladestorm,if=buff.deadly_calm.down&rage<30
+  if CDsON() and S.Bladestorm:IsCastable() and (Player:BuffDown(S.DeadlyCalmBuff) and Player:Rage() < 30) then
+    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm single_target 28"; end
+  end
+  -- deadly_calm
+  if CDsON() and S.DeadlyCalm:IsCastable() then
+    if Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm single_target 30"; end
+  end
+  -- overpower
+  if S.Overpower:IsCastable() then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower single_target 32"; end
   end
   -- mortal_strike
   if S.MortalStrike:IsReady() then
     if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike single_target 34"; end
   end
-  -- whirlwind,if=talent.fervor_of_battle.enabled
-  if S.Whirlwind:IsReady() and (S.FervorofBattle:IsAvailable()) then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind single_target 36"; end
+  -- rend,if=remains<duration*0.3
+  if S.Rend:IsReady() and (Target:DebuffRefreshable(S.RendDebuff)) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend single_target 36"; end
   end
-  -- slam,if=!talent.fervor_of_battle.enabled&(rage>50|runeforge.signet_of_tormented_kings)
-  if S.Slam:IsReady() and (not S.FervorofBattle:IsAvailable() and (Player:Rage() > 50 or SignetofTormentedKingsEquipped)) then
-    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam single_target 38"; end
+  -- cleave,if=spell_targets.whirlwind>1
+  if S.Cleave:IsReady() and (EnemiesCount8y > 1) then
+    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave single_target 38"; end
+  end
+  -- whirlwind,if=talent.fervor_of_battle.enabled|spell_targets.whirlwind>4|spell_targets.whirlwind>2&buff.sweeping_strikes.down
+  if S.Whirlwind:IsReady() and (S.FervorofBattle:IsAvailable() or EnemiesCount8y > 4 or EnemiesCount8y > 2 and Player:BuffDown(S.SweepingStrikesBuff)) then
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind single_target 40"; end
+  end
+  -- slam,if=!talent.fervor_of_battle.enabled&(rage>50|debuff.colossus_smash.up|!runeforge.enduring_blow)
+  if S.Slam:IsReady() and (not S.FervorofBattle:IsAvailable() and (Player:Rage() > 50 or Target:DebuffUp(S.ColossusSmashDebuff) or not EnduringBlowEquipped)) then
+    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam single_target 42"; end
   end
   
 end
@@ -369,8 +391,8 @@ local function APL()
       end
     end
     -- auto_attack
-    -- potion
-    if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions then
+    -- potion,if=gcd.remains=0&debuff.colossus_smash.remains>8|target.time_to_die<25
+    if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions and (Target:DebuffRemains(S.ColossusSmashDebuff) > 8 or Target:TimeToDie() < 25) then
       if Cast(I.PotionofSpectralStrength, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
     end
     if CDsON() then

@@ -29,10 +29,19 @@ local I = Item.Warrior.Fury
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.FlameofBattle:ID(),
+  I.InscrutableQuantumDevice:ID(),
+  I.InstructorsDivineBell:ID(),
+  I.MacabreSheetMusic:ID(),
+  I.OverwhelmingPowerCrystal:ID(),
+  I.WakenersFrond:ID(),
+  I.SinfulGladiatorsBadge:ID(),
+  I.UnchainedGladiatorsBadge:ID(),
 }
 
 -- Variables
 local VarExecutePhase
+local VarUniqueLegendaries
 
 -- Enemies Variables
 local Enemies8y, EnemiesCount8
@@ -41,6 +50,8 @@ local TargetInMeleeRange
 -- Legendaries
 local SignetofTormentedKingsEquipped = Player:HasLegendaryEquipped(181)
 local WilloftheBerserkerEquipped = Player:HasLegendaryEquipped(189)
+local ElysianMightEquipped = Player:HasLegendaryEquipped(263)
+local SinfulSurgeEquipped = Player:HasLegendaryEquipped(215)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -59,6 +70,8 @@ local StunInterrupts = {
 HL:RegisterForEvent(function()
   SignetofTormentedKingsEquipped = Player:HasLegendaryEquipped(181)
   WilloftheBerserkerEquipped = Player:HasLegendaryEquipped(189)
+  ElysianMightEquipped = Player:HasLegendaryEquipped(263)
+  SinfulSurgeEquipped = Player:HasLegendaryEquipped(215)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
@@ -103,12 +116,8 @@ local function SingleTarget()
     if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 4"; end
   end
   -- cancel_buff,name=bladestorm,if=spell_targets.whirlwind=1&gcd.remains=0&(talent.massacre.enabled|covenant.venthyr.enabled)&variable.execute_phase&(rage>90|!cooldown.condemn.remains)
-  -- bladestorm,if=buff.enrage.remains>gcd*2.5&spell_targets.whirlwind>1
-  if S.Bladestorm:IsCastable() and CDsON() and (Player:BuffRemains(S.EnrageBuff) > Player:GCD() * 2.5 and EnemiesCount8 > 1) then
-    if Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm single_target 6"; end
-  end
-  -- condemn,if=buff.enrage.up&variable.execute_phase
-  if S.Condemn:IsCastable() and (Player:BuffUp(S.EnrageBuff) and VarExecutePhase) then
+  -- condemn,if=(buff.enrage.up|buff.recklessness.up&runeforge.sinful_surge)&variable.execute_phase
+  if S.Condemn:IsCastable() and ((Player:BuffUp(S.EnrageBuff) or Player:BuffUp(S.RecklessnessBuff) and SinfulSurgeEquipped) and VarExecutePhase) then
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 8"; end
   end
   -- siegebreaker,if=spell_targets.whirlwind>1|raid_event.adds.in>15
@@ -123,26 +132,30 @@ local function SingleTarget()
   if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 14"; end
   end
-  if CDsON() then
-    -- ancient_aftershock,if=buff.enrage.up&cooldown.recklessness.remains>5&(target.time_to_die>95|buff.recklessness.up|target.time_to_die<20)&(spell_targets.whirlwind>1|raid_event.adds.in>75)
-    if S.AncientAftershock:IsCastable() and (Player:BuffUp(S.EnrageBuff) and S.Recklessness:CooldownRemains() > 5 and (Target:TimeToDie() > 95 or Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20)) then
-      if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(12)) then return "ancient_aftershock single_target 16"; end
-    end
-    -- spear_of_bastion,if=buff.enrage.up&cooldown.recklessness.remains>5&(target.time_to_die>65|buff.recklessness.up|target.time_to_die<20)&(spell_targets.whirlwind>1|raid_event.adds.in>75)
-    if S.SpearofBastion:IsCastable() and (Player:BuffUp(S.EnrageBuff) and S.Recklessness:CooldownRemains() > 5 and (Target:TimeToDie() > 65 or Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20)) then
-      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion single_target 18"; end
-    end
+  -- ancient_aftershock,if=buff.enrage.up&cooldown.recklessness.remains>5&(target.time_to_die>95|buff.recklessness.up|target.time_to_die<20)&raid_event.adds.in>75
+  if CDsON() and S.AncientAftershock:IsCastable() and (Player:BuffUp(S.EnrageBuff) and S.Recklessness:CooldownRemains() > 5 and (Target:TimeToDie() > 95 or Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20)) then
+    if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(12)) then return "ancient_aftershock single_target 16"; end
   end
   -- execute
   if S.Execute:IsCastable() and S.Execute:IsUsable() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 20"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 18"; end
   end
-  -- bladestorm,if=buff.enrage.up&(!buff.recklessness.remains|rage<50)&spell_targets.whirlwind=1&raid_event.adds.in>45
-  if S.Bladestorm:IsCastable() and CDsON() and (Player:BuffUp(S.EnrageBuff) and (Player:BuffDown(S.RecklessnessBuff) or Player:Rage() < 50) and EnemiesCount8 == 1) then
-    if Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm single_target 22"; end
+  if CDsON() then
+    -- spear_of_bastion,if=runeforge.elysian_might&buff.enrage.up&cooldown.recklessness.remains>5&(buff.recklessness.up|target.time_to_die<20|debuff.siegebreaker.up|!talent.siegebreaker&target.time_to_die>68)&raid_event.adds.in>55
+    if S.SpearofBastion:IsCastable() and (ElysianMightEquipped and Player:BuffUp(S.EnrageBuff) and S.Recklessness:CooldownRemains() > 5 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20 or Target:DebuffUp(S.SiegebreakerDebuff) or not S.Siegebreaker:IsAvailable() and Target:TimeToDie() > 68)) then
+      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(25)) then return "spear_of_bastion single_target 20"; end
+    end
+    -- bladestorm,if=buff.enrage.up&(!buff.recklessness.remains|rage<50)&(spell_targets.whirlwind=1&raid_event.adds.in>45|spell_targets.whirlwind=2)
+    if S.Bladestorm:IsCastable() and (Player:BuffUp(S.EnrageBuff) and (Player:BuffDown(S.RecklessnessBuff) or Player:Rage() < 50) and (EnemiesCount8 == 1 or EnemiesCount8 == 2)) then
+      if Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm single_target 22"; end
+    end
+    -- spear_of_bastion,if=buff.enrage.up&cooldown.recklessness.remains>5&(buff.recklessness.up|target.time_to_die<20|debuff.siegebreaker.up|!talent.siegebreaker&target.time_to_die>68)&raid_event.adds.in>55
+    if S.SpearofBastion:IsCastable() and (Player:BuffUp(S.EnrageBuff) and S.Recklessness:CooldownRemains() > 5 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20 or Target:DebuffUp(S.SiegebreakerDebuff) or not S.Siegebreaker:IsAvailable() and Target:TimeToDie() > 68)) then
+      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(25)) then return "spear_of_bastion single_target 23"; end
+    end
   end
-  -- bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
-  if S.Bloodthirst:IsCastable() and (Player:BuffDown(S.EnrageBuff) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35 and not S.Cruelty:IsAvailable()) then
+  -- bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35
+  if S.Bloodthirst:IsCastable() and (Player:BuffDown(S.EnrageBuff) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35) then
     if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 24"; end
   end
   -- bloodbath,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
@@ -153,20 +166,20 @@ local function SingleTarget()
   if S.DragonRoar:IsCastable() and (Player:BuffUp(S.EnrageBuff)) then
     if Cast(S.DragonRoar, nil, nil, not Target:IsInRange(12)) then return "dragon_roar single_target 28"; end
   end
-  -- whirlwind,if=buff.merciless_bonegrinder.up&spell_targets.whirlwind>3
-  if S.Whirlwind:IsCastable() and (Player:BuffUp(S.MercilessBonegrinderBuff) and EnemiesCount8 > 3) then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind single_target 30"; end
-  end
   -- onslaught
   if S.Onslaught:IsCastable() and S.Onslaught:IsUsable() then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught single_target 32"; end
+    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught single_target 30"; end
+  end
+  -- whirlwind,if=buff.merciless_bonegrinder.up&spell_targets.whirlwind>3
+  if S.Whirlwind:IsCastable() and (Player:BuffUp(S.MercilessBonegrinderBuff) and EnemiesCount8 > 3) then
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind single_target 32"; end
   end
   -- raging_blow,if=charges=2|buff.recklessness.up&variable.execute_phase&talent.massacre.enabled
   if S.RagingBlow:IsCastable() and (S.RagingBlow:Charges() == 2 or Player:BuffUp(S.RecklessnessBuff) and VarExecutePhase and S.Massacre:IsAvailable()) then
     if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 34"; end
   end
-  -- crushing_blow,if=charges=2
-  if S.CrushingBlow:IsCastable() and (S.CrushingBlow:Charges() == 2) then
+  -- crushing_blow,if=charges=2|buff.recklessness.up&variable.execute_phase&talent.massacre.enabled
+  if S.CrushingBlow:IsCastable() and (S.CrushingBlow:Charges() == 2 or Player:BuffUp(S.RecklessnessBuff) and VarExecutePhase and S.Massacre:IsAvailable()) then
     if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 36"; end
   end
   -- bloodthirst
@@ -233,6 +246,8 @@ local function APL()
     end
     -- variable,name=execute_phase,value=talent.massacre&target.health.pct<35|target.health.pct<20|target.health.pct>80&covenant.venthyr
     VarExecutePhase = (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35 or Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80 and Player:Covenant() == "Venthyr")
+    -- variable,name=unique_legendaries,value=runeforge.signet_of_tormented_kings|runeforge.sinful_surge|runeforge.elysian_might
+    VarUniqueLegendaries = (SignetofTormentedKingsEquipped or SinfulSurgeEquipped or ElysianMightEquipped)
     -- run_action_list,name=movement,if=movement.distance>5
     if (not TargetInMeleeRange) then
       local ShouldReturn = Movement(); if ShouldReturn then return ShouldReturn; end
@@ -264,9 +279,17 @@ local function APL()
       if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage main 10"; end
     end
     if CDsON() then
-      -- recklessness,if=!runeforge.signet_of_tormented_kings.equipped&gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|variable.execute_phase|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
-      if S.Recklessness:IsCastable() and (not SignetofTormentedKingsEquipped and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable()) or Target:TimeToDie() > 100 or VarExecutePhase) and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff))) then
+      -- recklessness,if=runeforge.sinful_surge&gcd.remains=0&(variable.execute_phase|(target.time_to_pct_35>40&talent.anger_management|target.time_to_pct_35>70&!talent.anger_management))&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
+      if S.Recklessness:IsCastable() and (SinfulSurgeEquipped and (VarExecutePhase or (Target:TimeToX(35) > 40 and S.AngerManagement:IsAvailable() or Target:TimeToX(35) > 70 and not S.AngerManagement:IsAvailable())) and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff))) then
+        if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 11"; end
+      end
+      -- recklessness,if=runeforge.elysian_might&gcd.remains=0&(cooldown.spear_of_bastion.remains<5|cooldown.spear_of_bastion.remains>20)&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|variable.execute_phase|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
+      if S.Recklessness:IsCastable() and (ElysianMightEquipped and (S.SpearofBastion:CooldownRemains() < 5 or S.SpearofBastion:CooldownRemains() > 20) and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable() or EnemiesCount8 == 1) or Target:TimeToDie() > 100 or VarExecutePhase or Target:TimeToDie() < 15) and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff))) then
         if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 12"; end
+      end
+      -- recklessness,if=!variable.unique_legendaries&gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|variable.execute_phase|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
+      if S.Recklessness:IsCastable() and (not VarUniqueLegendaries and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable() or EnemiesCount8 == 1) or Target:TimeToDie() > 100 or VarExecutePhase or Target:TimeToDie() < 15) and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff))) then
+        if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 13"; end
       end
       -- recklessness,use_off_gcd=1,if=runeforge.signet_of_tormented_kings.equipped&gcd.remains&prev_gcd.1.rampage&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|variable.execute_phase|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
       if S.Recklessness:IsCastable() and (SignetofTormentedKingsEquipped and Player:PrevGCDP(1, S.Rampage) and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable()) or Target:TimeToDie() > 100 or VarExecutePhase) and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff))) then
@@ -275,9 +298,40 @@ local function APL()
     end
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up|raid_event.adds.in<gcd&!buff.meat_cleaver.up
     if S.Whirlwind:IsCastable() and (EnemiesCount8 > 1 and Player:BuffDown(S.MeatCleaverBuff)) then
-      if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind 60"; end
+      if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind main 16"; end
     end
     if (Settings.Commons.Enabled.Trinkets) then
+      -- use_item,name=inscrutable_quantum_device,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<21|target.time_to_die>190|buff.bloodlust.up)
+      if I.InscrutableQuantumDevice:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 21 or Target:TimeToDie() > 190 or Player:BloodlustUp())) then
+        if Cast(I.InscrutableQuantumDevice) then return "inscrutable_quantum_device trinkets main"; end
+      end
+      -- use_item,name=wakeners_frond,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<13|target.time_to_die>130)
+      if I.WakenersFrond:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 13 or Target:TimeToDie() > 130)) then
+        if Cast(I.WakenersFrond) then return "wakeners_frond trinkets main"; end
+      end
+      -- use_item,name=macabre_sheet_music,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<25|target.time_to_die>110)
+      if I.MacabreSheetMusic:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 25 or Target:TimeToDie() > 110)) then
+        if Cast(I.MacabreSheetMusic) then return "macabre_sheet_music trinkets main"; end
+      end
+      -- use_item,name=overwhelming_power_crystal,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<16|target.time_to_die>100)
+      if I.OverwhelmingPowerCrystal:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 16 or Target:TimeToDie() > 100)) then
+        if Cast(I.OverwhelmingPowerCrystal) then return "overwhelming_power_crystal trinkets main"; end
+      end
+      -- use_item,name=instructors_divine_bell,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<10|target.time_to_die>95)
+      if I.InstructorsDivineBell:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 10 or Target:TimeToDie() > 95)) then
+        if Cast(I.InstructorsDivineBell) then return "instructors_divine_bell trinkets main"; end
+      end
+      -- use_item,name=flame_of_battle,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<11|target.time_to_die>100)
+      if I.FlameofBattle:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 11 or Target:TimeToDie() > 100)) then
+        if Cast(I.FlameofBattle) then return "flame_of_battle trinkets main"; end
+      end
+      -- use_item,name=gladiators_badge,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<11|target.time_to_die>65)
+      if I.SinfulGladiatorsBadge:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 11 or Target:TimeToDie() > 65)) then
+        if Cast(I.SinfulGladiatorsBadge) then return "gladiators_badge 1 trinkets main"; end
+      end
+      if I.UnchainedGladiatorsBadge:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 11 or Target:TimeToDie() > 65)) then
+        if Cast(I.UnchainedGladiatorsBadge) then return "gladiators_badge 2 trinkets main"; end
+      end
       -- use_items
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
