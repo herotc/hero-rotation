@@ -55,6 +55,7 @@ HR.GUISettings.APL.Warlock = {
   },
   Demonology = {
     ImpsRequiredForImplosion = 6,
+    SuppressLateTyrant = false,
     UnendingResolveHP = 20,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -111,6 +112,7 @@ CreateARPanelOptions(CP_Destruction, "APL.Warlock.Destruction")
 -- Demonology
 CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.ImpsRequiredForImplosion", {3, 9, 1}, "Imps Required for Implosion", "Set the number of Imps required for Implosion.")
 CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.")
+CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.SuppressLateTyrant", "Suppress Late Tyrant Casts", "Enable this setting to suppress Demonic Tyrant cast suggestions due to the target dying soon. This could be useful for AoE scenarios or Mythic+ scenarios.")
 CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology")
 
 -- Affliction

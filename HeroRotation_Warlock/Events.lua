@@ -89,6 +89,7 @@ HL.GuardiansTable = {
   FelguardDuration = 0,
   DreadstalkerDuration = 0,
   DemonicTyrantDuration = 0,
+  VilefiendDuration = 0,
   Infernal = 0,
 
   -- Used for Wild Imps spawn prediction
@@ -115,6 +116,10 @@ local PetsData = {
   },
   [135002] = {
     name = "Demonic Tyrant",
+    duration = 15
+  },
+  [135816] = {
+    name = "Vilefiend",
     duration = 15
   },
   [89] = {
@@ -198,6 +203,8 @@ function Warlock.UpdatePetTable()
           HL.GuardiansTable.DreadstalkerDuration = 0
         elseif petTable.name == "Demonic Tyrant" then
           HL.GuardiansTable.DemonicTyrantDuration = 0
+        elseif petTable.name == "Vilefiend" then
+          HL.GuardiansTable.VilefiendDuration = 0
         elseif petTable.name == "Infernal" then
           HL.GuardiansTable.InfernalDuration = 0
         end
@@ -218,8 +225,10 @@ function Warlock.UpdatePetTable()
         HL.GuardiansTable.DreadstalkerDuration = petTable.Duration
       elseif petTable.name == "Demonic Tyrant" then
         HL.GuardiansTable.DemonicTyrantDuration = petTable.Duration
+      elseif petTable.name == "Vilefiend" then
+        HL.GuardiansTable.VilefiendDuration = petTable.Duration
       elseif petTable.name == "Infernal" then
-          HL.GuardiansTable.InfernalDuration = petTable.Duration
+        HL.GuardiansTable.InfernalDuration = petTable.Duration
       end
     end
   end
@@ -250,6 +259,9 @@ HL:RegisterForSelfCombatEvent(
           HL.GuardiansTable.DemonicTyrantDuration = summonedPet.duration
           petDuration = summonedPet.duration
         end
+      elseif summonedPet.name == "Vilefiend" then
+        HL.GuardiansTable.VilefiendDuration = summonedPet.duration
+        petDuration = summonedPet.duration
       elseif summonedPet.name == "Infernal" then
         HL.GuardiansTable.InfernalDuration = summonedPet.duration
         petDuration = summonedPet.duration
@@ -306,7 +318,7 @@ HL:RegisterForCombatEvent(
       end
     end
 
-    -- Clear the imp table upon Implosion cast or Demonic Tyrant cast if Demonic Consumption is talented
+    -- Clear the imp table upon Implosion cast
     if SourceGUID == Player:GUID() and SpellID == 196277 then
       for key, petTable in pairs(HL.GuardiansTable.Pets) do
         if petTable.name == "Wild Imp" then

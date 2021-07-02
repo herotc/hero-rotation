@@ -50,12 +50,14 @@ Spell.Warlock.Demonology = {
   DemonicStrength                       = Spell(267171),
   Doom                                  = Spell(603),
   DoomDebuff                            = Spell(603),
+  FromtheShadows                        = Spell(267170),
   GrimoireFelguard                      = Spell(111898),
   InnerDemons                           = Spell(267216),
   NetherPortal                          = Spell(267217),
   NetherPortalBuff                      = Spell(267218),
   PowerSiphon                           = Spell(264130),
   SacrificedSouls                       = Spell(267214),
+  SoulConduit                           = Spell(215941),
   SoulStrike                            = Spell(264057),
   SummonVilefiend                       = Spell(264119),
 
@@ -68,8 +70,17 @@ Spell.Warlock.Demonology = {
   ScouringTithe                         = Spell(312321),
   SoulRot                               = Spell(325640), -- Splash, 15
 
+  -- Soulbinds/Conduits
+  CombatMeditation                      = Spell(328266),
+  FieldofBlossoms                       = Spell(319191),
+  GroveInvigoration                     = Spell(322721),
+  LeadByExample                         = Spell(342156),
+  RefinedPalate                         = Spell(336243),
+  WildHuntTactics                       = Spell(325066),
+
   -- Legendary Effects
   BalespidersBuff                       = Spell(337161),
+  ImplosivePotentialBuff                = Spell(337139),
 
   -- Item Effects
   ShiverVenomDebuff                     = Spell(301624),
@@ -202,7 +213,24 @@ Spell.Warlock.Destruction = {
 -- Items
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Demonology = {
-  PotionofSpectralIntellect             = Item(307096)
+  -- Potion
+  PotionofSpectralIntellect             = Item(307096),
+  -- Trinkets
+  DarkmoonDeckPutrescence               = Item(173069, {13, 14}),
+  DreadfireVessel                       = Item(184030, {13, 14}),
+  EbonsoulVise                          = Item(186431, {13, 14}),
+  EmpyrealOrdnance                      = Item(180117, {13, 14}),
+  GlyphofAssimilation                   = Item(184021, {13, 14}),
+  OverflowingAnimaCage                  = Item(178849, {13, 14}),
+  ShadowedOrbofTorment                  = Item(186428, {13, 14}),
+  SinfulAspirantsEmblem                 = Item(178334, {13, 14}),
+  SinfulGladiatorsEmblem                = Item(178447, {13, 14}),
+  SoleahsSecretTechnique                = Item(185818, {13, 14}),
+  SoulIgniter                           = Item(184019, {13, 14}),
+  SoullettingRuby                       = Item(178809, {13, 14}),
+  SunbloodAmethyst                      = Item(178826, {13, 14}),
+  TomeofMonstrousConstructions          = Item(186422, {13, 14}),
+  UnchainedGladiatorsShackles           = Item(186980, {13, 14}),
 }
 
 Item.Warlock.Affliction = {

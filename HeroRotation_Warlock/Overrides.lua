@@ -15,6 +15,9 @@ local SpellAffli   = Spell.Warlock.Affliction
 local SpellDemo    = Spell.Warlock.Demonology
 local SpellDestro  = Spell.Warlock.Destruction
 -- Lua
+local min     = math.min
+local max     = math.max
+local floor   = math.floor
 
 --SpellAffli.AbsoluteCorruption = Spell(196103)
 --SpellAffli.Haunt:RegisterInFlight()
@@ -107,6 +110,32 @@ BaseUnitDebuffRemains = HL.AddCoreOverride ("Unit.DebuffRemains",
 , 265)]]
 
 -- Demonology, ID: 266
+HL.AddCoreOverride ("Player.SoulShardsP",
+  function ()
+    local Shard = Player:SoulShards()
+    Shard = floor(Shard)
+    if not Player:IsCasting() then
+      return Shard
+    else
+      if Player:IsCasting(SpellDemo.SummonDemonicTyrant) and Player:Level() >= 58 then
+        return 5
+      elseif Player:IsCasting(SpellDemo.Demonbolt) then
+        return min(Shard + 2, 5)
+      elseif Player:IsCasting(SpellDemo.ShadowBolt) or Player:IsCasting(SpellDemo.SoulStrike) then
+        return min(Shard + 1, 5)
+      elseif Player:IsCasting(SpellDemo.HandofGuldan) then
+        return max(Shard - 3, 0)
+      elseif Player:IsCasting(SpellDemo.CallDreadstalkers) or Player:IsCasting(SpellDemo.BilescourgeBombers) then
+        return Shard - 2
+      elseif Player:IsCasting(SpellDemo.SummonVilefiend) or Player:IsCasting(SpellDemo.SummonPet) or Player:IsCasting(SpellDemo.NetherPortal) then
+        return Shard - 1
+      else
+        return Shard
+      end
+    end
+  end
+  , 266)
+
 local DemoOldSpellIsCastable
 DemoOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
@@ -139,50 +168,6 @@ DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
       return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
-    end
-  end
-, 266)
-
-HL.AddCoreOverride ("Player.SoulShardsP",
-  function (self)
-    local Shard = Player:SoulShards()
-    Shard = math.floor(Shard)
-    if not Player:IsCasting() then
-      return Shard
-    else
-      if (Player:IsCasting(SpellDemo.CallDreadstalkers) and Player:BuffDown(SpellDemo.DemonicCallingBuff))
-          or Player:IsCasting(SpellDemo.BilescourgeBombers) then
-        return Shard - 2
-      elseif Player:IsCasting(SpellDemo.CallDreadstalkers) and Player:BuffUp(SpellDemo.DemonicCallingBuff) then
-        return Shard
-      elseif Player:IsCasting(SpellDemo.SummonVilefiend)
-          or  Player:IsCasting(SpellDemo.SummonPet)
-          or  Player:IsCasting(SpellDemo.GrimoireFelguard)
-          or  Player:IsCasting(SpellDemo.NetherPortal) then
-        return Shard - 1
-      elseif Player:IsCasting(SpellDemo.HandofGuldan) then
-        if Shard > 3 then
-          return Shard - 3
-        else
-          return 0
-        end
-      elseif Player:IsCasting(SpellDemo.Demonbolt) then
-        if Shard >= 3 then
-          return 5
-        else
-          return Shard + 2
-        end
-      elseif Player:IsCasting(SpellDemo.ShadowBolt) then
-        if Shard == 5 then
-          return Shard
-        else
-          return Shard + 1
-        end
-      elseif Player:IsCasting(SpellDemo.SummonDemonicTyrant) and Player:Level() >= 58 then
-        return 5
-      else
-        return Shard
-      end
     end
   end
 , 266)
