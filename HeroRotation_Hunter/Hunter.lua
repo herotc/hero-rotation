@@ -231,9 +231,13 @@ Spell.Hunter.Survival = {
   -- Covenants
   DeathChakram                          = Spell(325028),
   FlayedShot                            = Spell(324149),
+  Fleshcraft                            = Spell(324631),
   ResonatingArrow                       = Spell(308491),
   WildSpirits                           = Spell(328231),
-  WildSpiritsDebuff                       = Spell(328275),
+  WildSpiritsDebuff                     = Spell(328275),
+  -- Soulbinds/Conduits
+  PustuleEruption                       = Spell(351094),
+  VolatileSolvent                       = Spell(323074),
   --legendary_debuffs
   NessingwarysTrappingBuff              = Spell(336744),
   SoulforgeEmbersDebuff                 = Spell(336746),

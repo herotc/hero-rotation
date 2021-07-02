@@ -191,6 +191,10 @@ local function Precombat()
   end
   -- snapshot_stats
   if Everyone.TargetIsValid() then
+    -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
+    if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
+    end
     -- Manually added: kill_shot
     -- Could be removed?
     if S.KillShot:IsReady() then
@@ -260,6 +264,10 @@ local function CDs()
   -- potion,if=target.time_to_die<60|buff.coordinated_assault.up
   if I.PotionOfSpectralAgility:IsReady() and (Target:TimeToDie() < 60 or Player:BuffUp(S.CoordinatedAssault)) then
     if Cast(I.PotionOfSpectralAgility, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 18"; end
+  end
+  -- fleshcraft,cancel_if=channeling&!soulbind.pustule_eruption,if=(focus<70|cooldown.coordinated_assault.remains<gcd)&(soulbind.pustule_eruption|soulbind.volatile_solvent)
+  if S.Fleshcraft:IsCastable() and ((Player:Focus() < 70 or S.CoordinatedAssault:CooldownRemains() < Player:GCD()) and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled())) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft cds 19"; end
   end
   -- tar_trap,if=focus+cast_regen<focus.max&runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd&(active_enemies>1|active_enemies=1&time_to_die>5*gcd)
   if S.TarTrap:IsCastable() and (CheckFocusCap(S.TarTrap:ExecuteTime()) and SoulForgeEmbersEquipped and Target:DebuffDown(S.SoulforgeEmbersDebuff) and (EnemyCount8ySplash > 1 or EnemyCount8ySplash == 1 and Target:TimeToDie() > 5 * Player:GCD())) then
