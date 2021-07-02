@@ -191,8 +191,8 @@ local function Precombat()
   end
   -- snapshot_stats
   if Everyone.TargetIsValid() then
-    -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
-    if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
+    -- fleshcraft
+    if S.Fleshcraft:IsCastable() then
       if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
     end
     -- Manually added: kill_shot

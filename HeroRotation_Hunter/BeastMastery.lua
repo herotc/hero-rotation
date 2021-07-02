@@ -116,8 +116,8 @@ local function PreCombat()
   -- summon_pet
   -- snapshot_stats
   if Everyone.TargetIsValid() and TargetInRange40y then
-    -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
-    if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
+    -- fleshcraft
+    if S.Fleshcraft:IsCastable() then
       if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "Fleshcraft (PreCombat)"; end
     end
     if CDsON() and S.BestialWrath:IsCastable() then
