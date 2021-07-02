@@ -67,9 +67,13 @@ Spell.Hunter.BeastMastery = {
   -- Covenants
   DeathChakram                          = Spell(325028),
   FlayedShot                            = Spell(324149),
+  Fleshcraft                            = Spell(324631),
   ResonatingArrow                       = Spell(308491),
   WildSpirits                           = Spell(328231),
   WildSpiritsBuff                       = Spell(328275),
+  -- Soulbinds
+  PustuleEruption                       = Spell(351094),
+  VolatileSolvent                       = Spell(323074),
   -- Legendaries (Shadowlands)
   NesingwarysTrappingApparatusBuff      = Spell(336744),
   SoulforgeEmbersDebuff                 = Spell(336746),
@@ -126,6 +130,7 @@ Spell.Hunter.Marksmanship = {
   -- Soulbinds
   EffusiveAnimaAccelerator              = Spell(352188),
   PustuleEruption                       = Spell(351094),
+  VolatileSolvent                       = Spell(323074),
   -- Racials
   Berserking                            = Spell(26297),
   BloodFury                             = Spell(20572),

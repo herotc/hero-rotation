@@ -116,33 +116,34 @@ local function PreCombat()
   -- summon_pet
   -- snapshot_stats
   if Everyone.TargetIsValid() and TargetInRange40y then
-    if CDsON() then
-      if S.BestialWrath:IsCastable() then
-        if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "Bestial Wrath (PreCombat)"; end
+    -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
+    if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "Fleshcraft (PreCombat)"; end
+    end
+    if CDsON() and S.BestialWrath:IsCastable() then
+      if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "Bestial Wrath (PreCombat)"; end
+    end
+    -- Barbed Shot
+    if S.BarbedShot:IsCastable() and S.BarbedShot:Charges() >= 2 then
+      if Cast(S.BarbedShot) then return "Barbed Shot (PreCombat)"; end
+    end
+    -- Kill Shot
+    if S.KillShot:IsCastable() then
+      if Cast(S.KillShot) then return "Kill Shot (PreCombat)"; end
+    end
+    -- Kill Command
+    if S.KillCommand:IsCastable() and TargetInRangePet30y then
+      if Cast(S.KillCommand) then return "Kill Shot (PreCombat)"; end
+    end
+    if PetEnemiesMixedyCount > 1 then
+      -- Multi Shot
+      if S.MultiShot:IsCastable()  then
+        if Cast(S.MultiShot) then return "Multi-Shot (PreCombat)"; end
       end
     else
-      -- Barbed Shot
-      if S.BarbedShot:IsCastable() and S.BarbedShot:Charges() >= 2 then
-        if Cast(S.BarbedShot) then return "Barbed Shot (PreCombat)"; end
-      end
-      -- Kill Shot
-      if S.KillShot:IsCastable() and S.KillShot:IsUsable() then
-        if Cast(S.KillShot) then return "Kill Shot (PreCombat)"; end
-      end
-      -- Kill Command
-      if S.KillCommand:IsCastable() and TargetInRangePet30y then
-        if Cast(S.KillCommand) then return "Kill Shot (PreCombat)"; end
-      end
-      if PetEnemiesMixedyCount > 1 then
-        -- Multi Shot
-        if S.MultiShot:IsCastable()  then
-          if Cast(S.MultiShot) then return "Multi-Shot (PreCombat)"; end
-        end
-      else
-        -- Cobra Shot
-        if S.CobraShot:IsCastable()  then
-          if Cast(S.CobraShot) then return "Cobra Shot (PreCombat)"; end
-        end
+      -- Cobra Shot
+      if S.CobraShot:IsCastable()  then
+        if Cast(S.CobraShot) then return "Cobra Shot (PreCombat)"; end
       end
     end
   end
@@ -240,7 +241,7 @@ local function Cleave()
     end
   end
   -- kill_shot
-  if S.KillShot:IsCastable() and S.KillShot:IsUsable() then
+  if S.KillShot:IsCastable() then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "Kill Shot (Cleave)"; end
   end
   -- chimaera_shot
@@ -318,7 +319,7 @@ local function ST()
     if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant) then return "flayed_shot st"; end
   end
   -- kill_shot
-  if S.KillShot:IsCastable() and S.KillShot:IsUsable() then
+  if S.KillShot:IsCastable() then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "Kill Shot (ST)"; end
   end
   -- wailing_arrow,if=cooldown.resonating_arrow.remains<gcd&(!talent.explosive_shot|buff.bloodlust.up)|!covenant.kyrian|cooldown.resonating_arrow.remains|target.time_to_die<5

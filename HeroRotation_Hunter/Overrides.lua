@@ -25,6 +25,8 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldBMIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellBM.SummonPet then
     return (not Pet:IsActive()) and BaseCheck
+  elseif self == SpellBM.KillShot then
+    return BaseCheck and self:IsUsable()
   else
     return BaseCheck
   end
