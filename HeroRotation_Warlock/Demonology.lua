@@ -242,7 +242,7 @@ local function TyrantSetup()
   end
   -- summon_demonic_tyrant,if=time>variable.first_tyrant_time&(pet.dreadstalker.active&pet.dreadstalker.remains>action.summon_demonic_tyrant.execute_time)&(!talent.summon_vilefiend.enabled|pet.vilefiend.active)&(soul_shard=0|(pet.dreadstalker.active&pet.dreadstalker.remains<action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)|(pet.vilefiend.active&pet.vilefiend.remains<action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)|(buff.grimoire_felguard.up&buff.grimoire_felguard.remains<action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time))
   if S.SummonDemonicTyrant:IsReady() and (HL.CombatTime() > VarFirstTyrantTime and (DreadStalkersTime() > 0 and DreadStalkersTime() > S.SummonDemonicTyrant:ExecuteTime()) and (not S.SummonVilefiend:IsAvailable() or VilefiendTime() > 0) and (Player:SoulShardsP() == 0 or (DreadStalkersTime() > 0 and DreadStalkersTime() < S.SummonDemonicTyrant:ExecuteTime() + S.ShadowBolt:ExecuteTime()) or (VilefiendTime() > 0 and VilefiendTime() < S.SummonDemonicTyrant:ExecuteTime() + S.ShadowBolt:ExecuteTime()) or (GrimoireFelguardTime() > 0 and GrimoireFelguardTime() < S.SummonDemonicTyrant:ExecuteTime() + S.ShadowBolt:ExecuteTime()))) then
-    if Cast(S.SummonDemonicTyrant) then return "summon_demonic_tyrant tyrant_setup 10"; end
+    if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant tyrant_setup 10"; end
   end
 end
 
@@ -451,7 +451,7 @@ local function APL()
     end
     -- summon_demonic_tyrant,if=time_to_die<15
     if S.SummonDemonicTyrant:IsReady() and not Settings.Demonology.SuppressLateTyrant and (FightRemains < 15) then
-      if Cast(S.SummonDemonicTyrant) then return "summon_demonic_tyrant main 26"; end
+      if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant main 26"; end
     end
     -- hand_of_guldan,if=soul_shard=5
     if S.HandofGuldan:IsReady() and (Player:SoulShardsP() == 5) then
