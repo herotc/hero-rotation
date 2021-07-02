@@ -160,7 +160,7 @@ local function Precombat()
   -- augmentation
   -- summon_pet
   if S.SummonPet:IsCastable() then
-    if Cast(S.SummonPet, Settings.Demonology.GCDasOffGCD.SummonPet) then return "summon_pet 2"; end
+    if Cast(S.SummonPet, Settings.Demonology.GCDasOffGCD.SummonPet) then return "summon_pet precombat 2"; end
   end
   -- snapshot_stats
   if Everyone.TargetIsValid() then
@@ -170,16 +170,20 @@ local function Precombat()
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,name=tome_of_monstrous_constructions
       if I.TomeofMonstrousConstructions:IsEquippedAndReady() then
-        if Cast(I.TomeofMonstrousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "tome_of_monstrous_constructions 4"; end
+        if Cast(I.TomeofMonstrousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "tome_of_monstrous_constructions precombat 4"; end
       end
       -- use_item,name=soleahs_secret_technique
       if I.SoleahsSecretTechnique:IsEquippedAndReady() then
-        if Cast(I.SoleahsSecretTechnique, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soleahs_secret_technique 6"; end
+        if Cast(I.SoleahsSecretTechnique, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soleahs_secret_technique precombat 6"; end
       end
+    end
+    -- fleshcraft
+    if S.Fleshcraft:IsCastable() then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 8"; end
     end
     -- demonbolt
     if S.Demonbolt:IsCastable() then
-      if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt 6"; end
+      if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt precombat 10"; end
     end
   end
 end
@@ -245,15 +249,15 @@ end
 local function OGCD()
   -- berserking
   if S.Berserking:IsCastable() then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 122"; end
+    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking ogcd 2"; end
   end
   -- blood_fury
   if S.BloodFury:IsCastable() then
-    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 126"; end
+    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury ogcd 4"; end
   end
   -- fireblood
   if S.Fireblood:IsCastable() then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 128"; end
+    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood ogcd 6"; end
   end
   -- use_items
   if Settings.Commons.Enabled.Trinkets then
