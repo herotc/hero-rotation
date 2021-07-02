@@ -296,6 +296,10 @@ local function Cds()
   if (Settings.Commons.Enabled.Trinkets) then
     local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
   end
+  -- fleshcraft,if=soulbind.volatile_solvent&buff.volatile_solvent_humanoid.remains<10&!buff.voidform.up&!buff.power_infusion.up
+  if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffRemains(S.VolatileSolventHumanBuff) < 10 and Player:BuffDown(S.VoidformBuff) and Player:BuffDown(S.PowerInfusionBuff)) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft 60"; end
+  end
 end
 
 local function Boon()

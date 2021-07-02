@@ -77,6 +77,7 @@ Spell.Priest.Shadow = {
   BoonoftheAscendedBuff                 = Spell(325013),
   FaeGuardians                          = Spell(327661),
   FaeGuardiansBuff                      = Spell(327661),
+  Fleshcraft                            = Spell(324631),
   Mindgames                             = Spell(323673),
   UnholyNova                            = Spell(324724), -- Melee, 15
   WrathfulFaerieDebuff                  = Spell(342132),
@@ -88,6 +89,8 @@ Spell.Priest.Shadow = {
   FieldofBlossoms                       = Spell(319191),
   GroveInvigoration                     = Spell(322721),
   RedirectedAnimaBuff                   = Spell(342814),
+  VolatileSolvent                       = Spell(323074),
+  VolatileSolventHumanBuff              = Spell(323491),
 
   -- Legendary Effects
 }
