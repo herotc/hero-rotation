@@ -261,7 +261,7 @@ local function OGCD()
   end
   -- use_items
   if Settings.Commons.Enabled.Trinkets then
-    local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
@@ -284,6 +284,7 @@ local function FiveYTrinkets()
   if Target.UnitExists then
     TargetDistance = Target:MaxDistance()
   end
+  if not TargetDistance then TargetDistance = 0 end
   if (S.SummonDemonicTyrant:CooldownRemains() < TargetDistance / 5 and HL.CombatTime() > VarFirstTyrantTime - (TargetDistance / 5)) then
     -- use_item,name=soulletting_ruby,if=cooldown.summon_demonic_tyrant.remains_expected<target.distance%5&time>variable.first_tyrant_time-(target.distance%5)
     if I.SoullettingRuby:IsEquippedAndReady() then
