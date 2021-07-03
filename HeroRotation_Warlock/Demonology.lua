@@ -466,7 +466,8 @@ local function APL()
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 32"; end
     end
     -- hand_of_guldan,if=soul_shard>=1&cooldown.summon_demonic_tyrant.remains_expected<gcd.max&time>variable.first_tyrant_time-gcd.max
-    if S.HandofGuldan:IsReady() and (Player:SoulShardsP() >= 1 and S.SummonDemonicTyrant:CooldownRemains() < Player:GCD() and HL.CombatTime() > VarFirstTyrantTime - Player:GCD()) then
+    -- Manually added DreadStalkersTime and VilefiendTime checks to avoid dumping shards without immediately casting SummonDemonicTyrant
+    if S.HandofGuldan:IsReady() and (Player:SoulShardsP() >= 1 and S.SummonDemonicTyrant:CooldownRemains() < Player:GCD() and HL.CombatTime() > VarFirstTyrantTime - Player:GCD() and (DreadStalkersTime() > 0 and (not S.SummonVilefiend:IsAvailable() or VilefiendTime() > 0))) then
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 34"; end
     end
     -- call_action_list,name=covenant_ability,if=!covenant.venthyr
