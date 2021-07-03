@@ -268,5 +268,7 @@ Item.Hunter.Survival = {
   -- Potion
   PotionOfSpectralAgility = Item(171270),
   -- Trinkets
-  DreadfireVessel         = Item(184030, {13, 14})
+  DreadfireVessel         = Item(184030, {13, 14}),
+  -- Other Items
+  Jotungeirr              = Item(186404)
 }

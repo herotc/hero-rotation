@@ -236,17 +236,23 @@ local function CDs()
   if I.DreadfireVessel:IsEquippedAndReady() and (Player:Covenant() == "Kyrian" and S.ResonatingArrow:CooldownRemains() > 10 or Player:Covenant() ~= "Kyrian") then
     if Cast(I.DreadfireVessel, nil, nil, not Target:IsInRange(50)) then return "dreadfire_vessel cds 4"; end
   end
-  -- blood_fury,if=cooldown.coordinated_assault.remains>30
-  if S.BloodFury:IsCastable() and (S.CoordinatedAssault:CooldownRemains() > 30) then
-    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 6"; end
+  -- use_item,name=jotungeirr_destinys_call,if=buff.coordinated_assault.up|time_to_die<31
+  if I.Jotungeirr:IsEquippedAndReady() and (Player:BuffUp(S.CoordinatedAssault) or Target:TimeToDie() < 31) then
+    if Cast(I.Jotungeirr) then return "jotungeirr_destinys_call cds 5"; end
   end
-  -- ancestral_call,if=cooldown.coordinated_assault.remains>30
-  if S.AncestralCall:IsCastable() and (S.CoordinatedAssault:CooldownRemains() > 30) then
-    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cds 8"; end
-  end
-  -- fireblood,if=cooldown.coordinated_assault.remains>30
-  if S.Fireblood:IsCastable() and (S.CoordinatedAssault:CooldownRemains() > 30) then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 10"; end
+  if (Player:BuffUp(S.CoordinatedAssault)) then
+    -- blood_fury,if=buff.coordinated_assault.up
+    if S.BloodFury:IsCastable() then
+      if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 6"; end
+    end
+    -- ancestral_call,if=buff.coordinated_assault.up
+    if S.AncestralCall:IsCastable() then
+      if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cds 8"; end
+    end
+    -- fireblood,if=buff.coordinated_assault.up
+    if S.Fireblood:IsCastable() then
+      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 10"; end
+    end
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
@@ -256,8 +262,8 @@ local function CDs()
   if S.BagofTricks:IsCastable() and (S.KillCommand:FullRechargeTime() > Player:GCD()) then
     if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks cds 14"; end
   end
-  -- berserking,if=cooldown.coordinated_assault.remains>60|time_to_die<13
-  if S.Berserking:IsCastable() and (S.CoordinatedAssault:CooldownRemains() > 60 or Target:TimeToDie() < 13) then
+  -- berserking,if=buff.coordinated_assault.up|time_to_die<13
+  if S.Berserking:IsCastable() and (Player:BuffUp(S.CoordinatedAssault) or Target:TimeToDie() < 13) then
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 16"; end
   end
   -- muzzle
