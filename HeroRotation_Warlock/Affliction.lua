@@ -40,6 +40,25 @@ local S = Spell.Warlock.Affliction
 -- Items
 local I = Item.Warlock.Affliction
 local TrinketsOnUseExcludes = {--  I.TrinketName:ID(),
+  I.DarkmoonDeckPutrescence:ID(),
+  I.DreadfireVessel:ID(),
+  I.EbonsoulVise:ID(),
+  I.EmpyrealOrdnance:ID(),
+  I.FlameofBattle:ID(),
+  I.GlyphofAssimilation:ID(),
+  I.InscrutableQuantumDevice:ID(),
+  I.InstructorsDivineBell:ID(),
+  I.MacabreSheetMusic:ID(),
+  I.OverflowingAnimaCage:ID(),
+  I.ShadowedOrbofTorment:ID(),
+  I.SinfulAspirantsBadgeofFerocity:ID(),
+  I.SinfulGladiatorsBadgeofFerocity:ID(),
+  I.SoulIgniter:ID(),
+  I.SoullettingRuby:ID(),
+  I.SunbloodAmethyst:ID(),
+  I.TabletofDespair:ID(),
+  I.UnchainedGladiatorsShackles:ID(),
+  I.WakenersFrond:ID(),
 }
 
 -- Trinket Item Objects
@@ -54,10 +73,14 @@ if equip[14] then
 end
 
 -- Enemies
-local Enemies40y, Enemies40yCount, EnemiesCount10ySplash, EnemiesCount
+local Enemies40y, Enemies40yCount, Enemies10ySplash, EnemiesCount10ySplash
 local EnemiesAgonyCount, EnemiesSeedofCorruptionCount, EnemiesSiphonLifeCount, EnemiesVileTaintCount = 0, 0, 0, 0
 local EnemiesWithUnstableAfflictionDebuff
 local FirstTarGUID
+local FightRemains
+
+-- Legendaries
+local MaleficWrathEquipped = Player:HasLegendaryEquipped(168)
 
 -- Stuns
 
@@ -93,6 +116,7 @@ HL:RegisterForEvent(function()
   if equip[14] then
     trinket2 = Item(equip[14])
   end
+  MaleficWrathEquipped = Player:HasLegendaryEquipped(168)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -268,12 +292,12 @@ local function Opener()
   if S.Corruption:IsReady() and (Target:DebuffDown(S.CorruptionDebuff)) then
     if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption opener 10"; end
   end
-  -- drain_soul,if=active_enemies<3&debuff.shadow_embrace.stack<3
-  if S.DrainSoul:IsReady() and (EnemiesCount10ySplash < 3 and Target:DebuffStack(S.ShadowEmbraceDebuff) < 3) then
+  -- drain_soul,if=active_enemies<3&talent.shadow_embrace.enabled&debuff.shadow_embrace.stack<3
+  if S.DrainSoul:IsReady() and (EnemiesCount10ySplash < 3 and S.ShadowEmbrace:IsAvailable() and Target:DebuffStack(S.ShadowEmbraceDebuff) < 3) then
     if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul opener 12"; end
   end
-  -- shadow_bolt,if=active_enemies<3&!talent.drain_soul.enabled&debuff.shadow_embrace.stack<3
-  if S.ShadowBolt:IsReady() and (EnemiesCount10ySplash < 3 and not S.DrainSoul:IsAvailable() and Target:DebuffStack(S.ShadowEmbraceDebuff) < 3) then
+  -- shadow_bolt,if=active_enemies<3&!talent.drain_soul.enabled&talent.shadow_embrace.enabled&debuff.shadow_embrace.stack<3
+  if S.ShadowBolt:IsReady() and (EnemiesCount10ySplash < 3 and not S.DrainSoul:IsAvailable() and S.ShadowEmbrace:IsAvailable() and Target:DebuffStack(S.ShadowEmbraceDebuff) < 3) then
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt opener 14"; end
   end
 end
@@ -353,7 +377,7 @@ local function Dot_prep()
   if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 8 and S.SummonDarkglare:CooldownRemains() > Target:DebuffRemains(S.UnstableAfflictionDebuff)) then
     if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction dot_prep 6"; end
   end
-  -- corruption,if=dot.corruption.remains<8&cooldown.summon_darkglare.remains>dot.corruption.remains
+  -- corruption,if=dot.corruption.remains<8&cooldown.summon_darkglare.remains>dot.corruption.remain
   if S.Corruption:IsReady() and (Target:DebuffRemains(S.CorruptionDebuff) < 8 and S.SummonDarkglare:CooldownRemains() > Target:DebuffRemains(S.CorruptionDebuff)) then
     if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption dot_prep 8"; end
   end
@@ -379,6 +403,10 @@ local function DelayedTrinkets()
   -- use_item,name=soulletting_ruby,if=(covenant.night_fae&cooldown.soul_rot.remains<8)|(covenant.venthyr&cooldown.impending_catastrophe.remains<8)|(covenant.necrolord|covenant.kyrian|covenant.none)
   if I.SoullettingRuby:IsEquippedAndReady() and ((CovenantID == 3 and S.SoulRot:CooldownRemains() < 8) or (CovenantID == 2 and S.ImpendingCatastrophe:CooldownRemains() < 8) or (CovenantID == 4 or CovenantID == 1 or CovenantID == 0)) then
     if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soulletting_ruby delayed_trinkets 6"; end
+  end
+  -- use_item,name=name=shadowed_orb_of_torment,if=(covenant.night_fae&cooldown.soul_rot.remains<4)|(covenant.venthyr&cooldown.impending_catastrophe.remains<4)|(covenant.necrolord|covenant.kyrian|covenant.none)
+  if I.ShadowedOrbofTorment:IsEquippedAndReady() and ((CovenantID == 3 and S.SoulRot:CooldownRemains() < 4) or (CovenantID == 2 and S.ImpendingCatastrophe:CooldownRemains() < 4) or (CovenantID == 4 or CovenantID == 1 or CovenantID == 0)) then
+    if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment delayed_trinkets 8"; end
   end
 end
 
@@ -452,6 +480,14 @@ local function DamageTrinkets()
   if I.GlyphofAssimilation:IsEquippedAndReady() then
     if Cast(I.GlyphofAssimilation, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "glyph_of_assimilation damage_trinkets 6"; end
   end
+  -- use_item,name=unchained_gladiators_shackles
+  if I.UnchainedGladiatorsShackles:IsEquippedAndReady() then
+    if Cast(I.UnchainedGladiatorsShackles, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(20)) then return "unchained_gladiators_shackles damage_trinkets 8"; end
+  end
+  -- use_item,name=ebonsoul_vise
+  if I.EbonsoulVise:IsEquippedAndReady() then
+    if Cast(I.EbonsoulVise, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "ebonsoul_vise damage_trinkets 10"; end
+  end
 end
 
 local function Se()
@@ -460,7 +496,7 @@ local function Se()
     if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt se 2"; end
   end
   -- drain_soul,interrupt_global=1,interrupt_if=debuff.shadow_embrace.stack>=3
-  if S.DrainSoul:IsReady() and (Target:DebuffStack(S.ShadowEmbraceDebuff) < 3) then
+  if S.DrainSoul:IsReady() and (Target:DebuffStack(S.ShadowEmbraceDebuff) < 3 or not S.ShadowEmbrace:IsAvailable()) then
     if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul se 4"; end
   end
   -- shadow_bolt
@@ -534,11 +570,11 @@ local function Aoe()
       local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
     end
     -- dark_soul,if=cooldown.summon_darkglare.remains>time_to_die&(!talent.phantom_singularity|cooldown.phantom_singularity.remains>time_to_die)
-    if S.DarkSoulMisery:IsReady() and (S.SummonDarkglare:CooldownRemains() > Target:TimeToDie() and (not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownRemains() > Target:TimeToDie())) then
+    if S.DarkSoulMisery:IsReady() and (S.SummonDarkglare:CooldownRemains() > FightRemains and (not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownRemains() > FightRemains)) then
       if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul aoe 18"; end
     end
     -- dark_soul,if=cooldown.summon_darkglare.remains+cooldown.summon_darkglare.duration<time_to_die
-    if S.DarkSoulMisery:IsReady() and (S.SummonDarkglare:CooldownRemains() + 20 < Target:TimeToDie()) then
+    if S.DarkSoulMisery:IsReady() and (S.SummonDarkglare:CooldownRemains() + 20 < FightRemains) then
       if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul aoe 20"; end
     end
   end
@@ -585,7 +621,7 @@ local function Aoe()
     local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
   end
   -- drain_life,if=buff.inevitable_demise.stack>=50|buff.inevitable_demise.up&time_to_die<5|buff.inevitable_demise.stack>=35&dot.soul_rot.ticking
-  if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) >= 50 or Player:BuffUp(S.InvetiableDemiseBuff) and Target:TimeToDie() < 5 or Player:BuffStack(S.InvetiableDemiseBuff) >= 35 and Target:DebuffUp(S.SoulRot)) then
+  if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) >= 50 or Player:BuffUp(S.InvetiableDemiseBuff) and FightRemains < 5 or Player:BuffStack(S.InvetiableDemiseBuff) >= 35 and Target:DebuffUp(S.SoulRot)) then
     if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life aoe 32"; end
   end
   -- drain_soul,interrupt=1
@@ -602,6 +638,7 @@ end
 local function APL()
   -- Unit Update
   Enemies40y = Player:GetEnemiesInRange(40)
+  Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
   if AoEON() then
     Enemies40yCount = #Enemies40y
     EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
@@ -616,6 +653,9 @@ local function APL()
   end
 
   EnemiesWithUnstableAfflictionDebuff = returnEnemiesWithDot(S.UnstableAfflictionDebuff, Enemies40y)
+
+  -- Check remaining time in fight
+  FightRemains = HL.FightRemains(Enemies10ySplash, false)
 
   if S.SummonPet:IsCastable() then
     if Cast(S.SummonPet, Settings.Affliction.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
@@ -665,6 +705,9 @@ local function APL()
       end
     end
     -- malefic_rapture,if=time_to_die<execute_time*soul_shard&dot.unstable_affliction.ticking
+    if S.MaleficRapture:IsReady() and (FightRemains < S.MaleficRapture:ExecuteTime() * Player:SoulShardsP() and Target:DebuffUp(S.UnstableAfflictionDebuff)) then
+      if Cast(S.MaleficRapture) then return "malefic_rapture target_near_death"; end
+    end
     if (CDsON()) then
       -- call_action_list,name=darkglare_prep,if=covenant.venthyr&dot.impending_catastrophe_dot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity)
       if (CovenantID == 2 and Target:DebuffUp(S.ImpendingCatastrophe) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
@@ -709,12 +752,16 @@ local function APL()
     if S.PhantomSingularity:IsReady() and (CovenantID == 2 and HL.CombatTime() > 5 and S.ImpendingCatastrophe:CooldownRemains() < 1 and (I.EmpyrealOrdnance:CooldownRemains() < 162 or not I.EmpyrealOrdnance:IsEquipped())) then
       if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity main 8"; end
     end
-    -- phantom_singularity,if=(covenant.necrolord|covenant.kyrian|covenant.none)&(trinket.empyreal_ordnance.cooldown.remains<162|!equipped.empyreal_ordnance)
-    if S.PhantomSingularity:IsReady() and ((CovenantID == 4 or CovenantID == 1 or CovenantID == 0) and (I.EmpyrealOrdnance:CooldownRemains() < 162 or not I.EmpyrealOrdnance:IsEquipped())) then
+    -- phantom_singularity,if=covenant.necrolord&runeforge.malefic_wrath&time>5&cooldown.decimating_bolt.remains<3&(trinket.empyreal_ordnance.cooldown.remains<162|!equipped.empyreal_ordnance)
+    if S.PhantomSingularity:IsReady() and (CovenantID == 4 and MaleficWrathEquipped and HL.CombatTime() > 5 and S.DecimatingBolt:CooldownRemains() < 3 and (I.EmpyrealOrdnance:CooldownRemains() < 162 or not I.EmpyrealOrdnance:IsEquipped())) then
+      if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity main 9"; end
+    end
+    -- phantom_singularity,if=(covenant.kyrian|covenant.none|(covenant.necrolord&!runeforge.malefic_wrath))&(trinket.empyreal_ordnance.cooldown.remains<162|!equipped.empyreal_ordnance)
+    if S.PhantomSingularity:IsReady() and ((CovenantID == 1 or CovenantID == 0 or (CovenantID == 4 and not MaleficWrathEquipped)) and (I.EmpyrealOrdnance:CooldownRemains() < 162 or not I.EmpyrealOrdnance:IsEquipped())) then
       if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity main 10"; end
     end
     -- phantom_singularity,if=time_to_die<16
-    if S.PhantomSingularity:IsReady() and (Target:TimeToDie() < 16) then
+    if S.PhantomSingularity:IsReady() and (FightRemains < 16) then
       if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity main 12"; end
     end
     -- call_action_list,name=covenant,if=dot.phantom_singularity.ticking&(covenant.night_fae|covenant.venthyr)
@@ -775,11 +822,11 @@ local function APL()
         local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
       end
       -- dark_soul,if=cooldown.summon_darkglare.remains>time_to_die&(!talent.phantom_singularity|cooldown.phantom_singularity.remains>time_to_die)
-      if S.DarkSoulMisery:IsReady() and (S.SummonDarkglare:CooldownRemains() > Target:TimeToDie() and (not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownRemains() > Target:TimeToDie())) then
+      if S.DarkSoulMisery:IsReady() and (S.SummonDarkglare:CooldownRemains() > FightRemains and (not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownRemains() > FightRemains)) then
         if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul main 32"; end
       end
       -- dark_soul,if=!talent.phantom_singularity&cooldown.summon_darkglare.remains+cooldown.summon_darkglare.duration<time_to_die
-      if S.DarkSoulMisery:IsReady() and (not S.PhantomSingularity:IsAvailable() and S.SummonDarkglare:CooldownRemains() + 20 < Target:TimeToDie()) then
+      if S.DarkSoulMisery:IsReady() and (not S.PhantomSingularity:IsAvailable() and S.SummonDarkglare:CooldownRemains() + 20 < FightRemains) then
         if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul main 34"; end
       end
     end
@@ -787,24 +834,32 @@ local function APL()
     if (Settings.Commons.Enabled.Trinkets) then
       local ShouldReturn = ItemFunc(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=se,if=debuff.shadow_embrace.stack<(2-action.shadow_bolt.in_flight)|debuff.shadow_embrace.remains<3
-    if (Target:DebuffStack(S.ShadowEmbraceDebuff) < (2 - num(S.ShadowBolt:InFlight())) or Target:DebuffRemains(S.ShadowEmbraceDebuff) < 3) then
+    -- call_action_list,name=se,if=talent.shadow_embrace&(debuff.shadow_embrace.stack<(2-action.shadow_bolt.in_flight)|debuff.shadow_embrace.remains<3)
+    if (S.ShadowEmbrace:IsAvailable() and (Target:DebuffStack(S.ShadowEmbraceDebuff) < (2 - num(S.ShadowBolt:InFlight())) or Target:DebuffRemains(S.ShadowEmbraceDebuff) < 3)) then
       local ShouldReturn = Se(); if ShouldReturn then return ShouldReturn; end
     end
-    -- malefic_rapture,if=dot.vile_taint.ticking|dot.impending_catastrophe_dot.ticking|dot.soul_rot.ticking
-    if S.MaleficRapture:IsReady() and (Target:DebuffUp(S.VileTaintDebuff) or Target:DebuffUp(S.ImpendingCatastrophe) or Target:DebuffUp(S.SoulRot)) then
+    -- malefic_rapture,if=(dot.vile_taint.ticking|dot.impending_catastrophe_dot.ticking|dot.soul_rot.ticking)&(!runeforge.malefic_wrath|buff.malefic_wrath.stack<3|soul_shard>1)
+    if S.MaleficRapture:IsReady() and ((Target:DebuffUp(S.VileTaintDebuff) or Target:DebuffUp(S.ImpendingCatastrophe) or Target:DebuffUp(S.SoulRot)) and (not MaleficWrathEquipped or Player:BuffStack(S.MaleficWrathBuff) < 3 or Player:SoulShardsP() > 1)) then
       if Cast(S.MaleficRapture) then return "malefic_rapture main 36"; end
     end
-    -- malefic_rapture,if=talent.phantom_singularity&(dot.phantom_singularity.ticking|cooldown.phantom_singularity.remains>25|time_to_die<cooldown.phantom_singularity.remains)
-    if S.MaleficRapture:IsReady() and (S.PhantomSingularity:IsAvailable() and (Target:DebuffUp(S.PhantomSingularityDebuff) or S.PhantomSingularity:CooldownRemains() > 25 or Target:TimeToDie() < S.PhantomSingularity:CooldownRemains())) then
+    -- malefic_rapture,if=runeforge.malefic_wrath&cooldown.soul_rot.remains>20&buff.malefic_wrath.remains<4
+    if S.MaleficRapture:IsReady() and (MaleficWrathEquipped and S.SoulRot:CooldownRemains() > 20 and Player:BuffRemains(S.MaleficWrathBuff) < 4) then
+      if Cast(S.MaleficRapture) then return "malefic_rapture main 37"; end
+    end
+    -- malefic_rapture,if=runeforge.malefic_wrath&(covenant.necrolord|covenant.kyrian)&buff.malefic_wrath.remains<4
+    if S.MaleficRapture:IsReady() and (MaleficWrathEquipped and (CovenantID == 4 or CovenantID == 1) and Player:BuffRemains(S.MaleficWrathBuff) < 4) then
       if Cast(S.MaleficRapture) then return "malefic_rapture main 38"; end
+    end
+    -- malefic_rapture,if=talent.phantom_singularity&(dot.phantom_singularity.ticking|cooldown.phantom_singularity.remains>25|time_to_die<cooldown.phantom_singularity.remains)&(!runeforge.malefic_wrath|buff.malefic_wrath.stack<3|soul_shard>1)
+    if S.MaleficRapture:IsReady() and (S.PhantomSingularity:IsAvailable() and (Target:DebuffUp(S.PhantomSingularityDebuff) or S.PhantomSingularity:CooldownRemains() > 25 or FightRemains < S.PhantomSingularity:CooldownRemains()) and (not MaleficWrathEquipped or Player:BuffStack(S.MaleficWrathBuff) < 3 or Player:SoulShardsP() > 1)) then
+      if Cast(S.MaleficRapture) then return "malefic_rapture main 39"; end
     end
     -- malefic_rapture,if=talent.sow_the_seeds
     if S.MaleficRapture:IsReady() and (S.SowtheSeeds:IsAvailable()) then
       if Cast(S.MaleficRapture) then return "malefic_rapture main 40"; end
     end
     -- drain_life,if=buff.inevitable_demise.stack>40|buff.inevitable_demise.up&time_to_die<4
-    if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) > 40 or Player:BuffUp(S.InvetiableDemiseBuff) and Target:TimeToDie() < 4) then
+    if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) > 40 or Player:BuffUp(S.InvetiableDemiseBuff) and FightRemains < 4) then
       if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life main 42"; end
     end
     -- call_action_list,name=covenant

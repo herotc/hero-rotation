@@ -145,6 +145,9 @@ Spell.Warlock.Affliction = {
   -- Conduit Effects
   CorruptingLeer                        = Spell(339455),
 
+  -- Legendary Effects
+  MaleficWrathBuff                      = Spell(337125),
+
   -- Item Effects
 
 }
@@ -234,25 +237,32 @@ Item.Warlock.Demonology = {
 }
 
 Item.Warlock.Affliction = {
+  -- Potion
   PotionofSpectralIntellect             = Item(307096),
-  DarkmoonDeckPutrescence               = Item(173069),
-  DreadfireVessel                       = Item(184030),
-  EmpyrealOrdnance                      = Item(180117),
-  FlameofBattle                         = Item(181501),
-  GlyphofAssimilation                   = Item(184021),
-  InscrutableQuantumDevice              = Item(179350),
-  InstructorsDivineBell                 = Item(184842),
-  MacabreSheetMusic                     = Item(184024),
-  OverflowingAnimaCage                  = Item(178849),
-  SinfulAspirantsBadgeofFerocity        = Item(175884),
-  SinfulGladiatorsBadgeofFerocity       = Item(175921),
-  SoulIgniter                           = Item(184019),
-  SoullettingRuby                       = Item(178809),
-  SunbloodAmethyst                      = Item(178826),
-  TabletofDespair                       = Item(181357),
-  WakenersFrond                         = Item(181457),
+  -- Trinkets
+  DarkmoonDeckPutrescence               = Item(173069, {13, 14}),
+  DreadfireVessel                       = Item(184030, {13, 14}),
+  EbonsoulVise                          = Item(186431, {13, 14}),
+  EmpyrealOrdnance                      = Item(180117, {13, 14}),
+  FlameofBattle                         = Item(181501, {13, 14}),
+  GlyphofAssimilation                   = Item(184021, {13, 14}),
+  InscrutableQuantumDevice              = Item(179350, {13, 14}),
+  InstructorsDivineBell                 = Item(184842, {13, 14}),
+  MacabreSheetMusic                     = Item(184024, {13, 14}),
+  OverflowingAnimaCage                  = Item(178849, {13, 14}),
+  ShadowedOrbofTorment                  = Item(186428, {13, 14}),
+  SinfulAspirantsBadgeofFerocity        = Item(175884, {13, 14}),
+  SinfulGladiatorsBadgeofFerocity       = Item(175921, {13, 14}),
+  SoulIgniter                           = Item(184019, {13, 14}),
+  SoullettingRuby                       = Item(178809, {13, 14}),
+  SunbloodAmethyst                      = Item(178826, {13, 14}),
+  TabletofDespair                       = Item(181357, {13, 14}),
+  UnchainedGladiatorsShackles           = Item(186980, {13, 14}),
+  WakenersFrond                         = Item(181457, {13, 14}),
 }
 
 Item.Warlock.Destruction = {
+  -- Potion
   PotionofSpectralIntellect             = Item(307096)
+  -- Trinkets
 }
