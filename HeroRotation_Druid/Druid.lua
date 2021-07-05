@@ -237,5 +237,5 @@ Item.Druid.Feral = {
 }
 
 Item.Druid.Guardian = {
-  PotionofSpectralAgility               = Item(171270)
+  PotionofPhantomFire                   = Item(171349)
 }
