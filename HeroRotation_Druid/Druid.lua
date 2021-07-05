@@ -205,13 +205,16 @@ Spell.Druid.Guardian = {
   AdaptiveSwarmHeal                     = Spell(325748),
   ConvoketheSpirits                     = Spell(323764),
   EmpowerBond                           = Spell(326647),
+  Fleshcraft                            = Spell(324631),
   KindredSpirits                        = Spell(326434),
   KindredEmpowermentEnergizeBuff        = Spell(327022),
   RavenousFrenzy                        = Spell(323546),
   RavenousFrenzyBuff                    = Spell(323546),
 
   -- Conduit Effects
+  PustuleEruption                       = Spell(351094),
   SavageCombatantBuff                   = Spell(340613), -- Needs verified
+  VolatileSolvent                       = Spell(323074),
 
   -- Legendary Effects
 
@@ -237,5 +240,9 @@ Item.Druid.Feral = {
 }
 
 Item.Druid.Guardian = {
-  PotionofPhantomFire                   = Item(171349)
+-- Potion
+  PotionofPhantomFire                   = Item(171349),
+  -- Trinkets
+  -- Other On-Use
+  Jotungeirr                            = Item(186404)
 }

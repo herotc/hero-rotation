@@ -116,6 +116,10 @@ local function Precombat()
   -- wrath,if=druid.owlweave_bear&!covenant.night_fae
   -- starfire,if=druid.owlweave_bear&covenant.night_fae
   -- NOTE: Not handling cat-weaving or owl-weaving
+  -- fleshcraft,if=soulbind.pustule_eruption.enabled|soulbind.volatile_solvent.enabled,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
+  end
   -- Manually added: wild_charge
   if S.WildCharge:IsCastable() and (Target:IsInRange(25) and not Target:IsInRange(8)) then
     if Cast(S.WildCharge) then return "wild_charge precombat 4"; end
@@ -215,6 +219,10 @@ local function Bear()
   if S.Moonfire:IsCastable() and ((Target:DebuffRefreshable(S.MoonfireDebuff) and MeleeEnemies8yCount < 2 and Target:TimeToDie() > 12) or (Target:DebuffDown(S.MoonfireDebuff) and MeleeEnemies8yCount > 1 and Target:TimeToDie() > 12)) then
     if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 26"; end
   end
+  -- fleshcraft,if=soulbind.pustule_eruption.enabled&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0)&(dot.moonfire.remains>=3)&(buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&buff.galactic_guardian.down))|soulbind.volatile_solvent.enabled,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent&(cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0)
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() and ((S.Thrash:CooldownRemains() > 0 and S.Mangle:CooldownRemains() > 0) and (Target:DebuffRemains(S.MoonfireDebuff) >= 3) and (Player:BuffDown(S.IncarnationBuff) and Player:BuffDown(S.BerserkBuff) and Player:BuffDown(S.GalacticGuardianBuff))) or S.VolatileSolvent:SoulbindEnabled()) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft bear 27"; end
+  end
   -- swipe,if=buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&active_enemies>=4
   if S.Swipe:IsCastable() and (Player:BuffDown(S.IncarnationBuff) and Player:BuffDown(S.BerserkBuff) and MeleeEnemies8yCount >= 4) then
     if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(8)) then return "swipe bear 28"; end
@@ -273,6 +281,7 @@ local function CatWeave()
   -- convoke_the_spirits,if=druid.catweave_bear
   -- ferocious_bite,if=combo_points>=4&energy>50
   -- adaptive_swarm,if=(!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>3)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<5&dot.adaptive_swarm_damage.ticking)
+  -- fleshcraft,if=soulbind.pustule_eruption.enabled&energy<35|soulbind.volatile_solvent.enabled,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent&energy<35
   -- shred
 end
 
@@ -324,7 +333,12 @@ local function APL()
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     end
     -- auto_attack,if=!buff.prowl.up
-    -- use_items,if=!buff.prowl.up
+    -- use_item,name=jotungeirr_destinys_call,if=!buff.prowl.up&(buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.down|covenant.night_fae&cooldown.convoke_the_spirits.remains<=1)
+    if I.Jotungeirr:IsEquippedAndReady() and (Player:BuffUp(S.BerserkBuff) or Player:BuffDown(S.IncarnationBuff) or Player:Covenant() == "Night Fae" and S.ConvoketheSpirits:CooldownRemains() <= 1) then
+      if Cast(I.Jotungeirr) then return "jotungeirr_destinys_call main"; end
+    end
+    -- use_items,if=!buff.prowl.up|!buff.prowl.up&equipped.jotungeirr_destinys_call&(cooldown.berserk_bear.remains>30|cooldown.incarnation_guardian_of_ursoc.remains>30|covenant.night_fae&cooldown.convoke_the_spirits.remains>30)
+    -- Always assuming true, as we always assume Prowl is down
     if Settings.Commons.Enabled.Trinkets then
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
