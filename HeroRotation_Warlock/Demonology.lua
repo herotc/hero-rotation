@@ -433,8 +433,8 @@ local function APL()
     if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and DemonicTyrantTime() == 0 and S.SummonDemonicTyrant:CooldownRemains() > 5 and not ImplosivePotentialEquipped and (not S.FromtheShadows:IsAvailable() or Player:BuffUp(S.FromtheShadowsBuff))) then
       if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion main 16"; end
     end
-    -- implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.implosive_potential.remains<2&runeforge.implosive_potential&(!talent.demonic_consumption.enabled|(buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5))
-    if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and Player:BuffRemains(S.ImplosivePotentialBuff) < 2 and ImplosivePotentialEquipped and (not S.DemonicConsumption:IsAvailable() or (DemonicTyrantTime() == 0 and S.SummonDemonicTyrant:CooldownRemains() > 5))) then
+    -- implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.implosive_potential.remains<2&runeforge.implosive_potential
+    if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and Player:BuffRemains(S.ImplosivePotentialBuff) < 2 and ImplosivePotentialEquipped) then
       if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion main 18"; end
     end
     -- implosion,if=buff.wild_imps.stack>=12&talent.soul_conduit.enabled&talent.from_the_shadows.enabled&runeforge.implosive_potential&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
