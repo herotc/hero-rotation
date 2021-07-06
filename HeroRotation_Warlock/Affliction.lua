@@ -251,6 +251,10 @@ local function Precombat()
     if Cast(S.GrimoireofSacrifice, Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "grimoire_of_sacrifice precombat 2"; end
   end
   -- snapshot_stats
+  -- fleshcraft
+  if S.Fleshcraft:IsCastable() then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
+  end
   -- potion
   if Settings.Commons.Enabled.Potions and I.PotionofSpectralIntellect:IsReady() then
     if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 4"; end
@@ -624,6 +628,10 @@ local function Aoe()
   if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) >= 50 or Player:BuffUp(S.InvetiableDemiseBuff) and FightRemains < 5 or Player:BuffStack(S.InvetiableDemiseBuff) >= 35 and Target:DebuffUp(S.SoulRot)) then
     if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life aoe 32"; end
   end
+  -- fleshcraft,if=soulbind.volatile_solvent,cancel_if=buff.volatile_solvent_humanoid.up
+  if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft aoe 33"; end
+  end
   -- drain_soul,interrupt=1
   if S.DrainSoul:IsReady() then
     if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul aoe 34"; end
@@ -881,6 +889,10 @@ local function APL()
     -- corruption,cycle_targets=1,if=active_enemies<4-(talent.sow_the_seeds|talent.siphon_life),target_if=refreshable
     if S.Corruption:IsReady() and (EnemiesCount10ySplash < 4 - num(S.SowtheSeeds:IsAvailable() or S.SiphonLife:IsAvailable())) then
       if Everyone.CastCycle(S.Corruption, Enemies40y, EvaluateCycleCorruptionRefresh, not Target:IsSpellInRange(S.Corruption)) then return "corruption main 50"; end
+    end
+    -- fleshcraft,if=soulbind.volatile_solvent,cancel_if=buff.volatile_solvent_humanoid.up
+    if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft main 51"; end
     end
     -- drain_soul,interrupt=1
     if S.DrainSoul:IsReady() then

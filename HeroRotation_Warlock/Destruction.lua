@@ -275,6 +275,10 @@ local function APL()
             if Cast(S.GrimoireofSacrifice, Settings.Destruction.GCDasOffGCD.GrimoireOfSacrifice) then return "grimoire_of_sacrifice precombat 2"; end
         end
         --snapshot_stats
+        -- fleshcraft
+        if S.Fleshcraft:IsCastable() then
+          if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
+        end
         --soul_fire
         if S.SoulFire:IsCastable() and not Player:IsCasting(S.SoulFire) then
             if Cast(S.SoulFire, nil, nil, not Target:IsSpellInRange(S.SoulFire)) then return "soul_fire precombat 3"; end
@@ -300,6 +304,10 @@ local function APL()
     --call_action_list,name=havoc,if=havoc_active&active_enemies>1&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
     if var_havoc_active and Enemies40yCount > 1 and Enemies40yCount < 5 - num(S.Inferno:IsAvailable()) + num(S.Inferno:IsAvailable() and S.InternalCombustion:IsAvailable()) then
         local ShouldReturn = Havoc(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- fleshcraft,if=soulbind.volatile_solvent,cancel_if=buff.volatile_solvent_humanoid.up
+    if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft main 1"; end
     end
     --conflagrate,if=talent.roaring_blaze.enabled&debuff.roaring_blaze.remains<1.5
     if S.Conflagrate:IsCastable() and S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.RoaringBlazeDebuff) < 1.5 then

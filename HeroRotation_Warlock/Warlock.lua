@@ -76,6 +76,8 @@ Spell.Warlock.Demonology = {
   GroveInvigoration                     = Spell(322721),
   LeadByExample                         = Spell(342156),
   RefinedPalate                         = Spell(336243),
+  VolatileSolvent                       = Spell(323074),
+  VolatileSolventHumanBuff              = Spell(323491),
   WildHuntTactics                       = Spell(325066),
 
   -- Legendary Effects
@@ -144,6 +146,8 @@ Spell.Warlock.Affliction = {
 
   -- Conduit Effects
   CorruptingLeer                        = Spell(339455),
+  VolatileSolvent                       = Spell(323074),
+  VolatileSolventHumanBuff              = Spell(323491),
 
   -- Legendary Effects
   MaleficWrathBuff                      = Spell(337125),
@@ -208,6 +212,8 @@ Spell.Warlock.Destruction = {
 
   -- Conduit Effects
   LeadByExample                         = Spell(342156),
+  VolatileSolvent                       = Spell(323074),
+  VolatileSolventHumanBuff              = Spell(323491),
 
   -- Item Effects
 

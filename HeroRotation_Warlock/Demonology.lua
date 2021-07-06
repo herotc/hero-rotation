@@ -164,9 +164,12 @@ local function Precombat()
   end
   -- snapshot_stats
   if Everyone.TargetIsValid() then
+    -- fleshcraft
+    if S.Fleshcraft:IsCastable() then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
+    end
     -- variable,name=first_tyrant_time,op=set,value=12
-    -- Tweaked to 10 instead of 12 to account for ShadowBolt cast time
-    VarFirstTyrantTime = 10
+    VarFirstTyrantTime = 12
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,name=tome_of_monstrous_constructions
       if I.TomeofMonstrousConstructions:IsEquippedAndReady() then
@@ -176,10 +179,6 @@ local function Precombat()
       if I.SoleahsSecretTechnique:IsEquippedAndReady() then
         if Cast(I.SoleahsSecretTechnique, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soleahs_secret_technique precombat 6"; end
       end
-    end
-    -- fleshcraft
-    if S.Fleshcraft:IsCastable() then
-      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 8"; end
     end
     -- demonbolt
     if S.Demonbolt:IsCastable() then
@@ -208,6 +207,10 @@ local function Covenant()
   -- decimating_bolt,if=!soulbind.lead_by_example&!pet.demonic_tyrant.active
   if S.DecimatingBolt:IsReady() and (not S.LeadByExample:SoulbindEnabled() and DemonicTyrantTime() == 0) then
     if Cast(S.DecimatingBolt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt covenant 10"; end
+  end
+  -- fleshcraft,if=soulbind.volatile_solvent,cancel_if=buff.volatile_solvent_humanoid.up
+  if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft covenant 11"; end
   end
   -- scouring_tithe,if=soulbind.combat_meditation&pet.demonic_tyrant.active
   if S.ScouringTithe:IsReady() and (S.CombatMeditation:SoulbindEnabled() and DemonicTyrantTime() > 0) then
