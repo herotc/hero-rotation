@@ -1,0 +1,53 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+    steps:
+      # Do the release checkout
+      - name: Clone Project
+        uses: actions/checkout@v1
+      - name: Get Tag
+        id: vars
+        run: |
+          echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+          echo ::set-output name=oldtag::$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1))
+      # Make a zip file for GitHub
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          filename: HeroRotation-${{ steps.vars.outputs.tag }}.zip
+          exclusions: '*.git* *.pkgmeta *.svn*'
+      # Create a release on GitHub
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: HeroRotation
+          body: |
+            Changes: https://github.com/herotc/hero-rotation/compare/${{ steps.vars.outputs.oldtag }}...${{ steps.vars.outputs.tag }}
+          draft: false
+          prerelease: false
+      # Upload the zip to the GitHub release
+      - name: Upload Zip
+        id: upload-zip
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./HeroRotation-${{ steps.vars.outputs.tag }}.zip
+          asset_name: HeroRotation-${{ steps.vars.outputs.tag }}.zip
+          asset_content_type: application/zip
+      # Use the BigWigs packager for Wago output
+      - name: Package and Release
+        uses: BigWigsMods/packager@v1
