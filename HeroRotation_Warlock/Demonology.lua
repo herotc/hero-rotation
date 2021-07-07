@@ -66,6 +66,7 @@ local EnemiesCount8ySplash
 local VarFirstTyrantTime = 0
 local BalespidersEquipped = Player:HasLegendaryEquipped(173)
 local WilfredsSigilEquipped = Player:HasLegendaryEquipped(162)
+local ImplosivePotentialEquipped = Player:HasLegendaryEquipped(170)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -92,6 +93,7 @@ HL:RegisterForEvent(function()
   end
   BalespidersEquipped = Player:HasLegendaryEquipped(173)
   WilfredsSigilEquipped = Player:HasLegendaryEquipped(162)
+  ImplosivePotentialEquipped = Player:HasLegendaryEquipped(170)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
