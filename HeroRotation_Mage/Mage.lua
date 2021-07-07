@@ -88,10 +88,13 @@ Spell.Mage.Arcane = {
   RadiantSparkVulnerability             = Spell(307454),
   MirrorsofTorment                      = Spell(314793),
   Deathborne                            = Spell(324220),
+  Fleshcraft                            = Spell(324631),
   ShiftingPower                         = Spell(314791),
   FieldOfBlossoms                       = Spell(319191),
   -- Conduit
   ArcaneProdigy                         = Spell(336873),
+  VolatileSolvent                       = Spell(323074),
+  PustuleEruption                       = Spell(351094),
   -- Legendaries (Shadowlands)
   ExpandedPotentialBuff                 = Spell(327495),
   SiphonStormBuff                       = Spell(332928),
@@ -285,6 +288,7 @@ Item.Mage.Arcane = {
   SoullettingRuby                  = Item(178809),
   SunbloodAmethyst                 = Item(178826),
   WakenersFrond                    = Item(181457),
+  ShadowedOrbofTorment             = Item(186428),
 }
 
 Item.Mage.Fire = {
