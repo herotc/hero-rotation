@@ -129,8 +129,8 @@ local function Cooldowns()
   if S.Deathborne:IsCastable() then
     if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne cd 3"; end
   end
-  -- mirrors_of_torment,if=active_enemies<3&(conduit.siphoned_malice.enabled|soulbind.wasteland_propriety.enabled)
-  if S.MirrorsofTorment:IsCastable() and (EnemiesCount8ySplash < 3 and (S.SiphonedMalice:ConduitEnabled() or S.WastelandPropriety:IsAvailable())) then
+  -- mirrors_of_torment,if=active_enemies<3&(conduit.siphoned_malice.enabled|soulbind.wasteland_propriety.enabled)&buff.brain_freeze.react=0
+  if S.MirrorsofTorment:IsCastable() and (EnemiesCount8ySplash < 3 and (S.SiphonedMalice:ConduitEnabled() or S.WastelandPropriety:IsAvailable())) and Player:BuffDown(S.BrainFreezeBuff) then
     if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment cd 4"; end
   end
   -- rune_of_power,if=cooldown.icy_veins.remains>12&buff.rune_of_power.down
@@ -398,7 +398,7 @@ local function APL()
 end
 
 local function Init()
-
+  -- APL 06/07/2021 https://github.com/simulationcraft/simc/commit/8f34b94945eeba7a59dec12a84ee89d19052df6d#diff-fc8c9f725bf89b92bde432d66bd54eff884fe7520e4742e94eb17551c6459f22
 end
 
 HR.SetAPL(64, APL, Init)
