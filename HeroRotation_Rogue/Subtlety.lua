@@ -12,6 +12,7 @@ local Target = Unit.Target
 local Spell = HL.Spell
 local MultiSpell = HL.MultiSpell
 local Item = HL.Item
+local BoolToInt = HL.Utils.BoolToInt
 -- HeroRotation
 local HR = HeroRotation
 local AoEON = HR.AoEON
@@ -84,7 +85,7 @@ local ShouldReturn; -- Used to get the return string
 local PoolingAbility, PoolingEnergy, PoolingFinisher; -- Used to store an ability we might want to pool for as a fallback in the current situation
 local Stealth, VanishBuff
 local RuptureThreshold, RuptureDMGThreshold
-local ComboPoints, ComboPointsDeficit
+local EffectiveComboPoints, ComboPoints, ComboPointsDeficit
 local PriorityRotation
 
 -- Legendaries
@@ -92,11 +93,17 @@ local DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
 local TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
 local AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
 local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
+local FinalityEquipped = Player:HasLegendaryEquipped(126)
+local ObedienceEquipped = Player:HasLegendaryEquipped(229)
+local ResoundingClarityEquipped = Player:HasLegendaryEquipped(231)
 HL:RegisterForEvent(function()
   DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
   TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
   AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
   MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
+  FinalityEquipped = Player:HasLegendaryEquipped(126)
+  ObedienceEquipped = Player:HasLegendaryEquipped(229)
+  ResoundingClarityEquipped = Player:HasLegendaryEquipped(231)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- GUI Settings
@@ -208,10 +215,10 @@ local function SnD_Condition ()
   return Player:BuffUp(S.SliceandDice) or MeleeEnemies10yCount >= 6
 end
 local function Skip_Rupture (ShadowDanceBuff)
-  -- actions.finish+=/variable,name=skip_rupture,value=master_assassin_remains>0|!talent.nightstalker.enabled&talent.dark_shadow.enabled&buff.shadow_dance.up|spell_targets.shuriken_storm>=5
+  -- actions.finish+=/variable,name=skip_rupture,value=master_assassin_remains>0|!talent.nightstalker.enabled&talent.dark_shadow.enabled&buff.shadow_dance.up|spell_targets.shuriken_storm>=(5-runeforge.finality)
   return Rogue.MasterAssassinsMarkRemains() > 0
     or not S.Nightstalker:IsAvailable() and S.DarkShadow:IsAvailable() and ShadowDanceBuff
-    or MeleeEnemies10yCount >= 5
+    or MeleeEnemies10yCount >= (5 - BoolToInt(FinalityEquipped))
 end
 
 -- # Finishers
@@ -291,8 +298,8 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       end
     end
   end
-  -- actions.finish+=/black_powder,if=!variable.use_priority_rotation&spell_targets>=4-debuff.find_weakness.down
-  if S.BlackPowder:IsCastable() and not PriorityRotation and MeleeEnemies10yCount >= 4 - num(Target:DebuffUp(S.FindWeaknessDebuff)) then
+  -- actions.finish+=/black_powder,if=!variable.use_priority_rotation&spell_targets>=3
+  if S.BlackPowder:IsCastable() and not PriorityRotation and MeleeEnemies10yCount >= 3 then
     if ReturnSpellOnly then
       return S.BlackPowder
     else
@@ -334,10 +341,14 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
       if HR.Cast(S.Shadowstrike) then return "Cast Shadowstrike (Stealth)" end
     end
   end
+  -- actions.stealthed+=/call_action_list,name=finish,if=effective_combo_points>=cp_max_spend
+  if EffectiveComboPoints >= Rogue.CPMaxSpend() then
+    return Finish(ReturnSpellOnly, StealthSpell)
+  end
   -- actions.stealthed+=/call_action_list,name=finish,if=buff.shuriken_tornado.up&combo_points.deficit<=2
   -- DONE IN DEFAULT PART!
-  -- actions.stealthed+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&combo_points>=4
-  if MeleeEnemies10yCount >= 4 and ComboPoints >= 4 then
+  -- actions.stealthed+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&effective_combo_points>=4
+  if MeleeEnemies10yCount >= 4 and EffectiveComboPoints >= 4 then
     return Finish(ReturnSpellOnly, StealthSpell)
   end
   -- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&buff.vanish.up)
@@ -371,8 +382,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
       if HR.Cast(S.Shadowstrike) then return "Cast Shadowstrike (Prio Rotation)" end
     end
   end
-  -- actions.stealthed+=/shuriken_storm,if=spell_targets>=3+(buff.the_rotten.up|runeforge.akaaris_soul_fragment&conduit.deeper_daggers.rank>=7)&(buff.symbols_of_death_autocrit.up|!buff.premeditation.up|spell_targets>=5)
-  -- TODO: Conduit Rank
+  -- actions.stealthed+=/shuriken_storm,if=spell_targets>=3+(buff.the_rotten.up|runeforge.akaaris_soul_fragment)&(buff.symbols_of_death_autocrit.up|!buff.premeditation.up|spell_targets>=5)
   if HR.AoEON() and S.ShurikenStorm:IsCastable() and MeleeEnemies10yCount >= 3 + num(Player:BuffUp(S.TheRottenBuff) or AkaarisSoulFragmentEquipped)
     and (Player:BuffUp(S.SymbolsofDeathCrit) or not Player:BuffUp(S.PremeditationBuff) or MeleeEnemies10yCount >= 5) then
     if ReturnSpellOnly then
@@ -459,14 +469,10 @@ local function CDs ()
   local SnDCondition = SnD_Condition()
 
   if Target:IsInMeleeRange(5) then
-    -- actions.cds+=/flagellation,if=variable.snd_condition&!stealthed.mantle
-    if HR.CDsON() and S.Flagellation:IsReady() and SnDCondition and not Player:StealthUp(false, false) then
+    -- actions.cds+=/flagellation,if=variable.snd_condition&!stealthed.mantle&(!runeforge.obedience|buff.symbols_of_death.up&combo_points>=5)
+    if HR.CDsON() and S.Flagellation:IsReady() and SnDCondition and not Player:StealthUp(false, false)
+      and (not ObedienceEquipped or Player:BuffUp(S.SymbolsofDeath) and ComboPoints >= 5) then
       if HR.Cast(S.Flagellation, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flrgrrlation" end
-    end
-
-    -- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
-    if S.FlagellationCleanse:IsCastable() and Player:BuffRemains(S.Flagellation) < 2 then
-      if HR.Cast(S.FlagellationCleanse, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flrgrrlation Cleanse" end
     end
   end
   -- actions.cds+=/vanish,if=(runeforge.mark_of_the_master_assassin&combo_points.deficit<=1-talent.deeper_strategem.enabled|runeforge.deathly_shadows&combo_points<1)&buff.symbols_of_death.up&buff.shadow_dance.up&master_assassin_remains=0&buff.deathly_shadows.down
@@ -476,8 +482,9 @@ local function CDs ()
     and not Player:BuffUp(S.DeathlyShadowsBuff) then
     if StealthMacro(S.Vanish) then return "Vanish Macro" end
   end
-  -- actions.cds+=/shuriken_tornado,if=energy>=60&variable.snd_condition&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1
-  if S.ShurikenTornado:IsCastable() and SnDCondition and S.SymbolsofDeath:CooldownUp() and S.ShadowDance:Charges() >= 1 then
+  -- actions.cds+=/shuriken_tornado,if=energy>=60&variable.snd_condition&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1&(!runeforge.obedience|debuff.flagellation.up)&combo_points<=2&(!buff.premeditation.up|spell_targets.shuriken_storm>4)
+  if S.ShurikenTornado:IsCastable() and SnDCondition and S.SymbolsofDeath:CooldownUp() and S.ShadowDance:Charges() >= 1
+    and (not ObedienceEquipped or Target:DebuffUp(S.Flagellation)) and ComboPoints <= 2 and (not Player:BuffUp(S.PremeditationBuff) or MeleeEnemies10yCount > 4) then
     -- actions.cds+=/pool_resource,for_next=1,if=!talent.shadow_focus.enabled
     if Player:Energy() >= 60 then
       if HR.Cast(S.ShurikenTornado) then return "Cast Shuriken Tornado" end
@@ -502,10 +509,11 @@ local function CDs ()
     if HR.CDsON() and S.Sepsis:IsReady() and SnDCondition and ComboPointsDeficit >= 1 then
       if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
     end
-    -- actions.cds+=/symbols_of_death,if=variable.snd_condition&(talent.enveloping_shadows.enabled|cooldown.shadow_dance.charges>=1)&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)
+    -- actions.cds+=/symbols_of_death,if=variable.snd_condition&(talent.enveloping_shadows.enabled|cooldown.shadow_dance.charges>=1)&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)&(!runeforge.obedience|cooldown.flagellation.remains>10|cooldown.flagellation.up&combo_points>=5)
     if S.SymbolsofDeath:IsCastable() and SnDCondition
       and (S.EnvelopingShadows:IsAvailable() or S.ShadowDance:Charges() >= 1)
-      and (not S.ShurikenTornado:IsAvailable() or S.ShadowFocus:IsAvailable() or S.ShurikenTornado:CooldownRemains() > 2) then
+      and (not S.ShurikenTornado:IsAvailable() or S.ShadowFocus:IsAvailable() or S.ShurikenTornado:CooldownRemains() > 2)
+      and (not ObedienceEquipped or S.Flagellation:CooldownRemains() > 10 or S.Flagellation:CooldownUp() and ComboPoints >= 5) then
       if HR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death" end
     end
   end
@@ -527,16 +535,19 @@ local function CDs ()
     end
   end
   if HR.CDsON() then
-    -- actions.cds+=/shadow_blades,if=variable.snd_condition&combo_points.deficit>=2
-    if S.ShadowBlades:IsCastable() and SnDCondition and ComboPointsDeficit >= 2 then
+    -- actions.cds+=/shadow_blades,if=variable.snd_condition&combo_points.deficit>=2&(cooldown.symbols_of_death.remains<1|buff.symbols_of_death.up|fight_remains<=20)
+    if S.ShadowBlades:IsCastable() and SnDCondition and ComboPointsDeficit >= 2
+      and (S.SymbolsofDeath:CooldownRemains() < 1 or Player:BuffUp(S.SymbolsofDeath) or HL.BossFilteredFightRemains("<=", 20)) then
       if HR.Cast(S.ShadowBlades, Settings.Subtlety.OffGCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades" end
     end
-    -- actions.cds+=/echoing_reprimand,if=variable.snd_condition&combo_points.deficit>=2&(variable.use_priority_rotation|spell_targets.shuriken_storm<=4)
-    if S.EchoingReprimand:IsReady() and Target:IsInMeleeRange(5) and SnDCondition and ComboPointsDeficit >= 2 and (PriorityRotation or MeleeEnemies10yCount <= 4) then
+    -- actions.cds+=/echoing_reprimand,if=variable.snd_condition&combo_points.deficit>=2&(variable.use_priority_rotation|spell_targets.shuriken_storm<=4|runeforge.resounding_clarity)
+    if S.EchoingReprimand:IsReady() and Target:IsInMeleeRange(5) and SnDCondition and ComboPointsDeficit >= 2
+      and (PriorityRotation or MeleeEnemies10yCount <= 4 or ResoundingClarityEquipped) then
       if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
     end
-    -- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&variable.snd_condition&buff.symbols_of_death.up
-    if S.ShurikenTornado:IsReady() and S.ShadowFocus:IsAvailable() and SnDCondition and Player:BuffUp(S.SymbolsofDeath) then
+    -- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&variable.snd_condition&buff.symbols_of_death.up&combo_points<=2&(!buff.premeditation.up|spell_targets.shuriken_storm>4)
+    if S.ShurikenTornado:IsReady() and S.ShadowFocus:IsAvailable() and SnDCondition and Player:BuffUp(S.SymbolsofDeath)
+      and ComboPoints <= 2 and (not Player:BuffUp(S.PremeditationBuff) or MeleeEnemies10yCount > 4) then
       if HR.Cast(S.ShurikenTornado) then return "Cast Shuriken Tornado (SF)" end
     end
     -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
@@ -544,6 +555,7 @@ local function CDs ()
       ShouldReturn = StealthMacro(S.ShadowDance)
       if ShouldReturn then return "Shadow Dance Macro (Low TTD) " .. ShouldReturn end
     end
+    -- TODO: actions.cds+=/fleshcraft,if=(soulbind.pustule_eruption|soulbind.volatile_solvent)&energy.deficit>=30&!stealthed.all&buff.symbols_of_death.down
 
     -- TODO: Add Potion Suggestion
     -- actions.cds+=/potion,if=buff.bloodlust.react|fight_remains<30|buff.symbols_of_death.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=10)
@@ -629,14 +641,15 @@ local function Build (EnergyThreshold)
     if ThresholdMet and HR.Cast(S.ShurikenStorm) then return "Cast Shiv (TTB)" end
     SetPoolingAbility(S.Shiv, EnergyThreshold)
   end
-  -- actions.build+=/shuriken_storm,if=spell_targets>=2
-  if HR.AoEON() and S.ShurikenStorm:IsCastable() and MeleeEnemies10yCount >= 2 then
+  -- actions.build+=/shuriken_storm,if=spell_targets>=2&(!covenant.necrolord|cooldown.serrated_bone_spike.max_charges-charges_fractional>=0.25|spell_targets.shuriken_storm>4)
+  if HR.AoEON() and S.ShurikenStorm:IsCastable() and MeleeEnemies10yCount >= 2
+    and (not Player:Covenant() == "Necrolord" or (S.SerratedBoneSpike:MaxCharges() - S.SerratedBoneSpike:ChargesFractional()) >= 0.25 or MeleeEnemies10yCount >= 4) then
     if ThresholdMet and HR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm" end
     SetPoolingAbility(S.ShurikenStorm, EnergyThreshold)
   end
-  -- actions.build+=/serrated_bone_spike,if=cooldown.serrated_bone_spike.charges_fractional>=2.75|soulbind.lead_by_example.enabled&!buff.lead_by_example.up
-  -- TODO: Lead by Example fishing
-  if S.SerratedBoneSpike:IsCastable() and S.SerratedBoneSpike:ChargesFractional() >= 2.75 then
+  -- actions.build+=/serrated_bone_spike,if=cooldown.serrated_bone_spike.max_charges-charges_fractional<=0.25|soulbind.lead_by_example.enabled&!buff.lead_by_example.up
+  if S.SerratedBoneSpike:IsCastable() and ((S.SerratedBoneSpike:MaxCharges() - S.SerratedBoneSpike:ChargesFractional()) <= 0.25
+    or (S.LeadbyExample:SoulbindEnabled() and not Player:BuffUp(S.LeadbyExampleBuff) and not HL.BossFightRemainsIsNotValid())) then
     if ThresholdMet and HR.Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Serrated Bone Spike (Capping Filler)" end
     SetPoolingAbility(S.SerratedBoneSpike, EnergyThreshold)
   end
@@ -691,6 +704,7 @@ local function APL ()
 
   -- Cache updates
   ComboPoints = Player:ComboPoints()
+  EffectiveComboPoints = Rogue.EffectiveComboPoints()
   ComboPointsDeficit = Player:ComboPointsDeficit()
   RuptureThreshold = (4 + ComboPoints * 4) * 0.3
   RuptureDMGThreshold = S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
@@ -726,6 +740,7 @@ local function APL ()
         if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
           if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
         end
+        -- TODO: actions.precombat+=/fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
       end
       if Player:StealthUp(true, true) then
         PoolingAbility = Stealthed(true)
@@ -803,15 +818,15 @@ local function APL ()
     ShouldReturn = Stealth_CDs(Player:EnergyMax() - Stealth_Threshold())
     if ShouldReturn then return "Stealth CDs: " .. ShouldReturn end
 
-    -- actions+=/call_action_list,name=finish,if=combo_points=animacharged_cp
+    -- actions+=/call_action_list,name=finish,if=effective_combo_points>=cp_max_spend
     -- # Finish at 4+ without DS or with SoD crit buff, 5+ with DS (outside stealth)
-    -- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|fight_remains<=1&combo_points>=3|buff.symbols_of_death_autocrit.up&combo_points>=4
+    -- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|fight_remains<=1&effective_combo_points>=3|buff.symbols_of_death_autocrit.up&effective_combo_points>=4
     -- # With DS also finish at 4+ against 4 targets (outside stealth)
-    -- actions+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&combo_points>=4
-    if ComboPoints == Rogue.AnimachargedCP()
-      or (ComboPointsDeficit <= 1 or (HL.BossFilteredFightRemains("<", 2) and ComboPoints >= 3))
-      or (MeleeEnemies10yCount >= 4 and ComboPoints >= 4)
-      or (Player:BuffUp(S.SymbolsofDeathCrit) and ComboPoints >= 4) then
+    -- actions+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&effective_combo_points>=4
+    if EffectiveComboPoints >= Rogue.CPMaxSpend()
+      or (ComboPointsDeficit <= 1 or (HL.BossFilteredFightRemains("<", 2) and EffectiveComboPoints >= 3))
+      or (MeleeEnemies10yCount >= 4 and EffectiveComboPoints >= 4)
+      or (Player:BuffUp(S.SymbolsofDeathCrit) and EffectiveComboPoints >= 4) then
       ShouldReturn = Finish()
       if ShouldReturn then return "Finish: " .. ShouldReturn end
     else
@@ -865,7 +880,7 @@ end
 
 HR.SetAPL(261, APL, Init)
 
--- Last Update: 2020-12-31
+-- Last Update: 2021-07-08
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=apply_poison
@@ -874,11 +889,12 @@ HR.SetAPL(261, APL, Init)
 -- actions.precombat+=/food
 -- # Snapshot raid buffed stats before combat begins and pre-potting is done.
 -- actions.precombat+=/snapshot_stats
+-- actions.precombat+=/fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
 -- actions.precombat+=/stealth
 -- actions.precombat+=/marked_for_death,precombat_seconds=15
 -- actions.precombat+=/slice_and_dice,precombat_seconds=1
 -- actions.precombat+=/shadow_blades,if=runeforge.mark_of_the_master_assassin
---
+
 -- # Executed every time the actor is available.
 -- # Restealth if possible (no vulnerable enemies in combat)
 -- actions=stealth
@@ -900,11 +916,11 @@ HR.SetAPL(261, APL, Init)
 -- actions+=/variable,name=stealth_threshold,value=25+talent.vigor.enabled*20+talent.master_of_shadows.enabled*20+talent.shadow_focus.enabled*25+talent.alacrity.enabled*20+25*(spell_targets.shuriken_storm>=4)
 -- # Consider using a Stealth CD when reaching the energy threshold
 -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold
--- actions+=/call_action_list,name=finish,if=combo_points=animacharged_cp
+-- actions+=/call_action_list,name=finish,if=effective_combo_points>=cp_max_spend
 -- # Finish at 4+ without DS or with SoD crit buff, 5+ with DS (outside stealth)
--- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|fight_remains<=1&combo_points>=3|buff.symbols_of_death_autocrit.up&combo_points>=4
+-- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|fight_remains<=1&effective_combo_points>=3|buff.symbols_of_death_autocrit.up&effective_combo_points>=4
 -- # With DS also finish at 4+ against 4 targets (outside stealth)
--- actions+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&combo_points>=4
+-- actions+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&effective_combo_points>=4
 -- # Use a builder when reaching the energy threshold
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
 -- # Lowest priority in all of the APL because it causes a GCD
@@ -912,39 +928,39 @@ HR.SetAPL(261, APL, Init)
 -- actions+=/arcane_pulse
 -- actions+=/lights_judgment
 -- actions+=/bag_of_tricks
---
+
 -- # Builders
 -- actions.build=shiv,if=!talent.nightstalker.enabled&runeforge.tiny_toxic_blade&spell_targets.shuriken_storm<5
--- actions.build+=/shuriken_storm,if=spell_targets>=2
--- actions.build+=/serrated_bone_spike,if=cooldown.serrated_bone_spike.charges_fractional>=2.75|soulbind.lead_by_example.enabled&!buff.lead_by_example.up
+-- actions.build+=/shuriken_storm,if=spell_targets>=2&(!covenant.necrolord|cooldown.serrated_bone_spike.max_charges-charges_fractional>=0.25|spell_targets.shuriken_storm>4)
+-- actions.build+=/serrated_bone_spike,if=cooldown.serrated_bone_spike.max_charges-charges_fractional<=0.25|soulbind.lead_by_example.enabled&!buff.lead_by_example.up
 -- actions.build+=/gloomblade
 -- actions.build+=/backstab
---
+
 -- # Cooldowns
 -- # Use Dance off-gcd before the first Shuriken Storm from Tornado comes in.
 -- actions.cds=shadow_dance,use_off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
 -- # (Unless already up because we took Shadow Focus) use Symbols off-gcd before the first Shuriken Storm from Tornado comes in.
 -- actions.cds+=/symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
--- actions.cds+=/flagellation,if=variable.snd_condition&!stealthed.mantle
--- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
+-- actions.cds+=/flagellation,if=variable.snd_condition&!stealthed.mantle&(!runeforge.obedience|buff.symbols_of_death.up&combo_points>=5)
 -- actions.cds+=/vanish,if=(runeforge.mark_of_the_master_assassin&combo_points.deficit<=1-talent.deeper_strategem.enabled|runeforge.deathly_shadows&combo_points<1)&buff.symbols_of_death.up&buff.shadow_dance.up&master_assassin_remains=0&buff.deathly_shadows.down
 -- # Pool for Tornado pre-SoD with ShD ready when not running SF.
 -- actions.cds+=/pool_resource,for_next=1,if=talent.shuriken_tornado.enabled&!talent.shadow_focus.enabled
 -- # Use Tornado pre SoD when we have the energy whether from pooling without SF or just generally.
--- actions.cds+=/shuriken_tornado,if=energy>=60&variable.snd_condition&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1
+-- actions.cds+=/shuriken_tornado,if=energy>=60&variable.snd_condition&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1&(!runeforge.obedience|debuff.flagellation.up)&combo_points<=2&(!buff.premeditation.up|spell_targets.shuriken_storm>4)
 -- actions.cds+=/serrated_bone_spike,cycle_targets=1,if=variable.snd_condition&!dot.serrated_bone_spike_dot.ticking&target.time_to_die>=21|fight_remains<=5&spell_targets.shuriken_storm<3
 -- actions.cds+=/sepsis,if=variable.snd_condition&combo_points.deficit>=1
 -- # Use Symbols on cooldown (after first SnD) unless we are going to pop Tornado and do not have Shadow Focus.
--- actions.cds+=/symbols_of_death,if=variable.snd_condition&(talent.enveloping_shadows.enabled|cooldown.shadow_dance.charges>=1)&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)
+-- actions.cds+=/symbols_of_death,if=variable.snd_condition&(talent.enveloping_shadows.enabled|cooldown.shadow_dance.charges>=1)&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)&(!runeforge.obedience|cooldown.flagellation.remains>10|cooldown.flagellation.up&combo_points>=5)
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or not stealthed without any CP.
--- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.all&combo_points.deficit>=cp_max_spend)
+-- actions.cds+=/marked_for_death,line_cd=1.5,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.all&combo_points.deficit>=cp_max_spend)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP.
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend
--- actions.cds+=/shadow_blades,if=variable.snd_condition&combo_points.deficit>=2
--- actions.cds+=/echoing_reprimand,if=variable.snd_condition&combo_points.deficit>=2&(variable.use_priority_rotation|spell_targets.shuriken_storm<=4)
+-- actions.cds+=/shadow_blades,if=variable.snd_condition&combo_points.deficit>=2&(cooldown.symbols_of_death.remains<1|buff.symbols_of_death.up|fight_remains<=20)
+-- actions.cds+=/echoing_reprimand,if=variable.snd_condition&combo_points.deficit>=2&(variable.use_priority_rotation|spell_targets.shuriken_storm<=4|runeforge.resounding_clarity)
 -- # With SF, if not already done, use Tornado with SoD up.
--- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&variable.snd_condition&buff.symbols_of_death.up
+-- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&variable.snd_condition&buff.symbols_of_death.up&combo_points<=2&(!buff.premeditation.up|spell_targets.shuriken_storm>4)
 -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
+-- actions.cds+=/fleshcraft,if=(soulbind.pustule_eruption|soulbind.volatile_solvent)&energy.deficit>=30&!stealthed.all&buff.symbols_of_death.down
 -- actions.cds+=/potion,if=buff.bloodlust.react|fight_remains<30|buff.symbols_of_death.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=10)
 -- actions.cds+=/blood_fury,if=buff.symbols_of_death.up
 -- actions.cds+=/berserking,if=buff.symbols_of_death.up
@@ -952,14 +968,14 @@ HR.SetAPL(261, APL, Init)
 -- actions.cds+=/ancestral_call,if=buff.symbols_of_death.up
 -- # Default fallback for usable items: Use with Symbols of Death.
 -- actions.cds+=/use_items,if=buff.symbols_of_death.up|fight_remains<20
---
+
 -- # Finishers
 -- # While using Premeditation, avoid casting Slice and Dice when Shadow Dance is soon to be used, except for Kyrian
 -- actions.finish=variable,name=premed_snd_condition,value=talent.premeditation.enabled&spell_targets.shuriken_storm<(5-covenant.necrolord)&!covenant.kyrian
 -- actions.finish+=/slice_and_dice,if=!variable.premed_snd_condition&spell_targets.shuriken_storm<6&!buff.shadow_dance.up&buff.slice_and_dice.remains<fight_remains&refreshable
 -- actions.finish+=/slice_and_dice,if=variable.premed_snd_condition&cooldown.shadow_dance.charges_fractional<1.75&buff.slice_and_dice.remains<cooldown.symbols_of_death.remains&(cooldown.shadow_dance.ready&buff.symbols_of_death.remains-buff.shadow_dance.remains<1.2)
 -- # Helper Variable for Rupture. Skip during Master Assassin or during Dance with Dark and no Nightstalker.
--- actions.finish+=/variable,name=skip_rupture,value=master_assassin_remains>0|!talent.nightstalker.enabled&talent.dark_shadow.enabled&buff.shadow_dance.up|spell_targets.shuriken_storm>=5
+-- actions.finish+=/variable,name=skip_rupture,value=master_assassin_remains>0|!talent.nightstalker.enabled&talent.dark_shadow.enabled&buff.shadow_dance.up|spell_targets.shuriken_storm>=(5-runeforge.finality)
 -- # Keep up Rupture if it is about to run out.
 -- actions.finish+=/rupture,if=(!variable.skip_rupture|variable.use_priority_rotation)&target.time_to_die-remains>6&refreshable
 -- actions.finish+=/secret_technique
@@ -967,9 +983,9 @@ HR.SetAPL(261, APL, Init)
 -- actions.finish+=/rupture,cycle_targets=1,if=!variable.skip_rupture&!variable.use_priority_rotation&spell_targets.shuriken_storm>=2&target.time_to_die>=(5+(2*combo_points))&refreshable
 -- # Refresh Rupture early if it will expire during Symbols. Do that refresh if SoD gets ready in the next 5s.
 -- actions.finish+=/rupture,if=!variable.skip_rupture&remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
--- actions.finish+=/black_powder,if=!variable.use_priority_rotation&spell_targets>=4-debuff.find_weakness.down
+-- actions.finish+=/black_powder,if=!variable.use_priority_rotation&spell_targets>=3
 -- actions.finish+=/eviscerate
---
+
 -- # Stealth Cooldowns
 -- # Helper Variable
 -- actions.stealth_cds=variable,name=shd_threshold,value=cooldown.shadow_dance.charges_fractional>=1.75
@@ -986,14 +1002,15 @@ HR.SetAPL(261, APL, Init)
 -- actions.stealth_cds+=/shadow_dance,if=variable.shd_combo_points&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)
 -- # Burn remaining Dances before the fight ends if SoD won't be ready in time.
 -- actions.stealth_cds+=/shadow_dance,if=variable.shd_combo_points&fight_remains<cooldown.symbols_of_death.remains
---
+
 -- # Stealthed Rotation
 -- # If Stealth/vanish are up, use Shadowstrike to benefit from the passive bonus and Find Weakness, even if we are at max CP (unless using Master Assassin)
 -- actions.stealthed=shadowstrike,if=(buff.stealth.up|buff.vanish.up)&master_assassin_remains=0
+-- actions.stealthed+=/call_action_list,name=finish,if=effective_combo_points>=cp_max_spend
 -- # Finish at 3+ CP without DS / 4+ with DS with Shuriken Tornado buff up to avoid some CP waste situations.
 -- actions.stealthed+=/call_action_list,name=finish,if=buff.shuriken_tornado.up&combo_points.deficit<=2
 -- # Also safe to finish at 4+ CP with exactly 4 targets. (Same as outside stealth.)
--- actions.stealthed+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&combo_points>=4
+-- actions.stealthed+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&effective_combo_points>=4
 -- # Finish at 4+ CP without DS, 5+ with DS, and 6 with DS after Vanish
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&buff.vanish.up)
 -- actions.stealthed+=/shadowstrike,if=stealthed.sepsis&spell_targets.shuriken_storm<4
@@ -1002,9 +1019,10 @@ HR.SetAPL(261, APL, Init)
 -- actions.stealthed+=/shadowstrike,cycle_targets=1,if=!variable.use_priority_rotation&debuff.find_weakness.remains<1&spell_targets.shuriken_storm<=3&target.time_to_die-remains>6
 -- # For priority rotation, use Shadowstrike over Storm with WM against up to 4 targets or if FW is running off (on any amount of targets)
 -- actions.stealthed+=/shadowstrike,if=variable.use_priority_rotation&(debuff.find_weakness.remains<1|talent.weaponmaster.enabled&spell_targets.shuriken_storm<=4)
--- actions.stealthed+=/shuriken_storm,if=spell_targets>=3+(buff.the_rotten.up|runeforge.akaaris_soul_fragment&conduit.deeper_daggers.rank>=7)&(buff.symbols_of_death_autocrit.up|!buff.premeditation.up|spell_targets>=5)
+-- actions.stealthed+=/shuriken_storm,if=spell_targets>=3+(buff.the_rotten.up|runeforge.akaaris_soul_fragment)&(buff.symbols_of_death_autocrit.up|!buff.premeditation.up|spell_targets>=5)
 -- # Shadowstrike to refresh Find Weakness and to ensure we can carry over a full FW into the next SoD if possible.
 -- actions.stealthed+=/shadowstrike,if=debuff.find_weakness.remains<=1|cooldown.symbols_of_death.remains<18&debuff.find_weakness.remains<cooldown.symbols_of_death.remains
 -- actions.stealthed+=/gloomblade,if=buff.perforated_veins.stack>=5&conduit.perforated_veins.rank>=13
 -- actions.stealthed+=/shadowstrike
 -- actions.stealthed+=/cheap_shot,if=!target.is_boss&combo_points.deficit>=1&buff.shot_in_the_dark.up&energy.time_to_40>gcd.max
+

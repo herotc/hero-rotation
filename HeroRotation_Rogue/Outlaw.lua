@@ -285,10 +285,6 @@ local function CDs ()
     if CDsON() and S.Flagellation:IsReady() and not Target:DebuffUp(S.Flagellation) then
       if HR.Cast(S.Flagellation, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation" end
     end
-    -- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
-    if S.FlagellationCleanse:IsReady() and Target:DebuffUp(S.Flagellation) and Target:DebuffRemains(S.Flagellation) < 2 then
-      if HR.Cast(S.FlagellationCleanse, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation Cleanse" end
-    end
     -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up
     if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush) then
       if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end

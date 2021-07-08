@@ -196,7 +196,7 @@ Spell.Rogue.Outlaw = {
   -- Covenants (Shadowlands)
   EchoingReprimand        = Spell(323547),
   Flagellation            = Spell(323654),
-  FlagellationCleanse     = Spell(345569),
+  FlagellationBuff        = Spell(345569),
   Sepsis                  = Spell(328305),
   SepsisBuff              = Spell(347037),
   SerratedBoneSpike       = Spell(328547),
@@ -291,13 +291,15 @@ Spell.Rogue.Subtlety = {
   -- Covenants (Shadowlands)
   EchoingReprimand        = Spell(323547),
   Flagellation            = Spell(323654),
-  FlagellationCleanse     = Spell(345569),
+  FlagellationBuff        = Spell(345569),
   Sepsis                  = Spell(328305),
   SepsisBuff              = Spell(347037),
   SerratedBoneSpike       = Spell(328547),
   SerratedBoneSpikeDebuff = Spell(324073),
   -- Soulbinds/Conduits (Shadowlands)
   DeeperDaggers           = Spell(341549),
+  LeadbyExample           = Spell(342156),
+  LeadbyExampleBuff       = Spell(342181),
   -- Legendaries (Shadowlands)
   DeathlyShadowsBuff      = Spell(341202),
   FinalityBlackPowder     = Spell(340603),
