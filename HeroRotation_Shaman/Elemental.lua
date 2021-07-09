@@ -225,6 +225,8 @@ local function IsViable(spell)
     -- d) TODO: you are casting something else, but you will have >= 1 charge at the end of the cast of the spell
     --    Implementing d) will require something like LavaBurstChargesFractionalP(); this is not hard but I haven't done it.
     return BaseCheck and MovementPredicate and (a or b or c)
+  elseif spell == S.PrimordialWave then
+    return BaseCheck and not Player:BuffUp(S.PrimordialWaveBuff)
   else
     return BaseCheck
   end
@@ -340,11 +342,11 @@ local function Precombat()
   if IsViable(S.LavaBurst) and not Player:IsCasting(S.LavaBurst) and (not S.ElementalBlast:IsAvailable() or (S.ElementalBlast:IsAvailable() and not IsViable(S.ElementalBlast))) then
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "Precombat Lavaburst" end
   end
-  if Player:IsCasting(S.LavaBurst) and IsViable(S.PrimordialWave) then
-    if Cast(S.PrimordialWave, nil, nil, not Target:IsSpellInRange(S.PrimordialWave)) then return "Precombat Primwave"; end
-  end
   if Player:IsCasting(S.LavaBurst) and S.FlameShock:CooldownRemains() == 0 then 
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "Precombat Flameshock" end
+  end
+  if Player:IsCasting(S.LavaBurst) and IsViable(S.PrimordialWave) then
+    if Cast(S.PrimordialWave, nil, nil, not Target:IsSpellInRange(S.PrimordialWave)) then return "Precombat Primwave"; end
   end
 end
 
