@@ -81,6 +81,14 @@ HR.GUISettings.APL.Shaman = {
       -- Racials
       -- Abilities
     }
+  },
+  Restoration = {
+    GCDasOffGCD = {
+
+    },
+    OffGCDasOffGCD = {
+
+    }
   }
 }
 
@@ -91,6 +99,7 @@ local ARPanel = HR.GUI.Panel
 local CP_Shaman = CreateChildPanel(ARPanel, "Shaman")
 local CP_Enhancement = CreateChildPanel(CP_Shaman, "Enhancement")
 local CP_Elemental = CreateChildPanel(CP_Shaman, "Elemental")
+local CP_Restoration = CreateChildPanel(CP_Shaman, "Restoration")
 
 -- Commons
 CreateARPanelOptions(CP_Shaman, "APL.Shaman.Commons")
@@ -103,3 +112,6 @@ CreatePanelOption("CheckButton", CP_Enhancement, "APL.Shaman.Enhancement.PreferE
 CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental")
 CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Elemental.PreferEarthShield", "Prefer Earth Shield", "Prefer using Earth Shield over Lightning Shield, when it's available.")
 CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Elemental.ShowMovementSpells", "Show Movement Spells", "Show Flame Shock and Frost Shock suggestions while moving. Note: This tends to make the rotation choppy when making small movements.")
+
+-- Restoration
+CreateARPanelOptions(CP_Restoration, "APL.Shaman.Restoration")

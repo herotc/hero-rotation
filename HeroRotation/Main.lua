@@ -345,7 +345,7 @@
     -- Shaman
       [262]   = "HeroRotation_Shaman",        -- Elemental
       [263]   = "HeroRotation_Shaman",        -- Enhancement
-      [264]   = false,                          -- Restoration
+      [264]   = "HeroRotation_Shaman",        -- Restoration
     -- Warlock
       [265]   = "HeroRotation_Warlock",       -- Affliction
       [266]   = "HeroRotation_Warlock",       -- Demonology

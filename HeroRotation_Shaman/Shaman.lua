@@ -208,11 +208,33 @@ Spell.Shaman.Elemental = {
 
 }
 
+Spell.Shaman.Restoration = {
+  LightningBolt                         = Spell(188196),
+  ChainLightning                        = Spell(188443),
+  FlameShock                            = Spell(188389),
+  FlameShockDebuff                      = Spell(188389),
+  FrostShock                            = Spell(196840),
+  LavaBurst                             = Spell(51505),
+  LavaSurgeBuff                         = Spell(77762),
+
+  WindShear                             = Spell(57994),
+  SpiritwalkersGrace                    = Spell(79206),
+  SpiritwalkersGraceBuff                = Spell(79206),
+
+  Fleshcraft                            = Spell(324631),
+  Pool                                  = Spell(999910),
+
+}
+
 if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Enhancement = {
   PotionofSpectralAgility               = Item(171270)
 }
 
 Item.Shaman.Elemental = {
+  PotionofSpectralIntellect             = Item(171273)
+}
+
+Item.Shaman.Restoration = {
   PotionofSpectralIntellect             = Item(171273)
 }
