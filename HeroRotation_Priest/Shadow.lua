@@ -38,6 +38,7 @@ local OnUseExcludes = {
   I.GlyphofAssimilation:ID(),
   I.InscrutableQuantumDevice:ID(),
   I.MacabreSheetMusic:ID(),
+  I.ShadowedOrbofTorment:ID(),
   I.SinfulGladiatorsBadgeofFerocity:ID(),
   I.SoullettingRuby:ID(),
   I.SunbloodAmethyst:ID()
@@ -168,7 +169,7 @@ local function EvaluateTargetIfFilterSoullettingRuby230(TargetUnit)
 end
 
 local function EvaluateTargetIfSoullettingRuby232(TargetUnit)
-  return (Player:BuffUp(S.PowerInfusionBuff) or not Settings.Shadow.SelfPI)
+  return (Player:BuffUp(S.PowerInfusionBuff) or not Settings.Shadow.SelfPI or I.ShadowedOrbofTorment:IsEquipped())
 end
 
 local function Precombat()
@@ -188,6 +189,10 @@ local function Precombat()
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastable() and CDsON() then
       if Cast(S.ArcaneTorrent, nil, nil, not Target:IsSpellInRange(S.ArcaneTorrent)) then return "arcane_torrent 6"; end
+    end
+    -- use_item,name=shadowed_orb_of_torment
+    if Settings.Commons.Enabeld.Trinkets and I.ShadowedOrbofTorment:IsEquippedAndReady() then
+      if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment 8"; end
     end
     -- variable,name=mind_sear_cutoff,op=set,value=2
     VarMindSearCutoff = 2
@@ -216,43 +221,47 @@ end
 
 local function DmgTrinkets()
   -- use_item,name=darkmoon_deck_putrescence
-  if I.DarkmoonDeckPutrescence:IsReady() then
+  if I.DarkmoonDeckPutrescence:IsEquippedAndReady() then
     if Cast(I.DarkmoonDeckPutrescence, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "darkmoon_deck_putrescence"; end
   end
   -- use_item,name=sunblood_amethyst
-  if I.SunbloodAmethyst:IsReady() then
+  if I.SunbloodAmethyst:IsEquippedAndReady() then
     if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "sunblood_amethyst"; end
   end
   -- use_item,name=glyph_of_assimilation
-  if I.GlyphofAssimilation:IsReady() then
+  if I.GlyphofAssimilation:IsEquippedAndReady() then
     if Cast(I.GlyphofAssimilation, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "glyph_of_assimilation"; end
   end
   -- use_item,name=dreadfire_vessel
-  if I.DreadfireVessel:IsReady() then
+  if I.DreadfireVessel:IsEquippedAndReady() then
     if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel"; end
   end
 end
 
 local function Trinkets()
   -- use_item,name=empyreal_ordnance,if=cooldown.void_eruption.remains<=12|cooldown.void_eruption.remains>27
-  if I.EmpyrealOrdinance:IsReady() and (S.VoidEruption:CooldownRemains() <= 12 or S.VoidEruption:CooldownRemains() > 27) then
+  if I.EmpyrealOrdinance:IsEquippedAndReady() and (S.VoidEruption:CooldownRemains() <= 12 or S.VoidEruption:CooldownRemains() > 27) then
     if Cast(I.EmpyrealOrdinance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "empyreal_ordnance"; end
   end
   -- use_item,name=inscrutable_quantum_device,if=buff.voidform.up&buff.power_infusion.up|fight_remains<=20|buff.power_infusion.up&cooldown.void_eruption.remains+15>fight_remains|buff.voidform.up&cooldown.power_infusion.remains+15>fight_remains|(cooldown.power_infusion.remains>=10&cooldown.void_eruption.remains>=10)&fight_remains>=190
-  if I.InscrutableQuantumDevice:IsReady() and (Player:BuffUp(S.VoidformBuff) and Player:BuffUp(S.PowerInfusionBuff) or HL.BossFilteredFightRemains("<=", 20) or Player:BuffUp(S.PowerInfusionBuff) and HL.BossFilteredFightRemains("<", S.VoidEruption:CooldownRemains() + 15) or Player:BuffUp(S.VoidformBuff) and HL.BossFilteredFightRemains("<", S.PowerInfusion:CooldownRemains() + 15) or (S.PowerInfusion:CooldownRemains() >= 10 and S.VoidEruption:CooldownRemains() >= 10) and HL.BossFilteredFightRemains(">=", 190)) then
+  if I.InscrutableQuantumDevice:IsEquippedAndReady() and (Player:BuffUp(S.VoidformBuff) and Player:BuffUp(S.PowerInfusionBuff) or HL.BossFilteredFightRemains("<=", 20) or Player:BuffUp(S.PowerInfusionBuff) and HL.BossFilteredFightRemains("<", S.VoidEruption:CooldownRemains() + 15) or Player:BuffUp(S.VoidformBuff) and HL.BossFilteredFightRemains("<", S.PowerInfusion:CooldownRemains() + 15) or (S.PowerInfusion:CooldownRemains() >= 10 and S.VoidEruption:CooldownRemains() >= 10) and HL.BossFilteredFightRemains(">=", 190)) then
     if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device"; end
   end
   -- use_item,name=macabre_sheet_music,if=cooldown.void_eruption.remains>10
-  if I.MacabreSheetMusic:IsReady() and (S.VoidEruption:CooldownRemains() > 10) then
+  if I.MacabreSheetMusic:IsEquippedAndReady() and (S.VoidEruption:CooldownRemains() > 10) then
     if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music"; end
   end
-  -- use_item,name=soulletting_ruby,if=buff.power_infusion.up|!priest.self_power_infusion,target_if=min:target.health.pct
-  if I.SoullettingRuby:IsReady() then
+  -- use_item,name=soulletting_ruby,if=buff.power_infusion.up|!priest.self_power_infusion|equipped.shadowed_orb_of_torment,target_if=min:target.health.pct
+  if I.SoullettingRuby:IsEquippedAndReady() then
     if Everyone.CastTargetIf(I.SoullettingRuby, Enemies40y, "min", EvaluateTargetIfFilterSoullettingRuby230, EvaluateTargetIfSoullettingRuby232) then return "soulletting_ruby"; end
   end
   -- use_item,name=sinful_gladiators_badge_of_ferocity,if=cooldown.void_eruption.remains>=10
-  if I.SinfulGladiatorsBadgeofFerocity:IsReady() and (S.VoidEruption:CooldownRemains() >= 10) then
+  if I.SinfulGladiatorsBadgeofFerocity:IsEquippedAndReady() and (S.VoidEruption:CooldownRemains() >= 10) then
     if Cast(I.SinfulGladiatorsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sinful_gladiators_badge_of_ferocity"; end
+  end
+  -- use_item,name=shadowed_orb_of_torment,if=!buff.voidform.up|(prev_gcd.1.void_bolt)
+  if I.ShadowedOrbofTorment:IsEquippedAndReady() and (Player:BuffDown(S.VoidformBuff) or Player:PrevGCD(1, S.VoidBolt)) then
+    if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment"; end
   end
   -- call_action_list,name=dmg_trinkets,if=(!talent.hungering_void.enabled|debuff.hungering_void.up)&(buff.voidform.up|cooldown.void_eruption.remains>10)
   if ((not S.HungeringVoid:IsAvailable() or Target:DebuffUp(S.HungeringVoidDebuff)) and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() > 10)) then
