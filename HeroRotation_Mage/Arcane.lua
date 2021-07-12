@@ -881,7 +881,7 @@ local function Harmony()
   --evocation,if=mana.pct<=30
   --&variable.outside_of_cooldowns&(talent.rune_of_power&cooldown.rune_of_power.remains<10)
   if S.Evocation:IsCastable() and Player:ManaPercentage() < 30
-  and var_outside_of_cooldowns and (S.RuneOfPower:IsAvailable() and S.RuneOfPower:CooldownRemains() < 10) then
+  and var_outside_of_cooldowns and (S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() < 10) then
     if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation harmony 2"; end
   end
   --arcane_missiles,if=(variable.stack_harmony|time<10)&buff.arcane_harmony.stack<16,chain=1
@@ -909,11 +909,11 @@ local function Harmony()
     if Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power harmony 7"; end
   end
   --rune_of_power,if=variable.empowered_barrage&cooldown.radiant_spark.remains<=execute_time&variable.time_until_ap>=20&(!conduit.arcane_prodigy|!variable.always_sync_cooldowns|cooldown.touch_of_the_magi.remains<=(execute_time*2))
-  if S.RuneofPower:IsCastable() and var_empowered_barrage and S.RadiantSpark:CooldownRemains() <= S.RuneOfPower:ExecuteTime() and var_time_until_ap >= 20 and (not S.ArcaneProdigy:ConduitEnabled() or not var_always_sync_cooldowns or S.TouchoftheMagi:CooldownRemains() <= (S.RuneofPower:ExecuteTime() * 2)) then
+  if S.RuneofPower:IsCastable() and var_empowered_barrage and S.RadiantSpark:CooldownRemains() <= S.RuneofPower:ExecuteTime() and var_time_until_ap >= 20 and (not S.ArcaneProdigy:ConduitEnabled() or not var_always_sync_cooldowns or S.TouchoftheMagi:CooldownRemains() <= (S.RuneofPower:ExecuteTime() * 2)) then
     if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power harmony 8"; end
   end
   --radiant_spark,if=variable.empowered_barrage&prev_gcd.1.rune_of_power
-  if S.RadiantSpark:IsCastable() and var_empowered_barrage and Player:IsCasting(S.RuneOfPower) then
+  if S.RadiantSpark:IsCastable() and var_empowered_barrage and Player:IsCasting(S.RuneofPower) then
     if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark harmony 9"; end
   end
   --touch_of_the_magi,if=variable.just_used_spark&!variable.holding_totm
@@ -936,7 +936,7 @@ local function Harmony()
   --&(!talent.rune_of_power|cooldown.rune_of_power.remains>5)&variable.estimated_ap_cooldown>=30
   --&(!conduit.arcane_prodigy|!variable.always_sync_cooldowns)
   if S.RadiantSpark:IsCastable() and var_empowered_barrage and (Player:ArcaneCharges() >= 2 or S.ArcaneOrb:CooldownRemains() == 0) 
-  and (not S.RuneOfPower:IsAvailable() or S.RuneOfPower:CooldownRemains() > 5) and var_estimated_ap_cooldown >= 30
+  and (not S.RuneofPower:IsAvailable() or S.RuneofPower:CooldownRemains() > 5) and var_estimated_ap_cooldown >= 30
   and (not S.ArcaneProdigy:ConduitEnabled() or not var_always_sync_cooldowns) then
     if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark harmony 14"; end
   end
@@ -1064,7 +1064,7 @@ local function Aoe()
   --mirrors_of_torment,if=cooldown.arcane_power.remains<=8&cooldown.touch_of_the_magi.remains<=8
   --&(buff.arcane_charge.stack<=variable.aoe_totm_max_charges&((talent.rune_of_power&cooldown.rune_of_power.remains<=gcd&cooldown.arcane_power.remains>5)|(!talent.rune_of_power&cooldown.arcane_power.remains>5)|cooldown.arcane_power.remains<=gcd))
   if S.MirrorsofTorment:IsCastable() and S.ArcanePower:CooldownRemains() <= 8 and S.TouchoftheMagi:CooldownRemains() <= 8 
-  and (Player:ArcaneCharges() <= var_aoe_totm_max_charges and ((S.RuneOfPower:IsAvailable() and S.RuneOfPower:CooldownRemains() <= Player:GCD() and S.ArcanePower:CooldownRemains() > 5) or (not S.RuneOfPower:IsAvailable() and S.ArcanePower:CooldownRemains() > 5) or S.ArcanePower:CooldownRemains() <= Player:GCD())) then
+  and (Player:ArcaneCharges() <= var_aoe_totm_max_charges and ((S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= Player:GCD() and S.ArcanePower:CooldownRemains() > 5) or (not S.RuneofPower:IsAvailable() and S.ArcanePower:CooldownRemains() > 5) or S.ArcanePower:CooldownRemains() <= Player:GCD())) then
     if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment Aoe 9"; end
   end
   --evocation,if=time>30&runeforge.siphon_storm&covenant.venthyr&prev_gcd.1.mirrors_of_torment
