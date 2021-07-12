@@ -171,7 +171,7 @@ local function Precombat()
       if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
     end
     -- variable,name=first_tyrant_time,op=set,value=12
-    VarFirstTyrantTime = 12
+    VarFirstTyrantTime = 12 - S.ShadowBolt:ExecuteTime()
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,name=tome_of_monstrous_constructions
       if I.TomeofMonstrousConstructions:IsEquippedAndReady() then
@@ -202,12 +202,12 @@ local function Covenant()
   if S.SoulRot:IsReady() and (S.WildHuntTactics:SoulbindEnabled()) then
     if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot covenant 6"; end
   end
-  -- decimating_bolt,if=soulbind.lead_by_example&(pet.demonic_tyrant.active&soul_shard<2|cooldown.summon_demonic_tyrant.remains_expected>40)
-  if S.DecimatingBolt:IsReady() and (S.LeadByExample:SoulbindEnabled() and (DemonicTyrantTime() > 0 and Player:SoulShardsP() < 2 or S.SummonDemonicTyrant:CooldownRemains() > 40)) then
+  -- decimating_bolt,if=(soulbind.lead_by_example|soulbind.kevins_oozeling)&(pet.demonic_tyrant.active&soul_shard<2|cooldown.summon_demonic_tyrant.remains_expected>40)
+  if S.DecimatingBolt:IsReady() and ((S.LeadByExample:SoulbindEnabled() or S.KevinsOozeling:SoulbindEnabled()) and (DemonicTyrantTime() > 0 and Player:SoulShardsP() < 2 or S.SummonDemonicTyrant:CooldownRemains() > 40)) then
     if Cast(S.DecimatingBolt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt covenant 8"; end
   end
-  -- decimating_bolt,if=!soulbind.lead_by_example&!pet.demonic_tyrant.active
-  if S.DecimatingBolt:IsReady() and (not S.LeadByExample:SoulbindEnabled() and DemonicTyrantTime() == 0) then
+  -- decimating_bolt,if=(soulbind.forgeborne_reveries|(soulbind.volatile_solvent&!soulbind.kevins_oozeling))&!pet.demonic_tyrant.active
+  if S.DecimatingBolt:IsReady() and ((S.ForgeborneReveries:SoulbindEnabled() or (S.VolatileSolvent:SoulbindEnabled() and not S.KevinsOozeling:SoulbindEnabled())) and DemonicTyrantTime() == 0) then
     if Cast(S.DecimatingBolt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt covenant 10"; end
   end
   -- fleshcraft,if=soulbind.volatile_solvent,cancel_if=buff.volatile_solvent_humanoid.up

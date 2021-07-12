@@ -73,7 +73,9 @@ Spell.Warlock.Demonology = {
   -- Soulbinds/Conduits
   CombatMeditation                      = Spell(328266),
   FieldofBlossoms                       = Spell(319191),
+  ForgeborneReveries                    = Spell(326514),
   GroveInvigoration                     = Spell(322721),
+  KevinsOozeling                        = Spell(352110),
   LeadByExample                         = Spell(342156),
   RefinedPalate                         = Spell(336243),
   VolatileSolvent                       = Spell(323074),
