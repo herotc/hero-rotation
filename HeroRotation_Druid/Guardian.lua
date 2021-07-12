@@ -41,6 +41,17 @@ local I = Item.Druid.Guardian
 local OnUseExcludes = {--  I.TrinketName:ID(),
 }
 
+-- Trinket Item Objects
+local equip = Player:GetEquipment()
+local trinket1 = Item(0)
+local trinket2 = Item(0)
+if equip[13] then
+  trinket1 = Item(equip[13])
+end
+if equip[14] then
+  trinket2 = Item(equip[14])
+end
+
 -- Rotation Variables
 local ActiveMitigationNeeded
 local IsTanking
@@ -55,6 +66,15 @@ local LuffaInfusedEmbraceEquipped = Player:HasLegendaryEquipped(58)
 
 -- Event Registrations
 HL:RegisterForEvent(function()
+  equip = Player:GetEquipment()
+  trinket1 = Item(0)
+  trinket2 = Item(0)
+  if equip[13] then
+    trinket1 = Item(equip[13])
+  end
+  if equip[14] then
+    trinket2 = Item(equip[14])
+  end
   LuffaInfusedEmbraceEquipped = Player:HasLegendaryEquipped(58)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -108,11 +128,11 @@ local function Precombat()
   -- prowl,if=druid.catweave_bear
   -- moonkin_form,if=(druid.owlweave_bear)|(covenant.night_fae&talent.balance_affinity.enabled)
   -- NOTE: Not handling cat-weaving or owl-weaving
-  -- bear_form,if=((!druid.owlweave_bear&!druid.catweave_bear)&(!covenant.night_fae))|((!druid.owlweave_bear&!druid.catweave_bear)&(covenant.night_fae&talent.restoration_affinity.enabled))
+  -- heart_of_the_Wild,if=talent.heart_of_the_wild.enabled&(druid.catweave_bear|druid.owlweave_bear|talent.balance_affinity.enabled)
+  -- bear_form,if=((!druid.owlweave_bear&!druid.catweave_bear)&(!covenant.night_fae))|((!druid.owlweave_bear&!druid.catweave_bear)&(covenant.night_fae&talent.restoration_affinity.enabled)|covenant.venthyr)
   if S.BearForm:IsCastable() and (Player:BuffDown(S.BearForm)) then
     if Cast(S.BearForm) then return "bear_form precombat 2"; end
   end
-  -- heart_of_the_Wild,if=talent.heart_of_the_wild.enabled&(druid.catweave_bear|druid.owlweave_bear|talent.balance_affinity.enabled)
   -- wrath,if=druid.owlweave_bear&!covenant.night_fae
   -- starfire,if=druid.owlweave_bear&covenant.night_fae
   -- NOTE: Not handling cat-weaving or owl-weaving
@@ -171,33 +191,66 @@ local function Bear()
   if S.BearForm:IsCastable() and (Player:BuffDown(S.BearForm)) then
     if Cast(S.BearForm) then return "bear_form bear 2"; end
   end
+  -- heart_of_the_wild,if=talent.heart_of_the_wild.enabled&(talent.balance_affinity.enabled)&covenant.venthyr
+  if S.HeartoftheWild:IsCastable() and (S.BalanceAffinity:IsAvailable() and Player:Covenant() == "Venthyr") then
+    if Cast(S.HeartoftheWild, Settings.Guardian.GCDasOffGCD.HeartOfTheWild) then return "heart_of_the_wild bear 3"; end
+  end
+  -- moonfire,if=((buff.galactic_guardian.up)&active_enemies<2)|((buff.galactic_guardian.up)&!dot.moonfire.ticking&active_enemies>1&target.time_to_die>12)
+  if S.Moonfire:IsCastable() and ((Player:BuffUp(S.GalacticGuardianBuff) and MeleeEnemies8yCount < 2) or (Player:BuffUp(S.GalacticGuardianBuff) and Target:DebuffDown(S.MoonfireDebuff) and MeleeEnemies8yCount > 1 and Target:TimeToDie() > 12)) then
+    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 4"; end
+  end
+  -- moonfire,if=(dot.moonfire.remains<=3&(buff.galactic_guardian.up)&active_enemies>5&target.time_to_die>12)
+  if S.Moonfire:IsCastable() and (Target:DebuffRemains(S.MoonfireDebuff) <= 3 and Player:BuffUp(S.GalacticGuardianBuff) and MeleeEnemies8yCount > 5 and Target:TimeToDie() > 12) then
+    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 5"; end
+  end
+  -- moonfire,if=(refreshable&active_enemies<2&target.time_to_die>12)|(!dot.moonfire.ticking&active_enemies>1&target.time_to_die>12)
+  if S.Moonfire:IsCastable() and ((Target:DebuffRefreshable(S.MoonfireDebuff) and MeleeEnemies8yCount < 2 and Target:TimeToDie() > 12) or (Target:DebuffDown(S.MoonfireDebuff) and MeleeEnemies8yCount > 1 and Target:TimeToDie() > 12)) then
+    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 6"; end
+  end
   -- ravenous_frenzy
   if S.RavenousFrenzy:IsCastable() then
-    if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy bear 4"; end
+    if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy bear 7"; end
+  end
+  -- use_item,name=jotungeirr_destinys_call,if=covenant.venthyr
+  if I.Jotungeirr:IsEquippedAndReady() and (Player:Covenant() == "Venthyr") then
+    if Cast(I.Jotungeirr) then return "jotungeirr_destinys_call bear 8"; end
+  end
+  -- use_item,slot=trinket1,if=!buff.prowl.up&covenant.venthyr
+  if trinket1:IsEquippedAndReady() and (Player:Covenant() == "Venthyr") then
+    if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 bear 9"; end
+  end
+  -- use_item,slot=trinket2,if=!buff.prowl.up&covenant.venthyr
+  if trinket2:IsEquippedAndReady() and (Player:Covenant() == "Venthyr") then
+    if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 bear 10"; end
+  end
+  -- potion,if=covenant.venthyr&buff.incarnation.remains>=24&buff.incarnation.remains<=25
+  -- Note: Extended time frame to better handle a real player's reaction time
+  if Settings.Commons.Enabled.Potions and I.PotionofPhantomFire:IsReady() and (Player:Covenant() == "Venthyr" and Player:BuffRemains(S.IncarnationBuff) >= 23 and Player:BuffRemains(S.IncarnationBuff) <= 26) then
+    if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion bear 11"; end
   end
   -- convoke_the_spirits,if=!druid.catweave_bear&!druid.owlweave_bear
   if S.ConvoketheSpirits:IsCastable() then
-    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInMeleeRange(5)) then return "convoke_the_spirits bear 6"; end
+    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInMeleeRange(5)) then return "convoke_the_spirits bear 12"; end
   end
   -- berserk_bear,if=(buff.ravenous_frenzy.up|!covenant.venthyr)
   if S.Berserk:IsCastable() and IsTanking and (Player:BuffUp(S.RavenousFrenzyBuff) or Player:Covenant() ~= "Venthyr") then
-    if Cast(S.Berserk, Settings.Guardian.OffGCDasOffGCD.Berserk) then return "berserk bear 8"; end
+    if Cast(S.Berserk, Settings.Guardian.OffGCDasOffGCD.Berserk) then return "berserk bear 13"; end
   end
   -- incarnation,if=(buff.ravenous_frenzy.up|!covenant.venthyr)
   if S.Incarnation:IsCastable() and IsTanking and (Player:BuffUp(S.RavenousFrenzyBuff) or Player:Covenant() ~= "Venthyr") then
-    if Cast(S.Incarnation, Settings.Guardian.OffGCDasOffGCD.Incarnation) then return "incarnation bear 10"; end
+    if Cast(S.Incarnation, Settings.Guardian.OffGCDasOffGCD.Incarnation) then return "incarnation bear 14"; end
   end
   -- berserking,if=(buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)
   if S.Berserking:IsCastable() and (Player:BuffUp(S.BerserkBuff) or Player:BuffUp(S.IncarnationBuff)) then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking bear 12"; end
+    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking bear 15"; end
   end
   -- empower_bond,if=(!druid.catweave_bear&!druid.owlweave_bear)|active_enemies>=2
   if S.EmpowerBond:IsCastable() then
-    if Cast(S.EmpowerBond, nil, Settings.Commons.DisplayStyle.Covenant) then return "empower_bond bear 14"; end
+    if Cast(S.EmpowerBond, nil, Settings.Commons.DisplayStyle.Covenant) then return "empower_bond bear 16"; end
   end
   -- barkskin,if=talent.brambles.enabled
   if S.Barkskin:IsCastable() and IsTanking and not Settings.Guardian.UseBarkskinDefensively then
-    if Cast(S.Barkskin, nil, Settings.Guardian.DisplayStyle.Defensives) then return "barkskin bear 16"; end
+    if Cast(S.Barkskin, nil, Settings.Guardian.DisplayStyle.Defensives) then return "barkskin bear 17"; end
   end
   -- adaptive_swarm,if=(!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>3)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<5&dot.adaptive_swarm_damage.ticking)
   if S.AdaptiveSwarm:IsCastable() and (Target:DebuffDown(S.AdaptiveSwarmDebuff) and not S.AdaptiveSwarm:InFlight() and (Target:DebuffDown(S.AdaptiveSwarmDebuff) or Player:BuffRemains(S.AdaptiveSwarmHeal) > 3) or Target:DebuffStack(S.AdaptiveSwarmDebuff) < 3 and Target:DebuffRemains(S.AdaptiveSwarmDebuff) < 5 and Target:DebuffUp(S.AdaptiveSwarmDebuff)) then
@@ -206,18 +259,6 @@ local function Bear()
   -- thrash_bear,target_if=refreshable|dot.thrash_bear.stack<3|(dot.thrash_bear.stack<4&runeforge.luffainfused_embrace.equipped)|active_enemies>=4
   if S.Thrash:IsCastable() then
     if Everyone.CastCycle(S.Thrash, MeleeEnemies8y, EvaluateCycleThrash, not Target:IsInMeleeRange(8)) then return "thrash bear 20"; end
-  end
-  -- moonfire,if=((buff.galactic_guardian.up)&active_enemies<2)|((buff.galactic_guardian.up)&!dot.moonfire.ticking&active_enemies>1&target.time_to_die>12)
-  if S.Moonfire:IsCastable() and ((Player:BuffUp(S.GalacticGuardianBuff) and MeleeEnemies8yCount < 2) or (Player:BuffUp(S.GalacticGuardianBuff) and Target:DebuffDown(S.MoonfireDebuff) and MeleeEnemies8yCount > 1 and Target:TimeToDie() > 12)) then
-    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 22"; end
-  end
-  -- moonfire,if=(dot.moonfire.remains<=3&(buff.galactic_guardian.up)&active_enemies>5&target.time_to_die>12)
-  if S.Moonfire:IsCastable() and (Target:DebuffRemains(S.MoonfireDebuff) <= 3 and Player:BuffUp(S.GalacticGuardianBuff) and MeleeEnemies8yCount > 5 and Target:TimeToDie() > 12) then
-    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 24"; end
-  end
-  -- moonfire,if=(refreshable&active_enemies<2&target.time_to_die>12)|(!dot.moonfire.ticking&active_enemies>1&target.time_to_die>12)
-  if S.Moonfire:IsCastable() and ((Target:DebuffRefreshable(S.MoonfireDebuff) and MeleeEnemies8yCount < 2 and Target:TimeToDie() > 12) or (Target:DebuffDown(S.MoonfireDebuff) and MeleeEnemies8yCount > 1 and Target:TimeToDie() > 12)) then
-    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 26"; end
   end
   -- fleshcraft,if=soulbind.pustule_eruption.enabled&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0)&(dot.moonfire.remains>=3)&(buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&buff.galactic_guardian.down))|soulbind.volatile_solvent.enabled,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent&(cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0)
   if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() and ((S.Thrash:CooldownRemains() > 0 and S.Mangle:CooldownRemains() > 0) and (Target:DebuffRemains(S.MoonfireDebuff) >= 3) and (Player:BuffDown(S.IncarnationBuff) and Player:BuffDown(S.BerserkBuff) and Player:BuffDown(S.GalacticGuardianBuff))) or S.VolatileSolvent:SoulbindEnabled()) then
@@ -333,20 +374,20 @@ local function APL()
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     end
     -- auto_attack,if=!buff.prowl.up
-    -- use_item,name=jotungeirr_destinys_call,if=!buff.prowl.up&(buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.down|covenant.night_fae&cooldown.convoke_the_spirits.remains<=1)
-    if I.Jotungeirr:IsEquippedAndReady() and (Player:BuffUp(S.BerserkBuff) or Player:BuffDown(S.IncarnationBuff) or Player:Covenant() == "Night Fae" and S.ConvoketheSpirits:CooldownRemains() <= 1) then
+    -- use_item,name=jotungeirr_destinys_call,if=!buff.prowl.up&!covenant.venthyr
+    if I.Jotungeirr:IsEquippedAndReady() and (Player:Covenant() ~= "Venthyr") then
       if Cast(I.Jotungeirr) then return "jotungeirr_destinys_call main"; end
     end
-    -- use_items,if=!buff.prowl.up|!buff.prowl.up&equipped.jotungeirr_destinys_call&(cooldown.berserk_bear.remains>30|cooldown.incarnation_guardian_of_ursoc.remains>30|covenant.night_fae&cooldown.convoke_the_spirits.remains>30)
-    -- Always assuming true, as we always assume Prowl is down
-    if Settings.Commons.Enabled.Trinkets then
-      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
-      end
+    -- use_item,slot=trinket1,if=!buff.prowl.up&!covenant.venthyr
+    if trinket1:IsEquippedAndReady() and (Player:Covenant() ~= "Venthyr") then
+      if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 main"; end
     end
-    -- potion,if=(((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)&(druid.catweave_bear|druid.owlweave_bear)&!buff.prowl.up)|((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!druid.catweave_bear&!druid.owlweave_bear)))
-    if Settings.Commons.Enabled.Potions and I.PotionofPhantomFire:IsReady() and (Player:BuffUp(S.BerserkBuff) or Player:BuffUp(S.Incarnation)) then
+    -- use_item,slot=trinket2,if=!buff.prowl.up&!covenant.venthyr
+    if trinket2:IsEquippedAndReady() and (Player:Covenant() ~= "Venthyr") then
+      if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 main"; end
+    end
+    -- potion,if=!covenant.venthyr&(((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)&(druid.catweave_bear|druid.owlweave_bear)&!buff.prowl.up)|((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!druid.catweave_bear&!druid.owlweave_bear)))
+    if Settings.Commons.Enabled.Potions and I.PotionofPhantomFire:IsReady() and (Player:Covenant() ~= "Venthyr" and (Player:BuffUp(S.BerserkBuff) or Player:BuffUp(S.Incarnation))) then
       if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main"; end
     end
     -- run_action_list,name=catweave,if=druid.catweave_bear&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=gcd+0.5&rage<40&buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&buff.galactic_guardian.down)|(buff.cat_form.up&energy>25)|(dot.rake.refreshable&dot.rip.refreshable)|(runeforge.oath_of_the_elder_druid.equipped&!buff.oath_of_the_elder_druid.up&(buff.cat_form.up&energy>20)&buff.heart_of_the_wild.remains<=10)|(covenant.kyrian&cooldown.empower_bond.remains<=1&active_enemies<2)|(buff.heart_of_the_wild.up&energy>90))

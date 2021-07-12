@@ -78,6 +78,7 @@ HR.GUISettings.APL.Druid = {
     },
     GCDasOffGCD = {
       FrenziedRegeneration = true,
+      HeartOfTheWild = true,
     },
     OffGCDasOffGCD = {
       Berserk = true,

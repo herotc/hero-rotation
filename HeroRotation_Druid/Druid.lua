@@ -191,8 +191,10 @@ Spell.Druid.Guardian = {
   ThrashDebuff                          = Spell(192090),
 
   -- Talents
+  BalanceAffinity                       = Spell(197488),
   BristlingFur                          = Spell(155835),
   GalacticGuardianBuff                  = Spell(213708),
+  HeartoftheWild                        = Spell(319454),
   Incarnation                           = Spell(102558),
   IncarnationBuff                       = Spell(102558),
   Pulverize                             = Spell(80313),
