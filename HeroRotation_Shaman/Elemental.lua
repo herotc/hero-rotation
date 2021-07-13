@@ -55,6 +55,7 @@ local DeeptremorStoneEquipped = Player:HasLegendaryEquipped(131)
 local SkybreakersEquipped = Player:HasLegendaryEquipped(134)
 local ElementalEquilibriumEquipped = Player:HasLegendaryEquipped(135)
 local EchoesofGreatSunderingEquipped = Player:HasLegendaryEquipped(136)
+local WindspeakersEquipped = Player:HasLegendaryEquipped(137)
 local CallOfFlameEquipped = S.CallOfFlame:ConduitEnabled()
 
 HL:RegisterForEvent(function()
@@ -62,6 +63,7 @@ HL:RegisterForEvent(function()
   SkybreakersEquipped = Player:HasLegendaryEquipped(134)
   ElementalEquilibriumEquipped = Player:HasLegendaryEquipped(135)
   EchoesofGreatSunderingEquipped = Player:HasLegendaryEquipped(136)
+  WindspeakersEquipped = Player:HasLegendaryEquipped(137)
   CallOfFlameEquipped = S.CallOfFlame:ConduitEnabled()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -419,9 +421,19 @@ local function MoteEmpowerment()
     if Cast(S.Earthquake) then return "MOTE EOGS" end
   end 
   local spender = SelectSpender()
-  -- Special case handling
+  -- Special case handling, non-intuitive stuff here.
   if n >= 4 and MaelstromP() >= 90 then
     if Cast(spender) then return "Spending Maelstrom despite MOTE because Builder will overcap (AOE)" end
+  end
+  -- On ST/Cleave, if you're capped on LVB just spend it anyways, unless doing so would definitely put you over mael cap.
+  local lavaburst_ms_lb = 10*(1 + num(Player:BuffUp(S.PrimordialWaveBuff))*ActiveFlameshocks)
+  if n <= 2 and S.LavaBurst:ChargesFractional() >= 2.0 and IsViable(S.LavaBurst) and Player:BuffUp(S.LavaSurgeBuff) and (MaelstromP() + lavaburst_ms_lb <= 100 or WindspeakersEquipped) then
+    if Cast(S.LavaBurst) then return "Lavaburst special case 1" end
+  end
+
+  -- If you've got windspeakers, it's okay to munch MOTE procs as long as you don't cap mael
+  if n <= 2 and WindspeakersEquipped and S.LavaBurst:ChargesFractional() >= 1.0 and IsViable(S.LavaBurst) and MaelstromP() >= 60 and MaelstromP() + lavaburst_ms_lb <= 100 then
+    if Cast(S.LavaBurst) then return "Lavaburst special case 2" end
   end
 
   if n >= 8 and MaelstromP() >= 60 and spender == S.Earthquake then
