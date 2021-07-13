@@ -220,15 +220,15 @@ local function Cooldowns()
 end
 
 local function NumFlameShocksToMaintain()
-  return 2 -- fallthrough when no combat?
+  return min(NumEnemiesInLargestCluster, 2) -- fallthrough when no combat?
 end
 
 local function ApplyFlameShock()
   if S.FlameShock:CooldownRemains() > 0 or BestFlameshockUnit == nil then return nil end
   if BestFlameshockUnit:GUID() == Target:GUID() then
-    if Cast(S.FlameShock, nil, nil, not Target:IsInRange(40)) then return "main-target " .. SpellObject.SpellName; end
+    if Cast(S.FlameShock, nil, nil, not Target:IsInRange(40)) then return "main-target flameshock"; end
   else
-    if HR.CastLeftNameplate(BestFlameshockUnit, S.FlameShock) then return "off-target " .. SpellObject.SpellName; end
+    if HR.CastLeftNameplate(BestFlameshockUnit, S.FlameShock) then return "off-target flameshock"; end
   end
   return nil
 end
