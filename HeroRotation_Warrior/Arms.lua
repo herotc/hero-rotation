@@ -84,7 +84,7 @@ local function Precombat()
       if Cast(S.BattleShout, Settings.Arms.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
     end
     -- Manually added opener abilties
-    if S.Charge:IsCastable() and S.Charge:Charges() >= 1 and not TargetInMeleeRange then
+    if S.Charge:IsCastable() and not TargetInMeleeRange then
       if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge) then return "charge precombat 4"; end
     end
     if TargetInMeleeRange then
