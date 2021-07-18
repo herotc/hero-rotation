@@ -191,7 +191,7 @@ local function Precombat()
       if Cast(S.ArcaneTorrent, nil, nil, not Target:IsSpellInRange(S.ArcaneTorrent)) then return "arcane_torrent 6"; end
     end
     -- use_item,name=shadowed_orb_of_torment
-    if Settings.Commons.Enabeld.Trinkets and I.ShadowedOrbofTorment:IsEquippedAndReady() then
+    if Settings.Commons.Enabled.Trinkets and I.ShadowedOrbofTorment:IsEquippedAndReady() then
       if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment 8"; end
     end
     -- variable,name=mind_sear_cutoff,op=set,value=2
