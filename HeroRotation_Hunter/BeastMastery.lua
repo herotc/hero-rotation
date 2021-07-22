@@ -233,7 +233,7 @@ local function Cleave()
     end
     -- wailing_arrow
     if S.WailingArrow:IsReady() then
-      if Cast(S.WailingArrow, nil, nil, not TargetInRange40y) then return "Wailing Arrow (Cleave)"; end
+      if Cast(S.WailingArrow, Settings.BeastMastery.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "Wailing Arrow (Cleave)"; end
     end
     -- flayed_shot
     if S.FlayedShot:IsCastable() then
@@ -325,7 +325,7 @@ local function ST()
   -- wailing_arrow,if=cooldown.resonating_arrow.remains<gcd&(!talent.explosive_shot|buff.bloodlust.up)|!covenant.kyrian|cooldown.resonating_arrow.remains|target.time_to_die<5
   -- Note: Explosive Shot doesn't exist for BM, so ignoring that block
   if CDsON() and S.WailingArrow:IsReady() and (S.ResonatingArrow:CooldownRemains() < Player:GCD() or Player:Covenant() ~= "Kyrian" or not S.ResonatingArrow:CooldownUp() or Target:TimeToDie() < 5) then
-    if Cast(S.WailingArrow, nil, nil, not TargetInRange40y) then return "Wailing Arrow (ST)"; end
+    if Cast(S.WailingArrow, Settings.BeastMastery.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "Wailing Arrow (ST)"; end
   end
   -- barbed_shot,if=cooldown.bestial_wrath.remains<12*charges_fractional+gcd&talent.scent_of_blood
   --   |full_recharge_time<gcd&cooldown.bestial_wrath.remains

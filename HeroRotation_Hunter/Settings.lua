@@ -56,6 +56,7 @@ HR.GUISettings.APL.Hunter = {
       BestialWrath = false,
       Bloodshed = false,
       Stampede = false,
+      WailingArrow = false,
     },
     OffGCDasOffGCD = {
       AspectOfTheWild = true,
@@ -66,6 +67,7 @@ HR.GUISettings.APL.Hunter = {
     GCDasOffGCD = {
       DoubleTap = false,
       Volley = false,
+      WailingArrow = false,
     },
     OffGCDasOffGCD = {
       Trueshot = true,

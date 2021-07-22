@@ -286,7 +286,7 @@ local function St()
   end
   -- wailing_arrow,if=cooldown.resonating_arrow.remains<gcd&(!talent.explosive_shot|buff.bloodlust.up)|!covenant.kyrian|cooldown.resonating_arrow.remains|target.time_to_die<5
   if S.WailingArrow:IsReady() and (S.ResonatingArrow:CooldownRemains() < Player:GCD() and (not S.ExplosiveShot:IsAvailable() or Player:BloodlustUp()) or Player:Covenant() ~= "Kyrian" or not S.ResonatingArrow:CooldownUp() or Target:TimeToDie() < 5) then
-    if Cast(S.WailingArrow, nil, nil, not TargetInRange40y) then return "wailing_arrow st 21"; end
+    if Cast(S.WailingArrow, Settings.Marksmanship.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "wailing_arrow st 21"; end
   end
   -- resonating_arrow,if=buff.double_tap.up|!talent.double_tap|target.time_to_die<12
   if S.ResonatingArrow:IsReady() and (Player:BuffUp(S.DoubleTap) or not S.DoubleTap:IsAvailable() or Target:TimeToDie() < 12) then
@@ -377,7 +377,7 @@ local function Trickshots()
   end
   -- wailing_arrow,if=cooldown.resonating_arrow.remains<gcd&(!talent.explosive_shot|buff.bloodlust.up)|!covenant.kyrian|cooldown.resonating_arrow.remains>10|target.time_to_die<5
   if S.WailingArrow:IsReady() and (S.ResonatingArrow:CooldownRemains() < Player:GCD() and (not S.ExplosiveShot:IsAvailable() or Player:BloodlustUp()) or Player:Covenant() ~= "Kyrian" or S.ResonatingArrow:CooldownRemains() > 10 or Target:TimeToDie() < 5) then
-    if Cast(S.WailingArrow, nil, nil, not TargetInRange40y) then return "wailing_arrow trickshots 13"; end
+    if Cast(S.WailingArrow, Settings.Marksmanship.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "wailing_arrow trickshots 13"; end
   end
   -- resonating_arrow,if=cooldown.volley.remains<gcd|!talent.volley|target.time_to_die<12
   if S.ResonatingArrow:IsReady() and (S.Volley:CooldownRemains() < Player:GCD() or not S.Volley:IsAvailable() or Target:TimeToDie() < 12) then
