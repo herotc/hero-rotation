@@ -709,7 +709,7 @@ local function APL()
   -- TODO: Verify which slot holds the AP value
   PAPValue = 0
   if PAPEquipped then
-    PAPValue = select(16, Player:BuffInfo(S.PAPBuff, false, true))
+    PAPValue = select(16, Player:BuffInfo(S.PAPBuff, false, true)) or 0
   end
 
   -- Moonkin Form OOC, if setting is true
