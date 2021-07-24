@@ -231,8 +231,8 @@ local function Demonic()
   if S.BladeDance:IsReady() and (VarBladeDance and not S.Metamorphosis:CooldownUp() and S.EyeBeam:CooldownRemains() > 5) then
     if Cast(S.BladeDance, nil, nil, not IsInMeleeRange(8)) then return "blade_dance demonic 12"; end
   end
-  -- immolation_aura
-  if S.ImmolationAura:IsCastable() then
+  -- immolation_aura,if=!buff.immolation_aura.up
+  if S.ImmolationAura:IsCastable() and (Player:BuffDown(S.ImmolationAuraBuff)) then
     if Cast(S.ImmolationAura, nil, nil, not IsInMeleeRange(8)) then return "immolation_aura demonic 14"; end
   end
   -- annihilation,if=!variable.pooling_for_blade_dance
@@ -302,8 +302,8 @@ local function Normal()
   if S.DeathSweep:IsReady() and (VarBladeDance) then
     if Cast(S.DeathSweep, nil, nil, not IsInMeleeRange(8)) then return "death_sweep normal 8"; end
   end
-  -- immolation_aura
-  if S.ImmolationAura:IsCastable() then
+  -- immolation_aura,if=!buff.immolation_aura.up
+  if S.ImmolationAura:IsCastable() and (Player:BuffDown(S.ImmolationAuraBuff)) then
     if Cast(S.ImmolationAura, nil, nil, not IsInMeleeRange(8)) then return "immolation_aura normal 10"; end
   end
   -- glaive_tempest,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>10)
