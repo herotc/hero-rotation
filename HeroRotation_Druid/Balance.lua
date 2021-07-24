@@ -793,6 +793,7 @@ local function APL()
 end
 
 local function OnInit()
+  HR.Print("Balance has not yet been updated for 9.1.")
 end
 
 HR.SetAPL(102, APL, OnInit)
