@@ -20,7 +20,9 @@ local CDsON = HR.CDsON
 -- Lua
 local pairs = pairs
 local tableinsert = table.insert
+local mathmin = math.min
 local mathmax = math.max
+local mathabs = math.abs
 
 --- APL Local Vars
 -- Commons
@@ -34,6 +36,33 @@ local I = Item.Rogue.Subtlety
 local OnUseExcludes = {
 }
 
+-- Rotation Var
+local Enemies30y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y
+local ShouldReturn; -- Used to get the return string
+local PoolingAbility, PoolingEnergy, PoolingFinisher; -- Used to store an ability we might want to pool for as a fallback in the current situation
+local Stealth, VanishBuff
+local RuptureThreshold, RuptureDMGThreshold
+local EffectiveComboPoints, ComboPoints, ComboPointsDeficit
+local PriorityRotation
+
+-- Legendaries
+local DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
+local TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
+local AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
+local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
+local FinalityEquipped = Player:HasLegendaryEquipped(126)
+local ObedienceEquipped = Player:HasLegendaryEquipped(229)
+local ResoundingClarityEquipped = Player:HasLegendaryEquipped(231)
+HL:RegisterForEvent(function()
+  DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
+  TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
+  AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
+  MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
+  FinalityEquipped = Player:HasLegendaryEquipped(126)
+  ObedienceEquipped = Player:HasLegendaryEquipped(229)
+  ResoundingClarityEquipped = Player:HasLegendaryEquipped(231)
+end, "PLAYER_EQUIPMENT_CHANGED")
+
 S.Eviscerate:RegisterDamageFormula(
   -- Eviscerate DMG Formula (Pre-Mitigation):
   --- Player Modifier
@@ -46,7 +75,7 @@ S.Eviscerate:RegisterDamageFormula(
         -- Attack Power
         Player:AttackPowerDamageMod() *
         -- Combo Points
-        Rogue.CPSpend() *
+        EffectiveComboPoints *
         -- Eviscerate R1 AP Coef
         0.176 *
         -- Aura Multiplier (SpellID: 137035)
@@ -78,33 +107,6 @@ S.Rupture:RegisterPMultiplier(
     return S.Nightstalker:IsAvailable() and Player:StealthUp(true, false) and 1.12 or 1
   end
 )
-
--- Rotation Var
-local Enemies30y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y
-local ShouldReturn; -- Used to get the return string
-local PoolingAbility, PoolingEnergy, PoolingFinisher; -- Used to store an ability we might want to pool for as a fallback in the current situation
-local Stealth, VanishBuff
-local RuptureThreshold, RuptureDMGThreshold
-local EffectiveComboPoints, ComboPoints, ComboPointsDeficit
-local PriorityRotation
-
--- Legendaries
-local DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
-local TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
-local AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
-local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
-local FinalityEquipped = Player:HasLegendaryEquipped(126)
-local ObedienceEquipped = Player:HasLegendaryEquipped(229)
-local ResoundingClarityEquipped = Player:HasLegendaryEquipped(231)
-HL:RegisterForEvent(function()
-  DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
-  TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
-  AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
-  MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
-  FinalityEquipped = Player:HasLegendaryEquipped(126)
-  ObedienceEquipped = Player:HasLegendaryEquipped(229)
-  ResoundingClarityEquipped = Player:HasLegendaryEquipped(231)
-end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- GUI Settings
 local Settings = {
@@ -346,7 +348,9 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     return Finish(ReturnSpellOnly, StealthSpell)
   end
   -- actions.stealthed+=/call_action_list,name=finish,if=buff.shuriken_tornado.up&combo_points.deficit<=2
-  -- DONE IN DEFAULT PART!
+  if Player:BuffUp(S.ShurikenTornado) and ComboPointsDeficit <= 2 then
+    return Finish(ReturnSpellOnly, StealthSpell)
+  end
   -- actions.stealthed+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&effective_combo_points>=4
   if MeleeEnemies10yCount >= 4 and EffectiveComboPoints >= 4 then
     return Finish(ReturnSpellOnly, StealthSpell)
@@ -493,7 +497,8 @@ local function CDs ()
     end
   end
   -- actions.cds+=/serrated_bone_spike,cycle_targets=1,if=variable.snd_condition&!dot.serrated_bone_spike_dot.ticking&target.time_to_die>=21|fight_remains<=5&spell_targets.shuriken_storm<3
-  if S.SerratedBoneSpike:IsReady() and (SnDCondition or HL.BossFilteredFightRemains("<=", 5) and MeleeEnemies10yCount < 3) then
+  if S.SerratedBoneSpike:IsReady() and (SnDCondition or HL.BossFilteredFightRemains("<=", 5) and MeleeEnemies10yCount < 3)
+    and not Player:BuffUp(S.PremeditationBuff) and not Player:BuffUp(S.ShurikenTornado) then
     local function Evaluate_BoneSpike_Target(TargetUnit)
       return not TargetUnit:DebuffUp(S.SerratedBoneSpikeDebuff)
     end
@@ -704,11 +709,24 @@ local function APL ()
 
   -- Cache updates
   ComboPoints = Player:ComboPoints()
-  EffectiveComboPoints = Rogue.EffectiveComboPoints()
+  EffectiveComboPoints = Rogue.EffectiveComboPoints(ComboPoints)
   ComboPointsDeficit = Player:ComboPointsDeficit()
   RuptureThreshold = (4 + ComboPoints * 4) * 0.3
   RuptureDMGThreshold = S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
   PriorityRotation = UsePriorityRotation()
+
+  -- Shuriken Tornado Combo Point Prediction
+  if Player:BuffUp(S.ShurikenTornado, nil, true) and ComboPoints < Rogue.CPMaxSpend() then
+    local TimeToNextTornadoTick = Rogue.TimeToNextTornado()
+    if TimeToNextTornadoTick <= Player:GCDRemains() or mathabs(Player:GCDRemains() - TimeToNextTornadoTick) < 0.25 then
+      local PredictedComboPointGeneration = MeleeEnemies10yCount + num(Player:BuffUp(S.ShadowBlades))
+      ComboPoints = mathmin(ComboPoints + PredictedComboPointGeneration, Rogue.CPMaxSpend())
+      ComboPointsDeficit = mathmax(ComboPointsDeficit - PredictedComboPointGeneration, 0)
+      if EffectiveComboPoints < Rogue.CPMaxSpend() then
+        EffectiveComboPoints = ComboPoints
+      end
+    end
+  end
 
   --- Defensives
   -- Crimson Vial
@@ -751,7 +769,7 @@ local function APL ()
             if HR.CastPooling(PoolingAbility) then return "Stealthed Cast or Pool (OOC): "..PoolingAbility:Name() end
           end
         end
-      elseif Player:ComboPoints() >= 5 then
+      elseif ComboPoints >= 5 then
         ShouldReturn = Finish()
         if ShouldReturn then return ShouldReturn .. " (OOC)" end
       elseif S.Backstab:IsCastable() then
@@ -775,23 +793,21 @@ local function APL ()
     ShouldReturn = CDs()
     if ShouldReturn then return "CDs: " .. ShouldReturn end
 
-    -- SPECIAL HACK FOR SHURIKEN TORNADO
-    -- Show a finisher if we can assume we will have enough CP with the next global
-    -- actions.stealthed+=/call_action_list,name=finish,if=buff.shuriken_tornado.up&combo_points.deficit<=2
-    if Player:BuffUp(S.ShurikenTornado) and (ComboPointsDeficit - MeleeEnemies10yCount - num(Player:BuffUp(S.ShadowBlades))) <= 1 + num(Player:StealthUp(true, false)) then
-      ShouldReturn = Finish()
-      if ShouldReturn then return "Finish (during Tornado): " .. ShouldReturn end
-    end
-
     -- # Run fully switches to the Stealthed Rotation (by doing so, it forces pooling if nothing is available).
     -- actions+=/run_action_list,name=stealthed,if=stealthed.all
     if Player:StealthUp(true, true) then
       PoolingAbility = Stealthed(true)
       if PoolingAbility then -- To avoid pooling icon spam
         if type(PoolingAbility) == "table" and #PoolingAbility > 1 then
-          if HR.CastQueuePooling(nil, unpack(PoolingAbility)) then return "Stealthed Macro ".. PoolingAbility[1]:Name() .. "|" .. PoolingAbility[2]:Name() end
+          if HR.CastQueuePooling(nil, unpack(PoolingAbility)) then return "Stealthed Macro " .. PoolingAbility[1]:Name() .. "|" .. PoolingAbility[2]:Name() end
         else
-          if HR.CastPooling(PoolingAbility) then return "Stealthed Cast "..PoolingAbility:Name() end
+          -- Special case for Shuriken Tornado
+          if Player:BuffUp(S.ShurikenTornado) and ComboPoints ~= Player:ComboPoints()
+            and (PoolingAbility == S.BlackPowder or PoolingAbility == S.Eviscerate or PoolingAbility == S.Rupture or PoolingAbility == S.SliceandDice) then
+            if HR.CastQueuePooling(nil, S.ShurikenTornado, PoolingAbility) then return "Stealthed Tornado Cast  " .. PoolingAbility:Name() end
+          else
+            if HR.CastPooling(PoolingAbility) then return "Stealthed Cast " .. PoolingAbility:Name() end
+          end
         end
       end
       HR.Cast(S.PoolEnergy)

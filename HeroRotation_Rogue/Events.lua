@@ -19,6 +19,7 @@ local Rogue = HR.Commons.Rogue
 local C_Timer = C_Timer
 local mathmax = math.max
 local mathmin = math.min
+local mathabs = math.abs
 local pairs = pairs
 local tableinsert = table.insert
 local UnitAttackSpeed = UnitAttackSpeed
@@ -231,6 +232,47 @@ do
     "UNIT_DIED", "UNIT_DESTROYED"
   )
 end
+
+--- Shuriken Tornado Tracking
+do
+  local LastEnergizeTime, LastCastTime = 0, 0
+  local ShurikenTornadoBuff = Spell(277925)
+  function Rogue.TimeToNextTornado()
+    if not Player:BuffUp(ShurikenTornadoBuff, nil, true) then
+      return 0
+    end
+    local TimeToNextTick = Player:BuffRemains(ShurikenTornadoBuff, nil, true) % 1
+    -- Tick happened in the same tick, we may not have the CP gain yet
+    if GetTime() == LastEnergizeTime then
+      return 0
+    -- Tick happened very recently, slightly before the predicted buff tick
+    elseif (GetTime() - LastEnergizeTime) < 0.1 and TimeToNextTick < 0.25 then
+      return 1
+    -- Tick hasn't happened yet but the predicted buff tick has passed
+    elseif (TimeToNextTick > 0.9 or TimeToNextTick == 0) and (GetTime() - LastEnergizeTime) > 0.75 then
+      return 0.1
+    end
+    return TimeToNextTick
+  end
+
+  HL:RegisterForSelfCombatEvent(
+    function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
+      -- Shuriken Storm Energize
+      if SpellID == 212743 then
+        LastEnergizeTime = GetTime()
+      -- Actual Shuriken Storm Cast
+      elseif SpellID == 197835 then
+        LastCastTime = GetTime()
+      end
+      -- If the player casts an actual Shuriken Storm, this value is no longer reliable
+      if LastCastTime == LastEnergizeTime then
+        LastEnergizeTime = 0
+      end
+    end,
+    "SPELL_CAST_SUCCESS"
+  )
+end
+
 
 --- Shadow Techniques Tracking
 do
