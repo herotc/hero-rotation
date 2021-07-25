@@ -60,7 +60,7 @@ local BleedTickTime, ExsanguinatedBleedTickTime = 2 / Player:SpellHaste(), 1 / P
 local ComboPoints, ComboPointsDeficit
 local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMGThreshold, RuptureDurationThreshold
 local PriorityRotation
-local PoisonedBleeds, EnergyRegenCombined, SingleTarget
+local PoisonedBleeds, EnergyRegenCombined, EnergyRegenSaturated, SingleTarget
 
 -- Legendaries
 local DashingScoundrelEquipped = Player:HasLegendaryEquipped(118)
@@ -69,7 +69,6 @@ local DoombladeEquipped = Player:HasLegendaryEquipped(119)
 local DuskwalkersPatchEquipped = Player:HasLegendaryEquipped(121)
 local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
 local VendettaCDMultiplier = DuskwalkersPatchEquipped and 0.55 or 1.0
-RuptureDurationThreshold = 4 + BoolToInt(DashingScoundrelEquipped) * 9 + BoolToInt(DoombladeEquipped) * 6
 HL:RegisterForEvent(function()
   DashingScoundrelEquipped = Player:HasLegendaryEquipped(118)
   DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
@@ -77,7 +76,6 @@ HL:RegisterForEvent(function()
   DuskwalkersPatchEquipped = Player:HasLegendaryEquipped(121)
   MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
   VendettaCDMultiplier = DuskwalkersPatchEquipped and 0.55 or 1.0
-  RuptureDurationThreshold = 4 + BoolToInt(DashingScoundrelEquipped) * 9 + BoolToInt(DoombladeEquipped) * 6
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- Interrupts
@@ -95,7 +93,7 @@ S.Envenom:RegisterDamageFormula(
       -- Attack Power
       Player:AttackPowerDamageMod() *
       -- Combo Points
-      Rogue.CPSpend() *
+      ComboPoints *
       -- Envenom AP Coef
       0.16 *
       -- Aura Multiplier (SpellID: 137037)
@@ -502,10 +500,10 @@ local function Dot ()
   if PriorityRotation then
     -- # Limit secondary Garrotes for priority rotation if we have 35 energy regen or Garrote will expire on the primary target
     -- actions.dot=variable,name=skip_cycle_garrote,value=priority_rotation&(dot.garrote.remains<cooldown.garrote.duration|energy.regen_combined>35)
-    SkipCycleGarrote = MeleeEnemies10yCount > 3 and (Target:DebuffRemains(S.Garrote) < 6 or EnergyRegenCombined > 35)
+    SkipCycleGarrote = MeleeEnemies10yCount > 3 and (Target:DebuffRemains(S.Garrote) < 6 or EnergyRegenSaturated)
     -- # Limit secondary Ruptures for priority rotation if we have 35 energy regen or Shiv is up on 2T+
     -- actions.dot+=/variable,name=skip_cycle_rupture,value=priority_rotation&(debuff.shiv.up&spell_targets.fan_of_knives>2|energy.regen_combined>35)
-    SkipCycleRupture = (Target:DebuffUp(S.ShivDebuff) and MeleeEnemies10yCount > 2) or EnergyRegenCombined > 35
+    SkipCycleRupture = (Target:DebuffUp(S.ShivDebuff) and MeleeEnemies10yCount > 2) or EnergyRegenSaturated
   end
   -- # Limit Ruptures if Vendetta+Shiv/Master Assassin is up and we have 2+ seconds left on the Rupture DoT
   -- actions.dot+=/variable,name=skip_rupture,value=debuff.vendetta.up&(debuff.shiv.up|master_assassin_remains>0)&dot.rupture.remains>2
@@ -545,21 +543,22 @@ local function Dot ()
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, 12, MeleeEnemies5y)
     end
   end
-  -- # Crimson Tempest on multiple targets at 4+ CP when running out in 2-3s as long as we have enough regen and aren't setting up for Vendetta
-  -- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&effective_combo_points>=4&energy.regen_combined>20&(!cooldown.vendetta.ready|dot.rupture.ticking)
+  -- # Crimson Tempest on multiple targets at 4+ CP when running out in 2-5s as long as we have enough regen and aren't setting up for Vendetta
+  -- actions.dot+=/crimson_tempest,target_if=min:remains,if=spell_targets>=2&effective_combo_points>=4&energy.regen_combined>20&(!cooldown.vendetta.ready|dot.rupture.ticking)&remains<2+3*(spell_targets>=4)
   if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 2 and ComboPoints >= 4
     and EnergyRegenCombined > 20 and (not S.Vendetta:CooldownUp() or Target:DebuffUp(S.Rupture)) then
     for _, CycleUnit in pairs(MeleeEnemies10y) do
-      -- Note: The APL does not do this due to target_if mechanics, just to determine if any targets are low on duration of the AoE Bleed
-      if CycleUnit:DebuffRemains(S.CrimsonTempest) < 2 + BoolToInt(MeleeEnemies10yCount >= 5) then
+      if CycleUnit:DebuffRemains(S.CrimsonTempest) < 2 + 3 * BoolToInt(MeleeEnemies10yCount >= 4) then
         if Cast(S.CrimsonTempest) then return "Cast Crimson Tempest (AoE)" end
       end
     end
   end
   -- # Keep up Rupture at 4+ on all targets (when living long enough and not snapshot)
-  -- actions.dot+=/rupture,if=!variable.skip_rupture&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>4
-  -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+runeforge.dashing_scoundrel*9+runeforge.doomblade*6)
+  -- actions.dot+=/rupture,if=!variable.skip_rupture&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
+  -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
   if not SkipRupture and S.Rupture:IsReady() and ComboPoints >= 4 then
+    -- target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
+    RuptureDurationThreshold = 4 + BoolToInt(DashingScoundrelEquipped) * 5 + BoolToInt(DoombladeEquipped) * 5 + BoolToInt(EnergyRegenSaturated) * 6
     local function Evaluate_Rupture_Target(TargetUnit)
       return TargetUnit:DebuffRefreshable(S.Rupture, RuptureThreshold)
         and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemains(S.Rupture) <= (Rogue.Exsanguinated(TargetUnit, S.Rupture) and ExsanguinatedBleedTickTime or BleedTickTime) and MeleeEnemies10yCount >= 3)
@@ -574,11 +573,11 @@ local function Dot ()
     end
   end
   -- # Fallback AoE Crimson Tempest with the same logic as above, but ignoring the energy conditions if we aren't using Rupture
-  -- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&effective_combo_points>=4
+  -- actions.dot+=/crimson_tempest,if=spell_targets>=2&effective_combo_points>=4&remains<2+3*(spell_targets>=4)
   if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 2 and ComboPoints >= 4 then
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       -- Note: The APL does not do this due to target_if mechanics, just to determine if any targets are low on duration of the AoE Bleed
-      if CycleUnit:DebuffRemains(S.CrimsonTempest) < 2 + BoolToInt(MeleeEnemies10yCount >= 5) then
+      if CycleUnit:DebuffRemains(S.CrimsonTempest) < 2 + 3 * BoolToInt(MeleeEnemies10yCount >= 4) then
         if Cast(S.CrimsonTempest) then return "Cast Crimson Tempest (AoE Fallback)" end
       end
     end
@@ -640,7 +639,7 @@ local function Direct ()
     -- # Fan of Knives at 19+ stacks of Hidden Blades or against 4+ targets.
     -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|(!priority_rotation&spell_targets.fan_of_knives>=4+stealthed.rogue))
     if HR.AoEON() and (Player:BuffStack(S.HiddenBladesBuff) >= 19 and MeleeEnemies10yCount >= 1
-      or (not PriorityRotation and MeleeEnemies10yCount >= 4 + BoolToInt(Player:StealthUp(true, false)))) then
+      or (not PriorityRotation and MeleeEnemies10yCount >= 4 + BoolToInt(DoombladeEquipped and S.CrimsonTempest:IsAvailable()) + BoolToInt(Player:StealthUp(true, false)))) then
       if CastPooling(S.FanofKnives) then return "Cast Fan of Knives" end
     end
     -- # Fan of Knives to apply poisons if inactive on any target (or any bleeding targets with priority rotation) at 3T
@@ -699,7 +698,7 @@ local function APL ()
   -- Rotation Variables Update
   Stealth = S.Subterfuge:IsAvailable() and S.Stealth2 or S.Stealth; -- w/ or w/o Subterfuge Talent
   BleedTickTime, ExsanguinatedBleedTickTime = 2 / Player:SpellHaste(), 1 / Player:SpellHaste()
-  ComboPoints = Rogue.EffectiveComboPoints()
+  ComboPoints = Rogue.EffectiveComboPoints(Player:ComboPoints())
   ComboPointsDeficit = Player:ComboPointsMax() - ComboPoints
   RuptureThreshold = (4 + ComboPoints * 4) * 0.3
   CrimsonTempestThreshold = (2 + ComboPoints * 2) * 0.3
@@ -749,8 +748,10 @@ local function APL ()
     if ShouldReturn then return ShouldReturn end
 
     PoisonedBleeds = Rogue.PoisonedBleeds()
-    -- actions+=/variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
+    -- TODO: Make this match the updated code version
     EnergyRegenCombined = Player:EnergyRegen() + PoisonedBleeds * 8 / (2 * Player:SpellHaste())
+    -- actions+=/variable,name=regen_saturated,value=energy.regen_combined>35
+    EnergyRegenSaturated = EnergyRegenCombined > 35
     -- actions+=/variable,name=single_target,value=spell_targets.fan_of_knives<2
     SingleTarget = MeleeEnemies10yCount < 2
 
@@ -765,10 +766,15 @@ local function APL ()
       if ShouldReturn then return ShouldReturn end
     end
     -- # Put SnD up initially for Cut to the Chase, refresh with Envenom if at low duration
-    -- actions+=/slice_and_dice,if=!buff.slice_and_dice.up&combo_points>=3
+    -- actions+=/slice_and_dice,if=!buff.slice_and_dice.up&combo_points>=1
     if not Player:BuffUp(S.SliceandDice) then
-      if S.SliceandDice:IsReady() and ComboPoints >= 3 then
+      if S.SliceandDice:IsReady() and ComboPoints >= 1 then
         if Cast(S.SliceandDice) then return "Cast Slice and Dice" end
+      end
+    elseif Target:IsInMeleeRange(10) then
+      -- actions+=/envenom,if=buff.slice_and_dice.up&buff.slice_and_dice.remains<5&combo_points>=4
+      if S.Envenom:IsReady() and Player:BuffRemains(S.SliceandDice) < 5 and ComboPoints >= 4 then
+        if Cast(S.Envenom, nil, nil, not Target:IsInMeleeRange(5)) then return "Cast Envenom (CttC)" end
       end
     else
       --- !!!! ---
@@ -778,10 +784,6 @@ local function APL ()
       if S.PoisonedKnife:IsCastable() and Target:IsInRange(30) and not Player:StealthUp(true, true)
         and MeleeEnemies10yCount == 0 and Player:EnergyTimeToMax() <= Player:GCD() * 1.5 then
         if Cast(S.PoisonedKnife) then return "Cast Poisoned Knife" end
-      end
-      -- actions+=/envenom,if=buff.slice_and_dice.up&buff.slice_and_dice.remains<5&combo_points>=4
-      if S.Envenom:IsReady() and Target:IsInMeleeRange(10) and Player:BuffRemains(S.SliceandDice) < 5 and ComboPoints >= 4 then
-        if Cast(S.Envenom, nil, nil, not Target:IsInMeleeRange(5)) then return "Cast Envenom (CttC)" end
       end
     end
     -- actions+=/call_action_list,name=dot
