@@ -315,7 +315,6 @@ Spell.Rogue.Subtlety = {
 if not Item.Rogue then Item.Rogue = {} end
 Item.Rogue.Assassination = {
   -- Trinkets
-  FlayedwingToxin       = Item(178742, {13, 14}),
   GalecallersBoon       = Item(159614, {13, 14}),
   LustrousGoldenPlumage = Item(159617, {13, 14}),
   ComputationDevice     = Item(167555, {13, 14}),
@@ -326,7 +325,6 @@ Item.Rogue.Assassination = {
 
 Item.Rogue.Outlaw = {
   -- Trinkets
-  FlayedwingToxin       = Item(178742, {13, 14}),
   ComputationDevice     = Item(167555, {13, 14}),
   VigorTrinket          = Item(165572, {13, 14}),
   FontOfPower           = Item(169314, {13, 14}),
@@ -334,7 +332,6 @@ Item.Rogue.Outlaw = {
 }
 
 Item.Rogue.Subtlety = {
-  FlayedwingToxin       = Item(178742, {13, 14}),
   ComputationDevice     = Item(167555, {13, 14}),
   VigorTrinket          = Item(165572, {13, 14}),
   FontOfPower           = Item(169314, {13, 14}),
@@ -379,48 +376,42 @@ do
   local CripplingPoison     = Spell(3408)
   local DeadlyPoison        = Spell(2823)
   local InstantPoison       = Spell(315584)
-  local NumbingPoinson      = Spell(5761)
+  local NumbingPoison       = Spell(5761)
   local WoundPoison         = Spell(8679)
-  local FlayedwingToxin     = Item(178742, {13, 14})
-  local FlayedwingToxinBuff = Spell(345545)
 
   function Commons.Poisons()
     local PoisonRefreshTime = Player:AffectingCombat() and Settings.Commons.PoisonRefreshCombat * 60 or Settings.Commons.PoisonRefresh * 60
+    local PoisonRemains
     -- Lethal Poison
-    if DeadlyPoison:IsAvailable() then
-      if (Player:BuffUp(DeadlyPoison) and Player:BuffRemains(DeadlyPoison) < PoisonRefreshTime)
-        or (Player:BuffUp(WoundPoison) and Player:BuffRemains(WoundPoison) < PoisonRefreshTime)
-        or (not Player:BuffUp(DeadlyPoison) and not Player:BuffUp(WoundPoison)) then
-        if Player:BuffUp(WoundPoison) then
-          HR.CastSuggested(WoundPoison)
-        else
-          HR.CastSuggested(DeadlyPoison)
-        end
+    PoisonRemains = Player:BuffRemains(WoundPoison)
+    if PoisonRemains > 0 then
+      if PoisonRemains < PoisonRefreshTime then
+        HR.CastSuggested(WoundPoison)
       end
     else
-      if (Player:BuffUp(InstantPoison) and Player:BuffRemains(InstantPoison) < PoisonRefreshTime)
-        or (Player:BuffUp(WoundPoison) and Player:BuffRemains(WoundPoison) < PoisonRefreshTime)
-        or (not Player:BuffUp(InstantPoison) and not Player:BuffUp(WoundPoison)) then
-        if Player:BuffUp(WoundPoison) then
-          HR.CastSuggested(WoundPoison)
-        else
+      if DeadlyPoison:IsAvailable() then
+        PoisonRemains = Player:BuffRemains(DeadlyPoison)
+        if PoisonRemains < PoisonRefreshTime then
+          HR.CastSuggested(DeadlyPoison)
+        end
+      else
+        PoisonRemains = Player:BuffRemains(InstantPoison)
+        if PoisonRemains < PoisonRefreshTime then
           HR.CastSuggested(InstantPoison)
         end
       end
     end
     -- Non-Lethal Poisons
-    if (Player:BuffUp(NumbingPoinson) and Player:BuffRemains(NumbingPoinson) < PoisonRefreshTime)
-      or (Player:BuffUp(CripplingPoison) and Player:BuffRemains(CripplingPoison) < PoisonRefreshTime)
-      or (not Player:BuffUp(NumbingPoinson) and not Player:BuffUp(CripplingPoison)) then
-      if Player:BuffUp(CripplingPoison) then
+    PoisonRemains = Player:BuffRemains(CripplingPoison)
+    if PoisonRemains > 0 then
+      if PoisonRemains < PoisonRefreshTime then
         HR.CastSuggested(CripplingPoison)
-      else
-        HR.CastSuggested(NumbingPoinson)
       end
-    end
-    -- Flayedwing Toxin Poison Trinket
-    if FlayedwingToxin:IsEquipped() and Player:BuffRemains(FlayedwingToxinBuff) < PoisonRefreshTime then
-      HR.CastSuggested(FlayedwingToxin)
+    else
+      PoisonRemains = Player:BuffRemains(NumbingPoison)
+      if PoisonRemains < PoisonRefreshTime then
+        HR.CastSuggested(NumbingPoison)
+      end
     end
   end
 end
@@ -485,8 +476,7 @@ do
     return -1
   end
 
-  function Commons.EffectiveComboPoints()
-    local ComboPoints = Player:ComboPoints()
+  function Commons.EffectiveComboPoints(ComboPoints)
     if Commons.AnimachargedCP() == ComboPoints then
       return 7
     end
