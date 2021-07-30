@@ -97,7 +97,7 @@ end
 -- The code is sound for a smoothing of damage intake.
 -- However this is not needed in the current APL.
 local function ShouldPurify ()
-  return S.PurifyingBrew:ChargesFractional() >= 1.8
+  return S.PurifyingBrew:ChargesFractional() >= 1.8 and (Player:DebuffUp(S.HeavyStagger) or Player:DebuffUp(S.ModerateStagger) or Player:DebuffUp(S.LightStagger))
 end
 
 local function Defensives()
