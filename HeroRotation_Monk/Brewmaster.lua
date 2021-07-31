@@ -173,8 +173,8 @@ local function APL()
       if S.BagOfTricks:IsCastable() then
         if HR.Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "Bag of Tricks"; end
       end
-      -- weapons_of_order
-      if S.WeaponsOfOrder:IsCastable() then
+      -- weapons_of_order (if KegSmash is on CD)
+      if S.WeaponsOfOrder:IsCastable() and S.KegSmash:CooldownRemains() then
         if HR.Cast(S.WeaponsOfOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Weapons Of Order cd 1"; end
       end
       -- fallen_order
@@ -216,8 +216,20 @@ local function APL()
     if S.KegSmash:IsCastable() and Player:BuffUp(S.WeaponsOfOrder) then
       if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 2"; end
     end
-    -- blackout_strike
-    if S.BlackoutKick:IsCastable() then
+    -- blackout_strike (Original with no CharredPassions)
+    if S.BlackoutKick:IsCastable() and not Player:HasLegendaryEquipped(86) then
+      if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
+    end
+    -- blackout_strike (With charred passions, but shuffle buff missing)
+    if S.BlackoutKick:IsCastable() and Player:HasLegendaryEquipped(86) and Player:BuffDown(S.Shuffle) then
+      if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
+    end
+    -- blackout_strike (With charred passions buff, save BK for after BoF if shuffle up)
+    if S.BlackoutKick:IsCastable() and S.BreathOfFire:IsCastable(10, true) and Player:HasLegendaryEquipped(86) and Player:BuffUp(S.Shuffle) then
+      if HR.Cast(S.BreathOfFire, nil, nil, not Target:IsInMeleeRange(8)) then return "Breath of Fire 2"; end
+    end
+	-- blackout_strike>KegSmash if only 1 target, and shuffle buff is up & charred passion buff up
+    if S.KegSmash:IsCastable() and S.BlackoutKick:IsCastable() and Player:BuffUp(S.CharredPassions) and Player:BuffUp(S.Shuffle) and EnemiesCount8 <= 1 then
       if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
     end
     -- keg_smash
@@ -236,7 +248,7 @@ local function APL()
       if HR.CastSuggested(S.TouchOfDeath) then return "Touch Of Death 1"; end
     end
 	-- Prio SCK with charred_passions buff/legendary
-	if Player:HasLegendaryEquipped(86) and not S.BlackoutKick:IsCastable() and S.SpinningCraneKick:IsCastable() and Player:BuffUp(S.CharredPassions) then
+	if Player:HasLegendaryEquipped(86) and not S.BlackoutKick:IsCastable() and S.SpinningCraneKick:IsReady() and Player:BuffUp(S.CharredPassions) then
       if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick 2"; end
     end
     if Player:HasLegendaryEquipped(86) and S.BlackoutKick:IsCastable() and Player:BuffUp(S.CharredPassions) then
