@@ -235,6 +235,14 @@ local function APL()
     if S.TouchOfDeath:IsReady() and Target:Health() < UnitHealthMax("player") then
       if HR.CastSuggested(S.TouchOfDeath) then return "Touch Of Death 1"; end
     end
+	-- Prio SCK with charred_passions buff/legendary
+	if Player:HasLegendaryEquipped(86) and not S.BlackoutKick:IsCastable() and S.SpinningCraneKick:IsCastable() and Player:BuffUp(S.CharredPassions) then
+      if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick 2"; end
+    end
+    if Player:HasLegendaryEquipped(86) and S.BlackoutKick:IsCastable() and Player:BuffUp(S.CharredPassions) then
+      if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
+    end
+	-- RJW
     if S.RushingJadeWind:IsCastable() and Player:BuffDown(S.RushingJadeWind) then
       if HR.Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "Rushing Jade Wind"; end
     end
