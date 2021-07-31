@@ -236,19 +236,19 @@ local function APL()
     if S.BlackoutKick:IsCastable() and (Player:HasLegendaryEquipped(86) and Player:BuffUp(S.CharredPassions) and Player:BuffDown(S.Shuffle)) then
       if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
     end
-	-- blackout_strike (Use BK where it would otherwise not, due to waiting for BoF CD)
-	if S.BlackoutKick:IsCastable() and (S.BreathOfFire:CooldownRemains() >= 4 and Player:BuffDown(S.CharredPassions) and Player:HasLegendaryEquipped(86)) then
+  	-- blackout_strike (Use BK where it would otherwise not, due to waiting for BoF CD)
+  	if S.BlackoutKick:IsCastable() and (S.BreathOfFire:CooldownRemains() >= 4 and Player:BuffDown(S.CharredPassions) and Player:HasLegendaryEquipped(86)) then
       if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
     end
     -- breath_of_fire (Save BK for after BoF if shuffle buff up)
     if S.BlackoutKick:IsCastable() and (S.BreathOfFire:IsCastable() and Player:HasLegendaryEquipped(86) and Player:BuffUp(S.Shuffle)) then
       if HR.Cast(S.BreathOfFire, nil, nil, not Target:IsInMeleeRange(8)) then return "Breath of Fire 2"; end
     end
-	-- Prio BK&SCK with charred_passions buff/legendary
+	  -- Prio BK&SCK with charred_passions buff/legendary
     if S.BlackoutKick:IsCastable() and (Player:HasLegendaryEquipped(86) and Player:BuffUp(S.CharredPassions)) then
       if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
     end
-	if not S.BlackoutKick:IsCastable() and (Player:HasLegendaryEquipped(86) and S.BlackoutKick:CooldownRemains() >= 1.3 and S.SpinningCraneKick:IsReady() and Player:BuffUp(S.CharredPassions)) then
+	  if not S.BlackoutKick:IsCastable() and (Player:HasLegendaryEquipped(86) and S.BlackoutKick:CooldownRemains() >= 1.3 and S.SpinningCraneKick:IsReady() and Player:BuffUp(S.CharredPassions)) then
       if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick 2"; end
     end
     -- faeline_stomp
