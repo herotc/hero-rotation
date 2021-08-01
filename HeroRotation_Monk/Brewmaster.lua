@@ -173,8 +173,8 @@ local function APL()
       if S.BagOfTricks:IsCastable() then
         if HR.Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "Bag of Tricks"; end
       end
-      -- weapons_of_order
-      if S.WeaponsOfOrder:IsCastable() then
+      -- weapons_of_order (if KegSmash is on CD)
+      if S.WeaponsOfOrder:IsCastable() and (not S.KegSmash:CooldownUp()) then
         if HR.Cast(S.WeaponsOfOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Weapons Of Order cd 1"; end
       end
       -- fallen_order
@@ -216,13 +216,40 @@ local function APL()
     if S.KegSmash:IsCastable() and Player:BuffUp(S.WeaponsOfOrder) then
       if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 2"; end
     end
-    -- blackout_strike
-    if S.BlackoutKick:IsCastable() then
+    -- blackout_strike (Original with no CharredPassions)
+    if S.BlackoutKick:IsCastable() and (not Player:HasLegendaryEquipped(86)) then
       if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
     end
-    -- keg_smash
-    if S.KegSmash:IsCastable() then
+    -- keg_smash (Original with no CharredPassions)
+    if S.KegSmash:IsReady() and (not Player:HasLegendaryEquipped(86)) then
       if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 3"; end
+    end
+    -- keg_smash (Kegsmash with charredpassions buff if BK on CD)
+    if S.KegSmash:IsReady() and (Player:HasLegendaryEquipped(86) and Player:BuffUp(S.CharredPassions) and not S.BlackoutKick:CooldownUp()) then
+      if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 3"; end
+    end
+    -- keg_smash (Kegsmash if no charredpassions buff)
+    if S.KegSmash:IsReady() and (Player:HasLegendaryEquipped(86) and Player:BuffDown(S.CharredPassions)) then
+      if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 3"; end
+    end
+    -- blackout_strike (BK with charredpassions buff, but shuffle buff missing)
+    if S.BlackoutKick:IsCastable() and (Player:HasLegendaryEquipped(86) and Player:BuffUp(S.CharredPassions) and Player:BuffDown(S.Shuffle)) then
+      if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
+    end
+  	-- blackout_strike (Use BK where it would otherwise not, due to waiting for BoF CD)
+  	if S.BlackoutKick:IsCastable() and (S.BreathOfFire:CooldownRemains() >= 4 and Player:BuffDown(S.CharredPassions) and Player:HasLegendaryEquipped(86)) then
+      if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
+    end
+    -- breath_of_fire (Save BK for after BoF if shuffle buff up)
+    if S.BlackoutKick:IsCastable() and (S.BreathOfFire:IsCastable() and Player:HasLegendaryEquipped(86) and Player:BuffUp(S.Shuffle)) then
+      if HR.Cast(S.BreathOfFire, nil, nil, not Target:IsInMeleeRange(8)) then return "Breath of Fire 2"; end
+    end
+	  -- Prio BK&SCK with charred_passions buff/legendary
+    if S.BlackoutKick:IsCastable() and (Player:HasLegendaryEquipped(86) and Player:BuffUp(S.CharredPassions)) then
+      if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
+    end
+	  if not S.BlackoutKick:IsCastable() and (Player:HasLegendaryEquipped(86) and S.BlackoutKick:CooldownRemains() >= 1.3 and S.SpinningCraneKick:IsReady() and Player:BuffUp(S.CharredPassions)) then
+      if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick 2"; end
     end
     -- faeline_stomp
     if S.FaelineStomp:IsCastable() then
@@ -235,6 +262,7 @@ local function APL()
     if S.TouchOfDeath:IsReady() and Target:Health() < UnitHealthMax("player") then
       if HR.CastSuggested(S.TouchOfDeath) then return "Touch Of Death 1"; end
     end
+	-- RJW
     if S.RushingJadeWind:IsCastable() and Player:BuffDown(S.RushingJadeWind) then
       if HR.Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "Rushing Jade Wind"; end
     end
