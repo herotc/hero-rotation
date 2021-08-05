@@ -229,7 +229,7 @@ end
 
 local function CDs()
   -- harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
-  if S.Harpoon:IsReady() and (S.TermsofEngagement:IsAvailable() and Player:Focus() < Player:FocusMax()) then
+  if S.Harpoon:IsReady() and (not Target:IsInRange(8) and Target:IsInRange(30) and S.TermsofEngagement:IsAvailable() and Player:Focus() < Player:FocusMax()) then
     if Cast(S.Harpoon, nil, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon cds 2"; end
   end
   -- use_item,name=dreadfire_vessel,if=covenant.kyrian&cooldown.resonating_arrow.remains>10|!covenant.kyrian
