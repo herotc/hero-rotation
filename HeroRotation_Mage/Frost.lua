@@ -103,8 +103,12 @@ local function Precombat()
   end
   -- snapshot_stats
   if Everyone.TargetIsValid() then
+    -- Manually added : precast Tome of monstruous Constructions
+    if I.TomeofMonstruousConstructions:IsEquippedAndReady() and not Player:AuraInfo(S.TomeofMonstruousConstructionsBuff) then
+      if Cast(I.TomeofMonstruousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tome_of_monstruous_constructions precombat 3"; end
+    end
     -- blizzard,if=active_enemies>=2
-    -- TODO
+    -- TODO precombat active_enemies
     -- frostbolt,if=active_enemies=1
     if S.Frostbolt:IsCastable() and not Player:IsCasting(S.Frostbolt) then
       if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 5"; end

@@ -102,6 +102,7 @@ Spell.Mage.Arcane = {
   ArcaneHarmonyBuff                     = Spell(332777),
   -- Trinket
   SoulIgniterBuff                       = Spell(345211),
+  TomeofMonstruousConstructionsBuff     = Spell(357163),
 }
 
 Spell.Mage.Fire = {
@@ -188,6 +189,7 @@ Spell.Mage.Fire = {
   DisciplinaryCommandBuff               = Spell(327371),
   -- Trinkets
   SoulIgnitionBuff                      = Spell(345211),
+  TomeofMonstruousConstructionsBuff     = Spell(357163),
 }
 
 Spell.Mage.Frost = {
@@ -267,6 +269,8 @@ Spell.Mage.Frost = {
   FreezingWindsBuff                     = Spell(327364),
   SlickIceBuff                          = Spell(327508),
   DisciplinaryCommandBuff               = Spell(327371),
+  -- Trinkets
+  TomeofMonstruousConstructionsBuff     = Spell(357163),
 }
 
 -- Items
@@ -289,6 +293,7 @@ Item.Mage.Arcane = {
   SunbloodAmethyst                 = Item(178826),
   WakenersFrond                    = Item(181457),
   ShadowedOrbofTorment             = Item(186428),
+  TomeofMonstruousConstructions    = Item(186422),
 }
 
 Item.Mage.Fire = {
@@ -308,11 +313,13 @@ Item.Mage.Fire = {
   SunbloodAmethyst                 = Item(178826),
   WakenersFrond                    = Item(181457),
   ShadowedOrbofTorment             = Item(186428),
+  TomeofMonstruousConstructions    = Item(186422),
 }
 
 Item.Mage.Frost = {
   PotionofSpectralIntellect        = Item(171273),
   ShadowedOrbofTorment             = Item(186428),
+  TomeofMonstruousConstructions    = Item(186422),
 }
 
 -- Variables

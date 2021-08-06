@@ -276,42 +276,46 @@ local function Precombat()
   end
   --conjure_mana_gem
   --TODO : manage mana gem
+  -- Manually added : precast Tome of monstruous Constructions
+  if I.TomeofMonstruousConstructions:IsEquippedAndReady() and not Player:AuraInfo(S.TomeofMonstruousConstructionsBuff) then
+    if Cast(I.TomeofMonstruousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tome_of_monstruous_constructions precombat 3"; end
+  end
   --mirror_image
   if S.MirrorImage:IsCastable() and CDsON() and Settings.Arcane.MirrorImagesBeforePull then
-    if Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 3"; end
+    if Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 4"; end
   end
   --fleshcraft,if=soulbind.volatile_solvent|soulbind.pustule_eruption
   if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:IsAvailable() or S.PustuleEruption:IsAvailable()) then
-    if Cast(S.Fleshcraft) then return "fleshcraft precombat 4"; end
+    if Cast(S.Fleshcraft) then return "fleshcraft precombat 5"; end
   end
   --rune_of_power,if=covenant.kyrian&runeforge.arcane_infinity&conduit.arcane_prodigy&variable.always_sync_cooldowns&active_enemies<variable.aoe_target_count
   --TODO : manage active_enemies precombat
   if S.RuneofPower:IsCastable() and Player:Covenant() == "Kyrian" and ArcaneInfinityEquipped and S.ArcaneProdigy:ConduitEnabled() and var_always_sync_cooldowns then
-    if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power precombat 5"; end
+    if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power precombat 6"; end
   end
   --potion
   if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
-    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 6"; end
+    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 7"; end
   end
   --frostbolt,if=!variable.prepull_evo=1&runeforge.disciplinary_command
   if not var_prepull_evo and S.Frostbolt:IsReady() and DisciplinaryCommandEquipped then
-    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 7"; end
+    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 8"; end
   end
   --fireblast,if=!variable.prepull_evo=1&runeforge.disciplinary_command
   if not var_prepull_evo and S.FireBlast:IsReady() and DisciplinaryCommandEquipped then
-    if Cast(S.FireBlast, nil, nil, not Target:IsSpellInRange(S.FireBlast)) then return "fireblast precombat 8"; end
+    if Cast(S.FireBlast, nil, nil, not Target:IsSpellInRange(S.FireBlast)) then return "fireblast precombat 9"; end
   end
   --arcane_blast,if=!variable.prepull_evo=1&!runeforge.disciplinary_command&(!covenant.venthyr|variable.fishing_opener)
   if not var_prepull_evo and S.ArcaneBlast:IsReady() and not DisciplinaryCommandEquipped and (not Player:Covenant() == "Venthyr" or var_fishing_opener) then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast precombat 9"; end
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast precombat 10"; end
   end
   --mirrors_of_torment,if=!variable.prepull_evo=1&!runeforge.disciplinary_command&covenant.venthyr&!variable.fishing_opener
   if S.MirrorsofTorment:IsCastable() and not var_prepull_evo and not DisciplinaryCommandEquipped and Player:Covenant() == "Venthyr" and not var_fishing_opener then
-    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment precombat 10"; end
+    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment precombat 11"; end
   end
   --evocation,if=variable.prepull_evo=1
   if var_prepull_evo and S.Evocation:IsReady() then
-    if Cast(S.Evocation) then return "evocation precombat 11"; end
+    if Cast(S.Evocation) then return "evocation precombat 12"; end
   end
 end
 
