@@ -186,8 +186,12 @@ local function Precombat()
   -- augmentation
   -- food
   -- summon_pet
-  if S.SummonPet:IsCastable() then
-    if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot]) then return "summon_pet precombat 2"; end
+  if S.SummonPet:IsCastable() and (not Pet:IsDeadOrGhost()) then
+    if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot], Settings.Commons2.GCDasOffGCD.SummonPet) then return "Summon Pet"; end
+  end
+  -- revive pet if dead
+  if Pet:IsDeadOrGhost() and S.RevivePet:IsCastable() then
+    if Cast(S.RevivePet, Settings.Commons2.GCDasOffGCD.RevivePet) then return "Revive Pet"; end
   end
   -- snapshot_stats
   if Everyone.TargetIsValid() then
@@ -228,6 +232,10 @@ local function Precombat()
 end
 
 local function CDs()
+  -- Suggest mend pet
+  if not Pet:IsDeadOrGhost() and S.MendPet:IsCastable() and Pet:HealthPercentage() <= Settings.Commons2.MendPetHighHP then
+    if Cast(S.MendPet, Settings.Commons2.GCDasOffGCD.MendPet) then return "Mend Pet High Priority"; end
+  end
   -- harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
   if S.Harpoon:IsReady() and (not Target:IsInRange(8) and Target:IsInRange(30) and S.TermsofEngagement:IsAvailable() and Player:Focus() < Player:FocusMax()) then
     if Cast(S.Harpoon, nil, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon cds 2"; end

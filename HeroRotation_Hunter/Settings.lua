@@ -44,6 +44,7 @@ HR.GUISettings.APL.Hunter = {
       Flare = false,
       RevivePet = false,
       SummonPet = false,
+      MendPet = false,
       FreezingTrap = false,
       TarTrap = false,
     },
