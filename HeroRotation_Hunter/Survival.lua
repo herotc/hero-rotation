@@ -232,10 +232,6 @@ local function Precombat()
 end
 
 local function CDs()
-  -- Suggest mend pet
-  if not Pet:IsDeadOrGhost() and S.MendPet:IsCastable() and Pet:HealthPercentage() <= Settings.Commons2.MendPetHighHP then
-    if Cast(S.MendPet, Settings.Commons2.GCDasOffGCD.MendPet) then return "Mend Pet High Priority"; end
-  end
   -- harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
   if S.Harpoon:IsReady() and (not Target:IsInRange(8) and Target:IsInRange(30) and S.TermsofEngagement:IsAvailable() and Player:Focus() < Player:FocusMax()) then
     if Cast(S.Harpoon, nil, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon cds 2"; end
@@ -696,10 +692,14 @@ local function APL()
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
-
+  
   -- Exhilaration
   if S.Exhilaration:IsCastable() and Player:HealthPercentage() <= Settings.Commons2.ExhilarationHP then
     if Cast(S.Exhilaration, Settings.Commons2.GCDasOffGCD.Exhilaration) then return "Exhilaration"; end
+  end
+  -- Suggest mend pet
+  if not Pet:IsDeadOrGhost() and S.MendPet:IsCastable() and Pet:HealthPercentage() <= Settings.Commons2.MendPetHighHP then
+    if Cast(S.MendPet, Settings.Commons2.GCDasOffGCD.MendPet) then return "Mend Pet High Priority"; end
   end
   if Everyone.TargetIsValid() then
     -- muzzle
