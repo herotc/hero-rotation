@@ -816,8 +816,8 @@ local function FishingOpener()
   if S.ArcaneBarrage:IsCastable() and var_empowered_barrage and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffUp(S.ArcanePower) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage fishing_opener 17"; end
   end
-  --touch_of_the_magi,if=buff.rune_of_power.down|prev_gcd.1.arcane_barrage|prev_gcd.1.radiant_spark|prev_gcd.1.deathborne
-  if S.TouchoftheMagi:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or Player:PrevGCD(1,S.ArcaneBarrage) or Player:IsCasting(S.RadiantSpark) or Player:IsCasting(S.Deathborne)) then
+  --touch_of_the_magi,if=buff.rune_of_power.down|prev_gcd.1.arcane_barrage|prev_gcd.1.radiant_spark|(prev_gcd.1.deathborne&!runeforge.siphon_storm)
+  if S.TouchoftheMagi:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or Player:PrevGCD(1,S.ArcaneBarrage) or Player:IsCasting(S.RadiantSpark) or (Player:IsCasting(S.Deathborne) and not SiphonStormEquipped)) then
     if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi fishing_opener 18"; end
   end
   --arcane_power,if=prev_gcd.1.touch_of_the_magi
@@ -1367,7 +1367,7 @@ local function APL()
 end
 
 local function Init()
-  -- APL 10/07/2021 https://github.com/simulationcraft/simc/commit/ec8dda33a4e1999583bb4acefc562f681126450a
+  -- APL 10/08/2021 https://github.com/simulationcraft/simc/commit/8377a1876d50880d617d84ccd22e84d22dc086a1
   HR.Print("Arcane Mage rotation is currently a work in progress.")
 end
 
