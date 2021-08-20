@@ -115,8 +115,6 @@ HL.AddCoreOverride("Spell.IsCastable",
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellArcane.Frostbolt then
       return BaseCheck and not Player:IsCasting(self)
-    elseif self == SpellArcane.PresenceofMind then
-      return BaseCheck and Player:BuffDown(SpellArcane.PresenceofMind)
     else
       return BaseCheck
     end
@@ -184,6 +182,35 @@ HL.AddCoreOverride("Spell.IsReady",
   end
 , 63)
 
+HL.AddCoreOverride("Spell.IsCastable",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self:CastTime() > 0 and Player:IsMoving() and Settings.Arcane.MovingRotation then
+      return false
+    end
+
+    local RangeOK = true
+    if Range then
+      local RangeUnit = ThisUnit or Target
+      RangeOK = RangeUnit:IsInRange( Range, AoESpell )
+    end
+
+    local BaseCheck = self:IsLearned() and self:CooldownRemains( BypassRecovery, Offset or "Auto") == 0 and RangeOK
+    if self == SpellFire.MirrorsofTorment then
+      return BaseCheck and not Player:IsCasting(self)
+    elseif self == SpellFire.RadiantSpark then
+      return BaseCheck and not Player:IsCasting(self)    
+    elseif self == SpellFire.ShiftingPower then
+      return BaseCheck and not Player:IsCasting(self)    
+    elseif self == SpellFire.Deathborne then
+      return BaseCheck and not Player:IsCasting(self)
+    elseif self == SpellFire.Frostbolt then
+      return BaseCheck and not Player:IsCasting(self)
+    else
+      return BaseCheck
+    end
+  end
+, 63)
+
 local FireOldPlayerAffectingCombat
 FireOldPlayerAffectingCombat = HL.AddCoreOverride("Player.AffectingCombat",
   function (self)
@@ -221,6 +248,12 @@ FrostOldSpellIsCastable = HL.AddCoreOverride("Spell.IsCastable",
       elseif self == SpellFrost.RuneofPower then
         return BaseCheck and not Player:IsCasting(self) and Player:BuffDown(SpellFrost.RuneofPowerBuff)
       elseif self == SpellFrost.MirrorsofTorment then
+        return BaseCheck and not Player:IsCasting(self)
+      elseif self == SpellFrost.RadiantSpark then
+        return BaseCheck and not Player:IsCasting(self)    
+      elseif self == SpellFrost.ShiftingPower then
+        return BaseCheck and not Player:IsCasting(self)    
+      elseif self == SpellFrost.Deathborne then
         return BaseCheck and not Player:IsCasting(self)
       else
         return BaseCheck

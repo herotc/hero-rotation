@@ -161,7 +161,7 @@ function S.ShiftingPower:FullReduction()
   return S.ShiftingPower:TickReduction() * S.ShiftingPower:BaseDuration() / S.ShiftingPower:BaseTickTime()
 end
 
-local function UnitsWithIgnite(enemies)
+local function UnitsWithIgnite (enemies)
   local WithIgnite = 0
   for k in pairs(enemies) do
     local CycleUnit = enemies[k]
@@ -172,15 +172,15 @@ local function UnitsWithIgnite(enemies)
   return WithIgnite
 end
 
-local function num(val)
+local function num (val)
   if val then return 1 else return 0 end
 end
 
-local function bool(val)
+local function bool (val)
   return val ~= 0
 end
 
-local function HotStreakInFlight()
+local function HotStreakInFlight ()
   local total = 0
   if (Player:BuffUp(S.HeatingUpBuff)) then
     total = total + 1
@@ -191,24 +191,24 @@ local function HotStreakInFlight()
   return total
 end
 
-local function VarInit()
+local function VarInit ()
   -- variable,name=firestarter_combustion,default=-1,value=1*!talent.pyroclasm,if=variable.firestarter_combustion<0
   if var_firestarter_combustion < 0 then
     var_firestarter_combustion = 1 * num(S.Pyroclasm:IsAvailable())
   end
 
-  -- variable,name=hot_streak_flamestrike,if=variable.hot_streak_flamestrike=0,value=2*talent.flame_patch+3*!talent.flame_patch
+  -- variable,name=hot_streak_flamestrike,if=variable.hot_streak_flamestrike=0,value=2*talent.flame_patch+4*!talent.flame_patch
   if S.FlamePatch:IsAvailable() then
     var_hot_streak_flamestrike = 2
   else
-    var_hot_streak_flamestrike = 3
+    var_hot_streak_flamestrike = 4
   end
 
-  -- variable,name=hard_cast_flamestrike,if=variable.hard_cast_flamestrike=0,value=2*talent.flame_patch+3*!talent.flame_patch
+  -- variable,name=hard_cast_flamestrike,if=variable.hard_cast_flamestrike=0,value=3*talent.flame_patch+6*!talent.flame_patch
   if S.FlamePatch:IsAvailable() then
-    var_hard_cast_flamestrike = 2
-  else
     var_hard_cast_flamestrike = 3
+  else
+    var_hard_cast_flamestrike = 6
   end
 
   -- variable,name=combustion_flamestrike,if=variable.combustion_flamestrike=0,value=3*talent.flame_patch+6*!talent.flame_patch
@@ -228,8 +228,8 @@ local function VarInit()
   -- variable,name=arcane_explosion_mana,default=40,op=reset
   var_arcane_explosion_mana = 40
 
-  -- variable,name=combustion_shifting_power,default=2,op=reset
-  var_combustion_shifting_power = 2
+  -- variable,name=combustion_shifting_power,if=variable.combustion_shifting_power=0,value=1*talent.pyroclasm*runeforge.sun_kings_blessing+3*(!runeforge.sun_kings_blessing|!talent.pyroclasm)
+  var_combustion_shifting_power = 1 * num(S.Pyroclasm:IsAvailable()) * num(SunKingsBlessingEquipped) + 3 * num(not SunKingsBlessingEquipped or not S.Pyroclasm:IsAvailable())
 
   -- variable,name=combustion_cast_remains,default=0.7,op=reset
   var_combustion_cast_remains = 0.7
@@ -275,7 +275,7 @@ local function VarInit()
   var_init = true
 end
 
-local function Precombat()
+local function Precombat ()
   -- flask
   -- food
   -- augmentation
@@ -311,7 +311,7 @@ local function Precombat()
   end
 end
 
-local function CombustionTiming()
+local function CombustionTiming ()
   -- variable,name=combustion_ready_time,value=cooldown.combustion.remains*expected_kindling_reduction
   var_combustion_ready_time = S.Combustion:CooldownRemains() * var_kindling_reduction
   -- variable,name=combustion_precast_time,value=(action.fireball.cast_time*!conduit.flame_accretion+action.scorch.cast_time+conduit.flame_accretion)*(active_enemies<variable.combustion_flamestrike)+action.flamestrike.cast_time*(active_enemies>=variable.combustion_flamestrike)-variable.combustion_cast_remains
@@ -377,7 +377,7 @@ local function CombustionTiming()
   end
 end
 
-local function ActiveTalents()
+local function ActiveTalents ()
   -- living_bomb,if=active_enemies>1&buff.combustion.down&(variable.time_to_combustion>cooldown.living_bomb.duration|variable.time_to_combustion<=0)
   if S.LivingBomb:IsReady() and (EnemiesCount10ySplash > 1 and Player:BuffDown(S.CombustionBuff) and (var_time_to_combustion > S.LivingBomb:CooldownRemains() or var_time_to_combustion <= 0)) then
     if Cast(S.LivingBomb, nil, nil, not Target:IsInRange(S.LivingBomb)) then return "living_bomb active_talents 1"; end
@@ -396,7 +396,7 @@ local function ActiveTalents()
   end
 end
 
-local function CombustionCooldowns()
+local function CombustionCooldowns ()
   -- potion
   if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
     if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion combustion_cooldowns 1"; end
@@ -452,7 +452,7 @@ local function CombustionCooldowns()
   end
 end
 
-local function CombustionPhase()
+local function CombustionPhase ()
   -- lights_judgment,if=buff.combustion.down
   if S.LightsJudgment:IsCastable() and Player:BuffDown(S.CombustionBuff) then
     if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment combustion_phase 1"; end
@@ -498,7 +498,7 @@ local function CombustionPhase()
   if (true) then
     local ShouldReturn = ActiveTalents(); if ShouldReturn then return ShouldReturn; end
   end
-  -- combustion,use_off_gcd=1,use_while_casting=1,if=buff.combustion.down&variable.time_to_combustion<=0&(!runeforge.disciplinary_command|buff.disciplinary_command.up|buff.disciplinary_command_frost.up&talent.rune_of_power&cooldown.buff_disciplinary_command.ready)
+  -- combustion,use_off_gcd=1,use_while_casting=1,if=hot_streak_spells_in_flight=0&buff.combustion.down&variable.time_to_combustion<=0&(!runeforge.disciplinary_command|buff.disciplinary_command.up|buff.disciplinary_command_frost.up&talent.rune_of_power&cooldown.buff_disciplinary_command.ready)
   --&(!runeforge.grisly_icicle|debuff.grisly_icicle.up)&(!covenant.necrolord|cooldown.deathborne.remains|buff.deathborne.up)&(!covenant.venthyr|cooldown.mirrors_of_torment.remains)
   --&(action.meteor.in_flight&action.meteor.in_flight_remains<=variable.combustion_cast_remains|action.scorch.executing&action.scorch.execute_remains<variable.combustion_cast_remains|action.fireball.executing&action.fireball.execute_remains<variable.combustion_cast_remains|action.pyroblast.executing&action.pyroblast.execute_remains<variable.combustion_cast_remains|action.flamestrike.executing&action.flamestrike.execute_remains<variable.combustion_cast_remains)
   if S.Combustion:IsReady() and (Player:BuffDown(S.CombustionBuff) and var_time_to_combustion <= 0 and (not DisciplinaryCommandEquipped or Player:BuffUp(S.DisciplinaryCommandBuff) or Mage.DC.Frost == 1 and S.RuneofPower:IsAvailable() and var_disciplinary_command_cd_remains <= 0) 
@@ -514,66 +514,78 @@ local function CombustionPhase()
   if S.Flamestrike:IsReady() and AoEON() and ((Player:BuffUp(S.HotStreakBuff) and EnemiesCount8ySplash >= var_combustion_flamestrike) or (Player:BuffUp(S.FirestormBuff) and EnemiesCount8ySplash >= var_combustion_flamestrike - num(FirestormEquipped))) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 16"; end
   end
+  -- radiant_spark,if=buff.combustion.up,if=prev_gcd.1.pyroblast
+  if S.RadiantSpark:IsReady() and Player:PrevGCD(1, S.Pyroblast) then
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "radiant_spark combustion_phase 17"; end
+  end
+  -- rune_of_power,if=buff.sun_kings_blessing_ready.up&!buff.hot_streak.react&buff.rune_of_power.remains<action.pyroblast.cast_time&buff.sun_kings_blessing_ready.remains>action.pyroblast.cast_time+execute_time
+  if S.RuneofPower:IsReady() and Player:BuffUp(S.SunKingsBlessingBuff) and Player:BuffRemains(S.RuneofPowerBuff) < S.Pyroblast:CastTime() and Player:BuffRemains(S.SunKingsBlessingBuff) > S.Pyroblast:CastTime() + S.Pyroblast:ExecuteTime() then
+    if Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneOfPower) then return "rune_of_power combustion_phase 18"; end
+  end
+  -- flamestrike,if=active_enemies>=variable.combustion_flamestrike&buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time
+  if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_combustion_flamestrike and Player:BuffUp(S.SunKingsBlessingBuff) and Player:BuffRemains(S.SunKingsBlessingBuff) > S.Flamestrike:CastTime()) then
+    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 19"; end
+  end
   -- pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.SunKingsBlessingBuff) and Player:BuffRemains(S.SunKingsBlessingBuff) > S.Pyroblast:CastTime()) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 18"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 20"; end
   end
   -- pyroblast,if=buff.firestorm.react
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.FirestormBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 19"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 21"; end
   end
   -- pyroblast,if=buff.pyroclasm.react&buff.pyroclasm.remains>cast_time&(buff.combustion.remains>cast_time|buff.combustion.down)&active_enemies<variable.combustion_flamestrike
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.PyroclasmBuff) and Player:BuffRemains(S.PyroclasmBuff) > S.Pyroblast:CastTime() and (Player:BuffRemains(S.CombustionBuff) > S.Pyroblast:CastTime() or Player:BuffDown(S.CombustionBuff)) and EnemiesCount8ySplash < var_combustion_flamestrike) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 20"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 22"; end
   end
   -- pyroblast,if=buff.hot_streak.react&buff.combustion.up
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.HotStreakBuff) and Player:BuffUp(S.CombustionBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 21"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 23"; end
   end
   -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react&active_enemies<variable.combustion_flamestrike&buff.combustion.up
   if S.Pyroblast:IsReady() and ((Player:IsCasting(S.Scorch) or Player:PrevGCD(1, S.Scorch)) and Player:BuffUp(S.HeatingUpBuff) and EnemiesCount8ySplash < var_combustion_flamestrike and Player:BuffUp(S.CombustionBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 22"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 24"; end
   end
   -- shifting_power,if=buff.combustion.up&!action.fire_blast.charges&active_enemies>=variable.combustion_shifting_power&action.phoenix_flames.full_recharge_time>full_reduction,interrupt_if=action.fire_blast.charges=action.fire_blast.max_charges
   --TODO : interrupt_if
   if S.ShiftingPower:IsReady() and AoEON() and (Player:BuffUp(S.CombustionBuff) and S.FireBlast:Charges() == 0 and EnemiesCount18yMelee >= var_combustion_shifting_power and S.PhoenixFlames:FullRechargeTime() > S.ShiftingPower:FullReduction()) then
-    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(18)) then return "shifting_power combustion_phase 23"; end
+    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(18)) then return "shifting_power combustion_phase 25"; end
   end
   -- phoenix_flames,if=buff.combustion.up&travel_time<buff.combustion.remains&((action.fire_blast.charges<1&talent.pyroclasm&active_enemies=1)|!talent.pyroclasm|active_enemies>1)&buff.heating_up.react+hot_streak_spells_in_flight<2
   if S.PhoenixFlames:IsCastable() and (Player:BuffUp(S.CombustionBuff) and S.PhoenixFlames:TravelTime() < Player:BuffRemains(S.CombustionBuff) and ((S.FireBlast:Charges() < 1 and S.Pyroclasm:IsAvailable() and EnemiesCount8ySplash == 1) or not S.Pyroclasm:IsAvailable() or EnemiesCount8ySplash > 1) and HotStreakInFlight() < 2) then
-    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 24"; end
+    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 26"; end
   end
   -- flamestrike,if=buff.combustion.down&cooldown.combustion.remains<cast_time&active_enemies>=variable.combustion_flamestrike
   if S.Flamestrike:IsReady() and AoEON() and (Player:BuffDown(S.CombustionBuff) and S.Combustion:CooldownRemains() < S.Flamestrike:CastTime() and EnemiesCount8ySplash >= var_combustion_flamestrike) then
-    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 25"; end
+    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 27"; end
   end
   -- Manually added: scorch,if=target.health.pct<=30&talent.searing_touch
   if S.Scorch:IsReady() and (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30) then
-    if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch combustion_phase 26"; end
+    if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch combustion_phase 28"; end
   end
   -- fireball,if=buff.combustion.down&cooldown.combustion.remains<cast_time&!conduit.flame_accretion
   if S.Fireball:IsReady() and (Player:BuffDown(S.CombustionBuff) and S.Combustion:CooldownRemains() < S.Fireball:CastTime() and not S.FlameAccretion:ConduitEnabled()) then
-    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball combustion_phase 27"; end
+    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball combustion_phase 29"; end
   end
   -- scorch,if=buff.combustion.remains>cast_time&buff.combustion.up|buff.combustion.down&cooldown.combustion.remains<cast_time
   if S.Scorch:IsReady() and (Player:BuffRemains(S.CombustionBuff) > S.Scorch:CastTime() and Player:BuffUp(S.CombustionBuff) or (Player:BuffDown(S.CombustionBuff) and S.Combustion:CooldownRemains() < S.Scorch:CastTime())) then
-    if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch combustion_phase 28"; end
+    if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch combustion_phase 30"; end
   end
   -- living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1
   if S.LivingBomb:IsReady() and AoEON() and (Player:BuffRemains(S.CombustionBuff) < Player:GCD() + 0.5 and EnemiesCount10ySplash > 1) then
-    if Cast(S.LivingBomb, nil, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb combustion_phase 29"; end
+    if Cast(S.LivingBomb, nil, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb combustion_phase 31"; end
   end
   -- dragons_breath,if=buff.combustion.remains<gcd.max&buff.combustion.up
   if S.DragonsBreath:IsReady() and (Player:BuffRemains(S.CombustionBuff) < Player:GCD() + 0.5 and Player:BuffUp(S.CombustionBuff)) then
     if Settings.Fire.StayDistance and not Target:IsInRange(12) then
-      if CastLeft(S.DragonsBreath) then return "dragons_breath combustion_phase 30 left"; end
+      if CastLeft(S.DragonsBreath) then return "dragons_breath combustion_phase 32 left"; end
     else
-      if Cast(S.DragonsBreath) then return "dragons_breath combustion_phase 30"; end
+      if Cast(S.DragonsBreath) then return "dragons_breath combustion_phase 32"; end
     end
   end
 end
 
-local function RoPPhase()
+local function RoPPhase ()
   -- flamestrike,if=active_enemies>=variable.hot_streak_flamestrike&(buff.hot_streak.react|buff.firestorm.react)
   if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_hot_streak_flamestrike and (Player:BuffUp(S.HotStreakBuff) or Player:BuffUp(S.FirestormBuff))) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike rop_phase 1"; end
@@ -582,25 +594,29 @@ local function RoPPhase()
   if S.Fireball:IsReady() and Player:BuffUp(S.Deathborne) and DeathFathomEquipped and var_time_to_combustion < Player:BuffRemains(S.Deathborne) and EnemiesCount8ySplash >= 2 then
     if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball rop_phase 2"; end
   end
+  -- flamestrike,if=active_enemies>=variable.hard_cast_flamestrike&buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time
+  if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_hard_cast_flamestrike and Player:BuffUp(S.SunKingsBlessingBuff) and Player:BuffRemains(S.SunKingsBlessingBuff) > S.Flamestrike:CastTime()) then
+    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike rop_phase 3"; end
+  end
   -- pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.SunKingsBlessingBuff) and Player:BuffRemains(S.SunKingsBlessingBuff) > S.Pyroblast:CastTime()) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 3"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 4"; end
   end
   -- pyroblast,if=buff.firestorm.react
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.FirestormBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 4"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 5"; end
   end
   -- pyroblast,if=buff.hot_streak.react
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.HotStreakBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 5"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 6"; end
   end
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&buff.sun_kings_blessing_ready.down&active_enemies<variable.hard_cast_flamestrike&!firestarter.active&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(talent.alexstraszas_fury&cooldown.dragons_breath.ready)|searing_touch.active))
   if S.FireBlast:IsReady() and (not var_fire_blast_pooling and Player:BuffDown(S.SunKingsBlessingBuff) and EnemiesCount8ySplash < var_hard_cast_flamestrike and not bool(S.Firestarter:ActiveStatus()) and (Player:BuffDown(S.HeatingUpBuff) and Player:BuffDown(S.HotStreakBuff) and not Player:PrevOffGCDP(1,S.FireBlast) and (S.FireBlast:Charges() >= 2 or (S.AlexstraszasFury:IsAvailable() and S.DragonsBreath:CooldownUp()) or var_searing_touch_active))) then
-    if FBCast(S.FireBlast) then return "fire_blast rop_phase 6"; end
+    if FBCast(S.FireBlast) then return "fire_blast rop_phase 7"; end
   end
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&!firestarter.active&(((action.fireball.executing&(action.fireball.execute_remains<0.5|!runeforge.firestorm)|action.pyroblast.executing&(action.pyroblast.execute_remains<0.5|!runeforge.firestorm))&buff.heating_up.react)|(searing_touch.active&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!hot_streak_spells_in_flight)))
   if S.FireBlast:IsReady() and (not var_fire_blast_pooling and not bool(S.Firestarter:ActiveStatus()) and (((Player:IsCasting(S.Fireball) and (S.Fireball:ExecuteRemains() < 0.5 or not FirestormEquipped) or Player:IsCasting(S.Pyroblast) and (S.Pyroblast:ExecuteRemains() < 0.5 or not FirestormEquipped)) and Player:BuffUp(S.HeatingUpBuff)) or (var_searing_touch_active and (Player:BuffUp(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDown(S.HotStreakBuff) and Player:BuffDown(S.HeatingUpBuff) and Player:IsCasting(S.Scorch) and not (S.Fireball:InFlight() or Player:IsCasting(S.Fireball) or Player:IsCasting(S.Scorch) or S.PhoenixFlames:InFlight()))))) then
-    if FBCast(S.FireBlast) then return "fire_blast rop_phase 7"; end
+    if FBCast(S.FireBlast) then return "fire_blast rop_phase 8"; end
   end
   -- call_action_list,name=active_talents
   if (true) then
@@ -608,86 +624,94 @@ local function RoPPhase()
   end
   -- pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains&cast_time<buff.rune_of_power.remains
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.PyroclasmBuff) and S.Pyroblast:CastTime() < Player:BuffRemains(S.PyroclasmBuff) and S.Pyroblast:CastTime() < Player:BuffRemains(S.RuneofPowerBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 9"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 10"; end
   end
   -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react&searing_touch.active&active_enemies<variable.hot_streak_flamestrike
   if S.Pyroblast:IsReady() and ((Player:IsCasting(S.Scorch) or Player:PrevGCD(1, S.Scorch)) and Player:BuffUp(S.HeatingUpBuff) and var_searing_touch_active and EnemiesCount8ySplash < var_hot_streak_flamestrike) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 10"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 11"; end
   end
   -- phoenix_flames,if=!variable.phoenix_pooling&buff.heating_up.react&!buff.hot_streak.react&(active_dot.ignite<2|active_enemies>=variable.hard_cast_flamestrike|active_enemies>=variable.hot_streak_flamestrike)
   if S.PhoenixFlames:IsCastable() and (not var_phoenix_pooling and Player:BuffUp(S.HeatingUpBuff) and Player:BuffDown(S.HotStreakBuff) and (UnitsWithIgniteCount < 2 or EnemiesCount8ySplash >= var_hard_cast_flamestrike or EnemiesCount8ySplash >= var_hot_streak_flamestrike)) then
-    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames rop_phase 11"; end
+    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames rop_phase 12"; end
   end
   -- scorch,if=searing_touch.active
   if S.Scorch:IsReady() and (var_searing_touch_active) then
-    if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch rop_phase 12"; end
+    if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch rop_phase 13"; end
   end
   -- dragons_breath,if=active_enemies>2
   if S.DragonsBreath:IsReady() and AoEON() and (EnemiesCount16ySplash > 2) then
     if Settings.Fire.StayDistance and not Target:IsInRange(12) then
-      if CastLeft(S.DragonsBreath) then return "dragons_breath rop_phase 13 left"; end
+      if CastLeft(S.DragonsBreath) then return "dragons_breath rop_phase 14 left"; end
     else
-      if Cast(S.DragonsBreath) then return "dragons_breath rop_phase 13"; end
+      if Cast(S.DragonsBreath) then return "dragons_breath rop_phase 14"; end
     end
   end
   -- arcane_explosion,if=active_enemies>=variable.arcane_explosion&mana.pct>=variable.arcane_explosion_mana
   if S.ArcaneExplosion:IsReady() and AoEON() and (EnemiesCount10yMelee >= var_arcane_explosion and Player:ManaPercentageP() >= var_arcane_explosion_mana) then
     if Settings.Fire.StayDistance and not Target:IsInRange(10) then
-      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion rop_phase 14 left"; end
+      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion rop_phase 15 left"; end
     else
-      if Cast(S.ArcaneExplosion) then return "arcane_explosion rop_phase 14"; end
+      if Cast(S.ArcaneExplosion) then return "arcane_explosion rop_phase 15"; end
     end
   end
   -- flamestrike,if=active_enemies>=variable.hard_cast_flamestrike
   if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_hard_cast_flamestrike) then
-    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike rop_phase 15"; end
+    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike rop_phase 16"; end
   end
   -- fireball
   if S.Fireball:IsReady() then
-    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball rop_phase 16"; end
+    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball rop_phase 17"; end
   end
 end
 
-local function StandardRotation()
+local function StandardRotation ()
   -- flamestrike,if=active_enemies>=variable.hot_streak_flamestrike&(buff.hot_streak.react|buff.firestorm.react)
   if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_hot_streak_flamestrike and (Player:BuffUp(S.HotStreakBuff) or Player:BuffUp(S.FirestormBuff))) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike standard_rotation 1"; end
   end
+  -- fireball,if=buff.deathborne.up&runeforge.deaths_fathom&variable.time_to_combustion<buff.deathborne.remains&active_enemies>=2
+  if S.Fireball:IsReady() and Player:BuffUp(S.Deathborne) and DeathFathomEquipped and var_time_to_combustion < Player:BuffRemains(S.Deathborne) and EnemiesCount8ySplash >= 2 then
+    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball standard_rotation 2"; end
+  end
   -- pyroblast,if=buff.firestorm.react
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.FirestormBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 2"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 3"; end
   end
   -- pyroblast,if=buff.hot_streak.react&buff.hot_streak.remains<action.fireball.execute_time
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.HotStreakBuff) and Player:BuffRemains(S.HotStreakBuff) < S.Fireball:ExecuteTime()) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 3"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 4"; end
   end
   -- pyroblast,if=buff.hot_streak.react&(prev_gcd.1.fireball|firestarter.active|action.pyroblast.in_flight)
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.HotStreakBuff) and (Player:PrevGCD(1,S.Fireball) or bool(S.Firestarter:ActiveStatus()) or S.Pyroblast:InFlight())) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 4"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 5"; end
+  end
+  -- flamestrike,if=active_enemies>=variable.hard_cast_flamestrike&buff.sun_kings_blessing_ready.up&(cooldown.rune_of_power.remains+action.rune_of_power.execute_time+cast_time>buff.sun_kings_blessing_ready.remains|!talent.rune_of_power)&variable.time_to_combustion+cast_time>buff.sun_kings_blessing_ready.remains
+  if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_hard_cast_flamestrike and Player:BuffUp(S.SunKingsBlessingBuff) and (S.RuneofPower:CooldownRemains() + S.RuneofPower:ExecuteTime() + S.Flamestrike:CastTime() > Player:BuffRemains(S.SunKingsBlessingBuff) or not S.RuneofPower:IsAvailable()) and var_time_to_combustion + S.Flamestrike:CastTime() > Player:BuffRemains(S.SunKingsBlessingBuff)) then
+    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike standard_rotation 6"; end
   end
   -- pyroblast,if=buff.sun_kings_blessing_ready.up&(cooldown.rune_of_power.remains+action.rune_of_power.execute_time+cast_time>buff.sun_kings_blessing_ready.remains|!talent.rune_of_power)&variable.time_to_combustion+cast_time>buff.sun_kings_blessing_ready.remains
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.SunKingsBlessingBuff) and (S.RuneofPower:CooldownRemains() + S.RuneofPower:ExecuteTime() + S.Pyroblast:CastTime() > Player:BuffRemains(S.SunKingsBlessingBuff) or not S.RuneofPower:IsAvailable()) and var_time_to_combustion + S.Pyroblast:CastTime() > Player:BuffRemains(S.SunKingsBlessingBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 5"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 7"; end
   end
   -- pyroblast,if=buff.hot_streak.react&searing_touch.active
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.HotStreakBuff) and var_searing_touch_active) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 6"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 8"; end
   end
   -- pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.PyroclasmBuff) and S.Pyroblast:CastTime() < Player:BuffRemains(S.PyroclasmBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 7"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 9"; end
   end
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!firestarter.active&!variable.fire_blast_pooling&(((action.fireball.executing&(action.fireball.execute_remains<0.5|!runeforge.firestorm)|action.pyroblast.executing&(action.pyroblast.execute_remains<0.5|!runeforge.firestorm))&buff.heating_up.react)|(searing_touch.active&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!hot_streak_spells_in_flight)))
   if S.FireBlast:IsReady() and (not bool(S.Firestarter:ActiveStatus()) and not var_fire_blast_pooling and (((Player:IsCasting(S.Fireball) and (S.Fireball:ExecuteRemains() < 0.5 or not FirestormEquipped) or Player:IsCasting(S.Pyroblast) and (S.Pyroblast:ExecuteRemains() < 0.5 or not FirestormEquipped)) and Player:BuffUp(S.HeatingUpBuff)) or (var_searing_touch_active and (Player:BuffUp(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDown(S.HotStreakBuff) and Player:BuffDown(S.HeatingUpBuff) and Player:IsCasting(S.Scorch) and not (S.Fireball:InFlight() or Player:IsCasting(S.Fireball) or Player:IsCasting(S.Scorch) or S.PhoenixFlames:InFlight()))))) then
-    if FBCast(S.FireBlast) then return "fire_blast standard_rotation 8"; end
+    if FBCast(S.FireBlast) then return "fire_blast standard_rotation 10"; end
   end
   -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react&searing_touch.active&active_enemies<variable.hot_streak_flamestrike
   if S.Pyroblast:IsReady() and ((Player:IsCasting(S.Scorch) or Player:PrevGCDP(1, S.Scorch)) and Player:BuffUp(S.HeatingUpBuff) and var_searing_touch_active and EnemiesCount8ySplash < var_hot_streak_flamestrike) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 9"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 11"; end
   end
   -- phoenix_flames,if=!variable.phoenix_pooling&(!talent.from_the_ashes|active_enemies>1)&(active_dot.ignite<2|active_enemies>=variable.hard_cast_flamestrike|active_enemies>=variable.hot_streak_flamestrike)
   if S.PhoenixFlames:IsCastable() and (not var_phoenix_pooling and (not S.FromTheAshes:IsAvailable() or EnemiesCount8ySplash > 1) and (UnitsWithIgniteCount < 2 or EnemiesCount8ySplash >= var_hard_cast_flamestrike or EnemiesCount8ySplash >= var_hot_streak_flamestrike)) then
-    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames standard_rotation 10"; end
+    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames standard_rotation 12"; end
   end
   -- call_action_list,name=active_talents
   if (true) then
@@ -696,35 +720,35 @@ local function StandardRotation()
   -- dragons_breath,if=active_enemies>1
   if S.DragonsBreath:IsReady() and AoEON() and (EnemiesCount16ySplash > 1) then
     if Settings.Fire.StayDistance and not Target:IsInRange(12) then
-      if CastLeft(S.DragonsBreath) then return "dragons_breath standard_rotation 12 left"; end
+      if CastLeft(S.DragonsBreath) then return "dragons_breath standard_rotation 14 left"; end
     else
-      if Cast(S.DragonsBreath) then return "dragons_breath standard_rotation 12"; end
+      if Cast(S.DragonsBreath) then return "dragons_breath standard_rotation 14"; end
     end
   end
   -- scorch,if=searing_touch.active
   if S.Scorch:IsReady() and (var_searing_touch_active) then
-    if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch standard_rotation 13"; end
+    if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch standard_rotation 15"; end
   end
   -- arcane_explosion,if=active_enemies>=variable.arcane_explosion&mana.pct>=variable.arcane_explosion_mana
   if S.ArcaneExplosion:IsReady() and AoEON() and (EnemiesCount10yMelee >= var_arcane_explosion and Player:ManaPercentageP() >= var_arcane_explosion_mana) then
     if Settings.Fire.StayDistance and not Target:IsInRange(10) then
-      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion standard_rotation 14 left"; end
+      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion standard_rotation 16 left"; end
     else
-      if Cast(S.ArcaneExplosion) then return "arcane_explosion standard_rotation 14"; end
+      if Cast(S.ArcaneExplosion) then return "arcane_explosion standard_rotation 16"; end
     end
   end
   -- flamestrike,if=active_enemies>=variable.hard_cast_flamestrike
   if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_hard_cast_flamestrike) then
-    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike standard_rotation 15"; end
+    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike standard_rotation 17"; end
   end
   -- fireball
   if S.Fireball:IsReady() then
-    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball standard_rotation 16"; end
+    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball standard_rotation 18"; end
   end
 end
 
 --- ======= ACTION LISTS =======
-local function APL()
+local function APL ()
   -- Check which cast style we should use for Fire Blast
   if Settings.Fire.ShowFireBlastLeft then
     FBCast = CastLeft
@@ -780,12 +804,14 @@ local function APL()
     --[[ if S.Counterspell:IsCastable() and not DisciplinaryCommandEquipped then
       if Cast(S.Counterspell) then return "counterspell default 1"; end
     end ]]
+    -- newfound_resolve,use_while_casting=1,if=(buff.combustion.up|buff.sun_kings_blessing_ready.react)&buff.newfound_resolve.down
+    -- Not really an action to do
     -- call_action_list,name=combustion_timing,if=!variable.disable_combustion
     if not var_disable_combustion then
       CombustionTiming()
     end
-    -- variable,name=shifting_power_before_combustion,value=(active_enemies<variable.combustion_shifting_power|active_enemies<variable.combustion_flamestrike|variable.time_to_combustion-action.shifting_power.full_reduction>cooldown.shifting_power.duration)&variable.time_to_combustion-cooldown.shifting_power.remains>action.shifting_power.full_reduction&(cooldown.rune_of_power.remains-cooldown.shifting_power.remains>5|!talent.rune_of_power)
-    if (EnemiesCount8ySplash < var_combustion_shifting_power or EnemiesCount8ySplash < var_combustion_flamestrike or var_time_to_combustion - S.ShiftingPower:FullReduction() > 60) and var_time_to_combustion - S.ShiftingPower:CooldownRemains() > S.ShiftingPower:FullReduction() and (S.RuneofPower:CooldownRemains() - S.ShiftingPower:CooldownRemains() > 5 or not S.RuneofPower:IsAvailable()) then
+    -- variable,name=shifting_power_before_combustion,value=variable.time_to_combustion-cooldown.shifting_power.remains>action.shifting_power.full_reduction&(cooldown.rune_of_power.remains-cooldown.shifting_power.remains>5|!talent.rune_of_power)
+    if var_time_to_combustion - S.ShiftingPower:CooldownRemains() > S.ShiftingPower:FullReduction() and (S.RuneofPower:CooldownRemains() - S.ShiftingPower:CooldownRemains() > 5 or not S.RuneofPower:IsAvailable()) then
       var_shifting_power_before_combustion = true
     else
       var_shifting_power_before_combustion = false
@@ -801,17 +827,17 @@ local function APL()
     if S.ShiftingPower:IsReady() and (Player:BuffDown(S.CombustionBuff) and S.FireBlast:Charges() <= 1 and not (Player:BuffUp(S.InfernalCascadeBuff) and Player:BuffUp(S.HotStreakBuff)) and var_shifting_power_before_combustion) then
       if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(18)) then return "shifting_power default 8"; end
     end
-    -- radiant_spark,if=buff.combustion.down&(variable.time_to_combustion<variable.combustion_precast_time+execute_time|variable.time_to_combustion>cooldown-10)
-    if S.RadiantSpark:IsReady() and (Player:BuffDown(S.CombustionBuff) and (var_time_to_combustion < var_combustion_precast_time + S.RadiantSpark:ExecuteTime() or var_time_to_combustion > 20)) then
+    -- radiant_spark,if=buff.combustion.down&(variable.time_to_combustion>cooldown-5)
+    if S.RadiantSpark:IsReady() and (Player:BuffDown(S.CombustionBuff) and (var_time_to_combustion > 25)) then
       if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "radiant_spark default 9"; end
     end
     -- deathborne,if=buff.combustion.down&buff.rune_of_power.down&variable.time_to_combustion<variable.combustion_precast_time+execute_time+(buff.deathborne.duration-buff.combustion.duration)*runeforge.deaths_fathom
     if S.Deathborne:IsCastable() and CDsON() and (Player:BuffDown(S.CombustionBuff) and Player:BuffDown(S.RuneofPowerBuff) and var_time_to_combustion < var_combustion_precast_time + S.Deathborne:ExecuteTime() + (S.Deathborne:BaseDuration() - S.Combustion:BaseDuration()) * num(DeathFathomEquipped)) then
-      if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne default 10"; end
+      if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "deathborne default 10"; end
     end
     -- mirrors_of_torment,if=variable.time_to_combustion<variable.combustion_precast_time+execute_time&buff.combustion.down
     if S.MirrorsofTorment:IsCastable() and CDsON() and (var_time_to_combustion < var_combustion_precast_time + S.MirrorsofTorment:ExecuteTime() and Player:BuffDown(S.CombustionBuff)) then
-      if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment default 11"; end
+      if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "mirrors_of_torment default 11"; end
     end
     -- fire_blast,use_while_casting=1,if=action.mirrors_of_torment.executing&full_recharge_time-action.mirrors_of_torment.execute_remains<4&!hot_streak_spells_in_flight&!buff.hot_streak.react
     if S.FireBlast:IsReady() and Player:IsCasting(S.MirrorsofTorment) and S.FireBlast:FullRechargeTime() - S.MirrorsofTorment:ExecuteTime() < 4 and not (S.Fireball:InFlight() or Player:IsCasting(S.Fireball) or Player:IsCasting(S.Scorch) or S.PhoenixFlames:InFlight()) and Player:BuffDown(S.HotStreakBuff) then
@@ -972,8 +998,8 @@ local function APL()
   end
 end
 
-local function Init()
-  -- APL 29/06/2021 https://github.com/simulationcraft/simc/commit/055011fdeaa28e5a51a4bf8c2ca504c798052a8b#diff-fc8c9f725bf89b92bde432d66bd54eff884fe7520e4742e94eb17551c6459f22
+local function Init ()
+  -- APL 19/08/2021 https://github.com/simulationcraft/simc/commit/8b2b2ac231f50252716e2a5eeef065d0e398ef88
   HR.Print("Fire Mage rotation is currently a work in progress.")
 end
 
