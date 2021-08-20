@@ -334,8 +334,8 @@ local function DamageTrinkets()
 end
 
 local function Trinkets()
-  -- use_item,name=shadowed_orb_of_torment,if=cooldown.summon_demonic_tyrant.remains_expected<15
-  if I.ShadowedOrbofTorment:IsEquippedAndReady() and (S.SummonDemonicTyrant:CooldownRemains() < 15) then
+  -- use_item,name=shadowed_orb_of_torment,if=cooldown.summon_demonic_tyrant.remains_expected<22
+  if I.ShadowedOrbofTorment:IsEquippedAndReady() and (S.SummonDemonicTyrant:CooldownRemains() < 22) then
     if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment trinkets 2"; end
   end
   -- call_action_list,name=hp_trinks,if=talent.demonic_consumption.enabled&cooldown.summon_demonic_tyrant.remains_expected<20

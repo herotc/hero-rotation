@@ -271,6 +271,7 @@ Item.Warlock.Affliction = {
 
 Item.Warlock.Destruction = {
   -- Potion
-  PotionofSpectralIntellect             = Item(307096)
+  PotionofSpectralIntellect             = Item(307096),
   -- Trinkets
+  ShadowedOrbofTorment                  = Item(186428, {13, 14}),
 }

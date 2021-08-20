@@ -40,6 +40,7 @@ local S = Spell.Warlock.Destruction
 -- Items
 local I = Item.Warlock.Destruction
 local TrinketsOnUseExcludes = {--  I.TrinketName:ID(),
+  I.ShadowedOrbofTorment:ID()
 }
 local OdrShawloftheYmirjarEquipped  = Player:HasLegendaryEquipped(174)
 
@@ -121,6 +122,10 @@ local function CDs()
     --fireblood,if=pet.infernal.active
     if S.Fireblood:IsCastable() and InfernalTime() > 0 then
         if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 6"; end
+    end
+    --use_item,name=shadowed_orb_of_torment,if=cooldown.summon_infernal.remains<3|target.time_to_die<42
+    if I.ShadowedOrbofTorment:IsEquippedAndReady() and (S.SummonInfernal:CooldownRemains() < 3 or Target:TimeToDie() < 42) then
+        if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment cds 7"; end
     end
     --use_items,if=pet.infernal.active|target.time_to_die<20
     if InfernalTime() > 0 then
