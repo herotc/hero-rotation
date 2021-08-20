@@ -307,8 +307,8 @@ local function Opener()
 end
 
 local function Covenant()
-  -- impending_catastrophe,if=!talent.phantom_singularity&(cooldown.summon_darkglare.remains<10|cooldown.summon_darkglare.remains>50&cooldown.summon_darkglare.remains>25&conduit.corrupting_leer)
-  if S.ImpendingCatastrophe:IsReady() and CDsON() and (not S.PhantomSingularity:IsAvailable() and (S.SummonDarkglare:CooldownRemains() < 10 or S.SummonDarkglare:CooldownRemains() > 50 and S.SummonDarkglare:CooldownRemains() > 25 and S.CorruptingLeer:ConduitEnabled())) then
+  -- impending_catastrophe,if=!talent.phantom_singularity&(cooldown.summon_darkglare.remains<10|cooldown.summon_darkglare.remains>50|cooldown.summon_darkglare.remains>25&conduit.corrupting_leer)
+  if S.ImpendingCatastrophe:IsReady() and CDsON() and (not S.PhantomSingularity:IsAvailable() and (S.SummonDarkglare:CooldownRemains() < 10 or S.SummonDarkglare:CooldownRemains() > 50 or S.SummonDarkglare:CooldownRemains() > 25 and S.CorruptingLeer:ConduitEnabled())) then
     if Cast(S.ImpendingCatastrophe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ImpendingCatastrophe)) then return "impending_catastrophe covenant 2"; end
   end
   -- impending_catastrophe,if=talent.phantom_singularity&dot.phantom_singularity.ticking
