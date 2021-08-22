@@ -183,7 +183,8 @@ Spell.Mage.Fire = {
   InfernalCascadeBuff                   = Spell(336832),
   -- Legendaries (Shadowlands)
   FirestormBuff                         = Spell(333100),
-  SunKingsBlessingBuff                  = Spell(333313),
+  SunKingsBlessingBuff                  = Spell(333314),
+  SunKingsBlessingBuffReady             = Spell(333315),
   GrislyIcicleBuff                      = Spell(333393),
   GrislyIcicleDebuff                    = Spell(348007),
   DisciplinaryCommandBuff               = Spell(327371),
