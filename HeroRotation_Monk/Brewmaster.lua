@@ -104,7 +104,7 @@ local function Defensives()
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
 
   if S.CelestialBrew:IsCastable() and Player:BuffStack(S.PurifiedChiBuff) >= 2 then
-    if HR.Cast(S.CelestialBrew) then return "Celestial Brew"; end
+    if HR.Cast(S.CelestialBrew, Settings.Brewmaster.GCDasOffGCD.CelestialBrew) then return "Celestial Brew"; end
   end
   if S.PurifyingBrew:IsCastable() and ShouldPurify() then
     if HR.CastRightSuggested(S.PurifyingBrew) then return "Purifying Brew"; end
