@@ -909,16 +909,20 @@ local function Harmony ()
   if S.ArcaneMissiles:IsCastable() and I.EmpyrealOrdnance:IsEquipped() and CombatTime() < 30 and I.EmpyrealOrdnance:CooldownRemains() > 168 then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles harmony 4"; end
   end
+  --use_item,name=soulletting_ruby,if=variable.empowered_barrage&cooldown.touch_of_the_magi.remains<=execute_time&cooldown.arcane_power.remains<=(execute_time*2)
+  if I.SoullettingRuby:IsEquippedAndReady() and var_empowered_barrage and S.TouchoftheMagi:CooldownRemains() <= Player:GCD() and S.ArcanePower:CooldownRemains() <= Player:GCD() * 2 then
+    if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby harmony 4.5"; end
+  end
   --radiant_spark,if=variable.empowered_barrage&cooldown.touch_of_the_magi.remains<=execute_time&cooldown.arcane_power.remains<=(execute_time*2)
-  --&(!equipped.soulletting_ruby|conduit.arcane_prodigy.rank>=5|trinket.soulletting_ruby.cooldown.remains<=(execute_time*2))
+  --&(!equipped.soulletting_ruby|conduit.arcane_prodigy.rank>=5|trinket.soulletting_ruby.cooldown.remains>110)
   if S.RadiantSpark:IsCastable() and var_empowered_barrage and S.TouchoftheMagi:CooldownRemains() < S.RadiantSpark:ExecuteTime() and S.ArcanePower:CooldownRemains() <= S.RadiantSpark:ExecuteTime() * 2
-  and (not I.SoullettingRuby:IsEquipped() or S.ArcaneProdigy:ConduitRank() >= 5 or I.SoullettingRuby:CooldownRemains() <= (S.RadiantSpark:ExecuteTime() * 2)) then
+  and (not I.SoullettingRuby:IsEquipped() or S.ArcaneProdigy:ConduitRank() >= 5 or I.SoullettingRuby:CooldownRemains() > 110) then
     if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark harmony 5"; end
   end
   --touch_of_the_magi,if=variable.just_used_spark&cooldown.arcane_power.remains<=execute_time
-  --&(!equipped.soulletting_ruby|conduit.arcane_prodigy.rank>=5|trinket.soulletting_ruby.cooldown.remains<=execute_time)
+  --&(!equipped.soulletting_ruby|conduit.arcane_prodigy.rank>=5|trinket.soulletting_ruby.cooldown.remains>110)
   if S.TouchoftheMagi:IsCastable() and var_just_used_spark and S.ArcanePower:CooldownRemains() <= S.RadiantSpark:ExecuteTime()
-  and (not I.SoullettingRuby:IsEquipped() or S.ArcaneProdigy:ConduitRank() >= 5 or I.SoullettingRuby:CooldownRemains() <= (S.RadiantSpark:ExecuteTime())) then
+  and (not I.SoullettingRuby:IsEquipped() or S.ArcaneProdigy:ConduitRank() >= 5 or I.SoullettingRuby:CooldownRemains() > 110) then
     if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi harmony 6"; end
   end
   --arcane_power,if=prev_gcd.1.touch_of_the_magi
@@ -1384,7 +1388,7 @@ local function APL ()
 end
 
 local function Init ()
-  -- APL 20/08/2021 https://github.com/simulationcraft/simc/commit/6af558d6c4315792d74e648ac209e3703ba18a32
+  -- APL 23/08/2021 https://github.com/simulationcraft/simc/commit/77c2a010ac6c46f2da677cc6b97f0632562aa38d
   HR.Print("Arcane Mage rotation is currently a work in progress.")
 end
 
