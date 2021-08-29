@@ -213,7 +213,7 @@ local function Bear()
   end
   -- use_item,name=jotungeirr_destinys_call,if=covenant.venthyr
   if I.Jotungeirr:IsEquippedAndReady() and (Player:Covenant() == "Venthyr") then
-    if Cast(I.Jotungeirr) then return "jotungeirr_destinys_call bear 8"; end
+    if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call bear 8"; end
   end
   -- use_item,slot=trinket1,if=!buff.prowl.up&covenant.venthyr
   if trinket1:IsEquippedAndReady() and (Player:Covenant() == "Venthyr") then
@@ -376,7 +376,7 @@ local function APL()
     -- auto_attack,if=!buff.prowl.up
     -- use_item,name=jotungeirr_destinys_call,if=!buff.prowl.up&!covenant.venthyr
     if I.Jotungeirr:IsEquippedAndReady() and (Player:Covenant() ~= "Venthyr") then
-      if Cast(I.Jotungeirr) then return "jotungeirr_destinys_call main"; end
+      if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main"; end
     end
     -- use_item,slot=trinket1,if=!buff.prowl.up&!covenant.venthyr
     if trinket1:IsEquippedAndReady() and (Player:Covenant() ~= "Venthyr") then

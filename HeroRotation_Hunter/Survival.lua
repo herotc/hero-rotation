@@ -238,7 +238,7 @@ local function CDs()
   end
   -- use_item,name=jotungeirr_destinys_call,if=buff.coordinated_assault.up|time_to_die<31
   if I.Jotungeirr:IsEquippedAndReady() and (Player:BuffUp(S.CoordinatedAssault) or Target:TimeToDie() < 31) then
-    if Cast(I.Jotungeirr) then return "jotungeirr_destinys_call cds 5"; end
+    if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call cds 5"; end
   end
   if (Player:BuffUp(S.CoordinatedAssault)) then
     -- blood_fury,if=buff.coordinated_assault.up

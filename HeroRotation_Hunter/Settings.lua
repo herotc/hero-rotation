@@ -24,7 +24,8 @@ HR.GUISettings.APL.Hunter = {
     DisplayStyle = {
       Covenant = "Suggested",
       Potions = "Suggested",
-      Trinkets = "Suggested"
+      Trinkets = "Suggested",
+      Items = "Suggested",
     },
     GCDasOffGCD = {
       AMurderofCrows = false,

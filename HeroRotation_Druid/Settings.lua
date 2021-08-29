@@ -25,6 +25,7 @@ HR.GUISettings.APL.Druid = {
       Potions = "Suggested",
       Trinkets = "Suggested",
       Covenant = "Suggested",
+      Items = "Suggested",
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
