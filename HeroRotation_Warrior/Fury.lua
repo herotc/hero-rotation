@@ -201,7 +201,7 @@ local function SingleTarget()
   end
   -- dragon_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
   if S.DragonRoar:IsCastable() and (EnrageUp) then
-    if Cast(S.DragonRoar, nil, nil, not Target:IsInRange(12)) then return "dragon_roar single_target 28"; end
+    if Cast(S.DragonRoar, Settings.Fury.GCDasOffGCD.DragonRoar, nil, not Target:IsInRange(12)) then return "dragon_roar single_target 28"; end
   end
   -- onslaught
   if S.Onslaught:IsCastable() and S.Onslaught:IsUsable() then
