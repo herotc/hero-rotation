@@ -569,11 +569,11 @@ local function Cooldowns ()
     if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi cooldowns 14"; end
   end
   --touch_of_the_magi,if=buff.arcane_charge.stack<=variable.totm_max_charges&talent.rune_of_power&cooldown.rune_of_power.remains<=execute_time&variable.time_until_ap>variable.totm_max_delay_for_ap
-  if S.TouchoftheMagi:IsCastable() and not Player:IsCasting(S.TouchoftheMagi) and Player:ArcaneCharges() <= var_totm_max_charges and S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= S.TouchoftheMagi:ExecuteTime() and var_time_until_ap > var_totm_max_delay_for_ap then
+  if S.TouchoftheMagi:IsCastable() and Player:ArcaneCharges() <= var_totm_max_charges and S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= S.TouchoftheMagi:ExecuteTime() and var_time_until_ap > var_totm_max_delay_for_ap then
     if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi cooldowns 15"; end
   end
   --touch_of_the_magi,if=buff.arcane_charge.stack<=variable.totm_max_charges&(!talent.rune_of_power|cooldown.rune_of_power.remains>variable.totm_max_delay_for_rop)&variable.time_until_ap>variable.totm_max_delay_for_ap
-  if S.TouchoftheMagi:IsCastable() and not Player:IsCasting(S.TouchoftheMagi) and Player:ArcaneCharges() <= var_totm_max_charges and (not S.RuneofPower:IsAvailable() or S.RuneofPower:CooldownRemains() > var_totm_max_delay_for_rop) and var_time_until_ap > var_totm_max_delay_for_ap then
+  if S.TouchoftheMagi:IsCastable() and Player:ArcaneCharges() <= var_totm_max_charges and (not S.RuneofPower:IsAvailable() or S.RuneofPower:CooldownRemains() > var_totm_max_delay_for_rop) and var_time_until_ap > var_totm_max_delay_for_ap then
     if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi cooldowns 16"; end
   end
   --arcane_power,if=cooldown.touch_of_the_magi.remains>variable.ap_max_delay_for_totm&(!covenant.venthyr|cooldown.mirrors_of_torment.remains>variable.ap_max_delay_for_mot)
@@ -909,6 +909,10 @@ local function Harmony ()
   if S.ArcaneMissiles:IsCastable() and I.EmpyrealOrdnance:IsEquipped() and CombatTime() < 30 and I.EmpyrealOrdnance:CooldownRemains() > 168 then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles harmony 4"; end
   end
+  --use_item,name=soulletting_ruby,if=buff.arcane_power.up&target.distance<=10
+  if I.SoullettingRuby:IsEquippedAndReady() and Player:BuffUp(S.ArcanePower) and Target:MaxDistance() <= 10 then
+    if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby harmony 4.2"; end
+  end
   --use_item,name=soulletting_ruby,if=variable.empowered_barrage&cooldown.touch_of_the_magi.remains<=execute_time&cooldown.arcane_power.remains<=(execute_time*2)
   if I.SoullettingRuby:IsEquippedAndReady() and var_empowered_barrage and S.TouchoftheMagi:CooldownRemains() <= Player:GCD() and S.ArcanePower:CooldownRemains() <= Player:GCD() * 2 then
     if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby harmony 4.5"; end
@@ -1070,17 +1074,27 @@ local function Aoe ()
   and S.ArcanePower:CooldownRemains() <= var_harmony_stack_time + S.ArcaneMissiles:ExecuteTime() + S.RadiantSpark:ExecuteTime() + S.TouchoftheMagi:ExecuteTime() then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles Aoe 5"; end
   end
+  --arcane_missiles,if=covenant.venthyr&runeforge.arcane_infinity&buff.arcane_harmony.stack<15&cooldown.touch_of_the_magi.remains<=variable.harmony_stack_time+execute_time
+  --&cooldown.arcane_power.remains<=variable.harmony_stack_time+execute_time+action.touch_of_the_magi.execute_time,chain=1
+  if S.ArcaneMissiles:IsCastable() and Player:Covenant() == "Kyrian" and ArcaneInfinityEquipped and Player:BuffStack(S.ArcaneHarmonyBuff) < 15 and S.TouchoftheMagi:CooldownRemains() <= var_harmony_stack_time + S.ArcaneMissiles:ExecuteTime() 
+  and S.ArcanePower:CooldownRemains() <= var_harmony_stack_time + S.ArcaneMissiles:ExecuteTime() + S.TouchoftheMagi:ExecuteTime() then
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles Aoe 5.5"; end
+  end
   --arcane_blast,if=covenant.venthyr&talent.arcane_echo&time<10&cooldown.mirrors_of_torment.remains&buff.clearcasting.stack<3
   if S.ArcaneBlast:IsCastable() and Player:Covenant() == "Venthyr" and S.ArcaneEcho:IsAvailable() and S.MirrorsofTorment:CooldownRemains() > 0 and Player:BuffStack(S.ClearcastingBuff) < 3 then
     if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast Aoe 6"; end
   end
   --touch_of_the_magi,if=runeforge.siphon_storm&prev_gcd.1.evocation
-  if S.TouchoftheMagi:IsCastable() and not Player:IsCasting(S.TouchoftheMagi) and SiphonStormEquipped and Player:IsCasting(S.Evocation) then
+  if S.TouchoftheMagi:IsCastable() and SiphonStormEquipped and Player:IsCasting(S.Evocation) then
     if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi Aoe 7"; end
   end
   --arcane_power,if=runeforge.siphon_storm&(prev_gcd.1.evocation|prev_gcd.1.touch_of_the_magi)
   if S.ArcanePower:IsCastable() and SiphonStormEquipped and (Player:IsCasting(S.Evocation) or Player:IsCasting(S.TouchoftheMagi)) then
     if Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "touch_of_the_magi Aoe 8"; end
+  end
+  --mirrors_of_torment,if=runeforge.arcane_infinity&cooldown.touch_of_the_magi.remains<=10&cooldown.arcane_power.remains<=15
+  if S.MirrorsofTorment:IsCastable() and ArcaneInfinityEquipped and S.TouchoftheMagi:CooldownRemains() <= 10 and S.ArcanePower:CooldownRemains() <= 15 then
+    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment Aoe 8.5"; end
   end
   --mirrors_of_torment,if=cooldown.arcane_power.remains<=8&cooldown.touch_of_the_magi.remains<=8
   --&(buff.arcane_charge.stack<=variable.aoe_totm_max_charges&((talent.rune_of_power&cooldown.rune_of_power.remains<=gcd&cooldown.arcane_power.remains>5)|(!talent.rune_of_power&cooldown.arcane_power.remains>5)|cooldown.arcane_power.remains<=gcd))
@@ -1125,8 +1139,22 @@ local function Aoe ()
   if S.Deathborne:IsCastable() and S.ArcanePower:CooldownRemains() == 0 and (((Target:DebuffRemains(S.TouchoftheMagi) > var_ap_max_delay_for_totm and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (Target:DebuffRemains(S.TouchoftheMagi) == 0 and Player:ArcaneCharges() <= var_totm_max_charges)) and Player:BuffDown(S.RuneofPowerBuff)) then
     if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne Aoe 15"; end
   end
+  --use_item,name=soulletting_ruby,if=(buff.arcane_charge.stack<=variable.aoe_totm_max_charges|prev_gcd.1.radiant_spark)
+  --&((talent.rune_of_power&cooldown.rune_of_power.remains<=gcd&cooldown.arcane_power.remains>variable.totm_max_delay_for_ap)|(!talent.rune_of_power&cooldown.arcane_power.remains>variable.totm_max_delay_for_ap)|cooldown.arcane_power.remains<=gcd)
+  if I.SoullettingRuby:IsEquippedAndReady() and (Player:ArcaneCharges() <= var_aoe_totm_max_charges or Player:IsCasting(S.RadiantSpark)) 
+  and ((S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= Player:GCDRemains() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or (not S.RuneofPower:IsAvailable() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or S.ArcanePower:CooldownRemains() <= Player:GCDRemains()) then
+    if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby Shared_cd 15.2"; end
+  end
+  --touch_of_the_magi,if=covenant.venthyr&runeforge.arcane_infinity&cooldown.mirrors_of_torment.remains<=50
+  if S.TouchoftheMagi:IsCastable() and Player:Covenant() == "Venthyr" and S.MirrorsofTorment:CooldownRemains() <= 50 then
+    if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi Aoe 15.5"; end
+  end
+  --touch_of_the_magi,if=covenant.venthyr&runeforge.arcane_infinity&buff.mirrors_of_torment.remains<=20&cooldown.arcane_power.remains<=gcd
+  if S.TouchoftheMagi:IsCastable() and Player:Covenant() == "Venthyr" then
+    if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi Aoe 15.7"; end
+  end
   --touch_of_the_magi,if=(buff.arcane_charge.stack<=variable.aoe_totm_max_charges|prev_gcd.1.radiant_spark)&((talent.rune_of_power&cooldown.rune_of_power.remains<=gcd&cooldown.arcane_power.remains>variable.totm_max_delay_for_ap)|(!talent.rune_of_power&cooldown.arcane_power.remains>variable.totm_max_delay_for_ap)|cooldown.arcane_power.remains<=gcd)
-  if S.TouchoftheMagi:IsCastable() and not Player:IsCasting(S.TouchoftheMagi) and (Player:ArcaneCharges() <= var_totm_max_charges or Player:IsCasting(S.RadiantSpark)) and ((S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= Player:GCDRemains() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or (not S.RuneofPower:IsAvailable() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or S.ArcanePower:CooldownRemains() <= Player:GCDRemains()) then
+  if S.TouchoftheMagi:IsCastable() and (Player:ArcaneCharges() <= var_totm_max_charges or Player:IsCasting(S.RadiantSpark)) and ((S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= Player:GCDRemains() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or (not S.RuneofPower:IsAvailable() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or S.ArcanePower:CooldownRemains() <= Player:GCDRemains()) then
     if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi Aoe 16"; end
   end
   --arcane_power,if=((cooldown.touch_of_the_magi.remains>variable.ap_max_delay_for_totm&buff.arcane_charge.stack=buff.arcane_charge.max_stack)|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack<=variable.aoe_totm_max_charges))&buff.rune_of_power.down
@@ -1388,7 +1416,7 @@ local function APL ()
 end
 
 local function Init ()
-  -- APL 23/08/2021 https://github.com/simulationcraft/simc/commit/77c2a010ac6c46f2da677cc6b97f0632562aa38d
+  -- APL 28/08/2021 https://github.com/simulationcraft/simc/commit/908ed38db6e4d55013c6e1574ce05ccd5f482fc7
   HR.Print("Arcane Mage rotation is currently a work in progress.")
 end
 
