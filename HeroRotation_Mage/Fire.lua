@@ -963,9 +963,9 @@ local function APL ()
       local ShouldReturn = CombustionPhase(); if ShouldReturn then return ShouldReturn; end
     end
     -- rune_of_power,if=buff.rune_of_power.down&!buff.firestorm.react&(variable.time_to_combustion>=buff.rune_of_power.duration&variable.time_to_combustion>action.fire_blast.full_recharge_time|variable.time_to_combustion>fight_remains)
-    --&(!runeforge.sun_kings_blessing|buff.sun_kings_blessing_ready.up|buff.sun_kings_blessing.react>=buff.sun_kings_blessing.max_stack-1|fight_remains<buff.rune_of_power.duration)
+    --&(!runeforge.sun_kings_blessing|active_enemies>=variable.hard_cast_flamestrike|buff.sun_kings_blessing_ready.up|buff.sun_kings_blessing.react>=buff.sun_kings_blessing.max_stack-1|fight_remains<buff.rune_of_power.duration)
     if S.RuneofPower:IsReady() and (Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.FirestormBuff) and (var_time_to_combustion >= 12 and var_time_to_combustion > S.FireBlast:FullRechargeTime() or var_time_to_combustion > fightRemains)) 
-    and (not SunKingsBlessingEquipped or Player:BuffUp(S.SunKingsBlessingBuffReady) or Player:BuffStack(S.SunKingsBlessingBuff) >= var_sun_kings_blessing_max_stack - 1 or fightRemains < 12) then
+    and (not SunKingsBlessingEquipped or EnemiesCount8ySplash >= var_hard_cast_flamestrike or Player:BuffUp(S.SunKingsBlessingBuffReady) or Player:BuffStack(S.SunKingsBlessingBuff) >= var_sun_kings_blessing_max_stack - 1 or fightRemains < 12) then
       if Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneOfPower) then return "rune_of_power default 31"; end
     end
     -- variable,use_off_gcd=1,use_while_casting=1,name=fire_blast_pooling,value=action.fire_blast.charges_fractional+(variable.time_to_combustion+action.shifting_power.full_reduction*variable.shifting_power_before_combustion)%cooldown.fire_blast.duration-1<cooldown.fire_blast.max_charges+variable.overpool_fire_blasts%cooldown.fire_blast.duration-(buff.combustion.duration%cooldown.fire_blast.duration)%%1&variable.time_to_combustion<fight_remains|runeforge.sun_kings_blessing&searing_touch.active&action.fire_blast.full_recharge_time>3*gcd.max
@@ -1017,7 +1017,7 @@ local function APL ()
 end
 
 local function Init ()
-  -- APL 22/08/2021 https://github.com/simulationcraft/simc/commit/2ece27efb67b7125aa8265f7da5d7d6f44a12f09
+  -- APL 25/08/2021 https://github.com/simulationcraft/simc/commit/7254baf8a25e49fdf5e027e412220cd379af9bc8
   HR.Print("Fire Mage rotation is currently a work in progress.")
 end
 
