@@ -168,23 +168,27 @@ local function Precombat()
   if Everyone.TargetIsValid() then
     -- fleshcraft
     if S.Fleshcraft:IsCastable() then
-      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 4"; end
     end
-    -- variable,name=first_tyrant_time,op=set,value=12
-    VarFirstTyrantTime = 12 - S.ShadowBolt:ExecuteTime()
+    -- variable,name=first_tyrant_time,op=set,value=10
+    VarFirstTyrantTime = 10
     if Settings.Commons.Enabled.Trinkets then
+      -- use_item,name=shadowed_orb_of_torment
+      if I.ShadowedOrbofTorment:IsEquippedAndReady() then
+        if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment precombat 6"; end
+      end
       -- use_item,name=tome_of_monstrous_constructions
       if I.TomeofMonstrousConstructions:IsEquippedAndReady() then
-        if Cast(I.TomeofMonstrousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "tome_of_monstrous_constructions precombat 4"; end
+        if Cast(I.TomeofMonstrousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "tome_of_monstrous_constructions precombat 8"; end
       end
       -- use_item,name=soleahs_secret_technique
       if I.SoleahsSecretTechnique:IsEquippedAndReady() then
-        if Cast(I.SoleahsSecretTechnique, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soleahs_secret_technique precombat 6"; end
+        if Cast(I.SoleahsSecretTechnique, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soleahs_secret_technique precombat 10"; end
       end
     end
     -- demonbolt
     if S.Demonbolt:IsCastable() then
-      if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt precombat 10"; end
+      if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt precombat 12"; end
     end
   end
 end
@@ -198,8 +202,8 @@ local function Covenant()
   if S.SoulRot:IsReady() and (S.FieldofBlossoms:SoulbindEnabled() and DemonicTyrantTime() > 0) then
     if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot covenant 4"; end
   end
-  -- soul_rot,if=soulbind.wild_hunt_tactics
-  if S.SoulRot:IsReady() and (S.WildHuntTactics:SoulbindEnabled()) then
+  -- soul_rot,if=soulbind.wild_hunt_tactics&!pet.demonic_tyrant.active&cooldown.summon_demonic_tyrant.remains_expected>18
+  if S.SoulRot:IsReady() and (S.WildHuntTactics:SoulbindEnabled() and DemonicTyrantTime() == 0 and S.SummonDemonicTyrant:CooldownRemains() > 18) then
     if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot covenant 6"; end
   end
   -- decimating_bolt,if=(soulbind.lead_by_example|soulbind.kevins_oozeling)&(pet.demonic_tyrant.active&soul_shard<2|!pet.demonic_tyrant.active&cooldown.summon_demonic_tyrant.remains_expected>40)
@@ -241,8 +245,8 @@ local function TyrantSetup()
   if S.SummonVilefiend:IsReady() and ((S.SummonDemonicTyrant:CooldownRemains() < 15 - (S.SummonDemonicTyrant:ExecuteTime()) and (S.CallDreadstalkers:CooldownRemains() < 15 - (S.SummonDemonicTyrant:ExecuteTime() + S.SummonVilefiend:ExecuteTime()) or DreadStalkersTime() > S.SummonDemonicTyrant:CooldownRemains() + S.SummonDemonicTyrant:ExecuteTime())) or (not WilfredsSigilEquipped and S.SummonDemonicTyrant:CooldownRemains() > 40)) then
     if Cast(S.SummonVilefiend) then return "summon_vilefiend tyrant_setup 6"; end
   end
-  -- call_dreadstalkers,if=cooldown.summon_demonic_tyrant.remains_expected<12-(action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)&time>variable.first_tyrant_time-12-action.call_dreadstalkers.execute_time+action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time
-  if S.CallDreadstalkers:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() < 12 - (S.SummonDemonicTyrant:ExecuteTime() + S.ShadowBolt:ExecuteTime()) and HL.CombatTime() > VarFirstTyrantTime - 12 - S.CallDreadstalkers:ExecuteTime() + S.SummonDemonicTyrant:ExecuteTime() + S.ShadowBolt:ExecuteTime()) then
+  -- call_dreadstalkers,if=cooldown.summon_demonic_tyrant.remains_expected<12-(action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)
+  if S.CallDreadstalkers:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() < 12 - (S.SummonDemonicTyrant:ExecuteTime() + S.ShadowBolt:ExecuteTime())) then
     if Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers tyrant_setup 8"; end
   end
   -- summon_demonic_tyrant,if=time>variable.first_tyrant_time&(pet.dreadstalker.active&pet.dreadstalker.remains>action.summon_demonic_tyrant.execute_time)&(!talent.summon_vilefiend.enabled|pet.vilefiend.active)&(soul_shard=0|(pet.dreadstalker.active&pet.dreadstalker.remains<action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)|(pet.vilefiend.active&pet.vilefiend.remains<action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)|(buff.grimoire_felguard.up&buff.grimoire_felguard.remains<action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time))
@@ -364,6 +368,29 @@ local function Trinkets()
   end
 end
 
+local function Opener()
+  -- soul_rot,if=soulbind.grove_invigoration
+  if S.SoulRot:IsCastable() and (S.GroveInvigoration:SoulbindEnabled()) then
+    if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot opener 2"; end
+  end
+  -- grimoire_felguard
+  if S.GrimoireFelguard:IsReady() then
+    if Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, not Target:IsSpellInRange(S.GrimoireFelguard)) then return "grimoire_felguard opener 4"; end
+  end
+  -- summon_vilefiend
+  if S.SummonVilefiend:IsReady() then
+    if Cast(S.SummonVilefiend) then return "summon_vilefiend opener 6"; end
+  end
+  -- shadow_bolt,if=soul_shard<5&cooldown.call_dreadstalkers.up
+  if S.ShadowBolt:IsReady() and (Player:SoulShardsP() < 5 and S.CallDreadstalkers:CooldownUp()) then
+    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt opener 8"; end
+  end
+  -- call_dreadstalkers
+  if S.CallDreadstalkers:IsReady() then
+    if Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers opener 10"; end
+  end
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
   -- Update Enemy Counts
@@ -392,6 +419,10 @@ local function APL()
     -- call_action_list,name=trinkets
     if Settings.Commons.Enabled.Trinkets then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=opener,if=time<variable.first_tyrant_time
+    if HL.CombatTime() < VarFirstTyrantTime then
+      local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
     -- doom,if=refreshable
     if S.Doom:IsCastable() and (Target:DebuffRefreshable(S.DoomDebuff)) then
