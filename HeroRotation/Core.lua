@@ -185,7 +185,7 @@
       QueueKeybindTable[i] = not HR.GUISettings.General.HideKeyBinds and HL.Action.TextureHotKey(QueueTextureTable[i]);
     end
     -- Call ChangeIcon so that the main icon exists to be able to display a cooldown sweep, even though it gets overlapped
-    HR.MainIconFrame:ChangeIcon(QueueTextureTable[1], QueueKeybindTable[1], QueueSpellTable[1]:IsUsable(), true, QueueSpellTable[1]:ID());
+    HR.MainIconFrame:ChangeIcon(QueueTextureTable[1], QueueKeybindTable[1], QueueSpellTable[1]:IsUsable(), false, QueueSpellTable[1]:ID());
     HR.MainIconFrame:SetupParts(QueueTextureTable, QueueKeybindTable);
   end
   -- Main Cast Queue
