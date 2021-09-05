@@ -147,7 +147,8 @@
   end
 
   -- Change Icon
-  function HR.MainIconFrame:ChangeIcon (Texture, Keybind, Usable, OutofRange)
+  function HR.MainIconFrame:ChangeIcon (Texture, Keybind, Usable, OutofRange, ID)
+    self.ID = ID
     -- Texture
     self.Texture:SetTexture(Texture);
     if HR.GUISettings.General.NotEnoughManaEnabled and not Usable then
@@ -288,6 +289,13 @@
       self.Part[i].Keybind:SetText("");
       self.Part[i]:Hide();
     end
+  end
+  function HR.MainIconFrame:getIconID ()
+    local CurrentID
+    if self.ID then
+      CurrentID = self.ID
+    end
+    return CurrentID
   end
 
 --- ======= SMALL ICONS =======
