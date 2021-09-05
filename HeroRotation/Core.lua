@@ -244,7 +244,7 @@
     if HR.CastSuggestedOffset == 1 then
       local Texture = HR.GetTexture(Object)
       local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.Action.TextureHotKey(Texture);
-      HR.SuggestedIconFrame:ChangeIcon(Texture, Keybind, OutofRange);
+      HR.SuggestedIconFrame:ChangeIcon(Texture, Keybind, OutofRange, Object:ID());
       HR.CastSuggestedOffset = HR.CastSuggestedOffset + 1;
       Object.LastDisplayTime = GetTime();
     end
@@ -257,7 +257,7 @@
     if HR.CastRightSuggestedOffset == 1 then
       local Texture = HR.GetTexture(Object)
       local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.Action.TextureHotKey(Texture);
-      HR.RightSuggestedIconFrame:ChangeIcon(Texture, Keybind, OutofRange);
+      HR.RightSuggestedIconFrame:ChangeIcon(Texture, Keybind, OutofRange, Object:ID());
       HR.CastRightSuggestedOffset = HR.CastRightSuggestedOffset + 1;
       Object.LastDisplayTime = GetTime();
     end

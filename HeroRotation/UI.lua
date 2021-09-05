@@ -284,18 +284,19 @@
     end
   end
   function HR.MainIconFrame:HideParts ()
+    self.ID = nil
     HR.MainIconPartOverlayFrame:Hide();
     for i = 1, #self.Part do
       self.Part[i].Keybind:SetText("");
       self.Part[i]:Hide();
     end
   end
+  -- Get Icon spell ID
   function HR.MainIconFrame:getIconID ()
-    local CurrentID
     if self.ID then
-      CurrentID = self.ID
+      return self.ID
     end
-    return CurrentID
+    return nil
   end
 
 --- ======= SMALL ICONS =======
@@ -556,7 +557,8 @@
     self:Show();
   end
   -- Change Icon
-  function HR.SuggestedIconFrame:ChangeIcon (Texture, Keybind, OutofRange)
+  function HR.SuggestedIconFrame:ChangeIcon (Texture, Keybind, OutofRange, ID)
+    self.ID = ID
     -- Texture
     self.Texture:SetTexture(Texture);
     self.Texture:SetAllPoints(self);
@@ -586,7 +588,15 @@
   end
   -- Hide Icon
   function HR.SuggestedIconFrame:HideIcon ()
+    self.ID = nil
     HR.SuggestedIconFrame:Hide();
+  end
+  -- Get Icon spell ID
+  function HR.SuggestedIconFrame:getIconID ()
+    if self.ID then
+      return self.ID
+    end
+    return nil
   end
 
 --- ======= RIGHT SUGGESTED ICON =======
@@ -619,7 +629,8 @@
     self:Show();
   end
   -- Change Icon
-  function HR.RightSuggestedIconFrame:ChangeIcon (Texture, Keybind, OutofRange)
+  function HR.RightSuggestedIconFrame:ChangeIcon (Texture, Keybind, OutofRange, ID)
+    self.ID = ID
     -- Texture
     self.Texture:SetTexture(Texture);
     self.Texture:SetAllPoints(self);
@@ -649,7 +660,15 @@
   end
   -- Hide Icon
   function HR.RightSuggestedIconFrame:HideIcon ()
+    self.ID = nil
     HR.RightSuggestedIconFrame:Hide();
+  end
+  -- Get Icon spell ID
+  function HR.RightSuggestedIconFrame:getIconID ()
+    if self.ID then
+      return self.ID
+    end
+    return nil
   end
 
 --- ======= TOGGLES =======
