@@ -70,6 +70,11 @@ local var_combustion_flamestrike
 local var_arcane_explosion
 local var_arcane_explosion_mana
 local var_kindling_reduction
+if S.Kindling:IsAvailable() then
+  var_kindling_reduction = 0.4
+else
+  var_kindling_reduction = 1
+end
 local var_skb_duration
 local var_combustion_on_use
 local var_empyreal_ordnance_delay
@@ -144,6 +149,14 @@ HL:RegisterForEvent(function()
   var_init = false
   var_firestarter_combustion = -1
 end, "PLAYER_REGEN_ENABLED")
+
+HL:RegisterForEvent(function()
+  if S.Kindling:IsAvailable() then
+    var_kindling_reduction = 0.4
+  else
+    var_kindling_reduction = 1
+  end
+end, "PLAYER_TALENT_UPDATE")
 
 function S.Firestarter:ActiveStatus()
     return (S.Firestarter:IsAvailable() and (Target:HealthPercentage() > 90)) and 1 or 0
@@ -271,7 +284,7 @@ local function VarInit ()
   end
 
   --variable,name=kindling_reduction,default=0.4,op=reset
-  var_kindling_reduction = 0.4
+  -- moved to variable declaration to avoid nil errors
 
   var_init = true
 end
