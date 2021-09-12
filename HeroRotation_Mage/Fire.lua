@@ -69,7 +69,7 @@ local var_hard_cast_flamestrike
 local var_combustion_flamestrike
 local var_arcane_explosion
 local var_arcane_explosion_mana
-local var_kindling_reduction
+local var_kindling_reduction = 0.4
 local var_skb_duration
 local var_combustion_on_use
 local var_empyreal_ordnance_delay
@@ -269,9 +269,6 @@ local function VarInit ()
   if I.EmpyrealOrdnance:IsEquipped() then
     var_on_use_cutoff = 20 + var_empyreal_ordnance_delay
   end
-
-  --variable,name=kindling_reduction,default=0.4,op=reset
-  var_kindling_reduction = 0.4
 
   var_init = true
 end
