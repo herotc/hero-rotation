@@ -228,7 +228,7 @@ local function IsViable(spell)
     --    Implementing d) will require something like LavaBurstChargesFractionalP(); this is not hard but I haven't done it.
     return BaseCheck and MovementPredicate and (a or b or c)
   elseif spell == S.PrimordialWave then
-    return BaseCheck and not Player:BuffUp(S.PrimordialWaveBuff)
+    return BaseCheck and not Player:BuffUp(S.PrimordialWaveBuff) and not Player:BuffUp(S.LavaSurgeBuff)
   else
     return BaseCheck
   end

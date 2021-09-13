@@ -43,11 +43,6 @@ local Settings = {
   Elemental = HR.GUISettings.APL.Shaman.Restoration
 }
 
---local DeeptremorStoneEquipped = Player:HasLegendaryEquipped(131)
-
---HL:RegisterForEvent(function()
---  DeeptremorStoneEquipped = Player:HasLegendaryEquipped(131)
---end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
   S.LavaBurst:RegisterInFlight()
@@ -73,7 +68,9 @@ local BestFlameshockUnit
 local SplashedEnemiesTable
 
 -- We keep track of total enemies in combat, as well as a bunch of parameters around the encounter.
+-- We also care about the state of our friendly units in the raid!
 local function BattlefieldSnapshot()
+  -- Parameters for damage automation
   NumEnemiesInCombat = 0
   NumEnemiesInLargestCluster = 0
   ActiveFlameshocks = 0
@@ -82,6 +79,10 @@ local function BattlefieldSnapshot()
   SplashedEnemiesTable = {}
   CoreUnitInLargestCluster = nil
   BestFlameshockUnit = nil
+  -- Parameters for healing automation 
+  InjuredFriends = 0
+  LowestHealthFriendPercentage = 1.0
+
 
   local min_flameshock_duration = 999
   local max_hp = 0
