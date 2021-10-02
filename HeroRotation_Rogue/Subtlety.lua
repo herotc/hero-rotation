@@ -648,7 +648,7 @@ local function Build (EnergyThreshold)
   end
   -- actions.build+=/shuriken_storm,if=spell_targets>=2&(!covenant.necrolord|cooldown.serrated_bone_spike.max_charges-charges_fractional>=0.25|spell_targets.shuriken_storm>4)
   if HR.AoEON() and S.ShurikenStorm:IsCastable() and MeleeEnemies10yCount >= 2
-    and (not Player:Covenant() == "Necrolord" or (S.SerratedBoneSpike:MaxCharges() - S.SerratedBoneSpike:ChargesFractional()) >= 0.25 or MeleeEnemies10yCount >= 4) then
+    and (Player:Covenant() ~= "Necrolord" or (S.SerratedBoneSpike:MaxCharges() - S.SerratedBoneSpike:ChargesFractional()) >= 0.25 or MeleeEnemies10yCount >= 4) then
     if ThresholdMet and HR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm" end
     SetPoolingAbility(S.ShurikenStorm, EnergyThreshold)
   end
