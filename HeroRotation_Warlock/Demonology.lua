@@ -432,13 +432,13 @@ local function APL()
     if (S.GroveInvigoration:SoulbindEnabled() or S.FieldofBlossoms:SoulbindEnabled() or S.CombatMeditation:SoulbindEnabled() or Player:Covenant() == "Necrolord") then
       local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
     end
+    -- potion,if=(cooldown.summon_demonic_tyrant.remains_expected=0&time>variable.first_tyrant_time|soulbind.refined_palate&cooldown.summon_demonic_tyrant.remains_expected<38)
+    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (S.SummonDemonicTyrant:CooldownUp() and HL.CombatTime() > VarFirstTyrantTime or S.RefinedPalate:SoulbindEnabled() and S.SummonDemonicTyrant:CooldownRemains() < 38) then
+      if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
+    end
     -- run_action_list,name=tyrant_setup
     if CDsON() then
       local ShouldReturn = TyrantSetup(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- potion,if=(cooldown.summon_demonic_tyrant.remains_expected<10&time>variable.first_tyrant_time-10|soulbind.refined_palate&cooldown.summon_demonic_tyrant.remains_expected<38)
-    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and ((S.SummonDemonicTyrant:CooldownRemains() < 10 and HL.CombatTime() > VarFirstTyrantTime - 10 or S.RefinedPalate:SoulbindEnabled() and S.SummonDemonicTyrant:CooldownRemains() < 38)) then
-      if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
     end
     -- call_action_list,name=ogcd,if=pet.demonic_tyrant.active
     if CDsON() and DemonicTyrantTime() > 0 then
