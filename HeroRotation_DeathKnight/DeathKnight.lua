@@ -214,15 +214,19 @@ Spell.DeathKnight.Unholy = {
   -- Conduit/Soulbind Effects
   ConvocationOfTheDead                  = Spell(338553),
   FrenziedMonstrosity                   = Spell(334896),
+  KevinsOozeling                        = Spell(352110),
   LeadByExample                         = Spell(342156),
   MarrowedGemstoneEnhancement           = Spell(327069),
   PustuleEruption                       = Spell(351094),
   ThrillSeeker                          = Spell(331939),
+  VolatileSolvent                       = Spell(323074),
 
   -- Buffs
+  ChaosBaneBuff                         = Spell(355829),
   DeathAndDecayBuff                     = Spell(188290),
   DeathStrikeBuff                       = Spell(101568),
   DeathsDueBuff                         = Spell(324165),
+  LeadByExampleBuff                     = Spell(342181),
   RunicCorruptionBuff                   = Spell(51460),
   SuddenDoomBuff                        = Spell(81340),
   SwarmingMistBuff                      = Spell(311648),
