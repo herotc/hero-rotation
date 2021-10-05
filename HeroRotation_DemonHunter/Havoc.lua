@@ -425,7 +425,7 @@ local function APL()
       if Cast(S.Blur, Settings.Havoc.OffGCDasOffGCD.Blur) then return "Blur defensives (Danger)"; end
     end
     -- pick_up_fragment,type=demon,if=demon_soul_fragments>0
-    -- pick_up_fragment,if=fury.deficit>=35
+    -- pick_up_fragment,mode=nearest,if=(talent.demonic_appetite.enabled&fury.deficit>=35|runeforge.blind_faith&buff.blind_faith.up)&(!cooldown.eye_beam.ready|fury<30)
     -- TODO: Can't detect when orbs actually spawn, we could possibly show a suggested icon when we DON'T want to pick up souls so people can avoid moving?
     -- throw_glaive,if=buff.fel_bombardment.stack=5&(buff.immolation_aura.up|!buff.metamorphosis.up)
     if S.ThrowGlaive:IsCastable() and (Player:BuffStack(S.FelBombardmentBuff) == 5 and (Player:BuffUp(S.ImmolationAuraBuff) or Player:BuffDown(S.MetamorphosisBuff))) then
