@@ -65,10 +65,10 @@ HR.GUISettings.APL.DemonHunter = {
     },
     GCDasOffGCD = {
       -- Abilities
-      Metamorphosis = true,
       EyeBeam = false,
       GlaiveTempest = false,
       ThrowGlaive = false,
+      ImmolationAura = false,
     },
   }
 }
