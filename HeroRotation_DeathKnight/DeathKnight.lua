@@ -57,6 +57,7 @@ Spell.DeathKnight.Blood = {
 
   -- Conduit Effects
   PustuleEruption                       = Spell(351094),
+  VolatileSolvent                       = Spell(323074),
 
   -- Buffs
   BoneShieldBuff                        = Spell(195181),
