@@ -59,6 +59,7 @@ HR.GUISettings.APL.DeathKnight = {
   },
   Frost = {
     DisableBoSPooling = false,
+    Using2H = false,
     DisplayStyle = {
       BoS = "Suggested",
     },
@@ -111,6 +112,7 @@ CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood")
 
 --Frost Panels
 CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.DisableBoSPooling", "Disable BoS Pooling", "Enable this option to bypass the BoS Pooling function.")
+CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.Using2H", "Using a 2H Weapon", "Enable this option if you are using a 2-handed weapon.")
 CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost")
 
 --Unholy Panels

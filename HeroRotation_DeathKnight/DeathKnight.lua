@@ -135,6 +135,10 @@ Spell.DeathKnight.Frost = {
   Everfrost                             = Spell(337988),
   PustuleEruption                       = Spell(351094),
   UnleashedFrenzy                       = Spell(338492),
+  VolatileSolvent                       = Spell(323074),
+  
+  -- Domination Shards
+  ChaosBaneBuff                         = Spell(355829),
 
   -- Buffs
   ColdHeartBuff                         = Spell(281209),
