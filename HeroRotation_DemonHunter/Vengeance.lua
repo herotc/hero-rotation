@@ -128,10 +128,6 @@ local function Precombat()
   -- augmentation
   -- food
   -- snapshot_stats
-  -- potion
-  if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
-    if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_unbridled_fury 2"; end
-  end
   -- First attacks
   if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
     if Cast(S.InfernalStrike, nil, nil, not Target:IsInRange(30)) then return "infernal_strike 6"; end
@@ -283,7 +279,7 @@ local function APL()
     end
     -- auto_attack
     -- variable,name=brand_build,value=talent.agonizing_flames.enabled&talent.burning_alive.enabled&talent.charred_flesh.enabled
-    -- Moved to Precombat, as talents can't change once in combat, so no need to continually check
+    -- Moved to declarations and PLAYER_TALENT_UPDATE registration, as talents can't change once in combat, so no need to continually check
     -- disrupt (Interrupts)
     local ShouldReturn = Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, false); if ShouldReturn then return ShouldReturn; end
     -- consume_magic
