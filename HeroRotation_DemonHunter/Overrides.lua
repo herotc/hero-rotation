@@ -22,7 +22,8 @@ HavocOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local BaseCheck = HavocOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellHavoc.Metamorphosis then
-      return BaseCheck and (Player:BuffDown(SpellHavoc.MetamorphosisBuff))
+      local HMIA = HR.GUISettings.APL.DemonHunter.Havoc.HideMetaIfActive
+      return BaseCheck and ((HMIA and Player:BuffDown(SpellHavoc.MetamorphosisBuff)) or not HMIA)
     else
       return BaseCheck
     end
