@@ -281,11 +281,11 @@ local function Precombat()
     if Cast(S.MoonkinForm) then return "moonkin_form precombat"; end
   end
   -- wrath
-  if S.Wrath:IsCastable() and not Player:IsCasting(S.Wrath) and (S.Wrath:Count() > 0 or Player:BuffUp(S.EclipseSolar)) then
+  if S.Wrath:IsCastable() and not Player:IsCasting(S.Wrath) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath precombat 2"; end
   end
   -- wrath
-  if S.Wrath:IsCastable() and (Player:IsCasting(S.Wrath) and S.Wrath:Count() == 2 or Player:PrevGCD(1, S.Wrath) and S.Wrath:Count() == 1 or Player:BuffUp(S.EclipseSolar)) then
+  if S.Wrath:IsCastable() and (Player:IsCasting(S.Wrath) and S.Wrath:Count() == 2 or Player:PrevGCD(1, S.Wrath) and S.Wrath:Count() == 1) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath precombat 4"; end
   end
   -- starfire,if=!runeforge.balance_of_all_things|!covenant.night_fae|!spell_targets.starfall=1|!talent.natures_balance.enabled
@@ -299,64 +299,83 @@ local function Precombat()
 end
 
 local function Opener()
+  -- moonfire
+  if S.Moonfire:IsReady() and (Target:DebuffDown(S.MoonfireDebuff)) then
+    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire opener 2"; end
+  end
+  -- sunfire
+  if S.Sunfire:IsReady() and (Target:DebuffDown(S.SunfireDebuff)) then
+    if Cast(S.Sunfire, nil, nil, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire opener 4"; end
+  end
+  -- stellar_flare
+  if S.StellarFlare:IsReady() and (Target:DebuffDown(S.StellarFlareDebuff)) then
+    if Cast(S.StellarFlare, nil, nil, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare opener 6"; end
+  end
   if (CovenantID == 3) then
-    -- moonfire
-    if S.Moonfire:IsReady() and (Target:DebuffDown(S.MoonfireDebuff)) then
-      if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire opener 4"; end
-    end
-    -- sunfire
-    if S.Sunfire:IsReady() and (Target:DebuffDown(S.SunfireDebuff)) then
-      if Cast(S.Sunfire, nil, nil, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire opener 6"; end
-    end
-    -- stellar_flare
-    if S.StellarFlare:IsReady() and (Target:DebuffDown(S.StellarFlareDebuff)) then
-      if Cast(S.StellarFlare, nil, nil, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare opener 8"; end
-    end
     -- warrior_of_elune
     if S.WarriorofElune:IsReady() then
-      if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune opener 10"; end
+      if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune opener 8"; end
     end
     -- force_of_nature
     if S.ForceofNature:IsReady() then
-      if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature opener 12"; end
+      if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature opener 10"; end
     end
     -- fury_of_elune
     if S.FuryofElune:IsReady() then
-      if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune opener 14"; end
+      if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune opener 12"; end
     end
-    -- ca_inc
-    if CaInc:IsReady() then
-      if Cast(CaInc, Settings.Balance.GCDasOffGCD.CaInc) then return "ca_inc opener 16"; end
+  end
+  if (CovenantID == 2) then
+    if S.RavenousFrenzy:IsCastable() then
+      if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy opener 14"; end
     end
-    if (S.NaturesBalance:IsAvailable() and not BOATEquipped) then
-      -- starsurge,if=prev_gcd.1.ca_inc&talent.natures_balance&!runeforge.balance_of_all_things.equipped
-      if S.Starsurge:IsReady() and (not CaInc:CooldownUp()) then
-        if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 18"; end
-      end
-      -- starsurge,if=prev_gcd.1.starsurge&talent.natures_balance&!runeforge.balance_of_all_things.equipped
-      if S.Starsurge:IsReady() and (Player:PrevGCDP(1, S.Starsurge)) then
-        if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 20"; end
-      end
+  end
+  -- ca_inc
+  if CaInc:IsReady() then
+    if Cast(CaInc, Settings.Balance.GCDasOffGCD.CaInc) then return "ca_inc opener 16"; end
+  end
+  -- starsurge
+  if S.Starsurge:IsReady() then
+    if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 18"; end
+  end
+  if (CovenantID == 2) then
+    -- wrath
+    if S.Wrath:IsCastable() then
+      if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath opener 20"; end
     end
-    -- convoke_the_spirits
-    if S.ConvoketheSpirits:IsReady() then
-      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "convoke_the_spirits opener 22"; end
+    -- wrath,if=prev_gcd.1.wrath&prev_gcd.2.starsurge
+    if S.Wrath:IsCastable() and (Player:PrevGCDP(1, S.Wrath) and Player:PrevGCDP(2, S.Starsurge)) then
+      if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath opener 22"; end
     end
-    -- starsurge,if=astral_power>=30
-    if S.Starsurge:IsReady() then
-      if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 24"; end
+    -- wrath,if=prev_gcd.1.wrath&prev_gcd.2.wrath&prev_gcd.3.starsurge
+    if S.Wrath:IsCastable() and (Player:PrevGCDP(1, S.Wrath) and Player:PrevGCDP(2, S.Wrath) and Player:PrevGCDP(3, S.Starsurge)) then
+      if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath opener 24"; end
     end
-    -- variable,name=opener_finished,value=1,if=astral_power<30&prev_gcd.1.starsurge
-    if (not S.ConvoketheSpirits:CooldownUp() and not CaInc:CooldownUp() and Player:AstralPowerP() < 30 and Player:PrevGCDP(1, S.Starsurge)) then
+    -- variable,name=opener_finished,value=1,if=prev_gcd.3.wrath&prev_gcd.4.starsurge
+    if (Player:PrevGCDP(3, S.Wrath) and Player:PrevGCDP(4, S.Starsurge)) then
       OpenerFinished = true
     end
   end
-  -- starfire,if=!runeforge.balance_of_all_things|!covenant.night_fae|!spell_targets.starfall=1|!talent.natures_balance.enabled
-  -- Manually added check to ensure we're not in a solar eclipse
-  if S.Starfire:IsCastable() and Player:BuffDown(S.EclipseSolar) and not Player:IsCasting(S.Starfire) and (not BOATEquipped or CovenantID ~= 3 or not EnemiesCount40y == 1 or not S.NaturesBalance:IsAvailable()) then
-    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire opener 2"; end
+  if (CovenantID == 3) then
+    -- starsurge,if=prev_gcd.1.starsurge&prev_gcd.2.ca_inc
+    if S.Starsurge:IsReady() and (Player:PrevGCDP(1, S.Starsurge) and Player:PrevGCDP(2, CaInc)) then
+      if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 26"; end
+    end
+    -- convoke_the_spirits
+    if S.ConvoketheSpirits:IsReady() then
+      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "convoke_the_spirits opener 28"; end
+    end
+    -- starsurge,if=astral_power>=30
+    if S.Starsurge:IsReady() then
+      if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 30"; end
+    end
+    -- variable,name=opener_finished,value=1,if=astral_power<30&prev_gcd.1.starsurge
+    if (S.ConvoketheSpirits:CooldownDown() and CaInc:CooldownDown() and Player:AstralPowerP() < 30 and Player:PrevGCDP(1, S.Starsurge)) then
+      OpenerFinished = true
+    end
   end
-  if (CovenantID ~= 3 or Player:PrevGCD(1, S.Starfire) or HL.CombatTime() > 20) then
+  -- Exit opener if we've been here for too long as a failsafe
+  if (HL.CombatTime() > 20) then
     OpenerFinished = true
   end
 end
@@ -769,9 +788,9 @@ local function APL()
     -- variable,name=in_gcd,value=prev_gcd.1.moonfire|prev_gcd.1.sunfire|prev_gcd.1.starsurge|prev_gcd.1.starfall|prev_gcd.1.fury_of_elune|prev.ravenous_frenzy|buff.ca_inc.remains=buff.ca_inc.duration|variable.is_aoe
     -- Ignoring this, as HR shouldn't need it
     -- Manually added: Opener function
-    --if (not OpenerFinished and (CaInc:CooldownUp() and (S.ConvoketheSpirits:CooldownUp() or CovenantID ~= 3))) then
-      --local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
-    --end
+    if (not OpenerFinished and (CovenantID == 2 or CovenantID == 3) and CaInc:CooldownUp() and (S.ConvoketheSpirits:CooldownUp() or CovenantID ~= 3) and (S.RavenousFrenzy:CooldownUp() or CovenantID ~= 2)) then
+      local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
+    end
     -- berserking,if=((!covenant.night_fae|!cooldown.convoke_the_spirits.up)&buff.ca_inc.remains>15&buff.ravenous_frenzy.remains<4&!covenant.venthyr|covenant.venthyr&buff.ca_inc.up&buff.ravenous_frenzy.up&(buff.ravenous_frenzy.remains<11-5*runeforge.sinful_hysteria|buff.ca_inc.remains<11|1%spell_haste<1.55))&variable.in_gcd
     if S.Berserking:IsCastable() and ((CovenantID ~= 3 or not S.ConvoketheSpirits:CooldownUp()) and Player:BuffRemains(CaInc) > 15 and Player:BuffRemains(S.RavenousFrenzyBuff) < 4 and CovenantID ~= 2 or CovenantID == 2 and Player:BuffUp(CaInc) and Player:BuffUp(S.RavenousFrenzyBuff) and (Player:BuffRemains(S.RavenousFrenzyBuff) < 11 - 5 * num(SinfulHysteriaEquipped) or Player:BuffRemains(CaInc) < 11 or 1 / Player:SpellHaste() < 1.55)) then
       if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 2"; end
