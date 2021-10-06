@@ -148,6 +148,7 @@ Spell.Druid.Feral = {
   AdaptiveSwarmHeal                     = Spell(325748),
   ConvoketheSpirits                     = Spell(323764),
   EmpowerBond                           = Spell(326647),
+  Fleshcraft                            = Spell(324631),
   KindredSpirits                        = Spell(326434),
   KindredEmpowermentEnergizeBuff        = Spell(327022),
   RavenousFrenzy                        = Spell(323546),
@@ -155,8 +156,10 @@ Spell.Druid.Feral = {
 
   -- Conduit Effects
   DeepAllegiance                        = Spell(341378),
+  PustuleEruption                       = Spell(351094),
   SuddenAmbushBuff                      = Spell(340698),
   TasteForBlood                         = Spell(340682),
+  VolatileSolvent                       = Spell(323074),
 
   -- Legendary Effects
   ApexPredatorsCravingBuff              = Spell(339140),
@@ -238,7 +241,9 @@ Item.Druid.Balance = {
 }
 
 Item.Druid.Feral = {
-  PotionofSpectralAgility               = Item(171270)
+  PotionofSpectralAgility               = Item(171270),
+  -- Other On-Use
+  Jotungeirr                            = Item(186404)
 }
 
 Item.Druid.Guardian = {
