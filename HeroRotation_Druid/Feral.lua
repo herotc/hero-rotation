@@ -404,7 +404,7 @@ local function Cooldown()
   end
   -- tigers_fury,sync=feral_frenzy,if=cooldown.bs_inc.up
   -- FeralFrenzy IsReady check for "sync=feral_frenzy"
-  if S.TigersFury:IsCastable() and (S.FeralFrenzy:IsReady()) then
+  if S.TigersFury:IsCastable() and (S.FeralFrenzy:IsReady() and BsInc:CooldownUp()) then
     if Cast(S.TigersFury) then return "tigers_fury cooldown 6"; end
   end
   -- feral_frenzy,target_if=max:target.time_to_die,if=combo_points<3&target.time_to_die>7&(buff.savage_roar.up|!talent.savage_roar.enabled)&(!cooldown.tigers_fury.up|cooldown.bs_inc.up)|fight_remains<8&fight_remains>2
