@@ -47,6 +47,7 @@ Spell.Druid.Balance = {
   FuryofElune                           = Spell(202770),
   Incarnation                           = Spell(102560),
   NaturesBalance                        = Spell(202430),
+  Solstice                              = Spell(343647),
   SolsticeBuff                          = Spell(343648),
   SouloftheForest                       = Spell(114107),
   Starlord                              = Spell(202345),
@@ -73,6 +74,10 @@ Spell.Druid.Balance = {
   KindredEmpowermentEnergizeBuff        = Spell(327022),
   RavenousFrenzy                        = Spell(323546),
   RavenousFrenzyBuff                    = Spell(323546),
+
+  -- Soulbind Abilities
+  ThrillSeeker                          = Spell(331586),
+  ThrillSeekerBuff                      = Spell(331939),
 
   -- Conduit Effects
   PreciseAlignment                      = Spell(340706),
@@ -232,10 +237,13 @@ Spell.Druid.Guardian = {
 -- Items
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Balance = {
-  -- Potion/Trinkets
+  -- Potion
   PotionofSpectralIntellect             = Item(171273),
+  -- Trinkets
   EmpyrealOrdinance                     = Item(180117),
   InscrutableQuantumDevice              = Item(179350),
+  InstructorsDivineBell                 = Item(184842),
+  ShadowedOrbofTorment                  = Item(186428),
   SoullettingRuby                       = Item(178809)
   -- Other "On-Use"
 }
