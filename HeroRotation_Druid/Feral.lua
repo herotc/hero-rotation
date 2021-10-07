@@ -534,7 +534,7 @@ local function Setup()
     local ShouldReturn = Bloodtalons(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=cooldown
-  if (true) then
+  if (CDsON()) then
     local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=finisher,if=combo_points>3&(buff.bloodtalons.up|!talent.bloodtalons.enabled)
@@ -584,7 +584,7 @@ local function APL()
       if Cast(S.Prowl) then return "prowl main 2"; end
     end
     -- tigers_fury,if=buff.cat_form.down
-    if S.TigersFury:IsCastable() and (Player:BuffDown(S.CatForm)) then
+    if S.TigersFury:IsCastable() and CDsON() and (Player:BuffDown(S.CatForm)) then
       if Cast(S.TigersFury, Settings.Feral.OffGCDasOffGCD.TigersFury) then return "tigers_fury main 4"; end
     end
     -- cat_form,if=buff.cat_form.down
