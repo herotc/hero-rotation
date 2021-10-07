@@ -439,7 +439,7 @@ local function St()
   end
   if (CDsON()) then
     -- celestial_alignment,if=variable.cd_condition_st&(buff.ca_inc.duration>=32|!covenant.venthyr)|buff.ravenous_frenzy.up&buff.ravenous_frenzy.remains<9+conduit.precise_alignment.time_value+(!buff.bloodlust.up&!talent.starlord.enabled)
-    if S.CelestialAlignment:IsCastable() and (VarCDConditionST and (Player:BuffDuration(CaInc) >= 32 or CovenantID ~= 2) or Player:BuffUp(S.RavenousFrenzyBuff) and Player:BuffRemains(S.RavenousFrenzyBuff) < 9 + PATime + (Player:BloodlustDown() and not S.Starlord:IsAvailable())) then
+    if S.CelestialAlignment:IsCastable() and (VarCDConditionST and (Player:BuffDuration(CaInc) >= 32 or CovenantID ~= 2) or Player:BuffUp(S.RavenousFrenzyBuff) and Player:BuffRemains(S.RavenousFrenzyBuff) < 9 + PATime + num(Player:BloodlustDown() and not S.Starlord:IsAvailable())) then
       if Cast(S.CelestialAlignment, Settings.Balance.GCDasOffGCD.CaInc) then return "celestial_alignment st 20"; end
     end
     -- incarnation,if=variable.cd_condition_st
