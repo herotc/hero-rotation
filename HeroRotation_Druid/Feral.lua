@@ -712,7 +712,7 @@ end
 local function OnInit()
   S.RipDebuff:RegisterAuraTracking()
 
-  HR.Print("Feral Druid rotation is currently a work in progress.")
+  HR.Print("Feral Druid rotation is currently a work in progress, but has been updated for patch 9.1.")
 end
 
 HR.SetAPL(103, APL, OnInit)
