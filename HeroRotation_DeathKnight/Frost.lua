@@ -58,6 +58,15 @@ local VarROTFCRime
 local VarFrostStrikeConduits
 local VarDeathsDueActive
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
 local Settings = {
@@ -727,7 +736,7 @@ local function APL()
     -- variable,name=frost_strike_conduits,value=conduit.eradicating_blow&buff.eradicating_blow.stack=2|conduit.unleashed_frenzy&buff.unleashed_frenzy.remains<(gcd*2)
     VarFrostStrikeConduits = (S.EradicatingBlow:ConduitEnabled() and Player:BuffStack(S.EradicatingBlowBuff) == 2 or S.UnleashedFrenzy:ConduitEnabled() and Player:BuffRemains(S.UnleashedFrenzyBuff) < (Player:GCD() * 2))
     -- variable,name=deaths_due_active,value=death_and_decay.ticking&covenant.night_fae
-    VarDeathsDueActive = (Player:BuffUp(S.DeathAndDecayBuff) and Player:Covenant() == "Night Fae")
+    VarDeathsDueActive = (Player:BuffUp(S.DeathAndDecayBuff) and CovenantID == 3)
     -- remorseless_winter,if=conduit.everfrost&talent.gathering_storm&!talent.obliteration&cooldown.pillar_of_frost.remains
     if S.RemorselessWinter:IsReady() and (S.Everfrost:ConduitEnabled() and S.GatheringStorm:IsAvailable() and not S.Obliteration:IsAvailable() and not S.PillarofFrost:CooldownUp()) then
       if Cast(S.RemorselessWinter, nil, nil, not TargetIsInRange[8]) then return "remorseless_winter main 2"; end

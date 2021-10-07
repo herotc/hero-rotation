@@ -77,6 +77,15 @@ local VarWaitingForMomentum = false
 local VarTrinketSyncSlot = 0
 local VarUseEyeBeamFuryCondition = false
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 HL:RegisterForEvent(function()
   VarPoolingForMeta = false
   VarBladeDance = false
@@ -171,11 +180,11 @@ end
 
 local function Cooldown()
   -- metamorphosis,if=!talent.demonic.enabled&cooldown.eye_beam.remains>20&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
-  if S.Metamorphosis:IsCastable() and (not S.Demonic:IsAvailable() and S.EyeBeam:CooldownRemains() > 20 and (Player:Covenant() ~= "Venthyr" or Target:DebuffDown(S.SinfulBrandDebuff)) or HL.BossFilteredFightRemains("<", 25)) then
+  if S.Metamorphosis:IsCastable() and (not S.Demonic:IsAvailable() and S.EyeBeam:CooldownRemains() > 20 and (CovenantID ~= 2 or Target:DebuffDown(S.SinfulBrandDebuff)) or HL.BossFilteredFightRemains("<", 25)) then
     if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis, not Target:IsInRange(40)) then return "metamorphosis cooldown 2"; end
   end
   -- metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
-  if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and (S.EyeBeam:CooldownRemains() > 20 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD())) and (Player:Covenant() ~= "Venthyr" or Target:DebuffDown(S.SinfulBrandDebuff)) or HL.BossFilteredFightRemains("<", 25)) then
+  if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and (S.EyeBeam:CooldownRemains() > 20 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD())) and (CovenantID ~= 2 or Target:DebuffDown(S.SinfulBrandDebuff)) or HL.BossFilteredFightRemains("<", 25)) then
     if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis, not Target:IsInRange(40)) then return "metamorphosis cooldown 4"; end
   end
   -- potion,if=buff.metamorphosis.remains>25|fight_remains<60

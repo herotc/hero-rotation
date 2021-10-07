@@ -64,6 +64,15 @@ local BsInc = S.Incarnation:IsAvailable() and S.Incarnation or S.Berserk
 local DeepFocusEquipped = Player:HasLegendaryEquipped(46)
 local CateyeCurioEquipped = Player:HasLegendaryEquipped(57)
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 -- Event Registration
 HL:RegisterForEvent(function()
   DeepFocusEquipped = Player:HasLegendaryEquipped(46)
@@ -215,7 +224,7 @@ end
 
 local function EvaluateTargetIfRakeStealth2(TargetUnit)
   -- if=(dot.rake.pmultiplier<1.5|refreshable)&druid.rake.ticks_gained_on_refresh>2|(persistent_multiplier>dot.rake.pmultiplier&buff.bs_inc.up&spell_targets.thrash_cat<3&covenant.necrolord)|buff.bs_inc.remains<1
-  return ((TargetUnit:PMultiplier(S.Rake) < 1.5 or TargetUnit:DebuffRefreshable(S.RakeDebuff)) and TicksGainedOnRefresh(S.RakeDebuff) > 2 or (Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake) and Player:BuffUp(BsInc) and EnemiesCount8y < 3 and Player:Covenant() == "Necrolord") or Player:BuffRemains(BsInc) < 1)
+  return ((TargetUnit:PMultiplier(S.Rake) < 1.5 or TargetUnit:DebuffRefreshable(S.RakeDebuff)) and TicksGainedOnRefresh(S.RakeDebuff) > 2 or (Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake) and Player:BuffUp(BsInc) and EnemiesCount8y < 3 and CovenantID == 4) or Player:BuffRemains(BsInc) < 1)
 end
 
 local function EvaluateTargetIfRakeBloodtalons2(TargetUnit)
@@ -245,7 +254,7 @@ end
 
 local function EvaluateCycleThrashMain18(TargetUnit)
   -- target_if=refreshable&druid.thrash_cat.ticks_gained_on_refresh>(4+spell_targets.thrash_cat*4)%(1+mastery_value)-conduit.taste_for_blood.enabled-covenant.necrolord&(!buff.bs_inc.up|spell_targets.thrash_cat>1)
-  return (TargetUnit:DebuffRefreshable(S.ThrashDebuff) and TicksGainedOnRefresh(S.ThrashDebuff) > (4 + EnemiesCount8y * 4) / (1 + (Player:MasteryPct() / 100)) - num(S.TasteForBlood:ConduitEnabled()) - num(Player:Covenant() == "Necrolord") and (Player:BuffDown(BsInc) or EnemiesCount8y > 1))
+  return (TargetUnit:DebuffRefreshable(S.ThrashDebuff) and TicksGainedOnRefresh(S.ThrashDebuff) > (4 + EnemiesCount8y * 4) / (1 + (Player:MasteryPct() / 100)) - num(S.TasteForBlood:ConduitEnabled()) - num(CovenantID == 4) and (Player:BuffDown(BsInc) or EnemiesCount8y > 1))
 end
 
 local function EvaluateCycleAdaptiveSwarmCooldown2(TargetUnit)
@@ -328,11 +337,11 @@ local function Owlweave()
     end
   end
   -- heart_of_the_wild,if=energy<30&dot.rip.remains>4.5&(cooldown.tigers_fury.remains>=6.5|runeforge.cateye_curio)&buff.clearcasting.stack<1&!buff.apex_predators_craving.up&!buff.bloodlust.up&!buff.bs_inc.up&(cooldown.convoke_the_spirits.remains>6.5|!covenant.night_fae)&(!covenant.necrolord|cooldown.adaptive_swarm.remains>=5|dot.adaptive_swarm_damage.remains>7)
-  if S.HeartoftheWild:IsCastable() and (Player:Energy() < 30 and Target:DebuffRemains(S.RipDebuff) > 4.5 and (S.TigersFury:CooldownRemains() >= 6.5 or CateyeCurioEquipped) and Player:BuffDown(S.Clearcasting) and Player:BuffDown(S.ApexPredatorsCravingBuff) and Player:BloodlustDown() and Player:BuffDown(BsInc) and (S.ConvoketheSpirits:CooldownRemains() > 6.5 or Player:Covenant() ~= "Night Fae") and (Player:Covenant() ~= "Necrolord" or S.AdaptiveSwarm:CooldownRemains() >= 5 or Target:DebuffRemains(S.AdaptiveSwarmDebuff) > 7)) then
+  if S.HeartoftheWild:IsCastable() and (Player:Energy() < 30 and Target:DebuffRemains(S.RipDebuff) > 4.5 and (S.TigersFury:CooldownRemains() >= 6.5 or CateyeCurioEquipped) and Player:BuffDown(S.Clearcasting) and Player:BuffDown(S.ApexPredatorsCravingBuff) and Player:BloodlustDown() and Player:BuffDown(BsInc) and (S.ConvoketheSpirits:CooldownRemains() > 6.5 or CovenantID ~= 3) and (CovenantID ~= 4 or S.AdaptiveSwarm:CooldownRemains() >= 5 or Target:DebuffRemains(S.AdaptiveSwarmDebuff) > 7)) then
     if Cast(S.HeartoftheWild) then return "heart_of_the_wild owlweave 8"; end
   end
   -- moonkin_form,if=energy<30&dot.rip.remains>4.5&(cooldown.tigers_fury.remains>=4.5|runeforge.cateye_curio)&buff.clearcasting.stack<1&!buff.apex_predators_craving.up&!buff.bloodlust.up&(!buff.bs_inc.up|covenant.necrolord&talent.savage_roar.enabled&buff.bs_inc.remains>6)&(cooldown.convoke_the_spirits.remains>6.5|!covenant.night_fae)&(!covenant.necrolord|cooldown.adaptive_swarm.remains>=5|dot.adaptive_swarm_damage.remains>7)&target.time_to_die>7
-  if S.MoonkinForm:IsCastable() and (Player:Energy() < 30 and Target:DebuffRemains(S.RipDebuff) > 4.5 and (S.TigersFury:CooldownRemains() >= 4.5 or CateyeCurioEquipped) and Player:BuffDown(S.Clearcasting) and Player:BuffDown(S.ApexPredatorsCravingBuff) and Player:BloodlustDown() and (Player:BuffDown(BsInc) or Player:Covenant() == "Necrolord" and S.SavageRoar:IsAvailable() and Player:BuffRemains(BsInc) > 6) and (S.ConvoketheSpirits:CooldownRemains() > 6.5 or Player:Covenant() ~= "Night Fae") and (Player:Covenant() ~= "Necrolord" or S.AdaptiveSwarm:CooldownRemains() >= 5 or Target:DebuffRemains(S.AdaptiveSwarmDebuff) > 7) and Target:TimeToDie() > 7) then
+  if S.MoonkinForm:IsCastable() and (Player:Energy() < 30 and Target:DebuffRemains(S.RipDebuff) > 4.5 and (S.TigersFury:CooldownRemains() >= 4.5 or CateyeCurioEquipped) and Player:BuffDown(S.Clearcasting) and Player:BuffDown(S.ApexPredatorsCravingBuff) and Player:BloodlustDown() and (Player:BuffDown(BsInc) or CovenantID == 4 and S.SavageRoar:IsAvailable() and Player:BuffRemains(BsInc) > 6) and (S.ConvoketheSpirits:CooldownRemains() > 6.5 or CovenantID ~= 3) and (CovenantID ~= 4 or S.AdaptiveSwarm:CooldownRemains() >= 5 or Target:DebuffRemains(S.AdaptiveSwarmDebuff) > 7) and Target:TimeToDie() > 7) then
     if Cast(S.MoonkinForm) then return "moonkin_form owlweave 10"; end
   end
 end
@@ -480,7 +489,7 @@ local function Finisher()
     if Everyone.CastTargetIf(S.FerociousBite, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, EvaluateTargetIfDummy, not Target:IsInRange(MeleeRange)) then return "ferocious_bite max_energy finisher 10"; end
   end
   -- ferocious_bite,target_if=max:time_to_die,if=buff.bs_inc.up&talent.soul_of_the_forest.enabled|cooldown.convoke_the_spirits.remains<1&covenant.night_fae
-  if S.FerociousBite:IsReady() and (Player:BuffUp(BsInc) and S.SouloftheForest:IsAvailable() or S.ConvoketheSpirits:CooldownRemains() < 1 and Player:Covenant() == "Night Fae") then
+  if S.FerociousBite:IsReady() and (Player:BuffUp(BsInc) and S.SouloftheForest:IsAvailable() or S.ConvoketheSpirits:CooldownRemains() < 1 and CovenantID == 3) then
     if Everyone.CastTargetIf(S.FerociousBite, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, EvaluateTargetIfDummy, not Target:IsInRange(MeleeRange)) then return "ferocious_bite finisher 12"; end
   end
   -- Manually added the below two lines, as otherwise the addon was wasting CPs
@@ -517,7 +526,7 @@ end
 
 local function Setup()
   -- lunar_inspiration,if=covenant.necrolord&spell_targets.thrash_cat<4&combo_points<5&!ticking&!buff.bs_inc.up
-  if S.LunarInspiration:IsAvailable() and S.Moonfire:IsReady() and (Player:Covenant() == "Necrolord" and EnemiesCount8y < 4 and Player:ComboPoints() < 5 and Target:DebuffDown(S.MoonfireDebuff) and Player:BuffDown(BsInc)) then
+  if S.LunarInspiration:IsAvailable() and S.Moonfire:IsReady() and (CovenantID == 4 and EnemiesCount8y < 4 and Player:ComboPoints() < 5 and Target:DebuffDown(S.MoonfireDebuff) and Player:BuffDown(BsInc)) then
     if CastPooling(S.Moonfire, Player:EnergyTimeToX(30), not Target:IsSpellInRange(S.Moonfire)) then return "lunar_inspiration setup 2"; end
   end
   -- pool_resource,for_next=1
@@ -620,7 +629,7 @@ local function APL()
       local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
     end
     -- rip,if=covenant.necrolord&(!talent.bloodtalons.enabled|buff.bloodtalons.up)&spell_targets.thrash_cat=1&(combo_points>2&refreshable&druid.rip.ticks_gained_on_refresh>variable.rip_ticks&(!buff.bs_inc.up|cooldown.bs_inc.up|(buff.bs_inc.up&cooldown.feral_frenzy.up))|combo_points=5&buff.tigers_fury.up&buff.tigers_fury.remains<4&druid.rip.ticks_gained_on_refresh>5)
-    if S.Rip:IsReady() and (Player:Covenant() == "Necrolord" and ((not S.Bloodtalons:IsAvailable()) or Player:BuffUp(S.BloodtalonsBuff)) and EnemiesCountMelee == 1 and (ComboPoints > 2 and Target:DebuffRefreshable(S.Rip) and TicksGainedOnRefresh(S.RipDebuff) > VarRipTicks and (Player:BuffDown(BsInc) or BsInc:CooldownUp() or (Player:BuffUp(BsInc) and S.FeralFrenzy:CooldownUp())) or Player:ComboPoints() == 5 and Player:BuffUp(S.TigersFury) and Player:BuffRemains(S.TigersFury) < 4 and TicksGainedOnRefresh(S.RipDebuff) > 5)) then
+    if S.Rip:IsReady() and (CovenantID == 4 and ((not S.Bloodtalons:IsAvailable()) or Player:BuffUp(S.BloodtalonsBuff)) and EnemiesCountMelee == 1 and (ComboPoints > 2 and Target:DebuffRefreshable(S.Rip) and TicksGainedOnRefresh(S.RipDebuff) > VarRipTicks and (Player:BuffDown(BsInc) or BsInc:CooldownUp() or (Player:BuffUp(BsInc) and S.FeralFrenzy:CooldownUp())) or Player:ComboPoints() == 5 and Player:BuffUp(S.TigersFury) and Player:BuffRemains(S.TigersFury) < 4 and TicksGainedOnRefresh(S.RipDebuff) > 5)) then
       if CastPooling(S.Rip, Player:EnergyTimeToX(20), not Target:IsInRange(MeleeRange)) then return "rip main 8"; end
     end
     -- run_action_list,name=finisher,if=combo_points>=(5-variable.4cp_bite)
@@ -658,7 +667,7 @@ local function APL()
     end
     -- pool_resource,for_next=1
     -- thrash_cat,target_if=refreshable&druid.thrash_cat.ticks_gained_on_refresh>(4+spell_targets.thrash_cat*4)%(1+mastery_value)-conduit.taste_for_blood.enabled-covenant.necrolord&(!buff.bs_inc.up|spell_targets.thrash_cat>1)
-    if S.Thrash:IsCastable() and (Target:DebuffRefreshable(S.ThrashDebuff) and TicksGainedOnRefresh(S.ThrashDebuff) > (4 + EnemiesCount8y * 4) / (1 + (Player:MasteryPct() / 100)) - num(S.TasteForBlood:ConduitEnabled()) - num(Player:Covenant() == "Necrolord") and (Player:BuffDown(BsInc) or EnemiesCount8y > 1)) then
+    if S.Thrash:IsCastable() and (Target:DebuffRefreshable(S.ThrashDebuff) and TicksGainedOnRefresh(S.ThrashDebuff) > (4 + EnemiesCount8y * 4) / (1 + (Player:MasteryPct() / 100)) - num(S.TasteForBlood:ConduitEnabled()) - num(CovenantID == 4) and (Player:BuffDown(BsInc) or EnemiesCount8y > 1)) then
       if CastPooling(S.Thrash, Player:EnergyTimeToX(40), not Target:IsInRange(EightRange)) then return "Pool for thrash target main 18"; end
     end
     if S.Thrash:IsCastable() and AoEON() then

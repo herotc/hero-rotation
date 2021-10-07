@@ -35,6 +35,14 @@ local OnUseExcludes = {
   I.DarkmoonDeckIndomitable:ID(),
 }
 
+-- GUI Settings
+local Everyone = HR.Commons.Everyone
+local Settings = {
+  General = HR.GUISettings.General,
+  Commons = HR.GUISettings.APL.DemonHunter.Commons,
+  Vengeance = HR.GUISettings.APL.DemonHunter.Vengeance
+}
+
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
 local SoulFragments, SoulFragmentsAdjusted, LastSoulFragmentAdjustment
@@ -46,13 +54,14 @@ local EnemiesCount8yMelee
 local VarBrandBuild = (S.AgonizingFlames:IsAvailable() and S.BurningAlive:IsAvailable() and S.CharredFlesh:IsAvailable())
 local RazelikhsDefilementEquipped = Player:HasLegendaryEquipped(27)
 
--- GUI Settings
-local Everyone = HR.Commons.Everyone
-local Settings = {
-  General = HR.GUISettings.General,
-  Commons = HR.GUISettings.APL.DemonHunter.Commons,
-  Vengeance = HR.GUISettings.APL.DemonHunter.Vengeance
-}
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
 
 HL:RegisterForEvent(function()
   VarBrandBuild = (S.AgonizingFlames:IsAvailable() and S.BurningAlive:IsAvailable() and S.CharredFlesh:IsAvailable())
@@ -236,7 +245,7 @@ local function Normal()
     if Cast(S.Fracture) then return "fracture 42"; end
   end
   -- sigil_of_flame,if=!(covenant.kyrian.enabled&runeforge.razelikhs_defilement)
-  if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemains(S.SigilofFlameDebuff) <= 3 and (not (Player:Covenant() == "Kyrian" and RazelikhsDefilementEquipped)) then
+  if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemains(S.SigilofFlameDebuff) <= 3 and (not (CovenantID == 1 and RazelikhsDefilementEquipped)) then
     if S.ConcentratedSigils:IsAvailable() then
       if Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 44 (Concentrated)"; end
     else

@@ -85,6 +85,15 @@ local SuperstrainEquipped = Player:HasLegendaryEquipped(30)
 local PhearomonesEquipped = Player:HasLegendaryEquipped(31)
 local DeadliestCoilEquipped = Player:HasLegendaryEquipped(45)
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 -- Stun Interrupts List
 local StunInterrupts = {
   {S.Asphyxiate, "Cast Asphyxiate (Interrupt)", function () return true; end},
@@ -458,7 +467,7 @@ local function Generic()
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil generic 4"; end
   end
   -- any_dnd,if=(talent.defile.enabled|covenant.night_fae|runeforge.phearomones)&(!variable.pooling_runes|fight_remains<5)
-  if AnyDnD:IsReady() and ((S.Defile:IsAvailable() or Player:Covenant() == "Night Fae" or PhearomonesEquipped) and (not VarPoolingRunes or HL.FilteredFightRemains(EnemiesMelee, "<", 5))) then
+  if AnyDnD:IsReady() and ((S.Defile:IsAvailable() or CovenantID == 3 or PhearomonesEquipped) and (not VarPoolingRunes or HL.FilteredFightRemains(EnemiesMelee, "<", 5))) then
     if AnyDnD == S.DeathsDue then
       if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Covenant) then return "any_dnd generic 6"; end
     else
@@ -562,7 +571,7 @@ local function APL()
     -- variable,name=major_cooldowns_active,value=(talent.summon_gargoyle&!pet.gargoyle.active&cooldown.summon_gargoyle.remains|!talent.summon_gargoyle)&(buff.unholy_assault.up|talent.army_of_the_damned&pet.apoc_ghoul.active|buff.dark_transformation.up|active_enemies>=2&death_and_decay.ticking)
     VarMajorCDsActive = ((S.SummonGargoyle:IsAvailable() and not VarGargoyleActive and not S.SummonGargoyle:CooldownUp() or not S.SummonGargoyle:IsAvailable()) and (Player:BuffUp(S.UnholyAssault) or S.ArmyoftheDamned:IsAvailable() and VarApocGhoulActive or Player:BuffUp(S.DarkTransformation) or EnemiesMeleeCount >= 2 and Player:BuffUp(S.DeathAndDecayBuff)))
     -- variable,name=dump_wounds,value=covenant.night_fae&death_and_decay.ticking&buff.deaths_due.stack<4|buff.marrowed_gemstone_enhancement.up|buff.thrill_seeker.up|buff.frenzied_monstrosity.up|buff.lead_by_example.up|buff.chaos_bane.up|cooldown.unholy_assault.remains<5
-    VarDumpWounds = (Player:Covenant() == "Night Fae" and Player:BuffUp(S.DeathAndDecayBuff) and Player:BuffStack(S.DeathsDueBuff) < 4 or Player:BuffUp(S.MarrowedGemstoneEnhancement) or Player:BuffUp(S.ThrillSeeker) or Player:BuffUp(S.FrenziedMonstrosity) or Player:BuffUp(S.LeadByExampleBuff) or Player:BuffUp(S.ChaosBaneBuff) or S.UnholyAssault:CooldownRemains() < 5)
+    VarDumpWounds = (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff) and Player:BuffStack(S.DeathsDueBuff) < 4 or Player:BuffUp(S.MarrowedGemstoneEnhancement) or Player:BuffUp(S.ThrillSeeker) or Player:BuffUp(S.FrenziedMonstrosity) or Player:BuffUp(S.LeadByExampleBuff) or Player:BuffUp(S.ChaosBaneBuff) or S.UnholyAssault:CooldownRemains() < 5)
     -- Manually added: Outbreak if targets are missing VP and out of range
     if S.Outbreak:IsReady() and (EnemiesWithoutVP > 0 and EnemiesMeleeCount == 0) then
       if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak out_of_range"; end
@@ -590,7 +599,7 @@ local function APL()
       if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak main 22"; end
     end
     -- wound_spender,if=covenant.night_fae&death_and_decay.active_remains<(gcd*1.5)&death_and_decay.ticking
-    if WoundSpender:IsReady() and (Player:Covenant() == "Night Fae" and Player:BuffRemains(S.DeathAndDecayBuff) < (Player:GCD() * 1.5) and Player:BuffUp(S.DeathAndDecayBuff)) then
+    if WoundSpender:IsReady() and (CovenantID == 3 and Player:BuffRemains(S.DeathAndDecayBuff) < (Player:GCD() * 1.5) and Player:BuffUp(S.DeathAndDecayBuff)) then
       if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender main 24"; end
     end
     -- wait_for_cooldown,name=soul_reaper,if=talent.soul_reaper&target.time_to_pct_35<5&fight_remains>5&cooldown.soul_reaper.remains<(gcd*0.75)&active_enemies=1

@@ -89,8 +89,7 @@ local fightRemains
 
 -- Player Covenant
 -- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local Covenants = _G.C_Covenants
-local CovenantID = Covenants.GetActiveCovenantID()
+local CovenantID = Player:CovenantID()
 
 -- CA/Incarnation Variable
 local CaInc = S.Incarnation:IsAvailable() and S.Incarnation or S.CelestialAlignment
@@ -156,7 +155,7 @@ end, "SOULBIND_ACTIVATED", "SOULBIND_CONDUIT_COLLECTION_UPDATED", "SOULBIND_COND
 
 -- Update CovenantID if we change Covenants
 HL:RegisterForEvent(function()
-  CovenantID = Covenants.GetActiveCovenantID()
+  CovenantID = Player:CovenantID()
 end, "COVENANT_CHOSEN")
 
 -- Enemy Variables
@@ -289,11 +288,11 @@ local function Precombat()
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath precombat 4"; end
   end
   -- starfire,if=!runeforge.balance_of_all_things|!covenant.night_fae|!spell_targets.starfall=1|!talent.natures_balance.enabled
-  if S.Starfire:IsCastable() and not Player:IsCasting(S.Starfire) and ((not BOATEquipped) or Player:Covenant() ~= "Night Fae" or EnemiesCount40y ~= 1 or not S.NaturesBalance:IsAvailable()) then
+  if S.Starfire:IsCastable() and not Player:IsCasting(S.Starfire) and ((not BOATEquipped) or CovenantID ~= 3 or EnemiesCount40y ~= 1 or not S.NaturesBalance:IsAvailable()) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire precombat 6"; end
   end
   -- starsurge,if=runeforge.balance_of_all_things&covenant.night_fae&spell_targets.starfall=1
-  if S.Starsurge:IsReady() and (BOATEquipped and Player:Covenant() == "Night Fae" and EnemiesCount40y == 1) then
+  if S.Starsurge:IsReady() and (BOATEquipped and Covenant == 3 and EnemiesCount40y == 1) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge precombat 8"; end
   end
 end

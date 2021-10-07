@@ -75,7 +75,7 @@ Spell.Hunter.BeastMastery = {
   PustuleEruption                       = Spell(351094),
   VolatileSolvent                       = Spell(323074),
   -- Legendaries (Shadowlands)
-  NesingwarysTrappingApparatusBuff      = Spell(336744),
+  NessingwarysTrappingApparatusBuff      = Spell(336744),
   SoulforgeEmbersDebuff                 = Spell(336746),
   WailingArrow                          = Spell(355589),
   -- Conduits (Shadowlands)

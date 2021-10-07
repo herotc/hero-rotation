@@ -64,6 +64,15 @@ local MeleeEnemies8y, MeleeEnemies8yCount
 -- Legendaries
 local LuffaInfusedEmbraceEquipped = Player:HasLegendaryEquipped(58)
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 -- Event Registrations
 HL:RegisterForEvent(function()
   equip = Player:GetEquipment()
@@ -196,7 +205,7 @@ local function Bear()
     if Cast(S.BearForm) then return "bear_form bear 2"; end
   end
   -- heart_of_the_wild,if=talent.heart_of_the_wild.enabled&(talent.balance_affinity.enabled)&covenant.venthyr
-  if S.HeartoftheWild:IsCastable() and (S.BalanceAffinity:IsAvailable() and Player:Covenant() == "Venthyr") then
+  if S.HeartoftheWild:IsCastable() and (S.BalanceAffinity:IsAvailable() and CovenantID == 2) then
     if Cast(S.HeartoftheWild, Settings.Guardian.GCDasOffGCD.HeartOfTheWild) then return "heart_of_the_wild bear 3"; end
   end
   -- moonfire,cycle_targets=1,if=((!ticking&time_to_die>12&buff.galactic_guardian.up)|(refreshable&time_to_die>12&buff.galactic_guardian.up))
@@ -210,20 +219,20 @@ local function Bear()
     if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy bear 7"; end
   end
   -- use_item,name=jotungeirr_destinys_call,if=covenant.venthyr
-  if I.Jotungeirr:IsEquippedAndReady() and (Player:Covenant() == "Venthyr") then
+  if I.Jotungeirr:IsEquippedAndReady() and (CovenantID == 2) then
     if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call bear 8"; end
   end
   -- use_item,slot=trinket1,if=!buff.prowl.up&covenant.venthyr
-  if trinket1:IsEquippedAndReady() and (Player:Covenant() == "Venthyr") then
+  if trinket1:IsEquippedAndReady() and (Covenant == 2) then
     if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 bear 9"; end
   end
   -- use_item,slot=trinket2,if=!buff.prowl.up&covenant.venthyr
-  if trinket2:IsEquippedAndReady() and (Player:Covenant() == "Venthyr") then
+  if trinket2:IsEquippedAndReady() and (Covenant == 2) then
     if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 bear 10"; end
   end
   -- potion,if=covenant.venthyr&buff.incarnation.remains>=24&buff.incarnation.remains<=25
   -- Note: Extended time frame to better handle a real player's reaction time
-  if Settings.Commons.Enabled.Potions and I.PotionofPhantomFire:IsReady() and (Player:Covenant() == "Venthyr" and Player:BuffRemains(S.IncarnationBuff) >= 23 and Player:BuffRemains(S.IncarnationBuff) <= 26) then
+  if Settings.Commons.Enabled.Potions and I.PotionofPhantomFire:IsReady() and (CovenantID == 2 and Player:BuffRemains(S.IncarnationBuff) >= 23 and Player:BuffRemains(S.IncarnationBuff) <= 26) then
     if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion bear 11"; end
   end
   -- convoke_the_spirits,if=!druid.catweave_bear&!druid.owlweave_bear
@@ -231,11 +240,11 @@ local function Bear()
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInMeleeRange(5)) then return "convoke_the_spirits bear 12"; end
   end
   -- berserk_bear,if=(buff.ravenous_frenzy.up|!covenant.venthyr)
-  if S.Berserk:IsCastable() and IsTanking and (Player:BuffUp(S.RavenousFrenzyBuff) or Player:Covenant() ~= "Venthyr") then
+  if S.Berserk:IsCastable() and IsTanking and (Player:BuffUp(S.RavenousFrenzyBuff) or CovenantID ~= 2) then
     if Cast(S.Berserk, Settings.Guardian.OffGCDasOffGCD.Berserk) then return "berserk bear 13"; end
   end
   -- incarnation,if=(buff.ravenous_frenzy.up|!covenant.venthyr)
-  if S.Incarnation:IsCastable() and IsTanking and (Player:BuffUp(S.RavenousFrenzyBuff) or Player:Covenant() ~= "Venthyr") then
+  if S.Incarnation:IsCastable() and IsTanking and (Player:BuffUp(S.RavenousFrenzyBuff) or CovenantID ~= 2) then
     if Cast(S.Incarnation, Settings.Guardian.OffGCDasOffGCD.Incarnation) then return "incarnation bear 14"; end
   end
   -- berserking,if=(buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)
@@ -377,19 +386,19 @@ local function APL()
     end
     -- auto_attack,if=!buff.prowl.up
     -- use_item,name=jotungeirr_destinys_call,if=!buff.prowl.up&!covenant.venthyr
-    if I.Jotungeirr:IsEquippedAndReady() and (Player:Covenant() ~= "Venthyr") then
+    if I.Jotungeirr:IsEquippedAndReady() and (CovenantID ~= 2) then
       if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main"; end
     end
     -- use_item,slot=trinket1,if=!buff.prowl.up&!covenant.venthyr
-    if trinket1:IsEquippedAndReady() and (Player:Covenant() ~= "Venthyr") then
+    if trinket1:IsEquippedAndReady() and (CovenantID ~= 2) then
       if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 main"; end
     end
     -- use_item,slot=trinket2,if=!buff.prowl.up&!covenant.venthyr
-    if trinket2:IsEquippedAndReady() and (Player:Covenant() ~= "Venthyr") then
+    if trinket2:IsEquippedAndReady() and (Covenant ~= 2) then
       if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 main"; end
     end
     -- potion,if=!covenant.venthyr&(((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)&(druid.catweave_bear|druid.owlweave_bear)&!buff.prowl.up)|((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!druid.catweave_bear&!druid.owlweave_bear)))
-    if Settings.Commons.Enabled.Potions and I.PotionofPhantomFire:IsReady() and (Player:Covenant() ~= "Venthyr" and (Player:BuffUp(S.BerserkBuff) or Player:BuffUp(S.Incarnation))) then
+    if Settings.Commons.Enabled.Potions and I.PotionofPhantomFire:IsReady() and (CovenantID ~= 2 and (Player:BuffUp(S.BerserkBuff) or Player:BuffUp(S.Incarnation))) then
       if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main"; end
     end
     -- run_action_list,name=catweave,if=druid.catweave_bear&!covenant.venthyr&buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=gcd+0.5&rage<40&buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&buff.galactic_guardian.down)|(buff.cat_form.up&energy>25)|(dot.rake.refreshable&dot.rip.refreshable)|(runeforge.oath_of_the_elder_druid.equipped&!buff.oath_of_the_elder_druid.up&(buff.cat_form.up&energy>20)&buff.heart_of_the_wild.remains<=10)|(covenant.kyrian&cooldown.empower_bond.remains<=1&active_enemies<2)|(buff.heart_of_the_wild.up&energy>90))
