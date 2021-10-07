@@ -325,7 +325,7 @@ local function Opener()
     end
   end
   if (CovenantID == 2) then
-    if S.RavenousFrenzy:IsCastable() then
+    if S.RavenousFrenzy:IsCastable() and CDsON() then
       if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy opener 14"; end
     end
   end
@@ -361,7 +361,7 @@ local function Opener()
       if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 26"; end
     end
     -- convoke_the_spirits
-    if S.ConvoketheSpirits:IsReady() then
+    if S.ConvoketheSpirits:IsReady() and CDsON() then
       if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "convoke_the_spirits opener 28"; end
     end
     -- starsurge,if=astral_power>=30
@@ -639,7 +639,7 @@ end
 
 local function Boat()
   -- ravenous_frenzy,if=buff.ca_inc.remains>15
-  if S.RavenousFrenzy:IsCastable() and (Player:BuffRemains(CaInc) > 15) then
+  if S.RavenousFrenzy:IsCastable() and CDsON() and (Player:BuffRemains(CaInc) > 15) then
     if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy boat 2"; end
   end
   -- adaptive_swarm,target_if=buff.balance_of_all_things_nature.stack<8&buff.balance_of_all_things_arcane.stack<8&(!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>3)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<5&dot.adaptive_swarm_damage.ticking)
