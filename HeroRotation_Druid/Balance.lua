@@ -333,13 +333,13 @@ local function Opener()
   if CaInc:IsReady() and CDsON() then
     if Cast(CaInc, Settings.Balance.GCDasOffGCD.CaInc) then return "ca_inc opener 16"; end
   end
-  -- starsurge
-  if S.Starsurge:IsReady() then
+  -- starsurge,if=prev_gcd.1.ca_inc
+  if S.Starsurge:IsReady() and (Player:PrevGCDP(1, CaInc)) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 18"; end
   end
   if (CovenantID == 2) then
-    -- wrath
-    if S.Wrath:IsCastable() then
+    -- wrath,if=prev_gcd.1.starsurge
+    if S.Wrath:IsCastable() and (Player:PrevGCDP(1, S.Starsurge)) then
       if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath opener 20"; end
     end
     -- wrath,if=prev_gcd.1.wrath&prev_gcd.2.starsurge
@@ -368,15 +368,15 @@ local function Opener()
     if S.Starsurge:IsReady() then
       if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge opener 30"; end
     end
-    -- variable,name=opener_finished,value=1,if=astral_power<30&prev_gcd.1.starsurge
-    if (S.ConvoketheSpirits:CooldownDown() and CaInc:CooldownDown() and Player:AstralPowerP() < 30 and Player:PrevGCDP(1, S.Starsurge)) then
+    -- variable,name=opener_finished,value=1,if=astral_power<30
+    if (S.ConvoketheSpirits:CooldownDown() and CaInc:CooldownDown() and Player:AstralPowerP() < 30) then
       OpenerFinished = true
     end
   end
   -- Exit opener if we've been here for too long as a failsafe
-  if (HL.CombatTime() > 20) then
-    OpenerFinished = true
-  end
+  --if (HL.CombatTime() > 20) then
+    --OpenerFinished = true
+  --end
 end
 
 local function Fallthru()
@@ -793,7 +793,7 @@ local function APL()
     -- variable,name=in_gcd,value=prev_gcd.1.moonfire|prev_gcd.1.sunfire|prev_gcd.1.starsurge|prev_gcd.1.starfall|prev_gcd.1.fury_of_elune|prev.ravenous_frenzy|buff.ca_inc.remains=buff.ca_inc.duration|variable.is_aoe
     -- Ignoring this, as HR shouldn't need it
     -- Manually added: Opener function
-    if (not OpenerFinished and (CovenantID == 2 or CovenantID == 3) and (CaInc:CooldownUp() or not CDsON()) and (S.ConvoketheSpirits:CooldownUp() or CovenantID ~= 3) and (S.RavenousFrenzy:CooldownUp() or CovenantID ~= 2)) then
+    if (not OpenerFinished and (CovenantID == 2 or CovenantID == 3)) then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
     -- berserking,if=((!covenant.night_fae|!cooldown.convoke_the_spirits.up)&buff.ca_inc.remains>15&buff.ravenous_frenzy.remains<4&!covenant.venthyr|covenant.venthyr&buff.ca_inc.up&buff.ravenous_frenzy.up&(buff.ravenous_frenzy.remains<11-5*runeforge.sinful_hysteria|buff.ca_inc.remains<11|1%spell_haste<1.55))&variable.in_gcd
