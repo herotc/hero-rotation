@@ -38,6 +38,15 @@ local TrinketsOnUseExcludes = {
   I.DreadfireVessel:ID(),
 }
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 -- Legendaries
 local NessingwarysTrappingEquipped = Player:HasLegendaryEquipped(67)
 local SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
@@ -185,6 +194,8 @@ local function Precombat()
   -- flask
   -- augmentation
   -- food
+  -- variable,name=mb_rs_cost,op=setif,value=action.mongoose_bite.cost,value_else=action.raptor_strike.cost,condition=talent.mongoose_bite
+  -- Defined with profile variables
   -- summon_pet
   if S.SummonPet:IsCastable() then
     if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot]) then return "summon_pet precombat 2"; end
@@ -193,35 +204,35 @@ local function Precombat()
   if Everyone.TargetIsValid() then
     -- fleshcraft
     if S.Fleshcraft:IsCastable() then
-      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 4"; end
     end
     -- Manually added: kill_shot
     -- Could be removed?
     if S.KillShot:IsReady() then
-      if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot precombat 4"; end
+      if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot precombat 6"; end
     end
     -- tar_trap,if=runeforge.soulforge_embers
     if S.TarTrap:IsCastable() and (SoulForgeEmbersEquipped) then
-      if Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap precombat 6"; end
+      if Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap precombat 7"; end
     end
     -- Manually added: flare,if=runeforge.soulforge_embers&prev_gcd.1.tar_trap
     if S.Flare:IsCastable() and (SoulForgeEmbersEquipped and Player:PrevGCD(1, S.TarTrap)) then
-      if Cast(S.Flare, Settings.Commons2.GCDasOffGCD.Flare) then return "flare precombat 8"; end
+      if Cast(S.Flare, Settings.Commons2.GCDasOffGCD.Flare) then return "flare precombat 10"; end
     end
     -- steel_trap,precast_time=20
     if S.SteelTrap:IsCastable() and Target:DebuffDown(S.SteelTrapDebuff) then
-      if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap precombat 10"; end
+      if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap precombat 12"; end
     end
     -- Manually added: harpoon
     if S.Harpoon:IsCastable() and not Target:IsInMeleeRange(5) and (Player:BuffDown(S.AspectoftheEagle) or not Target:IsInRange(40)) then
-      if Cast(S.Harpoon, nil, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon precombat 12"; end
+      if Cast(S.Harpoon, nil, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon precombat 14"; end
     end
     -- Manually added: mongoose_bite or raptor_strike
     if Target:IsInMeleeRange(5) or (Player:BuffUp(S.AspectoftheEagle) and Target:IsInRange(40)) then
       if S.MongooseBite:IsReady() then
-        if Cast(S.MongooseBite) then return "mongoose_bite precombat 14"; end
+        if Cast(S.MongooseBite) then return "mongoose_bite precombat 16"; end
       elseif S.RaptorStrike:IsReady() then
-        if Cast(S.RaptorStrike) then return "raptor_strike precombat 16"; end
+        if Cast(S.RaptorStrike) then return "raptor_strike precombat 18"; end
       end
     end
   end
@@ -231,14 +242,6 @@ local function CDs()
   -- harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
   if S.Harpoon:IsReady() and (S.TermsofEngagement:IsAvailable() and Player:Focus() < Player:FocusMax()) then
     if Cast(S.Harpoon, nil, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon cds 2"; end
-  end
-  -- use_item,name=dreadfire_vessel,if=covenant.kyrian&cooldown.resonating_arrow.remains>10|!covenant.kyrian
-  if I.DreadfireVessel:IsEquippedAndReady() and (Player:Covenant() == "Kyrian" and S.ResonatingArrow:CooldownRemains() > 10 or Player:Covenant() ~= "Kyrian") then
-    if Cast(I.DreadfireVessel, nil, nil, not Target:IsInRange(50)) then return "dreadfire_vessel cds 4"; end
-  end
-  -- use_item,name=jotungeirr_destinys_call,if=buff.coordinated_assault.up|time_to_die<31
-  if I.Jotungeirr:IsEquippedAndReady() and (Player:BuffUp(S.CoordinatedAssault) or Target:TimeToDie() < 31) then
-    if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call cds 5"; end
   end
   if (Player:BuffUp(S.CoordinatedAssault)) then
     -- blood_fury,if=buff.coordinated_assault.up
@@ -319,18 +322,18 @@ end
 
 local function ST()
   -- death_chakram,if=focus+cast_regen<focus.max
-  if CDsON() and S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
+  if S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
     if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram st 2"; end
   end
   -- serpent_sting,target_if=min:remains,if=!dot.serpent_sting.ticking&target.time_to_die>7|buff.vipers_venom.up&buff.vipers_venom.remains<gcd
   if S.SerpentSting:IsReady() then
     if Everyone.CastTargetIf(S.SerpentSting, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingST, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting st 4"; end
   end
+  -- flayed_shot
+  if S.FlayedShot:IsCastable() then
+    if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.FlayedShot)) then return "flayed_shot st 6"; end
+  end
   if CDsON() then
-    -- flayed_shot
-    if S.FlayedShot:IsCastable() then
-      if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.FlayedShot)) then return "flayed_shot st 6"; end
-    end
     -- resonating_arrow
     if S.ResonatingArrow:IsCastable() then
       if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "resonating_arrow st 8"; end
@@ -353,7 +356,7 @@ local function ST()
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike st 16"; end
   end
   -- a_murder_of_crows
-  if S.AMurderofCrows:IsReady() then
+  if S.AMurderofCrows:IsReady() and CDsON() then
     if Cast(S.AMurderofCrows, Settings.Commons.GCDasOffGCD.AMurderofCrows, nil, not Target:IsSpellInRange(S.AMurderofCrows)) then return "a_murder_of_crows st 18"; end
   end
   -- wildfire_bomb,if=full_recharge_time<gcd|focus+cast_regen<focus.max&(next_wi_bomb.volatile&dot.serpent_sting.ticking&dot.serpent_sting.refreshable|next_wi_bomb.pheromone&!buff.mongoose_fury.up&focus+cast_regen<focus.max-action.kill_command.cast_regen*3)|time_to_die<10
@@ -461,7 +464,7 @@ local function BOP()
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike bop 10"; end
   end
   -- flayed_shot
-  if CDsON() and S.FlayedShot:IsCastable() then
+  if S.FlayedShot:IsCastable() then
     if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.FlayedShot)) then return "flayed_shot bop 12"; end
   end
   -- call_action_list,name=nta,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus<variable.mb_rs_cost
@@ -469,7 +472,7 @@ local function BOP()
     local ShouldReturn = NTA(); if ShouldReturn then return ShouldReturn; end
   end
   -- death_chakram,if=focus+cast_regen<focus.max
-  if CDsON() and S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
+  if S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
     if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram bop 14"; end
   end
   -- raptor_strike,target_if=max:debuff.latent_poison_injection.stack,if=buff.coordinated_assault.up&buff.coordinated_assault.remains<1.5*gcd
@@ -585,15 +588,9 @@ local function Cleave()
   if S.Carve:IsReady() and (Target:DebuffUp(S.ShrapnelBombDebuff)) then
     if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 14"; end
   end
-  if CDsON() then
-    -- death_chakram,if=focus+cast_regen<focus.max
-    if S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
-      if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram cleave 16"; end
-    end
-    -- coordinated_assault
-    if S.CoordinatedAssault:IsReady() then
-      if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault) then return "coordinated_assault cleave 18"; end
-    end
+  -- death_chakram,if=focus+cast_regen<focus.max
+  if S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram cleave 16"; end
   end
   -- butchery,if=charges_fractional>2.5&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
   if S.Butchery:IsReady() and (S.Butchery:ChargesFractional() > 2.5 and S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
@@ -628,11 +625,11 @@ local function Cleave()
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot cleave 34"; end
   end
   -- flayed_shot
-  if CDsON() and S.FlayedShot:IsCastable() then
+  if S.FlayedShot:IsCastable() then
     if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.FlayedShot)) then return "flayed_shot cleave 36"; end
   end
   -- a_murder_of_crows
-  if S.AMurderofCrows:IsReady() then
+  if S.AMurderofCrows:IsReady() and CDsON() then
     if Cast(S.AMurderofCrows, Settings.Commons.GCDasOffGCD.AMurderofCrows, nil, not Target:IsSpellInRange(S.AMurderofCrows)) then return "a_murder_of_crows cleave 38"; end
   end
   -- steel_trap
@@ -706,13 +703,19 @@ local function APL()
         if Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon oor"; end
       end
     end
+    -- use_item,name=jotungeirr_destinys_call,if=buff.coordinated_assault.up|time_to_die<30
+    if I.Jotungeirr:IsReady() and (Player:BuffUp(S.CoordinatedAssault) or Target:TimeToDie() < 30) then
+      if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 2"; end
+    end
     -- use_items
-    if CDsON() and Settings.Commons.Enabled.Trinkets then
+    if Settings.Commons.Enabled.Trinkets then
       local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
       if TrinketToUse then
         if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
+    -- newfound_resolve,if=soulbind.newfound_resolve&(buff.resonating_arrow.up|cooldown.resonating_arrow.remains>10|target.time_to_die<16)
+    -- Unable to handle player facing
     -- call_action_list,name=cds
     if (CDsON()) then
       local ShouldReturn = CDs(); if ShouldReturn then return ShouldReturn; end
@@ -731,14 +734,15 @@ local function APL()
     end
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastable() and CDsON() then
-      if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent 888"; end
+      if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent main 888"; end
     end
+    -- PoolFocus if nothing else to do
     if Cast(S.PoolFocus) then return "Pooling Focus"; end
   end
 end
 
 local function OnInit ()
-  HR.Print("Survival Hunter rotation is currently a work in progress.")
+  HR.Print("Survival Hunter rotation is currently a work in progress, but has been updated for patch 9.1.")
 end
 
 HR.SetAPL(255, APL, OnInit)
