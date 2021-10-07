@@ -167,6 +167,8 @@ Spell.Hunter.Marksmanship = {
   -- Legendaries
   EagletalonsTrueFocusBuff              = Spell(336851),
   WailingArrow                          = Spell(355589),
+  -- Misc
+  PoolFocus                             = Spell(999910),
 }
 
 Spell.Hunter.Survival = {
