@@ -89,10 +89,13 @@ Spell.Hunter.BeastMastery = {
   BestialWrathBuff                      = Spell(19574),
   BestialWrathPetBuff                   = Spell(186254, "pet"),
   BloodFuryBuff                         = Spell(20572),
+  FlayersMarkBuff                       = Spell(324156),
   FrenzyPetBuff                         = Spell(272790, "pet"),
   -- Debuffs
   -- Racials
   AncestralCall                         = Spell(274738),
+  ArcanePulse                           = Spell(260364),
+  ArcaneTorrent                         = Spell(50613),
   BagofTricks                           = Spell(312411),
   Berserking                            = Spell(26297),
   BloodFury                             = Spell(20572),
