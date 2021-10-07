@@ -417,23 +417,23 @@ local function Covenants()
     if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "deaths_due covenants 2"; end
   end
   -- swarming_mist,if=runic_power.deficit>13&cooldown.pillar_of_frost.remains<3&!talent.breath_of_sindragosa&variable.st_planning
-  if S.SwarmingMist:IsReady() and (Player:RunicPowerDeficit() > 13 and S.PillarofFrost:CooldownRemains() < 3 and (not S.BreathofSindragosa:IsAvailable()) and VarSTPlanning) then
+  if S.SwarmingMist:IsReady() and CDsON() and (Player:RunicPowerDeficit() > 13 and S.PillarofFrost:CooldownRemains() < 3 and (not S.BreathofSindragosa:IsAvailable()) and VarSTPlanning) then
     if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "swarming_mist covenants 4"; end
   end
   -- swarming_mist,if=!talent.breath_of_sindragosa&variable.adds_remain
-  if S.SwarmingMist:IsReady() and ((not S.BreathofSindragosa:IsAvailable()) and VarAddsRemain) then
+  if S.SwarmingMist:IsReady() and CDsON() and ((not S.BreathofSindragosa:IsAvailable()) and VarAddsRemain) then
     if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "swarming_mist covenants 6"; end
   end
   -- swarming_mist,if=talent.breath_of_sindragosa&(buff.breath_of_sindragosa.up&(variable.st_planning&runic_power.deficit>40|variable.adds_remain&runic_power.deficit>60|variable.adds_remain&raid_event.adds.remains<9)|!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains)
-  if S.SwarmingMist:IsReady() and (S.BreathofSindragosa:IsAvailable() and (Player:BuffUp(S.BreathofSindragosa) and (VarSTPlanning and Player:RunicPowerDeficit() > 40 or VarAddsRemain and Player:RunicPowerDeficit() > 60) or Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownDown())) then
+  if S.SwarmingMist:IsReady() and CDsON() and (S.BreathofSindragosa:IsAvailable() and (Player:BuffUp(S.BreathofSindragosa) and (VarSTPlanning and Player:RunicPowerDeficit() > 40 or VarAddsRemain and Player:RunicPowerDeficit() > 60) or Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownDown())) then
     if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "swarming_mist covenants 8"; end
   end
   -- abomination_limb,if=cooldown.pillar_of_frost.remains<3&variable.st_planning&(talent.breath_of_sindragosa&runic_power.deficit<60&cooldown.breath_of_sindragosa.remains<2|!talent.breath_of_sindragosa)
-  if S.AbominationLimb:IsCastable() and (S.PillarofFrost:CooldownRemains() < 3 and VarSTPlanning and (S.BreathofSindragosa:IsAvailable() and Player:RunicPowerDeficit() < 60 and S.BreathofSindragosa:CooldownRemains() < 2 or not S.BreathofSindragosa:IsAvailable())) then
+  if S.AbominationLimb:IsCastable() and CDsON() and (S.PillarofFrost:CooldownRemains() < 3 and VarSTPlanning and (S.BreathofSindragosa:IsAvailable() and Player:RunicPowerDeficit() < 60 and S.BreathofSindragosa:CooldownRemains() < 2 or not S.BreathofSindragosa:IsAvailable())) then
     if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "abomination_limb covenants 10"; end
   end
   -- abomination_limb,if=variable.adds_remain
-  if S.AbominationLimb:IsCastable() and (VarAddsRemain) then
+  if S.AbominationLimb:IsCastable() and CDsON() and (VarAddsRemain) then
     if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "abomination_limb covenants 12"; end
   end
   -- shackle_the_unworthy,if=variable.st_planning&(cooldown.pillar_of_frost.remains<3|talent.icecap)

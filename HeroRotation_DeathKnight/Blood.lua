@@ -255,7 +255,7 @@ local function Covenants()
     if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike covenants 10"; end
   end
   -- swarming_mist,if=!buff.dancing_rune_weapon.up
-  if S.SwarmingMist:IsReady() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
+  if S.SwarmingMist:IsReady() and CDsON() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
     if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant) then return "swarming_mist covenants 12"; end
   end
   -- marrowrend,if=covenant.necrolord&buff.bone_shield.stack<=0
@@ -263,7 +263,7 @@ local function Covenants()
     if Cast(S.Marrowrend, nil, nil, not Target:IsSpellInRange(S.Marrowrend)) then return "marrowrend covenants 14"; end
   end
   -- abomination_limb,if=!buff.dancing_rune_weapon.up
-  if S.AbominationLimb:IsCastable() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
+  if S.AbominationLimb:IsCastable() and CDsON() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
     if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(8)) then return "abomination_limb covenants 16"; end
   end
   -- shackle_the_unworthy,if=cooldown.dancing_rune_weapon.remains<3|!buff.dancing_rune_weapon.up

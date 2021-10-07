@@ -215,7 +215,7 @@ local function Bear()
     if Everyone.CastCycle(S.Moonfire, MeleeEnemies8y, EvaluateCycleMoonfire, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 4"; end
   end
   -- ravenous_frenzy
-  if S.RavenousFrenzy:IsCastable() then
+  if S.RavenousFrenzy:IsCastable() and CDsON() then
     if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy bear 7"; end
   end
   -- use_item,name=jotungeirr_destinys_call,if=covenant.venthyr
@@ -236,7 +236,7 @@ local function Bear()
     if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion bear 11"; end
   end
   -- convoke_the_spirits,if=!druid.catweave_bear&!druid.owlweave_bear
-  if S.ConvoketheSpirits:IsCastable() then
+  if S.ConvoketheSpirits:IsCastable() and CDsON() then
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInMeleeRange(5)) then return "convoke_the_spirits bear 12"; end
   end
   -- berserk_bear,if=(buff.ravenous_frenzy.up|!covenant.venthyr)
