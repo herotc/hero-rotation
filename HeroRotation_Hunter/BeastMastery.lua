@@ -348,9 +348,9 @@ local function ST()
   if S.KillShot:IsCastable() then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot st 16"; end
   end
-  -- wailing_arrow,if=cooldown.resonating_arrow.remains<gcd&(!talent.explosive_shot|buff.bloodlust.up)|!covenant.kyrian|cooldown.resonating_arrow.remains|target.time_to_die<5
+  -- wailing_arrow,if=cooldown.resonating_arrow.remains<gcd&(!talent.explosive_shot|buff.bloodlust.up)|!covenant.kyrian|target.time_to_die<5
   -- Note: Explosive Shot doesn't exist for BM, so ignoring that block
-  if S.WailingArrow:IsReady() and (S.ResonatingArrow:CooldownRemains() < Player:GCD() or Player:Covenant() ~= "Kyrian" or not S.ResonatingArrow:CooldownUp() or Target:TimeToDie() < 5) then
+  if S.WailingArrow:IsReady() and (S.ResonatingArrow:CooldownRemains() < Player:GCD() or Player:Covenant() ~= "Kyrian" or Target:TimeToDie() < 5) then
     if Cast(S.WailingArrow, Settings.BeastMastery.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "wailing_arrow st 18"; end
   end
   -- barbed_shot,if=cooldown.bestial_wrath.remains<12*charges_fractional+gcd&talent.scent_of_blood|full_recharge_time<gcd&cooldown.bestial_wrath.remains|target.time_to_die<9
@@ -522,7 +522,8 @@ local function APL()
 end
 
 local function OnInit ()
-  HL.Print("BeastMastery can use pet abilities to better determine AoE. Make sure you have Growl and Blood Bolt / Bite / Claw / Smack in your player action bars.")
+  HR.Print("Beast Mastery can use pet abilities to better determine AoE. Make sure you have Growl and Blood Bolt / Bite / Claw / Smack in your player action bars.")
+  HR.Print("Beast Mastery Hunter rotation is currently a work in progress, but has been updated for patch 9.1.")
 end
 
 HR.SetAPL(253, APL, OnInit)
