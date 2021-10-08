@@ -1055,8 +1055,8 @@ local function APL ()
 end
 
 local function Init ()
-  -- APL 25/08/2021 https://github.com/simulationcraft/simc/commit/7254baf8a25e49fdf5e027e412220cd379af9bc8
-  HR.Print("Fire Mage rotation is currently a work in progress.")
+  -- APL 07/10/2021 https://github.com/simulationcraft/simc/tree/3e0633f1e70cd9849baad1dd42814dcdcdf31a84
+  HR.Print("Fire Mage rotation is currently a work in progress, but has been updated for patch 9.1.")
 end
 
 HR.SetAPL(63, APL, Init)
