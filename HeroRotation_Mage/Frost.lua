@@ -34,6 +34,7 @@ local I = Item.Mage.Frost
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.ShadowedOrbofTorment:ID()
 }
 
 -- Rotation Var
@@ -77,6 +78,15 @@ HL:RegisterForEvent(function()
   HeartoftheFaeEquipped = Player:HasLegendaryEquipped(260)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 local function num(val)
   if val then return 1 else return 0 end
 end
@@ -113,10 +123,6 @@ local function Precombat()
     if S.Frostbolt:IsCastable() and not Player:IsCasting(S.Frostbolt) then
       if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 5"; end
     end
-    -- frozen_orb
-    if S.FrozenOrb:IsCastable() then
-      if Cast(S.FrozenOrb, nil, nil, not Target:IsInRange(40)) then return "frozen_orb precombat 6"; end
-    end
   end
 end
 
@@ -133,12 +139,12 @@ local function Cooldowns()
   if S.Deathborne:IsCastable() then
     if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne cd 3"; end
   end
-  -- mirrors_of_torment,if=active_enemies<3&(conduit.siphoned_malice.enabled|soulbind.wasteland_propriety.enabled)&buff.brain_freeze.react=0
-  if S.MirrorsofTorment:IsCastable() and (EnemiesCount8ySplash < 3 and (S.SiphonedMalice:ConduitEnabled() or S.WastelandPropriety:IsAvailable())) and Player:BuffDown(S.BrainFreezeBuff) then
+  -- mirrors_of_torment,if=active_enemies<3&(conduit.siphoned_malice|soulbind.wasteland_propriety)&buff.brain_freeze.react=0
+  if S.MirrorsofTorment:IsCastable() and (EnemiesCount8ySplash < 3 and (S.SiphonedMalice:ConduitEnabled() or S.WastelandPropriety:SoulbindEnabled()) and Player:BuffDown(S.BrainFreezeBuff)) then
     if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment cd 4"; end
   end
   -- rune_of_power,if=cooldown.icy_veins.remains>12&buff.rune_of_power.down
-  if S.RuneofPower:IsCastable() and (S.IcyVeins:CooldownRemains() > S.RuneofPower:BaseDuration() or fightRemains < S.RuneofPower:CastTime() + Player:GCD()) then
+  if S.RuneofPower:IsCastable() and (S.IcyVeins:CooldownRemains() > 12 and Player:BuffDown(S.RuneofPowerBuff)) then
     if Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneOfPower) then return "rune_of_power cd 5"; end
   end
   -- icy_veins,if=buff.rune_of_power.down&(buff.icy_veins.down|talent.rune_of_power)&(buff.slick_ice.down|active_enemies>=2)
@@ -196,22 +202,22 @@ local function Aoe()
     if Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 3"; end
   end
   -- ice_nova
-  if S.IceNova:IsCastable() and (EnemiesCount8ySplash >= 5) then
+  if S.IceNova:IsCastable() then
     if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova aoe 4"; end
   end
   -- comet_storm
-  if S.CometStorm:IsCastable() and (EnemiesCount6ySplash >= 5) then
+  if S.CometStorm:IsCastable() then
     if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm aoe 5"; end
   end
   -- ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time|remaining_winters_chill&debuff.winters_chill.remains>travel_time
   if S.IceLance:IsCastable() and EnemiesCount8ySplash >= 2 and (Player:BuffUp(S.FingersofFrostBuff) or FrozenRemains() > S.IceLance:TravelTime() or Target:DebuffStack(S.WintersChillDebuff) > 1 and Target:DebuffRemains(S.WintersChillDebuff) > S.IceLance:TravelTime()) then
     if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 6"; end
   end
+  -- radiant_spark,if=soulbind.combat_meditation
+  if S.RadiantSpark:IsCastable() and (S.CombatMeditation:SoulbindEnabled()) then
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe 7"; end
+  end
   if CDsON() then
-    -- radiant_spark,if=soulbind.combat_meditation
-    if S.RadiantSpark:IsCastable() and (S.CombatMeditation:IsAvailable()) then
-      if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe 7"; end
-    end
     -- mirrors_of_torment
     if S.MirrorsofTorment:IsCastable() then
       if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment aoe 8"; end
@@ -238,13 +244,13 @@ local function Aoe()
   if S.Ebonbolt:IsCastable() and (EnemiesCount8ySplash >= 2) then
     if Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt aoe 13"; end
   end
-  -- ice_lance,if=runeforge.glacial_fragments.equipped&talent.splitting_ice.enabled&travel_time<ground_aoe.blizzard.remains
+  -- ice_lance,if=runeforge.glacial_fragments&(talent.splitting_ice|active_enemies>=5)&travel_time<ground_aoe.blizzard.remains
   local BlizzardRemains = 7 - S.Blizzard:TimeSinceLastCast()
   if BlizzardRemains < 0 then BlizzardRemains = 0 end
-  if S.IceLance:IsCastable() and (GlacialFragmentsEquipped and S.SplittingIce:IsAvailable() and S.IceLance:TravelTime() < BlizzardRemains) then
+  if S.IceLance:IsCastable() and (GlacialFragmentsEquipped and (S.SplittingIce:IsAvailable() or EnemiesCount8ySplash >= 5) and S.IceLance:TravelTime() < BlizzardRemains) then
     if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 14"; end
   end
-  -- wait,sec=0.1,if=runeforge.glacial_fragments.equipped&talent.splitting_ice.enabled
+  -- wait,sec=0.1,if=runeforge.glacial_fragments&(talent.splitting_ice|active_enemies>=5)
   -- NYI wait
   -- frostbolt
   if S.Frostbolt:IsCastable() then
@@ -289,15 +295,13 @@ local function Single()
   if S.IceNova:IsCastable() then
     if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova single 8"; end
   end
-  if CDsON() then
-    -- radiant_spark,if=buff.freezing_winds.up&active_enemies=1
-    if S.RadiantSpark:IsCastable() and (Player:BuffUp(S.FreezingWindsBuff) and EnemiesCount16ySplash == 1) then
-      if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 9"; end
-    end
-    -- radiant_spark,if=buff.brain_freeze.react&talent.glacial_spike&conduit.ire_of_the_ascended&buff.icicles.stack>=4
-    if S.RadiantSpark:IsCastable() and (Player:BuffUp(S.BrainFreezeBuff)and S.GlacialSpike:IsAvailable() and S.IreOfTheAscended:ConduitEnabled() and Player:BuffStack(S.IciclesBuff) >= 4) then
-      if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 10"; end
-    end
+  -- radiant_spark,if=buff.freezing_winds.up&active_enemies=1
+  if S.RadiantSpark:IsCastable() and (Player:BuffUp(S.FreezingWindsBuff) and EnemiesCount16ySplash == 1) then
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 9"; end
+  end
+  -- radiant_spark,if=buff.brain_freeze.react&talent.glacial_spike&conduit.ire_of_the_ascended&buff.icicles.stack>=4
+  if S.RadiantSpark:IsCastable() and (Player:BuffUp(S.BrainFreezeBuff)and S.GlacialSpike:IsAvailable() and S.IreOfTheAscended:ConduitEnabled() and Player:BuffStack(S.IciclesBuff) >= 4) then
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 10"; end
   end
   -- ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time
   if S.IceLance:IsCastable() and (Player:BuffUp(S.FingersofFrostBuff) or FrozenRemains() > S.IceLance:TravelTime()) then
@@ -307,11 +311,11 @@ local function Single()
   if S.Ebonbolt:IsCastable() then
     if Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt single 12"; end
   end
+  -- radiant_spark,if=(!talent.glacial_spike|!conduit.ire_of_the_ascended)&(!runeforge.freezing_winds|active_enemies>=2)&buff.brain_freeze.react
+  if S.RadiantSpark:IsCastable() and ((not S.GlacialSpike:IsAvailable() or not S.IreOfTheAscended:ConduitEnabled()) and (not FreezingWindsEquipped or EnemiesCount15yMelee >= 2) and Player:BuffUp(S.BrainFreezeBuff)) then
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 13"; end
+  end
   if CDsON() then
-    -- radiant_spark,if=(!talent.glacial_spike|!conduit.ire_of_the_ascended)&(!runeforge.freezing_winds|active_enemies>=2)&buff.brain_freeze.react
-    if S.RadiantSpark:IsCastable() and ((not S.GlacialSpike:IsAvailable() or not S.IreOfTheAscended:ConduitEnabled()) and (not FreezingWindsEquipped or EnemiesCount15yMelee >= 2) and Player:BuffUp(S.BrainFreezeBuff)) then
-      if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 13"; end
-    end
     -- mirrors_of_torment
     if S.MirrorsofTorment:IsCastable() then
       if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment single 14"; end
@@ -377,7 +381,7 @@ local function APL()
   Mage.DCCheck()
 
   -- call precombat
-  if not Player:AffectingCombat() and (not Player:IsCasting() or Player:IsCasting(S.WaterElemental)) then
+  if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
@@ -402,7 +406,8 @@ local function APL()
 end
 
 local function Init()
-  -- APL 06/07/2021 https://github.com/simulationcraft/simc/commit/8f34b94945eeba7a59dec12a84ee89d19052df6d#diff-fc8c9f725bf89b92bde432d66bd54eff884fe7520e4742e94eb17551c6459f22
+  -- APL 09/09/2021 https://github.com/simulationcraft/simc/tree/50ee5908b3404805f4e90ded4aa65e3b8bbc73a6
+  HR.Print("Frost Mage rotation is currently a work in progress, but has been updated for patch 9.1.")
 end
 
 HR.SetAPL(64, APL, Init)
