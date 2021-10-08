@@ -1427,7 +1427,7 @@ local function APL ()
 end
 
 local function Init ()
-  -- APL 09/09/2021 https://github.com/simulationcraft/simc/tree/50ee5908b3404805f4e90ded4aa65e3b8bbc73a6
+  -- APL 30/08/2021 https://github.com/simulationcraft/simc/tree/2cbba1602a0dc565301ca88d5f7d40a69b734102
   HR.Print("Arcane Mage rotation is currently a work in progress, but has been updated for patch 9.1.")
 end
 
