@@ -373,10 +373,6 @@ local function Opener()
       OpenerFinished = true
     end
   end
-  -- Exit opener if we've been here for too long as a failsafe
-  --if (HL.CombatTime() > 20) then
-    --OpenerFinished = true
-  --end
 end
 
 local function Fallthru()
@@ -793,6 +789,7 @@ local function APL()
     -- variable,name=in_gcd,value=prev_gcd.1.moonfire|prev_gcd.1.sunfire|prev_gcd.1.starsurge|prev_gcd.1.starfall|prev_gcd.1.fury_of_elune|prev.ravenous_frenzy|buff.ca_inc.remains=buff.ca_inc.duration|variable.is_aoe
     -- Ignoring this, as HR shouldn't need it
     -- Manually added: Opener function
+    if HL.CombatTime() > 20 then OpenerFinished = true end
     if (not OpenerFinished and (CovenantID == 2 or CovenantID == 3)) then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
