@@ -74,6 +74,7 @@ Spell.Druid.Balance = {
   KindredEmpowermentEnergizeBuff        = Spell(327022),
   RavenousFrenzy                        = Spell(323546),
   RavenousFrenzyBuff                    = Spell(323546),
+  RavenousFrenzySHBuff                  = Spell(355315),
 
   -- Soulbind Abilities
   ThrillSeeker                          = Spell(331586),
