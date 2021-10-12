@@ -52,10 +52,8 @@ HR.GUISettings.APL.DemonHunter = {
     }
   },
   Havoc = {
-    DisplayStyle = {
-      FelRush = "Main Icon",
-    },
     BlurHealthThreshold = 65,
+    ConserveFelRush = false,
     HideMetaIfActive = true,
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -90,6 +88,7 @@ CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.Conser
 CreateARPanelOptions(CP_Vengeance, "APL.DemonHunter.Vengeance")
 
 -- Havoc
+CreatePanelOption("CheckButton", CP_Havoc, "APL.DemonHunter.Havoc.ConserveFelRush", "Conserve Fel Rush", "Save at least 1 Fel Rush charge for mobility.")
 CreatePanelOption("CheckButton", CP_Havoc, "APL.DemonHunter.Havoc.HideMetaIfActive", "Hide Meta, If Active", "Enable this option to hide Metamorphosis suggestions if Metamorphosis is already active (from Demonic, for example).")
 CreatePanelOption("Slider", CP_Havoc, "APL.DemonHunter.Havoc.BlurHealthThreshold", {5, 100, 5}, "Blur Health Threshold", "Suggest Blur when below this health percentage.")
 CreateARPanelOptions(CP_Havoc, "APL.DemonHunter.Havoc")
