@@ -589,9 +589,9 @@ local function APL()
     if S.Outbreak:IsReady() and (Target:DebuffRefreshable(S.VirulentPlagueDebuff) and (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and not S.UnholyBlight:CooldownUp())) then
       if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak main 18"; end
     end
-    -- outbreak,target_if=dot.virulent_plague.refreshable&active_enemies>=2&(!talent.unholy_blight|talent.unholy_blight&cooldown.unholy_blight.remains)
+    -- outbreak,target_if=dot.virulent_plague.refreshable&active_enemies>=2&(!talent.unholy_blight|talent.unholy_blight&(cooldown.unholy_blight.remains>(15%active_enemies+dot.virulent_plague.remains)|active_enemies>=3))
     -- Note: target_if handled via the EnemiesWithoutVP check
-    if S.Outbreak:IsReady() and ((Target:DebuffRefreshable(S.VirulentPlagueDebuff) or EnemiesWithoutVP > 0) and EnemiesMeleeCount >= 2 and (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and not S.UnholyBlight:CooldownUp())) then
+    if S.Outbreak:IsReady() and ((Target:DebuffRefreshable(S.VirulentPlagueDebuff) or EnemiesWithoutVP > 0) and Enemies10ySplashCount >= 2 and ((not S.UnholyBlight:IsAvailable()) or S.UnholyBlight:IsAvailable() and (S.UnholyBlight:CooldownRemains() > (15 / Enemies10ySplashCount + Target:DebuffRemains(S.VirulentPlagueDebuff)) or Enemies10ySplashCount >= 3))) then
       if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak main 20"; end
     end
     -- outbreak,if=runeforge.superstrain&(dot.frost_fever.refreshable|dot.blood_plague.refreshable)
