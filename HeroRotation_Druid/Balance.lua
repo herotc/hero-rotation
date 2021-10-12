@@ -521,7 +521,7 @@ local function Aoe()
     if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireAoe, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire aoe 6"; end
   end
   -- sunfire,if=variable.iqd_condition&cooldown.inscrutable_quantum_device.ready&equipped.inscrutable_quantum_device
-  if S.Sunfire:IsCastable() and (VarIQDCondition and I.InscrutableQuantumDevice:IsEquippedAndReady()) then
+  if S.Sunfire:IsCastable() and Settings.Commons.Enabled.Trinkets and (VarIQDCondition and I.InscrutableQuantumDevice:IsEquippedAndReady()) then
     if Cast(S.Sunfire, nil, nil, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire aoe 7"; end
   end
   -- starfall,if=!talent.stellar_drift.enabled&(buff.starfall.refreshable&(spell_targets.starfall<3|!runeforge.timeworn_dreambinder)|talent.soul_of_the_forest.enabled&buff.eclipse_solar.remains<3&eclipse.in_solar&buff.starfall.remains<7&spell_targets.starfall>=4)&(!runeforge.lycaras_fleeting_glimpse|time%%45>buff.starfall.remains+2)&target.time_to_die>5
@@ -847,6 +847,8 @@ local function APL()
       if TrinketToUse then
         if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
+    else
+      VarIQDCondition = false
     end
     -- run_action_list,name=aoe,if=variable.is_aoe
     if (VarIsAoe) then
