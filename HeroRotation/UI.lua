@@ -499,7 +499,17 @@
       -- Set the Texture
       IconFrame.Texture:SetTexture(HR.GetTexture(Object));
       IconFrame.Texture:SetAllPoints(IconFrame);
-      IconFrame.Texture:SetAlpha(ThisUnit:IsSpellInRange(Object) and 1 or 0.4);
+      local SpellAlpha = 1;
+      if (Object.SpellName) then
+        if (Object:BookIndex() ~= nil) then
+          SpellAlpha = (ThisUnit:IsSpellInRange(Object) and 1 or 0.4);
+        else
+          SpellAlpha = 1;
+        end
+      else
+        SpellAlpha = 1;
+      end
+      IconFrame.Texture:SetAlpha(SpellAlpha);
       IconFrame:ClearAllPoints();
       IconFrame:SetAlpha(HR.GUISettings.General.SetAlpha);
       if not IconFrame:IsVisible() then
