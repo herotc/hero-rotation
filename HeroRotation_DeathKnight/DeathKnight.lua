@@ -148,6 +148,7 @@ Spell.DeathKnight.Frost = {
   EmpowerRuneWeaponBuff                 = Spell(47568),
   EradicatingBlowBuff                   = Spell(337936),
   FrozenPulseBuff                       = Spell(194909),
+  GatheringStormBuff                    = Spell(211805),
   IcyTalonsBuff                         = Spell(194879),
   KillingMachineBuff                    = Spell(51124),
   PillarofFrostBuff                     = Spell(51271),
