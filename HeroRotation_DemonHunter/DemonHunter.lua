@@ -134,7 +134,10 @@ Spell.DemonHunter.Havoc = {
 
   -- Conduits
   ExposedWoundDebuff                    = Spell(339229), -- Triggered by Serrated Glaive
-  SerratedGlaive                        = Spell(339230)
+  SerratedGlaive                        = Spell(339230),
+
+  -- Other
+  Pool                                  = Spell(999910)
 }
 
 -- Items

@@ -448,6 +448,10 @@ local function APL()
     if (true) then
       local ShouldReturn = Normal(); if ShouldReturn then return ShouldReturn; end
     end
+    -- Show pool icon if nothing else to do (should only happen when Demon Blades is used)
+    if (S.DemonBlades:IsAvailable()) then
+      if Cast(S.Pool) then return "pool demon_blades"; end
+    end
   end
 end
 
