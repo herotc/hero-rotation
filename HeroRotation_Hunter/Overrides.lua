@@ -136,9 +136,15 @@ OldSVIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldSVIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellSV.SummonPet then
-    return (not Pet:IsActive()) and BaseCheck
+    return (not Pet:IsActive()) and (not Pet:IsDeadOrGhost()) and BaseCheck
+  elseif self == SpellSV.RevivePet then
+    return (Pet:IsDeadOrGhost()) and BaseCheck
+  elseif self == SpellSV.MendPet then
+    return (not Pet:IsDeadOrGhost()) and Pet:HealthPercentage() <= HR.GUISettings.APL.Hunter.Commons2.MendPetHighHP and BaseCheck
   elseif self == SpellSV.AspectoftheEagle then
     return HR.GUISettings.APL.Hunter.Survival.AspectOfTheEagle and BaseCheck
+  elseif self == SpellSV.Harpoon then
+    return (not Target:IsInRange(8)) and BaseCheck
   else
     return BaseCheck
   end

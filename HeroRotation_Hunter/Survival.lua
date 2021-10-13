@@ -197,50 +197,46 @@ local function Precombat()
   -- variable,name=mb_rs_cost,op=setif,value=action.mongoose_bite.cost,value_else=action.raptor_strike.cost,condition=talent.mongoose_bite
   -- Defined with profile variables
   -- summon_pet
-  if S.SummonPet:IsCastable() then
-    if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot]) then return "summon_pet precombat 2"; end
-  end
+  -- Moved to Pet Management section in APL()
   -- snapshot_stats
-  if Everyone.TargetIsValid() then
-    -- fleshcraft
-    if S.Fleshcraft:IsCastable() then
-      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 4"; end
-    end
-    -- Manually added: kill_shot
-    -- Could be removed?
-    if S.KillShot:IsReady() then
-      if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot precombat 6"; end
-    end
-    -- tar_trap,if=runeforge.soulforge_embers
-    if S.TarTrap:IsCastable() and (SoulForgeEmbersEquipped) then
-      if Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap precombat 7"; end
-    end
-    -- Manually added: flare,if=runeforge.soulforge_embers&prev_gcd.1.tar_trap
-    if S.Flare:IsCastable() and (SoulForgeEmbersEquipped and Player:PrevGCD(1, S.TarTrap)) then
-      if Cast(S.Flare, Settings.Commons2.GCDasOffGCD.Flare) then return "flare precombat 10"; end
-    end
-    -- steel_trap,precast_time=20
-    if S.SteelTrap:IsCastable() and Target:DebuffDown(S.SteelTrapDebuff) then
-      if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap precombat 12"; end
-    end
-    -- Manually added: harpoon
-    if S.Harpoon:IsCastable() and not Target:IsInMeleeRange(5) and (Player:BuffDown(S.AspectoftheEagle) or not Target:IsInRange(40)) then
-      if Cast(S.Harpoon, nil, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon precombat 14"; end
-    end
-    -- Manually added: mongoose_bite or raptor_strike
-    if Target:IsInMeleeRange(5) or (Player:BuffUp(S.AspectoftheEagle) and Target:IsInRange(40)) then
-      if S.MongooseBite:IsReady() then
-        if Cast(S.MongooseBite) then return "mongoose_bite precombat 16"; end
-      elseif S.RaptorStrike:IsReady() then
-        if Cast(S.RaptorStrike) then return "raptor_strike precombat 18"; end
-      end
+  -- fleshcraft
+  if S.Fleshcraft:IsCastable() then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 4"; end
+  end
+  -- Manually added: kill_shot
+  -- Could be removed?
+  if S.KillShot:IsReady() then
+    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot precombat 6"; end
+  end
+  -- tar_trap,if=runeforge.soulforge_embers
+  if S.TarTrap:IsCastable() and (SoulForgeEmbersEquipped) then
+    if Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap precombat 7"; end
+  end
+  -- Manually added: flare,if=runeforge.soulforge_embers&prev_gcd.1.tar_trap
+  if S.Flare:IsCastable() and (SoulForgeEmbersEquipped and Player:PrevGCD(1, S.TarTrap)) then
+    if Cast(S.Flare, Settings.Commons2.GCDasOffGCD.Flare) then return "flare precombat 10"; end
+  end
+  -- steel_trap,precast_time=20
+  if S.SteelTrap:IsCastable() and Target:DebuffDown(S.SteelTrapDebuff) then
+    if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap precombat 12"; end
+  end
+  -- Manually added: harpoon
+  if S.Harpoon:IsCastable() and (Player:BuffDown(S.AspectoftheEagle) or not Target:IsInRange(40)) then
+    if Cast(S.Harpoon, nil, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon precombat 14"; end
+  end
+  -- Manually added: mongoose_bite or raptor_strike
+  if Target:IsInMeleeRange(5) or (Player:BuffUp(S.AspectoftheEagle) and Target:IsInRange(40)) then
+    if S.MongooseBite:IsReady() then
+      if Cast(S.MongooseBite) then return "mongoose_bite precombat 16"; end
+    elseif S.RaptorStrike:IsReady() then
+      if Cast(S.RaptorStrike) then return "raptor_strike precombat 18"; end
     end
   end
 end
 
 local function CDs()
   -- harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
-  if S.Harpoon:IsReady() and (S.TermsofEngagement:IsAvailable() and Player:Focus() < Player:FocusMax()) then
+  if S.Harpoon:IsCastable() and (S.TermsofEngagement:IsAvailable() and Player:Focus() < Player:FocusMax()) then
     if Cast(S.Harpoon, nil, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon cds 2"; end
   end
   if (Player:BuffUp(S.CoordinatedAssault)) then
@@ -681,16 +677,26 @@ local function APL()
     EnemyList = Player:GetEnemiesInRange(8)
   end
 
-  -- call precombat
-  if not Player:AffectingCombat() then
-    local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+  -- Pet Management; Conditions handled via override
+  if S.SummonPet:IsCastable() then
+    if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot]) then return "Summon Pet"; end
+  end
+  if S.RevivePet:IsCastable() then
+    if Cast(S.RevivePet, Settings.Commons2.GCDasOffGCD.RevivePet) then return "Revive Pet"; end
+  end
+  if S.MendPet:IsCastable() then
+    if Cast(S.MendPet, Settings.Commons2.GCDasOffGCD.MendPet) then return "Mend Pet"; end
   end
 
-  -- Exhilaration
-  if S.Exhilaration:IsCastable() and Player:HealthPercentage() <= Settings.Commons2.ExhilarationHP then
-    if Cast(S.Exhilaration, Settings.Commons2.GCDasOffGCD.Exhilaration) then return "Exhilaration"; end
-  end
   if Everyone.TargetIsValid() then
+    -- Out of Combat
+    if not Player:AffectingCombat() then
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- Exhilaration
+    if S.Exhilaration:IsCastable() and Player:HealthPercentage() <= Settings.Commons2.ExhilarationHP then
+      if Cast(S.Exhilaration, Settings.Commons2.GCDasOffGCD.Exhilaration) then return "Exhilaration"; end
+    end
     -- muzzle
     local ShouldReturn = Everyone.Interrupt(5, S.Muzzle, Settings.Survival.OffGCDasOffGCD.Muzzle, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
