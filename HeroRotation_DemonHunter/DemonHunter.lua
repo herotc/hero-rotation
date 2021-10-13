@@ -118,8 +118,8 @@ Spell.DemonHunter.Havoc = {
   MomentumBuff                          = Spell(208628),
   PreparedBuff                          = Spell(203650), -- Procs from Vengeful Retreat with Momentum
   TrailofRuin                           = Spell(258881),
-  UnboundChaos                          = Spell(275144),
-  UnboundChaosBuff                      = Spell(337313),
+  UnboundChaos                          = Spell(347461),
+  UnboundChaosBuff                      = Spell(347462),
 
   -- Covenant Abilities
   ElysianDecree                         = Spell(306830),
