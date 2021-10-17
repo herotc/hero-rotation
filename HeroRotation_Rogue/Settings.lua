@@ -89,6 +89,7 @@ HR.GUISettings.APL.Rogue = {
     ShDEcoCharge = 1.75, -- Shadow Dance Eco Mode (Min Fractional Charges before using it while CDs are disabled)
     BurnShadowDance = "On Bosses not in Dungeons", -- Burn Shadow Dance charges when the target is about to die
     GCDasOffGCD = {
+      ShurikenTornado = false,
     },
     OffGCDasOffGCD = {
       SymbolsofDeath = true,

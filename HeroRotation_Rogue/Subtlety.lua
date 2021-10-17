@@ -491,7 +491,7 @@ local function CDs ()
     and (not ObedienceEquipped or Target:DebuffUp(S.Flagellation)) and ComboPoints <= 2 and (not Player:BuffUp(S.PremeditationBuff) or MeleeEnemies10yCount > 4) then
     -- actions.cds+=/pool_resource,for_next=1,if=!talent.shadow_focus.enabled
     if Player:Energy() >= 60 then
-      if HR.Cast(S.ShurikenTornado) then return "Cast Shuriken Tornado" end
+      if HR.Cast(S.ShurikenTornado, Settings.Subtlety.GCDasOffGCD.ShurikenTornado) then return "Cast Shuriken Tornado" end
     elseif not S.ShadowFocus:IsAvailable() then
       if HR.CastPooling(S.ShurikenTornado) then return "Pool for Shuriken Tornado" end
     end
@@ -553,7 +553,7 @@ local function CDs ()
     -- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&variable.snd_condition&buff.symbols_of_death.up&combo_points<=2&(!buff.premeditation.up|spell_targets.shuriken_storm>4)
     if S.ShurikenTornado:IsReady() and S.ShadowFocus:IsAvailable() and SnDCondition and Player:BuffUp(S.SymbolsofDeath)
       and ComboPoints <= 2 and (not Player:BuffUp(S.PremeditationBuff) or MeleeEnemies10yCount > 4) then
-      if HR.Cast(S.ShurikenTornado) then return "Cast Shuriken Tornado (SF)" end
+      if HR.Cast(S.ShurikenTornado, Settings.Subtlety.GCDasOffGCD.ShurikenTornado) then return "Cast Shuriken Tornado (SF)" end
     end
     -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
     if S.ShadowDance:IsCastable() and MayBurnShadowDance() and not Player:BuffUp(S.ShadowDanceBuff) and HL.BossFilteredFightRemains("<=", 8 + num(S.Subterfuge:IsAvailable())) then
