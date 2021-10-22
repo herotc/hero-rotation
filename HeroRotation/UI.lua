@@ -755,6 +755,7 @@
     if Tooltip then
       ButtonFrame:SetScript("OnEnter",
         function ()
+          Mixin(GameTooltip, BackdropTemplateMixin);
           GameTooltip:SetOwner(HR.ToggleIconFrame, "ANCHOR_BOTTOM", 0, 0);
           GameTooltip:ClearLines();
           GameTooltip:SetBackdropColor(0, 0, 0, 1);
