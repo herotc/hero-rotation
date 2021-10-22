@@ -866,7 +866,7 @@ local function APL()
 end
 
 local function OnInit()
-  HR.Print("Balance Druid rotation is currently a work in progress, but has been updated for patch 9.1. We could still use data from a Venthyr Balance Druid using Sinful Hysteria. We would like to confirm the spell ID on your Ravenous Frenzy buff.")
+  HR.Print("Balance Druid rotation is currently a work in progress, but has been updated for patch 9.1.")
 end
 
 HR.SetAPL(102, APL, OnInit)
