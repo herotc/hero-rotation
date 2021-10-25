@@ -223,11 +223,11 @@ local function Bear()
     if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call bear 8"; end
   end
   -- use_item,slot=trinket1,if=!buff.prowl.up&covenant.venthyr
-  if trinket1:IsEquippedAndReady() and (Covenant == 2) then
+  if trinket1:IsEquippedAndReady() and (CovenantID == 2) then
     if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 bear 9"; end
   end
   -- use_item,slot=trinket2,if=!buff.prowl.up&covenant.venthyr
-  if trinket2:IsEquippedAndReady() and (Covenant == 2) then
+  if trinket2:IsEquippedAndReady() and (CovenantID == 2) then
     if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 bear 10"; end
   end
   -- potion,if=covenant.venthyr&buff.incarnation.remains>=24&buff.incarnation.remains<=25
@@ -394,7 +394,7 @@ local function APL()
       if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 main"; end
     end
     -- use_item,slot=trinket2,if=!buff.prowl.up&!covenant.venthyr
-    if trinket2:IsEquippedAndReady() and (Covenant ~= 2) then
+    if trinket2:IsEquippedAndReady() and (CovenantID ~= 2) then
       if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 main"; end
     end
     -- potion,if=!covenant.venthyr&(((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)&(druid.catweave_bear|druid.owlweave_bear)&!buff.prowl.up)|((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!druid.catweave_bear&!druid.owlweave_bear)))
