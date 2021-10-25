@@ -114,6 +114,7 @@ local LycaraEquipped = Player:HasLegendaryEquipped(48)
 local OnethsEquipped = Player:HasLegendaryEquipped(50)
 local TimewornEquipped = Player:HasLegendaryEquipped(53)
 local SinfulHysteriaEquipped = Player:HasLegendaryEquipped(220)
+local CelestialSpiritsEquipped = Player:HasLegendaryEquipped(226)
 
 -- Register
 HL:RegisterForEvent(function()
@@ -132,6 +133,7 @@ HL:RegisterForEvent(function()
   OnethsEquipped = Player:HasLegendaryEquipped(50)
   TimewornEquipped = Player:HasLegendaryEquipped(53)
   SinfulHysteriaEquipped = Player:HasLegendaryEquipped(220)
+  CelestialSpiritsEquipped = Player:HasLegendaryEquipped(226)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -292,7 +294,7 @@ local function Precombat()
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire precombat 6"; end
   end
   -- starsurge,if=runeforge.balance_of_all_things&covenant.night_fae&spell_targets.starfall=1
-  if S.Starsurge:IsReady() and (BOATEquipped and Covenant == 3 and EnemiesCount40y == 1) then
+  if S.Starsurge:IsReady() and (BOATEquipped and CovenantID == 3 and EnemiesCount40y == 1) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge precombat 8"; end
   end
 end
