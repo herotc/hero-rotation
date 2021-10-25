@@ -62,11 +62,13 @@ local ElderAntlersEquipped = Player:HasLegendaryEquipped(254)
 local NessingwarysEquipped = Player:HasLegendaryEquipped(67)
 local SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
 local QaplaEredunWarOrderEquipped = Player:HasLegendaryEquipped(72)
+local PouchofRazorFragmentsEquipped = Player:HasLegendaryEquipped(255)
 HL:RegisterForEvent(function()
   ElderAntlersEquipped = Player:HasLegendaryEquipped(254)
   NessingwarysEquipped = Player:HasLegendaryEquipped(67)
   SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
   QaplaEredunWarOrderEquipped = Player:HasLegendaryEquipped(72)
+  PouchofRazorFragmentsEquipped = Player:HasLegendaryEquipped(255)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- Enemies
