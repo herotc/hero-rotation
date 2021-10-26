@@ -48,7 +48,6 @@ local OnUseExcludeTrinkets = {
 local MeleeEnemies8y, MeleeEnemies8yCount, MeleeEnemies5y
 
 -- Rotation Variables
-local ShouldReturn
 local TimeToHPG
 
 -- Interrupts
@@ -193,8 +192,7 @@ end
 local function Generators()
   -- actions.generators=call_action_list,name=finishers,if=holy_power>=5|buff.holy_avenger.up|debuff.final_reckoning.up|debuff.execution_sentence.up|buff.memory_of_lucid_dreams.up|buff.seething_rage.up
   if Player:HolyPower() >= 5 or Player:BuffUp(S.HolyAvenger) or Target:DebuffUp(S.FinalReckoning) or Target:DebuffUp(S.ExecutionSentence) then
-    ShouldReturn = Finishers()
-    if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Finishers(); if ShouldReturn then return ShouldReturn; end
   end
   -- actions.generators+=/divine_toll,if=!debuff.judgment.up
   -- &(!raid_event.adds.exists|raid_event.adds.in>30)
@@ -230,16 +228,16 @@ local function Generators()
   end
   -- actions.generators+=/call_action_list,name=finishers,if=(target.health.pct<=20|buff.avenging_wrath.up|buff.crusade.up|buff.empyrean_power.up)
   if Target:HealthPercentage() <= 20 or Player:BuffUp(S.AvengingWrath) or Player:BuffUp(S.Crusade) or Player:BuffUp(S.EmpyreanPower) then
-    ShouldReturn = Finishers()
-    if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Finishers(); if ShouldReturn then return ShouldReturn; end
   end
   -- actions.generators+=/crusader_strike,if=cooldown.crusader_strike.charges_fractional>=1.75&(holy_power<=2|holy_power<=3&cooldown.blade_of_justice.remains>gcd*2|holy_power=4&cooldown.blade_of_justice.remains>gcd*2&cooldown.judgment.remains>gcd*2)
   if S.CrusaderStrike:IsCastable() and Target:IsInMeleeRange(5) and S.CrusaderStrike:ChargesFractional() >= 1.75 and (Player:HolyPower() <= 2 or (Player:HolyPower() <= 3 and S.BladeofJustice:CooldownRemains() > Player:GCD() * 2) or (Player:HolyPower() == 4 and S.BladeofJustice:CooldownRemains() > Player:GCD() * 2 and S.Judgment:CooldownRemains() > Player:GCD() * 2)) then
     if Cast(S.CrusaderStrike) then return "Cast Crusader Strike" end
   end
   -- actions.generators+=/call_action_list,name=finishers
-  ShouldReturn = Finishers()
-  if ShouldReturn then return ShouldReturn; end
+  if (true) then
+    local ShouldReturn = Finishers(); if ShouldReturn then return ShouldReturn; end
+  end
   -- actions.generators+=/crusader_strike,if=holy_power<=4
   if S.CrusaderStrike:IsCastable() and Target:IsInMeleeRange(5) and Player:HolyPower() <= 4 then
     if Cast(S.CrusaderStrike) then return "Cast Crusader Strike 2" end
@@ -309,14 +307,15 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- actions=auto_attack
     -- actions+=/rebuke
-    ShouldReturn = Everyone.Interrupt(5, S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, Interrupts)
-    if ShouldReturn then return "Interrupts: " .. ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(5, S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, Interrupts); if ShouldReturn then return "Interrupts: " .. ShouldReturn; end
     -- actions+=/call_action_list,name=cooldowns
-    ShouldReturn = Cooldowns()
-    if ShouldReturn then return "Cooldowns: " .. ShouldReturn; end
+    if (true) then
+      local ShouldReturn = Cooldowns(); if ShouldReturn then return "Cooldowns: " .. ShouldReturn; end
+    end
     -- actions+=/call_action_list,name=generators
-    ShouldReturn = Generators()
-    if ShouldReturn then return "Generators: " .. ShouldReturn; end
+    if (true) then
+      local ShouldReturn = Generators(); if ShouldReturn then return "Generators: " .. ShouldReturn; end
+    end
 
     if HR.Cast(S.Pool) then return "Pooling"; end
 

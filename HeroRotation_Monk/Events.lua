@@ -90,18 +90,18 @@ local GetTime = GetTime
 --------------------------
 
 -- Stagger Tracker
-local StaggerSpellID = 115069;
-local BobandWeave = Spell(280515);
-local StaggerFull = 0;
+local StaggerSpellID = 115069
+local BobandWeave = Spell(280515)
+local StaggerFull = 0
 
 local function RegisterStaggerFullAbsorb (Amount)
-  local StaggerDuration = 10 + (BobandWeave:IsAvailable() and 3 or 0);
-  StaggerFull = StaggerFull + Amount;
+  local StaggerDuration = 10 + (BobandWeave:IsAvailable() and 3 or 0)
+  StaggerFull = StaggerFull + Amount
   C_Timer.After(StaggerDuration, function() StaggerFull = StaggerFull - Amount; end)
 end
 
 function Player:StaggerFull ()
-  return StaggerFull;
+  return StaggerFull
 end
 
 HL:RegisterForCombatEvent(
@@ -128,4 +128,4 @@ HL:RegisterForCombatEvent(
     end
   end
   , "SPELL_ABSORBED"
-);
+)

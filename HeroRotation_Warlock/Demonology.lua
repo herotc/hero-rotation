@@ -60,7 +60,6 @@ if equip[14] then
 end
 
 -- Rotation Var
-local ShouldReturn -- Used to get the return string
 local FightRemains
 local EnemiesCount8ySplash
 local VarFirstTyrantTime = 0

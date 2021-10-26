@@ -14,7 +14,6 @@ local HR       = HeroRotation
 local SpellEle = Spell.Shaman.Elemental
 local SpellEnh = Spell.Shaman.Enhancement
 -- Lua
-local Enum     = Enum
 
 --- ============================ CONTENT ============================
 

@@ -37,7 +37,6 @@ local StunInterrupts = {
 }
 
 -- Rotation Var
-local ShouldReturn -- Used to get the return string
 local ActiveMitigationNeeded
 local IsTanking
 local Enemies8y, Enemies30y

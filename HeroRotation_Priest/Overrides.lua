@@ -14,6 +14,9 @@ local HR      = HeroRotation
 local SpellDisc    = Spell.Priest.Discipline
 local SpellShadow  = Spell.Priest.Shadow
 -- Lua
+-- WoW API
+local UnitPower         = UnitPower
+local InsanityPowerType = Enum.PowerType.Insanity
 
 --- ============================ CONTENT ============================
 -- Discipline, ID: 256
@@ -63,7 +66,7 @@ HL.AddCoreOverride ("Player.Insanity",
       end
     end 
   end
-,258)
+, 258)
 
 local OldShadowIsCastable
 OldShadowIsCastable = HL.AddCoreOverride("Spell.IsCastable",

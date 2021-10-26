@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, HR = ...
+local addonName, addonTable = ...
 -- HeroLib
 local HL = HeroLib
 local HR = HeroRotation
@@ -14,6 +14,8 @@ local Item = HL.Item
 -- Lua
 local find = string.find
 local GetTime = GetTime
+-- WoW API
+local UnitGUID = UnitGUID
 -- File Locals
 HR.Commons.Warlock = {}
 local Warlock = HR.Commons.Warlock

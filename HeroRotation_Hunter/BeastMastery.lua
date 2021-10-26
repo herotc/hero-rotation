@@ -16,12 +16,12 @@ local Item       = HL.Item
 local Action     = HL.Action
 -- HeroRotation
 local HR         = HeroRotation
-local AoEON = HR.AoEON
-local CDsON = HR.CDsON
-local Cast = HR.Cast
+local AoEON      = HR.AoEON
+local CDsON      = HR.CDsON
+local Cast       = HR.Cast
 local CastSuggested = HR.CastSuggested
 -- Lua
-local mathmax    = math.max;
+local mathmax    = math.max
 
 
 --- ============================ CONTENT ===========================

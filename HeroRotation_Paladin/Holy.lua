@@ -17,6 +17,11 @@ local Item       = HL.Item
 local HR         = HeroRotation
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
+-- lua
+local mathfloor  = math.floor
+-- WoW API
+local GetTotemInfo = GetTotemInfo
+local GetTime      = GetTime
 
 
 -- Define S/I for spell and item arrays
@@ -33,7 +38,6 @@ local StunInterrupts = {
 }
 
 -- Rotation Var
-local ShouldReturn -- Used to get the return string
 local Enemies8y, Enemies30y
 local EnemiesCount8y, EnemiesCount30y
 
@@ -101,7 +105,7 @@ local function ConsecrationTimeRemaining()
   for index=1,4 do
     local _, totemName, startTime, duration = GetTotemInfo(index)
     if totemName == S.Consecration:Name() then
-      return (floor(startTime + duration - GetTime() + 0.5)) or 0
+      return (mathfloor(startTime + duration - GetTime() + 0.5)) or 0
     end
   end
   return 0

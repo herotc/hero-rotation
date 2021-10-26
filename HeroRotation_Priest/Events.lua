@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, HR = ...
+local addonName, addonTable = ...
 -- HeroLib
 local HL = HeroLib
 local HR = HeroRotation
@@ -12,8 +12,7 @@ local Target = Unit.Target
 local Spell = HL.Spell
 local Item = HL.Item
 -- Lua
-local GetTime = GetTime
-  -- File Locals
+-- File Locals
 
 
 

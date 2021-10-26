@@ -33,7 +33,6 @@ local OnUseExcludes = {
 }
 
 -- Rotation Var
-local ShouldReturn -- Used to get the return string
 local EnemiesCount10ySplash
 local Enemies12yMelee, EnemiesCount12yMelee
 local Enemies8yMelee, EnemiesCount8yMelee

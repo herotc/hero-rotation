@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, addonTable = ...;
+local addonName, addonTable = ...
 -- HeroDBC
 local DBC        = HeroDBC.DBC
 -- HeroLib
@@ -20,7 +20,9 @@ local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 -- Lua
 local mathmin    = math.min
-local pairs      = pairs;
+local pairs      = pairs
+-- WoW API
+local UnitHealthMax = UnitHealthMax
 
 
 --- ============================ CONTENT ===========================
@@ -28,8 +30,8 @@ local pairs      = pairs;
 -- luacheck: max_line_length 9999
 
 -- Spells
-local S = Spell.Monk.Brewmaster;
-local I = Item.Monk.Brewmaster;
+local S = Spell.Monk.Brewmaster
+local I = Item.Monk.Brewmaster
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
@@ -43,7 +45,6 @@ local Enemies5y
 local Enemies8y
 local EnemiesCount8
 local IsInMeleeRange, IsInAoERange
-local ShouldReturn; -- Used to get the return string
 local Interrupts = {
   { S.SpearHandStrike, "Cast Spear Hand Strike (Interrupt)", function () return true end },
 }
@@ -55,13 +56,13 @@ local Traps = {
 }
 
 -- GUI Settings
-local Everyone = HR.Commons.Everyone;
-local Monk = HR.Commons.Monk;
+local Everyone = HR.Commons.Everyone
+local Monk = HR.Commons.Monk
 local Settings = {
   General    = HR.GUISettings.General,
   Commons    = HR.GUISettings.APL.Monk.Commons,
   Brewmaster = HR.GUISettings.APL.Monk.Brewmaster
-};
+}
 
 -- Legendary variables
 local CelestialInfusionEquipped = Player:HasLegendaryEquipped(88)
@@ -101,7 +102,7 @@ local function ShouldPurify ()
 end
 
 local function Defensives()
-  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
+  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
 
   if S.CelestialBrew:IsCastable() and Player:BuffStack(S.PurifiedChiBuff) >= 2 then
     if HR.Cast(S.CelestialBrew, Settings.Brewmaster.GCDasOffGCD.CelestialBrew) then return "Celestial Brew"; end
@@ -120,7 +121,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   -- Unit Update
-  IsInMeleeRange();
+  IsInMeleeRange()
   Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   EnemiesCount8 = #Enemies8y -- AOE Toogle
@@ -146,7 +147,7 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, Interrupts); if ShouldReturn then return ShouldReturn; end
     local ShouldReturn = Everyone.Interrupt(5, S.LegSweep, Settings.Commons.GCDasOffGCD.LegSweep, Stuns); if ShouldReturn and Settings.General.InterruptWithStun then return ShouldReturn; end
     local ShouldReturn = Everyone.Interrupt(5, S.Paralysis, Settings.Commons.GCDasOffGCD.Paralysis, Stuns); if ShouldReturn and Settings. General.InterruptWithStun then return ShouldReturn; end
-    ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     if HR.CDsON() then
       
       -- blood_fury
@@ -298,4 +299,4 @@ end
 local function Init()
 end
 
-HR.SetAPL(268, APL, Init);
+HR.SetAPL(268, APL, Init)

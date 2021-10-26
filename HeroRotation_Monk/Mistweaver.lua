@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, addonTable = ...;
+local addonName, addonTable = ...
 -- HeroDBC
 local DBC        = HeroDBC.DBC
 -- HeroLib
@@ -20,7 +20,7 @@ local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 -- Lua
 local mathmin    = math.min
-local pairs      = pairs;
+local pairs      = pairs
 
 
 --- ============================ CONTENT ===========================
@@ -28,8 +28,8 @@ local pairs      = pairs;
 -- luacheck: max_line_length 9999
 
 -- Spells
-local S = Spell.Monk.Mistweaver;
-local I = Item.Monk.Mistweaver;
+local S = Spell.Monk.Mistweaver
+local I = Item.Monk.Mistweaver
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
@@ -43,7 +43,6 @@ local Enemies5y
 local Enemies8y
 local EnemiesCount8
 local IsInMeleeRange, IsInAoERange
-local ShouldReturn; -- Used to get the return string
 local Stuns = {
   { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end },
 }
@@ -52,13 +51,13 @@ local Traps = {
 }
 
 -- GUI Settings
-local Everyone = HR.Commons.Everyone;
-local Monk = HR.Commons.Monk;
+local Everyone = HR.Commons.Everyone
+local Monk = HR.Commons.Monk
 local Settings = {
   General    = HR.GUISettings.General,
   Commons    = HR.GUISettings.APL.Monk.Commons,
   Mistweaver = HR.GUISettings.APL.Monk.Mistweaver
-};
+}
 
 -- Legendary variables
 local CelestialInfusionEquipped = Player:HasLegendaryEquipped(88)
@@ -91,7 +90,7 @@ local function UseItems()
 end
 
 local function Defensives()
-  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
+  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
 
   -- Dampen Harm
   if S.DampenHarm:IsCastable() and Settings.Mistweaver.ShowDampenHarmCD then
@@ -106,7 +105,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   -- Unit Update
-  IsInMeleeRange();
+  IsInMeleeRange()
   Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   EnemiesCount8 = #Enemies8y -- AOE Toogle
@@ -235,7 +234,10 @@ local function APL()
       if S.RenewingMist:IsCastable() then
         if HR.Cast(S.RenewingMist, Settings.Mistweaver.GCDasOffGCD.RenewingMist) then return "Renewing Mist"; end
       end
-      ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+      -- Defensives
+      if (true) then
+        local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+      end
       -- use_item
       if (Settings.Commons.UseTrinkets) then
         if (true) then
@@ -287,7 +289,7 @@ end
 local function Init()
 end
 
-HR.SetAPL(270, APL, Init);
+HR.SetAPL(270, APL, Init)
 
 -- Last Update: 2020-12-18
 

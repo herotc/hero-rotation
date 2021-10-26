@@ -18,6 +18,10 @@ local HR         = HeroRotation
 local Cast       = HR.Cast
 local CDsON      = HR.CDsON
 local AoEON      = HR.AoEON
+-- lua
+local strsplit   = strsplit
+-- WoW API
+local GetInventoryItemLink = GetInventoryItemLink
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======

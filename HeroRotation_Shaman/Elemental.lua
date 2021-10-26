@@ -20,7 +20,9 @@ local Cast       = HR.Cast
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 -- Lua
-
+-- WoW API
+local UnitPower          = UnitPower
+local MaelstromPowerType = Enum.PowerType.Maelstrom
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -236,7 +238,7 @@ end
 
 -- Compute how much maelstrom you are guaranteed to have when you finish your current cast, assuming you are casting. 
 local function MaelstromP()
-  local Maelstrom = UnitPower("player", Enum.PowerType.Maelstrom)
+  local Maelstrom = UnitPower("player", MaelstromPowerType)
   if not Player:IsCasting() then
     return Maelstrom
   else
@@ -399,7 +401,7 @@ local function NumFlameShocksToMaintain()
 end
 
 local function ApplyFlameShock()
-  local SpellObject = nil;
+  local SpellObject = nil
   if IsViable(S.PrimordialWave) then
     SpellObject = S.PrimordialWave
   elseif S.FlameShock:CooldownRemains() == 0 then
@@ -470,7 +472,7 @@ local function MoteEmpowerment()
     if Cast(S.Icefury) then return "MOTE Icefury" end
   elseif RefreshableFlameshocks > 0 then
     local DebugMessage = ApplyFlameShock()
-    if DebugMessage then return "Even with MOTE up, correct move is probably to refresh flameshocks." end;
+    if DebugMessage then return "Even with MOTE up, correct move is probably to refresh flameshocks." end
   elseif n >= 2 then
     if Cast(S.ChainLightning) then return "MOTE 2t CL" end
   elseif IsViable(S.LightningBolt) then
@@ -582,7 +584,7 @@ local function CoreRotation()
   -- Keep minimum number of flameshocks up
   if ActiveFlameshocks < NumFlameShocksToMaintain() then
     DebugMessage = ApplyFlameShock()
-    if DebugMessage then return DebugMessage end;
+    if DebugMessage then return DebugMessage end
   end
 
   -- Use MOTE empowerments appropriately. This function handles all cases (ST/Cleave/AOE).
@@ -611,7 +613,7 @@ local function CoreRotation()
   local flame_shock_condition_b = (NumEnemiesInLargestCluster == 1 and S.PrimordialWave:IsAvailable() and IsViable(S.PrimordialWave) and not PrimalStormElementalActive)
   if flame_shock_condition_a or flame_shock_condition_b then
     DebugMessage = ApplyFlameShock()
-    if DebugMessage then return DebugMessage end;
+    if DebugMessage then return DebugMessage end
   end
   
   local spender = SelectSpender()
@@ -658,19 +660,19 @@ local function APL()
       if Cast(S.LightningShield, Settings.Elemental.GCDasOffGCD.Shield) then return "Lightning Shield Refresh" end
     end
     if not Player:AffectingCombat() then
-      DebugMessage = Precombat();
-      if DebugMessage then return DebugMessage end;
+      DebugMessage = Precombat()
+      if DebugMessage then return DebugMessage end
     end
-    Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false);
+    Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false)
 
     DebugMessage = Cooldowns()
-    if DebugMessage then return DebugMessage end;
+    if DebugMessage then return DebugMessage end
 
     DebugMessage = CoreRotation()
-    if DebugMessage then return DebugMessage end;
+    if DebugMessage then return DebugMessage end
 
     -- This is actually an "error" state, we should always be able to frost shock.
-    HR.CastAnnotated(S.Pool, false, "ERR");
+    HR.CastAnnotated(S.Pool, false, "ERR")
   end
 end
 

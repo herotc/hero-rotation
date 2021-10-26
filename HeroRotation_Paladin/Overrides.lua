@@ -11,7 +11,7 @@ local Item    = HL.Item
 -- HeroRotation
 local HR      = HeroRotation
 -- Spells
-local SpellProt = Spell.Paladin.Protection;
+local SpellProt = Spell.Paladin.Protection
 -- Lua
 
 --- ============================ CONTENT ============================

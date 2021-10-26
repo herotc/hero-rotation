@@ -27,7 +27,7 @@ ArmsOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
       return BaseCheck
     end
   end
-, 71);
+, 71)
 
 -- Fury, ID: 72
 local FuryOldSpellIsCastable
@@ -40,7 +40,7 @@ FuryOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
       return BaseCheck
     end
   end
-, 72);
+, 72)
 
 -- Protection, ID: 73
 

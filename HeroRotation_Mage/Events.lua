@@ -1,20 +1,22 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, addonTable = ...;
+local addonName, addonTable = ...
 -- HeroLib
-local HL = HeroLib;
-local Cache = HeroCache;
-local HR = HeroRotation;
-local Unit = HL.Unit;
-local Player = Unit.Player;
-local Target = Unit.Target;
-local Spell = HL.Spell;
-local Item = HL.Item;
-local Mage = HR.Commons.Mage;
-
+local HL = HeroLib
+local Cache = HeroCache
+local HR = HeroRotation
+local Unit = HL.Unit
+local Player = Unit.Player
+local Target = Unit.Target
+local Spell = HL.Spell
+local Item = HL.Item
+local Mage = HR.Commons.Mage
 -- Lua
-local select = select;
+local select = select
+-- WoW API
+local GetTime = GetTime
+local C_Timer = C_Timer
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
@@ -88,7 +90,7 @@ local select = select;
 
     end
     , "SPELL_AURA_APPLIED"
-  );
+  )
 
   HL:RegisterForSelfCombatEvent(
     function (...)
@@ -98,7 +100,7 @@ local select = select;
       end
     end
     , "SPELL_AURA_REMOVED"
-  );
+  )
 
   --------------------------
   -------- Frost -----------

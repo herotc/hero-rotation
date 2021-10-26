@@ -1,18 +1,19 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
-  -- Addon
-  local addonName, addonTable = ...;
-  -- HeroLib
-  local HL = HeroLib;
-  local Cache = HeroCache;
-  local Unit = HL.Unit;
-  local Player = Unit.Player;
-  local Target = Unit.Target;
-  local Spell = HL.Spell;
-  local Item = HL.Item;
-  -- Lua
-
-  -- File Locals
+-- Addon
+local addonName, addonTable = ...
+-- HeroLib
+local HL = HeroLib
+local Cache = HeroCache
+local Unit = HL.Unit
+local Player = Unit.Player
+local Target = Unit.Target
+local Spell = HL.Spell
+local Item = HL.Item
+-- Lua
+-- WoW API
+local GetTime = GetTime
+-- File Locals
 
 
 
@@ -22,7 +23,7 @@ HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, destGUID, _, _, _, s
   if spellId ~= 46585 then return end
   HL.GhoulTable.SummonedGhoul = destGUID
   -- Unsure if there's any items that could extend the ghouls time past 60 seconds
-  HL.GhoulTable.SummonExpiration = time() + 60
+  HL.GhoulTable.SummonExpiration = GetTime() + 60
 end, "SPELL_SUMMON")
 
 HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, _, _, _, _, spellId)
@@ -100,7 +101,7 @@ end, "UNIT_DESTROYED")
 
   function HL.GhoulTable:remains()
     if HL.GhoulTable.SummonExpiration == nil then return 0 end
-    return HL.GhoulTable.SummonExpiration - time()
+    return HL.GhoulTable.SummonExpiration - GetTime()
   end
 
   function HL.GhoulTable:active()

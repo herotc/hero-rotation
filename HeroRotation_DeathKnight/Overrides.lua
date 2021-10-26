@@ -1,18 +1,18 @@
 --- ============================ HEADER ============================
 -- HeroLib
-local HL      = HeroLib;
-local Cache   = HeroCache;
-local Unit    = HL.Unit;
-local Player  = Unit.Player;
-local Pet     = Unit.Pet;
-local Target  = Unit.Target;
-local Spell   = HL.Spell;
-local Item    = HL.Item;
+local HL      = HeroLib
+local Cache   = HeroCache
+local Unit    = HL.Unit
+local Player  = Unit.Player
+local Pet     = Unit.Pet
+local Target  = Unit.Target
+local Spell   = HL.Spell
+local Item    = HL.Item
 -- HeroRotation
-local HR      = HeroRotation;
+local HR      = HeroRotation
 -- Spells
-local SpellFrost   = Spell.DeathKnight.Frost;
-local SpellUnholy  = Spell.DeathKnight.Unholy;
+local SpellFrost   = Spell.DeathKnight.Frost
+local SpellUnholy  = Spell.DeathKnight.Unholy
 -- Lua
 
 --- ============================ CONTENT ============================
@@ -31,7 +31,7 @@ OldFrostIsCastable = HL.AddCoreOverride("Spell.IsCastable",
       return BaseCheck
     end
   end
-, 251);
+, 251)
 
 -- Unholy, ID: 252
 local OldUHIsCastable
@@ -46,7 +46,7 @@ OldUHIsCastable = HL.AddCoreOverride("Spell.IsCastable",
       return BaseCheck
     end
   end
-, 252);
+, 252)
 
 local OldUHIsReady
 OldUHIsReady = HL.AddCoreOverride("Spell.IsReady",
@@ -58,7 +58,7 @@ OldUHIsReady = HL.AddCoreOverride("Spell.IsReady",
       return BaseCheck
     end
   end
-, 252);
+, 252)
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP",

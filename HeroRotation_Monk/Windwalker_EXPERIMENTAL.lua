@@ -1,7 +1,7 @@
 -- ----- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, addonTable = ...;
+local addonName, addonTable = ...
 -- HeroDBC
 local DBC        = HeroDBC.DBC
 -- HeroLib
@@ -20,7 +20,14 @@ local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 -- Lua
 local mathmin    = math.min
-local pairs      = pairs;
+local mathmax    = math.max
+local pairs      = pairs
+-- WoW API
+local GetSpellCount        = GetSpellCount
+local GetInventoryItemLink = GetInventoryItemLink
+local GetItemStats         = GetItemStats
+local UnitHealthMax        = UnitHealthMax
+local UnitIsPlayer         = UnitIsPlayer
 
 
 --- ============================ CONTENT ============================
@@ -28,8 +35,8 @@ local pairs      = pairs;
 -- luacheck: max_line_length 9999
 
 -- Define S/I for spell and item arrays
-local S = Spell.Monk.Windwalker;
-local I = Item.Monk.Windwalker;
+local S = Spell.Monk.Windwalker
+local I = Item.Monk.Windwalker
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
@@ -42,7 +49,6 @@ local IsInAoERange
 local Enemies5y
 local Enemies8y
 local EnemiesCount8
-local ShouldReturn
 local Interrupts = {
   { S.SpearHandStrike, "Cast Spear Hand Strike (Interrupt)", function () return true end },
 }
@@ -57,13 +63,13 @@ local Traps = {
 }
 
 -- GUI Settings
-local Everyone = HR.Commons.Everyone;
-local Monk = HR.Commons.Monk;
+local Everyone = HR.Commons.Everyone
+local Monk = HR.Commons.Monk
 local Settings = {
   General    = HR.GUISettings.General,
   Commons    = HR.GUISettings.APL.Monk.Commons,
   Windwalker = HR.GUISettings.APL.Monk.Windwalker
-};
+}
 
 -- Legendary variables
 local CelestialInfusionEquipped = Player:HasLegendaryEquipped(88)
@@ -158,7 +164,7 @@ local function ChiSpenderCosts()
   costs[S.BlackoutKick] = 1
   if Player:BuffUp(S.WeaponsOfOrder) then
     for spell, cost in pairs(costs) do
-      costs[spell] = max(0, cost-1)
+      costs[spell] = mathmax(0, cost-1)
     end
   end
   if Player:BuffUp(S.DanceOfChijiBuff) then
@@ -222,14 +228,14 @@ local function ChiSpenderValues()
   if Player:BuffUp(S.DanceOfChijiBuff) then chiji_coeff = 3.0 end
   local sck_tooltip = ability_power * sck_ap_coeff * sck_aura_coeff * vers_coeff * crane_coeff * chiji_coeff
   local sck_damage = sck_tooltip * mastery_coeff * armor_reduction_coeff * mystic_touch_coeff
-  local num_targets = min(6, EnemiesCount8)
+  local num_targets = mathmin(6, EnemiesCount8)
   values[S.SpinningCraneKick] = sck_damage * num_targets
   -- RJW
   local rjw_ap_coeff = 0.90
   local rjw_aura_coeff = 0.87 * 1.22
   local rjw_tooltip = ability_power * rjw_ap_coeff * rjw_aura_coeff * vers_coeff
   local rjw_damage = rjw_tooltip * mastery_coeff * armor_reduction_coeff * mystic_touch_coeff
-  local num_targets = min(6, EnemiesCount8)
+  local num_targets = mathmin(6, EnemiesCount8)
   values[S.RushingJadeWind] = num_targets * rjw_damage
   -- BOK
   local bok_ap_coeff = 0.847
@@ -275,7 +281,7 @@ local function UseCooldowns()
     if HR.Cast(S.TouchOfDeath) then return "Touch of Death PVP Main Target"; end
   end
   if S.WeaponsOfOrder:IsReady() then
-    if HR.Cast(S.WeaponsOfOrder, true, nil, not Target:IsInRange(40)) then return "Weapons of Order" end
+    if HR.Cast(S.WeaponsOfOrder, true, nil, not Target:IsInRange(40)) then return "Weapons of Order"; end
   end
 end
 
@@ -316,17 +322,17 @@ local function SpendChi(force_spend, chi_costs, chi_values)
   local rjw_efficiency = chi_values[S.RushingJadeWind] / (chi_costs[S.RushingJadeWind] + 0.0001)
   local bok_efficiency = chi_values[S.BlackoutKick] / (chi_costs[S.BlackoutKick] + 0.0001)
   local sck_efficiency = chi_values[S.SpinningCraneKick] / (chi_costs[S.SpinningCraneKick] + 0.0001)
-  if rsk_efficiency > max(rjw_efficiency, bok_efficiency, sck_efficiency) then
+  if rsk_efficiency > mathmax(rjw_efficiency, bok_efficiency, sck_efficiency) then
     if S.RisingSunKick:IsReady() and ComboStrike(S.RisingSunKick) then
       return OptimallyTargetedCast(S.RisingSunKick, "RSK is best possible chi spender and it's ready.")
     end
   end
-  if rjw_efficiency > max(rsk_efficiency, bok_efficiency, sck_efficiency) then
+  if rjw_efficiency > mathmax(rsk_efficiency, bok_efficiency, sck_efficiency) then
     if S.RushingJadeWind:IsReady() and ComboStrike(S.RushingJadeWind) then
       return OptimallyTargetedCast(S.RushingJadeWind, "RJW is best possible chi spender and it's ready.")
     end
   end
-  if bok_efficiency > max(rsk_efficiency, rjw_efficiency, sck_efficiency) then
+  if bok_efficiency > mathmax(rsk_efficiency, rjw_efficiency, sck_efficiency) then
     if S.BlackoutKick:IsReady() and ComboStrike(S.BlackoutKick) then
       return OptimallyTargetedCast(S.BlackoutKick, "BOK is best possible chi spender and it's ready.")
     end
@@ -334,7 +340,7 @@ local function SpendChi(force_spend, chi_costs, chi_values)
       return OptimallyTargetedCast(S.FlyingSerpentKick, "FSK to enable BOK")
     end
   end
-  if sck_efficiency > max(rsk_efficiency, rjw_efficiency, bok_efficiency) then
+  if sck_efficiency > mathmax(rsk_efficiency, rjw_efficiency, bok_efficiency) then
     if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) then
       return OptimallyTargetedCast(S.SpinningCraneKick, "SCK is best possible chi spender and it's ready.")
     end
@@ -477,7 +483,7 @@ local function APL()
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   EnemiesCount8 = #Enemies8y -- AOE Toogle
   ComputeTargetRange()
-  local DebugMessage;
+  local DebugMessage
 
 
   if Everyone.TargetIsValid() then
@@ -526,4 +532,4 @@ local function Init()
 --  HL.RegisterNucleusAbility(152175, 8, 6)               -- Whirling Dragon Punch
 end
 
-HR.SetAPL(269, APL, Init);
+HR.SetAPL(269, APL, Init)

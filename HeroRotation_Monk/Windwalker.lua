@@ -1,7 +1,7 @@
 -- ----- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, addonTable = ...;
+local addonName, addonTable = ...
 -- HeroDBC
 local DBC        = HeroDBC.DBC
 -- HeroLib
@@ -20,7 +20,7 @@ local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 -- Lua
 local mathmin    = math.min
-local pairs      = pairs;
+local pairs      = pairs
 
 
 --- ============================ CONTENT ============================
@@ -28,8 +28,8 @@ local pairs      = pairs;
 -- luacheck: max_line_length 9999
 
 -- Define S/I for spell and item arrays
-local S = Spell.Monk.Windwalker;
-local I = Item.Monk.Windwalker;
+local S = Spell.Monk.Windwalker
+local I = Item.Monk.Windwalker
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
@@ -42,7 +42,6 @@ local IsInAoERange
 local Enemies5y
 local Enemies8y
 local EnemiesCount8
-local ShouldReturn
 local VarXuenOnUse = false
 local VarXuenHold = false
 local VarSerenityBurst = false
@@ -62,13 +61,13 @@ local VarHoldTod = false
 local VarFoPPreChan = 0
 
 -- GUI Settings
-local Everyone = HR.Commons.Everyone;
-local Monk = HR.Commons.Monk;
+local Everyone = HR.Commons.Everyone
+local Monk = HR.Commons.Monk
 local Settings = {
   General    = HR.GUISettings.General,
   Commons    = HR.GUISettings.APL.Monk.Commons,
   Windwalker = HR.GUISettings.APL.Monk.Windwalker
-};
+}
 
 -- Legendary variables
 local CelestialInfusionEquipped = Player:HasLegendaryEquipped(88)
@@ -761,7 +760,7 @@ local function APL()
   Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   EnemiesCount8 = #Enemies8y -- AOE Toogle
-  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
+  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
 
   ComputeTargetRange()
 
@@ -865,7 +864,7 @@ local function Init()
 --  HL.RegisterNucleusAbility(152175, 8, 6)               -- Whirling Dragon Punch
 end
 
-HR.SetAPL(269, APL, Init);
+HR.SetAPL(269, APL, Init)
 
 -- Last Update: 2020-12-18
 

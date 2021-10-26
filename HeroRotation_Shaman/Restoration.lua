@@ -20,7 +20,7 @@ local Cast       = HR.Cast
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 -- Lua
-
+local mathmin    = math.min
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -221,7 +221,7 @@ local function Cooldowns()
 end
 
 local function NumFlameShocksToMaintain()
-  return min(NumEnemiesInLargestCluster, 2) -- fallthrough when no combat?
+  return mathmin(NumEnemiesInLargestCluster, 2) -- fallthrough when no combat?
 end
 
 local function ApplyFlameShock()

@@ -11,8 +11,6 @@ local Target = Unit.Target
 local Spell = HL.Spell
 local Item = HL.Item
 -- Lua
-local pairs = pairs
-local select = select
 -- File Locals
 
 

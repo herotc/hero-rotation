@@ -1,21 +1,23 @@
 --- ============================ HEADER ============================
-  -- HeroLib
-  local HL      = HeroLib
-  local Cache   = HeroCache
-  local Unit    = HL.Unit
-  local Player  = Unit.Player
-  local Pet     = Unit.Pet
-  local Target  = Unit.Target
-  local Spell   = HL.Spell
-  local Item    = HL.Item
+-- HeroLib
+local HL      = HeroLib
+local Cache   = HeroCache
+local Unit    = HL.Unit
+local Player  = Unit.Player
+local Pet     = Unit.Pet
+local Target  = Unit.Target
+local Spell   = HL.Spell
+local Item    = HL.Item
 -- HeroRotation
-  local HR      = HeroRotation
+local HR      = HeroRotation
 -- Spells
-  local SpellBM = Spell.Hunter.BeastMastery
-  local SpellMM = Spell.Hunter.Marksmanship
-  local SpellSV = Spell.Hunter.Survival
+local SpellBM = Spell.Hunter.BeastMastery
+local SpellMM = Spell.Hunter.Marksmanship
+local SpellSV = Spell.Hunter.Survival
 -- Lua
-  local mathmax = math.max
+local mathmax = math.max
+-- WoW API
+local GetTime = GetTime
 
 --- ============================ CONTENT ============================
 -- Beast Mastery, ID: 253

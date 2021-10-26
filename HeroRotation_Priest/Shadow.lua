@@ -45,7 +45,6 @@ local OnUseExcludes = {
 }
 
 -- Rotation Var
-local ShouldReturn -- Used to get the return string
 local Enemies8yMelee, Enemies30y, Enemies40y, Enemies10ySplash
 local EnemiesCount8ySplash, EnemiesCount10ySplash
 local UnitsWithoutSWPain
@@ -345,7 +344,7 @@ local function Main()
   end
   -- Manually added: void_bolt,if=buff.dissonant_echoes.up
   if S.VoidBolt:CooldownUp() and (Player:BuffUp(S.DissonantEchoesBuff)) then
-    if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt 90"; end
+    if Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 90"; end
   end
   -- void_eruption,if=variable.pool_for_cds&(insanity>=40|pet.fiend.active&runeforge.shadowflame_prism.equipped&!cooldown.mind_blast.up&!cooldown.shadow_word_death.up)&(insanity<=85|talent.searing_nightmare.enabled&variable.searing_nightmare_cutoff)&!cooldown.fiend.up&(!cooldown.mind_blast.up|spell_targets.mind_sear>2)
   if S.VoidEruption:IsReady() and (VarPoolForCDs and (Player:Insanity() >= 40 or S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and not S.MindBlast:CooldownUp() and not S.ShadowWordDeath:CooldownUp()) and (Player:Insanity() <= 85 or S.SearingNightmare:IsAvailable() and VarSearingNightmareCutoff) and not S.Mindbender:CooldownUp() and (not S.MindBlast:CooldownUp() or EnemiesCount10ySplash > 2)) then
@@ -382,7 +381,7 @@ local function Main()
   end
   -- void_bolt,if=insanity<=85&talent.hungering_void.enabled&talent.searing_nightmare.enabled&spell_targets.mind_sear<=6|((talent.hungering_void.enabled&!talent.searing_nightmare.enabled)|spell_targets.mind_sear=1)
   if S.VoidBolt:IsCastable() and (Player:Insanity() <= 85 and S.HungeringVoid:IsAvailable() and S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash <= 6 or ((S.HungeringVoid:IsAvailable() and not S.SearingNightmare:IsAvailable()) or EnemiesCount10ySplash == 1)) then
-    if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt 101"; end
+    if Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 101"; end
   end
   -- devouring_plague,if=(refreshable|insanity>75)&(!variable.pool_for_cds|insanity>=85)&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))
   if S.DevouringPlague:IsReady() and ((Target:DebuffRefreshable(S.DevouringPlagueDebuff) or Player:Insanity() > 75) and (not VarPoolForCDs or Player:Insanity() >= 85) and (not S.SearingNightmare:IsAvailable() or (S.SearingNightmare:IsAvailable() and not VarSearingNightmareCutoff))) then
@@ -390,7 +389,7 @@ local function Main()
   end
   -- void_bolt,if=spell_targets.mind_sear<(4+conduit.dissonant_echoes.enabled)&insanity<=85&talent.searing_nightmare.enabled|!talent.searing_nightmare.enabled
   if S.VoidBolt:IsCastable() and (EnemiesCount10ySplash < (4 + num(S.DissonantEchoes:ConduitEnabled())) and Player:Insanity() <= 85 and S.SearingNightmare:IsAvailable() or not S.SearingNightmare:IsAvailable()) then
-    if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt 103"; end
+    if Cast(S.VoidBolt, nil, nil, Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 103"; end
   end
   -- shadow_word_death,target_if=(target.health.pct<20&spell_targets.mind_sear<4)|(pet.fiend.active&runeforge.shadowflame_prism.equipped)
   if S.ShadowWordDeath:IsReady() then

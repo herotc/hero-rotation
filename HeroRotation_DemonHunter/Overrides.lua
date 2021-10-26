@@ -14,6 +14,8 @@ local HR      = HeroRotation
 local SpellHavoc              = Spell.DemonHunter.Havoc
 local SpellVengeance          = Spell.DemonHunter.Vengeance
 -- Lua
+-- WoW API
+local IsInJailersTower = IsInJailersTower
 
 --- ============================ CONTENT ============================
 -- Havoc, ID: 577
