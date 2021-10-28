@@ -554,6 +554,10 @@ local function Cleave()
       if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "resonating_arrow cleave 6"; end
     end
   end
+  -- coordinated_assault
+  if S.CoordinatedAssault:IsCastable() then
+    if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault) then return "coordinated_assault cleave 7"; end
+  end
   -- wildfire_bomb,if=full_recharge_time<gcd
   if S.WildfireBomb:FullRechargeTime() < Player:GCD() then
     if S.WildfireInfusion:IsAvailable() then
@@ -571,6 +575,10 @@ local function Cleave()
         if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb cleave 8"; end
       end
     end
+  end
+  -- call_action_list,name=nta,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus<variable.mb_rs_cost
+  if (NessingwarysTrappingEquipped and Player:Focus() < MBRSCost) then
+    local ShouldReturn = NTA(); if ShouldReturn then return ShouldReturn; end
   end
   -- chakrams
   if S.Chakrams:IsReady() then
@@ -628,8 +636,8 @@ local function Cleave()
   if S.AMurderofCrows:IsReady() and CDsON() then
     if Cast(S.AMurderofCrows, Settings.Commons.GCDasOffGCD.AMurderofCrows, nil, not Target:IsSpellInRange(S.AMurderofCrows)) then return "a_murder_of_crows cleave 38"; end
   end
-  -- steel_trap
-  if S.SteelTrap:IsCastable() then
+  -- steel_trap,if=focus+cast_regen<focus.max
+  if S.SteelTrap:IsCastable() and (CheckFocusCap(S.SteelTrap:ExecuteTime())) then
     if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap cleave 40"; end
   end
   -- serpent_sting,target_if=min:remains,if=refreshable&talent.hydras_bite.enabled&target.time_to_die>8
