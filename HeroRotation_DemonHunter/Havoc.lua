@@ -52,6 +52,7 @@ local EnemiesCount8, EnemiesCount20
 local DarkglareEquipped = Player:HasLegendaryEquipped(20)
 local ChaosTheoryEquipped = Player:HasLegendaryEquipped(23)
 local BurningWoundEquipped = Player:HasLegendaryEquipped(25)
+local AgonyGazeEquipped = Player:HasLegendaryEquipped(236)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -74,6 +75,7 @@ local VarPoolingForBladeDance = false
 local VarPoolingForEyeBeam = false
 local VarWaitingForEssenceBreak = false
 local VarWaitingForMomentum = false
+local VarWaitingForAgonyGaze = false
 local VarTrinketSyncSlot = 0
 local VarUseEyeBeamFuryCondition = false
 
@@ -93,6 +95,7 @@ HL:RegisterForEvent(function()
   VarPoolingForEyeBeam = false
   VarWaitingForEssenceBreak = false
   VarWaitingForMomentum = false
+  VarWaitingForAgonyGaze = false
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -108,6 +111,7 @@ HL:RegisterForEvent(function()
   DarkglareEquipped = Player:HasLegendaryEquipped(20)
   ChaosTheoryEquipped = Player:HasLegendaryEquipped(23)
   BurningWoundEquipped = Player:HasLegendaryEquipped(25)
+  AgonyGazeEquipped = Player:HasLegendaryEquipped(236)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
@@ -166,8 +170,12 @@ local function Precombat()
   if ((trinket1:TrinketHasStatAnyDps() and trinket2:TrinketHasStatAnyDps()) or not (trinket1:TrinketHasStatAnyDps() and trinket2:TrinketHasStatAnyDps())) then
     VarTrinketSyncSlot = 0
   end
-  -- variable,name=use_eye_beam_fury_condition,value=talent.blind_fury.enabled&(runeforge.darkglare_medallion|talent.demon_blades.enabled)
-  VarUseEyeBeamFuryCondition = (S.BlindFury:IsAvailable() and (DarkglareEquipped or S.DemonBlades:IsAvailable()))
+  -- variable,name=use_eye_beam_fury_condition,value=talent.blind_fury.enabled&(runeforge.darkglare_medallion|talent.demon_blades.enabled&!runeforge.agony_gaze)
+  VarUseEyeBeamFuryCondition = (S.BlindFury:IsAvailable() and (DarkglareEquipped or S.DemonBlades:IsAvailable() and not AgonyGazeEquipped))
+  -- arcane_torrent
+  if S.ArcaneTorrent:IsCastable() and CDsON() then
+    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 1"; end
+  end
   -- Manually added: Fel Rush if out of range
   if not Target:IsInMeleeRange(5) and S.FelRush:IsCastable() then
     if Cast(S.FelRush, nil, nil, not Target:IsInRange(15)) then return "fel_rush precombat 2"; end
@@ -179,12 +187,21 @@ local function Precombat()
 end
 
 local function Cooldown()
-  -- metamorphosis,if=!talent.demonic.enabled&cooldown.eye_beam.remains>20&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
-  if S.Metamorphosis:IsCastable() and (not S.Demonic:IsAvailable() and S.EyeBeam:CooldownRemains() > 20 and (CovenantID ~= 2 or Target:DebuffDown(S.SinfulBrandDebuff)) or HL.BossFilteredFightRemains("<", 25)) then
+  -- metamorphosis,landing_distance=10,if=!talent.demonic.enabled&covenant.venthyr.enabled&runeforge.agony_gaze&dot.sinful_brand.remains>8&spell_targets.metamorphosis_impact<2&(cooldown.eye_beam.remains>20|fight_remains<25)
+  -- APL Note: If Venthyr and Sinful Brand duration is over 8 seconds with 1T, purposfully whiff Metamorphosis impact to not refresh with a lower duration DoT
+  if S.Metamorphosis:IsCastable() and (not S.Demonic:IsAvailable() and CovenantID == 2 and AgonyGazeEquipped and Target:DebuffRemains(S.SinfulBrandDebuff) > 8 and EnemiesCount8 < 2 and (S.EyeBeam:CooldownRemains() > 20 or HL.BossFilteredFightRemains("<", 25))) then
+    if HR.CastAnnotated(S.Metamorphosis, nil, "AWAY") then return "metamorphosis whiff cooldown 0"; end
+  end
+  -- metamorphosis,landing_distance=10,if=talent.demonic.enabled&covenant.venthyr.enabled&runeforge.agony_gaze&dot.sinful_brand.remains>8&spell_targets.metamorphosis_impact<2&(cooldown.eye_beam.remains>20&!variable.blade_dance|cooldown.blade_dance.remains>gcd.max|fight_remains<25)
+  if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and CovenantID == 2 and AgonyGazeEquipped and Target:DebuffRemains(S.SinfulBrandDebuff) > 8 and EnemiesCount8 < 2 and (S.EyeBeam:CooldownRemains() > 20 and (not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD() or HL.BossFilteredFightRemains("<", 25))) then
+    if HR.CastAnnotated(S.Metamorphosis, nil, "AWAY") then return "metamorphosis whiff cooldown 1"; end
+  end
+  -- metamorphosis,if=!talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!covenant.venthyr.enabled|dot.sinful_brand.remains<=8|spell_targets.metamorphosis_impact>1)|fight_remains<25)
+  if S.Metamorphosis:IsCastable() and (not S.Demonic:IsAvailable() and (S.EyeBeam:CooldownRemains() > 20 and (CovenantID ~= 2 or Target:DebuffRemains(S.SinfulBrandDebuff) <= 8 or EnemiesCount8 > 1) or HL.BossFilteredFightRemains("<", 25))) then
     if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis, not Target:IsInRange(40)) then return "metamorphosis cooldown 2"; end
   end
-  -- metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
-  if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and (S.EyeBeam:CooldownRemains() > 20 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD())) and (CovenantID ~= 2 or Target:DebuffDown(S.SinfulBrandDebuff)) or HL.BossFilteredFightRemains("<", 25)) then
+  -- metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max)&(!covenant.venthyr.enabled|dot.sinful_brand.remains<=8|spell_targets.metamorphosis_impact>1)|fight_remains<25)
+  if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and (S.EyeBeam:CooldownRemains() > 20 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD()) and (CovenantID ~= 2 or Target:DebuffRemains(S.SinfulBrandDebuff) <= 8 or EnemiesCount8 > 1) or HL.BossFilteredFightRemains("<", 25))) then
     if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis, not Target:IsInRange(40)) then return "metamorphosis cooldown 4"; end
   end
   -- potion,if=buff.metamorphosis.remains>25|fight_remains<60
@@ -201,8 +218,8 @@ local function Cooldown()
   if trinket2:IsReady() and (VarTrinketSyncSlot == 2 and (Player:BuffUp(S.MetamorphosisBuff) or (not S.Demonic:IsAvailable() and S.Metamorphosis:CooldownRemains() > HL.FightRemains(Enemies20y)) or HL.BossFilteredFightRemains("<=", 20)) or (VarTrinketSyncSlot == 1 and not trinket1:IsReady()) or VarTrinketSyncSlot == 0) then
     if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 cooldown 10"; end
   end
-  -- sinful_brand,if=!dot.sinful_brand.ticking
-  if S.SinfulBrand:IsCastable() and (Target:DebuffDown(S.SinfulBrandDebuff)) then
+  -- sinful_brand,if=!dot.sinful_brand.ticking&(!runeforge.agony_gaze|(cooldown.eye_beam.remains<=gcd&fury>=30))&(!cooldown.metamorphosis.up|active_enemies=1)
+  if S.SinfulBrand:IsCastable() and (Target:DebuffDown(S.SinfulBrandDebuff) and ((not AgonyGazeEquipped) or (S.EyeBeam:CooldownRemains() <= Player:GCD() and Player:Fury() >= 30)) and (S.Metamorphosis:CooldownDown() or EnemiesCount8 == 1)) then
     if Cast(S.SinfulBrand, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand cooldown 12"; end
   end
   -- the_hunt,if=!talent.demonic.enabled&!variable.waiting_for_momentum&!variable.pooling_for_meta|buff.furious_gaze.up
@@ -216,6 +233,10 @@ local function Cooldown()
 end
 
 local function Demonic()
+  -- eye_beam,if=runeforge.agony_gaze&(active_enemies>desired_targets|raid_event.adds.in>25-talent.cycle_of_hatred*10)&dot.sinful_brand.ticking&dot.sinful_brand.remains<=gcd
+  if S.EyeBeam:IsReady() and (AgonyGazeEquipped and EnemiesCount8 > 1 and Target:DebuffUp(S.SinfulBrandDebuff) and Target:DebuffRemains(S.SinfulBrandDebuff) <= Player:GCD()) then
+    if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam demonic 1"; end
+  end
   -- fel_rush,if=talent.unbound_chaos.enabled&buff.unbound_chaos.up&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
   if S.FelRush:IsCastable() and (S.UnboundChaos:IsAvailable() and Player:BuffUp(S.UnboundChaosBuff) and S.FelRush:Charges() == 2) then
     if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush) then return "fel_rush demonic 2"; end
@@ -232,8 +253,8 @@ local function Demonic()
   if S.ThrowGlaive:IsCastable() and (S.SerratedGlaive:ConduitEnabled() and S.EyeBeam:CooldownRemains() < 6 and Player:BuffDown(S.MetamorphosisBuff) and Target:DebuffDown(S.ExposedWoundDebuff)) then
     if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive demonic 8"; end
   end
-  -- eye_beam,if=active_enemies>desired_targets|raid_event.adds.in>25&(!variable.use_eye_beam_fury_condition|spell_targets>1|fury<70)
-  if S.EyeBeam:IsReady() and (EnemiesCount8 > 0 and (not VarUseEyeBeamFuryCondition or EnemiesCount8 > 1 or Player:Fury() < 70)) then
+  -- eye_beam,if=active_enemies>desired_targets|raid_event.adds.in>25-talent.cycle_of_hatred*10&(!variable.use_eye_beam_fury_condition|spell_targets>1|fury<70)&!variable.waiting_for_agony_gaze
+  if S.EyeBeam:IsReady() and (EnemiesCount8 > 0 and (not VarUseEyeBeamFuryCondition or EnemiesCount8 > 1 or Player:Fury() < 70) and not VarWaitingForAgonyGaze) then
     if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam demonic 10"; end
   end
   -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>5|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
@@ -295,6 +316,10 @@ local function Demonic()
 end
 
 local function Normal()
+  -- eye_beam,if=runeforge.agony_gaze&(active_enemies>desired_targets|raid_event.adds.in>15)&dot.sinful_brand.ticking&dot.sinful_brand.remains<=gcd
+  if S.EyeBeam:IsReady() and (AgonyGazeEquipped and EnemiesCount8 > 1 and Target:DebuffUp(S.SinfulBrandDebuff) and Target:DebuffRemains(S.SinfulBrandDebuff) <= Player:GCD()) then
+    if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam normal 1"; end
+  end
   -- vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down&time>1
   if S.VengefulRetreat:IsCastable() and (S.Momentum:IsAvailable() and Player:BuffDown(S.PreparedBuff) and HL.CombatTime() > 1) then
     if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat normal 2"; end
@@ -323,8 +348,8 @@ local function Normal()
   if S.ThrowGlaive:IsCastable() and (S.SerratedGlaive:ConduitEnabled() and S.EyeBeam:CooldownRemains() < 6 and Player:BuffDown(S.MetamorphosisBuff) and Target:DebuffDown(S.ExposedWoundDebuff)) then
     if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive normal 14"; end
   end
-  -- eye_beam,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>15&(!variable.use_eye_beam_fury_condition|spell_targets>1|fury<70))
-  if S.EyeBeam:IsReady() and (not VarWaitingForMomentum and (EnemiesCount20 > 0 and (not VarUseEyeBeamFuryCondition or EnemiesCount8 > 1 or Player:Fury() < 70))) then
+  -- eye_beam,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>15&(!variable.use_eye_beam_fury_condition|spell_targets>1|fury<70)&!variable.waiting_for_agony_gaze)
+  if S.EyeBeam:IsReady() and (not VarWaitingForMomentum and (EnemiesCount20 > 0 and (not VarUseEyeBeamFuryCondition or EnemiesCount8 > 1 or Player:Fury() < 70) and not VarWaitingForAgonyGaze)) then
     if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not IsInMeleeRange(20)) then return "eye_beam normal 16"; end
   end
   -- blade_dance,if=variable.blade_dance
@@ -347,8 +372,8 @@ local function Normal()
   if S.ChaosStrike:IsReady() and ((S.DemonBlades:IsAvailable() or not VarWaitingForMomentum or Player:FuryDeficit() < 30) and not VarPoolingForMeta and not VarPoolingForBladeDance) then
     if Cast(S.ChaosStrike, nil, nil, not Target:IsSpellInRange(S.ChaosStrike)) then return "chaos_strike normal 26"; end
   end
-  -- eye_beam,if=talent.blind_fury.enabled&raid_event.adds.in>cooldown
-  if S.EyeBeam:IsReady() and (S.BlindFury:IsAvailable()) then
+  -- eye_beam,if=talent.blind_fury.enabled&raid_event.adds.in>cooldown&!variable.waiting_for_agony_gaze
+  if S.EyeBeam:IsReady() and (S.BlindFury:IsAvailable() and not VarWaitingForAgonyGaze) then
     if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam normal 28"; end
   end
   -- demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound&debuff.burning_wound.remains<4
@@ -415,6 +440,10 @@ local function APL()
     if (S.EssenceBreak:IsAvailable() and S.EssenceBreak:CooldownUp()) then
       VarBladeDance = false
     end
+    -- variable,name=blade_dance,if=runeforge.agony_gaze&talent.cycle_of_hatred,value=variable.blade_dance&active_dot.sinful_brand<2
+    if (AgonyGazeEquipped and S.CycleofHatred:IsAvailable()) then
+      VarBladeDance = VarBladeDance and S.SinfulBrandDebuff:AuraActiveCount() < 2
+    end
     -- variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30
     VarPoolingForMeta = not S.Demonic:IsAvailable() and S.Metamorphosis:CooldownRemains() < 6 and Player:FuryDeficit() > 30
     -- variable,name=pooling_for_blade_dance,value=variable.blade_dance&(fury<75-talent.first_blood.enabled*20)
@@ -423,6 +452,10 @@ local function APL()
     VarPoolingForEyeBeam = S.Demonic:IsAvailable() and not S.BlindFury:IsAvailable() and S.EyeBeam:CooldownRemains() < (Player:GCD() * 2) and Player:FuryDeficit() > 20
     -- variable,name=waiting_for_momentum,value=talent.momentum.enabled&!buff.momentum.up
     VarWaitingForMomentum = S.Momentum:IsAvailable() and Player:BuffDown(S.MomentumBuff)
+    -- variable,name=waiting_for_agony_gaze,if=runeforge.agony_gaze,value=!dot.sinful_brand.ticking&cooldown.sinful_brand.remains<gcd.max*4&(!cooldown.metamorphosis.up|active_enemies=1)&spell_targets.eye_beam<=3
+    if (AgonyGazeEquipped) then
+      VarWaitingForAgonyGaze = Target:DebuffDown(S.SinfulBrandDebuff) and S.SinfulBrand:CooldownRemains() < Player:GCD() * 4 and (S.Metamorphosis:CooldownDown() or EnemiesCount8 == 1) and EnemiesCount20 <= 3
+    end
     -- disrupt (and stun interrupts)
     local ShouldReturn = Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=cooldown,if=gcd.remains=0
@@ -456,7 +489,7 @@ local function APL()
 end
 
 local function Init()
-
+  S.SinfulBrandDebuff:RegisterAuraTracking()
 end
 
 HR.SetAPL(577, APL, Init)

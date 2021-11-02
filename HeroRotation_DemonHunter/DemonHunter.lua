@@ -82,6 +82,7 @@ Spell.DemonHunter.Vengeance = {
 
 Spell.DemonHunter.Havoc = {
   -- Racials
+  ArcaneTorrent                         = Spell(50613),
 
   -- Abilities
   Annihilation                          = Spell(201427),
