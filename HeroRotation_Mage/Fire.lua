@@ -205,7 +205,7 @@ local function bool (val)
   return val ~= 0
 end
 
-local function HotStreakInFlight ()
+local function HotStreakInFlight()
   local total = 0
   if (Player:BuffUp(S.HeatingUpBuff)) then
     total = total + 1
@@ -216,7 +216,7 @@ local function HotStreakInFlight ()
   return total
 end
 
-local function VarInit ()
+local function VarInit()
   -- variable,name=firestarter_combustion,default=-1,value=!talent.pyroclasm,if=variable.firestarter_combustion<0
   if var_firestarter_combustion < 0 then
     var_firestarter_combustion = num(S.Pyroclasm:IsAvailable())
@@ -306,7 +306,7 @@ local function VarInit ()
   var_init = true
 end
 
-local function Precombat ()
+local function Precombat()
   -- flask
   -- food
   -- augmentation
@@ -346,7 +346,7 @@ local function Precombat ()
   end
 end
 
-local function CombustionTiming ()
+local function CombustionTiming()
   -- variable,use_off_gcd=1,use_while_casting=1,name=combustion_ready_time,value=cooldown.combustion.remains*expected_kindling_reduction
   var_combustion_ready_time = S.Combustion:CooldownRemains() * var_kindling_reduction
   -- variable,use_off_gcd=1,use_while_casting=1,name=combustion_precast_time,value=(action.fireball.cast_time*!conduit.flame_accretion+action.scorch.cast_time+conduit.flame_accretion)*(active_enemies<variable.combustion_flamestrike)+action.flamestrike.cast_time*(active_enemies>=variable.combustion_flamestrike)-variable.combustion_cast_remains
@@ -408,7 +408,7 @@ local function CombustionTiming ()
   end
 end
 
-local function ActiveTalents ()
+local function ActiveTalents()
   -- living_bomb,if=active_enemies>1&buff.combustion.down&(variable.time_to_combustion>cooldown.living_bomb.duration|variable.time_to_combustion<=0)
   if S.LivingBomb:IsReady() and (EnemiesCount10ySplash > 1 and Player:BuffDown(S.CombustionBuff) and (var_time_to_combustion > S.LivingBomb:CooldownRemains() or var_time_to_combustion <= 0)) then
     if Cast(S.LivingBomb, nil, nil, not Target:IsInRange(S.LivingBomb)) then return "living_bomb active_talents 1"; end
@@ -427,7 +427,7 @@ local function ActiveTalents ()
   end
 end
 
-local function CombustionCooldowns ()
+local function CombustionCooldowns()
   -- potion
   if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
     if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion combustion_cooldowns 1"; end
@@ -483,7 +483,7 @@ local function CombustionCooldowns ()
   end
 end
 
-local function CombustionPhase ()
+local function CombustionPhase()
   -- lights_judgment,if=buff.combustion.down
   if S.LightsJudgment:IsCastable() and Player:BuffDown(S.CombustionBuff) then
     if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment combustion_phase 2"; end
@@ -629,7 +629,7 @@ local function CombustionPhase ()
   end
 end
 
-local function RoPPhase ()
+local function RoPPhase()
   -- flamestrike,if=active_enemies>=variable.hot_streak_flamestrike&(buff.hot_streak.react|buff.firestorm.react)
   if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_hot_streak_flamestrike and (Player:BuffUp(S.HotStreakBuff) or Player:BuffUp(S.FirestormBuff))) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike rop_phase 1"; end
@@ -712,7 +712,7 @@ local function RoPPhase ()
   end
 end
 
-local function StandardRotation ()
+local function StandardRotation()
   -- flamestrike,if=active_enemies>=variable.hot_streak_flamestrike&(buff.hot_streak.react|buff.firestorm.react)
   if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_hot_streak_flamestrike and (Player:BuffUp(S.HotStreakBuff) or Player:BuffUp(S.FirestormBuff))) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike standard_rotation 1"; end
@@ -800,7 +800,7 @@ local function StandardRotation ()
 end
 
 --- ======= ACTION LISTS =======
-local function APL ()
+local function APL()
   -- Check which cast style we should use for Fire Blast
   if Settings.Fire.ShowFireBlastLeft then
     FBCast = CastLeft
@@ -1035,12 +1035,12 @@ local function APL ()
     if S.FireBlast:IsReady() and (not var_fire_blast_pooling and var_time_to_combustion > 0 and EnemiesCount8ySplash >= var_hard_cast_flamestrike and not bool(S.Firestarter:ActiveStatus()) and Player:BuffDown(S.HotStreakBuff) and (Player:BuffUp(S.HeatingUpBuff) and var_flamestrike_execute_remains < 0.5 or S.FireBlast:ChargesFractional() >= 2)) then
       if FBCast(S.FireBlast) then return "fire_blast default 32"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=firestarter.active&variable.time_to_combustion>0&charges>=1&!variable.fire_blast_pooling&(!action.fireball.executing&!action.pyroblast.in_flight&buff.heating_up.react|action.fireball.executing&!buff.hot_streak.react|action.pyroblast.in_flight&buff.heating_up.react&!buff.hot_streak.react)
-    if S.FireBlast:IsReady() and (bool(S.Firestarter:ActiveStatus()) and var_time_to_combustion > 0 and S.FireBlast:Charges() >= 1 and not var_fire_blast_pooling and (not Player:IsCasting(S.Fireball) and not S.Pyroblast:InFlight() and Player:BuffUp(S.HeatingUpBuff) or Player:IsCasting(S.Fireball) and Player:BuffDown(S.HotStreakBuff) or S.Pyroblast:InFlight() and Player:BuffUp(S.HeatingUpBuff) and Player:BuffDown(S.HotStreakBuff))) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=firestarter.active&variable.time_to_combustion>0&!variable.fire_blast_pooling&(!action.fireball.executing&!action.pyroblast.in_flight&buff.heating_up.react|action.fireball.executing&!buff.hot_streak.react|action.pyroblast.in_flight&buff.heating_up.react&!buff.hot_streak.react)
+    if S.FireBlast:IsReady() and (bool(S.Firestarter:ActiveStatus()) and var_time_to_combustion > 0 and not var_fire_blast_pooling and (not Player:IsCasting(S.Fireball) and not S.Pyroblast:InFlight() and Player:BuffUp(S.HeatingUpBuff) or Player:IsCasting(S.Fireball) and Player:BuffDown(S.HotStreakBuff) or S.Pyroblast:InFlight() and Player:BuffUp(S.HeatingUpBuff) and Player:BuffDown(S.HotStreakBuff))) then
       if FBCast(S.FireBlast) then return "fire_blast default 33"; end
     end
-    -- fire_blast,use_while_casting=1,if=action.shifting_power.executing&full_recharge_time<action.shifting_power.tick_reduction&buff.hot_streak.down&time>10
-    if S.FireBlast:IsReady() and (Player:IsCasting(S.ShiftingPower) and S.FireBlast:FullRechargeTime() < S.ShiftingPower:TickReduction() and Player:BuffDown(S.HotStreakBuff) and HL.CombatTime() > 10) then
+    -- fire_blast,use_while_casting=1,if=action.shifting_power.executing&full_recharge_time<action.shifting_power.tick_reduction
+    if S.FireBlast:IsReady() and (Player:IsCasting(S.ShiftingPower) and S.FireBlast:FullRechargeTime() < S.ShiftingPower:TickReduction()) then
       if FBCast(S.FireBlast) then return "fire_blast default 34"; end
     end
     -- call_action_list,name=standard_rotation,if=variable.time_to_combustion>0&buff.rune_of_power.down&buff.combustion.down
@@ -1054,7 +1054,7 @@ local function APL ()
   end
 end
 
-local function Init ()
+local function Init()
   -- APL 07/10/2021 https://github.com/simulationcraft/simc/tree/3e0633f1e70cd9849baad1dd42814dcdcdf31a84
   HR.Print("Fire Mage rotation is currently a work in progress, but has been updated for patch 9.1.")
 end
