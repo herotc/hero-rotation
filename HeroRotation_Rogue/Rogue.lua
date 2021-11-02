@@ -111,6 +111,7 @@ Spell.Rogue.Assassination = {
   EchoingReprimand        = Spell(323547),
   Flagellation            = Spell(323654),
   FlagellationBuff        = Spell(345569),
+  Fleshcraft              = Spell(324631),
   Sepsis                  = Spell(328305),
   SepsisBuff              = Spell(347037),
   SerratedBoneSpike       = Spell(328547),
@@ -119,6 +120,8 @@ Spell.Rogue.Assassination = {
   LeadbyExample           = Spell(342156),
   LeadbyExampleBuff       = Spell(342181),
   MarrowedGemstoneBuff    = Spell(327069),
+  PustuleEruption         = Spell(351094),
+  VolatileSolvent         = Spell(323074),
   -- Legendaries (Shadowlands)
   -- Misc
   PoolEnergy              = Spell(999910),
@@ -197,6 +200,7 @@ Spell.Rogue.Outlaw = {
   EchoingReprimand        = Spell(323547),
   Flagellation            = Spell(323654),
   FlagellationBuff        = Spell(345569),
+  Fleshcraft              = Spell(324631),
   Sepsis                  = Spell(328305),
   SepsisBuff              = Spell(347037),
   SerratedBoneSpike       = Spell(328547),
@@ -292,20 +296,28 @@ Spell.Rogue.Subtlety = {
   EchoingReprimand        = Spell(323547),
   Flagellation            = Spell(323654),
   FlagellationBuff        = Spell(345569),
+  Fleshcraft              = Spell(324631),
   Sepsis                  = Spell(328305),
   SepsisBuff              = Spell(347037),
   SerratedBoneSpike       = Spell(328547),
   SerratedBoneSpikeDebuff = Spell(324073),
   -- Soulbinds/Conduits (Shadowlands)
   DeeperDaggers           = Spell(341549),
+  KevinsOozeling          = Spell(352110),
+  KevinsWrathDebuff       = Spell(352528),
   LeadbyExample           = Spell(342156),
   LeadbyExampleBuff       = Spell(342181),
+  PerforatedVeinsBuff     = Spell(341572),
+  PustuleEruption         = Spell(351094),
+  VolatileSolvent         = Spell(323074),
   -- Legendaries (Shadowlands)
   DeathlyShadowsBuff      = Spell(341202),
   FinalityBlackPowder     = Spell(340603),
   FinalityEviscerate      = Spell(340600),
   FinalityRupture         = Spell(340601),
   TheRottenBuff           = Spell(341134),
+  -- Domination Shards
+  ChaosBaneBuff           = Spell(355829),
   -- Misc
   PoolEnergy              = Spell(999910),
   SinfulRevelationDebuff  = Spell(324260),
