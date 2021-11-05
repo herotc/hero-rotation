@@ -105,13 +105,14 @@ Spell.Monk.Windwalker = {
   -- PvP Abilities
 
   -- Shadowland Covenant
-  WeaponsOfOrder                        = Spell(310454),
-  WeaponsOfOrderChiBuff                 = Spell(311054),
-  WeaponsOfOrderDebuff                  = Spell(312106),
   BonedustBrew                          = Spell(325216),
   FaelineStomp                          = Spell(327104),
   FaelineStompDebuff                    = Spell(327257),
   FallenOrder                           = Spell(326860),
+  Fleshcraft                            = Spell(324631),
+  WeaponsOfOrder                        = Spell(310454),
+  WeaponsOfOrderChiBuff                 = Spell(311054),
+  WeaponsOfOrderDebuff                  = Spell(312106),
 
   -- Shadowland Essences
   FortifyingIngrediencesBuff            = Spell(336874),
@@ -176,7 +177,7 @@ Spell.Monk.Brewmaster = {
 
   -- Defensive
   CelestialBrew                = Spell(322507),
-  DampenHarm                   = Spell(122278), --Talent
+  DampenHarm                   = Spell(122278), -- Talent
   DampenHarmBuff               = Spell(122278),
   ElusiveBrawlerBuff           = Spell(195630),
   FortifyingBrew               = Spell(115203),
@@ -187,7 +188,7 @@ Spell.Monk.Brewmaster = {
   Shuffle                      = Spell(215479),
 
   -- Utility
-  ChiTorpedo                   = Spell(115008), -- Talentn
+  ChiTorpedo                   = Spell(115008), -- Talent
   Detox                        = Spell(218164),
   Disable                      = Spell(116095),
   LegSweep                     = Spell(119381), -- Talent
@@ -204,13 +205,14 @@ Spell.Monk.Brewmaster = {
   Vivify                       = Spell(116670),
 
   -- Shadowlands Covenants
-  WeaponsOfOrder               = Spell(310454),
-  WeaponsOfOrderDebuff         = Spell(312106),
   BonedustBrew                 = Spell(325216),
   FaelineStomp                 = Spell(327104),
   FaelineStompBuff             = Spell(347480),
   FaelineStompDebuff           = Spell(327257),
   FallenOrder                  = Spell(326860),
+  Fleshcraft                   = Spell(324631),
+  WeaponsOfOrder               = Spell(310454),
+  WeaponsOfOrderDebuff         = Spell(312106),
 
   -- Shadowlands Legendary
   CharredPassions              = Spell(338140),
@@ -218,9 +220,6 @@ Spell.Monk.Brewmaster = {
   KeefersSkyreach              = Spell(344021),
   MightyPour                   = Spell(337994),
   RecentlyRushingTigerPalm     = Spell(337341),
-
-
-
 
   -- Trinket Debuffs
 
@@ -285,7 +284,6 @@ Spell.Monk.Mistweaver = {
   RefreshingJadeWind                    = Spell(196725),
   SummonJadeSerpentStatue               = Spell(115313),
 
-
   -- Defensive
   DampenHarm                            = Spell(122278), -- Talent
   DampenHarmBuff                        = Spell(122278),
@@ -326,6 +324,9 @@ Spell.Monk.Mistweaver = {
   FaelineStompDebuff                    = Spell(327257),
   FallenOrder                           = Spell(326860),
 
+  -- Soulbinds
+  VolatileSolvent                       = Spell(323074),
+
   -- Shadowland Essences
   FortifyingIngrediencesBuff            = Spell(336874),
 
@@ -343,6 +344,7 @@ Spell.Monk.Mistweaver = {
 -- Items
 if not Item.Monk then Item.Monk = {}; end
 Item.Monk.Windwalker = {
+  -- Potions
   PotionofPhantomFire                  = Item(171349),
   PotionofSpectralAgility              = Item(171270),
   PotionofDeathlyFixation              = Item(171351),
@@ -354,14 +356,12 @@ Item.Monk.Windwalker = {
 Item.Monk.Brewmaster = {
   -- Potions
   PotionofPhantomFire          = Item(171349),
-  PotionofSpectralAgility      = Item(171270),
-  PotionofDeathlyFixation      = Item(171351),
-  PotionofEmpoweredExorcisms   = Item(171352),
-  PotionofHardenedShadows      = Item(171271),
-  PotionofSpectralStamina      = Item(171274)
+  -- Items/Trinkets
+  Jotungeirr                   = Item(186404)
 }
 
 Item.Monk.Mistweaver = {
+  -- Potions
   PotionofPhantomFire                  = Item(171349),
   PotionofSpectralIntellect            = Item(171273),
   PotionofDeathlyFixation              = Item(171351),

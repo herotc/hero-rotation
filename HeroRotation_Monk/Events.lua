@@ -12,19 +12,10 @@ local Arena, Boss, Nameplate = Unit.Arena, Unit.Boss, Unit.Nameplate
 local Party, Raid = Unit.Party, Unit.Raid
 local Spell = HL.Spell
 local Item = HL.Item
--- HeroRotation
-local HR = HeroRotation
-local Rogue = HR.Commons.Monk
 -- Lua
 local C_Timer = C_Timer
-local mathmax = math.max
-local mathmin = math.min
-local pairs = pairs
+local tableremove = table.remove
 local tableinsert = table.insert
-local UnitAttackSpeed = UnitAttackSpeed
-local GetTime = GetTime
--- Lua
-
 -- File Locals
 
 --- ============================ CONTENT ============================
@@ -93,15 +84,57 @@ local GetTime = GetTime
 local StaggerSpellID = 115069
 local BobandWeave = Spell(280515)
 local StaggerFull = 0
+local StaggerDamage = {}
+local IncomingDamage = {}
 
-local function RegisterStaggerFullAbsorb (Amount)
+local function RegisterStaggerFullAbsorb(Amount)
   local StaggerDuration = 10 + (BobandWeave:IsAvailable() and 3 or 0)
   StaggerFull = StaggerFull + Amount
   C_Timer.After(StaggerDuration, function() StaggerFull = StaggerFull - Amount; end)
 end
 
-function Player:StaggerFull ()
+local function RegisterStaggerDamageTaken(Amount)
+  if Amount == nil or Amount == 0 then return false end
+  if #StaggerDamage == 10 then
+    tableremove(StaggerDamage, 10)
+  end
+  tableinsert(StaggerDamage, 1, Amount)
+end
+
+local function RegisterIncomingDamageTaken(Amount)
+  if Amount == nil or Amount == 0 then return false end
+  if #IncomingDamage > 0 then
+    while IncomingDamage[#IncomingDamage][1] < HL.CombatTime() - 6 do
+      tableremove(IncomingDamage, #IncomingDamage)
+    end
+  end
+  tableinsert(IncomingDamage, 1, {HL.CombatTime(), Amount})
+end
+
+function Player:StaggerFull()
   return StaggerFull
+end
+
+function Player:StaggerLastTickDamage(Count)
+  local TickDamage = 0
+  if Count > #StaggerDamage then
+    Count = #StaggerDamage
+  end
+  for i=1, Count do
+    TickDamage = TickDamage + StaggerDamage[i]
+  end
+  return TickDamage
+end
+
+function Player:IncomingDamageTaken(Milliseconds)
+  local DamageTaken = 0
+  local TimeOffset = Milliseconds / 1000
+  for i=1, #IncomingDamage do
+    if IncomingDamage[i][1] > HL.CombatTime() - TimeOffset then
+      DamageTaken = DamageTaken + IncomingDamage[i][2]
+    end
+  end
+  return DamageTaken
 end
 
 HL:RegisterForCombatEvent(
@@ -128,4 +161,38 @@ HL:RegisterForCombatEvent(
     end
   end
   , "SPELL_ABSORBED"
+)
+
+HL:RegisterForCombatEvent(
+  function(...)
+    local _, _, _, _, _, _, _, DestGUID, _, _, _, SpellID, _, _, Amount = ...
+    if DestGUID == Player:GUID() and SpellID == 124255 then
+      RegisterStaggerDamageTaken(Amount)
+    end
+  end
+  , "SPELL_PERIODIC_DAMAGE"
+)
+
+HL:RegisterForCombatEvent(
+  function(...)
+    local _, _, _, _, _, _, _, DestGUID, _, _, _, _, _, _, Amount = ...
+    if DestGUID == Player:GUID() then
+      RegisterIncomingDamageTaken(Amount)
+    end
+  end
+  , "SWING_DAMAGE"
+  , "SPELL_DAMAGE"
+  , "SPELL_PERIODIC_DAMAGE"
+)
+
+HL:RegisterForEvent(
+  function()
+    for i=0, #StaggerDamage do
+      StaggerDamage[i]=nil
+    end
+    for i=0, #IncomingDamage do
+      IncomingDamage[i]=nil
+    end
+  end
+  , "PLAYER_REGEN_ENABLED"
 )

@@ -11,12 +11,23 @@
 -- HeroRotation
   local HR      = HeroRotation
 -- Spells
-  local SpellBrewmaster = Spell.Monk.Brewmaster
-  local SpellWindwalker = Spell.Monk.Windwalker
+  local SpellBM = Spell.Monk.Brewmaster
+  local SpellWW = Spell.Monk.Windwalker
 -- Lua
 
 --- ============================ CONTENT ============================
 -- Brewmaster, ID: 268
+local BMOldSpellIsCastable
+BMOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = BMOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellBM.TouchOfDeath then
+      return BaseCheck and self:IsUsable()
+    else
+      return BaseCheck
+    end
+  end
+, 268)
 
 -- Windwalker, ID: 269
 
