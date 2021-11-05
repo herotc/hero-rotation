@@ -267,7 +267,7 @@ local function CDs()
   end
   -- muzzle
   -- potion,if=target.time_to_die<60|buff.coordinated_assault.up
-  if I.PotionOfSpectralAgility:IsReady() and (Target:TimeToDie() < 60 or Player:BuffUp(S.CoordinatedAssault)) then
+  if I.PotionOfSpectralAgility:IsReady() and Settings.Commons.Enabled.Potions and (Target:TimeToDie() < 60 or Player:BuffUp(S.CoordinatedAssault)) then
     if Cast(I.PotionOfSpectralAgility, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 18"; end
   end
   -- fleshcraft,cancel_if=channeling&!soulbind.pustule_eruption,if=(focus<70|cooldown.coordinated_assault.remains<gcd)&(soulbind.pustule_eruption|soulbind.volatile_solvent)
