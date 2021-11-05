@@ -361,6 +361,7 @@ local function APL()
 end
 
 local function Init()
+  HR.Print("Brewmaster rotation is currently a work in progress, but has been updated for patch 9.1.")
 end
 
 HR.SetAPL(268, APL, Init)
