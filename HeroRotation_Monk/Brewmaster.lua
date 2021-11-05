@@ -41,7 +41,6 @@ local OnUseExcludes = {
 local Enemies5y
 local Enemies8y
 local EnemiesCount8
-local IsInMeleeRange, IsInAoERange
 local IsTanking
 
 -- Interrupts
@@ -79,14 +78,6 @@ HL:RegisterForEvent(function()
   StormstoutsLastKegEquipped = Player:HasLegendaryEquipped(87)
   SwiftsureWrapsEquipped = Player:HasLegendaryEquipped(84)
 end, "PLAYER_EQUIPMENT_CHANGED")
-
--- Melee Is In Range w/ Movement Handlers
-local function IsInMeleeRange(range)
-  if S.TigerPalm:TimeSinceLastCast() <= Player:GCD() then
-    return true
-  end
-  return range and Target:IsInMeleeRange(range) or Target:IsInMeleeRange(5)
-end
 
 local function UseItems()
   -- use_items
@@ -181,7 +172,6 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   -- Unit Update
-  IsInMeleeRange()
   Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   EnemiesCount8 = #Enemies8y -- AOE Toogle
