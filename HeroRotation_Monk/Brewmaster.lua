@@ -59,24 +59,12 @@ local Settings = {
 }
 
 -- Legendary variables
-local CelestialInfusionEquipped = Player:HasLegendaryEquipped(88)
 local CharredPassionsEquipped = Player:HasLegendaryEquipped(86)
-local EscapeFromRealityEquipped = Player:HasLegendaryEquipped(82)
-local FatalTouchEquipped = Player:HasLegendaryEquipped(85)
-local InvokersDelightEquipped = Player:HasLegendaryEquipped(83)
 local ShaohaosMightEquipped = Player:HasLegendaryEquipped(89)
-local StormstoutsLastKegEquipped = Player:HasLegendaryEquipped(87)
-local SwiftsureWrapsEquipped = Player:HasLegendaryEquipped(84)
 
 HL:RegisterForEvent(function()
-  CelestialInfusionEquipped = Player:HasLegendaryEquipped(88)
   CharredPassionsEquipped = Player:HasLegendaryEquipped(86)
-  EscapeFromRealityEquipped = Player:HasLegendaryEquipped(82)
-  FatalTouchEquipped = Player:HasLegendaryEquipped(85)
-  InvokersDelightEquipped = Player:HasLegendaryEquipped(83)
   ShaohaosMightEquipped = Player:HasLegendaryEquipped(89)
-  StormstoutsLastKegEquipped = Player:HasLegendaryEquipped(87)
-  SwiftsureWrapsEquipped = Player:HasLegendaryEquipped(84)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function UseItems()
