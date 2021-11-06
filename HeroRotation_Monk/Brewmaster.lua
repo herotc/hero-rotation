@@ -154,7 +154,6 @@ local function Precombat()
 end
 
 local function Defensives()
-  -- if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2
   if S.CelestialBrew:IsCastable() and (Player:BuffDown(S.BlackoutComboBuff) and Player:IncomingDamageTaken(1999) > (UnitHealthMax("player") * 0.1 + Player:StaggerLastTickDamage(4)) and Player:BuffStack(S.ElusiveBrawlerBuff) < 2) then
     if Cast(S.CelestialBrew, nil, Settings.Brewmaster.DisplayStyle.CelestialBrew) then return "Celestial Brew"; end
   end
@@ -201,7 +200,7 @@ local function APL()
     end
     -- gift_of_the_ox
     -- TODO: Find a way to track gift orbs
-    -- dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down&
+    -- dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down
     -- Note: Handled via Defensives()
     -- fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)
     -- Note: Handled via Defensives()
@@ -234,40 +233,42 @@ local function APL()
       if S.BagOfTricks:IsCastable() then
         if Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks main 16"; end
       end
-    end
-    -- invoke_niuzao_the_black_ox,if=buff.recent_purifies.value>=health.max*0.05&(target.cooldown.pause_action.remains>=20|time<=10|target.cooldown.pause_action.duration=0)
-    -- APL Note: Cast Niuzao when we'll get at least 20 seconds of uptime. This is specific to the default enemy APL and will need adjustments for other enemies.
-    -- Note: Using BossFilteredFightRemains instead of the above calculation
-    if S.InvokeNiuzaoTheBlackOx:IsCastable() and HL.BossFilteredFightRemains(">", 25) then
-      if Cast(S.InvokeNiuzaoTheBlackOx, Settings.Brewmaster.GCDasOffGCD.InvokeNiuzaoTheBlackOx, nil, not Target:IsInRange(40)) then return "invoke_niuzao_the_black_ox main 18"; end
-    end
-    -- touch_of_death,if=target.health.pct<=15
-    if S.TouchOfDeath:IsCastable() and (Target:HealthPercentage() <= 15) then
-      if Cast(S.TouchOfDeath, Settings.Brewmaster.GCDasOffGCD.TouchOfDeath, nil, not Target:IsInMeleeRange(5)) then return "touch_of_death main 20"; end
-    end
-    -- weapons_of_order (if KegSmash is on CD)
-    if S.WeaponsOfOrder:IsCastable() and (not S.KegSmash:CooldownUp()) then
-      if Cast(S.WeaponsOfOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "weapons_of_order main 22"; end
-    end
-    -- fallen_order
-    if S.FallenOrder:IsCastable() then
-      if Cast(S.FallenOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "fallen_order main 24"; end
-    end
-    -- bonedust_brew
-    if S.BonedustBrew:IsCastable() then
-      if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Covenant) then return "bonedust_brew main 26"; end
+      -- invoke_niuzao_the_black_ox,if=buff.recent_purifies.value>=health.max*0.05&(target.cooldown.pause_action.remains>=20|time<=10|target.cooldown.pause_action.duration=0)
+      -- APL Note: Cast Niuzao when we'll get at least 20 seconds of uptime. This is specific to the default enemy APL and will need adjustments for other enemies.
+      -- Note: Using BossFilteredFightRemains instead of the above calculation
+      if S.InvokeNiuzaoTheBlackOx:IsCastable() and HL.BossFilteredFightRemains(">", 25) then
+        if Cast(S.InvokeNiuzaoTheBlackOx, Settings.Brewmaster.GCDasOffGCD.InvokeNiuzaoTheBlackOx, nil, not Target:IsInRange(40)) then return "invoke_niuzao_the_black_ox main 18"; end
+      end
+      -- touch_of_death,if=target.health.pct<=15
+      if S.TouchOfDeath:IsCastable() and (Target:HealthPercentage() <= 15) then
+        if Cast(S.TouchOfDeath, Settings.Brewmaster.GCDasOffGCD.TouchOfDeath, nil, not Target:IsInMeleeRange(5)) then return "touch_of_death main 20"; end
+      end
+      -- weapons_of_order
+      if S.WeaponsOfOrder:IsCastable() then
+        if Cast(S.WeaponsOfOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "weapons_of_order main 22"; end
+      end
+      -- fallen_order
+      if S.FallenOrder:IsCastable() then
+        if Cast(S.FallenOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "fallen_order main 24"; end
+      end
+      -- bonedust_brew
+      if S.BonedustBrew:IsCastable() then
+        if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Covenant) then return "bonedust_brew main 26"; end
+      end
     end
     -- purifying_brew,if=stagger.amounttototalpct>=0.7&(((target.cooldown.pause_action.remains>=20|time<=10|target.cooldown.pause_action.duration=0)&cooldown.invoke_niuzao_the_black_ox.remains<5)|buff.invoke_niuzao_the_black_ox.up)
     -- purifying_brew,if=buff.invoke_niuzao_the_black_ox.up&buff.invoke_niuzao_the_black_ox.remains<8
     -- purifying_brew,if=cooldown.purifying_brew.charges_fractional>=1.8&(cooldown.invoke_niuzao_the_black_ox.remains>10|buff.invoke_niuzao_the_black_ox.up)
     -- Handled via ShouldPurify()
-    -- black_ox_brew,if=cooldown.purifying_brew.charges_fractional<0.5
-    if S.BlackOxBrew:IsCastable() and S.PurifyingBrew:ChargesFractional() < 0.5 then
-      if Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "black_ox_brew main 28"; end
-    end
-    -- black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
-    if S.BlackOxBrew:IsCastable() and (Player:Energy() + (Player:EnergyRegen() * S.KegSmash:CooldownRemains())) < 40 and Player:BuffDown(S.BlackoutComboBuff) and S.KegSmash:CooldownUp() then
-      if Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "black_ox_brew main 30"; end
+    if CDsON() then
+      -- black_ox_brew,if=cooldown.purifying_brew.charges_fractional<0.5
+      if S.BlackOxBrew:IsCastable() and S.PurifyingBrew:ChargesFractional() < 0.5 then
+        if Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "black_ox_brew main 28"; end
+      end
+      -- black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
+      if S.BlackOxBrew:IsCastable() and (Player:Energy() + (Player:EnergyRegen() * S.KegSmash:CooldownRemains())) < 40 and Player:BuffDown(S.BlackoutComboBuff) and S.KegSmash:CooldownUp() then
+        if Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "black_ox_brew main 30"; end
+      end
     end
     -- fleshcraft,if=cooldown.bonedust_brew.remains<4&soulbind.pustule_eruption.enabled&cooldown
     if S.Fleshcraft:IsCastable() and (S.BonedustBrew:CooldownRemains() < 4 and S.PustuleEruption:SoulbindEnabled()) then
@@ -312,7 +313,7 @@ local function APL()
       if Cast(S.FaelineStomp, nil, Settings.Commons.DisplayStyle.Covenant) then return "faeline_stomp main 50"; end
     end
     -- touch_of_death
-    if S.TouchOfDeath:IsCastable() then
+    if S.TouchOfDeath:IsCastable() and CDsON() then
       if Cast(S.TouchOfDeath, Settings.Brewmaster.GCDasOffGCD.TouchOfDeath, nil, not Target:IsInMeleeRange(5)) then return "touch_of_death main 52"; end
     end
   -- rushing_jade_wind,if=buff.rushing_jade_wind.down
