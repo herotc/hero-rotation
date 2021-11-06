@@ -316,15 +316,17 @@ Spell.Monk.Mistweaver = {
   -- PvP Abilities
 
   -- Shadowland Covenant
-  WeaponsOfOrder                        = Spell(310454),
-  WeaponsOfOrderChiBuff                 = Spell(311054),
-  WeaponsOfOrderDebuff                  = Spell(312106),
   BonedustBrew                          = Spell(325216),
   FaelineStomp                          = Spell(327104),
   FaelineStompDebuff                    = Spell(327257),
   FallenOrder                           = Spell(326860),
+  Fleshcraft                            = Spell(324631),
+  WeaponsOfOrder                        = Spell(310454),
+  WeaponsOfOrderChiBuff                 = Spell(311054),
+  WeaponsOfOrderDebuff                  = Spell(312106),
 
   -- Soulbinds
+  LeadByExample                         = Spell(342156),
   VolatileSolvent                       = Spell(323074),
 
   -- Shadowland Essences
@@ -355,17 +357,14 @@ Item.Monk.Windwalker = {
 
 Item.Monk.Brewmaster = {
   -- Potions
-  PotionofPhantomFire          = Item(171349),
+  PotionofPhantomFire                  = Item(171349),
   -- Items/Trinkets
-  Jotungeirr                   = Item(186404)
+  Jotungeirr                           = Item(186404)
 }
 
 Item.Monk.Mistweaver = {
   -- Potions
-  PotionofPhantomFire                  = Item(171349),
   PotionofSpectralIntellect            = Item(171273),
-  PotionofDeathlyFixation              = Item(171351),
-  PotionofEmpoweredExorcisms           = Item(171352),
-  PotionofHardenedShadows              = Item(171271),
-  PotionofSpectralStamina              = Item(171274)
+  -- Items/Trinkets
+  Jotungeirr                           = Item(186404)
 }

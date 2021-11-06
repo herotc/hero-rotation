@@ -18,10 +18,8 @@ local Item       = HL.Item
 local HR         = HeroRotation
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
+local Cast       = HR.Cast
 -- Lua
-local mathmin    = math.min
-local pairs      = pairs
-
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -42,7 +40,6 @@ local OnUseExcludes = {
 local Enemies5y
 local Enemies8y
 local EnemiesCount8
-local IsInMeleeRange, IsInAoERange
 local Stuns = {
   { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end },
 }
@@ -59,94 +56,105 @@ local Settings = {
   Mistweaver = HR.GUISettings.APL.Monk.Mistweaver
 }
 
--- Legendary variables
-local CelestialInfusionEquipped = Player:HasLegendaryEquipped(88)
-local CharredPassionsEquipped = Player:HasLegendaryEquipped(86)
-local EscapeFromRealityEquipped = Player:HasLegendaryEquipped(82)
-local FatalTouchEquipped = Player:HasLegendaryEquipped(85)
-local InvokersDelightEquipped = Player:HasLegendaryEquipped(83)
-local ShaohaosMightEquipped = Player:HasLegendaryEquipped(89)
-local StormstoutsLastKegEquipped = Player:HasLegendaryEquipped(87)
-local SwiftsureWrapsEquipped = Player:HasLegendaryEquipped(84)
-
-HL:RegisterForEvent(function()
-  VarFoPPreChan = 0
-end, "PLAYER_REGEN_ENABLED")
-
--- Melee Is In Range w/ Movement Handlers
-local function IsInMeleeRange(range)
-  if S.TigerPalm:TimeSinceLastCast() <= Player:GCD() then
-    return true
-  end
-  return range and Target:IsInMeleeRange(range) or Target:IsInMeleeRange(5)
-end
-
 local function UseItems()
   -- use_items
   local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
   if TrinketToUse then
-    if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end
 end
 
 local function Defensives()
-  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
-
   -- Dampen Harm
-  if S.DampenHarm:IsCastable() and Settings.Mistweaver.ShowDampenHarmCD then
-    if HR.Cast(S.DampenHarm, Settings.Mistweaver.GCDasOffGCD.DampenHarm) then return "Dampen Harm"; end
+  if S.DampenHarm:IsCastable() and Player:BuffDown(S.FortifyingBrew) and Player:HealthPercentage() <= Settings.Mistweaver.DampenHarmHP then
+    if Cast(S.DampenHarm, nil, Settings.Mistweaver.DisplayStyle.DampenHarm) then return "dampen_harm defensives 2"; end
   end
   -- Fortifying Brew
-  if S.FortifyingBrew:IsCastable() then
-    if HR.Cast(S.FortifyingBrew, Settings.Mistweaver.GCDasOffGCD.FortifyingBrew) then return "Fortifying Brew"; end
+  if S.FortifyingBrew:IsCastable() and Player:BuffDown(S.DampenHarm) and Player:HealthPercentage() <= Settings.Mistweaver.FortifyingBrewHP then
+    if Cast(S.FortifyingBrew, Settings.Mistweaver.DisplayStyle.FortifyingBrew) then return "fortifying_brew defensives 4"; end
+  end
+end
+
+local function Precombat()
+  -- flask
+  -- food
+  -- augmentation
+  -- snapshot_stats
+  -- potion
+  -- Note: Removing this as it's no longer necessary to do in Precombat
+  -- fleshcraft
+  if S.Fleshcraft:IsCastable() then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 2"; end
+  end
+  -- chi_burst
+  if S.ChiBurst:IsCastable() then
+    if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst precombat 4"; end
+  end
+  -- chi_wave
+  if S.ChiWave:IsCastable() then
+    if Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "chi_wave precombat 6"; end
+  end
+end
+
+local function AOE()
+  -- spinning_crane_kick
+  if S.SpinningCraneKick:IsCastable() then
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick aoe 2"; end
+  end
+  -- chi_wave
+  if S.ChiWave:IsCastable() then
+    if Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "chi_wave aoe 4"; end
+  end
+  -- chi_burst
+  if S.ChiBurst:IsCastable() then
+    if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst aoe 6"; end
+  end
+end
+
+local function ST()
+  -- thunder_focus_tea
+  if S.ThunderFocusTea:IsCastable() then
+    if Cast(S.ThunderFocusTea, Settings.Mistweaver.OffGCDasOffGCD.ThunderFocusTea) then return "thunder_focus_tea st 2"; end
+  end
+  -- rising_sun_kick
+  if S.RisingSunKick:IsReady() then
+    if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick st 4"; end
+  end
+  -- blackout_kick,if=buff.teachings_of_the_monastery.stack=1&cooldown.rising_sun_kick.remains<12
+  if S.BlackoutKick:IsCastable() and (Player:BuffStack(S.TeachingsOfTheMonasteryBuff) == 1 and S.RisingSunKick:CooldownRemains() < 12) then
+    if Cast(S.BlackoutKick, nil, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick st 6"; end
+  end
+  -- chi_wave
+  if S.ChiWave:IsCastable() then
+    if Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "chi_wave st 8"; end
+  end
+  -- chi_burst
+  if S.ChiBurst:IsCastable() then
+    if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst st 10"; end
+  end
+  -- tiger_palm,if=buff.teachings_of_the_monastery.stack<3|buff.teachings_of_the_monastery.remains<2
+  if S.TigerPalm:IsCastable() and (Player:BuffStack(S.TeachingsOfTheMonasteryBuff) < 3 or Player:BuffRemains(S.TeachingsOfTheMonasteryBuff) < 2) then
+    if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm st 12"; end
   end
 end
 
 --- ======= ACTION LISTS =======
 local function APL()
   -- Unit Update
-  IsInMeleeRange()
   Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
-  EnemiesCount8 = #Enemies8y -- AOE Toogle
-
-  --- Out of Combat
-  if not Player:AffectingCombat() and Everyone.TargetIsValid() then
-    -- flask
-    -- food
-    -- augmentation
-    -- snapshot_stats
-    -- potion
-    if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofPhantomFire) then return "Potion of Phantom Fire"; end
-    end
-    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofSpectralIntellect) then return "Potion of Spectral Intellect"; end
-    end
-    if I.PotionofDeathlyFixation:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofDeathlyFixation) then return "Potion of Deathly Fixation"; end
-    end
-    if I.PotionofEmpoweredExorcisms:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofEmpoweredExorcisms) then return "Potion of Empowered Exorcisms"; end
-    end
-    if I.PotionofHardenedShadows:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofHardenedShadows) then return "Potion of Hardened Shadows"; end
-    end
-    if I.PotionofSpectralStamina:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofSpectralStamina) then return "Potion of Spectral Stamina"; end
-    end
-    -- chi_burst
-    if S.ChiBurst:IsCastable() then
-      if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "Chi Burst"; end
-    end
-    -- chi_wave
-    if S.ChiWave:IsCastable() then
-      if HR.Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "Chi Wave"; end
-    end
+  if AoEON() then
+    EnemiesCount8 = #Enemies8y -- AOE Toogle
+  else
+    EnemiesCount8 = 1
   end
 
   --- In Combat
   if Everyone.TargetIsValid() then
+    -- Precombat
+    if not Player:AffectingCombat() then
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
     -- auto_attack
     -- Interrupts
     -- Stun
@@ -154,180 +162,82 @@ local function APL()
     -- Trap
     local ShouldReturn = Everyone.Interrupt(5, S.Paralysis, Settings.Commons.GCDasOffGCD.Paralysis, Stuns); if ShouldReturn and Settings. General.InterruptWithStun then return ShouldReturn; end
     -- Defensives
-    if HR.CDsON() then
-      -- potion
-      if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofPhantomFire) then return "Potion of Phantom Fire 2"; end
-      end
-      if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofSpectralIntellect) then return "Potion of Spectral Intellect 2"; end
-      end
-      if I.PotionofDeathlyFixation:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofDeathlyFixation) then return "Potion of Deathly Fixation 2"; end
-      end
-      if I.PotionofEmpoweredExorcisms:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofEmpoweredExorcisms) then return "Potion of Empowered Exorcisms 2"; end
-      end
-      if I.PotionofHardenedShadows:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofHardenedShadows) then return "Potion of Hardened Shadows 2"; end
-      end
-      if I.PotionofSpectralStamina:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofSpectralStamina) then return "Potion of Spectral Stamina 2"; end
-      end
+    local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+    -- use_item,name=jotungeirr_destinys_call
+    if I.Jotungeirr:IsEquippedAndReady() then
+      if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 2"; end
+    end
+    -- use_items
+    if Settings.Commons.Enabled.Trinkets then
+      local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
+    end
+    if CDsON() and Target:TimeToDie() < 18 then
       -- blood_fury
       if S.BloodFury:IsCastable() then
-        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Blood Fury"; end
+        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 4"; end
       end
       -- berserking
       if S.Berserking:IsCastable() then
-        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Berserking"; end
+        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 6"; end
       end
       -- lights_judgment
       if S.LightsJudgment:IsCastable() then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "Lights Judgment"; end
+        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "lights_judgment main 8"; end
       end
       -- fireblood
       if S.Fireblood:IsCastable() then
-        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Fireblood"; end
+        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 10"; end
       end
       -- ancestral_call
       if S.AncestralCall:IsCastable() then
-        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Ancestral Call"; end
+        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 12"; end
       end
       -- bag_of_tricks
       if S.BagOfTricks:IsCastable() then
-        if HR.Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "Bag of Tricks"; end
+        if Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "bag_of_tricks main 14"; end
       end
-      -- weapons_of_order
-      if S.WeaponsOfOrder:IsCastable() then
-        if HR.Cast(S.WeaponsOfOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Weapons Of Order"; end
-      end
-      -- faeline_stomp
-      if S.FaelineStomp:IsCastable() then
-        if HR.Cast(S.FaelineStomp, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp"; end
-      end
+    end
+    -- potion
+    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
+      if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 16"; end
+    end
+    -- weapons_of_order
+    if S.WeaponsOfOrder:IsCastable() and CDsON() then
+      if Cast(S.WeaponsOfOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "weapons_of_order main 18"; end
+    end
+    -- faeline_stomp
+    if S.FaelineStomp:IsCastable() then
+      if Cast(S.FaelineStomp, nil, Settings.Commons.DisplayStyle.Covenant) then return "faeline_stomp main 20"; end
+    end
+    if CDsON() then
       -- fallen_order
       if S.FallenOrder:IsCastable() then
-        if HR.Cast(S.FallenOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Fallen Order"; end
+        if Cast(S.FallenOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "fallen_order main 22"; end
       end
       -- bonedust_brew
       if S.BonedustBrew:IsCastable() then
-        if HR.Cast(S.BonedustBrew, nil, Settings.Commons.CovenantDisplayStyle) then return "Bonedust Brew"; end
-      end
-      -- summon_jade_serpent_statue
-      if S.SummonJadeSerpentStatue:IsCastable() and S.SummonJadeSerpentStatue:TimeSinceLastCast() >= 900 then
-        if HR.Cast(S.SummonJadeSerpentStatue, Settings.Mistweaver.GCDasOffGCD.SummonJadeSerpentStatue) then return "Summon Jade Serpent Statue"; end
-      end
-      -- invoke_yulon_the_jade_serpent
-      if S.InvokeYulonTheJadeSerpent:IsCastable() and HL.BossFilteredFightRemains(">", 25) then
-        if HR.Cast(S.InvokeYulonTheJadeSerpent, Settings.Mistweaver.GCDasOffGCD.InvokeYulonTheJadeSerpent) then return "Invoke Yu'lon the Jade Serpent"; end
-      end
-      -- invoke_chiji_the_red_crane
-      if S.InvokeChiJiTheRedCrane:IsCastable() and HL.BossFilteredFightRemains(">", 25) then
-        if HR.Cast(S.InvokeChiJiTheRedCrane, Settings.Mistweaver.GCDasOffGCD.InvokeChiJiTheRedCrane) then return "Invoke Chi-Ji the Red Crane"; end
-      end
-      -- thunder_focus_tea
-      if S.ThunderFocusTea:IsCastable() and EnemiesCount8 < 3 then
-        if HR.Cast(S.ThunderFocusTea, Settings.Mistweaver.OffGCDasOffGCD.ThunderFocusTea) then return "Thunder Focus Tea"; end
-      end
-      -- renewing_mist
-      if S.RenewingMist:IsCastable() then
-        if HR.Cast(S.RenewingMist, Settings.Mistweaver.GCDasOffGCD.RenewingMist) then return "Renewing Mist"; end
-      end
-      -- Defensives
-      if (true) then
-        local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
-      end
-      -- use_item
-      if (Settings.Commons.UseTrinkets) then
-        if (true) then
-          local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
-        end
+        if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Covenant) then return "bonedust_brew main 24"; end
       end
     end
-    if (HR.AoEON() and (EnemiesCount8 >=3)) then
-      -- spinning_crane_kick
-      if S.SpinningCraneKick:IsCastable() then
-        if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick 1"; end
-      end
-      -- chi_burst
-      if S.ChiBurst:IsCastable() then
-        if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "Chi Burst AoE"; end
-      end
-      -- chi_wave
-      if S.ChiWave:IsCastable() then
-        if HR.Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "Chi Wave AoE"; end
-      end
+    -- fleshcraft,if=soulbind.lead_by_example.enabled
+    if S.Fleshcraft:IsCastable() and (S.LeadByExample:SoulbindEnabled()) then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft main 26"; end
     end
-    if EnemiesCount8 < 3 or (not HR.AoEON()) then
-      -- rising_sun_kick
-      if S.RisingSunKick:IsCastable() then
-        if HR.Cast(S.RisingSunKick, nil, nil, not Target:IsSpellInRange(S.RisingSunKick)) then return "Rising Sun Kick"; end
-      end
-      -- blackout_strike,if=buff.teachings_of_the_monastery.stack=1&cooldown.rising_sun_kick.remains<12
-      if S.BlackoutKick:IsCastable() and Player:BuffStack(S.TeachingsOfTheMonasteryBuff) >= 1 and S.RisingSunKick:CooldownRemains() < 12 then
-        if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
-      end
-      -- chi_burst
-      if S.ChiBurst:IsCastable() then
-        if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "Chi Burst Single Target"; end
-      end
-      -- chi_wave
-      if S.ChiWave:IsCastable() then
-        if HR.Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "Chi Wave Single Target"; end
-      end
-    -- tiger_palm,if=buff.teachings_of_the_monastery.stack<3|buff.teachings_of_the_monastery.remains<2
-    if S.TigerPalm:IsCastable() and Player:BuffStack(S.TeachingsOfTheMonasteryBuff) < 3 or Player:BuffRemains(S.TeachingsOfTheMonasteryBuff) < 2 then
-      if HR.Cast(S.TigerPalm, nil, nil, not Target:IsSpellInRange(S.TigerPalm)) then return "Tiger Palm 1"; end
+    -- call_action_list,name=aoe,if=active_enemies>=3
+    if (EnemiesCount8 >= 3) then
+      local ShouldReturn = AOE(); if ShouldReturn then return ShouldReturn; end
     end
+    -- call_action_list,name=st,if=active_enemies<3
+    if (EnemiesCount8 < 3) then
+      local ShouldReturn = ST(); if ShouldReturn then return ShouldReturn; end
     end
     -- Manually added Pool filler
-    if HR.Cast(S.PoolEnergy) and not Settings.Mistweaver.NoMistweaverPooling then return "Pool Energy"; end
+    if Cast(S.PoolEnergy) and not Settings.Mistweaver.NoMistweaverPooling then return "Pool Energy"; end
   end
 end
 
 local function Init()
+  HR.Print("Mistweaver rotation is currently a work in progress, but has been updated for patch 9.1.")
 end
 
 HR.SetAPL(270, APL, Init)
-
--- Last Update: 2020-12-18
-
--- # Executed before combat begins. Accepts non-harmful actions only.
--- actions.precombat=flask
--- actions.precombat+=/food
--- actions.precombat+=/augmentation
--- actions.precombat+=/snapshot_stats
--- actions.precombat+=/potion
--- actions.precombat+=/chi_burst
--- actions.precombat+=/chi_wave
-
--- # Executed every time the actor is available.
--- actions=auto_attack
--- actions+=/use_item,name=skulkers_wing
--- actions+=/blood_fury,if=target.time_to_die<18
--- actions+=/berserking,if=target.time_to_die<18
--- actions+=/arcane_torrent,if=chi.max-chi>=1&target.time_to_die<18
--- actions+=/lights_judgment,if=target.time_to_die<18
--- actions+=/fireblood,if=target.time_to_die<18
--- actions+=/ancestral_call,if=target.time_to_die<18
--- actions+=/bag_of_tricks,if=target.time_to_die<18
--- actions+=/potion
--- actions+=/run_action_list,name=aoe,if=active_enemies>=3
--- actions+=/call_action_list,name=st,if=active_enemies<3
--- actions+=/weapons_of_order
--- actions+=/faeline_stomp
--- actions+=/fallen_order
--- actions+=/bonedust_brew
-
--- actions.aoe=spinning_crane_kick
--- actions.aoe+=/chi_wave
--- actions.aoe+=/chi_burst
-
--- actions.st=thunder_focus_tea
--- actions.st+=/rising_sun_kick
--- actions.st+=/blackout_kick,if=buff.teachings_of_the_monastery.stack=1&cooldown.rising_sun_kick.remains<12
--- actions.st+=/chi_wave
--- actions.st+=/chi_burst
--- actions.st+=/tiger_palm,if=buff.teachings_of_the_monastery.stack<3|buff.teachings_of_the_monastery.remains<2
-
