@@ -17,6 +17,7 @@ local C_Timer = C_Timer
 local tableremove = table.remove
 local tableinsert = table.insert
 -- File Locals
+local SpecID = Cache.Persistent.Player.Spec[1]
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
@@ -82,6 +83,7 @@ local tableinsert = table.insert
 
 -- Stagger Tracker
 local StaggerSpellID = 115069
+local StaggerDoTID = 124255
 local BobandWeave = Spell(280515)
 local StaggerFull = 0
 local StaggerDamage = {}
@@ -94,7 +96,6 @@ local function RegisterStaggerFullAbsorb(Amount)
 end
 
 local function RegisterStaggerDamageTaken(Amount)
-  if Amount == nil or Amount == 0 then return false end
   if #StaggerDamage == 10 then
     tableremove(StaggerDamage, 10)
   end
@@ -102,7 +103,6 @@ local function RegisterStaggerDamageTaken(Amount)
 end
 
 local function RegisterIncomingDamageTaken(Amount)
-  if Amount == nil or Amount == 0 then return false end
   if #IncomingDamage > 0 then
     while IncomingDamage[#IncomingDamage][1] < HL.CombatTime() - 6 do
       tableremove(IncomingDamage, #IncomingDamage)
@@ -140,21 +140,14 @@ end
 HL:RegisterForCombatEvent(
   function (...)
     local args = {...}
-
     -- Absorb is coming from a spell damage
     if #args == 23 then
-      -- 1          2      3           4           5           6            7                8         9         10         11             12             13               14                 15                16                17                 18                     19       20         21           22
-      -- TimeStamp, Event, HideCaster, SourceGUID, SourceName, SourceFlags, SourceRaidFlags, DestGUID, DestName, DestFlags, DestRaidFlags, AbsorbSpellId, AbsorbSpellName, AbsorbSpellSchool, AbsorbSourceGUID, AbsorbSourceName, AbsorbSourceFlags, AbsorbSourceRaidFlags, SpellID, SpellName, SpellSchool, Amount
       local _, _, _, _, _, _, _, DestGUID, _, _, _, _, _, _, _, _, _, _, SpellID, _, _, Amount = ...
-
       if DestGUID == Player:GUID() and SpellID == StaggerSpellID then
         RegisterStaggerFullAbsorb(Amount)
       end
     else
-      -- 1          2      3           4           5           6            7                8         9         10         11             12                13                14                 15                     16       17         18           19
-      -- TimeStamp, Event, HideCaster, SourceGUID, SourceName, SourceFlags, SourceRaidFlags, DestGUID, DestName, DestFlags, DestRaidFlags, AbsorbSourceGUID, AbsorbSourceName, AbsorbSourceFlags, AbsorbSourceRaidFlags, SpellID, SpellName, SpellSchool, Amount
       local _, _, _, _, _, _, _, DestGUID, _, _, _, _, _, _, _, SpellID, _, _, Amount = ...
-
       if DestGUID == Player:GUID() and SpellID == StaggerSpellID then
         RegisterStaggerFullAbsorb(Amount)
       end
@@ -166,7 +159,7 @@ HL:RegisterForCombatEvent(
 HL:RegisterForCombatEvent(
   function(...)
     local _, _, _, _, _, _, _, DestGUID, _, _, _, SpellID, _, _, Amount = ...
-    if DestGUID == Player:GUID() and SpellID == 124255 then
+    if DestGUID == Player:GUID() and SpellID == StaggerDoTID and Amount > 0 then
       RegisterStaggerDamageTaken(Amount)
     end
   end
@@ -176,7 +169,7 @@ HL:RegisterForCombatEvent(
 HL:RegisterForCombatEvent(
   function(...)
     local _, _, _, _, _, _, _, DestGUID, _, _, _, _, _, _, Amount = ...
-    if DestGUID == Player:GUID() then
+    if SpecID == 268 and DestGUID == Player:GUID() and Amount > 0 then
       RegisterIncomingDamageTaken(Amount)
     end
   end
@@ -187,11 +180,15 @@ HL:RegisterForCombatEvent(
 
 HL:RegisterForEvent(
   function()
-    for i=0, #StaggerDamage do
-      StaggerDamage[i]=nil
+    if #StaggerDamage > 0 then
+      for i=0, #StaggerDamage do
+        StaggerDamage[i]=nil
+      end
     end
-    for i=0, #IncomingDamage do
-      IncomingDamage[i]=nil
+    if #IncomingDamage > 0 then
+      for i=0, #IncomingDamage do
+        IncomingDamage[i]=nil
+      end
     end
   end
   , "PLAYER_REGEN_ENABLED"
