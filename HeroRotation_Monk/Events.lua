@@ -16,6 +16,8 @@ local Item = HL.Item
 local C_Timer = C_Timer
 local tableremove = table.remove
 local tableinsert = table.insert
+-- WoW API
+local GetTime = GetTime
 -- File Locals
 local SpecID = Cache.Persistent.Player.Spec[1]
 
@@ -104,11 +106,11 @@ end
 
 local function RegisterIncomingDamageTaken(Amount)
   if #IncomingDamage > 0 then
-    while IncomingDamage[#IncomingDamage][1] < HL.CombatTime() - 6 do
+    while IncomingDamage[#IncomingDamage][1] < GetTime() - 6 do
       tableremove(IncomingDamage, #IncomingDamage)
     end
   end
-  tableinsert(IncomingDamage, 1, {HL.CombatTime(), Amount})
+  tableinsert(IncomingDamage, 1, {GetTime(), Amount})
 end
 
 function Player:StaggerFull()
@@ -130,7 +132,7 @@ function Player:IncomingDamageTaken(Milliseconds)
   local DamageTaken = 0
   local TimeOffset = Milliseconds / 1000
   for i=1, #IncomingDamage do
-    if IncomingDamage[i][1] > HL.CombatTime() - TimeOffset then
+    if IncomingDamage[i][1] > GetTime() - TimeOffset then
       DamageTaken = DamageTaken + IncomingDamage[i][2]
     end
   end
