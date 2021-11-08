@@ -214,6 +214,9 @@ Spell.Monk.Brewmaster = {
   WeaponsOfOrder               = Spell(310454),
   WeaponsOfOrderDebuff         = Spell(312106),
 
+  -- Soulbinds
+  PustuleEruption              = Spell(351094),
+
   -- Shadowlands Legendary
   CharredPassions              = Spell(338140),
   InvokersDelight              = Spell(338321),
