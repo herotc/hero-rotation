@@ -675,7 +675,7 @@ local function St()
     end
   end
   -- fists_of_fury,if=(raid_event.adds.in>cooldown.fists_of_fury.duration*0.8|raid_event.adds.up)&(energy.time_to_max>execute_time-1|chi.max-chi<=1|buff.storm_earth_and_fire.remains<execute_time+1)|fight_remains<execute_time+1
-  if S.FistsOfFury:IsReady() and (((EnergyTimeToMaxRounded() > (S.FistsOfFury:ExecuteTime() - 1)) or Player:ChiDeficit() <= 1 or (S.StormEarthAndFire.BuffRemains < (S.FistsOfFury:ExecuteTime() + 1))) or HL.BossFilteredFightRemains("<", (S.FistsOfFury:ExecuteTime() + 1))) then
+  if S.FistsOfFury:IsReady() and (((EnergyTimeToMaxRounded() > (S.FistsOfFury:ExecuteTime() - 1)) or Player:ChiDeficit() <= 1 or (Player:BuffRemains(S.StormEarthAndFireBuff) < (S.FistsOfFury:ExecuteTime() + 1))) or HL.BossFilteredFightRemains("<", (S.FistsOfFury:ExecuteTime() + 1))) then
     if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "Fists of Fury 810"; end
   end
   -- crackling_jade_lightning,if=buff.the_emperors_capacitor.stack>19&energy.time_to_max>execute_time-1&cooldown.rising_sun_kick.remains>execute_time|buff.the_emperors_capacitor.stack>14&(cooldown.serenity.remains<5&talent.serenity|cooldown.weapons_of_order.remains<5&covenant.kyrian|fight_remains<5)
