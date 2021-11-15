@@ -354,7 +354,7 @@ local function APL()
         if Cast(I.MacabreSheetMusic) then return "macabre_sheet_music trinkets main"; end
       end
       -- use_item,name=overwhelming_power_crystal,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<16|target.time_to_die>100)
-      if I.OverwhelmingPowerCrystal:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 16 or Target:TimeToDie() > 100)) then
+      if CDsON() and I.OverwhelmingPowerCrystal:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 16 or Target:TimeToDie() > 100)) then
         if Cast(I.OverwhelmingPowerCrystal) then return "overwhelming_power_crystal trinkets main"; end
       end
       -- use_item,name=instructors_divine_bell,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<10|target.time_to_die>95)
