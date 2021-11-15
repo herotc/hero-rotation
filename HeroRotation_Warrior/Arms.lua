@@ -252,7 +252,7 @@ local function Execute()
   end
   -- bladestorm,if=buff.deadly_calm.down&(rage<20|!runeforge.sinful_surge&rage<50)
   if CDsON() and S.Bladestorm:IsCastable() and (Player:BuffDown(S.DeadlyCalmBuff) and (Player:Rage() < 20 or not SinfulSurgeEquipped and Player:Rage() < 50)) then
-    if Cast(S.Bladestorm, nil, nil, not TargetInMeleeRange) then return "bladestorm execute 36"; end
+    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm execute 36"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
