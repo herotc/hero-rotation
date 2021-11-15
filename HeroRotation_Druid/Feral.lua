@@ -592,6 +592,10 @@ local function APL()
     if S.Prowl:IsCastable() then
       if Cast(S.Prowl) then return "prowl main 2"; end
     end
+    -- Defensive Usage
+    if S.Regrowth:IsCastable() and Player:HealthPercentage() <= Settings.Feral.RegrowthHP and Player:BuffRemains(S.PredatorySwiftnessBuff) >= 1 then
+      if Cast(S.Regrowth, Settings.Feral.GCDasOffGCD.Regrowth) then return "Cast Regrowth (Defensives)" end
+    end
     -- tigers_fury,if=buff.cat_form.down
     if S.TigersFury:IsCastable() and CDsON() and (Player:BuffDown(S.CatForm)) then
       if Cast(S.TigersFury, Settings.Feral.OffGCDasOffGCD.TigersFury) then return "tigers_fury main 4"; end
@@ -712,7 +716,7 @@ end
 local function OnInit()
   S.RipDebuff:RegisterAuraTracking()
 
-  HR.Print("Feral Druid rotation is currently a work in progress, but has been updated for patch 9.1.")
+  HR.Print("Feral Druid rotation is currently a work in progress, but has been updated for patch 9.1.5")
 end
 
 HR.SetAPL(103, APL, OnInit)

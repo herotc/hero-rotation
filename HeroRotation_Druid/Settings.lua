@@ -57,11 +57,13 @@ HR.GUISettings.APL.Druid = {
     }
   },
   Feral = {
+    RegrowthHP = 60,
     FillerSpell = "Rake Non-Snapshot",
     ShowCatFormOOC = false,
     UseOwlweave = false,
     GCDasOffGCD = {
       BsInc = true,
+      Regrowth = true,
     },
     OffGCDasOffGCD = {
       SkullBash = true,
@@ -108,6 +110,7 @@ CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMoonkinFormO
 CreateARPanelOptions(CP_Balance, "APL.Druid.Balance")
 
 -- Feral
+CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RegrowthHP", {0, 100, 1}, "Regrowth HP", "Set the Regrowth HP threshold.")
 CreatePanelOption("Dropdown", CP_Feral, "APL.Druid.Feral.FillerSpell", {"Shred", "Rake Non-Snapshot", "Rake Snapshot", "Moonfire", "Swipe"}, "Preferred Filler Spell", "Select which spell to use as your filler spell. The SimC APL default is Rake Non-Snapshot.")
 CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.ShowCatFormOOC", "Show Cat Form Out of Combat", "Enable this if you want the addon to show you the Cat Form reminder out of combat.")
 CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.UseOwlweave", "Utilize Owleaving", "Enable this if you want Owlweaving spell suggestions when talented into Balance Affinity.")

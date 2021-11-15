@@ -102,7 +102,7 @@ Spell.Druid.Feral = {
   Berserking                            = Spell(26297),
   Shadowmeld                            = Spell(58984),
 
-  -- Abilties
+  -- Abilities
   Barkskin                              = Spell(22812),
   Berserk                               = Spell(106951),
   CatForm                               = Spell(768),
@@ -171,6 +171,12 @@ Spell.Druid.Feral = {
   ApexPredatorsCravingBuff              = Spell(339140),
 
   -- Item Effects
+
+  -- Proc
+  PredatorySwiftnessBuff                = Spell(69369),
+
+  -- Defensive
+  Regrowth                              = Spell(8936),
 
   -- Custom
   Pool                                  = Spell(999910)
