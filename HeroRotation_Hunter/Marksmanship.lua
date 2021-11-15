@@ -190,13 +190,10 @@ local function Precombat()
     if S.TarTrap:IsReady() and SoulForgeEmbersEquipped then
       if Cast(S.TarTrap) then return "tar_trap soulforge_embers equipped opener"; end
     end
-    -- variable,name=etf_precast,value=0
     -- double_tap,precast_time=10,if=active_enemies>1|!covenant.kyrian&!talent.volley|variable.etf_precast
     if S.DoubleTap:IsReady() and (EnemiesCount10ySplash > 1 or CovenantID ~= 1 and not S.Volley:IsAvailable()) then
       if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap opener"; end
     end
-    -- trueshot,precast_etf_equip=1,precast_time=2,if=variable.etf_precast
-    -- Note: The above line and etf_precast variable could be added as a settings option in the future
     -- aimed_shot,if=active_enemies<3&(!covenant.kyrian&!talent.volley|active_enemies<2)&!variable.etf_precast
     if S.AimedShot:IsReady() and not Player:IsCasting(S.AimedShot) and (EnemiesCount10ySplash < 3 and (CovenantID ~= 1 and (not S.Volley:IsAvailable()) or EnemiesCount10ySplash < 2)) then
       if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot opener"; end
