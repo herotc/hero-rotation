@@ -245,7 +245,8 @@ Item.Druid.Balance = {
   InscrutableQuantumDevice              = Item(179350),
   InstructorsDivineBell                 = Item(184842),
   ShadowedOrbofTorment                  = Item(186428),
-  SoullettingRuby                       = Item(178809)
+  SoullettingRuby                       = Item(178809),
+  OverflowingAnimaCage                  = Item(178849)
   -- Other "On-Use"
 }
 
