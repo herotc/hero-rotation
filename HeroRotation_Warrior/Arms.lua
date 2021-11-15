@@ -94,7 +94,7 @@ local function Precombat()
       if S.ColossusSmash:IsCastable() then
         if Cast(S.ColossusSmash) then return "colossus_smash precombat 8"; end
       end
-      if S.Warbreaker:IsCastable() then
+      if S.Warbreaker:IsCastable() and CDsON() then
         if Cast(S.Warbreaker) then return "warbreaker precombat 10"; end
       end
       if S.Overpower:IsCastable() then
@@ -118,10 +118,10 @@ local function Hac()
     if S.Avatar:IsCastable() and (S.ColossusSmash:CooldownRemains() < 1) then
       if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar hac 6"; end
     end
-  end
-  -- warbreaker
-  if S.Warbreaker:IsCastable() then
-    if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker hac 8"; end
+    -- warbreaker
+    if S.Warbreaker:IsCastable() then
+      if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker hac 8"; end
+    end
   end
   -- colossus_smash
   if S.ColossusSmash:IsCastable() then
@@ -209,7 +209,7 @@ local function Execute()
     if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend execute 14"; end
   end
   -- warbreaker
-  if S.Warbreaker:IsCastable() then
+  if S.Warbreaker:IsCastable() and CDsON() then
     if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker execute 16"; end
   end
   -- colossus_smash
@@ -286,7 +286,7 @@ local function SingleTarget()
     if Cast(S.Ravager, nil, nil, not Target:IsInRange(40)) then return "ravager single_target 8"; end
   end
   -- warbreaker
-  if S.Warbreaker:IsCastable() then
+  if CDsON() and S.Warbreaker:IsCastable() then
     if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker single_target 10"; end
   end
   -- colossus_smash
