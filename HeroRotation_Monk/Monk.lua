@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
-  -- Addon
-  local addonName, addonTable = ...
+-- Addon
+local addonName, addonTable = ...
 -- HeroDBC
 local DBC = HeroDBC.DBC
 -- HeroLib
