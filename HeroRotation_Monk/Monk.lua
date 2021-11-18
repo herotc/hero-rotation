@@ -216,6 +216,7 @@ Spell.Monk.Brewmaster = {
 
   -- Soulbinds
   PustuleEruption              = Spell(351094),
+  VolatileSolvent              = Spell(323074),
 
   -- Shadowlands Legendary
   CharredPassions              = Spell(338140),
