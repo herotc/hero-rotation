@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
-  -- Addon
-  local addonName, addonTable = ...
+-- Addon
+local addonName, addonTable = ...
 -- HeroDBC
 local DBC = HeroDBC.DBC
 -- HeroLib
@@ -216,6 +216,7 @@ Spell.Monk.Brewmaster = {
 
   -- Soulbinds
   PustuleEruption              = Spell(351094),
+  VolatileSolvent              = Spell(323074),
 
   -- Shadowlands Legendary
   CharredPassions              = Spell(338140),

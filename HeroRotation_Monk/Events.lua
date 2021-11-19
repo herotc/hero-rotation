@@ -19,7 +19,6 @@ local tableinsert = table.insert
 -- WoW API
 local GetTime = GetTime
 -- File Locals
-local SpecID = Cache.Persistent.Player.Spec[1]
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
@@ -171,7 +170,7 @@ HL:RegisterForCombatEvent(
 HL:RegisterForCombatEvent(
   function(...)
     local _, _, _, _, _, _, _, DestGUID, _, _, _, _, _, _, Amount = ...
-    if SpecID == 268 and DestGUID == Player:GUID() and Amount > 0 then
+    if Cache.Persistent.Player.Spec[1] == 268 and DestGUID == Player:GUID() and Amount ~= nil and Amount > 0 then
       RegisterIncomingDamageTaken(Amount)
     end
   end
