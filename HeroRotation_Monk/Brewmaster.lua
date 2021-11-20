@@ -194,7 +194,7 @@ local function APL()
     -- Note: Handled via Defensives()
     -- potion
     if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
-      if Cast(S.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
+      if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
     end
     if CDsON() then
       -- blood_fury
