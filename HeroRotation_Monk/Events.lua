@@ -104,10 +104,8 @@ local function RegisterStaggerDamageTaken(Amount)
 end
 
 local function RegisterIncomingDamageTaken(Amount)
-  if #IncomingDamage > 0 then
-    while IncomingDamage[#IncomingDamage][1] < GetTime() - 6 do
-      tableremove(IncomingDamage, #IncomingDamage)
-    end
+  while #IncomingDamage > 0 and IncomingDamage[#IncomingDamage][1] < GetTime() - 6 do
+    tableremove(IncomingDamage, #IncomingDamage)
   end
   tableinsert(IncomingDamage, 1, {GetTime(), Amount})
 end
