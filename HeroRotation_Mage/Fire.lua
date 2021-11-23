@@ -117,6 +117,7 @@ local FirestormEquipped = Player:HasLegendaryEquipped(11)
 local MoltenSkyfallEquipped = Player:HasLegendaryEquipped(12)
 local SunKingsBlessingEquipped = Player:HasLegendaryEquipped(13)
 local DeathFathomEquipped = Player:HasLegendaryEquipped(221)
+local SinfulDelightEquipped = Player:HasLegendaryEquipped(222)
 
 -- Player Covenant
 -- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
@@ -137,6 +138,7 @@ HL:RegisterForEvent(function()
   MoltenSkyfallEquipped = Player:HasLegendaryEquipped(12)
   SunKingsBlessingEquipped = Player:HasLegendaryEquipped(13)
   DeathFathomEquipped = Player:HasLegendaryEquipped(221)
+  SinfulDelightEquipped = Player:HasLegendaryEquipped(222)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -678,8 +680,8 @@ local function RoPPhase()
   if S.Pyroblast:IsReady() and ((Player:IsCasting(S.Scorch) or Player:PrevGCD(1, S.Scorch)) and Player:BuffUp(S.HeatingUpBuff) and var_searing_touch_active and EnemiesCount8ySplash < var_hot_streak_flamestrike) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 11"; end
   end
-  -- phoenix_flames,if=!variable.phoenix_pooling&buff.heating_up.react&!buff.hot_streak.react&(active_dot.ignite<2|active_enemies>=variable.hard_cast_flamestrike|active_enemies>=variable.hot_streak_flamestrike)
-  if S.PhoenixFlames:IsCastable() and (not var_phoenix_pooling and Player:BuffUp(S.HeatingUpBuff) and Player:BuffDown(S.HotStreakBuff) and (UnitsWithIgniteCount < 2 or EnemiesCount8ySplash >= var_hard_cast_flamestrike or EnemiesCount8ySplash >= var_hot_streak_flamestrike)) then
+  -- phoenix_flames,if=!variable.phoenix_pooling&(active_dot.ignite<2|active_enemies>=variable.hard_cast_flamestrike|active_enemies>=variable.hot_streak_flamestrike)
+  if S.PhoenixFlames:IsCastable() and (not var_phoenix_pooling and (UnitsWithIgniteCount < 2 or EnemiesCount8ySplash >= var_hard_cast_flamestrike or EnemiesCount8ySplash >= var_hot_streak_flamestrike)) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames rop_phase 12"; end
   end
   -- scorch,if=searing_touch.active
@@ -889,7 +891,11 @@ local function APL()
     end
     -- mirrors_of_torment,if=variable.time_to_combustion<variable.combustion_precast_time+execute_time&buff.combustion.down
     if S.MirrorsofTorment:IsCastable() and CDsON() and (var_time_to_combustion < var_combustion_precast_time + S.MirrorsofTorment:ExecuteTime() and Player:BuffDown(S.CombustionBuff)) then
-      if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "mirrors_of_torment default 11"; end
+      if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "mirrors_of_torment default 11a"; end
+    end
+    -- mirrors_of_torment,if=variable.time_to_combustion>cooldown-30*runeforge.sinful_delight
+    if S.MirrorsofTorment:IsCastable() and CDsON() and (var_time_to_combustion > 90 - 30 * num(SinfulDelightEquipped)) then
+      if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "mirrors_of_torment default 11b"; end
     end
     -- fire_blast,use_while_casting=1,if=action.mirrors_of_torment.executing&full_recharge_time-action.mirrors_of_torment.execute_remains<4&!hot_streak_spells_in_flight&!buff.hot_streak.react
     if S.FireBlast:IsReady() and Player:IsCasting(S.MirrorsofTorment) and S.FireBlast:FullRechargeTime() - S.MirrorsofTorment:ExecuteTime() < 4 and not (S.Fireball:InFlight() or Player:IsCasting(S.Fireball) or Player:IsCasting(S.Scorch) or S.PhoenixFlames:InFlight()) and Player:BuffDown(S.HotStreakBuff) then
