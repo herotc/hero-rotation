@@ -288,6 +288,7 @@ Item.Mage.Arcane = {
   GlyphofAssimilation              = Item(184021),
   InscrutableQuantumDevice         = Item(179350),
   MacabreSheetMusic                = Item(184024),
+  MoonlitPrism                     = Item(137541),
   SinfulGladiatorsBadge            = Item(175921),
   SoulIgniter                      = Item(184019),
   SoullettingRuby                  = Item(178809),
