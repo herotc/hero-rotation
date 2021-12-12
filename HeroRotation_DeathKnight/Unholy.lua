@@ -339,11 +339,11 @@ local function Cooldowns()
   end
   -- unholy_blight,if=variable.st_planning&(cooldown.apocalypse.remains_expected<5|cooldown.apocalypse.remains_expected>10)&(cooldown.dark_transformation.remains<gcd|buff.dark_transformation.up)
   if S.UnholyBlight:IsReady() and (VarSTPlanning and (S.Apocalypse:CooldownRemains() < 5 or S.Apocalypse:CooldownRemains() > 10) and (S.DarkTransformation:CooldownRemains() < Player:GCD() or Pet:BuffUp(S.DarkTransformation))) then
-    if Cast(S.UnholyBlight, nil, nil, not Target:IsInRange(8)) then return "unholy_blight cooldowns 8"; end
+    if Cast(S.UnholyBlight, Settings.Unholy.GCDasOffGCD.UnholyBlight, nil, not Target:IsInRange(8)) then return "unholy_blight cooldowns 8"; end
   end
   -- unholy_blight,if=variable.adds_remain|fight_remains<21
   if S.UnholyBlight:IsReady() and (VarAddsRemain or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
-    if Cast(S.UnholyBlight, nil, nil, not Target:IsInRange(8)) then return "unholy_blight cooldowns 10"; end
+    if Cast(S.UnholyBlight, Settings.Unholy.GCDasOffGCD.UnholyBlight, nil, not Target:IsInRange(8)) then return "unholy_blight cooldowns 10"; end
   end
   -- dark_transformation,if=variable.st_planning&(dot.unholy_blight_dot.remains|!talent.unholy_blight)
   if S.DarkTransformation:IsCastable() and (VarSTPlanning and (Target:DebuffUp(S.UnholyBlightDebuff) or not S.UnholyBlight:IsAvailable())) then
