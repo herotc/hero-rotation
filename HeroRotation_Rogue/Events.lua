@@ -284,12 +284,19 @@ do
   }
   -- Return Time to x-th auto attack since last proc
   function Rogue.TimeToSht(Hit)
+    if ShadowTechniques.Counter >= Hit then
+      return 0
+    end
+
     local MHSpeed, OHSpeed = UnitAttackSpeed("player")
+    -- Generate the base time to use, if we are out of range this is set to the current time
+    local LastMH = mathmax(ShadowTechniques.LastMH + MHSpeed, GetTime())
+    local LastOH = mathmax(ShadowTechniques.LastOH + OHSpeed, GetTime())
 
     local AATable = {}
-    for i = 1, 5 do
-      tableinsert(AATable, ShadowTechniques.LastMH + i * MHSpeed)
-      tableinsert(AATable, ShadowTechniques.LastOH + i * OHSpeed)
+    for i = 0, 2 do
+      tableinsert(AATable, LastMH + i * MHSpeed)
+      tableinsert(AATable, LastOH + i * OHSpeed)
     end
     table.sort(AATable)
 

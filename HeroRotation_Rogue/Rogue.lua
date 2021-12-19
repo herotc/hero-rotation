@@ -14,6 +14,7 @@ local MouseOver  = Unit.MouseOver
 local Spell      = HL.Spell
 local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
+local MergeTableByKey = HL.Utils.MergeTableByKey
 -- HeroRotation
 local HR = HeroRotation
 local Everyone = HR.Commons.Everyone
@@ -39,7 +40,8 @@ local Settings = {
 
 -- Spells
 if not Spell.Rogue then Spell.Rogue = {} end
-Spell.Rogue.Assassination = {
+
+Spell.Rogue.Commons = {
   -- Racials
   AncestralCall           = Spell(274738),
   ArcanePulse             = Spell(260364),
@@ -50,6 +52,51 @@ Spell.Rogue.Assassination = {
   Fireblood               = Spell(265221),
   LightsJudgment          = Spell(255647),
   Shadowmeld              = Spell(58984),
+  -- Defensive
+  CloakofShadows          = Spell(31224),
+  CrimsonVial             = Spell(185311),
+  Evasion                 = Spell(5277),
+  Feint                   = Spell(1966),
+  -- Utility
+  Blind                   = Spell(2094),
+  CheapShot               = Spell(1833),
+  Kick                    = Spell(1766),
+  KidneyShot              = Spell(408),
+  Sap                     = Spell(6770),
+  Shadowstep              = Spell(36554),
+  Sprint                  = Spell(2983),
+  TricksoftheTrade        = Spell(57934),
+  -- Legendaries (Shadowlands)
+  MasterAssassinsMark     = Spell(340094),
+  -- Covenants (Shadowlands)
+  EchoingReprimand        = Spell(323547),
+  EchoingReprimand2       = Spell(323558),
+  EchoingReprimand3       = Spell(323559),
+  EchoingReprimand4       = Spell(323560),
+  EchoingReprimand5       = Spell(354838),
+  Flagellation            = Spell(323654),
+  FlagellationBuff        = Spell(345569),
+  Fleshcraft              = Spell(324631),
+  Sepsis                  = Spell(328305),
+  SepsisBuff              = Spell(347037),
+  SerratedBoneSpike       = Spell(328547),
+  SerratedBoneSpikeDebuff = Spell(324073),
+  -- Soulbinds/Conduits (Shadowlands)
+  KevinsOozeling          = Spell(352110),
+  KevinsWrathDebuff       = Spell(352528),
+  LeadbyExample           = Spell(342156),
+  LeadbyExampleBuff       = Spell(342181),
+  MarrowedGemstoneBuff    = Spell(327069),
+  PustuleEruption         = Spell(351094),
+  VolatileSolvent         = Spell(323074),
+  -- Domination Shards
+  ChaosBaneBuff           = Spell(355829),
+  -- Misc
+  PoolEnergy              = Spell(999910),
+  SinfulRevelationDebuff  = Spell(324260),
+}
+
+Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   -- Abilities
   Ambush                  = Spell(8676),
   DeadlyPoison            = Spell(2823),
@@ -87,57 +134,14 @@ Spell.Rogue.Assassination = {
   Subterfuge              = Spell(108208),
   SubterfugeBuff          = Spell(115192),
   VenomRush               = Spell(152152),
-  -- Defensive
-  CloakofShadows          = Spell(31224),
-  CrimsonVial             = Spell(185311),
-  Evasion                 = Spell(5277),
-  Feint                   = Spell(1966),
-  -- Utility
-  Blind                   = Spell(2094),
-  CheapShot               = Spell(1833),
-  Kick                    = Spell(1766),
-  KidneyShot              = Spell(408),
-  Sap                     = Spell(6770),
-  Shadowstep              = Spell(36554),
-  Sprint                  = Spell(2983),
-  TricksoftheTrade        = Spell(57934),
   -- PvP
   DeathfromAbove          = Spell(269513),
   Maneuverability         = Spell(197000),
   Neurotoxin              = Spell(206328),
   SmokeBomb               = Spell(212182),
-  -- Trinkets
-  -- Covenants (Shadowlands)
-  EchoingReprimand        = Spell(323547),
-  Flagellation            = Spell(323654),
-  FlagellationBuff        = Spell(345569),
-  Fleshcraft              = Spell(324631),
-  Sepsis                  = Spell(328305),
-  SepsisBuff              = Spell(347037),
-  SerratedBoneSpike       = Spell(328547),
-  SerratedBoneSpikeDebuff = Spell(324073),
-  -- Soulbinds/Conduits (Shadowlands)
-  LeadbyExample           = Spell(342156),
-  LeadbyExampleBuff       = Spell(342181),
-  MarrowedGemstoneBuff    = Spell(327069),
-  PustuleEruption         = Spell(351094),
-  VolatileSolvent         = Spell(323074),
-  -- Legendaries (Shadowlands)
-  -- Misc
-  PoolEnergy              = Spell(999910),
-}
+})
 
-Spell.Rogue.Outlaw = {
-  -- Racials
-  AncestralCall           = Spell(274738),
-  ArcanePulse             = Spell(260364),
-  ArcaneTorrent           = Spell(25046),
-  BagofTricks             = Spell(312411),
-  Berserking              = Spell(26297),
-  BloodFury               = Spell(20572),
-  Fireblood               = Spell(265221),
-  LightsJudgment          = Spell(255647),
-  Shadowmeld              = Spell(58984),
+Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   -- Abilities
   AdrenalineRush          = Spell(13750),
   Ambush                  = Spell(8676),
@@ -166,21 +170,8 @@ Spell.Rogue.Outlaw = {
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
   QuickDraw               = Spell(196938),
-  -- Defensive
-  CloakofShadows          = Spell(31224),
-  CrimsonVial             = Spell(185311),
-  Evasion                 = Spell(5277),
-  Feint                   = Spell(1966),
   -- Utility
-  Blind                   = Spell(2094),
-  CheapShot               = Spell(1833),
   Gouge                   = Spell(1776),
-  GrapplingHook           = Spell(195457),
-  Kick                    = Spell(1766),
-  KidneyShot              = Spell(408),
-  Sap                     = Spell(6770),
-  Sprint                  = Spell(2983),
-  TricksoftheTrade        = Spell(57934),
   -- PvP
   DeathfromAbove          = Spell(269513),
   Dismantle               = Spell(207777),
@@ -195,16 +186,6 @@ Spell.Rogue.Outlaw = {
   RuthlessPrecision       = Spell(193357),
   SkullandCrossbones      = Spell(199603),
   TrueBearing             = Spell(193359),
-  -- Trinkets
-  -- Covenants (Shadowlands)
-  EchoingReprimand        = Spell(323547),
-  Flagellation            = Spell(323654),
-  FlagellationBuff        = Spell(345569),
-  Fleshcraft              = Spell(324631),
-  Sepsis                  = Spell(328305),
-  SepsisBuff              = Spell(347037),
-  SerratedBoneSpike       = Spell(328547),
-  SerratedBoneSpikeDebuff = Spell(324073),
   -- Soulbinds/Conduits (Shadowlands)
   Ambidexterity           = Spell(341542),
   CountTheOdds            = Spell(341546),
@@ -212,13 +193,9 @@ Spell.Rogue.Outlaw = {
   ConcealedBlunderbuss    = Spell(340587),
   DeathlyShadowsBuff      = Spell(341202),
   GreenskinsWickers       = Spell(340573),
-  MasterAssassinsMark     = Spell(340094),
-  -- Misc
-  PoolEnergy              = Spell(999910),
-  SinfulRevelationDebuff  = Spell(324260),
-}
+})
 
-Spell.Rogue.Subtlety = {
+Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
   -- Racials
   AncestralCall           = Spell(274738),
   ArcanePulse             = Spell(260364),
@@ -270,20 +247,6 @@ Spell.Rogue.Subtlety = {
   Subterfuge              = Spell(108208),
   Vigor                   = Spell(14983),
   Weaponmaster            = Spell(193537),
-  -- Defensive
-  CloakofShadows          = Spell(31224),
-  CrimsonVial             = Spell(185311),
-  Evasion                 = Spell(5277),
-  Feint                   = Spell(1966),
-  -- Utility
-  Blind                   = Spell(2094),
-  CheapShot               = Spell(1833),
-  Kick                    = Spell(1766),
-  KidneyShot              = Spell(408),
-  Sap                     = Spell(6770),
-  Shadowstep              = Spell(36554),
-  Sprint                  = Spell(2983),
-  TricksoftheTrade        = Spell(57934),
   -- PvP
   ColdBlood               = Spell(213981),
   DeathfromAbove          = Spell(269513),
@@ -291,37 +254,16 @@ Spell.Rogue.Subtlety = {
   ShadowyDuel             = Spell(207736),
   SmokeBomb               = Spell(212182),
   VeilofMidnight          = Spell(198952),
-  -- Trinkets
-  -- Covenants (Shadowlands)
-  EchoingReprimand        = Spell(323547),
-  Flagellation            = Spell(323654),
-  FlagellationBuff        = Spell(345569),
-  Fleshcraft              = Spell(324631),
-  Sepsis                  = Spell(328305),
-  SepsisBuff              = Spell(347037),
-  SerratedBoneSpike       = Spell(328547),
-  SerratedBoneSpikeDebuff = Spell(324073),
   -- Soulbinds/Conduits (Shadowlands)
   DeeperDaggers           = Spell(341549),
-  KevinsOozeling          = Spell(352110),
-  KevinsWrathDebuff       = Spell(352528),
-  LeadbyExample           = Spell(342156),
-  LeadbyExampleBuff       = Spell(342181),
   PerforatedVeinsBuff     = Spell(341572),
-  PustuleEruption         = Spell(351094),
-  VolatileSolvent         = Spell(323074),
   -- Legendaries (Shadowlands)
   DeathlyShadowsBuff      = Spell(341202),
   FinalityBlackPowder     = Spell(340603),
   FinalityEviscerate      = Spell(340600),
   FinalityRupture         = Spell(340601),
   TheRottenBuff           = Spell(341134),
-  -- Domination Shards
-  ChaosBaneBuff           = Spell(355829),
-  -- Misc
-  PoolEnergy              = Spell(999910),
-  SinfulRevelationDebuff  = Spell(324260),
-}
+})
 
 -- Items
 if not Item.Rogue then Item.Rogue = {} end
@@ -472,24 +414,25 @@ end
 
 -- "animacharged_cp"
 do
-  local ERCharge2 = Spell(323558)
-  local ERCharge3 = Spell(323559)
-  local ERCharge4 = Spell(323560)
-
   function Commons.AnimachargedCP()
-    if Player:BuffUp(ERCharge2) then
+    if Player:BuffUp(Spell.Rogue.Commons.EchoingReprimand2) then
       return 2
-    elseif Player:BuffUp(ERCharge3) then
+    elseif Player:BuffUp(Spell.Rogue.Commons.EchoingReprimand3) then
       return 3
-    elseif Player:BuffUp(ERCharge4) then
+    elseif Player:BuffUp(Spell.Rogue.Commons.EchoingReprimand4) then
       return 4
+    elseif Player:BuffUp(Spell.Rogue.Commons.EchoingReprimand5) then
+      return 5
     end
 
     return -1
   end
 
   function Commons.EffectiveComboPoints(ComboPoints)
-    if Commons.AnimachargedCP() == ComboPoints then
+    if ComboPoints == 2 and Player:BuffUp(Spell.Rogue.Commons.EchoingReprimand2)
+    or ComboPoints == 3 and Player:BuffUp(Spell.Rogue.Commons.EchoingReprimand3)
+    or ComboPoints == 4 and Player:BuffUp(Spell.Rogue.Commons.EchoingReprimand4)
+    or ComboPoints == 5 and Player:BuffUp(Spell.Rogue.Commons.EchoingReprimand5) then
       return 7
     end
     return ComboPoints
