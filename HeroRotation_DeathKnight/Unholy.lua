@@ -28,7 +28,7 @@ local tableinsert = table.insert
 
 -- Define S/I for spell and item arrays
 local S = Spell.DeathKnight.Unholy
-local I = Item.DeathKnight.Unholy
+local I = Item.DeathKnight.Commons
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
