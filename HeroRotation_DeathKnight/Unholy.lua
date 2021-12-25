@@ -645,7 +645,7 @@ local function APL()
     end
     -- Add pool resources icon if nothing else to do
     if (true) then
-      if Cast(S.PoolResources) then return "pool_resources"; end
+      if Cast(S.Pool) then return "pool_resources"; end
     end
   end
 end
