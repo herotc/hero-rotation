@@ -242,6 +242,7 @@ Spell.Mage.Frost = {
   RuneofPowerBuff                       = Spell(116014),
   Ebonbolt                              = Spell(257537), --splash, 8 (with splitting ice)
   FreezingRain                          = Spell(270233),
+  FreezingRainBuff                      = Spell(270232),
   SplittingIce                          = Spell(56377), --splash, 8
   CometStorm                            = Spell(153595), --splash, 6
   RayofFrost                            = Spell(205021),
