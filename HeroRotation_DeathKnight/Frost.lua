@@ -213,7 +213,7 @@ end
 
 -- HowlingBlast
 local function EvaluateCycleHowlingBlast(TargetUnit)
-  return (TargetUnit:DebuffRefreshable(S.FrostFeverDebuff))
+  return (TargetUnit:DebuffDown(S.FrostFeverDebuff))
 end
 
 local function Precombat()
@@ -765,7 +765,7 @@ local function APL()
     if S.RemorselessWinter:IsReady() and (S.Everfrost:ConduitEnabled() and S.GatheringStorm:IsAvailable() and not S.Obliteration:IsAvailable() and not S.PillarofFrost:CooldownUp()) then
       if Cast(S.RemorselessWinter, nil, nil, not TargetIsInRange[8]) then return "remorseless_winter main 2"; end
     end
-    -- howling_blast,target_if=dot.frost_fever.refreshable&(talent.icecap|!buff.breath_of_sindragosa.up&talent.breath_of_sindragosa|talent.obliteration&cooldown.pillar_of_frost.remains&!buff.killing_machine.up)
+    -- howling_blast,target_if=!dot.frost_fever.remains&(talent.icecap|!buff.breath_of_sindragosa.up&talent.breath_of_sindragosa|talent.obliteration&cooldown.pillar_of_frost.remains&!buff.killing_machine.up)
     if S.HowlingBlast:IsReady() and (S.Icecap:IsAvailable() or Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:IsAvailable() or S.Obliteration:IsAvailable() and S.PillarofFrost:CooldownDown() and Player:BuffDown(S.KillingMachineBuff)) then
       if Everyone.CastCycle(S.HowlingBlast, Enemies10yd, EvaluateCycleHowlingBlast, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast main 4"; end
     end
