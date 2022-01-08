@@ -366,19 +366,19 @@ local function CDSEF()
   end
   -- weapons_of_order,if=(raid_event.adds.in>45|raid_event.adds.up)&cooldown.rising_sun_kick.remains<execute_time
   if S.WeaponsOfOrder:IsReady() and S.RisingSunKick:CooldownRemains() < Player:GCD() then
-    if HR.Cast(S.WeaponsOfOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Weapons Of Order 406"; end
+    if HR.Cast(S.WeaponsOfOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "Weapons Of Order 406"; end
   end
   -- faeline_stomp,if=combo_strike&(raid_event.adds.in>10|raid_event.adds.up)
   if S.FaelineStomp:IsReady() and ComboStrike(S.FaelineStomp) then
-    if HR.Cast(S.FaelineStomp, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp 408"; end
+    if HR.Cast(S.FaelineStomp, nil, Settings.Commons.DisplayStyle.Covenant) then return "Faeline Stomp 408"; end
   end
   -- fallen_order,if=raid_event.adds.in>30|raid_event.adds.up
   if S.FallenOrder:IsReady() then
-    if HR.Cast(S.FallenOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp 410"; end
+    if HR.Cast(S.FallenOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "Faeline Stomp 410"; end
   end
   -- bonedust_brew,if=raid_event.adds.in>50|raid_event.adds.up,line_cd=60
   if S.BonedustBrew:IsReady() then
-    if HR.Cast(S.BonedustBrew, nil, Settings.Commons.CovenantDisplayStyle) then return "Bonedust Brew 412"; end
+    if HR.Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Covenant) then return "Bonedust Brew 412"; end
   end
   -- storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|fight_remains<20|(raid_event.adds.remains>15|!covenant.kyrian&((raid_event.adds.in>cooldown.storm_earth_and_fire.full_recharge_time|!raid_event.adds.exists)&(cooldown.invoke_xuen_the_white_tiger.remains>cooldown.storm_earth_and_fire.full_recharge_time|variable.hold_xuen))&cooldown.fists_of_fury.remains<=9&chi>=2&cooldown.whirling_dragon_punch.remains<=12)
   if S.StormEarthAndFire:IsReady() and (S.StormEarthAndFire:Charges() == 2 or HL.BossFilteredFightRemains("<", 20) or ((not S.WeaponsOfOrder:IsAvailable()) and ((S.InvokeXuenTheWhiteTiger:CooldownRemains() > S.StormEarthAndFire:FullRechargeTime()) or VarXuenHold) and (S.FistsOfFury:CooldownRemains() <= 9) and Player:Chi() >= 2 and S.WhirlingDragonPunch:CooldownRemains() <= 12)) then
@@ -471,19 +471,19 @@ local function CDSerenity()
   end
   -- weapons_of_order,if=cooldown.rising_sun_kick.remains<execute_time
   if S.WeaponsOfOrder:IsReady() and S.RisingSunKick:CooldownRemains() < Player:GCD() then
-    if HR.Cast(S.WeaponsOfOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Weapons Of Order 518"; end
+    if HR.Cast(S.WeaponsOfOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "Weapons Of Order 518"; end
   end
   -- faeline_stomp
   if S.FaelineStomp:IsReady() and ComboStrike(S.FaelineStomp) then
-    if HR.Cast(S.FaelineStomp, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp 520"; end
+    if HR.Cast(S.FaelineStomp, nil, Settings.Commons.DisplayStyle.Covenant) then return "Faeline Stomp 520"; end
   end
   -- fallen_order
   if S.FallenOrder:IsReady() then
-    if HR.Cast(S.FallenOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp 522"; end
+    if HR.Cast(S.FallenOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "Faeline Stomp 522"; end
   end
   -- bonedust_brew
   if S.BonedustBrew:IsReady() then
-    if HR.Cast(S.BonedustBrew, nil, Settings.Commons.CovenantDisplayStyle) then return "Bonedust Brew 524"; end
+    if HR.Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Covenant) then return "Bonedust Brew 524"; end
   end
   -- serenity,if=cooldown.rising_sun_kick.remains<2|fight_remains<15
   if S.Serenity:IsReady() and (S.RisingSunKick:CooldownRemains() < 2 or HL.BossFilteredFightRemains("<", 15)) then
