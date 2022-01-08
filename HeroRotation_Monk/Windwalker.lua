@@ -210,7 +210,7 @@ local function UseItems()
   -- use_items
   local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
   if TrinketToUse then
-    if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end
 end
 
@@ -388,7 +388,7 @@ local function CDSEF()
   if S.StormEarthAndFire:IsReady() and S.WeaponsOfOrder:IsAvailable() and (Player:BuffUp(S.WeaponsOfOrder) or ((HL.BossFilteredFightRemains("<", S.WeaponsOfOrder:CooldownRemains()) or (S.WeaponsOfOrder:CooldownRemains() > S.StormEarthAndFire:FullRechargeTime())) and S.FistsOfFury:CooldownRemains() <= 9 and Player:Chi() >= 2 and S.WhirlingDragonPunch:CooldownRemains() <= 12)) then
     if HR.Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthAndFire) then return "Storm Earth and Fire 416"; end
   end
-  if (Settings.Commons.UseTrinkets) then
+  if (Settings.Commons.Enabled.Trinkets) then
     if (true) then
       local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
     end
@@ -432,7 +432,7 @@ local function CDSerenity()
   if S.InvokeXuenTheWhiteTiger:IsReady() and ( not VarXuenHold or HL.BossFilteredFightRemains("<", 25)) then
     if HR.Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "Invoke Xuen the White Tiger 500"; end
   end
-  if (Settings.Commons.UseTrinkets) then
+  if (Settings.Commons.Enabled.Trinkets) then
     if (true) then
       local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
     end
@@ -500,7 +500,7 @@ local function Serenity()
   if S.FistsOfFury:IsReady() and Player:BuffRemains(S.SerenityBuff) < 1 then
     if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "Fists of Fury 600"; end
   end
-  if (Settings.Commons.UseTrinkets) then
+  if (Settings.Commons.Enabled.Trinkets) then
     if (true) then
       local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
     end
