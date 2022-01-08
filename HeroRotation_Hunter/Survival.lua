@@ -222,7 +222,7 @@ local function Precombat()
   end
   -- Manually added: harpoon
   if S.Harpoon:IsCastable() and (Player:BuffDown(S.AspectoftheEagle) or not Target:IsInRange(40)) then
-    if Cast(S.Harpoon, nil, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon precombat 14"; end
+    if Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon precombat 14"; end
   end
   -- Manually added: mongoose_bite or raptor_strike
   if Target:IsInMeleeRange(5) or (Player:BuffUp(S.AspectoftheEagle) and Target:IsInRange(40)) then
@@ -237,7 +237,7 @@ end
 local function CDs()
   -- harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
   if S.Harpoon:IsCastable() and (S.TermsofEngagement:IsAvailable() and Player:Focus() < Player:FocusMax()) then
-    if Cast(S.Harpoon, nil, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon cds 2"; end
+    if Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon cds 2"; end
   end
   if (Player:BuffUp(S.CoordinatedAssault)) then
     -- blood_fury,if=buff.coordinated_assault.up
