@@ -640,11 +640,10 @@ local function Stealth_CDs (EnergyThreshold)
   if ShD_Combo_Points() and Target:IsInMeleeRange(5) and S.ShadowDance:IsCastable() and S.ShadowDance:Charges() >= 1
     and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3
     and (HR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge - (not S.EnvelopingShadows:IsAvailable() and 0.75 or 0))) then
-    -- actions.stealth_cds+=/shadow_dance,if=variable.shd_combo_points&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)
     -- actions.stealth_cds+=/shadow_dance,if=variable.shd_combo_points&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|buff.chaos_bane.up|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)&(buff.perforated_veins.stack<4|spell_targets.shuriken_storm>2)
     if (ShD_Threshold() or Player:BuffRemains(S.SymbolsofDeath) >= 1.2 or Player:BuffUp(S.ChaosBaneBuff)
       or (MeleeEnemies10yCount >= 4 and S.SymbolsofDeath:CooldownRemains() > 10))
-      and (Player:BuffStack(S.PerforatedVeinsBuff) <= 4 or MeleeEnemies10yCount > 2) then
+      and (Player:BuffStack(S.PerforatedVeinsBuff) < 4 or MeleeEnemies10yCount > 2) then
       ShouldReturn = StealthMacro(S.ShadowDance, EnergyThreshold)
       if ShouldReturn then return "ShadowDance Macro 1 " .. ShouldReturn end
     end
@@ -726,14 +725,27 @@ local function APL ()
     MeleeEnemies10yCount = 0
     MeleeEnemies5y = {}
   end
-
+  
   -- Cache updates
   ComboPoints = Player:ComboPoints()
   EffectiveComboPoints = Rogue.EffectiveComboPoints(ComboPoints)
   ComboPointsDeficit = Player:ComboPointsDeficit()
-  RuptureThreshold = (4 + ComboPoints * 4) * 0.3
-  RuptureDMGThreshold = S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
   PriorityRotation = UsePriorityRotation()
+
+  -- Adjust Animacharged CP Prediction for Shadow Techniques
+  -- If we are on a non-optimal Animacharged CP, ignore it if the time to ShT is less than GCD + 500ms, unless the ER buff will expire soon
+  -- Reduces the risk of queued finishers into ShT procs for non-optimal CP amounts
+  if EffectiveComboPoints > ComboPoints and ComboPointsDeficit > 2 and S.EchoingReprimand:CooldownRemains() > 5 and Player:AffectingCombat() then
+    if ComboPoints == 2 and not Player:BuffUp(S.EchoingReprimand3)
+    or ComboPoints == 3 and not Player:BuffUp(S.EchoingReprimand4)
+    or ComboPoints == 4 and not Player:BuffUp(S.EchoingReprimand5) then
+      local TimeToSht = Rogue.TimeToSht(4)
+      if TimeToSht == 0 then TimeToSht = Rogue.TimeToSht(5) end
+      if TimeToSht < (mathmax(Player:EnergyTimeToX(35), Player:GCDRemains()) + 0.5) then
+        EffectiveComboPoints = ComboPoints
+      end
+    end
+  end
 
   -- Shuriken Tornado Combo Point Prediction
   if Player:BuffUp(S.ShurikenTornado, nil, true) and ComboPoints < Rogue.CPMaxSpend() then
@@ -747,6 +759,10 @@ local function APL ()
       end
     end
   end
+
+  -- Damage Cache updates (after EffectiveComboPoints adjustments)
+  RuptureThreshold = (4 + EffectiveComboPoints * 4) * 0.3
+  RuptureDMGThreshold = S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
 
   --- Defensives
   -- Crimson Vial
@@ -813,6 +829,14 @@ local function APL ()
     ShouldReturn = CDs()
     if ShouldReturn then return "CDs: " .. ShouldReturn end
 
+    -- # Apply Slice and Dice at 4+ CP if it expires within the next GCD or is not up
+    -- actions+=/slice_and_dice,if=target.time_to_die>6&buff.slice_and_dice.remains<gcd.max&combo_points>=4
+    if S.SliceandDice:IsCastable()
+      and HL.FilteredFightRemains(MeleeEnemies10y, ">", 6) and Player:BuffRemains(S.SliceandDice) < Player:GCD() and ComboPoints >= 4 then
+      if S.SliceandDice:IsReady() and HR.Cast(S.SliceandDice) then return "Cast Slice and Dice (Low Duration)" end
+      SetPoolingFinisher(S.SliceandDice)
+    end
+
     -- # Run fully switches to the Stealthed Rotation (by doing so, it forces pooling if nothing is available).
     -- actions+=/run_action_list,name=stealthed,if=stealthed.all
     if Player:StealthUp(true, true) then
@@ -832,15 +856,6 @@ local function APL ()
       end
       HR.Cast(S.PoolEnergy)
       return "Stealthed Pooling"
-    end
-
-    -- # Apply Slice and Dice at 2+ CP during the first 10 seconds, after that 4+ CP if it expires within the next GCD or is not up
-    -- actions+=/slice_and_dice,if=target.time_to_die>6&buff.slice_and_dice.remains<gcd.max&combo_points>=4-(time<10)*2
-    if S.SliceandDice:IsCastable()
-      and (Target:FilteredTimeToDie(">", 6) or Target:TimeToDieIsNotValid())
-      and Player:BuffRemains(S.SliceandDice) < Player:GCD() and ComboPoints >= 4 - (HL.CombatTime() < 10 and 2 or 0) then
-      if S.SliceandDice:IsReady() and HR.Cast(S.SliceandDice) then return "Cast Slice and Dice (Low Duration)" end
-      SetPoolingFinisher(S.SliceandDice)
     end
 
     -- actions+=/call_action_list,name=stealth_cds,if=variable.use_priority_rotation

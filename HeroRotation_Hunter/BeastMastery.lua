@@ -256,8 +256,8 @@ local function Cleave()
   if S.Stampede:IsCastable() and CDsON() and (Player:BuffUp(S.AspectoftheWildBuff) or Target:TimeToDie() < 15) then
     if Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, not TargetInRange30y) then return "stampede cleave 26"; end
   end
-  -- wailing_arrow
-  if S.WailingArrow:IsReady() and CDsON() then
+  -- wailing_arrow,if=pet.main.buff.frenzy.remains>execute_time
+  if S.WailingArrow:IsReady() and CDsON() and (Pet:BuffRemains(S.FrenzyPetBuff) > S.WailingArrow:ExecuteTime()) then
     if Cast(S.WailingArrow, Settings.BeastMastery.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "wailing_arrow cleave 28"; end
   end
   -- flayed_shot
@@ -350,9 +350,9 @@ local function ST()
   if S.KillShot:IsCastable() then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot st 16"; end
   end
-  -- wailing_arrow,if=cooldown.resonating_arrow.remains<gcd&(!talent.explosive_shot|buff.bloodlust.up)|!covenant.kyrian|target.time_to_die<5
+  -- wailing_arrow,if=pet.main.buff.frenzy.remains>execute_time&(cooldown.resonating_arrow.remains<gcd&(!talent.explosive_shot|buff.bloodlust.up)|!covenant.kyrian)|target.time_to_die<5
   -- Note: Explosive Shot doesn't exist for BM, so ignoring that block
-  if S.WailingArrow:IsReady() and (S.ResonatingArrow:CooldownRemains() < Player:GCD() or Player:Covenant() ~= "Kyrian" or Target:TimeToDie() < 5) then
+  if S.WailingArrow:IsReady() and (Pet:BuffRemains(S.FrenzyPetBuff) > S.WailingArrow:ExecuteTime() and (S.ResonatingArrow:CooldownRemains() < Player:GCD() or CovenantID ~= 1) or Target:TimeToDie() < 5) then
     if Cast(S.WailingArrow, Settings.BeastMastery.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "wailing_arrow st 18"; end
   end
   -- barbed_shot,if=cooldown.bestial_wrath.remains<12*charges_fractional+gcd&talent.scent_of_blood|full_recharge_time<gcd&cooldown.bestial_wrath.remains|target.time_to_die<9
@@ -376,7 +376,7 @@ local function ST()
     if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant) then return "resonating_arrow st 28"; end
   end
   -- bestial_wrath,if=(cooldown.wild_spirits.remains>15|covenant.kyrian&(cooldown.resonating_arrow.remains<5|cooldown.resonating_arrow.remains>20)|target.time_to_die<15|(!covenant.night_fae&!covenant.kyrian))&(!raid_event.adds.exists|!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<20|raid_event.adds.count=1)|raid_event.adds.up&raid_event.adds.remains>19)
-  if S.BestialWrath:IsCastable() and CDsON() and (not S.WildSpirits:IsAvailable() or S.WildSpirits:CooldownRemains() > 15 or Player:Covenant() == "Kyrian" and (S.ResonatingArrow:CooldownRemains() < 5 or S.ResonatingArrow:CooldownRemains() > 20) or Target:TimeToDie() < 15 or (Player:Covenant() ~= "Night Fae" and Player:Covenant() ~= "Kyrian")) then
+  if S.BestialWrath:IsCastable() and CDsON() and (not S.WildSpirits:IsAvailable() or S.WildSpirits:CooldownRemains() > 15 or CovenantID == 1 and (S.ResonatingArrow:CooldownRemains() < 5 or S.ResonatingArrow:CooldownRemains() > 20) or Target:TimeToDie() < 15 or (CovenantID ~= 3 and CovenantID ~= 1)) then
     if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath st 30"; end
   end
   -- chimaera_shot

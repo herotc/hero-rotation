@@ -38,6 +38,8 @@ HR.GUISettings.APL.Paladin = {
       AvengingWrath = true,
       WordOfGlory = true,
       Seraphim = true,
+      GuardianofAncientKings = true,
+      ArdentDefender = true,
     },
     OffGCDasOffGCD = {
       MomentOfGlory = true,

@@ -222,6 +222,7 @@ Spell.Shaman.Restoration = {
   SpiritwalkersGraceBuff                = Spell(79206),
 
   Fleshcraft                            = Spell(324631),
+  VesperTotem                           = Spell(324386),
   Pool                                  = Spell(999910),
 
 }

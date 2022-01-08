@@ -29,7 +29,7 @@ local GetInventoryItemLink = GetInventoryItemLink
 
 -- Define S/I for spell and item arrays
 local S = Spell.DeathKnight.Frost
-local I = Item.DeathKnight.Frost
+local I = Item.DeathKnight.Commons
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
@@ -213,7 +213,7 @@ end
 
 -- HowlingBlast
 local function EvaluateCycleHowlingBlast(TargetUnit)
-  return (TargetUnit:DebuffRefreshable(S.FrostFeverDebuff))
+  return (TargetUnit:DebuffDown(S.FrostFeverDebuff))
 end
 
 local function Precombat()
@@ -356,7 +356,7 @@ local function BosPooling()
     if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, EvaluateTargetIfFrostStrikeBoSPooling2) then return "frost_strike bospooling 16"; end
   end
   -- wait for resources
-  if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait Resources BoS Pooling"; end
+  if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait Resources BoS Pooling"; end
 end
 
 local function BosTicking()
@@ -405,7 +405,7 @@ local function BosTicking()
     if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent bosticking 20"; end
   end
   -- wait for resources
-  if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait Resources BoS Ticking"; end
+  if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait Resources BoS Ticking"; end
 end
 
 local function ColdHeart()
@@ -626,7 +626,7 @@ local function Obliteration_Pooling()
     if Cast(S.Frostscythe, nil, nil, not TargetIsInRange[8]) then return "frostscythe obliteration_pooling 14"; end
   end
   -- wait for resources
-  if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait Resources Obliteration Pooling"; end
+  if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait Resources Obliteration Pooling"; end
 end
 
 local function Obliteration()
@@ -765,7 +765,7 @@ local function APL()
     if S.RemorselessWinter:IsReady() and (S.Everfrost:ConduitEnabled() and S.GatheringStorm:IsAvailable() and not S.Obliteration:IsAvailable() and not S.PillarofFrost:CooldownUp()) then
       if Cast(S.RemorselessWinter, nil, nil, not TargetIsInRange[8]) then return "remorseless_winter main 2"; end
     end
-    -- howling_blast,target_if=dot.frost_fever.refreshable&(talent.icecap|!buff.breath_of_sindragosa.up&talent.breath_of_sindragosa|talent.obliteration&cooldown.pillar_of_frost.remains&!buff.killing_machine.up)
+    -- howling_blast,target_if=!dot.frost_fever.remains&(talent.icecap|!buff.breath_of_sindragosa.up&talent.breath_of_sindragosa|talent.obliteration&cooldown.pillar_of_frost.remains&!buff.killing_machine.up)
     if S.HowlingBlast:IsReady() and (S.Icecap:IsAvailable() or Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:IsAvailable() or S.Obliteration:IsAvailable() and S.PillarofFrost:CooldownDown() and Player:BuffDown(S.KillingMachineBuff)) then
       if Everyone.CastCycle(S.HowlingBlast, Enemies10yd, EvaluateCycleHowlingBlast, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast main 4"; end
     end
@@ -822,7 +822,7 @@ local function APL()
       local ShouldReturn = Standard(); if ShouldReturn then return ShouldReturn; end
     end
     -- nothing to cast, wait for resouces
-    if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait/Pool Resources"; end
+    if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
 end
 

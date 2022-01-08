@@ -175,17 +175,19 @@ local function IsViable(spell)
     return nil
   end
   local BaseCheck = spell:IsCastable() and spell:IsReady()
-  if spell == S.LightningBolt or spell == S.ChainLightning then
-    local MovementPredicate = (not Player:IsMoving() or Player:BuffUp(S.SpiritwalkersGraceBuff))
+  local MovementPredicate = (Player:BuffUp(S.SpiritwalkersGraceBuff) or not Player:IsMoving())
+  if spell == S.LightningBolt or 
+     spell == S.ChainLightning or 
+     spell == S.HealingRain or
+     spell == S.HealingWave or 
+     spell == S.HealingSurge or 
+     spell == S.Wellspring then
     return BaseCheck and MovementPredicate
   elseif spell == S.LavaBurst then
-    local MovementPredicate = (not Player:IsMoving() or Player:BuffUp(S.LavaSurgeBuff) or Player:BuffUp(S.SpiritwalkersGraceBuff))
     local a = Player:BuffUp(S.LavaSurgeBuff)
     local b = (not Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() >= 1)
     local c = (Player:IsCasting(S.LavaBurst) and S.LavaBurst:Charges() == 2)
-    -- d) TODO: you are casting something else, but you will have >= 1 charge at the end of the cast of the spell
-    --    Implementing d) will require something like LavaBurstChargesFractionalP(); this is not hard but I haven't done it.
-    return BaseCheck and MovementPredicate and (a or b or c)
+    return BaseCheck and (MovementPredicate or Player:BuffUp(S.LavaSurgeBuff)) and (a or b or c)
   else
     return BaseCheck
   end
@@ -195,6 +197,9 @@ end
 local function Precombat()
   if IsViable(S.Fleshcraft) then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "Precombat Fleshcraft" end
+  end
+  if NumEnemiesInLargestCluster >= 3 and IsViable(S.ChainLightning) and not Player:IsCasting(S.ChainLightning) then
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "Precombat Chain Lightning" end
   end
   if IsViable(S.LavaBurst) and not Player:IsCasting(S.LavaBurst) then
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "Precombat Lavaburst" end
@@ -218,10 +223,16 @@ local function Cooldowns()
   if IsViable(S.FaeTransfusion) then
     if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant) then return "Fae Transfusion CD" end
   end
+  if IsViable(S.VesperTotem) then
+    if Cast(S.VesperTotem, nil, Settings.Commons.DisplayStyle.Covenant) then return "Vesper Totem CD" end
+  end
 end
 
 local function NumFlameShocksToMaintain()
-  return mathmin(NumEnemiesInLargestCluster, 2) -- fallthrough when no combat?
+  -- On AOE, don't maintain flame shock.
+  if NumEnemiesInLargestCluster >= 3 then return 0 end
+  -- On ST or 2T, return 1 or 2.
+  return NumEnemiesInLargestCluster
 end
 
 local function ApplyFlameShock()
