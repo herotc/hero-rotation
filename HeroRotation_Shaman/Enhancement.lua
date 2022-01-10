@@ -186,9 +186,8 @@ local function Single()
     if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "fae_transfusion single 26"; end
   end
   -- chain_lightning,if=buff.stormkeeper.up
-  -- Manually changed to: lightning_bolt,if=buff.stormkeeper.up
-  if S.LightningBolt:IsReady() and (Player:BuffUp(S.StormkeeperBuff)) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 28"; end
+  if S.ChainLightning:IsReady() and (Player:BuffUp(S.StormkeeperBuff)) then
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning single 28"; end
   end
   -- elemental_blast,if=buff.maelstrom_weapon.stack>=5
   if S.ElementalBlast:IsReady() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
@@ -456,7 +455,7 @@ local function APL()
       end
     end
     -- feral_spirit
-    if S.FeralSpirit:IsCastable() then
+    if S.FeralSpirit:IsCastable() and CDsON() then
       if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit default 6"; end
     end
     -- fae_transfusion,if=(talent.ascendance.enabled|runeforge.doom_winds.equipped)&(soulbind.grove_invigoration|soulbind.field_of_blossoms|active_enemies=1)
