@@ -717,8 +717,8 @@ local function APL()
         if Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon oor"; end
       end
     end
-    -- use_item,name=jotungeirr_destinys_call,if=buff.coordinated_assault.up|time_to_die<30
-    if I.Jotungeirr:IsReady() and (Player:BuffUp(S.CoordinatedAssault) or Target:TimeToDie() < 30) then
+    -- use_item,name=jotungeirr_destinys_call,if=buff.coordinated_assault.up|!cooldown.coordinated_assault.remains|time_to_die<30
+    if I.Jotungeirr:IsReady() and (Player:BuffUp(S.CoordinatedAssault) or S.CoordinatedAssault:CooldownUp() or Target:TimeToDie() < 30) then
       if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 2"; end
     end
     -- use_items
