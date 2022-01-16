@@ -137,6 +137,9 @@ local function Precombat()
 end
 
 local function Single()
+  if S.WindfuryTotem:IsReady() and Player:BuffDown(S.WindfuryTotemBuff, true) and not DoomWindsEquipped then
+    if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "windfury_totem single 1"; end
+  end
   -- windstrike
   if S.Windstrike:IsReady() then
     if Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Windstrike)) then return "windstrike single 2"; end
@@ -182,7 +185,7 @@ local function Single()
     if Cast(S.EarthenSpike, nil, nil, not Target:IsSpellInRange(S.EarthenSpike)) then return "earthen_spike single 24"; end
   end
   -- fae_transfusion
-  if S.FaeTransfusion:IsReady() then
+  if S.FaeTransfusion:IsReady() and CDsON() then
     if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "fae_transfusion single 26"; end
   end
   -- chain_lightning,if=buff.stormkeeper.up
@@ -252,12 +255,15 @@ local function Single()
 end
 
 local function Aoe()
+  if S.WindfuryTotem:IsReady() and Player:BuffDown(S.WindfuryTotemBuff, true) and not DoomWindsEquipped then
+    if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "windfury_totem aoe 1"; end
+  end
   -- windstrike,if=buff.crash_lightning.up
   if S.Windstrike:IsReady() and Player:BuffUp(S.CrashLightningBuff) then
     if Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Windstrike)) then return "windstrike aoe 2"; end
   end
   -- fae_transfusion,if=soulbind.grove_invigoration|soulbind.field_of_blossoms
-  if S.FaeTransfusion:IsReady() and (S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable()) then
+  if S.FaeTransfusion:IsReady() and CDsON() and (S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable()) then
     if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "fae_transfusion aoe 4"; end
   end
   -- crash_lightning,if=runeforge.doom_winds.equipped&buff.doom_winds.up
@@ -349,7 +355,7 @@ local function Aoe()
     if Everyone.CastCycle(S.FlameShock, Enemies40y, EvaluateCycleFlameShock, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 48"; end
   end
   -- fae_transfusion
-  if S.FaeTransfusion:IsReady() then
+  if S.FaeTransfusion:IsReady() and CDsON() then
     if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "fae_transfusion aoe 50"; end
   end
   -- frost_shock
@@ -459,7 +465,7 @@ local function APL()
       if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit default 6"; end
     end
     -- fae_transfusion,if=(talent.ascendance.enabled|runeforge.doom_winds.equipped)&(soulbind.grove_invigoration|soulbind.field_of_blossoms|active_enemies=1)
-    if S.FaeTransfusion:IsReady() and ((S.Ascendance:IsAvailable() or DoomWindsEquipped) and (S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable() or MeleeEnemies10yCount == 1)) then
+    if S.FaeTransfusion:IsReady() and CDsON() and ((S.Ascendance:IsAvailable() or DoomWindsEquipped) and (S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable() or MeleeEnemies10yCount == 1)) then
       if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "fae_transfusion default 8"; end
     end
     -- ascendance,if=raid_event.adds.in>=90|active_enemies>1
