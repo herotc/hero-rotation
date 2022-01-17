@@ -661,7 +661,7 @@ local function Build (EnergyThreshold)
   local ThresholdMet = not EnergyThreshold or Player:EnergyPredicted() >= EnergyThreshold
   -- actions.build=shiv,if=!talent.nightstalker.enabled&runeforge.tiny_toxic_blade.equipped&spell_targets.shuriken_storm<5
   if S.Shiv:IsCastable() and TinyToxicBladeEquipped and not S.Nightstalker:IsAvailable() and MeleeEnemies10yCount < 5 then
-    if ThresholdMet and HR.Cast(S.ShurikenStorm) then return "Cast Shiv (TTB)" end
+    if ThresholdMet and HR.Cast(S.Shiv) then return "Cast Shiv (TTB)" end
     SetPoolingAbility(S.Shiv, EnergyThreshold)
   end
   -- actions.build+=/shuriken_storm,if=spell_targets>=2&(!covenant.necrolord|cooldown.serrated_bone_spike.max_charges-charges_fractional>=0.25|spell_targets.shuriken_storm>4)&buff.perforated_veins.stack<=4
