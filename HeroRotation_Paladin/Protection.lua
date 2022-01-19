@@ -69,7 +69,7 @@ local function Precombat()
   -- snapshot_stats
   -- potion
   if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-    if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion 2"; end
+    if HR.CastRightSuggested(I.PotionofUnbridledFury) then return "potion 2"; end
   end
   -- consecration
   if S.Consecration:IsCastable() and Target:IsInMeleeRange(8) then
@@ -90,21 +90,29 @@ local function Precombat()
 end
 
 local function Defensives()
-  if Player:HealthPercentage() <= 10 and S.LayonHands:IsCastable() then
-    if HR.CastSuggested(S.Layonhands) then return "LOH"; end
+  if Player:HealthPercentage() <= 15 and S.LayonHands:IsCastable() then
+    if HR.CastRightSuggested(S.LayonHands) then return "LOH"; end
   end
   if S.GuardianofAncientKings:IsCastable() and (Player:HealthPercentage() <= Settings.Protection.GoAKHP and Player:BuffDown(S.ArdentDefenderBuff)) then
-    if HR.CastSuggested(S.GuardianofAncientKings) then return "guardian_of_ancient_kings defensive"; end
+    if HR.CastRightSuggested(S.GuardianofAncientKings) then return "guardian_of_ancient_kings defensive"; end
   end
   if S.ArdentDefender:IsCastable() and (Player:HealthPercentage() <= Settings.Protection.ArdentDefenderHP and Player:BuffDown(S.GuardianofAncientKingsBuff)) then
-    if HR.CastSuggested(S.ArdentDefender) then return "ardent_defender defensive"; end
+    if HR.CastRightSuggested(S.ArdentDefender) then return "ardent_defender defensive"; end
   end
-  -- todo: logic right here to check if you have enough SOTR buff up - you might have to choose between dropping buff and healing self
+  -- cast word of glory on us if it's a) free or b) probably not going to drop sotr
   if S.WordofGlory:IsReady() and (Player:HealthPercentage() <= Settings.Protection.WordofGloryHP and not Player:HealingAbsorbed()) then
-    if HR.Cast(S.WordofGlory) then return "word_of_glory defensive"; end
+    if (Player:BuffRemains(S.ShieldoftheRighteousBuff) >= 5 
+       or Player:BuffUp(S.DivinePurposeBuff) 
+       or Player:BuffUp(S.ShiningLightFreeBuff)) then
+      if HR.Cast(S.WordofGlory) then return "word_of_glory defensive"; end
+    else
+      -- cast it anyway but run the fuck away
+      if HR.CastAnnotated(S.WordofGlory, false, "KITE") then return "word_of_glory defensive"; end
+    end
   end
+
   if S.ShieldoftheRighteous:IsReady() and (Player:BuffRefreshable(S.ShieldoftheRighteousBuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP)) then
-    if HR.CastRightSuggested(S.ShieldoftheRighteous) then return "shield_of_the_righteous defensive"; end
+    if HR.CastSuggested(S.ShieldoftheRighteous) then return "shield_of_the_righteous defensive"; end
   end
 end
 
@@ -130,12 +138,12 @@ local function Cooldowns()
     if HR.Cast(S.AshenHallow, nil, Settings.Commons.CovenantDisplayStyle) then return "ashen_hallow 84"; end
   end
   -- divine_toll
-  if S.DivineToll:IsReady() and Player:HolyPower() <= 1 then
+  if S.DivineToll:IsReady() then
     if HR.Cast(S.DivineToll, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.DivineToll)) then return "divine_toll 80"; end
   end
   -- potion,if=buff.avenging_wrath.up
   if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffUp(S.AvengingWrathBuff)) then
-    if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion 40"; end
+    if HR.CastRightSuggested(I.PotionofUnbridledFury) then return "potion 40"; end
   end
   -- use_items,if=buff.seraphim.up|!talent.seraphim.enabled
   if (Player:BuffUp(S.SeraphimBuff) or not S.Seraphim:IsAvailable()) then
@@ -153,12 +161,12 @@ end
 local function Standard()
   -- shield_of_the_righteous,if=debuff.judgment.up&(debuff.vengeful_shock.up|!conduit.vengeful_shock.enabled)
   if S.ShieldoftheRighteous:IsReady() and (Target:DebuffUp(S.JudgmentDebuff) and (Target:DebuffUp(S.VengefulShockDebuff) or not S.VengefulShock:ConduitEnabled())) then
-    if HR.CastRightSuggested(S.ShieldoftheRighteous) then return "shield_of_the_righteous 62"; end
+    if HR.CastSuggested(S.ShieldoftheRighteous) then return "shield_of_the_righteous 62"; end
   end
 
   -- shield_of_the_righteous,if=holy_power=5|buff.holy_avenger.up|holy_power=4&talent.sanctified_wrath.enabled&buff.avenging_wrath.up
   if S.ShieldoftheRighteous:IsReady() and (Player:HolyPower() == 5 or Player:BuffUp(S.HolyAvengerBuff) or Player:HolyPower() == 4 and S.SanctifiedWrath:IsAvailable() and Player:BuffUp(S.AvengingWrathBuff)) then
-    if HR.CastRightSuggested(S.ShieldoftheRighteous) then return "shield_of_the_righteous 64"; end
+    if HR.CastSuggested(S.ShieldoftheRighteous) then return "shield_of_the_righteous 64"; end
   end
 
   -- NOTE(MRDMND) - added an AOE prio on this over judgment
@@ -231,7 +239,7 @@ local function Standard()
   -- word_of_glory,if=buff.shining_light_free.up&!covenant.necrolord
   -- TODO: this should not fire if everyone in your party is full HP, but we DO want to heal teammates if we're topped at this point
   if S.WordofGlory:IsReady() and (Player:BuffUp(S.ShiningLightFreeBuff) and not S.VanquishersHammer:IsAvailable()) then
-    if HR.Cast(S.WordofGlory) then return "word_of_glory 100"; end
+    if HR.CastAnnotated(S.WordofGlory, false, "OTHER") then return "word_of_glory 100"; end
   end
   
 end

@@ -42,6 +42,7 @@ Spell.Paladin.Protection = {
   ConsecrationBuff                      = Spell(188370),
   DevotionAura                          = Spell(465),
   DevotionAuraBuff                      = Spell(465),
+  DivinePurposeBuff                     = Spell(223819),
   DivineShield                          = Spell(642),
   DivineSteed                           = Spell(190784),
   FlashofLight                          = Spell(19750),
