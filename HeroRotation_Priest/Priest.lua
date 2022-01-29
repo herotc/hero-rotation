@@ -14,6 +14,7 @@ local Pet        = Unit.Pet
 local Spell      = HL.Spell
 local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
+local MergeTableByKey = HL.Utils.MergeTableByKey
 -- HeroRotation
 local HR         = HeroRotation
 
@@ -21,38 +22,63 @@ local HR         = HeroRotation
 
 -- Spells
 if not Spell.Priest then Spell.Priest = {} end
-Spell.Priest.Shadow = {
+Spell.Priest.Commons = {
   -- Racials
   AncestralCall                         = Spell(274738),
   ArcaneTorrent                         = Spell(50613),
   BagofTricks                           = Spell(312411),
   Berserking                            = Spell(26297),
+  BerserkingBuff                        = Spell(26297),
+  BloodFury                             = Spell(20572),
+  BloodFuryBuff                         = Spell(20572),
   Fireblood                             = Spell(265221),
   LightsJudgment                        = Spell(255647),
-
+  -- Abilities
+  DesperatePrayer                       = Spell(19236),
+  HolyNova                              = Spell(132157), -- Melee, 12
+  MindBlast                             = Spell(8092),
+  MindSear                              = Spell(48045), -- Splash, 10
+  PowerInfusion                         = Spell(10060),
+  PowerInfusionBuff                     = Spell(10060),
+  ShadowWordDeath                       = Spell(32379),
+  ShadowWordPain                        = Spell(589),
+  ShadowWordPainDebuff                  = Spell(589),
+  Smite                                 = Spell(585),
+  -- Talents
+  DivineStar                            = Spell(110744),
+  -- Covenant Abilities
+  AscendedNova                          = Spell(325020), -- Melee, 8
+  BoonoftheAscended                     = Spell(325013),
+  BoonoftheAscendedBuff                 = Spell(325013),
+  FaeGuardians                          = Spell(327661),
+  FaeGuardiansBuff                      = Spell(327661),
+  Fleshcraft                            = Spell(324631),
+  Mindgames                             = Spell(323673),
+  UnholyNova                            = Spell(324724), -- Melee, 15
+  WrathfulFaerieDebuff                  = Spell(342132),
+  -- Soulbind Abilities
+  PustuleEruption                       = Spell(351094),
+  VolatileSolvent                       = Spell(323074),
+  VolatileSolventHumanBuff              = Spell(323491),
+  -- Other
+  Pool                                  = Spell(999910)
+}
+Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   -- Base Spells
   DarkThoughtBuff                       = Spell(341207),
   DevouringPlague                       = Spell(335467),
   DevouringPlagueDebuff                 = Spell(335467),
   Dispersion                            = Spell(47585),
   Mindbender                            = MultiSpell(200174,34433),
-  MindBlast                             = Spell(8092),
   MindFlay                              = Spell(15407),
-  MindSear                              = Spell(48045), -- Splash, 10
-  PowerInfusion                         = Spell(10060),
-  PowerInfusionBuff                     = Spell(10060),
   Shadowform                            = Spell(232698),
   ShadowformBuff                        = Spell(232698),
-  ShadowWordDeath                       = Spell(32379),
-  ShadowWordPain                        = Spell(589),
-  ShadowWordPainDebuff                  = Spell(589),
   Silence                               = Spell(15487),
   VampiricTouch                         = Spell(34914),
   VampiricTouchDebuff                   = Spell(34914),
   VoidBolt                              = Spell(205448),
   VoidEruption                          = Spell(228260), -- Splash, 10
   VoidformBuff                          = Spell(194249),
-
   -- Talents
   Damnation                             = Spell(341374),
   FortressOfTheMind                     = Spell(193195),
@@ -67,21 +93,8 @@ Spell.Priest.Shadow = {
   UnfurlingDarkness                     = Spell(341273),
   UnfurlingDarknessBuff                 = Spell(341282),
   VoidTorrent                           = Spell(263165),
-
-  -- Trinket Effects
-
   -- Covenant Abilities
   AscendedBlast                         = Spell(325283),
-  AscendedNova                          = Spell(325020), -- Melee, 8
-  BoonoftheAscended                     = Spell(325013),
-  BoonoftheAscendedBuff                 = Spell(325013),
-  FaeGuardians                          = Spell(327661),
-  FaeGuardiansBuff                      = Spell(327661),
-  Fleshcraft                            = Spell(324631),
-  Mindgames                             = Spell(323673),
-  UnholyNova                            = Spell(324724), -- Melee, 15
-  WrathfulFaerieDebuff                  = Spell(342132),
-
   -- Conduit/Soulbind Effects
   CombatMeditation                      = Spell(328266),
   DissonantEchoes                       = Spell(338342),
@@ -89,37 +102,13 @@ Spell.Priest.Shadow = {
   FieldofBlossoms                       = Spell(319191),
   GroveInvigoration                     = Spell(322721),
   RedirectedAnimaBuff                   = Spell(342814),
-  VolatileSolvent                       = Spell(323074),
-  VolatileSolventHumanBuff              = Spell(323491),
+})
 
-  -- Legendary Effects
-}
-
-Spell.Priest.Discipline = {
-  -- Racials
-  AncestralCall                         = Spell(274738),
-  ArcaneTorrent                         = Spell(50613),
-  BagofTricks                           = Spell(312411),
-  Berserking                            = Spell(26297),
-  BerserkingBuff                        = Spell(26297),
-  BloodFury                             = Spell(20572),
-  BloodFuryBuff                         = Spell(20572),
-  Fireblood                             = Spell(265221),
-  LightsJudgment                        = Spell(255647),
-
+Spell.Priest.Discipline = MergeTableByKey(Spell.Priest.Commons, {
   -- Base Spells
-  MindBlast                             = Spell(8092),
-  Smite                                 = Spell(585),
-  ShadowWordPain                        = Spell(589),
-  ShadowWordPainDebuff                  = Spell(589),
-  ShadowWordDeath                       = Spell(32379),
-  HolyNova                              = Spell(132157), -- Melee, 12
-  MindSear                              = Spell(48045), -- Splash, 10
   Penance                               = Spell(47540),
-  PowerInfusion                         = Spell(10060),
   PowerWordRadiance                     = Spell(194509),
   PowerWordFortitude                    = Spell(21562),
-
   -- Talents
   Schism                                = Spell(214621),
   Mindbender                            = MultiSpell(123040, 34433),
@@ -128,64 +117,26 @@ Spell.Priest.Discipline = {
   ShadowCovenantBuff                    = Spell(322105),
   PurgeTheWicked                        = Spell(204197),
   PurgeTheWickedDebuff                  = Spell(204213),
-  DivineStar                            = Spell(110744),
   Halo                                  = Spell(120517),
-
   -- Covenant Abilities
   AscendedBlast                         = Spell(325315),
-  AscendedNova                          = Spell(325020), -- Melee, 8
-  BoonoftheAscended                     = Spell(325013),
-  BoonoftheAscendedBuff                 = Spell(325013),
-  FaeGuardians                          = Spell(327661),
-  FaeGuardiansBuff                      = Spell(327661),
-  WrathfulFaerieDebuff                  = Spell(342132),
-  Mindgames                             = Spell(323673),
-  UnholyNova                            = Spell(324724), -- Melee, 15
+})
 
-  -- Conduit/Soulbind Effects
-
-  -- Legendary Effects
-
-  -- Other
-  Pool                                  = Spell(999910)
-}
-
-Spell.Priest.Holy = {
-  -- Racials
-  AncestralCall                         = Spell(274738),
-  ArcanePulse                           = Spell(260364),
-  ArcaneTorrent                         = Spell(50613),
-  BagofTricks                           = Spell(312411),
-  Berserking                            = Spell(26297),
-  BerserkingBuff                        = Spell(26297),
-  BloodFury                             = Spell(20572),
-  BloodFuryBuff                         = Spell(20572),
-  Fireblood                             = Spell(265221),
-  LightsJudgment                        = Spell(255647),
-
+Spell.Priest.Holy = MergeTableByKey(Spell.Priest.Commons, {
   -- Base Spells
   HolyFire                              = Spell(14914),
   HolyFireDebuff                        = Spell(14914),
-  HolyNova                              = Spell(132157),
   HolyWordChastise                      = Spell(88625),
-  Smite                                 = Spell(585),
-
   -- Talents
   Apotheosis                            = Spell(200183),
-  DivineStar                            = Spell(110744),
   Halo                                  = Spell(120517),
-
-  -- Covenant Abilities
-
-  -- Other
-  Pool                                  = Spell(999910)
-}
+})
 
 -- Items
 if not Item.Priest then Item.Priest = {} end
-Item.Priest.Shadow = {
+Item.Priest.Commons = {
   -- Potion
-  PotionofPhantomFire              = Item(171352),
+  PotionofSpectralIntellect        = Item(171352),
   -- Trinkets
   DarkmoonDeckPutrescence          = Item(173069, {13, 14}),
   DreadfireVessel                  = Item(184030, {13, 14}),
@@ -197,10 +148,4 @@ Item.Priest.Shadow = {
   SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14}),
   SoullettingRuby                  = Item(178809, {13, 14}),
   SunbloodAmethyst                 = Item(178826, {13, 14}),
-}
-
-Item.Priest.Discipline = {
-}
-
-Item.Priest.Holy = {
 }
