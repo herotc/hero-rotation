@@ -473,7 +473,7 @@ local function APL()
       if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "windfury_totem default 12"; end
     end
     -- call_action_list,name=single,if=active_enemies=1
-    if MeleeEnemies10yCount == 1 then
+    if MeleeEnemies10yCount < 2 then
       local ShouldReturn = Single(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=aoe,if=active_enemies>1
