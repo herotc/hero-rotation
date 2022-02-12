@@ -158,9 +158,10 @@ local function EvaluateTargetIfFilterAimedShot(TargetUnit)
 end
 
 local function EvaluateTargetIfAimedShot()
-  -- if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|buff.trick_shots.remains>execute_time&active_enemies>1
+  -- if=buff.precise_shots.down&(buff.trick_shots.up|!set_bonus.tier28_4pc)|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|buff.trick_shots.remains>execute_time&active_enemies>1
   -- Note: Added IsCasting check to smooth out opener when not using SteadyFocus
-  return (Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.Trueshot) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime() and not Player:IsCasting(S.AimedShot)) and ((not S.ChimaeraShot:IsAvailable()) or EnemiesCount10ySplash < 2) or Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and EnemiesCount10ySplash > 1)
+  -- TODO: Tier 28 stuffs
+  return (Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.Trueshot) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime()) and ((not Player:IsCasting(S.AimedShot)) or EnemiesCount10ySplash < 2) or Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and EnemiesCount10ySplash > 1)
 end
 
 local function EvaluateTargetIfAimedShot2()
@@ -225,7 +226,7 @@ end
 
 local function Cds()
   -- berserking,if=(buff.trueshot.up&buff.resonating_arrow.up&covenant.kyrian)|(buff.trueshot.up&buff.wild_spirits.up&covenant.night_fae)|(covenant.venthyr|covenant.necrolord)&buff.trueshot.up|fight_remains<13|(covenant.kyrian&buff.resonating_arrow.up&fight_remains<73)
-  if S.Berserking:IsReady() and ((Player:BuffUp(S.Trueshot) and Target:DebuffUp(S.ResonatingArrowDebuff) and CovenantID == 1) or (Player:BuffUp(S.Trueshot) and Target:DebuffUp(S.WildMarkDebuff) and CovenantID == 3) or (CovenantID == 2 or CovenantID == 4) and Player:BuffUp(S.Trueshot) or fightRemains < 13 or (CovenantID == 1 and Target:DebuffUp(S.ResonatingArrowDebuff) and fightRemains < 73)) then
+  if S.Berserking:IsReady() and ((Player:BuffUp(S.Trueshot) and Target:DebuffUp(S.ResonatingArrowDebuff) and CovenantID == 1) or (Player:BuffUp(S.Trueshot) and Player:BuffUp(S.WildSpiritsBuff) and CovenantID == 3) or (CovenantID == 2 or CovenantID == 4) and Player:BuffUp(S.Trueshot) or fightRemains < 13 or (CovenantID == 1 and Target:DebuffUp(S.ResonatingArrowDebuff) and fightRemains < 73)) then
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 2"; end
   end
   -- blood_fury,if=buff.trueshot.up|cooldown.trueshot.remains>30|fight_remains<16
@@ -279,16 +280,16 @@ local function St()
   if S.ExplosiveShot:IsReady() then
     if Cast(S.ExplosiveShot, nil, nil, not TargetInRange40y) then return "explosive_shot 14"; end
   end
-  -- wild_spirits,if=!raid_event.adds.exists|!raid_event.adds.up&raid_event.adds.duration+raid_event.adds.in<20|raid_event.adds.up&raid_event.adds.remains>19|active_enemies>1
-  if S.WildSpirits:IsReady() and CDsON() then
+  -- wild_spirits,if=(cooldown.trueshot.remains<gcd|buff.trueshot.up)&(!raid_event.adds.exists|!raid_event.adds.up&raid_event.adds.duration+raid_event.adds.in<20|raid_event.adds.up&raid_event.adds.remains>19|active_enemies>1)|fight_remains<80
+  if S.WildSpirits:IsReady() and CDsON() and ((S.Trueshot:CooldownRemains() < Player:GCD() or S.Trueshot:CooldownUp()) or fightRemains < 80) then
     if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "wild_spirits st 16"; end
   end
   -- flayed_shot
   if S.FlayedShot:IsReady() then
     if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "flayed_shot st 18"; end
   end
-  -- death_chakram,if=focus+cast_regen<focus.max
-  if S.DeathChakram:IsReady() and (Player:FocusP() + Player:FocusCastRegen(S.DeathChakram:ExecuteTime()) < Player:FocusMax()) then
+  -- death_chakram
+  if S.DeathChakram:IsReady() then
     if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "dark_chakram st 20"; end
   end
   -- a_murder_of_crows
@@ -311,21 +312,21 @@ local function St()
   if S.SteadyShot:IsCastable() and (CovenantID == 1 and Player:FocusP() + Player:FocusCastRegen(S.SteadyShot:ExecuteTime()) < Player:FocusMax() and ((S.ResonatingArrow:CooldownRemains() < Player:GCD() * 3 and ((not S.EffusiveAnimaAccelerator:IsAvailable()) or not S.DoubleTap:IsAvailable())) or S.DoubleTap:IsAvailable() and S.DoubleTap:CooldownRemains() < 3)) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 30"; end
   end
-  -- trueshot,if=buff.precise_shots.down&(covenant.venthyr|covenant.necrolord|talent.calling_the_shots)|buff.resonating_arrow.up|buff.wild_spirits.up|buff.volley.up&active_enemies>1|fight_remains<25
-  if S.Trueshot:IsReady() and CDsON() and (Player:BuffDown(S.PreciseShotsBuff) and (CovenantID == 2 or CovenantID == 4 or S.CallingtheShots:IsAvailable()) or Target:DebuffUp(S.ResonatingArrowDebuff) or Target:DebuffUp(S.WildMarkDebuff) or Player:BuffUp(S.VolleyBuff) and EnemiesCount10ySplash > 1 or fightRemains < 25) then
-    if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot st 32"; end
-  end
   -- rapid_fire,if=runeforge.surging_shots&talent.streamline&(cooldown.resonating_arrow.remains>10|!covenant.kyrian|!talent.double_tap|soulbind.effusive_anima_accelerator)
   if S.RapidFire:IsCastable() and (SurgingShotsEquipped and S.Streamline:IsAvailable() and (S.ResonatingArrow:CooldownRemains() > 10 or CovenantID ~= 1 or (not S.DoubleTap:IsAvailable()) or S.EffusiveAnimaAccelerator:IsAvailable())) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 34"; end
   end
-  -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|buff.trick_shots.remains>execute_time&active_enemies>1
+  -- chimaera_shot,if=set_bonus.tier28_4pc&buff.trick_shots.down&buff.precise_shots.stack*20+focused_trickery_count>40&focus>buff.precise_shots.stack*cost+(action.aimed_shot.cost-buff.precise_shots.stack*cast_regen)
+  -- TODO: Tier 28 stuffs
+  -- arcane_shot,if=set_bonus.tier28_4pc&buff.trick_shots.down&buff.precise_shots.stack*20+focused_trickery_count>40&focus>buff.precise_shots.stack*cost+(action.aimed_shot.cost-buff.precise_shots.stack*cast_regen)
+  -- TODO: Tier 28 stuffs
+  -- trueshot,if=((buff.precise_shots.down|talent.calling_the_shots)&covenant.venthyr|covenant.necrolord|cooldown.resonating_arrow.remains>30|cooldown.resonating_arrow.remains<10|cooldown.wild_spirits.remains>30|buff.wild_spirits.up)|buff.volley.up&active_enemies>1|fight_remains<25
+  if S.Trueshot:IsReady() and CDsON() and (((Player:BuffDown(S.PreciseShotsBuff) or S.CallingtheShots:IsAvailable()) and CovenantID == 2 or CovenantID == 4 or S.ResonatingArrow:CooldownRemains() > 30 or S.ResonatingArrow:CooldownRemains() < 10 or S.WildSpirits:CooldownRemains() > 30 or Player:BuffUp(S.WildSpiritsBuff)) or Player:BuffUp(S.VolleyBuff) and EnemiesCount10ySplash > 1 or fightRemains < 25) then
+    if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot st 32"; end
+  end
+  -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=buff.precise_shots.down&(buff.trick_shots.up|!set_bonus.tier28_4pc)|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|buff.trick_shots.remains>execute_time&active_enemies>1
   if S.AimedShot:IsReady() then
     if Everyone.CastTargetIf(S.AimedShot, Enemies40y, "min", EvaluateTargetIfFilterAimedShot, EvaluateTargetIfAimedShot, not TargetInRange40y) then return "aimed_shot st 36"; end
-  end
-  -- death_chakram,if=focus+cast_regen<focus.max
-  if S.DeathChakram:IsCastable() and (Player:FocusP() + Player:FocusCastRegen(S.DeathChakram) < Player:FocusMax()) then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "death_chakram st 38"; end
   end
   -- rapid_fire,if=(cooldown.resonating_arrow.remains>10|!covenant.kyrian|!talent.double_tap|soulbind.effusive_anima_accelerator)&focus+cast_regen<focus.max&(buff.double_tap.down&buff.eagletalons_true_focus.down|talent.streamline)
   if S.RapidFire:IsCastable() and ((S.ResonatingArrow:CooldownRemains() > 10 or CovenantID ~= 1 or (not S.DoubleTap:IsAvailable()) or S.EffusiveAnimaAccelerator:SoulbindEnabled()) and Player:FocusP() + Player:FocusCastRegen(S.RapidFire:ExecuteTime()) < Player:FocusMax() and (Player:BuffDown(S.DoubleTap) and Player:BuffDown(S.EagletalonsTrueFocusBuff) or S.Streamline:IsAvailable())) then
