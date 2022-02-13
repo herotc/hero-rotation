@@ -87,6 +87,7 @@ local PhearomonesEquipped = Player:HasLegendaryEquipped(31)
 local DeadliestCoilEquipped = Player:HasLegendaryEquipped(45)
 local DeathsCertaintyEquipped = Player:HasLegendaryEquipped(44)
 local RampantTransferenceEquipped = Player:HasLegendaryEquipped(210)
+local AbominationsFrenzyEquipped = Player:HasLegendaryEquipped(213)
 
 -- Player Covenant
 -- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
@@ -123,6 +124,7 @@ HL:RegisterForEvent(function()
   DeadliestCoilEquipped = Player:HasLegendaryEquipped(45)
   DeathsCertaintyEquipped = Player:HasLegendaryEquipped(44)
   RampantTransferenceEquipped = Player:HasLegendaryEquipped(210)
+  AbominationsFrenzyEquipped = Player:HasLegendaryEquipped(213)
   MainHandLink = GetInventoryItemLink("player", 16) or ""
   _, _, MainHandRuneforge = strsplit(":", MainHandLink)
   UsingHysteria = (MainHandRuneforge == "6243")
@@ -340,8 +342,8 @@ local function Cooldowns()
   if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions and (VarMajorCDsActive or VarGargoyleActive and S.SummonGargoyle:TimeSinceLastCast() >= 9 or HL.FilteredFightRemains(EnemiesMelee, "<", 26)) then
     if Cast(I.PotionofSpectralStrength, Settings.Commons.OffGCDasOffGCD.Potions) then return "potion cooldowns 2"; end
   end
-  -- army_of_the_dead,if=cooldown.unholy_blight.remains<7&cooldown.dark_transformation.remains_expected<7&talent.unholy_blight&(cooldown.apocalypse.remains_expected<7&variable.full_cdr|!variable.full_cdr|variable.dc_rt)|!talent.unholy_blight|fight_remains<35
-  if S.ArmyoftheDead:IsReady() and not Settings.Unholy.DisableAotD and (S.UnholyBlight:CooldownRemains() < 7 and S.DarkTransformation:CooldownRemains() < 7 and S.UnholyBlight:IsAvailable() and (S.Apocalypse:CooldownRemains() < 7 and VarFullCDR or not VarFullCDR or VarDCRT) or not S.UnholyBlight:IsAvailable() or HL.FilteredFightRemains(EnemiesMelee, "<", 35)) then
+  -- army_of_the_dead,if=cooldown.unholy_blight.remains<7&cooldown.dark_transformation.remains_expected<7&talent.unholy_blight&(set_bonus.tier28_4pc&target.time_to_pct_35<4|!set_bonus.tier28_4pc|fight_remains>200)&(cooldown.abomination_limb.remains<18&runeforge.abominations_frenzy|!runeforge.abominations_frenzy)&(cooldown.apocalypse.remains_expected<7&variable.full_cdr|!variable.full_cdr|variable.dc_rt)|!talent.unholy_blight|fight_remains<35
+  if S.ArmyoftheDead:IsReady() and not Settings.Unholy.DisableAotD and (S.UnholyBlight:CooldownRemains() < 7 and S.DarkTransformation:CooldownRemains() < 7 and S.UnholyBlight:IsAvailable() and (Player:HasTier(28, 4) and Target:TimeToX(35) < 4 or (not Player:HasTier(28, 4)) or HL.FilteredFightRemains(EnemiesMelee, ">", 200)) and (S.AbominationLimb:CooldownRemains() < 18 and AbominationsFrenzyEquipped or not AbominationsFrenzyEquipped) and (S.Apocalypse:CooldownRemains() < 7 and VarFullCDR or not VarFullCDR or VarDCRT) or not S.UnholyBlight:IsAvailable() or HL.FilteredFightRemains(EnemiesMelee, "<", 35)) then
     if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyoftheDead) then return "army_of_the_dead cooldowns 4"; end
   end
   -- soul_reaper,target_if=target.time_to_pct_35<5&target.time_to_die>5&active_enemies<=3
@@ -419,8 +421,8 @@ local function Covenants()
   if S.AbominationLimb:IsCastable() and CDsON() and (VarSTPlanning and S.LeadByExample:SoulbindEnabled() and (Target:DebuffRemains(S.UnholyBlightDebuff) > 11 or not S.UnholyBlight:IsAvailable() and not S.DarkTransformation:CooldownUp())) then
     if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 8"; end
   end
-  -- abomination_limb,if=variable.st_planning&soulbind.kevins_oozeling&debuff.festering_wound.stack>=4
-  if S.AbominationLimb:IsCastable() and CDsON() and (VarSTPlanning and S.KevinsOozeling:SoulbindEnabled() and Target:DebuffStack(S.FesteringWoundDebuff) >= 4) then
+  -- abomination_limb,if=variable.st_planning&soulbind.kevins_oozeling&(debuff.festering_wound.stack>=4&!runeforge.abominations_frenzy|runeforge.abominations_frenzy&cooldown.apocalypse.remains)
+  if S.AbominationLimb:IsCastable() and CDsON() and (VarSTPlanning and S.KevinsOozeling:SoulbindEnabled() and (Target:DebuffStack(S.FesteringWoundDebuff) >= 4 and (not AbominationsFrenzyEquipped) or AbominationsFrenzyEquipped and S.Apocalypse:CooldownDown())) then
     if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 9"; end
   end
   -- abomination_limb,if=variable.adds_remain&rune.time_to_4>buff.runic_corruption.remains
