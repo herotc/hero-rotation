@@ -160,8 +160,7 @@ end
 local function EvaluateTargetIfAimedShot()
   -- if=buff.precise_shots.down&(buff.trick_shots.up|!set_bonus.tier28_4pc)|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|buff.trick_shots.remains>execute_time&active_enemies>1
   -- Note: Added IsCasting check to smooth out opener when not using SteadyFocus
-  -- TODO: Tier 28 stuffs
-  return (Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.Trueshot) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime()) and ((not Player:IsCasting(S.AimedShot)) or EnemiesCount10ySplash < 2) or Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and EnemiesCount10ySplash > 1)
+  return (Player:BuffDown(S.PreciseShotsBuff) and (TrickShotsBuffCheck() or not Player:HasTier(28, 4)) or (Player:BuffUp(S.Trueshot) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime()) and ((not Player:IsCasting(S.AimedShot)) or EnemiesCount10ySplash < 2) or Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and EnemiesCount10ySplash > 1)
 end
 
 local function EvaluateTargetIfAimedShot2()
@@ -317,9 +316,9 @@ local function St()
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 34"; end
   end
   -- chimaera_shot,if=set_bonus.tier28_4pc&buff.trick_shots.down&buff.precise_shots.stack*20+focused_trickery_count>40&focus>buff.precise_shots.stack*cost+(action.aimed_shot.cost-buff.precise_shots.stack*cast_regen)
-  -- TODO: Tier 28 stuffs
+  -- TODO: Handle Focused Trickery
   -- arcane_shot,if=set_bonus.tier28_4pc&buff.trick_shots.down&buff.precise_shots.stack*20+focused_trickery_count>40&focus>buff.precise_shots.stack*cost+(action.aimed_shot.cost-buff.precise_shots.stack*cast_regen)
-  -- TODO: Tier 28 stuffs
+  -- TODO: Handle Focused Trickery
   -- trueshot,if=((buff.precise_shots.down|talent.calling_the_shots)&covenant.venthyr|covenant.necrolord|cooldown.resonating_arrow.remains>30|cooldown.resonating_arrow.remains<10|cooldown.wild_spirits.remains>30|buff.wild_spirits.up)|buff.volley.up&active_enemies>1|fight_remains<25
   if S.Trueshot:IsReady() and CDsON() and (((Player:BuffDown(S.PreciseShotsBuff) or S.CallingtheShots:IsAvailable()) and CovenantID == 2 or CovenantID == 4 or S.ResonatingArrow:CooldownRemains() > 30 or S.ResonatingArrow:CooldownRemains() < 10 or S.WildSpirits:CooldownRemains() > 30 or Player:BuffUp(S.WildSpiritsBuff)) or Player:BuffUp(S.VolleyBuff) and EnemiesCount10ySplash > 1 or fightRemains < 25) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot st 32"; end
