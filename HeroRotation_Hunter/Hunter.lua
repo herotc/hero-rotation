@@ -234,8 +234,10 @@ Spell.Hunter.Survival = {
   WildfireInfusion                      = Spell(271014),
   -- Buffs/Debuffs
   CoordinatedAssaultBuff                = Spell(266779),
+  FlayersMarkBuff                       = Spell(324156),
   InternalBleedingDebuff                = Spell(270343),
   LatentPoisonDebuff                    = Spell(273286),
+  MadBombardierBuff                     = Spell(363805),
   SerpentStingDebuff                    = Spell(259491),
   VipersVenomBuff                       = Spell(268552),
   -- Covenants
