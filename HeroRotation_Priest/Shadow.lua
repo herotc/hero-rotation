@@ -66,6 +66,7 @@ local VarAllDotsUp = false
 local VarMindSearCutoff = 1
 local VarSearingNightmareCutoff = false
 local VarPoolForCDs = false
+local DarkThoughtMaxStacks = 2
 local SephuzEquipped = Player:HasLegendaryEquipped(202)
 local TalbadarEquipped = Player:HasLegendaryEquipped(161)
 local PainbreakerEquipped = Player:HasLegendaryEquipped(158)
@@ -143,7 +144,7 @@ end
 local function EvaluateCycleDamnation200(TargetUnit)
   -- target_if=(dot.vampiric_touch.refreshable|dot.shadow_word_pain.refreshable|(!buff.mind_devourer.up&insanity<50))&(buff.dark_thought.stack<buff.dark_thought.max_stack|!set_bonus.tier28_2pc)
   -- TODO: Add tier handling
-  return ((TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) or TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) or (Player:BuffDown(S.MindDevourerBuff) and Player:Insanity() < 50)))
+  return ((TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) or TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) or (Player:BuffDown(S.MindDevourerBuff) and Player:Insanity() < 50)) and (Player:BuffStack(S.DarkThoughtBuff) < DarkThoughtMaxStacks or not Player:HasTier(28, 2)))
 end
 
 local function EvaluateCycleShadowWordDeath204(TargetUnit)
@@ -397,7 +398,7 @@ local function Main()
   end
   -- mind_blast,if=(cooldown.mind_blast.charges>1&(debuff.hungering_void.up|!talent.hungering_void.enabled)|pet.fiend.remains<=cast_time+gcd)&pet.fiend.active&runeforge.shadowflame_prism.equipped&pet.fiend.remains>cast_time|buff.dark_thought.up&buff.voidform.up&!cooldown.void_bolt.up&(!runeforge.shadowflame_prism.equipped|!pet.fiend.active)&set_bonus.tier28_4pc
   -- TODO: Add tier handling (everything beyond "|buff.dark_thought.up"
-  if S.MindBlast:IsCastable() and ((S.MindBlast:Charges() > 1 and (Target:DebuffUp(S.HungeringVoidDebuff) or not S.HungeringVoid:IsAvailable()) or 15 - S.Mindbender:TimeSinceLastCast() <= S.MindBlast:CastTime() + Player:GCD() + 0.5) and S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and 15 - S.Mindbender:TimeSinceLastCast() > S.MindBlast:CastTime()) then
+  if S.MindBlast:IsCastable() and ((S.MindBlast:Charges() > 1 and (Target:DebuffUp(S.HungeringVoidDebuff) or not S.HungeringVoid:IsAvailable()) or (S.Mindbender:TimeSinceLastCast() <= 15 and 15 - S.Mindbender:TimeSinceLastCast() <= S.MindBlast:CastTime() + Player:GCD() + 0.5)) and S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and 15 - S.Mindbender:TimeSinceLastCast() > S.MindBlast:CastTime() or Player:BuffUp(S.DarkThoughtBuff) and Player:BuffUp(S.VoidformBuff) and (not S.VoidBolt:CooldownUp()) and ((not ShadowflamePrismEquipped) or S.Mindbender:TimeSinceLastCast() > 15) and Player:HasTier(28, 4)) then
     if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 100"; end
   end
   -- void_bolt,if=insanity<=85&talent.hungering_void.enabled&talent.searing_nightmare.enabled&spell_targets.mind_sear<=6|((talent.hungering_void.enabled&!talent.searing_nightmare.enabled)|spell_targets.mind_sear=1)
