@@ -32,16 +32,12 @@ local I = Item.Priest.Commons
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.DarkmoonDeckPutrescence:ID(),
-  I.DreadfireVessel:ID(),
   I.EmpyrealOrdinance:ID(),
-  I.GlyphofAssimilation:ID(),
   I.InscrutableQuantumDevice:ID(),
   I.MacabreSheetMusic:ID(),
   I.ShadowedOrbofTorment:ID(),
   I.SinfulGladiatorsBadgeofFerocity:ID(),
-  I.SoullettingRuby:ID(),
-  I.SunbloodAmethyst:ID()
+  I.SoullettingRuby:ID()
 }
 
 -- Rotation Var
@@ -238,25 +234,6 @@ local function Precombat()
   end
 end
 
-local function DmgTrinkets()
-  -- use_item,name=darkmoon_deck_putrescence
-  if I.DarkmoonDeckPutrescence:IsEquippedAndReady() then
-    if Cast(I.DarkmoonDeckPutrescence, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "darkmoon_deck_putrescence"; end
-  end
-  -- use_item,name=sunblood_amethyst
-  if I.SunbloodAmethyst:IsEquippedAndReady() then
-    if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "sunblood_amethyst"; end
-  end
-  -- use_item,name=glyph_of_assimilation
-  if I.GlyphofAssimilation:IsEquippedAndReady() then
-    if Cast(I.GlyphofAssimilation, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "glyph_of_assimilation"; end
-  end
-  -- use_item,name=dreadfire_vessel
-  if I.DreadfireVessel:IsEquippedAndReady() then
-    if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel"; end
-  end
-end
-
 local function Trinkets()
   -- use_item,name=empyreal_ordnance,if=cooldown.void_eruption.remains<=12|cooldown.void_eruption.remains>27
   if I.EmpyrealOrdinance:IsEquippedAndReady() and (S.VoidEruption:CooldownRemains() <= 12 or S.VoidEruption:CooldownRemains() > 27) then
@@ -281,10 +258,6 @@ local function Trinkets()
   -- use_item,name=shadowed_orb_of_torment,if=cooldown.power_infusion.remains<=10&cooldown.void_eruption.remains<=10&(covenant.necrolord|covenant.kyrian)|(covenant.venthyr|covenant.night_fae)&(!buff.voidform.up|prev_gcd.1.void_bolt)|fight_remains<=40
   if I.ShadowedOrbofTorment:IsEquippedAndReady() and (S.PowerInfusion:CooldownRemains() <= 10 and S.VoidEruption:CooldownRemains() <= 10 and (CovenantID == 4 or CovenantID == 1) or (CovenantID == 2 or CovenantID == 3) and (Player:BuffDown(S.VoidformBuff) or Player:PrevGCD(1, S.VoidBolt)) or fightRemains <= 40) then
     if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment"; end
-  end
-  -- call_action_list,name=dmg_trinkets,if=(!talent.hungering_void.enabled|debuff.hungering_void.up)&(buff.voidform.up|cooldown.void_eruption.remains>10)
-  if ((not S.HungeringVoid:IsAvailable() or Target:DebuffUp(S.HungeringVoidDebuff)) and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() > 10)) then
-    local ShouldReturn = DmgTrinkets(); if ShouldReturn then return ShouldReturn; end
   end
   -- use_items,if=buff.voidform.up|buff.power_infusion.up|cooldown.void_eruption.remains>10
   if (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or S.VoidEruption:CooldownRemains() > 10) then
