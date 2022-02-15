@@ -51,6 +51,7 @@ Spell.DeathKnight.Commons = {
   ThrillSeeker                          = Spell(331939),
   UnleashedFrenzy                       = Spell(338492),
   VolatileSolvent                       = Spell(323074),
+  VolatileSolventHumanBuff              = Spell(323491),
   WitheringGround                       = Spell(341344),
   -- Domination Shards
   ChaosBaneBuff                         = Spell(355829),

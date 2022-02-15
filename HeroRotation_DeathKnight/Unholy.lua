@@ -437,8 +437,8 @@ local function Covenants()
   if S.ShackleTheUnworthy:IsCastable() and (VarAddsRemain and (Player:BuffUp(S.DeathAndDecayBuff) or AddsFightRemains(Enemies10ySplash) <= 14)) then
     if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 14"; end
   end
-  -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
-  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
+  -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent&!buff.volatile_solvent_humanoid.up,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft covenants 16"; end
   end
 end
@@ -518,8 +518,8 @@ local function Generic()
 end
 
 local function Trinkets()
-  -- use_item,name=inscrutable_quantum_device,if=(cooldown.unholy_blight.remains>20|cooldown.dark_transformation.remains_expected>20)&(active_enemies>=2|pet.army_ghoul.active|pet.apoc_ghoul.active&(talent.unholy_assault|death_knight.disable_aotd)|pet.gargoyle.active)|fight_remains<21|target.time_to_pct_20<5
-  if I.InscrutableQuantumDevice:IsEquippedAndReady() and ((S.UnholyBlight:CooldownRemains() > 20 or S.DarkTransformation:CooldownRemains() > 20) and (EnemiesMeleeCount >= 2 or S.ArmyoftheDead:TimeSinceLastCast() <= 30 or VarApocGhoulActive and (S.UnholyAssault:IsAvailable() or Settings.Unholy.DisableAotD) or VarGargoyleActive) or HL.FilteredFightRemains(EnemiesMelee, "<", 21) or Target:TimeToX(20) < 5) then
+  -- use_item,name=inscrutable_quantum_device,if=(cooldown.unholy_blight.remains>20|cooldown.dark_transformation.remains_expected>20)&(active_enemies>=2|pet.army_ghoul.active|pet.apoc_ghoul.active&(talent.unholy_assault|death_knight.disable_aotd)|pet.gargoyle.active)|fight_remains<21|target.time_to_pct_20<5&!buff.bloodlust.up
+  if I.InscrutableQuantumDevice:IsEquippedAndReady() and ((S.UnholyBlight:CooldownRemains() > 20 or S.DarkTransformation:CooldownRemains() > 20) and (EnemiesMeleeCount >= 2 or S.ArmyoftheDead:TimeSinceLastCast() <= 30 or VarApocGhoulActive and (S.UnholyAssault:IsAvailable() or Settings.Unholy.DisableAotD) or VarGargoyleActive) or HL.FilteredFightRemains(EnemiesMelee, "<", 21) or Target:TimeToX(20) < 5 and Player:BloodlustDown()) then
     if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device trinkets 2"; end
   end
   -- use_item,slot=trinket1,if=!variable.specified_trinket&((trinket.1.proc.any_dps.duration<=15&cooldown.apocalypse.remains>20|trinket.1.proc.any_dps.duration>15&(cooldown.unholy_blight.remains>20|cooldown.dark_transformation.remains_expected>20)|active_enemies>=2&buff.dark_transformation.up)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1))|trinket.1.proc.any_dps.duration>=fight_remains
