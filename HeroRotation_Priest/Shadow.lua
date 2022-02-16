@@ -28,20 +28,16 @@ local mathmin       = math.min
 
 -- Define S/I for spell and item arrays
 local S = Spell.Priest.Shadow
-local I = Item.Priest.Shadow
+local I = Item.Priest.Commons
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.DarkmoonDeckPutrescence:ID(),
-  I.DreadfireVessel:ID(),
   I.EmpyrealOrdinance:ID(),
-  I.GlyphofAssimilation:ID(),
   I.InscrutableQuantumDevice:ID(),
   I.MacabreSheetMusic:ID(),
   I.ShadowedOrbofTorment:ID(),
   I.SinfulGladiatorsBadgeofFerocity:ID(),
-  I.SoullettingRuby:ID(),
-  I.SunbloodAmethyst:ID()
+  I.SoullettingRuby:ID()
 }
 
 -- Rotation Var
@@ -59,15 +55,19 @@ local Settings = {
 }
 
 -- Variables
+local combatTime = 0
+local fightRemains = 0
 local VarDotsUp = false
 local VarAllDotsUp = false
 local VarMindSearCutoff = 1
 local VarSearingNightmareCutoff = false
 local VarPoolForCDs = false
+local DarkThoughtMaxStacks = 2
 local SephuzEquipped = Player:HasLegendaryEquipped(202)
 local TalbadarEquipped = Player:HasLegendaryEquipped(161)
 local PainbreakerEquipped = Player:HasLegendaryEquipped(158)
 local ShadowflamePrismEquipped = Player:HasLegendaryEquipped(159)
+local SpheresHarmonyEquipped = Player:HasLegendaryEquipped(261)
 
 HL:RegisterForEvent(function()
   VarDotsUp = false
@@ -77,11 +77,21 @@ HL:RegisterForEvent(function()
   VarPoolForCDs = false
 end, "PLAYER_REGEN_ENABLED")
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 HL:RegisterForEvent(function()
   SephuzEquipped = Player:HasLegendaryEquipped(202)
   TalbadarEquipped = Player:HasLegendaryEquipped(161)
   PainbreakerEquipped = Player:HasLegendaryEquipped(158)
   ShadowflamePrismEquipped = Player:HasLegendaryEquipped(159)
+  SpheresHarmonyEquipped = Player:HasLegendaryEquipped(261)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -128,7 +138,9 @@ local function UnitsRefreshSWP(enemies)
 end
 
 local function EvaluateCycleDamnation200(TargetUnit)
-  return (not DotsUp(TargetUnit, true))
+  -- target_if=(dot.vampiric_touch.refreshable|dot.shadow_word_pain.refreshable|(!buff.mind_devourer.up&insanity<50))&(buff.dark_thought.stack<buff.dark_thought.max_stack|!set_bonus.tier28_2pc)
+  -- TODO: Add tier handling
+  return ((TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) or TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) or (Player:BuffDown(S.MindDevourerBuff) and Player:Insanity() < 50)) and (Player:BuffStack(S.DarkThoughtBuff) < DarkThoughtMaxStacks or not Player:HasTier(28, 2)))
 end
 
 local function EvaluateCycleShadowWordDeath204(TargetUnit)
@@ -140,15 +152,15 @@ local function EvaluateCycleSurrenderToMadness206(TargetUnit)
 end
 
 local function EvaluateCycleVoidTorrent208(TargetUnit)
-  return (DotsUp(TargetUnit, false) and TargetUnit:TimeToDie() > 3 and (Player:BuffDown(S.VoidformBuff) or Player:BuffRemains(S.VoidformBuff) < S.VoidBolt:CooldownRemains()) and S.VampiricTouchDebuff:AuraActiveCount() >= EnemiesCount10ySplash and EnemiesCount10ySplash < (5 + (6 * num(S.TwistofFate:IsAvailable()))))
+  return (DotsUp(TargetUnit, false) and (Player:BuffDown(S.VoidformBuff) or Player:BuffRemains(S.VoidformBuff) < S.VoidBolt:CooldownRemains() or Player:PrevGCD(1, S.VoidBolt) and Player:BloodlustDown() and EnemiesCount10ySplash < 3) and S.VampiricTouch:AuraActiveCount() >= EnemiesCount10ySplash and EnemiesCount10ySplash < (5 + (6 * num(S.TwistofFate:IsAvailable()))))
 end
 
 local function EvaluateCycleVampiricTouch214(TargetUnit)
-  return (TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) and TargetUnit:TimeToDie() > 6 or (S.Misery:IsAvailable() and TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff)) or Player:BuffUp(S.UnfurlingDarknessBuff))
+  return ((TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) and TargetUnit:TimeToDie() > 6 or (S.Misery:IsAvailable() and TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff))) and ((not S.Damnation:IsAvailable()) or S.Damnation:CooldownRemains() >= TargetUnit:DebuffRemains(S.VampiricTouchDebuff) or S.Damnation:CooldownRemains() >= TargetUnit:DebuffRemains(S.ShadowWordPainDebuff)) or Player:BuffUp(S.UnfurlingDarknessBuff))
 end
 
 local function EvaluateCycleShadowWordPain220(TargetUnit)
-  return (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and TargetUnit:TimeToDie() > 4 and not S.Misery:IsAvailable() and not (S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > VarMindSearCutoff) and (not S.PsychicLink:IsAvailable() or (S.PsychicLink:IsAvailable() and EnemiesCount10ySplash <= 2)))
+  return (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and TargetUnit:TimeToDie() > 4 and not S.Misery:IsAvailable() and not (S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > VarMindSearCutoff) and (not S.PsychicLink:IsAvailable() or (S.PsychicLink:IsAvailable() and EnemiesCount10ySplash <= 2)) and ((not S.Damnation:IsAvailable()) or S.Damnation:CooldownRemains() >= TargetUnit:DebuffRemains(S.ShadowWordPainDebuff)))
 end
 
 local function EvaluateCycleMindSear224(TargetUnit)
@@ -156,7 +168,7 @@ local function EvaluateCycleMindSear224(TargetUnit)
 end
 
 local function EvaluateCycleMindgames226(TargetUnit)
-  return (Player:Insanity() < 90 and ((DotsUp(TargetUnit, true) and (not S.VoidEruption:CooldownUp() or not S.HungeringVoid:IsAvailable())) or Player:BuffUp(S.VoidformBuff)) and (not S.HungeringVoid:IsAvailable() or Target:DebuffUp(S.HungeringVoidDebuff) or Player:BuffDown(S.VoidformBuff)) and (not S.SearingNightmare:IsAvailable() or EnemiesCount10ySplash < 5))
+  return (Player:Insanity() < 90 and ((DotsUp(TargetUnit, true) and (not S.VoidEruption:CooldownUp() or not S.HungeringVoid:IsAvailable())) or Player:BuffUp(S.VoidformBuff)) and (not S.HungeringVoid:IsAvailable() or Target:DebuffRemains(S.HungeringVoidDebuff) > S.Mindgames:CastTime() or Player:BuffDown(S.VoidformBuff)) and (not S.SearingNightmare:IsAvailable() or EnemiesCount10ySplash < 5))
 end
 
 local function EvaluateCycleSilence228(TargetUnit)
@@ -177,9 +189,9 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   if Everyone.TargetIsValid() then
-    -- potion
-    if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
-      if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_spectral_intellect 2"; end
+    -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
+    if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft 2"; end
     end
     -- shadowform,if=!buff.shadowform.up
     if S.Shadowform:IsCastable() and (Player:BuffDown(S.ShadowformBuff)) then
@@ -195,9 +207,13 @@ local function Precombat()
     end
     -- variable,name=mind_sear_cutoff,op=set,value=2
     VarMindSearCutoff = 2
-    -- vampiric_touch
-    if S.VampiricTouch:IsCastable() then
+    -- vampiric_touch,if=!talent.damnation.enabled
+    if S.VampiricTouch:IsCastable() and (not S.Damnation:IsAvailable()) then
       if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch 10"; end
+    end
+    -- mind_blast,if=talent.damnation.enabled
+    if S.MindBlast:IsReady() and (S.Damnation:IsAvailable()) then
+      if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 11"; end
     end
     -- Manually added: mind_blast,if=talent.misery.enabled&(!runeforge.talbadars_stratagem.equipped|!talent.void_torrent.enabled)
     if S.MindBlast:IsCastable() and (S.Misery:IsAvailable() and (not TalbadarEquipped or not S.VoidTorrent:IsAvailable())) then
@@ -215,25 +231,6 @@ local function Precombat()
     if S.ShadowWordPain:IsCastable() and (not S.Misery:IsAvailable()) then
       if Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 16"; end
     end
-  end
-end
-
-local function DmgTrinkets()
-  -- use_item,name=darkmoon_deck_putrescence
-  if I.DarkmoonDeckPutrescence:IsEquippedAndReady() then
-    if Cast(I.DarkmoonDeckPutrescence, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "darkmoon_deck_putrescence"; end
-  end
-  -- use_item,name=sunblood_amethyst
-  if I.SunbloodAmethyst:IsEquippedAndReady() then
-    if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "sunblood_amethyst"; end
-  end
-  -- use_item,name=glyph_of_assimilation
-  if I.GlyphofAssimilation:IsEquippedAndReady() then
-    if Cast(I.GlyphofAssimilation, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "glyph_of_assimilation"; end
-  end
-  -- use_item,name=dreadfire_vessel
-  if I.DreadfireVessel:IsEquippedAndReady() then
-    if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel"; end
   end
 end
 
@@ -258,13 +255,9 @@ local function Trinkets()
   if I.SinfulGladiatorsBadgeofFerocity:IsEquippedAndReady() and (S.VoidEruption:CooldownRemains() >= 10) then
     if Cast(I.SinfulGladiatorsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sinful_gladiators_badge_of_ferocity"; end
   end
-  -- use_item,name=shadowed_orb_of_torment,if=!buff.voidform.up|(prev_gcd.1.void_bolt)
-  if I.ShadowedOrbofTorment:IsEquippedAndReady() and (Player:BuffDown(S.VoidformBuff) or Player:PrevGCD(1, S.VoidBolt)) then
+  -- use_item,name=shadowed_orb_of_torment,if=cooldown.power_infusion.remains<=10&cooldown.void_eruption.remains<=10&(covenant.necrolord|covenant.kyrian)|(covenant.venthyr|covenant.night_fae)&(!buff.voidform.up|prev_gcd.1.void_bolt)|fight_remains<=40
+  if I.ShadowedOrbofTorment:IsEquippedAndReady() and (S.PowerInfusion:CooldownRemains() <= 10 and S.VoidEruption:CooldownRemains() <= 10 and (CovenantID == 4 or CovenantID == 1) or (CovenantID == 2 or CovenantID == 3) and (Player:BuffDown(S.VoidformBuff) or Player:PrevGCD(1, S.VoidBolt)) or fightRemains <= 40) then
     if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment"; end
-  end
-  -- call_action_list,name=dmg_trinkets,if=(!talent.hungering_void.enabled|debuff.hungering_void.up)&(buff.voidform.up|cooldown.void_eruption.remains>10)
-  if ((not S.HungeringVoid:IsAvailable() or Target:DebuffUp(S.HungeringVoidDebuff)) and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() > 10)) then
-    local ShouldReturn = DmgTrinkets(); if ShouldReturn then return ShouldReturn; end
   end
   -- use_items,if=buff.voidform.up|buff.power_infusion.up|cooldown.void_eruption.remains>10
   if (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or S.VoidEruption:CooldownRemains() > 10) then
@@ -276,8 +269,8 @@ local function Trinkets()
 end
 
 local function Cds()
-  -- power_infusion,if=priest.self_power_infusion&(buff.voidform.up|!covenant.kyrian&cooldown.void_eruption.remains>=10|fight_remains<cooldown.void_eruption.remains)&(fight_remains>=cooldown.void_eruption.remains+15&cooldown.void_eruption.remains<=gcd*4|fight_remains>cooldown.power_infusion.duration|fight_remains<cooldown.void_eruption.remains+15|covenant.kyrian|buff.bloodlust.up)
-  if S.PowerInfusion:IsCastable() and (Settings.Shadow.SelfPI and (Player:BuffUp(S.VoidformBuff) or Player:Covenant() ~= "Kyrian" and S.VoidEruption:CooldownRemains() >= 10 or HL.BossFilteredFightRemains("<", S.VoidEruption:CooldownRemains())) and (HL.BossFilteredFightRemains(">=", S.VoidEruption:CooldownRemains() + 15) and S.VoidEruption:CooldownRemains() <= Player:GCD() * 4 or HL.BossFilteredFightRemains(">", S.PowerInfusion:Cooldown()) or HL.BossFilteredFightRemains("<", S.VoidEruption:CooldownRemains() + 15) or Player:Covenant() == "Kyrian" or Player:BloodlustUp())) then
+  -- power_infusion,if=priest.self_power_infusion&(buff.voidform.up|!covenant.kyrian&!covenant.necrolord&cooldown.void_eruption.remains>=10|fight_remains<cooldown.void_eruption.remains)&(fight_remains>=cooldown.void_eruption.remains+15&cooldown.void_eruption.remains<=gcd*4|fight_remains>cooldown.power_infusion.duration|fight_remains<cooldown.void_eruption.remains+15|covenant.kyrian|buff.bloodlust.up)
+  if S.PowerInfusion:IsCastable() and (Settings.Shadow.SelfPI and (Player:BuffUp(S.VoidformBuff) or CovenantID ~= 1 and S.VoidEruption:CooldownRemains() >= 10 or fightRemains < S.VoidEruption:CooldownRemains()) and (fightRemains >= S.VoidEruption:CooldownRemains() + 15 and S.VoidEruption:CooldownRemains() <= Player:GCD() * 4 or fightRemains > 120 or fightRemains < S.VoidEruption:CooldownRemains() + 15 or CovenantID == 1 or Player:BloodlustUp())) then
     if Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "power_infusion 50"; end
   end
   -- silence,target_if=runeforge.sephuzs_proclamation.equipped&(target.is_add|target.debuff.casting.react)
@@ -288,12 +281,12 @@ local function Cds()
   if S.FaeGuardians:IsReady() and (Player:BuffDown(S.VoidformBuff) and (not S.VoidTorrent:CooldownUp() or not S.VoidTorrent:IsAvailable()) and (VarDotsUp and EnemiesCount10ySplash == 1 or S.VampiricTouchDebuff:AuraActiveCount() == EnemiesCount10ySplash and EnemiesCount10ySplash > 1) or Player:BuffUp(S.VoidformBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable())) then
     if Cast(S.FaeGuardians, Settings.Commons.DisplayStyle.Covenant) then return "fae_guardians 52"; end
   end
-  -- Covenant: mindgames,target_if=insanity<90&((variable.all_dots_up&(!cooldown.void_eruption.up|!talent.hungering_void.enabled))|buff.voidform.up)&(!talent.hungering_void.enabled|debuff.hungering_void.up|!buff.voidform.up)&(!talent.searing_nightmare.enabled|spell_targets.mind_sear<5)
+  -- Covenant: mindgames,target_if=insanity<90&((variable.all_dots_up&(!cooldown.void_eruption.up|!talent.hungering_void.enabled))|buff.voidform.up)&(!talent.hungering_void.enabled|debuff.hungering_void.remains>cast_time|!buff.voidform.up)&(!talent.searing_nightmare.enabled|spell_targets.mind_sear<5)
   if S.Mindgames:IsReady() then
     if Cast(S.Mindgames, Enemies40y, EvaluateCycleMindgames226, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames 54"; end
   end
-  -- Covenant: unholy_nova,if=((!raid_event.adds.up&raid_event.adds.in>20)|raid_event.adds.remains>=15|raid_event.adds.duration<15)&(buff.power_infusion.up|cooldown.power_infusion.remains>=10|!priest.self_power_infusion)&(!talent.hungering_void.enabled|debuff.hungering_void.up|!buff.voidform.up)
-  if S.UnholyNova:IsReady() and ((Player:BuffUp(S.PowerInfusionBuff) or S.PowerInfusion:CooldownRemains() >= 10 or not Settings.Shadow.SelfPI) and (not S.HungeringVoid:IsAvailable() or Target:DebuffUp(S.HungeringVoidDebuff) or Player:BuffDown(S.VoidformBuff))) then
+  -- Covenant: unholy_nova,if=!talent.hungering_void.enabled&variable.dots_up|debuff.hungering_void.up&buff.voidform.up|(cooldown.void_eruption.remains>10|!variable.pool_for_cds)&!buff.voidform.up
+  if S.UnholyNova:IsReady() and ((not S.HungeringVoid:IsAvailable()) and VarDotsUp or Target:DebuffUp(S.HungeringVoidDebuff) and Player:BuffUp(S.VoidformBuff) or (S.VoidEruption:CooldownRemains() > 10 or not VarPoolForCDs) and Player:BuffDown(S.VoidformBuff)) then
     if Cast(S.UnholyNova, Settings.Commons.DisplayStyle.Covenant, nil, not Target:IsSpellInRange(S.UnholyNova)) then return "unholy_nova 56"; end
   end
   -- Covenant: boon_of_the_ascended,if=!buff.voidform.up&!cooldown.void_eruption.up&spell_targets.mind_sear>1&!talent.searing_nightmare.enabled|(buff.voidform.up&spell_targets.mind_sear<2&!talent.searing_nightmare.enabled&(prev_gcd.1.void_bolt&(!equipped.empyreal_ordnance|!talent.hungering_void.enabled)|equipped.empyreal_ordnance&trinket.empyreal_ordnance.cooldown.remains<=162&debuff.hungering_void.up))|(buff.voidform.up&talent.searing_nightmare.enabled)
@@ -304,9 +297,9 @@ local function Cds()
   if (Settings.Commons.Enabled.Trinkets) then
     local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
   end
-  -- fleshcraft,if=soulbind.volatile_solvent&buff.volatile_solvent_humanoid.remains<10&!buff.voidform.up&!buff.power_infusion.up
-  if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffRemains(S.VolatileSolventHumanBuff) < 10 and Player:BuffDown(S.VoidformBuff) and Player:BuffDown(S.PowerInfusionBuff)) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft 60"; end
+  -- desperate_prayer,if=health.pct<=75
+  if S.DesperatePrayer:IsCastable() and (Player:HealthPercentage() <= Settings.Shadow.DesperatePrayerHP) then
+    if Cast(S.DesperatePrayer) then return "desperate_prayer 60"; end
   end
 end
 
@@ -315,8 +308,8 @@ local function Boon()
   if S.AscendedBlast:IsReady() and (EnemiesCount10ySplash <= 3) then
     if Cast(S.AscendedBlast, Settings.Commons.DisplayStyle.Covenant, nil, not Target:IsSpellInRange(S.AscendedBlast)) then return "ascended_blast 70"; end
   end
-  -- ascended_nova,if=spell_targets.ascended_nova>1&spell_targets.mind_sear>1+talent.searing_nightmare.enabled
-  if S.AscendedNova:IsReady() and (#Enemies8yMelee > 1 and EnemiesCount10ySplash > (1 + num(S.SearingNightmare:IsAvailable()))) then
+  -- ascended_nova,if=spell_targets.ascended_nova>1&spell_targets.mind_sear>1&!talent.searing_nightmare.enabled
+  if S.AscendedNova:IsReady() and (#Enemies8yMelee > 1 and EnemiesCount10ySplash > 1 and not S.SearingNightmare:IsAvailable()) then
     if Cast(S.AscendedNova, Settings.Commons.DisplayStyle.Covenant, nil, not Target:IsInRange(8)) then return "ascended_nova 72"; end
   end
 end
@@ -344,10 +337,10 @@ local function Main()
   end
   -- Manually added: void_bolt,if=buff.dissonant_echoes.up
   if S.VoidBolt:CooldownUp() and (Player:BuffUp(S.DissonantEchoesBuff)) then
-    if Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 90"; end
+    if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt 90"; end
   end
-  -- void_eruption,if=variable.pool_for_cds&(insanity>=40|pet.fiend.active&runeforge.shadowflame_prism.equipped&!cooldown.mind_blast.up&!cooldown.shadow_word_death.up)&(insanity<=85|talent.searing_nightmare.enabled&variable.searing_nightmare_cutoff)&!cooldown.fiend.up&(!cooldown.mind_blast.up|spell_targets.mind_sear>2)
-  if S.VoidEruption:IsReady() and (VarPoolForCDs and (Player:Insanity() >= 40 or S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and not S.MindBlast:CooldownUp() and not S.ShadowWordDeath:CooldownUp()) and (Player:Insanity() <= 85 or S.SearingNightmare:IsAvailable() and VarSearingNightmareCutoff) and not S.Mindbender:CooldownUp() and (not S.MindBlast:CooldownUp() or EnemiesCount10ySplash > 2)) then
+  -- void_eruption,if=variable.pool_for_cds&(insanity>=25|pet.fiend.active&runeforge.shadowflame_prism.equipped&!cooldown.mind_blast.up&!cooldown.shadow_word_death.up)&(insanity<=85|talent.searing_nightmare.enabled&variable.searing_nightmare_cutoff)&!cooldown.fiend.up&(!soulbind.volatile_solvent|buff.volatile_solvent_humanoid.up)
+  if S.VoidEruption:IsReady() and (VarPoolForCDs and (Player:Insanity() >= 25 or S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and not S.MindBlast:CooldownUp() and not S.ShadowWordDeath:CooldownUp()) and (Player:Insanity() <= 85 or S.SearingNightmare:IsAvailable() and VarSearingNightmareCutoff) and not S.Mindbender:CooldownUp() and ((not S.VolatileSolvent:SoulbindEnabled()) or Player:BuffUp(S.VolatileSolventHumanBuff))) then
     if Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption, nil, not Target:IsSpellInRange(S.VoidEruption)) then return "void_eruption 92"; end
   end
   -- shadow_word_pain,if=buff.fae_guardians.up&!debuff.wrathful_faerie.up&spell_targets.mind_sear<4
@@ -367,7 +360,8 @@ local function Main()
   if S.MindSear:IsCastable() and (S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > VarMindSearCutoff and UnitsWithoutSWPain > 0 and not S.Mindbender:CooldownUp()) then
     if Cast(S.MindSear, nil, nil, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear 97"; end
   end
-  -- damnation,target_if=!variable.all_dots_up
+  -- damnation,target_if=(dot.vampiric_touch.refreshable|dot.shadow_word_pain.refreshable|(!buff.mind_devourer.up&insanity<50))&(buff.dark_thought.stack<buff.dark_thought.max_stack|!set_bonus.tier28_2pc)
+  -- TODO: Add tier set bonus handling
   if S.Damnation:IsCastable() then
     if Everyone.CastCycle(S.Damnation, Enemies40y, EvaluateCycleDamnation200, not Target:IsSpellInRange(S.Damnation)) then return "damnation 98"; end
   end
@@ -375,16 +369,17 @@ local function Main()
   if S.ShadowWordDeath:IsReady() and (S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and 15 - S.Mindbender:TimeSinceLastCast() <= Player:GCD() + 0.5) then
     if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death 99"; end
   end
-  -- mind_blast,if=(cooldown.mind_blast.charges>1&(debuff.hungering_void.up|!talent.hungering_void.enabled)|pet.fiend.remains<=cast_time+gcd)&pet.fiend.active&runeforge.shadowflame_prism.equipped&pet.fiend.remains>cast_time
-  if S.MindBlast:IsCastable() and ((S.MindBlast:Charges() > 1 and (Target:DebuffUp(S.HungeringVoidDebuff) or not S.HungeringVoid:IsAvailable()) or 15 - S.Mindbender:TimeSinceLastCast() <= S.MindBlast:CastTime() + Player:GCD() + 0.5) and S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and 15 - S.Mindbender:TimeSinceLastCast() > S.MindBlast:CastTime()) then
+  -- mind_blast,if=(cooldown.mind_blast.charges>1&(debuff.hungering_void.up|!talent.hungering_void.enabled)|pet.fiend.remains<=cast_time+gcd)&pet.fiend.active&runeforge.shadowflame_prism.equipped&pet.fiend.remains>cast_time|buff.dark_thought.up&buff.voidform.up&!cooldown.void_bolt.up&(!runeforge.shadowflame_prism.equipped|!pet.fiend.active)&set_bonus.tier28_4pc
+  -- TODO: Add tier handling (everything beyond "|buff.dark_thought.up"
+  if S.MindBlast:IsCastable() and ((S.MindBlast:Charges() > 1 and (Target:DebuffUp(S.HungeringVoidDebuff) or not S.HungeringVoid:IsAvailable()) or (S.Mindbender:TimeSinceLastCast() <= 15 and 15 - S.Mindbender:TimeSinceLastCast() <= S.MindBlast:CastTime() + Player:GCD() + 0.5)) and S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and 15 - S.Mindbender:TimeSinceLastCast() > S.MindBlast:CastTime() or Player:BuffUp(S.DarkThoughtBuff) and Player:BuffUp(S.VoidformBuff) and (not S.VoidBolt:CooldownUp()) and ((not ShadowflamePrismEquipped) or S.Mindbender:TimeSinceLastCast() > 15) and Player:HasTier(28, 4)) then
     if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 100"; end
   end
   -- void_bolt,if=insanity<=85&talent.hungering_void.enabled&talent.searing_nightmare.enabled&spell_targets.mind_sear<=6|((talent.hungering_void.enabled&!talent.searing_nightmare.enabled)|spell_targets.mind_sear=1)
   if S.VoidBolt:IsCastable() and (Player:Insanity() <= 85 and S.HungeringVoid:IsAvailable() and S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash <= 6 or ((S.HungeringVoid:IsAvailable() and not S.SearingNightmare:IsAvailable()) or EnemiesCount10ySplash == 1)) then
     if Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 101"; end
   end
-  -- devouring_plague,if=(refreshable|insanity>75)&(!variable.pool_for_cds|insanity>=85)&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))
-  if S.DevouringPlague:IsReady() and ((Target:DebuffRefreshable(S.DevouringPlagueDebuff) or Player:Insanity() > 75) and (not VarPoolForCDs or Player:Insanity() >= 85) and (not S.SearingNightmare:IsAvailable() or (S.SearingNightmare:IsAvailable() and not VarSearingNightmareCutoff))) then
+  -- devouring_plague,if=(refreshable|insanity>75|talent.void_torrent.enabled&cooldown.void_torrent.remains<=3*gcd)&(!variable.pool_for_cds|insanity>=85)&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))
+  if S.DevouringPlague:IsReady() and ((Target:DebuffRefreshable(S.DevouringPlagueDebuff) or Player:Insanity() > 75 or S.VoidTorrent:IsAvailable() and S.VoidTorrent:CooldownRemains() <= 3 * Player:GCD()) and (not VarPoolForCDs or Player:Insanity() >= 85) and ((not S.SearingNightmare:IsAvailable()) or (S.SearingNightmare:IsAvailable() and not VarSearingNightmareCutoff))) then
     if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague 102"; end
   end
   -- void_bolt,if=spell_targets.mind_sear<(4+conduit.dissonant_echoes.enabled)&insanity<=85&talent.searing_nightmare.enabled|!talent.searing_nightmare.enabled
@@ -399,7 +394,7 @@ local function Main()
   if S.SurrenderToMadness:IsCastable() then
     if Everyone.CastCycle(S.SurrenderToMadness, Enemies40y, EvaluateCycleSurrenderToMadness206, not Target:IsSpellInRange(S.SurrenderToMadness), Settings.Shadow.OffGCDasOffGCD.SurrenderToMadness) then return "surrender_to_madness 106"; end
   end
-  -- void_torrent,target_if=variable.dots_up&target.time_to_die>3&(buff.voidform.down|buff.voidform.remains<cooldown.void_bolt.remains)&active_dot.vampiric_touch==spell_targets.vampiric_touch&spell_targets.mind_sear<(5+(6*talent.twist_of_fate.enabled))
+  -- void_torrent,target_if=variable.dots_up&(buff.voidform.down|buff.voidform.remains<cooldown.void_bolt.remains|prev_gcd.1.void_bolt&!buff.bloodlust.react&spell_targets.mind_sear<3)&active_dot.vampiric_touch==spell_targets.vampiric_touch&spell_targets.mind_sear<(5+(6*talent.twist_of_fate.enabled))
   if S.VoidTorrent:IsCastable() then
     if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrent208, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent 107"; end
   end
@@ -411,8 +406,6 @@ local function Main()
   if S.ShadowWordDeath:IsReady() and (PainbreakerEquipped and VarDotsUp and Target:TimeToX(20) > S.ShadowWordDeath:Cooldown() + Player:GCD()) then
     if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death 112"; end
   end
-  -- shadow_word_death,if=runeforge.bwonsamdis_pact.equipped&buff.fae_guardians.up&!cooldown.void_eruption.up&target.time_to_pct_20>(cooldown.shadow_word_death.duration+gcd)
-  -- TODO: Above line is 9.1 prep
   -- shadow_crash,if=raid_event.adds.in>10
   if S.ShadowCrash:IsCastable() then
     if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash 114"; end
@@ -421,8 +414,8 @@ local function Main()
   if S.MindSear:IsCastable() and (EnemiesCount10ySplash > VarMindSearCutoff and Player:BuffUp(S.DarkThoughtBuff)) then
     if Cast(S.MindSear, nil, nil, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear 118"; end
   end
-  -- mind_flay,if=buff.dark_thought.up&!(buff.voidform.up&cooldown.voidbolt.remains<=gcd)&variable.dots_up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&cooldown.void_bolt.up
-  if S.MindFlay:IsCastable() and not Player:IsCasting(S.MindFlay) and (Player:BuffUp(S.DarkThoughtBuff) and not (Player:BuffUp(S.VoidformBuff) and S.VoidBolt:CooldownRemains() <= Player:GCD()) and VarDotsUp) then
+  -- mind_flay,if=buff.dark_thought.up&variable.dots_up&!buff.voidform.up&!variable.pool_for_cds&cooldown.mind_blast.full_recharge_time>=gcd.max,chain=1,interrupt_immediate=1,interrupt_if=ticks>=4&!buff.dark_thought.up
+  if S.MindFlay:IsCastable() and not Player:IsCasting(S.MindFlay) and (Player:BuffUp(S.DarkThoughtBuff) and VarDotsUp and Player:BuffDown(S.VoidformBuff) and (not VarPoolForCDs) and S.MindBlast:FullRechargeTime() >= Player:GCD() + 0.150) then
     if Cast(S.MindFlay, nil, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay 120"; end
   end
   -- Manually added: devouring_plague,if=runeforge.talbadars_stratagem.equipped&variable.dots_up&!variable.all_dots_up
@@ -433,7 +426,7 @@ local function Main()
   if S.MindBlast:IsCastable() and (VarDotsUp and EnemiesCount10ySplash < (4 + 2 * num(S.Misery:IsAvailable()) + S.VampiricTouchDebuff:AuraActiveCount() * num(S.PsychicLink:IsAvailable()) + mathmin(5, EnemiesCount10ySplash) * num(S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped)) and (not ShadowflamePrismEquipped or not S.Mindbender:CooldownUp() and ShadowflamePrismEquipped or S.VampiricTouchDebuff:AuraActiveCount() == EnemiesCount10ySplash)) then
     if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 122"; end
   end
-  -- vampiric_touch,target_if=refreshable&target.time_to_die>6|(talent.misery.enabled&dot.shadow_word_pain.refreshable)|buff.unfurling_darkness.up
+  -- vampiric_touch,target_if=(refreshable&target.time_to_die>6|(talent.misery.enabled&dot.shadow_word_pain.refreshable))&(!talent.damnation.enabled|cooldown.damnation.remains>=dot.vampiric_touch.remains|cooldown.damnation.remains>=dot.shadow_word_pain.remains)|buff.unfurling_darkness.up
   if S.VampiricTouch:IsCastable() then
     if Everyone.CastCycle(S.VampiricTouch, Enemies40y, EvaluateCycleVampiricTouch214, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch 124"; end
   end
@@ -441,7 +434,7 @@ local function Main()
   if S.ShadowWordPain:IsCastable() and (Target:DebuffRefreshable(S.ShadowWordPainDebuff) and Target:TimeToDie() > 4 and not S.Misery:IsAvailable() and S.PsychicLink:IsAvailable() and EnemiesCount10ySplash > 2) then
     if Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 126"; end
   end
-  -- shadow_word_pain,target_if=refreshable&target.time_to_die>4&!talent.misery.enabled&!(talent.searing_nightmare.enabled&spell_targets.mind_sear>variable.mind_sear_cutoff)&(!talent.psychic_link.enabled|(talent.psychic_link.enabled&spell_targets.mind_sear<=2))
+  -- shadow_word_pain,target_if=refreshable&target.time_to_die>4&!talent.misery.enabled&!(talent.searing_nightmare.enabled&spell_targets.mind_sear>variable.mind_sear_cutoff)&(!talent.psychic_link.enabled|(talent.psychic_link.enabled&spell_targets.mind_sear<=2))&(!talent.damnation.enabled|cooldown.damnation.remains>=dot.shadow_word_pain.remains)
   if S.ShadowWordPain:IsCastable() and (not S.Misery:IsAvailable()) then
     if Everyone.CastCycle(S.ShadowWordPain, Enemies40y, EvaluateCycleShadowWordPain220, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 128"; end
   end
@@ -449,9 +442,13 @@ local function Main()
   if S.MindSear:IsCastable() and (EnemiesCount10ySplash > VarMindSearCutoff) then
     if Cast(S.MindSear, nil, nil, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear 130"; end
   end
-  -- mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(cooldown.void_bolt.up|cooldown.mind_blast.up)
+  -- mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(!buff.dark_thought.up|cooldown.void_bolt.up&(buff.voidform.up|!buff.dark_thought.up&buff.dissonant_echoes.up)),if=!soulbind.volatile_solvent|!cooldown.fleshcraft.up
   if S.MindFlay:IsCastable() then
     if Cast(S.MindFlay, nil, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay 132"; end
+  end
+  -- fleshcraft,if=soulbind.volatile_solvent&!buff.voidform.up&!buff.power_infusion.up,interrupt_immediate=1,interrupt_if=ticks>=1
+  if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VoidformBuff) and Player:BuffDown(S.PowerInfusionBuff)) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft 60"; end
   end
   -- shadow_word_death
   if S.ShadowWordDeath:IsReady() then
@@ -486,6 +483,10 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    -- Calculate fight_remains
+    fightRemains = HL.FightRemains(Enemies10ySplash, false)
+    -- Store HL.CombatTime into a variable (pool_for_cds variable checks it and fight_remains multiple times)
+    combatTime = HL.CombatTime()
     -- Manually Added: Use Dispersion if dying
     if S.Dispersion:IsCastable() and Player:HealthPercentage() < Settings.Shadow.DispersionHP then
       if Cast(S.Dispersion, Settings.Shadow.OffGCDasOffGCD.Dispersion) then return "dispersion low_hp"; end
@@ -493,8 +494,8 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(30, S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false); if ShouldReturn then return ShouldReturn; end
     -- potion,if=buff.voidform.up|buff.power_infusion.up
-    if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff)) then
-      if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_spectral_intellect 20"; end
+    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff)) then
+      if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_spectral_intellect 20"; end
     end
     -- variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
     VarDotsUp = DotsUp(Target, false)
@@ -502,8 +503,8 @@ local function APL()
     VarAllDotsUp = DotsUp(Target, true)
     -- variable,name=searing_nightmare_cutoff,op=set,value=spell_targets.mind_sear>2+buff.voidform.up
     VarSearingNightmareCutoff = (EnemiesCount10ySplash > (2 + num(Player:BuffUp(S.VoidformBuff))))
-    -- variable,name=pool_for_cds,op=set,value=cooldown.void_eruption.up&(!raid_event.adds.up|raid_event.adds.duration<=10|raid_event.adds.remains>=10+5*(talent.hungering_void.enabled|covenant.kyrian))&((raid_event.adds.in>20|spell_targets.void_eruption>=5)|talent.hungering_void.enabled|covenant.kyrian)
-    VarPoolForCDs = S.VoidEruption:CooldownUp() and ((EnemiesCount10ySplash == 1 or EnemiesCount10ySplash >= 5) or S.HungeringVoid:IsAvailable() or Player:Covenant() == "Kyrian")
+    -- variable,name=pool_for_cds,op=set,value=cooldown.void_eruption.up&(!runeforge.spheres_harmony.equipped&(!covenant.necrolord|((fight_remains+time)>=330&time<=200|(fight_remains+time)<=250&(fight_remains+time)>=200))|cooldown.power_infusion.remains<=gcd.max*3|buff.power_infusion.up|fight_remains<=25)
+    VarPoolForCDs = S.VoidEruption:CooldownUp() and (not SpheresHarmonyEquipped and (CovenantID ~= 4 or (fightRemains + combatTime >= 330 and combatTime <= 200 or fightRemains + combatTime <= 250 and fightRemains + combatTime >= 200)) or S.PowerInfusion:CooldownRemains() <= (Player:GCD() + 0.150) * 3 or Player:BuffUp(S.PowerInfusionBuff) or fightRemains <= 25)
     if (CDsON()) then
       -- fireblood,if=buff.voidform.up
       if S.Fireblood:IsCastable() and (Player:BuffUp(S.VoidformBuff)) then
@@ -520,10 +521,6 @@ local function APL()
       -- ancestral_call,if=buff.voidform.up
       if S.AncestralCall:IsCastable() and (Player:BuffUp(S.VoidformBuff)) then
         if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 28"; end
-      end
-      -- bag_of_tricks
-      if S.BagofTricks:IsCastable() then
-        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks 30"; end
       end
     end
     -- call_action_list,name=cwc

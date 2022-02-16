@@ -26,7 +26,7 @@ local Cast       = HR.Cast
 
 -- Define S/I for spell and item arrays
 local S = Spell.Priest.Discipline
-local I = Item.Priest.Discipline
+local I = Item.Priest.Commons
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
