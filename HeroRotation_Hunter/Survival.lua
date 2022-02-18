@@ -618,8 +618,8 @@ local function Cleave()
   if S.Butchery:IsReady() and (Target:DebuffUp(S.ShrapnelBombDebuff) and (Target:DebuffStack(S.InternalBleedingDebuff) < 2 or Target:DebuffRemains(S.ShrapnelBombDebuff) < Player:GCD())) then
     if Cast(S.Butchery, nil, nil, not Target:IsInRange(8)) then return "butchery cleave 12"; end
   end
-  -- carve,if=dot.shrapnel_bomb.ticking
-  if S.Carve:IsReady() and (Target:DebuffUp(S.ShrapnelBombDebuff)) then
+  -- carve,if=dot.shrapnel_bomb.ticking&!set_bonus.tier28_2pc
+  if S.Carve:IsReady() and (Target:DebuffUp(S.ShrapnelBombDebuff) and not Player:HasTier(28, 2)) then
     if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 14"; end
   end
   -- butchery,if=charges_fractional>2.5&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
@@ -668,8 +668,8 @@ local function Cleave()
   if S.KillCommand:IsCastable() then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandCleave, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 29"; end
   end
-  -- wildfire_bomb,if=!dot.wildfire_bomb.ticking
-  if S.WildfireBomb:IsCastable() and (Target:DebuffDown(S.WildfireBombDebuff)) then
+  -- wildfire_bomb,if=!dot.wildfire_bomb.ticking&!set_bonus.tier28_2pc|charges_fractional>1.3
+  if S.WildfireBomb:IsCastable() and (Target:DebuffDown(S.WildfireBombDebuff) and (not Player:HasTier(28, 2)) or S.WildfireBomb:ChargesFractional() > 1.3) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb cleave 30"; end
   end
   -- butchery,if=(!next_wi_bomb.shrapnel|!talent.wildfire_infusion.enabled)&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
