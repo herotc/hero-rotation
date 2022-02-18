@@ -67,6 +67,15 @@ HL:RegisterForEvent(function()
   ShaohaosMightEquipped = Player:HasLegendaryEquipped(89)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 local function UseItems()
   -- use_items
   local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
