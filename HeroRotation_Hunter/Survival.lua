@@ -138,6 +138,12 @@ local function EvaluateTargetIfKillCommandST2(TargetUnit)
   return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15))
 end
 
+-- if=set_bonus.tier28_2pc&dot.pheromone_bomb.ticking&!buff.mad_bombardier.up
+-- set_bonus and mad_bombardier buff checks done before CastTargetIf
+local function EvaluateTargetIfKillCommandST3(TargetUnit)
+  return (TargetUnit:DebuffUp(S.PheromoneBombDebuff))
+end
+
 -- if=buff.tip_of_the_spear.stack=3|dot.shrapnel_bomb.ticking
 local function EvaluateTargetIfRaptorStrikeST(TargetUnit)
   return (Player:BuffStack(S.TipoftheSpearBuff) == 3 or TargetUnit:DebuffUp(S.ShrapnelBombDebuff))
@@ -381,6 +387,10 @@ local function ST()
   end
   if S.VolatileBomb:IsReady() and (S.WildfireBomb:FullRechargeTime() < 2 * Player:GCD() and Player:HasTier(28, 2) or Player:BuffUp(S.MadBombardierBuff) or (not Player:HasTier(28, 2)) and (S.VolatileBomb:FullRechargeTime() < Player:GCD() or CheckFocusCap(S.WildfireBomb:ExecuteTime()) and Target:DebuffUp(S.SerpentStingDebuff) and Target:DebuffRefreshable(S.SerpentStingDebuff) or Target:TimeToDie() < 10)) then
     if Cast(S.VolatileBomb, nil, nil, not Target:IsSpellInRange(S.VolatileBomb)) then return "volatile_bomb st 22"; end
+  end
+  -- kill_command,target_if=min:bloodseeker.remains,if=set_bonus.tier28_2pc&dot.pheromone_bomb.ticking&!buff.mad_bombardier.up
+  if S.KillCommand:IsReady() and (Player:HasTier(28, 2) and Player:BuffDown(S.MadBombardierBuff)) then
+    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandST3, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command st 23"; end
   end
   -- carve,if=active_enemies>1&!runeforge.rylakstalkers_confounding_strikes.equipped
   if S.Carve:IsReady() and (EnemyCount8ySplash > 1 and not RylakstalkersConfoundingEquipped) then
