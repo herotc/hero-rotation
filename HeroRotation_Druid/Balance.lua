@@ -756,7 +756,6 @@ local function APL()
   fightRemains = HL.FightRemains(Enemies8ySplash, false)
 
   -- Determine amount of AP fed into Primordial Arcanic Pulsar
-  -- TODO: Verify which slot holds the AP value
   PAPValue = 0
   if PAPEquipped then
     PAPValue = select(16, Player:BuffInfo(S.PAPBuff, false, true)) or 0
@@ -868,7 +867,7 @@ local function APL()
 end
 
 local function OnInit()
-  HR.Print("Balance Druid rotation is currently a work in progress, but has been updated for patch 9.1.")
+  --HR.Print("Balance Druid rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(102, APL, OnInit)
