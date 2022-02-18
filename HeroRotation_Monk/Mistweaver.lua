@@ -42,8 +42,6 @@ local Enemies8y
 local EnemiesCount8
 local Stuns = {
   { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end },
-}
-local Traps = {
   { S.Paralysis, "Cast Paralysis (Stun)", function () return true end },
 }
 
@@ -157,10 +155,7 @@ local function APL()
     end
     -- auto_attack
     -- Interrupts
-    -- Stun
     local ShouldReturn = Everyone.Interrupt(5, S.LegSweep, Settings.Commons.GCDasOffGCD.LegSweep, Stuns); if ShouldReturn and Settings.General.InterruptWithStun then return ShouldReturn; end
-    -- Trap
-    local ShouldReturn = Everyone.Interrupt(5, S.Paralysis, Settings.Commons.GCDasOffGCD.Paralysis, Stuns); if ShouldReturn and Settings. General.InterruptWithStun then return ShouldReturn; end
     -- Defensives
     local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     -- use_item,name=jotungeirr_destinys_call
@@ -237,7 +232,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Mistweaver rotation is currently a work in progress, but has been updated for patch 9.1.")
+  HR.Print("Mistweaver rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(270, APL, Init)
