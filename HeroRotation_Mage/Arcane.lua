@@ -121,7 +121,7 @@ local RadiantSparkVulnerabilityMaxStack = 4
 local ClearCastingMaxStack = 3
 local PresenceMaxStack = 3
 local ArcaneHarmonyMaxStack = 18
-local fightRemains
+local FightRemains
 
 Player.ArcaneOpener = {}
 local ArcaneOpener = Player.ArcaneOpener
@@ -135,7 +135,7 @@ function ArcaneOpener:Reset ()
 end
 ArcaneOpener:Reset()
 
-fightRemains = HL.FightRemains(Enemies8ySplash, false)
+FightRemains = HL.FightRemains(Enemies8ySplash, false)
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -1311,7 +1311,7 @@ local function APL()
   EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
 
   -- How long is left in the fight?
-  fightRemains = HL.FightRemains(Enemies8ySplash, false)
+  FightRemains = HL.FightRemains(Enemies8ySplash, false)
 
   -- Check when the Disciplinary Command buff was last applied and its internal CD
   var_disciplinary_command_last_applied = S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()
@@ -1338,7 +1338,7 @@ local function APL()
       if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 3"; end
     end
     --time_warp,if=runeforge.temporal_warp&buff.exhaustion.up&(cooldown.arcane_power.ready|fight_remains<=40)
-    if S.TimeWarp:IsReady() and Settings.Arcane.UseTemporalWarp and (TemporalWarpEquipped and Player:BloodlustExhaustUp()) and (S.ArcanePower:CooldownRemains() == 0 or fightRemains <= 40) then
+    if S.TimeWarp:IsReady() and Settings.Arcane.UseTemporalWarp and (TemporalWarpEquipped and Player:BloodlustExhaustUp()) and (S.ArcanePower:CooldownRemains() == 0 or FightRemains <= 40) then
       if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp combustion_cooldowns 6"; end
     end
     --lights_judgment,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down
@@ -1406,7 +1406,7 @@ local function APL()
         if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music Shared_cd 18"; end
       end
       --use_item,name=shadowed_orb_of_torment,if=time=0|(variable.outside_of_cooldowns&((covenant.kyrian&cooldown.radiant_spark.remains<=2&cooldown.arcane_power.remains<=5&cooldown.touch_of_the_magi.remains<=5)|cooldown.arcane_power.remains<=2|fight_remains<cooldown.arcane_power.remains))
-      if I.ShadowedOrbofTorment:IsEquippedAndReady() and var_outside_of_cooldowns and ((CovenantID == 1 and S.RadiantSpark:CooldownRemains() <= 2 and S.ArcanePower:CooldownRemains() <= 5 and S.TouchoftheMagi:CooldownRemains() <= 5) or S.ArcanePower:CooldownRemains() <= 2 or fightRemains < S.ArcanePower:CooldownRemains()) then
+      if I.ShadowedOrbofTorment:IsEquippedAndReady() and var_outside_of_cooldowns and ((CovenantID == 1 and S.RadiantSpark:CooldownRemains() <= 2 and S.ArcanePower:CooldownRemains() <= 5 and S.TouchoftheMagi:CooldownRemains() <= 5) or S.ArcanePower:CooldownRemains() <= 2 or FightRemains < S.ArcanePower:CooldownRemains()) then
         if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment Shared_cd 19"; end
       end
       --use_item,name=soulletting_ruby,if=(variable.time_until_ap+(action.radiant_spark.execute_time*covenant.kyrian)+(action.deathborne.execute_time*covenant.necrolord)+action.touch_of_the_magi.execute_time<target.distance%5.6)&(variable.have_opened|(covenant.kyrian&runeforge.arcane_infinity))&target.distance>25

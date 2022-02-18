@@ -99,7 +99,7 @@ local var_expected_fire_blasts
 local var_sun_kings_blessing_max_stack = 8
 local var_phoenix_flames_max_stack = 3
 
-local fightRemains
+local FightRemains
 local var_disciplinary_command_cd_remains
 local var_disciplinary_command_last_applied
 
@@ -405,7 +405,7 @@ local function CombustionTiming()
   -- variable,use_off_gcd=1,use_while_casting=1,name=time_to_combustion,value=raid_event.vulnerable.in*!raid_event.vulnerable.up,if=raid_event.vulnerable.exists&variable.combustion_ready_time<raid_event.vulnerable.in
   -- Note: Skipping this, as we don't handle SimC's raid_event
   -- variable,use_off_gcd=1,use_while_casting=1,name=time_to_combustion,value=variable.combustion_ready_time,if=variable.combustion_ready_time+cooldown.combustion.duration*(1-(0.6+0.2*talent.firestarter)*talent.kindling)<=variable.time_to_combustion|variable.time_to_combustion>fight_remains-20
-  if var_combustion_ready_time + 120 * (1 - (0.6 + 0.2 * num(S.Firestarter:IsAvailable())) * num(S.Kindling:IsAvailable())) <= var_time_to_combustion or var_time_to_combustion > fightRemains - 20 then
+  if var_combustion_ready_time + 120 * (1 - (0.6 + 0.2 * num(S.Firestarter:IsAvailable())) * num(S.Kindling:IsAvailable())) <= var_time_to_combustion or var_time_to_combustion > FightRemains - 20 then
     var_time_to_combustion = var_combustion_ready_time
   end
 end
@@ -416,7 +416,7 @@ local function ActiveTalents()
     if Cast(S.LivingBomb, nil, nil, not Target:IsInRange(S.LivingBomb)) then return "living_bomb active_talents 1"; end
   end
   -- meteor,if=variable.time_to_combustion<=0|buff.combustion.remains>travel_time|(cooldown.meteor.duration<variable.time_to_combustion&!talent.rune_of_power)|talent.rune_of_power&buff.rune_of_power.up&variable.time_to_combustion>action.meteor.cooldown|fight_remains<variable.time_to_combustion
-  if S.Meteor:IsReady() and (var_time_to_combustion <= 0 or Player:BuffRemains(S.CombustionBuff) > S.Meteor:TravelTime() or (45 < var_time_to_combustion and not S.RuneofPower:IsAvailable()) or S.RuneofPower:IsAvailable() and Player:BuffUp(S.RuneofPowerBuff) and var_time_to_combustion > 45 or fightRemains < var_time_to_combustion) then
+  if S.Meteor:IsReady() and (var_time_to_combustion <= 0 or Player:BuffRemains(S.CombustionBuff) > S.Meteor:TravelTime() or (45 < var_time_to_combustion and not S.RuneofPower:IsAvailable()) or S.RuneofPower:IsAvailable() and Player:BuffUp(S.RuneofPowerBuff) and var_time_to_combustion > 45 or FightRemains < var_time_to_combustion) then
     if Cast(S.Meteor, nil, nil, not Target:IsInRange(40)) then return "meteor active_talents 2"; end
   end
   -- dragons_breath,if=talent.alexstraszas_fury&(buff.combustion.down&!buff.hot_streak.react)
@@ -832,7 +832,7 @@ local function APL()
   UnitsWithIgniteCount = UnitsWithIgnite(Enemies8ySplash)
 
   -- How long is left in the fight?
-  fightRemains = HL.FightRemains(Enemies8ySplash, false)
+  FightRemains = HL.FightRemains(Enemies8ySplash, false)
 
   -- Check when the Disciplinary Command buff was last applied and its internal CD
   var_disciplinary_command_last_applied = S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()
@@ -872,7 +872,7 @@ local function APL()
     end
     -- variable,use_off_gcd=1,use_while_casting=1,name=fire_blast_pooling,value=variable.extended_combustion_remains<variable.time_to_combustion&action.fire_blast.charges_fractional+(variable.time_to_combustion+action.shifting_power.full_reduction*variable.shifting_power_before_combustion+(debuff.mirrors_of_torment.max_stack-1)*variable.mot_recharge_amount*covenant.venthyr*(cooldown.mirrors_of_torment.remains<=variable.time_to_combustion))%cooldown.fire_blast.duration-1<cooldown.fire_blast.max_charges+variable.overpool_fire_blasts%cooldown.fire_blast.duration-(buff.combustion.duration%cooldown.fire_blast.duration)%%1&variable.time_to_combustion<fight_remains
     -- Note: Manually moved here from lower in the APL
-    if (not var_disable_combustion) and (var_extended_combustion_remains < var_time_to_combustion and S.FireBlast:ChargesFractional() + (var_time_to_combustion + S.ShiftingPower:FullReduction() * num(var_shifting_power_before_combustion) + 2 * var_mot_recharge_amount * num(CovenantID == 2) * num(S.MirrorsofTorment:CooldownRemains() <= var_time_to_combustion)) / S.FireBlast:Cooldown() - 1 < S.FireBlast:FullRechargeTime() + var_overpool_fire_blasts / S.FireBlast:Cooldown() - (10 / S.FireBlast:Cooldown()) % 1 and var_time_to_combustion < fightRemains) then
+    if (not var_disable_combustion) and (var_extended_combustion_remains < var_time_to_combustion and S.FireBlast:ChargesFractional() + (var_time_to_combustion + S.ShiftingPower:FullReduction() * num(var_shifting_power_before_combustion) + 2 * var_mot_recharge_amount * num(CovenantID == 2) * num(S.MirrorsofTorment:CooldownRemains() <= var_time_to_combustion)) / S.FireBlast:Cooldown() - 1 < S.FireBlast:FullRechargeTime() + var_overpool_fire_blasts / S.FireBlast:Cooldown() - (10 / S.FireBlast:Cooldown()) % 1 and var_time_to_combustion < FightRemains) then
       var_fire_blast_pooling = true
     else
       var_fire_blast_pooling = false
@@ -910,7 +910,7 @@ local function APL()
         if Cast(I.SinfulGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge gladiator default 14"; end
       end
       -- use_item,name=shadowed_orb_of_torment,if=(variable.time_to_combustion<=variable.combustion_precast_time+2|fight_remains<variable.time_to_combustion)&buff.combustion.down
-      if I.ShadowedOrbofTorment:IsEquippedAndReady() and (var_time_to_combustion <= var_combustion_precast_time + 2 or fightRemains < var_time_to_combustion) and Player:BuffDown(S.CombustionBuff) then
+      if I.ShadowedOrbofTorment:IsEquippedAndReady() and (var_time_to_combustion <= var_combustion_precast_time + 2 or FightRemains < var_time_to_combustion) and Player:BuffDown(S.CombustionBuff) then
         if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment default 15"; end
       end
       -- use_item,name=empyreal_ordnance,if=variable.time_to_combustion<=variable.empyreal_ordnance_delay&variable.time_to_combustion>variable.empyreal_ordnance_delay-5
@@ -926,7 +926,7 @@ local function APL()
         if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music default 18"; end
       end
       -- use_item,name=dreadfire_vessel,if=(buff.combustion.down&variable.time_to_combustion>=variable.on_use_cutoff|variable.on_use_cutoff=0)&(buff.infernal_cascade.stack=buff.infernal_cascade.max_stack|!conduit.infernal_cascade|variable.combustion_on_use|variable.time_to_combustion>interpolated_fight_remains%%(cooldown+10))
-      if I.DreadfireVessel:IsEquippedAndReady() and ((Player:BuffDown(S.CombustionBuff) and var_time_to_combustion >= var_on_use_cutoff or var_on_use_cutoff == 0) and (Player:BuffStack(S.InfernalCascadeBuff) == 2 or not S.InfernalCascade:ConduitEnabled() or var_combustion_on_use or var_time_to_combustion > fightRemains % 100)) then
+      if I.DreadfireVessel:IsEquippedAndReady() and ((Player:BuffDown(S.CombustionBuff) and var_time_to_combustion >= var_on_use_cutoff or var_on_use_cutoff == 0) and (Player:BuffStack(S.InfernalCascadeBuff) == 2 or not S.InfernalCascade:ConduitEnabled() or var_combustion_on_use or var_time_to_combustion > FightRemains % 100)) then
         if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel default 19"; end
       end
       -- use_item,name=soul_igniter,if=(variable.time_to_combustion>=30*(variable.on_use_cutoff>0)|cooldown.item_cd_1141.remains)&(!equipped.dreadfire_vessel|cooldown.dreadfire_vessel_349857.remains>5)
@@ -1007,7 +1007,7 @@ local function APL()
       local ShouldReturn = CombustionPhase(); if ShouldReturn then return ShouldReturn; end
     end
     -- rune_of_power,if=buff.combustion.down&buff.rune_of_power.down&!buff.firestorm.react&(variable.time_to_combustion>=buff.rune_of_power.duration&variable.time_to_combustion>action.fire_blast.full_recharge_time|variable.time_to_combustion>fight_remains)&(!runeforge.sun_kings_blessing|active_enemies>=variable.hard_cast_flamestrike|buff.sun_kings_blessing_ready.up|buff.sun_kings_blessing.react>=buff.sun_kings_blessing.max_stack-1|fight_remains<buff.rune_of_power.duration)
-    if S.RuneofPower:IsReady() and (Player:BuffDown(S.CombustionBuff) and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.FirestormBuff) and (var_time_to_combustion >= 12 and var_time_to_combustion > S.FireBlast:FullRechargeTime() or var_time_to_combustion > fightRemains) and ((not SunKingsBlessingEquipped) or EnemiesCount8ySplash >= var_hard_cast_flamestrike or Player:BuffUp(S.SunKingsBlessingBuffReady) or Player:BuffStack(S.SunKingsBlessingBuff) >= var_sun_kings_blessing_max_stack - 1 or fightRemains < 12)) then
+    if S.RuneofPower:IsReady() and (Player:BuffDown(S.CombustionBuff) and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.FirestormBuff) and (var_time_to_combustion >= 12 and var_time_to_combustion > S.FireBlast:FullRechargeTime() or var_time_to_combustion > FightRemains) and ((not SunKingsBlessingEquipped) or EnemiesCount8ySplash >= var_hard_cast_flamestrike or Player:BuffUp(S.SunKingsBlessingBuffReady) or Player:BuffStack(S.SunKingsBlessingBuff) >= var_sun_kings_blessing_max_stack - 1 or FightRemains < 12)) then
       if Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneOfPower) then return "rune_of_power default 31"; end
     end
     -- variable,use_off_gcd=1,use_while_casting=1,name=fire_blast_pooling,value=searing_touch.active&action.fire_blast.full_recharge_time>3*gcd.max,if=!variable.fire_blast_pooling&runeforge.sun_kings_blessing
@@ -1017,11 +1017,11 @@ local function APL()
     -- variable,name=phoenix_pooling,if=active_enemies<variable.combustion_flamestrike,value=variable.time_to_combustion+buff.combustion.duration-5<action.phoenix_flames.full_recharge_time+cooldown.phoenix_flames.duration-action.shifting_power.full_reduction*variable.shifting_power_before_combustion&variable.time_to_combustion<fight_remains|runeforge.sun_kings_blessing|time<5
     var_phoenix_pooling = false
     if not var_disable_combustion and (EnemiesCount8ySplash < var_combustion_flamestrike) then
-      var_phoenix_pooling = var_time_to_combustion + 10 - 5 < S.PhoenixFlames:FullRechargeTime() + S.PhoenixFlames:Cooldown() - S.ShiftingPower:FullReduction() * num(var_shifting_power_before_combustion) and var_time_to_combustion < fightRemains or SunKingsBlessingEquipped or HL.CombatTime() < 5
+      var_phoenix_pooling = var_time_to_combustion + 10 - 5 < S.PhoenixFlames:FullRechargeTime() + S.PhoenixFlames:Cooldown() - S.ShiftingPower:FullReduction() * num(var_shifting_power_before_combustion) and var_time_to_combustion < FightRemains or SunKingsBlessingEquipped or HL.CombatTime() < 5
     end
     -- variable,name=phoenix_pooling,if=active_enemies>=variable.combustion_flamestrike,value=variable.time_to_combustion<action.phoenix_flames.full_recharge_time-action.shifting_power.full_reduction*variable.shifting_power_before_combustion&variable.time_to_combustion<fight_remains|runeforge.sun_kings_blessing|time<5
     if not var_disable_combustion and (EnemiesCount8ySplash >= var_combustion_flamestrike) then
-      var_phoenix_pooling = var_time_to_combustion < S.PhoenixFlames:FullRechargeTime() - S.ShiftingPower:FullReduction() * num(var_shifting_power_before_combustion) and var_time_to_combustion < fightRemains or SunKingsBlessingEquipped or HL.CombatTime() < 5
+      var_phoenix_pooling = var_time_to_combustion < S.PhoenixFlames:FullRechargeTime() - S.ShiftingPower:FullReduction() * num(var_shifting_power_before_combustion) and var_time_to_combustion < FightRemains or SunKingsBlessingEquipped or HL.CombatTime() < 5
     end
     -- call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down&variable.time_to_combustion>0
     if (Player:BuffUp(S.RuneofPowerBuff) and Player:BuffDown(S.CombustionBuff) and var_time_to_combustion > 0) then
@@ -1029,7 +1029,7 @@ local function APL()
     end
     -- variable,use_off_gcd=1,use_while_casting=1,name=fire_blast_pooling,value=(!runeforge.sun_kings_blessing|buff.sun_kings_blessing.stack>buff.sun_kings_blessing.max_stack-1)&cooldown.rune_of_power.remains<action.fire_blast.full_recharge_time-action.shifting_power.full_reduction*(variable.shifting_power_before_combustion&cooldown.shifting_power.remains<cooldown.rune_of_power.remains)&cooldown.rune_of_power.remains<fight_remains,if=!variable.fire_blast_pooling&talent.rune_of_power&buff.rune_of_power.down
     if (not var_fire_blast_pooling and S.RuneofPower:IsAvailable() and Player:BuffDown(S.RuneofPowerBuff)) then
-      var_fire_blast_pooling = (((not SunKingsBlessingEquipped) or Player:BuffStack(S.SunKingsBlessingBuff) > var_sun_kings_blessing_max_stack - 1) and S.RuneofPower:CooldownRemains() < S.FireBlast:FullRechargeTime() - S.ShiftingPower:FullReduction() * num(var_shifting_power_before_combustion and S.ShiftingPower:CooldownRemains() < S.RuneofPower:CooldownRemains()) and S.RuneofPower:CooldownRemains() < fightRemains)
+      var_fire_blast_pooling = (((not SunKingsBlessingEquipped) or Player:BuffStack(S.SunKingsBlessingBuff) > var_sun_kings_blessing_max_stack - 1) and S.RuneofPower:CooldownRemains() < S.FireBlast:FullRechargeTime() - S.ShiftingPower:FullReduction() * num(var_shifting_power_before_combustion and S.ShiftingPower:CooldownRemains() < S.RuneofPower:CooldownRemains()) and S.RuneofPower:CooldownRemains() < FightRemains)
     end
     -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&variable.time_to_combustion>0&active_enemies>=variable.hard_cast_flamestrike&!firestarter.active&!buff.hot_streak.react&(buff.heating_up.react&action.flamestrike.execute_remains<0.5|charges_fractional>=2)
     local var_flamestrike_execute_remains

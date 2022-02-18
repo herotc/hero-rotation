@@ -47,7 +47,7 @@ local VarFiller
 local VarRipTicks
 local VarShortestTTD
 local ComboPoints, ComboPointsDeficit
-local fightRemains
+local FightRemains
 
 -- Enemy Variables
 local EnemiesMelee, EnemiesCountMelee
@@ -279,7 +279,7 @@ end
 
 local function EvaluateTargetIfFeralFrenzyCooldown4(TargetUnit)
   -- if=combo_points<3&target.time_to_die>7&(buff.savage_roar.up|!talent.savage_roar.enabled)&(!cooldown.tigers_fury.up|cooldown.bs_inc.up)|fight_remains<8&fight_remains>2
-  return (ComboPoints < 3 and TargetUnit:TimeToDie() > 7 and (Player:BuffUp(S.SavageRoar) or not S.SavageRoar:IsAvailable()) and (S.TigersFury:CooldownDown() or BsInc:CooldownUp()) or fightRemains < 8 and fightRemains > 2)
+  return (ComboPoints < 3 and TargetUnit:TimeToDie() > 7 and (Player:BuffUp(S.SavageRoar) or not S.SavageRoar:IsAvailable()) and (S.TigersFury:CooldownDown() or BsInc:CooldownUp()) or FightRemains < 8 and FightRemains > 2)
 end
 
 local function EvaluateTargetIfDummy(TargetUnit)
@@ -438,15 +438,15 @@ local function Cooldown()
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cooldown 16"; end
   end
   -- potion,if=buff.bs_inc.up|fight_remains<cooldown.bs_inc.remains|fight_remains<25
-  if I.PotionofSpectralAgility:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(BsInc) or fightRemains < BsInc:CooldownRemains() or fightRemains < 25) then
+  if I.PotionofSpectralAgility:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(BsInc) or FightRemains < BsInc:CooldownRemains() or FightRemains < 25) then
     if Cast(I.PotionofSpectralAgility, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldown 18"; end
   end
   -- ravenous_frenzy,if=buff.bs_inc.up|fight_remains<21
-  if S.RavenousFrenzy:IsCastable() and (Player:BuffUp(BsInc) or fightRemains < 21) then
+  if S.RavenousFrenzy:IsCastable() and (Player:BuffUp(BsInc) or FightRemains < 21) then
     if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy cooldown 20"; end
   end
   -- convoke_the_spirits,if=(dot.rip.remains>4&combo_points<5&(dot.rake.ticking|spell_targets.thrash_cat>1)&energy.deficit>=20)|fight_remains<5
-  if S.ConvoketheSpirits:IsCastable() and ((Target:DebuffRemains(S.RipDebuff) > 4 and ComboPoints < 5 and (Target:DebuffUp(S.RakeDebuff) or EnemiesCount8y > 1) and Player:EnergyDeficit() >= 20) or fightRemains < 5) then
+  if S.ConvoketheSpirits:IsCastable() and ((Target:DebuffRemains(S.RipDebuff) > 4 and ComboPoints < 5 and (Target:DebuffUp(S.RakeDebuff) or EnemiesCount8y > 1) and Player:EnergyDeficit() >= 20) or FightRemains < 5) then
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "convoke_the_spirits cooldown 22"; end
   end
   -- kindred_spirits,if=buff.tigers_fury.up|(conduit.deep_allegiance.enabled)
@@ -571,7 +571,7 @@ local function APL()
   ComboPointsDeficit = Player:ComboPointsDeficit()
 
   -- Determine fight_remains
-  fightRemains = HL.FightRemains(Enemies8y, false)
+  FightRemains = HL.FightRemains(Enemies8y, false)
 
   -- cat_form OOC, if setting is true
   if S.CatForm:IsCastable() and Settings.Feral.ShowCatFormOOC then

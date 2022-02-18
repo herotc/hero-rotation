@@ -45,7 +45,7 @@ if equip[14] then
 end
 
 -- Rotation Var
-local fightRemains
+local FightRemains
 
 -- Enemy Range Variables
 local Enemies40y
@@ -225,19 +225,19 @@ end
 
 local function Cds()
   -- berserking,if=(buff.trueshot.up&buff.resonating_arrow.up&covenant.kyrian)|(buff.trueshot.up&buff.wild_spirits.up&covenant.night_fae)|(covenant.venthyr|covenant.necrolord)&buff.trueshot.up|fight_remains<13|(covenant.kyrian&buff.resonating_arrow.up&fight_remains<73)
-  if S.Berserking:IsReady() and ((Player:BuffUp(S.Trueshot) and Target:DebuffUp(S.ResonatingArrowDebuff) and CovenantID == 1) or (Player:BuffUp(S.Trueshot) and Player:BuffUp(S.WildSpiritsBuff) and CovenantID == 3) or (CovenantID == 2 or CovenantID == 4) and Player:BuffUp(S.Trueshot) or fightRemains < 13 or (CovenantID == 1 and Target:DebuffUp(S.ResonatingArrowDebuff) and fightRemains < 73)) then
+  if S.Berserking:IsReady() and ((Player:BuffUp(S.Trueshot) and Target:DebuffUp(S.ResonatingArrowDebuff) and CovenantID == 1) or (Player:BuffUp(S.Trueshot) and Player:BuffUp(S.WildSpiritsBuff) and CovenantID == 3) or (CovenantID == 2 or CovenantID == 4) and Player:BuffUp(S.Trueshot) or FightRemains < 13 or (CovenantID == 1 and Target:DebuffUp(S.ResonatingArrowDebuff) and FightRemains < 73)) then
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 2"; end
   end
   -- blood_fury,if=buff.trueshot.up|cooldown.trueshot.remains>30|fight_remains<16
-  if S.BloodFury:IsReady() and (Player:BuffUp(S.Trueshot) or S.Trueshot:CooldownRemains() > 30 or fightRemains < 16) then
+  if S.BloodFury:IsReady() and (Player:BuffUp(S.Trueshot) or S.Trueshot:CooldownRemains() > 30 or FightRemains < 16) then
     if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 4"; end
   end
   -- ancestral_call,if=buff.trueshot.up|cooldown.trueshot.remains>30|fight_remains<16
-  if S.AncestralCall:IsReady() and (Player:BuffUp(S.Trueshot) or S.Trueshot:CooldownRemains() > 30 or fightRemains < 16) then
+  if S.AncestralCall:IsReady() and (Player:BuffUp(S.Trueshot) or S.Trueshot:CooldownRemains() > 30 or FightRemains < 16) then
     if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cds 6"; end
   end
   -- fireblood,if=buff.trueshot.up|cooldown.trueshot.remains>30|fight_remains<9
-  if S.Fireblood:IsReady() and (Player:BuffUp(S.Trueshot) or S.Trueshot:CooldownRemains() > 30 or fightRemains < 9) then
+  if S.Fireblood:IsReady() and (Player:BuffUp(S.Trueshot) or S.Trueshot:CooldownRemains() > 30 or FightRemains < 9) then
     if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 8"; end
   end
   -- lights_judgment,if=buff.trueshot.down
@@ -245,7 +245,7 @@ local function Cds()
     if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cds 10"; end
   end
   -- potion,if=buff.trueshot.up&(buff.bloodlust.up|target.health.pct<20)|fight_remains<26|(covenant.kyrian&buff.resonating_arrow.up&fight_remains<72)
-  if I.PotionOfSpectralAgility:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.Trueshot) and (Player:BloodlustUp() or Target:HealthPercentage() < 20) or fightRemains < 26 or (CovenantID == 1 and Target:DebuffUp(S.ResonatingArrowDebuff) and fightRemains < 72)) then
+  if I.PotionOfSpectralAgility:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.Trueshot) and (Player:BloodlustUp() or Target:HealthPercentage() < 20) or FightRemains < 26 or (CovenantID == 1 and Target:DebuffUp(S.ResonatingArrowDebuff) and FightRemains < 72)) then
     if Cast(I.PotionOfSpectralAgility, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 12"; end
   end
 end
@@ -264,7 +264,7 @@ local function St()
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot st 6"; end
   end
   -- double_tap,if=(covenant.kyrian&(cooldown.resonating_arrow.remains<gcd)|!covenant.kyrian&!covenant.night_fae|covenant.night_fae&(cooldown.wild_spirits.remains<gcd|cooldown.wild_spirits.remains>30)|fight_remains<15)&(!raid_event.adds.exists|raid_event.adds.up&(raid_event.adds.in<10&raid_event.adds.remains<3|raid_event.adds.in>cooldown|active_enemies>1)|!raid_event.adds.up&(raid_event.adds.count=1|raid_event.adds.in>cooldown))
-  if S.DoubleTap:IsReady() and (CovenantID == 1 and (S.ResonatingArrow:CooldownRemains() < Player:GCD() + 0.5) or CovenantID ~= 1 and CovenantID ~= 3 or CovenantID == 3 and (S.WildSpirits:CooldownRemains() < Player:GCD() + 0.5 or S.WildSpirits:CooldownRemains() > 30) or fightRemains < 15) then
+  if S.DoubleTap:IsReady() and (CovenantID == 1 and (S.ResonatingArrow:CooldownRemains() < Player:GCD() + 0.5) or CovenantID ~= 1 and CovenantID ~= 3 or CovenantID == 3 and (S.WildSpirits:CooldownRemains() < Player:GCD() + 0.5 or S.WildSpirits:CooldownRemains() > 30) or FightRemains < 15) then
     if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap st 8"; end
   end
   -- flare,if=tar_trap.up&runeforge.soulforge_embers
@@ -280,7 +280,7 @@ local function St()
     if Cast(S.ExplosiveShot, nil, nil, not TargetInRange40y) then return "explosive_shot 14"; end
   end
   -- wild_spirits,if=(cooldown.trueshot.remains<gcd|buff.trueshot.up)&(!raid_event.adds.exists|!raid_event.adds.up&raid_event.adds.duration+raid_event.adds.in<20|raid_event.adds.up&raid_event.adds.remains>19|active_enemies>1)|fight_remains<80
-  if S.WildSpirits:IsReady() and CDsON() and ((S.Trueshot:CooldownRemains() < Player:GCD() or S.Trueshot:CooldownUp()) or fightRemains < 80) then
+  if S.WildSpirits:IsReady() and CDsON() and ((S.Trueshot:CooldownRemains() < Player:GCD() or S.Trueshot:CooldownUp()) or FightRemains < 80) then
     if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "wild_spirits st 16"; end
   end
   -- flayed_shot
@@ -300,7 +300,7 @@ local function St()
     if Cast(S.WailingArrow, Settings.Marksmanship.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "wailing_arrow st 24"; end
   end
   -- resonating_arrow,if=(buff.double_tap.up|!talent.double_tap|fight_remains<12)&(!raid_event.adds.exists|!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<10|raid_event.adds.count=1)|raid_event.adds.up&raid_event.adds.remains>9|active_enemies>1)
-  if S.ResonatingArrow:IsReady() and CDsON() and (Player:BuffUp(S.DoubleTap) or (not S.DoubleTap:IsAvailable()) or fightRemains < 12) then
+  if S.ResonatingArrow:IsReady() and CDsON() and (Player:BuffUp(S.DoubleTap) or (not S.DoubleTap:IsAvailable()) or FightRemains < 12) then
     if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "resonating_arrow st 26"; end
   end
   -- volley,if=buff.resonating_arrow.up|!covenant.kyrian&(buff.precise_shots.down|!talent.chimaera_shot|active_enemies<2)
@@ -316,7 +316,7 @@ local function St()
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 34"; end
   end
   -- trueshot,if=((buff.precise_shots.down|talent.calling_the_shots)&covenant.venthyr|covenant.necrolord|cooldown.resonating_arrow.remains>30|cooldown.resonating_arrow.remains<10|cooldown.wild_spirits.remains>30|buff.wild_spirits.up)|buff.volley.up&active_enemies>1|fight_remains<25
-  if S.Trueshot:IsReady() and CDsON() and (((Player:BuffDown(S.PreciseShotsBuff) or S.CallingtheShots:IsAvailable()) and CovenantID == 2 or CovenantID == 4 or S.ResonatingArrow:CooldownRemains() > 30 or S.ResonatingArrow:CooldownRemains() < 10 or S.WildSpirits:CooldownRemains() > 30 or Player:BuffUp(S.WildSpiritsBuff)) or Player:BuffUp(S.VolleyBuff) and EnemiesCount10ySplash > 1 or fightRemains < 25) then
+  if S.Trueshot:IsReady() and CDsON() and (((Player:BuffDown(S.PreciseShotsBuff) or S.CallingtheShots:IsAvailable()) and CovenantID == 2 or CovenantID == 4 or S.ResonatingArrow:CooldownRemains() > 30 or S.ResonatingArrow:CooldownRemains() < 10 or S.WildSpirits:CooldownRemains() > 30 or Player:BuffUp(S.WildSpiritsBuff)) or Player:BuffUp(S.VolleyBuff) and EnemiesCount10ySplash > 1 or FightRemains < 25) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot st 32"; end
   end
   -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|buff.trick_shots.remains>execute_time&active_enemies>1
@@ -490,7 +490,7 @@ local function APL()
   end
 
   -- Calculate fight_remains
-  fightRemains = HL.FightRemains(Enemies10ySplash, false)
+  FightRemains = HL.FightRemains(Enemies10ySplash, false)
 
   -- call precombat
   if not Player:AffectingCombat() then

@@ -43,7 +43,7 @@ local EnemiesCount15yMelee  --Enemies arround player
 local Enemies16ySplash
 local var_disciplinary_command_cd_remains
 local var_disciplinary_command_last_applied
-local fightRemains
+local FightRemains
 local TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
 local GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
 local FreezingWindsEquipped = Player:HasLegendaryEquipped(4)
@@ -132,7 +132,7 @@ local function Cooldowns()
     if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment cd 1"; end
   end
   -- potion,if=prev_off_gcd.icy_veins|fight_remains<30
-  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (Player:PrevGCDP(1, S.IcyVeins) or fightRemains < 30) then
+  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (Player:PrevGCDP(1, S.IcyVeins) or FightRemains < 30) then
     if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cd 2"; end
   end
   -- deathborne
@@ -152,7 +152,7 @@ local function Cooldowns()
     if Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cd 6"; end
   end
   -- time_warp,if=runeforge.temporal_warp&buff.exhaustion.up&(prev_off_gcd.icy_veins|fight_remains<40)
-  if S.TimeWarp:IsCastable() and Settings.Frost.UseTemporalWarp and (TemporalWarpEquipped and Player:BloodlustExhaustUp() and Player:BloodlustDown() and (Player:BuffUp(S.IcyVeins) or fightRemains < 40)) then
+  if S.TimeWarp:IsCastable() and Settings.Frost.UseTemporalWarp and (TemporalWarpEquipped and Player:BloodlustExhaustUp() and Player:BloodlustDown() and (Player:BuffUp(S.IcyVeins) or FightRemains < 40)) then
     if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 7"; end
   end
   -- use_items
@@ -370,7 +370,7 @@ local function APL()
   Mage.IFTracker()
 
   -- How long is left in the fight?
-  fightRemains = HL.FightRemains(Enemies16ySplash, false)
+  FightRemains = HL.FightRemains(Enemies16ySplash, false)
 
   -- Check when the Disciplinary Command buff was last applied and its internal CD
   var_disciplinary_command_last_applied = S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()

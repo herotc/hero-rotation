@@ -36,7 +36,7 @@ local OnUseExcludes = {
 -- Rotation Var
 local hasMainHandEnchant, hasOffHandEnchant
 local Enemies40y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y, Enemies40yCount, EnemiesCount30ySplash
-local fightRemains
+local FightRemains
 local EnemiesFlameShockCount = 0
 local DoomWindsEquipped = Player:HasLegendaryEquipped(138)
 local PrimalLavaActuatorsEquipped = Player:HasLegendaryEquipped(141)
@@ -404,7 +404,7 @@ local function APL()
   end
 
   -- Calculate how long is remaining in the fight
-  fightRemains = HL.FightRemains(MeleeEnemies10y, false)
+  FightRemains = HL.FightRemains(MeleeEnemies10y, false)
 
   if Everyone.TargetIsValid() then
     -- lightning_shield
@@ -419,7 +419,7 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- potion,if=expected_combat_length-time<60
-    if I.PotionofSpectralAgility:IsReady() and (fightRemains < 60) then
+    if I.PotionofSpectralAgility:IsReady() and (FightRemains < 60) then
       if Cast(I.PotionofSpectralAgility, nil, Settings.Commons.DisplayStyle.Potions) then return "potion default 4"; end
     end
     -- wind_shear

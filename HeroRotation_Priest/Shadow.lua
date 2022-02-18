@@ -247,7 +247,7 @@ local function Trinkets()
     if Cast(I.EmpyrealOrdinance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "empyreal_ordnance"; end
   end
   -- use_item,name=inscrutable_quantum_device,if=buff.voidform.up&buff.power_infusion.up|fight_remains<=20|buff.power_infusion.up&cooldown.void_eruption.remains+15>fight_remains|buff.voidform.up&cooldown.power_infusion.remains+15>fight_remains|(cooldown.power_infusion.remains>=10&cooldown.void_eruption.remains>=10)&fight_remains>=190
-  if I.InscrutableQuantumDevice:IsEquippedAndReady() and (Player:BuffUp(S.VoidformBuff) and Player:BuffUp(S.PowerInfusionBuff) or HL.BossFilteredFightRemains("<=", 20) or Player:BuffUp(S.PowerInfusionBuff) and HL.BossFilteredFightRemains("<", S.VoidEruption:CooldownRemains() + 15) or Player:BuffUp(S.VoidformBuff) and HL.BossFilteredFightRemains("<", S.PowerInfusion:CooldownRemains() + 15) or (S.PowerInfusion:CooldownRemains() >= 10 and S.VoidEruption:CooldownRemains() >= 10) and HL.BossFilteredFightRemains(">=", 190)) then
+  if I.InscrutableQuantumDevice:IsEquippedAndReady() and (Player:BuffUp(S.VoidformBuff) and Player:BuffUp(S.PowerInfusionBuff) or FightRemains <= 20 or Player:BuffUp(S.PowerInfusionBuff) and FightRemains < S.VoidEruption:CooldownRemains() + 15 or Player:BuffUp(S.VoidformBuff) and FightRemains < S.PowerInfusion:CooldownRemains() + 15 or (S.PowerInfusion:CooldownRemains() >= 10 and S.VoidEruption:CooldownRemains() >= 10) and FightRemains >= 190) then
     if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device"; end
   end
   -- use_item,name=macabre_sheet_music,if=cooldown.void_eruption.remains>10
