@@ -28,6 +28,7 @@ local Mage = HR.Commons.Mage
 
 -- Spells
 if not Spell.Mage then Spell.Mage = {} end
+-- TODO: Merge using MergeTableByKey
 Spell.Mage.Arcane = {
   -- Racials
   AncestralCall                         = Spell(274738),
@@ -91,6 +92,8 @@ Spell.Mage.Arcane = {
   Fleshcraft                            = Spell(324631),
   ShiftingPower                         = Spell(314791),
   FieldOfBlossoms                       = Spell(319191),
+  -- Soulbind
+  EffusiveAnimaAccelerator              = Spell(352188),
   -- Conduit
   ArcaneProdigy                         = Spell(336873),
   VolatileSolvent                       = Spell(323074),
