@@ -345,12 +345,12 @@ local function APL()
       if Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "rushing_jade_wind main 72"; end
     end
     -- Manually added Pool filler
-    if Cast(S.PoolEnergy) and not Settings.Brewmaster.NoBrewmasterPooling then return "Pool Energy"; end
+    if Cast(S.PoolEnergy) then return "Pool Energy"; end
   end
 end
 
 local function Init()
-  HR.Print("Brewmaster rotation is currently a work in progress, but has been updated for patch 9.1.")
+  HR.Print("Brewmaster rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(268, APL, Init)

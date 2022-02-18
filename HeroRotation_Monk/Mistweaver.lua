@@ -232,7 +232,7 @@ local function APL()
       local ShouldReturn = ST(); if ShouldReturn then return ShouldReturn; end
     end
     -- Manually added Pool filler
-    if Cast(S.PoolEnergy) and not Settings.Mistweaver.NoMistweaverPooling then return "Pool Energy"; end
+    if Cast(S.PoolEnergy) then return "Pool Energy"; end
   end
 end
 
