@@ -384,7 +384,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Blood DK rotation is currently a work in progress, but has been updated for patch 9.1.")
+  --HR.Print("Blood DK rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(250, APL, Init)

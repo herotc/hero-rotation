@@ -827,7 +827,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Frost DK rotation is currently a work in progress, but has been updated for patch 9.1.")
+  --HR.Print("Frost DK rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(251, APL, Init)
