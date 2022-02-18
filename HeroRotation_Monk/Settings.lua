@@ -24,7 +24,8 @@ HR.GUISettings.APL.Monk = {
     DisplayStyle = {
       Potions = "Suggested",
       Covenant = "Suggested",
-      Trinkets = "Suggested"
+      Trinkets = "Suggested",
+      Items = "Suggested"
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
