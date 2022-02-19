@@ -85,6 +85,7 @@ Spell.Warlock.Demonology = {
   -- Legendary Effects
   BalespidersBuff                       = Spell(337161),
   ImplosivePotentialBuff                = Spell(337139),
+  ShardofAnnihilationBuff               = Spell(356342),
 
   -- Item Effects
   ShiverVenomDebuff                     = Spell(301624),
@@ -227,12 +228,17 @@ Item.Warlock.Demonology = {
   -- Potion
   PotionofSpectralIntellect             = Item(307096),
   -- Trinkets
+  ArchitectsIngenuityCore               = Item(188268, {13, 14}),
+  CosmicGladiatorsResonator             = Item(188766, {13, 14}),
   DarkmoonDeckPutrescence               = Item(173069, {13, 14}),
   DreadfireVessel                       = Item(184030, {13, 14}),
   EbonsoulVise                          = Item(186431, {13, 14}),
   EmpyrealOrdnance                      = Item(180117, {13, 14}),
   GlyphofAssimilation                   = Item(184021, {13, 14}),
+  GrimEclipse                           = Item(188254, {13, 14}),
   OverflowingAnimaCage                  = Item(178849, {13, 14}),
+  ResonantReservoir                     = Item(188272, {13, 14}),
+  ScarsofFraternalStrife                = Item(188253, {13, 14}),
   ShadowedOrbofTorment                  = Item(186428, {13, 14}),
   SinfulAspirantsEmblem                 = Item(178334, {13, 14}),
   SinfulGladiatorsEmblem                = Item(178447, {13, 14}),
