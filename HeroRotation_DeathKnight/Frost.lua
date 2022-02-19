@@ -48,7 +48,6 @@ if equip[14] then
 end
 
 -- Rotation Var
-local ShouldReturn -- Used to get the return string
 local no_heal
 local UsingRazorice
 local UsingFallenCrusader
@@ -776,6 +775,11 @@ local function APL()
     -- frost_strike,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&(!talent.breath_of_sindragosa|!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains>10)
     if S.FrostStrike:IsReady() and (Player:BuffRemains(S.IcyTalonsBuff) <= Player:GCD() and Player:BuffUp(S.IcyTalonsBuff) and ((not S.BreathofSindragosa:IsAvailable()) or Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownRemains() > 10)) then
       if Cast(S.FrostStrike) then return "frost_strike main 8"; end
+    end
+    -- obliterate,if=covenant.night_fae&death_and_decay.ticking&death_and_decay.active_remains<(gcd*1.5)
+    local AnyDnD = S.DeathsDue:IsAvailable() and S.DeathsDue or S.DeathAndDecay
+    if S.Obliterate:IsReady() and (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff) and 10 - AnyDnD:TimeSinceLastCast() < (Player:GCD() * 1.5)) then
+      if Cast(S.Obliterate, nil, nil, not TargetIsInRange[8]) then return "obliterate main 10"; end
     end
     -- call_action_list,name=covenants
     if (true) then
