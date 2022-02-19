@@ -154,8 +154,8 @@ local function Cooldowns()
     if Cast(S.HolyAvenger) then return "holy_avenger cooldowns 8"; end
   end
   -- potion,if=buff.avenging_wrath.up
-  if I.PotionofSpectralStrength:IsReady() and (Player:BuffUp(S.AvengingWrathBuff)) then
-    if Cast(I.PotionofSpectralStrength, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldowns 10"; end
+  if I.PotionofPhantomFire:IsReady() and (Player:BuffUp(S.AvengingWrathBuff)) then
+    if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldowns 10"; end
   end
   -- use_items,if=buff.seraphim.up|!talent.seraphim.enabled
   if (Player:BuffUp(S.SeraphimBuff) or not S.Seraphim:IsAvailable()) then
