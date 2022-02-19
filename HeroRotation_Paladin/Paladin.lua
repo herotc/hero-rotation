@@ -224,7 +224,7 @@ Spell.Paladin.Holy = {
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Protection = {
   -- Potion
-  PotionofUnbridledFury = Item(169299)
+  PotionofSpectralStrength = Item(171275)
 }
 
 Item.Paladin.Holy = {
