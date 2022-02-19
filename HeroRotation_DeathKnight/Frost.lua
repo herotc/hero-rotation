@@ -102,6 +102,7 @@ local _, _, MainHandRuneforge = strsplit(":", MainHandLink)
 local _, _, OffHandRuneforge = strsplit(":", OffHandLink)
 local UsingRazorice = (MainHandRuneforge == "3370" or OffHandRuneforge == "3370")
 local UsingFallenCrusader = (MainHandRuneforge == "3368" or OffHandRuneforge == "3368")
+local Using2H = IsEquippedItemType("Two-Hand")
 HL:RegisterForEvent(function()
   equip = Player:GetEquipment()
   trinket1 = Item(0)
@@ -121,6 +122,7 @@ HL:RegisterForEvent(function()
   _, _, OffHandRuneforge = strsplit(":", OffHandLink)
   UsingRazorice = (MainHandRuneforge == "3370" or OffHandRuneforge == "3370")
   UsingFallenCrusader = (MainHandRuneforge == "3368" or OffHandRuneforge == "3368")
+  Using2H = IsEquippedItemType("Two-Hand")
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
@@ -409,7 +411,7 @@ end
 
 local function ColdHeart()
   -- chains_of_ice,if=fight_remains<gcd&(rune<2|!buff.killing_machine.up&(!main_hand.2h&buff.cold_heart.stack>=4+runeforge.koltiras_favor|main_hand.2h&buff.cold_heart.stack>8+runeforge.koltiras_favor)|buff.killing_machine.up&(!main_hand.2h&buff.cold_heart.stack>8+runeforge.koltiras_favor|main_hand.2h&buff.cold_heart.stack>10+runeforge.koltiras_favor))
-  if S.ChainsofIce:IsReady() and (HL.FilteredFightRemains(Enemies10yd, "<", Player:GCD()) and (Player:Rune() < 2 or Player:BuffDown(S.KillingMachineBuff) and ((not Settings.Frost.Using2H) and Player:BuffStack(S.ColdHeartBuff) >= 4 + num(KoltirasFavorEquipped) or Settings.Frost.Using2H and Player:BuffStack(S.ColdHeartBuff) > 8 + num(KoltirasFavorEquipped)) or Player:BuffUp(S.KillingMachineBuff) and ((not Settings.Frost.Using2H) and Player:BuffStack(S.ColdHeartBuff) > 8 + num(KoltirasFavorEquipped) or Settings.Frost.Using2H and Player:BuffStack(S.ColdHeartBuff) > 10 + num(KoltirasFavorEquipped)))) then
+  if S.ChainsofIce:IsReady() and (HL.FilteredFightRemains(Enemies10yd, "<", Player:GCD()) and (Player:Rune() < 2 or Player:BuffDown(S.KillingMachineBuff) and ((not Using2H) and Player:BuffStack(S.ColdHeartBuff) >= 4 + num(KoltirasFavorEquipped) or Using2H and Player:BuffStack(S.ColdHeartBuff) > 8 + num(KoltirasFavorEquipped)) or Player:BuffUp(S.KillingMachineBuff) and ((not Using2H) and Player:BuffStack(S.ColdHeartBuff) > 8 + num(KoltirasFavorEquipped) or Using2H and Player:BuffStack(S.ColdHeartBuff) > 10 + num(KoltirasFavorEquipped)))) then
     if Cast(S.ChainsofIce, nil, nil, not TargetIsInRange[30]) then return "chains_of_ice coldheart 2"; end
   end
   -- chains_of_ice,if=!talent.obliteration&buff.pillar_of_frost.up&buff.cold_heart.stack>=10&(buff.pillar_of_frost.remains<gcd*(1+cooldown.frostwyrms_fury.ready)|buff.unholy_strength.up&buff.unholy_strength.remains<gcd|buff.chaos_bane.up&buff.chaos_bane.remains<gcd)
@@ -431,8 +433,8 @@ local function ColdHeart()
 end
 
 local function Covenants()
-  -- deaths_due,if=variable.st_planning|variable.adds_remain
-  if S.DeathsDue:IsReady() and (VarSTPlanning or VarAddsRemain) then
+  -- deaths_due,if=(!talent.obliteration|talent.obliteration&active_enemies>=2&cooldown.pillar_of_frost.remains|active_enemies=1)&(variable.st_planning|variable.adds_remain)
+  if S.DeathsDue:IsReady() and (((not S.Obliteration:IsAvailable()) or S.Obliteration:IsAvailable() and EnemiesCount10yd >= 2 and S.PillarofFrost:CooldownDown() or EnemiesCount10yd == 1) and (VarSTPlanning or VarAddsRemain)) then
     if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "deaths_due covenants 2"; end
   end
   -- swarming_mist,if=runic_power.deficit>13&cooldown.pillar_of_frost.remains<3&!talent.breath_of_sindragosa&variable.st_planning
@@ -545,8 +547,8 @@ local function Cooldowns()
   if S.PillarofFrost:IsCastable() and (S.Icecap:IsAvailable() and not Player:BuffUp(S.PillarofFrost)) then
     if Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cooldowns 12"; end
   end
-  -- pillar_of_frost,if=talent.obliteration&runic_power>=25&(variable.st_planning|variable.adds_remain)&(talent.gathering_storm.enabled&buff.remorseless_winter.up|!talent.gathering_storm.enabled)
-  if S.PillarofFrost:IsCastable() and (S.Obliteration:IsAvailable() and Player:RunicPower() >= 25 and (VarSTPlanning or VarAddsRemain) and (S.GatheringStorm:IsAvailable() and Player:BuffUp(S.RemorselessWinter) or not S.GatheringStorm:IsAvailable())) then
+  -- pillar_of_frost,if=talent.obliteration&runic_power>=35&(variable.st_planning|variable.adds_remain)&(talent.gathering_storm.enabled&buff.remorseless_winter.up|!talent.gathering_storm.enabled)
+  if S.PillarofFrost:IsCastable() and (S.Obliteration:IsAvailable() and Player:RunicPower() >= 35 and (VarSTPlanning or VarAddsRemain) and (S.GatheringStorm:IsAvailable() and Player:BuffUp(S.RemorselessWinter) or not S.GatheringStorm:IsAvailable())) then
     if Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cooldowns 14"; end
   end
   -- breath_of_sindragosa,if=buff.pillar_of_frost.up
@@ -561,8 +563,8 @@ local function Cooldowns()
   if S.FrostwyrmsFury:IsCastable() and (EnemiesMeleeCount >= 2 and Player:BuffUp(S.PillarofFrostBuff) and Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD()) then
     if Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury, nil, not TargetIsInRange[40]) then return "frostwyrms_fury cooldowns 20"; end
   end
-  -- frostwyrms_fury,if=talent.obliteration&buff.pillar_of_frost.up&((buff.pillar_of_frost.remains<gcd|buff.unholy_strength.up&buff.unholy_strength.remains<gcd)&(debuff.razorice.stack=5|!death_knight.runeforge.razorice))
-  if S.FrostwyrmsFury:IsCastable() and (S.Obliteration:IsAvailable() and Player:BuffUp(S.PillarofFrostBuff) and ((Player:BuffRemains(S.PillarofFrostBuff) or Player:BuffUp(S.UnholyStrengthBuff) and Player:BuffRemains(S.UnholyStrengthBuff) < Player:GCD()) and (Target:DebuffStack(S.RazoriceDebuff) == 5 or not UsingRazorice))) then
+  -- frostwyrms_fury,if=talent.obliteration&(buff.pillar_of_frost.up&!main_hand.2h|!buff.pillar_of_frost.up&main_hand.2h&cooldown.pillar_of_frost.remains)&((buff.pillar_of_frost.remains<gcd|buff.unholy_strength.up&buff.unholy_strength.remains<gcd)&(debuff.razorice.stack=5|!death_knight.runeforge.razorice))
+  if S.FrostwyrmsFury:IsCastable() and (S.Obliteration:IsAvailable() and (Player:BuffUp(S.PillarofFrostBuff) and (not Using2H) or Player:BuffDown(S.PillarofFrostBuff) and Using2H and S.PillarofFrost:CooldownDown()) and ((Player:BuffRemains(S.PillarofFrostBuff) or Player:BuffUp(S.UnholyStrengthBuff) and Player:BuffRemains(S.UnholyStrengthBuff) < Player:GCD()) and (Target:DebuffStack(S.RazoriceDebuff) == 5 or not UsingRazorice))) then
     if Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury, nil, not TargetIsInRange[40]) then return "frostwyrms_fury cooldowns 22"; end
   end
   -- hypothermic_presence,if=talent.breath_of_sindragosa&runic_power.deficit>40&rune<=3&(buff.breath_of_sindragosa.up|cooldown.breath_of_sindragosa.remains>40)|!talent.breath_of_sindragosa&runic_power.deficit>=25
@@ -760,25 +762,25 @@ local function APL()
     VarFrostStrikeConduits = (S.EradicatingBlow:ConduitEnabled() and Player:BuffStack(S.EradicatingBlowBuff) == 2 or S.UnleashedFrenzy:ConduitEnabled() and Player:BuffRemains(S.UnleashedFrenzyBuff) < (Player:GCD() * 2))
     -- variable,name=deaths_due_active,value=death_and_decay.ticking&covenant.night_fae
     VarDeathsDueActive = (Player:BuffUp(S.DeathAndDecayBuff) and CovenantID == 3)
-    -- remorseless_winter,if=conduit.everfrost&talent.gathering_storm&!talent.obliteration&cooldown.pillar_of_frost.remains
-    if S.RemorselessWinter:IsReady() and (S.Everfrost:ConduitEnabled() and S.GatheringStorm:IsAvailable() and not S.Obliteration:IsAvailable() and not S.PillarofFrost:CooldownUp()) then
+    -- remorseless_winter,if=conduit.everfrost&talent.gathering_storm&!talent.obliteration&cooldown.pillar_of_frost.remains|talent.obliteration&!buff.pillar_of_frost.up)
+    if S.RemorselessWinter:IsReady() and (S.Everfrost:ConduitEnabled() and S.GatheringStorm:IsAvailable() and not S.Obliteration:IsAvailable() and not S.PillarofFrost:CooldownUp() or S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff)) then
       if Cast(S.RemorselessWinter, nil, nil, not TargetIsInRange[8]) then return "remorseless_winter main 2"; end
     end
     -- howling_blast,target_if=!dot.frost_fever.remains&(talent.icecap|!buff.breath_of_sindragosa.up&talent.breath_of_sindragosa|talent.obliteration&cooldown.pillar_of_frost.remains&!buff.killing_machine.up)
     if S.HowlingBlast:IsReady() and (S.Icecap:IsAvailable() or Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:IsAvailable() or S.Obliteration:IsAvailable() and S.PillarofFrost:CooldownDown() and Player:BuffDown(S.KillingMachineBuff)) then
       if Everyone.CastCycle(S.HowlingBlast, Enemies10yd, EvaluateCycleHowlingBlast, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast main 4"; end
     end
-    -- glacial_advance,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&spell_targets.glacial_advance>=2&(!talent.breath_of_sindragosa|cooldown.breath_of_sindragosa.remains>15)
-    if S.GlacialAdvance:IsReady() and (Player:BuffRemains(S.IcyTalonsBuff) <= Player:GCD() and Player:BuffUp(S.IcyTalonsBuff) and EnemiesCount10yd >= 2 and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownRemains() > 15)) then
+    -- glacial_advance,if=buff.icy_talons.remains<=gcd&talent.icy_talons&spell_targets.glacial_advance>=2&(talent.icecap|talent.breath_of_sindragosa&cooldown.breath_of_sindragosa.remains>15|talent.obliteration&!buff.pillar_of_frost.up)
+    if S.GlacialAdvance:IsReady() and (Player:BuffRemains(S.IcyTalonsBuff) <= Player:GCD() and S.IcyTalons:IsAvailable() and EnemiesCount10yd >= 2 and (S.Icecap:IsAvailable() or S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemains() > 15 or S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff))) then
       if Cast(S.GlacialAdvance, nil, nil, 100) then return "glacial_advance main 6"; end
     end
-    -- frost_strike,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&(!talent.breath_of_sindragosa|!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains>10)
-    if S.FrostStrike:IsReady() and (Player:BuffRemains(S.IcyTalonsBuff) <= Player:GCD() and Player:BuffUp(S.IcyTalonsBuff) and ((not S.BreathofSindragosa:IsAvailable()) or Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownRemains() > 10)) then
+    -- frost_strike,if=buff.icy_talons.remains<=gcd&talent.icy_talons&(talent.icecap|talent.breath_of_sindragosa&!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains>10|talent.obliteration&!buff.pillar_of_frost.up)
+    if S.FrostStrike:IsReady() and (Player:BuffRemains(S.IcyTalonsBuff) <= Player:GCD() and S.IcyTalons:IsAvailable() and (S.Icecap:IsAvailable() or S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownRemains() > 10 or S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff))) then
       if Cast(S.FrostStrike) then return "frost_strike main 8"; end
     end
-    -- obliterate,if=covenant.night_fae&death_and_decay.ticking&death_and_decay.active_remains<(gcd*1.5)
+    -- obliterate,if=covenant.night_fae&death_and_decay.ticking&death_and_decay.active_remains<(gcd*1.5)&(!talent.obliteration|talent.obliteration&!buff.pillar_of_frost.up)
     local AnyDnD = S.DeathsDue:IsAvailable() and S.DeathsDue or S.DeathAndDecay
-    if S.Obliterate:IsReady() and (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff) and 10 - AnyDnD:TimeSinceLastCast() < (Player:GCD() * 1.5)) then
+    if S.Obliterate:IsReady() and (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff) and 10 - AnyDnD:TimeSinceLastCast() < (Player:GCD() * 1.5) and ((not S.Obliteration:IsAvailable()) or S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff))) then
       if Cast(S.Obliterate, nil, nil, not TargetIsInRange[8]) then return "obliterate main 10"; end
     end
     -- call_action_list,name=covenants
