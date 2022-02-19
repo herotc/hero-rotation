@@ -56,6 +56,12 @@ HR.GUISettings.APL.Paladin = {
     }
   },
   Retribution = {
+    GCDasOffGCD = {
+      ExecutionSentence = false,
+      HammerOfWrath = true,
+      Seraphim = false,
+      ShieldOfVengeance = true,
+    },
     OffGCDasOffGCD = {
       AvengingWrath = true,
     },
