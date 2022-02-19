@@ -16,12 +16,17 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 --- ============================ CONTENT ============================
 HR.GUISettings.APL.Paladin = {
   Commons = {
-    UseTrinkets = true,
-    UsePotions = true,
-    TrinketDisplayStyle = "Suggested",
-    CovenantDisplayStyle = "Suggested",
+    Enabled = {
+      Trinkets = true,
+      Potions = true,
+    },
+    DisplayStyle = {
+      Trinkets = "Suggested",
+      Covenant = "Suggested",
+      Potions = "Suggested",
+      Items = "Suggested",
+    },
     GCDasOffGCD = {
-      Racials = false,
     },
     OffGCDasOffGCD = {
       Racials = true,
@@ -52,8 +57,17 @@ HR.GUISettings.APL.Paladin = {
     },
   },
   Holy = {
+    LoHHP = 10,
+    DPHP = 40,
+    WoGHP = 60,
+    GCDasOffGCD = {
+      HammerOfWrath = false,
+      LightOfDawn = true,
+      Seraphim = true,
+    },
     OffGCDasOffGCD = {
       AvengingWrath = true,
+      HolyAvenger = true,
     },
   },
 }
@@ -85,3 +99,6 @@ CreateARPanelOptions(CP_Retribution, "APL.Paladin.Retribution")
 
 -- Holy
 CreateARPanelOptions(CP_Holy, "APL.Paladin.Holy")
+CreatePanelOption("Slider", CP_Holy, "APL.Paladin.Holy.LoHHP", {0, 100, 1}, "Lay on Hands HP", "Set the Lay on Hands HP threshold.")
+CreatePanelOption("Slider", CP_Holy, "APL.Paladin.Holy.DPHP", {0, 100, 1}, "Divine Protection HP", "Set the Divine Protection HP threshold.")
+CreatePanelOption("Slider", CP_Holy, "APL.Paladin.Holy.WoGHP", {0, 100, 1}, "Word of Glory HP", "Set the Word of Glory HP threshold.")

@@ -176,25 +176,26 @@ Spell.Paladin.Holy = {
   Judgment                              = Spell(275773),
   JudgmentDebuff                        = Spell(197277),
   LayonHands                            = Spell(633),
+  LightofDawn                           = Spell(85222),
   ShieldoftheRighteous                  = Spell(53600),
   ShieldoftheRighteousBuff              = Spell(132403),
   InfusionofLightBuff                   = Spell(54149),
   WordofGlory                           = Spell(85673),
 
   -- Talents
-  CrusadersMight                        = Spell(196926),
+  AvengingCrusader                      = Spell(216331),
+  Awakening                             = Spell(248033),
   BestowFaith                           = Spell(223306),
-  LightsHammer                          = Spell(114158),
+  CrusadersMight                        = Spell(196926),
   DivinePurpose                         = Spell(223817),
   DivinePurposeBuff                     = Spell(223819),
-  HolyAvenger                           = Spell(105809),
-  Seraphim                              = Spell(152262),
-  SeraphimBuff                          = Spell(152262),
-  AvengingCrusader                      = Spell(216331),
   GlimmerofLight                        = Spell(325966),
   GlimmerofLightDebuff                  = Spell(325966),
-
-
+  HolyAvenger                           = Spell(105809),
+  HolyPrism                             = Spell(114165),
+  LightsHammer                          = Spell(114158),
+  Seraphim                              = Spell(152262),
+  SeraphimBuff                          = Spell(152262),
 
   -- Trinkets
 
@@ -209,6 +210,7 @@ Spell.Paladin.Holy = {
   Fleshcraft                            = Spell(324631),
   Soulshape                             = Spell(310143),
   SummonSteward                         = Spell(324739),
+  VanquishersHammer                     = Spell(328204),
 
   -- Soulbinds/Conduits (Shadowlands)
   -- TO BE FILLED
@@ -221,5 +223,11 @@ Spell.Paladin.Holy = {
 -- Items
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Protection = {
-  PotionofUnbridledFury = Item(169299),
+  -- Potion
+  PotionofUnbridledFury = Item(169299)
+}
+
+Item.Paladin.Holy = {
+  -- Potion
+  PotionofSpectralIntellect = Item(171273)
 }
