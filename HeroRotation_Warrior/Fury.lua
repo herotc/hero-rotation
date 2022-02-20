@@ -48,12 +48,6 @@ local VarUniqueLegendaries
 local Enemies8y, EnemiesCount8
 local TargetInMeleeRange
 
--- Legendaries
-local SignetofTormentedKingsEquipped = Player:HasLegendaryEquipped(181)
-local WilloftheBerserkerEquipped = Player:HasLegendaryEquipped(189)
-local ElysianMightEquipped = Player:HasLegendaryEquipped(263)
-local SinfulSurgeEquipped = Player:HasLegendaryEquipped(215)
-
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
 local Settings = {
@@ -67,6 +61,12 @@ local StunInterrupts = {
   {S.StormBolt, "Cast Storm Bolt (Interrupt)", function () return true; end},
 }
 
+-- Legendaries
+local SignetofTormentedKingsEquipped = Player:HasLegendaryEquipped(181)
+local WilloftheBerserkerEquipped = Player:HasLegendaryEquipped(189)
+local ElysianMightEquipped = Player:HasLegendaryEquipped(263)
+local SinfulSurgeEquipped = Player:HasLegendaryEquipped(215)
+
 -- Event Registrations
 HL:RegisterForEvent(function()
   SignetofTormentedKingsEquipped = Player:HasLegendaryEquipped(181)
@@ -74,6 +74,15 @@ HL:RegisterForEvent(function()
   ElysianMightEquipped = Player:HasLegendaryEquipped(263)
   SinfulSurgeEquipped = Player:HasLegendaryEquipped(215)
 end, "PLAYER_EQUIPMENT_CHANGED")
+
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -284,7 +293,7 @@ local function APL()
       end
     end
     -- variable,name=execute_phase,value=talent.massacre&target.health.pct<35|target.health.pct<20|target.health.pct>80&covenant.venthyr
-    VarExecutePhase = (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35 or Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80 and Player:Covenant() == "Venthyr")
+    VarExecutePhase = (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35 or Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80 and CovenantID == 2)
     -- variable,name=unique_legendaries,value=runeforge.signet_of_tormented_kings|runeforge.sinful_surge|runeforge.elysian_might
     VarUniqueLegendaries = (SignetofTormentedKingsEquipped or SinfulSurgeEquipped or ElysianMightEquipped)
     -- run_action_list,name=movement,if=movement.distance>5
@@ -297,11 +306,11 @@ local function APL()
     end
     if (not Settings.Fury.HideCastQueue) then
       -- sequence,if=active_enemies=1&covenant.venthyr.enabled&runeforge.signet_of_tormented_kings.equipped,name=BT&Reck:bloodthirst:recklessness
-      if (S.Bloodthirst:IsCastable() and S.Recklessness:IsCastable()) and (EnemiesCount8 == 1 and Player:Covenant() == "Venthyr" and SignetofTormentedKingsEquipped) then
+      if (S.Bloodthirst:IsCastable() and S.Recklessness:IsCastable()) and (EnemiesCount8 == 1 and CovenantID == 2 and SignetofTormentedKingsEquipped) then
         if HR.CastQueue(S.Bloodthirst, S.Recklessness) then return "BT&Reck sequence"; end
       end
       -- sequence,if=active_enemies=1&!covenant.venthyr.enabled&runeforge.signet_of_tormented_kings.equipped,name=BT&Charge:bloodthirst:heroic_charge
-      --if (S.Bloodthirst:IsCastable() and S.HeroicLeap:IsCastable()) and (EnemiesCount8 == 1 and Player:Covenant() ~= "Venthyr" and SignetofTormentedKingsEquipped) then
+      --if (S.Bloodthirst:IsCastable() and S.HeroicLeap:IsCastable()) and (EnemiesCount8 == 1 and CovenantID ~= 2 and SignetofTormentedKingsEquipped) then
         --if HR.CastQueue(S.Bloodthirst, S.HeroicLeap) then return "BT&Charge sequence"; end
       --end
     end

@@ -35,7 +35,7 @@ FuryOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local BaseCheck = FuryOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellFury.Charge then
-      return BaseCheck and (SpellFury.Charge:Charges() >= 1 and (not Target:IsInRange(8)) and Target:IsInRange(25))
+      return BaseCheck and (self:Charges() >= 1 and (not Target:IsInRange(8)) and Target:IsInRange(25))
     else
       return BaseCheck
     end
