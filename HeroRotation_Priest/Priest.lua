@@ -122,6 +122,7 @@ Spell.Priest.Discipline = MergeTableByKey(Spell.Priest.Commons, {
   PurgeTheWicked                        = Spell(204197),
   PurgeTheWickedDebuff                  = Spell(204213),
   Halo                                  = Spell(120517),
+  SpiritShell                           = Spell(109964),
   -- Covenant Abilities
   AscendedBlast                         = Spell(325315),
 })
