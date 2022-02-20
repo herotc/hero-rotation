@@ -474,7 +474,7 @@ local function CDSEF()
     if Cast(S.BonedustBrew, nil, Settings.Commons.CovenantDisplayStyle) then return "bonedust_brew cd_sef 12"; end
   end
   -- storm_earth_and_fire_fixate,if=conduit.coordinated_offensive.enabled
-  if S.StormEarthAndFireFixate:IsCastable() and (S.CoordinatedOffensive:ConduitEnabled()) then
+  if S.StormEarthAndFireFixate:IsCastable() and (Player:BuffUp(S.StormEarthAndFireBuff) and S.StormEarthAndFireFixate:TimeSinceLastCast() > 15) and (S.CoordinatedOffensive:ConduitEnabled()) then
     if Cast(S.StormEarthAndFireFixate) then return "storm_earth_and_fire_fixate cd_sef 14"; end
   end
   -- storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|fight_remains<20|(raid_event.adds.remains>15|(!covenant.kyrian&!covenant.necrolord)&((raid_event.adds.in>cooldown.storm_earth_and_fire.full_recharge_time|!raid_event.adds.exists)&(cooldown.invoke_xuen_the_white_tiger.remains>cooldown.storm_earth_and_fire.full_recharge_time|variable.hold_xuen))&cooldown.fists_of_fury.remains<=9&chi>=2&cooldown.whirling_dragon_punch.remains<=12)
