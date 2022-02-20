@@ -88,22 +88,20 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
-  if Everyone.TargetIsValid() then
-    -- Manually added: battle_shout,if=buff.battle_shout.remains<60
-    if S.BattleShout:IsCastable() and (Player:BuffRemains(S.BattleShoutBuff, true) < 60) then
-      if Cast(S.BattleShout, Settings.Fury.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
-    end
-    -- recklessness,if=!runeforge.signet_of_tormented_kings.equipped
-    if S.Recklessness:IsCastable() and CDsON() and (not SignetofTormentedKingsEquipped) then
-      if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat 4"; end
-    end
-    -- Manually Added: Charge if not in melee. Bloodthirst if in melee
-    if S.Charge:IsCastable() then
-      if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge, not Target:IsSpellInRange(S.Charge)) then return "charge precombat 6"; end
-    end
-    if S.Bloodthirst:IsCastable() then
-      if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst precombat 8"; end
-    end
+  -- Manually added: battle_shout,if=buff.battle_shout.remains<60
+  if S.BattleShout:IsCastable() and (Player:BuffRemains(S.BattleShoutBuff, true) < 60) then
+    if Cast(S.BattleShout, Settings.Fury.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
+  end
+  -- recklessness,if=!runeforge.signet_of_tormented_kings.equipped
+  if S.Recklessness:IsCastable() and CDsON() and (not SignetofTormentedKingsEquipped) then
+    if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat 4"; end
+  end
+  -- Manually Added: Charge if not in melee. Bloodthirst if in melee
+  if S.Charge:IsCastable() then
+    if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge, not Target:IsSpellInRange(S.Charge)) then return "charge precombat 6"; end
+  end
+  if S.Bloodthirst:IsCastable() then
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst precombat 8"; end
   end
 end
 
@@ -244,7 +242,7 @@ end
 local function Movement()
   -- heroic_leap
   if S.HeroicLeap:IsCastable() and not Target:IsInMeleeRange(8) then
-    if Cast(S.HeroicLeap, nil, Settings.Commons.DisplayStyle.HeroicLeap) then return "heroic_leap 152"; end
+    if Cast(S.HeroicLeap, nil, Settings.Commons.DisplayStyle.HeroicLeap) then return "heroic_leap movement 2"; end
   end
 end
 
@@ -263,11 +261,12 @@ local function APL()
   -- Range check
   TargetInMeleeRange = Target:IsInMeleeRange(5)
 
-  -- call precombat
-  if not Player:AffectingCombat() then
-    local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
-  end
   if Everyone.TargetIsValid() then
+    -- call Precombat
+    if not Player:AffectingCombat() then
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- In Combat
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
@@ -380,6 +379,9 @@ local function APL()
     end
     if CDsON() then
       -- arcane_torrent,if=rage<40&!buff.recklessness.up
+      if S.ArcaneTorrent:IsCastable() and (Player:Rage() < 40 and Player:BuffDown(S.RecklessnessBuff)) then
+        if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent"; end
+      end
       -- lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
       if S.LightsJudgment:IsCastable() and (Player:BuffDown(S.RecklessnessBuff) and Target:DebuffDown(S.SiegebreakerDebuff)) then
         if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment"; end
@@ -406,18 +408,14 @@ local function APL()
       end
     end
     -- call_action_list,name=aoe
-    if (true) then
-      local ShouldReturn = AOE(); if ShouldReturn then return ShouldReturn; end
-    end
+    local ShouldReturn = AOE(); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=single_target
-    if (true) then
-      local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
-    end
+    local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
   end
 end
 
 local function Init()
-
+  HR.Print("Fury Warrior rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(72, APL, Init)
