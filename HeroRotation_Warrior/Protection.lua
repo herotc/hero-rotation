@@ -37,9 +37,6 @@ local TargetInMeleeRange
 local Enemies8y
 local EnemiesCount8
 
--- Legendaries
-local ReprisalEquipped = Player:HasLegendaryEquipped(193)
-
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
 local Settings = {
@@ -53,10 +50,24 @@ local StunInterrupts = {
   {S.IntimidatingShout, "Cast Intimidating Shout (Interrupt)", function () return true; end},
 }
 
+-- Legendaries
+local ReprisalEquipped = Player:HasLegendaryEquipped(193)
+local GloryEquipped = Player:HasLegendaryEquipped(214)
+
 -- Event Registrations
 HL:RegisterForEvent(function()
   ReprisalEquipped = Player:HasLegendaryEquipped(193)
+  GloryEquipped = Player:HasLegendaryEquipped(214)
 end, "PLAYER_EQUIPMENT_CHANGED")
+
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -194,15 +205,15 @@ local function Generic()
     if Cast(S.ShieldSlam, nil, nil, not TargetInMeleeRange) then return "shield_slam generic 10"; end
   end
   -- condemn
-  if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
+  if S.Condemn:IsReady() then
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn generic 12"; end
   end
   -- execute
-  if S.Execute:IsCastable() and S.Execute:IsUsable() then
+  if S.Execute:IsReady() then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute generic 14"; end
   end
-  -- revenge,if=rage>=70
-  if S.Revenge:IsReady() and (Player:Rage() >= 70) then
+  -- revenge,if=rage>80&target.health.pct>20|buff.revenge.up
+  if S.Revenge:IsReady() and (Player:Rage() > 80 and Target:HealthPercentage() > 20 or Player:BuffUp(S.RevengeBuff)) then
     if Cast(S.Revenge, nil, nil, not TargetInMeleeRange) then return "revenge generic 16"; end
   end
   -- thunder_clap
@@ -249,8 +260,9 @@ local function APL()
     -- Interrupt
     local ShouldReturn = Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
-    -- charge
-    if S.Charge:IsCastable() and (not TargetInMeleeRange) then
+    -- charge,if=time=0
+    -- heroic_charge,if=runeforge.reprisal
+    if S.Charge:IsCastable() then
       if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge, not Target:IsSpellInRange(S.Charge)) then return "charge main 2"; end
     end
     -- use_items,if=cooldown.avatar.remains<=gcd|buff.avatar.up
@@ -301,6 +313,10 @@ local function APL()
     if S.Charge:IsCastable() and (Player:Rage() < 60 and Player:BuffDown(S.RevengeBuff) and ReprisalEquipped) then
       if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge, not Target:IsSpellInRange(S.Charge)) then return "charge for reprisal"; end
     end
+    -- conquerors_banner,if=runeforge.glory
+    if S.ConquerorsBanner:IsCastable() and (GloryEquipped) then
+      if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner main 6"; end
+    end
     -- demoralizing_shout,if=talent.booming_voice.enabled
     if S.DemoralizingShout:IsCastable() and (S.BoomingVoice:IsAvailable()) then
       if S.BoomingVoice:IsAvailable() then
@@ -334,16 +350,14 @@ local function APL()
       return Aoe();
     end
     -- call_action_list,name=generic
-    if (true) then
-      local ShouldReturn = Generic(); if ShouldReturn then return ShouldReturn; end
-    end
+    local ShouldReturn = Generic(); if ShouldReturn then return ShouldReturn; end
     -- If nothing else to do, show the Pool icon
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
 end
 
 local function Init()
-  HR.Print("Protection Warrior rotation is currently a work in progress.")
+  HR.Print("Protection Warrior rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(73, APL, Init)
