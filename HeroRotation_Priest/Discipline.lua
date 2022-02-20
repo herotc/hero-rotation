@@ -229,7 +229,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Discipline Priest rotation is currently a work in progress, but has been updated for patch 9.1.5.")
+  --HR.Print("Discipline Priest rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(256, APL, Init)
