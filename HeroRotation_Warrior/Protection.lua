@@ -357,7 +357,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Protection Warrior rotation is currently a work in progress, but has been updated for patch 9.1.5.")
+  --HR.Print("Protection Warrior rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(73, APL, Init)
