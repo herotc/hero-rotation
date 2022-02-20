@@ -201,7 +201,7 @@ local function EvaluateTargetIfFrostStrikeOblitPooling(TargetUnit)
   return (Player:RunicPowerDeficit() < 70)
 end
 local function EvaluateTargetIfObliterateOblitPooling2(TargetUnit)
-  return (Player:Rune() >= 3 and (not Using2H) or Player:Rune() >= 4 and Using2H)
+  return (Player:Rune() >= 3 and ((not Using2H) or CovenantID == 4 or CovenantID == 1) or Player:Rune() >= 4 and Using2H)
 end
 
 -- Obliteration
@@ -618,7 +618,7 @@ local function Obliteration_Pooling()
   if S.FrostStrike:IsReady() then
     if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, EvaluateTargetIfFrostStrikeOblitPooling) then return "frost_strike obliteration_pooling 10"; end
   end
-  -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=rune>=3&!main_hand.2h|rune>=4&main_hand.2h
+  -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=rune>=3&(!main_hand.2h|covenant.necrolord|covenant.kyrian)|rune>=4&main_hand.2h
   if S.Obliterate:IsReady() then
     if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, EvaluateTargetIfObliterateOblitPooling2) then return "obliterate obliteration_pooling 12"; end
   end
@@ -766,8 +766,8 @@ local function APL()
     VarFrostStrikeConduits = (S.EradicatingBlow:ConduitEnabled() and Player:BuffStack(S.EradicatingBlowBuff) == 2 or S.UnleashedFrenzy:ConduitEnabled() and Player:BuffRemains(S.UnleashedFrenzyBuff) < (Player:GCD() * 2))
     -- variable,name=deaths_due_active,value=death_and_decay.ticking&covenant.night_fae
     VarDeathsDueActive = (Player:BuffUp(S.DeathAndDecayBuff) and CovenantID == 3)
-    -- remorseless_winter,if=conduit.everfrost&talent.gathering_storm&!talent.obliteration&cooldown.pillar_of_frost.remains|talent.obliteration&!buff.pillar_of_frost.up)
-    if S.RemorselessWinter:IsReady() and (S.Everfrost:ConduitEnabled() and S.GatheringStorm:IsAvailable() and not S.Obliteration:IsAvailable() and not S.PillarofFrost:CooldownUp() or S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff)) then
+    -- remorseless_winter,if=conduit.everfrost&talent.gathering_storm&!talent.obliteration&cooldown.pillar_of_frost.remains|set_bonus.tier28_4pc&talent.obliteration&!buff.pillar_of_frost.up)
+    if S.RemorselessWinter:IsReady() and (S.Everfrost:ConduitEnabled() and S.GatheringStorm:IsAvailable() and not S.Obliteration:IsAvailable() and not S.PillarofFrost:CooldownUp() or Player:HasTier(28, 4) and S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff)) then
       if Cast(S.RemorselessWinter, nil, nil, not TargetIsInRange[8]) then return "remorseless_winter main 2"; end
     end
     -- howling_blast,target_if=!dot.frost_fever.remains&(talent.icecap|!buff.breath_of_sindragosa.up&talent.breath_of_sindragosa|talent.obliteration&cooldown.pillar_of_frost.remains&!buff.killing_machine.up)
@@ -819,8 +819,8 @@ local function APL()
     if (Player:BuffUp(S.PillarofFrostBuff) and S.Obliteration:IsAvailable()) then
       local ShouldReturn = Obliteration(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=obliteration_pooling,if=!set_bonus.tier28_4pc&talent.obliteration&cooldown.pillar_of_frost.remains<7&(variable.st_planning|raid_event.adds.exists&raid_event.adds.in<10|!raid_event.adds.exists)
-    if ((not Player:HasTier(28, 4)) and S.Obliteration:IsAvailable() and S.PillarofFrost:CooldownRemains() < 7) then
+    -- run_action_list,name=obliteration_pooling,if=!set_bonus.tier28_4pc&talent.obliteration&cooldown.pillar_of_frost.remains<10&(variable.st_planning|raid_event.adds.exists&raid_event.adds.in<10|!raid_event.adds.exists)
+    if ((not Player:HasTier(28, 4)) and S.Obliteration:IsAvailable() and S.PillarofFrost:CooldownRemains() < 10) then
       local ShouldReturn = Obliteration_Pooling(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=aoe,if=active_enemies>=2
