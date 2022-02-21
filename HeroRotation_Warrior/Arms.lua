@@ -79,28 +79,28 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   -- Manually added: battle_shout,if=buff.battle_shout.remains<60
-    if S.BattleShout:IsCastable() and (Player:BuffRemains(S.BattleShoutBuff, true) < 60) then
-      if Cast(S.BattleShout, Settings.Arms.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
+  if S.BattleShout:IsCastable() and (Player:BuffRemains(S.BattleShoutBuff, true) < 60) then
+    if Cast(S.BattleShout, Settings.Arms.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
+  end
+  -- Manually added opener abilties
+  if S.Charge:IsCastable() and not TargetInMeleeRange then
+    if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge) then return "charge precombat 4"; end
+  end
+  if TargetInMeleeRange then
+    if S.Skullsplitter:IsCastable() then
+      if Cast(S.Skullsplitter) then return "skullsplitter precombat 6"; end
     end
-    -- Manually added opener abilties
-    if S.Charge:IsCastable() and not TargetInMeleeRange then
-      if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge) then return "charge precombat 4"; end
+    if S.ColossusSmash:IsCastable() then
+      if Cast(S.ColossusSmash) then return "colossus_smash precombat 8"; end
     end
-    if TargetInMeleeRange then
-      if S.Skullsplitter:IsCastable() then
-        if Cast(S.Skullsplitter) then return "skullsplitter precombat 6"; end
-      end
-      if S.ColossusSmash:IsCastable() then
-        if Cast(S.ColossusSmash) then return "colossus_smash precombat 8"; end
-      end
-      if S.Warbreaker:IsCastable() then
-        if Cast(S.Warbreaker) then return "warbreaker precombat 10"; end
-      end
-      if S.Overpower:IsCastable() then
-        if Cast(S.Overpower) then return "overpower precombat 12"; end
-      end
+    if S.Warbreaker:IsCastable() then
+      if Cast(S.Warbreaker) then return "warbreaker precombat 10"; end
+    end
+    if S.Overpower:IsCastable() then
+      if Cast(S.Overpower) then return "overpower precombat 12"; end
     end
   end
+end
 
 local function Hac()
   -- skullsplitter,if=rage<60&buff.deadly_calm.down
