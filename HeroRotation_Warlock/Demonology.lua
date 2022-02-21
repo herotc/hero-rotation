@@ -174,6 +174,20 @@ local function ImpsSpawnedDuring(SpellCastTime)
   return ImpSpawned
 end
 
+local function EvaluateTargetIfFilterHealth(TargetUnit)
+  return TargetUnit:HealthPercentage()
+end
+
+local function EvaluateTargetIfSoullettingRuby(TargetUnit)
+  local TargetDistance = 0
+  if TargetUnit.UnitExists then
+    TargetDistance = TargetUnit:MaxDistance()
+  end
+  if not TargetDistance then TargetDistance = 0 end
+
+  return (VarBuffSyncCD < TargetDistance / 5 - (2 * (Player:GCD() + 0.5) * num(VarUseBoltTimings)))
+end
+
 local function Precombat()
   -- flask
   -- food
@@ -226,17 +240,17 @@ local function Covenant()
   if S.SoulRot:IsReady() and (S.WildHuntTactics:SoulbindEnabled() and DemonicTyrantTime() == 0 and VarNextTyrantCD > 18) then
     if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot covenant 6"; end
   end
-  -- decimating_bolt,if=!variable.use_bolt_timings&(soulbind.lead_by_example|soulbind.kevins_oozeling)&(pet.demonic_tyrant.active&soul_shard<2|!pet.demonic_tyrant.active&variable.next_tyrant_cd>40)
+  -- decimating_bolt,target_if=min:target.health.pct,if=!variable.use_bolt_timings&(soulbind.lead_by_example|soulbind.kevins_oozeling)&(pet.demonic_tyrant.active&soul_shard<2|!pet.demonic_tyrant.active&variable.next_tyrant_cd>40)
   if S.DecimatingBolt:IsReady() and ((not VarUseBoltTimings) and (S.LeadByExample:SoulbindEnabled() or S.KevinsOozeling:SoulbindEnabled()) and (DemonicTyrantTime() > 0 and Player:SoulShardsP() < 2 or DemonicTyrantTime() == 0 and VarNextTyrantCD > 40)) then
-    if Cast(S.DecimatingBolt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt covenant 8"; end
+    if Everyone.CastTargetIf(S.DecimatingBolt, Enemies8ySplash, "min", EvaluateTargetIfFilterHealth, nil, not Target:IsSpellInRange(S.DecimatingBolt), nil, Settings.Commons.DisplayStyle.Covenant) then return "decimating_bolt covenant 8"; end
   end
-  -- decimating_bolt,if=!variable.use_bolt_timings&(soulbind.forgeborne_reveries|(soulbind.volatile_solvent&!soulbind.kevins_oozeling))&!pet.demonic_tyrant.active
+  -- decimating_bolt,target_if=min:target.health.pct,if=!variable.use_bolt_timings&(soulbind.forgeborne_reveries|(soulbind.volatile_solvent&!soulbind.kevins_oozeling))&!pet.demonic_tyrant.active
   if S.DecimatingBolt:IsReady() and ((not VarUseBoltTimings) and (S.ForgeborneReveries:SoulbindEnabled() or (S.VolatileSolvent:SoulbindEnabled() and not S.KevinsOozeling:SoulbindEnabled())) and DemonicTyrantTime() == 0) then
-    if Cast(S.DecimatingBolt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt covenant 10"; end
+    if Everyone.CastTargetIf(S.DecimatingBolt, Enemies8ySplash, "min", EvaluateTargetIfFilterHealth, nil, not Target:IsSpellInRange(S.DecimatingBolt), nil, Settings.Commons.DisplayStyle.Covenant) then return "decimating_bolt covenant 10"; end
   end
-  -- decimating_bolt,if=variable.use_bolt_timings&(!talent.power_siphon|cooldown.power_siphon.remains<action.decimating_bolt.execute_time)&!cooldown.summon_demonic_tyrant.up&(pet.demonic_tyrant.remains<8|cooldown.summon_demonic_tyrant.remains_expected<30)
+  -- decimating_bolt,target_if=min:target.health.pct,if=variable.use_bolt_timings&(!talent.power_siphon|cooldown.power_siphon.remains<action.decimating_bolt.execute_time)&!cooldown.summon_demonic_tyrant.up&(pet.demonic_tyrant.remains<8|cooldown.summon_demonic_tyrant.remains_expected<30)
   if S.DecimatingBolt:IsReady() and (VarUseBoltTimings and ((not S.PowerSiphon:IsAvailable()) or S.PowerSiphon:CooldownRemains() < S.DecimatingBolt:ExecuteTime()) and S.SummonDemonicTyrant:CooldownDown() and (DemonicTyrantTime() < 8 or S.SummonDemonicTyrant:CooldownRemains() < 30)) then
-    if Cast(S.DecimatingBolt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt covenant 11"; end
+    if Everyone.CastTargetIf(S.DecimatingBolt, Enemies8ySplash, "min", EvaluateTargetIfFilterHealth, nil, not Target:IsSpellInRange(S.DecimatingBolt), nil, Settings.Commons.DisplayStyle.Covenant) then return "decimating_bolt covenant 12"; end
   end
   -- fleshcraft,if=soulbind.volatile_solvent&buff.volatile_solvent_humanoid.down,cancel_if=buff.volatile_solvent_humanoid.up
   if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
@@ -318,18 +332,16 @@ local function FiveYTrinkets()
     TargetDistance = Target:MaxDistance()
   end
   if not TargetDistance then TargetDistance = 0 end
-  if (VarNextTyrantCD < TargetDistance / 5 and HL.CombatTime() > VarFirstTyrantTime - (TargetDistance / 5)) then
-    -- use_item,name=soulletting_ruby,if=variable.next_tyrant_cd<target.distance%5&time>variable.first_tyrant_time-(target.distance%5)
-    if I.SoullettingRuby:IsEquippedAndReady() then
-      if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soulletting_ruby 5y 2"; end
-    end
-    -- use_item,name=sunblood_amethyst,if=variable.next_tyrant_cd<target.distance%5&time>variable.first_tyrant_time-(target.distance%5)
-    if I.SunbloodAmethyst:IsEquippedAndReady() then
-      if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "sunblood_amethyst 5y 4"; end
-    end
+  -- use_item,name=soulletting_ruby,target_if=min:target.health.pct,if=variable.buff_sync_cd<target.distance%5&time>variable.first_tyrant_time-(target.distance%5)
+  if I.SoullettingRuby:IsEquippedAndReady() then
+    if Everyone.CastTargetIf(I.SoullettingRuby, Enemies8ySplash, "min", EvaluateTargetIfFilterHealth, EvaluateTargetIfSoullettingRuby, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby 5y 2"; end
   end
-  -- use_item,name=empyreal_ordnance,if=variable.next_tyrant_cd<(target.distance%5)+12&variable.next_tyrant_cd>(((target.distance%5)+12)-15)&time>variable.first_tyrant_time-((target.distance%5)+12)
-  if I.EmpyrealOrdnance:IsEquippedAndReady() and (VarNextTyrantCD < (TargetDistance / 5) + 12 and VarNextTyrantCD > (((TargetDistance / 5) + 12) - 15) and HL.CombatTime() > VarFirstTyrantTime - ((TargetDistance / 5) + 12)) then
+  -- use_item,name=sunblood_amethyst,if=variable.buff_sync_cd<target.distance%5+(2*variable.use_bolt_timings)
+  if I.SunbloodAmethyst:IsEquippedAndReady() and (VarBuffSyncCD < TargetDistance / 5 + (2 * num(VarUseBoltTimings))) then
+    if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "sunblood_amethyst 5y 4"; end
+  end
+  -- use_item,name=empyreal_ordnance,if=variable.buff_sync_cd<(target.distance%5)+12+(2*variable.use_bolt_timings)
+  if I.EmpyrealOrdnance:IsEquippedAndReady() and (VarBuffSyncCD < (TargetDistance / 5) + 12 + (2 * num(VarUseBoltTimings))) then
     if Cast(I.EmpyrealOrdnance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "empyreal_ordnance 5y 6"; end
   end
 end
@@ -394,8 +406,8 @@ local function Trinkets()
   if (true) then
     local ShouldReturn = FiveYTrinkets(); if ShouldReturn then return ShouldReturn; end
   end
-  -- use_item,name=overflowing_anima_cage,if=pet.demonic_tyrant.active
-  if I.OverflowingAnimaCage:IsEquippedAndReady() and (DemonicTyrantTime() > 0) then
+  -- use_item,name=overflowing_anima_cage,if=(!variable.use_bolt_timings&pet.demonic_tyrant.active)|(variable.use_bolt_timings&buff.shard_of_annihilation.up)
+  if I.OverflowingAnimaCage:IsEquippedAndReady() and (((not VarUseBoltTimings) and DemonicTyrantTime() > 0) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff))) then
     if Cast(I.OverflowingAnimaCage, nil, Settings.Commons.DisplayStyle.Trinkets) then return "overflowing_anima_cage trinkets 4"; end
   end
   -- use_item,slot=trinket1,if=trinket.1.has_use_buff&((!variable.use_bolt_timings&pet.demonic_tyrant.active)|(variable.use_bolt_timings&buff.shard_of_annihilation.up))
@@ -446,8 +458,13 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   -- Update Enemy Counts
-  Enemies8ySplash = Target:GetEnemiesInSplashRange(8)
-  EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
+  if AoEON() then
+    Enemies8ySplash = Target:GetEnemiesInSplashRange(8)
+    EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
+  else
+    Enemies8ySplash = {}
+    EnemiesCount8ySplash = 1
+  end
 
   -- Update Demonology-specific Tables
   Warlock.UpdatePetTable()
@@ -480,6 +497,10 @@ local function APL()
     if (S.FieldofBlossoms:SoulbindEnabled() and S.SummonDemonicTyrant:CooldownRemains() < S.SoulRot:CooldownRemains()) then
       VarNextTyrantCD = S.SoulRot:CooldownRemains()
     end
+    -- variable,name=next_tyrant_cd,op=set,value=variable.first_tyrant_time-time,if=time<variable.first_tyrant_time
+    if (HL.CombatTime() < VarFirstTyrantTime) then
+      VarNextTyrantCD = VarFirstTyrantTime - HL.CombatTime()
+    end
     -- variable,name=buff_sync_cd,op=set,value=variable.next_tyrant_cd,if=!variable.use_bolt_timings
     if (not VarUseBoltTimings) then
       VarBuffSyncCD = VarNextTyrantCD
@@ -492,8 +513,8 @@ local function APL()
     if Settings.Commons.Enabled.Trinkets then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=ogcd,if=(!variable.use_bolt_timings&pet.demonic_tyrant.active)|(variable.use_bolt_timings&buff.shard_of_annihilation.up)
-    if CDsON() and (((not VarUseBoltTimings) and DemonicTyrantTime() > 0) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff))) then
+    -- call_action_list,name=ogcd,if=(!variable.use_bolt_timings&pet.demonic_tyrant.active)|(variable.use_bolt_timings&buff.shard_of_annihilation.up&(!talent.power_siphon.enabled|buff.power_siphon.up))
+    if CDsON() and (((not VarUseBoltTimings) and DemonicTyrantTime() > 0) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff) and ((not S.PowerSiphon:IsAvailable()) or Player:BuffUp(S.PowerSiphon)))) then
       local ShouldReturn = OGCD(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=opener,if=time<variable.first_tyrant_time
@@ -545,8 +566,8 @@ local function APL()
     if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 1 + (1 * num(S.SacrificedSouls:IsAvailable())) and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and DemonicTyrantTime() == 0 and VarNextTyrantCD > 5) then
       if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion main 14"; end
     end
-    -- implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.tyrant.down&variable.next_tyrant_cd>5&!runeforge.implosive_potential&(!talent.from_the_shadows.enabled|buff.from_the_shadows.up)
-    if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and DemonicTyrantTime() == 0 and VarNextTyrantCD > 5 and not ImplosivePotentialEquipped and (not S.FromtheShadows:IsAvailable() or Player:BuffUp(S.FromtheShadowsBuff))) then
+    -- implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.tyrant.down&variable.next_tyrant_cd>5&!runeforge.implosive_potential&(!talent.from_the_shadows.enabled|debuff.from_the_shadows.up)
+    if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and DemonicTyrantTime() == 0 and VarNextTyrantCD > 5 and not ImplosivePotentialEquipped and (not S.FromtheShadows:IsAvailable() or Target:DebuffUp(S.FromtheShadowsDebuff))) then
       if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion main 16"; end
     end
     -- implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.implosive_potential.remains<2&runeforge.implosive_potential

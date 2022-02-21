@@ -51,6 +51,7 @@ Spell.Warlock.Demonology = {
   Doom                                  = Spell(603),
   DoomDebuff                            = Spell(603),
   FromtheShadows                        = Spell(267170),
+  FromtheShadowsDebuff                  = Spell(270569),
   GrimoireFelguard                      = Spell(111898),
   InnerDemons                           = Spell(267216),
   NetherPortal                          = Spell(267217),
