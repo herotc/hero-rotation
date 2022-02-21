@@ -146,8 +146,8 @@ local function bool(val)
 end
 
 local function VarInit()
-  --variable,name=aoe_target_count,op=reset,default=3
-  var_aoe_target_count = 3
+  --variable,name=aoe_target_count,default=-1,op=set,if=variable.aoe_target_count=-1,value=3+(1*covenant.kyrian)
+  var_aoe_target_count = 3 + (1 * num(CovenantID == 1))
 
   --variable,name=evo_pct,op=reset,default=15
   var_evo_pct = 15
@@ -171,8 +171,8 @@ local function VarInit()
   --variable,name=harmony_stack_time,op=reset,default=9
   var_harmony_stack_time = 9
 
-  --variable,name=always_sync_cooldowns,default=-1,op=set,if=variable.always_sync_cooldowns=-1,value=1*set_bonus.tier28_2pc
-  var_always_sync_cooldowns = num(Player:HasTier(28, 2))
+  --variable,name=always_sync_cooldowns,default=-1,op=set,if=variable.always_sync_cooldowns=-1,value=1*set_bonus.tier28_4pc
+  var_always_sync_cooldowns = num(Player:HasTier(28, 4))
 
   --variable,name=rs_max_delay_for_totm,op=reset,default=5
   var_rs_max_delay_for_totm = 5
@@ -1183,21 +1183,22 @@ local function Aoe()
   if CDsON() and S.ArcanePower:IsCastable() and (S.EffusiveAnimaAccelerator:SoulbindEnabled() and HarmonicEchoEquipped and Player:PrevGCD(1, S.TouchoftheMagi)) then
     if Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power Aoe 23"; end
   end
-  --arcane_blast,if=covenant.kyrian&runeforge.arcane_infinity&buff.arcane_power.up&debuff.radiant_spark_vulnerability.stack=4&prev_gcd.1.arcane_orb&active_enemies<7
+  -- wait,sec=0.04,if=debuff.radiant_spark_vulnerability.stack=(debuff.radiant_spark_vulnerability.max_stack-1)&runeforge.harmonic_echo&active_enemies<5,line_cd=25
+  --arcane_blast,if=covenant.kyrian&runeforge.arcane_infinity&buff.arcane_power.up&debuff.radiant_spark_vulnerability.stack=4&prev_gcd.1.arcane_orb&active_enemies<7&!runeforge.harmonic_echo
   --arcane_barrage,if=covenant.kyrian&runeforge.arcane_infinity&buff.arcane_power.up&debuff.radiant_spark_vulnerability.stack=4
-  --arcane_blast,if=covenant.kyrian&runeforge.arcane_infinity&buff.arcane_power.up&(dot.radiant_spark.remains>6|debuff.radiant_spark_vulnerability.up)&debuff.radiant_spark_vulnerability.stack<4&active_enemies=3
+  --arcane_blast,if=covenant.kyrian&runeforge.arcane_infinity&buff.arcane_power.up&(dot.radiant_spark.remains>6|debuff.radiant_spark_vulnerability.up)&debuff.radiant_spark_vulnerability.stack<4&active_enemies<5
   --arcane_orb,if=covenant.kyrian&runeforge.arcane_infinity&buff.arcane_power.up&debuff.radiant_spark_vulnerability.stack=3
   --arcane_barrage,if=covenant.kyrian&runeforge.arcane_infinity&buff.arcane_power.up&debuff.radiant_spark_vulnerability.stack=2
   --arcane_explosion,if=covenant.kyrian&runeforge.arcane_infinity&buff.arcane_power.up&prev_gcd.2.radiant_spark&active_enemies>3
   --arcane_explosion,if=covenant.kyrian&runeforge.arcane_infinity&buff.arcane_power.up&debuff.radiant_spark_vulnerability.stack=1&active_enemies>3
   if CovenantID == 1 and ArcaneInfinityEquipped and Player:BuffUp(S.ArcanePower) then
-    if S.ArcaneBlast:IsCastable() and Target:DebuffStack(S.RadiantSparkVulnerability) == 4 and Player:PrevGCD(1,S.ArcaneOrb) and EnemiesCount8ySplash < 7 then
+    if S.ArcaneBlast:IsCastable() and Target:DebuffStack(S.RadiantSparkVulnerability) == 4 and Player:PrevGCD(1,S.ArcaneOrb) and EnemiesCount8ySplash < 7 and (not HarmonicEchoEquipped) then
       if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast Aoe 24"; end
     end
     if S.ArcaneBarrage:IsCastable() and Target:DebuffStack(S.RadiantSparkVulnerability) == 4 then
       if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage Aoe 25"; end
     end
-    if S.ArcaneBlast:IsCastable() and (Target:DebuffRemains(S.RadiantSpark) > 6 or Target:DebuffUp(S.RadiantSparkVulnerability)) and Target:DebuffStack(S.RadiantSparkVulnerability) < 4 and EnemiesCount8ySplash == 3 then
+    if S.ArcaneBlast:IsCastable() and (Target:DebuffRemains(S.RadiantSpark) > 6 or Target:DebuffUp(S.RadiantSparkVulnerability)) and Target:DebuffStack(S.RadiantSparkVulnerability) < 4 and EnemiesCount8ySplash < 5 then
       if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast Aoe 26"; end
     end
     if S.ArcaneOrb:IsCastable() and Target:DebuffStack(S.RadiantSparkVulnerability) == 3 then
@@ -1377,9 +1378,13 @@ local function APL()
       if I.SinfulGladiatorsBadge:IsEquippedAndReady() and (Player:BuffUp(S.ArcanePower) or (S.ArcanePower:CooldownRemains() >= 55 and Target:DebuffUp(S.TouchoftheMagi))) then
         if Cast(I.SinfulGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge Shared_cd 11"; end
       end
-      --use_item,name=moonlit_prism,if=cooldown.arcane_power.remains<=6&cooldown.touch_of_the_magi.remains<=6
-      if I.MoonlitPrism:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() <= 6 and S.TouchoftheMagi:CooldownRemains() <=6) then
-        if Cast(I.MoonlitPrism, nil, Settings.Commons.DisplayStyle.Trinkets) then return "moonlit_prism Shared_cd 12"; end
+      --use_item,name=moonlit_prism,if=covenant.kyrian&cooldown.arcane_power.remains<=10&cooldown.touch_of_the_magi.remains<=10
+      if I.MoonlitPrism:IsEquippedAndReady() and (CovenantID == 1 and S.ArcanePower:CooldownRemains() <= 10 and S.TouchoftheMagi:CooldownRemains() <= 10) then
+        if Cast(I.MoonlitPrism, nil, Settings.Commons.DisplayStyle.Trinkets) then return "moonlit_prism Shared_cd 12 kyrian"; end
+      end
+      --use_item,name=moonlit_prism,if=!covenant.kyrian&cooldown.arcane_power.remains<=6&cooldown.touch_of_the_magi.remains<=6
+      if I.MoonlitPrism:IsEquippedAndReady() and (CovenantID ~= 1 and S.ArcanePower:CooldownRemains() <= 6 and S.TouchoftheMagi:CooldownRemains() <= 6) then
+        if Cast(I.MoonlitPrism, nil, Settings.Commons.DisplayStyle.Trinkets) then return "moonlit_prism Shared_cd 12 non-kyrian"; end
       end
       --use_item,name=empyreal_ordnance,if=cooldown.arcane_power.remains<=15&cooldown.touch_of_the_magi.remains<=15
       if I.EmpyrealOrdnance:IsEquippedAndReady() and S.ArcanePower:CooldownRemains() <= 15 and Target:DebuffRemains(S.TouchoftheMagi) <= 15 then
