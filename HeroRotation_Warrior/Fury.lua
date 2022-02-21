@@ -105,12 +105,16 @@ local function Precombat()
   if S.Recklessness:IsCastable() and CDsON() and (not SignetofTormentedKingsEquipped) then
     if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat 4"; end
   end
+  -- conquerors_banner
+  if S.ConquerorsBanner:IsCastable() then
+    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner precombat 6"; end
+  end
   -- Manually Added: Charge if not in melee. Bloodthirst if in melee
   if S.Charge:IsCastable() then
-    if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge, not Target:IsSpellInRange(S.Charge)) then return "charge precombat 6"; end
+    if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge, not Target:IsSpellInRange(S.Charge)) then return "charge precombat 8"; end
   end
   if S.Bloodthirst:IsCastable() then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst precombat 8"; end
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst precombat 10"; end
   end
 end
 
@@ -168,12 +172,12 @@ local function SingleTarget()
   if S.Siegebreaker:IsCastable() then
     if Cast(S.Siegebreaker, nil, nil, not TargetInMeleeRange) then return "siegebreaker single_target 10"; end
   end
-  -- rampage,if=buff.recklessness.up|(buff.enrage.remains<gcd|rage>90)|buff.frenzy.remains<1.5
-  if S.Rampage:IsReady() and (Player:BuffUp(S.RecklessnessBuff) or (Player:BuffRemains(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90) or Player:BuffRemains(S.FrenzyBuff) < 1.5) then
+  -- rampage,if=buff.recklessness.up|(buff.enrage.remains<gcd|rage>80)|buff.frenzy.remains<1.5
+  if S.Rampage:IsReady() and (Player:BuffUp(S.RecklessnessBuff) or (Player:BuffRemains(S.EnrageBuff) < Player:GCD() or Player:Rage() > 80) or Player:BuffRemains(S.FrenzyBuff) < 1.5) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 12"; end
   end
   -- condemn
-  if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
+  if S.Condemn:IsReady() then
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 14"; end
   end
   -- ancient_aftershock,if=buff.enrage.up&cooldown.recklessness.remains>5&(target.time_to_die>95|buff.recklessness.up|target.time_to_die<20)&raid_event.adds.in>75
@@ -181,7 +185,7 @@ local function SingleTarget()
     if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(12)) then return "ancient_aftershock single_target 16"; end
   end
   -- execute
-  if S.Execute:IsCastable() and S.Execute:IsUsable() then
+  if S.Execute:IsReady() then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 18"; end
   end
   if CDsON() then
@@ -210,21 +214,21 @@ local function SingleTarget()
   if S.DragonRoar:IsCastable() and (EnrageUp) then
     if Cast(S.DragonRoar, Settings.Fury.GCDasOffGCD.DragonRoar, nil, not Target:IsInRange(12)) then return "dragon_roar single_target 28"; end
   end
-  -- onslaught
-  if S.Onslaught:IsCastable() and S.Onslaught:IsUsable() then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught single_target 30"; end
-  end
   -- whirlwind,if=buff.merciless_bonegrinder.up&spell_targets.whirlwind>3
   if S.Whirlwind:IsCastable() and (Player:BuffUp(S.MercilessBonegrinderBuff) and EnemiesCount8 > 3) then
     if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind single_target 32"; end
   end
-  -- raging_blow,if=charges=2|buff.recklessness.up&variable.execute_phase&talent.massacre.enabled
-  if S.RagingBlow:IsCastable() and (S.RagingBlow:Charges() == 2 or Player:BuffUp(S.RecklessnessBuff) and VarExecutePhase and S.Massacre:IsAvailable()) then
+  -- raging_blow,if=set_bonus.tier28_2pc|charges=2|buff.recklessness.up&variable.execute_phase&talent.massacre.enabled
+  if S.RagingBlow:IsCastable() and (Player:HasTier(28, 2) or S.RagingBlow:Charges() == 2 or Player:BuffUp(S.RecklessnessBuff) and VarExecutePhase and S.Massacre:IsAvailable()) then
     if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 34"; end
   end
-  -- crushing_blow,if=charges=2|buff.recklessness.up&variable.execute_phase&talent.massacre.enabled
-  if S.CrushingBlow:IsCastable() and (S.CrushingBlow:Charges() == 2 or Player:BuffUp(S.RecklessnessBuff) and VarExecutePhase and S.Massacre:IsAvailable()) then
+  -- crushing_blow,if=set_bonus.tier28_2pc|charges=2|buff.recklessness.up&variable.execute_phase&talent.massacre.enabled
+  if S.CrushingBlow:IsCastable() and (Player:HasTier(28, 2) or S.CrushingBlow:Charges() == 2 or Player:BuffUp(S.RecklessnessBuff) and VarExecutePhase and S.Massacre:IsAvailable()) then
     if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 36"; end
+  end
+  -- onslaught,if=buff.enrage.up
+  if S.Onslaught:IsReady() and (EnrageUp) then
+    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught single_target 30"; end
   end
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
@@ -285,10 +289,10 @@ local function APL()
     end
     -- Manually added: VR/IV
     if Player:HealthPercentage() < Settings.Commons.VictoryRushHP then
-      if S.VictoryRush:IsCastable() and S.VictoryRush:IsUsable() then
+      if S.VictoryRush:IsReady() then
         if Cast(S.VictoryRush, nil, nil, not TargetInMeleeRange) then return "victory_rush heal"; end
       end
-      if S.ImpendingVictory:IsReady() and S.VictoryRush:IsUsable() then
+      if S.ImpendingVictory:IsReady() then
         if Cast(S.ImpendingVictory, nil, nil, not TargetInMeleeRange) then return "impending_victory heal"; end
       end
     end
@@ -318,9 +322,13 @@ local function APL()
     if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions then
       if Cast(I.PotionofSpectralStrength, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 6"; end
     end
-    -- conquerors_banner,if=rage>74
-    if S.ConquerorsBanner:IsCastable() and CDsON() and (Player:Rage() > 74) then
+    -- conquerors_banner,if=rage>70
+    if S.ConquerorsBanner:IsCastable() and CDsON() and (Player:Rage() > 70) then
       if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner main 8"; end
+    end
+    -- spear_of_bastion,if=buff.enrage.up&rage<70
+    if S.SpearofBastion:IsCastable() and (EnrageUp and Player:Rage() < 70) then
+      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(25)) then return "spear_of_bastion main 9"; end
     end
     -- rampage,if=cooldown.recklessness.remains<3&talent.reckless_abandon.enabled
     if S.Rampage:IsReady() and (S.Recklessness:CooldownRemains() < 3 and S.RecklessAbandon:IsAvailable()) then
@@ -335,8 +343,8 @@ local function APL()
       if S.Recklessness:IsCastable() and (ElysianMightEquipped and (S.SpearofBastion:CooldownRemains() < 5 or S.SpearofBastion:CooldownRemains() > 20) and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable() or EnemiesCount8 == 1) or Target:TimeToDie() > 100 or VarExecutePhase or Target:TimeToDie() < 15) and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff))) then
         if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 12"; end
       end
-      -- recklessness,if=!variable.unique_legendaries&gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|variable.execute_phase|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
-      if S.Recklessness:IsCastable() and (not VarUniqueLegendaries and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable() or EnemiesCount8 == 1) or Target:TimeToDie() > 100 or VarExecutePhase or Target:TimeToDie() < 15) and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff))) then
+      -- recklessness,if=!variable.unique_legendaries&gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|variable.execute_phase|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)&cooldown.conquerors_banner.remains>20
+      if S.Recklessness:IsCastable() and (not VarUniqueLegendaries and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable() or EnemiesCount8 == 1) or Target:TimeToDie() > 100 or VarExecutePhase or Target:TimeToDie() < 15) and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff)) and S.ConquerorsBanner:CooldownRemains() > 20) then
         if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 13"; end
       end
       -- recklessness,use_off_gcd=1,if=runeforge.signet_of_tormented_kings.equipped&gcd.remains&prev_gcd.1.rampage&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|variable.execute_phase|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
