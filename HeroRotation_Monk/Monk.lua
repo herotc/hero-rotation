@@ -29,7 +29,6 @@ Spell.Monk.Windwalker = {
   BagOfTricks                           = Spell(312411),
   Berserking                            = Spell(26297),
   BloodFury                             = Spell(20572),
-  Bloodlust                             = Spell(2825),
   GiftoftheNaaru                        = Spell(59547),
   Fireblood                             = Spell(265221),
   LightsJudgment                        = Spell(255647),
@@ -49,6 +48,7 @@ Spell.Monk.Windwalker = {
   SpinningCraneKick                     = Spell(101546),
   StormEarthAndFire                     = Spell(137639),
   StormEarthAndFireBuff                 = Spell(137639),
+  StormEarthAndFireFixate               = Spell(221771),
   TigerPalm                             = Spell(100780),
   TouchOfDeath                          = Spell(322109),
 
@@ -114,6 +114,11 @@ Spell.Monk.Windwalker = {
   WeaponsOfOrderChiBuff                 = Spell(311054),
   WeaponsOfOrderDebuff                  = Spell(312106),
 
+  -- Shadowland Soulbinds
+  GroveInvigoration                     = Spell(322721),
+  PustuleEruption                       = Spell(351094),
+  VolatileSolvent                       = Spell(323074),
+
   -- Shadowland Essences
   FortifyingIngrediencesBuff            = Spell(336874),
 
@@ -121,12 +126,13 @@ Spell.Monk.Windwalker = {
   ChiEnergyBuff                         = Spell(337571),
   InvokersDelight                       = Spell(338321),
   KeefersSkyreachDebuff                 = Spell(344021),
-  RecentlyRushingTigerPalm              = Spell(337341),
+  SkyreachExhaustion                    = Spell(337341),
   TheEmperorsCapacitor                  = Spell(337291),
 
   -- Conduits
-  InnerFury                             = Spell(336452),
   CalculatedStrikes                     = Spell(336526),
+  CoordinatedOffensive                  = Spell(336598),
+  InnerFury                             = Spell(336452),
 
   -- Misc
   PoolEnergy                            = Spell(999910)
@@ -351,12 +357,18 @@ Spell.Monk.Mistweaver = {
 if not Item.Monk then Item.Monk = {}; end
 Item.Monk.Windwalker = {
   -- Potions
-  PotionofPhantomFire                  = Item(171349),
   PotionofSpectralAgility              = Item(171270),
-  PotionofDeathlyFixation              = Item(171351),
-  PotionofEmpoweredExorcisms           = Item(171352),
-  PotionofHardenedShadows              = Item(171271),
-  PotionofSpectralStamina              = Item(171274)
+  -- Items
+  Jotungeirr                           = Item(186404),
+  -- Trinkets
+  GladiatorsBadgeCosmic                = Item(186866, {13, 14}),
+  GladiatorsBadgeSinful                = Item(175921, {13, 14}),
+  GladiatorsBadgeUnchained             = Item(185197, {13, 14}),
+  InscrutibleQuantumDevice             = Item(179350, {13, 14}),
+  OverchargedAnimaBattery              = Item(180116, {13, 14}),
+  ShadowgraspTotem                     = Item(179356, {13, 14}),
+  TheFirstSigil                        = Item(188271, {13, 14}),
+  Wrathstone                           = Item(156000, {13, 14})
 }
 
 Item.Monk.Brewmaster = {

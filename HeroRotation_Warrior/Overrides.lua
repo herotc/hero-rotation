@@ -13,6 +13,7 @@ local HR      = HeroRotation
 -- Spells
 local SpellFury             = Spell.Warrior.Fury
 local SpellArms             = Spell.Warrior.Arms
+local SpellProt             = Spell.Warrior.Protection
 -- Lua
 
 --- ============================ CONTENT ============================
@@ -35,7 +36,7 @@ FuryOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local BaseCheck = FuryOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellFury.Charge then
-      return BaseCheck and (SpellFury.Charge:Charges() >= 1 and (not Target:IsInRange(8)) and Target:IsInRange(25))
+      return BaseCheck and (self:Charges() >= 1 and (not Target:IsInRange(8)) and Target:IsInRange(25))
     else
       return BaseCheck
     end
@@ -43,6 +44,17 @@ FuryOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 , 72)
 
 -- Protection, ID: 73
+local ProtOldSpellIsCastable
+ProtOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = ProtOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellProt.Charge then
+      return BaseCheck and (self:Charges() >= 1 and (not Target:IsInRange(8)) and Target:IsInRange(25))
+    else
+      return BaseCheck
+    end
+  end
+, 73)
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP",

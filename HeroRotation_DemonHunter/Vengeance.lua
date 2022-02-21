@@ -44,7 +44,6 @@ local Settings = {
 }
 
 -- Rotation Var
-local ShouldReturn -- Used to get the return string
 local SoulFragments, SoulFragmentsAdjusted, LastSoulFragmentAdjustment
 local IsInMeleeRange, IsInAoERange
 local ActiveMitigationNeeded
@@ -316,7 +315,7 @@ local function APL()
 end
 
 local function Init()
-
+  --HR.Print("Vengeance DH rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(581, APL, Init);

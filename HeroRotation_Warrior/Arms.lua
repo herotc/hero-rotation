@@ -38,12 +38,6 @@ local TargetInMeleeRange
 local Enemies8y
 local EnemiesCount8y
 
--- Legendaries
-local BattlelordEquipped = Player:HasLegendaryEquipped(183)
-local SinfulSurgeEquipped = Player:HasLegendaryEquipped(215)
-local EnduringBlowEquipped = Player:HasLegendaryEquipped(182)
-local SignetofTormentedKingsEquipped = Player:HasLegendaryEquipped(181)
-
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
 local Settings = {
@@ -57,6 +51,12 @@ local StunInterrupts = {
   {S.StormBolt, "Cast Storm Bolt (Interrupt)", function () return true; end},
 }
 
+-- Legendaries
+local BattlelordEquipped = Player:HasLegendaryEquipped(183)
+local SinfulSurgeEquipped = Player:HasLegendaryEquipped(215)
+local EnduringBlowEquipped = Player:HasLegendaryEquipped(182)
+local SignetofTormentedKingsEquipped = Player:HasLegendaryEquipped(181)
+
 -- Event Registrations
 HL:RegisterForEvent(function()
   BattlelordEquipped = Player:HasLegendaryEquipped(183)
@@ -64,6 +64,15 @@ HL:RegisterForEvent(function()
   EnduringBlowEquipped = Player:HasLegendaryEquipped(182)
   SignetofTormentedKingsEquipped = Player:HasLegendaryEquipped(181)
 end, "PLAYER_EQUIPMENT_CHANGED")
+
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -129,45 +138,57 @@ local function Hac()
   if S.Cleave:IsReady() and (Target:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD()) then
     if Cast(S.Cleave, nil, nil, not Target:IsInRange(8)) then return "cleave hac 12"; end
   end
+  -- ancient_aftershock
+  if S.AncientAftershock:IsCastable() then
+    if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock hac 14"; end
+  end
+  -- spear_of_bastion
+  if S.SpearofBastion:IsCastable() then
+    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion hac 16"; end
+  end
   -- bladestorm
   if S.Bladestorm:IsCastable() and CDsON() then
-    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm hac 14"; end
+    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm hac 18"; end
   end
   -- ravager
   if S.Ravager:IsCastable() and CDsON() then
-    if Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager hac 16"; end
+    if Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager hac 20"; end
   end
   -- rend,if=remains<=duration*0.3&buff.sweeping_strikes.up
   if S.Rend:IsReady() and (Target:DebuffRefreshable(S.RendDebuff) and Player:BuffUp(S.SweepingStrikesBuff)) then
-    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend hac 18"; end
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend hac 22"; end
   end
   -- cleave
   if S.Cleave:IsReady() then
-    if Cast(S.Cleave, nil, nil, not Target:IsInRange(8)) then return "cleave hac 20"; end
+    if Cast(S.Cleave, nil, nil, not Target:IsInRange(8)) then return "cleave hac 24"; end
   end
   -- mortal_strike,if=buff.sweeping_strikes.up|dot.deep_wounds.remains<gcd&!talent.cleave.enabled
   if S.MortalStrike:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff) or Target:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD() and not S.Cleave:IsAvailable()) then
-    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike hac 22"; end
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike hac 26"; end
   end
   -- overpower,if=talent.dreadnaught.enabled
   if S.Overpower:IsCastable() and (S.Dreadnaught:IsAvailable()) then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower hac 24"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower hac 28"; end
   end
   -- condemn
   if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn hac 26"; end
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn hac 30"; end
   end
   -- execute,if=buff.sweeping_strikes.up
-  if S.Execute:IsCastable() and S.Execute:IsUsable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute hac 28"; end
+  if S.Execute:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute hac 32"; end
+  end
+  -- execute,if=buff.sudden_death.react
+  if S.Execute:IsReady() and (Player:BuffUp(S.SuddenDeathBuff)) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute hac 34"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower hac 30"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower hac 36"; end
   end
   -- whirlwind
   if S.Whirlwind:IsReady() then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind hac 32"; end
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind hac 38"; end
   end
   
 end
@@ -177,10 +198,6 @@ local function Execute()
   if S.DeadlyCalm:IsCastable() and CDsON() then
     if Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm execute 2"; end
   end
-  --[[ // rend,if=remains<=duration*0.3
-  if S.Rend:IsReady() and (Target:DebuffRefreshable(S.RendDebuff)) then
-    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend"; end
-  end]]
   -- conquerors_banner
   if CDsON() and S.ConquerorsBanner:IsCastable() then
     if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner execute 4"; end
@@ -195,7 +212,7 @@ local function Execute()
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 8"; end
   end
   -- execute,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd&conduit.ashen_juggernaut.rank>1
-  if S.Execute:IsCastable() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() and S.AshenJuggernaut:ConduitRank() > 1) then
+  if S.Execute:IsReady() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() and S.AshenJuggernaut:ConduitRank() > 1) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 10"; end
   end
   -- ravager
@@ -261,7 +278,7 @@ local function Execute()
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 40"; end
   end
   -- execute
-  if S.Execute:IsCastable() and S.Execute:IsUsable() then
+  if S.Execute:IsReady() then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 42"; end
   end
 end
@@ -314,7 +331,7 @@ local function SingleTarget()
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 22"; end
   end
   -- execute,if=buff.sudden_death.react
-  if S.Execute:IsCastable() and S.Execute:IsUsable() and (Player:BuffUp(S.SuddenDeathBuff)) then
+  if S.Execute:IsReady() and (Player:BuffUp(S.SuddenDeathBuff)) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 24"; end
   end
   -- skullsplitter,if=rage.deficit>45&buff.deadly_calm.down
@@ -368,11 +385,11 @@ local function APL()
   -- Range check
   TargetInMeleeRange = Target:IsInMeleeRange(5)
 
-  -- call precombat
-  if not Player:AffectingCombat() then
-    local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
-  end
   if Everyone.TargetIsValid() then
+    -- call Precombat
+    if not Player:AffectingCombat() then
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- charge
@@ -439,20 +456,18 @@ local function APL()
       local ShouldReturn = Hac(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|(target.health.pct>80&covenant.venthyr)
-    if ((S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20 or (Target:HealthPercentage() > 80 and Player:Covenant() == "Venthyr")) then
+    if ((S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20 or (Target:HealthPercentage() > 80 and CovenantID == 2)) then
       local ShouldReturn = Execute(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=single_target
-    if (true) then
-      local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
-    end
+    local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
     -- Pool if nothing else to suggest
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
 end
 
 local function Init()
-
+  --HR.Print("Arms Warrior rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(71, APL, Init)

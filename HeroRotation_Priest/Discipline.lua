@@ -19,7 +19,6 @@ local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 local Cast       = HR.Cast
 
-
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -54,55 +53,48 @@ local function bool(val)
 end
 
 local function Precombat()
-
   -- flask
   -- food
   -- augmentation
   -- snapshot_stats
-  if Everyone.TargetIsValid() then
-    -- potion
-    -- Manually added
-    if S.MindBlast:IsCastable() then
-      if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast precombat 2"; end
-    end
-    if S.ShadowWordDeath:IsCastable() then
-      if Cast(S.ShadowWordDeath, nil, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death precombat 4"; end
-    end
+  -- smite
+  if S.Smite:IsCastable() then
+    if Cast(S.Smite, nil, nil, not Target:IsSpellInRange(S.Smite)) then return "smite precombat 2"; end
   end
 end
 
 local function Racials()
   -- arcane_torrent,if=mana.pct<=95
   if S.ArcaneTorrent:IsCastable() and (Player:ManaPercentage() <= 95) then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent racials 12"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent racials 2"; end
   end
   -- blood_fury
   if S.BloodFury:IsCastable() then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury racials 14"; end
+    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury racials 4"; end
   end
   -- berserking
   if S.Berserking:IsCastable()  then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking racials 16"; end
+    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking racials 6"; end
   end
   -- arcane_torrent
   if S.ArcaneTorrent:IsCastable() then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent racials 18"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent racials 8"; end
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 20"; end
+    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 10"; end
   end
   -- fireblood
   if S.Fireblood:IsCastable() then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood racials 22"; end
+    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood racials 12"; end
   end
   -- ancestral_call
   if S.AncestralCall:IsCastable() then
-    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call racials 24"; end
+    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call racials 14"; end
   end
   -- bag_of_tricks
   if S.BagofTricks:IsCastable() then
-    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks racials 26"; end
+    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks racials 16"; end
   end
 end
 
@@ -110,12 +102,12 @@ local function Boon()
   -- ascended_blast
   -- Manually added: ,if=spell_targets.ascended_nova<3
   if S.AscendedBlast:IsReady() and (EnemiesCount8yMelee < 3) then
-    if Cast(S.AscendedBlast, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.AscendedBlast)) then return "ascended_blast boon 32"; end
+    if Cast(S.AscendedBlast, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.AscendedBlast)) then return "ascended_blast boon 2"; end
   end
   -- ascended_nova
   -- Manually added: ,if=spell_targets.ascended_nova>=3
   if S.AscendedNova:IsReady() and (EnemiesCount8yMelee >= 3) then
-    if Cast(S.AscendedNova, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(8)) then return "ascended_nova boon 34"; end
+    if Cast(S.AscendedNova, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(8)) then return "ascended_nova boon 4"; end
   end
 end
 
@@ -133,11 +125,11 @@ local function APL()
     EnemiesCount8yMelee = 1
   end
 
-  -- call precombat
-  if not Player:AffectingCombat() then
-    local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
-  end
   if Everyone.TargetIsValid() then
+    -- call precombat
+    if not Player:AffectingCombat() then
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
     -- use_items
     if Settings.Commons.Enabled.Trinkets then
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
@@ -146,10 +138,11 @@ local function APL()
       end
     end
     -- potion,if=buff.bloodlust.react|buff.power_infusion.up|target.time_to_die<=40
-    -- call_action_list,name=racials
-    if (true) then
-      local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
+    if Settings.Commons.Enabled.Potions and I.PotionofSpectralIntellect:IsReady() and (Player:BloodlustUp() or Player:BuffUp(S.PowerInfusion) or Target:TimeToDie() <= 40) then
+      if Cast(I.PotionofSpectralIntellect) then return "potion main 2"; end
     end
+    -- call_action_list,name=racials
+    local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
     -- power_infusion
     if S.PowerInfusion:IsCastable() then
       if Cast(S.PowerInfusion, Settings.Discipline.GCDasOffGCD.PowerInfusion) then return "power_infusion main 42"; end
@@ -158,7 +151,7 @@ local function APL()
     if S.DivineStar:IsCastable() then
       if Cast(S.DivineStar, nil, nil, not Target:IsSpellInRange(S.DivineStar)) then return "divine_star main 44"; end
     end
-    --MA halo
+    -- halo
     if S.Halo:IsCastable() then
       if Cast(S.Halo) then return "divine_star main 11"; end
     end
@@ -174,13 +167,21 @@ local function APL()
     if S.ShadowCovenant:IsCastable() and (Player:Covenant() ~= "Kyrian" or (not S.BoonoftheAscended:CooldownUp() and Player:BuffDown(S.BoonoftheAscendedBuff))) then
       if Cast(S.ShadowCovenant, Settings.Discipline.GCDasOffGCD.ShadowCovenant) then return "shadow_covenant main 50"; end
     end
+    --schism
+    if S.Schism:IsCastable() then
+      if Cast(S.Schism, nil, nil, not Target:IsSpellInRange(S.Schism)) then return "schism main 52"; end
+    end
     -- mindgames
     if S.Mindgames:IsReady() then
       if Cast(S.Mindgames, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames 57"; end
     end
-    --schism
-    if S.Schism:IsCastable() then
-      if Cast(S.Schism, nil, nil, not Target:IsSpellInRange(S.Schism)) then return "schism main 52"; end
+    -- fae_guardians
+    if S.FaeGuardians:IsCastable() then
+      if Cast(S.FaeGuardians, nil, Settings.Commons.DisplayStyle.Covenant) then return "fae_guardians main "; end
+    end
+    -- unholy_nova
+    if S.UnholyNova:IsCastable() then
+      if Cast(S.UnholyNova, nil, Settings.Commons.DisplayStyle.Covenant) then return "unholy_nova main "; end
     end
     -- boon_of_the_ascended
     if S.BoonoftheAscended:IsCastable() then
@@ -194,29 +195,17 @@ local function APL()
     if S.Mindbender:IsCastable() then
       if Cast(S.Mindbender, Settings.Discipline.GCDasOffGCD.Mindbender) then return "mindbender main 56"; end
     end
-    --purge_the_wicked,if=!ticking
+    -- spirit_shell
+    if S.SpiritShell:IsReady() then
+      if Cast(S.SpiritShell) then return "spirit_shell main "; end
+    end
+    -- purge_the_wicked,if=!ticking
     if S.PurgeTheWicked:IsCastable() and (Target:DebuffDown(S.PurgeTheWickedDebuff)) then
       if Cast(S.PurgeTheWicked, nil, nil, not Target:IsSpellInRange(S.PurgeTheWicked)) then return "purge_the_wicked main 58"; end
     end
-    --shadow_word_pain,if=!ticking&!talent.purge_the_wicked.enabled
+    -- shadow_word_pain,if=!ticking&!talent.purge_the_wicked.enabled
     if S.ShadowWordPain:IsCastable() and (Target:DebuffDown(S.ShadowWordPainDebuff) and not S.PurgeTheWicked:IsAvailable()) then
       if Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain main 60"; end
-    end
-    --shadow_word_death
-    if S.ShadowWordDeath:IsCastable() then
-      if Cast(S.ShadowWordDeath, nil, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 62"; end
-    end
-    --mind_blast
-    if S.MindBlast:IsCastable() then
-      if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 64"; end
-    end
-    --purge_the_wicked,if=refreshable
-    if S.PurgeTheWicked:IsCastable() and (Target:DebuffRefreshable(S.PurgeTheWickedDebuff)) then
-      if Cast(S.PurgeTheWicked, nil, nil, not Target:IsSpellInRange(S.PurgeTheWicked)) then return "purge_the_wicked main 66"; end
-    end
-    --shadow_word_pain,if=refreshable&!talent.purge_the_wicked.enabled
-    if S.ShadowWordPain:IsCastable() and (Target:DebuffRefreshable(S.ShadowWordPainDebuff) and not S.PurgeTheWicked:IsAvailable()) then
-      if Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain main 68"; end
     end
     --smite,if=spell_targets.holy_nova<3
     if S.Smite:IsCastable() and (EnemiesCount12yMelee < 3) then
@@ -240,7 +229,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Discipline Priest rotation is currently a work in progress.")
+  --HR.Print("Discipline Priest rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(256, APL, Init)

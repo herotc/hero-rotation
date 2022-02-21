@@ -138,6 +138,12 @@ local function EvaluateTargetIfKillCommandST2(TargetUnit)
   return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15))
 end
 
+-- if=set_bonus.tier28_2pc&dot.pheromone_bomb.ticking&!buff.mad_bombardier.up
+-- set_bonus and mad_bombardier buff checks done before CastTargetIf
+local function EvaluateTargetIfKillCommandST3(TargetUnit)
+  return (TargetUnit:DebuffUp(S.PheromoneBombDebuff))
+end
+
 -- if=buff.tip_of_the_spear.stack=3|dot.shrapnel_bomb.ticking
 local function EvaluateTargetIfRaptorStrikeST(TargetUnit)
   return (Player:BuffStack(S.TipoftheSpearBuff) == 3 or TargetUnit:DebuffUp(S.ShrapnelBombDebuff))
@@ -382,6 +388,10 @@ local function ST()
   if S.VolatileBomb:IsReady() and (S.WildfireBomb:FullRechargeTime() < 2 * Player:GCD() and Player:HasTier(28, 2) or Player:BuffUp(S.MadBombardierBuff) or (not Player:HasTier(28, 2)) and (S.VolatileBomb:FullRechargeTime() < Player:GCD() or CheckFocusCap(S.WildfireBomb:ExecuteTime()) and Target:DebuffUp(S.SerpentStingDebuff) and Target:DebuffRefreshable(S.SerpentStingDebuff) or Target:TimeToDie() < 10)) then
     if Cast(S.VolatileBomb, nil, nil, not Target:IsSpellInRange(S.VolatileBomb)) then return "volatile_bomb st 22"; end
   end
+  -- kill_command,target_if=min:bloodseeker.remains,if=set_bonus.tier28_2pc&dot.pheromone_bomb.ticking&!buff.mad_bombardier.up
+  if S.KillCommand:IsReady() and (Player:HasTier(28, 2) and Player:BuffDown(S.MadBombardierBuff)) then
+    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandST3, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command st 23"; end
+  end
   -- carve,if=active_enemies>1&!runeforge.rylakstalkers_confounding_strikes.equipped
   if S.Carve:IsReady() and (EnemyCount8ySplash > 1 and not RylakstalkersConfoundingEquipped) then
     if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve st 24"; end
@@ -618,8 +628,8 @@ local function Cleave()
   if S.Butchery:IsReady() and (Target:DebuffUp(S.ShrapnelBombDebuff) and (Target:DebuffStack(S.InternalBleedingDebuff) < 2 or Target:DebuffRemains(S.ShrapnelBombDebuff) < Player:GCD())) then
     if Cast(S.Butchery, nil, nil, not Target:IsInRange(8)) then return "butchery cleave 12"; end
   end
-  -- carve,if=dot.shrapnel_bomb.ticking
-  if S.Carve:IsReady() and (Target:DebuffUp(S.ShrapnelBombDebuff)) then
+  -- carve,if=dot.shrapnel_bomb.ticking&!set_bonus.tier28_2pc
+  if S.Carve:IsReady() and (Target:DebuffUp(S.ShrapnelBombDebuff) and not Player:HasTier(28, 2)) then
     if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 14"; end
   end
   -- butchery,if=charges_fractional>2.5&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
@@ -630,8 +640,8 @@ local function Cleave()
   if S.FlankingStrike:IsCastable() and (CheckFocusCap(S.FlankingStrike:ExecuteTime())) then
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike cleave 22"; end
   end
-  -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2&talent.alpha_predator.enabled
-  if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2 and S.AlphaPredator:IsAvailable()) then
+  -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
+  if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
     if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 24"; end
   end
   -- wildfire_bomb,if=buff.mad_bombardier.up
@@ -668,17 +678,13 @@ local function Cleave()
   if S.KillCommand:IsCastable() then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandCleave, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 29"; end
   end
-  -- wildfire_bomb,if=!dot.wildfire_bomb.ticking
-  if S.WildfireBomb:IsCastable() and (Target:DebuffDown(S.WildfireBombDebuff)) then
+  -- wildfire_bomb,if=!dot.wildfire_bomb.ticking&!set_bonus.tier28_2pc|charges_fractional>1.3
+  if S.WildfireBomb:IsCastable() and (Target:DebuffDown(S.WildfireBombDebuff) and (not Player:HasTier(28, 2)) or S.WildfireBomb:ChargesFractional() > 1.3) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb cleave 30"; end
   end
   -- butchery,if=(!next_wi_bomb.shrapnel|!talent.wildfire_infusion.enabled)&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
   if S.Butchery:IsReady() and ((not S.ShrapnelBomb:IsCastable() or not S.WildfireInfusion:IsAvailable()) and S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
     if Cast(S.Butchery, nil, nil, not Target:IsInRange(8)) then return "butchery cleave 31"; end
-  end
-  -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
-  if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
-    if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 32"; end
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsReady() and CDsON() then
@@ -808,7 +814,7 @@ local function APL()
 end
 
 local function OnInit ()
-  HR.Print("Survival Hunter rotation is currently a work in progress, but has been updated for patch 9.1.")
+  --HR.Print("Survival Hunter rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(255, APL, OnInit)

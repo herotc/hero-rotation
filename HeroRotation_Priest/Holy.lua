@@ -61,7 +61,7 @@ local function Precombat()
   if Everyone.TargetIsValid() then
     -- smite
     if S.Smite:IsReady() then
-      if Cast(S.Smite, nil, nil, not Target:IsSpellInRange(S.Smite)) then return "smite precombat"; end
+      if Cast(S.Smite, nil, nil, not Target:IsSpellInRange(S.Smite)) then return "smite precombat 2"; end
     end
   end
 end
@@ -95,7 +95,9 @@ local function APL()
       end
     end
     -- potion,if=buff.bloodlust.react|(raid_event.adds.up&(raid_event.adds.remains>20|raid_event.adds.duration<20))|target.time_to_die<=30
-    -- TODO: Add potion
+    if I.PotionofSpectralIntellect:IsReady() and (Player:BloodlustUp() or Target:TimeToDie() <= 30) then
+      if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
+    end
     -- holy_fire,if=dot.holy_fire.ticking&(dot.holy_fire.remains<=gcd|dot.holy_fire.stack<2)&spell_targets.holy_nova<7
     if S.HolyFire:IsReady() and (Target:DebuffUp(S.HolyFireDebuff) and (Target:DebuffRemains(S.HolyFireDebuff) <= Player:GCD() or Target:DebuffStack(S.HolyFireDebuff) < 2) and EnemiesCount12yMelee < 7) then
       if Cast(S.HolyFire, nil, nil, not Target:IsSpellInRange(S.HolyFire)) then return "holy_fire main 4"; end
@@ -172,7 +174,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Holy Priest rotation is currently a work in progress.")
+  --HR.Print("Holy Priest rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(257, APL, Init)

@@ -67,6 +67,15 @@ HL:RegisterForEvent(function()
   ShaohaosMightEquipped = Player:HasLegendaryEquipped(89)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 local function UseItems()
   -- use_items
   local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
@@ -345,12 +354,12 @@ local function APL()
       if Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "rushing_jade_wind main 72"; end
     end
     -- Manually added Pool filler
-    if Cast(S.PoolEnergy) and not Settings.Brewmaster.NoBrewmasterPooling then return "Pool Energy"; end
+    if Cast(S.PoolEnergy) then return "Pool Energy"; end
   end
 end
 
 local function Init()
-  HR.Print("Brewmaster rotation is currently a work in progress, but has been updated for patch 9.1.")
+  --HR.Print("Brewmaster rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(268, APL, Init)

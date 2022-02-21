@@ -46,7 +46,6 @@ if equip[14] then
 end
 
 -- Rotation Var
-local ShouldReturn -- Used to get the return string
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
 local DarkglareEquipped = Player:HasLegendaryEquipped(20)
@@ -490,6 +489,7 @@ end
 
 local function Init()
   S.SinfulBrandDebuff:RegisterAuraTracking()
+  --HR.Print("Havoc DH rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(577, APL, Init)

@@ -346,8 +346,8 @@ local function Cooldowns()
   if S.ArmyoftheDead:IsReady() and not Settings.Unholy.DisableAotD and (S.UnholyBlight:CooldownRemains() < 7 and S.DarkTransformation:CooldownRemains() < 7 and S.UnholyBlight:IsAvailable() and (Player:HasTier(28, 4) and Target:TimeToX(35) < 4 or (not Player:HasTier(28, 4)) or HL.FilteredFightRemains(EnemiesMelee, ">", 200)) and (S.AbominationLimb:CooldownRemains() < 18 and AbominationsFrenzyEquipped or not AbominationsFrenzyEquipped) and (S.Apocalypse:CooldownRemains() < 7 and VarFullCDR or not VarFullCDR or VarDCRT) or not S.UnholyBlight:IsAvailable() or HL.FilteredFightRemains(EnemiesMelee, "<", 35)) then
     if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyoftheDead) then return "army_of_the_dead cooldowns 4"; end
   end
-  -- soul_reaper,target_if=target.time_to_pct_35<5&target.time_to_die>5&active_enemies<=3
-  if S.SoulReaper:IsReady() and (EnemiesMeleeCount <= 3) then
+  -- soul_reaper,target_if=target.time_to_pct_35<5&(target.time_to_die>5&active_enemies<=3|set_bonus.tier28_4pc&buff.dark_transformation.up&active_enemies<=5&(!death_and_decay.ticking|covenant.night_fae))
+  if S.SoulReaper:IsReady() and (EnemiesMeleeCount <= 3 or Player:HasTier(28, 4) and Pet:BuffUp(S.DarkTransformation) and EnemiesMeleeCount <= 5 and ((not Player:BuffUp(S.DeathAndDecayBuff)) or CovenantID == 3)) then
     if ((Target:TimeToX(35) < 5 or Target:HealthPercentage() < 35) and Target:TimeToDie() > 5) then
       if Cast(S.SoulReaper, nil, nil, not Target:IsSpellInRange(S.SoulReaper)) then return "soul_reaper cooldowns 5"; end
     else
@@ -671,7 +671,7 @@ local function Init()
   S.VirulentPlagueDebuff:RegisterAuraTracking()
   S.FesteringWoundDebuff:RegisterAuraTracking()
 
-  HR.Print("Unholy DK rotation is currently a work in progress, but has been updated for patch 9.1.")
+  --HR.Print("Unholy DK rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(252, APL, Init)

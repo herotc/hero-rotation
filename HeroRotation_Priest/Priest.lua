@@ -57,6 +57,8 @@ Spell.Priest.Commons = {
   UnholyNova                            = Spell(324724), -- Melee, 15
   WrathfulFaerieDebuff                  = Spell(342132),
   -- Soulbind Abilities
+  FieldofBlossoms                       = Spell(319191),
+  GroveInvigoration                     = Spell(322721),
   PustuleEruption                       = Spell(351094),
   VolatileSolvent                       = Spell(323074),
   VolatileSolventHumanBuff              = Spell(323491),
@@ -102,6 +104,8 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   FieldofBlossoms                       = Spell(319191),
   GroveInvigoration                     = Spell(322721),
   RedirectedAnimaBuff                   = Spell(342814),
+  -- Tier Set Effects
+  LivingShadowBuff                      = Spell(363578)
 })
 
 Spell.Priest.Discipline = MergeTableByKey(Spell.Priest.Commons, {
@@ -118,6 +122,7 @@ Spell.Priest.Discipline = MergeTableByKey(Spell.Priest.Commons, {
   PurgeTheWicked                        = Spell(204197),
   PurgeTheWickedDebuff                  = Spell(204213),
   Halo                                  = Spell(120517),
+  SpiritShell                           = Spell(109964),
   -- Covenant Abilities
   AscendedBlast                         = Spell(325315),
 })
