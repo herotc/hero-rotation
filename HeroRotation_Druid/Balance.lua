@@ -825,7 +825,7 @@ local function APL()
         if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby main 8"; end
       end
       -- variable,name=iqd_condition,value=buff.ca_inc.remains>15&(!runeforge.sinful_hysteria|buff.ravenous_frenzy.remains<=12.2+(3*buff.bloodlust.up)+(8-5*buff.bloodlust.up)*equipped.instructors_divine_bell&buff.ravenous_frenzy.up)|fight_remains<25|equipped.empyreal_ordnance&cooldown.empyreal_ordnance.remains
-      VarIQDCondition = CDsON() and (Player:BuffRemains(CaInc) > 15 and ((not SinfulHysteriaEquipped) or Player:BuffRemains(S.RavenousFrenzyBuff) <= 12.2 + (3 * num(Player:BloodlustUp())) + (8 - 5 * num(Player:BloodlustUp())) * num(I.InstructorsDivineBell:IsEquipped()) and Player:BuffUp(S.RavenousFrenzyBuff)) or FightRemains < 25 or I.EmpyrealOrdinance:IsEquipped() and not I.EmpyrealOrdinance:CooldownUp())
+      VarIQDCondition = (Player:BuffRemains(CaInc) > 15 and ((not SinfulHysteriaEquipped) or Player:BuffRemains(S.RavenousFrenzyBuff) <= 12.2 + (3 * num(Player:BloodlustUp())) + (8 - 5 * num(Player:BloodlustUp())) * num(I.InstructorsDivineBell:IsEquipped()) and Player:BuffUp(S.RavenousFrenzyBuff)) or FightRemains < 25 or I.EmpyrealOrdinance:IsEquipped() and not I.EmpyrealOrdinance:CooldownUp())
       -- use_item,name=inscrutable_quantum_device,if=variable.iqd_condition&variable.in_gcd
       if I.InscrutableQuantumDevice:IsEquippedAndReady() and (VarIQDCondition) then
         if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device main 10"; end
