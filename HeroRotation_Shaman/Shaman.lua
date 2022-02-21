@@ -39,6 +39,7 @@ Spell.Shaman.Enhancement = {
   CrashLightning                        = Spell(187874),
   FeralSpirit                           = Spell(51533),
   LavaLash                              = Spell(60103),
+  StormbringerBuff                      = Spell(201846),
   Stormstrike                           = Spell(17364),
   Windstrike                            = Spell(115356),
   WindfuryTotem                         = Spell(8512),
@@ -59,9 +60,6 @@ Spell.Shaman.Enhancement = {
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
   BagofTricks                           = Spell(312411),
-
-
-
 
   -- Talents
   Ascendance                            = Spell(114051),
@@ -91,10 +89,13 @@ Spell.Shaman.Enhancement = {
   -- Soulbind Abilities
   FieldofBlossoms                       = Spell(319191),
   GroveInvigoration                     = Spell(322721),
+  PustuleEruption                       = Spell(351094),
+  VolatileSolvent                       = Spell(323074),
 
   -- Covenant Abilities
   ChainHarvest                          = Spell(320674),
   FaeTransfusion                        = Spell(328923),
+  Fleshcraft                            = Spell(324631),
   PrimordialWave                        = Spell(326059),
   PrimordialWaveBuff                    = Spell(327164),
   VesperTotem                           = Spell(324386),
