@@ -78,8 +78,7 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
-  if Everyone.TargetIsValid() then
-    -- Manually added: battle_shout,if=buff.battle_shout.remains<60
+  -- Manually added: battle_shout,if=buff.battle_shout.remains<60
     if S.BattleShout:IsCastable() and (Player:BuffRemains(S.BattleShoutBuff, true) < 60) then
       if Cast(S.BattleShout, Settings.Arms.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
     end
@@ -94,7 +93,7 @@ local function Precombat()
       if S.ColossusSmash:IsCastable() then
         if Cast(S.ColossusSmash) then return "colossus_smash precombat 8"; end
       end
-      if S.Warbreaker:IsCastable() and CDsON() then
+      if S.Warbreaker:IsCastable() then
         if Cast(S.Warbreaker) then return "warbreaker precombat 10"; end
       end
       if S.Overpower:IsCastable() then
@@ -102,7 +101,6 @@ local function Precombat()
       end
     end
   end
-end
 
 local function Hac()
   -- skullsplitter,if=rage<60&buff.deadly_calm.down
