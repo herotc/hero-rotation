@@ -640,8 +640,8 @@ local function Cleave()
   if S.FlankingStrike:IsCastable() and (CheckFocusCap(S.FlankingStrike:ExecuteTime())) then
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike cleave 22"; end
   end
-  -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2&talent.alpha_predator.enabled
-  if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2 and S.AlphaPredator:IsAvailable()) then
+  -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
+  if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
     if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 24"; end
   end
   -- wildfire_bomb,if=buff.mad_bombardier.up
@@ -685,10 +685,6 @@ local function Cleave()
   -- butchery,if=(!next_wi_bomb.shrapnel|!talent.wildfire_infusion.enabled)&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
   if S.Butchery:IsReady() and ((not S.ShrapnelBomb:IsCastable() or not S.WildfireInfusion:IsAvailable()) and S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
     if Cast(S.Butchery, nil, nil, not Target:IsInRange(8)) then return "butchery cleave 31"; end
-  end
-  -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
-  if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
-    if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 32"; end
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsReady() and CDsON() then
