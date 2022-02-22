@@ -250,32 +250,38 @@ local function Precombat()
   -- variable,name=trinket_split,value=(variable.trinket_one&variable.damage_trinket)|(variable.trinket_two&variable.damage_trinket)|(variable.trinket_one^variable.special_equipped)|(variable.trinket_two^variable.special_equipped)
   VarTrinketSplit = ((VarTrinketOne and VarDamageTrinket) or (VarTrinketTwo and VarDamageTrinket) or (VarTrinketOne ~= VarSpecialEquipped) or (VarTrinketTwo ~= VarSpecialEquipped))
   -- summon_pet - Moved to APL()
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,name=tome_of_monstrous_constructions
+    if I.TomeofMonstrousConstructions:IsEquippedAndReady() then
+      if Cast(I.TomeofMonstrousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tome_of_monstrous_constructions precombat 2"; end
+    end
+    -- use_item,name=soleahs_secret_technique
+    if I.SoleahsSecretTechnique:IsEquippedAndReady() then
+      if Cast(I.SoleahsSecretTechnique, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soleahs_secret_technique precombat 4"; end
+    end
+  end
   -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
-  if S.GrimoireofSacrifice:IsCastable() and Player:BuffDown(S.GrimoireofSacrificeBuff) then
-    if Cast(S.GrimoireofSacrifice, Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "grimoire_of_sacrifice precombat 2"; end
+  if S.GrimoireofSacrifice:IsReady() and Player:BuffDown(S.GrimoireofSacrificeBuff) then
+    if Cast(S.GrimoireofSacrifice, Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "grimoire_of_sacrifice precombat 6"; end
   end
   -- snapshot_stats
   -- fleshcraft
   if S.Fleshcraft:IsCastable() then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
-  end
-  -- potion
-  if Settings.Commons.Enabled.Potions and I.PotionofSpectralIntellect:IsReady() then
-    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 4"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 8"; end
   end
   -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3
   -- Note: Not handled because we can't get splash data before the pull
   -- haunt
   if S.Haunt:IsReady() then
-    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt precombat 6"; end
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt precombat 10"; end
   end
   -- unstable_affliction
   if S.UnstableAffliction:IsReady() then
-    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction precombat 8"; end
+    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction precombat 12"; end
   end
   -- Manually added: agony
   if S.Agony:IsReady() then
-    if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony precombat 10"; end
+    if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony precombat 14"; end
   end
 end
 
