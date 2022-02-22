@@ -156,8 +156,8 @@ Spell.Warlock.Affliction = {
   -- Legendary Effects
   MaleficWrathBuff                      = Spell(337125),
 
-  -- Item Effects
-
+  -- T28 Effects
+  CalamitousCrescendo                   = Spell(364322),
 }
 
 Spell.Warlock.Destruction = {
