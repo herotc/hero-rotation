@@ -196,21 +196,8 @@ local function Precombat()
   if S.SummonPet:IsCastable() then
     if Cast(S.SummonPet, Settings.Demonology.GCDasOffGCD.SummonPet) then return "summon_pet precombat 2"; end
   end
-  -- snapshot_stats
   if Everyone.TargetIsValid() then
-    -- fleshcraft
-    if S.Fleshcraft:IsCastable() then
-      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 4"; end
-    end
-    -- variable,name=first_tyrant_time,op=set,value=10
-    VarFirstTyrantTime = 10
-    -- variable,name=use_bolt_timings,op=set,value=runeforge.balespiders_burning_core&runeforge.shard_of_annihilation
-    VarUseBoltTimings = (BalespidersEquipped and ShardofAnnihilationEquipped)
     if Settings.Commons.Enabled.Trinkets then
-      -- use_item,name=shadowed_orb_of_torment
-      if I.ShadowedOrbofTorment:IsEquippedAndReady() then
-        if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment precombat 6"; end
-      end
       -- use_item,name=tome_of_monstrous_constructions
       if I.TomeofMonstrousConstructions:IsEquippedAndReady() then
         if Cast(I.TomeofMonstrousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "tome_of_monstrous_constructions precombat 8"; end
@@ -219,6 +206,19 @@ local function Precombat()
       if I.SoleahsSecretTechnique:IsEquippedAndReady() then
         if Cast(I.SoleahsSecretTechnique, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soleahs_secret_technique precombat 10"; end
       end
+    end
+    -- snapshot_stats
+    -- fleshcraft
+    if S.Fleshcraft:IsCastable() then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 4"; end
+    end
+    -- variable,name=first_tyrant_time,op=set,value=10
+    VarFirstTyrantTime = 10
+    -- variable,name=use_bolt_timings,op=set,value=runeforge.balespiders_burning_core&runeforge.shard_of_annihilation
+    VarUseBoltTimings = (BalespidersEquipped and ShardofAnnihilationEquipped)
+    -- use_item,name=shadowed_orb_of_torment
+    if I.ShadowedOrbofTorment:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets then
+      if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment precombat 6"; end
     end
     -- demonbolt
     if S.Demonbolt:IsCastable() then
