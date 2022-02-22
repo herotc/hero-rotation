@@ -453,7 +453,7 @@ local function APL()
 end
 
 local function OnInit()
-    HR.Print("Destruction Warlock rotation is currently a work in progress, but has been updated for patch 9.1.5.")
+  --HR.Print("Destruction Warlock rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(267, APL, OnInit)
