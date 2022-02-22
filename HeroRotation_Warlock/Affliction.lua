@@ -629,7 +629,7 @@ local function Aoe()
     local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
   end
   -- drain_life,if=buff.inevitable_demise.stack>=50|buff.inevitable_demise.up&time_to_die<5|buff.inevitable_demise.stack>=35&dot.soul_rot.ticking
-  if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) >= 50 or Player:BuffUp(S.InvetiableDemiseBuff) and FightRemains < 5 or Player:BuffStack(S.InvetiableDemiseBuff) >= 35 and Target:DebuffUp(S.SoulRot)) then
+  if S.DrainLife:IsReady() and (Player:BuffStack(S.InevitableDemiseBuff) >= 50 or Player:BuffUp(S.InevitableDemiseBuff) and FightRemains < 5 or Player:BuffStack(S.InevitableDemiseBuff) >= 35 and Target:DebuffUp(S.SoulRot)) then
     if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life aoe 32"; end
   end
   -- fleshcraft,if=soulbind.volatile_solvent,cancel_if=buff.volatile_solvent_humanoid.up
@@ -1016,7 +1016,7 @@ local function APL()
       if Cast(S.MaleficRapture) then return "malefic_rapture main 40"; end
     end
     -- drain_life,if=buff.inevitable_demise.stack>40|buff.inevitable_demise.up&time_to_die<4
-    if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) > 40 or Player:BuffUp(S.InvetiableDemiseBuff) and FightRemains < 4) then
+    if S.DrainLife:IsReady() and (Player:BuffStack(S.InevitableDemiseBuff) > 40 or Player:BuffUp(S.InevitableDemiseBuff) and FightRemains < 4) then
       if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life main 42"; end
     end
     -- call_action_list,name=covenant
