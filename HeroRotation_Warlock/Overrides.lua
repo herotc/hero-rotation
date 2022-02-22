@@ -173,29 +173,40 @@ DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
 , 266)
 
 -- Destruction, ID: 267
-local DestroOldSpellIsCastableP
-DestroOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastable",
+HL.AddCoreOverride ("Player.SoulShardsP",
+  function ()
+    local Shard = Player:SoulShards()
+    if not Player:IsCasting() then
+      return Shard
+    else
+      if Player:IsCasting(SpellDestro.ChaosBolt) then
+        return min(Shard - 2, 5)
+      elseif Player:IsCasting(SpellDestro.RainofFire) then
+        return min(Shard - 3, 5)
+      elseif Player:IsCasting(SpellDestro.Incinerate) then
+        return min(Shard + 0.2, 5)
+      elseif Player:IsCasting(SpellDestro.Conflagrate) then
+        return min(Shard + 0.5, 5)
+      else
+        return Shard
+      end
+    end
+  end
+  , 267)
+  
+local DestroOldSpellIsCastable
+DestroOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local RangeOK = true
     if Range then
       local RangeUnit = ThisUnit or Target
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
-    local BaseCheck = DestroOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = DestroOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellDestro.SummonPet then
-      return BaseCheck and not Pet:IsActive()
-    elseif self == SpellDestro.Cataclysm then
-      return BaseCheck and not Player:IsCasting(SpellDestro.Cataclysm)
-    elseif self == SpellDestro.ChannelDemonfire then
-      return BaseCheck and not Player:IsCasting(SpellDestro.ChannelDemonfire)
-    elseif self == SpellDestro.ScourgeStrike then
-      return BaseCheck and not Player:IsCasting(SpellDestro.ScourgeStrike)
-    elseif self == SpellDestro.DecimatingBolt then
-      return BaseCheck and not Player:IsCasting(SpellDestro.DecimatingBolt)
-    elseif self == SpellDestro.SoulRot then
-      return BaseCheck and not Player:IsCasting(SpellDestro.SoulRot)
-    elseif self == SpellDestro.ImpendingCatastrophe then
-      return BaseCheck and not Player:IsCasting(SpellDestro.ImpendingCatastrophe)
+      return BaseCheck and Player:SoulShardsP() > 0 and not (Pet:IsActive() or Player:BuffUp(SpellAffli.GrimoireofSacrificeBuff))
+    elseif self == SpellDestro.Immolate or self == SpellDestro.Cataclysm or self == SpellDestro.ChannelDemonfire or self == SpellDestro.DecimatingBolt or self == SpellDestro.SoulRot or self == SpellDestro.ImpendingCatastrophe or self == SpellDestro.ScouringTithe then
+      return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
     end

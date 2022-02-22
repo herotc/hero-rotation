@@ -154,16 +154,19 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   Inferno                               = Spell(270545),
   InternalCombustion                    = Spell(266134),
   RainofChaos                           = Spell(266086),
+  RainofChaosBuff                       = Spell(266087),
   ReverseEntropy                        = Spell(205148),
   RoaringBlaze                          = Spell(205184),
   RoaringBlazeDebuff                    = Spell(265931),
   Shadowburn                            = Spell(17877),
   SoulFire                              = Spell(6353),
+  -- T28 Effects
+  RitualofRuinBuff                      = Spell(364349),
 })
 
 -- Items
 if not Item.Warlock then Item.Warlock = {} end
-Item.Warlock.Demonology = {
+Item.Warlock.Commons = {
   -- Potion
   PotionofSpectralIntellect             = Item(307096),
   -- Trinkets
@@ -173,43 +176,26 @@ Item.Warlock.Demonology = {
   DreadfireVessel                       = Item(184030, {13, 14}),
   EbonsoulVise                          = Item(186431, {13, 14}),
   EmpyrealOrdnance                      = Item(180117, {13, 14}),
+  FlameofBattle                         = Item(181501, {13, 14}),
   GlyphofAssimilation                   = Item(184021, {13, 14}),
   GrimEclipse                           = Item(188254, {13, 14}),
+  InscrutableQuantumDevice              = Item(179350, {13, 14}),
+  InstructorsDivineBell                 = Item(184842, {13, 14}),
+  MacabreSheetMusic                     = Item(184024, {13, 14}),
   OverflowingAnimaCage                  = Item(178849, {13, 14}),
   ResonantReservoir                     = Item(188272, {13, 14}),
   ScarsofFraternalStrife                = Item(188253, {13, 14}),
   ShadowedOrbofTorment                  = Item(186428, {13, 14}),
+  SinfulAspirantsBadgeofFerocity        = Item(175884, {13, 14}),
   SinfulAspirantsEmblem                 = Item(178334, {13, 14}),
+  SinfulGladiatorsBadgeofFerocity       = Item(175921, {13, 14}),
   SinfulGladiatorsEmblem                = Item(178447, {13, 14}),
   SoleahsSecretTechnique                = Item(185818, {13, 14}),
   SoulIgniter                           = Item(184019, {13, 14}),
   SoullettingRuby                       = Item(178809, {13, 14}),
   SunbloodAmethyst                      = Item(178826, {13, 14}),
-  TomeofMonstrousConstructions          = Item(186422, {13, 14}),
-  UnchainedGladiatorsShackles           = Item(186980, {13, 14}),
-}
-
-Item.Warlock.Commons = {
-  -- Potion
-  PotionofSpectralIntellect             = Item(307096),
-  -- Trinkets
-  DarkmoonDeckPutrescence               = Item(173069, {13, 14}),
-  DreadfireVessel                       = Item(184030, {13, 14}),
-  EbonsoulVise                          = Item(186431, {13, 14}),
-  EmpyrealOrdnance                      = Item(180117, {13, 14}),
-  FlameofBattle                         = Item(181501, {13, 14}),
-  GlyphofAssimilation                   = Item(184021, {13, 14}),
-  InscrutableQuantumDevice              = Item(179350, {13, 14}),
-  InstructorsDivineBell                 = Item(184842, {13, 14}),
-  MacabreSheetMusic                     = Item(184024, {13, 14}),
-  OverflowingAnimaCage                  = Item(178849, {13, 14}),
-  ShadowedOrbofTorment                  = Item(186428, {13, 14}),
-  SinfulAspirantsBadgeofFerocity        = Item(175884, {13, 14}),
-  SinfulGladiatorsBadgeofFerocity       = Item(175921, {13, 14}),
-  SoulIgniter                           = Item(184019, {13, 14}),
-  SoullettingRuby                       = Item(178809, {13, 14}),
-  SunbloodAmethyst                      = Item(178826, {13, 14}),
   TabletofDespair                       = Item(181357, {13, 14}),
+  TomeofMonstrousConstructions          = Item(186422, {13, 14}),
   UnchainedGladiatorsShackles           = Item(186980, {13, 14}),
   WakenersFrond                         = Item(181457, {13, 14}),
 }
