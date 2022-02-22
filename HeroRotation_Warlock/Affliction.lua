@@ -93,11 +93,6 @@ local VarTrinketSplit = false
 local VarDoTsTicking = false
 local VarTrinketDelay = 0
 
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local Covenants = _G.C_Covenants
-local CovenantID = Covenants.GetActiveCovenantID()
-
 -- Register
 HL:RegisterForEvent(function()
   S.SeedofCorruption:RegisterInFlight()
@@ -122,10 +117,6 @@ HL:RegisterForEvent(function()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
-  CovenantID = Covenants.GetActiveCovenantID()
-end, "COVENANT_CHOSEN")
-
-HL:RegisterForEvent(function()
   VarDamageTrinket = false
   VarSpecialEquipped = false
   VarTrinketOne = false
@@ -134,6 +125,15 @@ HL:RegisterForEvent(function()
   VarDoTsTicking = false
   VarTrinketDelay = 0
 end, "PLAYER_REGEN_ENABLED")
+
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
 
 local function num(val)
   if val then return 1 else return 0 end
