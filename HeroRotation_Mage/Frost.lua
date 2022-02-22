@@ -44,11 +44,15 @@ local Enemies16ySplash
 local var_disciplinary_command_cd_remains
 local var_disciplinary_command_last_applied
 local FightRemains
-local TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
-local GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
+
+local SlickIceEquipped = Player:HasLegendaryEquipped(2)
+local ColdFrontEquipped = Player:HasLegendaryEquipped(3)
 local FreezingWindsEquipped = Player:HasLegendaryEquipped(4)
 local GlacialFragmentsEquipped = Player:HasLegendaryEquipped(5)
 local DisciplinaryCommandEquipped = Player:HasLegendaryEquipped(7)
+local GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
+local TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
+local DeathsFathomEquipped = Player:HasLegendaryEquipped(221)
 local HeartoftheFaeEquipped = Player:HasLegendaryEquipped(260)
 
 -- GUI Settings
@@ -70,11 +74,14 @@ S.IceLance:RegisterInFlightEffect(228598)
 S.IceLance:RegisterInFlight()
 
 HL:RegisterForEvent(function()
-  TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
-  GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
+  SlickIceEquipped = Player:HasLegendaryEquipped(2)
+  ColdFrontEquipped = Player:HasLegendaryEquipped(3)
   FreezingWindsEquipped = Player:HasLegendaryEquipped(4)
   GlacialFragmentsEquipped = Player:HasLegendaryEquipped(5)
   DisciplinaryCommandEquipped = Player:HasLegendaryEquipped(7)
+  GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
+  TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
+  DeathsFathomEquipped = Player:HasLegendaryEquipped(221)
   HeartoftheFaeEquipped = Player:HasLegendaryEquipped(260)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
