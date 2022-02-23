@@ -240,9 +240,13 @@ local function Covenant()
   if S.SoulRot:IsReady() and (S.WildHuntTactics:SoulbindEnabled() and DemonicTyrantTime() == 0 and VarNextTyrantCD > 18) then
     if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot covenant 6"; end
   end
-  -- decimating_bolt,target_if=min:target.health.pct,if=!variable.use_bolt_timings&(soulbind.lead_by_example|soulbind.kevins_oozeling)&(pet.demonic_tyrant.active&soul_shard<2|!pet.demonic_tyrant.active&variable.next_tyrant_cd>40)
-  if S.DecimatingBolt:IsReady() and ((not VarUseBoltTimings) and (S.LeadByExample:SoulbindEnabled() or S.KevinsOozeling:SoulbindEnabled()) and (DemonicTyrantTime() > 0 and Player:SoulShardsP() < 2 or DemonicTyrantTime() == 0 and VarNextTyrantCD > 40)) then
+  -- decimating_bolt,target_if=min:target.health.pct,if=!variable.use_bolt_timings&soulbind.lead_by_example&(pet.demonic_tyrant.active&soul_shard<2|!pet.demonic_tyrant.active&variable.next_tyrant_cd>40)
+  if S.DecimatingBolt:IsReady() and ((not VarUseBoltTimings) and S.LeadByExample:SoulbindEnabled() and (DemonicTyrantTime() > 0 and Player:SoulShardsP() < 2 or DemonicTyrantTime() == 0 and VarNextTyrantCD > 40)) then
     if Everyone.CastTargetIf(S.DecimatingBolt, Enemies8ySplash, "min", EvaluateTargetIfFilterHealth, nil, not Target:IsSpellInRange(S.DecimatingBolt), nil, Settings.Commons.DisplayStyle.Covenant) then return "decimating_bolt covenant 8"; end
+  end
+  -- decimating_bolt,target_if=min:target.health.pct,if=!variable.use_bolt_timings&soulbind.kevins_oozeling&(pet.demonic_tyrant.active|!pet.demonic_tyrant.active&variable.next_tyrant_cd>40)
+  if S.DecimatingBolt:IsReady() and ((not VarUseBoltTimings) and S.KevinsOozeling:SoulbindEnabled() and (DemonicTyrantTime() > 0 or DemonicTyrantTime() == 0 and VarNextTyrantCD > 40)) then
+    if Everyone.CastTargetIf(S.DecimatingBolt, Enemies8ySplash, "min", EvaluateTargetIfFilterHealth, nil, not Target:IsSpellInRange(S.DecimatingBolt), nil, Settings.Commons.DisplayStyle.Covenant) then return "decimating_bolt covenant 9"; end
   end
   -- decimating_bolt,target_if=min:target.health.pct,if=!variable.use_bolt_timings&(soulbind.forgeborne_reveries|(soulbind.volatile_solvent&!soulbind.kevins_oozeling))&!pet.demonic_tyrant.active
   if S.DecimatingBolt:IsReady() and ((not VarUseBoltTimings) and (S.ForgeborneReveries:SoulbindEnabled() or (S.VolatileSolvent:SoulbindEnabled() and not S.KevinsOozeling:SoulbindEnabled())) and DemonicTyrantTime() == 0) then
@@ -533,8 +537,8 @@ local function APL()
     if S.PowerSiphon:IsReady() and (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff)) then
       if Cast(S.PowerSiphon) then return "power_siphon main 3"; end
     end
-    -- potion,if=(!variable.use_bolt_timings&variable.next_tyrant_cd=0&time>variable.first_tyrant_time|soulbind.refined_palate&variable.next_tyrant_cd<38)|(variable.use_bolt_timings&buff.shard_of_annihilation.up)
-    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (((not VarUseBoltTimings) and VarNextTyrantCD == 0 and HL.CombatTime() > VarFirstTyrantTime or S.RefinedPalate:SoulbindEnabled() and VarNextTyrantCD < 38) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff))) then
+    -- potion,if=(!variable.use_bolt_timings&variable.next_tyrant_cd<gcd.max&time>variable.first_tyrant_time|soulbind.refined_palate&variable.next_tyrant_cd<38)|(variable.use_bolt_timings&buff.shard_of_annihilation.up)
+    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (((not VarUseBoltTimings) and VarNextTyrantCD < Player:GCD() + 0.5 and HL.CombatTime() > VarFirstTyrantTime or S.RefinedPalate:SoulbindEnabled() and VarNextTyrantCD < 38) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff))) then
       if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
     end
     -- call_action_list,name=tyrant_setup
