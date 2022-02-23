@@ -25,6 +25,7 @@ if not Spell.Warrior then Spell.Warrior = {} end
 Spell.Warrior.Fury = {
   -- Racials
   AncestralCall                         = Spell(274738),
+  ArcaneTorrent                         = Spell(50613),
   BagofTricks                           = Spell(312411),
   Berserking                            = Spell(26297),
   BloodFury                             = Spell(20572),

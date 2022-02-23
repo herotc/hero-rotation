@@ -90,11 +90,8 @@ local VarSpecialEquipped = false
 local VarTrinketOne = false
 local VarTrinketTwo = false
 local VarTrinketSplit = false
-
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local Covenants = _G.C_Covenants
-local CovenantID = Covenants.GetActiveCovenantID()
+local VarDoTsTicking = false
+local VarTrinketDelay = 0
 
 -- Register
 HL:RegisterForEvent(function()
@@ -120,16 +117,23 @@ HL:RegisterForEvent(function()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
-  CovenantID = Covenants.GetActiveCovenantID()
-end, "COVENANT_CHOSEN")
-
-HL:RegisterForEvent(function()
   VarDamageTrinket = false
   VarSpecialEquipped = false
   VarTrinketOne = false
   VarTrinketTwo = false
   VarTrinketSplit = false
+  VarDoTsTicking = false
+  VarTrinketDelay = 0
 end, "PLAYER_REGEN_ENABLED")
+
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -203,7 +207,7 @@ local function EvaluateCycleUnstableAfflictionRefresh(TargetUnit)
 end
 
 -- Counter for Debuff on other enemies
-local function calcEnemiesDotCount(Object, Enemies)
+local function CalcEnemiesDotCount(Object, Enemies)
   local debuffs = 0
 
   for _, CycleUnit in pairs(Enemies) do
@@ -216,7 +220,7 @@ local function calcEnemiesDotCount(Object, Enemies)
   return debuffs
 end
 
-local function returnEnemiesWithDot(Object, Enemies)
+local function ReturnEnemiesWithDot(Object, Enemies)
   for _, CycleUnit in pairs(Enemies) do
     --if CycleUnit:DebuffUp(Object, nil, 0) then
     --if CycleUnit:DebuffTicksRemain(Object) > 0 then
@@ -246,32 +250,38 @@ local function Precombat()
   -- variable,name=trinket_split,value=(variable.trinket_one&variable.damage_trinket)|(variable.trinket_two&variable.damage_trinket)|(variable.trinket_one^variable.special_equipped)|(variable.trinket_two^variable.special_equipped)
   VarTrinketSplit = ((VarTrinketOne and VarDamageTrinket) or (VarTrinketTwo and VarDamageTrinket) or (VarTrinketOne ~= VarSpecialEquipped) or (VarTrinketTwo ~= VarSpecialEquipped))
   -- summon_pet - Moved to APL()
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,name=tome_of_monstrous_constructions
+    if I.TomeofMonstrousConstructions:IsEquippedAndReady() then
+      if Cast(I.TomeofMonstrousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tome_of_monstrous_constructions precombat 2"; end
+    end
+    -- use_item,name=soleahs_secret_technique
+    if I.SoleahsSecretTechnique:IsEquippedAndReady() then
+      if Cast(I.SoleahsSecretTechnique, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soleahs_secret_technique precombat 4"; end
+    end
+  end
   -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
-  if S.GrimoireofSacrifice:IsCastable() and Player:BuffDown(S.GrimoireofSacrificeBuff) then
-    if Cast(S.GrimoireofSacrifice, Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "grimoire_of_sacrifice precombat 2"; end
+  if S.GrimoireofSacrifice:IsReady() and Player:BuffDown(S.GrimoireofSacrificeBuff) then
+    if Cast(S.GrimoireofSacrifice, Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "grimoire_of_sacrifice precombat 6"; end
   end
   -- snapshot_stats
   -- fleshcraft
   if S.Fleshcraft:IsCastable() then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
-  end
-  -- potion
-  if Settings.Commons.Enabled.Potions and I.PotionofSpectralIntellect:IsReady() then
-    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 4"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 8"; end
   end
   -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3
   -- Note: Not handled because we can't get splash data before the pull
   -- haunt
   if S.Haunt:IsReady() then
-    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt precombat 6"; end
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt precombat 10"; end
   end
   -- unstable_affliction
   if S.UnstableAffliction:IsReady() then
-    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction precombat 8"; end
+    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction precombat 12"; end
   end
   -- Manually added: agony
   if S.Agony:IsReady() then
-    if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony precombat 10"; end
+    if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony precombat 14"; end
   end
 end
 
@@ -408,7 +418,7 @@ local function DelayedTrinkets()
   if I.SoullettingRuby:IsEquippedAndReady() and ((CovenantID == 3 and S.SoulRot:CooldownRemains() < 8) or (CovenantID == 2 and S.ImpendingCatastrophe:CooldownRemains() < 8) or (CovenantID == 4 or CovenantID == 1 or CovenantID == 0)) then
     if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soulletting_ruby delayed_trinkets 6"; end
   end
-  -- use_item,name=name=shadowed_orb_of_torment,if=(covenant.night_fae&cooldown.soul_rot.remains<4)|(covenant.venthyr&cooldown.impending_catastrophe.remains<4)|(covenant.necrolord|covenant.kyrian|covenant.none)
+  -- use_item,name=shadowed_orb_of_torment,if=(covenant.night_fae&cooldown.soul_rot.remains<4)|(covenant.venthyr&cooldown.impending_catastrophe.remains<4)|(covenant.necrolord|covenant.kyrian|covenant.none)
   if I.ShadowedOrbofTorment:IsEquippedAndReady() and ((CovenantID == 3 and S.SoulRot:CooldownRemains() < 4) or (CovenantID == 2 and S.ImpendingCatastrophe:CooldownRemains() < 4) or (CovenantID == 4 or CovenantID == 1 or CovenantID == 0)) then
     if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment delayed_trinkets 8"; end
   end
@@ -625,7 +635,7 @@ local function Aoe()
     local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
   end
   -- drain_life,if=buff.inevitable_demise.stack>=50|buff.inevitable_demise.up&time_to_die<5|buff.inevitable_demise.stack>=35&dot.soul_rot.ticking
-  if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) >= 50 or Player:BuffUp(S.InvetiableDemiseBuff) and FightRemains < 5 or Player:BuffStack(S.InvetiableDemiseBuff) >= 35 and Target:DebuffUp(S.SoulRot)) then
+  if S.DrainLife:IsReady() and (Player:BuffStack(S.InevitableDemiseBuff) >= 50 or Player:BuffUp(S.InevitableDemiseBuff) and FightRemains < 5 or Player:BuffStack(S.InevitableDemiseBuff) >= 35 and Target:DebuffUp(S.SoulRot)) then
     if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life aoe 32"; end
   end
   -- fleshcraft,if=soulbind.volatile_solvent,cancel_if=buff.volatile_solvent_humanoid.up
@@ -642,6 +652,143 @@ local function Aoe()
   end
 end
 
+local function NecroMW()
+  -- variable,name=dots_ticking,value=dot.corruption.remains>2&dot.agony.remains>2&dot.unstable_affliction.remains>2&(!talent.siphon_life|dot.siphon_life.remains>2)
+  VarDoTsTicking = (Target:DebuffRemains(S.CorruptionDebuff) > 2 and Target:DebuffRemains(S.AgonyDebuff) > 2 and Target:DebuffRemains(S.UnstableAfflictionDebuff) > 2 and ((not S.SiphonLife:IsAvailable()) or Target:DebuffRemains(S.SiphonLifeDebuff) > 2))
+  -- variable,name=trinket_delay,value=cooldown.phantom_singularity.remains,value_else=cooldown.decimating_bolt.remains,op=setif,condition=talent.shadow_embrace,if=covenant.necrolord
+  -- Note: Omitting 'if', as we only end up in NecroMW if we're Necrolord
+  if (S.ShadowEmbrace:IsAvailable()) then
+    VarTrinketDelay = S.PhantomSingularity:CooldownRemains()
+  else
+    VarTrinketDelay = S.DecimatingBolt:CooldownRemains()
+  end
+  -- malefic_rapture,if=time_to_die<execute_time*soul_shard&dot.unstable_affliction.ticking
+  if S.MaleficRapture:IsReady() and (Target:TimeToDie() < S.MaleficRapture:ExecuteTime() * Player:SoulShardsP() and Target:DebuffUp(S.UnstableAfflictionDebuff)) then
+    if Cast(S.MaleficRapture) then return "malefic_rapture necro_mw 2"; end
+  end
+  -- haunt,if=dot.haunt.remains<2+execute_time
+  if S.Haunt:IsReady() and (Target:DebuffRemains(S.HauntDebuff) < 2 + S.Haunt:ExecuteTime()) then
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt necro_mw 4"; end
+  end
+  -- malefic_rapture,if=time>7&buff.malefic_wrath.remains<gcd.max+execute_time
+  if S.MaleficRapture:IsReady() and (HL.CombatTime() > 7 and Player:BuffRemains(S.MaleficWrathBuff) < Player:GCD() + 0.5 + S.MaleficRapture:ExecuteTime()) then
+    if Cast(S.MaleficRapture) then return "malefic_rapture necro_mw 6"; end
+  end
+  -- use_item,name=empyreal_ordnance,if=variable.trinket_delay<20
+  if I.EmpyrealOrdnance:IsEquippedAndReady() and (VarTrinketDelay < 20) then
+    if Cast(I.EmpyrealOrdnance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "empyreal_ordnance necro_mw 8"; end
+  end
+  -- use_item,name=sunblood_amethyst,if=variable.trinket_delay<6 
+  if I.SunbloodAmethyst:IsEquippedAndReady() and (VarTrinketDelay < 6) then
+    if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "sunblood_amethyst necro_mw 10"; end
+  end
+  -- use_item,name=soulletting_ruby,if=variable.trinket_delay<8
+  if I.SoullettingRuby:IsEquippedAndReady() and (VarTrinketDelay < 8) then
+    if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soulletting_ruby necro_mw 12"; end
+  end
+  -- use_item,name=name=shadowed_orb_of_torment,if=variable.trinket_delay<4
+  if I.ShadowedOrbofTorment:IsEquippedAndReady() and (VarTrinketDelay < 4) then
+    if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment necro_mw 14"; end
+  end
+  -- phantom_singularity,if=!talent.shadow_embrace&variable.dots_ticking
+  if S.PhantomSingularity:IsReady() and ((not S.ShadowEmbrace:IsAvailable()) and VarDoTsTicking) then
+    if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity necro_mw 16"; end
+  end
+  -- decimating_bolt,if=!talent.shadow_embrace&cooldown.phantom_singularity.remains>0
+  if S.DecimatingBolt:IsReady() and ((not S.ShadowEmbrace:IsAvailable()) and S.PhantomSingularity:CooldownRemains() > 0) then
+    if Cast(S.DecimatingBolt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt necro_mw 18"; end
+  end
+  -- decimating_bolt,if=talent.shadow_embrace&variable.dots_ticking
+  if S.DecimatingBolt:IsReady() and (S.ShadowEmbrace:IsAvailable() and VarDoTsTicking) then
+    if Cast(S.DecimatingBolt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt necro_mw 20"; end
+  end
+  -- phantom_singularity,if=talent.shadow_embrace&cooldown.decimating_bolt.remains>0
+  if S.PhantomSingularity:IsReady() and (S.ShadowEmbrace:IsAvailable() and S.DecimatingBolt:CooldownRemains() > 0) then
+    if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity necro_mw 22"; end
+  end
+  -- unstable_affliction,if=dot.unstable_affliction.remains<6
+  if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 6) then
+    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction necro_mw 24"; end
+  end
+  -- agony,if=dot.agony.remains<4
+  if S.Agony:IsReady() and (Target:DebuffRemains(S.AgonyDebuff) < 4) then
+    if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony necro_mw 26"; end
+  end
+  -- siphon_life,if=dot.siphon_life.remains<4
+  if S.SiphonLife:IsReady() and (Target:DebuffRemains(S.SiphonLifeDebuff) < 4) then
+    if Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life necro_mw 28"; end
+  end
+  -- corruption,if=dot.corruption.remains<4
+  if S.Corruption:IsReady() and (Target:DebuffRemains(S.CorruptionDebuff) < 4) then
+    if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption necro_mw 30"; end
+  end
+  -- malefic_rapture,if=time>7&buff.malefic_wrath.remains<2*gcd.max+execute_time
+  if S.MaleficRapture:IsReady() and (HL.CombatTime() > 7 and Player:BuffRemains(S.MaleficWrathBuff) < 2 * (Player:GCD() + 0.5) + S.MaleficRapture:ExecuteTime()) then
+    if Cast(S.MaleficRapture) then return "malefic_rapture necro_mw 32"; end
+  end
+  -- call_action_list,name=darkglare_prep,if=dot.phantom_singularity.ticking
+  if (Target:DebuffUp(S.PhantomSingularityDebuff)) then
+    local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- call_action_list,name=stat_trinkets,if=dot.phantom_singularity.ticking
+  if (Target:DebuffUp(S.PhantomSingularityDebuff)) then
+    local ShouldReturn = StatTrinkets(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- malefic_rapture,if=time>7&(buff.malefic_wrath.stack<3|buff.malefic_wrath.remains<4.5)
+  if S.MaleficRapture:IsReady() and (HL.CombatTime() > 7 and (Player:BuffStack(S.MaleficWrathBuff) < 3 or Player:BuffRemains(S.MaleficWrathBuff) < 4.5)) then
+    if Cast(S.MaleficRapture) then return "malefic_rapture necro_mw 34"; end
+  end
+  -- malefic_rapture,if=(dot.phantom_singularity.ticking|time_to_die<cooldown.phantom_singularity.remains)&(buff.malefic_wrath.stack<3|soul_shard>1)
+  if S.MaleficRapture:IsReady() and ((Target:DebuffUp(S.PhantomSingularityDebuff) or Target:TimeToDie() < S.PhantomSingularity:CooldownRemains()) and (Player:BuffStack(S.MaleficWrathBuff) < 3 or Player:SoulShardsP() > 1)) then
+    if Cast(S.MaleficRapture) then return "malefic_rapture necro_mw 36"; end
+  end
+  -- drain_soul,if=dot.phantom_singularity.ticking
+  if S.DrainSoul:IsReady() and (Target:DebuffUp(S.PhantomSingularityDebuff)) then
+    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul necro_mw 38"; end
+  end
+  -- agony,if=refreshable
+  if S.Agony:IsReady() and (Target:DebuffRefreshable(S.AgonyDebuff)) then
+    if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony necro_mw 40"; end
+  end
+  -- unstable_affliction,if=refreshable
+  if S.UnstableAffliction:IsReady() and (Target:DebuffRefreshable(S.UnstableAfflictionDebuff)) then
+    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction necro_mw 42"; end
+  end
+  -- corruption,if=refreshable
+  if S.Corruption:IsReady() and (Target:DebuffRefreshable(S.CorruptionDebuff)) then
+    if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption necro_mw 44"; end
+  end
+  -- siphon_life,if=talent.siphon_life&refreshable
+  -- Note: Excluded 'talent.siphon_life', as it will not pass IsReady if not talented
+  if S.SiphonLife:IsReady() and (Target:DebuffRefreshable(S.SiphonLifeDebuff)) then
+    if Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life necro_mw 46"; end
+  end
+  -- fleshcraft,if=soulbind.volatile_solvent,cancel_if=buff.volatile_solvent_humanoid.up
+  if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft necro_mw 48"; end
+  end
+  -- haunt,if=dot.haunt.remains<3
+  if S.Haunt:IsReady() and (Target:DebuffRemains(S.HauntDebuff) < 3) then
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt necro_mw 50"; end
+  end
+  -- drain_soul,if=buff.decimating_bolt.up
+  if S.DrainSoul:IsReady() and (Player:BuffUp(S.DecimatingBoltBuff)) then
+    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul necro_mw 52"; end
+  end
+  -- drain_soul,if=talent.shadow_embrace&debuff.shadow_embrace.remains<3|debuff.shadow_embrace.stack<3,interrupt_if=debuff.shadow_embrace.stack>=3&debuff.shadow_embrace.remains>3
+  if S.DrainSoul:IsReady() and (S.ShadowEmbrace:IsAvailable() and Target:DebuffRemains(S.ShadowEmbraceDebuff) < 3 or Target:DebuffStack(S.ShadowEmbraceDebuff) < 3) then
+    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul necro_mw 54"; end
+  end
+  -- drain_soul,interrupt=1
+  if S.DrainSoul:IsReady() then
+    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul necro_mw 56"; end
+  end
+  -- shadow_bolt
+  if S.ShadowBolt:IsReady() then
+    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt necro_mw 58"; end
+  end
+end
+
 --- ======= MAIN =======
 local function APL()
   -- Unit Update
@@ -651,16 +798,16 @@ local function APL()
     Enemies40yCount = #Enemies40y
     EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
 
-    EnemiesAgonyCount = calcEnemiesDotCount(S.AgonyDebuff, Enemies40y)
-    EnemiesSeedofCorruptionCount = calcEnemiesDotCount(S.SeedofCorruptionDebuff, Enemies40y)
-    EnemiesSiphonLifeCount = calcEnemiesDotCount(S.SiphonLifeDebuff, Enemies40y)
-    EnemiesVileTaintCount = calcEnemiesDotCount(S.VileTaintDebuff, Enemies40y)
+    EnemiesAgonyCount = CalcEnemiesDotCount(S.AgonyDebuff, Enemies40y)
+    EnemiesSeedofCorruptionCount = CalcEnemiesDotCount(S.SeedofCorruptionDebuff, Enemies40y)
+    EnemiesSiphonLifeCount = CalcEnemiesDotCount(S.SiphonLifeDebuff, Enemies40y)
+    EnemiesVileTaintCount = CalcEnemiesDotCount(S.VileTaintDebuff, Enemies40y)
   else
     Enemies40yCount = 1
     EnemiesCount10ySplash = 1
   end
 
-  EnemiesWithUnstableAfflictionDebuff = returnEnemiesWithDot(S.UnstableAfflictionDebuff, Enemies40y)
+  EnemiesWithUnstableAfflictionDebuff = ReturnEnemiesWithDot(S.UnstableAfflictionDebuff, Enemies40y)
 
   -- Check remaining time in fight
   FightRemains = HL.FightRemains(Enemies10ySplash, false)
@@ -683,6 +830,14 @@ local function APL()
     -- 12 seconds chosen arbitrarily, as it's enough time to get all DoTs up and not have any wear off
     if HL.CombatTime() < 12 and Target:GUID() == FirstTarGUID then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- malefic_rapture,if=ptr=1&buff.calamitous_crescendo.up
+    if S.MaleficRapture:IsReady() and (Player:BuffUp(S.CalamitousCrescendo)) then
+      if Cast(S.MaleficRapture) then return "malefic_rapture pre-necro_mw"; end
+    end
+    -- run_action_list,name=necro_mw,if=covenant.necrolord&runeforge.malefic_wrath&active_enemies=1&talent.phantom_singularity
+    if (CovenantID == 4 and MaleficWrathEquipped and EnemiesCount10ySplash == 1 and S.PhantomSingularity:IsAvailable()) then
+      local ShouldReturn = NecroMW(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=trinket_split_check,if=time<1
     -- Note: Added these variables to the Precombat function
@@ -867,7 +1022,7 @@ local function APL()
       if Cast(S.MaleficRapture) then return "malefic_rapture main 40"; end
     end
     -- drain_life,if=buff.inevitable_demise.stack>40|buff.inevitable_demise.up&time_to_die<4
-    if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) > 40 or Player:BuffUp(S.InvetiableDemiseBuff) and FightRemains < 4) then
+    if S.DrainLife:IsReady() and (Player:BuffStack(S.InevitableDemiseBuff) > 40 or Player:BuffUp(S.InevitableDemiseBuff) and FightRemains < 4) then
       if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life main 42"; end
     end
     -- call_action_list,name=covenant
@@ -908,7 +1063,7 @@ local function APL()
 end
 
 local function OnInit()
-
+  --HR.Print("Affliction Warlock rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(265, APL, OnInit)

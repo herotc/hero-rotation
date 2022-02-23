@@ -228,8 +228,8 @@ local function Precombat()
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(trinket.2.cooldown.duration%%45=0)
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!trinket.1.has_use_buff&trinket.2.has_use_buff|trinket.2.has_use_buff&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync))
   -- TODO: Trinket sync/priority stuff. Currently unable to pull trinket CD durations because WoW's API is bad.
-  -- variable,name=full_cdr,value=talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=9
-  VarFullCDR = (S.ArmyoftheDamned:IsAvailable() and S.ConvocationOfTheDead:ConduitRank() >= 9)
+  -- variable,name=full_cdr,value=talent.army_of_the_damned&conduit.convocation_of_the_dead
+  VarFullCDR = (S.ArmyoftheDamned:IsAvailable() and S.ConvocationOfTheDead:ConduitEnabled())
   -- variable,name=dc_rt,value=runeforge.deaths_certainty&runeforge.rampant_transference
   VarDCRT = (DeathsCertaintyEquipped and RampantTransferenceEquipped)
   -- Manually added: festering_strike if in melee range

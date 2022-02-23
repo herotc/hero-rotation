@@ -167,27 +167,27 @@ local function APL()
       local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
     end
     if CDsON() and Target:TimeToDie() < 18 then
-      -- blood_fury
+      -- blood_fury,if=target.time_to_die<18
       if S.BloodFury:IsCastable() then
         if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 4"; end
       end
-      -- berserking
+      -- berserking,if=target.time_to_die<18
       if S.Berserking:IsCastable() then
         if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 6"; end
       end
-      -- lights_judgment
+      -- lights_judgment,if=target.time_to_die<18
       if S.LightsJudgment:IsCastable() then
         if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "lights_judgment main 8"; end
       end
-      -- fireblood
+      -- fireblood,if=target.time_to_die<18
       if S.Fireblood:IsCastable() then
         if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 10"; end
       end
-      -- ancestral_call
+      -- ancestral_call,if=target.time_to_die<18
       if S.AncestralCall:IsCastable() then
         if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 12"; end
       end
-      -- bag_of_tricks
+      -- bag_of_tricks,if=target.time_to_die<18
       if S.BagOfTricks:IsCastable() then
         if Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "bag_of_tricks main 14"; end
       end

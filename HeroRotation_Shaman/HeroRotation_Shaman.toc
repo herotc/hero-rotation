@@ -1,4 +1,4 @@
-## Interface: 90105
+## Interface: 90200
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFF0070DDShaman|r]
 ## Author: HeroRotation Team
