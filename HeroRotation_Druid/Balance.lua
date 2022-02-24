@@ -45,7 +45,6 @@ local I = Item.Druid.Balance
 local OnUseExcludes = {--  I.TrinketName:ID(),
   I.EmpyrealOrdinance:ID(),
   I.InscrutableQuantumDevice:ID(),
-  I.InstructorsDivineBell:ID(),
   I.ShadowedOrbofTorment:ID(),
   I.SoullettingRuby:ID()
 }
@@ -767,11 +766,6 @@ local function APL()
       -- use_item,name=inscrutable_quantum_device,if=variable.iqd_condition&variable.in_gcd
       if I.InscrutableQuantumDevice:IsEquippedAndReady() and (VarIQDCondition) then
         if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device main 10"; end
-      end
-      -- use_item,name=instructors_divine_bell,if=trinket.1.cooldown.remains<=trinket.1.cooldown.duration-20&trinket.1.cooldown.remains|trinket.2.cooldown.remains<=trinket.2.cooldown.duration-20&trinket.2.cooldown.remains|variable.on_use_trinket=0
-      -- Note: Unable to parse trinket.x.cooldown.remains and this appears to be accounting for the shared trinket CD, which is handled by IsEquippedAndReady(), and VarOnUseTrinket shouldn't be 0 if this trinket is equipped
-      if I.InstructorsDivineBell:IsEquippedAndReady() then
-        if Cast(I.InstructorsDivineBell, nil, Settings.Commons.DisplayStyle.Trinkets) then return "instructors_divine_bell main 12"; end
       end
       -- use_item,name=shadowed_orb_of_torment,if=(cooldown.ca_inc.ready&!covenant.night_fae&variable.thrill_seeker_wait&(cooldown.berserking.ready|!race.troll)|covenant.night_fae&cooldown.convoke_the_spirits.ready&(variable.convoke_desync|cooldown.ca_inc.ready))&dot.sunfire.ticking&(dot.stellar_flare.ticking|!talent.stellar_flare.enabled|spell_targets.starfire>3)&dot.moonfire.ticking&(variable.is_aoe|runeforge.balance_of_all_things|astral_power>=90|variable.convoke_desync|buff.bloodlust.up)&!equipped.inscrutable_quantum_device|equipped.inscrutable_quantum_device&cooldown.inscrutable_quantum_device.remains>30&!buff.ca_inc.up|fight_remains<40
       if I.ShadowedOrbofTorment:IsEquippedAndReady() and ((CaInc:CooldownUp() and CovenantID ~= 3 and VarThrillSeekerWait and (S.Berserking:CooldownUp() or Player:Race() ~= "Troll") or CovenantID == 3 and S.ConvoketheSpirits:CooldownUp() and (VarConvokeDesync or CaInc:CooldownUp())) and Target:DebuffUp(S.SunfireDebuff) and (Target:DebuffUp(S.StellarFlareDebuff) or (not S.StellarFlare:IsAvailable()) or EnemiesCount8ySplash > 3) and Target:DebuffUp(S.MoonfireDebuff) and (VarIsAoe or BOATEquipped or Player:AstralPowerP() >= 90 or VarConvokeDesync or Player:BloodlustUp()) and (not I.InscrutableQuantumDevice:IsEquipped()) or I.InscrutableQuantumDevice:IsEquipped() and I.InscrutableQuantumDevice:CooldownRemains() > 30 and Player:BuffDown(CaInc) or FightRemains < 40) then
