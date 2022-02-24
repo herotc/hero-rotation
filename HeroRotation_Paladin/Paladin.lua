@@ -123,6 +123,8 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   Zeal                                  = Spell(269569),
   -- Defensive
   ShieldofVengeance                     = Spell(184662),
+  -- Legendary Effects
+  FinalVerdict                          = Spell(336872),
 })
 
 Spell.Paladin.Holy = MergeTableByKey(Spell.Paladin.Commons, {

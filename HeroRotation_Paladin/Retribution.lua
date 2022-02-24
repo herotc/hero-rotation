@@ -63,12 +63,14 @@ local MagistratesJudgmentEquipped = Player:HasLegendaryEquipped(101)
 local VanguardsMomentumEquipped = Player:HasLegendaryEquipped(112)
 local MadParagonEquipped = Player:HasLegendaryEquipped(196)
 local DivineResonanceEquipped = Player:HasLegendaryEquipped(234)
+local VerdictSpell = S.FinalVerdict:IsAvailable() and S.FinalVerdict or S.TemplarsVerdict
 
 HL:RegisterForEvent(function()
   MagistratesJudgmentEquipped = Player:HasLegendaryEquipped(101)
   VanguardsMomentumEquipped = Player:HasLegendaryEquipped(112)
   MadParagonEquipped = Player:HasLegendaryEquipped(196)
   DivineResonanceEquipped = Player:HasLegendaryEquipped(234)
+  VerdictSpell = S.FinalVerdict:IsAvailable() and S.FinalVerdict or S.TemplarsVerdict
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- Player Covenant
@@ -148,8 +150,8 @@ local function Precombat()
     if S.DivineStorm:IsReady() and EnemiesCount8y >= 2 then
       if Cast(S.DivineStorm) then return "divine_storm precombat 8" end
     end
-    if S.TemplarsVerdict:IsReady() and EnemiesCount8y < 2 and Target:IsInMeleeRange(5) then
-      if Cast(S.TemplarsVerdict) then return "templars_verdict precombat 10" end
+    if VerdictSpell:IsReady() and EnemiesCount8y < 2 and Target:IsInMeleeRange(5) then
+      if Cast(VerdictSpell) then return "either verdict precombat 10" end
     end
   end
   if S.BladeofJustice:IsCastable() then
@@ -307,8 +309,8 @@ local function Finishers()
     if Cast(S.DivineStorm, nil, nil, not Target:IsInRange(8)) then return "divine_storm finishers 6" end
   end
   -- templars_verdict,if=(!talent.crusade|cooldown.crusade.remains>gcd*3)&(!talent.execution_sentence|cooldown.execution_sentence.remains>gcd*8|cooldown.execution_sentence.remains>gcd*6&holy_power>=4|target.time_to_die<8|!talent.seraphim&cooldown.execution_sentence.remains>gcd*2)&(!talent.final_reckoning|cooldown.final_reckoning.remains>gcd*8|cooldown.final_reckoning.remains>gcd*6&holy_power>=4|!talent.seraphim&cooldown.final_reckoning.remains>gcd*2)|talent.holy_avenger&cooldown.holy_avenger.remains<gcd*3|buff.holy_avenger.up|buff.crusade.up&buff.crusade.stack<10
-  if S.TemplarsVerdict:IsReady() and (((not S.Crusade:IsAvailable()) or S.Crusade:CooldownRemains() > Player:GCD() * 3) and ((not S.ExecutionSentence:IsAvailable()) or S.ExecutionSentence:CooldownRemains() > Player:GCD() * 8 or S.ExecutionSentence:CooldownRemains() > Player:GCD() * 6 and Player:HolyPower() >= 4 or Target:TimeToDie() < 8 or (not S.Seraphim:IsAvailable()) and S.ExecutionSentence:CooldownRemains() > Player:GCD() * 2) and ((not S.FinalReckoning:IsAvailable()) or S.FinalReckoning:CooldownRemains() > Player:GCD() * 8 or S.FinalReckoning:CooldownRemains() > Player:GCD() * 6 and Player:HolyPower() >= 4 or (not S.Seraphim:IsAvailable()) and S.FinalReckoning:CooldownRemains() > Player:GCD() * 2) or S.HolyAvenger:IsAvailable() and S.HolyAvenger:CooldownRemains() < Player:GCD() * 3 or Player:BuffUp(S.HolyAvenger) or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
-    if Cast(S.TemplarsVerdict, nil, nil, not Target:IsInMeleeRange(5)) then return "templars_verdict finishers 8" end
+  if VerdictSpell:IsReady() and (((not S.Crusade:IsAvailable()) or S.Crusade:CooldownRemains() > Player:GCD() * 3) and ((not S.ExecutionSentence:IsAvailable()) or S.ExecutionSentence:CooldownRemains() > Player:GCD() * 8 or S.ExecutionSentence:CooldownRemains() > Player:GCD() * 6 and Player:HolyPower() >= 4 or Target:TimeToDie() < 8 or (not S.Seraphim:IsAvailable()) and S.ExecutionSentence:CooldownRemains() > Player:GCD() * 2) and ((not S.FinalReckoning:IsAvailable()) or S.FinalReckoning:CooldownRemains() > Player:GCD() * 8 or S.FinalReckoning:CooldownRemains() > Player:GCD() * 6 and Player:HolyPower() >= 4 or (not S.Seraphim:IsAvailable()) and S.FinalReckoning:CooldownRemains() > Player:GCD() * 2) or S.HolyAvenger:IsAvailable() and S.HolyAvenger:CooldownRemains() < Player:GCD() * 3 or Player:BuffUp(S.HolyAvenger) or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
+    if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(5)) then return "either verdict finishers 8" end
   end
 end
 
