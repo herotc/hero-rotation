@@ -98,11 +98,6 @@ local function EvaluateTargetIfFilterMaxHealthPct(TargetUnit)
   return (TargetUnit:HealthPercentage())
 end
 
--- Function to force true return
-local function EvaluateTargetIfAlwaysTrue(TargetUnit)
-  return true
-end
-
 -- if=!dot.serpent_sting.ticking&target.time_to_die>7|buff.vipers_venom.up&buff.vipers_venom.remains<gcd
 local function EvaluateTargetIfSerpentStingST(TargetUnit)
   return (TargetUnit:DebuffDown(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 7 or Player:BuffUp(S.VipersVenomBuff) and Player:BuffRemains(S.VipersVenomBuff) < Player:GCD())
@@ -672,7 +667,7 @@ local function Cleave()
   end
   -- flayed_shot,target_if=max:target.health.pct
   if S.FlayedShot:IsCastable() then
-    if Everyone.CastTargetIf(S.FlayedShot, EnemyList, EvaluateTargetIfFilterMaxHealthPct, EvaluateTargetIfAlwaysTrue, not Target:IsSpellInRange(S.FlayedShot)) then return "flayed_shot cleave 28"; end
+    if Everyone.CastTargetIf(S.FlayedShot, EnemyList, "max", EvaluateTargetIfFilterMaxHealthPct, nil, not Target:IsSpellInRange(S.FlayedShot), nil, Settings.Commons.DisplayStyle.Covenant) then return "flayed_shot cleave 28"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&full_recharge_time<gcd&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
   if S.KillCommand:IsCastable() then
