@@ -363,7 +363,7 @@ local function Generators()
     if Cast(S.HammerofWrath, nil, Settings.Retribution.GCDasOffGCD.HammerOfWrath, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 4"; end
   end
   -- wake_of_ashes,if=holy_power<=2&set_bonus.tier28_4pc&(cooldown.avenging_wrath.remains|cooldown.crusade.remains)
-  if S.WakeofAshes:IsCastable() and (Player:HolyPower() <= 2 and Player:HasTier(28, 4) and (S.AvengingWrath:CooldownDown() or S.Crusade:CooldownDown()) then
+  if S.WakeofAshes:IsCastable() and (Player:HolyPower() <= 2 and Player:HasTier(28, 4) and (S.AvengingWrath:CooldownDown() or S.Crusade:CooldownDown())) then
     if Cast(S.WakeofAshes, nil, nil, not Target:IsInRange(12)) then return "wake_of_ashes generators 5"; end
   end
   -- divine_toll,if=holy_power<=1&!debuff.judgment.up&(!talent.seraphim|buff.seraphim.up)&(!raid_event.adds.exists|raid_event.adds.in>30|raid_event.adds.up)&!talent.final_reckoning&(!talent.execution_sentence|fight_remains<8|spell_targets.divine_storm>=5)&(cooldown.avenging_wrath.remains|cooldown.crusade.remains)
