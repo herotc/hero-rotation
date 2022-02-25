@@ -113,13 +113,15 @@ local PreciseAlignmentTimeTable = { 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 
 local PATime = S.PreciseAlignment:ConduitEnabled() and PreciseAlignmentTimeTable[S.PreciseAlignment:ConduitRank()] or 0
 
 -- Legendaries
-local PAPEquipped = Player:HasLegendaryEquipped(51)
-local BOATEquipped = Player:HasLegendaryEquipped(52)
+local CircleofLifeandDeathEquipped = Player:HasLegendaryEquipped(47)
 local LycaraEquipped = Player:HasLegendaryEquipped(48)
 local OnethsEquipped = Player:HasLegendaryEquipped(50)
+local PAPEquipped = Player:HasLegendaryEquipped(51)
+local BOATEquipped = Player:HasLegendaryEquipped(52)
 local TimewornEquipped = Player:HasLegendaryEquipped(53)
 local SinfulHysteriaEquipped = Player:HasLegendaryEquipped(220)
 local CelestialSpiritsEquipped = Player:HasLegendaryEquipped(226)
+
 
 -- Register
 HL:RegisterForEvent(function()
@@ -132,10 +134,11 @@ HL:RegisterForEvent(function()
   if equip[14] then
     trinket2 = Item(equip[14])
   end
-  PAPEquipped = Player:HasLegendaryEquipped(51)
-  BOATEquipped = Player:HasLegendaryEquipped(52)
+  CircleofLifeandDeathEquipped = Player:HasLegendaryEquipped(47)
   LycaraEquipped = Player:HasLegendaryEquipped(48)
   OnethsEquipped = Player:HasLegendaryEquipped(50)
+  PAPEquipped = Player:HasLegendaryEquipped(51)
+  BOATEquipped = Player:HasLegendaryEquipped(52)
   TimewornEquipped = Player:HasLegendaryEquipped(53)
   SinfulHysteriaEquipped = Player:HasLegendaryEquipped(220)
   CelestialSpiritsEquipped = Player:HasLegendaryEquipped(226)
@@ -434,8 +437,8 @@ local function St()
   if S.StellarFlare:IsCastable() and (AP_Check(S.StellarFlare) and VarDotRequirements) then
     if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareST, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare st 14"; end
   end
-  -- variable,name=no_hysteria_early_dot,value=covenant.venthyr&!runeforge.sinful_hysteria&cooldown.berserking.ready&cooldown.ravenous_frenzy.ready&!buff.ca_inc.up&(astral_power>87|buff.bloodlust.up)
-  VarNoHysteriaEarlyDoT = (CovenantID == 2 and (not SinfulHysteriaEquipped) and S.Berserking:CooldownUp() and S.RavenousFrenzy:CooldownUp() and Player:BuffDown(CaInc) and (Player:AstralPowerP() > 87 or Player:BloodlustUp()))
+  -- variable,name=no_hysteria_early_dot,value=covenant.venthyr&!runeforge.sinful_hysteria&!runeforge.circle_of_life_and_death&cooldown.berserking.ready&cooldown.ravenous_frenzy.ready&!buff.ca_inc.up&(astral_power>87|buff.bloodlust.up)
+  VarNoHysteriaEarlyDoT = (CovenantID == 2 and (not SinfulHysteriaEquipped) and (not CircleofLifeandDeathEquipped) and S.Berserking:CooldownUp() and S.RavenousFrenzy:CooldownUp() and Player:BuffDown(CaInc) and (Player:AstralPowerP() > 87 or Player:BloodlustUp()))
   -- moonfire,if=variable.no_hysteria_early_dot&remains<20
   if S.Moonfire:IsCastable() and (VarNoHysteriaEarlyDoT and Target:DebuffRemains(S.MoonfireDebuff) < 20) then
     if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire st 16"; end
