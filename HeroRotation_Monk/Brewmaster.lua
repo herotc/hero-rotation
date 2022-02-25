@@ -133,8 +133,8 @@ local function Precombat()
   if S.Fleshcraft:IsCastable() then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 2"; end
   end
-  -- chi_burst
-  if S.ChiBurst:IsCastable() then
+  -- chi_burst,if=!covenant.night_fae
+  if S.ChiBurst:IsCastable() and (CovenantID ~= 3) then
     if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst precombat 6"; end
   end
   -- chi_wave
