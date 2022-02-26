@@ -34,6 +34,8 @@ local I = Item.DeathKnight.Commons
 local OnUseExcludes = {
   --  I.TrinketName:ID(),
   I.InscrutableQuantumDevice:ID(),
+  I.OverwhelmingPowerCrystal:ID(),
+  I.TheFirstSigil:ID()
 }
 
 -- Trinket Item Objects
@@ -522,6 +524,14 @@ local function Trinkets()
   if I.InscrutableQuantumDevice:IsEquippedAndReady() and ((S.UnholyBlight:CooldownRemains() > 20 or S.DarkTransformation:CooldownRemains() > 20) and (EnemiesMeleeCount >= 2 or S.ArmyoftheDead:TimeSinceLastCast() <= 30 or VarApocGhoulActive and (S.UnholyAssault:IsAvailable() or Settings.Unholy.DisableAotD) or VarGargoyleActive) or HL.FilteredFightRemains(EnemiesMelee, "<", 21) or Target:TimeToX(20) < 5 and Player:BloodlustDown()) then
     if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device trinkets 2"; end
   end
+  -- use_item,name=the_first_sigil,if=variable.major_cooldowns_active&(time>30|!equipped.inscrutable_quantum_device)
+  if I.TheFirstSigil:IsEquippedAndReady() and (VarMajorCDsActive and (HL.CombatTime() > 30 or not I.InscrutableQuantumDevice:IsEquipped())) then
+    if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil trinkets 4"; end
+  end
+  -- use_item,name=overwhelming_power_crystal,if=variable.major_cooldowns_active&(time>30|!equipped.inscrutable_quantum_device&!equipped.the_first_sigil)
+  if I.OverwhelmingPowerCrystal:IsEquippedAndReady() and (VarMajorCDsActive and (HL.CombatTime() > 30 or (not I.InscrutableQuantumDevice:IsEquipped()) and not I.TheFirstSigil:IsEquipped())) then
+    if Cast(I.OverwhelmingPowerCrystal, nil, Settings.Commons.DisplayStyle.Trinkets) then return "overwhelming_power_crystal trinkets 6"; end
+  end
   -- use_item,slot=trinket1,if=!variable.specified_trinket&((trinket.1.proc.any_dps.duration<=15&cooldown.apocalypse.remains>20|trinket.1.proc.any_dps.duration>15&(cooldown.unholy_blight.remains>20|cooldown.dark_transformation.remains_expected>20)|active_enemies>=2&buff.dark_transformation.up)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1))|trinket.1.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket2,if=!variable.specified_trinket&((trinket.2.proc.any_dps.duration<=15&cooldown.apocalypse.remains>20|trinket.2.proc.any_dps.duration>15&(cooldown.unholy_blight.remains>20|cooldown.dark_transformation.remains_expected>20)|active_enemies>=2&buff.dark_transformation.up)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2))|trinket.2.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket1,if=!trinket.1.has_use_buff&(trinket.2.cooldown.remains|!trinket.2.has_use_buff)
@@ -574,7 +584,7 @@ local function APL()
       if Cast(S.DeathStrike) then return "death_strike low hp or proc"; end
     end
     -- auto_attack
-    -- variable,name=specified_trinket,value=(equipped.inscrutable_quantum_device&cooldown.inscrutable_quantum_device.ready)
+    -- variable,name=specified_trinket,value=(equipped.inscrutable_quantum_device|equipped.the_first_sigil|equipped.overwhelming_power_crystal)&(cooldown.inscrutable_quantum_device.ready|cooldown.the_first_sigil.remains|cooldown.overwhelming_power_crystal.remains)|(equipped.the_first_sigil|equipped.overwhelming_power_crystal)&equipped.inscrutable_quantum_device
     -- TODO: Leaving this commented out until other trinket sync/priority variables can be handled
     --VarSpecifiedTrinket = (I.InscrutableQuantumDevice:IsEquippedAndReady())
     -- variable,name=pooling_runic_power,value=cooldown.summon_gargoyle.remains<5&talent.summon_gargoyle&(talent.unholy_blight&cooldown.unholy_blight.remains<13&cooldown.dark_transformation.remains_expected<13|!talent.unholy_blight)

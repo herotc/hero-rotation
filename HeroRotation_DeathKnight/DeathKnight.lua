@@ -89,7 +89,6 @@ Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
   Marrowrend                            = Spell(195182),
   RuneTap                               = Spell(194679),
   VampiricBlood                         = Spell(55233),
-
   -- Talents
   Blooddrinker                          = Spell(206931),
   BloodTap                              = Spell(221699),
@@ -99,7 +98,6 @@ Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
   RapidDecomposition                    = Spell(194662),
   RelishinBlood                         = Spell(317610),
   Tombstone                             = Spell(219809),
-
   -- Buffs
   BoneShieldBuff                        = Spell(195181),
   CrimsonScourgeBuff                    = Spell(81141),
@@ -120,7 +118,6 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   Obliterate                            = Spell(49020),
   PillarofFrost                         = Spell(51271),
   RemorselessWinter                     = Spell(196770),
-
   -- Talents
   Avalanche                             = Spell(207142),
   BreathofSindragosa                    = Spell(152279),
@@ -135,7 +132,6 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   IcyTalons                             = Spell(194878),
   Obliteration                          = Spell(281238),
   RunicAttenuation                      = Spell(207104),
-
   -- Buffs
   ColdHeartBuff                         = Spell(281209),
   EmpowerRuneWeaponBuff                 = Spell(47568),
@@ -147,7 +143,6 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   PillarofFrostBuff                     = Spell(51271),
   RimeBuff                              = Spell(59052),
   UnleashedFrenzyBuff                   = Spell(338501),
-
   -- Debuffs
   RazoriceDebuff                        = Spell(51714)
 })
@@ -163,7 +158,6 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   Outbreak                              = Spell(77575),
   RaiseDead                             = Spell(46584),
   ScourgeStrike                         = Spell(55090),
-
   -- Talents
   ArmyoftheDamned                       = Spell(276837),
   BurstingSores                         = Spell(207264),
@@ -175,13 +169,11 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   UnholyAssault                         = Spell(207289),
   UnholyBlight                          = Spell(115989),
   UnholyPact                            = Spell(319230),
-
   -- Buffs
   LeadByExampleBuff                     = Spell(342181),
   RunicCorruptionBuff                   = Spell(51460),
   SuddenDoomBuff                        = Spell(81340),
   UnholyAssaultBuff                     = Spell(207289),
-
   -- Debuffs
   FesteringWoundDebuff                  = Spell(194310),
   UnholyBlightDebuff                    = Spell(115994),
@@ -195,5 +187,7 @@ Item.DeathKnight.Commons = {
   PotionofPhantomFire                   = Item(171349),
   PotionofSpectralStrength              = Item(171275),
   -- Trinkets
-  InscrutableQuantumDevice              = Item(179350, {13, 14})
+  InscrutableQuantumDevice              = Item(179350, {13, 14}),
+  OverwhelmingPowerCrystal              = Item(179342, {13, 14}),
+  TheFirstSigil                         = Item(188271, {13, 14})
 }

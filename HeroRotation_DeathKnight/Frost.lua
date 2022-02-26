@@ -33,7 +33,8 @@ local I = Item.DeathKnight.Commons
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.InscrutableQuantumDevice:ID()
+  I.InscrutableQuantumDevice:ID(),
+  I.TheFirstSigil:ID()
 }
 
 -- Trinket Item Objects
@@ -507,6 +508,10 @@ local function Trinkets()
   if I.InscrutableQuantumDevice:IsEquippedAndReady() and (Player:BuffUp(S.PillarofFrostBuff) or Target:TimeToX(20) < 5 or HL.FilteredFightRemains(Enemies10yd, "<", 21)) then
     if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device trinkets 2"; end
   end
+  -- use_item,name=the_first_sigil,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
+  if I.TheFirstSigil:IsEquippedAndReady() and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffUp(S.EmpowerRuneWeaponBuff)) then
+    if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil trinkets 4"; end
+  end
   -- use_item,slot=trinket1,if=!variable.specified_trinket&buff.pillar_of_frost.up&(!talent.icecap|talent.icecap&buff.pillar_of_frost.remains>=10)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket2,if=!variable.specified_trinket&buff.pillar_of_frost.up&(!talent.icecap|talent.icecap&buff.pillar_of_frost.remains>=10)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket1,if=!trinket.1.has_use_buff&(trinket.2.cooldown.remains|!trinket.2.has_use_buff)|cooldown.pillar_of_frost.remains>20
@@ -753,7 +758,7 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
-    -- variable,name=specified_trinket,value=(equipped.inscrutable_quantum_device&cooldown.inscrutable_quantum_device.ready)
+    -- variable,name=specified_trinket,value=(equipped.inscrutable_quantum_device|equipped.the_first_sigil)&(cooldown.inscrutable_quantum_device.ready|cooldown.the_first_sigil.remains)|equipped.the_first_sigil&equipped.inscrutable_quantum_device
     -- TODO: Leaving this commented out until other trinket sync/priority variables can be handled
     --VarSpecifiedTrinket = (I.InscrutableQuantumDevice:IsEquippedAndReady())
     -- variable,name=st_planning,value=active_enemies=1&(raid_event.adds.in>15|!raid_event.adds.exists)
