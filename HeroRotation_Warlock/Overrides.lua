@@ -49,7 +49,7 @@ AffOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     end
     local BaseCheck = AffOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellAffli.SummonPet then
-      return BaseCheck and Player:SoulShardsP() > 0 and not (Pet:IsActive() or Player:BuffUp(SpellAffli.GrimoireofSacrificeBuff))
+      return BaseCheck and Player:SoulShardsP() > 0 and (not Player:IsCasting(self)) and not (Pet:IsActive() or Player:BuffUp(SpellAffli.GrimoireofSacrificeBuff))
     else
       return BaseCheck
     end
@@ -146,7 +146,7 @@ DemoOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     end
     local BaseCheck = DemoOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellDemo.SummonPet then
-      return BaseCheck and not Pet:IsActive() and Player:SoulShardsP() > 0
+      return BaseCheck and (not Pet:IsActive()) and Player:SoulShardsP() > 0 and not Player:IsCasting(self)
     elseif self == SpellDemo.SummonDemonicTyrant then
       return BaseCheck and not Player:IsCasting(self)
     else
@@ -204,7 +204,7 @@ DestroOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     end
     local BaseCheck = DestroOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellDestro.SummonPet then
-      return BaseCheck and Player:SoulShardsP() > 0 and not (Pet:IsActive() or Player:BuffUp(SpellAffli.GrimoireofSacrificeBuff))
+      return BaseCheck and Player:SoulShardsP() > 0 and (not Player:IsCasting(self)) and not (Pet:IsActive() or Player:BuffUp(SpellDestro.GrimoireofSacrificeBuff))
     elseif self == SpellDestro.Immolate or self == SpellDestro.Cataclysm or self == SpellDestro.ChannelDemonfire or self == SpellDestro.DecimatingBolt or self == SpellDestro.SoulRot or self == SpellDestro.ImpendingCatastrophe or self == SpellDestro.ScouringTithe then
       return BaseCheck and not Player:IsCasting(self)
     else

@@ -46,13 +46,14 @@ local TrinketsOnUseExcludes = {--  I.TrinketName:ID(),
 }
 
 -- Enemies
-local Enemies40y, Enemies40yCount, EnemiesCount8ySplash
+local Enemies40y, EnemiesCount40y, EnemiesCount8ySplash
 
 -- Rotation Variables
 local VarPoolSoulShards
 local VarHavocActive
 local VarHavocGUID
 local VarHavocRemains
+local FightRemains
 
 S.SummonInfernal:RegisterInFlight()
 S.ChaosBolt:RegisterInFlight()
@@ -195,8 +196,8 @@ local function CDs()
   if S.Fireblood:IsCastable() and InfernalTime() > 0 then
     if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 14"; end
   end
-  -- use_items,if=pet.infernal.active|target.time_to_die<20
-  if (InfernalTime() > 0 or Target:TimeToDie() < 20) then
+  -- use_items,if=pet.infernal.active|target.time_to_die<21
+  if (InfernalTime() > 0 or Target:TimeToDie() < 21) then
     local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
     if TrinketToUse then
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
@@ -324,14 +325,20 @@ end
 local function APL()
   -- Unit Update
   Enemies40y = Player:GetEnemiesInRange(40)
+  Enemies8ySplash = Player:GetEnemiesInSplashRange(8)
   if AoEON() then
-    Enemies40yCount = #Enemies40y
-    EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
+    EnemiesCount40y = #Enemies40y
+    EnemiesCount8ySplash = #Enemies8ySplash
   else
-    Enemies40yCount = 1
+    EnemiesCount40y = 1
     EnemiesCount8ySplash = 1
   end
+
+  -- Check Havoc Status
   VarHavocActive,VarHavocGUID,VarHavocRemains = UnitWithHavoc(Enemies40y)
+
+  -- Check FightRemains Time
+  FightRemains = HL.FightRemains(Enemies8ySplash, false)
 
   if Everyone.TargetIsValid() then
     if S.SummonPet:IsCastable() then
@@ -342,7 +349,7 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=havoc,if=havoc_active&active_enemies>1&active_enemies<5-talent.inferno.enabled+(talent.inferno.enabled&talent.internal_combustion.enabled)
-    if VarHavocActive and Enemies40yCount > 1 and Enemies40yCount < 5 - num(S.Inferno:IsAvailable()) + num(S.Inferno:IsAvailable() and S.InternalCombustion:IsAvailable()) then
+    if VarHavocActive and EnemiesCount40y > 1 and EnemiesCount40y < 5 - num(S.Inferno:IsAvailable()) + num(S.Inferno:IsAvailable() and S.InternalCombustion:IsAvailable()) then
       local ShouldReturn = Havoc(); if ShouldReturn then return ShouldReturn; end
     end
     -- fleshcraft,if=soulbind.volatile_solvent,cancel_if=buff.volatile_solvent_humanoid.up
@@ -421,8 +428,8 @@ local function APL()
     if S.Conflagrate:IsCastable() and (Player:BuffDown(S.Backdraft) and Player:SoulShardsP() >= 1.5 - 0.3 * num(S.Flashover:IsAvailable()) and (not VarPoolSoulShards)) then
       if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 28"; end
     end
-    -- chaos_bolt,if=pet.infernal.active|buff.rain_of_chaos.up
-    if S.ChaosBolt:IsReady() and Player:SoulShardsP() >= 2 and (InfernalTime() > 0 or Player:BuffUp(S.RainofChaosBuff)) then
+    -- chaos_bolt,if=pet.infernal.active|buff.rain_of_chaos.remains>cast_time
+    if S.ChaosBolt:IsReady() and Player:SoulShardsP() >= 2 and (InfernalTime() > 0 or Player:BuffRemains(S.RainofChaosBuff) > S.ChaosBolt:CastTime()) then
       if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 30"; end
     end
     -- chaos_bolt,if=buff.backdraft.up&!variable.pool_soul_shards
@@ -433,19 +440,25 @@ local function APL()
     if S.ChaosBolt:IsReady() and Player:SoulShardsP() >= 2 and (S.Eradication:IsAvailable() and (not VarPoolSoulShards) and Target:DebuffRemains(S.EradicationDebuff) < S.ChaosBolt:CastTime()) then
       if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 34"; end
     end
-    --shadowburn,if=!variable.pool_soul_shards|soul_shard>=4.5
+    -- shadowburn,if=!variable.pool_soul_shards|soul_shard>=4.5
     if S.Shadowburn:IsCastable() and ((not VarPoolSoulShards) or Player:SoulShardsP() >= 4.5) then
       if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn main 36"; end
     end
-    --chaos_bolt,if=soul_shard>3.5
+    -- chaos_bolt,if=soul_shard>3.5
     if S.ChaosBolt:IsReady() and (Player:SoulShardsP() >= 3.5) then
       if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 38"; end
     end
-    --conflagrate,if=charges>1
-    if S.Conflagrate:IsCastable() and (S.Conflagrate:Charges() > 1) then
+    -- chaos_bolt,if=target.time_to_die<5&target.time_to_die>cast_time+travel_time
+    -- Note: Using FightRemains instead of TimeToDie, as that appears to be the APL intent; Also added time buffer of 0.5s
+    if S.ChaosBolt:IsReady() and (FightRemains < 5.5 and FightRemains > S.ChaosBolt:CastTime() + S.ChaosBolt:TravelTime()) then
+      if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 39"; end
+    end
+    -- conflagrate,if=charges>1|target.time_to_die<gcd
+    -- Note: Using FightRemains instead of TimeToDie, as that appears to be the APL intent; Also added time buffer of 0.5s
+    if S.Conflagrate:IsCastable() and (S.Conflagrate:Charges() > 1 or FightRemains < Player:GCD() + 0.5) then
       if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 40"; end
     end
-    --incinerate
+    -- incinerate
     if S.Incinerate:IsCastable() then
       if Cast(S.Incinerate, nil, nil, not Target:IsSpellInRange(S.Incinerate)) then return "incinerate main 42"; end
     end
