@@ -319,6 +319,7 @@ Item.Mage.Fire = {
   SunbloodAmethyst                 = Item(178826),
   WakenersFrond                    = Item(181457),
   ShadowedOrbofTorment             = Item(186428),
+  TheFirstSigil                    = Item(188271),
   TomeofMonstruousConstructions    = Item(186422),
 }
 

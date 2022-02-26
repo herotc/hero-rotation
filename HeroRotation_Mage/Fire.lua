@@ -48,6 +48,7 @@ local OnUseExcludes = {
   I.SinfulGladiatorsBadge:ID(),
   I.SoulIgniter:ID(),
   I.SunbloodAmethyst:ID(),
+  I.TheFirstSigil:ID(),
   I.WakenersFrond:ID()
 }
 
@@ -481,6 +482,10 @@ local function CombustionCooldowns()
     -- use_item,name=sunblood_amethyst
     if I.SunbloodAmethyst:IsEquippedAndReady() then
       if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sunblood_amethyst combustion_cooldowns 13"; end
+    end
+    -- use_item,name=the_first_sigil
+    if I.TheFirstSigil:IsEquippedAndReady() then
+      if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil combustion_cooldowns 14"; end
     end
   end
 end
