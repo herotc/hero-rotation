@@ -398,7 +398,8 @@ local function APL()
   end
 
   -- Check our IF status
-  Mage.IFTracker()
+  -- Note: Not referenced in the current APL, but saving for potential use later
+  --Mage.IFTracker()
 
   -- How long is left in the fight?
   FightRemains = HL.FightRemains(Enemies16ySplash, false)
