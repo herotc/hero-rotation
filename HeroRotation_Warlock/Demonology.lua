@@ -69,6 +69,7 @@ local FightRemains
 local EnemiesCount8ySplash
 local VarFirstTyrantTime = 0
 local VarUseBoltTimings = false
+local VarInOpener = false
 local VarNextTyrantCD = 0
 local VarBuffSyncCD = 0
 local BalespidersEquipped = Player:HasLegendaryEquipped(173)
@@ -214,6 +215,8 @@ local function Precombat()
     end
     -- variable,name=first_tyrant_time,op=set,value=10
     VarFirstTyrantTime = 10
+    -- variable,name=in_opener,op=set,value=1
+    VarInOpener = true
     -- variable,name=use_bolt_timings,op=set,value=runeforge.balespiders_burning_core&runeforge.shard_of_annihilation
     VarUseBoltTimings = (BalespidersEquipped and ShardofAnnihilationEquipped)
     -- use_item,name=shadowed_orb_of_torment
@@ -501,13 +504,25 @@ local function APL()
     if (S.FieldofBlossoms:SoulbindEnabled() and S.SummonDemonicTyrant:CooldownRemains() < S.SoulRot:CooldownRemains()) then
       VarNextTyrantCD = S.SoulRot:CooldownRemains()
     end
-    -- variable,name=next_tyrant_cd,op=set,value=variable.first_tyrant_time-time,if=time<variable.first_tyrant_time
-    if (HL.CombatTime() < VarFirstTyrantTime) then
-      VarNextTyrantCD = VarFirstTyrantTime - HL.CombatTime()
+    -- variable,name=in_opener,op=set,value=0,if=pet.demonic_tyrant.active
+    if (VarInOpener and DemonicTyrantTime() > 0) then
+      VarInOpener = false
     end
-    -- variable,name=buff_sync_cd,op=set,value=variable.next_tyrant_cd,if=!variable.use_bolt_timings
-    if (not VarUseBoltTimings) then
+    -- variable,name=buff_sync_cd,op=set,value=variable.next_tyrant_cd,if=!variable.use_bolt_timings&!variable.in_opener
+    if ((not VarUseBoltTimings) and not VarInOpener) then
       VarBuffSyncCD = VarNextTyrantCD
+    end
+    -- variable,name=buff_sync_cd,op=set,value=12,if=!variable.use_bolt_timings&variable.in_opener&!pet.dreadstalker.active
+    if ((not VarUseBoltTimings) and VarInOpener and DreadStalkersTime() == 0) then
+      VarBuffSyncCD = 12
+    end
+    -- variable,name=buff_sync_cd,op=set,value=0,if=!variable.use_bolt_timings&variable.in_opener&pet.dreadstalker.active&buff.wild_imps.stack>0&!talent.vilefiend.enabled
+    if ((not VarUseBoltTimings) and VarInOpener and DreadStalkersTime() > 0 and WildImpsCount() > 0 and not S.SummonVilefiend:IsAvailable()) then
+      VarBuffSyncCD = 0
+    end
+    -- variable,name=buff_sync_cd,op=set,value=0,if=!variable.use_bolt_timings&variable.in_opener&pet.dreadstalker.active&prev_gcd.1.hand_of_guldan&talent.vilefiend.enabled
+    if ((not VarUseBoltTimings) and VarInOpener and DreadStalkersTime() > 0 and Player:PrevGCD(1, S.HandofGuldan) and S.SummonVilefiend:IsAvailable()) then
+      VarBuffSyncCD = 0
     end
     -- variable,name=buff_sync_cd,op=set,value=cooldown.decimating_bolt.remains_expected,if=variable.use_bolt_timings
     if (VarUseBoltTimings) then
