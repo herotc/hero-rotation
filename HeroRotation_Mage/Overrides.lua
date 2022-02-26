@@ -115,6 +115,10 @@ HL.AddCoreOverride("Spell.IsCastable",
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellArcane.Frostbolt then
       return BaseCheck and not Player:IsCasting(self)
+    elseif self == SpellArcane.ConjureManaGem then
+      local ManaGem = Item.Mage.Arcane.ManaGem
+      local GemCD = ManaGem:CooldownRemains()
+      return BaseCheck and (not Player:IsCasting(self)) and not (ManaGem:IsReady() or GemCD > 0)
     else
       return BaseCheck
     end

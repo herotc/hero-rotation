@@ -75,7 +75,7 @@ HR.GUISettings.APL.Mage = {
   },
   Arcane = {
     Enabled={
-      UseManaGem = true,
+      ManaGem = true,
     },
     AMSpamRotation = false,
     StayDistance = false,
@@ -95,6 +95,7 @@ HR.GUISettings.APL.Mage = {
     -- {Display OffGCD as OffGCD}
     OffGCDasOffGCD = {
       -- Abilities
+      ManaGem = true,
       PresenceOfMind = true,
     }
   }

@@ -44,7 +44,6 @@ local OnUseExcludes = {
 }
 
 -- Rotation Var
-local ShouldReturn; -- Used to get the return string
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -288,7 +287,10 @@ local function Precombat()
     if Cast(S.ArcaneIntellect) then return "arcane_intellect precombat 2"; end
   end
   --conjure_mana_gem
-  --TODO : manage mana gem
+  -- TODO: Fix hotkey issue (spell and item use the same icon)
+  if S.ConjureManaGem:IsCastable() then
+    if Cast(S.ConjureManaGem) then return "conjure_mana_gem precombat "; end
+  end
   -- Manually added : precast Tome of monstruous Constructions
   if I.TomeofMonstruousConstructions:IsEquippedAndReady() and not Player:AuraInfo(S.TomeofMonstruousConstructionsBuff) then
     if Cast(I.TomeofMonstruousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tome_of_monstruous_constructions precombat 3"; end
@@ -310,25 +312,27 @@ local function Precombat()
   if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
     if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 7"; end
   end
-  --frostbolt,if=!variable.prepull_evo=1&runeforge.disciplinary_command
-  if not var_prepull_evo and S.Frostbolt:IsReady() and DisciplinaryCommandEquipped then
-    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 8"; end
-  end
-  --fireblast,if=!variable.prepull_evo=1&runeforge.disciplinary_command
-  if not var_prepull_evo and S.FireBlast:IsReady() and DisciplinaryCommandEquipped then
-    if Cast(S.FireBlast, nil, nil, not Target:IsSpellInRange(S.FireBlast)) then return "fireblast precombat 9"; end
-  end
-  --arcane_blast,if=!variable.prepull_evo=1&!runeforge.disciplinary_command&(!covenant.venthyr|variable.fishing_opener)
-  if not var_prepull_evo and S.ArcaneBlast:IsReady() and not DisciplinaryCommandEquipped and (CovenantID ~= 2 or var_fishing_opener) then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast precombat 10"; end
-  end
-  --mirrors_of_torment,if=!variable.prepull_evo=1&!runeforge.disciplinary_command&covenant.venthyr&!variable.fishing_opener
-  if S.MirrorsofTorment:IsCastable() and not var_prepull_evo and not DisciplinaryCommandEquipped and CovenantID == 2 and not var_fishing_opener then
-    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment precombat 11"; end
-  end
-  --evocation,if=variable.prepull_evo=1
-  if var_prepull_evo and S.Evocation:IsReady() then
-    if Cast(S.Evocation) then return "evocation precombat 12"; end
+  if (not Player:IsCasting()) then
+    --frostbolt,if=!variable.prepull_evo=1&runeforge.disciplinary_command
+    if not var_prepull_evo and S.Frostbolt:IsReady() and DisciplinaryCommandEquipped then
+      if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 8"; end
+    end
+    --fireblast,if=!variable.prepull_evo=1&runeforge.disciplinary_command
+    if not var_prepull_evo and S.FireBlast:IsReady() and DisciplinaryCommandEquipped then
+      if Cast(S.FireBlast, nil, nil, not Target:IsSpellInRange(S.FireBlast)) then return "fireblast precombat 9"; end
+    end
+    --arcane_blast,if=!variable.prepull_evo=1&!runeforge.disciplinary_command&(!covenant.venthyr|variable.fishing_opener)
+    if not var_prepull_evo and S.ArcaneBlast:IsReady() and not DisciplinaryCommandEquipped and (CovenantID ~= 2 or var_fishing_opener) then
+      if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast precombat 10"; end
+    end
+    --mirrors_of_torment,if=!variable.prepull_evo=1&!runeforge.disciplinary_command&covenant.venthyr&!variable.fishing_opener
+    if S.MirrorsofTorment:IsCastable() and not var_prepull_evo and not DisciplinaryCommandEquipped and CovenantID == 2 and not var_fishing_opener then
+      if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment precombat 11"; end
+    end
+    --evocation,if=variable.prepull_evo=1
+    if var_prepull_evo and S.Evocation:IsReady() then
+      if Cast(S.Evocation) then return "evocation precombat 12"; end
+    end
   end
 end
 
@@ -1322,18 +1326,22 @@ local function APL()
   -- Disciplinary Command Check
   Mage.DCCheck()
 
-  -- call precombat
-  if not Player:AffectingCombat() and not Player:IsCasting() and Everyone.TargetIsValid() then
-    ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
-  end
   if Everyone.TargetIsValid() then
+    -- call precombat
+    if not Player:AffectingCombat() then
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- opener
     if not var_init then
       ArcaneOpener:StartOpener()
     end
     --counterspell
-    --ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
+    --local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
     --use_mana_gem,if=(talent.enlightened&mana.pct<=80&mana.pct>=65)|(!talent.enlightened&mana.pct<=85)
-    --TODO : manage mana_gem
+    -- TODO: Fix hotkey issue, as item and spell use the same icon
+    if I.ManaGem:IsReady() and Settings.Arcane.Enabled.ManaGem and ((S.Enlightened:IsAvailable() and Player:ManaPercentage() <= 80 and Player:ManaPercentage() >= 65) or ((not S.Enlightened:IsAvailable()) and Player:ManaPercentage() <= 85)) then
+      if Cast(I.ManaGem, Settings.Arcane.OffGCDasOffGCD.ManaGem) then return "mana_gem main 1"; end
+    end
     --potion,if=buff.arcane_power.up
     if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and Player:BuffUp(S.ArcanePower) then
       if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 3"; end
@@ -1395,7 +1403,7 @@ local function APL()
         if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel Shared_cd 14"; end
       end
       --use_item,name=soul_igniter,if=cooldown.arcane_power.remains>=30|!variable.ap_on_use=1
-      if I.SoulIgniter:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 30 or not var_ap_on_use) and not Player:BuffUp(S.SoulIgniterBuff) then
+      if I.SoulIgniter:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 30 or not var_ap_on_use) and not Player:BuffUp(S.SoulIgnitionBuff) then
         if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soul_igniter Shared_cd 15"; end
       end
       --use_item,name=glyph_of_assimilation,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use=1|(time=0&variable.fishing_opener=1&runeforge.siphon_storm)
@@ -1422,36 +1430,34 @@ local function APL()
     --newfound_resolve,use_while_casting=1,if=buff.arcane_power.up|debuff.touch_of_the_magi.up|dot.radiant_spark.ticking
     -- Not really an action to do
     --call_action_list,name=calculations
-    if (true) then
-      ShouldReturn = Calculations(); if ShouldReturn then return ShouldReturn; end
-    end
+    local ShouldReturn = Calculations(); if ShouldReturn then return ShouldReturn; end
     --call_action_list,name=aoe,if=active_enemies>=variable.aoe_target_count
     if AoEON() and EnemiesCount8ySplash >= var_aoe_target_count then
-      ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
+      local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=harmony,if=covenant.kyrian&runeforge.arcane_infinity
     if CovenantID == 1 and ArcaneInfinityEquipped then
-      ShouldReturn = Harmony(); if ShouldReturn then return ShouldReturn; end
+      local ShouldReturn = Harmony(); if ShouldReturn then return ShouldReturn; end
     else
       --call_action_list,name=fishing_opener,if=variable.have_opened=0&variable.fishing_opener&!(covenant.kyrian&runeforge.arcane_infinity)
-      if not ArcaneOpener:HasOpened() and var_fishing_opener then
-        ShouldReturn = FishingOpener(); if ShouldReturn then return ShouldReturn; end
+      if (not ArcaneOpener:HasOpened()) and var_fishing_opener then
+        local ShouldReturn = FishingOpener(); if ShouldReturn then return ShouldReturn; end
       end
       --call_action_list,name=opener,if=variable.have_opened=0&!(covenant.kyrian&runeforge.arcane_infinity)
-      if not ArcaneOpener:HasOpened() and CDsON() then
-        ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
+      if (not ArcaneOpener:HasOpened()) and CDsON() then
+        local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
       end
       --call_action_list,name=cooldowns,if=!(covenant.kyrian&runeforge.arcane_infinity)
       if CDsON() then
-        ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
+        local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
       end
       --call_action_list,name=rotation,if=variable.final_burn=0&!(covenant.kyrian&runeforge.arcane_infinity)
       if not ArcaneOpener:IsFinalBurn() then
-        ShouldReturn = Rotation(); if ShouldReturn then return ShouldReturn; end
+        local ShouldReturn = Rotation(); if ShouldReturn then return ShouldReturn; end
       end
       --call_action_list,name=final_burn,if=variable.final_burn=1&!(covenant.kyrian&runeforge.arcane_infinity)
       if ArcaneOpener:IsFinalBurn() then
-        ShouldReturn = Final_burn(); if ShouldReturn then return ShouldReturn; end
+        local ShouldReturn = Final_burn(); if ShouldReturn then return ShouldReturn; end
       end
     end
   end
