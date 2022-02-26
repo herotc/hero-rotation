@@ -29,7 +29,7 @@ local GetInventoryItemLink = GetInventoryItemLink
 
 -- Define S/I for spell and item arrays
 local S = Spell.DeathKnight.Frost
-local I = Item.DeathKnight.Commons
+local I = Item.DeathKnight.Frost
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {

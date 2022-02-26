@@ -25,7 +25,7 @@ local CDsON      = HR.CDsON
 
 -- Define S/I for spell and item arrays
 local S = Spell.DeathKnight.Blood
-local I = Item.DeathKnight.Commons
+local I = Item.DeathKnight.Blood
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {

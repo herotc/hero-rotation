@@ -191,3 +191,12 @@ Item.DeathKnight.Commons = {
   OverwhelmingPowerCrystal              = Item(179342, {13, 14}),
   TheFirstSigil                         = Item(188271, {13, 14})
 }
+
+Item.DeathKnight.Blood = MergeTableByKey(Item.DeathKnight.Commons, {
+})
+
+Item.DeathKnight.Frost = MergeTableByKey(Item.DeathKnight.Commons, {
+})
+
+Item.DeathKnight.Unholy = MergeTableByKey(Item.DeathKnight.Commons, {
+})
