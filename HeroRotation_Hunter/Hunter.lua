@@ -14,6 +14,7 @@ local Pet        = Unit.Pet
 local Spell      = HL.Spell
 local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
+local MergeTableByKey = HL.Utils.MergeTableByKey
 -- HeroRotation
 local HR         = HeroRotation
 
@@ -21,77 +22,7 @@ local HR         = HeroRotation
 
 -- Spells
 if not Spell.Hunter then Spell.Hunter = {} end
-Spell.Hunter.BeastMastery = {
-  -- Player Abilities
-  AMurderofCrows                        = Spell(131894),
-  AnimalCompanion                       = Spell(267116),
-  ArcaneShot                            = Spell(185358),
-  AspectoftheWild                       = Spell(193530),
-  BarbedShot                            = Spell(217200),
-  Barrage                               = Spell(120360),
-  BestialWrath                          = Spell(19574),
-  ChimaeraShot                          = Spell(53209),
-  CobraShot                             = Spell(193455),
-  CounterShot                           = Spell(147362),
-  DireBeast                             = Spell(120679),
-  Exhilaration                          = Spell(109304),
-  Flare                                 = Spell(1543),
-  HuntersMark                           = Spell(257284),
-  Intimidation                          = Spell(19577),
-  KillCommand                           = Spell(34026),
-  KillerInstinct                        = Spell(273887),
-  KillShot                              = Spell(53351),
-  MultiShot                             = Spell(2643),
-  Stampede                              = Spell(201430),
-  TarTrap                               = Spell(187698),
-  -- Pet Utility Abilities
-  MendPet                               = Spell(136),
-  RevivePet                             = Spell(982),
-  SummonPet                             = Spell(883),
-  SummonPet2                            = Spell(83242),
-  SummonPet3                            = Spell(83243),
-  SummonPet4                            = Spell(83244),
-  SummonPet5                            = Spell(83245),
-  -- Pet Abilities
-  Bite                                 = Spell(17253, "pet"),
-  BloodBolt                            = Spell(288962, "pet"),
-  Claw                                 = Spell(16827, "pet"),
-  Growl                                = Spell(2649, "pet"),
-  Smack                                = Spell(49966, "pet"),
-  -- Talents
-  Bloodshed                             = Spell(321530),
-  OneWithThePack                        = Spell(199528),
-  ScentOfBlood                          = Spell(193532),
-  SpittingCobra                         = Spell(257891),
-  Stomp                                 = Spell(199530),
-  -- Covenants
-  DeathChakram                          = Spell(325028),
-  FlayedShot                            = Spell(324149),
-  Fleshcraft                            = Spell(324631),
-  ResonatingArrow                       = Spell(308491),
-  WildSpirits                           = Spell(328231),
-  WildSpiritsBuff                       = Spell(328275),
-  -- Soulbinds
-  PustuleEruption                       = Spell(351094),
-  VolatileSolvent                       = Spell(323074),
-  -- Legendaries (Shadowlands)
-  NessingwarysTrappingApparatusBuff      = Spell(336744),
-  SoulforgeEmbersDebuff                 = Spell(336746),
-  WailingArrow                          = Spell(355589),
-  -- Conduits (Shadowlands)
-  Bloodletting                          = Spell(341440),
-  NewfoundResolve                       = Spell(351149),
-  -- Buffs
-  AspectoftheWildBuff                   = Spell(193530),
-  BeastCleavePetBuff                    = Spell(118455, "pet"),
-  BeastCleaveBuff                       = Spell(268877),
-  BerserkingBuff                        = Spell(26297),
-  BestialWrathBuff                      = Spell(19574),
-  BestialWrathPetBuff                   = Spell(186254, "pet"),
-  BloodFuryBuff                         = Spell(20572),
-  FlayersMarkBuff                       = Spell(324156),
-  FrenzyPetBuff                         = Spell(272790, "pet"),
-  -- Debuffs
+Spell.Hunter.Commons = {
   -- Racials
   AncestralCall                         = Spell(274738),
   ArcanePulse                           = Spell(260364),
@@ -101,85 +32,15 @@ Spell.Hunter.BeastMastery = {
   BloodFury                             = Spell(20572),
   Fireblood                             = Spell(265221),
   LightsJudgment                        = Spell(255647),
-  -- Misc
-  PoolFocus                             = Spell(999910),
-}
-
-Spell.Hunter.Marksmanship = {
-  SummonPet                             = Spell(883),
-  HuntersMark                           = Spell(257284),
-  Trueshot                              = Spell(288613),
-  AimedShot                             = Spell(19434),
-  RapidFire                             = Spell(257044),
-  CarefulAim                            = Spell(260228),
-  ExplosiveShot                         = Spell(212431),
-  Barrage                               = Spell(120360),
-  AMurderofCrows                        = Spell(131894),
-  SerpentSting                          = Spell(271788),
+  -- Abilities
   ArcaneShot                            = Spell(185358),
-  TarTrap                               = Spell(187698),
-  SteadyShot                            = Spell(56641),
-  Flare                                 = Spell(1543),
-  KillShot                              = Spell(53351),
-  Multishot                             = Spell(257620),
+  AspectoftheWild                       = Spell(193530),
   CounterShot                           = Spell(147362),
   Exhilaration                          = Spell(109304),
-  -- Covenants
-  WildSpirits                           = Spell(328231),
-  DeathChakram                          = Spell(325028),
-  ResonatingArrow                       = Spell(308491),
-  FlayedShot                            = Spell(324149),
-  Fleshcraft                            = Spell(324631),
-  -- Soulbinds
-  EffusiveAnimaAccelerator              = Spell(352188),
-  PustuleEruption                       = Spell(351094),
-  VolatileSolvent                       = Spell(323074),
-  -- Racials
-  Berserking                            = Spell(26297),
-  BloodFury                             = Spell(20572),
-  AncestralCall                         = Spell(274738),
-  Fireblood                             = Spell(265221),
-  LightsJudgment                        = Spell(255647),
-  BagofTricks                           = Spell(312411),
-  PiercingShot                          = Spell(198670),
-  -- Talents
-  CallingtheShots                       = Spell(260404),
-  DoubleTap                             = Spell(260402),
-  MasterMarksman                        = Spell(260309),
-  SteadyFocus                           = Spell(193533),
-  Volley                                = Spell(260243),
-  ChimaeraShot                          = Spell(342049),
-  DeadEye                               = Spell(321460),
-  Streamline                            = Spell(260367),
-  -- Buffs
-  VolleyBuff                            = Spell(260243),
-  MasterMarksmanBuff                    = Spell(269576),
-  PreciseShotsBuff                      = Spell(260242),
-  SteadyFocusBuff                       = Spell(193534),
-  DeadEyeBuff                           = Spell(321461),
-  TrickShotsBuff                        = Spell(257622),
-  LockandLoadBuff                       = Spell(194594),
-  -- Debuffs
-  SerpentStingDebuff                    = Spell(271788),
-  HuntersMarkDebuff                     = Spell(257284),
-  ResonatingArrowDebuff                 = Spell(308498),
-  WildMarkDebuff                        = Spell(328275),
-  -- Legendaries
-  EagletalonsTrueFocusBuff              = Spell(336851),
-  WailingArrow                          = Spell(355589),
-  -- Misc
-  PoolFocus                             = Spell(999910),
-}
-
-Spell.Hunter.Survival = {
-  -- Racials
-  AncestralCall                         = Spell(274738),
-  ArcaneTorrent                         = Spell(50613),
-  BagofTricks                           = Spell(312411),
-  Berserking                            = Spell(26297),
-  BloodFury                             = Spell(20572),
-  Fireblood                             = Spell(265221),
-  LightsJudgment                        = Spell(255647),
+  Flare                                 = Spell(1543),
+  HuntersMark                           = Spell(257284),
+  Intimidation                          = Spell(19577),
+  TarTrap                               = Spell(187698),
   -- Pet Utility Abilities
   MendPet                               = Spell(136),
   RevivePet                             = Spell(982),
@@ -188,26 +49,122 @@ Spell.Hunter.Survival = {
   SummonPet3                            = Spell(83243),
   SummonPet4                            = Spell(83244),
   SummonPet5                            = Spell(83245),
+  -- Talents
+  AMurderofCrows                        = Spell(131894),
+  Barrage                               = Spell(120360),
+  -- Buffs
+  AspectoftheWildBuff                   = Spell(193530),
+  -- Debuffs
+  HuntersMarkDebuff                     = Spell(257284),
+  TarTrapDebuff                         = Spell(135299),
+  -- Covenant Abilities
+  DeathChakram                          = Spell(325028),
+  FlayedShot                            = Spell(324149),
+  FlayersMarkBuff                       = Spell(324156),
+  Fleshcraft                            = Spell(324631),
+  ResonatingArrow                       = Spell(308491),
+  ResonatingArrowDebuff                 = Spell(308498),
+  WildSpirits                           = Spell(328231),
+  WildSpiritsBuff                       = Spell(328275),
+  WildMarkDebuff                        = Spell(328275),
+  -- Soulbinds
+  EffusiveAnimaAccelerator              = Spell(352188),
+  PustuleEruption                       = Spell(351094),
+  VolatileSolvent                       = Spell(323074),
+  -- Conduits
+  Bloodletting                          = Spell(341440),
+  NewfoundResolve                       = Spell(351149),
+  --Legendary Effects
+  NessingwarysTrappingBuff              = Spell(336744),
+  SoulforgeEmbersDebuff                 = Spell(336746),
+  WailingArrow                          = Spell(355589),
+  -- Misc
+  PoolFocus                             = Spell(999910),
+}
+
+Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
+  -- Abilities
+  AnimalCompanion                       = Spell(267116),
+  BarbedShot                            = Spell(217200),
+  BestialWrath                          = Spell(19574),
+  CobraShot                             = Spell(193455),
+  DireBeast                             = Spell(120679),
+  KillCommand                           = Spell(34026),
+  KillerInstinct                        = Spell(273887),
+  KillShot                              = Spell(53351),
+  MultiShot                             = Spell(2643),
+  Stampede                              = Spell(201430),
+  -- Pet Abilities
+  Bite                                 = Spell(17253, "pet"),
+  BloodBolt                            = Spell(288962, "pet"),
+  Claw                                 = Spell(16827, "pet"),
+  Growl                                = Spell(2649, "pet"),
+  Smack                                = Spell(49966, "pet"),
+  -- Talents
+  Bloodshed                             = Spell(321530),
+  ChimaeraShot                          = Spell(53209),
+  OneWithThePack                        = Spell(199528),
+  ScentOfBlood                          = Spell(193532),
+  SpittingCobra                         = Spell(257891),
+  Stomp                                 = Spell(199530),
+  -- Buffs
+  BeastCleavePetBuff                    = Spell(118455, "pet"),
+  BeastCleaveBuff                       = Spell(268877),
+  BerserkingBuff                        = Spell(26297),
+  BestialWrathBuff                      = Spell(19574),
+  BestialWrathPetBuff                   = Spell(186254, "pet"),
+  BloodFuryBuff                         = Spell(20572),
+  FrenzyPetBuff                         = Spell(272790, "pet"),
+})
+
+Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
+  -- Abilities
+  AimedShot                             = Spell(19434),
+  KillShot                              = Spell(53351),
+  Multishot                             = Spell(257620),
+  RapidFire                             = Spell(257044),
+  SerpentSting                          = Spell(271788),
+  SteadyShot                            = Spell(56641),
+  Trueshot                              = Spell(288613),
+  -- Talents
+  CallingtheShots                       = Spell(260404),
+  CarefulAim                            = Spell(260228),
+  ChimaeraShot                          = Spell(342049),
+  DeadEye                               = Spell(321460),
+  DoubleTap                             = Spell(260402),
+  ExplosiveShot                         = Spell(212431),
+  MasterMarksman                        = Spell(260309),
+  SteadyFocus                           = Spell(193533),
+  Streamline                            = Spell(260367),
+  Volley                                = Spell(260243),
+  -- Buffs
+  DeadEyeBuff                           = Spell(321461),
+  LockandLoadBuff                       = Spell(194594),
+  MasterMarksmanBuff                    = Spell(269576),
+  PreciseShotsBuff                      = Spell(260242),
+  SteadyFocusBuff                       = Spell(193534),
+  TrickShotsBuff                        = Spell(257622),
+  VolleyBuff                            = Spell(260243),
+  -- Debuffs
+  SerpentStingDebuff                    = Spell(271788),
+  -- Legendaries
+  EagletalonsTrueFocusBuff              = Spell(336851),
+})
+
+Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   -- Abilities
   AspectoftheEagle                      = Spell(186289),
   Carve                                 = Spell(187708),
   CoordinatedAssault                    = Spell(266779),
-  Exhilaration                          = Spell(109304),
-  Flare                                 = Spell(1543),
   Harpoon                               = Spell(190925),
-  Intimidation                          = Spell(19577),
   KillCommand                           = Spell(259489),
   KillShot                              = Spell(320976),
-  LatentPoison                          = Spell(273283),
   Muzzle                                = Spell(187707),
   RaptorStrike                          = MultiSpell(186270,265189),
   SerpentSting                          = Spell(259491),
   -- Traps
   FreezingTrap                          = Spell(187650),
   SteelTrap                             = Spell(162488),
-  SteelTrapDebuff                       = Spell(162487),
-  TarTrap                               = Spell(187698),
-  TarTrapDebuff                         = Spell(135299),
   -- Bombs
   PheromoneBomb                         = Spell(270323),
   PheromoneBombDebuff                   = Spell(270332),
@@ -219,7 +176,6 @@ Spell.Hunter.Survival = {
   WildfireBombDebuff                    = Spell(269747),
   -- Talents
   AlphaPredator                         = Spell(269737),
-  AMurderofCrows                        = Spell(131894),
   BirdsofPrey                           = Spell(260331),
   BloodseekerDebuff                     = Spell(259277),
   Butchery                              = Spell(212436),
@@ -234,48 +190,30 @@ Spell.Hunter.Survival = {
   WildfireInfusion                      = Spell(271014),
   -- Buffs/Debuffs
   CoordinatedAssaultBuff                = Spell(266779),
-  FlayersMarkBuff                       = Spell(324156),
   InternalBleedingDebuff                = Spell(270343),
-  LatentPoisonDebuff                    = Spell(273286),
+  LatentPoisonDebuff                    = Spell(336903),
   MadBombardierBuff                     = Spell(363805),
   SerpentStingDebuff                    = Spell(259491),
+  SteelTrapDebuff                       = Spell(162487),
   VipersVenomBuff                       = Spell(268552),
-  -- Covenants
-  DeathChakram                          = Spell(325028),
-  FlayedShot                            = Spell(324149),
-  Fleshcraft                            = Spell(324631),
-  ResonatingArrow                       = Spell(308491),
-  WildSpirits                           = Spell(328231),
-  WildSpiritsDebuff                     = Spell(328275),
-  -- Soulbinds/Conduits
-  PustuleEruption                       = Spell(351094),
-  VolatileSolvent                       = Spell(323074),
-  --legendary_debuffs
-  NessingwarysTrappingBuff              = Spell(336744),
-  SoulforgeEmbersDebuff                 = Spell(336746),
-  -- Other
-  PoolFocus                             = Spell(999910)
-}
+})
 
 -- Items
 if not Item.Hunter then Item.Hunter = {} end
-Item.Hunter.BeastMastery = {
-  -- Potion
-  PotionOfSpectralAgility = Item(171270)
-  -- Trinkets
-}
-
-Item.Hunter.Marksmanship = {
-  -- Potion
-  PotionOfSpectralAgility = Item(171270)
-  -- Trinkets
-}
-
-Item.Hunter.Survival = {
-  -- Potion
+Item.Hunter.Commons = {
+  -- Potions
   PotionOfSpectralAgility = Item(171270),
   -- Trinkets
   DreadfireVessel         = Item(184030, {13, 14}),
-  -- Other Items
+  -- Other On-Use Items
   Jotungeirr              = Item(186404)
 }
+
+Item.Hunter.BeastMastery = MergeTableByKey(Item.Hunter.Commons, {
+})
+
+Item.Hunter.Marksmanship = MergeTableByKey(Item.Hunter.Commons, {
+})
+
+Item.Hunter.Survival = MergeTableByKey(Item.Hunter.Commons, {
+})

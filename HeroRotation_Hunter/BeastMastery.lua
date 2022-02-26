@@ -396,7 +396,7 @@ local function ST()
     if Cast(S.DireBeast, nil, nil, not TargetInRange40y) then return "dire_beast st 38"; end
   end
   -- cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd)|(buff.bestial_wrath.up|buff.nessingwarys_trapping_apparatus.up)&!runeforge.qapla_eredun_war_order|target.time_to_die<3
-  if S.CobraShot:IsReady() and (((Player:Focus() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemains() - 1) > S.KillCommand:Cost())or (S.KillCommand:CooldownRemains() > 1 + GCDMax)) or ((Player:BuffUp(S.BestialWrathBuff) or Player:BuffUp(S.NessingwarysTrappingApparatusBuff)) and not QaplaEredunWarOrderEquipped) or Target:TimeToDie() < 3) then
+  if S.CobraShot:IsReady() and (((Player:Focus() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemains() - 1) > S.KillCommand:Cost())or (S.KillCommand:CooldownRemains() > 1 + GCDMax)) or ((Player:BuffUp(S.BestialWrathBuff) or Player:BuffUp(S.NessingwarysTrappingBuff)) and not QaplaEredunWarOrderEquipped) or Target:TimeToDie() < 3) then
     if Cast(S.CobraShot, nil, nil, not TargetInRange40y) then return "cobra_shot st 40"; end
   end
   -- barbed_shot,if=buff.wild_spirits.up|charges_fractional>1.2&conduit.bloodletting
