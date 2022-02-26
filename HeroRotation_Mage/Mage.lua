@@ -14,6 +14,7 @@ local Pet        = Unit.Pet
 local Spell      = HL.Spell
 local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
+local MergeTableByKey = HL.Utils.MergeTableByKey
 -- HeroRotation
 local HR         = HeroRotation
 -- lua
@@ -28,8 +29,7 @@ local Mage = HR.Commons.Mage
 
 -- Spells
 if not Spell.Mage then Spell.Mage = {} end
--- TODO: Merge using MergeTableByKey
-Spell.Mage.Arcane = {
+Spell.Mage.Commons = {
   -- Racials
   AncestralCall                         = Spell(274738),
   BagofTricks                           = Spell(312411),
@@ -40,130 +40,26 @@ Spell.Mage.Arcane = {
   Fireblood                             = Spell(265221),
   LightsJudgment                        = Spell(255647),
   -- Abilities
-  ArcaneBarrage                         = Spell(44425), --Splash, 10
-  ArcaneBlast                           = Spell(30451),
-  ArcaneMissiles                        = Spell(5143),
+  AlterTime                             = Spell(108978),
   ArcaneExplosion                       = Spell(1449), --Melee, 10
   ArcaneIntellect                       = Spell(1459),
-  ArcanePower                           = Spell(12042),
-  Blink                                 = MultiSpell(1953, 212653),
-  ClearcastingBuff                      = Spell(263725),
-  Counterspell                          = Spell(2139),
-  Evocation                             = Spell(12051),
-  FireBlast                             = Spell(319836),
-  MirrorImage                           = Spell(55342),
-  PresenceofMind                        = Spell(205025),
-  TouchoftheMagi                        = Spell(321507), --Splash, 8
-  Frostbolt                             = Spell(116),
-  ConjureManaHem                        = Spell(759),
-  FrostNova                             = Spell(122),
-  TimeWarp                              = Spell(80353),
-  AlterTime                             = Spell(108978),
-  SpellSteal                            = Spell(30449),
-  RemoveCurse                           = Spell(475),
-  Invisibility                          = Spell(66),
-  SlowFall                              = Spell(130),
-  IceBlock                              = Spell(45438),
-  PrismaticBarrier                      = Spell(235450),
-  GreaterInvisibility                   = Spell(110959),
-  -- Talents
-  Amplification                         = Spell(236628),
-  RuleofThrees                          = Spell(264354),
-  RuleofThreesBuff                      = Spell(264774),
-  ArcaneFamiliar                        = Spell(205022),
-  ArcaneFamiliarBuff                    = Spell(210126),
-  Slipstream                            = Spell(236457),
-  RuneofPower                           = Spell(116011),
-  RuneofPowerBuff                       = Spell(116014),
-  Resonance                             = Spell(205028),
-  ArcaneEcho                            = Spell(342231), --Splash, 8
-  NetherTempest                         = Spell(114923), --Splash, 10
-  ArcaneOrb                             = Spell(153626), --Splash, 16
-  Supernova                             = Spell(157980), --Splash, 8
-  Overpowered                           = Spell(155147),
-  Enlightened                           = Spell(321387),
-  FocusMagic                            = Spell(321358),
-  RingOfFrost                           = Spell(113724),
-  -- Covenant Abilities
-  RadiantSpark                          = Spell(307443),
-  RadiantSparkVulnerability             = Spell(307454),
-  MirrorsofTorment                      = Spell(314793),
-  Deathborne                            = Spell(324220),
-  Fleshcraft                            = Spell(324631),
-  ShiftingPower                         = Spell(314791),
-  FieldOfBlossoms                       = Spell(319191),
-  -- Soulbind
-  EffusiveAnimaAccelerator              = Spell(352188),
-  -- Conduit
-  ArcaneProdigy                         = Spell(336873),
-  VolatileSolvent                       = Spell(323074),
-  PustuleEruption                       = Spell(351094),
-  -- Legendaries (Shadowlands)
-  ExpandedPotentialBuff                 = Spell(327495),
-  SiphonStormBuff                       = Spell(332928),
-  DisciplinaryCommandBuff               = Spell(327371),
-  ArcaneHarmonyBuff                     = Spell(332777),
-  -- Trinket
-  SoulIgniterBuff                       = Spell(345211),
-  TomeofMonstruousConstructionsBuff     = Spell(357163),
-}
-
-Spell.Mage.Fire = {
-  -- Racials
-  AncestralCall                         = Spell(274738),
-  BagofTricks                           = Spell(312411),
-  Berserking                            = Spell(26297),
-  BerserkingBuff                        = Spell(26297),
-  BloodFury                             = Spell(20572),
-  BloodFuryBuff                         = Spell(20572),
-  Fireblood                             = Spell(265221),
-  LightsJudgment                        = Spell(255647),
-  -- Abilities
-  ArcaneIntellect                       = Spell(1459),
   ArcaneIntellectBuff                   = Spell(1459),
-  ArcaneExplosion                       = Spell(1449),
   Blink                                 = MultiSpell(1953, 212653),
-  Frostbolt                             = Spell(116),
-  TimeWarp                              = Spell(80353),
-  MirrorImage                           = Spell(55342),
-  Pyroblast                             = Spell(11366),
-  Combustion                            = Spell(190319),
-  CombustionBuff                        = Spell(190319),
-  FireBlast                             = Spell(108853),
-  Fireball                              = Spell(133),
-  Scorch                                = Spell(2948),
-  HeatingUpBuff                         = Spell(48107),
-  HotStreakBuff                         = Spell(48108),
-  PhoenixFlames                         = Spell(257541),
-  DragonsBreath                         = Spell(31661),
-  Flamestrike                           = Spell(2120),
   Counterspell                          = Spell(2139),
+  Frostbolt                             = Spell(116),
   FrostNova                             = Spell(122),
-  Ignite                                = Spell(12654),
-  AlterTime                             = Spell(108978),
-  SpellSteal                            = Spell(30449),
-  RemoveCurse                           = Spell(475),
-  Invisibility                          = Spell(66),
-  SlowFall                              = Spell(130),
   IceBlock                              = Spell(45438),
-  BlazingBarrier                        = Spell(235313),
+  Invisibility                          = Spell(66),
+  MirrorImage                           = Spell(55342),
+  RemoveCurse                           = Spell(475),
+  SlowFall                              = Spell(130),
+  SpellSteal                            = Spell(30449),
+  TimeWarp                              = Spell(80353),
   -- Talents
-  Firestarter                           = Spell(205026),
-  SearingTouch                          = Spell(269644),
-  RuneofPower                           = Spell(116011),
-  RuneofPowerBuff                       = Spell(116014),
-  FlameOn                               = Spell(205029),
-  AlexstraszasFury                      = Spell(235870),
-  FromTheAshes                          = Spell(342344),
-  FlamePatch                            = Spell(205037),
-  LivingBomb                            = Spell(44457),
-  Kindling                              = Spell(155148),
-  Pyroclasm                             = Spell(269650),
-  PyroclasmBuff                         = Spell(269651),
-  Meteor                                = Spell(153561),
   FocusMagic                            = Spell(321358),
   RingOfFrost                           = Spell(113724),
-  BlastWave                             = Spell(157981),
+  RuneofPower                           = Spell(116011),
+  RuneofPowerBuff                       = Spell(116014),
   -- Covenant Abilities
   Deathborne                            = Spell(324220),
   DeathborneBuff                        = Spell(324220),
@@ -172,117 +68,140 @@ Spell.Mage.Fire = {
   MirrorsofTorment                      = Spell(314793),
   RadiantSpark                          = Spell(307443),
   RadiantSparkDebuff                    = Spell(307443),
-  RaidantSparkVulnerability             = Spell(307454),
+  RadiantSparkVulnerability             = Spell(307454),
   ShiftingPower                         = Spell(314791), --Melee 15
   Soulshape                             = Spell(310143),
-  WastelandPropriety                    = Spell(333251),
-  SiphonedMalice                        = Spell(337090),
-  GroveInvigoration                     = Spell(322721),
+  -- Soulbind
+  CombatMeditation                      = Spell(328266),
+  EffusiveAnimaAccelerator              = Spell(352188),
   FieldOfBlossoms                       = Spell(319191),
+  GroveInvigoration                     = Spell(322721),
+  WastelandPropriety                    = Spell(333251),
+  -- Conduit
+  ArcaneProdigy                         = Spell(336873),
   IreOfTheAscended                      = Spell(337058),
+  PustuleEruption                       = Spell(351094),
+  SiphonedMalice                        = Spell(337090),
+  VolatileSolvent                       = Spell(323074),
+  -- Legendary Effects
+  DisciplinaryCommandBuff               = Spell(327371),
+  ExpandedPotentialBuff                 = Spell(327495),
+  -- Trinket Effects
+  SoulIgnitionBuff                      = Spell(345211),
+  TomeofMonstruousConstructionsBuff     = Spell(357163),
+}
+
+Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
+  -- Abilities
+  ArcaneBarrage                         = Spell(44425), --Splash, 10
+  ArcaneBlast                           = Spell(30451),
+  ArcaneMissiles                        = Spell(5143),
+  ArcanePower                           = Spell(12042),
+  ClearcastingBuff                      = Spell(263725),
+  ConjureManaGem                        = Spell(759),
+  Evocation                             = Spell(12051),
+  FireBlast                             = Spell(319836),
+  PresenceofMind                        = Spell(205025),
+  TouchoftheMagi                        = Spell(321507), --Splash, 8
+  PrismaticBarrier                      = Spell(235450),
+  GreaterInvisibility                   = Spell(110959),
+  -- Talents
+  Amplification                         = Spell(236628),
+  ArcaneEcho                            = Spell(342231), --Splash, 8
+  ArcaneFamiliar                        = Spell(205022),
+  ArcaneFamiliarBuff                    = Spell(210126),
+  ArcaneOrb                             = Spell(153626), --Splash, 16
+  Enlightened                           = Spell(321387),
+  NetherTempest                         = Spell(114923), --Splash, 10
+  Overpowered                           = Spell(155147),
+  Resonance                             = Spell(205028),
+  RuleofThrees                          = Spell(264354),
+  RuleofThreesBuff                      = Spell(264774),
+  Slipstream                            = Spell(236457),
+  Supernova                             = Spell(157980), --Splash, 8
+  -- Legendaries (Shadowlands)
+  ArcaneHarmonyBuff                     = Spell(332777),
+  SiphonStormBuff                       = Spell(332934),
+})
+
+Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
+  -- Abilities
+  BlazingBarrier                        = Spell(235313),
+  Combustion                            = Spell(190319),
+  CombustionBuff                        = Spell(190319),
+  DragonsBreath                         = Spell(31661),
+  FireBlast                             = Spell(108853),
+  Fireball                              = Spell(133),
+  Flamestrike                           = Spell(2120),
+  HeatingUpBuff                         = Spell(48107),
+  HotStreakBuff                         = Spell(48108),
+  Ignite                                = Spell(12654),
+  PhoenixFlames                         = Spell(257541),
+  Pyroblast                             = Spell(11366),
+  Scorch                                = Spell(2948),
+  -- Talents
+  AlexstraszasFury                      = Spell(235870),
+  BlastWave                             = Spell(157981),
+  Firestarter                           = Spell(205026),
+  FlameOn                               = Spell(205029),
+  FlamePatch                            = Spell(205037),
+  FromTheAshes                          = Spell(342344),
+  Kindling                              = Spell(155148),
+  LivingBomb                            = Spell(44457),
+  Meteor                                = Spell(153561),
+  Pyroclasm                             = Spell(269650),
+  PyroclasmBuff                         = Spell(269651),
+  SearingTouch                          = Spell(269644),
   -- Conduit
   FlameAccretion                        = Spell(337224),
   InfernalCascade                       = Spell(336821),
   InfernalCascadeBuff                   = Spell(336832),
   -- Legendaries (Shadowlands)
   FirestormBuff                         = Spell(333100),
-  SunKingsBlessingBuff                  = Spell(333314),
-  SunKingsBlessingBuffReady             = Spell(333315),
   GrislyIcicleBuff                      = Spell(333393),
   GrislyIcicleDebuff                    = Spell(348007),
-  DisciplinaryCommandBuff               = Spell(327371),
-  -- Trinkets
-  SoulIgnitionBuff                      = Spell(345211),
-  TomeofMonstruousConstructionsBuff     = Spell(357163),
-}
+  SunKingsBlessingBuff                  = Spell(333314),
+  SunKingsBlessingBuffReady             = Spell(333315),
+})
 
-Spell.Mage.Frost = {
-  -- Racials
-  AncestralCall                         = Spell(274738),
-  BagofTricks                           = Spell(312411),
-  Berserking                            = Spell(26297),
-  BloodFury                             = Spell(20572),
-  Fireblood                             = Spell(265221),
-  LightsJudgment                        = Spell(255647),
-  -- Base Abilities
-  ArcaneExplosion                       = Spell(1449), --Melee, 10
-  ArcaneIntellect                       = Spell(1459),
-  Blink                                 = MultiSpell(1953, 212653),
+Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
+  -- Abilities
   Blizzard                              = Spell(190356), --splash, 16
   BrainFreezeBuff                       = Spell(190446),
   ConeofCold                            = Spell(120),--Melee, 12
-  Counterspell                          = Spell(2139),
   FingersofFrostBuff                    = Spell(44544),
   Flurry                                = Spell(44614),
-  Frostbolt                             = Spell(116),
   FrozenOrb                             = Spell(84714), --splash, 16
-  FrostNova                             = Spell(122), --Melee, 12
   IceLance                              = Spell(30455), --splash, 8 (with splitting ice)
   IciclesBuff                           = Spell(205473),
   IcyVeins                              = Spell(12472),
   SummonWaterElemental                  = Spell(31687),
   WintersChillDebuff                    = Spell(228358),
-  TimeWarp                              = Spell(80353),
   FireBlast                             = Spell(319836),
   Frostbite                             = Spell(198121),
-  Freeze                                = Spell(33395), --splash, 8
-  MirrorImage                           = Spell(55342),
+  Freeze                                = Spell(33395, "pet"), --splash, 8
   TemporalDisplacement                  = Spell(80354),
-  AlterTime                             = Spell(108978),
-  SpellSteal                            = Spell(30449),
-  RemoveCurse                           = Spell(475),
-  Invisibility                          = Spell(66),
-  SlowFall                              = Spell(130),
   IceBarrier                            = Spell(11426),
-  IceBlock                              = Spell(45438),
   -- Talents
-  IceNova                               = Spell(157997), --splash, 8
-  IceFloes                              = Spell(108839),
-  IncantersFlow                         = Spell(1463),
-  IncantersFlowBuff                     = Spell(116267),
-  FocusMagic                            = Spell(321358),
-  RuneofPower                           = Spell(116011),
-  RuneofPowerBuff                       = Spell(116014),
+  CometStorm                            = Spell(153595), --splash, 6
   Ebonbolt                              = Spell(257537), --splash, 8 (with splitting ice)
   FreezingRain                          = Spell(270233),
   FreezingRainBuff                      = Spell(270232),
-  SplittingIce                          = Spell(56377), --splash, 8
-  CometStorm                            = Spell(153595), --splash, 6
-  RayofFrost                            = Spell(205021),
   GlacialSpike                          = Spell(199786), --splash, 8 (with splitting ice)
   GlacialSpikeBuff                      = Spell(199844),
-  RingOfFrost                           = Spell(113724),
-  -- Covenant Abilities
-  CombatMeditation                      = Spell(328266),
-  Deathborne                            = Spell(324220),
-  DoorofShadows                         = Spell(300728),
-  Fleshcraft                            = Spell(324631),
-  MirrorsofTorment                      = Spell(314793),
-  RadiantSpark                          = Spell(307443),
-  RadiantSparkDebuff                    = Spell(307443),
-  RaidantSparkVulnerability             = Spell(307454),
-  ShiftingPower                         = Spell(314791), --Melee 15
-  Soulshape                             = Spell(310143),
-  WastelandPropriety                    = Spell(333251),
-  SiphonedMalice                        = Spell(337090),
-  GroveInvigoration                     = Spell(322721),
-  FieldOfBlossoms                       = Spell(319191),
-  IreOfTheAscended                      = Spell(337058),
-  -- Conduit
+  IceFloes                              = Spell(108839),
+  IceNova                               = Spell(157997), --splash, 8
+  RayofFrost                            = Spell(205021),
+  SplittingIce                          = Spell(56377), --splash, 8
   -- Legendaries (Shadowlands)
-  ExpandedPotentialBuff                 = Spell(327495),
   FreezingWindsBuff                     = Spell(327364),
   SlickIceBuff                          = Spell(327508),
-  DisciplinaryCommandBuff               = Spell(327371),
-  -- Trinkets
-  TomeofMonstruousConstructionsBuff     = Spell(357163),
-}
+})
 
 -- Items
 if not Item.Mage then Item.Mage = {} end
-Item.Mage.Arcane = {
-  ManaGem                          = Item(36799),
-  -- Potion,
+Item.Mage.Commons = {
+  -- Potions
   PotionofSpectralIntellect        = Item(171273),
   -- Trinkets
   DarkmoonDeckPutrescence          = Item(173069),
@@ -291,43 +210,29 @@ Item.Mage.Arcane = {
   FlameofBattle                    = Item(181501),
   GlyphofAssimilation              = Item(184021),
   InscrutableQuantumDevice         = Item(179350),
+  InstructorsDivineBell            = Item(184842),
   MacabreSheetMusic                = Item(184024),
   MoonlitPrism                     = Item(137541),
+  ShadowedOrbofTorment             = Item(186428),
+  SinfulAspirantsBadge             = Item(175884),
   SinfulGladiatorsBadge            = Item(175921),
   SoulIgniter                      = Item(184019),
   SoullettingRuby                  = Item(178809),
   SunbloodAmethyst                 = Item(178826),
-  WakenersFrond                    = Item(181457),
-  ShadowedOrbofTorment             = Item(186428),
-  TomeofMonstruousConstructions    = Item(186422),
-}
-
-Item.Mage.Fire = {
-  -- Potion,
-  PotionofSpectralIntellect        = Item(171273),
-  -- Trinkets
-  DreadfireVessel                  = Item(184030),
-  EmpyrealOrdnance                 = Item(180117),
-  FlameofBattle                    = Item(181501),
-  GlyphofAssimilation              = Item(184021),
-  InscrutableQuantumDevice         = Item(179350),
-  InstructorsDivineBell            = Item(184842),
-  MacabreSheetMusic                = Item(184024),
-  SinfulAspirantsBadge             = Item(175884),
-  SinfulGladiatorsBadge            = Item(175921),
-  SoulIgniter                      = Item(184019),
-  SunbloodAmethyst                 = Item(178826),
-  WakenersFrond                    = Item(181457),
-  ShadowedOrbofTorment             = Item(186428),
   TheFirstSigil                    = Item(188271),
   TomeofMonstruousConstructions    = Item(186422),
+  WakenersFrond                    = Item(181457),
 }
 
-Item.Mage.Frost = {
-  PotionofSpectralIntellect        = Item(171273),
-  ShadowedOrbofTorment             = Item(186428),
-  TomeofMonstruousConstructions    = Item(186422),
-}
+Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
+  ManaGem                          = Item(36799),
+})
+
+Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
+})
+
+Item.Mage.Frost = MergeTableByKey(Item.Mage.Commons, {
+})
 
 -- Variables
 Mage.IFST = {
