@@ -148,7 +148,7 @@ S.BrutalSlash:RegisterDamageFormula(
 -- Functions for Bloodtalons
 local BtTriggers = {
   S.Rake,
-  S.Moonfire,
+  S.LIMoonfire,
   S.Thrash,
   S.BrutalSlash,
   S.Swipe,
@@ -214,7 +214,7 @@ local function EvaluateTargetIfFilterRakeTicks(TargetUnit)
 end
 
 local function EvaluateTargetIfFilterMoonfireTicks(TargetUnit)
-  return (TicksGainedOnRefresh(S.MoonfireDebuff))
+  return (TicksGainedOnRefresh(S.LIMoonfireDebuff))
 end
 
 local function EvaluateTargetIfRakeMain14(TargetUnit)
@@ -234,7 +234,7 @@ end
 
 local function EvaluateTargetIfMoonfireBloodtalons4(TargetUnit)
   -- if=refreshable&buff.bt_moonfire.down
-  return (TargetUnit:DebuffRefreshable(S.MoonfireDebuff))
+  return (TargetUnit:DebuffRefreshable(S.LIMoonfireDebuff))
 end
 
 local function EvaluateTargetIfRakeFiller2(TargetUnit)
@@ -244,7 +244,7 @@ end
 
 local function EvaluateCycleMoonfireMain16(TargetUnit)
   -- target_if=refreshable&druid.lunar_inspiration.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2
-  return (TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and TicksGainedOnRefresh(S.MoonfireDebuff) > EnemiesCount8y * 2 - 2)
+  return (TargetUnit:DebuffRefreshable(S.LIMoonfireDebuff) and TicksGainedOnRefresh(S.LIMoonfireDebuff) > EnemiesCount8y * 2 - 2)
 end
 
 local function EvaluateCycleThrashBloodtalons6(TargetUnit)
@@ -353,8 +353,8 @@ local function Stealth()
     if Everyone.CastTargetIf(S.Rake, Enemies8y, "max", EvaluateTargetIfFilterRakeTicks, EvaluateTargetIfRakeStealth2, not Target:IsInRange(MeleeRange)) then return "rake stealth 2"; end
   end
   -- lunar_inspiration,if=spell_targets.thrash_cat<3&refreshable&druid.lunar_inspiration.ticks_gained_on_refresh>5&(combo_points=4|dot.lunar_inspiration.remains<5|!dot.lunar_inspiration.ticking)
-  if S.LunarInspiration:IsAvailable() and S.Moonfire:IsReady() and (EnemiesCount8y < 3 and Target:DebuffRefreshable(S.MoonfireDebuff) and TicksGainedOnRefresh(S.MoonfireDebuff) > 5 and (ComboPoints == 4 or Target:DebuffRemains(S.MoonfireDebuff) < 5 or Target:DebuffDown(S.MoonfireDebuff))) then
-    if CastPooling(S.Moonfire, Player:EnergyTimeToX(30), not Target:IsSpellInRange(S.Moonfire)) then return "moonfire stealth 4"; end
+  if S.LunarInspiration:IsAvailable() and S.LIMoonfire:IsReady() and (EnemiesCount8y < 3 and Target:DebuffRefreshable(S.LIMoonfireDebuff) and TicksGainedOnRefresh(S.LIMoonfireDebuff) > 5 and (ComboPoints == 4 or Target:DebuffRemains(S.LIMoonfireDebuff) < 5 or Target:DebuffDown(S.LIMoonfireDebuff))) then
+    if CastPooling(S.LIMoonfire, Player:EnergyTimeToX(30), not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire stealth 4"; end
   end
   -- brutal_slash,if=spell_targets.brutal_slash>2
   if S.BrutalSlash:IsReady() and (EnemiesCount8y > 2) then
@@ -373,8 +373,8 @@ local function Bloodtalons()
     if Everyone.CastTargetIf(S.Rake, Enemies8y, "max", EvaluateTargetIfFilterRakeTicks, EvaluateTargetIfRakeBloodtalons2, not Target:IsInRange(EightRange)) then return "rake bloodtalons 2"; end
   end
   -- lunar_inspiration,target_if=max:druid.lunar_inspiration.ticks_gained_on_refresh,if=refreshable&buff.bt_moonfire.down
-  if S.LunarInspiration:IsAvailable() and S.Moonfire:IsReady() and (BTBuffDown(S.Moonfire)) then
-    if Everyone.CastTargetIf(S.Moonfire, Enemies8y, "max", EvaluateTargetIfFilterMoonfireTicks, EvaluateTargetIfMoonfireBloodtalons4, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bloodtalons 4"; end
+  if S.LunarInspiration:IsAvailable() and S.LIMoonfire:IsReady() and (BTBuffDown(S.LIMoonfire)) then
+    if Everyone.CastTargetIf(S.LIMoonfire, Enemies8y, "max", EvaluateTargetIfFilterMoonfireTicks, EvaluateTargetIfMoonfireBloodtalons4, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire bloodtalons 4"; end
   end
   -- thrash_cat,target_if=refreshable&buff.bt_thrash.down&druid.thrash_cat.ticks_gained_on_refresh>(4+spell_targets.thrash_cat*4)%(1+mastery_value)-conduit.taste_for_blood.enabled
   if S.Thrash:IsReady() and (BTBuffDown(S.Thrash)) then
@@ -511,8 +511,8 @@ local function Filler()
     if CastPooling(S.Rake, Player:EnergyTimeToX(35), not Target:IsInRange(MeleeRange)) then return "rake filler 4"; end
   end
   -- lunar_inspiration,if=variable.filler=3
-  if S.LunarInspiration:IsAvailable() and S.Moonfire:IsReady() and (VarFiller == "Moonfire") then
-    if CastPooling(S.Moonfire, Player:EnergyTimeToX(30), not Target:IsSpellInRange(S.Moonfire)) then return "moonfire filler 6"; end
+  if S.LunarInspiration:IsAvailable() and S.LIMoonfire:IsReady() and (VarFiller == "Moonfire") then
+    if CastPooling(S.LIMoonfire, Player:EnergyTimeToX(30), not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire filler 6"; end
   end
   -- swipe,if=variable.filler=4
   if S.Swipe:IsReady() and (VarFiller == "Swipe") then
@@ -526,12 +526,12 @@ end
 
 local function Setup()
   -- lunar_inspiration,if=covenant.necrolord&spell_targets.thrash_cat<4&combo_points<5&!ticking&!buff.bs_inc.up
-  if S.LunarInspiration:IsAvailable() and S.Moonfire:IsReady() and (CovenantID == 4 and EnemiesCount8y < 4 and Player:ComboPoints() < 5 and Target:DebuffDown(S.MoonfireDebuff) and Player:BuffDown(BsInc)) then
-    if CastPooling(S.Moonfire, Player:EnergyTimeToX(30), not Target:IsSpellInRange(S.Moonfire)) then return "lunar_inspiration setup 2"; end
+  if S.LunarInspiration:IsAvailable() and S.LIMoonfire:IsReady() and (CovenantID == 4 and EnemiesCount8y < 4 and Player:ComboPoints() < 5 and Target:DebuffDown(S.LIMoonfireDebuff) and Player:BuffDown(BsInc)) then
+    if CastPooling(S.LIMoonfire, Player:EnergyTimeToX(30), not Target:IsSpellInRange(S.LIMoonfire)) then return "lunar_inspiration setup 2"; end
   end
   -- pool_resource,for_next=1
   -- savage_roar,if=talent.feral_frenzy.enabled&cooldown.feral_frenzy.up&!buff.savage_roar.up&combo_points>1&dot.rake.ticking&(dot.lunar_inspiration.ticking|!talent.lunar_inspiration.enabled)
-  if S.SavageRoar:IsCastable() and (S.FeralFrenzy:IsAvailable() and S.FeralFrenzy:CooldownUp() and Player:BuffDown(S.SavageRoar) and Player:ComboPoints() > 1 and Target:DebuffUp(S.RakeDebuff) and (Target:DebuffUp(S.MoonfireDebuff) or not S.LunarInspiration:IsAvailable())) then
+  if S.SavageRoar:IsCastable() and (S.FeralFrenzy:IsAvailable() and S.FeralFrenzy:CooldownUp() and Player:BuffDown(S.SavageRoar) and Player:ComboPoints() > 1 and Target:DebuffUp(S.RakeDebuff) and (Target:DebuffUp(S.LIMoonfireDebuff) or not S.LunarInspiration:IsAvailable())) then
     if CastPooling(S.SavageRoar, Player:EnergyTimeToX(25)) then return "savage_roar setup 4"; end
   end
   -- pool_resource,if=talent.bloodtalons.enabled&buff.bloodtalons.down&(energy+3.5*energy.regen+(40*buff.clearcasting.up))<(115-23*buff.incarnation_king_of_the_jungle.up)&active_bt_triggers=0
@@ -662,8 +662,8 @@ local function APL()
       if Everyone.CastTargetIf(S.Rake, Enemies8y, "max", EvaluateTargetIfFilterRakeTicks, EvaluateTargetIfRakeMain14, not Target:IsInRange(MeleeRange)) then return "rake main 14"; end
     end
     -- lunar_inspiration,target_if=refreshable&druid.lunar_inspiration.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2
-    if S.LunarInspiration:IsAvailable() and S.Moonfire:IsReady() then
-      if Everyone.CastCycle(S.Moonfire, Enemies8y, EvaluateCycleMoonfireMain16, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire main 16"; end
+    if S.LunarInspiration:IsAvailable() and S.LIMoonfire:IsReady() then
+      if Everyone.CastCycle(S.LIMoonfire, Enemies8y, EvaluateCycleMoonfireMain16, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire main 16"; end
     end
     -- pool_resource,for_next=1
     -- thrash_cat,target_if=refreshable&druid.thrash_cat.ticks_gained_on_refresh>(4+spell_targets.thrash_cat*4)%(1+mastery_value)-conduit.taste_for_blood.enabled-covenant.necrolord&(!buff.bs_inc.up|spell_targets.thrash_cat>1)
