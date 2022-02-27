@@ -143,6 +143,7 @@ Item.Priest.Commons = {
   -- Potion
   PotionofSpectralIntellect        = Item(171352),
   -- Trinkets
+  ArchitechtsIngenuityCore         = Item(188268, {13, 14}),
   DarkmoonDeckPutrescence          = Item(173069, {13, 14}),
   DreadfireVessel                  = Item(184030, {13, 14}),
   EmpyrealOrdinance                = Item(180117, {13, 14}),
@@ -153,4 +154,14 @@ Item.Priest.Commons = {
   SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14}),
   SoullettingRuby                  = Item(178809, {13, 14}),
   SunbloodAmethyst                 = Item(178826, {13, 14}),
+  TheFirstSigil                    = Item(188271, {13, 14}),
 }
+
+Item.Priest.Shadow = MergeTableByKey(Item.Priest.Commons, {
+})
+
+Item.Priest.Discipline = MergeTableByKey(Item.Priest.Commons, {
+})
+
+Item.Priest.Holy = MergeTableByKey(Item.Priest.Commons, {
+})

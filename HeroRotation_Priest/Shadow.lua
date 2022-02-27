@@ -28,16 +28,18 @@ local mathmin       = math.min
 
 -- Define S/I for spell and item arrays
 local S = Spell.Priest.Shadow
-local I = Item.Priest.Commons
+local I = Item.Priest.Shadow
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.ArchitectsIngenuityCore:ID(),
   I.EmpyrealOrdinance:ID(),
   I.InscrutableQuantumDevice:ID(),
   I.MacabreSheetMusic:ID(),
   I.ShadowedOrbofTorment:ID(),
   I.SinfulGladiatorsBadgeofFerocity:ID(),
-  I.SoullettingRuby:ID()
+  I.SoullettingRuby:ID(),
+  I.TheFirstSigil:ID()
 }
 
 -- Rotation Var
@@ -186,10 +188,6 @@ local function EvaluateTargetIfFilterSoullettingRuby230(TargetUnit)
   return TargetUnit:HealthPercentage()
 end
 
-local function EvaluateTargetIfSoullettingRuby232(TargetUnit)
-  return (Player:BuffUp(S.PowerInfusionBuff) or not Settings.Shadow.SelfPI or I.ShadowedOrbofTorment:IsEquipped())
-end
-
 local function Precombat()
   -- flask
   -- food
@@ -255,8 +253,12 @@ local function Trinkets()
     if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music"; end
   end
   -- use_item,name=soulletting_ruby,if=buff.power_infusion.up|!priest.self_power_infusion|equipped.shadowed_orb_of_torment,target_if=min:target.health.pct
-  if I.SoullettingRuby:IsEquippedAndReady() then
-    if Everyone.CastTargetIf(I.SoullettingRuby, Enemies40y, "min", EvaluateTargetIfFilterSoullettingRuby230, EvaluateTargetIfSoullettingRuby232) then return "soulletting_ruby"; end
+  if I.SoullettingRuby:IsEquippedAndReady() and (Player:BuffUp(S.PowerInfusionBuff) or (not Settings.Shadow.SelfPI) or I.ShadowedOrbofTorment:IsEquipped()) then
+    if Everyone.CastTargetIf(I.SoullettingRuby, Enemies40y, "min", EvaluateTargetIfFilterSoullettingRuby230, nil, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby"; end
+  end
+  -- use_item,name=the_first_sigil,if=buff.voidform.up|buff.power_infusion.up|!priest.self_power_infusion|cooldown.void_eruption.remains>10|(equipped.soulletting_ruby&!trinket.soulletting_ruby.cooldown.up)|fight_remains<20
+  if I.TheFirstSigil:IsEquippedAndReady() and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or (not Settings.Shadow.SelfPI) or S.VoidEruption:CooldownRemains() > 10 or (I.SoullettingRuby:IsEquipped() and not I.SoullettingRuby:IsReady()) or FightRemains < 20) then
+    if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil"; end
   end
   -- use_item,name=sinful_gladiators_badge_of_ferocity,if=cooldown.void_eruption.remains>=10
   if I.SinfulGladiatorsBadgeofFerocity:IsEquippedAndReady() and (S.VoidEruption:CooldownRemains() >= 10) then
@@ -265,6 +267,10 @@ local function Trinkets()
   -- use_item,name=shadowed_orb_of_torment,if=cooldown.power_infusion.remains<=10&cooldown.void_eruption.remains<=10&(covenant.necrolord|covenant.kyrian)|(covenant.venthyr|covenant.night_fae)&(!buff.voidform.up|prev_gcd.1.void_bolt)|fight_remains<=40
   if I.ShadowedOrbofTorment:IsEquippedAndReady() and (S.PowerInfusion:CooldownRemains() <= 10 and S.VoidEruption:CooldownRemains() <= 10 and (CovenantID == 4 or CovenantID == 1) or (CovenantID == 2 or CovenantID == 3) and (Player:BuffDown(S.VoidformBuff) or Player:PrevGCD(1, S.VoidBolt)) or FightRemains <= 40) then
     if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment"; end
+  end
+  -- use_item,name=architects_ingenuity_core
+  if I.ArchitectsIngenuityCore:IsEquippedAndReady() then
+    if Cast(I.ArchitectsIngenuityCore, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "architects_ingenuity_core"; end
   end
   -- use_items,if=buff.voidform.up|buff.power_infusion.up|cooldown.void_eruption.remains>10
   if (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or S.VoidEruption:CooldownRemains() > 10) then
