@@ -332,7 +332,7 @@ end
 local function Finishers()
   -- variable,name=ds_castable,value=spell_targets.divine_storm=2&!(runeforge.final_verdict|talent.righteous_verdict)|spell_targets.divine_storm>2|buff.empyrean_power.up&!debuff.judgment.up&!buff.divine_purpose.up
   -- Note: The last part with "spell_targets.divine_storm>=2&..." is redundant with the first condition.
-  VarDSCastable = (EnemiesCount8y == 2 and (not (FinalVerdictEquipped or S.RighteousVerdict:IsAvailable())) or EnemiesCount8y > 2 or Player:BuffUp(S.EmpyreanPower) and Target:DebuffDown(S.JudgmentDebuff) and Player:BuffDown(S.DivinePurposeBuff))
+  VarDSCastable = (EnemiesCount8y == 2 and (not (FinalVerdictEquipped or S.RighteousVerdict:IsAvailable())) or EnemiesCount8y > 2 or Player:BuffUp(S.EmpyreanPowerBuff) and Target:DebuffDown(S.JudgmentDebuff) and Player:BuffDown(S.DivinePurposeBuff))
   -- seraphim,if=if=(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15)&!talent.final_reckoning&(!talent.execution_sentence|spell_targets.divine_storm>=5)&(!raid_event.adds.exists|raid_event.adds.in>40|raid_event.adds.in<gcd|raid_event.adds.up)&(!covenant.kyrian|cooldown.divine_toll.remains<9)|fight_remains<15&fight_remains>5|buff.crusade.up&buff.crusade.stack<10
   if S.Seraphim:IsReady() and ((S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15) and (not S.FinalReckoning:IsAvailable()) and ((not S.ExecutionSentence:IsAvailable()) or EnemiesCount8y >= 5) and (CovenantID ~= 1 or S.DivineToll:CooldownRemains() < 9) or FightRemains < 15 and FightRemains > 5 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
     if Cast(S.Seraphim, Settings.Retribution.GCDasOffGCD.Seraphim) then return "seraphim finishers 2" end
@@ -401,7 +401,7 @@ local function Generators()
     if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice generators 18"; end
   end
   -- call_action_list,name=finishers,if=(target.health.pct<=20|buff.avenging_wrath.up|buff.crusade.up|buff.empyrean_power.up)
-  if (Target:HealthPercentage() <= 20 or Player:BuffUp(S.AvengingWrathBuff) or Player:BuffUp(S.CrusadeBuff) or Player:BuffUp(S.EmpyreanPower)) then
+  if (Target:HealthPercentage() <= 20 or Player:BuffUp(S.AvengingWrathBuff) or Player:BuffUp(S.CrusadeBuff) or Player:BuffUp(S.EmpyreanPowerBuff)) then
     local ShouldReturn = Finishers(); if ShouldReturn then return ShouldReturn; end
   end
   -- consecration,if=!consecration.up&spell_targets.divine_storm>=2

@@ -115,6 +115,7 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   Crusade                               = Spell(231895),
   CrusadeBuff                           = Spell(231895),
   EmpyreanPower                         = Spell(326732),
+  EmpyreanPowerBuff                     = Spell(326733),
   ExecutionSentence                     = Spell(343527),
   FinalReckoning                        = Spell(343721),
   FiresofJustice                        = Spell(203316),
