@@ -68,16 +68,18 @@ local OnUseExcludeTrinkets = {
 
 local MagistratesJudgmentEquipped = Player:HasLegendaryEquipped(101)
 local VanguardsMomentumEquipped = Player:HasLegendaryEquipped(112)
+local FinalVerdictEquipped = Player:HasLegendaryEquipped(113)
 local MadParagonEquipped = Player:HasLegendaryEquipped(196)
 local DivineResonanceEquipped = Player:HasLegendaryEquipped(234)
-local VerdictSpell = S.FinalVerdict:IsAvailable() and S.FinalVerdict or S.TemplarsVerdict
+local VerdictSpell = FinalVerdictEquipped and S.FinalVerdict or S.TemplarsVerdict
 
 HL:RegisterForEvent(function()
   MagistratesJudgmentEquipped = Player:HasLegendaryEquipped(101)
   VanguardsMomentumEquipped = Player:HasLegendaryEquipped(112)
+  FinalVerdictEquipped = Player:HasLegendaryEquipped(113)
   MadParagonEquipped = Player:HasLegendaryEquipped(196)
   DivineResonanceEquipped = Player:HasLegendaryEquipped(234)
-  VerdictSpell = S.FinalVerdict:IsAvailable() and S.FinalVerdict or S.TemplarsVerdict
+  VerdictSpell = FinalVerdictEquipped and S.FinalVerdict or S.TemplarsVerdict
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- Player Covenant
