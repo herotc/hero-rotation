@@ -62,6 +62,8 @@ Spell.Priest.Commons = {
   PustuleEruption                       = Spell(351094),
   VolatileSolvent                       = Spell(323074),
   VolatileSolventHumanBuff              = Spell(323491),
+  -- Trinket Effects
+  ScarsofFraternalStrifeBuff4           = Spell(368638),
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -150,6 +152,7 @@ Item.Priest.Commons = {
   GlyphofAssimilation              = Item(184021, {13, 14}),
   InscrutableQuantumDevice         = Item(179350, {13, 14}),
   MacabreSheetMusic                = Item(184024, {13, 14}),
+  ScarsofFraternalStrife           = Item(188253, {13, 14}),
   ShadowedOrbofTorment             = Item(186428, {13, 14}),
   SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14}),
   SoullettingRuby                  = Item(178809, {13, 14}),
