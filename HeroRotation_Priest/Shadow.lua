@@ -356,8 +356,8 @@ local function Main()
   if S.VoidBolt:CooldownUp() and (Player:BuffUp(S.DissonantEchoesBuff)) then
     if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt 90"; end
   end
-  -- void_eruption,if=variable.pool_for_cds&(insanity>=25|pet.fiend.active&runeforge.shadowflame_prism.equipped&!cooldown.mind_blast.up&!cooldown.shadow_word_death.up)&(insanity<=85|talent.searing_nightmare.enabled&variable.searing_nightmare_cutoff)&!cooldown.fiend.up&(!soulbind.volatile_solvent|buff.volatile_solvent_humanoid.up)
-  if S.VoidEruption:IsReady() and (VarPoolForCDs and (Player:Insanity() >= 25 or S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and not S.MindBlast:CooldownUp() and not S.ShadowWordDeath:CooldownUp()) and (Player:Insanity() <= 85 or S.SearingNightmare:IsAvailable() and VarSearingNightmareCutoff) and not S.Mindbender:CooldownUp() and ((not S.VolatileSolvent:SoulbindEnabled()) or Player:BuffUp(S.VolatileSolventHumanBuff))) then
+  -- void_eruption,if=variable.pool_for_cds&(insanity>=25+(15*(race.blood_elf&time<30))|pet.fiend.active&runeforge.shadowflame_prism.equipped&!cooldown.mind_blast.up&!cooldown.shadow_word_death.up)&(insanity<=85|talent.searing_nightmare.enabled&variable.searing_nightmare_cutoff)&!cooldown.fiend.up&(!soulbind.volatile_solvent|buff.volatile_solvent_humanoid.up)
+  if S.VoidEruption:IsReady() and (VarPoolForCDs and (Player:Insanity() >= 25 + (15 * (num(Player:Race() == "BloodElf" and HL.CombatTime() < 30))) or S.Mindbender:TimeSinceLastCast() <= 15 and ShadowflamePrismEquipped and not S.MindBlast:CooldownUp() and not S.ShadowWordDeath:CooldownUp()) and (Player:Insanity() <= 85 or S.SearingNightmare:IsAvailable() and VarSearingNightmareCutoff) and not S.Mindbender:CooldownUp() and ((not S.VolatileSolvent:SoulbindEnabled()) or Player:BuffUp(S.VolatileSolventHumanBuff))) then
     if Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption, nil, not Target:IsSpellInRange(S.VoidEruption)) then return "void_eruption 92"; end
   end
   -- shadow_word_pain,if=buff.fae_guardians.up&!debuff.wrathful_faerie.up&spell_targets.mind_sear<4
