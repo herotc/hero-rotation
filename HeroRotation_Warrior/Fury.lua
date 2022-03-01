@@ -184,71 +184,71 @@ local function SingleTarget()
   if CDsON() and S.AncientAftershock:IsCastable() and (EnrageUp and S.Recklessness:CooldownRemains() > 5 and (Target:TimeToDie() > 95 or Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20)) then
     if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(12)) then return "ancient_aftershock single_target 16"; end
   end
+  -- crushing_blow,if=set_bonus.tier28_2pc|charges=2|(buff.recklessness.up&variable.execute_phase&talent.massacre.enabled)
+  if S.CrushingBlow:IsCastable() and (Player:HasTier(28, 2) or S.CrushingBlow:Charges() == 2 or (Player:BuffUp(S.RecklessnessBuff) and VarExecutePhase and S.Massacre:IsAvailable())) then
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 18"; end
+  end
   -- execute
   if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 18"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 20"; end
   end
   if CDsON() then
     -- spear_of_bastion,if=runeforge.elysian_might&buff.enrage.up&cooldown.recklessness.remains>5&(buff.recklessness.up|target.time_to_die<20|debuff.siegebreaker.up|!talent.siegebreaker&target.time_to_die>68)&raid_event.adds.in>55
     if S.SpearofBastion:IsCastable() and (ElysianMightEquipped and EnrageUp and S.Recklessness:CooldownRemains() > 5 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20 or Target:DebuffUp(S.SiegebreakerDebuff) or not S.Siegebreaker:IsAvailable() and Target:TimeToDie() > 68)) then
-      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(25)) then return "spear_of_bastion single_target 20"; end
+      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(25)) then return "spear_of_bastion single_target 22"; end
     end
     -- bladestorm,if=buff.enrage.up&(!buff.recklessness.remains|rage<50)&(spell_targets.whirlwind=1&raid_event.adds.in>45|spell_targets.whirlwind=2)
     if S.Bladestorm:IsCastable() and (EnrageUp and (Player:BuffDown(S.RecklessnessBuff) or Player:Rage() < 50) and (EnemiesCount8 == 1 or EnemiesCount8 == 2)) then
-      if Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm single_target 22"; end
+      if Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm single_target 24"; end
     end
     -- spear_of_bastion,if=buff.enrage.up&cooldown.recklessness.remains>5&(buff.recklessness.up|target.time_to_die<20|debuff.siegebreaker.up|!talent.siegebreaker&target.time_to_die>68)&raid_event.adds.in>55
     if S.SpearofBastion:IsCastable() and (EnrageUp and S.Recklessness:CooldownRemains() > 5 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20 or Target:DebuffUp(S.SiegebreakerDebuff) or not S.Siegebreaker:IsAvailable() and Target:TimeToDie() > 68)) then
-      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(25)) then return "spear_of_bastion single_target 23"; end
+      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(25)) then return "spear_of_bastion single_target 26"; end
     end
-  end
-  -- bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35
-  if S.Bloodthirst:IsCastable() and ((not EnrageUp) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35) then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 24"; end
-  end
-  -- bloodbath,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
-  if S.Bloodbath:IsCastable() and ((not EnrageUp) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35 and not S.Cruelty:IsAvailable()) then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 26"; end
-  end
-  -- dragon_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
-  if S.DragonRoar:IsCastable() and (EnrageUp) then
-    if Cast(S.DragonRoar, Settings.Fury.GCDasOffGCD.DragonRoar, nil, not Target:IsInRange(12)) then return "dragon_roar single_target 28"; end
-  end
-  -- whirlwind,if=buff.merciless_bonegrinder.up&spell_targets.whirlwind>3
-  if S.Whirlwind:IsCastable() and (Player:BuffUp(S.MercilessBonegrinderBuff) and EnemiesCount8 > 3) then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind single_target 32"; end
   end
   -- raging_blow,if=set_bonus.tier28_2pc|charges=2|buff.recklessness.up&variable.execute_phase&talent.massacre.enabled
   if S.RagingBlow:IsCastable() and (Player:HasTier(28, 2) or S.RagingBlow:Charges() == 2 or Player:BuffUp(S.RecklessnessBuff) and VarExecutePhase and S.Massacre:IsAvailable()) then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 34"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 28"; end
   end
-  -- crushing_blow,if=set_bonus.tier28_2pc|charges=2|buff.recklessness.up&variable.execute_phase&talent.massacre.enabled
-  if S.CrushingBlow:IsCastable() and (Player:HasTier(28, 2) or S.CrushingBlow:Charges() == 2 or Player:BuffUp(S.RecklessnessBuff) and VarExecutePhase and S.Massacre:IsAvailable()) then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 36"; end
+  -- bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35
+  if S.Bloodthirst:IsCastable() and ((not EnrageUp) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35) then
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 30"; end
+  end
+  -- bloodbath,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
+  if S.Bloodbath:IsCastable() and ((not EnrageUp) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35 and not S.Cruelty:IsAvailable()) then
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 32"; end
+  end
+  -- dragon_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
+  if S.DragonRoar:IsCastable() and (EnrageUp) then
+    if Cast(S.DragonRoar, Settings.Fury.GCDasOffGCD.DragonRoar, nil, not Target:IsInRange(12)) then return "dragon_roar single_target 34"; end
+  end
+  -- whirlwind,if=buff.merciless_bonegrinder.up&spell_targets.whirlwind>3
+  if S.Whirlwind:IsCastable() and (Player:BuffUp(S.MercilessBonegrinderBuff) and EnemiesCount8 > 3) then
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind single_target 36"; end
   end
   -- onslaught,if=buff.enrage.up
   if S.Onslaught:IsReady() and (EnrageUp) then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught single_target 30"; end
+    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught single_target 38"; end
   end
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 38"; end
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 40"; end
   end
   -- bloodbath
   if S.Bloodbath:IsCastable() then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 40"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 42"; end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 42"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 44"; end
   end
   -- crushing_blow
   if S.CrushingBlow:IsCastable() then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 44"; end
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 46"; end
   end
   -- whirlwind
   if S.Whirlwind:IsCastable() then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind single_target 46"; end
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind single_target 48"; end
   end
 end
 
