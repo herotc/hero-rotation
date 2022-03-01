@@ -143,7 +143,7 @@ Item.Priest.Commons = {
   -- Potion
   PotionofSpectralIntellect        = Item(171352),
   -- Trinkets
-  ArchitechtsIngenuityCore         = Item(188268, {13, 14}),
+  ArchitectsIngenuityCore         = Item(188268, {13, 14}),
   DarkmoonDeckPutrescence          = Item(173069, {13, 14}),
   DreadfireVessel                  = Item(184030, {13, 14}),
   EmpyrealOrdinance                = Item(180117, {13, 14}),
