@@ -272,8 +272,8 @@ local function Trinkets()
   if I.ArchitectsIngenuityCore:IsEquippedAndReady() then
     if Cast(I.ArchitectsIngenuityCore, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "architects_ingenuity_core"; end
   end
-  -- use_item,name=scars_of_fraternal_strife,if=(!buff.scars_of_fraternal_strife_4.up&time>1)|(buff.voidform.up|buff.power_infusion.up|cooldown.void_eruption.remains>10)
-  if I.ScarsofFraternalStrife:IsEquippedAndReady() and ((Player:BuffDown(S.ScarsofFraternalStrifeBuff4) and CombatTime > 1) or (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or S.VoidEruption:CooldownRemains() > 10)) then
+  -- use_item,name=scars_of_fraternal_strife,if=(!buff.scars_of_fraternal_strife_4.up&time>1)|(buff.voidform.up|buff.power_infusion.up|cooldown.void_eruption.remains>10)|covenant.night_fae
+  if I.ScarsofFraternalStrife:IsEquippedAndReady() and ((Player:BuffDown(S.ScarsofFraternalStrifeBuff4) and CombatTime > 1) or (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or S.VoidEruption:CooldownRemains() > 10) or CovenantID == 3) then
     if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife"; end
   end
   -- use_items,if=buff.voidform.up|buff.power_infusion.up|cooldown.void_eruption.remains>10
