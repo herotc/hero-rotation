@@ -34,6 +34,7 @@ local I = Item.DeathKnight.Frost
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
   I.InscrutableQuantumDevice:ID(),
+  I.ScarsofFraternalStrife:ID(),
   I.TheFirstSigil:ID()
 }
 
@@ -274,12 +275,12 @@ local function Aoe()
   if S.HowlingBlast:IsReady() and (VarROTFCRime) then
     if Cast(S.HowlingBlast, nil, nil, not TargetIsInRange[30]) then return "howling_blast aoe 14"; end
   end
-  -- frostscythe,if=buff.gathering_storm.up&active_enemies>2&!variable.deaths_due_active
-  if S.Frostscythe:IsReady() and (Player:BuffUp(S.GatheringStormBuff) and EnemiesCount10yd > 2 and not VarDeathsDueActive) then
+  -- frostscythe,if=talent.gathering_storm&buff.remorseless_winter.up&active_enemies>2&!variable.deaths_due_active
+  if S.Frostscythe:IsReady() and (S.GatheringStorm:IsAvailable() and Player:BuffUp(S.RemorselessWinter) and EnemiesCount10yd > 2 and not VarDeathsDueActive) then
     if Cast(S.Frostscythe, nil, nil, not TargetIsInRange[8]) then return "frostscythe aoe 16"; end
   end
-  -- obliterate,if=variable.deaths_due_active&buff.deaths_due.stack<4|buff.gathering_storm.up
-  if S.Obliterate:IsReady() and (VarDeathsDueActive and Player:BuffStack(S.DeathsDueBuff) < 4 or Player:BuffUp(S.GatheringStormBuff)) then
+  -- obliterate,if=variable.deaths_due_active&buff.deaths_due.stack<4|talent.gathering_storm&buff.remorseless_winter.up
+  if S.Obliterate:IsReady() and (VarDeathsDueActive and Player:BuffStack(S.DeathsDueBuff) < 4 or S.GatheringStorm:IsAvailable() and Player:BuffUp(S.RemorselessWinter)) then
     if Cast(S.Obliterate, nil, nil, not TargetIsInRange[8]) then return "obliterate aoe 18"; end
   end
   -- frost_strike,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit<(15+talent.runic_attenuation*5)
@@ -450,8 +451,8 @@ local function Covenants()
   if S.SwarmingMist:IsReady() and CDsON() and (S.BreathofSindragosa:IsAvailable() and (Player:BuffUp(S.BreathofSindragosa) and (VarSTPlanning and Player:RunicPowerDeficit() > 40 or VarAddsRemain and Player:RunicPowerDeficit() > 60) or Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownDown())) then
     if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "swarming_mist covenants 8"; end
   end
-  -- abomination_limb,if=cooldown.pillar_of_frost.remains<3&variable.st_planning&(talent.breath_of_sindragosa&runic_power.deficit<60&cooldown.breath_of_sindragosa.remains<2|!talent.breath_of_sindragosa)
-  if S.AbominationLimb:IsCastable() and CDsON() and (S.PillarofFrost:CooldownRemains() < 3 and VarSTPlanning and (S.BreathofSindragosa:IsAvailable() and Player:RunicPowerDeficit() < 60 and S.BreathofSindragosa:CooldownRemains() < 2 or not S.BreathofSindragosa:IsAvailable())) then
+  -- abomination_limb,if=cooldown.pillar_of_frost.remains<3&variable.st_planning&(talent.breath_of_sindragosa&runic_power>65&cooldown.breath_of_sindragosa.remains<2|!talent.breath_of_sindragosa)
+  if S.AbominationLimb:IsCastable() and CDsON() and (S.PillarofFrost:CooldownRemains() < 3 and VarSTPlanning and (S.BreathofSindragosa:IsAvailable() and Player:RunicPower() > 65 and S.BreathofSindragosa:CooldownRemains() < 2 or not S.BreathofSindragosa:IsAvailable())) then
     if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "abomination_limb covenants 10"; end
   end
   -- abomination_limb,if=variable.adds_remain
@@ -508,6 +509,10 @@ local function Trinkets()
   if I.InscrutableQuantumDevice:IsEquippedAndReady() and (Player:BuffUp(S.PillarofFrostBuff) or Target:TimeToX(20) < 5 or HL.FilteredFightRemains(Enemies10yd, "<", 21)) then
     if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device trinkets 2"; end
   end
+  -- use_item,name=scars_of_fraternal_strife
+  if I.ScarsofFraternalStrife:IsEquippedAndReady() then
+    if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife trinkets 3"; end
+  end
   -- use_item,name=the_first_sigil,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
   if I.TheFirstSigil:IsEquippedAndReady() and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffUp(S.EmpowerRuneWeaponBuff)) then
     if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil trinkets 4"; end
@@ -544,8 +549,8 @@ local function Cooldowns()
   if S.EmpowerRuneWeapon:IsCastable() and (S.Icecap:IsAvailable()) then
     if Cast(S.EmpowerRuneWeapon, Settings.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 8"; end
   end
-  -- pillar_of_frost,if=talent.breath_of_sindragosa&(variable.st_planning|variable.adds_remain)&(cooldown.breath_of_sindragosa.remains|cooldown.breath_of_sindragosa.ready&runic_power.deficit<50)
-  if S.PillarofFrost:IsCastable() and (S.BreathofSindragosa:IsAvailable() and (VarSTPlanning or VarAddsRemain) and ((not S.BreathofSindragosa:CooldownUp()) or S.BreathofSindragosa:CooldownUp() and Player:RunicPowerDeficit() < 50)) then
+  -- pillar_of_frost,if=talent.breath_of_sindragosa&(variable.st_planning|variable.adds_remain)&(cooldown.breath_of_sindragosa.remains|cooldown.breath_of_sindragosa.ready&runic_power.deficit<65)
+  if S.PillarofFrost:IsCastable() and (S.BreathofSindragosa:IsAvailable() and (VarSTPlanning or VarAddsRemain) and ((not S.BreathofSindragosa:CooldownUp()) or S.BreathofSindragosa:CooldownUp() and Player:RunicPowerDeficit() < 65)) then
     if Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cooldowns 10"; end
   end
   -- pillar_of_frost,if=talent.icecap&!buff.pillar_of_frost.up

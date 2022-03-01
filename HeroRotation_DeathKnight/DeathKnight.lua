@@ -189,6 +189,7 @@ Item.DeathKnight.Commons = {
   -- Trinkets
   InscrutableQuantumDevice              = Item(179350, {13, 14}),
   OverwhelmingPowerCrystal              = Item(179342, {13, 14}),
+  ScarsofFraternalStrife                = Item(188253, {13, 14}),
   TheFirstSigil                         = Item(188271, {13, 14})
 }
 
