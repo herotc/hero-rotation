@@ -170,8 +170,8 @@ local function VarInit()
   --variable,name=harmony_stack_time,op=reset,default=9
   var_harmony_stack_time = 9
 
-  --variable,name=always_sync_cooldowns,default=-1,op=set,if=variable.always_sync_cooldowns=-1,value=1*set_bonus.tier28_4pc
-  var_always_sync_cooldowns = num(Player:HasTier(28, 4))
+  --variable,name=always_sync_cooldowns,op=reset,default=1
+  var_always_sync_cooldowns = 1
 
   --variable,name=rs_max_delay_for_totm,op=reset,default=5
   var_rs_max_delay_for_totm = 5
