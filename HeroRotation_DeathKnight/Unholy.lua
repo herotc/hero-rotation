@@ -35,6 +35,7 @@ local OnUseExcludes = {
   --  I.TrinketName:ID(),
   I.InscrutableQuantumDevice:ID(),
   I.OverwhelmingPowerCrystal:ID(),
+  I.ScarsofFraternalStrife:ID(),
   I.TheFirstSigil:ID()
 }
 
@@ -523,6 +524,10 @@ local function Trinkets()
   -- use_item,name=inscrutable_quantum_device,if=(cooldown.unholy_blight.remains>20|cooldown.dark_transformation.remains_expected>20)&(active_enemies>=2|pet.army_ghoul.active|pet.apoc_ghoul.active&(talent.unholy_assault|death_knight.disable_aotd)|pet.gargoyle.active)|fight_remains<21|target.time_to_pct_20<5&!buff.bloodlust.up
   if I.InscrutableQuantumDevice:IsEquippedAndReady() and ((S.UnholyBlight:CooldownRemains() > 20 or S.DarkTransformation:CooldownRemains() > 20) and (EnemiesMeleeCount >= 2 or S.ArmyoftheDead:TimeSinceLastCast() <= 30 or VarApocGhoulActive and (S.UnholyAssault:IsAvailable() or Settings.Unholy.DisableAotD) or VarGargoyleActive) or HL.FilteredFightRemains(EnemiesMelee, "<", 21) or Target:TimeToX(20) < 5 and Player:BloodlustDown()) then
     if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device trinkets 2"; end
+  end
+  -- use_item,name=scars_of_fraternal_strife
+  if I.ScarsofFraternalStrife:IsEquippedAndReady() then
+    if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife trinkets 3"; end
   end
   -- use_item,name=the_first_sigil,if=variable.major_cooldowns_active&(time>30|!equipped.inscrutable_quantum_device)
   if I.TheFirstSigil:IsEquippedAndReady() and (VarMajorCDsActive and (HL.CombatTime() > 30 or not I.InscrutableQuantumDevice:IsEquipped())) then
