@@ -184,6 +184,7 @@ Item.Druid.Commons = {
   InstructorsDivineBell                 = Item(184842, {13, 14}),
   ShadowedOrbofTorment                  = Item(186428, {13, 14}),
   SoullettingRuby                       = Item(178809, {13, 14}),
+  TheFirstSigil                         = Item(188271, {13, 14}),
   -- Other On-Use Items
   Jotungeirr                            = Item(186404)
 }
