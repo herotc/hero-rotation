@@ -248,8 +248,8 @@ local function APL()
       if S.FallenOrder:IsCastable() then
         if Cast(S.FallenOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "fallen_order main 24"; end
       end
-      -- bonedust_brew
-      if S.BonedustBrew:IsCastable() then
+      -- bonedust_brew,if=!debuff.bonedust_brew_debuff.up
+      if S.BonedustBrew:IsCastable() and (Target:DebuffDown(S.BonedustBrew)) then
         if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Covenant) then return "bonedust_brew main 26"; end
       end
     end
