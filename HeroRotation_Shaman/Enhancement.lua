@@ -398,37 +398,35 @@ local function Aoe()
   if S.ChainLightning:IsReady() and (Player:BuffUp(S.StormkeeperBuff)) then
     if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 50"; end
   end
-  if (Player:BuffUp(S.CrashLightningBuff)) then
-    -- lava_lash,if=buff.crash_lightning.up
-    if S.LavaLash:IsReady() then
-      if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash aoe 52"; end
-    end
-    -- stormstrike,if=buff.crash_lightning.up
-    if S.Stormstrike:IsReady() then
-      if Cast(S.Stormstrike, nil, nil, not Target:IsInMeleeRange(5)) then return "lava_lash aoe 54"; end
-    end
-  end
-  -- fire_nova,if=active_dot.flame_shock>=2
-  if S.FireNova:IsReady() and (S.FlameShockDebuff:AuraActiveCount() >= 2) then
-    if Cast(S.FireNova) then return "fire_nova aoe 56"; end
+  -- lava_lash,if=buff.crash_lightning.up
+  if S.LavaLash:IsReady() and (Player:BuffUp(S.CrashLightningBuff)) then
+    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash aoe 52"; end
   end
   if (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
     -- elemental_blast,if=buff.maelstrom_weapon.stack>=5
     if S.ElementalBlast:IsReady() then
-      if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 58"; end
+      if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 54"; end
     end
     -- stormkeeper,if=buff.maelstrom_weapon.stack>=5
     if S.Stormkeeper:IsCastable() then
-      if Cast(S.Stormkeeper) then return "stormkeeper aoe 60"; end
+      if Cast(S.Stormkeeper) then return "stormkeeper aoe 56"; end
     end
-  end
-  -- crash_lightning
-  if S.CrashLightning:IsReady() then
-    if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInRange(8)) then return "crash_lightning aoe 62"; end
   end
   -- chain_lightning,if=buff.maelstrom_weapon.stack=10
   if S.ChainLightning:IsReady() and (Player:BuffStack(S.MaelstromWeaponBuff) == 10) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 64"; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 58"; end
+  end
+  -- stormstrike,if=buff.crash_lightning.up
+  if S.Stormstrike:IsReady() then
+    if Cast(S.Stormstrike, nil, nil, not Target:IsInMeleeRange(5)) then return "lava_lash aoe 60"; end
+  end
+  -- fire_nova,if=active_dot.flame_shock>=2
+  if S.FireNova:IsReady() and (S.FlameShockDebuff:AuraActiveCount() >= 2) then
+    if Cast(S.FireNova) then return "fire_nova aoe 62"; end
+  end
+  -- crash_lightning
+  if S.CrashLightning:IsReady() then
+    if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInRange(8)) then return "crash_lightning aoe 64"; end
   end
   -- windstrike
   if S.Windstrike:IsReady() then
