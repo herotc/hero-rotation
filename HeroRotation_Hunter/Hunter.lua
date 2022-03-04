@@ -66,7 +66,7 @@ Spell.Hunter.Commons = {
   ResonatingArrowDebuff                 = Spell(308498),
   WildSpirits                           = Spell(328231),
   WildSpiritsBuff                       = Spell(328275),
-  WildMarkDebuff                        = Spell(328275),
+  WildSpiritsDebuff                     = Spell(328275),
   -- Soulbinds
   EffusiveAnimaAccelerator              = Spell(352188),
   PustuleEruption                       = Spell(351094),
