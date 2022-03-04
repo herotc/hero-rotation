@@ -118,6 +118,12 @@ local function EvaluateTargetIfSerpentStingCleave2(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 8)
 end
 
+-- if=refreshable&!ticking&next_wi_bomb.volatile&target.time_to_die>15&focus+cast_regen>35&active_enemies<=4
+-- Note: next_wi_bomb.volatile, focus checks, and active_enemies checked before CastTargetIf
+local function EvaluateTargetIfSerpentStingCleave3(TargetUnit)
+  return (TargetUnit:DebuffDown(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 15)
+end
+
 -- if=full_recharge_time<gcd&focus+cast_regen<focus.max
 local function EvaluateKillCommandCycleCondition1(TargetUnit)
   return (S.KillCommand:FullRechargeTime() < Player:GCD() and CheckFocusCap(S.KillCommand:ExecuteTime(), 15))
@@ -668,6 +674,10 @@ local function Cleave()
   -- flayed_shot,target_if=max:target.health.pct
   if S.FlayedShot:IsCastable() then
     if Everyone.CastTargetIf(S.FlayedShot, EnemyList, "max", EvaluateTargetIfFilterMaxHealthPct, nil, not Target:IsSpellInRange(S.FlayedShot), nil, Settings.Commons.DisplayStyle.Covenant) then return "flayed_shot cleave 28"; end
+  end
+  -- serpent_sting,target_if=min:remains,if=refreshable&!ticking&next_wi_bomb.volatile&target.time_to_die>15&focus+cast_regen>35&active_enemies<=4
+  if S.SerpentSting:IsReady() and (S.VolatileBomb:IsCastable() and Player:Focus() + Player:FocusCastRegen(S.SerpentSting:ExecuteTime()) > 35 and EnemyCount8ySplash <= 4) then
+    if Cast(S.SerpentSting, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingCleave3, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting cleave 28.5"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&full_recharge_time<gcd&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
   if S.KillCommand:IsCastable() then
