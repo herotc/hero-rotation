@@ -686,7 +686,7 @@ local function NecroMW()
   if I.SoullettingRuby:IsEquippedAndReady() and (VarTrinketDelay < 8) then
     if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soulletting_ruby necro_mw 12"; end
   end
-  -- use_item,name=name=shadowed_orb_of_torment,if=variable.trinket_delay<4
+  -- use_item,name=shadowed_orb_of_torment,if=variable.trinket_delay<4
   if I.ShadowedOrbofTorment:IsEquippedAndReady() and (VarTrinketDelay < 4) then
     if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment necro_mw 14"; end
   end
@@ -831,7 +831,7 @@ local function APL()
     if HL.CombatTime() < 12 and Target:GUID() == FirstTarGUID then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
-    -- malefic_rapture,if=ptr=1&buff.calamitous_crescendo.up
+    -- malefic_rapture,if=buff.calamitous_crescendo.up
     if S.MaleficRapture:IsReady() and (Player:BuffUp(S.CalamitousCrescendo)) then
       if Cast(S.MaleficRapture) then return "malefic_rapture pre-necro_mw"; end
     end
