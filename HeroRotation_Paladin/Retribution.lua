@@ -303,7 +303,7 @@ local function Cooldowns()
     if (Player:BuffUp(S.AvengingWrathBuff) or Player:BuffUp(S.CrusadeBuff)) then
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludeTrinkets)
       if TrinketToUse then
-        if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
   end
@@ -317,7 +317,7 @@ local function Cooldowns()
   end
   -- ashen_hallow
   if S.AshenHallow:IsCastable() then
-    if Cast(S.AshenHallow, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(30)) then return "ashen_hallow cooldowns 64" end
+    if Cast(S.AshenHallow, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "ashen_hallow cooldowns 64" end
   end
   -- holy_avenger,if=time_to_hpg=0&holy_power<=2&(buff.avenging_wrath.up|talent.crusade&(cooldown.crusade.remains=0|buff.crusade.up)|fight_remains<20)
   if S.HolyAvenger:IsCastable() and (TimeToHPG <= Player:GCDRemains() and Player:HolyPower() <= 2 and (Player:BuffUp(S.AvengingWrath) or S.Crusade:IsAvailable() and (S.Crusade:CooldownUp() or Player:BuffUp(S.CrusadeBuff)) or FightRemains < 20)) then
