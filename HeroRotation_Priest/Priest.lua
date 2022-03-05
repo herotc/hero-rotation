@@ -25,6 +25,7 @@ if not Spell.Priest then Spell.Priest = {} end
 Spell.Priest.Commons = {
   -- Racials
   AncestralCall                         = Spell(274738),
+  ArcanePulse                           = Spell(260364),
   ArcaneTorrent                         = Spell(50613),
   BagofTricks                           = Spell(312411),
   Berserking                            = Spell(26297),
