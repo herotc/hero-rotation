@@ -79,6 +79,7 @@ Spell.Mage.Commons = {
   WastelandPropriety                    = Spell(333251),
   -- Conduit
   ArcaneProdigy                         = Spell(336873),
+  IcyPropulsion                         = Spell(336522),
   IreOfTheAscended                      = Spell(337058),
   PustuleEruption                       = Spell(351094),
   SiphonedMalice                        = Spell(337090),
