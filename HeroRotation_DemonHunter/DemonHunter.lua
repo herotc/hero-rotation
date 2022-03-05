@@ -48,7 +48,10 @@ Spell.DemonHunter.Commons = {
   -- Soulbind/Conduit Effects
   EnduringGloom                         = Spell(319978),
   ExposedWoundDebuff                    = Spell(339229), -- Triggered by Serrated Glaive
+  PustuleEruption                       = Spell(351094),
   SerratedGlaive                        = Spell(339230),
+  VolatileSolvent                       = Spell(323074),
+  VolatileSolventHumanBuff              = Spell(323491),
   -- Other
   Pool                                  = Spell(999910)
 }

@@ -175,6 +175,10 @@ local function Precombat()
   if S.ArcaneTorrent:IsCastable() and CDsON() then
     if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 1"; end
   end
+  -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 1.5"; end
+  end
   -- Manually added: Fel Rush if out of range
   if not Target:IsInMeleeRange(5) and S.FelRush:IsCastable() then
     if Cast(S.FelRush, nil, nil, not Target:IsInRange(15)) then return "fel_rush precombat 2"; end
@@ -228,6 +232,10 @@ local function Cooldown()
   -- elysian_decree,if=(active_enemies>desired_targets|raid_event.adds.in>30)
   if S.ElysianDecree:IsCastable() and (EnemiesCount8 > 0) then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "elysian_decree cooldown 16"; end
+  end
+  -- fleshcraft,if=soulbind.volatile_solvent&!buff.volatile_solvent_humanoid.up,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
+  if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft cooldown 18"; end
   end
 end
 
