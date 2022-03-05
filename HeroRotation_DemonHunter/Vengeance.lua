@@ -32,7 +32,6 @@ local I = Item.DemonHunter.Vengeance
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
   I.PulsatingStoneheart:ID(),
-  I.DarkmoonDeckIndomitable:ID(),
 }
 
 -- GUI Settings
@@ -136,12 +135,16 @@ local function Precombat()
   -- augmentation
   -- food
   -- snapshot_stats
+  -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 2"; end
+  end
   -- First attacks
   if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
-    if Cast(S.InfernalStrike, nil, nil, not Target:IsInRange(30)) then return "infernal_strike 6"; end
+    if Cast(S.InfernalStrike, nil, nil, not Target:IsInRange(30)) then return "infernal_strike precombat 4"; end
   end
   if S.Fracture:IsCastable() and IsInMeleeRange then
-    if Cast(S.Fracture) then return "fracture 8"; end
+    if Cast(S.Fracture) then return "fracture precombat 6"; end
   end
 end
 
@@ -153,9 +156,6 @@ local function Defensives()
     elseif (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.DemonSpikesHealthThreshold) then
       if Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "demon_spikes defensives (Danger)"; end
     end
-  end
-  if I.DarkmoonDeckIndomitable:IsEquipped() and I.DarkmoonDeckIndomitable:IsReady() and Settings.Commons.Enabled.Trinkets and Player:HealthPercentage() <= 75 then
-    if Cast(I.DarkmoonDeckIndomitable, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_indomitable defensives"; end
   end
   -- Metamorphosis,if=!buff.metamorphosis.up&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<15
   if S.Metamorphosis:IsCastable() and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold and (Player:BuffDown(S.MetamorphosisBuff) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff)) or Target:TimeToDie() < 15) then
@@ -174,18 +174,18 @@ end
 local function Brand()
   -- fiery_brand
   if S.FieryBrand:IsCastable() and IsInMeleeRange then
-    if Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand 92"; end
+    if Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand brand 2"; end
   end
   -- immolation_aura,if=dot.fiery_brand.ticking
   if S.ImmolationAura:IsCastable() and IsInMeleeRange and (Target:DebuffUp(S.FieryBrandDebuff)) then
-    if Cast(S.ImmolationAura) then return "immolation_aura 88"; end
+    if Cast(S.ImmolationAura) then return "immolation_aura brand 4"; end
   end
 end
 
 local function Cooldowns()
   -- potion
   if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
-    if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_unbridled_fury 60"; end
+    if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_unbridled_fury cooldowns 2"; end
   end
   -- use_items
   if Settings.Commons.Enabled.Trinkets then
@@ -196,72 +196,72 @@ local function Cooldowns()
   end
   -- sinful_brand,if=!dot.sinful_brand.ticking
   if S.SinfulBrand:IsCastable() and (Target:BuffDown(S.SinfulBrandDebuff)) then
-    if Cast(S.SinfulBrand, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 74"; end
+    if Cast(S.SinfulBrand, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand cooldowns 4"; end
   end
   -- the_hunt
   if S.TheHunt:IsCastable() then
-    if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt 76"; end
+    if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt cooldowns 6"; end
   end
   -- elysian_decree
   if S.ElysianDecree:IsCastable() then
-    if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Covenant) then return "elysian_decree 80"; end
+    if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Covenant) then return "elysian_decree cooldowns 8"; end
   end
 end
 
 local function Normal()
   -- infernal_strike
   if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (S.InfernalStrike:TimeSinceLastCast() > 2) then
-    if Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike 24"; end
+    if Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike normal 2"; end
   end
   -- bulk_extraction
   if S.BulkExtraction:IsCastable() then
-    if Cast(S.BulkExtraction) then return "bulk_extraction 26"; end
+    if Cast(S.BulkExtraction) then return "bulk_extraction normal 4"; end
   end
   -- spirit_bomb,if=((buff.metamorphosis.up&talent.fracture.enabled&soul_fragments>=3)|soul_fragments>=4)
   if S.SpiritBomb:IsReady() and IsInAoERange and ((Player:BuffUp(S.Metamorphosis) and S.Fracture:IsAvailable() and SoulFragments >= 3) or SoulFragments >= 4) then
-    if Cast(S.SpiritBomb) then return "spirit_bomb 28"; end
+    if Cast(S.SpiritBomb) then return "spirit_bomb normal 6"; end
   end
   -- fel_devastation
   -- Manual add: ,if=talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled
   -- This way we don't waste potential Meta uptime
   if S.FelDevastation:IsReady() and (S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) then
-    if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation 34"; end
+    if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation normal 8"; end
   end
   -- soul_cleave,if=((talent.spirit_bomb.enabled&soul_fragments=0)|!talent.spirit_bomb.enabled)&((talent.fracture.enabled&fury>=55)|(!talent.fracture.enabled&fury>=70)|cooldown.fel_devastation.remains>target.time_to_die|(buff.metamorphosis.up&((talent.fracture.enabled&fury>=35)|(!talent.fracture.enabled&fury>=50))))
   if S.SoulCleave:IsReady() and (((S.SpiritBomb:IsAvailable() and SoulFragments == 0) or not S.SpiritBomb:IsAvailable()) and ((S.Fracture:IsAvailable() and Player:Fury() >= 55) or (not S.Fracture:IsAvailable() and Player:Fury() >= 70) or S.FelDevastation:CooldownRemains() > Target:TimeToDie() or (Player:BuffUp(S.MetamorphosisBuff) and ((S.Fracture:IsAvailable() and Player:Fury() >= 35) or (not S.Fracture:IsAvailable() and Player:Fury() >= 50))))) then
-    if Cast(S.SoulCleave, nil, nil, not Target:IsSpellInRange(S.SoulCleave)) then return "soul_cleave 36"; end
+    if Cast(S.SoulCleave, nil, nil, not Target:IsSpellInRange(S.SoulCleave)) then return "soul_cleave normal 10"; end
   end
   -- immolation_aura,if=((variable.brand_build&cooldown.fiery_brand.remains>10)|!variable.brand_build)&fury<=90
   if S.ImmolationAura:IsCastable() and (((VarBrandBuild and S.FieryBrand:CooldownRemains() > 10) or not VarBrandBuild) and Player:Fury() <= 90) then
-    if Cast(S.ImmolationAura) then return "immolation_aura 38"; end
+    if Cast(S.ImmolationAura) then return "immolation_aura normal 12"; end
   end
   -- felblade,if=fury<=60
   if S.Felblade:IsCastable() and (Player:Fury() <= 60) then
-    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade 40"; end
+    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade normal 14"; end
   end
   -- fracture,if=((talent.spirit_bomb.enabled&soul_fragments<=3)|(!talent.spirit_bomb.enabled&((buff.metamorphosis.up&fury<=55)|(buff.metamorphosis.down&fury<=70))))
   if S.Fracture:IsCastable() and IsInMeleeRange and ((S.SpiritBomb:IsAvailable() and SoulFragments <= 3) or (not S.SpiritBomb:IsAvailable() and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Fury() <= 55) or (Player:BuffDown(S.MetamorphosisBuff) and Player:Fury() <= 70)))) then
-    if Cast(S.Fracture) then return "fracture 42"; end
+    if Cast(S.Fracture) then return "fracture normal 16"; end
   end
   -- sigil_of_flame,if=!(covenant.kyrian.enabled&runeforge.razelikhs_defilement)
   if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemains(S.SigilofFlameDebuff) <= 3 and (not (CovenantID == 1 and RazelikhsDefilementEquipped)) then
     if S.ConcentratedSigils:IsAvailable() then
-      if Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 44 (Concentrated)"; end
+      if Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame normal 18 (Concentrated)"; end
     else
-      if Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame 44 (Normal)"; end
+      if Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame normal 18 (Normal)"; end
     end
   end
   -- shear
   if S.Shear:IsReady() and IsInMeleeRange then
-    if Cast(S.Shear) then return "shear 46"; end
+    if Cast(S.Shear) then return "shear normal 20"; end
   end
   -- Manually adding Fracture as a fallback filler
   if S.Fracture:IsCastable() and IsInMeleeRange then
-    if Cast(S.Fracture) then return "fracture 48"; end
+    if Cast(S.Fracture) then return "fracture normal 22"; end
   end
   -- throw_glaive
   if S.ThrowGlaive:IsCastable() then
-    if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive 50 (OOR)"; end
+    if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive normal 24 (OOR)"; end
   end
 end
 
