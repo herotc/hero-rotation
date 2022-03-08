@@ -71,24 +71,14 @@ Hunter.FTCount = 0
 
 -- Set counter to zero when Trick Shots buff is removed
 HL:RegisterForSelfCombatEvent(function(...)
-  local _, _, _, sourceGUID, _, _, _, _, _, _, _, SpellID = select(1, ...)
-  if sourceGUID == Player:GUID() then
-    if SpellID == SpellMM.TrickShotsBuff:ID() then
-      Hunter.FTCount = 0
-    end
+  local SpellID = select(12, ...)
+  if SpellID == SpellMM.TrickShotsBuff:ID() then
+    Hunter.FTCount = 0
   end
 end, "SPELL_AURA_REMOVED")
 
 -- Count Focus spent since last Trick Shots
 HL:RegisterForSelfCombatEvent(function(...)
-  local _, _, _, sourceGUID, _, _, _, _, _, _, _, SpellID = select(1, ...)
-  if sourceGUID == Player:GUID() then
-    if SpellID == SpellMM.ArcaneShot:ID() or SpellID == SpellMM.Multishot:ID() or SpellID == SpellMM.ExplosiveShot:ID() or SpellID == SpellMM.AMurderofCrows:ID() or SpellID == SpellMM.ChimaeraShot:ID() then
-      Hunter.FTCount = Hunter.FTCount + 20
-    elseif SpellID == SpellMM.KillShot:ID() or SpellID == SpellMM.SerpentSting:ID() then
-      Hunter.FTCount = Hunter.FTCount + 10
-    elseif SpellID == SpellMM.Barrage:ID() then
-      Hunter.FTCount = Hunter.FTCount + 30
-    end
-  end
-end, "SPELL_DAMAGE")
+  local SpellID = select(12, ...)
+  Hunter.FTCount = Hunter.FTCount + Spell(SpellID):Cost()
+end, "SPELL_CAST_SUCCESS")
