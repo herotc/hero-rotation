@@ -40,6 +40,7 @@ Spell.Hunter.Commons = {
   Flare                                 = Spell(1543),
   HuntersMark                           = Spell(257284),
   Intimidation                          = Spell(19577),
+  ScareBeast                            = Spell(1513),
   TarTrap                               = Spell(187698),
   -- Pet Utility Abilities
   MendPet                               = Spell(136),
@@ -120,6 +121,7 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
 Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   -- Abilities
   AimedShot                             = Spell(19434),
+  BurstingShot                          = Spell(186387),
   KillShot                              = Spell(53351),
   Multishot                             = Spell(257620),
   RapidFire                             = Spell(257044),
