@@ -288,9 +288,6 @@ end
 
 -- APL Functions
 local function Precombat()
-  -- flask
-  -- food
-  -- augmentation
   -- variable,name=4cp_bite,value=0
   VarFourCPBite = 0
   -- variable,name=filler,value=1
