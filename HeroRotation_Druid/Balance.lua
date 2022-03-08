@@ -735,8 +735,8 @@ local function APL()
     if ((not OpenerFinished) and (CovenantID == 2 or CovenantID == 3)) then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
-    -- berserking,if=((!covenant.night_fae|!cooldown.convoke_the_spirits.up|runeforge.celestial_spirits)&buff.ca_inc.remains>15&buff.ravenous_frenzy.remains<4&!covenant.venthyr|covenant.venthyr&buff.ca_inc.up&buff.ravenous_frenzy.up&(buff.ravenous_frenzy.remains<12-4*runeforge.sinful_hysteria|buff.ca_inc.remains<11|1%spell_haste<1.6))&variable.in_gcd
-    if S.Berserking:IsCastable() and CDsON() and ((CovenantID ~= 3 or not S.ConvoketheSpirits:CooldownUp() or CelestialSpiritsEquipped) and Player:BuffRemains(CaInc) > 15 and Player:BuffRemains(S.RavenousFrenzyBuff) and CovenantID ~= 2 or CovenantID == 2 and Player:BuffUp(CaInc) and Player:BuffUp(S.RavenousFrenzyBuff) and (Player:BuffRemains(S.RavenousFrenzyBuff) < 12 - 4 * num(SinfulHysteriaEquipped) or Player:BuffRemains(CaInc) < 11 or 1 / Player:SpellHaste() < 1.6)) then
+    -- berserking,if=((!covenant.night_fae|!cooldown.convoke_the_spirits.up|!runeforge.balance_of_all_things)&buff.ca_inc.remains>15&buff.ravenous_frenzy.remains<4&!covenant.venthyr|covenant.venthyr&buff.ca_inc.up&buff.ravenous_frenzy.up&(buff.ravenous_frenzy.remains<12-4*runeforge.sinful_hysteria|buff.ca_inc.remains<11|1%spell_haste<1.6))&variable.in_gcd
+    if S.Berserking:IsCastable() and CDsON() and ((CovenantID ~= 3 or not S.ConvoketheSpirits:CooldownUp() or not BOATEquipped) and Player:BuffRemains(CaInc) > 15 and Player:BuffRemains(S.RavenousFrenzyBuff) and CovenantID ~= 2 or CovenantID == 2 and Player:BuffUp(CaInc) and Player:BuffUp(S.RavenousFrenzyBuff) and (Player:BuffRemains(S.RavenousFrenzyBuff) < 12 - 4 * num(SinfulHysteriaEquipped) or Player:BuffRemains(CaInc) < 11 or 1 / Player:SpellHaste() < 1.6)) then
       if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 2"; end
     end
     -- potion,if=(buff.ca_inc.remains>15&(!runeforge.sinful_hysteria|buff.ravenous_frenzy.remains<19&buff.ravenous_frenzy.up)|fight_remains<25)&variable.in_gcd
