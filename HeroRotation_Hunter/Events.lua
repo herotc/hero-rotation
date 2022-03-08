@@ -23,6 +23,17 @@ local GetTime = HL.GetTime
 -- Spells
 local SpellBM = Spell.Hunter.BeastMastery
 local SpellMM = Spell.Hunter.Marksmanship
+-- MM Spell Cost Table
+HR.Commons.Hunter.MMCost = {}
+local MMCost = HR.Commons.Hunter.MMCost
+for spell in pairs(SpellMM) do
+  if spell ~= "PoolFocus" then
+    if SpellMM[spell]:Cost() > 0 then
+      local SpellID = SpellMM[spell]:ID()
+      MMCost[SpellID] = SpellMM[spell]:Cost()
+    end
+  end
+end
 
 -- Animal Companion Listener
 do
@@ -80,5 +91,7 @@ end, "SPELL_AURA_REMOVED")
 -- Count Focus spent since last Trick Shots
 HL:RegisterForSelfCombatEvent(function(...)
   local SpellID = select(12, ...)
-  Hunter.FTCount = Hunter.FTCount + Spell(SpellID):Cost()
+  if MMCost[SpellID] ~= nil then
+    Hunter.FTCount = Hunter.FTCount + MMCost[SpellID]
+  end
 end, "SPELL_CAST_SUCCESS")
