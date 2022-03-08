@@ -45,6 +45,8 @@ local OnUseExcludes = {--  I.TrinketName:ID(),
 local VarFourCPBite
 local VarFiller
 local VarRipTicks
+local VarOnUseTrinket
+local VarMaxTrinketHold
 local VarShortestTTD
 local ComboPoints, ComboPointsDeficit
 local FightRemains
@@ -59,6 +61,17 @@ local FortyRange = S.BalanceAffinity:IsAvailable() and 43 or 40
 
 -- Berserk/Incarnation Variables
 local BsInc = S.Incarnation:IsAvailable() and S.Incarnation or S.Berserk
+
+-- Trinket Item Objects
+local equip = Player:GetEquipment()
+local trinket1 = Item(0)
+local trinket2 = Item(0)
+if equip[13] then
+  trinket1 = Item(equip[13])
+end
+if equip[14] then
+  trinket2 = Item(equip[14])
+end
 
 -- Legendaries
 local DeepFocusEquipped = Player:HasLegendaryEquipped(46)
@@ -75,6 +88,15 @@ end, "COVENANT_CHOSEN")
 
 -- Event Registration
 HL:RegisterForEvent(function()
+  equip = Player:GetEquipment()
+  trinket1 = Item(0)
+  trinket2 = Item(0)
+  if equip[13] then
+    trinket1 = Item(equip[13])
+  end
+  if equip[14] then
+    trinket2 = Item(equip[14])
+  end
   DeepFocusEquipped = Player:HasLegendaryEquipped(46)
   CateyeCurioEquipped = Player:HasLegendaryEquipped(57)
 end, "PLAYER_EQUIPMENT_CHANGED")
@@ -294,6 +316,14 @@ local function Precombat()
   VarFiller = Settings.Feral.FillerSpell
   -- variable,name=rip_ticks,value=7
   VarRipTicks = 7
+  -- variable,name=on_use_trinket,value=0
+  VarOnUseTrinket = 0
+  -- variable,name=on_use_trinket,op=add,value=(trinket.1.has_proc.any&trinket.1.cooldown.duration)|trinket.1.is.inscrutable_quantum_device
+  VarOnUseTrinket = num(trinket1:IsReady() or trinket1:CooldownRemains() > 0 or trinket1:ID() == I.InscrutableQuantumDevice:ID())
+  -- variable,name=on_use_trinket,op=add,value=((trinket.2.has_proc.any&trinket.2.cooldown.duration)|trinket.2.is.inscrutable_quantum_device)*2
+  VarOnUseTrinket = VarOnUseTrinket + num(trinket2:IsReady() or trinket2:CooldownRemains() > 0 or trinket2:ID() == I.InscrutableQuantumDevice:ID()) * 2
+  -- variable,name=max_trinket_hold,value=61
+  VarMaxTrinketHold = 61
   if Everyone.TargetIsValid() then
     -- fleshcraft,if=(soulbind.pustule_eruption|soulbind.volatile_solvent)
     if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
@@ -328,8 +358,8 @@ local function Owlweave()
     if S.Sunfire:IsReady() and (S.Sunfire:TimeSinceLastCast() > 4 * Player:GCD()) then
       if Cast(S.Sunfire, nil, nil, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire owlweave 4"; end
     end
-    -- moonfire,line_cd=4*gcd,if=buff.moonkin_form.up&spell_targets.thrash_cat<2&!talent.lunar_inspiration.enabled
-    if S.Moonfire:IsReady() and S.Moonfire:TimeSinceLastCast() > 4 * Player:GCD() and (EnemiesCount8y < 2 and not S.LunarInspiration:IsAvailable()) then
+    -- moonfire,line_cd=4*gcd,if=buff.moonkin_form.up&spell_targets.thrash_cat<2&!talent.lunar_inspiration.enabled&energy<60&!buff.clearcasting.up
+    if S.Moonfire:IsReady() and S.Moonfire:TimeSinceLastCast() > 4 * Player:GCD() and (EnemiesCount8y < 2 and (not S.LunarInspiration:IsAvailable()) and Player:Energy() < 60 and Player:BuffDown(S.Clearcasting)) then
       if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire owlweave 6"; end
     end
   end
@@ -408,22 +438,33 @@ local function Cooldown()
   if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft cooldown 4"; end
   end
+  -- use_items,slots=trinket1,if=((cooldown.convoke_the_spirits.remains<2&(buff.bs_inc.up|cooldown.bs_inc.remains>10))|fight_remains<20)|(cooldown.convoke_the_spirits.remains-2>variable.max_trinket_hold)|variable.on_use_trinket=0|(variable.on_use_trinket=2&(cooldown.convoke_the_spirits.remains>22|fight_remains<20|trinket.2.cooldown.remains>20))
+  if trinket1:IsReady() and Settings.Commons.Enabled.Trinkets and (((S.ConvoketheSpirits:CooldownRemains() < 2 and (Player:BuffUp(BsInc) or BsInc:CooldownRemains() > 10)) or FightRemains < 20) or (S.ConvoketheSpirits:CooldownRemains() - 2 > VarMaxTrinketHold) or VarOnUseTrinket == 0 or (VarOnUseTrinket == 2 and (S.ConvoketheSpirits:CooldownRemains() > 22 or FightRemains < 20 or trinket2:CooldownRemains() > 20))) then
+    if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 cooldown 5"; end
+  end
+  -- use_items,slots=trinket2,if=((cooldown.convoke_the_spirits.remains<2&(buff.bs_inc.up|cooldown.bs_inc.remains>10)&(trinket.1.cooldown.remains>=2|variable.on_use_trinket=2))|fight_remains<20)|((cooldown.convoke_the_spirits.remains-2+60*((trinket.1.cooldown.remains<cooldown.convoke_the_spirits.remains-2)&(variable.on_use_trinket=1|variable.on_use_trinket>=3)))>variable.max_trinket_hold)|variable.on_use_trinket=0|(variable.on_use_trinket=1&(cooldown.convoke_the_spirits.remains>22|fight_remains<20|trinket.1.cooldown.remains>20))
+  if trinket2:IsReady() and Settings.Commons.Enabled.Trinkets and (((S.ConvoketheSpirits:CooldownRemains() < 2 and (Player:BuffUp(BsInc) or BsInc:CooldownRemains() > 10) and (trinket1:CooldownRemains() >= 2 or VarOnUseTrinket == 2)) or FightRemains < 20) or ((S.ConvoketheSpirits:CooldownRemains() - 2 + 60 * num((trinket1:CooldownRemains() < S.ConvoketheSpirits:CooldownRemains() - 2) and (VarOnUseTrinket == 1 or VarOnUseTrinket >= 3))) > VarMaxTrinketHold) or VarOnUseTrinket == 0 or (VarOnUseTrinket == 1 and (S.ConvoketheSpirits:CooldownRemains() > 22 or FightRemains < 20 or trinket1:CooldownRemains() > 20))) then
+    if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 cooldown 6"; end
+  end
   -- tigers_fury,sync=feral_frenzy,if=cooldown.bs_inc.up
   -- FeralFrenzy IsReady check for "sync=feral_frenzy"
   if S.TigersFury:IsCastable() and (S.FeralFrenzy:IsReady() and BsInc:CooldownUp()) then
-    if Cast(S.TigersFury) then return "tigers_fury cooldown 6"; end
+    if Cast(S.TigersFury) then return "tigers_fury cooldown 7"; end
   end
   -- feral_frenzy,target_if=max:target.time_to_die,if=combo_points<3&target.time_to_die>7&(buff.savage_roar.up|!talent.savage_roar.enabled)&(!cooldown.tigers_fury.up|cooldown.bs_inc.up)|fight_remains<8&fight_remains>2
   if S.FeralFrenzy:IsReady() then
     if Everyone.CastTargetIf(S.FeralFrenzy, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, EvaluateTargetIfFeralFrenzyCooldown4, not Target:IsInRange(MeleeRange)) then return "feral_frenzy cooldown 8"; end
   end
-  -- berserk,if=combo_points>=3
-  -- incarnation,if=combo_points>=3
-  if BsInc:IsReady() and (ComboPoints >= 3) then
-    if Cast(BsInc, Settings.Feral.GCDasOffGCD.BsInc) then return "bs_inc cooldown 10"; end
+  -- berserk,if=dot.rip.ticking&(cooldown.convoke_the_spirits.up|cooldown.convoke_the_spirits.remains>32|fight_remains<20)
+  if S.Berserk:IsReady() and CDsON() and (Target:DebuffUp(S.RipDebuff) and (S.ConvoketheSpirits:CooldownUp() or S.ConvoketheSpirits:CooldownRemains() > 32 or FightRemains < 20)) then
+    if Cast(S.Berserk, Settings.Feral.GCDasOffGCD.BsInc) then return "berserk cooldown 9"; end
   end
-  -- tigers_fury,if=energy.deficit>40|buff.bs_inc.up|(talent.predator.enabled&variable.shortest_ttd<3)
-  if S.TigersFury:IsCastable() and (Player:EnergyDeficit() > 40 or Player:BuffUp(BsInc) or (S.Predator:IsAvailable() and VarShortestTTD < 3)) then
+  -- incarnation,if=dot.rip.ticking&(cooldown.convoke_the_spirits.up|fight_remains<30)
+  if S.Incarnation:IsReady() and CDsON() and (Target:DebuffUp(S.RipDebuff) and (S.ConvoketheSpirits:CooldownUp() or FightRemains < 30)) then
+    if Cast(S.Incarnation, Settings.Feral.GCDasOffGCD.BsInc) then return "incarnation cooldown 10"; end
+  end
+  -- tigers_fury,if=energy.deficit>40|buff.bs_inc.up|(talent.predator.enabled&variable.shortest_ttd<3)|(!dot.rip.ticking&buff.bloodtalons.up)
+  if S.TigersFury:IsCastable() and (Player:EnergyDeficit() > 40 or Player:BuffUp(BsInc) or (S.Predator:IsAvailable() and VarShortestTTD < 3) or (Target:DebuffDown(S.RipDebuff) and Player:BuffUp(S.BloodtalonsBuff))) then
     if Cast(S.TigersFury, Settings.Feral.OffGCDasOffGCD.TigersFury) then return "tigers_fury cooldown 12"; end
   end
   -- shadowmeld,if=buff.tigers_fury.up&buff.bs_inc.down&combo_points<4&buff.sudden_ambush.down&dot.rake.pmultiplier<1.6&energy>40&druid.rake.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2&target.time_to_die>5
@@ -442,8 +483,8 @@ local function Cooldown()
   if S.RavenousFrenzy:IsCastable() and (Player:BuffUp(BsInc) or FightRemains < 21) then
     if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy cooldown 20"; end
   end
-  -- convoke_the_spirits,if=(dot.rip.remains>4&combo_points<5&(dot.rake.ticking|spell_targets.thrash_cat>1)&energy.deficit>=20)|fight_remains<5
-  if S.ConvoketheSpirits:IsCastable() and ((Target:DebuffRemains(S.RipDebuff) > 4 and ComboPoints < 5 and (Target:DebuffUp(S.RakeDebuff) or EnemiesCount8y > 1) and Player:EnergyDeficit() >= 20) or FightRemains < 5) then
+  -- convoke_the_spirits,if=(dot.rip.remains>4&combo_points<5&(dot.rake.ticking|spell_targets.thrash_cat>1)&energy.deficit>=20&cooldown.bs_inc.remains>10)|fight_remains<5|(buff.bs_inc.up&buff.bs_inc.remains>12)
+  if S.ConvoketheSpirits:IsCastable() and ((Target:DebuffRemains(S.RipDebuff) > 4 and ComboPoints < 5 and (Target:DebuffUp(S.RakeDebuff) or EnemiesCount8y > 1) and Player:EnergyDeficit() >= 20 and BsInc:CooldownRemains() > 10) or FightRemains < 5 or (Player:BuffUp(BsInc) and Player:BuffRemains(BsInc) > 12)) then
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "convoke_the_spirits cooldown 22"; end
   end
   -- kindred_spirits,if=buff.tigers_fury.up|(conduit.deep_allegiance.enabled)
