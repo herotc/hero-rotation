@@ -211,6 +211,10 @@ local function Cooldown()
   if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or HL.BossFilteredFightRemains("<", 60)) then
     if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldown 6"; end
   end
+  -- use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up&(active_enemies=desired_targets&raid_event.adds.in>60|active_enemies>desired_targets|fight_remains<25)
+  if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredAxeBuff) and (EnemiesCount8 >= 1 or FightRemains < 25)) then
+    if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures cooldown 7"; end
+  end
   -- use_items,slots=trinket1,if=variable.trinket_sync_slot=1&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.1.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready)|!variable.trinket_sync_slot
   -- TODO: Find a way to get trinket.x.cooldown.duration
   if trinket1:IsReady() and (VarTrinketSyncSlot == 1 and (Player:BuffUp(S.MetamorphosisBuff) or (not S.Demonic:IsAvailable() and S.Metamorphosis:CooldownRemains() > HL.FightRemains(Enemies20y)) or HL.BossFilteredFightRemains("<=", 20)) or (VarTrinketSyncSlot == 2 and not trinket2:IsReady()) or VarTrinketSyncSlot == 0) then

@@ -52,6 +52,8 @@ Spell.DemonHunter.Commons = {
   SerratedGlaive                        = Spell(339230),
   VolatileSolvent                       = Spell(323074),
   VolatileSolventHumanBuff              = Spell(323491),
+  -- Trinket Effects
+  AcquiredAxeBuff                       = Spell(368650),
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -127,7 +129,10 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
 -- Items
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Commons = {
+  -- Potions
   PotionofPhantomFire              = Item(171349),
+  -- Trinkets
+  CacheofAcquiredTreasures         = Item(188265, {13, 14}),
   PulsatingStoneheart              = Item(178825, {13, 14}),
   DarkmoonDeckIndomitable          = Item(173096, {13, 14}),
 }
