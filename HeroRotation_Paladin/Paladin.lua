@@ -153,7 +153,6 @@ Item.Paladin.Commons = {
   -- Potion
   PotionofSpectralIntellect             = Item(171273),
   PotionofSpectralStrength              = Item(171275),
-  PotionofPhantomFire                   = Item(171349),
   -- Trinkets
   AspirantsBadgeCosmic                  = Item(186906, {13, 14}),
   AspirantsBadgeSinful                  = Item(175884, {13, 14}),
