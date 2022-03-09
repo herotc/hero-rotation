@@ -63,7 +63,6 @@ HR.GUISettings.APL.Rogue = {
   },
   Outlaw = {
     Enabled = {
-      VanishEchoingReprimand = false,
     },
     -- Roll the Bones Logic, accepts "SimC", "1+ Buff" and every "RtBName".
     -- "SimC", "1+ Buff", "Broadside", "Buried Treasure", "Grand Melee", "Skull and Crossbones", "Ruthless Precision", "True Bearing"

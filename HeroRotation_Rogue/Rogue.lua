@@ -82,6 +82,7 @@ Spell.Rogue.Commons = {
   SerratedBoneSpike       = Spell(328547),
   SerratedBoneSpikeDebuff = Spell(324073),
   -- Soulbinds/Conduits (Shadowlands)
+  EffusiveAnimaAccelerator= Spell(352188),
   KevinsOozeling          = Spell(352110),
   KevinsWrathDebuff       = Spell(352528),
   LeadbyExample           = Spell(342156),
@@ -91,6 +92,10 @@ Spell.Rogue.Commons = {
   VolatileSolvent         = Spell(323074),
   -- Domination Shards
   ChaosBaneBuff           = Spell(355829),
+  -- Trinkets
+  AcquiredSword           = Spell(368657),
+  AcquiredAxe             = Spell(368656),
+  AcquiredWand            = Spell(368654),
   -- Misc
   PoolEnergy              = Spell(999910),
   SinfulRevelationDebuff  = Spell(324260),
@@ -193,6 +198,8 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   ConcealedBlunderbuss    = Spell(340587),
   DeathlyShadowsBuff      = Spell(341202),
   GreenskinsWickers       = Spell(340573),
+  -- Set Bonuses (Shadowlands)
+  TornadoTriggerBuff      = Spell(364556),
 })
 
 Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
@@ -290,6 +297,7 @@ Item.Rogue.Subtlety = {
   VigorTrinket          = Item(165572, {13, 14}),
   FontOfPower           = Item(169314, {13, 14}),
   RazorCoral            = Item(169311, {13, 14}),
+  CacheOfAcquiredTreasures = Item(188265, {13, 14}),
 }
 
 -- Stealth
