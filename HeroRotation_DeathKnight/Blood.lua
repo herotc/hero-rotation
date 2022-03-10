@@ -33,7 +33,12 @@ local OnUseExcludes = {
 }
 
 -- Rotation Var
-local ShouldReturn
+local VarDeathStrikeDumpAmt
+local VarDeathsDueBuffCheck
+local VarHeartStrikeRP
+local VarHeartStrikeRPDRW
+local VarHeartStrikeRPDRWVenthyr
+local VarTomestoneBoneCount
 local IsTanking
 local EnemiesMelee
 local EnemiesMeleeCount
@@ -126,9 +131,10 @@ local function Defensives()
     if S.Marrowrend:IsReady() then
       if Cast(S.Marrowrend, nil, nil, not Target:IsSpellInRange(S.Marrowrend)) then return "marrowrend defensives 6"; end
     end
-    if S.Tombstone:IsReady() and Player:BuffStack(S.BoneShieldBuff) >= 7 then
-      if Cast(S.Tombstone, Settings.Blood.GCDasOffGCD.Tombstone) then return "tombstone defensives 8"; end
-    end
+    -- Moving back to drw_up_venthyr and standard. Leaving this commented out for now, in case we want to revert.
+    --if S.Tombstone:IsReady() and Player:BuffStack(S.BoneShieldBuff) >= 7 then
+      --if Cast(S.Tombstone, Settings.Blood.GCDasOffGCD.Tombstone) then return "tombstone defensives 8"; end
+    --end
     if S.DeathStrike:IsReady() then
       if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike defensives 10"; end
     end
@@ -151,124 +157,184 @@ local function Defensives()
   end
 end
 
-local function Standard()
-  -- blood_tap,if=rune<=2&rune.time_to_4>gcd&charges_fractional>=1.8
-  if S.BloodTap:IsCastable() and (Player:Rune() <= 2 and Player:RuneTimeToX(4) > Player:GCD() and S.BloodTap:ChargesFractional() >= 1.8) then
-    if Cast(S.BloodTap) then return "blood_tap standard 2"; end
+local function Racials()
+  -- blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
+  if S.BloodFury:IsCastable() and (S.DancingRuneWeapon:CooldownUp() and (not S.Blooddrinker:IsReady() or not S.Blooddrinker:IsAvailable()))  then
+    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury racials 2"; end
   end
-  -- dancing_rune_weapon,if=(!talent.blooddrinker.enabled|!cooldown.blooddrinker.ready)&!(covenant.venthyr&cooldown.swarming_mist.ready&runic_power>=(90-(spell_targets.swarming_mist*3)))
-  if S.DancingRuneWeapon:IsCastable() and (((not S.Blooddrinker:IsAvailable()) or not S.Blooddrinker:CooldownUp()) and not (CovenantID == 2 and S.SwarmingMist:CooldownUp() and Player:RunicPower() >= (90 - (EnemiesMeleeCount * 3)))) then
-    if Cast(S.DancingRuneWeapon, Settings.Blood.GCDasOffGCD.DancingRuneWeapon) then return "dancing_rune_weapon standard 4"; end
+  -- berserking
+  if S.Berserking:IsCastable() then
+    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking racials 4"; end
   end
-  -- tombstone,if=buff.bone_shield.stack>=7&rune>=2
-  -- Moved to Defensives
-  -- marrowrend,if=(!covenant.necrolord|buff.abomination_limb.up)&(buff.bone_shield.remains<=rune.time_to_3|buff.bone_shield.remains<=(gcd+cooldown.blooddrinker.ready*talent.blooddrinker.enabled*2)|buff.bone_shield.stack<3)&runic_power.deficit>=20
-  if S.Marrowrend:IsReady() and ((CovenantID ~= 4 or Player:BuffUp(S.AbominationLimbBuff)) and (Player:BuffRemains(S.BoneShieldBuff) <= Player:RuneTimeToX(3) or Player:BuffRemains(S.BoneShieldBuff) <= (Player:GCD() + num(S.Blooddrinker:CooldownUp()) * num(S.Blooddrinker:IsAvailable()) * 2) or Player:BuffStack(S.BoneShieldBuff) < 3) and Player:RunicPowerDeficit() >= 20) then
-    if Cast(S.Marrowrend, nil, nil, not Target:IsSpellInRange(S.Marrowrend)) then return "marrowrend standard 8"; end
+  -- arcane_pulse,if=active_enemies>=2|rune<1&runic_power.deficit>60
+  if S.ArcanePulse:IsCastable() and (EnemiesMeleeCount >= 2 or Player:Rune() < 1 and Player:RunicPowerDeficit() > 60) then
+    if Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 6"; end
   end
-  -- death_strike,if=runic_power.deficit<=70&!(talent.bonestorm.enabled&cooldown.bonestorm.remains<2)&!(covenant.venthyr&cooldown.swarming_mist.remains<3)
-  if S.DeathStrike:IsReady() and (Player:RunicPowerDeficit() <= 70 and (not (S.Bonestorm:IsAvailable() and S.Bonestorm:CooldownRemains() < 2)) and not (CovenantID == 2 and S.SwarmingMist:CooldownRemains() < 3)) then
-    if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike standard 10"; end
+  -- lights_judgment,if=buff.unholy_strength.up
+  if S.LightsJudgment:IsCastable() and (Player:BuffUp(S.UnholyStrengthBuff)) then
+    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
   end
-  -- marrowrend,if=buff.bone_shield.stack<6&runic_power.deficit>=15&(!covenant.night_fae|buff.deaths_due.remains>5)
-  if S.Marrowrend:IsReady() and (Player:BuffStack(S.BoneShieldBuff) < 6 and Player:RunicPowerDeficit() >= 15 and (CovenantID ~= 3 or Player:BuffRemains(S.DeathsDueBuff) > 5)) then
-    if Cast(S.Marrowrend, nil, nil, not Target:IsSpellInRange(S.Marrowrend)) then return "marrowrend standard 12"; end
+  -- ancestral_call
+  if S.AncestralCall:IsCastable() then
+    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
   end
-  -- heart_strike,if=!talent.blooddrinker.enabled&death_and_decay.remains<5&runic_power.deficit<=(15+buff.dancing_rune_weapon.up*5+spell_targets.heart_strike*talent.heartbreaker.enabled*2)
-  if S.HeartStrike:IsReady() and (not S.Blooddrinker:IsAvailable() and Player:BuffRemains(S.DeathAndDecayBuff) < 5 and Player:RunicPowerDeficit() <= (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 5 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2)) then
-    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike standard 14"; end
+  -- fireblood
+  if S.Fireblood:IsCastable() then
+    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood racials 12"; end
   end
-  -- blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)
-  if S.BloodBoil:IsCastable() and (S.BloodBoil:ChargesFractional() >= 1.8 and (Player:BuffStack(S.HemostasisBuff) <= (5 - EnemiesCount10y) or EnemiesCount10y > 2)) then
-    if Cast(S.BloodBoil, Settings.Blood.GCDasOffGCD.BloodBoil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil standard 16"; end
-  end
-  -- death_and_decay,if=(buff.crimson_scourge.up&talent.relish_in_blood.enabled)&runic_power.deficit>10
-  if S.DeathAndDecay:IsReady() and ((Player:BuffUp(S.CrimsonScourgeBuff) and S.RelishinBlood:IsAvailable()) and Player:RunicPowerDeficit() > 10) then
-    if Cast(S.DeathAndDecay, nil, nil, not Target:IsInRange(30)) then return "death_and_decay standard 18"; end
-  end
-  -- bonestorm,if=runic_power>=100&(!buff.dancing_rune_weapon.up|(covenant.venthyr&buff.swarming_mist.up))
-  if S.Bonestorm:IsReady() and (Player:RunicPower() >= 100 and (Player:BuffDown(S.DancingRuneWeaponBuff) or (CovenantID == 2 and Player:BuffUp(S.SwarmingMist)))) then
-    if Cast(S.Bonestorm, nil, nil, not Target:IsInRange(8)) then return "bonestorm standard 20"; end
-  end
-  -- death_strike,if=runic_power.deficit<=(15+buff.dancing_rune_weapon.up*5+spell_targets.heart_strike*talent.heartbreaker.enabled*2)|target.1.time_to_die<10
-  if S.DeathStrike:IsReady() and (Player:RunicPowerDeficit() <= (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 5 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2) or Target:TimeToDie() < 10) then
-    if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike standard 22"; end
-  end
-  -- death_and_decay,if=spell_targets.death_and_decay>=3
-  if S.DeathAndDecay:IsReady() and (EnemiesMeleeCount >= 3) then
-    if Cast(S.DeathAndDecay, nil, nil, not Target:IsInRange(30)) then return "death_and_decay standard 24"; end
-  end
-  -- heart_strike,if=buff.dancing_rune_weapon.up|rune.time_to_4<gcd
-  if S.HeartStrike:IsReady() and (Player:BuffUp(S.DancingRuneWeaponBuff) or Player:RuneTimeToX(4) < Player:GCD()) then
-    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike standard 26"; end
-  end
-  -- blood_boil,if=buff.dancing_rune_weapon.up
-  if S.BloodBoil:IsCastable() and (Player:BuffUp(S.DancingRuneWeaponBuff)) then
-    if Cast(S.BloodBoil, Settings.Blood.GCDasOffGCD.BloodBoil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil standard 28"; end
-  end
-  -- blood_tap,if=rune.time_to_3>gcd
-  if S.BloodTap:IsCastable() and (Player:RuneTimeToX(3) > Player:GCD()) then
-    if Cast(S.BloodTap) then return "blood_tap standard 30"; end
-  end
-  -- death_and_decay,if=buff.crimson_scourge.up|talent.rapid_decomposition.enabled|spell_targets.death_and_decay>=2
-  if S.DeathAndDecay:IsReady() and (Player:BuffUp(S.CrimsonScourgeBuff) or S.RapidDecomposition:IsAvailable() or EnemiesMeleeCount >= 2) then
-    if Cast(S.DeathAndDecay, nil, nil, not Target:IsInRange(30)) then return "death_and_decay standard 32"; end
-  end
-  -- consumption
-  if S.Consumption:IsCastable() then
-    if Cast(S.Consumption, nil, Settings.Blood.DisplayStyle.Consumption, not Target:IsSpellInRange(S.Consumption)) then return "consumption standard 34"; end
-  end
-  -- blood_boil,if=charges_fractional>=1.1
-  if S.BloodBoil:IsCastable() and (S.BloodBoil:ChargesFractional() >= 1.1) then
-    if Cast(S.BloodBoil, Settings.Blood.GCDasOffGCD.BloodBoil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil standard 36"; end
-  end
-  -- heart_strike,if=(rune>1&(rune.time_to_3<gcd|buff.bone_shield.stack>7))
-  if S.HeartStrike:IsReady() and (Player:Rune() > 1 and (Player:RuneTimeToX(3) < Player:GCD() or Player:BuffStack(S.BoneShieldBuff) > 7)) then
-    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike standard 38"; end
+  -- bag_of_tricks
+  if S.BagofTricks:IsCastable() then
+    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks racials 14"; end
   end
   -- arcane_torrent,if=runic_power.deficit>20
   if S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 20) then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInMeleeRange(8)) then return "arcane_torrent standard 40"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent racials 16"; end
   end
 end
 
 local function Covenants()
-  -- death_strike,if=covenant.night_fae&buff.deaths_due.remains>6&runic_power>70&!(talent.bonestorm.enabled&cooldown.bonestorm.remains<2)
-  if S.DeathStrike:IsReady() and (CovenantID == 3 and Player:BuffRemains(S.DeathsDueBuff) > 6 and Player:RunicPower() > 70 and not (S.Bonestorm:IsAvailable() and S.Bonestorm:CooldownRemains() < 2)) then
-    if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike covenants 2"; end
-  end
-  -- heart_strike,if=covenant.night_fae&death_and_decay.ticking&((buff.deaths_due.up|buff.dancing_rune_weapon.up)&buff.deaths_due.remains<6)
-  if S.HeartStrike:IsReady() and (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff) and ((Player:BuffUp(S.DeathsDueBuff) or Player:BuffUp(S.DancingRuneWeaponBuff)) and Player:BuffRemains(S.DeathsDueBuff))) then
-    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike covenants 4"; end
-  end
   -- deaths_due,if=!buff.deaths_due.up|buff.deaths_due.remains<4|buff.crimson_scourge.up
   if S.DeathsDue:IsReady() and (Player:BuffDown(S.DeathsDueBuff) or Player:BuffRemains(S.DeathsDueBuff) < 4 or Player:BuffUp(S.CrimsonScourgeBuff)) then
     if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DeathsDue)) then return "deaths_due covenants 6"; end
   end
-  -- swarming_mist,if=(cooldown.dancing_rune_weapon.remains>3&covenant.venthyr&runic_power>=(90-(spell_targets.swarming_mist*3)))
-  if S.SwarmingMist:IsCastable() and (S.DancingRuneWeapon:CooldownRemains() > 3 and CovenantID == 2 and Player:RunicPower() >= (90 - (EnemiesMeleeCount * 3))) then
+  -- swarming_mist,if=cooldown.dancing_rune_weapon.remains>3&runic_power>=(90-(spell_targets.swarming_mist*3))
+  if S.SwarmingMist:IsCastable() and (S.DancingRuneWeapon:CooldownRemains() > 3 and Player:RunicPower() >= (90 - (EnemiesMeleeCount * 3))) then
     if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant) then return "swarming_mist covenants 7"; end
-  end
-  -- sacrificial_pact,if=(!covenant.night_fae|buff.deaths_due.remains>6)&!buff.dancing_rune_weapon.up&(pet.ghoul.remains<10|target.time_to_die<gcd)
-  -- Note: Manually changed target.time_to_die to fight_remains to stop suggesting when one mob in a pack is about to die.
-  if ghoul.active() and S.SacrificialPact:IsReady() and ((CovenantID ~= 3 or Player:BuffRemains(S.DeathsDueBuff) > 6) and Player:BuffDown(S.DancingRuneWeaponBuff) and (ghoul.remains() < 10 or HL.FilteredFightRemains(Enemies10y, "<", Player:GCD()))) then
-    if Cast(S.SacrificialPact, Settings.Commons.OffGCDasOffGCD.SacrificialPact) then return "sacrificial_pact covenants 8"; end
-  end
-  -- marrowrend,if=covenant.necrolord&buff.bone_shield.stack<=0
-  if S.Marrowrend:IsReady() and (CovenantID == 4 and Player:BuffDown(S.BoneShieldBuff)) then
-    if Cast(S.Marrowrend, nil, nil, not Target:IsSpellInRange(S.Marrowrend)) then return "marrowrend covenants 14"; end
   end
   -- abomination_limb,if=!buff.dancing_rune_weapon.up
   if S.AbominationLimb:IsCastable() and CDsON() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
     if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(8)) then return "abomination_limb covenants 16"; end
   end
+  -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent&!buff.volatile_solvent_humanoid.up,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft covenants 20"; end
+  end
   -- shackle_the_unworthy,if=cooldown.dancing_rune_weapon.remains<3|!buff.dancing_rune_weapon.up
   if S.ShackleTheUnworthy:IsCastable() and (S.DancingRuneWeapon:CooldownRemains() < 3 or Player:BuffDown(S.DancingRuneWeaponBuff)) then
     if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 18"; end
   end
-  -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent&!buff.volatile_solvent_humanoid.up,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
-  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft covenants 20"; end
+end
+
+local function DRWUp()
+  -- variable,name=heart_strike_rp_drw,value=(15+buff.dancing_rune_weapon.up*10+spell_targets.heart_strike*talent.heartbreaker.enabled*2),op=setif,condition=covenant.night_fae&death_and_decay.ticking,value_else=(15+buff.dancing_rune_weapon.up*10+spell_targets.heart_strike*talent.heartbreaker.enabled*2)*1.2
+  if (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff)) then
+    VarHeartStrikeRPDRW = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2)
+  else
+    VarHeartStrikeRPDRW = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2) * 1.2
+  end
+  -- marrowrend,if=(!covenant.necrolord|buff.abomination_limb.up)&(buff.bone_shield.remains<=rune.time_to_3|buff.bone_shield.remains<=(gcd+cooldown.blooddrinker.ready*talent.blooddrinker.enabled*4|buff.bone_shield.stack<3))&runic_power.deficit>20
+  if S.Marrowrend:IsReady() and ((CovenantID ~= 4 or Player:BuffUp(S.AbominationLimbBuff)) and (Player:BuffRemains(S.BoneShieldBuff) <= Player:RuneTimeToX(3) or Player:BuffRemains(S.BoneShieldBuff) <= (Player:GCD() + num(S.Blooddrinker:CooldownUp()) * num(S.Blooddrinker:IsAvailable()) * 4) or Player:BuffStack(S.BoneShieldBuff) < 3) and Player:RunicPowerDeficit() > 20) then
+    if Cast(S.Marrowrend, nil, nil, not Target:IsSpellInRange(S.Marrowrend)) then return "marrowrend drw_up 2"; end
+  end
+  -- blood_boil,if=charges>=2
+  if S.BloodBoil:IsCastable() and (S.BloodBoil:Charges() >= 2) then
+    if Cast(S.BloodBoil, Settings.Blood.GCDasOffGCD.BloodBoil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil drw_up 4"; end
+  end
+  -- death_strike,if=(runic_power.deficit<=variable.death_strike_dump_amount&!(buff.dancing_rune_weapon.remains<=2&talent.bonestorm.enabled&cooldown.bonestorm.remains<2))|runic_power.deficit<=variable.heart_strike_rp_drw
+  if S.DeathStrike:IsReady() and ((Player:RunicPowerDeficit() <= VarDeathStrikeDumpAmt and (not (Player:BuffRemains(S.DancingRuneWeaponBuff) <= 2 and S.Bonestorm:IsAvailable() and S.Bonestorm:CooldownRemains() < 2))) or Player:RunicPowerDeficit() <= VarHeartStrikeRPDRW) then
+    if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike drw_up 6"; end
+  end
+  -- variable,name=deaths_due_buff_check,value=covenant.night_fae&death_and_decay.ticking&(buff.deaths_due.up&buff.deaths_due.remains<6)
+  VarDeathsDueBuffCheck = (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff) and (Player:BuffUp(S.DeathsDueBuff) and Player:BuffRemains(S.DeathsDueBuff) < 6))
+  -- heart_strike,if=variable.deaths_due_buff_check|rune.time_to_4<gcd|runic_power.deficit>variable.heart_strike_rp_drw
+  if S.HeartStrike:IsReady() and (VarDeathsDueBuffCheck or Player:RuneTimeToX(4) < Player:GCD() or Player:RunicPowerDeficit() > VarHeartStrikeRPDRW) then
+    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike drw_up 8"; end
+  end
+end
+
+local function DRWUpVenthyr()
+  -- variable,name=tombstone_bone_count,value=7,op=setif,condition=buff.dancing_rune_weapon.up,value_else=5
+  VarTomestoneBoneCount = (Player:BuffUp(S.DancingRuneWeaponBuff)) and 7 or 5
+  -- tombstone,if=buff.bone_shield.stack>=variable.tombstone_bone_count&rune>=2&runic_power.deficit>30
+  if S.Tombstone:IsCastable() and (Player:BuffStack(S.BoneShieldBuff) >= VarTomestoneBoneCount and Player:Rune() >= 2 and Player:RunicPowerDeficit() > 30) then
+    if Cast(S.Tombstone, Settings.Blood.GCDasOffGCD.Tombstone) then return "tombstone drw_up_venthyr 2"; end
+  end
+  -- marrowrend,if=(buff.bone_shield.remains<=rune.time_to_3|buff.bone_shield.remains<=(gcd+cooldown.blooddrinker.ready*talent.blooddrinker.enabled*4|buff.bone_shield.stack<5))&runic_power.deficit>20
+  if S.Marrowrend:IsReady() and ((Player:BuffRemains(S.BoneShieldBuff) <= Player:RuneTimeToX(3) or Player:BuffRemains(S.BoneShieldBuff) <= (Player:GCD() + num(S.Blooddrinker:CooldownUp()) * num(S.Blooddrinker:IsAvailable()) * 4) or Player:BuffStack(S.BoneShieldBuff) < 5) and Player:RunicPowerDeficit() > 20) then
+    if Cast(S.Marrowrend, nil, nil, not Target:IsSpellInRange(S.Marrowrend)) then return "drw_up_venthyr 4"; end
+  end
+  -- blood_boil,if=charges>=2
+  if S.BloodBoil:IsCastable() and (S.BloodBoil:Charges() >= 2) then
+    if Cast(S.BloodBoil, Settings.Blood.GCDasOffGCD.BloodBoil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil drw_up_venthyr 6"; end
+  end
+  -- death_strike,if=runic_power.deficit<=variable.death_strike_dump_amount&!(talent.bonestorm.enabled&cooldown.bonestorm.remains<2)
+  if S.DeathStrike:IsReady() and (Player:RunicPowerDeficit() <= VarDeathStrikeDumpAmt and not (S.Bonestorm:IsAvailable() and S.Bonestorm:CooldownRemains() < 2)) then
+    if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike drw_up_venthyr 8"; end
+  end
+  -- bonestorm,if=runic_power>=100&buff.swarming_mist.up
+  if S.Bonestorm:IsReady() and (Player:RunicPower() >= 100 and Player:BuffUp(S.SwarmingMist)) then
+    if Cast(S.Bonestorm, nil, nil, not Target:IsInRange(8)) then return "bonestorm drw_up_venthyr 10"; end
+  end
+  -- variable,name=heart_strike_rp_drw_venthyr,value=(15+buff.dancing_rune_weapon.up*10+spell_targets.heart_strike*talent.heartbreaker.enabled*2)
+  VarHeartStrikeRPDRWVenthyr = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2)
+  -- heart_strike,if=rune.time_to_4<gcd|runic_power.deficit>=variable.heart_strike_rp_drw_venthyr
+  if S.HeartStrike:IsReady() and (Player:RuneTimeToX(4) < Player:GCD() or Player:RunicPowerDeficit() >= VarHeartStrikeRPDRWVenthyr) then
+    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike drw_up_venthyr 12"; end
+  end
+end
+
+local function Standard()
+  -- heart_strike,if=covenant.night_fae&death_and_decay.ticking&(buff.deaths_due.up&buff.deaths_due.remains<6)
+  if S.HeartStrike:IsReady() and (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff) and (Player:BuffUp(S.DeathsDueBuff) and Player:BuffRemains(S.DeathsDueBuff) < 6)) then
+    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike standard 2"; end
+  end
+  -- tombstone,if=buff.bone_shield.stack>=7&rune>=2&!covenant.venthyr
+  if S.Tombstone:IsCastable() and (Player:BuffStack(S.BoneShieldBuff) >= 7 and Player:Rune() >= 2 and CovenantID ~= 2) then
+    if Cast(S.Tombstone, Settings.Blood.GCDasOffGCD.Tombstone) then return "tombstone standard 4"; end
+  end
+  -- marrowrend,if=(buff.bone_shield.remains<=rune.time_to_3|buff.bone_shield.remains<=(gcd+cooldown.blooddrinker.ready*talent.blooddrinker.enabled*4)|buff.bone_shield.stack<6|((!covenant.night_fae|buff.deaths_due.remains>5)&buff.bone_shield.remains<7))&runic_power.deficit>=15
+  if S.Marrowrend:IsReady() and ((Player:BuffRemains(S.BoneShieldBuff) <= Player:RuneTimeToX(3) or Player:BuffRemains(S.BoneShieldBuff) <= (Player:GCD() + num(S.Blooddrinker:CooldownUp()) * num(S.Blooddrinker:IsAvailable()) * 4) or Player:BuffStack(S.BoneShieldBuff) < 6 or ((CovenantID ~= 3 or Player:BuffRemains(S.DeathsDueBuff) > 5) and Player:BuffRemains(S.BoneShieldBuff) < 7)) and Player:RunicPowerDeficit() >= 15) then
+    if Cast(S.Marrowrend, nil, nil, not Target:IsSpellInRange(S.Marrowrend)) then return "marrowrend standard 6"; end
+  end
+  -- death_strike,if=runic_power.deficit<=variable.death_strike_dump_amount&!(talent.bonestorm.enabled&cooldown.bonestorm.remains<2)&!(covenant.venthyr&cooldown.swarming_mist.remains<3)
+  if S.DeathStrike:IsReady() and (Player:RunicPowerDeficit() <= VarDeathStrikeDumpAmt and (not (S.Bonestorm:IsAvailable() and S.Bonestorm:CooldownRemains() < 2)) and not (CovenantID == 2 and S.SwarmingMist:CooldownRemains() < 3)) then
+    if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike standard 8"; end
+  end
+  -- blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)
+  if S.BloodBoil:IsCastable() and (S.BloodBoil:ChargesFractional() >= 1.8 and (Player:BuffStack(S.HemostasisBuff) <= (5 - EnemiesCount10y) or EnemiesCount10y > 2)) then
+    if Cast(S.BloodBoil, Settings.Blood.GCDasOffGCD.BloodBoil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil standard 10"; end
+  end
+  -- death_and_decay,if=buff.crimson_scourge.up&talent.relish_in_blood.enabled&runic_power.deficit>10
+  if S.DeathAndDecay:IsReady() and ((Player:BuffUp(S.CrimsonScourgeBuff) and S.RelishinBlood:IsAvailable()) and Player:RunicPowerDeficit() > 10) then
+    if Cast(S.DeathAndDecay, nil, nil, not Target:IsInRange(30)) then return "death_and_decay standard 12"; end
+  end
+  -- bonestorm,if=runic_power>=100&!covenant.venthyr
+  if S.Bonestorm:IsReady() and (Player:RunicPower() >= 100 and CovenantID ~= 2) then
+    if Cast(S.Bonestorm, nil, nil, not Target:IsInRange(8)) then return "bonestorm standard 14"; end
+  end
+  -- variable,name=heart_strike_rp,value=(15+spell_targets.heart_strike*talent.heartbreaker.enabled*2),op=setif,condition=covenant.night_fae&death_and_decay.ticking,value_else=(15+spell_targets.heart_strike*talent.heartbreaker.enabled*2)*1.2
+  if (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff)) then
+    VarHeartStrikeRP = (15 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2)
+  else
+    VarHeartStrikeRP = (15 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2) * 1.2
+  end
+  -- death_strike,if=(runic_power.deficit<=variable.heart_strike_rp)|target.time_to_die<10
+  if S.DeathStrike:IsReady() and ((Player:RunicPowerDeficit() <= VarHeartStrikeRP) or Target:TimeToDie() < 10) then
+    if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike standard 16"; end
+  end
+  -- death_and_decay,if=spell_targets.death_and_decay>=3
+  if S.DeathAndDecay:IsReady() and (EnemiesMeleeCount >= 3) then
+    if Cast(S.DeathAndDecay, nil, nil, not Target:IsInRange(30)) then return "death_and_decay standard 18"; end
+  end
+  -- heart_strike,if=rune.time_to_4<gcd
+  if S.HeartStrike:IsReady() and (Player:RuneTimeToX(4) < Player:GCD()) then
+    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike standard 20"; end
+  end
+  -- death_and_decay,if=buff.crimson_scourge.up|talent.rapid_decomposition.enabled
+  if S.DeathAndDecay:IsReady() and (Player:BuffUp(S.CrimsonScourgeBuff) or S.RapidDecomposition:IsAvailable()) then
+    if Cast(S.DeathAndDecay, nil, nil, not Target:IsInRange(30)) then return "death_and_decay standard 22"; end
+  end
+  -- consumption
+  if S.Consumption:IsCastable() then
+    if Cast(S.Consumption, nil, Settings.Blood.DisplayStyle.Consumption, not Target:IsSpellInRange(S.Consumption)) then return "consumption standard 24"; end
+  end
+  -- blood_boil,if=charges_fractional>=1.1
+  if S.BloodBoil:IsCastable() and (S.BloodBoil:ChargesFractional() >= 1.1) then
+    if Cast(S.BloodBoil, Settings.Blood.GCDasOffGCD.BloodBoil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil standard 26"; end
+  end
+  -- heart_strike,if=(rune>1&(rune.time_to_3<gcd|buff.bone_shield.stack>7))
+  if S.HeartStrike:IsReady() and (Player:Rune() > 1 and (Player:RuneTimeToX(3) < Player:GCD() or Player:BuffStack(S.BoneShieldBuff) > 7)) then
+    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike standard 28"; end
   end
 end
 
@@ -305,39 +371,11 @@ local function APL()
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool During Blooddrinker"; end
     end
     -- auto_attack
-    if CDsON() then
-      -- blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
-      if S.BloodFury:IsCastable() and (S.DancingRuneWeapon:CooldownUp() and (not S.Blooddrinker:IsReady() or not S.Blooddrinker:IsAvailable()))  then
-        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 2"; end
-      end
-      -- berserking
-      if S.Berserking:IsCastable() then
-        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 4"; end
-      end
-      -- arcane_pulse,if=active_enemies>=2|rune<1&runic_power.deficit>60
-      if S.ArcanePulse:IsCastable() and (EnemiesMeleeCount >= 2 or Player:Rune() < 1 and Player:RunicPowerDeficit() > 60) then
-        if Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse main 6"; end
-      end
-      -- lights_judgment,if=buff.unholy_strength.up
-      if S.LightsJudgment:IsCastable() and (Player:BuffUp(S.UnholyStrengthBuff)) then
-        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 8"; end
-      end
-      -- ancestral_call
-      if S.AncestralCall:IsCastable() then
-        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 10"; end
-      end
-      -- fireblood
-      if S.Fireblood:IsCastable() then
-        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 12"; end
-      end
-      -- bag_of_tricks
-      if S.BagofTricks:IsCastable() then
-        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 14"; end
-      end
-    end
+    -- variable,name=death_strike_dump_amount,value=70,op=setif,condition=covenant.night_fae&buff.deaths_due.remains>6,value_else=55
+    VarDeathStrikeDumpAmt = (CovenantID == 3 and Player:BuffRemains(S.DeathsDueBuff) > 6) and 70 or 55
     -- potion,if=buff.dancing_rune_weapon.up
     if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.DancingRuneWeaponBuff)) then
-      if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 16"; end
+      if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
     end
     -- use_items
     if (Settings.Commons.Enabled.Trinkets) then
@@ -348,23 +386,48 @@ local function APL()
     end
     -- raise_dead
     if CDsON() and S.RaiseDead:IsCastable() then
-      if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead main 18"; end
+      if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead main 4"; end
     end
     -- blooddrinker,if=!buff.dancing_rune_weapon.up&(!covenant.night_fae|buff.deaths_due.remains>7)
     if S.Blooddrinker:IsReady() and (Player:BuffDown(S.DancingRuneWeaponBuff) and (CovenantID ~= 3 or Player:BuffRemains(S.DeathsDueBuff) > 7)) then
-      if Cast(S.Blooddrinker, nil, nil, not Target:IsSpellInRange(S.Blooddrinker)) then return "blooddrinker main 20"; end
+      if Cast(S.Blooddrinker, nil, nil, not Target:IsSpellInRange(S.Blooddrinker)) then return "blooddrinker main 6"; end
     end
-    -- blood_boil,if=charges>=2&(covenant.kyrian|buff.dancing_rune_weapon.up)
-    if S.BloodBoil:IsCastable() and (S.BloodBoil:Charges() >= 2 and (CovenantID == 1 or Player:BuffUp(S.DancingRuneWeaponBuff))) then
-      if Cast(S.BloodBoil, Settings.Blood.GCDasOffGCD.BloodBoil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil main 22"; end
+    -- marrowrend,if=covenant.necrolord&buff.bone_shield.stack<=0
+    -- Note: Likely covered in Defensives, but just in case...
+    if S.Marrowrend:IsReady() and (CovenantID == 4 and Player:BuffDown(S.BoneShieldBuff)) then
+      if Cast(S.Marrowrend, nil, nil, not Target:IsSpellInRange(S.Marrowrend)) then return "marrowrend main 8"; end
     end
-    -- death_strike,if=fight_remains<3
-    if S.DeathStrike:IsReady() and (HL.FilteredFightRemains(Enemies10y, "<", 3)) then
-      if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike main 26"; end
+    -- call_action_list,name=racials
+    if (CDsON()) then
+      local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- sacrificial_pact,if=(!covenant.night_fae|buff.deaths_due.remains>6)&!buff.dancing_rune_weapon.up&(pet.ghoul.remains<2|target.time_to_die<gcd)
+    if S.SacrificialPact:IsReady() and ghoul.active() and ((CovenantID ~= 3 or Player:BuffRemains(S.DeathsDueBuff) > 6) and Player:BuffDown(S.DancingRuneWeaponBuff) and (ghoul.remains() < 2 or Target:TimeToDie() < Player:GCD())) then
+      if Cast(S.SacrificialPact, Settings.Commons.OffGCDasOffGCD.SacrificialPact) then return "sacrificial_pact main 10"; end
     end
     -- call_action_list,name=covenants
     if (true) then
       local ShouldReturn = Covenants(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- blood_tap,if=(rune<=2&rune.time_to_4>gcd&charges_fractional>=1.8)|rune.time_to_3>gcd
+    if S.BloodTap:IsCastable() and ((Player:Rune() <= 2 and Player:RuneTimeToX(4) > Player:GCD() and S.BloodTap:ChargesFractional() >= 1.8) or Player:RuneTimeToX(3) > Player:GCD()) then
+      if Cast(S.BloodTap) then return "blood_tap main 12"; end
+    end
+    -- dancing_rune_weapon,if=!covenant.venthyr
+    if S.DancingRuneWeapon:IsCastable() and (CovenantID ~= 2) then
+      if Cast(S.DancingRuneWeapon, Settings.Blood.GCDasOffGCD.DancingRuneWeapon) then return "dancing_rune_weapon main 14"; end
+    end
+    -- run_action_list,name=drw_up,if=buff.dancing_rune_weapon.up&!covenant.venthyr
+    if (Player:BuffUp(S.DancingRuneWeaponBuff) and CovenantID ~= 2) then
+      local ShouldReturn = DRWUp(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- dancing_rune_weapon,if=covenant.venthyr&cooldown.swarming_mist.ready&runic_power>=(90-(spell_targets.swarming_mist*3))
+    if S.DancingRuneWeapon:IsCastable() and (CovenantID == 2 and S.SwarmingMist:CooldownUp() and Player:RunicPower() >= (90 - (EnemiesMeleeCount * 3))) then
+      if Cast(S.DancingRuneWeapon, Settings.Blood.GCDasOffGCD.DancingRuneWeapon) then return "dancing_rune_weapon main 16"; end
+    end
+    -- run_action_list,name=drw_up_venthyr,if=covenant.venthyr&(buff.dancing_rune_weapon.up|buff.swarming_mist.up)
+    if (CovenantID == 2 and (Player:BuffUp(S.DancingRuneWeaponBuff) or Player:BuffUp(S.SwarmingMist))) then
+      local ShouldReturn = DRWUpVenthyr(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=standard
     if (true) then
