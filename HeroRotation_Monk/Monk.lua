@@ -94,6 +94,9 @@ Spell.Monk.Commons = {
   RecentlyRushingTigerPalm              = Spell(337341),
   SkyreachExhaustion                    = Spell(337341),
   TheEmperorsCapacitor                  = Spell(337291),
+  -- Trinket Effects
+  AcquiredAxeBuff                       = Spell(368656),
+  AcquiredWandBuff                      = Spell(368654),
   -- Misc
   PoolEnergy                            = Spell(999910)
 }
@@ -206,6 +209,7 @@ Item.Monk.Commons = {
   PotionofSpectralAgility              = Item(171270),
   PotionofSpectralIntellect            = Item(171273),
   -- Trinkets
+  CacheofAcquiredTreasures             = Item(188265, {13, 14}),
   GladiatorsBadgeCosmic                = Item(186866, {13, 14}),
   GladiatorsBadgeSinful                = Item(175921, {13, 14}),
   GladiatorsBadgeUnchained             = Item(185197, {13, 14}),

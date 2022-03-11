@@ -40,7 +40,8 @@ local OnUseExcludes = {
   I.GladiatorsBadgeCosmic:ID(),
   I.GladiatorsBadgeSinful:ID(),
   I.GladiatorsBadgeUnchained:ID(),
-  I.TheFirstSigil:ID()
+  I.TheFirstSigil:ID(),
+  I.CacheofAcquiredTreasures:ID()
 }
 
 -- Rotation Var
@@ -222,8 +223,8 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   -- potion
-  -- variable,name=xuen_on_use_trinket,op=set,value=equipped.inscrutable_quantum_device|equipped.gladiators_badge|equipped.wrathstone|equipped.overcharged_anima_battery|equipped.shadowgrasp_totem|equipped.the_first_sigil
-  VarXuenOnUse = (I.InscrutibleQuantumDevice:IsEquipped() or I.GladiatorsBadgeCosmic:IsEquipped() or I.GladiatorsBadgeSinful:IsEquipped() or I.GladiatorsBadgeUnchained:IsEquipped() or I.Wrathstone:IsEquipped() or I.OverchargedAnimaBattery:IsEquipped() or I.ShadowgraspTotem:IsEquipped() or I.TheFirstSigil:IsEquipped())
+  -- variable,name=xuen_on_use_trinket,op=set,value=equipped.inscrutable_quantum_device|equipped.gladiators_badge|equipped.wrathstone|equipped.overcharged_anima_battery|equipped.shadowgrasp_totem|equipped.the_first_sigil|equipped.cache_of_acquired_treasures
+  VarXuenOnUse = (I.InscrutibleQuantumDevice:IsEquipped() or I.GladiatorsBadgeCosmic:IsEquipped() or I.GladiatorsBadgeSinful:IsEquipped() or I.GladiatorsBadgeUnchained:IsEquipped() or I.Wrathstone:IsEquipped() or I.OverchargedAnimaBattery:IsEquipped() or I.ShadowgraspTotem:IsEquipped() or I.TheFirstSigil:IsEquipped() or I.CacheofAcquiredTreasures:IsEquipped())
   -- fleshcraft
   if S.Fleshcraft:IsCastable() then
     if Cast(S.Fleshcraft) then return "fleshcraft precombat 2"; end
@@ -520,9 +521,13 @@ local function CDSEF()
     if I.GladiatorsBadgeUnchained:IsEquippedAndReady() and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 55 or VarHoldXuen or FightRemains < 15) then
       if Cast(I.GladiatorsBadgeUnchained, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge cd_sef 32 unchained"; end
     end
-    -- use_item,name=the_first_sigil,if=pet.xuen_the_white_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>60&fight_remains>300|fight_remains<20
-    if I.TheFirstSigil:IsEquippedAndReady() and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 60 and FightRemains > 300 or FightRemains < 20) then
+    -- use_item,name=the_first_sigil,if=pet.xuen_the_white_tiger.remains>15|cooldown.invoke_xuen_the_white_tiger.remains>60&fight_remains>300|fight_remains<20
+    if I.TheFirstSigil:IsEquippedAndReady() and (S.InvokeXuenTheWhiteTiger:TimeSinceLastCast() < 9 or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 60 and FightRemains > 300 or FightRemains < 20) then
       if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil cd_sef 34"; end
+    end
+    -- use_item,name=cache_of_acquired_treasures,if=active_enemies<2&buff.acquired_wand.up|active_enemies>1&buff.acquired_axe.up|fight_remains<20
+    if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (EnemiesCount8y < 2 and Player:BuffUp(S.AcquiredWandBuff) or EnemiesCount8y > 1 and Player:BuffUp(S.AcquiredAxeBuff) or FightRemains < 20) then
+      if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures cd_sef 35"; end
     end
     -- use_items,if=!variable.xuen_on_use_trinket|cooldown.invoke_xuen_the_white_tiger.remains>20&pet.xuen_the_white_tiger.remains<20|variable.hold_xuen
     if ((not VarXuenOnUse) or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 20 and XuenActive and S.InvokeXuenTheWhiteTiger:TimeSinceLastCast() > 4 or VarHoldXuen) then
