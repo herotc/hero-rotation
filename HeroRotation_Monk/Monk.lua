@@ -132,6 +132,9 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   CalculatedStrikes                     = Spell(336526),
   CoordinatedOffensive                  = Spell(336598),
   InnerFury                             = Spell(336452),
+  -- Tier 28 Set Bonus
+  PrimordialPotentialBuff               = Spell(363911),
+  PrimordialPowerBuff                   = Spell(368685),
 })
 
 Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Commons, {

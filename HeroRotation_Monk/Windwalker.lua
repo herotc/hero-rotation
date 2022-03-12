@@ -186,7 +186,7 @@ local function EvaluateTargetIfBlackoutKick604(TargetUnit)
 end
 
 local function EvaluateTargetIfBlackoutKick700(TargetUnit)
-  return (ComboStrike(S.BlackoutKick) and EnemiesCount8y >=2 and VarBoKNeeded)
+  return (ComboStrike(S.BlackoutKick) and S.FistsOfFury:CooldownRemains() > 0 and S.RisingSunKick:CooldownRemains() > 0 and Player:BuffUp(S.WeaponsOfOrderChiBuff))
 end
 
 local function EvaluateTargetIfRisingSunKick800(TargetUnit)
@@ -470,8 +470,8 @@ local function CDSEF()
   if S.FallenOrder:IsReady() then
     if Cast(S.FallenOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "fallen_order cd_sef 10"; end
   end
-  -- bonedust_brew,if=chi>=2&fight_remains>60&(cooldown.storm_earth_and_fire.charges>0|cooldown.storm_earth_and_fire.remains>10)&(pet.xuen_the_white_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>10|variable.hold_xuen)|(chi>=2&fight_remains<=60&(pet.xuen_the_White_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>fight_remains)&(cooldown.storm_earth_and_fire.charges>0|cooldown.storm_earth_and_fire.remains>fight_remains|buff.storm_earth_and_fire.up))|fight_remains<15
-  if S.BonedustBrew:IsReady() and (Player:Chi() >= 2 and FightRemains > 60 and (S.StormEarthAndFire:Charges() > 0 or S.StormEarthAndFire:CooldownRemains() > 10) and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 or VarHoldXuen) or (Player:Chi() >= 2 and FightRemains <= 60 and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > FightRemains) and (S.StormEarthAndFire:Charges() > 0 or S.StormEarthAndFire:CooldownRemains() > FightRemains or Player:BuffUp(S.StormEarthAndFireBuff))) or FightRemains < 15) then
+  -- bonedust_brew,if=!buff.bonedust_brew.up&(chi>=2&fight_remains>60&(cooldown.storm_earth_and_fire.charges>0|cooldown.storm_earth_and_fire.remains>10)&(pet.xuen_the_white_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>10|variable.hold_xuen)|(chi>=2&fight_remains<=60&(pet.xuen_the_White_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>fight_remains)&(cooldown.storm_earth_and_fire.charges>0|cooldown.storm_earth_and_fire.remains>fight_remains|buff.storm_earth_and_fire.up))|fight_remains<15)|fight_remains<10&soulbind.lead_by_example
+  if S.BonedustBrew:IsReady() and (Player:BuffDown(S.BonedustBrew) and (Player:Chi() >= 2 and FightRemains > 60 and (S.StormEarthAndFire:Charges() > 0 or S.StormEarthAndFire:CooldownRemains() > 10) and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 or VarHoldXuen) or (Player:Chi() >= 2 and FightRemains <= 60 and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > FightRemains) and (S.StormEarthAndFire:Charges() > 0 or S.StormEarthAndFire:CooldownRemains() > FightRemains or Player:BuffUp(S.StormEarthAndFireBuff))) or FightRemains < 15) or FightRemains < 10 and S.LeadByExample:SoulbindEnabled()) then
     if Cast(S.BonedustBrew, nil, Settings.Commons.CovenantDisplayStyle) then return "bonedust_brew cd_sef 12"; end
   end
   -- storm_earth_and_fire_fixate,if=conduit.coordinated_offensive.enabled
@@ -622,8 +622,6 @@ local function Serenity()
 end
 
 local function WeaponsOfOrder()
-  -- variable,name=blackout_kick_needed,op=set,value=buff.weapons_of_order_ww.remains&(cooldown.rising_sun_kick.remains>buff.weapons_of_order_ww.remains&buff.weapons_of_order_ww.remains<2.1|cooldown.rising_sun_kick.remains-buff.weapons_of_order_ww.remains>1.9&buff.weapons_of_order_ww.remains<4.1|buff.bloodlust.up&buff.invokers_delight.up&buff.invokers_delight.remains<buff.weapons_of_order_ww.remains)
-  VarBoKNeeded = (Player:BuffUp(S.WeaponsOfOrderChiBuff) and (S.RisingSunKick:CooldownRemains() > Player:BuffRemains(S.WeaponsOfOrderChiBuff) and Player:BuffRemains(S.WeaponsOfOrderChiBuff) < 2.1 or S.RisingSunKick:CooldownRemains() - Player:BuffRemains(S.WeaponsOfOrderChiBuff) > 1.9 and Player:BuffRemains(S.WeaponsOfOrderChiBuff) < 4.1 or Player:BloodlustUp() and Player:BuffUp(S.InvokersDelight) and Player:BuffRemains(S.InvokersDelight) < Player:BuffRemains(S.WeaponsOfOrderChiBuff)))
   -- call_action_list,name=cd_sef,if=!talent.serenity
   if (CDsON() and not S.Serenity:IsAvailable()) then
     local ShouldReturn = CDSEF(); if ShouldReturn then return ShouldReturn; end
@@ -649,18 +647,10 @@ local function WeaponsOfOrder()
     if S.WhirlingDragonPunch:IsReady() and (EnemiesCount8y >= 2) then
       if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(8)) then return "whirling_dragon_punch weapons_of_order 8"; end
     end
-    -- spinning_crane_kick,if=combo_strike&active_enemies>=3&buff.weapons_of_order_ww.up
-    if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and EnemiesCount8y >= 3 and Player:BuffUp(S.WeaponsOfOrderChiBuff)) then
+    -- spinning_crane_kick,if=combo_strike&(active_enemies>=3&buff.weapons_of_order_ww.up|buff.dance_of_chiji.up)
+    if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and (EnemiesCount8y >= 3 and Player:BuffUp(S.WeaponsOfOrderChiBuff) or Player:BuffUp(S.DanceOfChijiBuff))) then
       if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick weapons_of_order 10"; end
     end
-    -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&active_enemies<=2&variable.blackout_kick_needed
-    if S.BlackoutKick:IsReady() then
-      if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfBlackoutKick700) then return "blackout_kick weapons_of_order 12"; end
-    end
-  end
-  -- spinning_crane_kick,if=combo_strike&buff.dance_of_chiji.up
-  if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.DanceOfChijiBuff)) then
-    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick weapons_of_order 14"; end
   end
   -- expel_harm,if=chi=0&buff.weapons_of_order_ww.remains<4
   if S.ExpelHarm:IsReady() and (Player:Chi() == 0 and Player:BuffRemains(S.WeaponsOfOrderChiBuff) < 4) then
@@ -674,12 +664,16 @@ local function WeaponsOfOrder()
   if S.WhirlingDragonPunch:IsReady() then
     if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(8)) then return "whirling_dragon_punch weapons_of_order 20"; end
   end
+  -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&cooldown.fists_of_fury.remains&cooldown.rising_sun_kick.remains&buff.weapons_of_order_ww.up
+    if S.BlackoutKick:IsReady() then
+      if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfBlackoutKick700) then return "blackout_kick weapons_of_order 21"; end
+    end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains+(debuff.skyreach_exhaustion.up*20),if=chi=0&buff.weapons_of_order_ww.remains<4
   if S.TigerPalm:IsReady() and (Player:Chi() == 0 and Player:BuffRemains(S.WeaponsOfOrderChiBuff) < 4) then
     if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane101) then return "tiger_palm weapons_of_order 22"; end
   end
-  -- fists_of_fury,interrupt=1,if=buff.storm_earth_and_fire.up&raid_event.adds.in>cooldown.fists_of_fury.duration*0.6
-  if S.FistsOfFury:IsReady() and (Player:BuffUp(S.StormEarthAndFireBuff)) then
+  -- fists_of_fury,interrupt=1,interrupt_immediate=1,if=buff.weapons_of_order_ww.up&buff.storm_earth_and_fire.up
+  if S.FistsOfFury:IsReady() and (Player:BuffUp(S.WeaponsOfOrderChiBuff) and Player:BuffUp(S.StormEarthAndFireBuff)) then
     if Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "fists_of_fury weapons_of_order 24"; end
   end
   -- spinning_crane_kick,if=buff.chi_energy.stack>30-5*active_enemies
@@ -702,6 +696,10 @@ local function WeaponsOfOrder()
   if S.TigerPalm:IsReady() then
     if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane101, EvaluateTargetIfTigerPalm302) then return "tiger_palm weapons_of_order 34"; end
   end
+  -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&active_enemies<=3&chi>=3|buff.weapons_of_order_ww.up
+  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and EnemiesCount8y <= 3 and Player:Chi() >= 3 or Player:BuffUp(S.WeaponsOfOrderChiBuff)) then
+    if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100) then return "blackout_kick weapons_of_order 35"; end
+  end
   -- chi_wave
   if S.ChiWave:IsReady() then
     if Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "chi_wave weapons_of_order 36"; end
@@ -714,8 +712,8 @@ local function WeaponsOfOrder()
 end
 
 local function St()
-  -- whirling_dragon_punch,if=raid_event.adds.in>cooldown.whirling_dragon_punch.duration*0.8|raid_event.adds.up
-  if S.WhirlingDragonPunch:IsReady() then
+  -- whirling_dragon_punch,if=(buff.primordial_potential.stack<9|buff.bonedust_brew.remains<cooldown.rising_sun_kick.remains&buff.bonedust_brew.up&pet.xuen_the_white_tiger.active)&(raid_event.adds.in>cooldown.whirling_dragon_punch.duration*0.8|spell_targets>1)
+  if S.WhirlingDragonPunch:IsReady() and (Player:BuffStack(S.PrimordialPotentialBuff) < 9 or Player:BuffRemains(S.BonedustBrew) < S.RisingSunKick:CooldownRemains() and Player:BuffUp(S.BonedustBrew) and XuenActive) then
     if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(8)) then return "whirling_dragon_punch st 2"; end
   end
   -- energizing_elixir,if=chi.max-chi>=2&energy.time_to_max>3|chi.max-chi>=4&(energy.time_to_max>2|!prev_gcd.1.tiger_palm)
@@ -734,8 +732,8 @@ local function St()
   if S.RisingSunKick:IsReady() then
     if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfRisingSunKick800) then return "rising_sun_kick st 10"; end
   end
-  -- fists_of_fury,if=(raid_event.adds.in>cooldown.fists_of_fury.duration*0.8|raid_event.adds.up)&(energy.time_to_max>execute_time-1|chi.max-chi<=1|buff.storm_earth_and_fire.remains<execute_time+1)|fight_remains<execute_time+1|debuff.bonedust_brew_debuff.up
-  if S.FistsOfFury:IsReady() and ((EnergyTimeToMaxRounded() > S.FistsOfFury:ExecuteTime() - 1 or Player:ChiDeficit() <= 1 or Player:BuffRemains(S.StormEarthAndFireBuff) < S.FistsOfFury:ExecuteTime() + 1) or FightRemains < S.FistsOfFury:ExecuteTime() + 1 or Target:DebuffUp(S.BonedustBrew)) then
+  -- fists_of_fury,if=(raid_event.adds.in>cooldown.fists_of_fury.duration*0.8|raid_event.adds.up)&(energy.time_to_max>execute_time-1|chi.max-chi<=1|buff.storm_earth_and_fire.remains<execute_time+1)|fight_remains<execute_time+1|debuff.bonedust_brew_debuff.up|buff.primordial_power.up
+  if S.FistsOfFury:IsReady() and ((EnergyTimeToMaxRounded() > S.FistsOfFury:ExecuteTime() - 1 or Player:ChiDeficit() <= 1 or Player:BuffRemains(S.StormEarthAndFireBuff) < S.FistsOfFury:ExecuteTime() + 1) or FightRemains < S.FistsOfFury:ExecuteTime() + 1 or Target:DebuffUp(S.BonedustBrew) or Player:BuffUp(S.PrimordialPowerBuff)) then
     if Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "fists_of_fury st 12"; end
   end
   -- crackling_jade_lightning,if=buff.the_emperors_capacitor.stack>19&energy.time_to_max>execute_time-1&cooldown.rising_sun_kick.remains>execute_time|buff.the_emperors_capacitor.stack>14&(cooldown.serenity.remains<5&talent.serenity|cooldown.weapons_of_order.remains<5&covenant.kyrian|fight_remains<5)
@@ -758,8 +756,8 @@ local function St()
   if S.ChiBurst:IsReady() and (Player:ChiDeficit() >= 1 and EnemiesCount8y == 1 or Player:ChiDeficit() >= 2 and EnemiesCount8y >= 2) then
     if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst st 22"; end
   end
-  -- chi_wave
-  if S.ChiWave:IsReady() then
+  -- chi_wave,if=!buff.primordial_power.up
+  if S.ChiWave:IsReady() and (Player:BuffDown(S.PrimordialPowerBuff)) then
     if Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "chi_wave st 24"; end
   end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains+(debuff.skyreach_exhaustion.up*20),if=combo_strike&chi.max-chi>=2&buff.storm_earth_and_fire.down
@@ -782,9 +780,9 @@ local function St()
   if CDsON() and S.ArcaneTorrent:IsCastable() and (Player:ChiDeficit() >= 1) then
     if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent st 34"; end
   end
-  -- flying_serpent_kick,interrupt=1
+  -- flying_serpent_kick,interrupt=1,if=!covenant.necrolord|buff.primordial_potential.up
   local FSK = S.FlyingSerpentKickActionBarReplacement:IsAvailable() and S.FlyingSerpentKickActionBarReplacement or S.FlyingSerpentKick
-  if FSK:IsReady() and not Settings.Windwalker.IgnoreFSK then
+  if FSK:IsReady() and (not Settings.Windwalker.IgnoreFSK) and (CovenantID ~= 4 or Player:BuffUp(S.PrimordialPotentialBuff)) then
     if Cast(FSK, nil, nil, not Target:IsInRange(40)) then return "flying_serpent_kick st 36"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&cooldown.fists_of_fury.remains<3&chi=2&prev_gcd.1.tiger_palm&energy.time_to_50<1
@@ -843,10 +841,6 @@ local function APL()
     if S.FaelineStomp:IsCastable() and (ComboStrike(S.FaelineStomp) and (FaelineHarmonyEquipped or S.GroveInvigoration:SoulbindEnabled() or EnemiesCount8y < 3 and Player:BuffDown(S.StormEarthAndFireBuff))) then
       if Cast(S.FaelineStomp, nil, Settings.Commons.DisplayStyle.Covenant) then return "faeline_stomp main 6"; end
     end
-    -- chi_burst,if=covenant.night_fae&cooldown.faeline_stomp.remains>25&(chi.max-chi>=1&active_enemies=1&raid_event.adds.in>20|chi.max-chi>=2&active_enemies>=2)
-    if S.ChiBurst:IsReady() and (CovenantID == 3 and S.FaelineStomp:CooldownRemains() > 25 and (Player:ChiDeficit() >= 1 and EnemiesCount8y == 1 or Player:ChiDeficit() >= 2 and EnemiesCount8y >= 2)) then
-      if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst main 8"; end
-    end
     -- call_action_list,name=opener,if=time<4&chi<5&!pet.xuen_the_white_tiger.active
     if (HL.CombatTime() < 4 and Player:Chi() < 5 and not (XuenActive)) then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
@@ -862,6 +856,10 @@ local function APL()
     -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&chi.max-chi>=2&(energy.time_to_max<1|cooldown.serenity.remains<2|energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5|cooldown.weapons_of_order.remains<2)&!debuff.bonedust_brew_debuff.up
     if S.TigerPalm:IsReady() then
       if Everyone.CastTargetIf(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfTigerPalm106) then return "tiger_palm main 14"; end
+    end
+    -- chi_burst,if=covenant.night_fae&cooldown.faeline_stomp.remains>25&(chi.max-chi>=1&active_enemies=1&raid_event.adds.in>20|chi.max-chi>=2&active_enemies>=2)
+    if S.ChiBurst:IsReady() and (CovenantID == 3 and S.FaelineStomp:CooldownRemains() > 25 and (Player:ChiDeficit() >= 1 and EnemiesCount8y == 1 or Player:ChiDeficit() >= 2 and EnemiesCount8y >= 2)) then
+      if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst main 16"; end
     end
     -- call_action_list,name=cd_sef,if=!talent.serenity
     if (CDsON() and not S.Serenity:IsAvailable()) then
