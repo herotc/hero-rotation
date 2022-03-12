@@ -41,6 +41,7 @@ local OnUseExcludes = {
   I.GlyphofAssimilation:ID(),
   I.MacabreSheetMusic:ID(),
   I.MoonlitPrism:ID(),
+  I.ScarsofFraternalStrife:ID(),
 }
 
 -- Rotation Var
@@ -1381,6 +1382,10 @@ local function APL()
         if TrinketToUse then
           if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
         end
+      end
+      -- use_item,name=scars_of_fraternal_strife
+      if I.ScarsofFraternalStrife:IsEquippedAndReady() then
+        if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife Shared_cd 10"; end
       end
       --use_item,effect_name=gladiators_badge,if=buff.arcane_power.up|cooldown.arcane_power.remains>=55&debuff.touch_of_the_magi.up
       if I.SinfulGladiatorsBadge:IsEquippedAndReady() and (Player:BuffUp(S.ArcanePower) or (S.ArcanePower:CooldownRemains() >= 55 and Target:DebuffUp(S.TouchoftheMagi))) then
