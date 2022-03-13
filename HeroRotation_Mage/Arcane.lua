@@ -122,6 +122,7 @@ local ClearCastingMaxStack = 3
 local PresenceMaxStack = 3
 local ArcaneHarmonyMaxStack = 18
 local FightRemains
+local CastAE
 
 Player.ArcaneOpener = {}
 local ArcaneOpener = Player.ArcaneOpener
@@ -220,8 +221,8 @@ local function VarInit()
   --variable,name=aoe_totm_max_charges,op=reset,default=2
   var_aoe_totm_max_charges = 2
 
-  --variable,name=fishing_opener,default=-1,op=set,if=variable.fishing_opener=-1,value=1*(equipped.empyreal_ordnance|(talent.rune_of_power&(talent.arcane_echo|!covenant.kyrian)&(!covenant.necrolord|active_enemies=1|runeforge.siphon_storm)&!covenant.venthyr))
-  var_fishing_opener = Settings.Arcane.UseFishingOpener and bool(1 * (I.EmpyrealOrdnance:IsEquipped() or (S.RuneofPower:IsAvailable() and (S.ArcaneEcho:IsAvailable() or CovenantID ~= 1) and (CovenantID ~= 4 or SiphonStormEquipped) and CovenantID ~= 2)))
+  --variable,name=fishing_opener,default=-1,op=set,if=variable.fishing_opener=-1,value=1*(equipped.empyreal_ordnance|(talent.rune_of_power&(talent.arcane_echo|!covenant.kyrian)&(!covenant.necrolord|active_enemies=1|runeforge.siphon_storm)&!covenant.venthyr))|(covenant.venthyr&equipped.moonlit_prism)
+  var_fishing_opener = Settings.Arcane.UseFishingOpener and bool(1 * (I.EmpyrealOrdnance:IsEquipped() or (S.RuneofPower:IsAvailable() and (S.ArcaneEcho:IsAvailable() or CovenantID ~= 1) and (CovenantID ~= 4 or SiphonStormEquipped) and CovenantID ~= 2)) or (CovenantID == 2 and I.MoonlitPrism:IsEquipped()))
 
   --variable,name=ap_on_use,op=set,value=equipped.macabre_sheet_music|equipped.gladiators_badge|equipped.gladiators_medallion|equipped.darkmoon_deck_putrescence|equipped.inscrutable_quantum_device|equipped.soulletting_ruby|equipped.sunblood_amethyst|equipped.wakeners_frond|equipped.flame_of_battle
   var_ap_on_use = I.MacabreSheetMusic:IsEquipped() or I.SinfulGladiatorsBadge:IsEquipped() or I.DarkmoonDeckPutrescence:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SoullettingRuby:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.WakenersFrond:IsEquipped() or I.FlameofBattle:IsEquipped() 
@@ -383,7 +384,7 @@ local function Calculations()
   --variable,name=just_used_spark,op=set,value=(prev_gcd.1.radiant_spark|prev_gcd.2.radiant_spark|prev_gcd.3.radiant_spark)&debuff.radiant_spark_vulnerability.down
   var_just_used_spark = (Player:PrevGCD(1,S.RadiantSpark) or Player:PrevGCD(2,S.RadiantSpark) or Player:PrevGCD(3,S.RadiantSpark)) and Target:DebuffDown(S.RadiantSparkVulnerability)
   --variable,name=outside_of_cooldowns,op=set,value=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down&!variable.just_used_spark&debuff.radiant_spark_vulnerability.down
-  var_outside_of_cooldowns = Player:BuffDown(S.ArcanePower) and Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffDown(S.TouchoftheMagi) and not var_just_used_spark and Target:DebuffDown(S.RadiantSparkVulnerability)
+  var_outside_of_cooldowns = Player:BuffDown(S.ArcanePower) and Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffDown(S.TouchoftheMagiDebuff) and not var_just_used_spark and Target:DebuffDown(S.RadiantSparkVulnerability)
   --variable,name=stack_harmony,op=set,value=runeforge.arcane_infinity&((covenant.kyrian&cooldown.radiant_spark.remains<variable.harmony_stack_time))
   var_stack_harmony = ArcaneInfinityEquipped and (CovenantID == 1 and S.RadiantSpark:CooldownRemains() < var_harmony_stack_time)
 end
@@ -438,7 +439,7 @@ local function Opener()
     if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power opener 12"; end
   end
   --presence_of_mind,if=!talent.arcane_echo&debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=(action.arcane_blast.execute_time*buff.presence_of_mind.max_stack)
-  if S.PresenceofMind:IsCastable() and S.ArcaneEcho:IsAvailable() and Target:DebuffUp(S.TouchoftheMagi) and Target:DebuffRemains(S.TouchoftheMagi) <= (S.ArcaneBlast:ExecuteTime() * PresenceMaxStack) then
+  if S.PresenceofMind:IsCastable() and S.ArcaneEcho:IsAvailable() and Target:DebuffUp(S.TouchoftheMagiDebuff) and Target:DebuffRemains(S.TouchoftheMagi) <= (S.ArcaneBlast:ExecuteTime() * PresenceMaxStack) then
     if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind opener 13"; end
   end
   --presence_of_mind,if=buff.arcane_power.up&buff.rune_of_power.remains<=(action.arcane_blast.execute_time*buff.presence_of_mind.max_stack)
@@ -459,7 +460,7 @@ local function Opener()
   end
   --arcane_missiles,if=debuff.touch_of_the_magi.up&talent.arcane_echo&(buff.deathborne.down|active_enemies=1)&debuff.touch_of_the_magi.remains>action.arcane_missiles.execute_time,chain=1,early_chain_if=buff.clearcasting_channel.down&(buff.arcane_power.up|(!talent.overpowered&(buff.rune_of_power.up|cooldown.evocation.ready)))
   --TODO : early chain
-  if S.ArcaneMissiles:IsCastable() and Target:DebuffUp(S.TouchoftheMagi) and S.ArcaneEcho:IsAvailable() and (Player:BuffDown(S.Deathborne) or EnemiesCount8ySplash == 1) and Target:DebuffRemains(S.TouchoftheMagi) > S.ArcaneMissiles:ExecuteTime() then
+  if S.ArcaneMissiles:IsCastable() and Target:DebuffUp(S.TouchoftheMagiDebuff) and S.ArcaneEcho:IsAvailable() and (Player:BuffDown(S.Deathborne) or EnemiesCount8ySplash == 1) and Target:DebuffRemains(S.TouchoftheMagiDebuff) > S.ArcaneMissiles:ExecuteTime() then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles opener 18"; end
   end
   --arcane_missiles,if=buff.clearcasting.stack=buff.clearcasting.max_stack&covenant.venthyr
@@ -515,7 +516,7 @@ local function Cooldowns()
   --&(buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down)&cooldown.touch_of_the_magi.remains=0
   --&(buff.arcane_charge.stack<=variable.totm_max_charges&((talent.rune_of_power&cooldown.rune_of_power.remains<=gcd&cooldown.arcane_power.remains>variable.totm_max_delay_for_ap)|(!talent.rune_of_power&cooldown.arcane_power.remains>variable.totm_max_delay_for_ap)|cooldown.arcane_power.remains<=gcd))
   if S.Frostbolt:IsReady() and not Player:IsCasting(S.Frostbolt) and DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Frost == 0 
-  and (Player:BuffDown(S.ArcanePower) and Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffDown(S.TouchoftheMagi)) and S.TouchoftheMagi:CooldownRemains() == 0
+  and (Player:BuffDown(S.ArcanePower) and Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffDown(S.TouchoftheMagiDebuff)) and S.TouchoftheMagi:CooldownRemains() == 0
   and (Player:ArcaneCharges() <= var_totm_max_charges and ((S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= Player:GCD() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or (not S.RuneofPower:IsAvailable() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or (S.ArcanePower:CooldownRemains() <= Player:GCD()))) then
     if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt cooldowns 3"; end
   end
@@ -523,27 +524,25 @@ local function Cooldowns()
   if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Fire == 0 and Player:IsCasting(S.Frostbolt) then
     if Cast(S.FireBlast, nil, nil, not Target:IsSpellInRange(S.FireBlast)) then return "fire_blast cooldowns 4"; end
   end
-  --mirrors_of_torment,if=(!runeforge.siphon_storm|buff.siphon_storm.up)&cooldown.touch_of_the_magi.remains<variable.mot_preceed_totm_by|(variable.time_until_ap>variable.mot_max_delay_for_ap&cooldown.touch_of_the_magi.remains>variable.mot_max_delay_for_totm)
-  if S.MirrorsofTorment:IsCastable() and (not SiphonStormEquipped or Player:BuffUp(S.SiphonStormBuff)) and (S.TouchoftheMagi:CooldownRemains() < var_mot_preceed_totm_by or (var_time_until_ap > var_mot_max_delay_for_ap and S.TouchoftheMagi:CooldownRemains() > var_mot_max_delay_for_totm)) then
+  --mirrors_of_torment,if=!runeforge.siphon_storm&cooldown.touch_of_the_magi.remains<=9-(3*set_bonus.tier28_4pc)&cooldown.arcane_power.remains<=10-(3*set_bonus.tier28_4pc)
+  if S.MirrorsofTorment:IsCastable() and ((not SiphonStormEquipped) and S.TouchoftheMagi:CooldownRemains() <= 9 - (3 * num(Player:HasTier(28, 4))) and S.ArcanePower:CooldownRemains() <= 10 - (3 * num(Player:HasTier(28, 4)))) then
     if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment cooldowns 5"; end
   end
-  --mirrors_of_torment,if=cooldown.arcane_power.ready
-  --&(!talent.enlightened|(talent.enlightened&mana.pct>=70))
-  --&((cooldown.touch_of_the_magi.remains>variable.ap_max_delay_for_totm&buff.arcane_charge.stack=buff.arcane_charge.max_stack)|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack=0))
-  --&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct
-  if S.MirrorsofTorment:IsCastable() and S.ArcanePower:CooldownRemains() == 0
-  and (not S.Enlightened:IsAvailable() or (S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70))
-  and ((Player:BuffRemains(S.TouchoftheMagi) > var_ap_max_delay_for_totm and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0))
-  and Player:BuffDown(S.RuneofPowerBuff) and Player:ManaPercentage() >= var_ap_minimum_mana_pct then
+  --mirrors_of_torment,if=runeforge.siphon_storm&buff.siphon_storm.up&cooldown.touch_of_the_magi.remains<=9-(3*set_bonus.tier28_4pc)&cooldown.arcane_power.remains<=10-(3*set_bonus.tier28_4pc)
+  if S.MirrorsofTorment:IsCastable() and (SiphonStormEquipped and Player:BuffUp(S.SiphonStormBuff) and S.TouchoftheMagi:CooldownRemains() <= 9 - (3 * num(Player:HasTier(28, 4))) and S.ArcanePower:CooldownRemains() <= 10 - (3 * num(Player:HasTier(28, 4)))) then
     if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment cooldowns 6"; end
   end
   --fleshcraft,if=variable.outside_of_cooldowns&(soulbind.volatile_solvent|soulbind.pustule_eruption)
   if S.Fleshcraft:IsCastable() and var_outside_of_cooldowns and (S.VolatileSolvent:IsAvailable() or S.PustuleEruption:IsAvailable()) then
     if Cast(S.Fleshcraft) then return "fleshcraft cooldowns 7"; end
   end
-  --deathborne,if=cooldown.touch_of_the_magi.ready&buff.arcane_charge.stack<=variable.totm_max_charges&cooldown.arcane_power.remains<=gcd
-  if S.Deathborne:IsCastable() and S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() <= var_totm_max_charges and S.ArcanePower:CooldownRemains() <= Player:GCDRemains() then
+  --deathborne,if=!runeforge.siphon_storm&cooldown.touch_of_the_magi.remains<=15&cooldown.arcane_power.remains<=16
+  if S.Deathborne:IsCastable() and ((not SiphonStormEquipped) and S.TouchoftheMagi:CooldownRemains() <= 15 and S.ArcanePower:CooldownRemains() <= 16) then
     if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne cooldowns 8"; end
+  end
+  --deathborne,if=runeforge.siphon_storm&prev_gcd.1.evocation
+  if S.Deathborne:IsCastable() and (SiphonStormEquipped and Player:PrevGCD(1, S.Evocation)) then
+    if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne cooldowns 9"; end
   end
   --deathborne,if=cooldown.arcane_power.ready
   --&(!talent.enlightened|(talent.enlightened&mana.pct>=70))
@@ -553,19 +552,19 @@ local function Cooldowns()
   and (not S.Enlightened:IsAvailable() or (S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70))
   and ((Player:BuffRemains(S.TouchoftheMagi) > 10 and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0))
   and Player:BuffDown(S.RuneofPowerBuff) and Player:ManaPercentage() >= var_ap_minimum_mana_pct then
-    if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne cooldowns 9"; end
+    if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne cooldowns 10"; end
   end
   --radiant_spark,if=cooldown.touch_of_the_magi.remains>variable.rs_max_delay_for_totm&cooldown.arcane_power.remains>variable.rs_max_delay_for_ap
   --&(talent.rune_of_power&(cooldown.rune_of_power.remains<execute_time|cooldown.rune_of_power.remains>variable.rs_max_delay_for_rop)|!talent.rune_of_power)
   --&buff.arcane_charge.stack>2&debuff.touch_of_the_magi.down&buff.rune_of_power.down&buff.arcane_power.down
   if S.RadiantSpark:IsCastable() and S.TouchoftheMagi:CooldownRemains() > var_rs_max_delay_for_totm and S.ArcanePower:CooldownRemains() > var_rs_max_delay_for_ap
   and ((S.RuneofPower:IsAvailable() and (S.RuneofPower:CooldownRemains() <= S.RadiantSpark:ExecuteTime() or S.RuneofPower:CooldownRemains() > var_rs_max_delay_for_rop)) or not S.RuneofPower:IsAvailable())
-  and Player:ArcaneCharges() > 2 and Target:DebuffDown(S.TouchoftheMagi) and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) then
-    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark cooldowns 10"; end
+  and Player:ArcaneCharges() > 2 and Target:DebuffDown(S.TouchoftheMagiDebuff) and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) then
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark cooldowns 11"; end
   end
   --radiant_spark,if=cooldown.touch_of_the_magi.remains<execute_time&buff.arcane_charge.stack<=variable.totm_max_charges&cooldown.arcane_power.remains<(execute_time+action.touch_of_the_magi.execute_time)
   if S.RadiantSpark:IsCastable() and S.TouchoftheMagi:CooldownRemains() < S.RadiantSpark:ExecuteTime() and Player:ArcaneCharges() <= var_totm_max_charges and S.ArcanePower:CooldownRemains() < (S.RadiantSpark:ExecuteTime() + S.TouchoftheMagi:ExecuteTime()) then
-    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark cooldowns 11"; end
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark cooldowns 12"; end
   end
   --radiant_spark,if=cooldown.arcane_power.remains<execute_time
   --&((!talent.enlightened|(talent.enlightened&mana.pct>=70))
@@ -575,53 +574,69 @@ local function Cooldowns()
   and (not S.Enlightened:IsAvailable() or (S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70))
   and ((S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay_for_totm and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0))
   and Player:BuffDown(S.RuneofPowerBuff) and Player:ManaPercentage() >= var_ap_minimum_mana_pct then
-    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark cooldowns 12"; end
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark cooldowns 13"; end
   end
   --use_item,name=soulletting_ruby,if=(!runeforge.siphon_storm|buff.siphon_storm.up)&buff.arcane_charge.stack<=variable.totm_max_charges&cooldown.arcane_power.remains<=execute_time&mana.pct>variable.ap_minimum_mana_pct&buff.rune_of_power.down
   if I.SoullettingRuby:IsEquippedAndReady() and (not SiphonStormEquipped or Player:BuffUp(S.SiphonStormBuff)) and Player:ArcaneCharges() <= var_totm_max_charges and S.ArcanePower:CooldownRemains() <= S.SoullettingRuby:ExecuteTime() and Player:ManaPercentage() > var_ap_minimum_mana_pct and Player:BuffDown(S.RuneofPowerBuff) then
-    if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby cooldowns 13"; end
+    if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby cooldowns 14"; end
   end
-  --touch_of_the_magi,if=(!runeforge.siphon_storm|buff.siphon_storm.up)&buff.arcane_charge.stack<=variable.totm_max_charges&cooldown.arcane_power.remains<=execute_time&mana.pct>variable.ap_minimum_mana_pct&buff.rune_of_power.down
-  if S.TouchoftheMagi:IsCastable() and (not SiphonStormEquipped or Player:BuffUp(S.SiphonStormBuff)) and Player:ArcaneCharges() <= var_totm_max_charges and S.ArcanePower:CooldownRemains() <= S.TouchoftheMagi:ExecuteTime() and Player:ManaPercentage() > var_ap_minimum_mana_pct and Player:BuffDown(S.RuneofPowerBuff) then
-    if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi cooldowns 14"; end
+  --evocation,if=runeforge.siphon_storm&cooldown.touch_of_the_magi.remains<=(action.evocation.execute_time+13)
+  if S.Evocation:IsCastable() and (SiphonStormEquipped and S.TouchoftheMagi:CooldownRemains() <= (S.Evocation:ExecuteTime() + 13)) then
+    if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation cooldowns 15"; end
   end
-  --touch_of_the_magi,if=buff.arcane_charge.stack<=variable.totm_max_charges&talent.rune_of_power&cooldown.rune_of_power.remains<=execute_time&variable.time_until_ap>variable.totm_max_delay_for_ap
-  if S.TouchoftheMagi:IsCastable() and Player:ArcaneCharges() <= var_totm_max_charges and S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= S.TouchoftheMagi:ExecuteTime() and var_time_until_ap > var_totm_max_delay_for_ap then
-    if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi cooldowns 15"; end
+  -- Note: The following lines all use set_bonus.tier28_2pc&covenant.venthyr, so checking once here
+  if (Player:HasTier(28, 2) and CovenantID == 2) then
+    --rune_of_power,if=set_bonus.tier28_2pc&covenant.venthyr&buff.arcane_power.down&cooldown.touch_of_the_magi.remains<=execute_time&cooldown.arcane_power.remains>10
+    if S.RuneofPower:IsCastable() and (Player:BuffDown(S.ArcanePower) and S.TouchoftheMagi:CooldownRemains() <= S.RuneofPower:ExecuteTime() and S.ArcanePower:CooldownRemains() > 10) then
+      if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power cooldowns 16"; end
+    end
+    --touch_of_the_magi,if=set_bonus.tier28_2pc&covenant.venthyr&prev_gcd.1.rune_of_power
+    if S.TouchoftheMagi:IsCastable() and (Player:PrevGCD(1, S.RuneofPower)) then
+      if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi cooldowns 17"; end
+    end
+    --touch_of_the_magi,if=set_bonus.tier28_2pc&covenant.venthyr&cooldown.arcane_power.remains<=execute_time
+    if S.TouchoftheMagi:IsCastable() and (S.ArcanePower:CooldownRemains() <= S.TouchoftheMagi:ExecuteTime()) then
+      if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi cooldowns 18"; end
+    end
   end
-  --touch_of_the_magi,if=buff.arcane_charge.stack<=variable.totm_max_charges&(!talent.rune_of_power|cooldown.rune_of_power.remains>variable.totm_max_delay_for_rop)&variable.time_until_ap>variable.totm_max_delay_for_ap
-  if S.TouchoftheMagi:IsCastable() and Player:ArcaneCharges() <= var_totm_max_charges and (not S.RuneofPower:IsAvailable() or S.RuneofPower:CooldownRemains() > var_totm_max_delay_for_rop) and var_time_until_ap > var_totm_max_delay_for_ap then
-    if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi cooldowns 16"; end
+  --arcane_power,if=prev_gcd.1.touch_of_the_magi
+  if S.ArcanePower:IsCastable() and (Player:PrevGCD(1, S.TouchoftheMagi)) then
+    if Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power cooldowns 19"; end
   end
-  --arcane_power,if=cooldown.touch_of_the_magi.remains>variable.ap_max_delay_for_totm&(!covenant.venthyr|cooldown.mirrors_of_torment.remains>variable.ap_max_delay_for_mot)
-  --&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct
-  if S.ArcanePower:IsCastable() and S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay_for_totm and (CovenantID ~= 2 or S.MirrorsofTorment:CooldownRemains() > var_ap_max_delay_for_mot)
-  and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffDown(S.RuneofPowerBuff) and Player:ManaPercentage() >= var_ap_minimum_mana_pct then
-    if Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power cooldowns 17"; end
-  end
-  --rune_of_power,if=buff.arcane_power.down
-  --&(cooldown.touch_of_the_magi.remains>variable.rop_max_delay_for_totm|cooldown.arcane_power.remains<=variable.totm_max_delay_for_ap)
-  --&buff.arcane_charge.stack=buff.arcane_charge.max_stack&cooldown.arcane_power.remains>10&cooldown.touch_of_the_magi.remains>10
-  if S.RuneofPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) 
-  and (S.TouchoftheMagi:CooldownRemains() > var_rop_max_delay_for_totm or S.ArcanePower:CooldownRemains() <= var_totm_max_delay_for_ap) 
-  and Player:ArcaneCharges() == Player:ArcaneChargesMax() and S.ArcanePower:CooldownRemains() > 10 and S.TouchoftheMagi:CooldownRemains() > 10 then
-    if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power cooldowns 18"; end
+  -- Note: The following lines all use (!set_bonus.tier28_2pc|!covenant.venthyr), so checking once here
+  if ((not Player:HasTier(28, 2)) or CovenantID ~= 2) then
+    --touch_of_the_magi,if=(!set_bonus.tier28_2pc|!covenant.venthyr)&(!runeforge.siphon_storm|buff.siphon_storm.up)&buff.arcane_charge.stack<=variable.totm_max_charges&cooldown.arcane_power.remains<=execute_time&mana.pct>variable.ap_minimum_mana_pct&buff.rune_of_power.down
+    if S.TouchoftheMagi:IsCastable() and (((not SiphonStormEquipped) or Player:BuffUp(S.SiphonStormBuff)) and Player:ArcaneCharges() <= var_totm_max_charges and S.ArcanePower:CooldownRemains() <= S.TouchoftheMagi:ExecuteTime() and Player:ManaPercentage() > var_ap_minimum_mana_pct and Player:BuffDown(S.RuneofPowerBuff)) then
+      if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi cooldowns 20"; end
+    end
+    --touch_of_the_magi,if=(!set_bonus.tier28_2pc|!covenant.venthyr)&buff.arcane_charge.stack<=variable.totm_max_charges&talent.rune_of_power&cooldown.rune_of_power.remains<=execute_time&variable.time_until_ap>variable.totm_max_delay_for_ap
+    if S.TouchoftheMagi:IsCastable() and (Player:ArcaneCharges() <= var_totm_max_charges and S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= S.TouchoftheMagi:ExecuteTime() and var_time_until_ap > var_totm_max_delay_for_ap) then
+      if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi cooldowns 21"; end
+    end
+    --touch_of_the_magi,if=(!set_bonus.tier28_2pc|!covenant.venthyr)&buff.arcane_charge.stack<=variable.totm_max_charges&(!talent.rune_of_power|cooldown.rune_of_power.remains>variable.totm_max_delay_for_rop)&variable.time_until_ap>variable.totm_max_delay_for_ap
+    if S.TouchoftheMagi:IsCastable() and (Player:ArcaneCharges() <= var_totm_max_charges and ((not S.RuneofPower:IsAvailable()) or S.RuneofPower:CooldownRemains() > var_totm_max_delay_for_rop) and var_time_until_ap > var_totm_max_delay_for_ap) then
+      if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi cooldowns 22"; end
+    end
+    --rune_of_power,if=(!set_bonus.tier28_2pc|!covenant.venthyr)&buff.arcane_power.down&(cooldown.touch_of_the_magi.remains>variable.rop_max_delay_for_totm|cooldown.arcane_power.remains<=variable.totm_max_delay_for_ap)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&cooldown.arcane_power.remains>10&cooldown.touch_of_the_magi.remains>10
+    if S.RuneofPower:IsCastable() and (Player:BuffDown(S.ArcanePower) and (S.TouchoftheMagi:CooldownRemains() > var_rop_max_delay_for_totm or S.ArcanePower:CooldownRemains() <= var_totm_max_delay_for_ap) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and S.ArcanePower:CooldownRemains() > 10 and S.TouchoftheMagi:CooldownRemains() > 10) then
+      if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power cooldowns 23"; end
+    end
   end
   --shifting_power,if=variable.outside_of_cooldowns
   if S.ShiftingPower:IsCastable() and var_outside_of_cooldowns then
-    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(18)) then return "shifting_power cooldowns 19"; end
+    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(18)) then return "shifting_power cooldowns 24"; end
   end
   --presence_of_mind,if=talent.rune_of_power&buff.arcane_power.up&buff.rune_of_power.remains<gcd.max
   if S.PresenceofMind:IsCastable() and Player:BuffDown(S.PresenceofMind) and S.RuneofPower:IsAvailable() and Player:BuffUp(S.ArcanePower) and Player:BuffRemains(S.RuneofPowerBuff) < Player:GCD() then
-    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind cooldowns 20"; end
+    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind cooldowns 25"; end
   end
   --presence_of_mind,if=debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<action.arcane_missiles.execute_time&!covenant.kyrian
-  if S.PresenceofMind:IsCastable() and Player:BuffDown(S.PresenceofMind) and CovenantID ~= 1 and Target:DebuffUp(S.TouchoftheMagi) and Target:DebuffRemains(S.TouchoftheMagi) < S.ArcaneMissiles:ExecuteTime() then
-    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind cooldowns 21"; end
+  if S.PresenceofMind:IsCastable() and Player:BuffDown(S.PresenceofMind) and CovenantID ~= 1 and Target:DebuffUp(S.TouchoftheMagiDebuff) and Target:DebuffRemains(S.TouchoftheMagi) < S.ArcaneMissiles:ExecuteTime() then
+    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind cooldowns 26"; end
   end
   --presence_of_mind,if=buff.rune_of_power.up&buff.rune_of_power.remains<gcd.max&cooldown.evocation.ready&cooldown.touch_of_the_magi.remains&!covenant.kyrian
   if S.PresenceofMind:IsCastable() and Player:BuffDown(S.PresenceofMind) and CovenantID ~= 1 and Player:BuffUp(S.RuneofPowerBuff) and Player:BuffRemains(S.RuneofPowerBuff) < Player:GCD() and S.Evocation:CooldownRemains() == 0 and S.TouchoftheMagi:CooldownRemains() > 0 then
-    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind cooldowns 22"; end
+    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind cooldowns 27"; end
   end
 end
 
@@ -633,31 +648,34 @@ local function Rotation()
   --&buff.rune_of_power.down&buff.arcane_power.down&debuff.touch_of_the_magi.down&!prev_gcd.1.touch_of_the_magi
   if S.Evocation:IsCastable() and not not SiphonStormEquipped and Player:ManaPercentage() < var_evo_pct 
   and (S.TouchoftheMagi:CooldownRemains() <= S.Evocation:ExecuteTime() or S.ArcanePower:CooldownRemains() <= S.Evocation:ExecuteTime() or (S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= S.Evocation:ExecuteTime())) 
-  and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Target:DebuffDown(S.TouchoftheMagi) and not Player:IsCasting(S.TouchoftheMagi) then
+  and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Target:DebuffDown(S.TouchoftheMagiDebuff) and not Player:IsCasting(S.TouchoftheMagi) then
     if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation Rotation 2"; end
   end
-  --evocation,if=runeforge.siphon_storm&!covenant.venthyr&cooldown.arcane_power.remains<=action.evocation.execute_time
-  --evocation,if=runeforge.siphon_storm&cooldown.arcane_power.remains<=action.evocation.execute_time
-  if S.Evocation:IsCastable() and SiphonStormEquipped and CovenantID ~= 2 and S.ArcanePower:CooldownRemains() <= S.Evocation:ExecuteTime() then
-    if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation Rotation 3"; end
+  -- Note: The following lines use set_bonus.tier28_2pc&covenant.venthyr, so checking once here
+  if (Player:HasTier(28, 2) and CovenantID == 2) then
+    --arcane_barrage,if=set_bonus.tier28_2pc&covenant.venthyr&cooldown.touch_of_the_magi.remains<=execute_time&(buff.arcane_charge.stack>variable.totm_max_charges&cooldown.arcane_power.remains<3&mana.pct>variable.ap_minimum_mana_pct&buff.rune_of_power.down)
+    if S.ArcaneBarrage:IsCastable() and (S.TouchoftheMagi:CooldownRemains() <= S.ArcaneBarrage:ExecuteTime() and (Player:ArcaneCharges() > var_totm_max_charges and S.ArcanePower:CooldownRemains() < 3 and Player:ManaPercentage() > var_ap_minimum_mana_pct and Player:BuffDown(S.RuneofPowerBuff))) then
+      if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage rotation 3"; end
+    end
+    --arcane_barrage,if=set_bonus.tier28_2pc&covenant.venthyr&cooldown.rune_of_power.remains<=execute_time&cooldown.touch_of_the_magi.remains<3&(buff.arcane_charge.stack>variable.totm_max_charges&talent.rune_of_power&variable.time_until_ap>variable.totm_max_delay_for_ap)
+    if S.ArcaneBarrage:IsCastable() and (S.RuneofPower:CooldownRemains() <= S.ArcaneBarrage:ExecuteTime() and S.TouchoftheMagi:CooldownRemains() < 3 and (Player:ArcaneCharges() > var_totm_max_charges and S.RuneofPower:IsAvailable() and var_time_until_ap > var_totm_max_delay_for_ap)) then
+      if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage rotation 4"; end
+    end
   end
-  --evocation,if=runeforge.siphon_storm&covenant.venthyr&cooldown.mirrors_of_torment.remains<=action.evocation.execute_time
-  --&cooldown.touch_of_the_magi.remains<=(variable.mot_preceed_totm_by+action.evocation.execute_time+3)&cooldown.arcane_power.remains<=(variable.mot_preceed_totm_by+action.evocation.execute_time+3)
-  if S.Evocation:IsCastable() and SiphonStormEquipped and CovenantID == 2 and S.MirrorsofTorment:CooldownRemains() <= S.Evocation:ExecuteTime() 
-  and S.TouchoftheMagi:CooldownRemains() <= (var_mot_preceed_totm_by + S.Evocation:ExecuteTime() + 3) and S.ArcanePower:CooldownRemains() <= (var_mot_preceed_totm_by and S.Evocation:ExecuteTime() + 3) then
-    if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation Rotation 4"; end
-  end
-  --arcane_barrage,if=cooldown.touch_of_the_magi.ready&(buff.arcane_charge.stack>variable.totm_max_charges&cooldown.arcane_power.remains<=execute_time&mana.pct>variable.ap_minimum_mana_pct&buff.rune_of_power.down)
-  if S.ArcaneBarrage:IsCastable() and S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() > var_totm_max_charges and S.ArcanePower:CooldownRemains() > S.ArcaneBarrage:ExecuteTime() and Player:ManaPercentage() > var_ap_minimum_mana_pct and Player:BuffDown(S.RuneofPowerBuff) then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage rotation 5"; end
-  end
-  --arcane_barrage,if=cooldown.touch_of_the_magi.ready&(buff.arcane_charge.stack>variable.totm_max_charges&talent.rune_of_power&cooldown.rune_of_power.remains<=execute_time&variable.time_until_ap>variable.totm_max_delay_for_ap)
-  if S.ArcaneBarrage:IsCastable() and S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() > var_totm_max_charges and S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= S.ArcaneBarrage:ExecuteTime() and var_time_until_ap > var_totm_max_delay_for_ap then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage rotation 6"; end
-  end
-  --arcane_barrage,if=cooldown.touch_of_the_magi.ready&(buff.arcane_charge.stack>variable.totm_max_charges&(!talent.rune_of_power|cooldown.rune_of_power.remains>variable.totm_max_delay_for_rop)&variable.time_until_ap>variable.totm_max_delay_for_ap)
-  if S.ArcaneBarrage:IsCastable() and S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() > var_totm_max_charges and (not S.RuneofPower:IsAvailable() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_rop) and var_time_until_ap > var_totm_max_delay_for_ap then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage rotation 7"; end
+  -- Note: The following lines all use (!set_bonus.tier28_2pc|!covenant.venthyr), so checking once here
+  if ((not Player:HasTier(28, 2)) or CovenantID ~= 2) then
+    --arcane_barrage,if=(!set_bonus.tier28_2pc|!covenant.venthyr)&cooldown.touch_of_the_magi.ready&(buff.arcane_charge.stack>variable.totm_max_charges&cooldown.arcane_power.remains<=execute_time&mana.pct>variable.ap_minimum_mana_pct&buff.rune_of_power.down)
+    if S.ArcaneBarrage:IsCastable() and S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() > var_totm_max_charges and S.ArcanePower:CooldownRemains() > S.ArcaneBarrage:ExecuteTime() and Player:ManaPercentage() > var_ap_minimum_mana_pct and Player:BuffDown(S.RuneofPowerBuff) then
+      if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage rotation 5"; end
+    end
+    --arcane_barrage,if=(!set_bonus.tier28_2pc|!covenant.venthyr)&cooldown.touch_of_the_magi.ready&(buff.arcane_charge.stack>variable.totm_max_charges&talent.rune_of_power&cooldown.rune_of_power.remains<=execute_time&variable.time_until_ap>variable.totm_max_delay_for_ap)
+    if S.ArcaneBarrage:IsCastable() and S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() > var_totm_max_charges and S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= S.ArcaneBarrage:ExecuteTime() and var_time_until_ap > var_totm_max_delay_for_ap then
+      if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage rotation 6"; end
+    end
+    --arcane_barrage,if=(!set_bonus.tier28_2pc|!covenant.venthyr)&cooldown.touch_of_the_magi.ready&(buff.arcane_charge.stack>variable.totm_max_charges&(!talent.rune_of_power|cooldown.rune_of_power.remains>variable.totm_max_delay_for_rop)&variable.time_until_ap>variable.totm_max_delay_for_ap)
+    if S.ArcaneBarrage:IsCastable() and S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() > var_totm_max_charges and (not S.RuneofPower:IsAvailable() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_rop) and var_time_until_ap > var_totm_max_delay_for_ap then
+      if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage rotation 7"; end
+    end
   end
   --arcane_barrage,if=debuff.radiant_spark_vulnerability.stack=debuff.radiant_spark_vulnerability.max_stack&(buff.arcane_power.down|buff.arcane_power.remains<=gcd)&(buff.rune_of_power.down|buff.rune_of_power.remains<=gcd)
   if S.ArcaneBarrage:IsCastable() and Target:DebuffStack(S.RadiantSparkVulnerability) == RadiantSparkVulnerabilityMaxStack and (Player:BuffDown(S.ArcanePower) or Player:BuffRemains(S.ArcanePower) <= Player:GCDRemains()) and (Player:BuffDown(S.RuneofPowerBuff) or Player:BuffRemains(S.RuneofPowerBuff) <= Player:GCDRemains()) then
@@ -668,12 +686,12 @@ local function Rotation()
     if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast rotation 9"; end
   end
   --arcane_blast,if=buff.presence_of_mind.up&debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=action.arcane_blast.execute_time
-  if S.ArcaneBlast:IsCastable() and Player:BuffUp(S.PresenceofMind) and Target:DebuffUp(S.TouchoftheMagi) and Target:DebuffRemains(S.TouchoftheMagi) < (S.ArcaneBlast:ExecuteTime() + Player:GCDRemains()) then
+  if S.ArcaneBlast:IsCastable() and Player:BuffUp(S.PresenceofMind) and Target:DebuffUp(S.TouchoftheMagiDebuff) and Target:DebuffRemains(S.TouchoftheMagi) < (S.ArcaneBlast:ExecuteTime() + Player:GCDRemains()) then
     if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast rotation 10"; end
   end
   --arcane_missiles,if=debuff.touch_of_the_magi.up&talent.arcane_echo&(buff.deathborne.down|active_enemies=1)&(debuff.touch_of_the_magi.remains>action.arcane_missiles.execute_time|cooldown.presence_of_mind.remains|covenant.kyrian),chain=1,early_chain_if=buff.clearcasting_channel.down&(buff.arcane_power.up|(!talent.overpowered&(buff.rune_of_power.up|cooldown.evocation.ready)))
   --TODO early_chain
-  if S.ArcaneMissiles:IsCastable() and Target:DebuffUp(S.TouchoftheMagi) and S.ArcaneEcho:IsAvailable() and (Player:BuffDown(S.Deathborne) or EnemiesCount8ySplash == 1) and (Target:DebuffRemains(S.TouchoftheMagi) > S.ArcaneMissiles:ExecuteTime() or S.PresenceofMind:CooldownRemains() > 0 or CovenantID == 1) then
+  if S.ArcaneMissiles:IsCastable() and Target:DebuffUp(S.TouchoftheMagiDebuff) and S.ArcaneEcho:IsAvailable() and (Player:BuffDown(S.Deathborne) or EnemiesCount8ySplash == 1) and (Target:DebuffRemains(S.TouchoftheMagi) > S.ArcaneMissiles:ExecuteTime() or S.PresenceofMind:CooldownRemains() > 0 or CovenantID == 1) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles rotation 11"; end
   end
   --arcane_missiles,if=buff.clearcasting.react&buff.expanded_potential.up
@@ -693,7 +711,7 @@ local function Rotation()
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles rotation 15"; end
   end
   --nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.arcane_power.down&debuff.touch_of_the_magi.down
-  if S.NetherTempest:IsCastable() and Target:DebuffRefreshable(S.NetherTempest) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffDown(S.ArcanePower) and Target:DebuffDown(S.TouchoftheMagi) then
+  if S.NetherTempest:IsCastable() and Target:DebuffRefreshable(S.NetherTempest) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffDown(S.ArcanePower) and Target:DebuffDown(S.TouchoftheMagiDebuff) then
     if Cast(S.NetherTempest, nil, nil, not Target:IsSpellInRange(S.NetherTempest)) then return "nether_tempest rotation 16"; end
   end
   --arcane_orb,if=buff.arcane_charge.stack<=variable.totm_max_charges
@@ -729,7 +747,7 @@ local function Rotation()
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage rotation 24"; end
   end
   --arcane_barrage,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=gcd&buff.arcane_charge.stack=buff.arcane_charge.max_stack
-  if S.ArcaneBarrage:IsCastable() and Player:BuffDown(S.ArcanePower) and Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffUp(S.TouchoftheMagi) and Target:DebuffRemains(S.TouchoftheMagi) <= Player:GCDRemains() and Player:ArcaneCharges() == Player:ArcaneChargesMax() then
+  if S.ArcaneBarrage:IsCastable() and Player:BuffDown(S.ArcanePower) and Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffUp(S.TouchoftheMagiDebuff) and Target:DebuffRemains(S.TouchoftheMagi) <= Player:GCDRemains() and Player:ArcaneCharges() == Player:ArcaneChargesMax() then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage rotation 25"; end
   end
   --arcane_barrage,if=variable.empowered_barrage&buff.arcane_charge.stack>=(active_enemies-1)&active_enemies>1&buff.deathborne.down
@@ -738,11 +756,7 @@ local function Rotation()
   end
   --arcane_explosion,if=variable.empowered_barrage&buff.arcane_charge.stack<buff.arcane_charge.max_stack&active_enemies>1&buff.deathborne.down
   if S.ArcaneExplosion:IsCastable() and var_empowered_barrage and Player:ArcaneCharges() < Player:ArcaneChargesMax() and EnemiesCount10ySplash > 1 and Player:BuffDown(S.Deathborne) then
-    if Settings.Arcane.StayDistance and not Target:IsInRange(10) then
-      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion rotation 27 left"; end
-    else
-      if Cast(S.ArcaneExplosion) then return "arcane_explosion rotation 27"; end
-    end
+    if CastAE(S.ArcaneExplosion) then return "arcane_explosion rotation 27"; end
   end
   --arcane_blast
   if S.ArcaneBlast:IsCastable() then
@@ -791,121 +805,129 @@ local function FishingOpener()
     if Cast(S.FrostNova, nil, nil, not Target:IsSpellInRange(S.FrostNova)) then return "frost_nova fishing_opener 4"; end
   end
   --arcane_missiles,if=runeforge.arcane_infinity&buff.arcane_harmony.stack<buff.arcane_harmony.max_stack&((buff.arcane_power.down&cooldown.arcane_power.ready)|debuff.touch_of_the_magi.up),chain=1
-  if S.ArcaneMissiles:IsCastable() and ArcaneInfinityEquipped and Player:BuffStack(S.ArcaneHarmonyBuff) < ArcaneHarmonyMaxStack and ((Player:BuffDown(S.ArcanePower) and S.ArcanePower:CooldownRemains() == 0) or Target:DebuffUp(S.TouchoftheMagi))then
+  if S.ArcaneMissiles:IsCastable() and ArcaneInfinityEquipped and Player:BuffStack(S.ArcaneHarmonyBuff) < ArcaneHarmonyMaxStack and ((Player:BuffDown(S.ArcanePower) and S.ArcanePower:CooldownRemains() == 0) or Target:DebuffUp(S.TouchoftheMagiDebuff))then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles fishing_opener 5"; end
+  end
+  --deathborne,if=conduit.gift_of_the_lich
+  if S.Deathborne:IsCastable() and (S.GiftoftheLich:ConduitEnabled()) then
+    if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne fishing_opener 6"; end
   end
   --rune_of_power,if=runeforge.siphon_storm
   if S.RuneofPower:IsCastable() and SiphonStormEquipped then
-    if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power fishing_opener 6"; end
+    if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power fishing_opener 7"; end
   end
   --arcane_orb,if=cooldown.rune_of_power.ready
   if S.ArcaneOrb:IsCastable() and S.RuneofPower:CooldownRemains() == 0 then
-    if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb fishing_opener 7"; end
+    if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb fishing_opener 8"; end
   end
   --arcane_blast,if=cooldown.rune_of_power.ready&buff.arcane_charge.stack<buff.arcane_charge.max_stack
   if S.ArcaneBlast:IsCastable() and S.RuneofPower:CooldownRemains() == 0 and Player:ArcaneCharges() < Player:ArcaneChargesMax() then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast fishing_opener 8"; end
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast fishing_opener 9"; end
   end
-  --deathborne,if=!runeforge.siphon_storm&!runeforge.temporal_warp
-  if S.Deathborne:IsCastable() and not SiphonStormEquipped and not TemporalWarpEquipped then
-    if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne fishing_opener 9"; end
+  --mirrors_of_torment,if=time>=5+(1*set_bonus.tier28_4pc)
+  if S.MirrorsofTorment:IsCastable() and (HL.CombatTime() >= 5 + (1 * num(Player:HasTier(28, 4)))) then
+    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment fishing_opener 10"; end
+  end
+  --use_item,name=moonlit_prism,if=time>6
+  if I.MoonlitPrism:IsEquippedAndReady() and (HL.CombatTime() > 6) then
+    if Cast(I.MoonlitPrism, nil, Settings.Commons.DisplayStyle.Trinkets) then return "moonlit_prism fishing_opener 11"; end
   end
   --rune_of_power
   if S.RuneofPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and not S.ArcanePower:IsCastable() then
-    if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power fishing_opener 10"; end
+    if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power fishing_opener 12"; end
   end
   --arcane_missiles,if=buff.clearcasting.react&buff.clearcasting.stack=buff.clearcasting.max_stack&covenant.venthyr&cooldown.mirrors_of_torment.ready&!variable.empowered_barrage&cooldown.arcane_power.ready
   if S.ArcaneMissiles:IsCastable() and Player:BuffUp(S.ClearcastingBuff) and Player:BuffStack(S.ClearcastingBuff) == ClearCastingMaxStack and CovenantID == 2 and S.MirrorsofTorment:CooldownRemains() == 0 and not var_empowered_barrage and S.RuneofPower:CooldownRemains() == 0 then
-    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles fishing_opener 11"; end
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles fishing_opener 13"; end
   end
   --potion,if=!runeforge.temporal_warp&(!runeforge.siphon_storm|(variable.prepull_evo=1&buff.arcane_charge.stack=buff.arcane_charge.max_stack))
   if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (not TemporalWarpEquipped and (not SiphonStormEquipped and (var_prepull_evo and Player:ArcaneCharges() == Player:ArcaneChargesMax()))) then
-    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion fishing_opener 12"; end
+    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion fishing_opener 14"; end
   end
   --deathborne,if=buff.rune_of_power.down|prev_gcd.1.arcane_barrage
   if S.Deathborne:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or Player:PrevGCD(1,S.ArcaneBarrage)) then
-    if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne fishing_opener 13"; end
+    if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne fishing_opener 15"; end
   end
   --radiant_spark,if=buff.rune_of_power.down|prev_gcd.1.arcane_barrage
   if S.RadiantSpark:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or Player:PrevGCD(1,S.ArcaneBarrage)) then
-    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark fishing_opener 14"; end
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark fishing_opener 16"; end
   end
   --mirrors_of_torment,if=buff.rune_of_power.remains<(6+2*runeforge.siphon_storm)
   if S.MirrorsofTorment:IsCastable() and Player:BuffRemains(S.RuneofPowerBuff) < (6 + 2 * num(SiphonStormEquipped)) then
-    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment fishing_opener 15"; end
+    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment fishing_opener 17"; end
   end
   --arcane_power,if=variable.empowered_barrage&buff.rune_of_power.up&(mana.pct<(25+(10*covenant.kyrian))|buff.clearcasting.stack=buff.clearcasting.max_stack)
   if S.ArcanePower:IsCastable() and var_empowered_barrage and Player:BuffUp(S.RuneofPowerBuff) and ((Player:ManaPercentage() < (25 + (10 * num(CovenantID == 1)))) or Player:BuffStack(S.ClearcastingBuff) == ClearCastingMaxStack) then
-    if Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power fishing_opener 16"; end
+    if Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power fishing_opener 18"; end
   end
   --arcane_barrage,if=variable.empowered_barrage&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.arcane_power.up
   if S.ArcaneBarrage:IsCastable() and var_empowered_barrage and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffUp(S.ArcanePower) then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage fishing_opener 17"; end
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage fishing_opener 19"; end
   end
   --use_item,name=soulletting_ruby,if=buff.rune_of_power.down|prev_gcd.1.arcane_barrage|prev_gcd.1.radiant_spark|(prev_gcd.1.deathborne&!runeforge.siphon_storm)
   if I.SoullettingRuby:IsEquippedAndReady() and (Player:BuffDown(S.RuneofPowerBuff) or Player:PrevGCD(1,S.ArcaneBarrage) or Player:IsCasting(S.RadiantSpark) or (Player:IsCasting(S.Deathborne) and not SiphonStormEquipped)) then
-    if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby fishing_opener 18"; end
+    if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby fishing_opener 20"; end
   end
   --touch_of_the_magi,if=buff.rune_of_power.down|prev_gcd.1.arcane_barrage|prev_gcd.1.radiant_spark|(prev_gcd.1.deathborne&!runeforge.siphon_storm)
   if S.TouchoftheMagi:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or Player:PrevGCD(1,S.ArcaneBarrage) or Player:IsCasting(S.RadiantSpark) or (Player:IsCasting(S.Deathborne) and not SiphonStormEquipped)) then
-    if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi fishing_opener 19"; end
+    if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi fishing_opener 21"; end
   end
   --arcane_power,if=prev_gcd.1.touch_of_the_magi
   if S.ArcanePower:IsCastable() and Player:IsCasting(S.TouchoftheMagi) then
-    if Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power fishing_opener 20"; end
+    if Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power fishing_opener 22"; end
   end
   --presence_of_mind,if=!talent.arcane_echo&debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=(action.arcane_blast.execute_time*buff.presence_of_mind.max_stack)
-  if S.PresenceofMind:IsCastable() and S.ArcaneEcho:IsAvailable() and Target:DebuffUp(S.TouchoftheMagi) and Target:DebuffRemains(S.TouchoftheMagi) <= (S.ArcaneBlast:ExecuteTime() * PresenceMaxStack) then
-    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind fishing_opener 21"; end
+  if S.PresenceofMind:IsCastable() and S.ArcaneEcho:IsAvailable() and Target:DebuffUp(S.TouchoftheMagiDebuff) and Target:DebuffRemains(S.TouchoftheMagi) <= (S.ArcaneBlast:ExecuteTime() * PresenceMaxStack) then
+    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind fishing_opener 23"; end
   end
   --presence_of_mind,if=buff.arcane_power.up&buff.rune_of_power.remains<=(action.arcane_blast.execute_time*buff.presence_of_mind.max_stack)
   if S.PresenceofMind:IsCastable() and Player:BuffUp(S.ArcanePower) and Player:BuffRemains(S.RuneofPowerBuff) <= (S.ArcaneBlast:ExecuteTime() * PresenceMaxStack) then
-    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind fishing_opener 22"; end
+    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind fishing_opener 24"; end
   end
   --arcane_blast,if=dot.radiant_spark.remains>5|debuff.radiant_spark_vulnerability.stack>0
   if S.ArcaneBlast:IsCastable() and (Target:DebuffRemains(S.RadiantSpark) > 5 or Target:DebuffStack(S.RadiantSparkVulnerability) > 0) then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast fishing_opener 23"; end
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast fishing_opener 25"; end
   end
   --arcane_barrage,if=cooldown.arcane_power.ready&mana.pct<(40+(10*covenant.kyrian))&buff.arcane_charge.stack=buff.arcane_charge.max_stack&(!runeforge.siphon_storm|variable.prepull_evo=1)&!runeforge.temporal_warp&!runeforge.arcane_infinity
   if S.ArcaneBarrage:IsCastable() and S.ArcanePower:CooldownRemains() == 0 and Player:ManaPercentage() < ( 40 + (10 * num(CovenantID == 1))) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and (not SiphonStormEquipped or var_prepull_evo) and not TemporalWarpEquipped and not ArcaneInfinityEquipped then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage fishing_opener 24"; end
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage fishing_opener 26"; end
   end
   --arcane_barrage,if=buff.arcane_power.up&buff.arcane_power.remains<=gcd&cooldown.evocation.remains
   if S.ArcaneBarrage:IsCastable() and Player:BuffUp(S.ArcanePower) and Player:BuffRemains(S.ArcanePower) <= Player:GCD() and S.Evocation:CooldownRemains() > 0 then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage fishing_opener 25"; end
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage fishing_opener 27"; end
   end
   --arcane_barrage,if=buff.rune_of_power.up&buff.arcane_power.down&buff.rune_of_power.remains<=gcd&!runeforge.arcane_infinity
   if S.ArcaneBarrage:IsCastable() and Player:BuffUp(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Player:BuffRemains(S.RuneofPowerBuff) <= Player:GCD() and ArcaneInfinityEquipped and not ArcaneInfinityEquipped then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage fishing_opener 26"; end
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage fishing_opener 28"; end
   end
   --arcane_missiles,if=debuff.touch_of_the_magi.up&talent.arcane_echo&(buff.deathborne.down|active_enemies=1)&debuff.touch_of_the_magi.remains>action.arcane_missiles.execute_time,chain=1,early_chain_if=buff.clearcasting_channel.down&(buff.arcane_power.up|(!talent.overpowered&(buff.rune_of_power.up|cooldown.evocation.ready)))
   --TODO : early chain
-  if S.ArcaneMissiles:IsCastable() and Target:DebuffUp(S.TouchoftheMagi) and S.ArcaneEcho:IsAvailable() and (Player:BuffDown(S.Deathborne) or EnemiesCount8ySplash == 1) and Target:DebuffRemains(S.TouchoftheMagi) > S.ArcaneMissiles:ExecuteTime() then
-    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles fishing_opener 27"; end
+  if S.ArcaneMissiles:IsCastable() and Target:DebuffUp(S.TouchoftheMagiDebuff) and S.ArcaneEcho:IsAvailable() and (Player:BuffDown(S.Deathborne) or EnemiesCount8ySplash == 1) and Target:DebuffRemains(S.TouchoftheMagi) > S.ArcaneMissiles:ExecuteTime() then
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles fishing_opener 29"; end
   end
   --arcane_missiles,if=covenant.venthyr&buff.clearcasting.stack=buff.clearcasting.max_stack
   if S.ArcaneMissiles:IsCastable() and CovenantID == 2 and Player:BuffStack(S.ClearcastingBuff) == ClearCastingMaxStack then
-    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles fishing_opener 28"; end
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles fishing_opener 30"; end
   end
   --arcane_missiles,if=buff.clearcasting.react&cooldown.arcane_power.remains&(buff.rune_of_power.up|buff.arcane_power.up),chain=1
   if S.ArcaneMissiles:IsCastable() and Player:BuffUp(S.ClearcastingBuff) and S.ArcanePower:CooldownRemains() > 0 and (Player:BuffUp(S.RuneofPowerBuff or Player:BuffUp(S.ArcanePower))) then
-    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles fishing_opener 29"; end
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles fishing_opener 31"; end
   end
   --arcane_orb,if=buff.arcane_charge.stack<=variable.totm_max_charges
   if S.ArcaneOrb:IsCastable() and Player:ArcaneCharges() <= var_totm_max_charges then
-    if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb fishing_opener 30"; end
+    if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb fishing_opener 32"; end
   end
   --arcane_blast,if=buff.rune_of_power.up|mana.pct>15
   if S.ArcaneBlast:IsCastable() and (Player:BuffUp(S.RuneofPowerBuff) or Player:ManaPercentage() > 15) then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast fishing_opener 31"; end
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast fishing_opener 33"; end
   end
   --evocation,if=buff.rune_of_power.down&buff.arcane_power.down,interrupt_if=mana.pct>=85,interrupt_immediate=1
   if S.Evocation:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Player:ManaPercentage() < 85 then
-    if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation fishing_opener 32"; end
+    if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation fishing_opener 34"; end
   end
   --arcane_barrage
   if S.ArcaneBarrage:IsCastable()  then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage fishing_opener 33"; end
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage fishing_opener 35"; end
   end
 end
 
@@ -1013,8 +1035,8 @@ local function Harmony()
   if S.ArcaneBarrage:IsCastable() and Player:BuffUp(S.RuneofPowerBuff) and Player:BuffRemains(S.RuneofPowerBuff) <= S.ArcaneMissiles:ExecuteTime() and Player:BuffUp(S.ArcanePower) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffUp(S.ArcaneHarmonyBuff) and Player:PowerInfusionUp() and Player:BloodlustUp() then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage harmony 21"; end
   end
-  --arcane_blast,if=buff.presence_of_mind.up&(buff.arcane_charge.stack<buff.arcane_charge.max_stack|!(buff.power_infusion.up&buff.bloodlust.up))
-  if S.ArcaneBlast:IsCastable() and Player:BuffUp(S.PresenceofMind) and (Player:ArcaneCharges() < Player:ArcaneChargesMax() or not (Player:PowerInfusionUp() and Player:BloodlustUp())) then
+  --arcane_blast,if=buff.presence_of_mind.up&(buff.arcane_charge.stack<buff.arcane_charge.max_stack|!(buff.power_infusion.up&buff.bloodlust.up))&!(buff.arcane_charge.stack=0&buff.presence_of_mind.stack=1)
+  if S.ArcaneBlast:IsCastable() and Player:BuffUp(S.PresenceofMind) and (Player:ArcaneCharges() < Player:ArcaneChargesMax() or not (Player:PowerInfusionUp() and Player:BloodlustUp()) and (not (Player:ArcaneCharges() == 0 and Player:BuffStack(S.PresenceofMind) == 1))) then
     if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast harmony 22"; end
   end
   --presence_of_mind,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack&buff.arcane_power.up
@@ -1054,7 +1076,7 @@ end
 local function Aoe()
   --frostbolt,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_frost.down&(buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down)&cooldown.touch_of_the_magi.remains=0&(buff.arcane_charge.stack<=variable.aoe_totm_max_charges&((talent.rune_of_power&cooldown.rune_of_power.remains<=gcd&cooldown.arcane_power.remains>variable.totm_max_delay_for_ap)|(!talent.rune_of_power&cooldown.arcane_power.remains>variable.totm_max_delay_for_ap)|cooldown.arcane_power.remains<=gcd))
   if S.Frostbolt:IsReady() and DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Frost == 0 
-  and (Player:BuffDown(S.ArcanePower) and Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffDown(S.TouchoftheMagi)) and S.TouchoftheMagi:CooldownRemains() == 0 and (Player:ArcaneCharges() <= var_totm_max_charges 
+  and (Player:BuffDown(S.ArcanePower) and Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffDown(S.TouchoftheMagiDebuff)) and S.TouchoftheMagi:CooldownRemains() == 0 and (Player:ArcaneCharges() <= var_totm_max_charges 
   and ((S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= Player:GCD() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or (not S.RuneofPower:IsAvailable() and S.ArcanePower:CooldownRemains() > var_totm_max_delay_for_ap) or (S.ArcanePower:CooldownRemains() <= Player:GCD()))) then
     if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt Aoe 1"; end
   end
@@ -1165,7 +1187,7 @@ local function Aoe()
     if Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power Aoe 17"; end
   end
   --rune_of_power,if=buff.rune_of_power.down&((cooldown.touch_of_the_magi.remains>20&buff.arcane_charge.stack=buff.arcane_charge.max_stack)|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack<=variable.aoe_totm_max_charges))&(cooldown.arcane_power.remains>12|debuff.touch_of_the_magi.up)&!(soulbind.effusive_anima_accelerator&runeforge.harmonic_echo)
-  if CDsON() and S.RuneofPower:IsCastable() and not S.ArcanePower:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) and ((S.TouchoftheMagi:CooldownRemains() > 20 and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() <= var_totm_max_charges)) and (S.ArcanePower:CooldownRemains() > S.RuneofPower:BaseDuration() or Target:DebuffUp(S.TouchoftheMagi)) and not (S.EffusiveAnimaAccelerator:SoulbindEnabled() and HarmonicEchoEquipped)) then
+  if CDsON() and S.RuneofPower:IsCastable() and not S.ArcanePower:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) and ((S.TouchoftheMagi:CooldownRemains() > 20 and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() <= var_totm_max_charges)) and (S.ArcanePower:CooldownRemains() > S.RuneofPower:BaseDuration() or Target:DebuffUp(S.TouchoftheMagiDebuff)) and not (S.EffusiveAnimaAccelerator:SoulbindEnabled() and HarmonicEchoEquipped)) then
     if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power Aoe 18"; end
   end
   --shifting_power,if=cooldown.arcane_orb.remains>5|!talent.arcane_orb
@@ -1213,46 +1235,30 @@ local function Aoe()
       if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage Aoe 28"; end
     end
     if S.ArcaneExplosion:IsCastable() and Player:PrevGCD(2,S.RadiantSpark) and EnemiesCount8ySplash > 3 then
-      if Settings.Arcane.StayDistance and not Target:IsInRange(10) then
-        if CastLeft(S.ArcaneExplosion) then return "arcane_explosion Aoe 29 left"; end
-      else
-        if Cast(S.ArcaneExplosion) then return "arcane_explosion Aoe 29"; end
-      end
+      if CastAE(S.ArcaneExplosion) then return "arcane_explosion Aoe 29"; end
     end
     if S.ArcaneExplosion:IsCastable() and Target:DebuffStack(S.RadiantSparkVulnerability) == 1 and EnemiesCount8ySplash > 3 then
-      if Settings.Arcane.StayDistance and not Target:IsInRange(10) then
-        if CastLeft(S.ArcaneExplosion) then return "arcane_explosion Aoe 30 left"; end
-      else
-        if Cast(S.ArcaneExplosion) then return "arcane_explosion Aoe 30"; end
-      end
+      if CastAE(S.ArcaneExplosion) then return "arcane_explosion Aoe 30"; end
     end
   end
   --arcane_explosion,if=runeforge.harmonic_echo&debuff.radiant_spark_vulnerability.stack=1
   if S.ArcaneExplosion:IsReady() and (HarmonicEchoEquipped and Target:DebuffStack(S.RadiantSparkVulnerability) == 1) then
-    if Settings.Arcane.StayDistance and not Target:IsInRange(10) then
-      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion Aoe 31 left"; end
-    else
-      if Cast(S.ArcaneExplosion) then return "arcane_explosion Aoe 31"; end
-    end
+    if CastAE(S.ArcaneExplosion) then return "arcane_explosion Aoe 31"; end
   end
   --arcane_explosion,if=runeforge.harmonic_echo&(prev_gcd.1.radiant_spark|(prev_gcd.2.radiant_spark&debuff.touch_of_the_magi.up))
-  if S.ArcaneExplosion:IsReady() and (HarmonicEchoEquipped and (Player:PrevGCD(1, S.RadiantSpark) or (Player:PrevGCD(2, S.RadiantSpark) and Target:DebuffUp(S.TouchoftheMagi)))) then
-    if Settings.Arcane.StayDistance and not Target:IsInRange(10) then
-      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion Aoe 32 left"; end
-    else
-      if Cast(S.ArcaneExplosion) then return "arcane_explosion Aoe 32"; end
-    end
+  if S.ArcaneExplosion:IsReady() and (HarmonicEchoEquipped and (Player:PrevGCD(1, S.RadiantSpark) or (Player:PrevGCD(2, S.RadiantSpark) and Target:DebuffUp(S.TouchoftheMagiDebuff)))) then
+    if CastAE(S.ArcaneExplosion) then return "arcane_explosion Aoe 32"; end
   end
   --arcane_orb,if=runeforge.harmonic_echo&debuff.radiant_spark_vulnerability.stack=3
   if S.ArcaneOrb:IsCastable() and (HarmonicEchoEquipped and Target:DebuffStack(S.RadiantSparkVulnerability) == 3) then
     if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb Aoe 33"; end
   end
   --arcane_missiles,if=buff.clearcasting.react&talent.arcane_echo&debuff.touch_of_the_magi.up
-  if S.ArcaneMissiles:IsReady() and (Player:BuffUp(S.ClearcastingBuff) and S.ArcaneEcho:IsAvailable() and Target:DebuffUp(S.TouchoftheMagi)) then
+  if S.ArcaneMissiles:IsReady() and (Player:BuffUp(S.ClearcastingBuff) and S.ArcaneEcho:IsAvailable() and Target:DebuffUp(S.TouchoftheMagiDebuff)) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles Aoe 34"; end
   end
   --presence_of_mind,if=buff.deathborne.up&debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time&((talent.resonance&active_enemies<4)|active_enemies<5)&(!runeforge.arcane_bombardment|target.health.pct>35)
-  if CDsON() and S.PresenceofMind:IsCastable() and Player:BuffUp(S.Deathborne) and Target:DebuffUp(S.TouchoftheMagi) and Target:DebuffRemains(S.TouchoftheMagi) <= (PresenceMaxStack * S.ArcaneBlast:ExecuteTime()) + Player:GCDRemains() 
+  if CDsON() and S.PresenceofMind:IsCastable() and Player:BuffUp(S.Deathborne) and Target:DebuffUp(S.TouchoftheMagiDebuff) and Target:DebuffRemains(S.TouchoftheMagi) <= (PresenceMaxStack * S.ArcaneBlast:ExecuteTime()) + Player:GCDRemains() 
   and ((S.Resonance:IsAvailable() and EnemiesCount8ySplash < 4) or EnemiesCount8ySplash < 5) and (not ArcaneBombardmentEquipped or Target:HealthPercentage() > 35) then
     if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind Aoe 35"; end
   end
@@ -1290,23 +1296,104 @@ local function Aoe()
   end
   --arcane_explosion,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack
   if S.ArcaneExplosion:IsCastable() and Player:ArcaneCharges() < Player:ArcaneChargesMax() then
-    if Settings.Arcane.StayDistance and not Target:IsInRange(10) then
-      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion Aoe 44 left"; end
-    else
-      if Cast(S.ArcaneExplosion) then return "arcane_explosion Aoe 44"; end
-    end
+    if CastAE(S.ArcaneExplosion) then return "arcane_explosion Aoe 44"; end
   end
   --arcane_explosion,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&prev_gcd.1.arcane_barrage
   if S.ArcaneExplosion:IsCastable() and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:IsCasting(S.ArcaneBarrage) then
-    if Settings.Arcane.StayDistance and not Target:IsInRange(10) then
-      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion Aoe 45 left"; end
-    else
-      if Cast(S.ArcaneExplosion) then return "arcane_explosion Aoe 45"; end
-    end
+    if CastAE(S.ArcaneExplosion) then return "arcane_explosion Aoe 45"; end
   end
   --evocation,interrupt_if=mana.pct>=85,interrupt_immediate=1
   if S.Evocation:IsCastable() and Player:ManaPercentage() < 85 then
     if Cast(S.Evocation) then return "evocation Aoe 46"; end
+  end
+end
+
+local function Vaoe()
+  if (HL.CombatTime() < 7) then
+    --rune_of_power,if=time<7
+    if S.RuneofPower:IsCastable() then
+      if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power vaoe 1"; end
+    end
+    --arcane_orb,if=time<7
+    if S.ArcaneOrb:IsCastable() then
+      if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb vaoe 2"; end
+    end
+    --arcane_explosion,if=time<7
+    if S.ArcaneExplosion:IsCastable() then
+      if CastAE(S.ArcaneExplosion) then return "arcane_explosion vaoe 3"; end
+    end
+  end
+  --use_item,name=moonlit_prism,if=prev_gcd.1.mirrors_of_torment
+  if I.MoonlitPrism:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (Player:PrevGCD(1, S.MirrorsofTorment)) then
+    if Cast(I.MoonlitPrism, nil, Settings.Commons.DisplayStyle.Trinkets) then return "moonlit_prism vaoe 4"; end
+  end
+  --evocation,if=cooldown.touch_of_the_magi.remains<=(action.evocation.execute_time+13)&cooldown.arcane_power.remains<=(action.evocation.execute_time+14)
+  if S.Evocation:IsCastable() and (S.TouchoftheMagi:CooldownRemains() <= (S.Evocation:ExecuteTime() + 13) and S.ArcanePower:CooldownRemains() <= (S.Evocation:ExecuteTime() + 14)) then
+    if Cast(S.Evocation) then return "evocation vaoe 5"; end
+  end
+  --mirrors_of_torment,if=time>6&cooldown.touch_of_the_magi.remains<=9&buff.siphon_storm.up
+  if S.MirrorsofTorment:IsCastable() and (HL.CombatTime() > 6 and S.TouchoftheMagi:CooldownRemains() <= 9 and Player:BuffUp(S.SiphonStormBuff)) then
+    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenants) then return "mirrors_of_torment vaoe 6"; end
+  end
+  --arcane_explosion,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.siphon_storm.remains>20&!debuff.mirrors_of_torment.up
+  if S.ArcaneExplosion:IsCastable() and (Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffRemains(S.SiphonStormBuff) > 20 and Target:DebuffDown(S.MirrorsofTorment)) then
+    if CastAE(S.ArcaneExplosion) then return "arcane_explosion vaoe 7"; end
+  end
+  --arcane_blast,if=debuff.mirrors_of_torment.up&time<13
+  if S.ArcaneBlast:IsCastable() and (Target:DebuffUp(S.MirrorsofTorment) and HL.CombatTime() < 13) then
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast vaoe 8"; end
+  end
+  --arcane_blast,if=debuff.mirrors_of_torment.remains>=19&cooldown.touch_of_the_magi.remains
+  if S.ArcaneBlast:IsCastable() and (Target:DebuffRemains(S.MirrorsofTorment) >= 19 and S.TouchoftheMagi:CooldownRemains() > 0) then
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast vaoe 9"; end
+  end
+  --rune_of_power,if=buff.arcane_power.down&cooldown.touch_of_the_magi.remains<=execute_time&cooldown.arcane_power.remains>10
+  if S.RuneofPower:IsCastable() and (Player:BuffDown(S.ArcanePower) and S.TouchoftheMagi:CooldownRemains() <= S.RuneofPower:ExecuteTime() and S.ArcanePower:CooldownRemains() > 10) then
+    if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power vaoe 10"; end
+  end
+  --touch_of_the_magi,if=time>=13&cooldown.arcane_power.remains<=execute_time
+  if S.TouchoftheMagi:IsCastable() and (HL.CombatTime() >= 13 and S.ArcanePower:CooldownRemains() <= S.TouchoftheMagi:ExecuteTime()) then
+    if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi vaoe 11"; end
+  end
+  --touch_of_the_magi,if=time>30&prev_gcd.1.rune_of_power
+  if S.TouchoftheMagi:IsCastable() and (HL.CombatTime() > 30 and Player:PrevGCD(1, S.RuneofPower)) then
+    if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi vaoe 12"; end
+  end
+  --arcane_power,if=prev_gcd.1.touch_of_the_magi
+  if S.ArcanePower:IsCastable() and (Player:PrevGCD(1, S.TouchoftheMagi)) then
+    if Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power vaoe 13"; end
+  end
+  --arcane_explosion,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.siphon_storm.remains>24&!debuff.touch_of_the_magi.down
+  if S.ArcaneExplosion:IsCastable() and (Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffRemains(S.SiphonStormBuff) > 24 and Target:DebuffUp(S.TouchoftheMagiDebuff)) then
+    if CastAE(S.ArcaneExplosion) then return "arcane_explosion vaoe 14"; end
+  end
+  --arcane_blast,if=cooldown.touch_of_the_magi.remains<=8&cooldown.rune_of_power.remains<=9&buff.arcane_charge.stack=buff.arcane_charge.max_stack&active_enemies<6-(1*set_bonus.tier28_2pc)
+  if S.ArcaneBlast:IsCastable() and (S.TouchoftheMagi:CooldownRemains() <= 8 and S.RuneofPower:CooldownRemains() <= 9 and Player:ArcaneCharges() == Player:ArcaneChargesMax() and EnemiesCount8ySplash < 6 - (1 * num(Player:HasTier(28, 2)))) then
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast vaoe 15"; end
+  end
+  --arcane_missiles,if=active_enemies<9-(1*set_bonus.tier28_2pc)&debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains>action.arcane_missiles.execute_time,chain=1,early_chain_if=buff.clearcasting_channel.down&active_enemies<6
+  if S.ArcaneMissiles:IsCastable() and (EnemiesCount8ySplash < 9 - (1 * num(Player:HasTier(28, 2))) and Target:DebuffUp(S.TouchoftheMagiDebuff) and Target:DebuffRemains(S.TouchoftheMagiDebuff) > S.ArcaneMissiles:ExecuteTime()) then
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles vaoe 16"; end
+  end
+  --arcane_missiles,if=buff.clearcasting.react
+  if S.ArcaneMissiles:IsCastable() and (Player:BuffUp(S.ClearcastingBuff)) then
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles vaoe 17"; end
+  end
+  --arcane_orb,if=buff.arcane_charge.stack=0&cooldown.arcane_power.remains>15
+  if S.ArcaneOrb:IsCastable() and (Player:ArcaneCharges() == 0 and S.ArcanePower:CooldownRemains() > 15) then
+    if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb vaoe 18"; end
+  end
+  --arcane_barrage,if=time>10&buff.arcane_charge.stack=buff.arcane_charge.max_stack&cooldown.touch_of_the_magi.remains&(buff.siphon_storm.remains<25|buff.siphon_storm.down&cooldown.touch_of_the_magi.remains>=11)
+  if S.ArcaneBarrage:IsCastable() and (HL.CombatTime() > 10 and Player:ArcaneCharges() == Player:ArcaneChargesMax() and S.TouchoftheMagi:CooldownRemains() > 0 and (Player:BuffRemains(S.SiphonStormBuff) < 25 or Player:BuffDown(S.SiphonStormBuff) and S.TouchoftheMagi:CooldownRemains() >= 11)) then
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage vaoe 19"; end
+  end
+  --arcane_explosion,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack
+  if S.ArcaneExplosion:IsCastable() and (Player:ArcaneCharges() < Player:ArcaneChargesMax()) then
+    if CastAE(S.ArcaneExplosion) then return "arcane_explosion vaoe 20"; end
+  end
+  --arcane_explosion,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&prev_gcd.1.arcane_barrage
+  if S.ArcaneExplosion:IsCastable() and (Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:PrevGCD(1, S.ArcaneBarrage)) then
+    if CastAE(S.ArcaneExplosion) then return "arcane_explosion vaoe 21"; end
   end
 end
 
@@ -1326,6 +1413,9 @@ local function APL()
 
   -- Disciplinary Command Check
   Mage.DCCheck()
+
+  -- Set which cast function to use for ArcaneExplosion
+  CastAE = (Settings.Arcane.StayDistance and not Target:IsInRange(10)) and CastLeft or Cast
 
   if Everyone.TargetIsValid() then
     -- call precombat
@@ -1352,11 +1442,11 @@ local function APL()
       if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp combustion_cooldowns 6"; end
     end
     --lights_judgment,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down
-    if S.LightsJudgment:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Target:DebuffDown(S.TouchoftheMagi) then
+    if S.LightsJudgment:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Target:DebuffDown(S.TouchoftheMagiDebuff) then
       if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment Shared_cd 4"; end
     end
     --bag_of_tricks,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down
-    if S.BagofTricks:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Target:DebuffDown(S.TouchoftheMagi) then
+    if S.BagofTricks:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Target:DebuffDown(S.TouchoftheMagiDebuff) then
       if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks Shared_cd 5"; end
     end
     --berserking,if=buff.arcane_power.up
@@ -1388,15 +1478,15 @@ local function APL()
         if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife Shared_cd 10"; end
       end
       --use_item,effect_name=gladiators_badge,if=buff.arcane_power.up|cooldown.arcane_power.remains>=55&debuff.touch_of_the_magi.up
-      if I.SinfulGladiatorsBadge:IsEquippedAndReady() and (Player:BuffUp(S.ArcanePower) or (S.ArcanePower:CooldownRemains() >= 55 and Target:DebuffUp(S.TouchoftheMagi))) then
+      if I.SinfulGladiatorsBadge:IsEquippedAndReady() and (Player:BuffUp(S.ArcanePower) or (S.ArcanePower:CooldownRemains() >= 55 and Target:DebuffUp(S.TouchoftheMagiDebuff))) then
         if Cast(I.SinfulGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge Shared_cd 11"; end
       end
       --use_item,name=moonlit_prism,if=covenant.kyrian&cooldown.arcane_power.remains<=10&cooldown.touch_of_the_magi.remains<=10
       if I.MoonlitPrism:IsEquippedAndReady() and (CovenantID == 1 and S.ArcanePower:CooldownRemains() <= 10 and S.TouchoftheMagi:CooldownRemains() <= 10) then
         if Cast(I.MoonlitPrism, nil, Settings.Commons.DisplayStyle.Trinkets) then return "moonlit_prism Shared_cd 12 kyrian"; end
       end
-      --use_item,name=moonlit_prism,if=!covenant.kyrian&cooldown.arcane_power.remains<=6&cooldown.touch_of_the_magi.remains<=6
-      if I.MoonlitPrism:IsEquippedAndReady() and (CovenantID ~= 1 and S.ArcanePower:CooldownRemains() <= 6 and S.TouchoftheMagi:CooldownRemains() <= 6) then
+      --use_item,name=moonlit_prism,if=!covenant.kyrian&cooldown.arcane_power.remains<=6&cooldown.touch_of_the_magi.remains<=6&time>30&(!covenant.venthyr|active_enemies<variable.aoe_target_count)
+      if I.MoonlitPrism:IsEquippedAndReady() and (CovenantID ~= 1 and S.ArcanePower:CooldownRemains() <= 6 and S.TouchoftheMagi:CooldownRemains() <= 6 and HL.CombatTime() > 30 and (CovenantID ~= 2 or EnemiesCount8ySplash < var_aoe_target_count)) then
         if Cast(I.MoonlitPrism, nil, Settings.Commons.DisplayStyle.Trinkets) then return "moonlit_prism Shared_cd 12 non-kyrian"; end
       end
       --use_item,name=empyreal_ordnance,if=cooldown.arcane_power.remains<=15&cooldown.touch_of_the_magi.remains<=15
@@ -1436,6 +1526,10 @@ local function APL()
     -- Not really an action to do
     --call_action_list,name=calculations
     local ShouldReturn = Calculations(); if ShouldReturn then return ShouldReturn; end
+    --call_action_list,name=vaoe,if=covenant.venthyr&runeforge.siphon_storm&talent.arcane_echo&active_enemies>=variable.aoe_target_count
+    if AoEON() and (CovenantID == 2 and SiphonStormEquipped and S.ArcaneEcho:IsAvailable() and EnemiesCount8ySplash >= var_aoe_target_count) then
+      local ShouldReturn = Vaoe(); if ShouldReturn then return ShouldReturn; end
+    end
     --call_action_list,name=aoe,if=active_enemies>=variable.aoe_target_count
     if AoEON() and EnemiesCount8ySplash >= var_aoe_target_count then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end

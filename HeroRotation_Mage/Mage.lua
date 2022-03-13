@@ -104,6 +104,7 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   FireBlast                             = Spell(319836),
   PresenceofMind                        = Spell(205025),
   TouchoftheMagi                        = Spell(321507), --Splash, 8
+  TouchoftheMagiDebuff                  = Spell(210824),
   PrismaticBarrier                      = Spell(235450),
   GreaterInvisibility                   = Spell(110959),
   -- Talents
