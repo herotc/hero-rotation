@@ -64,6 +64,9 @@ Spell.Shaman.Commons = {
   GroveInvigoration                     = Spell(322721),
   PustuleEruption                       = Spell(351094),
   VolatileSolvent                       = Spell(323074),
+  -- Trinket Effects
+  AcquiredSwordBuff                     = Spell(368657),
+  ScarsofFraternalStrifeBuff4           = Spell(368638),
   -- Misc
   Pool                                  = Spell(999910),
 }
@@ -100,6 +103,10 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   Stormflurry                           = Spell(344357),
   Stormkeeper                           = Spell(320137),
   StormkeeperBuff                       = Spell(320137),
+  -- Elemental Spirits Buffs
+  CracklingSurgeBuff                    = Spell(224127),
+  IcyEdgeBuff                           = Spell(224126),
+  MoltenWeaponBuff                      = Spell(224125),
   -- Legendaries (Shadowlands)
   DoomWindsBuff                         = Spell(335903),
   DoomWindsDebuff                       = Spell(335904),
@@ -152,7 +159,11 @@ if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Commons = {
   -- Potions
   PotionofSpectralAgility               = Item(171270),
-  PotionofSpectralIntellect             = Item(171273)
+  PotionofSpectralIntellect             = Item(171273),
+  -- Trinkets
+  CacheofAcquiredTreasures              = Item(188265, {13, 14}),
+  ScarsofFraternalStrife                = Item(188253, {13, 14}),
+  TheFirstSigil                         = Item(188271, {13, 14}),
 }
 Item.Shaman.Enhancement = MergeTableByKey(Item.Shaman.Commons, {
 })

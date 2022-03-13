@@ -32,6 +32,9 @@ local I = Item.Shaman.Enhancement
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.CacheofAcquiredTreasures:ID(),
+  I.ScarsofFraternalStrife:ID(),
+  I.TheFirstSigil:ID(),
 }
 
 -- Rotation Var
@@ -141,8 +144,9 @@ local function Precombat()
   if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 6"; end
   end
-  -- potion
-  -- Manually removed, as this is no longer needed precombat
+  -- variable,name=trinket1_is_weird,value=trinket.1.is.the_first_sigil|trinket.1.is.scars_of_fraternal_strife|trinket.1.is.cache_of_acquired_treasures
+  -- variable,name=trinket2_is_weird,value=trinket.2.is.the_first_sigil|trinket.2.is.scars_of_fraternal_strife|trinket.2.is.cache_of_acquired_treasures
+  -- Note: These variables just exclude these three trinkets from the generic use_items. We'll just use HR's OnUseExcludes instead.
   -- snapshot_stats
 end
 
@@ -505,16 +509,31 @@ local function APL()
     end
     -- bloodlust
     -- Not adding this, as when to use Bloodlust will vary fight to fight
-    -- potion,if=expected_combat_length-time<60
-    if I.PotionofSpectralAgility:IsReady() and (FightRemains < 60) then
+    -- potion,if=(talent.ascendance.enabled&raid_event.adds.in>=90&cooldown.ascendance.remains<10)|(talent.hot_hand.enabled&buff.molten_weapon.up)|buff.icy_edge.up|(talent.stormflurry.enabled&buff.crackling_surge.up)|debuff.earthen_spike.up|active_enemies>1|fight_remains<30
+    if I.PotionofSpectralAgility:IsReady() and ((S.Ascendance:IsAvailable() and S.Ascendance:CooldownRemains() < 10) or (S.HotHand:IsAvailable() and Player:BuffUp(S.MoltenWeaponBuff)) or Player:BuffUp(S.IcyEdgeBuff) or (S.Stormflurry:IsAvailable() and Player:BuffUp(S.CracklingSurgeBuff)) or Target:DebuffUp(S.EarthenSpike) or MeleeEnemies10yCount > 1 or FightRemains < 30) then
       if Cast(I.PotionofSpectralAgility, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
     end
     -- wind_shear
     local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- heart_essence (I guess the simc module is out of date?)
-    -- use_items
     if (Settings.Commons.Enabled.Trinkets) then
+      -- use_item,name=the_first_sigil,if=(talent.ascendance.enabled&raid_event.adds.in>=90&cooldown.ascendance.remains<10)|(talent.hot_hand.enabled&buff.molten_weapon.up)|buff.icy_edge.up|(talent.stormflurry.enabled&buff.crackling_surge.up)|debuff.earthen_spike.up|active_enemies>1|fight_remains<30
+      if I.TheFirstSigil:IsEquippedAndReady() and ((S.Ascendance:IsAvailable() and S.Ascendance:CooldownRemains() < 10) or (S.HotHand:IsAvailable() and Player:BuffUp(S.MoltenWeaponBuff)) or Player:BuffUp(S.IcyEdgeBuff) or (S.Stormflurry:IsAvailable() and Player:BuffUp(S.CracklingSurgeBuff)) or Target:DebuffUp(S.EarthenSpike) or MeleeEnemies10yCount > 1 or FightRemains < 30) then
+        if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil main 6"; end
+      end
+      -- use_item,name=cache_of_acquired_treasures,if=buff.acquired_sword.up|fight_remains<25
+      if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredSwordBuff) or FightRemains < 25) then
+        if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures main 8"; end
+      end
+      -- use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up|fight_remains<30
+      if I.ScarsofFraternalStrife:IsEquippedAndReady() and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) or FightRemains < 30) then
+        if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife main 10"; end
+      end
+      -- use_items,slots=trinket1,if=!variable.trinket1_is_weird
+      -- use_items,slots=trinket2,if=!variable.trinket2_is_weird
+      -- Note: These variables just exclude the above three trinkets from the generic use_items. We'll just use HR's OnUseExcludes instead.
+      -- use_items
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
         if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
@@ -544,20 +563,20 @@ local function APL()
     end
     -- feral_spirit
     if S.FeralSpirit:IsCastable() then
-      if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit main 6"; end
+      if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit main 12"; end
     end
     -- fae_transfusion,if=(talent.ascendance.enabled|runeforge.doom_winds.equipped)&(soulbind.grove_invigoration|soulbind.field_of_blossoms|active_enemies=1)
     if S.FaeTransfusion:IsReady() and ((S.Ascendance:IsAvailable() or DoomWindsEquipped) and (S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable() or MeleeEnemies10yCount == 1)) then
-      if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "fae_transfusion main 8"; end
+      if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "fae_transfusion main 14"; end
     end
     -- ascendance,if=raid_event.adds.in>=90|active_enemies>1
     if S.Ascendance:IsCastable() and CDsON() then
-      if Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "ascendance main 10"; end
+      if Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "ascendance main 16"; end
     end
     -- windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down&(raid_event.adds.in>=60|active_enemies>1)
     -- Note: Added TimeSinceLastCast, as DoomWindsBuff has an internal CD of 60s
     if S.WindfuryTotem:IsReady() and (DoomWindsEquipped and Player:BuffDown(S.DoomWindsBuff) and S.WindfuryTotem:TimeSinceLastCast() > 60) then
-      if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "windfury_totem main 12"; end
+      if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "windfury_totem main 18"; end
     end
     -- call_action_list,name=single,if=active_enemies=1
     if MeleeEnemies10yCount < 2 then
