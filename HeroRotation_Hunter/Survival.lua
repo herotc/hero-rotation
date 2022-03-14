@@ -795,7 +795,7 @@ local function APL()
       end
     end
     -- use_item,name=jotungeirr_destinys_call,if=!raid_event.adds.exists&(buff.coordinated_assault.up|!cooldown.coordinated_assault.remains|time_to_die<30)|(raid_event.adds.exists&buff.resonating_arrow.up|buff.coordinated_assault.up)
-    if I.Jotungeirr:IsReady() and (#EnemyList < 2 and (Player:BuffUp(S.CoordinatedAssault) or S.CoordinatedAssault:CooldownUp() or Target:TimeToDie() < 30) or (#EnemyList > 1 and Player:BuffUp(S.ResonatingArrow) or Player:BuffUp(S.CoordinatedAssault))) then
+    if I.Jotungeirr:IsEquippedAndReady() and (#EnemyList < 2 and (Player:BuffUp(S.CoordinatedAssault) or S.CoordinatedAssault:CooldownUp() or Target:TimeToDie() < 30) or (#EnemyList > 1 and Player:BuffUp(S.ResonatingArrow) or Player:BuffUp(S.CoordinatedAssault))) then
       if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 2"; end
     end
     -- use_items
