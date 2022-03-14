@@ -359,34 +359,34 @@ local function APL()
     if (Settings.Commons.Enabled.Trinkets) then
       -- use_item,name=inscrutable_quantum_device,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<21|target.time_to_die>190|buff.bloodlust.up)
       if I.InscrutableQuantumDevice:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 21 or Target:TimeToDie() > 190 or Player:BloodlustUp())) then
-        if Cast(I.InscrutableQuantumDevice) then return "inscrutable_quantum_device trinkets main"; end
+        if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device trinkets main"; end
       end
       -- use_item,name=wakeners_frond,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<13|target.time_to_die>130)
       if I.WakenersFrond:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 13 or Target:TimeToDie() > 130)) then
-        if Cast(I.WakenersFrond) then return "wakeners_frond trinkets main"; end
+        if Cast(I.WakenersFrond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "wakeners_frond trinkets main"; end
       end
       -- use_item,name=macabre_sheet_music,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<25|target.time_to_die>110)
       if I.MacabreSheetMusic:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 25 or Target:TimeToDie() > 110)) then
-        if Cast(I.MacabreSheetMusic) then return "macabre_sheet_music trinkets main"; end
+        if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music trinkets main"; end
       end
       -- use_item,name=overwhelming_power_crystal,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<16|target.time_to_die>100)
       if I.OverwhelmingPowerCrystal:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 16 or Target:TimeToDie() > 100)) then
-        if Cast(I.OverwhelmingPowerCrystal) then return "overwhelming_power_crystal trinkets main"; end
+        if Cast(I.OverwhelmingPowerCrystal, nil, Settings.Commons.DisplayStyle.Trinkets) then return "overwhelming_power_crystal trinkets main"; end
       end
       -- use_item,name=instructors_divine_bell,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<10|target.time_to_die>95)
       if I.InstructorsDivineBell:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 10 or Target:TimeToDie() > 95)) then
-        if Cast(I.InstructorsDivineBell) then return "instructors_divine_bell trinkets main"; end
+        if Cast(I.InstructorsDivineBell, nil, Settings.Commons.DisplayStyle.Trinkets) then return "instructors_divine_bell trinkets main"; end
       end
       -- use_item,name=flame_of_battle,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<11|target.time_to_die>100)
       if I.FlameofBattle:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 11 or Target:TimeToDie() > 100)) then
-        if Cast(I.FlameofBattle) then return "flame_of_battle trinkets main"; end
+        if Cast(I.FlameofBattle, nil, Settings.Commons.DisplayStyle.Trinkets) then return "flame_of_battle trinkets main"; end
       end
       -- use_item,name=gladiators_badge,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<11|target.time_to_die>65)
       if I.SinfulGladiatorsBadge:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 11 or Target:TimeToDie() > 65)) then
-        if Cast(I.SinfulGladiatorsBadge) then return "gladiators_badge 1 trinkets main"; end
+        if Cast(I.SinfulGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge 1 trinkets main"; end
       end
       if I.UnchainedGladiatorsBadge:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 11 or Target:TimeToDie() > 65)) then
-        if Cast(I.UnchainedGladiatorsBadge) then return "gladiators_badge 2 trinkets main"; end
+        if Cast(I.UnchainedGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge 2 trinkets main"; end
       end
       -- use_items
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
