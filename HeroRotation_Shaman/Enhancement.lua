@@ -593,7 +593,7 @@ end
 
 local function Init()
   S.FlameShockDebuff:RegisterAuraTracking()
-  HR.Print("Enhancement Shaman rotation is currently a work in progress, but has been updated for patch 9.1.5.")
+  -- HR.Print("Enhancement Shaman rotation is currently a work in progress, but has been updated for patch 9.1.5.")
 end
 
 HR.SetAPL(263, APL, Init)
