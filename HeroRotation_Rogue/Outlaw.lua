@@ -299,7 +299,7 @@ local function CDs ()
     end
     -- actions.cds+=/fleshcraft,if=(soulbind.pustule_eruption|soulbind.volatile_solvent)&!stealthed.all&(!buff.blade_flurry.up|spell_targets.blade_flurry<2)&(!buff.adrenaline_rush.up|energy.time_to_max>2)
     if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled())
-      and (not Player.BuffUp(S.BladeFlurry) or EnemiesBFCount < 2) and (not Player:BuffUp(S.AdrenalineRush) or EnergyTimeToMaxStable() > 2) then
+      and (not Player:BuffUp(S.BladeFlurry) or EnemiesBFCount < 2) and (not Player:BuffUp(S.AdrenalineRush) or EnergyTimeToMaxStable() > 2) then
       HR.CastSuggested(S.Fleshcraft)
     end
     -- actions.cds+=/flagellation,if=!stealthed.all&(variable.finish_condition|target.time_to_die<13)
