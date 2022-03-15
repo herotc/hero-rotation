@@ -536,7 +536,7 @@ local function APL()
     if CDsON() and (((not VarUseBoltTimings) and DemonicTyrantTime() > 0) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff) and ((not S.PowerSiphon:IsAvailable()) or Player:BuffUp(S.PowerSiphon)))) then
       local ShouldReturn = OGCD(); if ShouldReturn then return ShouldReturn; end
     end
-    -- implosion,if=target.time_to_die<2*gcd
+    -- implosion,if=time_to_die<2*gcd
     if S.Implosion:IsReady() and (FightRemains < 2 * Player:GCD()) then
       if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion main 1"; end
     end

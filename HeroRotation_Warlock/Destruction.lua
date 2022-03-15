@@ -168,16 +168,16 @@ local function Precombat()
 end
 
 local function CDs()
-  -- use_item,name=shadowed_orb_of_torment,if=cooldown.summon_infernal.remains<3|target.time_to_die<42
-  if I.ShadowedOrbofTorment:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (S.SummonInfernal:CooldownRemains() < 3 or Target:TimeToDie() < 42) then
+  -- use_item,name=shadowed_orb_of_torment,if=cooldown.summon_infernal.remains<3|time_to_die<42
+  if I.ShadowedOrbofTorment:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (S.SummonInfernal:CooldownRemains() < 3 or FightRemains < 42) then
     if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment cds 2"; end
   end
   -- summon_infernal
   if S.SummonInfernal:IsCastable() then
     if Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal) then return "summon_infernal cds 4"; end
   end
-  -- dark_soul_instability,if=pet.infernal.active|cooldown.summon_infernal.remains_expected>target.time_to_die
-  if S.DarkSoulInstability:IsCastable() and (InfernalTime() > 0 or S.SummonInfernal:CooldownRemains() > Target:TimeToDie()) then
+  -- dark_soul_instability,if=pet.infernal.active|cooldown.summon_infernal.remains_expected>time_to_die
+  if S.DarkSoulInstability:IsCastable() and (InfernalTime() > 0 or S.SummonInfernal:CooldownRemains() > FightRemains) then
     if Cast(S.DarkSoulInstability, Settings.Destruction.OffGCDasOffGCD.DarkSoulInstability) then return "dark_soul_instability cds 6"; end
   end
   -- potion,if=pet.infernal.active
@@ -196,8 +196,8 @@ local function CDs()
   if S.Fireblood:IsCastable() and InfernalTime() > 0 then
     if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 14"; end
   end
-  -- use_items,if=pet.infernal.active|target.time_to_die<21
-  if (InfernalTime() > 0 or Target:TimeToDie() < 21) then
+  -- use_items,if=pet.infernal.active|time_to_die<21
+  if (InfernalTime() > 0 or FightRemains < 21) then
     local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
     if TrinketToUse then
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
@@ -448,13 +448,13 @@ local function APL()
     if S.ChaosBolt:IsReady() and (Player:SoulShardsP() >= 3.5) then
       if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 38"; end
     end
-    -- chaos_bolt,if=target.time_to_die<5&target.time_to_die>cast_time+travel_time
-    -- Note: Using FightRemains instead of TimeToDie, as that appears to be the APL intent; Also added time buffer of 0.5s
+    -- chaos_bolt,if=time_to_die<5&time_to_die>cast_time+travel_time
+    -- Note: Added time_to_die buffer of 0.5s
     if S.ChaosBolt:IsReady() and (FightRemains < 5.5 and FightRemains > S.ChaosBolt:CastTime() + S.ChaosBolt:TravelTime()) then
       if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 39"; end
     end
-    -- conflagrate,if=charges>1|target.time_to_die<gcd
-    -- Note: Using FightRemains instead of TimeToDie, as that appears to be the APL intent; Also added time buffer of 0.5s
+    -- conflagrate,if=charges>1|time_to_die<gcd
+    -- Note: Added time_to_die buffer of 0.5s
     if S.Conflagrate:IsCastable() and (S.Conflagrate:Charges() > 1 or FightRemains < Player:GCD() + 0.5) then
       if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 40"; end
     end
