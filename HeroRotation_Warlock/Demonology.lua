@@ -393,9 +393,15 @@ local function DamageTrinkets()
 end
 
 local function Trinkets()
-  -- use_item,name=scars_of_fraternal_strife
-  if I.ScarsofFraternalStrife:IsEquippedAndReady() then
+  -- variable,name=use_buff_trinkets,value=(!variable.use_bolt_timings&pet.demonic_tyrant.active)|(variable.use_bolt_timings&buff.shard_of_annihilation.up)
+  VarUseBuffTrinkets = (((not VarUseBoltTimings) and DemonicTyrantTime() > 0) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff)))
+  -- use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up
+  if I.ScarsofFraternalStrife:IsEquippedAndReady() and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4)) then
     if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife trinkets 2"; end
+  end
+  -- use_item,name=scars_of_fraternal_strife,if=buff.scars_of_fraternal_strife_4.up&pet.demonic_tyrant.active
+  if I.ScarsofFraternalStrife:IsEquippedAndReady() and (Player:BuffUp(S.ScarsofFraternalStrifeBuff4) and DemonicTyrantTime() > 0) then
+    if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife 3"; end
   end
   -- use_item,name=shadowed_orb_of_torment,if=variable.buff_sync_cd<22
   if I.ShadowedOrbofTorment:IsEquippedAndReady() and (VarBuffSyncCD < 22) then
@@ -413,16 +419,16 @@ local function Trinkets()
   if (true) then
     local ShouldReturn = FiveYTrinkets(); if ShouldReturn then return ShouldReturn; end
   end
-  -- use_item,name=overflowing_anima_cage,if=(!variable.use_bolt_timings&pet.demonic_tyrant.active)|(variable.use_bolt_timings&buff.shard_of_annihilation.up)
-  if I.OverflowingAnimaCage:IsEquippedAndReady() and (((not VarUseBoltTimings) and DemonicTyrantTime() > 0) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff))) then
+  -- use_item,name=overflowing_anima_cage,if=variable.use_buff_trinkets
+  if I.OverflowingAnimaCage:IsEquippedAndReady() and (VarUseBuffTrinkets) then
     if Cast(I.OverflowingAnimaCage, nil, Settings.Commons.DisplayStyle.Trinkets) then return "overflowing_anima_cage trinkets 8"; end
   end
-  -- use_item,slot=trinket1,if=trinket.1.has_use_buff&((!variable.use_bolt_timings&pet.demonic_tyrant.active)|(variable.use_bolt_timings&buff.shard_of_annihilation.up))
-  if trinket1:IsEquippedAndReady() and (trinket1:TrinketHasUseBuff() and (((not VarUseBoltTimings) and DemonicTyrantTime() > 0) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff)))) then
+  -- use_item,slot=trinket1,if=trinket.1.has_use_buff&variable.use_buff_trinkets
+  if trinket1:IsEquippedAndReady() and (trinket1:TrinketHasUseBuff() and VarUseBuffTrinkets) then
     if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 trinkets 10"; end
   end
-  -- use_item,slot=trinket2,if=trinket.2.has_use_buff&((!variable.use_bolt_timings&pet.demonic_tyrant.active)|(variable.use_bolt_timings&buff.shard_of_annihilation.up))
-  if trinket2:IsEquippedAndReady() and (trinket2:TrinketHasUseBuff() and (((not VarUseBoltTimings) and DemonicTyrantTime() > 0) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff)))) then
+  -- use_item,slot=trinket2,if=trinket.2.has_use_buff&variable.use_buff_trinkets
+  if trinket2:IsEquippedAndReady() and (trinket2:TrinketHasUseBuff() and VarUseBuffTrinkets) then
     if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 trinkets 12"; end
   end
   -- call_action_list,name=pure_damage_trinks,if=time>variable.first_tyrant_time&variable.buff_sync_cd>20

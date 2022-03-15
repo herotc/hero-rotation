@@ -59,6 +59,8 @@ Spell.Warlock.Commons = {
   ImplosivePotentialBuff                = Spell(337139),
   MaleficWrathBuff                      = Spell(337125),
   ShardofAnnihilationBuff               = Spell(356342),
+  -- Trinket Effects
+  ScarsofFraternalStrifeBuff4           = Spell(368638),
 }
 
 Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
