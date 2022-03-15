@@ -82,6 +82,7 @@ local VarThrillSeekerWait
 local VarIQDCondition
 local VarWrathInFrenzy
 local VarSSCost
+local VarSFCost
 local VarConvokeAsp
 local VarNoHysteriaEarlyDoT
 local VarProcPulsarEarly
@@ -285,8 +286,10 @@ local function Precombat()
   VarOnUseTrinket = VarOnUseTrinket + (num(trinket2:IsReady() or trinket2:CooldownRemains() > 0) * 2)
   -- variable,name=on_use_trinket,op=add,value=(equipped.inscrutable_quantum_device|equipped.empyreal_ordnance|equipped.soulletting_ruby)*4
   VarOnUseTrinket = VarOnUseTrinket + (num(I.InscrutableQuantumDevice:IsEquipped() or I.EmpyrealOrdinance:IsEquipped() or I.SoullettingRuby:IsEquipped()) * 4)
-  -- variable,name=ss_cost,value=30*(1-0.2*set_bonus.tier28_4pc)
-  VarSSCost = 30 * (1 - 0.2 * num(Player:HasTier(28, 4)))
+  -- variable,name=ss_cost,value=30*(1-0.15*set_bonus.tier28_4pc)
+  VarSSCost = 30 * (1 - 0.15 * num(Player:HasTier(28, 4)))
+  -- variable,name=sf_cost,value=50*(1-0.15*set_bonus.tier28_4pc)
+  VarSFCost = 50 * (1 - 0.15 * num(Player:HasTier(28, 4)))
   -- variable,name=convoke_asp,value=30+10*runeforge.celestial_spirits
   VarConvokeAsp = 30 + 10 * num(CelestialSpiritsEquipped)
   -- moonkin_form
@@ -590,8 +593,8 @@ local function Aoe()
   if S.AdaptiveSwarm:IsCastable() then
     if Everyone.CastCycle(S.AdaptiveSwarm, Enemies40y, EvaluateCycleAdaptiveSwarmAoe, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm aoe 16"; end
   end
-  -- moonfire,target_if=refreshable&target.time_to_die>((14+(spell_targets.starfire*2*buff.eclipse_lunar.up))+remains)%(1+talent.twin_moons.enabled),if=(ap_check|variable.ignore_starsurge|!eclipse.in_any)&(cooldown.ca_inc.ready&eclipse.in_any&!druid.no_cds&(variable.convoke_desync|cooldown.convoke_the_spirits.ready|!covenant.night_fae)|spell_targets.starfire<((6-(buff.eclipse_lunar.up*2))*(1+talent.twin_moons.enabled))&!eclipse.solar_next&!cooldown.ca_inc.ready|(eclipse.in_solar|buff.eclipse_lunar.up&!talent.soul_of_the_forest.enabled|buff.primordial_arcanic_pulsar.value>=250)&(spell_targets.starfire<10*(1+talent.twin_moons.enabled))&astral_power>50-buff.starfall.remains*6)&(!covenant.kyrian|!buff.kindred_empowerment_energize.up|eclipse.in_solar)&!buff.ravenous_frenzy_sinful_hysteria.up
-  if S.Moonfire:IsCastable() and ((AP_Check(S.Moonfire) or VarIgnoreStarsurge or not EclipseInAny) and (CaInc:CooldownUp() and EclipseInAny and CDsON() and (VarConvokeDesync or S.ConvoketheSpirits:CooldownUp() or CovenantID ~= 3) or EnemiesCount8ySplash < ((6 - (num(Player:BuffUp(S.EclipseLunar)) * 2)) * (1 + num(S.TwinMoons:IsAvailable()))) and (not EclipseSolarNext) and CaInc:CooldownDown() or (EclipseInSolar or Player:BuffUp(S.EclipseLunar) and (not S.SouloftheForest:IsAvailable()) or PAPValue >= 250) and (EnemiesCount8ySplash < 10 * (1 + num(S.TwinMoons:IsAvailable()))) and Player:AstralPowerP() > 50 - Player:BuffRemains(S.StarfallBuff) * 6) and (CovenantID ~= 1 or Player:BuffDown(S.KindredEmpowermentEnergizeBuff) or EclipseInSolar) and Player:BuffDown(S.RavenousFrenzySHBuff)) then
+  -- moonfire,target_if=refreshable&target.time_to_die>((14+(spell_targets.starfire*2*buff.eclipse_lunar.up))+remains)%(1+talent.twin_moons.enabled),if=astral_power>variable.sf_cost-buff.starfall.remains*6&(ap_check|variable.ignore_starsurge|!eclipse.in_any)&(cooldown.ca_inc.ready&eclipse.in_any&!druid.no_cds&(variable.convoke_desync|cooldown.convoke_the_spirits.ready|!covenant.night_fae)|spell_targets.starfire<((8-(buff.eclipse_lunar.up*3))*(1+talent.twin_moons.enabled))&!eclipse.solar_next&(!cooldown.ca_inc.ready|druid.no_cds)|(eclipse.in_solar|buff.eclipse_lunar.up&!talent.soul_of_the_forest.enabled)&(spell_targets.starfire<10*(1+talent.twin_moons.enabled)))&(!covenant.kyrian|!buff.kindred_empowerment_energize.up|eclipse.in_solar)&!buff.ravenous_frenzy_sinful_hysteria.up
+  if S.Moonfire:IsCastable() and (Player:AstralPowerP() > VarSFCost - Player:BuffRemains(S.StarfallBuff) * 6 and (AP_Check(S.Moonfire) or VarIgnoreStarsurge or not EclipseInAny) and (CaInc:CooldownUp() and EclipseInAny and CDsON() and (VarConvokeDesync or S.ConvoketheSpirits:CooldownUp() or CovenantID ~= 3) or EnemiesCount8ySplash < ((8 - (num(Player:BuffUp(S.EclipseLunar)) * 3)) * (1 + num(S.TwinMoons:IsAvailable()))) and (not EclipseSolarNext) and (CaInc:CooldownDown() or (not CDsON())) or (EclipseInSolar or Player:BuffUp(S.EclipseLunar) and (not S.SouloftheForest:IsAvailable())) and (EnemiesCount8ySplash < 10 * (1 + num(S.TwinMoons:IsAvailable())))) and (CovenantID ~= 1 or Player:BuffDown(S.KindredEmpowermentEnergizeBuff) or EclipseInSolar) and Player:BuffDown(S.RavenousFrenzySHBuff)) then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireAoe, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire aoe 18"; end
   end
   -- force_of_nature,if=ap_check|variable.ignore_starsurge
@@ -630,8 +633,8 @@ local function Aoe()
   if S.Starfall:IsReady() and (Player:BuffUp(S.OnethsPerceptionBuff) and (Player:BuffRefreshable(S.StarfallBuff) or Player:AstralPowerP() > 90)) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall aoe 34"; end
   end
-  -- starfall,if=covenant.night_fae&!talent.stellar_drift.enabled&(variable.convoke_desync|cooldown.ca_inc.up|buff.ca_inc.up)&cooldown.convoke_the_spirits.remains<gcd.max*ceil(astral_power%50)&buff.starfall.remains<4&!druid.no_cds
-  if S.Starfall:IsReady() and (CovenantID == 3 and (not S.StellarDrift:IsAvailable()) and (VarConvokeDesync or CaInc:CooldownUp() or Player:BuffUp(CaInc)) and S.ConvoketheSpirits:CooldownRemains() < GCDMax * ceil(Player:AstralPowerP() / 50) and Player:BuffRemains(S.StarfallBuff) < 4 and CDsON()) then
+  -- starfall,if=covenant.night_fae&!talent.stellar_drift.enabled&(variable.convoke_desync|cooldown.ca_inc.up|buff.ca_inc.up)&cooldown.convoke_the_spirits.remains<gcd.max*ceil(astral_power%variable.sf_cost)&buff.starfall.remains<4&!druid.no_cds
+  if S.Starfall:IsReady() and (CovenantID == 3 and (not S.StellarDrift:IsAvailable()) and (VarConvokeDesync or CaInc:CooldownUp() or Player:BuffUp(CaInc)) and S.ConvoketheSpirits:CooldownRemains() < GCDMax * ceil(Player:AstralPowerP() / VarSFCost) and Player:BuffRemains(S.StarfallBuff) < 4 and CDsON()) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall aoe 36"; end
   end
   -- starsurge,if=covenant.night_fae&(variable.convoke_desync|cooldown.ca_inc.up|buff.ca_inc.up)&cooldown.convoke_the_spirits.remains<5&variable.starfall_wont_fall_off&eclipse.in_any&!variable.ignore_starsurge&!druid.no_cds
