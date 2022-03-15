@@ -354,10 +354,6 @@ local function FiveYTrinkets()
 end
 
 local function DamageTrinkets()
-  -- use_item,name=grim_eclipse
-  if I.GrimEclipse:IsEquippedAndReady() then
-    if Cast(I.GrimEclipse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange()) then return "grim_eclipse dmg 2"; end
-  end
   -- use_item,name=resonant_reservoir
   if I.ResonantReservoir:IsEquippedAndReady() then
     if Cast(I.ResonantReservoir, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange()) then return "resonant_reservoir dmg 4"; end
@@ -397,13 +393,17 @@ local function DamageTrinkets()
 end
 
 local function Trinkets()
-  -- use_item,name=shadowed_orb_of_torment,if=variable.buff_sync_cd<22
-  if I.ShadowedOrbofTorment:IsEquippedAndReady() and (VarBuffSyncCD < 22) then
-    if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment trinkets 2"; end
-  end
   -- use_item,name=scars_of_fraternal_strife
   if I.ScarsofFraternalStrife:IsEquippedAndReady() then
-    if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife trinkets 3"; end
+    if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife trinkets 2"; end
+  end
+  -- use_item,name=shadowed_orb_of_torment,if=variable.buff_sync_cd<22
+  if I.ShadowedOrbofTorment:IsEquippedAndReady() and (VarBuffSyncCD < 22) then
+    if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment trinkets 4"; end
+  end
+  -- use_item,name=grim_eclipse,if=variable.buff_sync_cd<7
+  if I.GrimEclipse:IsEquippedAndReady() and (VarBuffSyncCD < 7) then
+    if Cast(I.GrimEclipse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange()) then return "grim_eclipse trinkets 6"; end
   end
   -- call_action_list,name=hp_trinks,if=talent.demonic_consumption.enabled&variable.next_tyrant_cd<20
   if (S.DemonicConsumption:IsAvailable() and VarNextTyrantCD < 20) then
@@ -415,15 +415,15 @@ local function Trinkets()
   end
   -- use_item,name=overflowing_anima_cage,if=(!variable.use_bolt_timings&pet.demonic_tyrant.active)|(variable.use_bolt_timings&buff.shard_of_annihilation.up)
   if I.OverflowingAnimaCage:IsEquippedAndReady() and (((not VarUseBoltTimings) and DemonicTyrantTime() > 0) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff))) then
-    if Cast(I.OverflowingAnimaCage, nil, Settings.Commons.DisplayStyle.Trinkets) then return "overflowing_anima_cage trinkets 4"; end
+    if Cast(I.OverflowingAnimaCage, nil, Settings.Commons.DisplayStyle.Trinkets) then return "overflowing_anima_cage trinkets 8"; end
   end
   -- use_item,slot=trinket1,if=trinket.1.has_use_buff&((!variable.use_bolt_timings&pet.demonic_tyrant.active)|(variable.use_bolt_timings&buff.shard_of_annihilation.up))
   if trinket1:IsEquippedAndReady() and (trinket1:TrinketHasUseBuff() and (((not VarUseBoltTimings) and DemonicTyrantTime() > 0) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff)))) then
-    if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 trinkets 6"; end
+    if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 trinkets 10"; end
   end
   -- use_item,slot=trinket2,if=trinket.2.has_use_buff&((!variable.use_bolt_timings&pet.demonic_tyrant.active)|(variable.use_bolt_timings&buff.shard_of_annihilation.up))
   if trinket2:IsEquippedAndReady() and (trinket2:TrinketHasUseBuff() and (((not VarUseBoltTimings) and DemonicTyrantTime() > 0) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff)))) then
-    if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 trinkets 8"; end
+    if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 trinkets 12"; end
   end
   -- call_action_list,name=pure_damage_trinks,if=time>variable.first_tyrant_time&variable.buff_sync_cd>20
   if (HL.CombatTime() > VarFirstTyrantTime and VarBuffSyncCD > 20) then
