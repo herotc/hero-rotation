@@ -160,9 +160,9 @@ local function EvaluateTargetIfFilterAimedShot(TargetUnit)
 end
 
 local function EvaluateTargetIfAimedShot()
-  -- if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|buff.trick_shots.remains>execute_time&active_enemies>1
+  -- if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|(buff.trick_shots.remains>execute_time|focused_trickery_count>0)&active_enemies>1
   -- Note: Added IsCasting check to smooth out opener when not using SteadyFocus
-  return (Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.Trueshot) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime()) and ((not Player:IsCasting(S.AimedShot)) or EnemiesCount10ySplash < 2) or Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and EnemiesCount10ySplash > 1)
+  return (Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.Trueshot) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime()) and ((not Player:IsCasting(S.AimedShot)) or EnemiesCount10ySplash < 2) or (Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() or Hunter.FTCount > 0) and EnemiesCount10ySplash > 1)
 end
 
 local function EvaluateTargetIfAimedShot2()
@@ -331,7 +331,7 @@ local function St()
   if S.Trueshot:IsReady() and CDsON() and (((Player:BuffDown(S.PreciseShotsBuff) or S.CallingtheShots:IsAvailable()) and CovenantID == 2 or CovenantID == 4 or S.ResonatingArrow:CooldownRemains() > 30 or S.ResonatingArrow:CooldownRemains() < 10 or S.WildSpirits:CooldownRemains() > 30 or Player:BuffUp(S.WildSpiritsBuff)) or Player:BuffUp(S.VolleyBuff) and EnemiesCount10ySplash > 1 or FightRemains < 25) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot st 38"; end
   end
-  -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|buff.trick_shots.remains>execute_time&active_enemies>1
+  -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|(buff.trick_shots.remains>execute_time|focused_trickery_count>0)&active_enemies>1
   if S.AimedShot:IsReady() then
     if Everyone.CastTargetIf(S.AimedShot, Enemies40y, "min", EvaluateTargetIfFilterAimedShot, EvaluateTargetIfAimedShot, not TargetInRange40y) then return "aimed_shot st 40"; end
   end
