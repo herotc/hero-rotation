@@ -69,6 +69,7 @@ local VarCAExecute = Target:HealthPercentage() > 70 and S.CarefulAim:IsAvailable
 local SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
 local EagletalonsTrueFocusEquipped = Player:HasLegendaryEquipped(74)
 local SurgingShotsEquipped = Player:HasLegendaryEquipped(75)
+local UnblinkingVigilEquipped = Player:HasLegendaryEquipped(77)
 local RazorFragmentsEquipped = Player:HasLegendaryEquipped(255)
 
 -- Player Covenant
@@ -93,6 +94,7 @@ HL:RegisterForEvent(function()
   SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
   EagletalonsTrueFocusEquipped = Player:HasLegendaryEquipped(74)
   SurgingShotsEquipped = Player:HasLegendaryEquipped(75)
+  UnblinkingVigilEquipped = Player:HasLegendaryEquipped(77)
   RazorFragmentsEquipped = Player:HasLegendaryEquipped(255)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -160,14 +162,14 @@ local function EvaluateTargetIfFilterAimedShot(TargetUnit)
 end
 
 local function EvaluateTargetIfAimedShot()
-  -- if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|(buff.trick_shots.remains>execute_time|focused_trickery_count>0)&active_enemies>1
+  -- if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time|set_bonus.tier28_4pc&runeforge.secrets_of_the_unblinking_vigil)&(!talent.chimaera_shot|active_enemies<2)|(buff.trick_shots.remains>execute_time|focused_trickery_count>0)&active_enemies>1
   -- Note: Added IsCasting check to smooth out opener when not using SteadyFocus
-  return (Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.Trueshot) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime()) and ((not Player:IsCasting(S.AimedShot)) or EnemiesCount10ySplash < 2) or (Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() or Hunter.FTCount > 0) and EnemiesCount10ySplash > 1)
+  return (Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.Trueshot) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime() or Player:HasTier(28, 4) and UnblinkingVigilEquipped) and (not Player:IsCasting(S.AimedShot)) and ((not S.ChimaeraShot:IsAvailable()) or EnemiesCount10ySplash < 2) or (Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() or Hunter.FTCount > 0) and EnemiesCount10ySplash > 1)
 end
 
 local function EvaluateTargetIfAimedShot2()
-  -- if=(buff.trick_shots.remains>=execute_time|focused_trickery_count>0)&(buff.precise_shots.down|full_recharge_time<cast_time+gcd|buff.trueshot.up)
-  return ((Player:BuffRemains(S.TrickShotsBuff) >= S.AimedShot:ExecuteTime() or Hunter.FTCount > 0) and (Player:BuffDown(S.PreciseShotsBuff) or S.AimedShot:FullRechargeTime() < S.AimedShot:CastTime() + Player:GCD() or Player:BuffUp(S.Trueshot)))
+  -- if=(buff.trick_shots.remains>=execute_time|focused_trickery_count>0)&(buff.precise_shots.down|full_recharge_time<cast_time+gcd|buff.trueshot.up|set_bonus.tier28_4pc&runeforge.secrets_of_the_unblinking_vigil)
+  return ((Player:BuffRemains(S.TrickShotsBuff) >= S.AimedShot:ExecuteTime() or Hunter.FTCount > 0) and (Player:BuffDown(S.PreciseShotsBuff) or S.AimedShot:FullRechargeTime() < S.AimedShot:CastTime() + Player:GCD() or Player:BuffUp(S.Trueshot) or Player:HasTier(28, 4) and UnblinkingVigilEquipped))
 end
 
 local function EvaluateCycleKillShot1(TargetUnit)
@@ -281,8 +283,8 @@ local function St()
   if S.ExplosiveShot:IsReady() then
     if Cast(S.ExplosiveShot, nil, nil, not TargetInRange40y) then return "explosive_shot 14"; end
   end
-  -- wild_spirits,if=(cooldown.trueshot.remains<gcd|buff.trueshot.up)&(!raid_event.adds.exists|!raid_event.adds.up&raid_event.adds.duration+raid_event.adds.in<20|raid_event.adds.up&raid_event.adds.remains>19|active_enemies>1)|fight_remains<80
-  if S.WildSpirits:IsReady() and CDsON() and ((S.Trueshot:CooldownRemains() < Player:GCD() or S.Trueshot:CooldownUp()) or FightRemains < 80) then
+  -- wild_spirits,if=(cooldown.trueshot.remains<gcd|buff.trueshot.up)&(!raid_event.adds.exists|!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<20|raid_event.adds.in>60)|raid_event.adds.up&raid_event.adds.remains>19|active_enemies>1)|fight_remains<20
+  if S.WildSpirits:IsReady() and CDsON() and ((S.Trueshot:CooldownRemains() < Player:GCD() or S.Trueshot:CooldownUp()) or FightRemains < 20) then
     if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "wild_spirits st 16"; end
   end
   -- flayed_shot
@@ -301,7 +303,7 @@ local function St()
   if S.WailingArrow:IsReady() and (S.ResonatingArrow:CooldownRemains() < Player:GCD() and ((not S.ExplosiveShot:IsAvailable()) or Player:BloodlustUp()) or CovenantID ~= 1 or S.ResonatingArrow:CooldownDown() or Target:TimeToDie() < 5) then
     if Cast(S.WailingArrow, Settings.Marksmanship.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "wailing_arrow st 24"; end
   end
-  -- resonating_arrow,if=(buff.double_tap.up|!talent.double_tap|fight_remains<12)&(!raid_event.adds.exists|!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<10|raid_event.adds.count=1)|raid_event.adds.up&raid_event.adds.remains>9|active_enemies>1)
+  -- resonating_arrow,if=(buff.double_tap.up|!talent.double_tap|fight_remains<12)&(!raid_event.adds.exists|!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<10|raid_event.adds.in>40|raid_event.adds.count=1)|raid_event.adds.up&raid_event.adds.remains>9|active_enemies>1)
   if S.ResonatingArrow:IsReady() and CDsON() and (Player:BuffUp(S.DoubleTap) or (not S.DoubleTap:IsAvailable()) or FightRemains < 12) then
     if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "resonating_arrow st 26"; end
   end
@@ -327,11 +329,11 @@ local function St()
       if Cast(S.ArcaneShot, nil, nil, not TargetInRange40y) then return "arcane_shot st 36"; end
     end
   end
-  -- trueshot,if=((buff.precise_shots.down|talent.calling_the_shots)&covenant.venthyr|covenant.necrolord|cooldown.resonating_arrow.remains>30|cooldown.resonating_arrow.remains<10|cooldown.wild_spirits.remains>30|buff.wild_spirits.up)|buff.volley.up&active_enemies>1|fight_remains<25
-  if S.Trueshot:IsReady() and CDsON() and (((Player:BuffDown(S.PreciseShotsBuff) or S.CallingtheShots:IsAvailable()) and CovenantID == 2 or CovenantID == 4 or S.ResonatingArrow:CooldownRemains() > 30 or S.ResonatingArrow:CooldownRemains() < 10 or S.WildSpirits:CooldownRemains() > 30 or Player:BuffUp(S.WildSpiritsBuff)) or Player:BuffUp(S.VolleyBuff) and EnemiesCount10ySplash > 1 or FightRemains < 25) then
+  -- trueshot,if=((covenant.venthyr&(buff.precise_shots.down|set_bonus.tier28_4pc&runeforge.secrets_of_the_unblinking_vigil|talent.calling_the_shots)|covenant.necrolord|covenant.kyrian&(cooldown.resonating_arrow.remains>30|cooldown.resonating_arrow.remains<10)|covenant.night_fae&(cooldown.wild_spirits.remains>30|buff.wild_spirits.up))|buff.volley.up&active_enemies>1)&(!raid_event.adds.exists|!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<25|raid_event.adds.in>60)|raid_event.adds.up&raid_event.adds.remains>10|active_enemies>1)|fight_remains<25
+  if S.Trueshot:IsReady() and CDsON() and (((CovenantID == 2 and (Player:BuffDown(S.PreciseShotsBuff) or Player:HasTier(28, 4) and UnblinkingVigilEquipped or S.CallingtheShots:IsAvailable()) or CovenantID == 4 or CovenantID == 1 and (S.ResonatingArrow:CooldownRemains() > 30 or S.ResonatingArrow:CooldownRemains() < 10) or CovenantID == 3 and (S.WildSpirits:CooldownRemains() > 30 or Player:BuffUp(S.WildSpiritsBuff))) or Player:BuffUp(S.VolleyBuff) and EnemiesCount10ySplash > 1) or FightRemains < 25) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot st 38"; end
   end
-  -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2)|(buff.trick_shots.remains>execute_time|focused_trickery_count>0)&active_enemies>1
+  -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time|set_bonus.tier28_4pc&runeforge.secrets_of_the_unblinking_vigil)&(!talent.chimaera_shot|active_enemies<2)|(buff.trick_shots.remains>execute_time|focused_trickery_count>0)&active_enemies>1
   if S.AimedShot:IsReady() then
     if Everyone.CastTargetIf(S.AimedShot, Enemies40y, "min", EvaluateTargetIfFilterAimedShot, EvaluateTargetIfAimedShot, not TargetInRange40y) then return "aimed_shot st 40"; end
   end
@@ -402,7 +404,7 @@ local function Trickshots()
   if S.ExplosiveShot:IsReady() then
     if Cast(S.ExplosiveShot, nil, nil, not TargetInRange40y) then return "explosive_shot trickshots 14"; end
   end
-  -- wild_spirits,if=!raid_event.adds.exists|raid_event.adds.remains>10|active_enemies>=raid_event.adds.count*2
+  -- wild_spirits,if=!raid_event.adds.exists|raid_event.adds.remains>10|active_enemies>=raid_event.adds.count*2|raid_event.adds.in>60
   if S.WildSpirits:IsReady() and CDsON() then
     if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "wild_spirits trickshots 16"; end
   end
@@ -422,15 +424,15 @@ local function Trickshots()
   if S.Barrage:IsReady() then
     if Cast(S.Barrage, nil, nil, not TargetInRange40y) then return "barrage trickshots 24"; end
   end
-  -- trueshot,if=buff.resonating_arrow.up|cooldown.resonating_arrow.remains>10|!covenant.kyrian|target.time_to_die<20
-  if S.Trueshot:IsReady() and CDsON() and (Target:DebuffUp(S.ResonatingArrowDebuff) or S.ResonatingArrow:CooldownRemains() > 10 or CovenantID ~= 1 or Target:TimeToDie() < 20) then
+  -- trueshot,if=covenant.kyrian&(buff.resonating_arrow.up|cooldown.resonating_arrow.remains>10)|covenant.night_fae&buff.wild_spirits.up|covenant.venthyr|covenant.necrolord|target.time_to_die<25
+  if S.Trueshot:IsReady() and CDsON() and (CovenantID == 1 and (Target:DebuffUp(S.ResonatingArrowDebuff) or S.ResonatingArrow:CooldownRemains() > 10) or CovenantID == 3 and Player:BuffUp(S.WildSpiritsBuff) or CovenantID == 2 or CovenantID == 4 or FightRemains < 25) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot, nil, not TargetInRange40y) then return "trueshot trickshots 26"; end
   end
   -- rapid_fire,if=runeforge.surging_shots&(cooldown.resonating_arrow.remains>10|!covenant.kyrian|!talent.double_tap)&buff.trick_shots.remains>=execute_time
   if S.RapidFire:IsCastable() and (SurgingShotsEquipped and (S.ResonatingArrow:CooldownRemains() > 10 or CovenantID ~= 1 or not S.DoubleTap:IsAvailable()) and Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime()) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire trickshots 28"; end
   end
-  -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=(buff.trick_shots.remains>=execute_time|focused_trickery_count>0)&(buff.precise_shots.down|full_recharge_time<cast_time+gcd|buff.trueshot.up)
+  -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=(buff.trick_shots.remains>=execute_time|focused_trickery_count>0)&(buff.precise_shots.down|full_recharge_time<cast_time+gcd|buff.trueshot.up|set_bonus.tier28_4pc&runeforge.secrets_of_the_unblinking_vigil)
   if S.AimedShot:IsReady() then
     if Everyone.CastTargetIf(S.AimedShot, Enemies40y, "min", EvaluateTargetIfFilterAimedShot, EvaluateTargetIfAimedShot2, not TargetInRange40y) then return "aimed_shot trickshots 30"; end
   end
