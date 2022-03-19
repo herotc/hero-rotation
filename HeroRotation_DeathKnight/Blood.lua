@@ -22,6 +22,7 @@ local CDsON      = HR.CDsON
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
+local mathmin = math.min
 
 -- Define S/I for spell and item arrays
 local S = Spell.DeathKnight.Blood
@@ -42,6 +43,7 @@ local VarTomestoneBoneCount
 local IsTanking
 local EnemiesMelee
 local EnemiesMeleeCount
+local HeartStrikeCount
 local UnitsWithoutBloodPlague
 local ghoul = HL.GhoulTable
 
@@ -53,6 +55,43 @@ local CovenantID = Player:CovenantID()
 HL:RegisterForEvent(function()
   CovenantID = Player:CovenantID()
 end, "COVENANT_CHOSEN")
+
+-- Legendaries
+local CovLegendaries = {
+  [0] = 0,
+  [1] = 211,
+  [2] = 212,
+  [3] = 210,
+  [4] = 213,
+}
+local UnityLegendaryIds = {
+  264,
+  267,
+  268,
+  269,
+  270,
+  271,
+  272,
+  273,
+  274,
+  275,
+  276,
+  277,
+}
+
+local function HasUnity()
+  for k,v in pairs(UnityLegendaryIds) do
+    if Player:HasLegendaryEquipped(v) then return true end
+  end
+  return false
+end
+
+local CovenantLegendary = HasUnity() or Player:HasLegendaryEquipped(CovLegendaries[CovenantID])
+
+-- Update CovenantLegendary if we change gear
+HL:RegisterForEvent(function()
+  CovenantLegendary = HasUnity() or Player:HasLegendaryEquipped(CovLegendaries[CovenantID])
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -198,7 +237,7 @@ local function Covenants()
     if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DeathsDue)) then return "deaths_due covenants 6"; end
   end
   -- swarming_mist,if=cooldown.dancing_rune_weapon.remains>3&runic_power>=(90-(spell_targets.swarming_mist*3))
-  if S.SwarmingMist:IsCastable() and (S.DancingRuneWeapon:CooldownRemains() > 3 and Player:RunicPower() >= (90 - (EnemiesMeleeCount * 3))) then
+  if S.SwarmingMist:IsCastable() and (S.DancingRuneWeapon:CooldownRemains() > 3 and not CovenantLegendary or Player:RunicPower() >= (90 - (EnemiesMeleeCount * 3))) then
     if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant) then return "swarming_mist covenants 7"; end
   end
   -- abomination_limb,if=!buff.dancing_rune_weapon.up
@@ -217,10 +256,10 @@ end
 
 local function DRWUp()
   -- variable,name=heart_strike_rp_drw,value=(15+buff.dancing_rune_weapon.up*10+spell_targets.heart_strike*talent.heartbreaker.enabled*2),op=setif,condition=covenant.night_fae&death_and_decay.ticking,value_else=(15+buff.dancing_rune_weapon.up*10+spell_targets.heart_strike*talent.heartbreaker.enabled*2)*1.2
-  if (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff)) then
-    VarHeartStrikeRPDRW = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2)
+  if (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff) and CovenantLegendary) then
+    VarHeartStrikeRPDRW = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + HeartStrikeCount * num(S.Heartbreaker:IsAvailable()) * 2) * 1.2
   else
-    VarHeartStrikeRPDRW = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2) * 1.2
+    VarHeartStrikeRPDRW = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + HeartStrikeCount * num(S.Heartbreaker:IsAvailable()) * 2)
   end
   -- marrowrend,if=(!covenant.necrolord|buff.abomination_limb.up)&(buff.bone_shield.remains<=rune.time_to_3|buff.bone_shield.remains<=(gcd+cooldown.blooddrinker.ready*talent.blooddrinker.enabled*4|buff.bone_shield.stack<3))&runic_power.deficit>20
   if S.Marrowrend:IsReady() and ((CovenantID ~= 4 or Player:BuffUp(S.AbominationLimbBuff)) and (Player:BuffRemains(S.BoneShieldBuff) <= Player:RuneTimeToX(3) or Player:BuffRemains(S.BoneShieldBuff) <= (Player:GCD() + num(S.Blooddrinker:CooldownUp()) * num(S.Blooddrinker:IsAvailable()) * 4) or Player:BuffStack(S.BoneShieldBuff) < 3) and Player:RunicPowerDeficit() > 20) then
@@ -266,7 +305,7 @@ local function DRWUpVenthyr()
     if Cast(S.Bonestorm, nil, nil, not Target:IsInRange(8)) then return "bonestorm drw_up_venthyr 10"; end
   end
   -- variable,name=heart_strike_rp_drw_venthyr,value=(15+buff.dancing_rune_weapon.up*10+spell_targets.heart_strike*talent.heartbreaker.enabled*2)
-  VarHeartStrikeRPDRWVenthyr = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2)
+  VarHeartStrikeRPDRWVenthyr = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + HeartStrikeCount * num(S.Heartbreaker:IsAvailable()) * 2)
   -- heart_strike,if=rune.time_to_4<gcd|runic_power.deficit>=variable.heart_strike_rp_drw_venthyr
   if S.HeartStrike:IsReady() and (Player:RuneTimeToX(4) < Player:GCD() or Player:RunicPowerDeficit() >= VarHeartStrikeRPDRWVenthyr) then
     if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike drw_up_venthyr 12"; end
@@ -303,10 +342,10 @@ local function Standard()
     if Cast(S.Bonestorm, nil, nil, not Target:IsInRange(8)) then return "bonestorm standard 14"; end
   end
   -- variable,name=heart_strike_rp,value=(15+spell_targets.heart_strike*talent.heartbreaker.enabled*2),op=setif,condition=covenant.night_fae&death_and_decay.ticking,value_else=(15+spell_targets.heart_strike*talent.heartbreaker.enabled*2)*1.2
-  if (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff)) then
-    VarHeartStrikeRP = (15 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2)
+  if (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff) and CovenantLegendary) then
+    VarHeartStrikeRP = (15 + HeartStrikeCount * num(S.Heartbreaker:IsAvailable()) * 2) * 1.2
   else
-    VarHeartStrikeRP = (15 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2) * 1.2
+    VarHeartStrikeRP = (15 + HeartStrikeCount * num(S.Heartbreaker:IsAvailable()) * 2)
   end
   -- death_strike,if=(runic_power.deficit<=variable.heart_strike_rp)|target.time_to_die<10
   if S.DeathStrike:IsReady() and ((Player:RunicPowerDeficit() <= VarHeartStrikeRP) or Target:TimeToDie() < 10) then
@@ -350,6 +389,8 @@ local function APL()
     EnemiesMeleeCount = 1
     EnemiesCount10y   = 1
   end
+
+  HeartStrikeCount = mathmin(EnemiesMeleeCount, Player:BuffUp(S.DeathAndDecayBuff) and 5 or 2)
 
   -- Check Units without Blood Plague
   UnitsWithoutBloodPlague = UnitsWithoutBP(Enemies10y)
@@ -422,7 +463,7 @@ local function APL()
       local ShouldReturn = DRWUp(); if ShouldReturn then return ShouldReturn; end
     end
     -- dancing_rune_weapon,if=covenant.venthyr&cooldown.swarming_mist.ready&runic_power>=(90-(spell_targets.swarming_mist*3))
-    if S.DancingRuneWeapon:IsCastable() and (CovenantID == 2 and S.SwarmingMist:CooldownUp() and Player:RunicPower() >= (90 - (EnemiesMeleeCount * 3))) then
+    if S.DancingRuneWeapon:IsCastable() and (CovenantID == 2 and S.SwarmingMist:CooldownUp() and not CovenantLegendary or Player:RunicPower() >= (90 - (EnemiesMeleeCount * 3))) then
       if Cast(S.DancingRuneWeapon, Settings.Blood.GCDasOffGCD.DancingRuneWeapon) then return "dancing_rune_weapon main 16"; end
     end
     -- run_action_list,name=drw_up_venthyr,if=covenant.venthyr&(buff.dancing_rune_weapon.up|buff.swarming_mist.up)
