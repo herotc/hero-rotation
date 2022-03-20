@@ -451,8 +451,8 @@ local function Covenants()
   if S.SwarmingMist:IsReady() and CDsON() and (S.BreathofSindragosa:IsAvailable() and (Player:BuffUp(S.BreathofSindragosa) and (VarSTPlanning and Player:RunicPowerDeficit() > 40 or VarAddsRemain and Player:RunicPowerDeficit() > 60) or Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownDown())) then
     if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "swarming_mist covenants 8"; end
   end
-  -- abomination_limb,if=cooldown.pillar_of_frost.remains<3&variable.st_planning&(talent.breath_of_sindragosa&runic_power>65&cooldown.breath_of_sindragosa.remains<2|!talent.breath_of_sindragosa)
-  if S.AbominationLimb:IsCastable() and CDsON() and (S.PillarofFrost:CooldownRemains() < 3 and VarSTPlanning and (S.BreathofSindragosa:IsAvailable() and Player:RunicPower() > 65 and S.BreathofSindragosa:CooldownRemains() < 2 or not S.BreathofSindragosa:IsAvailable())) then
+  -- abomination_limb,if=cooldown.pillar_of_frost.remains<gcd*2&variable.st_planning&(talent.breath_of_sindragosa&runic_power>65&cooldown.breath_of_sindragosa.remains<2|!talent.breath_of_sindragosa)
+  if S.AbominationLimb:IsCastable() and CDsON() and (S.PillarofFrost:CooldownRemains() < Player:GCD() * 2 and VarSTPlanning and (S.BreathofSindragosa:IsAvailable() and Player:RunicPower() > 65 and S.BreathofSindragosa:CooldownRemains() < 2 or not S.BreathofSindragosa:IsAvailable())) then
     if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant, not TargetIsInRange[10]) then return "abomination_limb covenants 10"; end
   end
   -- abomination_limb,if=variable.adds_remain
@@ -557,8 +557,8 @@ local function Cooldowns()
   if S.PillarofFrost:IsCastable() and (S.Icecap:IsAvailable() and not Player:BuffUp(S.PillarofFrost)) then
     if Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cooldowns 12"; end
   end
-  -- pillar_of_frost,if=talent.obliteration&(runic_power>=35&!buff.abomination_limb.up|buff.abomination_limb.up)&(variable.st_planning|variable.adds_remain)&(talent.gathering_storm.enabled&buff.remorseless_winter.up|!talent.gathering_storm.enabled)
-  if S.PillarofFrost:IsCastable() and (S.Obliteration:IsAvailable() and (Player:RunicPower() >= 35 and Player:BuffDown(S.AbominationLimb) or Player:BuffUp(S.AbominationLimb)) and (VarSTPlanning or VarAddsRemain) and (S.GatheringStorm:IsAvailable() and Player:BuffUp(S.RemorselessWinter) or not S.GatheringStorm:IsAvailable())) then
+  -- pillar_of_frost,if=talent.obliteration&(runic_power>=35&!buff.abomination_limb.up|buff.abomination_limb.up|runeforge.rage_of_the_frozen_champion)&(variable.st_planning|variable.adds_remain)&(talent.gathering_storm.enabled&buff.remorseless_winter.up|!talent.gathering_storm.enabled)
+  if S.PillarofFrost:IsCastable() and (S.Obliteration:IsAvailable() and (Player:RunicPower() >= 35 and Player:BuffDown(S.AbominationLimb) or Player:BuffUp(S.AbominationLimb) or RageoftheFrozenChampionEquipped) and (VarSTPlanning or VarAddsRemain) and (S.GatheringStorm:IsAvailable() and Player:BuffUp(S.RemorselessWinter) or not S.GatheringStorm:IsAvailable())) then
     if Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cooldowns 14"; end
   end
   -- breath_of_sindragosa,if=buff.pillar_of_frost.up
@@ -829,8 +829,8 @@ local function APL()
     if (Player:BuffUp(S.PillarofFrostBuff) and S.Obliteration:IsAvailable()) then
       local ShouldReturn = Obliteration(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=obliteration_pooling,if=!set_bonus.tier28_4pc&talent.obliteration&cooldown.pillar_of_frost.remains<10&(variable.st_planning|raid_event.adds.exists&raid_event.adds.in<10|!raid_event.adds.exists)
-    if ((not Player:HasTier(28, 4)) and S.Obliteration:IsAvailable() and S.PillarofFrost:CooldownRemains() < 10) then
+    -- run_action_list,name=obliteration_pooling,if=!set_bonus.tier28_4pc&!runeforge.rage_of_the_frozen_champion&talent.obliteration&cooldown.pillar_of_frost.remains<10&(variable.st_planning|raid_event.adds.exists&raid_event.adds.in<10|!raid_event.adds.exists)
+    if ((not Player:HasTier(28, 4)) and (not RageoftheFrozenChampionEquipped) and S.Obliteration:IsAvailable() and S.PillarofFrost:CooldownRemains() < 10) then
       local ShouldReturn = Obliteration_Pooling(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=aoe,if=active_enemies>=2
