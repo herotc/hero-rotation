@@ -18,6 +18,8 @@ local HR         = HeroRotation
 local Cast       = HR.Cast
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
+-- lua
+local mathmin    = math.min
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -42,6 +44,7 @@ local VarTomestoneBoneCount
 local IsTanking
 local EnemiesMelee
 local EnemiesMeleeCount
+local HeartStrikeCount
 local UnitsWithoutBloodPlague
 local ghoul = HL.GhoulTable
 
@@ -218,9 +221,9 @@ end
 local function DRWUp()
   -- variable,name=heart_strike_rp_drw,value=(15+buff.dancing_rune_weapon.up*10+spell_targets.heart_strike*talent.heartbreaker.enabled*2),op=setif,condition=covenant.night_fae&death_and_decay.ticking,value_else=(15+buff.dancing_rune_weapon.up*10+spell_targets.heart_strike*talent.heartbreaker.enabled*2)*1.2
   if (CovenantID == 3 and Player:BuffUp(S.DeathAndDecayBuff)) then
-    VarHeartStrikeRPDRW = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2)
+    VarHeartStrikeRPDRW = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + HeartStrikeCount * num(S.Heartbreaker:IsAvailable()) * 2)
   else
-    VarHeartStrikeRPDRW = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2) * 1.2
+    VarHeartStrikeRPDRW = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + HeartStrikeCount * num(S.Heartbreaker:IsAvailable()) * 2) * 1.2
   end
   -- marrowrend,if=(!covenant.necrolord|buff.abomination_limb.up)&(buff.bone_shield.remains<=rune.time_to_3|buff.bone_shield.remains<=(gcd+cooldown.blooddrinker.ready*talent.blooddrinker.enabled*4|buff.bone_shield.stack<3))&runic_power.deficit>20
   if S.Marrowrend:IsReady() and ((CovenantID ~= 4 or Player:BuffUp(S.AbominationLimbBuff)) and (Player:BuffRemains(S.BoneShieldBuff) <= Player:RuneTimeToX(3) or Player:BuffRemains(S.BoneShieldBuff) <= (Player:GCD() + num(S.Blooddrinker:CooldownUp()) * num(S.Blooddrinker:IsAvailable()) * 4) or Player:BuffStack(S.BoneShieldBuff) < 3) and Player:RunicPowerDeficit() > 20) then
@@ -266,7 +269,7 @@ local function DRWUpVenthyr()
     if Cast(S.Bonestorm, nil, nil, not Target:IsInRange(8)) then return "bonestorm drw_up_venthyr 10"; end
   end
   -- variable,name=heart_strike_rp_drw_venthyr,value=(15+buff.dancing_rune_weapon.up*10+spell_targets.heart_strike*talent.heartbreaker.enabled*2)
-  VarHeartStrikeRPDRWVenthyr = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + EnemiesMeleeCount * num(S.Heartbreaker:IsAvailable()) * 2)
+  VarHeartStrikeRPDRWVenthyr = (15 + num(Player:BuffUp(S.DancingRuneWeaponBuff)) * 10 + HeartStrikeCount * num(S.Heartbreaker:IsAvailable()) * 2)
   -- heart_strike,if=rune.time_to_4<gcd|runic_power.deficit>=variable.heart_strike_rp_drw_venthyr
   if S.HeartStrike:IsReady() and (Player:RuneTimeToX(4) < Player:GCD() or Player:RunicPowerDeficit() >= VarHeartStrikeRPDRWVenthyr) then
     if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike drw_up_venthyr 12"; end
@@ -350,6 +353,9 @@ local function APL()
     EnemiesMeleeCount = 1
     EnemiesCount10y   = 1
   end
+
+  -- HeartStrike is limited to 5 targets maximum
+  HeartStrikeCount = mathmin(EnemiesMeleeCount, Player:BuffUp(S.DeathAndDecayBuff) and 5 or 2)
 
   -- Check Units without Blood Plague
   UnitsWithoutBloodPlague = UnitsWithoutBP(Enemies10y)
