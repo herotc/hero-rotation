@@ -318,10 +318,6 @@ local function Precombat()
     if Cast(S.ArcaneIntellect) then return "arcane_intellect"; end
   end
   if Everyone.TargetIsValid() then
-    -- Initialize variables
-    if not var_init then
-      VarInit()
-    end
     -- Manually added : precast Tome of monstruous Constructions
     if I.TomeofMonstruousConstructions:IsEquippedAndReady() and not Player:AuraInfo(S.TomeofMonstruousConstructionsBuff) then
       if Cast(I.TomeofMonstruousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tome_of_monstruous_constructions precombat"; end
@@ -831,6 +827,11 @@ local function APL()
     EnemiesCount16ySplash = 1
     EnemiesCount10yMelee = 1
     EnemiesCount18yMelee = 1
+  end
+
+  -- Initialize variables
+  if not var_init then
+    VarInit()
   end
 
   -- Check how many units have ignite
