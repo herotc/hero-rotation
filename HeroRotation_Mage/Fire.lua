@@ -65,26 +65,21 @@ local var_init
 local var_searing_touch_active
 local var_disable_combustion
 local var_firestarter_combustion = -1
-local var_hot_streak_flamestrike
-local var_hard_cast_flamestrike
-local var_combustion_flamestrike
-local var_arcane_explosion
-local var_arcane_explosion_mana
-local var_kindling_reduction
-if S.Kindling:IsAvailable() then
-  var_kindling_reduction = 0.4
-else
-  var_kindling_reduction = 1
-end
-local var_skb_duration
-local var_mot_recharge_amount
-local var_combustion_on_use
-local var_empyreal_ordnance_delay
-local var_on_use_cutoff
+local var_hot_streak_flamestrike = (S.FlamePatch:IsAvailable()) and 2 or 4
+local var_hard_cast_flamestrike = (S.FlamePatch:IsAvailable()) and 3 or 6
+local var_combustion_flamestrike = (S.FlamePatch:IsAvailable()) and 3 or 6
+local var_arcane_explosion = (S.FlamePatch:IsAvailable()) and 99 or 2
+local var_arcane_explosion_mana = 40
+local var_kindling_reduction = (S.Kindling:IsAvailable()) and 0.4 or 1
+local var_skb_duration = 6
+local var_mot_recharge_amount = 6
+local var_combustion_on_use = (I.SinfulGladiatorsBadge:IsEquipped() or I.SinfulAspirantsBadge:IsEquipped() or I.MacabreSheetMusic:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.EmpyrealOrdnance:IsEquipped() or I.FlameofBattle:IsEquipped() or I.WakenersFrond:IsEquipped() or I.InstructorsDivineBell:IsEquipped() or I.ShadowedOrbofTorment:IsEquipped())
+local var_empyreal_ordnance_delay = 18
+local var_on_use_cutoff = 0
 local var_use_shifting_power = false
-local var_combustion_shifting_power
-local var_combustion_cast_remains
-local var_overpool_fire_blasts
+local var_combustion_shifting_power = var_combustion_flamestrike
+local var_combustion_cast_remains = 0.7
+local var_overpool_fire_blasts = 0
 local var_combustion_ready_time
 local var_combustion_precast_time
 local var_combustion_time
@@ -140,6 +135,7 @@ HL:RegisterForEvent(function()
   SunKingsBlessingEquipped = Player:HasLegendaryEquipped(13)
   DeathFathomEquipped = Player:HasLegendaryEquipped(221)
   SinfulDelightEquipped = Player:HasLegendaryEquipped(222)
+  var_combustion_on_use = (I.SinfulGladiatorsBadge:IsEquipped() or I.SinfulAspirantsBadge:IsEquipped() or I.MacabreSheetMusic:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.EmpyrealOrdnance:IsEquipped() or I.FlameofBattle:IsEquipped() or I.WakenersFrond:IsEquipped() or I.InstructorsDivineBell:IsEquipped() or I.ShadowedOrbofTorment:IsEquipped())
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -165,11 +161,11 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  if S.Kindling:IsAvailable() then
-    var_kindling_reduction = 0.4
-  else
-    var_kindling_reduction = 1
-  end
+  var_kindling_reduction = (S.Kindling:IsAvailable()) and 0.4 or 1
+  var_hot_streak_flamestrike = (S.FlamePatch:IsAvailable()) and 2 or 4
+  var_hard_cast_flamestrike = (S.FlamePatch:IsAvailable()) and 3 or 6
+  var_combustion_flamestrike = (S.FlamePatch:IsAvailable()) and 3 or 6
+  var_arcane_explosion = (S.FlamePatch:IsAvailable()) and 99 or 2
 end, "PLAYER_TALENT_UPDATE")
 
 function S.Firestarter:ActiveStatus()
@@ -222,36 +218,20 @@ end
 local function VarInit()
   -- variable,name=firestarter_combustion,default=-1,value=!talent.pyroclasm,if=variable.firestarter_combustion<0
   if var_firestarter_combustion < 0 then
-    var_firestarter_combustion = num(S.Pyroclasm:IsAvailable())
+    var_firestarter_combustion = num(not S.Pyroclasm:IsAvailable())
   end
 
   -- variable,name=hot_streak_flamestrike,if=variable.hot_streak_flamestrike=0,value=2*talent.flame_patch+4*!talent.flame_patch
-  if S.FlamePatch:IsAvailable() then
-    var_hot_streak_flamestrike = 2
-  else
-    var_hot_streak_flamestrike = 4
-  end
+  -- Moved to initial declarations and PLAYER_TALENT_UPDATE
 
   -- variable,name=hard_cast_flamestrike,if=variable.hard_cast_flamestrike=0,value=3*talent.flame_patch+6*!talent.flame_patch
-  if S.FlamePatch:IsAvailable() then
-    var_hard_cast_flamestrike = 3
-  else
-    var_hard_cast_flamestrike = 6
-  end
+  -- Moved to initial declarations and PLAYER_TALENT_UPDATE
 
   -- variable,name=combustion_flamestrike,if=variable.combustion_flamestrike=0,value=3*talent.flame_patch+6*!talent.flame_patch
-  if S.FlamePatch:IsAvailable() then
-    var_combustion_flamestrike = 3
-  else
-    var_combustion_flamestrike = 6
-  end
+  -- Moved to initial declarations and PLAYER_TALENT_UPDATE
 
   -- variable,name=arcane_explosion,if=variable.arcane_explosion=0,value=99*talent.flame_patch+2*!talent.flame_patch
-  if S.FlamePatch:IsAvailable() then
-    var_arcane_explosion = 99
-  else
-    var_arcane_explosion = 2
-  end
+  -- Moved to initial declarations and PLAYER_TALENT_UPDATE
 
   -- variable,name=arcane_explosion_mana,default=40,op=reset
   var_arcane_explosion_mana = 40
@@ -280,7 +260,7 @@ local function VarInit()
   var_mot_recharge_amount = 6
 
   -- variable,name=combustion_on_use,value=equipped.gladiators_badge|equipped.macabre_sheet_music|equipped.inscrutable_quantum_device|equipped.sunblood_amethyst|equipped.empyreal_ordnance|equipped.flame_of_battle|equipped.wakeners_frond|equipped.instructors_divine_bell|equipped.shadowed_orb_of_torment
-  var_combustion_on_use = (I.SinfulGladiatorsBadge:IsEquipped() or I.SinfulAspirantsBadge:IsEquipped() or I.MacabreSheetMusic:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.EmpyrealOrdnance:IsEquipped() or I.FlameofBattle:IsEquipped() or I.WakenersFrond:IsEquipped() or I.InstructorsDivineBell:IsEquipped() or I.ShadowedOrbofTorment:IsEquipped())
+  -- Moved to initial declarations and PLAYER_EQUIPMENT_CHANGED
 
   -- Manually added: variable,name=on_use_cutoff,value=0
   var_on_use_cutoff = 0
@@ -318,6 +298,10 @@ local function Precombat()
     if Cast(S.ArcaneIntellect) then return "arcane_intellect"; end
   end
   if Everyone.TargetIsValid() then
+    -- Initialize variables
+    if not var_init then
+      VarInit()
+    end
     -- Manually added : precast Tome of monstruous Constructions
     if I.TomeofMonstruousConstructions:IsEquippedAndReady() and not Player:AuraInfo(S.TomeofMonstruousConstructionsBuff) then
       if Cast(I.TomeofMonstruousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tome_of_monstruous_constructions precombat"; end
@@ -829,11 +813,6 @@ local function APL()
     EnemiesCount18yMelee = 1
   end
 
-  -- Initialize variables
-  if not var_init then
-    VarInit()
-  end
-
   -- Check how many units have ignite
   UnitsWithIgniteCount = UnitsWithIgnite(Enemies8ySplash)
 
@@ -858,7 +837,8 @@ local function APL()
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
-  if Everyone.TargetIsValid() then
+  if Everyone.TargetIsValid() and Player:AffectingCombat() then
+    -- Note: Added Player:AffectingCombat() above to potentially avoid nil errors if CombustionTiming() is called before VarInit occurs
     -- counterspell,if=!runeforge.disciplinary_command
     -- TODO : manage for solo ?
     --[[ if S.Counterspell:IsCastable() and not DisciplinaryCommandEquipped then
