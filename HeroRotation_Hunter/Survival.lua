@@ -35,7 +35,7 @@ local S = Spell.Hunter.Survival
 -- Items
 local I = Item.Hunter.Survival
 local TrinketsOnUseExcludes = {
-  I.DreadfireVessel:ID(),
+  -- I.Trinket:ID(),
 }
 
 -- Player Covenant
@@ -47,11 +47,33 @@ HL:RegisterForEvent(function()
   CovenantID = Player:CovenantID()
 end, "COVENANT_CHOSEN")
 
+-- Trinket Item Objects
+local equip = Player:GetEquipment()
+local trinket1 = Item(0)
+local trinket2 = Item(0)
+if equip[13] then
+  trinket1 = Item(equip[13])
+end
+if equip[14] then
+  trinket2 = Item(equip[14])
+end
+
 -- Legendaries
 local NessingwarysTrappingEquipped = Player:HasLegendaryEquipped(67)
 local SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
 local RylakstalkersConfoundingEquipped = Player:HasLegendaryEquipped(79)
+
+-- Check when equipment changes
 HL:RegisterForEvent(function()
+  equip = Player:GetEquipment()
+  trinket1 = Item(0)
+  trinket2 = Item(0)
+  if equip[13] then
+    trinket1 = Item(equip[13])
+  end
+  if equip[14] then
+    trinket2 = Item(equip[14])
+  end
   NessingwarysTrappingEquipped = Player:HasLegendaryEquipped(67)
   SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
   RylakstalkersConfoundingEquipped = Player:HasLegendaryEquipped(79)
@@ -258,6 +280,47 @@ local function Precombat()
     elseif S.RaptorStrike:IsReady() then
       if Cast(S.RaptorStrike) then return "raptor_strike precombat 18"; end
     end
+  end
+end
+
+local function Trinkets()
+  -- variable,name=sync_up,value=buff.resonating_arrow.up|buff.coordinated_assault.up
+  VarSyncUp = (Target:DebuffUp(S.ResonatingArrowDebuff) or Player:BuffUp(S.CoordinatedAssault))
+  -- variable,name=strong_sync_up,value=covenant.kyrian&buff.resonating_arrow.up&buff.coordinated_assault.up|!covenant.kyrian&buff.coordinated_assault.up
+  VarStrongSyncUp = (CovenantID == 1 and Target:DebuffUp(S.ResonatingArrowDebuff) and Player:BuffUp(S.CoordinatedAssault) or CovenantID ~= 1 and Player:BuffUp(S.CoordinatedAssault))
+  -- variable,name=strong_sync_remains,op=setif,condition=covenant.kyrian,value=cooldown.resonating_arrow.remains<?cooldown.coordinated_assault.remains_guess,value_else=cooldown.coordinated_assault.remains_guess,if=buff.coordinated_assault.down
+  if (Player:BuffDown(S.CoordinatedAssault)) then
+    if (CovenantID == 1) then
+      VarStrongSyncRemains = (S.ResonatingArrow:CooldownRemains() < S.CoordinatedAssault:CooldownRemains()) and S.ResonatingArrow:CooldownRemains() or S.CoordinatedAssault:CooldownRemains()
+    else
+      VarStrongSyncRemains = S.CoordinatedAssault:CooldownRemains()
+    end
+  end
+  -- variable,name=strong_sync_remains,op=setif,condition=covenant.kyrian,value=cooldown.resonating_arrow.remains,value_else=cooldown.coordinated_assault.remains_guess,if=buff.coordinated_assault.up
+  if (Player:BuffUp(S.CoordinatedAssault)) then
+    if (CovenantID == 1) then
+      VarStrongSyncRemains = S.ResonatingArrow:CooldownRemains()
+    else
+      VarStrongSyncRemains = S.CoordinatedAssault:CooldownRemains()
+    end
+  end
+  -- variable,name=sync_remains,op=setif,condition=covenant.kyrian,value=cooldown.resonating_arrow.remains>?cooldown.coordinated_assault.remains_guess,value_else=cooldown.coordinated_assault.remains_guess
+  if (CovenantID == 1) then
+    VarSyncRemains = (S.ResonatingArrow:CooldownRemains() > S.CoordinatedAssault:CooldownRemains()) and S.ResonatingArrow:CooldownRemains() or S.CoordinatedAssault:CooldownRemains()
+  else
+    VarSyncRemains = S.CoordinatedAssault:CooldownRemains()
+  end
+  -- use_items,slots=trinket1,if=((trinket.1.has_use_buff|covenant.kyrian&trinket.1.has_cooldown)&(variable.strong_sync_up&(!covenant.kyrian&!trinket.2.has_use_buff|covenant.kyrian&!trinket.2.has_cooldown|trinket.2.cooldown.remains|trinket.1.has_use_buff&(!trinket.2.has_use_buff|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)|trinket.1.has_cooldown&!trinket.2.has_use_buff&trinket.1.cooldown.duration>=trinket.2.cooldown.duration)|!variable.strong_sync_up&(!trinket.2.has_use_buff&(trinket.1.cooldown.duration-5<variable.sync_remains|variable.sync_remains>trinket.1.cooldown.duration%2)|trinket.2.has_use_buff&(trinket.1.has_use_buff&trinket.1.cooldown.duration>=trinket.2.cooldown.duration&(trinket.1.cooldown.duration-5<variable.sync_remains|variable.sync_remains>trinket.1.cooldown.duration%2)|(!trinket.1.has_use_buff|trinket.2.cooldown.duration>=trinket.1.cooldown.duration)&(trinket.2.cooldown.ready&trinket.2.cooldown.duration-5>variable.sync_remains&variable.sync_remains<trinket.2.cooldown.duration%2|!trinket.2.cooldown.ready&(trinket.2.cooldown.remains-5<variable.strong_sync_remains&variable.strong_sync_remains>20&(trinket.1.cooldown.duration-5<variable.sync_remains|trinket.2.cooldown.remains-5<variable.sync_remains&trinket.2.cooldown.duration-10+variable.sync_remains<variable.strong_sync_remains|variable.sync_remains>trinket.1.cooldown.duration%2|variable.sync_up)|trinket.2.cooldown.remains-5>variable.strong_sync_remains&(trinket.1.cooldown.duration-5<variable.strong_sync_remains|trinket.1.cooldown.duration<fight_remains&variable.strong_sync_remains+trinket.1.cooldown.duration>fight_remains|!trinket.1.has_use_buff&(variable.sync_remains>trinket.1.cooldown.duration%2|variable.sync_up))))))|target.time_to_die<variable.sync_remains)|!trinket.1.has_use_buff&!covenant.kyrian&(trinket.2.has_use_buff&((!variable.sync_up|trinket.2.cooldown.remains>5)&(variable.sync_remains>20|trinket.2.cooldown.remains-5>variable.sync_remains))|!trinket.2.has_use_buff&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|trinket.2.cooldown.duration>=trinket.1.cooldown.duration)))&(!trinket.1.is.cache_of_acquired_treasures|active_enemies<2&buff.acquired_wand.up|active_enemies>1&!buff.acquired_wand.up)
+  if trinket1:IsReady() and (((trinket1:TrinketHasUseBuff() or CovenantID == 1 and trinket1:HasCooldown()) and (VarStrongSyncUp and (CovenantID ~= 1 and (not trinket2:TrinketHasUseBuff()) or CovenantID == 1 and (not trinket2:HasCooldown()) or trinket2:CooldownRemains() > 0 or trinket1:TrinketHasUseBuff() and ((not trinket2:TrinketHasUseBuff()) or trinket1:Cooldown() >= trinket2:Cooldown()) or trinket1:HasCooldown() and (not trinket2:TrinketHasUseBuff()) and trinket1:Cooldown() >= trinket2:Cooldown()) or (not VarStrongSyncUp) and ((not trinket2:TrinketHasUseBuff()) and (trinket1:Cooldown() - 5 < VarSyncRemains or VarSyncRemains > trinket1:Cooldown() / 2) or trinket2:TrinketHasUseBuff() and (trinket1:TrinketHasUseBuff() and trinket1:Cooldown() >= trinket2:Cooldown() and (trinket1:Cooldown() - 5 < VarSyncRemains or VarSyncRemains > trinket1:Cooldown() / 2) or ((not trinket1:TrinketHasUseBuff()) or trinket2:Cooldown() >= trinket1:Cooldown()) and (trinket2:IsReady() and trinket2:Cooldown() - 5 > VarSyncRemains and VarSyncRemains < trinket2:Cooldown() / 2 or (not trinket2:IsReady()) and (trinket2:CooldownRemains() - 5 < VarStrongSyncRemains and VarStrongSyncRemains > 20 and (trinket1:Cooldown() - 5 < VarSyncRemains or trinket2:CooldownRemains() - 5 < VarSyncRemains and trinket2:Cooldown() - 10 + VarSyncRemains < VarStrongSyncRemains or VarSyncRemains > trinket1:Cooldown() / 2 or VarSyncUp) or trinket2:CooldownRemains() - 5 > VarStrongSyncRemains and (trinket1:Cooldown() - 5 < VarStrongSyncRemains or trinket1:Cooldown() < FightRemains and VarStrongSyncRemains + trinket1:Cooldown() > FightRemains or (not trinket1:TrinketHasUseBuff()) and (VarSyncRemains > trinket1:Cooldown() / 2 or VarSyncUp)))))) or Target:TimeToDie() < VarSyncRemains) or (not trinket1:TrinketHasUseBuff()) and CovenantID ~= 1 and (trinket2:TrinketHasUseBuff() and (((not VarSyncUp) or trinket2:CooldownRemains() > 5) and (VarSyncRemains > 20 or trinket2:CooldownRemains() - 5 > VarSyncRemains)) or (not trinket2:TrinketHasUseBuff()) and ((not trinket2:HasCooldown()) or trinket2:CooldownRemains() > 0 or trinket2:Cooldown() >= trinket1:Cooldown()))) and (trinket1:ID() ~= I.CacheofAcquiredTreasures:ID() or EnemyCount8ySplash < 2 and Player:BuffUp(S.AcquiredWandBuff) or EnemyCount8ySplash > 1 and Player:BuffDown(S.AcquiredWandBuff))) then
+    if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 trinkets 2"; end
+  end
+  -- use_items,slots=trinket2,if=((trinket.2.has_use_buff|covenant.kyrian&trinket.2.has_cooldown)&(variable.strong_sync_up&(!covenant.kyrian&!trinket.1.has_use_buff|covenant.kyrian&!trinket.1.has_cooldown|trinket.1.cooldown.remains|trinket.2.has_use_buff&(!trinket.1.has_use_buff|trinket.2.cooldown.duration>=trinket.1.cooldown.duration)|trinket.2.has_cooldown&!trinket.1.has_use_buff&trinket.2.cooldown.duration>=trinket.1.cooldown.duration)|!variable.strong_sync_up&(!trinket.1.has_use_buff&(trinket.2.cooldown.duration-5<variable.sync_remains|variable.sync_remains>trinket.2.cooldown.duration%2)|trinket.1.has_use_buff&(trinket.2.has_use_buff&trinket.2.cooldown.duration>=trinket.1.cooldown.duration&(trinket.2.cooldown.duration-5<variable.sync_remains|variable.sync_remains>trinket.2.cooldown.duration%2)|(!trinket.2.has_use_buff|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)&(trinket.1.cooldown.ready&trinket.1.cooldown.duration-5>variable.sync_remains&variable.sync_remains<trinket.1.cooldown.duration%2|!trinket.1.cooldown.ready&(trinket.1.cooldown.remains-5<variable.strong_sync_remains&variable.strong_sync_remains>20&(trinket.2.cooldown.duration-5<variable.sync_remains|trinket.1.cooldown.remains-5<variable.sync_remains&trinket.1.cooldown.duration-10+variable.sync_remains<variable.strong_sync_remains|variable.sync_remains>trinket.2.cooldown.duration%2|variable.sync_up)|trinket.1.cooldown.remains-5>variable.strong_sync_remains&(trinket.2.cooldown.duration-5<variable.strong_sync_remains|trinket.2.cooldown.duration<fight_remains&variable.strong_sync_remains+trinket.2.cooldown.duration>fight_remains|!trinket.2.has_use_buff&(variable.sync_remains>trinket.2.cooldown.duration%2|variable.sync_up))))))|target.time_to_die<variable.sync_remains)|!trinket.2.has_use_buff&!covenant.kyrian&(trinket.1.has_use_buff&((!variable.sync_up|trinket.1.cooldown.remains>5)&(variable.sync_remains>20|trinket.1.cooldown.remains-5>variable.sync_remains))|!trinket.1.has_use_buff&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)))&(!trinket.2.is.cache_of_acquired_treasures|active_enemies<2&buff.acquired_wand.up|active_enemies>1&!buff.acquired_wand.up)
+  if trinket2:IsReady() and (((trinket2:TrinketHasUseBuff() or CovenantID == 1 and trinket2:HasCooldown()) and (VarStrongSyncUp and (CovenantID ~= 1 and (not trinket1:TrinketHasUseBuff()) or CovenantID == 1 and (not trinket1:HasCooldown()) or trinket1:CooldownRemains() > 0 or trinket2:TrinketHasUseBuff() and ((not trinket1:TrinketHasUseBuff()) or trinket2:Cooldown() >= trinket1:Cooldown()) or trinket2:HasCooldown() and (not trinket1:TrinketHasUseBuff()) and trinket2:Cooldown() >= trinket1:Cooldown()) or (not VarStrongSyncUp) and ((not trinket1:TrinketHasUseBuff()) and (trinket2:Cooldown() - 5 < VarSyncRemains or VarSyncRemains > trinket2:Cooldown() / 2) or trinket1:TrinketHasUseBuff() and (trinket2:TrinketHasUseBuff() and trinket2:Cooldown() >= trinket1:Cooldown() and (trinket2:Cooldown() - 5 < VarSyncRemains or VarSyncRemains > trinket2:Cooldown() / 2) or ((not trinket2:TrinketHasUseBuff()) or trinket1:Cooldown() >= trinket2:Cooldown()) and (trinket1:IsReady() and trinket1:Cooldown() - 5 > VarSyncRemains and VarSyncRemains < trinket1:Cooldown() / 2 or (not trinket1:IsReady()) and (trinket1:CooldownRemains() - 5 < VarStrongSyncRemains and VarStrongSyncRemains > 20 and (trinket2:Cooldown() - 5 < VarSyncRemains or trinket1:CooldownRemains() - 5 < VarSyncRemains and trinket1:Cooldown() - 10 + VarSyncRemains < VarStrongSyncRemains or VarSyncRemains > trinket2:Cooldown() / 2 or VarSyncUp) or trinket1:CooldownRemains() - 5 > VarStrongSyncRemains and (trinket2:Cooldown() - 5 < VarStrongSyncRemains or trinket2:Cooldown() < FightRemains and VarStrongSyncRemains + trinket2:Cooldown() > FightRemains or (not trinket2:TrinketHasUseBuff()) and (VarSyncRemains > trinket2:Cooldown() / 2 or VarSyncUp)))))) or Target:TimeToDie() < VarSyncRemains) or (not trinket2:TrinketHasUseBuff()) and CovenantID ~= 1 and (trinket1:TrinketHasUseBuff() and (((not VarSyncUp) or trinket1:CooldownRemains() > 5) and (VarSyncRemains > 20 or trinket1:CooldownRemains() - 5 > VarSyncRemains)) or (not trinket1:TrinketHasUseBuff()) and ((not trinket1:HasCooldown()) or trinket1:CooldownRemains() > 0 or trinket1:Cooldown() >= trinket2:Cooldown()))) and (trinket2:ID() ~= I.CacheofAcquiredTreasures:ID() or EnemyCount8ySplash < 2 and Player:BuffUp(S.AcquiredWandBuff) or EnemyCount8ySplash > 1 and Player:BuffDown(S.AcquiredWandBuff))) then
+    if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 trinkets 4"; end
+  end
+  -- use_item,name=jotungeirr_destinys_call
+  if I.Jotungeirr:IsEquippedAndReady() then
+    if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call trinkets 6"; end
   end
 end
 
@@ -794,19 +857,12 @@ local function APL()
         if Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon oor"; end
       end
     end
-    -- use_item,name=jotungeirr_destinys_call,if=!raid_event.adds.exists&(buff.coordinated_assault.up|!cooldown.coordinated_assault.remains|time_to_die<30)|(raid_event.adds.exists&buff.resonating_arrow.up|buff.coordinated_assault.up)
-    if I.Jotungeirr:IsEquippedAndReady() and (#EnemyList < 2 and (Player:BuffUp(S.CoordinatedAssault) or S.CoordinatedAssault:CooldownUp() or Target:TimeToDie() < 30) or (#EnemyList > 1 and Player:BuffUp(S.ResonatingArrow) or Player:BuffUp(S.CoordinatedAssault))) then
-      if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 2"; end
-    end
-    -- use_items
-    if Settings.Commons.Enabled.Trinkets then
-      local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
-      if TrinketToUse then
-        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
-      end
-    end
     -- newfound_resolve,if=soulbind.newfound_resolve&(buff.resonating_arrow.up|cooldown.resonating_arrow.remains>10|target.time_to_die<16)
     -- Unable to handle player facing
+    -- call_action_list,name=trinkets,if=covenant.kyrian&cooldown.coordinated_assault.remains&cooldown.resonating_arrow.remains|!covenant.kyrian&cooldown.coordinated_assault.remains
+    if (CovenantID == 1 and S.CoordinatedAssault:CooldownRemains() > 0 and S.ResonatingArrow:CooldownRemains() > 0 or CovenantID ~= 1 and S.CoordinatedAssault:CooldownRemains() > 0) then
+      local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
+    end
     -- call_action_list,name=cds
     if (CDsON()) then
       local ShouldReturn = CDs(); if ShouldReturn then return ShouldReturn; end

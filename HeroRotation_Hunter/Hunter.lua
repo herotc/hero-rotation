@@ -79,6 +79,9 @@ Spell.Hunter.Commons = {
   NessingwarysTrappingBuff              = Spell(336744),
   SoulforgeEmbersDebuff                 = Spell(336746),
   WailingArrow                          = Spell(355589),
+  -- Trinket Effects
+  AcquiredAxeBuff                       = Spell(368656),
+  AcquiredWandBuff                      = Spell(368654),
   -- Misc
   PoolFocus                             = Spell(999910),
 }
@@ -204,11 +207,12 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Commons = {
   -- Potions
-  PotionOfSpectralAgility = Item(171270),
+  PotionOfSpectralAgility               = Item(171270),
   -- Trinkets
-  DreadfireVessel         = Item(184030, {13, 14}),
+  CacheofAcquiredTreasures              = Item(188265, {13, 14}),
+  DreadfireVessel                       = Item(184030, {13, 14}),
   -- Other On-Use Items
-  Jotungeirr              = Item(186404)
+  Jotungeirr                            = Item(186404)
 }
 
 Item.Hunter.BeastMastery = MergeTableByKey(Item.Hunter.Commons, {
