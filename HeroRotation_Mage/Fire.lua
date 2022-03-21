@@ -837,8 +837,7 @@ local function APL()
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
-  if Everyone.TargetIsValid() and Player:AffectingCombat() then
-    -- Note: Added Player:AffectingCombat() above to potentially avoid nil errors if CombustionTiming() is called before VarInit occurs
+  if Everyone.TargetIsValid() then
     -- counterspell,if=!runeforge.disciplinary_command
     -- TODO : manage for solo ?
     --[[ if S.Counterspell:IsCastable() and not DisciplinaryCommandEquipped then
