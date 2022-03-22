@@ -307,8 +307,8 @@ local function St()
   if S.ResonatingArrow:IsReady() and CDsON() and (Player:BuffUp(S.DoubleTap) or (not S.DoubleTap:IsAvailable()) or FightRemains < 12) then
     if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "resonating_arrow st 26"; end
   end
-  -- volley,if=buff.resonating_arrow.up|!covenant.kyrian&(buff.precise_shots.down|!talent.chimaera_shot|active_enemies<2)
-  if S.Volley:IsReady() and (Target:DebuffUp(S.ResonatingArrowDebuff) or CovenantID ~= 1 and (Player:BuffDown(S.PreciseShotsBuff) or (not S.ChimaeraShot:IsAvailable()) or EnemiesCount10ySplash < 2)) then
+  -- volley,if=buff.resonating_arrow.up|!covenant.kyrian&(buff.precise_shots.down|!talent.chimaera_shot|active_enemies<2)&(!talent.double_tap|!set_bonus.tier28_2pc|set_bonus.tier28_4pc|buff.double_tap.up)
+  if S.Volley:IsReady() and (Target:DebuffUp(S.ResonatingArrowDebuff) or CovenantID ~= 1 and (Player:BuffDown(S.PreciseShotsBuff) or (not S.ChimaeraShot:IsAvailable()) or EnemiesCount10ySplash < 2) and ((not S.DoubleTap:IsAvailable()) or (not Player:HasTier(28, 2)) or Player:HasTier(28, 4) or Player:BuffUp(S.DoubleTap))) then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley st 28"; end
   end
   -- steady_shot,if=covenant.kyrian&focus+cast_regen<focus.max&((cooldown.resonating_arrow.remains<gcd*3&(!soulbind.effusive_anima_accelerator|!talent.double_tap))|talent.double_tap&cooldown.double_tap.remains<3)
