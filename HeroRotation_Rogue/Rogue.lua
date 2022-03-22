@@ -263,6 +263,7 @@ Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
   VeilofMidnight          = Spell(198952),
   -- Soulbinds/Conduits (Shadowlands)
   DeeperDaggers           = Spell(341549),
+  PerforatedVeins         = Spell(341567),
   PerforatedVeinsBuff     = Spell(341572),
   -- Legendaries (Shadowlands)
   DeathlyShadowsBuff      = Spell(341202),

@@ -54,6 +54,7 @@ local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
 local FinalityEquipped = Player:HasLegendaryEquipped(126)
 local ObedienceEquipped = Player:HasLegendaryEquipped(229)
 local ResoundingClarityEquipped = Player:HasLegendaryEquipped(231)
+local TheRottenEquipped = Player:HasLegendaryEquipped(128)
 local Tier282pcEquipped = Player:HasTier(28, 2)
 HL:RegisterForEvent(function()
   DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
@@ -63,6 +64,7 @@ HL:RegisterForEvent(function()
   FinalityEquipped = Player:HasLegendaryEquipped(126)
   ObedienceEquipped = Player:HasLegendaryEquipped(229)
   ResoundingClarityEquipped = Player:HasLegendaryEquipped(231)
+  TheRottenEquipped = Player:HasLegendaryEquipped(128)
   Tier282pcEquipped = Player:HasTier(28, 2)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -206,8 +208,12 @@ local function Stealth_Threshold ()
   return 25 + num(S.Vigor:IsAvailable()) * 20 + num(S.MasterofShadows:IsAvailable()) * 20 + num(S.ShadowFocus:IsAvailable()) * 25 + num(S.Alacrity:IsAvailable()) * 20 + num(MeleeEnemies10yCount >= 4) * 25
 end
 local function ShD_Threshold ()
-  -- actions.stealth_cds=variable,name=shd_threshold,value=cooldown.shadow_dance.charges_fractional>=1.75
-  return S.ShadowDance:ChargesFractional() >= 1.75
+  -- actions.stealth_cds=variable,name=shd_threshold,value=cooldown.shadow_dance.charges_fractional>=(1.75-0.75*(covenant.kyrian&set_bonus.tier28_2pc&cooldown.symbols_of_death.remains>=8))
+  -- actions.stealth_cds+=/variable,name=shd_threshold,if=runeforge.the_rotten,value=cooldown.shadow_dance.charges_fractional>=1.75|cooldown.symbols_of_death.remains>=16
+  if TheRottenEquipped then
+    return S.ShadowDance:ChargesFractional() >= 1.75 or S.SymbolsofDeath:CooldownRemains() >= 16
+  end
+  return S.ShadowDance:ChargesFractional() >= (1.75 - (0.75 * BoolToInt(Covenant == "Kyrian" and Tier282pcEquipped and S.SymbolsofDeath:CooldownRemains() >= 8)))
 end
 local function ShD_Combo_Points ()
   -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=2+buff.shadow_blades.up
@@ -340,6 +346,10 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   local StealthBuff = Player:BuffUp(Stealth) or (StealthSpell and StealthSpell:ID() == Stealth:ID())
   local VanishBuffCheck = Player:BuffUp(VanishBuff) or (StealthSpell and StealthSpell:ID() == S.Vanish:ID())
   local ShadowDanceBuff = Player:BuffUp(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
+  local ShadowDanceBuffRemains = Player:BuffRemains(S.ShadowDanceBuff)
+  if StealthSpell and StealthSpell:ID() == S.ShadowDance:ID() then
+    ShadowDanceBuffRemains = 8
+  end
   local ShadowstrikeIsCastable = S.Shadowstrike:IsCastable() or StealthBuff or VanishBuffCheck or ShadowDanceBuff
   if StealthBuff or VanishBuffCheck then
     ShadowstrikeIsCastable = ShadowstrikeIsCastable and Target:IsInRange(25)
@@ -379,14 +389,19 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
       if HR.Cast(S.Shadowstrike) then return "Cast Shadowstrike (Sepsis)" end
     end
   end
-  -- actions.stealthed+=/backstab,if=buff.perforated_veins.stack>=5&buff.shadow_dance.remains>=3&buff.shadow_blades.up&spell_targets.shuriken_storm<=3
-  -- Note: Don't compare to StealthSpell here since we don't want to macro combo it
-  if Player:BuffStack(S.PerforatedVeinsBuff) >= 5 and Player:BuffRemains(S.ShadowDanceBuff) >= 3
-    and Player:BuffUp(S.ShadowBlades) and MeleeEnemies10yCount <= 3 then 
+  -- As we're in stealth, show a special macro combo with the PV icon to make it clear we are casting Backstab specifically within Shadow Dance
+  -- actions.stealthed+=/backstab,if=conduit.perforated_veins.rank>=8&buff.perforated_veins.stack>=5&buff.shadow_dance.remains>=3&buff.shadow_blades.up&(spell_targets.shuriken_storm<=3|variable.use_priority_rotation)&(buff.shadow_blades.remains<=buff.shadow_dance.remains+2|!covenant.venthyr)
+  if S.PerforatedVeins:ConduitRank() >= 8 and Player:BuffStack(S.PerforatedVeinsBuff) >= 5 and ShadowDanceBuffRemains >= 3 and Player:BuffUp(S.ShadowBlades)
+    and (MeleeEnemies10yCount <= 3 or PriorityRotation) and (Covenant ~= "Venthyr" or Player:BuffRemains(S.ShadowBlades) <= ShadowDanceBuffRemains + 2) then
     if ReturnSpellOnly then
-      return S.Backstab
+      -- If calling from a Stealth macro, we don't need the PV suggestion since it's already a macro cast
+      if StealthSpell then
+        return S.Backstab
+      else
+        return { S.Backstab, S.PerforatedVeins }
+      end
     else
-      if HR.Cast(S.Backstab) then return "Cast Backstab (Stealth PV)" end
+      if HR.CastQueue(S.Backstab, S.PerforatedVeins) then return "Cast Backstab (Stealth PV)" end
     end
   end
   -- actions.stealthed+=/shiv,if=talent.nightstalker.enabled&runeforge.tiny_toxic_blade.equipped&spell_targets.shuriken_storm<5
@@ -408,9 +423,9 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
       if HR.Cast(S.Shadowstrike) then return "Cast Shadowstrike (Prio Rotation)" end
     end
   end
-  -- actions.stealthed+=/shuriken_storm,if=spell_targets>=3+(buff.the_rotten.up|runeforge.akaaris_soul_fragment|set_bonus.tier28_2pc)&(buff.symbols_of_death_autocrit.up|!buff.premeditation.up|spell_targets>=5)
+  -- actions.stealthed+=/shuriken_storm,if=spell_targets>=3+(buff.the_rotten.up|runeforge.akaaris_soul_fragment|set_bonus.tier28_2pc&talent.shadow_focus.enabled)&(buff.symbols_of_death_autocrit.up|!buff.premeditation.up|spell_targets>=5)
   if HR.AoEON() and S.ShurikenStorm:IsCastable()
-    and MeleeEnemies10yCount >= 3 + num(Player:BuffUp(S.TheRottenBuff) or AkaarisSoulFragmentEquipped or Tier282pcEquipped)
+    and MeleeEnemies10yCount >= 3 + num(Player:BuffUp(S.TheRottenBuff) or AkaarisSoulFragmentEquipped or Tier282pcEquipped and S.ShadowFocus:IsAvailable())
     and (Player:BuffUp(S.SymbolsofDeathCrit) or not Player:BuffUp(S.PremeditationBuff) or MeleeEnemies10yCount >= 5) then
     if ReturnSpellOnly then
       return S.ShurikenStorm
@@ -544,8 +559,9 @@ local function CDs ()
     if HR.CDsON() and S.Sepsis:IsReady() and SnDCondition and ComboPointsDeficit >= 1 and not Target:FilteredTimeToDie("<", 16) then
       if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
     end
-    -- actions.cds+=/symbols_of_death,if=variable.snd_condition&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm>=2|cooldown.shuriken_tornado.remains>2)&(!covenant.venthyr|cooldown.flagellation.remains>10|cooldown.flagellation.up&combo_points>=5)
-    if S.SymbolsofDeath:IsCastable() and SnDCondition
+    -- actions.cds+=/symbols_of_death,if=(!stealthed.all|buff.perforated_veins.stack<4)&variable.snd_condition&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm>=2|cooldown.shuriken_tornado.remains>2)&(!covenant.venthyr|cooldown.flagellation.remains>10|cooldown.flagellation.up&combo_points>=5)
+    if S.SymbolsofDeath:IsCastable()
+      and (not Player:StealthUp(true, true) or Player:BuffStack(S.PerforatedVeinsBuff) < 4) and SnDCondition
       and (not S.ShurikenTornado:IsAvailable() or S.ShadowFocus:IsAvailable() or MeleeEnemies10yCount >= 2 or S.ShurikenTornado:CooldownRemains() > 2)
       and (Covenant ~= "Venthyr" or S.Flagellation:CooldownRemains() > 10 or S.Flagellation:CooldownUp() and ComboPoints >= 5) then
       if HR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death" end
@@ -665,9 +681,9 @@ local function Stealth_CDs (EnergyThreshold)
   if Target:IsInMeleeRange(5) and S.ShadowDance:IsCastable() and S.ShadowDance:Charges() >= 1
     and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3
     and (HR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge - (not S.EnvelopingShadows:IsAvailable() and 0.75 or 0))) then
-    -- actions.stealth_cds+=/shadow_dance,if=((variable.shd_combo_points|variable.shd_threshold)&set_bonus.tier28_2pc&covenant.kyrian|variable.shd_combo_points&(buff.symbols_of_death.remains>=1.2|variable.shd_threshold)|buff.chaos_bane.up|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)&(buff.perforated_veins.stack<4|spell_targets.shuriken_storm>3)
-    if (Tier282pcEquipped and Covenant == "Kyrian" and (ShD_Combo_Points() or ShD_Threshold()))
-      or (ShD_Combo_Points() and (Player:BuffRemains(S.SymbolsofDeath) >= 1.2 or ShD_Threshold())
+    -- actions.stealth_cds+=/shadow_dance,if=(runeforge.the_rotten&cooldown.symbols_of_death.remains<=8|variable.shd_combo_points&(buff.symbols_of_death.remains>=1.2|variable.shd_threshold)|buff.chaos_bane.up|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)&(buff.perforated_veins.stack<4|spell_targets.shuriken_storm>3)
+    if (TheRottenEquipped and Player:BuffRemains(S.SymbolsofDeath) <= 8
+      or ShD_Combo_Points() and (Player:BuffRemains(S.SymbolsofDeath) >= 1.2 or ShD_Threshold())
       or Player:BuffUp(S.ChaosBaneBuff) or (MeleeEnemies10yCount >= 4 and S.SymbolsofDeath:CooldownRemains() > 10))
       and (Player:BuffStack(S.PerforatedVeinsBuff) < 4 or MeleeEnemies10yCount > 3) then
       ShouldReturn = StealthMacro(S.ShadowDance, EnergyThreshold)
@@ -691,10 +707,10 @@ local function Build (EnergyThreshold)
     if ThresholdMet and HR.Cast(S.Shiv) then return "Cast Shiv (TTB)" end
     SetPoolingAbility(S.Shiv, EnergyThreshold)
   end
-  -- actions.build+=/shuriken_storm,if=spell_targets>=2&(!covenant.necrolord|cooldown.serrated_bone_spike.max_charges-charges_fractional>=0.25|spell_targets.shuriken_storm>4)&(buff.perforated_veins.stack<=4|spell_targets.shuriken_storm>4)
+  -- actions.build+=/shuriken_storm,if=spell_targets>=2&(!covenant.necrolord|cooldown.serrated_bone_spike.max_charges-charges_fractional>=0.25|spell_targets.shuriken_storm>4)&(buff.perforated_veins.stack<=4|spell_targets.shuriken_storm>4&!variable.use_priority_rotation)
   if HR.AoEON() and S.ShurikenStorm:IsCastable() and MeleeEnemies10yCount >= 2
     and (Covenant ~= "Necrolord" or (S.SerratedBoneSpike:MaxCharges() - S.SerratedBoneSpike:ChargesFractional()) >= 0.25 or MeleeEnemies10yCount > 4)
-    and (Player:BuffStack(S.PerforatedVeinsBuff) <= 4 or MeleeEnemies10yCount > 4) then
+    and (Player:BuffStack(S.PerforatedVeinsBuff) <= 4 or MeleeEnemies10yCount > 4 and not PriorityRotation) then
     if ThresholdMet and HR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm" end
     SetPoolingAbility(S.ShurikenStorm, EnergyThreshold)
   end
@@ -974,7 +990,7 @@ end
 
 HR.SetAPL(261, APL, Init)
 
--- Last Update: 11/02/2021
+-- Last Update: 2022-03-15
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=apply_poison
@@ -1030,7 +1046,7 @@ HR.SetAPL(261, APL, Init)
 
 -- # Builders
 -- actions.build=shiv,if=!talent.nightstalker.enabled&runeforge.tiny_toxic_blade&spell_targets.shuriken_storm<5
--- actions.build+=/shuriken_storm,if=spell_targets>=2&(!covenant.necrolord|cooldown.serrated_bone_spike.max_charges-charges_fractional>=0.25|spell_targets.shuriken_storm>4)&(buff.perforated_veins.stack<=4|spell_targets.shuriken_storm>4)
+-- actions.build+=/shuriken_storm,if=spell_targets>=2&(!covenant.necrolord|cooldown.serrated_bone_spike.max_charges-charges_fractional>=0.25|spell_targets.shuriken_storm>4)&(buff.perforated_veins.stack<=4|spell_targets.shuriken_storm>4&!variable.use_priority_rotation)
 -- actions.build+=/serrated_bone_spike,if=buff.perforated_veins.stack<=2&(cooldown.serrated_bone_spike.max_charges-charges_fractional<=0.25|soulbind.lead_by_example.enabled&!buff.lead_by_example.up|soulbind.kevins_oozeling.enabled&!debuff.kevins_wrath.up)
 -- actions.build+=/gloomblade
 -- # Backstab immediately unless the next CP is Animacharged and we won't cap energy waiting for it.
@@ -1050,7 +1066,7 @@ HR.SetAPL(261, APL, Init)
 -- actions.cds+=/serrated_bone_spike,cycle_targets=1,if=variable.snd_condition&!dot.serrated_bone_spike_dot.ticking&target.time_to_die>=21&(combo_points.deficit>=(cp_gain>?4))&!buff.shuriken_tornado.up&(!buff.premeditation.up|spell_targets.shuriken_storm>4)|fight_remains<=5&spell_targets.shuriken_storm<3
 -- actions.cds+=/sepsis,if=variable.snd_condition&combo_points.deficit>=1&target.time_to_die>=16
 -- # Use Symbols on cooldown (after first SnD) unless we are going to pop Tornado and do not have Shadow Focus.
--- actions.cds+=/symbols_of_death,if=variable.snd_condition&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm>=2|cooldown.shuriken_tornado.remains>2)&(!covenant.venthyr|cooldown.flagellation.remains>10|cooldown.flagellation.up&combo_points>=5)
+-- actions.cds+=/symbols_of_death,if=(!stealthed.all|buff.perforated_veins.stack<4)&variable.snd_condition&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm>=2|cooldown.shuriken_tornado.remains>2)&(!covenant.venthyr|cooldown.flagellation.remains>10|cooldown.flagellation.up&combo_points>=5)
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or not stealthed without any CP.
 -- actions.cds+=/marked_for_death,line_cd=1.5,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.all&combo_points.deficit>=cp_max_spend)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP.
@@ -1066,6 +1082,7 @@ HR.SetAPL(261, APL, Init)
 -- actions.cds+=/berserking,if=buff.symbols_of_death.up
 -- actions.cds+=/fireblood,if=buff.symbols_of_death.up
 -- actions.cds+=/ancestral_call,if=buff.symbols_of_death.up
+-- actions.cds+=/use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up&(spell_targets.shuriken_storm=1&raid_event.adds.in>60|spell_targets.shuriken_storm>1)|fight_remains<25
 -- # Default fallback for usable items: Use with Symbols of Death.
 -- actions.cds+=/use_items,if=buff.symbols_of_death.up|fight_remains<20
 
@@ -1088,7 +1105,8 @@ HR.SetAPL(261, APL, Init)
 
 -- # Stealth Cooldowns
 -- # Helper Variable
--- actions.stealth_cds=variable,name=shd_threshold,value=cooldown.shadow_dance.charges_fractional>=1.75
+-- actions.stealth_cds=variable,name=shd_threshold,value=cooldown.shadow_dance.charges_fractional>=(1.75-0.75*(covenant.kyrian&set_bonus.tier28_2pc&cooldown.symbols_of_death.remains>=8))
+-- actions.stealth_cds+=/variable,name=shd_threshold,if=runeforge.the_rotten,value=cooldown.shadow_dance.charges_fractional>=1.75|cooldown.symbols_of_death.remains>=16
 -- # Vanish if we are capping on Dance charges. Early before first dance if we have no Nightstalker but Dark Shadow in order to get Rupture up (no Master Assassin).
 -- actions.stealth_cds+=/vanish,if=(!variable.shd_threshold|!talent.nightstalker.enabled&talent.dark_shadow.enabled)&combo_points.deficit>1&!runeforge.mark_of_the_master_assassin
 -- # Pool for Shadowmeld + Shadowstrike unless we are about to cap on Dance charges. Only when Find Weakness is about to run out.
@@ -1100,7 +1118,7 @@ HR.SetAPL(261, APL, Init)
 -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit<=1,if=variable.use_priority_rotation&spell_targets.shuriken_storm>=4
 -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit<=1,if=spell_targets.shuriken_storm=4
 -- # Dance during Symbols or above threshold.
--- actions.stealth_cds+=/shadow_dance,if=((variable.shd_combo_points|variable.shd_threshold)&set_bonus.tier28_2pc&covenant.kyrian|variable.shd_combo_points&(buff.symbols_of_death.remains>=1.2|variable.shd_threshold)|buff.chaos_bane.up|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)&(buff.perforated_veins.stack<4|spell_targets.shuriken_storm>3)
+-- actions.stealth_cds+=/shadow_dance,if=(runeforge.the_rotten&cooldown.symbols_of_death.remains<=8|variable.shd_combo_points&(buff.symbols_of_death.remains>=1.2|variable.shd_threshold)|buff.chaos_bane.up|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)&(buff.perforated_veins.stack<4|spell_targets.shuriken_storm>3)
 -- # Burn Dances charges if you play Dark Shadows/Alacrity or before the fight ends if SoD won't be ready in time.
 -- actions.stealth_cds+=/shadow_dance,if=variable.shd_combo_points&fight_remains<cooldown.symbols_of_death.remains|!talent.enveloping_shadows.enabled
 
@@ -1116,13 +1134,13 @@ HR.SetAPL(261, APL, Init)
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&buff.vanish.up)
 -- actions.stealthed+=/shadowstrike,if=stealthed.sepsis&spell_targets.shuriken_storm<4
 -- # Backstab during Shadow Dance when on high PV stacks and Shadow Blades is up.
--- actions.stealthed+=/backstab,if=buff.perforated_veins.stack>=5&buff.shadow_dance.remains>=3&buff.shadow_blades.up&spell_targets.shuriken_storm<=3
+-- actions.stealthed+=/backstab,if=conduit.perforated_veins.rank>=8&buff.perforated_veins.stack>=5&buff.shadow_dance.remains>=3&buff.shadow_blades.up&(spell_targets.shuriken_storm<=3|variable.use_priority_rotation)&(buff.shadow_blades.remains<=buff.shadow_dance.remains+2|!covenant.venthyr)
 -- actions.stealthed+=/shiv,if=talent.nightstalker.enabled&runeforge.tiny_toxic_blade&spell_targets.shuriken_storm<5
 -- # Up to 3 targets (no prio) keep up Find Weakness by cycling Shadowstrike.
 -- actions.stealthed+=/shadowstrike,cycle_targets=1,if=!variable.use_priority_rotation&debuff.find_weakness.remains<1&spell_targets.shuriken_storm<=3&target.time_to_die-remains>6
 -- # For priority rotation, use Shadowstrike over Storm with WM against up to 4 targets or if FW is running off (on any amount of targets)
 -- actions.stealthed+=/shadowstrike,if=variable.use_priority_rotation&(debuff.find_weakness.remains<1|talent.weaponmaster.enabled&spell_targets.shuriken_storm<=4)
--- actions.stealthed+=/shuriken_storm,if=spell_targets>=3+(buff.the_rotten.up|runeforge.akaaris_soul_fragment|set_bonus.tier28_2pc)&(buff.symbols_of_death_autocrit.up|!buff.premeditation.up|spell_targets>=5)
+-- actions.stealthed+=/shuriken_storm,if=spell_targets>=3+(buff.the_rotten.up|runeforge.akaaris_soul_fragment|set_bonus.tier28_2pc&talent.shadow_focus.enabled)&(buff.symbols_of_death_autocrit.up|!buff.premeditation.up|spell_targets>=5)
 -- # Shadowstrike to refresh Find Weakness and to ensure we can carry over a full FW into the next SoD if possible.
 -- actions.stealthed+=/shadowstrike,if=debuff.find_weakness.remains<=1|cooldown.symbols_of_death.remains<18&debuff.find_weakness.remains<cooldown.symbols_of_death.remains
 -- actions.stealthed+=/gloomblade,if=buff.perforated_veins.stack>=5&conduit.perforated_veins.rank>=13
