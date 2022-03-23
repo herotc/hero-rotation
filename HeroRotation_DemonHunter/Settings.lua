@@ -40,15 +40,16 @@ HR.GUISettings.APL.DemonHunter = {
     FieryBrandHealthThreshold = 40,
     DemonSpikesHealthThreshold = 65,
     ConserveInfernalStrike = true,
+    UseFieryBrandOffensively = false,
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
       DemonSpikes = true,
       InfernalStrike = false,
-      FieryBrand = false,
     },
     GCDasOffGCD = {
       FelDevastation = false,
+      FieryBrand = false,
     }
   },
   Havoc = {
@@ -85,6 +86,7 @@ CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.Metamorphos
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.FieryBrandHealthThreshold", {5, 100, 5}, "Fiery Brand Health Threshold", "Suggest Fiery Brand when below this health percentage.")
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.DemonSpikesHealthThreshold", {5, 100, 5}, "Demon Spikes Health Threshold", "Suggest Demon Spikes when below this health percentage.")
 CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.ConserveInfernalStrike", "Conserve Infernal Strike", "Save at least 1 Infernal Strike charge for mobility.")
+CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.UseFieryBrandOffensively", "Use Fiery Brand Offensively", "Check this to recommend offensive Fiery Brand usage. Otherwise, it will be saved as a defensive.")
 CreateARPanelOptions(CP_Vengeance, "APL.DemonHunter.Vengeance")
 
 -- Havoc

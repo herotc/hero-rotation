@@ -42,6 +42,7 @@ Spell.DemonHunter.Commons = {
   SummonSteward                         = Spell(324739),
   TheHunt                               = Spell(323639),
   -- Legendary Effects
+  BlindFaithBuff                        = Spell(355894),
   ChaosTheoryBuff                       = Spell(337567),
   FelBombardmentBuff                    = Spell(337849),
   BurningWoundDebuff                    = Spell(346278),
@@ -82,6 +83,7 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   CharredFlesh                          = Spell(336639),
   ConcentratedSigils                    = Spell(207666),
   Demonic                               = Spell(321453),
+  Fallout                               = Spell(227174),
   Fracture                              = Spell(263642),
   SoulBarrier                           = Spell(263648),
   SpiritBomb                            = Spell(247454),
