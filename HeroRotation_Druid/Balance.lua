@@ -664,6 +664,10 @@ local function Aoe()
   -- variable,name=starfire_in_solar,value=spell_targets.starfire>4+floor(mastery_value*100%20)+floor(buff.starsurge_empowerment_solar.stack%4)
   -- TODO: Find a way to calculate starsurge_empowerment_solar
   VarStarfireinSolar = (EnemiesCount8ySplash > 4 + floor(Player:MasteryPct() / 20))
+  -- wrath,if=!buff.ravenous_frenzy.up&!buff.ravenous_frenzy_sinful_hysteria.up&!talent.soul_of_the_forest.enabled&spell_targets.starfire<3&buff.eclipse_solar.remains>execute_time&fight_remains>buff.ca_inc.remains+12*runeforge.primordial_arcanic_pulsar
+  if S.Wrath:IsCastable() and (Player:BuffDown(S.RavenousFrenzyBuff) and Player:BuffDown(S.RavenousFrenzySHBuff) and (not S.SouloftheForest:IsAvailable()) and EnemiesCount8ySplash < 3 and Player:BuffRemains(S.EclipseSolar) > S.Wrath:ExecuteTime() and FightRemains > Player:BuffRemains(CaInc) + 12 * num(PAPEquipped)) then
+    if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath aoe 49"; end
+  end
   -- variable,name=wrath_in_frenzy,value=1%spell_haste<2-(0.2*(spell_targets.starfire-1)*(1+talent.soul_of_the_forest.enabled*1.5))+0.15*buff.ravenous_frenzy.remains
   VarWrathInFrenzy = (1 / Player:SpellHaste() < 2 - (0.2 * (EnemiesCount8ySplash - 1) * (1 + num(S.SouloftheForest:IsAvailable()) * 1.5)) + 0.15 * Player:BuffRemains(S.RavenousFrenzyBuff))
   -- wrath,if=(eclipse.lunar_next|eclipse.any_next&variable.is_cleave)&(target.time_to_die>4|eclipse.lunar_in_2|fight_remains<10)|buff.eclipse_solar.remains<action.starfire.execute_time&buff.eclipse_solar.up|eclipse.in_solar&!variable.starfire_in_solar|buff.ca_inc.remains<action.starfire.execute_time&!variable.is_cleave&buff.ca_inc.remains<execute_time&buff.ca_inc.up|buff.ravenous_frenzy.up&variable.wrath_in_frenzy|!variable.is_cleave&buff.ca_inc.remains>execute_time
