@@ -21,6 +21,7 @@ local Cast          = HR.Cast
 local CastSuggested = HR.CastSuggested
 -- lua
 local mathmax       = math.max
+local mathmin       = math.min
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -246,10 +247,10 @@ local function Normal()
   end
   -- soul_cleave,if=((talent.spirit_bomb.enabled&soul_fragments=0)|!talent.spirit_bomb.enabled)&((talent.fracture.enabled&fury>=55)|(!talent.fracture.enabled&fury>=70)|cooldown.fel_devastation.remains>target.time_to_die|(buff.metamorphosis.up&((talent.fracture.enabled&fury>=35)|(!talent.fracture.enabled&fury>=50))))
   -- Note: Added Blind Faith buff check if SpiritBomb is available
-  if S.SoulCleave:IsReady() and (((S.SpiritBomb:IsAvailable() and SoulFragments == 0 and Player:BuffDown(S.BlindFaithBuff)) or not S.SpiritBomb:IsAvailable()) and ((S.Fracture:IsAvailable() and Player:Fury() >= 55) or (not S.Fracture:IsAvailable() and Player:Fury() >= 70) or S.FelDevastation:CooldownRemains() > Target:TimeToDie() or (Player:BuffUp(S.MetamorphosisBuff) and ((S.Fracture:IsAvailable() and Player:Fury() >= 35) or (not S.Fracture:IsAvailable() and Player:Fury() >= 50))))) then
+  if S.SoulCleave:IsReady() and (((S.SpiritBomb:IsAvailable() and SoulFragments == 0 and Player:BuffDown(S.BlindFaithBuff)) or not S.SpiritBomb:IsAvailable()) and ((S.Fracture:IsAvailable() and Player:Fury() >= 55) or ((not S.Fracture:IsAvailable()) and Player:Fury() >= 70) or S.FelDevastation:CooldownRemains() > Target:TimeToDie() or (Player:BuffUp(S.MetamorphosisBuff) and ((S.Fracture:IsAvailable() and Player:Fury() >= 35) or (not S.Fracture:IsAvailable() and Player:Fury() >= 50))))) then
     if Cast(S.SoulCleave, nil, nil, not Target:IsSpellInRange(S.SoulCleave)) then return "soul_cleave normal 14"; end
   end
-  -- Manually added: immolation_aura,if=set_bonus.tier28_4pc&buff.immolation_aura.down&fury
+  -- Manually added: immolation_aura,if=set_bonus.tier28_4pc&buff.immolation_aura.down
   if S.ImmolationAura:IsCastable() and (Player:HasTier(28, 4) and Player:BuffDown(S.ImmolationAuraBuff)) then
     if Cast(S.ImmolationAura) then return "immolation_aura normal 16"; end
   end
@@ -259,7 +260,7 @@ local function Normal()
   end
   -- immolation_aura,if=((variable.brand_build&cooldown.fiery_brand.remains>10)|!variable.brand_build)&fury<=90
   -- Manually added: Don't cast if we'll cap SoulFragments with Fallout (we have a 60-70% chance to get a fragment per target)
-  if S.ImmolationAura:IsCastable() and (((VarBrandBuild and S.FieryBrand:CooldownRemains() > 10) or not VarBrandBuild) and (Player:Fury() <= 90 and (not S.Fallout:IsAvailable()) or S.Fallout:IsAvailable() and SoulFragments <= 5 - mathmax(5, EnemiesCount8yMelee * 0.6))) then
+  if S.ImmolationAura:IsCastable() and (((VarBrandBuild and S.FieryBrand:CooldownRemains() > 10) or not VarBrandBuild) and (Player:Fury() <= 90 and (not S.Fallout:IsAvailable()) or S.Fallout:IsAvailable() and SoulFragments <= 5 - mathmin(5, EnemiesCount8yMelee * 0.6))) then
     if Cast(S.ImmolationAura) then return "immolation_aura normal 20"; end
   end
   -- felblade,if=fury<=60
