@@ -315,11 +315,11 @@ local function St()
   if S.SteadyShot:IsCastable() and (CovenantID == 1 and Player:FocusP() + Player:FocusCastRegen(S.SteadyShot:ExecuteTime()) < Player:FocusMax() and ((S.ResonatingArrow:CooldownRemains() < Player:GCD() * 3 and ((not S.EffusiveAnimaAccelerator:IsAvailable()) or not S.DoubleTap:IsAvailable())) or S.DoubleTap:IsAvailable() and S.DoubleTap:CooldownRemains() < 3)) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 30"; end
   end
-  -- rapid_fire,if=runeforge.surging_shots&talent.streamline&(cooldown.resonating_arrow.remains>10|!covenant.kyrian|!talent.double_tap|soulbind.effusive_anima_accelerator)
-  if S.RapidFire:IsCastable() and (SurgingShotsEquipped and S.Streamline:IsAvailable() and (S.ResonatingArrow:CooldownRemains() > 10 or CovenantID ~= 1 or (not S.DoubleTap:IsAvailable()) or S.EffusiveAnimaAccelerator:IsAvailable())) then
+  -- rapid_fire,if=(runeforge.surging_shots|set_bonus.tier28_2pc&buff.trick_shots.up&buff.volley.down)&talent.streamline&(cooldown.resonating_arrow.remains>10|!covenant.kyrian|!talent.double_tap|soulbind.effusive_anima_accelerator)
+  if S.RapidFire:IsCastable() and ((SurgingShotsEquipped or Player:HasTier(28, 2) and TrickShotsBuffCheck() and Player:BuffDown(S.VolleyBuff)) and S.Streamline:IsAvailable() and (S.ResonatingArrow:CooldownRemains() > 10 or CovenantID ~= 1 or (not S.DoubleTap:IsAvailable()) or S.EffusiveAnimaAccelerator:IsAvailable())) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 32"; end
   end
-  if (Player:HasTier(28, 4) and Player:BuffDown(S.TrickShotsBuff) and Hunter.FTCount < 5 and Player:BuffUp(S.PreciseShotsBuff)) then
+  if (Player:HasTier(28, 4) and (not TrickShotsBuffCheck()) and Hunter.FTCount < 5 and Player:BuffUp(S.PreciseShotsBuff)) then
     -- chimaera_shot,if=set_bonus.tier28_4pc&buff.trick_shots.down&focused_trickery_count<5&buff.precise_shots.up
     if S.ChimaeraShot:IsReady() then
       if Cast(S.ChimaeraShot, nil, nil, not TargetInRange40y) then return "chimaera_shot st 34"; end
