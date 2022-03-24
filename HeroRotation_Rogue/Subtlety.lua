@@ -46,33 +46,29 @@ local RuptureThreshold, RuptureDMGThreshold
 local EffectiveComboPoints, ComboPoints, ComboPointsDeficit
 local PriorityRotation
 
--- Legendaries
+-- Covenant and Legendaries
+local Covenant = Player:Covenant()
 local DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
 local TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
 local AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
 local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
 local FinalityEquipped = Player:HasLegendaryEquipped(126)
-local ObedienceEquipped = Player:HasLegendaryEquipped(229)
-local ResoundingClarityEquipped = Player:HasLegendaryEquipped(231)
+local ObedienceEquipped = Player:HasLegendaryEquipped(229) or (Player:HasUnity() and Covenant == "Venthyr")
+local ResoundingClarityEquipped = Player:HasLegendaryEquipped(231) or (Player:HasUnity() and Covenant == "Kyrian")
 local TheRottenEquipped = Player:HasLegendaryEquipped(128)
 local Tier282pcEquipped = Player:HasTier(28, 2)
 HL:RegisterForEvent(function()
+  Covenant = Player:Covenant()
   DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
   TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
   AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
   MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
   FinalityEquipped = Player:HasLegendaryEquipped(126)
-  ObedienceEquipped = Player:HasLegendaryEquipped(229)
-  ResoundingClarityEquipped = Player:HasLegendaryEquipped(231)
+  ObedienceEquipped = Player:HasLegendaryEquipped(229) or (Player:HasUnity() and Covenant == "Venthyr")
+  ResoundingClarityEquipped = Player:HasLegendaryEquipped(231) or (Player:HasUnity() and Covenant == "Kyrian")
   TheRottenEquipped = Player:HasLegendaryEquipped(128)
   Tier282pcEquipped = Player:HasTier(28, 2)
-end, "PLAYER_EQUIPMENT_CHANGED")
-
--- Covenant
-local Covenant = Player:Covenant()
-HL:RegisterForEvent(function()
-  Covenant = Player:Covenant()
-end, "COVENANT_CHOSEN")
+end, "PLAYER_EQUIPMENT_CHANGED", "COVENANT_CHOSEN" )
 
 S.Eviscerate:RegisterDamageFormula(
   -- Eviscerate DMG Formula (Pre-Mitigation):

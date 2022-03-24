@@ -144,6 +144,8 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   Maneuverability         = Spell(197000),
   Neurotoxin              = Spell(206328),
   SmokeBomb               = Spell(212182),
+  -- Set Bonuses (Shadowlands)
+  GrudgeMatchDebuff       = Spell(364668),
 })
 
 Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {

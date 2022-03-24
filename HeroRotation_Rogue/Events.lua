@@ -74,6 +74,13 @@ do
     Garrote = {},
     Rupture = {},
   }
+  local Vendetta = {}
+
+  local Tier284pcEquipped = Player:HasTier(28, 4)
+  HL:RegisterForEvent(function()
+    Tier284pcEquipped = Player:HasTier(28, 4)
+  end, "PLAYER_EQUIPMENT_CHANGED")
+
   -- Exsanguinated Expression
   function Rogue.Exsanguinated(ThisUnit, ThisSpell)
     local GUID = ThisUnit:GUID()
@@ -93,11 +100,43 @@ do
 
     return false
   end
+
+  function Rogue.WillLoseExsanguinate(ThisUnit, ThisSpell)
+    -- TODO: Check rate comparison for Exsang + Vendetta
+    if Tier284pcEquipped and Vendetta[ThisUnit] then
+      return false
+    end
+    
+    if Rogue.Exsanguinated(ThisUnit, ThisSpell) then
+      return true
+    end
+
+    return false
+  end
+
+  function Rogue.ExsanguinatedRate(ThisUnit, ThisSpell)
+    -- TODO: Check rate comparison for Exsang + Vendetta
+    if Rogue.Exsanguinated(ThisUnit, ThisSpell) then
+      return 2.0
+    end
+
+    return 1.0
+  end
+
   -- Exsanguinate OnCast Listener
   HL:RegisterForSelfCombatEvent(
     function(_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
       -- Exsanguinate
       if SpellID == 200806 then
+        for _, ExsanguinatedByGUID in pairs(ExsanguinatedByBleed) do
+          for GUID, _ in pairs(ExsanguinatedByGUID) do
+            if GUID == DestGUID then
+              ExsanguinatedByGUID[GUID] = true
+            end
+          end
+        end
+      -- Vendetta
+      elseif Tier284pcEquipped and SpellID == 79140 then
         for _, ExsanguinatedByGUID in pairs(ExsanguinatedByBleed) do
           for GUID, _ in pairs(ExsanguinatedByGUID) do
             if GUID == DestGUID then
@@ -112,15 +151,22 @@ do
   -- Bleed OnApply/OnRefresh Listener
   HL:RegisterForSelfCombatEvent(
     function(_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
+      if Tier284pcEquipped and SpellID == 79140 then
+        -- Vendetta
+        Vendetta[DestGUID] = true
+      end
+
+      -- Debuff are additionally Exsanguinated on cast when Vendetta is up 
+      local Exsanguinated = Tier284pcEquipped and Vendetta[DestGUID]
       if SpellID == 121411 then
         -- Crimson Tempest
-        ExsanguinatedByBleed.CrimsonTempest[DestGUID] = false
+        ExsanguinatedByBleed.CrimsonTempest[DestGUID] = Exsanguinated
       elseif SpellID == 703 then
         -- Garrote
-        ExsanguinatedByBleed.Garrote[DestGUID] = false
+        ExsanguinatedByBleed.Garrote[DestGUID] = Exsanguinated
       elseif SpellID == 1943 then
         -- Rupture
-        ExsanguinatedByBleed.Rupture[DestGUID] = false
+        ExsanguinatedByBleed.Rupture[DestGUID] = Exsanguinated
       end
     end,
     "SPELL_AURA_APPLIED", "SPELL_AURA_REFRESH"
@@ -128,7 +174,12 @@ do
   -- Bleed OnRemove Listener
   HL:RegisterForSelfCombatEvent(
     function(_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
-      if SpellID == 121411 then
+      if Tier284pcEquipped and SpellID == 79140 then
+        -- Vendetta
+        if Vendetta[DestGUID] ~= nil then
+          Vendetta[DestGUID] = nil
+        end
+      elseif SpellID == 121411 then
         -- Crimson Tempest
         if ExsanguinatedByBleed.CrimsonTempest[DestGUID] ~= nil then
           ExsanguinatedByBleed.CrimsonTempest[DestGUID] = nil
@@ -150,6 +201,10 @@ do
   -- Bleed OnUnitDeath Listener
   HL:RegisterForCombatEvent(
     function(_, _, _, _, _, _, _, DestGUID)
+      -- Vendetta
+      if Vendetta[DestGUID] ~= nil then
+        Vendetta[DestGUID] = nil
+      end
       -- Crimson Tempest
       if ExsanguinatedByBleed.CrimsonTempest[DestGUID] ~= nil then
         ExsanguinatedByBleed.CrimsonTempest[DestGUID] = nil
