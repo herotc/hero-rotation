@@ -348,8 +348,8 @@ local function Aoe()
   if S.FlameShock:IsReady() and ((not S.Hailstorm:IsAvailable()) and S.FlameShockDebuff:AuraActiveCount() < MeleeEnemies10yCount and S.FlameShockDebuff:AuraActiveCount() < 6) then
     if Everyone.CastCycle(S.FlameShock, Enemies40y, EvaluateCycleFlameShock, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 24"; end
   end
-  -- lightning_bolt,if=(active_dot.flame_shock>=active_enemies|active_dot.flame_shock>=4)&buff.primordial_wave.up&buff.maelstrom_weapon.stack>=5
-  if S.LightningBolt:IsCastable() and ((S.FlameShockDebuff:AuraActiveCount() >= MeleeEnemies10yCount or S.FlameShockDebuff:AuraActiveCount() >= 4) and Player:BuffUp(S.PrimordialWaveBuff) and Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
+  -- lightning_bolt,if=(active_dot.flame_shock>=active_enemies|active_dot.flame_shock>=4)&buff.primordial_wave.up&buff.maelstrom_weapon.stack>=5&!buff.splintered_elements.up
+  if S.LightningBolt:IsCastable() and ((S.FlameShockDebuff:AuraActiveCount() >= MeleeEnemies10yCount or S.FlameShockDebuff:AuraActiveCount() >= 4) and Player:BuffUp(S.PrimordialWaveBuff) and Player:BuffStack(S.MaelstromWeaponBuff) >= 5 and Player:BuffDown(S.SplinteredElementsBuff)) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt aoe 26"; end
   end
   -- frost_shock,if=buff.hailstorm.up

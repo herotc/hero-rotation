@@ -64,6 +64,8 @@ Spell.Shaman.Commons = {
   GroveInvigoration                     = Spell(322721),
   PustuleEruption                       = Spell(351094),
   VolatileSolvent                       = Spell(323074),
+  -- Legendary Effects (Shadowlands)
+  SplinteredElementsBuff                = Spell(354648),
   -- Trinket Effects
   AcquiredSwordBuff                     = Spell(368657),
   ScarsofFraternalStrifeBuff4           = Spell(368638),
