@@ -494,8 +494,8 @@ local function ST()
   if S.SerpentSting:IsReady() then
     if Everyone.CastTargetIf(S.SerpentSting, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingST2, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting st 44"; end
   end
-  -- wildfire_bomb,if=next_wi_bomb.shrapnel&focus>variable.mb_rs_cost*2&dot.serpent_sting.remains>5*gcd
-  if S.ShrapnelBomb:IsCastable() and (Player:Focus() > MBRSCost * 2 and Target:DebuffRemains(S.SerpentStingDebuff) > 5 * Player:GCD()) then
+  -- wildfire_bomb,if=next_wi_bomb.shrapnel&focus>variable.mb_rs_cost*2&dot.serpent_sting.remains>5*gcd&!set_bonus.tier28_2pc
+  if S.ShrapnelBomb:IsCastable() and (Player:Focus() > MBRSCost * 2 and Target:DebuffRemains(S.SerpentStingDebuff) > 5 * Player:GCD() and not Player:HasTier(28, 2)) then
     if Cast(S.ShrapnelBomb, nil, nil, not Target:IsSpellInRange(S.ShrapnelBomb)) then return "shrapnel_bomb st 46"; end
   end
   -- chakrams
