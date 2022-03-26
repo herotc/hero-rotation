@@ -161,7 +161,7 @@ local function Cooldowns()
   if (Player:BuffUp(S.SeraphimBuff) or not S.Seraphim:IsAvailable()) then
     local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
   end
   -- moment_of_glory,if=prev_gcd.1.avengers_shield&cooldown.avengers_shield.remains
