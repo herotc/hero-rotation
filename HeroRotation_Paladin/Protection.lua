@@ -201,13 +201,17 @@ local function Standard()
   if S.Judgment:IsReady() then
     if Everyone.CastCycle(S.Judgment, Enemies30y, EvaluateCycleJudgment200, not Target:IsSpellInRange(S.Judgment)) then return "judgment standard 14"; end
   end
-  -- consecration,if=!consecration.up
-  if S.Consecration:IsCastable() and (Player:BuffDown(S.ConsecrationBuff)) then
-    if Cast(S.Consecration) then return "consecration standard 16"; end
-  end
   -- vanquishers_hammer
   if S.VanquishersHammer:IsReady() then
-    if Cast(S.VanquishersHammer, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.VanquishersHammer)) then return "vanquishers_hammer standard 18"; end
+    if Cast(S.VanquishersHammer, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.VanquishersHammer)) then return "vanquishers_hammer standard 16"; end
+  end
+  -- consecration,if=!consecration.up
+  if S.Consecration:IsCastable() and (Player:BuffDown(S.ConsecrationBuff)) then
+    if Cast(S.Consecration) then return "consecration standard 18"; end
+  end
+  -- divine_toll
+  if S.DivineToll:IsCastable() then
+    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll standard 19"; end
   end
   -- blessed_hammer,strikes=2.4,if=charges=3
   if S.BlessedHammer:IsCastable() and (S.BlessedHammer:Charges() == 3) then
