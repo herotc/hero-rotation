@@ -55,6 +55,7 @@ local ActiveMitigationNeeded
 local IsTanking
 local Enemies8yMelee
 local EnemiesCount8yMelee
+local BlindFaithStacks = 0
 local VarBrandBuild = (S.AgonizingFlames:IsAvailable() and S.BurningAlive:IsAvailable() and S.CharredFlesh:IsAvailable())
 local RazelikhsDefilementEquipped = Player:HasLegendaryEquipped(27)
 local BlindFaithEquipped = (Player:HasLegendaryEquipped(238) or CovenantID == 1 and Player:HasUnity())
@@ -152,6 +153,9 @@ local function Precombat()
   if S.Fracture:IsCastable() and IsInMeleeRange then
     if Cast(S.Fracture) then return "fracture precombat 6"; end
   end
+  if S.Shear:IsCastable() and IsInMeleeRange then
+    if Cast(S.Shear) then return "shear precombat 8"; end
+  end
 end
 
 local function Defensives()
@@ -164,7 +168,7 @@ local function Defensives()
     end
   end
   -- Metamorphosis,if=!buff.metamorphosis.up&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<15
-  if S.Metamorphosis:IsCastable() and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold and (Player:BuffDown(S.MetamorphosisBuff) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff)) or Target:TimeToDie() < 15) then
+  if S.Metamorphosis:IsCastable() and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold and (Player:BuffDown(S.MetamorphosisBuff) and ((not S.SinfulBrand:IsAvailable()) or Target:DebuffDown(S.SinfulBrandDebuff)) or Target:TimeToDie() < 15) then
     if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis) then return "metamorphosis defensives"; end
   end
   -- Fiery Brand
@@ -217,7 +221,7 @@ end
 
 local function Normal()
   -- infernal_strike
-  if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (S.InfernalStrike:TimeSinceLastCast() > 2) then
+  if S.InfernalStrike:IsCastable() and ((not Settings.Vengeance.ConserveInfernalStrike) or S.InfernalStrike:ChargesFractional() > 1.9) and (S.InfernalStrike:TimeSinceLastCast() > 2) then
     if Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike normal 2"; end
   end
   -- bulk_extraction
@@ -225,11 +229,11 @@ local function Normal()
   if S.BulkExtraction:IsCastable() and (SoulFragments <= 5 - mathmax(5, EnemiesCount8yMelee)) then
     if Cast(S.BulkExtraction) then return "bulk_extraction normal 4"; end
   end
-  -- Manually added: spirit_bomb if Kyrian, Blind Faith legendary, Spirit Bomb, and we've just casted Elysian Decree and one Spirit Bomb
+  -- Manually added: spirit_bomb,if=covenant.kyrian&runeforge.blind_faith&talent.spirit_bomb&prev_gcd.2.elysian_decree&prev_gcd.1.spirit_bomb
   if S.SpiritBomb:IsCastable() and IsInAoERange and (KyrianLegendaryAndSpB and Player:PrevGCD(2, S.ElysianDecree) and Player:PrevGCD(1, S.SpiritBomb)) then
     if Cast(S.SpiritBomb) then return "spirit_bomb normal 6"; end
   end
-  -- spirit_bomb,if=((buff.metamorphosis.up&talent.fracture.enabled&soul_fragments>=3)|soul_fragments>=4)
+  -- spirit_bomb,if=((buff.metamorphosis.up&talent.fracture.enabled&soul_fragments>=3&(!covenant.kyrian|cooldown.elysian_decree.remains>gcd*2))|soul_fragments>=4)
   -- Note: Added Elysian Decree check so we don't waste SoulFragments when it's ready
   if S.SpiritBomb:IsReady() and IsInAoERange and ((Player:BuffUp(S.Metamorphosis) and S.Fracture:IsAvailable() and SoulFragments >= 3 and (CovenantID ~= 1 or S.ElysianDecree:CooldownRemains() > Player:GCD() * 2)) or SoulFragments >= 4) then
     if Cast(S.SpiritBomb) then return "spirit_bomb normal 8"; end
@@ -238,30 +242,30 @@ local function Normal()
   -- Manual add: ,if=talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled
   -- This way we don't waste potential Meta uptime
   -- Note: Also add Blind Faith check so we don't waste buff time when we could be generating more stacks
-  if S.FelDevastation:IsReady() and ((S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) and (Player:BuffDown(S.BlindFaithBuff) or select(16, Player:BuffInfo(S.BlindFaithBuff, false, true)) == 20)) then
+  if S.FelDevastation:IsReady() and ((S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) and (Player:BuffDown(S.BlindFaithBuff) or BlindFaithStacks == 20)) then
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation normal 10"; end
   end
-  -- Manually added: soul_cleave during Blind Faith
+  -- Manually added: soul_cleave,if=buff.blind_faith.up&talent.spirit_bomb&soul_fragments>=3&(talent.fracture&cooldown.fracture.remains>gcd-0.5|!talent.fracture)
   if S.SoulCleave:IsReady() and (Player:BuffUp(S.BlindFaithBuff) and S.SpiritBomb:IsAvailable() and SoulFragments >= 3 and (S.Fracture:IsAvailable() and S.Fracture:CooldownRemains() > Player:GCD() - 0.5 or not S.Fracture:IsAvailable())) then
     if Cast(S.SoulCleave, nil, nil, not Target:IsSpellInRange(S.SoulCleave)) then return "soul_cleave normal 12"; end
   end
-  -- soul_cleave,if=((talent.spirit_bomb.enabled&soul_fragments=0)|!talent.spirit_bomb.enabled)&((talent.fracture.enabled&fury>=55)|(!talent.fracture.enabled&fury>=70)|cooldown.fel_devastation.remains>target.time_to_die|(buff.metamorphosis.up&((talent.fracture.enabled&fury>=35)|(!talent.fracture.enabled&fury>=50))))
+  -- soul_cleave,if=/soul_cleave,if=((talent.spirit_bomb.enabled&soul_fragments=0&buff.blind_faith.down)|!talent.spirit_bomb.enabled)&((talent.fracture.enabled&fury>=55)|(!talent.fracture.enabled&fury>=70)|cooldown.fel_devastation.remains>target.time_to_die|(buff.metamorphosis.up&((talent.fracture.enabled&fury>=35)|(!talent.fracture.enabled&fury>=50))))
   -- Note: Added Blind Faith buff check if SpiritBomb is available
-  if S.SoulCleave:IsReady() and (((S.SpiritBomb:IsAvailable() and SoulFragments == 0 and Player:BuffDown(S.BlindFaithBuff)) or not S.SpiritBomb:IsAvailable()) and ((S.Fracture:IsAvailable() and Player:Fury() >= 55) or ((not S.Fracture:IsAvailable()) and Player:Fury() >= 70) or S.FelDevastation:CooldownRemains() > Target:TimeToDie() or (Player:BuffUp(S.MetamorphosisBuff) and ((S.Fracture:IsAvailable() and Player:Fury() >= 35) or (not S.Fracture:IsAvailable() and Player:Fury() >= 50))))) then
+  if S.SoulCleave:IsReady() and (((S.SpiritBomb:IsAvailable() and SoulFragments == 0 and Player:BuffDown(S.BlindFaithBuff)) or not S.SpiritBomb:IsAvailable()) and ((S.Fracture:IsAvailable() and Player:Fury() >= 55) or ((not S.Fracture:IsAvailable()) and Player:Fury() >= 70) or S.FelDevastation:CooldownRemains() > Target:TimeToDie() or (Player:BuffUp(S.MetamorphosisBuff) and ((S.Fracture:IsAvailable() and Player:Fury() >= 35) or ((not S.Fracture:IsAvailable()) and Player:Fury() >= 50))))) then
     if Cast(S.SoulCleave, nil, nil, not Target:IsSpellInRange(S.SoulCleave)) then return "soul_cleave normal 14"; end
   end
   -- Manually added: immolation_aura,if=set_bonus.tier28_4pc&buff.immolation_aura.down
   if S.ImmolationAura:IsCastable() and (Player:HasTier(28, 4) and Player:BuffDown(S.ImmolationAuraBuff)) then
     if Cast(S.ImmolationAura) then return "immolation_aura normal 16"; end
   end
-  -- fracture,if=((talent.spirit_bomb.enabled&soul_fragments<=3)|(!talent.spirit_bomb.enabled&((buff.metamorphosis.up&fury<=55)|(buff.metamorphosis.down&fury<=70))))
-  if S.Fracture:IsCastable() and IsInMeleeRange and ((S.SpiritBomb:IsAvailable() and SoulFragments <= 3) or (not S.SpiritBomb:IsAvailable() and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Fury() <= 55) or (Player:BuffDown(S.MetamorphosisBuff) and Player:Fury() <= 70)))) then
-    if Cast(S.Fracture) then return "fracture normal 18"; end
-  end
-  -- immolation_aura,if=((variable.brand_build&cooldown.fiery_brand.remains>10)|!variable.brand_build)&fury<=90
+  -- immolation_aura,if=((variable.brand_build&cooldown.fiery_brand.remains>10)|!variable.brand_build)&(fury<=90&!talent.fallout|talent.fallout&soul_fragments<=4)
   -- Manually added: Don't cast if we'll cap SoulFragments with Fallout (we have a 60-70% chance to get a fragment per target)
   if S.ImmolationAura:IsCastable() and (((VarBrandBuild and S.FieryBrand:CooldownRemains() > 10) or not VarBrandBuild) and (Player:Fury() <= 90 and (not S.Fallout:IsAvailable()) or S.Fallout:IsAvailable() and SoulFragments <= 5 - mathmin(5, EnemiesCount8yMelee * 0.6))) then
     if Cast(S.ImmolationAura) then return "immolation_aura normal 20"; end
+  end
+  -- fracture,if=((talent.spirit_bomb.enabled&soul_fragments<=3)|(!talent.spirit_bomb.enabled&((buff.metamorphosis.up&fury<=55)|(buff.metamorphosis.down&fury<=70))))
+  if S.Fracture:IsCastable() and IsInMeleeRange and ((S.SpiritBomb:IsAvailable() and SoulFragments <= 3) or ((not S.SpiritBomb:IsAvailable()) and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Fury() <= 55) or (Player:BuffDown(S.MetamorphosisBuff) and Player:Fury() <= 70)))) then
+    if Cast(S.Fracture) then return "fracture normal 18"; end
   end
   -- felblade,if=fury<=60
   if S.Felblade:IsCastable() and (Player:Fury() <= 60) then
@@ -279,7 +283,7 @@ local function Normal()
   if S.Shear:IsReady() and IsInMeleeRange then
     if Cast(S.Shear) then return "shear normal 26"; end
   end
-  -- Manually adding Fracture as a fallback filler
+  -- Manually added: fracture as a fallback filler
   if S.Fracture:IsCastable() and IsInMeleeRange then
     if Cast(S.Fracture) then return "fracture normal 28"; end
   end
@@ -303,6 +307,12 @@ local function APL()
 
   ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
+
+  if Player:BuffUp(S.BlindFaithBuff) then
+    BlindFaithStacks = select(16, Player:BuffInfo(S.BlindFaithBuff, false, true))
+  else
+    BlindFaithStacks = 0
+  end
 
   if Everyone.TargetIsValid() then
     -- Precombat
