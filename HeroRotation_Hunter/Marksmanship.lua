@@ -337,6 +337,10 @@ local function St()
   if S.AimedShot:IsReady() then
     if Everyone.CastTargetIf(S.AimedShot, Enemies40y, "min", EvaluateTargetIfFilterAimedShot, EvaluateTargetIfAimedShot, not TargetInRange40y) then return "aimed_shot st 40"; end
   end
+  -- steady_shot,if=buff.steady_focus.remains<5&talent.steady_focus&buff.resonating_arrow.down
+  if S.SteadyShot:IsCastable() and (Player:BuffRemains(S.SteadyFocusBuff) < 5 and S.SteadyFocus:IsAvailable() and Target:DebuffDown(S.ResonatingArrowDebuff)) then
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_focus st 41"; end
+  end
   -- rapid_fire,if=(cooldown.resonating_arrow.remains>10|!covenant.kyrian|!talent.double_tap|soulbind.effusive_anima_accelerator)&focus+cast_regen<focus.max&(buff.double_tap.down&buff.eagletalons_true_focus.down|talent.streamline)
   if S.RapidFire:IsCastable() and ((S.ResonatingArrow:CooldownRemains() > 10 or CovenantID ~= 1 or (not S.DoubleTap:IsAvailable()) or S.EffusiveAnimaAccelerator:SoulbindEnabled()) and Player:FocusP() + Player:FocusCastRegen(S.RapidFire:ExecuteTime()) < Player:FocusMax() and (Player:BuffDown(S.DoubleTap) and Player:BuffDown(S.EagletalonsTrueFocusBuff) or S.Streamline:IsAvailable())) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 42"; end
