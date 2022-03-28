@@ -76,6 +76,7 @@ local BalespidersEquipped = Player:HasLegendaryEquipped(173)
 local WilfredsSigilEquipped = Player:HasLegendaryEquipped(162)
 local ImplosivePotentialEquipped = Player:HasLegendaryEquipped(170)
 local ShardofAnnihilationEquipped = Player:HasLegendaryEquipped(249)
+local DecayingSoulSatchelEquipped = Player:HasLegendaryEquipped(250)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -104,6 +105,7 @@ HL:RegisterForEvent(function()
   WilfredsSigilEquipped = Player:HasLegendaryEquipped(162)
   ImplosivePotentialEquipped = Player:HasLegendaryEquipped(170)
   ShardofAnnihilationEquipped = Player:HasLegendaryEquipped(249)
+  DecayingSoulSatchelEquipped = Player:HasLegendaryEquipped(250)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -231,16 +233,16 @@ local function Precombat()
 end
 
 local function Covenant()
-  -- soul_rot,if=soulbind.grove_invigoration&(variable.next_tyrant_cd<20|variable.next_tyrant_cd>30)
-  if S.SoulRot:IsReady() and (S.GroveInvigoration:SoulbindEnabled() and (VarNextTyrantCD < 20 or VarNextTyrantCD > 30)) then
+  -- soul_rot,if=(soulbind.field_of_blossoms|runeforge.decaying_soul_satchel)&pet.demonic_tyrant.active
+  if S.SoulRot:IsReady() and ((S.FieldofBlossoms:SoulbindEnabled() or DecayingSoulSatchelEquipped) and DemonicTyrantTime() > 0) then
     if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot covenant 2"; end
   end
-  -- soul_rot,if=soulbind.field_of_blossoms&pet.demonic_tyrant.active
-  if S.SoulRot:IsReady() and (S.FieldofBlossoms:SoulbindEnabled() and DemonicTyrantTime() > 0) then
+  -- soul_rot,if=soulbind.grove_invigoration&!runeforge.decaying_soul_satchel&(variable.next_tyrant_cd<20|variable.next_tyrant_cd>30)
+  if S.SoulRot:IsReady() and (S.GroveInvigoration:SoulbindEnabled() and (not DecayingSoulSatchelEquipped) and (VarNextTyrantCD < 20 or VarNextTyrantCD > 30)) then
     if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot covenant 4"; end
   end
-  -- soul_rot,if=soulbind.wild_hunt_tactics&!pet.demonic_tyrant.active&variable.next_tyrant_cd>18
-  if S.SoulRot:IsReady() and (S.WildHuntTactics:SoulbindEnabled() and DemonicTyrantTime() == 0 and VarNextTyrantCD > 18) then
+  -- soul_rot,if=soulbind.wild_hunt_tactics&!runeforge.decaying_soul_satchel&!pet.demonic_tyrant.active&variable.next_tyrant_cd>18
+  if S.SoulRot:IsReady() and (S.WildHuntTactics:SoulbindEnabled() and (not DecayingSoulSatchelEquipped) and DemonicTyrantTime() == 0 and VarNextTyrantCD > 18) then
     if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot covenant 6"; end
   end
   -- decimating_bolt,target_if=min:target.health.pct,if=!variable.use_bolt_timings&soulbind.lead_by_example&(pet.demonic_tyrant.active&soul_shard<2|!pet.demonic_tyrant.active&variable.next_tyrant_cd>40)
