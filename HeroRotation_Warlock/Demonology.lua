@@ -215,8 +215,26 @@ local function Precombat()
     if S.Fleshcraft:IsCastable() then
       if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 4"; end
     end
-    -- variable,name=first_tyrant_time,op=set,value=10
-    VarFirstTyrantTime = 10
+    -- variable,name=first_tyrant_time,op=set,value=12
+    VarFirstTyrantTime = 12
+    -- variable,name=first_tyrant_time,op=add,value=action.grimoire_felguard.execute_time,if=talent.grimoire_felguard.enabled
+    if S.GrimoireFelguard:IsAvailable() then
+      VarFirstTyrantTime = VarFirstTyrantTime + S.GrimoireFelguard:ExecuteTime()
+    end
+    -- variable,name=first_tyrant_time,op=add,value=action.summon_vilefiend.execute_time,if=talent.summon_vilefiend.enabled
+    if S.SummonVilefiend:IsAvailable() then
+      VarFirstTyrantTime = VarFirstTyrantTime + S.SummonVilefiend:ExecuteTime()
+    end
+    -- variable,name=first_tyrant_time,op=add,value=gcd.max,if=talent.grimoire_felguard.enabled|talent.summon_vilefiend.enabled
+    if S.GrimoireFelguard:IsAvailable() or S.SummonVilefiend:IsAvailable() then
+      VarFirstTyrantTime = VarFirstTyrantTime + Player:GCD() + 0.5
+    end
+    -- variable,name=first_tyrant_time,op=sub,value=action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time
+    VarFirstTyrantTime = VarFirstTyrantTime - (S.SummonDemonicTyrant:ExecuteTime() + S.ShadowBolt:ExecuteTime())
+    -- variable,name=first_tyrant_time,op=min,value=10
+    if VarFirstTyrantTime < 10 then
+      VarFirstTyrantTime = 10
+    end
     -- variable,name=in_opener,op=set,value=1
     VarInOpener = true
     -- variable,name=use_bolt_timings,op=set,value=runeforge.balespiders_burning_core&runeforge.shard_of_annihilation
