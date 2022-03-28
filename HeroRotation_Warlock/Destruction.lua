@@ -214,13 +214,17 @@ local function Aoe()
   if S.SoulRot:IsCastable() then
     if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot aoe 4"; end
   end
+  -- impending_catastrophe
+  if S.ImpendingCatastrophe:IsCastable() then
+    if Cast(S.ImpendingCatastrophe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ImpendingCatastrophe)) then return "impending_catastrophe aoe 6"; end
+  end
   -- channel_demonfire,if=dot.immolate.remains>cast_time
   if S.ChannelDemonfire:IsCastable() and (Target:DebuffRemains(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime()) then
-    if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire aoe 6"; end
+    if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire aoe 8"; end
   end
-  -- immolate,cycle_targets=1,if=remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>remains)
-  if S.Immolate:IsCastable() then
-    if Everyone.CastCycle(S.Immolate, Enemies40y, EvaluateCycleImmolateAoE, not Target:IsSpellInRange(S.Immolate)) then return "immolate aoe 8"; end
+  -- immolate,cycle_targets=1,if=active_enemies<5&remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>remains)
+  if S.Immolate:IsCastable() and (EnemiesCount40y < 5) then
+    if Everyone.CastCycle(S.Immolate, Enemies40y, EvaluateCycleImmolateAoE, not Target:IsSpellInRange(S.Immolate)) then return "immolate aoe 10"; end
   end
   -- call_action_list,name=cds
   if CDsON() then
@@ -238,7 +242,7 @@ local function Aoe()
   end
   -- rain_of_fire
   if S.RainofFire:IsReady() and Player:SoulShardsP() >= 3 then
-    if Cast(S.RainofFire, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "rain_of_fire aoe 10"; end
+    if Cast(S.RainofFire, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "rain_of_fire aoe 12"; end
   end
   -- havoc,cycle_targets=1,if=!(self.target=target)
   if S.Havoc:IsCastable() then
@@ -250,39 +254,37 @@ local function Aoe()
       end
     end
   end
-  -- decimating_bolt,if=(soulbind.lead_by_example.enabled|!talent.fire_and_brimstone.enabled)
-  if S.DecimatingBolt:IsCastable() and (S.LeadByExample:SoulbindEnabled() or not S.FireandBrimstone:IsAvailable()) then
-    if Cast(S.DecimatingBolt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt aoe 12"; end
+  -- decimating_bolt
+  if S.DecimatingBolt:IsCastable() then
+    if Cast(S.DecimatingBolt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt aoe 14"; end
   end
   -- incinerate,if=talent.fire_and_brimstone.enabled&buff.backdraft.up&soul_shard<5-0.2*active_enemies
   if S.Incinerate:IsCastable() and (S.FireandBrimstone:IsAvailable() and Player:BuffUp(S.Backdraft) and Player:SoulShardsP() < 5 - 0.2 * EnemiesCount8ySplash) then
-    if Cast(S.Incinerate, nil, nil, not Target:IsSpellInRange(S.Incinerate)) then return "incinerate aoe 14"; end
+    if Cast(S.Incinerate, nil, nil, not Target:IsSpellInRange(S.Incinerate)) then return "incinerate aoe 16"; end
   end
   -- soul_fire
   if S.SoulFire:IsCastable() then
-    if Cast(S.SoulFire, nil, nil, not Target:IsSpellInRange(S.SoulFire)) then return "soul_fire aoe 16"; end
+    if Cast(S.SoulFire, nil, nil, not Target:IsSpellInRange(S.SoulFire)) then return "soul_fire aoe 18"; end
   end
   -- conflagrate,if=buff.backdraft.down
   if S.Conflagrate:IsCastable() and (Player:BuffDown(S.Backdraft)) then
-    if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate aoe 18"; end
+    if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate aoe 20"; end
   end
   -- shadowburn,if=target.health.pct<20
   if S.Shadowburn:IsCastable() and (Target:HealthPercentage() < 20) then
-    if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn aoe 20"; end
+    if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn aoe 22"; end
   end
-  if (not (S.FireandBrimstone:IsAvailable() or S.Inferno:IsAvailable())) then
-    -- scouring_tithe,if=!(talent.fire_and_brimstone.enabled|talent.inferno.enabled)
-    if S.ScouringTithe:IsCastable() then
-      if Cast(S.ScouringTithe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ScouringTithe)) then return "decimating_bolt aoe 22"; end
-    end
-    -- impending_catastrophe,if=!(talent.fire_and_brimstone.enabled|talent.inferno.enabled)
-    if S.ImpendingCatastrophe:IsCastable() then
-      if Cast(S.ImpendingCatastrophe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ImpendingCatastrophe)) then return "impending_catastrophe aoe 24"; end
-    end
+  -- immolate
+  if S.Immolate:IsCastable() and Target:DebuffRefreshable(S.ImmolateDebuff) then
+    if Cast(S.Immolate, nil, nil, not Target:IsSpellInRange(S.Immolate)) then return "immolate aoe 24"; end
+  end
+  -- scouring_tithe
+  if S.ScouringTithe:IsCastable() then
+    if Cast(S.ScouringTithe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ScouringTithe)) then return "decimating_bolt aoe 26"; end
   end
   -- incinerate
   if S.Incinerate:IsCastable() then
-    if Cast(S.Incinerate, nil, nil, not Target:IsSpellInRange(S.Incinerate)) then return "incinerate aoe 26"; end
+    if Cast(S.Incinerate, nil, nil, not Target:IsSpellInRange(S.Incinerate)) then return "incinerate aoe 28"; end
   end
 end
 
