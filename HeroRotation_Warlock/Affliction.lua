@@ -40,16 +40,28 @@ local S = Spell.Warlock.Affliction
 -- Items
 local I = Item.Warlock.Affliction
 local TrinketsOnUseExcludes = {--  I.TrinketName:ID(),
+  I.ArchitectsIngenuityCore:ID(),
+  I.CosmicAspirantsBadgeofFerocity:ID(),
+  I.CosmicGladiatorsBadgeofFerocity:ID(),
+  I.CosmicGladiatorsResonator:ID(),
   I.DarkmoonDeckPutrescence:ID(),
   I.DreadfireVessel:ID(),
   I.EbonsoulVise:ID(),
   I.EmpyrealOrdnance:ID(),
+  I.FigureheadoftheNaglfar:ID(),
   I.FlameofBattle:ID(),
   I.GlyphofAssimilation:ID(),
+  I.GrimEclipse:ID(),
+  I.HornofValor:ID(),
   I.InscrutableQuantumDevice:ID(),
   I.InstructorsDivineBell:ID(),
   I.MacabreSheetMusic:ID(),
+  I.MoonlitPrism:ID(),
+  I.MrrgriasFavor:ID(),
+  I.ObeliskoftheVoid:ID(),
   I.OverflowingAnimaCage:ID(),
+  I.ResonantReservoir:ID(),
+  I.ScarsofFraternalStrife:ID(),
   I.ShadowedOrbofTorment:ID(),
   I.SinfulAspirantsBadgeofFerocity:ID(),
   I.SinfulGladiatorsBadgeofFerocity:ID(),
@@ -57,6 +69,8 @@ local TrinketsOnUseExcludes = {--  I.TrinketName:ID(),
   I.SoullettingRuby:ID(),
   I.SunbloodAmethyst:ID(),
   I.TabletofDespair:ID(),
+  I.TheFirstSigil:ID(),
+  I.ToeKneesPromise:ID(),
   I.UnchainedGladiatorsShackles:ID(),
   I.WakenersFrond:ID(),
 }
@@ -406,6 +420,10 @@ local function ItemFunc()
 end
 
 local function DelayedTrinkets()
+  -- use_item,name=grim_eclipse,if=(covenant.night_fae&cooldown.soul_rot.remains<6)|(covenant.venthyr&cooldown.impending_catastrophe.remains<6)|(covenant.necrolord|covenant.kyrian|covenant.none)
+  if I.GrimEclipse:IsEquippedAndReady() and ((CovenantID == 3 and S.SoulRot:CooldownRemains() < 6) or (CovenantID == 2 and S.ImpendingCatastrophe:CooldownRemains() < 6) or (CovenantID == 4 or CovenantID == 1 or CovenantID == 0)) then
+    if Cast(I.GrimEclipse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "grim_eclipse delayed_trinkets 1"; end
+  end
   -- use_item,name=empyreal_ordnance,if=(covenant.night_fae&cooldown.soul_rot.remains<20)|(covenant.venthyr&cooldown.impending_catastrophe.remains<20)|(covenant.necrolord|covenant.kyrian|covenant.none)
   if I.EmpyrealOrdnance:IsEquippedAndReady() and ((CovenantID == 3 and S.SoulRot:CooldownRemains() < 20) or (CovenantID == 2 and S.ImpendingCatastrophe:CooldownRemains() < 20) or (CovenantID == 4 or CovenantID == 1 or CovenantID == 0)) then
     if Cast(I.EmpyrealOrdnance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "empyreal_ordnance delayed_trinkets 2"; end
@@ -425,58 +443,90 @@ local function DelayedTrinkets()
 end
 
 local function StatTrinkets()
+  -- use_item,name=the_first_sigil
+  if I.TheFirstSigil:IsEquippedAndReady() then
+    if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil stat_trinkets 2"; end
+  end
+  -- use_item,name=scars_of_fraternal_strife
+  if I.ScarsofFraternalStrife:IsEquippedAndReady() then
+    if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife stat_trinkets 4"; end
+  end
   -- use_item,name=inscrutable_quantum_device
   if I.InscrutableQuantumDevice:IsEquippedAndReady() then
-    if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device stat_trinkets 2"; end
+    if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device stat_trinkets 6"; end
   end
   -- use_item,name=instructors_divine_bell
   if I.InstructorsDivineBell:IsEquippedAndReady() then
-    if Cast(I.InstructorsDivineBell, nil, Settings.Commons.DisplayStyle.Trinkets) then return "instructors_divine_bell stat_trinkets 4"; end
+    if Cast(I.InstructorsDivineBell, nil, Settings.Commons.DisplayStyle.Trinkets) then return "instructors_divine_bell stat_trinkets 8"; end
   end
   -- use_item,name=overflowing_anima_cage
   if I.OverflowingAnimaCage:IsEquippedAndReady() then
-    if Cast(I.OverflowingAnimaCage, nil, Settings.Commons.DisplayStyle.Trinkets) then return "overflowing_anima_cage stat_trinkets 6"; end
+    if Cast(I.OverflowingAnimaCage, nil, Settings.Commons.DisplayStyle.Trinkets) then return "overflowing_anima_cage stat_trinkets 10"; end
   end
   -- use_item,name=darkmoon_deck_putrescence
   if I.DarkmoonDeckPutrescence:IsEquippedAndReady() then
-    if Cast(I.DarkmoonDeckPutrescence, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_putrescence stat_trinkets 8"; end
+    if Cast(I.DarkmoonDeckPutrescence, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_putrescence stat_trinkets 12"; end
   end
   -- use_item,name=macabre_sheet_music
   if I.MacabreSheetMusic:IsEquippedAndReady() then
-    if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music stat_trinkets 10"; end
+    if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music stat_trinkets 14"; end
   end
   -- use_item,name=flame_of_battle
   if I.FlameofBattle:IsEquippedAndReady() then
-    if Cast(I.FlameofBattle, nil, Settings.Commons.DisplayStyle.Trinkets) then return "flame_of_battle stat_trinkets 12"; end
+    if Cast(I.FlameofBattle, nil, Settings.Commons.DisplayStyle.Trinkets) then return "flame_of_battle stat_trinkets 16"; end
   end
   -- use_item,name=wakeners_frond
   if I.WakenersFrond:IsEquippedAndReady() then
-    if Cast(I.WakenersFrond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "wakeners_frond stat_trinkets 14"; end
+    if Cast(I.WakenersFrond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "wakeners_frond stat_trinkets 18"; end
   end
   -- use_item,name=tablet_of_despair
   if I.TabletofDespair:IsEquippedAndReady() then
-    if Cast(I.TabletofDespair, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tablet_of_despair stat_trinkets 16"; end
+    if Cast(I.TabletofDespair, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tablet_of_despair stat_trinkets 20"; end
   end
   -- use_item,name=sinful_aspirants_badge_of_ferocity
   if I.SinfulAspirantsBadgeofFerocity:IsEquippedAndReady() then
-    if Cast(I.SinfulAspirantsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sinful_aspirants_badge_of_ferocity stat_trinkets 18"; end
+    if Cast(I.SinfulAspirantsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sinful_aspirants_badge_of_ferocity stat_trinkets 22"; end
+  end
+  -- use_item,name=cosmic_aspirants_badge_of_ferocity
+  if I.CosmicAspirantsBadgeofFerocity:IsEquippedAndReady() then
+    if Cast(I.CosmicAspirantsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cosmic_aspirants_badge_of_ferocity stat_trinkets 24"; end
   end
   -- use_item,name=sinful_gladiators_badge_of_ferocity
   if I.SinfulGladiatorsBadgeofFerocity:IsEquippedAndReady() then
-    if Cast(I.SinfulGladiatorsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sinful_gladiators_badge_of_ferocity stat_trinkets 20"; end
+    if Cast(I.SinfulGladiatorsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sinful_gladiators_badge_of_ferocity stat_trinkets 26"; end
+  end
+  -- use_item,name=cosmic_gladiators_badge_of_ferocity
+  if I.CosmicGladiatorsBadgeofFerocity:IsEquippedAndReady() then
+    if Cast(I.CosmicGladiatorsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cosmic_gladiators_badge_of_ferocity stat_trinkets 28"; end
+  end
+  -- use_item,name=obelisk_of_the_void
+  if I.ObeliskoftheVoid:IsEquippedAndReady() then
+    if Cast(I.CosmicGladiatorsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "obelisk_of_the_void stat_trinkets 30"; end
+  end
+  -- use_item,name=horn_of_valor
+  if I.HornofValor:IsEquippedAndReady() then
+    if Cast(I.HornofValor, nil, Settings.Commons.DisplayStyle.Trinkets) then return "horn_of_valor stat_trinkets 32"; end
+  end
+  -- use_item,name=moonlit_prism
+  if I.MoonlitPrism:IsEquippedAndReady() then
+    if Cast(I.MoonlitPrism, nil, Settings.Commons.DisplayStyle.Trinkets) then return "moonlit_prism stat_trinkets 34"; end
+  end
+  -- use_item,name=figurehead_of_the_naglfar
+  if I.FigureheadoftheNaglfar:IsEquippedAndReady() then
+    if Cast(I.FigureheadoftheNaglfar, nil, Settings.Commons.DisplayStyle.Trinkets) then return "figurehead_of_the_naglfar stat_trinkets 36"; end
   end
   if (CDsON()) then
     -- blood_fury
     if S.BloodFury:IsCastable() then
-      if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury stat_trinkets 22"; end
+      if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury stat_trinkets 38"; end
     end
     -- fireblood
     if S.Fireblood:IsCastable() then
-      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood stat_trinkets 24"; end
+      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood stat_trinkets 40"; end
     end
     -- berserking
     if S.Berserking:IsCastable() then
-      if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking stat_trinkets 26"; end
+      if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking stat_trinkets 42"; end
     end
   end
 end
@@ -501,6 +551,30 @@ local function DamageTrinkets()
   -- use_item,name=ebonsoul_vise
   if I.EbonsoulVise:IsEquippedAndReady() then
     if Cast(I.EbonsoulVise, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "ebonsoul_vise damage_trinkets 10"; end
+  end
+  -- use_item,name=resonant_reservoir
+  if I.ResonantReservoir:IsEquippedAndReady() then
+    if Cast(I.ResonantReservoir, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "resonant_reservoir damage_trinkets 12"; end
+  end
+  -- use_item,name=architects_ingenuity_core
+  if I.ArchitectsIngenuityCore:IsEquippedAndReady() then
+    if Cast(I.ArchitectsIngenuityCore, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "architects_ingenuity_core damage_trinkets 14"; end
+  end
+  -- use_item,name=grim_eclipse
+  if I.GrimEclipse:IsEquippedAndReady() then
+    if Cast(I.GrimEclipse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "grim_eclipse damage_trinkets 16"; end
+  end
+  -- use_item,name=toe_knees_promise
+  if I.ToeKneesPromise:IsEquippedAndReady() then
+    if Cast(I.ToeKneesPromise, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "toe_knees_promise damage_trinkets 18"; end
+  end
+  -- use_item,name=mrrgrias_favor
+  if I.MrrgriasFavor:IsEquippedAndReady() then
+    if Cast(I.MrrgriasFavor, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "mrrgrias_favor damage_trinkets 20"; end
+  end
+  -- use_item,name=cosmic_gladiators_resonator
+  if I.CosmicGladiatorsResonator:IsEquippedAndReady() then
+    if Cast(I.CosmicGladiatorsResonator, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "cosmic_gladiators_resonator damage_trinkets 22"; end
   end
 end
 
