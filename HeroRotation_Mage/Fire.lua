@@ -318,6 +318,10 @@ local function Precombat()
     if S.MirrorImage:IsCastable() and CDsON() and Settings.Fire.MirrorImagesBeforePull then
       if Cast(S.MirrorImage, Settings.Fire.GCDasOffGCD.MirrorImage) then return "mirror_image precombat"; end
     end
+    -- fleshcraft
+    if S.Fleshcraft:IsCastable() then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat"; end
+    end
     -- pyroblast
     if S.Pyroblast:IsReady() and not Player:IsCasting(S.Pyroblast) then
       if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast precombat"; end

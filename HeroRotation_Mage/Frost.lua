@@ -128,8 +128,12 @@ local function Precombat()
   end
   -- snapshot_stats
   if Everyone.TargetIsValid() then
+    -- fleshcraft
+    if S.Fleshcraft:IsCastable() then
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 5"; end
+    end
     -- Manually added : precast Tome of monstruous Constructions
-    if I.TomeofMonstruousConstructions:IsEquippedAndReady() and not Player:AuraInfo(S.TomeofMonstruousConstructionsBuff) then
+    if I.TomeofMonstruousConstructions:IsEquippedAndReady() and Player:BuffDown(S.TomeofMonstruousConstructionsBuff) then
       if Cast(I.TomeofMonstruousConstructions, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tome_of_monstruous_constructions precombat 6"; end
     end
     -- blizzard,if=active_enemies>=2
