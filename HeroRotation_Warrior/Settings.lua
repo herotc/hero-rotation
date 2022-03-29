@@ -67,6 +67,7 @@ HR.GUISettings.APL.Warrior = {
     }
   },
   Protection = {
+    DisableHeroicCharge = false,
     DisplayStyle = {
       Defensive = "Suggested"
     },
@@ -101,3 +102,4 @@ CreatePanelOption("CheckButton", CP_Fury, "APL.Warrior.Fury.HideCastQueue", "Hid
 
 -- Protection Settings
 CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection")
+CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.DisableHeroicCharge", "Disable Heroic Charge", "Enable this setting to no longer receive the CastQueue 'Heroic Charge' suggestion (Heroic Leap, followed by Charge).")

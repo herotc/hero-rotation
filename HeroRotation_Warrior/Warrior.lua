@@ -149,6 +149,8 @@ Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   BoomingVoice                          = Spell(202743),
   Ravager                               = Spell(228920),
   UnstoppableForce                      = Spell(275336),
+  -- Tier Effects
+  OutburstBuff                          = Spell(364010),
 })
 
 -- Items
