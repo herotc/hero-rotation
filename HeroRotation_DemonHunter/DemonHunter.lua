@@ -55,6 +55,8 @@ Spell.DemonHunter.Commons = {
   VolatileSolventHumanBuff              = Spell(323491),
   -- Trinket Effects
   AcquiredAxeBuff                       = Spell(368656),
+  AcquiredSwordBuff                     = Spell(368657),
+  AcquiredWandBuff                      = Spell(368654),
   -- Other
   Pool                                  = Spell(999910)
 }

@@ -33,7 +33,7 @@ local I = Item.DemonHunter.Vengeance
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.PulsatingStoneheart:ID(),
+  I.CacheofAcquiredTreasures:ID(),
 }
 
 -- GUI Settings
@@ -196,6 +196,10 @@ local function Cooldowns()
   -- potion
   if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
     if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_unbridled_fury cooldowns 2"; end
+  end
+  -- Manually added: use_item,name=cache_of_acquired_treasures,if=buff.acquired_sword.up
+  if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredSwordBuff)) then
+    if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures 3"; end
   end
   -- use_items
   if Settings.Commons.Enabled.Trinkets then
