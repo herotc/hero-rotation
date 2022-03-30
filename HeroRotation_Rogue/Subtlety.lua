@@ -47,25 +47,27 @@ local EffectiveComboPoints, ComboPoints, ComboPointsDeficit
 local PriorityRotation
 
 -- Covenant and Legendaries
-local Covenant = Player:Covenant()
+local CovenantId = Player:CovenantID()
+local IsKyrian, IsVenthyr, IsNightFae, IsNecrolord = (CovenantId == 1), (CovenantId == 2), (CovenantId == 3), (CovenantId == 4)
 local DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
 local TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
 local AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
 local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
 local FinalityEquipped = Player:HasLegendaryEquipped(126)
-local ObedienceEquipped = Player:HasLegendaryEquipped(229) or (Player:HasUnity() and Covenant == "Venthyr")
-local ResoundingClarityEquipped = Player:HasLegendaryEquipped(231) or (Player:HasUnity() and Covenant == "Kyrian")
+local ObedienceEquipped = Player:HasLegendaryEquipped(229) or (Player:HasUnity() and IsVenthyr)
+local ResoundingClarityEquipped = Player:HasLegendaryEquipped(231) or (Player:HasUnity() and IsKyrian)
 local TheRottenEquipped = Player:HasLegendaryEquipped(128)
 local Tier282pcEquipped = Player:HasTier(28, 2)
 HL:RegisterForEvent(function()
-  Covenant = Player:Covenant()
+  CovenantId = Player:CovenantID()
+  IsKyrian, IsVenthyr, IsNightFae, IsNecrolord = (CovenantId == 1), (CovenantId == 2), (CovenantId == 3), (CovenantId == 4)
   DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
   TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
   AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
   MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
   FinalityEquipped = Player:HasLegendaryEquipped(126)
-  ObedienceEquipped = Player:HasLegendaryEquipped(229) or (Player:HasUnity() and Covenant == "Venthyr")
-  ResoundingClarityEquipped = Player:HasLegendaryEquipped(231) or (Player:HasUnity() and Covenant == "Kyrian")
+  ObedienceEquipped = Player:HasLegendaryEquipped(229) or (Player:HasUnity() and IsVenthyr)
+  ResoundingClarityEquipped = Player:HasLegendaryEquipped(231) or (Player:HasUnity() and IsKyrian)
   TheRottenEquipped = Player:HasLegendaryEquipped(128)
   Tier282pcEquipped = Player:HasTier(28, 2)
 end, "PLAYER_EQUIPMENT_CHANGED", "COVENANT_CHOSEN" )
@@ -209,7 +211,7 @@ local function ShD_Threshold ()
   if TheRottenEquipped then
     return S.ShadowDance:ChargesFractional() >= 1.75 or S.SymbolsofDeath:CooldownRemains() >= 16
   end
-  return S.ShadowDance:ChargesFractional() >= (1.75 - (0.75 * BoolToInt(Covenant == "Kyrian" and Tier282pcEquipped and S.SymbolsofDeath:CooldownRemains() >= 8)))
+  return S.ShadowDance:ChargesFractional() >= (1.75 - (0.75 * BoolToInt(IsKyrian and Tier282pcEquipped and S.SymbolsofDeath:CooldownRemains() >= 8)))
 end
 local function ShD_Combo_Points ()
   -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=2+buff.shadow_blades.up
@@ -220,7 +222,7 @@ local function ShD_Combo_Points ()
     return ComboPointsDeficit <= 1
   elseif PriorityRotation and MeleeEnemies10yCount >= 4 then
     return ComboPointsDeficit <= 1
-  elseif Covenant == "Kyrian" then
+  elseif IsKyrian then
     return ComboPointsDeficit >= 3
   else
     return ComboPointsDeficit >= (2 + num(Player:BuffUp(S.ShadowBlades)))
@@ -244,7 +246,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
 
   if S.SliceandDice:IsCastable() and HL.FilteredFightRemains(MeleeEnemies10y, ">", Player:BuffRemains(S.SliceandDice)) then
     -- actions.finish=variable,name=premed_snd_condition,value=talent.premeditation.enabled&spell_targets.shuriken_storm<(5-covenant.necrolord)&!covenant.kyrian
-    if S.Premeditation:IsAvailable() and MeleeEnemies10yCount < 5 - num(Covenant == "Necrolord") and Covenant ~= "Kyrian" then
+    if S.Premeditation:IsAvailable() and MeleeEnemies10yCount < 5 - num(IsNecrolord) and not IsKyrian then
       -- actions.finish+=/slice_and_dice,if=variable.premed_snd_condition&cooldown.shadow_dance.charges_fractional<1.75&buff.slice_and_dice.remains<cooldown.symbols_of_death.remains&(cooldown.shadow_dance.ready&buff.symbols_of_death.remains-buff.shadow_dance.remains<1.2)
       if S.ShadowDance:ChargesFractional() < 1.75 and Player:BuffRemains(S.SliceandDice) < S.SymbolsofDeath:CooldownRemains()
         and (S.ShadowDance:Charges() >= 1 and Player:BuffRemains(S.SymbolsofDeath) - Player:BuffRemains(S.ShadowDanceBuff) < 1.2) then
@@ -388,7 +390,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   -- As we're in stealth, show a special macro combo with the PV icon to make it clear we are casting Backstab specifically within Shadow Dance
   -- actions.stealthed+=/backstab,if=conduit.perforated_veins.rank>=8&buff.perforated_veins.stack>=5&buff.shadow_dance.remains>=3&buff.shadow_blades.up&(spell_targets.shuriken_storm<=3|variable.use_priority_rotation)&(buff.shadow_blades.remains<=buff.shadow_dance.remains+2|!covenant.venthyr)
   if S.PerforatedVeins:ConduitRank() >= 8 and Player:BuffStack(S.PerforatedVeinsBuff) >= 5 and ShadowDanceBuffRemains >= 3 and Player:BuffUp(S.ShadowBlades)
-    and (MeleeEnemies10yCount <= 3 or PriorityRotation) and (Covenant ~= "Venthyr" or Player:BuffRemains(S.ShadowBlades) <= ShadowDanceBuffRemains + 2) then
+    and (MeleeEnemies10yCount <= 3 or PriorityRotation) and (not IsVenthyr or Player:BuffRemains(S.ShadowBlades) <= ShadowDanceBuffRemains + 2) then
     if ReturnSpellOnly then
       -- If calling from a Stealth macro, we don't need the PV suggestion since it's already a macro cast
       if StealthSpell then
@@ -523,7 +525,7 @@ local function CDs ()
   -- actions.cds+=/shuriken_tornado,if=spell_targets.shuriken_storm<=1&energy>=60&variable.snd_condition&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1&(!runeforge.obedience|debuff.flagellation.up|spell_targets.shuriken_storm>=(1+4*(!talent.nightstalker.enabled&!talent.dark_shadow.enabled)))&combo_points<=2&!buff.premeditation.up&(!covenant.venthyr|!cooldown.flagellation.up)
   if S.ShurikenTornado:IsCastable() and MeleeEnemies10yCount <= 1 and SnDCondition and S.SymbolsofDeath:CooldownUp() and S.ShadowDance:Charges() >= 1
     and (not ObedienceEquipped or Target:DebuffUp(S.Flagellation) or MeleeEnemies10yCount >= 1 + 4*num(not S.Nightstalker:IsAvailable() and not S.DarkShadow:IsAvailable()))
-    and ComboPoints <= 2 and not Player:BuffUp(S.PremeditationBuff) and (Covenant ~= "Venthyr" or not S.Flagellation:CooldownUp()) then
+    and ComboPoints <= 2 and not Player:BuffUp(S.PremeditationBuff) and (not IsVenthyr or not S.Flagellation:CooldownUp()) then
     -- actions.cds+=/pool_resource,for_next=1,if=talent.shuriken_tornado.enabled&!talent.shadow_focus.enabled
     if Player:Energy() >= 60 then
       if HR.Cast(S.ShurikenTornado, Settings.Subtlety.GCDasOffGCD.ShurikenTornado) then return "Cast Shuriken Tornado" end
@@ -559,7 +561,7 @@ local function CDs ()
     if S.SymbolsofDeath:IsCastable()
       and (not Player:StealthUp(true, true) or Player:BuffStack(S.PerforatedVeinsBuff) < 4) and SnDCondition
       and (not S.ShurikenTornado:IsAvailable() or S.ShadowFocus:IsAvailable() or MeleeEnemies10yCount >= 2 or S.ShurikenTornado:CooldownRemains() > 2)
-      and (Covenant ~= "Venthyr" or S.Flagellation:CooldownRemains() > 10 or S.Flagellation:CooldownUp() and ComboPoints >= 5) then
+      and (not IsVenthyr or S.Flagellation:CooldownRemains() > 10 or S.Flagellation:CooldownUp() and ComboPoints >= 5) then
       if HR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death" end
     end
   end
@@ -705,7 +707,7 @@ local function Build (EnergyThreshold)
   end
   -- actions.build+=/shuriken_storm,if=spell_targets>=2&(!covenant.necrolord|cooldown.serrated_bone_spike.max_charges-charges_fractional>=0.25|spell_targets.shuriken_storm>4)&(buff.perforated_veins.stack<=4|spell_targets.shuriken_storm>4&!variable.use_priority_rotation)
   if HR.AoEON() and S.ShurikenStorm:IsCastable() and MeleeEnemies10yCount >= 2
-    and (Covenant ~= "Necrolord" or (S.SerratedBoneSpike:MaxCharges() - S.SerratedBoneSpike:ChargesFractional()) >= 0.25 or MeleeEnemies10yCount > 4)
+    and (not IsNecrolord or (S.SerratedBoneSpike:MaxCharges() - S.SerratedBoneSpike:ChargesFractional()) >= 0.25 or MeleeEnemies10yCount > 4)
     and (Player:BuffStack(S.PerforatedVeinsBuff) <= 4 or MeleeEnemies10yCount > 4 and not PriorityRotation) then
     if ThresholdMet and HR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm" end
     SetPoolingAbility(S.ShurikenStorm, EnergyThreshold)
@@ -721,7 +723,7 @@ local function Build (EnergyThreshold)
   if Target:IsInMeleeRange(5) then
     -- Pooling for generator conditions below
     -- if=!covenant.kyrian|!(variable.is_next_cp_animacharged&(time_to_sht.3.plus<0.5|time_to_sht.4.plus<1)&energy<60)
-    if Covenant == "Kyrian" and Player:Energy() < 60
+    if IsKyrian and Player:Energy() < 60
       and (ComboPoints == 2 and Player:BuffUp(S.EchoingReprimand3)
         or ComboPoints == 3 and Player:BuffUp(S.EchoingReprimand4)
         or ComboPoints == 4 and Player:BuffUp(S.EchoingReprimand5))

@@ -63,24 +63,26 @@ local PriorityRotation
 local PoisonedBleeds, EnergyRegenCombined, EnergyTimeToMaxCombined, EnergyRegenSaturated, SingleTarget, VendettaCooldownRemains
 
 -- Covenant and Legendaries
-local Covenant = Player:Covenant()
+local CovenantId = Player:CovenantID()
+local IsKyrian, IsVenthyr, IsNightFae, IsNecrolord = (CovenantId == 1), (CovenantId == 2), (CovenantId == 3), (CovenantId == 4)
 local DashingScoundrelEquipped = Player:HasLegendaryEquipped(118)
 local DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
 local DoombladeEquipped = Player:HasLegendaryEquipped(119)
 local DuskwalkersPatchEquipped = Player:HasLegendaryEquipped(121)
 local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
-local ObedienceEquipped = Player:HasLegendaryEquipped(229) or (Player:HasUnity() and Covenant == "Venthyr")
+local ObedienceEquipped = Player:HasLegendaryEquipped(229) or (Player:HasUnity() and IsVenthyr)
 local VendettaCDMultiplier = DuskwalkersPatchEquipped and 0.55 or 1.0
 local FlagellationCDMultiplier = ObedienceEquipped and 0.56 or 1.0
 local Tier282pcEquipped = Player:HasTier(28, 2)
 HL:RegisterForEvent(function()
-  Covenant = Player:Covenant()
+  CovenantId = Player:CovenantID()
+  IsKyrian, IsVenthyr, IsNightFae, IsNecrolord = (CovenantId == 1), (CovenantId == 2), (CovenantId == 3), (CovenantId == 4)
   DashingScoundrelEquipped = Player:HasLegendaryEquipped(118)
   DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
   DoombladeEquipped = Player:HasLegendaryEquipped(119)
   DuskwalkersPatchEquipped = Player:HasLegendaryEquipped(121)
   MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
-  ObedienceEquipped = Player:HasLegendaryEquipped(229) or (Player:HasUnity() and Covenant == "Venthyr")
+  ObedienceEquipped = Player:HasLegendaryEquipped(229) or (Player:HasUnity() and IsVenthyr)
   VendettaCDMultiplier = DuskwalkersPatchEquipped and 0.55 or 1.0
   FlagellationCDMultiplier = ObedienceEquipped and 0.56 or 1.0
   Tier282pcEquipped = Player:HasTier(28, 2)
@@ -364,7 +366,7 @@ local function CDs ()
     -- # If no adds will die within the next 30s, use MfD on boss without any CP.
     -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend&!cooldown.shiv.ready&(!covenant.venthyr|debuff.flagellation.up|cooldown.flagellation.remains>15)
     if ComboPointsDeficit >= Rogue.CPMaxSpend() and not S.Shiv:IsReady()
-      and (Covenant ~= "Venthyr" or S.Flagellation:AnyDebuffUp() or S.Flagellation:CooldownRemains() > 15) then
+      and (not IsVenthyr or S.Flagellation:AnyDebuffUp() or S.Flagellation:CooldownRemains() > 15) then
       if not Settings.Commons.STMfDAsDPSCD then
         HR.CastSuggested(S.MarkedforDeath)
       elseif HR.CDsON() then
@@ -379,7 +381,7 @@ local function CDs ()
 
   if not Player:StealthUp(true, false) then
     -- actions.cds+=/variable,name=vendetta_ma_condition,value=!talent.master_assassin.enabled|dot.garrote.ticking|covenant.venthyr&combo_points.deficit=0
-    local VendettaMACondition = not S.MasterAssassin:IsAvailable() or Target:DebuffUp(S.Garrote) or (Covenant == "Venthyr" and ComboPointsDeficit == 0)
+    local VendettaMACondition = not S.MasterAssassin:IsAvailable() or Target:DebuffUp(S.Garrote) or (IsVenthyr and ComboPointsDeficit == 0)
     -- actions.cds+=/fleshcraft,if=(soulbind.pustule_eruption|soulbind.volatile_solvent)&!stealthed.all&!debuff.vendetta.up&master_assassin_remains=0&(energy.time_to_max_combined>2|!debuff.shiv.up)
     if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) and not Player:StealthUp(true, true)
       and not S.Vendetta:AnyDebuffUp() and MasterAssassinRemains() <= 0 and (EnergyTimeToMaxCombined > 2 or not Target:DebuffUp(S.ShivDebuff)) then
@@ -413,10 +415,10 @@ local function CDs ()
       -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.kyrian|covenant.necrolord|covenant.none,value=1
       -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.venthyr,value=floor((fight_remains-20)%(120*variable.vendetta_cdr))>floor((fight_remains-20-cooldown.flagellation.remains)%(120*variable.vendetta_cdr))|buff.flagellation_buff.up|debuff.flagellation.up|fight_remains<20
       -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.night_fae,value=floor((fight_remains-20)%(120*variable.vendetta_cdr))>floor((fight_remains-20-cooldown.sepsis.remains)%(120*variable.vendetta_cdr))|dot.sepsis.ticking|fight_remains<20
-      if NightstalkerCondition and VendettaMACondition and (HL.BossFilteredFightRemains("<", 20) or Covenant == "Necrolord" or Covenant == "Kyrian" or Covenant == nil
-        or (Covenant == "Venthyr" and (CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Flagellation:CooldownRemains(), 20)
+      if NightstalkerCondition and VendettaMACondition and (HL.BossFilteredFightRemains("<", 20) or IsNecrolord or IsKyrian or CovenantId == 0
+        or (IsVenthyr and (CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Flagellation:CooldownRemains(), 20)
           or Player:BuffUp(S.Flagellation) or Player:BuffUp(S.FlagellationBuff) or S.Flagellation:AnyDebuffUp()))
-        or (Covenant == "Night Fae" and (CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Sepsis:CooldownRemains(), 20) or Target:DebuffUp(S.Sepsis)))) then
+        or (IsNightFae and (CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Sepsis:CooldownRemains(), 20) or Target:DebuffUp(S.Sepsis)))) then
         
         -- # Sync the priority stat buff trinket with Vendetta, otherwise use on cooldown
         -- actions.cds+=/use_items,slots=trinket1,if=(!variable.use_trinket_1_pre_vendetta|variable.vendetta_condition&(cooldown.vendetta.remains<2|variable.vendetta_cooldown_remains>trinket.1.cooldown.duration%2)|fight_remains<=20)&(variable.trinket_sync_slot=1&(debuff.vendetta.up|variable.use_trinket_1_pre_vendetta|fight_remains<=20)|(variable.trinket_sync_slot=2&(!trinket.2.cooldown.ready|variable.vendetta_cooldown_remains>20))|!variable.trinket_sync_slot)
@@ -438,7 +440,7 @@ local function CDs ()
   end
   -- actions.cds+=/shiv,if=!debuff.shiv.up&(dot.garrote.ticking&dot.rupture.ticking)&(!covenant.night_fae|((cooldown.sepsis.ready|cooldown.sepsis.remains>12)+(cooldown.vendetta.ready|variable.vendetta_cooldown_remains>12)=2))
   if S.Shiv:IsCastable() and not Target:DebuffUp(S.ShivDebuff) and (Target:DebuffUp(S.Garrote) and Target:DebuffUp(S.Rupture))
-    and (Covenant ~= "Night Fae" or (BoolToInt(S.Sepsis:CooldownUp() or S.Sepsis:CooldownRemains() > 12)
+    and (not IsNightFae or (BoolToInt(S.Sepsis:CooldownUp() or S.Sepsis:CooldownRemains() > 12)
       + BoolToInt(S.Vendetta:CooldownUp() or VendettaCooldownRemains > 12) == 2)) then
     if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then ShouldReturn = "Cast Shiv" end
   end

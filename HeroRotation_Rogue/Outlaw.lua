@@ -86,20 +86,18 @@ local Interrupts = {
 }
 
 -- Legendaries
+local CovenantId = Player:CovenantID()
+local IsKyrian, IsVenthyr, IsNightFae, IsNecrolord = (CovenantId == 1), (CovenantId == 2), (CovenantId == 3), (CovenantId == 4)
 local DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
 local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
 local TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
 HL:RegisterForEvent(function()
+  CovenantId = Player:CovenantID()
+  IsKyrian, IsVenthyr, IsNightFae, IsNecrolord = (CovenantId == 1), (CovenantId == 2), (CovenantId == 3), (CovenantId == 4)
   DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
   MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
   TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
-end, "PLAYER_EQUIPMENT_CHANGED")
-
--- Covenant
-local Covenant = Player:Covenant()
-HL:RegisterForEvent(function()
-  Covenant = Player:Covenant()
-end, "COVENANT_CHOSEN")
+end, "PLAYER_EQUIPMENT_CHANGED", "COVENANT_CHOSEN" )
 
 -- Utils
 local function num(val)
@@ -308,7 +306,7 @@ local function CDs ()
     end
     -- actions.cds+=/dreadblades,if=!stealthed.all&combo_points<=2&(!covenant.venthyr|debuff.flagellation.up)
     if S.Dreadblades:IsReady() and Target:IsSpellInRange(S.Dreadblades) and not Player:StealthUp(true, true) and ComboPoints <= 2 
-      and (Covenant ~= "Venthyr" or S.Flagellation:AnyDebuffUp()) then
+      and (not IsVenthyr or S.Flagellation:AnyDebuffUp()) then
       if HR.Cast(S.Dreadblades, Settings.Outlaw.GCDasOffGCD.Dreadblades) then return "Cast Dreadblades" end
     end
     -- actions.cds+=/roll_the_bones,if=master_assassin_remains=0&buff.dreadblades.down&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
