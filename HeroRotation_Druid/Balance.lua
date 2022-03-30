@@ -61,6 +61,7 @@ if equip[14] then
 end
 
 -- Rotation Variables
+local VarInit = false
 local VarOnUseTrinket
 local VarIsAoe
 local VarIsCleave
@@ -143,10 +144,12 @@ HL:RegisterForEvent(function()
   TimewornEquipped = Player:HasLegendaryEquipped(53)
   SinfulHysteriaEquipped = Player:HasLegendaryEquipped(220)
   CelestialSpiritsEquipped = Player:HasLegendaryEquipped(226)
+  VarInit = false
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
   OpenerFinished = false
+  VarInit = false
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -156,12 +159,14 @@ S.AdaptiveSwarm:RegisterInFlight()
 
 HL:RegisterForEvent(function()
   CaInc = S.Incarnation:IsAvailable() and S.Incarnation or S.CelestialAlignment
+  VarInit = false
 end, "PLAYER_TALENT_UPDATE")
 
 -- Figure out new Precise Alignment time when changed
 -- Might be using too many events, but would rather capture too many than too few
 HL:RegisterForEvent(function()
   PATime = S.PreciseAlignment:ConduitEnabled() and PreciseAlignmentTimeTable[S.PreciseAlignment:ConduitRank()] or 0
+  VarInit = false
 end, "SOULBIND_ACTIVATED", "SOULBIND_CONDUIT_COLLECTION_UPDATED", "SOULBIND_CONDUIT_INSTALLED", "SOULBIND_NODE_UPDATED")
 
 -- Update CovenantID if we change Covenants
@@ -273,11 +278,7 @@ local function AP_Check(spell)
   end
 end
 
-local function Precombat()
-  -- flask
-  -- food
-  -- augmentation
-  -- snapshot_stats
+local function InitVars()
   -- variable,name=on_use_trinket,value=0
   VarOnUseTrinket = 0
   -- variable,name=on_use_trinket,op=add,value=trinket.1.has_proc.any&trinket.1.cooldown.duration
@@ -292,6 +293,15 @@ local function Precombat()
   VarSFCost = 50 * (1 - 0.15 * num(Player:HasTier(28, 4)))
   -- variable,name=convoke_asp,value=30+10*runeforge.celestial_spirits
   VarConvokeAsp = 30 + 10 * num(CelestialSpiritsEquipped)
+
+  VarInit = true
+end
+
+local function Precombat()
+  -- flask
+  -- food
+  -- augmentation
+  -- snapshot_stats
   -- moonkin_form
   if S.MoonkinForm:IsCastable() then
     if Cast(S.MoonkinForm) then return "moonkin_form precombat"; end
@@ -694,6 +704,11 @@ local function APL()
   else
     EnemiesCount40y = 1
     EnemiesCount8ySplash = 1
+  end
+
+  -- Set required variables
+  if not VarInit then
+    VarInit()
   end
 
   -- GCDMax is GCD plus half a second, to account for lag and player reaction time
