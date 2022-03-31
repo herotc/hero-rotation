@@ -708,7 +708,7 @@ local function APL()
 
   -- Set required variables
   if not VarInit then
-    VarInit()
+    InitVars()
   end
 
   -- GCDMax is GCD plus half a second, to account for lag and player reaction time
