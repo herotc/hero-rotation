@@ -58,7 +58,7 @@ local ShouldReturn
 local Stealth
 local BleedTickTime, ExsanguinatedBleedTickTime = 2 / Player:SpellHaste(), 1 / Player:SpellHaste()
 local ComboPoints, ComboPointsDeficit
-local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMGThreshold, RuptureDurationThreshold
+local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMGThreshold, RuptureDurationThreshold, RuptureTickTime
 local PriorityRotation
 local PoisonedBleeds, EnergyRegenCombined, EnergyTimeToMaxCombined, EnergyRegenSaturated, SingleTarget, VendettaCooldownRemains
 
@@ -73,7 +73,7 @@ local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
 local ObedienceEquipped = Player:HasLegendaryEquipped(229) or (Player:HasUnity() and IsVenthyr)
 local VendettaCDMultiplier = DuskwalkersPatchEquipped and 0.55 or 1.0
 local FlagellationCDMultiplier = ObedienceEquipped and 0.56 or 1.0
-local Tier282pcEquipped = Player:HasTier(28, 2)
+local Tier282pcEquipped, Tier284pcEquipped = Player:HasTier(28, 2), Player:HasTier(28, 4)
 HL:RegisterForEvent(function()
   CovenantId = Player:CovenantID()
   IsKyrian, IsVenthyr, IsNightFae, IsNecrolord = (CovenantId == 1), (CovenantId == 2), (CovenantId == 3), (CovenantId == 4)
@@ -85,7 +85,7 @@ HL:RegisterForEvent(function()
   ObedienceEquipped = Player:HasLegendaryEquipped(229) or (Player:HasUnity() and IsVenthyr)
   VendettaCDMultiplier = DuskwalkersPatchEquipped and 0.55 or 1.0
   FlagellationCDMultiplier = ObedienceEquipped and 0.56 or 1.0
-  Tier282pcEquipped = Player:HasTier(28, 2)
+  Tier282pcEquipped, Tier284pcEquipped = Player:HasTier(28, 2), Player:HasTier(28, 4)
 end, "PLAYER_EQUIPMENT_CHANGED", "COVENANT_CHOSEN" )
 
 -- Interrupts
@@ -158,6 +158,15 @@ local function UsePriorityRotation()
   end
 
   return false
+end
+
+-- Custom Override for Handling 4pc Pandemics
+local function IsDebuffRefreshable(TargetUnit, Spell, PandemicThreshold)
+  local PandemicThreshold = PandemicThreshold or Spell:PandemicThreshold()
+  if Tier284pcEquipped and TargetUnit:DebuffUp(S.Vendetta) then
+    PandemicThreshold = PandemicThreshold * 0.5
+  end
+  return TargetUnit:DebuffRefreshable(Spell, PandemicThreshold)
 end
 
 -- Handle CastLeftNameplate Suggestions for DoT Spells
@@ -335,7 +344,7 @@ local function Vanish ()
   end
   -- actions.vanish+=/vanish,if=talent.subterfuge.enabled&cooldown.garrote.up&debuff.vendetta.up&(dot.garrote.refreshable|dot.garrote.pmultiplier<=1)&combo_points.deficit>=(spell_targets.fan_of_knives>?4)&raid_event.adds.in>12
   if S.Subterfuge:IsAvailable() and S.Garrote:CooldownUp() and Target:DebuffUp(S.Vendetta)
-    and (Target:DebuffRefreshable(S.Garrote) or Target:PMultiplier(S.Garrote) <= 1)
+    and (IsDebuffRefreshable(Target, S.Garrote) or Target:PMultiplier(S.Garrote) <= 1)
     and ComboPointsDeficit >= math.min(MeleeEnemies10yCount, 4) then
     -- actions.cds+=/pool_resource,for_next=1,extra_amount=45
     if Settings.Commons.ShowPooling and Player:EnergyPredicted() < 45 then
@@ -347,7 +356,7 @@ local function Vanish ()
   -- actions.vanish+=/vanish,if=(talent.master_assassin.enabled|runeforge.mark_of_the_master_assassin)&!dot.rupture.refreshable&dot.garrote.remains>3&debuff.vendetta.up&(debuff.shiv.up|debuff.vendetta.remains<4|dot.sepsis.ticking)&dot.sepsis.remains<3
   if (S.MasterAssassin:IsAvailable() or MarkoftheMasterAssassinEquipped) and S.Vendetta:AnyDebuffUp() then
     local VendettaUnit = S.Vendetta:MaxDebuffRemainsUnit()
-    if not VendettaUnit:DebuffRefreshable(S.Rupture, RuptureThreshold) and VendettaUnit:DebuffRemains(S.Garrote) > 3
+    if not IsDebuffRefreshable(VendettaUnit, S.Rupture, RuptureThreshold) and VendettaUnit:DebuffRemains(S.Garrote) > 3
       and (VendettaUnit:DebuffUp(S.ShivDebuff) or VendettaUnit:DebuffRemains(S.Vendetta) < 4 or S.Sepsis:AnyDebuffUp())
       and S.Sepsis:MaxDebuffRemains() < 3 then
       if Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)" end
@@ -432,7 +441,7 @@ local function CDs ()
     end
     -- # Exsanguinate when not stealthed and both Rupture and Garrote are up for long enough.
     -- actions.cds+=/exsanguinate,if=!stealthed.rogue&(!dot.garrote.refreshable&dot.rupture.remains>4+4*cp_max_spend|dot.rupture.remains*0.5>target.time_to_die)&target.time_to_die>4
-    if S.Exsanguinate:IsCastable() and (not Target:DebuffRefreshable(S.Garrote) and Target:DebuffRemains(S.Rupture) > 4+4*Rogue.CPMaxSpend()
+    if S.Exsanguinate:IsCastable() and (not IsDebuffRefreshable(Target, S.Garrote) and Target:DebuffRemains(S.Rupture) > 4 + 4 * Rogue.CPMaxSpend()
       or Target:FilteredTimeToDie("<", Target:DebuffRemains(S.Rupture)*0.5)) and (Target:FilteredTimeToDie(">", 4) or Target:TimeToDieIsNotValid())
       and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
       if Cast(S.Exsanguinate) then return "Cast Exsanguinate" end
@@ -553,7 +562,7 @@ local function Dot ()
   -- actions.dot+=/garrote,cycle_targets=1,if=!variable.skip_cycle_garrote&target!=self.target&refreshable&combo_points.deficit>=1&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!will_lose_exsanguinate|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&(target.time_to_die-remains)>12&master_assassin_remains=0
   if S.Garrote:IsCastable() and ComboPointsDeficit >= 1 then
     local function Evaluate_Garrote_Target(TargetUnit)
-      return TargetUnit:DebuffRefreshable(S.Garrote)
+      return IsDebuffRefreshable(TargetUnit, S.Garrote)
         and (TargetUnit:PMultiplier(S.Garrote) <= 1 or (MeleeEnemies10yCount >= 3
           and TargetUnit:DebuffRemains(S.Garrote) <= (Rogue.Exsanguinated(TargetUnit, S.Garrote) and ExsanguinatedBleedTickTime or BleedTickTime)))
         and (not Rogue.WillLoseExsanguinate(TargetUnit, S.Garrote) or TargetUnit:DebuffRemains(S.Garrote) <= 1.5 and MeleeEnemies10yCount >= 3)
@@ -572,21 +581,23 @@ local function Dot ()
   if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 2 and ComboPoints >= 4
     and EnergyRegenCombined > 20 and (not S.Vendetta:CooldownUp() or Target:DebuffUp(S.Rupture)) then
     for _, CycleUnit in pairs(MeleeEnemies10y) do
-      if CycleUnit:DebuffRemains(S.CrimsonTempest) < 2 + 3 * BoolToInt(MeleeEnemies10yCount >= 4) then
+      if CycleUnit:DebuffRemains(S.CrimsonTempest) < (2 + 3 * BoolToInt(MeleeEnemies10yCount >= 4) *
+        (1 - (BoolToInt(Tier284pcEquipped and CycleUnit:DebuffUp(S.Vendetta)) * 0.5))) then
         if Cast(S.CrimsonTempest) then return "Cast Crimson Tempest (AoE)" end
       end
     end
   end
   -- # Keep up Rupture at 4+ on all targets (when living long enough and not snapshot)
-  -- actions.dot+=/rupture,if=!variable.skip_rupture&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
-  -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
+  -- actions.dot+=/rupture,if=!variable.skip_rupture&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!will_lose_exsanguinate|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
+  -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!will_lose_exsanguinate|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
   if not SkipRupture and S.Rupture:IsReady() and ComboPoints >= 4 then
     -- target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
     RuptureDurationThreshold = 4 + BoolToInt(DashingScoundrelEquipped) * 5 + BoolToInt(DoombladeEquipped) * 5 + BoolToInt(EnergyRegenSaturated) * 6
     local function Evaluate_Rupture_Target(TargetUnit)
-      return TargetUnit:DebuffRefreshable(S.Rupture, RuptureThreshold)
-        and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemains(S.Rupture) <= (Rogue.Exsanguinated(TargetUnit, S.Rupture) and ExsanguinatedBleedTickTime or BleedTickTime) and MeleeEnemies10yCount >= 3)
-        and (not Rogue.Exsanguinated(TargetUnit, S.Rupture) or TargetUnit:DebuffRemains(S.Rupture) <= ExsanguinatedBleedTickTime * 2 and MeleeEnemies10yCount >= 3)
+      RuptureTickTime = Rogue.Exsanguinated(TargetUnit, S.Rupture) and ExsanguinatedBleedTickTime or BleedTickTime
+      return IsDebuffRefreshable(TargetUnit, S.Rupture, RuptureThreshold)
+        and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemains(S.Rupture) <= RuptureTickTime and MeleeEnemies10yCount >= 3)
+        and (not Rogue.WillLoseExsanguinate(TargetUnit, S.Rupture) or TargetUnit:DebuffRemains(S.Rupture) <= RuptureTickTime * 2 and MeleeEnemies10yCount >= 3)
         and (TargetUnit:FilteredTimeToDie(">", RuptureDurationThreshold, -TargetUnit:DebuffRemains(S.Rupture)) or TargetUnit:TimeToDieIsNotValid())
     end
     if Evaluate_Rupture_Target(Target) and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
@@ -610,7 +621,7 @@ local function Dot ()
   -- actions.dot+=/crimson_tempest,if=spell_targets=1&(!runeforge.dashing_scoundrel|rune_word.frost.enabled)&master_assassin_remains=0&effective_combo_points>=(cp_max_spend-1)&refreshable&!will_lose_exsanguinate&(!debuff.shiv.up|debuff.grudge_match.remains>2)&target.time_to_die-remains>4
   if S.CrimsonTempest:IsReady() and Target:IsInMeleeRange(10) and MeleeEnemies10yCount == 1
     and not DashingScoundrelEquipped and MasterAssassinRemains() <= 0
-    and ComboPoints >= (Rogue.CPMaxSpend() - 1) and Target:DebuffRefreshable(S.CrimsonTempest, CrimsonTempestThreshold)
+    and ComboPoints >= (Rogue.CPMaxSpend() - 1) and IsDebuffRefreshable(Target, S.CrimsonTempest, CrimsonTempestThreshold)
     and not Rogue.WillLoseExsanguinate(Target, S.CrimsonTempest) and (not Target:DebuffUp(S.ShivDebuff) or Target:DebuffRemains(S.GrudgeMatchDebuff) > 2)
     and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.CrimsonTempest)) or Target:TimeToDieIsNotValid())
     and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
