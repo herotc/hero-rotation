@@ -14,4 +14,5 @@ Events.lua
 Balance.lua
 Feral.lua
 Guardian.lua
+Restoration.lua
 Overrides.lua

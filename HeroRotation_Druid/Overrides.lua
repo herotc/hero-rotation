@@ -14,6 +14,7 @@ local HR      = HeroRotation
 local SpellGuardian = Spell.Druid.Guardian
 local SpellBalance = Spell.Druid.Balance
 local SpellFeral = Spell.Druid.Feral
+local SpellResto = Spell.Druid.Restoration
 -- Lua
 
 --- ============================ CONTENT ============================
@@ -89,3 +90,16 @@ GuardianOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     end
   end
 , 104)
+
+-- Restoration, ID: 105
+local RestoOldSpellIsCastable
+RestoOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = RestoOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellResto.CatForm or self == SpellResto.MoonkinForm then
+      return BaseCheck and Player:BuffDown(self)
+    else
+      return BaseCheck
+    end
+  end
+, 105)

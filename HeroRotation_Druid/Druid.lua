@@ -28,12 +28,19 @@ Spell.Druid.Commons = {
   Shadowmeld                            = Spell(58984),
   -- Abilities
   Barkskin                              = Spell(22812),
+  CatForm                               = Spell(768),
+  FerociousBite                         = Spell(22568),
   Moonfire                              = Spell(8921),
   MoonfireDebuff                        = Spell(164812),
+  Prowl                                 = Spell(5215),
+  Rake                                  = Spell(1822),
+  RakeDebuff                            = Spell(155722),
+  Rip                                   = Spell(1079),
+  RipDebuff                             = Spell(1079),
+  Shred                                 = Spell(5221),
   SkullBash                             = Spell(106839),
   SurvivalInstincts                     = Spell(61336),
   -- Talents
-  BalanceAffinity                       = Spell(197488),
   HeartoftheWild                        = Spell(319454),
   HeartoftheWildBuff                    = Spell(108291),
   -- Covenant Abilities
@@ -59,6 +66,8 @@ Spell.Druid.Commons = {
   SuddenAmbushBuff                      = Spell(340698),
   TasteForBlood                         = Spell(340682),
   VolatileSolvent                       = Spell(323074),
+  -- Legendary Effects
+  OathoftheElderDruidBuff               = Spell(338643),
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -78,6 +87,7 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   SunfireDebuff                         = Spell(164815),
   Wrath                                 = Spell(190984),
   -- Talents
+  BalanceAffinity                       = Spell(197488),
   ForceofNature                         = Spell(205636),
   FuryofElune                           = Spell(202770),
   Incarnation                           = Spell(102560),
@@ -109,21 +119,14 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
 Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   -- Abilties
   Berserk                               = Spell(106951),
-  CatForm                               = Spell(768),
   Clearcasting                          = Spell(135700),
-  FerociousBite                         = Spell(22568),
   Maim                                  = Spell(22570),
-  Prowl                                 = Spell(5215),
-  Rake                                  = Spell(1822),
-  RakeDebuff                            = Spell(155722),
-  Rip                                   = Spell(1079),
-  RipDebuff                             = Spell(1079),
-  Shred                                 = Spell(5221),
   Swipe                                 = Spell(106785),
   Thrash                                = Spell(106830),
   ThrashDebuff                          = Spell(106830),
   TigersFury                            = Spell(5217),
   -- Talents
+  BalanceAffinity                       = Spell(197488),
   Bloodtalons                           = Spell(319439),
   BloodtalonsBuff                       = Spell(145152),
   BrutalSlash                           = Spell(202028),
@@ -162,6 +165,7 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   Thrash                                = Spell(77758),
   ThrashDebuff                          = Spell(192090),
   -- Talents
+  BalanceAffinity                       = Spell(197488),
   BristlingFur                          = Spell(155835),
   GalacticGuardianBuff                  = Spell(213708),
   Incarnation                           = Spell(102558),
@@ -169,6 +173,22 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   Pulverize                             = Spell(80313),
   ToothandClawBuff                      = Spell(135286),
   WildCharge                            = Spell(16979),
+})
+
+Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Commons, {
+  -- Abilities
+  EclipseLunar                          = Spell(48518),
+  EclipseSolar                          = Spell(48517),
+  MoonkinForm                           = Spell(197625),
+  Starfire                              = Spell(197628),
+  Starsurge                             = Spell(197626),
+  Sunfire                               = Spell(93402),
+  SunfireDebuff                         = Spell(164815),
+  Swipe                                 = Spell(106785),
+  Wrath                                 = Spell(5176),
+  -- Talents
+  BalanceAffinity                       = Spell(197632),
+  FeralAffinity                         = Spell(197490),
 })
 
 -- Items
@@ -196,4 +216,7 @@ Item.Druid.Feral = MergeTableByKey(Item.Druid.Commons, {
 })
 
 Item.Druid.Guardian = MergeTableByKey(Item.Druid.Commons, {
+})
+
+Item.Druid.Restoration = MergeTableByKey(Item.Druid.Commons, {
 })
