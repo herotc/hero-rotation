@@ -107,13 +107,13 @@ local var_aoe_totm_max_charges
 local var_fishing_opener
 local var_ap_on_use
 local var_empowered_barrage
-local var_outside_of_cooldowns
+local var_outside_of_cooldowns = true
 local var_stack_harmony
 local var_just_used_spark
 local var_estimated_ap_cooldown
 local var_holding_totm
 local var_last_ap_use
-local var_time_until_ap
+local var_time_until_ap = 0
 local var_init = false
 local var_disciplinary_command_cd_remains
 local var_disciplinary_command_last_applied
