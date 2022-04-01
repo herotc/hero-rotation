@@ -73,8 +73,11 @@ Spell.Paladin.Commons = {
   VanquishersHammerBuff                 = Spell(328204),
   -- Soulbinds/Conduits (Shadowlands)
   Expurgation                           = Spell(339371),
+  PustuleEruption                       = Spell(351094),
   VengefulShock                         = Spell(340006),
   VengefulShockDebuff                   = Spell(340007),
+  VolatileSolvent                       = Spell(323074),
+  VolatileSolventHumanBuff              = Spell(323491),
   -- Buffs
   DivinePurposeBuff                     = Spell(223819),
   -- Legendary Effects
