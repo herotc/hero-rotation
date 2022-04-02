@@ -97,6 +97,7 @@ Spell.Monk.Commons = {
   -- Trinket Effects
   AcquiredAxeBuff                       = Spell(368656),
   AcquiredWandBuff                      = Spell(368654),
+  ScarsofFraternalStrifeBuff4           = Spell(368638),
   -- Misc
   PoolEnergy                            = Spell(999910)
 }
@@ -218,6 +219,7 @@ Item.Monk.Commons = {
   GladiatorsBadgeUnchained             = Item(185197, {13, 14}),
   InscrutibleQuantumDevice             = Item(179350, {13, 14}),
   OverchargedAnimaBattery              = Item(180116, {13, 14}),
+  ScarsofFraternalStrife                = Item(188253, {13, 14}),
   ShadowgraspTotem                     = Item(179356, {13, 14}),
   TheFirstSigil                        = Item(188271, {13, 14}),
   Wrathstone                           = Item(156000, {13, 14}),

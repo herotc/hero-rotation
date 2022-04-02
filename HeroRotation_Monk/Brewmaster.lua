@@ -34,7 +34,7 @@ local I = Item.Monk.Brewmaster
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- I.ItemName:ID()
+  I.ScarsofFraternalStrife:ID()
 }
 
 -- Rotation Var
@@ -186,6 +186,10 @@ local function APL()
     -- Defensives
     if IsTanking then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up&time>1
+    if I.ScarsofFraternalStrife:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) and HL.CombatTime() > 1) then
+      if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife main 1"; end
     end
     -- use_item,name=jotungeirr_destinys_call
     if I.Jotungeirr:IsEquippedAndReady() then

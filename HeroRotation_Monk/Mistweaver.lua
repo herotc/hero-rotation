@@ -31,9 +31,7 @@ local I = Item.Monk.Mistweaver
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- BfA
---  I.PocketsizedComputationDevice:ID(),
---  I.AshvanesRazorCoral:ID(),
+  I.ScarsofFraternalStrife:ID()
 }
 
 -- Rotation Var
@@ -158,6 +156,10 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(5, S.LegSweep, Settings.Commons.GCDasOffGCD.LegSweep, Stuns); if ShouldReturn and Settings.General.InterruptWithStun then return ShouldReturn; end
     -- Defensives
     local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+    -- use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up&time>1
+    if I.ScarsofFraternalStrife:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) and HL.CombatTime() > 1) then
+      if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife main 1"; end
+    end
     -- use_item,name=jotungeirr_destinys_call
     if I.Jotungeirr:IsEquippedAndReady() then
       if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 2"; end

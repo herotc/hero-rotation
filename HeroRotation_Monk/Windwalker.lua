@@ -33,15 +33,16 @@ local I = Item.Monk.Windwalker
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.InscrutibleQuantumDevice:ID(),
-  I.Wrathstone:ID(),
-  I.ShadowgraspTotem:ID(),
-  I.OverchargedAnimaBattery:ID(),
+  I.CacheofAcquiredTreasures:ID(),
   I.GladiatorsBadgeCosmic:ID(),
   I.GladiatorsBadgeSinful:ID(),
   I.GladiatorsBadgeUnchained:ID(),
+  I.InscrutibleQuantumDevice:ID(),
+  I.OverchargedAnimaBattery:ID(),
+  I.ScarsofFraternalStrife:ID(),
+  I.ShadowgraspTotem:ID(),
   I.TheFirstSigil:ID(),
-  I.CacheofAcquiredTreasures:ID()
+  I.Wrathstone:ID(),
 }
 
 -- Rotation Var
@@ -489,6 +490,10 @@ local function CDSEF()
   -- storm_earth_and_fire,if=covenant.necrolord&debuff.bonedust_brew_debuff.up&(pet.xuen_the_white_tiger.active|variable.hold_xuen|cooldown.invoke_xuen_the_white_tiger.remains>cooldown.storm_earth_and_fire.full_recharge_time|cooldown.invoke_xuen_the_white_tiger.remains>30)
   if S.StormEarthAndFire:IsReady() and (CovenantID == 4 and Target:DebuffUp(S.BonedustBrew) and (XuenActive or VarHoldXuen or S.InvokeXuenTheWhiteTiger:CooldownRemains() > S.StormEarthAndFire:FullRechargeTime() or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30)) then
     if Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthAndFire) then return "storm_earth_and_fire cd_sef 20"; end
+  end
+  -- use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up|fight_remains<35
+  if I.ScarsofFraternalStrife:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) or FightRemains < 35) then
+    if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife cd_sef 21"; end
   end
   -- use_item,name=jotungeirr_destinys_call,if=pet.xuen_the_white_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>60&fight_remains>180|fight_remains<20
   if I.Jotungeirr:IsEquippedAndReady() and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 60 and FightRemains > 180 or FightRemains < 20) then
