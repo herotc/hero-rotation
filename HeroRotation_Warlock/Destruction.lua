@@ -274,8 +274,8 @@ local function Aoe()
   if S.Shadowburn:IsCastable() and (Target:HealthPercentage() < 20) then
     if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn aoe 22"; end
   end
-  -- immolate
-  if S.Immolate:IsCastable() and Target:DebuffRefreshable(S.ImmolateDebuff) then
+  -- immolate,if=refreshable
+  if S.Immolate:IsCastable() and (Target:DebuffRefreshable(S.ImmolateDebuff)) then
     if Cast(S.Immolate, nil, nil, not Target:IsSpellInRange(S.Immolate)) then return "immolate aoe 24"; end
   end
   -- scouring_tithe
