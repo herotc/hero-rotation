@@ -62,6 +62,7 @@ local VarAddsRemain
 local VarROTFCRime
 local VarFrostStrikeConduits
 local VarDeathsDueActive
+local ghoul = HL.GhoulTable
 
 -- Player Covenant
 -- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
@@ -560,7 +561,7 @@ local function Cooldowns()
     if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead cooldowns 26"; end
   end
   -- sacrificial_pact,if=active_enemies>=2&(fight_remains<3|!buff.breath_of_sindragosa.up&(pet.ghoul.remains<gcd|raid_event.adds.exists&raid_event.adds.remains<3&raid_event.adds.in>pet.ghoul.remains))
-  if S.SacrificialPact:IsReady() and (EnemiesCount10yd >= 2 and (HL.FilteredFightRemains(Enemies10yd, "<", 3) or Player:BuffDown(S.BreathofSindragosa) and ((S.RaiseDead:TimeSinceLastCast() > (55 + Player:GCD()) and S.RaiseDead:TimeSinceLastCast() < (60 - Player:GCD())) or Target:TimeToDie() < Player:GCD()))) then
+  if S.SacrificialPact:IsReady() and ghoul.active() and (EnemiesCount10yd >= 2 and (HL.FilteredFightRemains(Enemies10yd, "<", 3) or Player:BuffDown(S.BreathofSindragosa) and ghoul.remains() < Player:GCD())) then
     if Cast(S.SacrificialPact, Settings.Commons.OffGCDasOffGCD.SacrificialPact, nil, not TargetIsInRange[8]) then return "sacrificial_pact cooldowns 28"; end
   end
   -- death_and_decay,if=active_enemies>5|runeforge.phearomones
