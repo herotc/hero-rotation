@@ -442,8 +442,8 @@ local function APL()
 end
 
 local function Init()
-  -- APL Feb 22, 2022 https://github.com/simulationcraft/simc/tree/a87419d83a582f38324360c324601ce9ae0a098e
-  --HR.Print("Frost Mage rotation is currently a work in progress, but has been updated for patch 9.1.5.")
+  -- APL March 29, 2022 https://github.com/simulationcraft/simc/tree/8c018d49403f278feda815acd3125e93cda2682e
+  --HR.Print("Frost Mage rotation is currently a work in progress, but has been updated for patch 9.2.")
 end
 
 HR.SetAPL(64, APL, Init)
