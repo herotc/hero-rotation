@@ -181,6 +181,8 @@ Item.Paladin.Commons = {
   SpareMeatHook                         = Item(178751, {13, 14}),
   TheFirstSigil                         = Item(188271, {13, 14}),
   WindscarWhetstone                     = Item(137486, {13, 14}),
+  -- Other On-Use Items
+  GaveloftheFirstArbiter                = Item(189862),
 }
 
 Item.Paladin.Protection = MergeTableByKey(Item.Paladin.Commons, {

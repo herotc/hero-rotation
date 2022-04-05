@@ -48,6 +48,7 @@ local OnUseExcludeTrinkets = {
   I.DreadfireVessel:ID(),
   I.EarthbreakersImpact:ID(),
   I.FaultyCountermeasure:ID(),
+  I.GaveloftheFirstArbiter:ID(),
   I.GiantOrnamentalPearl:ID(),
   I.GladiatorsBadgeCosmic:ID(),
   I.GladiatorsBadgeSinful:ID(),
@@ -201,6 +202,10 @@ local function Cooldowns()
   -- blessing_of_the_seasons
   local ShouldReturn = HandleNightFaeBlessings(); if ShouldReturn then return ShouldReturn; end
   if (Settings.Commons.Enabled.Trinkets) then
+    -- use_item,name=gavel_of_the_first_arbiter
+    if I.GaveloftheFirstArbiter:IsEquippedAndReady() then
+      if Cast(I.GaveloftheFirstArbiter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "gavel_of_the_first_arbiter cooldowns 11"; end
+    end
     -- use_item,name=the_first_sigil,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10|fight_remains<20
     if I.TheFirstSigil:IsEquippedAndReady() and (Player:BuffUp(S.AvengingWrathBuff) or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) == 10 or FightRemains < 20) then
       if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil cooldowns 12"; end
@@ -269,8 +274,8 @@ local function Cooldowns()
     if I.EarthbreakersImpact:IsEquippedAndReady() then
       if Cast(I.EarthbreakersImpact, nil, Settings.Commons.DisplayStyle.Trinkets) then return "earthbreakers_impact cooldowns 44"; end
     end
-    -- use_item,name=heart_of_the_swarm,if=!buff.avenging_wrath.up&buff.crusade.up
-    if I.HeartoftheSwarm:IsEquippedAndReady() and (Player:BuffDown(S.AvengingWrathBuff) and Player:BuffUp(S.CrusadeBuff)) then
+    -- use_item,name=heart_of_the_swarm,if=!buff.avenging_wrath.up&!buff.crusade.up
+    if I.HeartoftheSwarm:IsEquippedAndReady() and (Player:BuffDown(S.AvengingWrathBuff) and Player:BuffDown(S.CrusadeBuff)) then
       if Cast(I.HeartoftheSwarm, nil, Settings.Commons.DisplayStyle.Trinkets) then return "heart_of_the_swarm cooldowns 46"; end
     end
     if (Player:BuffUp(S.AvengingWrathBuff) or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) >= 10 or S.AvengingWrath:CooldownRemains() > 45 or S.Crusade:CooldownRemains() > 45) then
@@ -368,8 +373,8 @@ local function Generators()
   if S.WakeofAshes:IsCastable() and (Player:HolyPower() <= 2 and Player:HasTier(28, 4) and (S.AvengingWrath:CooldownDown() or S.Crusade:CooldownDown())) then
     if Cast(S.WakeofAshes, nil, nil, not Target:IsInRange(12)) then return "wake_of_ashes generators 5"; end
   end
-  -- divine_toll,if=holy_power<=1&!debuff.judgment.up&(!talent.seraphim|buff.seraphim.up)&(!raid_event.adds.exists|raid_event.adds.in>30|raid_event.adds.up)&!talent.final_reckoning&(!talent.execution_sentence|fight_remains<8|spell_targets.divine_storm>=5)&(cooldown.avenging_wrath.remains|cooldown.crusade.remains)
-  if S.DivineToll:IsCastable() and (Player:HolyPower() <= 1 and Target:DebuffDown(S.JudgmentDebuff) and ((not S.Seraphim:IsAvailable()) or Player:BuffUp(S.Seraphim)) and (not S.FinalReckoning:IsAvailable()) and ((not S.ExecutionSentence) or FightRemains < 8 or EnemiesCount8y >= 5) and (S.AvengingWrath:CooldownDown() or S.Crusade:CooldownDown())) then
+  -- divine_toll,if=holy_power<=2&!debuff.judgment.up&(!talent.seraphim|buff.seraphim.up)&(!raid_event.adds.exists|raid_event.adds.in>30|raid_event.adds.up)&!talent.final_reckoning&(!talent.execution_sentence|fight_remains<8|spell_targets.divine_storm>=5)&(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15|fight_remains<8)
+  if S.DivineToll:IsCastable() and (Player:HolyPower() <= 2 and Target:DebuffDown(S.JudgmentDebuff) and ((not S.Seraphim:IsAvailable()) or Player:BuffUp(S.Seraphim)) and (not S.FinalReckoning:IsAvailable()) and ((not S.ExecutionSentence) or FightRemains < 8 or EnemiesCount8y >= 5) and (S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15 or FightRemains < 8)) then
     if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll generators 6"; end
   end
   -- judgment,if=!debuff.judgment.up&(holy_power>=1&runeforge.the_magistrates_judgment|holy_power>=2)
