@@ -503,7 +503,7 @@ local function CombustionPhase()
   if (true) then
     local ShouldReturn = ActiveTalents(); if ShouldReturn then return ShouldReturn; end
   end
-  -- cancel_buff,name=sun_kings_blessing,if=buff.combustion.down&buff.sun_kings_blessing.stack>2&talent.rune_of_power&cooldown.rune_of_power.remains<20
+  -- cancel_buff,name=sun_kings_blessing,if=!set_bonus.tier28_4pc&buff.combustion.down&buff.sun_kings_blessing.stack>2&talent.rune_of_power&cooldown.rune_of_power.remains<20
   -- TODO: Find a way to handle cancel_buff
   -- flamestrike,if=buff.combustion.down&cooldown.combustion.remains<cast_time&active_enemies>=variable.combustion_flamestrike
   if S.Flamestrike:IsReady() and (Player:BuffDown(S.CombustionBuff) and S.Combustion:CooldownRemains() < S.Flamestrike:CastTime() and EnemiesCount8ySplash >= var_combustion_flamestrike) then
@@ -529,8 +529,12 @@ local function CombustionPhase()
   if S.Combustion:IsReady() and (Player:BuffDown(S.CombustionBuff) and var_time_to_combustion <= 0 and (not DisciplinaryCommandEquipped or Player:BuffUp(S.DisciplinaryCommandBuff) or Mage.DC.Frost == 1 and S.RuneofPower:IsAvailable() and var_disciplinary_command_cd_remains <= 0) and (not GrislyIcicleEquipped or Target:DebuffUp(S.GrislyIcicleDebuff)) and (CovenantID ~= 4 or not S.Deathborne:CooldownUp() or Player:BuffUp(S.DeathborneBuff)) and (not CovenantID ~= 2 or not S.MirrorsofTorment:CooldownUp()) and (S.Meteor:InFlight() or Player:IsCasting(S.Scorch) and S.Scorch:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Fireball) and S.Fireball:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Pyroblast) and S.Pyroblast:ExecuteRemains() < var_combustion_cast_remains or Player:IsCasting(S.Flamestrike) and S.Flamestrike:ExecuteRemains() < var_combustion_cast_remains)) then
     if Cast(S.Combustion, Settings.Fire.OffGCDasOffGCD.Combustion) then return "combustion combustion_phase 18"; end
   end
-  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!conduit.infernal_cascade&!variable.fire_blast_pooling&buff.combustion.up&!buff.firestorm.react&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react*(gcd.remains>0)<2
-  if S.FireBlast:IsReady() and (not S.InfernalCascade:ConduitEnabled() and not var_fire_blast_pooling and Player:BuffUp(S.CombustionBuff) and Player:BuffDown(S.FirestormBuff) and Player:BuffDown(S.HotStreakBuff) and HotStreakInFlight() + num(Player:BuffUp(S.HeatingUpBuff)) * num(Player:GCDRemains() > 0) < 2) then
+  -- rune_of_power,if=buff.rune_of_power.down&variable.extended_combustion_remains>variable.skb_duration
+  if S.RuneofPower:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) and var_extended_combustion_remains > var_skb_duration) then
+    if Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneOfPower) then return "rune_of_power combustion_phase 19"; end
+  end
+  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!conduit.infernal_cascade&!variable.fire_blast_pooling&(!set_bonus.tier28_4pc|debuff.mirrors_of_torment.down|buff.sun_kings_blessing_ready.down|action.pyroblast.executing)&buff.combustion.up&!buff.firestorm.react&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react*(gcd.remains>0)<2
+  if S.FireBlast:IsReady() and ((not S.InfernalCascade:ConduitEnabled()) and (not var_fire_blast_pooling) and ((not Player:HasTier(28, 4)) or Target:DebuffDown(S.MirrorsofTorment) or Player:BuffDown(S.SunKingsBlessingBuff) or Player:IsCasting(S.Pyroblast)) and Player:BuffUp(S.CombustionBuff) and Player:BuffDown(S.FirestormBuff) and Player:BuffDown(S.HotStreakBuff) and HotStreakInFlight() + num(Player:BuffUp(S.HeatingUpBuff)) * num(Player:GCDRemains() > 0) < 2) then
     if FBCast(S.FireBlast) then return "fire_blast combustion_phase 20"; end
   end
   -- variable,use_off_gcd=1,use_while_casting=1,name=expected_fire_blasts,value=action.fire_blast.charges_fractional+(variable.extended_combustion_remains-buff.infernal_cascade.duration)%cooldown.fire_blast.duration,if=conduit.infernal_cascade
@@ -546,8 +550,8 @@ local function CombustionPhase()
   if (CovenantID == 3) then
     var_use_shifting_power = (S.Firestarter:ActiveRemains() < var_extended_combustion_remains and (S.InfernalCascade:ConduitEnabled() and var_expected_fire_blasts < var_needed_fire_blasts) and ((not S.RuneofPower:IsAvailable()) or S.RuneofPower:CooldownRemains() > var_extended_combustion_remains) or EnemiesCount18yMelee >= var_combustion_shifting_power)
   end
-  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=conduit.infernal_cascade&!variable.fire_blast_pooling&(variable.expected_fire_blasts>=variable.needed_fire_blasts|buff.combustion.remains<gcd.max|variable.extended_combustion_remains<=buff.infernal_cascade.duration|buff.infernal_cascade.stack<2|buff.infernal_cascade.remains<gcd.max|cooldown.shifting_power.ready&variable.use_shifting_power)&buff.combustion.up&(!buff.firestorm.react|buff.infernal_cascade.remains<0.5)&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react*(gcd.remains>0)<2
-  if S.FireBlast:IsReady() and (S.InfernalCascade:ConduitEnabled() and not var_fire_blast_pooling and (var_expected_fire_blasts >= var_needed_fire_blasts or Player:BuffRemains(S.CombustionBuff) < Player:GCD() + 0.5 or var_extended_combustion_remains <= S.InfernalCascadeBuff:BaseDuration() or Player:BuffStack(S.InfernalCascadeBuff) < 2 or Player:BuffRemains(S.InfernalCascadeBuff) < Player:GCD() + 0.5 or S.ShiftingPower:CooldownUp() and var_use_shifting_power) and Player:BuffUp(S.CombustionBuff) and ((not Player:BuffUp(S.FirestormBuff)) or Player:BuffRemains(S.InfernalCascadeBuff) < 0.5) and Player:BuffDown(S.HotStreakBuff) and HotStreakInFlight() + num(Player:BuffUp(S.HeatingUpBuff)) * num(Player:GCDRemains() > 0) < 2) then
+  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=conduit.infernal_cascade&!variable.fire_blast_pooling&(!set_bonus.tier28_4pc|debuff.mirrors_of_torment.down|buff.sun_kings_blessing_ready.down|action.pyroblast.executing)&(variable.expected_fire_blasts>=variable.needed_fire_blasts|buff.combustion.remains<gcd.max|variable.extended_combustion_remains<=buff.infernal_cascade.duration|buff.infernal_cascade.stack<2|buff.infernal_cascade.remains<gcd.max|cooldown.shifting_power.ready&variable.use_shifting_power)&buff.combustion.up&(!buff.firestorm.react|buff.infernal_cascade.remains<0.5)&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react*(gcd.remains>0)<2
+  if S.FireBlast:IsReady() and (S.InfernalCascade:ConduitEnabled() and (not var_fire_blast_pooling) and ((not Player:HasTier(28, 4)) or Target:DebuffDown(S.MirrorsofTorment) or Player:BuffDown(S.SunKingsBlessingBuff) or Player:IsCasting(S.Pyroblast)) and (var_expected_fire_blasts >= var_needed_fire_blasts or Player:BuffRemains(S.CombustionBuff) < Player:GCD() + 0.5 or var_extended_combustion_remains <= S.InfernalCascadeBuff:BaseDuration() or Player:BuffStack(S.InfernalCascadeBuff) < 2 or Player:BuffRemains(S.InfernalCascadeBuff) < Player:GCD() + 0.5 or S.ShiftingPower:CooldownUp() and var_use_shifting_power) and Player:BuffUp(S.CombustionBuff) and ((not Player:BuffUp(S.FirestormBuff)) or Player:BuffRemains(S.InfernalCascadeBuff) < 0.5) and Player:BuffDown(S.HotStreakBuff) and HotStreakInFlight() + num(Player:BuffUp(S.HeatingUpBuff)) * num(Player:GCDRemains() > 0) < 2) then
     if FBCast(S.FireBlast) then return "fire_blast combustion_phase 22"; end
   end
   -- flamestrike,if=(buff.hot_streak.react&active_enemies>=variable.combustion_flamestrike)|(buff.firestorm.react&active_enemies>=variable.combustion_flamestrike-runeforge.firestorm)
@@ -574,20 +578,20 @@ local function CombustionPhase()
   if S.ShiftingPower:IsReady() and (var_use_shifting_power and Player:BuffUp(S.CombustionBuff) and S.FireBlast:Charges() == 0 and S.PhoenixFlames:Charges() < var_phoenix_flames_max_stack) then
     if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(18)) then return "shifting_power combustion_phase 34"; end
   end
-  -- rune_of_power,if=buff.sun_kings_blessing_ready.up&(variable.needed_fire_blasts<=variable.expected_fire_blasts|debuff.mirrors_of_torment.up)&active_enemies>=variable.combustion_flamestrike&buff.sun_kings_blessing_ready.remains>execute_time+action.flamestrike.cast_time
-  if S.RuneofPower:IsReady() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and (var_needed_fire_blasts <= var_expected_fire_blasts or Target:DebuffUp(S.MirrorsofTorment)) and EnemiesCount16ySplash >= var_combustion_flamestrike and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.RuneofPower:ExecuteTime() + S.Flamestrike:CastTime()) then
+  -- rune_of_power,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>execute_time+action.flamestrike.cast_time&buff.rune_of_power.remains<action.flamestrike.cast_time&active_enemies>=variable.combustion_flamestrike
+  if S.RuneofPower:IsReady() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.RuneofPower:ExecuteTime() + S.Flamestrike:CastTime() and Player:BuffRemains(S.RuneofPowerBuff) < S.Flamestrike:CastTime() and EnemiesCount16ySplash >= var_combustion_flamestrike) then
     if Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneOfPower) then return "rune_of_power combustion_phase 36"; end
   end
-  -- flamestrike,if=buff.sun_kings_blessing_ready.up&(variable.needed_fire_blasts<=variable.expected_fire_blasts|debuff.mirrors_of_torment.up)&active_enemies>=variable.combustion_flamestrike&buff.sun_kings_blessing_ready.remains>cast_time&(!conduit.infernal_cascade|buff.infernal_cascade.remains>execute_time|buff.heating_up.react+hot_streak_spells_in_flight<2)
-  if S.Flamestrike:IsReady() and AoEON() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and (var_needed_fire_blasts <= var_expected_fire_blasts or Target:DebuffUp(S.MirrorsofTorment)) and EnemiesCount8ySplash >= var_combustion_flamestrike and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.Flamestrike:CastTime() and ((not S.InfernalCascade:ConduitEnabled()) or Player:BuffRemains(S.InfernalCascadeBuff) > S.Flamestrike:ExecuteTime() or Player:BuffStack(S.HeatingUpBuff) + HotStreakInFlight() < 2)) then
+  -- flamestrike,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time&active_enemies>=variable.combustion_flamestrike
+  if S.Flamestrike:IsReady() and AoEON() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.Flamestrike:CastTime() and EnemiesCount16ySplash >= var_combustion_flamestrike) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 38"; end
   end
-  -- rune_of_power,if=buff.sun_kings_blessing_ready.up&(!talent.pyroclasm|buff.pyroclasm.react&buff.pyroclasm.remains>execute_time+action.pyroblast.cast_time|variable.needed_fire_blasts<=variable.expected_fire_blasts|debuff.mirrors_of_torment.up)&buff.sun_kings_blessing_ready.remains>execute_time+action.pyroblast.cast_time
-  if S.RuneofPower:IsCastable() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and ((not S.Pyroclasm:IsAvailable()) or Player:BuffUp(S.PyroclasmBuff) and Player:BuffRemains(S.PyroclasmBuff) > S.RuneofPower:ExecuteTime() + S.Pyroblast:CastTime() or var_needed_fire_blasts <= var_expected_fire_blasts or Target:DebuffUp(S.MirrorsofTorment)) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.RuneofPower:ExecuteTime() + S.Pyroblast:CastTime()) then
+  -- rune_of_power,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>execute_time+action.pyroblast.cast_time&buff.rune_of_power.remains<action.pyroblast.cast_time
+  if S.RuneofPower:IsCastable() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.RuneofPower:ExecuteTime() + S.Pyroblast:CastTime() and Player:BuffRemains(S.RuneofPowerBuff) < S.Pyroblast:CastTime()) then
     if Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneOfPower) then return "rune_of_power combustion_phase 40"; end
   end
-  -- pyroblast,if=buff.sun_kings_blessing_ready.up&(!talent.pyroclasm|buff.pyroclasm.react&buff.pyroclasm.remains>cast_time|variable.needed_fire_blasts<=variable.expected_fire_blasts|debuff.mirrors_of_torment.up)&buff.sun_kings_blessing_ready.remains>cast_time&(!conduit.infernal_cascade|buff.infernal_cascade.remains>execute_time|buff.heating_up.react+hot_streak_spells_in_flight<2)
-  if S.Pyroblast:IsReady() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and ((not S.Pyroclasm:IsAvailable()) or Player:BuffUp(S.PyroclasmBuff) and Player:BuffRemains(S.PyroclasmBuff) > S.Pyroblast:CastTime() or var_needed_fire_blasts <= var_expected_fire_blasts or Target:DebuffUp(S.MirrorsofTorment)) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.Pyroblast:CastTime() and ((not S.InfernalCascade:ConduitEnabled()) or Player:BuffRemains(S.InfernalCascadeBuff) > S.Pyroblast:ExecuteTime() or Player:BuffStack(S.HeatingUpBuff) + HotStreakInFlight() < 2)) then
+  -- pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time
+  if S.Pyroblast:IsReady() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.Pyroblast:CastTime()) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 42"; end
   end
   -- pyroblast,if=buff.pyroclasm.react&buff.pyroclasm.remains>cast_time&buff.combustion.remains>cast_time&active_enemies<variable.combustion_flamestrike&(!conduit.infernal_cascade|buff.infernal_cascade.remains>execute_time|buff.heating_up.react+hot_streak_spells_in_flight<2)
@@ -1050,8 +1054,8 @@ local function APL()
 end
 
 local function Init()
-  -- APL Nov 15, 2021 https://github.com/simulationcraft/simc/tree/a2591a92792ee0313927424048cedefb7e8a31f6
-  --HR.Print("Fire Mage rotation is currently a work in progress, but has been updated for patch 9.1.5.")
+  -- APL April 3, 2022 https://github.com/simulationcraft/simc/tree/c47283d854adc672c969569887ede9de92962240
+  --HR.Print("Fire Mage rotation is currently a work in progress, but has been updated for patch 9.2.")
 end
 
 HR.SetAPL(63, APL, Init)
