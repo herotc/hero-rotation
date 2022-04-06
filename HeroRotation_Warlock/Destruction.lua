@@ -40,6 +40,7 @@ local S = Spell.Warlock.Destruction
 -- Items
 local I = Item.Warlock.Destruction
 local TrinketsOnUseExcludes = {--  I.TrinketName:ID(),
+  I.ScarsofFraternalStrife:ID(),
   I.ShadowedOrbofTorment:ID(),
   I.TomeofMonstrousConstructions:ID(),
   I.SoleahsSecretTechnique:ID(),
@@ -195,6 +196,12 @@ local function CDs()
   -- fireblood,if=pet.infernal.active
   if S.Fireblood:IsCastable() and InfernalTime() > 0 then
     if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 14"; end
+  end
+  -- use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up
+  -- use_item,name=scars_of_fraternal_strife,if=buff.scars_of_fraternal_strife_4.up&pet.infernal.active
+  -- Note: Combined both lines into a single check
+  if I.ScarsofFraternalStrife:IsEquippedAndReady() and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) or Player:BuffUp(S.ScarsofFraternalStrifeBuff4) and InfernalTime() > 0) then
+    if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife cds 16"; end
   end
   -- use_items,if=pet.infernal.active|time_to_die<21
   if (InfernalTime() > 0 or FightRemains < 21) then
