@@ -48,7 +48,7 @@ Spell.Warrior.Commons = {
   StormBolt                             = Spell(107570),
   -- Covenant Abilities (Shadowlands)
   AncientAftershock                     = Spell(325886),
-  Condemn                               = MultiSpell(330325, 317485),
+  Condemn                               = MultiSpell(330325, 330334, 317485),
   CondemnDebuff                         = Spell(317491),
   ConquerorsBanner                      = Spell(324143),
   ConquerorsFrenzyBuff                  = Spell(343672),
