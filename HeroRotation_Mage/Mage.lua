@@ -88,6 +88,7 @@ Spell.Mage.Commons = {
   DisciplinaryCommandBuff               = Spell(327371),
   ExpandedPotentialBuff                 = Spell(327495),
   -- Trinket Effects
+  ScarsofFraternalStrifeBuff4           = Spell(368638),
   SoulIgnitionBuff                      = Spell(345211),
   TomeofMonstruousConstructionsBuff     = Spell(357163),
 }
@@ -211,6 +212,7 @@ Item.Mage.Commons = {
   EmpyrealOrdnance                 = Item(180117, {13, 14}),
   FlameofBattle                    = Item(181501, {13, 14}),
   GlyphofAssimilation              = Item(184021, {13, 14}),
+  GrimEclipse                      = Item(188254, {13, 14}),
   InscrutableQuantumDevice         = Item(179350, {13, 14}),
   InstructorsDivineBell            = Item(184842, {13, 14}),
   MacabreSheetMusic                = Item(184024, {13, 14}),
