@@ -82,6 +82,7 @@ Spell.Mage.Commons = {
   IcyPropulsion                         = Spell(336522),
   IreOfTheAscended                      = Spell(337058),
   PustuleEruption                       = Spell(351094),
+  ShiveringCore                         = Spell(336472),
   SiphonedMalice                        = Spell(337090),
   VolatileSolvent                       = Spell(323074),
   -- Legendary Effects
@@ -186,6 +187,7 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   TemporalDisplacement                  = Spell(80354),
   IceBarrier                            = Spell(11426),
   -- Talents
+  BoneChilling                          = Spell(205027),
   CometStorm                            = Spell(153595), --splash, 6
   Ebonbolt                              = Spell(257537), --splash, 8 (with splitting ice)
   FreezingRain                          = Spell(270233),

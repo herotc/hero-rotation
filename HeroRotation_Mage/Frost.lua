@@ -166,8 +166,8 @@ local function Cooldowns()
   if S.RuneofPower:IsCastable() and (S.IcyVeins:CooldownRemains() > 12 and Player:BuffDown(S.RuneofPowerBuff)) then
     if Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneOfPower) then return "rune_of_power cd 10"; end
   end
-  -- icy_veins,if=buff.rune_of_power.down&(buff.icy_veins.down|talent.rune_of_power)&(buff.slick_ice.down|active_enemies>=2)
-  if S.IcyVeins:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) and (Player:BuffDown(S.IcyVeins) or S.RuneofPower:IsAvailable()) and (Player:BuffDown(S.SlickIceBuff) or EnemiesCount8ySplash >= 2)) then
+  -- icy_veins,if=buff.rune_of_power.down&(buff.icy_veins.down|talent.rune_of_power)&(buff.slick_ice.down|conduit.icy_propulsion&(talent.comet_storm|set_bonus.tier28_2pc)|active_enemies>=2)
+  if S.IcyVeins:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) and (Player:BuffDown(S.IcyVeins) or S.RuneofPower:IsAvailable()) and (Player:BuffDown(S.SlickIceBuff) or S.IcyPropulsion:ConduitEnabled() and (S.CometStorm:IsAvailable() or Player:HasTier(28, 2)) or EnemiesCount8ySplash >= 2)) then
     if Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cd 12"; end
   end
   -- time_warp,if=runeforge.temporal_warp&buff.exhaustion.up&(prev_off_gcd.icy_veins|fight_remains<40)
@@ -212,80 +212,94 @@ local function Aoe()
   if S.FrozenOrb:IsCastable() then
     if Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb, nil, not Target:IsInRange(40)) then return "frozen_orb aoe 2"; end
   end
-  -- blizzard
-  if S.Blizzard:IsCastable() then
+  -- blizzard,if=buff.deathborne.down|!runeforge.deaths_fathom|buff.freezing_rain.up|active_enemies>=6
+  if S.Blizzard:IsCastable() and (Player:BuffDown(S.Deathborne) or (not DeathsFathomEquipped) or Player:BuffUp(S.FreezingRainBuff) or EnemiesCount16ySplash >= 6) then
     if Cast(S.Blizzard, nil, nil, not Target:IsInRange(40)) then return "blizzard aoe 4"; end
+  end
+  if S.Blizzard:IsCastable() and Player:BuffUp(S.Deathborne) then
+    -- blizzard,if=buff.deathborne.up&active_enemies=5&(talent.freezing_rain|talent.bone_chilling|conduit.shivering_core|!runeforge.cold_front)
+    if (EnemiesCount16ySplash == 5 and (S.FreezingRain:IsAvailable() or S.BoneChilling:IsAvailable() or S.ShiveringCore:ConduitEnabled() or not ColdFrontEquipped)) then
+      if Cast(S.Blizzard, nil, nil, not Target:IsInRange(40)) then return "blizzard aoe 6"; end
+    end
+    -- blizzard,if=buff.deathborne.up&active_enemies=4&(talent.freezing_rain|talent.bone_chilling&conduit.shivering_core|!runeforge.cold_front&!runeforge.slick_ice)
+    if (EnemiesCount16ySplash == 4 and (S.FreezingRain:IsAvailable() or S.BoneChilling:IsAvailable() and S.ShiveringCore:ConduitEnabled() or (not ColdFrontEquipped) and not SlickIceEquipped)) then
+      if Cast(S.Blizzard, nil, nil, not Target:IsInRange(40)) then return "blizzard aoe 8"; end
+    end
+    -- blizzard,if=buff.deathborne.up&active_enemies<=3&!runeforge.slick_ice&!runeforge.cold_front&conduit.shivering_core&(talent.freezing_rain|talent.bone_chilling)
+    if (EnemiesCount16ySplash <= 3 and (not SlickIceEquipped) and (not ColdFrontEquipped) and S.ShiveringCore:ConduitEnabled() and (S.FreezingRain:IsAvailable() or S.BoneChilling:IsAvailable())) then
+      if Cast(S.Blizzard, nil, nil, not Target:IsInRange(40)) then return "blizzard aoe 10"; end
+    end
   end
   -- flurry,if=(remaining_winters_chill=0|debuff.winters_chill.down)&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&(buff.fingers_of_frost.react=0|runeforge.deaths_fathom&prev_gcd.1.frostbolt&(runeforge.cold_front|runeforge.slick_ice)&buff.deathborne.up))
   if S.Flurry:IsCastable() and (Target:DebuffDown(S.WintersChillDebuff) and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:BuffDown(S.FingersofFrostBuff) or DeathsFathomEquipped and Player:PrevGCD(1, S.Frostbolt) and (ColdFrontEquipped or SlickIceEquipped) and Player:BuffUp(S.Deathborne)))) then
-    if Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 6"; end
+    if Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 12"; end
   end
   -- ice_nova
   if S.IceNova:IsCastable() then
-    if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova aoe 8"; end
+    if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova aoe 14"; end
   end
   -- comet_storm
   if S.CometStorm:IsCastable() then
-    if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm aoe 10"; end
+    if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm aoe 16"; end
   end
   -- frostbolt,if=runeforge.deaths_fathom&(runeforge.cold_front|runeforge.slick_ice)&buff.deathborne.remains>cast_time+travel_time
   if S.Frostbolt:IsCastable() and (DeathsFathomEquipped and (ColdFrontEquipped or SlickIceEquipped) and Player:BuffRemains(S.Deathborne) > S.Frostbolt:CastTime() + S.Frostbolt:TravelTime()) then
-    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 12"; end
+    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 18"; end
   end
   -- frostbolt,if=remaining_winters_chill=1&comet_storm_remains>action.ice_lance.travel_time
   if S.Frostbolt:IsCastable() and (Target:DebuffStack(S.WintersChillDebuff) == 1 and CometStormRemains() > S.IceLance:TravelTime()) then
-    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 14"; end
+    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 20"; end
   end
   -- ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time|remaining_winters_chill&debuff.winters_chill.remains>travel_time
   if S.IceLance:IsCastable() and EnemiesCount8ySplash >= 2 and (Player:BuffUp(S.FingersofFrostBuff) or FrozenRemains() > S.IceLance:TravelTime() or Target:DebuffStack(S.WintersChillDebuff) > 1 and Target:DebuffRemains(S.WintersChillDebuff) > S.IceLance:TravelTime()) then
-    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 16"; end
+    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 22"; end
   end
   -- radiant_spark,if=soulbind.combat_meditation
   if S.RadiantSpark:IsCastable() and (S.CombatMeditation:SoulbindEnabled()) then
-    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe 18"; end
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe 24"; end
   end
   if CDsON() then
     -- mirrors_of_torment
     if S.MirrorsofTorment:IsCastable() then
-      if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment aoe 20"; end
+      if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment aoe 26"; end
     end
     -- shifting_power
     if S.ShiftingPower:IsCastable() then
-      if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(18)) then return "shifting_power aoe 22"; end
+      if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(18)) then return "shifting_power aoe 28"; end
     end
   end
   -- fire_blast,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
   if S.FireBlast:IsCastable() and (DisciplinaryCommandEquipped and var_disciplinary_command_cd_remains <= 0 and Mage.DC.Fire == 0) then
-    if Cast(S.FireBlast) then return "fire_blast aoe 24"; end
+    if Cast(S.FireBlast) then return "fire_blast aoe 30"; end
   end
   -- arcane_explosion,if=mana.pct>30&active_enemies>=6&!runeforge.glacial_fragments
   -- Note: Using 8y splash instead of 10y to account for distance from caster to the target after moving into range
   if S.ArcaneExplosion:IsCastable() and (Player:ManaPercentageP() > 30 and EnemiesCount8ySplash >= 6 and not GlacialFragmentsEquipped) then
     if Settings.Frost.StayDistance and not Target:IsInRange(10) then
-      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion aoe 26 left"; end
+      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion aoe 32 left"; end
     else
-      if Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 26"; end
+      if Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 32"; end
     end
   end
   -- ebonbolt
   if S.Ebonbolt:IsCastable() and (EnemiesCount8ySplash >= 2) then
-    if Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt aoe 28"; end
+    if Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt aoe 34"; end
   end
   -- ice_lance,if=runeforge.glacial_fragments&(talent.splitting_ice|active_enemies>=5)&travel_time<ground_aoe.blizzard.remains
   local BlizzardRemains = 7 - S.Blizzard:TimeSinceLastCast()
   if BlizzardRemains < 0 then BlizzardRemains = 0 end
   if S.IceLance:IsCastable() and (GlacialFragmentsEquipped and (S.SplittingIce:IsAvailable() or EnemiesCount8ySplash >= 5) and S.IceLance:TravelTime() < BlizzardRemains) then
-    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 30"; end
+    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 36"; end
   end
   -- wait,sec=0.1,if=runeforge.glacial_fragments&(talent.splitting_ice|active_enemies>=5)
   -- NYI wait
   -- frostbolt
   if S.Frostbolt:IsCastable() then
-    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 32"; end
+    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 38"; end
   end
   -- Manually added: ice_lance as a fallthrough when MovingRotation is true
   if S.IceLance:IsCastable() then
-    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 34"; end
+    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 40"; end
   end
 end
 
@@ -442,7 +456,7 @@ local function APL()
 end
 
 local function Init()
-  -- APL March 29, 2022 https://github.com/simulationcraft/simc/tree/8c018d49403f278feda815acd3125e93cda2682e
+  -- APL April 6, 2022 https://github.com/simulationcraft/simc/tree/1ba3249f3ecc4ca494c4bf95a2439980389a13b6
   --HR.Print("Frost Mage rotation is currently a work in progress, but has been updated for patch 9.2.")
 end
 
