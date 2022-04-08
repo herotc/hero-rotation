@@ -124,7 +124,7 @@ local function Precombat()
     if S.ShackleTheUnworthy:IsCastable() and (Player:Rune() < 3 and Player:RunicPower() < 100) then
       if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy precombat 8"; end
     end
-    if S.SwarmingMist:IsCastable() then
+    if S.SwarmingMist:IsCastable() and (S.DancingRuneWeapon:CooldownRemains() > 3 and Player:RunicPower() >= (90 - (EnemiesMeleeCount * 3))) then
       if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant) then return "swarming_mist precombat 10"; end
     end
     if S.AbominationLimb:IsCastable() then
