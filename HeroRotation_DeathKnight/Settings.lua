@@ -54,6 +54,7 @@ HR.GUISettings.APL.DeathKnight = {
       VampiricBlood = false,
     },
     OffGCDasOffGCD = {
+      BloodTap = true,
       RuneTap = true,
     },
   },

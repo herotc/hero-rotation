@@ -121,7 +121,7 @@ local function Precombat()
     if S.Blooddrinker:IsReady() then
       if Cast(S.Blooddrinker, nil, nil, not Target:IsSpellInRange(S.Blooddrinker)) then return "blooddrinker precombat 6"; end
     end
-    if S.ShackleTheUnworthy:IsCastable() then
+    if S.ShackleTheUnworthy:IsCastable() and (Player:Rune() < 3 and Player:RunicPower() < 100) then
       if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy precombat 8"; end
     end
     if S.SwarmingMist:IsCastable() then
@@ -408,7 +408,7 @@ local function APL()
     end
     -- blood_tap,if=(rune<=2&rune.time_to_4>gcd&charges_fractional>=1.8)|rune.time_to_3>gcd
     if S.BloodTap:IsCastable() and ((Player:Rune() <= 2 and Player:RuneTimeToX(4) > Player:GCD() and S.BloodTap:ChargesFractional() >= 1.8) or Player:RuneTimeToX(3) > Player:GCD()) then
-      if Cast(S.BloodTap) then return "blood_tap main 12"; end
+      if Cast(S.BloodTap, Settings.Blood.OffGCDasOffGCD.BloodTap) then return "blood_tap main 12"; end
     end
     -- dancing_rune_weapon,if=!buff.dancing_rune_weapon.up
     if S.DancingRuneWeapon:IsCastable() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
