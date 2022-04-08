@@ -112,17 +112,32 @@ local function Precombat()
   if Everyone.TargetIsValid() then
     -- fleshcraft
     if S.Fleshcraft:IsCastable() then
-      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 1"; end
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 2"; end
     end
     -- Manually added: Openers
-    if S.DeathsCaress:IsReady() and not Target:IsInMeleeRange(5) then
-      if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress precombat 2"; end
+    if S.DeathsDue:IsCastable() then
+      if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "deaths_due precombat 4"; end
     end
-    if S.Marrowrend:IsReady() and Target:IsInMeleeRange(5) then
-      if Cast(S.Marrowrend) then return "marrowrend precombat 4"; end
+    if S.Blooddrinker:IsReady() then
+      if Cast(S.Blooddrinker, nil, nil, not Target:IsSpellInRange(S.Blooddrinker)) then return "blooddrinker precombat 6"; end
     end
-    if S.BloodBoil:IsCastable() and Target:IsInMeleeRange(10) then
-      if Cast(S.BloodBoil) then return "blood_boil precombat 6"; end
+    if S.ShackleTheUnworthy:IsCastable() then
+      if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy precombat 8"; end
+    end
+    if S.SwarmingMist:IsCastable() then
+      if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant) then return "swarming_mist precombat 10"; end
+    end
+    if S.AbominationLimb:IsCastable() then
+      if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(15)) then return "abomination_limb precombat 12"; end
+    end
+    if S.DancingRuneWeapon:IsCastable() then
+      if Cast(S.DancingRuneWeapon, Settings.Blood.GCDasOffGCD.DancingRuneWeapon) then return "dancing_rune_weapon precombat 14"; end
+    end
+    if S.Marrowrend:IsReady() then
+      if Cast(S.Marrowrend, nil, nil, not Target:IsInMeleeRange(5)) then return "marrowrend precombat 16"; end
+    end
+    if S.BloodBoil:IsReady() then
+      if Cast(S.BloodBoil, Settings.Blood.GCDasOffGCD.BloodBoil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil precombat 18"; end
     end
   end
 end
