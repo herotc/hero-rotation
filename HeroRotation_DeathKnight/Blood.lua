@@ -386,6 +386,10 @@ local function APL()
         if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
+    -- use_item,name=gavel_of_the_first_arbiter
+    if I.GaveloftheFirstArbiter:IsEquippedAndReady() then
+      if Cast(I.GaveloftheFirstArbiter, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(30)) then return "gavel_of_the_first_arbiter main 3"; end
+    end
     -- raise_dead
     if CDsON() and S.RaiseDead:IsCastable() then
       if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead main 4"; end

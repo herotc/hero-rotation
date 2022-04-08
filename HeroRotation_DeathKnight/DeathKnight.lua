@@ -189,7 +189,9 @@ Item.DeathKnight.Commons = {
   InscrutableQuantumDevice              = Item(179350, {13, 14}),
   OverwhelmingPowerCrystal              = Item(179342, {13, 14}),
   ScarsofFraternalStrife                = Item(188253, {13, 14}),
-  TheFirstSigil                         = Item(188271, {13, 14})
+  TheFirstSigil                         = Item(188271, {13, 14}),
+  -- Other On-Use Items
+  GaveloftheFirstArbiter                = Item(189862),
 }
 
 Item.DeathKnight.Blood = MergeTableByKey(Item.DeathKnight.Commons, {

@@ -525,17 +525,21 @@ local function Trinkets()
   if I.InscrutableQuantumDevice:IsEquippedAndReady() and ((S.UnholyBlight:CooldownRemains() > 20 or S.DarkTransformation:CooldownRemains() > 20) and (EnemiesMeleeCount >= 2 or S.ArmyoftheDead:TimeSinceLastCast() <= 30 or VarApocGhoulActive and (S.UnholyAssault:IsAvailable() or Settings.Unholy.DisableAotD) or VarGargoyleActive) or HL.FilteredFightRemains(EnemiesMelee, "<", 21) or Target:TimeToX(20) < 5 and Player:BloodlustDown()) then
     if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device trinkets 2"; end
   end
+  -- use_item,name=gavel_of_the_first_arbiter
+  if I.GaveloftheFirstArbiter:IsEquippedAndReady() then
+    if Cast(I.GaveloftheFirstArbiter, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(30)) then return "gavel_of_the_first_arbiter trinkets 4"; end
+  end
   -- use_item,name=scars_of_fraternal_strife
   if I.ScarsofFraternalStrife:IsEquippedAndReady() then
-    if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife trinkets 3"; end
+    if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife trinkets 6"; end
   end
   -- use_item,name=the_first_sigil,if=variable.major_cooldowns_active&(time>30|!equipped.inscrutable_quantum_device)
   if I.TheFirstSigil:IsEquippedAndReady() and (VarMajorCDsActive and (HL.CombatTime() > 30 or not I.InscrutableQuantumDevice:IsEquipped())) then
-    if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil trinkets 4"; end
+    if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil trinkets 8"; end
   end
   -- use_item,name=overwhelming_power_crystal,if=variable.major_cooldowns_active&(time>30|!equipped.inscrutable_quantum_device&!equipped.the_first_sigil)
   if I.OverwhelmingPowerCrystal:IsEquippedAndReady() and (VarMajorCDsActive and (HL.CombatTime() > 30 or (not I.InscrutableQuantumDevice:IsEquipped()) and not I.TheFirstSigil:IsEquipped())) then
-    if Cast(I.OverwhelmingPowerCrystal, nil, Settings.Commons.DisplayStyle.Trinkets) then return "overwhelming_power_crystal trinkets 6"; end
+    if Cast(I.OverwhelmingPowerCrystal, nil, Settings.Commons.DisplayStyle.Trinkets) then return "overwhelming_power_crystal trinkets 10"; end
   end
   -- use_item,slot=trinket1,if=!variable.specified_trinket&((trinket.1.proc.any_dps.duration<=15&cooldown.apocalypse.remains>20|trinket.1.proc.any_dps.duration>15&(cooldown.unholy_blight.remains>20|cooldown.dark_transformation.remains_expected>20)|active_enemies>=2&buff.dark_transformation.up)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1))|trinket.1.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket2,if=!variable.specified_trinket&((trinket.2.proc.any_dps.duration<=15&cooldown.apocalypse.remains>20|trinket.2.proc.any_dps.duration>15&(cooldown.unholy_blight.remains>20|cooldown.dark_transformation.remains_expected>20)|active_enemies>=2&buff.dark_transformation.up)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2))|trinket.2.proc.any_dps.duration>=fight_remains

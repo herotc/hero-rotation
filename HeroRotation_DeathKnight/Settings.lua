@@ -27,6 +27,7 @@ HR.GUISettings.APL.DeathKnight = {
       Potions = "Suggested",
       Covenant = "Suggested",
       Trinkets = "Suggested",
+      Items = "Suggested",
       RaiseDead = "Suggested",
     },
     OffGCDasOffGCD = {
