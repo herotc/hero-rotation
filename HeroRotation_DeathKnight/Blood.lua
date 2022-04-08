@@ -56,6 +56,13 @@ HL:RegisterForEvent(function()
   CovenantID = Player:CovenantID()
 end, "COVENANT_CHOSEN")
 
+-- Legendary
+local CrimsonRuneWeaponEquipped = Player:HasLegendaryEquipped(35)
+
+HL:RegisterForEvent(function()
+  CrimsonRuneWeaponEquipped = Player:HasLegendaryEquipped(35)
+end, "PLAYER_EQUIPMENT_CHANGED")
+
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
 local Settings = {
