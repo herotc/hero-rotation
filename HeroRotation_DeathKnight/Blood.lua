@@ -376,8 +376,8 @@ local function APL()
     -- variable,name=death_strike_dump_amount,value=70,op=setif,condition=covenant.night_fae&buff.deaths_due.remains>6,value_else=55
     VarDeathStrikeDumpAmt = (CovenantID == 3 and Player:BuffRemains(S.DeathsDueBuff) > 6) and 70 or 55
     -- potion,if=buff.dancing_rune_weapon.up
-    if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.DancingRuneWeaponBuff)) then
-      if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
+    if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.DancingRuneWeaponBuff)) then
+      if Cast(I.PotionofSpectralStrength, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
     end
     -- use_items
     if (Settings.Commons.Enabled.Trinkets) then

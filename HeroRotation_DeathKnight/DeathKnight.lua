@@ -184,7 +184,6 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
 if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Commons = {
   -- Potions
-  PotionofPhantomFire                   = Item(171349),
   PotionofSpectralStrength              = Item(171275),
   -- Trinkets
   InscrutableQuantumDevice              = Item(179350, {13, 14}),
