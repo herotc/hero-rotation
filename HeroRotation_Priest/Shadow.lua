@@ -172,7 +172,7 @@ local function EvaluateCycleMindSear224(TargetUnit)
   return (S.SearingNightmare:IsAvailable() and TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and EnemiesCount10ySplash > 2)
 end
 
-local function EvaluatecycleMindSear225(TargetUnit)
+local function EvaluateCycleMindSear225(TargetUnit)
   return (TargetUnit:DebuffDown(S.ShadowWordPainDebuff))
 end
 
