@@ -7,6 +7,7 @@ local DBC = HeroDBC.DBC
 -- HeroLib
 local HL         = HeroLib
 local Cache      = HeroCache
+local Utils      = HL.Utils
 local Unit       = HL.Unit
 local Player     = Unit.Player
 local Target     = Unit.Target
@@ -80,6 +81,30 @@ end
 
 local function bool(val)
   return val ~= 0
+end
+
+local function EvaluateTargetIfFilterHP(TargetUnit)
+  return (TargetUnit:HealthPercentage())
+end
+
+local function EvaluateTargetIfExecuteRend(TargetUnit)
+  return (TargetUnit:DebuffRemains(S.RendDebuff) <= Player:GCD() and TargetUnit:TimeToDie() > 12)
+end
+
+local function EvaluateTargetIfExecuteAncientAftershock(TargetUnit)
+  return (TargetUnit:DebuffUp(S.ColossusSmashDebuff))
+end
+
+local function EvaluateTargetIfExecuteCondemn(TargetUnit)
+  return (Player:RageDeficit() < 25 or TargetUnit:DebuffUp(S.ColossusSmashDebuff) and Player:Rage() > 40 or Player:BuffUp(S.SuddenDeathBuff) or Player:BuffUp(S.DeadlyCalmBuff))
+end
+
+local function EvaluateTargetIfExecuteCleave(TargetUnit)
+  return (TargetUnit:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD())
+end
+
+local function EvaluateTargetIfExecuteMortalStrike(TargetUnit)
+  return (TargetUnit:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD() or EnduringBlowEquipped or Player:BuffStack(S.OverpowerBuff) == 2 and TargetUnit:DebuffStack(S.ExploiterDebuff) == 2 or Player:BuffUp(S.BattlelordBuff))
 end
 
 local function Precombat()
@@ -170,8 +195,8 @@ local function Hac()
   if S.Overpower:IsCastable() and (S.Dreadnaught:IsAvailable()) then
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower hac 28"; end
   end
-  -- condemn
-  if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
+  -- condemnif=buff.sweeping_strikes.up|buff.sudden_death.react
+  if S.Condemn:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff) or Player:BuffUp(S.SuddenDeathBuff)) then
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn hac 30"; end
   end
   -- execute,if=buff.sweeping_strikes.up
@@ -193,7 +218,7 @@ local function Hac()
   
 end
 
-local function Execute()
+local function Execute(Mode, CurTarget)
   -- deadly_calm
   if S.DeadlyCalm:IsCastable() and CDsON() then
     if Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm execute 2"; end
@@ -208,78 +233,78 @@ local function Execute()
     if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar execute 6"; end
   end
   -- condemn,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd&conduit.ashen_juggernaut.rank>1
-  if S.Condemn:IsCastable() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() and S.AshenJuggernaut:ConduitRank() > 1) then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 8"; end
+  if S.Condemn:IsReady() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() and S.AshenJuggernaut:ConduitRank() > 1) then
+    if Everyone.CastTargetIf(S.Condemn, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not TargetInMeleeRange, nil, Settings.Commons.DisplayStyle.Covenant) then return "condemn execute 8"; end
   end
   -- execute,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd&conduit.ashen_juggernaut.rank>1
   if S.Execute:IsReady() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() and S.AshenJuggernaut:ConduitRank() > 1) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 10"; end
+    if Everyone.CastTargetIf(S.Execute, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not TargetInMeleeRange, nil, Settings.Commons.DisplayStyle.Covenant) then return "execute execute 10"; end
   end
   -- ravager
   if CDsON() and S.Ravager:IsCastable() then
-    if Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager execute 12"; end
+    if Everyone.CastTargetIf(S.Ravager, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not Target:IsSpellInRange(S.Ravager), Settings.Arms.GCDasOffGCD.Ravager) then return "ravager execute 12"; end
   end
   -- rend,if=remains<=gcd&(!talent.warbreaker.enabled&cooldown.colossus_smash.remains<4|talent.warbreaker.enabled&cooldown.warbreaker.remains<4)&target.time_to_die>12
-  if S.Rend:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and (not S.Warbreaker:IsAvailable() and S.ColossusSmash:CooldownRemains() < 4 or S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemains() < 4) and Target:TimeToDie() > 12) then
-    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend execute 14"; end
+  if S.Rend:IsReady() and ((not S.Warbreaker:IsAvailable()) and S.ColossusSmash:CooldownRemains() < 4 or S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemains() < 4) then
+    if Everyone.CastTargetIf(S.Rend, Enemies8y, Mode, EvaluateTargetIfFilterHP, EvaluateTargetIfExecuteRend, not TargetInMeleeRange) then return "rend execute 14"; end
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
-    if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker execute 16"; end
+    if Everyone.CastTargetIf(S.Warbreaker, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not Target:IsInRange(8)) then return "warbreaker execute 16"; end
   end
   -- colossus_smash
   if S.ColossusSmash:IsCastable() then
-    if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash execute 18"; end
+    if Everyone.CastTargetIf(S.ColossusSmash, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not TargetInMeleeRange) then return "colossus_smash execute 18"; end
   end
   if CDsON() then
     -- ancient_aftershock,if=debuff.colossus_smash.up
-    if S.AncientAftershock:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
-      if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock execute 20"; end
+    if S.AncientAftershock:IsCastable() then
+      if Everyone.CastTargetIf(S.AncientAftershock, Enemies8y, Mode, EvaluateTargetIfFilterHP, EvaluateTargetIfExecuteAncientAftershock, not TargetInMeleeRange, nil, Settings.Commons.DisplayStyle.Covenant) then return "ancient_aftershock execute 20"; end
     end
     -- spear_of_bastion
     if S.SpearofBastion:IsCastable() then
-      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 22"; end
+      if Everyone.CastTargetIf(S.SpearofBastion, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not Target:IsSpellInRange(S.SpearofBastion), nil, Settings.Commons.DisplayStyle.Covenant) then return "spear_of_bastion execute 22"; end
     end
   end
   -- condemn,if=runeforge.signet_of_tormented_kings&(rage.deficit<25|debuff.colossus_smash.up&rage>40|buff.sudden_death.react|buff.deadly_calm.up)
-  if S.Condemn:IsCastable() and (SignetofTormentedKingsEquipped and (Player:RageDeficit() < 25 or Target:DebuffUp(S.ColossusSmashDebuff) and Player:Rage() > 40 or Player:BuffUp(S.SuddenDeathBuff) or Player:BuffUp(S.DeadlyCalmBuff))) then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 24"; end
+  if S.Condemn:IsCastable() and (SignetofTormentedKingsEquipped) then
+    if Everyone.CastTargetIf(S.Condemn, Enemies8y, Mode, EvaluateTargetIfFilterHP, EvaluateTargetIfExecuteCondemn, not TargetInMeleeRange, nil, Settings.Commons.DisplayStyle.Covenant) then return "condemn execute 24"; end
   end
   -- overpower,if=charges=2
   if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2) then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 26"; end
+    if Everyone.CastTargetIf(S.Overpower, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not TargetInMeleeRange) then return "overpower execute 26"; end
   end
   -- cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
-  if S.Cleave:IsReady() and (EnemiesCount8y > 1 and Target:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD()) then
-    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave execute 28"; end
+  if S.Cleave:IsReady() and (EnemiesCount8y > 1) then
+    if Everyone.CastTargetIf(S.Cleave, Enemies8y, Mode, EvaluateTargetIfFilterHP, EvaluateTargetIfExecuteCleave, not TargetInMeleeRange) then return "cleave execute 28"; end
   end
   -- mortal_strike,if=dot.deep_wounds.remains<=gcd|runeforge.enduring_blow|buff.overpower.stack=2&debuff.exploiter.stack=2|buff.battlelord.up
-  if S.MortalStrike:IsReady() and (Target:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD() or EnduringBlowEquipped or Player:BuffStack(S.OverpowerBuff) == 2 and Target:DebuffStack(S.ExploiterDebuff) == 2 or Player:BuffUp(S.BattlelordBuff)) then
-    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 30"; end
+  if S.MortalStrike:IsReady() then
+    if Everyone.CastTargetIf(S.MortalStrike, Enemies8y, Mode, EvaluateTargetIfFilterHP, EvaluateTargetIfExecuteMortalStrike, not TargetInMeleeRange) then return "mortal_strike execute 30"; end
   end
   -- condemn,if=rage.deficit<25|buff.deadly_calm.up
   if S.Condemn:IsCastable() and (Player:RageDeficit() < 25 or Player:BuffUp(S.DeadlyCalmBuff)) then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 32"; end
+    if Everyone.CastTargetIf(S.Condemn, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not TargetInMeleeRange, nil, Settings.Commons.DisplayStyle.Covenant) then return "condemn execute 32"; end
   end
   -- skullsplitter,if=rage<45
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 45) then
-    if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter execute 34"; end
+    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not TargetInMeleeRange) then return "skullsplitter execute 34"; end
   end
   -- bladestorm,if=buff.deadly_calm.down&(rage<20|!runeforge.sinful_surge&rage<50)
   if CDsON() and S.Bladestorm:IsCastable() and (Player:BuffDown(S.DeadlyCalmBuff) and (Player:Rage() < 20 or not SinfulSurgeEquipped and Player:Rage() < 50)) then
-    if Cast(S.Bladestorm, nil, nil, not TargetInMeleeRange) then return "bladestorm execute 36"; end
+    if Everyone.CastTargetIf(S.Bladestorm, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not TargetInMeleeRange) then return "bladestorm execute 36"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 38"; end
+    if Everyone.CastTargetIf(S.Overpower, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not TargetInMeleeRange) then return "overpower execute 38"; end
   end
   -- condemn
-  if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 40"; end
+  if S.Condemn:IsReady() then
+    if Everyone.CastTargetIf(S.Condemn, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not TargetInMeleeRange, nil, Settings.Commons.DisplayStyle.Covenant) then return "condemn execute 40"; end
   end
   -- execute
   if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 42"; end
+    if Everyone.CastTargetIf(S.Execute, Enemies8y, Mode, EvaluateTargetIfFilterHP, nil, not TargetInMeleeRange) then return "execute execute 42"; end
   end
 end
 
@@ -451,13 +476,45 @@ local function APL()
     if S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1 and (S.Bladestorm:CooldownRemains() > 15 or S.Ravager:IsAvailable())) then
       if Cast(S.SweepingStrikes, nil, nil, not Target:IsInRange(8)) then return "sweeping_strikes main 20"; end
     end
+    -- call_action_list,name=execute,target_if=max:target.health.pct,if=target.health.pct>80&covenant.venthyr
+    if CovenantID == 2 then
+      if AoEON() then
+        local BestUnit, BestConditionValue = nil, nil
+        for _, CycleUnit in pairs(Enemies8y) do
+          if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy())
+            and (not BestConditionValue or Utils.CompareThis("max", EvaluateTargetIfFilterHP(CycleUnit), BestConditionValue)) then
+            BestUnit, BestConditionValue = CycleUnit, EvaluateTargetIfFilterHP(CycleUnit)
+          end
+        end
+        if BestUnit and BestUnit:HealthPercentage() > 80 then
+          local ShouldReturn = Execute("max"); if ShouldReturn then return ShouldReturn; end
+        end
+      else
+        if Target:HealthPercentage() > 80 then
+          local ShouldReturn = Execute("max"); if ShouldReturn then return ShouldReturn; end
+        end
+      end
+    end
+    -- call_action_list,name=execute,target_if=min:target.health.pct,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
+    if AoEON() then
+      local BestUnit, BestConditionValue = nil, nil
+      for _, CycleUnit in pairs(Enemies8y) do
+        if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy())
+          and (not BestConditionValue or Utils.CompareThis("min", EvaluateTargetIfFilterHP(CycleUnit), BestConditionValue)) then
+          BestUnit, BestConditionValue = CycleUnit, EvaluateTargetIfFilterHP(CycleUnit)
+        end
+      end
+      if BestUnit and ((S.Massacre:IsAvailable() and BestUnit:HealthPercentage() < 35) or BestUnit:HealthPercentage() < 20) then
+        local ShouldReturn = Execute("min"); if ShouldReturn then return ShouldReturn; end
+      end
+    else
+      if ((S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20) then
+        local ShouldReturn = Execute("min"); if ShouldReturn then return ShouldReturn; end
+      end
+    end
     -- run_action_list,name=hac,if=raid_event.adds.exists
     if (EnemiesCount8y >= 3) then
       local ShouldReturn = Hac(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|(target.health.pct>80&covenant.venthyr)
-    if ((S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20 or (Target:HealthPercentage() > 80 and CovenantID == 2)) then
-      local ShouldReturn = Execute(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=single_target
     local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
