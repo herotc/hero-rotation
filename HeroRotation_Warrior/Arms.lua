@@ -195,7 +195,7 @@ local function Hac()
   if S.Overpower:IsCastable() and (S.Dreadnaught:IsAvailable()) then
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower hac 28"; end
   end
-  -- condemnif=buff.sweeping_strikes.up|buff.sudden_death.react
+  -- condemn,if=buff.sweeping_strikes.up|buff.sudden_death.react
   if S.Condemn:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff) or Player:BuffUp(S.SuddenDeathBuff)) then
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn hac 30"; end
   end
@@ -218,7 +218,7 @@ local function Hac()
   
 end
 
-local function Execute(Mode, CurTarget)
+local function Execute(Mode)
   -- deadly_calm
   if S.DeadlyCalm:IsCastable() and CDsON() then
     if Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm execute 2"; end
@@ -512,8 +512,8 @@ local function APL()
         local ShouldReturn = Execute("min"); if ShouldReturn then return ShouldReturn; end
       end
     end
-    -- run_action_list,name=hac,if=raid_event.adds.exists
-    if (EnemiesCount8y >= 3) then
+    -- run_action_list,name=hac,if=raid_event.adds.exists|spell_targets.whirlwind>1
+    if (EnemiesCount8y > 1) then
       local ShouldReturn = Hac(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=single_target
