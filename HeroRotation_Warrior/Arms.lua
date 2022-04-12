@@ -170,8 +170,8 @@ local function Hac()
   if S.Overpower:IsCastable() and (S.Dreadnaught:IsAvailable()) then
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower hac 28"; end
   end
-  -- condemn
-  if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
+  -- condemn,if=buff.sweeping_strikes.up|buff.sudden_death.react
+  if S.Condemn:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff) or Player:BuffUp(S.SuddenDeathBuff)) then
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn hac 30"; end
   end
   -- execute,if=buff.sweeping_strikes.up
@@ -274,7 +274,7 @@ local function Execute()
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 38"; end
   end
   -- condemn
-  if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
+  if S.Condemn:IsReady() then
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 40"; end
   end
   -- execute
@@ -327,7 +327,7 @@ local function SingleTarget()
     if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike single_target 20"; end
   end
   -- condemn,if=buff.sudden_death.react
-  if S.Condemn:IsCastable() and S.Condemn:IsUsable() and (Player:BuffUp(S.SuddenDeathBuff)) then
+  if S.Condemn:IsReady() and (Player:BuffUp(S.SuddenDeathBuff)) then
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 22"; end
   end
   -- execute,if=buff.sudden_death.react
@@ -398,10 +398,10 @@ local function APL()
     end
     -- Manually added: VR/IV
     if Player:HealthPercentage() < Settings.Commons.VictoryRushHP then
-      if S.VictoryRush:IsCastable() and S.VictoryRush:IsUsable() then
+      if S.VictoryRush:IsReady() then
         if Cast(S.VictoryRush, nil, nil, not TargetInMeleeRange) then return "victory_rush heal"; end
       end
-      if S.ImpendingVictory:IsReady() and S.VictoryRush:IsUsable() then
+      if S.ImpendingVictory:IsReady() then
         if Cast(S.ImpendingVictory, nil, nil, not TargetInMeleeRange) then return "impending_victory heal"; end
       end
     end
@@ -451,13 +451,15 @@ local function APL()
     if S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1 and (S.Bladestorm:CooldownRemains() > 15 or S.Ravager:IsAvailable())) then
       if Cast(S.SweepingStrikes, nil, nil, not Target:IsInRange(8)) then return "sweeping_strikes main 20"; end
     end
-    -- run_action_list,name=hac,if=raid_event.adds.exists
-    if (EnemiesCount8y >= 3) then
-      local ShouldReturn = Hac(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|(target.health.pct>80&covenant.venthyr)
+    -- call_action_list,name=execute,target_if=max:target.health.pct,if=target.health.pct>80&covenant.venthyr
+    -- call_action_list,name=execute,target_if=min:target.health.pct,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
+    -- Note: Combined both lines
     if ((S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20 or (Target:HealthPercentage() > 80 and CovenantID == 2)) then
       local ShouldReturn = Execute(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- run_action_list,name=hac,if=raid_event.adds.exists|spell_targets.whirlwind>1
+    if (EnemiesCount8y > 1) then
+      local ShouldReturn = Hac(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=single_target
     local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
