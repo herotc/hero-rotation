@@ -124,6 +124,10 @@ local function EvaluateCycleAdaptiveSwarmCount4(TargetUnit)
   return (TargetUnit:DebuffStack(S.AdaptiveSwarmDebuff) == 4 and TargetUnit:DebuffRemains(S.AdaptiveSwarmDebuff) > 2)
 end
 
+local function EvaluateCycleAdaptiveSwarmDown(TargetUnit)
+  return TargetUnit:DebuffStack(S.AdaptiveSwarmDebuff) == 0
+end
+
 local function EvaluateCycleCatSunfire(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.SunfireDebuff) and FightRemains > 5)
 end
