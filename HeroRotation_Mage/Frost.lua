@@ -242,6 +242,10 @@ local function Aoe()
   if S.CometStorm:IsCastable() then
     if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm aoe 16"; end
   end
+  -- fleshcraft,if=soulbind.volatile_solvent&buff.volatile_solvent_humanoid.down,interrupt_immediate=1,interrupt_global=1,interrupt_if=1
+  if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft aoe 17"; end
+  end
   -- frostbolt,if=runeforge.deaths_fathom&(runeforge.cold_front|runeforge.slick_ice)&buff.deathborne.remains>cast_time+travel_time
   if S.Frostbolt:IsCastable() and (DeathsFathomEquipped and (ColdFrontEquipped or SlickIceEquipped) and Player:BuffRemains(S.Deathborne) > S.Frostbolt:CastTime() + S.Frostbolt:TravelTime()) then
     if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 18"; end
@@ -316,6 +320,10 @@ local function Single()
   if S.CometStorm:IsCastable() and (Target:DebuffUp(S.WintersChillDebuff)) then
     if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm single 6"; end
   end
+  -- ice_lance,if=talent.splitting_ice&talent.chain_reaction&buff.fingers_of_frost.react=buff.fingers_of_frost.max_stack
+  if S.IceLance:IsCastable() and (S.SplittingIce:IsAvailable() and S.ChainReaction:IsAvailable() and Player:BuffStack(S.FingersofFrostBuff) == 2) then
+    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single 7"; end
+  end
   -- frostbolt,if=runeforge.deaths_fathom&(runeforge.cold_front|runeforge.slick_ice)&buff.deathborne.remains>cast_time+travel_time&active_enemies>=2
   if S.Frostbolt:IsCastable() and (DeathsFathomEquipped and (ColdFrontEquipped or SlickIceEquipped) and Player:BuffRemains(S.Deathborne) > S.Frostbolt:CastTime() + S.Frostbolt:TravelTime() and EnemiesCount16ySplash >= 2) then
     if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt single 8"; end
@@ -389,6 +397,10 @@ local function Single()
   -- glacial_spike,if=buff.brain_freeze.react
   if S.GlacialSpike:IsCastable() and (Player:BuffUp(S.BrainFreezeBuff)) then
     if Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike single 40"; end
+  end
+  -- fleshcraft,if=soulbind.volatile_solvent&buff.volatile_solvent_humanoid.down,interrupt_immediate=1,interrupt_global=1,interrupt_if=1
+  if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft single 41"; end
   end
   -- frostbolt
   if S.Frostbolt:IsCastable() then

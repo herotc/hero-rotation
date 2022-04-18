@@ -76,6 +76,8 @@ Spell.Mage.Commons = {
   EffusiveAnimaAccelerator              = Spell(352188),
   FieldOfBlossoms                       = Spell(319191),
   GroveInvigoration                     = Spell(322721),
+  VolatileSolvent                       = Spell(323074),
+  VolatileSolventHumanBuff              = Spell(323491),
   WastelandPropriety                    = Spell(333251),
   -- Conduit
   ArcaneProdigy                         = Spell(336873),
@@ -84,7 +86,6 @@ Spell.Mage.Commons = {
   PustuleEruption                       = Spell(351094),
   ShiveringCore                         = Spell(336472),
   SiphonedMalice                        = Spell(337090),
-  VolatileSolvent                       = Spell(323074),
   -- Legendary Effects
   DisciplinaryCommandBuff               = Spell(327371),
   ExpandedPotentialBuff                 = Spell(327495),
@@ -188,6 +189,7 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   IceBarrier                            = Spell(11426),
   -- Talents
   BoneChilling                          = Spell(205027),
+  ChainReaction                         = Spell(278309),
   CometStorm                            = Spell(153595), --splash, 6
   Ebonbolt                              = Spell(257537), --splash, 8 (with splitting ice)
   FreezingRain                          = Spell(270233),
