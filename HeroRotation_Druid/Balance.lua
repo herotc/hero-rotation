@@ -87,6 +87,7 @@ local VarSFCost
 local VarConvokeAsp
 local VarNoHysteriaEarlyDoT
 local VarProcPulsarEarly
+local VarUseFrenzyBeforeCA
 local GCDMax
 local PAPValue
 local FuryTicksRemain
@@ -472,13 +473,15 @@ local function St()
   VarAspDump = (Player:AstralPowerP() > 90 - (2.5 * Player:BuffStack(S.FuryofElune) - 2 * num(EclipseInLunar)))
   -- variable,name=cd_condition_st,value=!druid.no_cds&(variable.cd_condition&!buff.ca_inc.up&(!set_bonus.tier28_2pc|eclipse.in_lunar|eclipse.solar_next)&(((variable.asp_dump|covenant.night_fae|(covenant.kyrian&cooldown.empower_bond.ready)|runeforge.timeworn_dreambinder)&dot.sunfire.remains>8&dot.moonfire.remains>9&(dot.stellar_flare.remains>10|!talent.stellar_flare.enabled)&variable.thrill_seeker_wait&target.time_to_die>buff.ca_inc.duration*0.7|buff.bloodlust.up&buff.bloodlust.remains<buff.ca_inc.duration+(12*runeforge.primordial_arcanic_pulsar))|(equipped.empyreal_ordnance&cooldown.empyreal_ordnance.remains<167+(5*runeforge.sinful_hysteria)))&((!covenant.night_fae|(variable.convoke_desync|cooldown.convoke_the_spirits.remains<15)&(!runeforge.balance_of_all_things|astral_power<50&cooldown.convoke_the_spirits.ready))|fight_remains<cooldown.convoke_the_spirits.remains)|fight_remains<buff.ca_inc.duration+12*runeforge.primordial_arcanic_pulsar)
   VarCDConditionST = (CDsON() and (VarCDCondition and Player:BuffDown(CaInc) and ((not Player:HasTier(28, 2)) or EclipseInLunar or EclipseSolarNext) and (((VarAspDump or CovenantID == 3 or (CovenantID == 1 and S.EmpowerBond:CooldownUp()) or TimewornEquipped) and Target:DebuffRemains(S.SunfireDebuff) > 8 and Target:DebuffRemains(S.MoonfireDebuff) > 9 and (Target:DebuffRemains(S.StellarFlareDebuff) > 10 or not S.StellarFlare:IsAvailable()) and VarThrillSeekerWait and Target:TimeToDie() > CaInc:BaseDuration() * 0.7 or Player:BloodlustUp() and Player:BloodlustRemains() < CaInc:BaseDuration() + (12 * num(PAPEquipped))) or (I.EmpyrealOrdinance:IsEquipped() and I.EmpyrealOrdinance:CooldownRemains() < 167 + (5 * num(SinfulHysteriaEquipped)))) and ((CovenantID ~= 3 or (VarConvokeDesync or S.ConvoketheSpirits:CooldownRemains() < 15) and ((not BOATEquipped) or Player:AstralPowerP() < 50 and S.ConvoketheSpirits:CooldownUp())) or FightRemains < S.ConvoketheSpirits:CooldownRemains()) or FightRemains < CaInc:BaseDuration() + 12 * num(PAPEquipped)))
-  -- ravenous_frenzy,if=buff.ca_inc.remains>15|buff.ca_inc.duration+runeforge.primordial_arcanic_pulsar*12<27&variable.cd_condition_st
-  if S.RavenousFrenzy:IsCastable() and (Player:BuffRemains(CaInc) > 15 or CaInc:BaseDuration() + num(PAPEquipped) * 12 < 27 and VarCDConditionST) then
+  -- variable,name=use_frenzy_before_ca,value=buff.ca_inc.duration+runeforge.primordial_arcanic_pulsar*12<27
+  VarUseFrenzyBeforeCA = (CaInc:BaseDuration() + num(PAPEquipped) * 12 < 27)
+  -- ravenous_frenzy,if=buff.ca_inc.remains>15|variable.use_frenzy_before_ca&variable.cd_condition_st
+  if S.RavenousFrenzy:IsCastable() and (Player:BuffRemains(CaInc) > 15 or VarUseFrenzyBeforeCA and VarCDConditionST) then
     if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy st 24"; end
   end
   if (CDsON()) then
-    -- celestial_alignment,if=variable.cd_condition_st&(buff.ca_inc.duration>=27+runeforge.primordial_arcanic_pulsar*12|!covenant.venthyr)|buff.ravenous_frenzy.up&buff.ravenous_frenzy.remains<9+conduit.precise_alignment.time_value+(!buff.bloodlust.up&!talent.starlord.enabled)
-    if S.CelestialAlignment:IsCastable() and (VarCDConditionST and (CaInc:BaseDuration() >= 27 + num(PAPEquipped) * 12 or CovenantID ~= 2) or Player:BuffUp(S.RavenousFrenzyBuff) and Player:BuffRemains(S.RavenousFrenzyBuff) < 9 + PATime + num(Player:BloodlustDown() and not S.Starlord:IsAvailable())) then
+    -- celestial_alignment,if=variable.cd_condition_st&(!variable.use_frenzy_before_ca|!covenant.venthyr)|buff.ravenous_frenzy.up&buff.ravenous_frenzy.remains+5<buff.ca_inc.duration
+    if S.CelestialAlignment:IsCastable() and (VarCDConditionST and ((not VarUseFrenzyBeforeCA) or CovenantID ~= 2) or Player:BuffUp(S.RavenousFrenzyBuff) and Player:BuffRemains(S.RavenousFrenzyBuff) +5 < CaInc:BaseDuration()) then
       if Cast(S.CelestialAlignment, Settings.Balance.GCDasOffGCD.CaInc) then return "celestial_alignment st 26"; end
     end
     -- incarnation,if=variable.cd_condition_st
@@ -756,8 +759,8 @@ local function APL()
     if ((not OpenerFinished) and (CovenantID == 2 or CovenantID == 3)) then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
-    -- berserking,if=((!covenant.night_fae|!cooldown.convoke_the_spirits.up|!runeforge.balance_of_all_things)&buff.ca_inc.remains>15&buff.ravenous_frenzy.remains<4&!covenant.venthyr|covenant.venthyr&buff.ca_inc.up&buff.ravenous_frenzy.up&(buff.ravenous_frenzy.remains<12-4*runeforge.sinful_hysteria|buff.ca_inc.remains<11|1%spell_haste<1.6))&variable.in_gcd
-    if S.Berserking:IsCastable() and CDsON() and ((CovenantID ~= 3 or not S.ConvoketheSpirits:CooldownUp() or not BOATEquipped) and Player:BuffRemains(CaInc) > 15 and Player:BuffRemains(S.RavenousFrenzyBuff) and CovenantID ~= 2 or CovenantID == 2 and Player:BuffUp(CaInc) and Player:BuffUp(S.RavenousFrenzyBuff) and (Player:BuffRemains(S.RavenousFrenzyBuff) < 12 - 4 * num(SinfulHysteriaEquipped) or Player:BuffRemains(CaInc) < 11 or 1 / Player:SpellHaste() < 1.6)) then
+    -- berserking,if=((!covenant.night_fae|!cooldown.convoke_the_spirits.up|!runeforge.balance_of_all_things)&buff.ca_inc.remains>15&!covenant.venthyr|covenant.venthyr&buff.ca_inc.up&buff.ravenous_frenzy.up&(buff.ravenous_frenzy.remains<12-4*runeforge.sinful_hysteria|buff.ca_inc.remains<11|1%spell_haste<(1.9-talent.stellar_flare.enabled*0.1)))&variable.in_gcd
+    if S.Berserking:IsCastable() and CDsON() and ((CovenantID ~= 3 or not S.ConvoketheSpirits:CooldownUp() or not BOATEquipped) and Player:BuffRemains(CaInc) > 15 and CovenantID ~= 2 or CovenantID == 2 and Player:BuffUp(CaInc) and Player:BuffUp(S.RavenousFrenzyBuff) and (Player:BuffRemains(S.RavenousFrenzyBuff) < 12 - 4 * num(SinfulHysteriaEquipped) or Player:BuffRemains(CaInc) < 11 or 1 / Player:SpellHaste() < (1.9 - num(S.StellarFlare:IsAvailable()) * 0.1))) then
       if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 2"; end
     end
     -- potion,if=(buff.ca_inc.remains>15&(!runeforge.sinful_hysteria|buff.ravenous_frenzy.remains<19&buff.ravenous_frenzy.up)|fight_remains<25)&variable.in_gcd
