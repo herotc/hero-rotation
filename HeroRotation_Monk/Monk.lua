@@ -99,7 +99,8 @@ Spell.Monk.Commons = {
   AcquiredWandBuff                      = Spell(368654),
   ScarsofFraternalStrifeBuff4           = Spell(368638),
   -- Misc
-  PoolEnergy                            = Spell(999910)
+  PoolEnergy                            = Spell(999910),
+  StopFoF                               = Spell(363653)
 }
 
 Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {

@@ -253,7 +253,7 @@ local function Aoe()
     if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInMeleeRange(8)) then return "arcane_torrent aoe 24"; end
   end
   -- spinning_crane_kick,if=combo_strike&(cooldown.bonedust_brew.remains>2|!covenant.necrolord)&(chi>=5|cooldown.fists_of_fury.remains>6|cooldown.fists_of_fury.remains>3&chi>=3&energy.time_to_50<1|energy.time_to_max<=(3+3*cooldown.fists_of_fury.remains<5)|buff.storm_earth_and_fire.up)
-  if S.SpinningCraneKick:IsCastable() and (ComboStrike(S.SpinningCraneKick) and (S.BonedustBrew:CooldownRemains() > 2 or CovenantID ~= 4) and (Player:Chi() >= 5 or S.FistsOfFury:CooldownRemains() > 6 or S.FistsOfFury:CooldownRemains() > 3 and Player:Chi() >= 3 and Player:EnergyTimeToX(50) < 1 or EnergyTimeToMaxRounded() <= (3 + 3 * num(S.FistsOfFury:CooldownRemains() < 5)) or Player:BuffUp(S.StormEarthAndFireBuff))) then
+  if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and (S.BonedustBrew:CooldownRemains() > 2 or CovenantID ~= 4) and (Player:Chi() >= 5 or S.FistsOfFury:CooldownRemains() > 6 or S.FistsOfFury:CooldownRemains() > 3 and Player:Chi() >= 3 and Player:EnergyTimeToX(50) < 1 or EnergyTimeToMaxRounded() <= (3 + 3 * num(S.FistsOfFury:CooldownRemains() < 5)) or Player:BuffUp(S.StormEarthAndFireBuff))) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick aoe 26"; end
   end
   -- chi_wave,if=combo_strike
@@ -429,46 +429,46 @@ local function CDSEF()
   end
   -- use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up|fight_remains<35
   if I.ScarsofFraternalStrife:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) or FightRemains < 35) then
-    if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife cd_sef 21"; end
+    if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife cd_sef 22"; end
   end
   -- use_item,name=jotungeirr_destinys_call,if=pet.xuen_the_white_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>60&fight_remains>180|fight_remains<20
   if I.Jotungeirr:IsEquippedAndReady() and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 60 and FightRemains > 180 or FightRemains < 20) then
-    if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call cd_sef 22"; end
+    if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call cd_sef 24"; end
   end
   if (Settings.Commons.Enabled.Trinkets) then
     -- use_item,name=inscrutable_quantum_device,if=pet.xuen_the_white_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>60&fight_remains>180|fight_remains<20
     if I.InscrutibleQuantumDevice:IsEquippedAndReady() and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 60 and FightRemains > 180 or FightRemains < 20) then
-      if Cast(I.InscrutibleQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device cd_sef 24"; end
+      if Cast(I.InscrutibleQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device cd_sef 26"; end
     end
     -- use_item,name=wrathstone,if=pet.xuen_the_white_tiger.active|fight_remains<20
     if I.Wrathstone:IsEquippedAndReady() and (XuenActive or FightRemains < 20) then
-      if Cast(I.Wrathstone, nil, Settings.Commons.DisplayStyle.Trinkets) then return "wrathstone cd_sef 26"; end
+      if Cast(I.Wrathstone, nil, Settings.Commons.DisplayStyle.Trinkets) then return "wrathstone cd_sef 28"; end
     end
     -- use_item,name=shadowgrasp_totem,if=pet.xuen_the_white_tiger.active|fight_remains<20|!runeforge.invokers_delight
     if I.ShadowgraspTotem:IsEquippedAndReady() and (XuenActive or FightRemains < 20 or not InvokersDelightEquipped) then
-      if Cast(I.ShadowgraspTotem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowgrasp_totem cd_sef 28"; end
+      if Cast(I.ShadowgraspTotem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowgrasp_totem cd_sef 30"; end
     end
     -- use_item,name=overcharged_anima_battery,if=pet.xuen_the_white_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>90|fight_remains<20
     if I.OverchargedAnimaBattery:IsEquippedAndReady() and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 90 or FightRemains < 20) then
-      if Cast(I.OverchargedAnimaBattery, nil, Settings.Commons.DisplayStyle.Trinkets) then return "overcharged_anima_battery cd_sef 30"; end
+      if Cast(I.OverchargedAnimaBattery, nil, Settings.Commons.DisplayStyle.Trinkets) then return "overcharged_anima_battery cd_sef 32"; end
     end
     -- use_item,name=gladiators_badge,if=cooldown.invoke_xuen_the_white_tiger.remains>55|variable.hold_xuen|fight_remains<15
     if I.GladiatorsBadgeCosmic:IsEquippedAndReady() and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 55 or VarHoldXuen or FightRemains < 15) then
-      if Cast(I.GladiatorsBadgeCosmic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge cd_sef 32 cosmic"; end
+      if Cast(I.GladiatorsBadgeCosmic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge cd_sef 34 cosmic"; end
     end
     if I.GladiatorsBadgeSinful:IsEquippedAndReady() and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 55 or VarHoldXuen or FightRemains < 15) then
-      if Cast(I.GladiatorsBadgeSinful, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge cd_sef 32 sinful"; end
+      if Cast(I.GladiatorsBadgeSinful, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge cd_sef 34 sinful"; end
     end
     if I.GladiatorsBadgeUnchained:IsEquippedAndReady() and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 55 or VarHoldXuen or FightRemains < 15) then
-      if Cast(I.GladiatorsBadgeUnchained, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge cd_sef 32 unchained"; end
+      if Cast(I.GladiatorsBadgeUnchained, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge cd_sef 34 unchained"; end
     end
     -- use_item,name=the_first_sigil,if=pet.xuen_the_white_tiger.remains>15|cooldown.invoke_xuen_the_white_tiger.remains>60&fight_remains>300|fight_remains<20
     if I.TheFirstSigil:IsEquippedAndReady() and (S.InvokeXuenTheWhiteTiger:TimeSinceLastCast() < 9 or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 60 and FightRemains > 300 or FightRemains < 20) then
-      if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil cd_sef 34"; end
+      if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil cd_sef 36"; end
     end
     -- use_item,name=cache_of_acquired_treasures,if=active_enemies<2&buff.acquired_wand.up|active_enemies>1&buff.acquired_axe.up|fight_remains<20
     if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (EnemiesCount8y < 2 and Player:BuffUp(S.AcquiredWandBuff) or EnemiesCount8y > 1 and Player:BuffUp(S.AcquiredAxeBuff) or FightRemains < 20) then
-      if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures cd_sef 35"; end
+      if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures cd_sef 38"; end
     end
     -- use_items,if=!variable.xuen_on_use_trinket|cooldown.invoke_xuen_the_white_tiger.remains>20&pet.xuen_the_white_tiger.remains<20|variable.hold_xuen
     if ((not VarXuenOnUse) or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 20 and XuenActive and S.InvokeXuenTheWhiteTiger:TimeSinceLastCast() > 4 or VarHoldXuen) then
@@ -477,41 +477,41 @@ local function CDSEF()
   end
   -- touch_of_karma,if=fight_remains>90|pet.xuen_the_white_tiger.active|variable.hold_xuen|fight_remains<16
   if S.TouchOfKarma:IsReady() and not Settings.Windwalker.IgnoreToK and (FightRemains > 90 or XuenActive or VarHoldXuen or FightRemains < 16) then
-    if Cast(S.TouchOfKarma, Settings.Windwalker.GCDasOffGCD.TouchOfKarma, nil, not Target:IsInRange(20)) then return "touch_of_karma cd_sef 36"; end
+    if Cast(S.TouchOfKarma, Settings.Windwalker.GCDasOffGCD.TouchOfKarma, nil, not Target:IsInRange(20)) then return "touch_of_karma cd_sef 40"; end
   end
   -- touch_of_karma,if=fight_remains>159|variable.hold_xuen
   if S.TouchOfKarma:IsReady() and not Settings.Windwalker.IgnoreToK and (FightRemains > 159 or VarHoldXuen) then
-    if Cast(S.TouchOfKarma, Settings.Windwalker.GCDasOffGCD.TouchOfKarma, nil, not Target:IsInRange(20)) then return "touch_of_karma cd_sef 38"; end
+    if Cast(S.TouchOfKarma, Settings.Windwalker.GCDasOffGCD.TouchOfKarma, nil, not Target:IsInRange(20)) then return "touch_of_karma cd_sef 42"; end
   end
   if (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or VarHoldXuen or FightRemains < 20) then
     -- ancestral_call,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
     if S.AncestralCall:IsCastable() then
-      if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cd_sef 40"; end
+      if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cd_sef 44"; end
     end
     -- blood_fury,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
     if S.BloodFury:IsCastable() then
-      if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cd_sef 42"; end
+      if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cd_sef 46"; end
     end
     -- fireblood,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
     if S.Fireblood:IsCastable() then
-      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cd_sef 44"; end
+      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cd_sef 48"; end
     end
     -- berserking,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
     if S.Berserking:IsCastable() then
-      if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cd_sef 46"; end
+      if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cd_sef 50"; end
     end
   end
   -- bag_of_tricks,if=buff.storm_earth_and_fire.down
   if S.BagOfTricks:IsCastable() and (Player:BuffDown(S.StormEarthAndFireBuff)) then
-    if Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks cd_sef 48"; end
+    if Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks cd_sef 52"; end
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "lights_judgment cd_sef 50"; end
+    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "lights_judgment cd_sef 54"; end
   end
   -- fleshcraft,if=soulbind.pustule_eruption&debuff.bonedust_brew_debuff.down
   if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() and Target:DebuffDown(S.BonedustBrew)) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft cd_sef 52"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft cd_sef 56"; end
   end
 end
 
@@ -563,6 +563,10 @@ local function Serenity()
 end
 
 local function WeaponsOfOrder()
+  -- Cancel FoF if we don't have 2pc tier 28
+  if Player:IsChanneling(S.FistsOfFury) and not Player:HasTier(28, 2) then
+    if HR.CastAnnotated(S.StopFoF, false, "Stop FoF") then return "stop fists_of_fury weapons_of_order"; end
+  end
   -- call_action_list,name=cd_sef,if=!talent.serenity
   if (CDsON() and not S.Serenity:IsAvailable()) then
     local ShouldReturn = CDSEF(); if ShouldReturn then return ShouldReturn; end
@@ -581,57 +585,56 @@ local function WeaponsOfOrder()
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&cooldown.fists_of_fury.remains&cooldown.rising_sun_kick.remains&buff.weapons_of_order_ww.up
   if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and S.FistsOfFury:CooldownRemains() > 0 and S.RisingSunKick:CooldownRemains() > 0 and Player:BuffUp(S.WeaponsOfOrderChiBuff)) then
-    if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick weapons_of_order 5"; end
+    if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick weapons_of_order 6"; end
   end
-  if AoEON() then
-    -- fists_of_fury,interrupt=1,interrupt_immediate=1,if=buff.weapons_of_order_ww.up&buff.storm_earth_and_fire.up&!set_bonus.tier28_2pc&active_enemies<2
-    -- fists_of_fury,if=buff.weapons_of_order_ww.up&buff.storm_earth_and_fire.up&set_bonus.tier28_2pc|active_enemies>=2&buff.weapons_of_order_ww.remains<1
-    -- TODO: Update below line to the above lines. Need to determine how to handle the interrupt for not having T28 2pc.
-    -- fists_of_fury,if=active_enemies>=2&buff.weapons_of_order_ww.remains<1
-    if S.FistsOfFury:IsReady() and (EnemiesCount8y >= 2 and Player:BuffRemains(S.WeaponsOfOrderChiBuff) < 1) then
-      if Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "fists_of_fury weapons_of_order 6"; end
-    end
-    -- whirling_dragon_punch
-    if S.WhirlingDragonPunch:IsReady() then
-      if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(8)) then return "whirling_dragon_punch weapons_of_order 8"; end
-    end
-    -- spinning_crane_kick,if=combo_strike&(active_enemies>=3&buff.weapons_of_order_ww.up|buff.dance_of_chiji.up)
-    if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and (EnemiesCount8y >= 3 and Player:BuffUp(S.WeaponsOfOrderChiBuff) or Player:BuffUp(S.DanceOfChijiBuff))) then
-      if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick weapons_of_order 10"; end
-    end
+  -- fists_of_fury,interrupt=1,interrupt_immediate=1,if=buff.weapons_of_order_ww.up&buff.storm_earth_and_fire.up&!set_bonus.tier28_2pc&active_enemies<2
+  if S.FistsOfFury:IsReady() and (Player:BuffUp(S.WeaponsOfOrderChiBuff) and Player:BuffUp(S.StormEarthAndFireBuff) and (not Player:HasTier(28, 2)) and EnemiesCount8y < 2) then
+    if HR.CastQueue(S.FistsOfFury, S.StopFoF) then return "one_gcd fists_of_fury weapons_of_order 8"; end
+  end
+  -- fists_of_fury,if=buff.weapons_of_order_ww.up&buff.storm_earth_and_fire.up&set_bonus.tier28_2pc|active_enemies>=2&buff.weapons_of_order_ww.remains<1
+  if S.FistsOfFury:IsReady() and (Player:BuffUp(S.WeaponsOfOrderChiBuff) and Player:BuffUp(S.StormEarthAndFireBuff) and Player:HasTier(28, 2) or EnemiesCount8y >= 2 and AoEON() and Player:BuffRemains(S.WeaponsOfOrderChiBuff) < 1) then
+    if Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "fists_of_fury weapons_of_order 10"; end
+  end
+  -- whirling_dragon_punch
+  if S.WhirlingDragonPunch:IsReady() then
+    if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(8)) then return "whirling_dragon_punch weapons_of_order 12"; end
+  end
+  -- spinning_crane_kick,if=combo_strike&(active_enemies>=3&buff.weapons_of_order_ww.up|buff.dance_of_chiji.up)
+  if S.SpinningCraneKick:IsReady() and AoEON() and (ComboStrike(S.SpinningCraneKick) and (EnemiesCount8y >= 3 and Player:BuffUp(S.WeaponsOfOrderChiBuff) or Player:BuffUp(S.DanceOfChijiBuff))) then
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick weapons_of_order 14"; end
   end
   -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi=0&buff.weapons_of_order_ww.remains<4|chi<3
   if S.FistOfTheWhiteTiger:IsReady() and (Player:Chi() == 0 and Player:BuffRemains(S.WeaponsOfOrderChiBuff) < 4 or Player:Chi() < 3) then
-    if Everyone.CastTargetIf(S.FistOfTheWhiteTiger, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100) then return "fist_of_the_white_tiger weapons_of_order 18"; end
+    if Everyone.CastTargetIf(S.FistOfTheWhiteTiger, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100) then return "fist_of_the_white_tiger weapons_of_order 16"; end
   end
   -- expel_harm,if=chi.max-chi>=1
   if S.ExpelHarm:IsReady() and (Player:ChiDeficit() >= 1) then
-    if Cast(S.ExpelHarm, nil, nil, not Target:IsInRange(8)) then return "expel_harm weapons_of_order 19"; end
+    if Cast(S.ExpelHarm, nil, nil, not Target:IsInRange(8)) then return "expel_harm weapons_of_order 18"; end
   end
   -- chi_burst,if=chi.max-chi>=(1+active_enemies>1)
   if S.ChiBurst:IsReady() and (Player:ChiDeficit() >= (1 + num(EnemiesCount8y > 1))) then
-    if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst weapons_of_order 32"; end
+    if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst weapons_of_order 20"; end
   end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains+(debuff.skyreach_exhaustion.up*20),if=chi=0&buff.weapons_of_order_ww.remains<4|(!talent.hit_combo|combo_strike)&chi.max-chi>=2
   if S.TigerPalm:IsReady() and (Player:Chi() == 0 and Player:BuffRemains(S.WeaponsOfOrderChiBuff) < 4 or ((not S.HitCombo:IsAvailable()) or ComboStrike(S.TigerPalm)) and Player:ChiDeficit() >= 2) then
-    if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane101, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm weapons_of_order 34"; end
+    if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane101, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm weapons_of_order 22"; end
   end
   -- spinning_crane_kick,if=buff.chi_energy.stack>30-5*active_enemies
   if S.SpinningCraneKick:IsReady() and (Player:BuffStack(S.ChiEnergyBuff) > 30 - 5 * EnemiesCount8y) then
-    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInRange(8)) then return "spinning_crane_kick weapons_of_order "; end
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInRange(8)) then return "spinning_crane_kick weapons_of_order 24"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&active_enemies<=3&chi>=3|buff.weapons_of_order_ww.up
   if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and EnemiesCount8y <= 3 and Player:Chi() >= 3 or Player:BuffUp(S.WeaponsOfOrderChiBuff)) then
-    if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100) then return "blackout_kick weapons_of_order 35"; end
+    if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100) then return "blackout_kick weapons_of_order 26"; end
   end
   -- chi_wave
   if S.ChiWave:IsReady() then
-    if Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "chi_wave weapons_of_order 36"; end
+    if Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "chi_wave weapons_of_order 28"; end
   end
   -- flying_serpent_kick,interrupt=1
   local FSK = S.FlyingSerpentKickActionBarReplacement:IsAvailable() and S.FlyingSerpentKickActionBarReplacement or S.FlyingSerpentKick
   if FSK:IsReady() and not Settings.Windwalker.IgnoreFSK then
-    if Cast(FSK, nil, nil, not Target:IsInRange(40)) then return "flying_serpent_kick weapons_of_order 38"; end
+    if Cast(FSK, nil, nil, not Target:IsInRange(40)) then return "flying_serpent_kick weapons_of_order 30"; end
   end
 end
 
