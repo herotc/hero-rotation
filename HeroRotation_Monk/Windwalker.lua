@@ -563,10 +563,6 @@ local function Serenity()
 end
 
 local function WeaponsOfOrder()
-  -- Cancel FoF if we don't have 2pc tier 28
-  if Player:IsChanneling(S.FistsOfFury) and not Player:HasTier(28, 2) then
-    if HR.CastAnnotated(S.StopFoF, false, "Stop FoF") then return "stop fists_of_fury weapons_of_order"; end
-  end
   -- call_action_list,name=cd_sef,if=!talent.serenity
   if (CDsON() and not S.Serenity:IsAvailable()) then
     local ShouldReturn = CDSEF(); if ShouldReturn then return ShouldReturn; end
