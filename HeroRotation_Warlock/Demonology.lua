@@ -41,6 +41,7 @@ local OnUseExcludes = {
   I.EmpyrealOrdnance:ID(),
   I.GlyphofAssimilation:ID(),
   I.GrimEclipse:ID(),
+  I.MoonlitPrism:ID(),
   I.OverflowingAnimaCage:ID(),
   I.ResonantReservoir:ID(),
   I.ScarsofFraternalStrife:ID(),
@@ -426,6 +427,10 @@ local function Trinkets()
   -- use_item,name=shadowed_orb_of_torment,if=variable.buff_sync_cd<22
   if I.ShadowedOrbofTorment:IsEquippedAndReady() and (VarBuffSyncCD < 22) then
     if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment trinkets 4"; end
+  end
+  -- use_item,name=moonlit_prism,if=variable.use_bolt_timings&pet.demonic_tyrant.active
+  if I.MoonlitPrism:IsEquippedAndReady() and (VarUseBoltTimings and DemonicTyrantTime()) then
+    if Cast(I.MoonlitPrism, nil, Settings.Commons.DisplayStyle.Trinkets) then return "moonlit_prism trinkets 5"; end
   end
   -- use_item,name=grim_eclipse,if=variable.buff_sync_cd<7
   if I.GrimEclipse:IsEquippedAndReady() and (VarBuffSyncCD < 7) then
