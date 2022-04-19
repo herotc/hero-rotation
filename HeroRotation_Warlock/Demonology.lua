@@ -575,10 +575,6 @@ local function APL()
     if HL.CombatTime() < VarFirstTyrantTime then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
-    -- doom,if=refreshable
-    if S.Doom:IsCastable() and (Target:DebuffRefreshable(S.DoomDebuff)) then
-      if Cast(S.Doom, nil, nil, not Target:IsSpellInRange(S.Doom)) then return "doom main 4"; end
-    end
     -- call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
     if (S.GroveInvigoration:SoulbindEnabled() or S.FieldofBlossoms:SoulbindEnabled() or S.CombatMeditation:SoulbindEnabled() or CovenantID == 4) then
       local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
@@ -643,6 +639,10 @@ local function APL()
     -- shadow_bolt,if=soul_shard<5&runeforge.balespiders_burning_core&buff.balespiders_burning_core.remains<5
     if S.ShadowBolt:IsCastable() and (Player:SoulShardsP() < 5 and BalespidersEquipped and Player:BuffRemains(S.BalespidersBuff) < 5) then
       if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt main 32"; end
+    end
+    -- doom,if=refreshable
+    if S.Doom:IsCastable() and (Target:DebuffRefreshable(S.DoomDebuff)) then
+      if Cast(S.Doom, nil, nil, not Target:IsSpellInRange(S.Doom)) then return "doom main 33"; end
     end
     -- hand_of_guldan,if=soul_shard>=3&(pet.dreadstalker.active|pet.demonic_tyrant.active)
     if S.HandofGuldan:IsReady() and (Player:SoulShardsP() >= 3 and (DreadStalkersTime() > 0 or DemonicTyrantTime() > 0)) then
