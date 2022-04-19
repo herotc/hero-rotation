@@ -727,8 +727,8 @@ local function Standard()
   if S.FrostStrike:IsReady() and (Player:RunicPowerDeficit() < (15 + num(S.RunicAttenuation:IsAvailable()) * 5)) then
     if Cast(S.FrostStrike, nil, nil, not TargetIsInRange[8]) then return "frost_strike standard 16"; end
   end
-  -- obliterate,if=!buff.frozen_pulse.up&talent.frozen_pulse|variable.deaths_due_active&buff.deaths_due.stack<4|talent.gathering_storm&buff.remorseless_winter.up|runic_power.deficit>(25+talent.runic_attenuation*5)
-  if S.Obliterate:IsReady() and (Player:BuffDown(S.FrozenPulseBuff) and S.FrozenPulse:IsAvailable() or VarDeathsDueActive and Player:BuffStack(S.DeathsDueBuff) < 4 or S.GatheringStorm:IsAvailable() and Player:BuffUp(S.RemorselessWinter) or Player:RunicPowerDeficit() > (25 + num(S.RunicAttenuation:IsAvailable()) * 5)) then
+  -- obliterate,if=!buff.frozen_pulse.up&talent.frozen_pulse|variable.deaths_due_active&buff.deaths_due.stack<4|rune>=4|main_hand.2h&talent.gathering_storm&buff.remorseless_winter.up
+  if S.Obliterate:IsReady() and (Player:BuffDown(S.FrozenPulseBuff) and S.FrozenPulse:IsAvailable() or VarDeathsDueActive and Player:BuffStack(S.DeathsDueBuff) < 4 or Player:Rune() >= 4 or Using2H and S.GatheringStorm:IsAvailable() and Player:BuffUp(S.RemorselessWinter)) then
     if Cast(S.Obliterate, nil, nil, not TargetIsInRange[8]) then return "obliterate standard 18"; end
   end
   -- frost_strike
