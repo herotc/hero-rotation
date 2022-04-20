@@ -495,6 +495,7 @@ local function St()
   if S.FuryofElune:IsCastable() and CDsON() and (EclipseInAny and (Player:AstralPowerP() < 92 - Player:BuffStack(S.FuryofElune) * 5 or Player:BuffUp(S.RavenousFrenzyBuff)) and (PAPValue < 240 or Player:BuffRemains(CaInc) > 8) and VarSaveForCAInc and (CovenantID ~= 4 or Target:DebuffUp(S.AdaptiveSwarmDebuff)) and (CovenantID ~= 2 or Player:BuffRemains(S.RavenousFrenzyBuff) < 9 - (4 * num(SinfulHysteriaEquipped)) and Player:BuffUp(S.RavenousFrenzyBuff) or Player:BuffDown(S.RavenousFrenzyBuff)) and (CovenantID ~= 1 or S.EmpowerBond:CooldownRemains() > 20) and Target:TimeToDie() > 5 or FightRemains < 10) then
     if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune st 30"; end
   end
+  -- wait,sec=0.15,if=buff.ravenous_frenzy.remains=buff.ravenous_frenzy.duration&variable.asp_dump
   -- starfall,if=buff.oneths_perception.up&buff.starfall.refreshable
   if S.Starfall:IsReady() and (Player:BuffUp(S.OnethsPerceptionBuff) and Player:BuffRefreshable(S.StarfallBuff)) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall st 32"; end
@@ -583,6 +584,7 @@ local function Aoe()
   if S.Sunfire:IsCastable() and Settings.Commons.Enabled.Trinkets and (VarIQDCondition and I.InscrutableQuantumDevice:IsEquippedAndReady() and AP_Check(S.Sunfire)) then
     if Cast(S.Sunfire, nil, nil, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire aoe 6"; end
   end
+  -- wait,sec=0.15,if=covenant.venthyr&buff.ravenous_frenzy.remains=buff.ravenous_frenzy.duration&(!starfire.ap_check|talent.stellar_drift.enabled&cooldown.starfall.ready|buff.starfall.refreshable)
   -- starfall,if=!talent.stellar_drift.enabled&(!set_bonus.tier28_4pc|eclipse.in_any|spell_targets.starfall>3)&(buff.starfall.refreshable&(spell_targets.starfall<3|!runeforge.timeworn_dreambinder)|talent.soul_of_the_forest.enabled&buff.eclipse_solar.remains<3&eclipse.in_solar&buff.starfall.remains<7&spell_targets.starfall>=4)&(!runeforge.lycaras_fleeting_glimpse|time%%45>buff.starfall.remains+2)&target.time_to_die>5
   if S.Starfall:IsReady() and ((not S.StellarDrift:IsAvailable()) and ((not Player:HasTier(28, 4)) or EclipseInAny or EnemiesCount8ySplash > 3) and (Player:BuffRefreshable(S.StarfallBuff) and (EnemiesCount40y < 3 or not TimewornEquipped) or S.SouloftheForest:IsAvailable() and Player:BuffRemains(S.EclipseSolar) < 3 and EclipseInSolar and Player:BuffRemains(S.StarfallBuff) < 7 and EnemiesCount40y >= 4) and ((not LycaraEquipped) or HL.CombatTime() % 45 > Player:BuffRemains(S.StarfallBuff) + 2) and Target:TimeToDie() > 5) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall aoe 8"; end
