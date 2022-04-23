@@ -557,9 +557,9 @@ local function CDs ()
     if HR.CDsON() and S.Sepsis:IsReady() and SnDCondition and ComboPointsDeficit >= 1 and not Target:FilteredTimeToDie("<", 16) then
       if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
     end
-    -- actions.cds+=/symbols_of_death,if=(!stealthed.all|buff.perforated_veins.stack<4)&variable.snd_condition&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm>=2|cooldown.shuriken_tornado.remains>2)&(!covenant.venthyr|cooldown.flagellation.remains>10|cooldown.flagellation.up&combo_points>=5)
-    if S.SymbolsofDeath:IsCastable()
-      and (not Player:StealthUp(true, true) or Player:BuffStack(S.PerforatedVeinsBuff) < 4) and SnDCondition
+    -- actions.cds+=/symbols_of_death,if=variable.snd_condition&(!stealthed.all|buff.perforated_veins.stack<4|spell_targets.shuriken_storm>4&!variable.use_priority_rotation)&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm>=2|cooldown.shuriken_tornado.remains>2)&(!covenant.venthyr|cooldown.flagellation.remains>10|cooldown.flagellation.up&combo_points>=5)
+    if S.SymbolsofDeath:IsCastable() and SnDCondition
+      and (not Player:StealthUp(true, true) or Player:BuffStack(S.PerforatedVeinsBuff) < 4 or MeleeEnemies10yCount > 4 and not PriorityRotation)
       and (not S.ShurikenTornado:IsAvailable() or S.ShadowFocus:IsAvailable() or MeleeEnemies10yCount >= 2 or S.ShurikenTornado:CooldownRemains() > 2)
       and (not IsVenthyr or S.Flagellation:CooldownRemains() > 10 or S.Flagellation:CooldownUp() and ComboPoints >= 5) then
       if HR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death" end
@@ -571,9 +571,6 @@ local function CDs ()
       if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death" end
     end
     -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30&!stealthed.all&combo_points.deficit>=cp_max_spend
-    -- Note: Without Settings.Subtlety.STMfDAsDPSCD
-    -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30&!stealthed.all&combo_points.deficit>=cp_max_spend
-    -- Note: With Settings.Subtlety.STMfDAsDPSCD
     if not Player:StealthUp(true, true) and ComboPointsDeficit >= Rogue.CPMaxSpend() then
       if not Settings.Commons.STMfDAsDPSCD then
         HR.CastSuggested(S.MarkedforDeath)
@@ -588,9 +585,10 @@ local function CDs ()
       and (Player:BuffUp(S.SymbolsofDeath) or HL.BossFilteredFightRemains("<=", 20) or (not Player:BuffUp(S.ShadowBlades) and Tier282pcEquipped)) then
       if HR.Cast(S.ShadowBlades, Settings.Subtlety.OffGCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades" end
     end
-    -- actions.cds+=/echoing_reprimand,if=!stealthed.all&variable.snd_condition&combo_points.deficit>=2&(variable.use_priority_rotation|spell_targets.shuriken_storm<=4|runeforge.resounding_clarity)
-    if S.EchoingReprimand:IsReady() and Target:IsInMeleeRange(5) and not Player:StealthUp(true, true) and SnDCondition and ComboPointsDeficit >= 2
-      and (PriorityRotation or MeleeEnemies10yCount <= 4 or ResoundingClarityEquipped) then
+    -- actions.cds+=/echoing_reprimand,if=(!talent.shadow_focus.enabled|!stealthed.all|spell_targets.shuriken_storm>=4)&variable.snd_condition&combo_points.deficit>=2&(variable.use_priority_rotation|spell_targets.shuriken_storm<=4|runeforge.resounding_clarity)
+    if S.EchoingReprimand:IsReady() and Target:IsInMeleeRange(5)
+      and (not Player:StealthUp(true, true) or not S.ShadowFocus:IsAvailable() or MeleeEnemies10yCount >= 4)
+      and SnDCondition and ComboPointsDeficit >= 2 and (PriorityRotation or MeleeEnemies10yCount <= 4 or ResoundingClarityEquipped) then
       if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
     end
     -- actions.cds+=/shuriken_tornado,if=(talent.shadow_focus.enabled|spell_targets.shuriken_storm>=2)&variable.snd_condition&buff.symbols_of_death.up&combo_points<=2&(!buff.premeditation.up|spell_targets.shuriken_storm>4)
