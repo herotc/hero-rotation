@@ -74,7 +74,8 @@ do
     Garrote = {},
     Rupture = {},
   }
-  local Vendetta = {}
+  local VendettaGUID = {}
+  local VendettaSpell = Spell.Rogue.Assassination.Vendetta
 
   local Tier284pcEquipped = Player:HasTier(28, 4)
   HL:RegisterForEvent(function()
@@ -103,7 +104,7 @@ do
 
   function Rogue.WillLoseExsanguinate(ThisUnit, ThisSpell)
     -- TODO: Check rate comparison for Exsang + Vendetta
-    if Tier284pcEquipped and Vendetta[ThisUnit] then
+    if Tier284pcEquipped and ThisUnit:DebuffUp(VendettaSpell) then
       return false
     end
     
@@ -153,11 +154,11 @@ do
     function(_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
       if Tier284pcEquipped and SpellID == 79140 then
         -- Vendetta
-        Vendetta[DestGUID] = true
+        VendettaGUID[DestGUID] = true
       end
 
       -- Debuff are additionally Exsanguinated on cast when Vendetta is up 
-      local Exsanguinated = Tier284pcEquipped and Vendetta[DestGUID]
+      local Exsanguinated = Tier284pcEquipped and VendettaGUID[DestGUID]
       if SpellID == 121411 then
         -- Crimson Tempest
         ExsanguinatedByBleed.CrimsonTempest[DestGUID] = Exsanguinated
@@ -176,8 +177,8 @@ do
     function(_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
       if Tier284pcEquipped and SpellID == 79140 then
         -- Vendetta
-        if Vendetta[DestGUID] ~= nil then
-          Vendetta[DestGUID] = nil
+        if VendettaGUID[DestGUID] ~= nil then
+          VendettaGUID[DestGUID] = nil
         end
       elseif SpellID == 121411 then
         -- Crimson Tempest
@@ -202,8 +203,8 @@ do
   HL:RegisterForCombatEvent(
     function(_, _, _, _, _, _, _, DestGUID)
       -- Vendetta
-      if Vendetta[DestGUID] ~= nil then
-        Vendetta[DestGUID] = nil
+      if VendettaGUID[DestGUID] ~= nil then
+        VendettaGUID[DestGUID] = nil
       end
       -- Crimson Tempest
       if ExsanguinatedByBleed.CrimsonTempest[DestGUID] ~= nil then

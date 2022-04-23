@@ -279,12 +279,17 @@ Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
 if not Item.Rogue then Item.Rogue = {} end
 Item.Rogue.Assassination = {
   -- Trinkets
-  GalecallersBoon       = Item(159614, {13, 14}),
-  LustrousGoldenPlumage = Item(159617, {13, 14}),
-  ComputationDevice     = Item(167555, {13, 14}),
-  VigorTrinket          = Item(165572, {13, 14}),
-  FontOfPower           = Item(169314, {13, 14}),
-  RazorCoral            = Item(169311, {13, 14}),
+  GalecallersBoon           = Item(159614, {13, 14}),
+  LustrousGoldenPlumage     = Item(159617, {13, 14}),
+  ComputationDevice         = Item(167555, {13, 14}),
+  VigorTrinket              = Item(165572, {13, 14}),
+  FontOfPower               = Item(169314, {13, 14}),
+  RazorCoral                = Item(169311, {13, 14}),
+  InscrutableQuantumDevice  = Item(179350, {13, 14}),
+  ShadowgraspTotem          = Item(179356, {13, 14}),
+  OverchargedAnimaBattery   = Item(180116, {13, 14}),
+  CacheOfAcquiredTreasures  = Item(188265, {13, 14}),
+  TheFirstSigil             = Item(188271, {13, 14}),
 }
 
 Item.Rogue.Outlaw = {
@@ -296,11 +301,11 @@ Item.Rogue.Outlaw = {
 }
 
 Item.Rogue.Subtlety = {
-  ComputationDevice     = Item(167555, {13, 14}),
-  VigorTrinket          = Item(165572, {13, 14}),
-  FontOfPower           = Item(169314, {13, 14}),
-  RazorCoral            = Item(169311, {13, 14}),
-  CacheOfAcquiredTreasures = Item(188265, {13, 14}),
+  ComputationDevice         = Item(167555, {13, 14}),
+  VigorTrinket              = Item(165572, {13, 14}),
+  FontOfPower               = Item(169314, {13, 14}),
+  RazorCoral                = Item(169311, {13, 14}),
+  CacheOfAcquiredTreasures  = Item(188265, {13, 14}),
 }
 
 -- Stealth
