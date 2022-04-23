@@ -184,21 +184,12 @@ local function Precombat()
 end
 
 local function Cooldown()
-  -- metamorphosis,landing_distance=10,if=!talent.demonic.enabled&covenant.venthyr.enabled&runeforge.agony_gaze&dot.sinful_brand.remains>8&spell_targets.metamorphosis_impact<2&(cooldown.eye_beam.remains>20|fight_remains<25)
-  -- APL Note: If Venthyr and Sinful Brand duration is over 8 seconds with 1T, purposfully whiff Metamorphosis impact to not refresh with a lower duration DoT
-  if S.Metamorphosis:IsCastable() and ((not S.Demonic:IsAvailable()) and CovenantID == 2 and AgonyGazeEquipped and Target:DebuffRemains(S.SinfulBrandDebuff) > 8 and EnemiesCount8 < 2 and (S.EyeBeam:CooldownRemains() > 20 or FightRemains < 25)) then
-    if HR.CastAnnotated(S.Metamorphosis, nil, "AWAY") then return "metamorphosis whiff cooldown 0"; end
-  end
-  -- metamorphosis,landing_distance=10,if=talent.demonic.enabled&covenant.venthyr.enabled&runeforge.agony_gaze&dot.sinful_brand.remains>8&spell_targets.metamorphosis_impact<2&(cooldown.eye_beam.remains>20&!variable.blade_dance|cooldown.blade_dance.remains>gcd.max|fight_remains<25)
-  if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and CovenantID == 2 and AgonyGazeEquipped and Target:DebuffRemains(S.SinfulBrandDebuff) > 8 and EnemiesCount8 < 2 and (S.EyeBeam:CooldownRemains() > 20 and (not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD() or FightRemains < 25)) then
-    if HR.CastAnnotated(S.Metamorphosis, nil, "AWAY") then return "metamorphosis whiff cooldown 1"; end
-  end
-  -- metamorphosis,if=!talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!covenant.venthyr.enabled|dot.sinful_brand.remains<=8|spell_targets.metamorphosis_impact>1)|fight_remains<25)
-  if S.Metamorphosis:IsCastable() and ((not S.Demonic:IsAvailable()) and (S.EyeBeam:CooldownRemains() > 20 and (CovenantID ~= 2 or Target:DebuffRemains(S.SinfulBrandDebuff) <= 8 or EnemiesCount8 > 1) or FightRemains < 25)) then
+  -- metamorphosis,if=!talent.demonic.enabled&(cooldown.eye_beam.remains>20|fight_remains<25)
+  if S.Metamorphosis:IsCastable() and ((not S.Demonic:IsAvailable()) and (S.EyeBeam:CooldownRemains() > 20 or FightRemains < 25)) then
     if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis, not Target:IsInRange(40)) then return "metamorphosis cooldown 2"; end
   end
-  -- metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max)&(!covenant.venthyr.enabled|dot.sinful_brand.remains<=8|spell_targets.metamorphosis_impact>1)|fight_remains<25)
-  if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and (S.EyeBeam:CooldownRemains() > 20 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD()) and (CovenantID ~= 2 or Target:DebuffRemains(S.SinfulBrandDebuff) <= 8 or EnemiesCount8 > 1) or FightRemains < 25)) then
+  -- metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max)|fight_remains<25)
+  if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and (S.EyeBeam:CooldownRemains() > 20 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD() + 0.5) or FightRemains < 25)) then
     if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis, not Target:IsInRange(40)) then return "metamorphosis cooldown 4"; end
   end
   -- potion,if=buff.metamorphosis.remains>25|fight_remains<60
