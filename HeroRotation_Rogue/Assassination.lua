@@ -56,7 +56,7 @@ local Enemies30y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y
 -- Rotation Variables
 local ShouldReturn
 local Stealth
-local BleedTickTime, ExsanguinatedBleedTickTime = 2 / Player:SpellHaste(), 1 / Player:SpellHaste()
+local BleedTickTime, ExsanguinatedBleedTickTime = 2 * Player:SpellHaste(), 1 * Player:SpellHaste()
 local ComboPoints, ComboPointsDeficit
 local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMGThreshold, RuptureDurationThreshold, RuptureTickTime, GarroteTickTime
 local PriorityRotation
@@ -448,10 +448,10 @@ local function CDs ()
     -- actions.cds+=/variable,name=vendetta_nightstalker_condition,value=!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled
     local VendettaNSCondition = not S.Nightstalker:IsAvailable() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemains() < 5 - 2 * BoolToInt(S.DeeperStratagem:IsAvailable())
     -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.kyrian|covenant.necrolord|covenant.none,value=1
-    -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.venthyr,value=floor((fight_remains-20)%(120*variable.vendetta_cdr))>floor((fight_remains-20-cooldown.flagellation.remains)%(120*variable.vendetta_cdr))|buff.flagellation_buff.up|debuff.flagellation.up|fight_remains<20
+    -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.venthyr,value=floor((fight_remains-20)%(120*variable.vendetta_cdr))>floor((fight_remains-20-cooldown.flagellation.remains)%(120*variable.vendetta_cdr))&cooldown.flagellation.remains>10|buff.flagellation_buff.up|debuff.flagellation.up|fight_remains<20
     -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.night_fae,value=floor((fight_remains-20)%(120*variable.vendetta_cdr))>floor((fight_remains-20-cooldown.sepsis.remains)%(120*variable.vendetta_cdr))|dot.sepsis.ticking|fight_remains<20
     local VendettaCovenantCondition = HL.BossFilteredFightRemains("<", 20) or IsNecrolord or IsKyrian or CovenantId == 0
-      or (IsVenthyr and (CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Flagellation:CooldownRemains(), 20)
+      or (IsVenthyr and (S.Flagellation:CooldownRemains() > 10 and CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Flagellation:CooldownRemains(), 20)
         or Player:BuffUp(S.Flagellation) or Player:BuffUp(S.FlagellationBuff) or S.Flagellation:AnyDebuffUp()))
       or (IsNightFae and (CheckWillWasteCooldown(120 * VendettaCDMultiplier, S.Sepsis:CooldownRemains(), 20) or Target:DebuffUp(S.Sepsis)))
     -- actions.cds+=/variable,name=vendetta_condition,value=!stealthed.rogue&dot.rupture.ticking&!debuff.vendetta.up&variable.vendetta_nightstalker_condition&variable.vendetta_ma_condition&variable.vendetta_covenant_condition
@@ -604,6 +604,9 @@ local function Dot ()
   -- # Garrote upkeep, also tries to use it as a special generator for the last CP before a finisher
   -- actions.dot+=/pool_resource,for_next=1
   -- actions.dot+=/garrote,if=refreshable&combo_points.deficit>=1&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!will_lose_exsanguinate|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&(target.time_to_die-remains)>4&master_assassin_remains=0
+  -- # Early refresh Garrote if it is at low duration (but not yet pandemic) at the end of Vendetta with 4pc
+  -- actions.dot+=/pool_resource,for_next=1
+  -- actions.dot+=/garrote,if=set_bonus.tier28_4pc&debuff.vendetta.up&debuff.vendetta.remains<3&remains<7&combo_points.deficit>=1&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(target.time_to_die-remains)>2
   -- actions.dot+=/pool_resource,for_next=1
   -- actions.dot+=/garrote,cycle_targets=1,if=!variable.skip_cycle_garrote&target!=self.target&refreshable&combo_points.deficit>=1&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!will_lose_exsanguinate|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&(target.time_to_die-remains)>12&master_assassin_remains=0
   if S.Garrote:IsCastable() and ComboPointsDeficit >= 1 then
@@ -611,11 +614,16 @@ local function Dot ()
       GarroteTickTime = Rogue.Exsanguinated(TargetUnit, S.Garrote) and ExsanguinatedBleedTickTime or BleedTickTime
       return IsDebuffRefreshable(TargetUnit, S.Garrote) and MasterAssassinRemains() <= 0
         and (TargetUnit:PMultiplier(S.Garrote) <= 1 or (MeleeEnemies10yCount >= 3 and TargetUnit:DebuffRemains(S.Garrote) <= GarroteTickTime))
-        and (not Rogue.WillLoseExsanguinate(TargetUnit, S.Garrote) or (MeleeEnemies10yCount >= 3 and TargetUnit:DebuffRemains(S.Garrote) <= GarroteTickTime * 2))
+        and (not Rogue.WillLoseExsanguinate(TargetUnit, S.Garrote) or TargetUnit:DebuffRemains(S.Garrote) <= GarroteTickTime * (1 + BoolToInt(MeleeEnemies10yCount >= 3)))
     end
     if Evaluate_Garrote_Target(Target) and Rogue.CanDoTUnit(Target, GarroteDMGThreshold)
       and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Garrote)) or Target:TimeToDieIsNotValid()) then
       if CastPooling(S.Garrote, nil, not Target:IsInMeleeRange(5)) then return "Pool for Garrote (ST)" end
+    end
+    if Tier284pcEquipped and Target:DebuffUp(S.Vendetta) and Target:DebuffRemains(S.Vendetta) < 3 and Target:DebuffRemains(S.Garrote) < 7
+      and (ComboPointsDeficit >= 1 or Target:DebuffRemains(S.Vendetta) < 2) and Target:FilteredTimeToDie(">", 2)
+      and (Target:PMultiplier(S.Garrote) <= 1 or (MeleeEnemies10yCount >= 3 and Target:DebuffRemains(S.Garrote) <= GarroteTickTime)) then
+      if CastPooling(S.Garrote, nil, not Target:IsInMeleeRange(5)) then return "Pool for Garrote (Vendetta Refresh)" end
     end
     if HR.AoEON() and not SkipCycleGarrote then
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, 12, MeleeEnemies5y)
@@ -634,21 +642,27 @@ local function Dot ()
   end
   -- # Keep up Rupture at 4+ on all targets (when living long enough and not snapshot)
   -- actions.dot+=/rupture,if=!variable.skip_rupture&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!will_lose_exsanguinate|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
+  -- # Early refresh Rupture if it is at low duration (but not yet pandemic) at the end of Vendetta with 4pc
+  -- actions.dot+=/rupture,if=set_bonus.tier28_4pc&effective_combo_points>=4&debuff.vendetta.up&debuff.vendetta.remains<3&remains<8&target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))%2
   -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!will_lose_exsanguinate|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
-  if not SkipRupture and S.Rupture:IsReady() and ComboPoints >= 4 then
+  if S.Rupture:IsReady() and ComboPoints >= 4 then
     -- target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
     RuptureDurationThreshold = 4 + BoolToInt(DashingScoundrelEquipped) * 5 + BoolToInt(DoombladeEquipped) * 5 + BoolToInt(EnergyRegenSaturated) * 6
     local function Evaluate_Rupture_Target(TargetUnit)
       RuptureTickTime = Rogue.Exsanguinated(TargetUnit, S.Rupture) and ExsanguinatedBleedTickTime or BleedTickTime
       return IsDebuffRefreshable(TargetUnit, S.Rupture, RuptureThreshold)
         and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemains(S.Rupture) <= RuptureTickTime and MeleeEnemies10yCount >= 3)
-        and (not Rogue.WillLoseExsanguinate(TargetUnit, S.Rupture) or TargetUnit:DebuffRemains(S.Rupture) <= RuptureTickTime * 2 and MeleeEnemies10yCount >= 3)
+        and (not Rogue.WillLoseExsanguinate(TargetUnit, S.Rupture) or TargetUnit:DebuffRemains(S.Rupture) <= RuptureTickTime * (1 + BoolToInt(MeleeEnemies10yCount >= 3)))
         and (TargetUnit:FilteredTimeToDie(">", RuptureDurationThreshold, -TargetUnit:DebuffRemains(S.Rupture)) or TargetUnit:TimeToDieIsNotValid())
     end
-    if Evaluate_Rupture_Target(Target) and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
+    if not SkipRupture and Evaluate_Rupture_Target(Target) and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
       if Cast(S.Rupture, nil, nil, not Target:IsInMeleeRange(5)) then return "Cast Rupture (Refresh)" end
     end
-    if HR.AoEON() and not SkipCycleRupture then
+    if Tier284pcEquipped and Target:DebuffUp(S.Vendetta) and Target:DebuffRemains(S.Vendetta) < 3 and Target:DebuffRemains(S.Rupture) < 8
+      and (Target:FilteredTimeToDie(">", RuptureDurationThreshold / 2, -Target:DebuffRemains(S.Rupture)) or Target:TimeToDieIsNotValid()) then
+      if Cast(S.Rupture, nil, nil, not Target:IsInMeleeRange(5)) then return "Cast Rupture (Vendetta Refresh)" end
+    end
+    if not SkipRupture and not SkipCycleRupture and HR.AoEON() then
       SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, RuptureDurationThreshold, MeleeEnemies5y)
     end
   end
@@ -787,7 +801,7 @@ local function APL ()
 
   -- Rotation Variables Update
   Stealth = S.Subterfuge:IsAvailable() and S.Stealth2 or S.Stealth; -- w/ or w/o Subterfuge Talent
-  BleedTickTime, ExsanguinatedBleedTickTime = 2 / Player:SpellHaste(), 1 / Player:SpellHaste()
+  BleedTickTime, ExsanguinatedBleedTickTime = 2 * Player:SpellHaste(), 1 * Player:SpellHaste()
   ComboPoints = Rogue.EffectiveComboPoints(Player:ComboPoints())
   ComboPointsDeficit = Player:ComboPointsMax() - ComboPoints
   RuptureThreshold = (4 + ComboPoints * 4) * 0.3
@@ -918,7 +932,7 @@ end
 HR.SetAPL(259, APL, Init)
 
 --- ======= SIMC =======
--- Last Update: 11/02/2021
+-- Last Update: 04/24/2022
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=apply_poison
@@ -972,7 +986,7 @@ HR.SetAPL(259, APL, Init)
 -- actions.cds+=/variable,name=vendetta_ma_condition,value=!talent.master_assassin.enabled|dot.garrote.ticking|covenant.venthyr&combo_points.deficit=0
 -- # Sync Vendetta with Flagellation and Sepsis as long as we won't lose a cast over the fight duration
 -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.kyrian|covenant.necrolord|covenant.none,value=1
--- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.venthyr,value=floor((fight_remains-20)%(120*variable.vendetta_cdr))>floor((fight_remains-20-cooldown.flagellation.remains)%(120*variable.vendetta_cdr))|buff.flagellation_buff.up|debuff.flagellation.up|fight_remains<20
+-- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.venthyr,value=floor((fight_remains-20)%(120*variable.vendetta_cdr))>floor((fight_remains-20-cooldown.flagellation.remains)%(120*variable.vendetta_cdr))&cooldown.flagellation.remains>10|buff.flagellation_buff.up|debuff.flagellation.up|fight_remains<20
 -- actions.cds+=/variable,name=vendetta_covenant_condition,if=covenant.night_fae,value=floor((fight_remains-20)%(120*variable.vendetta_cdr))>floor((fight_remains-20-cooldown.sepsis.remains)%(120*variable.vendetta_cdr))|dot.sepsis.ticking|fight_remains<20
 -- # Fleshcraft for Pustule Eruption if not stealthed or in a cooldown cycle
 -- actions.cds+=/fleshcraft,if=(soulbind.pustule_eruption|soulbind.volatile_solvent)&!stealthed.all&!debuff.vendetta.up&master_assassin_remains=0&(energy.time_to_max_combined>2|!debuff.shiv.up)
@@ -1038,12 +1052,17 @@ HR.SetAPL(259, APL, Init)
 -- # Garrote upkeep, also tries to use it as a special generator for the last CP before a finisher
 -- actions.dot+=/pool_resource,for_next=1
 -- actions.dot+=/garrote,if=refreshable&combo_points.deficit>=1&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!will_lose_exsanguinate|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&(target.time_to_die-remains)>4&master_assassin_remains=0
+-- # Early refresh Garrote if it is at low duration (but not yet pandemic) at the end of Vendetta with 4pc
+-- actions.dot+=/pool_resource,for_next=1
+-- actions.dot+=/garrote,if=set_bonus.tier28_4pc&debuff.vendetta.up&debuff.vendetta.remains<3&remains<7&combo_points.deficit>=1&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(target.time_to_die-remains)>2
 -- actions.dot+=/pool_resource,for_next=1
 -- actions.dot+=/garrote,cycle_targets=1,if=!variable.skip_cycle_garrote&target!=self.target&refreshable&combo_points.deficit>=1&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!will_lose_exsanguinate|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&(target.time_to_die-remains)>12&master_assassin_remains=0
 -- # Crimson Tempest on multiple targets at 4+ CP when running out in 2-5s as long as we have enough regen and aren't setting up for Vendetta
 -- actions.dot+=/crimson_tempest,target_if=min:remains,if=spell_targets>=2&effective_combo_points>=4&energy.regen_combined>20&(!cooldown.vendetta.ready|dot.rupture.ticking)&remains<(2+3*(spell_targets>=4))*(1-(set_bonus.tier28_4pc*debuff.vendetta.up*0.5))
 -- # Keep up Rupture at 4+ on all targets (when living long enough and not snapshot)
 -- actions.dot+=/rupture,if=!variable.skip_rupture&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!will_lose_exsanguinate|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
+-- # Early refresh Rupture if it is at low duration (but not yet pandemic) at the end of Vendetta with 4pc
+-- actions.dot+=/rupture,if=set_bonus.tier28_4pc&effective_combo_points>=4&debuff.vendetta.up&debuff.vendetta.remains<3&remains<8&target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))%2
 -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&effective_combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(!will_lose_exsanguinate|remains<=tick_time*2&spell_targets.fan_of_knives>=3)&target.time_to_die-remains>(4+(runeforge.dashing_scoundrel*5)+(runeforge.doomblade*5)+(variable.regen_saturated*6))
 -- # Fallback AoE Crimson Tempest with the same logic as above, but ignoring the energy conditions if we aren't using Rupture
 -- actions.dot+=/crimson_tempest,if=spell_targets>=2&effective_combo_points>=4&remains<2+3*(spell_targets>=4)

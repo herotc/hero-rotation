@@ -155,10 +155,20 @@ do
       if Tier284pcEquipped and SpellID == 79140 then
         -- Vendetta
         VendettaGUID[DestGUID] = true
+        if ExsanguinatedByBleed.CrimsonTempest[DestGUID] == false then
+          ExsanguinatedByBleed.CrimsonTempest[DestGUID] = true
+        end
+        if ExsanguinatedByBleed.Garrote[DestGUID] == false then
+          ExsanguinatedByBleed.Garrote[DestGUID] = true
+        end
+        if ExsanguinatedByBleed.Rupture[DestGUID] == false then
+            ExsanguinatedByBleed.Rupture[DestGUID] = true
+        end
+        return
       end
 
       -- Debuff are additionally Exsanguinated on cast when Vendetta is up 
-      local Exsanguinated = Tier284pcEquipped and VendettaGUID[DestGUID]
+      local Exsanguinated = Tier284pcEquipped and VendettaGUID[DestGUID] or false
       if SpellID == 121411 then
         -- Crimson Tempest
         ExsanguinatedByBleed.CrimsonTempest[DestGUID] = Exsanguinated

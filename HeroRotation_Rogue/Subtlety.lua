@@ -632,12 +632,13 @@ local function CDs ()
 
     -- Trinkets
     if Settings.Commons.UseTrinkets then
-      -- use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up&spell_targets.fan_of_knives>1|buff.acquired_wand.up&(spell_targets.fan_of_knives=1&raid_event.adds.in>60|fight_remains<25)
+      -- use_item,name=cache_of_acquired_treasures,if=(covenant.venthyr&buff.acquired_axe.up|!covenant.venthyr&buff.acquired_wand.up)&(spell_targets.shuriken_storm=1&raid_event.adds.in>60|fight_remains<25|variable.use_priority_rotation)|buff.acquired_axe.up&spell_targets.shuriken_storm>1
       if I.CacheOfAcquiredTreasures:IsEquippedAndReady() then
         if Player:BuffUp(S.AcquiredAxe) and MeleeEnemies10yCount > 1 then
-          if HR.Cast(I.CacheOfAcquiredTreasures, nil, Settings.Commons.TrinketDisplayStyle) then return "Cache Axe for AoE" end
-        elseif Player:BuffUp(S.AcquiredAxe) and (MeleeEnemies10yCount == 1 and Target:IsInBossList() or HL.BossFilteredFightRemains("<", 20)) then
-          if HR.Cast(I.CacheOfAcquiredTreasures, nil, Settings.Commons.TrinketDisplayStyle) then return "Cache Wand for ST" end
+          if HR.Cast(I.CacheOfAcquiredTreasures, nil, Settings.Commons.TrinketDisplayStyle) then return "Cache for AoE" end
+        elseif (IsVenthyr and Player:BuffUp(S.AcquiredAxe) or not IsVenthyr and Player:BuffUp(S.AcquiredWand))
+          and (MeleeEnemies10yCount == 1 or PriorityRotation) and (Target:IsInBossList() or Target:IsDummy()) or HL.BossFilteredFightRemains("<", 25) then
+          if HR.Cast(I.CacheOfAcquiredTreasures, nil, Settings.Commons.TrinketDisplayStyle) then return "Cache for ST" end
         end
       end
       local DefaultTrinketCondition = Player:BuffUp(S.SymbolsofDeath) or HL.BossFilteredFightRemains("<", 20)
@@ -986,7 +987,7 @@ end
 
 HR.SetAPL(261, APL, Init)
 
--- Last Update: 2022-03-15
+-- Last Update: 04/24/2022
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=apply_poison
@@ -1062,13 +1063,13 @@ HR.SetAPL(261, APL, Init)
 -- actions.cds+=/serrated_bone_spike,cycle_targets=1,if=variable.snd_condition&!dot.serrated_bone_spike_dot.ticking&target.time_to_die>=21&(combo_points.deficit>=(cp_gain>?4))&!buff.shuriken_tornado.up&(!buff.premeditation.up|spell_targets.shuriken_storm>4)|fight_remains<=5&spell_targets.shuriken_storm<3
 -- actions.cds+=/sepsis,if=variable.snd_condition&combo_points.deficit>=1&target.time_to_die>=16
 -- # Use Symbols on cooldown (after first SnD) unless we are going to pop Tornado and do not have Shadow Focus.
--- actions.cds+=/symbols_of_death,if=(!stealthed.all|buff.perforated_veins.stack<4)&variable.snd_condition&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm>=2|cooldown.shuriken_tornado.remains>2)&(!covenant.venthyr|cooldown.flagellation.remains>10|cooldown.flagellation.up&combo_points>=5)
+-- actions.cds+=/symbols_of_death,if=variable.snd_condition&(!stealthed.all|buff.perforated_veins.stack<4|spell_targets.shuriken_storm>4&!variable.use_priority_rotation)&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm>=2|cooldown.shuriken_tornado.remains>2)&(!covenant.venthyr|cooldown.flagellation.remains>10|cooldown.flagellation.up&combo_points>=5)
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or not stealthed without any CP.
 -- actions.cds+=/marked_for_death,line_cd=1.5,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.all&combo_points.deficit>=cp_max_spend)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP.
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend
 -- actions.cds+=/shadow_blades,if=variable.snd_condition&combo_points.deficit>=2&(buff.symbols_of_death.up|fight_remains<=20|!buff.shadow_blades.up&set_bonus.tier28_2pc)
--- actions.cds+=/echoing_reprimand,if=!stealthed.all&variable.snd_condition&combo_points.deficit>=2&(variable.use_priority_rotation|spell_targets.shuriken_storm<=4|runeforge.resounding_clarity)
+-- actions.cds+=/echoing_reprimand,if=(!talent.shadow_focus.enabled|!stealthed.all|spell_targets.shuriken_storm>=4)&variable.snd_condition&combo_points.deficit>=2&(variable.use_priority_rotation|spell_targets.shuriken_storm<=4|runeforge.resounding_clarity)
 -- # With SF, if not already done, use Tornado with SoD up.
 -- actions.cds+=/shuriken_tornado,if=(talent.shadow_focus.enabled|spell_targets.shuriken_storm>=2)&variable.snd_condition&buff.symbols_of_death.up&combo_points<=2&(!buff.premeditation.up|spell_targets.shuriken_storm>4)
 -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
@@ -1078,7 +1079,7 @@ HR.SetAPL(261, APL, Init)
 -- actions.cds+=/berserking,if=buff.symbols_of_death.up
 -- actions.cds+=/fireblood,if=buff.symbols_of_death.up
 -- actions.cds+=/ancestral_call,if=buff.symbols_of_death.up
--- actions.cds+=/use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up&(spell_targets.shuriken_storm=1&raid_event.adds.in>60|spell_targets.shuriken_storm>1)|fight_remains<25
+-- actions.cds+=/use_item,name=cache_of_acquired_treasures,if=(covenant.venthyr&buff.acquired_axe.up|!covenant.venthyr&buff.acquired_wand.up)&(spell_targets.shuriken_storm=1&raid_event.adds.in>60|fight_remains<25|variable.use_priority_rotation)|buff.acquired_axe.up&spell_targets.shuriken_storm>1
 -- # Default fallback for usable items: Use with Symbols of Death.
 -- actions.cds+=/use_items,if=buff.symbols_of_death.up|fight_remains<20
 
