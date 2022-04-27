@@ -120,9 +120,9 @@ local function EvaluateTargetIfFilterMaxHealthPct(TargetUnit)
   return (TargetUnit:HealthPercentage())
 end
 
--- if=!dot.serpent_sting.ticking&target.time_to_die>7|buff.vipers_venom.up&buff.vipers_venom.remains<gcd
+-- if=!dot.serpent_sting.ticking&target.time_to_die>7&(!dot.pheromone_bomb.ticking|buff.mad_bombardier.up&next_wi_bomb.pheromone)|buff.vipers_venom.up&buff.vipers_venom.remains<gcd|!set_bonus.tier28_2pc&!dot.serpent_sting.ticking&target.time_to_die>7
 local function EvaluateTargetIfSerpentStingST(TargetUnit)
-  return (TargetUnit:DebuffDown(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 7 or Player:BuffUp(S.VipersVenomBuff) and Player:BuffRemains(S.VipersVenomBuff) < Player:GCD())
+  return (TargetUnit:DebuffDown(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 7 or (TargetUnit:DebuffDown(S.PheromoneBombDebuff) or Player:BuffUp(S.MadBombardierBuff) and S.PheromoneBomb:IsCastable()) or Player:BuffUp(S.VipersVenomBuff) and Player:BuffRemains(S.VipersVenomBuff) < Player:GCD() + 0.5 or (not Player:HasTier(28, 2)) and TargetUnit:DebuffDown(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 7)
 end
 
 -- if=refreshable&target.time_to_die>7|buff.vipers_venom.up
@@ -455,7 +455,7 @@ local function ST()
   if S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
     if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram st 2"; end
   end
-  -- serpent_sting,target_if=min:remains,if=!dot.serpent_sting.ticking&target.time_to_die>7|buff.vipers_venom.up&buff.vipers_venom.remains<gcd
+  -- serpent_sting,target_if=min:remains,if=!dot.serpent_sting.ticking&target.time_to_die>7&(!dot.pheromone_bomb.ticking|buff.mad_bombardier.up&next_wi_bomb.pheromone)|buff.vipers_venom.up&buff.vipers_venom.remains<gcd|!set_bonus.tier28_2pc&!dot.serpent_sting.ticking&target.time_to_die>7
   if S.SerpentSting:IsReady() then
     if Everyone.CastTargetIf(S.SerpentSting, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingST, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting st 4"; end
   end
@@ -476,10 +476,6 @@ local function ST()
     if S.CoordinatedAssault:IsCastable() then
       if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault) then return "coordinated_assault st 12"; end
     end
-  end
-  -- kill_shot
-  if S.KillShot:IsReady() then
-    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot st 14"; end
   end
   -- flanking_strike,if=focus+cast_regen<focus.max
   if S.FlankingStrike:IsCastable() and (CheckFocusCap(S.FlankingStrike:ExecuteTime())) then
@@ -505,6 +501,10 @@ local function ST()
   -- kill_command,target_if=min:bloodseeker.remains,if=set_bonus.tier28_2pc&dot.pheromone_bomb.ticking&!buff.mad_bombardier.up
   if S.KillCommand:IsReady() and (Player:HasTier(28, 2) and Player:BuffDown(S.MadBombardierBuff)) then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandST3, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command st 28"; end
+  end
+  -- kill_shot
+  if S.KillShot:IsReady() then
+    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot st 29"; end
   end
   -- carve,if=active_enemies>1&!runeforge.rylakstalkers_confounding_strikes.equipped
   if S.Carve:IsReady() and (EnemyCount8ySplash > 1 and not RylakstalkersConfoundingEquipped) then
