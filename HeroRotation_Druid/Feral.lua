@@ -42,6 +42,7 @@ local OnUseExcludes = {--  I.TrinketName:ID(),
 }
 
 -- Rotation Variables
+local VarsInit = false
 local VarFourCPBite
 local VarFiller
 local VarRipTicks
@@ -308,8 +309,7 @@ local function EvaluateTargetIfDummy(TargetUnit)
   return true
 end
 
--- APL Functions
-local function Precombat()
+local function InitVars()
   -- variable,name=4cp_bite,value=0
   VarFourCPBite = 0
   -- variable,name=filler,value=1
@@ -324,27 +324,31 @@ local function Precombat()
   VarOnUseTrinket = VarOnUseTrinket + num(trinket2:IsReady() or trinket2:CooldownRemains() > 0 or trinket2:ID() == I.InscrutableQuantumDevice:ID()) * 2
   -- variable,name=max_trinket_hold,value=61
   VarMaxTrinketHold = 61
-  if Everyone.TargetIsValid() then
-    -- fleshcraft,if=(soulbind.pustule_eruption|soulbind.volatile_solvent)
-    if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
-      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 1"; end
-    end
-    -- cat_form
-    if S.CatForm:IsCastable() then
-      if Cast(S.CatForm) then return "cat_form precombat 2"; end
-    end
-    -- prowl
-    if S.Prowl:IsCastable() then
-      if Cast(S.Prowl) then return "prowl precombat 4"; end
-    end
-    -- Manually added: wild_charge if talented and not in melee range
-    if S.WildCharge:IsCastable() and not Target:IsInRange(MeleeRange) then
-      if Cast(S.WildCharge, nil, nil, not Target:IsSpellInRange(S.WildCharge)) then return "wild_charge precombat 6"; end
-    end
-    -- Manually added: rake if in melee range
-    if S.Rake:IsReady() and Target:IsInRange(MeleeRange) then
-      if Cast(S.Rake, nil, nil, not Target:IsInRange(MeleeRange)) then return "rake precombat 8"; end
-    end
+
+  VarsInit = true
+end
+
+-- APL Functions
+local function Precombat()
+  -- fleshcraft,if=(soulbind.pustule_eruption|soulbind.volatile_solvent)
+  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 1"; end
+  end
+  -- cat_form
+  if S.CatForm:IsCastable() then
+    if Cast(S.CatForm) then return "cat_form precombat 2"; end
+  end
+  -- prowl
+  if S.Prowl:IsCastable() then
+    if Cast(S.Prowl) then return "prowl precombat 4"; end
+  end
+  -- Manually added: wild_charge if talented and not in melee range
+  if S.WildCharge:IsCastable() and not Target:IsInRange(MeleeRange) then
+    if Cast(S.WildCharge, nil, nil, not Target:IsSpellInRange(S.WildCharge)) then return "wild_charge precombat 6"; end
+  end
+  -- Manually added: rake if in melee range
+  if S.Rake:IsReady() and Target:IsInRange(MeleeRange) then
+    if Cast(S.Rake, nil, nil, not Target:IsInRange(MeleeRange)) then return "rake precombat 8"; end
   end
 end
 
@@ -616,12 +620,13 @@ local function APL()
     if Cast(S.CatForm) then return "cat_form ooc"; end
   end
 
-  -- Precombat
-  if not Player:AffectingCombat() then
-    local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
-  end
-
   if Everyone.TargetIsValid() then
+    -- Initialize variables, if not yet done
+    if not VarsInit then InitVars() end
+    -- Precombat
+    if not Player:AffectingCombat() then
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
     -- call_action_list,name=owlweave,if=druid.owlweave_cat
     if (Settings.Feral.UseOwlweave and S.BalanceAffinity:IsAvailable()) then
       local ShouldReturn = Owlweave(); if ShouldReturn then return ShouldReturn; end
