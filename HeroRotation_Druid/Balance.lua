@@ -550,7 +550,7 @@ local function St()
     if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon st 54"; end
   end
   -- warrior_of_elune
-  if S.WarriorofElune:IsCastable() then
+  if S.WarriorofElune:IsReady() then
     if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune st 56"; end
   end
   -- starfire,if=eclipse.in_lunar&!buff.ravenous_frenzy.up|eclipse.solar_next|(eclipse.any_next|buff.ca_inc.remains<action.wrath.execute_time&buff.ca_inc.up)&(!set_bonus.tier28_2pc|runeforge.primordial_arcanic_pulsar&buff.primordial_arcanic_pulsar.value<210&cooldown.ca_inc.remains>17&(!covenant.night_fae|cooldown.convoke_the_spirits.remains>17)&(!race.troll|cooldown.berserking.remains>17))|eclipse.in_any&(buff.warrior_of_elune.up|spell_haste<0.45&(!covenant.venthyr|!buff.ravenous_frenzy.up)|covenant.venthyr&spell_haste<0.4)
@@ -672,7 +672,7 @@ local function Aoe()
     if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon aoe 46"; end
   end
   -- warrior_of_elune
-  if S.WarriorofElune:IsCastable() then
+  if S.WarriorofElune:IsReady() then
     if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune aoe 48"; end
   end
   -- variable,name=starfire_in_solar,value=spell_targets.starfire>4+floor(mastery_value*100%20)+floor(buff.starsurge_empowerment_solar.stack%4)
