@@ -76,6 +76,7 @@ end
 
 -- Legendaries
 local DeepFocusEquipped = Player:HasLegendaryEquipped(46)
+local FrenzybandEquipped = Player:HasLegendaryEquipped(54)
 local CateyeCurioEquipped = Player:HasLegendaryEquipped(57)
 
 -- Player Covenant
@@ -99,6 +100,7 @@ HL:RegisterForEvent(function()
     trinket2 = Item(equip[14])
   end
   DeepFocusEquipped = Player:HasLegendaryEquipped(46)
+  FrenzybandEquipped = Player:HasLegendaryEquipped(54)
   CateyeCurioEquipped = Player:HasLegendaryEquipped(57)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -379,6 +381,10 @@ end
 
 local function Stealth()
   -- pool_resource,for_next=1
+  -- swipe_cat,if=buff.bs_inc.up&spell_targets.swipe_cat>3&runeforge.frenzyband
+  if S.Swipe:IsCastable() and (Player:BuffUp(BsInc) and EnemiesCount8y > 3 and FrenzybandEquipped) then
+    if CastPooling(S.Swipe, Player:EnergyTimeToX(35), not Target:IsInRange(EightRange)) then return "swipe stealth 1"; end
+  end
   -- rake,target_if=max:druid.rake.ticks_gained_on_refresh,if=(dot.rake.pmultiplier<1.5|refreshable)&druid.rake.ticks_gained_on_refresh>2|(persistent_multiplier>dot.rake.pmultiplier&buff.bs_inc.up&spell_targets.thrash_cat<3&covenant.necrolord)|buff.bs_inc.remains<1
   if S.Rake:IsCastable() then
     if Everyone.CastTargetIf(S.Rake, Enemies8y, "max", EvaluateTargetIfFilterRakeTicks, EvaluateTargetIfRakeStealth2, not Target:IsInRange(MeleeRange)) then return "rake stealth 2"; end
