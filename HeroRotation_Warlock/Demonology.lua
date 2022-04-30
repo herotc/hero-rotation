@@ -377,15 +377,15 @@ end
 local function DamageTrinkets()
   -- use_item,name=resonant_reservoir
   if I.ResonantReservoir:IsEquippedAndReady() then
-    if Cast(I.ResonantReservoir, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange()) then return "resonant_reservoir dmg 4"; end
+    if Cast(I.ResonantReservoir, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "resonant_reservoir dmg 4"; end
   end
   -- use_item,name=architects_ingenuity_core
   if I.ArchitectsIngenuityCore:IsEquippedAndReady() then
-    if Cast(I.ArchitectsIngenuityCore, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange()) then return "architects_ingenuity_core dmg 6"; end
+    if Cast(I.ArchitectsIngenuityCore, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "architects_ingenuity_core dmg 6"; end
   end
   -- use_item,name=cosmic_gladiators_resonator
   if I.CosmicGladiatorsResonator:IsEquippedAndReady() then
-    if Cast(I.CosmicGladiatorsResonator, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange()) then return "cosmic_gladiators_resonator dmg 8"; end
+    if Cast(I.CosmicGladiatorsResonator, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "cosmic_gladiators_resonator dmg 8"; end
   end
   -- use_item,name=dreadfire_vessel
   if I.DreadfireVessel:IsEquippedAndReady() then
@@ -434,7 +434,7 @@ local function Trinkets()
   end
   -- use_item,name=grim_eclipse,if=variable.buff_sync_cd<7
   if I.GrimEclipse:IsEquippedAndReady() and (VarBuffSyncCD < 7) then
-    if Cast(I.GrimEclipse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange()) then return "grim_eclipse trinkets 6"; end
+    if Cast(I.GrimEclipse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "grim_eclipse trinkets 6"; end
   end
   -- call_action_list,name=hp_trinks,if=talent.demonic_consumption.enabled&variable.next_tyrant_cd<20
   if (S.DemonicConsumption:IsAvailable() and VarNextTyrantCD < 20) then
