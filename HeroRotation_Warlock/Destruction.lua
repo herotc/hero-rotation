@@ -278,7 +278,7 @@ local function Aoe()
     if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate aoe 20"; end
   end
   -- shadowburn,if=target.health.pct<20
-  if S.Shadowburn:IsCastable() and (Target:HealthPercentage() < 20) then
+  if S.Shadowburn:IsReady() and (Target:HealthPercentage() < 20) then
     if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn aoe 22"; end
   end
   -- immolate,if=refreshable
@@ -321,7 +321,7 @@ local function Havoc()
     if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt havoc 12"; end
   end
   -- shadowburn
-  if S.Shadowburn:IsCastable() then
+  if S.Shadowburn:IsReady() then
     if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn havoc 14"; end
   end
   -- incinerate,if=cast_time<havoc_remains
@@ -450,7 +450,7 @@ local function APL()
       if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 34"; end
     end
     -- shadowburn,if=!variable.pool_soul_shards|soul_shard>=4.5
-    if S.Shadowburn:IsCastable() and ((not VarPoolSoulShards) or Player:SoulShardsP() >= 4.5) then
+    if S.Shadowburn:IsReady() and ((not VarPoolSoulShards) or Player:SoulShardsP() >= 4.5) then
       if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn main 36"; end
     end
     -- chaos_bolt,if=soul_shard>3.5
