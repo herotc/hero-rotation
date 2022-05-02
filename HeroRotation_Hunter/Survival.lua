@@ -234,9 +234,9 @@ local function EvaluateCycleKillCommandCleave(TargetUnit)
   return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and (NessingwarysTrappingEquipped and not S.FreezingTrap:CooldownUp() and not S.TarTrap:CooldownUp() or not NessingwarysTrappingEquipped))
 end
 
--- target_if=dot.pheromone_bomb.ticking&set_bonus.tier28_2pc
+-- target_if=dot.pheromone_bomb.ticking&set_bonus.tier28_2pc&!buff.mad_bombardier.up
 local function EvaluateCycleKillCommandCleave2(TargetUnit)
-  return (TargetUnit:DebuffUp(S.PheromoneBombDebuff) and Player:HasTier(28, 2))
+  return (TargetUnit:DebuffUp(S.PheromoneBombDebuff) and Player:HasTier(28, 2) and Player:BuffDown(S.MadBombardierBuff))
 end
 
 local function Precombat()
@@ -711,8 +711,8 @@ local function Cleave()
   if S.CoordinatedAssault:IsCastable() then
     if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault) then return "coordinated_assault cleave 8"; end
   end
-  -- wildfire_bomb,if=full_recharge_time<gcd
-  if S.WildfireBomb:FullRechargeTime() < Player:GCD() then
+  -- wildfire_bomb,if=full_recharge_time<gcd|buff.mad_bombardier.up
+  if S.WildfireBomb:FullRechargeTime() < Player:GCD() or Player:BuffUp(S.MadBombardierBuff) then
     if S.ShrapnelBomb:IsCastable() then
       if Cast(S.ShrapnelBomb, nil, nil, not Target:IsSpellInRange(S.ShrapnelBomb)) then return "shrapnel_bomb cleave 10"; end
     end
@@ -725,6 +725,10 @@ local function Cleave()
     if S.WildfireBomb:IsCastable() then
       if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb cleave 16"; end
     end
+  end
+  -- carve,if=cooldown.wildfire_bomb.charges_fractional<1
+  if S.Carve:IsReady() and (S.WildfireBomb:ChargesFractional() < 1) then
+    if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 17"; end
   end
   -- death_chakram,if=(!raid_event.adds.exists|raid_event.adds.remains>5|active_enemies>=raid_event.adds.count*2)|focus+cast_regen<focus.max&!runeforge.bag_of_munitions.equipped
   if S.DeathChakram:IsCastable() and ((EnemyCount8ySplash < 2 or EnemyCount8ySplash > 5) or CheckFocusCap(S.DeathChakram:ExecuteTime()) and not BagofMunitionsEquipped) then
@@ -754,10 +758,6 @@ local function Cleave()
   if S.FlankingStrike:IsCastable() and (CheckFocusCap(S.FlankingStrike:ExecuteTime())) then
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike cleave 28"; end
   end
-  -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
-  if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
-    if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 30"; end
-  end
   -- wildfire_bomb,if=buff.mad_bombardier.up
   if (Player:BuffUp(S.MadBombardierBuff)) then
     if S.ShrapnelBomb:IsCastable() then
@@ -773,7 +773,7 @@ local function Cleave()
       if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb cleave 38"; end
     end
   end
-  -- kill_command,target_if=dot.pheromone_bomb.ticking&set_bonus.tier28_2pc
+  -- kill_command,target_if=dot.pheromone_bomb.ticking&set_bonus.tier28_2pc&!buff.mad_bombardier.up
   if S.KillCommand:IsCastable() then
     if Everyone.CastCycle(S.KillCommand, EnemyList, EvaluateCycleKillCommandCleave2, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 40"; end
   end
@@ -811,6 +811,10 @@ local function Cleave()
   -- butchery,if=(!next_wi_bomb.shrapnel|!talent.wildfire_infusion.enabled)&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
   if S.Butchery:IsReady() and ((not S.ShrapnelBomb:IsCastable() or not S.WildfireInfusion:IsAvailable()) and S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
     if Cast(S.Butchery, nil, nil, not Target:IsInRange(8)) then return "butchery cleave 58"; end
+  end
+  -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
+  if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
+    if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 30"; end
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsReady() and CDsON() then
