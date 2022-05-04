@@ -122,7 +122,7 @@ end
 
 -- if=!dot.serpent_sting.ticking&target.time_to_die>7&(!dot.pheromone_bomb.ticking|buff.mad_bombardier.up&next_wi_bomb.pheromone)|buff.vipers_venom.up&buff.vipers_venom.remains<gcd|!set_bonus.tier28_2pc&!dot.serpent_sting.ticking&target.time_to_die>7
 local function EvaluateTargetIfSerpentStingST(TargetUnit)
-  return (TargetUnit:DebuffDown(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 7 or (TargetUnit:DebuffDown(S.PheromoneBombDebuff) or Player:BuffUp(S.MadBombardierBuff) and S.PheromoneBomb:IsCastable()) or Player:BuffUp(S.VipersVenomBuff) and Player:BuffRemains(S.VipersVenomBuff) < Player:GCD() + 0.5 or (not Player:HasTier(28, 2)) and TargetUnit:DebuffDown(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 7)
+  return (TargetUnit:DebuffDown(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 7 and (TargetUnit:DebuffDown(S.PheromoneBombDebuff) or Player:BuffUp(S.MadBombardierBuff) and S.PheromoneBomb:IsCastable()) or Player:BuffUp(S.VipersVenomBuff) and Player:BuffRemains(S.VipersVenomBuff) < Player:GCD() + 0.5 or (not Player:HasTier(28, 2)) and TargetUnit:DebuffDown(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 7)
 end
 
 -- if=refreshable&target.time_to_die>7|buff.vipers_venom.up
