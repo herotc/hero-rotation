@@ -793,11 +793,11 @@ local function Cleave()
   if S.KillCommand:IsCastable() then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandCleave, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 48"; end
   end
-  -- wildfire_bomb,if=!dot.wildfire_bomb.ticking&!set_bonus.tier28_2pc|charges_fractional>1.3
-  if S.WildfireBomb:IsCastable() and (Target:DebuffDown(S.WildfireBombDebuff) and (not Player:HasTier(28, 2)) or S.WildfireBomb:ChargesFractional() > 1.3) then
+  -- wildfire_bomb,if=!dot.wildfire_bomb.ticking&!set_bonus.tier28_2pc|raid_event.adds.exists&(charges_fractional>1.2&active_enemies>4|charges_fractional>1.4&active_enemies>3|charges_fractional>1.6)|!raid_event.adds.exists&charges_fractional>1.5
+  if S.WildfireBomb:IsCastable() and (Target:DebuffDown(S.WildfireBombDebuff) and (not Player:HasTier(28, 2)) or (EnemyCount8ySplash > 4 and S.WildfireBomb:ChargesFractional() > 1.2 or EnemyCount8ySplash > 3 and S.WildfireBomb:ChargesFractional() > 1.4 or S.WildfireBomb:ChargesFractional() > 1.6)) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb cleave 50"; end
   end
-  if (S.WildfireInfusion:IsAvailable() and S.WildfireBomb:ChargesFractional() > 1.3) then
+  if (S.WildfireInfusion:IsAvailable() and (EnemyCount8ySplash > 4 and S.WildfireBomb:ChargesFractional() > 1.2 or EnemyCount8ySplash > 3 and S.WildfireBomb:ChargesFractional() > 1.4 or S.WildfireBomb:ChargesFractional() > 1.6)) then
     if S.ShrapnelBomb:IsCastable() then
       if Cast(S.ShrapnelBomb, nil, nil, not Target:IsSpellInRange(S.ShrapnelBomb)) then return "shrapnel_bomb cleave 52"; end
     end
