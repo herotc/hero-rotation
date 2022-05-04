@@ -93,7 +93,7 @@ local function IgnorePainWillNotCap()
 end
 
 local function ShouldPressShieldBlock()
-  return IsCurrentlyTanking() and S.ShieldBlock:IsReady() and ((Player:BuffDown(S.ShieldBlockBuff) or Player:BuffRemains(S.ShieldBlockBuff) <= 1.5 * Player:GCD()) and Player:BuffDown(S.LastStandBuff) and Player:Rage() >= 30)
+  return IsCurrentlyTanking() and S.ShieldBlock:IsReady() and (Player:BuffDown(S.ShieldBlockBuff) and Player:BuffDown(S.LastStandBuff) and Player:Rage() >= 30)
 end
 
 -- A bit of logic to decide whether to pre-cast-rage-dump on ignore pain.
