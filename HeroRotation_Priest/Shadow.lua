@@ -563,6 +563,10 @@ local function APL()
     -- variable,name=pool_for_cds,op=set,value=cooldown.void_eruption.up&variable.cd_management
     VarPoolForCDs = (S.VoidEruption:CooldownUp() and VarCDManagement)
     if (CDsON()) then
+      -- blood_fury,if=buff.power_infusion.up
+      if S.BloodFury:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff)) then
+        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 21"; end
+      end
       -- fireblood,if=buff.voidform.up
       if S.Fireblood:IsCastable() and (Player:BuffUp(S.VoidformBuff)) then
         if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 22"; end
