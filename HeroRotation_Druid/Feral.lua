@@ -566,9 +566,13 @@ local function Filler()
   if S.Swipe:IsReady() and (VarFiller == "Swipe") then
     if CastPooling(S.Swipe, Player:EnergyTimeToX(35), not Target:IsInRange(EightRange)) then return "swipe filler 8"; end
   end
+  -- swipe_cat,if=spell_targets.swipe_cat=1&!buff.clearcasting.up
+  if S.Swipe:IsReady() and (EnemiesCount8y == 1 and Player:BuffDown(S.Clearcasting)) then
+    if CastPooling(S.Swipe, Player:EnergyTimeToX(35), not Target:IsInRange(EightRange)) then return "swipe filler 10"; end
+  end
   -- shred,if=buff.sudden_ambush.down
   if S.Shred:IsReady() and (Player:BuffDown(S.SuddenAmbushBuff)) then
-    if CastPooling(S.Shred, Player:EnergyTimeToX(40), not Target:IsInRange(MeleeRange)) then return "shred filler 10"; end
+    if CastPooling(S.Shred, Player:EnergyTimeToX(40), not Target:IsInRange(MeleeRange)) then return "shred filler 12"; end
   end
 end
 
