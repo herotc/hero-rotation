@@ -50,7 +50,7 @@ local VarOnUseTrinket
 local VarMaxTrinketHold
 local VarShortestTTD
 local ComboPoints, ComboPointsDeficit
-local FightRemains
+local FightRemains = 9999
 
 -- Enemy Variables
 local EnemiesMelee, EnemiesCountMelee
@@ -111,6 +111,10 @@ HL:RegisterForEvent(function()
   FortyRange = S.BalanceAffinity:IsAvailable() and 43 or 40
   BsInc = S.Incarnation:IsAvailable() and S.Incarnation or S.Berserk
 end, "PLAYER_TALENT_UPDATE")
+
+HL:RegisterForEvent(function()
+  FightRemains = 9999
+end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   S.AdaptiveSwarm:RegisterInFlight()
@@ -622,8 +626,10 @@ local function APL()
   ComboPoints = Player:ComboPoints()
   ComboPointsDeficit = Player:ComboPointsDeficit()
 
-  -- Determine fight_remains
-  FightRemains = HL.FightRemains(Enemies8y, false)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(Enemies8y, false)
+  end
 
   -- cat_form OOC, if setting is true
   if S.CatForm:IsCastable() and Settings.Feral.ShowCatFormOOC then

@@ -89,6 +89,10 @@ HL:RegisterForEvent(function()
   MBRSCost = S.MongooseBite:IsAvailable() and S.MongooseBite:Cost() or S.RaptorStrike:Cost()
 end, "PLAYER_TALENT_UPDATE")
 
+HL:RegisterForEvent(function()
+  FightRemains = 9999
+end, "PLAYER_REGEN_ENABLED")
+
 -- Stuns
 local StunInterrupts = {
   {S.Intimidation, "Cast Intimidation (Interrupt)", function () return true; end},
@@ -874,6 +878,11 @@ local function APL()
     EnemyList = Player:GetEnemiesInRange(8)
   end
 
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(EnemyList, false)
+  end
+
   -- Pet Management; Conditions handled via override
   if S.SummonPet:IsCastable() then
     if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot]) then return "Summon Pet"; end
@@ -886,8 +895,6 @@ local function APL()
   end
 
   if Everyone.TargetIsValid() then
-    -- Calculate time remaining in the fight
-    FightRemains = HL.FightRemains(EnemyList, false)
     -- Out of Combat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end

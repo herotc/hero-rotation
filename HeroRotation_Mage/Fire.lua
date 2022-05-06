@@ -98,7 +98,7 @@ local var_expected_fire_blasts
 local var_sun_kings_blessing_max_stack = 8
 local var_phoenix_flames_max_stack = 3
 
-local FightRemains
+local FightRemains = 9999
 local var_disciplinary_command_cd_remains
 local var_disciplinary_command_last_applied
 
@@ -161,6 +161,7 @@ S.Fireball:RegisterInFlight(S.CombustionBuff)
 HL:RegisterForEvent(function()
   var_init = false
   var_firestarter_combustion = -1
+  FightRemains = 9999
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -831,8 +832,10 @@ local function APL()
   -- Check how many units have ignite
   UnitsWithIgniteCount = UnitsWithIgnite(Enemies8ySplash)
 
-  -- How long is left in the fight?
-  FightRemains = HL.FightRemains(Enemies8ySplash, false)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(Enemies8ySplash, false)
+  end
 
   -- Check when the Disciplinary Command buff was last applied and its internal CD
   var_disciplinary_command_last_applied = S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()

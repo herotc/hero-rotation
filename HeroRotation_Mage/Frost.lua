@@ -43,7 +43,7 @@ local EnemiesCount15yMelee  --Enemies arround player
 local Enemies16ySplash
 local var_disciplinary_command_cd_remains
 local var_disciplinary_command_last_applied
-local FightRemains
+local FightRemains = 9999
 
 local SlickIceEquipped = Player:HasLegendaryEquipped(2)
 local ColdFrontEquipped = Player:HasLegendaryEquipped(3)
@@ -93,6 +93,10 @@ local CovenantID = Player:CovenantID()
 HL:RegisterForEvent(function()
   CovenantID = Player:CovenantID()
 end, "COVENANT_CHOSEN")
+
+HL:RegisterForEvent(function()
+  FightRemains = 9999
+end, "PLAYER_REGEN_ENABLED")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -431,8 +435,10 @@ local function APL()
   -- Note: Not referenced in the current APL, but saving for potential use later
   --Mage.IFTracker()
 
-  -- How long is left in the fight?
-  FightRemains = HL.FightRemains(Enemies16ySplash, false)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(Enemies16ySplash, false)
+  end
 
   -- Check when the Disciplinary Command buff was last applied and its internal CD
   var_disciplinary_command_last_applied = S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()

@@ -41,8 +41,12 @@ local OnUseExcludes = {
 local HasMainHandEnchant, HasOffHandEnchant
 local MHEnchantTimeRemains, OHEnchantTimeRemains
 local Enemies40y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y, Enemies40yCount
-local FightRemains
+local FightRemains = 9999
 local VesperHealingCharges = 0
+
+HL:RegisterForEvent(function()
+  FightRemains = 9999
+end, "PLAYER_REGEN_ENABLED")
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -492,8 +496,10 @@ local function APL()
     MeleeEnemies10yCount = 1
   end
 
-  -- Calculate how long is remaining in the fight
-  FightRemains = HL.FightRemains(MeleeEnemies10y, false)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(MeleeEnemies10y, false)
+  end
 
   if Everyone.TargetIsValid() then
     -- Moved from Precombat: lightning_shield

@@ -54,7 +54,11 @@ local VarPoolSoulShards
 local VarHavocActive
 local VarHavocGUID
 local VarHavocRemains
-local FightRemains
+local FightRemains = 9999
+
+HL:RegisterForEvent(function()
+  FightRemains = 9999
+end, "PLAYER_REGEN_ENABLED")
 
 S.SummonInfernal:RegisterInFlight()
 S.ChaosBolt:RegisterInFlight()
@@ -346,8 +350,10 @@ local function APL()
   -- Check Havoc Status
   VarHavocActive,VarHavocGUID,VarHavocRemains = UnitWithHavoc(Enemies40y)
 
-  -- Check FightRemains Time
-  FightRemains = HL.FightRemains(Enemies8ySplash, false)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(Enemies8ySplash, false)
+  end
 
   if Everyone.TargetIsValid() then
     if S.SummonPet:IsCastable() then

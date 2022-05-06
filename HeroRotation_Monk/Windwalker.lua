@@ -49,7 +49,7 @@ local OnUseExcludes = {
 local Enemies5y
 local Enemies8y
 local EnemiesCount8y
-local FightRemains
+local FightRemains = 9999
 local XuenActive
 local VarXuenOnUse = false
 local VarHoldXuen = false
@@ -106,6 +106,7 @@ end, "COVENANT_CHOSEN")
 
 HL:RegisterForEvent(function()
   VarFoPPreChan = 0
+  FightRemains = 9999
 end, "PLAYER_REGEN_ENABLED")
 
 local function num(val)
@@ -730,7 +731,10 @@ local function APL()
 
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
 
-  FightRemains = HL.FightRemains(Enemies8y, false)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(Enemies8y, false)
+  end
 
   XuenActive = S.InvokeXuenTheWhiteTiger:TimeSinceLastCast() <= 24
 

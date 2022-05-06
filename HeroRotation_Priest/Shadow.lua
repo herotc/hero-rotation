@@ -58,7 +58,7 @@ local Settings = {
 
 -- Variables
 local CombatTime = 0
-local FightRemains = 0
+local FightRemains = 9999
 local RemainsPlusTime = 0
 local VarDotsUp = false
 local VarAllDotsUp = false
@@ -82,6 +82,7 @@ HL:RegisterForEvent(function()
   VarMindSearCutoff = 1
   VarSearingNightmareCutoff = false
   VarPoolForCDs = false
+  FightRemains = 9999
 end, "PLAYER_REGEN_ENABLED")
 
 -- Player Covenant
@@ -505,13 +506,16 @@ local function APL()
   UnitsWithoutSWPain = UnitsWithoutSWP(Enemies10ySplash)
   UnitsRefreshSWPain = UnitsRefreshSWP(Enemies10ySplash)
 
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(Enemies10ySplash, false)
+  end
+
   -- call precombat
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
-    -- Calculate fight_remains
-    FightRemains = HL.FightRemains(Enemies10ySplash, false)
     -- Store HL.CombatTime into a variable (pool_for_cds variable checks it and fight_remains multiple times)
     CombatTime = HL.CombatTime()
     -- Store FightRemains + CombatTime for cd_management variable

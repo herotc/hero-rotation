@@ -43,7 +43,7 @@ local OnUseExcludes = {
 
 -- Enemies Variables
 local Enemies8ySplash, EnemiesCount8ySplash
-local FightRemains
+local FightRemains = 9999
 
 -- Eclipse Variables
 local EclipseInAny = false
@@ -73,6 +73,10 @@ HL:RegisterForEvent(function()
   ElderDruidEquipped = Player:HasLegendaryEquipped(49)
   CelestialSpiritsEquipped = (Player:HasLegendaryEquipped(226) or CovenantID == 3 and Player:HasUnity())
 end, "PLAYER_EQUIPMENT_CHANGED")
+
+HL:RegisterForEvent(function()
+  FightRemains = 9999
+end, "PLAYER_REGEN_ENABLED")
 
 -- PMultiplier Registration
 local function ComputeRakePMultiplier()
@@ -345,8 +349,10 @@ local function APL()
     EnemiesCount8ySplash = 1
   end
 
-  -- Determine FightRemains
-  FightRemains = HL.FightRemains(Enemies8ySplash, false)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(Enemies8ySplash, false)
+  end
 
   if Everyone.TargetIsValid() then
     -- Eclipse Check

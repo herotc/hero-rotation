@@ -66,7 +66,7 @@ if equip[14] then
 end
 
 -- Rotation Var
-local FightRemains
+local FightRemains = 9999
 local EnemiesCount8ySplash
 local VarFirstTyrantTime = 0
 local VarUseBoltTimings = false
@@ -78,6 +78,10 @@ local WilfredsSigilEquipped = Player:HasLegendaryEquipped(162)
 local ImplosivePotentialEquipped = Player:HasLegendaryEquipped(170)
 local ShardofAnnihilationEquipped = Player:HasLegendaryEquipped(249)
 local DecayingSoulSatchelEquipped = Player:HasLegendaryEquipped(250)
+
+HL:RegisterForEvent(function()
+  FightRemains = 9999
+end, "PLAYER_REGEN_ENABLED")
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -508,8 +512,10 @@ local function APL()
   Warlock.UpdatePetTable()
   Warlock.UpdateSoulShards()
 
-  -- Length of fight remaining
-  FightRemains = HL.FightRemains(Enemies8ySplash, false)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(Enemies8ySplash, false)
+  end
 
   -- call precombat
   if not Player:AffectingCombat() and not Player:IsCasting() then

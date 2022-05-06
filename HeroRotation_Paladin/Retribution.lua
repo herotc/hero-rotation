@@ -98,9 +98,13 @@ local Enemies8y
 local EnemiesCount8y
 
 -- Rotation Variables
-local FightRemains
+local FightRemains = 9999
 local TimeToHPG
 local VarDSCastable
+
+HL:RegisterForEvent(function()
+  FightRemains = 9999
+end, "PLAYER_REGEN_ENABLED")
 
 -- Interrupts
 local Interrupts = {
@@ -575,8 +579,10 @@ local function APL()
   -- Rotation Variables Update
   TimeToHPG = ComputeTimeToHPG()
 
-  -- Calculate fight_remains
-  FightRemains = HL.FightRemains(Enemies8y, false)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(Enemies8y, false)
+  end
 
   if Everyone.TargetIsValid() then
     -- Precombat

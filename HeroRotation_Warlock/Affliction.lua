@@ -91,7 +91,7 @@ local Enemies40y, Enemies40yCount, Enemies10ySplash, EnemiesCount10ySplash
 local EnemiesAgonyCount, EnemiesSeedofCorruptionCount, EnemiesSiphonLifeCount, EnemiesVileTaintCount = 0, 0, 0, 0
 local EnemiesWithUnstableAfflictionDebuff
 local FirstTarGUID
-local FightRemains
+local FightRemains = 9999
 
 -- Legendaries
 local MaleficWrathEquipped = Player:HasLegendaryEquipped(168)
@@ -138,6 +138,7 @@ HL:RegisterForEvent(function()
   VarTrinketSplit = false
   VarDoTsTicking = false
   VarTrinketDelay = 0
+  FightRemains = 9999
 end, "PLAYER_REGEN_ENABLED")
 
 -- Player Covenant
@@ -883,8 +884,10 @@ local function APL()
 
   EnemiesWithUnstableAfflictionDebuff = ReturnEnemiesWithDot(S.UnstableAfflictionDebuff, Enemies40y)
 
-  -- Check remaining time in fight
-  FightRemains = HL.FightRemains(Enemies10ySplash, false)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(Enemies10ySplash, false)
+  end
 
   if S.SummonPet:IsCastable() then
     if Cast(S.SummonPet, Settings.Affliction.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end

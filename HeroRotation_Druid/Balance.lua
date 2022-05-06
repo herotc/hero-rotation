@@ -93,7 +93,7 @@ local PAPValue
 local FuryTicksRemain
 local FuryofEluneRemains
 local OpenerFinished = false
-local FightRemains
+local FightRemains = 9999
 
 -- Player Covenant
 -- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
@@ -151,6 +151,7 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 HL:RegisterForEvent(function()
   OpenerFinished = false
   VarInit = false
+  FightRemains = 9999
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -719,8 +720,10 @@ local function APL()
   -- GCDMax is GCD plus half a second, to account for lag and player reaction time
   GCDMax = Player:GCD() + 0.5
 
-  -- Length of fight remaining - Used for later variables
-  FightRemains = HL.FightRemains(Enemies8ySplash, false)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(Enemies8ySplash, false)
+  end
 
   -- Determine amount of AP fed into Primordial Arcanic Pulsar
   PAPValue = 0

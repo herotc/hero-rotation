@@ -47,7 +47,7 @@ if equip[14] then
 end
 
 -- Rotation Var
-local FightRemains
+local FightRemains = 9999
 
 -- Enemy Range Variables
 local Enemies40y
@@ -97,6 +97,10 @@ HL:RegisterForEvent(function()
   UnblinkingVigilEquipped = Player:HasLegendaryEquipped(77)
   RazorFragmentsEquipped = Player:HasLegendaryEquipped(255)
 end, "PLAYER_EQUIPMENT_CHANGED")
+
+HL:RegisterForEvent(function()
+  FightRemains = 9999
+end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   S.SerpentSting:RegisterInFlight()
@@ -507,8 +511,10 @@ local function APL()
     EnemiesCount10ySplash = 1
   end
 
-  -- Calculate fight_remains
-  FightRemains = HL.FightRemains(Enemies10ySplash, false)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    FightRemains = HL.FightRemains(Enemies10ySplash, false)
+  end
 
   -- call precombat
   if not Player:AffectingCombat() then
