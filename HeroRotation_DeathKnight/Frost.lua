@@ -65,6 +65,10 @@ local VarDeathsDueActive
 local FightRemains = 9999
 local ghoul = HL.GhoulTable
 
+HL:RegisterForEvent(function()
+  FightRemains = 9999
+end, "PLAYER_REGEN_ENABLED")
+
 -- Player Covenant
 -- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
 local CovenantID = Player:CovenantID()
@@ -749,9 +753,12 @@ local function APL()
     EnemiesMeleeCount = 1
   end
 
-  if Everyone.TargetIsValid() then
-    -- Calculate time remaining in the fight
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
     FightRemains = HL.FightRemains(Enemies10yd, false)
+  end
+
+  if Everyone.TargetIsValid() then
     -- call precombat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
