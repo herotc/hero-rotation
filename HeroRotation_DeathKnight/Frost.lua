@@ -62,6 +62,7 @@ local VarAddsRemain
 local VarROTFCRime
 local VarFrostStrikeConduits
 local VarDeathsDueActive
+local FightRemains = 9999
 local ghoul = HL.GhoulTable
 
 -- Player Covenant
@@ -146,25 +147,22 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
-  -- opener
-  if Everyone.TargetIsValid() then
-    -- fleshcraft
-    if S.Fleshcraft:IsCastable() then
-      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat"; end
-    end
-    -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(!talent.breath_of_sindragosa&(trinket.1.cooldown.duration%%cooldown.pillar_of_frost.duration=0)|talent.breath_of_sindragosa&(cooldown.breath_of_sindragosa.duration%%trinket.1.cooldown.duration=0)|talent.icecap)
-    -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(!talent.breath_of_sindragosa&(trinket.2.cooldown.duration%%cooldown.pillar_of_frost.duration=0)|talent.breath_of_sindragosa&(cooldown.breath_of_sindragosa.duration%%trinket.2.cooldown.duration=0)|talent.icecap)
-    -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!trinket.1.has_use_buff&trinket.2.has_use_buff|trinket.2.has_use_buff&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync))
-    -- TODO: Trinket sync/priority stuff. Currently unable to pull trinket CD durations because WoW's API is bad.
-    -- variable,name=rw_buffs,value=talent.gathering_storm|conduit.everfrost|runeforge.biting_cold
-    VarRWBuffs = (S.GatheringStorm:IsAvailable() or S.Everfrost:ConduitEnabled() or BitingColdEquipped)
-    -- Manually added openers: HowlingBlast if at range, RemorselessWinter if in melee
-    if S.HowlingBlast:IsReady() and (not Target:IsInRange(8)) then
-      if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast precombat"; end
-    end
-    if S.RemorselessWinter:IsReady() and (Target:IsInRange(8)) then
-      if Cast(S.RemorselessWinter) then return "remorseless_winter precombat"; end
-    end
+  -- fleshcraft
+  if S.Fleshcraft:IsCastable() then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat"; end
+  end
+  -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(!talent.breath_of_sindragosa&(trinket.1.cooldown.duration%%cooldown.pillar_of_frost.duration=0)|talent.breath_of_sindragosa&(cooldown.breath_of_sindragosa.duration%%trinket.1.cooldown.duration=0)|talent.icecap)
+  -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(!talent.breath_of_sindragosa&(trinket.2.cooldown.duration%%cooldown.pillar_of_frost.duration=0)|talent.breath_of_sindragosa&(cooldown.breath_of_sindragosa.duration%%trinket.2.cooldown.duration=0)|talent.icecap)
+  -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!trinket.1.has_use_buff&trinket.2.has_use_buff|trinket.2.has_use_buff&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync))
+  -- TODO: Trinket sync/priority stuff. Currently unable to pull trinket CD durations because WoW's API is bad.
+  -- variable,name=rw_buffs,value=talent.gathering_storm|conduit.everfrost|runeforge.biting_cold
+  VarRWBuffs = (S.GatheringStorm:IsAvailable() or S.Everfrost:ConduitEnabled() or BitingColdEquipped)
+  -- Manually added openers: HowlingBlast if at range, RemorselessWinter if in melee
+  if S.HowlingBlast:IsReady() and (not Target:IsInRange(8)) then
+    if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast precombat"; end
+  end
+  if S.RemorselessWinter:IsReady() and (Target:IsInRange(8)) then
+    if Cast(S.RemorselessWinter) then return "remorseless_winter precombat"; end
   end
 end
 
@@ -379,7 +377,7 @@ end
 
 local function ColdHeart()
   -- chains_of_ice,if=fight_remains<gcd&(rune<2|!buff.killing_machine.up&(!main_hand.2h&buff.cold_heart.stack>=4+runeforge.koltiras_favor|main_hand.2h&buff.cold_heart.stack>8+runeforge.koltiras_favor)|buff.killing_machine.up&(!main_hand.2h&buff.cold_heart.stack>8+runeforge.koltiras_favor|main_hand.2h&buff.cold_heart.stack>10+runeforge.koltiras_favor))
-  if S.ChainsofIce:IsReady() and (HL.FilteredFightRemains(Enemies10yd, "<", Player:GCD()) and (Player:Rune() < 2 or Player:BuffDown(S.KillingMachineBuff) and ((not Using2H) and Player:BuffStack(S.ColdHeartBuff) >= 4 + num(KoltirasFavorEquipped) or Using2H and Player:BuffStack(S.ColdHeartBuff) > 8 + num(KoltirasFavorEquipped)) or Player:BuffUp(S.KillingMachineBuff) and ((not Using2H) and Player:BuffStack(S.ColdHeartBuff) > 8 + num(KoltirasFavorEquipped) or Using2H and Player:BuffStack(S.ColdHeartBuff) > 10 + num(KoltirasFavorEquipped)))) then
+  if S.ChainsofIce:IsReady() and (FightRemains < Player:GCD() and (Player:Rune() < 2 or Player:BuffDown(S.KillingMachineBuff) and ((not Using2H) and Player:BuffStack(S.ColdHeartBuff) >= 4 + num(KoltirasFavorEquipped) or Using2H and Player:BuffStack(S.ColdHeartBuff) > 8 + num(KoltirasFavorEquipped)) or Player:BuffUp(S.KillingMachineBuff) and ((not Using2H) and Player:BuffStack(S.ColdHeartBuff) > 8 + num(KoltirasFavorEquipped) or Using2H and Player:BuffStack(S.ColdHeartBuff) > 10 + num(KoltirasFavorEquipped)))) then
     if Cast(S.ChainsofIce, nil, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice coldheart 2"; end
   end
   -- chains_of_ice,if=!talent.obliteration&buff.pillar_of_frost.up&buff.cold_heart.stack>=10&(buff.pillar_of_frost.remains<gcd*(1+cooldown.frostwyrms_fury.ready)|buff.unholy_strength.up&buff.unholy_strength.remains<gcd|buff.chaos_bane.up&buff.chaos_bane.remains<gcd)
@@ -472,7 +470,7 @@ end
 
 local function Trinkets()
   -- use_item,name=inscrutable_quantum_device,if=buff.pillar_of_frost.up|target.time_to_pct_20<5|fight_remains<21
-  if I.InscrutableQuantumDevice:IsEquippedAndReady() and (Player:BuffUp(S.PillarofFrostBuff) or Target:TimeToX(20) < 5 or HL.FilteredFightRemains(Enemies10yd, "<", 21)) then
+  if I.InscrutableQuantumDevice:IsEquippedAndReady() and (Player:BuffUp(S.PillarofFrostBuff) or Target:TimeToX(20) < 5 or FightRemains < 21) then
     if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device trinkets 2"; end
   end
   -- use_item,name=gavel_of_the_first_arbiter
@@ -508,11 +506,11 @@ local function Cooldowns()
     if Cast(I.PotionofSpectralStrength, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldowns 2"; end
   end
   -- empower_rune_weapon,if=talent.obliteration&rune<6&(variable.st_planning|variable.adds_remain)&(cooldown.pillar_of_frost.remains<5&(cooldown.fleshcraft.remains>5&soulbind.pustule_eruption|!soulbind.pustule_eruption)|buff.pillar_of_frost.up)|fight_remains<20
-  if S.EmpowerRuneWeapon:IsCastable() and (S.Obliteration:IsAvailable() and Player:Rune() < 6 and (VarSTPlanning or VarAddsRemain) and (S.PillarofFrost:CooldownRemains() < 5 and (S.Fleshcraft:CooldownRemains() > 5 and S.PustuleEruption:SoulbindEnabled() or not S.PustuleEruption:SoulbindEnabled()) or Player:BuffUp(S.PillarofFrostBuff)) or HL.FilteredFightRemains(Enemies10yd, "<", 20)) then
+  if S.EmpowerRuneWeapon:IsCastable() and (S.Obliteration:IsAvailable() and Player:Rune() < 6 and (VarSTPlanning or VarAddsRemain) and (S.PillarofFrost:CooldownRemains() < 5 and (S.Fleshcraft:CooldownRemains() > 5 and S.PustuleEruption:SoulbindEnabled() or not S.PustuleEruption:SoulbindEnabled()) or Player:BuffUp(S.PillarofFrostBuff)) or FightRemains < 20) then
     if Cast(S.EmpowerRuneWeapon, Settings.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 4"; end
   end
   -- empower_rune_weapon,if=talent.breath_of_sindragosa&runic_power.deficit>30&rune.time_to_5>gcd&(buff.breath_of_sindragosa.up|fight_remains<20)
-  if S.EmpowerRuneWeapon:IsCastable() and (S.BreathofSindragosa:IsAvailable() and Player:RunicPowerDeficit() > 30 and Player:RuneTimeToX(5) > Player:GCD() and (Player:BuffUp(S.BreathofSindragosa) or HL.FilteredFightRemains(Enemies10yd, "<", 20))) then
+  if S.EmpowerRuneWeapon:IsCastable() and (S.BreathofSindragosa:IsAvailable() and Player:RunicPowerDeficit() > 30 and Player:RuneTimeToX(5) > Player:GCD() and (Player:BuffUp(S.BreathofSindragosa) or FightRemains < 20)) then
     if Cast(S.EmpowerRuneWeapon, Settings.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 6"; end
   end
   -- empower_rune_weapon,if=talent.icecap
@@ -536,7 +534,7 @@ local function Cooldowns()
     if Cast(S.BreathofSindragosa, nil, Settings.Frost.DisplayStyle.BoS, not Target:IsInMeleeRange(12)) then return "breath_of_sindragosa cooldowns 16"; end
   end
   -- frostwyrms_fury,if=active_enemies=1&buff.pillar_of_frost.remains<gcd&buff.pillar_of_frost.up&!talent.obliteration&(!raid_event.adds.exists|raid_event.adds.in>30)|fight_remains<3
-  if S.FrostwyrmsFury:IsCastable() and (EnemiesCount10yd == 1 and Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() and Player:BuffUp(S.PillarofFrostBuff) and (not S.Obliteration:IsAvailable()) or HL.FilteredFightRemains(Enemies10yd, "<", 3)) then
+  if S.FrostwyrmsFury:IsCastable() and (EnemiesCount10yd == 1 and Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() and Player:BuffUp(S.PillarofFrostBuff) and (not S.Obliteration:IsAvailable()) or FightRemains < 3) then
     if Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury, nil, not Target:IsInRange(40)) then return "frostwyrms_fury cooldowns 18"; end
   end
   -- frostwyrms_fury,if=active_enemies>=2&(buff.pillar_of_frost.up|raid_event.adds.exists&raid_event.adds.in>cooldown.pillar_of_frost.remains+7)&(buff.pillar_of_frost.remains<gcd|raid_event.adds.exists&raid_event.adds.remains<gcd)
@@ -556,7 +554,7 @@ local function Cooldowns()
     if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead cooldowns 26"; end
   end
   -- sacrificial_pact,if=active_enemies>=2&(fight_remains<3|!buff.breath_of_sindragosa.up&(pet.ghoul.remains<gcd|raid_event.adds.exists&raid_event.adds.remains<3&raid_event.adds.in>pet.ghoul.remains))
-  if S.SacrificialPact:IsReady() and ghoul.active() and (EnemiesCount10yd >= 2 and (HL.FilteredFightRemains(Enemies10yd, "<", 3) or Player:BuffDown(S.BreathofSindragosa) and ghoul.remains() < Player:GCD())) then
+  if S.SacrificialPact:IsReady() and ghoul.active() and (EnemiesCount10yd >= 2 and (FightRemains < 3 or Player:BuffDown(S.BreathofSindragosa) and ghoul.remains() < Player:GCD())) then
     if Cast(S.SacrificialPact, Settings.Commons.OffGCDasOffGCD.SacrificialPact, nil, not Target:IsInRange(8)) then return "sacrificial_pact cooldowns 28"; end
   end
   -- death_and_decay,if=active_enemies>5|runeforge.phearomones
@@ -751,11 +749,13 @@ local function APL()
     EnemiesMeleeCount = 1
   end
 
-  -- call precombat
-  if not Player:AffectingCombat() then
-    local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
-  end
   if Everyone.TargetIsValid() then
+    -- Calculate time remaining in the fight
+    FightRemains = HL.FightRemains(Enemies10yd, false)
+    -- call precombat
+    if not Player:AffectingCombat() then
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
     -- use DeathStrike on low HP or with proc in Solo Mode
     if S.DeathStrike:IsReady() and not no_heal then
       if Cast(S.DeathStrike, nil, nil, not Target:IsInMeleeRange(5)) then return "death_strike low hp or proc"; end
@@ -814,7 +814,7 @@ local function APL()
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cold_heart,if=talent.cold_heart&(!buff.killing_machine.up|talent.breath_of_sindragosa)&((debuff.razorice.stack=5|!death_knight.runeforge.razorice)|fight_remains<=gcd)
-    if (S.ColdHeart:IsAvailable() and (Player:BuffDown(S.KillingMachineBuff) or S.BreathofSindragosa:IsAvailable()) and ((Target:DebuffStack(S.RazoriceDebuff) == 5 or not UsingRazorice) or HL.FilteredFightRemains(Enemies10yd, "<=", Player:GCD()))) then
+    if (S.ColdHeart:IsAvailable() and (Player:BuffDown(S.KillingMachineBuff) or S.BreathofSindragosa:IsAvailable()) and ((Target:DebuffStack(S.RazoriceDebuff) == 5 or not UsingRazorice) or FightRemains <= Player:GCD())) then
       local ShouldReturn = ColdHeart(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
