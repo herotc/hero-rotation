@@ -98,12 +98,14 @@ local Enemies8y
 local EnemiesCount8y
 
 -- Rotation Variables
-local FightRemains = 9999
+local BossFightRemains = 11111
+local FightRemains = 11111
 local TimeToHPG
 local VarDSCastable
 
 HL:RegisterForEvent(function()
-  FightRemains = 9999
+  BossFightRemains = 11111
+  FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
 -- Interrupts
@@ -581,7 +583,11 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    FightRemains = HL.FightRemains(Enemies8y, false)
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies8y, false)
+    end
   end
 
   if Everyone.TargetIsValid() then

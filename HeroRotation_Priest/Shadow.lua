@@ -58,7 +58,8 @@ local Settings = {
 
 -- Variables
 local CombatTime = 0
-local FightRemains = 9999
+local BossFightRemains = 11111
+local FightRemains = 11111
 local RemainsPlusTime = 0
 local VarDotsUp = false
 local VarAllDotsUp = false
@@ -82,7 +83,8 @@ HL:RegisterForEvent(function()
   VarMindSearCutoff = 1
   VarSearingNightmareCutoff = false
   VarPoolForCDs = false
-  FightRemains = 9999
+  BossFightRemains = 11111
+  FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
 -- Player Covenant
@@ -508,7 +510,11 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    FightRemains = HL.FightRemains(Enemies10ySplash, false)
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies10ySplash, false)
+    end
   end
 
   -- call precombat

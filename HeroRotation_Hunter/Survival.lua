@@ -82,7 +82,8 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 -- Rotation Var
 local SummonPetSpells = { S.SummonPet, S.SummonPet2, S.SummonPet3, S.SummonPet4, S.SummonPet5 }
 local EnemyCount8ySplash, EnemyList
-local FightRemains = 9999
+local BossFightRemains = 11111
+local FightRemains = 11111
 local MBRSCost = S.MongooseBite:IsAvailable() and S.MongooseBite:Cost() or S.RaptorStrike:Cost()
 
 HL:RegisterForEvent(function()
@@ -90,7 +91,8 @@ HL:RegisterForEvent(function()
 end, "PLAYER_TALENT_UPDATE")
 
 HL:RegisterForEvent(function()
-  FightRemains = 9999
+  BossFightRemains = 11111
+  FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
 -- Stuns
@@ -880,7 +882,11 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    FightRemains = HL.FightRemains(EnemyList, false)
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(EnemyList, false)
+    end
   end
 
   -- Pet Management; Conditions handled via override

@@ -76,7 +76,8 @@ local VarWaitingForMomentum = false
 local VarWaitingForAgonyGaze = false
 local VarTrinketSyncSlot = 0
 local VarUseEyeBeamFuryCondition = false
-local FightRemains = 9999
+local BossFightRemains = 11111
+local FightRemains = 11111
 
 -- Player Covenant
 -- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
@@ -95,7 +96,8 @@ HL:RegisterForEvent(function()
   VarWaitingForEssenceBreak = false
   VarWaitingForMomentum = false
   VarWaitingForAgonyGaze = false
-  FightRemains = 9999
+  BossFightRemains = 11111
+  FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -416,7 +418,11 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    FightRemains = HL.FightRemains(Enemies8y, false)
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies8y, false)
+    end
   end
 
   if Everyone.TargetIsValid() then

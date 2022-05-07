@@ -98,7 +98,8 @@ local var_expected_fire_blasts
 local var_sun_kings_blessing_max_stack = 8
 local var_phoenix_flames_max_stack = 3
 
-local FightRemains = 9999
+local BossFightRemains = 11111
+local FightRemains = 11111
 local var_disciplinary_command_cd_remains
 local var_disciplinary_command_last_applied
 
@@ -161,7 +162,8 @@ S.Fireball:RegisterInFlight(S.CombustionBuff)
 HL:RegisterForEvent(function()
   var_init = false
   var_firestarter_combustion = -1
-  FightRemains = 9999
+  BossFightRemains = 11111
+  FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -834,7 +836,11 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    FightRemains = HL.FightRemains(Enemies8ySplash, false)
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies8ySplash, false)
+    end
   end
 
   -- Check when the Disciplinary Command buff was last applied and its internal CD

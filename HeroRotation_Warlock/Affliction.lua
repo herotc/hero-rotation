@@ -91,7 +91,8 @@ local Enemies40y, Enemies40yCount, Enemies10ySplash, EnemiesCount10ySplash
 local EnemiesAgonyCount, EnemiesSeedofCorruptionCount, EnemiesSiphonLifeCount, EnemiesVileTaintCount = 0, 0, 0, 0
 local EnemiesWithUnstableAfflictionDebuff
 local FirstTarGUID
-local FightRemains = 9999
+local BossFightRemains = 11111
+local FightRemains = 11111
 
 -- Legendaries
 local MaleficWrathEquipped = Player:HasLegendaryEquipped(168)
@@ -138,7 +139,8 @@ HL:RegisterForEvent(function()
   VarTrinketSplit = false
   VarDoTsTicking = false
   VarTrinketDelay = 0
-  FightRemains = 9999
+  BossFightRemains = 11111
+  FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
 -- Player Covenant
@@ -886,7 +888,11 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    FightRemains = HL.FightRemains(Enemies10ySplash, false)
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies10ySplash, false)
+    end
   end
 
   if S.SummonPet:IsCastable() then

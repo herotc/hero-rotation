@@ -50,7 +50,8 @@ local VarOnUseTrinket
 local VarMaxTrinketHold
 local VarShortestTTD
 local ComboPoints, ComboPointsDeficit
-local FightRemains = 9999
+local BossFightRemains = 11111
+local FightRemains = 11111
 
 -- Enemy Variables
 local EnemiesMelee, EnemiesCountMelee
@@ -113,7 +114,8 @@ HL:RegisterForEvent(function()
 end, "PLAYER_TALENT_UPDATE")
 
 HL:RegisterForEvent(function()
-  FightRemains = 9999
+  BossFightRemains = 11111
+  FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -628,7 +630,11 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    FightRemains = HL.FightRemains(Enemies8y, false)
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies8y, false)
+    end
   end
 
   -- cat_form OOC, if setting is true

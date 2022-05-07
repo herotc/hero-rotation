@@ -47,7 +47,8 @@ if equip[14] then
 end
 
 -- Rotation Var
-local FightRemains = 9999
+local BossFightRemains = 11111
+local FightRemains = 11111
 
 -- Enemy Range Variables
 local Enemies40y
@@ -99,7 +100,8 @@ HL:RegisterForEvent(function()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
-  FightRemains = 9999
+  BossFightRemains = 11111
+  FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -513,7 +515,11 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    FightRemains = HL.FightRemains(Enemies10ySplash, false)
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies10ySplash, false)
+    end
   end
 
   -- call precombat

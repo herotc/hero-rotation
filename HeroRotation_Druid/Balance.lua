@@ -93,7 +93,8 @@ local PAPValue
 local FuryTicksRemain
 local FuryofEluneRemains
 local OpenerFinished = false
-local FightRemains = 9999
+local BossFightRemains = 11111
+local FightRemains = 11111
 
 -- Player Covenant
 -- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
@@ -151,7 +152,8 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 HL:RegisterForEvent(function()
   OpenerFinished = false
   VarInit = false
-  FightRemains = 9999
+  BossFightRemains = 11111
+  FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -722,7 +724,11 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    FightRemains = HL.FightRemains(Enemies8ySplash, false)
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies8ySplash, false)
+    end
   end
 
   -- Determine amount of AP fed into Primordial Arcanic Pulsar

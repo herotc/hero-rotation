@@ -66,7 +66,8 @@ if equip[14] then
 end
 
 -- Rotation Var
-local FightRemains = 9999
+local BossFightRemains = 11111
+local FightRemains = 11111
 local EnemiesCount8ySplash
 local VarFirstTyrantTime = 0
 local VarUseBoltTimings = false
@@ -80,7 +81,8 @@ local ShardofAnnihilationEquipped = Player:HasLegendaryEquipped(249)
 local DecayingSoulSatchelEquipped = Player:HasLegendaryEquipped(250)
 
 HL:RegisterForEvent(function()
-  FightRemains = 9999
+  BossFightRemains = 11111
+  FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
 -- GUI Settings
@@ -514,7 +516,11 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    FightRemains = HL.FightRemains(Enemies8ySplash, false)
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies8ySplash, false)
+    end
   end
 
   -- call precombat

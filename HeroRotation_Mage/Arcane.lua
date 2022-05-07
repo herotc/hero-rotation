@@ -121,7 +121,8 @@ local RadiantSparkVulnerabilityMaxStack = 4
 local ClearCastingMaxStack = 3
 local PresenceMaxStack = 3
 local ArcaneHarmonyMaxStack = 18
-local FightRemains = 9999
+local BossFightRemains = 11111
+local FightRemains = 11111
 local CastAE
 
 Player.ArcaneOpener = {}
@@ -135,8 +136,6 @@ function ArcaneOpener:Reset ()
   var_init = false
 end
 ArcaneOpener:Reset()
-
-FightRemains = HL.FightRemains(Enemies8ySplash, false)
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -265,7 +264,8 @@ HL:RegisterForEvent(function()
   VarTotalBurns = 0
   VarAverageBurnLength = 0
   VarFontPrecombatChannel = 0
-  FightRemains = 9999
+  BossFightRemains = 11111
+  FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -1406,7 +1406,11 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    FightRemains = HL.FightRemains(Enemies10ySplash, false)
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies8ySplash, false)
+    end
   end
 
   -- Check when the Disciplinary Command buff was last applied and its internal CD
