@@ -187,7 +187,7 @@ local function Hac()
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower hac 36"; end
   end
   -- whirlwind
-  if S.Whirlwind:IsReady() then
+  if S.Whirlwind:IsReady() and Player:BuffDown(S.SweepingStrikesBuff) and EnemiesCount8y > 2then
     if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind hac 38"; end
   end
   
