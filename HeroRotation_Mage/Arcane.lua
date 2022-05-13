@@ -104,7 +104,7 @@ local var_barrage_mana_pct
 local var_ap_minimum_mana_pct
 local var_totm_max_charges
 local var_aoe_totm_max_charges
-local var_fishing_opener
+local var_fishing_opener = false
 local var_ap_on_use
 local var_empowered_barrage
 local var_outside_of_cooldowns = true
@@ -221,7 +221,7 @@ local function VarInit()
   var_aoe_totm_max_charges = 2
 
   --variable,name=fishing_opener,default=-1,op=set,if=variable.fishing_opener=-1,value=1*(equipped.empyreal_ordnance|(talent.rune_of_power&(talent.arcane_echo|!covenant.kyrian)&(!covenant.necrolord|active_enemies=1|runeforge.siphon_storm)&!covenant.venthyr))|(covenant.venthyr&equipped.moonlit_prism)
-  var_fishing_opener = Settings.Arcane.UseFishingOpener and bool(1 * (I.EmpyrealOrdnance:IsEquipped() or (S.RuneofPower:IsAvailable() and (S.ArcaneEcho:IsAvailable() or CovenantID ~= 1) and (CovenantID ~= 4 or SiphonStormEquipped) and CovenantID ~= 2)) or (CovenantID == 2 and I.MoonlitPrism:IsEquipped()))
+  var_fishing_opener = Settings.Arcane.UseFishingOpener and ((I.EmpyrealOrdnance:IsEquipped() or (S.RuneofPower:IsAvailable() and (S.ArcaneEcho:IsAvailable() or CovenantID ~= 1) and (CovenantID ~= 4 or SiphonStormEquipped) and CovenantID ~= 2)) or (CovenantID == 2 and I.MoonlitPrism:IsEquipped()))
 
   --variable,name=ap_on_use,op=set,value=equipped.macabre_sheet_music|equipped.gladiators_badge|equipped.gladiators_medallion|equipped.darkmoon_deck_putrescence|equipped.inscrutable_quantum_device|equipped.soulletting_ruby|equipped.sunblood_amethyst|equipped.wakeners_frond|equipped.flame_of_battle
   var_ap_on_use = I.MacabreSheetMusic:IsEquipped() or I.SinfulGladiatorsBadge:IsEquipped() or I.DarkmoonDeckPutrescence:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SoullettingRuby:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.WakenersFrond:IsEquipped() or I.FlameofBattle:IsEquipped() 
