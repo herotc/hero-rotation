@@ -718,8 +718,8 @@ local function Cleave()
   if S.CoordinatedAssault:IsCastable() then
     if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault) then return "coordinated_assault cleave 8"; end
   end
-  -- wildfire_bomb,if=full_recharge_time<gcd|buff.mad_bombardier.up
-  if S.WildfireBomb:FullRechargeTime() < Player:GCD() or Player:BuffUp(S.MadBombardierBuff) then
+  -- wildfire_bomb,if=full_recharge_time<gcd|buff.mad_bombardier.up|target.time_to_die<5
+  if S.WildfireBomb:FullRechargeTime() < Player:GCD() or Player:BuffUp(S.MadBombardierBuff) or FightRemains < 5 then
     if S.ShrapnelBomb:IsCastable() then
       if Cast(S.ShrapnelBomb, nil, nil, not Target:IsSpellInRange(S.ShrapnelBomb)) then return "shrapnel_bomb cleave 10"; end
     end
@@ -764,21 +764,6 @@ local function Cleave()
   -- flanking_strike,if=focus+cast_regen<focus.max
   if S.FlankingStrike:IsCastable() and (CheckFocusCap(S.FlankingStrike:ExecuteTime())) then
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike cleave 28"; end
-  end
-  -- wildfire_bomb,if=buff.mad_bombardier.up
-  if (Player:BuffUp(S.MadBombardierBuff)) then
-    if S.ShrapnelBomb:IsCastable() then
-      if Cast(S.ShrapnelBomb, nil, nil, not Target:IsSpellInRange(S.ShrapnelBomb)) then return "shrapnel_bomb cleave 32"; end
-    end
-    if S.PheromoneBomb:IsCastable() then
-      if Cast(S.PheromoneBomb, nil, nil, not Target:IsSpellInRange(S.PheromoneBomb)) then return "pheromone_bomb cleave 34"; end
-    end
-    if S.VolatileBomb:IsCastable() then
-      if Cast(S.VolatileBomb, nil, nil, not Target:IsSpellInRange(S.VolatileBomb)) then return "volatile_bomb cleave 36"; end
-    end
-    if S.WildfireBomb:IsCastable() then
-      if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb cleave 38"; end
-    end
   end
   -- kill_command,target_if=dot.pheromone_bomb.ticking&set_bonus.tier28_2pc&!buff.mad_bombardier.up
   if S.KillCommand:IsCastable() then
