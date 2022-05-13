@@ -361,10 +361,12 @@ local function APL()
     end
   end
 
+  -- Summon Pet
+  if S.SummonPet:IsCastable() then
+    if Cast(S.SummonPet, Settings.Destruction.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
+  end
+
   if Everyone.TargetIsValid() then
-    if S.SummonPet:IsCastable() then
-      if Cast(S.SummonPet, Settings.Destruction.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
-    end
     -- Precombat
     if (not Player:AffectingCombat()) then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end

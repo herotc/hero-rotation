@@ -26,6 +26,7 @@ HR.GUISettings.APL.Warlock = {
       Trinkets = "Suggested",
       Covenant = "Suggested",
     },
+    HidePetSummon = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -103,6 +104,7 @@ local CP_Destruction = CreateChildPanel(CP_Warlock, "Destruction")
 
 -- Warlock
 CreateARPanelOptions(CP_Warlock, "APL.Warlock.Commons")
+CreatePanelOption("CheckButton", CP_Warlock, "APL.Warlock.Commons.HidePetSummon", "Hide Pet Summon", "Enable this setting to hide suggestions for summoning your base pet. Rotational pets (Infernal, Darkglare, Tyrant, etc) will still be suggested.")
 
 -- Destruction
 --CreatePanelOption("Slider", CP_Destruction, "APL.Warlock.Destruction.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.")
