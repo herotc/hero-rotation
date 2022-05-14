@@ -237,7 +237,7 @@ local function EvaluateTargetIfKillCommandCleave(TargetUnit)
 end
 
 -- target_if=focus+cast_regen<focus.max&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
-local function EvaluateCycleKillCommandCleave(TargetUnit)
+local function EvaluateTargetIfKillCommandCleave2(TargetUnit)
   return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and (NessingwarysTrappingEquipped and not S.FreezingTrap:CooldownUp() and not S.TarTrap:CooldownUp() or not NessingwarysTrappingEquipped))
 end
 
@@ -781,10 +781,6 @@ local function Cleave()
   if S.SerpentSting:IsReady() and (S.VolatileBomb:IsCastable() and Player:Focus() + Player:FocusCastRegen(S.SerpentSting:ExecuteTime()) > 35 and EnemyCount8ySplash <= 4) then
     if Cast(S.SerpentSting, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingCleave3, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting cleave 46"; end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&full_recharge_time<gcd&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
-  if S.KillCommand:IsCastable() then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandCleave, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 48"; end
-  end
   -- wildfire_bomb,if=!dot.wildfire_bomb.ticking&!set_bonus.tier28_2pc|raid_event.adds.exists&(charges_fractional>1.2&active_enemies>4|charges_fractional>1.4&active_enemies>3|charges_fractional>1.6)|!raid_event.adds.exists&charges_fractional>1.5
   if S.WildfireBomb:IsCastable() and (Target:DebuffDown(S.WildfireBombDebuff) and (not Player:HasTier(28, 2)) or (EnemyCount8ySplash > 4 and S.WildfireBomb:ChargesFractional() > 1.2 or EnemyCount8ySplash > 3 and S.WildfireBomb:ChargesFractional() > 1.4 or S.WildfireBomb:ChargesFractional() > 1.6)) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb cleave 50"; end
@@ -808,6 +804,10 @@ local function Cleave()
   if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
     if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 30"; end
   end
+  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&full_recharge_time<gcd&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
+  if S.KillCommand:IsCastable() then
+    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandCleave, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 48"; end
+  end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsReady() and CDsON() then
     if Cast(S.AMurderofCrows, Settings.Commons.GCDasOffGCD.AMurderofCrows, nil, not Target:IsSpellInRange(S.AMurderofCrows)) then return "a_murder_of_crows cleave 60"; end
@@ -824,9 +824,9 @@ local function Cleave()
   if S.Carve:IsReady() then
     if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 66"; end
   end
-  -- kill_command,target_if=focus+cast_regen<focus.max&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
+  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
   if S.KillCommand:IsCastable() then
-    if Everyone.CastCycle(S.KillCommand, EnemyList, EvaluateCycleKillCommandCleave, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 68"; end
+    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterKillCommandRemains, EvaluateTargetIfKillCommandCleave2, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 68"; end
   end
   -- kill_shot
   if S.KillShot:IsReady() then
