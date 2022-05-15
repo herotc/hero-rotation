@@ -43,6 +43,22 @@ FuryOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   end
 , 72)
 
+local FuryOldSpellIsReady
+FuryOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = FuryOldSpellIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellFury.Rampage then
+      if Player:PrevGCDP(1, SpellFury.Bladestorm) then
+        return self:IsCastable() and Player:Rage() >= self:Cost()
+      else
+        return BaseCheck
+      end
+    else
+      return BaseCheck
+    end
+  end
+, 72)
+
 -- Protection, ID: 73
 local ProtOldSpellIsCastable
 ProtOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
