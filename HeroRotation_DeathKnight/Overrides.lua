@@ -11,6 +11,7 @@ local Item    = HL.Item
 -- HeroRotation
 local HR      = HeroRotation
 -- Spells
+local SpellBlood   = Spell.DeathKnight.Blood
 local SpellFrost   = Spell.DeathKnight.Frost
 local SpellUnholy  = Spell.DeathKnight.Unholy
 -- Lua
@@ -19,6 +20,17 @@ local SpellUnholy  = Spell.DeathKnight.Unholy
 -- Generic
 
 -- Blood, ID: 250
+local OldBloodIsCastable
+OldBloodIsCastable = HL.AddCoreOverride("Spell.IsCastable",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldBloodIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellBlood.RaiseDead then
+      return (not Pet:IsActive()) and BaseCheck
+    else
+      return BaseCheck
+    end
+  end
+, 250)
 
 -- Frost, ID: 251
 local OldFrostIsCastable
