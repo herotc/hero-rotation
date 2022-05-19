@@ -301,7 +301,7 @@ local function Aoe()
   if S.IceLance:IsCastable() and (GlacialFragmentsEquipped and (S.SplittingIce:IsAvailable() or EnemiesCount8ySplash >= 5) and S.IceLance:TravelTime() < BlizzardRemains) then
     if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 36"; end
   end
-  -- wait,sec=0.1,if=runeforge.glacial_fragments&(talent.splitting_ice|active_enemies>=5)
+  -- wait,sec=0.1,if=runeforge.glacial_fragments&!runeforge.deaths_fathom&(!talent.comet_storm&active_enemies>=5|active_enemies>=6)
   -- NYI wait
   -- frostbolt
   if S.Frostbolt:IsCastable() then
