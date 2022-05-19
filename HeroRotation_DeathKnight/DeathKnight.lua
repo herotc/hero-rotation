@@ -59,6 +59,7 @@ Spell.DeathKnight.Commons = {
   DeathAndDecayBuff                     = Spell(188290),
   DeathStrikeBuff                       = Spell(101568), -- Frost and Unholy, but not Blood
   DeathsDueBuff                         = Spell(324165),
+  EndlessRuneWaltzBuff                  = Spell(366008), -- Tier 28 2pc bonus
   UnholyStrengthBuff                    = Spell(53365),
   -- Debuffs
   BloodPlagueDebuff                     = Spell(55078),
