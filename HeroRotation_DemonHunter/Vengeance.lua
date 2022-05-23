@@ -179,6 +179,10 @@ local function Defensives()
   if S.DoorofShadows:IsCastable() and S.EnduringGloom:IsAvailable() then
     if Cast(S.DoorofShadows, nil, Settings.Commons.DisplayStyle.Covenant) then return "door_of_shadows defensives"; end
   end
+  -- Manual add: fel_devastation,if=buff.blind_faith.up&health.pct<30
+  if S.FelDevastation:IsReady() and (Player:BuffUp(S.BlindFaithBuff) and Player:HealthPercentage() < Settings.Vengeance.FelDevHealthThreshold) then
+    if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation defensives"; end
+  end
 end
 
 local function Brand()
