@@ -68,6 +68,8 @@ HR.GUISettings.APL.Warrior = {
   },
   Protection = {
     DisableHeroicCharge = false,
+    DisableIntervene = false,
+    RageCapValue = 80,
     DisplayStyle = {
       Defensive = "Suggested"
     },
@@ -103,3 +105,5 @@ CreatePanelOption("CheckButton", CP_Fury, "APL.Warrior.Fury.HideCastQueue", "Hid
 -- Protection Settings
 CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection")
 CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.DisableHeroicCharge", "Disable Heroic Charge", "Enable this setting to no longer receive the CastQueue 'Heroic Charge' suggestion (Heroic Leap, followed by Charge).")
+CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.DisableIntervene", "Disable Intervene", "Enable this setting to no longer receive Intervene cast suggestions.")
+CreatePanelOption("Slider", CP_Protection, "APL.Warrior.Protection.RageCapValue", {30, 100, 5}, "Rage Cap Value", "Set the highest amount of Rage we should allow to pool before dumping Rage with Ignore Pain. Setting this value to 30 will allow you to over-cap Rage.")

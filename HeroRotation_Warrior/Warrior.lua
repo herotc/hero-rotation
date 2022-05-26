@@ -52,6 +52,7 @@ Spell.Warrior.Commons = {
   CondemnDebuff                         = Spell(317491),
   ConquerorsBanner                      = Spell(324143),
   ConquerorsFrenzyBuff                  = Spell(343672),
+  Fleshcraft                            = Spell(324631),
   SpearofBastion                        = Spell(307865),
   SpearofBastionBuff                    = Spell(307871),
   -- Conduits (Shadowlands)
@@ -137,6 +138,7 @@ Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   Devastate                             = Spell(20243),
   Execute                               = Spell(163201),
   IgnorePain                            = Spell(190456),
+  Intervene                             = Spell(3411),
   LastStand                             = Spell(12975),
   LastStandBuff                         = Spell(12975),
   Revenge                               = Spell(6572),
@@ -151,6 +153,7 @@ Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   UnstoppableForce                      = Spell(275336),
   -- Tier Effects
   OutburstBuff                          = Spell(364010),
+  SeeingRedBuff                         = Spell(364006),
 })
 
 -- Items

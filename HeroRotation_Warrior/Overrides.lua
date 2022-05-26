@@ -68,6 +68,8 @@ ProtOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
       --return BaseCheck and (self:Charges() >= 1 and (not Target:IsInRange(8)) and Target:IsInRange(25))
     if self == SpellProt.Avatar then
       return BaseCheck and (Player:BuffDown(SpellProt.AvatarBuff))
+    elseif self == SpellProt.Intervene then
+      return BaseCheck and (Player:IsInParty() or Player:IsInRaid())
     else
       return BaseCheck
     end
