@@ -106,6 +106,15 @@ local function CheckFocusCap(SpellCastTime, GenFocus)
   return (Player:Focus() + Player:FocusCastRegen(SpellCastTime) + GeneratedFocus < Player:FocusMax())
 end
 
+-- Helper Functions
+local function num(val)
+  if val then return 1 else return 0 end
+end
+
+local function bool(val)
+  return val ~= 0
+end
+
 -- CastCycle/CastTargetIf functions
 -- target_if=min:remains
 local function EvaluateTargetIfFilterSerpentStingRemains(TargetUnit)
@@ -125,6 +134,11 @@ end
 -- target_if=max:target.health.pct
 local function EvaluateTargetIfFilterMaxHealthPct(TargetUnit)
   return (TargetUnit:HealthPercentage())
+end
+
+-- target_if=min:(bloodseeker.remains-1000*dot.pheromone_bomb.ticking)
+local function EvaluateTargetIfFilterBloodseekerRemains(TargetUnit)
+  return (TargetUnit:DebuffRemains(S.BloodseekerDebuff) - 1000 * num(TargetUnit:DebuffUp(S.PheromoneBombDebuff)))
 end
 
 -- if=!dot.serpent_sting.ticking&target.time_to_die>7&(!dot.pheromone_bomb.ticking|buff.mad_bombardier.up&next_wi_bomb.pheromone)|buff.vipers_venom.up&buff.vipers_venom.remains<gcd|!set_bonus.tier28_2pc&!dot.serpent_sting.ticking&target.time_to_die>7
@@ -236,13 +250,13 @@ local function EvaluateTargetIfKillCommandCleave(TargetUnit)
   return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and S.KillCommand:FullRechargeTime() < Player:GCD() and (NessingwarysTrappingEquipped and not S.FreezingTrap:CooldownUp() and not S.TarTrap:CooldownUp() or not NessingwarysTrappingEquipped))
 end
 
--- target_if=focus+cast_regen<focus.max&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
+-- if=focus+cast_regen<focus.max&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
 local function EvaluateTargetIfKillCommandCleave2(TargetUnit)
   return (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and (NessingwarysTrappingEquipped and not S.FreezingTrap:CooldownUp() and not S.TarTrap:CooldownUp() or not NessingwarysTrappingEquipped))
 end
 
--- target_if=dot.pheromone_bomb.ticking&set_bonus.tier28_2pc&!buff.mad_bombardier.up
-local function EvaluateCycleKillCommandCleave2(TargetUnit)
+-- if=dot.pheromone_bomb.ticking&set_bonus.tier28_2pc&!buff.mad_bombardier.up
+local function EvaluateTargetIfKillCommandCleave3(TargetUnit)
   return (TargetUnit:DebuffUp(S.PheromoneBombDebuff) and Player:HasTier(28, 2) and Player:BuffDown(S.MadBombardierBuff))
 end
 
@@ -469,6 +483,10 @@ local function ST()
   -- flayed_shot
   if S.FlayedShot:IsCastable() then
     if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.FlayedShot)) then return "flayed_shot st 6"; end
+  end
+  -- kill_shot,if=buff.flayers_mark.up
+  if S.KillShot:IsReady() and (Player:BuffUp(S.FlayersMarkBuff)) then
+    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot st 7"; end
   end
   if CDsON() then
     -- resonating_arrow,if=!raid_event.adds.exists|!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<20|raid_event.adds.count=1)|raid_event.adds.up&raid_event.adds.remains>40|time_to_die<10
@@ -765,9 +783,9 @@ local function Cleave()
   if S.FlankingStrike:IsCastable() and (CheckFocusCap(S.FlankingStrike:ExecuteTime())) then
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike cleave 28"; end
   end
-  -- kill_command,target_if=dot.pheromone_bomb.ticking&set_bonus.tier28_2pc&!buff.mad_bombardier.up
+  -- kill_command,target_if=min:(bloodseeker.remains-1000*dot.pheromone_bomb.ticking),if=dot.pheromone_bomb.ticking&set_bonus.tier28_2pc&!buff.mad_bombardier.up
   if S.KillCommand:IsCastable() then
-    if Everyone.CastCycle(S.KillCommand, EnemyList, EvaluateCycleKillCommandCleave2, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 40"; end
+    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, EvaluateTargetIfKillCommandCleave3, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 40"; end
   end
   -- kill_shot,if=buff.flayers_mark.up
   if S.KillShot:IsReady() and (Player:BuffUp(S.FlayersMarkBuff)) then
