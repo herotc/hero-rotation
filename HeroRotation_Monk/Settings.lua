@@ -71,10 +71,11 @@ HR.GUISettings.APL.Monk = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
+      FortifyingBrew          = true,
       InvokeXuenTheWhiteTiger = true,
+      StormEarthAndFireFixate = false,
       TouchOfDeath            = true,
       TouchOfKarma            = true,
-      FortifyingBrew          = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {

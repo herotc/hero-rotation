@@ -413,7 +413,7 @@ local function CDSEF()
   end
   -- storm_earth_and_fire_fixate,if=conduit.coordinated_offensive.enabled
   if S.StormEarthAndFireFixate:IsCastable() and (Player:BuffUp(S.StormEarthAndFireBuff) and S.StormEarthAndFireFixate:TimeSinceLastCast() > 15) and (S.CoordinatedOffensive:ConduitEnabled()) then
-    if Cast(S.StormEarthAndFireFixate) then return "storm_earth_and_fire_fixate cd_sef 14"; end
+    if Cast(S.StormEarthAndFireFixate, Settings.Windwalker.GCDasOffGCD.StormEarthAndFireFixate) then return "storm_earth_and_fire_fixate cd_sef 14"; end
   end
   -- storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|fight_remains<20|(raid_event.adds.remains>15|(!covenant.kyrian&!covenant.necrolord)&((raid_event.adds.in>cooldown.storm_earth_and_fire.full_recharge_time|!raid_event.adds.exists)&(cooldown.invoke_xuen_the_white_tiger.remains>cooldown.storm_earth_and_fire.full_recharge_time|variable.hold_xuen))&cooldown.fists_of_fury.remains<=9&chi>=2&cooldown.whirling_dragon_punch.remains<=12)
   if S.StormEarthAndFire:IsReady() and (S.StormEarthAndFire:Charges() == 2 or FightRemains < 20 or ((CovenantID ~= 1 and CovenantID ~= 4) and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > S.StormEarthAndFire:FullRechargeTime() or VarHoldXuen) and S.FistsOfFury:CooldownRemains() <= 9 and Player:Chi() >= 2 and S.WhirlingDragonPunch:CooldownRemains() <= 12)) then
