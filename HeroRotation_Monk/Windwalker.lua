@@ -154,7 +154,7 @@ local function UseItems()
   -- use_items
   local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
   if TrinketToUse then
-    if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end
 end
 
