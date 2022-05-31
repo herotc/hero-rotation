@@ -795,10 +795,6 @@ local function Cleave()
   if S.FlayedShot:IsCastable() then
     if Everyone.CastTargetIf(S.FlayedShot, EnemyList, "max", EvaluateTargetIfFilterMaxHealthPct, nil, not Target:IsSpellInRange(S.FlayedShot), nil, Settings.Commons.DisplayStyle.Covenant) then return "flayed_shot cleave 44"; end
   end
-  -- serpent_sting,target_if=min:remains,if=refreshable&!ticking&next_wi_bomb.volatile&target.time_to_die>15&focus+cast_regen>35&active_enemies<=4
-  if S.SerpentSting:IsReady() and (S.VolatileBomb:IsCastable() and Player:Focus() + Player:FocusCastRegen(S.SerpentSting:ExecuteTime()) > 35 and EnemyCount8ySplash <= 4) then
-    if Cast(S.SerpentSting, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingCleave3, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting cleave 46"; end
-  end
   -- wildfire_bomb,if=!dot.wildfire_bomb.ticking&!set_bonus.tier28_2pc|raid_event.adds.exists&(charges_fractional>1.2&active_enemies>4|charges_fractional>1.4&active_enemies>3|charges_fractional>1.6)|!raid_event.adds.exists&charges_fractional>1.5
   if S.WildfireBomb:IsCastable() and (Target:DebuffDown(S.WildfireBombDebuff) and (not Player:HasTier(28, 2)) or (EnemyCount8ySplash > 4 and S.WildfireBomb:ChargesFractional() > 1.2 or EnemyCount8ySplash > 3 and S.WildfireBomb:ChargesFractional() > 1.4 or S.WildfireBomb:ChargesFractional() > 1.6)) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb cleave 50"; end
