@@ -34,6 +34,7 @@ local I = Item.Monk.Brewmaster
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.CacheofAcquiredTreasures:ID(),
   I.ScarsofFraternalStrife:ID()
 }
 
@@ -191,9 +192,13 @@ local function APL()
     if I.ScarsofFraternalStrife:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) and HL.CombatTime() > 1) then
       if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife main 1"; end
     end
+    -- use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up|fight_remains<25
+    if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredAxeBuff) or HL.FilteredFightRemains(Enemies8y, "<", 25)) then
+      if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures main 2"; end
+    end
     -- use_item,name=jotungeirr_destinys_call
     if I.Jotungeirr:IsEquippedAndReady() then
-      if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 2"; end
+      if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 3"; end
     end
     -- use_items
     if (Settings.Commons.Enabled.Trinkets) then
