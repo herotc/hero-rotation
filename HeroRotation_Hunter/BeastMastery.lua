@@ -316,8 +316,8 @@ local function Cleave()
 end
 
 local function ST()
-  -- aspect_of_the_wild,if=!raid_event.adds.exists|!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<20|(raid_event.adds.count=1&covenant.kyrian))|raid_event.adds.up&raid_event.adds.remains>19
-  if S.AspectoftheWild:IsCastable() and CDsON() then
+  -- aspect_of_the_wild,if=(!covenant.night_fae|cooldown.wild_spirits.remains>20)&(!raid_event.adds.exists|!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<20|(raid_event.adds.count=1&covenant.kyrian))|raid_event.adds.up&raid_event.adds.remains>19)
+  if S.AspectoftheWild:IsCastable() and CDsON() and (CovenantID ~= 3 or S.WildSpirits:CooldownRemains() > 20) then
     if Cast(S.AspectoftheWild, Settings.BeastMastery.OffGCDasOffGCD.AspectOfTheWild) then return "aspect_of_the_wild st 2"; end
   end
   -- barbed_shot,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains<=gcd|buff.wild_spirits.up&charges_fractional>1.4&runeforge.fragments_of_the_elder_antlers
