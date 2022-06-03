@@ -314,7 +314,7 @@ local function CDSerenity()
   end
   -- weapons_of_order,if=cooldown.rising_sun_kick.remains<execute_time
   if S.WeaponsOfOrder:IsReady() and (S.RisingSunKick:CooldownRemains() < S.WeaponsOfOrder:ExecuteTime()) then
-    if Cast(S.WeaponsOfOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "weapons_of_order cd_serenity 20"; end
+    if Cast(S.WeaponsOfOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "weapons_of_order cd_serenity 20"; end
   end
   if (VarSerenityBurst or FightRemains < 20) then
     -- use_item,name=jotungeirr_destinys_call,if=variable.serenity_burst|fight_remains<20
@@ -362,15 +362,15 @@ local function CDSerenity()
   end
   -- faeline_stomp
   if S.FaelineStomp:IsReady() and ComboStrike(S.FaelineStomp) then
-    if Cast(S.FaelineStomp, nil, Settings.Commons.CovenantDisplayStyle) then return "faeline_stomp cd_serenity 36"; end
+    if Cast(S.FaelineStomp, nil, Settings.Commons.DisplayStyle.Covenant) then return "faeline_stomp cd_serenity 36"; end
   end
   -- fallen_order
   if S.FallenOrder:IsReady() then
-    if Cast(S.FallenOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "fallen_order cd_serenity 38"; end
+    if Cast(S.FallenOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "fallen_order cd_serenity 38"; end
   end
   -- bonedust_brew,if=fight_remains<15|(chi>=2&(fight_remains>60&((cooldown.serenity.remains>10|buff.serenity.up|cooldown.serenity.up)&(pet.xuen_the_white_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>10|variable.hold_xuen)))|(fight_remains<=60&(pet.xuen_the_White_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>fight_remains)))
   if S.BonedustBrew:IsReady() and (FightRemains < 15 or (Player:Chi() >= 2 and (FightRemains > 60 and ((S.Serenity:CooldownRemains() > 10 or Player:BuffUp(S.SerenityBuff) or S.Serenity:CooldownUp()) and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 or VarHoldXuen))) or (FightRemains <= 60 and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > FightRemains)))) then
-    if Cast(S.BonedustBrew, nil, Settings.Commons.CovenantDisplayStyle) then return "bonedust_brew cd_serenity 40"; end
+    if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Covenant) then return "bonedust_brew cd_serenity 40"; end
   end
   -- serenity,if=cooldown.rising_sun_kick.remains<2|fight_remains<15
   if S.Serenity:IsReady() and (S.RisingSunKick:CooldownRemains() < 2 or FightRemains < 15) then
@@ -397,19 +397,19 @@ local function CDSEF()
   end
   -- weapons_of_order,if=(raid_event.adds.in>45|raid_event.adds.up)&cooldown.rising_sun_kick.remains<execute_time&cooldown.invoke_xuen_the_white_tiger.remains>(20+20*runeforge.invokers_delight)&(!runeforge.xuens_treasure|cooldown.fists_of_fury.remains)|fight_remains<35
   if S.WeaponsOfOrder:IsReady() and (S.RisingSunKick:CooldownRemains() < S.WeaponsOfOrder:ExecuteTime() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > (20 + 20 * num(InvokersDelightEquipped)) and ((not XuensTreasureEquipped) or S.FistsOfFury:CooldownRemains() > 0) or FightRemains < 35) then
-    if Cast(S.WeaponsOfOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "weapons_of_order cd_sef 6"; end
+    if Cast(S.WeaponsOfOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "weapons_of_order cd_sef 6"; end
   end
   -- faeline_stomp,if=combo_strike&(raid_event.adds.in>10|raid_event.adds.up)
   if S.FaelineStomp:IsReady() and (ComboStrike(S.FaelineStomp)) then
-    if Cast(S.FaelineStomp, nil, Settings.Commons.CovenantDisplayStyle) then return "faeline_stomp cd_sef 8"; end
+    if Cast(S.FaelineStomp, nil, Settings.Commons.DisplayStyle.Covenant) then return "faeline_stomp cd_sef 8"; end
   end
   -- fallen_order,if=raid_event.adds.in>30|raid_event.adds.up
   if S.FallenOrder:IsReady() then
-    if Cast(S.FallenOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "fallen_order cd_sef 10"; end
+    if Cast(S.FallenOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "fallen_order cd_sef 10"; end
   end
   -- bonedust_brew,if=!buff.bonedust_brew.up&(chi>=2&fight_remains>60&(cooldown.storm_earth_and_fire.charges>0|cooldown.storm_earth_and_fire.remains>10)&(pet.xuen_the_white_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>10|variable.hold_xuen)|(chi>=2&fight_remains<=60&(pet.xuen_the_White_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>fight_remains)&(cooldown.storm_earth_and_fire.charges>0|cooldown.storm_earth_and_fire.remains>fight_remains|buff.storm_earth_and_fire.up))|fight_remains<15)|fight_remains<10&soulbind.lead_by_example
   if S.BonedustBrew:IsReady() and (Player:BuffDown(S.BonedustBrew) and (Player:Chi() >= 2 and FightRemains > 60 and (S.StormEarthAndFire:Charges() > 0 or S.StormEarthAndFire:CooldownRemains() > 10) and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 or VarHoldXuen) or (Player:Chi() >= 2 and FightRemains <= 60 and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > FightRemains) and (S.StormEarthAndFire:Charges() > 0 or S.StormEarthAndFire:CooldownRemains() > FightRemains or Player:BuffUp(S.StormEarthAndFireBuff))) or FightRemains < 15) or FightRemains < 10 and S.LeadByExample:SoulbindEnabled()) then
-    if Cast(S.BonedustBrew, nil, Settings.Commons.CovenantDisplayStyle) then return "bonedust_brew cd_sef 12"; end
+    if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Covenant) then return "bonedust_brew cd_sef 12"; end
   end
   -- storm_earth_and_fire_fixate,if=conduit.coordinated_offensive.enabled
   if S.StormEarthAndFireFixate:IsCastable() and (Player:BuffUp(S.StormEarthAndFireBuff) and S.StormEarthAndFireFixate:TimeSinceLastCast() > 15) and (S.CoordinatedOffensive:ConduitEnabled()) then
