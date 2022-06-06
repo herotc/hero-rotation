@@ -65,6 +65,15 @@ if equip[14] then
   trinket2 = Item(equip[14])
 end
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 -- Rotation Var
 local BossFightRemains = 11111
 local FightRemains = 11111
@@ -77,8 +86,8 @@ local VarBuffSyncCD = 0
 local BalespidersEquipped = Player:HasLegendaryEquipped(173)
 local WilfredsSigilEquipped = Player:HasLegendaryEquipped(162)
 local ImplosivePotentialEquipped = Player:HasLegendaryEquipped(170)
-local ShardofAnnihilationEquipped = Player:HasLegendaryEquipped(249)
-local DecayingSoulSatchelEquipped = Player:HasLegendaryEquipped(250)
+local ShardofAnnihilationEquipped = (Player:HasLegendaryEquipped(249) or CovenantID == 4 and Player:HasUnity())
+local DecayingSoulSatchelEquipped = (Player:HasLegendaryEquipped(250) or CovenantID == 3 and Player:HasUnity())
 
 HL:RegisterForEvent(function()
   BossFightRemains = 11111
@@ -111,23 +120,14 @@ HL:RegisterForEvent(function()
   BalespidersEquipped = Player:HasLegendaryEquipped(173)
   WilfredsSigilEquipped = Player:HasLegendaryEquipped(162)
   ImplosivePotentialEquipped = Player:HasLegendaryEquipped(170)
-  ShardofAnnihilationEquipped = Player:HasLegendaryEquipped(249)
-  DecayingSoulSatchelEquipped = Player:HasLegendaryEquipped(250)
+  ShardofAnnihilationEquipped = (Player:HasLegendaryEquipped(249) or CovenantID == 4 and Player:HasUnity())
+  DecayingSoulSatchelEquipped = (Player:HasLegendaryEquipped(250) or CovenantID == 3 and Player:HasUnity())
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
   S.HandofGuldan:RegisterInFlight()
 end, "LEARNED_SPELL_IN_TAB")
 S.HandofGuldan:RegisterInFlight()
-
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
-
--- Update CovenantID if we change Covenants
-HL:RegisterForEvent(function()
-  CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -244,8 +244,8 @@ local function Precombat()
     end
     -- variable,name=in_opener,op=set,value=1
     VarInOpener = true
-    -- variable,name=use_bolt_timings,op=set,value=runeforge.balespiders_burning_core&runeforge.shard_of_annihilation
-    VarUseBoltTimings = (BalespidersEquipped and ShardofAnnihilationEquipped)
+    -- variable,name=use_bolt_timings,op=set,value=runeforge.shard_of_annihilation&(runeforge.balespiders_burning_core+talent.sacrificed_souls.enabled+talent.power_siphon.enabled>1)
+    VarUseBoltTimings = ShardofAnnihilationEquipped and (num(BalespidersEquipped) + num(S.SacrificedSouls:IsAvailable()) + num(S.PowerSiphon:IsAvailable()) > 1)
     -- use_item,name=shadowed_orb_of_torment
     if I.ShadowedOrbofTorment:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets then
       if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment precombat 6"; end
@@ -469,8 +469,9 @@ local function Trinkets()
 end
 
 local function Opener()
-  -- soul_rot,if=soulbind.grove_invigoration
-  if S.SoulRot:IsCastable() and (S.GroveInvigoration:SoulbindEnabled()) then
+  -- soul_rot,if=soulbind.grove_invigoration,if=!runeforge.decaying_soul_satchel
+  -- Note: Double if fixed to be an 'and' instead
+  if S.SoulRot:IsCastable() and (S.GroveInvigoration:SoulbindEnabled() and not DecayingSoulSatchelEquipped) then
     if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot opener 2"; end
   end
   -- nether_portal
@@ -543,8 +544,8 @@ local function APL()
     if ((not S.FieldofBlossoms:SoulbindEnabled()) or S.SummonDemonicTyrant:CooldownRemains() > S.SoulRot:CooldownRemains()) then
       VarNextTyrantCD = S.SummonDemonicTyrant:CooldownRemains()
     end
-    -- variable,name=next_tyrant_cd,op=set,value=cooldown.soul_rot.remains_expected,if=soulbind.field_of_blossoms&cooldown.summon_demonic_tyrant.remains_expected<cooldown.soul_rot.remains_expected
-    if (S.FieldofBlossoms:SoulbindEnabled() and S.SummonDemonicTyrant:CooldownRemains() < S.SoulRot:CooldownRemains()) then
+    -- variable,name=next_tyrant_cd,op=set,value=cooldown.soul_rot.remains_expected,if=(soulbind.field_of_blossoms|runeforge.decaying_soul_satchel)&cooldown.summon_demonic_tyrant.remains_expected<cooldown.soul_rot.remains_expected
+    if ((S.FieldofBlossoms:SoulbindEnabled() or DecayingSoulSatchelEquipped) and S.SummonDemonicTyrant:CooldownRemains() < S.SoulRot:CooldownRemains()) then
       VarNextTyrantCD = S.SoulRot:CooldownRemains()
     end
     -- variable,name=in_opener,op=set,value=0,if=pet.demonic_tyrant.active
