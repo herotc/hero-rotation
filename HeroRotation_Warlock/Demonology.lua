@@ -259,7 +259,7 @@ end
 
 local function Covenant()
   -- soul_rot,if=(soulbind.field_of_blossoms|runeforge.decaying_soul_satchel)&pet.demonic_tyrant.active
-  if S.SoulRot:IsReady() and ((S.FieldofBlossoms:SoulbindEnabled() or DecayingSoulSatchelEquipped) and DemonicTyrantTime() > 0) then
+  if S.SoulRot:IsReady() and ((S.FieldofBlossoms:SoulbindEnabled() or DecayingSoulSatchelEquipped) and (DemonicTyrantTime() > 0 or Player:IsCasting(S.SummonDemonicTyrant))) then
     if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot covenant 2"; end
   end
   -- soul_rot,if=soulbind.grove_invigoration&!runeforge.decaying_soul_satchel&(variable.next_tyrant_cd<20|variable.next_tyrant_cd>30)
@@ -271,11 +271,11 @@ local function Covenant()
     if Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot covenant 6"; end
   end
   -- decimating_bolt,target_if=min:target.health.pct,if=!variable.use_bolt_timings&soulbind.lead_by_example&(pet.demonic_tyrant.active&soul_shard<2|!pet.demonic_tyrant.active&variable.next_tyrant_cd>40)
-  if S.DecimatingBolt:IsReady() and ((not VarUseBoltTimings) and S.LeadByExample:SoulbindEnabled() and (DemonicTyrantTime() > 0 and Player:SoulShardsP() < 2 or DemonicTyrantTime() == 0 and VarNextTyrantCD > 40)) then
+  if S.DecimatingBolt:IsReady() and ((not VarUseBoltTimings) and S.LeadByExample:SoulbindEnabled() and ((DemonicTyrantTime() > 0 or Player:IsCasting(S.SummonDemonicTyrant)) and Player:SoulShardsP() < 2 or DemonicTyrantTime() == 0 and VarNextTyrantCD > 40)) then
     if Everyone.CastTargetIf(S.DecimatingBolt, Enemies8ySplash, "min", EvaluateTargetIfFilterHealth, nil, not Target:IsSpellInRange(S.DecimatingBolt), nil, Settings.Commons.DisplayStyle.Covenant) then return "decimating_bolt covenant 8"; end
   end
   -- decimating_bolt,target_if=min:target.health.pct,if=!variable.use_bolt_timings&soulbind.kevins_oozeling&(pet.demonic_tyrant.active|!pet.demonic_tyrant.active&variable.next_tyrant_cd>40)
-  if S.DecimatingBolt:IsReady() and ((not VarUseBoltTimings) and S.KevinsOozeling:SoulbindEnabled() and (DemonicTyrantTime() > 0 or DemonicTyrantTime() == 0 and VarNextTyrantCD > 40)) then
+  if S.DecimatingBolt:IsReady() and ((not VarUseBoltTimings) and S.KevinsOozeling:SoulbindEnabled() and ((DemonicTyrantTime() > 0 or Player:IsCasting(S.SummonDemonicTyrant)) or DemonicTyrantTime() == 0 and VarNextTyrantCD > 40)) then
     if Everyone.CastTargetIf(S.DecimatingBolt, Enemies8ySplash, "min", EvaluateTargetIfFilterHealth, nil, not Target:IsSpellInRange(S.DecimatingBolt), nil, Settings.Commons.DisplayStyle.Covenant) then return "decimating_bolt covenant 9"; end
   end
   -- decimating_bolt,target_if=min:target.health.pct,if=!variable.use_bolt_timings&(soulbind.forgeborne_reveries|(soulbind.volatile_solvent&!soulbind.kevins_oozeling))&!pet.demonic_tyrant.active
@@ -291,7 +291,7 @@ local function Covenant()
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft covenant 12"; end
   end
   -- scouring_tithe,if=soulbind.combat_meditation&pet.demonic_tyrant.active
-  if S.ScouringTithe:IsReady() and (S.CombatMeditation:SoulbindEnabled() and DemonicTyrantTime() > 0) then
+  if S.ScouringTithe:IsReady() and (S.CombatMeditation:SoulbindEnabled() and (DemonicTyrantTime() > 0 or Player:IsCasting(S.SummonDemonicTyrant))) then
     if Cast(S.ScouringTithe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ScouringTithe)) then return "scouring_tithe covenant 13"; end
   end
   -- scouring_tithe,if=!soulbind.combat_meditation
@@ -299,7 +299,7 @@ local function Covenant()
     if Cast(S.ScouringTithe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ScouringTithe)) then return "scouring_tithe covenant 14"; end
   end
   -- impending_catastrophe,if=pet.demonic_tyrant.active&soul_shard=0
-  if S.ImpendingCatastrophe:IsReady() and (DemonicTyrantTime() > 0 and Player:SoulShardsP() == 0) then
+  if S.ImpendingCatastrophe:IsReady() and ((DemonicTyrantTime() > 0 or Player:IsCasting(S.SummonDemonicTyrant)) and Player:SoulShardsP() == 0) then
     if Cast(S.ImpendingCatastrophe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ImpendingCatastrophe)) then return "impending_catastrophe covenant 16"; end
   end
 end
