@@ -421,13 +421,13 @@ end
 
 local function Trinkets()
   -- variable,name=use_buff_trinkets,value=(!variable.use_bolt_timings&pet.demonic_tyrant.active)|(variable.use_bolt_timings&buff.shard_of_annihilation.up)
-  VarUseBuffTrinkets = (((not VarUseBoltTimings) and DemonicTyrantTime() > 0) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff)))
+  VarUseBuffTrinkets = (((not VarUseBoltTimings) and (DemonicTyrantTime() > 0 or Player:IsCasting(S.SummonDemonicTyrant))) or (VarUseBoltTimings and Player:BuffUp(S.ShardofAnnihilationBuff)))
   -- use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up
   if I.ScarsofFraternalStrife:IsEquippedAndReady() and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4)) then
     if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife trinkets 2"; end
   end
   -- use_item,name=scars_of_fraternal_strife,if=buff.scars_of_fraternal_strife_4.up&pet.demonic_tyrant.active
-  if I.ScarsofFraternalStrife:IsEquippedAndReady() and (Player:BuffUp(S.ScarsofFraternalStrifeBuff4) and DemonicTyrantTime() > 0) then
+  if I.ScarsofFraternalStrife:IsEquippedAndReady() and (Player:BuffUp(S.ScarsofFraternalStrifeBuff4) and (DemonicTyrantTime() > 0 or Player:IsCasting(S.SummonDemonicTyrant))) then
     if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife 3"; end
   end
   -- use_item,name=shadowed_orb_of_torment,if=variable.buff_sync_cd<22
@@ -435,7 +435,7 @@ local function Trinkets()
     if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment trinkets 4"; end
   end
   -- use_item,name=moonlit_prism,if=variable.use_bolt_timings&pet.demonic_tyrant.active
-  if I.MoonlitPrism:IsEquippedAndReady() and (VarUseBoltTimings and DemonicTyrantTime()) then
+  if I.MoonlitPrism:IsEquippedAndReady() and (VarUseBoltTimings and (DemonicTyrantTime() > 0 or Player:IsCasting(S.SummonDemonicTyrant))) then
     if Cast(I.MoonlitPrism, nil, Settings.Commons.DisplayStyle.Trinkets) then return "moonlit_prism trinkets 5"; end
   end
   -- use_item,name=grim_eclipse,if=variable.buff_sync_cd<7
