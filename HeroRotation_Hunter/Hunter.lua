@@ -55,9 +55,13 @@ Spell.Hunter.Commons = {
   Barrage                               = Spell(120360),
   -- Buffs
   AspectoftheWildBuff                   = Spell(193530),
+  
+  --notably this is a debuff!
+  DecryptedUrhCypherDebuff              = Spell(368239),
   -- Debuffs
   HuntersMarkDebuff                     = Spell(257284),
   TarTrapDebuff                         = Spell(135299),
+  
   -- Covenant Abilities
   DeathChakram                          = Spell(325028),
   FlayedShot                            = Spell(324149),
