@@ -106,6 +106,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   DissonantEchoesBuff                   = Spell(343144),
   FieldofBlossoms                       = Spell(319191),
   GroveInvigoration                     = Spell(322721),
+  MindDevourerBuff                      = Spell(338333),
   RedirectedAnimaBuff                   = Spell(342814),
   -- Tier Set Effects
   LivingShadowBuff                      = Spell(363578)
