@@ -206,9 +206,9 @@ local function Cleave()
       if Cast(S.BarbedShot, nil, nil, not TargetInRange40y) then return "barbed_shot @target cleave 4"; end
     end
   end
-  -- multishot,if=gcd-pet.main.buff.beast_cleave.remains>0.25
+  -- multishot,if=gcd-pet.main.buff.beast_cleave.remains>0.25|buff.killing_frenzy.up&pet.main.buff.beast_cleave.remains<2
   -- Check both the player and pet buffs since the pet buff can be impacted by latency
-  if S.MultiShot:IsReady() and (GCDMax - Pet:BuffRemains(S.BeastCleavePetBuff) > 0.25 or GCDMax - Player:BuffRemains(S.BeastCleaveBuff) > 0.25) then
+  if S.MultiShot:IsReady() and (GCDMax - Pet:BuffRemains(S.BeastCleavePetBuff) > 0.25 or GCDMax - Player:BuffRemains(S.BeastCleaveBuff) > 0.25 or Player:BuffUp(S.KillingFrenzyBuff) and (Pet:BuffRemains(S.BeastCleavePetBuff) < 2 or Player:BuffRemains(S.BeastCleaveBuff) < 2)) then
     if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot cleave 6"; end
   end
   -- kill_shot,if=runeforge.pouch_of_razor_fragments&buff.flayers_mark.up

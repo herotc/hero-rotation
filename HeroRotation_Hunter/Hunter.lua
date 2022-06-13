@@ -123,6 +123,8 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   BestialWrathPetBuff                   = Spell(186254, "pet"),
   BloodFuryBuff                         = Spell(20572),
   FrenzyPetBuff                         = Spell(272790, "pet"),
+  -- Tier Set Bonuses
+  KillingFrenzyBuff                     = Spell(363760),
 })
 
 Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
