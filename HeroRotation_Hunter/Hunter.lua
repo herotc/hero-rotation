@@ -196,6 +196,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   MongooseBite                          = MultiSpell(259387, 265888),
   MongooseFuryBuff                      = Spell(259388),
   TermsofEngagement                     = Spell(265895),
+  TipoftheSpear                         = Spell(260285),
   TipoftheSpearBuff                     = Spell(260286),
   VipersVenom                           = Spell(268501),
   WildfireInfusion                      = Spell(271014),

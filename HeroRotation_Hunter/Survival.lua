@@ -193,6 +193,11 @@ local function EvaluateTargetIfRaptorStrikeST(TargetUnit)
   return (Player:BuffStack(S.TipoftheSpearBuff) == 3 or TargetUnit:DebuffUp(S.ShrapnelBombDebuff))
 end
 
+-- if=(buff.tip_of_the_spear.stack=3&(!dot.pheromone_bomb.ticking|buff.mad_bombardier.up&next_wi_bomb.pheromone))|next_wi_bomb.pheromone&buff.tip_of_the_spear.stack=3&(cooldown.wildfire_bomb.full_recharge_time<2*gcd|buff.mad_bombardier.up)
+local function EvaluateTargetIfRaptorStrikeST2(TargetUnit)
+  return ((Player:BuffStack(S.TipoftheSpearBuff) == 3 and (TargetUnit:DebuffDown(S.PheromoneBombDebuff) or Player:BuffUp(S.MadBombardierBuff) and S.PheromoneBomb:IsCastable())) or S.PheromoneBomb:IsCastable() and Player:BuffStack(S.TipoftheSpearBuff) == 3 and (S.WildfireBomb:FullRechargeTime() < 2 * Player:GCD() or Player:BuffUp(S.MadBombardierBuff)))
+end
+
 -- if=talent.alpha_predator.enabled&(buff.mongoose_fury.up&buff.mongoose_fury.remains<focus%(variable.mb_rs_cost-cast_regen)*gcd&!buff.wild_spirits.remains|buff.mongoose_fury.remains&next_wi_bomb.pheromone)
 local function EvaluateTargetIfMongooseBiteST(TargetUnit) 
   return (S.AlphaPredator:IsAvailable() and (Player:BuffUp(S.MongooseFuryBuff) and Player:BuffRemains(S.MongooseFuryBuff) < Player:Focus() / (MBRSCost - Player:FocusCastRegen(S.MongooseBite:ExecuteTime())) * Player:GCD() and not TargetUnit:DebuffRemains(S.WildSpiritsDebuff) or Player:BuffRemains(S.MongooseFuryBuff) and S.PheromoneBomb:IsCastable()))
@@ -479,6 +484,10 @@ local function ST()
   -- serpent_sting,target_if=min:remains,if=!dot.serpent_sting.ticking&target.time_to_die>7&(!dot.pheromone_bomb.ticking|buff.mad_bombardier.up&next_wi_bomb.pheromone)|buff.vipers_venom.up&buff.vipers_venom.remains<gcd|!set_bonus.tier28_2pc&!dot.serpent_sting.ticking&target.time_to_die>7
   if S.SerpentSting:IsReady() then
     if Everyone.CastTargetIf(S.SerpentSting, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingST, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting st 4"; end
+  end
+  -- raptor_strike,target_if=max:debuff.latent_poison_injection.stack,if=(buff.tip_of_the_spear.stack=3&(!dot.pheromone_bomb.ticking|buff.mad_bombardier.up&next_wi_bomb.pheromone))|next_wi_bomb.pheromone&buff.tip_of_the_spear.stack=3&(cooldown.wildfire_bomb.full_recharge_time<2*gcd|buff.mad_bombardier.up)
+  if S.RaptorStrike:IsReady() and S.TipoftheSpear:IsAvailable() then
+    if Everyone.CastTargetIf(S.RaptorStrike, EnemyList, "max", EvaluateTargetIfFilterRaptorStrikeLatentStacks, EvaluateTargetIfRaptorStrikeST2, not Target:IsSpellInRange(S.RaptorStrike)) then return "raptor_strike st 5"; end
   end
   -- flayed_shot
   if S.FlayedShot:IsCastable() then
