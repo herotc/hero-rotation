@@ -75,6 +75,7 @@ local var_arcane_explosion = (S.FlamePatch:IsAvailable()) and 99 or 2
 local var_arcane_explosion_mana = 40
 local var_kindling_reduction = (S.Kindling:IsAvailable()) and 0.4 or 1
 local var_skb_duration = 6
+local var_skb_delay = 0.1
 local var_mot_recharge_amount = 6
 local var_combustion_on_use = (I.SinfulGladiatorsBadge:IsEquipped() or I.SinfulAspirantsBadge:IsEquipped() or I.MacabreSheetMusic:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.EmpyrealOrdnance:IsEquipped() or I.FlameofBattle:IsEquipped() or I.WakenersFrond:IsEquipped() or I.InstructorsDivineBell:IsEquipped() or I.ShadowedOrbofTorment:IsEquipped())
 local var_empyreal_ordnance_delay = 18
@@ -253,6 +254,9 @@ local function VarInit()
 
   -- variable,name=empyreal_ordnance_delay,default=18,op=reset
   var_empyreal_ordnance_delay = 18
+
+  -- variable,name=skb_delay,default=-1,value=0.1,if=variable.skb_delay<0
+  var_skb_delay = 0.1
 
   -- variable,name=time_to_combustion,value=fight_remains+100,if=variable.disable_combustion
   if var_disable_combustion then
@@ -519,7 +523,8 @@ local function CombustionPhase()
   if S.Flamestrike:IsReady() and (Player:BuffDown(S.CombustionBuff) and S.Combustion:CooldownRemains() < S.Flamestrike:CastTime() and EnemiesCount8ySplash >= var_combustion_flamestrike) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsSpellInRange(S.Flamestrike)) then return "flamestrike combustion_phase 8"; end
   end
-  -- pyroblast,if=buff.combustion.down&buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time
+  -- pyroblast,if=buff.combustion.down&buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time&buff.sun_kings_blessing_ready.expiration_delay_remains=0
+  -- TODO: Handle SKB expiration_delay_remains
   if S.Pyroblast:IsReady() and (Player:BuffDown(S.CombustionBuff) and Player:BuffUp(S.SunKingsBlessingBuffReady) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.Pyroblast:CastTime()) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 10"; end
   end
@@ -576,6 +581,7 @@ local function CombustionPhase()
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.FirestormBuff)) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 28"; end
   end
+  -- wait,sec=0.01,if=buff.hot_streak.react&active_enemies<variable.combustion_flamestrike&(buff.sun_kings_blessing_ready.expiration_delay_remains|time-buff.sun_kings_blessing_ready.last_expire<variable.skb_delay-0.03)
   -- pyroblast,if=buff.hot_streak.react&buff.combustion.up
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.HotStreakBuff) and Player:BuffUp(S.CombustionBuff)) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 30"; end
@@ -592,7 +598,8 @@ local function CombustionPhase()
   if S.RuneofPower:IsReady() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.RuneofPower:ExecuteTime() + S.Flamestrike:CastTime() and Player:BuffRemains(S.RuneofPowerBuff) < S.Flamestrike:CastTime() and EnemiesCount16ySplash >= var_combustion_flamestrike) then
     if Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneOfPower) then return "rune_of_power combustion_phase 36"; end
   end
-  -- flamestrike,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time&active_enemies>=variable.combustion_flamestrike
+  -- flamestrike,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time&active_enemies>=variable.combustion_flamestrike&buff.sun_kings_blessing_ready.expiration_delay_remains=0
+  -- TODO: Handle SKB expiration_delay_remains
   if S.Flamestrike:IsReady() and AoEON() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.Flamestrike:CastTime() and EnemiesCount16ySplash >= var_combustion_flamestrike) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 38"; end
   end
@@ -600,7 +607,8 @@ local function CombustionPhase()
   if S.RuneofPower:IsCastable() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.RuneofPower:ExecuteTime() + S.Pyroblast:CastTime() and Player:BuffRemains(S.RuneofPowerBuff) < S.Pyroblast:CastTime()) then
     if Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneOfPower) then return "rune_of_power combustion_phase 40"; end
   end
-  -- pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time
+  -- pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time&buff.sun_kings_blessing_ready.expiration_delay_remains=0
+  -- TODO: Handle SKB expiration_delay_remains
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.Pyroblast:CastTime()) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 42"; end
   end
@@ -643,11 +651,13 @@ local function RoPPhase()
   if S.Fireball:IsReady() and Player:BuffUp(S.Deathborne) and DeathFathomEquipped and var_time_to_combustion < Player:BuffRemains(S.Deathborne) and EnemiesCount8ySplash >= 2 then
     if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball rop_phase 2"; end
   end
-  -- flamestrike,if=active_enemies>=variable.hard_cast_flamestrike&buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time
+  -- flamestrike,if=active_enemies>=variable.hard_cast_flamestrike&buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time&buff.sun_kings_blessing_ready.expiration_delay_remains=0
+  -- TODO: Handle SKB expiration_delay_remains
   if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_hard_cast_flamestrike and Player:BuffUp(S.SunKingsBlessingBuffReady) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.Flamestrike:CastTime()) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike rop_phase 3"; end
   end
-  -- pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time
+  -- pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time&buff.sun_kings_blessing_ready.expiration_delay_remains=0
+  -- TODO: Handle SKB expiration_delay_remains
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.SunKingsBlessingBuffReady) and Player:BuffRemains(S.SunKingsBlessingBuffReady) > S.Pyroblast:CastTime()) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast rop_phase 4"; end
   end
@@ -738,11 +748,13 @@ local function StandardRotation()
   if S.Pyroblast:IsReady() and Player:BuffUp(S.HotStreakBuff) and (Player:PrevGCD(1,S.Fireball) or bool(S.Firestarter:ActiveStatus()) or S.Pyroblast:InFlight()) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 5"; end
   end
-  -- flamestrike,if=active_enemies>=variable.hard_cast_flamestrike&buff.sun_kings_blessing_ready.up&(cooldown.rune_of_power.remains+action.rune_of_power.execute_time+cast_time>buff.sun_kings_blessing_ready.remains|!talent.rune_of_power)&variable.time_to_combustion+cast_time>buff.sun_kings_blessing_ready.remains
+  -- flamestrike,if=active_enemies>=variable.hard_cast_flamestrike&buff.sun_kings_blessing_ready.up&(cooldown.rune_of_power.remains+action.rune_of_power.execute_time+cast_time>buff.sun_kings_blessing_ready.remains|!talent.rune_of_power)&variable.time_to_combustion+cast_time>buff.sun_kings_blessing_ready.remains&buff.sun_kings_blessing_ready.expiration_delay_remains=0
+  -- TODO: Handle SKB expiration_delay_remains
   if S.Flamestrike:IsReady() and AoEON() and (EnemiesCount8ySplash >= var_hard_cast_flamestrike and Player:BuffUp(S.SunKingsBlessingBuffReady) and (S.RuneofPower:CooldownRemains() + S.RuneofPower:ExecuteTime() + S.Flamestrike:CastTime() > Player:BuffRemains(S.SunKingsBlessingBuffReady) or not S.RuneofPower:IsAvailable()) and var_time_to_combustion + S.Flamestrike:CastTime() > Player:BuffRemains(S.SunKingsBlessingBuffReady)) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike standard_rotation 6"; end
   end
-  -- pyroblast,if=buff.sun_kings_blessing_ready.up&(cooldown.rune_of_power.remains+action.rune_of_power.execute_time+cast_time>buff.sun_kings_blessing_ready.remains|!talent.rune_of_power)&variable.time_to_combustion+cast_time>buff.sun_kings_blessing_ready.remains
+  -- pyroblast,if=buff.sun_kings_blessing_ready.up&(cooldown.rune_of_power.remains+action.rune_of_power.execute_time+cast_time>buff.sun_kings_blessing_ready.remains|!talent.rune_of_power)&variable.time_to_combustion+cast_time>buff.sun_kings_blessing_ready.remains&buff.sun_kings_blessing_ready.expiration_delay_remains=0
+  -- TODO: Handle SKB expiration_delay_remains
   if S.Pyroblast:IsReady() and Player:BuffUp(S.SunKingsBlessingBuffReady) and (S.RuneofPower:CooldownRemains() + S.RuneofPower:ExecuteTime() + S.Pyroblast:CastTime() > Player:BuffRemains(S.SunKingsBlessingBuffReady) or not S.RuneofPower:IsAvailable()) and var_time_to_combustion + S.Pyroblast:CastTime() > Player:BuffRemains(S.SunKingsBlessingBuffReady) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 7"; end
   end
