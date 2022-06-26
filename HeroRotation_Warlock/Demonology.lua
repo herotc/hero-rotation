@@ -360,7 +360,7 @@ local function HPTrinkets()
   end
 end
 
-local function FiveYTrinkets()
+local function SlowTrinkets()
   local TargetDistance = 0
   if Target.UnitExists then
     TargetDistance = Target:MaxDistance()
@@ -368,15 +368,15 @@ local function FiveYTrinkets()
   if not TargetDistance then TargetDistance = 0 end
   -- use_item,name=soulletting_ruby,target_if=min:target.health.pct,if=variable.buff_sync_cd<target.distance%5&time>variable.first_tyrant_time-(target.distance%5)
   if I.SoullettingRuby:IsEquippedAndReady() then
-    if Everyone.CastTargetIf(I.SoullettingRuby, Enemies8ySplash, "min", EvaluateTargetIfFilterHealth, EvaluateTargetIfSoullettingRuby, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby 5y 2"; end
+    if Everyone.CastTargetIf(I.SoullettingRuby, Enemies8ySplash, "min", EvaluateTargetIfFilterHealth, EvaluateTargetIfSoullettingRuby, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby slow_trinkets 2"; end
   end
   -- use_item,name=sunblood_amethyst,if=variable.buff_sync_cd<target.distance%5+(2*variable.use_bolt_timings)
   if I.SunbloodAmethyst:IsEquippedAndReady() and (VarBuffSyncCD < TargetDistance / 5 + (2 * num(VarUseBoltTimings))) then
-    if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "sunblood_amethyst 5y 4"; end
+    if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "sunblood_amethyst slow_trinkets 4"; end
   end
   -- use_item,name=empyreal_ordnance,if=variable.buff_sync_cd<(target.distance%5)+12+(2*variable.use_bolt_timings)
   if I.EmpyrealOrdnance:IsEquippedAndReady() and (VarBuffSyncCD < (TargetDistance / 5) + 12 + (2 * num(VarUseBoltTimings))) then
-    if Cast(I.EmpyrealOrdnance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "empyreal_ordnance 5y 6"; end
+    if Cast(I.EmpyrealOrdnance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "empyreal_ordnance slow_trinkets 6"; end
   end
 end
 
@@ -446,9 +446,9 @@ local function Trinkets()
   if (S.DemonicConsumption:IsAvailable() and VarNextTyrantCD < 20) then
     local ShouldReturn = HPTrinkets(); if ShouldReturn then return ShouldReturn; end
   end
-  -- call_action_list,name=5y_per_sec_trinkets
+  -- call_action_list,name=slow_trinkets
   if (true) then
-    local ShouldReturn = FiveYTrinkets(); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = SlowTrinkets(); if ShouldReturn then return ShouldReturn; end
   end
   -- use_item,name=overflowing_anima_cage,if=variable.use_buff_trinkets
   if I.OverflowingAnimaCage:IsEquippedAndReady() and (VarUseBuffTrinkets) then
