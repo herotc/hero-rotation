@@ -79,15 +79,17 @@ local Tier282pcEquipped, Tier284pcEquipped = Player:HasTier(28, 2), Player:HasTi
 local TrinketItem1 = Equipment[13] and Item(Equipment[13]) or Item(0)
 local TrinketItem2 = Equipment[14] and Item(Equipment[14]) or Item(0)
 local function SetTrinketVariables ()
-  -- actions.precombat+=/variable,name=trinket_sync_slot,value=1,if=trinket.1.has_stat.any_dps&(!trinket.2.has_stat.any_dps|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)|trinket.1.is.inscrutable_quantum_device|(trinket.1.is.shadowgrasp_totem&covenant.venthyr)
-  -- actions.precombat+=/variable,name=trinket_sync_slot,value=2,if=trinket.2.has_stat.any_dps&(!trinket.1.has_stat.any_dps|trinket.2.cooldown.duration>trinket.1.cooldown.duration)|trinket.2.is.inscrutable_quantum_device|(trinket.2.is.shadowgrasp_totem&covenant.venthyr)
+  -- actions.precombat+=/variable,name=trinket_sync_slot,value=1,if=trinket.1.has_stat.any_dps&(!trinket.2.has_stat.any_dps|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)|trinket.1.is.inscrutable_quantum_device|(covenant.venthyr&!trinket.2.has_stat.any_dps&trinket.1.is.shadowgrasp_totem)
+  -- actions.precombat+=/variable,name=trinket_sync_slot,value=2,if=trinket.2.has_stat.any_dps&(!trinket.1.has_stat.any_dps|trinket.2.cooldown.duration>trinket.1.cooldown.duration)|trinket.2.is.inscrutable_quantum_device|(covenant.venthyr&!trinket.1.has_stat.any_dps&trinket.2.is.shadowgrasp_totem)
   -- actions.precombat+=/variable,name=use_trinket_1_pre_vendetta,value=set_bonus.tier28_4pc&(trinket.1.has_stat.haste_rating|trinket.1.is.inscrutable_quantum_device)
   -- actions.precombat+=/variable,name=use_trinket_2_pre_vendetta,value=set_bonus.tier28_4pc&(trinket.2.has_stat.haste_rating|trinket.2.is.inscrutable_quantum_device)
   if TrinketItem1:TrinketHasStatAnyDps() and (not TrinketItem2:TrinketHasStatAnyDps() or TrinketItem1:Cooldown() >= TrinketItem2:Cooldown())
-    or TrinketItem1:ID() == I.InscrutableQuantumDevice:ID() or IsVenthyr and TrinketItem1:ID() == I.ShadowgraspTotem:ID() then
+    or TrinketItem1:ID() == I.InscrutableQuantumDevice:ID()
+    or IsVenthyr and not TrinketItem2:TrinketHasStatAnyDps() and TrinketItem1:ID() == I.ShadowgraspTotem:ID() then
     TrinketSyncSlot = 1
   elseif TrinketItem2:TrinketHasStatAnyDps() and (not TrinketItem1:TrinketHasStatAnyDps() or TrinketItem2:Cooldown() > TrinketItem1:Cooldown())
-    or TrinketItem2:ID() == I.InscrutableQuantumDevice:ID() or IsVenthyr and TrinketItem2:ID() == I.ShadowgraspTotem:ID() then
+    or TrinketItem2:ID() == I.InscrutableQuantumDevice:ID()
+    or IsVenthyr and not TrinketItem1:TrinketHasStatAnyDps() and TrinketItem2:ID() == I.ShadowgraspTotem:ID() then
     TrinketSyncSlot = 2
   else
     TrinketSyncSlot = 0
@@ -680,7 +682,7 @@ local function Dot ()
   -- actions.dot+=/crimson_tempest,if=spell_targets=1&(!runeforge.dashing_scoundrel|rune_word.frost.enabled)&effective_combo_points>=(cp_max_spend-1)&refreshable&!will_lose_exsanguinate&(!debuff.shiv.up|debuff.grudge_match.remains>2)&target.time_to_die-remains>4
   if S.CrimsonTempest:IsReady() and Target:IsInMeleeRange(10) and MeleeEnemies10yCount == 1
     and not DashingScoundrelEquipped and ComboPoints >= (Rogue.CPMaxSpend() - 1) and IsDebuffRefreshable(Target, S.CrimsonTempest, CrimsonTempestThreshold)
-    and not Rogue.WillLoseExsanguinate(Target, S.CrimsonTempest) and (not Target:DebuffUp(S.ShivDebuff) or Target:DebuffRemains(S.GrudgeMatchDebuff) > 2)
+    and not Rogue.WillLoseExsanguinate(Target, S.CrimsonTempest) and (Target:DebuffRemains(S.GrudgeMatchDebuff) > 2 or not Target:DebuffUp(S.ShivDebuff))
     and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.CrimsonTempest)) or Target:TimeToDieIsNotValid())
     and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
     if Cast(S.CrimsonTempest) then return "Cast Crimson Tempest (ST)" end
@@ -947,8 +949,8 @@ HR.SetAPL(259, APL, Init)
 -- # The average CDR is 0.22 but due to the RNG nature of CP gen, 2x this value is optimal for syncing logic
 -- actions.precombat+=/variable,name=flagellation_cdr,value=1-(runeforge.obedience*0.44)
 -- # Determine which (if any) stat buff trinket we want to attempt to sync with Vendetta.
--- actions.precombat+=/variable,name=trinket_sync_slot,value=1,if=trinket.1.has_stat.any_dps&(!trinket.2.has_stat.any_dps|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)|trinket.1.is.inscrutable_quantum_device|(trinket.1.is.shadowgrasp_totem&covenant.venthyr)
--- actions.precombat+=/variable,name=trinket_sync_slot,value=2,if=trinket.2.has_stat.any_dps&(!trinket.1.has_stat.any_dps|trinket.2.cooldown.duration>trinket.1.cooldown.duration)|trinket.2.is.inscrutable_quantum_device|(trinket.2.is.shadowgrasp_totem&covenant.venthyr)
+-- actions.precombat+=/variable,name=trinket_sync_slot,value=1,if=trinket.1.has_stat.any_dps&(!trinket.2.has_stat.any_dps|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)|trinket.1.is.inscrutable_quantum_device|(covenant.venthyr&!trinket.2.has_stat.any_dps&trinket.1.is.shadowgrasp_totem)
+-- actions.precombat+=/variable,name=trinket_sync_slot,value=2,if=trinket.2.has_stat.any_dps&(!trinket.1.has_stat.any_dps|trinket.2.cooldown.duration>trinket.1.cooldown.duration)|trinket.2.is.inscrutable_quantum_device|(covenant.venthyr&!trinket.1.has_stat.any_dps&trinket.2.is.shadowgrasp_totem)
 -- actions.precombat+=/variable,name=use_trinket_1_pre_vendetta,value=set_bonus.tier28_4pc&(trinket.1.has_stat.haste_rating|trinket.1.is.inscrutable_quantum_device)
 -- actions.precombat+=/variable,name=use_trinket_2_pre_vendetta,value=set_bonus.tier28_4pc&(trinket.2.has_stat.haste_rating|trinket.2.is.inscrutable_quantum_device)
 -- actions.precombat+=/stealth
@@ -1016,6 +1018,7 @@ HR.SetAPL(259, APL, Init)
 -- actions.cds+=/call_action_list,name=vanish,if=!stealthed.all&master_assassin_remains=0
 -- actions.cds+=/use_item,name=windscar_whetstone,if=spell_targets.fan_of_knives>desired_targets|raid_event.adds.in>60|fight_remains<7
 -- actions.cds+=/use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up&(spell_targets.fan_of_knives=1&raid_event.adds.in>60|spell_targets.fan_of_knives>1)|fight_remains<25
+-- actions.cds+=/use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up|fight_remains<30
 
 -- # Direct damage abilities
 -- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
