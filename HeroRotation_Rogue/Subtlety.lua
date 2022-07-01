@@ -43,7 +43,7 @@ local ShouldReturn; -- Used to get the return string
 local PoolingAbility, PoolingEnergy, PoolingFinisher; -- Used to store an ability we might want to pool for as a fallback in the current situation
 local Stealth, VanishBuff
 local RuptureThreshold, RuptureDMGThreshold
-local EffectiveComboPoints, ComboPoints, ComboPointsDeficit
+local EffectiveComboPoints, ComboPoints, ComboPointsDeficit, StealthEnergyRequired
 local PriorityRotation
 
 -- Covenant and Legendaries
@@ -161,6 +161,9 @@ local function UsePriorityRotation()
       return true
     -- Council of Blood
     elseif Target:NPCID() == 166969 or Target:NPCID() == 166971 or Target:NPCID() == 166970 then
+      return true
+    -- Anduin (Remnant of a Fallen King/Monstrous Soul)
+    elseif Target:NPCID() == 183463 or Target:NPCID() == 183671 then
       return true
     end
   end
@@ -783,6 +786,7 @@ local function APL ()
   EffectiveComboPoints = Rogue.EffectiveComboPoints(ComboPoints)
   ComboPointsDeficit = Player:ComboPointsDeficit()
   PriorityRotation = UsePriorityRotation()
+  StealthEnergyRequired = Player:EnergyMax() - Stealth_Threshold()
 
   -- Adjust Animacharged CP Prediction for Shadow Techniques
   -- If we are on a non-optimal Animacharged CP, ignore it if the time to ShT is less than GCD + 500ms, unless the ER buff will expire soon
@@ -920,10 +924,11 @@ local function APL ()
       if ShouldReturn then return "Stealth CDs: (Priority Rotation)" .. ShouldReturn end
     end
 
-    -- # Consider using a Stealth CD when reaching the energy threshold, called with params to register potential pooling
     -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold
-    ShouldReturn = Stealth_CDs(Player:EnergyMax() - Stealth_Threshold())
-    if ShouldReturn then return "Stealth CDs: " .. ShouldReturn end
+    if Player:EnergyPredicted() >= StealthEnergyRequired then
+      ShouldReturn = Stealth_CDs()
+      if ShouldReturn then return "Stealth CDs: " .. ShouldReturn end
+    end
 
     -- actions+=/call_action_list,name=finish,if=effective_combo_points>=cp_max_spend
     -- # Finish at 4+ without DS or with SoD crit buff, 5+ with DS (outside stealth)
@@ -937,9 +942,17 @@ local function APL ()
       ShouldReturn = Finish()
       if ShouldReturn then return "Finish: " .. ShouldReturn end
     else
+      -- NOTE: Duplicated stealth_cds line from above since both this and build have the same energy threshold if condition
+      -- If we aren't finishing in between, we'll be suggesting to pool something and re-process with StealthEnergyRequired
+      
+      -- # Consider using a Stealth CD when reaching the energy threshold, called with params to register potential pooling
+      -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold
+      ShouldReturn = Stealth_CDs(StealthEnergyRequired)
+      if ShouldReturn then return "Stealth CDs: " .. ShouldReturn end
+
       -- # Use a builder when reaching the energy threshold
       -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
-      ShouldReturn = Build(Player:EnergyMax() - Stealth_Threshold())
+      ShouldReturn = Build(StealthEnergyRequired)
       if ShouldReturn then return "Build: " .. ShouldReturn end
     end
 
