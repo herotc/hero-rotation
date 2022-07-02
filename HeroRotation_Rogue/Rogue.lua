@@ -177,6 +177,7 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
   QuickDraw               = Spell(196938),
+  Weaponmaster            = Spell(200733),
   -- Utility
   Gouge                   = Spell(1776),
   -- PvP
@@ -294,10 +295,11 @@ Item.Rogue.Assassination = {
 
 Item.Rogue.Outlaw = {
   -- Trinkets
-  ComputationDevice     = Item(167555, {13, 14}),
-  VigorTrinket          = Item(165572, {13, 14}),
-  FontOfPower           = Item(169314, {13, 14}),
-  RazorCoral            = Item(169311, {13, 14}),
+  ComputationDevice         = Item(167555, {13, 14}),
+  VigorTrinket              = Item(165572, {13, 14}),
+  FontOfPower               = Item(169314, {13, 14}),
+  RazorCoral                = Item(169311, {13, 14}),
+  CacheOfAcquiredTreasures  = Item(188265, {13, 14}),
 }
 
 Item.Rogue.Subtlety = {
