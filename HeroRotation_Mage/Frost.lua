@@ -237,7 +237,7 @@ local function Aoe()
     end
   end
   -- flurry,if=(remaining_winters_chill=0|debuff.winters_chill.down)&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&(buff.fingers_of_frost.react=0|runeforge.deaths_fathom&prev_gcd.1.frostbolt&(runeforge.cold_front|runeforge.slick_ice)&buff.deathborne.up))
-  if S.Flurry:IsCastable() and (Target:DebuffDown(S.WintersChillDebuff) and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:BuffDown(S.FingersofFrostBuff) or DeathsFathomEquipped and Player:PrevGCD(1, S.Frostbolt) and (ColdFrontEquipped or SlickIceEquipped) and Player:BuffUp(S.Deathborne)))) then
+  if S.Flurry:IsCastable() and (Target:DebuffDown(S.WintersChillDebuff) and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:BuffDownP(S.FingersofFrostBuff) or DeathsFathomEquipped and Player:PrevGCD(1, S.Frostbolt) and (ColdFrontEquipped or SlickIceEquipped) and Player:BuffUp(S.Deathborne)))) then
     if Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 12"; end
   end
   -- ice_nova
@@ -261,7 +261,7 @@ local function Aoe()
     if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 20"; end
   end
   -- ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time|remaining_winters_chill&debuff.winters_chill.remains>travel_time
-  if S.IceLance:IsCastable() and EnemiesCount8ySplash >= 2 and (Player:BuffUp(S.FingersofFrostBuff) or FrozenRemains() > S.IceLance:TravelTime() or Target:DebuffStack(S.WintersChillDebuff) > 1 and Target:DebuffRemains(S.WintersChillDebuff) > S.IceLance:TravelTime()) then
+  if S.IceLance:IsCastable() and EnemiesCount8ySplash >= 2 and (Player:BuffUpP(S.FingersofFrostBuff) or FrozenRemains() > S.IceLance:TravelTime() or Target:DebuffStack(S.WintersChillDebuff) > 1 and Target:DebuffRemains(S.WintersChillDebuff) > S.IceLance:TravelTime()) then
     if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 22"; end
   end
   -- radiant_spark,if=soulbind.combat_meditation
@@ -315,7 +315,7 @@ end
 
 local function Single()
   -- flurry,if=(remaining_winters_chill=0|debuff.winters_chill.down)&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(!conduit.ire_of_the_ascended|cooldown.radiant_spark.remains|runeforge.freezing_winds)|prev_gcd.1.radiant_spark|buff.fingers_of_frost.react=0&(debuff.mirrors_of_torment.up|buff.freezing_winds.up|buff.expanded_potential.react)))
-  if S.Flurry:IsCastable() and (Target:DebuffDown(S.WintersChillDebuff) and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:IsCasting(S.GlacialSpike) or Player:IsCasting(S.Frostbolt) and (not S.IreOfTheAscended:ConduitEnabled() or S.RadiantSpark:CooldownRemains() > 0 or FreezingWindsEquipped) or Player:IsCasting(S.RadiantSpark) or Player:BuffDown(S.FingersofFrostBuff) and (Target:DebuffUp(S.MirrorsofTorment) or Player:BuffUp(S.FreezingWindsBuff) or Player:BuffUp(S.ExpandedPotentialBuff))))) then
+  if S.Flurry:IsCastable() and (Target:DebuffDown(S.WintersChillDebuff) and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:IsCasting(S.GlacialSpike) or Player:IsCasting(S.Frostbolt) and (not S.IreOfTheAscended:ConduitEnabled() or S.RadiantSpark:CooldownRemains() > 0 or FreezingWindsEquipped) or Player:IsCasting(S.RadiantSpark) or Player:BuffDownP(S.FingersofFrostBuff) and (Target:DebuffUp(S.MirrorsofTorment) or Player:BuffUp(S.FreezingWindsBuff) or Player:BuffUp(S.ExpandedPotentialBuff))))) then
     if Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry single 2"; end
   end
   -- frozen_orb
@@ -327,7 +327,7 @@ local function Single()
     if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm single 6"; end
   end
   -- ice_lance,if=talent.splitting_ice&talent.chain_reaction&buff.fingers_of_frost.react=buff.fingers_of_frost.max_stack
-  if S.IceLance:IsCastable() and (S.SplittingIce:IsAvailable() and S.ChainReaction:IsAvailable() and Player:BuffStack(S.FingersofFrostBuff) == 2) then
+  if S.IceLance:IsCastable() and (S.SplittingIce:IsAvailable() and S.ChainReaction:IsAvailable() and Player:BuffStackP(S.FingersofFrostBuff) == 2) then
     if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single 7"; end
   end
   -- frostbolt,if=runeforge.deaths_fathom&(runeforge.cold_front|runeforge.slick_ice)&buff.deathborne.remains>cast_time+travel_time&active_enemies>=2
@@ -351,7 +351,7 @@ local function Single()
     if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt single 16"; end
   end
   -- ice_lance,if=remaining_winters_chill&remaining_winters_chill>buff.fingers_of_frost.react&debuff.winters_chill.remains>travel_time
-  if S.IceLance:IsCastable() and (Target:DebuffUp(S.WintersChillDebuff) and Target:DebuffStack(S.WintersChillDebuff) > num(Player:BuffUp(S.FingersofFrostBuff)) and Target:DebuffRemains(S.WintersChillDebuff) > S.IceLance:TravelTime()) then
+  if S.IceLance:IsCastable() and (Target:DebuffUp(S.WintersChillDebuff) and Target:DebuffStack(S.WintersChillDebuff) > num(Player:BuffUpP(S.FingersofFrostBuff)) and Target:DebuffRemains(S.WintersChillDebuff) > S.IceLance:TravelTime()) then
     if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single 18"; end
   end
   -- ice_nova
@@ -363,11 +363,11 @@ local function Single()
     if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 22"; end
   end
   -- radiant_spark,if=buff.brain_freeze.react&talent.glacial_spike&conduit.ire_of_the_ascended&buff.icicles.stack>=4
-  if S.RadiantSpark:IsCastable() and (Player:BuffUp(S.BrainFreezeBuff)and S.GlacialSpike:IsAvailable() and S.IreOfTheAscended:ConduitEnabled() and Player:BuffStack(S.IciclesBuff) >= 4) then
+  if S.RadiantSpark:IsCastable() and (Player:BuffUp(S.BrainFreezeBuff)and S.GlacialSpike:IsAvailable() and S.IreOfTheAscended:ConduitEnabled() and Player:BuffStackP(S.IciclesBuff) >= 4) then
     if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 24"; end
   end
   -- ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time
-  if S.IceLance:IsCastable() and (Player:BuffUp(S.FingersofFrostBuff) or FrozenRemains() > S.IceLance:TravelTime()) then
+  if S.IceLance:IsCastable() and (Player:BuffUpP(S.FingersofFrostBuff) or FrozenRemains() > S.IceLance:TravelTime()) then
     if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single 26"; end
   end
   -- ebonbolt

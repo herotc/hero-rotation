@@ -280,9 +280,9 @@ FrostOldSpellCooldownRemains = HL.AddCoreOverride("Spell.CooldownRemains",
 , 64)
 
 local FrostOldPlayerBuffStack
-FrostOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffStack",
+FrostOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffStackP",
   function (self, Spell, AnyCaster, Offset)
-    local BaseCheck = FrostOldPlayerBuffStack(self, Spell, AnyCaster, Offset)
+    local BaseCheck = Player:BuffStack(Spell)
     if Spell == SpellFrost.IciclesBuff then
       return self:IsCasting(SpellFrost.GlacialSpike) and 0 or math.min(BaseCheck + (self:IsCasting(SpellFrost.Frostbolt) and 1 or 0), 5)
     elseif Spell == SpellFrost.GlacialSpikeBuff then
@@ -305,13 +305,13 @@ FrostOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffStack",
   end
 , 64)
 
-local FrostOldPlayerBuffStack
-FrostOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffUp",
+local FrostOldPlayerBuffUp
+FrostOldPlayerBuffUp = HL.AddCoreOverride("Player.BuffUpP",
   function (self, Spell, AnyCaster, Offset)
-    local BaseCheck = FrostOldPlayerBuffStack(self, Spell, AnyCaster, Offset)
+    local BaseCheck = Player:BuffUp(Spell)
     if Spell == SpellFrost.FingersofFrostBuff then
       if SpellFrost.IceLance:InFlight() then
-        return Player:BuffStack(self) >= 1
+        return Player:BuffStack(Spell) >= 1
       else
         return BaseCheck
       end
@@ -321,13 +321,13 @@ FrostOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffUp",
   end
 , 64)
 
-local FrostOldPlayerBuffStack
-FrostOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffDown",
+local FrostOldPlayerBuffDown
+FrostOldPlayerBuffDown = HL.AddCoreOverride("Player.BuffDownP",
   function (self, Spell, AnyCaster, Offset)
-    local BaseCheck = FrostOldPlayerBuffStack(self, Spell, AnyCaster, Offset)
+    local BaseCheck = Player:BuffDown(Spell)
     if Spell == SpellFrost.FingersofFrostBuff then
       if SpellFrost.IceLance:InFlight() then
-        return Player:BuffStack(self) == 0
+        return Player:BuffStack(Spell) == 0
       else
         return BaseCheck
       end
