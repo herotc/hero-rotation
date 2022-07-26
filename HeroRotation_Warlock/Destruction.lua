@@ -187,21 +187,23 @@ local function CDs()
   if S.DarkSoulInstability:IsCastable() and (InfernalTime() > 0 or S.SummonInfernal:CooldownRemains() > FightRemains) then
     if Cast(S.DarkSoulInstability, Settings.Destruction.OffGCDasOffGCD.DarkSoulInstability) then return "dark_soul_instability cds 6"; end
   end
-  -- potion,if=pet.infernal.active
-  if Settings.Commons.Enabled.Potions and I.PotionofSpectralIntellect:IsReady() and InfernalTime() > 0 then
-    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 8"; end
-  end
-  -- berserking,if=pet.infernal.active
-  if S.Berserking:IsCastable() and (InfernalTime() > 0) then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 10"; end
-  end
-  -- blood_fury,if=pet.infernal.active
-  if S.BloodFury:IsCastable() and (InfernalTime() > 0) then
-    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 12"; end
-  end
-  -- fireblood,if=pet.infernal.active
-  if S.Fireblood:IsCastable() and InfernalTime() > 0 then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 14"; end
+  if InfernalTime() > 0 then
+    -- potion,if=pet.infernal.active
+    if Settings.Commons.Enabled.Potions and I.PotionofSpectralIntellect:IsReady() then
+      if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 8"; end
+    end
+    -- berserking,if=pet.infernal.active
+    if S.Berserking:IsCastable() then
+      if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 10"; end
+    end
+    -- blood_fury,if=pet.infernal.active
+    if S.BloodFury:IsCastable() then
+      if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 12"; end
+    end
+    -- fireblood,if=pet.infernal.active
+    if S.Fireblood:IsCastable() then
+      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 14"; end
+    end
   end
   -- use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up
   -- use_item,name=scars_of_fraternal_strife,if=buff.scars_of_fraternal_strife_4.up&pet.infernal.active
@@ -222,6 +224,10 @@ local function Aoe()
   -- rain_of_fire,if=pet.infernal.active&(!cooldown.havoc.ready|active_enemies>3)
   if S.RainofFire:IsReady() and Player:SoulShardsP() >= 3 and (InfernalTime() > 0 and (S.Havoc:CooldownRemains() > 0 or EnemiesCount8ySplash > 3)) then
     if Cast(S.RainofFire, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "rain_of_fire aoe 2"; end
+  end
+  -- rain_of_fire,if=set_bonus.tier28_4pc
+  if S.RainofFire:IsReady() and Player:SoulShardsP() >= 3 and (Player:HasTier(28, 4)) then
+    if Cast(S.RainofFire, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "rain_of_fire aoe 3"; end
   end
   -- soul_rot
   if S.SoulRot:IsCastable() then
@@ -326,6 +332,10 @@ local function Havoc()
   if S.ChaosBolt:IsReady() and Player:SoulShardsP() >= 2 and (S.ChaosBolt:CastTime() < VarHavocRemains) then
     if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt havoc 12"; end
   end
+  -- rain_of_fire,if=set_bonus.tier28_4pc&active_enemies>1&talent.inferno.enabled
+  if S.RainofFire:IsReady() and Player:SoulShardsP() >= 3 and (Player:HasTier(28, 4) and EnemiesCount8ySplash > 1 and S.Inferno:IsAvailable()) then
+    if Cast(S.RainofFire, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "rain_of_fire havoc 13"; end
+  end
   -- shadowburn
   if S.Shadowburn:IsReady() then
     if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn havoc 14"; end
@@ -387,8 +397,8 @@ local function APL()
     if S.Cataclysm:IsReady() then
       if Cast(S.Cataclysm, nil, nil, not Target:IsInRange(40)) then return "cataclysm main 6"; end
     end
-    -- call_action_list,name=aoe,if=active_enemies>2
-    if EnemiesCount8ySplash > 2 then
+    -- call_action_list,name=aoe,if=active_enemies>2-set_bonus.tier28_4pc
+    if EnemiesCount8ySplash > (2 - num(Player:HasTier(28, 4))) then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     -- soul_fire,cycle_targets=1,if=refreshable&soul_shard<=4&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>remains)
