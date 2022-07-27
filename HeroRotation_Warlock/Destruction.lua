@@ -350,7 +350,7 @@ end
 local function APL()
   -- Unit Update
   Enemies40y = Player:GetEnemiesInRange(40)
-  Enemies8ySplash = Target:GetEnemiesInSplashRange(8)
+  Enemies8ySplash = Target:GetEnemiesInSplashRange(12)
   if AoEON() then
     EnemiesCount40y = #Enemies40y
     EnemiesCount8ySplash = #Enemies8ySplash
