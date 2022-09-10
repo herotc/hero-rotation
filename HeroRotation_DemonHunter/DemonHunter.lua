@@ -57,6 +57,8 @@ Spell.DemonHunter.Commons = {
   AcquiredAxeBuff                       = Spell(368656),
   AcquiredSwordBuff                     = Spell(368657),
   AcquiredWandBuff                      = Spell(368654),
+  -- Other Item Effects
+  TemptationBuff                        = Spell(234143),
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -139,6 +141,9 @@ Item.DemonHunter.Commons = {
   CacheofAcquiredTreasures         = Item(188265, {13, 14}),
   PulsatingStoneheart              = Item(178825, {13, 14}),
   DarkmoonDeckIndomitable          = Item(173096, {13, 14}),
+  -- Other On-Use Items
+  RingofCollapsingFutures          = Item(142173, {11, 12}),
+  WrapsofElectrostaticPotential    = Item(169069, 9),
 }
 
 Item.DemonHunter.Vengeance = MergeTableByKey(Item.DemonHunter.Commons, {

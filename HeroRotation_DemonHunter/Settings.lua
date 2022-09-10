@@ -25,6 +25,7 @@ HR.GUISettings.APL.DemonHunter = {
       Potions = "Suggested",
       Covenant = "Suggested",
       Trinkets = "Suggested",
+      Items = "Suggested",
       FelRush = "Suggested",
       Metamorphosis = "Suggested",
     },

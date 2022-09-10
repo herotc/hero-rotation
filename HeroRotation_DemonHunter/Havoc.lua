@@ -31,6 +31,8 @@ local I = Item.DemonHunter.Havoc
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.RingofCollapsingFutures:ID(),
+  I.WrapsofElectrostaticPotential:ID(),
 }
 
 -- Trinket Item Objects
@@ -200,33 +202,41 @@ local function Cooldown()
   if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or FightRemains < 60) then
     if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldown 6"; end
   end
+  -- use_item,name=wraps_of_electrostatic_potential
+  if I.WrapsofElectrostaticPotential:IsEquippedAndReady() then
+    if Cast(I.WrapsofElectrostaticPotential, nil, Settings.Commons.DisplayStyle.Items) then return "wraps_of_electrostatic_potential cooldown 8"; end
+  end
+  -- use_item,name=ring_of_collapsing_futures,if=buff.temptation.down|fight_remains<30
+  if I.RingofCollapsingFutures:IsEquippedAndReady() and (Player:BuffDown(S.TemptationBuff) or FightRemains < 30) then
+    if Cast(I.RingofCollapsingFutures, nil, Settings.Commons.DisplayStyle.Items) then return "ring_of_collapsing_futures cooldown 10"; end
+  end
   -- use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up&((active_enemies=desired_targets&raid_event.adds.in>60|active_enemies>desired_targets)&(active_enemies<3|cooldown.eye_beam.remains<20)|fight_remains<25)
   if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredAxeBuff) and ((EnemiesCount8 >= 1) and (EnemiesCount8 < 3 or S.EyeBeam:CooldownRemains() < 20) or FightRemains < 25)) then
-    if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures cooldown 7"; end
+    if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures cooldown 12"; end
   end
   -- use_items,slots=trinket1,if=variable.trinket_sync_slot=1&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.1.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready)|!variable.trinket_sync_slot
   if trinket1:IsReady() and (VarTrinketSyncSlot == 1 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > ((FightRemains > trinket1:Cooldown() / 2) and FightRemains or trinket1:Cooldown() / 2)) or FightRemains <= 20) or (VarTrinketSyncSlot == 2 and not trinket2:IsReady()) or VarTrinketSyncSlot == 0) then
-    if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 cooldown 8"; end
+    if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 cooldown 14"; end
   end
   -- use_items,slots=trinket2,if=variable.trinket_sync_slot=2&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.2.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=1&!trinket.1.cooldown.ready)|!variable.trinket_sync_slot
   if trinket2:IsReady() and (VarTrinketSyncSlot == 2 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > ((FightRemains > trinket2:Cooldown() / 2) and FightRemains or trinket2:Cooldown() / 2)) or FightRemains <= 20) or (VarTrinketSyncSlot == 1 and not trinket1:IsReady()) or VarTrinketSyncSlot == 0) then
-    if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 cooldown 10"; end
+    if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 cooldown 16"; end
   end
   -- sinful_brand,if=!dot.sinful_brand.ticking&(!runeforge.agony_gaze|(cooldown.eye_beam.remains<=gcd&fury>=30))&(!cooldown.metamorphosis.up|active_enemies=1)
   if S.SinfulBrand:IsCastable() and (Target:DebuffDown(S.SinfulBrandDebuff) and ((not AgonyGazeEquipped) or (S.EyeBeam:CooldownRemains() <= Player:GCD() and Player:Fury() >= 30)) and (S.Metamorphosis:CooldownDown() or EnemiesCount8 == 1)) then
-    if Cast(S.SinfulBrand, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand cooldown 12"; end
+    if Cast(S.SinfulBrand, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand cooldown 18"; end
   end
   -- the_hunt,if=!talent.demonic.enabled&!variable.waiting_for_momentum&!variable.pooling_for_meta|buff.furious_gaze.up
   if S.TheHunt:IsCastable() and ((not S.Demonic:IsAvailable()) and (not VarWaitingForMomentum) and (not VarPoolingForMeta) or Player:BuffUp(S.FuriousGazeBuff)) then
-    if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt cooldown 14"; end
+    if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt cooldown 20"; end
   end
   -- elysian_decree,if=(active_enemies>desired_targets|raid_event.adds.in>30)
   if S.ElysianDecree:IsCastable() and (EnemiesCount8 > 0) then
-    if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "elysian_decree cooldown 16"; end
+    if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "elysian_decree cooldown 22"; end
   end
   -- fleshcraft,if=soulbind.volatile_solvent&!buff.volatile_solvent_humanoid.up,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
   if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft cooldown 18"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft cooldown 24"; end
   end
 end
 
