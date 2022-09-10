@@ -24,6 +24,7 @@ HR.GUISettings.APL.Priest = {
     DisplayStyle = {
       Potions = "Suggested",
       Trinkets = "Suggested",
+      Items = "Suggested",
       Covenant = "Suggested",
     },
     GCDasOffGCD = {

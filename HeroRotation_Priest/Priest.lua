@@ -65,6 +65,8 @@ Spell.Priest.Commons = {
   VolatileSolventHumanBuff              = Spell(323491),
   -- Trinket Effects
   ScarsofFraternalStrifeBuff4           = Spell(368638),
+  -- Other Item Effects
+  TemptationBuff                        = Spell(234143),
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -160,6 +162,8 @@ Item.Priest.Commons = {
   SoullettingRuby                  = Item(178809, {13, 14}),
   SunbloodAmethyst                 = Item(178826, {13, 14}),
   TheFirstSigil                    = Item(188271, {13, 14}),
+  -- Other On-Use Items
+  RingofCollapsingFutures          = Item(142173, {11, 12}),
 }
 
 Item.Priest.Shadow = MergeTableByKey(Item.Priest.Commons, {

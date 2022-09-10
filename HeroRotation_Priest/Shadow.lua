@@ -36,6 +36,7 @@ local OnUseExcludes = {
   I.EmpyrealOrdinance:ID(),
   I.InscrutableQuantumDevice:ID(),
   I.MacabreSheetMusic:ID(),
+  I.RingofCollapsingFutures:ID(),
   I.ShadowedOrbofTorment:ID(),
   I.SinfulGladiatorsBadgeofFerocity:ID(),
   I.SoullettingRuby:ID(),
@@ -594,6 +595,10 @@ local function APL()
         if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 28"; end
       end
     end
+    -- use_item,name=hyperthread_wristwraps,if=0
+    -- Intention is to disable use of these entirely, so we'll ignore it.
+    -- use_item,name=ring_of_collapsing_futures,if=(buff.temptation.stack<1&target.time_to_die>60)|target.time_to_die<60
+    if I.RingofCollapsingFutures:IsEquippedAndReady() and ((Player:BuffDown(S.TemptationBuff) and FightRemains > 60) or FightRemains < 60)
     -- call_action_list,name=cwc
     if (Player:IsChanneling()) then
       local ShouldReturn = Cwc(); if ShouldReturn then return ShouldReturn; end
