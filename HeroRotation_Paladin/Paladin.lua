@@ -80,6 +80,10 @@ Spell.Paladin.Commons = {
   VolatileSolventHumanBuff              = Spell(323491),
   -- Buffs
   DivinePurposeBuff                     = Spell(223819),
+  ScarsofFraternalStrifeBuff4           = Spell(368638),
+  TemptationBuff                        = Spell(234143),
+  -- Debuffs
+  CruelGarroteDebuff                    = Spell(230011),
   -- Legendary Effects
   DivineResonanceBuff                   = Spell(355455),
   FinalVerdictBuff                      = Spell(337228),
@@ -160,10 +164,12 @@ Item.Paladin.Commons = {
   AspirantsBadgeCosmic                  = Item(186906, {13, 14}),
   AspirantsBadgeSinful                  = Item(175884, {13, 14}),
   AspirantsBadgeUnchained               = Item(185161, {13, 14}),
+  BloodstainedHandkerchief              = Item(142159, {13, 14}),
   ChainsofDomination                    = Item(188252, {13, 14}),
   DarkmoonDeckVoracity                  = Item(173087, {13, 14}),
   DreadfireVessel                       = Item(184030, {13, 14}),
   EarthbreakersImpact                   = Item(188264, {13, 14}),
+  EnforcersStunGrenade                  = Item(110017, {13, 14}),
   FaultyCountermeasure                  = Item(137539, {13, 14}),
   GiantOrnamentalPearl                  = Item(137369, {13, 14}),
   GladiatorsBadgeCosmic                 = Item(186866, {13, 14}),
@@ -175,14 +181,18 @@ Item.Paladin.Commons = {
   MacabreSheetMusic                     = Item(184024, {13, 14}),
   MemoryofPastSins                      = Item(184025, {13, 14}),
   OverwhelmingPowerCrystal              = Item(179342, {13, 14}),
+  RemoteGuidanceDevice                  = Item(169769, {13, 14}),
   SalvagedFusionAmplifier               = Item(186432, {13, 14}),
   ScarsofFraternalStrife                = Item(188253, {13, 14}),
   SkulkersWing                          = Item(184016, {13, 14}),
   SpareMeatHook                         = Item(178751, {13, 14}),
   TheFirstSigil                         = Item(188271, {13, 14}),
+  ToeKneesPromise                       = Item(142164, {13, 14}),
   WindscarWhetstone                     = Item(137486, {13, 14}),
   -- Other On-Use Items
+  AnodizedDeflectors                    = Item(168978, 9),
   GaveloftheFirstArbiter                = Item(189862),
+  RingofCollapsingFutures               = Item(142173, {11, 12}),
 }
 
 Item.Paladin.Protection = MergeTableByKey(Item.Paladin.Commons, {
