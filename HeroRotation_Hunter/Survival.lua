@@ -51,11 +51,19 @@ end, "COVENANT_CHOSEN")
 local equip = Player:GetEquipment()
 local trinket1 = Item(0)
 local trinket2 = Item(0)
+local finger1 = Item(0)
+local finger2 = Item(0)
 if equip[13] then
   trinket1 = Item(equip[13])
 end
 if equip[14] then
   trinket2 = Item(equip[14])
+end
+if equip[11] then
+  finger1 = Item(equip[11])
+end
+if equip[12] then
+  finger2 = Item(equip[12])
 end
 
 -- Legendaries
@@ -68,11 +76,19 @@ HL:RegisterForEvent(function()
   equip = Player:GetEquipment()
   trinket1 = Item(0)
   trinket2 = Item(0)
+  finger1 = Item(0)
+  finger2 = Item(0)
   if equip[13] then
     trinket1 = Item(equip[13])
   end
   if equip[14] then
     trinket2 = Item(equip[14])
+  end
+  if equip[11] then
+    finger1 = Item(equip[11])
+  end
+  if equip[12] then
+    finger2 = Item(equip[12])
   end
   NessingwarysTrappingEquipped = Player:HasLegendaryEquipped(67)
   SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
@@ -165,6 +181,11 @@ end
 -- Note: next_wi_bomb.volatile, focus checks, and active_enemies checked before CastTargetIf
 local function EvaluateTargetIfSerpentStingCleave3(TargetUnit)
   return (TargetUnit:DebuffDown(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 15)
+end
+
+-- if=refreshable&target.time_to_die>15
+local function EvaluateTargetIfSerpentStingCleave4(TargetUnit)
+  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 15)
 end
 
 -- if=full_recharge_time<gcd&focus+cast_regen<focus.max
@@ -388,9 +409,20 @@ local function Trinkets()
     and (trinket2:ID() ~= I.CacheofAcquiredTreasures:ID() or EnemyCount8ySplash < 2 and Player:BuffUp(S.AcquiredWandBuff) or EnemyCount8ySplash > 1 and Player:BuffDown(S.AcquiredWandBuff))) then
       if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 trinkets 4"; end
   end
-  -- use_item,name=jotungeirr_destinys_call
-  if I.Jotungeirr:IsEquippedAndReady() then
-    if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call trinkets 6"; end
+end
+
+local function OtherOnUse()
+  -- use_items,slots=finger1
+  if finger1:IsEquippedAndReady() then
+    if Cast(finger1, nil, Settings.Commons.DisplayStyle.Items) then return "finger1 other_on_use 2"; end
+  end
+  -- use_items,slots=finger2
+  if finger2:IsEquippedAndReady() then
+    if Cast(finger2, nil, Settings.Commons.DisplayStyle.Items) then return "finger2 other_on_use 4"; end
+  end
+  -- use_item,name=jotungeirr_destinys_call,if=cooldown.coordinated_assault.remains>75|time_to_die<30
+  if I.Jotungeirr:IsEquippedAndReady() and (S.CoordinatedAssault:CooldownRemains() > 75 or FightRemains < 30) then
+    if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call other_on_use 6"; end
   end
 end
 
@@ -745,10 +777,18 @@ local function Cleave()
   if S.CoordinatedAssault:IsCastable() then
     if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault) then return "coordinated_assault cleave 8"; end
   end
+  -- carve,if=cooldown.wildfire_bomb.full_recharge_time>5&spell_targets>4
+  if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > 5 and EnemyCount8ySplash > 4) then
+    if Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "carve cleave 9"; end
+  end
+  -- serpent_sting,target_if=min:remains,if=refreshable&target.time_to_die>15&next_wi_bomb.pheromone&cooldown.wildfire_bomb.full_recharge_time>gcd
+  if S.SerpentSting:IsReady() and (S.PheromoneBomb:IsCastable() and S.WildfireBomb:FullRechargeTime() > Player:GCD()) then
+    if Everyone.CastTargetIf(S.SerpentSting, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingCleave4, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting cleave 10"; end
+  end
   -- wildfire_bomb,if=full_recharge_time<gcd|buff.mad_bombardier.up|target.time_to_die<5
   if S.WildfireBomb:FullRechargeTime() < Player:GCD() or Player:BuffUp(S.MadBombardierBuff) or FightRemains < 5 then
     if S.ShrapnelBomb:IsCastable() then
-      if Cast(S.ShrapnelBomb, nil, nil, not Target:IsSpellInRange(S.ShrapnelBomb)) then return "shrapnel_bomb cleave 10"; end
+      if Cast(S.ShrapnelBomb, nil, nil, not Target:IsSpellInRange(S.ShrapnelBomb)) then return "shrapnel_bomb cleave 11"; end
     end
     if S.PheromoneBomb:IsCastable() then
       if Cast(S.PheromoneBomb, nil, nil, not Target:IsSpellInRange(S.PheromoneBomb)) then return "pheromone_bomb cleave 12"; end
@@ -932,8 +972,12 @@ local function APL()
     -- newfound_resolve,if=soulbind.newfound_resolve&(buff.resonating_arrow.up|cooldown.resonating_arrow.remains>10|target.time_to_die<16)
     -- Unable to handle player facing
     -- call_action_list,name=trinkets,if=covenant.kyrian&cooldown.coordinated_assault.remains&cooldown.resonating_arrow.remains|!covenant.kyrian&cooldown.coordinated_assault.remains
-    if (CovenantID == 1 and S.CoordinatedAssault:CooldownRemains() > 0 and S.ResonatingArrow:CooldownRemains() > 0 or CovenantID ~= 1 and S.CoordinatedAssault:CooldownRemains() > 0) then
+    if Settings.Commons.Enabled.Trinkets and (CovenantID == 1 and S.CoordinatedAssault:CooldownRemains() > 0 and S.ResonatingArrow:CooldownRemains() > 0 or CovenantID ~= 1 and S.CoordinatedAssault:CooldownRemains() > 0) then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=other_on_use
+    if Settings.Commons.Enabled.Trinkets then
+      local ShouldReturn = OtherOnUse(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cds
     if (CDsON()) then
