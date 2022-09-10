@@ -68,6 +68,9 @@ Spell.Druid.Commons = {
   VolatileSolvent                       = Spell(323074),
   -- Legendary Effects
   OathoftheElderDruidBuff               = Spell(338643),
+  -- Trinket Effects
+  ScarsofFraternalStrifeBuff4           = Spell(368638),
+  TormentedInsightBuff                  = Spell(355321),
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -202,6 +205,7 @@ Item.Druid.Commons = {
   EmpyrealOrdinance                     = Item(180117, {13, 14}),
   InscrutableQuantumDevice              = Item(179350, {13, 14}),
   InstructorsDivineBell                 = Item(184842, {13, 14}),
+  ScarsofFraternalStrife                = Item(188253, {13, 14}),
   ShadowedOrbofTorment                  = Item(186428, {13, 14}),
   SoullettingRuby                       = Item(178809, {13, 14}),
   TheFirstSigil                         = Item(188271, {13, 14}),
