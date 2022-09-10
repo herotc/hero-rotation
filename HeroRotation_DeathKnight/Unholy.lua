@@ -366,9 +366,13 @@ local function Cooldowns()
   if S.SoulReaper:IsReady() and (EnemiesMeleeCount >= 2 and (EnemiesMeleeCount <= 3 or Player:HasTier(28, 4) and EnemiesMeleeCount <= 5 and (Pet:BuffUp(S.DarkTransformation) or ReanimatedShamblerEquipped) and (Player:BuffDown(S.DeathAndDecayBuff) or CovenantID == 3))) then
     if Everyone.CastTargetIf(S.SoulReaper, EnemiesMelee, "min", EvaluateTargetIfFilterSoulReaper, EvaluateTargetIfSoulReaper, not Target:IsSpellInRange(S.SoulReaper)) then return "soul_reaper cooldowns 7"; end
   end
+  -- soul_reaper_gavel,if=equipped.gavel_of_the_first_arbiter&Target.time_to_pct_35>5
+  if I.GaveloftheFirstArbiter:IsEquippedAndReady() and (Target:TimeToX(35) > 5) then
+    if Cast(I.GaveloftheFirstArbiter, nil, Settings.Commons.DisplayStyle.Items) then return "soul_reaper_gavel cooldowns 8"; end
+  end
   -- unholy_blight,if=variable.st_planning&(cooldown.apocalypse.remains_expected<7|cooldown.apocalypse.remains_expected>15)&(cooldown.dark_transformation.remains<gcd|buff.dark_transformation.up)
   if S.UnholyBlight:IsReady() and (VarSTPlanning and (S.Apocalypse:CooldownRemains() < 7 or S.Apocalypse:CooldownRemains() > 15) and (S.DarkTransformation:CooldownRemains() < Player:GCD() or Pet:BuffUp(S.DarkTransformation))) then
-    if Cast(S.UnholyBlight, Settings.Unholy.GCDasOffGCD.UnholyBlight, nil, not Target:IsInRange(8)) then return "unholy_blight cooldowns 8"; end
+    if Cast(S.UnholyBlight, Settings.Unholy.GCDasOffGCD.UnholyBlight, nil, not Target:IsInRange(8)) then return "unholy_blight cooldowns 9"; end
   end
   -- unholy_blight,if=variable.adds_remain|fight_remains<21
   if S.UnholyBlight:IsReady() and (VarAddsRemain or HL.FilteredFightRemains(EnemiesMelee, "<", 21)) then
