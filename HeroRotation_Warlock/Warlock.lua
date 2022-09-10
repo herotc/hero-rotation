@@ -209,6 +209,8 @@ Item.Warlock.Commons = {
   TomeofMonstrousConstructions          = Item(186422, {13, 14}),
   UnchainedGladiatorsShackles           = Item(186980, {13, 14}),
   WakenersFrond                         = Item(181457, {13, 14}),
+  -- Other On-Use Items
+  NeuralSynapseEnhancer                 = Item(168973),
 }
 
 Item.Warlock.Affliction = MergeTableByKey(Item.Warlock.Commons, {

@@ -24,6 +24,7 @@ HR.GUISettings.APL.Warlock = {
     DisplayStyle = {
       Potions = "Suggested",
       Trinkets = "Suggested",
+      Items = "Suggested",
       Covenant = "Suggested",
     },
     HidePetSummon = false,

@@ -42,6 +42,7 @@ local OnUseExcludes = {
   I.GlyphofAssimilation:ID(),
   I.GrimEclipse:ID(),
   I.MoonlitPrism:ID(),
+  I.NeuralSynapseEnhancer:ID(),
   I.OverflowingAnimaCage:ID(),
   I.ResonantReservoir:ID(),
   I.ScarsofFraternalStrife:ID(),
@@ -417,6 +418,14 @@ local function DamageTrinkets()
   if I.UnchainedGladiatorsShackles:IsEquippedAndReady() then
     if Cast(I.UnchainedGladiatorsShackles, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(20)) then return "unchained_gladiators_shackles dmg 20"; end
   end
+  -- use_item,slot=trinket1,if=!trinket.1.has_use_buff
+  if trinket1:IsReady() and (not trinket1:TrinketHasUseBuff()) then
+    if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 dmg 22"; end
+  end
+  -- use_item,slot=trinket2,if=!trinket.2.has_use_buff
+  if trinket2:IsReady() and (not trinket2:TrinketHasUseBuff()) then
+    if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 dmg 24"; end
+  end
 end
 
 local function Trinkets()
@@ -461,6 +470,10 @@ local function Trinkets()
   -- use_item,slot=trinket2,if=trinket.2.has_use_buff&variable.use_buff_trinkets
   if trinket2:IsEquippedAndReady() and (trinket2:TrinketHasUseBuff() and VarUseBuffTrinkets) then
     if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 trinkets 12"; end
+  end
+  -- use_item,name=neural_synapse_enhancer,if=variable.buff_sync_cd>45|variable.use_buff_trinkets
+  if I.NeuralSynapseEnhancer:IsEquippedAndReady() and (VarBuffSyncCD > 45 or VarUseBuffTrinkets) then
+    if Cast(I.NeuralSynapseEnhancer, nil, Settings.Commons.DisplayStyle.Items) then return "neural_synapse_enhancer trinkets 14"; end
   end
   -- call_action_list,name=pure_damage_trinks,if=time>variable.first_tyrant_time&variable.buff_sync_cd>20
   if (HL.CombatTime() > VarFirstTyrantTime and VarBuffSyncCD > 20) then
