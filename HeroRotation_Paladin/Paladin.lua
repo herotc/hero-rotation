@@ -190,7 +190,7 @@ Item.Paladin.Commons = {
   ToeKneesPromise                       = Item(142164, {13, 14}),
   WindscarWhetstone                     = Item(137486, {13, 14}),
   -- Other On-Use Items
-  AnodizedDeflectors                    = Item(168978, 9),
+  AnodizedDeflectors                    = Item(168978),
   GaveloftheFirstArbiter                = Item(189862),
   RingofCollapsingFutures               = Item(142173, {11, 12}),
 }
