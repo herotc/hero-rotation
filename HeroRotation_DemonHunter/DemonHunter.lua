@@ -143,7 +143,7 @@ Item.DemonHunter.Commons = {
   DarkmoonDeckIndomitable          = Item(173096, {13, 14}),
   -- Other On-Use Items
   RingofCollapsingFutures          = Item(142173, {11, 12}),
-  WrapsofElectrostaticPotential    = Item(169069, 9),
+  WrapsofElectrostaticPotential    = Item(169069),
 }
 
 Item.DemonHunter.Vengeance = MergeTableByKey(Item.DemonHunter.Commons, {
