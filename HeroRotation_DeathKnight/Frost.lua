@@ -339,7 +339,7 @@ local function BosTicking()
   -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=buff.killing_machine.react
   if S.Obliterate:IsReady() and (Player:BuffUp(S.KillingMachineBuff)) then
     if UsingRazorice then
-      if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max" EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5)) then return "obliterate bosticking 5"; end
+      if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5)) then return "obliterate bosticking 5"; end
     else
       if Cast(S.Obliterate, nil, nil, not Target:IsInMeleeRange(5)) then return "obliterate bosticking 5 no_razorice"; end
     end
