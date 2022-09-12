@@ -87,6 +87,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   VoidEruption                          = Spell(228260), -- Splash, 10
   VoidformBuff                          = Spell(194249),
   -- Talents
+  AncientMadness                        = Spell(341240),
   Damnation                             = Spell(341374),
   FortressOfTheMind                     = Spell(193195),
   HungeringVoid                         = Spell(345218),
@@ -149,13 +150,15 @@ Item.Priest.Commons = {
   -- Potion
   PotionofSpectralIntellect        = Item(171352),
   -- Trinkets
-  ArchitectsIngenuityCore         = Item(188268, {13, 14}),
+  ArchitectsIngenuityCore          = Item(188268, {13, 14}),
   DarkmoonDeckPutrescence          = Item(173069, {13, 14}),
   DreadfireVessel                  = Item(184030, {13, 14}),
   EmpyrealOrdinance                = Item(180117, {13, 14}),
+  FleshrendersMeathook             = Item(110002, {13, 14}),
   GlyphofAssimilation              = Item(184021, {13, 14}),
   InscrutableQuantumDevice         = Item(179350, {13, 14}),
   MacabreSheetMusic                = Item(184024, {13, 14}),
+  MoonlitPrism                     = Item(137541, {13, 14}),
   ScarsofFraternalStrife           = Item(188253, {13, 14}),
   ShadowedOrbofTorment             = Item(186428, {13, 14}),
   SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14}),
@@ -163,6 +166,7 @@ Item.Priest.Commons = {
   SunbloodAmethyst                 = Item(178826, {13, 14}),
   TheFirstSigil                    = Item(188271, {13, 14}),
   -- Other On-Use Items
+  NeuralSynapseEnhancer            = Item(168973),
   RingofCollapsingFutures          = Item(142173, {11, 12}),
 }
 
