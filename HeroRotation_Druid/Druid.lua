@@ -62,13 +62,17 @@ Spell.Druid.Commons = {
   DeepAllegiance                        = Spell(341378),
   PreciseAlignment                      = Spell(340706),
   PustuleEruption                       = Spell(351094),
-  SavageCombatantBuff                   = Spell(340613), -- Needs verified
+  SavageCombatant                       = Spell(340609),
+  SavageCombatantBuff                   = Spell(340613),
   SuddenAmbushBuff                      = Spell(340698),
   TasteForBlood                         = Spell(340682),
   VolatileSolvent                       = Spell(323074),
   -- Legendary Effects
   OathoftheElderDruidBuff               = Spell(338643),
   -- Trinket Effects
+  AcquiredAxeBuff                       = Spell(368656),
+  AcquiredSwordBuff                     = Spell(368657),
+  AcquiredWandBuff                      = Spell(368654),
   ScarsofFraternalStrifeBuff4           = Spell(368638),
   TormentedInsightBuff                  = Spell(355321),
   -- Other
@@ -202,6 +206,7 @@ Item.Druid.Commons = {
   PotionofSpectralAgility               = Item(171270),
   PotionofSpectralIntellect             = Item(171273),
   -- Trinkets
+  CacheofAcquiredTreasures              = Item(188265, {13, 14}),
   EmpyrealOrdinance                     = Item(180117, {13, 14}),
   InscrutableQuantumDevice              = Item(179350, {13, 14}),
   InstructorsDivineBell                 = Item(184842, {13, 14}),
@@ -210,7 +215,10 @@ Item.Druid.Commons = {
   SoullettingRuby                       = Item(178809, {13, 14}),
   TheFirstSigil                         = Item(188271, {13, 14}),
   -- Other On-Use Items
-  Jotungeirr                            = Item(186404)
+  GaveloftheFirstArbiter                = Item(189862),
+  Jotungeirr                            = Item(186404),
+  RingofCollapsingFutures               = Item(142173),
+  WrapsofElectrostaticPotential         = Item(169069),
 }
 
 Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
