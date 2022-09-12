@@ -49,22 +49,10 @@ end, "COVENANT_CHOSEN")
 
 -- Trinket Item Objects
 local equip = Player:GetEquipment()
-local trinket1 = Item(0)
-local trinket2 = Item(0)
-local finger1 = Item(0)
-local finger2 = Item(0)
-if equip[13] then
-  trinket1 = Item(equip[13])
-end
-if equip[14] then
-  trinket2 = Item(equip[14])
-end
-if equip[11] then
-  finger1 = Item(equip[11])
-end
-if equip[12] then
-  finger2 = Item(equip[12])
-end
+local trinket1 = (equip[13]) and Item(equip[13]) or Item(0)
+local trinket2 = (equip[14]) and Item(equip[14]) or Item(0)
+local finger1 = (equip[11]) and Item(equip[11]) or Item(0)
+local finger2 = (equip[12]) and Item(equip[12]) or Item(0)
 
 -- Legendaries
 local NessingwarysTrappingEquipped = Player:HasLegendaryEquipped(67)
@@ -74,22 +62,10 @@ local RylakstalkersConfoundingEquipped = Player:HasLegendaryEquipped(79)
 -- Check when equipment changes
 HL:RegisterForEvent(function()
   equip = Player:GetEquipment()
-  trinket1 = Item(0)
-  trinket2 = Item(0)
-  finger1 = Item(0)
-  finger2 = Item(0)
-  if equip[13] then
-    trinket1 = Item(equip[13])
-  end
-  if equip[14] then
-    trinket2 = Item(equip[14])
-  end
-  if equip[11] then
-    finger1 = Item(equip[11])
-  end
-  if equip[12] then
-    finger2 = Item(equip[12])
-  end
+  trinket1 = (equip[13]) and Item(equip[13]) or Item(0)
+  trinket2 = (equip[14]) and Item(equip[14]) or Item(0)
+  finger1 = (equip[11]) and Item(equip[11]) or Item(0)
+  finger2 = (equip[12]) and Item(equip[12]) or Item(0)
   NessingwarysTrappingEquipped = Player:HasLegendaryEquipped(67)
   SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
   RylakstalkersConfoundingEquipped = Player:HasLegendaryEquipped(79)

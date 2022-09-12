@@ -37,14 +37,10 @@ local OnUseExcludes = {
 
 -- Trinket Item Objects
 local equip = Player:GetEquipment()
-local trinket1 = Item(0)
-local trinket2 = Item(0)
-if equip[13] then
-  trinket1 = Item(equip[13])
-end
-if equip[14] then
-  trinket2 = Item(equip[14])
-end
+local trinket1 = (equip[13]) and Item(equip[13]) or Item(0)
+local trinket2 = (equip[14]) and Item(equip[14]) or Item(0)
+local finger1 = (equip[11]) and Item(equip[11]) or Item(0)
+local finger2 = (equip[12]) and Item(equip[12]) or Item(0)
 
 -- Rotation Var
 local BossFightRemains = 11111
@@ -84,14 +80,10 @@ end, "COVENANT_CHOSEN")
 
 HL:RegisterForEvent(function()
   equip = Player:GetEquipment()
-  trinket1 = Item(0)
-  trinket2 = Item(0)
-  if equip[13] then
-    trinket1 = Item(equip[13])
-  end
-  if equip[14] then
-    trinket2 = Item(equip[14])
-  end
+  trinket1 = (equip[13]) and Item(equip[13]) or Item(0)
+  trinket2 = (equip[14]) and Item(equip[14]) or Item(0)
+  finger1 = (equip[11]) and Item(equip[11]) or Item(0)
+  finger2 = (equip[12]) and Item(equip[12]) or Item(0)
   SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
   EagletalonsTrueFocusEquipped = Player:HasLegendaryEquipped(74)
   SurgingShotsEquipped = Player:HasLegendaryEquipped(75)
@@ -230,6 +222,17 @@ local function Trinkets()
     if TrinketToUse then
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
+  end
+end
+
+local function OtherOnUse()
+  -- use_items,slots=finger1
+  if finger1:IsEquippedAndReady() then
+    if Cast(finger1, nil, Settings.Commons.DisplayStyle.Items) then return "finger1 other_on_use 2"; end
+  end
+  -- use_items,slots=finger2
+  if finger2:IsEquippedAndReady() then
+    if Cast(finger2, nil, Settings.Commons.DisplayStyle.Items) then return "finger2 other_on_use 4"; end
   end
 end
 
@@ -539,6 +542,10 @@ local function APL()
     -- call_action_list,name=trinkets,if=covenant.kyrian&cooldown.trueshot.remains&cooldown.resonating_arrow.remains|!covenant.kyrian&cooldown.trueshot.remains
     if (Settings.Commons.Enabled.Trinkets and (CovenantID == 1 and not S.Trueshot:CooldownUp() and (not S.ResonatingArrow:CooldownUp()) or CovenantID ~= 1 and not S.Trueshot:CooldownUp())) then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=other_on_use
+    if Settings.Commons.Enabled.Trinkets then
+      local ShouldReturn = OtherOnUse(); if ShouldReturn then return ShouldReturn; end
     end
     -- newfound_resolve,if=soulbind.newfound_resolve&(buff.resonating_arrow.up|cooldown.resonating_arrow.remains>10|fight_remains<16
     -- APL Comment: Delay facing your doubt until you have put Resonating Arrow down, or if the cooldown is too long to delay facing your Doubt. If none of these conditions are able to met within the 10 seconds leeway, the sim faces your Doubt automatically.

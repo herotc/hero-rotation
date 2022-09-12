@@ -57,13 +57,23 @@ HL:RegisterForEvent(function()
   CovenantID = Player:CovenantID()
 end, "COVENANT_CHOSEN")
 
+-- Usable Item Objects
+local equip = Player:GetEquipment()
+local finger1 = (equip[11]) and Item(equip[11]) or Item(0)
+local finger2 = (equip[12]) and Item(equip[12]) or Item(0)
+
 -- Legendaries
 local ElderAntlersEquipped = Player:HasLegendaryEquipped(254)
 local NessingwarysEquipped = Player:HasLegendaryEquipped(67)
 local SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
 local QaplaEredunWarOrderEquipped = Player:HasLegendaryEquipped(72)
 local PouchofRazorFragmentsEquipped = Player:HasLegendaryEquipped(255)
+
+-- Check for equipment changes
 HL:RegisterForEvent(function()
+  equip = Player:Equipment()
+  finger1 = (equip[11]) and Item(equip[11]) or Item(0)
+  finger2 = (equip[12]) and Item(equip[12]) or Item(0)
   ElderAntlersEquipped = Player:HasLegendaryEquipped(254)
   NessingwarysEquipped = Player:HasLegendaryEquipped(67)
   SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
@@ -430,6 +440,19 @@ local function Trinkets()
   end
 end
 
+local function OtherOnUse()
+  if Player:BuffUp(S.BestialWrathBuff) then
+    -- use_items,slots=finger1,if=buff.bestial_wrath.up
+    if finger1:IsEquippedAndReady() then
+      if Cast(finger1, nil, Settings.Commons.DisplayStyle.Items) then return "finger1 other_on_use 2"; end
+    end
+    -- use_items,slots=finger2,if=buff.bestial_wrath.up
+    if finger2:IsEquippedAndReady() then
+      if Cast(finger2, nil, Settings.Commons.DisplayStyle.Items) then return "finger2 other_on_use 4"; end
+    end
+  end
+end
+
 --- ======= MAIN =======
 local function APL()
   -- HeroLib SplashData Tracking Update (used as fallback if pet abilities are not in action bars)
@@ -496,6 +519,10 @@ local function APL()
     -- call_action_list,name=trinkets,if=covenant.kyrian&cooldown.aspect_of_the_wild.remains&cooldown.resonating_arrow.remains|!covenant.kyrian&cooldown.aspect_of_the_wild.remains
     if (Settings.Commons.Enabled.Trinkets and (CovenantID == 1 and S.AspectoftheWild:CooldownDown() and S.ResonatingArrow:CooldownDown() or CovenantID ~= 1 and S.AspectoftheWild:CooldownDown())) then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=other_on_use
+    if Settings.Commons.Enabled.Trinkets then
+      local ShouldReturn = OtherOnUse(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cds
     if (CDsON()) then
