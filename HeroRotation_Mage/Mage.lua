@@ -211,8 +211,10 @@ Item.Mage.Commons = {
   -- Potions
   PotionofSpectralIntellect        = Item(171273),
   -- Trinkets
+  ArchitectsIngenuityCore          = Item(188268, {13, 14}),
   DarkmoonDeckPutrescence          = Item(173069, {13, 14}),
   DreadfireVessel                  = Item(184030, {13, 14}),
+  EbonsoulVise                     = Item(186431, {13, 14}),
   EmpyrealOrdnance                 = Item(180117, {13, 14}),
   FlameofBattle                    = Item(181501, {13, 14}),
   GlyphofAssimilation              = Item(184021, {13, 14}),
@@ -221,6 +223,8 @@ Item.Mage.Commons = {
   InstructorsDivineBell            = Item(184842, {13, 14}),
   MacabreSheetMusic                = Item(184024, {13, 14}),
   MoonlitPrism                     = Item(137541, {13, 14}),
+  MrrgriasFavor                    = Item(142160, {13, 14}),
+  ResonantReservoir                = Item(188272, {13, 14}),
   ScarsofFraternalStrife           = Item(188253, {13, 14}),
   ShadowedOrbofTorment             = Item(186428, {13, 14}),
   SinfulAspirantsBadge             = Item(175884, {13, 14}),
@@ -231,6 +235,8 @@ Item.Mage.Commons = {
   TheFirstSigil                    = Item(188271, {13, 14}),
   TomeofMonstruousConstructions    = Item(186422, {13, 14}),
   WakenersFrond                    = Item(181457, {13, 14}),
+  -- Other On-Use Items
+  NeuralSynapseEnhancer            = Item(168973),
 }
 
 Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {

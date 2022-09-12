@@ -33,15 +33,20 @@ local I = Item.Mage.Arcane;
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.SinfulGladiatorsBadge:ID(),
-  I.EmpyrealOrdnance:ID(),
+  I.ArchitectsIngenuityCore:ID(),
   I.DreadfireVessel:ID(),
-  I.SoulIgniter:ID(),
-  I.SoullettingRuby:ID(),
+  I.EbonsoulVise:ID(),
+  I.EmpyrealOrdnance:ID(),
   I.GlyphofAssimilation:ID(),
+  I.GrimEclipse:ID(),
   I.MacabreSheetMusic:ID(),
   I.MoonlitPrism:ID(),
+  I.MrrgriasFavor:ID(),
+  I.ResonantReservoir:ID(),
   I.ScarsofFraternalStrife:ID(),
+  I.SinfulGladiatorsBadge:ID(),
+  I.SoulIgniter:ID(),
+  I.SoullettingRuby:ID(),
 }
 
 -- Rotation Var
@@ -224,8 +229,8 @@ local function VarInit()
   --variable,name=fishing_opener,default=-1,op=set,if=variable.fishing_opener=-1,value=1*(equipped.empyreal_ordnance|(talent.rune_of_power&(talent.arcane_echo|!covenant.kyrian)&(!covenant.necrolord|active_enemies=1|runeforge.siphon_storm)&!covenant.venthyr))|(covenant.venthyr&equipped.moonlit_prism)
   var_fishing_opener = Settings.Arcane.UseFishingOpener and ((I.EmpyrealOrdnance:IsEquipped() or (S.RuneofPower:IsAvailable() and (S.ArcaneEcho:IsAvailable() or CovenantID ~= 1) and (CovenantID ~= 4 or SiphonStormEquipped) and CovenantID ~= 2)) or (CovenantID == 2 and I.MoonlitPrism:IsEquipped()))
 
-  --variable,name=ap_on_use,op=set,value=equipped.macabre_sheet_music|equipped.gladiators_badge|equipped.gladiators_medallion|equipped.darkmoon_deck_putrescence|equipped.inscrutable_quantum_device|equipped.soulletting_ruby|equipped.sunblood_amethyst|equipped.wakeners_frond|equipped.flame_of_battle
-  var_ap_on_use = I.MacabreSheetMusic:IsEquipped() or I.SinfulGladiatorsBadge:IsEquipped() or I.DarkmoonDeckPutrescence:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SoullettingRuby:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.WakenersFrond:IsEquipped() or I.FlameofBattle:IsEquipped()
+  --variable,name=ap_on_use,op=set,value=equipped.macabre_sheet_music|equipped.gladiators_badge|equipped.gladiators_medallion|equipped.darkmoon_deck_putrescence|equipped.inscrutable_quantum_device|equipped.soulletting_ruby|equipped.sunblood_amethyst|equipped.wakeners_frond|equipped.flame_of_battle|equipped.neural_synapse_enhancer
+  var_ap_on_use = I.MacabreSheetMusic:IsEquipped() or I.SinfulGladiatorsBadge:IsEquipped() or I.DarkmoonDeckPutrescence:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SoullettingRuby:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.WakenersFrond:IsEquipped() or I.FlameofBattle:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped()
 
   -- variable,name=aoe_spark_target_count,op=reset,default=8+(2*runeforge.harmonic_echo)
   var_aoe_spark_target_count = 8 + (2 * num(HarmonicEchoEquipped))
@@ -1087,6 +1092,10 @@ local function Harmony()
   if S.ArcaneExplosion:IsCastable() and (Player:ArcaneCharges() < Player:ArcaneChargesMax() and EnemiesCount10ySplash >= var_aoe_target_count) then
     if CastAE(S.ArcaneExplosion) then return "arcane_explosion harmony 31"; end
   end
+  --nether_tempest,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&(refreshable|!ticking)
+  if S.NetherTempest:IsCastable() and (Player:ArcaneCharges() == Player:ArcaneChargesMax() and (Target:DebuffRefreshable(S.NetherTempest) or Target:DebuffDown(S.NetherTempest))) then
+    if Cast(S.NetherTempest, nil, nil, not Target:IsSpellInRange(S.NetherTempest)) then return "nether_tempest harmony 31.5"; end
+  end
   --arcane_missiles,if=buff.arcane_harmony.stack<16,chain=1,interrupt=1,interrupt_global=1
   if S.ArcaneMissiles:IsCastable() and Player:BuffStack(S.ArcaneHarmonyBuff) < 16 then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles harmony 32"; end
@@ -1506,17 +1515,13 @@ local function APL()
       if I.EmpyrealOrdnance:IsEquippedAndReady() and S.ArcanePower:CooldownRemains() <= 15 and Target:DebuffRemains(S.TouchoftheMagi) <= 15 then
         if Cast(I.EmpyrealOrdnance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "empyreal_ordnance Shared_cd 13"; end
       end
-      --use_item,name=dreadfire_vessel,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use=1|(time=0&variable.fishing_opener=1&runeforge.siphon_storm)
-      if I.DreadfireVessel:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 20 or not var_ap_on_use or (CombatTime() == 0 and var_fishing_opener and SiphonStormEquipped)) then
-        if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel Shared_cd 14"; end
+      --use_item,name=grim_eclipse,if=cooldown.arcane_power.remains<=7&cooldown.touch_of_the_magi.remains<=7
+      if I.GrimEclipse:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() <= 7 and S.TouchoftheMagi:CooldownRemains() <= 7) then
+        if Cast(I.GrimEclipse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "grim_eclipse Shared_cd 13.5"; end
       end
-      --use_item,name=soul_igniter,if=cooldown.arcane_power.remains>=30|!variable.ap_on_use=1
-      if I.SoulIgniter:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 30 or not var_ap_on_use) and not Player:BuffUp(S.SoulIgnitionBuff) then
-        if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soul_igniter Shared_cd 15"; end
-      end
-      --use_item,name=glyph_of_assimilation,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use=1|(time=0&variable.fishing_opener=1&runeforge.siphon_storm)
-      if I.GlyphofAssimilation:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 20 or not var_ap_on_use or (CombatTime() == 0 and var_fishing_opener and SiphonStormEquipped)) then
-        if Cast(I.GlyphofAssimilation, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "glyph_of_assimilation Shared_cd 16"; end
+      -- use_item,name=mrrgrias_favor,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use
+      if I.MrrgriasFavor:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 20 or not var_ap_on_use) then
+        if Cast(I.MrrgriasFavor, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "mrrgrias_favor Shared_cd 15"; end
       end
       --use_item,name=macabre_sheet_music,if=cooldown.arcane_power.remains<=5&(!variable.fishing_opener=1|time>30)
       if I.MacabreSheetMusic:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() <= 5 and (not var_ap_on_use or CombatTime() > 30)) then
@@ -1533,6 +1538,34 @@ local function APL()
       --use_item,name=soulletting_ruby,if=(variable.time_until_ap+(action.radiant_spark.execute_time*covenant.kyrian)+(action.deathborne.execute_time*covenant.necrolord)+action.touch_of_the_magi.execute_time<target.distance%5.6)&(variable.have_opened|(covenant.kyrian&runeforge.arcane_infinity))&target.distance>25
       if I.SoullettingRuby:IsEquippedAndReady() and (var_time_until_ap + (num(CovenantID == 1) * S.RadiantSpark:ExecuteTime()) + (num(CovenantID == 4) * S.Deathborne:ExecuteTime()) + S.TouchoftheMagi:ExecuteTime() < Target:MaxDistance() / 5.6) and (ArcaneOpener:HasOpened() or (CovenantID == 1 and ArcaneInfinityEquipped)) and Target:MaxDistance() > 25 then
         if Cast(I.SoullettingRuby, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soulletting_ruby Shared_cd 20"; end
+      end
+      --use_item,name=neural_synapse_enhancer,if=(buff.arcane_power.up&cooldown.touch_of_the_magi.remains>40)|(cooldown.arcane_power.remains>=20&debuff.touch_of_the_magi.up)
+      if I.NeuralSynapseEnhancer:IsEquippedAndReady() and (Player:BuffUp(S.ArcanePower) and S.TouchoftheMagi:CooldownRemains() > 40 or (S.ArcanePower:CooldownRemains() >= 20 and Target:DebuffUp(S.TouchoftheMagiDebuff))) then
+        if Cast(I.NeuralSynapseEnhancer, nil, Settings.Commons.DisplayStyle.Items) then return "neural_synapse_enhancer Shared_cd 22"; end
+      end
+      --use_item,name=dreadfire_vessel,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use=1|(time=0&variable.fishing_opener=1&runeforge.siphon_storm)
+      if I.DreadfireVessel:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 20 or not var_ap_on_use or (CombatTime() == 0 and var_fishing_opener and SiphonStormEquipped)) then
+        if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel Shared_cd 14"; end
+      end
+      --use_item,name=glyph_of_assimilation,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use=1|(time=0&variable.fishing_opener=1&runeforge.siphon_storm)
+      if I.GlyphofAssimilation:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 20 or not var_ap_on_use or (CombatTime() == 0 and var_fishing_opener and SiphonStormEquipped)) then
+        if Cast(I.GlyphofAssimilation, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "glyph_of_assimilation Shared_cd 16"; end
+      end
+      --use_item,name=ebonsoul_vise,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use=1|(time=0&variable.fishing_opener=1&runeforge.siphon_storm)
+      if I.EbonsoulVise:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 20 or not var_ap_on_use or (CombatTime() == 0 and var_fishing_opener and SiphonStormEquipped)) then
+        if Cast(I.EbonsoulVise, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "ebonsoul_vise Shared_cd 16"; end
+      end
+      --use_item,name=resonant_reservoir,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use=1|(time=0&variable.fishing_opener=1&runeforge.siphon_storm)
+      if I.ResonantReservoir:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 20 or not var_ap_on_use or (CombatTime() == 0 and var_fishing_opener and SiphonStormEquipped)) then
+        if Cast(I.ResonantReservoir, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "resonant_reservoir Shared_cd 16"; end
+      end
+      --use_item,name=architects_ingenuity_core,if=cooldown.arcane_power.remains>=20|!variable.ap_on_use=1|(time=0&variable.fishing_opener=1&runeforge.siphon_storm)
+      if I.ArchitectsIngenuityCore:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 20 or not var_ap_on_use or (CombatTime() == 0 and var_fishing_opener and SiphonStormEquipped)) then
+        if Cast(I.ArchitectsIngenuityCore, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "architects_ingenuity_core Shared_cd 16"; end
+      end
+      --use_item,name=soul_igniter,if=cooldown.arcane_power.remains>=30|!variable.ap_on_use=1
+      if I.SoulIgniter:IsEquippedAndReady() and (S.ArcanePower:CooldownRemains() >= 30 or not var_ap_on_use) and not Player:BuffUp(S.SoulIgnitionBuff) then
+        if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soul_igniter Shared_cd 15"; end
       end
     end
     --newfound_resolve,use_while_casting=1,if=buff.arcane_power.up|debuff.touch_of_the_magi.up|dot.radiant_spark.ticking
