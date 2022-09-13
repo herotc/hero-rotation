@@ -105,7 +105,8 @@ local function ShouldPurify()
     StaggerSpell = S.HeavyStagger
   end
   if StaggerSpell then
-    _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, StaggerCurrent = Player:DebuffInfo(StaggerSpell, false, true)
+    local spellTable = Player:DebuffInfo(StaggerSpell, false, true)
+    StaggerCurrent = spellTable.points[2]
   end
   -- if=stagger.amounttototalpct>=0.7&(((target.cooldown.pause_action.remains>=20|time<=10|target.cooldown.pause_action.duration=0)&cooldown.invoke_niuzao_the_black_ox.remains<5)|buff.invoke_niuzao_the_black_ox.up)
   -- APL Note: Cast PB during the Niuzao window, but only if recently hit.

@@ -55,7 +55,6 @@ local ActiveMitigationNeeded
 local IsTanking
 local Enemies8yMelee
 local EnemiesCount8yMelee
-local BlindFaithStacks = 0
 local VarBrandBuild = (S.AgonizingFlames:IsAvailable() and S.BurningAlive:IsAvailable() and S.CharredFlesh:IsAvailable())
 local RazelikhsDefilementEquipped = Player:HasLegendaryEquipped(27)
 local BlindFaithEquipped = (Player:HasLegendaryEquipped(238) or CovenantID == 1 and Player:HasUnity())
@@ -250,7 +249,7 @@ local function Normal()
   -- Manual add: ,if=talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled
   -- This way we don't waste potential Meta uptime
   -- Note: Also add Blind Faith check so we don't waste buff time when we could be generating more stacks
-  if S.FelDevastation:IsReady() and ((S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) and (Player:BuffDown(S.BlindFaithBuff) or BlindFaithStacks == 20)) then
+  if S.FelDevastation:IsReady() and (S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) then
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation normal 10"; end
   end
   -- Manually added: soul_cleave,if=buff.blind_faith.up&talent.spirit_bomb&soul_fragments>=3&(talent.fracture&cooldown.fracture.remains>gcd-0.5|!talent.fracture)
@@ -315,12 +314,6 @@ local function APL()
 
   ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
-
-  if Player:BuffUp(S.BlindFaithBuff) then
-    BlindFaithStacks = select(16, Player:BuffInfo(S.BlindFaithBuff, false, true))
-  else
-    BlindFaithStacks = 0
-  end
 
   if Everyone.TargetIsValid() then
     -- Precombat

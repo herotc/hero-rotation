@@ -99,6 +99,8 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   FuryofElune                           = Spell(202770),
   Incarnation                           = Spell(102560),
   NaturesBalance                        = Spell(202430),
+  PrimordialArcanicPulsar               = Spell(338668),
+  PAPBuff                               = Spell(338825),
   Solstice                              = Spell(343647),
   SolsticeBuff                          = Spell(343648),
   SouloftheForest                       = Spell(114107),
@@ -119,7 +121,6 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   BOATNatureBuff                        = Spell(339943),
   OnethsClearVisionBuff                 = Spell(339797),
   OnethsPerceptionBuff                  = Spell(339800),
-  PAPBuff                               = Spell(338825),
   TimewornDreambinderBuff               = Spell(340049)
 })
 

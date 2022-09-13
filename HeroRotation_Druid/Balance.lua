@@ -720,8 +720,13 @@ local function APL()
 
   -- Determine amount of AP fed into Primordial Arcanic Pulsar
   PAPValue = 0
-  if PAPEquipped then
-    PAPValue = select(16, Player:BuffInfo(S.PAPBuff, false, true)) or 0
+  if S.PrimordialArcanicPulsar:IsAvailable() then
+    local spellTable = Player:BuffInfo(S.PAPBuff, false, true)
+    if spellTable == nil then
+      PAPValue = 0
+    else
+      PAPValue = spellTable.points[1]
+    end
   end
 
   -- Check Fury of Elune
