@@ -58,4 +58,4 @@ local CP_Devastation = CreateChildPanel(CP_Evoker, "Devastation")
 CreateARPanelOptions(CP_Evoker, "APL.Evoker.Commons")
 
 -- Devastation
-CreateARPanelOptions(CP_Devastation, "APL.Druid.Devastation")
+CreateARPanelOptions(CP_Devastation, "APL.Evoker.Devastation")

@@ -27,6 +27,8 @@ DevOldIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     local BaseCheck = DevOldIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellDeva.Firestorm then
       return BaseCheck and not Player:IsCasting(self)
+    elseif self == SpellDeva.TipTheScales then
+      return BaseCheck and not Player:BuffUp(self)
     else
       return BaseCheck
     end
