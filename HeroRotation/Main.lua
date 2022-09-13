@@ -318,6 +318,9 @@
       [103]   = "HeroRotation_Druid",         -- Feral
       [104]   = "HeroRotation_Druid",         -- Guardian
       [105]   = "HeroRotation_Druid",         -- Restoration
+    -- Evoker
+      [1467]  = "HeroRotation_Evoker",        -- Devastation
+      --[1468] = "HeroRotation_Evoker",         -- Preservation
     -- Hunter
       [253]   = "HeroRotation_Hunter",        -- Beast Mastery
       [254]   = "HeroRotation_Hunter",        -- Marksmanship

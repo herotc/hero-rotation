@@ -1,17 +1,15 @@
 ## Interface: 100002
 
-## Title: Hero|cFFA330C9Rotation|r [|cFFFFFFFFPriest|r]
+## Title: Hero|cFFA330C9Rotation|r [|cFF33937FEvoker|r]
 ## Author: Cilraaz
-## Notes: Hero Rotation - Priest Module.
+## Notes: Hero Rotation - Evoker Module.
 
 ## DefaultState: Enabled
 ## LoadOnDemand: 1
 ## Dependencies: HeroRotation
 
 Settings.lua
-Priest.lua
+Evoker.lua
 Events.lua
-Holy.lua
-Shadow.lua
-Discipline.lua
+Devastation.lua
 Overrides.lua

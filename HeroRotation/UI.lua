@@ -152,11 +152,11 @@
     -- Texture
     self.Texture:SetTexture(Texture);
     if HR.GUISettings.General.NotEnoughManaEnabled and not Usable then
-      self.Texture:SetGradient("HORIZONTAL", 0.5, 0.5, 1.0, 0.5, 0.5, 1.0);
+      self.Texture:SetVertexColor(0.5, 0.5, 1.0)
     elseif OutofRange then
-      self.Texture:SetGradient("HORIZONTAL", 1.0, 0.5, 0.5, 1.0, 0.5, 0.5);
+      self.Texture:SetVertexColor(1.0, 0.5, 0.5)
     else
-      self.Texture:SetGradient("HORIZONTAL", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+      self.Texture:SetVertexColor(1.0, 1.0, 1.0)
     end
     self.Texture:SetAllPoints(self);
     -- Keybind
@@ -355,9 +355,9 @@
     IconFrame.Texture:SetAllPoints(IconFrame);
     -- Out of Range
     if OutofRange then
-      IconFrame.Texture:SetGradient("HORIZONTAL", 1.0, 0.5, 0.5, 1.0, 0.5, 0.5);
+      IconFrame.Texture:SetVertexColor(1.0, 0.5, 0.5)
     else
-      IconFrame.Texture:SetGradient("HORIZONTAL", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+      IconFrame.Texture:SetVertexColor(1.0, 1.0, 1.0)
     end
     -- Keybind
     if Keybind then
@@ -574,9 +574,9 @@
     self.Texture:SetAllPoints(self);
     -- Out of Range
     if OutofRange then
-      self.Texture:SetGradient("HORIZONTAL", 1.0, 0.5, 0.5, 1.0, 0.5, 0.5);
+      self.Texture:SetVertexColor(1.0, 0.5, 0.5)
     else
-      self.Texture:SetGradient("HORIZONTAL", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+      self.Texture:SetVertexColor(1.0, 1.0, 1.0)
     end
     -- Black Border Icon
     if HR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
@@ -646,9 +646,9 @@
     self.Texture:SetAllPoints(self);
     -- Out of Range
     if OutofRange then
-      self.Texture:SetGradient("HORIZONTAL", 1.0, 0.5, 0.5, 1.0, 0.5, 0.5);
+      self.Texture:SetVertexColor(1.0, 0.5, 0.5)
     else
-      self.Texture:SetGradient("HORIZONTAL", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+      self.Texture:SetVertexColor(1.0, 1.0, 1.0)
     end
     -- Black Border Icon
     if HR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then

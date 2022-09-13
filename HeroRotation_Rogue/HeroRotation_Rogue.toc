@@ -1,4 +1,4 @@
-## Interface: 90207
+## Interface: 100002
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFFFFF569Rogue|r]
 ## Author: Aethys, Kojiyama, Mystler

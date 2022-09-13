@@ -1,4 +1,4 @@
-## Interface: 90207
+## Interface: 100002
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFFC41F3BDeathKnight|r]
 ## Author: Krich
