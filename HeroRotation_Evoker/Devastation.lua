@@ -154,7 +154,7 @@ local function APL()
       if Cast(S.Pyre, nil, nil, not Target:IsInRange(25)) then return "pyre main 28"; end
     end
     -- living_flame,if=buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack
-    if S.LivingFlame:IsCastable() and (Player:BuffUp(S.BurnoutBuff) and Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack) then
+    if S.LivingFlame:IsCastable() and (not Player:IsCasting(S.LivingFlame)) and (Player:BuffUp(S.BurnoutBuff) and Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack) then
       if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame main 30"; end
     end
     -- disintegrate
