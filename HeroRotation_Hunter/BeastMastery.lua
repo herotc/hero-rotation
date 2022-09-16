@@ -71,7 +71,7 @@ local PouchofRazorFragmentsEquipped = Player:HasLegendaryEquipped(255)
 
 -- Check for equipment changes
 HL:RegisterForEvent(function()
-  equip = Player:Equipment()
+  equip = Player:GetEquipment()
   finger1 = (equip[11]) and Item(equip[11]) or Item(0)
   finger2 = (equip[12]) and Item(equip[12]) or Item(0)
   ElderAntlersEquipped = Player:HasLegendaryEquipped(254)
