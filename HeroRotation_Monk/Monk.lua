@@ -82,6 +82,10 @@ Spell.Monk.Commons = {
   WeaponsOfOrderChiBuff                 = Spell(311054),
   WeaponsOfOrderDebuff                  = Spell(312106),
   -- Soulbinds (Shadowlands)
+  CarversEye                            = Spell(350899),
+  CarversEyeBuff                        = Spell(351414),
+  FirstStrike                           = Spell(325069),
+  FirstStrikeBuff                       = Spell(325381),
   GroveInvigoration                     = Spell(322721),
   LeadByExample                         = Spell(342156),
   PustuleEruption                       = Spell(351094),
@@ -98,6 +102,7 @@ Spell.Monk.Commons = {
   AcquiredAxeBuff                       = Spell(368656),
   AcquiredWandBuff                      = Spell(368654),
   ScarsofFraternalStrifeBuff4           = Spell(368638),
+  TemptationBuff                        = Spell(234143),
   -- Misc
   PoolEnergy                            = Spell(999910),
   StopFoF                               = Spell(363653)
@@ -215,17 +220,21 @@ Item.Monk.Commons = {
   PotionofSpectralIntellect            = Item(171273),
   -- Trinkets
   CacheofAcquiredTreasures             = Item(188265, {13, 14}),
+  EnforcersStunGrenade                 = Item(110017, {13, 14}),
   GladiatorsBadgeCosmic                = Item(186866, {13, 14}),
   GladiatorsBadgeSinful                = Item(175921, {13, 14}),
   GladiatorsBadgeUnchained             = Item(185197, {13, 14}),
   InscrutibleQuantumDevice             = Item(179350, {13, 14}),
+  KihrasAdrenalineInjector             = Item(109997, {13, 14}),
   OverchargedAnimaBattery              = Item(180116, {13, 14}),
-  ScarsofFraternalStrife                = Item(188253, {13, 14}),
+  ScarsofFraternalStrife               = Item(188253, {13, 14}),
   ShadowgraspTotem                     = Item(179356, {13, 14}),
   TheFirstSigil                        = Item(188271, {13, 14}),
   Wrathstone                           = Item(156000, {13, 14}),
   -- Other On-Use Items
   Jotungeirr                           = Item(186404),
+  RingofCollapsingFutures              = Item(142173),
+  WrapsofElectrostaticPotential        = Item(169069),
 }
 
 Item.Monk.Windwalker = MergeTableByKey(Item.Monk.Commons, {
