@@ -30,7 +30,7 @@ Spell.Evoker.Commons = {
   AzureStrike                           = Spell(362969),
   DeepBreath                            = Spell(357210),
   Disintegrate                          = Spell(356995),
-  FireBreath                            = Spell(357208),
+  FireBreath                            = MultiSpell(357208,382266), -- with and without Font of Magic
   LivingFlame                           = Spell(361469),
   -- Talents
   TipTheScales                          = Spell(370553),
@@ -44,9 +44,10 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   -- Talents
   Dragonrage                            = Spell(375087),
   EssenceAttunement                     = Spell(375722),
-  EternitySurge                         = Spell(359073),
+  EternitySurge                         = MultiSpell(359073,382411), -- with and without Font of Magic
   EternitysSpan                         = Spell(375757),
   Firestorm                             = Spell(368847),
+  FontofMagic                           = Spell(375783),
   Pyre                                  = Spell(357211),
   ShatteringStar                        = Spell(370452),
   -- Buffs/Debuffs

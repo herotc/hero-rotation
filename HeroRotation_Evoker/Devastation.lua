@@ -123,51 +123,60 @@ local function APL()
     -- Manually added: All empower levels. Is this optimal?
     if S.EternitySurge:IsReady() then
       if S.EternitysSpan:IsAvailable() then
-        if EnemiesCount8ySplash <= 2 then
-          if CastAnnotated(S.EternitySurge, false, "1") then return "eternity_surge empower 1 main 12"; end
-        elseif EnemiesCount8ySplash > 2 and EnemiesCount8ySplash <= 4 then
-          if CastAnnotated(S.EternitySurge, false, "2") then return "eternity_surge empower 2 main 14"; end
+        if EnemiesCount8ySplash > 6 and S.FontofMagic:IsAvailable() then
+          if CastAnnotated(S.EternitySurge, false, "4") then return "eternity_surge empower 4 main 12"; end
         elseif EnemiesCount8ySplash > 4 then
-          if CastAnnotated(S.EternitySurge, false, "3") then return "eternity_surge empower 3 main 16"; end
+          if CastAnnotated(S.EternitySurge, false, "3") then return "eternity_surge empower 3 main 12"; end
+        elseif EnemiesCount8ySplash > 2 and EnemiesCount8ySplash <= 4 then
+          if CastAnnotated(S.EternitySurge, false, "2") then return "eternity_surge empower 2 main 12"; end
+        else
+          if CastAnnotated(S.EternitySurge, false, "1") then return "eternity_surge empower 1 main 12"; end
         end
       else
-        if EnemiesCount8ySplash == 1 then
-          if CastAnnotated(S.EternitySurge, false, "1") then return "eternity_surge empower 1 main 18"; end
-        elseif EnemiesCount8ySplash == 2 then
-          if CastAnnotated(S.EternitySurge, false, "2") then return "eternity_surge empower 2 main 20"; end
+        if EnemiesCount8ySplash > 3 and S.FontofMagic:IsAvailable() then
+          if CastAnnotated(S.EternitySurge, false, "4") then return "eternity_surge empower 4 main 14"; end
         elseif EnemiesCount8ySplash > 2 then
-          if CastAnnotated(S.EternitySurge, false, "3") then return "eternity_surge empower 3 main 22"; end
+          if CastAnnotated(S.EternitySurge, false, "3") then return "eternity_surge empower 3 main 14"; end
+        elseif EnemiesCount8ySplash == 2 then
+          if CastAnnotated(S.EternitySurge, false, "2") then return "eternity_surge empower 2 main 14"; end
+        else
+          if CastAnnotated(S.EternitySurge, false, "1") then return "eternity_surge empower 1 main 14"; end
         end
       end
     end
     -- tip_the_scales,if=buff.dragonrage.up
     if S.TipTheScales:IsCastable() and (Player:BuffUp(S.Dragonrage)) then
-      if Cast(S.TipTheScales, Settings.Devastation.GCDasOffGCD.TipTheScales) then return "tip_the_scales main 24"; end
+      if Cast(S.TipTheScales, Settings.Devastation.GCDasOffGCD.TipTheScales) then return "tip_the_scales main 16"; end
     end
     -- fire_breath
-    -- Assuming we always max empower
-    if S.FireBreath:IsCastable() then
-      if CastAnnotated(S.FireBreath, false, "3") then return "fire_breath empower 3 main 26"; end
+    if S.FireBreath:IsCastable() and ((Target:TimeToDie() > 19 and S.FontofMagic:IsAvailable()) or (Target:TimeToDie() > 15 and not S.FontofMagic:IsAvailable())) then
+      if not S.FontofMagic:IsAvailable() then
+        if CastAnnotated(S.FireBreath, false, "3") then return "fire_breath empower 3 main 18"; end
+      else
+        if CastAnnotated(S.FireBreath, false, "4") then return "fire_breath empower 4 main 18"; end
+      end
+    elseif S.FireBreath:IsCastable() then
+      if CastAnnotated(S.FireBreath, false, "1") then return "fire_breath empower 1 main 18"; end
     end
     -- pyre,if=spell_targets.pyre>2
     if S.Pyre:IsReady() and (EnemiesCount8ySplash > 2) then
-      if Cast(S.Pyre, nil, nil, not Target:IsInRange(25)) then return "pyre main 28"; end
+      if Cast(S.Pyre, nil, nil, not Target:IsInRange(25)) then return "pyre main 20"; end
     end
     -- living_flame,if=buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack
     if S.LivingFlame:IsCastable() and (not Player:IsCasting(S.LivingFlame)) and (Player:BuffUp(S.BurnoutBuff) and Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack) then
-      if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame main 30"; end
+      if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame main 22"; end
     end
     -- disintegrate
     if S.Disintegrate:IsReady() and EnemiesCount8ySplash < 3 then
-      if Cast(S.Disintegrate, nil, nil, not Target:IsInRange(25)) then return "disintegrate main 32"; end
+      if Cast(S.Disintegrate, nil, nil, not Target:IsInRange(25)) then return "disintegrate main 24"; end
     end
     -- azure_strike,if=spell_targets.azure_strike>2
     if S.AzureStrike:IsCastable() and (EnemiesCount8ySplash > 2) then
-      if Cast(S.AzureStrike, nil, nil, not Target:IsInRange(25)) then return "azure_strike main 34"; end
+      if Cast(S.AzureStrike, nil, nil, not Target:IsInRange(25)) then return "azure_strike main 26"; end
     end
     -- living_flame
     if S.LivingFlame:IsCastable() then
-      if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame main 36"; end
+      if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame main 28"; end
     end
     -- If nothing else to do, show the Pool icon
     if CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
