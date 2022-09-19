@@ -74,12 +74,167 @@ local function Precombat()
   -- snapshot_stats
   -- Manually added: precast living_flame
   if S.LivingFlame:IsCastable() then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame precombat"; end
+    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame precombat"; end
   end
 end
 
 local function Defensives()
   
+end
+
+local function DRAoE()
+  -- eternity_surge
+  if S.EternitySurge:IsCastable() then
+    if S.EternitysSpan:IsAvailable() then
+      if EnemiesCount8ySplash > 6 and S.FontofMagic:IsAvailable() then
+        if CastAnnotated(S.EternitySurge, false, "4") then return "eternity_surge empower 4 dr_aoe 2"; end
+      elseif EnemiesCount8ySplash > 4 then
+        if CastAnnotated(S.EternitySurge, false, "3") then return "eternity_surge empower 3 dr_aoe 2"; end
+      elseif EnemiesCount8ySplash > 2 and EnemiesCount8ySplash <= 4 then
+        if CastAnnotated(S.EternitySurge, false, "2") then return "eternity_surge empower 2 dr_aoe 2"; end
+      else
+        if CastAnnotated(S.EternitySurge, false, "1") then return "eternity_surge empower 1 dr_aoe 2"; end
+      end
+    else
+      if EnemiesCount8ySplash > 3 and S.FontofMagic:IsAvailable() then
+        if CastAnnotated(S.EternitySurge, false, "4") then return "eternity_surge empower 4 dr_aoe 4"; end
+      elseif EnemiesCount8ySplash > 2 then
+        if CastAnnotated(S.EternitySurge, false, "3") then return "eternity_surge empower 3 dr_aoe 4"; end
+      elseif EnemiesCount8ySplash == 2 then
+        if CastAnnotated(S.EternitySurge, false, "2") then return "eternity_surge empower 2 dr_aoe 4"; end
+      else
+        if CastAnnotated(S.EternitySurge, false, "1") then return "eternity_surge empower 1 dr_aoe 4"; end
+      end
+    end
+  end
+  -- pyre,if=buff.essence_burst.up
+  if S.Pyre:IsReady() and (Player:BuffUp(S.EssenceBurstBuff)) then
+    if Cast(S.Pyre, nil, nil, not Target:IsInRange(25)) then return "pyre dr_aoe 6"; end
+  end
+  -- firestorm
+  if S.Firestorm:IsCastable() then
+    if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm dr_aoe 8"; end
+  end
+  -- tip_the_scales
+  if S.TipTheScales:IsCastable() then
+    if Cast(S.TipTheScales, Settings.Devastation.GCDasOffGCD.TipTheScales) then return "tip_the_scales dr_aoe 10"; end
+  end
+  -- fire_breath,if=buff.tip_the_scales.up
+  if S.FireBreath:IsCastable() and (Player:BuffUp(S.TipTheScales)) then
+    if Cast(S.FireBreath, nil, nil, not Target:IsInRange(25)) then return "fire_breath dr_aoe 12"; end
+  end
+  -- living_flame,if=buff.leaping_flames.up
+  if S.LivingFlame:IsReady() and (Player:BuffUp(S.LeapingFlamesBuff)) then
+    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame dr_aoe 14"; end
+  end
+  -- pyre,if=prev_gcd.1.azure_strike|prev_gcd.1.disintegrate
+  if S.Pyre:IsReady() and (Player:PrevGCD(1, S.AzureStrike) or Player:PrevGCD(1, S.Disintegrate)) then
+    if Cast(S.Pyre, nil, nil, not Target:IsInRange(25)) then return "pyre dr_aoe 16"; end
+  end
+  -- azure_strike,if=spell_targets.azure_strike>3
+  if S.AzureStrike:IsCastable() and (EnemiesCount8ySplash > 3) then
+    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike dr_aoe 18"; end
+  end
+  -- disintegrate,if=spell_targets.azure_strike<4
+  if S.Disintegrate:IsReady() and (EnemiesCount8ySplash < 4) then
+    if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate dr_aoe 20"; end
+  end
+end
+
+local function AOE()
+  -- dragonrage,if=buff.charged_blast.stacks=20
+  if S.Dragonrage:IsCastable() and (Player:BuffStack(S.ChargedBlastBuff) == 20) then
+    if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage aoe 2"; end
+  end
+  -- fire_breath,if=debuff.fire_breath.down
+  if S.FireBreath:IsReady() then
+    if S.FontofMagic:IsAvailable() then
+      if CastAnnotated(S.FireBreath, false, "4") then return "fire_breath empower 4 aoe 4"; end
+    else
+      if CastAnnotated(S.FireBreath, false, "3") then return "fire_breath empower 3 aoe 4"; end
+    end
+  end
+  -- firestorm
+  if S.Firestorm:IsReady() then
+    if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 6"; end
+  end
+  -- living_flame,if=buff.leaping_flames.up
+  if S.LivingFlame:IsReady() and (Player:BuffUp(S.LeapingFlamesBuff)) then
+    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 8"; end
+  end
+  -- pyre,if=buff.essence_burst.up
+  if S.Pyre:IsReady() and (Player:BuffUp(S.EssenceBurstBuff)) then
+    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 10"; end
+  end
+  -- eternity_surge
+  if S.EternitySurge:IsReady() then
+    if S.EternitysSpan:IsAvailable() then
+      if EnemiesCount8ySplash > 6 and S.FontofMagic:IsAvailable() then
+        if CastAnnotated(S.EternitySurge, false, "4") then return "eternity_surge empower 4 aoe 12"; end
+      elseif EnemiesCount8ySplash > 4 then
+        if CastAnnotated(S.EternitySurge, false, "3") then return "eternity_surge empower 3 aoe 12"; end
+      elseif EnemiesCount8ySplash > 2 and EnemiesCount8ySplash <= 4 then
+        if CastAnnotated(S.EternitySurge, false, "2") then return "eternity_surge empower 2 aoe 12"; end
+      end
+    else
+      if EnemiesCount8ySplash > 3 and S.FontofMagic:IsAvailable() then
+        if CastAnnotated(S.EternitySurge, false, "4") then return "eternity_surge empower 4 aoe 14"; end
+      elseif EnemiesCount8ySplash > 2 then
+        if CastAnnotated(S.EternitySurge, false, "3") then return "eternity_surge empower 3 aoe 14"; end
+      end
+    end
+  end
+  -- disintegrate
+  if S.Disintegrate:IsReady() then
+    if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate aoe 16"; end
+  end
+  -- deep_breath,if=talent.ruin
+  if S.DeepBreath:IsReady() and (S.Ruin:IsAvailable()) then
+    if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath) then return "deep_breath aoe 18"; end
+  end
+  -- azure_strike
+  if S.AzureStrike:IsReady() then
+    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike aoe 20"; end
+  end
+end
+
+local function ST()
+  -- dragonrage,if=debuff.fire_breath.up&cooldown.fire_breath.remains<17+gcd
+  if S.Dragonrage:IsCastable() and (Target:DebuffUp(S.FireBreathDebuff) and S.FireBreath:CooldownRemains() < 17 + Player:GCD()) then
+    if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage st 2"; end
+  end
+  -- tip_the_scales,if=cooldown.fire_breath.up&debuff.fire_breath.down
+  if S.TipTheScales:IsCastable() and (S.FireBreath:IsReady() and Target:DebuffDown(S.FireBreathDebuff)) then
+    if Cast(S.TipTheScales, Settings.Devastation.GCDasOffGCD.TipTheScales) then return "tip_the_scales st 4"; end
+  end
+  -- fire_breath,if=debuff.fire_breath.down
+  if S.FireBreath:IsReady() and (Target:DebuffDown(S.FireBreathDebuff)) then
+    if Cast(S.FireBreath, nil, nil, not Target:IsInRange(25)) then return "fire_breath st 6"; end
+  end
+  -- firestorm
+  if S.Firestorm:IsReady() then
+    if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm st 8"; end
+  end
+  -- living_flame,if=buff.leaping_flames.up
+  if S.LivingFlame:IsReady() and (Player:BuffUp(S.LeapingFlamesBuff) or Player:IsCasting(S.FireBreath)) then
+    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 10"; end
+  end
+  -- shattering_star,if=essence>=3|buff.essence_burst.up|cooldown.eternity_surge.up
+  if S.ShatteringStar:IsCastable() and (Player:Essence() >= 3 or Player:BuffUp(S.EssenceBurstBuff) or S.EternitySurge:IsCastable()) then
+    if Cast(S.ShatteringStar, nil, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star st 12"; end
+  end
+  -- eternity_surge,empower_to=1
+  if S.EternitySurge:IsCastable() then
+    if CastAnnotated(S.EternitySurge, false, "1") then return "eternity_surge empower 1 st 14"; end
+  end
+  -- disintegrate
+  if S.Disintegrate:IsReady() then
+    if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate st 16"; end
+  end
+  -- living_flame
+  if S.LivingFlame:IsReady() then
+    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 18"; end
+  end
 end
 
 -- APL Main
@@ -103,80 +258,17 @@ local function APL()
     if Settings.Commons.Enabled.Potions and I.PotionofSpectralIntellect:IsReady() then
       if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
     end
-    -- disintegrate,if=cooldown.dragonrage.remains<=3*gcd.max
-    if S.Disintegrate:IsReady() and EnemiesCount8ySplash < 3 and (S.Dragonrage:IsAvailable() and S.Dragonrage:CooldownRemains() <= 3 * Player:GCD()) then
-      if Cast(S.Disintegrate, nil, nil, not Target:IsInRange(25)) then return "disintegrate main 4"; end
+    -- call_action_list,name=dr_aoe,if=buff.dragonrage.up&spell_targets.azure_strike>2
+    if Player:BuffUp(S.Dragonrage) and EnemiesCount8ySplash > 2 then
+      local ShouldReturn = DRAoE(); if ShouldReturn then return ShouldReturn; end
     end
-    -- dragonrage
-    if S.Dragonrage:IsCastable() then
-      if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage main 6"; end
+    -- call_action_list,name=aoe,if=spell_targets.azure_strike>2
+    if EnemiesCount8ySplash > 2 then
+      local ShouldReturn = AOE(); if ShouldReturn then return ShouldReturn; end
     end
-    -- Manually added: firestorm
-    if S.Firestorm:IsCastable() then
-      if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm main 8"; end
-    end
-    -- shattering_star
-    if S.ShatteringStar:IsCastable() then
-      if Cast(S.ShatteringStar, nil, nil, not Target:IsInRange(25)) then return "shattering_star main 10"; end
-    end
-    -- eternity_surge,empower_to=1
-    -- Manually added: All empower levels. Is this optimal?
-    if S.EternitySurge:IsReady() then
-      if S.EternitysSpan:IsAvailable() then
-        if EnemiesCount8ySplash > 6 and S.FontofMagic:IsAvailable() then
-          if CastAnnotated(S.EternitySurge, false, "4") then return "eternity_surge empower 4 main 12"; end
-        elseif EnemiesCount8ySplash > 4 then
-          if CastAnnotated(S.EternitySurge, false, "3") then return "eternity_surge empower 3 main 12"; end
-        elseif EnemiesCount8ySplash > 2 and EnemiesCount8ySplash <= 4 then
-          if CastAnnotated(S.EternitySurge, false, "2") then return "eternity_surge empower 2 main 12"; end
-        else
-          if CastAnnotated(S.EternitySurge, false, "1") then return "eternity_surge empower 1 main 12"; end
-        end
-      else
-        if EnemiesCount8ySplash > 3 and S.FontofMagic:IsAvailable() then
-          if CastAnnotated(S.EternitySurge, false, "4") then return "eternity_surge empower 4 main 14"; end
-        elseif EnemiesCount8ySplash > 2 then
-          if CastAnnotated(S.EternitySurge, false, "3") then return "eternity_surge empower 3 main 14"; end
-        elseif EnemiesCount8ySplash == 2 then
-          if CastAnnotated(S.EternitySurge, false, "2") then return "eternity_surge empower 2 main 14"; end
-        else
-          if CastAnnotated(S.EternitySurge, false, "1") then return "eternity_surge empower 1 main 14"; end
-        end
-      end
-    end
-    -- tip_the_scales,if=buff.dragonrage.up
-    if S.TipTheScales:IsCastable() and (Player:BuffUp(S.Dragonrage)) then
-      if Cast(S.TipTheScales, Settings.Devastation.GCDasOffGCD.TipTheScales) then return "tip_the_scales main 16"; end
-    end
-    -- fire_breath
-    if S.FireBreath:IsCastable() and ((Target:TimeToDie() > 19 and S.FontofMagic:IsAvailable()) or (Target:TimeToDie() > 15 and not S.FontofMagic:IsAvailable())) then
-      if not S.FontofMagic:IsAvailable() then
-        if CastAnnotated(S.FireBreath, false, "3") then return "fire_breath empower 3 main 18"; end
-      else
-        if CastAnnotated(S.FireBreath, false, "4") then return "fire_breath empower 4 main 18"; end
-      end
-    elseif S.FireBreath:IsCastable() then
-      if CastAnnotated(S.FireBreath, false, "1") then return "fire_breath empower 1 main 18"; end
-    end
-    -- pyre,if=spell_targets.pyre>2
-    if S.Pyre:IsReady() and (EnemiesCount8ySplash > 2) then
-      if Cast(S.Pyre, nil, nil, not Target:IsInRange(25)) then return "pyre main 20"; end
-    end
-    -- living_flame,if=buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack
-    if S.LivingFlame:IsCastable() and (not Player:IsCasting(S.LivingFlame)) and (Player:BuffUp(S.BurnoutBuff) and Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack) then
-      if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame main 22"; end
-    end
-    -- disintegrate
-    if S.Disintegrate:IsReady() and EnemiesCount8ySplash < 3 then
-      if Cast(S.Disintegrate, nil, nil, not Target:IsInRange(25)) then return "disintegrate main 24"; end
-    end
-    -- azure_strike,if=spell_targets.azure_strike>2
-    if S.AzureStrike:IsCastable() and (EnemiesCount8ySplash > 2) then
-      if Cast(S.AzureStrike, nil, nil, not Target:IsInRange(25)) then return "azure_strike main 26"; end
-    end
-    -- living_flame
-    if S.LivingFlame:IsCastable() then
-      if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame main 28"; end
+    -- call_action_list,name=st,if=spell_targets.azure_strike<3
+    if EnemiesCount8ySplash < 3 then
+      local ShouldReturn = ST(); if ShouldReturn then return ShouldReturn; end
     end
     -- If nothing else to do, show the Pool icon
     if CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end

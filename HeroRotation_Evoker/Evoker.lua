@@ -34,6 +34,9 @@ Spell.Evoker.Commons = {
   LivingFlame                           = Spell(361469),
   -- Talents
   TipTheScales                          = Spell(370553),
+  -- Buffs/Debuffs
+  FireBreathDebuff                      = Spell(357209),
+  LeapingFlamesBuff                     = Spell(370901),
   -- Utility
   Quell                                 = Spell(351338),
   -- Other
@@ -49,9 +52,11 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   Firestorm                             = Spell(368847),
   FontofMagic                           = Spell(375783),
   Pyre                                  = Spell(357211),
+  Ruin                                  = Spell(376888),
   ShatteringStar                        = Spell(370452),
   -- Buffs/Debuffs
   BurnoutBuff                           = Spell(375802),
+  ChargedBlastBuff                      = Spell(370454),
   EssenceBurstBuff                      = Spell(359618),
 })
 
