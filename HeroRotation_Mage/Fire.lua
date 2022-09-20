@@ -77,9 +77,10 @@ local var_kindling_reduction = (S.Kindling:IsAvailable()) and 0.4 or 1
 local var_skb_duration = 6
 local var_skb_delay = 0.1
 local var_mot_recharge_amount = 6
-local var_combustion_on_use = (I.SinfulGladiatorsBadge:IsEquipped() or I.SinfulAspirantsBadge:IsEquipped() or I.MacabreSheetMusic:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.EmpyrealOrdnance:IsEquipped() or I.FlameofBattle:IsEquipped() or I.WakenersFrond:IsEquipped() or I.InstructorsDivineBell:IsEquipped() or I.ShadowedOrbofTorment:IsEquipped())
+local var_combustion_on_use = (I.SinfulGladiatorsBadge:IsEquipped() or I.SinfulAspirantsBadge:IsEquipped() or I.MacabreSheetMusic:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.EmpyrealOrdnance:IsEquipped() or I.FlameofBattle:IsEquipped() or I.WakenersFrond:IsEquipped() or I.InstructorsDivineBell:IsEquipped() or I.ShadowedOrbofTorment:IsEquipped() or I.TheFirstSigil:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped() or I.FleshrendersMeathook:IsEquipped() or I.EnforcersStunGrenade:IsEquipped())
 local var_empyreal_ordnance_delay = 18
 local var_on_use_cutoff = 0
+local var_item_cutoff_active = false
 local var_use_shifting_power = false
 local var_combustion_shifting_power = var_combustion_flamestrike
 local var_combustion_cast_remains = 0.7
@@ -109,13 +110,10 @@ local EnemiesCount10yMelee,EnemiesCount18yMelee
 local Enemies8ySplash,Enemies10yMelee,Enemies18yMelee
 local UnitsWithIgniteCount
 
-local ExpandedPotentialEquipped = Player:HasLegendaryEquipped(6)
 local DisciplinaryCommandEquipped = Player:HasLegendaryEquipped(7)
 local GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
 local TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
-local FeveredIncantationEquipped = Player:HasLegendaryEquipped(10)
 local FirestormEquipped = Player:HasLegendaryEquipped(11)
-local MoltenSkyfallEquipped = Player:HasLegendaryEquipped(12)
 local SunKingsBlessingEquipped = Player:HasLegendaryEquipped(13)
 local DeathFathomEquipped = Player:HasLegendaryEquipped(221)
 local SinfulDelightEquipped = Player:HasLegendaryEquipped(222)
@@ -129,18 +127,25 @@ HL:RegisterForEvent(function()
   CovenantID = Player:CovenantID()
 end, "COVENANT_CHOSEN")
 
+-- Trinket Item Objects
+local equip = Player:GetEquipment()
+local trinkets = {}
+trinkets[1] = (equip[13]) and Item(equip[13]) or Item(0)
+trinkets[2] = (equip[14]) and Item(equip[14]) or Item(0)
+
 HL:RegisterForEvent(function()
-  ExpandedPotentialEquipped = Player:HasLegendaryEquipped(6)
   DisciplinaryCommandEquipped = Player:HasLegendaryEquipped(7)
   GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
   TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
-  FeveredIncantationEquipped = Player:HasLegendaryEquipped(10)
   FirestormEquipped = Player:HasLegendaryEquipped(11)
-  MoltenSkyfallEquipped = Player:HasLegendaryEquipped(12)
   SunKingsBlessingEquipped = Player:HasLegendaryEquipped(13)
   DeathFathomEquipped = Player:HasLegendaryEquipped(221)
   SinfulDelightEquipped = Player:HasLegendaryEquipped(222)
-  var_combustion_on_use = (I.SinfulGladiatorsBadge:IsEquipped() or I.SinfulAspirantsBadge:IsEquipped() or I.MacabreSheetMusic:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.EmpyrealOrdnance:IsEquipped() or I.FlameofBattle:IsEquipped() or I.WakenersFrond:IsEquipped() or I.InstructorsDivineBell:IsEquipped() or I.ShadowedOrbofTorment:IsEquipped())
+  var_combustion_on_use = (I.SinfulGladiatorsBadge:IsEquipped() or I.SinfulAspirantsBadge:IsEquipped() or I.MacabreSheetMusic:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.EmpyrealOrdnance:IsEquipped() or I.FlameofBattle:IsEquipped() or I.WakenersFrond:IsEquipped() or I.InstructorsDivineBell:IsEquipped() or I.ShadowedOrbofTorment:IsEquipped() or I.TheFirstSigil:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped() or I.FleshrendersMeathook:IsEquipped() or I.EnforcersStunGrenade:IsEquipped())
+  equip = Player:GetEquipment()
+  trinkets = {}
+  trinkets[1] = (equip[13]) and Item(equip[13]) or Item(0)
+  trinkets[2] = (equip[14]) and Item(equip[14]) or Item(0)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -324,8 +329,8 @@ local function Precombat()
     if Settings.Commons.Enabled.Trinkets and I.SoulIgniter:IsEquippedAndReady() and not var_combustion_on_use and I.DreadfireVessel:IsEquipped() and (not S.Firestarter:IsAvailable() or var_firestarter_combustion) then
       if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soul_igniter precombat"; end
     end
-    -- use_item,name=shadowed_orb_of_torment
-    if Settings.Commons.Enabled.Trinkets and I.ShadowedOrbofTorment:IsEquippedAndReady() then
+    -- use_item,name=shadowed_orb_of_torment,if=!equipped.the_first_sigil
+    if Settings.Commons.Enabled.Trinkets and I.ShadowedOrbofTorment:IsEquippedAndReady() and (not I.TheFirstSigil:IsEquipped()) then
       if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "use_item precombat"; end
     end
     -- mirror_image
@@ -489,6 +494,18 @@ local function CombustionCooldowns()
     if I.TheFirstSigil:IsEquippedAndReady() then
       if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil combustion_cooldowns 30"; end
     end
+    -- use_item,name=fleshrenders_meathook
+    if I.FleshrendersMeathook:IsEquippedAndReady() then
+      if Cast(I.FleshrendersMeathook, nil, Settings.Commons.DisplayStyle.Trinkets) then return "fleshrenders_meathook combustion_cooldowns 32"; end
+    end
+    -- use_item,name=enforcers_stun_grenade
+    if I.EnforcersStunGrenade:IsEquippedAndReady() then
+      if Cast(I.EnforcersStunGrenade, nil, Settings.Commons.DisplayStyle.Trinkets) then return "enforcers_stun_grenade combustion_cooldowns 34"; end
+    end
+    -- use_item,name=neural_synapse_enhancer
+    if I.NeuralSynapseEnhancer:IsEquippedAndReady() then
+      if Cast(I.NeuralSynapseEnhancer, nil, Settings.Commons.DisplayStyle.Items) then return "neural_synapse_enhancer combustion_cooldowns 36"; end
+    end
   end
 end
 
@@ -513,9 +530,17 @@ local function CombustionPhase()
   else
     var_extended_combustion_remains = 0
   end
-  -- call_action_list,name=combustion_cooldowns,if=variable.extended_combustion_remains>variable.skb_duration
-  if (var_extended_combustion_remains > var_skb_duration) then
+  -- call_action_list,name=combustion_cooldowns,if=buff.combustion.remains>variable.skb_duration|fight_remains<20
+  if (Player:BuffRemains(S.CombustionBuff) > var_skb_duration or FightRemains < 20) then
     local ShouldReturn = CombustionCooldowns(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- use_item,name=hyperthread_wristwraps,if=hyperthread_wristwraps.fire_blast>=2&action.fire_blast.charges=0
+  if I.HyperthreadWristwraps:IsEquippedAndReady() and (num(Player:PrevGCD(1, S.FireBlast)) + num(Player:PrevGCD(2, S.FireBlast)) + num(Player:PrevGCD(3, S.FireBlast)) >= 2 and S.FireBlast:Charges() == 0) then
+    if Cast(I.HyperthreadWristwraps, nil, Settings.Commons.DisplayStyle.Items) then return "hyperthread_wristwraps combustion_cooldowns 38"; end
+  end
+  -- use_item,name=neural_synapse_enhancer,if=variable.time_to_combustion>60
+  if I.NeuralSynapseEnhancer:IsEquippedAndReady() and (var_time_to_combustion > 60) then
+    if Cast(I.NeuralSynapseEnhancer, nil, Settings.Commons.DisplayStyle.Items) then return "neural_synapse_enhancer combustion_phase 7"; end
   end
   -- call_action_list,name=active_talents
   if (true) then
@@ -568,8 +593,8 @@ local function CombustionPhase()
   if (CovenantID == 3) then
     var_use_shifting_power = (S.Firestarter:ActiveRemains() < var_extended_combustion_remains and (S.InfernalCascade:ConduitEnabled() and var_expected_fire_blasts < var_needed_fire_blasts) and ((not S.RuneofPower:IsAvailable()) or S.RuneofPower:CooldownRemains() > var_extended_combustion_remains) or EnemiesCount18yMelee >= var_combustion_shifting_power)
   end
-  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=conduit.infernal_cascade&!variable.fire_blast_pooling&(!set_bonus.tier28_4pc|debuff.mirrors_of_torment.down|buff.sun_kings_blessing_ready.down|action.pyroblast.executing)&(variable.expected_fire_blasts>=variable.needed_fire_blasts|buff.combustion.remains<gcd.max|variable.extended_combustion_remains<=buff.infernal_cascade.duration|buff.infernal_cascade.stack<2|buff.infernal_cascade.remains<gcd.max|cooldown.shifting_power.ready&variable.use_shifting_power)&buff.combustion.up&(!buff.firestorm.react|buff.infernal_cascade.remains<0.5)&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react*(gcd.remains>0)<2
-  if S.FireBlast:IsReady() and (S.InfernalCascade:ConduitEnabled() and (not var_fire_blast_pooling) and ((not Player:HasTier(28, 4)) or Target:DebuffDown(S.MirrorsofTorment) or Player:BuffDown(S.SunKingsBlessingBuff) or Player:IsCasting(S.Pyroblast)) and (var_expected_fire_blasts >= var_needed_fire_blasts or Player:BuffRemains(S.CombustionBuff) < Player:GCD() + 0.5 or var_extended_combustion_remains <= S.InfernalCascadeBuff:BaseDuration() or Player:BuffStack(S.InfernalCascadeBuff) < 2 or Player:BuffRemains(S.InfernalCascadeBuff) < Player:GCD() + 0.5 or S.ShiftingPower:CooldownUp() and var_use_shifting_power) and Player:BuffUp(S.CombustionBuff) and ((not Player:BuffUp(S.FirestormBuff)) or Player:BuffRemains(S.InfernalCascadeBuff) < 0.5) and Player:BuffDown(S.HotStreakBuff) and HotStreakInFlight() + num(Player:BuffUp(S.HeatingUpBuff)) * num(Player:GCDRemains() > 0) < 2) then
+  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=conduit.infernal_cascade&!variable.fire_blast_pooling&(!set_bonus.tier28_4pc|debuff.mirrors_of_torment.down|buff.sun_kings_blessing_ready.down|action.pyroblast.executing)&(!equipped.hyperthread_wristwraps|!cooldown.hyperthread_wristwraps_300142.ready|charges>1|hyperthread_wristwraps.fire_blast.first_remains>1|debuff.mirrors_of_torment.up)&(variable.expected_fire_blasts>=variable.needed_fire_blasts|buff.combustion.remains<gcd.max|variable.extended_combustion_remains<=buff.infernal_cascade.duration|buff.infernal_cascade.stack<2|buff.infernal_cascade.remains<gcd.max|cooldown.shifting_power.ready&variable.use_shifting_power|equipped.hyperthread_wristwraps&cooldown.hyperthread_wristwraps_300142.ready)&buff.combustion.up&(!buff.firestorm.react|buff.infernal_cascade.remains<0.5)&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react*(gcd.remains>0)<2
+  if S.FireBlast:IsReady() and (S.InfernalCascade:ConduitEnabled() and (not var_fire_blast_pooling) and ((not Player:HasTier(28, 4)) or Target:DebuffDown(S.MirrorsofTorment) or Player:BuffDown(S.SunKingsBlessingBuff) or Player:IsCasting(S.Pyroblast)) and ((not I.HyperthreadWristwraps:IsEquipped()) or (not I.HyperthreadWristwraps:IsReady()) or S.FireBlast:Charges() > 1 or Target:DebuffUp(S.MirrorsofTorment)) and (var_expected_fire_blasts >= var_needed_fire_blasts or Player:BuffRemains(S.CombustionBuff) < Player:GCD() + 0.5 or var_extended_combustion_remains <= S.InfernalCascadeBuff:BaseDuration() or Player:BuffStack(S.InfernalCascadeBuff) < 2 or Player:BuffRemains(S.InfernalCascadeBuff) < Player:GCD() + 0.5 or S.ShiftingPower:CooldownUp() and var_use_shifting_power or I.HyperthreadWristwraps:IsEquippedAndReady()) and Player:BuffUp(S.CombustionBuff) and ((not Player:BuffUp(S.FirestormBuff)) or Player:BuffRemains(S.InfernalCascadeBuff) < 0.5) and Player:BuffDown(S.HotStreakBuff) and HotStreakInFlight() + num(Player:BuffUp(S.HeatingUpBuff)) * num(Player:GCDRemains() > 0) < 2) then
     if FBCast(S.FireBlast) then return "fire_blast combustion_phase 22"; end
   end
   -- flamestrike,if=(buff.hot_streak.react&active_enemies>=variable.combustion_flamestrike)|(buff.firestorm.react&active_enemies>=variable.combustion_flamestrike-runeforge.firestorm)
@@ -919,6 +944,8 @@ local function APL()
     if S.FireBlast:IsReady() and Player:IsCasting(S.MirrorsofTorment) and S.FireBlast:FullRechargeTime() - S.MirrorsofTorment:ExecuteTime() < 4 and not (S.Fireball:InFlight() or Player:IsCasting(S.Fireball) or Player:IsCasting(S.Scorch) or S.PhoenixFlames:InFlight()) and Player:BuffDown(S.HotStreakBuff) then
       if FBCast(S.FireBlast) then return "fire_blast default 12"; end
     end
+    -- variable,name=item_cutoff_active,value=(variable.time_to_combustion<variable.on_use_cutoff|buff.combustion.remains>variable.skb_duration&!cooldown.item_cd_1141.remains)&((trinket.1.cooldown.remains<variable.on_use_cutoff)+(trinket.2.cooldown.remains<variable.on_use_cutoff)>1)
+    var_item_cutoff_active = (var_time_to_combustion < var_on_use_cutoff or Player:BuffRemains(S.CombustionBuff) > var_skb_duration and I.ScarsofFraternalStrife:IsReady()) and (num(trinkets[1]:CooldownRemains() < var_on_use_cutoff) + num(trinkets[2]:CooldownRemains() < var_on_use_cutoff) > 1)
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,effect_name=gladiators_badge,if=variable.time_to_combustion>cooldown-5
       if I.SinfulAspirantsBadge:IsEquippedAndReady() and (var_time_to_combustion > 55) then
@@ -931,8 +958,8 @@ local function APL()
       if I.EmpyrealOrdnance:IsEquippedAndReady() and (var_time_to_combustion <= var_empyreal_ordnance_delay and var_time_to_combustion > var_empyreal_ordnance_delay - 5) then
         if Cast(I.EmpyrealOrdnance, nil, Settings.Commons.DisplayStyle.Trinkets) then return "empyreal_ordnance default 18"; end
       end
-      -- use_item,name=shadowed_orb_of_torment,if=(variable.time_to_combustion<=variable.combustion_precast_time+2|fight_remains<variable.time_to_combustion)&buff.combustion.down
-      if I.ShadowedOrbofTorment:IsEquippedAndReady() and (var_time_to_combustion <= var_combustion_precast_time + 2 or FightRemains < var_time_to_combustion) and Player:BuffDown(S.CombustionBuff) then
+      -- use_item,name=shadowed_orb_of_torment,if=(variable.time_to_combustion<=variable.combustion_precast_time+2|fight_remains<variable.time_to_combustion)&buff.combustion.down&(!equipped.the_first_sigil|cooldown.the_first_sigil_367241.remains>40)
+      if I.ShadowedOrbofTorment:IsEquippedAndReady() and ((var_time_to_combustion <= var_combustion_precast_time + 2 or FightRemains < var_time_to_combustion) and Player:BuffDown(S.CombustionBuff) and ((not I.TheFirstSigil:IsEquipped()) or I.TheFirstSigil:CooldownRemains() > 40)) then
         if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment default 20"; end
       end
       -- use_item,name=grim_eclipse,if=variable.time_to_combustion<=8|fight_remains<variable.time_to_combustion
@@ -943,45 +970,45 @@ local function APL()
       if I.MoonlitPrism:IsEquippedAndReady() and (var_time_to_combustion <= 5 or FightRemains < var_time_to_combustion) then
         if Cast(I.MoonlitPrism, nil, Settings.Commons.DisplayStyle.Trinkets) then return "moonlit_prism default 24"; end
       end
-      -- use_item,name=glyph_of_assimilation,if=(buff.combustion.down&variable.time_to_combustion>=variable.on_use_cutoff|variable.on_use_cutoff=0)
-      if I.GlyphofAssimilation:IsEquippedAndReady() and (Player:BuffDown(S.CombustionBuff) and var_time_to_combustion >= var_on_use_cutoff or var_on_use_cutoff == 0) then
+      -- use_item,name=glyph_of_assimilation,if=!variable.item_cutoff_active
+      if I.GlyphofAssimilation:IsEquippedAndReady() and (not var_item_cutoff_active) then
         if Cast(I.GlyphofAssimilation, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "glyph_of_assimilation default 26"; end
       end
       -- use_item,name=macabre_sheet_music,if=variable.time_to_combustion<=5
       if I.MacabreSheetMusic:IsEquippedAndReady() and (var_time_to_combustion <= 5) then
         if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music default 28"; end
       end
-      -- use_item,name=dreadfire_vessel,if=(buff.combustion.down&variable.time_to_combustion>=variable.on_use_cutoff|variable.on_use_cutoff=0)&(buff.infernal_cascade.stack=buff.infernal_cascade.max_stack|!conduit.infernal_cascade|variable.combustion_on_use|variable.time_to_combustion>interpolated_fight_remains%%(cooldown+10))
-      if I.DreadfireVessel:IsEquippedAndReady() and ((Player:BuffDown(S.CombustionBuff) and var_time_to_combustion >= var_on_use_cutoff or var_on_use_cutoff == 0) and (Player:BuffStack(S.InfernalCascadeBuff) == 2 or not S.InfernalCascade:ConduitEnabled() or var_combustion_on_use or var_time_to_combustion > FightRemains % 100)) then
+      -- use_item,name=dreadfire_vessel,if=!variable.item_cutoff_active&(buff.infernal_cascade.stack=buff.infernal_cascade.max_stack|!conduit.infernal_cascade|variable.combustion_on_use&!runeforge.sun_kings_blessing|variable.time_to_combustion>interpolated_fight_remains%%(cooldown+10))
+      if I.DreadfireVessel:IsEquippedAndReady() and ((not var_item_cutoff_active) and (Player:BuffStack(S.InfernalCascadeBuff) == 2 or not S.InfernalCascade:ConduitEnabled() or var_combustion_on_use and (not SunKingsBlessingEquipped) or var_time_to_combustion > FightRemains % 100)) then
         if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel default 30"; end
       end
-      -- use_item,name=soul_igniter,if=(variable.time_to_combustion>=30*(variable.on_use_cutoff>0)|cooldown.item_cd_1141.remains)&(!equipped.dreadfire_vessel|cooldown.dreadfire_vessel_349857.remains>5)
+      -- use_item,name=soul_igniter,if=(cooldown.item_cd_1141.remains|!variable.item_cutoff_active)&(!conduit.infernal_cascade|buff.infernal_cascade.up|buff.combustion.up)&(!equipped.dreadfire_vessel|cooldown.dreadfire_vessel_349857.remains>5)
       -- TODO: Check cooldown.item_cd_1141.remains
-      if I.SoulIgniter:IsEquippedAndReady() and (var_time_to_combustion >= 30 * num(var_on_use_cutoff > 0) and (not I.DreadfireVessel:IsEquipped() or I.DreadfireVessel:CooldownRemains() > 5)) then
+      if I.SoulIgniter:IsEquippedAndReady() and ((S.ScarsofFraternalStrife:CooldownDown() or (not var_item_cutoff_active)) and ((not S.InfernalCascade:ConduitEnabled()) or Player:BuffUp(S.InfernalCascadeBuff) or Player:BuffUp(S.CombustionBuff)) and ((not I.DreadfireVessel:IsEquipped()) or I.DreadfireVessel:CooldownRemains() > 5)) then
         if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "soul_igniter default 32"; end
       end
       -- cancel_buff,name=soul_ignition,if=!conduit.infernal_cascade&time<5|buff.infernal_cascade.stack=buff.infernal_cascade.max_stack
       if Player:BuffUp(S.SoulIgnitionBuff) and (not S.InfernalCascade:ConduitEnabled() and HL.CombatTime() < 5 or Player:BuffStack(S.InfernalCascadeBuff) == 2) then
         if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "cancel soul_igniter default 34"; end
       end
-      if ((I.SinfulAspirantsBadge:IsEquipped() or I.SinfulGladiatorsBadge:IsEquipped()) and (Player:BuffDown(S.CombustionBuff) and var_time_to_combustion >= var_on_use_cutoff or var_on_use_cutoff == 0)) then
-        -- use_item,name=inscrutable_quantum_device,if=equipped.gladiators_badge&(buff.combustion.down&variable.time_to_combustion>=variable.on_use_cutoff|variable.on_use_cutoff=0)
-        if I.InscrutableQuantumDevice:IsEquippedAndReady() then
-          if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device default 36"; end
-        end
-        -- use_item,name=flame_of_battle,if=equipped.gladiators_badge&(buff.combustion.down&variable.time_to_combustion>=variable.on_use_cutoff|variable.on_use_cutoff=0)
+      -- use_item,name=inscrutable_quantum_device,if=equipped.gladiators_badge&(buff.combustion.down&variable.time_to_combustion>=variable.on_use_cutoff|variable.on_use_cutoff=0)
+      if I.InscrutableQuantumDevice:IsEquippedAndReady() and ((I.SinfulAspirantsBadge:IsEquipped() or I.SinfulGladiatorsBadge:IsEquipped()) and (Player:BuffDown(S.CombustionBuff) and var_time_to_combustion >= var_on_use_cutoff or var_on_use_cutoff == 0)) then
+        if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device default 36"; end
+      end
+      if ((I.SinfulAspirantsBadge:IsEquipped() or I.SinfulGladiatorsBadge:IsEquipped()) and not var_item_cutoff_active) then
+        -- use_item,name=flame_of_battle,if=equipped.gladiators_badge&!variable.item_cutoff_active
         if I.FlameofBattle:IsEquippedAndReady() then
           if Cast(I.FlameofBattle, nil, Settings.Commons.DisplayStyle.Trinkets) then return "flame_of_battle default 38"; end
         end
-        -- use_item,name=wakeners_frond,if=equipped.gladiators_badge&(buff.combustion.down&variable.time_to_combustion>=variable.on_use_cutoff|variable.on_use_cutoff=0)
+        -- use_item,name=wakeners_frond,if=equipped.gladiators_badge&!variable.item_cutoff_active
         if I.WakenersFrond:IsEquippedAndReady() then
           if Cast(I.WakenersFrond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "wakeners_frond default 40"; end
         end
-        -- use_item,name=instructors_divine_bell,if=equipped.gladiators_badge&(buff.combustion.down&variable.time_to_combustion>=variable.on_use_cutoff|variable.on_use_cutoff=0)
+        -- use_item,name=instructors_divine_bell,if=equipped.gladiators_badge&!variable.item_cutoff_active
         if I.InstructorsDivineBell:IsEquippedAndReady() then
           if Cast(I.InstructorsDivineBell, nil, Settings.Commons.DisplayStyle.Trinkets) then return "instructors_divine_bell default 42"; end
         end
-        -- use_item,name=sunblood_amethyst,if=equipped.gladiators_badge&(buff.combustion.down&variable.time_to_combustion>=variable.on_use_cutoff|variable.on_use_cutoff=0)
+        -- use_item,name=sunblood_amethyst,if=equipped.gladiators_badge&!variable.item_cutoff_active
         if I.SunbloodAmethyst:IsEquippedAndReady() then
           if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sunblood_amethyst default 44"; end
         end
@@ -990,8 +1017,8 @@ local function APL()
       if I.ScarsofFraternalStrife:IsEquippedAndReady() and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4)) then
         if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife default 46"; end
       end
-      -- use_items,if=buff.combustion.down&variable.time_to_combustion>=variable.on_use_cutoff|variable.on_use_cutoff=0
-      if (Player:BuffDown(S.CombustionBuff) and var_time_to_combustion >= var_on_use_cutoff or var_on_use_cutoff == 0) then
+      -- use_items,if=!variable.item_cutoff_active
+      if (not var_item_cutoff_active) then
         local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
         if TrinketToUse then
           if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end

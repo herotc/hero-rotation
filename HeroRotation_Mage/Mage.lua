@@ -216,7 +216,9 @@ Item.Mage.Commons = {
   DreadfireVessel                  = Item(184030, {13, 14}),
   EbonsoulVise                     = Item(186431, {13, 14}),
   EmpyrealOrdnance                 = Item(180117, {13, 14}),
+  EnforcersStunGrenade             = Item(110017, {13, 14}),
   FlameofBattle                    = Item(181501, {13, 14}),
+  FleshrendersMeathook             = Item(110002, {13, 14}),
   GlyphofAssimilation              = Item(184021, {13, 14}),
   GrimEclipse                      = Item(188254, {13, 14}),
   InscrutableQuantumDevice         = Item(179350, {13, 14}),
@@ -236,6 +238,7 @@ Item.Mage.Commons = {
   TomeofMonstruousConstructions    = Item(186422, {13, 14}),
   WakenersFrond                    = Item(181457, {13, 14}),
   -- Other On-Use Items
+  HyperthreadWristwraps            = Item(168989),
   NeuralSynapseEnhancer            = Item(168973),
 }
 
