@@ -124,7 +124,7 @@ local function DRAoE()
     if Cast(S.FireBreath, nil, nil, not Target:IsInRange(25)) then return "fire_breath dr_aoe 12"; end
   end
   -- living_flame,if=buff.leaping_flames.up
-  if S.LivingFlame:IsReady() and (Player:BuffUp(S.LeapingFlamesBuff)) then
+  if S.LivingFlame:IsReady() and (not Player:IsCasting(S.LivingFlame)) and (Player:BuffUp(S.LeapingFlamesBuff) or Player:IsCasting(S.FireBreath)) then
     if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame dr_aoe 14"; end
   end
   -- pyre,if=prev_gcd.1.azure_strike|prev_gcd.1.disintegrate
@@ -159,7 +159,7 @@ local function AOE()
     if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 6"; end
   end
   -- living_flame,if=buff.leaping_flames.up
-  if S.LivingFlame:IsReady() and (Player:BuffUp(S.LeapingFlamesBuff)) then
+  if S.LivingFlame:IsReady() and (not Player:IsCasting(S.LivingFlame)) and (Player:BuffUp(S.LeapingFlamesBuff) or Player:IsCasting(S.FireBreath)) then
     if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 8"; end
   end
   -- pyre,if=buff.essence_burst.up
@@ -216,7 +216,7 @@ local function ST()
     if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm st 8"; end
   end
   -- living_flame,if=buff.leaping_flames.up
-  if S.LivingFlame:IsReady() and (Player:BuffUp(S.LeapingFlamesBuff) or Player:IsCasting(S.FireBreath)) then
+  if S.LivingFlame:IsReady() and (not Player:IsCasting(S.LivingFlame)) and (Player:BuffUp(S.LeapingFlamesBuff) or Player:IsCasting(S.FireBreath)) then
     if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 10"; end
   end
   -- shattering_star,if=essence>=3|buff.essence_burst.up|cooldown.eternity_surge.up
