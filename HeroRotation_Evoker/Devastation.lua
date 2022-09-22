@@ -189,7 +189,7 @@ local function AOE()
     if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate aoe 16"; end
   end
   -- deep_breath,if=talent.ruin
-  if S.DeepBreath:IsReady() and (S.Ruin:IsAvailable()) then
+  if S.DeepBreath:IsReady() and (S.Tyranny:IsAvailable()) then
     if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath) then return "deep_breath aoe 18"; end
   end
   -- azure_strike

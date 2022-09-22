@@ -45,6 +45,7 @@ Spell.Evoker.Commons = {
 
 Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   -- Talents
+  Burnout                               = Spell(375801),
   Dragonrage                            = Spell(375087),
   EssenceAttunement                     = Spell(375722),
   EternitySurge                         = MultiSpell(359073,382411), -- with and without Font of Magic
@@ -52,7 +53,7 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   Firestorm                             = Spell(368847),
   FontofMagic                           = Spell(375783),
   Pyre                                  = Spell(357211),
-  Ruin                                  = Spell(376888),
+  Tyranny                               = Spell(376888),
   ShatteringStar                        = Spell(370452),
   -- Buffs/Debuffs
   BurnoutBuff                           = Spell(375802),
