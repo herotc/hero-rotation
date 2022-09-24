@@ -127,8 +127,8 @@ local function DRAoE()
   if S.LivingFlame:IsReady() and (not Player:IsCasting(S.LivingFlame)) and (Player:BuffUp(S.LeapingFlamesBuff) or Player:IsCasting(S.FireBreath)) then
     if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame dr_aoe 14"; end
   end
-  -- pyre,if=prev_gcd.1.azure_strike|prev_gcd.1.disintegrate
-  if S.Pyre:IsReady() and (Player:PrevGCD(1, S.AzureStrike) or Player:PrevGCD(1, S.Disintegrate)) then
+  -- pyre,if=spell_targets.azure_strike>3&(prev_gcd.1.azure_strike|prev_gcd.1.disintegrate)
+  if S.Pyre:IsReady() and (EnemiesCount8ySplash > 3 and (Player:PrevGCD(1, S.AzureStrike) or Player:PrevGCD(1, S.Disintegrate))) then
     if Cast(S.Pyre, nil, nil, not Target:IsInRange(25)) then return "pyre dr_aoe 16"; end
   end
   -- azure_strike,if=spell_targets.azure_strike>3
@@ -164,7 +164,7 @@ local function AOE()
   end
   -- pyre,if=buff.essence_burst.up
   if S.Pyre:IsReady() and (Player:BuffUp(S.EssenceBurstBuff)) then
-    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 10"; end
+    if Cast(S.Pyre, nil, nil, not Target:IsInRange(25)) then return "pyre aoe 10"; end
   end
   -- eternity_surge
   if S.EternitySurge:IsReady() then
@@ -188,7 +188,7 @@ local function AOE()
   if S.Disintegrate:IsReady() then
     if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate aoe 16"; end
   end
-  -- deep_breath,if=talent.ruin
+  -- deep_breath,if=talent.tyranny
   if S.DeepBreath:IsReady() and (S.Tyranny:IsAvailable()) then
     if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath) then return "deep_breath aoe 18"; end
   end
