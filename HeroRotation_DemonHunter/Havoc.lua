@@ -46,13 +46,17 @@ if equip[14] then
   trinket2 = Item(equip[14])
 end
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
 -- Rotation Var
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
 local DarkglareEquipped = Player:HasLegendaryEquipped(20)
 local ChaosTheoryEquipped = Player:HasLegendaryEquipped(23)
 local BurningWoundEquipped = Player:HasLegendaryEquipped(25)
-local AgonyGazeEquipped = Player:HasLegendaryEquipped(236)
+local AgonyGazeEquipped = Player:HasLegendaryEquipped(236) or (CovenantID == 2 and Player:HasUnity())
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -80,10 +84,6 @@ local VarTrinketSyncSlot = 0
 local VarUseEyeBeamFuryCondition = false
 local BossFightRemains = 11111
 local FightRemains = 11111
-
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
 
 -- Update CovenantID if we change Covenants
 HL:RegisterForEvent(function()
@@ -115,7 +115,7 @@ HL:RegisterForEvent(function()
   DarkglareEquipped = Player:HasLegendaryEquipped(20)
   ChaosTheoryEquipped = Player:HasLegendaryEquipped(23)
   BurningWoundEquipped = Player:HasLegendaryEquipped(25)
-  AgonyGazeEquipped = Player:HasLegendaryEquipped(236)
+  AgonyGazeEquipped = Player:HasLegendaryEquipped(236) or (CovenantID == 2 and Player:HasUnity())
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
