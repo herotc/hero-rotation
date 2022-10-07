@@ -45,20 +45,29 @@ Spell.Evoker.Commons = {
 
 Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   -- Talents
+  Animosity                             = Spell(375797),
+  ArcaneVigor                           = Spell(386342),
   Burnout                               = Spell(375801),
+  Causality                             = Spell(375777),
+  ChargedBlast                          = Spell(370455),
   Dragonrage                            = Spell(375087),
+  EngulfingBlaze                        = Spell(370837),
   EssenceAttunement                     = Spell(375722),
   EternitySurge                         = MultiSpell(359073,382411), -- with and without Font of Magic
   EternitysSpan                         = Spell(375757),
+  FeedtheFlames                         = Spell(369846),
   Firestorm                             = Spell(368847),
   FontofMagic                           = Spell(375783),
   Pyre                                  = Spell(357211),
+  RubyEmbers                            = Spell(365937),
+  Scintillation                         = Spell(370821),
   Tyranny                               = Spell(376888),
   ShatteringStar                        = Spell(370452),
   -- Buffs/Debuffs
   BurnoutBuff                           = Spell(375802),
   ChargedBlastBuff                      = Spell(370454),
   EssenceBurstBuff                      = Spell(359618),
+  SnapfireBuff                          = Spell(370818),
 })
 
 -- Items
@@ -66,6 +75,8 @@ if not Item.Evoker then Item.Evoker = {} end
 Item.Evoker.Commons = {
   -- Potions
   PotionofSpectralIntellect             = Item(171273),
+  -- Trinkets
+  ShadowedOrbofTorment                  = Item(186428, {13, 14}),
 }
 
 Item.Evoker.Devastation = MergeTableByKey(Item.Evoker.Commons, {
