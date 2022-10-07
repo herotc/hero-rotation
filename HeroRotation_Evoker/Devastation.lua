@@ -90,7 +90,7 @@ local function Precombat()
     if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm precombat"; end
   end
   -- living_flame,if=!talent.firestorm
-  if S.LivingFlame:IsCastable() and (not S.Firestorm:IsCastable()) then
+  if S.LivingFlame:IsCastable() and (not S.Firestorm:IsAvailable()) then
     if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame precombat"; end
   end
 end
