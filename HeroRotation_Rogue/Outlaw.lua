@@ -485,6 +485,12 @@ local function Build ()
   if CDsON() and S.EchoingReprimand:IsReady() and (not S.EffusiveAnimaAccelerator:SoulbindEnabled() or Blade_Flurry_Sync()) then
     if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
   end
+      -- actions.build+=/Ambush,if=buff.Audacity.up
+  if S.Ambush:IsCastable() and Target:IsSpellInRange(S.Ambush) then
+    if Player:BuffUp(S.AudacityBuff) then
+      if HR.CastPooling(S.Ambush) then return "Cast Ambush (Buffed)" end
+    end
+  end
   -- actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.greenskins_wickers.up|buff.concealed_blunderbuss.up|buff.tornado_trigger.up)|buff.greenskins_wickers.up&buff.greenskins_wickers.remains<1.5
   if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) then
     if Player:BuffUp(S.Opportunity) and Player:BuffUp(S.GreenskinsWickers) or Player:BuffUp(S.ConcealedBlunderbuss) or Player:BuffUp(S.TornadoTriggerBuff) then
