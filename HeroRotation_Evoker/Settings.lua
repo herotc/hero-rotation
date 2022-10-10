@@ -41,6 +41,7 @@ HR.GUISettings.APL.Evoker = {
   },
   Devastation = {
     GCDasOffGCD = {
+      DeepBreath = true,
       Dragonrage = true,
       TipTheScales = true,
     },
