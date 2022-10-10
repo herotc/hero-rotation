@@ -439,7 +439,7 @@ local function Stealth ()
     if HR.CastPooling(S.Dispatch) then return "Cast Dispatch" end
   end
     -- actions.stealth=ambush
-  if S.Ambush:IsReady() and Target:IsSpellInRange(S.Ambush) then
+  if S.Ambush:IsCastable() and Target:IsSpellInRange(S.Ambush) then
     if HR.CastPooling(S.Ambush) then return "Cast Ambush" end
   end
 end
