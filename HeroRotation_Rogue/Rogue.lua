@@ -99,6 +99,10 @@ Spell.Rogue.Commons = {
   -- Misc
   PoolEnergy              = Spell(999910),
   SinfulRevelationDebuff  = Spell(324260),
+  -- Beta DF
+  EchoingReprimandDF     = Spell(385616),
+  ThistleTea             = Spell(381623),
+  ShadowDance            = Spell(185313),
 }
 
 Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
@@ -203,6 +207,18 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   GreenskinsWickers       = Spell(340573),
   -- Set Bonuses (Shadowlands)
   TornadoTriggerBuff      = Spell(364556),
+  -- Beta DF
+   KeepItRolling	        = Spell(381989),
+   Audacity               = Spell(381845),
+   AudacityBuff		        = Spell(386270),
+   GreenskinsWickersTalent  = Spell(386823),
+   GreenskinsWickersBuff  = Spell(394131),
+   FanTheHammer           = Spell(381846),
+   ImprovedAdrenalineRush = Spell(395422),
+   SwiftSlasher           = Spell(381988),
+   ColdBloodDF            = Spell(382245),
+   SepsisDF               = Spell(385408),
+   TakeEmBySurprise       = Spell(385907),
 })
 
 Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
@@ -300,6 +316,13 @@ Item.Rogue.Outlaw = {
   FontOfPower               = Item(169314, {13, 14}),
   RazorCoral                = Item(169311, {13, 14}),
   CacheOfAcquiredTreasures  = Item(188265, {13, 14}),
+  BloodstainedHandkerchief  = Item(142159, {13, 14}),
+  ScarsOfFraternalStrife    = Item(188253, {13, 14}),
+  WindscarWhetstone         = Item(137486, {13, 14}),
+  -- Items
+  WrapsOfElectrostaticPotential = Item(169069), -- {9}
+  RingOfCollapsingFutures   = Item(142173, {11, 12}),
+
 }
 
 Item.Rogue.Subtlety = {

@@ -23,7 +23,9 @@ HR.GUISettings.APL.Rogue = {
     RangedMultiDoT = true, -- Suggest Multi-DoT at 10y Range
     UsePriorityRotation = "Never", -- Only for Assassination / Subtlety
     UseTrinkets = true,
+    UseItems = true,
     TrinketDisplayStyle = "Suggested",
+    ItemDisplayStyle = "Suggested",
     CovenantDisplayStyle = "Suggested",
     SerratedBoneSpikeDumpDisplayStyle = "Suggested",
     ShowPooling = false,
@@ -119,7 +121,9 @@ CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.PoisonRefreshCombat", {
 CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.")
 CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.UsePriorityRotation", {"Never", "On Bosses", "Always", "Auto"}, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall AoE damage.)\nAuto will function as Never except on specific encounters where AoE is not recommended.")
 CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
+CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.UseItems", "Use Items", "Use Items as part of the rotation")
 CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
+CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.ItemDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Item Display Style", "Define which icon display style to use for Items.")
 CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for Covenants.")
 CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.SerratedBoneSpikeDumpDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Serrated Bone Spike Burn Display Style", "Define which icon display style to use for Serrated Bone Spike charge burning.")
 CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.ShowPooling", "Show Pooling", "Show pooling icon instead of pooling prediction.")
