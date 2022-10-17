@@ -312,17 +312,17 @@ local function CDs ()
         EvaluateFlagellationCondition, not Target:IsInMeleeRange(5), nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation" end
     end
     --actions.cds+=/shadow_dance,if=!runeforge.mark_of_the_master_assassin&!runeforge.invigorating_shadowdust&!runeforge.deathly_shadows&!stealthed.all&!buff.take_em_by_surprise.up&(variable.finish_condition&buff.slice_and_dice.up|variable.ambush_condition&!buff.slice_and_dice.up)
-    if S.ShadowDance:IsReady()
+    if S.ShadowDance:IsAvailable() and S.ShadowDance:IsReady()
       and not MarkoftheMasterAssassinEquipped and not InvigoratingShadowdustEquipped and not DeathlyShadowsEquipped
       and not Player:StealthUp(true, true) and not Player:BuffUp(S.TakeEmBySurprise)
-      and Finish_Condition() and Player:BuffUp(S.SliceandDice) or Ambush_Condition() and not Player:BuffUp(S.SliceandDice) then
+      and ((Finish_Condition() and Player:BuffUp(S.SliceandDice)) or (Ambush_Condition() and not Player:BuffUp(S.SliceandDice))) then
         if HR.Cast(S.ShadowDance) then return "Cast Shadow Dance" end
       end
     --actions.cds+=/vanish,if=!runeforge.mark_of_the_master_assassin&!runeforge.invigorating_shadowdust&!runeforge.deathly_shadows&!stealthed.all&!buff.take_em_by_surprise.up&(variable.finish_condition&buff.slice_and_dice.up|variable.ambush_condition&!buff.slice_and_dice.up)
     if S.Vanish:IsCastable() and Vanish_DPS_Condition()
     and not MarkoftheMasterAssassinEquipped and not InvigoratingShadowdustEquipped and not DeathlyShadowsEquipped
     and not Player:StealthUp(true, true) and not Player:BuffUp(S.TakeEmBySurprise)
-    and Finish_Condition() and Player:BuffUp(S.SliceandDice) or Ambush_Condition() and not Player:BuffUp(S.SliceandDice) then
+    and ((Finish_Condition() and Player:BuffUp(S.SliceandDice)) or (Ambush_Condition() and not Player:BuffUp(S.SliceandDice))) then
       if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Finish or Ambush)" end
     end
     --actions.cds+=/vanish,if=runeforge.deathly_shadows&!stealthed.all&buff.deathly_shadows.down&combo_points<=2&variable.ambush_condition
