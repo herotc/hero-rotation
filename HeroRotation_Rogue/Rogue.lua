@@ -99,10 +99,11 @@ Spell.Rogue.Commons = {
   -- Misc
   PoolEnergy              = Spell(999910),
   SinfulRevelationDebuff  = Spell(324260),
-  -- Beta DF
-  EchoingReprimandDF     = Spell(385616),
-  ThistleTea             = Spell(381623),
-  ShadowDance            = Spell(185313),
+  -- Talents
+  ThistleTea              = Spell(381623),
+  EchoingReprimandTalent  = Spell(385616),
+  ShadowDance             = Spell(185313),
+  ShadowDanceBuff         = Spell(185422),
 }
 
 Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
@@ -182,6 +183,17 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   PreyontheWeakDebuff     = Spell(255909),
   QuickDraw               = Spell(196938),
   Weaponmaster            = Spell(200733),
+  KeepItRolling           = Spell(381989),
+  Audacity                = Spell(381845),
+  AudacityBuff		        = Spell(386270),
+  GreenskinsWickersTalent = Spell(386823),
+  GreenskinsWickersBuff   = Spell(394131),
+  FanTheHammer            = Spell(381846),
+  ImprovedAdrenalineRush  = Spell(395422),
+  SwiftSlasher            = Spell(381988),
+  ColdBloodTalent         = Spell(382245),
+  SepsisTalent            = Spell(385408),
+  TakeEmBySurprise        = Spell(385907),
   -- Utility
   Gouge                   = Spell(1776),
   -- PvP
@@ -207,18 +219,6 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   GreenskinsWickers       = Spell(340573),
   -- Set Bonuses (Shadowlands)
   TornadoTriggerBuff      = Spell(364556),
-  -- Beta DF
-   KeepItRolling	        = Spell(381989),
-   Audacity               = Spell(381845),
-   AudacityBuff		        = Spell(386270),
-   GreenskinsWickersTalent  = Spell(386823),
-   GreenskinsWickersBuff  = Spell(394131),
-   FanTheHammer           = Spell(381846),
-   ImprovedAdrenalineRush = Spell(395422),
-   SwiftSlasher           = Spell(381988),
-   ColdBloodDF            = Spell(382245),
-   SepsisDF               = Spell(385408),
-   TakeEmBySurprise       = Spell(385907),
 })
 
 Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
@@ -240,8 +240,6 @@ Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
   FindWeaknessDebuff      = Spell(316220),
   Rupture                 = Spell(1943),
   ShadowBlades            = Spell(121471),
-  ShadowDance             = Spell(185313),
-  ShadowDanceBuff         = Spell(185422),
   Shadowstrike            = Spell(185438),
   Shiv                    = Spell(5938),
   ShurikenStorm           = Spell(197835),

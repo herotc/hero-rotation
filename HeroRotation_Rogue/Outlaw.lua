@@ -459,8 +459,8 @@ local function Finish ()
     if HR.CastPooling(S.SliceandDice) then return "Cast Slice and Dice" end
   end
   --actions.finish+=/cold_blood,if=!(runeforge.greenskins_wickers|talent.greenskins_wickers)
-  if S.ColdBloodDF:IsCastable() and not (GreenskinsWickersEquipped or S.GreenskinsWickersTalent:IsAvailable()) then
-    if HR.CastPooling(S.ColdBloodDF) then return "Cast Cold Blood" end
+  if S.ColdBloodTalent:IsCastable() and not (GreenskinsWickersEquipped or S.GreenskinsWickersTalent:IsAvailable()) then
+    if HR.CastPooling(S.ColdBloodTalent) then return "Cast Cold Blood" end
   end
   --actions.finish+=/dispatch
   if S.Dispatch:IsCastable() and Target:IsSpellInRange(S.Dispatch) then
@@ -470,9 +470,13 @@ end
 
 local function Build ()
   --actions.build=sepsis,target_if=max:target.time_to_die*debuff.between_the_eyes.up,if=target.time_to_die>11&debuff.between_the_eyes.up|fight_remains<11
-  if CDsON() and S.SepsisDF:IsReady() and Target:IsSpellInRange(S.SepsisDF)
+  if CDsON() and S.SepsisTalent:IsReady() and Target:IsSpellInRange(S.SepsisTalent)
     and (Target:FilteredTimeToDie(">", 11) and Target:DebuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 11)) then
-    if HR.Cast(S.SepsisDF, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
+    if HR.Cast(S.SepsisTalent, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
+  end
+  if CDsON() and S.Sepsis:IsReady() and Target:IsSpellInRange(S.Sepsis)
+    and (Target:FilteredTimeToDie(">", 11) and Target:DebuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 11)) then
+    if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis (Covenant)" end
   end
   --actions.build+=/ghostly_strike,if=debuff.ghostly_strike.remains<=3
   if S.GhostlyStrike:IsReady() and Target:IsSpellInRange(S.GhostlyStrike) and Target:DebuffRemains(S.GhostlyStrike) <= 3 then
@@ -483,20 +487,23 @@ local function Build ()
     if HR.Cast(S.Shiv) then return "Cast Shiv (TTB)" end
   end
   --actions.build+=/echoing_reprimand,if=!soulbind.effusive_anima_accelerator|variable.blade_flurry_sync
-  if S.EchoingReprimandDF:IsReady() and Target:IsSpellInRange(S.EchoingReprimandDF) and (not S.EffusiveAnimaAccelerator:SoulbindEnabled() or Blade_Flurry_Sync()) then
-    if HR.Cast(S.EchoingReprimandDF, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
+  if S.EchoingReprimandTalent:IsReady() and Target:IsSpellInRange(S.EchoingReprimandTalent) and (not S.EffusiveAnimaAccelerator:SoulbindEnabled() or Blade_Flurry_Sync()) then
+    if HR.Cast(S.EchoingReprimandTalent, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
+  end
+  if S.EchoingReprimand:IsReady() and Target:IsSpellInRange(S.EchoingReprimand) and (not S.EffusiveAnimaAccelerator:SoulbindEnabled() or Blade_Flurry_Sync()) then
+    if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand (Covenant)" end
   end
   --actions.build+=/ambush
   if S.Ambush:IsCastable() and Target:IsSpellInRange(S.Ambush) and Player:BuffUp(S.AudacityBuff) then
     if HR.CastPooling(S.Ambush) then return "Cast Ambush" end
   end
   --actions.build+=/cold_blood,if=buff.opportunity.up&buff.greenskins_wickers.up|buff.greenskins_wickers.up&buff.greenskins_wickers.remains<1.5
-  if S.ColdBloodDF:IsCastable()
+  if S.ColdBloodTalent:IsCastable()
     and (((Player:BuffUp(S.Opportunity) and Player:BuffUp(S.GreenskinsWickersBuff))
     or (Player:BuffUp(S.GreenskinsWickersBuff) and (Player:BuffRemains(S.GreenskinsWickersBuff) < 1.5)))
     or ((Player:BuffUp(S.Opportunity) and Player:BuffUp(S.GreenskinsWickers))
     or (Player:BuffUp(S.GreenskinsWickers) and (Player:BuffRemains(S.GreenskinsWickers) < 1.5)))) then
-    if HR.CastPooling(S.ColdBloodDF) then return "Cast Cold Blood" end
+    if HR.CastPooling(S.ColdBloodTalent) then return "Cast Cold Blood" end
   end
   --actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.greenskins_wickers.up|buff.concealed_blunderbuss.up|talent.fan_the_hammer)|buff.greenskins_wickers.up&buff.greenskins_wickers.remains<1.5
   if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) then
