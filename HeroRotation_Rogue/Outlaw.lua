@@ -86,6 +86,7 @@ local Energy, EnergyRegen, EnergyDeficit, EnergyTimeToMax, EnergyMaxOffset
 local Interrupts = {
   { S.Blind, "Cast Blind (Interrupt)", function () return true end },
 }
+local VanishMACondition = false
 
 -- Legendaries
 local CovenantId = Player:CovenantID()
@@ -236,19 +237,21 @@ end
 -- # Always attempt to use BtE at 5+ CP, regardless of CP gen waste
 -- # Finish at 2+ in the last GCD of Flagellation
 local function Finish_Condition ()
-  -- actions+=/variable,name=finish_condition,value=combo_points>=cp_max_spend-buff.broadside.up-(buff.opportunity.up*talent.quick_draw.enabled|buff.concealed_blunderbuss.up)|effective_combo_points>=cp_max_spend
-  -- actions+=/variable,name=finish_condition,op=reset,if=cooldown.between_the_eyes.ready&effective_combo_points<5
+  --actions+=/variable,name=finish_condition,op=reset,if=cooldown.between_the_eyes.ready&effective_combo_points<5
+  if S.BetweentheEyes:CooldownUp() and EffectiveComboPoints < 5 then
+    return false
+  end
+  -- actions+=/variable,name=finish_condition,value=combo_points>=cp_max_spend-buff.broadside.up-(buff.opportunity.up*(talent.quick_draw|talent.fan_the_hammer)|buff.concealed_blunderbuss.up)|effective_combo_points>=cp_max_spend
+  if ComboPoints >= (Rogue.CPMaxSpend() - num(Player:BuffUp(S.Broadside)) - (num(Player:BuffUp(S.Opportunity)) *
+    num((S.QuickDraw:IsAvailable() or S.FanTheHammer:IsAvailable()) or Player:BuffUp(S.ConcealedBlunderbuss)))) or EffectiveComboPoints >= Rogue.CPMaxSpend() then
+    return true
+  end
   -- actions+=/variable,name=finish_condition,value=1,if=buff.flagellation_buff.up&buff.flagellation_buff.remains<1&effective_combo_points>=2
   if EffectiveComboPoints >=2 and S.Flagellation:AnyDebuffUp() and Player:BuffRemains(S.Flagellation) < 1.5 then
     return true
   end
 
-  if S.BetweentheEyes:CooldownUp() and EffectiveComboPoints < 5 then
-    return false
-  end
-
-  return ComboPoints >= (Rogue.CPMaxSpend() - num(Player:BuffUp(S.Broadside)) - (num(Player:BuffUp(S.Opportunity)) *
-    num(S.QuickDraw:IsAvailable() or Player:BuffUp(S.ConcealedBlunderbuss)))) or EffectiveComboPoints >= Rogue.CPMaxSpend()
+  return false
 end
 
 -- # Ensure we get full Ambush CP gains and aren't rerolling Count the Odds buffs away
@@ -318,23 +321,30 @@ local function CDs ()
       and ((Finish_Condition() and Player:BuffUp(S.SliceandDice)) or (Ambush_Condition() and not Player:BuffUp(S.SliceandDice))) then
         if HR.Cast(S.ShadowDance) then return "Cast Shadow Dance" end
       end
-    --actions.cds+=/vanish,if=!runeforge.mark_of_the_master_assassin&!runeforge.invigorating_shadowdust&!runeforge.deathly_shadows&!stealthed.all&!buff.take_em_by_surprise.up&(variable.finish_condition&buff.slice_and_dice.up|variable.ambush_condition&!buff.slice_and_dice.up)
-    if S.Vanish:IsCastable() and Vanish_DPS_Condition()
-    and not MarkoftheMasterAssassinEquipped and not InvigoratingShadowdustEquipped and not DeathlyShadowsEquipped
-    and not Player:StealthUp(true, true) and not Player:BuffUp(S.TakeEmBySurprise)
-    and ((Finish_Condition() and Player:BuffUp(S.SliceandDice)) or (Ambush_Condition() and not Player:BuffUp(S.SliceandDice))) then
-      if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Finish or Ambush)" end
+    -- # Vanish
+    if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
+      --actions.cds+=/vanish,if=!runeforge.mark_of_the_master_assassin&!runeforge.invigorating_shadowdust&!runeforge.deathly_shadows&!stealthed.all&!buff.take_em_by_surprise.up&(variable.finish_condition&buff.slice_and_dice.up|variable.ambush_condition&!buff.slice_and_dice.up)
+      if not MarkoftheMasterAssassinEquipped and not InvigoratingShadowdustEquipped and not DeathlyShadowsEquipped
+      and not Player:StealthUp(true, true) and not Player:BuffUp(S.TakeEmBySurprise)
+      and ((Finish_Condition() and Player:BuffUp(S.SliceandDice)) or (Ambush_Condition() and not Player:BuffUp(S.SliceandDice))) then
+       if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Finish or Ambush)" end
+      end
+      --actions.cds+=/vanish,if=runeforge.deathly_shadows&!stealthed.all&buff.deathly_shadows.down&combo_points<=2&variable.ambush_condition
+      if DeathlyShadowsEquipped and not Player:StealthUp(true, true) and Player:BuffDown(S.DeathlyShadowsBuff) and ComboPoints <= 2 and Ambush_Condition() then
+        if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Deathly Shadows - Ambush)" end
+      end
+      if MarkoftheMasterAssassinEquipped then
+        --actions.cds+=/variable,name=vanish_ma_condition,if=runeforge.mark_of_the_master_assassin&!talent.marked_for_death.enabled,value=(!cooldown.between_the_eyes.ready&variable.finish_condition)|(cooldown.between_the_eyes.ready&variable.ambush_condition)
+        if not S.MarkedforDeath:IsAvailable() then
+          VanishMACondition = (not S.BetweentheEyes:IsReady() and Finish_Condition()) or (S.BetweentheEyes:IsReady() and Ambush_Condition())
+        --actions.cds+=/variable,name=vanish_ma_condition,if=runeforge.mark_of_the_master_assassin&talent.marked_for_death.enabled,value=variable.finish_condition
+        else VanishMACondition = Finish_Condition() end
+        --actions.cds+=/vanish,if=variable.vanish_ma_condition&master_assassin_remains=0&variable.blade_flurry_sync
+        if VanishMACondition and Rogue.MasterAssassinsMarkRemains() <= 0 and Blade_Flurry_Sync() then
+          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Mark of the Master Assassin)" end
+        end
+      end
     end
-    --actions.cds+=/vanish,if=runeforge.deathly_shadows&!stealthed.all&buff.deathly_shadows.down&combo_points<=2&variable.ambush_condition
-    if S.Vanish:IsCastable() and Vanish_DPS_Condition()
-    and DeathlyShadowsEquipped
-    and not Player:StealthUp(true, true) and Player:BuffDown(S.DeathlyShadowsBuff)
-    and ComboPoints <= 2 and Ambush_Condition() then
-      if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Deathly Shadows - Ambush)" end
-    end
-    --actions.cds+=/variable,name=vanish_ma_condition,if=runeforge.mark_of_the_master_assassin&!talent.marked_for_death.enabled,value=(!cooldown.between_the_eyes.ready&variable.finish_condition)|(cooldown.between_the_eyes.ready&variable.ambush_condition)
-    --actions.cds+=/variable,name=vanish_ma_condition,if=runeforge.mark_of_the_master_assassin&talent.marked_for_death.enabled,value=variable.finish_condition
-    --actions.cds+=/vanish,if=variable.vanish_ma_condition&master_assassin_remains=0&variable.blade_flurry_sync
     --actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!talent.improved_adrenaline_rush|combo_points<=2)
     if S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush) and ((not S.ImprovedAdrenalineRush:IsAvailable()) or ComboPoints <= 2) then
       if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
@@ -505,8 +515,25 @@ local function Build ()
   if S.SerratedBoneSpike:IsReady() and not Target:DebuffUp(S.SerratedBoneSpikeDebuff) then
     if HR.Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Serrated Bone Spike" end
   end
---actions.build+=/serrated_bone_spike,target_if=min:target.time_to_die+(dot.serrated_bone_spike_dot.ticking*600),if=!dot.serrated_bone_spike_dot.ticking
---actions.build+=/serrated_bone_spike,if=fight_remains<=5|cooldown.serrated_bone_spike.max_charges-charges_fractional<=0.25|combo_points.deficit=cp_gain&!buff.skull_and_crossbones.up&energy.base_time_to_max>1
+  --actions.build+=/serrated_bone_spike,target_if=min:target.time_to_die+(dot.serrated_bone_spike_dot.ticking*600),if=!dot.serrated_bone_spike_dot.ticking
+  if AoEON() and S.SerratedBoneSpike:IsReady() then
+    -- Prefer melee cycle units
+    local BestUnit, BestUnitTTD = nil, 4
+    local TargetGUID = Target:GUID()
+    for _, CycleUnit in pairs(Enemies30y) do
+      if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemains(S.SerratedBoneSpike))
+        and not CycleUnit:DebuffUp(S.SerratedBoneSpikeDebuff) then
+          BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie()
+        end
+    end
+    if BestUnit then
+      HR.CastLeftNameplate(BestUnit, S.SerratedBoneSpike)
+    end
+  end
+  --actions.build+=/serrated_bone_spike,if=fight_remains<=5|cooldown.serrated_bone_spike.max_charges-charges_fractional<=0.25|combo_points.deficit=cp_gain&!buff.skull_and_crossbones.up&energy.base_time_to_max>1
+  if S.SerratedBoneSpike:IsReady() and S.SerratedBoneSpike:ChargesFractional() > 2.75 then
+    if HR.Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Serrated Bone Spike Filler" end
+  end
   --actions.build+=/pistol_shot,if=buff.opportunity.up&(energy.base_deficit>energy.regen*1.5|!talent.weaponmaster&combo_points.deficit<=1+buff.broadside.up|talent.quick_draw.enabled|talent.audacity.enabled&!buff.audacity.up)
   if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot)
     and Player:BuffUp(S.Opportunity) and (EnergyDeficit > (EnergyRegen * 1.5)
