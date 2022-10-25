@@ -377,8 +377,14 @@ local function CDs ()
         if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
       end
     end
-    --actions.cds+=/vanish,if=runeforge.invigorating_shadowdust&covenant.venthyr&!stealthed.all&variable.ambush_condition&(!cooldown.flagellation.ready&(!talent.dreadblades|!cooldown.dreadblades.ready|!buff.flagellation_buff.up))
-    --actions.cds+=/vanish,if=runeforge.invigorating_shadowdust&!covenant.venthyr&!stealthed.all&(cooldown.echoing_reprimand.remains>6|!cooldown.sepsis.ready|cooldown.serrated_bone_spike.full_recharge_time>20)
+    --actions.cds+=/vanish,if=runeforge.invigorating_shadowdust&covenant.venthyr&!stealthed.all&variable.finish_condition&(!cooldown.flagellation.ready&(!talent.dreadblades|!cooldown.dreadblades.ready|!buff.flagellation_buff.up))
+    --actions.cds+=/vanish,if=runeforge.invigorating_shadowdust&!covenant.venthyr&!stealthed.all&variable.finish_condition&(cooldown.echoing_reprimand.remains>6|!cooldown.sepsis.ready|cooldown.serrated_bone_spike.full_recharge_time>20)
+    if CDsON() and S.Vanish:IsReady() and InvigoratingShadowdustEquipped and not Player:StealthUp(true, true) and Finish_Condition() then
+      if (IsVenthyr and (not S.Flagellation:IsReady() and (not S.Dreadblades:IsAvailable() or not S.Dreadblades:IsReady() or not S.Flagellation:AnyDebuffUp()))
+        or (not IsVenthyr and (S.EchoingReprimand:CooldownRemains() > 6 or S.EchoingReprimandTalent:CooldownRemains() > 6 or not S.Sepsis:IsReady() or not S.SepsisTalent:IsReady() or S.SerratedBoneSpike:FullRechargeTime() > 20))) then
+        if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Invigorating Shadowdust)" end
+      end
+    end
     --actions.cds+=/shadowmeld,if=!stealthed.all&((conduit.count_the_odds|talent.count_the_odds)&variable.finish_condition|!talent.weaponmaster.enabled&variable.ambush_condition)
     --actions.cds+=/thistle_tea,if=energy.deficit>=100&!buff.thistle_tea.up&(charges=3|buff.adrenaline_rush.up|fight_remains<charges*6)
     if S.ThistleTea:IsCastable() and (EnergyDeficit >= 100 and not Player:BuffUp(S.ThistleTea)) then
@@ -613,6 +619,10 @@ local function APL ()
         end
       end
       -- TODO actions.precombat+=/fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
+      -- actions.precombat+=/adrenaline_rush,precombat_seconds=3,if=talent.improved_adrenaline_rush
+      if S.AdrenalineRush:IsReady() and S.ImprovedAdrenalineRush:IsAvailable() then
+        if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush (Opener)" end
+      end
       -- actions.precombat+=/roll_the_bones,precombat_seconds=2
       if S.RolltheBones:IsReady() and (not Player:BuffUp(S.RolltheBones) or RtB_Reroll()) then
         if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones (Opener)" end
@@ -706,7 +716,7 @@ end
 HR.SetAPL(260, APL, Init)
 
 --- ======= SIMC =======
--- Last Update: 2022-10-17
+-- Last Update: 2022-10-25
 
 --  # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=apply_poison
@@ -717,6 +727,7 @@ HR.SetAPL(260, APL, Init)
 -- actions.precombat+=/snapshot_stats
 -- actions.precombat+=/marked_for_death,precombat_seconds=10,if=raid_event.adds.in>25
 -- actions.precombat+=/fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
+-- actions.precombat+=/adrenaline_rush,precombat_seconds=3,if=talent.improved_adrenaline_rush
 -- actions.precombat+=/roll_the_bones,precombat_seconds=2
 -- actions.precombat+=/slice_and_dice,precombat_seconds=1
 -- actions.precombat+=/stealth
@@ -797,8 +808,8 @@ HR.SetAPL(260, APL, Init)
 -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&variable.killing_spree_vanish_sync&!stealthed.rogue&(debuff.between_the_eyes.up&buff.dreadblades.down&energy.base_deficit>(energy.regen*2+15)|spell_targets.blade_flurry>(2-buff.deathly_shadows.up)|master_assassin_remains>0)
 -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&(energy.base_time_to_max>2&!buff.dreadblades.up&!buff.flagellation_buff.up|energy<=30|spell_targets>2)
 -- # If using Invigorating Shadowdust, use normal logic in addition to checking major CDs.
--- actions.cds+=/vanish,if=runeforge.invigorating_shadowdust&covenant.venthyr&!stealthed.all&variable.ambush_condition&(!cooldown.flagellation.ready&(!talent.dreadblades|!cooldown.dreadblades.ready|!buff.flagellation_buff.up))
--- actions.cds+=/vanish,if=runeforge.invigorating_shadowdust&!covenant.venthyr&!stealthed.all&(cooldown.echoing_reprimand.remains>6|!cooldown.sepsis.ready|cooldown.serrated_bone_spike.full_recharge_time>20)
+-- actions.cds+=/vanish,if=runeforge.invigorating_shadowdust&covenant.venthyr&!stealthed.all&variable.finish_condition&(!cooldown.flagellation.ready&(!talent.dreadblades|!cooldown.dreadblades.ready|!buff.flagellation_buff.up))
+-- actions.cds+=/vanish,if=runeforge.invigorating_shadowdust&!covenant.venthyr&!stealthed.all&variable.finish_condition&(cooldown.echoing_reprimand.remains>6|!cooldown.sepsis.ready|cooldown.serrated_bone_spike.full_recharge_time>20)
 -- actions.cds+=/shadowmeld,if=!stealthed.all&((conduit.count_the_odds|talent.count_the_odds)&variable.finish_condition|!talent.weaponmaster.enabled&variable.ambush_condition)
 -- actions.cds+=/thistle_tea,if=energy.deficit>=100&!buff.thistle_tea.up&(charges=3|buff.adrenaline_rush.up|fight_remains<charges*6)
 -- actions.cds+=/potion,if=buff.bloodlust.react|fight_remains<30|buff.adrenaline_rush.up

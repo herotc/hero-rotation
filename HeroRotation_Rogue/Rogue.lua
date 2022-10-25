@@ -100,10 +100,11 @@ Spell.Rogue.Commons = {
   PoolEnergy              = Spell(999910),
   SinfulRevelationDebuff  = Spell(324260),
   -- Talents
-  ThistleTea              = Spell(381623),
   EchoingReprimandTalent  = Spell(385616),
+  Nightstalker            = Spell(14062),
   ShadowDance             = Spell(185313),
   ShadowDanceBuff         = Spell(185422),
+  ThistleTea              = Spell(381623),
 }
 
 Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
@@ -136,7 +137,6 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   MarkedforDeath          = Spell(137619),
   MasterAssassin          = Spell(255989),
   MasterAssassinBuff      = Spell(256735),
-  Nightstalker            = Spell(14062),
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
   Shiv                    = Spell(5938),
@@ -257,10 +257,11 @@ Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
   DarkShadow              = Spell(245687),
   DeeperStratagem         = Spell(193531),
   EnvelopingShadows       = Spell(238104),
+  FlagellationTalent      = Spell(384631),
+  FlagellationTalentBuff  = Spell(394758),
   Gloomblade              = Spell(200758),
   MarkedforDeath          = Spell(137619),
   MasterofShadows         = Spell(196976),
-  Nightstalker            = Spell(14062),
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
   Premeditation           = Spell(343160),
