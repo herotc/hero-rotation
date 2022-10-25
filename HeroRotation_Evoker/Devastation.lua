@@ -135,11 +135,11 @@ local function APL()
     end
     -- deep_breath,if=spell_targets.deep_breath>1
     if S.DeepBreath:IsCastable() and (EnemiesCount8ySplash > 1) then
-      if Cast(S.DeepBreath, nil, nil, not Target:IsInRange(50)) then return "deep_breath main 6"; end
+      if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath main 6"; end
     end
     -- dragonrage,if=cooldown.eternity_surge.remains<=2*gcd.max&cooldown.fire_breath.remains<=3*gcd.max|!talent.feed_the_flames|!talent.causality
     if S.Dragonrage:IsCastable() and (S.EternitySurge:CooldownRemains() <= 2 * Player:GCD() and S.FireBreath:CooldownRemains() <= 3 * Player:GCD() or (not S.FeedtheFlames:IsAvailable()) or (not S.Causality:IsAvailable())) then
-      if Cast(S.Dragonrage, nil, nil, not Target:IsInRange(25)) then return "dragonrage main 8"; end
+      if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage, nil, not Target:IsInRange(25)) then return "dragonrage main 8"; end
     end
     -- tip_the_scales,if=buff.dragonrage.up&cooldown.fire_breath.up
     if S.TipTheScales:IsCastable() and (Player:BuffUp(S.Dragonrage) and S.FireBreath:IsCastable()) then
