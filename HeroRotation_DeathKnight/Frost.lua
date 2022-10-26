@@ -505,7 +505,6 @@ local function SingleTarget()
     if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter single_target 2"; end
   end
   -- howling_blast,if=buff.rime.react&talent.icebreaker.rank=2
-  -- TODO: Handle rank 2 check
   if S.HowlingBlast:IsReady() and (Player:BuffUp(S.RimeBuff) and Player:TalentRank(S.Icebreaker:ID()) == 2) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast single_target 4"; end
   end
@@ -589,10 +588,21 @@ local function Racials()
 end
 
 local function Trinkets()
+  -- use_item<name=gavel_of_the_first_arbiter
+  if Settings.Commons.Enabled.Items and I.GaveloftheFirstArbiter:IsEquippedAndReady() then
+    if Cast(I.GaveloftheFirstArbiter, nil, Settings.Commons.DisplayStyle.Items) then return "gavel_of_the_first_arbiter trinkets 2"; end
+  end
   -- use_item,slot=trinket1,if=(buff.pillar_of_frost.up|buff.breath_of_sindragosa.up)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket2,if=(buff.pillar_of_frost.up|buff.breath_of_sindragosa.up)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket1,if=(!trinket.1.has_use_buff&(trinket.2.cooldown.remains|!trinket.2.has_use_buff)|talent.pillar_of_frost&cooldown.pillar_of_frost.remains>20|!talent.pillar_of_frost)
   -- use_item,slot=trinket2,if=(!trinket.2.has_use_buff&(trinket.1.cooldown.remains|!trinket.1.has_use_buff)|talent.pillar_of_frost&cooldown.pillar_of_frost.remains>20|!talent.pillar_of_frost)
+  -- TODO: Trinket stuff. Until then, have a generic trinket usage function.
+  if Settings.Commons.Enabled.Trinkets then
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
+  end
 end
 
 --- ======= ACTION LISTS =======

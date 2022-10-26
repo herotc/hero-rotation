@@ -22,6 +22,7 @@ HR.GUISettings.APL.DeathKnight = {
     Enabled = {
       Potions = true,
       Trinkets = true,
+      Items = true,
     },
     DisplayStyle = {
       Potions = "Suggested",
