@@ -614,10 +614,12 @@ local function APL()
     -- run_action_list,name=aoe,if=active_enemies>=4
     if (AoEON() and Enemies10ySplashCount >= 4) then
       local ShouldReturn = AoE(); if ShouldReturn then return ShouldReturn; end
+      if Cast(S.Pool) then return "pool for AoE()"; end
     end
     -- run_action_list,name=generic,if=active_enemies<=3
     if (Enemies10ySplashCount <= 3) then
       local ShouldReturn = Generic(); if ShouldReturn then return ShouldReturn; end
+      if Cast(S.Pool) then return "pool for Generic()"; end
     end
     -- Add pool resources icon if nothing else to do
     if (true) then
@@ -630,7 +632,7 @@ local function Init()
   S.VirulentPlagueDebuff:RegisterAuraTracking()
   S.FesteringWoundDebuff:RegisterAuraTracking()
 
-  --HR.Print("Unholy DK rotation is currently a work in progress, but has been updated for patch 9.1.5.")
+  HR.Print("Unholy DK rotation is currently a work in progress, but has been updated for patch 10.0.0.")
 end
 
 HR.SetAPL(252, APL, Init)
