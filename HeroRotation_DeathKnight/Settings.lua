@@ -94,6 +94,7 @@ HR.GUISettings.APL.DeathKnight = {
       SummonGargoyle = false,
       UnholyAssault = true,
       UnholyBlight = false,
+      VileContagion = false,
     }
   },
 }
