@@ -60,6 +60,7 @@ local VarOblitPoolingTime
 local VarBreathPoolingTime
 local VarPoolingRunes
 local VarPoolingRP
+local AnyDnD
 local BossFightRemains = 11111
 local FightRemains = 11111
 local ghoul = HL.GhoulTable
@@ -367,9 +368,13 @@ local function Cooldowns()
   if S.SacrificialPact:IsReady() and ((not S.GlacialAdvance:IsAvailable()) and Player:BuffDown(S.BreathofSindragosa) and ghoul:remains() < Player:GCD() * 2 and EnemiesCount10yd > 3) then
     if Cast(S.SacrificialPact, Settings.Commons.GCDasOffGCD.SacrificialPact) then return "sacrificial_pact cooldowns 32"; end
   end
-  -- death_and_decay,if=!death_and_decay.ticking&variable.adds_remain&(buff.pillar_of_frost.up&buff.pillar_of_frost.remains>5|!buff.pillar_of_frost.up)&(active_enemies>5|talent.cleaving_strikes&active_enemies>=2)
-  if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and VarAddsRemain and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffRemains(S.PillarofFrostBuff) > 5 or Player:BuffDown(S.PillarofFrostBuff)) and (EnemiesCount10yd > 5 or S.CleavingStrikes:IsAvailable() and EnemiesCount10yd >= 2)) then
-    if Cast(S.DeathAndDecay, Settings.Commons.GCDasOffGCD.DeathAndDecay, nil, not Target:IsInRange(30)) then return "death_and_decay cooldowns 34"; end
+  -- any_dnd,if=!death_and_decay.ticking&variable.adds_remain&(buff.pillar_of_frost.up&buff.pillar_of_frost.remains>5|!buff.pillar_of_frost.up)&(active_enemies>5|talent.cleaving_strikes&active_enemies>=2)
+  if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and VarAddsRemain and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffRemains(S.PillarofFrostBuff) > 5 or Player:BuffDown(S.PillarofFrostBuff)) and (EnemiesCount10yd > 5 or S.CleavingStrikes:IsAvailable() and EnemiesCount10yd >= 2)) then
+    if AnyDnD == S.DeathsDue then
+      if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Covenant) then return "any_dnd cooldowns 34"; end
+    else
+      if Cast(AnyDnD, Settings.Commons.GCDasOffGCD.DeathAndDecay) then return "any_dnd cooldowns 36"; end
+    end
   end
 end
 
@@ -628,6 +633,10 @@ local function APL()
       FightRemains = HL.FightRemains(Enemies10yd, false)
     end
   end
+
+  -- Set AnyDnD
+  AnyDnD = S.DeathAndDecay
+  if S.DeathsDue:IsAvailable() then AnyDnD = S.DeathsDue end
 
   if Everyone.TargetIsValid() then
     -- call precombat
