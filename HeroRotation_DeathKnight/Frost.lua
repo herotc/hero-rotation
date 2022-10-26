@@ -510,7 +510,7 @@ local function SingleTarget()
     if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter single_target 2"; end
   end
   -- howling_blast,if=buff.rime.react&talent.icebreaker.rank=2
-  if S.HowlingBlast:IsReady() and (Player:BuffUp(S.RimeBuff) and Player:TalentRank(S.Icebreaker:ID()) == 2) then
+  if S.HowlingBlast:IsReady() and (Player:BuffUp(S.RimeBuff) and S.Icebreaker:TalentRank() == 2) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast single_target 4"; end
   end
   -- frostscythe,if=!variable.pooling_runes&buff.killing_machine.react&variable.frostscythe_priority
