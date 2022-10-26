@@ -22,6 +22,7 @@ HR.GUISettings.APL.DeathKnight = {
     Enabled = {
       Potions = true,
       Trinkets = true,
+      Items = true,
     },
     DisplayStyle = {
       Potions = "Suggested",
@@ -30,13 +31,17 @@ HR.GUISettings.APL.DeathKnight = {
       Items = "Suggested",
       RaiseDead = "Suggested",
     },
+    GCDasOffGCD = {
+      AbominationLimb = false,
+      DeathAndDecay = false,
+      EmpowerRuneWeapon = true,
+      Racials = true,
+      SacrificialPact = true
+    },
     OffGCDasOffGCD = {
       Trinkets = true,
       Potions = true,
-      Racials = true,
       MindFreeze = true,
-      DeathAndDecay = false,
-      SacrificialPact = true
     }
   },
   Blood = {
@@ -48,6 +53,7 @@ HR.GUISettings.APL.DeathKnight = {
     },
     PoolDuringBlooddrinker = false,
     GCDasOffGCD = {
+      ChainsOfIce = false,
       DancingRuneWeapon = false,
       DeathStrike = false,
       IceboundFortitude = false,
@@ -66,12 +72,12 @@ HR.GUISettings.APL.DeathKnight = {
     },
     GCDasOffGCD = {
       -- Abilities
-      HornOfWinter = true,
+      BreathOfSindragosa = true,
+      FrostStrike = false,
       FrostwyrmsFury = true,
-      PillarOfFrost = true,
-      EmpowerRuneWeapon = true,
+      HornOfWinter = true,
       HypothermicPresence = true,
-      BreathofSindragosa = true
+      PillarOfFrost = true,
     }
   },
   Unholy = {
