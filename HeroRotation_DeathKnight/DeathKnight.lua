@@ -25,41 +25,37 @@ if not Spell.DeathKnight then Spell.DeathKnight = {} end
 Spell.DeathKnight.Commons = {
   -- Abilities
   DeathAndDecay                         = Spell(43265),
-  DeathStrike                           = Spell(49998),
-  RaiseDead                             = Spell(46585), -- Blood and Frost, but not Unholy
-  SacrificialPact                       = Spell(327574),
   -- Talents
-  Asphyxiate                            = Spell(108194), -- Frost and Unholy, but not Blood
+  AbominationLimb                       = Spell(383269),
+  Asphyxiate                            = Spell(221562),
+  ChainsofIce                           = Spell(45524),
+  CleavingStrikes                       = Spell(316916),
+  DeathStrike                           = Spell(49998),
+  EmpowerRuneWeapon                     = Spell(47568),
+  IcyTalons                             = Spell(194878),
+  RaiseDead                             = Spell(46585),
+  RunicAttenuation                      = Spell(207104),
+  SacrificialPact                       = Spell(327574),
+  SoulReaper                            = Spell(343294),
   -- Covenant Abilities
-  AbominationLimb                       = Spell(315443),
-  AbominationLimbBuff                   = Spell(315443),
+  AbominationLimbCov                    = Spell(315443),
+  AbominationLimbCovBuff                = Spell(315443),
   DeathsDue                             = Spell(324128),
   Fleshcraft                            = Spell(324631),
   ShackleTheUnworthy                    = Spell(312202),
   SwarmingMist                          = Spell(311648),
   SwarmingMistBuff                      = Spell(311648),
-  -- Conduit Effects
-  BitingCold                            = Spell(337988),
-  ConvocationOfTheDead                  = Spell(338553),
-  EradicatingBlow                       = Spell(337934),
-  Everfrost                             = Spell(337988),
-  FrenziedMonstrosity                   = Spell(334896),
+  -- Soulbind Effects (Shadowlands)
   KevinsOozeling                        = Spell(352110),
   LeadByExample                         = Spell(342156),
-  MarrowedGemstoneEnhancement           = Spell(327069),
   PustuleEruption                       = Spell(351094),
-  ThrillSeeker                          = Spell(331939),
-  UnleashedFrenzy                       = Spell(338492),
   VolatileSolvent                       = Spell(323074),
   VolatileSolventHumanBuff              = Spell(323491),
-  WitheringGround                       = Spell(341344),
-  -- Domination Shards
-  ChaosBaneBuff                         = Spell(355829),
   -- Buffs
   DeathAndDecayBuff                     = Spell(188290),
-  DeathStrikeBuff                       = Spell(101568), -- Frost and Unholy, but not Blood
-  DeathsDueBuff                         = Spell(324165),
-  EndlessRuneWaltzBuff                  = Spell(366008), -- Tier 28 2pc bonus
+  DeathsDueBuff                         = Spell(324165), -- SL Covenant. Remove after DF launch?
+  EmpowerRuneWeaponBuff                 = Spell(47568),
+  IcyTalonsBuff                         = Spell(194879),
   UnholyStrengthBuff                    = Spell(53365),
   -- Debuffs
   BloodPlagueDebuff                     = Spell(55078),
@@ -111,39 +107,36 @@ Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
 
 Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   -- Abilities
-  ChainsofIce                           = Spell(45524),
-  EmpowerRuneWeapon                     = Spell(47568),
   FrostStrike                           = Spell(49143),
-  FrostwyrmsFury                        = Spell(279302),
   HowlingBlast                          = Spell(49184),
-  Obliterate                            = Spell(49020),
-  PillarofFrost                         = Spell(51271),
-  RemorselessWinter                     = Spell(196770),
   -- Talents
   Avalanche                             = Spell(207142),
+  BitingCold                            = Spell(377056),
   BreathofSindragosa                    = Spell(152279),
+  ChillStreak                           = Spell(305392),
   ColdHeart                             = Spell(281208),
   Frostscythe                           = Spell(207230),
-  FrozenPulse                           = Spell(194909),
+  FrostwyrmsFury                        = Spell(279302),
   GatheringStorm                        = Spell(194912),
   GlacialAdvance                        = Spell(194913),
   HornofWinter                          = Spell(57330),
-  HypothermicPresence                   = Spell(321995),
+  Icebreaker                            = Spell(392950),
   Icecap                                = Spell(207126),
-  IcyTalons                             = Spell(194878),
+  ImprovedObliterate                    = Spell(317198),
+  MightoftheFrozenWastes                = Spell(81333),
+  Obliterate                            = Spell(49020),
   Obliteration                          = Spell(281238),
-  RunicAttenuation                      = Spell(207104),
+  PillarofFrost                         = Spell(51271),
+  RageoftheFrozenChampion               = Spell(377076),
+  RemorselessWinter                     = Spell(196770),
+  UnleashedFrenzy                       = Spell(376905),
   -- Buffs
   ColdHeartBuff                         = Spell(281209),
-  EmpowerRuneWeaponBuff                 = Spell(47568),
-  EradicatingBlowBuff                   = Spell(337936),
-  FrozenPulseBuff                       = Spell(194909),
   GatheringStormBuff                    = Spell(211805),
-  IcyTalonsBuff                         = Spell(194879),
   KillingMachineBuff                    = Spell(51124),
   PillarofFrostBuff                     = Spell(51271),
   RimeBuff                              = Spell(59052),
-  UnleashedFrenzyBuff                   = Spell(338501),
+  UnleashedFrenzyBuff                   = Spell(376907),
   -- Debuffs
   RazoriceDebuff                        = Spell(51714)
 })
@@ -165,7 +158,6 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   ClawingShadows                        = Spell(207311),
   Defile                                = Spell(152280),
   Pestilence                            = Spell(277234),
-  SoulReaper                            = Spell(343294),
   SummonGargoyle                        = MultiSpell(49206, 207349),
   UnholyAssault                         = Spell(207289),
   UnholyBlight                          = Spell(115989),
