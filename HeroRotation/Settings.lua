@@ -19,6 +19,8 @@
       MainFrameStrata = "BACKGROUND",
       -- Nameplate Icon Anchor
       NamePlateIconAnchor = "Clickable Area",
+      -- Show while mounted
+      ShowWhileMounted = false,
       -- Black Border Icon (Enable if you want clean black borders)
       BlackBorderIcon = false,
       HideKeyBinds = false,
@@ -48,6 +50,7 @@
     -- Controls
     CreatePanelOption("Dropdown", CP_General, "General.MainFrameStrata", {"HIGH", "MEDIUM", "LOW", "BACKGROUND"}, "Main Frame Strata", "Choose the frame strata to use for icons.", {ReloadRequired = true});
     CreatePanelOption("Dropdown", CP_General, "General.NamePlateIconAnchor", {"Clickable Area", "Life Bar", "Disable"}, "Nameplate Icon Anchor", "Choose the frame to anchor the Nameplate icon to (or disable it).", {ReloadRequired = true});
+    CreatePanelOption("CheckButton", CP_General, "General.ShowWhileMounted", "Show While Mounted", "Enable if you want the HeroRotation icon to show while mounted.");
     CreatePanelOption("CheckButton", CP_General, "General.BlackBorderIcon", "Black Border Icon", "Enable if you want clean black borders icons.", {ReloadRequired = true});
     CreatePanelOption("CheckButton", CP_General, "General.HideKeyBinds", "Hide Keybinds", "Enable if you want to hide the keybind on the icons.");
     CreatePanelOption("CheckButton", CP_General, "General.InterruptEnabled", "Interrupt", "Enable if you want to interrupt.");

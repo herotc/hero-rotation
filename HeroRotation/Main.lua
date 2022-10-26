@@ -463,7 +463,13 @@
 
   -- Is the player ready ?
   function HR.Ready ()
-    return not Player:IsDeadOrGhost() and not Player:IsMounted() and not Player:IsInVehicle() and not C_PetBattles.IsInBattle();
+    local AreWeReady
+    if HR.GUISettings.General.ShowWhileMounted then
+      AreWeReady = not Player:IsDeadOrGhost() and not Player:IsInVehicle() and not C_PetBattles.IsInBattle();
+    else
+      AreWeReady = not Player:IsDeadOrGhost() and not Player:IsMounted() and not Player:IsInVehicle() and not C_PetBattles.IsInBattle();
+    end
+    return AreWeReady
   end
 
   -- Used to force a short/long pulse wait, it also resets the icons.
