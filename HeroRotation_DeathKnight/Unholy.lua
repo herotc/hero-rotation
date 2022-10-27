@@ -378,19 +378,19 @@ local function Covenants()
   end
   -- abomination_limb_covenant,if=variable.st_planning&!soulbind.lead_by_example&(cooldown.apocalypse.remains|!talent.army_of_the_damned&cooldown.dark_transformation.remains)&rune.time_to_4>buff.runic_corruption.remains|fight_remains<12+(soulbind.kevins_oozeling*28)
   if S.AbominationLimbCov:IsReady() and CDsON() and (VarSTPlanning and not S.LeadByExample:SoulbindEnabled() and (not S.Apocalypse:CooldownUp() or not S.ArmyoftheDamned:IsAvailable() and not S.DarkTransformation:CooldownUp()) and Player:RuneTimeToX(4) > Player:BuffRemains(S.RunicCorruptionBuff) or HL.FilteredFightRemains(EnemiesMelee, "<", 12 + (num(S.KevinsOozeling:SoulbindEnabled()) * 28))) then
-    if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 6"; end
+    if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 6"; end
   end
   -- abomination_limb,if=variable.st_planning&soulbind.lead_by_example&(dot.unholy_blight_dot.remains>11|!talent.unholy_blight&cooldown.dark_transformation.remains)
   if S.AbominationLimbCov:IsReady() and CDsON() and (VarSTPlanning and S.LeadByExample:SoulbindEnabled() and (Target:DebuffRemains(S.UnholyBlightDebuff) > 11 or not S.UnholyBlight:IsAvailable() and not S.DarkTransformation:CooldownUp())) then
-    if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 8"; end
+    if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 8"; end
   end
   -- abomination_limb,if=variable.st_planning&soulbind.kevins_oozeling&(debuff.festering_wound.stack>=4&!runeforge.abominations_frenzy|runeforge.abominations_frenzy&cooldown.apocalypse.remains)
   if S.AbominationLimbCov:IsReady() and CDsON() and (VarSTPlanning and S.KevinsOozeling:SoulbindEnabled() and (Target:DebuffStack(S.FesteringWoundDebuff) >= 4 and (not AbominationsFrenzyEquipped) or AbominationsFrenzyEquipped and S.Apocalypse:CooldownDown())) then
-    if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 9"; end
+    if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 9"; end
   end
   -- abomination_limb,if=variable.adds_remain&rune.time_to_4>buff.runic_corruption.remains
   if S.AbominationLimbCov:IsReady() and CDsON() and (VarAddsRemain and Player:RuneTimeToX(4) > Player:BuffRemains(S.RunicCorruptionBuff)) then
-    if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 10"; end
+    if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 10"; end
   end
   -- shackle_the_unworthy,if=variable.st_planning&(cooldown.apocalypse.remains>10|!talent.army_of_the_damned&cooldown.dark_transformation.remains)|fight_remains<15
   if S.ShackleTheUnworthy:IsCastable() and (VarSTPlanning and (S.Apocalypse:CooldownRemains() > 10 or not S.ArmyoftheDamned:IsAvailable() and not S.DarkTransformation:CooldownUp()) or HL.FilteredFightRemains(EnemiesMelee, "<", 15)) then
