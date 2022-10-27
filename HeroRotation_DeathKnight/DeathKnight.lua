@@ -25,6 +25,7 @@ if not Spell.DeathKnight then Spell.DeathKnight = {} end
 Spell.DeathKnight.Commons = {
   -- Abilities
   DeathAndDecay                         = Spell(43265),
+  DeathCoil                             = Spell(47541),
   -- Talents
   AbominationLimb                       = Spell(383269),
   Asphyxiate                            = Spell(221562),
@@ -32,6 +33,7 @@ Spell.DeathKnight.Commons = {
   CleavingStrikes                       = Spell(316916),
   DeathStrike                           = Spell(49998),
   EmpowerRuneWeapon                     = Spell(47568),
+  IceboundFortitude                     = Spell(48792),
   IcyTalons                             = Spell(194878),
   RaiseDead                             = Spell(46585),
   RunicAttenuation                      = Spell(207104),
@@ -48,6 +50,7 @@ Spell.DeathKnight.Commons = {
   -- Soulbind Effects (Shadowlands)
   KevinsOozeling                        = Spell(352110),
   LeadByExample                         = Spell(342156),
+  LeadByExampleBuff                     = Spell(342181),
   PustuleEruption                       = Spell(351094),
   VolatileSolvent                       = Spell(323074),
   VolatileSolventHumanBuff              = Spell(323491),
@@ -60,6 +63,7 @@ Spell.DeathKnight.Commons = {
   -- Debuffs
   BloodPlagueDebuff                     = Spell(55078),
   FrostFeverDebuff                      = Spell(55095),
+  VirulentPlagueDebuff                  = Spell(191587),
   -- Racials
   AncestralCall                         = Spell(274738),
   ArcanePulse                           = Spell(260364),
@@ -77,12 +81,10 @@ Spell.DeathKnight.Commons = {
 
 Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
   -- Abilities
-  Asphyxiate                            = Spell(221562),
   BloodBoil                             = Spell(50842),
   DancingRuneWeapon                     = Spell(49028),
   DeathsCaress                          = Spell(195292),
   HeartStrike                           = Spell(206930),
-  IceboundFortitude                     = Spell(48792),
   Marrowrend                            = Spell(195182),
   RuneTap                               = Spell(194679),
   VampiricBlood                         = Spell(55233),
@@ -143,34 +145,44 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
 
 Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   -- Abilities
-  Apocalypse                            = Spell(275699),
-  ArmyoftheDead                         = Spell(42650),
-  DarkTransformation                    = Spell(63560),
-  DeathCoil                             = Spell(47541),
-  Epidemic                              = Spell(207317),
-  FesteringStrike                       = Spell(85948),
-  Outbreak                              = Spell(77575),
-  RaiseDead                             = Spell(46584),
-  ScourgeStrike                         = Spell(55090),
   -- Talents
+  Apocalypse                            = Spell(275699),
   ArmyoftheDamned                       = Spell(276837),
+  ArmyoftheDead                         = Spell(42650),
   BurstingSores                         = Spell(207264),
   ClawingShadows                        = Spell(207311),
+  CoilofDevastation                     = Spell(390270),
+  CommanderoftheDead                    = Spell(390259),
+  DarkTransformation                    = Spell(63560),
   Defile                                = Spell(152280),
+  Epidemic                              = Spell(207317),
+  EternalAgony                          = Spell(390268),
+  FesteringStrike                       = Spell(85948),
+  Festermight                           = Spell(377590),
+  GhoulishFrenzy                        = Spell(377587),
+  ImprovedDeathCoil                     = Spell(377580),
+  Morbidity                             = Spell(377592),
+  Outbreak                              = Spell(77575),
   Pestilence                            = Spell(277234),
+  Plaguebringer                         = Spell(390175),
+  RottenTouch                           = Spell(390275),
+  ScourgeStrike                         = Spell(55090),
   SummonGargoyle                        = MultiSpell(49206, 207349),
+  Superstrain                           = Spell(390283),
   UnholyAssault                         = Spell(207289),
   UnholyBlight                          = Spell(115989),
+  UnholyCommand                         = Spell(316941),
   UnholyPact                            = Spell(319230),
+  VileContagion                         = Spell(390279),
   -- Buffs
-  LeadByExampleBuff                     = Spell(342181),
+  FestermightBuff                       = Spell(377591),
+  PlaguebringerBuff                     = Spell(390178),
   RunicCorruptionBuff                   = Spell(51460),
   SuddenDoomBuff                        = Spell(81340),
   UnholyAssaultBuff                     = Spell(207289),
   -- Debuffs
   FesteringWoundDebuff                  = Spell(194310),
   UnholyBlightDebuff                    = Spell(115994),
-  VirulentPlagueDebuff                  = Spell(191587)
 })
 
 -- Items

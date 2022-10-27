@@ -20,6 +20,7 @@ HR.GUISettings.APL.DemonHunter = {
     Enabled = {
       Potions = true,
       Trinkets = true,
+      Items = true,
     },
     DisplayStyle = {
       Potions = "Suggested",
@@ -30,9 +31,10 @@ HR.GUISettings.APL.DemonHunter = {
       Metamorphosis = "Suggested",
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
-    OffGCDasOffGCD = {
+    GCDasOffGCD = {
       Racials = true,
-      -- Abilities
+    },
+    OffGCDasOffGCD = {
       Disrupt = true,
     },
   },
@@ -68,8 +70,9 @@ HR.GUISettings.APL.DemonHunter = {
       -- Abilities
       EyeBeam = false,
       GlaiveTempest = false,
-      ThrowGlaive = false,
       ImmolationAura = false,
+      SigilOfFlame = false,
+      ThrowGlaive = false,
     },
   }
 }

@@ -60,6 +60,7 @@ local VarOblitPoolingTime
 local VarBreathPoolingTime
 local VarPoolingRunes
 local VarPoolingRP
+local AnyDnD
 local BossFightRemains = 11111
 local FightRemains = 11111
 local ghoul = HL.GhoulTable
@@ -367,9 +368,13 @@ local function Cooldowns()
   if S.SacrificialPact:IsReady() and ((not S.GlacialAdvance:IsAvailable()) and Player:BuffDown(S.BreathofSindragosa) and ghoul:remains() < Player:GCD() * 2 and EnemiesCount10yd > 3) then
     if Cast(S.SacrificialPact, Settings.Commons.GCDasOffGCD.SacrificialPact) then return "sacrificial_pact cooldowns 32"; end
   end
-  -- death_and_decay,if=!death_and_decay.ticking&variable.adds_remain&(buff.pillar_of_frost.up&buff.pillar_of_frost.remains>5|!buff.pillar_of_frost.up)&(active_enemies>5|talent.cleaving_strikes&active_enemies>=2)
-  if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and VarAddsRemain and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffRemains(S.PillarofFrostBuff) > 5 or Player:BuffDown(S.PillarofFrostBuff)) and (EnemiesCount10yd > 5 or S.CleavingStrikes:IsAvailable() and EnemiesCount10yd >= 2)) then
-    if Cast(S.DeathAndDecay, Settings.Commons.GCDasOffGCD.DeathAndDecay, nil, not Target:IsInRange(30)) then return "death_and_decay cooldowns 34"; end
+  -- any_dnd,if=!death_and_decay.ticking&variable.adds_remain&(buff.pillar_of_frost.up&buff.pillar_of_frost.remains>5|!buff.pillar_of_frost.up)&(active_enemies>5|talent.cleaving_strikes&active_enemies>=2)
+  if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and VarAddsRemain and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffRemains(S.PillarofFrostBuff) > 5 or Player:BuffDown(S.PillarofFrostBuff)) and (EnemiesCount10yd > 5 or S.CleavingStrikes:IsAvailable() and EnemiesCount10yd >= 2)) then
+    if AnyDnD == S.DeathsDue then
+      if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Covenant) then return "any_dnd cooldowns 34"; end
+    else
+      if Cast(AnyDnD, Settings.Commons.GCDasOffGCD.DeathAndDecay) then return "any_dnd cooldowns 36"; end
+    end
   end
 end
 
@@ -415,11 +420,11 @@ local function Covenants()
     if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant) then return "swarming_mist covenants 8"; end
   end
   -- abomination_limb_covenant,if=cooldown.pillar_of_frost.remains<gcd*2&variable.st_planning&(talent.breath_of_sindragosa&runic_power>65&cooldown.breath_of_sindragosa.remains<2|!talent.breath_of_sindragosa)
-  if S.AbominationLimbCov:IsCastable() and (S.PillarofFrost:CooldownRemains() < Player:GCD() * 2 and VarSTPlanning and (S.BreathofSindragosa:IsAvailable() and Player:RunicPower() > 65 and S.BreathofSindragosa:CooldownRemains() < 2 or not S.BreathofSindragosa:IsAvailable())) then
+  if S.AbominationLimbCov:IsReady() and (S.PillarofFrost:CooldownRemains() < Player:GCD() * 2 and VarSTPlanning and (S.BreathofSindragosa:IsAvailable() and Player:RunicPower() > 65 and S.BreathofSindragosa:CooldownRemains() < 2 or not S.BreathofSindragosa:IsAvailable())) then
     if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb_covenant covenants 10"; end
   end
   -- abomination_limb_covenant,if=variable.adds_remain
-  if S.AbominationLimbCov:IsCastable() and (VarAddsRemain) then
+  if S.AbominationLimbCov:IsReady() and (VarAddsRemain) then
     if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb_covenant covenants 12"; end
   end
   -- shackle_the_unworthy,if=variable.st_planning&(cooldown.pillar_of_frost.remains<3|talent.icecap)
@@ -505,7 +510,7 @@ local function SingleTarget()
     if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter single_target 2"; end
   end
   -- howling_blast,if=buff.rime.react&talent.icebreaker.rank=2
-  if S.HowlingBlast:IsReady() and (Player:BuffUp(S.RimeBuff) and Player:TalentRank(S.Icebreaker:ID()) == 2) then
+  if S.HowlingBlast:IsReady() and (Player:BuffUp(S.RimeBuff) and S.Icebreaker:TalentRank() == 2) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast single_target 4"; end
   end
   -- frostscythe,if=!variable.pooling_runes&buff.killing_machine.react&variable.frostscythe_priority
@@ -628,6 +633,10 @@ local function APL()
       FightRemains = HL.FightRemains(Enemies10yd, false)
     end
   end
+
+  -- Set AnyDnD
+  AnyDnD = S.DeathAndDecay
+  if S.DeathsDue:IsAvailable() then AnyDnD = S.DeathsDue end
 
   if Everyone.TargetIsValid() then
     -- call precombat
