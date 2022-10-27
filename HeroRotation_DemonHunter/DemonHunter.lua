@@ -74,8 +74,6 @@ Spell.DemonHunter.Commons = {
 
 Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   -- Abilities
-  FelDevastation                        = Spell(212084),
-  Frailty                               = Spell(247456),
   InfernalStrike                        = Spell(189110),
   Shear                                 = Spell(203782),
   SoulCleave                            = Spell(228477),
@@ -83,9 +81,6 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   ThrowGlaive                           = Spell(204157),
   -- Defensive
   DemonSpikes                           = Spell(203720),
-  DemonSpikesBuff                       = Spell(203819),
-  FieryBrand                            = Spell(204021),
-  FieryBrandDebuff                      = Spell(207771),
   Torment                               = Spell(185245),
   -- Talents
   AgonizingFlames                       = Spell(207548),
@@ -94,13 +89,21 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   CharredFlesh                          = Spell(336639),
   ConcentratedSigils                    = Spell(207666),
   Fallout                               = Spell(227174),
+  FelDevastation                        = Spell(212084),
+  FieryBrand                            = Spell(204021),
+  Frailty                               = Spell(389958),
   Fracture                              = Spell(263642),
   SoulBarrier                           = Spell(263648),
+  SoulCarver                            = Spell(207407),
   SpiritBomb                            = Spell(247454),
-  SpiritBombDebuff                      = Spell(247456),
   -- Utility
   Metamorphosis                         = Spell(187827),
-  MetamorphosisBuff                     = Spell(187827)
+  -- Buffs
+  DemonSpikesBuff                       = Spell(203819),
+  MetamorphosisBuff                     = Spell(187827),
+  -- Debuffs
+  FieryBrandDebuff                      = Spell(207771),
+  FrailtyDebuff                         = Spell(247456),
 })
 
 Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {

@@ -146,14 +146,17 @@ local function Precombat()
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 2"; end
   end
   -- First attacks
+  if S.TheHunt:IsCastable() and not IsInMeleeRange then
+    if Cast(S.TheHunt, nil, nil, not Target:IsInRange(50)) then return "the_hunt precombat 4"; end
+  end
   if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
-    if Cast(S.InfernalStrike, nil, nil, not Target:IsInRange(30)) then return "infernal_strike precombat 4"; end
+    if Cast(S.InfernalStrike, nil, nil, not Target:IsInRange(30)) then return "infernal_strike precombat 6"; end
   end
   if S.Fracture:IsCastable() and IsInMeleeRange then
-    if Cast(S.Fracture) then return "fracture precombat 6"; end
+    if Cast(S.Fracture) then return "fracture precombat 8"; end
   end
   if S.Shear:IsCastable() and IsInMeleeRange then
-    if Cast(S.Shear) then return "shear precombat 8"; end
+    if Cast(S.Shear) then return "shear precombat 10"; end
   end
 end
 
@@ -202,7 +205,7 @@ local function Cooldowns()
   end
   -- Manually added: use_item,name=cache_of_acquired_treasures,if=buff.acquired_sword.up
   if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredSwordBuff)) then
-    if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures 3"; end
+    if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures 4"; end
   end
   -- use_items
   if Settings.Commons.Enabled.Trinkets then
@@ -213,16 +216,22 @@ local function Cooldowns()
   end
   -- sinful_brand,if=!dot.sinful_brand.ticking
   if S.SinfulBrand:IsCastable() and (Target:BuffDown(S.SinfulBrandDebuff)) then
-    if Cast(S.SinfulBrand, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand cooldowns 4"; end
+    if Cast(S.SinfulBrand, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand cooldowns 6"; end
   end
   -- the_hunt
+  if S.TheHuntCov:IsReady() then
+    if Cast(S.TheHuntCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.TheHuntCov)) then return "the_hunt covenant cooldowns 8"; end
+  end
   if S.TheHunt:IsCastable() then
-    if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt cooldowns 6"; end
+    if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt cooldowns 8"; end
   end
   -- elysian_decree
   -- Note: Added Unity/Blind Faith handling
-  if S.ElysianDecree:IsCastable() and ((not KyrianLegendaryAndSpB) or SoulFragments >= 4) then
-    if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Covenant) then return "elysian_decree cooldowns 8"; end
+  if S.ElysianDecreeCov:IsReady() and ((not KyrianLegendaryAndSpB) or SoulFragments >= 4) then
+    if Cast(S.ElysianDecreeCov, nil, Settings.Commons.DisplayStyle.Covenant) then return "elysian_decree covenant cooldowns 10"; end
+  end
+  if S.ElysianDecree:IsCastable() then
+    if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Covenant) then return "elysian_decree cooldowns 10"; end
   end
 end
 
@@ -328,7 +337,11 @@ local function APL()
     -- consume_magic
     -- throw_glaive,if=buff.fel_bombardment.stack=5&(buff.immolation_aura.up|!buff.metamorphosis.up)
     if S.ThrowGlaive:IsCastable() and (Player:BuffStack(S.FelBombardmentBuff) == 5 and (Player:BuffUp(S.ImmolationAuraBuff) or Player:BuffDown(S.MetamorphosisBuff))) then
-      if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive fel_bombardment"; end
+      if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 2"; end
+    end
+    -- Manually added: soul_carver,if=soul_fragments<3
+    if S.SoulCarver:IsReady() and (SoulFragments < 3) then
+      if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver main 4"; end
     end
     -- call_action_list,name=brand,if=variable.brand_build
     if VarBrandBuild or Settings.Vengeance.UseFieryBrandOffensively then
@@ -350,7 +363,7 @@ local function APL()
 end
 
 local function Init()
-  --HR.Print("Vengeance DH rotation is currently a work in progress, but has been updated for patch 9.1.5.")
+  HR.Print("Vengeance DH rotation is currently a work in progress. It has been updated to work with patch 10.0.0, but is not currently based on an updated Simulationcraft APL, so it very well may not be optimal.")
 end
 
 HR.SetAPL(581, APL, Init);
