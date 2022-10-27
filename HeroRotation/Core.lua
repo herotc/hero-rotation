@@ -85,7 +85,13 @@
       StartTime = Player:CastStart()
       CastDuration = Player:CastDuration()
     else
-      StartTime, CastDuration = GCDSpell:CooldownInfo()
+      --StartTime, CastDuration = GCDSpell:CooldownInfo()
+      if HR.GUISettings.General.HideGcdSwirl then
+        StartTime = Player:CastStart()
+        CastDuration = 0.1
+      else
+        StartTime, CastDuration = GCDSpell:CooldownInfo()
+      end
     end
 
     -- Tracking Values for Current Spell

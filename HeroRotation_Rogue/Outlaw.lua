@@ -207,10 +207,10 @@ local function RtB_Reroll ()
     -- SimC Default
     else
       -- # Reroll BT + GM or single buffs early other than Broadside, TB with Shadowdust, or SnC with Blunderbuss
-      -- actions+=/variable,name=rtb_reroll,value=rtb_buffs<2&(!buff.broadside.up&(!runeforge.concealed_blunderbuss|!buff.skull_and_crossbones.up)&(!runeforge.invigorating_shadowdust|!buff.true_bearing.up))|rtb_buffs=2&buff.buried_treasure.up&buff.grand_melee.up
+      -- actions+=/variable,name=rtb_reroll,value=rtb_buffs<2&(!buff.broadside.up&(!runeforge.concealed_blunderbuss&!talent.fan_the_hammer|!buff.skull_and_crossbones.up)&(!runeforge.invigorating_shadowdust|!buff.true_bearing.up))|rtb_buffs=2&buff.buried_treasure.up&buff.grand_melee.up
       if RtB_Buffs() == 2 and Player:BuffUp(S.BuriedTreasure) and Player:BuffUp(S.GrandMelee) then
         Cache.APLVar.RtB_Reroll = true
-      elseif RtB_Buffs() < 2 and (not Player:BuffUp(S.Broadside) and (not ConcealedBlunderbussEquipped or not Player:BuffUp(S.SkullandCrossbones))
+      elseif RtB_Buffs() < 2 and (not Player:BuffUp(S.Broadside) and (not ConcealedBlunderbussEquipped and not S.FanTheHammer:IsAvailable() or not Player:BuffUp(S.SkullandCrossbones))
         and (not InvigoratingShadowdustEquipped or not Player:BuffUp(S.TrueBearing))) then
         Cache.APLVar.RtB_Reroll = true
       else
@@ -422,7 +422,7 @@ local function CDs ()
     if Settings.Commons.UseTrinkets then
       --actions.cds+=/use_item,name=windscar_whetstone,if=spell_targets.blade_flurry>desired_targets|raid_event.adds.in>60|fight_remains<7
       --actions.cds+=/use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up|fight_remains<25     
-      if I.CacheOfAcquiredTreasures:IsEquippedAndReady() and Player:BuffUp(S.AcquiredAxe) or (Target:FilteredTimeToDie("<", 25) or HL.BossFilteredFightRemains("<", 25)) then
+      if I.CacheOfAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredAxe) or (Target:FilteredTimeToDie("<", 25) or HL.BossFilteredFightRemains("<", 25))) then
         if HR.Cast(I.CacheOfAcquiredTreasures, nil, Settings.Commons.TrinketDisplayStyle) then return "Use Cache of Acquired Treasures" end
       end
       --actions.cds+=/use_item,name=bloodstained_handkerchief,target_if=max:target.time_to_die*(!dot.cruel_garrote.ticking),if=!dot.cruel_garrote.ticking
