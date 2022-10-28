@@ -732,8 +732,6 @@ end
 
 local function Init ()
   S.Flagellation:RegisterAuraTracking()
-
-  HR.Print("Outlaw Rogue rotation has not been updated for pre-patch 10.0. It may not function properly or may cause errors in-game.")
 end
 
 HR.SetAPL(260, APL, Init)
