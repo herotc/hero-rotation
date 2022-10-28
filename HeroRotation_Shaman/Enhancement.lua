@@ -202,7 +202,11 @@ local function Single()
   end
   -- actions.single+=/lightning_bolt,if=buff.maelstrom_weapon.stack>=5&buff.primordial_wave.up&raid_event.adds.in>buff.primordial_wave.remains&(!buff.splintered_elements.up|fight_remains<=12)
   if S.LightningBolt:IsCastable() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5 and Player:BuffUp(S.PrimordialWaveBuff) and (Player:BuffDown(S.SplinteredElementsBuff) or FightRemains <= 12)) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "Lightning Bolt single"; TiLightningBolt = 1; TiChainLightning = 0; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then
+      TiLightningBolt = 1
+      TiChainLightning = 0
+      return "Lightning Bolt single"
+    end
   end
   -- actions.single+=/ice_strike,if=talent.hailstorm.enabled
     if S.IceStrike:IsReady() and S.Hailstorm:IsAvailable() then
@@ -234,7 +238,11 @@ local function Single()
   end
   -- actions.single+=/lightning_bolt,if=buff.maelstrom_weapon.stack=10&buff.primordial_wave.down
   if S.LightningBolt:IsReady() and (Player:BuffStack(S.MaelstromWeaponBuff) == 10 and Player:BuffDown(S.PrimordialWaveBuff)) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "Lightning Bolt single"; TiLightningBolt = 1; TiChainLightning = 0; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then
+      TiLightningBolt = 1
+      TiChainLightning = 0
+      return "Lightning Bolt single"
+    end
   end
   -- actions.single+=/stormstrike
   if S.Stormstrike:IsReady() then
@@ -262,7 +270,11 @@ local function Single()
   end
   -- actions.single+=/lightning_bolt,if=buff.maelstrom_weapon.stack>=5&buff.primordial_wave.down
   if S.LightningBolt:IsCastable() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5 and Player:BuffDown(S.PrimordialWaveBuff)) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "Lightning Bolt single"; TiLightningBolt = 1; TiChainLightning = 0; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then
+      TiLightningBolt = 1
+      TiChainLightning = 0
+      return "Lightning Bolt single"
+    end
   end
   -- actions.single+=/sundering,if=raid_event.adds.in>=40
   if S.Sundering:IsReady() then
@@ -309,7 +321,11 @@ local function Aoe()
   end
   -- actions.aoe+=/lightning_bolt,if=(active_dot.flame_shock=active_enemies|active_dot.flame_shock=6)&buff.primordial_wave.up&buff.maelstrom_weapon.stack>=(5+5*talent.overflowing_maelstrom.enabled)&(!buff.splintered_elements.up|fight_remains<=12|raid_event.adds.remains<=gcd)
   if S.LightningBolt:IsCastable() and ((S.FlameShockDebuff:AuraActiveCount() == Enemies10yCount or S.FlameShockDebuff:AuraActiveCount() == 6) and Player:BuffUp(S.PrimordialWaveBuff) and Player:BuffStack(S.MaelstromWeaponBuff) >= (5 + 5 * num(S.OverflowingMaelstrom:IsAvailable())) and (Player:BuffDown(S.SplinteredElementsBuff) or FightRemains <= 12)) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "Lightning Bolt aoe"; TiLightningBolt = 1; TiChainLightning = 0; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then
+      TiLightningBolt = 1
+      TiChainLightning = 0
+      return "Lightning Bolt aoe"
+    end
   end
   -- actions.aoe+=/chain_harvest,if=buff.maelstrom_weapon.stack>=5
   if S.ChainHarvest:IsCastable() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
@@ -374,16 +390,20 @@ local function Aoe()
     end
     -- actions.aoe+=/chain_lightning,if=buff.maelstrom_weapon.stack=10
     if S.ChainLightning:IsReady() then
-      if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "Chain Lightning aoe (Maelstrom Weapon Buff Stacks == 10)"; TiLightningBolt = 0; TiChainLightning = 1; end
+      if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then
+        TiLightningBolt = 0
+        TiChainLightning = 1 
+        return "Chain Lightning aoe (Maelstrom Weapon Buff Stacks == 10)"
+       end
     end
   end
   -- actions.aoe+=/crash_lightning,if=buff.cl_crash_lightning.up
-  if S.CrashLightning:IsReady() and Player:BuffUp(S.ClCrashLightningBuff)) then
+  if S.CrashLightning:IsReady() and Player:BuffUp(S.ClCrashLightningBuff) then
     if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInRange(8)) then return "Crash Lightning aoe (Chain Lightning Buff)"; end
   end
   if Player:BuffUp(S.CrashLightningBuff) then
     -- actions.aoe+=/lava_lash,if=buff.crash_lightning.up&buff.ashen_catalyst.stack=8|buff.primal_lava_actuators.stack=8
-    if S.LavaLash:IsReady() and ((Player:BuffStack(S.AshenCatalystBuff) == 8) or (Player:BuffStack(S.PrimalLavaActuatorsBuff) == 8) then
+    if S.LavaLash:IsReady() and ((Player:BuffStack(S.AshenCatalystBuff) == 8) or (Player:BuffStack(S.PrimalLavaActuatorsBuff) == 8)) then
       if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "Lava Lash aoe (Ashen Catalyst / Primal Lava Actuator Buff)"; end
     end
     -- actions.aoe+=/windstrike,if=buff.crash_lightning.up
@@ -445,7 +465,11 @@ local function Aoe()
   end
   -- actions.aoe+=/chain_lightning,if=buff.maelstrom_weapon.stack>=5
   if S.ChainLightning:IsReady() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "Chain Lightning aoe"; TiLightningBolt = 0; TiChainLightning = 1; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then
+      TiLightningBolt = 0
+      TiChainLightning = 1 
+      return "Chain Lightning aoe"
+    end
   end
   -- actions.aoe+=/earth_elemental
   if S.EarthElemental:IsCastable() then
