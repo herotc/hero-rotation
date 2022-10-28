@@ -151,8 +151,8 @@ local function Precombat()
   if (trinket2:TrinketHasStatAnyDps() and ((not trinket1:TrinketHasStatAnyDps()) or trinket2:Cooldown() >= trinket1:Cooldown())) then
     VarTrinketSyncSlot = 2
   end
-  -- variable,name=use_eye_beam_fury_condition,value=talent.blind_fury.enabled&(runeforge.darkglare_medallion|talent.demon_blades&!runeforge.agony_gaze)
-  VarUseEyeBeamFuryCondition = (S.BlindFury:IsAvailable() and (DarkglareEquipped or S.DemonBlades:IsAvailable() and not AgonyGazeEquipped))
+  -- variable,name=use_eye_beam_fury_condition,value=0
+  VarUseEyeBeamFuryCondition = false
   -- arcane_torrent
   if S.ArcaneTorrent:IsCastable() and CDsON() then
     if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 1"; end
