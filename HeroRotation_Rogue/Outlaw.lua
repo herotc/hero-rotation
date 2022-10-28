@@ -46,7 +46,8 @@ local OnUseExcludes = {
   I.VigorTrinket:ID(),
   I.FontOfPower:ID(),
   I.RazorCoral:ID(),
-  I.CacheOfAcquiredTreasures:ID()
+  I.CacheOfAcquiredTreasures:ID(),
+  I.ScarsofFraternalStrife:ID(),
 }
 
 S.Dispatch:RegisterDamageFormula(
@@ -116,14 +117,16 @@ end
 local PrevEnergyTimeToMaxPredicted, PrevEnergyPredicted = 0, 0
 local function EnergyTimeToMaxStable (MaxOffset)
   local EnergyTimeToMaxPredicted = Player:EnergyTimeToMaxPredicted(nil, MaxOffset)
-  if mathabs(PrevEnergyTimeToMaxPredicted - EnergyTimeToMaxPredicted) > 1 then
+  if EnergyTimeToMaxPredicted < PrevEnergyTimeToMaxPredicted 
+    or (EnergyTimeToMaxPredicted - PrevEnergyTimeToMaxPredicted) > 0.5 then
     PrevEnergyTimeToMaxPredicted = EnergyTimeToMaxPredicted
   end
   return PrevEnergyTimeToMaxPredicted
 end
-local function EnergyPredictedStable (MaxOffset)
-  local EnergyPredicted = Player:EnergyPredicted(nil, MaxOffset)
-  if mathabs(PrevEnergyPredicted - EnergyPredicted) > 9 then
+local function EnergyPredictedStable ()
+  local EnergyPredicted = Player:EnergyPredicted()
+  if EnergyPredicted > PrevEnergyPredicted
+    or (EnergyPredicted - PrevEnergyPredicted) > 9 then
     PrevEnergyPredicted = EnergyPredicted
   end
   return PrevEnergyPredicted
@@ -206,10 +209,11 @@ local function RtB_Reroll ()
     -- SimC Default
     else
       -- # Reroll BT + GM or single buffs early other than Broadside, TB with Shadowdust, or SnC with Blunderbuss
-      -- actions+=/variable,name=rtb_reroll,value=rtb_buffs<2&(!buff.broadside.up&(!runeforge.concealed_blunderbuss|!buff.skull_and_crossbones.up)&(!runeforge.invigorating_shadowdust|!buff.true_bearing.up))|rtb_buffs=2&buff.buried_treasure.up&buff.grand_melee.up
+      -- actions+=/variable,name=rtb_reroll,value=rtb_buffs<2&(!buff.broadside.up&(!runeforge.concealed_blunderbuss&!talent.fan_the_hammer|!buff.skull_and_crossbones.up)&(!runeforge.invigorating_shadowdust|!buff.true_bearing.up))|rtb_buffs=2&buff.buried_treasure.up&buff.grand_melee.up
       if RtB_Buffs() == 2 and Player:BuffUp(S.BuriedTreasure) and Player:BuffUp(S.GrandMelee) then
         Cache.APLVar.RtB_Reroll = true
-      elseif RtB_Buffs() < 2 and (not Player:BuffUp(S.Broadside) and (not ConcealedBlunderbussEquipped or not Player:BuffUp(S.SkullandCrossbones))
+      elseif RtB_Buffs() < 2 and (not Player:BuffUp(S.Broadside)
+        and (not ConcealedBlunderbussEquipped and not S.FanTheHammer:IsAvailable() or not Player:BuffUp(S.SkullandCrossbones))
         and (not InvigoratingShadowdustEquipped or not Player:BuffUp(S.TrueBearing))) then
         Cache.APLVar.RtB_Reroll = true
       else
@@ -236,7 +240,7 @@ end
 -- # Always attempt to use BtE at 5+ CP, regardless of CP gen waste
 -- # Finish at 2+ in the last GCD of Flagellation
 local function Finish_Condition ()
-  -- actions+=/variable,name=finish_condition,value=combo_points>=cp_max_spend-buff.broadside.up-(buff.opportunity.up*talent.quick_draw.enabled|buff.concealed_blunderbuss.up)|effective_combo_points>=cp_max_spend
+  -- actions+=/variable,name=finish_condition,value=combo_points>=cp_max_spend-buff.broadside.up-(buff.opportunity.up*(talent.quick_draw|talent.fan_the_hammer)|buff.concealed_blunderbuss.up)|effective_combo_points>=cp_max_spend
   -- actions+=/variable,name=finish_condition,op=reset,if=cooldown.between_the_eyes.ready&effective_combo_points<5
   -- actions+=/variable,name=finish_condition,value=1,if=buff.flagellation_buff.up&buff.flagellation_buff.remains<1&effective_combo_points>=2
   if EffectiveComboPoints >=2 and S.Flagellation:AnyDebuffUp() and Player:BuffRemains(S.Flagellation) < 1.5 then
@@ -247,15 +251,16 @@ local function Finish_Condition ()
     return false
   end
 
-  return ComboPoints >= (Rogue.CPMaxSpend() - num(Player:BuffUp(S.Broadside)) - (num(Player:BuffUp(S.Opportunity)) *
-    num(S.QuickDraw:IsAvailable() or Player:BuffUp(S.ConcealedBlunderbuss)))) or EffectiveComboPoints >= Rogue.CPMaxSpend()
+  return ComboPoints >= (Rogue.CPMaxSpend() - num(Player:BuffUp(S.Broadside)) - 
+    num(Player:BuffUp(S.Opportunity) and (S.QuickDraw:IsAvailable() or S.FanTheHammer:IsAvailable()) or Player:BuffUp(S.ConcealedBlunderbuss)))
+    or EffectiveComboPoints >= Rogue.CPMaxSpend()
 end
 
 -- # Ensure we get full Ambush CP gains and aren't rerolling Count the Odds buffs away
 local function Ambush_Condition ()
-  -- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+buff.broadside.up&energy>=50&(!conduit.count_the_odds|buff.roll_the_bones.remains>=10)
+  -- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+buff.broadside.up&energy>=50&(!conduit.count_the_odds&!talent.count_the_odds|buff.roll_the_bones.remains>=10)
   return ComboPointsDeficit >= 2 + num(Player:BuffUp(S.Broadside)) and EffectiveComboPoints < Rogue.CPMaxSpend()
-    and Energy > 50 and (not S.CountTheOdds:ConduitEnabled() or Player:BuffRemains(S.RolltheBones) > 10)
+    and Energy > 50 and (not S.CountTheOddsConduit:ConduitEnabled() and not S.CountTheOdds:IsAvailable() or Rogue.RtBRemains() > 10)
 end
 
 -- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
@@ -298,9 +303,15 @@ local function CDs ()
     end
   end
   -- actions.cds+=/roll_the_bones,if=master_assassin_remains=0&buff.dreadblades.down&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
-  if S.RolltheBones:IsReady() and Rogue.MasterAssassinsMarkRemains() <= 0 and not Player:BuffUp(S.Dreadblades)
-    and (not Player:BuffUp(S.RolltheBones) or RtB_Reroll()) then
+  if S.RolltheBones:IsReady() and Rogue.MasterAssassinsMarkRemains() <= 0
+    and not (Player:DebuffUp(S.Dreadblades) or S.Flagellation:AnyDebuffUp() and S.Dreadblades:IsReady())
+    and (Rogue.RtBRemains() <= 0 or RtB_Reroll()) then
     if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones" end
+  end
+  -- actions.cds+=/keep_it_rolling,if=!variable.rtb_reroll&(buff.broadside.up+buff.true_bearing.up+buff.skull_and_crossbones.up+buff.ruthless_precision.up)>2
+  if S.KeepItRolling:IsCastable() and not RtB_Reroll()
+    and (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.TrueBearing)) + num(Player:BuffUp(S.SkullandCrossbones))) > 2 then
+    if HR.Cast(S.KeepItRolling) then return "Cast Keep it Rolling" end
   end
   if Target:IsSpellInRange(S.SinisterStrike) then
     -- actions.cds+=/flagellation,target_if=max:target.time_to_die,if=!stealthed.all&(variable.finish_condition&target.time_to_die>10|fight_remains<13)
@@ -309,9 +320,10 @@ local function CDs ()
         EvaluateFlagellationCondition, not Target:IsInMeleeRange(5), nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation"; end
     end
     -- # Using Ambush is a 2% increase, so Vanish can be sometimes be used as a utility spell unless using Master Assassin or Deathly Shadows
-    if S.Vanish:IsCastable() and Vanish_DPS_Condition() and not Player:StealthUp(true, true) then
+    if S.Vanish:IsCastable() and Vanish_DPS_Condition() and not Player:StealthUp(true, true) and not Player:BuffUp(S.TakeEmBySurpriseBuff) then
       if not MarkoftheMasterAssassinEquipped and not InvigoratingShadowdustEquipped and not DeathlyShadowsEquipped then
-        -- actions.cds+=/vanish,if=!runeforge.mark_of_the_master_assassin&!runeforge.invigorating_shadowdust&!runeforge.deathly_shadows&!stealthed.all&(variable.finish_condition&buff.slice_and_dice.up|variable.ambush_condition&!buff.slice_and_dice.up)
+        -- TODO actions.cds+=/shadow_dance,if=!runeforge.mark_of_the_master_assassin&!runeforge.invigorating_shadowdust&!runeforge.deathly_shadows&!stealthed.all&!buff.take_em_by_surprise.up&(variable.finish_condition&buff.slice_and_dice.up|variable.ambush_condition&!buff.slice_and_dice.up)
+        -- actions.cds+=/vanish,if=!runeforge.mark_of_the_master_assassin&!runeforge.invigorating_shadowdust&!runeforge.deathly_shadows&!stealthed.all&!buff.take_em_by_surprise.up&(variable.finish_condition&buff.slice_and_dice.up|variable.ambush_condition&!buff.slice_and_dice.up)
         if Player:BuffUp(S.SliceandDice) and Finish_Condition() then
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Finish)" end
         elseif not Player:BuffUp(S.SliceandDice) and Ambush_Condition() then
@@ -324,7 +336,7 @@ local function CDs ()
         -- actions.cds+=/vanish,if=variable.vanish_ma_condition&master_assassin_remains=0&variable.blade_flurry_sync
         if DeathlyShadowsEquipped and not Player:BuffUp(S.DeathlyShadowsBuff) and ComboPoints <= 2 and Ambush_Condition() then
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Deathly)" end
-        elseif Rogue.MasterAssassinsMarkRemains() <= 0 and Blade_Flurry_Sync() then
+        elseif MarkoftheMasterAssassinEquipped and Rogue.MasterAssassinsMarkRemains() <= 0 and Blade_Flurry_Sync() then
           if S.MarkedforDeath:IsAvailable() then
             if Finish_Condition() then
               if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (MA+MfD)" end
@@ -337,8 +349,9 @@ local function CDs ()
         end
       end
     end
-    -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up
-    if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush) then
+    -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!talent.improved_adrenaline_rush|combo_points<=2)
+    if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush)
+      and (not S.ImprovedAdrenalineRush:IsAvailable() or ComboPoints <= 2) then
       if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
     end
     -- actions.cds+=/fleshcraft,if=(soulbind.pustule_eruption|soulbind.volatile_solvent)&!stealthed.all&(!buff.blade_flurry.up|spell_targets.blade_flurry<2)&(!buff.adrenaline_rush.up|energy.time_to_max>2)
@@ -347,9 +360,9 @@ local function CDs ()
       HR.CastSuggested(S.Fleshcraft)
     end
     -- actions.cds+=/dreadblades,if=!stealthed.all&combo_points<=2&(!covenant.venthyr|buff.flagellation_buff.up)&(!talent.marked_for_death|!cooldown.marked_for_death.ready)
-    if S.Dreadblades:IsReady() and Target:IsSpellInRange(S.Dreadblades) and not Player:StealthUp(true, true) and ComboPoints <= 2 
+    if S.Dreadblades:IsCastable() and Target:IsSpellInRange(S.Dreadblades) and not Player:StealthUp(true, true) and ComboPoints <= 2 
       and (not IsVenthyr or S.Flagellation:AnyDebuffUp()) and (not S.MarkedforDeath:IsAvailable() or not S.MarkedforDeath:CooldownUp()) then
-      if HR.Cast(S.Dreadblades, Settings.Outlaw.GCDasOffGCD.Dreadblades) then return "Cast Dreadblades" end
+      if HR.CastPooling(S.Dreadblades, Settings.Outlaw.GCDasOffGCD.Dreadblades) then return "Cast Dreadblades" end
     end
   end
   if Blade_Flurry_Sync() then
@@ -359,23 +372,23 @@ local function CDs ()
     -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&variable.killing_spree_vanish_sync&!stealthed.rogue&(debuff.between_the_eyes.up&buff.dreadblades.down&energy.deficit>(energy.regen*2+15)|spell_targets.blade_flurry>(2-buff.deathly_shadows.up)|master_assassin_remains>0)
     if CDsON() and S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and not Player:StealthUp(true, false)
         and (not MarkoftheMasterAssassinEquipped or S.Vanish:CooldownRemains() > 10 or Rogue.MasterAssassinsMarkRemains() > 2 or not Vanish_DPS_Condition())
-        and (Target:DebuffUp(S.BetweentheEyes) and not Player:BuffUp(S.Dreadblades) and EnergyDeficit > (EnergyRegen * 2 + 10)
+        and (Target:DebuffUp(S.BetweentheEyes) and not Player:DebuffUp(S.Dreadblades) and EnergyDeficit > (EnergyRegen * 2 + 10)
           or EnemiesBFCount > (2 - num(Player:BuffUp(S.DeathlyShadowsBuff))) or Rogue.MasterAssassinsMarkRemains() > 0) then
       if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree" end
     end
     -- blade_rush,if=variable.blade_flurry_sync&(energy.time_to_max>2|spell_targets>2)
     -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&(energy.time_to_max>2&buff.dreadblades.down|energy<=30|spell_targets>2)
-    if S.BladeRush:IsCastable() and Target:IsSpellInRange(S.BladeRush) and (EnergyTimeToMax > 2 and not Player:BuffUp(S.Dreadblades)
+    if S.BladeRush:IsCastable() and Target:IsSpellInRange(S.BladeRush) and (EnergyTimeToMax > 2 and not Player:DebuffUp(S.Dreadblades)
       or Energy <= 30 or EnemiesBFCount > 2) then
       if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
     end
   end
   if Target:IsSpellInRange(S.SinisterStrike) then
     -- # If using Invigorating Shadowdust, use normal logic in addition to checking major CDs.
-    -- actions.cds+=/vanish,if=runeforge.invigorating_shadowdust&covenant.venthyr&!stealthed.all&variable.ambush_condition&(!cooldown.flagellation.ready&(!talent.dreadblades|!cooldown.dreadblades.ready|!buff.flagellation_buff.up))
-    -- actions.cds+=/vanish,if=runeforge.invigorating_shadowdust&!covenant.venthyr&!stealthed.all&(cooldown.echoing_reprimand.remains>6|!cooldown.sepsis.ready|cooldown.serrated_bone_spike.full_recharge_time>20)
-    if InvigoratingShadowdustEquipped and S.Vanish:IsCastable() and Vanish_DPS_Condition() and not Player:StealthUp(true, true) then
-      if IsVenthyr and Ambush_Condition() and (not S.Flagellation:CooldownUp() and (not S.Dreadblades:IsAvailable()
+    -- actions.cds+=/vanish,if=runeforge.invigorating_shadowdust&covenant.venthyr&!stealthed.all&variable.finish_condition&(!cooldown.flagellation.ready&(!talent.dreadblades|!cooldown.dreadblades.ready|!buff.flagellation_buff.up))
+    -- actions.cds+=/vanish,if=runeforge.invigorating_shadowdust&!covenant.venthyr&!stealthed.all&variable.finish_condition&(cooldown.echoing_reprimand.remains>6|!cooldown.sepsis.ready|cooldown.serrated_bone_spike.full_recharge_time>20)
+    if InvigoratingShadowdustEquipped and S.Vanish:IsCastable() and Vanish_DPS_Condition() and not Player:StealthUp(true, true) and Finish_Condition() then
+      if IsVenthyr and (not S.Flagellation:CooldownUp() and (not S.Dreadblades:IsAvailable()
         or not S.Dreadblades:CooldownUp() or not S.Flagellation:AnyDebuffUp())) then
         if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Venthyr Shadowdust)" end
       elseif not IsVenthyr and (IsKyrian and S.EchoingReprimand:CooldownRemains() > 6 or IsNightFae and not S.Sepsis:CooldownUp()
@@ -385,9 +398,9 @@ local function CDs ()
     end
 
     if CDsON() then
-      -- actions.cds+=/shadowmeld,if=!stealthed.all&(conduit.count_the_odds&variable.finish_condition|!talent.weaponmaster.enabled&variable.ambush_condition)
+      -- actions.cds+=/shadowmeld,if=!stealthed.all&((conduit.count_the_odds|talent.count_the_odds)&variable.finish_condition|!talent.weaponmaster.enabled&variable.ambush_condition)
       if Settings.Outlaw.UseDPSVanish and S.Shadowmeld:IsCastable() and
-        (S.CountTheOdds:ConduitEnabled() and Finish_Condition() or not S.Weaponmaster:IsAvailable() and Ambush_Condition()) then
+        ((S.CountTheOddsConduit:ConduitEnabled() or S.CountTheOdds:IsAvailable()) and Finish_Condition() or not S.Weaponmaster:IsAvailable() and Ambush_Condition()) then
         if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
       end
 
@@ -418,6 +431,19 @@ local function CDs ()
         if I.CacheOfAcquiredTreasures:IsEquippedAndReady() and Player:BuffUp(S.AcquiredAxe) then
           if HR.Cast(I.CacheOfAcquiredTreasures, nil, Settings.Commons.TrinketDisplayStyle) then return "Cache Axe" end
         end
+        -- actions.cds+=/use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up|fight_remains<35
+        -- actions.cds+=/use_item,name=scars_of_fraternal_strife,if=buff.scars_of_fraternal_strife_4.up&(spell_targets.fan_of_knives>(1-!raid_event.adds.up))&raid_event.adds.in<30&raid_event.adds.count>2
+        -- actions.cds+=/use_item,name=scars_of_fraternal_strife,if=buff.scars_of_fraternal_strife_4.up&spell_targets.fan_of_knives>1&(!raid_event.adds.up|raid_event.adds.remains>35)&raid_event.adds.count<spell_targets.fan_of_knives*2
+        if I.ScarsofFraternalStrife:IsEquippedAndReady() then
+          if not Player:BuffUp(S.TheFourthRune) then
+            if HR.Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.TrinketDisplayStyle) then return "Scars (Stacking)" end
+          elseif HL.BossFilteredFightRemains("<", 35) then
+            if HR.Cast(S.TheFinalRune, nil, Settings.Commons.TrinketDisplayStyle) then return "Scars (End of Fight)" end
+          elseif EnemiesBFCount > 1 and HL.FilteredFightRemains(EnemiesBF, ">", 35, true) then
+            if HR.CastRightSuggested(S.TheFinalRune, nil, Settings.Commons.TrinketDisplayStyle) then return "Scars (AoE)" end
+          end
+        end
+        -- TODO actions.cds+=/use_item,name=chains_of_domination,if=target.time_to_die>5&(raid_event.adds.in<2|raid_event.adds.count<spell_targets.fan_of_knives*2)|fight_remains<5
         -- actions.cds+=/use_items,slots=trinket1,if=debuff.between_the_eyes.up|trinket.1.has_stat.any_dps|fight_remains<=20
         -- actions.cds+=/use_items,slots=trinket2,if=debuff.between_the_eyes.up|trinket.2.has_stat.any_dps|fight_remains<=20
         local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
@@ -446,20 +472,21 @@ end
 
 local function Finish ()
   -- # BtE to keep the Crit debuff up, if RP is up, or for Greenskins, unless the target is about to die.
-  -- actions.finish=between_the_eyes,if=target.time_to_die>3&(debuff.between_the_eyes.remains<4|runeforge.greenskins_wickers&!buff.greenskins_wickers.up|!runeforge.greenskins_wickers&buff.ruthless_precision.up)
+  -- actions.finish=between_the_eyes,if=target.time_to_die>3&(debuff.between_the_eyes.remains<4|(runeforge.greenskins_wickers|talent.greenskins_wickers)&!buff.greenskins_wickers.up|!runeforge.greenskins_wickers&!talent.greenskins_wickers&buff.ruthless_precision.up)
   -- Note: Increased threshold to 4s to account for player reaction time
   if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes)
     and (Target:FilteredTimeToDie(">", 4) or Target:TimeToDieIsNotValid()) and Rogue.CanDoTUnit(Target, BetweenTheEyesDMGThreshold)
-    and (Target:DebuffRemains(S.BetweentheEyes) < 4 or GreenskinsWickersEquipped and not Player:BuffUp(S.GreenskinsWickers)
-      or not GreenskinsWickersEquipped and Player:BuffUp(S.RuthlessPrecision)) then
+    and (Target:DebuffRemains(S.BetweentheEyes) < 4 or (GreenskinsWickersEquipped or S.GreenskinsWickers:IsAvailable()) and not Player:BuffUp(S.GreenskinsWickersBuff)
+      or not (GreenskinsWickersEquipped or S.GreenskinsWickers:IsAvailable()) and Player:BuffUp(S.RuthlessPrecision)) then
     if HR.CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
   end
-  -- actions.finish=slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&refreshable
+  -- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&refreshable&(!talent.swift_slasher|combo_points>=cp_max_spend)
   -- Note: Added Player:BuffRemains(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
   if S.SliceandDice:IsCastable() and (HL.FilteredFightRemains(EnemiesBF, ">", Player:BuffRemains(S.SliceandDice), true) or Player:BuffRemains(S.SliceandDice) == 0)
-    and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints) * 1.8 then
+    and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints) * 1.8 and (not S.SwiftSlasher:IsAvailable() or ComboPointsDeficit == 0) then
     if HR.CastPooling(S.SliceandDice) then return "Cast Slice and Dice" end
   end
+  -- TODO actions.finish+=/cold_blood,if=!(runeforge.greenskins_wickers|talent.greenskins_wickers)
   -- actions.finish+=/dispatch
   if S.Dispatch:IsCastable() and Target:IsSpellInRange(S.Dispatch) then
     if HR.CastPooling(S.Dispatch) then return "Cast Dispatch" end
@@ -482,16 +509,37 @@ local function Build ()
     if HR.Cast(S.Shiv) then return "Cast Shiv (TTB)" end
   end
   -- actions.build+=/echoing_reprimand,if=!soulbind.effusive_anima_accelerator|variable.blade_flurry_sync
-  if CDsON() and S.EchoingReprimand:IsReady() and (not S.EffusiveAnimaAccelerator:SoulbindEnabled() or Blade_Flurry_Sync()) then
+  if CDsON() and S.EchoingReprimand:IsReady() and not Player:DebuffUp(S.Dreadblades)
+    and (not S.EffusiveAnimaAccelerator:SoulbindEnabled() or Blade_Flurry_Sync()) then
     if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
   end
-  -- actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.greenskins_wickers.up|buff.concealed_blunderbuss.up|buff.tornado_trigger.up)|buff.greenskins_wickers.up&buff.greenskins_wickers.remains<1.5
+  if S.Ambush:IsReady() then
+    if HR.Cast(S.Ambush) then return "Cast Ambush" end
+  end
+
+  -- TODO actions.build+=/cold_blood,if=buff.opportunity.up&buff.greenskins_wickers.up|buff.greenskins_wickers.up&buff.greenskins_wickers.remains<1.5
+  
+  -- actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.greenskins_wickers.up&!talent.fan_the_hammer|buff.concealed_blunderbuss.up)|buff.greenskins_wickers.up&buff.greenskins_wickers.remains<1.5
+  -- actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&(buff.opportunity.stack>=buff.opportunity.max_stack|buff.opportunity.remains<2)
+  -- actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&combo_points.deficit>4&!buff.dreadblades.up
   if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) then
-    if Player:BuffUp(S.Opportunity) and Player:BuffUp(S.GreenskinsWickers) or Player:BuffUp(S.ConcealedBlunderbuss) or Player:BuffUp(S.TornadoTriggerBuff) then
+    if Player:BuffUp(S.Opportunity) and (Player:BuffUp(S.GreenskinsWickersBuff) and not S.FanTheHammer:IsAvailable() or Player:BuffUp(S.ConcealedBlunderbuss)) then
       if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (Buffed)" end
-    elseif Player:BuffUp(S.GreenskinsWickers) and Player:BuffRemains(S.GreenskinsWickers) < 1.5 then
+    elseif Player:BuffUp(S.GreenskinsWickersBuff) and Player:BuffRemains(S.GreenskinsWickersBuff) < 1.5 then
       if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (GSW Dump)" end
     end
+    if S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity) then
+      if Player:BuffStack(S.Opportunity) >= 6 or Player:BuffRemains(S.Opportunity) < 2 then
+        if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (FtH Dump)" end
+      elseif ComboPointsDeficit > 4 and not Player:DebuffUp(S.Dreadblades) then
+        if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (FtH)" end
+      end
+    end
+  end
+  -- actions.build+=/pool_resource,for_next=1
+  -- actions.build+=/ambush
+  if S.Ambush:IsCastable() and Player:BuffUp(S.AudacityBuff) then
+    if HR.CastPooling(S.Ambush) then return "Cast Ambush (Pooling)" end
   end
   -- actions.build+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75
   if S.SerratedBoneSpike:IsReady() then
@@ -516,11 +564,12 @@ local function Build ()
       if HR.Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Serrated Bone Spike Filler" end
     end
   end
-  -- actions.build+=/pistol_shot,if=buff.opportunity.up&(energy.base_deficit>energy.regen*1.5|!talent.weaponmaster&combo_points.deficit<=1+buff.broadside.up|talent.quick_draw.enabled)
-  if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and Player:BuffUp(S.Opportunity) 
-    and (EnergyDeficit > (EnergyRegen * 1.5) or S.QuickDraw:IsAvailable()
-      or not S.Weaponmaster:IsAvailable() and ComboPointsDeficit <= 1 + num(Player:BuffUp(S.Broadside))) then
+  -- actions.build+=/pistol_shot,if=!talent.fan_the_hammer&buff.opportunity.up&(energy.base_deficit>energy.regen*1.5|!talent.weaponmaster&combo_points.deficit<=1+buff.broadside.up|talent.quick_draw.enabled|talent.audacity.enabled&!buff.audacity.up)
+  if not S.FanTheHammer:IsAvailable() and S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and Player:BuffUp(S.Opportunity) then
+    if (EnergyTimeToMax > 1.5 or S.QuickDraw:IsAvailable() or (S.Audacity:IsAvailable() and not Player:BuffUp(S.AudacityBuff))
+      or (not S.Weaponmaster:IsAvailable() and ComboPointsDeficit <= 1 + num(Player:BuffUp(S.Broadside)))) then
       if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
+    end
   end
   -- TODO: actions.build+=/sinister_strike,target_if=min:dot.vicious_wound.remains,if=buff.acquired_axe_driver.up
   -- actions.build+=/sinister_strike
@@ -538,10 +587,10 @@ local function APL ()
   EffectiveComboPoints = Rogue.EffectiveComboPoints(ComboPoints)
   ComboPointsDeficit = Player:ComboPointsDeficit()
   EnergyMaxOffset = Player:BuffUp(S.AdrenalineRush, nil, true) and -50 or 0 -- For base_time_to_max emulation
-  Energy = EnergyPredictedStable(EnergyMaxOffset)
+  Energy = EnergyPredictedStable()
   EnergyRegen = Player:EnergyRegen()
-  EnergyTimeToMax = EnergyTimeToMaxStable(EnergyMaxOffset)
-  EnergyDeficit = Player:EnergyDeficitPredicted(nil, EnergyMaxOffset)
+  EnergyTimeToMax = EnergyTimeToMaxStable(EnergyMaxOffset) -- energy.base_deficit
+  EnergyDeficit = Player:EnergyDeficitPredicted(nil, EnergyMaxOffset) -- energy.base_time_to_max
 
   -- Unit Update
   if AoEON() then
@@ -585,9 +634,18 @@ local function APL ()
           if HR.CastSuggested(S.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
         end
       end
+      if CDsON() and Settings.Commons.UseTrinkets then
+        if I.ScarsofFraternalStrife:IsEquippedAndReady() and not Player:BuffUp(S.TheFirstRune) then
+          if HR.Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.TrinketDisplayStyle) then return "Scars (Precombat)" end
+        end
+      end
       -- TODO actions.precombat+=/fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
+      -- actions.precombat+=/adrenaline_rush,precombat_seconds=3,if=talent.improved_adrenaline_rush
+      if S.AdrenalineRush:IsReady() and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2 then
+        if HR.Cast(S.AdrenalineRush) then return "Cast Adrenaline Rush (Opener)" end
+      end
       -- actions.precombat+=/roll_the_bones,precombat_seconds=2
-      if S.RolltheBones:IsReady() and (not Player:BuffUp(S.RolltheBones) or RtB_Reroll()) then
+      if S.RolltheBones:IsReady() and (Rogue.RtBRemains() > 0 or RtB_Reroll()) then
         if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones (Opener)" end
       end
       -- actions.precombat+=/slice_and_dice,precombat_seconds=1
@@ -776,7 +834,9 @@ HR.SetAPL(260, APL, Init)
 -- actions.cds+=/ancestral_call
 -- actions.cds+=/use_item,name=windscar_whetstone,if=spell_targets.blade_flurry>desired_targets|raid_event.adds.in>60|fight_remains<7
 -- actions.cds+=/use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up|fight_remains<25
--- actions.cds+=/use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up|fight_remains<30
+-- actions.cds+=/use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up|fight_remains<35
+-- actions.cds+=/use_item,name=scars_of_fraternal_strife,if=buff.scars_of_fraternal_strife_4.up&(spell_targets.fan_of_knives>(1-!raid_event.adds.up))&raid_event.adds.in<30&raid_event.adds.count>2
+-- actions.cds+=/use_item,name=scars_of_fraternal_strife,if=buff.scars_of_fraternal_strife_4.up&spell_targets.fan_of_knives>1&(!raid_event.adds.up|raid_event.adds.remains>35)&raid_event.adds.count<spell_targets.fan_of_knives*2
 -- # Default conditions for usable items.
 -- actions.cds+=/use_items,slots=trinket1,if=debuff.between_the_eyes.up|trinket.1.has_stat.any_dps|fight_remains<=20
 -- actions.cds+=/use_items,slots=trinket2,if=debuff.between_the_eyes.up|trinket.2.has_stat.any_dps|fight_remains<=20

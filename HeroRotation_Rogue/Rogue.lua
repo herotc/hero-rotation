@@ -69,7 +69,7 @@ Spell.Rogue.Commons = {
   -- Legendaries (Shadowlands)
   MasterAssassinsMark     = Spell(340094),
   -- Covenants (Shadowlands)
-  EchoingReprimand        = Spell(323547),
+  EchoingReprimand        = Spell(385616):IsAvailable() and Spell(385616) or Spell(323547),
   EchoingReprimand2       = Spell(323558),
   EchoingReprimand3       = Spell(323559),
   EchoingReprimand4       = Spell(323560),
@@ -96,6 +96,9 @@ Spell.Rogue.Commons = {
   AcquiredSword           = Spell(368657),
   AcquiredAxe             = Spell(368656),
   AcquiredWand            = Spell(368654),
+  TheFirstRune            = Spell(368635),
+  TheFourthRune           = Spell(368638),
+  TheFinalRune            = Spell(368641),
   -- Misc
   PoolEnergy              = Spell(999910),
   SinfulRevelationDebuff  = Spell(324260),
@@ -166,17 +169,26 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   Vanish                  = Spell(1856),
   VanishBuff              = Spell(11327),
   -- Talents
+  Audacity                = Spell(381845),
+  AudacityBuff            = Spell(386270),
   AcrobaticStrikes        = Spell(196924),
   BladeRush               = Spell(271877),
+  CountTheOdds            = Spell(381982),
   DeeperStratagem         = Spell(193531),
   Dreadblades             = Spell(343142),
+  FanTheHammer            = Spell(381846),
   GhostlyStrike           = Spell(196937),
+  GreenskinsWickers       = Spell(386823),
+  KeepItRolling           = Spell(381989),
   KillingSpree            = Spell(51690),
+  ImprovedAdrenalineRush  = Spell(395422),
   LoadedDiceBuff          = Spell(256171),
   MarkedforDeath          = Spell(137619),
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
   QuickDraw               = Spell(196938),
+  SwiftSlasher            = Spell(381988),
+  TakeEmBySurpriseBuff    = Spell(385907),
   Weaponmaster            = Spell(200733),
   -- Utility
   Gouge                   = Spell(1776),
@@ -195,14 +207,12 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   SkullandCrossbones      = Spell(199603),
   TrueBearing             = Spell(193359),
   -- Soulbinds/Conduits (Shadowlands)
-  Ambidexterity           = Spell(341542),
-  CountTheOdds            = Spell(341546),
+  AmbidexterityConduit    = Spell(341542),
+  CountTheOddsConduit     = Spell(341546),
   -- Legendaries (Shadowlands)
   ConcealedBlunderbuss    = Spell(340587),
   DeathlyShadowsBuff      = Spell(341202),
-  GreenskinsWickers       = Spell(340573),
-  -- Set Bonuses (Shadowlands)
-  TornadoTriggerBuff      = Spell(364556),
+  GreenskinsWickersBuff   = Spell(386823):IsAvailable() and Spell(394131) or Spell(340573),
 })
 
 Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
@@ -291,6 +301,7 @@ Item.Rogue.Assassination = {
   OverchargedAnimaBattery   = Item(180116, {13, 14}),
   CacheOfAcquiredTreasures  = Item(188265, {13, 14}),
   TheFirstSigil             = Item(188271, {13, 14}),
+  ScarsofFraternalStrife    = Item(188253, {13, 14}),
 }
 
 Item.Rogue.Outlaw = {
@@ -300,6 +311,7 @@ Item.Rogue.Outlaw = {
   FontOfPower               = Item(169314, {13, 14}),
   RazorCoral                = Item(169311, {13, 14}),
   CacheOfAcquiredTreasures  = Item(188265, {13, 14}),
+  ScarsofFraternalStrife    = Item(188253, {13, 14}),
 }
 
 Item.Rogue.Subtlety = {
@@ -308,6 +320,7 @@ Item.Rogue.Subtlety = {
   FontOfPower               = Item(169314, {13, 14}),
   RazorCoral                = Item(169311, {13, 14}),
   CacheOfAcquiredTreasures  = Item(188265, {13, 14}),
+  ScarsofFraternalStrife    = Item(188253, {13, 14}),
 }
 
 -- Stealth
@@ -350,6 +363,7 @@ do
   local InstantPoison       = Spell(315584)
   local NumbingPoison       = Spell(5761)
   local WoundPoison         = Spell(8679)
+  local AtrophicPoison      = Spell(381637)
 
   function Commons.Poisons()
     local PoisonRefreshTime = Player:AffectingCombat() and Settings.Commons.PoisonRefreshCombat * 60 or Settings.Commons.PoisonRefresh * 60
@@ -374,15 +388,20 @@ do
       end
     end
     -- Non-Lethal Poisons
-    PoisonRemains = Player:BuffRemains(CripplingPoison)
-    if PoisonRemains > 0 then
+    if AtrophicPoison:IsAvailable() then
+      PoisonRemains = Player:BuffRemains(AtrophicPoison)
       if PoisonRemains < PoisonRefreshTime then
-        HR.CastSuggested(CripplingPoison)
+        HR.CastSuggested(AtrophicPoison)
       end
-    else
+    elseif NumbingPoison:IsAvailable() then
       PoisonRemains = Player:BuffRemains(NumbingPoison)
       if PoisonRemains < PoisonRefreshTime then
         HR.CastSuggested(NumbingPoison)
+      end
+    else
+      PoisonRemains = Player:BuffRemains(CripplingPoison)
+      if PoisonRemains < PoisonRefreshTime then
+        HR.CastSuggested(CripplingPoison)
       end
     end
   end
