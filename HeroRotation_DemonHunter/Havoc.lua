@@ -46,7 +46,7 @@ local EnemiesCount8, EnemiesCount20
 local DarkglareEquipped = Player:HasLegendaryEquipped(20)
 local ChaosTheoryEquipped = Player:HasLegendaryEquipped(23)
 local BurningWoundEquipped = Player:HasLegendaryEquipped(25)
-local AgonyGazeEquipped = Player:HasLegendaryEquipped(236)
+local AgonyGazeEquipped = Player:HasLegendaryEquipped(236) or (CovenantID == 2 and Player:HasUnity())
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -103,7 +103,7 @@ HL:RegisterForEvent(function()
   DarkglareEquipped = Player:HasLegendaryEquipped(20)
   ChaosTheoryEquipped = Player:HasLegendaryEquipped(23)
   BurningWoundEquipped = Player:HasLegendaryEquipped(25)
-  AgonyGazeEquipped = Player:HasLegendaryEquipped(236)
+  AgonyGazeEquipped = Player:HasLegendaryEquipped(236) or (CovenantID == 2 and Player:HasUnity())
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
