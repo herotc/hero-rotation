@@ -45,7 +45,6 @@ Spell.Shaman.Commons = {
   WindShear                             = Spell(57994),
   -- Talents
   EarthShield                           = Spell(974),
-  ElementalBlast                        = Spell(117014),
   -- Defensive
   AstralShift                           = Spell(10871),
   -- Utility
@@ -78,6 +77,7 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   CrashLightning                        = Spell(187874),
   CrashLightningBuff                    = Spell(187878),
   FeralSpirit                           = Spell(51533),
+  FeralSpiritBuff                       = Spell(333957),   -- DF
   LavaLash                              = Spell(60103),
   StormbringerBuff                      = Spell(201846),
   Stormstrike                           = Spell(17364),
@@ -89,11 +89,17 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   -- Talents
   Ascendance                            = Spell(114051),
   AscendanceBuff                        = Spell(114051),
+  AshenCatalystBuff                     = Spell(390371),  -- DF
+  ClCrashLightningBuff                  = Spell(333964),  -- DF
   CrashingStorm                         = Spell(192246),
+  CrashingStorms                        = Spell(334308),  -- DF
+  DoomWinds                             = Spell(384352),  -- DF
   EarthenSpike                          = Spell(188089),
+  ElementalBlast                        = Spell(117014),  -- DF
   ElementalSpirits                      = Spell(262624),
   FireNova                              = Spell(333974),
   ForcefulWinds                         = Spell(262647),
+  GatheringStorms                       = Spell(384363),  -- DF
   Hailstorm                             = Spell(334195),
   HailstormBuff                         = Spell(334196),
   HotHand                               = Spell(201900),
@@ -101,10 +107,13 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   IceStrike                             = Spell(342240),
   LashingFlames                         = Spell(334046),
   LashingFlamesDebuff                   = Spell(334168),
+  OverflowingMaelstrom                  = Spell(384149),  -- DF
   Sundering                             = Spell(197214),
   Stormflurry                           = Spell(344357),
   Stormkeeper                           = Spell(320137),
   StormkeeperBuff                       = Spell(320137),
+  SwirlingMaelstrom                     = Spell(384359),  -- DF
+  ThorimsInvocation                     = Spell(384444),  -- DF
   -- Elemental Spirits Buffs
   CracklingSurgeBuff                    = Spell(224127),
   IcyEdgeBuff                           = Spell(224126),
