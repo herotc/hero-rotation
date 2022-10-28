@@ -328,8 +328,8 @@ local function Demonic()
   if S.EyeBeam:IsReady() and (AgonyGazeEquipped and EnemiesCount8 > 1 and Target:DebuffUp(S.SinfulBrandDebuff) and Target:DebuffRemains(S.SinfulBrandDebuff) <= Player:GCD()) then
     if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam demonic 2"; end
   end
-  -- essence_break
-  if S.EssenceBreak:IsCastable() then
+  -- essence_break,if=!variable.waiting_for_momentum&(!cooldown.eye_beam.ready|buff.metamorphosis.up)
+  if S.EssenceBreak:IsCastable() and ((not VarWaitingForMomentum) and (S.EyeBeam:Cooldown() or Player:BuffUp(S.MetamorphosisBuff))) then
     if Cast(S.EssenceBreak, nil, nil, not IsInMeleeRange(10)) then return "essence_break demonic 4"; end
   end
   -- death_sweep,if=variable.blade_dance
@@ -446,25 +446,17 @@ local function APL()
     end
     -- auto_attack
     -- retarget_auto_attack,line_cd=1,target_if=min:debuff.burning_wound.remains,if=(runeforge.burning_wound|talent.burning_wound)&talent.demon_blades
-    -- variable,name=blade_dance,if=!runeforge.chaos_theory&!talent.chaos_theory&!runeforge.darkglare_medallion,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
-    if ((not ChaosTheoryEquipped) and (not S.ChaosTheory:IsAvailable()) and not DarkglareEquipped) then
+    -- variable,name=blade_dance,if=!runeforge.chaos_theory&!runeforge.darkglare_medallion,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
+    if ((not ChaosTheoryEquipped) and not DarkglareEquipped) then
       VarBladeDance = (S.FirstBlood:IsAvailable() or EnemiesCount8 >= (3 - num(S.TrailofRuin:IsAvailable())))
     end
-    -- variable,name=blade_dance,if=runeforge.chaos_theory|talent.chaos_theory,value=buff.chaos_theory.down|talent.first_blood.enabled&spell_targets.blade_dance1>=(2-talent.trail_of_ruin.enabled)|!talent.cycle_of_hatred.enabled&spell_targets.blade_dance1>=(4-talent.trail_of_ruin.enabled)
+    -- variable,name=blade_dance,if=runeforge.chaos_theory|talent.chaos_theory,value=buff.chaos_theory.down|talent.first_blood.enabled|!talent.cycle_of_hatred.enabled&spell_targets.blade_dance1>=(4-talent.trail_of_ruin.enabled)
     if (ChaosTheoryEquipped or S.ChaosTheory:IsAvailable()) then
-      VarBladeDance = ((Player:BuffDown(S.ChaosTheoryBuff) and Player:BuffDown(S.ChaosTheoryLegBuff)) or S.FirstBlood:IsAvailable() and EnemiesCount8 >= (2 - num(S.TrailofRuin:IsAvailable())) or (not S.CycleofHatred:IsAvailable()) and EnemiesCount8 >= (4 - num(S.TrailofRuin:IsAvailable())))
+      VarBladeDance = ((Player:BuffDown(S.ChaosTheoryBuff) and Player:BuffDown(S.ChaosTheoryLegBuff)) or S.FirstBlood:IsAvailable() or (not S.CycleofHatred:IsAvailable()) and EnemiesCount8 >= (4 - num(S.TrailofRuin:IsAvailable())))
     end
     -- variable,name=blade_dance,if=runeforge.darkglare_medallion,value=talent.first_blood.enabled|(buff.metamorphosis.up|talent.trail_of_ruin.enabled|debuff.essence_break.up)&spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)|!talent.demonic.enabled&spell_targets.blade_dance1>=4
     if (DarkglareEquipped) then
       VarBladeDance = (S.FirstBlood:IsAvailable() or (Player:BuffUp(S.MetamorphosisBuff) or S.TrailofRuin:IsAvailable() or Target:DebuffUp(S.EssenceBreakDebuff)) and EnemiesCount8 >= (3 - num(S.TrailofRuin:IsAvailable())) or (not S.Demonic:IsAvailable()) and EnemiesCount8 >= 4)
-    end
-    -- variable,name=blade_dance,op=reset,if=talent.essence_break.enabled&cooldown.essence_break.ready
-    if (S.EssenceBreak:IsAvailable() and S.EssenceBreak:CooldownUp()) then
-      VarBladeDance = false
-    end
-    -- variable,name=blade_dance,if=runeforge.agony_gaze&talent.cycle_of_hatred,value=variable.blade_dance&active_dot.sinful_brand<2
-    if (AgonyGazeEquipped and S.CycleofHatred:IsAvailable()) then
-      VarBladeDance = VarBladeDance and S.SinfulBrandDebuff:AuraActiveCount() < 2
     end
     -- variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30
     VarPoolingForMeta = (not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() < 6 and Player:FuryDeficit() > 30
