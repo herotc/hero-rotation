@@ -40,6 +40,15 @@ local equip = Player:GetEquipment()
 local trinket1 = equip[13] and Item(equip[13]) or Item(0)
 local trinket2 = equip[14] and Item(equip[14]) or Item(0)
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 -- Rotation Var
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
@@ -74,15 +83,6 @@ local VarTrinketSyncSlot = 0
 local VarUseEyeBeamFuryCondition = false
 local BossFightRemains = 11111
 local FightRemains = 11111
-
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
-
--- Update CovenantID if we change Covenants
-HL:RegisterForEvent(function()
-  CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN")
 
 HL:RegisterForEvent(function()
   VarPoolingForMeta = false
@@ -184,25 +184,31 @@ local function Cooldown()
   if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or FightRemains < 60) then
     if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldown 6"; end
   end
-  -- use_item,name=wraps_of_electrostatic_potential
-  if I.WrapsofElectrostaticPotential:IsEquippedAndReady() then
-    if Cast(I.WrapsofElectrostaticPotential, nil, Settings.Commons.DisplayStyle.Items) then return "wraps_of_electrostatic_potential cooldown 8"; end
+  if Settings.Commons.Enabled.Items then
+    -- use_item,name=wraps_of_electrostatic_potential
+    if I.WrapsofElectrostaticPotential:IsEquippedAndReady() then
+      if Cast(I.WrapsofElectrostaticPotential, nil, Settings.Commons.DisplayStyle.Items) then return "wraps_of_electrostatic_potential cooldown 8"; end
+    end
+    -- use_item,name=ring_of_collapsing_futures,if=buff.temptation.down|fight_remains<30
+    if I.RingofCollapsingFutures:IsEquippedAndReady() and (Player:BuffDown(S.TemptationBuff) or FightRemains < 30) then
+      if Cast(I.RingofCollapsingFutures, nil, Settings.Commons.DisplayStyle.Items) then return "ring_of_collapsing_futures cooldown 10"; end
+    end
   end
-  -- use_item,name=ring_of_collapsing_futures,if=buff.temptation.down|fight_remains<30
-  if I.RingofCollapsingFutures:IsEquippedAndReady() and (Player:BuffDown(S.TemptationBuff) or FightRemains < 30) then
-    if Cast(I.RingofCollapsingFutures, nil, Settings.Commons.DisplayStyle.Items) then return "ring_of_collapsing_futures cooldown 10"; end
-  end
-  -- use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up&((active_enemies=desired_targets&raid_event.adds.in>60|active_enemies>desired_targets)&(active_enemies<3|cooldown.eye_beam.remains<20)|fight_remains<25)
-  if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredAxeBuff) and ((EnemiesCount8 >= 1) and (EnemiesCount8 < 3 or S.EyeBeam:CooldownRemains() < 20) or FightRemains < 25)) then
-    if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures cooldown 12"; end
-  end
-  -- use_items,slots=trinket1,if=variable.trinket_sync_slot=1&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.1.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready)|!variable.trinket_sync_slot
-  if trinket1:IsReady() and (VarTrinketSyncSlot == 1 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > ((FightRemains > trinket1:Cooldown() / 2) and FightRemains or trinket1:Cooldown() / 2)) or FightRemains <= 20) or (VarTrinketSyncSlot == 2 and not trinket2:IsReady()) or VarTrinketSyncSlot == 0) then
-    if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 cooldown 14"; end
-  end
-  -- use_items,slots=trinket2,if=variable.trinket_sync_slot=2&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.2.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=1&!trinket.1.cooldown.ready)|!variable.trinket_sync_slot
-  if trinket2:IsReady() and (VarTrinketSyncSlot == 2 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > ((FightRemains > trinket2:Cooldown() / 2) and FightRemains or trinket2:Cooldown() / 2)) or FightRemains <= 20) or (VarTrinketSyncSlot == 1 and not trinket1:IsReady()) or VarTrinketSyncSlot == 0) then
-    if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 cooldown 16"; end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up&((active_enemies=desired_targets&raid_event.adds.in>60|active_enemies>desired_targets)&(active_enemies<3|cooldown.eye_beam.remains<20)|fight_remains<25)
+    if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredAxeBuff) and ((EnemiesCount8 >= 1) and (EnemiesCount8 < 3 or S.EyeBeam:CooldownRemains() < 20) or FightRemains < 25)) then
+      if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures cooldown 12"; end
+    end
+    -- use_items,slots=trinket1,if=variable.trinket_sync_slot=1&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.1.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready)|!variable.trinket_sync_slot
+    local Trinket1ToUse = Player:GetUseableTrinkets(OnUseExcludes, 13)
+    if Trinket1ToUse and (VarTrinketSyncSlot == 1 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > ((FightRemains > trinket1:Cooldown() / 2) and FightRemains or trinket1:Cooldown() / 2)) or FightRemains <= 20) or (VarTrinketSyncSlot == 2 and not trinket2:IsReady()) or VarTrinketSyncSlot == 0) then
+      if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 cooldown 14"; end
+    end
+    -- use_items,slots=trinket2,if=variable.trinket_sync_slot=2&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.2.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=1&!trinket.1.cooldown.ready)|!variable.trinket_sync_slot
+    local Trinket2ToUse = Player:GetUseableTrinkets(OnUseExcludes, 14)
+    if Trinket2ToUse and (VarTrinketSyncSlot == 2 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > ((FightRemains > trinket2:Cooldown() / 2) and FightRemains or trinket2:Cooldown() / 2)) or FightRemains <= 20) or (VarTrinketSyncSlot == 1 and not trinket1:IsReady()) or VarTrinketSyncSlot == 0) then
+      if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 cooldown 16"; end
+    end
   end
   -- sinful_brand,if=!dot.sinful_brand.ticking&(!runeforge.agony_gaze|(cooldown.eye_beam.remains<=gcd&fury>=30))&(!cooldown.metamorphosis.up|active_enemies=1)
   if S.SinfulBrand:IsCastable() and (Target:DebuffDown(S.SinfulBrandDebuff) and ((not AgonyGazeEquipped) or (S.EyeBeam:CooldownRemains() <= Player:GCD() and Player:Fury() >= 30)) and (S.Metamorphosis:CooldownDown() or EnemiesCount8 == 1)) then
