@@ -224,7 +224,7 @@ local function Cooldowns()
   if (Settings.Commons.Enabled.Items) then
     -- use_item,name=gavel_of_the_first_arbiter
     if I.GaveloftheFirstArbiter:IsEquippedAndReady() then
-      if Cast(I.GaveloftheFirstArbiter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "gavel_of_the_first_arbiter cooldowns 12"; end
+      if Cast(I.GaveloftheFirstArbiter, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(30)) then return "gavel_of_the_first_arbiter cooldowns 12"; end
     end
     -- use_item,name=ring_of_collapsing_futures,if=!buff.temptation.up|fight_remains<15
     if I.RingofCollapsingFutures:IsEquippedAndReady() and (Player:BuffDown(S.TemptationBuff) or FightRemains < 15) then
@@ -232,7 +232,7 @@ local function Cooldowns()
     end
     -- use_item,name=anodized_deflectors
     if I.AnodizedDeflectors:IsEquippedAndReady() then
-      if Cast(I.AnodizedDeflectors, nil, Settings.Commons.DisplayStyle.Trinkets) then return "anodized_deflectors cooldowns 16"; end
+      if Cast(I.AnodizedDeflectors, nil, Settings.Commons.DisplayStyle.Items) then return "anodized_deflectors cooldowns 16"; end
     end
   end
   if (Settings.Commons.Enabled.Trinkets) then
