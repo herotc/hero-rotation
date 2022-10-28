@@ -996,6 +996,7 @@ local function APL ()
 end
 
 local function Init ()
+  HR.Print("Subtlety Rogue rotation has not been updated for pre-patch 10.0. It may not function properly or may cause errors in-game.")
 end
 
 HR.SetAPL(261, APL, Init)

@@ -929,6 +929,8 @@ local function Init ()
   S.Vendetta:RegisterAuraTracking()
   S.Sepsis:RegisterAuraTracking()
   S.Flagellation:RegisterAuraTracking()
+
+  HR.Print("Assassination Rogue rotation has not been updated for pre-patch 10.0. It may not function properly or may cause errors in-game.")
 end
 
 HR.SetAPL(259, APL, Init)

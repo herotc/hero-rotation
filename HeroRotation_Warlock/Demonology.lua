@@ -747,7 +747,7 @@ local function APL()
 end
 
 local function Init()
-  --HR.Print("Demonology Warlock rotation is currently a work in progress, but has been updated for patch 9.1.5.")
+  HR.Print("Demonology Warlock rotation has not been updated for pre-patch 10.0. It may not function properly or may cause errors in-game.")
 end
 
 HR.SetAPL(266, APL, Init)
