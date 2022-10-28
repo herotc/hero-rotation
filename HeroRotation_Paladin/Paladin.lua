@@ -33,28 +33,24 @@ Spell.Paladin.Commons = {
   GiftoftheNaaru                        = Spell(59542),
   LightsJudgment                        = Spell(255647),
   -- Abilities
-  AvengingWrath                         = Spell(31884),
-  AvengingWrathBuff                     = Spell(31884),
   Consecration                          = Spell(26573),
-  ConsecrationBuff                      = Spell(188370),
-  ConsecrationDebuff                    = Spell(204242),
   CrusaderStrike                        = Spell(35395),
-  DevotionAura                          = Spell(465),
-  DevotionAuraBuff                      = Spell(465),
   DivineShield                          = Spell(642),
   DivineSteed                           = Spell(190784),
   FlashofLight                          = Spell(19750),
   HammerofJustice                       = Spell(853),
-  HammerofWrath                         = MultiSpell(24275, 326730),
   HandofReckoning                       = Spell(62124),
-  LayonHands                            = Spell(633),
+  Judgment                              = Spell(20271),
   Rebuke                                = Spell(96231),
   ShieldoftheRighteous                  = Spell(53600),
-  ShieldoftheRighteousBuff              = Spell(132403),
   WordofGlory                           = Spell(85673),
   -- Talents
+  AvengingWrath                         = Spell(384376),
+  HammerofWrath                         = MultiSpell(24275, 326730),
   HolyAvenger                           = Spell(105809),
   HolyAvengerBuff                       = Spell(105809),
+  LayonHands                            = Spell(633),
+  SanctifiedWrath                       = Spell(53376),
   Seraphim                              = Spell(152262),
   SeraphimBuff                          = Spell(152262),
   -- Covenants (Shadowlands)
@@ -64,7 +60,7 @@ Spell.Paladin.Commons = {
   BlessingofSummer                      = Spell(328620),
   BlessingofWinter                      = Spell(328281),
   DivinePurpose                         = Spell(223817),
-  DivineToll                            = Spell(304971),
+  DivineTollCov                         = Spell(304971),
   DoorofShadows                         = Spell(300728),
   Fleshcraft                            = Spell(324631),
   Soulshape                             = Spell(310143),
@@ -78,15 +74,25 @@ Spell.Paladin.Commons = {
   VengefulShockDebuff                   = Spell(340007),
   VolatileSolvent                       = Spell(323074),
   VolatileSolventHumanBuff              = Spell(323491),
+  -- Auras
+  ConcentrationAura                     = Spell(317920),
+  CrusaderAura                          = Spell(32223),
+  DevotionAura                          = Spell(465),
+  RetributionAura                       = Spell(183435),
   -- Buffs
+  AvengingWrathBuff                     = Spell(31884),
+  ConsecrationBuff                      = Spell(188370),
   DivinePurposeBuff                     = Spell(223819),
   ScarsofFraternalStrifeBuff4           = Spell(368638),
+  ShieldoftheRighteousBuff              = Spell(132403),
   TemptationBuff                        = Spell(234143),
   -- Debuffs
+  ConsecrationDebuff                    = Spell(204242),
   CruelGarroteDebuff                    = Spell(230011),
   -- Legendary Effects
   DivineResonanceBuff                   = Spell(355455),
   FinalVerdictBuff                      = Spell(337228),
+  JudgmentDebuff                        = Spell(197277),
   -- Pool
   Pool                                  = Spell(999910),
 }
@@ -111,26 +117,30 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
 
 Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   -- Abilities
-  BladeofJustice                        = Spell(184575),
-  DivineStorm                           = Spell(53385),
-  Judgment                              = Spell(20271),
-  JudgmentDebuff                        = Spell(197277),
   TemplarsVerdict                       = Spell(85256),
-  WakeofAshes                           = Spell(255937),
   -- Talents
+  AshestoDust                           = Spell(383300),
+  BladeofJustice                        = Spell(184575),
   BladeofWrath                          = Spell(231832),
-  Crusade                               = Spell(231895),
-  CrusadeBuff                           = Spell(231895),
+  Crusade                               = Spell(231895), -- On-bar spell ID. Talent is a different ID for some reason.
+  CrusadeTalent                         = Spell(384392),
+  DivineStorm                           = Spell(53385),
+  DivineToll                            = Spell(375576),
   EmpyreanPower                         = Spell(326732),
-  EmpyreanPowerBuff                     = Spell(326733),
   ExecutionSentence                     = Spell(343527),
+  ExecutionersWrath                     = Spell(387196),
+  Exorcism                              = Spell(383185),
   FinalReckoning                        = Spell(343721),
   FiresofJustice                        = Spell(203316),
+  RadiantDecree                         = Spell(384052),
   RighteousVerdict                      = Spell(267610),
-  SanctifiedWrath                       = Spell(317866),
-  Zeal                                  = Spell(269569),
-  -- Defensive
   ShieldofVengeance                     = Spell(184662),
+  WakeofAshes                           = Spell(255937),
+  Zeal                                  = Spell(269569),
+  -- Buffs
+  CrusadeBuff                           = Spell(231895),
+  EmpyreanPowerBuff                     = Spell(326733),
+  -- Debuffs
   -- Legendary Effects
   FinalVerdict                          = Spell(336872),
 })

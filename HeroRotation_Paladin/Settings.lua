@@ -19,6 +19,7 @@ HR.GUISettings.APL.Paladin = {
     Enabled = {
       Trinkets = true,
       Potions = true,
+      Items = true,
     },
     DisplayStyle = {
       Trinkets = "Suggested",

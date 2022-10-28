@@ -147,12 +147,20 @@ local function HandleNightFaeBlessings()
   end
 end
 
+local function MissingAura()
+  return (Player:BuffDown(S.RetributionAura) and Player:BuffDown(S.DevotionAura) and Player:BuffDown(S.ConcentrationAura) and Player:BuffDown(S.CrusaderAura))
+end
+
 --- ======= ACTION LISTS =======
 local function Precombat()
   -- flask
   -- food
   -- augmentation
   -- snapshot_stats
+  -- retribution_aura
+  if S.RetributionAura:IsCastable() and (MissingAura()) then
+    if Cast(S.RetributionAura) then return "retribution_aura precombat 2"; end
+  end
   -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
   if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 2"; end
@@ -213,7 +221,7 @@ local function Cooldowns()
   end
   -- blessing_of_the_seasons
   local ShouldReturn = HandleNightFaeBlessings(); if ShouldReturn then return ShouldReturn; end
-  if (Settings.Commons.Enabled.Trinkets) then
+  if (Settings.Commons.Enabled.Items) then
     -- use_item,name=gavel_of_the_first_arbiter
     if I.GaveloftheFirstArbiter:IsEquippedAndReady() then
       if Cast(I.GaveloftheFirstArbiter, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "gavel_of_the_first_arbiter cooldowns 12"; end
@@ -226,6 +234,8 @@ local function Cooldowns()
     if I.AnodizedDeflectors:IsEquippedAndReady() then
       if Cast(I.AnodizedDeflectors, nil, Settings.Commons.DisplayStyle.Trinkets) then return "anodized_deflectors cooldowns 16"; end
     end
+  end
+  if (Settings.Commons.Enabled.Trinkets) then
     -- use_item,name=the_first_sigil,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10|fight_remains<20
     if I.TheFirstSigil:IsEquippedAndReady() and (Player:BuffUp(S.AvengingWrathBuff) or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) == 10 or FightRemains < 20) then
       if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil cooldowns 18"; end
@@ -364,31 +374,34 @@ local function Cooldowns()
   if S.HolyAvenger:IsCastable() and (TimeToHPG <= Player:GCDRemains() and Player:HolyPower() <= 2 and (Player:BuffUp(S.AvengingWrath) or S.Crusade:IsAvailable() and (S.Crusade:CooldownUp() or Player:BuffUp(S.CrusadeBuff)) or FightRemains < 20)) then
     if Cast(S.HolyAvenger) then return "holy_avenger cooldowns 80" end
   end
-  -- final_reckoning,if=(holy_power>=4&time<8|holy_power>=3&(time>=8|spell_targets.divine_storm>=2&covenant.kyrian))&cooldown.avenging_wrath.remains>gcd&time_to_hpg=0&(!talent.seraphim|buff.seraphim.up)&(!raid_event.adds.exists|raid_event.adds.up|raid_event.adds.in>40)&(!buff.avenging_wrath.up|holy_power=5|cooldown.hammer_of_wrath.remains|spell_targets.divine_storm>=2&covenant.kyrian)
-  if S.FinalReckoning:IsCastable() and ((Player:HolyPower() >= 4 and HL.CombatTime() < 8 or Player:HolyPower() >= 3 and (HL.CombatTime() >= 8 or EnemiesCount8y >= 2 and CovenantID == 1)) and S.AvengingWrath:CooldownRemains() > Player:GCD() and TimeToHPG <= Player:GCDRemains() and ((not S.Seraphim:IsAvailable()) or Player:BuffUp(S.Seraphim)) and (Player:BuffDown(S.AvengingWrathBuff) or Player:HolyPower() == 5 or S.HammerofWrath:CooldownDown() or EnemiesCount8y >= 2 and CovenantID == 1)) then
+  -- final_reckoning,if=(holy_power>=4&time<8|holy_power>=3&(time>=8|spell_targets.divine_storm>=2&covenant.kyrian))&(cooldown.avenging_wrath.remains>gcd|cooldown.crusade.remains&(!buff.crusade.up|buff.crusade.stack>=10))&(time_to_hpg>0|holy_power=5)&(!talent.seraphim|buff.seraphim.up)&(!raid_event.adds.exists|raid_event.adds.up|raid_event.adds.in>40)&(!buff.avenging_wrath.up|holy_power=5|cooldown.hammer_of_wrath.remains|spell_targets.divine_storm>=2&covenant.kyrian)
+  if S.FinalReckoning:IsCastable() and ((Player:HolyPower() >= 4 and HL.CombatTime() < 8 or Player:HolyPower() >= 3 and (HL.CombatTime() >= 8 or EnemiesCount8y >= 2 and CovenantID == 1)) and (S.AvengingWrath:CooldownRemains() > Player:GCD() or S.Crusade:CooldownDown() and (Player:BuffDown(S.CrusadeBuff) or Player:BuffStack(S.CrusadeBuff) >= 10)) and (TimeToHPG > 0 or Player:HolyPower() == 5) and ((not S.Seraphim:IsAvailable()) or Player:BuffUp(S.Seraphim)) and (Player:BuffDown(S.AvengingWrathBuff) or Player:HolyPower() == 5 or S.HammerofWrath:CooldownDown() or EnemiesCount8y >= 2 and CovenantID == 1)) then
     if Cast(S.FinalReckoning) then return "final_reckoning cooldowns 82" end
   end
 end
 
 local function Finishers()
-  -- variable,name=ds_castable,value=spell_targets.divine_storm=2&!(runeforge.final_verdict|talent.righteous_verdict)|spell_targets.divine_storm>2|buff.empyrean_power.up&!debuff.judgment.up&!buff.divine_purpose.up
-  -- Note: The last part with "spell_targets.divine_storm>=2&..." is redundant with the first condition.
-  VarDSCastable = (EnemiesCount8y == 2 and (not (FinalVerdictEquipped or S.RighteousVerdict:IsAvailable())) or EnemiesCount8y > 2 or Player:BuffUp(S.EmpyreanPowerBuff) and Target:DebuffDown(S.JudgmentDebuff) and Player:BuffDown(S.DivinePurposeBuff))
-  -- seraphim,if=if=(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15)&!talent.final_reckoning&(!talent.execution_sentence|spell_targets.divine_storm>=5)&(!raid_event.adds.exists|raid_event.adds.in>40|raid_event.adds.in<gcd|raid_event.adds.up)&(!covenant.kyrian|cooldown.divine_toll.remains<9)|fight_remains<15&fight_remains>5|buff.crusade.up&buff.crusade.stack<10
+  -- variable,name=ds_castable,value=spell_targets.divine_storm>=2|buff.empyrean_power.up&!debuff.judgment.up&!buff.divine_purpose.up
+  VarDSCastable = (EnemiesCount8y >= 2 and AoEON() or Player:BuffUp(S.EmpyreanPowerBuff) and Target:DebuffDown(S.JudgmentDebuff) and Player:BuffDown(S.DivinePurposeBuff))
+  -- seraphim,if=(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15)&!talent.final_reckoning&(!talent.execution_sentence|spell_targets.divine_storm>=5)&(!raid_event.adds.exists|raid_event.adds.in>40|raid_event.adds.in<gcd|raid_event.adds.up)&(!covenant.kyrian|cooldown.divine_toll.remains<9)|fight_remains<15&fight_remains>5|buff.crusade.up&buff.crusade.stack<10
   if S.Seraphim:IsReady() and ((S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15) and (not S.FinalReckoning:IsAvailable()) and ((not S.ExecutionSentence:IsAvailable()) or EnemiesCount8y >= 5) and (CovenantID ~= 1 or S.DivineToll:CooldownRemains() < 9) or FightRemains < 15 and FightRemains > 5 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
     if Cast(S.Seraphim, Settings.Retribution.GCDasOffGCD.Seraphim) then return "seraphim finishers 2" end
   end
-  -- execution_sentence,if=(buff.crusade.down&cooldown.crusade.remains>10|buff.crusade.stack>=3|cooldown.avenging_wrath.remains>10)&(!talent.final_reckoning|cooldown.final_reckoning.remains>10)&target.time_to_die>8&spell_targets.divine_storm<5
-  if S.ExecutionSentence:IsReady() and ((Player:BuffDown(S.CrusadeBuff) and S.Crusade:CooldownRemains() > 10 or Player:BuffStack(S.CrusadeBuff) >= 3 or S.AvengingWrath:CooldownRemains() > 10) and ((not S.FinalReckoning:IsAvailable()) or S.FinalReckoning:CooldownRemains() > 10) and Target:TimeToDie() > 8 and EnemiesCount8y < 5) then
+  -- execution_sentence,if=(buff.crusade.down&cooldown.crusade.remains>10|buff.crusade.stack>=3|cooldown.avenging_wrath.remains>10)&(!talent.final_reckoning|cooldown.final_reckoning.remains>10)&target.time_to_die>8&(spell_targets.divine_storm<5|talent.executioners_wrath)
+  if S.ExecutionSentence:IsReady() and ((Player:BuffDown(S.CrusadeBuff) and S.Crusade:CooldownRemains() > 10 or Player:BuffStack(S.CrusadeBuff) >= 3 or S.AvengingWrath:CooldownRemains() > 10) and ((not S.FinalReckoning:IsAvailable()) or S.FinalReckoning:CooldownRemains() > 10) and Target:TimeToDie() > 8 and (EnemiesCount8y < 5 or S.ExecutionersWrath:IsAvailable())) then
     if Cast(S.ExecutionSentence, Settings.Retribution.GCDasOffGCD.ExecutionSentence, nil, not Target:IsSpellInRange(S.ExecutionSentence)) then return "execution_sentence finishers 4" end
+  end
+  -- radiant_decree,if=(buff.crusade.down&cooldown.crusade.remains>5|buff.crusade.stack>=3|cooldown.avenging_wrath.remains>5)&(!talent.final_reckoning|cooldown.final_reckoning.remains>5)
+  if S.RadiantDecree:IsReady() and ((Player:BuffDown(S.CrusadeBuff) and S.Crusade:CooldownRemains() > 5 or Player:BuffStack(S.CrusadeBuff) >= 3 or S.AvengingWrath:CooldownRemains() > 5) and ((not S.FinalReckoning:IsAvailable()) or S.FinalReckoning:CooldownRemains() > 5)) then
+    if Cast(S.RadiantDecree, nil, nil, not Target:IsInMeleeRange(12)) then return "radiant_decree finishers 6"; end
   end
   -- divine_storm,if=variable.ds_castable&!buff.vanquishers_hammer.up&((!talent.crusade|cooldown.crusade.remains>gcd*3)&(!talent.execution_sentence|cooldown.execution_sentence.remains>gcd*6|cooldown.execution_sentence.remains>gcd*4&holy_power>=4|target.time_to_die<8|spell_targets.divine_storm>=5|!talent.seraphim&cooldown.execution_sentence.remains>gcd*2)&(!talent.final_reckoning|cooldown.final_reckoning.remains>gcd*6|cooldown.final_reckoning.remains>gcd*4&holy_power>=4|!talent.seraphim&cooldown.final_reckoning.remains>gcd*2)|talent.holy_avenger&cooldown.holy_avenger.remains<gcd*3|buff.holy_avenger.up|buff.crusade.up&buff.crusade.stack<10)
   if S.DivineStorm:IsReady() and (VarDSCastable and Player:BuffDown(S.VanquishersHammer) and (((not S.Crusade:IsAvailable()) or S.Crusade:CooldownRemains() > Player:GCD() * 3) and ((not S.ExecutionSentence) or S.ExecutionSentence:CooldownRemains() > Player:GCD() * 6 or S.ExecutionSentence:CooldownRemains() > Player:GCD() * 4 and Player:HolyPower() >= 4 or Target:TimeToDie() < 8 or EnemiesCount8y >= 5 or (not S.Seraphim:IsAvailable()) and S.ExecutionSentence:CooldownRemains() > Player:GCD() * 2) and ((not S.FinalReckoning:IsAvailable()) or S.FinalReckoning:CooldownRemains() > Player:GCD() * 6 or S.FinalReckoning:CooldownRemains() > Player:GCD() * 4 and Player:HolyPower() >= 4 or (not S.Seraphim:IsAvailable()) and S.FinalReckoning:CooldownRemains() > Player:GCD() * 2) or S.HolyAvenger:IsAvailable() and S.HolyAvenger:CooldownRemains() < Player:GCD() * 3 or Player:BuffUp(S.HolyAvenger) or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10)) then
-    if Cast(S.DivineStorm, nil, nil, not Target:IsInRange(8)) then return "divine_storm finishers 6" end
+    if Cast(S.DivineStorm, nil, nil, not Target:IsInRange(8)) then return "divine_storm finishers 8" end
   end
   -- templars_verdict,if=(!talent.crusade|cooldown.crusade.remains>gcd*3)&(!talent.execution_sentence|cooldown.execution_sentence.remains>gcd*6|cooldown.execution_sentence.remains>gcd*4&holy_power>=4|target.time_to_die<8|!talent.seraphim&cooldown.execution_sentence.remains>gcd*2)&(!talent.final_reckoning|cooldown.final_reckoning.remains>gcd*6|cooldown.final_reckoning.remains>gcd*4&holy_power>=4|!talent.seraphim&cooldown.final_reckoning.remains>gcd*2)|talent.holy_avenger&cooldown.holy_avenger.remains<gcd*3|buff.holy_avenger.up|buff.crusade.up&buff.crusade.stack<10
   if VerdictSpell:IsReady() and (((not S.Crusade:IsAvailable()) or S.Crusade:CooldownRemains() > Player:GCD() * 3) and ((not S.ExecutionSentence:IsAvailable()) or S.ExecutionSentence:CooldownRemains() > Player:GCD() * 6 or S.ExecutionSentence:CooldownRemains() > Player:GCD() * 4 and Player:HolyPower() >= 4 or Target:TimeToDie() < 8 or (not S.Seraphim:IsAvailable()) and S.ExecutionSentence:CooldownRemains() > Player:GCD() * 2) and ((not S.FinalReckoning:IsAvailable()) or S.FinalReckoning:CooldownRemains() > Player:GCD() * 6 or S.FinalReckoning:CooldownRemains() > Player:GCD() * 4 and Player:HolyPower() >= 4 or (not S.Seraphim:IsAvailable()) and S.FinalReckoning:CooldownRemains() > Player:GCD() * 2) or S.HolyAvenger:IsAvailable() and S.HolyAvenger:CooldownRemains() < Player:GCD() * 3 or Player:BuffUp(S.HolyAvenger) or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
-    if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(5)) then return "either verdict finishers 8" end
+    if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(5)) then return "either verdict finishers 10" end
   end
 end
 
@@ -405,13 +418,18 @@ local function Generators()
   if S.HammerofWrath:IsReady() and (MadParagonEquipped or CovenantID == 2 and S.AshenHallow:CooldownRemains() > 210) then
     if Cast(S.HammerofWrath, nil, Settings.Retribution.GCDasOffGCD.HammerOfWrath, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 4"; end
   end
-  -- wake_of_ashes,if=holy_power<=2&set_bonus.tier28_4pc&(cooldown.avenging_wrath.remains|cooldown.crusade.remains)
-  if S.WakeofAshes:IsCastable() and (Player:HolyPower() <= 2 and Player:HasTier(28, 4) and (S.AvengingWrath:CooldownDown() or S.Crusade:CooldownDown())) then
+  -- wake_of_ashes,if=holy_power<=2&talent.ashes_to_dust&(cooldown.avenging_wrath.remains|cooldown.crusade.remains)
+  if S.WakeofAshes:IsCastable() and (Player:HolyPower() <= 2 and S.AshestoDust:IsAvailable() and (S.AvengingWrath:CooldownDown() or S.Crusade:CooldownDown())) then
     if Cast(S.WakeofAshes, nil, nil, not Target:IsInRange(12)) then return "wake_of_ashes generators 5"; end
   end
   -- divine_toll,if=holy_power<=2&!debuff.judgment.up&(!talent.seraphim|buff.seraphim.up)&(!raid_event.adds.exists|raid_event.adds.in>30|raid_event.adds.up)&!talent.final_reckoning&(!talent.execution_sentence|fight_remains<8|spell_targets.divine_storm>=5)&(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15|fight_remains<8)
-  if S.DivineToll:IsCastable() and (Player:HolyPower() <= 2 and Target:DebuffDown(S.JudgmentDebuff) and ((not S.Seraphim:IsAvailable()) or Player:BuffUp(S.Seraphim)) and (not S.FinalReckoning:IsAvailable()) and ((not S.ExecutionSentence) or FightRemains < 8 or EnemiesCount8y >= 5) and (S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15 or FightRemains < 8)) then
-    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll generators 6"; end
+  if (Player:HolyPower() <= 2 and Target:DebuffDown(S.JudgmentDebuff) and ((not S.Seraphim:IsAvailable()) or Player:BuffUp(S.Seraphim)) and (not S.FinalReckoning:IsAvailable()) and ((not S.ExecutionSentence) or FightRemains < 8 or EnemiesCount8y >= 5) and (S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15 or FightRemains < 8)) then
+    if S.DivineToll:IsCastable() then
+      if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll generators 6"; end
+    end
+    if S.DivineTollCov:IsReady() then
+      if Cast(S.DivineTollCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll covenant generators 6"; end
+    end
   end
   -- judgment,if=!debuff.judgment.up&(holy_power>=1&runeforge.the_magistrates_judgment|holy_power>=2)
   if S.Judgment:IsCastable() and (Target:DebuffDown(S.JudgmentDebuff) and (Player:HolyPower() >= 1 and MagistratesJudgmentEquipped or Player:HolyPower() >= 2)) then
@@ -424,6 +442,10 @@ local function Generators()
   -- call_action_list,name=finishers,if=holy_power>=3&buff.crusade.up&buff.crusade.stack<10
   if (Player:HolyPower() >= 3 and Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
     local ShouldReturn = Finishers(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- exorcism
+  if S.Exorcism:IsCastable() then
+    if Cast(S.Exorcism, nil, nil, not Target:IsSpellInRange(S.Exorcism)) then return "exorcism generators 12"; end
   end
   -- blade_of_justice,if=conduit.expurgation&holy_power<=3
   if S.BladeofJustice:IsCastable() and (S.Expurgation:ConduitEnabled() and Player:HolyPower() <= 3) then
@@ -490,8 +512,8 @@ local function ESFRPooling()
   if S.HammerofWrath:IsReady() and (VanguardsMomentumEquipped) then
     if Cast(S.HammerofWrath, Settings.Retribution.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath es_fr_pooling 6"; end
   end
-  -- wake_of_ashes,if=holy_power<=2&set_bonus.tier28_4pc
-  if S.WakeofAshes:IsCastable() and (Player:HolyPower() <=2 and Player:HasTier(28, 4)) then
+  -- wake_of_ashes,if=holy_power<=2&talent.ashes_to_dust&(cooldown.crusade.remains|cooldown.avenging_wrath.remains)
+  if S.WakeofAshes:IsCastable() and (Player:HolyPower() <=2 and S.AshestoDust:IsAvailable() and (S.Crusade:CooldownDown() or S.AvengingWrath:CooldownDown())) then
     if Cast(S.WakeofAshes, nil, nil, not Target:IsInRange(12)) then return "wake_of_ashes es_fr_pooling 7"; end
   end
   -- blade_of_justice,if=holy_power<=3
@@ -524,13 +546,17 @@ local function ESFRPooling()
   if S.ArcaneTorrent:IsCastable() and (Player:HolyPower() <= 4) then
     if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent es_fr_pooling 20"; end
   end
+  -- exorcism
+  if S.Exorcism:IsCastable() then
+    if Cast(S.Exorcism, nil, nil, not Target:IsSpellInRange(S.Exorcism)) then return "exorcism es_fr_pooling 22"; end
+  end
   -- seraphim,if=(!talent.final_reckoning|cooldown.final_reckoning.remains<=gcd*3)&(!talent.execution_sentence|cooldown.execution_sentence.remains<=gcd*3|talent.final_reckoning)&(!covenant.kyrian|cooldown.divine_toll.remains<9)
   if S.Seraphim:IsReady() and (((not S.FinalReckoning:IsAvailable()) or S.FinalReckoning:CooldownRemains() <= Player:GCD() * 3) and ((not S.ExecutionSentence:IsAvailable()) or S.ExecutionSentence:CooldownRemains() <= Player:GCD() * 3 or S.FinalReckoning:IsAvailable()) and (CovenantID ~= 1 or S.DivineToll:CooldownRemains() < 9)) then
-    if Cast(S.Seraphim, Settings.Retribution.GCDasOffGCD.Seraphim) then return "seraphim es_fr_pooling 22"; end
+    if Cast(S.Seraphim, Settings.Retribution.GCDasOffGCD.Seraphim) then return "seraphim es_fr_pooling 24"; end
   end
   -- consecration
   if S.Consecration:IsCastable() then
-    if Cast(S.Consecration, nil, nil, not Target:IsInMeleeRange(8)) then return "consecration es_fr_pooling 24"; end
+    if Cast(S.Consecration, nil, nil, not Target:IsInMeleeRange(8)) then return "consecration es_fr_pooling 26"; end
   end
 end
 
@@ -589,9 +615,13 @@ local function ESFRActive()
   if S.ArcaneTorrent:IsCastable() then
     if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent es_fr_active 24"; end
   end
+  -- exorcism
+  if S.Exorcism:IsCastable() then
+    if Cast(S.Exorcism, nil, nil, not Target:IsSpellInRange(S.Exorcism)) then return "exorcism es_fr_active 26"; end
+  end
   -- consecration
   if S.Consecration:IsCastable() then
-    if Cast(S.Consecration, nil, nil, not Target:IsInMeleeRange(8)) then return "consecration es_fr_active 26"; end
+    if Cast(S.Consecration, nil, nil, not Target:IsInMeleeRange(8)) then return "consecration es_fr_active 28"; end
   end
 end
 
@@ -648,7 +678,7 @@ local function APL()
 end
 
 local function OnInit()
-  --HR.Print("Retribution Paladin rotation is currently a work in progress, but has been updated for patch 9.1.5.")
+  HR.Print("Retribution Paladin rotation is currently a work in progress, but has been updated for patch 10.0.0.")
 end
 
 HR.SetAPL(70, APL, OnInit)
