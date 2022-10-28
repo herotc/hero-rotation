@@ -387,7 +387,7 @@ local function CDs ()
     end
     --actions.cds+=/shadowmeld,if=!stealthed.all&((conduit.count_the_odds|talent.count_the_odds)&variable.finish_condition|!talent.weaponmaster.enabled&variable.ambush_condition)
     --actions.cds+=/thistle_tea,if=energy.deficit>=100&!buff.thistle_tea.up&(charges=3|buff.adrenaline_rush.up|fight_remains<charges*6)
-    if S.ThistleTea:IsCastable() and (EnergyDeficit >= 100 and not Player:BuffUp(S.ThistleTea)) then
+    if S.ThistleTea:IsCastable() and (EnergyDeficit >= 100 and not Player:BuffUp(S.ThistleTea) and (S.ThistleTea:Charges() == 3 or Player:BuffUp(S.AdrenalineRush))) then
       if HR.Cast(S.ThistleTea) then return "Cast Thistle Tea" end
     end
     --actions.cds+=/potion,if=buff.bloodlust.react|fight_remains<30|buff.adrenaline_rush.up
@@ -511,12 +511,21 @@ local function Build ()
     or (Player:BuffUp(S.GreenskinsWickers) and (Player:BuffRemains(S.GreenskinsWickers) < 1.5)))) then
     if HR.CastPooling(S.ColdBloodTalent) then return "Cast Cold Blood" end
   end
-  --actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.greenskins_wickers.up|buff.concealed_blunderbuss.up|talent.fan_the_hammer)|buff.greenskins_wickers.up&buff.greenskins_wickers.remains<1.5
   if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) then
-    if Player:BuffUp(S.Opportunity) and (Player:BuffUp(S.GreenskinsWickersBuff) or Player:BuffUp(S.GreenskinsWickers) or Player:BuffUp(S.ConcealedBlunderbuss) or S.FanTheHammer:IsAvailable()) then
+    --actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.greenskins_wickers.up&!talent.fan_the_hammer|buff.concealed_blunderbuss.up)|buff.greenskins_wickers.up&buff.greenskins_wickers.remains<1.5
+    if Player:BuffUp(S.Opportunity) and ((Player:BuffUp(S.GreenskinsWickersBuff) or Player:BuffUp(S.GreenskinsWickers)) and (not S.FanTheHammer:IsAvailable()) or Player:BuffUp(S.ConcealedBlunderbuss)) then
       if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (Buffed)" end
     elseif (Player:BuffUp(S.GreenskinsWickersBuff) and (Player:BuffRemains(S.GreenskinsWickersBuff) < 1.5)) or (Player:BuffUp(S.GreenskinsWickers) and (Player:BuffRemains(S.GreenskinsWickers) < 1.5)) then
       if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (GSW Dump)" end
+     --# With Fan the Hammer, consume Opportunity at max stacks or if we will get 4+ CP and Dreadblades is not up
+    elseif S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity) then
+      --actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&(buff.opportunity.stack>=buff.opportunity.max_stack|buff.opportunity.remains<2)
+      if (Player:BuffStack(S.Opportunity) >= 6 or Player:BuffRemains(S.Opportunity) < 2) then
+        if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (Fan the Hammer - Opportunity Max Stack)" end
+      --actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&combo_points.deficit>4&!buff.dreadblades.up
+      elseif (ComboPointsDeficit > 4 and not Player:BuffUp(S.Dreadblades)) then
+        if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (Fan the Hammer - Combo Point Deficit > 4)" end
+      end
     end
   end
 --actions.build+=/pool_resource,for_next=1
@@ -547,9 +556,9 @@ local function Build ()
   if S.SerratedBoneSpike:IsReady() and S.SerratedBoneSpike:ChargesFractional() > 2.75 then
     if HR.Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Serrated Bone Spike Filler" end
   end
-  --actions.build+=/pistol_shot,if=buff.opportunity.up&(energy.base_deficit>energy.regen*1.5|!talent.weaponmaster&combo_points.deficit<=1+buff.broadside.up|talent.quick_draw.enabled|talent.audacity.enabled&!buff.audacity.up)
+  --actions.build+=/pistol_shot,if=!talent.fan_the_hammer&buff.opportunity.up&(energy.base_deficit>energy.regen*1.5|!talent.weaponmaster&combo_points.deficit<=1+buff.broadside.up|talent.quick_draw.enabled|talent.audacity.enabled&!buff.audacity.up)
   if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot)
-    and Player:BuffUp(S.Opportunity) and (EnergyDeficit > (EnergyRegen * 1.5)
+    and (not S.FanTheHammer:IsAvailable()) and Player:BuffUp(S.Opportunity) and (EnergyDeficit > (EnergyRegen * 1.5)
     or not S.Weaponmaster:IsAvailable() and ComboPointsDeficit <= 1 + num(Player:BuffUp(S.Broadside))
     or S.QuickDraw:IsAvailable()
     or S.Audacity:IsAvailable() and not Player:BuffUp(S.AudacityBuff)) then
@@ -716,9 +725,9 @@ end
 HR.SetAPL(260, APL, Init)
 
 --- ======= SIMC =======
--- Last Update: 2022-10-25
+-- Last Update: 2022-10-28
 
---  # Executed before combat begins. Accepts non-harmful actions only.
+-- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=apply_poison
 -- actions.precombat+=/flask
 -- actions.precombat+=/augmentation
@@ -731,7 +740,7 @@ HR.SetAPL(260, APL, Init)
 -- actions.precombat+=/roll_the_bones,precombat_seconds=2
 -- actions.precombat+=/slice_and_dice,precombat_seconds=1
 -- actions.precombat+=/stealth
-
+-- 
 -- # Executed every time the actor is available.
 -- # Restealth if possible (no vulnerable enemies in combat)
 -- actions=stealth
@@ -757,7 +766,7 @@ HR.SetAPL(260, APL, Init)
 -- actions+=/arcane_pulse
 -- actions+=/lights_judgment
 -- actions+=/bag_of_tricks
-
+-- 
 -- # Builders
 -- actions.build=sepsis,target_if=max:target.time_to_die*debuff.between_the_eyes.up,if=target.time_to_die>11&debuff.between_the_eyes.up|fight_remains<11
 -- actions.build+=/ghostly_strike,if=debuff.ghostly_strike.remains<=3
@@ -766,7 +775,10 @@ HR.SetAPL(260, APL, Init)
 -- actions.build+=/ambush
 -- # Use Pistol Shot when buffed by bonuses as a priority
 -- actions.build+=/cold_blood,if=buff.opportunity.up&buff.greenskins_wickers.up|buff.greenskins_wickers.up&buff.greenskins_wickers.remains<1.5
--- actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.greenskins_wickers.up|buff.concealed_blunderbuss.up|talent.fan_the_hammer)|buff.greenskins_wickers.up&buff.greenskins_wickers.remains<1.5
+-- actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.greenskins_wickers.up&!talent.fan_the_hammer|buff.concealed_blunderbuss.up)|buff.greenskins_wickers.up&buff.greenskins_wickers.remains<1.5
+-- # With Fan the Hammer, consume Opportunity at max stacks or if we will get 4+ CP and Dreadblades is not up
+-- actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&(buff.opportunity.stack>=buff.opportunity.max_stack|buff.opportunity.remains<2)
+-- actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&combo_points.deficit>4&!buff.dreadblades.up
 -- actions.build+=/pool_resource,for_next=1
 -- actions.build+=/ambush
 -- # Apply SBS to all targets without a debuff as priority, preferring targets dying sooner after the primary target
@@ -775,11 +787,11 @@ HR.SetAPL(260, APL, Init)
 -- # Attempt to use when it will cap combo points and SnD is down, otherwise keep from capping charges
 -- actions.build+=/serrated_bone_spike,if=fight_remains<=5|cooldown.serrated_bone_spike.max_charges-charges_fractional<=0.25|combo_points.deficit=cp_gain&!buff.skull_and_crossbones.up&energy.base_time_to_max>1
 -- # Use Pistol Shot with Opportunity if Combat Potency won't overcap energy, when it will exactly cap CP, or when using Quick Draw
--- actions.build+=/pistol_shot,if=buff.opportunity.up&(energy.base_deficit>energy.regen*1.5|!talent.weaponmaster&combo_points.deficit<=1+buff.broadside.up|talent.quick_draw.enabled|talent.audacity.enabled&!buff.audacity.up)
+-- actions.build+=/pistol_shot,if=!talent.fan_the_hammer&buff.opportunity.up&(energy.base_deficit>energy.regen*1.5|!talent.weaponmaster&combo_points.deficit<=1+buff.broadside.up|talent.quick_draw.enabled|talent.audacity.enabled&!buff.audacity.up)
 -- # Use Sinister Strike on targets without the Cache DoT if the trinket is up
 -- actions.build+=/sinister_strike,target_if=min:dot.vicious_wound.remains,if=buff.acquired_axe_driver.up
 -- actions.build+=/sinister_strike
-
+-- 
 -- # Cooldowns
 -- # Blade Flurry on 2+ enemies
 -- actions.cds=blade_flurry,if=spell_targets>=2&!buff.blade_flurry.up
@@ -826,14 +838,14 @@ HR.SetAPL(260, APL, Init)
 -- # Default conditions for usable items.
 -- actions.cds+=/use_items,slots=trinket1,if=debuff.between_the_eyes.up|trinket.1.has_stat.any_dps|fight_remains<=20
 -- actions.cds+=/use_items,slots=trinket2,if=debuff.between_the_eyes.up|trinket.2.has_stat.any_dps|fight_remains<=20
-
+-- 
 -- # Finishers
 -- # BtE to keep the Crit debuff up, if RP is up, or for Greenskins, unless the target is about to die.
 -- actions.finish=between_the_eyes,if=target.time_to_die>3&(debuff.between_the_eyes.remains<4|(runeforge.greenskins_wickers|talent.greenskins_wickers)&!buff.greenskins_wickers.up|!runeforge.greenskins_wickers&!talent.greenskins_wickers&buff.ruthless_precision.up)
 -- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&refreshable&(!talent.swift_slasher|combo_points>=cp_max_spend)
 -- actions.finish+=/cold_blood,if=!(runeforge.greenskins_wickers|talent.greenskins_wickers)
 -- actions.finish+=/dispatch
-
+-- 
 -- # Stealth
 -- actions.stealth=dispatch,if=variable.finish_condition
 -- actions.stealth+=/ambush
