@@ -573,11 +573,11 @@ local function APL()
       end
     end
     -- actions+=/feral_spirit
-    if S.FeralSpirit:IsCastable() then
+    if CDsON() and S.FeralSpirit:IsCastable() then
       if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "Feral Spirit main"; end
     end
     -- actions+=/fae_transfusion,if=runeforge.seeds_of_rampant_growth.equipped|soulbind.grove_invigoration|soulbind.field_of_blossoms|active_enemies=1
-    if S.FaeTransfusion:IsReady() and (SeedsofRampantGrowthEquipped or S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable() or Enemies10yCount == 1) then
+    if CDsON() and S.FaeTransfusion:IsReady() and (SeedsofRampantGrowthEquipped or S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable() or Enemies10yCount == 1) then
       if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "Fae Transfusion main"; end
     end
     -- actions+=/vesper_totem,if=raid_event.adds.in>40|active_enemies>1
