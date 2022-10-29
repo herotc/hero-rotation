@@ -40,13 +40,22 @@ local equip = Player:GetEquipment()
 local trinket1 = equip[13] and Item(equip[13]) or Item(0)
 local trinket2 = equip[14] and Item(equip[14]) or Item(0)
 
+-- Player Covenant
+-- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
+local CovenantID = Player:CovenantID()
+
+-- Update CovenantID if we change Covenants
+HL:RegisterForEvent(function()
+  CovenantID = Player:CovenantID()
+end, "COVENANT_CHOSEN")
+
 -- Rotation Var
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
 local DarkglareEquipped = Player:HasLegendaryEquipped(20)
 local ChaosTheoryEquipped = Player:HasLegendaryEquipped(23)
 local BurningWoundEquipped = Player:HasLegendaryEquipped(25)
-local AgonyGazeEquipped = Player:HasLegendaryEquipped(236)
+local AgonyGazeEquipped = Player:HasLegendaryEquipped(236) or (CovenantID == 2 and Player:HasUnity())
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -75,15 +84,6 @@ local VarUseEyeBeamFuryCondition = false
 local BossFightRemains = 11111
 local FightRemains = 11111
 
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
-
--- Update CovenantID if we change Covenants
-HL:RegisterForEvent(function()
-  CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN")
-
 HL:RegisterForEvent(function()
   VarPoolingForMeta = false
   VarBladeDance = false
@@ -103,7 +103,7 @@ HL:RegisterForEvent(function()
   DarkglareEquipped = Player:HasLegendaryEquipped(20)
   ChaosTheoryEquipped = Player:HasLegendaryEquipped(23)
   BurningWoundEquipped = Player:HasLegendaryEquipped(25)
-  AgonyGazeEquipped = Player:HasLegendaryEquipped(236)
+  AgonyGazeEquipped = Player:HasLegendaryEquipped(236) or (CovenantID == 2 and Player:HasUnity())
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
@@ -151,8 +151,8 @@ local function Precombat()
   if (trinket2:TrinketHasStatAnyDps() and ((not trinket1:TrinketHasStatAnyDps()) or trinket2:Cooldown() >= trinket1:Cooldown())) then
     VarTrinketSyncSlot = 2
   end
-  -- variable,name=use_eye_beam_fury_condition,value=talent.blind_fury.enabled&(runeforge.darkglare_medallion|talent.demon_blades&!runeforge.agony_gaze)
-  VarUseEyeBeamFuryCondition = (S.BlindFury:IsAvailable() and (DarkglareEquipped or S.DemonBlades:IsAvailable() and not AgonyGazeEquipped))
+  -- variable,name=use_eye_beam_fury_condition,value=0
+  VarUseEyeBeamFuryCondition = false
   -- arcane_torrent
   if S.ArcaneTorrent:IsCastable() and CDsON() then
     if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 1"; end
@@ -184,25 +184,31 @@ local function Cooldown()
   if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or FightRemains < 60) then
     if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldown 6"; end
   end
-  -- use_item,name=wraps_of_electrostatic_potential
-  if I.WrapsofElectrostaticPotential:IsEquippedAndReady() then
-    if Cast(I.WrapsofElectrostaticPotential, nil, Settings.Commons.DisplayStyle.Items) then return "wraps_of_electrostatic_potential cooldown 8"; end
+  if Settings.Commons.Enabled.Items then
+    -- use_item,name=wraps_of_electrostatic_potential
+    if I.WrapsofElectrostaticPotential:IsEquippedAndReady() then
+      if Cast(I.WrapsofElectrostaticPotential, nil, Settings.Commons.DisplayStyle.Items) then return "wraps_of_electrostatic_potential cooldown 8"; end
+    end
+    -- use_item,name=ring_of_collapsing_futures,if=buff.temptation.down|fight_remains<30
+    if I.RingofCollapsingFutures:IsEquippedAndReady() and (Player:BuffDown(S.TemptationBuff) or FightRemains < 30) then
+      if Cast(I.RingofCollapsingFutures, nil, Settings.Commons.DisplayStyle.Items) then return "ring_of_collapsing_futures cooldown 10"; end
+    end
   end
-  -- use_item,name=ring_of_collapsing_futures,if=buff.temptation.down|fight_remains<30
-  if I.RingofCollapsingFutures:IsEquippedAndReady() and (Player:BuffDown(S.TemptationBuff) or FightRemains < 30) then
-    if Cast(I.RingofCollapsingFutures, nil, Settings.Commons.DisplayStyle.Items) then return "ring_of_collapsing_futures cooldown 10"; end
-  end
-  -- use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up&((active_enemies=desired_targets&raid_event.adds.in>60|active_enemies>desired_targets)&(active_enemies<3|cooldown.eye_beam.remains<20)|fight_remains<25)
-  if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredAxeBuff) and ((EnemiesCount8 >= 1) and (EnemiesCount8 < 3 or S.EyeBeam:CooldownRemains() < 20) or FightRemains < 25)) then
-    if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures cooldown 12"; end
-  end
-  -- use_items,slots=trinket1,if=variable.trinket_sync_slot=1&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.1.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready)|!variable.trinket_sync_slot
-  if trinket1:IsReady() and (VarTrinketSyncSlot == 1 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > ((FightRemains > trinket1:Cooldown() / 2) and FightRemains or trinket1:Cooldown() / 2)) or FightRemains <= 20) or (VarTrinketSyncSlot == 2 and not trinket2:IsReady()) or VarTrinketSyncSlot == 0) then
-    if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 cooldown 14"; end
-  end
-  -- use_items,slots=trinket2,if=variable.trinket_sync_slot=2&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.2.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=1&!trinket.1.cooldown.ready)|!variable.trinket_sync_slot
-  if trinket2:IsReady() and (VarTrinketSyncSlot == 2 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > ((FightRemains > trinket2:Cooldown() / 2) and FightRemains or trinket2:Cooldown() / 2)) or FightRemains <= 20) or (VarTrinketSyncSlot == 1 and not trinket1:IsReady()) or VarTrinketSyncSlot == 0) then
-    if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 cooldown 16"; end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up&((active_enemies=desired_targets&raid_event.adds.in>60|active_enemies>desired_targets)&(active_enemies<3|cooldown.eye_beam.remains<20)|fight_remains<25)
+    if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredAxeBuff) and ((EnemiesCount8 >= 1) and (EnemiesCount8 < 3 or S.EyeBeam:CooldownRemains() < 20) or FightRemains < 25)) then
+      if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "cache_of_acquired_treasures cooldown 12"; end
+    end
+    -- use_items,slots=trinket1,if=variable.trinket_sync_slot=1&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.1.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready)|!variable.trinket_sync_slot
+    local Trinket1ToUse = Player:GetUseableTrinkets(OnUseExcludes, 13)
+    if Trinket1ToUse and (VarTrinketSyncSlot == 1 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > ((FightRemains > trinket1:Cooldown() / 2) and FightRemains or trinket1:Cooldown() / 2)) or FightRemains <= 20) or (VarTrinketSyncSlot == 2 and not trinket2:IsReady()) or VarTrinketSyncSlot == 0) then
+      if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 cooldown 14"; end
+    end
+    -- use_items,slots=trinket2,if=variable.trinket_sync_slot=2&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.2.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=1&!trinket.1.cooldown.ready)|!variable.trinket_sync_slot
+    local Trinket2ToUse = Player:GetUseableTrinkets(OnUseExcludes, 14)
+    if Trinket2ToUse and (VarTrinketSyncSlot == 2 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > ((FightRemains > trinket2:Cooldown() / 2) and FightRemains or trinket2:Cooldown() / 2)) or FightRemains <= 20) or (VarTrinketSyncSlot == 1 and not trinket1:IsReady()) or VarTrinketSyncSlot == 0) then
+      if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 cooldown 16"; end
+    end
   end
   -- sinful_brand,if=!dot.sinful_brand.ticking&(!runeforge.agony_gaze|(cooldown.eye_beam.remains<=gcd&fury>=30))&(!cooldown.metamorphosis.up|active_enemies=1)
   if S.SinfulBrand:IsCastable() and (Target:DebuffDown(S.SinfulBrandDebuff) and ((not AgonyGazeEquipped) or (S.EyeBeam:CooldownRemains() <= Player:GCD() and Player:Fury() >= 30)) and (S.Metamorphosis:CooldownDown() or EnemiesCount8 == 1)) then
@@ -328,8 +334,8 @@ local function Demonic()
   if S.EyeBeam:IsReady() and (AgonyGazeEquipped and EnemiesCount8 > 1 and Target:DebuffUp(S.SinfulBrandDebuff) and Target:DebuffRemains(S.SinfulBrandDebuff) <= Player:GCD()) then
     if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam demonic 2"; end
   end
-  -- essence_break
-  if S.EssenceBreak:IsCastable() then
+  -- essence_break,if=!variable.waiting_for_momentum&(!cooldown.eye_beam.ready|buff.metamorphosis.up)
+  if S.EssenceBreak:IsCastable() and ((not VarWaitingForMomentum) and (S.EyeBeam:Cooldown() or Player:BuffUp(S.MetamorphosisBuff))) then
     if Cast(S.EssenceBreak, nil, nil, not IsInMeleeRange(10)) then return "essence_break demonic 4"; end
   end
   -- death_sweep,if=variable.blade_dance
@@ -446,25 +452,17 @@ local function APL()
     end
     -- auto_attack
     -- retarget_auto_attack,line_cd=1,target_if=min:debuff.burning_wound.remains,if=(runeforge.burning_wound|talent.burning_wound)&talent.demon_blades
-    -- variable,name=blade_dance,if=!runeforge.chaos_theory&!talent.chaos_theory&!runeforge.darkglare_medallion,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
-    if ((not ChaosTheoryEquipped) and (not S.ChaosTheory:IsAvailable()) and not DarkglareEquipped) then
+    -- variable,name=blade_dance,if=!runeforge.chaos_theory&!runeforge.darkglare_medallion,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
+    if ((not ChaosTheoryEquipped) and not DarkglareEquipped) then
       VarBladeDance = (S.FirstBlood:IsAvailable() or EnemiesCount8 >= (3 - num(S.TrailofRuin:IsAvailable())))
     end
-    -- variable,name=blade_dance,if=runeforge.chaos_theory|talent.chaos_theory,value=buff.chaos_theory.down|talent.first_blood.enabled&spell_targets.blade_dance1>=(2-talent.trail_of_ruin.enabled)|!talent.cycle_of_hatred.enabled&spell_targets.blade_dance1>=(4-talent.trail_of_ruin.enabled)
+    -- variable,name=blade_dance,if=runeforge.chaos_theory|talent.chaos_theory,value=buff.chaos_theory.down|talent.first_blood.enabled|!talent.cycle_of_hatred.enabled&spell_targets.blade_dance1>=(4-talent.trail_of_ruin.enabled)
     if (ChaosTheoryEquipped or S.ChaosTheory:IsAvailable()) then
-      VarBladeDance = ((Player:BuffDown(S.ChaosTheoryBuff) and Player:BuffDown(S.ChaosTheoryLegBuff)) or S.FirstBlood:IsAvailable() and EnemiesCount8 >= (2 - num(S.TrailofRuin:IsAvailable())) or (not S.CycleofHatred:IsAvailable()) and EnemiesCount8 >= (4 - num(S.TrailofRuin:IsAvailable())))
+      VarBladeDance = ((Player:BuffDown(S.ChaosTheoryBuff) and Player:BuffDown(S.ChaosTheoryLegBuff)) or S.FirstBlood:IsAvailable() or (not S.CycleofHatred:IsAvailable()) and EnemiesCount8 >= (4 - num(S.TrailofRuin:IsAvailable())))
     end
     -- variable,name=blade_dance,if=runeforge.darkglare_medallion,value=talent.first_blood.enabled|(buff.metamorphosis.up|talent.trail_of_ruin.enabled|debuff.essence_break.up)&spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)|!talent.demonic.enabled&spell_targets.blade_dance1>=4
     if (DarkglareEquipped) then
       VarBladeDance = (S.FirstBlood:IsAvailable() or (Player:BuffUp(S.MetamorphosisBuff) or S.TrailofRuin:IsAvailable() or Target:DebuffUp(S.EssenceBreakDebuff)) and EnemiesCount8 >= (3 - num(S.TrailofRuin:IsAvailable())) or (not S.Demonic:IsAvailable()) and EnemiesCount8 >= 4)
-    end
-    -- variable,name=blade_dance,op=reset,if=talent.essence_break.enabled&cooldown.essence_break.ready
-    if (S.EssenceBreak:IsAvailable() and S.EssenceBreak:CooldownUp()) then
-      VarBladeDance = false
-    end
-    -- variable,name=blade_dance,if=runeforge.agony_gaze&talent.cycle_of_hatred,value=variable.blade_dance&active_dot.sinful_brand<2
-    if (AgonyGazeEquipped and S.CycleofHatred:IsAvailable()) then
-      VarBladeDance = VarBladeDance and S.SinfulBrandDebuff:AuraActiveCount() < 2
     end
     -- variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30
     VarPoolingForMeta = (not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() < 6 and Player:FuryDeficit() > 30
