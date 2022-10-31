@@ -152,7 +152,7 @@ local function Execute()
   end
   -- thunderous_roar,if=buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or (not S.TestofMight:IsAvailable()) and Target:DebuffUp(S.ColossusSmashDebuff)) then
-    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar execute 14"; end
+    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar execute 14"; end
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
@@ -265,7 +265,7 @@ local function SingleTarget()
   end
   -- thunderous_roar,if=debuff.colossus_smash.up|buff.test_of_might.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff)) then
-    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 26"; end
+    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 26"; end
   end
   -- bladestorm,if=debuff.colossus_smash.up&talent.unhinged.enabled|buff.test_of_might.up&talent.hurricane.enabled
   if CDsON() and S.Bladestorm:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) and S.Unhinged:IsAvailable() or Player:BuffUp(S.TestofMightBuff) and S.Hurricane:IsAvailable()) then
