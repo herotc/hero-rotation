@@ -30,26 +30,28 @@ HR.GUISettings.APL.Warrior = {
     },
     VictoryRushHP = 80,
     -- {Display OffGCD as OffGCD, ForceReturn}
-    OffGCDasOffGCD = {
+    GCDasOffGCD = {
       Racials = true,
       -- Abilities
-      Pummel = true,
       Avatar = true,
-      BattleCry = true
+      BattleCry = true,
+      Shockwave = true,
+    },
+    OffGCDasOffGCD = {
+      Pummel = true,
     },
   },
   Arms = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
+      Avatar = false,
       BattleShout = false,
       Bladestorm = false,
       Ravager = false,
-      Avatar = false,
+      ThunderousRoar = false,
     },
     OffGCDasOffGCD = {
-      -- Abilities
-      DeadlyCalm = true,
     },
   },
   Fury = {
