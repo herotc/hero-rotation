@@ -641,7 +641,7 @@ local function APL ()
       end
       -- TODO actions.precombat+=/fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
       -- actions.precombat+=/adrenaline_rush,precombat_seconds=3,if=talent.improved_adrenaline_rush
-      if S.AdrenalineRush:IsReady() and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2 then
+      if CDsON() and S.AdrenalineRush:IsReady() and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2 then
         if HR.Cast(S.AdrenalineRush) then return "Cast Adrenaline Rush (Opener)" end
       end
       -- actions.precombat+=/roll_the_bones,precombat_seconds=2
