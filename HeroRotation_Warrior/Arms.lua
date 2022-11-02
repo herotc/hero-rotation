@@ -91,13 +91,13 @@ local function Precombat()
   if S.BattleShout:IsCastable() and (Player:BuffRemains(S.BattleShoutBuff, true) < 60) then
     if Cast(S.BattleShout, Settings.Arms.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
   end
-  -- conquerors_banner
-  if S.ConquerorsBanner:IsCastable() then
-    if Cast(S.ConquerorsBanner) then return "conquerors_banner precombat 4"; end
-  end
   -- fleshcraft
   if S.Fleshcraft:IsCastable() then
     if Cast(S.Fleshcraft) then return "fleshcraft precombat 6"; end
+  end
+  -- conquerors_banner
+  if S.ConquerorsBanner:IsCastable() then
+    if Cast(S.ConquerorsBanner) then return "conquerors_banner precombat 4"; end
   end
   -- Manually added opener abilties
   if S.Charge:IsCastable() and not TargetInMeleeRange then
