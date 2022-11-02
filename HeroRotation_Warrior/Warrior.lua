@@ -138,11 +138,13 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   TideofBlood                           = Spell(386357),
   Unhinged                              = Spell(386628),
   Warbreaker                            = Spell(262161),
+  Ravager                               = Spell(228920),
   -- Buffs
   MartialProwessBuff                    = Spell(7384),
   SuddenDeathBuff                       = Spell(52437),
   TestofMightBuff                       = Spell(385013),
   WarMachineBuff                        = Spell(262231),
+  JuggernautBuff                        = Spell(383292),
   -- Debuffs
   ColossusSmashDebuff                   = Spell(208086),
   DeepWoundsDebuff                      = Spell(262115),
