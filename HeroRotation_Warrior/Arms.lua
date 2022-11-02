@@ -142,10 +142,6 @@ local function Execute()
   if S.Execute:IsReady() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() or Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff)) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 8"; end
   end
-  -- ravager
-  if CDsON() and S.Ravager:IsCastable() then
-    if Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager execute 10"; end
-  end
   -- rend,if=remains<=gcd&(!talent.warbreaker&cooldown.colossus_smash.remains<4|talent.warbreaker&cooldown.warbreaker.remains<4)&target.time_to_die>12
   if S.Rend:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and ((not S.Warbreaker:IsAvailable()) and S.ColossusSmash:CooldownRemains() < 4 or S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemains() < 4) and Target:TimeToDie() > 12) then
     if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend execute 12"; end

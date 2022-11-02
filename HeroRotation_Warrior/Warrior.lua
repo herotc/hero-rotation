@@ -91,7 +91,6 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   Onslaught                             = Spell(315720),
   RagingBlow                            = Spell(85288),
   Rampage                               = Spell(184367),
-  Ravager                               = Spell(228920),
   RecklessAbandon                       = Spell(202751),
   Recklessness                          = Spell(1719),
   SuddenDeath                           = Spell(280721),
