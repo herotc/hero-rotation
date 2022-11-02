@@ -283,19 +283,19 @@ local function APL()
     if (CDsON() and Player:BuffUp(S.AvatarBuff)) then
       -- blood_fury,if=buff.avatar.up
       if S.BloodFury:IsCastable() then
-        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury racial"; end
+        if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury racial"; end
       end
       -- berserking,if=buff.avatar.up
       if S.Berserking:IsCastable() then
-        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking racial"; end
+        if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking racial"; end
       end
       -- fireblood,if=buff.avatar.up
       if S.Fireblood:IsCastable() then
-        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood racial"; end
+        if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood racial"; end
       end
       -- ancestral_call,if=buff.avatar.up
       if S.AncestralCall:IsCastable() then
-        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call racial"; end
+        if Cast(S.AncestralCall, Settings.Commons.GCDasOffGCD.Racials) then return "ancestral_call racial"; end
       end
     end
     -- thunder_clap,if=buff.outburst.up&((buff.seeing_red.stack>6&cooldown.shield_slam.remains>2))
@@ -354,15 +354,15 @@ local function APL()
     if (CDsON()) then
       -- bag_of_tricks
       if S.BagofTricks:IsCastable() then
-        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racial"; end
+        if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racial"; end
       end
       -- arcane_torrent,if=rage<80
       if S.ArcaneTorrent:IsCastable() and (Player:Rage() < 80) then
-        if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent racial"; end
+        if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent racial"; end
       end
       -- lights_judgment
       if S.LightsJudgment:IsCastable() then
-        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "lights_judgment racial"; end
+        if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "lights_judgment racial"; end
       end
     end
     -- If nothing else to do, show the Pool icon
