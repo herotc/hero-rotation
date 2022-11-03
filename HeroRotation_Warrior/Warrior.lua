@@ -91,7 +91,6 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   Onslaught                             = Spell(315720),
   RagingBlow                            = Spell(85288),
   Rampage                               = Spell(184367),
-  Ravager                               = Spell(228920),
   RecklessAbandon                       = Spell(202751),
   Recklessness                          = Spell(1719),
   SuddenDeath                           = Spell(280721),
@@ -138,11 +137,13 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   TideofBlood                           = Spell(386357),
   Unhinged                              = Spell(386628),
   Warbreaker                            = Spell(262161),
+  Ravager                               = Spell(228920),
   -- Buffs
   MartialProwessBuff                    = Spell(7384),
   SuddenDeathBuff                       = Spell(52437),
   TestofMightBuff                       = Spell(385013),
   WarMachineBuff                        = Spell(262231),
+  JuggernautBuff                        = Spell(383292),
   -- Debuffs
   ColossusSmashDebuff                   = Spell(208086),
   DeepWoundsDebuff                      = Spell(262115),

@@ -287,31 +287,31 @@ local function APL()
     if CDsON() then
       -- arcane_torrent,if=rage<40&!buff.recklessness.up
       --[[if S.ArcaneTorrent:IsCastable() and (Player:Rage() < 40 and Player:BuffDown(S.RecklessnessBuff)) then
-        if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent"; end
+        if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent"; end
       end]]
       -- lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
       if S.LightsJudgment:IsCastable() and (Player:BuffDown(S.RecklessnessBuff) and Target:DebuffDown(S.SiegebreakerDebuff)) then
-        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment"; end
+        if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment"; end
       end
       -- bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
       if S.BagofTricks:IsCastable() and (Player:BuffDown(S.RecklessnessBuff) and Target:DebuffDown(S.SiegebreakerDebuff) and EnrageUp) then
-        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks"; end
+        if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks"; end
       end
       -- berserking,if=buff.recklessness.up
       if S.Berserking:IsCastable() and (Player:BuffUp(S.RecklessnessBuff)) then
-        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking"; end
+        if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking"; end
       end
       -- blood_fury
       if S.BloodFury:IsCastable() then
-        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury"; end
+        if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury"; end
       end
       -- fireblood
       if S.Fireblood:IsCastable() then
-        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood"; end
+        if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood"; end
       end
       -- ancestral_call
       if S.AncestralCall:IsCastable() then
-        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call"; end
+        if Cast(S.AncestralCall, Settings.Commons.GCDasOffGCD.Racials) then return "ancestral_call"; end
       end
     end
     -- avatar,if=talent.titans_torment&buff.enrage.up&(buff.elysian_might.up|!covenant.kyrian)

@@ -91,13 +91,13 @@ local function Precombat()
   if S.BattleShout:IsCastable() and (Player:BuffRemains(S.BattleShoutBuff, true) < 60) then
     if Cast(S.BattleShout, Settings.Arms.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
   end
-  -- conquerors_banner
-  if S.ConquerorsBanner:IsCastable() then
-    if Cast(S.ConquerorsBanner) then return "conquerors_banner precombat 4"; end
-  end
   -- fleshcraft
   if S.Fleshcraft:IsCastable() then
     if Cast(S.Fleshcraft) then return "fleshcraft precombat 6"; end
+  end
+  -- conquerors_banner
+  if S.ConquerorsBanner:IsCastable() then
+    if Cast(S.ConquerorsBanner) then return "conquerors_banner precombat 4"; end
   end
   -- Manually added opener abilties
   if S.Charge:IsCastable() and not TargetInMeleeRange then
@@ -141,10 +141,6 @@ local function Execute()
   -- execute,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd|buff.juggernaut.up&buff.juggernaut.remains<gcd
   if S.Execute:IsReady() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() or Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff)) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 8"; end
-  end
-  -- ravager
-  if CDsON() and S.Ravager:IsCastable() then
-    if Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager execute 10"; end
   end
   -- rend,if=remains<=gcd&(!talent.warbreaker&cooldown.colossus_smash.remains<4|talent.warbreaker&cooldown.warbreaker.remains<4)&target.time_to_die>12
   if S.Rend:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and ((not S.Warbreaker:IsAvailable()) and S.ColossusSmash:CooldownRemains() < 4 or S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemains() < 4) and Target:TimeToDie() > 12) then
@@ -349,31 +345,31 @@ local function APL()
     if CDsON() then
       -- arcane_torrent,if=cooldown.mortal_strike.remains>1.5&rage<50
       if S.ArcaneTorrent:IsCastable() and (S.MortalStrike:CooldownRemains() > 1.5 and Player:Rage() < 50) then
-        if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent main 6"; end
+        if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent main 6"; end
       end
       -- lights_judgment,if=debuff.colossus_smash.down&cooldown.mortal_strike.remains
       if S.LightsJudgment:IsCastable() and (Target:DebuffDown(S.ColossusSmashDebuff) and not S.MortalStrike:CooldownUp()) then
-        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 8"; end
+        if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 8"; end
       end
       -- bag_of_tricks,if=debuff.colossus_smash.down&cooldown.mortal_strike.remains
       if S.BagofTricks:IsCastable() and (Target:DebuffDown(S.ColossusSmashDebuff) and not S.MortalStrike:CooldownUp()) then
-        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 10"; end
+        if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 10"; end
       end
       -- berserking,if=debuff.colossus_smash.remains>6
       if S.Berserking:IsCastable() and (Target:DebuffRemains(S.ColossusSmashDebuff) > 6) then
-        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 12"; end
+        if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking main 12"; end
       end
       -- blood_fury,if=debuff.colossus_smash.up
       if S.BloodFury:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
-        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 14"; end
+        if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury main 14"; end
       end
       -- fireblood,if=debuff.colossus_smash.up
       if S.Fireblood:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
-        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 16"; end
+        if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood main 16"; end
       end
       -- ancestral_call,if=debuff.colossus_smash.up
       if S.AncestralCall:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
-        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 18"; end
+        if Cast(S.AncestralCall, Settings.Commons.GCDasOffGCD.Racials) then return "ancestral_call main 18"; end
       end
     end
     if (Settings.Commons.Enabled.Trinkets) then
