@@ -339,7 +339,7 @@ local function APL()
       if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(25)) then return "kyrian_spear main 22"; end
     end
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up|raid_event.adds.in<2&!buff.meat_cleaver.up
-    if S.Whirlwind:IsCastable() and (EnemiesCount8 > 1 and Player:BuffDown(S.MeatCleaverBuff)) then
+    if S.Whirlwind:IsCastable() and (EnemiesCount8 > 1 and (S.MeatCleaver:IsAvailable() and Player:BuffDown(S.MeatCleaverBuff))) then
       if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind main 24"; end
     end
     -- call_action_list,name=single_target
