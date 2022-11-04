@@ -324,12 +324,12 @@ local function Aoe()
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then
       TiLightningBolt = 1
       TiChainLightning = 0
-      return "Lightning Bolt aoe"
+      return "Lightning Bolt"
     end
   end
   -- actions.aoe+=/chain_harvest,if=buff.maelstrom_weapon.stack>=5
   if S.ChainHarvest:IsCastable() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
-    if Cast(S.ChainHarvest, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ChainHarvest)) then return "Chain Harvest aoe"; end
+    if Cast(S.ChainHarvest, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ChainHarvest)) then return "Chain Harvest"; end
   end
   -- actions.aoe+=/sundering,if=(talent.doomwinds|runeforge.doom_winds.equipped)&(buff.doom_winds.up|buff.doom_winds_talent.up)
   if S.Sundering:IsReady() and (S.DoomWinds:IsAvailable() or DoomWindsEquipped) and (Player:BuffUp(S.DoomWindsBuff) or Player:BuffUp(S.DoomWinds)) then
@@ -337,31 +337,31 @@ local function Aoe()
   end
   -- actions.aoe+=/fire_nova,if=active_dot.flame_shock>=6|(active_dot.flame_shock>=4&active_dot.flame_shock=active_enemies)
   if S.FireNova:IsReady() and (S.FlameShockDebuff:AuraActiveCount() >= 6 or (S.FlameShockDebuff:AuraActiveCount() >= 4 and S.FlameShockDebuff:AuraActiveCount() >= Enemies10yCount)) then
-    if Cast(S.FireNova) then return "Fire Nova aoe"; end
+    if Cast(S.FireNova) then return "Fire Nova"; end
   end
   -- actions.aoe+=/primordial_wave,target_if=min:dot.flame_shock.remains,cycle_targets=1,if=!buff.primordial_wave.up
   if S.PrimordialWave:IsReady() and (Player:BuffDown(S.PrimordialWaveBuff)) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies40y, "min", EvaluateTargetIfFilterPrimordialWave, EvaluateTargetIfPrimordialWave, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Covenant) then return "Primordial Wave aoe"; end
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies40y, "min", EvaluateTargetIfFilterPrimordialWave, EvaluateTargetIfPrimordialWave, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Covenant) then return "Primordial Wave"; end
   end
   -- actions.aoe+=/windstrike,if=talent.thorims_invocation.enabled&ti_chain_lightning&buff.maelstrom_weapon.stack>1
   if S.Windstrike:IsReady() and S.ThorimsInvocation:IsAvailable() and TiChainLightning == 1 and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
-    if Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Windstrike)) then return "Windstrike aoe"; end
+    if Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Windstrike)) then return "Windstrike"; end
   end
   -- actions.aoe+=/lava_lash,target_if=min:debuff.lashing_flames.remains,cycle_targets=1,if=dot.flame_shock.ticking&(active_dot.flame_shock<active_enemies&active_dot.flame_shock<6)
   if S.LavaLash:IsReady() and (S.LashingFlames:IsAvailable()) then
-    if Everyone.CastTargetIf(S.LavaLash, Enemies10y, "min", EvaluateTargetIfFilterLavaLash, EvaluateTargetIfLavaLash2, not Target:IsSpellInRange(S.LavaLash)) then return "Lava Lash aoe"; end
+    if Everyone.CastTargetIf(S.LavaLash, Enemies10y, "min", EvaluateTargetIfFilterLavaLash, EvaluateTargetIfLavaLash2, not Target:IsSpellInRange(S.LavaLash)) then return "Lava Lash"; end
   end
   -- actions.aoe+=/flame_shock,if=!ticking
   if S.FlameShock:IsReady() and (Target:DebuffDown(S.FlameShockDebuff)) then
-    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "Flame Shock aoe"; end
+    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "Flame Shock"; end
   end
   -- actions.aoe+=/flame_shock,target_if=min:dot.flame_shock.remains,cycle_targets=1,if=!talent.hailstorm.enabled&active_dot.flame_shock<active_enemies&active_dot.flame_shock<6
   if S.FlameShock:IsReady() and ((not S.Hailstorm:IsAvailable()) and S.FlameShockDebuff:AuraActiveCount() < Enemies10yCount and S.FlameShockDebuff:AuraActiveCount() < 6) then
-    if Everyone.CastCycle(S.FlameShock, Enemies40y, EvaluateCycleFlameShock, not Target:IsSpellInRange(S.FlameShock)) then return "Flame Shock aoe"; end
+    if Everyone.CastCycle(S.FlameShock, Enemies40y, EvaluateCycleFlameShock, not Target:IsSpellInRange(S.FlameShock)) then return "Flame Shock"; end
   end
   -- actions.aoe+=/ice_strike,if=talent.hailstorm.enabled
   if S.IceStrike:IsReady() and S.Hailstorm:IsAvailable() then
-    if Cast(S.IceStrike, nil, nil, not Target:IsSpellInRange(S.IceStrike)) then return "Ice Strike aoe"; end
+    if Cast(S.IceStrike, nil, nil, not Target:IsSpellInRange(S.IceStrike)) then return "Ice Strike"; end
   end
   -- actions.aoe+=/frost_shock,if=talent.hailstorm.enabled&buff.hailstorm.up
   if S.FrostShock:IsReady() and S.Hailstorm:IsAvailable() and (Player:BuffUp(S.HailstormBuff)) then
@@ -369,7 +369,7 @@ local function Aoe()
   end
   -- actions.aoe+=/sundering
   if S.Sundering:IsReady() then
-    if Cast(S.Sundering, nil, nil, not Target:IsInRange(11)) then return "Sundering aoe"; end
+    if Cast(S.Sundering, nil, nil, not Target:IsInRange(11)) then return "Sundering"; end
   end
   -- actions.aoe+=/fire_nova,if=active_dot.flame_shock>=4
   if S.FireNova:IsReady() and (S.FlameShockDebuff:AuraActiveCount() >= 4) then
@@ -377,7 +377,7 @@ local function Aoe()
   end
   -- actions.aoe+=/lava_lash,target_if=min:debuff.lashing_flames.remains,cycle_targets=1,if=talent.lashing_flames.enabled
   if S.LavaLash:IsReady() and (S.LashingFlames:IsAvailable()) then
-    if Everyone.CastTargetIf(S.LavaLash, Enemies10y, "min", EvaluateTargetIfFilterLavaLash, EvaluateTargetIfLavaLash, not Target:IsSpellInRange(S.LavaLash)) then return "Lava Lash aoe"; end
+    if Everyone.CastTargetIf(S.LavaLash, Enemies10y, "min", EvaluateTargetIfFilterLavaLash, EvaluateTargetIfLavaLash, not Target:IsSpellInRange(S.LavaLash)) then return "Lava Lash"; end
   end
   -- actions.aoe+=/fire_nova,if=active_dot.flame_shock>=3
   if S.FireNova:IsReady() and (S.FlameShockDebuff:AuraActiveCount() >= 3) then
@@ -437,47 +437,47 @@ local function Aoe()
   end
   -- actions.aoe+=/crash_lightning
   if S.CrashLightning:IsReady() then
-    if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInRange(8)) then return "Crash Lightning aoe"; end
+    if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInRange(8)) then return "Crash Lightning"; end
   end
   -- actions.aoe+=/windstrike
   if S.Windstrike:IsReady() then
-    if Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Windstrike)) then return "Windstrike aoe"; end
+    if Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Windstrike)) then return "Windstrike"; end
   end
   -- actions.aoe+=/lava_lash
   if S.LavaLash:IsReady() then
-    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "Lava Lash aoe"; end
+    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "Lava Lash"; end
   end
   -- actions.aoe+=/ice_strike
   if S.IceStrike:IsReady() then
-    if Cast(S.IceStrike, nil, nil, not Target:IsSpellInRange(S.IceStrike)) then return "Ice Strike aoe"; end
+    if Cast(S.IceStrike, nil, nil, not Target:IsSpellInRange(S.IceStrike)) then return "Ice Strike"; end
   end
   -- actions.aoe+=/stormstrike
   if S.Stormstrike:IsReady() then
-    if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "Stormstrike aoe"; end
+    if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "Stormstrike"; end
   end
   -- actions.aoe+=/flame_shock,target_if=refreshable,cycle_targets=1
   if S.FlameShock:IsReady() then
-    if Everyone.CastCycle(S.FlameShock, Enemies40y, EvaluateCycleFlameShock, not Target:IsSpellInRange(S.FlameShock)) then return "Flame Shock aoe"; end
+    if Everyone.CastCycle(S.FlameShock, Enemies40y, EvaluateCycleFlameShock, not Target:IsSpellInRange(S.FlameShock)) then return "Flame Shock"; end
   end
   -- actions.aoe+=/frost_shock
   if S.FrostShock:IsReady() then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "Frost Shock aoe"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "Frost Shock"; end
   end
   -- actions.aoe+=/chain_lightning,if=buff.maelstrom_weapon.stack>=5
   if S.ChainLightning:IsReady() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
     if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then
       TiLightningBolt = 0
       TiChainLightning = 1 
-      return "Chain Lightning aoe"
+      return "Chain Lightning"
     end
   end
   -- actions.aoe+=/earth_elemental
   if S.EarthElemental:IsCastable() then
-    if Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "Earth Elemental aoe"; end
+    if Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "Earth Elemental"; end
   end
   -- actions.aoe+=/windfury_totem,if=buff.windfury_totem.remains<30
   if S.WindfuryTotem:IsReady() and (Player:BuffDown(S.WindfuryTotemBuff, true) or S.WindfuryTotem:TimeSinceLastCast() > 90) then
-    if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "Windfury Totem aoe"; end
+    if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "Windfury Totem"; end
   end
 end
 
@@ -512,13 +512,13 @@ local function APL()
     -- Moved from Precombat: lightning_shield
     -- Manually added: earth_shield if available and PreferEarthShield setting is true
     if Settings.Enhancement.PreferEarthShield and S.EarthShield:IsReady() and (Player:BuffDown(S.EarthShield) or (not Player:AffectingCombat() and Player:BuffStack(S.EarthShield) < 5)) then
-      if Cast(S.EarthShield, Settings.Enhancement.GCDasOffGCD.Shield) then return "earth_shield main 2"; end
+      if Cast(S.EarthShield, Settings.Enhancement.GCDasOffGCD.Shield) then return "Cast Earth Shield"; end
     elseif S.LightningShield:IsReady() and Player:BuffDown(S.LightningShield) and (Settings.Enhancement.PreferEarthShield and Player:BuffDown(S.EarthShield) or not Settings.Enhancement.PreferEarthShield) then
-      if Cast(S.LightningShield, Settings.Enhancement.GCDasOffGCD.Shield) then return "lightning_shield main 2"; end
+      if Cast(S.LightningShield, Settings.Enhancement.GCDasOffGCD.Shield) then return "Cast Lightning Shield"; end
     end
     -- Precombat
     if not Player:AffectingCombat() then
-      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+      local ShouldReturn = Precombat(); if ShouldReturn then return "Precombat: " .. ShouldReturn; end
     end
 
     -- actions=bloodlust,line_cd=600
@@ -526,7 +526,7 @@ local function APL()
 
     -- actions+=/potion,if=(talent.ascendance.enabled&raid_event.adds.in>=90&cooldown.ascendance.remains<10)|(talent.hot_hand.enabled&buff.molten_weapon.up)|buff.icy_edge.up|(talent.stormflurry.enabled&buff.crackling_surge.up)|active_enemies>1|fight_remains<30
     if I.PotionofSpectralAgility:IsReady() and ((S.Ascendance:IsAvailable() and S.Ascendance:CooldownRemains() < 10) or (S.HotHand:IsAvailable() and Player:BuffUp(S.MoltenWeaponBuff)) or Player:BuffUp(S.IcyEdgeBuff) or (S.Stormflurry:IsAvailable() and Player:BuffUp(S.CracklingSurgeBuff)) or Enemies10yCount > 1 or FightRemains < 30) then
-      if Cast(I.PotionofSpectralAgility, nil, Settings.Commons.DisplayStyle.Potions) then return "Potion main"; end
+      if Cast(I.PotionofSpectralAgility, nil, Settings.Commons.DisplayStyle.Potions) then return "Use Potion"; end
     end
     -- actions+=/auto_attack
     -- actions+=/heart_essence
@@ -534,15 +534,15 @@ local function APL()
     if (Settings.Commons.Enabled.Trinkets) and CDsON() then
       -- actions+=/use_item,name=the_first_sigil,if=(talent.ascendance.enabled&raid_event.adds.in>=90&cooldown.ascendance.remains<10)|(talent.hot_hand.enabled&buff.molten_weapon.up)|buff.icy_edge.up|(talent.stormflurry.enabled&buff.crackling_surge.up)|active_enemies>1|fight_remains<30
       if I.TheFirstSigil:IsEquippedAndReady() and ((S.Ascendance:IsAvailable() and S.Ascendance:CooldownRemains() < 10) or (S.HotHand:IsAvailable() and Player:BuffUp(S.MoltenWeaponBuff)) or Player:BuffUp(S.IcyEdgeBuff) or (S.Stormflurry:IsAvailable() and Player:BuffUp(S.CracklingSurgeBuff)) or Enemies10yCount > 1 or FightRemains < 30) then
-        if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "The First Sigil main"; end
+        if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Use The First Sigil"; end
       end
       -- actions+=/use_item,name=cache_of_acquired_treasures,if=buff.acquired_sword.up|fight_remains<25
       if I.CacheofAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredSwordBuff) or FightRemains < 25) then
-        if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Cache of Acquired Treasures main"; end
+        if Cast(I.CacheofAcquiredTreasures, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Use Cache of Acquired Treasures"; end
       end
       -- actions+=/use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up|fight_remains<31|raid_event.adds.in<16|active_enemies>1
       if I.ScarsofFraternalStrife:IsEquippedAndReady() and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) or FightRemains < 31 or Enemies10yCount > 1) then
-        if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Scars of Fraternal Strife main"; end
+        if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Use Scars of Fraternal Strife"; end
       end
       -- actions+=/use_items,slots=trinket1,if=!variable.trinket1_is_weird
       -- actions+=/use_items,slots=trinket2,if=!variable.trinket2_is_weird
@@ -565,47 +565,47 @@ local function APL()
       end
       -- actions+=/fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
       if S.Fireblood:IsCastable() and (not S.Ascendance:IsAvailable() or Player:BuffUp(S.AscendanceBuff) or S.Ascendance:CooldownRemains() > 50) then
-        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood racial"; end
+        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Fireblood racial"; end
       end
       -- actions+=/ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
       if S.AncestralCall:IsCastable() and (not S.Ascendance:IsAvailable() or Player:BuffUp(S.AscendanceBuff) or S.Ascendance:CooldownRemains() > 50) then
-        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call racial"; end
+        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Ancestral Call racial"; end
       end
     end
     -- actions+=/feral_spirit
     if CDsON() and S.FeralSpirit:IsCastable() then
-      if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "Feral Spirit main"; end
+      if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "Cast Feral Spirit"; end
     end
     -- actions+=/fae_transfusion,if=runeforge.seeds_of_rampant_growth.equipped|soulbind.grove_invigoration|soulbind.field_of_blossoms|active_enemies=1
     if CDsON() and S.FaeTransfusion:IsReady() and (SeedsofRampantGrowthEquipped or S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable() or Enemies10yCount == 1) then
-      if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "Fae Transfusion main"; end
+      if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "Cast Fae Transfusion"; end
     end
     -- actions+=/vesper_totem,if=raid_event.adds.in>40|active_enemies>1
     if S.VesperTotem:IsReady() and Enemies10yCount > 1 then
-      if Cast(S.VesperTotem, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "Vesper Totem main"; end
+      if Cast(S.VesperTotem, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "Cast Vesper Totem"; end
     end
     -- actions+=/ascendance,if=(ti_lightning_bolt&active_enemies=1&raid_event.adds.in>=90)|(ti_chain_lightning&active_enemies>1)
     if CDsON() and S.Ascendance:IsCastable() and ((TiLightningBolt == 1 and Enemies40yCount == 1) or (TiChainLightning == 1 and Enemies40yCount > 1)) then
-      if Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "Ascendance main"; end
+      if Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "Cast Ascendance"; end
     end
     -- actions+=/doom_winds,if=raid_event.adds.in>=90|active_enemies>1
     -- TODO some tests
     if CDsON() and S.DoomWinds:IsReady() then
-      if Cast(S.DoomWinds, nil, nil, not Target:IsSpellInRange(S.DoomWinds)) then return "Doom Winds main"; end
+      if Cast(S.DoomWinds, nil, nil, not Target:IsSpellInRange(S.DoomWinds)) then return "Cast Doom Winds"; end
     end
     -- actions+=/windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down&(raid_event.adds.in>=60|active_enemies>1)
     -- Note: Added TimeSinceLastCast, as DoomWindsBuff has an internal CD of 60s
     if S.WindfuryTotem:IsReady() and (DoomWindsEquipped and Player:BuffDown(S.DoomWindsBuff) and S.WindfuryTotem:TimeSinceLastCast() > 60) then
-      if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "Windfury Totem main (Doom Wind Equipped)"; end
+      if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "Cast Windfury Totem (Doom Wind Equipped)"; end
     end
 
     -- call_action_list,name=single,if=active_enemies=1
     if Enemies10yCount < 2 then
-      local ShouldReturn = Single(); if ShouldReturn then return ShouldReturn; end
+      local ShouldReturn = Single(); if ShouldReturn then return "Single: " .. ShouldReturn; end
     end
     -- call_action_list,name=aoe,if=active_enemies>1
     if Enemies10yCount > 1 then
-      local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
+      local ShouldReturn = Aoe(); if ShouldReturn then return "Aoe: " .. ShouldReturn; end
     end
     -- If nothing else to do, show the Pool icon
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
