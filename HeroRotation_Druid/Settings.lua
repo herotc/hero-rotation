@@ -20,6 +20,7 @@ HR.GUISettings.APL.Druid = {
     Enabled = {
       Potions = true,
       Trinkets = true,
+      Items = true,
     },
     DisplayStyle = {
       Potions = "Suggested",
@@ -44,16 +45,17 @@ HR.GUISettings.APL.Druid = {
     ShowMoonkinFormOOC = false,
     DelayBerserking = false,
     GCDasOffGCD = {
-      MoonkinForm = false,
+      AstralCommunion = true,
       CaInc = true,
-      WarriorOfElune = true,
       ForceOfNature = true,
       FuryOfElune = true,
+      MoonkinForm = false,
       Starfall = false,
+      WarriorOfElune = true,
     },
     OffGCDasOffGCD = {
-      Renewal = true,
       Barkskin = true,
+      Renewal = true,
     }
   },
   Feral = {
