@@ -40,26 +40,31 @@ Spell.Mage.Commons = {
   Fireblood                             = Spell(265221),
   LightsJudgment                        = Spell(255647),
   -- Abilities
-  AlterTime                             = Spell(108978),
   ArcaneExplosion                       = Spell(1449), --Melee, 10
   ArcaneIntellect                       = Spell(1459),
   ArcaneIntellectBuff                   = Spell(1459),
   Blink                                 = MultiSpell(1953, 212653),
-  Counterspell                          = Spell(2139),
   Frostbolt                             = Spell(116),
   FrostNova                             = Spell(122),
+  SlowFall                              = Spell(130),
+  TimeWarp                              = Spell(80353),
+  -- Talents
+  AlterTime                             = Spell(342245),
   IceBlock                              = Spell(45438),
+  Counterspell                          = Spell(2139),
+  SpellSteal                            = Spell(30449),
   Invisibility                          = Spell(66),
   MirrorImage                           = Spell(55342),
   RemoveCurse                           = Spell(475),
-  SlowFall                              = Spell(130),
-  SpellSteal                            = Spell(30449),
-  TimeWarp                              = Spell(80353),
-  -- Talents
   FocusMagic                            = Spell(321358),
   RingOfFrost                           = Spell(113724),
   RuneofPower                           = Spell(116011),
   RuneofPowerBuff                       = Spell(116014),
+  BlastWave                             = Spell(157981),
+  IceFloes                              = Spell(108839),
+  IceNova                               = Spell(157997), --splash, 8
+  Meteor                                = Spell(153561),
+  ShiftingPower                         = Spell(382440), --Melee 15
   -- Covenant Abilities
   Deathborne                            = Spell(324220),
   DeathborneBuff                        = Spell(324220),
@@ -69,7 +74,6 @@ Spell.Mage.Commons = {
   RadiantSpark                          = Spell(307443),
   RadiantSparkDebuff                    = Spell(307443),
   RadiantSparkVulnerability             = Spell(307454),
-  ShiftingPower                         = Spell(314791), --Melee 15
   Soulshape                             = Spell(310143),
   -- Soulbind
   CombatMeditation                      = Spell(328266),
@@ -146,14 +150,12 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   Scorch                                = Spell(2948),
   -- Talents
   AlexstraszasFury                      = Spell(235870),
-  BlastWave                             = Spell(157981),
   Firestarter                           = Spell(205026),
   FlameOn                               = Spell(205029),
   FlamePatch                            = Spell(205037),
   FromTheAshes                          = Spell(342344),
   Kindling                              = Spell(155148),
   LivingBomb                            = Spell(44457),
-  Meteor                                = Spell(153561),
   Pyroclasm                             = Spell(269650),
   PyroclasmBuff                         = Spell(269651),
   SearingTouch                          = Spell(269644),
@@ -171,38 +173,38 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
 
 Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   -- Abilities
-  Blizzard                              = Spell(190356), --splash, 16
-  BrainFreezeBuff                       = Spell(190446),
   ConeofCold                            = Spell(120),--Melee, 12
-  FingersofFrostBuff                    = Spell(44544),
-  Flurry                                = Spell(44614),
-  FrozenOrb                             = Spell(84714), --splash, 16
-  IceLance                              = Spell(30455), --splash, 8 (with splitting ice)
   IciclesBuff                           = Spell(205473),
-  IcyVeins                              = Spell(12472),
-  SummonWaterElemental                  = Spell(31687),
   WintersChillDebuff                    = Spell(228358),
   FireBlast                             = Spell(319836),
-  Frostbite                             = Spell(198121),
-  Freeze                                = Spell(33395, "pet"), --splash, 8
-  TemporalDisplacement                  = Spell(80354),
-  IceBarrier                            = Spell(11426),
   -- Talents
-  BoneChilling                          = Spell(205027),
-  ChainReaction                         = Spell(278309),
-  CometStorm                            = Spell(153595), --splash, 6
+  IceBarrier                            = Spell(11426),
+  IceLance                              = Spell(30455), --splash, 8 (with splitting ice)
+  FrozenOrb                             = Spell(84714), --splash, 16
+  Blizzard                              = Spell(190356), --splash, 16
+  FingersofFrostBuff                    = Spell(44544),
+  Flurry                                = Spell(44614),
+  BrainFreezeBuff                       = Spell(190446),
+  Frostbite                             = Spell(198121),
+  SummonWaterElemental                  = Spell(31687),
+  WaterJet                              = Spell(135029, "pet"),
+  Freeze                                = Spell(33395, "pet"), --splash, 8
+  IceCaller                             = Spell(236662),
+  BoneChilling                          = Spell(205766),
   Ebonbolt                              = Spell(257537), --splash, 8 (with splitting ice)
+  SnowStorm                             = Spell(381706),
+  SnowStormBuff                         = Spell(381522),
+  IcyVeins                              = Spell(12472),
+  CometStorm                            = Spell(153595), --splash, 6
   FreezingRain                          = Spell(270233),
   FreezingRainBuff                      = Spell(270232),
-  GlacialSpike                          = Spell(199786), --splash, 8 (with splitting ice)
-  GlacialSpikeBuff                      = Spell(199844),
-  IceFloes                              = Spell(108839),
-  IceNova                               = Spell(157997), --splash, 8
   RayofFrost                            = Spell(205021),
   SplittingIce                          = Spell(56377), --splash, 8
-  -- Legendaries (Shadowlands)
-  FreezingWindsBuff                     = Spell(327364),
-  SlickIceBuff                          = Spell(327508),
+  SlickIce                              = Spell(382144),
+  ChainReaction                         = Spell(278309),
+  FreezingWinds                         = Spell(382103),
+  GlacialSpike                          = Spell(199786), --splash, 8 (with splitting ice)
+  GlacialSpikeBuff                      = Spell(199844),
 })
 
 -- Items
