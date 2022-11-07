@@ -20,11 +20,12 @@ HR.GUISettings.APL.Evoker = {
     Enabled = {
       Potions = true,
       Trinkets = true,
+      Items = true,
     },
     DisplayStyle = {
+      Defensives = "Suggested",
       Potions = "Suggested",
       Trinkets = "Suggested",
-      Covenant = "Suggested",
       Items = "Suggested",
     },
     -- {Display GCD as OffGCD, ForceReturn}
@@ -40,6 +41,8 @@ HR.GUISettings.APL.Evoker = {
     }
   },
   Devastation = {
+    UseDefensives = true,
+    ObsidianScalesThreshold = 60,
     GCDasOffGCD = {
       DeepBreath = true,
       Dragonrage = true,
@@ -59,4 +62,6 @@ local CP_Devastation = CreateChildPanel(CP_Evoker, "Devastation")
 CreateARPanelOptions(CP_Evoker, "APL.Evoker.Commons")
 
 -- Devastation
+CreatePanelOption("CheckButton", CP_Devastation, "APL.Evoker.Devastation.UseDefensives", "Suggest Defensives", "Enable this option to have the addon suggest defensive spells.")
+CreatePanelOption("Slider", CP_Devastation, "APL.Evoker.Devastation.ObsidianScalesThreshold", {5, 100, 5}, "Obsidian Scales Threshold", "Suggest Obsidian Scales when below this health percentage.")
 CreateARPanelOptions(CP_Devastation, "APL.Evoker.Devastation")

@@ -33,10 +33,13 @@ Spell.Evoker.Commons = {
   FireBreath                            = MultiSpell(357208,382266), -- with and without Font of Magic
   LivingFlame                           = Spell(361469),
   -- Talents
+  ObsidianScales                        = Spell(363916),
   TipTheScales                          = Spell(370553),
   -- Buffs/Debuffs
   FireBreathDebuff                      = Spell(357209),
   LeapingFlamesBuff                     = Spell(370901),
+  -- External Buffs
+  PowerInfusionBuff                     = Spell(10060),
   -- Utility
   Quell                                 = Spell(351338),
   -- Other
@@ -55,6 +58,7 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   EssenceAttunement                     = Spell(375722),
   EternitySurge                         = MultiSpell(359073,382411), -- with and without Font of Magic
   EternitysSpan                         = Spell(375757),
+  EverburningFlame                      = Spell(370819),
   FeedtheFlames                         = Spell(369846),
   Firestorm                             = Spell(368847),
   FontofMagic                           = Spell(375783),
@@ -76,6 +80,10 @@ Item.Evoker.Commons = {
   -- Potions
   PotionofSpectralIntellect             = Item(171273),
   -- Trinkets
+  CrimsonAspirantsBadgeofFerocity       = Item(201449, {13, 14}),
+  -- Items
+  KharnalexTheFirstLight                = Item(195519),
+  -- Trinkets (SL)
   ShadowedOrbofTorment                  = Item(186428, {13, 14}),
 }
 
