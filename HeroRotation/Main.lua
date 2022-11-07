@@ -307,7 +307,7 @@
   end
   local EnabledRotation = {
     -- Death Knight
-      [250]   = "HeroRotation_DeathKnight",   -- Blood
+      --[250]   = "HeroRotation_DeathKnight",   -- Blood
       [251]   = "HeroRotation_DeathKnight",   -- Frost
       [252]   = "HeroRotation_DeathKnight",   -- Unholy
     -- Demon Hunter
@@ -315,48 +315,48 @@
       [581]   = "HeroRotation_DemonHunter",   -- Vengeance
     -- Druid
       [102]   = "HeroRotation_Druid",         -- Balance
-      [103]   = "HeroRotation_Druid",         -- Feral
-      [104]   = "HeroRotation_Druid",         -- Guardian
-      [105]   = "HeroRotation_Druid",         -- Restoration
+      --[103]   = "HeroRotation_Druid",         -- Feral
+      --[104]   = "HeroRotation_Druid",         -- Guardian
+      --[105]   = "HeroRotation_Druid",         -- Restoration
     -- Evoker
       [1467]  = "HeroRotation_Evoker",        -- Devastation
       --[1468] = "HeroRotation_Evoker",         -- Preservation
     -- Hunter
-      [253]   = "HeroRotation_Hunter",        -- Beast Mastery
-      [254]   = "HeroRotation_Hunter",        -- Marksmanship
-      [255]   = "HeroRotation_Hunter",        -- Survival
+      --[253]   = "HeroRotation_Hunter",        -- Beast Mastery
+      --[254]   = "HeroRotation_Hunter",        -- Marksmanship
+      --[255]   = "HeroRotation_Hunter",        -- Survival
     -- Mage
-      [62]    = "HeroRotation_Mage",          -- Arcane
-      [63]    = "HeroRotation_Mage",          -- Fire
+      --[62]    = "HeroRotation_Mage",          -- Arcane
+      --[63]    = "HeroRotation_Mage",          -- Fire
       [64]    = "HeroRotation_Mage",          -- Frost
     -- Monk
-      [268]   = "HeroRotation_Monk",          -- Brewmaster
-      [269]   = "HeroRotation_Monk",          -- Windwalker
-      [270]   = "HeroRotation_Monk",          -- Mistweaver
+      --[268]   = "HeroRotation_Monk",          -- Brewmaster
+      --[269]   = "HeroRotation_Monk",          -- Windwalker
+      --[270]   = "HeroRotation_Monk",          -- Mistweaver
     -- Paladin
-      [65]    = "HeroRotation_Paladin",       -- Holy
-      [66]    = "HeroRotation_Paladin",       -- Protection
+      --[65]    = "HeroRotation_Paladin",       -- Holy
+      --[66]    = "HeroRotation_Paladin",       -- Protection
       [70]    = "HeroRotation_Paladin",       -- Retribution
     -- Priest
-      [256]   = "HeroRotation_Priest",        -- Discipline
-      [257]   = "HeroRotation_Priest",        -- Holy
-      [258]   = "HeroRotation_Priest",        -- Shadow
+      --[256]   = "HeroRotation_Priest",        -- Discipline
+      --[257]   = "HeroRotation_Priest",        -- Holy
+      --[258]   = "HeroRotation_Priest",        -- Shadow
     -- Rogue
-      [259]   = "HeroRotation_Rogue",         -- Assassination
+      --[259]   = "HeroRotation_Rogue",         -- Assassination
       [260]   = "HeroRotation_Rogue",         -- Outlaw
-      [261]   = "HeroRotation_Rogue",         -- Subtlety
+      --[261]   = "HeroRotation_Rogue",         -- Subtlety
     -- Shaman
-      [262]   = "HeroRotation_Shaman",        -- Elemental
-      [263]   = "HeroRotation_Shaman",        -- Enhancement
-      [264]   = "HeroRotation_Shaman",        -- Restoration
+      --[262]   = "HeroRotation_Shaman",        -- Elemental
+      --[263]   = "HeroRotation_Shaman",        -- Enhancement
+      --[264]   = "HeroRotation_Shaman",        -- Restoration
     -- Warlock
-      [265]   = "HeroRotation_Warlock",       -- Affliction
-      [266]   = "HeroRotation_Warlock",       -- Demonology
-      [267]   = "HeroRotation_Warlock",       -- Destruction
+      --[265]   = "HeroRotation_Warlock",       -- Affliction
+      --[266]   = "HeroRotation_Warlock",       -- Demonology
+      --[267]   = "HeroRotation_Warlock",       -- Destruction
     -- Warrior
       [71]    = "HeroRotation_Warrior",       -- Arms
       [72]    = "HeroRotation_Warrior",       -- Fury
-      [73]    = "HeroRotation_Warrior"        -- Protection
+      --[73]    = "HeroRotation_Warrior"        -- Protection
   };
   local LatestSpecIDChecked = 0;
   function HR.PulseInit ()
