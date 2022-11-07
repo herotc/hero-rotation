@@ -60,7 +60,7 @@ local VarIsCleave
 local VarPassiveAsp
 local VarCDConditionST
 local VarCDConditionAoE
-local VarEnterSolar
+local VarEnterLunar
 local PAPValue
 local CAIncBuffUp
 local CAIncBuffRemains
@@ -308,15 +308,15 @@ local function St()
   if S.AstralCommunion:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 75) then
     if Cast(S.AstralCommunion, Settings.Balance.GCDasOffGCD.AstralCommunion) then return "astral_communion st 32"; end
   end
-  -- variable,name=enter_solar,value=eclipse.any_next|buff.eclipse_solar.up&buff.eclipse_solar.remains<action.wrath.execute_time
-  VarEnterSolar = EclipseAnyNext or Player:BuffUp(S.EclipseSolar) and Player:BuffRemains(S.EclipseSolar) < S.Wrath:ExecuteTime()
-  -- starsurge,if=talent.rattle_the_stars&buff.rattled_stars.up&variable.enter_solar&buff.rattled_stars.remains<action.starfire.execute_time
-  if S.Starsurge:IsReady() and (S.RattletheStars:IsAvailable() and Player:BuffUp(S.RattledStarsBuff) and VarEnterSolar and Player:BuffRemains(S.RattledStarsBuff) < S.Starfire:ExecuteTime()) then
+  -- variable,name=enter_solar,value=eclipse.any_next|buff.eclipse_lunar.up&buff.eclipse_lunar.remains<action.wrath.execute_time
+  VarEnterLunar = EclipseAnyNext or Player:BuffUp(S.EclipseLunar) and Player:BuffRemains(S.EclipseLunar) < S.Wrath:ExecuteTime()
+  -- starsurge,if=talent.rattle_the_stars&buff.rattled_stars.up&variable.enter_lunar&buff.rattled_stars.remains<action.starfire.execute_time
+  if S.Starsurge:IsReady() and (S.RattletheStars:IsAvailable() and Player:BuffUp(S.RattledStarsBuff) and VarEnterLunar and Player:BuffRemains(S.RattledStarsBuff) < S.Starfire:ExecuteTime()) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 34"; end
   end
-  -- starfire,if=variable.enter_solar
-  if S.Starfire:IsCastable() and (VarEnterSolar) then
-    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire st 36"; end
+  -- wrath,if=variable.enter_lunar
+  if S.Wrath:IsCastable() and (VarEnterLunar) then
+    if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath st 36"; end
   end
   -- fury_of_elune,if=astral_power.deficit>variable.passive_asp+8
   if S.FuryofElune:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 8) then
@@ -338,13 +338,9 @@ local function St()
   if S.Starfall:IsReady() and (Player:BuffUp(S.StarweaversWarp) or Var4pcStarfallST and Player:BuffUp(S.TouchtheCosmos)) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall st 46"; end
   end
-  -- starfire,if=buff.gathering_starstuff.stack=3&astral_power.deficit>variable.passive_asp+8
-  if S.Starfire:IsCastable() and (Player:BuffStack(S.GatheringStarstuff) == 3 and Player:AstralPowerDeficit() > VarPassiveAsp + 8) then
+  -- starfire,if=buff.gathering_starstuff.stack=3&astral_power.deficit>variable.passive_asp+8&buff.eclipse_lunar.up
+  if S.Starfire:IsCastable() and (Player:BuffStack(S.GatheringStarstuff) == 3 and Player:AstralPowerDeficit() > VarPassiveAsp + 8 and Player:BuffUp(S.EclipseLunar)) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire st 48"; end
-  end
-  -- wrath,if=buff.gathering_starstuff.stack=3&astral_power.deficit>variable.passive_asp+6+3*talent.soul_of_the_forest
-  if S.Wrath:IsCastable() and (Player:BuffStack(S.GatheringStarstuff) == 3 and Player:AstralPowerDeficit() > VarPassiveAsp + 6 + 3 * num(S.SouloftheForest:IsAvailable())) then
-    if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath st 50"; end
   end
   -- starfall,if=buff.primordial_arcanic_pulsar.value>=550&astral_power.deficit<variable.passive_asp
   if S.Starfall:IsReady() and (PAPValue >= 550 and Player:AstralPowerDeficit() < VarPassiveAsp) then
@@ -362,8 +358,8 @@ local function St()
   if S.WildMushroom:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 5 and ((not S.FungalGrowth:IsAvailable()) or (not Player:PrevGCD(1, S.WildMushroom)) and (not Player:PrevGCD(2, S.WildMushroom)) and Target:DebuffRemains(S.FungalGrowthDebuff) < 2)) then
     if Cast(S.WildMushroom, nil, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 58"; end
   end
-  -- starfire,if=buff.warrior_of_elune.up&(buff.eclipse_lunar.up|buff.umbral_embrace.react)
-  if S.Starfire:IsCastable() and (Player:BuffUp(S.WarriorofEluneBuff) and (Player:BuffUp(S.EclipseLunar) or Player:BuffUp(S.UmbralEmbraceBuff))) then
+  -- starfire,if=eclipse.in_lunar|buff.warrior_of_elune.up&(buff.eclipse_lunar.up|buff.umbral_embrace.react)
+  if S.Starfire:IsCastable() and (EclipseInLunar or Player:BuffUp(S.WarriorofEluneBuff) and (Player:BuffUp(S.EclipseLunar) or Player:BuffUp(S.UmbralEmbraceBuff))) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire st 60"; end
   end
   -- wrath
