@@ -55,8 +55,8 @@ Spell.Shaman.Commons = {
   ChainHarvest                          = Spell(320674),
   FaeTransfusion                        = Spell(328923),
   Fleshcraft                            = Spell(324631),
-  PrimordialWave                        = Spell(326059),
-  PrimordialWaveBuff                    = Spell(327164),
+  PrimordialWaveCovenant                = Spell(326059),
+  PrimordialWaveCovenantBuff            = Spell(327164),
   VesperTotem                           = Spell(324386),
   -- Soulbind Abilities (Shadowlands)
   FieldofBlossoms                       = Spell(319191),
@@ -108,6 +108,8 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   LashingFlames                         = Spell(334046),
   LashingFlamesDebuff                   = Spell(334168),
   OverflowingMaelstrom                  = Spell(384149),  -- DF
+  PrimordialWave                        = Spell(375982),  -- DF
+  PrimordialWaveBuff                    = Spell(375986),  -- DF
   Sundering                             = Spell(197214),
   Stormflurry                           = Spell(344357),
   Stormkeeper                           = Spell(320137),
@@ -175,6 +177,7 @@ Item.Shaman.Commons = {
   CacheofAcquiredTreasures              = Item(188265, {13, 14}),
   ScarsofFraternalStrife                = Item(188253, {13, 14}),
   TheFirstSigil                         = Item(188271, {13, 14}),
+  SoleahsSecretTechnique                = Item(190958, {13, 14}),
 }
 Item.Shaman.Enhancement = MergeTableByKey(Item.Shaman.Commons, {
 })

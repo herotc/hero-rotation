@@ -35,6 +35,7 @@ local OnUseExcludes = {
   I.CacheofAcquiredTreasures:ID(),
   I.ScarsofFraternalStrife:ID(),
   I.TheFirstSigil:ID(),
+  I.SoleahsSecretTechnique:ID(),
 }
 
 -- Rotation Var
@@ -105,8 +106,16 @@ local function EvaluateCycleLavaLash(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.LashingFlamesDebuff))
 end
 
+local function EvaluateTargetIfFilterPrimordialWaveCovenant(TargetUnit)
+  return (TargetUnit:DebuffRemains(S.FlameShockDebuff))
+end
+
 local function EvaluateTargetIfFilterPrimordialWave(TargetUnit)
   return (TargetUnit:DebuffRemains(S.FlameShockDebuff))
+end
+
+local function EvaluateTargetIfPrimordialWaveCovenant(TargetUnit)
+  return (Player:BuffDown(S.PrimordialWaveCovenantBuff))
 end
 
 local function EvaluateTargetIfPrimordialWave(TargetUnit)
@@ -193,6 +202,9 @@ local function Single()
     end
   end
   -- actions.single+=/primordial_wave,if=buff.primordial_wave.down&(raid_event.adds.in>42|raid_event.adds.in<6)
+  if S.PrimordialWaveCovenant:IsCastable() and (Player:BuffDown(S.PrimordialWaveCovenantBuff)) then
+    if Cast(S.PrimordialWaveCovenant, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.PrimordialWaveCovenant)) then return "Primordial Wave single (Covenant)"; end
+  end
   if S.PrimordialWave:IsCastable() and (Player:BuffDown(S.PrimordialWaveBuff)) then
     if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.PrimordialWave)) then return "Primordial Wave single"; end
   end
@@ -201,7 +213,7 @@ local function Single()
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "Flame Shock single"; end
   end
   -- actions.single+=/lightning_bolt,if=buff.maelstrom_weapon.stack>=5&buff.primordial_wave.up&raid_event.adds.in>buff.primordial_wave.remains&(!buff.splintered_elements.up|fight_remains<=12)
-  if S.LightningBolt:IsCastable() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5 and Player:BuffUp(S.PrimordialWaveBuff) and (Player:BuffDown(S.SplinteredElementsBuff) or FightRemains <= 12)) then
+  if S.LightningBolt:IsCastable() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5 and (Player:BuffUp(S.PrimordialWaveBuff) or Player:BuffUp(S.PrimordialWaveCovenantBuff)) and (Player:BuffDown(S.SplinteredElementsBuff) or FightRemains <= 12)) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then
       TiLightningBolt = 1
       TiChainLightning = 0
@@ -237,7 +249,7 @@ local function Single()
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "Lava Burst single"; end
   end
   -- actions.single+=/lightning_bolt,if=buff.maelstrom_weapon.stack=10&buff.primordial_wave.down
-  if S.LightningBolt:IsReady() and (Player:BuffStack(S.MaelstromWeaponBuff) == 10 and Player:BuffDown(S.PrimordialWaveBuff)) then
+  if S.LightningBolt:IsReady() and (Player:BuffStack(S.MaelstromWeaponBuff) == 10 and (Player:BuffDown(S.PrimordialWaveBuff) or Player:BuffDown(S.PrimordialWaveCovenantBuff))) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then
       TiLightningBolt = 1
       TiChainLightning = 0
@@ -269,7 +281,7 @@ local function Single()
     if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "Bag of Tricks single"; end
   end
   -- actions.single+=/lightning_bolt,if=buff.maelstrom_weapon.stack>=5&buff.primordial_wave.down
-  if S.LightningBolt:IsCastable() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5 and Player:BuffDown(S.PrimordialWaveBuff)) then
+  if S.LightningBolt:IsCastable() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5 and (Player:BuffDown(S.PrimordialWaveBuff) or Player:BuffDown(S.PrimordialWaveCovenantBuff))) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then
       TiLightningBolt = 1
       TiChainLightning = 0
@@ -320,7 +332,7 @@ local function Aoe()
     if Cast(S.CrashLightning, nil, nil, not Target:IsInRange(8)) then return "Crash Lightning aoe (Doom Winds buff)"; end
   end
   -- actions.aoe+=/lightning_bolt,if=(active_dot.flame_shock=active_enemies|active_dot.flame_shock=6)&buff.primordial_wave.up&buff.maelstrom_weapon.stack>=(5+5*talent.overflowing_maelstrom.enabled)&(!buff.splintered_elements.up|fight_remains<=12|raid_event.adds.remains<=gcd)
-  if S.LightningBolt:IsCastable() and ((S.FlameShockDebuff:AuraActiveCount() == Enemies10yCount or S.FlameShockDebuff:AuraActiveCount() == 6) and Player:BuffUp(S.PrimordialWaveBuff) and Player:BuffStack(S.MaelstromWeaponBuff) >= (5 + 5 * num(S.OverflowingMaelstrom:IsAvailable())) and (Player:BuffDown(S.SplinteredElementsBuff) or FightRemains <= 12)) then
+  if S.LightningBolt:IsCastable() and ((S.FlameShockDebuff:AuraActiveCount() == Enemies10yCount or S.FlameShockDebuff:AuraActiveCount() == 6) and (Player:BuffUp(S.PrimordialWaveBuff) or Player:BuffUp(S.PrimordialWaveCovenantBuff)) and Player:BuffStack(S.MaelstromWeaponBuff) >= (5 + 5 * num(S.OverflowingMaelstrom:IsAvailable())) and (Player:BuffDown(S.SplinteredElementsBuff) or FightRemains <= 12)) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then
       TiLightningBolt = 1
       TiChainLightning = 0
@@ -340,6 +352,9 @@ local function Aoe()
     if Cast(S.FireNova) then return "Fire Nova"; end
   end
   -- actions.aoe+=/primordial_wave,target_if=min:dot.flame_shock.remains,cycle_targets=1,if=!buff.primordial_wave.up
+  if S.PrimordialWaveCovenant:IsReady() and (Player:BuffDown(S.PrimordialWaveCovenantBuff)) then
+    if Everyone.CastTargetIf(S.PrimordialWaveCovenant, Enemies40y, "min", EvaluateTargetIfFilterPrimordialWaveCovenant, EvaluateTargetIfPrimordialWaveCovenant, not Target:IsSpellInRange(S.PrimordialWaveCovenant), nil, Settings.Commons.DisplayStyle.Covenant) then return "Primordial Wave (Covenant)"; end
+  end
   if S.PrimordialWave:IsReady() and (Player:BuffDown(S.PrimordialWaveBuff)) then
     if Everyone.CastTargetIf(S.PrimordialWave, Enemies40y, "min", EvaluateTargetIfFilterPrimordialWave, EvaluateTargetIfPrimordialWave, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Covenant) then return "Primordial Wave"; end
   end

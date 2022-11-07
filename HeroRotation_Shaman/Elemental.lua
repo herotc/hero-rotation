@@ -70,12 +70,12 @@ HL:RegisterForEvent(function()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
-  S.PrimordialWave:RegisterInFlightEffect(327162)
-  S.PrimordialWave:RegisterInFlight()
+  S.PrimordialWaveCovenant:RegisterInFlightEffect(327162)
+  S.PrimordialWaveCovenant:RegisterInFlight()
   S.LavaBurst:RegisterInFlight()
 end, "LEARNED_SPELL_IN_TAB")
-S.PrimordialWave:RegisterInFlightEffect(327162)
-S.PrimordialWave:RegisterInFlight()
+S.PrimordialWaveCovenant:RegisterInFlightEffect(327162)
+S.PrimordialWaveCovenant:RegisterInFlight()
 S.LavaBurst:RegisterInFlight()
 
 local function num(val)
@@ -229,8 +229,8 @@ local function IsViable(spell)
     -- d) TODO: you are casting something else, but you will have >= 1 charge at the end of the cast of the spell
     --    Implementing d) will require something like LavaBurstChargesFractionalP(); this is not hard but I haven't done it.
     return BaseCheck and MovementPredicate and (a or b or c)
-  elseif spell == S.PrimordialWave then
-    return BaseCheck and not Player:BuffUp(S.PrimordialWaveBuff) and not Player:BuffUp(S.LavaSurgeBuff)
+  elseif spell == S.PrimordialWaveCovenant then
+    return BaseCheck and not Player:BuffUp(S.PrimordialWaveCovenantBuff) and not Player:BuffUp(S.LavaSurgeBuff)
   else
     return BaseCheck
   end
@@ -249,7 +249,7 @@ local function MaelstromP()
     elseif Player:IsCasting(S.LightningBolt) then
       return Maelstrom + 8
     elseif Player:IsCasting(S.LavaBurst) then
-      return Maelstrom + 10*(1 + num(Player:BuffUp(S.PrimordialWaveBuff))*ActiveFlameshocks)
+      return Maelstrom + 10*(1 + num(Player:BuffUp(S.PrimordialWaveCovenantBuff))*ActiveFlameshocks)
     elseif Player:IsCasting(S.ChainLightning) then
       --TODO: figure out the *actual* maelstrom you'll get from hitting your current target...
       --return Maelstrom + (4 * #SplashedEnemiesTable[Target])
@@ -337,10 +337,10 @@ local function Precombat()
   if IsViable(S.ElementalBlast) then
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "Precombat Elemental Blast" end
   end
-  if Player:IsCasting(S.ElementalBlast) and IsViable(S.PrimordialWave) then
-    if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.PrimordialWave)) then return "Precombat Primwave" end
+  if Player:IsCasting(S.ElementalBlast) and IsViable(S.PrimordialWaveCovenant) then
+    if Cast(S.PrimordialWaveCovenant, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.PrimordialWaveCovenant)) then return "Precombat Primwave" end
   end
-  if Player:IsCasting(S.ElementalBlast) and not IsViable(S.PrimordialWave) and S.FlameShock:CooldownRemains() == 0 then
+  if Player:IsCasting(S.ElementalBlast) and not IsViable(S.PrimordialWaveCovenant) and S.FlameShock:CooldownRemains() == 0 then
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "Precombat Flameshock" end
   end
   if IsViable(S.LavaBurst) and not Player:IsCasting(S.LavaBurst) and (not S.ElementalBlast:IsAvailable() or (S.ElementalBlast:IsAvailable() and not IsViable(S.ElementalBlast))) then
@@ -349,8 +349,8 @@ local function Precombat()
   if Player:IsCasting(S.LavaBurst) and S.FlameShock:CooldownRemains() == 0 then 
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "Precombat Flameshock" end
   end
-  if Player:IsCasting(S.LavaBurst) and IsViable(S.PrimordialWave) then
-    if Cast(S.PrimordialWave, nil, nil, not Target:IsSpellInRange(S.PrimordialWave)) then return "Precombat Primwave"; end
+  if Player:IsCasting(S.LavaBurst) and IsViable(S.PrimordialWaveCovenant) then
+    if Cast(S.PrimordialWaveCovenant, nil, nil, not Target:IsSpellInRange(S.PrimordialWaveCovenant)) then return "Precombat Primwave"; end
   end
 end
 
@@ -402,14 +402,14 @@ end
 
 local function ApplyFlameShock()
   local SpellObject = nil
-  if IsViable(S.PrimordialWave) then
-    SpellObject = S.PrimordialWave
+  if IsViable(S.PrimordialWaveCovenant) then
+    SpellObject = S.PrimordialWaveCovenant
   elseif S.FlameShock:CooldownRemains() == 0 then
     SpellObject = S.FlameShock
   end
   if SpellObject == nil or BestFlameshockUnit == nil then return nil end
   if BestFlameshockUnit:GUID() == Target:GUID() then
-    if Player:IsCasting(S.PrimordialWave) or S.PrimordialWave:InFlight() then return nil end
+    if Player:IsCasting(S.PrimordialWaveCovenant) or S.PrimordialWaveCovenant:InFlight() then return nil end
     if Cast(SpellObject, nil, nil, not Target:IsInRange(40)) then return "main-target " .. SpellObject.SpellName; end
   else
     if HR.CastLeftNameplate(BestFlameshockUnit, SpellObject) then return "off-target " .. SpellObject.SpellName; end
@@ -428,7 +428,7 @@ local function MoteEmpowerment()
     if Cast(spender) then return "Spending Maelstrom despite MOTE because Builder will overcap (AOE)" end
   end
   -- On ST/Cleave, if you're capped on LVB just spend it anyways, unless doing so would definitely put you over mael cap.
-  local lavaburst_ms_lb = 10*(1 + num(Player:BuffUp(S.PrimordialWaveBuff))*ActiveFlameshocks)
+  local lavaburst_ms_lb = 10*(1 + num(Player:BuffUp(S.PrimordialWaveCovenantBuff))*ActiveFlameshocks)
   if n <= 2 and S.LavaBurst:ChargesFractional() >= 2.0 and IsViable(S.LavaBurst) and Player:BuffUp(S.LavaSurgeBuff) and (MaelstromP() + lavaburst_ms_lb <= 100 or WindspeakersEquipped) then
     if Cast(S.LavaBurst) then return "Lavaburst special case 1" end
   end
@@ -483,12 +483,12 @@ local function MoteEmpowerment()
 end
 
 local function SingleTargetAndSpreadCleaveBuilder()
-  local lavaburst_ms_lb = 10*(1 + num(Player:BuffUp(S.PrimordialWaveBuff))*ActiveFlameshocks)
-  local lavaburst_ms_ub = 14*(1 + num(Player:BuffUp(S.PrimordialWaveBuff))*ActiveFlameshocks)
+  local lavaburst_ms_lb = 10*(1 + num(Player:BuffUp(S.PrimordialWaveCovenantBuff))*ActiveFlameshocks)
+  local lavaburst_ms_ub = 14*(1 + num(Player:BuffUp(S.PrimordialWaveCovenantBuff))*ActiveFlameshocks)
 
   -- only lightning bolt during storm ele (TODO: mrdmnd - consider case when you won't get a full ele off (combat falling soon) and don't do this)
   -- Use necro buff even if storm ele is up
-  if IsViable(S.LavaBurst) and Player:BuffUp(S.PrimordialWaveBuff) then
+  if IsViable(S.LavaBurst) and Player:BuffUp(S.PrimordialWaveCovenantBuff) then
     return S.LavaBurst, false, lavaburst_ms_ub
   elseif IsViable(S.LightningBolt) and PrimalStormElementalActive then
     return S.LightningBolt, false, 11
@@ -516,14 +516,14 @@ local function SingleTargetAndSpreadCleaveBuilder()
 end
 
 local function StackedCleaveBuilder()
-  local lavaburst_ms_lb = 10*(1 + num(Player:BuffUp(S.PrimordialWaveBuff))*ActiveFlameshocks)
-  local lavaburst_ms_ub = 14*(1 + num(Player:BuffUp(S.PrimordialWaveBuff))*ActiveFlameshocks)
+  local lavaburst_ms_lb = 10*(1 + num(Player:BuffUp(S.PrimordialWaveCovenantBuff))*ActiveFlameshocks)
+  local lavaburst_ms_ub = 14*(1 + num(Player:BuffUp(S.PrimordialWaveCovenantBuff))*ActiveFlameshocks)
   local n = NumEnemiesInLargestCluster
   local chainlightning_ms = 4*n + 3*n*n
  
   -- Top two cases are special-cased.
   -- Use necro buff with the flame shock legendary
-  if IsViable(S.LavaBurst) and ActiveFlameshocks >= 3 and Player:BuffUp(S.PrimordialWaveBuff) then
+  if IsViable(S.LavaBurst) and ActiveFlameshocks >= 3 and Player:BuffUp(S.PrimordialWaveCovenantBuff) then
     return S.LavaBurst, false, lavaburst_ms_ub
   -- only chain lightning during storm ele (TODO: mrdmnd - consider case when you won't get a full ele off (combat falling soon) and don't do this)
   elseif IsViable(S.ChainLightning) and PrimalStormElementalActive then
@@ -553,14 +553,14 @@ local function StackedCleaveBuilder()
 end
 
 local function AOEBuilder()
-  local lavaburst_ms_lb = 10*(1 + num(Player:BuffUp(S.PrimordialWaveBuff))*ActiveFlameshocks)
-  local lavaburst_ms_ub = 14*(1 + num(Player:BuffUp(S.PrimordialWaveBuff))*ActiveFlameshocks)
+  local lavaburst_ms_lb = 10*(1 + num(Player:BuffUp(S.PrimordialWaveCovenantBuff))*ActiveFlameshocks)
+  local lavaburst_ms_ub = 14*(1 + num(Player:BuffUp(S.PrimordialWaveCovenantBuff))*ActiveFlameshocks)
   local n = NumEnemiesInLargestCluster
   local chainlightning_ms = 4*n + 3*n*n
 
   -- Top two cases are special-cased.
   -- Use necro buff with the flame shock legendary
-  if IsViable(S.LavaBurst) and ActiveFlameshocks >= 3 and Player:BuffUp(S.PrimordialWaveBuff) then
+  if IsViable(S.LavaBurst) and ActiveFlameshocks >= 3 and Player:BuffUp(S.PrimordialWaveCovenantBuff) then
     return S.LavaBurst, false, lavaburst_ms_ub
   -- only chain lightning during storm ele (TODO: mrdmnd - consider case when you won't get a full ele off (combat falling soon) and don't do this)
   elseif IsViable(S.ChainLightning) and PrimalStormElementalActive then
@@ -610,7 +610,7 @@ local function CoreRotation()
 
   -- Refresh flameshocks when the builder is low priority.
   local flame_shock_condition_a = (prefer_fs_refresh and RefreshableFlameshocks > 0 and ActiveFlameshocks <= NumFlameShocksToMaintain())
-  local flame_shock_condition_b = (NumEnemiesInLargestCluster == 1 and S.PrimordialWave:IsAvailable() and IsViable(S.PrimordialWave) and not PrimalStormElementalActive)
+  local flame_shock_condition_b = (NumEnemiesInLargestCluster == 1 and S.PrimordialWaveCovenant:IsAvailable() and IsViable(S.PrimordialWaveCovenant) and not PrimalStormElementalActive)
   if flame_shock_condition_a or flame_shock_condition_b then
     DebugMessage = ApplyFlameShock()
     if DebugMessage then return DebugMessage end

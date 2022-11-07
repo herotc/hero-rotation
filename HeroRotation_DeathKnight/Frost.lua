@@ -713,7 +713,9 @@ local function APL()
     -- call_action_list,name=trinkets
     local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=cooldowns
-    local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
+    if CDsON() then
+      local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
+    end
     -- call_action_list,name=racials
     local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=covenants
