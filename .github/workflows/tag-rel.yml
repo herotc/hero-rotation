@@ -18,35 +18,35 @@ jobs:
       - name: Get Tag
         id: vars
         run: |
-          echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-          echo ::set-output name=oldtag::$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1))
+          echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          echo "oldtag=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1))" >> $GITHUB_ENV
       # Make a zip file for GitHub
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
-          filename: HeroRotation-${{ steps.vars.outputs.tag }}.zip
+          filename: HeroRotation-${{ env.tag }}.zip
           exclusions: '*.git* *.pkgmeta *.svn* .editorconfig LICENSE README.md symlink.bat symlink.sh HeroRotation_ClassTemplate HeroRotation_ClassTemplate/*'
       # Create a release on GitHub
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1.11.1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: HeroRotation
+          tag: ${{ github.ref }}
+          name: HeroRotation
           body: |
-            Changes: https://github.com/herotc/hero-rotation/compare/${{ steps.vars.outputs.oldtag }}...${{ steps.vars.outputs.tag }}
+            Changes: https://github.com/herotc/hero-rotation/compare/${{ env.oldtag }}...${{ env.tag }}
           draft: false
           prerelease: false
       # Upload the zip to the GitHub release
       - name: Upload Zip
         id: upload-zip
-        uses: actions/upload-release-asset@v1
+        uses: shogo82148/actions-upload-release-asset@v1.6.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./HeroRotation-${{ steps.vars.outputs.tag }}.zip
-          asset_name: HeroRotation-${{ steps.vars.outputs.tag }}.zip
+          asset_path: ./HeroRotation-${{ env.tag }}.zip
+          asset_name: HeroRotation-${{ env.tag }}.zip
           asset_content_type: application/zip
       # Use the BigWigs packager for Wago output
       - name: Package and Release
