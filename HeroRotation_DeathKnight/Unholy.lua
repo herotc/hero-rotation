@@ -196,7 +196,7 @@ local function Precombat()
     if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyoftheDead) then return "army_of_the_dead precombat 4"; end
   end
   -- fleshcraft
-  if S.Fleshcraft:IsCastable() then
+  if S.Fleshcraft:IsReady() then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
   end
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(trinket.1.cooldown.duration%%45=0)
@@ -363,15 +363,15 @@ local function Covenants()
     if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb covenants 10"; end
   end
   -- shackle_the_unworthy,if=variable.st_planning&(cooldown.apocalypse.remains>10|!talent.army_of_the_damned&cooldown.dark_transformation.remains)|fight_remains<15
-  if S.ShackleTheUnworthy:IsCastable() and (VarSTPlanning and (S.Apocalypse:CooldownRemains() > 10 or not S.ArmyoftheDamned:IsAvailable() and not S.DarkTransformation:CooldownUp()) or HL.FilteredFightRemains(EnemiesMelee, "<", 15)) then
+  if S.ShackleTheUnworthy:IsReady() and (VarSTPlanning and (S.Apocalypse:CooldownRemains() > 10 or not S.ArmyoftheDamned:IsAvailable() and not S.DarkTransformation:CooldownUp()) or HL.FilteredFightRemains(EnemiesMelee, "<", 15)) then
     if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 12"; end
   end
   -- shackle_the_unworthy,if=variable.adds_remain&(death_and_decay.ticking|raid_event.adds.remains<=14)
-  if S.ShackleTheUnworthy:IsCastable() and (VarAddsRemain and (Player:BuffUp(S.DeathAndDecayBuff) or AddsFightRemains(Enemies10ySplash) <= 14)) then
+  if S.ShackleTheUnworthy:IsReady() and (VarAddsRemain and (Player:BuffUp(S.DeathAndDecayBuff) or AddsFightRemains(Enemies10ySplash) <= 14)) then
     if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 14"; end
   end
   -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent&!buff.volatile_solvent_humanoid.up,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
-  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
+  if S.Fleshcraft:IsReady() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft covenants 16"; end
   end
 end
