@@ -39,6 +39,7 @@ Spell.DeathKnight.Commons = {
   RunicAttenuation                      = Spell(207104),
   SacrificialPact                       = Spell(327574),
   SoulReaper                            = Spell(343294),
+  UnholyGround                          = Spell(374265),
   -- Covenant Abilities
   AbominationLimbCov                    = Spell(315443),
   AbominationLimbCovBuff                = Spell(315443),
@@ -55,6 +56,7 @@ Spell.DeathKnight.Commons = {
   VolatileSolvent                       = Spell(323074),
   VolatileSolventHumanBuff              = Spell(323491),
   -- Buffs
+  AbominationLimbBuff                   = Spell(383269),
   DeathAndDecayBuff                     = Spell(188290),
   DeathsDueBuff                         = Spell(324165), -- SL Covenant. Remove after DF launch?
   EmpowerRuneWeaponBuff                 = Spell(47568),
@@ -81,24 +83,30 @@ Spell.DeathKnight.Commons = {
 
 Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
   -- Abilities
+  -- Talents
   BloodBoil                             = Spell(50842),
+  BloodTap                              = Spell(221699),
+  Blooddrinker                          = Spell(206931),
+  Bonestorm                             = Spell(194844),
+  Coagulopathy                          = Spell(391477),
+  Consumption                           = Spell(274156),
   DancingRuneWeapon                     = Spell(49028),
   DeathsCaress                          = Spell(195292),
+  GorefiendsGrasp                       = Spell(108199),
   HeartStrike                           = Spell(206930),
-  Marrowrend                            = Spell(195182),
-  RuneTap                               = Spell(194679),
-  VampiricBlood                         = Spell(55233),
-  -- Talents
-  Blooddrinker                          = Spell(206931),
-  BloodTap                              = Spell(221699),
-  Bonestorm                             = Spell(194844),
-  Consumption                           = Spell(274156),
   Heartbreaker                          = Spell(221536),
+  InsatiableBlade                       = Spell(377637),
+  Marrowrend                            = Spell(195182),
   RapidDecomposition                    = Spell(194662),
   RelishinBlood                         = Spell(317610),
+  RuneTap                               = Spell(194679),
+  SanguineGround                        = Spell(391458),
+  TighteningGrasp                       = Spell(206970),
   Tombstone                             = Spell(219809),
+  VampiricBlood                         = Spell(55233),
   -- Buffs
   BoneShieldBuff                        = Spell(195181),
+  CoagulopathyBuff                      = Spell(391481),
   CrimsonScourgeBuff                    = Spell(81141),
   DancingRuneWeaponBuff                 = Spell(81256),
   HemostasisBuff                        = Spell(273947),
