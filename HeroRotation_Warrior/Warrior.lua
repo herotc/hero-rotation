@@ -158,20 +158,19 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
 
 Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   -- Abilities
-  DemoralizingShout                     = Spell(1160),
-  Devastate                             = Spell(20243),
   Execute                               = Spell(163201),
-  IgnorePain                            = Spell(190456),
-  Intervene                             = Spell(3411),
-  LastStand                             = Spell(12975),
-  LastStandBuff                         = Spell(12975),
-  Revenge                               = Spell(6572),
-  RevengeBuff                           = Spell(5302),
   ShieldBlock                           = Spell(2565),
   ShieldBlockBuff                       = Spell(132404),
   ShieldSlam                            = Spell(23922),
-  ThunderClap                           = Spell(6343),
   -- Talents
+  Intervene                             = Spell(3411),
+  ThunderClap                           = Spell(6343),
+  IgnorePain                            = Spell(190456),
+  Revenge                               = Spell(6572),
+  RevengeBuff                           = Spell(5302),
+  DemoralizingShout                     = Spell(1160),
+  LastStand                             = Spell(12975),
+  LastStandBuff                         = Spell(12975),
   BoomingVoice                          = Spell(202743),
   Ravager                               = Spell(228920),
   UnstoppableForce                      = Spell(275336),

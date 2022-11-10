@@ -170,11 +170,6 @@ local function Aoe()
     SuggestRageDump(10)
     if Cast(S.Ravager, nil, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager aoe 2"; end
   end
-  -- dragon_roar
-  if S.DragonRoar:IsCastable() then
-    SuggestRageDump(20)
-    if Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar, nil, not Target:IsInMeleeRange(12)) then return "dragon_roar aoe 4"; end
-  end
   -- thunder_clap,if=buff.outburst.up
   if S.ThunderClap:IsCastable() and (Player:BuffUp(S.OutburstBuff)) then
     SuggestRageDump(5)
@@ -203,11 +198,6 @@ local function Generic()
     SuggestRageDump(10)
     if Cast(S.Ravager, nil, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager generic 2"; end
   end
-  -- dragon_roar
-  if S.DragonRoar:IsCastable() then
-    SuggestRageDump(20)
-    if Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar, nil, not Target:IsInMeleeRange(12)) then return "dragon_roar generic 4"; end
-  end
   if (not ShouldPressShieldBlock()) then
     -- execute
     if S.Execute:IsReady() then
@@ -230,12 +220,8 @@ local function Generic()
   end
   -- revenge
   -- Manually added: Reserve 30 Rage for ShieldBlock
-  if S.Revenge:IsReady() and (Player:Rage() >= 50 and not ShouldPressShieldBlock()) then
+  if S.Revenge:IsReady() and (Player:Rage() >= 30 and not ShouldPressShieldBlock()) then
     if Cast(S.Revenge, nil, nil, not TargetInMeleeRange) then return "revenge generic 22"; end
-  end
-  -- devastate
-  if S.Devastate:IsCastable() then
-    if Cast(S.Devastate, nil, nil, not TargetInMeleeRange) then return "devastate generic 24"; end
   end
 end
 
@@ -302,10 +288,6 @@ local function APL()
     if S.ThunderClap:IsCastable() and (Player:BuffUp(S.OutburstBuff) and (Player:BuffStack(S.SeeingRedBuff) > 6 and S.ShieldSlam:CooldownRemains() > 2)) then
       if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap main 6"; end
     end
-    -- avatar,if=buff.outburst.down
-    if S.Avatar:IsCastable() and (Player:BuffDown(S.OutburstBuff)) then
-      if Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar main 8"; end
-    end
     -- potion,if=buff.avatar.up|target.time_to_die<25
     if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.AvatarBuff) or Target:TimeToDie() < 25) then
       if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 10"; end
@@ -332,15 +314,13 @@ local function APL()
     if S.IgnorePain:IsReady() and IgnorePainWillNotCap() and (Target:HealthPercentage() >= 20 and (Target:HealthPercentage() >= 80 and CovenantID ~= 2) and (Player:Rage() >= 85 and S.ShieldSlam:CooldownUp() and Player:BuffUp(S.ShieldBlockBuff) or Player:Rage() >= 60 and S.DemoralizingShout:CooldownUp() and S.BoomingVoice:IsAvailable() or Player:Rage() >= 70 and S.Avatar:CooldownUp() or Player:Rage() >= 40 and S.DemoralizingShout:CooldownUp() and S.BoomingVoice:IsAvailable() and Player:BuffUp(S.LastStandBuff) or Player:Rage() >= 55 and S.Avatar:CooldownUp() and Player:BuffUp(S.LastStandBuff) or Player:Rage() >= 80 or Player:Rage() >= 55 and S.ShieldSlam:CooldownUp() and Player:BuffUp(S.OutburstBuff) and Player:BuffUp(S.ShieldBlockBuff) or Player:Rage() >= 30 and S.ShieldSlam:CooldownUp() and Player:BuffUp(S.OutburstBuff) and Player:BuffUp(S.LastStandBuff) and Player:BuffUp(S.ShieldBlockBuff))) then
       if Cast(S.IgnorePain, nil, Settings.Protection.DisplayStyle.Defensive) then return "ignore_pain main 20"; end
     end
-    -- shield_block,if=(buff.shield_block.down|buff.shield_block.remains<cooldown.shield_slam.remains)&target.health.pct>20
-    -- Note: Handled via Defensive()
-    -- last_stand,if=target.health.pct>=90|target.health.pct<=20
-    -- Note: Handled via Defensive()
     -- demoralizing_shout,if=talent.booming_voice.enabled&rage<60
     if S.DemoralizingShout:IsCastable() and (S.BoomingVoice:IsAvailable() and Player:Rage() < 60) then
       SuggestRageDump(40)
       if Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout, nil, not Target:IsInRange(10)) then return "demoralizing_shout main 22"; end
     end
+    -- shield_block,if=(buff.shield_block.down|buff.shield_block.remains<cooldown.shield_slam.remains)&target.health.pct>20
+    -- Note: Handled via Defensive()
     -- shield_slam,if=buff.outburst.up&rage<=55
     if S.ShieldSlam:IsCastable() and (Player:BuffUp(S.OutburstBuff) and Player:Rage() <= 55) then
       if Cast(S.ShieldSlam, nil, nil, not TargetInMeleeRange) then return "shield_slam main 24"; end
@@ -371,7 +351,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Protection Warrior rotation has not been updated for pre-patch 10.0. It may not function properly or may cause errors in-game.")
+  HR.Print("Arms Warrior rotation is currently a work in progress, but has been updated for patch 10.0.0.")
 end
 
 HR.SetAPL(73, APL, Init)

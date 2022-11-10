@@ -356,7 +356,7 @@
     -- Warrior
       [71]    = "HeroRotation_Warrior",       -- Arms
       [72]    = "HeroRotation_Warrior",       -- Fury
-      --[73]    = "HeroRotation_Warrior"        -- Protection
+      [73]    = "HeroRotation_Warrior"        -- Protection
   };
   local LatestSpecIDChecked = 0;
   function HR.PulseInit ()
