@@ -35,16 +35,22 @@ Spell.Druid.Commons = {
   Prowl                                 = Spell(5215),
   Shred                                 = Spell(5221),
   -- Talents
+  ConvoketheSpirits                     = Spell(391528),
   HeartoftheWild                        = Spell(319454),
   Innervate                             = Spell(29166),
-  MoonkinForm                           = Spell(24858),
+  Maim                                  = Spell(22570),
+  MightyBash                            = Spell(5211),
+  MoonkinForm                           = MultiSpell(24858,197625),
   Rake                                  = Spell(1822),
   Rip                                   = Spell(1079),
   SkullBash                             = Spell(106839),
   Starfire                              = Spell(194153),
-  Starsurge                             = Spell(78674),
+  Starsurge                             = MultiSpell(78674,197626),
   Sunfire                               = Spell(93402),
   SurvivalInstincts                     = Spell(61336),
+  Swipe                                 = Spell(213764),
+  Thrash                                = Spell(106830),
+  WildCharge                            = Spell(49376),
   -- Buffs
   HeartoftheWildBuff                    = Spell(319454),
   -- Debuffs
@@ -52,10 +58,11 @@ Spell.Druid.Commons = {
   RakeDebuff                            = Spell(155722),
   RipDebuff                             = Spell(1079),
   SunfireDebuff                         = Spell(164815),
+  ThrashDebuff                          = Spell(106830),
   -- Covenant Abilities
-  AdaptiveSwarm                         = Spell(325727),
-  AdaptiveSwarmDebuff                   = Spell(325733),
-  AdaptiveSwarmHeal                     = Spell(325748),
+  AdaptiveSwarmCov                      = Spell(325727),
+  AdaptiveSwarmCovDebuff                = Spell(325733),
+  AdaptiveSwarmCovHeal                  = Spell(325748),
   AstralCommunion                       = Spell(202359),
   ConvoketheSpiritsCov                  = Spell(323764),
   EmpowerBond                           = Spell(326647),
@@ -98,7 +105,6 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   AetherialKindling                     = Spell(327541),
   BalanceofAllThings                    = Spell(394048),
   CelestialAlignment                    = Spell(383410),
-  ConvoketheSpirits                     = Spell(391528),
   ForceofNature                         = Spell(205636),
   FungalGrowth                          = Spell(392999),
   FuryofElune                           = Spell(202770),
@@ -154,34 +160,29 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
 
 Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   -- Abilties
-  Berserk                               = Spell(106951),
-  Clearcasting                          = Spell(135700),
-  Maim                                  = Spell(22570),
-  Swipe                                 = Spell(106785),
-  Thrash                                = Spell(106830),
-  ThrashDebuff                          = Spell(106830),
-  TigersFury                            = Spell(5217),
   -- Talents
-  BalanceAffinity                       = Spell(197488),
+  AdaptiveSwarm                         = Spell(391888),
+  Berserk                               = Spell(106951),
   Bloodtalons                           = Spell(319439),
-  BloodtalonsBuff                       = Spell(145152),
   BrutalSlash                           = Spell(202028),
   FeralFrenzy                           = Spell(274837),
   Incarnation                           = Spell(102543),
   LunarInspiration                      = Spell(155580),
   LIMoonfire                            = Spell(155625), -- Lunar Inspiration Moonfire
-  LIMoonfireDebuff                      = Spell(155625),
-  MightyBash                            = Spell(5211),
   Predator                              = Spell(202021),
   PrimalWrath                           = Spell(285381),
+  RipandTear                            = Spell(391347),
   Sabertooth                            = Spell(202031),
-  SavageRoar                            = Spell(52610),
   SouloftheForest                       = Spell(158476),
-  WildCharge                            = Spell(49376),
-  -- Owlweaving Abilities
-  MoonkinForm                           = Spell(197625),
-  Starsurge                             = Spell(197626),
-  Sunfire                               = Spell(197630),
+  TearOpenWounds                        = Spell(391785),
+  TigersFury                            = Spell(5217),
+  -- Buffs
+  BloodtalonsBuff                       = Spell(145152),
+  Clearcasting                          = Spell(135700),
+  -- Debuffs
+  AdaptiveSwarmDebuff                   = Spell(391889),
+  AdaptiveSwarmHeal                     = Spell(391891),
+  LIMoonfireDebuff                      = Spell(155625),
   -- Legendary Effects
   ApexPredatorsCravingBuff              = Spell(339140)
 })
@@ -214,7 +215,6 @@ Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Commons, {
   -- Abilities
   EclipseLunar                          = Spell(48518),
   EclipseSolar                          = Spell(48517),
-  MoonkinForm                           = Spell(197625),
   Starfire                              = Spell(197628),
   Starsurge                             = Spell(197626),
   Sunfire                               = Spell(93402),

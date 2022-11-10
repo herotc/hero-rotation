@@ -100,9 +100,9 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  S.AdaptiveSwarm:RegisterInFlight()
+  S.AdaptiveSwarmCov:RegisterInFlight()
 end, "LEARNED_SPELL_IN_TAB")
-S.AdaptiveSwarm:RegisterInFlight()
+S.AdaptiveSwarmCov:RegisterInFlight()
 
 HL:RegisterForEvent(function()
   CaInc = S.IncarnationTalent:IsAvailable() and S.Incarnation or S.CelestialAlignment
@@ -142,7 +142,7 @@ end
 
 local function EvaluateCycleAdaptiveSwarmST(TargetUnit)
   -- target_if=!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>5)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<3&dot.adaptive_swarm_damage.ticking
-  return (TargetUnit:DebuffDown(S.AdaptiveSwarmDebuff) and (not S.AdaptiveSwarm:InFlight()) and (Player:BuffDown(S.AdaptiveSwarmHeal) or Player:BuffRemains(S.AdaptiveSwarmHeal) > 5) or TargetUnit:DebuffStack(S.AdaptiveSwarmDebuff) < 3 and TargetUnit:DebuffRemains(S.AdaptiveSwarmDebuff) < 3 and TargetUnit:DebuffUp(S.AdaptiveSwarmDebuff))
+  return (TargetUnit:DebuffDown(S.AdaptiveSwarmCovDebuff) and (not S.AdaptiveSwarmCov:InFlight()) and (Player:BuffDown(S.AdaptiveSwarmCovHeal) or Player:BuffRemains(S.AdaptiveSwarmCovHeal) > 5) or TargetUnit:DebuffStack(S.AdaptiveSwarmCovDebuff) < 3 and TargetUnit:DebuffRemains(S.AdaptiveSwarmCovDebuff) < 3 and TargetUnit:DebuffUp(S.AdaptiveSwarmCovDebuff))
 end
 
 local function EvaluateCycleStellarFlareST(TargetUnit)
@@ -162,7 +162,7 @@ end
 
 local function EvaluateCycleAdaptiveSwarmAoE(TargetUnit)
   -- target_if=!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>5)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<3&dot.adaptive_swarm_damage.ticking
-  return (TargetUnit:DebuffDown(S.AdaptiveSwarmDebuff) and (not S.AdaptiveSwarm:InFlight()) and (Player:BuffDown(S.AdaptiveSwarmHeal) or Player:BuffRemains(S.AdaptiveSwarmHeal) > 5) or TargetUnit:DebuffStack(S.AdaptiveSwarmDebuff) < 3 and TargetUnit:DebuffRemains(S.AdaptiveSwarmDebuff) < 3 and TargetUnit:DebuffUp(S.AdaptiveSwarmDebuff))
+  return (TargetUnit:DebuffDown(S.AdaptiveSwarmCovDebuff) and (not S.AdaptiveSwarmCov:InFlight()) and (Player:BuffDown(S.AdaptiveSwarmCovHeal) or Player:BuffRemains(S.AdaptiveSwarmCovHeal) > 5) or TargetUnit:DebuffStack(S.AdaptiveSwarmCovDebuff) < 3 and TargetUnit:DebuffRemains(S.AdaptiveSwarmCovDebuff) < 3 and TargetUnit:DebuffUp(S.AdaptiveSwarmCovDebuff))
 end
 
 local function EvaluateCycleStellarFlareAoE(TargetUnit)
@@ -248,8 +248,8 @@ local function St()
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireST, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire st 6"; end
   end
   -- adaptive_swarm,target_if=!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>5)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<3&dot.adaptive_swarm_damage.ticking
-  if S.AdaptiveSwarm:IsCastable() then
-    if Everyone.CastCycle(S.AdaptiveSwarm, Enemies40y, EvaluateCycleAdaptiveSwarmST, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm st 8"; end
+  if S.AdaptiveSwarmCov:IsCastable() then
+    if Everyone.CastCycle(S.AdaptiveSwarmCov, Enemies40y, EvaluateCycleAdaptiveSwarmST, not Target:IsSpellInRange(S.AdaptiveSwarmCov)) then return "adaptive_swarm st 8"; end
   end
   -- stellar_flare,target_if=refreshable&astral_power.deficit>variable.passive_asp+8
   if S.StellarFlare:IsCastable() then
@@ -373,8 +373,8 @@ local function AoE()
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireAoE, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire aoe 4"; end
   end
   -- adaptive_swarm,target_if=!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>5)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<3&dot.adaptive_swarm_damage.ticking
-  if S.AdaptiveSwarm:IsCastable() then
-    if Everyone.CastCycle(S.AdaptiveSwarm, Enemies40y, EvaluateCycleAdaptiveSwarmAoE, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm aoe 6"; end
+  if S.AdaptiveSwarmCov:IsCastable() then
+    if Everyone.CastCycle(S.AdaptiveSwarmCov, Enemies40y, EvaluateCycleAdaptiveSwarmAoE, not Target:IsSpellInRange(S.AdaptiveSwarmCov)) then return "adaptive_swarm aoe 6"; end
   end
   -- variable,name=cd_condition_aoe,value=!buff.ca_inc.up&(target.1.time_to_die>10-5*talent.orbital_strike|fight_remains<25+10*talent.incarnation_chosen_of_elune)
   VarCDConditionAoE = (not CAIncBuffUp) and (Target:TimeToDie() > 10 - 5 * num(S.OrbitalStrike:IsAvailable()) or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable()))
