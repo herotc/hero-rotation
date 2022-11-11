@@ -316,7 +316,7 @@
     -- Druid
       [102]   = "HeroRotation_Druid",         -- Balance
       [103]   = "HeroRotation_Druid",         -- Feral
-      --[104]   = "HeroRotation_Druid",         -- Guardian
+      [104]   = "HeroRotation_Druid",         -- Guardian
       --[105]   = "HeroRotation_Druid",         -- Restoration
     -- Evoker
       [1467]  = "HeroRotation_Evoker",        -- Devastation

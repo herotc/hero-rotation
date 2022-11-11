@@ -31,13 +31,16 @@ Spell.Druid.Commons = {
   BearForm                              = Spell(5487),
   CatForm                               = Spell(768),
   FerociousBite                         = Spell(22568),
+  MarkoftheWild                         = Spell(1126),
   Moonfire                              = Spell(8921),
   Prowl                                 = Spell(5215),
   Shred                                 = Spell(5221),
   -- Talents
   ConvoketheSpirits                     = Spell(391528),
+  FrenziedRegeneration                  = Spell(22842),
   HeartoftheWild                        = Spell(319454),
   Innervate                             = Spell(29166),
+  Ironfur                               = Spell(192081),
   Maim                                  = Spell(22570),
   MightyBash                            = Spell(5211),
   MoonkinForm                           = MultiSpell(24858,197625),
@@ -48,17 +51,19 @@ Spell.Druid.Commons = {
   Starsurge                             = MultiSpell(78674,197626),
   Sunfire                               = Spell(93402),
   SurvivalInstincts                     = Spell(61336),
-  Swipe                                 = Spell(213764),
-  Thrash                                = Spell(106830),
-  WildCharge                            = Spell(49376),
+  Swipe                                 = MultiSpell(213764,213771),
+  Thrash                                = MultiSpell(77758,106830),
+  WildCharge                            = MultiSpell(16979,49376),
   -- Buffs
+  FrenziedRegenerationBuff              = Spell(22842),
   HeartoftheWildBuff                    = Spell(319454),
+  IronfurBuff                           = Spell(192081),
   -- Debuffs
   MoonfireDebuff                        = Spell(164812),
   RakeDebuff                            = Spell(155722),
   RipDebuff                             = Spell(1079),
   SunfireDebuff                         = Spell(164815),
-  ThrashDebuff                          = Spell(106830),
+  ThrashDebuff                          = MultiSpell(106830,192090),
   -- Covenant Abilities
   AdaptiveSwarmCov                      = Spell(325727),
   AdaptiveSwarmCovDebuff                = Spell(325733),
@@ -189,26 +194,26 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
 
 Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   -- Abilities
-  Berserk                               = Spell(50334),
-  BerserkBuff                           = Spell(50334),
-  FrenziedRegeneration                  = Spell(22842),
-  FrenziedRegenerationBuff              = Spell(22842),
-  Ironfur                               = Spell(192081),
-  IronfurBuff                           = Spell(192081),
   Mangle                                = Spell(33917),
-  Maul                                  = Spell(6807),
-  Swipe                                 = Spell(213771),
-  Thrash                                = Spell(77758),
-  ThrashDebuff                          = Spell(192090),
   -- Talents
-  BalanceAffinity                       = Spell(197488),
+  Berserk                               = Spell(50334),
   BristlingFur                          = Spell(155835),
-  GalacticGuardianBuff                  = Spell(213708),
+  Maul                                  = Spell(6807),
   Incarnation                           = Spell(102558),
-  IncarnationBuff                       = Spell(102558),
   Pulverize                             = Spell(80313),
+  RageoftheSleeper                      = Spell(200851),
+  SouloftheForest                       = Spell(158477),
+  ViciousCycle                          = Spell(371999),
+  -- Buffs
+  BerserkBuff                           = Spell(50334),
+  GalacticGuardianBuff                  = Spell(213708),
+  GoreBuff                              = Spell(93662),
+  IncarnationBuff                       = Spell(102558),
   ToothandClawBuff                      = Spell(135286),
-  WildCharge                            = Spell(16979),
+  ViciousCycleMaulBuff                  = Spell(372015),
+  ViciousCycleMangleBuff                = Spell(372019),
+  -- Debuffs
+  ToothandClawDebuff                    = Spell(135601),
 })
 
 Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Commons, {
