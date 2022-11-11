@@ -48,11 +48,17 @@ local Settings = {
 -- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
 local CovenantID = Player:CovenantID()
 
+-- Trinket Item Objects
+local equip = Player:GetEquipment()
+local trinket1 = equip[13] and Item(equip[13]) or Item(0)
+local trinket2 = equip[14] and Item(equip[14]) or Item(0)
+
 -- Rotation Var
 local Enemies25y
 local Enemies8ySplash
 local EnemiesCount8ySplash
 local MaxEssenceBurstStack = (S.EssenceAttunement:IsAvailable()) and 2 or 1
+local VarTrinket1Sync, VarTrinket2Sync, TrinketPriority
 
 -- Stun Interrupts
 local StunInterrupts = {
@@ -60,10 +66,17 @@ local StunInterrupts = {
   {S.WingBuffet, "Cast Wing Buffet (Interrupt)", function() return true; end},
 }
 
+-- Update Equipment
+HL:RegisterForEvent(function()
+  equip = Player:GetEquipment()
+  trinket1 = equip[13] and Item(equip[13]) or Item(0)
+  trinket2 = equip[14] and Item(equip[14]) or Item(0)
+end, "PLAYER_EQUIPMENT_CHANGED")
+
 -- Update CovenantID if we change Covenants
 HL:RegisterForEvent(function()
   CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN", "PLAYER_EQUIPMENT_CHANGED")
+end, "COVENANT_CHOSEN")
 
 -- Talent change registrations
 HL:RegisterForEvent(function()
@@ -83,6 +96,12 @@ local function Precombat()
   -- augmentation
   -- food
   -- snapshot_stats
+  -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(trinket.1.cooldown.duration%%cooldown.dragonrage.duration=0)
+  -- VarTrinket1Sync = (trinket1:TrinketHasUseBuff() and (trinket1:Cooldown() % 120 == 0)) and 1 or 0
+  -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(trinket.2.cooldown.duration%%cooldown.dragonrage.duration=0)
+  -- VarTrinket2Sync = (trinket2:TrinketHasUseBuff() and (trinket2:Cooldown() % 120 == 0)) and 1 or 0
+  -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!trinket.1.has_use_buff&trinket.2.has_use_buff|trinket.2.has_use_buff&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.intelligence)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.intelligence)*(variable.trinket_1_sync))
+  -- TODO: Can't yet handle all of these trinket conditions
   -- use_item,name=shadowed_orb_of_torment
   if Settings.Commons.Enabled.Trinkets and I.ShadowedOrbofTorment:IsEquippedAndReady() then
     if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment precombat"; end
@@ -101,6 +120,21 @@ local function Defensives()
   if S.ObsidianScales:IsCastable() and (Player:HealthPercentage() < Settings.Devastation.ObsidianScalesThreshold) then
     if Cast(S.ObsidianScales, nil, Settings.Commons.DisplayStyle.Defensives) then return "obsidian_scales defensives"; end
   end
+end
+
+local function Trinkets()
+  -- use_item,slot=trinket1,if=buff.dragonrage.up&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
+  -- use_item,slot=trinket2,if=buff.dragonrage.up&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
+  -- use_item,slot=trinket1,if=(!trinket.1.has_use_buff&(trinket.2.cooldown.remains|!trinket.2.has_use_buff)|cooldown.dragonrage.remains>20|!talent.dragonrage)
+  -- use_item,slot=trinket2,if=(!trinket.2.has_use_buff&(trinket.1.cooldown.remains|!trinket.1.has_use_buff)|cooldown.dragonrage.remains>20|!talent.dragonrage)
+  -- Note: Can't handle above trinket tracking, so let's use the old fallback. When we can do above tracking, the below can be removed.
+  -- use_items,if=buff.dragonrage.up
+      if Player:BuffUp(S.Dragonrage) then
+        local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+        if TrinketToUse then
+          if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+        end
+      end
 end
 
 -- APL Main
@@ -137,13 +171,8 @@ local function APL()
       if I.CrimsonAspirantsBadgeofFerocity:IsEquippedAndReady() and (S.Dragonrage:CooldownRemains() >= 55) then
         if Cast(S.CrimsonAspirantsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "crimson_aspirants_badge_of_ferocity main 6"; end
       end
-      -- use_items,if=buff.dragonrage.up
-      if Player:BuffUp(S.Dragonrage) then
-        local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-        if TrinketToUse then
-          if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
-        end
-      end
+      -- call_action_list,name=trinkets
+      local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- deep_breath,if=spell_targets.deep_breath>1&buff.dragonrage.down
     if S.DeepBreath:IsCastable() and (EnemiesCount8ySplash > 1 and Player:BuffDown(S.Dragonrage)) then
@@ -213,11 +242,11 @@ local function APL()
     if S.LivingFlame:IsCastable() and (not Player:IsCasting(S.LivingFlame)) and (Player:Essence() < Player:EssenceMax() and Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack and (Player:BuffUp(S.BurnoutBuff) or (not S.EngulfingBlaze:IsAvailable()) and (not S.ShatteringStar:IsAvailable()) and Player:BuffUp(S.Dragonrage) and Target:HealthPercentage() > 80)) then
       if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame main 32"; end
     end
-    -- disintegrate,early_chain_if=ticks>=2,if=buff.dragonrage.up,interrupt_if=buff.dragonrage.up&ticks>=2,interrupt_immediate=1
+    -- disintegrate,chain=1,if=buff.dragonrage.up,interrupt_if=buff.dragonrage.up&ticks>=2,interrupt_immediate=1
     if S.Disintegrate:IsReady() and (Player:BuffUp(S.Dragonrage)) then
       if Cast(S.Disintegrate, nil, nil, not Target:IsInRange(25)) then return "disintegrate main 28"; end
     end
-    -- disintegrate,early_chain_if=ticks>=2,if=essence=essence.max|buff.essence_burst.stack=buff.essence_burst.max_stack|debuff.shattering_star_debuff.up|cooldown.shattering_star.remains>=3*gcd.max|!talent.shattering_star
+    -- disintegrate,chain=1,if=essence=essence.max|buff.essence_burst.stack=buff.essence_burst.max_stack|debuff.shattering_star_debuff.up|cooldown.shattering_star.remains>=3*gcd.max|!talent.shattering_star
     if S.Disintegrate:IsReady() and (Player:Essence() == Player:EssenceMax() or Player:BuffStack(S.EssenceBurstBuff) == MaxEssenceBurstStack or Target:DebuffUp(S.ShatteringStar) or S.ShatteringStar:CooldownRemains() >= 3 * Player:GCD() or not S.ShatteringStar:IsAvailable()) then
       if Cast(S.Disintegrate, nil, nil, not Target:IsInRange(25)) then return "disintegrate main 30"; end
     end
