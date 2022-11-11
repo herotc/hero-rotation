@@ -313,7 +313,7 @@ local function CDs ()
     and (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.TrueBearing)) + num(Player:BuffUp(S.SkullandCrossbones))) > 2 then
     if HR.Cast(S.KeepItRolling) then return "Cast Keep it Rolling" end
   end
-  if Target:IsSpellInRange(S.SinisterStrike) then
+  if Target:IsSpellInRange(S.SinisterStrike) then   
     -- actions.cds+=/flagellation,target_if=max:target.time_to_die,if=!stealthed.all&(variable.finish_condition&target.time_to_die>10|fight_remains<13)
     if CDsON() and S.Flagellation:IsReady() and not Player:StealthUp(true, true) then
       if Everyone.CastTargetIf(S.Flagellation, EnemiesBF, "max", EvaluateFlagellationTargetIfCondition,

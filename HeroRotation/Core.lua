@@ -83,7 +83,11 @@
     local CurrentTime = GetTime()
     if Player:IsCasting() or Player:IsChanneling() then
       StartTime = Player:CastStart()
-      CastDuration = Player:CastDuration()
+      if HR.GUISettings.General.HideGcdSwirl then
+        CastDuration = 0.1
+      else
+        CastDuration = Player:CastDuration()
+      end
     else
       --StartTime, CastDuration = GCDSpell:CooldownInfo()
       if HR.GUISettings.General.HideGcdSwirl then
