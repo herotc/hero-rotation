@@ -110,6 +110,7 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   AetherialKindling                     = Spell(327541),
   BalanceofAllThings                    = Spell(394048),
   CelestialAlignment                    = Spell(383410),
+  ElunesGuidance                        = Spell(393991),
   ForceofNature                         = Spell(205636),
   FungalGrowth                          = Spell(392999),
   FuryofElune                           = Spell(202770),
