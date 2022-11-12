@@ -340,7 +340,7 @@
     -- Priest
       --[256]   = "HeroRotation_Priest",        -- Discipline
       --[257]   = "HeroRotation_Priest",        -- Holy
-      --[258]   = "HeroRotation_Priest",        -- Shadow
+      [258]   = "HeroRotation_Priest",        -- Shadow
     -- Rogue
       --[259]   = "HeroRotation_Rogue",         -- Assassination
       [260]   = "HeroRotation_Rogue",         -- Outlaw
