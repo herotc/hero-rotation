@@ -164,7 +164,7 @@ local function Execute()
       if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 20"; end
     end
     -- kyrian_spear,if=debuff.colossus_smash.up|buff.test_of_might.up
-    if S.SpearofBastionCov:IsCastable() then
+    if S.SpearofBastionCov:IsReady() then
       if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "kyrian_spear execute 22"; end
     end
     -- ancient_aftershock,if=debuff.colossus_smash.up|buff.test_of_might.up
@@ -236,7 +236,7 @@ local function SingleTarget()
     if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion single_target 12"; end
   end
   -- kyrian_spear
-  if CDsON() and S.SpearofBastionCov:IsCastable() then
+  if CDsON() and S.SpearofBastionCov:IsReady() then
     if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "kyrian_spear single_target 14"; end
   end
   -- skullsplitter,if=dot.rend.remains>duration*0.95&(debuff.colossus_smash.up&rage<60|buff.test_of_might.up)

@@ -298,7 +298,7 @@ local function Bear()
     if Cast(S.EmpowerBond, nil, Settings.Commons.DisplayStyle.Covenant) then return "empower_bond bear 40"; end
   end
   -- adaptive_swarm,if=(!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>3)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<5&dot.adaptive_swarm_damage.ticking)
-  if S.AdaptiveSwarmCov:IsCastable() and (Target:DebuffDown(S.AdaptiveSwarmCovDebuff) and not S.AdaptiveSwarmCov:InFlight() and (Target:DebuffDown(S.AdaptiveSwarmCovDebuff) or Player:BuffRemains(S.AdaptiveSwarmCovHeal) > 3) or Target:DebuffStack(S.AdaptiveSwarmCovDebuff) < 3 and Target:DebuffRemains(S.AdaptiveSwarmCovDebuff) < 5 and Target:DebuffUp(S.AdaptiveSwarmCovDebuff)) then
+  if S.AdaptiveSwarmCov:IsReady() and (Target:DebuffDown(S.AdaptiveSwarmCovDebuff) and not S.AdaptiveSwarmCov:InFlight() and (Target:DebuffDown(S.AdaptiveSwarmCovDebuff) or Player:BuffRemains(S.AdaptiveSwarmCovHeal) > 3) or Target:DebuffStack(S.AdaptiveSwarmCovDebuff) < 3 and Target:DebuffRemains(S.AdaptiveSwarmCovDebuff) < 5 and Target:DebuffUp(S.AdaptiveSwarmCovDebuff)) then
     if Cast(S.AdaptiveSwarmCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.AdaptiveSwarmCov)) then return "adaptive_swarm bear 42"; end
   end
   -- fleshcraft,if=soulbind.pustule_eruption.enabled&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0)&(dot.moonfire.remains>=3)&(buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&buff.galactic_guardian.down))|soulbind.volatile_solvent.enabled,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent&(cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0)
