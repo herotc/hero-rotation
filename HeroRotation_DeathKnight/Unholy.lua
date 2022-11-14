@@ -416,8 +416,8 @@ local function Generic()
   if S.DeathCoil:IsReady() and ((not VarPoolingRunicPower) and (Player:BuffUp(S.SuddenDoomBuff) or Player:RunicPowerDeficit() <= 40 or Player:Rune() < 3) or ghoul:gargactive() and (S.Apocalypse:CooldownRemains() > Player:GCD() or FesterStacks >= 4) or FightRemains < (30 / Player:GCD())) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil generic 2"; end
   end
-  -- any_dnd,if=active_enemies>=2&death_knight.fwounded_targets=active_enemies
-  if AnyDnD:IsReady() and (Enemies10ySplashCount >= 2 and S.FesteringWoundDebuff:AuraActiveCount() == EnemiesMeleeCount) then
+  -- any_dnd,if=!death_and_decay.ticking&(active_enemies>=2&death_knight.fwounded_targets=active_enemies|covenant.night_fae|runeforge.phearomones)
+  if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and (Enemies10ySplashCount >= 2 and S.FesteringWoundDebuff:AuraActiveCount() == EnemiesMeleeCount or CovenantID == 3 or PhearomonesEquipped)) then
     if AnyDnD == S.DeathsDue then
       if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Covenant) then return "any_dnd generic 4"; end
     else
@@ -528,8 +528,8 @@ local function APL()
     end
     -- variable,name=build_wounds,value=debuff.festering_wound.stack<4
     VarBuildWounds = FesterStacks < 4
-    -- variable,name=pop_wounds,value=!cooldown.apocalypse.ready&(variable.festermight_tracker|debuff.festering_wound.stack>=1&!talent.apocalypse|debuff.festering_wound.up&cooldown.unholy_assault.remains<30&talent.unholy_assault&!talent.summon_gargoyle&variable.st_planning|debuff.festering_wound.stack>4)
-    VarPopWounds = (S.Apocalypse:CooldownDown() and (VarFesterTracker or FesterStacks >= 1 and (not S.Apocalypse:IsAvailable()) or FesterStacks > 0 and S.UnholyAssault:CooldownRemains() < 30 and S.UnholyAssault:IsAvailable() and (not S.SummonGargoyle:IsAvailable()) and VarSTPlanning or FesterStacks > 4))
+    -- variable,name=pop_wounds,value=(!cooldown.apocalypse.ready|!talent.apocalypse)&(variable.festermight_tracker|debuff.festering_wound.stack>=1&!talent.apocalypse|debuff.festering_wound.up&cooldown.unholy_assault.remains<30&talent.unholy_assault&!talent.summon_gargoyle&variable.st_planning|debuff.festering_wound.stack>4)
+    VarPopWounds = ((S.Apocalypse:CooldownDown() or not S.Apocalypse:IsAvailable()) and (VarFesterTracker or FesterStacks >= 1 and (not S.Apocalypse:IsAvailable()) or FesterStacks > 0 and S.UnholyAssault:CooldownRemains() < 30 and S.UnholyAssault:IsAvailable() and (not S.SummonGargoyle:IsAvailable()) and VarSTPlanning or FesterStacks > 4))
     -- variable,name=pooling_runic_power,value=cooldown.summon_gargoyle.remains<variable.garg_pooling&talent.summon_gargoyle|talent.eternal_agony&cooldown.dark_transformation.remains<3&!active_enemies>=3|talent.vile_contagion&cooldown.vile_contagion.remains<3&runic_power<60&!variable.st_planning
     VarPoolingRunicPower = (S.SummonGargoyle:CooldownRemains() < VarGargPooling and S.SummonGargoyle:IsAvailable() or S.EternalAgony:IsAvailable() and S.DarkTransformation:CooldownRemains() < 3 and Enemies10ySplashCount < 3 or S.VileContagion:IsAvailable() and S.VileContagion:CooldownRemains() < 3 and Player:RunicPower() < 60 and not VarSTPlanning)
     -- variable,name=pooling_runes,value=talent.soul_reaper&rune<2&target.time_to_pct_35<5&fight_remains>(dot.soul_reaper.remains+5)

@@ -43,24 +43,12 @@ HL.AddCoreOverride ("Player.Insanity",
     if not Player:IsCasting() then
       return Insanity
     else
-      local FotMMod = SpellShadow.FortressOfTheMind:IsAvailable() and 1.2 or 1.0
-      local STMMod = Player:BuffUp(SpellShadow.SurrenderToMadness) and 2.0 or 1.0
       if Player:IsCasting(SpellShadow.MindBlast) then
-        return Insanity + (8 * FotMMod * STMMod)
+        return Insanity + 6
       elseif Player:IsCasting(SpellShadow.VampiricTouch) then
-        return Insanity + (5 * STMMod)
+        return Insanity + 4
       elseif Player:IsCasting(SpellShadow.MindFlay) then
-        return Insanity + ((18 * FotMMod * STMMod) / SpellShadow.MindFlay:BaseDuration())
-      elseif Player:IsCasting(SpellShadow.MindSear) then
-        local targets
-        if HR.GUISettings.APL.Priest.Shadow.UseSplashData then
-          targets = Target:GetEnemiesInSplashRangeCount(10)
-        else
-          targets = Player:GetEnemiesInRange(15)
-        end
-        return Insanity + ((6 * targets * STMMod) / SpellShadow.MindSear:BaseDuration())
-      elseif Player:IsCasting(SpellShadow.VoidTorrent) then
-        return Insanity + ((30 * STMMod) / SpellShadow.MindSear:BaseDuration())
+        return Insanity + (12 / SpellShadow.MindFlay:BaseDuration())
       else
         return Insanity
       end

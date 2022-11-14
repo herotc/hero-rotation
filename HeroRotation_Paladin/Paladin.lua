@@ -45,7 +45,7 @@ Spell.Paladin.Commons = {
   ShieldoftheRighteous                  = Spell(53600),
   WordofGlory                           = Spell(85673),
   -- Talents
-  AvengingWrath                         = Spell(384376),
+  AvengingWrath                         = Spell(31884),
   HammerofWrath                         = MultiSpell(24275, 326730),
   HolyAvenger                           = Spell(105809),
   HolyAvengerBuff                       = Spell(105809),
@@ -113,6 +113,7 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   CrusadersJudgment                     = Spell(204023),
   MomentofGlory                         = Spell(327193),
   SanctifiedWrath                       = Spell(171648),
+  DivineToll                            = Spell(375576),
 })
 
 Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {

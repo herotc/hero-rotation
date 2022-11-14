@@ -92,11 +92,11 @@ local function Precombat()
     if Cast(S.BattleShout, Settings.Arms.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
   end
   -- fleshcraft
-  if S.Fleshcraft:IsCastable() then
+  if S.Fleshcraft:IsReady() then
     if Cast(S.Fleshcraft) then return "fleshcraft precombat 6"; end
   end
   -- conquerors_banner
-  if S.ConquerorsBanner:IsCastable() then
+  if S.ConquerorsBanner:IsReady() then
     if Cast(S.ConquerorsBanner) then return "conquerors_banner precombat 4"; end
   end
   -- Manually added opener abilties
@@ -131,11 +131,11 @@ local function Execute()
     if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar execute 2"; end
   end
   -- conquerors_banner
-  if CDsON() and S.ConquerorsBanner:IsCastable() then
+  if CDsON() and S.ConquerorsBanner:IsReady() then
     if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner execute 4"; end
   end
   -- condemn,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd|buff.juggernaut.up&buff.juggernaut.remains<gcd
-  if S.Condemn:IsCastable() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() or Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff)) then
+  if S.Condemn:IsReady() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() or Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff)) then
     if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 6"; end
   end
   -- execute,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd|buff.juggernaut.up&buff.juggernaut.remains<gcd
@@ -164,7 +164,7 @@ local function Execute()
       if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 20"; end
     end
     -- kyrian_spear,if=debuff.colossus_smash.up|buff.test_of_might.up
-    if S.SpearofBastionCov:IsCastable() then
+    if S.SpearofBastionCov:IsReady() then
       if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "kyrian_spear execute 22"; end
     end
     -- ancient_aftershock,if=debuff.colossus_smash.up|buff.test_of_might.up
@@ -216,7 +216,7 @@ local function SingleTarget()
     if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend single_target 2"; end
   end
   -- conquerors_banner,if=target.time_to_die>140
-  if CDsON() and S.ConquerorsBanner:IsCastable() and (Target:TimeToDie() > 140) then
+  if CDsON() and S.ConquerorsBanner:IsReady() and (Target:TimeToDie() > 140) then
     if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner single_target 4"; end
   end
   -- avatar,if=gcd.remains=0
@@ -236,7 +236,7 @@ local function SingleTarget()
     if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion single_target 12"; end
   end
   -- kyrian_spear
-  if CDsON() and S.SpearofBastionCov:IsCastable() then
+  if CDsON() and S.SpearofBastionCov:IsReady() then
     if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "kyrian_spear single_target 14"; end
   end
   -- skullsplitter,if=dot.rend.remains>duration*0.95&(debuff.colossus_smash.up&rage<60|buff.test_of_might.up)

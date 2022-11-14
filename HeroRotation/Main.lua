@@ -316,7 +316,7 @@
     -- Druid
       [102]   = "HeroRotation_Druid",         -- Balance
       [103]   = "HeroRotation_Druid",         -- Feral
-      --[104]   = "HeroRotation_Druid",         -- Guardian
+      [104]   = "HeroRotation_Druid",         -- Guardian
       --[105]   = "HeroRotation_Druid",         -- Restoration
     -- Evoker
       [1467]  = "HeroRotation_Evoker",        -- Devastation
@@ -335,12 +335,12 @@
       --[270]   = "HeroRotation_Monk",          -- Mistweaver
     -- Paladin
       --[65]    = "HeroRotation_Paladin",       -- Holy
-      --[66]    = "HeroRotation_Paladin",       -- Protection
+      [66]    = "HeroRotation_Paladin",       -- Protection
       [70]    = "HeroRotation_Paladin",       -- Retribution
     -- Priest
       --[256]   = "HeroRotation_Priest",        -- Discipline
       --[257]   = "HeroRotation_Priest",        -- Holy
-      --[258]   = "HeroRotation_Priest",        -- Shadow
+      [258]   = "HeroRotation_Priest",        -- Shadow
     -- Rogue
       --[259]   = "HeroRotation_Rogue",         -- Assassination
       [260]   = "HeroRotation_Rogue",         -- Outlaw

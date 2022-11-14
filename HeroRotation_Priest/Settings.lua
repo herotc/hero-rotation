@@ -49,13 +49,14 @@ HR.GUISettings.APL.Priest = {
       Shadowform = true,
       ShadowWordDeath = false,
       VoidEruption = true,
+      DarkAscension = true,
+      DarkVoid = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
       Dispersion = true,
       PowerInfusion = false,
-      SurrenderToMadness = false,
       -- Items
     }
   },
@@ -96,9 +97,12 @@ local CP_Holy = CreateChildPanel(CP_Priest, "Holy")
 CreateARPanelOptions(CP_Priest, "APL.Priest.Commons")
 
 --Shadow
-CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DesperatePrayerHP", {0, 100, 1}, "Desperate Prayer HP", "Set the Desperate Prayer HP threshold.")
-CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", {0, 100, 1}, "Dispersion HP", "Set the Dispersion HP threshold.")
-CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume Self-Power Infusion", "Assume the player will be using Power Infusion on themselves.")
+CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DesperatePrayerHP", { 0, 100, 1 }, "Desperate Prayer HP",
+  "Set the Desperate Prayer HP threshold.")
+CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", { 0, 100, 1 }, "Dispersion HP",
+  "Set the Dispersion HP threshold.")
+CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume Self-Power Infusion",
+  "Assume the player will be using Power Infusion on themselves.")
 CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow")
 
 --Discipline

@@ -70,7 +70,7 @@ end
 local function HandleNightFaeBlessings()
   local Seasons = {S.BlessingofSpring, S.BlessingofSummer, S.BlessingofAutumn, S.BlessingofWinter}
   for _, i in pairs(Seasons) do
-    if i:IsCastable() then
+    if i:IsReady() then
       if Cast(i, nil, Settings.Commons.DisplayStyle.Covenant) then return "blessing_of_the_seasons"; end
     end
   end
@@ -81,7 +81,7 @@ local function Precombat()
   -- food
   -- augmentation
   -- devotion_aura
-  if S.DevotionAura:IsCastable() and (Player:BuffDown(S.DevotionAuraBuff)) then
+  if S.DevotionAura:IsCastable() and (Player:BuffDown(S.DevotionAura)) then
     if Cast(S.DevotionAura) then return "devotion_aura precombat 2"; end
   end
   -- snapshot_stats
@@ -96,7 +96,7 @@ local function Precombat()
     if Cast(S.LightsJudgment, nil, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment precombat 6"; end
   end
   -- ashen_hallow
-  if S.AshenHallow:IsCastable() and Target:IsInRange(30) then
+  if S.AshenHallow:IsReady() and Target:IsInRange(30) then
     if Cast(S.AshenHallow, nil, Settings.Commons.DisplayStyle.Covenant) then return "ashen_hallow precombat 8"; end
   end
   -- Manually added: avengers_shield
@@ -211,14 +211,17 @@ local function Standard()
   end
   -- divine_toll
   if S.DivineToll:IsCastable() then
-    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll standard 19"; end
+    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll generators 19"; end
+  end
+  if S.DivineTollCov:IsReady() then
+    if Cast(S.DivineTollCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll covenant generators 19"; end
   end
   -- blessed_hammer,strikes=2.4,if=charges=3
   if S.BlessedHammer:IsCastable() and (S.BlessedHammer:Charges() == 3) then
     if Cast(S.BlessedHammer, nil, nil, not Target:IsInMeleeRange(5)) then return "blessed_hammer standard 20"; end
   end
   -- ashen_hallow
-  if S.AshenHallow:IsCastable() then
+  if S.AshenHallow:IsReady() then
     if Cast(S.AshenHallow, nil, Settings.Commons.DisplayStyle.Covenant) then return "ashen_hallow standard 22"; end
   end
   -- hammer_of_the_righteous,if=charges=2
@@ -243,7 +246,7 @@ local function Standard()
   end
   -- arcane_torrent
   if S.ArcaneTorrent:IsCastable() then
-    if Cast(S.ArcaneTorrent) then return "arcane_torrent standard 34"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent standard 34"; end
   end
   -- consecration
   if S.Consecration:IsCastable() then
@@ -298,7 +301,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Protection Paladin rotation has not been updated for pre-patch 10.0. It may not function properly or may cause errors in-game.")
+  HR.Print("Protection Paladin rotation is currently a work in progress, but has been updated for patch 10.0.0.")
 end
 
 HR.SetAPL(66, APL, Init)

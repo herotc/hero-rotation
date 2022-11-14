@@ -331,7 +331,7 @@ local function APL()
       if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 18"; end
     end
     -- kyrian_spear,if=buff.enrage.up&(buff.recklessness.up|buff.avatar.up|target.time_to_die<20)
-    if S.SpearofBastionCov:IsCastable() and (EnrageUp and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffUp(S.AvatarBuff) or Target:TimeToDie() < 20)) then
+    if S.SpearofBastionCov:IsReady() and (EnrageUp and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffUp(S.AvatarBuff) or Target:TimeToDie() < 20)) then
       if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(25)) then return "kyrian_spear main 20"; end
     end
     -- spear_of_bastion,if=buff.enrage.up&(buff.recklessness.up|buff.avatar.up|target.time_to_die<20)
