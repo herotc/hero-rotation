@@ -134,6 +134,7 @@ local BtTriggers = {
   S.BrutalSlash,
   S.Swipe,
   S.Shred,
+  S.FeralFrenzy,
 }
 
 local function BTBuffUp(Trigger)
