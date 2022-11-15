@@ -65,6 +65,7 @@ Spell.Hunter.Commons = {
   BloodFuryBuff                         = Spell(20572),
   -- Debuffs
   HuntersMarkDebuff                     = Spell(257284),
+  LatentPoisonDebuff                    = Spell(336903),
   SerpentStingDebuff                    = Spell(271788),
   TarTrapDebuff                         = Spell(135299),
   -- Misc
@@ -90,6 +91,7 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   CalloftheWild                         = Spell(359844),
   CobraShot                             = Spell(193455),
   DireBeast                             = Spell(120679),
+  KillCleave                            = Spell(378207),
   MultiShot                             = Spell(2643),
   OneWithThePack                        = Spell(199528),
   ScentofBlood                          = Spell(193532),
@@ -154,7 +156,6 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   SerpentSting                          = Spell(259491),
   -- Traps
   FreezingTrap                          = Spell(187650),
-  
   -- Bombs
   PheromoneBomb                         = Spell(270323),
   PheromoneBombDebuff                   = Spell(270332),
@@ -181,7 +182,6 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   -- Buffs/Debuffs
   CoordinatedAssaultBuff                = Spell(266779),
   InternalBleedingDebuff                = Spell(270343),
-  LatentPoisonDebuff                    = Spell(336903),
   MadBombardierBuff                     = Spell(363805),
   SerpentStingDebuff                    = Spell(259491),
   SteelTrapDebuff                       = Spell(162487),
