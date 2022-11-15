@@ -322,7 +322,7 @@
       [1467]  = "HeroRotation_Evoker",        -- Devastation
       --[1468] = "HeroRotation_Evoker",         -- Preservation
     -- Hunter
-      --[253]   = "HeroRotation_Hunter",        -- Beast Mastery
+      [253]   = "HeroRotation_Hunter",        -- Beast Mastery
       --[254]   = "HeroRotation_Hunter",        -- Marksmanship
       --[255]   = "HeroRotation_Hunter",        -- Survival
     -- Mage
