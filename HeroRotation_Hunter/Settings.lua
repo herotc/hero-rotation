@@ -20,6 +20,7 @@ HR.GUISettings.APL.Hunter = {
     Enabled = {
       Potions = true,
       Trinkets = true,
+      Items = true,
     },
     DisplayStyle = {
       Covenant = "Suggested",
@@ -28,11 +29,9 @@ HR.GUISettings.APL.Hunter = {
       Items = "Suggested",
     },
     GCDasOffGCD = {
-      AMurderofCrows = false,
       Racials = false,
     },
     OffGCDasOffGCD = {
-      Racials = true,
     }
   },
   Commons2 = {
@@ -47,6 +46,7 @@ HR.GUISettings.APL.Hunter = {
       MendPet = false,
       SummonPet = false,
       FreezingTrap = false,
+      SteelTrap = false,
       TarTrap = false,
     },
     OffGCDasOffGCD = {
@@ -55,8 +55,11 @@ HR.GUISettings.APL.Hunter = {
   },
   BeastMastery = {
     GCDasOffGCD = {
+      AMurderOfCrows = false,
       BestialWrath = false,
       Bloodshed = false,
+      CallOfTheWild = false,
+      DireBeast = false,
       Stampede = false,
       WailingArrow = false,
     },
