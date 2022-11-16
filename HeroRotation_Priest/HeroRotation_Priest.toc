@@ -1,4 +1,4 @@
-## Interface: 100000
+## Interface: 100002
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFFFFFFFFPriest|r]
 ## Author: Cilraaz
