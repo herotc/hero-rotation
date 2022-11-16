@@ -10,6 +10,7 @@ ln -s "$CWD/../hero-rotation/HeroRotation" "$WoWRep/_retail_/Interface/AddOns/He
 ln -s "$CWD/../hero-rotation/HeroRotation_DeathKnight" "$WoWRep/_retail_/Interface/AddOns/HeroRotation_DeathKnight"
 ln -s "$CWD/../hero-rotation/HeroRotation_DemonHunter" "$WoWRep/_retail_/Interface/AddOns/HeroRotation_DemonHunter"
 ln -s "$CWD/../hero-rotation/HeroRotation_Druid" "$WoWRep/_retail_/Interface/AddOns/HeroRotation_Druid"
+ln -s "$CWD/../hero-rotation/HeroRotation_Evoker" "$WoWRep/_retail_/Interface/AddOns/HeroRotation_Evoker"
 ln -s "$CWD/../hero-rotation/HeroRotation_Hunter" "$WoWRep/_retail_/Interface/AddOns/HeroRotation_Hunter"
 ln -s "$CWD/../hero-rotation/HeroRotation_Mage" "$WoWRep/_retail_/Interface/AddOns/HeroRotation_Mage"
 ln -s "$CWD/../hero-rotation/HeroRotation_Monk" "$WoWRep/_retail_/Interface/AddOns/HeroRotation_Monk"

@@ -1,13 +1,14 @@
 REM Modify the WoWRep var so it match you own setup. Make sure you have it surrounded by double quotes
 REM WoWRep  : World of warcraft main directory
 set WoWRep="C:\Program Files (x86)\World of Warcraft"
-set CWD=%cd%
+set CWD="%cd%"
 
 REM Don't touch anything bellow this if you aren't experienced
 mklink /J %WoWRep%"\_retail_\Interface\AddOns\HeroRotation" %CWD%"\HeroRotation"
 mklink /J %WoWRep%"\_retail_\Interface\AddOns\HeroRotation_DeathKnight" %CWD%"\HeroRotation_DeathKnight"
 mklink /J %WoWRep%"\_retail_\Interface\AddOns\HeroRotation_DemonHunter" %CWD%"\HeroRotation_DemonHunter"
 mklink /J %WoWRep%"\_retail_\Interface\AddOns\HeroRotation_Druid" %CWD%"\HeroRotation_Druid"
+mklink /J %WoWRep%"\_retail_\Interface\AddOns\HeroRotation_Evoker" %CWD%"\HeroRotation_Evoker"
 mklink /J %WoWRep%"\_retail_\Interface\AddOns\HeroRotation_Hunter" %CWD%"\HeroRotation_Hunter"
 mklink /J %WoWRep%"\_retail_\Interface\AddOns\HeroRotation_Mage" %CWD%"\HeroRotation_Mage"
 mklink /J %WoWRep%"\_retail_\Interface\AddOns\HeroRotation_Monk" %CWD%"\HeroRotation_Monk"
