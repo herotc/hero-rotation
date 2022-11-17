@@ -186,7 +186,7 @@ local function APL()
     end
     -- potion,if=buff.dragonrage.up|time>=300&fight_remains<35
     if Settings.Commons.Enabled.Potions then
-      local PotionSelected = Player:PotionSelected()
+      local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() and (Player:BuffUp(S.Dragonrage) or HL.CombatTime() >= 300 or FightRemains < 35) then
         if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
       end
