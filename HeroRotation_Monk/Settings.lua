@@ -20,6 +20,7 @@ HR.GUISettings.APL.Monk = {
     Enabled = {
       Trinkets = true,
       Potions = true,
+      Items = true,
     },
     DisplayStyle = {
       Potions = "Suggested",
@@ -43,6 +44,9 @@ HR.GUISettings.APL.Monk = {
     }
   },
   Brewmaster = {
+    PotionType = {
+      Selected = "Power",
+    },
     -- DisplayStyle for Brewmaster-only stuff
     DisplayStyle = {
       CelestialBrew = "Suggested",
@@ -68,6 +72,9 @@ HR.GUISettings.APL.Monk = {
     ShowFortifyingBrewCD = false,
     IgnoreToK = false,
     IgnoreFSK = true,
+    PotionType = {
+      Selected = "Power",
+    },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -90,6 +97,9 @@ HR.GUISettings.APL.Monk = {
     -- Defensives
     DampenHarmHP = 60,
     FortifyingBrewHP = 40,
+    PotionType = {
+      Selected = "Power",
+    },
     -- DisplayStyle
     DisplayStyle = {
       DampenHarm = "Suggested",

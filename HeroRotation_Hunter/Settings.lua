@@ -54,6 +54,9 @@ HR.GUISettings.APL.Hunter = {
     }
   },
   BeastMastery = {
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       AMurderOfCrows = false,
       BestialWrath = false,
@@ -69,6 +72,9 @@ HR.GUISettings.APL.Hunter = {
   },
   Marksmanship = {
     HideAimedWhileMoving = false,
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       DoubleTap = false,
       Volley = false,
@@ -80,6 +86,9 @@ HR.GUISettings.APL.Hunter = {
   },
   Survival = {
     AspectOfTheEagle = true,
+    PotionType = {
+      Selected = "Power",
+    },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities

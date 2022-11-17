@@ -54,6 +54,9 @@ HR.GUISettings.APL.Rogue = {
     EnvenomDMGOffset = 3,
     MutilateDMGOffset = 3,
     AlwaysSuggestGarrote = false, -- Suggest Garrote even when Vanish is up
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       Shiv = false,
     },
@@ -73,6 +76,9 @@ HR.GUISettings.APL.Rogue = {
     UseDPSVanish = false, -- Use Vanish in the rotation for DPS
     KillingSpreeDisplayStyle = "Suggested",
     DumpSpikes = false, -- don't dump bone spikes at end of boss, useful in M+
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       BladeFlurry = false,
       BladeRush = false,
@@ -87,6 +93,9 @@ HR.GUISettings.APL.Rogue = {
     EviscerateDMGOffset = 3, -- Used to compute the rupture threshold
     ShDEcoCharge = 1.75, -- Shadow Dance Eco Mode (Min Fractional Charges before using it while CDs are disabled)
     BurnShadowDance = "On Bosses not in Dungeons", -- Burn Shadow Dance charges when the target is about to die
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       ShurikenTornado = false,
     },

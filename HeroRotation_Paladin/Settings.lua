@@ -41,6 +41,9 @@ HR.GUISettings.APL.Paladin = {
     WordofGloryHP = 50,
     ArdentDefenderHP = 60,
     ShieldoftheRighteousHP = 70,
+    PotionType = {
+      Selected = "Power",
+    },
     DisplayStyle = {
       Defensives = "SuggestedRight",
     },
@@ -57,6 +60,9 @@ HR.GUISettings.APL.Paladin = {
     }
   },
   Retribution = {
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       ExecutionSentence = false,
       HammerOfWrath = true,
@@ -71,6 +77,9 @@ HR.GUISettings.APL.Paladin = {
     LoHHP = 10,
     DPHP = 40,
     WoGHP = 60,
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       HammerOfWrath = false,
       LightOfDawn = true,

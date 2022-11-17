@@ -45,6 +45,9 @@ HR.GUISettings.APL.Druid = {
     RenewalHP = 40,
     ShowMoonkinFormOOC = false,
     DelayBerserking = false,
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       AstralCommunion = true,
       CaInc = true,
@@ -63,6 +66,9 @@ HR.GUISettings.APL.Druid = {
     FillerSpell = "Rake Non-Snapshot",
     ShowCatFormOOC = false,
     UseOwlweave = false,
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       BsInc = true,
     },
@@ -77,6 +83,9 @@ HR.GUISettings.APL.Druid = {
     FrenziedRegenHP = 70,
     SurvivalInstinctsHP = 30,
     BristlingFurRage = 50,
+    PotionType = {
+      Selected = "Power",
+    },
     DisplayStyle = {
       Defensives = "Suggested"
     },
@@ -92,6 +101,9 @@ HR.GUISettings.APL.Druid = {
     }
   },
   Restoration = {
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       HeartOfTheWild = true,
     },

@@ -20,6 +20,7 @@ HR.GUISettings.APL.Mage = {
     Enabled = {
       Potions = true,
       Trinkets = true,
+      Items = true,
     },
     DisplayStyle = {
       Potions = "Suggested",
@@ -44,6 +45,9 @@ HR.GUISettings.APL.Mage = {
     MovingRotation = false,
     StayDistance = true,
     UseTemporalWarp = true,
+    PotionType = {
+      Selected = "Power",
+    },
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
@@ -63,6 +67,9 @@ HR.GUISettings.APL.Mage = {
     UseTemporalWarp = true,
     StayDistance = true,
     ShowFireBlastLeft = true,
+    PotionType = {
+      Selected = "Power",
+    },
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
@@ -75,6 +82,9 @@ HR.GUISettings.APL.Mage = {
     }
   },
   Arcane = {
+    PotionType = {
+      Selected = "Power",
+    },
     Enabled={
       ManaGem = true,
     },

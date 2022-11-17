@@ -20,6 +20,7 @@ HR.GUISettings.APL.Priest = {
     Enabled = {
       Potions = true,
       Trinkets = true,
+      Items = true,
     },
     DisplayStyle = {
       Potions = "Suggested",
@@ -41,6 +42,9 @@ HR.GUISettings.APL.Priest = {
     DesperatePrayerHP = 75,
     DispersionHP = 30,
     SelfPI = true,
+    PotionType = {
+      Selected = "Power",
+    },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -61,6 +65,9 @@ HR.GUISettings.APL.Priest = {
     }
   },
   Discipline = {
+    PotionType = {
+      Selected = "Power",
+    },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -75,6 +82,9 @@ HR.GUISettings.APL.Priest = {
     }
   },
   Holy = {
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       Apotheosis = true,
       DivineStar = true,

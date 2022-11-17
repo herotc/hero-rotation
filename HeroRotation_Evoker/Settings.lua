@@ -28,9 +28,6 @@ HR.GUISettings.APL.Evoker = {
       Trinkets = "Suggested",
       Items = "Suggested",
     },
-    PotionType = {
-      Selected = "Power",
-    },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -46,6 +43,9 @@ HR.GUISettings.APL.Evoker = {
   Devastation = {
     UseDefensives = true,
     ObsidianScalesThreshold = 60,
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       DeepBreath = true,
       Dragonrage = true,
