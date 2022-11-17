@@ -96,3 +96,49 @@ function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, 
     end
   end
 end
+
+-- Check if player's selected potion type is ready
+function Commons.PotionSelected()
+  local Class = Cache.Persistent.Player.Class[1]
+  local PotionType = HR.GUISettings.APL[Class].Commons.PotionType.Selected
+  local PowerPotionIDs = {
+    -- Fleeting Ultimate Power
+    191914, 191913, 191912,
+    -- Fleeting Power
+    191907, 191906, 191905,
+    -- Ultimate Power
+    191383, 191382, 191381,
+    -- Power
+    191389, 191388, 191387
+  }
+  local FrozenFocusIDs = { 191365, 191364, 191363 }
+  local ChilledClarityIDs = { 191368, 191367, 191366 }
+  local ShockingDisclosureIDs = { 191401, 191400, 191399 }
+  if PotionType == "Power" then
+    for _, PotionID in ipairs(PowerPotionIDs) do
+      if Item(PotionID):IsUsable() then
+        return Item(PotionID)
+      end
+    end
+  elseif PotionType == "Frozen Focus" then
+    for _, PotionID in ipairs(FrozenFocusIDs) do
+      if Item(PotionID):IsUsable() then
+        return Item(PotionID)
+      end
+    end
+  elseif PotionType == "Chilled Clarity" then
+    for _, PotionID in ipairs(ChilledClarityIDs) do
+      if Item(PotionID):IsUsable() then
+        return Item(PotionID)
+      end
+    end
+  elseif PotionType == "Shocking Disclosure" then
+    for _, PotionID in ipairs(ShockingDisclosureIDs) do
+      if Item(PotionID):IsUsable() then
+        return Item(PotionID)
+      end
+    end
+  else
+    return nil
+  end
+end
