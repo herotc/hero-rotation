@@ -59,6 +59,8 @@ local Enemies8ySplash
 local EnemiesCount8ySplash
 local MaxEssenceBurstStack = (S.EssenceAttunement:IsAvailable()) and 2 or 1
 local VarTrinket1Sync, VarTrinket2Sync, TrinketPriority
+local BossFightRemains = 11111
+local FightRemains = 11111
 
 -- Stun Interrupts
 local StunInterrupts = {
@@ -82,6 +84,12 @@ end, "COVENANT_CHOSEN")
 HL:RegisterForEvent(function()
   MaxEssenceBurstStack = (S.EssenceAttunement:IsAvailable()) and 2 or 1
 end, "PLAYER_TALENT_UPDATE")
+
+-- Reset variables after fights
+HL:RegisterForEvent(function()
+  BossFightRemains = 11111
+  FightRemains = 11111
+end, "PLAYER_REGEN_ENABLED")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -147,6 +155,15 @@ local function APL()
     EnemiesCount8ySplash = 1
   end
 
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains = 11111 then
+      FightRemains = HL.FightRemains(Enemies25y, false)
+    end
+  end
+
   if Everyone.TargetIsValid() then
     -- Precombat
     if not Player:AffectingCombat() and not Player:IsCasting() then
@@ -158,8 +175,13 @@ local function APL()
     end
     -- Manually added: Interrupts
     local ShouldReturn = Everyone.Interrupt(10, S.Quell, Settings.Commons.OffGCDasOffGCD.Quell, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    -- Manually added: boon_of_the_covenants,if=buff.dragonrage.up
+    -- TODO: Remove this when Dragonflight launches
+    if S.BoonoftheCovenants:IsReady() and (Player:BuffUp(S.Dragonrage)) then
+      if Cast(S.BoonoftheCovenants, nil, Settings.Commons.DisplayStyle.Covenant) then return "boon_of_the_covenants main 1"; end
+    end
     -- potion,if=buff.dragonrage.up|time>=300&fight_remains<35
-    if Settings.Commons.Enabled.Potions and I.PotionofSpectralIntellect:IsReady() then
+    if Settings.Commons.Enabled.Potions and I.PotionofUnbridledFury:IsReady() and (Player:BuffUp(S.Dragonrage) or HL.CombatTime() >= 300 or FightRemains < 35) then
       if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
     end
     if Settings.Commons.Enabled.Trinkets then

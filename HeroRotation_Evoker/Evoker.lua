@@ -42,6 +42,8 @@ Spell.Evoker.Commons = {
   PowerInfusionBuff                     = Spell(10060),
   -- Utility
   Quell                                 = Spell(351338),
+  -- Covenant
+  BoonoftheCovenants                    = Spell(387168),
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -78,7 +80,7 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
 if not Item.Evoker then Item.Evoker = {} end
 Item.Evoker.Commons = {
   -- Potions
-  PotionofSpectralIntellect             = Item(171273),
+  PotionofUnbridledFury                 = Item(169299),
   -- Trinkets
   CrimsonAspirantsBadgeofFerocity       = Item(201449, {13, 14}),
   -- Items
