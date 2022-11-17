@@ -69,7 +69,7 @@
         CreatePanelOption("Dropdown", Panel, Setting, {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Display Style: " .. Name, "Define which icon display style to use for " .. Name .. ".");
       end,
       PotionType = function(Panel, Setting, Name)
-        CreatePanelOption("Dropdown", Panel, Setting, {"Ultimate Power", "Power", "Frozen Focus", "Chilled Clarity", "Shocking Disclosure"}, "Potion Type: ", "Define which potion type to track.\n\nUltimate Power and Power potions will include their Fleeting varieties (obtained from Cauldrons).");
+        CreatePanelOption("Dropdown", Panel, Setting, {"Power", "Frozen Focus", "Chilled Clarity", "Shocking Disclosure"}, "Potion Type: ", "Define which potion type to track.\n\nThe Power option will include Fleeting Ultimate Power, Fleeting Power, Ultimate Power, and Power potions.");
       end,
       GCDasOffGCD = function(Panel, Setting, Name)
         CreatePanelOption("CheckButton", Panel, Setting, GCDName(Name), GCDDesc(Name));
