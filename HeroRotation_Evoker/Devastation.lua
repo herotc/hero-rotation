@@ -117,7 +117,7 @@ local function Precombat()
 end
 
 local function Defensives()
-  if S.ObsidianScales:IsCastable() and (Player:HealthPercentage() < Settings.Devastation.ObsidianScalesThreshold) then
+  if S.ObsidianScales:IsCastable() and Player:BuffDown(S.ObsidianScales) and (Player:HealthPercentage() < Settings.Devastation.ObsidianScalesThreshold) then
     if Cast(S.ObsidianScales, nil, Settings.Commons.DisplayStyle.Defensives) then return "obsidian_scales defensives"; end
   end
 end
