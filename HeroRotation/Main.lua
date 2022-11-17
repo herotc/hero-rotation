@@ -99,7 +99,7 @@
       end
       HR.SuggestedIconFrame:SetPoint("BOTTOM", HR.MainIconFrame, "LEFT", -HR.LeftIconFrame:GetWidth()/2, HR.LeftIconFrame:GetHeight()/2+(HR.GUISettings.General.BlackBorderIcon and 3*Multiplier or 4*Multiplier));
 	  HR.RightSuggestedIconFrame:SetPoint("BOTTOM", HR.MainIconFrame, "RIGHT", HR.LeftIconFrame:GetWidth()/2, HR.LeftIconFrame:GetHeight()/2 + (HR.GUISettings.General.BlackBorderIcon and 3*Multiplier or 4*Multiplier)); -- todo matt fix this location
-      HeroRotationDB.GUISettings["General.ScaleUI"] = Multiplier;
+      HeroRotationDB.GUISettings["Scaling.ScaleUI"] = Multiplier;
     end
     function HR.MainFrame:ResizeButtons (Multiplier)
       local FramesToResize = {
@@ -116,7 +116,7 @@
       for i = 1, 3 do
         HR.ToggleIconFrame.Button[i]:SetPoint("LEFT", HR.ToggleIconFrame, "LEFT", HR.ToggleIconFrame.Button[i]:GetWidth()*(i-1)+i, 0);
       end
-      HeroRotationDB.GUISettings["General.ScaleButtons"] = Multiplier;
+      HeroRotationDB.GUISettings["Scaling.ScaleButtons"] = Multiplier;
     end
     -- Lock/Unlock
     local LockSpell = Spell(18282);
@@ -231,11 +231,11 @@
           HR.SuggestedIconFrame:Init();
           HR.RightSuggestedIconFrame:Init();
           HR.ToggleIconFrame:Init();
-          if HeroRotationDB.GUISettings["General.ScaleUI"] then
-            HR.MainFrame:ResizeUI(HeroRotationDB.GUISettings["General.ScaleUI"]);
+          if HeroRotationDB.GUISettings["Scaling.ScaleUI"] then
+            HR.MainFrame:ResizeUI(HeroRotationDB.GUISettings["Scaling.ScaleUI"]);
           end
-          if HeroRotationDB.GUISettings["General.ScaleButtons"] then
-            HR.MainFrame:ResizeButtons(HeroRotationDB.GUISettings["General.ScaleButtons"]);
+          if HeroRotationDB.GUISettings["Scaling.ScaleButtons"] then
+            HR.MainFrame:ResizeButtons(HeroRotationDB.GUISettings["Scaling.ScaleButtons"]);
           end
           for k, v in pairs(MasqueFrameList) do
             if type(v.Icon) == "table" then
@@ -281,12 +281,15 @@
           -- Load additionnal settings
           local CP_General = GUI.GetPanelByName("General")
           if CP_General then
-            CreatePanelOption("Slider", CP_General, "General.ScaleUI", {0.5, 5, 0.1}, "UI Scale", "Scale of the Icons.", function(value) HR.MainFrame:ResizeUI(value); end);
-            CreatePanelOption("Slider", CP_General, "General.ScaleButtons", {0.5, 5, 0.1}, "Buttons Scale", "Scale of the Buttons.", function(value) HR.MainFrame:ResizeButtons(value); end);
-            CreatePanelOption("Slider", CP_General, "General.ScaleHotkey", {0.5, 5, 0.1}, "Hotkey Scale", "Scale of the Hotkeys.");
             CreatePanelOption("Slider", CP_General, "General.SetAlpha", {0, 1, 0.05}, "Addon Alpha", "Change the addon's alpha setting.");
             CreatePanelOption("Button", CP_General, "ButtonMove", "Lock/Unlock", "Enable the moving of the frames.", function() HR.MainFrame:ToggleLock(); end);
             CreatePanelOption("Button", CP_General, "ButtonReset", "Reset Buttons", "Resets the anchor of buttons.", function() HR.ToggleIconFrame:ResetAnchor(); end);
+          end
+          local CP_Scaling = GUI.GetPanelByName("Scaling")
+          if CP_Scaling then
+            CreatePanelOption("Slider", CP_Scaling, "Scaling.ScaleUI", {0.5, 5, 0.1}, "UI Scale", "Scale of the Icons.", function(value) HR.MainFrame:ResizeUI(value); end);
+            CreatePanelOption("Slider", CP_Scaling, "Scaling.ScaleButtons", {0.5, 5, 0.1}, "Buttons Scale", "Scale of the Buttons.", function(value) HR.MainFrame:ResizeButtons(value); end);
+            CreatePanelOption("Slider", CP_Scaling, "Scaling.ScaleHotkey", {0.5, 5, 0.1}, "Hotkey Scale", "Scale of the Hotkeys.");
           end
 
           -- Modules

@@ -43,6 +43,9 @@ HR.GUISettings.APL.Evoker = {
   Devastation = {
     UseDefensives = true,
     ObsidianScalesThreshold = 60,
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
       DeepBreath = true,
       Dragonrage = true,

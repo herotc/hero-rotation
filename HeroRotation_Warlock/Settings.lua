@@ -20,6 +20,7 @@ HR.GUISettings.APL.Warlock = {
     Enabled = {
       Potions = true,
       Trinkets = true,
+      Items = true,
     },
     DisplayStyle = {
       Potions = "Suggested",
@@ -41,6 +42,9 @@ HR.GUISettings.APL.Warlock = {
     }
   },
   Destruction = {
+    PotionType = {
+      Selected = "Power",
+    },
     --UnendingResolveHP = 20,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -56,6 +60,9 @@ HR.GUISettings.APL.Warlock = {
     }
   },
   Demonology = {
+    PotionType = {
+      Selected = "Power",
+    },
     ImpsRequiredForImplosion = 6,
     SuppressLateTyrant = false,
     UnendingResolveHP = 20,
@@ -77,6 +84,9 @@ HR.GUISettings.APL.Warlock = {
     }
   },
   Affliction = {
+    PotionType = {
+      Selected = "Power",
+    },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities

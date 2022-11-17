@@ -43,6 +43,9 @@ HR.GUISettings.APL.Warrior = {
     },
   },
   Arms = {
+    PotionType = {
+      Selected = "Power",
+    },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -55,6 +58,9 @@ HR.GUISettings.APL.Warrior = {
     },
   },
   Fury = {
+    PotionType = {
+      Selected = "Power",
+    },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
@@ -71,6 +77,9 @@ HR.GUISettings.APL.Warrior = {
     DisableHeroicCharge = false,
     DisableIntervene = false,
     RageCapValue = 80,
+    PotionType = {
+      Selected = "Power",
+    },
     DisplayStyle = {
       Defensive = "Suggested"
     },

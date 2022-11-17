@@ -59,6 +59,9 @@ local Enemies8ySplash
 local EnemiesCount8ySplash
 local MaxEssenceBurstStack = (S.EssenceAttunement:IsAvailable()) and 2 or 1
 local VarTrinket1Sync, VarTrinket2Sync, TrinketPriority
+local BossFightRemains = 11111
+local FightRemains = 11111
+local GCDMax
 
 -- Stun Interrupts
 local StunInterrupts = {
@@ -82,6 +85,12 @@ end, "COVENANT_CHOSEN")
 HL:RegisterForEvent(function()
   MaxEssenceBurstStack = (S.EssenceAttunement:IsAvailable()) and 2 or 1
 end, "PLAYER_TALENT_UPDATE")
+
+-- Reset variables after fights
+HL:RegisterForEvent(function()
+  BossFightRemains = 11111
+  FightRemains = 11111
+end, "PLAYER_REGEN_ENABLED")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -117,7 +126,7 @@ local function Precombat()
 end
 
 local function Defensives()
-  if S.ObsidianScales:IsCastable() and (Player:HealthPercentage() < Settings.Devastation.ObsidianScalesThreshold) then
+  if S.ObsidianScales:IsCastable() and Player:BuffDown(S.ObsidianScales) and (Player:HealthPercentage() < Settings.Devastation.ObsidianScalesThreshold) then
     if Cast(S.ObsidianScales, nil, Settings.Commons.DisplayStyle.Defensives) then return "obsidian_scales defensives"; end
   end
 end
@@ -147,6 +156,18 @@ local function APL()
     EnemiesCount8ySplash = 1
   end
 
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies25y, false)
+    end
+  end
+
+  -- Set GCDMax (add 0.25 seconds for latency/player reaction)
+  GCDMax = Player:GCD() + 0.25
+
   if Everyone.TargetIsValid() then
     -- Precombat
     if not Player:AffectingCombat() and not Player:IsCasting() then
@@ -158,9 +179,17 @@ local function APL()
     end
     -- Manually added: Interrupts
     local ShouldReturn = Everyone.Interrupt(10, S.Quell, Settings.Commons.OffGCDasOffGCD.Quell, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    -- Manually added: boon_of_the_covenants,if=buff.dragonrage.up
+    -- TODO: Remove this when Dragonflight launches
+    if S.BoonoftheCovenants:IsReady() and (Player:BuffUp(S.Dragonrage)) then
+      if Cast(S.BoonoftheCovenants, nil, Settings.Commons.DisplayStyle.Covenant) then return "boon_of_the_covenants main 1"; end
+    end
     -- potion,if=buff.dragonrage.up|time>=300&fight_remains<35
-    if Settings.Commons.Enabled.Potions and I.PotionofSpectralIntellect:IsReady() then
-      if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
+    if Settings.Commons.Enabled.Potions then
+      local PotionSelected = Everyone.PotionSelected()
+      if PotionSelected and PotionSelected:IsReady() and (Player:BuffUp(S.Dragonrage) or HL.CombatTime() >= 300 or FightRemains < 35) then
+        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
+      end
     end
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,name=shadowed_orb_of_torment
@@ -179,11 +208,11 @@ local function APL()
       if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath main 8"; end
     end
     -- dragonrage,if=cooldown.eternity_surge.remains<=(buff.dragonrage.duration+6)&(cooldown.fire_breath.remains<=2*gcd.max|!talent.feed_the_flames)
-    if S.Dragonrage:IsCastable() and (S.EternitySurge:CooldownRemains() <= (S.Dragonrage:BaseDuration() + 6) and (S.FireBreath:CooldownRemains() <= 2 * Player:GCD() or not S.FeedtheFlames:IsAvailable())) then
+    if S.Dragonrage:IsCastable() and (S.EternitySurge:CooldownRemains() <= (S.Dragonrage:BaseDuration() + 6) and (S.FireBreath:CooldownRemains() <= 2 * GCDMax or not S.FeedtheFlames:IsAvailable())) then
       if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage, nil, not Target:IsInRange(25)) then return "dragonrage main 10"; end
     end
     -- tip_the_scales,if=buff.dragonrage.up&(cooldown.eternity_surge.up|cooldown.fire_breath.up)&buff.dragonrage.remains<=gcd.max
-    if S.TipTheScales:IsCastable() and (Player:BuffUp(S.Dragonrage) and (S.EternitySurge:CooldownUp() or S.FireBreath:CooldownUp()) and Player:BuffRemains(S.Dragonrage) <= Player:GCD() + 0.5) then
+    if S.TipTheScales:IsCastable() and (Player:BuffUp(S.Dragonrage) and (S.EternitySurge:CooldownUp() or S.FireBreath:CooldownUp()) and Player:BuffRemains(S.Dragonrage) <= GCDMax) then
       if Cast(S.TipTheScales, Settings.Devastation.GCDasOffGCD.TipTheScales) then return "tip_the_scales main 12"; end
     end
     -- eternity_surge,empower_to=1,if=buff.dragonrage.up&(buff.bloodlust.up|buff.power_infusion.up)&talent.feed_the_flames
@@ -196,7 +225,7 @@ local function APL()
     end
     -- fire_breath,empower_to=1,if=talent.everburning_flame&(cooldown.firestorm.remains>=2*gcd.max|!dot.firestorm.ticking)|cooldown.dragonrage.remains>=10&talent.feed_the_flames|!talent.everburning_flame&!talent.feed_the_flames
     -- TODO: Find a way to track Firestorm. It does not have a DoT on the target.
-    if S.FireBreath:IsCastable() and (S.EverburningFlame:IsAvailable() and (S.Firestorm:CooldownRemains() >= 2 * Player:GCD() or S.Firestorm:TimeSinceLastCast() >= 12) or S.Dragonrage:CooldownRemains() >= 10 and S.FeedtheFlames:IsAvailable() or (not S.EverburningFlame:IsAvailable()) and not S.FeedtheFlames:IsAvailable()) then
+    if S.FireBreath:IsCastable() and (S.EverburningFlame:IsAvailable() and (S.Firestorm:CooldownRemains() >= 2 * GCDMax or S.Firestorm:TimeSinceLastCast() >= 12) or S.Dragonrage:CooldownRemains() >= 10 and S.FeedtheFlames:IsAvailable() or (not S.EverburningFlame:IsAvailable()) and not S.FeedtheFlames:IsAvailable()) then
       if CastAnnotated(S.FireBreath, false, "1") then return "fire_breath main 18"; end
     end
     -- fire_breath,empower_to=2,if=talent.everburning_flame
@@ -222,7 +251,7 @@ local function APL()
       end
       if ESEmpower > 1 then
         if CastAnnotated(S.EternitySurge, false, ESEmpower) then return "eternity_surge main 24"; end
-      elseif (30 - S.Dragonrage:CooldownRemains()) < (S.Dragonrage:BaseDuration() + 6 - Player:GCD()) then
+      elseif (30 - S.Dragonrage:CooldownRemains()) < (S.Dragonrage:BaseDuration() + 6 - GCDMax) then
         if CastAnnotated(S.EternitySurge, false, ESEmpower) then return "eternity_surge empower 1 main 24"; end
       end
     end
@@ -247,7 +276,7 @@ local function APL()
       if Cast(S.Disintegrate, nil, nil, not Target:IsInRange(25)) then return "disintegrate main 28"; end
     end
     -- disintegrate,chain=1,if=essence=essence.max|buff.essence_burst.stack=buff.essence_burst.max_stack|debuff.shattering_star_debuff.up|cooldown.shattering_star.remains>=3*gcd.max|!talent.shattering_star
-    if S.Disintegrate:IsReady() and (Player:Essence() == Player:EssenceMax() or Player:BuffStack(S.EssenceBurstBuff) == MaxEssenceBurstStack or Target:DebuffUp(S.ShatteringStar) or S.ShatteringStar:CooldownRemains() >= 3 * Player:GCD() or not S.ShatteringStar:IsAvailable()) then
+    if S.Disintegrate:IsReady() and (Player:Essence() == Player:EssenceMax() or Player:BuffStack(S.EssenceBurstBuff) == MaxEssenceBurstStack or Target:DebuffUp(S.ShatteringStar) or S.ShatteringStar:CooldownRemains() >= 3 * GCDMax or not S.ShatteringStar:IsAvailable()) then
       if Cast(S.Disintegrate, nil, nil, not Target:IsInRange(25)) then return "disintegrate main 30"; end
     end
     -- use_item,name=kharnalex_the_first_light,if=!debuff.shattering_star_debuff.up&!buff.dragonrage.up&spell_targets.pyre=1

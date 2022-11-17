@@ -162,7 +162,7 @@
     -- Keybind
     if Keybind then
       self.Keybind:SetText(Keybind);
-      self.Keybind:SetScale(HR.GUISettings.General.ScaleHotkey);
+      self.Keybind:SetScale(HR.GUISettings.Scaling.ScaleHotkey);
     else
       self.Keybind:SetText("");
     end
@@ -272,7 +272,7 @@
       -- Keybind
       if Keybinds then
         PartFrame.Keybind:SetText(Keybinds[i]);
-        PartFrame.Keybind:SetScale(HR.GUISettings.General.ScaleHotkey);
+        PartFrame.Keybind:SetScale(HR.GUISettings.Scaling.ScaleHotkey);
       else
         PartFrame.Keybind:SetText("");
       end
@@ -362,7 +362,7 @@
     -- Keybind
     if Keybind then
       IconFrame.Keybind:SetText(Keybind);
-      IconFrame.Keybind:SetScale(HR.GUISettings.General.ScaleHotkey * 0.85);
+      IconFrame.Keybind:SetScale(HR.GUISettings.Scaling.ScaleHotkey * 0.85);
     else
       IconFrame.Keybind:SetText("");
     end
@@ -437,7 +437,7 @@
     -- Keybind
     if Keybind then
       self.Keybind:SetText(Keybind);
-      self.Keybind:SetScale(HR.GUISettings.General.ScaleHotkey);
+      self.Keybind:SetScale(HR.GUISettings.Scaling.ScaleHotkey);
     else
       self.Keybind:SetText("");
     end
@@ -585,7 +585,7 @@
     -- Keybind
     if Keybind then
       self.Keybind:SetText(Keybind);
-      self.Keybind:SetScale(HR.GUISettings.General.ScaleHotkey * 0.85);
+      self.Keybind:SetScale(HR.GUISettings.Scaling.ScaleHotkey * 0.85);
     else
       self.Keybind:SetText("");
     end
@@ -657,7 +657,7 @@
     -- Keybind
     if Keybind then
       self.Keybind:SetText(Keybind);
-      self.Keybind:SetScale(HR.GUISettings.General.ScaleHotkey * 0.85);
+      self.Keybind:SetScale(HR.GUISettings.Scaling.ScaleHotkey * 0.85);
     else
       self.Keybind:SetText("");
     end

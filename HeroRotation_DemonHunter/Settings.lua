@@ -45,6 +45,9 @@ HR.GUISettings.APL.DemonHunter = {
     FelDevHealthThreshold = 30,
     ConserveInfernalStrike = true,
     UseFieryBrandOffensively = false,
+    PotionType = {
+      Selected = "Power",
+    },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
@@ -60,6 +63,9 @@ HR.GUISettings.APL.DemonHunter = {
     BlurHealthThreshold = 65,
     ConserveFelRush = false,
     HideMetaIfActive = true,
+    PotionType = {
+      Selected = "Power",
+    },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities

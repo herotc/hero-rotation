@@ -48,6 +48,9 @@ HR.GUISettings.APL.DeathKnight = {
     RuneTapThreshold = 40,
     IceboundFortitudeThreshold = 50,
     VampiricBloodThreshold = 65,
+    PotionType = {
+      Selected = "Power",
+    },
     DisplayStyle = {
       Consumption = "Suggested",
     },
@@ -67,6 +70,9 @@ HR.GUISettings.APL.DeathKnight = {
   },
   Frost = {
     DisableBoSPooling = false,
+    PotionType = {
+      Selected = "Power",
+    },
     DisplayStyle = {
       BoS = "Suggested",
     },
@@ -83,6 +89,9 @@ HR.GUISettings.APL.DeathKnight = {
   Unholy = {
     DisableAotD = false,
     RaiseDeadCastLeft = false,
+    PotionType = {
+      Selected = "Power",
+    },
     DisplayStyle = {
       ArmyoftheDead = "SuggestedRight",
     },
