@@ -30,71 +30,50 @@ Spell.Warlock.Commons = {
   -- Abilities
   ShadowBolt                            = Spell(686),
   SummonDarkglare                       = Spell(205180),
+  UnendingResolve                       = Spell(104773),
   -- Talents
   GrimoireofSacrifice                   = Spell(108503),
   GrimoireofSacrificeBuff               = Spell(196099),
   SoulConduit                           = Spell(215941),
-  -- Covenant Abilities
-  DecimatingBolt                        = Spell(325289),
-  DecimatingBoltBuff                    = Spell(325299),
-  DoorofShadows                         = Spell(300728),
-  Fleshcraft                            = Spell(324631),
-  ImpendingCatastrophe                  = Spell(321792), -- Splash, 8/10/12/15?
-  ScouringTithe                         = Spell(312321),
-  SoulRot                               = Spell(325640), -- Splash, 15
-  -- Soulbinds/Conduits
-  CombatMeditation                      = Spell(328266),
-  CorruptingLeer                        = Spell(339455),
-  FieldofBlossoms                       = Spell(319191),
-  ForgeborneReveries                    = Spell(326514),
-  GroveInvigoration                     = Spell(322721),
-  KevinsOozeling                        = Spell(352110),
-  LeadByExample                         = Spell(342156),
-  RefinedPalate                         = Spell(336243),
-  VolatileSolvent                       = Spell(323074),
-  VolatileSolventHumanBuff              = Spell(323491),
-  WildHuntTactics                       = Spell(325066),
-  -- Legendary Effects
-  BalespidersBuff                       = Spell(337161),
-  ImplosivePotentialBuff                = Spell(337139),
-  MaleficWrathBuff                      = Spell(337125),
-  ShardofAnnihilationBuff               = Spell(356342),
-  -- Trinket Effects
-  ScarsofFraternalStrifeBuff4           = Spell(368638),
+  -- Command Demon Abilities
+  AxeToss                               = Spell(119914),
+  Seduction                             = Spell(119909),
+  ShadowBulwark                         = Spell(119907),
+  SingeMagic                            = Spell(119905),
+  SpellLock                             = Spell(119910),
 }
 
 Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
   -- Base Abilities
-  AxeToss                               = Spell(119914),
-  CallDreadstalkers                     = Spell(104316),
-  Demonbolt                             = Spell(264178),
-  DemonicCoreBuff                       = Spell(264173),
   Felstorm                              = Spell(89751),
   HandofGuldan                          = Spell(105174), -- Splash, 8
-  Implosion                             = Spell(196277), -- Splash, 8
-  SpellLock                             = Spell(119910),
-  SummonDemonicTyrant                   = Spell(265187),
   SummonPet                             = Spell(30146),
-  UnendingResolve                       = Spell(104773),
   -- Talents
   BilescourgeBombers                    = Spell(267211), -- Splash, 8
+  CallDreadstalkers                     = Spell(104316),
+  Demonbolt                             = Spell(264178),
   DemonicCalling                        = Spell(205145),
-  DemonicCallingBuff                    = Spell(205146),
-  DemonicConsumption                    = Spell(267215),
-  DemonicPowerBuff                      = Spell(265273),
   DemonicStrength                       = Spell(267171),
   Doom                                  = Spell(603),
-  DoomDebuff                            = Spell(603),
   FromtheShadows                        = Spell(267170),
-  FromtheShadowsDebuff                  = Spell(270569),
   GrimoireFelguard                      = Spell(111898),
+  Guillotine                            = Spell(386833),
+  Implosion                             = Spell(196277), -- Splash, 8
   InnerDemons                           = Spell(267216),
   NetherPortal                          = Spell(267217),
-  NetherPortalBuff                      = Spell(267218),
   PowerSiphon                           = Spell(264130),
   SacrificedSouls                       = Spell(267214),
   SoulStrike                            = Spell(264057),
+  SummonDemonicTyrant                   = Spell(265187),
   SummonVilefiend                       = Spell(264119),
+  -- Buffs
+  DemonicCallingBuff                    = Spell(205146),
+  DemonicCoreBuff                       = Spell(264173),
+  DemonicPowerBuff                      = Spell(265273),
+  NetherPortalBuff                      = Spell(267218),
+  -- Debuffs
+  DoomDebuff                            = Spell(603),
+  FromtheShadowsDebuff                  = Spell(270569),
 })
 
 Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {

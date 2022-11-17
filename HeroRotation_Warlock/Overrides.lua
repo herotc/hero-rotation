@@ -121,7 +121,7 @@ HL.AddCoreOverride ("Player.SoulShardsP",
     if not Player:IsCasting() then
       return Shard
     else
-      if Player:IsCasting(SpellDemo.SummonDemonicTyrant) and Player:Level() >= 58 then
+      if Player:IsCasting(SpellDemo.SummonDemonicTyrant) then
         return 5
       elseif Player:IsCasting(SpellDemo.Demonbolt) then
         return min(Shard + 2, 5)
@@ -129,7 +129,7 @@ HL.AddCoreOverride ("Player.SoulShardsP",
         return min(Shard + 1, 5)
       elseif Player:IsCasting(SpellDemo.HandofGuldan) then
         return max(Shard - 3, 0)
-      elseif Player:IsCasting(SpellDemo.CallDreadstalkers) or Player:IsCasting(SpellDemo.BilescourgeBombers) then
+      elseif Player:IsCasting(SpellDemo.CallDreadstalkers) then
         return Shard - 2
       elseif Player:IsCasting(SpellDemo.SummonVilefiend) or Player:IsCasting(SpellDemo.SummonPet) or Player:IsCasting(SpellDemo.NetherPortal) then
         return Shard - 1
@@ -168,7 +168,7 @@ DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
     local BaseCheck = DemoOldSpellIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    if self == SpellDemo.SummonVilefiend or self == SpellDemo.CallDreadstalkers or self == SpellDemo.NetherPortal or self == SpellDemo.DecimatingBolt or self == SpellDemo.ScouringTithe then
+    if self == SpellDemo.SummonVilefiend or self == SpellDemo.CallDreadstalkers or self == SpellDemo.NetherPortal then
       return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck

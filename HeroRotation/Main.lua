@@ -354,7 +354,7 @@
       --[264]   = "HeroRotation_Shaman",        -- Restoration
     -- Warlock
       --[265]   = "HeroRotation_Warlock",       -- Affliction
-      --[266]   = "HeroRotation_Warlock",       -- Demonology
+      [266]   = "HeroRotation_Warlock",       -- Demonology
       --[267]   = "HeroRotation_Warlock",       -- Destruction
     -- Warrior
       [71]    = "HeroRotation_Warrior",       -- Arms
