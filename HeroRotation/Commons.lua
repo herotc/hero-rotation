@@ -100,7 +100,8 @@ end
 -- Check if player's selected potion type is ready
 function Commons.PotionSelected()
   local Class = Cache.Persistent.Player.Class[1]
-  local PotionType = HR.GUISettings.APL[Class].Commons.PotionType.Selected
+  local Spec = Cache.Persistent.Player.Spec[2]
+  local PotionType = HR.GUISettings.APL[Class][Spec].PotionType.Selected
   local PowerPotionIDs = {
     -- Fleeting Ultimate Power
     191914, 191913, 191912,
