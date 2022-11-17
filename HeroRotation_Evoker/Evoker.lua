@@ -79,8 +79,6 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
 -- Items
 if not Item.Evoker then Item.Evoker = {} end
 Item.Evoker.Commons = {
-  -- Potions
-  PotionofUnbridledFury                 = Item(169299),
   -- Trinkets
   CrimsonAspirantsBadgeofFerocity       = Item(201449, {13, 14}),
   -- Items

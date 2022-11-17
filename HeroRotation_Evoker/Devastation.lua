@@ -185,8 +185,11 @@ local function APL()
       if Cast(S.BoonoftheCovenants, nil, Settings.Commons.DisplayStyle.Covenant) then return "boon_of_the_covenants main 1"; end
     end
     -- potion,if=buff.dragonrage.up|time>=300&fight_remains<35
-    if Settings.Commons.Enabled.Potions and I.PotionofUnbridledFury:IsReady() and (Player:BuffUp(S.Dragonrage) or HL.CombatTime() >= 300 or FightRemains < 35) then
-      if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
+    if Settings.Commons.Enabled.Potions then
+      local PotionSelected = Player:PotionSelected()
+      if PotionSelected and PotionSelected:IsReady() and (Player:BuffUp(S.Dragonrage) or HL.CombatTime() >= 300 or FightRemains < 35) then
+        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
+      end
     end
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,name=shadowed_orb_of_torment
