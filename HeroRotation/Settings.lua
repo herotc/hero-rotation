@@ -34,10 +34,12 @@
       --
       NotEnoughManaEnabled = false,
       RotationDebugOutput = false,
+      SetAlpha = 1,
+    },
+    Scaling = {
       ScaleUI = 1,
       ScaleButtons = 1,
       ScaleHotkey = 1,
-      SetAlpha = 1
     },
     APL = {}
   };
@@ -47,6 +49,7 @@
     local ARPanel = CreatePanel(HR.GUI, "HeroRotation", "PanelFrame", HR.GUISettings, HeroRotationDB.GUISettings);
     -- Child Panel
     local CP_General = CreateChildPanel(ARPanel, "General");
+    local CP_Scaling = CreateChildPanel(ARPanel, "Scaling");
     -- Controls
     CreatePanelOption("Dropdown", CP_General, "General.MainFrameStrata", {"HIGH", "MEDIUM", "LOW", "BACKGROUND"}, "Main Frame Strata", "Choose the frame strata to use for icons.", {ReloadRequired = true});
     CreatePanelOption("Dropdown", CP_General, "General.NamePlateIconAnchor", {"Clickable Area", "Life Bar", "Disable"}, "Nameplate Icon Anchor", "Choose the frame to anchor the Nameplate icon to (or disable it).", {ReloadRequired = true});
