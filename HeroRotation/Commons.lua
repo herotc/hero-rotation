@@ -97,6 +97,34 @@ function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, 
   end
 end
 
+function Commons.GetCurrentEmpowerData(stage)
+  local CurrentStage = 0
+  local StagesData = {}
+  _, _, _, StartTimeMS, EndTimeMS, _, _, _, _, StageTotal = UnitChannelInfo("player")
+
+  if StageTotal and StageTotal > 0 then
+    local LastFinish = 0
+    for i = 1, StageTotal do
+      StagesData[i] = {
+        Start = LastFinish,
+        Finish = LastFinish + GetUnitEmpowerStageDuration("player", i - 1) / 1000
+      }
+      HR.Print(" Start"..i..": "..StagesData[i].Start)
+      HR.Print("Finish"..i..": "..StagesData[i].Finish)
+      LastFinish = StagesData[i].Finish
+      if StartTimeMS / 1000 + LastFinish <= GetTime() then
+        CurrentStage = i
+      end
+    end
+  end
+
+  if stage then
+    return CurrentStage
+  else
+    return StagesData
+  end
+end
+
 -- Check if player's selected potion type is ready
 function Commons.PotionSelected()
   local Class = Cache.Persistent.Player.Class[1]
