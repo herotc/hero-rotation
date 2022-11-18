@@ -40,17 +40,21 @@ Spell.Warrior.Commons = {
   VictoryRush                           = Spell(34428),
   -- Talents
   Avatar                                = Spell(107574),
+  BerserkerRage                         = Spell(18499),
+  BloodandThunder                       = Spell(384277),
   DoubleTime                            = Spell(103827),
   FrothingBerserker                     = Spell(215571),
   IntimidatingShout                     = Spell(5246),
   HeroicLeap                            = Spell(6544),
   ImpendingVictory                      = Spell(202168),
   OverwhelmingRage                      = Spell(382767),
+  RallyingCry                           = Spell(97462),
   Shockwave                             = Spell(46968),
   SonicBoom                             = Spell(390725),
   SpearofBastion                        = Spell(376079),
   StormBolt                             = Spell(107570),
   ThunderousRoar                        = Spell(384318),
+  TitanicThrow                          = Spell(384090),
   TitansTorment                         = Spell(390135),
   WreckingThrow                         = Spell(384110),
   -- Buffs
@@ -161,25 +165,32 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
 
 Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   -- Abilities
+  Devastate                             = Spell(20243),
   Execute                               = Spell(163201),
   ShieldBlock                           = Spell(2565),
-  ShieldBlockBuff                       = Spell(132404),
   ShieldSlam                            = Spell(23922),
   -- Talents
-  Intervene                             = Spell(3411),
-  ThunderClap                           = Spell(6343),
-  IgnorePain                            = Spell(190456),
-  Revenge                               = Spell(6572),
-  RevengeBuff                           = Spell(5302),
-  DemoralizingShout                     = Spell(1160),
-  LastStand                             = Spell(12975),
-  LastStandBuff                         = Spell(12975),
   BoomingVoice                          = Spell(202743),
+  DemoralizingShout                     = Spell(1160),
+  IgnorePain                            = Spell(190456),
+  Intervene                             = Spell(3411),
+  LastStand                             = Spell(12975),
   Ravager                               = Spell(228920),
+  Rend                                  = Spell(394062),
+  Revenge                               = Spell(6572),
+  ShieldCharge                          = Spell(385952),
+  ShieldWall                            = Spell(871),
+  ThunderClap                           = Spell(6343),
   UnstoppableForce                      = Spell(275336),
-  -- Tier Effects
-  OutburstBuff                          = Spell(364010),
-  SeeingRedBuff                         = Spell(364006),
+  -- Buffs
+  LastStandBuff                         = Spell(12975),
+  RallyingCryBuff                       = Spell(97463),
+  RevengeBuff                           = Spell(5302),
+  SeeingRedBuff                         = Spell(386486),
+  ShieldBlockBuff                       = Spell(132404),
+  ShieldWallBuff                        = Spell(871),
+  ViolentOutburstBuff                   = Spell(386478),
+  -- Debuffs
 })
 
 -- Items
