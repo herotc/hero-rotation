@@ -247,8 +247,11 @@ local function APL()
       if Cast(S.HeroicLeap, nil, Settings.Commons.DisplayStyle.HeroicLeap) then return "heroic_leap main 4"; end
     end
     -- potion
-    if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions then
-      if Cast(I.PotionofSpectralStrength, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 6"; end
+    if Settings.Commons.Enabled.Potions then
+      local PotionSelected = Everyone.PotionSelected()
+      if PotionSelected and PotionSelected:IsReady() then
+        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 6"; end
+      end
     end
     -- conquerors_banner
     if S.ConquerorsBanner:IsCastable() and CDsON() then
