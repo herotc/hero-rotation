@@ -126,178 +126,186 @@ local function Precombat()
 end
 
 local function Execute()
-  -- avatar,if=gcd.remains=0|target.time_to_die<20
-  if S.Avatar:IsCastable() and CDsON() then
-    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar execute 2"; end
-  end
-  -- conquerors_banner
-  if CDsON() and S.ConquerorsBanner:IsReady() then
-    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner execute 4"; end
-  end
-  -- condemn,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd|buff.juggernaut.up&buff.juggernaut.remains<gcd
-  if S.Condemn:IsReady() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() or Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff)) then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 6"; end
-  end
-  -- execute,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd|buff.juggernaut.up&buff.juggernaut.remains<gcd
-  if S.Execute:IsReady() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() or Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff)) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 8"; end
+  -- sweeping_strikes,if=spell_targets.whirlwind>1
+  if S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
+    if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes execute 2"; end
   end
   -- rend,if=remains<=gcd&(!talent.warbreaker&cooldown.colossus_smash.remains<4|talent.warbreaker&cooldown.warbreaker.remains<4)&target.time_to_die>12
   if S.Rend:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and ((not S.Warbreaker:IsAvailable()) and S.ColossusSmash:CooldownRemains() < 4 or S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemains() < 4) and Target:TimeToDie() > 12) then
-    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend execute 12"; end
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend execute 4"; end
+  end
+  -- avatar,if=gcd.remains=0|target.time_to_die<20
+  if S.Avatar:IsCastable() and CDsON() then
+    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar execute 6"; end
+  end
+  -- conquerors_banner
+  if CDsON() and S.ConquerorsBanner:IsReady() then
+    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner execute 8"; end
+  end
+  -- condemn,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd|buff.juggernaut.up&buff.juggernaut.remains<gcd
+  if S.Condemn:IsReady() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() or Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff)) then
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 10"; end
   end
   -- thunderous_roar,if=buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or (not S.TestofMight:IsAvailable()) and Target:DebuffUp(S.ColossusSmashDebuff)) then
-    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar execute 14"; end
+    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar execute 12"; end
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
-    if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker execute 16"; end
+    if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker execute 14"; end
   end
   -- colossus_smash
   if S.ColossusSmash:IsCastable() then
-    if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash execute 18"; end
+    if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash execute 16"; end
   end
   if CDsON() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff)) then
     -- spear_of_bastion,if=debuff.colossus_smash.up|buff.test_of_might.up
     if S.SpearofBastion:IsCastable() then
-      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 20"; end
+      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 18"; end
     end
     -- kyrian_spear,if=debuff.colossus_smash.up|buff.test_of_might.up
     if S.SpearofBastionCov:IsReady() then
-      if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "kyrian_spear execute 22"; end
+      if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "kyrian_spear execute 20"; end
     end
     -- ancient_aftershock,if=debuff.colossus_smash.up|buff.test_of_might.up
     if S.AncientAftershock:IsCastable() then
-      if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock execute 24"; end
+      if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock execute 22"; end
     end
+  end
+  -- mortal_strike,if=dot.deep_wounds.remains<=gcd
+  if S.MortalStrike:IsReady() and (Target:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD()) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 24"; end
   end
   -- cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
   if S.Cleave:IsReady() and (EnemiesCount8y > 1 and Target:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD()) then
     if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave execute 26"; end
   end
-  -- mortal_strike,if=dot.deep_wounds.remains<=gcd|buff.martial_prowess.stack=2&debuff.executioners_precision.stack=2
-  if S.MortalStrike:IsReady() and (Target:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD() or Player:BuffStack(S.MartialProwessBuff) == 2 and Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2) then
-    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 28"; end
+  -- condemn
+  if S.Condemn:IsReady() then
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 28"; end
   end
-  -- skullsplitter,if=rage<35
-  if S.Skullsplitter:IsCastable() and (Player:Rage() < 35) then
+  -- skullsplitter,if=rage<40
+  if S.Skullsplitter:IsCastable() and (Player:Rage() < 40) then
     if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter execute 30"; end
   end
-  -- bladestorm,if=rage<20|buff.test_of_might.up&talent.hurricane.enabled
-  if CDsON() and S.Bladestorm:IsCastable() and (Player:Rage() < 20 or Player:BuffUp(S.TestofMightBuff) and S.Hurricane:IsAvailable()) then
-    if Cast(S.Bladestorm, nil, nil, not TargetInMeleeRange) then return "bladestorm execute 32"; end
+  -- mortal_strike,if=debuff.executioners_precision.stack=2|dot.deep_wounds.remains<=gcd
+  if S.MortalStrike:IsReady() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 or Target:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD()) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 32"; end
   end
   -- rend,if=remains<duration*0.3&debuff.colossus_smash.down
   if S.Rend:IsReady() and (Target:DebuffRefreshable(S.RendDebuff) and Target:DebuffDown(S.ColossusSmashDebuff)) then
     if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend execute 34"; end
   end
-  -- condemn
-  if S.Condemn:IsReady() then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 36"; end
-  end
   -- execute
   if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 38"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 36"; end
   end
-  -- shockwave
-  if S.Shockwave:IsCastable() then
-    if Cast(S.Shockwave, Settings.Commons.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave execute 40"; end
+  -- shockwave,if=talent.sonic_boom
+  if S.Shockwave:IsCastable() and (S.SonicBoom:IsAvailable()) then
+    if Cast(S.Shockwave, Settings.Commons.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave execute 38"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 42"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 40"; end
   end
 end
 
 local function SingleTarget()
-  -- rend,if=remains<=gcd|talent.tide_of_blood.enabled&cooldown.skullsplitter.remains<=gcd&(cooldown.colossus_smash.remains<=gcd|debuff.colossus_smash.up)&dot.rend.remains<duration*0.85
+  -- sweeping_strikes,if=spell_targets.whirlwind>1
+  if S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
+    if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes single_target 2"; end
+  end
+  -- rend,if=remains<=gcd|talent.tide_of_blood&cooldown.skullsplitter.remains<=gcd&(cooldown.colossus_smash.remains<=gcd|debuff.colossus_smash.up)&dot.rend.remains<duration*0.85
   if S.Rend:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() or S.TideofBlood:IsAvailable() and S.Skullsplitter:CooldownRemains() <= Player:GCD() and (S.ColossusSmash:CooldownRemains() <= Player:GCD() or Target:DebuffUp(S.ColossusSmashDebuff)) and Target:DebuffRemains(S.RendDebuff) < S.RendDebuff:BaseDuration() * 0.85) then
-    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend single_target 2"; end
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend single_target 4"; end
   end
   -- conquerors_banner,if=target.time_to_die>140
   if CDsON() and S.ConquerorsBanner:IsReady() and (Target:TimeToDie() > 140) then
-    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner single_target 4"; end
+    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner single_target 6"; end
   end
   -- avatar,if=gcd.remains=0
   if CDsON() and S.Avatar:IsCastable() then
-    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar single_target 6"; end
+    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar single_target 8"; end
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
-    if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker single_target 8"; end
+    if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker single_target 10"; end
   end
   -- colossus_smash
   if S.ColossusSmash:IsCastable() then
-    if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash single_target 10"; end
-  end
-  -- spear_of_bastion,if=debuff.colossus_smash.up|buff.test_of_might.up
-  if CDsON() and S.SpearofBastion:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff)) then
-    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion single_target 12"; end
-  end
-  -- kyrian_spear
-  if CDsON() and S.SpearofBastionCov:IsReady() then
-    if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "kyrian_spear single_target 14"; end
-  end
-  -- skullsplitter,if=dot.rend.remains>duration*0.95&(debuff.colossus_smash.up&rage<60|buff.test_of_might.up)
-  if S.Skullsplitter:IsCastable() and (Target:DebuffRemains(S.RendDebuff) > S.RendDebuff:BaseDuration() * 0.95 and (Target:DebuffUp(S.ColossusSmashDebuff) and Player:Rage() < 60 or Player:BuffUp(S.TestofMightBuff))) then
-    if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter single_target 16"; end
-  end
-  -- ancient_aftershock,if=debuff.colossus_smash.up
-  if S.AncientAftershock:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
-    if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock single_target 18"; end
-  end
-  -- mortal_strike,if=runeforge.enduring_blow|runeforge.battlelord|dot.deep_wounds.remains<=gcd
-  if S.MortalStrike:IsReady() and (EnduringBlowEquipped or BattlelordEquipped or Target:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD()) then
-    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike single_target 20"; end
-  end
-  -- condemn,if=buff.sudden_death.react
-  if S.Condemn:IsReady() and (Player:BuffUp(S.SuddenDeathBuff)) then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 22"; end
-  end
-  -- execute,if=buff.sudden_death.react
-  if S.Execute:IsReady() and (Player:BuffUp(S.SuddenDeathBuff)) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 24"; end
+    if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash single_target 12"; end
   end
   -- thunderous_roar,if=debuff.colossus_smash.up|buff.test_of_might.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff)) then
-    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 26"; end
+    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 14"; end
   end
-  -- bladestorm,if=debuff.colossus_smash.up&talent.unhinged.enabled|buff.test_of_might.up&talent.hurricane.enabled
-  if CDsON() and S.Bladestorm:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) and S.Unhinged:IsAvailable() or Player:BuffUp(S.TestofMightBuff) and S.Hurricane:IsAvailable()) then
-    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm single_target 28"; end
+  -- spear_of_bastion,if=debuff.colossus_smash.up|buff.test_of_might.up
+  if CDsON() and S.SpearofBastion:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff)) then
+    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion single_target 16"; end
   end
-  -- shockwave
-  if S.Shockwave:IsCastable() then
-    if Cast(S.Shockwave, Settings.Commons.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave single_target 30"; end
+  -- kyrian_spear,if=debuff.colossus_smash.up|buff.test_of_might.up
+  if CDsON() and S.SpearofBastionCov:IsReady() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff)) then
+    if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "kyrian_spear single_target 18"; end
+  end
+  -- ancient_aftershock,if=debuff.colossus_smash.up|buff.test_of_might.up
+  if S.AncientAftershock:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff)) then
+    if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock single_target 20"; end
+  end
+  -- bladestorm,if=talent.hurricane&(buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up)|debuff.colossus_smash.up&talent.unhinged
+  if S.Bladestorm:IsCastable() and (S.Hurricane:IsAvailable() and (Player:BuffUp(S.TestofMightBuff) or (not S.TestofMight:IsAvailable()) and Target:DebuffUp(S.ColossusSmashDebuff)) or Target:DebuffUp(S.ColossusSmashDebuff) and S.Unhinged:IsAvailable()) then
+    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm single_target 22"; end
+  end
+  -- skullsplitter,if=talent.tide_of_blood&dot.rend.remains&(buff.sweeping_strikes.up&active_enemies>=2|debuff.colossus_smash.up|buff.test_of_might.up)|rage<40
+  if S.Skullsplitter:IsCastable() and (S.TideofBlood:IsAvailable() and Target:DebuffUp(S.RendDebuff) and (Player:BuffUp(S.SweepingStrikesBuff) and EnemiesCount8y >= 2 or Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff)) or Player:Rage() < 40) then
+    if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter single_target 24"; end
+  end
+  -- mortal_strike,if=runeforge.enduring_blow|runeforge.battlelord|dot.deep_wounds.remains<=gcd|debuff.executioners_precision.stack=2
+  if S.MortalStrike:IsReady() and (EnduringBlowEquipped or BattlelordEquipped or Target:DebuffRemains(S.DeepWoundsDebuff) <= Player:GCD() or Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike single_target 26"; end
+  end
+  -- execute,if=buff.sudden_death.react
+  if S.Execute:IsReady() and (Player:BuffUp(S.SuddenDeathBuff)) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 28"; end
+  end
+  -- condemn,if=buff.sudden_death.react
+  if S.Condemn:IsReady() and (Player:BuffUp(S.SuddenDeathBuff)) then
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 30"; end
+  end
+  -- shockwave,if=talent.sonic_boom.enabled
+  if S.Shockwave:IsCastable() and (S.SonicBoom:IsAvailable()) then
+    if Cast(S.Shockwave, Settings.Commons.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave single_target 32"; end
+  end
+  -- whirlwind,if=spell_targets.whirlwind>1&buff.merciless_bonegrinder.up
+  if S.Whirlwind:IsReady() and (EnemiesCount8y > 1 and Player:BuffUp(S.MercilessBonegrinderBuff)) then
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 34"; end
+  end
+  -- overpower,if=charges=2&(!talent.test_of_might|talent.test_of_might&debuff.colossus_smash.down)
+  if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2 and ((not S.TestofMight:IsAvailable()) or S.TestofMight:IsAvailable() and Target:DebuffDown(S.ColossusSmashDebuff))) then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower single_target 36"; end
   end
   -- mortal_strike
   if S.MortalStrike:IsReady() then
-    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike single_target 32"; end
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike single_target 38"; end
   end
   -- rend,if=remains<duration*0.3
   if S.Rend:IsReady() and (Target:DebuffRefreshable(S.RendDebuff)) then
-    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend single_target 34"; end
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend single_target 40"; end
   end
   -- cleave
   if S.Cleave:IsReady() then
-    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave single_target 36"; end
+    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave single_target 42"; end
   end
-  -- overpower,if=rage<70
-  if S.Overpower:IsCastable() and (Player:Rage() < 70) then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower single_target 38"; end
+  -- overpower,if=rage<70&debuff.colossus_smash.down|rage<30
+  if S.Overpower:IsCastable() and (Player:Rage() < 70 and Target:DebuffDown(S.ColossusSmashDebuff) or Player:Rage() < 30) then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower single_target 44"; end
   end
-  -- whirlwind,if=talent.fervor_of_battle.enabled|spell_targets.whirlwind>4|spell_targets.whirlwind>2&buff.sweeping_strikes.down
-  if S.Whirlwind:IsReady() and (S.FervorofBattle:IsAvailable() or EnemiesCount8y > 4 or EnemiesCount8y > 2 and Player:BuffDown(S.SweepingStrikesBuff)) then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind single_target 40"; end
+  -- slam,if=!talent.fervor_of_battle.enabled|spell_targets.whirlwind=1
+  if S.Slam:IsReady() and ((not S.FervorofBattle:IsAvailable()) or EnemiesCount8y == 1) then
+    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam single_target 46"; end
   end
-  -- slam,if=!talent.fervor_of_battle.enabled
-  if S.Slam:IsReady() and (not S.FervorofBattle:IsAvailable()) then
-    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam single_target 42"; end
-  end
-  -- impending_victory
-  if S.ImpendingVictory:IsReady() then
-    if Cast(S.ImpendingVictory, nil, nil, not TargetInMeleeRange) then return "impending_victory single_target 44"; end
+  -- whirlwind,if=talent.fervor_of_battle.enabled&spell_targets.whirlwind>1
+  if S.Whirlwind:IsReady() and (S.FervorofBattle:IsAvailable() and EnemiesCount8y > 1) then
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind single_target 48"; end
   end
   -- wrecking_throw
   if S.WreckingThrow:IsCastable() then
@@ -339,8 +347,11 @@ local function APL()
     end
     -- auto_attack
     -- potion,if=gcd.remains=0&debuff.colossus_smash.remains>8|target.time_to_die<25
-    if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions and (Target:DebuffRemains(S.ColossusSmashDebuff) > 8 or Target:TimeToDie() < 25) then
-      if Cast(I.PotionofSpectralStrength, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
+    if Settings.Commons.Enabled.Potions then
+      local PotionSelected = Everyone.PotionSelected()
+      if PotionSelected and PotionSelected:IsReady() and (Target:DebuffRemains(S.ColossusSmashDebuff) > 8 or Target:TimeToDie() < 25) then
+        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
+      end
     end
     if CDsON() then
       -- arcane_torrent,if=cooldown.mortal_strike.remains>1.5&rage<50

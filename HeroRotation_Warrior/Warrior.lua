@@ -47,6 +47,7 @@ Spell.Warrior.Commons = {
   ImpendingVictory                      = Spell(202168),
   OverwhelmingRage                      = Spell(382767),
   Shockwave                             = Spell(46968),
+  SonicBoom                             = Spell(390725),
   SpearofBastion                        = Spell(376079),
   StormBolt                             = Spell(107570),
   ThunderousRoar                        = Spell(384318),
