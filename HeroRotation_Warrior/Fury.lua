@@ -115,81 +115,93 @@ local function Precombat()
 end
 
 local function SingleTarget()
-  -- rampage,if=buff.recklessness.up|buff.enrage.remains<gcd|(rage>110&talent.overwhelming_rage)|(rage>80&!talent.overwhelming_rage)|buff.frenzy.remains<1.5
-  if S.Rampage:IsReady() and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffRemains(S.EnrageBuff) < Player:GCD() or (Player:Rage() > 110 and S.OverwhelmingRage:IsAvailable()) or (Player:Rage() > 80 and not S.OverwhelmingRage:IsAvailable()) or Player:BuffRemains(S.FrenzyBuff) < 1.5) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 2"; end
-  end
-  -- execute
-  if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 4"; end
-  end
-  -- condemn
-  if S.Condemn:IsReady() then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 6"; end
-  end
-  -- bloodthirst,if=buff.enrage.down|(talent.annihilator&!buff.recklessness.up)
-  if S.Bloodthirst:IsCastable() and ((not EnrageUp) or (S.Annihilator:IsAvailable() and Player:BuffDown(S.RecklessnessBuff))) then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 8"; end
+  -- execute,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd
+  if S.Execute:IsReady() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD()) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 2"; end
   end
   -- thunderous_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
   if S.ThunderousRoar:IsCastable() and (EnrageUp) then
-    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 10"; end
+    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 4"; end
   end
-  -- odyns_fury,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
-  if S.OdynsFury:IsCastable() and (EnrageUp) then
-    if Cast(S.OdynsFury, nil, nil, not Target:IsInMeleeRange(12)) then return "odyns_fury single_target 12"; end
+  -- crushing_blow,if=talent.wrath_and_fury
+  if S.CrushingBlow:IsCastable() and (S.WrathandFury:IsAvailable()) then
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 6"; end
+  end
+  -- execute,if=buff.enrage.up
+  if S.Execute:IsReady() and (EnrageUp) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 8"; end
+  end
+  -- odyns_fury,if=!talent.annihilator&buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
+  if S.OdynsFury:IsCastable() and ((not S.Annihilator:IsAvailable()) and EnrageUp) then
+    if Cast(S.OdynsFury, nil, nil, not Target:IsInMeleeRange(12)) then return "odyns_fury single_target 10"; end
+  end
+  -- rampage,if=buff.recklessness.up|buff.enrage.remains<gcd|(rage>110&talent.overwhelming_rage)|(rage>80&!talent.overwhelming_rage)|buff.frenzy.remains<gcd
+  if S.Rampage:IsReady() and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffRemains(S.EnrageBuff) < Player:GCD() or (Player:Rage() > 110 and S.OverwhelmingRage:IsAvailable()) or (Player:Rage() > 80 and not S.OverwhelmingRage:IsAvailable()) or Player:BuffRemains(S.FrenzyBuff) < Player:GCD()) then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 12"; end
+  end
+  -- condemn
+  if S.Condemn:IsReady() then
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 14"; end
+  end
+  -- execute
+  if S.Execute:IsReady() then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 16"; end
+  end
+  -- bloodthirst,if=buff.enrage.down|(talent.annihilator&!buff.recklessness.up)
+  if S.Bloodthirst:IsCastable() and ((not EnrageUp) or (S.Annihilator:IsAvailable() and Player:BuffDown(S.RecklessnessBuff))) then
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 18"; end
+  end
+  -- odyns_fury,if=!talent.annihilator&buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
+  if S.OdynsFury:IsCastable() and ((not S.Annihilator:IsAvailable()) and EnrageUp) then
+    if Cast(S.OdynsFury, nil, nil, not Target:IsInMeleeRange(12)) then return "odyns_fury single_target 20"; end
   end
   -- onslaught,if=!talent.annihilator&buff.enrage.up|talent.tenderize
   if S.Onslaught:IsReady() and ((not S.Annihilator:IsAvailable()) and EnrageUp or S.Tenderize:IsAvailable()) then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught single_target 14"; end
+    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught single_target 22"; end
+  end
+  -- raging_blow,if=charges>1&talent.wrath_and_fury
+  if S.RagingBlow:IsCastable() and (S.RagingBlow:Charges() > 1 and S.WrathandFury:IsAvailable()) then
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 24"; end
+  end
+  -- bloodbath,if=buff.enrage.down|!talent.wrath_and_fury
+  if S.Bloodbath:IsCastable() and ((not EnrageUp) or not S.WrathandFury:IsAvailable()) then
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 26"; end
+  end
+  -- bloodthirst,if=!talent.wrath_and_fury
+  if S.Bloodthirst:IsCastable() and (not S.WrathandFury:IsAvailable()) then
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 28"; end
   end
   -- raging_blow,if=charges>1
   if S.RagingBlow:IsCastable() and (S.RagingBlow:Charges() > 1) then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 16"; end
-  end
-  -- crushing_blow,if=charges>1
-  if S.CrushingBlow:IsCastable() and (S.CrushingBlow:Charges() > 1) then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 18"; end
-  end
-  -- bloodbath,if=buff.enrage.down|talent.annihilator
-  if S.Bloodbath:IsCastable() and ((not EnrageUp) or S.Annihilator:IsAvailable()) then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 20"; end
-  end
-  -- bloodthirst,if=talent.annihilator
-  if S.Bloodthirst:IsCastable() and (S.Annihilator:IsAvailable()) then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 22"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 30"; end
   end
   -- rampage
   if S.Rampage:IsReady() then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 24"; end
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 32"; end
   end
-  -- slam,if=talent.annihilator
-  if S.Slam:IsReady() and (S.Annihilator:IsAvailable()) then
-    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam single_target 26"; end
-  end
-  -- bloodthirst,if=!talent.annihilator
-  if S.Bloodthirst:IsCastable() and (not S.Annihilator:IsAvailable()) then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 28"; end
+  -- slam,if=talent.storm_of_swords
+  if S.Slam:IsReady() and (S.StormofSwords:IsAvailable()) then
+    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam single_target 34"; end
   end
   -- bloodbath
   if S.Bloodbath:IsCastable() then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 30"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 36"; end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 32"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 38"; end
   end
   -- crushing_blow
   if S.CrushingBlow:IsCastable() then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 34"; end
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 40"; end
   end
   -- whirlwind
   if S.Whirlwind:IsCastable() then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 36"; end
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 42"; end
   end
   -- wrecking_throw
   if S.WreckingThrow:IsCastable() then
-    if Cast(S.WreckingThrow, nil, nil, not Target:IsInRange(30)) then return "wrecking_throw single_target 38"; end
+    if Cast(S.WreckingThrow, nil, nil, not Target:IsInRange(30)) then return "wrecking_throw single_target 44"; end
   end
 end
 
@@ -314,8 +326,8 @@ local function APL()
         if Cast(S.AncestralCall, Settings.Commons.GCDasOffGCD.Racials) then return "ancestral_call"; end
       end
     end
-    -- avatar,if=talent.titans_torment&buff.enrage.up&(buff.elysian_might.up|!covenant.kyrian)
-    if S.Avatar:IsCastable() and (S.TitansTorment:IsAvailable() and EnrageUp and (Player:BuffUp(S.ElysianMightBuff) or CovenantID ~= 1)) then
+    -- avatar,if=talent.titans_torment&buff.enrage.up&(buff.elysian_might.up|!runeforge.elysian_might|!covenant.kyrian)
+    if S.Avatar:IsCastable() and (S.TitansTorment:IsAvailable() and EnrageUp and (Player:BuffUp(S.ElysianMightBuff) or (not ElysianMightEquipped) or CovenantID ~= 1)) then
       if Cast(S.Avatar, Settings.Commons.GCDasOffGCD.Avatar) then return "avatar main 12"; end
     end
     -- avatar,if=!talent.titans_torment&(buff.recklessness.up|target.time_to_die<20)

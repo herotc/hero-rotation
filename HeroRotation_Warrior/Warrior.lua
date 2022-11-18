@@ -68,6 +68,8 @@ Spell.Warrior.Commons = {
   SpearofBastionCov                     = Spell(307865),
   SpearofBastionCovBuff                 = Spell(307871),
   -- Conduits (Shadowlands)
+  AshenJuggernaut                       = Spell(335232),
+  AshenJuggernautBuff                   = Spell(335234),
   MercilessBonegrinder                  = Spell(335260),
   MercilessBonegrinderBuff              = Spell(346574),
   -- Pool
@@ -94,8 +96,10 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   Ravager                               = Spell(228920),
   RecklessAbandon                       = Spell(202751),
   Recklessness                          = Spell(1719),
+  StormofSwords                         = Spell(388903),
   SuddenDeath                           = Spell(280721),
   Tenderize                             = Spell(388933),
+  WrathandFury                          = Spell(392936),
   -- Buffs
   EnrageBuff                            = Spell(184362),
   FrenzyBuff                            = Spell(335082),
@@ -150,8 +154,6 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   ExecutionersPrecisionDebuff           = Spell(386633),
   RendDebuff                            = Spell(388539),
   -- Conduits (Shadowlands)
-  AshenJuggernaut                       = Spell(335232),
-  AshenJuggernautBuff                   = Spell(335234),
   BattlelordBuff                        = Spell(346369),
   ExploiterDebuff                       = Spell(335452),
 })
