@@ -1,23 +1,24 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
-  -- Addon
-  local addonName, HR = ...;
-  -- HeroLib
-  local HL = HeroLib;
-  local Cache, Utils = HeroCache, HL.Utils;
-  local Unit = HL.Unit;
-  local Player = Unit.Player;
-  local Target = Unit.Target;
-  local Spell = HL.Spell;
-  local Item = HL.Item;
-  -- Lua
-  local pairs = pairs;
-  -- File Locals
-  HR.Commons = {};
-  local Commons = {};
-  HR.Commons.Everyone = Commons;
-  local Settings = HR.GUISettings.General;
-  local AbilitySettings = HR.GUISettings.Abilities;
+-- Addon
+local addonName, HR = ...;
+-- HeroLib
+local HL = HeroLib;
+local Cache, Utils = HeroCache, HL.Utils;
+local Unit = HL.Unit;
+local Player = Unit.Player;
+local Target = Unit.Target;
+local Spell = HL.Spell;
+local Item = HL.Item;
+-- Lua
+local pairs = pairs;
+local gsub = string.gsub;
+-- File Locals
+HR.Commons = {};
+local Commons = {};
+HR.Commons.Everyone = Commons;
+local Settings = HR.GUISettings.General;
+local AbilitySettings = HR.GUISettings.Abilities;
 
 --- ============================ CONTENT ============================
 -- Is the current target valid?
@@ -128,6 +129,7 @@ end
 -- Check if player's selected potion type is ready
 function Commons.PotionSelected()
   local Class = Cache.Persistent.Player.Class[1]
+  Class = sub(Class, "%s+", "")
   local Spec = Cache.Persistent.Player.Spec[2]
   local PotionType = HR.GUISettings.APL[Class][Spec].PotionType.Selected
   local PowerPotionIDs = {
