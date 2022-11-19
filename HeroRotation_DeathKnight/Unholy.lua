@@ -192,7 +192,7 @@ local function Precombat()
   end
   -- fleshcraft
   if S.Fleshcraft:IsReady() then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 3"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 6"; end
   end
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(trinket.1.cooldown.duration%%45=0)
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(trinket.2.cooldown.duration%%45=0)
@@ -200,13 +200,13 @@ local function Precombat()
   -- variable,name=trinket_1_buffs,value=trinket.1.has_buff.strength|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit
   -- variable,name=trinket_2_buffs,value=trinket.2.has_buff.strength|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit
   -- TODO: Trinket sync/priority stuff. Currently unable to pull trinket CD durations because WoW's API is bad.
-  -- Manually added: festering_strike if in melee range
-  if S.FesteringStrike:IsReady() and Target:IsSpellInRange(S.FesteringStrike) then
-    if Cast(S.FesteringStrike) then return "festering_strike precombat 6"; end
-  end
   -- Manually added: outbreak if not in melee range
-  if S.Outbreak:IsReady() then
-    if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak precombat 8"; end
+  if S.Outbreak:IsReady() and not Target:IsInMeleeRange(5) then
+    if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak precombat 10"; end
+  end
+  -- Manually added: festering_strike if in melee range
+  if S.FesteringStrike:IsReady() then
+    if Cast(S.FesteringStrike, nil, nil, not Target:IsInMeleeRange(5)) then return "festering_strike precombat 8"; end
   end
 end
 
@@ -294,7 +294,7 @@ or S.SummonGargoyle:CooldownRemains() > 60) and (Pet:BuffUp(S.DarkTransformation
     if Everyone.CastTargetIf(S.UnholyAssault, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfUnholyAssault, not Target:IsInMeleeRange(5), Settings.Unholy.GCDasOffGCD.UnholyAssault) then return "unholy_assault cooldowns 26"; end
   end
   -- apocalypse,target_if=max:debuff.festering_wound.stack,if=active_enemies<=3
-  if S.Apocalypse:IsCastable() and (EnemiesMeleeCount <= 3) then
+  if S.Apocalypse:IsReady() and (EnemiesMeleeCount <= 3) then
     if Everyone.CastTargetIf(S.Apocalypse, Enemies10ySplash, "max", EvaluateTargetIfFilterFWStack, nil, not Target:IsInMeleeRange(5)) then return "apocalypse cooldowns 10"; end
   end
   -- dark_transformation,if=variable.st_planning&(pet.apoc_ghoul.active|cooldown.apocalypse.remains<gcd*2|!talent.commander_of_the_dead)
