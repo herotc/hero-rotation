@@ -333,8 +333,8 @@ local function Main()
   if S.VoidBolt:IsCastable() and VarDotsUp and Player:Insanity() <= 85 then
     if Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt main 40"; end
   end
-  -- mind_sear,target_if=(spell_targets.mind_sear>variable.mind_sear_cutoff|buff.voidform.up)&buff.mind_devourer.up
-  if S.MindSear:IsReady() and (EnemiesCount10ySplash > VarMindSearCutoff or Player:BuffUp(S.VoidformBuff)) and
+  -- mind_sear,target_if=(spell_targets.mind_sear>1|buff.voidform.up)&buff.mind_devourer.up
+  if S.MindSear:IsReady() and (EnemiesCount10ySplash > 1 or Player:BuffUp(S.VoidformBuff)) and
       Player:BuffUp(S.MindDevourerBuff) then
     if Everyone.CastCycle(S.MindSear, Enemies40y, EvaluateCycleMindSear225, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear main 50"; end
   end
