@@ -151,8 +151,8 @@ local function SingleTarget()
   if S.Bloodthirst:IsCastable() and ((not EnrageUp) or (S.Annihilator:IsAvailable() and Player:BuffDown(S.RecklessnessBuff))) then
     if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 18"; end
   end
-  -- odyns_fury,if=!talent.annihilator&buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
-  if S.OdynsFury:IsCastable() and ((not S.Annihilator:IsAvailable()) and EnrageUp) then
+  -- odyns_fury,if=talent.annihilator&buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
+  if S.OdynsFury:IsCastable() and (S.Annihilator:IsAvailable() and EnrageUp) then
     if Cast(S.OdynsFury, nil, nil, not Target:IsInMeleeRange(12)) then return "odyns_fury single_target 20"; end
   end
   -- onslaught,if=!talent.annihilator&buff.enrage.up|talent.tenderize
