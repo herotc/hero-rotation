@@ -63,6 +63,7 @@ local VarIsVTPossible = false
 local VarVTsApplied = false
 local VarPoolForCDs = false
 local VarSFP = false
+local VarDPCutoff = false
 local DarkThoughtMaxStacks = 2
 local TalbadarEquipped = Player:HasLegendaryEquipped(161)
 local ShadowflamePrismEquipped = Player:HasLegendaryEquipped(159)
@@ -154,54 +155,51 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
-  if Everyone.TargetIsValid() then
-    -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
-    if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
-      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft 10"; end
-    end
-    -- shadowform,if=!buff.shadowform.up
-    if S.Shadowform:IsCastable() and (Player:BuffDown(S.ShadowformBuff)) then
-      if Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "shadowform 20"; end
-    end
-    -- arcane_torrent
-    if S.ArcaneTorrent:IsCastable() and CDsON() then
-      if Cast(S.ArcaneTorrent, nil, nil, not Target:IsSpellInRange(S.ArcaneTorrent)) then return "arcane_torrent 30"; end
-    end
-    -- use_item,name=shadowed_orb_of_torment
-    if Settings.Commons.Enabled.Trinkets and I.ShadowedOrbofTorment:IsEquippedAndReady() then
-      if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment 40"; end
-    end
-    -- variable,name=mind_sear_cutoff,op=set,value=2
-    VarMindSearCutoff = 2
-    --shadow_crash,if=talent.shadow_crash.enabled
-    if S.ShadowCrash:IsCastable() then
-      if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash 50"; end
-    end
-    -- mind_blast,if=talent.damnation.enabled&!talent.shadow_crash.enabled
-    if S.MindBlast:IsReady() and (S.Damnation:IsAvailable() and not S.ShadowCrash:IsAvailable()) then
-      if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 60"; end
-    end
-    -- vampiric_touch,if=!talent.damnation.enabled&!talent.shadow_crash.enabled
-    if S.VampiricTouch:IsCastable() and (not S.Damnation:IsAvailable() and not S.ShadowCrash:IsAvailable()) then
-      if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch 70"; end
-    end
-    -- Manually added: mind_blast,if=talent.misery.enabled&(!runeforge.talbadars_stratagem.equipped|!talent.void_torrent.enabled)
-    if S.MindBlast:IsCastable() and
-        (S.Misery:IsAvailable() and (not TalbadarEquipped or not S.VoidTorrent:IsAvailable())) then
-      if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 80"; end
-    end
-    -- Manually added: void_torrent,if=talent.misery.enabled&runeforge.talbadars_stratagem.equipped
-    if S.VoidTorrent:IsCastable() and (S.Misery:IsAvailable() and TalbadarEquipped) then
-      if Cast(S.VoidTorrent, nil, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent 90"; end
-    end
-    -- Manually added: mind_flay,if=talent.misery.enabled&runeforge.talbadars_stratagem.equipped&!talent.void_torrent.enabled
-    if S.MindFlay:IsCastable() and (S.Misery:IsAvailable() and TalbadarEquipped and not S.VoidTorrent:IsAvailable()) then
-      if Cast(S.MindFlay, nil, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay 100"; end
-    end
-    -- Manually added: shadow_word_pain,if=!talent.misery.enabled
-    if S.ShadowWordPain:IsCastable() and (not S.Misery:IsAvailable()) then
-      if Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 110"; end
-    end
+  -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
+  if S.Fleshcraft:IsReady() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft 10"; end
+  end
+  -- shadowform,if=!buff.shadowform.up
+  if S.Shadowform:IsCastable() and (Player:BuffDown(S.ShadowformBuff)) then
+    if Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "shadowform 20"; end
+  end
+  -- arcane_torrent
+  if S.ArcaneTorrent:IsCastable() and CDsON() then
+    if Cast(S.ArcaneTorrent, nil, nil, not Target:IsSpellInRange(S.ArcaneTorrent)) then return "arcane_torrent 30"; end
+  end
+  -- use_item,name=shadowed_orb_of_torment
+  if Settings.Commons.Enabled.Trinkets and I.ShadowedOrbofTorment:IsEquippedAndReady() then
+    if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment 40"; end
+  end
+  -- variable,name=mind_sear_cutoff,op=set,value=2
+  VarMindSearCutoff = 2
+  --shadow_crash,if=talent.shadow_crash.enabled
+  if S.ShadowCrash:IsCastable() then
+    if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash 50"; end
+  end
+  -- mind_blast,if=talent.damnation.enabled&!talent.shadow_crash.enabled
+  if S.MindBlast:IsReady() and (S.Damnation:IsAvailable() and not S.ShadowCrash:IsAvailable()) then
+    if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 60"; end
+  end
+  -- vampiric_touch,if=!talent.damnation.enabled&!talent.shadow_crash.enabled
+  if S.VampiricTouch:IsCastable() and (not S.Damnation:IsAvailable() and not S.ShadowCrash:IsAvailable()) then
+    if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch 70"; end
+  end
+  -- Manually added: mind_blast,if=talent.misery.enabled&(!runeforge.talbadars_stratagem.equipped|!talent.void_torrent.enabled)
+  if S.MindBlast:IsCastable() and (S.Misery:IsAvailable() and (not TalbadarEquipped or not S.VoidTorrent:IsAvailable())) then
+    if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 80"; end
+  end
+  -- Manually added: void_torrent,if=talent.misery.enabled&runeforge.talbadars_stratagem.equipped
+  if S.VoidTorrent:IsCastable() and (S.Misery:IsAvailable() and TalbadarEquipped) then
+    if Cast(S.VoidTorrent, nil, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent 90"; end
+  end
+  -- Manually added: mind_flay,if=talent.misery.enabled&runeforge.talbadars_stratagem.equipped&!talent.void_torrent.enabled
+  if S.MindFlay:IsCastable() and (S.Misery:IsAvailable() and TalbadarEquipped and not S.VoidTorrent:IsAvailable()) then
+    if Cast(S.MindFlay, nil, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay 100"; end
+  end
+  -- Manually added: shadow_word_pain,if=!talent.misery.enabled
+  if S.ShadowWordPain:IsCastable() and (not S.Misery:IsAvailable()) then
+    if Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 110"; end
   end
 end
 
@@ -342,14 +340,8 @@ local function Main()
   if S.MindSear:IsReady() and (EnemiesCount10ySplash > VarMindSearCutoff) then
     if Cast(S.MindSear, nil, nil, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear main 60"; end
   end
-  -- devouring_plague,if=(refreshable&!variable.pool_for_cds|insanity>75|talent.void_torrent&cooldown.void_torrent.remains<=3*gcd|buff.mind_devourer.up&cooldown.mind_blast.full_recharge_time<=2*gcd.max&!cooldown.void_eruption.up&talent.void_eruption)
-  if S.DevouringPlague:IsReady() and
-      (
-      (
-          Target:DebuffRefreshable(S.DevouringPlagueDebuff) and not VarPoolForCDs or Player:Insanity() > 75 or
-              S.VoidTorrent:IsAvailable() and S.VoidTorrent:CooldownRemains() <= 3 * Player:GCD() or
-              Player:BuffUp(S.MindDevourerBuff) and S.MindBlast:FullRechargeTime() <= 2 * Player:GCD() and
-              not S.VoidEruption:CooldownUp() and S.VoidEruption:IsAvailable())) then
+  -- devouring_plague,if=(refreshable&!variable.pool_for_cds|insanity>75|talent.void_torrent&cooldown.void_torrent.remains<=3*gcd|buff.mind_devourer.up&cooldown.mind_blast.full_recharge_time<=2*gcd.max&!cooldown.void_eruption.up&talent.void_eruption)&variable.dp_cutoff
+  if S.DevouringPlague:IsReady() and ((Target:DebuffRefreshable(S.DevouringPlagueDebuff) and (not VarPoolForCDs) or Player:Insanity() > 75 or S.VoidTorrent:IsAvailable() and S.VoidTorrent:CooldownRemains() <= 3 * Player:GCD() or Player:BuffUp(S.MindDevourerBuff) and S.MindBlast:FullRechargeTime() <= 2 * Player:GCD() and S.VoidEruption:CooldownDown() and S.VoidEruption:IsAvailable()) and VarDPCutoff) then
     if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 70"; end
   end
   -- shadow_word_death,target_if=(target.health.pct<20&spell_targets.mind_sear<4)&(!variable.sfp|cooldown.fiend.remains>=10)|(pet.fiend.active&variable.sfp&spell_targets.mind_sear<=7)|buff.deathspeaker.up&(cooldown.fiend.remains+gcd.max)>buff.deathspeaker.remains
@@ -397,8 +389,8 @@ local function Main()
   if S.DarkVoid:IsCastable() then
     if Cast(S.DarkVoid, Settings.Shadow.GCDasOffGCD.DarkVoid, nil, not Target:IsInRange(40)) then return "dark_void main 140"; end
   end
-  -- devouring_plague,if=buff.voidform.up&variable.dots_up
-  if S.DevouringPlague:IsReady() and Player:BuffUp(S.VoidformBuff) and VarDotsUp then
+  -- devouring_plague,if=buff.voidform.up&variable.dots_up&variable.dp_cutoff
+  if S.DevouringPlague:IsReady() and Player:BuffUp(S.VoidformBuff) and VarDotsUp and VarDPCutoff then
     if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 150"; end
   end
   -- void_torrent,if=insanity<=35,target_if=variable.dots_up
@@ -481,12 +473,11 @@ local function APL()
     end
   end
 
-  -- call precombat
-  if not Player:AffectingCombat() then
-    local ShouldReturn = Precombat();
-    if ShouldReturn then return ShouldReturn; end
-  end
   if Everyone.TargetIsValid() then
+    -- call precombat
+    if not Player:AffectingCombat() then
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
     -- Store HL.CombatTime into a variable (pool_for_cds variable checks it and fight_remains multiple times)
     CombatTime = HL.CombatTime()
     -- Store FightRemains + CombatTime for cd_management variable
@@ -499,9 +490,11 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(30, S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false);
     if ShouldReturn then return ShouldReturn; end
     -- potion,if=buff.power_infusion.up&(buff.bloodlust.up|(time+fight_remains)>=320)
-    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and
-        (Player:BuffUp(S.PowerInfusionBuff) and (Player:BloodlustUp() or RemainsPlusTime >= 320)) then
-      if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_spectral_intellect 20"; end
+    if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.PowerInfusionBuff) and (Player:BloodlustUp() or RemainsPlusTime >= 320)) then
+      local PotionSelected = Everyone.PotionSelected()
+      if PotionSelected and PotionSelected:IsReady() then
+        if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_spectral_intellect 20"; end
+      end
     end
     -- variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
     VarDotsUp = DotsUp(Target, false)
@@ -524,9 +517,9 @@ local function APL()
     --variable,name=sfp,op=set,value=runeforge.shadowflame_prism.equipped|talent.inescapable_torment
     VarSFP = ShadowflamePrismEquipped or S.InescapableTorment:IsAvailable();
     -- variable,name=pool_for_cds,op=set,value=(cooldown.void_eruption.remains<=gcd.max*3&talent.void_eruption|cooldown.dark_ascension.up&talent.dark_ascension)
-    VarPoolForCDs = (
-        S.VoidEruption:CooldownRemains() <= Player:GCD() * 3 and S.VoidEruption:IsAvailable() or
-            S.DarkAscension:CooldownUp() and S.DarkAscension:IsAvailable())
+    VarPoolForCDs = (S.VoidEruption:CooldownRemains() <= Player:GCD() * 3 and S.VoidEruption:IsAvailable() or S.DarkAscension:CooldownUp() and S.DarkAscension:IsAvailable())
+    -- variable,name=dp_cutoff,op=set,value=!talent.mind_sear|(spell_targets.mind_sear<=variable.mind_sear_cutoff&(!buff.mind_devourer.up|spell_targets.mind_sear=1))
+    VarDPCutoff = (not S.MindSear:IsAvailable()) or (EnemiesCount10ySplash <= VarMindSearCutoff and (Player:BuffDown(S.MindDevourerBuff) or EnemiesCount10ySplash == 1))
     -- variable,name=pool_amount,op=set,value=60
     VarPoolAmount = 60
     if (CDsON()) then
