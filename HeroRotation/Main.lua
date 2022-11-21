@@ -350,7 +350,7 @@
       --[261]   = "HeroRotation_Rogue",         -- Subtlety
     -- Shaman
       --[262]   = "HeroRotation_Shaman",        -- Elemental
-      --[263]   = "HeroRotation_Shaman",        -- Enhancement
+      [263]   = "HeroRotation_Shaman",        -- Enhancement
       --[264]   = "HeroRotation_Shaman",        -- Restoration
     -- Warlock
       --[265]   = "HeroRotation_Warlock",       -- Affliction

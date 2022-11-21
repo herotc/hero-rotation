@@ -33,12 +33,12 @@ HR.GUISettings.APL.Shaman = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-      EarthElemental = true
+      EarthElemental = true,
+      -- Racials
+      Racials = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      -- Racials
-      Racials = true,
       -- Abilities
       WindShear = true
     }
