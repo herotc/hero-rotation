@@ -455,7 +455,7 @@ local function APL()
       if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress main 16"; end
     end
     -- gorefiends_grasp,if=talent.tightening_grasp.enabled
-    if S.GorefiendsGrasp:IsCastable() and (S.TighteningGrap:IsAvailable()) then
+    if S.GorefiendsGrasp:IsCastable() and (S.TighteningGrasp:IsAvailable()) then
       if Cast(S.GorefiendsGrasp, Settings.Blood.GCDasOffGCD.GorefiendsGrasp, nil, not Target:IsSpellInRange(S.GorefiendsGrasp)) then return "gorefiends_grasp main 18"; end
     end
     -- deaths_due,if=covenant.night_fae&!death_and_decay.ticking
