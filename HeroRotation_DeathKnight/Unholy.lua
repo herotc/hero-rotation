@@ -379,8 +379,8 @@ local function Covenants()
 end
 
 local function Racials()
-  -- arcane_torrent,if=runic_power.deficit>20&(pet.gargoyle.active|!talent.summon_gargoyle.enabled)
-  if S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 20 and (VarGargoyleActive or not S.SummonGargoyle:IsAvailable())) then
+  -- arcane_torrent,if=runic_power.deficit>20&(cooldown.summon_gargoyle.remains<gcd|!talent.summon_gargoyle.enabled|pet.gargoyle.active&rune<2&debuff.festering_wound.stack<1)
+  if S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 20 and (S.SummonGargoyle:CooldownRemains() < Player:GCD() or (not S.SummonGargoyle:IsAvailable()) or VarGargoyleActive and Player:Rune() < 2 and FesterStacks < 1)) then
     if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent main 2"; end
   end
   -- blood_fury,if=(buff.blood_fury.duration>=pet.gargoyle.remains&pet.gargoyle.active)|(!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>60)&(buff.dark_transformation.up&buff.blood_fury.duration>=buff.dark_transformation.remains|pet.army_ghoul.active&pet.army_ghoul.remains<=buff.blood_fury.duration|pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=buff.blood_fury.duration|active_enemies>=2&death_and_decay.ticking)|fight_remains<=buff.blood_fury.duration
@@ -445,8 +445,8 @@ local function Trinkets()
   if I.GaveloftheFirstArbiter:IsEquippedAndReady() and Settings.Commons.Enabled.Items then
     if Cast(I.GaveloftheFirstArbiter, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(30)) then return "gavel_of_the_first_arbiter trinkets 2"; end
   end
-  -- use_item,slot=trinket1,if=((!talent.summon_gargoyle|talent.gargoyle&pet.gargoyle.active|cooldown.summon_gargoyle.remains>90)&(pet.apoc_ghoul.active|buff.dark_transformation.up)&variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
-  -- use_item,slot=trinket2,if=((!talent.summon_gargoyle|talent.gargoyle&pet.gargoyle.active|cooldown.summon_gargoyle.remains>90)&(pet.apoc_ghoul.active|buff.dark_transformation.up)&variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
+  -- use_item,slot=trinket1,if=((!talent.summon_gargoyle|talent.summon_gargoyle&pet.gargoyle.active|cooldown.summon_gargoyle.remains>90)&(pet.apoc_ghoul.active|buff.dark_transformation.up)&variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
+  -- use_item,slot=trinket2,if=((!talent.summon_gargoyle|talent.summon_gargoyle&pet.gargoyle.active|cooldown.summon_gargoyle.remains>90)&(pet.apoc_ghoul.active|buff.dark_transformation.up)&variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs|!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>20&!pet.gargoyle.active)|fight_remains<15
   -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs|!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>20&!pet.gargoyle.active)|fight_remains<15
   -- TODO: Add above lines and remove below lines when we can handle the trinket sync/priority variables. For now, keeping the old trinket setup below.
