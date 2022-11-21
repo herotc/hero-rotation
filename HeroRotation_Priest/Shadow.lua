@@ -155,6 +155,10 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
+  -- Manually added: Group buff check
+  if S.PowerWordFortitude:IsCastable() and (Player:BuffDown(S.PowerWordFortitudeBuff, true) or Everyone.GroupBuffMissing(S.PowerWordFortitudeBuff)) then
+    if Cast(S.PowerWordFortitude, Settings.Commons.GCDasOffGCD.PowerWordFortitude) then return "power_word_fortitude precombat"; end
+  end
   -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
   if S.Fleshcraft:IsReady() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft 10"; end

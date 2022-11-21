@@ -58,6 +58,7 @@ Spell.Druid.Commons = {
   FrenziedRegenerationBuff              = Spell(22842),
   HeartoftheWildBuff                    = Spell(319454),
   IronfurBuff                           = Spell(192081),
+  MarkoftheWildBuff                     = Spell(1126),
   -- Debuffs
   MoonfireDebuff                        = Spell(164812),
   RakeDebuff                            = Spell(155722),

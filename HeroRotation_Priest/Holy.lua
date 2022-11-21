@@ -59,6 +59,10 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   if Everyone.TargetIsValid() then
+    -- Manually added: Group buff check
+    if S.PowerWordFortitude:IsCastable() and (Player:BuffDown(S.PowerWordFortitudeBuff, true) or Everyone.GroupBuffMissing(S.PowerWordFortitudeBuff)) then
+      if Cast(S.PowerWordFortitude, Settings.Commons.GCDasOffGCD.PowerWordFortitude) then return "power_word_fortitude precombat"; end
+    end
     -- smite
     if S.Smite:IsReady() then
       if Cast(S.Smite, nil, nil, not Target:IsSpellInRange(S.Smite)) then return "smite precombat 2"; end

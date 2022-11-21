@@ -297,9 +297,9 @@ local function Precombat()
   if S.ArcaneFamiliar:IsCastable() and Player:BuffDown(S.ArcaneFamiliarBuff) then
     if Cast(S.ArcaneFamiliar) then return "arcane_familiar precombat 1"; end
   end  
-  --arcane_intellect
-  if S.ArcaneIntellect:IsCastable() and Player:BuffDown(S.ArcaneIntellect, true) then
-    if Cast(S.ArcaneIntellect) then return "arcane_intellect precombat 2"; end
+  -- arcane_intellect
+  if S.ArcaneIntellect:IsCastable() and (Player:BuffDown(S.ArcaneIntellect, true) or Everyone.GroupBuffMissing(S.ArcaneIntellect)) then
+    if Cast(S.ArcaneIntellect, Settings.Commons.GCDasOffGCD.ArcaneIntellect) then return "arcane_intellect precombat 2"; end
   end
   --conjure_mana_gem
   -- TODO: Fix hotkey issue (spell and item use the same icon)

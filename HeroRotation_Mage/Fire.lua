@@ -308,8 +308,8 @@ local function Precombat()
   -- food
   -- augmentation
   -- arcane_intellect
-  if S.ArcaneIntellect:IsCastable() and Player:BuffDown(S.ArcaneIntellectBuff, true) then
-    if Cast(S.ArcaneIntellect) then return "arcane_intellect"; end
+  if S.ArcaneIntellect:IsCastable() and (Player:BuffDown(S.ArcaneIntellect, true) or Everyone.GroupBuffMissing(S.ArcaneIntellect)) then
+    if Cast(S.ArcaneIntellect, Settings.Commons.GCDasOffGCD.ArcaneIntellect) then return "arcane_intellect precombat 2"; end
   end
   -- Initialize variables
   if not var_init then

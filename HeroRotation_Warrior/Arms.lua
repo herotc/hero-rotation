@@ -87,17 +87,17 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
-  -- Manually added: battle_shout,if=buff.battle_shout.remains<60
-  if S.BattleShout:IsCastable() and (Player:BuffRemains(S.BattleShoutBuff, true) < 60) then
-    if Cast(S.BattleShout, Settings.Arms.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
+  -- Manually added: Group buff check
+  if S.BattleShout:IsCastable() and (Player:BuffDown(S.BattleShoutBuff, true) or Everyone.GroupBuffMissing(S.BattleShoutBuff)) then
+    if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
   end
   -- fleshcraft
   if S.Fleshcraft:IsReady() then
-    if Cast(S.Fleshcraft) then return "fleshcraft precombat 6"; end
+    if Cast(S.Fleshcraft) then return "fleshcraft precombat 4"; end
   end
   -- conquerors_banner
   if S.ConquerorsBanner:IsReady() then
-    if Cast(S.ConquerorsBanner) then return "conquerors_banner precombat 4"; end
+    if Cast(S.ConquerorsBanner) then return "conquerors_banner precombat 6"; end
   end
   -- Manually added opener abilties
   if S.Charge:IsCastable() and not TargetInMeleeRange then

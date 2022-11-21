@@ -97,9 +97,9 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
-  -- Manually added: battle_shout,if=buff.battle_shout.remains<60
-  if S.BattleShout:IsCastable() and (Player:BuffRemains(S.BattleShoutBuff, true) < 60) then
-    if Cast(S.BattleShout, Settings.Fury.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
+  -- Manually added: Group buff check
+  if S.BattleShout:IsCastable() and (Player:BuffDown(S.BattleShoutBuff, true) or Everyone.GroupBuffMissing(S.BattleShoutBuff)) then
+    if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
   end
   -- recklessness,if=!runeforge.signet_of_tormented_kings.equipped
   if S.Recklessness:IsCastable() and CDsON() and (not SignetofTormentedKingsEquipped) then

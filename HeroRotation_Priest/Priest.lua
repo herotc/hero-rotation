@@ -41,6 +41,7 @@ Spell.Priest.Commons = {
   MindSear                    = Spell(48045), -- Splash, 10
   PowerInfusion               = Spell(10060),
   PowerInfusionBuff           = Spell(10060),
+  PowerWordFortitude          = Spell(21562),
   ShadowWordDeath             = Spell(32379),
   ShadowWordPain              = Spell(589),
   ShadowWordPainDebuff        = Spell(589),
@@ -49,6 +50,9 @@ Spell.Priest.Commons = {
   DivineStar                  = Spell(110744),
   Halo                        = Spell(230644),
   Mindgames                   = Spell(375901),
+  -- Buffs
+  PowerWordFortitudeBuff      = Spell(21562),
+  -- Debuffs
   -- Covenant Abilities
   AscendedNova                = Spell(325020), -- Melee, 8
   BoonoftheAscended           = Spell(325013),
@@ -137,7 +141,6 @@ Spell.Priest.Discipline = MergeTableByKey(Spell.Priest.Commons, {
   -- Base Spells
   Penance              = Spell(47540),
   PowerWordRadiance    = Spell(194509),
-  PowerWordFortitude   = Spell(21562),
   -- Talents
   Schism               = Spell(214621),
   Mindbender           = MultiSpell(123040, 34433),

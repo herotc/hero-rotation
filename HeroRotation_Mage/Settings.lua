@@ -31,6 +31,7 @@ HR.GUISettings.APL.Mage = {
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
+      ArcaneIntellect = true,
     },
     -- {Display OffGCD as OffGCD}
     OffGCDasOffGCD = {

@@ -35,6 +35,7 @@ HR.GUISettings.APL.Warrior = {
       -- Abilities
       Avatar = true,
       BattleCry = true,
+      BattleShout = true,
       Shockwave = true,
       ThunderousRoar = false,
     },
@@ -50,7 +51,6 @@ HR.GUISettings.APL.Warrior = {
     GCDasOffGCD = {
       -- Abilities
       Avatar = false,
-      BattleShout = false,
       Bladestorm = false,
       Ravager = false,
     },
@@ -66,7 +66,6 @@ HR.GUISettings.APL.Warrior = {
       -- Abilities
     },
     GCDasOffGCD = {
-      BattleShout = false,
       Bladestorm = false,
       DragonRoar = false,
       Recklessness = false,

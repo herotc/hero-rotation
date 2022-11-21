@@ -136,6 +136,10 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
+  -- Manually added: Group buff check
+  if S.BattleShout:IsCastable() and (Player:BuffDown(S.BattleShoutBuff, true) or Everyone.GroupBuffMissing(S.BattleShoutBuff)) then
+    if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
+  end
   -- fleshcraft
   -- Note: Manually moved this above conquerors_banner so we don't waste 3s of the banner buff
   if S.Fleshcraft:IsCastable() then

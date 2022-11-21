@@ -202,6 +202,10 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
+  -- Manually added: Group buff check
+  if S.MarkoftheWild:IsCastable() and (Player:BuffDown(S.MarkoftheWildBuff, true) or Everyone.GroupBuffMissing(S.MarkoftheWildBuff)) then
+    if Cast(S.MarkoftheWild, Settings.Commons.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat"; end
+  end
   -- moonkin_form
   if S.MoonkinForm:IsCastable() then
     if Cast(S.MoonkinForm) then return "moonkin_form precombat"; end

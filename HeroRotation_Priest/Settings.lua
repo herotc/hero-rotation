@@ -30,6 +30,7 @@ HR.GUISettings.APL.Priest = {
     },
     GCDasOffGCD = {
       -- Abilities
+      PowerWordFortitude = true,
     },
     OffGCDasOffGCD = {
       -- Racials

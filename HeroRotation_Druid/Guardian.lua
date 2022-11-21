@@ -137,9 +137,9 @@ local function Precombat()
   -- heart_of_the_wild,if=talent.heart_of_the_wild.enabled
   -- prowl,if=(druid.catweave_bear=1)&(cooldown.pause_action.remains|time>30)
   -- NOTE: Not handling cat-weaving or owl-weaving, so skipping above 4 lines
-  -- Manually added: mark_of_the_wild,if=buff.mark_of_the_wild.down
-  if S.MarkoftheWild:IsCastable() and (Player:BuffDown(S.MarkoftheWild)) then
-    if Cast(S.MarkoftheWild) then return "mark_of_the_wild precombat 2"; end
+  -- Manually added: Group buff check
+  if S.MarkoftheWild:IsCastable() and (Player:BuffDown(S.MarkoftheWildBuff, true) or Everyone.GroupBuffMissing(S.MarkoftheWildBuff)) then
+    if Cast(S.MarkoftheWild, Settings.Commons.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat 2"; end
   end
   -- bear_form,if=(!buff.prowl.up)
   if S.BearForm:IsCastable() then
