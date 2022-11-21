@@ -13,6 +13,9 @@ local Item = HL.Item;
 -- Lua
 local pairs = pairs;
 local gsub = string.gsub;
+-- API
+local UnitInParty = UnitInParty
+local UnitInRaid = UnitInRaid
 -- File Locals
 HR.Commons = {};
 local Commons = {};
@@ -96,6 +99,25 @@ function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, 
       end
     end
   end
+end
+
+function Commons.GroupBuffMissing(spell)
+  local range = 40
+  if spell:Name() == "Battle Shout" then range = 100 end
+  local Group
+  if UnitInRaid("player") then
+    Group = Unit.Raid
+  elseif UnitInParty("player") then
+    Group = Unit.Party
+  else
+    return false
+  end
+  for _, Char in pairs(Group) do
+    if Char:Exists() and Char:IsInRange(range) and Char:BuffDown(spell, true) then
+      return true
+    end
+  end
+  return false
 end
 
 function Commons.GetCurrentEmpowerData(stage)
