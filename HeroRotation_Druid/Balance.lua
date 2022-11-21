@@ -266,6 +266,10 @@ local function St()
   if S.Starsurge:IsReady() and (VarCDConditionST and Player:BuffUp(S.TouchtheCosmos)) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 14"; end
   end
+  -- wild_mushroom,if=variable.cd_condition_st&cooldown.ca_inc.remains<gcd.max*2&(!prev_gcd.1.wild_mushroom|prev_gcd.1.wild_mushroom&!prev_gcd.2.wild_mushroom)
+  if S.WildMushroom:IsCastable() and (VarCDConditionST and CaInc:CooldownRemains() < (Player:GCD() + 0.5) * 2 and ((not Player:PrevGCD(1, S.WildMushroom)) or Player:PrevGCD(1, S.WildMushroom) and not Player:PrevGCD(2, S.WildMushroom))) then
+    if Cast(S.WildMushroom, nil, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 15"; end
+  end
   if CDsON() then
     -- celestial_alignment,if=variable.cd_condition_st
     if S.CelestialAlignment:IsCastable() and (VarCDConditionST) then
@@ -345,8 +349,8 @@ local function St()
   if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:AstralPowerDeficit() < VarPassiveAsp + (8 * (1 + 0.5 * num(S.SouloftheForest:IsAvailable()) * num(Player:BuffUp(S.EclipseSolar)))) or S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemains() < 3 or FightRemains < 5) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 48"; end
   end
-  -- wild_mushroom,if=astral_power.deficit>variable.passive_asp+5&(!talent.fungal_growth|!talent.stellar_flare|!prev_gcd.1.wild_mushroom&!prev_gcd.2.wild_mushroom&dot.fungal_growth.remains<2)
-  if S.WildMushroom:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 5 and ((not S.FungalGrowth:IsAvailable()) or (not S.StellarFlare:IsAvailable()) or (not Player:PrevGCD(1, S.WildMushroom)) and (not Player:PrevGCD(2, S.WildMushroom)) and Target:DebuffRemains(S.FungalGrowthDebuff) < 2)) then
+  -- wild_mushroom,if=astral_power.deficit>variable.passive_asp+5&cooldown.ca_inc.remains-30>full_recharge_time&(!talent.primordial_arcanic_pulsar|buff.ca_inc.remains>3)&(!talent.fungal_growth|talent.stellar_flare|!prev_gcd.1.wild_mushroom&!prev_gcd.2.wild_mushroom&dot.fungal_growth.remains<2)|fight_remains<10
+  if S.WildMushroom:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 5 and CaInc:CooldownRemains() - 30 > S.WildMushroom:FullRechargeTime() and ((not S.PrimordialArcanicPulsar:IsAvailable()) or CAIncBuffRemains > 3) and ((not S.FungalGrowth:IsAvailable()) or S.StellarFlare:IsAvailable() or (not Player:PrevGCD(1, S.WildMushroom)) and (not Player:PrevGCD(2, S.WildMushroom)) and Target:DebuffRemains(S.FungalGrowthDebuff) < 2) or FightRemains < 10) then
     if Cast(S.WildMushroom, nil, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 50"; end
   end
   -- starfire,if=eclipse.in_lunar|buff.warrior_of_elune.up&(buff.eclipse_lunar.up|buff.umbral_embrace.react)
