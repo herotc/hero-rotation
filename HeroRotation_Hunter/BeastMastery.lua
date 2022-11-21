@@ -282,8 +282,8 @@ local function Cleave()
   if S.BarbedShot:IsCastable() then
     if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateTargetIfFilterBarbedShot, EvaluateTargetIfBarbedShotCleave4, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot cleave 28"; end
   end
-  -- kill_command,if=focus>cost+action.multishot.cost
-  if S.KillCommand:IsReady() and (Player:Focus() > S.KillCommand:Cost() + S.MultiShot:Cost()) then
+  -- kill_command
+  if S.KillCommand:IsReady() then
     if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command cleave 30"; end
   end
   -- dire_beast
