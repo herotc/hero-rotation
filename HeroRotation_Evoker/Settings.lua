@@ -31,11 +31,10 @@ HR.GUISettings.APL.Evoker = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
+      BlessingOfTheBronze = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      -- Racials
-      Racials = true,
       -- Abilities
       Quell = true,
     }
