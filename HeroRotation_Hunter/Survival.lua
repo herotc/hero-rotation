@@ -273,7 +273,7 @@ local function Precombat()
   -- snapshot_stats
   -- fleshcraft
   if S.Fleshcraft:IsCastable() then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 4"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft precombat 4"; end
   end
   -- Manually added: kill_shot
   -- Could be removed?
@@ -440,7 +440,7 @@ local function CDs()
   end
   -- fleshcraft,cancel_if=channeling&!soulbind.pustule_eruption,if=(focus<70|cooldown.coordinated_assault.remains<gcd)&(soulbind.pustule_eruption|soulbind.volatile_solvent)
   if S.Fleshcraft:IsCastable() and ((Player:Focus() < 70 or S.CoordinatedAssault:CooldownRemains() < Player:GCD()) and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled())) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft cds 19"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft cds 19"; end
   end
   -- tar_trap,if=focus+cast_regen<focus.max&runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd&(active_enemies>1|active_enemies=1&time_to_die>5*gcd)
   if S.TarTrap:IsCastable() and (CheckFocusCap(S.TarTrap:ExecuteTime()) and SoulForgeEmbersEquipped and Target:DebuffDown(S.SoulforgeEmbersDebuff) and (EnemyCount8ySplash > 1 or EnemyCount8ySplash == 1 and FightRemains > 5 * Player:GCD())) then
@@ -487,7 +487,7 @@ end
 local function ST()
   -- death_chakram,if=focus+cast_regen<focus.max&(!raid_event.adds.exists|!raid_event.adds.up&raid_event.adds.duration+raid_event.adds.in<5)|raid_event.adds.up&raid_event.adds.remains>40
   if S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram st 2"; end
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram st 2"; end
   end
   -- serpent_sting,target_if=min:remains,if=!dot.serpent_sting.ticking&target.time_to_die>7&(!dot.pheromone_bomb.ticking|buff.mad_bombardier.up&next_wi_bomb.pheromone)|buff.vipers_venom.up&buff.vipers_venom.remains<gcd|!set_bonus.tier28_2pc&!dot.serpent_sting.ticking&target.time_to_die>7
   if S.SerpentSting:IsReady() then
@@ -499,7 +499,7 @@ local function ST()
   end
   -- flayed_shot
   if S.FlayedShot:IsCastable() then
-    if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.FlayedShot)) then return "flayed_shot st 6"; end
+    if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.FlayedShot)) then return "flayed_shot st 6"; end
   end
   -- kill_shot,if=buff.flayers_mark.up
   if S.KillShot:IsReady() and (Player:BuffUp(S.FlayersMarkBuff)) then
@@ -508,11 +508,11 @@ local function ST()
   if CDsON() then
     -- resonating_arrow,if=!raid_event.adds.exists|!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<20|raid_event.adds.count=1)|raid_event.adds.up&raid_event.adds.remains>40|time_to_die<10
     if S.ResonatingArrow:IsCastable() then
-      if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "resonating_arrow st 8"; end
+      if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "resonating_arrow st 8"; end
     end
     -- wild_spirits,if=!raid_event.adds.exists|!raid_event.adds.up&raid_event.adds.duration+raid_event.adds.in<20|raid_event.adds.up&raid_event.adds.remains>20|time_to_die<20
     if S.WildSpirits:IsCastable() then
-      if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "wild_spirits st 10"; end
+      if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "wild_spirits st 10"; end
     end
     -- coordinated_assault,if=!raid_event.adds.exists|covenant.night_fae&cooldown.wild_spirits.remains|!covenant.night_fae&(!raid_event.adds.up&raid_event.adds.duration+raid_event.adds.in<30|raid_event.adds.up&raid_event.adds.remains>20|!raid_event.adds.up)|time_to_die<30
     if S.CoordinatedAssault:IsCastable() then
@@ -652,7 +652,7 @@ local function BOP()
   end
   -- flayed_shot
   if S.FlayedShot:IsCastable() then
-    if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.FlayedShot)) then return "flayed_shot bop 12"; end
+    if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.FlayedShot)) then return "flayed_shot bop 12"; end
   end
   -- call_action_list,name=nta,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus<variable.mb_rs_cost
   if (NessingwarysTrappingEquipped and Player:Focus() < MBRSCost) then
@@ -660,7 +660,7 @@ local function BOP()
   end
   -- death_chakram,if=focus+cast_regen<focus.max
   if S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime())) then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram bop 14"; end
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram bop 14"; end
   end
   -- raptor_strike,target_if=max:debuff.latent_poison_injection.stack,if=buff.coordinated_assault.up&buff.coordinated_assault.remains<1.5*gcd
   if S.RaptorStrike:IsReady() then
@@ -705,11 +705,11 @@ local function BOP()
   if CDsON() then
     -- resonating_arrow
     if S.ResonatingArrow:IsCastable() then
-      if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "resonating_arrow bop 36"; end
+      if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "resonating_arrow bop 36"; end
     end
     -- wild_spirits
     if S.WildSpirits:IsCastable() then
-      if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "wild_spirits bop 38"; end
+      if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "wild_spirits bop 38"; end
     end
     -- coordinated_assault,if=!buff.coordinated_assault.up
     if S.CoordinatedAssault:IsCastable() then
@@ -742,11 +742,11 @@ local function Cleave()
   if CDsON() then
     -- wild_spirits,if=!raid_event.adds.exists|raid_event.adds.remains>=10|active_enemies>=raid_event.adds.count*2
     if S.WildSpirits:IsCastable() then
-      if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "wild_spirits cleave 4"; end
+      if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "wild_spirits cleave 4"; end
     end
     -- resonating_arrow,if=!raid_event.adds.exists|raid_event.adds.remains>=8|active_enemies>=raid_event.adds.count*2
     if S.ResonatingArrow:IsCastable() then
-      if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "resonating_arrow cleave 6"; end
+      if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "resonating_arrow cleave 6"; end
     end
   end
   -- coordinated_assault,if=!raid_event.adds.exists|raid_event.adds.remains>=10|active_enemies>=raid_event.adds.count*2
@@ -782,7 +782,7 @@ local function Cleave()
   end
   -- death_chakram,if=(!raid_event.adds.exists|raid_event.adds.remains>5|active_enemies>=raid_event.adds.count*2)|focus+cast_regen<focus.max&!runeforge.bag_of_munitions.equipped
   if S.DeathChakram:IsCastable() and ((EnemyCount8ySplash < 2 or EnemyCount8ySplash > 5) or CheckFocusCap(S.DeathChakram:ExecuteTime()) and not BagofMunitionsEquipped) then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram cleave 18"; end
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram cleave 18"; end
   end
   -- call_action_list,name=nta,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus<variable.mb_rs_cost
   if (NessingwarysTrappingEquipped and Player:Focus() < MBRSCost) then
@@ -818,7 +818,7 @@ local function Cleave()
   end
   -- flayed_shot,target_if=max:target.health.pct
   if S.FlayedShot:IsCastable() then
-    if Everyone.CastTargetIf(S.FlayedShot, EnemyList, "max", EvaluateTargetIfFilterMaxHealthPct, nil, not Target:IsSpellInRange(S.FlayedShot), nil, Settings.Commons.DisplayStyle.Covenant) then return "flayed_shot cleave 44"; end
+    if Everyone.CastTargetIf(S.FlayedShot, EnemyList, "max", EvaluateTargetIfFilterMaxHealthPct, nil, not Target:IsSpellInRange(S.FlayedShot), nil, Settings.Commons.DisplayStyle.Signature) then return "flayed_shot cleave 44"; end
   end
   -- wildfire_bomb,if=!dot.wildfire_bomb.ticking&!set_bonus.tier28_2pc|raid_event.adds.exists&(charges_fractional>1.2&active_enemies>4|charges_fractional>1.4&active_enemies>3|charges_fractional>1.6)|!raid_event.adds.exists&charges_fractional>1.5
   if S.WildfireBomb:IsCastable() and (Target:DebuffDown(S.WildfireBombDebuff) and (not Player:HasTier(28, 2)) or (EnemyCount8ySplash > 4 and S.WildfireBomb:ChargesFractional() > 1.2 or EnemyCount8ySplash > 3 and S.WildfireBomb:ChargesFractional() > 1.4 or S.WildfireBomb:ChargesFractional() > 1.6)) then

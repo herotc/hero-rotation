@@ -26,7 +26,7 @@ HR.GUISettings.APL.DeathKnight = {
     },
     DisplayStyle = {
       Potions = "Suggested",
-      Covenant = "Suggested",
+      Signature = "Suggested",
       Trinkets = "Suggested",
       Items = "Suggested",
       RaiseDead = "Suggested",

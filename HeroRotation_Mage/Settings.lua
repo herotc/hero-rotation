@@ -26,7 +26,7 @@ HR.GUISettings.APL.Mage = {
       Potions = "Suggested",
       Trinkets = "Suggested",
       Items = "Suggested",
-      Covenant = "Suggested",
+      Signature = "Suggested",
     },
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {

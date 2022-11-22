@@ -122,7 +122,7 @@ local function Precombat()
   if Everyone.TargetIsValid() then
     -- fleshcraft
     if S.Fleshcraft:IsCastable() then
-      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 5"; end
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft precombat 5"; end
     end
     -- Manually added : precast Tome of monstruous Constructions
     if I.TomeofMonstruousConstructions:IsEquippedAndReady() and Player:BuffDown(S.TomeofMonstruousConstructionsBuff) then
@@ -151,11 +151,11 @@ local function Cooldowns()
   end
   -- deathborne
   if S.Deathborne:IsCastable() then
-    if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne cd 6"; end
+    if Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Signature) then return "deathborne cd 6"; end
   end
   -- mirrors_of_torment
   if S.MirrorsofTorment:IsCastable() then
-    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment cd 8"; end
+    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Signature) then return "mirrors_of_torment cd 8"; end
   end
   -- icy_veins,if=buff.rune_of_power.down
   if S.IcyVeins:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) then
@@ -229,7 +229,7 @@ local function Aoe()
   end
   -- fleshcraft,if=soulbind.volatile_solvent&buff.volatile_solvent_humanoid.down,interrupt_immediate=1,interrupt_global=1,interrupt_if=1
   if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft aoe 16"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft aoe 16"; end
   end
   -- frostbolt,if=runeforge.deaths_fathom&(runeforge.cold_front|runeforge.slick_ice)&buff.deathborne.remains>cast_time+travel_time
   if S.Frostbolt:IsCastable() and (DeathsFathomEquipped and (ColdFrontEquipped or SlickIceEquipped) and Player:BuffRemains(S.Deathborne) > S.Frostbolt:CastTime() + S.Frostbolt:TravelTime()) then
@@ -241,16 +241,16 @@ local function Aoe()
   end
   -- radiant_spark,if=soulbind.combat_meditation
   if S.RadiantSpark:IsCastable() and (S.CombatMeditation:SoulbindEnabled()) then
-    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe 22"; end
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe 22"; end
   end
   if CDsON() then
     -- mirrors_of_torment
     if S.MirrorsofTorment:IsCastable() then
-      if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment aoe 24"; end
+      if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment aoe 24"; end
     end
     -- shifting_power
     if S.ShiftingPower:IsCastable() then
-      if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(18)) then return "shifting_power aoe 26"; end
+      if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power aoe 26"; end
     end
   end
   -- fire_blast,if=runeforge.disciplinary_command&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
@@ -307,7 +307,7 @@ local function Single()
   end
   -- shifting_power,if=buff.rune_of_power.down
   if S.ShiftingPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) then
-    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(18)) then return "shifting_power single 14"; end
+    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power single 14"; end
   end
   -- glacial_spike,if=remaining_winters_chill
   if S.GlacialSpike:IsCastable() and (Target:DebuffUp(S.WintersChillDebuff) and Target:DebuffRemains(S.WintersChillDebuff) > S.GlacialSpike:CastTime() + S.GlacialSpike:TravelTime()) then
@@ -319,11 +319,11 @@ local function Single()
   end
   -- radiant_spark,if=buff.freezing_winds.up&active_enemies=1
   if S.RadiantSpark:IsCastable() and (Player:BuffUp(S.FreezingWindsBuff) and EnemiesCount16ySplash == 1) then
-    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 20"; end
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 20"; end
   end
   -- radiant_spark,if=action.flurry.cooldown_react&talent.glacial_spike&conduit.ire_of_the_ascended&buff.icicles.stack>=4
   if S.RadiantSpark:IsCastable() and (Player:BuffUp(S.BrainFreezeBuff) and S.GlacialSpike:IsAvailable() and S.IreOfTheAscended:ConduitEnabled() and Player:BuffStackP(S.IciclesBuff) >= 4) then
-    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 22"; end
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 22"; end
   end
   -- ice_lance,if=buff.fingers_of_frost.react&!prev_gcd.1.glacial_spike|remaining_winters_chill
   if S.IceLance:IsCastable() and (Player:BuffUpP(S.FingersofFrostBuff) and not Player:IsCasting(S.GlacialSpike) or Target:DebuffUp(S.WintersChillDebuff)) then
@@ -331,11 +331,11 @@ local function Single()
   end
   -- radiant_spark,if=(!talent.glacial_spike|!conduit.ire_of_the_ascended)&(!runeforge.freezing_winds|active_enemies>=2)&action.flurry.cooldown_react
   if S.RadiantSpark:IsCastable() and ((not S.GlacialSpike:IsAvailable() or not S.IreOfTheAscended:ConduitEnabled()) and (not FreezingWindsEquipped or EnemiesCount15yMelee >= 2) and Player:BuffUp(S.BrainFreezeBuff)) then
-    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 30"; end
+    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 30"; end
   end
   -- mirrors_of_torment
   if S.MirrorsofTorment:IsCastable() then
-    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment single 32"; end
+    if Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Signature) then return "mirrors_of_torment single 32"; end
   end
   -- glacial_spike,if=buff.brain_freeze.react
   if S.GlacialSpike:IsCastable() and Player:BuffUp(S.BrainFreezeBuff) then
@@ -347,7 +347,7 @@ local function Single()
   end
   -- fleshcraft,if=soulbind.volatile_solvent&buff.volatile_solvent_humanoid.down,interrupt_immediate=1,interrupt_global=1,interrupt_if=1
   if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft single 38"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft single 38"; end
   end
   if CDsON() then
     -- bag_of_tricks

@@ -296,12 +296,12 @@ local function St()
     end
     -- ravenous_frenzy,if=buff.ca_inc.remains>15
     if S.RavenousFrenzy:IsCastable() and (CAIncBuffRemains > 15) then
-      if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy st 20"; end
+      if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Signature) then return "ravenous_frenzy st 20"; end
     end
   end
   -- empower_bond,if=
   if S.EmpowerBond:IsCastable() then
-    if Cast(S.EmpowerBond, nil, Settings.Commons.DisplayStyle.Covenant) then return "empower_bond st 22"; end
+    if Cast(S.EmpowerBond, nil, Settings.Commons.DisplayStyle.Signature) then return "empower_bond st 22"; end
   end
   -- warrior_of_elune
   if S.WarriorofElune:IsCastable() then
@@ -322,10 +322,10 @@ local function St()
   -- convoke_the_spirits,if=variable.convoke_condition
   if CDsON() then
     if S.ConvoketheSpiritsCov:IsReady() and (VarConvokeCondition) then
-      if Cast(S.ConvoketheSpiritsCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "convoke_the_spirits covenant st 30"; end
+      if Cast(S.ConvoketheSpiritsCov, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "convoke_the_spirits covenant st 30"; end
     end
     if S.ConvoketheSpirits:IsCastable() and (VarConvokeCondition) then
-      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "convoke_the_spirits st 30"; end
+      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "convoke_the_spirits st 30"; end
     end
   end
   -- astral_communion,if=astral_power.deficit>variable.passive_asp+55
@@ -428,11 +428,11 @@ local function AoE()
   end
   -- empower_bond,if=
   if S.EmpowerBond:IsCastable() then
-    if Cast(S.EmpowerBond, nil, Settings.Commons.DisplayStyle.Covenant) then return "empower_bond aoe 16"; end
+    if Cast(S.EmpowerBond, nil, Settings.Commons.DisplayStyle.Signature) then return "empower_bond aoe 16"; end
   end
   -- ravenous_frenzy,if=buff.ca_inc.remains>15
   if S.RavenousFrenzy:IsCastable() and CDsON() and (CAIncBuffRemains > 15) then
-    if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy aoe 18"; end
+    if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Signature) then return "ravenous_frenzy aoe 18"; end
   end
   -- warrior_of_elune
   if S.WarriorofElune:IsCastable() then
@@ -481,10 +481,10 @@ local function AoE()
   -- convoke_the_spirits,if=astral_power<50&spell_targets.starfall<3+talent.elunes_guidance&(buff.eclipse_lunar.remains>4|buff.eclipse_solar.remains>4)
   if CDsON() then
     if S.ConvoketheSpiritsCov:IsReady() and (Player:AstralPowerP() < 50 and EnemiesCount40y < 3 + num(S.ElunesGuidance:IsAvailable()) and (Player:BuffRemains(S.EclipseLunar) > 4 or Player:BuffRemains(S.EclipseSolar) > 4)) then
-      if Cast(S.ConvoketheSpiritsCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "convoke_the_spirits covenant aoe 20"; end
+      if Cast(S.ConvoketheSpiritsCov, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "convoke_the_spirits covenant aoe 20"; end
     end
     if S.ConvoketheSpirits:IsCastable() and (Player:AstralPowerP() < 50 and EnemiesCount40y < 3 + num(S.ElunesGuidance:IsAvailable()) and (Player:BuffRemains(S.EclipseLunar) > 4 or Player:BuffRemains(S.EclipseSolar) > 4)) then
-      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "convoke_the_spirits aoe 20"; end
+      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "convoke_the_spirits aoe 20"; end
     end
   end
   -- new_moon,if=astral_power.deficit>variable.passive_asp+10

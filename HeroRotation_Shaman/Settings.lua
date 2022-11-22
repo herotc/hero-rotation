@@ -26,7 +26,7 @@ HR.GUISettings.APL.Shaman = {
       Potions = "Suggested",
       Trinkets = "Suggested",
       Items = "Suggested",
-      Covenant = "Suggested",
+      Signature = "Suggested",
       SpiritwalkersGrace = "SuggestedRight",
     },
     UseBloodlust = false,

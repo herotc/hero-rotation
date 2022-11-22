@@ -147,7 +147,7 @@ local function Precombat()
   end
   -- fleshcraft,if=soulbind.pustule_eruption.enabled|soulbind.volatile_solvent.enabled,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
   if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 6"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft precombat 6"; end
   end
   -- Manually added: moonfire
   if S.Moonfire:IsCastable() then
@@ -221,15 +221,15 @@ local function Bear()
   end
   -- ravenous_frenzy,if=(((trinket.1.is.cache_of_acquired_treasures|trinket.2.is.cache_of_acquired_treasures)&buff.acquired_axe.up))|(!trinket.1.is.cache_of_acquired_treasures&!trinket.2.is.cache_of_acquired_treasures)
   if S.RavenousFrenzy:IsCastable() and CDsON() and ((I.CacheofAcquiredTreasures:IsEquipped() and Player:BuffUp(S.AcquiredAxeBuff)) or not I.CacheofAcquiredTreasures:IsEquipped()) then
-    if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy bear 10"; end
+    if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Signature) then return "ravenous_frenzy bear 10"; end
   end
   -- convoke_the_spirits,if=!druid.catweave_bear&!druid.owlweave_bear&(trinket.1.is.cache_of_acquired_treasures|trinket.2.is.cache_of_acquired_treasures)
   if S.ConvoketheSpirits:IsCastable() and (I.CacheofAcquiredTreasures:IsEquipped()) then
-    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "convoke_the_spirits bear 12"; end
+    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature) then return "convoke_the_spirits bear 12"; end
   end
   -- TODO: Remove me after expansion launch
   if S.ConvoketheSpiritsCov:IsReady() and (I.CacheofAcquiredTreasures:IsEquipped()) then
-    if Cast(S.ConvoketheSpiritsCov, nil, Settings.Commons.DisplayStyle.Covenant) then return "convoke_the_spirits covenant bear 12"; end
+    if Cast(S.ConvoketheSpiritsCov, nil, Settings.Commons.DisplayStyle.Signature) then return "convoke_the_spirits covenant bear 12"; end
   end
   -- incarnation,if=(!covenant.venthyr&((trinket.1.is.cache_of_acquired_treasures|trinket.2.is.cache_of_acquired_treasures)&buff.acquired_axe.up))
   if S.Incarnation:IsCastable() and (CovenantID ~= 2 and I.CacheofAcquiredTreasures:IsEquipped() and Player:BuffUp(S.AcquiredAxeBuff)) then
@@ -281,7 +281,7 @@ local function Bear()
   if CDsON() then
     -- convoke_the_spirits,if=!druid.catweave_bear&!druid.owlweave_bear
     if S.ConvoketheSpirits:IsCastable() then
-      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInMeleeRange(8)) then return "convoke_the_spirits bear 32"; end
+      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(8)) then return "convoke_the_spirits bear 32"; end
     end
     -- berserk_bear,if=(buff.ravenous_frenzy.up|!covenant.venthyr)
     if S.Berserk:IsCastable() and (Player:BuffUp(S.RavenousFrenzyBuff) or CovenantID ~= 2) then
@@ -298,15 +298,15 @@ local function Bear()
   end
   -- empower_bond
   if S.EmpowerBond:IsCastable() then
-    if Cast(S.EmpowerBond, nil, Settings.Commons.DisplayStyle.Covenant) then return "empower_bond bear 40"; end
+    if Cast(S.EmpowerBond, nil, Settings.Commons.DisplayStyle.Signature) then return "empower_bond bear 40"; end
   end
   -- adaptive_swarm,if=(!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>3)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<5&dot.adaptive_swarm_damage.ticking)
   if S.AdaptiveSwarmCov:IsReady() and (Target:DebuffDown(S.AdaptiveSwarmCovDebuff) and not S.AdaptiveSwarmCov:InFlight() and (Target:DebuffDown(S.AdaptiveSwarmCovDebuff) or Player:BuffRemains(S.AdaptiveSwarmCovHeal) > 3) or Target:DebuffStack(S.AdaptiveSwarmCovDebuff) < 3 and Target:DebuffRemains(S.AdaptiveSwarmCovDebuff) < 5 and Target:DebuffUp(S.AdaptiveSwarmCovDebuff)) then
-    if Cast(S.AdaptiveSwarmCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.AdaptiveSwarmCov)) then return "adaptive_swarm bear 42"; end
+    if Cast(S.AdaptiveSwarmCov, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.AdaptiveSwarmCov)) then return "adaptive_swarm bear 42"; end
   end
   -- fleshcraft,if=soulbind.pustule_eruption.enabled&((cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0)&(dot.moonfire.remains>=3)&(buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&buff.galactic_guardian.down))|soulbind.volatile_solvent.enabled,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent&(cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0)
   if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() and ((S.Thrash:CooldownRemains() > 0 and S.Mangle:CooldownRemains() > 0) and (Target:DebuffRemains(S.MoonfireDebuff) >= 3) and (Player:BuffDown(S.IncarnationBuff) and Player:BuffDown(S.BerserkBuff) and Player:BuffDown(S.GalacticGuardianBuff))) or S.VolatileSolvent:SoulbindEnabled()) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft bear 44"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft bear 44"; end
   end
   -- rage_of_the_sleeper,if=(cooldown.pause_action.remains)
   if S.RageoftheSleeper:IsCastable() and (IsTanking) then

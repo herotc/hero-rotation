@@ -211,36 +211,36 @@ local function Cat()
   if CovenantID == 4 then
     -- adaptive_swarm,target_if=dot.adaptive_swarm_damage.stack=2&dot.adaptive_swarm_damage.remains>2
       if S.AdaptiveSwarm:IsCastable() then
-        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount2, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Covenant) then return "adaptive_swarm cat 4"; end
+        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount2, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm cat 4"; end
       end
       -- adaptive_swarm,target_if=dot.adaptive_swarm_damage.stack=1&dot.adaptive_swarm_damage.remains>2
       if S.AdaptiveSwarm:IsCastable() then
-        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount1, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Covenant) then return "adaptive_swarm cat 6"; end
+        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount1, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm cat 6"; end
       end
       -- adaptive_swarm,target_if=dot.adaptive_swarm_damage.stack=3&dot.adaptive_swarm_damage.remains>2
       if S.AdaptiveSwarm:IsCastable() then
-        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount3, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Covenant) then return "adaptive_swarm cat 8"; end
+        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount3, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm cat 8"; end
       end
       -- adaptive_swarm,target_if=dot.adaptive_swarm_damage.stack=4&dot.adaptive_swarm_damage.remains>2
       if S.AdaptiveSwarm:IsCastable() then
-        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount4, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Covenant) then return "adaptive_swarm cat 10"; end
+        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount4, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm cat 10"; end
       end
       -- adaptive_swarm,target_if=!dot.adaptive_swarm_damage.ticking
       if S.AdaptiveSwarm:IsCastable() then
-        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmDown, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Covenant) then return "adaptive_swarm cat 12"; end
+        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmDown, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm cat 12"; end
       end
   end
   -- kindred_spirits
   if S.KindredSpirits:IsCastable() then
-    if Cast(S.KindredSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "kindred_spirits cat 14"; end
+    if Cast(S.KindredSpirits, nil, Settings.Commons.DisplayStyle.Signature) then return "kindred_spirits cat 14"; end
   end
   -- ravenous_frenzy,if=(buff.heart_of_the_wild.up|cooldown.heart_of_the_wild.remains>60|!talent.heart_of_the_wild.enabled)
   if S.RavenousFrenzy:IsCastable() and CDsON() and (Player:BuffUp(S.HeartoftheWildBuff) or S.HeartoftheWild:CooldownRemains() > 60 or not S.HeartoftheWild:IsAvailable()) then
-    if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy cat 16"; end
+    if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Signature) then return "ravenous_frenzy cat 16"; end
   end
   -- convoke_the_spirits,if=(buff.heart_of_the_wild.up|cooldown.heart_of_the_wild.remains>60-30*runeforge.celestial_spirits|!talent.heart_of_the_wild.enabled)&buff.cat_form.up&energy<50&(combo_points<5&dot.rip.remains>5|spell_targets.swipe_cat>1)
   if S.ConvoketheSpirits:IsCastable() and CDsON() and ((Player:BuffUp(S.HeartoftheWildBuff) or S.HeartoftheWild:CooldownRemains() > 60 - 30 * num(CelestialSpiritsEquipped) or not S.HeartoftheWild:IsAvailable()) and Player:BuffUp(S.CatForm) and Player:Energy() < 50 and (Player:ComboPoints() < 5 and Target:DebuffRemains(S.RipDebuff) > 5 or EnemiesCount8ySplash > 1)) then
-    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "convoke_the_spirits cat 18"; end
+    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "convoke_the_spirits cat 18"; end
   end
   -- sunfire,target_if=(refreshable&target.time_to_die>5)&!prev_gcd.1.cat_form
   if S.Sunfire:IsReady() and (not Player:PrevGCD(1, S.CatForm)) then
@@ -308,15 +308,15 @@ local function Owl()
   end
   -- convoke_the_spirits,if=(buff.heart_of_the_wild.up|cooldown.heart_of_the_wild.remains>60-30*runeforge.celestial_spirits|!talent.heart_of_the_wild.enabled)&(buff.eclipse_solar.remains>4|buff.eclipse_lunar.remains>4)&(!equipped.soulleting_ruby|cooldown.soulleting_ruby.remains<114-60*runeforge.celestial_spirits&!cooldown.soulleting_ruby.ready)
   if S.ConvoketheSpirits:IsCastable() and CDsON() and ((Player:BuffUp(S.HeartoftheWildBuff) or S.HeartoftheWild:CooldownRemains() > 60 - 30 * num(CelestialSpiritsEquipped) or not S.HeartoftheWild:IsAvailable()) and (Player:BuffRemains(S.EclipseSolar) > 4 or Player:BuffRemains(S.EclipseLunar) > 4) and ((not I.SoullettingRuby:IsEquipped()) or I.SoullettingRuby:CooldownRemains() < 114 - 60 * num(CelestialSpiritsEquipped) and not I.SoullettingRuby:IsReady())) then
-    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(35)) then return "convoke_the_spirits owl 8"; end
+    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(35)) then return "convoke_the_spirits owl 8"; end
   end
   -- ravenous_frenzy,if=(buff.heart_of_the_wild.up|cooldown.heart_of_the_wild.remains>60|!talent.heart_of_the_wild.enabled)
   if S.RavenousFrenzy:IsCastable() and CDsON() and (Player:BuffUp(S.HeartoftheWildBuff) or S.HeartoftheWild:CooldownRemains() > 60 or not S.HeartoftheWild:IsAvailable()) then
-    if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant) then return "ravenous_frenzy owl 10"; end
+    if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Signature) then return "ravenous_frenzy owl 10"; end
   end
   -- kindred_spirits,if=(buff.heart_of_the_wild.up|cooldown.heart_of_the_wild.remains>60|!talent.heart_of_the_wild.enabled)
   if S.KindredSpirits:IsCastable() and (Player:BuffUp(S.HeartoftheWildBuff) or S.HeartoftheWild:CooldownRemains() > 60 or not S.HeartoftheWild:IsAvailable()) then
-    if Cast(S.KindredSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "kindred_spirits owl 12"; end
+    if Cast(S.KindredSpirits, nil, Settings.Commons.DisplayStyle.Signature) then return "kindred_spirits owl 12"; end
   end
   -- starsurge,if=spell_targets.starfire<6|!eclipse.in_lunar&spell_targets.starfire<8
   if S.Starsurge:IsReady() and (EnemiesCount8ySplash < 6 or (not EclipseInLunar) and EnemiesCount8ySplash < 8) then
@@ -395,27 +395,27 @@ local function APL()
     if CovenantID == 4 then
       -- adaptive_swarm,target_if=dot.adaptive_swarm_damage.stack=2&dot.adaptive_swarm_damage.remains>2
       if S.AdaptiveSwarm:IsCastable() then
-        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount2, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Covenant) then return "adaptive_swarm main 6"; end
+        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount2, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm main 6"; end
       end
       -- adaptive_swarm,target_if=min:dot.adaptive_swarm_damage.stack,if=dot.adaptive_swarm_damage.remains>2
       if S.AdaptiveSwarm:IsCastable() then
-        if Everyone.CastTargetIf(S.AdaptiveSwarm, Enemies8ySplash, "min", EvaluateTargetIfFilterAdaptiveSwarm, EvaluateTargetIfAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Covenant) then return "adaptive_swarm main 8"; end
+        if Everyone.CastTargetIf(S.AdaptiveSwarm, Enemies8ySplash, "min", EvaluateTargetIfFilterAdaptiveSwarm, EvaluateTargetIfAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm main 8"; end
       end
       -- adaptive_swarm,target_if=dot.adaptive_swarm_damage.stack=1&dot.adaptive_swarm_damage.remains>2
       if S.AdaptiveSwarm:IsCastable() then
-        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount1, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Covenant) then return "adaptive_swarm main 10"; end
+        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount1, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm main 10"; end
       end
       -- adaptive_swarm,target_if=dot.adaptive_swarm_damage.stack=3&dot.adaptive_swarm_damage.remains>2
       if S.AdaptiveSwarm:IsCastable() then
-        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount3, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Covenant) then return "adaptive_swarm main 12"; end
+        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount3, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm main 12"; end
       end
       -- adaptive_swarm,target_if=dot.adaptive_swarm_damage.stack=4&dot.adaptive_swarm_damage.remains>2
       if S.AdaptiveSwarm:IsCastable() then
-        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount4, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Covenant) then return "adaptive_swarm main 14"; end
+        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmCount4, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm main 14"; end
       end
       -- adaptive_swarm,target_if=!dot.adaptive_swarm_damage.ticking
       if S.AdaptiveSwarm:IsCastable() then
-        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmDown, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Covenant) then return "adaptive_swarm main 16"; end
+        if Everyone.CastCycle(S.AdaptiveSwarm, Enemies8ySplash, EvaluateCycleAdaptiveSwarmDown, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm main 16"; end
       end
     end
     -- run_action_list,name=owl,if=talent.balance_affinity.enabled
@@ -424,16 +424,16 @@ local function APL()
     end
     -- convoke_the_spirits,if=(buff.heart_of_the_wild.up|cooldown.heart_of_the_wild.remains>60-30*runeforge.celestial_spirits|!talent.heart_of_the_wild.enabled)&(!equipped.soulleting_ruby|cooldown.soulleting_ruby.remains<114&!cooldown.soulleting_ruby.ready)
     if S.ConvoketheSpirits:IsCastable() and CDsON() and ((Player:BuffUp(S.HeartoftheWildBuff) or S.HeartoftheWild:CooldownRemains() > 60 - 30 * num(CelestialSpiritsEquipped) or not S.HeartoftheWild:IsAvailable()) and ((not I.SoullettingRuby:IsEquipped()) or I.SoullettingRuby:CooldownRemains() < 114 and not I.SoullettingRuby:IsReady())) then
-      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(35)) then return "convoke_the_spirits main 18"; end
+      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(35)) then return "convoke_the_spirits main 18"; end
     end
     if (Player:BuffUp(S.HeartoftheWildBuff) or S.HeartoftheWild:CooldownRemains() > 60 or not S.HeartoftheWild:IsAvailable()) then
       -- ravenous_frenzy,if=(buff.heart_of_the_wild.up|cooldown.heart_of_the_wild.remains>60|!talent.heart_of_the_wild.enabled)
       if S.RavenousFrenzy:IsCastable() and CDsON() then
-        if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "ravenous_frenzy main 20"; end
+        if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "ravenous_frenzy main 20"; end
       end
       -- kindred_spirits,if=(buff.heart_of_the_wild.up|cooldown.heart_of_the_wild.remains>60|!talent.heart_of_the_wild.enabled)
       if S.KindredSpirits:IsCastable() then
-        if Cast(S.KindredSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "kindred_spirits main 22"; end
+        if Cast(S.KindredSpirits, nil, Settings.Commons.DisplayStyle.Signature) then return "kindred_spirits main 22"; end
       end
     end
     -- sunfire,target_if=refreshable

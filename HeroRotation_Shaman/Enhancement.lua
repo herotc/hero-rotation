@@ -150,7 +150,7 @@ local function Precombat()
   end
   -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
   if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 6"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft precombat 6"; end
   end
   -- variable,name=trinket1_is_weird,value=trinket.1.is.the_first_sigil|trinket.1.is.scars_of_fraternal_strife|trinket.1.is.cache_of_acquired_treasures
   -- variable,name=trinket2_is_weird,value=trinket.2.is.the_first_sigil|trinket.2.is.scars_of_fraternal_strife|trinket.2.is.cache_of_acquired_treasures
@@ -191,7 +191,7 @@ local function Single()
   end
   -- primordial_wave,if=buff.primordial_wave.down&(raid_event.adds.in>42|raid_event.adds.in<6)
   if S.PrimordialWave:IsCastable() and (Player:BuffDown(S.PrimordialWaveBuff)) then
-    if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single 16"; end
+    if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single 16"; end
   end
   -- flame_shock,if=!ticking
   if S.FlameShock:IsReady() and (Target:DebuffDown(S.FlameShockDebuff)) then
@@ -223,7 +223,7 @@ local function Single()
   end
   -- chain_harvest,if=buff.maelstrom_weapon.stack>=5&raid_event.adds.in>=90
   if S.ChainHarvest:IsReady() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
-    if Cast(S.ChainHarvest, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ChainHarvest)) then return "chain_harvest single 32"; end
+    if Cast(S.ChainHarvest, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.ChainHarvest)) then return "chain_harvest single 32"; end
   end
   -- lava_burst,if=buff.maelstrom_weapon.stack>=5
   if S.LavaBurst:IsReady() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
@@ -239,7 +239,7 @@ local function Single()
   end
   -- fleshcraft,interrupt=1,if=soulbind.volatile_solvent
   if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled()) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft single 40"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft single 40"; end
   end
   -- windfury_totem,if=buff.windfury_totem.remains<10
   if S.WindfuryTotem:IsReady() and (Player:BuffDown(S.WindfuryTotemBuff, true) or S.WindfuryTotem:TimeSinceLastCast() > 110) then
@@ -283,7 +283,7 @@ local function Single()
   end
   -- fleshcraft,if=soulbind.pustule_eruption
   if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled()) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft single 62"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft single 62"; end
   end
   -- earth_elemental
   if S.EarthElemental:IsCastable() then
@@ -310,7 +310,7 @@ local function Aoe()
   end
   -- chain_harvest,if=buff.maelstrom_weapon.stack>=5
   if S.ChainHarvest:IsReady() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
-    if Cast(S.ChainHarvest, nil, Settings.Commons.DisplayStyle.Covenant) then return "chain_harvest aoe 6"; end
+    if Cast(S.ChainHarvest, nil, Settings.Commons.DisplayStyle.Signature) then return "chain_harvest aoe 6"; end
   end
   -- sundering,if=(talent.doomwinds|runeforge.doom_winds.equipped)&(buff.doom_winds.up|buff.doom_winds_talent.up)
   if S.Sundering:IsReady() and ((S.DoomWinds:IsAvailable() or DoomWindsEquipped) and (Player:BuffUp(S.DoomWindsLegBuff) or Player:BuffUp(S.DoomWindsBuff))) then
@@ -322,7 +322,7 @@ local function Aoe()
   end
   -- primordial_wave,target_if=min:dot.flame_shock.remains,cycle_targets=1,if=!buff.primordial_wave.up
   if S.PrimordialWave:IsReady() and (Player:BuffDown(S.PrimordialWaveBuff)) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies40y, "min", EvaluateTargetIfFilterPrimordialWave, EvaluateTargetIfPrimordialWave, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Covenant) then return "primordial_wave aoe 12"; end
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies40y, "min", EvaluateTargetIfFilterPrimordialWave, EvaluateTargetIfPrimordialWave, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 12"; end
   end
   -- windstrike,if=talent.thorims_invocation.enabled&ti_chain_lightning&buff.maelstrom_weapon.stack>1
   if S.Windstrike:IsReady() and (S.ThorimsInvocation:IsAvailable() and TIAction == S.ChainLightning and Player:BuffStack(S.MaelstromWeaponBuff) > 1) then
@@ -564,11 +564,11 @@ local function APL()
     end
     -- fae_transfusion,if=runeforge.seeds_of_rampant_growth.equipped|soulbind.grove_invigoration|soulbind.field_of_blossoms|active_enemies=1
     if S.FaeTransfusion:IsReady() and (SeedsofRampantGrowthEquipped or S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable() or Enemies10yCount == 1) then
-      if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "fae_transfusion main 14"; end
+      if Cast(S.FaeTransfusion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "fae_transfusion main 14"; end
     end
     -- vesper_totem,if=raid_event.adds.in>40|active_enemies>1
     if S.VesperTotem:IsReady() then
-      if Cast(S.VesperTotem, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(40)) then return "vesper_totem main 16"; end
+      if Cast(S.VesperTotem, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "vesper_totem main 16"; end
     end
     -- ascendance,if=(ti_lightning_bolt&active_enemies=1&raid_event.adds.in>=90)|(ti_chain_lightning&active_enemies>1)
     if S.Ascendance:IsCastable() and CDsON() and (TIAction == S.LightningBolt and Enemies10yCount == 1 or TIAction == S.ChainLightning and Enemies10yCount > 1) then

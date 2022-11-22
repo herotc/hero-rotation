@@ -24,7 +24,7 @@ HR.GUISettings.APL.DemonHunter = {
     },
     DisplayStyle = {
       Potions = "Suggested",
-      Covenant = "Suggested",
+      Signature = "Suggested",
       Trinkets = "Suggested",
       Items = "Suggested",
       FelRush = "Suggested",

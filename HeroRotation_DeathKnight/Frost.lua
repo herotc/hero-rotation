@@ -374,7 +374,7 @@ local function Cooldowns()
   -- any_dnd,if=!death_and_decay.ticking&variable.adds_remain&(buff.pillar_of_frost.up&buff.pillar_of_frost.remains>5|!buff.pillar_of_frost.up)&(active_enemies>5|talent.cleaving_strikes&active_enemies>=2)
   if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and VarAddsRemain and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffRemains(S.PillarofFrostBuff) > 5 or Player:BuffDown(S.PillarofFrostBuff)) and (EnemiesCount10yd > 5 or S.CleavingStrikes:IsAvailable() and EnemiesCount10yd >= 2)) then
     if AnyDnD == S.DeathsDue then
-      if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Covenant) then return "any_dnd cooldowns 36"; end
+      if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Signature) then return "any_dnd cooldowns 36"; end
     else
       if Cast(AnyDnD, Settings.Commons.GCDasOffGCD.DeathAndDecay) then return "any_dnd cooldowns 38"; end
     end
@@ -408,39 +408,39 @@ local function Covenants()
   -- Shadowlands Covenant stuff. Remove after DF launch?
   -- deaths_due,if=(variable.rw_buffs&cooldown.remorseless_winter.remains|!variable.rw_buffs)&(!talent.obliteration|talent.obliteration&active_enemies>=2&cooldown.pillar_of_frost.remains|active_enemies=1)&(variable.st_planning|variable.adds_remain)
   if S.DeathsDue:IsReady() and ((VarRWBuffs and S.RemorselessWinter:CooldownRemains() > 0 or not VarRWBuffs) and ((not S.Obliteration:IsAvailable()) or S.Obliteration:IsAvailable() and EnemiesCount10yd >= 2 and S.PillarofFrost:CooldownRemains() > 0 or EnemiesCount10yd == 1) and (VarSTPlanning or VarAddsRemain)) then
-    if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant) then return "deaths_due covenants 2"; end
+    if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Signature) then return "deaths_due covenants 2"; end
   end
   -- swarming_mist,if=runic_power.deficit>13&cooldown.pillar_of_frost.remains<3&!talent.breath_of_sindragosa&variable.st_planning
   if S.SwarmingMist:IsReady() and (Player:RunicPowerDeficit() > 13 and S.PillarofFrost:CooldownRemains() < 3 and (not S.BreathofSindragosa:IsAvailable()) and VarSTPlanning) then
-    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant) then return "swarming_mist covenants 4"; end
+    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Signature) then return "swarming_mist covenants 4"; end
   end
   -- swarming_mist,if=!talent.breath_of_sindragosa&variable.adds_remain
   if S.SwarmingMist:IsReady() and ((not S.BreathofSindragosa:IsAvailable()) and VarAddsRemain) then
-    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant) then return "swarming_mist covenants 6"; end
+    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Signature) then return "swarming_mist covenants 6"; end
   end
   -- swarming_mist,if=talent.breath_of_sindragosa&(buff.breath_of_sindragosa.up&(variable.st_planning&runic_power.deficit>40|variable.adds_remain&runic_power.deficit>60|variable.adds_remain&raid_event.adds.remains<9&raid_event.adds.exists)|!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains)
   if S.SwarmingMist:IsReady() and (S.BreathofSindragosa:IsAvailable() and (Player:BuffUp(S.BreathofSindragosa) and (VarSTPlanning and Player:RunicPowerDeficit() > 40 or VarAddsRemain and Player:RunicPowerDeficit() > 60) or Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownRemains() > 0)) then
-    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant) then return "swarming_mist covenants 8"; end
+    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Signature) then return "swarming_mist covenants 8"; end
   end
   -- abomination_limb_covenant,if=cooldown.pillar_of_frost.remains<gcd*2&variable.st_planning&(talent.breath_of_sindragosa&runic_power>65&cooldown.breath_of_sindragosa.remains<2|!talent.breath_of_sindragosa)
   if S.AbominationLimbCov:IsReady() and (S.PillarofFrost:CooldownRemains() < Player:GCD() * 2 and VarSTPlanning and (S.BreathofSindragosa:IsAvailable() and Player:RunicPower() > 65 and S.BreathofSindragosa:CooldownRemains() < 2 or not S.BreathofSindragosa:IsAvailable())) then
-    if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb_covenant covenants 10"; end
+    if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Signature) then return "abomination_limb_covenant covenants 10"; end
   end
   -- abomination_limb_covenant,if=variable.adds_remain
   if S.AbominationLimbCov:IsReady() and (VarAddsRemain) then
-    if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Covenant) then return "abomination_limb_covenant covenants 12"; end
+    if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Signature) then return "abomination_limb_covenant covenants 12"; end
   end
   -- shackle_the_unworthy,if=variable.st_planning&(cooldown.pillar_of_frost.remains<3|talent.icecap)
   if S.ShackleTheUnworthy:IsReady() and (VarSTPlanning and (S.PillarofFrost:CooldownRemains() < 3 or S.Icecap:IsAvailable())) then
-    if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant) then return "shackle_the_unworthy covenants 14"; end
+    if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Signature) then return "shackle_the_unworthy covenants 14"; end
   end
   -- shackle_the_unworthy,if=variable.adds_remain
   if S.ShackleTheUnworthy:IsReady() and (VarAddsRemain) then
-    if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant) then return "shackle_the_unworthy covenants 16"; end
+    if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Signature) then return "shackle_the_unworthy covenants 16"; end
   end
   -- fleshcraft,if=!buff.pillar_of_frost.up&(soulbind.pustule_eruption|soulbind.volatile_solvent&!buff.volatile_solvent_humanoid.up),interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
   if S.Fleshcraft:IsReady() and (Player:BuffDown(S.PillarofFrostBuff) and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff))) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft covenants 18"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft covenants 18"; end
   end
 end
 

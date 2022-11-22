@@ -142,7 +142,7 @@ local function HandleNightFaeBlessings()
   local Seasons = {S.BlessingofSpring, S.BlessingofSummer, S.BlessingofAutumn, S.BlessingofWinter}
   for _, i in pairs(Seasons) do
     if i:IsCastable() then
-      if Cast(i, nil, Settings.Commons.DisplayStyle.Covenant) then return "blessing_of_the_seasons"; end
+      if Cast(i, nil, Settings.Commons.DisplayStyle.Signature) then return "blessing_of_the_seasons"; end
     end
   end
 end
@@ -163,7 +163,7 @@ local function Precombat()
   end
   -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
   if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 2"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft precombat 2"; end
   end
   -- arcane_torrent,if=talent.final_reckoning&talent.seraphim
   if S.ArcaneTorrent:IsCastable() and Target:IsInRange(8) and (S.FinalReckoning:IsAvailable() and S.Seraphim:IsAvailable()) then
@@ -216,7 +216,7 @@ local function Cooldowns()
   end
   -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
   if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft cooldowns 8"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft cooldowns 8"; end
   end
   -- shield_of_vengeance,if=(!talent.execution_sentence|cooldown.execution_sentence.remains<52)&fight_remains>15
   if S.ShieldofVengeance:IsCastable() and (((not S.ExecutionSentence:IsAvailable()) or S.ExecutionSentence:CooldownRemains() < 52) and FightRemains > 15) then
@@ -371,7 +371,7 @@ local function Cooldowns()
   end
   -- ashen_hallow
   if S.AshenHallow:IsCastable() then
-    if Cast(S.AshenHallow, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "ashen_hallow cooldowns 78" end
+    if Cast(S.AshenHallow, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "ashen_hallow cooldowns 78" end
   end
   -- holy_avenger,if=time_to_hpg=0&holy_power<=2&(buff.avenging_wrath.up|talent.crusade&(cooldown.crusade.remains=0|buff.crusade.up)|fight_remains<20)
   if S.HolyAvenger:IsCastable() and (TimeToHPG <= Player:GCDRemains() and Player:HolyPower() <= 2 and (Player:BuffUp(S.AvengingWrath) or S.Crusade:IsAvailable() and (S.Crusade:CooldownUp() or Player:BuffUp(S.CrusadeBuff)) or FightRemains < 20)) then
@@ -415,7 +415,7 @@ local function Generators()
   end
   -- vanquishers_hammer,if=!runeforge.dutybound_gavel|!talent.final_reckoning&!talent.execution_sentence|fight_remains<8
   if S.VanquishersHammer:IsCastable() and ((not DutyboundGavelEquipped) or (not S.FinalReckoning:IsAvailable()) and (not S.ExecutionSentence:IsAvailable()) or FightRemains < 8) then
-    if Cast(S.VanquishersHammer, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.VanquishersHammer)) then return "vanquishers_hammer generators 2"; end
+    if Cast(S.VanquishersHammer, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.VanquishersHammer)) then return "vanquishers_hammer generators 2"; end
   end
   -- hammer_of_wrath,if=runeforge.the_mad_paragon|covenant.venthyr&cooldown.ashen_hallow.remains>210
   if S.HammerofWrath:IsReady() and (MadParagonEquipped or CovenantID == 2 and S.AshenHallow:CooldownRemains() > 210) then
@@ -428,10 +428,10 @@ local function Generators()
   -- divine_toll,if=holy_power<=2&!debuff.judgment.up&(!talent.seraphim|buff.seraphim.up)&(!raid_event.adds.exists|raid_event.adds.in>30|raid_event.adds.up)&!talent.final_reckoning&(!talent.execution_sentence|fight_remains<8|spell_targets.divine_storm>=5)&(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15|fight_remains<8)
   if (Player:HolyPower() <= 2 and Target:DebuffDown(S.JudgmentDebuff) and ((not S.Seraphim:IsAvailable()) or Player:BuffUp(S.Seraphim)) and (not S.FinalReckoning:IsAvailable()) and ((not S.ExecutionSentence) or FightRemains < 8 or EnemiesCount8y >= 5) and (S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15 or FightRemains < 8)) then
     if S.DivineToll:IsCastable() then
-      if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll generators 6"; end
+      if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll generators 6"; end
     end
     if S.DivineTollCov:IsReady() then
-      if Cast(S.DivineTollCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll covenant generators 6"; end
+      if Cast(S.DivineTollCov, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll covenant generators 6"; end
     end
   end
   -- judgment,if=!debuff.judgment.up&(holy_power>=1&runeforge.the_magistrates_judgment|holy_power>=2)
@@ -509,7 +509,7 @@ local function ESFRPooling()
   end
   -- vanquishers_hammer,if=buff.seraphim.up
   if S.VanquishersHammer:IsCastable() and (Player:BuffUp(S.Seraphim)) then
-    if Cast(S.VanquishersHammer, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.VanquishersHammer)) then return "vanquishers_hammer es_fr_pooling 4"; end
+    if Cast(S.VanquishersHammer, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.VanquishersHammer)) then return "vanquishers_hammer es_fr_pooling 4"; end
   end
   -- hammer_of_wrath,if=runeforge.vanguards_momentum
   if S.HammerofWrath:IsReady() and (VanguardsMomentumEquipped) then
@@ -574,11 +574,11 @@ local function ESFRActive()
   end
   -- divine_toll,if=holy_power<=2
   if S.DivineToll:IsCastable() and (Player:HolyPower() <= 2) then
-    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll es_fr_active 4"; end
+    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll es_fr_active 4"; end
   end
   -- vanquishers_hammer
   if S.VanquishersHammer:IsCastable() then
-    if Cast(S.VanquishersHammer, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.VanquishersHammer)) then return "vanquishers_hammer es_fr_active 6"; end
+    if Cast(S.VanquishersHammer, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.VanquishersHammer)) then return "vanquishers_hammer es_fr_active 6"; end
   end
   -- wake_of_ashes,if=holy_power<=2&(debuff.final_reckoning.up&debuff.final_reckoning.remains<gcd*2&!runeforge.divine_resonance|debuff.execution_sentence.up&debuff.execution_sentence.remains<gcd|spell_targets.divine_storm>=5&runeforge.divine_resonance&talent.execution_sentence)
   if S.WakeofAshes:IsCastable() and (Player:HolyPower() <= 2 and (Target:DebuffUp(S.FinalReckoning) and Target:DebuffRemains(S.FinalReckoning) < Player:GCD() * 2 and (not DivineResonanceEquipped) or Target:DebuffUp(S.ExecutionSentence) and Target:DebuffRemains(S.ExecutionSentence) < Player:GCD() or EnemiesCount8y >= 5 and DivineResonanceEquipped and S.ExecutionSentence:IsAvailable())) then

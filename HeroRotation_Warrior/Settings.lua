@@ -23,7 +23,7 @@ HR.GUISettings.APL.Warrior = {
     },
     DisplayStyle = {
       Potions = "Suggested",
-      Covenant = "Suggested",
+      Signature = "Suggested",
       Trinkets = "Suggested",
       Charge = "Suggested",
       HeroicLeap = "Suggested",

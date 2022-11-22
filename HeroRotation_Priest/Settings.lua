@@ -26,7 +26,7 @@ HR.GUISettings.APL.Priest = {
       Potions = "Suggested",
       Trinkets = "Suggested",
       Items = "Suggested",
-      Covenant = "Suggested",
+      Signature = "Suggested",
     },
     GCDasOffGCD = {
       -- Abilities

@@ -23,7 +23,7 @@ HR.GUISettings.APL.Paladin = {
     },
     DisplayStyle = {
       Trinkets = "Suggested",
-      Covenant = "Suggested",
+      Signature = "Suggested",
       Potions = "Suggested",
       Items = "Suggested",
     },

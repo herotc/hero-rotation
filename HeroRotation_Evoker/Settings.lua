@@ -25,6 +25,7 @@ HR.GUISettings.APL.Evoker = {
     DisplayStyle = {
       Defensives = "Suggested",
       Potions = "Suggested",
+      Signature = "Suggested",
       Trinkets = "Suggested",
       Items = "Suggested",
     },

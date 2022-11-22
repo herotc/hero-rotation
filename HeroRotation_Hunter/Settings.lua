@@ -23,7 +23,7 @@ HR.GUISettings.APL.Hunter = {
       Items = true,
     },
     DisplayStyle = {
-      Covenant = "Suggested",
+      Signature = "Suggested",
       Potions = "Suggested",
       Trinkets = "Suggested",
       Items = "Suggested",

@@ -71,7 +71,7 @@ local function HandleNightFaeBlessings()
   local Seasons = {S.BlessingofSpring, S.BlessingofSummer, S.BlessingofAutumn, S.BlessingofWinter}
   for _, i in pairs(Seasons) do
     if i:IsReady() then
-      if Cast(i, nil, Settings.Commons.DisplayStyle.Covenant) then return "blessing_of_the_seasons"; end
+      if Cast(i, nil, Settings.Commons.DisplayStyle.Signature) then return "blessing_of_the_seasons"; end
     end
   end
 end
@@ -97,7 +97,7 @@ local function Precombat()
   end
   -- ashen_hallow
   if S.AshenHallow:IsReady() and Target:IsInRange(30) then
-    if Cast(S.AshenHallow, nil, Settings.Commons.DisplayStyle.Covenant) then return "ashen_hallow precombat 8"; end
+    if Cast(S.AshenHallow, nil, Settings.Commons.DisplayStyle.Signature) then return "ashen_hallow precombat 8"; end
   end
   -- Manually added: avengers_shield
   if S.AvengersShield:IsCastable() then
@@ -206,7 +206,7 @@ local function Standard()
   end
   -- vanquishers_hammer
   if S.VanquishersHammer:IsReady() then
-    if Cast(S.VanquishersHammer, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.VanquishersHammer)) then return "vanquishers_hammer standard 16"; end
+    if Cast(S.VanquishersHammer, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.VanquishersHammer)) then return "vanquishers_hammer standard 16"; end
   end
   -- consecration,if=!consecration.up
   if S.Consecration:IsCastable() and (Player:BuffDown(S.ConsecrationBuff)) then
@@ -214,10 +214,10 @@ local function Standard()
   end
   -- divine_toll
   if S.DivineToll:IsCastable() then
-    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll generators 19"; end
+    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll generators 19"; end
   end
   if S.DivineTollCov:IsReady() then
-    if Cast(S.DivineTollCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "divine_toll covenant generators 19"; end
+    if Cast(S.DivineTollCov, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll covenant generators 19"; end
   end
   -- blessed_hammer,strikes=2.4,if=charges=3
   if S.BlessedHammer:IsCastable() and (S.BlessedHammer:Charges() == 3) then
@@ -225,7 +225,7 @@ local function Standard()
   end
   -- ashen_hallow
   if S.AshenHallow:IsReady() then
-    if Cast(S.AshenHallow, nil, Settings.Commons.DisplayStyle.Covenant) then return "ashen_hallow standard 22"; end
+    if Cast(S.AshenHallow, nil, Settings.Commons.DisplayStyle.Signature) then return "ashen_hallow standard 22"; end
   end
   -- hammer_of_the_righteous,if=charges=2
   if S.HammeroftheRighteous:IsCastable() and (S.HammeroftheRighteous:Charges() == 2) then

@@ -261,7 +261,7 @@ local function St()
   end
   -- death_chakram
   if S.DeathChakram:IsReady() then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "dark_chakram st 16"; end
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not TargetInRange40y) then return "dark_chakram st 16"; end
   end
   -- wailing_arrow,if=active_enemies>1
   if S.WailingArrow:IsReady() and (EnemiesCount10ySplash > 1) then
@@ -341,7 +341,7 @@ local function Trickshots()
   end
   -- death_chakram
   if S.DeathChakram:IsReady() then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "death_chakram trickshots 10"; end
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not TargetInRange40y) then return "death_chakram trickshots 10"; end
   end
   -- stampede
   if S.Stampede:IsReady() then

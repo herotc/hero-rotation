@@ -143,11 +143,11 @@ local function Precombat()
   -- fleshcraft
   -- Note: Manually moved this above conquerors_banner so we don't waste 3s of the banner buff
   if S.Fleshcraft:IsCastable() then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft precombat"; end
   end
   -- conquerors_banner
   if S.ConquerorsBanner:IsCastable() then
-    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner precombat"; end
+    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Signature) then return "conquerors_banner precombat"; end
   end
   -- Manually added opener
   if Target:IsInMeleeRange(12) then
@@ -202,7 +202,7 @@ local function Aoe()
   -- spear_of_bastion
   if S.SpearofBastion:IsCastable() then
     SuggestRageDump(20)
-    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant) then return "spear_of_bastion aoe 4"; end
+    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature) then return "spear_of_bastion aoe 4"; end
   end
   -- thunderous_roar
   if S.ThunderousRoar:IsCastable() then
@@ -281,7 +281,7 @@ local function Generic()
   -- spear_of_bastion
   if S.SpearofBastion:IsCastable() then
     SuggestRageDump(20)
-    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(25)) then return "spear_of_bastion generic 8"; end
+    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "spear_of_bastion generic 8"; end
   end
   -- shield_charge
   if S.ShieldCharge:IsCastable() then

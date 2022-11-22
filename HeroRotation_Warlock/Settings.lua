@@ -26,7 +26,7 @@ HR.GUISettings.APL.Warlock = {
       Potions = "Suggested",
       Trinkets = "Suggested",
       Items = "Suggested",
-      Covenant = "Suggested",
+      Signature = "Suggested",
     },
     HidePetSummon = false,
     -- {Display GCD as OffGCD, ForceReturn}

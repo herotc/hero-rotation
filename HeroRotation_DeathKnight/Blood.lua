@@ -112,7 +112,7 @@ local function Precombat()
   if Everyone.TargetIsValid() then
     -- fleshcraft
     if S.Fleshcraft:IsReady() then
-      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft precombat 2"; end
+      if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft precombat 2"; end
     end
     -- Manually added: Openers
     if S.DeathsCaress:IsReady() then
@@ -202,23 +202,23 @@ end
 local function Covenants()
   -- deaths_due,if=!buff.deaths_due.up|buff.deaths_due.remains<4|buff.crimson_scourge.up
   if S.DeathsDue:IsReady() and (Player:BuffDown(S.DeathsDueBuff) or Player:BuffRemains(S.DeathsDueBuff) < 4 or Player:BuffUp(S.CrimsonScourgeBuff)) then
-    if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DeathsDue)) then return "deaths_due covenants 6"; end
+    if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathsDue)) then return "deaths_due covenants 6"; end
   end
   -- swarming_mist,if=cooldown.dancing_rune_weapon.remains>3&runic_power>=(90-(spell_targets.swarming_mist*3))
   if S.SwarmingMist:IsReady() and (S.DancingRuneWeapon:CooldownRemains() > 3 and Player:RunicPower() >= (90 - (EnemiesMeleeCount * 3))) then
-    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Covenant) then return "swarming_mist covenants 7"; end
+    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Signature) then return "swarming_mist covenants 7"; end
   end
   -- abomination_limb
   if S.AbominationLimbCov:IsReady() and CDsON() then
-    if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(8)) then return "abomination_limb covenants 16"; end
+    if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(8)) then return "abomination_limb covenants 16"; end
   end
   -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent&!buff.volatile_solvent_humanoid.up,interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
   if S.Fleshcraft:IsReady() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff)) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Covenant) then return "fleshcraft covenants 20"; end
+    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft covenants 20"; end
   end
   -- shackle_the_unworthy,if=rune<3&runic_power<100
   if S.ShackleTheUnworthy:IsReady() and (Player:Rune() < 3 and Player:RunicPower() < 100) then
-    if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 18"; end
+    if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy covenants 18"; end
   end
 end
 
@@ -253,7 +253,7 @@ local function DRWUp()
   end
   -- deaths_due,if=covenant.night_fae&!death_and_decay.ticking
   if S.DeathsDue:IsReady() and (CovenantID == 3 and Player:BuffDown(S.DeathAndDecayBuff)) then
-    if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "deaths_due drw_up 16"; end
+    if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "deaths_due drw_up 16"; end
   end
   -- death_and_decay,if=!death_and_decay.ticking&(talent.sanguine_ground|talent.unholy_ground)
   if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and (S.SanguineGround:IsAvailable() or S.UnholyGround:IsAvailable())) then
@@ -290,7 +290,7 @@ local function Standard()
   end
   -- abomination_limb_talent,if=buff.bone_shield.stack<6
   if S.AbominationLimb:IsCastable() and (Player:BuffStack(S.BoneShieldBuff) < 6) then
-    if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(20)) then return "abomination_limb_talent standard 4"; end
+    if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(20)) then return "abomination_limb_talent standard 4"; end
   end
   -- marrowrend,if=buff.bone_shield.remains<=rune.time_to_3|buff.bone_shield.remains<=(gcd+cooldown.blooddrinker.ready*talent.blooddrinker.enabled*4)|buff.bone_shield.stack<6&runic_power.deficit>20&!(talent.insatiable_blade&cooldown.dancing_rune_weapon.remains<buff.bone_shield.remains)
   if S.Marrowrend:IsReady() and (Player:BuffRemains(S.BoneShieldBuff) <= Player:RuneTimeToX(3) or Player:BuffRemains(S.BoneShieldBuff) <= (Player:GCD() + num(S.Blooddrinker:CooldownUp()) * num(S.Blooddrinker:IsAvailable()) * 4) or Player:BuffStack(S.BoneShieldBuff) < 6 and Player:RunicPowerDeficit() > 20 and not (S.InsatiableBlade:IsAvailable() and S.DancingRuneWeapon:CooldownRemains() < Player:BuffRemains(S.BoneShieldBuff))) then
@@ -306,7 +306,7 @@ local function Standard()
   end
   -- deaths_due,if=covenant.night_fae&!death_and_decay.ticking
   if S.DeathsDue:IsReady() and (CovenantID == 3 and Player:BuffDown(S.DeathAndDecayBuff)) then
-    if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "deaths_due standard 12"; end
+    if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "deaths_due standard 12"; end
   end
   -- death_and_decay,if=!death_and_decay.ticking&(talent.sanguine_ground|talent.unholy_ground)
   if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and (S.SanguineGround:IsAvailable() or S.UnholyGround:IsAvailable())) then
@@ -463,7 +463,7 @@ local function APL()
     end
     -- deaths_due,if=covenant.night_fae&!death_and_decay.ticking
     if S.DeathsDue:IsReady() and (CovenantID == 3 and Player:BuffDown(S.DeathAndDecayBuff)) then
-      if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "deaths_due main 20"; end
+      if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "deaths_due main 20"; end
     end
     -- death_and_decay,if=(talent.unholy_ground|talent.sanguine_ground)&cooldown.dancing_rune_weapon.remains<gcd
     -- Note: Manually added buff check, as otherwise it burns all runes that are available.

@@ -186,7 +186,7 @@ local function APL()
     -- Manually added: boon_of_the_covenants,if=buff.dragonrage.up
     -- TODO: Remove this when Dragonflight launches
     if S.BoonoftheCovenants:IsReady() and (Player:BuffUp(S.Dragonrage)) then
-      if Cast(S.BoonoftheCovenants, nil, Settings.Commons.DisplayStyle.Covenant) then return "boon_of_the_covenants main 1"; end
+      if Cast(S.BoonoftheCovenants, nil, Settings.Commons.DisplayStyle.Signature) then return "boon_of_the_covenants main 1"; end
     end
     -- potion,if=buff.dragonrage.up|time>=300&fight_remains<35
     if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.Dragonrage) or HL.CombatTime() >= 300 or FightRemains < 35) then

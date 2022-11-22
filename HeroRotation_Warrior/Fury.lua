@@ -141,7 +141,7 @@ local function SingleTarget()
   end
   -- condemn
   if S.Condemn:IsReady() then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 14"; end
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Signature, not TargetInMeleeRange) then return "condemn single_target 14"; end
   end
   -- execute
   if S.Execute:IsReady() then
@@ -255,7 +255,7 @@ local function APL()
     end
     -- conquerors_banner
     if S.ConquerorsBanner:IsCastable() and CDsON() then
-      if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner main 8"; end
+      if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Signature) then return "conquerors_banner main 8"; end
     end
     -- ravager,if=cooldown.avatar.remains<3
     if S.Ravager:IsCastable() and (S.Avatar:CooldownRemains() < 3) then
@@ -347,11 +347,11 @@ local function APL()
     end
     -- kyrian_spear,if=buff.enrage.up&(buff.recklessness.up|buff.avatar.up|target.time_to_die<20)
     if S.SpearofBastionCov:IsReady() and (EnrageUp and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffUp(S.AvatarBuff) or Target:TimeToDie() < 20)) then
-      if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(25)) then return "kyrian_spear main 20"; end
+      if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "kyrian_spear main 20"; end
     end
     -- spear_of_bastion,if=buff.enrage.up&(buff.recklessness.up|buff.avatar.up|target.time_to_die<20)
     if S.SpearofBastion:IsCastable() and (EnrageUp and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffUp(S.AvatarBuff) or Target:TimeToDie() < 20)) then
-      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(25)) then return "kyrian_spear main 22"; end
+      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "kyrian_spear main 22"; end
     end
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up|raid_event.adds.in<2&!buff.meat_cleaver.up
     if S.Whirlwind:IsCastable() and (EnemiesCount8 > 1 and (S.MeatCleaver:IsAvailable() and Player:BuffDown(S.MeatCleaverBuff))) then

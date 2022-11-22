@@ -362,10 +362,10 @@ local function Cooldown()
   end
   -- convoke_the_spirits,if=buff.tigers_fury.up&combo_points<3|fight_remains<5
   if S.ConvoketheSpirits:IsReady() and (Player:BuffUp(S.TigersFury) and ComboPoints < 3 or FightRemains < 5) then
-    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInMeleeRange(8)) then return "convoke_the_spirits cooldown 6"; end
+    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(8)) then return "convoke_the_spirits cooldown 6"; end
   end
   if S.ConvoketheSpiritsCov:IsReady() and (Player:BuffUp(S.TigersFury) and ComboPoints < 3 or FightRemains < 5) then
-    if Cast(S.ConvoketheSpiritsCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInMeleeRange(8)) then return "convoke_the_spirits covenant cooldown 6"; end
+    if Cast(S.ConvoketheSpiritsCov, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(8)) then return "convoke_the_spirits covenant cooldown 6"; end
   end
   -- berserking
   if S.Berserking:IsCastable() then

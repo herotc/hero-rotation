@@ -140,11 +140,11 @@ local function Execute()
   end
   -- conquerors_banner
   if CDsON() and S.ConquerorsBanner:IsReady() then
-    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner execute 8"; end
+    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Signature) then return "conquerors_banner execute 8"; end
   end
   -- condemn,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd|buff.juggernaut.up&buff.juggernaut.remains<gcd
   if S.Condemn:IsReady() and (Player:BuffUp(S.AshenJuggernautBuff) and Player:BuffRemains(S.AshenJuggernautBuff) < Player:GCD() or Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff)) then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 10"; end
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Signature, not TargetInMeleeRange) then return "condemn execute 10"; end
   end
   -- thunderous_roar,if=buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or (not S.TestofMight:IsAvailable()) and Target:DebuffUp(S.ColossusSmashDebuff)) then
@@ -161,15 +161,15 @@ local function Execute()
   if CDsON() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff)) then
     -- spear_of_bastion,if=debuff.colossus_smash.up|buff.test_of_might.up
     if S.SpearofBastion:IsCastable() then
-      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 18"; end
+      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 18"; end
     end
     -- kyrian_spear,if=debuff.colossus_smash.up|buff.test_of_might.up
     if S.SpearofBastionCov:IsReady() then
-      if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "kyrian_spear execute 20"; end
+      if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.SpearofBastion)) then return "kyrian_spear execute 20"; end
     end
     -- ancient_aftershock,if=debuff.colossus_smash.up|buff.test_of_might.up
     if S.AncientAftershock:IsCastable() then
-      if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock execute 22"; end
+      if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Signature, not TargetInMeleeRange) then return "ancient_aftershock execute 22"; end
     end
   end
   -- mortal_strike,if=dot.deep_wounds.remains<=gcd
@@ -182,7 +182,7 @@ local function Execute()
   end
   -- condemn
   if S.Condemn:IsReady() then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn execute 28"; end
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Signature, not TargetInMeleeRange) then return "condemn execute 28"; end
   end
   -- skullsplitter,if=rage<40
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 40) then
@@ -221,7 +221,7 @@ local function SingleTarget()
   end
   -- conquerors_banner,if=target.time_to_die>140
   if CDsON() and S.ConquerorsBanner:IsReady() and (Target:TimeToDie() > 140) then
-    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Covenant) then return "conquerors_banner single_target 6"; end
+    if Cast(S.ConquerorsBanner, nil, Settings.Commons.DisplayStyle.Signature) then return "conquerors_banner single_target 6"; end
   end
   -- avatar,if=gcd.remains=0
   if CDsON() and S.Avatar:IsCastable() then
@@ -241,15 +241,15 @@ local function SingleTarget()
   end
   -- spear_of_bastion,if=debuff.colossus_smash.up|buff.test_of_might.up
   if CDsON() and S.SpearofBastion:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff)) then
-    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion single_target 16"; end
+    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion single_target 16"; end
   end
   -- kyrian_spear,if=debuff.colossus_smash.up|buff.test_of_might.up
   if CDsON() and S.SpearofBastionCov:IsReady() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff)) then
-    if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SpearofBastion)) then return "kyrian_spear single_target 18"; end
+    if Cast(S.SpearofBastionCov, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.SpearofBastion)) then return "kyrian_spear single_target 18"; end
   end
   -- ancient_aftershock,if=debuff.colossus_smash.up|buff.test_of_might.up
   if S.AncientAftershock:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff)) then
-    if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "ancient_aftershock single_target 20"; end
+    if Cast(S.AncientAftershock, nil, Settings.Commons.DisplayStyle.Signature, not TargetInMeleeRange) then return "ancient_aftershock single_target 20"; end
   end
   -- bladestorm,if=talent.hurricane&(buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up)|debuff.colossus_smash.up&talent.unhinged
   if S.Bladestorm:IsCastable() and (S.Hurricane:IsAvailable() and (Player:BuffUp(S.TestofMightBuff) or (not S.TestofMight:IsAvailable()) and Target:DebuffUp(S.ColossusSmashDebuff)) or Target:DebuffUp(S.ColossusSmashDebuff) and S.Unhinged:IsAvailable()) then
@@ -269,7 +269,7 @@ local function SingleTarget()
   end
   -- condemn,if=buff.sudden_death.react
   if S.Condemn:IsReady() and (Player:BuffUp(S.SuddenDeathBuff)) then
-    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInMeleeRange) then return "condemn single_target 30"; end
+    if Cast(S.Condemn, nil, Settings.Commons.DisplayStyle.Signature, not TargetInMeleeRange) then return "condemn single_target 30"; end
   end
   -- shockwave,if=talent.sonic_boom.enabled
   if S.Shockwave:IsCastable() and (S.SonicBoom:IsAvailable()) then
