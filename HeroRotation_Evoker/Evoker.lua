@@ -28,6 +28,7 @@ Spell.Evoker.Commons = {
   WingBuffet                            = Spell(357214),
   -- Abilities
   AzureStrike                           = Spell(362969),
+  BlessingoftheBronze                   = Spell(364342),
   DeepBreath                            = Spell(357210),
   Disintegrate                          = Spell(356995),
   FireBreath                            = MultiSpell(357208,382266), -- with and without Font of Magic
@@ -36,6 +37,7 @@ Spell.Evoker.Commons = {
   ObsidianScales                        = Spell(363916),
   TipTheScales                          = Spell(370553),
   -- Buffs/Debuffs
+  BlessingoftheBronzeBuff               = Spell(381748),
   FireBreathDebuff                      = Spell(357209),
   LeapingFlamesBuff                     = Spell(370901),
   -- External Buffs
