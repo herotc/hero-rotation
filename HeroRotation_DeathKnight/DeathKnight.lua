@@ -170,6 +170,7 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   Festermight                           = Spell(377590),
   GhoulishFrenzy                        = Spell(377587),
   ImprovedDeathCoil                     = Spell(377580),
+  InfectedClaws                         = Spell(207272),
   Morbidity                             = Spell(377592),
   Outbreak                              = Spell(77575),
   Pestilence                            = Spell(277234),

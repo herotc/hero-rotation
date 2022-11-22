@@ -39,7 +39,6 @@ HR.GUISettings.APL.DeathKnight = {
       SacrificialPact = true
     },
     OffGCDasOffGCD = {
-      Trinkets = true,
       Potions = true,
       MindFreeze = true,
     }
