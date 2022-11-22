@@ -60,11 +60,7 @@ OldMMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldMMIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellMM.SummonPet then
-    return (not Pet:IsActive() and not HR.GUISettings.APL.Hunter.Marksmanship.UseLoneWolf) and BaseCheck
-  elseif self == SpellMM.SteadyShot then
-    return BaseCheck and (not SpellMM.SteadyFocus:IsAvailable() or not Player:PrevGCD(1, self) or (Player:PrevGCD(1, self) and not Player:IsCasting(self)))
-  elseif self == SpellMM.KillShot then
-    return BaseCheck and self:IsUsable()
+    return (not Pet:IsActive()) and BaseCheck
   else
     return BaseCheck
   end
@@ -76,15 +72,12 @@ OldMMIsReady = HL.AddCoreOverride("Spell.IsReady",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldMMIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellMM.AimedShot then
+    local ShouldCastAS = ((not Player:IsCasting(SpellMM.AimedShot)) and SpellMM.AimedShot:Charges() == 1 or SpellMM.AimedShot:Charges() > 1)
     if HR.GUISettings.APL.Hunter.Marksmanship.HideAimedWhileMoving then
-      return BaseCheck and not Player:IsCasting(SpellMM.AimedShot) and (not Player:IsMoving() or Player:BuffUp(SpellMM.LockandLoadBuff))
+      return BaseCheck and ShouldCastAS and ((not Player:IsMoving()) or Player:BuffUp(SpellMM.LockandLoadBuff))
     else
-      return BaseCheck and (not Player:IsCasting(SpellMM.AimedShot) and SpellMM.AimedShot:Charges() == 1 or SpellMM.AimedShot:Charges() > 1)
+      return BaseCheck and ShouldCastAS
     end
-  elseif self == SpellMM.ExplosiveShot then
-    local Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
-    local FightRemains = HL.FightRemains(Enemies10ySplash, false)
-    return BaseCheck and (FightRemains > 3)
   elseif self == SpellMM.WailingArrow then
     return BaseCheck and (not Player:IsCasting(self))
   else
@@ -117,12 +110,16 @@ OldMMBuffDown = HL.AddCoreOverride("Player.BuffDown",
 
 HL.AddCoreOverride("Player.FocusP",
   function()
-    local Focus = Player:Focus()
+    local Focus = Player:Focus() + Player:FocusRemainingCastRegen()
     if not Player:IsCasting() then
       return Focus
     else
       if Player:IsCasting(SpellMM.SteadyShot) then
         return Focus + 10
+      elseif Player:IsChanneling(SpellMM.RapidFire) then
+        return Focus + 7
+      elseif Player:IsCasting(SpellMM.WailingArrow) then
+        return Focus - 15
       elseif Player:IsCasting(SpellMM.AimedShot) then
         return Focus - 35
       end
