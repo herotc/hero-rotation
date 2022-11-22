@@ -282,7 +282,7 @@ or S.SummonGargoyle:CooldownRemains() > 60) and (Pet:BuffUp(S.DarkTransformation
     if Cast(S.EmpowerRuneWeapon, Settings.Commons.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 12"; end
   end
   -- summon_gargoyle,if=buff.commander_of_the_dead_window.up|!talent.commander_of_the_dead&runic_power>=40
-  if S.SummonGargoyle:IsReady() and (S.CommanderoftheDead:TimeSinceLastCast() <= 4 or (not S.CommanderoftheDead:IsAvailable()) and Player:RunicPower() >= 40) then
+  if S.SummonGargoyle:IsReady() and (S.DarkTransformation:TimeSinceLastCast() <= 4 or (not S.CommanderoftheDead:IsAvailable()) and Player:RunicPower() >= 40) then
     if Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return "summon_gargoyle cooldowns 14"; end
   end
   -- unholy_assault,if=variable.st_planning
@@ -290,7 +290,7 @@ or S.SummonGargoyle:CooldownRemains() > 60) and (Pet:BuffUp(S.DarkTransformation
     if Cast(S.UnholyAssault, Settings.Unholy.GCDasOffGCD.UnholyAssault, nil, not Target:IsInMeleeRange(5)) then return "unholy_assault cooldowns 16"; end
   end
   -- apocalypse,target_if=max:debuff.festering_wound.stack,if=active_enemies<=3&(!talent.commander_of_the_dead|talent.commander_of_the_dead&buff.commander_of_the_dead_window.up)
-  if S.Apocalypse:IsReady() and (EnemiesMeleeCount <= 3 and ((not S.CommanderoftheDead:IsAvailable()) or S.CommanderoftheDead:IsAvailable() and S.CommanderoftheDead:TimeSinceLastCast() <= 4)) then
+  if S.Apocalypse:IsReady() and (EnemiesMeleeCount <= 3 and ((not S.CommanderoftheDead:IsAvailable()) or S.CommanderoftheDead:IsAvailable() and S.DarkTransformation:TimeSinceLastCast() <= 4)) then
     if Everyone.CastTargetIf(S.Apocalypse, Enemies10ySplash, "max", EvaluateTargetIfFilterFWStack, nil, not Target:IsInMeleeRange(5)) then return "apocalypse cooldowns 18"; end
   end
   -- dark_transformation,if=variable.st_planning&cooldown.apocalypse.remains<gcd
@@ -539,7 +539,7 @@ local function APL()
       if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil out_of_range"; end
     end
     -- army_of_the_dead,if=talent.commander_of_the_dead&(cooldown.dark_transformation.remains<4|buff.commander_of_the_dead_window.up)|!talent.commander_of_the_dead&talent.unholy_assault&cooldown.unholy_assault.remains<10|!talent.unholy_assault&!talent.commander_of_the_dead|fight_remains<=30
-    if S.ArmyoftheDead:IsReady() and CDsON() and (S.CommanderoftheDead:IsAvailable() and (S.DarkTransformation:CooldownRemains() < 4 or S.CommanderoftheDead:TimeSinceLastCast() <= 4) or (not S.CommanderoftheDead:IsAvailable()) and S.UnholyAssault:IsAvailable() and S.UnholyAssault:CooldownRemains() < 10 or (not S.UnholyAssault:IsAvailable()) and (not S.CommanderoftheDead:IsAvailable()) or FightRemains <= 30) then
+    if S.ArmyoftheDead:IsReady() and CDsON() and (S.CommanderoftheDead:IsAvailable() and (S.DarkTransformation:CooldownRemains() < 4 or S.DarkTransformation:TimeSinceLastCast() <= 4) or (not S.CommanderoftheDead:IsAvailable()) and S.UnholyAssault:IsAvailable() and S.UnholyAssault:CooldownRemains() < 10 or (not S.UnholyAssault:IsAvailable()) and (not S.CommanderoftheDead:IsAvailable()) or FightRemains <= 30) then
       if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyoftheDead) then return "army_of_the_dead main 1"; end
     end
     -- outbreak,target_if=(dot.virulent_plague.refreshable|talent.superstrain&(dot.frost_fever_superstrain.refreshable|dot.blood_plague_superstrain.refreshable))&(!talent.unholy_blight|talent.unholy_blight&cooldown.unholy_blight.remains>15%((talent.superstrain*3)+(talent.plaguebringer*2)))
