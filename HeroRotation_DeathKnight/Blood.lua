@@ -407,8 +407,11 @@ local function APL()
     -- variable,name=death_strike_dump_amount,value=70
     VarDeathStrikeDumpAmt = 70
     -- potion,if=buff.dancing_rune_weapon.up
-    if I.PotionofSpectralStrength:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.DancingRuneWeaponBuff)) then
-      if Cast(I.PotionofSpectralStrength, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
+    if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.DancingRuneWeaponBuff)) then
+      local PotionSelected = Everyone.PotionSelected()
+      if PotionSelected and PotionSelected:IsReady() then
+        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
+      end
     end
     -- use_items
     if (Settings.Commons.Enabled.Trinkets) then

@@ -200,8 +200,11 @@ end
 
 local function Cooldowns()
   -- potion
-  if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
-    if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_unbridled_fury cooldowns 2"; end
+  if Settings.Commons.Enabled.Potions then
+    local PotionSelected = Everyone.PotionSelected()
+    if PotionSelected and PotionSelected:IsReady() then
+      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldowns 2"; end
+    end
   end
   -- Manually added: use_item,name=cache_of_acquired_treasures,if=buff.acquired_sword.up
   if Settings.Commons.Enabled.Trinkets and I.CacheofAcquiredTreasures:IsEquippedAndReady() and (Player:BuffUp(S.AcquiredSwordBuff)) then

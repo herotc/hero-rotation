@@ -272,8 +272,11 @@ local function Bear()
   end
   -- potion,if=covenant.venthyr&buff.incarnation.remains>=24&buff.incarnation.remains<=25
   -- Note: Extended time frame to better handle a real player's reaction time
-  if Settings.Commons.Enabled.Potions and I.PotionofPhantomFire:IsReady() and (CovenantID == 2 and Player:BuffRemains(S.IncarnationBuff) >= 23 and Player:BuffRemains(S.IncarnationBuff) <= 26) then
-    if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion bear 30"; end
+  if Settings.Commons.Enabled.Potions and (CovenantID == 2 and Player:BuffRemains(S.IncarnationBuff) >= 23 and Player:BuffRemains(S.IncarnationBuff) <= 26) then
+    local PotionSelected = Everyone.PotionSelected()
+    if PotionSelected and PotionSelected:IsReady() then
+      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion bear 30"; end
+    end
   end
   if CDsON() then
     -- convoke_the_spirits,if=!druid.catweave_bear&!druid.owlweave_bear
@@ -413,8 +416,11 @@ local function APL()
       if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 main 6"; end
     end
     -- potion,if=!covenant.venthyr&(((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)&(druid.catweave_bear|druid.owlweave_bear)&!buff.prowl.up)|((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!druid.catweave_bear&!druid.owlweave_bear)))
-    if Settings.Commons.Enabled.Potions and I.PotionofPhantomFire:IsReady() and (CovenantID ~= 2 and (Player:BuffUp(S.BerserkBuff) or Player:BuffUp(S.Incarnation))) then
-      if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 8"; end
+    if Settings.Commons.Enabled.Potions and (CovenantID ~= 2 and (Player:BuffUp(S.BerserkBuff) or Player:BuffUp(S.Incarnation))) then
+      local PotionSelected = Everyone.PotionSelected()
+      if PotionSelected and PotionSelected:IsReady() then
+        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 8"; end
+      end
     end
     -- run_action_list,name=catweave,if=(target.cooldown.pause_action.remains|time>=30)&druid.catweave_bear=1&((cooldown.convoke_the_spirits.remains<=1)&(buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down)|(buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down)&(cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=gcd+0.5)|(buff.cat_form.up&energy>25)|(buff.heart_of_the_wild.up&energy>90))
     -- run_action_list,name=owlweave,if=(target.cooldown.pause_action.remains|time>=30)&((druid.owlweave_bear=1)&buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&cooldown.starsurge.up)

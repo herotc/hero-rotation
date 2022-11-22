@@ -143,8 +143,11 @@ local function Cooldowns()
     if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 2"; end
   end
   -- potion
-  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
-    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cd 4"; end
+  if Settings.Commons.Enabled.Potions then
+    local PotionSelected = Everyone.PotionSelected()
+    if PotionSelected and PotionSelected:IsReady() then
+      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cd 4"; end
+    end
   end
   -- deathborne
   if S.Deathborne:IsCastable() then

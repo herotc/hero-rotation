@@ -261,7 +261,7 @@ local function Cooldowns()
       local PotionDuration = PotionSelected:BuffDuration()
       if PotionSelected:IsReady() and ((PotionDuration >= ghoul:gargremains() and ghoul:gargactive()) or ((not S.SummonGargoyle:IsAvailable()) 
 or S.SummonGargoyle:CooldownRemains() > 60) and (Pet:BuffUp(S.DarkTransformation) and PotionDuration >= Pet:BuffRemains(S.DarkTransformation) or VarArmyGhoulActive and VarArmyGhoulRemains <= PotionDuration or VarApocGhoulActive and VarApocGhoulRemains <= PotionDuration) or FightRemains <= PotionDuration) then
-        if Cast(I.PotionofSpectralStrength, Settings.Commons.OffGCDasOffGCD.Potions) then return "potion cooldowns 2"; end
+        if Cast(PotionSelected, Settings.Commons.OffGCDasOffGCD.Potions) then return "potion cooldowns 2"; end
       end
     end
   end

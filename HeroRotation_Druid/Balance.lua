@@ -551,8 +551,11 @@ local function APL()
       if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 2"; end
     end
     -- potion,if=buff.ca_inc.up|variable.no_cd_talent|fight_remains<25
-    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (CAIncBuffUp or VarNoCDTalent or FightRemains < 25) then
-      if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion 4"; end
+    if Settings.Commons.Enabled.Potions and (CAIncBuffUp or VarNoCDTalent or FightRemains < 25) then
+      local PotionSelected = Everyone.PotionSelected()
+      if PotionSelected and PotionSelected:IsReady() then
+        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion 4"; end
+      end
     end
     if (Settings.Commons.Enabled.Trinkets) then
       -- use_items,slots=trinket1,if=variable.on_use_trinket!=1&!trinket.2.ready_cooldown|(variable.on_use_trinket=1|variable.on_use_trinket=3)&buff.ca_inc.up|variable.no_cd_talent|fight_remains<20|variable.on_use_trinket=0
