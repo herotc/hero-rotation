@@ -132,11 +132,21 @@ end
 
 -- CastCycle/CastTargetIf Functions
 local function EvaluateCycleSunfireST(TargetUnit)
+  -- target_if=refreshable&remains<2
+  return (TargetUnit:DebuffRefreshable(S.SunfireDebuff) and TargetUnit:DebuffRemains(S.SunfireDebuff) < 2)
+end
+
+local function EvaluateCycleSunfireST2(TargetUnit)
   -- target_if=refreshable&astral_power.deficit>variable.passive_asp+3
   return (TargetUnit:DebuffRefreshable(S.SunfireDebuff) and Player:AstralPowerDeficit() > VarPassiveAsp + 3)
 end
 
 local function EvaluateCycleMoonfireST(TargetUnit)
+  -- target_if=refreshable&remains<2
+  return (TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and TargetUnit:DebuffRemains(S.MoonfireDebuff) < 2)
+end
+
+local function EvaluateCycleMoonfireST2(TargetUnit)
   -- target_if=refreshable&astral_power.deficit>variable.passive_asp+3
   return (TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and Player:AstralPowerDeficit() > VarPassiveAsp + 3)
 end
@@ -147,6 +157,11 @@ local function EvaluateCycleAdaptiveSwarmST(TargetUnit)
 end
 
 local function EvaluateCycleStellarFlareST(TargetUnit)
+  -- target_if=refreshable&astral_power.deficit>variable.passive_asp+8&remains<2
+  return (TargetUnit:DebuffRefreshable(S.StellarFlareDebuff) and Player:AstralPowerDeficit() > VarPassiveAsp + 8 and TargetUnit:DebuffRemains(S.StellarFlareDebuff) < 2)
+end
+
+local function EvaluateCycleStellarFlareST2(TargetUnit)
   -- target_if=refreshable&astral_power.deficit>variable.passive_asp+8
   return (TargetUnit:DebuffRefreshable(S.StellarFlareDebuff) and Player:AstralPowerDeficit() > VarPassiveAsp + 8)
 end
@@ -240,11 +255,11 @@ local function Fallthru()
 end
 
 local function St()
-  -- sunfire,target_if=refreshable&astral_power.deficit>variable.passive_asp+3
+  -- sunfire,target_if=refreshable&remains<2
   if S.Sunfire:IsCastable() then
     if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireST, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire st 4"; end
   end
-  -- moonfire,target_if=refreshable&astral_power.deficit>variable.passive_asp+3
+  -- moonfire,target_if=refreshable&remains<2
   if S.Moonfire:IsCastable() then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireST, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire st 6"; end
   end
@@ -252,7 +267,7 @@ local function St()
   if S.AdaptiveSwarmCov:IsReady() then
     if Everyone.CastCycle(S.AdaptiveSwarmCov, Enemies40y, EvaluateCycleAdaptiveSwarmST, not Target:IsSpellInRange(S.AdaptiveSwarmCov)) then return "adaptive_swarm st 8"; end
   end
-  -- stellar_flare,target_if=refreshable&astral_power.deficit>variable.passive_asp+8
+  -- stellar_flare,target_if=refreshable&astral_power.deficit>variable.passive_asp+8&remains<2
   if S.StellarFlare:IsCastable() then
     if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareST, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare st 10"; end
   end
@@ -333,33 +348,45 @@ local function St()
   if S.Starsurge:IsReady() and (S.Starlord:IsAvailable() and Player:BuffStack(S.StarlordBuff) < 3 or S.RattletheStars:IsAvailable() and Player:BuffUp(S.RattledStarsBuff) and Player:BuffRemains(S.RattledStarsBuff) < Player:GCD() + 0.5) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 40"; end
   end
+  -- sunfire,target_if=refreshable&astral_power.deficit>variable.passive_asp+3
+  if S.Sunfire:IsCastable() then
+    if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireST2, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire st 42"; end
+  end
+  -- moonfire,target_if=refreshable&astral_power.deficit>variable.passive_asp+3
+  if S.Moonfire:IsCastable() then
+    if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireST2, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire st 44"; end
+  end
+  -- stellar_flare,target_if=refreshable&astral_power.deficit>variable.passive_asp+8
+  if S.StellarFlare:IsCastable() then
+    if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareST2, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare st 46"; end
+  end
   -- new_moon,if=astral_power.deficit>variable.passive_asp+10
   if S.NewMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 10) then
-    if Cast(S.NewMoon, nil, nil, not Target:IsSpellInRange(S.NewMoon)) then return "new_moon st 42"; end
+    if Cast(S.NewMoon, nil, nil, not Target:IsSpellInRange(S.NewMoon)) then return "new_moon st 48"; end
   end
   -- half_moon,if=astral_power.deficit>variable.passive_asp+20&(buff.eclipse_lunar.remains>execute_time|buff.eclipse_solar.remains>execute_time)
   if S.HalfMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 20 and (Player:BuffRemains(S.EclipseLunar) > S.HalfMoon:ExecuteTime() or Player:BuffRemains(S.EclipseSolar) > S.HalfMoon:ExecuteTime())) then
-    if Cast(S.HalfMoon, nil, nil, not Target:IsSpellInRange(S.HalfMoon)) then return "half_moon st 44"; end
+    if Cast(S.HalfMoon, nil, nil, not Target:IsSpellInRange(S.HalfMoon)) then return "half_moon st 50"; end
   end
   -- full_moon,if=astral_power.deficit>variable.passive_asp+40&(buff.eclipse_lunar.remains>execute_time|buff.eclipse_solar.remains>execute_time)
   if S.FullMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 40 and (Player:BuffRemains(S.EclipseLunar) > S.FullMoon:ExecuteTime() or Player:BuffRemains(S.EclipseSolar) > S.FullMoon:ExecuteTime())) then
-    if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon st 46"; end
+    if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon st 52"; end
   end
   -- starsurge,if=buff.starweavers_weft.up|astral_power.deficit<variable.passive_asp+(8*(1+0.5*talent.soul_of_the_forest*buff.eclipse_solar.up))|talent.astral_communion&cooldown.astral_communion.remains<3|fight_remains<5
   if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:AstralPowerDeficit() < VarPassiveAsp + (8 * (1 + 0.5 * num(S.SouloftheForest:IsAvailable()) * num(Player:BuffUp(S.EclipseSolar)))) or S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemains() < 3 or FightRemains < 5) then
-    if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 48"; end
+    if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 54"; end
   end
   -- wild_mushroom,if=astral_power.deficit>variable.passive_asp+5&cooldown.ca_inc.remains-30>full_recharge_time&(!talent.primordial_arcanic_pulsar|buff.ca_inc.remains>3)&(!talent.fungal_growth|talent.stellar_flare|!prev_gcd.1.wild_mushroom&!prev_gcd.2.wild_mushroom&dot.fungal_growth.remains<2)|fight_remains<10
   if S.WildMushroom:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 5 and CaInc:CooldownRemains() - 30 > S.WildMushroom:FullRechargeTime() and ((not S.PrimordialArcanicPulsar:IsAvailable()) or CAIncBuffRemains > 3) and ((not S.FungalGrowth:IsAvailable()) or S.StellarFlare:IsAvailable() or (not Player:PrevGCD(1, S.WildMushroom)) and (not Player:PrevGCD(2, S.WildMushroom)) and Target:DebuffRemains(S.FungalGrowthDebuff) < 2) or FightRemains < 10) then
-    if Cast(S.WildMushroom, nil, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 50"; end
+    if Cast(S.WildMushroom, nil, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 56"; end
   end
   -- starfire,if=eclipse.in_lunar|buff.warrior_of_elune.up&(buff.eclipse_lunar.up|buff.umbral_embrace.react)
   if S.Starfire:IsCastable() and (EclipseInLunar or Player:BuffUp(S.WarriorofEluneBuff) and (Player:BuffUp(S.EclipseLunar) or Player:BuffUp(S.UmbralEmbraceBuff))) then
-    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire st 54"; end
+    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire st 58"; end
   end
   -- wrath
   if S.Wrath:IsCastable() and not Player:IsMoving() then
-    if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath st 56"; end
+    if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath st 60"; end
   end
   -- run_action_list,name=fallthru
   local ShouldReturn = Fallthru(); if ShouldReturn then return ShouldReturn; end
