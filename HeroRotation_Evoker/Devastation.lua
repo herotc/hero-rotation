@@ -142,12 +142,12 @@ local function Trinkets()
   -- use_item,slot=trinket2,if=(!trinket.2.has_use_buff&(trinket.1.cooldown.remains|!trinket.1.has_use_buff)|cooldown.dragonrage.remains>20|!talent.dragonrage)
   -- Note: Can't handle above trinket tracking, so let's use the old fallback. When we can do above tracking, the below can be removed.
   -- use_items,if=buff.dragonrage.up
-      if Player:BuffUp(S.Dragonrage) then
-        local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-        if TrinketToUse then
-          if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
-        end
-      end
+  if Player:BuffUp(S.Dragonrage) then
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
+  end
 end
 
 -- APL Main
