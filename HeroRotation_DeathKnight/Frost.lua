@@ -340,8 +340,8 @@ local function Cooldowns()
   if S.PillarofFrost:IsCastable() and (S.Icecap:IsAvailable() and (not S.Obliteration:IsAvailable()) and (not S.BreathofSindragosa:IsAvailable()) and (VarAddsRemain or VarSTPlanning)) then
     if Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cooldowns 20"; end
   end
-  -- breath_of_sindragosa,if=runic_power>60&(variable.adds_remain|variable.st_planning)|fight_remains<30
-  if S.BreathofSindragosa:IsReady() and (Player:RunicPower() > 60 and (VarAddsRemain or VarSTPlanning) or FightRemains < 30) then
+  -- breath_of_sindragosa,if=!buff.breath_of_sindragosa.up&runic_power>60&(variable.adds_remain|variable.st_planning)|fight_remains<30
+  if S.BreathofSindragosa:IsReady() and (Player:BuffDown(S.BreathofSindragosa) and Player:RunicPower() > 60 and (VarAddsRemain or VarSTPlanning) or FightRemains < 30) then
     if Cast(S.BreathofSindragosa, Settings.Frost.GCDasOffGCD.BreathOfSindragosa, nil, not Target:IsInRange(12)) then return "breath_of_sindragosa cooldowns 22"; end
   end
   -- frostwyrms_fury,if=active_enemies=1&(talent.pillar_of_frost&buff.pillar_of_frost.remains<gcd*2&buff.pillar_of_frost.up&!talent.obliteration|!talent.pillar_of_frost)&(!raid_event.adds.exists|(raid_event.adds.in>15+raid_event.adds.duration|talent.absolute_zero&raid_event.adds.in>15+raid_event.adds.duration))|fight_remains<3
@@ -454,12 +454,12 @@ local function Obliteration()
   if S.Frostscythe:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and VarFrostscythePriority) then
     if Cast(S.Frostscythe, nil, nil, not Target:IsInMeleeRange(8)) then return "frostscythe obliteration 8"; end
   end
-  -- howling_blast,if=!dot.frost_fever.ticking&!buff.killing_machine.react|!buff.killing_machine.react&buff.rime.react
-  if S.HowlingBlast:IsReady() and (Target:DebuffDown(S.FrostFeverDebuff) and Player:BuffDown(S.KillingMachineBuff) or Player:BuffDown(S.KillingMachineBuff) and Player:BuffUp(S.RimeBuff)) then
+  -- howling_blast,if=!dot.frost_fever.ticking&!buff.killing_machine.react
+  if S.HowlingBlast:IsReady() and (Target:DebuffDown(S.FrostFeverDebuff) and Player:BuffDown(S.KillingMachineBuff)) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast obliteration 10"; end
   end
-  -- frost_strike,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=!buff.killing_machine.react&variable.rp_buffs&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1)
-  if S.FrostStrike:IsReady() and (Player:BuffDown(S.KillingMachineBuff) and VarRPBuffs and (not VarPoolingRP) and ((not S.GlacialAdvance:IsAvailable()) or EnemiesCount10yd == 1)) then
+  -- frost_strike,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=!buff.killing_machine.react&(variable.rp_buffs|debuff.razorice.stack=5&talent.shattering_blade)&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1)
+  if S.FrostStrike:IsReady() and (Player:BuffDown(S.KillingMachineBuff) and (VarRPBuffs or Target:DebuffStack(S.RazoriceDebuff) == 5 and S.ShatteringBlade:IsAvailable()) and (not VarPoolingRP) and ((not S.GlacialAdvance:IsAvailable()) or EnemiesCount10yd == 1)) then
     if Cast(S.FrostStrike, Settings.Frost.GCDasOffGCD.FrostStrike, nil, not Target:IsInMeleeRange(5)) then return "frost_strike obliteration 12"; end
   end
   -- howling_blast,if=buff.rime.react&buff.killing_machine.react
@@ -505,24 +505,24 @@ local function SingleTarget()
   if S.RemorselessWinter:IsReady() and (VarRWBuffs or VarAddsRemain) then
     if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter single_target 2"; end
   end
-  -- howling_blast,if=buff.rime.react&talent.icebreaker.rank=2
-  if S.HowlingBlast:IsReady() and (Player:BuffUp(S.RimeBuff) and S.Icebreaker:TalentRank() == 2) then
-    if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast single_target 4"; end
-  end
   -- frostscythe,if=!variable.pooling_runes&buff.killing_machine.react&variable.frostscythe_priority
   if S.Frostscythe:IsReady() and ((not VarPoolingRunes) and Player:BuffUp(S.KillingMachineBuff) and VarFrostscythePriority) then
-    if Cast(S.Frostscythe, nil, nil, not Target:IsInMeleeRange(8)) then return "frostscythe single_target 6"; end
+    if Cast(S.Frostscythe, nil, nil, not Target:IsInMeleeRange(8)) then return "frostscythe single_target 4"; end
   end
   -- obliterate,if=!variable.pooling_runes&buff.killing_machine.react
   if S.Obliterate:IsReady() and ((not VarPoolingRunes) and Player:BuffUp(S.KillingMachineBuff)) then
-    if Cast(S.Obliterate, nil, nil, not Target:IsInMeleeRange(5)) then return "obliterate single_target 8"; end
+    if Cast(S.Obliterate, nil, nil, not Target:IsInMeleeRange(5)) then return "obliterate single_target 6"; end
+  end
+  -- howling_blast,if=buff.rime.react&talent.icebreaker.rank=2
+  if S.HowlingBlast:IsReady() and (Player:BuffUp(S.RimeBuff) and S.Icebreaker:TalentRank() == 2) then
+    if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast single_target 8"; end
   end
   -- horn_of_winter,if=rune<4&runic_power.deficit>25&talent.obliteration&talent.breath_of_sindragosa
   if S.HornofWinter:IsReady() and (Player:Rune() < 4 and Player:RunicPowerDeficit() > 25 and S.Obliteration:IsAvailable() and S.BreathofSindragosa:IsAvailable()) then
     if Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornOfWinter) then return "horn_of_winter single_target 10"; end
   end
-  -- frost_strike,if=!variable.pooling_runic_power&(variable.rp_buffs|runic_power.deficit<25)
-  if S.FrostStrike:IsReady() and ((not VarPoolingRP) and (VarRPBuffs or Player:RunicPowerDeficit() < 25)) then
+  -- frost_strike,if=!variable.pooling_runic_power&(variable.rp_buffs|runic_power.deficit<25|debuff.razorice.stack=5&talent.shattering_blade)
+  if S.FrostStrike:IsReady() and ((not VarPoolingRP) and (VarRPBuffs or Player:RunicPowerDeficit() < 25 or Target:DebuffStack(S.RazoriceDebuff) == 5 and S.ShatteringBlade:IsAvailable())) then
     if Cast(S.FrostStrike, Settings.Frost.GCDasOffGCD.FrostStrike, nil, not Target:IsInMeleeRange(5)) then return "frost_strike single_target 12"; end
   end
   -- howling_blast,if=variable.rime_buffs

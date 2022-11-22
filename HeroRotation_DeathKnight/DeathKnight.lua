@@ -139,6 +139,7 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   PillarofFrost                         = Spell(51271),
   RageoftheFrozenChampion               = Spell(377076),
   RemorselessWinter                     = Spell(196770),
+  ShatteringBlade                       = Spell(207057),
   UnleashedFrenzy                       = Spell(376905),
   -- Buffs
   ColdHeartBuff                         = Spell(281209),
