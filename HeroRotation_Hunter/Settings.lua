@@ -42,11 +42,12 @@ HR.GUISettings.APL.Hunter = {
     GCDasOffGCD = {
       Exhilaration = true,
       Flare = false,
-      RevivePet = false,
-      MendPet = false,
-      SummonPet = false,
       FreezingTrap = false,
+      MendPet = false,
+      RevivePet = false,
+      Stampede = false,
       SteelTrap = false,
+      SummonPet = false,
       TarTrap = false,
     },
     OffGCDasOffGCD = {
@@ -63,7 +64,6 @@ HR.GUISettings.APL.Hunter = {
       Bloodshed = false,
       CallOfTheWild = false,
       DireBeast = false,
-      Stampede = false,
       WailingArrow = false,
     },
     OffGCDasOffGCD = {
@@ -101,8 +101,6 @@ HR.GUISettings.APL.Hunter = {
       -- Abilities
       AspectOfTheEagle = true,
       Muzzle = true,
-      -- Items
-      -- Racials
     }
   }
 }

@@ -255,7 +255,7 @@ local function Cleave()
   end
   -- stampede,if=buff.bestial_wrath.up|target.time_to_die<15
   if S.Stampede:IsCastable() and CDsON() and (Player:BuffUp(S.BestialWrathBuff) or FightRemains < 15) then
-    if Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, not Target:IsSpellInRange(S.Stampede)) then return "stampede cleave 14"; end
+    if Cast(S.Stampede, Settings.Commons2.GCDasOffGCD.Stampede, nil, not Target:IsSpellInRange(S.Stampede)) then return "stampede cleave 14"; end
   end
   -- bloodshed
   if S.Bloodshed:IsCastable() then
@@ -350,7 +350,7 @@ local function ST()
   end
   -- stampede
   if S.Stampede:IsCastable() and CDsON() then
-    if Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, not Target:IsSpellInRange(S.Stampede)) then return "stampede st 12"; end
+    if Cast(S.Stampede, Settings.Commons2.GCDasOffGCD.Stampede, nil, not Target:IsSpellInRange(S.Stampede)) then return "stampede st 12"; end
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsCastable() then
