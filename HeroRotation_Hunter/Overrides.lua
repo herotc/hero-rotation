@@ -26,7 +26,7 @@ OldBMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldBMIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellBM.SummonPet then
-    return (not Pet:IsActive()) and BaseCheck
+    return (not Pet:IsActive()) and (not Pet:IsDeadOrGhost()) and BaseCheck
   else
     return BaseCheck
   end
@@ -60,7 +60,7 @@ OldMMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldMMIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellMM.SummonPet then
-    return (not Pet:IsActive()) and BaseCheck
+    return (not Pet:IsActive()) and (not Pet:IsDeadOrGhost()) and BaseCheck
   else
     return BaseCheck
   end
@@ -155,9 +155,7 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     return OldSVIsReady(self, "Melee", AoESpell, ThisUnit, BypassRecovery, Offset)
   else
     local BaseCheck = OldSVIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    if self == SpellSV.KillShot then
-      return BaseCheck and self:IsUsable()
-    elseif self == SpellSV.Carve or self == SpellSV.Butchery then
+    if self == SpellSV.Carve or self == SpellSV.Butchery then
       return BaseCheck and (Player:BuffDown(SpellSV.AspectoftheEagle) or Player:BuffUp(SpellSV.AspectoftheEagle) and Target:IsInMeleeRange(8))
     else
       return BaseCheck

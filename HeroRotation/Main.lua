@@ -327,7 +327,7 @@
     -- Hunter
       [253]   = "HeroRotation_Hunter",        -- Beast Mastery
       [254]   = "HeroRotation_Hunter",        -- Marksmanship
-      --[255]   = "HeroRotation_Hunter",        -- Survival
+      [255]   = "HeroRotation_Hunter",        -- Survival
     -- Mage
       --[62]    = "HeroRotation_Mage",          -- Arcane
       --[63]    = "HeroRotation_Mage",          -- Fire
