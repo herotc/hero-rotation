@@ -281,10 +281,6 @@ local function St()
   if S.Starsurge:IsReady() and (VarCDConditionST and Player:BuffUp(S.TouchtheCosmos)) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 14"; end
   end
-  -- wild_mushroom,if=variable.cd_condition_st&cooldown.ca_inc.remains<gcd.max*2&(!prev_gcd.1.wild_mushroom|prev_gcd.1.wild_mushroom&!prev_gcd.2.wild_mushroom)
-  if S.WildMushroom:IsCastable() and (VarCDConditionST and CaInc:CooldownRemains() < (Player:GCD() + 0.5) * 2 and ((not Player:PrevGCD(1, S.WildMushroom)) or Player:PrevGCD(1, S.WildMushroom) and not Player:PrevGCD(2, S.WildMushroom))) then
-    if Cast(S.WildMushroom, nil, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 15"; end
-  end
   if CDsON() then
     -- celestial_alignment,if=variable.cd_condition_st
     if S.CelestialAlignment:IsCastable() and (VarCDConditionST) then
