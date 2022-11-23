@@ -101,6 +101,7 @@ Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
   RelishinBlood                         = Spell(317610),
   RuneTap                               = Spell(194679),
   SanguineGround                        = Spell(391458),
+  ShatteringBone                        = Spell(377640),
   TighteningGrasp                       = Spell(206970),
   Tombstone                             = Spell(219809),
   VampiricBlood                         = Spell(55233),
