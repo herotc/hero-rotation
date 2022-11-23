@@ -480,7 +480,7 @@ local function APL()
       local ShouldReturn = Trickshots(); if ShouldReturn then return ShouldReturn; end
     end
     -- Pool Focus if nothing else to do
-    if Cast(S.PoolFocus) then return "Pooling Focus"; end
+    if HR.CastAnnotated(S.PoolFocus, false, "WAIT") then return "Pooling Focus"; end
   end
 end
 

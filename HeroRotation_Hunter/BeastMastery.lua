@@ -502,7 +502,7 @@ local function APL()
       if Cast(S.MendPet) then return "Mend Pet Low Priority (w/ Target)"; end
     end
     -- Pool Focus if nothing else to do
-    if Cast(S.PoolFocus) then return "Pooling Focus"; end
+    if HR.CastAnnotated(S.PoolFocus, false, "WAIT") then return "Pooling Focus"; end
   end
 
   -- Note: We have to put it again in case we don't have a target but our pet is dying.
