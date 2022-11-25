@@ -51,12 +51,12 @@ HR.GUISettings.APL.Warlock = {
       -- Abilities
       SummonPet = false,
       GrimoireOfSacrifice = true,
-      SummonInfernal = true
+      SummonInfernal = true,
+      SummonSoulkeeper = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
-      DarkSoulInstability = true
     }
   },
   Demonology = {

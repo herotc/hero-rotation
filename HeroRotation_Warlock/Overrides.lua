@@ -152,13 +152,15 @@ HL.AddCoreOverride ("Player.SoulShardsP",
       return Shard
     else
       if Player:IsCasting(SpellDestro.ChaosBolt) then
-        return min(Shard - 2, 5)
+        return Shard - 2
       elseif Player:IsCasting(SpellDestro.RainofFire) then
-        return min(Shard - 3, 5)
+        return Shard - 3
       elseif Player:IsCasting(SpellDestro.Incinerate) then
         return min(Shard + 0.2, 5)
       elseif Player:IsCasting(SpellDestro.Conflagrate) then
         return min(Shard + 0.5, 5)
+      elseif Player:IsCasting(SpellDestro.SoulFire) then
+        return min(Shard + 1, 5)
       else
         return Shard
       end
@@ -177,8 +179,25 @@ DestroOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     local BaseCheck = DestroOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellDestro.SummonPet then
       return BaseCheck and (not Settings.Commons.HidePetSummon) and Player:SoulShardsP() > 0 and (not Player:IsCasting(self)) and not (Pet:IsActive() or Player:BuffUp(SpellDestro.GrimoireofSacrificeBuff))
-    elseif self == SpellDestro.Immolate or self == SpellDestro.Cataclysm or self == SpellDestro.ChannelDemonfire or self == SpellDestro.DecimatingBolt or self == SpellDestro.SoulRot or self == SpellDestro.ImpendingCatastrophe or self == SpellDestro.ScouringTithe then
+    elseif self == SpellDestro.Immolate or self == SpellDestro.Cataclysm or self == SpellDestro.ChannelDemonfire or self == SpellDestro.SoulRot or self == SpellDestro.SummonSoulkeeper then
       return BaseCheck and not Player:IsCasting(self)
+    else
+      return BaseCheck
+    end
+  end
+, 267)
+
+local DestroOldSpellIsReady
+DestroOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local RangeOK = true
+    if Range then
+      local RangeUnit = ThisUnit or Target
+      RangeOK = RangeUnit:IsInRange( Range, AoESpell )
+    end
+    local BaseCheck = DestroOldSpellIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellDestro.GrimoireofSacrifice then
+      return BaseCheck and Player:BuffDown(SpellDestro.GrimoireofSacrificeBuff)
     else
       return BaseCheck
     end
@@ -188,7 +207,7 @@ DestroOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 local DestroOldPlayerAffectingCombat
 DestroOldPlayerAffectingCombat = HL.AddCoreOverride("Player.AffectingCombat",
   function (self)
-    return SpellDestro.Incinerate:InFlight() or DestroOldPlayerAffectingCombat(self)
+    return SpellDestro.Incinerate:InFlight() or Player:IsCasting(SpellDestro.SoulFire) or DestroOldPlayerAffectingCombat(self)
   end
 , 267)
 
