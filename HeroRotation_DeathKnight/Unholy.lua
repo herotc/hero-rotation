@@ -526,6 +526,8 @@ local function APL()
     VarSTPlanning = (EnemiesMeleeCount <= 3 or not AoEON())
     -- variable,name=adds_remain,value=active_enemies>=4&(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.remains>6)
     VarAddsRemain = (EnemiesMeleeCount >= 4 and AoEON())
+    -- invoke_external_buff,name=power_infusion,line_cd=120,if=variable.st_planning&runic_power.deficit>20&(pet.gargoyle.active&pet.apoc_ghoul.active|!talent.summon_gargoyle&talent.army_of_the_damned&pet.army_ghoul.active&pet.apoc_ghoul.active|!talent.summon_gargoyle&!talent.army_of_the_damned&buff.dark_transformation.up|!talent.summon_gargoyle&!talent.summon_gargoyle&buff.dark_transformation.up)|fight_remains<=21
+    -- Note: Not handling external buffs.
     -- Manually added: Outbreak if targets are missing VP and out of range
     if S.Outbreak:IsReady() and (EnemiesWithoutVP > 0 and EnemiesMeleeCount == 0) then
       if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak out_of_range"; end
