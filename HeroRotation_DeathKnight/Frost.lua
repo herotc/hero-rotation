@@ -677,6 +677,8 @@ local function APL()
     VarPoolingRunes = (S.Obliteration:IsAvailable() and S.PillarofFrost:CooldownRemains() < VarOblitPoolingTime)
     -- variable,name=pooling_runic_power,value=talent.breath_of_sindragosa&cooldown.breath_of_sindragosa.remains<variable.breath_pooling_time|talent.obliteration&runic_power<35&cooldown.pillar_of_frost.remains_expected<variable.oblit_pooling_time
     VarPoolingRP = (S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemains() < VarBreathPoolingTime or S.Obliteration:IsAvailable() and Player:RunicPower() < 35 and S.PillarofFrost:CooldownRemains() < VarOblitPoolingTime)
+    -- invoke_external_buff,name=power_infusion,line_cd=120,if=(buff.pillar_of_frost.up|!talent.pillar_of_frost)&(talent.obliteration|talent.breath_of_sindragosa&buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa&!talent.obliteration)
+    -- Note: Not handling external buffs.
     -- howling_blast,if=!dot.frost_fever.ticking&active_enemies>=2&(!talent.obliteration|talent.obliteration&(!buff.pillar_of_frost.up|buff.pillar_of_frost.up&!buff.killing_machine.react))
     if S.HowlingBlast:IsReady() and (Target:DebuffDown(S.FrostFeverDebuff) and EnemiesCount10yd >= 2 and ((not S.Obliteration:IsAvailable()) or S.Obliteration:IsAvailable() and (Player:BuffDown(S.PillarofFrostBuff) or Player:BuffUp(S.PillarofFrostBuff) and Player:BuffDown(S.KillingMachineBuff)))) then
       if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast main 2"; end
