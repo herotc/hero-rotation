@@ -42,7 +42,8 @@ local S = Spell.Druid.Balance
 
 -- Items
 local I = Item.Druid.Balance
-local OnUseExcludes = {--  I.TrinketName:ID(),
+local OnUseExcludes = {
+  --  I.TrinketName:ID(),
 }
 
 -- Trinket Item Objects
@@ -68,10 +69,6 @@ local CAIncBuffRemains
 local Druid = HL.Druid
 local BossFightRemains = 11111
 local FightRemains = 11111
-
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
 
 -- CA/Incarnation Variable
 local CaInc = S.IncarnationTalent:IsAvailable() and S.Incarnation or S.CelestialAlignment
@@ -101,19 +98,9 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  S.AdaptiveSwarmCov:RegisterInFlight()
-end, "LEARNED_SPELL_IN_TAB")
-S.AdaptiveSwarmCov:RegisterInFlight()
-
-HL:RegisterForEvent(function()
   CaInc = S.IncarnationTalent:IsAvailable() and S.Incarnation or S.CelestialAlignment
   VarInit = false
 end, "PLAYER_TALENT_UPDATE")
-
--- Update CovenantID if we change Covenants
-HL:RegisterForEvent(function()
-  CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN")
 
 -- Enemy Variables
 local Enemies40y, EnemiesCount40y
@@ -151,11 +138,6 @@ local function EvaluateCycleMoonfireST2(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and Player:AstralPowerDeficit() > VarPassiveAsp + 3)
 end
 
-local function EvaluateCycleAdaptiveSwarmST(TargetUnit)
-  -- target_if=!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>5)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<3&dot.adaptive_swarm_damage.ticking
-  return (TargetUnit:DebuffDown(S.AdaptiveSwarmCovDebuff) and (not S.AdaptiveSwarmCov:InFlight()) and (Player:BuffDown(S.AdaptiveSwarmCovHeal) or Player:BuffRemains(S.AdaptiveSwarmCovHeal) > 5) or TargetUnit:DebuffStack(S.AdaptiveSwarmCovDebuff) < 3 and TargetUnit:DebuffRemains(S.AdaptiveSwarmCovDebuff) < 3 and TargetUnit:DebuffUp(S.AdaptiveSwarmCovDebuff))
-end
-
 local function EvaluateCycleStellarFlareST(TargetUnit)
   -- target_if=refreshable&astral_power.deficit>variable.passive_asp+8&remains<2
   return (TargetUnit:DebuffRefreshable(S.StellarFlareDebuff) and Player:AstralPowerDeficit() > VarPassiveAsp + 8 and TargetUnit:DebuffRemains(S.StellarFlareDebuff) < 2)
@@ -174,11 +156,6 @@ end
 local function EvaluateCycleMoonfireAoE(TargetUnit)
   -- target_if=refreshable&(target.time_to_die-remains)>8&astral_power.deficit>variable.passive_asp+3
   return (TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and (TargetUnit:TimeToDie() - Target:DebuffRemains(S.MoonfireDebuff)) > 8 and Player:AstralPowerDeficit() > VarPassiveAsp + 3)
-end
-
-local function EvaluateCycleAdaptiveSwarmAoE(TargetUnit)
-  -- target_if=!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>5)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<3&dot.adaptive_swarm_damage.ticking
-  return (TargetUnit:DebuffDown(S.AdaptiveSwarmCovDebuff) and (not S.AdaptiveSwarmCov:InFlight()) and (Player:BuffDown(S.AdaptiveSwarmCovHeal) or Player:BuffRemains(S.AdaptiveSwarmCovHeal) > 5) or TargetUnit:DebuffStack(S.AdaptiveSwarmCovDebuff) < 3 and TargetUnit:DebuffRemains(S.AdaptiveSwarmCovDebuff) < 3 and TargetUnit:DebuffUp(S.AdaptiveSwarmCovDebuff))
 end
 
 local function EvaluateCycleStellarFlareAoE(TargetUnit)
@@ -263,10 +240,6 @@ local function St()
   if S.Moonfire:IsCastable() then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireST, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire st 6"; end
   end
-  -- adaptive_swarm,target_if=!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>5)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<3&dot.adaptive_swarm_damage.ticking
-  if S.AdaptiveSwarmCov:IsReady() then
-    if Everyone.CastCycle(S.AdaptiveSwarmCov, Enemies40y, EvaluateCycleAdaptiveSwarmST, not Target:IsSpellInRange(S.AdaptiveSwarmCov)) then return "adaptive_swarm st 8"; end
-  end
   -- stellar_flare,target_if=refreshable&astral_power.deficit>variable.passive_asp+8&remains<2
   if S.StellarFlare:IsCastable() then
     if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareST, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare st 10"; end
@@ -290,14 +263,6 @@ local function St()
     if S.Incarnation:IsCastable() and (VarCDConditionST) then
       if Cast(S.Incarnation, Settings.Balance.GCDasOffGCD.CaInc) then return "incarnation st 18"; end
     end
-    -- ravenous_frenzy,if=buff.ca_inc.remains>15
-    if S.RavenousFrenzy:IsCastable() and (CAIncBuffRemains > 15) then
-      if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Signature) then return "ravenous_frenzy st 20"; end
-    end
-  end
-  -- empower_bond,if=
-  if S.EmpowerBond:IsCastable() then
-    if Cast(S.EmpowerBond, nil, Settings.Commons.DisplayStyle.Signature) then return "empower_bond st 22"; end
   end
   -- warrior_of_elune
   if S.WarriorofElune:IsCastable() then
@@ -312,17 +277,12 @@ local function St()
   -- variable,name=convoke_condition,value=buff.ca_inc.remains>4|(cooldown.ca_inc.remains>30|variable.no_cd_talent)&(buff.eclipse_lunar.remains>4|buff.eclipse_solar.remains>4)
   VarConvokeCondition = (CAIncBuffRemains > 4 or (CaInc:CooldownRemains() > 30 or VarNoCDTalent) and (Player:BuffRemains(S.EclipseLunar) > 4 or Player:BuffRemains(S.EclipseSolar) > 4))
   -- starsurge,if=talent.convoke_the_spirits&cooldown.convoke_the_spirits.ready&variable.convoke_condition
-  if S.Starsurge:IsReady() and ((S.ConvoketheSpirits:IsAvailable() or CovenantID == 3) and (S.ConvoketheSpirits:IsCastable() or S.ConvoketheSpiritsCov:IsReady()) and VarConvokeCondition) then
+  if S.Starsurge:IsReady() and (S.ConvoketheSpirits:IsAvailable() and S.ConvoketheSpirits:IsCastable() and VarConvokeCondition) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 28"; end
   end
   -- convoke_the_spirits,if=variable.convoke_condition
-  if CDsON() then
-    if S.ConvoketheSpiritsCov:IsReady() and (VarConvokeCondition) then
-      if Cast(S.ConvoketheSpiritsCov, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "convoke_the_spirits covenant st 30"; end
-    end
-    if S.ConvoketheSpirits:IsCastable() and (VarConvokeCondition) then
-      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "convoke_the_spirits st 30"; end
-    end
+  if S.ConvoketheSpirits:IsCastable() and CDsON() and (VarConvokeCondition) then
+    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "convoke_the_spirits st 30"; end
   end
   -- astral_communion,if=astral_power.deficit>variable.passive_asp+55
   if S.AstralCommunion:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 55) then
@@ -398,10 +358,6 @@ local function AoE()
   if S.Moonfire:IsCastable() then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireAoE, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire aoe 4"; end
   end
-  -- adaptive_swarm,target_if=!dot.adaptive_swarm_damage.ticking&!action.adaptive_swarm_damage.in_flight&(!dot.adaptive_swarm_heal.ticking|dot.adaptive_swarm_heal.remains>5)|dot.adaptive_swarm_damage.stack<3&dot.adaptive_swarm_damage.remains<3&dot.adaptive_swarm_damage.ticking
-  if S.AdaptiveSwarmCov:IsReady() then
-    if Everyone.CastCycle(S.AdaptiveSwarmCov, Enemies40y, EvaluateCycleAdaptiveSwarmAoE, not Target:IsSpellInRange(S.AdaptiveSwarmCov)) then return "adaptive_swarm aoe 6"; end
-  end
   -- variable,name=cd_condition_aoe,value=cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.1.time_to_die>10-5*talent.orbital_strike|fight_remains<25+10*talent.incarnation_chosen_of_elune)
   VarCDConditionAoE = CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 10 - 5 * num(S.OrbitalStrike:IsAvailable()) or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable()))
   -- wrath,if=variable.cd_condition_aoe&set_bonus.tier29_4pc&eclipse.any_next
@@ -422,14 +378,6 @@ local function AoE()
       if Cast(S.Incarnation, Settings.Balance.GCDasOffGCD.CaInc) then return "celestial_alignment aoe 14"; end
     end
   end
-  -- empower_bond,if=
-  if S.EmpowerBond:IsCastable() then
-    if Cast(S.EmpowerBond, nil, Settings.Commons.DisplayStyle.Signature) then return "empower_bond aoe 16"; end
-  end
-  -- ravenous_frenzy,if=buff.ca_inc.remains>15
-  if S.RavenousFrenzy:IsCastable() and CDsON() and (CAIncBuffRemains > 15) then
-    if Cast(S.RavenousFrenzy, nil, Settings.Commons.DisplayStyle.Signature) then return "ravenous_frenzy aoe 18"; end
-  end
   -- warrior_of_elune
   if S.WarriorofElune:IsCastable() then
     if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune aoe 22"; end
@@ -442,16 +390,8 @@ local function AoE()
   if S.FuryofElune:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 8) then
     if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune aoe 30"; end
   end
-  -- new_moon,if=astral_power.deficit>variable.passive_asp+10&(charges=2&recharge_time<5|charges=3)
-  if S.NewMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 10 and (S.NewMoon:Charges() == 2 and S.NewMoon:Recharge() < 5 or S.NewMoon:Charges() == 3)) then
-    if Cast(S.NewMoon, nil, nil, not Target:IsSpellInRange(S.NewMoon)) then return "new_moon aoe 32"; end
-  end
-  -- half_moon,if=astral_power.deficit>variable.passive_asp+20&(charges=2&recharge_time<5|charges=3)
-  if S.HalfMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 20 and (S.HalfMoon:Charges() == 2 and S.HalfMoon:Recharge() < 5 or S.HalfMoon:Charges() == 3)) then
-    if Cast(S.HalfMoon, nil, nil, not Target:IsSpellInRange(S.HalfMoon)) then return "half_moon aoe 34"; end
-  end
-  -- full_moon,if=astral_power.deficit>variable.passive_asp+40
-  if S.FullMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 40) then
+  -- full_moon,if=astral_power.deficit>variable.passive_asp+40&(buff.eclipse_lunar.remains>execute_time|buff.eclipse_solar.remains>execute_time)
+  if S.FullMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 40 and (Player:BuffRemains(S.EclipseLunar) > S.FullMoon:ExecuteTime() or Player:BuffRemains(S.EclipseSolar) > S.FullMoon:ExecuteTime())) then
     if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon aoe 36"; end
   end
   -- wild_mushroom,if=astral_power.deficit>variable.passive_asp+20&(!talent.fungal_growth|!talent.waning_twilight|!prev_gcd.1.wild_mushroom&!prev_gcd.2.wild_mushroom&dot.fungal_growth.remains<2&target.time_to_die>7)
@@ -475,20 +415,15 @@ local function AoE()
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall aoe 44"; end
   end
   -- convoke_the_spirits,if=astral_power<50&spell_targets.starfall<3+talent.elunes_guidance&(buff.eclipse_lunar.remains>4|buff.eclipse_solar.remains>4)
-  if CDsON() then
-    if S.ConvoketheSpiritsCov:IsReady() and (Player:AstralPowerP() < 50 and EnemiesCount40y < 3 + num(S.ElunesGuidance:IsAvailable()) and (Player:BuffRemains(S.EclipseLunar) > 4 or Player:BuffRemains(S.EclipseSolar) > 4)) then
-      if Cast(S.ConvoketheSpiritsCov, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "convoke_the_spirits covenant aoe 20"; end
-    end
-    if S.ConvoketheSpirits:IsCastable() and (Player:AstralPowerP() < 50 and EnemiesCount40y < 3 + num(S.ElunesGuidance:IsAvailable()) and (Player:BuffRemains(S.EclipseLunar) > 4 or Player:BuffRemains(S.EclipseSolar) > 4)) then
-      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "convoke_the_spirits aoe 20"; end
-    end
+  if S.ConvoketheSpirits:IsCastable() and CDsON() and (Player:AstralPowerP() < 50 and EnemiesCount40y < 3 + num(S.ElunesGuidance:IsAvailable()) and (Player:BuffRemains(S.EclipseLunar) > 4 or Player:BuffRemains(S.EclipseSolar) > 4)) then
+    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "convoke_the_spirits aoe 20"; end
   end
   -- new_moon,if=astral_power.deficit>variable.passive_asp+10
   if S.NewMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 10) then
     if Cast(S.NewMoon, nil, nil, not Target:IsSpellInRange(S.NewMoon)) then return "new_moon aoe 46"; end
   end
-  -- half_moon,if=astral_power.deficit>variable.passive_asp+20
-  if S.HalfMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 20) then
+  -- half_moon,if=astral_power.deficit>variable.passive_asp+20&(buff.eclipse_lunar.remains>execute_time|buff.eclipse_solar.remains>execute_time)
+  if S.HalfMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 20 and (Player:BuffRemains(S.EclipseLunar) > S.FullMoon:ExecuteTime() or Player:BuffRemains(S.EclipseSolar) > S.FullMoon:ExecuteTime())) then
     if Cast(S.HalfMoon, nil, nil, not Target:IsSpellInRange(S.HalfMoon)) then return "half_moon aoe 48"; end
   end
   -- starsurge,if=buff.starweavers_weft.up
