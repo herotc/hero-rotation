@@ -79,37 +79,33 @@ Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
 Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   -- Base Abilities
   Agony                                 = Spell(980),
-  AgonyDebuff                           = Spell(980),
   Corruption                            = Spell(172),
-  CorruptionDebuff                      = Spell(146739),
   DrainLife                             = Spell(234153),
-  MaleficRapture                        = Spell(324536),
-  SeedofCorruption                      = Spell(27243),
-  SeedofCorruptionDebuff                = Spell(27243),
   SummonPet                             = Spell(688),
-  UnstableAffliction                    = Spell(316099),
-  UnstableAfflictionDebuff              = Spell(316099),
   -- Talents
   AbsoluteCorruption                    = Spell(196103),
-  DarkSoulMisery                        = Spell(113860),
   DrainSoul                             = Spell(198590),
   Haunt                                 = Spell(48181),
-  HauntDebuff                           = Spell(48181),
-  InevitableDemise                      = Spell(334319),
-  InevitableDemiseBuff                  = Spell(334320),
-  Nightfall                             = Spell(108558),
+  MaleficRapture                        = Spell(324536),
   PhantomSingularity                    = Spell(205179),
-  PhantomSingularityDebuff              = Spell(205179),
-  ShadowEmbrace                         = Spell(32388),
-  ShadowEmbraceDebuff                   = Spell(32390),
+  SeedofCorruption                      = Spell(27243),
   SiphonLife                            = Spell(63106),
-  SiphonLifeDebuff                      = Spell(63106),
+  SoulRot                               = Spell(386997),
+  SoulSwap                              = Spell(386951),
+  SoulTap                               = Spell(387073),
   SowtheSeeds                           = Spell(196226),
+  UnstableAffliction                    = Spell(316099),
   VileTaint                             = Spell(278350),
+  -- Buffs
+  -- Debuffs
+  AgonyDebuff                           = Spell(980),
+  CorruptionDebuff                      = Spell(146739),
+  HauntDebuff                           = Spell(48181),
+  PhantomSingularityDebuff              = Spell(205179),
+  SeedofCorruptionDebuff                = Spell(27243),
+  SiphonLifeDebuff                      = Spell(63106),
+  UnstableAfflictionDebuff              = Spell(316099),
   VileTaintDebuff                       = Spell(278350),
-  WritheinAgony                         = Spell(196102),
-  -- T28 Effects
-  CalamitousCrescendo                   = Spell(364322),
 })
 
 Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
