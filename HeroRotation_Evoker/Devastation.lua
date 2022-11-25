@@ -44,10 +44,6 @@ local Settings = {
   Devastation = HR.GUISettings.APL.Evoker.Devastation
 }
 
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
-
 -- Trinket Item Objects
 local equip = Player:GetEquipment()
 local trinket1 = equip[13] and Item(equip[13]) or Item(0)
@@ -75,11 +71,6 @@ HL:RegisterForEvent(function()
   trinket1 = equip[13] and Item(equip[13]) or Item(0)
   trinket2 = equip[14] and Item(equip[14]) or Item(0)
 end, "PLAYER_EQUIPMENT_CHANGED")
-
--- Update CovenantID if we change Covenants
-HL:RegisterForEvent(function()
-  CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN")
 
 -- Talent change registrations
 HL:RegisterForEvent(function()
@@ -109,11 +100,13 @@ local function Precombat()
   if S.BlessingoftheBronze:IsCastable() and (Player:BuffDown(S.BlessingoftheBronzeBuff) or Everyone.GroupBuffMissing(S.BlessingoftheBronzeBuff)) then
     if Cast(S.BlessingoftheBronze, Settings.Commons.GCDasOffGCD.BlessingOfTheBronze) then return "blessing_of_the_bronze precombat"; end
   end
-  -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(trinket.1.cooldown.duration%%cooldown.dragonrage.duration=0)
-  -- VarTrinket1Sync = (trinket1:TrinketHasUseBuff() and (trinket1:Cooldown() % 120 == 0)) and 1 or 0
-  -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(trinket.2.cooldown.duration%%cooldown.dragonrage.duration=0)
-  -- VarTrinket2Sync = (trinket2:TrinketHasUseBuff() and (trinket2:Cooldown() % 120 == 0)) and 1 or 0
+  -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(trinket.1.cooldown.duration%%cooldown.dragonrage.duration=0|cooldown.dragonrage.duration%%trinket.1.cooldown.duration=0)
+  -- VarTrinket1Sync = (trinket1:TrinketHasUseBuff() and (trinket1:Cooldown() % 120 == 0 or 120 % trinket1:Cooldown() == 0)) and 1 or 0
+  -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(trinket.2.cooldown.duration%%cooldown.dragonrage.duration=0|cooldown.dragonrage.duration%%trinket.2.cooldown.duration=0)
+  -- VarTrinket2Sync = (trinket2:TrinketHasUseBuff() and (trinket2:Cooldown() % 120 == 0 or 120 % trinket2:Cooldown() == 0)) and 1 or 0
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!trinket.1.has_use_buff&trinket.2.has_use_buff|trinket.2.has_use_buff&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.intellect)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.intellect)*(variable.trinket_1_sync))
+  -- variable,name=trinket_1_buffs,value=trinket.1.has_buff.intellect|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit
+  -- variable,name=trinket_2_buffs,value=trinket.2.has_buff.intellect|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit
   -- TODO: Can't yet handle all of these trinket conditions
   -- use_item,name=shadowed_orb_of_torment
   if Settings.Commons.Enabled.Trinkets and I.ShadowedOrbofTorment:IsEquippedAndReady() then
@@ -138,8 +131,8 @@ end
 local function Trinkets()
   -- use_item,slot=trinket1,if=buff.dragonrage.up&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket2,if=buff.dragonrage.up&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
-  -- use_item,slot=trinket1,if=(!trinket.1.has_use_buff&(trinket.2.cooldown.remains|!trinket.2.has_use_buff)|cooldown.dragonrage.remains>20|!talent.dragonrage)
-  -- use_item,slot=trinket2,if=(!trinket.2.has_use_buff&(trinket.1.cooldown.remains|!trinket.1.has_use_buff)|cooldown.dragonrage.remains>20|!talent.dragonrage)
+  -- use_item,slot=trinket1,if=(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|cooldown.dragonrage.remains>20|!talent.dragonrage)
+  -- use_item,slot=trinket2,if=(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|cooldown.dragonrage.remains>20|!talent.dragonrage)
   -- Note: Can't handle above trinket tracking, so let's use the old fallback. When we can do above tracking, the below can be removed.
   -- use_items,if=buff.dragonrage.up
   if Player:BuffUp(S.Dragonrage) then
