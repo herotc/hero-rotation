@@ -40,21 +40,6 @@ Spell.DeathKnight.Commons = {
   SacrificialPact                       = Spell(327574),
   SoulReaper                            = Spell(343294),
   UnholyGround                          = Spell(374265),
-  -- Covenant Abilities
-  AbominationLimbCov                    = Spell(315443),
-  AbominationLimbCovBuff                = Spell(315443),
-  DeathsDue                             = Spell(324128),
-  Fleshcraft                            = Spell(324631),
-  ShackleTheUnworthy                    = Spell(312202),
-  SwarmingMist                          = Spell(311648),
-  SwarmingMistBuff                      = Spell(311648),
-  -- Soulbind Effects (Shadowlands)
-  KevinsOozeling                        = Spell(352110),
-  LeadByExample                         = Spell(342156),
-  LeadByExampleBuff                     = Spell(342181),
-  PustuleEruption                       = Spell(351094),
-  VolatileSolvent                       = Spell(323074),
-  VolatileSolventHumanBuff              = Spell(323491),
   -- Buffs
   AbominationLimbBuff                   = Spell(383269),
   DeathAndDecayBuff                     = Spell(188290),
@@ -199,15 +184,6 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
 -- Items
 if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Commons = {
-  -- Potions
-  PotionofSpectralStrength              = Item(171275),
-  -- Trinkets
-  InscrutableQuantumDevice              = Item(179350, {13, 14}),
-  OverwhelmingPowerCrystal              = Item(179342, {13, 14}),
-  ScarsofFraternalStrife                = Item(188253, {13, 14}),
-  TheFirstSigil                         = Item(188271, {13, 14}),
-  -- Other On-Use Items
-  GaveloftheFirstArbiter                = Item(189862),
 }
 
 Item.DeathKnight.Blood = MergeTableByKey(Item.DeathKnight.Commons, {

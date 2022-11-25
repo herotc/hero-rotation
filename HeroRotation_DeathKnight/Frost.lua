@@ -33,9 +33,7 @@ local I = Item.DeathKnight.Frost
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.InscrutableQuantumDevice:ID(),
-  I.ScarsofFraternalStrife:ID(),
-  I.TheFirstSigil:ID()
+  -- I.TrinketName:ID(),
 }
 
 -- Trinket Item Objects
@@ -60,7 +58,6 @@ local VarOblitPoolingTime
 local VarBreathPoolingTime
 local VarPoolingRunes
 local VarPoolingRP
-local AnyDnD
 local BossFightRemains = 11111
 local FightRemains = 11111
 local ghoul = HL.GhoulTable
@@ -69,15 +66,6 @@ HL:RegisterForEvent(function()
   BossFightRemains = 11111
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
-
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
-
--- Update CovenantID if we change Covenants
-HL:RegisterForEvent(function()
-  CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN")
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -92,11 +80,6 @@ local StunInterrupts = {
   {S.Asphyxiate, "Cast Asphyxiate (Interrupt)", function () return true; end},
 }
 
-local KoltirasFavorEquipped = Player:HasLegendaryEquipped(38)
-local BitingColdEquipped = Player:HasLegendaryEquipped(39)
-local RageoftheFrozenChampionEquipped = Player:HasLegendaryEquipped(41)
-local RampantTransferenceEquipped = (Player:HasLegendaryEquipped(210) or CovenantID == 3 and Player:HasUnity())
-
 local MainHandLink = GetInventoryItemLink("player", 16) or ""
 local OffHandLink = GetInventoryItemLink("player", 17) or ""
 local _, _, MainHandRuneforge = strsplit(":", MainHandLink)
@@ -110,11 +93,6 @@ HL:RegisterForEvent(function()
   equip = Player:GetEquipment()
   trinket1 = equip[13] and Item(equip[13]) or Item(0)
   trinket2 = equip[14] and Item(equip[14]) or Item(0)
-
-  KoltirasFavorEquipped = Player:HasLegendaryEquipped(38)
-  BitingColdEquipped = Player:HasLegendaryEquipped(39)
-  RageoftheFrozenChampionEquipped = Player:HasLegendaryEquipped(41)
-  RampantTransferenceEquipped = (Player:HasLegendaryEquipped(210) or CovenantID == 3 and Player:HasUnity())
 
   MainHandLink = GetInventoryItemLink("player", 16) or ""
   OffHandLink = GetInventoryItemLink("player", 17) or ""
@@ -315,15 +293,15 @@ local function Cooldowns()
   if S.EmpowerRuneWeapon:IsCastable() and ((not S.BreathofSindragosa:IsAvailable()) and (not S.Obliteration:IsAvailable()) and Player:BuffDown(S.EmpowerRuneWeaponBuff) and Player:Rune() < 5 and (S.PillarofFrost:CooldownRemains() < 7 or Player:BuffUp(S.PillarofFrostBuff) or not S.PillarofFrost:IsAvailable())) then
     if Cast(S.EmpowerRuneWeapon, Settings.Commons.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 6"; end
   end
-  -- abomination_limb_talent,if=talent.obliteration&!buff.pillar_of_frost.up&(variable.adds_remain|variable.st_planning)|fight_remains<12
+  -- abomination_limb,if=talent.obliteration&!buff.pillar_of_frost.up&(variable.adds_remain|variable.st_planning)|fight_remains<12
   if S.AbominationLimb:IsCastable() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and (VarAddsRemain or VarSTPlanning) or FightRemains < 12) then
     if Cast(S.AbominationLimb, Settings.Commons.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb_talent cooldowns 8"; end
   end
-  -- abomination_limb_talent,if=talent.breath_of_sindragosa&(variable.adds_remain|variable.st_planning)
+  -- abomination_limb,if=talent.breath_of_sindragosa&(variable.adds_remain|variable.st_planning)
   if S.AbominationLimb:IsCastable() and (S.BreathofSindragosa:IsAvailable() and (VarAddsRemain or VarSTPlanning)) then
     if Cast(S.AbominationLimb, Settings.Commons.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb_talent cooldowns 10"; end
   end
-  -- abomination_limb_talent,if=!talent.breath_of_sindragosa&!talent.obliteration&(variable.adds_remain|variable.st_planning)
+  -- abomination_limb,if=!talent.breath_of_sindragosa&!talent.obliteration&(variable.adds_remain|variable.st_planning)
   if S.AbominationLimb:IsCastable() and ((not S.BreathofSindragosa:IsAvailable()) and (not S.Obliteration:IsAvailable()) and (VarAddsRemain or VarSTPlanning)) then
     if Cast(S.AbominationLimb, Settings.Commons.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb_talent cooldowns 12"; end
   end
@@ -372,12 +350,8 @@ local function Cooldowns()
     if Cast(S.SacrificialPact, Settings.Commons.GCDasOffGCD.SacrificialPact) then return "sacrificial_pact cooldowns 34"; end
   end
   -- any_dnd,if=!death_and_decay.ticking&variable.adds_remain&(buff.pillar_of_frost.up&buff.pillar_of_frost.remains>5|!buff.pillar_of_frost.up)&(active_enemies>5|talent.cleaving_strikes&active_enemies>=2)
-  if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and VarAddsRemain and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffRemains(S.PillarofFrostBuff) > 5 or Player:BuffDown(S.PillarofFrostBuff)) and (EnemiesCount10yd > 5 or S.CleavingStrikes:IsAvailable() and EnemiesCount10yd >= 2)) then
-    if AnyDnD == S.DeathsDue then
-      if Cast(AnyDnD, nil, Settings.Commons.DisplayStyle.Signature) then return "any_dnd cooldowns 36"; end
-    else
-      if Cast(AnyDnD, Settings.Commons.GCDasOffGCD.DeathAndDecay) then return "any_dnd cooldowns 38"; end
-    end
+  if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and VarAddsRemain and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffRemains(S.PillarofFrostBuff) > 5 or Player:BuffDown(S.PillarofFrostBuff)) and (EnemiesCount10yd > 5 or S.CleavingStrikes:IsAvailable() and EnemiesCount10yd >= 2)) then
+    if Cast(S.DeathAndDecay, Settings.Commons.GCDasOffGCD.DeathAndDecay) then return "death_and_decay cooldowns 36"; end
   end
 end
 
@@ -401,46 +375,6 @@ local function ColdHeart()
   -- chains_of_ice,if=talent.obliteration&!buff.pillar_of_frost.up&(buff.cold_heart.stack>=14&(buff.unholy_strength.up|buff.chaos_bane.up)|buff.cold_heart.stack>=19|cooldown.pillar_of_frost.remains<3&buff.cold_heart.stack>=14)
   if S.ChainsofIce:IsReady() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and (Player:BuffStack(S.ColdHeartBuff) >= 14 and (Player:BuffUp(S.UnholyStrengthBuff)) or Player:BuffStack(S.ColdHeartBuff) >= 19 or S.PillarofFrost:CooldownRemains() < 3 and Player:BuffStack(S.ColdHeartBuff) >= 14)) then
     if Cast(S.ChainsofIce, Settings.Commons.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 10"; end
-  end
-end
-
-local function Covenants()
-  -- Shadowlands Covenant stuff. Remove after DF launch?
-  -- deaths_due,if=(variable.rw_buffs&cooldown.remorseless_winter.remains|!variable.rw_buffs)&(!talent.obliteration|talent.obliteration&active_enemies>=2&cooldown.pillar_of_frost.remains|active_enemies=1)&(variable.st_planning|variable.adds_remain)
-  if S.DeathsDue:IsReady() and ((VarRWBuffs and S.RemorselessWinter:CooldownRemains() > 0 or not VarRWBuffs) and ((not S.Obliteration:IsAvailable()) or S.Obliteration:IsAvailable() and EnemiesCount10yd >= 2 and S.PillarofFrost:CooldownRemains() > 0 or EnemiesCount10yd == 1) and (VarSTPlanning or VarAddsRemain)) then
-    if Cast(S.DeathsDue, nil, Settings.Commons.DisplayStyle.Signature) then return "deaths_due covenants 2"; end
-  end
-  -- swarming_mist,if=runic_power.deficit>13&cooldown.pillar_of_frost.remains<3&!talent.breath_of_sindragosa&variable.st_planning
-  if S.SwarmingMist:IsReady() and (Player:RunicPowerDeficit() > 13 and S.PillarofFrost:CooldownRemains() < 3 and (not S.BreathofSindragosa:IsAvailable()) and VarSTPlanning) then
-    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Signature) then return "swarming_mist covenants 4"; end
-  end
-  -- swarming_mist,if=!talent.breath_of_sindragosa&variable.adds_remain
-  if S.SwarmingMist:IsReady() and ((not S.BreathofSindragosa:IsAvailable()) and VarAddsRemain) then
-    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Signature) then return "swarming_mist covenants 6"; end
-  end
-  -- swarming_mist,if=talent.breath_of_sindragosa&(buff.breath_of_sindragosa.up&(variable.st_planning&runic_power.deficit>40|variable.adds_remain&runic_power.deficit>60|variable.adds_remain&raid_event.adds.remains<9&raid_event.adds.exists)|!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains)
-  if S.SwarmingMist:IsReady() and (S.BreathofSindragosa:IsAvailable() and (Player:BuffUp(S.BreathofSindragosa) and (VarSTPlanning and Player:RunicPowerDeficit() > 40 or VarAddsRemain and Player:RunicPowerDeficit() > 60) or Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownRemains() > 0)) then
-    if Cast(S.SwarmingMist, nil, Settings.Commons.DisplayStyle.Signature) then return "swarming_mist covenants 8"; end
-  end
-  -- abomination_limb_covenant,if=cooldown.pillar_of_frost.remains<gcd*2&variable.st_planning&(talent.breath_of_sindragosa&runic_power>65&cooldown.breath_of_sindragosa.remains<2|!talent.breath_of_sindragosa)
-  if S.AbominationLimbCov:IsReady() and (S.PillarofFrost:CooldownRemains() < Player:GCD() * 2 and VarSTPlanning and (S.BreathofSindragosa:IsAvailable() and Player:RunicPower() > 65 and S.BreathofSindragosa:CooldownRemains() < 2 or not S.BreathofSindragosa:IsAvailable())) then
-    if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Signature) then return "abomination_limb_covenant covenants 10"; end
-  end
-  -- abomination_limb_covenant,if=variable.adds_remain
-  if S.AbominationLimbCov:IsReady() and (VarAddsRemain) then
-    if Cast(S.AbominationLimbCov, nil, Settings.Commons.DisplayStyle.Signature) then return "abomination_limb_covenant covenants 12"; end
-  end
-  -- shackle_the_unworthy,if=variable.st_planning&(cooldown.pillar_of_frost.remains<3|talent.icecap)
-  if S.ShackleTheUnworthy:IsReady() and (VarSTPlanning and (S.PillarofFrost:CooldownRemains() < 3 or S.Icecap:IsAvailable())) then
-    if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Signature) then return "shackle_the_unworthy covenants 14"; end
-  end
-  -- shackle_the_unworthy,if=variable.adds_remain
-  if S.ShackleTheUnworthy:IsReady() and (VarAddsRemain) then
-    if Cast(S.ShackleTheUnworthy, nil, Settings.Commons.DisplayStyle.Signature) then return "shackle_the_unworthy covenants 16"; end
-  end
-  -- fleshcraft,if=!buff.pillar_of_frost.up&(soulbind.pustule_eruption|soulbind.volatile_solvent&!buff.volatile_solvent_humanoid.up),interrupt_immediate=1,interrupt_global=1,interrupt_if=soulbind.volatile_solvent
-  if S.Fleshcraft:IsReady() and (Player:BuffDown(S.PillarofFrostBuff) and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled() and Player:BuffDown(S.VolatileSolventHumanBuff))) then
-    if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft covenants 18"; end
   end
 end
 
@@ -592,10 +526,6 @@ local function Racials()
 end
 
 local function Trinkets()
-  -- use_item<name=gavel_of_the_first_arbiter
-  if Settings.Commons.Enabled.Items and I.GaveloftheFirstArbiter:IsEquippedAndReady() then
-    if Cast(I.GaveloftheFirstArbiter, nil, Settings.Commons.DisplayStyle.Items) then return "gavel_of_the_first_arbiter trinkets 2"; end
-  end
   -- use_item,slot=trinket1,if=(buff.pillar_of_frost.up|buff.breath_of_sindragosa.up)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket2,if=(buff.pillar_of_frost.up|buff.breath_of_sindragosa.up)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket1,if=(!trinket.1.has_use_buff&(trinket.2.cooldown.remains|!trinket.2.has_use_buff)|talent.pillar_of_frost&cooldown.pillar_of_frost.remains>20|!talent.pillar_of_frost)
@@ -632,10 +562,6 @@ local function APL()
       FightRemains = HL.FightRemains(Enemies10yd, false)
     end
   end
-
-  -- Set AnyDnD
-  AnyDnD = S.DeathAndDecay
-  if S.DeathsDue:IsAvailable() then AnyDnD = S.DeathsDue end
 
   if Everyone.TargetIsValid() then
     -- call precombat
@@ -723,8 +649,6 @@ local function APL()
     end
     -- call_action_list,name=racials
     local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
-    -- call_action_list,name=covenants
-    local ShouldReturn = Covenants(); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=cold_heart,if=talent.cold_heart&(!buff.killing_machine.up|talent.breath_of_sindragosa)&((debuff.razorice.stack=5|!death_knight.runeforge.razorice&!talent.glacial_advance&!talent.avalanche)|fight_remains<=gcd)
     if (S.ColdHeart:IsAvailable() and (Player:BuffDown(S.KillingMachineBuff) or S.BreathofSindragosa:IsAvailable()) and ((Target:DebuffStack(S.RazoriceDebuff) == 5 or (not UsingRazorice) and (not S.GlacialAdvance:IsAvailable()) and not S.Avalanche:IsAvailable()) or FightRemains <= Player:GCD() + 0.5)) then
       local ShouldReturn = ColdHeart(); if ShouldReturn then return ShouldReturn; end
