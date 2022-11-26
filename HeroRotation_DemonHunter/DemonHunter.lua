@@ -94,6 +94,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   BlindFury                             = Spell(203550),
   BurningWound                          = Spell(391189),
   ChaosTheory                           = Spell(389687),
+  ChaoticTransformation                 = Spell(388112),
   CycleofHatred                         = Spell(258887),
   DemonBlades                           = Spell(203555),
   EssenceBreak                          = Spell(258860),
