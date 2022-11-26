@@ -150,9 +150,41 @@ end
 
 -- Check if player's selected potion type is ready
 function Commons.PotionSelected()
-  local Class = Cache.Persistent.Player.Class[1]
-  Class = gsub(Class, "%s+", "")
-  local Spec = Cache.Persistent.Player.Spec[2]
+  local Classes = { "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "DeathKnight", "Shaman", "Mage", "Warlock", "Monk", "Druid", "DemonHunter", "Evoker" }
+  local ClassNum = Cache.Persistent.Player.Class[3]
+  local Class = Classes[ClassNum]
+
+  local Specs = {
+    -- DeathKnight
+    [250] = "Blood", [251] = "Frost", [252] = "Unholy",
+    -- DemonHunter
+    [577] = "Havoc", [581] = "Vengeance",
+    -- Druid
+    [102] = "Balance", [103] = "Feral", [104] = "Guardian", [105] = "Restoration", 
+    -- Evoker
+    [1467] = "Devastation", [1468] = "Preservation",
+    -- Hunter
+    [253] = "BeastMastery", [254] = "Marksmanship", [255] = "Survival",
+    -- Mage
+    [62] = "Arcane", [63] = "Fire", [64] = "Frost",
+    -- Monk
+    [268] = "Brewmaster", [269] = "Windwalker", [270] = "Mistweaver",
+    -- Paladin
+    [65] = "Holy", [66] = "Protection", [70] = "Retribution",
+    --Priest
+    [256] = "Discipline", [257] = "Holy", [258] = "Shadow",
+    -- Rogue
+    [259] = "Assassination", [260] = "Outlaw", [261] = "Subtlety",
+    -- Shaman
+    [262] = "Elemental", [263] = "Enhancement", [264] = "Restoration",
+    -- Warlock
+    [265] = "Affliction", [266] = "Demonology", [267] = "Destruction",
+    -- Warrior
+    [71] = "Arms", [72] = "Fury", [73] = "Protection",
+  }
+  local SpecNum = Cache.Persistent.Player.Spec[1]
+  local Spec = Specs[SpecNum]
+
   local PotionType = HR.GUISettings.APL[Class][Spec].PotionType.Selected
   local PowerPotionIDs = {
     -- Fleeting Ultimate Power
