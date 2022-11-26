@@ -138,25 +138,27 @@ local function Precombat()
   if (trinket2:TrinketHasStatAnyDps() and ((not trinket1:TrinketHasStatAnyDps()) or trinket2:Cooldown() >= trinket1:Cooldown())) then
     VarTrinketSyncSlot = 2
   end
-  -- variable,name=use_eye_beam_fury_condition,value=0
-  VarUseEyeBeamFuryCondition = false
   -- arcane_torrent
   if S.ArcaneTorrent:IsCastable() and CDsON() then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 1"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 2"; end
+  end
+  -- From APL(): immolation_aura,if=time=0
+  if S.ImmolationAura:IsCastable() then
+    if Cast(S.ImmolationAura, Settings.Havoc.GCDasOffGCD.ImmolationAura) then return "immolation_aura precombat 4"; end
   end
   -- Manually added: Fel Rush if out of range
   if (not Target:IsInMeleeRange(5)) and S.FelRush:IsCastable() then
-    if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush, not Target:IsInRange(15)) then return "fel_rush precombat 2"; end
+    if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush, not Target:IsInRange(15)) then return "fel_rush precombat 6"; end
   end
   -- Manually added: Demon's Bite/Demon Blades if in melee range
   if Target:IsInMeleeRange(5) and (S.DemonsBite:IsCastable() or S.DemonBlades:IsAvailable()) then
-    if Cast(S.DemonsBite, nil, nil, not Target:IsInMeleeRange(5)) then return "demons_bite or demon_blades precombat 4"; end
+    if Cast(S.DemonsBite, nil, nil, not Target:IsInMeleeRange(5)) then return "demons_bite or demon_blades precombat 8"; end
   end
 end
 
 local function Cooldown()
   -- metamorphosis,if=!talent.demonic&((!talent.chaotic_transformation|cooldown.eye_beam.remains>20)&active_enemies>desired_targets|raid_event.adds.in>60|fight_remains<25)
-  if S.Metamorphosis:IsCastable() and ((not S.Demonic:IsAvailable()) and (((not S.ChaoticTransformation:IsAvailable()) or S.EyeBeam:CooldownRemains() > 20) or FightRemains < 25)) then
+  if S.Metamorphosis:IsCastable() and (not S.Demonic:IsAvailable()) then
     if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis, not Target:IsInRange(40)) then return "metamorphosis cooldown 2"; end
   end
   -- metamorphosis,if=talent.demonic&(!talent.chaotic_transformation|cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max)|fight_remains<25)
@@ -182,8 +184,8 @@ local function Cooldown()
       if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 cooldown 16"; end
     end
   end
-  -- the_hunt,if=!talent.demonic&!variable.waiting_for_momentum|(!talent.furious_gaze|buff.furious_gaze.up)
-  if S.TheHunt:IsCastable() and ((not S.Demonic:IsAvailable()) and (not VarWaitingForMomentum) or ((not S.FuriousGaze:IsAvailable()) or Player:BuffUp(S.FuriousGazeBuff))) then
+  -- the_hunt,if=(!talent.momentum|!buff.momentum.up)
+  if S.TheHunt:IsCastable() and ((not S.Momentum:IsAvailable()) or Player:BuffDown(S.MomentumBuff)) then
     if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt cooldown 20"; end
   end
   -- elysian_decree,if=(active_enemies>desired_targets|raid_event.adds.in>30)
@@ -220,14 +222,12 @@ local function APL()
     end
     -- auto_attack
     -- retarget_auto_attack,line_cd=1,target_if=min:debuff.burning_wound.remains,if=talent.burning_wound&talent.demon_blades
-    -- variable,name=blade_dance,value=talent.first_blood|spell_targets.blade_dance1>=(3-talent.trail_of_ruin)
-    VarBladeDance = (S.FirstBlood:IsAvailable() or EnemiesCount8 >= (3 - num(S.TrailofRuin:IsAvailable())))
-    -- variable,name=blade_dance,if=talent.chaos_theory,value=buff.chaos_theory.down|talent.first_blood|!talent.cycle_of_hatred&spell_targets.blade_dance1>=(4-talent.trail_of_ruin)
-    if (S.ChaosTheory:IsAvailable()) then
-      VarBladeDance = (Player:BuffDown(S.ChaosTheoryBuff) or S.FirstBlood:IsAvailable() or (not S.CycleofHatred:IsAvailable()) and EnemiesCount8 >= (4 - num(S.TrailofRuin:IsAvailable())))
-    end
-    -- variable,name=pooling_for_blade_dance,value=variable.blade_dance&(fury<75-talent.first_blood*20)
-    VarPoolingForBladeDance = VarBladeDance and Player:Fury() < 75 - num(S.FirstBlood:IsAvailable()) * 20
+    -- immolation_aura,if=time=0
+    -- Moved to Precombat()
+    -- variable,name=blade_dance,value=talent.first_blood|talent.trail_of_ruin|talent.chaos_theory&buff.chaos_theory.down|spell_targets.blade_dance1>1
+    VarBladeDance = (S.FirstBlood:IsAvailable() or S.TrailofRuin:IsAvailable() or S.ChaosTheory:IsAvailable() and Player:BuffDown(S.ChaosTheoryBuff) or EnemiesCount8 > 1)
+    -- variable,name=pooling_for_blade_dance,value=variable.blade_dance&fury<(75-talent.demon_blades*20)&cooldown.blade_dance.remains<gcd.max
+    VarPoolingForBladeDance = (VarBladeDance and Player:Fury() < (75 - num(S.DemonBlades:IsAvailable()) * 20) and S.BladeDance:CooldownRemains() < Player:GCD() + 0.5)
     -- variable,name=pooling_for_eye_beam,value=talent.demonic&!talent.blind_fury&cooldown.eye_beam.remains<(gcd.max*2)&fury.deficit>20
     VarPoolingForEyeBeam = S.Demonic:IsAvailable() and (not S.BlindFury:IsAvailable()) and S.EyeBeam:CooldownRemains() < (Player:GCD() * 2) and Player:FuryDeficit() > 20
     -- variable,name=waiting_for_momentum,value=talent.momentum&!buff.momentum.up
@@ -245,16 +245,16 @@ local function APL()
     -- pick_up_fragment,type=demon,if=demon_soul_fragments>0
     -- pick_up_fragment,mode=nearest,if=talent.demonic_appetite&fury.deficit>=35&(!cooldown.eye_beam.ready|fury<30)
     -- TODO: Can't detect when orbs actually spawn, we could possibly show a suggested icon when we DON'T want to pick up souls so people can avoid moving?
-    -- vengeful_retreat,if=time>1&(variable.waiting_for_momentum|!talent.momentum&talent.tactical_retreat)&buff.tactical_retreat.down
-    if S.VengefulRetreat:IsCastable() and (HL.CombatTime() > 1 and (VarWaitingForMomentum or (not S.Momentum:IsAvailable()) and S.TacticalRetreat:IsAvailable()) and Player:BuffDown(S.TacticalRetreatBuff)) then
+    -- vengeful_retreat,use_off_gcd=1,if=time>1&talent.initiative&(talent.essence_break&(cooldown.essence_break.remains>15|cooldown.essence_break.remains<gcd.max&(!cooldown.eye_beam.ready|buff.metamorphosis.up))|!talent.essence_break&!buff.momentum.up)
+    if S.VengefulRetreat:IsCastable() and (HL.CombatTime() > 1 and S.Initiative:IsAvailable() and (S.EssenceBreak:IsAvailable() and (S.EssenceBreak:CooldownRemains() > 15 or S.EssenceBreak:CooldownRemains() < Player:GCD() + 0.5 and (S.EyeBeam:CooldownDown() or Player:BuffUp(S.MetamorphosisBuff))) or (not S.EssenceBreak:IsAvailable()) and Player:BuffDown(S.MomentumBuff))) then
       if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat main 4"; end
     end
     -- fel_rush,if=(buff.unbound_chaos.up|variable.waiting_for_momentum&(!talent.unbound_chaos|!cooldown.immolation_aura.ready))&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
     if S.FelRush:IsCastable() and ((Player:BuffUp(S.UnboundChaosBuff) or VarWaitingForMomentum and ((not S.UnboundChaos:IsAvailable()) or S.ImmolationAura:CooldownDown())) and UseFelRush()) then
       if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush) then return "fel_rush main 6"; end
     end
-    -- essence_break,if=!variable.waiting_for_momentum&(!cooldown.eye_beam.ready|buff.metamorphosis.up)
-    if S.EssenceBreak:IsCastable() and ((not VarWaitingForMomentum) and (S.EyeBeam:CooldownDown() or Player:BuffUp(S.MetamorphosisBuff))) then
+    -- essence_break,if=!variable.waiting_for_momentum&(cooldown.eye_beam.remains>4|buff.metamorphosis.up)&(!talent.tactical_retreat|buff.tactical_retreat.up)
+    if S.EssenceBreak:IsCastable() and ((not VarWaitingForMomentum) and (S.EyeBeam:CooldownRemains() > 4 or Player:BuffUp(S.MetamorphosisBuff)) and ((not S.TacticalRetreat:IsAvailable()) or Player:BuffUp(S.TacticalRetreatBuff))) then
       if Cast(S.EssenceBreak, nil, nil, not IsInMeleeRange(10)) then return "essence_break main 8"; end
     end
     -- death_sweep,if=variable.blade_dance
@@ -273,8 +273,8 @@ local function APL()
     if S.ThrowGlaive:IsCastable() and (S.SerratedGlaive:IsAvailable() and S.EyeBeam:CooldownRemains() < 6 and Player:BuffDown(S.MetamorphosisBuff) and Target:DebuffDown(S.ExposedWoundDebuff)) then
       if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 16"; end
     end
-    -- eye_beam,if=active_enemies>desired_targets|raid_event.adds.in>25-talent.cycle_of_hatred*10&(!variable.use_eye_beam_fury_condition|spell_targets>1|fury<70)
-    if S.EyeBeam:IsReady() and ((not VarUseEyeBeamFuryCondition) or EnemiesCount8 > 1 or Player:Fury() < 70) then
+    -- eye_beam,if=active_enemies>desired_targets|raid_event.adds.in>(40-talent.cycle_of_hatred*15)&!debuff.essence_break.up
+    if S.EyeBeam:IsReady() and (Target:DebuffDown(S.EssenceBreakDebuff)) then
       if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not IsInMeleeRange(20)) then return "eye_beam main 18"; end
     end
     -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>5|!talent.demonic|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
@@ -298,9 +298,9 @@ local function APL()
       if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade main 28"; end
     end
     -- sigil_of_flame,if=active_enemies>desired_targets
-    if S.SigilofFlame:IsCastable() then
+    --[[if S.SigilofFlame:IsCastable() then
       if Cast(S.SigilofFlame, Settings.Havoc.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame main 30"; end
-    end
+    end]]
     -- chaos_strike,if=!variable.pooling_for_blade_dance&!variable.pooling_for_eye_beam
     if S.ChaosStrike:IsReady() and ((not VarPoolingForBladeDance) and not VarPoolingForEyeBeam) then
       if Cast(S.ChaosStrike, nil, nil, not Target:IsSpellInRange(S.ChaosStrike)) then return "chaos_strike main 32"; end

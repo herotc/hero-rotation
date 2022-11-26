@@ -104,6 +104,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   FirstBlood                            = Spell(206416),
   FuriousGaze                           = Spell(343311),
   GlaiveTempest                         = Spell(342817),
+  Initiative                            = Spell(388108),
   Momentum                              = Spell(206476),
   Ragefire                              = Spell(388107),
   SerratedGlaive                        = Spell(390154),
