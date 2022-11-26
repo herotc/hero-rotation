@@ -65,26 +65,15 @@ local Settings = {
 }
 
 -- Legendaries
-local DeeplyRootedEquipped = Player:HasLegendaryEquipped(132)
 local DoomWindsEquipped = Player:HasLegendaryEquipped(138)
 local PrimalLavaActuatorsEquipped = Player:HasLegendaryEquipped(141)
 local SeedsofRampantGrowthEquipped = Player:HasLegendaryEquipped(246)
 
 HL:RegisterForEvent(function()
-  DeeplyRootedEquipped = Player:HasLegendaryEquipped(132)
   DoomWindsEquipped = Player:HasLegendaryEquipped(138)
   PrimalLavaActuatorsEquipped = Player:HasLegendaryEquipped(141)
   SeedsofRampantGrowthEquipped = Player:HasLegendaryEquipped(246)
 end, "PLAYER_EQUIPMENT_CHANGED")
-
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
-
--- Update CovenantID if we change Covenants
-HL:RegisterForEvent(function()
-  CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -149,7 +138,7 @@ local function Precombat()
     if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "windfury_totem precombat 4"; end
   end
   -- fleshcraft,if=soulbind.pustule_eruption|soulbind.volatile_solvent
-  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
+  if S.Fleshcraft:IsReady() and (S.PustuleEruption:SoulbindEnabled() or S.VolatileSolvent:SoulbindEnabled()) then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft precombat 6"; end
   end
   -- variable,name=trinket1_is_weird,value=trinket.1.is.the_first_sigil|trinket.1.is.scars_of_fraternal_strife|trinket.1.is.cache_of_acquired_treasures
@@ -238,7 +227,7 @@ local function Single()
     if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 38"; end
   end
   -- fleshcraft,interrupt=1,if=soulbind.volatile_solvent
-  if S.Fleshcraft:IsCastable() and (S.VolatileSolvent:SoulbindEnabled()) then
+  if S.Fleshcraft:IsReady() and (S.VolatileSolvent:SoulbindEnabled()) then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft single 40"; end
   end
   -- windfury_totem,if=buff.windfury_totem.remains<10
@@ -282,7 +271,7 @@ local function Single()
     if Cast(S.FireNova) then return "fire_nova single 60"; end
   end
   -- fleshcraft,if=soulbind.pustule_eruption
-  if S.Fleshcraft:IsCastable() and (S.PustuleEruption:SoulbindEnabled()) then
+  if S.Fleshcraft:IsReady() and (S.PustuleEruption:SoulbindEnabled()) then
     if Cast(S.Fleshcraft, nil, Settings.Commons.DisplayStyle.Signature) then return "fleshcraft single 62"; end
   end
   -- earth_elemental
@@ -572,7 +561,7 @@ local function APL()
     end
     -- ascendance,if=(ti_lightning_bolt&active_enemies=1&raid_event.adds.in>=90)|(ti_chain_lightning&active_enemies>1)
     if S.Ascendance:IsCastable() and CDsON() and (TIAction == S.LightningBolt and Enemies10yCount == 1 or TIAction == S.ChainLightning and Enemies10yCount > 1) then
-      if Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "ascendance main 18"; end
+      if Cast(S.Ascendance, Settings.Commons.GCDasOffGCD.Ascendance) then return "ascendance main 18"; end
     end
     -- doom_winds,if=raid_event.adds.in>=90|active_enemies>1
     if S.DoomWinds:IsCastable() and CDsON() then
