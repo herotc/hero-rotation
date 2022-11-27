@@ -20,6 +20,7 @@ local CDsON         = HR.CDsON
 local Cast          = HR.Cast
 local CastSuggested = HR.CastSuggested
 -- lua
+local mathmin       = math.min
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -120,8 +121,8 @@ local function EvalutateTargetIfFilterDemonsBite(TargetUnit)
 end
 
 local function EvaluateTargetIfDemonsBite(TargetUnit)
-  -- if=talent.burning_wound&debuff.burning_wound.remains<4
-  return S.BurningWound:IsAvailable() and TargetUnit:DebuffRemains(S.BurningWoundDebuff) < 4
+  -- if=talent.burning_wound&debuff.burning_wound.remains<4&active_dot.burning_wound<(spell_targets>?3)
+  return S.BurningWound:IsAvailable() and TargetUnit:DebuffRemains(S.BurningWoundDebuff) < 4 and S.BurningWoundDebuff:AuraActiveCount() < mathmin(EnemiesCount8, 3)
 end
 
 local function Precombat()
@@ -221,7 +222,7 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- auto_attack
-    -- retarget_auto_attack,line_cd=1,target_if=min:debuff.burning_wound.remains,if=talent.burning_wound&talent.demon_blades
+    -- retarget_auto_attack,line_cd=1,target_if=min:debuff.burning_wound.remains,if=talent.burning_wound&talent.demon_blades&active_dot.burning_wound<(spell_targets>?3)
     -- immolation_aura,if=time=0
     -- Moved to Precombat()
     -- variable,name=blade_dance,value=talent.first_blood|talent.trail_of_ruin|talent.chaos_theory&buff.chaos_theory.down|spell_targets.blade_dance1>1
@@ -269,10 +270,6 @@ local function APL()
     if S.GlaiveTempest:IsReady() then
       if Cast(S.GlaiveTempest, Settings.Havoc.GCDasOffGCD.GlaiveTempest) then return "glaive_tempest main 14"; end
     end
-    -- throw_glaive,if=talent.serrated_glaive&cooldown.eye_beam.remains<6&!buff.metamorphosis.up&!debuff.exposed_wound.up
-    if S.ThrowGlaive:IsCastable() and (S.SerratedGlaive:IsAvailable() and S.EyeBeam:CooldownRemains() < 6 and Player:BuffDown(S.MetamorphosisBuff) and Target:DebuffDown(S.ExposedWoundDebuff)) then
-      if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 16"; end
-    end
     -- eye_beam,if=active_enemies>desired_targets|raid_event.adds.in>(40-talent.cycle_of_hatred*15)&!debuff.essence_break.up
     if S.EyeBeam:IsReady() and (Target:DebuffDown(S.EssenceBreakDebuff)) then
       if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not IsInMeleeRange(20)) then return "eye_beam main 18"; end
@@ -281,13 +278,17 @@ local function APL()
     if S.BladeDance:IsReady() and (VarBladeDance and S.Metamorphosis:CooldownDown() and (S.EyeBeam:CooldownRemains() > 5 or not S.Demonic:IsAvailable())) then
       if Cast(S.BladeDance, nil, nil, not IsInMeleeRange(8)) then return "blade_dance main 20"; end
     end
-    -- throw_glaive,if=talent.soulrend&spell_targets>(2-talent.furious_throws)
-    if S.ThrowGlaive:IsCastable() and (S.Soulrend:IsAvailable() and EnemiesCount8 > (2 - num(S.FuriousThrows))) then
+    -- throw_glaive,if=talent.soulrend&spell_targets>(2-talent.furious_throws)&!debuff.essence_break.up
+    if S.ThrowGlaive:IsCastable() and (S.Soulrend:IsAvailable() and EnemiesCount8 > (2 - num(S.FuriousThrows)) and Target:DebuffDown(S.EssenceBreakDebuff)) then
       if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 22"; end
     end
     -- annihilation,if=!variable.pooling_for_blade_dance
     if S.Annihilation:IsReady() and (not VarPoolingForBladeDance) then
       if Cast(S.Annihilation, nil, nil, not IsInMeleeRange(5)) then return "annihilation main 24"; end
+    end
+    -- throw_glaive,if=talent.serrated_glaive&cooldown.eye_beam.remains<6&!buff.metamorphosis.up&!debuff.serrated_glaive.up&!debuff.essence_break.up
+    if S.ThrowGlaive:IsCastable() and (S.SerratedGlaive:IsAvailable() and S.EyeBeam:CooldownRemains() < 6 and Player:BuffDown(S.MetamorphosisBuff) and Target:DebuffDown(S.SerratedGlaiveDebuff) and Target:DebuffDown(S.EssenceBreakDebuff)) then
+      if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 16"; end
     end
     -- immolation_aura,if=!buff.immolation_aura.up&(!talent.ragefire|active_enemies>desired_targets|raid_event.adds.in>15)
     if S.ImmolationAura:IsCastable() and (Player:BuffDown(S.ImmolationAuraBuff)) then
@@ -309,7 +310,7 @@ local function APL()
     if S.FelRush:IsCastable() and ((not S.Momentum:IsAvailable()) and S.DemonBlades:IsAvailable() and S.EyeBeam:CooldownDown() and UseFelRush()) then
       if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush) then return "fel_rush main 34"; end
     end
-    -- demons_bite,target_if=min:debuff.burning_wound.remains,if=talent.burning_wound&debuff.burning_wound.remains<4
+    -- demons_bite,target_if=min:debuff.burning_wound.remains,if=talent.burning_wound&debuff.burning_wound.remains<4&active_dot.burning_wound<(spell_targets>?3)
     if S.DemonsBite:IsCastable() then
       if Everyone.CastTargetIf(S.DemonsBite, Enemies8y, "min", EvalutateTargetIfFilterDemonsBite, EvaluateTargetIfDemonsBite, not Target:IsSpellInRange(S.DemonsBite)) then return "demons_bite main 36"; end
     end
@@ -325,20 +326,16 @@ local function APL()
     if S.DemonsBite:IsCastable() then
       if Cast(S.DemonsBite, nil, nil, not Target:IsSpellInRange(S.DemonsBite)) then return "demons_bite main 42"; end
     end
-    -- throw_glaive,if=buff.out_of_range.up
-    if S.ThrowGlaive:IsCastable() and (not Target:IsInRange(12)) then
-      if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 44"; end
-    end
     -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum)
     if S.FelRush:IsCastable() and ((not IsInMeleeRange()) and (not S.Momentum:IsAvailable()) and UseFelRush()) then
       if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush) then return "fel_rush main 46"; end
     end
-    -- vengeful_retreat,if=!talent.momentum&movement.distance>15
-    if S.VengefulRetreat:IsCastable() and ((not S.Momentum:IsAvailable()) and (not IsInMeleeRange())) then
+    -- vengeful_retreat,if=!talent.initiative&movement.distance>15
+    if S.VengefulRetreat:IsCastable() and ((not S.Initiative:IsAvailable()) and (not IsInMeleeRange())) then
       if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat main 48"; end
     end
-    -- throw_glaive,if=talent.demon_blades.enabled
-    if S.ThrowGlaive:IsCastable() and (S.DemonBlades:IsAvailable()) then
+    -- throw_glaive,if=talent.demon_blades.enabled|buff.out_of_range.up
+    if S.ThrowGlaive:IsCastable() and (S.DemonBlades:IsAvailable() or not Target:IsInRange(12)) then
       if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 50"; end
     end
     -- Show pool icon if nothing else to do (should only happen when Demon Blades is used)
@@ -349,6 +346,8 @@ local function APL()
 end
 
 local function Init()
+  S.BurningWoundDebuff:RegisterAuraTracking()
+
   HR.Print("Havoc DH rotation is currently a work in progress, but has been updated for patch 10.0.")
 end
 

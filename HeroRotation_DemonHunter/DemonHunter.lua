@@ -123,6 +123,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   -- Debuffs
   BurningWoundDebuff                    = Spell(391191),
   EssenceBreakDebuff                    = Spell(320338),
+  SerratedGlaiveDebuff                  = Spell(390155),
 })
 
 -- Items
