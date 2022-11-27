@@ -65,8 +65,6 @@ local VarPoolForCDs = false
 local VarSFP = false
 local VarDPCutoff = false
 local DarkThoughtMaxStacks = 2
-local TalbadarEquipped = Player:HasLegendaryEquipped(161)
-local ShadowflamePrismEquipped = Player:HasLegendaryEquipped(159)
 
 HL:RegisterForEvent(function()
   VarDotsUp = false
@@ -77,20 +75,6 @@ HL:RegisterForEvent(function()
   BossFightRemains = 11111
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
-
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
-
--- Update CovenantID if we change Covenants
-HL:RegisterForEvent(function()
-  CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN")
-
-HL:RegisterForEvent(function()
-  TalbadarEquipped = Player:HasLegendaryEquipped(161)
-  ShadowflamePrismEquipped = Player:HasLegendaryEquipped(159)
-end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
   S.ShadowCrash:RegisterInFlight()
@@ -189,18 +173,6 @@ local function Precombat()
   if S.VampiricTouch:IsCastable() and (not S.Damnation:IsAvailable() and not S.ShadowCrash:IsAvailable()) then
     if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch 70"; end
   end
-  -- Manually added: mind_blast,if=talent.misery.enabled&(!runeforge.talbadars_stratagem.equipped|!talent.void_torrent.enabled)
-  if S.MindBlast:IsCastable() and (S.Misery:IsAvailable() and (not TalbadarEquipped or not S.VoidTorrent:IsAvailable())) then
-    if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 80"; end
-  end
-  -- Manually added: void_torrent,if=talent.misery.enabled&runeforge.talbadars_stratagem.equipped
-  if S.VoidTorrent:IsCastable() and (S.Misery:IsAvailable() and TalbadarEquipped) then
-    if Cast(S.VoidTorrent, nil, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent 90"; end
-  end
-  -- Manually added: mind_flay,if=talent.misery.enabled&runeforge.talbadars_stratagem.equipped&!talent.void_torrent.enabled
-  if S.MindFlay:IsCastable() and (S.Misery:IsAvailable() and TalbadarEquipped and not S.VoidTorrent:IsAvailable()) then
-    if Cast(S.MindFlay, nil, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay 100"; end
-  end
   -- Manually added: shadow_word_pain,if=!talent.misery.enabled
   if S.ShadowWordPain:IsCastable() and (not S.Misery:IsAvailable()) then
     if Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 110"; end
@@ -253,43 +225,27 @@ local function Cds()
       (Settings.Shadow.SelfPI and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscension))) then
     if Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "power_infusion cds 10"; end
   end
-  -- void_eruption,if=!cooldown.fiend.up&(pet.fiend.active|!talent.mindbender|covenant.night_fae)&(cooldown.mind_blast.charges=0|time>15|buff.shadowy_insight.up&cooldown.mind_blast.charges=buff.shadowy_insight.stack)
+  -- void_eruption,if=!cooldown.fiend.up&(pet.fiend.active|!talent.mindbender)&(cooldown.mind_blast.charges=0|time>15|buff.shadowy_insight.up&cooldown.mind_blast.charges=buff.shadowy_insight.stack)
   if S.VoidEruption:IsCastable() and
       (
       S.Mindbender:CooldownDown() and
-          (S.Mindbender:TimeSinceLastCast() <= 15 or not S.Mindbender:IsAvailable() or CovenantID == 3) and
+          (S.Mindbender:TimeSinceLastCast() <= 15 or not S.Mindbender:IsAvailable()) and
           (
           S.MindBlast:Charges() == 0 or CombatTime > 15 or
               Player:BuffUp(S.ShadowyInsight) and S.MindBlast:Charges() == Player:BuffStack(S.ShadowyInsight))) then
     if Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption) then return "void_eruption cds 20"; end
   end
-  -- dark_ascension,if=pet.fiend.active&cooldown.mind_blast.charges<2|!talent.mindbender&!cooldown.fiend.up|covenant.night_fae&cooldown.fiend.remains>=15&cooldown.fae_guardians.remains>=4*gcd.max
+  -- dark_ascension,if=pet.fiend.active&cooldown.mind_blast.charges<2|!talent.mindbender&!cooldown.fiend.up&cooldown.fiend.remains>=15
   if S.DarkAscension:IsCastable() and not Player:IsCasting(S.DarkAscension) and
       (
       S.Mindbender:TimeSinceLastCast() <= 15 and S.MindBlast:Charges() < 2 or
-          not S.Mindbender:IsAvailable() and S.ShadowFiend:CooldownDown() or
-          CovenantID == 3 and S.Mindbender:CooldownRemains() >= 15 and
-          S.FaeGuardians:CooldownRemains() >= 4 * Player:GCD()) then
+          not S.Mindbender:IsAvailable() and S.ShadowFiend:CooldownDown() and S.Mindbender:CooldownRemains() >= 15) then
     if Cast(S.DarkAscension, Settings.Shadow.GCDasOffGCD.DarkAscension) then return "dark_ascension cds 30"; end
   end
   -- call_action_list,name=trinkets
   if (Settings.Commons.Enabled.Trinkets) then
     local ShouldReturn = Trinkets();
     if ShouldReturn then return ShouldReturn; end
-  end
-  -- unholy_nova,if=dot.shadow_word_pain.ticking&variable.vts_applied|action.shadow_crash.in_flight
-  if S.UnholyNova:IsReady() and
-      (Target:DebuffUp(S.ShadowWordPainDebuff) and VarVTsApplied or S.ShadowCrash:TimeSinceLastCast() <= 5) then
-    if Cast(S.UnholyNova, Settings.Commons.DisplayStyle.Signature, nil, not Target:IsSpellInRange(S.UnholyNova)) then return "unholy_nova cds 50"; end
-  end
-  --fae_guardians,if=(dot.shadow_word_pain.ticking&variable.vts_applied|action.shadow_crash.in_flight)&(!talent.void_eruption|buff.voidform.up&!cooldown.void_bolt.up&cooldown.mind_blast.full_recharge_time>gcd.max|!cooldown.void_eruption.up)
-  if S.FaeGuardians:IsReady() and
-      (Target:DebuffUp(S.ShadowWordPainDebuff) and VarVTsApplied or S.ShadowCrash:TimeSinceLastCast() <= 5) and
-      (
-      not S.VoidEruption:IsAvailable() or
-          Player:BuffUp(S.VoidformBuff) and S.VoidBolt:CooldownUp() and S.MindBlast:FullRechargeTime() > Player:GCD() or
-          not S.VoidEruption:CooldownUp()) then
-    if Cast(S.FaeGuardians, Settings.Commons.DisplayStyle.Signature) then return "fae_guardians cds 60"; end
   end
   -- mindbender,if=(dot.shadow_word_pain.ticking&variable.vts_applied|action.shadow_crash.in_flight)
   if S.Mindbender:IsCastable() and
@@ -308,22 +264,22 @@ local function Main()
     local ShouldReturn = Cds();
     if ShouldReturn then return ShouldReturn; end
   end
-  -- shadow_word_death,if=pet.fiend.active&variable.sfp&(pet.fiend.remains<=gcd|target.health.pct<20)&spell_targets.mind_sear<=7
+  -- shadow_word_death,if=pet.fiend.active&talent.inescapable_torment&(pet.fiend.remains<=gcd|target.health.pct<20)&spell_targets.mind_sear<=7
   if S.ShadowWordDeath:IsCastable() and
       (
-      S.Mindbender:TimeSinceLastCast() <= 15 and VarSFP and
+      S.Mindbender:TimeSinceLastCast() <= 15 and S.InescapableTorment:IsAvailable() and
           (15 - S.Mindbender:TimeSinceLastCast() > Player:GCD() or Target:HealthPercentage() < 20) and
           EnemiesCount10ySplash <= 7) then
     if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil,
       not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 10"; end
   end
-  -- mind_blast,if=(cooldown.mind_blast.full_recharge_time<=gcd.max|pet.fiend.remains<=cast_time+gcd.max)&pet.fiend.active&variable.sfp&pet.fiend.remains>cast_time&spell_targets.mind_sear<=7
+  -- mind_blast,if=(cooldown.mind_blast.full_recharge_time<=gcd.max|pet.fiend.remains<=cast_time+gcd.max)&pet.fiend.active&talent.inescapable_torment&pet.fiend.remains>cast_time&spell_targets.mind_sear<=7
   if S.MindBlast:IsCastable() and
       (
       (
           S.MindBlast:FullRechargeTime() <= Player:GCD() or
               15 - S.Mindbender:TimeSinceLastCast() <= S.MindBlast:CastTime() + Player:GCD() + 0.5) and
-          S.Mindbender:TimeSinceLastCast() <= 15 and VarSFP and
+          S.Mindbender:TimeSinceLastCast() <= 15 and S.InescapableTorment:IsAvailable() and
           15 - S.Mindbender:TimeSinceLastCast() > S.MindBlast:CastTime() and EnemiesCount10ySplash <= 7) then
     if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 20"; end
   end
@@ -348,12 +304,12 @@ local function Main()
   if S.DevouringPlague:IsReady() and ((Target:DebuffRefreshable(S.DevouringPlagueDebuff) and (not VarPoolForCDs) or Player:Insanity() > 75 or S.VoidTorrent:IsAvailable() and S.VoidTorrent:CooldownRemains() <= 3 * Player:GCD() or Player:BuffUp(S.MindDevourerBuff) and S.MindBlast:FullRechargeTime() <= 2 * Player:GCD() and S.VoidEruption:CooldownDown() and S.VoidEruption:IsAvailable()) and VarDPCutoff) then
     if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 70"; end
   end
-  -- shadow_word_death,target_if=(target.health.pct<20&spell_targets.mind_sear<4)&(!variable.sfp|cooldown.fiend.remains>=10)|(pet.fiend.active&variable.sfp&spell_targets.mind_sear<=7)|buff.deathspeaker.up&(cooldown.fiend.remains+gcd.max)>buff.deathspeaker.remains
+  -- shadow_word_death,target_if=(target.health.pct<20&spell_targets.mind_sear<4)&(!talent.inescapable_torment|cooldown.fiend.remains>=10)|(pet.fiend.active&talent.inescapable_torment&spell_targets.mind_sear<=7)|buff.deathspeaker.up&(cooldown.fiend.remains+gcd.max)>buff.deathspeaker.remains
   if S.ShadowWordDeath:IsCastable() and
       (
       (Target:HealthPercentage() < 20 and EnemiesCount10ySplash < 4) and
-          (not VarSFP or S.Mindbender:CooldownRemains() >= 10) or
-          (S.Mindbender:TimeSinceLastCast() <= 15 and VarSFP and EnemiesCount10ySplash <= 7) and
+          ((not S.InescapableTorment:IsAvailable()) or S.Mindbender:CooldownRemains() >= 10) or
+          (S.Mindbender:TimeSinceLastCast() <= 15 and S.InescapableTorment:IsAvailable() and EnemiesCount10ySplash <= 7) and
           Player:BuffUp(S.DeathSpeakerBuff) and
           (S.Mindbender:CooldownRemains() + Player:GCD()) > Player:BuffRemains(S.DeathSpeakerBuff)) then
     if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil,
@@ -378,10 +334,7 @@ local function Main()
   end
   -- mindgames,if=spell_targets.mind_sear<5&variable.all_dots_up
   if (
-      S.Mindgames:IsAvailable() and S.Mindgames:IsReady() and not Player:IsCasting(S.Mindgames) or
-          CovenantID == 2 and
-          (S.MindgamesCov:IsReady() and not S.Mindgames:IsAvailable() and S.Mindgames:CooldownDown()
-          )) and
+      S.Mindgames:IsReady() and not Player:IsCasting(S.Mindgames)) and
       (EnemiesCount10ySplash < 5 and VarAllDotsUp) then
     if Cast(S.Mindgames, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames main 120"; end
   end
@@ -400,6 +353,10 @@ local function Main()
   -- void_torrent,if=insanity<=35,target_if=variable.dots_up
   if S.VoidTorrent:IsCastable() and Player:Insanity() <= 35 then
     if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrent84, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent 160"; end
+  end
+  -- mind_blast,if=raid_event.movement.in>cast_time+0.5&(!talent.inescapable_torment|!cooldown.fiend.up&talent.inescapable_torment|variable.vts_applied
+  if S.MindBlast:IsCastable() and ((not S.InescapableTorment:IsAvailable()) or S.Mindbender:CooldownDown() and S.InescapableTorment:IsAvailable() or VarVTsApplied) then
+    if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 165"; end
   end
   -- vampiric_touch,if=buff.unfurling_darkness.up
   if S.VampiricTouch:IsCastable() and Player:BuffUp(S.UnfurlingDarknessBuff) then
@@ -420,13 +377,13 @@ local function Main()
   if S.DivineStar:IsCastable() and EnemiesCount30y > 1 then
     if Cast(S.DivineStar, nil, nil, not Target:IsInRange(40)) then return "divine_star main 200"; end
   end
-  -- mind_spike,if=buff.surge_of_darkness.up|!conduit.dissonant_echoes&(!talent.mental_decay|dot.vampiric_touch.remains>=(cooldown.shadow_crash.remains+action.shadow_crash.travel_time))&(talent.mind_melt|!talent.idol_of_cthun)
+  -- mind_spike,if=buff.surge_of_darkness.up|(!talent.mental_decay|dot.vampiric_touch.remains>=(cooldown.shadow_crash.remains+action.shadow_crash.travel_time))&(talent.mind_melt|!talent.idol_of_cthun)
   --TODO : shadow crash travel time
-  if S.MinFlayInsanity:IsCastable() and
+  if S.MindSpike:IsCastable() and
       (
-      Player:BuffUp(S.MinFlayInsanityBuff) and VarDotsUp and
-          (not Player:BuffUp(S.SurgeOfDarknessBuff) or S.ScreamsOfTheVoid:IsAvailable())) then
-    if Cast(S.MinFlayInsanity, nil, nil, not Target:IsSpellInRange(S.MinFlayInsanity)) then return "mind_flay_insanity main 180"; end
+      Player:BuffUp(S.SurgeOfDarknessBuff) or ((not S.MentalDecay:IsAvailable()) or Target:DebuffRemains(S.VampiricTouchDebuff) >= (S.ShadowCrash:CooldownRemains() + 1)) and
+          (S.MindMelt:IsAvailable() or not S.IdolOfCthun:IsAvailable())) then
+    if Cast(S.MindSpike, nil, nil, not Target:IsSpellInRange(S.MindSpike)) then return "mind_spike main 180"; end
   end
   -- mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
   if S.MindFlay:IsCastable() then
@@ -518,8 +475,6 @@ local function APL()
     end
     -- variable,name=vts_applied,op=set,value=active_dot.vampiric_touch>=variable.max_vts|!variable.is_vt_possible
     VarVTsApplied = (S.VampiricTouchDebuff:AuraActiveCount() >= VarMaxVTs or not VarIsVTPossible)
-    --variable,name=sfp,op=set,value=runeforge.shadowflame_prism.equipped|talent.inescapable_torment
-    VarSFP = ShadowflamePrismEquipped or S.InescapableTorment:IsAvailable();
     -- variable,name=pool_for_cds,op=set,value=(cooldown.void_eruption.remains<=gcd.max*3&talent.void_eruption|cooldown.dark_ascension.up&talent.dark_ascension)
     VarPoolForCDs = (S.VoidEruption:CooldownRemains() <= Player:GCD() * 3 and S.VoidEruption:IsAvailable() or S.DarkAscension:CooldownUp() and S.DarkAscension:IsAvailable())
     -- variable,name=dp_cutoff,op=set,value=!talent.mind_sear|(spell_targets.mind_sear<=variable.mind_sear_cutoff&(!buff.mind_devourer.up|spell_targets.mind_sear=1))
