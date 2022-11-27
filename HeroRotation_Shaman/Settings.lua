@@ -33,7 +33,10 @@ HR.GUISettings.APL.Shaman = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
+      Ascendance = true,
       EarthElemental = true,
+      NaturesSwiftness = true,
+      TotemicRecall = true,
       -- Racials
       Racials = true,
     },
@@ -51,7 +54,6 @@ HR.GUISettings.APL.Shaman = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-      Ascendance = true,
       CrashLightning = false,
       FeralSpirit = true,
       Shield = false,

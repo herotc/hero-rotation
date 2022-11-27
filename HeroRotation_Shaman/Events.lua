@@ -13,6 +13,8 @@ local Spell = HL.Spell
 local Item = HL.Item
 -- Lua
 -- File Locals
+HR.Commons.Shaman = {}
+local Shaman = HR.Commons.Shaman
 
 
 --- ============================ CONTENT ============================

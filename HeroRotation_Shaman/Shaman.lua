@@ -30,48 +30,43 @@ Spell.Shaman.Commons = {
   BloodFury                             = Spell(33697),
   Fireblood                             = Spell(265221),
   -- Abilities
+  Bloodlust                             = MultiSpell(2825,32182), -- Bloodlust/Heroism
+  FlameShock                            = Spell(188389),
   FlamentongueWeapon                    = Spell(318038),
+  FrostShock                            = Spell(196840),
+  LightningBolt                         = Spell(188196),
   LightningShield                       = Spell(192106),
-  
-  
-  Bloodlust                             = Spell(2825),
+  -- Talents
+  AstralShift                           = Spell(108271),
+  CapacitorTotem                        = Spell(192058),
   ChainLightning                        = Spell(188443),
   EarthElemental                        = Spell(198103),
-  FlameShock                            = Spell(188389),
-  FlameShockDebuff                      = Spell(188389),
-  FrostShock                            = Spell(196840),
-  
-  LavaSurgeBuff                         = Spell(77762),
-  LightningBolt                         = Spell(188196),
-  
-  -- Talents
   EarthShield                           = Spell(974),
   ElementalBlast                        = Spell(117014),
   LavaBurst                             = Spell(51505),
-  WindShear                             = Spell(57994),
-  -- Defensive
-  AstralShift                           = Spell(10871),
-  -- Utility
-  CapacitorTotem                        = Spell(192058),
+  NaturesSwiftness                      = Spell(378081),
+  PrimordialWave                        = Spell(375982),
   SpiritwalkersGrace                    = Spell(79206),
-  SpiritwalkersGraceBuff                = Spell(79206),
+  TotemicRecall                         = Spell(108285),
+  WindShear                             = Spell(57994),
   -- Buffs
   LightningShieldBuff                   = Spell(192106),
+  PrimordialWaveBuff                    = Spell(375986),
+  SpiritwalkersGraceBuff                = Spell(79206),
   -- Debuffs
+  FlameShockDebuff                      = Spell(188389),
   -- Covenant Abilities (Shadowlands)
   ChainHarvest                          = Spell(320674),
   FaeTransfusion                        = Spell(328923),
   Fleshcraft                            = Spell(324631),
-  PrimordialWave                        = Spell(326059),
-  PrimordialWaveBuff                    = Spell(327164),
+  PrimordialWaveCov                     = Spell(326059),
+  PrimordialWaveCovBuff                 = Spell(327164),
   VesperTotem                           = Spell(324386),
   -- Soulbind Abilities (Shadowlands)
   FieldofBlossoms                       = Spell(319191),
   GroveInvigoration                     = Spell(322721),
   PustuleEruption                       = Spell(351094),
   VolatileSolvent                       = Spell(323074),
-  -- Legendary Effects (Shadowlands)
-  SplinteredElementsBuff                = Spell(354648),
   -- Trinket Effects
   AcquiredSwordBuff                     = Spell(368657),
   ScarsofFraternalStrifeBuff4           = Spell(368638),
@@ -137,35 +132,52 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   -- Talents
   Aftershock                            = Spell(273221),
   Ascendance                            = Spell(114050),
-  AscendanceBuff                        = Spell(114050),
+  DeeplyRootedElements                  = Spell(378270),
   EarthenRage                           = Spell(170374),
-  EchoOfTheElements                     = Spell(333919),
+  EchooftheElements                     = Spell(333919),
+  EchoesofGreatSundering                = Spell(384087),
   EchoingShock                          = Spell(320125),
   EchoingShockBuff                      = Spell(320125),
+  ElectrifiedShocks                     = Spell(382086),
+  EyeoftheStorm                         = Spell(381708),
+  FlowofPower                           = Spell(385923),
+  FluxMelting                           = Spell(381776),
   Icefury                               = Spell(210714),
   IcefuryBuff                           = Spell(210714),
   LavaBeam                              = Spell(114074),
+  LavaSurge                             = Spell(77756),
+  LightningRod                          = Spell(210689),
   LiquidMagmaTotem                      = Spell(192222),
-  MasterOfTheElements                   = Spell(16166),
-  MasterOfTheElementsBuff               = Spell(260734),
+  MagmaChamber                          = Spell(381932),
+  MasteroftheElements                   = Spell(16166),
   PrimalElementalist                    = Spell(117013),
+  SearingFlames                         = Spell(381782),
+  SkybreakersFieryDemise                = Spell(378310),
   StaticDischarge                       = Spell(342243),
   StormElemental                        = Spell(192249),
   Stormkeeper                           = Spell(191634),
   StormkeeperBuff                       = Spell(191634),
-  SurgeOfPower                          = Spell(262303),
+  SurgeofPower                          = Spell(262303),
   UnlimitedPower                        = Spell(260895),
+  UnrelentingCalamity                   = Spell(382685),
   WindGustBuff                          = Spell(263806),
   -- Pets
   Meteor                                = Spell(117588, "pet"),
   CallLightning                         = Spell(157348, "pet"),
   CallLightningBuff                     = Spell(157348),
-  EyeOfTheStorm                         = Spell(157375, "pet"),
-  -- Conduits (Shadowlands)
-  CallOfFlame                           = Spell(338303),
-  -- Legendaries (Shadowlands)
-  EchoesofGreatSunderingBuff            = Spell(336217),
-  ElementalEquilibriumBuff              = Spell(347348),
+  -- Buffs
+  AscendanceBuff                        = Spell(114050),
+  EchoesofGreatSunderingBuff            = Spell(384088),
+  FluxMeltingBuff                       = Spell(381777),
+  LavaSurgeBuff                         = Spell(77762),
+  MasteroftheElementsBuff               = Spell(260734),
+  PoweroftheMaelstromBuff               = Spell(191877),
+  SplinteredElementsBuff                = Spell(382043),
+  SurgeofPowerBuff                      = Spell(285514),
+  WindspeakersLavaResurgenceBuff        = Spell(378269),
+  -- Debuffs
+  ElectrifiedShocksDebuff               = Spell(382089),
+  LightningRodDebuff                    = Spell(197209),
 })
 
 Spell.Shaman.Restoration = MergeTableByKey(Spell.Shaman.Commons, {
