@@ -65,38 +65,6 @@ Spell.Mage.Commons = {
   IceNova                               = Spell(157997), --splash, 8
   Meteor                                = Spell(153561),
   ShiftingPower                         = Spell(382440), --Melee 15
-  -- Covenant Abilities
-  Deathborne                            = Spell(324220),
-  DeathborneBuff                        = Spell(324220),
-  DoorofShadows                         = Spell(300728),
-  Fleshcraft                            = Spell(324631),
-  MirrorsofTorment                      = Spell(314793),
-  RadiantSpark                          = Spell(307443),
-  RadiantSparkDebuff                    = Spell(307443),
-  RadiantSparkVulnerability             = Spell(307454),
-  Soulshape                             = Spell(310143),
-  -- Soulbind
-  CombatMeditation                      = Spell(328266),
-  EffusiveAnimaAccelerator              = Spell(352188),
-  FieldOfBlossoms                       = Spell(319191),
-  GroveInvigoration                     = Spell(322721),
-  VolatileSolvent                       = Spell(323074),
-  VolatileSolventHumanBuff              = Spell(323491),
-  WastelandPropriety                    = Spell(333251),
-  -- Conduit
-  ArcaneProdigy                         = Spell(336873),
-  IcyPropulsion                         = Spell(336522),
-  IreOfTheAscended                      = Spell(337058),
-  PustuleEruption                       = Spell(351094),
-  ShiveringCore                         = Spell(336472),
-  SiphonedMalice                        = Spell(337090),
-  -- Legendary Effects
-  DisciplinaryCommandBuff               = Spell(327371),
-  ExpandedPotentialBuff                 = Spell(327495),
-  -- Trinket Effects
-  ScarsofFraternalStrifeBuff4           = Spell(368638),
-  SoulIgnitionBuff                      = Spell(345211),
-  TomeofMonstruousConstructionsBuff     = Spell(357163),
 }
 
 Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
@@ -178,70 +146,45 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   WintersChillDebuff                    = Spell(228358),
   FireBlast                             = Spell(319836),
   -- Talents
-  IceBarrier                            = Spell(11426),
-  IceLance                              = Spell(30455), --splash, 8 (with splitting ice)
-  FrozenOrb                             = Spell(84714), --splash, 16
   Blizzard                              = Spell(190356), --splash, 16
-  FingersofFrostBuff                    = Spell(44544),
-  Flurry                                = Spell(44614),
-  BrainFreezeBuff                       = Spell(190446),
-  Frostbite                             = Spell(198121),
-  SummonWaterElemental                  = Spell(31687),
-  WaterJet                              = Spell(135029, "pet"),
-  Freeze                                = Spell(33395, "pet"), --splash, 8
-  IceCaller                             = Spell(236662),
   BoneChilling                          = Spell(205766),
-  Ebonbolt                              = Spell(257537), --splash, 8 (with splitting ice)
-  SnowStorm                             = Spell(381706),
-  SnowStormBuff                         = Spell(381522),
-  IcyVeins                              = Spell(12472),
-  CometStorm                            = Spell(153595), --splash, 6
-  FreezingRain                          = Spell(270233),
-  FreezingRainBuff                      = Spell(270232),
-  RayofFrost                            = Spell(205021),
-  SplittingIce                          = Spell(56377), --splash, 8
-  SlickIce                              = Spell(382144),
   ChainReaction                         = Spell(278309),
+  CometStorm                            = Spell(153595), --splash, 6
+  Ebonbolt                              = Spell(257537), --splash, 8 (with splitting ice)
+  Flurry                                = Spell(44614),
+  FreezingRain                          = Spell(270233),
   FreezingWinds                         = Spell(382103),
+  Frostbite                             = Spell(198121),
+  FrozenOrb                             = Spell(84714), --splash, 16
   GlacialSpike                          = Spell(199786), --splash, 8 (with splitting ice)
-  GlacialSpikeBuff                      = Spell(199844),
+  IceBarrier                            = Spell(11426),
+  IceCaller                             = Spell(236662),
+  IceLance                              = Spell(30455), --splash, 8 (with splitting ice)
+  IcyVeins                              = Spell(12472),
+  RayofFrost                            = Spell(205021),
+  SlickIce                              = Spell(382144),
+  Snowstorm                             = Spell(381706),
+  SplittingIce                          = Spell(56377), --splash, 8
+  SummonWaterElemental                  = Spell(31687),
+  -- Pet Abilities
+  Freeze                                = Spell(33395, "pet"), --splash, 8
+  WaterJet                              = Spell(135029, "pet"),
   -- Buffs
+  BrainFreezeBuff                       = Spell(190446),
+  FingersofFrostBuff                    = Spell(44544),
+  FreezingRainBuff                      = Spell(270232),
   FreezingWindsBuff                     = Spell(382106),
+  GlacialSpikeBuff                      = Spell(199844),
+  IcyVeinsBuff                          = Spell(12472),
+  SnowstormBuff                         = Spell(381522),
   -- Debuffs
 })
 
 -- Items
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Commons = {
-  -- Potions
-  PotionofSpectralIntellect        = Item(171273),
   -- Trinkets
-  ArchitectsIngenuityCore          = Item(188268, {13, 14}),
-  DarkmoonDeckPutrescence          = Item(173069, {13, 14}),
-  DreadfireVessel                  = Item(184030, {13, 14}),
-  EbonsoulVise                     = Item(186431, {13, 14}),
-  EmpyrealOrdnance                 = Item(180117, {13, 14}),
-  FlameofBattle                    = Item(181501, {13, 14}),
-  GlyphofAssimilation              = Item(184021, {13, 14}),
-  GrimEclipse                      = Item(188254, {13, 14}),
-  InscrutableQuantumDevice         = Item(179350, {13, 14}),
-  InstructorsDivineBell            = Item(184842, {13, 14}),
-  MacabreSheetMusic                = Item(184024, {13, 14}),
-  MoonlitPrism                     = Item(137541, {13, 14}),
-  MrrgriasFavor                    = Item(142160, {13, 14}),
-  ResonantReservoir                = Item(188272, {13, 14}),
-  ScarsofFraternalStrife           = Item(188253, {13, 14}),
-  ShadowedOrbofTorment             = Item(186428, {13, 14}),
-  SinfulAspirantsBadge             = Item(175884, {13, 14}),
-  SinfulGladiatorsBadge            = Item(175921, {13, 14}),
-  SoulIgniter                      = Item(184019, {13, 14}),
-  SoullettingRuby                  = Item(178809, {13, 14}),
-  SunbloodAmethyst                 = Item(178826, {13, 14}),
-  TheFirstSigil                    = Item(188271, {13, 14}),
-  TomeofMonstruousConstructions    = Item(186422, {13, 14}),
-  WakenersFrond                    = Item(181457, {13, 14}),
   -- Other On-Use Items
-  NeuralSynapseEnhancer            = Item(168973),
 }
 
 Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
@@ -339,68 +282,4 @@ function Mage.IFTimeToX(count, direction)
     local ticks_low = (10 + low - buff_position) % 10
     local ticks_high = (10 + high - buff_position) % 10
     return (Mage.IFST.CurrStacksTime - Mage.IFST.OldStacksTime) + math.min(ticks_low, ticks_high) - 1
-end
-
-Mage.DC = {
-  Arcane = 0,
-  ArcaneTime = 0,
-  Fire = 0,
-  FireTime = 0,
-  Frost = 0,
-  FrostTime = 0
-}
-
-function Mage.DCCheck()
-  local CurrentTime = GetTime()
-  local specID = Cache.Persistent.Player.Spec[1]
-  local S
-  if specID == 62 then
-    S = Spell.Mage.Arcane
-  elseif specID == 63 then
-    S = Spell.Mage.Fire
-  elseif specID == 64 then
-    S = Spell.Mage.Frost
-  end
-
-  local M = Mage.DC
-  local var_disciplinary_command_cd_remains = 30 - S.DisciplinaryCommandBuff:TimeSinceLastAppliedOnPlayer()
-  if Player:BuffDown(S.DisciplinaryCommandBuff) and var_disciplinary_command_cd_remains <= 0 then
-    if M.Arcane == 0 then
-      -- Split Blink (1953)/Shimmer (212653) into unique spell objects, as PrevGCD doesn't like MultiSpell, apparently
-      if Player:PrevOffGCD(1, S.Counterspell) or Player:PrevGCD(1, S.ArcaneExplosion) or Player:PrevGCD(1, S.RuneofPower) or Player:PrevOffGCD(1, Spell(212653)) or Player:PrevOffGCD(1, Spell(1953)) or Player:PrevGCD(1, S.ArcaneIntellect) or Player:PrevGCD(1, S.AlterTime) or Player:PrevGCD(1, S.SpellSteal) or Player:PrevGCD(1, S.RemoveCurse) or Player:PrevGCD(1, S.MirrorImage) or Player:PrevGCD(1, S.Invisibility) or Player:PrevGCD(1, S.SlowFall) or Player:PrevGCD(1, S.FocusMagic) or Player:PrevOffGCD(1, S.TimeWarp)
-      or (S.RuneofPower:IsAvailable() and ((specID == 64 and Player:PrevOffGCD(1, S.IcyVeins)) or (specID == 63 and Player:PrevOffGCD(1, S.Combustion)) or (specID == 62 and Player:PrevOffGCD(1, S.ArcanePower)))) 
-      or (specID == 62 and (Player:PrevGCD(1, S.ArcaneBarrage) or Player:PrevGCD(1, S.ArcaneBlast) or Player:PrevGCD(1, S.ArcaneMissiles) or Player:PrevGCD(1, S.ArcaneOrb) or Player:PrevOffGCD(1, S.ArcanePower) or Player:PrevGCD(1, S.Evocation) or Player:PrevGCD(1, S.PresenceofMind) or Player:PrevGCD(1, S.GreaterInvisibility) or Player:PrevGCD(1, S.PrismaticBarrier) or Player:PrevGCD(1, S.TouchoftheMagi) or Player:PrevGCD(1, S.ArcaneFamiliar) or Player:PrevGCD(1, S.NetherTempest) or Player:PrevGCD(1, S.Supernova))) then
-        M.Arcane = 1
-        M.ArcaneTime = CurrentTime
-      end
-    end
-    if M.Fire == 0 then
-      if Player:PrevGCD(1, S.FireBlast)
-      or (specID == 63 and (Player:PrevOffGCD(1, S.FireBlast) or Player:PrevGCD(1, S.Fireball) or Player:PrevGCD(1, S.Scorch) or Player:PrevGCD(1, S.Pyroblast) or Player:PrevGCD(1, S.Flamestrike) or Player:PrevGCD(1, S.BlazingBarrier) or Player:PrevOffGCD(1, S.Combustion) or Player:PrevGCD(1, S.DragonsBreath) or Player:PrevGCD(1, S.PhoenixFlames) or Player:PrevGCD(1, S.BlastWave) or Player:PrevGCD(1, S.LivingBomb) or Player:PrevGCD(1, S.Meteor))) then
-        M.Fire = 1
-        M.FireTime = CurrentTime
-      end
-    end
-    if M.Frost == 0 then
-      if Player:PrevGCD(1, S.Frostbolt) or Player:PrevGCD(1, S.FrostNova) or Player:PrevGCD(1, S.IceBlock) or Player:PrevGCD(1, S.RingOfFrost) 
-      or (specID == 64 and (Player:PrevGCD(1, S.IceLance) or Player:PrevGCD(1, S.Flurry) or Player:PrevGCD(1, S.Blizzard) or Player:PrevGCD(1, S.ConeofCold) or Player:PrevGCD(1, S.FrozenOrb) or Player:PrevGCD(1, S.IceBarrier) or Player:PrevOffGCD(1, S.IcyVeins) or Player:PrevGCD(1, S.RayofFrost) or Player:PrevGCD(1, S.GlacialSpike) or Player:PrevGCD(1, S.CometStorm) or Player:PrevGCD(1, S.Ebonbolt) or Player:PrevOffGCD(1, S.IceFloes) or Player:PrevOffGCD(1, S.IceNova) or Player:PrevOffGCD(1, S.SummonWaterElemental))) then
-        M.Frost = 1
-        M.FrostTime = CurrentTime
-      end
-    end
-  end
-  if Player:BuffUp(S.DisciplinaryCommandBuff) and (M.Arcane == 1 or M.Fire == 1 or M.Frost == 1) then
-    M.Arcane = 0
-    M.Fire = 0
-    M.Frost = 0
-  end
-  if M.Arcane == 1 and M.ArcaneTime < CurrentTime - 10 then
-    M.Arcane = 0
-  end
-  if M.Fire == 1 and M.FireTime < CurrentTime - 10 then
-    M.Fire = 0
-  end
-  if M.Frost == 1 and M.FrostTime < CurrentTime - 10 then
-    M.Frost = 0
-  end
 end

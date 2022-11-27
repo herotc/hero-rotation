@@ -33,20 +33,6 @@ local I = Item.Mage.Arcane;
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.ArchitectsIngenuityCore:ID(),
-  I.DreadfireVessel:ID(),
-  I.EbonsoulVise:ID(),
-  I.EmpyrealOrdnance:ID(),
-  I.GlyphofAssimilation:ID(),
-  I.GrimEclipse:ID(),
-  I.MacabreSheetMusic:ID(),
-  I.MoonlitPrism:ID(),
-  I.MrrgriasFavor:ID(),
-  I.ResonantReservoir:ID(),
-  I.ScarsofFraternalStrife:ID(),
-  I.SinfulGladiatorsBadge:ID(),
-  I.SoulIgniter:ID(),
-  I.SoullettingRuby:ID(),
 }
 
 -- Rotation Var

@@ -37,22 +37,6 @@ local I = Item.Mage.Fire
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.DreadfireVessel:ID(),
-  I.EmpyrealOrdnance:ID(),
-  I.FlameofBattle:ID(),
-  I.GlyphofAssimilation:ID(),
-  I.GrimEclipse:ID(),
-  I.InscrutableQuantumDevice:ID(),
-  I.InstructorsDivineBell:ID(),
-  I.MacabreSheetMusic:ID(),
-  I.MoonlitPrism:ID(),
-  I.ScarsofFraternalStrife:ID(),
-  I.SinfulAspirantsBadge:ID(),
-  I.SinfulGladiatorsBadge:ID(),
-  I.SoulIgniter:ID(),
-  I.SunbloodAmethyst:ID(),
-  I.TheFirstSigil:ID(),
-  I.WakenersFrond:ID()
 }
 
 -- GUI Settings
@@ -77,7 +61,7 @@ local var_kindling_reduction = (S.Kindling:IsAvailable()) and 0.4 or 1
 local var_skb_duration = 6
 local var_skb_delay = 0.1
 local var_mot_recharge_amount = 6
-local var_combustion_on_use = (I.SinfulGladiatorsBadge:IsEquipped() or I.SinfulAspirantsBadge:IsEquipped() or I.MacabreSheetMusic:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.EmpyrealOrdnance:IsEquipped() or I.FlameofBattle:IsEquipped() or I.WakenersFrond:IsEquipped() or I.InstructorsDivineBell:IsEquipped() or I.ShadowedOrbofTorment:IsEquipped())
+local var_combustion_on_use = false
 local var_empyreal_ordnance_delay = 18
 local var_on_use_cutoff = 0
 local var_use_shifting_power = false
