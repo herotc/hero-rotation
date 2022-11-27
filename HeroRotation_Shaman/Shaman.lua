@@ -55,18 +55,6 @@ Spell.Shaman.Commons = {
   SpiritwalkersGraceBuff                = Spell(79206),
   -- Debuffs
   FlameShockDebuff                      = Spell(188389),
-  -- Covenant Abilities (Shadowlands)
-  ChainHarvest                          = Spell(320674),
-  FaeTransfusion                        = Spell(328923),
-  Fleshcraft                            = Spell(324631),
-  PrimordialWaveCov                     = Spell(326059),
-  PrimordialWaveCovBuff                 = Spell(327164),
-  VesperTotem                           = Spell(324386),
-  -- Soulbind Abilities (Shadowlands)
-  FieldofBlossoms                       = Spell(319191),
-  GroveInvigoration                     = Spell(322721),
-  PustuleEruption                       = Spell(351094),
-  VolatileSolvent                       = Spell(323074),
   -- Trinket Effects
   AcquiredSwordBuff                     = Spell(368657),
   ScarsofFraternalStrifeBuff4           = Spell(368638),
@@ -118,10 +106,6 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   EarthenWeaponBuff                     = Spell(392375),
   IcyEdgeBuff                           = Spell(224126),
   MoltenWeaponBuff                      = Spell(224125),
-  -- Legendaries (Shadowlands)
-  DoomWindsLegBuff                      = Spell(335903),
-  DoomWindsLegDebuff                    = Spell(335904),
-  PrimalLavaActuatorsBuff               = Spell(335896),
 })
 
 Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
@@ -185,9 +169,6 @@ Spell.Shaman.Restoration = MergeTableByKey(Spell.Shaman.Commons, {
 
 if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Commons = {
-  -- Potions
-  PotionofSpectralAgility               = Item(171270),
-  PotionofSpectralIntellect             = Item(171273),
   -- Trinkets
   CacheofAcquiredTreasures              = Item(188265, {13, 14}),
   ScarsofFraternalStrife                = Item(188253, {13, 14}),
