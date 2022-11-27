@@ -264,6 +264,10 @@ local function Main()
     local ShouldReturn = Cds();
     if ShouldReturn then return ShouldReturn; end
   end
+  -- mind_blast,if=cooldown.mind_blast.charges>=2&talent.mind_devourer&spell_targets.mind_sear>=3&spell_targets.mind_sear<=7&!buff.mind_devourer.up
+  if S.MindBlast:IsCastable() and (S.MindBlast:Charges() >= 2 and S.MindDevourer:IsAvailable() and Enemies10ySplash >= 3 and Enemies10ySplash <= 7 and Player:BuffDown(S.MindDevourerBuff)) then
+    if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 5"; end
+  end
   -- shadow_word_death,if=pet.fiend.active&talent.inescapable_torment&(pet.fiend.remains<=gcd|target.health.pct<20)&spell_targets.mind_sear<=7
   if S.ShadowWordDeath:IsCastable() and
       (
@@ -296,8 +300,8 @@ local function Main()
       Player:BuffUp(S.MindDevourerBuff) then
     if Everyone.CastCycle(S.MindSear, Enemies40y, EvaluateCycleMindSear225, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear main 50"; end
   end
-  -- mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
-  if S.MindSear:IsReady() and (EnemiesCount10ySplash > VarMindSearCutoff) then
+  -- mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff&(insanity>=75|((!set_bonus.tier29_4pc&!set_bonus.tier29_2pc)|!buff.dark_reveries.up)|(!set_bonus.tier29_2pc|buff.gathering_shadows.stack=3)),chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
+  if S.MindSear:IsReady() and (EnemiesCount10ySplash > VarMindSearCutoff and (Player:Insanity() >= 75 or (((not Player:HasTier(29, 4)) and not Player:HasTier(29, 2)) or Player:BuffDown(S.DarkReveriesBuff)) or ((not Player:HasTier(29, 2)) or Player:BuffStack(S.GatheringShadowsBuff) == 3))) then
     if Cast(S.MindSear, nil, nil, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear main 60"; end
   end
   -- devouring_plague,if=(refreshable&!variable.pool_for_cds|insanity>75|talent.void_torrent&cooldown.void_torrent.remains<=3*gcd|buff.mind_devourer.up&cooldown.mind_blast.full_recharge_time<=2*gcd.max&!cooldown.void_eruption.up&talent.void_eruption)&variable.dp_cutoff

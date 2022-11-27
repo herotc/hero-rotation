@@ -111,6 +111,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   DarkAscension         = Spell(391109),
   ShadowyInsight        = Spell(375981),
   InescapableTorment    = Spell(373427),
+  MindDevourer          = Spell(373202),
   MindDevourerBuff      = Spell(373204),
   DeathSpeaker          = Spell(392507),
   DeathSpeakerBuff      = Spell(392511),
@@ -124,17 +125,9 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   MentalDecay           = Spell(375994),
   MindMelt              = Spell(391090),
   IdolOfCthun           = Spell(377349),
-  -- Covenant Abilities
-  AscendedBlast         = Spell(325283),
-  -- Conduit/Soulbind Effects
-  CombatMeditation      = Spell(328266),
-  DissonantEchoes       = Spell(338342),
-  DissonantEchoesBuff   = Spell(343144),
-  FieldofBlossoms       = Spell(319191),
-  GroveInvigoration     = Spell(322721),
-  RedirectedAnimaBuff   = Spell(342814),
   -- Tier Set Effects
-  LivingShadowBuff      = Spell(363578)
+  DarkReveries          = Spell(394963),
+  GatheringShadowsBuff  = Spell(394961),
 })
 
 Spell.Priest.Discipline = MergeTableByKey(Spell.Priest.Commons, {
