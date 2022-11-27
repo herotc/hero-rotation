@@ -190,13 +190,21 @@ local function Havoc()
   if S.Immolate:IsCastable() then
     if Everyone.CastCycle(S.Immolate, Enemies40y, EvaluateCycleImmolateHavoc, not Target:IsSpellInRange(S.Immolate)) then return "immolate havoc 8"; end
   end
-  -- chaos_bolt,if=cast_time<havoc_remains&(active_enemies<4-talent.inferno+talent.madness_of_the_azjaqir+(!talent.inferno&talent.ashen_remains))
-  if S.ChaosBolt:IsReady() and (S.ChaosBolt:CastTime() < VarHavocRemains and (EnemiesCount8ySplash < 4 - num(S.Inferno:IsAvailable()) + num(S.MadnessoftheAzjAqir:IsAvailable()) + num((not S.Inferno:IsAvailable()) and S.AshenRemains:IsAvailable()))) then
+  -- chaos_bolt,if=talent.cry_havoc&!talent.inferno&cast_time<havoc_remains
+  if S.ChaosBolt:IsReady() and (S.CryHavoc:IsAvailable() and (not S.Inferno:IsAvailable()) and S.ChaosBolt:CastTime() < VarHavocRemains) then
+    if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt havoc 9"; end
+  end
+  -- chaos_bolt,if=cast_time<havoc_remains&(active_enemies<4-talent.inferno+talent.madness_of_the_azjaqir-(talent.inferno&(talent.rain_of_chaos|talent.avatar_of_destruction)&buff.rain_of_chaos.up))
+  if S.ChaosBolt:IsReady() and (S.ChaosBolt:CastTime() < VarHavocRemains and (EnemiesCount8ySplash < 4 - num(S.Inferno:IsAvailable()) + num(S.MadnessoftheAzjAqir:IsAvailable()) - num(S.Inferno:IsAvailable() and (S.RainofChaos:IsAvailable() or S.AvatarofDestruction:IsAvailable()) and Player:BuffUp(S.RainofChaosBuff)))) then
     if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt havoc 10"; end
   end
-  -- rain_of_fire,if=(active_enemies>=4-talent.inferno+talent.madness_of_the_azjaqir+(!talent.inferno&talent.ashen_remains))
-  if S.RainofFire:IsReady() and (EnemiesCount8ySplash >= 4 - num(S.Inferno:IsAvailable()) + num(S.MadnessoftheAzjAqir:IsAvailable()) + num((not S.Inferno:IsAvailable()) and S.AshenRemains:IsAvailable())) then
+  -- rain_of_fire,if=(active_enemies>=4-talent.inferno+talent.madness_of_the_azjaqir)
+  if S.RainofFire:IsReady() and (EnemiesCount8ySplash >= 4 - num(S.Inferno:IsAvailable()) + num(S.MadnessoftheAzjAqir:IsAvailable())) then
     if Cast(S.RainofFire, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "rain_of_fire havoc 12"; end
+  end
+  -- rain_of_fire,if=active_enemies>1&(talent.avatar_of_destruction|(talent.rain_of_chaos&buff.rain_of_chaos.up))&talent.inferno.enabled
+  if S.RainofFire:IsReady() and (EnemiesCount8ySplash > 1 and (S.AvatarofDestruction:IsAvailable() or (S.RainofChaos:IsAvailable() and Player:BuffUp(S.RainofChaosBuff))) and S.Inferno:IsAvailable()) then
+    if Cast(S.RainofFire, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "rain_of_fire havoc 13"; end
   end
   -- conflagrate
   if S.Conflagrate:IsCastable() then
@@ -209,6 +217,14 @@ local function Havoc()
 end
 
 local function Cleave()
+  -- call_action_list,name=items
+  if Settings.Commons.Enabled.Trinkets then
+    local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- call_action_list,name=ogcd
+  if true then
+    local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
+  end
   -- call_action_list,name=havoc,if=havoc_active&havoc_remains>gcd
   if (VarHavocActive and VarHavocRemains > Player:GCD()) then
     local ShouldReturn = Havoc(); if ShouldReturn then return ShouldReturn; end
@@ -252,14 +268,6 @@ local function Cleave()
   -- chaos_bolt,if=pet.infernal.active|pet.blasphemy.active|soul_shard>=4
   if S.ChaosBolt:IsReady() and (InfernalTime() > 0 or BlasphemyTime() > 0 or Player:SoulShardsP() >= 4) then
     if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt cleave 16"; end
-  end
-  -- call_action_list,name=items
-  if Settings.Commons.Enabled.Trinkets then
-    local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
-  end
-  -- call_action_list,name=ogcd
-  if true then
-    local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
   end
   -- summon_infernal
   if S.SummonInfernal:IsCastable() then
@@ -325,8 +333,16 @@ local function Cleave()
 end
 
 local function Aoe()
-  -- call_action_list,name=havoc,if=havoc_active&havoc_remains>gcd&active_enemies<5
-  if (VarHavocActive and VarHavocRemains > Player:GCD() and EnemiesCount8ySplash < 5) then
+  -- call_action_list,name=ogcd
+  if true then
+    local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- call_action_list,name=items
+  if Settings.Commons.Enabled.Trinkets then
+    local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- call_action_list,name=havoc,if=havoc_active&havoc_remains>gcd&active_enemies<5+(talent.cry_havoc&!talent.inferno)
+  if (VarHavocActive and VarHavocRemains > Player:GCD() and EnemiesCount8ySplash < 5 + num(S.CryHavoc:IsAvailable() and not S.Inferno:IsAvailable())) then
     local ShouldReturn = Havoc(); if ShouldReturn then return ShouldReturn; end
   end
   -- rain_of_fire,if=pet.infernal.active
@@ -349,8 +365,8 @@ local function Aoe()
   if S.Cataclysm:IsCastable() then
     if Cast(S.Cataclysm, nil, nil, not Target:IsSpellInRange(S.Cataclysm)) then return "cataclysm aoe 10"; end
   end
-  -- channel_demonfire,if=dot.immolate.remains>cast_time&(talent.raging_demonfire.rank+talent.roaring_blaze.rank)>1
-  if S.ChannelDemonfire:IsCastable() and (Target:DebuffRemains(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime() and (num(S.RagingDemonfire:IsAvailable()) + num(S.RoaringBlaze:IsAvailable())) > 1) then
+  -- channel_demonfire,if=dot.immolate.remains>cast_time&talent.raging_demonfire
+  if S.ChannelDemonfire:IsCastable() and (Target:DebuffRemains(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime() and S.RagingDemonfire:IsAvailable()) then
     if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire aoe 12"; end
   end
   -- immolate,cycle_targets=1,if=dot.immolate.remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&active_dot.immolate<=6
@@ -366,10 +382,6 @@ local function Aoe()
         break
       end
     end
-  end
-  -- call_action_list,name=items
-  if Settings.Commons.Enabled.Trinkets then
-    local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
   end
   -- summon_soulkeeper,if=buff.tormented_soul.stack=10
   if S.SummonSoulkeeper:IsCastable() and (Player:BuffStack(S.TormentedSoulBuff) == 10) then
@@ -396,6 +408,10 @@ local function Aoe()
         break
       end
     end
+  end
+  -- channel_demonfire,if=dot.immolate.remains>cast_time
+  if S.ChannelDemonfire:IsReady() and (Target:DebuffRemains(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime()) then
+    if Cast(S.ChannelDemonfire, nil, nil, not Target:IsSpellInRange(S.ChannelDemonfire)) then return "channel_demonfire aoe 17"; end
   end
   -- immolate,cycle_targets=1,if=dot.immolate.remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)
   if S.Immolate:IsCastable() then
@@ -470,6 +486,14 @@ local function APL()
     if (EnemiesCount8ySplash >= 3) then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
+    -- call_action_list,name=items
+    if (Settings.Commons.Enabled.Trinkets) then
+      local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=ogcd
+    if (true) then
+      local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
+    end
     -- conflagrate,if=(talent.roaring_blaze&debuff.conflagrate.remains<1.5)|charges=max_charges
     if S.Conflagrate:IsReady() and ((S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.RoaringBlazeDebuff) < 1.5) or S.Conflagrate:Charges() == S.Conflagrate:MaxCharges()) then
       if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 2"; end
@@ -490,17 +514,13 @@ local function APL()
     if S.Immolate:IsCastable() and (((Target:DebuffRefreshable(S.ImmolateDebuff) and S.InternalCombustion:IsAvailable()) or Target:DebuffRemains(S.ImmolateDebuff) < 3) and ((not S.Cataclysm:IsAvailable()) or S.Cataclysm:CooldownRemains() > Target:DebuffRemains(S.ImmolateDebuff)) and ((not S.SoulFire:IsAvailable()) or S.SoulFire:CooldownRemains() > Target:DebuffRemains(S.ImmolateDebuff))) then
       if Cast(S.Immolate, nil, nil, not Target:IsSpellInRange(S.Immolate)) then return "immolate main 10"; end
     end
+    -- havoc,if=talent.cry_havoc&(buff.ritual_of_ruin.up|pet.infernal.active)
+    if S.Havoc:IsCastable() and (S.CryHavoc:IsAvailable() and (Player:BuffUp(S.RitualofRuinBuff) or InfernalTime() > 0)) then
+      if Cast(S.Havoc, nil, nil, not Target:IsSpellInRange(S.Havoc)) then return "havoc main 11"; end
+    end
     -- chaos_bolt,if=pet.infernal.active|pet.blasphemy.active|soul_shard>=4
     if S.ChaosBolt:IsReady() and (InfernalTime() > 0 or BlasphemyTime() > 0 or Player:SoulShardsP() >= 4) then
       if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 12"; end
-    end
-    -- call_action_list,name=items
-    if Settings.Commons.Enabled.Trinkets then
-      local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- call_action_list,name=ogcd
-    if true then
-      local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
     end
     -- summon_infernal
     if S.SummonInfernal:IsCastable() then
@@ -510,21 +530,17 @@ local function APL()
     if S.ChannelDemonfire:IsCastable() and (S.Ruin:TalentRank() > 1 and not (S.DiabolicEmbers:IsAvailable() and S.AvatarofDestruction:IsAvailable() and (S.BurntoAshes:IsAvailable() or S.ChaosIncarnate:IsAvailable()))) then
       if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire main 16"; end
     end
-    -- conflagrate,if=buff.backdraft.down&soul_shard>=1.5
-    if S.Conflagrate:IsCastable() and (Player:BuffDown(S.Backdraft) and Player:SoulShardsP() >= 1.5) then
+    -- conflagrate,if=buff.backdraft.down&soul_shard>=1.5&!talent.roaring_blaze
+    if S.Conflagrate:IsCastable() and (Player:BuffDown(S.Backdraft) and Player:SoulShardsP() >= 1.5 and not S.RoaringBlaze:IsAvailable()) then
       if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 28"; end
     end
     -- chaos_bolt,if=buff.rain_of_chaos.remains>cast_time
     if S.ChaosBolt:IsReady() and (Player:BuffRemains(S.RainofChaosBuff) > S.ChaosBolt:CastTime()) then
       if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 30"; end
     end
-    -- chaos_bolt,if=buff.backdraft.up
-    if S.ChaosBolt:IsReady() and (Player:BuffUp(S.Backdraft)) then
+    -- chaos_bolt,if=buff.backdraft.up&!talent.eradication&!talent.madness_of_the_azjaqir
+    if S.ChaosBolt:IsReady() and (Player:BuffUp(S.Backdraft) and (not S.Eradication:IsAvailable()) and not S.MadnessoftheAzjAqir:IsAvailable()) then
       if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 32"; end
-    end
-    -- chaos_bolt,if=talent.eradication&debuff.eradication.remains<cast_time&!action.chaos_bolt.in_flight
-    if S.ChaosBolt:IsReady() and (S.Eradication:IsAvailable() and Target:DebuffRemains(S.EradicationDebuff) < S.ChaosBolt:CastTime() and not S.ChaosBolt:InFlight()) then
-      if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 34"; end
     end
     -- chaos_bolt,if=buff.madness_cb.up
     if S.ChaosBolt:IsReady() and (Player:BuffUp(S.MadnessCBBuff)) then
