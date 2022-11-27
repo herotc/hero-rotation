@@ -158,7 +158,7 @@ local function Aoe()
   if S.StormElemental:IsCastable() then
     if Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "storm_elemental aoe 4"; end
   end
-  -- stormkeeper
+  -- stormkeeper,if=!buff.stormkeeper.up
   if IsViable(S.Stormkeeper) and (not Player:StormkeeperP()) then
     if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper aoe 6"; end
   end
@@ -325,8 +325,8 @@ local function SingleTarget()
   if S.FlameShock:IsCastable() and (Shaman.Targets > 1 and Shaman.ClusterTargets > 1 and Player:BuffDown(S.SurgeofPowerBuff) and (S.DeeplyRootedElements:IsAvailable() or S.Ascendance:IsAvailable() or S.PrimordialWave:IsAvailable() or S.SearingFlames:IsAvailable() or S.MagmaChamber:IsAvailable())) then
     if Everyone.CastTargetIf(S.FlameShock, Enemies10ySplash, "min", EvaluateFlameShockRemains, EvaluateFlameShockRefreshable, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 14"; end
   end
-  -- stormkeeper,if=!buff.ascendance.up
-  if IsViable(S.Stormkeeper) and (Player:BuffDown(S.AscendanceBuff)) then
+  -- stormkeeper,if=!buff.ascendance.up&!buff.stormkeeper.up
+  if IsViable(S.Stormkeeper) and (Player:BuffDown(S.AscendanceBuff) and not Player:StormkeeperP()) then
     if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper single_target 16"; end
   end
   -- ascendance,if=!buff.stormkeeper.up
