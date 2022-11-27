@@ -408,7 +408,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Arms Warrior rotation is currently a work in progress, but has been updated for patch 10.0.0.")
+  HR.Print("Arms Warrior rotation is currently a work in progress, but has been updated for patch 10.0.")
 end
 
 HR.SetAPL(71, APL, Init)

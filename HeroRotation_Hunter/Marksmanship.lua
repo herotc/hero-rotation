@@ -485,7 +485,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Marksmanship Hunter rotation is currently a work in progress, but has been updated for patch 10.0.2.")
+  HR.Print("Marksmanship Hunter rotation is currently a work in progress, but has been updated for patch 10.0.")
 end
 
 HR.SetAPL(254, APL, Init)

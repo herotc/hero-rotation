@@ -425,7 +425,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Frost Mage rotation is currently a work in progress, but has been updated for patch 10.0.0.")
+  HR.Print("Frost Mage rotation is currently a work in progress, but has been updated for patch 10.0.")
 end
 
 HR.SetAPL(64, APL, Init)

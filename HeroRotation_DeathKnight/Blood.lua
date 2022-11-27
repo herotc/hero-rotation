@@ -436,7 +436,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Blood DK rotation has not been updated for pre-patch 10.0. It may not function properly or may cause errors in-game.")
+  HR.Print("Blood DK rotation is currently a work in progress, but has been updated for patch 10.0.")
 end
 
 HR.SetAPL(250, APL, Init)

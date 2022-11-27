@@ -302,7 +302,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Vengeance DH rotation is currently a work in progress. It has been updated to work with patch 10.0.0, but is not currently based on an updated Simulationcraft APL, so it very well may not be optimal.")
+  HR.Print("Vengeance DH rotation is currently a work in progress. It has been updated to work with patch 10.0, but is not currently based on an updated Simulationcraft APL, so it very well may not be optimal.")
 end
 
 HR.SetAPL(581, APL, Init);
