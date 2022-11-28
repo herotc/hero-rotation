@@ -34,11 +34,11 @@ HR.GUISettings.APL.Monk = {
       LegSweep = true,
       RingOfPeace = true,
       Paralysis = true,
+      -- Racials
+      Racials = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      -- Racials
-      Racials = true,
       -- Abilities
       Interrupts = true,
     }
@@ -72,6 +72,7 @@ HR.GUISettings.APL.Monk = {
     ShowFortifyingBrewCD = false,
     IgnoreToK = false,
     IgnoreFSK = true,
+    FortifyingBrewHP = 40,
     PotionType = {
       Selected = "Power",
     },
@@ -139,6 +140,7 @@ CreateARPanelOptions(CP_Windwalker, "APL.Monk.Windwalker")
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.ShowFortifyingBrewCD", "Fortifying Brew", "Enable or disable Fortifying Brew recommendations.")
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.IgnoreToK", "Ignore Touch of Karma", "Enable this setting to allow you to ignore Touch of Karma without stalling the rotation. (NOTE: Touch of Karma will never be suggested if this is enabled)")
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.IgnoreFSK", "Ignore Flying Serpent Kick", "Enable this setting to allow you to ignore Flying Serpent Kick without stalling the rotation. (NOTE: Flying Serpent Kick will never be suggested if this is enabled)")
+CreatePanelOption("Slider", CP_Windwalker, "APL.Monk.Windwalker.FortifyingBrewHP", {1, 100, 1}, "Fortifying Brew HP Threshold", "Set the HP threshold for when to suggest Fortifying Brew.)")
 
 -- Brewmaster
 CreateARPanelOptions(CP_Brewmaster, "APL.Monk.Brewmaster")

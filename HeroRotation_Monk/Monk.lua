@@ -26,7 +26,7 @@ Spell.Monk.Commons = {
   -- Racials
   AncestralCall                         = Spell(274738),
   ArcaneTorrent                         = Spell(25046),
-  BagOfTricks                           = Spell(312411),
+  BagofTricks                           = Spell(312411),
   Berserking                            = Spell(26297),
   BloodFury                             = Spell(20572),
   GiftoftheNaaru                        = Spell(59547),
@@ -37,67 +37,42 @@ Spell.Monk.Commons = {
   -- Abilities
   CracklingJadeLightning                = Spell(117952),
   ExpelHarm                             = Spell(322101),
-  RisingSunKick                         = Spell(107428),
-  TigerPalm                             = Spell(100780),
-  TouchOfDeath                          = Spell(322109),
-  -- Talents
-  Celerity                              = Spell(115173),
-  ChiBurst                              = Spell(123986),
-  ChiWave                               = Spell(115098),
-  EyeOfTheTiger                         = Spell(196607),
-  GoodKarma                             = Spell(280195),
-  InnerStrengthBuff                     = Spell(261769),
-  RushingJadeWind                       = Spell(116847),
-  RushingJadeWindBuff                   = Spell(116847),
-  -- Talents
-  ChiTorpedo                            = Spell(115008),
-  DampenHarm                            = Spell(122278),
-  DampenHarmBuff                        = Spell(122278),
-  DiffuseMagic                          = Spell(122783),
-  EnergizingElixir                      = Spell(115288),
-  HealingElixir                         = Spell(122281),
   LegSweep                              = Spell(119381),
-  RingOfPeace                           = Spell(116844),
-  TigersLust                            = Spell(116841),
-  TigerTailSweep                        = Spell(264348),
-  -- Utility
-  Detox                                 = Spell(218164),
-  Disable                               = Spell(116095),
-  Paralysis                             = Spell(115078),
   Provoke                               = Spell(115546),
   Resuscitate                           = Spell(115178),
+  RisingSunKick                         = Spell(107428),
   Roll                                  = Spell(109132),
-  SpearHandStrike                       = Spell(116705),
+  TigerPalm                             = Spell(100780),
+  TouchofDeath                          = Spell(322109),
   Transcendence                         = Spell(101643),
   TranscendenceTransfer                 = Spell(119996),
   Vivify                                = Spell(116670),
-  -- Covenant Abilities (Shadowlands)
-  BonedustBrew                          = Spell(325216),
-  FaelineStomp                          = Spell(327104),
-  FaelineStompBuff                      = Spell(347480),
-  FaelineStompDebuff                    = Spell(327257),
-  FallenOrder                           = Spell(326860),
-  Fleshcraft                            = Spell(324631),
-  WeaponsOfOrder                        = Spell(310454),
-  WeaponsOfOrderChiBuff                 = Spell(311054),
-  WeaponsOfOrderDebuff                  = Spell(312106),
-  -- Soulbinds (Shadowlands)
-  GroveInvigoration                     = Spell(322721),
-  LeadByExample                         = Spell(342156),
-  PustuleEruption                       = Spell(351094),
-  VolatileSolvent                       = Spell(323074),
-  -- Conduits (Shadowlands)
-  FortifyingIngrediencesBuff            = Spell(336874),
-  -- Legendary Effects (Shadowlands)
-  ChiEnergyBuff                         = Spell(337571),
-  InvokersDelight                       = Spell(338321),
-  RecentlyRushingTigerPalm              = Spell(337341),
-  SkyreachExhaustion                    = Spell(337341),
-  TheEmperorsCapacitor                  = Spell(337291),
-  -- Trinket Effects
-  AcquiredAxeBuff                       = Spell(368656),
-  AcquiredWandBuff                      = Spell(368654),
-  ScarsofFraternalStrifeBuff4           = Spell(368638),
+  -- Talents
+  BonedustBrew                          = Spell(386276),
+  Celerity                              = Spell(115173),
+  ChiBurst                              = Spell(123986),
+  ChiTorpedo                            = Spell(115008),
+  ChiWave                               = Spell(115098),
+  DampenHarm                            = Spell(122278),
+  Detox                                 = Spell(218164),
+  Disable                               = Spell(116095),
+  DiffuseMagic                          = Spell(122783),
+  EyeoftheTiger                         = Spell(196607),
+  InnerStrengthBuff                     = Spell(261769),
+  Paralysis                             = Spell(115078),
+  RingofPeace                           = Spell(116844),
+  RushingJadeWind                       = Spell(116847),
+  SpearHandStrike                       = Spell(116705),
+  SummonWhiteTigerStatue                = Spell(388686),
+  TigerTailSweep                        = Spell(264348),
+  TigersLust                            = Spell(116841),
+  -- Buffs
+  BonedustBrewBuff                      = Spell(386276),
+  DampenHarmBuff                        = Spell(122278),
+  RushingJadeWindBuff                   = Spell(116847),
+  -- Debuffs
+  -- Item Effects
+  TheEmperorsCapacitorBuff              = Spell(235054),
   -- Misc
   PoolEnergy                            = Spell(999910),
   StopFoF                               = Spell(363653)
@@ -106,37 +81,44 @@ Spell.Monk.Commons = {
 Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   -- Abilities
   BlackoutKick                          = Spell(100784),
-  BlackoutKickBuff                      = Spell(116768),
-  FistsOfFury                           = Spell(113656),
   FlyingSerpentKick                     = Spell(101545),
-  FlyingSerpentKickActionBarReplacement = Spell(115057),
-  InvokeXuenTheWhiteTiger               = Spell(123904),
+  FlyingSerpentKickLand                 = Spell(115057),
   SpinningCraneKick                     = Spell(101546),
-  StormEarthAndFire                     = Spell(137639),
-  StormEarthAndFireBuff                 = Spell(137639),
-  StormEarthAndFireFixate               = Spell(221771),
-  -- Debuffs
-  MarkOfTheCraneDebuff                  = Spell(228287),
   -- Talents
-  DanceOfChijiBuff                      = Spell(325202),
-  FistOfTheWhiteTiger                   = Spell(261947),
+  BonedustBrew                          = Spell(386276),
+  FaelineHarmony                        = Spell(391412),
+  FaelineStomp                          = Spell(388193),
+  FistsofFury                           = Spell(113656),
   HitCombo                              = Spell(196740),
-  HitComboBuff                          = Spell(196741),
+  InvokeXuenTheWhiteTiger               = Spell(123904),
+  MarkoftheCrane                        = Spell(220357),
   Serenity                              = Spell(152173),
-  SerenityBuff                          = Spell(152173),
-  SpiritualFocus                        = Spell(280197),
+  ShadowboxingTreads                    = Spell(392982),
+  StormEarthAndFire                     = Spell(137639),
+  StormEarthAndFireFixate               = Spell(221771),
+  StrikeoftheWindlord                   = Spell(392983),
+  TeachingsoftheMonastery               = Spell(116645),
+  Thunderfist                           = Spell(392985),
   WhirlingDragonPunch                   = Spell(152175),
-  WhirlingDragonPunchBuff               = Spell(196742),
+  XuensBattlegear                       = Spell(392993),
   -- Defensive
   FortifyingBrew                        = Spell(243435),
-  TouchOfKarma                          = Spell(122470),
-  -- Conduits
-  CalculatedStrikes                     = Spell(336526),
-  CoordinatedOffensive                  = Spell(336598),
-  InnerFury                             = Spell(336452),
-  -- Tier 28 Set Bonus
-  PrimordialPotentialBuff               = Spell(363911),
-  PrimordialPowerBuff                   = Spell(368685),
+  TouchofKarma                          = Spell(122470),
+  -- Buffs
+  BlackoutKickBuff                      = Spell(116768),
+  DanceofChijiBuff                      = Spell(325202),
+  HitComboBuff                          = Spell(196741),
+  PowerStrikesBuff                      = Spell(129914),
+  SerenityBuff                          = Spell(152173),
+  StormEarthAndFireBuff                 = Spell(137639),
+  TeachingsoftheMonasteryBuff           = Spell(202090),
+  WhirlingDragonPunchBuff               = Spell(196742),
+  -- Debuffs
+  MarkoftheCraneDebuff                  = Spell(228287),
+  SkyreachExhaustionDebuff              = Spell(393050),
+  -- Tier 29 Effects
+  KicksofFlowingMomentumBuff            = Spell(394944),
+  FistsofFlowingMomentumBuff            = Spell(394949),
 })
 
 Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Commons, {
@@ -209,23 +191,6 @@ Spell.Monk.Mistweaver = MergeTableByKey(Spell.Monk.Commons, {
 -- Items
 if not Item.Monk then Item.Monk = {}; end
 Item.Monk.Commons = {
-  -- Potions
-  PotionofPhantomFire                  = Item(171349),
-  PotionofSpectralAgility              = Item(171270),
-  PotionofSpectralIntellect            = Item(171273),
-  -- Trinkets
-  CacheofAcquiredTreasures             = Item(188265, {13, 14}),
-  GladiatorsBadgeCosmic                = Item(186866, {13, 14}),
-  GladiatorsBadgeSinful                = Item(175921, {13, 14}),
-  GladiatorsBadgeUnchained             = Item(185197, {13, 14}),
-  InscrutibleQuantumDevice             = Item(179350, {13, 14}),
-  OverchargedAnimaBattery              = Item(180116, {13, 14}),
-  ScarsofFraternalStrife                = Item(188253, {13, 14}),
-  ShadowgraspTotem                     = Item(179356, {13, 14}),
-  TheFirstSigil                        = Item(188271, {13, 14}),
-  Wrathstone                           = Item(156000, {13, 14}),
-  -- Other On-Use Items
-  Jotungeirr                           = Item(186404),
 }
 
 Item.Monk.Windwalker = MergeTableByKey(Item.Monk.Commons, {

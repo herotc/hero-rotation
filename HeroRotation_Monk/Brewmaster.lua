@@ -34,8 +34,7 @@ local I = Item.Monk.Brewmaster
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.CacheofAcquiredTreasures:ID(),
-  I.ScarsofFraternalStrife:ID()
+  -- I.TrinketName:ID(),
 }
 
 -- Rotation Var
@@ -190,7 +189,7 @@ local function APL()
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     end
     -- use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up&time>1
-    if I.ScarsofFraternalStrife:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) and HL.CombatTime() > 1) then
+    --[[if I.ScarsofFraternalStrife:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) and HL.CombatTime() > 1) then
       if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife main 1"; end
     end
     -- use_item,name=cache_of_acquired_treasures,if=buff.acquired_axe.up|fight_remains<25
@@ -200,7 +199,7 @@ local function APL()
     -- use_item,name=jotungeirr_destinys_call
     if I.Jotungeirr:IsEquippedAndReady() then
       if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 3"; end
-    end
+    end]]
     -- use_items
     if (Settings.Commons.Enabled.Trinkets) then
       local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
@@ -212,9 +211,9 @@ local function APL()
     -- fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)
     -- Note: Handled via Defensives()
     -- potion
-    if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
+    --[[if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
       if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
-    end
+    end]]
     if CDsON() then
       -- blood_fury
       if S.BloodFury:IsCastable() then

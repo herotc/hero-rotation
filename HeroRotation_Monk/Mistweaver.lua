@@ -31,7 +31,7 @@ local I = Item.Monk.Mistweaver
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.ScarsofFraternalStrife:ID()
+  -- I.TrinketName:ID(),
 }
 
 -- Rotation Var
@@ -157,13 +157,13 @@ local function APL()
     -- Defensives
     local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     -- use_item,name=scars_of_fraternal_strife,if=!buff.scars_of_fraternal_strife_4.up&time>1
-    if I.ScarsofFraternalStrife:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) and HL.CombatTime() > 1) then
+    --[[if I.ScarsofFraternalStrife:IsEquippedAndReady() and Settings.Commons.Enabled.Trinkets and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) and HL.CombatTime() > 1) then
       if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife main 1"; end
     end
     -- use_item,name=jotungeirr_destinys_call
     if I.Jotungeirr:IsEquippedAndReady() then
       if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 2"; end
-    end
+    end]]
     -- use_items
     if Settings.Commons.Enabled.Trinkets then
       local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
@@ -195,9 +195,9 @@ local function APL()
       end
     end
     -- potion
-    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
+    --[[if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
       if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 16"; end
-    end
+    end]]
     -- weapons_of_order
     if S.WeaponsOfOrder:IsCastable() and CDsON() then
       if Cast(S.WeaponsOfOrder, nil, Settings.Commons.DisplayStyle.Covenant) then return "weapons_of_order main 18"; end
