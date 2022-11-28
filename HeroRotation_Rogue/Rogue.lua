@@ -63,12 +63,16 @@ Spell.Rogue.Commons = {
   Kick                    = Spell(1766),
   KidneyShot              = Spell(408),
   Sap                     = Spell(6770),
+  Shiv                    = Spell(5938),
+  SliceandDice            = Spell(315496),
   Shadowstep              = Spell(36554),
   Sprint                  = Spell(2983),
   TricksoftheTrade        = Spell(57934),
   -- Talents
   AcrobaticStrikes        = Spell(196924),
+  Alacrity                = Spell(193539),
   ColdBlood               = Spell(382245),
+  DeeperStratagem         = Spell(193531),
   EchoingReprimand        = Spell(385616),
   EchoingReprimand2       = Spell(323558),
   EchoingReprimand3       = Spell(323559),
@@ -77,18 +81,25 @@ Spell.Rogue.Commons = {
   FindWeakness            = Spell(91023),
   FindWeaknessDebuff      = Spell(316220),
   ImprovedAmbush          = Spell(381620),
+  MarkedforDeath          = Spell(137619),
+  Nightstalker            = Spell(14062),
   ResoundingClarity       = Spell(381622),
+  SealFate                = Spell(14190),
   Sepsis                  = Spell(385408),
   SepsisBuff              = Spell(375939),
-  ShadowDance             = Spell(185313),
+  ShadowDance             = Spell(185313), -- Base Spell
+  ShadowDanceTalent       = Spell(394930),
   ShadowDanceBuff         = Spell(185422),
   Subterfuge              = Spell(108208),
   SubterfugeBuff          = Spell(115192),
   ThistleTea              = Spell(381623),
+  Vigor                   = Spell(14983),
   -- Stealth
-  Stealth                 = Spell(108208):IsAvailable() and Spell(115191) or Spell(1784),
+  Stealth                 = Spell(1784),
+  Stealth2                = Spell(115191),
   Vanish                  = Spell(1856),
-  VanishBuff              = Spell(108208):IsAvailable() and Spell(115193) or Spell(11327),
+  VanishBuff              = Spell(11327),
+  VanishBuff2             = Spell(115193),
   -- Trinkets
   -- Misc
   PoolEnergy              = Spell(999910),
@@ -112,7 +123,6 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   PoisonedKnife           = Spell(185565),
   Rupture                 = Spell(1943),
   RuptureDeathmark        = Spell(360826),
-  SliceandDice            = Spell(315496),
   WoundPoison             = Spell(8679),
   WoundPoisonDebuff       = Spell(8680),
   -- Talents
@@ -122,7 +132,6 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   CutToTheChase           = Spell(51667),
   DashingScoundrel        = Spell(381797),
   Deathmark               = Spell(360194),
-  DeeperStratagem         = Spell(193531),
   Doomblade               = Spell(381673),
   DragonTemperedBlades    = Spell(381801),
   Elusiveness             = Spell(79008),
@@ -133,15 +142,12 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   IndiscriminateCarnage   = Spell(381802),
   InternalBleeding        = Spell(154953),
   Kingsbane               = Spell(385627),
-  MarkedforDeath          = Spell(137619),
   MasterAssassin          = Spell(255989),
   MasterAssassinBuff      = Spell(256735),
-  Nightstalker            = Spell(14062),
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
   SerratedBoneSpike       = Spell(385424),
   SerratedBoneSpikeDebuff = Spell(394036),
-  Shiv                    = Spell(5938),
   ShivDebuff              = Spell(319504),
   VenomRush               = Spell(152152),
   -- PvP
@@ -158,15 +164,12 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   Opportunity             = Spell(195627),
   PistolShot              = Spell(185763),
   RolltheBones            = Spell(315508),
-  Shiv                    = Spell(5938),
   SinisterStrike          = Spell(193315),
-  SliceandDice            = Spell(315496),
   -- Talents
   Audacity                = Spell(381845),
   AudacityBuff            = Spell(386270),
   BladeRush               = Spell(271877),
   CountTheOdds            = Spell(381982),
-  DeeperStratagem         = Spell(193531),
   Dreadblades             = Spell(343142),
   FanTheHammer            = Spell(381846),
   GhostlyStrike           = Spell(196937),
@@ -177,7 +180,6 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   KeepItRolling           = Spell(381989),
   KillingSpree            = Spell(51690),
   LoadedDiceBuff          = Spell(256171),
-  MarkedforDeath          = Spell(137619),
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
   QuickDraw               = Spell(196938),
@@ -205,30 +207,36 @@ Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
   Rupture                 = Spell(1943),
   ShadowBlades            = Spell(121471),
   Shadowstrike            = Spell(185438),
-  Shiv                    = Spell(5938),
   ShurikenStorm           = Spell(197835),
   ShurikenToss            = Spell(114014),
-  SliceandDice            = Spell(315496),
   SymbolsofDeath          = Spell(212283),
-  SymbolsofDeathCrit      = Spell(227151), 
   -- Talents
-  Alacrity                = Spell(193539),
+  DanseMacabre            = Spell(382528),
+  DanseMacabreBuff        = Spell(393969),
+  DarkBrew                = Spell(382504),
   DarkShadow              = Spell(245687),
-  DeeperStratagem         = Spell(193531),
   EnvelopingShadows       = Spell(238104),
+  Finality                = Spell(382525),
+  FinalityBlackPowderBuff = Spell(385948),
+  FinalityEviscerateBuff  = Spell(385949),
+  FinalityRuptureBuff     = Spell(385951),
+  Flagellation            = Spell(384631),
+  FlagellationPersistBuff = Spell(394758),
   Gloomblade              = Spell(200758),
-  MarkedforDeath          = Spell(137619),
+  LingeringShadow         = Spell(382524),
+  LingeringShadowBuff     = Spell(385960),
   MasterofShadows         = Spell(196976),
-  Nightstalker            = Spell(14062),
+  PerforatedVeinsBuff     = Spell(394254),
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
   Premeditation           = Spell(343160),
   PremeditationBuff       = Spell(343173),
+  SecretStratagem         = Spell(394320),
   SecretTechnique         = Spell(280719),
   ShadowFocus             = Spell(108209),
   ShurikenTornado         = Spell(277925),
-  Subterfuge              = Spell(108208),
-  Vigor                   = Spell(14983),
+  TheRotten               = Spell(382015),
+  TheRottenBuff           = Spell(394203),
   Weaponmaster            = Spell(193537),
   -- PvP
 })
@@ -246,6 +254,14 @@ Item.Rogue.Outlaw = {
 Item.Rogue.Subtlety = {
   -- Trinkets
 }
+
+function Commons.StealthSpell()
+  return Spell.Rogue.Commons.Subterfuge:IsAvailable() and Spell.Rogue.Commons.Stealth2 or Spell.Rogue.Commons.Stealth
+end
+
+function Commons.VanishBuffSpell()
+  return Spell.Rogue.Commons.Subterfuge:IsAvailable() and Spell.Rogue.Commons.VanishBuff2 or Spell.Rogue.Commons.VanishBuff
+end
 
 -- Stealth
 function Commons.Stealth(Stealth, Setting)

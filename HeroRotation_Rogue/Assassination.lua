@@ -483,7 +483,7 @@ local function CDs ()
   end
   -- actions.cds+=/cold_blood,if=combo_points>=4
   if S.ColdBlood:IsReady() and ComboPoints >= 4 then
-    if Cast(S.ColdBlood, Settings.Assassination.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
+    if Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
   end
 
   return ShouldReturn
@@ -744,8 +744,8 @@ local function APL ()
   -- Out of Combat
   if not Player:AffectingCombat() then
     -- actions=stealth
-    if not Player:BuffUp(S.VanishBuff) then
-      ShouldReturn = Rogue.Stealth(S.Stealth)
+    if not Player:BuffUp(Rogue.VanishBuffSpell()) then
+      ShouldReturn = Rogue.Stealth(Rogue.StealthSpell())
       if ShouldReturn then return ShouldReturn end
     end
     -- Flask

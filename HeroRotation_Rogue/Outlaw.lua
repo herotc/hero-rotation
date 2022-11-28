@@ -213,7 +213,7 @@ end
 -- # Checks if we are in an appropriate Stealth state for triggering the Count the Odds bonus
 local function Stealthed_CtO ()
   -- actions+=/variable,name=stealthed_cto,value=talent.count_the_odds&(stealthed.basic|buff.shadowmeld.up|buff.shadow_dance.up)
-  return S.CountTheOdds:IsAvailable() and (Player:BuffUp(S.Stealth) or Player:BuffUp(S.VanishBuff) or Player:BuffUp(S.Shadowmeld) or Player:BuffUp(S.ShadowDanceBuff))
+  return S.CountTheOdds:IsAvailable() and (Player:BuffUp(Rogue.StealthSpell()) or Player:BuffUp(Rogue.VanishBuffSpell()) or Player:BuffUp(S.Shadowmeld) or Player:BuffUp(S.ShadowDanceBuff))
 end
 
 -- # Finish at max possible CP without overflowing bonus combo points, unless for BtE which always should be 5+ CP
@@ -262,7 +262,7 @@ end
 local function StealthCDs ()
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     -- actions.stealth_cds=variable,name=vanish_condition,value=talent.hidden_opportunity|!talent.shadow_dance|!cooldown.shadow_dance.ready
-    if S.HiddenOpportunity:IsAvailable() or not S.ShadowDance:IsAvailable() or not S.ShadowDance:IsCastable() then
+    if S.HiddenOpportunity:IsAvailable() or not S.ShadowDanceTalent:IsAvailable() or not S.ShadowDance:IsCastable() then
       -- actions.stealth_cds+=/vanish,if=talent.find_weakness&debuff.find_weakness.down&variable.ambush_condition&variable.vanish_condition
       -- actions.stealth_cds+=/vanish,if=talent.hidden_opportunity&!buff.audacity.up&(variable.vanish_opportunity_condition|buff.opportunity.stack<buff.opportunity.max_stack)&variable.ambush_condition&variable.vanish_condition
       -- actions.stealth_cds+=/vanish,if=!talent.find_weakness&!talent.hidden_opportunity&variable.finish_condition&variable.vanish_condition     
@@ -272,7 +272,7 @@ local function StealthCDs ()
       end
       if S.HiddenOpportunity:IsAvailable() then
         -- actions.stealth_cds+=/variable,name=vanish_opportunity_condition,value=!talent.shadow_dance&talent.fan_the_hammer.rank+talent.quick_draw+talent.audacity<talent.count_the_odds+talent.keep_it_rolling
-        local VanishOpportunityCondition = not S.ShadowDance:IsAvailable()
+        local VanishOpportunityCondition = not S.ShadowDanceTalent:IsAvailable()
           and (S.FanTheHammer:TalentRank() + num(S.QuickDraw:IsAvailable()) + num(S.Audacity:IsAvailable()) < num(S.CountTheOdds:IsAvailable()) + num(S.KeepItRolling:IsAvailable()))
         if Player:BuffDown(S.AudacityBuff) and (VanishOpportunityCondition or Player:BuffStack(S.Opportunity) < (S.FanTheHammer:IsAvailable() and 6 or 1)) and Ambush_Condition() then
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (HO)" end
@@ -417,7 +417,7 @@ local function Stealth ()
   end
   -- actions.stealth+=/ambush,if=variable.stealthed_cto|stealthed.basic&talent.find_weakness&!debuff.find_weakness.up|talent.hidden_opportunity
   if S.Ambush:IsCastable() and Target:IsSpellInRange(S.Ambush) and (Stealthed_CtO() or S.HiddenOpportunity:IsAvailable()
-    or (Player:BuffUp(S.Stealth) or Player:BuffUp(S.VanishBuff)) and S.FindWeakness:IsAvailable() and not Target:DebuffUp(S.FindWeaknessDebuff)) then
+    or (Player:BuffUp(Rogue.StealthSpell()) or Player:BuffUp(Rogue.VanishBuffSpell())) and S.FindWeakness:IsAvailable() and not Target:DebuffUp(S.FindWeaknessDebuff)) then
     if HR.CastPooling(S.Ambush) then return "Cast Ambush" end
   end
 end
@@ -540,8 +540,8 @@ local function APL ()
   -- Out of Combat
   if not Player:AffectingCombat() then
     -- Stealth
-    if not Player:BuffUp(S.VanishBuff) then
-      ShouldReturn = Rogue.Stealth(S.Stealth)
+    if not Player:BuffUp(Rogue.VanishBuffSpell()) then
+      ShouldReturn = Rogue.Stealth(Rogue.StealthSpell())
       if ShouldReturn then return ShouldReturn end
     end
     -- Flask
@@ -607,7 +607,7 @@ local function APL ()
 
     -- # Higher priority Stealth list for Count the Odds or true Stealth/Vanish that will break in a single global
     -- actions+=/call_action_list,name=stealth,if=stealthed.basic|buff.shadowmeld.up
-    if Player:BuffUp(S.Stealth) or Player:BuffUp(S.VanishBuff) or Player:BuffUp(S.Shadowmeld) then
+    if Player:BuffUp(Rogue.StealthSpell()) or Player:BuffUp(Rogue.VanishBuffSpell()) or Player:BuffUp(S.Shadowmeld) then
       ShouldReturn = Stealth()
       if ShouldReturn then return "Stealth: " .. ShouldReturn end
     end

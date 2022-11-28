@@ -347,7 +347,7 @@
     -- Rogue
       [259]   = "HeroRotation_Rogue",         -- Assassination
       [260]   = "HeroRotation_Rogue",         -- Outlaw
-      --[261]   = "HeroRotation_Rogue",         -- Subtlety
+      [261]   = "HeroRotation_Rogue",         -- Subtlety
     -- Shaman
       [262]   = "HeroRotation_Shaman",        -- Elemental
       [263]   = "HeroRotation_Shaman",        -- Enhancement
