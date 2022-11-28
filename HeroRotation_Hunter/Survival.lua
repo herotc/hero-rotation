@@ -112,8 +112,8 @@ local function EvaluateTargetIfRaptorStrikeCleave(TargetUnit)
 end
 
 local function EvaluateTargetIfSerpentStingCleave(TargetUnit)
-  -- if=refreshable&target.time_to_die>8
-  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 8)
+  -- if=refreshable&target.time_to_die>12&(!talent.vipers_venom|talent.hydras_bite)
+  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 12 and ((not S.VipersVenom:IsAvailable()) or S.HydrasBite:IsAvailable()))
 end
 
 local function EvaluateTargetIfSerpentStingST(TargetUnit)
@@ -291,7 +291,7 @@ local function Cleave()
   if S.SteelTrap:IsCastable() and (CheckFocusCap(S.SteelTrap:ExecuteTime())) then
     if Cast(S.SteelTrap, Settings.Commons2.GCDasOffGCD.SteelTrap, nil, not Target:IsInRange(40)) then return "steel_trap cleave 40"; end
   end
-  -- serpent_sting,target_if=min:remains,if=refreshable&target.time_to_die>8
+  -- serpent_sting,target_if=min:remains,if=refreshable&target.time_to_die>12&(!talent.vipers_venom|talent.hydras_bite)
   if S.SerpentSting:IsReady() then
     if Everyone.CastTargetIf(S.SerpentSting, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingCleave, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting cleave 42"; end
   end
