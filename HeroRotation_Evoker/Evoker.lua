@@ -34,6 +34,7 @@ Spell.Evoker.Commons = {
   FireBreath                            = MultiSpell(357208,382266), -- with and without Font of Magic
   LivingFlame                           = Spell(361469),
   -- Talents
+  BlastFurnace                          = Spell(375510),
   ObsidianScales                        = Spell(363916),
   TipTheScales                          = Spell(370553),
   -- Buffs/Debuffs
@@ -69,13 +70,17 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   Pyre                                  = Spell(357211),
   RubyEmbers                            = Spell(365937),
   Scintillation                         = Spell(370821),
-  Tyranny                               = Spell(376888),
   ShatteringStar                        = Spell(370452),
-  -- Buffs/Debuffs
+  Snapfire                              = Spell(370783),
+  Tyranny                               = Spell(376888),
+  Volatility                            = Spell(369089),
+  -- Buffs
   BurnoutBuff                           = Spell(375802),
   ChargedBlastBuff                      = Spell(370454),
   EssenceBurstBuff                      = Spell(359618),
   SnapfireBuff                          = Spell(370818),
+  -- Debuffs
+  LivingFlameDebuff                     = Spell(361500),
 })
 
 -- Items
