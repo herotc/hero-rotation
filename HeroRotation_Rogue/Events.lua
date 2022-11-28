@@ -74,13 +74,6 @@ do
     Garrote = {},
     Rupture = {},
   }
-  local VendettaGUID = {}
-  local VendettaSpell = Spell.Rogue.Assassination.Vendetta
-
-  local Tier284pcEquipped = Player:HasTier(28, 4)
-  HL:RegisterForEvent(function()
-    Tier284pcEquipped = Player:HasTier(28, 4)
-  end, "PLAYER_EQUIPMENT_CHANGED")
 
   -- Exsanguinated Expression
   function Rogue.Exsanguinated(ThisUnit, ThisSpell)
@@ -103,11 +96,6 @@ do
   end
 
   function Rogue.WillLoseExsanguinate(ThisUnit, ThisSpell)
-    -- TODO: Check rate comparison for Exsang + Vendetta
-    if Tier284pcEquipped and ThisUnit:DebuffUp(VendettaSpell) then
-      return false
-    end
-    
     if Rogue.Exsanguinated(ThisUnit, ThisSpell) then
       return true
     end
@@ -116,7 +104,6 @@ do
   end
 
   function Rogue.ExsanguinatedRate(ThisUnit, ThisSpell)
-    -- TODO: Check rate comparison for Exsang + Vendetta
     if Rogue.Exsanguinated(ThisUnit, ThisSpell) then
       return 2.0
     end
@@ -136,15 +123,6 @@ do
             end
           end
         end
-      -- Vendetta
-      elseif Tier284pcEquipped and SpellID == 79140 then
-        for _, ExsanguinatedByGUID in pairs(ExsanguinatedByBleed) do
-          for GUID, _ in pairs(ExsanguinatedByGUID) do
-            if GUID == DestGUID then
-              ExsanguinatedByGUID[GUID] = true
-            end
-          end
-        end
       end
     end,
     "SPELL_CAST_SUCCESS"
@@ -152,32 +130,15 @@ do
   -- Bleed OnApply/OnRefresh Listener
   HL:RegisterForSelfCombatEvent(
     function(_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
-      if Tier284pcEquipped and SpellID == 79140 then
-        -- Vendetta
-        VendettaGUID[DestGUID] = true
-        if ExsanguinatedByBleed.CrimsonTempest[DestGUID] == false then
-          ExsanguinatedByBleed.CrimsonTempest[DestGUID] = true
-        end
-        if ExsanguinatedByBleed.Garrote[DestGUID] == false then
-          ExsanguinatedByBleed.Garrote[DestGUID] = true
-        end
-        if ExsanguinatedByBleed.Rupture[DestGUID] == false then
-            ExsanguinatedByBleed.Rupture[DestGUID] = true
-        end
-        return
-      end
-
-      -- Debuff are additionally Exsanguinated on cast when Vendetta is up 
-      local Exsanguinated = Tier284pcEquipped and VendettaGUID[DestGUID] or false
       if SpellID == 121411 then
         -- Crimson Tempest
-        ExsanguinatedByBleed.CrimsonTempest[DestGUID] = Exsanguinated
+        ExsanguinatedByBleed.CrimsonTempest[DestGUID] = false
       elseif SpellID == 703 then
         -- Garrote
-        ExsanguinatedByBleed.Garrote[DestGUID] = Exsanguinated
+        ExsanguinatedByBleed.Garrote[DestGUID] = false
       elseif SpellID == 1943 then
         -- Rupture
-        ExsanguinatedByBleed.Rupture[DestGUID] = Exsanguinated
+        ExsanguinatedByBleed.Rupture[DestGUID] = false
       end
     end,
     "SPELL_AURA_APPLIED", "SPELL_AURA_REFRESH"
@@ -185,12 +146,7 @@ do
   -- Bleed OnRemove Listener
   HL:RegisterForSelfCombatEvent(
     function(_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
-      if Tier284pcEquipped and SpellID == 79140 then
-        -- Vendetta
-        if VendettaGUID[DestGUID] ~= nil then
-          VendettaGUID[DestGUID] = nil
-        end
-      elseif SpellID == 121411 then
+      if SpellID == 121411 then
         -- Crimson Tempest
         if ExsanguinatedByBleed.CrimsonTempest[DestGUID] ~= nil then
           ExsanguinatedByBleed.CrimsonTempest[DestGUID] = nil
@@ -212,10 +168,6 @@ do
   -- Bleed OnUnitDeath Listener
   HL:RegisterForCombatEvent(
     function(_, _, _, _, _, _, _, DestGUID)
-      -- Vendetta
-      if VendettaGUID[DestGUID] ~= nil then
-        VendettaGUID[DestGUID] = nil
-      end
       -- Crimson Tempest
       if ExsanguinatedByBleed.CrimsonTempest[DestGUID] ~= nil then
         ExsanguinatedByBleed.CrimsonTempest[DestGUID] = nil
@@ -227,72 +179,6 @@ do
       -- Rupture
       if ExsanguinatedByBleed.Rupture[DestGUID] ~= nil then
         ExsanguinatedByBleed.Rupture[DestGUID] = nil
-      end
-    end,
-    "UNIT_DIED", "UNIT_DESTROYED"
-  )
-end
-
---- Relentless Strikes Energy Prediction
-do
-  -- Variables
-  local RelentlessStrikes = {
-    Offset = 0,
-    FinishDestGUID = nil,
-    FinishCount = 0,
-  }
-  -- Return RS adjusted Energy Predicted
-  function Rogue.EnergyPredictedWithRS()
-      return Player:EnergyPredicted() + RelentlessStrikes.Offset
-  end
-  -- Return RS adjusted Energy Deficit Predicted
-  function Rogue.EnergyDeficitPredictedWithRS()
-      return Player:EnergyDeficitPredicted() - RelentlessStrikes.Offset
-  end
-  -- Zero RSOffset after receiving relentless strikes energize
-  HL:RegisterForSelfCombatEvent(
-    function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
-      -- Relentless Strikes
-      if SpellID == 98440 then
-        RelentlessStrikes.Offset = 0
-      end
-    end,
-    "SPELL_ENERGIZE"
-  )
-  -- Running Combo Point tally to access after casting finisher
-  HL:RegisterForEvent(
-    function(_, _, PowerType)
-      if PowerType == "COMBO_POINTS"and Player:ComboPoints() > 0 then
-        RelentlessStrikes.Offsetvote = Player:ComboPoints() * 6
-      end
-    end,
-    "UNIT_POWER_UPDATE"
-  )
-  -- Set RSOffset when casting a finisher
-  HL:RegisterForSelfCombatEvent(
-    function(_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
-      -- Eviscerate & Rupture & Shadow Vault SpellIDs
-      if SpellID == 196819 or SpellID == 1943 or SpellID == 319175 then
-        RelentlessStrikes.FinishDestGUID = DestGUID
-        RelentlessStrikes.FinishCount = RelentlessStrikes.FinishCount + 1
-        RelentlessStrikes.Offset = RelentlessStrikes.Offsetvote
-        -- Backup clear
-        C_Timer.After(2, function ()
-            if RelentlessStrikes.FinishCount == 1 then
-              RelentlessStrikes.Offset = 0
-            end
-            RelentlessStrikes.FinishCount = RelentlessStrikes.FinishCount - 1
-          end
-        )
-      end
-    end,
-    "SPELL_CAST_SUCCESS"
-  )
-  -- Prevent RSOffset getting stuck when target dies mid-finisher (mostly DfA)
-  HL:RegisterForCombatEvent(
-    function(_, _, _, _, _, _, _, DestGUID)
-      if RelentlessStrikes.FinishDestGUID == DestGUID then
-        RelentlessStrikes.Offset = 0
       end
     end,
     "UNIT_DIED", "UNIT_DESTROYED"
@@ -338,7 +224,6 @@ do
     "SPELL_CAST_SUCCESS"
   )
 end
-
 
 --- Shadow Techniques Tracking
 do

@@ -66,89 +66,85 @@ Spell.Rogue.Commons = {
   Shadowstep              = Spell(36554),
   Sprint                  = Spell(2983),
   TricksoftheTrade        = Spell(57934),
-  -- Legendaries (Shadowlands)
-  MasterAssassinsMark     = Spell(340094),
-  -- Covenants (Shadowlands)
-  EchoingReprimand        = Spell(385616):IsAvailable() and Spell(385616) or Spell(323547),
+  -- Talents
+  AcrobaticStrikes        = Spell(196924),
+  ColdBlood               = Spell(382245),
+  EchoingReprimand        = Spell(385616),
   EchoingReprimand2       = Spell(323558),
   EchoingReprimand3       = Spell(323559),
   EchoingReprimand4       = Spell(323560),
   EchoingReprimand5       = Spell(354838),
-  Flagellation            = Spell(323654),
-  FlagellationBuff        = Spell(345569),
-  Fleshcraft              = Spell(324631),
-  Sepsis                  = Spell(328305),
-  SepsisBuff              = Spell(347037),
-  SerratedBoneSpike       = Spell(328547),
-  SerratedBoneSpikeDebuff = Spell(324073),
-  -- Soulbinds/Conduits (Shadowlands)
-  EffusiveAnimaAccelerator= Spell(352188),
-  KevinsOozeling          = Spell(352110),
-  KevinsWrathDebuff       = Spell(352528),
-  LeadbyExample           = Spell(342156),
-  LeadbyExampleBuff       = Spell(342181),
-  MarrowedGemstoneBuff    = Spell(327069),
-  PustuleEruption         = Spell(351094),
-  VolatileSolvent         = Spell(323074),
-  -- Domination Shards
-  ChaosBaneBuff           = Spell(355829),
+  FindWeakness            = Spell(91023),
+  FindWeaknessDebuff      = Spell(316220),
+  ImprovedAmbush          = Spell(381620),
+  ResoundingClarity       = Spell(381622),
+  Sepsis                  = Spell(385408),
+  SepsisBuff              = Spell(375939),
+  ShadowDance             = Spell(185313),
+  ShadowDanceBuff         = Spell(185422),
+  Subterfuge              = Spell(108208),
+  SubterfugeBuff          = Spell(115192),
+  ThistleTea              = Spell(381623),
+  -- Stealth
+  Stealth                 = Spell(108208):IsAvailable() and Spell(115191) or Spell(1784),
+  Vanish                  = Spell(1856),
+  VanishBuff              = Spell(108208):IsAvailable() and Spell(115193) or Spell(11327),
   -- Trinkets
-  AcquiredSword           = Spell(368657),
-  AcquiredAxe             = Spell(368656),
-  AcquiredWand            = Spell(368654),
-  TheFirstRune            = Spell(368635),
-  TheFourthRune           = Spell(368638),
-  TheFinalRune            = Spell(368641),
   -- Misc
   PoolEnergy              = Spell(999910),
-  SinfulRevelationDebuff  = Spell(324260),
 }
 
 Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   -- Abilities
   Ambush                  = Spell(8676),
+  AmplifyingPoison        = Spell(381664),
+  AmplifyingPoisonDebuff  = Spell(383414),
+  AmplifyingPoisonDebuffDeathmark = Spell(394328),
+  CripplingPoisonDebuff   = Spell(3409),
   DeadlyPoison            = Spell(2823),
   DeadlyPoisonDebuff      = Spell(2818),
+  DeadlyPoisonDebuffDeathmark = Spell(394324),
   Envenom                 = Spell(32645),
   FanofKnives             = Spell(51723),
   Garrote                 = Spell(703),
+  GarroteDeathmark        = Spell(360830),
   Mutilate                = Spell(1329),
   PoisonedKnife           = Spell(185565),
   Rupture                 = Spell(1943),
+  RuptureDeathmark        = Spell(360826),
   SliceandDice            = Spell(315496),
-  Stealth                 = Spell(1784),
-  Stealth2                = Spell(115191), -- w/ Subterfuge Talent
-  Vanish                  = Spell(1856),
-  VanishBuff              = Spell(11327),
-  Vendetta                = Spell(79140),
   WoundPoison             = Spell(8679),
   WoundPoisonDebuff       = Spell(8680),
   -- Talents
+  AtrophicPoisonDebuff    = Spell(392388),
   BlindsideBuff           = Spell(121153),
   CrimsonTempest          = Spell(121411),
+  CutToTheChase           = Spell(51667),
+  DashingScoundrel        = Spell(381797),
+  Deathmark               = Spell(360194),
   DeeperStratagem         = Spell(193531),
+  Doomblade               = Spell(381673),
+  DragonTemperedBlades    = Spell(381801),
   Elusiveness             = Spell(79008),
   Exsanguinate            = Spell(200806),
-  HiddenBladesBuff        = Spell(270070),
+  ImprovedGarrote         = Spell(381632),
+  ImprovedGarroteBuff     = Spell(392401),
+  ImprovedGarroteAura     = Spell(392403),
+  IndiscriminateCarnage   = Spell(381802),
   InternalBleeding        = Spell(154953),
+  Kingsbane               = Spell(385627),
   MarkedforDeath          = Spell(137619),
   MasterAssassin          = Spell(255989),
   MasterAssassinBuff      = Spell(256735),
   Nightstalker            = Spell(14062),
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
+  SerratedBoneSpike       = Spell(385424),
+  SerratedBoneSpikeDebuff = Spell(394036),
   Shiv                    = Spell(5938),
   ShivDebuff              = Spell(319504),
-  Subterfuge              = Spell(108208),
-  SubterfugeBuff          = Spell(115192),
   VenomRush               = Spell(152152),
   -- PvP
-  DeathfromAbove          = Spell(269513),
-  Maneuverability         = Spell(197000),
-  Neurotoxin              = Spell(206328),
-  SmokeBomb               = Spell(212182),
-  -- Set Bonuses (Shadowlands)
-  GrudgeMatchDebuff       = Spell(364668),
 })
 
 Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
@@ -165,13 +161,9 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   Shiv                    = Spell(5938),
   SinisterStrike          = Spell(193315),
   SliceandDice            = Spell(315496),
-  Stealth                 = Spell(1784),
-  Vanish                  = Spell(1856),
-  VanishBuff              = Spell(11327),
   -- Talents
   Audacity                = Spell(381845),
   AudacityBuff            = Spell(386270),
-  AcrobaticStrikes        = Spell(196924),
   BladeRush               = Spell(271877),
   CountTheOdds            = Spell(381982),
   DeeperStratagem         = Spell(193531),
@@ -179,9 +171,11 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   FanTheHammer            = Spell(381846),
   GhostlyStrike           = Spell(196937),
   GreenskinsWickers       = Spell(386823),
+  GreenskinsWickersBuff   = Spell(394131),
+  HiddenOpportunity       = Spell(383281),
+  ImprovedAdrenalineRush  = Spell(395422),
   KeepItRolling           = Spell(381989),
   KillingSpree            = Spell(51690),
-  ImprovedAdrenalineRush  = Spell(395422),
   LoadedDiceBuff          = Spell(256171),
   MarkedforDeath          = Spell(137619),
   PreyontheWeak           = Spell(131511),
@@ -193,12 +187,6 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   -- Utility
   Gouge                   = Spell(1776),
   -- PvP
-  DeathfromAbove          = Spell(269513),
-  Dismantle               = Spell(207777),
-  Maneuverability         = Spell(197000),
-  PlunderArmor            = Spell(198529),
-  SmokeBomb               = Spell(212182),
-  ThickasThieves          = Spell(221622),
   -- Roll the Bones
   Broadside               = Spell(193356),
   BuriedTreasure          = Spell(199600),
@@ -206,48 +194,23 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   RuthlessPrecision       = Spell(193357),
   SkullandCrossbones      = Spell(199603),
   TrueBearing             = Spell(193359),
-  -- Soulbinds/Conduits (Shadowlands)
-  AmbidexterityConduit    = Spell(341542),
-  CountTheOddsConduit     = Spell(341546),
-  -- Legendaries (Shadowlands)
-  ConcealedBlunderbuss    = Spell(340587),
-  DeathlyShadowsBuff      = Spell(341202),
-  GreenskinsWickersBuff   = Spell(386823):IsAvailable() and Spell(394131) or Spell(340573),
 })
 
 Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
-  -- Racials
-  AncestralCall           = Spell(274738),
-  ArcanePulse             = Spell(260364),
-  ArcaneTorrent           = Spell(50613),
-  BagofTricks             = Spell(312411),
-  Berserking              = Spell(26297),
-  BloodFury               = Spell(20572),
-  Fireblood               = Spell(265221),
-  LightsJudgment          = Spell(255647),
-  Shadowmeld              = Spell(58984),
   -- Abilities
   Backstab                = Spell(53),
   BlackPowder             = Spell(319175),
   Elusiveness             = Spell(79008),
   Eviscerate              = Spell(196819),
-  FindWeaknessDebuff      = Spell(316220),
   Rupture                 = Spell(1943),
   ShadowBlades            = Spell(121471),
-  ShadowDance             = Spell(185313),
-  ShadowDanceBuff         = Spell(185422),
   Shadowstrike            = Spell(185438),
   Shiv                    = Spell(5938),
   ShurikenStorm           = Spell(197835),
   ShurikenToss            = Spell(114014),
   SliceandDice            = Spell(315496),
-  Stealth                 = Spell(1784),
-  Stealth2                = Spell(115191), -- w/ Subterfuge Talent
   SymbolsofDeath          = Spell(212283),
-  SymbolsofDeathCrit      = Spell(227151),
-  Vanish                  = Spell(1856),
-  VanishBuff              = Spell(11327),
-  VanishBuff2             = Spell(115193), -- w/ Subterfuge Talent
+  SymbolsofDeathCrit      = Spell(227151), 
   -- Talents
   Alacrity                = Spell(193539),
   DarkShadow              = Spell(245687),
@@ -268,59 +231,20 @@ Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
   Vigor                   = Spell(14983),
   Weaponmaster            = Spell(193537),
   -- PvP
-  ColdBlood               = Spell(213981),
-  DeathfromAbove          = Spell(269513),
-  Maneuverability         = Spell(197000),
-  ShadowyDuel             = Spell(207736),
-  SmokeBomb               = Spell(212182),
-  VeilofMidnight          = Spell(198952),
-  -- Soulbinds/Conduits (Shadowlands)
-  DeeperDaggers           = Spell(341549),
-  PerforatedVeins         = Spell(341567),
-  PerforatedVeinsBuff     = Spell(341572),
-  -- Legendaries (Shadowlands)
-  DeathlyShadowsBuff      = Spell(341202),
-  FinalityBlackPowder     = Spell(340603),
-  FinalityEviscerate      = Spell(340600),
-  FinalityRupture         = Spell(340601),
-  TheRottenBuff           = Spell(341134),
 })
 
 -- Items
 if not Item.Rogue then Item.Rogue = {} end
 Item.Rogue.Assassination = {
   -- Trinkets
-  GalecallersBoon           = Item(159614, {13, 14}),
-  LustrousGoldenPlumage     = Item(159617, {13, 14}),
-  ComputationDevice         = Item(167555, {13, 14}),
-  VigorTrinket              = Item(165572, {13, 14}),
-  FontOfPower               = Item(169314, {13, 14}),
-  RazorCoral                = Item(169311, {13, 14}),
-  InscrutableQuantumDevice  = Item(179350, {13, 14}),
-  ShadowgraspTotem          = Item(179356, {13, 14}),
-  OverchargedAnimaBattery   = Item(180116, {13, 14}),
-  CacheOfAcquiredTreasures  = Item(188265, {13, 14}),
-  TheFirstSigil             = Item(188271, {13, 14}),
-  ScarsofFraternalStrife    = Item(188253, {13, 14}),
 }
 
 Item.Rogue.Outlaw = {
   -- Trinkets
-  ComputationDevice         = Item(167555, {13, 14}),
-  VigorTrinket              = Item(165572, {13, 14}),
-  FontOfPower               = Item(169314, {13, 14}),
-  RazorCoral                = Item(169311, {13, 14}),
-  CacheOfAcquiredTreasures  = Item(188265, {13, 14}),
-  ScarsofFraternalStrife    = Item(188253, {13, 14}),
 }
 
 Item.Rogue.Subtlety = {
-  ComputationDevice         = Item(167555, {13, 14}),
-  VigorTrinket              = Item(165572, {13, 14}),
-  FontOfPower               = Item(169314, {13, 14}),
-  RazorCoral                = Item(169311, {13, 14}),
-  CacheOfAcquiredTreasures  = Item(188265, {13, 14}),
-  ScarsofFraternalStrife    = Item(188253, {13, 14}),
+  -- Trinkets
 }
 
 -- Stealth
@@ -361,48 +285,53 @@ do
   local CripplingPoison     = Spell(3408)
   local DeadlyPoison        = Spell(2823)
   local InstantPoison       = Spell(315584)
+  local AmplifyingPoison    = Spell(381664)
   local NumbingPoison       = Spell(5761)
   local WoundPoison         = Spell(8679)
   local AtrophicPoison      = Spell(381637)
+
+  local PoisonRemains = 0
+  local UsingWoundPoison = false
+  
+  local function CastPoison(Poison)
+    PoisonRemains = Player:BuffRemains(Poison)
+    if PoisonRemains < (Player:AffectingCombat() and Settings.Commons.PoisonRefreshCombat * 60 or Settings.Commons.PoisonRefresh * 60) then
+      HR.CastSuggested(Poison)
+    end
+  end
 
   function Commons.Poisons()
     local PoisonRefreshTime = Player:AffectingCombat() and Settings.Commons.PoisonRefreshCombat * 60 or Settings.Commons.PoisonRefresh * 60
     local PoisonRemains
     -- Lethal Poison
-    PoisonRemains = Player:BuffRemains(WoundPoison)
-    if PoisonRemains > 0 then
-      if PoisonRemains < PoisonRefreshTime then
-        HR.CastSuggested(WoundPoison)
+    UsingWoundPoison = Player:BuffUp(WoundPoison)
+
+    if Spell.Rogue.Assassination.DragonTemperedBlades:IsAvailable() then
+      CastPoison(UsingWoundPoison and WoundPoison or DeadlyPoison)
+      if AmplifyingPoison:IsAvailable() then
+        CastPoison(AmplifyingPoison)
+      else
+        CastPoison(InstantPoison)
       end
     else
-      if DeadlyPoison:IsAvailable() then
-        PoisonRemains = Player:BuffRemains(DeadlyPoison)
-        if PoisonRemains < PoisonRefreshTime then
-          HR.CastSuggested(DeadlyPoison)
-        end
+      if UsingWoundPoison then
+        CastPoison(WoundPoison)
+      elseif AmplifyingPoison:IsAvailable() and Player:BuffDown(DeadlyPoison) then
+        CastPoison(AmplifyingPoison)
+      elseif DeadlyPoison:IsAvailable() then
+        CastPoison(DeadlyPoison)
       else
-        PoisonRemains = Player:BuffRemains(InstantPoison)
-        if PoisonRemains < PoisonRefreshTime then
-          HR.CastSuggested(InstantPoison)
-        end
+        CastPoison(InstantPoison)
       end
     end
+
     -- Non-Lethal Poisons
     if AtrophicPoison:IsAvailable() then
-      PoisonRemains = Player:BuffRemains(AtrophicPoison)
-      if PoisonRemains < PoisonRefreshTime then
-        HR.CastSuggested(AtrophicPoison)
-      end
+      CastPoison(AtrophicPoison)
     elseif NumbingPoison:IsAvailable() then
-      PoisonRemains = Player:BuffRemains(NumbingPoison)
-      if PoisonRemains < PoisonRefreshTime then
-        HR.CastSuggested(NumbingPoison)
-      end
+      CastPoison(NumbingPoison)
     else
-      PoisonRemains = Player:BuffRemains(CripplingPoison)
-      if PoisonRemains < PoisonRefreshTime then
-        HR.CastSuggested(CripplingPoison)
-      end
+      CastPoison(CripplingPoison)
     end
   end
 end
@@ -434,13 +363,16 @@ end
 function Commons.CanDoTUnit(ThisUnit, HealthThreshold)
   return Everyone.CanDoTUnit(ThisUnit, HealthThreshold)
 end
+
 --- ======= SIMC CUSTOM FUNCTION / EXPRESSION =======
 -- cp_max_spend
 do
   local DeeperStratagem = Spell(193531)
+  local DeviousStratagem = Spell(394321)
+  local SecretStratagem = Spell(394320)
 
   function Commons.CPMaxSpend()
-    return DeeperStratagem:IsAvailable() and 6 or 5
+    return 5 + (DeeperStratagem:IsAvailable() and 1 or 0) + (DeviousStratagem:IsAvailable() and 1 or 0) + (SecretStratagem:IsAvailable() and 1 or 0) 
   end
 end
 
@@ -484,46 +416,13 @@ end
 do
   local DeadlyPoisonDebuff = Spell.Rogue.Assassination.DeadlyPoisonDebuff
   local WoundPoisonDebuff = Spell.Rogue.Assassination.WoundPoisonDebuff
+  local AmplifyingPoisonDebuff = Spell.Rogue.Assassination.AmplifyingPoisonDebuff
+  local CripplingPoisonDebuff = Spell.Rogue.Assassination.CripplingPoisonDebuff
+  local AtrophicPoisonDebuff = Spell.Rogue.Assassination.AtrophicPoisonDebuff
 
   function Commons.Poisoned (ThisUnit)
-    return (ThisUnit:DebuffUp(DeadlyPoisonDebuff) or ThisUnit:DebuffUp(WoundPoisonDebuff)) and true or false
-  end
-end
-
--- poison_remains
---[[ Original SimC Code
-  if ( dots.deadly_poison -> is_ticking() ) {
-    return dots.deadly_poison -> remains();
-  } else if ( debuffs.wound_poison -> check() ) {
-    return debuffs.wound_poison -> remains();
-  } else {
-    return timespan_t::from_seconds( 0.0 );
-  }
-]]
-do
-  local DeadlyPoisonDebuff = Spell.Rogue.Assassination.DeadlyPoisonDebuff
-  local WoundPoisonDebuff = Spell.Rogue.Assassination.WoundPoisonDebuff
-
-  function Commons.PoisonRemains (ThisUnit)
-    return (ThisUnit:DebuffUp(DeadlyPoisonDebuff) and ThisUnit:DebuffRemains(DeadlyPoisonDebuff)) or (ThisUnit:DebuffUp(WoundPoisonDebuff) and ThisUnit:DebuffRemains(WoundPoisonDebuff)) or 0
-  end
-end
-
--- bleeds
---[[ Original SimC Code
-  rogue_td_t* tdata = get_target_data( target );
-  return tdata -> dots.garrote -> is_ticking() +
-          tdata -> dots.internal_bleeding -> is_ticking() +
-          tdata -> dots.rupture -> is_ticking();
-]]
-do
-  local Garrote = Spell.Rogue.Assassination.Garrote
-  local Rupture = Spell.Rogue.Assassination.Rupture
-  local CrimsonTempest = Spell.Rogue.Assassination.CrimsonTempest
-  local InternalBleeding = Spell.Rogue.Assassination.InternalBleeding
-
-  function Commons.Bleeds ()
-    return (Target:DebuffUp(Garrote) and 1 or 0) + (Target:DebuffUp(Rupture) and 1 or 0) + (Target:DebuffUp(CrimsonTempest) and 1 or 0) + (Target:DebuffUp(InternalBleeding) and 1 or 0)
+    return (ThisUnit:DebuffUp(DeadlyPoisonDebuff) or ThisUnit:DebuffUp(AmplifyingPoisonDebuff) or ThisUnit:DebuffUp(CripplingPoisonDebuff)
+      or ThisUnit:DebuffUp(WoundPoisonDebuff) or ThisUnit:DebuffUp(AtrophicPoisonDebuff)) and true or false
   end
 end
 
@@ -544,8 +443,10 @@ end
 ]]
 do
   local Garrote = Spell.Rogue.Assassination.Garrote
-  local InternalBleeding = Spell.Rogue.Assassination.InternalBleeding
+  local GarroteDeathmark = Spell.Rogue.Assassination.GarroteDeathmark
   local Rupture = Spell.Rogue.Assassination.Rupture
+  local RuptureDeathmark = Spell.Rogue.Assassination.RuptureDeathmark
+  local InternalBleeding = Spell.Rogue.Assassination.InternalBleeding
 
   local PoisonedBleedsCount = 0
   function Commons.PoisonedBleeds ()
@@ -554,28 +455,21 @@ do
       if Commons.Poisoned(ThisUnit) then
         if ThisUnit:DebuffUp(Garrote) then
           PoisonedBleedsCount = PoisonedBleedsCount + 1
-        end
-        if ThisUnit:DebuffUp(InternalBleeding) then
-          PoisonedBleedsCount = PoisonedBleedsCount + 1
+          if ThisUnit:DebuffUp(GarroteDeathmark) then
+            PoisonedBleedsCount = PoisonedBleedsCount + 1
+          end
         end
         if ThisUnit:DebuffUp(Rupture) then
+          PoisonedBleedsCount = PoisonedBleedsCount + 1
+          if ThisUnit:DebuffUp(RuptureDeathmark) then
+            PoisonedBleedsCount = PoisonedBleedsCount + 1
+          end
+        end
+        if ThisUnit:DebuffUp(InternalBleeding) then
           PoisonedBleedsCount = PoisonedBleedsCount + 1
         end
       end
     end
     return PoisonedBleedsCount
-  end
-end
-
--- Master Assassin's Mark Remains Check
-do
-  local MasterAssassinsMark, NominalDuration = Spell(340094), 4
-
-  function Commons.MasterAssassinsMarkRemains ()
-    if Player:BuffRemains(MasterAssassinsMark) < 0 then
-      return Player:GCDRemains() + NominalDuration
-    else
-      return Player:BuffRemains(MasterAssassinsMark)
-    end
   end
 end

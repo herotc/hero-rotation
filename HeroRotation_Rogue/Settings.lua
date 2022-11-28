@@ -32,9 +32,12 @@ HR.GUISettings.APL.Rogue = {
       Racials = true,
     },
     OffGCDasOffGCD = {
-      MarkedforDeath = true,
       Racials = true,
       Vanish = true,
+      ShadowDance = true,
+      ThistleTea = true,
+      ColdBlood = true,
+      MarkedforDeath = true,
     }
   },
   Commons2 = {
@@ -58,10 +61,13 @@ HR.GUISettings.APL.Rogue = {
       Selected = "Power",
     },
     GCDasOffGCD = {
+      Exsanguinate = false,
+      Kingsbane = false,
       Shiv = false,
     },
     OffGCDasOffGCD = {
-      Vendetta = true,
+      Deathmark = true,
+      IndiscriminateCarnage = true,
     }
   },
   Outlaw = {
@@ -75,7 +81,6 @@ HR.GUISettings.APL.Rogue = {
     RolltheBonesLeechRerollHP = 40, -- % HP threshold to reroll for Grand Melee while solo.
     UseDPSVanish = false, -- Use Vanish in the rotation for DPS
     KillingSpreeDisplayStyle = "Suggested",
-    DumpSpikes = false, -- don't dump bone spikes at end of boss, useful in M+
     PotionType = {
       Selected = "Power",
     },

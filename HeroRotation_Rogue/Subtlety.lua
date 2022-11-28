@@ -34,14 +34,12 @@ local I = Item.Rogue.Subtlety
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.CacheOfAcquiredTreasures:ID()
 }
 
 -- Rotation Var
 local Enemies30y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y
 local ShouldReturn; -- Used to get the return string
 local PoolingAbility, PoolingEnergy, PoolingFinisher; -- Used to store an ability we might want to pool for as a fallback in the current situation
-local Stealth, VanishBuff
 local RuptureThreshold, RuptureDMGThreshold
 local EffectiveComboPoints, ComboPoints, ComboPointsDeficit, StealthEnergyRequired
 local PriorityRotation
@@ -106,9 +104,7 @@ S.Eviscerate:RegisterDamageFormula(
         (1 + Player:VersatilityDmgPct() / 100) *
       --- Target Modifier
         -- Eviscerate R2 Multiplier
-        (Target:DebuffUp(S.FindWeaknessDebuff) and 1.5 or 1) *
-        -- Sinful Revelation Enchant
-        (Target:DebuffUp(S.SinfulRevelationDebuff) and 1.06 or 1)
+        (Target:DebuffUp(S.FindWeaknessDebuff) and 1.5 or 1)
   end
 )
 S.Rupture:RegisterPMultiplier(
@@ -344,8 +340,8 @@ end
 -- # Stealthed Rotation
 -- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
 local function Stealthed (ReturnSpellOnly, StealthSpell)
-  local StealthBuff = Player:BuffUp(Stealth) or (StealthSpell and StealthSpell:ID() == Stealth:ID())
-  local VanishBuffCheck = Player:BuffUp(VanishBuff) or (StealthSpell and StealthSpell:ID() == S.Vanish:ID())
+  local StealthBuff = Player:BuffUp(S.Stealth) or (StealthSpell and StealthSpell:ID() == S.Stealth:ID())
+  local VanishBuffCheck = Player:BuffUp(S.VanishBuff) or (StealthSpell and StealthSpell:ID() == S.Vanish:ID())
   local ShadowDanceBuff = Player:BuffUp(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
   local ShadowDanceBuffRemains = Player:BuffRemains(S.ShadowDanceBuff)
   if StealthSpell and StealthSpell:ID() == S.ShadowDance:ID() then
@@ -635,15 +631,6 @@ local function CDs ()
 
     -- Trinkets
     if Settings.Commons.UseTrinkets then
-      -- use_item,name=cache_of_acquired_treasures,if=(covenant.venthyr&buff.acquired_axe.up|!covenant.venthyr&buff.acquired_wand.up)&(spell_targets.shuriken_storm=1&raid_event.adds.in>60|fight_remains<25|variable.use_priority_rotation)|buff.acquired_axe.up&spell_targets.shuriken_storm>1
-      if I.CacheOfAcquiredTreasures:IsEquippedAndReady() then
-        if Player:BuffUp(S.AcquiredAxe) and MeleeEnemies10yCount > 1 then
-          if HR.Cast(I.CacheOfAcquiredTreasures, nil, Settings.Commons.TrinketDisplayStyle) then return "Cache for AoE" end
-        elseif (IsVenthyr and Player:BuffUp(S.AcquiredAxe) or not IsVenthyr and Player:BuffUp(S.AcquiredWand))
-          and (MeleeEnemies10yCount == 1 or PriorityRotation) and (Target:IsInBossList() or Target:IsDummy()) or HL.BossFilteredFightRemains("<", 25) then
-          if HR.Cast(I.CacheOfAcquiredTreasures, nil, Settings.Commons.TrinketDisplayStyle) then return "Cache for ST" end
-        end
-      end
       local DefaultTrinketCondition = Player:BuffUp(S.SymbolsofDeath) or HL.BossFilteredFightRemains("<", 20)
       -- actions.cds+=/use_items,if=buff.symbols_of_death.up|fight_remains<20
       if DefaultTrinketCondition then
@@ -754,15 +741,6 @@ local Interrupts = {
 
 -- APL Main
 local function APL ()
-  -- Spell ID Changes check
-  if S.Subterfuge:IsAvailable() then
-    Stealth = S.Stealth2
-    VanishBuff = S.VanishBuff2
-  else
-    Stealth = S.Stealth
-    VanishBuff = S.VanishBuff
-  end
-
   -- Reset pooling cache
   PoolingAbility = nil
   PoolingFinisher = nil
@@ -839,8 +817,8 @@ local function APL ()
   if not Player:AffectingCombat() then
     -- Stealth
     -- Note: Since 7.2.5, Blizzard disallowed Stealth cast under ShD (workaround to prevent the Extended Stealth bug)
-    if not Player:BuffUp(S.ShadowDanceBuff) and not Player:BuffUp(VanishBuff) then
-      ShouldReturn = Rogue.Stealth(Stealth)
+    if not Player:BuffUp(S.ShadowDanceBuff) and not Player:BuffUp(S.VanishBuff) then
+      ShouldReturn = Rogue.Stealth(S.Stealth)
       if ShouldReturn then return ShouldReturn end
     end
     -- Flask
