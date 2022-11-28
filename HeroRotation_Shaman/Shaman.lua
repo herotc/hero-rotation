@@ -142,6 +142,7 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   Stormkeeper                           = Spell(191634),
   StormkeeperBuff                       = Spell(191634),
   SurgeofPower                          = Spell(262303),
+  SwellingMaelstrom                     = Spell(384359),
   UnlimitedPower                        = Spell(260895),
   UnrelentingCalamity                   = Spell(382685),
   WindGustBuff                          = Spell(263806),

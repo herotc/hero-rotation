@@ -345,9 +345,17 @@ local function SingleTarget()
   if IsViable(S.ChainLightning) and (Shaman.Targets > 1 and Shaman.ClusterTargets > 1 and Player:StormkeeperP() and not S.SurgeofPower:IsAvailable()) then
     if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning single_target 24"; end
   end
-  -- lightning_bolt,if=buff.stormkeeper.up&!talent.surge_of_power.enabled
-  if IsViable(S.LightningBolt) and (Player:StormkeeperP() and not S.SurgeofPower:IsAvailable()) then
+  -- lava_burst,if=buff.stormkeeper.up&!buff.master_of_the_elements.up&!talent.surge_of_power.enabled&talent.master_of_the_elements.enabled
+  if IsViable(S.LavaBurst) and (Player:StormkeeperP() and (not Player:MOTEP()) and (not S.SurgeofPower:IsAvailable()) and S.MasteroftheElements:IsAvailable()) then
+    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 25"; end
+  end
+  -- lightning_bolt,if=buff.stormkeeper.up&!talent.surge_of_power.enabled&buff.master_of_the_elements.up
+  if IsViable(S.LightningBolt) and (Player:StormkeeperP() and (not S.SurgeofPower:IsAvailable()) and Player:MOTEP()) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 26"; end
+  end
+  -- lightning_bolt,if=buff.stormkeeper.up&!talent.surge_of_power.enabled&!talent.master_of_the_elements.enabled
+  if IsViable(S.LightningBolt) and (Player:StormkeeperP() and (not S.SurgeofPower:IsAvailable()) and not S.MasteroftheElements:IsAvailable()) then
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 27"; end
   end
   -- lightning_bolt,if=buff.surge_of_power.up
   if IsViable(S.LightningBolt) and (Player:BuffUp(S.SurgeofPowerBuff)) then
@@ -377,9 +385,17 @@ local function SingleTarget()
   if IsViable(S.LavaBurst) and (Player:BuffUp(S.LavaSurgeBuff)) then
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 40"; end
   end
+  -- lava_burst,if=talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&maelstrom>=50&!talent.swelling_maelstrom.enabled&maelstrom<=80
+  if IsViable(S.LavaBurst) and (S.MasteroftheElements:IsAvailable() and (not Player:MOTEP()) and Player:MaelstromP() >= 50 and (not S.SwellingMaelstrom:IsAvailable()) and Player:MaelstromP() <= 80) then
+    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 41"; end
+  end
+  -- lava_burst,if=talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&maelstrom>=50&talent.swelling_maelstrom.enabled&maelstrom<=130
+  if IsViable(S.LavaBurst) and (S.MasteroftheElements:IsAvailable() and (not Player:MOTEP()) and Player:MaelstromP() >= 50 and S.SwellingMaelstrom:IsAvailable() and Player:MaelstromP() <= 130) then
+    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 42"; end
+  end
   -- earthquake,if=buff.echoes_of_great_sundering.up&(!talent.elemental_blast.enabled&active_enemies<2|active_enemies>1)
   if S.Earthquake:IsReady() and (Player:BuffUp(S.EchoesofGreatSunderingBuff) and ((not S.ElementalBlast:IsAvailable()) and Shaman.Targets < 2 or Shaman.Targets > 1)) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 42"; end
+    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 43"; end
   end
   -- earthquake,if=active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)&!talent.echoes_of_great_sundering.enabled&!talent.elemental_blast.enabled
   if S.Earthquake:IsReady() and (Shaman.Targets > 1 and Shaman.ClusterTargets > 1 and (not S.EchoesofGreatSundering:IsAvailable()) and not S.ElementalBlast:IsAvailable()) then
@@ -421,9 +437,19 @@ local function SingleTarget()
   if IsViable(S.LightningBolt) and (Pet:IsActive() and Pet:Name() == "Primal Storm Elemental" and Target:DebuffUp(S.LightningRodDebuff) and (Target:DebuffUp(S.ElectrifiedShocksDebuff) or Player:BuffUp(S.PoweroftheMaelstromBuff))) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 62"; end
   end
+  -- frost_shock,if=buff.icefury.up&buff.master_of_the_elements.up&!buff.lava_surge.up&!talent.electrified_shocks.enabled&!talent.flux_melting.enabled&cooldown.lava_burst.charges_fractional<1.0&talent.echoes_of_the_elements.enabled
+  -- Note: echoes_of_the_elements doesn't appear to exist???
+  if S.FrostShock:IsCastable() and (Player:IcefuryP() and Player:MOTEP() and Player:BuffDown(S.LavaSurgeBuff) and (not S.ElectrifiedShocks:IsAvailable()) and (not S.FluxMelting:IsAvailable()) and S.LavaBurst:ChargesFractional() < 1.0) then
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 63"; end
+  end
+  -- lightning_bolt,if=buff.master_of_the_elements.up&!buff.lava_surge.up&(cooldown.lava_burst.charges_fractional<1.0&talent.echoes_of_the_elements.enabled)
+  -- Note: echoes_of_the_elements doesn't appear to exist???
+  if IsViable(S.LightningBolt) and (Player:MOTEP() and Player:BuffDown(S.LavaSurgeBuff) and (S.LavaBurst:ChargesFractional() < 1.0)) then
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 64"; end
+  end
   -- lava_burst,target_if=dot.flame_shock.remains>2
   if IsViable(S.LavaBurst) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 64"; end
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 65"; end
   end
   -- frost_shock,if=buff.icefury.up&!talent.electrified_shocks.enabled&!talent.flux_melting.enabled
   if S.FrostShock:IsCastable() and (Player:IcefuryP() and (not S.ElectrifiedShocks:IsAvailable()) and not S.FluxMelting:IsAvailable()) then
