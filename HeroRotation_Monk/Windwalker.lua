@@ -379,7 +379,7 @@ local function Serenity()
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity 16"; end
   end
   -- whirling_dragon_punch,if=active_enemies>1
-  if S.WhirlingDragonPunch:IsCastable() and (EnemiesCount8y > 1) then
+  if S.WhirlingDragonPunch:IsReady() and (EnemiesCount8y > 1) then
     if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch serenity 18"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=active_enemies>=3&cooldown.fists_of_fury.remains&talent.shadowboxing_treads
@@ -403,7 +403,7 @@ local function Serenity()
     if Cast(S.BlackoutKick, nil, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick serenity 26"; end
   end
   -- whirling_dragon_punch
-  if S.WhirlingDragonPunch:IsCastable() then
+  if S.WhirlingDragonPunch:IsReady() then
     if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch serenity 28"; end
   end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=talent.teachings_of_the_monastery&buff.teachings_of_the_monastery.stack<3
@@ -426,7 +426,7 @@ local function Aoe()
     if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsInMeleeRange(5)) then return "strike_of_the_windlord aoe 6"; end
   end
   -- whirling_dragon_punch,if=active_enemies>8
-  if S.WhirlingDragonPunch:IsCastable() and (EnemiesCount8y > 8) then
+  if S.WhirlingDragonPunch:IsReady() and (EnemiesCount8y > 8) then
     if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch aoe 8"; end
   end
   -- spinning_crane_kick,if=buff.bonedust_brew.up&combo_strike&active_enemies>5&spinning_crane_kick.modifier>=3.2
@@ -446,7 +446,7 @@ local function Aoe()
     if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsInMeleeRange(5)) then return "strike_of_the_windlord aoe 16"; end
   end
   -- whirling_dragon_punch,if=active_enemies>5
-  if S.WhirlingDragonPunch:IsCastable() and (EnemiesCount8y > 5) then
+  if S.WhirlingDragonPunch:IsReady() and (EnemiesCount8y > 5) then
     if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch aoe 18"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=buff.teachings_of_the_monastery.up&(buff.teachings_of_the_monastery.stack=2|active_enemies<5)&talent.shadowboxing_treads
@@ -454,7 +454,7 @@ local function Aoe()
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick aoe 20"; end
   end
   -- whirling_dragon_punch
-  if S.WhirlingDragonPunch:IsCastable() then
+  if S.WhirlingDragonPunch:IsReady() then
     if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch aoe 22"; end
   end
   -- spinning_crane_kick,if=buff.bonedust_brew.up&combo_strike
@@ -510,7 +510,7 @@ local function Aoe()
     if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick aoe 48"; end
   end
   -- whirling_dragon_punch
-  if S.WhirlingDragonPunch:IsCastable() then
+  if S.WhirlingDragonPunch:IsReady() then
     if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch aoe 50"; end
   end
 end
@@ -553,7 +553,7 @@ local function STCleave()
     if Cast(S.BlackoutKick, nil, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick st_cleave 18"; end
   end
   -- whirling_dragon_punch,if=active_enemies=2
-  if S.WhirlingDragonPunch:IsCastable() and (EnemiesCount8y == 2) then
+  if S.WhirlingDragonPunch:IsReady() and (EnemiesCount8y == 2) then
     if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch st_cleave 20"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=buff.teachings_of_the_monastery.stack=3
@@ -581,7 +581,7 @@ local function STCleave()
     if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick st_cleave 32"; end
   end
   -- whirling_dragon_punch
-  if S.WhirlingDragonPunch:IsCastable() then
+  if S.WhirlingDragonPunch:IsReady() then
     if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch st_cleave 34"; end
   end
   -- rushing_jade_wind,if=!buff.rushing_jade_wind.up
