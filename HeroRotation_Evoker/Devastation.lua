@@ -148,6 +148,8 @@ local function Trinkets()
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
   end
+  -- invoke_external_buff,name=power_infusion,if=!buff.power_infusion.up&buff.dragonrage.up
+  -- Note: Not handling external buffs
 end
 
 local function ES()
