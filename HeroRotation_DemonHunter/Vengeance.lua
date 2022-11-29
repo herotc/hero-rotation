@@ -70,6 +70,12 @@ local function UpdateSoulFragments()
 
   -- Check if we have cast Fracture or Shear within the last GCD and haven't "snapshot" yet
   if SoulFragmentsAdjusted == 0 then
+    if S.SoulCarver:IsAvailable() then
+      if S.SoulCarver:TimeSinceLastCast() < Player:GCD() and S.SoulCarver.LastCastTime ~= LastSoulFragmentAdjustment then
+        SoulFragmentsAdjusted = math.min(SoulFragments + 2, 5)
+        LastSoulFragmentAdjustment = S.SoulCarver.LastCastTime
+      end
+    end
     if S.Fracture:IsAvailable() then
       if S.Fracture:TimeSinceLastCast() < Player:GCD() and S.Fracture.LastCastTime ~= LastSoulFragmentAdjustment then
         SoulFragmentsAdjusted = math.min(SoulFragments + 2, 5)
@@ -152,7 +158,7 @@ local function Defensives()
     if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis) then return "metamorphosis defensives"; end
   end
   -- Fiery Brand
-  if S.FieryBrand:IsCastable() and Target:DebuffDown(S.FieryBrandDebuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
+  if S.FieryBrand:IsCastable() and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
     if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand defensives"; end
   end
 end
