@@ -103,6 +103,7 @@ end
 
 function Commons.GroupBuffMissing(spell)
   local range = 40
+  local buffIDs = { 381732, 381741, 381746, 381748, 381749, 381750, 381751, 381752, 381753, 381754, 381756, 381757, 381758 }
   if spell:Name() == "Battle Shout" then range = 100 end
   local Group
   if UnitInRaid("player") then
@@ -113,8 +114,17 @@ function Commons.GroupBuffMissing(spell)
     return false
   end
   for _, Char in pairs(Group) do
-    if Char:Exists() and Char:IsInRange(range) and Char:BuffDown(spell, true) then
-      return true
+    if spell:Name() == "Blessing of the Bronze" then
+      if Char:Exists() and Char:IsInRange(range) then
+        for _, v in pairs(buffIDs) do
+          if Char:BuffUp(HL.Spell(v)) then return false end
+        end
+        return true
+      end
+    else
+      if Char:Exists() and Char:IsInRange(range) and Char:BuffDown(spell, true) then
+        return true
+      end
     end
   end
   return false
