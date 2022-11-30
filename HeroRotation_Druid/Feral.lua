@@ -334,7 +334,7 @@ local function Finisher()
   end
   -- primal_wrath,target_if=refreshable,if=spell_targets.primal_wrath>1
   if S.PrimalWrath:IsReady() and (EnemiesCount11y > 1) then
-    if Everyone.CastTargetIf(S.PrimalWrath, Enemies11y, EvaluateCyclePrimalWrath, not Target:IsInMeleeRange(11)) then return "primal_wrath finisher 4"; end
+    if Everyone.CastCycle(S.PrimalWrath, Enemies11y, EvaluateCyclePrimalWrath, not Target:IsInMeleeRange(11)) then return "primal_wrath finisher 4"; end
   end
   -- rip,target_if=refreshable
   if S.Rip:IsReady() then
