@@ -231,7 +231,7 @@ local function Aoe()
   end
   -- deep_breath,if=!buff.dragonrage.up
   if S.DeepBreath:IsCastable() and CDsON() and (not VarDragonrageUp) then
-    if Cast(S.DeepBreath, Settings.Commons.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath aoe 10"; end
+    if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath aoe 10"; end
   end
   -- firestorm
   if S.Firestorm:IsCastable() then
