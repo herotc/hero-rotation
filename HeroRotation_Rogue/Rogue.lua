@@ -342,10 +342,14 @@ do
     end
 
     -- Non-Lethal Poisons
-    if AtrophicPoison:IsAvailable() then
-      CastPoison(AtrophicPoison)
-    elseif NumbingPoison:IsAvailable() then
-      CastPoison(NumbingPoison)
+    if Player:BuffDown(CripplingPoison) then
+      if AtrophicPoison:IsAvailable() then
+        CastPoison(AtrophicPoison)
+      elseif NumbingPoison:IsAvailable() then
+        CastPoison(NumbingPoison)
+      else
+        CastPoison(CripplingPoison)
+      end
     else
       CastPoison(CripplingPoison)
     end
