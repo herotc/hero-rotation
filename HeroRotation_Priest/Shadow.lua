@@ -265,7 +265,7 @@ local function Main()
     if ShouldReturn then return ShouldReturn; end
   end
   -- mind_blast,if=cooldown.mind_blast.charges>=2&talent.mind_devourer&spell_targets.mind_sear>=3&spell_targets.mind_sear<=7&!buff.mind_devourer.up
-  if S.MindBlast:IsCastable() and (S.MindBlast:Charges() >= 2 and S.MindDevourer:IsAvailable() and Enemies10ySplash >= 3 and Enemies10ySplash <= 7 and Player:BuffDown(S.MindDevourerBuff)) then
+  if S.MindBlast:IsCastable() and (S.MindBlast:Charges() >= 2 and S.MindDevourer:IsAvailable() and EnemiesCount10ySplash >= 3 and EnemiesCount10ySplash <= 7 and Player:BuffDown(S.MindDevourerBuff)) then
     if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 5"; end
   end
   -- shadow_word_death,if=pet.fiend.active&talent.inescapable_torment&(pet.fiend.remains<=gcd|target.health.pct<20)&spell_targets.mind_sear<=7
