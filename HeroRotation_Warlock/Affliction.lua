@@ -201,7 +201,7 @@ local function APL()
     if S.SiphonLife:IsCastable() and (Target:DebuffRemains(S.SiphonLifeDebuff) < 5) then
       if Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life main 12"; end
     end
-    -- corruption,if=dot.corruption_dot.remains<5
+    -- corruption,if=remains<5
     if S.Corruption:IsCastable() and (Target:DebuffRemains(S.CorruptionDebuff) < 5) then
       if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption main 14"; end
     end
@@ -238,7 +238,7 @@ local function APL()
     if S.Agony:IsCastable() and (Target:DebuffRefreshable(S.AgonyDebuff)) then
       if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony main 28"; end
     end
-    -- corruption,if=dot.corruption_dot.refreshable
+    -- corruption,if=refreshable
     if S.Corruption:IsCastable() and (Target:DebuffRefreshable(S.CorruptionDebuff)) then
       if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption main 30"; end
     end
