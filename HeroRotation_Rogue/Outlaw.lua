@@ -211,9 +211,10 @@ local function RtB_Reroll ()
 end
 
 -- # Checks if we are in an appropriate Stealth state for triggering the Count the Odds bonus
-local function Stealthed_CtO ()
+local function Stealthed_CtO (BypassRecovery)
   -- actions+=/variable,name=stealthed_cto,value=talent.count_the_odds&(stealthed.basic|buff.shadowmeld.up|buff.shadow_dance.up)
-  return S.CountTheOdds:IsAvailable() and (Player:BuffUp(Rogue.StealthSpell()) or Player:BuffUp(Rogue.VanishBuffSpell()) or Player:BuffUp(S.Shadowmeld) or Player:BuffUp(S.ShadowDanceBuff))
+  return S.CountTheOdds:IsAvailable() and (Player:BuffUp(Rogue.StealthSpell(), nil, BypassRecovery) or Player:BuffUp(Rogue.VanishBuffSpell(), nil, BypassRecovery)
+    or Player:BuffUp(S.Shadowmeld, nil, BypassRecovery) or Player:BuffUp(S.ShadowDanceBuff, nil, BypassRecovery))
 end
 
 -- # Finish at max possible CP without overflowing bonus combo points, unless for BtE which always should be 5+ CP
@@ -299,7 +300,7 @@ local function StealthCDs ()
         end
       else
         if Player:BuffUp(S.SliceandDice) and (Finish_Condition() or S.HiddenOpportunity:IsAvailable())
-          and (not S.HiddenOpportunity:IsAvailable() or not S.Vanish:CooldownUp()) then
+          and (not S.HiddenOpportunity:IsAvailable() or not S.Vanish:CooldownUp() or not Vanish_DPS_Condition()) then
           if HR.Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
           return
         end
@@ -329,7 +330,7 @@ local function CDs ()
   end
   if Target:IsSpellInRange(S.SinisterStrike) then
     -- actions.cds+=/call_action_list,name=stealth_cds,if=!stealthed.all|talent.count_the_odds&!variable.stealthed_cto
-    if not Player:StealthUp(true, true) or S.CountTheOdds:IsAvailable() and not Stealthed_CtO() then
+    if not Player:StealthUp(true, true, true) or S.CountTheOdds:IsAvailable() and not Stealthed_CtO(true) then
       ShouldReturn = StealthCDs()
       if ShouldReturn then return ShouldReturn end
     end
@@ -538,9 +539,9 @@ local function APL ()
   Rogue.Poisons()
 
   -- Out of Combat
-  if not Player:AffectingCombat() then
+  if not Player:AffectingCombat() and S.Vanish:TimeSinceLastCast() > 1 then
     -- Stealth
-    if not Player:BuffUp(Rogue.VanishBuffSpell()) then
+    if not Player:StealthUp(true, false) then
       ShouldReturn = Rogue.Stealth(Rogue.StealthSpell())
       if ShouldReturn then return ShouldReturn end
     end
@@ -564,20 +565,24 @@ local function APL ()
         if HR.Cast(S.AdrenalineRush) then return "Cast Adrenaline Rush (Opener)" end
       end
       -- actions.precombat+=/roll_the_bones,precombat_seconds=2
-      if S.RolltheBones:IsReady() and (Rogue.RtBRemains() > 0 or RtB_Reroll()) then
+      if S.RolltheBones:IsReady() and (Rogue.RtBRemains() <= 0 or RtB_Reroll()) then
         if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones (Opener)" end
       end
       -- actions.precombat+=/slice_and_dice,precombat_seconds=1
       if S.SliceandDice:IsReady() and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints) * 1.8 then
         if HR.CastPooling(S.SliceandDice) then return "Cast Slice and Dice (Opener)" end
       end
-      if Player:StealthUp(true, true) then
+      if Player:StealthUp(true, false) then
         ShouldReturn = Stealth()
         if ShouldReturn then return "Stealth (Opener): " .. ShouldReturn end
+        if S.Ambush:IsCastable() then
+          if HR.Cast(S.Ambush) then return "Cast Ambush (Opener)" end
+        end
       elseif Finish_Condition() then
         ShouldReturn = Finish()
         if ShouldReturn then return "Finish (Opener): " .. ShouldReturn end
-      elseif S.SinisterStrike:IsCastable() then
+      end
+      if S.SinisterStrike:IsCastable() then
         if HR.Cast(S.SinisterStrike) then return "Cast Sinister Strike (Opener)" end
       end
     end
