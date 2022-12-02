@@ -89,6 +89,7 @@ HR.GUISettings.APL.Rogue = {
       BladeRush = false,
       GhostlyStrike = false,
       Dreadblades = false,
+      KeepItRolling = false,
     },
     OffGCDasOffGCD = {
       AdrenalineRush = true,

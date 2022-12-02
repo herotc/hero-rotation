@@ -213,7 +213,7 @@ end
 -- # Checks if we are in an appropriate Stealth state for triggering the Count the Odds bonus
 local function Stealthed_CtO (BypassRecovery)
   -- actions+=/variable,name=stealthed_cto,value=talent.count_the_odds&(stealthed.basic|buff.shadowmeld.up|buff.shadow_dance.up)
-  return S.CountTheOdds:IsAvailable() and (Player:BuffUp(Rogue.StealthSpell(), nil, BypassRecovery) or Player:BuffUp(Rogue.VanishBuffSpell(), nil, BypassRecovery)
+  return S.CountTheOdds:IsAvailable() and (Player:StealthUp(false, false, BypassRecovery)
     or Player:BuffUp(S.Shadowmeld, nil, BypassRecovery) or Player:BuffUp(S.ShadowDanceBuff, nil, BypassRecovery))
 end
 
@@ -326,7 +326,7 @@ local function CDs ()
   if S.KeepItRolling:IsCastable() and not RtB_Reroll()
     and (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.TrueBearing)) + num(Player:BuffUp(S.SkullandCrossbones))) > 2
     and (Player:BuffDown(S.ShadowDanceBuff) or RtB_Buffs() >= 6) then
-    if HR.Cast(S.KeepItRolling) then return "Cast Keep it Rolling" end
+    if HR.Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then return "Cast Keep it Rolling" end
   end
   if Target:IsSpellInRange(S.SinisterStrike) then
     -- actions.cds+=/call_action_list,name=stealth_cds,if=!stealthed.all|talent.count_the_odds&!variable.stealthed_cto
@@ -418,7 +418,7 @@ local function Stealth ()
   end
   -- actions.stealth+=/ambush,if=variable.stealthed_cto|stealthed.basic&talent.find_weakness&!debuff.find_weakness.up|talent.hidden_opportunity
   if S.Ambush:IsCastable() and Target:IsSpellInRange(S.Ambush) and (Stealthed_CtO() or S.HiddenOpportunity:IsAvailable()
-    or (Player:BuffUp(Rogue.StealthSpell()) or Player:BuffUp(Rogue.VanishBuffSpell())) and S.FindWeakness:IsAvailable() and not Target:DebuffUp(S.FindWeaknessDebuff)) then
+    or Player:StealthUp(false, false) and S.FindWeakness:IsAvailable() and not Target:DebuffUp(S.FindWeaknessDebuff)) then
     if HR.CastPooling(S.Ambush) then return "Cast Ambush" end
   end
 end
@@ -612,7 +612,7 @@ local function APL ()
 
     -- # Higher priority Stealth list for Count the Odds or true Stealth/Vanish that will break in a single global
     -- actions+=/call_action_list,name=stealth,if=stealthed.basic|buff.shadowmeld.up
-    if Player:BuffUp(Rogue.StealthSpell()) or Player:BuffUp(Rogue.VanishBuffSpell()) or Player:BuffUp(S.Shadowmeld) then
+    if Player:StealthUp(false, false) or Player:BuffUp(S.Shadowmeld) then
       ShouldReturn = Stealth()
       if ShouldReturn then return "Stealth: " .. ShouldReturn end
     end
