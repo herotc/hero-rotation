@@ -13,6 +13,9 @@ local HR      = HeroRotation
 -- Spells
 local SpellDeva = Spell.Evoker.Devastation
 -- Lua
+-- API
+local GetPowerRegenForPowerType = GetPowerRegenForPowerType
+local EssencePowerType = Enum.PowerType.Essence
 
 --- ============================ CONTENT ============================
 -- Devastation, ID: 1467
@@ -32,6 +35,29 @@ DevOldIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     else
       return BaseCheck
     end
+  end
+, 1467)
+
+HL.AddCoreOverride ("Player.EssenceTimeToMax",
+  function()
+    local Deficit = Player:EssenceDeficit()
+    if Deficit == 0 then return 0; end
+    local Regen = GetPowerRegenForPowerType(EssencePowerType)
+    if not Regen or Regen < 0.2 then Regen = 0.2; end
+    local TimeToOneEssence = 1 / Regen
+    local LastUpdate = Cache.Persistent.Player.LastPowerUpdate
+    return Deficit * TimeToOneEssence - (GetTime() - LastUpdate)
+  end
+, 1467)
+
+HL.AddCoreOverride ("Player.EssenceTimeToX",
+  function(Amount)
+    local Essence = Player:Essence()
+    if Essence >= Amount then return 0; end
+    local Regen = GetPowerRegenForPowerType(EssencePowerType)
+    local TimeToOneEssence = 1 / Regen
+    local LastUpdate = Cache.Persistent.Player.LastPowerUpdate
+    return ((Amount - Essence) * TimeToOneEssence) - (GetTime() - LastUpdate)
   end
 , 1467)
 

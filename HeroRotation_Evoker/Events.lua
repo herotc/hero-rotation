@@ -17,6 +17,19 @@ local Item = HL.Item
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
+HL:RegisterForEvent(
+  function(Event, Arg1, Arg2)
+    -- Ensure it's the player
+    if Arg1 ~= "player"then
+      return
+    end
+
+    if Arg2 == "ESSENCE" then
+      Cache.Persistent.Player.LastPowerUpdate = GetTime()
+    end
+  end,
+  "UNIT_POWER_UPDATE"
+)
 
 --- ======= COMBATLOG =======
   --- Combat Log Arguments
