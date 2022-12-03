@@ -259,7 +259,7 @@ local function APL()
     end
     -- ravager,if=cooldown.avatar.remains<3
     if S.Ravager:IsCastable() and (S.Avatar:CooldownRemains() < 3) then
-      if Cast(S.Ravager, nil, nil, not Target:IsInRange(40)) then return "ravager main 10"; end
+      if Cast(S.Ravager, Settings.Fury.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager main 10"; end
     end
     if (Settings.Commons.Enabled.Trinkets) then
       -- use_item,name=inscrutable_quantum_device,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<21|target.time_to_die>190|buff.bloodlust.up)

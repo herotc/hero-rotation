@@ -70,6 +70,7 @@ HR.GUISettings.APL.Warrior = {
       DragonRoar = false,
       Recklessness = false,
       Siegebreaker = false,
+      Ravager = false,
     }
   },
   Protection = {
