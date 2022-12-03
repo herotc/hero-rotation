@@ -34,7 +34,7 @@ local S = Spell.Hunter.Survival
 
 -- Items
 local I = Item.Hunter.Survival
-local TrinketsOnUseExcludes = {
+local OnUseExcludes = {
   -- I.Trinket:ID(),
 }
 
