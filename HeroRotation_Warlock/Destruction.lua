@@ -515,8 +515,15 @@ local function APL()
       if Cast(S.Immolate, nil, nil, not Target:IsSpellInRange(S.Immolate)) then return "immolate main 10"; end
     end
     -- havoc,if=talent.cry_havoc&(buff.ritual_of_ruin.up|pet.infernal.active)
+    -- Should be a cycle_targets, like other Havoc casts?
     if S.Havoc:IsCastable() and (S.CryHavoc:IsAvailable() and (Player:BuffUp(S.RitualofRuinBuff) or InfernalTime() > 0)) then
-      if Cast(S.Havoc, nil, nil, not Target:IsSpellInRange(S.Havoc)) then return "havoc main 11"; end
+      local TargetGUID = Target:GUID()
+      for _, CycleUnit in pairs(Enemies40y) do
+        if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() then
+          HR.CastLeftNameplate(CycleUnit, S.Havoc)
+          break
+        end
+      end
     end
     -- chaos_bolt,if=pet.infernal.active|pet.blasphemy.active|soul_shard>=4
     if S.ChaosBolt:IsReady() and (InfernalTime() > 0 or BlasphemyTime() > 0 or Player:SoulShardsP() >= 4) then
