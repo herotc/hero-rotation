@@ -134,6 +134,7 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   Inferno                               = Spell(270545),
   InternalCombustion                    = Spell(266134),
   MadnessoftheAzjAqir                   = Spell(387400),
+  RagingDemonfire                       = Spell(387166),
   RainofChaos                           = Spell(266086),
   RainofFire                            = Spell(5740),
   RoaringBlaze                          = Spell(205184),
