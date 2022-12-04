@@ -68,6 +68,7 @@ HR.GUISettings.APL.Warrior = {
     GCDasOffGCD = {
       Bladestorm = false,
       DragonRoar = false,
+      Ravager = false,
       Recklessness = false,
       Siegebreaker = false,
     }
