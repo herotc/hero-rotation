@@ -491,7 +491,7 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- Interrupts
-    local ShouldReturn = Everyone.Interrupt(InterruptRange, S.SkullBash, Settings.Feral.OffGCDasOffGCD.SkullBash, InterruptStuns); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(13, S.SkullBash, Settings.Feral.OffGCDasOffGCD.SkullBash, InterruptStuns); if ShouldReturn then return ShouldReturn; end
     -- prowl
     if S.Prowl:IsCastable() then
       if Cast(S.Prowl) then return "prowl main 2"; end
