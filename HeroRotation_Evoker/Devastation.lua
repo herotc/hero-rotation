@@ -34,8 +34,9 @@ local I = Item.Evoker.Devastation
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.ShadowedOrbofTorment:ID(),
   I.KharnalexTheFirstLight:ID(),
+  I.ShadowedOrbofTorment:ID(),
+  I.SpoilsofNeltharus:ID(),
 }
 
 -- GUI Settings
@@ -60,7 +61,9 @@ local MaxBurnoutStack = 2
 local VarTrinket1Sync, VarTrinket2Sync, TrinketPriority
 local VarNextDragonrage
 local VarDragonrageUp, VarDragonrageRemains
+local VarR1CastTime
 local BFRank = S.BlastFurnace:TalentRank()
+local PlayerHaste
 local BossFightRemains = 11111
 local FightRemains = 11111
 local GCDMax
@@ -107,13 +110,11 @@ local function Precombat()
   if S.BlessingoftheBronze:IsCastable() and (Player:BuffDown(S.BlessingoftheBronzeBuff) or Everyone.GroupBuffMissing(S.BlessingoftheBronzeBuff)) then
     if Cast(S.BlessingoftheBronze, Settings.Commons.GCDasOffGCD.BlessingOfTheBronze) then return "blessing_of_the_bronze precombat"; end
   end
-  -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(trinket.1.cooldown.duration%%cooldown.dragonrage.duration=0|cooldown.dragonrage.duration%%trinket.1.cooldown.duration=0)
-  -- VarTrinket1Sync = (trinket1:TrinketHasUseBuff() and (trinket1:Cooldown() % 120 == 0 or 120 % trinket1:Cooldown() == 0)) and 1 or 0
-  -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(trinket.2.cooldown.duration%%cooldown.dragonrage.duration=0|cooldown.dragonrage.duration%%trinket.2.cooldown.duration=0)
-  -- VarTrinket2Sync = (trinket2:TrinketHasUseBuff() and (trinket2:Cooldown() % 120 == 0 or 120 % trinket2:Cooldown() == 0)) and 1 or 0
-  -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!trinket.1.has_use_buff&trinket.2.has_use_buff|trinket.2.has_use_buff&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.intellect)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.intellect)*(variable.trinket_1_sync))
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_buff.intellect|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_buff.intellect|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit
+  -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_1_buffs&(trinket.1.cooldown.duration%%cooldown.dragonrage.duration=0|cooldown.dragonrage.duration%%trinket.1.cooldown.duration=0)
+  -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_2_buffs&(trinket.2.cooldown.duration%%cooldown.dragonrage.duration=0|cooldown.dragonrage.duration%%trinket.2.cooldown.duration=0)
+  -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.intellect)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.intellect)*(variable.trinket_1_sync))
+  -- variable,name=trinket_1_manual,value=trinket.1.is.spoils_of_neltharus
+  -- variable,name=trinket_2_manual,value=trinket.2.is.spoils_of_neltharus
   -- TODO: Can't yet handle all of these trinket conditions
   -- use_item,name=shadowed_orb_of_torment
   if Settings.Commons.Enabled.Trinkets and I.ShadowedOrbofTorment:IsEquippedAndReady() then
@@ -136,10 +137,14 @@ local function Defensives()
 end
 
 local function Trinkets()
-  -- use_item,slot=trinket1,if=buff.dragonrage.up&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)
-  -- use_item,slot=trinket2,if=buff.dragonrage.up&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains|trinket.2.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=2)
-  -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(variable.next_dragonrage>20|!talent.dragonrage)
-  -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)&(variable.next_dragonrage>20|!talent.dragonrage)
+  -- use_item,name=spoils_of_neltharus,if=buff.dragonrage.up&(buff.spoils_of_neltharus_mastery.up|buff.spoils_of_neltharus_haste.up|buff.dragonrage.remains+6*(cooldown.eternity_surge.remains<=gcd.max*2+cooldown.fire_breath.remains<=gcd.max*2)<=18)|fight_remains<=20
+  if I.SpoilsofNeltharus:IsEquippedAndReady() and (VarDragonrageUp and (Player:BuffUp(S.SpoilsofNeltharusMastery) or Player:BuffUp(S.SpoilsofNeltharusHaste) or VarDragonrageRemains + 6 * num(num(S.EternitySurge:CooldownRemains() <= GCDMax * 2) + num(S.FireBreath:CooldownRemains() <= GCDMax * 2)) <= 18) or FightRemains <= 20) then
+    if Cast(I.SpoilsofNeltharus, nil, Settings.Commons.DisplayStyle.Trinkets) then return "spoils_of_neltharus trinkets 2"; end
+  end
+  -- use_item,slot=trinket1,if=buff.dragonrage.up&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)
+  -- use_item,slot=trinket2,if=buff.dragonrage.up&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)&!variable.trinket_2_manual|trinket.2.proc.any_dps.duration>=fight_remains|trinket.2.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=2)
+  -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(variable.next_dragonrage>20|!talent.dragonrage)&!variable.trinket_1_manual
+  -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)&(variable.next_dragonrage>20|!talent.dragonrage)&!variable.trinket_2_manual
   -- Note: Can't handle above trinket tracking, so let's use a generic fallback. When we can do above tracking, the below can be removed.
   -- use_items,if=buff.dragonrage.up|variable.next_dragonrage>20|!talent.dragonrage
   if (VarDragonrageUp or VarNextDragonrage > 20 or not S.Dragonrage:IsAvailable()) then
@@ -148,13 +153,10 @@ local function Trinkets()
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
   end
-  -- invoke_external_buff,name=power_infusion,if=!buff.power_infusion.up&buff.dragonrage.up
-  -- Note: Not handling external buffs
 end
 
 local function ES()
   local ESEmpower = 0
-  local PlayerHaste = Player:SpellHaste()
   -- eternity_surge,empower_to=1,if=spell_targets.pyre<=1+talent.eternitys_span|buff.dragonrage.remains<1.75*spell_haste&buff.dragonrage.remains>=1*spell_haste
   if (EnemiesCount8ySplash <= 1 + num(S.EternitysSpan:IsAvailable()) or VarDragonrageRemains < 1.75 * PlayerHaste and VarDragonrageRemains >= 1 * PlayerHaste) then
     ESEmpower = 1
@@ -174,7 +176,6 @@ end
 local function FB()
   local FBEmpower = 0
   local FBRemains = Target:DebuffRemains(S.FireBreath)
-  local PlayerHaste = Player:SpellHaste()
   -- fire_breath,empower_to=1,if=(20+2*talent.blast_furnace.rank)+dot.fire_breath_damage.remains<(20+2*talent.blast_furnace.rank)*1.3|buff.dragonrage.remains<1.75*spell_haste&buff.dragonrage.remains>=1*spell_haste|active_enemies<=2
   if ((20 + 2 * BFRank) + FBRemains < (20 + 2 * BFRank) * 1.3 or VarDragonrageRemains < 1.75 * PlayerHaste and VarDragonrageRemains >= 1 * PlayerHaste or EnemiesCount8ySplash <= 2) then
     FBEmpower = 1
@@ -280,8 +281,8 @@ local function ST()
   if S.Dragonrage:IsCastable() and CDsON() and (S.FireBreath:CooldownRemains() < GCDMax and S.EternitySurge:CooldownRemains() < 2 * GCDMax or FightRemains < 30) then
     if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage st 2"; end
   end
-  -- tip_the_scales,if=buff.dragonrage.up&(buff.dragonrage.remains<0.87*gcd.max&(buff.dragonrage.remains>cooldown.fire_breath.remains|buff.dragonrage.remains>cooldown.eternity_surge.remains)|talent.feed_the_flames&!cooldown.fire_breath.up)
-  if S.TipTheScales:IsCastable() and CDsON() and (VarDragonrageUp and (VarDragonrageRemains < 0.87 * GCDMax and (VarDragonrageRemains > S.FireBreath:CooldownRemains() or VarDragonrageRemains > S.EternitySurge:CooldownRemains()) or S.FeedtheFlames:IsAvailable() and S.FireBreath:CooldownDown())) then
+  -- tip_the_scales,if=buff.dragonrage.up&(buff.dragonrage.remains<variable.r1_cast_time&(buff.dragonrage.remains>cooldown.fire_breath.remains|buff.dragonrage.remains>cooldown.eternity_surge.remains)|talent.feed_the_flames&!cooldown.fire_breath.up)
+  if S.TipTheScales:IsCastable() and CDsON() and (VarDragonrageUp and (VarDragonrageRemains < VarR1CastTime and (VarDragonrageRemains > S.FireBreath:CooldownRemains() or VarDragonrageRemains > S.EternitySurge:CooldownRemains()) or S.FeedtheFlames:IsAvailable() and S.FireBreath:CooldownDown())) then
     if Cast(S.TipTheScales, Settings.Devastation.GCDasOffGCD.TipTheScales) then return "tip_the_scales st 4"; end
   end
   -- call_action_list,name=fb,if=!talent.dragonrage|variable.next_dragonrage>15|!talent.animosity
@@ -294,16 +295,16 @@ local function ST()
       local ShouldReturn = ES(); if ShouldReturn then return ShouldReturn; end
     end
   end
-  -- wait,sec=cooldown.fire_breath.remains,if=buff.dragonrage.up&buff.dragonrage.remains<(1+0.87*buff.tip_the_scales.down)*gcd.max&buff.dragonrage.remains-cooldown.fire_breath.remains>=0.87*buff.tip_the_scales.down*gcd.max
-  if (VarDragonrageUp and VarDragonrageRemains < (1 + 0.87 * num(Player:BuffDown(S.TipTheScales))) * GCDMax and VarDragonrageRemains - S.FireBreath:CooldownRemains() >= 0.87 * num(Player:BuffDown(S.TipTheScales)) * GCDMax) then
+  -- wait,sec=cooldown.fire_breath.remains,if=talent.animosity&buff.dragonrage.up&buff.dragonrage.remains<gcd.max+variable.r1_cast_time*buff.tip_the_scales.down&buff.dragonrage.remains-cooldown.fire_breath.remains>=variable.r1_cast_time*buff.tip_the_scales.down
+  if (S.Animosity:IsAvailable() and VarDragonrageUp and VarDragonrageRemains < GCDMax + VarR1CastTime * num(Player:BuffDown(S.TipTheScales)) and VarDragonrageRemains - S.FireBreath:CooldownRemains() >= VarR1CastTime * num(Player:BuffDown(S.TipTheScales))) then
     if CastPooling(S.Pool, S.FireBreath:CooldownRemains(), "WAIT") then return "Wait for Fire Breath st 6"; end
   end
-  -- wait,sec=cooldown.eternity_surge.remains,if=buff.dragonrage.up&buff.dragonrage.remains<(1+0.87*buff.tip_the_scales.down)*gcd.max&buff.dragonrage.remains-cooldown.eternity_surge.remains>=0.87*buff.tip_the_scales.down*gcd.max
-  if (VarDragonrageUp and VarDragonrageRemains < (1 + 0.87 * num(Player:BuffDown(S.TipTheScales))) * GCDMax and VarDragonrageRemains - S.EternitySurge:CooldownRemains() >= 0.87 * num(Player:BuffDown(S.TipTheScales)) * GCDMax) then
+  -- wait,sec=cooldown.eternity_surge.remains,if=talent.animosity&buff.dragonrage.up&buff.dragonrage.remains<gcd.max+variable.r1_cast_time&buff.dragonrage.remains-cooldown.eternity_surge.remains>=variable.r1_cast_time*buff.tip_the_scales.down
+  if (S.Animosity:IsAvailable() and VarDragonrageUp and VarDragonrageRemains < GCDMax + VarR1CastTime and VarDragonrageRemains - S.EternitySurge:CooldownRemains() >= VarR1CastTime * num(Player:BuffDown(S.TipTheScales))) then
     if CastPooling(S.Pool, S.EternitySurge:CooldownRemains(), "WAIT") then return "Wait for Eternity Surge st 8"; end
   end
-  -- shattering_star,if=!buff.dragonrage.up|essence%3+buff.essence_burst.stack>=2+0.5*talent.feed_the_flames|buff.bloodlust.down
-  if S.ShatteringStar:IsCastable() and ((not VarDragonrageUp) or Player:Essence() / 3 + Player:BuffStack(S.EssenceBurstBuff) >= 2 + 0.5 * num(S.FeedtheFlames:IsAvailable()) or Player:BloodlustDown()) then
+  -- shattering_star,if=!buff.dragonrage.up|buff.essence_burst.stack==buff.essence_burst.max_stack|talent.eye_of_infinity
+  if S.ShatteringStar:IsCastable() and ((not VarDragonrageUp) or Player:BuffStack(S.EssenceBurstBuff) == MaxEssenceBurstStack or S.EyeofInfinity:IsAvailable()) then
     if Cast(S.ShatteringStar, nil, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star st 10"; end
   end
   -- living_flame,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max&buff.burnout.up
@@ -314,37 +315,21 @@ local function ST()
   if S.AzureStrike:IsCastable() and (VarDragonrageUp and VarDragonrageRemains < (MaxEssenceBurstStack - Player:BuffStack(S.EssenceBurstBuff)) * GCDMax) then
     if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 14"; end
   end
-  -- pyre,if=(talent.volatility|!talent.eternitys_span|!talent.scintillation)&buff.charged_blast.stack==20&spell_targets.pyre>1
-  if S.Pyre:IsReady() and ((S.Volatility:IsAvailable() or (not S.EternitysSpan:IsAvailable()) or not S.Scintillation:IsAvailable()) and Player:BuffStack(S.ChargedBlastBuff) == 20 and EnemiesCount8ySplash > 1) then
-    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre st 16"; end
-  end
-  -- firestorm,if=!buff.dragonrage.up&dot.fire_breath_damage.remains>3&debuff.shattering_star_debuff.down|buff.snapfire.up
-  if S.Firestorm:IsCastable() and ((not VarDragonrageUp) and Target:DebuffRemains(S.FireBreath) > 3 and Target:DebuffDown(S.ShatteringStar) or Player:BuffUp(S.SnapfireBuff)) then
+  -- firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down|buff.snapfire.up
+  if S.Firestorm:IsCastable() and ((not VarDragonrageUp) and Target:DebuffDown(S.ShatteringStar) or Player:BuffUp(S.SnapfireBuff)) then
     if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm st 18"; end
   end
-  -- living_flame,if=!buff.dragonrage.up&buff.burnout.stack==buff.burnout.max_stack
-  if S.LivingFlame:IsCastable() and ((not VarDragonrageUp) and Player:BuffStack(S.BurnoutBuff) == MaxBurnoutStack) then
+  -- living_flame,if=buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack&essence<essence.max-1
+  if S.LivingFlame:IsCastable() and (Player:BuffUp(S.BurnoutBuff) and Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack and Player:Essence() < Player:EssenceMax() - 1) then
     if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 20"; end
   end
-  -- living_flame,if=buff.dragonrage.up&(buff.burnout.up|talent.ruby_embers&dot.living_flame_damage.remains<4&!prev_gcd.1.living_flame)&buff.essence_burst.stack<buff.essence_burst.max_stack&essence<essence.max-1
-  if S.LivingFlame:IsCastable() and (VarDragonrageUp and (Player:BuffUp(S.BurnoutBuff) or S.RubyEmbers:IsAvailable() and Target:DebuffRemains(S.LivingFlameDebuff) < 4 and not Player:PrevGCDP(1, S.LivingFlame)) and Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack and Player:Essence() < Player:EssenceMax() - 1) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 22"; end
-  end
-  -- azure_strike,if=buff.dragonrage.up&essence<3&!buff.essence_burst.up
-  if S.AzureStrike:IsCastable() and (VarDragonrageUp and Player:Essence() < 3 and Player:BuffDown(S.EssenceBurstBuff)) then
+  -- azure_strike,if=buff.dragonrage.up&(essence<3&!buff.essence_burst.up|(talent.shattering_star&cooldown.shattering_star.remains<=(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max))
+  if S.AzureStrike:IsCastable() and (VarDragonrageUp and (Player:Essence() < 3 and Player:BuffDown(S.EssenceBurstBuff) or (S.ShatteringStar:IsAvailable() and S.ShatteringStar:CooldownRemains() <= (MaxEssenceBurstStack - Player:BuffStack(S.EssenceBurstBuff)) * GCDMax))) then
     if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 24"; end
   end
-  -- disintegrate,chain=1,if=!buff.dragonrage.up&(!talent.shattering_star|cooldown.shattering_star.remains>6|essence>essence.max-1|buff.essence_burst.stack==buff.essence_burst.max_stack)
-  if S.Disintegrate:IsReady() and ((not VarDragonrageUp) and ((not S.ShatteringStar:IsAvailable()) or S.ShatteringStar:CooldownRemains() > 6 or Player:Essence() > Player:EssenceMax() - 1 or Player:BuffStack(S.EssenceBurstBuff) == MaxEssenceBurstStack)) then
+  -- disintegrate,chain=1,early_chain_if=buff.dragonrage.up&ticks>=2,interrupt_if=buff.dragonrage.up&ticks>=2,if=buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence>essence.max-1|buff.essence_burst.stack==buff.essence_burst.max_stack)
+  if S.Disintegrate:IsReady() and (VarDragonrageUp or ((not S.ShatteringStar:IsAvailable()) or S.ShatteringStar:CooldownRemains() > 6 or Player:Essence() > Player:EssenceMax() - 1 or Player:BuffStack(S.EssenceBurstBuff) == MaxEssenceBurstStack)) then
     if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate st 26"; end
-  end
-  -- disintegrate,chain=1,early_chain_if=ticks>=2,interrupt_if=ticks>=2,if=buff.dragonrage.up&(!talent.shattering_star|cooldown.shattering_star.remains>(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max|essence>essence.max-1|buff.essence_burst.stack==buff.essence_burst.max_stack)
-  if S.Disintegrate:IsReady() and (VarDragonrageUp and ((not S.ShatteringStar:IsAvailable()) or S.ShatteringStar:CooldownRemains() > (MaxEssenceBurstStack - Player:BuffStack(S.EssenceBurstBuff)) * GCDMax or Player:Essence() > Player:EssenceMax() - 1 or Player:BuffStack(S.EssenceBurstBuff) == MaxEssenceBurstStack)) then
-    if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate st 28"; end
-  end
-  -- azure_strike,if=buff.dragonrage.up
-  if S.AzureStrike:IsCastable() and (VarDragonrageUp) then
-    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 30"; end
   end
   -- deep_breath,if=!buff.dragonrage.up&spell_targets.deep_breath>1
   if S.DeepBreath:IsCastable() and CDsON() and ((not VarDragonrageUp) and EnemiesCount8ySplash > 1) then
@@ -382,6 +367,9 @@ local function APL()
   -- Set GCDMax (add 0.25 seconds for latency/player reaction)
   GCDMax = Player:GCD() + 0.25
 
+  -- Player haste value is used in multiple places
+  PlayerHaste = Player:SpellHaste()
+
   -- Set Dragonrage Variables
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     VarDragonrageUp = Player:BuffUp(S.Dragonrage)
@@ -408,6 +396,8 @@ local function APL()
     end
     -- variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?(cooldown.eternity_surge.remains-2*gcd.max)<?(cooldown.fire_breath.remains-gcd.max)
     VarNextDragonrage = mathmax(S.Dragonrage:CooldownRemains(), (S.EternitySurge:CooldownRemains() - 2 * GCDMax), (S.FireBreath:CooldownRemains() - GCDMax))
+    -- variable,name=r1_cast_time,value=1.3*spell_haste
+    VarR1CastTime = 1.3 * PlayerHaste
     -- call_action_list,name=trinkets
     if Settings.Commons.Enabled.Trinkets then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end

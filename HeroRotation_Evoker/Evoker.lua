@@ -41,12 +41,13 @@ Spell.Evoker.Commons = {
   BlessingoftheBronzeBuff               = Spell(381748),
   FireBreathDebuff                      = Spell(357209),
   LeapingFlamesBuff                     = Spell(370901),
-  -- External Buffs
-  PowerInfusionBuff                     = Spell(10060),
+  -- Trinket Effects
+  SpoilsofNeltharusCrit                 = Spell(381954),
+  SpoilsofNeltharusHaste                = Spell(381955),
+  SpoilsofNeltharusMastery              = Spell(381956),
+  SpoilsofNeltharusVers                 = Spell(381957),
   -- Utility
   Quell                                 = Spell(351338),
-  -- Covenant
-  BoonoftheCovenants                    = Spell(387168),
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -64,6 +65,7 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   EternitySurge                         = MultiSpell(359073,382411), -- with and without Font of Magic
   EternitysSpan                         = Spell(375757),
   EverburningFlame                      = Spell(370819),
+  EyeofInfinity                         = Spell(369375),
   FeedtheFlames                         = Spell(369846),
   Firestorm                             = Spell(368847),
   FontofMagic                           = Spell(375783),
@@ -90,6 +92,8 @@ Item.Evoker.Commons = {
   CrimsonAspirantsBadgeofFerocity       = Item(201449, {13, 14}),
   -- Items
   KharnalexTheFirstLight                = Item(195519),
+  -- Trinkets
+  SpoilsofNeltharus                     = Item(193773, {13, 14}),
   -- Trinkets (SL)
   ShadowedOrbofTorment                  = Item(186428, {13, 14}),
 }
