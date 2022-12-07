@@ -44,6 +44,7 @@ Spell.Shaman.Commons = {
   EarthShield                           = Spell(974),
   ElementalBlast                        = Spell(117014),
   LavaBurst                             = Spell(51505),
+  DeeplyRootedElements                  = Spell(378270),
   NaturesSwiftness                      = Spell(378081),
   PrimordialWave                        = Spell(375982),
   SpiritwalkersGrace                    = Spell(79206),
@@ -104,6 +105,7 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   -- Elemental Spirits Buffs
   CracklingSurgeBuff                    = Spell(224127),
   EarthenWeaponBuff                     = Spell(392375),
+  LegacyoftheFrostWitch                 = Spell(335901),
   IcyEdgeBuff                           = Spell(224126),
   MoltenWeaponBuff                      = Spell(224125),
 })
@@ -116,7 +118,6 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   -- Talents
   Aftershock                            = Spell(273221),
   Ascendance                            = Spell(114050),
-  DeeplyRootedElements                  = Spell(378270),
   EarthenRage                           = Spell(170374),
   EchooftheElements                     = Spell(333919),
   EchoesofGreatSundering                = Spell(384087),

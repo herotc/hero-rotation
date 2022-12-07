@@ -144,8 +144,8 @@ local function Precombat()
 end
 
 local function Single()
-  -- windstrike
-  if S.Windstrike:IsReady() then
+  -- windstrike,if=talent.thorims_invocation.enabled&buff.maelstrom_weapon.stack>=1
+  if S.Windstrike:IsReady() and (S.ThorimsInvocation:IsAvailable() and Player:BuffStack(S.MaelstromWeaponBuff) >= 1) then
     if Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Windstrike)) then return "windstrike single 2"; end
   end
   -- lava_lash,if=buff.hot_hand.up|buff.ashen_catalyst.stack=8
@@ -198,8 +198,12 @@ local function Single()
   if S.LavaLash:IsCastable() and (Target:DebuffRefreshable(S.FlameShockDebuff)) then
     if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 26"; end
   end
-  -- stormstrike,if=talent.stormflurry.enabled&buff.stormbringer.up
-  if S.Stormstrike:IsCastable() and (S.Stormflurry:IsAvailable() and Player:BuffUp(S.StormbringerBuff)) then
+  -- windstrike,if=talent.deeply_rooted_elements.enabled|buff.earthen_weapon.up|buff.legacy_of_the_frost_witch.up
+  if S.Windstrike:IsCastable() and (S.DeeplyRootedElements:IsAvailable() or Player:BuffUp(S.EarthenWeaponBuff) or Player:BuffUp(S.LegacyoftheFrostWitch)) then
+    if Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 28"; end
+  end
+  -- stormstrike,if=talent.deeply_rooted_elements.enabled|buff.earthen_weapon.up|buff.legacy_of_the_frost_witch.up
+  if S.Stormstrike:IsCastable() and (S.DeeplyRootedElements:IsAvailable() or Player:BuffUp(S.EarthenWeaponBuff) or Player:BuffUp(S.LegacyoftheFrostWitch)) then
     if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 28"; end
   end
   -- elemental_blast,if=(!talent.elemental_spirits.enabled|(talent.elemental_spirits.enabled&(charges=max_charges|buff.feral_spirit.up)))&buff.maelstrom_weapon.stack>=5
