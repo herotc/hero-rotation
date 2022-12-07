@@ -58,6 +58,7 @@ Spell.Monk.Commons = {
   Disable                               = Spell(116095),
   DiffuseMagic                          = Spell(122783),
   EyeoftheTiger                         = Spell(196607),
+  FastFeet                              = Spell(388809),
   InnerStrengthBuff                     = Spell(261769),
   Paralysis                             = Spell(115078),
   RingofPeace                           = Spell(116844),
@@ -86,6 +87,7 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   SpinningCraneKick                     = Spell(101546),
   -- Talents
   BonedustBrew                          = Spell(386276),
+  CraneVortex                           = Spell(388848),
   FaelineHarmony                        = Spell(391412),
   FaelineStomp                          = Spell(388193),
   FistsofFury                           = Spell(113656),
