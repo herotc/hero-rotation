@@ -64,6 +64,7 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   Fallout                               = Spell(227174),
   FelDevastation                        = Spell(212084),
   FieryBrand                            = Spell(204021),
+  FieryDemise                           = Spell(389220),
   Frailty                               = Spell(389958),
   Fracture                              = Spell(263642),
   SoulBarrier                           = Spell(263648),
