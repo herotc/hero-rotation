@@ -78,6 +78,7 @@ local VanguardsMomentumEquipped = Player:HasLegendaryEquipped(112)
 local FinalVerdictEquipped = Player:HasLegendaryEquipped(113)
 local MadParagonEquipped = Player:HasLegendaryEquipped(196)
 local DivineResonanceEquipped = Player:HasLegendaryEquipped(234)
+local DutyboundGavelEquipped = Player:HasLegendaryEquipped(235)
 local VerdictSpell = FinalVerdictEquipped and S.FinalVerdict or S.TemplarsVerdict
 
 HL:RegisterForEvent(function()
@@ -86,6 +87,7 @@ HL:RegisterForEvent(function()
   FinalVerdictEquipped = Player:HasLegendaryEquipped(113)
   MadParagonEquipped = Player:HasLegendaryEquipped(196)
   DivineResonanceEquipped = Player:HasLegendaryEquipped(234)
+  DutyboundGavelEquipped = Player:HasLegendaryEquipped(235)
   VerdictSpell = FinalVerdictEquipped and S.FinalVerdict or S.TemplarsVerdict
 end, "PLAYER_EQUIPMENT_CHANGED")
 
