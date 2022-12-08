@@ -144,8 +144,8 @@ local function EvaluateTargetIfSerpentSting(TargetUnit)
 end
 
 local function EvaluateTargetIfSerpentSting2(TargetUnit)
-  -- if=refreshable&talent.hydras_bite
-  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and S.HydrasBite:IsAvailable())
+  -- if=refreshable&talent.hydras_bite&!talent.serpentstalkers_trickery
+  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and S.HydrasBite:IsAvailable() and not S.SerpentstalkersTrickery:IsAvailable())
 end
 
 local function EvaluateTargetIfSerpentSting3(TargetUnit)
@@ -351,7 +351,7 @@ local function Trickshots()
   if S.WailingArrow:IsReady() then
     if Cast(S.WailingArrow, Settings.Marksmanship.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "wailing_arrow trickshots 14"; end
   end
-  -- serpent_sting,target_if=min:dot.serpent_sting.remains,if=refreshable&talent.hydras_bite
+  -- serpent_sting,target_if=min:dot.serpent_sting.remains,if=refreshable&talent.hydras_bite&!talent.serpentstalkers_trickery
   if S.SerpentSting:IsReady() then
     if Everyone.CastTargetIf(S.SerpentSting, Enemies40y, "min", EvaluateTargetIfFilterSerpentRemains, EvaluateTargetIfSerpentSting2, not TargetInRange40y) then return "serpent_sting trickshots 16"; end
   end
