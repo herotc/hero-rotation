@@ -311,7 +311,7 @@ local function APL()
     end
     -- auto_attack,if=!buff.prowl.up
     -- use_item,name=jotungeirr_destinys_call,if=!buff.prowl.up&!covenant.venthyr
-    if I.Jotungeirr:IsEquippedAndReady() and (CovenantID ~= 2) then
+    if I.Jotungeirr:IsEquippedAndReady() then
       if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 2"; end
     end
     -- use_item,slot=trinket1
