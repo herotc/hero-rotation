@@ -54,6 +54,7 @@ Spell.Shaman.Commons = {
   LightningShieldBuff                   = Spell(192106),
   PrimordialWaveBuff                    = Spell(375986),
   SpiritwalkersGraceBuff                = Spell(79206),
+  SplinteredElementsBuff                = Spell(382043),
   -- Debuffs
   FlameShockDebuff                      = Spell(188389),
   -- Trinket Effects
@@ -80,6 +81,7 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   IceStrike                             = Spell(342240),
   LashingFlames                         = Spell(334046),
   LavaLash                              = Spell(60103),
+  OverflowingMaelstrom                  = Spell(384149),
   Stormflurry                           = Spell(344357),
   Stormstrike                           = Spell(17364),
   Sundering                             = Spell(197214),
@@ -158,7 +160,6 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   LavaSurgeBuff                         = Spell(77762),
   MasteroftheElementsBuff               = Spell(260734),
   PoweroftheMaelstromBuff               = Spell(191877),
-  SplinteredElementsBuff                = Spell(382043),
   SurgeofPowerBuff                      = Spell(285514),
   WindspeakersLavaResurgenceBuff        = Spell(378269),
   -- Debuffs
