@@ -506,7 +506,7 @@ local function CDs ()
   -- actions.cds+=/cold_blood,if=(!talent.danse_macabre|!talent.secret_technique)&combo_points>=5
   if S.ColdBlood:IsReady() then
     if (not S.DanseMacabre:IsAvailable() or not S.SecretTechnique:IsAvailable()) and ComboPoints >= 5 then
-      if Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
+      if HR.Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
     end
     -- TODO tracking buff
     -- actions.cds+=/cold_blood,use_off_gcd=1,if=talent.secret_technique&buff.secret_technique.up
