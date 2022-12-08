@@ -20,7 +20,6 @@ local AoEON = HR.AoEON
 local CDsON = HR.CDsON
 local Cast  = HR.Cast
 -- Lua
-local GetCombatRating = GetCombatRating
 local floor = math.floor
 local ceil = math.ceil
 local max = math.max
@@ -161,6 +160,11 @@ end
 local function EvaluateCycleStellarFlareAoE(TargetUnit)
   -- target_if=refreshable&(target.time_to_die-remains-spell_targets.starfire)>8
   return (TargetUnit:DebuffRefreshable(S.StellarFlareDebuff) and (TargetUnit:TimeToDie() - TargetUnit:DebuffRemains(S.StellarFlareDebuff) - TargetUnit:GetEnemiesInSplashRangeCount(8)) > 8)
+end
+
+local function EvaluateCycleSunfireFallthru(TargetUnit)
+  -- target_if=dot.moonfire.remains>remains*22%18
+  return (TargetUnit:DebuffRemains(S.MoonfireDebuff) > (TargetUnit:DebuffRemains(S.SunfireDebuff) * 22 / 18))
 end
 
 -- Other Functions
