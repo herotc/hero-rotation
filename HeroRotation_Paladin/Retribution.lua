@@ -153,6 +153,16 @@ local function MissingAura()
   return (Player:BuffDown(S.RetributionAura) and Player:BuffDown(S.DevotionAura) and Player:BuffDown(S.ConcentrationAura) and Player:BuffDown(S.CrusaderAura))
 end
 
+local function EvaluateTargetIfFilterHP(TargetUnit)
+  -- target_if=max:target.time_to_die*(!dot.cruel_garrote.ticking)
+  return (TargetUnit:TimeToDie() * num(Target:DebuffDown(S.CruelGarroteDebuff)))
+end
+
+local function EvaluateTargetIfCruelGarrote(TargetUnit)
+  -- if=!dot.cruel_garrote.ticking
+  return (TargetUnit:DebuffDown(S.CruelGarroteDebuff))
+end
+
 --- ======= ACTION LISTS =======
 local function Precombat()
   -- flask
