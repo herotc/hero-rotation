@@ -160,7 +160,7 @@ local function TicksGainedOnRefresh(Spell)
   -- Added TickTime variable, as Rake and Moonfire don't have tick times in DBC
   local TickTime = 0
   if Spell == S.RipDebuff then
-    AddedDuration = (4 + ComboPoints * 4) * mod
+    AddedDuration = (4 + ComboPoints * 4)
     MaxDuration = 31.2
     TickTime = Spell:TickTime()
   else
