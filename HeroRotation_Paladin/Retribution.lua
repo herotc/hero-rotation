@@ -116,6 +116,14 @@ HL:RegisterForEvent(function()
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
+local function num(val)
+  if val then return 1 else return 0 end
+end
+
+local function bool(val)
+  return val ~= 0
+end
+
 -- Interrupts
 local Interrupts = {
   { S.HammerofJustice, "Cast Hammer of Justice (Interrupt)", function () return true; end },
