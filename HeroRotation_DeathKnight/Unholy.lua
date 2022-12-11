@@ -132,6 +132,11 @@ local function EvaluateTargetIfFilterFWStack(TargetUnit)
   return (TargetUnit:DebuffStack(S.FesteringWoundDebuff))
 end
 
+local function EvaluateTargetIfFilterSoulReaper(TargetUnit)
+  -- target_if=min:dot.soul_reaper.remains
+  return (TargetUnit:DebuffRemains(S.SoulReaper))
+end
+
 local function EvaluateTargetIfApocalypse(TargetUnit)
   -- if=debuff.festering_wound.up&variable.adds_remain&!death_and_decay.ticking&cooldown.death_and_decay.remains&rune<3|death_and_decay.ticking&rune=0
   return (TargetUnit:DebuffUp(S.FesteringWoundDebuff) and VarAddsRemain and Player:BuffDown(S.DeathAndDecayBuff) and S.DeathAndDecay:CooldownRemains() < 3 or Player:BuffUp(S.DeathAndDecayBuff) and Player:Rune() == 0)
@@ -148,6 +153,11 @@ end
 
 local function EvaluateTargetIfUnholyAssault(TargetUnit)
   return (TargetUnit:DebuffStack(S.FesteringWoundDebuff) <= 2)
+end
+
+local function EvaluateTargetIfVileContagion(TargetUnit)
+  -- if=active_enemies>=2&debuff.festering_wound.stack>=4&cooldown.any_dnd.remains<3
+  return (Enemies10ySplashCount >= 2 and TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 4 and AnyDnD:CooldownRemains() < 3)
 end
 
 local function Precombat()
