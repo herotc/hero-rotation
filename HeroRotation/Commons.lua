@@ -42,7 +42,7 @@ end
 -- Interrupt
 function Commons.Interrupt(Range, Spell, Setting, StunSpells)
   if Settings.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(Range) then
-    if Spell:IsCastable() then
+    if Spell:IsCastable(true) then
       if HR.Cast(Spell, Setting) then return "Cast " .. Spell:Name() .. " (Interrupt)"; end
     elseif Settings.InterruptWithStun and Target:CanBeStunned() then
       if StunSpells then
