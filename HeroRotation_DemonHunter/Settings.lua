@@ -45,6 +45,7 @@ HR.GUISettings.APL.DemonHunter = {
     FelDevHealthThreshold = 30,
     ConserveInfernalStrike = true,
     UseFieryBrandOffensively = false,
+    UseMetaOffensively = false,
     PotionType = {
       Selected = "Power",
     },
@@ -99,6 +100,7 @@ CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.DemonSpikes
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.FelDevHealthThreshold", {0, 100, 5}, "Fel Devastation Health Threshold", "Suggest Fel Devastation during Blind Faith when below this health percentage.")
 CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.ConserveInfernalStrike", "Conserve Infernal Strike", "Save at least 1 Infernal Strike charge for mobility.")
 CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.UseFieryBrandOffensively", "Use Fiery Brand Offensively", "Check this to recommend offensive Fiery Brand usage. Otherwise, it will be saved as a defensive.")
+CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.UseMetaOffensively", "Use Metamorphosis Offensively", "Check this to recommend offensive Metamorphosis usage. Otherwise, it will be saved as a defensive.")
 CreateARPanelOptions(CP_Vengeance, "APL.DemonHunter.Vengeance")
 
 -- Havoc

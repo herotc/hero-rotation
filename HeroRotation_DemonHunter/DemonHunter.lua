@@ -61,6 +61,7 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   BurningAlive                          = Spell(207739),
   CharredFlesh                          = Spell(336639),
   ConcentratedSigils                    = Spell(207666),
+  DowninFlames                          = Spell(389732),
   Fallout                               = Spell(227174),
   FelDevastation                        = Spell(212084),
   FieryBrand                            = Spell(204021),
