@@ -166,8 +166,8 @@ local function Cooldown()
   if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and ((not S.ChaoticTransformation:IsAvailable()) or S.EyeBeam:CooldownRemains() > 20 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD() + 0.5) or FightRemains < 25)) then
     if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis, not Target:IsInRange(40)) then return "metamorphosis cooldown 4"; end
   end
-  -- potion,if=buff.metamorphosis.remains>25|fight_remains<60
-  if Settings.Commons.Enabled.Potions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or FightRemains < 60) then
+  -- potion,if=buff.metamorphosis.remains>25|buff.metamorphosis.up&cooldown.metamorphosis.ready|fight_remains<60
+  if Settings.Commons.Enabled.Potions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or Player:BuffUp(S.MetamorphosisBuff) and S.Metamorphosis:CooldownUp() or FightRemains < 60) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldown 6"; end
@@ -258,12 +258,8 @@ local function APL()
     if S.FelRush:IsCastable() and ((Player:BuffUp(S.UnboundChaosBuff) or VarWaitingForMomentum and ((not S.UnboundChaos:IsAvailable()) or S.ImmolationAura:CooldownDown())) and UseFelRush()) then
       if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush) then return "fel_rush main 6"; end
     end
-    -- essence_break,if=!variable.waiting_for_momentum&(cooldown.eye_beam.remains>4|buff.metamorphosis.up)&(!talent.tactical_retreat|buff.tactical_retreat.up)
-    if S.EssenceBreak:IsCastable() and ((not VarWaitingForMomentum) and (S.EyeBeam:CooldownRemains() > 4 or Player:BuffUp(S.MetamorphosisBuff)) and ((not S.TacticalRetreat:IsAvailable()) or Player:BuffUp(S.TacticalRetreatBuff))) then
-      if Cast(S.EssenceBreak, nil, nil, not IsInMeleeRange(10)) then return "essence_break main 8"; end
-    end
-    -- essence_break,if=(active_enemies>desired_targets|raid_event.adds.in>40)&!variable.waiting_for_momentum&fury>50&(cooldown.eye_beam.remains>8|buff.metamorphosis.up)&(!talent.tactical_retreat|buff.tactical_retreat.up)
-    if S.EssenceBreak:IsCastable() and ((not VarWaitingForMomentum) and Player:Fury() > 50 and (S.EyeBeam:CooldownRemains() > 8 or Player:BuffUp(S.MetamorphosisBuff)) and ((not S.TacticalRetreat:IsAvailable()) or Player:BuffUp(S.TacticalRetreatBuff))) then
+    -- essence_break,if=(active_enemies>desired_targets|raid_event.adds.in>40)&!variable.waiting_for_momentum&fury>40&(cooldown.eye_beam.remains>8|buff.metamorphosis.up)&(!talent.tactical_retreat|buff.tactical_retreat.up)
+    if S.EssenceBreak:IsCastable() and ((not VarWaitingForMomentum) and Player:Fury() > 40 and (S.EyeBeam:CooldownRemains() > 8 or Player:BuffUp(S.MetamorphosisBuff)) and ((not S.TacticalRetreat:IsAvailable()) or Player:BuffUp(S.TacticalRetreatBuff))) then
       if Cast(S.EssenceBreak, nil, nil, not IsInMeleeRange(10)) then return "essence_break main 9"; end
     end
     -- death_sweep,if=variable.blade_dance&(!talent.essence_break|cooldown.essence_break.remains>(cooldown.death_sweep.duration-4))
