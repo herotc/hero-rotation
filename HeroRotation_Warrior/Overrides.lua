@@ -20,8 +20,8 @@ local SpellProt             = Spell.Warrior.Protection
 -- Arms, ID: 71
 local ArmsOldSpellIsCastable
 ArmsOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = ArmsOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = ArmsOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellArms.Charge then
       return BaseCheck and self:Charges() >= 1 and (not Target:IsInRange(8) and Target:IsInRange(25))
     else
@@ -33,8 +33,8 @@ ArmsOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 -- Fury, ID: 72
 local FuryOldSpellIsCastable
 FuryOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = FuryOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = FuryOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellFury.Charge then
       return BaseCheck and (self:Charges() >= 1 and (not Target:IsInRange(8)) and Target:IsInRange(25))
     else
@@ -62,8 +62,8 @@ FuryOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
 -- Protection, ID: 73
 local ProtOldSpellIsCastable
 ProtOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = ProtOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = ProtOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellProt.Charge then
       return BaseCheck and (self:Charges() >= 1 and (not Target:IsInRange(8)))
     elseif self == SpellProt.HeroicThrow or self == SpellProt.TitanicThrow then

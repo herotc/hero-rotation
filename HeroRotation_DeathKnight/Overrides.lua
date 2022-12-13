@@ -22,8 +22,8 @@ local SpellUnholy  = Spell.DeathKnight.Unholy
 -- Blood, ID: 250
 local OldBloodIsCastable
 OldBloodIsCastable = HL.AddCoreOverride("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = OldBloodIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+  local BaseCheck = OldBloodIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellBlood.RaiseDead then
       return (not Pet:IsActive()) and BaseCheck
     else
@@ -35,8 +35,8 @@ OldBloodIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 -- Frost, ID: 251
 local OldFrostIsCastable
 OldFrostIsCastable = HL.AddCoreOverride("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = OldFrostIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = OldFrostIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellFrost.RaiseDead then
       return (not Pet:IsActive()) and BaseCheck
     else
@@ -48,8 +48,8 @@ OldFrostIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 -- Unholy, ID: 252
 local OldUHIsCastable
 OldUHIsCastable = HL.AddCoreOverride("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = OldUHIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = OldUHIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellUnholy.RaiseDead then
       return (not Pet:IsActive()) and BaseCheck
     elseif self == SpellUnholy.DarkTransformation then

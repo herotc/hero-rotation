@@ -23,8 +23,8 @@ local GetTime = GetTime
 -- Beast Mastery, ID: 253
 local OldBMIsCastable
 OldBMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
-function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = OldBMIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+  local BaseCheck = OldBMIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   if self == SpellBM.SummonPet then
     return (not Pet:IsActive()) and (not Pet:IsDeadOrGhost()) and BaseCheck
   else
@@ -57,8 +57,8 @@ end
 -- Marksmanship, ID: 254
 local OldMMIsCastable
 OldMMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
-function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = OldMMIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+  local BaseCheck = OldMMIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   if self == SpellMM.SummonPet then
     return (not Pet:IsActive()) and (not Pet:IsDeadOrGhost()) and BaseCheck
   else
@@ -130,8 +130,8 @@ HL.AddCoreOverride("Player.FocusP",
 -- Survival, ID: 255
 local OldSVIsCastable
 OldSVIsCastable = HL.AddCoreOverride("Spell.IsCastable",
-function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = OldSVIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+  local BaseCheck = OldSVIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   if self == SpellSV.SummonPet then
     return (not Pet:IsActive()) and (not Pet:IsDeadOrGhost()) and BaseCheck
   elseif self == SpellSV.RevivePet then

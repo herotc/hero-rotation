@@ -21,8 +21,8 @@ local IsInJailersTower = IsInJailersTower
 -- Havoc, ID: 577
 local HavocOldSpellIsCastable
 HavocOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = HavocOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = HavocOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellHavoc.Metamorphosis then
       local HMIA = HR.GUISettings.APL.DemonHunter.Havoc.HideMetaIfActive
       return BaseCheck and ((HMIA and Player:BuffDown(SpellHavoc.MetamorphosisBuff)) or not HMIA)
@@ -35,8 +35,8 @@ HavocOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 -- Vengeance, ID: 581
 local VengOldSpellIsCastable
 VengOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = VengOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = VengOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellVengeance.FieryBrand then
       return BaseCheck and Target:DebuffDown(SpellVengeance.FieryBrandDebuff)
     else

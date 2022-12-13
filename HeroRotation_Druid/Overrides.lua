@@ -42,13 +42,13 @@ HL.AddCoreOverride ("Player.AstralPowerP",
 
 local BalOldSpellIsCastable
 BalOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local RangeOK = true
     if Range then
       local RangeUnit = ThisUnit or Target
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
-    local BaseCheck = BalOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = BalOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellBalance.MoonkinForm then
       return BaseCheck and Player:BuffDown(self)
     elseif self == SpellBalance.StellarFlare then
@@ -68,8 +68,8 @@ BalOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 -- Feral, ID: 103
 local FeralOldSpellIsCastable
 FeralOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = FeralOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = FeralOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellFeral.CatForm or self == SpellFeral.MoonkinForm then
       return BaseCheck and Player:BuffDown(self)
     elseif self == SpellFeral.Prowl then
@@ -83,8 +83,8 @@ FeralOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 -- Guardian, ID: 104
 local GuardianOldSpellIsCastable
 GuardianOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = GuardianOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = GuardianOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellGuardian.Thrash then
       return BaseCheck and (Player:Rage() <= 95 and Target:DebuffRemains(SpellGuardian.ThrashDebuff) > Player:GCD() * 2 or Target:DebuffStack(SpellGuardian.ThrashDebuff) < 3)
     elseif self == SpellGuardian.BearForm then
@@ -100,8 +100,8 @@ GuardianOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 -- Restoration, ID: 105
 local RestoOldSpellIsCastable
 RestoOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = RestoOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = RestoOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellResto.CatForm or self == SpellResto.MoonkinForm then
       return BaseCheck and Player:BuffDown(self)
     else

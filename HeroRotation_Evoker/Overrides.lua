@@ -21,13 +21,13 @@ local EssencePowerType = Enum.PowerType.Essence
 -- Devastation, ID: 1467
 local DevOldIsCastable
 DevOldIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local RangeOK = true
     if Range then
       local RangeUnit = ThisUnit or Target
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
-    local BaseCheck = DevOldIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = DevOldIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellDeva.Firestorm then
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellDeva.TipTheScales then

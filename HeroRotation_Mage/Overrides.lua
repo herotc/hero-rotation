@@ -89,7 +89,7 @@ ArcanePlayerBuff = HL.AddCoreOverride("Player.BuffUp",
 , 62)
 
 HL.AddCoreOverride("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self:CastTime() > 0 and Player:IsMoving() and Settings.Arcane.MovingRotation then
       return false
     end
@@ -187,7 +187,7 @@ HL.AddCoreOverride("Spell.IsReady",
 , 63)
 
 HL.AddCoreOverride("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self:CastTime() > 0 and Player:IsMoving() and Settings.Arcane.MovingRotation then
       return false
     end
@@ -228,7 +228,7 @@ FireOldPlayerAffectingCombat = HL.AddCoreOverride("Player.AffectingCombat",
 -- Frost, ID: 64
 local FrostOldSpellIsCastable
 FrostOldSpellIsCastable = HL.AddCoreOverride("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local MovingOK = true
     if self:CastTime() > 0 and Player:IsMoving() and Settings.Frost.MovingRotation then
       if self == SpellFrost.Blizzard and Player:BuffUp(SpellFrost.FreezingRain) then
@@ -246,7 +246,7 @@ FrostOldSpellIsCastable = HL.AddCoreOverride("Spell.IsCastable",
     if self == SpellFrost.GlacialSpike then
       return self:IsLearned() and RangeOK and MovingOK and not Player:IsCasting(self) and (Player:BuffUp(SpellFrost.GlacialSpikeBuff) or (Player:BuffStack(SpellFrost.IciclesBuff) == 5))
     else
-      local BaseCheck = FrostOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      local BaseCheck = FrostOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
       if self == SpellFrost.SummonWaterElemental then
         return BaseCheck and not Pet:IsActive()
       elseif self == SpellFrost.RuneofPower then

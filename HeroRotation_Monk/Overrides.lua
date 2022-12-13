@@ -19,8 +19,8 @@
 -- Brewmaster, ID: 268
 local BMOldSpellIsCastable
 BMOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = BMOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = BMOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellBM.TouchOfDeath then
       return BaseCheck and self:IsUsable()
     else

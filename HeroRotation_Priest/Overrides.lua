@@ -22,8 +22,8 @@ local InsanityPowerType = Enum.PowerType.Insanity
 -- Discipline, ID: 256
 local OldDiscIsCastable
 OldDiscIsCastable = HL.AddCoreOverride("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = OldDiscIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = OldDiscIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellDisc.MindBlast or self == SpellDisc.Schism then
       return BaseCheck and (not Player:IsCasting(self))
     elseif self == SpellDisc.Smite or self == SpellDisc.DivineStar or self == SpellDisc.Halo or self == SpellDisc.Penance or self == SpellDisc.PowerWordSolace then
@@ -58,8 +58,8 @@ HL.AddCoreOverride ("Player.Insanity",
 
 local OldShadowIsCastable
 OldShadowIsCastable = HL.AddCoreOverride("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = OldShadowIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = OldShadowIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellShadow.VampiricTouch then
       return BaseCheck and (SpellShadow.UnfurlingDarkness:IsAvailable() or not Player:IsCasting(self))
     elseif self == SpellShadow.MindBlast then

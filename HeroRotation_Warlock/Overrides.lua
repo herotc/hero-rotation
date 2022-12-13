@@ -45,13 +45,13 @@ HL.AddCoreOverride ("Player.SoulShardsP",
   
 local AffOldSpellIsCastable
 AffOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local RangeOK = true
     if Range then
       local RangeUnit = ThisUnit or Target
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
-    local BaseCheck = AffOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = AffOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellAffli.SummonPet then
       return BaseCheck and (not Settings.Commons.HidePetSummon) and Player:SoulShardsP() > 0 and (not Player:IsCasting(self)) and not (Pet:IsActive() or Player:BuffUp(SpellAffli.GrimoireofSacrificeBuff))
     elseif self == SpellAffli.GrimoireofSacrifice then
@@ -110,13 +110,13 @@ HL.AddCoreOverride ("Player.SoulShardsP",
 
 local DemoOldSpellIsCastable
 DemoOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local RangeOK = true
     if Range then
       local RangeUnit = ThisUnit or Target
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
-    local BaseCheck = DemoOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = DemoOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellDemo.SummonPet then
       return BaseCheck and (not Settings.Commons.HidePetSummon) and (not Pet:IsActive()) and Player:SoulShardsP() > 0 and not Player:IsCasting(self)
     elseif self == SpellDemo.SummonDemonicTyrant then
@@ -170,13 +170,13 @@ HL.AddCoreOverride ("Player.SoulShardsP",
   
 local DestroOldSpellIsCastable
 DestroOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
-  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local RangeOK = true
     if Range then
       local RangeUnit = ThisUnit or Target
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
-    local BaseCheck = DestroOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = DestroOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellDestro.SummonPet then
       return BaseCheck and (not Settings.Commons.HidePetSummon) and Player:SoulShardsP() > 0 and (not Player:IsCasting(self)) and not (Pet:IsActive() or Player:BuffUp(SpellDestro.GrimoireofSacrificeBuff))
     elseif self == SpellDestro.Immolate or self == SpellDestro.Cataclysm or self == SpellDestro.ChannelDemonfire or self == SpellDestro.SoulRot or self == SpellDestro.SummonSoulkeeper then
