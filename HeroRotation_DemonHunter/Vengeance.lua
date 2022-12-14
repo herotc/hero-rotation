@@ -73,26 +73,26 @@ local function UpdateSoulFragments()
 
   -- Check if we have cast Soul Carver, Fracture, or Shear within the last GCD and haven't "snapshot" yet
   if SoulFragmentsAdjusted == 0 then
+    local MetaMod = (Player:BuffUp(S.MetamorphosisBuff)) and 1 or 0
     if S.SoulCarver:IsAvailable() and S.SoulCarver:TimeSinceLastCast() < Player:GCD() and S.SoulCarver.LastCastTime ~= LastSoulFragmentAdjustment then
       SoulFragmentsAdjusted = math.min(SoulFragments + 2, 5)
       LastSoulFragmentAdjustment = S.SoulCarver.LastCastTime
     elseif S.Fracture:IsAvailable() and S.Fracture:TimeSinceLastCast() < Player:GCD() and S.Fracture.LastCastTime ~= LastSoulFragmentAdjustment then
-      SoulFragmentsAdjusted = math.min(SoulFragments + 2, 5)
+      SoulFragmentsAdjusted = math.min(SoulFragments + 2 + MetaMod, 5)
       LastSoulFragmentAdjustment = S.Fracture.LastCastTime
     elseif S.Shear:TimeSinceLastCast() < Player:GCD() and S.Fracture.Shear ~= LastSoulFragmentAdjustment then
-      SoulFragmentsAdjusted = math.min(SoulFragments + 1, 5)
+      SoulFragmentsAdjusted = math.min(SoulFragments + 1 + MetaMod, 5)
       LastSoulFragmentAdjustment = S.Shear.LastCastTime
     end
   else
     -- If we have a soul fragement "snapshot", see if we should invalidate it based on time
-    if S.Fracture:IsAvailable() then
-      if S.Fracture:TimeSinceLastCast() >= Player:GCD() then
-        SoulFragmentsAdjusted = 0
-      end
-    else
-      if S.Shear:TimeSinceLastCast() >= Player:GCD() then
-        SoulFragmentsAdjusted = 0
-      end
+    local Prev = Player:PrevGCD(1)
+    if Prev == 207407 and S.SoulCarver:TimeSinceLastCast() >= Player:GCD() then
+      SoulFragmentsAdjusted = 0
+    elseif Prev == 263642 and S.Fracture:TimeSinceLastCast() >= Player:GCD() then
+      SoulFragmentsAdjusted = 0
+    elseif Prev == 203782 and S.Shear:TimeSinceLastCast() >= Player:GCD() then
+      SoulFragmentsAdjusted = 0
     end
   end
 
