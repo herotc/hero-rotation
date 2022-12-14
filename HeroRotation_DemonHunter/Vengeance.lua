@@ -20,6 +20,9 @@ local CDsON         = HR.CDsON
 local Cast          = HR.Cast
 local CastSuggested = HR.CastSuggested
 local CastAnnotated = HR.CastAnnotated
+-- Num/Bool Helper Functions
+local num           = HR.Commons.Everyone.num
+local bool          = HR.Commons.Everyone.bool
 -- lua
 local mathmax       = math.max
 local mathmin       = math.min
@@ -333,11 +336,11 @@ local function APL()
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     end
     -- variable,name=rampH_done,value=0,op=setif,value_else=1,condition=talent.the_hunt.enabled&cooldown.the_hunt.remains<5
-    VarRampHDone = (S.TheHunt:IsAvailable() and S.TheHunt:CooldownRemains() < 5) and false or true
+    VarRampHDone = (S.TheHunt:IsAvailable() and S.TheHunt:CooldownRemains() < 5) and 0 or 1
     -- variable,name=rampED_done,value=0,op=setif,value_else=1,condition=talent.elysian_decree.enabled&cooldown.elysian_decree.remains<5
-    VarRampEDDone = (S.ElysianDecree:IsAvailable() and S.ElysianDecree:CooldownRemains() < 5) and false or true
+    VarRampEDDone = (S.ElysianDecree:IsAvailable() and S.ElysianDecree:CooldownRemains() < 5) and 0 or 1
     -- variable,name=rampSC_done,value=0,op=setif,value_else=1,condition=talent.soul_carver.enabled&cooldown.soul_carver.remains<5&!talent.fiery_demise.enabled
-    VarRampSCDone = (S.SoulCarver:IsAvailable() and S.SoulCarver:CooldownRemains() < 5 and not S.FieryDemise:IsAvailable()) and false or true
+    VarRampSCDone = (S.SoulCarver:IsAvailable() and S.SoulCarver:CooldownRemains() < 5 and not S.FieryDemise:IsAvailable()) and 0 or 1
     -- variable,name=FD_done,value=0,op=setif,value_else=1,condition=talent.fiery_demise.enabled&cooldown.soul_carver.up&cooldown.fiery_brand.up&cooldown.immolation_aura.up&cooldown.fel_devastation.remains<10|dot.fiery_brand.ticking&talent.fiery_demise
     -- Note: Tweaked as per conversation with APL creator:
     -- variable,name=FD_done,value=0,op=setif,condition=talent.fiery_demise.enabled&cooldown.fiery_brand.up&(talent.down_in_flames.enabled&(cooldown.soul_carver.up|cooldown.fel_devastation.up)|!talent.down_in_flames.enabled&cooldown.soul_carver.up)
@@ -379,17 +382,17 @@ local function APL()
     end
     if Target:DebuffDown(S.FieryBrandDebuff) then
       -- run_action_list,name=rampH,if=variable.rampH_done=0&!dot.fiery_brand.ticking
-      if (not VarRampHDone) then
+      if (not bool(VarRampHDone)) then
         local ShouldReturn = RampH(); if ShouldReturn then return ShouldReturn; end
         if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for RampH()"; end
       end
       -- run_action_list,name=rampED,if=variable.rampED_done=0&!dot.fiery_brand.ticking
-      if (not VarRampEDDone) then
+      if (not bool(VarRampEDDone)) then
         local ShouldReturn = RampED(); if ShouldReturn then return ShouldReturn; end
         if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for RampED()"; end
       end
       -- run_action_list,name=rampSC,if=variable.rampSC_done=0&!dot.fiery_brand.ticking
-      if (not VarRampSCDone) then
+      if (not bool(VarRampSCDone)) then
         local ShouldReturn = RampSC(); if ShouldReturn then return ShouldReturn; end
         if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for RampSC()"; end
       end
