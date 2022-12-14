@@ -19,6 +19,9 @@ local HR         = HeroRotation
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 local Cast       = HR.Cast
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 -- Lua
 -- WoW API
 local UnitHealthMax = UnitHealthMax

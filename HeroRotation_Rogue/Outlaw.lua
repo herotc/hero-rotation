@@ -17,6 +17,9 @@ local Item = HL.Item
 local HR = HeroRotation
 local AoEON = HR.AoEON
 local CDsON = HR.CDsON
+-- Num/Bool Helper Functions
+local num = HR.Commons.Everyone.num
+local bool = HR.Commons.Everyone.bool
 -- Lua
 local mathmin = math.min
 local mathabs = math.abs
@@ -78,11 +81,6 @@ local Energy, EnergyRegen, EnergyDeficit, EnergyTimeToMax, EnergyMaxOffset
 local Interrupts = {
   { S.Blind, "Cast Blind (Interrupt)", function () return true end },
 }
-
--- Utils
-local function num(val)
-  if val then return 1 else return 0 end
-end
 
 -- Stable Energy Prediction
 local PrevEnergyTimeToMaxPredicted, PrevEnergyPredicted = 0, 0

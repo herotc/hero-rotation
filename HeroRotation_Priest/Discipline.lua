@@ -18,6 +18,9 @@ local HR         = HeroRotation
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 local Cast       = HR.Cast
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -43,14 +46,6 @@ local Settings = {
   Commons = HR.GUISettings.APL.Priest.Commons,
   Discipline = HR.GUISettings.APL.Priest.Discipline
 }
-
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
 
 local function Precombat()
   -- flask

@@ -17,6 +17,9 @@ local BoolToInt = HL.Utils.BoolToInt
 local HR = HeroRotation
 local AoEON = HR.AoEON
 local CDsON = HR.CDsON
+-- Num/Bool Helper Functions
+local num = HR.Commons.Everyone.num
+local bool = HR.Commons.Everyone.bool
 -- Lua
 local pairs = pairs
 local tableinsert = table.insert
@@ -168,10 +171,6 @@ local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD, Enemies)
       HR.CastLeftNameplate(BestUnit, DoTSpell)
     end
   end
-end
-
-local function num(val)
-  if val then return 1 else return 0 end
 end
 
 -- APL Action Lists (and Variables)

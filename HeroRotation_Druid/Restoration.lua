@@ -3,22 +3,25 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroDBC
-local DBC = HeroDBC.DBC
+local DBC           = HeroDBC.DBC
 -- HeroLib
-local HL = HeroLib
-local Cache = HeroCache
-local Unit = HL.Unit
-local Player = Unit.Player
-local Pet = Unit.Pet
-local Target = Unit.Target
-local Spell = HL.Spell
-local MultiSpell = HL.MultiSpell
-local Item = HL.Item
+local HL            = HeroLib
+local Cache         = HeroCache
+local Unit          = HL.Unit
+local Player        = Unit.Player
+local Pet           = Unit.Pet
+local Target        = Unit.Target
+local Spell         = HL.Spell
+local MultiSpell    = HL.MultiSpell
+local Item          = HL.Item
 -- HeroRotation
-local HR = HeroRotation
-local AoEON = HR.AoEON
-local CDsON = HR.CDsON
-local Cast  = HR.Cast
+local HR            = HeroRotation
+local AoEON         = HR.AoEON
+local CDsON         = HR.CDsON
+local Cast          = HR.Cast
+-- Num/Bool Helper Functions
+local num           = HR.Commons.Everyone.num
+local bool          = HR.Commons.Everyone.bool
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -85,15 +88,6 @@ local function ComputeRakePMultiplier()
   return Player:StealthUp(true, true) and 1.6 or 1
 end
 S.Rake:RegisterPMultiplier(S.RakeDebuff, ComputeRakePMultiplier)
-
--- num/bool Functions
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
 
 -- Helper Functions
 local function EclipseCheck()

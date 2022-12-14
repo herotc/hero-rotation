@@ -21,6 +21,9 @@ local CastLeft   = HR.CastLeft
 local CDsON      = HR.CDsON
 local AoEON      = HR.AoEON
 local Mage       = HR.Commons.Mage
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 -- lua
 local max        = math.max
 
@@ -66,14 +69,6 @@ HL:RegisterForEvent(function()
   BossFightRemains = 11111
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
-
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
 
 local function FrozenRemains()
   return max(Target:DebuffRemains(S.Frostbite), Target:DebuffRemains(S.Freeze), Target:DebuffRemains(S.FrostNova))

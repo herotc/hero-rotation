@@ -19,6 +19,9 @@ local Cast       = HR.Cast
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 local Warlock    = HR.Commons.Warlock
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 -- lua
 local GetTime    = GetTime
 
@@ -74,15 +77,6 @@ HL:RegisterForEvent(function()
   S.HandofGuldan:RegisterInFlight()
 end, "LEARNED_SPELL_IN_TAB")
 S.HandofGuldan:RegisterInFlight()
-
--- Helper Functions
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
 
 -- Function to check for imp count
 local function WildImpsCount()

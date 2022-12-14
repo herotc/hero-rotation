@@ -19,6 +19,9 @@ local HR         = HeroRotation
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 local Cast       = HR.Cast
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 -- Lua
 local pairs      = pairs
 
@@ -70,14 +73,6 @@ HL:RegisterForEvent(function()
   BossFightRemains = 11111
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
-
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
 
 local function EnergyTimeToMaxRounded()
   -- Round to the nearesth 10th to reduce prediction instability on very high regen rates

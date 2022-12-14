@@ -3,7 +3,7 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroDBC
-local DBC = HeroDBC.DBC
+local DBC        = HeroDBC.DBC
 -- HeroLib
 local HL         = HeroLib
 local Cache      = HeroCache
@@ -19,6 +19,9 @@ local HR         = HeroRotation
 local Cast       = HR.Cast
 local CDsON      = HR.CDsON
 local AoEON      = HR.AoEON
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 -- lua
 local GetTime    = GetTime
 -- File Locals
@@ -93,15 +96,6 @@ end, "LEARNED_SPELL_IN_TAB")
 S.SerpentSting:RegisterInFlight()
 S.SteadyShot:RegisterInFlight()
 S.AimedShot:RegisterInFlight()
-
---Functions
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
 
 -- TODO(mrdmnd) - if you're casting (aimed or rapid fire) with volley up, you actually only have trick shots for next
 -- aimed shot if volley buff is still up at the end of the cast. also conceivably build in buffer here.

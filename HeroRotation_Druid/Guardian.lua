@@ -3,22 +3,25 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroDBC
-local DBC = HeroDBC.DBC
+local DBC           = HeroDBC.DBC
 -- HeroLib
-local HL = HeroLib
-local Cache = HeroCache
-local Unit = HL.Unit
-local Player = Unit.Player
-local Pet = Unit.Pet
-local Target = Unit.Target
-local Spell = HL.Spell
-local MultiSpell = HL.MultiSpell
-local Item = HL.Item
+local HL            = HeroLib
+local Cache         = HeroCache
+local Unit          = HL.Unit
+local Player        = Unit.Player
+local Pet           = Unit.Pet
+local Target        = Unit.Target
+local Spell         = HL.Spell
+local MultiSpell    = HL.MultiSpell
+local Item          = HL.Item
 -- HeroRotation
-local HR = HeroRotation
-local AoEON = HR.AoEON
-local CDsON = HR.CDsON
-local Cast  = HR.Cast
+local HR            = HeroRotation
+local AoEON         = HR.AoEON
+local CDsON         = HR.CDsON
+local Cast          = HR.Cast
+-- Num/Bool Helper Functions
+local num           = HR.Commons.Everyone.num
+local bool          = HR.Commons.Everyone.bool
 -- Lua
 
 --- ============================ CONTENT ============================
@@ -62,15 +65,7 @@ HL:RegisterForEvent(function()
   trinket2 = equip[14] and Item(equip[14]) or Item(0)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
--- num/bool Functions
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
-
+-- Functions
 local function NoToothandClaw(enemies)
   for _, CycleUnit in pairs(enemies) do
     if CycleUnit:DebuffUp(S.ToothandClawDebuff) then
@@ -80,7 +75,7 @@ local function NoToothandClaw(enemies)
   return true
 end
 
--- Functions
+-- Cycle Functions
 local function EvaluateCycleMoonfire(TargetUnit)
   -- if=((!ticking&time_to_die>12)|(refreshable&time_to_die>12))&active_enemies<8
   return ((TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and TargetUnit:TimeToDie() > 12) and MeleeEnemies11yCount < 8)

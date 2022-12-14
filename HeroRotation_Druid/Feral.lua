@@ -20,6 +20,9 @@ local AoEON       = HR.AoEON
 local CDsON       = HR.CDsON
 local Cast        = HR.Cast
 local CastPooling = HR.CastPooling
+-- Num/Bool Helper Functions
+local num         = HR.Commons.Everyone.num
+local bool        = HR.Commons.Everyone.bool
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -106,15 +109,6 @@ S.AdaptiveSwarm:RegisterInFlight()
 local InterruptStuns = {
   { S.MightyBash, "Cast Mighty Bash (Interrupt)", function () return true; end },
 }
-
--- num/bool Functions
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
 
 -- PMultiplier and Damage Registrations
 local function ComputeRakePMultiplier()

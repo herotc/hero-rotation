@@ -18,6 +18,9 @@ local HR         = HeroRotation
 local Cast       = HR.Cast
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 -- Lua
 local GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local max        = math.max
@@ -74,14 +77,6 @@ HL:RegisterForEvent(function()
   PrimalLavaActuatorsEquipped = Player:HasLegendaryEquipped(141)
   SeedsofRampantGrowthEquipped = Player:HasLegendaryEquipped(246)
 end, "PLAYER_EQUIPMENT_CHANGED")
-
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
 
 local function TotemFinder()
   for i = 1, 6, 1 do

@@ -18,6 +18,9 @@ local HR         = HeroRotation
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 local Cast       = HR.Cast
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 -- lua
 local mathfloor  = math.floor
 -- WoW API

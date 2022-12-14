@@ -23,6 +23,9 @@ local CDsON = HR.CDsON
 local Cast = HR.Cast
 local CastPooling = HR.CastPooling
 local CastLeftNameplate = HR.CastLeftNameplate
+-- Num/Bool Helper Functions
+local num = HR.Commons.Everyone.num
+local bool = HR.Commons.Everyone.bool
 -- Lua
 local pairs = pairs
 local mathfloor = math.floor

@@ -19,6 +19,9 @@ local AoEON         = HR.AoEON
 local CDsON         = HR.CDsON
 local Cast          = HR.Cast
 local CastSuggested = HR.CastSuggested
+-- Num/Bool Helper Functions
+local num           = HR.Commons.Everyone.num
+local bool          = HR.Commons.Everyone.bool
 -- lua
 local mathmin       = math.min
 
@@ -94,14 +97,7 @@ HL:RegisterForEvent(function()
   trinket2 = equip[14] and Item(equip[14]) or Item(0)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
-
+-- Functions
 local function IsInMeleeRange(range)
   if S.Felblade:TimeSinceLastCast() <= Player:GCD() then
     return true

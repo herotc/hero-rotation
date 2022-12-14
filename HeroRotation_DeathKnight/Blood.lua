@@ -18,6 +18,9 @@ local HR         = HeroRotation
 local Cast       = HR.Cast
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 -- lua
 local mathmin    = math.min
 
@@ -59,14 +62,6 @@ local StunInterrupts = {
 }
 
 --Functions
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
-
 local function UnitsWithoutBP(enemies)
   local WithoutBPCount = 0
   for _, CycleUnit in pairs(enemies) do

@@ -16,6 +16,9 @@ local HR         = HeroRotation
 local Cast       = HR.Cast
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 -- lua
 local mathfloor  = math.floor
 
@@ -69,14 +72,6 @@ local CovenantID = Player:CovenantID()
 HL:RegisterForEvent(function()
   CovenantID = Player:CovenantID()
 end, "COVENANT_CHOSEN")
-
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
 
 local function IsCurrentlyTanking()
   return Player:IsTankingAoE(16) or Player:IsTanking(Target) or Target:IsDummy()

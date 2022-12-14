@@ -18,6 +18,9 @@ local HR         = HeroRotation
 local Cast       = HR.Cast
 local CDsON      = HR.CDsON
 local AoEON      = HR.AoEON
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 -- lua
 local strsplit   = strsplit
 -- WoW API
@@ -104,14 +107,6 @@ HL:RegisterForEvent(function()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- Helper Functions
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
-
 local function DeathStrikeHeal()
   return (Settings.General.SoloMode and (Player:HealthPercentage() < Settings.Commons.UseDeathStrikeHP or Player:HealthPercentage() < Settings.Commons.UseDarkSuccorHP and Player:BuffUp(S.DeathStrikeBuff)))
 end

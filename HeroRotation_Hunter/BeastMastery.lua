@@ -3,26 +3,27 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroDBC
-local DBC = HeroDBC.DBC
+local DBC           = HeroDBC.DBC
 -- HeroLib
-local HL         = HeroLib
-local Cache      = HeroCache
-local Unit       = HL.Unit
-local Player     = Unit.Player
-local Target     = Unit.Target
-local Pet        = Unit.Pet
-local Spell      = HL.Spell
-local Item       = HL.Item
-local Action     = HL.Action
+local HL            = HeroLib
+local Cache         = HeroCache
+local Unit          = HL.Unit
+local Player        = Unit.Player
+local Target        = Unit.Target
+local Pet           = Unit.Pet
+local Spell         = HL.Spell
+local Item          = HL.Item
+local Action        = HL.Action
 -- HeroRotation
-local HR         = HeroRotation
-local AoEON      = HR.AoEON
-local CDsON      = HR.CDsON
-local Cast       = HR.Cast
+local HR            = HeroRotation
+local AoEON         = HR.AoEON
+local CDsON         = HR.CDsON
+local Cast          = HR.Cast
 local CastSuggested = HR.CastSuggested
+-- Num/Bool Helper Functions
+local num           = HR.Commons.Everyone.num
+local bool          = HR.Commons.Everyone.bool
 -- Lua
-local mathmax    = math.max
-
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -82,16 +83,7 @@ local TargetInRangePet30y
 -- Interrupts
 local StunInterrupts = {
   { S.Intimidation, "Cast Intimidation (Interrupt)", function () return true; end },
-};
-
---- ======= HELPERS =======
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
+}
 
 --- ======= CastTargetIf Functions =======
 local function EvaluateTargetIfFilterBarbedShot(TargetUnit)

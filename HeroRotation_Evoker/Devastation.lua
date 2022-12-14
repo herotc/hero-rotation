@@ -21,6 +21,9 @@ local Cast          = HR.Cast
 local CastPooling   = HR.CastPooling
 local CastAnnotated = HR.CastAnnotated
 local CastSuggested = HR.CastSuggested
+-- Num/Bool Helper Functions
+local num           = HR.Commons.Everyone.num
+local bool          = HR.Commons.Everyone.bool
 -- lua
 local mathmax       = math.max
 
@@ -92,14 +95,6 @@ HL:RegisterForEvent(function()
   BossFightRemains = 11111
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
-
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
 
 local function Precombat()
   -- flask

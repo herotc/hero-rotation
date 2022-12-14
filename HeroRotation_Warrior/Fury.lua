@@ -17,7 +17,9 @@ local HR         = HeroRotation
 local Cast       = HR.Cast
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
-
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -83,14 +85,6 @@ HL:RegisterForEvent(function()
   ElysianMightEquipped = Player:HasLegendaryEquipped(263)
   SinfulSurgeEquipped = Player:HasLegendaryEquipped(215) or (CovenantID == 2 and Player:HasUnity())
 end, "PLAYER_EQUIPMENT_CHANGED")
-
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
 
 local function Precombat()
   -- flask

@@ -21,6 +21,9 @@ local CastLeft   = HR.CastLeft
 local CDsON      = HR.CDsON
 local AoEON      = HR.AoEON
 local FBCast
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 -- lua
 local max        = math.max
 local ceil       = math.ceil
@@ -185,14 +188,6 @@ local function UnitsWithIgnite (enemies)
     end
   end
   return WithIgnite
-end
-
-local function num (val)
-  if val then return 1 else return 0 end
-end
-
-local function bool (val)
-  return val ~= 0
 end
 
 local function HotStreakInFlight()

@@ -22,6 +22,9 @@ local Cast       = HR.Cast
 local CastLeft   = HR.CastLeft
 local CDsON      = HR.CDsON
 local AoEON      = HR.AoEON
+-- Num/Bool Helper Functions
+local num        = HR.Commons.Everyone.num
+local bool       = HR.Commons.Everyone.bool
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -128,14 +131,6 @@ function ArcaneOpener:Reset ()
   var_init = false
 end
 ArcaneOpener:Reset()
-
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
 
 local function VarInit()
   --variable,name=aoe_target_count,default=-1,op=set,if=variable.aoe_target_count=-1,value=3
