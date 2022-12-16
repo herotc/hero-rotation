@@ -193,7 +193,8 @@ end
 
 local function RampED()
   -- fracture,if=fury.deficit>=30
-  if S.Fracture:IsCastable() and (Player:FuryDeficit() >= 30) then
+  -- Manually added: &debuff.frailty.stack<=5 (otherwise, will continually loop Fracture and SpiritBomb/SoulCleave)
+  if S.Fracture:IsCastable() and (Player:FuryDeficit() >= 30 and Target:DebuffStack(S.FrailtyDebuff) <= 5) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture ramped 2"; end
   end
   -- sigil_of_flame,if=fury.deficit>=30
@@ -226,7 +227,8 @@ end
 
 local function RampSC()
   -- fracture,if=fury.deficit>=30
-  if S.Fracture:IsCastable() and (Player:FuryDeficit() >= 30) then
+  -- Manually added: &debuff.frailty.stack<=5 (otherwise, will continually loop Fracture and SpiritBomb/SoulCleave)
+  if S.Fracture:IsCastable() and (Player:FuryDeficit() >= 30 and Target:DebuffStack(S.FrailtyDebuff) <= 5) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture rampsc 2"; end
   end
   -- sigil_of_flame,if=fury.deficit>=30
@@ -398,7 +400,7 @@ local function APL()
       end
     end
     -- run_action_list,name=FD,if=variable.FD_done=0
-    if (not VarFDDone) then
+    if (S.FieryDemise:IsAvailable() and not VarFDDone) then
       local ShouldReturn = FD(); if ShouldReturn then return ShouldReturn; end
       if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for FD()"; end
     end
