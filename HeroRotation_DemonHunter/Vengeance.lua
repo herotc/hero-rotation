@@ -400,6 +400,7 @@ local function APL()
       end
     end
     -- run_action_list,name=FD,if=variable.FD_done=0
+    -- Manually added: Check fiery_demise. If not talented, the VarFDDone check remains nil, causing the profile to enter FD().
     if (S.FieryDemise:IsAvailable() and not VarFDDone) then
       local ShouldReturn = FD(); if ShouldReturn then return ShouldReturn; end
       if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for FD()"; end
