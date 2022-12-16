@@ -55,6 +55,7 @@ HR.GUISettings.APL.DeathKnight = {
     },
     PoolDuringBlooddrinker = false,
     GCDasOffGCD = {
+      Bonestorm = false,
       ChainsOfIce = false,
       DancingRuneWeapon = false,
       DeathStrike = false,
