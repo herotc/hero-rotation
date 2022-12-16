@@ -256,7 +256,7 @@ local function Cleave()
   end
   -- death_chakram
   if S.DeathChakram:IsCastable() then
-    if Cast(S.DeathChakram, nil, nil, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram cleave 18"; end
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram cleave 18"; end
   end
   -- bestial_wrath
   if S.BestialWrath:IsCastable() and CDsON() then
@@ -335,7 +335,7 @@ local function ST()
   end
   -- death_chakram
   if S.DeathChakram:IsCastable() then
-    if Cast(S.DeathChakram, nil, nil, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram st 8"; end
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram st 8"; end
   end
   -- bloodshed
   if S.Bloodshed:IsCastable() then
