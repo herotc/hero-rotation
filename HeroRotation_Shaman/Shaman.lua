@@ -89,6 +89,8 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   ThorimsInvocation                     = Spell(384444),
   WindfuryTotem                         = Spell(8512),
   WindfuryWeapon                        = Spell(33757),
+  MoltenAssault							= Spell(334033),
+  ConvergingStorms                      = Spell(384363),
   -- Buffs
   AscendanceBuff                        = Spell(114051),
   AshenCatalystBuff                     = Spell(390371),
