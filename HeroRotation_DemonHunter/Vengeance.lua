@@ -443,13 +443,13 @@ local function APL()
     if S.Shear:IsCastable() and IsInMeleeRange then
       if Cast(S.Shear) then return "shear main 30"; end
     end
-    --[[ Manually added: fracture as a fallback filler
+    -- Manually added: fracture as a fallback filler
     if S.Fracture:IsCastable() and IsInMeleeRange then
       if Cast(S.Fracture) then return "fracture main 32"; end
-    end]]
+    end
     -- throw_glaive
     if S.ThrowGlaive:IsCastable() then
-      if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 34 (OOR)"; end
+      if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 34"; end
     end
     -- If nothing else to do, show the Pool icon
     if CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
