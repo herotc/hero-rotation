@@ -277,8 +277,8 @@ local function Cleave()
   if S.Carve:IsReady() then
     if Cast(S.Carve, nil, nil, not Target:IsInMeleeRange(5)) then return "carve cleave 36"; end
   end
-  -- kill_shot
-  if S.KillShot:IsReady() then
+  -- kill_shot,if=!buff.coordinated_assault.up
+  if S.KillShot:IsReady() and (Player:BuffDown(S.CoordinatedAssaultBuff)) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot cleave 38"; end
   end
   -- steel_trap,if=focus+cast_regen<focus.max
@@ -324,8 +324,8 @@ local function ST()
   if S.MongooseBite:IsReady() and (EnemyCount8ySplash == 1 and Target:TimeToDie() < Player:Focus() / (MBRSCost - Player:FocusCastRegen(S.MongooseBite:ExecuteTime())) * Player:GCD() or Player:BuffUp(S.MongooseFuryBuff) and Player:BuffRemains(S.MongooseFuryBuff) < Player:GCD()) then
     if Cast(S.MongooseBite, nil, nil, not Target:IsInMeleeRange(5)) then return "mongoose_bite st 12"; end
   end
-  -- kill_shot
-  if S.KillShot:IsReady() then
+  -- kill_shot,if=!buff.coordinated_assault.up
+  if S.KillShot:IsReady() and (Player:BuffDown(S.CoordinatedAssaultBuff)) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot st 14"; end
   end
   -- raptor_strike,if=active_enemies=1&target.time_to_die<focus%(variable.mb_rs_cost-cast_regen)*gcd
@@ -344,12 +344,16 @@ local function ST()
   if S.FlankingStrike:IsCastable() and (CheckFocusCap(S.FlankingStrike:ExecuteTime(), 30)) then
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike st 22"; end
   end
+  -- stampede
+  if S.Stampede:IsCastable() and CDsON() then
+    if Cast(S.Stampede, Settings.Commons2.GCDasOffGCD.Stampede, nil, not Target:IsSpellInRange(S.Stampede)) then return "stampede st 23"; end
+  end
   -- coordinated_assault,if=!talent.coordinated_kill&target.health.pct<20&(!buff.spearhead.remains&cooldown.spearhead.remains|!talent.spearhead)|talent.coordinated_kill&(!buff.spearhead.remains&cooldown.spearhead.remains|!talent.spearhead)
   if S.CoordinatedAssault:IsCastable() and CDsON() and ((not S.CoordinatedKill:IsAvailable()) and Target:HealthPercentage() < 20 and (Player:BuffDown(S.SpearheadBuff) and S.Spearhead:CooldownDown() or not S.Spearhead:IsAvailable()) or S.CoordinatedKill:IsAvailable() and (Player:BuffDown(S.SpearheadBuff) and S.Spearhead:CooldownDown() or not S.Spearhead:IsAvailable())) then
     if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault st 24"; end
   end
-  -- wildfire_bomb,if=next_wi_bomb.pheromone&!buff.mongoose_fury.up&focus+cast_regen<focus.max-action.kill_command.cast_regen*2
-  if S.PheromoneBomb:IsCastable() and (S.PheromoneBomb:IsCastable() and Player:BuffDown(S.MongooseFuryBuff) and Player:Focus() + Player:FocusCastRegen(S.PheromoneBomb:ExecuteTime()) < Player:FocusMax() - (Player:FocusCastRegen(S.KillCommand:ExecuteTime()) + 21) * 2) then
+  -- wildfire_bomb,if=next_wi_bomb.pheromone&!buff.mongoose_fury.up&focus+cast_regen<focus.max-action.kill_command.cast_regen*2|buff.coordinated_assault.up&focus+cast_regen<focus.max&talent.coordinated_kill.rank>1
+  if S.PheromoneBomb:IsCastable() and (S.PheromoneBomb:IsCastable() and Player:BuffDown(S.MongooseFuryBuff) and Player:Focus() + Player:FocusCastRegen(S.PheromoneBomb:ExecuteTime()) < Player:FocusMax() - (Player:FocusCastRegen(S.KillCommand:ExecuteTime()) + 21) * 2 or Player:BuffUp(S.CoordinatedAssaultBuff) and CheckFocusCap(S.PheromoneBomb:ExecuteTime()) and S.CoordinatedKill:TalentRank() > 1) then
     if Cast(S.PheromoneBomb, nil, nil, not Target:IsSpellInRange(S.PheromoneBomb)) then return "wildfire_bomb st 26"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=full_recharge_time<gcd&focus+cast_regen<focus.max
@@ -376,6 +380,10 @@ local function ST()
   if S.MongooseBite:IsReady() and (Player:BuffUp(S.MongooseFuryBuff)) then
     if Everyone.CastTargetIf(S.MongooseBite, EnemyList, "max", EvaluateTargetIfFilterLatentStacks, nil, not Target:IsInMeleeRange(5)) then return "mongoose_bite st 36"; end
   end
+  -- explosive_shot,if=talent.ranger
+  if S.ExplosiveShot:IsReady() and (S.Ranger:IsAvailable()) then
+    if Cast(S.ExplosiveShot, nil, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot st 37"; end
+  end
   -- wildfire_bomb,if=full_recharge_time<gcd
   if (S.WildfireBomb:FullRechargeTime() < Player:GCD()) then
     for _, Bomb in pairs(Bombs) do
@@ -387,14 +395,6 @@ local function ST()
   -- mongoose_bite,target_if=max:debuff.latent_poison.stack,if=focus+action.kill_command.cast_regen>focus.max-10
   if S.MongooseBite:IsReady() and (Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) + 21 > Player:FocusMax() - 10) then
     if Everyone.CastTargetIf(S.MongooseBite, EnemyList, "max", EvaluateTargetIfFilterLatentStacks, nil, not Target:IsInMeleeRange(5)) then return "mongoose_bite st 40"; end
-  end
-  -- stampede
-  if S.Stampede:IsCastable() and CDsON() then
-    if Cast(S.Stampede, Settings.Commons2.GCDasOffGCD.Stampede, nil, not Target:IsSpellInRange(S.Stampede)) then return "stampede st 42"; end
-  end
-  -- explosive_shot,if=talent.ranger
-  if S.ExplosiveShot:IsReady() and (S.Ranger:IsAvailable()) then
-    if Cast(S.ExplosiveShot, nil, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot st 44"; end
   end
   -- raptor_strike,target_if=max:debuff.latent_poison.stack
   if S.RaptorStrike:IsReady() then
