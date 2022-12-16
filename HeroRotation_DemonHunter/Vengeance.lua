@@ -227,7 +227,7 @@ end
 local function RampSC()
   -- fracture,if=fury.deficit>=30
   if S.Fracture:IsCastable() and (Player:FuryDeficit() >= 30) then
-    if Cast(S.Fracture, nil, nil, IsInMeleeRange) then return "fracture rampsc 2"; end
+    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture rampsc 2"; end
   end
   -- sigil_of_flame,if=fury.deficit>=30
   if S.SigilofFlame:IsCastable() and ((IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRefreshable(S.SigilofFlameDebuff)) and (Player:FuryDeficit() >= 30) then
