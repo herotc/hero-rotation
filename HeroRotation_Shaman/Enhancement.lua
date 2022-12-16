@@ -185,11 +185,10 @@ local function Single()
   if S.IceStrike:IsReady() and (S.Hailstorm:IsAvailable()) then
     if Cast(S.IceStrike, nil, nil, not Target:IsInMeleeRange(5)) then return "ice_strike single 22"; end
   end
-
-
-  -- (+) stormstrike,if=set_bonus.tier29_2pc&buff.maelstrom_of_elements.down&buff.maelstrom_weapon.stack<=5
-
-
+  -- stormstrike,if=set_bonus.tier29_2pc&buff.maelstrom_of_elements.down&buff.maelstrom_weapon.stack<=5
+  if S.Stormstrike:IsCastable() and (S.MaelstromofElementsBuff:IsAvailable() and Player:BuffDown(S.MaelstromofElementsBuff) and Player:BuffStack(S.MaelstromWeaponBuff) <= 5) then
+    if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 28"; end
+  end
   -- frost_shock,if=buff.hailstorm.up
   if S.FrostShock:IsReady() and (Player:BuffUp(S.HailstormBuff)) then
     if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 24"; end
@@ -367,15 +366,10 @@ local function Aoe()
     if S.Windstrike:IsReady() then
       if Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Windstrike)) then return "windstrike aoe 44"; end
     end
-
-
-    -- (+) stormstrike,if=buff.crash_lightning.up&(buff.converging_storms.stack=6|(set_bonus.tier29_2pc&buff.maelstrom_of_elements.down&buff.maelstrom_weapon.stack<=5))
-    -- (-) stormstrike,if=buff.crash_lightning.up&buff.gathering_storms.stack=6
-    if S.Stormstrike:IsReady() and (Player:BuffStack(S.ConvergingStorms) == 6) then
+    -- stormstrike,if=buff.crash_lightning.up&(buff.converging_storms.stack=6|(set_bonus.tier29_2pc&buff.maelstrom_of_elements.down&buff.maelstrom_weapon.stack<=5))
+    if S.Stormstrike:IsReady() and (Player:BuffStack(S.ConvergingStorms) == 6 or (S.MaelstromofElementsBuff:IsAvailable() and Player:BuffDown(S.MaelstromofElementsBuff) and Player:BuffStack(S.MaelstromWeaponBuff) <= 5)) then
       if Cast(S.Stormstrike, nil, nil, not Target:IsInMeleeRange(5)) then return "stormstrike aoe 46"; end
     end
-
-
     -- lava_lash,if=buff.crash_lightning.up,if=talent.molten_assault.enabled
     if S.LavaLash:IsReady() and (S.MoltenAssault:IsAvailable()) then
       if Cast(S.LavaLash, nil, nil, not Target:IsInMeleeRange(5)) then return "lava_lash aoe 48"; end

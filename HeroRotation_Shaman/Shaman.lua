@@ -112,6 +112,8 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   LegacyoftheFrostWitch                 = Spell(335901),
   IcyEdgeBuff                           = Spell(224126),
   MoltenWeaponBuff                      = Spell(224125),
+  -- Tier 29 Buffs
+  MaelstromofElementsBuff               = Spell(394677),
 })
 
 Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
