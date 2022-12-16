@@ -80,7 +80,7 @@ end
 
 local function EvaluateTargetIfSoulReaper(TargetUnit)
   -- if=target.time_to_pct_35<5&active_enemies>=2&target.time_to_die>(dot.soul_reaper.remains+5)
-  return (TargetUnit:TimeToX(35) < 35 and TargetUnit:TimeToDie() > (TargetUnit:DebuffRemains(S.SoulReaperDebuff) + 5))
+  return (TargetUnit:TimeToX(35) < 5 and TargetUnit:TimeToDie() > (TargetUnit:DebuffRemains(S.SoulReaperDebuff) + 5))
 end
 
 local function Precombat()

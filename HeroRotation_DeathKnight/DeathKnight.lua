@@ -50,6 +50,7 @@ Spell.DeathKnight.Commons = {
   -- Debuffs
   BloodPlagueDebuff                     = Spell(55078),
   FrostFeverDebuff                      = Spell(55095),
+  SoulReaperDebuff                      = Spell(343294),
   VirulentPlagueDebuff                  = Spell(191587),
   -- Racials
   AncestralCall                         = Spell(274738),
