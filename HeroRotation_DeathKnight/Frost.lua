@@ -337,7 +337,7 @@ local function Cooldowns()
     if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead cooldowns 30"; end
   end
   -- soul_reaper,if=fight_remains>5&target.time_to_pct_35<5&active_enemies<=2&(buff.breath_of_sindragosa.up&runic_power>40|!buff.breath_of_sindragosa.up&!talent.obliteration|talent.obliteration&!buff.pillar_of_frost.up)
-  if S.SoulReaper:IsReady() and (FightRemains > 5 and Target:TimeToX(35) < 5 and EnemiesCount10yd <= 2 and (Player:BuffUp(S.BreathofSindragosa) and Player:RunicPower() > 40 or Player:BuffDown(S.BreathofSindragosa) and (not S.Obliteration:IsAvailable()) or S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff))) then
+  if S.SoulReaper:IsReady() and (FightRemains > 5 and (Target:TimeToX(35) < 5 or Target:HealthPercentage() <= 35) and EnemiesCount10yd <= 2 and (Player:BuffUp(S.BreathofSindragosa) and Player:RunicPower() > 40 or Player:BuffDown(S.BreathofSindragosa) and (not S.Obliteration:IsAvailable()) or S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff))) then
     if Cast(S.SoulReaper, nil, nil, not Target:IsInMeleeRange(5)) then return "soul_reaper cooldowns 32"; end
   end
   -- sacrificial_pact,if=!talent.glacial_advance&!buff.breath_of_sindragosa.up&pet.ghoul.remains<gcd*2&active_enemies>3
