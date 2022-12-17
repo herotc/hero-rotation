@@ -193,13 +193,22 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
 -- Items
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Commons = {
-  -- Potions
-  PotionOfSpectralAgility               = Item(171270),
   -- Trinkets
-  CacheofAcquiredTreasures              = Item(188265, {13, 14}),
-  DreadfireVessel                       = Item(184030, {13, 14}),
+  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
+  DMDDance                              = Item(198088, {13, 14}),
+  DMDDanceBox                           = Item(198478, {13, 14}),
+  DMDInferno                            = Item(198086, {13, 14}),
+  DMDInfernoBox                         = Item(194872, {13, 14}),
+  DMDRime                               = Item(198087, {13, 14}),
+  DMDRimeBox                            = Item(198477, {13, 14}),
+  DMDWatcher                            = Item(198089, {13, 14}),
+  DMDWatcherBox                         = Item(198481, {13, 14}),
+  DecorationofFlame                     = Item(194299, {13, 14}),
+  GlobeofJaggedIce                      = Item(193732, {13, 14}),
+  ManicGrieftorch                       = Item(194308, {13, 14}),
+  StormeatersBoon                       = Item(194302, {13, 14}),
+  WindscarWhetstone                     = Item(137486, {13, 14}),
   -- Other On-Use Items
-  Jotungeirr                            = Item(186404)
 }
 
 Item.Hunter.BeastMastery = MergeTableByKey(Item.Hunter.Commons, {

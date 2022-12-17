@@ -46,7 +46,19 @@ local SummonPetSpells = { S.SummonPet, S.SummonPet2, S.SummonPet3, S.SummonPet4,
 -- Items
 local I = Item.Hunter.BeastMastery;
 local OnUseExcludes = {
-  --  I.TrinketName:ID(),
+  I.DMDDance:ID(),
+  I.DMDDanceBox:ID(),
+  I.DMDInferno:ID(),
+  I.DMDInfernoBox:ID(),
+  I.DMDRime:ID(),
+  I.DMDRimeBox:ID(),
+  I.DMDWatcher:ID(),
+  I.DMDWatcherBox:ID(),
+  I.DecorationofFlame:ID(),
+  I.GlobeofJaggedIce:ID(),
+  I.ManicGrieftorch:ID(),
+  I.StormeatersBoon:ID(),
+  I.WindscarWhetstone:ID(),
 }
 
 -- Usable Item Objects
@@ -149,6 +161,10 @@ local function Precombat()
   -- summon_pet
   -- Handled in APL()
   -- snapshot_stats
+  --- use_item,name=algethar_puzzle_box
+  if I.AlgetharPuzzleBox:IsEquippedAndReady() then
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 1"; end
+  end
   -- steel_trap,precast_time=1.5,if=!talent.wailing_arrow&talent.steel_trap
   if S.SteelTrap:IsCastable() and ((not S.WailingArrow:IsAvailable()) and S.SteelTrap:IsAvailable()) then
     if Cast(S.SteelTrap, Settings.Commons2.GCDasOffGCD.SteelTrap) then return "steel_trap precombat 2"; end
@@ -186,6 +202,15 @@ local function CDs()
   end
   -- use_items,slots=trinket1,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<31
   -- use_items,slots=trinket2,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<31
+  -- use_item,name=manic_grieftorch,if=pet.main.buff.frenzy.remains>execute_time
+  -- use_item,name=darkmoon_deck_box_rime
+  -- use_item,name=darkmoon_deck_box_inferno
+  -- use_item,name=darkmoon_deck_box_dance
+  -- use_item,name=darkmoon_deck_box_watcher
+  -- use_item,name=decoration_of_flame
+  -- use_item,name=stormeaters_boon
+  -- use_item,name=windscar_whetstone
+  -- use_item,name=globe_of_jagged_ice
   -- Moved to Trinkets() so trinkets aren't relying on CDsON
   -- blood_fury,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<16
   if S.BloodFury:IsCastable() and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and (Player:BuffUp(S.BestialWrathBuff) and (Player:BloodlustUp() or Target:HealthPercentage() < 20)) or FightRemains < 16) then
@@ -212,12 +237,60 @@ local function Trinkets()
   -- use_items,slots=trinket1,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<31
   local Trinket1ToUse = Player:GetUseableTrinkets(OnUseExcludes, 13)
   if Trinket1ToUse and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and (Player:BuffUp(S.BestialWrathBuff) and (Player:BloodlustUp() or Target:HealthPercentage() < 20)) or FightRemains < 31) then
-    if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 cds 4"; end
+    if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 trinkets 2"; end
   end
   -- use_items,slots=trinket2,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<31
   local Trinket2ToUse = Player:GetUseableTrinkets(OnUseExcludes, 14)
   if Trinket2ToUse and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and (Player:BuffUp(S.BestialWrathBuff) and (Player:BloodlustUp() or Target:HealthPercentage() < 20)) or FightRemains < 31) then
-    if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 cds 6"; end
+    if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 trinkets 4"; end
+  end
+  -- use_item,name=manic_grieftorch,if=pet.main.buff.frenzy.remains>execute_time
+  if I.ManicGrieftorch:IsEquippedAndReady() and (Pet:BuffRemains(S.FrenzyPetBuff) > Spell(377463):ExecuteTime()) then
+    if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch trinkets 6"; end
+  end
+  -- use_item,name=darkmoon_deck_box_rime
+  if I.DMDRime:IsEquippedAndReady() then
+    if Cast(I.DMDRime, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_rime trinkets 8"; end
+  end
+  if I.DMDRimeBox:IsEquippedAndReady() then
+    if Cast(I.DMDRimeBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_rime trinkets 10"; end
+  end
+  -- use_item,name=darkmoon_deck_box_inferno
+  if I.DMDInferno:IsEquippedAndReady() then
+    if Cast(I.DMDInferno, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_inferno trinkets 12"; end
+  end
+  if I.DMDInfernoBox:IsEquippedAndReady() then
+    if Cast(I.DMDInfernoBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_inferno trinkets 14"; end
+  end
+  -- use_item,name=darkmoon_deck_box_dance
+  if I.DMDDance:IsEquippedAndReady() then
+    if Cast(I.DMDDance, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_dance trinkets 16"; end
+  end
+  if I.DMDDanceBox:IsEquippedAndReady() then
+    if Cast(I.DMDDanceBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_dance trinkets 18"; end
+  end
+  -- use_item,name=darkmoon_deck_box_watcher
+  if I.DMDWatcher:IsEquippedAndReady() then
+    if Cast(I.DMDWatcher, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_watcher trinkets 20"; end
+  end
+  if I.DMDWatcherBox:IsEquippedAndReady() then
+    if Cast(I.DMDWatcherBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_watcher trinkets 22"; end
+  end
+  -- use_item,name=decoration_of_flame
+  if I.DecorationofFlame:IsEquippedAndReady() then
+    if Cast(I.DecorationofFlame, nil, Settings.Commons.DisplayStyle.Trinkets) then return "decoration_of_flame trinkets 24"; end
+  end
+  -- use_item,name=stormeaters_boon
+  if I.StormeatersBoon:IsEquippedAndReady() then
+    if Cast(I.StormeatersBoon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "stormeaters_boon trinkets 26"; end
+  end
+  -- use_item,name=windscar_whetstone
+  if I.WindscarWhetstone:IsEquippedAndReady() then
+    if Cast(I.WindscarWhetstone, nil, Settings.Commons.DisplayStyle.Trinkets) then return "windscar_whetstone trinkets 28"; end
+  end
+  -- use_item,name=globe_of_jagged_ice
+  if I.GlobeofJaggedIce:IsEquippedAndReady() then
+    if Cast(I.GlobeofJaggedIce, nil, Settings.Commons.DisplayStyle.Trinkets) then return "globe_of_jagged_ice trinkets 30"; end
   end
 end
 
