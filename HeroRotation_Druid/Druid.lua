@@ -174,10 +174,12 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   Berserk                               = Spell(106951),
   Bloodtalons                           = Spell(319439),
   BrutalSlash                           = Spell(202028),
+  DoubleClawedRake                      = Spell(391700),
   FeralFrenzy                           = Spell(274837),
   Incarnation                           = Spell(102543),
   LunarInspiration                      = Spell(155580),
   LIMoonfire                            = Spell(155625), -- Lunar Inspiration Moonfire
+  MomentofClarity                       = Spell(236068),
   Predator                              = Spell(202021),
   PrimalWrath                           = Spell(285381),
   RipandTear                            = Spell(391347),
@@ -238,24 +240,10 @@ Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Commons, {
 -- Items
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Commons = {
-  -- Potions
-  PotionofPhantomFire                   = Item(171349),
-  PotionofSpectralAgility               = Item(171270),
-  PotionofSpectralIntellect             = Item(171273),
   -- Trinkets
-  CacheofAcquiredTreasures              = Item(188265, {13, 14}),
-  EmpyrealOrdinance                     = Item(180117, {13, 14}),
-  InscrutableQuantumDevice              = Item(179350, {13, 14}),
-  InstructorsDivineBell                 = Item(184842, {13, 14}),
-  ScarsofFraternalStrife                = Item(188253, {13, 14}),
-  ShadowedOrbofTorment                  = Item(186428, {13, 14}),
-  SoullettingRuby                       = Item(178809, {13, 14}),
-  TheFirstSigil                         = Item(188271, {13, 14}),
+  ManicGrieftorch                       = Item(194308, {13, 14}),
   -- Other On-Use Items
-  GaveloftheFirstArbiter                = Item(189862),
   Jotungeirr                            = Item(186404),
-  RingofCollapsingFutures               = Item(142173),
-  WrapsofElectrostaticPotential         = Item(169069),
 }
 
 Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
