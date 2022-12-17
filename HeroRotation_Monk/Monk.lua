@@ -96,6 +96,7 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   MarkoftheCrane                        = Spell(220357),
   Serenity                              = Spell(152173),
   ShadowboxingTreads                    = Spell(392982),
+  Skyreach                              = Spell(392991),
   StormEarthAndFire                     = Spell(137639),
   StormEarthAndFireFixate               = Spell(221771),
   StrikeoftheWindlord                   = Spell(392983),
@@ -111,11 +112,13 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   DanceofChijiBuff                      = Spell(325202),
   HitComboBuff                          = Spell(196741),
   PowerStrikesBuff                      = Spell(129914),
+  PressurePointBuff                     = Spell(337482),
   SerenityBuff                          = Spell(152173),
   StormEarthAndFireBuff                 = Spell(137639),
   TeachingsoftheMonasteryBuff           = Spell(202090),
   WhirlingDragonPunchBuff               = Spell(196742),
   -- Debuffs
+  FaeExposureDebuff                     = Spell(395414),
   MarkoftheCraneDebuff                  = Spell(228287),
   SkyreachExhaustionDebuff              = Spell(393050),
   -- Tier 29 Effects
