@@ -143,8 +143,8 @@ local function Single()
   if S.Windstrike:IsReady() and (S.ThorimsInvocation:IsAvailable() and Player:BuffStack(S.MaelstromWeaponBuff) >= 1) then
     if Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Windstrike)) then return "windstrike single 2"; end
   end
-  -- lava_lash,if=buff.hot_hand.up|buff.ashen_catalyst.stack=8
-  if S.LavaLash:IsReady() and (Player:BuffUp(S.HotHandBuff) or Player:BuffStack(S.AshenCatalystBuff) == 8) then
+  -- lava_lash,if=buff.hot_hand.up|buff.ashen_catalyst.stack=8|(buff.ashen_catalyst.stack>=5&buff.maelstrom_of_elements.up&buff.maelstrom_weapon.stack<=6)
+  if S.LavaLash:IsReady() and (Player:BuffUp(S.HotHandBuff) or Player:BuffStack(S.AshenCatalystBuff) == 8 or (Player:BuffStack(S.AshenCatalystBuff) >= 5 and Player:BuffUp(S.MaelstromofElementsBuff) and Player:BuffStack(S.MaelstromWeaponBuff) <= 6)) then
     if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 4"; end
   end
   -- windfury_totem,if=!buff.windfury_totem.up
@@ -205,8 +205,8 @@ local function Single()
   if S.Stormstrike:IsCastable() and (S.DeeplyRootedElements:IsAvailable() or Player:BuffUp(S.EarthenWeaponBuff) or Player:BuffUp(S.LegacyoftheFrostWitch)) then
     if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 28"; end
   end
-  -- elemental_blast,if=(!talent.elemental_spirits.enabled|(talent.elemental_spirits.enabled&(charges=max_charges|buff.feral_spirit.up)))&buff.maelstrom_weapon.stack>=5
-  if S.ElementalBlast:IsReady() and (((not S.ElementalSpirits:IsAvailable()) or (S.ElementalSpirits:IsAvailable() and (S.ElementalBlast:Charges() == MaxEBCharges or Player:BuffUp(S.FeralSpiritBuff)))) and Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
+  -- elemental_blast,if=(talent.elemental_spirits.enabled&buff.maelstrom_weapon.stack=10)|(!talent.elemental_spirits.enabled&buff.maelstrom_weapon.stack>=5)
+  if S.ElementalBlast:IsReady() and ((S.ElementalSpirits:IsAvailable() and Player:BuffStack(S.MaelstromWeaponBuff) == 10) or ((not S.ElementalSpirits:IsAvailable()) and Player:BuffStack(S.MaelstromWeaponBuff) >= 5)) then
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 30"; end
   end
   -- lava_burst,if=buff.maelstrom_weapon.stack>=5
@@ -236,6 +236,10 @@ local function Single()
   -- lava_lash
   if S.LavaLash:IsReady() then
     if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 46"; end
+  end
+  -- elemental_blast,if=talent.elemental_spirits.enabled&(charges=max_charges|buff.feral_spirit.up)&buff.maelstrom_weapon.stack>=5
+  if S.ElementalBlast:IsReady() and (S.ElementalSpirits:IsAvailable() and (S.ElementalBlast:Charges() == S.ElementalBlast:MaxCharges() or Player:BuffUp(S.FeralSpiritBuff)) and Player:BuffStack(S.MaelstromWeaponBuff) >= 5) then
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 47"; end
   end
   -- bag_of_tricks
   if S.BagofTricks:IsCastable() and CDsON() then
