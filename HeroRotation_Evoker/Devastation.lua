@@ -326,7 +326,8 @@ local function ST()
   if S.AzureStrike:IsCastable() and (VarDragonrageUp and (Player:Essence() < 3 and Player:BuffDown(S.EssenceBurstBuff) or (S.ShatteringStar:IsAvailable() and S.ShatteringStar:CooldownRemains() <= (MaxEssenceBurstStack - Player:BuffStack(S.EssenceBurstBuff)) * GCDMax))) then
     if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 24"; end
   end
-  -- disintegrate,chain=1,early_chain_if=buff.dragonrage.up&ticks>=2,interrupt_if=buff.dragonrage.up&ticks>=2,if=buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence>essence.max-1|buff.essence_burst.stack==buff.essence_burst.max_stack)
+  -- disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&buff.dragonrage.up&ticks>=2,interrupt_if=buff.dragonrage.up&ticks>=2&(evoker.use_clipping|cooldown.fire_breath.up|cooldown.eternity_surge.up),if=buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence>essence.max-1|buff.essence_burst.stack==buff.essence_burst.max_stack)
+  -- Note: Chaining is up to the user. We will display this for the next action, but the user must decide when to press the button.
   if S.Disintegrate:IsReady() and (VarDragonrageUp or ((not S.ShatteringStar:IsAvailable()) or S.ShatteringStar:CooldownRemains() > 6 or Player:Essence() > Player:EssenceMax() - 1 or Player:BuffStack(S.EssenceBurstBuff) == MaxEssenceBurstStack)) then
     if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate st 26"; end
   end
