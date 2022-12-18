@@ -129,7 +129,11 @@ local function Precombat()
   -- summon_pet
   -- Moved to Pet Management section in APL()
   -- snapshot_stat
-  -- steel_trap,precast_time=20
+  -- use_item,name=algethar_puzzle_box
+  if I.AlgetharPuzzleBox:IsEquippedAndReady() then
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 1"; end
+  end
+  -- steel_trap,precast_time=2
   if S.SteelTrap:IsCastable() and Target:DebuffDown(S.SteelTrapDebuff) then
     if Cast(S.SteelTrap, nil, nil, not Target:IsInRange(40)) then return "steel_trap precombat 2"; end
   end
