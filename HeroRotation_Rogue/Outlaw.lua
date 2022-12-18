@@ -142,15 +142,29 @@ end
 -- Get the number of Roll the Bones buffs currently on
 local function RtB_Buffs ()
   if not Cache.APLVar.RtB_Buffs then
-    Cache.APLVar.RtB_Buffs = 0
+    Cache.APLVar.RtB_Buffs = {}
+    Cache.APLVar.RtB_Buffs.Total = 0
+    Cache.APLVar.RtB_Buffs.Normal = 0
+    Cache.APLVar.RtB_Buffs.Shorter = 0
+    Cache.APLVar.RtB_Buffs.Longer = 0
+    local RtBRemains = Rogue.RtBRemains()
     for i = 1, #RtB_BuffsList do
-      if Player:BuffUp(RtB_BuffsList[i]) then
-        Cache.APLVar.RtB_Buffs = Cache.APLVar.RtB_Buffs + 1
+      local Remains = Player:BuffRemains(RtB_BuffsList[i])
+      if Remains > 0 then
+        Cache.APLVar.RtB_Buffs.Total = Cache.APLVar.RtB_Buffs.Total + 1
+        if Remains == RtBRemains then
+          Cache.APLVar.RtB_Buffs.Normal = Cache.APLVar.RtB_Buffs.Normal + 1
+        elseif Remains > RtBRemains then
+          Cache.APLVar.RtB_Buffs.Longer = Cache.APLVar.RtB_Buffs.Longer + 1
+        else
+          Cache.APLVar.RtB_Buffs.Shorter = Cache.APLVar.RtB_Buffs.Shorter + 1
+        end
       end
     end
   end
-  return Cache.APLVar.RtB_Buffs
+  return Cache.APLVar.RtB_Buffs.Total
 end
+
 -- RtB rerolling strategy, return true if we should reroll
 local function RtB_Reroll ()
   if not Cache.APLVar.RtB_Reroll then
@@ -208,6 +222,28 @@ local function RtB_Reroll ()
   return Cache.APLVar.RtB_Reroll
 end
 
+-- RtB rerolling strategy, return true if we should reroll
+local function RtB_KiR_Reroll ()
+  if not Cache.APLVar.RtB_KiR_Reroll then
+    -- actions+=/variable,name=rtb_reroll_kir_cto,if=talent.keep_it_rolling|talent.count_the_odds,value=(rtb_buffs.normal=0&rtb_buffs.longer>=1)&!(buff.broadside.up&buff.true_bearing.up&buff.skull_and_crossbones.up)&!(buff.broadside.remains>39|buff.true_bearing.remains>39|buff.ruthless_precision.remains>39|buff.skull_and_crossbones.remains>39)
+    if not S.KeepItRolling:IsAvailable() and not S.CountTheOdds:IsAvailable() then
+      Cache.APLVar.RtB_KiR_Reroll = false
+    else
+      RtB_Buffs() -- Regenerate cache
+      if Cache.APLVar.RtB_Buffs.Normal == 0 and Cache.APLVar.RtB_Buffs.Longer > 0
+        and not (Player:BuffUp(S.Broadside) and Player:BuffUp(S.TrueBearing) and Player:BuffUp(S.SkullandCrossbones))
+        and not (Player:BuffRemains(S.Broadside) > 39 or Player:BuffRemains(S.TrueBearing) > 39
+          or Player:BuffRemains(S.RuthlessPrecision) > 39 or Player:BuffRemains(S.SkullandCrossbones) > 39) then
+        Cache.APLVar.RtB_KiR_Reroll = true
+      else
+        Cache.APLVar.RtB_KiR_Reroll = false
+      end
+    end
+  end
+
+  return Cache.APLVar.RtB_KiR_Reroll
+end
+
 -- # Checks if we are in an appropriate Stealth state for triggering the Count the Odds bonus
 local function Stealthed_CtO (BypassRecovery)
   -- actions+=/variable,name=stealthed_cto,value=talent.count_the_odds&(stealthed.basic|buff.shadowmeld.up|buff.shadow_dance.up)
@@ -262,10 +298,10 @@ local function StealthCDs ()
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     -- actions.stealth_cds=variable,name=vanish_condition,value=talent.hidden_opportunity|!talent.shadow_dance|!cooldown.shadow_dance.ready
     if S.HiddenOpportunity:IsAvailable() or not S.ShadowDanceTalent:IsAvailable() or not S.ShadowDance:IsCastable() then
-      -- actions.stealth_cds+=/vanish,if=talent.find_weakness&debuff.find_weakness.down&variable.ambush_condition&variable.vanish_condition
+      -- actions.stealth_cds+=/vanish,if=talent.find_weakness&!talent.audacity&debuff.find_weakness.down&variable.ambush_condition&variable.vanish_condition
       -- actions.stealth_cds+=/vanish,if=talent.hidden_opportunity&!buff.audacity.up&(variable.vanish_opportunity_condition|buff.opportunity.stack<buff.opportunity.max_stack)&variable.ambush_condition&variable.vanish_condition
-      -- actions.stealth_cds+=/vanish,if=!talent.find_weakness&!talent.hidden_opportunity&variable.finish_condition&variable.vanish_condition     
-      if S.FindWeakness:IsAvailable() and Target:DebuffDown(S.FindWeaknessDebuff) and Ambush_Condition() then
+      -- actions.stealth_cds+=/vanish,if=(!talent.find_weakness|talent.audacity)&!talent.hidden_opportunity&variable.finish_condition&variable.vanish_condition
+      if S.FindWeakness:IsAvailable() and not S.Audacity:IsAvailable() and Target:DebuffDown(S.FindWeaknessDebuff) and Ambush_Condition() then
         if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (FW)" end
         return
       end
@@ -278,7 +314,7 @@ local function StealthCDs ()
           return
         end
       end
-      if not S.FindWeakness:IsAvailable() and not S.HiddenOpportunity:IsAvailable() and Finish_Condition() then
+      if (not S.FindWeakness:IsAvailable() or not S.Audacity:IsAvailable()) and not S.HiddenOpportunity:IsAvailable() and Finish_Condition() then
         if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Finish)" end
         return
       end
@@ -316,13 +352,13 @@ local function CDs ()
       if HR.Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
     end
   end
-  -- actions.cds+=/roll_the_bones,if=buff.dreadblades.down&(!buff.roll_the_bones.up|variable.rtb_reroll)
-  if S.RolltheBones:IsReady() and not Player:DebuffUp(S.Dreadblades) and (Rogue.RtBRemains() <= 0 or RtB_Reroll()) then
+  -- actions.cds+=/roll_the_bones,if=buff.dreadblades.down&(rtb_buffs.total=0|variable.rtb_reroll|variable.rtb_reroll_kir_cto)
+  if S.RolltheBones:IsReady() and not Player:DebuffUp(S.Dreadblades) and (RtB_Buffs() == 0 or RtB_Reroll() or RtB_KiR_Reroll()) then
     if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones" end
   end
   -- actions.cds+=/keep_it_rolling,if=!variable.rtb_reroll&(buff.broadside.up+buff.true_bearing.up+buff.skull_and_crossbones.up+buff.ruthless_precision.up)>2&(buff.shadow_dance.down|rtb_buffs>=6)
   if S.KeepItRolling:IsCastable() and not RtB_Reroll()
-    and (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.TrueBearing)) + num(Player:BuffUp(S.SkullandCrossbones))) > 2
+    and (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.TrueBearing)) + num(Player:BuffUp(S.SkullandCrossbones)) + num(Player:BuffUp(S.RuthlessPrecision))) > 2
     and (Player:BuffDown(S.ShadowDanceBuff) or RtB_Buffs() >= 6) then
     if HR.Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then return "Cast Keep it Rolling" end
   end
@@ -349,9 +385,9 @@ local function CDs ()
     if HR.Cast(S.ThistleTea, Settings.Commons.OffGCDasOffGCD.ThistleTea) then return "Cast Thistle Tea" end
   end
   if Blade_Flurry_Sync() then
-    -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&!stealthed.rogue&(debuff.between_the_eyes.up&buff.dreadblades.down&energy.base_deficit>(energy.regen*2+15)|spell_targets.blade_flurry>2)
+    -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&!stealthed.rogue&debuff.between_the_eyes.up&energy.base_time_to_max>4
     if CDsON() and S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and not Player:StealthUp(true, false)
-      and (Target:DebuffUp(S.BetweentheEyes) and not Player:DebuffUp(S.Dreadblades) and EnergyDeficit > (EnergyRegen * 2 + 15) or EnemiesBFCount > 2) then
+      and Target:DebuffUp(S.BetweentheEyes) and EnergyTimeToMax > 4 then
       if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree" end
     end
     -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&!buff.dreadblades.up&!buff.shadow_dance.up&energy.base_time_to_max>4&target.time_to_die>4
@@ -451,9 +487,9 @@ local function Build ()
     and (Target:FilteredTimeToDie(">", 11) and Target:DebuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 11)) then
     if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
   end
-  -- actions.build+=/ghostly_strike,if=debuff.ghostly_strike.remains<=3&(spell_targets.blade_flurry<=2|buff.dreadblades.up)&target.time_to_die>=5
+  -- actions.build+=/ghostly_strike,if=debuff.ghostly_strike.remains<=3&(spell_targets.blade_flurry<=2|buff.dreadblades.up)&!buff.subterfuge.up&target.time_to_die>=5
   if S.GhostlyStrike:IsReady() and Target:IsSpellInRange(S.GhostlyStrike) and Target:DebuffRemains(S.GhostlyStrike) <= 3
-    and (EnemiesBFCount <= 2 or Player:BuffUp(S.Dreadblades)) and Target:FilteredTimeToDie(">=", 5) then
+    and (EnemiesBFCount <= 2 or Player:BuffUp(S.Dreadblades)) and Player:BuffDown(S.SubterfugeBuff) and Target:FilteredTimeToDie(">=", 5) then
     if HR.Cast(S.GhostlyStrike, Settings.Outlaw.GCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike" end
   end
   -- actions.build+=/echoing_reprimand,if=!buff.dreadblades.up
@@ -465,6 +501,7 @@ local function Build ()
     or S.FindWeakness:IsAvailable() and not Target:DebuffUp(S.FindWeaknessDebuff)) then
     if HR.Cast(S.Ambush) then return "Cast Ambush (HO/FW)" end
   end
+  -- actions.build+=/pistol_shot,if=talent.fan_the_hammer&talent.audacity&talent.hidden_opportunity&buff.opportunity.up&!buff.audacity.up&!buff.subterfuge.up&!buff.shadow_dance.up
   -- actions.build+=/pistol_shot,if=buff.greenskins_wickers.up&(!talent.fan_the_hammer&buff.opportunity.up|buff.greenskins_wickers.remains<1.5)
   -- actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&(buff.opportunity.stack>=buff.opportunity.max_stack|buff.opportunity.remains<2)
   -- actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&combo_points.deficit>((1+talent.quick_draw)*talent.fan_the_hammer.rank)&!buff.dreadblades.up&(!talent.hidden_opportunity|!buff.subterfuge.up&!buff.shadow_dance.up)
@@ -475,7 +512,10 @@ local function Build ()
       if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (GSW Dump)" end
     end
     if S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity) then
-      if Player:BuffStack(S.Opportunity) >= 6 or Player:BuffRemains(S.Opportunity) < 2 then
+      if S.Audacity:IsAvailable() and S.HiddenOpportunity:IsAvailable() and Player:BuffDown(S.AudacityBuff)
+        and Player:BuffDown(S.SubterfugeBuff) and Player:BuffDown(S.ShadowDanceBuff) then
+        if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (Audacity)" end
+      elseif Player:BuffStack(S.Opportunity) >= 6 or Player:BuffRemains(S.Opportunity) < 2 then
         if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (FtH Dump)" end
       elseif ComboPointsDeficit > (1+num(S.QuickDraw:IsAvailable())*S.FanTheHammer:TalentRank()) and not Player:DebuffUp(S.Dreadblades)
         and (not S.HiddenOpportunity:IsAvailable() or not Player:BuffUp(S.SubterfugeBuff) and not Player:BuffUp(S.ShadowDanceBuff)) then
@@ -563,7 +603,8 @@ local function APL ()
         if HR.Cast(S.AdrenalineRush) then return "Cast Adrenaline Rush (Opener)" end
       end
       -- actions.precombat+=/roll_the_bones,precombat_seconds=2
-      if S.RolltheBones:IsReady() and (Rogue.RtBRemains() <= 0 or RtB_Reroll()) then
+      -- Use same extended logic as a normal rotation for between pulls
+      if S.RolltheBones:IsReady() and not Player:DebuffUp(S.Dreadblades) and (RtB_Buffs() == 0 or RtB_Reroll() or RtB_KiR_Reroll()) then
         if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones (Opener)" end
       end
       -- actions.precombat+=/slice_and_dice,precombat_seconds=1
@@ -689,6 +730,7 @@ HR.SetAPL(260, APL, Init)
 -- actions+=/variable,name=stealthed_cto,value=talent.count_the_odds&(stealthed.basic|buff.shadowmeld.up|buff.shadow_dance.up)
 -- # Roll the Bones Reroll Conditions
 -- actions+=/variable,name=rtb_reroll,value=rtb_buffs<2&(!buff.broadside.up&(!talent.fan_the_hammer|!buff.skull_and_crossbones.up)&!buff.true_bearing.up|buff.loaded_dice.up)|rtb_buffs=2&(buff.buried_treasure.up&buff.grand_melee.up|!buff.broadside.up&!buff.true_bearing.up&buff.loaded_dice.up)
+-- actions+=/variable,name=rtb_reroll_kir_cto,if=talent.keep_it_rolling|talent.count_the_odds,value=(rtb_buffs.normal=0&rtb_buffs.longer>=1)&!(buff.broadside.up&buff.true_bearing.up&buff.skull_and_crossbones.up)&!(buff.broadside.remains>39|buff.true_bearing.remains>39|buff.ruthless_precision.remains>39|buff.skull_and_crossbones.remains>39)
 -- # Ensure we get full Ambush CP gains and aren't rerolling Count the Odds buffs away
 -- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+talent.improved_ambush+buff.broadside.up&energy>=50&(!talent.count_the_odds|buff.roll_the_bones.remains>=10)
 -- # Finish at max possible CP without overflowing bonus combo points, unless for BtE which always should be 5+ CP
@@ -711,7 +753,7 @@ HR.SetAPL(260, APL, Init)
 
 -- # Builders
 -- actions.build=sepsis,target_if=max:target.time_to_die*debuff.between_the_eyes.up,if=target.time_to_die>11&debuff.between_the_eyes.up|fight_remains<11
--- actions.build+=/ghostly_strike,if=debuff.ghostly_strike.remains<=3&(spell_targets.blade_flurry<=2|buff.dreadblades.up)&target.time_to_die>=5
+-- actions.build+=/ghostly_strike,if=debuff.ghostly_strike.remains<=3&(spell_targets.blade_flurry<=2|buff.dreadblades.up)&!buff.subterfuge.up&target.time_to_die>=5
 -- actions.build+=/echoing_reprimand,if=!buff.dreadblades.up
 -- # High priority Ambush line to apply Find Weakness or consume HO+Audacity buff before Pistol Shot
 -- actions.build+=/ambush,if=talent.hidden_opportunity&buff.audacity.up|talent.find_weakness&debuff.find_weakness.down
@@ -729,7 +771,7 @@ HR.SetAPL(260, APL, Init)
 -- # Cooldowns
 -- # Blade Flurry on 2+ enemies
 -- actions.cds=blade_flurry,if=spell_targets>=2&!buff.blade_flurry.up
--- actions.cds+=/roll_the_bones,if=buff.dreadblades.down&(!buff.roll_the_bones.up|variable.rtb_reroll)
+-- actions.cds+=/roll_the_bones,if=buff.dreadblades.down&(rtb_buffs.total=0|variable.rtb_reroll|variable.rtb_reroll_kir_cto)
 -- actions.cds+=/keep_it_rolling,if=!variable.rtb_reroll&(buff.broadside.up+buff.true_bearing.up+buff.skull_and_crossbones.up+buff.ruthless_precision.up)>2&(buff.shadow_dance.down|rtb_buffs>=6)
 -- actions.cds+=/call_action_list,name=stealth_cds,if=!stealthed.all|talent.count_the_odds&!variable.stealthed_cto
 -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!talent.improved_adrenaline_rush|combo_points<=2)
@@ -739,8 +781,7 @@ HR.SetAPL(260, APL, Init)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP.
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend-1&!buff.dreadblades.up
 -- actions.cds+=/thistle_tea,if=!buff.thistle_tea.up&(energy.base_deficit>=100|fight_remains<charges*6)
--- # Use in 1-2T if BtE is up and won't cap Energy, or at 3T+
--- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&!stealthed.rogue&(debuff.between_the_eyes.up&buff.dreadblades.down&energy.base_deficit>(energy.regen*2+15)|spell_targets.blade_flurry>2)
+-- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&!stealthed.rogue&debuff.between_the_eyes.up&energy.base_time_to_max>4
 -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&!buff.dreadblades.up&!buff.shadow_dance.up&energy.base_time_to_max>4&target.time_to_die>4
 -- actions.cds+=/shadowmeld,if=!stealthed.all&(talent.count_the_odds&variable.finish_condition|!talent.weaponmaster.enabled&variable.ambush_condition)
 -- actions.cds+=/potion,if=buff.bloodlust.react|fight_remains<30|buff.adrenaline_rush.up
@@ -756,9 +797,9 @@ HR.SetAPL(260, APL, Init)
 -- # Stealth Cooldowns
 -- actions.stealth_cds=variable,name=vanish_condition,value=talent.hidden_opportunity|!talent.shadow_dance|!cooldown.shadow_dance.ready
 -- actions.stealth_cds+=/variable,name=vanish_opportunity_condition,value=!talent.shadow_dance&talent.fan_the_hammer.rank+talent.quick_draw+talent.audacity<talent.count_the_odds+talent.keep_it_rolling
--- actions.stealth_cds+=/vanish,if=talent.find_weakness&debuff.find_weakness.down&variable.ambush_condition&variable.vanish_condition
+-- actions.stealth_cds+=/vanish,if=talent.find_weakness&!talent.audacity&debuff.find_weakness.down&variable.ambush_condition&variable.vanish_condition
 -- actions.stealth_cds+=/vanish,if=talent.hidden_opportunity&!buff.audacity.up&(variable.vanish_opportunity_condition|buff.opportunity.stack<buff.opportunity.max_stack)&variable.ambush_condition&variable.vanish_condition
--- actions.stealth_cds+=/vanish,if=!talent.find_weakness&!talent.hidden_opportunity&variable.finish_condition&variable.vanish_condition
+-- actions.stealth_cds+=/vanish,if=(!talent.find_weakness|talent.audacity)&!talent.hidden_opportunity&variable.finish_condition&variable.vanish_condition
 -- actions.stealth_cds+=/variable,name=shadow_dance_condition,value=talent.shadow_dance&debuff.between_the_eyes.up&(!talent.ghostly_strike|debuff.ghostly_strike.up)&(!talent.dreadblades|!cooldown.dreadblades.ready)&(!talent.hidden_opportunity|!buff.audacity.up&(talent.fan_the_hammer.rank<2|!buff.opportunity.up))
 -- actions.stealth_cds+=/shadow_dance,if=!talent.keep_it_rolling&variable.shadow_dance_condition&buff.slice_and_dice.up&(variable.finish_condition|talent.hidden_opportunity)&(!talent.hidden_opportunity|!cooldown.vanish.ready)
 -- actions.stealth_cds+=/shadow_dance,if=talent.keep_it_rolling&variable.shadow_dance_condition&(cooldown.keep_it_rolling.remains<=30|cooldown.keep_it_rolling.remains>120&(variable.finish_condition|talent.hidden_opportunity))
@@ -775,3 +816,4 @@ HR.SetAPL(260, APL, Init)
 -- actions.stealth+=/cold_blood,if=variable.finish_condition
 -- actions.stealth+=/dispatch,if=variable.finish_condition
 -- actions.stealth+=/ambush,if=variable.stealthed_cto|stealthed.basic&talent.find_weakness&!debuff.find_weakness.up|talent.hidden_opportunity
+
