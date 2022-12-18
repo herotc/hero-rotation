@@ -183,11 +183,11 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   Predator                              = Spell(202021),
   PrimalWrath                           = Spell(285381),
   RipandTear                            = Spell(391347),
-  Sabertooth                            = Spell(202031),
   SouloftheForest                       = Spell(158476),
   TearOpenWounds                        = Spell(391785),
   TigersFury                            = Spell(5217),
   -- Buffs
+  SabertoothBuff                        = Spell(202031),
   ApexPredatorsCravingBuff              = Spell(391882),
   BloodtalonsBuff                       = Spell(145152),
   Clearcasting                          = Spell(135700),
