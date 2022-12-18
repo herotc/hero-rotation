@@ -191,6 +191,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   ApexPredatorsCravingBuff              = Spell(391882),
   BloodtalonsBuff                       = Spell(145152),
   Clearcasting                          = Spell(135700),
+  SabertoothBuff                        = Spell(391722),
   -- Debuffs
   AdaptiveSwarmDebuff                   = Spell(391889),
   AdaptiveSwarmHeal                     = Spell(391891),
