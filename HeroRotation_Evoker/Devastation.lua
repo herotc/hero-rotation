@@ -394,6 +394,8 @@ local function APL()
     VarNextDragonrage = mathmax(S.Dragonrage:CooldownRemains(), (S.EternitySurge:CooldownRemains() - 2 * GCDMax), (S.FireBreath:CooldownRemains() - GCDMax))
     -- variable,name=r1_cast_time,value=1.3*spell_haste
     VarR1CastTime = 1.3 * PlayerHaste
+    -- invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&!buff.power_infusion.up
+    -- Note: Not handling external buffs.
     -- call_action_list,name=trinkets
     if Settings.Commons.Enabled.Trinkets then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
