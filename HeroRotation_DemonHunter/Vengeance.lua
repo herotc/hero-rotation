@@ -3,7 +3,7 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroDBC
-local DBC = HeroDBC.DBC
+local DBC           = HeroDBC.DBC
 -- HeroLib
 local HL            = HeroLib
 local Cache         = HeroCache
@@ -23,9 +23,12 @@ local CastAnnotated = HR.CastAnnotated
 -- Num/Bool Helper Functions
 local num           = HR.Commons.Everyone.num
 local bool          = HR.Commons.Everyone.bool
+-- File locals
+local DemonHunter   = HR.Commons.DemonHunter
+DemonHunter.DGBCDR  = 0
+DemonHunter.DGBCDRLastUpdate = 0
 -- lua
-local mathmax       = math.max
-local mathmin       = math.min
+local GetTime       = GetTime
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -56,10 +59,21 @@ local ActiveMitigationNeeded
 local IsTanking
 local Enemies8yMelee
 local EnemiesCount8yMelee
-local VarRampHDone
-local VarRampEDDone
-local VarRampSCDone
-local VarFDDone
+local VarDGBHighRoll = 0
+local VarHuntRamp = false
+local VarEDRamp = false
+local VarSCRamp = false
+local VarFDSC = false
+local VarFDNoSC = false
+
+HL:RegisterForEvent(function()
+  VarDGBHighRoll = 0
+  VarHuntRamp = false
+  VarEDRamp = false
+  VarSCRamp = false
+  VarFDSC = false
+  VarFDNoSC = false
+end, "PLAYER_REGEN_ENABLED")
 
 -- Soul Fragments function taking into consideration aura lag
 local function UpdateSoulFragments()
@@ -124,6 +138,13 @@ local function Precombat()
   -- augmentation
   -- food
   -- snapshot_stats
+  -- variable,name=the_hunt_ramp_in_progress,value=0
+  -- variable,name=elysian_decree_ramp_in_progress,value=0
+  -- variable,name=soul_carver_ramp_in_progress,value=0
+  -- variable,name=fiery_demise_with_soul_carver_in_progress,value=0
+  -- variable,name=fiery_demise_without_soul_carver_available,value=0
+  -- variable,name=darkglare_boon_high_roll,value=0
+  -- Note: Handling variable resets via PLAYER_REGEN_ENABLED registration
   -- First attacks
   if S.TheHunt:IsCastable() and not IsInMeleeRange then
     if Cast(S.TheHunt, nil, nil, not Target:IsInRange(50)) then return "the_hunt precombat 4"; end
@@ -158,7 +179,15 @@ local function Defensives()
   end
 end
 
-local function RampH()
+local function HuntRamp()
+  -- variable,name=the_hunt_ramp_in_progress,value=1,if=!variable.the_hunt_ramp_in_progress
+  if (not VarHuntRamp) then
+    VarHuntRamp = true
+  end
+  -- variable,name=the_hunt_ramp_in_progress,value=0,if=cooldown.the_hunt.remains
+  if (S.TheHunt:CooldownDown()) then
+    VarHuntRamp = false
+  end
   -- fracture,if=fury.deficit>=30&debuff.frailty.stack<=5
   if S.Fracture:IsCastable() and (Player:FuryDeficit() >= 30 and Target:DebuffStack(S.FrailtyDebuff) <= 5) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture ramph 2"; end
@@ -175,25 +204,30 @@ local function RampH()
   if S.Shear:IsCastable() and (Player:FuryDeficit() <= 90) then
     if Cast(S.Shear, nil, nil, not IsInMeleeRange) then return "shear ramph 6"; end
   end
-  -- spirit_bomb,if=soul_fragments>=4&active_enemies>1
+  -- spirit_bomb,if=soul_fragments>=4&spell_targets>1
   if S.SpiritBomb:IsReady() and (SoulFragments >= 4 and EnemiesCount8yMelee > 1) then
     if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb ramph 8"; end
   end
-  -- soul_cleave,if=(soul_fragments=0&active_enemies>1)|(active_enemies<2)|debuff.frailty.stack>=0
-  if S.SoulCleave:IsReady() and ((SoulFragments == 0 and EnemiesCount8yMelee > 1) or EnemiesCount8yMelee < 2 or Target:DebuffStack(S.FrailtyDebuff) >= 0) then
+  -- soul_cleave,if=(soul_fragments<=1&spell_targets>1)|(spell_targets<2)|debuff.frailty.stack>=0
+  if S.SoulCleave:IsReady() and ((SoulFragments <= 1 and EnemiesCount8yMelee > 1) or EnemiesCount8yMelee < 2 or Target:DebuffStack(S.FrailtyDebuff) >= 0) then
     if Cast(S.SoulCleave, nil, nil, not IsInMeleeRange) then return "soul_cleave ramph 10"; end
   end
   -- the_hunt
   if S.TheHunt:IsCastable() then
     if Cast(S.TheHunt, nil, nil, not Target:IsInRange(50)) then return "the_hunt ramph 12"; end
   end
-  -- variable,name=rampH_done,op=setif,value=1,value_else=0,condition=talent.the_hunt.enabled&cooldown.the_hunt.remains
-  -- Handled via APL variable settings
 end
 
-local function RampED()
-  -- fracture,if=fury.deficit>=30
-  -- Manually added: &debuff.frailty.stack<=5 (otherwise, will continually loop Fracture and SpiritBomb/SoulCleave)
+local function EDRamp()
+  -- variable,name=elysian_decree_ramp_in_progress,value=1,if=!variable.elysian_decree_ramp_in_progress
+  if (not VarEDRamp) then
+    VarEDRamp = true
+  end
+  -- variable,name=elysian_decree_ramp_in_progress,value=0,if=cooldown.elysian_decree.remains
+  if (S.ElysianDecree:CooldownDown()) then
+    VarEDRamp = false
+  end
+  -- fracture,if=fury.deficit>=30&debuff.frailty.stack<=5
   if S.Fracture:IsCastable() and (Player:FuryDeficit() >= 30 and Target:DebuffStack(S.FrailtyDebuff) <= 5) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture ramped 2"; end
   end
@@ -209,25 +243,30 @@ local function RampED()
   if S.Shear:IsCastable() and (Player:FuryDeficit() <= 90 and Target:DebuffStack(S.FrailtyDebuff) >= 0) then
     if Cast(S.Shear, nil, nil, not IsInMeleeRange) then return "shear ramped 6"; end
   end
-  -- spirit_bomb,if=soul_fragments>=4&active_enemies>1
+  -- spirit_bomb,if=soul_fragments>=4&spell_targets>1
   if S.SpiritBomb:IsReady() and (SoulFragments >= 4 and EnemiesCount8yMelee > 1) then
     if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb ramped 8"; end
   end
-  -- soul_cleave,if=(soul_fragments=0&active_enemies>1)|(active_enemies<2)|debuff.frailty.stack>=0
-  if S.SoulCleave:IsReady() and ((SoulFragments == 0 and EnemiesCount8yMelee > 1) or EnemiesCount8yMelee < 2 or Target:DebuffStack(S.FrailtyDebuff) >= 0) then
+  -- soul_cleave,if=(soul_fragments<=1&spell_targets>1)|(spell_targets<2)|debuff.frailty.stack>=0
+  if S.SoulCleave:IsReady() and ((SoulFragments <= 1 and EnemiesCount8yMelee > 1) or EnemiesCount8yMelee < 2 or Target:DebuffStack(S.FrailtyDebuff) >= 0) then
     if Cast(S.SoulCleave, nil, nil, not IsInMeleeRange) then return "soul_cleave ramped 10"; end
   end
   -- elysian_decree
   if S.ElysianDecree:IsCastable() then
     if Cast(S.ElysianDecree, nil, nil, not Target:IsInRange(30)) then return "elysian_decree ramped 12"; end
   end
-  -- variable,name=rampED_done,op=setif,value=1,value_else=0,condition=talent.elysian_decree.enabled&cooldown.elysian_decree.remains
-  -- Handled via APL variable settings
 end
 
-local function RampSC()
-  -- fracture,if=fury.deficit>=30
-  -- Manually added: &debuff.frailty.stack<=5 (otherwise, will continually loop Fracture and SpiritBomb/SoulCleave)
+local function SCRamp()
+  -- variable,name=soul_carver_ramp_in_progress,value=1,if=!variable.soul_carver_ramp_in_progress
+  if (not VarSCRamp) then
+    VarSCRamp = true
+  end
+  -- variable,name=soul_carver_ramp_in_progress,value=0,if=cooldown.soul_carver.remains
+  if (S.SoulCarver:CooldownDown()) then
+    VarSCRamp = false
+  end
+  -- fracture,if=fury.deficit>=30&debuff.frailty.stack<=5
   if S.Fracture:IsCastable() and (Player:FuryDeficit() >= 30 and Target:DebuffStack(S.FrailtyDebuff) <= 5) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture rampsc 2"; end
   end
@@ -243,71 +282,118 @@ local function RampSC()
   if S.Shear:IsCastable() and (Player:FuryDeficit() <= 90 and Target:DebuffStack(S.FrailtyDebuff) >= 0) then
     if Cast(S.Shear, nil, nil, not IsInMeleeRange) then return "shear rampsc 6"; end
   end
-  -- spirit_bomb,if=soul_fragments>=4&active_enemies>1
+  -- spirit_bomb,if=soul_fragments>=4&spell_targets>1
   if S.SpiritBomb:IsReady() and (SoulFragments >= 4 and EnemiesCount8yMelee > 1) then
     if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb rampsc 8"; end
   end
-  -- soul_cleave,if=(soul_fragments=0&active_enemies>1)|(active_enemies<2)|debuff.frailty.stack>=0
-  if S.SoulCleave:IsReady() and ((SoulFragments == 0 and EnemiesCount8yMelee > 1) or EnemiesCount8yMelee < 2 or Target:DebuffStack(S.FrailtyDebuff) >= 0) then
+  -- soul_cleave,if=(soul_fragments<=1&spell_targets>1)|(spell_targets<2)|debuff.frailty.stack>=0
+  if S.SoulCleave:IsReady() and ((SoulFragments <= 1 and EnemiesCount8yMelee > 1) or EnemiesCount8yMelee < 2 or Target:DebuffStack(S.FrailtyDebuff) >= 0) then
     if Cast(S.SoulCleave, nil, nil, not IsInMeleeRange) then return "soul_cleave rampsc 10"; end
   end
   -- soul_carver
   if S.SoulCarver:IsCastable() then
     if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver rampsc 12"; end
   end
-  -- variable,name=rampSC_done,op=setif,value=1,value_else=0,condition=talent.soul_carver.enabled&cooldown.soul_carver.remains&!talent.fiery_demise.enabled
-  -- Handled via APL variable settings
 end
 
-local function FD()
-  -- variable setting moved to top of function
-  -- Note: Tweaked as per discussion with APL creator
-  -- variable,name=FD_done,op=setif,value=1,condition=talent.fiery_demise.enabled&(cooldown.soul_carver.down|!talent.soul_carver.enabled)&(cooldown.fiery_brand.down|talent.down_in_flames.enabled&cooldown.fiery_brand.charges_fractional<1.65)&cooldown.immolation_aura.down&cooldown.fel_devastation.down
-  if (S.FieryDemise:IsAvailable() and (S.SoulCarver:CooldownDown() or not S.SoulCarver:IsAvailable()) and (S.FieryBrand:CooldownDown() or S.DowninFlames:IsAvailable() and S.FieryBrand:ChargesFractional() < 1.65) and S.ImmolationAura:CooldownDown() and S.FelDevastation:CooldownDown()) then
-    VarFDDone = true
+local function FDSC()
+  -- variable,name=fiery_demise_with_soul_carver_in_progress,value=1,if=!variable.fiery_demise_with_soul_carver_in_progress
+  if (not VarFDSC) then
+    VarFDSC = true
   end
+  -- variable,name=fiery_demise_with_soul_carver_in_progress,value=0,if=cooldown.soul_carver.remains&cooldown.fiery_brand.remains&cooldown.immolation_aura.remains&cooldown.fel_devastation.remains
+  -- Note: Added ChargesFractional check so we don't stay in the function and burn both charges of FB at once.
+  if (S.SoulCarver:CooldownDown() and (S.FieryBrand:CooldownDown() or S.DowninFlames:IsAvailable() and S.FieryBrand:ChargesFractional() < 1.65) and S.ImmolationAura:CooldownDown() and S.FelDevastation:CooldownDown()) then
+    VarFDSC = false
+  end
+  -- variable,name=darkglare_boon_high_roll,op=setif,value=1,value_else=0,condition=darkglare_boon_cdr_roll>=18,if=prev_gcd.1.fel_devastation
+  -- Moved to top of APL()
   -- fracture,if=fury.deficit>=30&!dot.fiery_brand.ticking
   if S.Fracture:IsCastable() and (Player:FuryDeficit() >= 30 and Target:DebuffDown(S.FieryBrandDebuff)) then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fd 2"; end
+    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fdsc 2"; end
   end
   -- fiery_brand,if=!dot.fiery_brand.ticking&fury>=30
   if S.FieryBrand:IsCastable() and (Target:DebuffDown(S.FieryBrandDebuff) and Player:Fury() >= 30) then
-    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fd 4"; end
+    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fdsc 4"; end
   end
   -- fel_devastation,if=dot.fiery_brand.remains<=3
   if S.FelDevastation:IsReady() and (Target:DebuffRemains(S.FieryBrandDebuff) <= 3) then
-    if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation fd 6"; end
+    if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation fdsc 6"; end
   end
   -- immolation_aura,if=dot.fiery_brand.ticking
   if S.ImmolationAura:IsCastable() and (Target:DebuffUp(S.FieryBrandDebuff)) then
-    if Cast(S.ImmolationAura) then return "immolation_aura fd 8"; end
+    if Cast(S.ImmolationAura) then return "immolation_aura fdsc 8"; end
   end
   -- spirit_bomb,if=soul_fragments>=4&dot.fiery_brand.remains>=4
   if S.SpiritBomb:IsReady() and (SoulFragments >= 4 and Target:DebuffRemains(S.FieryBrandDebuff) >= 4) then
-    if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb fd 10"; end
+    if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb fdsc 10"; end
   end
   -- soul_carver,if=soul_fragments<=3
   if S.SoulCarver:IsCastable() and (SoulFragments <= 3) then
-    if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver fd 12"; end
+    if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver fdsc 12"; end
   end
   -- fracture,if=soul_fragments<=3&dot.fiery_brand.remains>=5|dot.fiery_brand.remains<=5&fury<50
   if S.Fracture:IsCastable() and (SoulFragments <= 3 and Target:DebuffRemains(S.FieryBrandDebuff) >= 5 or Target:DebuffRemains(S.FieryBrandDebuff) <= 5 and Player:Fury() < 50) then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fd 14"; end
+    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fdsc 14"; end
   end
   -- sigil_of_flame,if=dot.fiery_brand.remains<=3&fury<50
   if S.SigilofFlame:IsCastable() and ((IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRefreshable(S.SigilofFlameDebuff)) and (Target:DebuffRemains(S.FieryBrandDebuff) <= 3 and Player:Fury() < 50) then
     if S.ConcentratedSigils:IsAvailable() then
-      if Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame fd 16 (Concentrated)"; end
+      if Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame fdsc 16 (Concentrated)"; end
     else
-      if Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame fd 16 (Normal)"; end
+      if Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame fdsc 16 (Normal)"; end
     end
   end
   -- throw_glaive
   if S.ThrowGlaive:IsCastable() then
-    if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive fd 18"; end
+    if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive fdsc 18"; end
   end
-  -- variable,name=FD_done,op=setif,value=1,value_else=0,condition=(talent.fiery_demise.enabled&cooldown.soul_carver.remains&cooldown.fiery_brand.remains&cooldown.immolation_aura.remains&cooldown.fel_devastation.remains)
-  -- Moved to top of function so we exit as soon as CDs are used
+end
+
+local function FDNoSC()
+  -- variable,name=fiery_demise_without_soul_carver_in_progress,value=1,if=!variable.fiery_demise_without_soul_carver_in_progress
+  if (not VarFDNoSC) then
+    VarFDNoSC = true
+  end
+  -- variable,name=fiery_demise_without_soul_carver_in_progress,value=0,if=cooldown.fiery_brand.remains&cooldown.immolation_aura.remains&cooldown.fel_devastation.remains
+  -- Note: Added ChargesFractional check so we don't stay in the function and burn both charges of FB at once.
+  if ((S.FieryBrand:CooldownDown() or S.DowninFlames:IsAvailable() and S.FieryBrand:ChargesFractional() < 1.65) and S.ImmolationAura:CooldownDown() and S.FelDevastation:CooldownDown()) then
+    VarFDNoSC = false
+  end
+  -- variable,name=darkglare_boon_high_roll,op=setif,value=1,value_else=0,condition=darkglare_boon_cdr_roll>=18,if=prev_gcd.1.fel_devastation
+  -- Moved to top of APL()
+  -- fracture,if=fury.deficit>=30&!dot.fiery_brand.ticking
+  if S.Fracture:IsCastable() and (Player:FuryDeficit() >= 30 and Target:DebuffDown(S.FieryBrandDebuff)) then
+    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fdnosc 2"; end
+  end
+  -- fiery_brand,if=!dot.fiery_brand.ticking&fury>=30
+  if S.FieryBrand:IsCastable() and (Target:DebuffDown(S.FieryBrandDebuff) and Player:Fury() >= 30) then
+    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fdnosc 4"; end
+  end
+  -- immolation_aura,if=dot.fiery_brand.ticking
+  if S.ImmolationAura:IsCastable() and (Target:DebuffUp(S.FieryBrandDebuff)) then
+    if Cast(S.ImmolationAura) then return "immolation_aura fdnosc 6"; end
+  end
+  -- spirit_bomb,if=soul_fragments>=4&dot.fiery_brand.remains>=4
+  if S.SpiritBomb:IsReady() and (SoulFragments >= 4 and Target:DebuffRemains(S.FieryBrandDebuff) >= 4) then
+    if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb fdnosc 8"; end
+  end
+  -- fracture,if=soul_fragments<=3&dot.fiery_brand.remains>=5|dot.fiery_brand.remains<=5&fury<50
+  if S.Fracture:IsCastable() and (SoulFragments <= 3 and Target:DebuffRemains(S.FieryBrandDebuff) >= 5 or Target:DebuffRemains(S.FieryBrandDebuff) <= 5 and Player:Fury() < 50) then
+    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fdnosc 10"; end
+  end
+  -- fel_devastation,if=dot.fiery_brand.remains<=3
+  if S.FelDevastation:IsReady() and (Target:DebuffRemains(S.FieryBrandDebuff) <= 3) then
+    if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation fdnosc 12"; end
+  end
+  -- sigil_of_flame,if=dot.fiery_brand.remains<=3&fury<50
+  if S.SigilofFlame:IsCastable() and ((IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRefreshable(S.SigilofFlameDebuff)) and (Target:DebuffRemains(S.FieryBrandDebuff) <= 3 and Player:Fury() < 50) then
+    if S.ConcentratedSigils:IsAvailable() then
+      if Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame fdnosc 14 (Concentrated)"; end
+    else
+      if Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame fdnosc 14 (Normal)"; end
+    end
+  end
 end
 
 -- APL Main
@@ -326,6 +412,14 @@ local function APL()
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
 
   if Everyone.TargetIsValid() then
+    -- Check DGB CDR value
+    if (S.FieryDemise:IsAvailable() and Player:PrevGCD(1, S.FelDevastation) and (DemonHunter.DGBCDRLastUpdate == 0 or GetTime() - DemonHunter.DGBCDRLastUpdate < 5)) then
+      if DemonHunter.DGBCDR >= 18 then
+        VarDGBHighRoll = true
+      else
+        VarDGBHighRoll = false
+      end
+    end
     -- Precombat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
@@ -336,18 +430,6 @@ local function APL()
     -- Manually added: Defensives
     if (IsTanking) then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- variable,name=rampH_done,value=0,op=setif,value_else=1,condition=talent.the_hunt.enabled&cooldown.the_hunt.remains<5
-    VarRampHDone = (S.TheHunt:IsAvailable() and S.TheHunt:CooldownRemains() < 5) and 0 or 1
-    -- variable,name=rampED_done,value=0,op=setif,value_else=1,condition=talent.elysian_decree.enabled&cooldown.elysian_decree.remains<5
-    VarRampEDDone = (S.ElysianDecree:IsAvailable() and S.ElysianDecree:CooldownRemains() < 5) and 0 or 1
-    -- variable,name=rampSC_done,value=0,op=setif,value_else=1,condition=talent.soul_carver.enabled&cooldown.soul_carver.remains<5&!talent.fiery_demise.enabled
-    VarRampSCDone = (S.SoulCarver:IsAvailable() and S.SoulCarver:CooldownRemains() < 5 and not S.FieryDemise:IsAvailable()) and 0 or 1
-    -- variable,name=FD_done,value=0,op=setif,value_else=1,condition=talent.fiery_demise.enabled&cooldown.soul_carver.up&cooldown.fiery_brand.up&cooldown.immolation_aura.up&cooldown.fel_devastation.remains<10|dot.fiery_brand.ticking&talent.fiery_demise
-    -- Note: Tweaked as per conversation with APL creator:
-    -- variable,name=FD_done,value=0,op=setif,condition=talent.fiery_demise.enabled&cooldown.fiery_brand.up&(talent.down_in_flames.enabled&(cooldown.soul_carver.up|cooldown.fel_devastation.up)|!talent.down_in_flames.enabled&cooldown.soul_carver.up)
-    if (S.FieryDemise:IsAvailable() and S.FieryBrand:CooldownUp() and (S.DowninFlames:IsAvailable() and (S.SoulCarver:CooldownUp() or S.FelDevastation:CooldownUp()) or (not S.DowninFlames:IsAvailable()) and S.SoulCarver:CooldownUp())) then
-      VarFDDone = false
     end
     -- infernal_strike
     if S.InfernalStrike:IsCastable() and ((not Settings.Vengeance.ConserveInfernalStrike) or S.InfernalStrike:ChargesFractional() > 1.9) and (S.InfernalStrike:TimeSinceLastCast() > 2) then
@@ -382,43 +464,45 @@ local function APL()
         if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 main 12"; end
       end
     end
-    if Target:DebuffDown(S.FieryBrandDebuff) then
-      -- run_action_list,name=rampH,if=variable.rampH_done=0&!dot.fiery_brand.ticking
-      if (not bool(VarRampHDone)) then
-        local ShouldReturn = RampH(); if ShouldReturn then return ShouldReturn; end
-        if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for RampH()"; end
-      end
-      -- run_action_list,name=rampED,if=variable.rampED_done=0&!dot.fiery_brand.ticking
-      if (not bool(VarRampEDDone)) then
-        local ShouldReturn = RampED(); if ShouldReturn then return ShouldReturn; end
-        if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for RampED()"; end
-      end
-      -- run_action_list,name=rampSC,if=variable.rampSC_done=0&!dot.fiery_brand.ticking
-      if (not bool(VarRampSCDone)) then
-        local ShouldReturn = RampSC(); if ShouldReturn then return ShouldReturn; end
-        if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for RampSC()"; end
-      end
+    -- run_action_list,name=the_hunt_ramp,if=variable.the_hunt_ramp_in_progress|talent.the_hunt.enabled&cooldown.the_hunt.remains<5&!dot.fiery_brand.ticking
+    if (VarHuntRamp or S.TheHunt:IsAvailable() and S.TheHunt:CooldownRemains() < 5 and Target:DebuffDown(S.FieryBrandDebuff)) then
+      local ShouldReturn = HuntRamp(); if ShouldReturn then return ShouldReturn; end
+      if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for HuntRamp()"; end
     end
-    -- run_action_list,name=FD,if=variable.FD_done=0
-    -- Manually added: Check fiery_demise. If not talented, the VarFDDone check remains nil, causing the profile to enter FD().
-    if (S.FieryDemise:IsAvailable() and not VarFDDone) then
-      local ShouldReturn = FD(); if ShouldReturn then return ShouldReturn; end
-      if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for FD()"; end
+    -- run_action_list,name=elysian_decree_ramp,if=variable.elysian_decree_ramp_in_progress|talent.elysian_decree.enabled&cooldown.elysian_decree.remains<5&!dot.fiery_brand.ticking
+    if (VarEDRamp or S.ElysianDecree:IsAvailable() and S.ElysianDecree:CooldownRemains() < 5 and Target:DebuffDown(S.FieryBrandDebuff)) then
+      local ShouldReturn = EDRamp(); if ShouldReturn then return ShouldReturn; end
+      if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for EDRamp()"; end
+    end
+    -- run_action_list,name=soul_carver_without_fiery_demise_ramp,if=variable.soul_carver_ramp_in_progress|talent.soul_carver.enabled&cooldown.soul_carver.remains<5&!talent.fiery_demise.enabled&!dot.fiery_brand.ticking
+    if (VarSCRamp or S.SoulCarver:IsAvailable() and S.SoulCarver:CooldownRemains() < 5 and (not S.FieryDemise:IsAvailable()) and Target:DebuffDown(S.FieryBrandDebuff)) then
+      local ShouldReturn = SCRamp(); if ShouldReturn then return ShouldReturn; end
+      if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SCRamp()"; end
+    end
+    -- run_action_list,name=fiery_demise_window_with_soul_carver,if=variable.fiery_demise_with_soul_carver_in_progress|talent.fiery_demise.enabled&talent.soul_carver.enabled&cooldown.soul_carver.up&cooldown.fiery_brand.up&cooldown.immolation_aura.up&cooldown.fel_devastation.remains<10
+    if (VarFDSC or S.FieryDemise:IsAvailable() and S.SoulCarver:IsAvailable() and S.SoulCarver:CooldownUp() and S.FieryBrand:CooldownUp() and S.ImmolationAura:CooldownUp() and S.FelDevastation:CooldownRemains() < 10) then
+      local ShouldReturn = FDSC(); if ShouldReturn then return ShouldReturn; end
+      if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for FDSC()"; end
+    end
+    -- run_action_list,name=fiery_demise_window_without_soul_carver,if=variable.fiery_demise_without_soul_carver_in_progress|talent.fiery_demise.enabled&((talent.soul_carver.enabled&!cooldown.soul_carver.up)|!talent.soul_carver.enabled)&cooldown.fiery_brand.up&cooldown.immolation_aura.up&cooldown.fel_devastation.remains<10&((talent.darkglare_boon.enabled&variable.darkglare_boon_high_roll)|!talent.darkglare_boon.enabled)
+    if (VarFDNoSC or S.FieryDemise:IsAvailable() and (S.SoulCarver:IsAvailable() and S.SoulCarver:CooldownDown() or not S.SoulCarver:IsAvailable()) and S.FieryBrand:CooldownUp() and S.ImmolationAura:CooldownUp() and S.FelDevastation:CooldownRemains() < 10 and (S.DarkglareBoon:IsAvailable() and VarDGBHighRoll or not S.DarkglareBoon:IsAvailable())) then
+      local ShouldReturn = FDNoSC(); if ShouldReturn then return ShouldReturn; end
+      if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for FDNoSC()"; end
     end
     -- metamorphosis,if=!buff.metamorphosis.up&!dot.fiery_brand.ticking
     if S.Metamorphosis:IsCastable() and Settings.Vengeance.UseMetaOffensively and (Player:BuffDown(S.MetamorphosisBuff) and Target:DebuffDown(S.FieryBrandDebuff)) then
       if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis) then return "metamorphosis main 14"; end
     end
-    -- fel_devastation,if=(!talent.down_in_flames.enabled)
+    -- fel_devastation,if=!talent.down_in_flames.enabled
     if S.FelDevastation:IsReady() and (not S.DowninFlames:IsAvailable()) then
       if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation main 16"; end
     end
-    -- spirit_bomb,if=((buff.metamorphosis.up&talent.fracture.enabled&soul_fragments>=3)|soul_fragments>=4&active_enemies>1)
+    -- spirit_bomb,if=((buff.metamorphosis.up&talent.fracture.enabled&soul_fragments>=3)|soul_fragments>=4&spell_targets>1)
     if S.SpiritBomb:IsReady() and ((Player:BuffUp(S.MetamorphosisBuff) and S.Fracture:IsAvailable() and SoulFragments >= 3) or SoulFragments >= 4 and EnemiesCount8yMelee > 1) then
       if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb main 18"; end
     end
-    -- soul_cleave,if=(talent.spirit_bomb.enabled&soul_fragments=0&target>1)|(active_enemies<2&((talent.fracture.enabled&fury>=55)|(!talent.fracture.enabled&fury>=70)|(buff.metamorphosis.up&((talent.fracture.enabled&fury>=35)|(!talent.fracture.enabled&fury>=50)))))|(!talent.spirit_bomb.enabled)&((talent.fracture.enabled&fury>=55)|(!talent.fracture.enabled&fury>=70)|(buff.metamorphosis.up&((talent.fracture.enabled&fury>=35)|(!talent.fracture.enabled&fury>=50))))
-    if S.SoulCleave:IsReady() and ((S.SpiritBomb:IsAvailable() and SoulFragments == 0 and EnemiesCount8yMelee > 1) or (EnemiesCount8yMelee < 2 and ((S.Fracture:IsAvailable() and Player:Fury() >= 55) or ((not S.Fracture:IsAvailable()) and Player:Fury() >= 70) or (Player:BuffUp(S.MetamorphosisBuff) and ((S.Fracture:IsAvailable() and Player:Fury() >= 35) or ((not S.Fracture:IsAvailable()) and Player:Fury() >= 50))))) or (not S.SpiritBomb:IsAvailable()) and ((S.Fracture:IsAvailable() and Player:Fury() >= 55) or ((not S.Fracture:IsAvailable()) and Player:Fury() >= 70) or (Player:BuffUp(S.MetamorphosisBuff) and ((S.Fracture:IsAvailable() and Player:Fury() >= 35) or ((not S.Fracture:IsAvailable()) and Player:Fury() >= 50))))) then
+    -- soul_cleave,if=(talent.spirit_bomb.enabled&soul_fragments<=1&spell_targets>1)|(spell_targets<2&((talent.fracture.enabled&fury>=55)|(!talent.fracture.enabled&fury>=70)|(buff.metamorphosis.up&((talent.fracture.enabled&fury>=35)|(!talent.fracture.enabled&fury>=50)))))|(!talent.spirit_bomb.enabled)&((talent.fracture.enabled&fury>=55)|(!talent.fracture.enabled&fury>=70)|(buff.metamorphosis.up&((talent.fracture.enabled&fury>=35)|(!talent.fracture.enabled&fury>=50))))
+    if S.SoulCleave:IsReady() and ((S.SpiritBomb:IsAvailable() and SoulFragments <= 1 and EnemiesCount8yMelee > 1) or (EnemiesCount8yMelee < 2 and ((S.Fracture:IsAvailable() and Player:Fury() >= 55) or ((not S.Fracture:IsAvailable()) and Player:Fury() >= 70) or (Player:BuffUp(S.MetamorphosisBuff) and ((S.Fracture:IsAvailable() and Player:Fury() >= 35) or ((not S.Fracture:IsAvailable()) and Player:Fury() >= 50))))) or (not S.SpiritBomb:IsAvailable()) and ((S.Fracture:IsAvailable() and Player:Fury() >= 55) or ((not S.Fracture:IsAvailable()) and Player:Fury() >= 70) or (Player:BuffUp(S.MetamorphosisBuff) and ((S.Fracture:IsAvailable() and Player:Fury() >= 35) or ((not S.Fracture:IsAvailable()) and Player:Fury() >= 50))))) then
       if Cast(S.SoulCleave, nil, nil, not Target:IsSpellInRange(S.SoulCleave)) then return "soul_cleave main 20"; end
     end
     -- immolation_aura,if=(talent.fiery_demise.enabled&fury.deficit>=10&(cooldown.soul_carver.remains>15))|(!talent.fiery_demise.enabled&fury.deficit>=10)
@@ -430,7 +514,7 @@ local function APL()
     if S.Felblade:IsCastable() and (Player:FuryDeficit() >= 40) then
       if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade main 24"; end
     end
-    -- fracture,if=(talent.spirit_bomb.enabled&(soul_fragments<=3&target>1|target<2&fury.deficit>=30))|(!talent.spirit_bomb.enabled&((buff.metamorphosis.up&fury.deficit>=45)|(buff.metamorphosis.down&fury.deficit>=30)))
+    -- fracture,if=(talent.spirit_bomb.enabled&(soul_fragments<=3&spell_targets>1|spell_targets<2&fury.deficit>=30))|(!talent.spirit_bomb.enabled&((buff.metamorphosis.up&fury.deficit>=45)|(buff.metamorphosis.down&fury.deficit>=30)))
     if S.Fracture:IsCastable() and ((S.SpiritBomb:IsAvailable() and (SoulFragments <= 3 and EnemiesCount8yMelee > 1 or EnemiesCount8yMelee < 2 and Player:FuryDeficit() >= 30)) or ((not S.SpiritBomb:IsAvailable()) and ((Player:BuffUp(S.MetamorphosisBuff) and Player:FuryDeficit() >= 45) or (Player:BuffDown(S.MetamorphosisBuff) and Player:FuryDeficit() >= 30)))) then
       if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture main 26"; end
     end

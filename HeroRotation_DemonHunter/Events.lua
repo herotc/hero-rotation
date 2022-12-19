@@ -3,21 +3,44 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroLib
-local HL = HeroLib
-local Cache = HeroCache
-local Unit = HL.Unit
-local Player = Unit.Player
-local Target = Unit.Target
-local Spell = HL.Spell
-local Item = HL.Item
+local HL               = HeroLib
+local HR               = HeroRotation
+local Cache            = HeroCache
+local Unit             = HL.Unit
+local Player           = Unit.Player
+local Target           = Unit.Target
+local Spell            = HL.Spell
+local Item             = HL.Item
 -- Lua
+local GetTime          = GetTime
 -- File Locals
+HR.Commons.DemonHunter = {}
+local DemonHunter      = HR.Commons.DemonHunter
+local SpellVDH         = Spell.DemonHunter.Vengeance
 
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
 
 --- ======= COMBATLOG =======
+
+-------------------
+----- DGB CDR -----
+-------------------
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local SourceGUID, _, _, _, _, _, _, _, SpellID, _, _, Amount = select(4, ...)
+
+    if SourceGUID == Player:GUID() then
+      if SpellID == 391345 then
+        DemonHunter.DGBCDR = (Amount / 100) * 60
+        DemonHunter.DGBCDRLastUpdate = GetTime()
+      end
+    end
+  end
+  , "SPELL_ENERGIZE"
+)
+
   --- Combat Log Arguments
     ------- Base -------
       --     1        2         3           4           5           6              7             8         9        10           11
