@@ -36,6 +36,8 @@ Spell.Warlock.Commons = {
   GrimoireofSacrificeBuff               = Spell(196099),
   SoulConduit                           = Spell(215941),
   SummonSoulkeeper                      = Spell(386256),
+  InquisitorsGaze                       = Spell(386344),
+  Soulburn                              = Spell(385899),
   -- Buffs
   TormentedSoulBuff                     = Spell(386251), -- Needs verified
   -- Debuffs
@@ -70,6 +72,9 @@ Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
   SoulStrike                            = Spell(264057),
   SummonDemonicTyrant                   = Spell(265187),
   SummonVilefiend                       = Spell(264119),
+  FelCovenant                           = Spell(387432),
+  FelCovenantBuff                       = Spell(387437),
+  SoulboundTyrant                       = Spell(334585),
   -- Buffs
   DemonicCallingBuff                    = Spell(205146),
   DemonicCoreBuff                       = Spell(264173),
@@ -157,6 +162,8 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
 -- Items
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Commons = {
+  -- Trinkets
+  TimebreachingTalon                    = Item(193791, {13, 14}),
 }
 
 Item.Warlock.Affliction = MergeTableByKey(Item.Warlock.Commons, {

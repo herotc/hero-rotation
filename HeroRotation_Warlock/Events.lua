@@ -214,6 +214,10 @@ function Warlock.UpdatePetTable()
           HL.GuardiansTable.VilefiendDuration = 0
         elseif petTable.name == "Infernal" then
           HL.GuardiansTable.InfernalDuration = 0
+        elseif petTable.name == "Inquisitor's Eye" then
+          HL.GuardiansTable.InquisitorsEye = 0
+        elseif petTable.name == "Soulkeeper" then
+          HL.GuardiansTable.Soulkeeper = 0
         elseif petTable.name == "Blasphemy" then
           HL.GuardiansTable.BlasphemyDuration = 0
         end
@@ -238,6 +242,10 @@ function Warlock.UpdatePetTable()
         HL.GuardiansTable.VilefiendDuration = petTable.Duration
       elseif petTable.name == "Infernal" then
         HL.GuardiansTable.InfernalDuration = petTable.Duration
+      elseif petTable.name == "Inquisitor's Eye" then
+        HL.GuardiansTable.InquisitorsEye = petTable.Duration
+      elseif petTable.name == "Soulkeeper" then
+        HL.GuardiansTable.Soulkeeper = petTable.Duration
       elseif petTable.name == "Blasphy" then
         HL.GuardiansTable.BlasphemyDuration = petTable.Duration
       end
@@ -276,6 +284,11 @@ HL:RegisterForSelfCombatEvent(
       elseif summonedPet.name == "Infernal" then
         HL.GuardiansTable.InfernalDuration = summonedPet.duration
         petDuration = summonedPet.duration
+      elseif summonedPet.name == "Inquisitor's Eye" then
+        HL.GuardiansTable.InquisitorsEye = summonedPet.duration
+        petDuration = summonedPet.duration
+      elseif summonedPet.name == "Soulkeeper" then
+        HL.GuardiansTable.Soulkeeper = summonedPet.duration
       elseif summonedPet.name == "Blasphemy" then
         HL.GuardiansTable.BlasphemyDuration = summonedPet.duration
         petDuration = summonedPet.duration
