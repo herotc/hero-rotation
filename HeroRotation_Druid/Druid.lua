@@ -51,7 +51,6 @@ Spell.Druid.Commons = {
   Starsurge                             = MultiSpell(78674,197626),
   Sunfire                               = Spell(93402),
   SurvivalInstincts                     = Spell(61336),
-  Swipe                                 = MultiSpell(213764,213771),
   Thrash                                = MultiSpell(77758,106830),
   WildCharge                            = MultiSpell(16979,49376),
   -- Buffs
@@ -129,6 +128,7 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   Starlord                              = Spell(202345),
   Starweaver                            = Spell(393940),
   StellarFlare                          = Spell(202347),
+  Swipe                                 = Spell(213764),
   TwinMoons                             = Spell(279620),
   UmbralEmbrace                         = Spell(393760),
   WaningTwilight                        = Spell(393956),
@@ -185,6 +185,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   RipandTear                            = Spell(391347),
   Sabertooth                            = Spell(202031),
   SouloftheForest                       = Spell(158476),
+  Swipe                                 = Spell(106785),
   TearOpenWounds                        = Spell(391785),
   TigersFury                            = Spell(5217),
   -- Buffs
@@ -210,6 +211,7 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   Pulverize                             = Spell(80313),
   RageoftheSleeper                      = Spell(200851),
   SouloftheForest                       = Spell(158477),
+  Swipe                                 = Spell(213771),
   ViciousCycle                          = Spell(371999),
   -- Buffs
   BerserkBuff                           = Spell(50334),
@@ -231,7 +233,7 @@ Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Commons, {
   Starsurge                             = Spell(197626),
   Sunfire                               = Spell(93402),
   SunfireDebuff                         = Spell(164815),
-  Swipe                                 = Spell(106785),
+  Swipe                                 = Spell(213764),
   Wrath                                 = Spell(5176),
   -- Talents
   BalanceAffinity                       = Spell(197632),
