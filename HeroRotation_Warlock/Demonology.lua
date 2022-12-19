@@ -110,9 +110,7 @@ local function Precombat()
   -- Moved to APL()
   -- snapshot_stats
   -- inquisitors_gaze
-  if(S.InquisitorsGaze:IsCastable()) then
-    if Cast(S.InquisitorsGaze) then return "inquisitors_gaze precombat 29"; end
-  end
+  -- Moved to APL()
   -- variable,name=tyrant_prep_start,op=set,value=12
   VarTyrantPrepStart = 12
   -- variable,name=next_tyrant,op=set,value=14+talent.grimoire_felguard+talent.summon_vilefiend
@@ -257,10 +255,14 @@ local function APL()
   if S.SummonPet:IsCastable() then
     if Cast(S.SummonPet, Settings.Demonology.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
   end
+  -- inquisitors_gaze
+  if S.InquisitorsGaze:IsCastable() and Player:BuffDown(S.InquisitorsGazeBuff) then
+    if Cast(S.InquisitorsGaze) then return "inquisitors_gaze ooc"; end
+  end
 
   if Everyone.TargetIsValid() then
     -- call precombat
-    if not Player:AffectingCombat() and not Player:IsCasting() then
+    if not Player:AffectingCombat() and not Player:IsCasting(S.Demonbolt) then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- Interrupts
@@ -288,7 +290,7 @@ local function APL()
       if Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal) then return "nether_portal main 40"; end
     end
     -- hand_of_guldan,if=buff.nether_portal.up
-    if S.HandofGuldan:IsCastable() and Player:BuffUp(S.NetherPortalBuff) then
+    if S.HandofGuldan:IsReady() and Player:BuffUp(S.NetherPortalBuff) then
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 41"; end
     end
     -- call_action_list,name=items
@@ -316,13 +318,13 @@ local function APL()
       if Cast(S.SummonVilefiend) then return "summon_vilefiend main 47"; end
     end
     -- guillotine,if=cooldown.demonic_strength.remains
-    -- Added check to make sure that we're not suggesting this during pet's Felstorm
-    if S.Guillotine:IsReady() and S.DemonicStrength:CooldownDown() and (S.Felstorm:CooldownRemains() < 30 - (5 * (1 - (Player:HastePct() / 100)))) then
+    -- Added check to make sure that we're not suggesting this during pet's Felstorm or demonic strength
+    if S.Guillotine:IsReady() and S.DemonicStrength:CooldownDown() and (S.Felstorm:CooldownRemains() < 30 - (5 * (1 - (Player:HastePct() / 100)))) and S.DemonicStrength:TimeSinceLastCast() >= 4 then
       if Cast(S.Guillotine, nil, nil, not Target:IsInRange(40)) then return "guillotine main 48"; end
     end
     -- demonic_strength
-    -- Added check to make sure that we're not suggesting this during pet's Felstorm
-    if S.DemonicStrength:IsReady() and (S.Felstorm:CooldownRemains() < 30 - (5 * (1 - (Player:HastePct() / 100)))) then
+    -- Added check to make sure that we're not suggesting this during pet's Felstorm or Guillotine
+    if S.DemonicStrength:IsReady() and (S.Felstorm:CooldownRemains() < 30 - (5 * (1 - (Player:HastePct() / 100)))) and S.Guillotine:TimeSinceLastCast() >= 8 then
       if Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength main 49"; end
     end
     -- bilescourge_bombers,if=!pet.demonic_tyrant.active
@@ -342,7 +344,7 @@ local function APL()
       if Cast(S.SoulStrike, nil, nil, not Target:IsSpellInRange(S.SoulStrike)) then return "soul_strike main 53"; end
     end
     -- summon_soulkeeper,if=active_enemies>1&buff.tormented_soul.stack=10
-    if S.SummonSoulkeeper:IsReady() and EnemiesCount8ySplash > 1 and Player:BuffStack(S.TormentedSoulBuff) == 10 then
+    if S.SummonSoulkeeper:IsReady() and EnemiesCount8ySplash > 1 and S.SummonSoulkeeper:Count() == 10 then
       if Cast(S.SummonSoulkeeper) then return "soul_strike main 54"; end
     end
     -- demonbolt,if=buff.demonic_core.react&soul_shard<4

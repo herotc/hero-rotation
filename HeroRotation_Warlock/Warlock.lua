@@ -37,9 +37,9 @@ Spell.Warlock.Commons = {
   SoulConduit                           = Spell(215941),
   SummonSoulkeeper                      = Spell(386256),
   InquisitorsGaze                       = Spell(386344),
+  InquisitorsGazeBuff                   = Spell(388068),
   Soulburn                              = Spell(385899),
   -- Buffs
-  TormentedSoulBuff                     = Spell(386251), -- Needs verified
   -- Debuffs
   -- Command Demon Abilities
   AxeToss                               = Spell(119914),
