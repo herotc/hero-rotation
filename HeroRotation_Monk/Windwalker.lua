@@ -222,6 +222,8 @@ local function CDSerenity()
   if S.SummonWhiteTigerStatue:IsCastable() and (XuenActive) then
     if Cast(S.SummonWhiteTigerStatue, Settings.Commons.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue cd_serenity 2"; end
   end
+  -- invoke_external_buff,name=power_infusion,if=pet.xuen_the_white_tiger.active
+  -- Note: Not handling external buffs.
   -- invoke_xuen_the_white_tiger,if=!variable.hold_xuen&talent.bonedust_brew&cooldown.bonedust_brew.remains<=5|fight_remains<25
   if S.InvokeXuenTheWhiteTiger:IsCastable() and ((not VarHoldXuen) and S.BonedustBrew:IsAvailable() and S.BonedustBrew:CooldownRemains() <= 5 or FightRemains < 25) then
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_serenity 4"; end
