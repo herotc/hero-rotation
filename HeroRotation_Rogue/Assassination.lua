@@ -432,7 +432,8 @@ local function CDs ()
           or Target:FilteredTimeToDie("<", Target:DebuffRemains(S.Rupture)*0.5) then
           if Cast(S.Exsanguinate, Settings.Assassination.GCDasOffGCD.Exsanguinate) then ShouldReturn = "Cast Exsanguinate" end
         end
-      elseif S.ResoundingClarity:IsAvailable() and S.EchoingReprimand:IsReady() and S.Exsanguinate:CooldownRemains() > 40 then
+      end
+      if S.ResoundingClarity:IsAvailable() and S.EchoingReprimand:IsReady() and S.Exsanguinate:CooldownRemains() > 40 then
         if Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle, not TargetInMeleeRange) then return "Cast Echoing Reprimand (Exsang Desync)" end
       end
     end
