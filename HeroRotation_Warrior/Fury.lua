@@ -325,11 +325,11 @@ local function APL()
     end
     -- avatar,if=talent.titans_torment&buff.enrage.up&(buff.elysian_might.up|!runeforge.elysian_might|!covenant.kyrian)
     if S.Avatar:IsCastable() and (S.TitansTorment:IsAvailable() and EnrageUp and (Player:BuffUp(S.ElysianMightBuff) or (not ElysianMightEquipped) or CovenantID ~= 1)) then
-      if Cast(S.Avatar, Settings.Commons.GCDasOffGCD.Avatar) then return "avatar main 12"; end
+      if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar main 12"; end
     end
     -- avatar,if=!talent.titans_torment&(buff.recklessness.up|target.time_to_die<20)
     if S.Avatar:IsCastable() and ((not S.TitansTorment:IsAvailable()) and (Player:BuffUp(S.RecklessnessBuff) or Target:TimeToDie() < 20)) then
-      if Cast(S.Avatar, Settings.Commons.GCDasOffGCD.Avatar) then return "avatar main 14"; end
+      if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar main 14"; end
     end
     -- recklessness,if=talent.annihilator&cooldown.avatar.remains<1|cooldown.avatar.remains>40|!talent.avatar|target.time_to_die<20
     if S.Recklessness:IsCastable() and (S.Annihilator:IsAvailable() and S.Avatar:CooldownRemains() < 1 or S.Avatar:CooldownRemains() > 40 or (not S.Avatar:IsAvailable()) or Target:TimeToDie() < 20) then

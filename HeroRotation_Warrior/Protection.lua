@@ -202,7 +202,7 @@ local function Aoe()
   -- thunderous_roar
   if S.ThunderousRoar:IsCastable() then
     SuggestRageDump(10)
-    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar aoe 6"; end
+    if Cast(S.ThunderousRoar, Settings.Protection.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar aoe 6"; end
   end
   -- ravager
   if S.Ravager:IsCastable() then
@@ -212,7 +212,7 @@ local function Aoe()
   -- shockwave
   if S.Shockwave:IsCastable() then
     SuggestRageDump(10)
-    if Cast(S.Shockwave, Settings.Commons.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave aoe 10"; end
+    if Cast(S.Shockwave, Settings.Protection.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave aoe 10"; end
   end
   -- shield_charge
   if S.ShieldCharge:IsCastable() then
@@ -271,7 +271,7 @@ local function Generic()
   -- thunderous_roar
   if S.ThunderousRoar:IsCastable() then
     SuggestRageDump(10)
-    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar generic 6"; end
+    if Cast(S.ThunderousRoar, Settings.Protection.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar generic 6"; end
   end
   -- spear_of_bastion
   if S.SpearofBastion:IsCastable() then
@@ -285,7 +285,7 @@ local function Generic()
   -- shockwave
   if S.Shockwave:IsCastable() then
     SuggestRageDump(10)
-    if Cast(S.Shockwave, Settings.Commons.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave generic 12"; end
+    if Cast(S.Shockwave, Settings.Protection.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave generic 12"; end
   end
   -- execute
   if S.Execute:IsReady() and not ShouldPressShieldBlock() then

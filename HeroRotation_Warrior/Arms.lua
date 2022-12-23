@@ -113,7 +113,7 @@ local function Hac()
   end
   -- thunderous_roar,if=(buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up)&raid_event.adds.in>15|active_enemies>1&dot.deep_wounds.remains
   if CDsON() and S.ThunderousRoar:IsCastable() and ((Player:BuffUp(S.TestofMightBuff) or not S.TestofMight:IsAvailable() and Target:DebuffUp(S.ColossusSmashDebuff)) or EnemiesCount8y > 1 and Target:DebuffRemains(S.DeepWoundsDebuff) > 0) then
-    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar hac 74"; end
+    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar hac 74"; end
   end
   -- spear_of_bastion,if=(buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up)&raid_event.adds.in>15
   if CDsON() and S.SpearofBastion:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or not S.TestofMight:IsAvailable() and Target:DebuffUp(S.ColossusSmashDebuff)) then
@@ -149,11 +149,11 @@ local function Hac()
   end
   -- thunderous_roar,if=raid_event.adds.in>15
   if CDsON() and S.ThunderousRoar:IsCastable() then
-    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar hac 83"; end
+    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar hac 83"; end
   end
   -- shockwave,if=active_enemies>2&talent.sonic_boom
   if S.Shockwave:IsCastable() and EnemiesCount8y > 2 and (S.SonicBoom:IsAvailable()) then
-    if Cast(S.Shockwave, Settings.Commons.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave hac 84"; end
+    if Cast(S.Shockwave, Settings.Arms.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave hac 84"; end
   end
   -- whirlwind,if=talent.storm_of_swords&talent.dreadnaught&talent.battlelord&rage.pct>70
   if S.Whirlwind:IsReady() and S.StormofSwords:IsAvailable() and S.Dreadnaught:IsAvailable() and Player:Rage() > 70 then
@@ -193,7 +193,7 @@ local function Hac()
   end
   -- shockwave,if=talent.sonic_boom
   if S.Shockwave:IsCastable() and (S.SonicBoom:IsAvailable()) then
-    if Cast(S.Shockwave, Settings.Commons.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave hac 94"; end
+    if Cast(S.Shockwave, Settings.Arms.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave hac 94"; end
   end
   -- bladestorm,if=raid_event.adds.in>30
   if CDsON() and S.Bladestorm:IsCastable() then
@@ -228,7 +228,7 @@ local function Execute()
   end
   -- thunderous_roar,if=buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or (not S.TestofMight:IsAvailable()) and Target:DebuffUp(S.ColossusSmashDebuff)) then
-    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar execute 56"; end
+    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar execute 56"; end
   end
   -- spear_of_bastion,if=debuff.colossus_smash.up|buff.test_of_might.up
   if CDsON() and S.SpearofBastion:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff) ) then
@@ -256,7 +256,7 @@ local function Execute()
   end
   -- shockwave,if=talent.sonic_boom
   if S.Shockwave:IsCastable() and (S.SonicBoom:IsAvailable()) then
-    if Cast(S.Shockwave, Settings.Commons.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave execute 63"; end
+    if Cast(S.Shockwave, Settings.Arms.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave execute 63"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
@@ -291,7 +291,7 @@ local function SingleTarget()
   end
   -- thunderous_roar,if=buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) or (Player:BuffUp(S.TestofMightBuff) and Target:DebuffUp(S.ColossusSmashDebuff))) then
-    if Cast(S.ThunderousRoar, Settings.Commons.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 103"; end
+    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 103"; end
   end
   -- spear_of_bastion,if=buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up
   if CDsON() and S.SpearofBastion:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) or (Player:BuffUp(S.TestofMightBuff) and Target:DebuffUp(S.ColossusSmashDebuff))) then
@@ -315,7 +315,7 @@ local function SingleTarget()
   end
   -- shockwave,if=talent.sonic_boom.enabled
   if S.Shockwave:IsCastable() and (S.SonicBoom:IsAvailable()) then
-    if Cast(S.Shockwave, Settings.Commons.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave single_target 109"; end
+    if Cast(S.Shockwave, Settings.Arms.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave single_target 109"; end
   end
   -- overpower,if=charges=2&(debuff.colossus_smash.down|rage.pct<25)
   if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2 and (Target:DebuffDown(S.ColossusSmashDebuff) or Player:Rage() < 25)) then
