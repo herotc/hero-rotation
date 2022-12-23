@@ -31,6 +31,7 @@ local I = Item.Warrior.Arms
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.ManicGrieftorch:ID(),
 }
 
 -- Variables
@@ -60,29 +61,34 @@ local function Precombat()
   -- snapshot_stats
   -- Manually added: Group buff check
   if S.BattleShout:IsCastable() and (Player:BuffDown(S.BattleShoutBuff, true) or Everyone.GroupBuffMissing(S.BattleShoutBuff)) then
-    if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
+    if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat"; end
+  end
+  --battle_stance,toggle=on
+  if S.BattleStance:IsCastable() and Player:BuffDown(S.BattleStance, true) then
+    if Cast(S.BattleStance) then return "battle_stance 28"; end
   end
   --use_item,name=algethar_puzzle_box
+  -- Manually added: pre-pull
   if TargetInMeleeRange then
     if S.Skullsplitter:IsCastable() then
-      if Cast(S.Skullsplitter) then return "skullsplitter precombat 10"; end
+      if Cast(S.Skullsplitter) then return "skullsplitter precombat"; end
     end
     if S.ColossusSmash:IsCastable() then
-      if Cast(S.ColossusSmash) then return "colossus_smash precombat 12"; end
+      if Cast(S.ColossusSmash) then return "colossus_smash precombat"; end
     end
     if S.Warbreaker:IsCastable() then
-      if Cast(S.Warbreaker) then return "warbreaker precombat 14"; end
+      if Cast(S.Warbreaker) then return "warbreaker precombat"; end
     end
     if S.Overpower:IsCastable() then
-      if Cast(S.Overpower) then return "overpower precombat 16"; end
+      if Cast(S.Overpower) then return "overpower precombat"; end
     end
   end
   if S.Charge:IsCastable() then
-    if Cast(S.Charge) then return "charge precombat 20"; end
+    if Cast(S.Charge) then return "charge precombat"; end
   end
 end
 
-local function Hac() 
+local function Hac()
   -- execute,if=buff.juggernaut.up&buff.juggernaut.remains<gcd
   if S.Execute:IsReady() and Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff) < Player:GCD() then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute hac 67"; end

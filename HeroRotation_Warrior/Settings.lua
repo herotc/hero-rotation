@@ -63,12 +63,11 @@ HR.GUISettings.APL.Warrior = {
       -- Abilities
     },
     GCDasOffGCD = {
-      Bladestorm = false,
-      DragonRoar = false,
-      Ravager = false,
       Avatar = false,
+      Ravager = false,
       Recklessness = false,
-      Siegebreaker = false,
+      Shockwave = true,
+      ThunderousRoar = false,
     }
   },
   Protection = {
@@ -85,9 +84,8 @@ HR.GUISettings.APL.Warrior = {
       -- Abilities
     },
     GCDasOffGCD = {
-      DemoralizingShout = false,
-      DragonRoar = false,
       Avatar = false,
+      DemoralizingShout = false,
       Shockwave = true,
       ThunderousRoar = false,
     }

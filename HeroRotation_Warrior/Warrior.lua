@@ -38,11 +38,11 @@ Spell.Warrior.Commons = {
   Pummel                                = Spell(6552),
   Slam                                  = Spell(1464),
   VictoryRush                           = Spell(34428),
+  DefensiveStance                       = Spell(386208),
   -- Talents
   Avatar                                = Spell(107574),
   AvatarBuff                            = Spell(107574),
   BerserkerRage                         = Spell(18499),
-  BlademastersTorment                   = Spell(390138),
   BloodandThunder                       = Spell(384277),
   DoubleTime                            = Spell(103827),
   CrushingForce                         = Spell(382764),
@@ -59,78 +59,64 @@ Spell.Warrior.Commons = {
   ThunderClap                           = Spell(396719),
   ThunderousRoar                        = Spell(384318),
   TitanicThrow                          = Spell(384090),
-  TitansTorment                         = Spell(390135),
-  WarMachineBuff                        = Spell(262231),
+  WarMachineBuff                        = Spell(262232),
   WreckingThrow                         = Spell(384110),
   -- Buffs
   BattleShoutBuff                       = Spell(6673),
-  -- Debuffs
-  SpearofBastionDebuff                  = Spell(376080),
-  -- Covenant Abilities (Shadowlands)
-  AncientAftershock                     = Spell(325886),
-  Condemn                               = MultiSpell(330325, 330334, 317485, 317349),
-  CondemnDebuff                         = Spell(317491),
-  ConquerorsBanner                      = Spell(324143),
-  ConquerorsFrenzyBuff                  = Spell(343672),
-  ElysianMightBuff                      = Spell(311193),
-  Fleshcraft                            = Spell(324631),
-  SpearofBastionCov                     = Spell(307865),
-  SpearofBastionCovBuff                 = Spell(307871),
-  -- Conduits (Shadowlands)
-  AshenJuggernaut                       = Spell(335232),
-  AshenJuggernautBuff                   = Spell(335234),
   -- Pool
   Pool                                  = Spell(999910),
 }
 
 Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   -- Abilities
+  BerserkerStance                       = Spell(386196),
   Bloodbath                             = Spell(335096),
   CrushingBlow                          = Spell(335097),
   Execute                               = MultiSpell(5308, 280735),
   Whirlwind                             = Spell(190411),
   -- Talents
   Annihilator                           = Spell(383916),
+  AshenJuggernaut                       = Spell(392536),
+  AshenJuggernautBuff                   = Spell(392537),
   Bloodthirst                           = Spell(23881),
-  Cruelty                               = Spell(392931),
+  DancingBlades                         = Spell(391683),
+  DancingBladesBuff                     = Spell(391688),
   Frenzy                                = Spell(335077),
-  Massacre                              = Spell(206315),
+  FrenzyBuff                            = Spell(335082),
+  ImprovedWhilwind                      = Spell(12950),
   MeatCleaver                           = Spell(280392),
+  MeatCleaverBuff                       = Spell(85739),
   OdynsFury                             = Spell(385059),
   Onslaught                             = Spell(315720),
   RagingBlow                            = Spell(85288),
   Rampage                               = Spell(184367),
   Ravager                               = Spell(228920),
-  RecklessAbandon                       = Spell(202751),
+  RecklessAbandon                       = Spell(396749),
   Recklessness                          = Spell(1719),
+  RecklessnessBuff                      = Spell(1719),
   StormofSwords                         = Spell(388903),
   SuddenDeath                           = Spell(280721),
+  SuddenDeathBuff                       = Spell(280776),
   Tenderize                             = Spell(388933),
+  TitanicRage                           = Spell(394329),
+  TitansTorment                         = Spell(390135),
   WrathandFury                          = Spell(392936),
   -- Buffs
   EnrageBuff                            = Spell(184362),
-  FrenzyBuff                            = Spell(335082),
-  MeatCleaverBuff                       = Spell(85739),
-  RecklessnessBuff                      = Spell(1719),
-  SuddenDeathBuff                       = Spell(280776),
-  -- Debuffs
-  SiegebreakerDebuff                    = Spell(280773),
-  -- Conduits (Shadowlands)
-  ViciousContempt                       = Spell(337302),
-  -- Legendary Effects (Shadowlands)
-  WilloftheBerserkerBuff                = Spell(335594),
 })
 
 Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   -- Abilities
+  BattleStance                          = Spell(386164),
   Execute                               = MultiSpell(163201, 281000),
   Whirlwind                             = Spell(1680),
   -- Talents
   Battlelord                            = Spell(386630),
   BattlelordBuff                        = Spell(386631),
-  Bladestorm                            = Spell(389774),
+  BlademastersTorment                   = Spell(390138),
+  Bladestorm                            = MultiSpell(227847, 389774),
   Cleave                                = Spell(845),
-  ColossusSmash                         = Spell(167105),
+  ColossusSmash                         = MultiSpell(167105, 262161),
   ColossusSmashDebuff                   = Spell(208086),
   Dreadnaught                           = Spell(262150),
   ExecutionersPrecision                 = Spell(386634),
@@ -138,6 +124,7 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   FervorofBattle                        = Spell(202316),
   Hurricane                             = Spell(390563),
   HurricaneBuff                         = Spell(390581),
+  Juggernaut                            = Spell(383292),
   JuggernautBuff                        = Spell(383292),
   Massacre                              = Spell(281001),
   MercilessBonegrinder                  = Spell(383317),
@@ -164,6 +151,7 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
 
 Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   -- Abilities
+  BattleStance                          = Spell(386164),
   Devastate                             = Spell(20243),
   Execute                               = Spell(163201),
   ShieldBlock                           = Spell(2565),
@@ -196,18 +184,6 @@ if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Commons = {
   -- Trinkets
   ManicGrieftorch                       = Item(194308, {13, 14}),
-
-  --old, keeping them until fury is updated
-    -- Gladiator's Badges
-    SinfulGladiatorsBadge                 = Item(175921, {13, 14}),
-    UnchainedGladiatorsBadge              = Item(185197, {13, 14}),
-    -- Trinkets
-    FlameofBattle                         = Item(181501, {13, 14}),
-    InscrutableQuantumDevice              = Item(179350, {13, 14}),
-    InstructorsDivineBell                 = Item(184842, {13, 14}),
-    MacabreSheetMusic                     = Item(184024, {13, 14}),
-    OverwhelmingPowerCrystal              = Item(179342, {13, 14}),
-    WakenersFrond                         = Item(181457, {13, 14}),
 }
 
 Item.Warrior.Fury = MergeTableByKey(Item.Warrior.Commons, {
