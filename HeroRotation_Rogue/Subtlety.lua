@@ -184,15 +184,12 @@ local function ShD_Threshold ()
 end
 local function ShD_Combo_Points ()
   -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points<=1
-  -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=2,if=spell_targets.shuriken_storm=3
   -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit<=1,if=spell_targets.shuriken_storm>(4-2*talent.shuriken_tornado.enabled)|variable.priority_rotation&spell_targets.shuriken_storm>=4
   -- actions.stealth_cds+=/variable,name=shd_combo_points,value=1,if=spell_targets.shuriken_storm=4
-  if MeleeEnemies10yCount == 4 then
+  if MeleeEnemies10yCount == (4 - num(S.SealFate:IsAvailable())) then
     return true
   elseif MeleeEnemies10yCount > (4 - 2 * BoolToInt(S.ShurikenTornado:IsAvailable())) or PriorityRotation and MeleeEnemies10yCount >= 4 then
     return ComboPointsDeficit <= 1
-  elseif MeleeEnemies10yCount == 3 then
-   return ComboPointsDeficit >= 2
   else
     return ComboPoints <= 1
   end
@@ -212,6 +209,10 @@ end
 -- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
 local function Finish (ReturnSpellOnly, StealthSpell)
   local ShadowDanceBuff = Player:BuffUp(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
+  local ShadowDanceBuffRemains = Player:BuffRemains(S.ShadowDanceBuff)
+  if StealthSpell and StealthSpell:ID() == S.ShadowDance:ID() then
+    ShadowDanceBuffRemains = 8
+  end
 
   if S.SliceandDice:IsCastable() and HL.FilteredFightRemains(MeleeEnemies10y, ">", Player:BuffRemains(S.SliceandDice)) then
     -- actions.finish=variable,name=premed_snd_condition,value=talent.premeditation.enabled&spell_targets.shuriken_storm<5    
@@ -241,8 +242,8 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   end
 
   local SkipRupture = Skip_Rupture(ShadowDanceBuff)
+  -- actions.finish+=/rupture,if=(!variable.skip_rupture|variable.priority_rotation)&target.time_to_die-remains>6&refreshable
   if (not SkipRupture or PriorityRotation) and S.Rupture:IsCastable() then
-    -- actions.finish+=/rupture,if=(!variable.skip_rupture|variable.priority_rotation)&target.time_to_die-remains>6&refreshable
     if TargetInMeleeRange
       and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemains(S.Rupture)) or Target:TimeToDieIsNotValid())
       and Rogue.CanDoTUnit(Target, RuptureDMGThreshold)
@@ -255,13 +256,35 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       end
     end
   end
-  -- actions.finish+=/secret_technique,if=buff.shadow_dance.up&(buff.danse_macabre.stack>=3|!talent.danse_macabre)
+  -- actions.finish+=/rupture,if=!variable.skip_rupture&buff.finality_rupture.up&cooldown.shadow_dance.remains<12&cooldown.shadow_dance.charges_fractional<=1&spell_targets.shuriken_storm=1&(talent.dark_brew|talent.danse_macabre)
+  if not SkipRupture and S.Rupture:IsCastable() then
+    if MeleeEnemies10yCount == 1 and Player:BuffUp(S.FinalityRuptureBuff) and (S.DarkBrew:IsAvailable() or S.DanseMacabre:IsAvailable())
+      and S.ShadowDance:CooldownRemains() < 12 and S.ShadowDance:ChargesFractional() <= 1 then
+      if S.Rupture:IsReady() and HR.Cast(S.Rupture) then return "Cast Rupture (Finality)" end
+      SetPoolingFinisher(S.Rupture)
+    end
+  end
+  -- actions.finish+=/cold_blood,if=buff.shadow_dance.up&(buff.danse_macabre.stack>=3|!talent.danse_macabre)&cooldown.secret_technique.ready
+  -- actions.finish+=/secret_technique,if=buff.shadow_dance.up&(buff.danse_macabre.stack>=3|!talent.danse_macabre)&(!talent.cold_blood|cooldown.cold_blood.remains>buff.shadow_dance.remains-2)
   if S.SecretTechnique:IsCastable() and ShadowDanceBuff and (Player:BuffStack(S.DanseMacabreBuff) >= 3 or not S.DanseMacabre:IsAvailable()) then
-    if ReturnSpellOnly then
-      return S.SecretTechnique
-    else
-      if S.SecretTechnique:IsReady() and HR.Cast(S.SecretTechnique) then return "Cast Secret Technique" end
-      SetPoolingFinisher(S.SecretTechnique)
+    if S.ColdBlood:IsReady() then
+      if Settings.Commons.OffGCDasOffGCD.ColdBlood then
+        HR.Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood)
+      else
+        if ReturnSpellOnly then
+          return S.ColdBlood
+        else
+          if HR.Cast(S.ColdBlood) then return "Cast Cold Blood (SecTec)" end
+        end
+      end
+    end
+    if not S.ColdBlood:IsAvailable() or S.ColdBlood:IsReady() or S.ColdBlood:CooldownRemains() > (ShadowDanceBuffRemains - 2) then
+      if ReturnSpellOnly then
+        return S.SecretTechnique
+      else
+        if S.SecretTechnique:IsReady() and HR.Cast(S.SecretTechnique) then return "Cast Secret Technique" end
+        SetPoolingFinisher(S.SecretTechnique)
+      end
     end
   end
   if not SkipRupture and S.Rupture:IsCastable() then
@@ -286,8 +309,8 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       end
     end
   end
-  -- actions.finish+=/black_powder,if=!variable.priority_rotation&spell_targets>=(3-talent.dark_brew.enabled)
-  if S.BlackPowder:IsCastable() and not PriorityRotation and MeleeEnemies10yCount >= (3 - BoolToInt(S.DarkBrew:IsAvailable())) then
+  -- actions.finish+=/black_powder,if=!variable.priority_rotation&spell_targets>=3
+  if S.BlackPowder:IsCastable() and not PriorityRotation and MeleeEnemies10yCount >= 3 then
     if ReturnSpellOnly then
       return S.BlackPowder
     else
@@ -336,10 +359,19 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   end
 
   -- #Variable to Gloomblade / Backstab when on 4 or 5 combo points with premediation and when the combo point is not anima charged
-  -- actions.stealthed+=/variable,name=gloomblade_condition,value=(combo_points.deficit=2|combo_points.deficit=3)&(buff.premeditation.up|effective_combo_points<7)&(spell_targets.shuriken_storm<=8|talent.lingering_shadow)
-  if (ComboPointsDeficit == 2 or ComboPointsDeficit == 3) and (PremeditationBuff or EffectiveComboPoints < 7) and (MeleeEnemies10yCount <= 8 or S.LingeringShadow:IsAvailable()) then
+  -- actions.stealthed+=/variable,name=gloomblade_condition,value=buff.danse_macabre.stack<5&(combo_points.deficit=2|combo_points.deficit=3)&(buff.premeditation.up|effective_combo_points<7)&(spell_targets.shuriken_storm<=8|talent.lingering_shadow)
+  if Player:BuffStack(S.DanseMacabreBuff) < 5 and (ComboPointsDeficit == 2 or ComboPointsDeficit == 3) and (PremeditationBuff or EffectiveComboPoints < 7)
+    and (MeleeEnemies10yCount <= 8 or S.LingeringShadow:IsAvailable()) then
+    -- actions.stealthed+=/shuriken_storm,if=variable.gloomblade_condition&buff.silent_storm.up&!debuff.find_weakness.remains
+    if (Player:BuffUp(S.SilentStormBuff) or StealthSpell and S.SilentStorm:IsAvailable()) and Target:DebuffDown(S.FindWeaknessDebuff) then
+      if ReturnSpellOnly then
+        return S.ShurikenStorm
+      else
+        if HR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm (FW)" end
+      end
+    end
     -- actions.stealthed+=/gloomblade,if=variable.gloomblade_condition
-    -- actions.stealthed+=/backstab,if=variable.gloomblade_condition&talent.danse_macabre&buff.danse_macabre.stack<=2
+    -- actions.stealthed+=/backstab,if=variable.gloomblade_condition&talent.danse_macabre&buff.danse_macabre.stack<=2&spell_targets.shuriken_storm<=2
     if S.Gloomblade:IsCastable() then
       if ReturnSpellOnly then
         -- If calling from a Stealth macro, we don't need the PV suggestion since it's already a macro cast
@@ -351,7 +383,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
       else
         if HR.CastQueue(S.Gloomblade, S.Stealth) then return "Cast Gloomblade (Stealth)" end
       end
-    elseif S.Backstab:IsCastable() and S.DanseMacabre:IsAvailable() and Player:BuffStack(S.DanseMacabreBuff) <= 2 then
+    elseif S.Backstab:IsCastable() and S.DanseMacabre:IsAvailable() and Player:BuffStack(S.DanseMacabreBuff) <= 2 and MeleeEnemies10yCount <= 2 then
       if ReturnSpellOnly then
         -- If calling from a Stealth macro, we don't need the PV suggestion since it's already a macro cast
         if StealthSpell then
@@ -491,6 +523,7 @@ end
 local function CDs ()
   if Player:BuffUp(S.ShurikenTornado) then
     -- actions.cds+=/shadow_dance,off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
+    -- actions.cds+=/symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
     if S.SymbolsofDeath:IsCastable() and S.ShadowDance:IsCastable() and not Player:BuffUp(S.SymbolsofDeath) and not Player:BuffUp(S.ShadowDance) then
       if HR.CastQueue(S.SymbolsofDeath, S.ShadowDance) then return "Dance + Symbols (during Tornado)" end
     elseif S.SymbolsofDeath:IsCastable() and not Player:BuffUp(S.SymbolsofDeath) then
@@ -502,13 +535,14 @@ local function CDs ()
 
   local SnDCondition = SnD_Condition()
 
-  -- actions.cds+=/cold_blood,if=(!talent.danse_macabre|!talent.secret_technique)&combo_points>=5
-  if S.ColdBlood:IsReady() then
-    if (not S.DanseMacabre:IsAvailable() or not S.SecretTechnique:IsAvailable()) and ComboPoints >= 5 then
-      if HR.Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
-    end
-    -- TODO tracking buff
-    -- actions.cds+=/cold_blood,use_off_gcd=1,if=talent.secret_technique&buff.secret_technique.up
+  -- actions.cds+=/vanish,if=buff.danse_macabre.stack>3&combo_points<=2
+  if S.Vanish:IsCastable() and ComboPoints <= 2 and Player:BuffStack(S.DanseMacabreBuff) > 3 then
+    ShouldReturn = StealthMacro(S.Vanish)
+    if ShouldReturn then return "Vanish Macro (DM) " .. ShouldReturn end
+  end
+  -- actions.cds+=/cold_blood,if=!talent.secret_technique&combo_points>=5
+  if S.ColdBlood:IsReady() and not S.SecretTechnique:IsAvailable() and ComboPoints >= 5 then
+    if HR.Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
   end
   if TargetInMeleeRange then
     -- actions.cds+=/flagellation,target_if=max:target.time_to_die,if=variable.snd_condition&combo_points>=5&target.time_to_die>10
@@ -532,7 +566,6 @@ local function CDs ()
     if HR.CDsON() and S.Sepsis:IsReady() and SnDCondition and ComboPointsDeficit >= 1 and not Target:FilteredTimeToDie("<", 16) then
       if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
     end
-    -- actions.cds+=/symbols_of_death,if=variable.snd_condition&(!stealthed.all|buff.perforated_veins.stack<4|spell_targets.shuriken_storm>4&!variable.use_priority_rotation)&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm>=2|cooldown.shuriken_tornado.remains>2)&(!covenant.venthyr|cooldown.flagellation.remains>10|cooldown.flagellation.up&combo_points>=5)
     -- actions.cds+=/symbols_of_death,if=variable.snd_condition&(!talent.flagellation|cooldown.flagellation.remains>10|cooldown.flagellation.up&combo_points>=5)
     if S.SymbolsofDeath:IsCastable() and SnDCondition and (not S.Flagellation:IsAvailable() or S.Flagellation:CooldownRemains() > 10
       or S.Flagellation:CooldownUp() and ComboPoints >= 5) then
@@ -564,21 +597,26 @@ local function CDs ()
       and (Player:BuffUp(S.ShadowDanceBuff) or not S.DanseMacabre:IsAvailable()) then
       if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
     end
-    -- actions.cds+=/shuriken_tornado,if=(talent.shadow_focus.enabled|spell_targets.shuriken_storm>=2)&variable.snd_condition&buff.symbols_of_death.up&combo_points<=2&(!buff.premeditation.up|spell_targets.shuriken_storm>4)
     -- actions.cds+=/shuriken_tornado,if=variable.snd_condition&buff.symbols_of_death.up&combo_points<=2&(!buff.premeditation.up|spell_targets.shuriken_storm>4)
-    if S.ShurikenTornado:IsReady() and SnD_Condition and Player:BuffUp(S.SymbolsofDeath) and ComboPoints <= 2
-      and (not Player:BuffUp(S.PremeditationBuff) or MeleeEnemies10yCount > 4) then
-      if HR.Cast(S.ShurikenTornado, Settings.Subtlety.GCDasOffGCD.ShurikenTornado) then return "Cast Shuriken Tornado (SF)" end
+    -- actions.cds+=/shuriken_tornado,if=cooldown.shadow_dance.ready&!stealthed.all&spell_targets.shuriken_storm>=3&!talent.flagellation.enabled
+    if S.ShurikenTornado:IsReady() then
+      if SnD_Condition and Player:BuffUp(S.SymbolsofDeath) and ComboPoints <= 2 and (not Player:BuffUp(S.PremeditationBuff) or MeleeEnemies10yCount > 4) then
+        if HR.Cast(S.ShurikenTornado, Settings.Subtlety.GCDasOffGCD.ShurikenTornado) then return "Cast Shuriken Tornado (SoD)" end
+      end
+      if not S.Flagellation:IsAvailable() and MeleeEnemies10yCount >= 3 and S.ShadowDance:Charges() >= 1 and not Player:StealthUp(true, true) then
+        if HR.Cast(S.ShurikenTornado, Settings.Subtlety.GCDasOffGCD.ShurikenTornado) then return "Cast Shuriken Tornado (Dance)" end
+      end
     end
     -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
     if S.ShadowDance:IsCastable() and MayBurnShadowDance() and not Player:BuffUp(S.ShadowDanceBuff) and HL.BossFilteredFightRemains("<=", 8) then
       ShouldReturn = StealthMacro(S.ShadowDance)
       if ShouldReturn then return "Shadow Dance Macro (Low TTD) " .. ShouldReturn end
     end
-    -- actions.cds+=/thistle_tea,if=cooldown.symbols_of_death.remains>=3&!buff.thistle_tea.up&(energy.deficit>=100|cooldown.thistle_tea.charges_fractional>=2.75&energy.deficit>=40)|buff.shadow_dance.up&!buff.thistle_tea.up&spell_targets.shuriken_storm>=2
+    -- actions.cds+=/thistle_tea,if=cooldown.symbols_of_death.remains>=3&!buff.thistle_tea.up&(energy.deficit>=100|cooldown.thistle_tea.charges_fractional>=2.75&buff.shadow_dance.up)|buff.shadow_dance.up&!buff.thistle_tea.up&spell_targets.shuriken_storm>=3|!buff.thistle_tea.up&fight_remains<=(6*cooldown.thistle_tea.charges)
     if S.ThistleTea:IsCastable() and not Player:BuffUp(S.ThistleTea)
-      and (S.SymbolsofDeath:CooldownRemains() >= 3 and (Player:EnergyDeficit() >= 100 or S.ThistleTea:ChargesFractional() >= 2.75 and Player:EnergyDeficit() >= 40)
-        or Player:BuffUp(S.ShadowDanceBuff) and MeleeEnemies10yCount >= 2) then
+      and (S.SymbolsofDeath:CooldownRemains() >= 3 and (Player:EnergyDeficit() >= 100 or S.ThistleTea:ChargesFractional() >= 2.75 and Player:BuffUp(S.ShadowDanceBuff))
+        or Player:BuffUp(S.ShadowDanceBuff) and MeleeEnemies10yCount >= 3
+        or HL.BossFilteredFightRemains("<=", S.ThistleTea:Charges()*6)) then
       if HR.Cast(S.ThistleTea, Settings.Commons.OffGCDasOffGCD.ThistleTea) then return "Cast Thistle Tea" end
     end
 
@@ -624,8 +662,8 @@ end
 -- # Stealth Cooldowns
 local function Stealth_CDs (EnergyThreshold)
   if HR.CDsON() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) then
-    -- actions.stealth_cds+=/vanish,if=!variable.shd_threshold&combo_points.deficit>1
-    if S.Vanish:IsCastable() and not ShD_Threshold() and ComboPointsDeficit > 1 then
+    -- actions.stealth_cds+=/vanish,if=(!talent.danse_macabre|spell_targets.shuriken_storm>=3)&!variable.shd_threshold&combo_points.deficit>1
+    if S.Vanish:IsCastable() and (not S.DanseMacabre:IsAvailable() or MeleeEnemies10yCount >= 3) and not ShD_Threshold() and ComboPointsDeficit > 1 then
       ShouldReturn = StealthMacro(S.Vanish, EnergyThreshold)
       if ShouldReturn then return "Vanish Macro " .. ShouldReturn end
     end
@@ -825,10 +863,6 @@ local function APL ()
     ShouldReturn = Everyone.Interrupt(5, S.Kick, Settings.Commons2.OffGCDasOffGCD.Kick, Interrupts)
     if ShouldReturn then return ShouldReturn end
 
-    -- TODO
-    -- # Wait for for the 3rd Secret Technique attack to trigger when syncing with Cold Blood
-    -- actions+=/wait,sec=0.3,if=talent.cold_blood&talent.secret_technique&buff.cold_blood.up&buff.secret_technique.up
-
     -- # Check CDs at first
     -- actions=call_action_list,name=cds
     ShouldReturn = CDs()
@@ -873,10 +907,10 @@ local function APL ()
     -- # Finish at maximum or close to maximum combo point value
     -- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|fight_remains<=1&variable.effective_combo_points>=3
     -- # Finish at 4+ against 4 targets (outside stealth)
-    -- actions+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&variable.effective_combo_points>=4
+    -- actions+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=(4-talent.seal_fate)&variable.effective_combo_points>=4
     if EffectiveComboPoints >= Rogue.CPMaxSpend()
       or (ComboPointsDeficit <= 1 or (HL.BossFilteredFightRemains("<", 2) and EffectiveComboPoints >= 3))
-      or (MeleeEnemies10yCount >= 4 and EffectiveComboPoints >= 4) then
+      or (MeleeEnemies10yCount >= (4 - num(S.SealFate:IsAvailable())) and EffectiveComboPoints >= 4) then
       ShouldReturn = Finish()
       if ShouldReturn then return "Finish: " .. ShouldReturn end
     else
@@ -957,8 +991,6 @@ HR.SetAPL(261, APL, Init)
 -- actions=stealth
 -- # Interrupt on cooldown to allow simming interactions with that
 -- actions+=/kick
--- # Wait for for the 3rd Secret Technique attack to trigger when syncing with Cold Blood
--- actions+=/wait,sec=0.3,if=talent.cold_blood&talent.secret_technique&buff.cold_blood.up&buff.secret_technique.up
 -- # Used to determine whether cooldowns wait for SnD based on targets.
 -- actions+=/variable,name=snd_condition,value=buff.slice_and_dice.up|spell_targets.shuriken_storm>=cp_max_spend
 -- # Check to see if the next CP (in the event of a ShT proc) is Animacharged
@@ -982,7 +1014,7 @@ HR.SetAPL(261, APL, Init)
 -- # Finish at maximum or close to maximum combo point value
 -- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|fight_remains<=1&variable.effective_combo_points>=3
 -- # Finish at 4+ against 4 targets (outside stealth)
--- actions+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&variable.effective_combo_points>=4
+-- actions+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=(4-talent.seal_fate)&variable.effective_combo_points>=4
 -- # Use a builder when reaching the energy threshold
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
 -- # Lowest priority in all of the APL because it causes a GCD
@@ -1003,10 +1035,10 @@ HR.SetAPL(261, APL, Init)
 -- actions.cds=shadow_dance,use_off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
 -- # (Unless already up because we took Shadow Focus) use Symbols off-gcd before the first Shuriken Storm from Tornado comes in.
 -- actions.cds+=/symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
--- # Cold Blood on 5 combo points when not playing DM or secret technique
--- actions.cds+=/cold_blood,if=(!talent.danse_macabre|!talent.secret_technique)&combo_points>=5
--- # Cold Blood after secret techniques initial attack
--- actions.cds+=/cold_blood,use_off_gcd=1,if=talent.secret_technique&buff.secret_technique.up
+-- # Vanish for Shadowstrike with Danse Macabre at adaquate stacks
+-- actions.cds+=/vanish,if=buff.danse_macabre.stack>3&combo_points<=2
+-- # Cold Blood on 5 combo points when not playing Secret Technique
+-- actions.cds+=/cold_blood,if=!talent.secret_technique&combo_points>=5
 -- actions.cds+=/flagellation,target_if=max:target.time_to_die,if=variable.snd_condition&combo_points>=5&target.time_to_die>10
 -- # Pool for Tornado pre-SoD with ShD ready when not running SF.
 -- actions.cds+=/pool_resource,for_next=1,if=talent.shuriken_tornado.enabled&!talent.shadow_focus.enabled
@@ -1023,8 +1055,9 @@ HR.SetAPL(261, APL, Init)
 -- actions.cds+=/echoing_reprimand,if=variable.snd_condition&combo_points.deficit>=3&(variable.priority_rotation|spell_targets.shuriken_storm<=4|talent.resounding_clarity)&(buff.shadow_dance.up|!talent.danse_macabre)
 -- # With SF, if not already done, use Tornado with SoD up.
 -- actions.cds+=/shuriken_tornado,if=variable.snd_condition&buff.symbols_of_death.up&combo_points<=2&(!buff.premeditation.up|spell_targets.shuriken_storm>4)
+-- actions.cds+=/shuriken_tornado,if=cooldown.shadow_dance.ready&!stealthed.all&spell_targets.shuriken_storm>=3&!talent.flagellation.enabled
 -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
--- actions.cds+=/thistle_tea,if=cooldown.symbols_of_death.remains>=3&!buff.thistle_tea.up&(energy.deficit>=100|cooldown.thistle_tea.charges_fractional>=2.75&energy.deficit>=40)|buff.shadow_dance.up&!buff.thistle_tea.up&spell_targets.shuriken_storm>=2
+-- actions.cds+=/thistle_tea,if=cooldown.symbols_of_death.remains>=3&!buff.thistle_tea.up&(energy.deficit>=100|cooldown.thistle_tea.charges_fractional>=2.75&buff.shadow_dance.up)|buff.shadow_dance.up&!buff.thistle_tea.up&spell_targets.shuriken_storm>=3|!buff.thistle_tea.up&fight_remains<=(6*cooldown.thistle_tea.charges)
 -- actions.cds+=/potion,if=buff.bloodlust.react|fight_remains<30|buff.symbols_of_death.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=10)
 -- actions.cds+=/blood_fury,if=buff.symbols_of_death.up
 -- actions.cds+=/berserking,if=buff.symbols_of_death.up
@@ -1041,30 +1074,32 @@ HR.SetAPL(261, APL, Init)
 -- actions.finish+=/variable,name=skip_rupture,value=buff.thistle_tea.up&spell_targets.shuriken_storm=1|buff.shadow_dance.up&(spell_targets.shuriken_storm=1|dot.rupture.ticking&spell_targets.shuriken_storm>=2)
 -- # Keep up Rupture if it is about to run out.
 -- actions.finish+=/rupture,if=(!variable.skip_rupture|variable.priority_rotation)&target.time_to_die-remains>6&refreshable
+-- # Refresh Rupture early for Finality
+-- actions.finish+=/rupture,if=!variable.skip_rupture&buff.finality_rupture.up&cooldown.shadow_dance.remains<12&cooldown.shadow_dance.charges_fractional<=1&spell_targets.shuriken_storm=1&(talent.dark_brew|talent.danse_macabre)
+-- # Sync Cold Blood with Secret Technique when possible
+-- actions.finish+=/cold_blood,if=buff.shadow_dance.up&(buff.danse_macabre.stack>=3|!talent.danse_macabre)
 -- actions.finish+=/secret_technique,if=buff.shadow_dance.up&(buff.danse_macabre.stack>=3|!talent.danse_macabre)
 -- # Multidotting targets that will live for the duration of Rupture, refresh during pandemic.
 -- actions.finish+=/rupture,cycle_targets=1,if=!variable.skip_rupture&!variable.priority_rotation&spell_targets.shuriken_storm>=2&target.time_to_die>=(2*combo_points)&refreshable
 -- # Refresh Rupture early if it will expire during Symbols. Do that refresh if SoD gets ready in the next 5s.
 -- actions.finish+=/rupture,if=!variable.skip_rupture&remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
--- actions.finish+=/black_powder,if=!variable.priority_rotation&spell_targets>=(3-talent.dark_brew.enabled)
+-- actions.finish+=/black_powder,if=!variable.priority_rotation&spell_targets>=3
 -- actions.finish+=/eviscerate
 
 -- # Stealth Cooldowns
 -- # Helper Variable
 -- actions.stealth_cds=variable,name=shd_threshold,value=cooldown.shadow_dance.charges_fractional>=0.75+talent.shadow_dance
 -- # Vanish if we are capping on Dance charges. Early before first dance if we have no Nightstalker but Dark Shadow in order to get Rupture up (no Master Assassin).
--- actions.stealth_cds+=/vanish,if=!variable.shd_threshold&combo_points.deficit>1
+-- actions.stealth_cds+=/vanish,if=(!talent.danse_macabre|spell_targets.shuriken_storm>=3)&!variable.shd_threshold&combo_points.deficit>1
 -- # Pool for Shadowmeld + Shadowstrike unless we are about to cap on Dance charges. Only when Find Weakness is about to run out.
 -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40,if=race.night_elf
 -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.shd_threshold&combo_points.deficit>4
 -- # CP thresholds for entering Shadow Dance Default to start dance with 0 or 1 combo point
 -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points<=1
--- # Use stealth cooldowns with at least 2 combo points missing on 3 targets
--- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=2,if=spell_targets.shuriken_storm=3
 -- # Use stealth cooldowns with high combo points when playing shuriken tornado or with high target counts
 -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit<=1,if=spell_targets.shuriken_storm>(4-2*talent.shuriken_tornado.enabled)|variable.priority_rotation&spell_targets.shuriken_storm>=4
 -- # Use stealth cooldowns on any combo point on 4 targets
--- actions.stealth_cds+=/variable,name=shd_combo_points,value=1,if=spell_targets.shuriken_storm=4
+-- actions.stealth_cds+=/variable,name=shd_combo_points,value=1,if=spell_targets.shuriken_storm=(4-talent.seal_fate)
 -- # Dance during Symbols or above threshold.
 -- actions.stealth_cds+=/shadow_dance,if=(variable.shd_combo_points&(buff.symbols_of_death.remains>=(2.2-talent.flagellation.enabled)|variable.shd_threshold)|buff.flagellation.up|buff.flagellation_persist.remains>=6|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)&!buff.the_rotten.up
 -- # Burn Dances charges if before the fight ends if SoD won't be ready in time.
@@ -1073,10 +1108,11 @@ HR.SetAPL(261, APL, Init)
 -- # Stealthed Rotation
 -- # If Stealth/vanish are up, use Shadowstrike to benefit from the passive bonus and Find Weakness, even if we are at max CP (unless using Master Assassin)
 -- actions.stealthed=shadowstrike,if=(buff.stealth.up|buff.vanish.up)&(spell_targets.shuriken_storm<4|variable.priority_rotation)
--- #Variable to Gloomblade / Backstab when on 4 or 5 combo points with premediation and when the combo point is not anima charged
--- actions.stealthed+=/variable,name=gloomblade_condition,value=(combo_points.deficit=2|combo_points.deficit=3)&(buff.premeditation.up|effective_combo_points<7)&(spell_targets.shuriken_storm<=8|talent.lingering_shadow)
+-- # Variable to Gloomblade / Backstab when on 4 or 5 combo points with premediation and when the combo point is not anima charged
+-- actions.stealthed+=/variable,name=gloomblade_condition,value=buff.danse_macabre.stack<5&(combo_points.deficit=2|combo_points.deficit=3)&(buff.premeditation.up|effective_combo_points<7)&(spell_targets.shuriken_storm<=8|talent.lingering_shadow)
+-- actions.stealthed+=/shuriken_storm,if=variable.gloomblade_condition&buff.silent_storm.up&!debuff.find_weakness.remains
 -- actions.stealthed+=/gloomblade,if=variable.gloomblade_condition
--- actions.stealthed+=/backstab,if=variable.gloomblade_condition&talent.danse_macabre&buff.danse_macabre.stack<=2
+-- actions.stealthed+=/backstab,if=variable.gloomblade_condition&talent.danse_macabre&buff.danse_macabre.stack<=2&spell_targets.shuriken_storm<=2
 -- actions.stealthed+=/call_action_list,name=finish,if=variable.effective_combo_points>=cp_max_spend
 -- # Finish earlier with Shuriken tornado up.
 -- actions.stealthed+=/call_action_list,name=finish,if=buff.shuriken_tornado.up&combo_points.deficit<=2
