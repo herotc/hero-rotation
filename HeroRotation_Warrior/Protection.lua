@@ -110,7 +110,7 @@ local function SuggestRageDump(RageFromSpell)
   local RageMax = Settings.Protection.RageCapValue
   -- If the setting value is lower than 35, it's not possible to cast Ignore Pain, so just return false
   if (RageMax < 35 or Player:Rage() < 35) then return false end
-  local ShouldPreRageDump = false
+  local shouldPreRageDump = false
   -- Make sure we have enough Rage to cast IP, that it's not on CD, and that we shouldn't use Shield Block
   local AbleToCastIP = (Player:Rage() >= 35 and not ShouldPressShieldBlock())
   if AbleToCastIP and (Player:Rage() + RageFromSpell >= RageMax or S.DemoralizingShout:IsReady()) then
