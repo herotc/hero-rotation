@@ -180,7 +180,7 @@ local function Aoe()
   -- ravager
   if S.Ravager:IsCastable() then
     SuggestRageDump(10)
-    if Cast(S.Ravager, nil, nil, not Target:IsInRange(40)) then return "ravager aoe 8"; end
+    if Cast(S.Ravager, Settings.Protection.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager aoe 8"; end
   end
   -- shockwave
   if S.Shockwave:IsCastable() then
@@ -239,7 +239,7 @@ local function Generic()
   -- ravager
   if S.Ravager:IsCastable() then
     SuggestRageDump(10)
-    if Cast(S.Ravager, nil, nil, not Target:IsInRange(40)) then return "ravager generic 4"; end
+    if Cast(S.Ravager, Settings.Protection.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager generic 4"; end
   end
   -- thunderous_roar
   if S.ThunderousRoar:IsCastable() then
