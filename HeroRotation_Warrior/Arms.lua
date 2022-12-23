@@ -53,29 +53,6 @@ local StunInterrupts = {
   {S.StormBolt, "Cast Storm Bolt (Interrupt)", function () return true; end},
 }
 
--- Legendaries
-local BattlelordEquipped = Player:HasLegendaryEquipped(183)
-local SinfulSurgeEquipped = Player:HasLegendaryEquipped(215)
-local EnduringBlowEquipped = Player:HasLegendaryEquipped(182)
-local SignetofTormentedKingsEquipped = Player:HasLegendaryEquipped(181)
-
--- Event Registrations
-HL:RegisterForEvent(function()
-  BattlelordEquipped = Player:HasLegendaryEquipped(183)
-  SinfulSurgeEquipped = Player:HasLegendaryEquipped(215)
-  EnduringBlowEquipped = Player:HasLegendaryEquipped(182)
-  SignetofTormentedKingsEquipped = Player:HasLegendaryEquipped(181)
-end, "PLAYER_EQUIPMENT_CHANGED")
-
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
-
--- Update CovenantID if we change Covenants
-HL:RegisterForEvent(function()
-  CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN")
-
 local function Precombat()
   -- flask
   -- food
