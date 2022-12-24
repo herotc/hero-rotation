@@ -416,8 +416,8 @@ local function APL()
     -- spell_reflection
     -- Note: Above 2 lines are too situational to be included
     -- avatar
-    if S.Avatar:IsCastable() then
-      if Cast(S.Avatar, Settings.Commons.GCDasOffGCD.Avatar) then return "avatar main 18"; end
+    if CDsON() and S.Avatar:IsCastable() then
+      if Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar main 18"; end
     end
     -- run_action_list,name=aoe,if=spell_targets.thunder_clap>3
     if EnemiesCount8 > 3 then

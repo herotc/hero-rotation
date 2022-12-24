@@ -345,11 +345,11 @@ local function APL()
         if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
-    -- ravager,if=cooldown.avatar.remains<3
-    if S.Ravager:IsCastable() and S.Avatar:CooldownRemains() < 3 then
-      if Cast(S.Ravager, Settings.Fury.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager main 40"; end
-    end
     if CDsON() then
+      -- ravager,if=cooldown.avatar.remains<3
+      if S.Ravager:IsCastable() and S.Avatar:CooldownRemains() < 3 then
+        if Cast(S.Ravager, Settings.Fury.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager main 40"; end
+      end
       -- blood_fury
       if S.BloodFury:IsCastable() then
         if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury main 41"; end
