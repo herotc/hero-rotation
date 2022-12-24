@@ -139,17 +139,25 @@ local function Precombat()
   if S.ArcaneTorrent:IsCastable() and CDsON() then
     if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 2"; end
   end
-  -- From APL(): immolation_aura,if=time=0
+  -- use_item,name=algethar_puzzle_box
+  if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() then
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 4"; end
+  end
+  -- sigil_of_flame
+  if S.SigilofFlame:IsCastable() then
+    if Cast(S.SigilofFlame, Settings.Havoc.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame precombat 6"; end
+  end
+  -- immolation_aura
   if S.ImmolationAura:IsCastable() then
-    if Cast(S.ImmolationAura, Settings.Havoc.GCDasOffGCD.ImmolationAura) then return "immolation_aura precombat 4"; end
+    if Cast(S.ImmolationAura, Settings.Havoc.GCDasOffGCD.ImmolationAura) then return "immolation_aura precombat 8"; end
   end
   -- Manually added: Fel Rush if out of range
   if (not Target:IsInMeleeRange(5)) and S.FelRush:IsCastable() then
-    if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush, not Target:IsInRange(15)) then return "fel_rush precombat 6"; end
+    if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush, not Target:IsInRange(15)) then return "fel_rush precombat 10"; end
   end
   -- Manually added: Demon's Bite/Demon Blades if in melee range
   if Target:IsInMeleeRange(5) and (S.DemonsBite:IsCastable() or S.DemonBlades:IsAvailable()) then
-    if Cast(S.DemonsBite, nil, nil, not Target:IsInMeleeRange(5)) then return "demons_bite or demon_blades precombat 8"; end
+    if Cast(S.DemonsBite, nil, nil, not Target:IsInMeleeRange(5)) then return "demons_bite or demon_blades precombat 12"; end
   end
 end
 
@@ -219,8 +227,6 @@ local function APL()
     end
     -- auto_attack
     -- retarget_auto_attack,line_cd=1,target_if=min:debuff.burning_wound.remains,if=talent.burning_wound&talent.demon_blades&active_dot.burning_wound<(spell_targets>?3)
-    -- immolation_aura,if=time=0
-    -- Moved to Precombat()
     -- variable,name=blade_dance,value=talent.first_blood|talent.trail_of_ruin|talent.chaos_theory&buff.chaos_theory.down|spell_targets.blade_dance1>1
     VarBladeDance = (S.FirstBlood:IsAvailable() or S.TrailofRuin:IsAvailable() or S.ChaosTheory:IsAvailable() and Player:BuffDown(S.ChaosTheoryBuff) or EnemiesCount8 > 1)
     -- variable,name=pooling_for_blade_dance,value=variable.blade_dance&fury<(75-talent.demon_blades*20)&cooldown.blade_dance.remains<gcd.max
@@ -274,8 +280,8 @@ local function APL()
     if S.EyeBeam:IsReady() and (Target:DebuffDown(S.EssenceBreakDebuff)) then
       if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not IsInMeleeRange(20)) then return "eye_beam main 18"; end
     end
-    -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>5|!talent.demonic|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
-    if S.BladeDance:IsReady() and (VarBladeDance and S.Metamorphosis:CooldownDown() and (S.EyeBeam:CooldownRemains() > 5 or not S.Demonic:IsAvailable())) then
+    -- blade_dance,if=variable.blade_dance&(cooldown.eye_beam.remains>5|!talent.demonic|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
+    if S.BladeDance:IsReady() and (VarBladeDance and (S.EyeBeam:CooldownRemains() > 5 or not S.Demonic:IsAvailable())) then
       if Cast(S.BladeDance, nil, nil, not IsInMeleeRange(8)) then return "blade_dance main 20"; end
     end
     -- throw_glaive,if=talent.soulrend&(active_enemies>desired_targets|raid_event.adds.in>full_recharge_time+9)&spell_targets>=(2-talent.furious_throws)&!debuff.essence_break.up

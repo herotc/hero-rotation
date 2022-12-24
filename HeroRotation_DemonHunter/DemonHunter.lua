@@ -132,6 +132,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
 -- Items
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Commons = {
+  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
 }
 
 Item.DemonHunter.Vengeance = MergeTableByKey(Item.DemonHunter.Commons, {
