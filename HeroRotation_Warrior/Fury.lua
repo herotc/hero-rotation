@@ -167,7 +167,7 @@ local function SingleTarget()
     if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 102"; end
   end
   -- whirlwind
-  if S.Whirlwind:IsCastable() then
+  if AoEON() and S.Whirlwind:IsCastable() then
     if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 103"; end
   end
   -- wrecking_throw
@@ -213,8 +213,8 @@ local function MultiTarget()
   if S.Execute:IsReady() and EnrageUp then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute multi_target 61"; end
   end
-  -- CDsON() and odyns_fury,if=buff.enrage.up&raid_event.adds.in>15
-  if S.OdynsFury:IsCastable() and EnrageUp then
+  -- odyns_fury,if=buff.enrage.up&raid_event.adds.in>15
+  if CDsON() and S.OdynsFury:IsCastable() and EnrageUp then
     if Cast(S.OdynsFury, nil, nil, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 62"; end
   end
   -- rampage,if=buff.recklessness.up|buff.enrage.remains<gcd|(rage>110&talent.overwhelming_rage)|(rage>80&!talent.overwhelming_rage)
