@@ -347,7 +347,8 @@ local function APL()
     end
     if CDsON() then
       -- ravager,if=cooldown.avatar.remains<3
-      if S.Ravager:IsCastable() and S.Avatar:CooldownRemains() < 3 then
+      -- Note: manually added cast if avatar was pressed before ravager and end of fight
+      if S.Ravager:IsCastable() and (S.Avatar:CooldownRemains() < 3 or Player:BuffRemains(S.AvatarBuff) >= 10 or HL.FightRemains() < 10) then
         if Cast(S.Ravager, Settings.Fury.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager main 40"; end
       end
       -- blood_fury
