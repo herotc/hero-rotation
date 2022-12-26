@@ -39,6 +39,8 @@ VengOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     local BaseCheck = VengOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellVengeance.FieryBrand then
       return BaseCheck and Target:DebuffDown(SpellVengeance.FieryBrandDebuff)
+    elseif self == SpellVengeance.TheHunt then
+      return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
     end
