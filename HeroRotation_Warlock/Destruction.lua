@@ -47,13 +47,12 @@ local TrinketsOnUseExcludes = {
 }
 
 -- Enemies
-local Enemies40y, EnemiesCount40y, EnemiesCount8ySplash
+local Enemies40y, EnemiesCount8ySplash
 
 -- Rotation Variables
 local VarPoolSoulShards = false
 local VarCleaveAPL = false
 local VarHavocActive = false
-local VarHavocGUID = 0
 local VarHavocRemains = 0
 local BossFightRemains = 11111
 local FightRemains = 11111
@@ -62,7 +61,6 @@ HL:RegisterForEvent(function()
   VarPoolSoulShards = false
   VarCleaveAPL = false
   VarHavocActive = false
-  VarHavocGUID = 0
   VarHavocRemains = 0
   BossFightRemains = 11111
   FightRemains = 11111
@@ -76,10 +74,10 @@ local function UnitWithHavoc(enemies)
   for k in pairs(enemies) do
     local CycleUnit = enemies[k]
     if CycleUnit:DebuffUp(S.Havoc) then
-      return true,CycleUnit:GUID(),CycleUnit:DebuffRemains(S.Havoc)
+      return true,CycleUnit:DebuffRemains(S.Havoc)
     end
   end
-  return false
+  return false, 0
 end
 
 local function InfernalTime()
@@ -102,9 +100,9 @@ local function EvaluateCycleImmolateCleave(TargetUnit)
 end
 
 local function EvaluateCycleImmolateAoE(TargetUnit)
-  -- if=dot.immolate.remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&active_dot.immolate<=6
+  -- if=dot.immolate.remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&(!talent.raging_demonfire|cooldown.channel_demonfire.remains>remains)&active_dot.immolate<=6
   -- Note: active_dot.immolate handled before CastCycle
-  return (TargetUnit:DebuffRemains(S.ImmolateDebuff) < 5 and ((not S.Cataclysm:IsAvailable()) or S.Cataclysm:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff)))
+  return (TargetUnit:DebuffRemains(S.ImmolateDebuff) < 5 and ((not S.Cataclysm:IsAvailable()) or S.Cataclysm:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff)) and (not S.RagingDemonfire:IsAvailable() or S.ChannelDemonfire:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff)))
 end
 
 local function Precombat()
@@ -142,6 +140,15 @@ local function Items()
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
   end
+  --TODO manage trinkets
+  --use_item,slot=trinket1,if=pet.infernal.active|!talent.summon_infernal|time_to_die<21|trinket.1.cooldown.duration<cooldown.summon_infernal.remains
+  --use_item,slot=trinket2,if=pet.infernal.active|!talent.summon_infernal|time_to_die<21|trinket.2.cooldown.duration<cooldown.summon_infernal.remains
+  --use_item,slot=trinket1,if=(!talent.rain_of_chaos&time_to_die<cooldown.summon_infernal.remains+trinket.1.cooldown.duration&time_to_die>trinket.1.cooldown.duration)|time_to_die<cooldown.summon_infernal.remains|(trinket.2.cooldown.remains>0&trinket.2.cooldown.remains<cooldown.summon_infernal.remains)
+  --use_item,slot=trinket2,if=(!talent.rain_of_chaos&time_to_die<cooldown.summon_infernal.remains+trinket.2.cooldown.duration&time_to_die>trinket.2.cooldown.duration)|time_to_die<cooldown.summon_infernal.remains|(trinket.1.cooldown.remains>0&trinket.1.cooldown.remains<cooldown.summon_infernal.remains)
+  --use_item,name=erupting_spear_fragment,if=(!talent.rain_of_chaos&time_to_die<cooldown.summon_infernal.remains+trinket.erupting_spear_fragment.cooldown.duration&time_to_die>trinket.erupting_spear_fragment.cooldown.duration)|time_to_die<cooldown.summon_infernal.remains|trinket.erupting_spear_fragment.cooldown.duration<cooldown.summon_infernal.remains+5
+  --use_item,name=desperate_invokers_codex
+  --use_item,name=iceblood_deathsnare
+  --use_item,name=conjured_chillglobe
 end
 
 local function oGCD()
@@ -153,16 +160,16 @@ local function oGCD()
         if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 8"; end
       end
     end
-    -- berserking,if=pet.infernal.active|!talent.summon_infernal
-    if S.Berserking:IsCastable() then
+    -- berserking,if=pet.infernal.active|!talent.summon_infernal|(time_to_die<(cooldown.summon_infernal.remains+cooldown.berserking.duration)&(time_to_die>cooldown.berserking.duration))|time_to_die<cooldown.summon_infernal.remains
+    if S.Berserking:IsCastable() or (FightRemains < (S.SummonInfernal:CooldownRemains() + 12) and (FightRemains > 12) or FightRemains < S.SummonInfernal:CooldownRemains()) then
       if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 10"; end
     end
-    -- blood_fury,if=pet.infernal.active|!talent.summon_infernal
-    if S.BloodFury:IsCastable() then
+    -- blood_fury,if=pet.infernal.active|!talent.summon_infernal|(time_to_die<cooldown.summon_infernal.remains+10+cooldown.blood_fury.duration&time_to_die>cooldown.blood_fury.duration)|time_to_die<cooldown.summon_infernal.remains
+    if S.BloodFury:IsCastable() or (FightRemains < (S.SummonInfernal:CooldownRemains() + 10 + 15) and (FightRemains > 15) or FightRemains < S.SummonInfernal:CooldownRemains()) then
       if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 12"; end
     end
-    -- fireblood,if=pet.infernal.active|!talent.summon_infernal
-    if S.Fireblood:IsCastable() then
+    -- fireblood,if=pet.infernal.active|!talent.summon_infernal|(time_to_die<cooldown.summon_infernal.remains+10+cooldown.fireblood.duration&time_to_die>cooldown.fireblood.duration)|time_to_die<cooldown.summon_infernal.remains
+    if S.Fireblood:IsCastable() or (FightRemains < (S.SummonInfernal:CooldownRemains() + 10 + 8) and (FightRemains > 8) or FightRemains < S.SummonInfernal:CooldownRemains()) then
       if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 14"; end
     end
   end
@@ -201,8 +208,8 @@ local function Havoc()
   if S.RainofFire:IsReady() and (EnemiesCount8ySplash > 1 and (S.AvatarofDestruction:IsAvailable() or (S.RainofChaos:IsAvailable() and Player:BuffUp(S.RainofChaosBuff))) and S.Inferno:IsAvailable()) then
     if Cast(S.RainofFire, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "rain_of_fire havoc 13"; end
   end
-  -- conflagrate
-  if S.Conflagrate:IsCastable() then
+  -- conflagrate,if=!talent.backdraft
+  if S.Conflagrate:IsCastable() and not S.Backdraft:IsAvailable() then
     if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate havoc 14"; end
   end
   -- incinerate,if=cast_time<havoc_remains
@@ -275,6 +282,10 @@ local function Cleave()
   -- conflagrate,if=buff.backdraft.down&soul_shard>=1.5&!variable.pool_soul_shards
   if S.Conflagrate:IsCastable() and (Player:BuffDown(S.BackdraftBuff) and Player:SoulShardsP() >= 1.5 and not VarPoolSoulShards) then
     if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate cleave 22"; end
+  end
+  --incinerate,if=buff.burn_to_ashes.up&cast_time+action.chaos_bolt.cast_time<buff.madness_cb.remains
+  if S.Incinerate:IsCastable() and (Player:BuffUp(S.BurntoAshesBuff) and S.Incinerate:CastTime() + S.ChaosBolt:CastTime() < Player:BuffRemains(S.MadnessCBBuff)) then
+    if Cast(S.Incinerate, nil, nil, not Target:IsSpellInRange(S.Incinerate)) then return "incinerate cleave 23"; end
   end
   -- chaos_bolt,if=buff.rain_of_chaos.remains>cast_time
   if S.ChaosBolt:IsReady() and (Player:BuffRemains(S.RainofChaosBuff) > S.ChaosBolt:CastTime()) then
@@ -364,7 +375,7 @@ local function Aoe()
   if S.ChannelDemonfire:IsCastable() and (Target:DebuffRemains(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime() and S.RagingDemonfire:IsAvailable()) then
     if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire aoe 12"; end
   end
-  -- immolate,cycle_targets=1,if=dot.immolate.remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&active_dot.immolate<=6
+  -- immolate,cycle_targets=1,if=dot.immolate.remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&(!talent.raging_demonfire|cooldown.channel_demonfire.remains>remains)&active_dot.immolate<=6
   if S.Immolate:IsCastable() and (S.ImmolateDebuff:AuraActiveCount() <= 6) then
     if Everyone.CastCycle(S.Immolate, Enemies40y, EvaluateCycleImmolateAoE, not Target:IsSpellInRange(S.Immolate)) then return "immolate aoe 10"; end
   end
@@ -444,15 +455,13 @@ local function APL()
   Enemies40y = Player:GetEnemiesInRange(40)
   Enemies8ySplash = Target:GetEnemiesInSplashRange(12)
   if AoEON() then
-    EnemiesCount40y = #Enemies40y
     EnemiesCount8ySplash = #Enemies8ySplash
   else
-    EnemiesCount40y = 1
     EnemiesCount8ySplash = 1
   end
 
   -- Check Havoc Status
-  VarHavocActive, VarHavocGUID, VarHavocRemains = UnitWithHavoc(Enemies40y)
+  VarHavocActive, VarHavocRemains = UnitWithHavoc(Enemies40y)
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
@@ -501,6 +510,10 @@ local function APL()
     if S.Cataclysm:IsReady() then
       if Cast(S.Cataclysm, nil, nil, not Target:IsInRange(40)) then return "cataclysm main 6"; end
     end
+    -- channel_demonfire,if=talent.raging_demonfire
+    if S.ChannelDemonfire:IsReady() and S.RagingDemonfire:IsAvailable() then
+      if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire main 7"; end
+    end
     -- soul_fire,if=soul_shard<=4
     if S.SoulFire:IsCastable() and (Player:SoulShardsP() <= 4) then
       if Cast(S.SoulFire, nil, nil, not Target:IsSpellInRange(S.SoulFire)) then return "soul_fire main 8"; end
@@ -528,13 +541,17 @@ local function APL()
     if S.SummonInfernal:IsCastable() then
       if Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal) then return "summon_infernal main 14"; end
     end
-    -- channel_demonfire,if=talent.ruin.rank>1&!(talent.diabolic_embers&talent.avatar_of_destruction&(talent.burn_to_ashes|talent.chaos_incarnate))
-    if S.ChannelDemonfire:IsCastable() and (S.Ruin:TalentRank() > 1 and not (S.DiabolicEmbers:IsAvailable() and S.AvatarofDestruction:IsAvailable() and (S.BurntoAshes:IsAvailable() or S.ChaosIncarnate:IsAvailable()))) then
+    -- channel_demonfire,if=talent.ruin.rank>1&!(talent.diabolic_embers&talent.avatar_of_destruction&(talent.burn_to_ashes|talent.chaos_incarnate))&dot.immolate.remains>cast_time
+    if S.ChannelDemonfire:IsCastable() and (S.Ruin:TalentRank() > 1 and not (S.DiabolicEmbers:IsAvailable() and S.AvatarofDestruction:IsAvailable() and (S.BurntoAshes:IsAvailable() or S.ChaosIncarnate:IsAvailable())) and Target:DebuffRemains(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime()) then
       if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire main 16"; end
     end
     -- conflagrate,if=buff.backdraft.down&soul_shard>=1.5&!talent.roaring_blaze
     if S.Conflagrate:IsCastable() and (Player:BuffDown(S.Backdraft) and Player:SoulShardsP() >= 1.5 and not S.RoaringBlaze:IsAvailable()) then
       if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 28"; end
+    end
+    --incinerate,if=buff.burn_to_ashes.up&cast_time+action.chaos_bolt.cast_time<buff.madness_cb.remains
+    if S.Incinerate:IsCastable() and (Player:BuffUp(S.BurntoAshesBuff) and S.Incinerate:CastTime() + S.ChaosBolt:CastTime() < Player:BuffRemains(S.MadnessCBBuff)) then
+      if Cast(S.Incinerate, nil, nil, not Target:IsSpellInRange(S.Incinerate)) then return "incinerate aoe 29"; end
     end
     -- chaos_bolt,if=buff.rain_of_chaos.remains>cast_time
     if S.ChaosBolt:IsReady() and (Player:BuffRemains(S.RainofChaosBuff) > S.ChaosBolt:CastTime()) then
@@ -548,8 +565,8 @@ local function APL()
     if S.ChaosBolt:IsReady() and (Player:BuffUp(S.MadnessCBBuff)) then
       if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt cleave 36"; end
     end
-    -- channel_demonfire,if=!(talent.diabolic_embers&talent.avatar_of_destruction&(talent.burn_to_ashes|talent.chaos_incarnate))
-    if S.ChannelDemonfire:IsCastable() and (not (S.DiabolicEmbers:IsAvailable() and S.AvatarofDestruction:IsAvailable() and (S.BurntoAshes:IsAvailable() or S.ChaosIncarnate:IsAvailable()))) then
+    -- channel_demonfire,if=!(talent.diabolic_embers&talent.avatar_of_destruction&(talent.burn_to_ashes|talent.chaos_incarnate))&dot.immolate.remains>cast_time
+    if S.ChannelDemonfire:IsCastable() and (not (S.DiabolicEmbers:IsAvailable() and S.AvatarofDestruction:IsAvailable() and (S.BurntoAshes:IsAvailable() or S.ChaosIncarnate:IsAvailable())) and Target:DebuffRemains(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime()) then
       if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire cleave 38"; end
     end
     -- dimensional_rift
