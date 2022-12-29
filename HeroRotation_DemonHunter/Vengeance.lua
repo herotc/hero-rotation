@@ -59,7 +59,7 @@ local ActiveMitigationNeeded
 local IsTanking
 local Enemies8yMelee
 local EnemiesCount8yMelee
-local VarDGBHighRoll = 0
+local VarDGBHighRoll = false
 local VarHuntRamp = false
 local VarEDRamp = false
 local VarSCRamp = false
@@ -67,7 +67,7 @@ local VarFDSC = false
 local VarFDNoSC = false
 
 HL:RegisterForEvent(function()
-  VarDGBHighRoll = 0
+  VarDGBHighRoll = false
   VarHuntRamp = false
   VarEDRamp = false
   VarSCRamp = false
@@ -143,12 +143,16 @@ local function Precombat()
   -- variable,name=soul_carver_ramp_in_progress,value=0
   -- variable,name=fiery_demise_with_soul_carver_in_progress,value=0
   -- variable,name=fiery_demise_without_soul_carver_available,value=0
-  -- variable,name=darkglare_boon_high_roll,value=0
   -- Note: Handling variable resets via PLAYER_REGEN_ENABLED registration
-  -- First attacks
-  if S.TheHunt:IsCastable() and not IsInMeleeRange then
-    if Cast(S.TheHunt, nil, nil, not Target:IsInRange(50)) then return "the_hunt precombat 4"; end
+  -- sigil_of_flame
+  if (not S.ConcentratedSigils:IsAvailable()) and S.SigilofFlame:IsCastable() then
+    if Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame precombat 2"; end
   end
+  -- immolation_aura
+  if S.ImmolationAura:IsCastable() then
+    if Cast(S.ImmolationAura) then return "immolation_aura precombat 4"; end
+  end
+  -- First attacks
   if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
     if Cast(S.InfernalStrike, nil, nil, not Target:IsInRange(30)) then return "infernal_strike precombat 6"; end
   end
@@ -306,8 +310,6 @@ local function FDSC()
   if (S.SoulCarver:CooldownDown() and (S.FieryBrand:CooldownDown() or S.DowninFlames:IsAvailable() and S.FieryBrand:ChargesFractional() < 1.65) and S.ImmolationAura:CooldownDown() and S.FelDevastation:CooldownDown()) then
     VarFDSC = false
   end
-  -- variable,name=darkglare_boon_high_roll,op=setif,value=1,value_else=0,condition=darkglare_boon_cdr_roll>=18,if=prev_gcd.1.fel_devastation
-  -- Moved to top of APL()
   -- fracture,if=fury.deficit>=30&!dot.fiery_brand.ticking
   if S.Fracture:IsCastable() and (Player:FuryDeficit() >= 30 and Target:DebuffDown(S.FieryBrandDebuff)) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fdsc 2"; end
@@ -360,8 +362,6 @@ local function FDNoSC()
   if ((S.FieryBrand:CooldownDown() or S.DowninFlames:IsAvailable() and S.FieryBrand:ChargesFractional() < 1.65) and S.ImmolationAura:CooldownDown() and S.FelDevastation:CooldownDown()) then
     VarFDNoSC = false
   end
-  -- variable,name=darkglare_boon_high_roll,op=setif,value=1,value_else=0,condition=darkglare_boon_cdr_roll>=18,if=prev_gcd.1.fel_devastation
-  -- Moved to top of APL()
   -- fracture,if=fury.deficit>=30&!dot.fiery_brand.ticking
   if S.Fracture:IsCastable() and (Player:FuryDeficit() >= 30 and Target:DebuffDown(S.FieryBrandDebuff)) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fdnosc 2"; end
@@ -413,7 +413,7 @@ local function APL()
 
   if Everyone.TargetIsValid() then
     -- Check DGB CDR value
-    if (S.FieryDemise:IsAvailable() and Player:PrevGCD(1, S.FelDevastation) and (DemonHunter.DGBCDRLastUpdate == 0 or GetTime() - DemonHunter.DGBCDRLastUpdate < 5)) then
+    if (S.DarkglareBoon:IsAvailable() and Player:PrevGCD(1, S.FelDevastation) and (DemonHunter.DGBCDRLastUpdate == 0 or GetTime() - DemonHunter.DGBCDRLastUpdate < 5)) then
       if DemonHunter.DGBCDR >= 18 then
         VarDGBHighRoll = true
       else

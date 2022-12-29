@@ -34,7 +34,7 @@ Spell.DemonHunter.Commons = {
   ElysianDecree                         = Spell(390163),
   Felblade                              = Spell(232893),
   FoddertotheFlame                      = Spell(391429),
-  SigilofFlame                          = Spell(204596),
+  SigilofFlame                          = MultiSpell(204596, 204513, 389810), -- 204596: Base ID, 204513: Concentrated, 389810: Precise
   TheHunt                               = Spell(370965),
   -- Utility
   Disrupt                               = Spell(183752),
