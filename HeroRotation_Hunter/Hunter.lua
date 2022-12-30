@@ -140,6 +140,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   BulletstormBuff                       = Spell(389020),
   DoubleTapBuff                         = Spell(260402),
   PreciseShotsBuff                      = Spell(260242),
+  RazorFragmentsBuff                    = Spell(388998),
   SteadyFocusBuff                       = Spell(193534),
   TrickShotsBuff                        = Spell(257622),
   TrueshotBuff                          = Spell(288613),
