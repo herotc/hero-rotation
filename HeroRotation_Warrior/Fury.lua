@@ -59,15 +59,15 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
-  -- Manually added: Group buff check
-  if S.BattleShout:IsCastable() and (Player:BuffDown(S.BattleShoutBuff, true) or Everyone.GroupBuffMissing(S.BattleShoutBuff)) then
-    if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat"; end
-  end
+
   -- berserker_stance,toggle=on
   if S.BerserkerStance:IsCastable() and Player:BuffDown(S.BerserkerStance, true) then
     if Cast(S.BerserkerStance) then return "berserker_stance 28"; end
   end
-  --use_item,name=algethar_puzzle_box
+  -- use_item,name=algethar_puzzle_box
+  if I.AlgethaPuzzleBox:IsEquippedAndReady() then
+    if Cast(I.AlgethaPuzzleBox, nil, Settings.Commons.DisplayStyle.Items) then return "algethar_puzzle_box main 2"; end
+  end
   -- Manually Added: Charge if not in melee. Bloodthirst if in melee
   if S.Bloodthirst:IsCastable() and TargetInMeleeRange then
     if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst precombat"; end
@@ -305,6 +305,10 @@ local function APL()
     -- call Precombat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- Manually added: Group buff check
+    if S.BattleShout:IsCastable() and (Player:BuffDown(S.BattleShoutBuff, true) or Everyone.GroupBuffMissing(S.BattleShoutBuff)) then
+      if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat"; end
     end
     -- In Combat
     -- auto_attack
