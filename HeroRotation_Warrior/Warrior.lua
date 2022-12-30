@@ -55,6 +55,7 @@ Spell.Warrior.Commons = {
   Shockwave                             = Spell(46968),
   SonicBoom                             = Spell(390725),
   SpearofBastion                        = Spell(376079),
+  SpellReflection                       = Spell(23920),
   StormBolt                             = Spell(107570),
   ThunderClap                           = Spell(396719),
   ThunderousRoar                        = Spell(384318),
@@ -183,6 +184,7 @@ Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Commons = {
   -- Trinkets
+  AlgethaPuzzleBox                      = Item(193701, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
 }
 
