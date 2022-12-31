@@ -417,7 +417,7 @@ local function APL()
   Enemies40y = Player:GetEnemiesInRange(S.AimedShot.MaximumRange)
   Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
   if AoEON() then
-    EnemiesCount10ySplash = #Enemies10ySplash
+    EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
   else
     EnemiesCount10ySplash = 1
   end
