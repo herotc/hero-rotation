@@ -47,6 +47,7 @@ Spell.DeathKnight.Commons = {
   EmpowerRuneWeaponBuff                 = Spell(47568),
   IcyTalonsBuff                         = Spell(194879),
   UnholyStrengthBuff                    = Spell(53365),
+  DeathStrikeBuff                       = Spell(101568),
   -- Debuffs
   BloodPlagueDebuff                     = Spell(55078),
   FrostFeverDebuff                      = Spell(55095),
