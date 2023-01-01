@@ -66,7 +66,7 @@ local function Precombat()
   end
   -- use_item,name=algethar_puzzle_box
   if I.AlgethaPuzzleBox:IsEquippedAndReady() then
-    if Cast(I.AlgethaPuzzleBox, nil, Settings.Commons.DisplayStyle.Items) then return "algethar_puzzle_box main 2"; end
+    if Cast(I.AlgethaPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box main 2"; end
   end
   -- Manually Added: Charge if not in melee. Bloodthirst if in melee
   if S.Bloodthirst:IsCastable() and TargetInMeleeRange then
@@ -87,7 +87,7 @@ local function SingleTarget()
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 82"; end
   end
   -- thunderous_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
-  if S.ThunderousRoar:IsCastable() and EnrageUp then
+  if CDsON() and S.ThunderousRoar:IsCastable() and EnrageUp then
     if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 83"; end
   end
   -- odyns_fury,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)&(talent.dancing_blades&buff.dancing_blades.remains<5|!talent.dancing_blades)
@@ -198,7 +198,7 @@ local function MultiTarget()
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute multi_target 57"; end
   end
   -- thunderous_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
-  if S.ThunderousRoar:IsCastable() and EnrageUp then
+  if CDsON() and S.ThunderousRoar:IsCastable() and EnrageUp then
     if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar multi_target 58"; end
   end
   -- odyns_fury,if=active_enemies>1&buff.enrage.up&raid_event.adds.in>15
