@@ -335,8 +335,8 @@ local function St()
   if S.WildMushroom:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 5 and ((not S.FungalGrowth:IsAvailable()) or S.StellarFlare:IsAvailable() or Target:DebuffRemains(S.FungalGrowthDebuff) < 2) or FightRemains < 10) then
     if Cast(S.WildMushroom, nil, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 56"; end
   end
-  -- starfire,if=eclipse.in_lunar|buff.warrior_of_elune.up&(buff.eclipse_lunar.up|buff.umbral_embrace.react)
-  if S.Starfire:IsCastable() and (EclipseInLunar or Player:BuffUp(S.WarriorofEluneBuff) and (Player:BuffUp(S.EclipseLunar) or Player:BuffUp(S.UmbralEmbraceBuff))) then
+  -- starfire,if=eclipse.in_lunar&buff.umbral_embrace.react|buff.eclipse_lunar.up&buff.warrior_of_elune.up
+  if S.Starfire:IsCastable() and (EclipseInLunar and Player:BuffUp(S.UmbralEmbraceBuff) or Player:BuffUp(S.EclipseLunar) and Player:BuffUp(S.WarriorofEluneBuff)) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire st 58"; end
   end
   -- wrath
