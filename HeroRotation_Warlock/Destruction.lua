@@ -12,7 +12,6 @@ local Player        = Unit.Player
 local Pet           = Unit.Pet
 local Target        = Unit.Target
 local Spell         = HL.Spell
-local MultiSpell    = HL.MultiSpell
 local Item          = HL.Item
 -- HeroRotation
 local HR            = HeroRotation
@@ -28,7 +27,6 @@ local bool          = HR.Commons.Everyone.bool
 --- ======= APL LOCALS =======
 -- Commons
 local Everyone = HR.Commons.Everyone
-local Warlock = HR.Commons.Warlock
 
 -- GUI Settings
 local Settings = {
@@ -162,15 +160,15 @@ local function oGCD()
     end
     -- berserking,if=pet.infernal.active|!talent.summon_infernal|(time_to_die<(cooldown.summon_infernal.remains+cooldown.berserking.duration)&(time_to_die>cooldown.berserking.duration))|time_to_die<cooldown.summon_infernal.remains
     if S.Berserking:IsCastable() or (FightRemains < (S.SummonInfernal:CooldownRemains() + 12) and (FightRemains > 12) or FightRemains < S.SummonInfernal:CooldownRemains()) then
-      if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 10"; end
+      if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking cds 10"; end
     end
     -- blood_fury,if=pet.infernal.active|!talent.summon_infernal|(time_to_die<cooldown.summon_infernal.remains+10+cooldown.blood_fury.duration&time_to_die>cooldown.blood_fury.duration)|time_to_die<cooldown.summon_infernal.remains
     if S.BloodFury:IsCastable() or (FightRemains < (S.SummonInfernal:CooldownRemains() + 10 + 15) and (FightRemains > 15) or FightRemains < S.SummonInfernal:CooldownRemains()) then
-      if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 12"; end
+      if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury cds 12"; end
     end
     -- fireblood,if=pet.infernal.active|!talent.summon_infernal|(time_to_die<cooldown.summon_infernal.remains+10+cooldown.fireblood.duration&time_to_die>cooldown.fireblood.duration)|time_to_die<cooldown.summon_infernal.remains
     if S.Fireblood:IsCastable() or (FightRemains < (S.SummonInfernal:CooldownRemains() + 10 + 8) and (FightRemains > 8) or FightRemains < S.SummonInfernal:CooldownRemains()) then
-      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 14"; end
+      if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood cds 14"; end
     end
   end
 end
@@ -220,11 +218,11 @@ end
 
 local function Cleave()
   -- call_action_list,name=items
-  if Settings.Commons.Enabled.Trinkets then
+  if CDsON() and Settings.Commons.Enabled.Trinkets then
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=ogcd
-  if true then
+  if CDsON() then
     local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=havoc,if=havoc_active&havoc_remains>gcd
@@ -238,11 +236,11 @@ local function Cleave()
     if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate cleave 2"; end
   end
   -- dimensional_rift,if=soul_shard<4.7&(charges>2|time_to_die<cooldown.dimensional_rift.duration)
-  if S.DimensionalRift:IsCastable() and (Player:SoulShardsP() < 4.7 and (S.DimensionalRift:Charges() > 2 or FightRemains < S.DimensionalRift:Cooldown())) then
+  if CDsON() and S.DimensionalRift:IsCastable() and (Player:SoulShardsP() < 4.7 and (S.DimensionalRift:Charges() > 2 or FightRemains < S.DimensionalRift:Cooldown())) then
     if Cast(S.DimensionalRift, nil, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift cleave 4"; end
   end
   -- cataclysm
-  if S.Cataclysm:IsCastable() then
+  if CDsON() and S.Cataclysm:IsCastable() then
     if Cast(S.Cataclysm, nil, nil, not Target:IsSpellInRange(S.Cataclysm)) then return "cataclysm cleave 6"; end
   end
   -- channel_demonfire,if=talent.raging_demonfire
@@ -272,7 +270,7 @@ local function Cleave()
     if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt cleave 16"; end
   end
   -- summon_infernal
-  if S.SummonInfernal:IsCastable() then
+  if CDsON() and S.SummonInfernal:IsCastable() then
     if Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal) then return "summon_infernal cleave 18"; end
   end
   -- channel_demonfire,if=talent.ruin.rank>1&!(talent.diabolic_embers&talent.avatar_of_destruction&(talent.burn_to_ashes|talent.chaos_incarnate))
@@ -312,7 +310,7 @@ local function Cleave()
     if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire cleave 34"; end
   end
   -- dimensional_rift
-  if S.DimensionalRift:IsCastable() then
+  if CDsON() and S.DimensionalRift:IsCastable() then
     if Cast(S.DimensionalRift, nil, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift cleave 36"; end
   end
   -- chaos_bolt,if=soul_shard>3.5
@@ -340,11 +338,11 @@ end
 
 local function Aoe()
   -- call_action_list,name=ogcd
-  if true then
+  if CDsON() then
     local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=items
-  if Settings.Commons.Enabled.Trinkets then
+  if CDsON() and Settings.Commons.Enabled.Trinkets then
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=havoc,if=havoc_active&havoc_remains>gcd&active_enemies<5+(talent.cry_havoc&!talent.inferno)
@@ -368,7 +366,7 @@ local function Aoe()
     if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt aoe 8"; end
   end
   -- cataclysm
-  if S.Cataclysm:IsCastable() then
+  if CDsON() and S.Cataclysm:IsCastable() then
     if Cast(S.Cataclysm, nil, nil, not Target:IsSpellInRange(S.Cataclysm)) then return "cataclysm aoe 10"; end
   end
   -- channel_demonfire,if=dot.immolate.remains>cast_time&talent.raging_demonfire
@@ -394,11 +392,11 @@ local function Aoe()
     if Cast(S.SummonSoulkeeper, Settings.Destruction.GCDasOffGCD.SummonSoulkeeper) then return "summon_soulkeeper aoe 12"; end
   end
   -- call_action_list,name=ogcd
-  if true then
+  if CDsON() then
     local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
   end
   -- summon_infernal
-  if S.SummonInfernal:IsCastable() then
+  if CDsON() and S.SummonInfernal:IsCastable() then
     if Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal) then return "summon_infernal aoe 14"; end
   end
   -- rain_of_fire
@@ -436,7 +434,7 @@ local function Aoe()
     if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate aoe 24"; end
   end
   -- dimensional_rift
-  if S.DimensionalRift:IsCastable() then
+  if CDsON() and S.DimensionalRift:IsCastable() then
     if Cast(S.DimensionalRift, nil, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift aoe 26"; end
   end
   -- immolate,if=dot.immolate.refreshable
@@ -476,6 +474,10 @@ local function APL()
   if S.SummonPet:IsCastable() then
     if Cast(S.SummonPet, Settings.Destruction.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
   end
+  -- inquisitors_gaze
+  if S.InquisitorsGaze:IsCastable() and not Player:BuffUp(S.InquisitorsGazeBuff) then
+    if Cast(S.InquisitorsGaze, Settings.Destruction.GCDasOffGCD.InquisitorsGaze) then return "inquisitors_gaze ooc"; end
+  end
 
   if Everyone.TargetIsValid() then
     -- Precombat
@@ -491,11 +493,11 @@ local function APL()
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=items
-    if (Settings.Commons.Enabled.Trinkets) then
+    if CDsON() and Settings.Commons.Enabled.Trinkets then
       local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=ogcd
-    if (true) then
+    if CDsON() then
       local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
     end
     -- conflagrate,if=(talent.roaring_blaze&debuff.conflagrate.remains<1.5)|charges=max_charges
@@ -503,11 +505,11 @@ local function APL()
       if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 2"; end
     end
     -- dimensional_rift,if=soul_shard<4.7&(charges>2|time_to_die<cooldown.dimensional_rift.duration)
-    if S.DimensionalRift:IsCastable() and (Player:SoulShardsP() < 4.7 and (S.DimensionalRift:Charges() > 2 or FightRemains < S.DimensionalRift:Cooldown())) then
+    if CDsON() and S.DimensionalRift:IsCastable() and (Player:SoulShardsP() < 4.7 and (S.DimensionalRift:Charges() > 2 or FightRemains < S.DimensionalRift:Cooldown())) then
       if Cast(S.DimensionalRift, nil, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift main 4"; end
     end
     -- cataclysm
-    if S.Cataclysm:IsReady() then
+    if CDsON() and S.Cataclysm:IsReady() then
       if Cast(S.Cataclysm, nil, nil, not Target:IsInRange(40)) then return "cataclysm main 6"; end
     end
     -- channel_demonfire,if=talent.raging_demonfire
@@ -538,7 +540,7 @@ local function APL()
       if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 12"; end
     end
     -- summon_infernal
-    if S.SummonInfernal:IsCastable() then
+    if CDsON() and S.SummonInfernal:IsCastable() then
       if Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal) then return "summon_infernal main 14"; end
     end
     -- channel_demonfire,if=talent.ruin.rank>1&!(talent.diabolic_embers&talent.avatar_of_destruction&(talent.burn_to_ashes|talent.chaos_incarnate))&dot.immolate.remains>cast_time
@@ -570,7 +572,7 @@ local function APL()
       if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire cleave 38"; end
     end
     -- dimensional_rift
-    if S.DimensionalRift:IsCastable() then
+    if CDsON() and S.DimensionalRift:IsCastable() then
       if Cast(S.DimensionalRift, nil, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift cleave 40"; end
     end
     -- chaos_bolt,if=soul_shard>3.5
