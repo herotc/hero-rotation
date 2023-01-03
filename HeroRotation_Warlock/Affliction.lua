@@ -12,7 +12,6 @@ local Player        = Unit.Player
 local Pet           = Unit.Pet
 local Target        = Unit.Target
 local Spell         = HL.Spell
-local MultiSpell    = HL.MultiSpell
 local Item          = HL.Item
 -- HeroRotation
 local HR            = HeroRotation
@@ -28,7 +27,6 @@ local bool          = HR.Commons.Everyone.bool
 --- ======= APL LOCALS =======
 -- Commons
 local Everyone = HR.Commons.Everyone
-local Warlock = HR.Commons.Warlock
 
 -- GUI Settings
 local Settings = {
@@ -42,28 +40,14 @@ local S = Spell.Warlock.Affliction
 
 -- Items
 local I = Item.Warlock.Affliction
-local OnUseExcludes = {
+local TrinketsOnUseExcludes = {
   --  I.TrinketName:ID(),
 }
 
--- Trinket Item Objects
-local equip = Player:GetEquipment()
-local trinket1 = equip[13] and Item(equip[13]) or Item(0)
-local trinket2 = equip[14] and Item(equip[14]) or Item(0)
-
 -- Enemies
-local Enemies40y, Enemies40yCount, Enemies10ySplash, EnemiesCount10ySplash
-local EnemiesAgonyCount, EnemiesSeedofCorruptionCount, EnemiesSiphonLifeCount, EnemiesVileTaintCount = 0, 0, 0, 0
-local EnemiesWithUnstableAfflictionDebuff
-local FirstTarGUID
+local Enemies40y, Enemies10ySplash, EnemiesCount10ySplash
 local BossFightRemains = 11111
 local FightRemains = 11111
-
--- Legendaries
-
--- Stuns
-
--- Rotation Variables
 
 -- Register
 HL:RegisterForEvent(function()
@@ -76,61 +60,276 @@ S.ShadowBolt:RegisterInFlight()
 S.Haunt:RegisterInFlight()
 
 HL:RegisterForEvent(function()
-  equip = Player:GetEquipment()
-  trinket1 = equip[13] and Item(equip[13]) or Item(0)
-  trinket2 = equip[14] and Item(equip[14]) or Item(0)
-end, "PLAYER_EQUIPMENT_CHANGED")
-
-HL:RegisterForEvent(function()
   BossFightRemains = 11111
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
--- Counter for Debuff on other enemies
-local function CalcEnemiesDotCount(Object, Enemies)
-  local debuffs = 0
-
-  for _, CycleUnit in pairs(Enemies) do
-    --if CycleUnit:DebuffUp(Object, nil, 0) then
-    if CycleUnit:DebuffUp(Object) then
-      debuffs = debuffs + 1
-    end
-  end
-
-  return debuffs
+local function EvaluateAgony(TargetUnit)
+  -- target_if=remains<5,if=active_dot.agony<5
+  return (TargetUnit:DebuffRemains(S.AgonyDebuff) < 5)
 end
 
-local function ReturnEnemiesWithDot(Object, Enemies)
-  for _, CycleUnit in pairs(Enemies) do
-    --if CycleUnit:DebuffUp(Object, nil, 0) then
-    --if CycleUnit:DebuffTicksRemain(Object) > 0 then
-    if CycleUnit:DebuffUp(Object) then
-      if Object == S.UnstableAfflictionDebuff then
-        return CycleUnit:GUID()
-      end
+local function EvaluateAgonyRefreshable(TargetUnit)
+  -- target_if=refreshable
+  return (TargetUnit:DebuffRefreshable(S.AgonyDebuff))
+end
+
+local function EvaluateSiphonLife(TargetUnit)
+  -- target_if=remains<5,if=active_dot.siphon_life<3
+  return (TargetUnit:DebuffRemains(S.SiphonLifeDebuff) < 3)
+end
+
+local function EvaluateCorruption(TargetUnit)
+  -- target_if=remains<5
+  return (TargetUnit:DebuffRemains(S.CorruptionDebuff) < 5)
+end
+
+local function EvaluateCorruptionRefreshable(TargetUnit)
+  -- target_if=refreshable
+  return (TargetUnit:DebuffRefreshable(S.CorruptionDebuff))
+end
+
+local function Items()
+  --use_items,if=pet.darkglare.active|dot.soul_rot.ticking|!talent.summon_darkglare&!talent.soul_rot|time_to_die<21
+  if (HL.GuardiansTable.DarkglareDuration > 0 or Target:DebuffUp(S.SoulRotDebuff) or not S.SummonDarkglare:IsAvailable() and not S.SoulRot:IsAvailable() or FightRemains < 21) then
+    local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
+    if TrinketToUse then
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
   end
-  return 0
+end
+
+local function oGCD()
+  if HL.GuardiansTable.DarkglareDuration > 0 or Target:DebuffUp(S.SoulRotDebuff) or not S.SummonDarkglare:IsAvailable() and not S.SoulRot:IsAvailable() then
+    -- potion,if=pet.darkglare.active|dot.soul_rot.ticking|!talent.summon_darkglare&!talent.soul_rot
+    if Settings.Commons.Enabled.Potions then
+      local PotionSelected = Everyone.PotionSelected()
+      if PotionSelected and PotionSelected:IsReady() then
+        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 8"; end
+      end
+    end
+    -- berserking,if=pet.darkglare.active|dot.soul_rot.ticking|!talent.summon_darkglare&!talent.soul_rot
+    if S.Berserking:IsCastable() then
+      if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking cds 10"; end
+    end
+    -- blood_fury,if=pet.darkglare.active|dot.soul_rot.ticking|!talent.summon_darkglare&!talent.soul_rot
+    if S.BloodFury:IsCastable() then
+      if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury cds 12"; end
+    end
+    -- fireblood,if=pet.darkglare.active|dot.soul_rot.ticking|!talent.summon_darkglare&!talent.soul_rot
+    if S.Fireblood:IsCastable() then
+      if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood cds 14"; end
+    end
+  end
+end
+
+local function AoE()
+  -- call_action_list,name=ogcd
+  if CDsON() then
+    local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- call_action_list,name=items
+  if CDsON() and Settings.Commons.Enabled.Trinkets then
+    local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- haunt
+  if S.Haunt:IsReady() then
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt aoe 68"; end
+  end
+  -- vile_taint
+  if CDsON() and S.VileTaint:IsReady() then
+    if Cast(S.VileTaint, nil, nil, not Target:IsSpellInRange(S.VileTaint)) then return "vile_taint aoe 69"; end
+  end
+  -- phantom_singularity
+  if CDsON() and S.PhantomSingularity:IsCastable() then
+    if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity aoe 70"; end
+  end
+  -- soul_rot
+  if CDsON() and S.SoulRot:IsReady() then
+    if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot aoe 71"; end
+  end
+  -- seed_of_corruption,if=dot.corruption.remains<5
+  if S.SeedofCorruption:IsReady() and Target:DebuffRemains(S.SeedofCorruptionDebuff) < 5 then
+    if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "soul_rot aoe 72"; end
+  end
+  -- agony,target_if=remains<5,if=active_dot.agony<5
+  if S.Agony:IsReady() then
+    if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateAgony, not Target:IsSpellInRange(S.Agony)) then return "agony aoe 73"; end
+  end
+  -- summon_darkglare
+  if CDsON() and S.SummonDarkglare:IsCastable() then
+    if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare aoe 74"; end
+  end
+  -- seed_of_corruption,if=talent.sow_the_seeds
+  if S.SeedofCorruption:IsReady() and S.SowTheSeeds:IsAvailable() then
+    if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "soul_rot aoe 75"; end
+  end
+  -- malefic_rapture
+  if S.MaleficRapture:IsReady() then
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture aoe 76"; end
+  end
+  -- drain_life,if=(buff.soul_rot.up|!talent.soul_rot)&buff.inevitable_demise.stack>10
+  if S.DrainLife:IsReady() and (Target:DebuffUp(S.SoulRotDebuff) or not S.SoulRot:IsAvailable()) and Player:BuffStack(S.InevitableDemiseBuff) > 10 then
+    if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life aoe 77"; end
+  end
+  -- summon_soulkeeper,if=buff.tormented_soul.stack=10
+  if S.SummonSoulkeeper:IsReady() and S.SummonSoulkeeper:Count() == 10 then
+    if Cast(S.SummonSoulkeeper) then return "soul_strike aoe 78"; end
+  end
+  -- siphon_life,target_if=remains<5,if=active_dot.siphon_life<3
+  if S.SiphonLife:IsReady() then
+    if Cast(S.SiphonLife, Enemies40y, EvaluateSiphonLife, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life aoe 79"; end
+  end
+  -- drain_soul,interrupt_global=1
+  if S.DrainSoul:IsReady() then
+    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul aoe 80"; end
+  end
+  -- shadow_bolt
+  if S.ShadowBolt:IsReady() then
+    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt aoe 81"; end
+  end
+end
+
+local function Cleave()
+  -- call_action_list,name=ogcd
+  if CDsON() then
+    local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- call_action_list,name=items
+  if CDsON() and Settings.Commons.Enabled.Trinkets then
+    local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- malefic_rapture,if=soul_shard=5
+  if S.MaleficRapture:IsReady() and (Player:SoulShardsP() == 5) then
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 85"; end
+  end
+  -- haunt
+  if S.Haunt:IsReady() then
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt cleave 86"; end
+  end
+  -- soul_swap,if=dot.unstable_affliction.remains<5
+  if S.SoulSwap:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
+    if Cast(S.SoulSwap, nil, nil, not Target:IsSpellInRange(S.SoulSwap)) then return "soul_swap cleave 87"; end
+  end
+  -- unstable_affliction,if=remains<5
+  if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
+    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction cleave 88"; end
+  end
+  -- agony,if=remains<5
+  if S.Agony:IsReady() and Target:DebuffRemains(S.AgonyDebuff) < 5 then
+    if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony cleave 89"; end
+  end
+  -- agony,target_if=!(target=self.target)&remains<5
+  if S.Agony:IsReady() then
+    if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateAgony, not Target:IsSpellInRange(S.Agony)) then return "agony cleave 90"; end
+  end
+  -- siphon_life,if=remains<5
+  if S.SiphonLife:IsCastable() and (Target:DebuffRemains(S.SiphonLifeDebuff) < 5) then
+    if Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life cleave 91"; end
+  end
+  -- siphon_life,target_if=!(target=self.target)&remains<3
+  if S.SiphonLife:IsReady() then
+    if Cast(S.SiphonLife, Enemies40y, EvaluateSiphonLife, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life cleave 92"; end
+  end
+  -- seed_of_corruption,if=!talent.absolute_corruption&dot.corruption.remains<5
+  if S.SeedofCorruption:IsReady() and not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.CorruptionDebuff) < 5 then
+    if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "seed_of_corruption cleave 93"; end
+  end
+  -- corruption,target_if=remains<5&(talent.absolute_corruption|!talent.seed_of_corruption)
+  if S.Corruption:IsCastable() and (S.AbsoluteCorruption:IsAvailable() or not S.SeedofCorruption:IsAvailable()) then
+    if Everyone.CastCycle(S.Corruption, Enemies40y, EvaluateCorruption, not Target:IsSpellInRange(S.Corruption)) then return "corruption cleave 94"; end
+  end
+  -- phantom_singularity
+  if CDsON() and S.PhantomSingularity:IsCastable() then
+    if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity cleave 95"; end
+  end
+  -- vile_taint
+  if CDsON() and S.VileTaint:IsReady() then
+    if Cast(S.VileTaint, nil, nil, not Target:IsSpellInRange(S.VileTaint)) then return "vile_taint cleave 96"; end
+  end
+  -- soul_rot
+  if CDsON() and S.SoulRot:IsReady() then
+    if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot cleave 97"; end
+  end
+  -- summon_darkglare
+  if CDsON() and S.SummonDarkglare:IsCastable() then
+    if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare cleave 98"; end
+  end
+  -- malefic_rapture,if=talent.malefic_affliction&buff.malefic_affliction.stack<3
+  if S.MaleficRapture:IsReady() and S.MaleficAffliction:IsAvailable() and Player:BuffStack(S.MaleficAfflictionBuff) < 3 then
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 99"; end
+  end
+  -- malefic_rapture,if=talent.dread_touch&debuff.dread_touch.remains<gcd
+  if S.MaleficRapture:IsReady() and S.DreadTouch:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < Player:GCD() then
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 100"; end
+  end
+  -- malefic_rapture,if=!talent.dread_touch&buff.tormented_crescendo.up
+  if S.MaleficRapture:IsReady() and not S.DreadTouch:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) then
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 101"; end
+  end
+  -- malefic_rapture,if=!talent.dread_touch&(dot.soul_rot.remains>cast_time|dot.phantom_singularity.remains>cast_time|dot.vile_taint.remains>cast_time|pet.darkglare.active)
+  if S.MaleficRapture:IsReady() and not S.DreadTouch:IsAvailable() and (Target:DebuffRemains(S.SoulRotDebuff) > S.MaleficRapture:CastTime() or Target:DebuffRemains(S.PhantomSingularityDebuff) > S.MaleficRapture:CastTime() or Target:DebuffRemains(S.VileTaintDebuff) > S.MaleficRapture:CastTime() or HL.GuardiansTable.DarkglareDuration > 0) then
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 102"; end
+  end
+  -- drain_soul,if=buff.nightfall.react
+  if S.DrainSoul:IsReady() and Player:BuffUp(S.NightfallBuff) then
+    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul cleave 103"; end
+  end
+  -- shadow_bolt,if=buff.nightfall.react
+  if S.ShadowBolt:IsReady() and Player:BuffUp(S.NightfallBuff) then
+    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt cleave 104"; end
+  end
+  -- drain_life,if=buff.inevitable_demise.stack>48|buff.inevitable_demise.stack>20&time_to_die<4
+  if S.DrainLife:IsReady() and (Player:BuffStack(S.InevitableDemiseBuff) > 48 or Player:BuffStack(S.InevitableDemiseBuff) > 20 and FightRemains < 4) then
+    if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life cleave 105"; end
+  end
+  -- drain_life,if=buff.soul_rot.up&buff.inevitable_demise.stack>10
+  if S.DrainLife:IsReady() and Target:DebuffUp(S.SoulRotDebuff) and Player:BuffStack(S.InevitableDemiseBuff) > 10 then
+    if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life cleave 106"; end
+  end
+  -- agony,target_if=refreshable
+  if S.Agony:IsReady() then
+    if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateAgonyRefreshable, not Target:IsSpellInRange(S.Agony)) then return "agony cleave 107"; end
+  end
+  -- corruption,target_if=refreshable
+  if S.Corruption:IsCastable() then
+    if Everyone.CastCycle(S.Corruption, Enemies40y, EvaluateCorruptionRefreshable, not Target:IsSpellInRange(S.Corruption)) then return "corruption cleave 108"; end
+  end
+  -- drain_soul,interrupt_global=1
+  if S.DrainSoul:IsReady() then
+    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul cleave 109"; end
+  end
+  -- shadow_bolt
+  if S.ShadowBolt:IsReady() then
+    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt cleave 110"; end
+  end
 end
 
 local function Precombat()
-  FirstTarGUID = Target:GUID()
   -- flask
   -- food
   -- augmentation
   -- summon_pet - Moved to APL()
+  --variable,name=cleave_apl,default=0,op=reset
   -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
   if S.GrimoireofSacrifice:IsCastable() then
     if Cast(S.GrimoireofSacrifice, Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "grimoire_of_sacrifice precombat 2"; end
   end
   -- snapshot_stats
+  --inquisitors_gaze - Moved to APL()
+  -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>3
+  --NYI precombat multi target
+  -- haunt
+  if S.Haunt:IsReady() then
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt precombat 33"; end
+  end
   -- unstable_affliction,if=!talent.soul_swap
   if S.UnstableAffliction:IsReady() and (not S.SoulSwap:IsAvailable()) then
-    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction precombat 4"; end
+    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction precombat 34"; end
   end
   -- shadow_bolt
   if S.ShadowBolt:IsReady() then
-    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt precombat 6"; end
+    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt precombat 35"; end
   end
 end
 
@@ -140,19 +339,10 @@ local function APL()
   Enemies40y = Player:GetEnemiesInRange(40)
   Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
   if AoEON() then
-    Enemies40yCount = #Enemies40y
     EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
-
-    EnemiesAgonyCount = CalcEnemiesDotCount(S.AgonyDebuff, Enemies40y)
-    EnemiesSeedofCorruptionCount = CalcEnemiesDotCount(S.SeedofCorruptionDebuff, Enemies40y)
-    EnemiesSiphonLifeCount = CalcEnemiesDotCount(S.SiphonLifeDebuff, Enemies40y)
-    EnemiesVileTaintCount = CalcEnemiesDotCount(S.VileTaintDebuff, Enemies40y)
   else
-    Enemies40yCount = 1
     EnemiesCount10ySplash = 1
   end
-
-  EnemiesWithUnstableAfflictionDebuff = ReturnEnemiesWithDot(S.UnstableAfflictionDebuff, Enemies40y)
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
@@ -163,8 +353,13 @@ local function APL()
     end
   end
 
+  -- summon_pet 
   if S.SummonPet:IsCastable() then
     if Cast(S.SummonPet, Settings.Affliction.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
+  end
+  -- inquisitors_gaze
+  if S.InquisitorsGaze:IsCastable() and not Player:BuffUp(S.InquisitorsGazeBuff) then
+    if Cast(S.InquisitorsGaze, Settings.Affliction.GCDasOffGCD.InquisitorsGaze) then return "inquisitors_gaze ooc"; end
   end
 
   if Everyone.TargetIsValid() then
@@ -172,81 +367,114 @@ local function APL()
     if (not Player:AffectingCombat()) then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
+    -- call_action_list,name=cleave,if=active_enemies!=1&active_enemies<4|variable.cleave_apl
+    if (EnemiesCount10ySplash > 1 and EnemiesCount10ySplash < 4) then
+      local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=aoe,if=active_enemies>3
+    if (EnemiesCount10ySplash > 3) then
+      local ShouldReturn = AoE(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=ogcd
+    if CDsON() then
+      local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=items
+    if CDsON() and Settings.Commons.Enabled.Trinkets then
+      local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
+    end
     -- malefic_rapture,if=soul_shard=5
     if S.MaleficRapture:IsReady() and (Player:SoulShardsP() == 5) then
-      if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 2"; end
+      if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 42"; end
     end
     -- haunt
     if S.Haunt:IsReady() then
-      if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt main 4"; end
+      if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt main 43"; end
     end
     -- soul_swap,if=dot.unstable_affliction.remains<5
     if S.SoulSwap:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
-      if Cast(S.SoulSwap, nil, nil, not Target:IsSpellInRange(S.SoulSwap)) then return "soul_swap main 6"; end
+      if Cast(S.SoulSwap, nil, nil, not Target:IsSpellInRange(S.SoulSwap)) then return "soul_swap main 44"; end
     end
     -- unstable_affliction,if=remains<5
     if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
-      if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction main 8"; end
+      if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction main 45"; end
     end
     -- agony,if=remains<5
     if S.Agony:IsCastable() and (Target:DebuffRemains(S.AgonyDebuff) < 5) then
-      if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony main 10"; end
+      if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony main 46"; end
     end
     -- siphon_life,if=remains<5
     if S.SiphonLife:IsCastable() and (Target:DebuffRemains(S.SiphonLifeDebuff) < 5) then
-      if Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life main 12"; end
+      if Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life main 47"; end
     end
     -- corruption,if=remains<5
     if S.Corruption:IsCastable() and (Target:DebuffRemains(S.CorruptionDebuff) < 5) then
-      if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption main 14"; end
+      if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption main 48"; end
     end
-    -- soul_tap,line_cd=30
-    if S.SoulTap:IsCastable() and (S.SoulTap:TimeSinceLastCast() >= 30) then
-      if Cast(S.SoulTap, Settings.Affliction.GCDasOffGCD.SoulTap) then return "soul_tap main 16"; end
+    -- soul_tap
+    if S.SoulTap:IsCastable() then
+      if Cast(S.SoulTap, Settings.Affliction.GCDasOffGCD.SoulTap) then return "soul_tap main 49"; end
     end
     -- phantom_singularity
-    if S.PhantomSingularity:IsCastable() then
-      if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity main 18"; end
+    if CDsON() and S.PhantomSingularity:IsCastable() then
+      if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity main 50"; end
     end
     -- vile_taint
-    if S.VileTaint:IsReady() then
-      if Cast(S.VileTaint, nil, nil, not Target:IsSpellInRange(S.VileTaint)) then return "vile_taint main 20"; end
+    if CDsON() and S.VileTaint:IsReady() then
+      if Cast(S.VileTaint, nil, nil, not Target:IsSpellInRange(S.VileTaint)) then return "vile_taint main 51"; end
     end
     -- soul_rot
-    if S.SoulRot:IsReady() then
-      if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot main 22"; end
-    end
-    -- use_items
-    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-    if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    if CDsON() and S.SoulRot:IsReady() then
+      if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot main 52"; end
     end
     -- summon_darkglare
-    if S.SummonDarkglare:IsCastable() then
-      if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare main 24"; end
+    if CDsON() and S.SummonDarkglare:IsCastable() then
+      if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare main 53"; end
     end
-    -- malefic_rapture
-    if S.MaleficRapture:IsReady() then
-      if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 26"; end
+    -- malefic_rapture,if=talent.malefic_affliction&buff.malefic_affliction.stack<3
+    if S.MaleficRapture:IsReady() and S.MaleficAffliction:IsAvailable() and Player:BuffStack(S.MaleficAfflictionBuff) < 3 then
+      if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 54"; end
+    end
+    -- malefic_rapture,if=talent.dread_touch&debuff.dread_touch.remains<gcd
+    if S.MaleficRapture:IsReady() and S.DreadTouch:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < Player:GCD() then
+      if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 55"; end
+    end
+    -- malefic_rapture,if=!talent.dread_touch&buff.tormented_crescendo.up
+    if S.MaleficRapture:IsReady() and not S.DreadTouch:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) then
+      if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 56"; end
+    end
+    -- malefic_rapture,if=!talent.dread_touch&(dot.soul_rot.remains>cast_time|dot.phantom_singularity.remains>cast_time|dot.vile_taint.remains>cast_time|pet.darkglare.active)
+    if S.MaleficRapture:IsReady() and not S.DreadTouch:IsAvailable() and (Target:DebuffRemains(S.SoulRotDebuff) > S.MaleficRapture:CastTime() or Target:DebuffRemains(S.PhantomSingularityDebuff) > S.MaleficRapture:CastTime() or Target:DebuffRemains(S.VileTaintDebuff) > S.MaleficRapture:CastTime() or HL.GuardiansTable.DarkglareDuration > 0) then
+      if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 57"; end
+    end
+    -- drain_soul,if=buff.nightfall.react|talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<2)
+    if S.DrainSoul:IsReady() and (Player:BuffUp(S.NightfallBuff) or S.ShadowEmbrace:IsAvailable() and (Player:DebuffStack(S.ShadowEmbraceDebuff) < 3 or Player:DebuffRemains(S.ShadowEmbraceDebuff) < 2)) then
+      if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul main 58"; end
+    end
+    -- shadow_bolt,if=buff.nightfall.react|talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<2)
+    if S.ShadowBolt:IsReady() and (Player:BuffUp(S.NightfallBuff) or S.ShadowEmbrace:IsAvailable() and (Player:DebuffStack(S.ShadowEmbraceDebuff) < 3 or Player:DebuffRemains(S.ShadowEmbraceDebuff) < 2)) then
+      if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt main 59"; end
+    end
+    -- drain_life,if=buff.inevitable_demise.stack>48|buff.inevitable_demise.stack>20&time_to_die<4
+    if S.DrainLife:IsReady() and (Player:BuffStack(S.InevitableDemiseBuff) > 48 or Player:BuffStack(S.InevitableDemiseBuff) > 20 and FightRemains < 4) then
+      if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life main 60"; end
     end
     -- agony,if=refreshable
     if S.Agony:IsCastable() and (Target:DebuffRefreshable(S.AgonyDebuff)) then
-      if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony main 28"; end
+      if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony main 61"; end
     end
     -- corruption,if=refreshable
     if S.Corruption:IsCastable() and (Target:DebuffRefreshable(S.CorruptionDebuff)) then
-      if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption main 30"; end
+      if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption main 62"; end
     end
     -- drain_soul,interrupt=1
     if S.DrainSoul:IsReady() then
-      if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul main 32"; end
+      if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul main 63"; end
     end
     -- shadow_bolt
     if S.ShadowBolt:IsReady() then
-      if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt main 34"; end
+      if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt main 64"; end
     end
-
-    return
   end
 end
 

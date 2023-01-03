@@ -53,6 +53,7 @@ HR.GUISettings.APL.Warlock = {
       GrimoireOfSacrifice = true,
       SummonInfernal = true,
       SummonSoulkeeper = false,
+      InquisitorsGaze = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -73,6 +74,7 @@ HR.GUISettings.APL.Warlock = {
       DemonicStrength = false,
       NetherPortal = true,
       Implosion = false,
+      InquisitorsGaze = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -93,6 +95,7 @@ HR.GUISettings.APL.Warlock = {
       SoulTap = true,
       SummonDarkglare = true,
       SummonPet = false,
+      InquisitorsGaze = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -112,7 +115,6 @@ local CP_Destruction = CreateChildPanel(CP_Warlock, "Destruction")
 
 -- Warlock
 CreateARPanelOptions(CP_Warlock, "APL.Warlock.Commons")
-CreatePanelOption("CheckButton", CP_Warlock, "APL.Warlock.Commons.HidePetSummon", "Hide Pet Summon", "Enable this setting to hide suggestions for summoning your base pet. Rotational pets (Infernal, Darkglare, Tyrant, etc) will still be suggested.")
 
 -- Destruction
 CreateARPanelOptions(CP_Destruction, "APL.Warlock.Destruction")

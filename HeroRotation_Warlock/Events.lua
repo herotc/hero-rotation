@@ -94,6 +94,7 @@ HL.GuardiansTable = {
   VilefiendDuration = 0,
   Infernal = 0,
   Blasphemy = 0,
+  DarkglareDuration = 0,
 
   -- Used for Wild Imps spawn prediction
   InnerDemonsNextCast = 0,
@@ -132,6 +133,10 @@ local PetsData = {
   [185584] = {
     name = "Blasphemy",
     duration = 8
+  },
+  [103673] = {
+    name = "Darkglare",
+    duration = 25
   },
 }
 
@@ -218,6 +223,8 @@ function Warlock.UpdatePetTable()
           HL.GuardiansTable.Soulkeeper = 0
         elseif petTable.name == "Blasphemy" then
           HL.GuardiansTable.BlasphemyDuration = 0
+        elseif petTable.name == "Darkglare" then
+          HL.GuardiansTable.DarkglareDuration = 0
         end
         HL.GuardiansTable.Pets[key] = nil
       end
@@ -244,6 +251,8 @@ function Warlock.UpdatePetTable()
         HL.GuardiansTable.Soulkeeper = petTable.Duration
       elseif petTable.name == "Blasphy" then
         HL.GuardiansTable.BlasphemyDuration = petTable.Duration
+      elseif petTable.name == "Darkglare" then
+        HL.GuardiansTable.DarkglareDuration = petTable.Duration
       end
     end
   end
@@ -284,6 +293,9 @@ HL:RegisterForSelfCombatEvent(
         HL.GuardiansTable.Soulkeeper = summonedPet.duration
       elseif summonedPet.name == "Blasphemy" then
         HL.GuardiansTable.BlasphemyDuration = summonedPet.duration
+        petDuration = summonedPet.duration
+      elseif summonedPet.name == "Darkglare" then
+        HL.GuardiansTable.DarkglareDuration = summonedPet.duration
         petDuration = summonedPet.duration
       end
       local petTable = {

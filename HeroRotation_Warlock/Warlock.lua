@@ -94,10 +94,15 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   -- Talents
   AbsoluteCorruption                    = Spell(196103),
   DrainSoul                             = Spell(198590),
+  DreadTouch                            = Spell(389775),
   Haunt                                 = Spell(48181),
+  InevitableDemise                      = Spell(334319),
+  MaleficAffliction                     = Spell(389761),
   MaleficRapture                        = Spell(324536),
   PhantomSingularity                    = Spell(205179),
+  SowTheSeeds                           = Spell(196226),
   SeedofCorruption                      = Spell(27243),
+  ShadowEmbrace                         = Spell(27243),
   SiphonLife                            = Spell(63106),
   SoulRot                               = Spell(386997),
   SoulSwap                              = Spell(386951),
@@ -106,6 +111,10 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   UnstableAffliction                    = Spell(316099),
   VileTaint                             = Spell(278350),
   -- Buffs
+  InevitableDemiseBuff                  = Spell(334320),
+  NightfallBuff                         = Spell(264571),
+  MaleficAfflictionBuff                 = Spell(389845),
+  TormentedCrescendoBuff                = Spell(387079),
   -- Debuffs
   AgonyDebuff                           = Spell(980),
   CorruptionDebuff                      = Spell(146739),
@@ -115,6 +124,9 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   SiphonLifeDebuff                      = Spell(63106),
   UnstableAfflictionDebuff              = Spell(316099),
   VileTaintDebuff                       = Spell(278350),
+  SoulRotDebuff                         = Spell(386997),
+  DreadTouchDebuff                      = Spell(389868),
+  ShadowEmbraceDebuff                   = Spell(32390),
 })
 
 Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
