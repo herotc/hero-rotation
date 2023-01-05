@@ -36,7 +36,9 @@ local I = Item.Monk.Windwalker
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- I.TrinketName:ID(),
+  I.AlgetharPuzzleBox:ID(),
+  I.HornofValor:ID(),
+  I.ManicGrieftorch:ID(),
 }
 
 -- Rotation Var
@@ -51,6 +53,7 @@ local VarHoldXuen = false
 local VarHoldSEF = false
 local VarSerenityBurst = false
 local VarBoKNeeded = false
+local VarTrinketType = (S.Serenity:IsAvailable()) and 1 or 2
 local Stuns = {
   { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end },
   { S.RingOfPeace, "Cast Ring Of Peace (Stun)", function () return true end },
@@ -73,6 +76,10 @@ HL:RegisterForEvent(function()
   BossFightRemains = 11111
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
+
+HL:RegisterForEvent(function()
+  VarTrinketType = (S.Serenity:IsAvailable()) and 1 or 2
+end, "PLAYER_TALENT_UPDATE")
 
 local function EnergyTimeToMaxRounded()
   -- Round to the nearesth 10th to reduce prediction instability on very high regen rates
@@ -139,10 +146,54 @@ local function EvaluateTargetIfFaelineStomp(TargetUnit)
 end
 
 local function UseItems()
-  -- use_items
-  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-  if TrinketToUse then
-    if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+  if VarTrinketType == 1 then
+    -- horn_of_valor,if=pet.xuen_the_white_tiger.active|!talent.invoke_xuen_the_white_tiger&buff.serenity.up|fight_remains<30
+    if I.HornofValor:IsEquippedAndReady() and (XuenActive or (not S.InvokeXuenTheWhiteTiger:IsAvailable()) and Player:BuffUp(S.SerenityBuff) or FightRemains < 30) then
+      if Cast(I.HornofValor, nil, Settings.Commons.DisplayStyle.Trinkets) then return "horn_of_valor serenity_trinkets 2"; end
+    end
+    -- manic_grieftorch,if=!pet.xuen_the_white_tiger.active&!buff.serenity.up|fight_remains<5
+    if I.ManicGrieftorch:IsEquippedAndReady() and ((not XuenActive) and Player:BuffDown(S.SerenityBuff) or FightRemains < 5) then
+      if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch serenity_trinkets 4"; end
+    end
+    -- algethar_puzzle_box,if=(pet.xuen_the_white_tiger.active|!talent.invoke_xuen_the_white_tiger)&!buff.serenity.up|fight_remains<25
+    if I.AlgetharPuzzleBox:IsEquippedAndReady() and ((XuenActive or not S.InvokeXuenTheWhiteTiger:IsAvailable()) and Player:BuffDown(S.SerenityBuff) or FightRemains < 25) then
+      if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box serenity_trinkets 6"; end
+    end
+    -- ITEM_STAT_BUFF,if=buff.serenity.remains>10
+    -- ITEM_DMG_BUFF,if=cooldown.invoke_xuen_the_white_tiger.remains>cooldown%%120|cooldown<=60&variable.hold_xuen|!talent.invoke_xuen_the_white_tiger
+    -- Note: Combining both of the above, as we can't/don't differentiate between stat and dmg buff trinkets
+    local Trinket1ToUse = Player:GetUseableTrinkets(OnUseExcludes, 13)
+    if Trinket1ToUse and (Player:BuffRemains(S.SerenityBuff) > 10 or S.InvokeXuenTheWhiteTiger:CooldownRemains() > Trinket1ToUse:Cooldown() % 120 or Trinket1ToUse:Cooldown() <= 60 and VarHoldXuen or not S.InvokeXuenTheWhiteTiger:IsAvailable()) then
+      if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. Trinket1ToUse:Name(); end
+    end
+    local Trinket2ToUse = Player:GetUseableTrinkets(OnUseExcludes, 14)
+    if Trinket2ToUse and (Player:BuffRemains(S.SerenityBuff) > 10 or S.InvokeXuenTheWhiteTiger:CooldownRemains() > Trinket2ToUse:Cooldown() % 120 or Trinket2ToUse:Cooldown() <= 60 and VarHoldXuen or not S.InvokeXuenTheWhiteTiger:IsAvailable()) then
+      if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. Trinket2ToUse:Name(); end
+    end
+  else
+    -- horn_of_valor,if=pet.xuen_the_white_tiger.active|!talent.invoke_xuen_the_white_tiger&buff.storm_earth_and_fire.up|fight_remains<30
+    if I.HornofValor:IsEquippedAndReady() and (XuenActive or (not S.InvokeXuenTheWhiteTiger:IsAvailable()) and Player:BuffUp(S.StormEarthAndFireBuff) or FightRemains < 30) then
+      if Cast(I.HornofValor, nil, Settings.Commons.DisplayStyle.Trinkets) then return "horn_of_valor sef_trinkets 2"; end
+    end
+    -- manic_grieftorch,if=!pet.xuen_the_white_tiger.active&!buff.storm_earth_and_fire.up|fight_remains<5
+    if I.ManicGrieftorch:IsEquippedAndReady() and ((not XuenActive) and Player:BuffDown(S.StormEarthAndFireBuff) or FightRemains < 5) then
+      if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch sef_trinkets 4"; end
+    end
+    -- algethar_puzzle_box,if=(pet.xuen_the_white_tiger.active|!talent.invoke_xuen_the_white_tiger)&!buff.storm_earth_and_fire.up|fight_remains<25
+    if I.AlgetharPuzzleBox:IsEquippedAndReady() and ((XuenActive or not S.InvokeXuenTheWhiteTiger:IsAvailable()) and Player:BuffDown(S.StormEarthAndFireBuff) or FightRemains < 25) then
+      if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box sef_trinkets 6"; end
+    end
+    -- ITEM_STAT_BUFF,if=cooldown.invoke_xuen_the_white_tiger.remains>cooldown%%120|cooldown<=60&variable.hold_xuen|cooldown<=60&buff.storm_earth_and_fire.remains>10|!talent.invoke_xuen_the_white_tiger
+    -- ITEM_DMG_BUFF,if=cooldown.invoke_xuen_the_white_tiger.remains>cooldown%%120|cooldown<=60&variable.hold_xuen|!talent.invoke_xuen_the_white_tiger
+    -- Note: Combining both of the above, as we can't/don't differentiate between stat and dmg buff trinkets
+    local Trinket1ToUse = Player:GetUseableTrinkets(OnUseExcludes, 13)
+    if Trinket1ToUse and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > Trinket1ToUse:Cooldown() % 120 or Trinket1ToUse:Cooldown() <= 60 and VarHoldXuen or (not S.InvokeXuenTheWhiteTiger:IsAvailable()) or Trinket1ToUse:Cooldown() <= 60 and Player:BuffRemains(S.StormEarthAndFireBuff) > 10) then
+      if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. Trinket1ToUse:Name(); end
+    end
+    local Trinket2ToUse = Player:GetUseableTrinkets(OnUseExcludes, 14)
+    if Trinket2ToUse and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > Trinket2ToUse:Cooldown() % 120 or Trinket2ToUse:Cooldown() <= 60 and VarHoldXuen or (not S.InvokeXuenTheWhiteTiger:IsAvailable()) or Trinket2ToUse:Cooldown() <= 60 and Player:BuffRemains(S.StormEarthAndFireBuff) > 10) then
+      if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. Trinket2ToUse:Name(); end
+    end
   end
 end
 
@@ -151,8 +202,6 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
-  -- potion
-  -- Note: Not including in precombat, as potion usage conditions can vary.
   -- summon_white_tiger_statue
   if S.SummonWhiteTigerStatue:IsCastable() and CDsON() then
     if Cast(S.SummonWhiteTigerStatue, Settings.Commons.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue precombat 2"; end
@@ -316,8 +365,7 @@ local function CDSEF()
   if S.TouchofDeath:IsReady() and (ComboStrike(S.TouchofDeath)) then
     if Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath, nil, not Target:IsInMeleeRange(5)) then return "touch_of_death cd_sef 14"; end
   end
-  -- use_items,if=!variable.xuen_on_use_trinket|cooldown.invoke_xuen_the_white_tiger.remains>20&pet.xuen_the_white_tiger.remains<20|variable.hold_xuen
-  -- Note: variable.xuen_on_use_trinket referred to SL trinkets, so was removed, making this always true.
+  -- use_items
   if Settings.Commons.Enabled.Trinkets then
     local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
   end
@@ -419,6 +467,10 @@ local function Serenity()
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=talent.teachings_of_the_monastery&buff.teachings_of_the_monastery.stack<3
   if S.TigerPalm:IsReady() and (S.TeachingsoftheMonastery:IsAvailable() and Player:BuffStack(S.TeachingsoftheMonasteryBuff) < 3) then
     if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm serenity 30"; end
+  end
+  -- use_items
+  if Settings.Commons.Enabled.Trinkets then
+    local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
   end
 end
 

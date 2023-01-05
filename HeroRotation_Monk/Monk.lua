@@ -197,6 +197,10 @@ Spell.Monk.Mistweaver = MergeTableByKey(Spell.Monk.Commons, {
 -- Items
 if not Item.Monk then Item.Monk = {}; end
 Item.Monk.Commons = {
+  -- Trinkets
+  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
+  HornofValor                           = Item(133642, {13, 14}),
+  ManicGrieftorch                       = Item(194308, {13, 14}),
 }
 
 Item.Monk.Windwalker = MergeTableByKey(Item.Monk.Commons, {
