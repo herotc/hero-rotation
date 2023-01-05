@@ -245,13 +245,13 @@ local function St()
   if S.Wrath:IsCastable() and (VarCDConditionST and Player:HasTier(29, 4) and EclipseAnyNext) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath st 12"; end
   end
+  -- starsurge,if=variable.cd_condition_st&buff.touch_the_cosmos.up|buff.primordial_arcanic_pulsar.value>=560&buff.starweavers_weft.up
+  if S.Starsurge:IsReady() and (VarCDConditionST and Player:BuffUp(S.TouchtheCosmos) or PAPValue >= 560 and Player:BuffUp(S.StarweaversWeft)) then
+    if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 13"; end
+  end
   -- starfall,if=buff.primordial_arcanic_pulsar.value>=550&!buff.ca_inc.up
   if S.Starfall:IsReady() and (PAPValue >= 550 and not CAIncBuffUp) then
-    if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall st 13"; end
-  end
-  -- starsurge,if=variable.cd_condition_st&buff.touch_the_cosmos.up
-  if S.Starsurge:IsReady() and (VarCDConditionST and Player:BuffUp(S.TouchtheCosmos)) then
-    if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 14"; end
+    if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall st 14"; end
   end
   if CDsON() then
     -- celestial_alignment,if=variable.cd_condition_st
@@ -295,8 +295,8 @@ local function St()
   if S.FuryofElune:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 8) then
     if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune st 36"; end
   end
-  -- starfall,if=buff.starweavers_warp.up
-  if S.Starfall:IsReady() and (Player:BuffUp(S.StarweaversWarp)) then
+  -- starfall,if=buff.starweavers_warp.up&!buff.touch_the_cosmos.up
+  if S.Starfall:IsReady() and (Player:BuffUp(S.StarweaversWarp) and Player:BuffDown(S.TouchtheCosmos)) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall st 38"; end
   end
   -- starsurge,if=talent.starlord&buff.starlord.stack<3|talent.rattle_the_stars&buff.rattled_stars.up&buff.rattled_stars.remains<gcd.max
