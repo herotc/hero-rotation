@@ -152,6 +152,7 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   CommanderoftheDead                    = Spell(390259),
   DarkTransformation                    = Spell(63560),
   Defile                                = Spell(152280),
+  EbonFever                             = Spell(207269),
   Epidemic                              = Spell(207317),
   EternalAgony                          = Spell(390268),
   FesteringStrike                       = Spell(85948),
@@ -179,6 +180,7 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   SuddenDoomBuff                        = Spell(81340),
   UnholyAssaultBuff                     = Spell(207289),
   -- Debuffs
+  DeathRotDebuff                        = Spell(377540),
   FesteringWoundDebuff                  = Spell(194310),
   UnholyBlightDebuff                    = Spell(115994),
 })

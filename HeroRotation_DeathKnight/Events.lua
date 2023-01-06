@@ -25,16 +25,17 @@ HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, destGUID, _, _, _, s
     -- Unsure if there's any items that could extend the ghouls time past 60 seconds
     HL.GhoulTable.SummonExpiration = GetTime() + 60
   end
-  if spellId == 49206 then
+  if spellId == 49206 or spellId == 207349 then
     HL.GhoulTable.SummonedGargoyle = destGUID
     HL.GhoulTable.GargoyleExpiration = GetTime() + 25
   end
 end, "SPELL_SUMMON")
 
 HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, _, _, _, _, spellId)
-  if spellId ~= 327574 then return end
-  HL.GhoulTable.SummonedGhoul = nil
-  HL.GhoulTable.SummonExpiration = nil
+  if spellId == 327574 then
+    HL.GhoulTable.SummonedGhoul = nil
+    HL.GhoulTable.SummonExpiration = nil
+  end
 end, "SPELL_CAST_SUCCESS")
 
 HL:RegisterForCombatEvent(function(_, _, _, _, _, _, _, destGUID)

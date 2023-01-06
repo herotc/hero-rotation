@@ -93,7 +93,7 @@ HR.GUISettings.APL.DeathKnight = {
       Selected = "Power",
     },
     DisplayStyle = {
-      ArmyoftheDead = "SuggestedRight",
+      ArmyOfTheDead = "SuggestedRight",
     },
     GCDasOffGCD = {
       -- Abilities
