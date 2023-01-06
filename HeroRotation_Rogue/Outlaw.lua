@@ -22,6 +22,7 @@ local num = HR.Commons.Everyone.num
 local bool = HR.Commons.Everyone.bool
 -- Lua
 local mathmin = math.min
+local mathmax = math.max
 local mathabs = math.abs
 
 --- ============================ CONTENT ============================
@@ -44,6 +45,7 @@ local I = Item.Rogue.Outlaw
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.ManicGrieftorch:ID(),
 }
 
 S.Dispatch:RegisterDamageFormula(
@@ -191,19 +193,31 @@ local function RtB_Reroll ()
       Cache.APLVar.RtB_Reroll = (not Player:BuffUp(S.TrueBearing)) and true or false
     -- SimC Default
     else
-      -- actions+=/variable,name=rtb_reroll,value=rtb_buffs<2&(!buff.broadside.up&(!talent.fan_the_hammer|!buff.skull_and_crossbones.up)&!buff.true_bearing.up|buff.loaded_dice.up)|rtb_buffs=2&(buff.buried_treasure.up&buff.grand_melee.up|!buff.broadside.up&!buff.true_bearing.up&buff.loaded_dice.up)
-      if RtB_Buffs() == 2 then
-        if Player:BuffUp(S.BuriedTreasure) and Player:BuffUp(S.GrandMelee) then
+      -- actions+=/variable,name=rtb_reroll,if=!talent.hidden_opportunity,value=rtb_buffs<2&(!buff.broadside.up&(!talent.fan_the_hammer|!buff.skull_and_crossbones.up)&!buff.true_bearing.up|buff.loaded_dice.up)|rtb_buffs=2&(buff.buried_treasure.up&buff.grand_melee.up|!buff.broadside.up&!buff.true_bearing.up&buff.loaded_dice.up)
+      -- actions+=/variable,name=rtb_reroll,if=talent.hidden_opportunity,value=!rtb_buffs.will_lose.skull_and_crossbones&(rtb_buffs.will_lose-rtb_buffs.will_lose.grand_melee)<2+buff.loaded_dice.up
+      if S.HiddenOpportunity:IsAvailable() then
+        RtB_Buffs() -- Update cache
+        if (Player:BuffDown(S.SkullandCrossbones) or Player:BuffRemains(S.SkullandCrossbones) > Rogue.RtBRemains())
+          and ((Cache.APLVar.RtB_Buffs.Normal + Cache.APLVar.RtB_Buffs.Shorter) -
+            num(Player:BuffUp(S.GrandMelee) and Player:BuffRemains(S.GrandMelee) <= Rogue.RtBRemains())) < (2 + num(Player:BuffUp(S.LoadedDiceBuff))) then
           Cache.APLVar.RtB_Reroll = true
-        elseif Player:BuffUp(S.LoadedDiceBuff) and not Player:BuffUp(S.Broadside) and not Player:BuffUp(S.TrueBearing) then
-          Cache.APLVar.RtB_Reroll = true
+        else
+          Cache.APLVar.RtB_Reroll = false
         end
-      elseif RtB_Buffs() < 2
-        and (not Player:BuffUp(S.Broadside) and (not S.FanTheHammer:IsAvailable() or not Player:BuffUp(S.SkullandCrossbones))
-          and not Player:BuffUp(S.TrueBearing) or Player:BuffUp(S.LoadedDiceBuff)) then
-        Cache.APLVar.RtB_Reroll = true
       else
-        Cache.APLVar.RtB_Reroll = false
+        if RtB_Buffs() == 2 then
+          if Player:BuffUp(S.BuriedTreasure) and Player:BuffUp(S.GrandMelee) then
+            Cache.APLVar.RtB_Reroll = true
+          elseif Player:BuffUp(S.LoadedDiceBuff) and not Player:BuffUp(S.Broadside) and not Player:BuffUp(S.TrueBearing) then
+            Cache.APLVar.RtB_Reroll = true
+          end
+        elseif RtB_Buffs() < 2
+          and (not Player:BuffUp(S.Broadside) and (not S.FanTheHammer:IsAvailable() or not Player:BuffUp(S.SkullandCrossbones))
+            and not Player:BuffUp(S.TrueBearing) or Player:BuffUp(S.LoadedDiceBuff)) then
+          Cache.APLVar.RtB_Reroll = true
+        else
+          Cache.APLVar.RtB_Reroll = false
+        end
       end
     end
 
@@ -344,15 +358,21 @@ local function StealthCDs ()
 end
 
 local function CDs ()
-  -- actions.cds+=/blade_flurry,if=spell_targets>=2&!buff.blade_flurry.up
-  if S.BladeFlurry:IsReady() and AoEON() and EnemiesBFCount >= 2 and not Player:BuffUp(S.BladeFlurry) then
+  -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!talent.improved_adrenaline_rush|combo_points<=2)
+  if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush)
+    and (not S.ImprovedAdrenalineRush:IsAvailable() or ComboPoints <= 2) then
+    if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
+  end
+  -- actions.cds+=/blade_flurry,if=spell_targets>=2&buff.blade_flurry.remains<gcd
+  if S.BladeFlurry:IsReady() and AoEON() and EnemiesBFCount >= 2
+    and Player:BuffRemains(S.BladeFlurry) < (Player:BuffUp(S.AdrenalineRush) and 0.8 or 1) then
     if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
       HR.CastSuggested(S.BladeFlurry)
     else
       if HR.Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
     end
   end
-  -- actions.cds+=/roll_the_bones,if=buff.dreadblades.down&(rtb_buffs.total=0|variable.rtb_reroll|variable.rtb_reroll_kir_cto)
+  -- actions.cds+=/roll_the_bones,if=buff.dreadblades.down&(rtb_buffs.total=0|variable.rtb_reroll)
   if S.RolltheBones:IsReady() and not Player:DebuffUp(S.Dreadblades) and (RtB_Buffs() == 0 or RtB_Reroll() or RtB_KiR_Reroll()) then
     if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones" end
   end
@@ -362,16 +382,16 @@ local function CDs ()
     and (Player:BuffDown(S.ShadowDanceBuff) or RtB_Buffs() >= 6) then
     if HR.Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then return "Cast Keep it Rolling" end
   end
+  -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&!buff.dreadblades.up&(energy.base_time_to_max>4+stealthed.rogue-spell_targets%3)
+  if S.BladeRush:IsCastable() and Target:IsSpellInRange(S.BladeRush) and Blade_Flurry_Sync() and not Player:DebuffUp(S.Dreadblades)
+    and EnergyTimeToMax > (4 + num(Player:StealthUp(true, false)) - (EnemiesBFCount / 3)) and HL.FilteredFightRemains(EnemiesBF, ">", 4) then
+    if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
+  end
   if Target:IsSpellInRange(S.SinisterStrike) then
     -- actions.cds+=/call_action_list,name=stealth_cds,if=!stealthed.all|talent.count_the_odds&!variable.stealthed_cto
     if not Player:StealthUp(true, true, true) or S.CountTheOdds:IsAvailable() and not Stealthed_CtO(true) then
       ShouldReturn = StealthCDs()
       if ShouldReturn then return ShouldReturn end
-    end
-    -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!talent.improved_adrenaline_rush|combo_points<=2)
-    if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush)
-      and (not S.ImprovedAdrenalineRush:IsAvailable() or ComboPoints <= 2) then
-      if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
     end
     -- actions.cds+=/dreadblades,if=!stealthed.all&combo_points<=2&(!talent.marked_for_death|!cooldown.marked_for_death.ready)&target.time_to_die>=10
     if S.Dreadblades:IsCastable() and Target:IsSpellInRange(S.Dreadblades) and not Player:StealthUp(true, true) and ComboPoints <= 2 
@@ -384,17 +404,10 @@ local function CDs ()
     and (EnergyDeficit >= 100 or HL.BossFilteredFightRemains("<", S.ThistleTea:Charges()*6)) then
     if HR.Cast(S.ThistleTea, Settings.Commons.OffGCDasOffGCD.ThistleTea) then return "Cast Thistle Tea" end
   end
-  if Blade_Flurry_Sync() then
-    -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&!stealthed.rogue&debuff.between_the_eyes.up&energy.base_time_to_max>4
-    if CDsON() and S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and not Player:StealthUp(true, false)
-      and Target:DebuffUp(S.BetweentheEyes) and EnergyTimeToMax > 4 then
-      if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree" end
-    end
-    -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&!buff.dreadblades.up&!buff.shadow_dance.up&energy.base_time_to_max>4&target.time_to_die>4
-    if S.BladeRush:IsCastable() and Target:IsSpellInRange(S.BladeRush) and not Player:DebuffUp(S.Dreadblades)
-      and not Player:BuffUp(S.ShadowDanceBuff) and EnergyTimeToMax > 4 and Target:FilteredTimeToDie(">", 4) then
-      if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
-    end
+  -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&!stealthed.rogue&debuff.between_the_eyes.up&energy.base_time_to_max>4
+  if CDsON() and S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and Blade_Flurry_Sync()
+    and not Player:StealthUp(true, false) and Target:DebuffUp(S.BetweentheEyes) and EnergyTimeToMax > 4 then
+    if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree" end
   end
   if Target:IsSpellInRange(S.SinisterStrike) and CDsON() then
     -- actions.cds+=/shadowmeld,if=!stealthed.all&(talent.count_the_odds&variable.finish_condition|!talent.weaponmaster.enabled&variable.ambush_condition)
@@ -425,6 +438,11 @@ local function CDs ()
 
     -- Trinkets
     if Settings.Commons.UseTrinkets then
+      -- actions.cds+=/use_item,name=manic_grieftorch,if=!stealthed.all&!buff.adrenaline_rush.up|fight_remains<5
+      if I.ManicGrieftorch:IsEquippedAndReady() and Target:FilteredTimeToDie(">", 2) and not Player:StealthUp(true, true) then
+        if HR.Cast(I.ManicGrieftorch, nil, Settings.Commons.TrinketDisplayStyle) then return "Manic Grieftorch"; end
+      end
+      -- actions.cds+=/use_item,name=windscar_whetstone,if=spell_targets.blade_flurry>desired_targets|raid_event.adds.in>60|fight_remains<7
       -- actions.cds+=/use_items,slots=trinket1,if=debuff.between_the_eyes.up|trinket.1.has_stat.any_dps|fight_remains<=20
       -- actions.cds+=/use_items,slots=trinket2,if=debuff.between_the_eyes.up|trinket.2.has_stat.any_dps|fight_remains<=20
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
@@ -629,6 +647,12 @@ local function APL ()
   end
 
   -- In Combat
+
+  -- Fan the Hammer Combo Point Prediction
+  if S.FanTheHammer:IsAvailable() and S.PistolShot:TimeSinceLastCast() < Player:GCDRemains() then
+    ComboPoints = mathmax(ComboPoints, Rogue.FanTheHammerCP())
+  end
+
   -- MfD Sniping (Higher Priority than APL)
   -- actions.cds+=/marked_for_death,line_cd=1.5,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|combo_points.deficit>=cp_max_spend-1)&!buff.dreadblades.up
   -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend-1&!buff.dreadblades.up

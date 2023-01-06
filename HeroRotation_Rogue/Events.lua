@@ -185,6 +185,38 @@ do
   )
 end
 
+--- Fan the Hammer Tracking
+do
+  local OpportunityBuff = Spell(195627)
+  local FanCP = 0
+  local FanStart = GetTime()
+
+  function Rogue.FanTheHammerCP()
+    if (GetTime() - FanStart) < 0.5 and FanCP > 0 then
+      if FanCP > Player:ComboPoints() then
+        return FanCP
+      else
+        FanCP = 0
+      end
+    end
+
+    return 0
+  end
+
+  -- Reset counter on energize
+  HL:RegisterForSelfCombatEvent(
+    function(_, _, _, _, _, _, _, _, _, _, _, SpellID, _, _, Amount, Over )
+      if SpellID == 185763 then
+        if (GetTime() - FanStart) > 0.5 then
+          FanStart = GetTime()
+          FanCP = mathmin(Rogue.CPMaxSpend(), Player:ComboPoints() + (Amount * mathmin(3, Player:BuffStack(OpportunityBuff))))
+        end
+      end
+    end,
+    "SPELL_ENERGIZE"
+  )
+end
+
 --- Shuriken Tornado Tracking
 do
   local LastEnergizeTime, LastCastTime = 0, 0
