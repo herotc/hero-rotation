@@ -537,7 +537,7 @@ local function APL()
     end
     -- wait_for_cooldown,name=apocalypse,if=cooldown.apocalypse.remains<gcd&buff.commander_of_the_dead_window.up
     -- Note: Added FesterStacks check so we're not waiting for no reason.
-    if FesterStacks > 0 and (S.Apocalypse:CooldownRemains() < Player:GCD() and VarCommanderBuffUp) then
+    if S.Apocalypse:IsAvailable() and FesterStacks > 0 and (S.Apocalypse:CooldownRemains() < Player:GCD() and VarCommanderBuffUp) then
       if HR.CastPooling(S.Apocalypse, S.Apocalypse:CooldownRemains(), not Target:IsInMeleeRange(5)) then return "apocalypse main 3"; end
     end
     -- death_coil,if=(active_enemies<=3|!talent.epidemic)&(pet.gargoyle.active&buff.commander_of_the_dead_window.up&buff.commander_of_the_dead_window.remains>gcd*1.1&cooldown.apocalypse.remains<gcd|(!buff.commander_of_the_dead_window.up|buff.commander_of_the_dead_window.up&cooldown.apocalypse.remains>5)&debuff.death_rot.up&debuff.death_rot.remains<gcd)
