@@ -126,7 +126,7 @@ function Commons.GroupBuffMissing(spell)
     if spell:Name() == "Blessing of the Bronze" then
       if Char:Exists() and Char:IsInRange(range) then
         for _, v in pairs(buffIDs) do
-          if Char:BuffUp(HL.Spell(v)) then return false end
+          if Char:BuffUp(HL.Spell(v), true) then return false end
         end
         return true
       end
