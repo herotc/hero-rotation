@@ -209,8 +209,8 @@ local function AoE()
   if S.ScourgeStrike:IsReady() and (S.Superstrain:IsAvailable() and S.EbonFever:IsAvailable() and S.Plaguebringer:IsAvailable() and Player:BuffRemains(S.PlaguebringerBuff) < Player:GCD()) then
     if Cast(S.ScourgeStrike, nil, nil, not Target:IsInMeleeRange(5)) then return "scourge_strike aoe 4"; end
   end
-  -- epidemic,if=!talent.bursting_sores&!variable.pooling_runic_power&active_enemies>=6
-  if S.Epidemic:IsReady() and ((not S.BurstingSores:IsAvailable()) and (not VarPoolingRunicPower) and Enemies10ySplashCount >= 6) then
+  -- epidemic,if=(!talent.bursting_sores|rune<1|talent.bursting_sores&debuff.festering_wound.stack=0)&!variable.pooling_runic_power&(active_enemies>=6|runic_power.deficit<30)
+  if S.Epidemic:IsReady() and (((not S.BurstingSores:IsAvailable()) or Player:Rune() < 1 or S.BurstingSores:IsAvailable() and FesterStacks == 0) and (not VarPoolingRunicPower) and (Enemies10ySplashCount >= 6 or Player:RunicPowerDeficit() < 30)) then
     if Cast(S.Epidemic, nil, nil, not Target:IsInRange(30)) then return "epidemic aoe 6"; end
   end
   -- festering_strike,target_if=max:debuff.festering_wound.stack,if=!death_and_decay.ticking&debuff.festering_wound.stack<4&(cooldown.vile_contagion.remains<5|cooldown.apocalypse.ready&cooldown.any_dnd.remains)
