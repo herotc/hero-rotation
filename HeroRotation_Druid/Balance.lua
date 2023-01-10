@@ -109,8 +109,9 @@ local Enemies8ySplash, EnemiesCount8ySplash
 
 -- CastCycle/CastTargetIf Functions
 local function EvaluateCycleSunfireST(TargetUnit)
-  -- target_if=refreshable&remains<2
-  return (TargetUnit:DebuffRefreshable(S.SunfireDebuff) and TargetUnit:DebuffRemains(S.SunfireDebuff) < 2)
+  -- target_if=refreshable&remains<2&(target.time_to_die-remains)>6
+  local Remains = TargetUnit:DebuffRemains(S.SunfireDebuff)
+  return (TargetUnit:DebuffRefreshable(S.SunfireDebuff) and Remains < 2 and (TargetUnit:TimeToDie() - Remains) > 6)
 end
 
 local function EvaluateCycleSunfireST2(TargetUnit)
@@ -119,8 +120,9 @@ local function EvaluateCycleSunfireST2(TargetUnit)
 end
 
 local function EvaluateCycleMoonfireST(TargetUnit)
-  -- target_if=refreshable&remains<2
-  return (TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and TargetUnit:DebuffRemains(S.MoonfireDebuff) < 2)
+  -- target_if=refreshable&remains<2&(target.time_to_die-remains)>6
+  local Remains = TargetUnit:DebuffRemains(S.MoonfireDebuff)
+  return (TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and Remains < 2 and (TargetUnit:TimeToDie() - Remains) > 6)
 end
 
 local function EvaluateCycleMoonfireST2(TargetUnit)
@@ -129,8 +131,9 @@ local function EvaluateCycleMoonfireST2(TargetUnit)
 end
 
 local function EvaluateCycleStellarFlareST(TargetUnit)
-  -- target_if=refreshable&astral_power.deficit>variable.passive_asp+8&remains<2
-  return (TargetUnit:DebuffRefreshable(S.StellarFlareDebuff) and Player:AstralPowerDeficit() > VarPassiveAsp + 8 and TargetUnit:DebuffRemains(S.StellarFlareDebuff) < 2)
+  -- target_if=refreshable&astral_power.deficit>variable.passive_asp+8&remains<2&(target.time_to_die-remains)>8
+  local Remains = TargetUnit:DebuffRemains(S.StellarFlareDebuff)
+  return (TargetUnit:DebuffRefreshable(S.StellarFlareDebuff) and Player:AstralPowerDeficit() > VarPassiveAsp + 8 and Remains < 2 and (TargetUnit:TimeToDie() - Remains) > 8)
 end
 
 local function EvaluateCycleStellarFlareST2(TargetUnit)
@@ -139,13 +142,13 @@ local function EvaluateCycleStellarFlareST2(TargetUnit)
 end
 
 local function EvaluateCycleSunfireAoE(TargetUnit)
-  -- target_if=refreshable&(target.time_to_die-remains)>8&astral_power.deficit>variable.passive_asp+3
-  return (TargetUnit:DebuffRefreshable(S.SunfireDebuff) and (TargetUnit:TimeToDie() - Target:DebuffRemains(S.SunfireDebuff)) > 8 and Player:AstralPowerDeficit() > VarPassiveAsp + 3)
+  -- target_if=refreshable&(target.time_to_die-remains)>6-(spell_targets%2)&astral_power.deficit>variable.passive_asp+3
+  return (TargetUnit:DebuffRefreshable(S.SunfireDebuff) and (TargetUnit:TimeToDie() - Target:DebuffRemains(S.SunfireDebuff)) > 6 - (EnemiesCount8ySplash / 2) and Player:AstralPowerDeficit() > VarPassiveAsp + 3)
 end
 
 local function EvaluateCycleMoonfireAoE(TargetUnit)
-  -- target_if=refreshable&(target.time_to_die-remains)>8&astral_power.deficit>variable.passive_asp+3
-  return (TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and (TargetUnit:TimeToDie() - Target:DebuffRemains(S.MoonfireDebuff)) > 8 and Player:AstralPowerDeficit() > VarPassiveAsp + 3)
+  -- target_if=refreshable&(target.time_to_die-remains)>6&astral_power.deficit>variable.passive_asp+3
+  return (TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and (TargetUnit:TimeToDie() - Target:DebuffRemains(S.MoonfireDebuff)) > 6 and Player:AstralPowerDeficit() > VarPassiveAsp + 3)
 end
 
 local function EvaluateCycleStellarFlareAoE(TargetUnit)
@@ -227,22 +230,22 @@ local function Fallthru()
 end
 
 local function St()
-  -- sunfire,target_if=refreshable&remains<2
+  -- sunfire,target_if=refreshable&remains<2&(target.time_to_die-remains)>6
   if S.Sunfire:IsCastable() then
     if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireST, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire st 4"; end
   end
-  -- moonfire,target_if=refreshable&remains<2
+  -- moonfire,target_if=refreshable&remains<2&(target.time_to_die-remains)>6
   if S.Moonfire:IsCastable() then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireST, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire st 6"; end
   end
-  -- stellar_flare,target_if=refreshable&astral_power.deficit>variable.passive_asp+8&remains<2
+  -- stellar_flare,target_if=refreshable&astral_power.deficit>variable.passive_asp+8&remains<2&(target.time_to_die-remains)>8
   if S.StellarFlare:IsCastable() then
     if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareST, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare st 10"; end
   end
-  -- variable,name=cd_condition_st,value=cooldown.ca_inc.remains<15&!buff.ca_inc.up&(target.1.time_to_die>15|fight_remains<25+10*talent.incarnation_chosen_of_elune)
+  -- variable,name=cd_condition_st,value=cooldown.ca_inc.remains<15&!buff.ca_inc.up&(target.time_to_die>15|fight_remains<25+10*talent.incarnation_chosen_of_elune)
   VarCDConditionST = CaInc:CooldownRemains() < 15 and (not CAIncBuffUp) and (Target:TimeToDie() > 15 or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable()))
-  -- wrath,if=variable.cd_condition_st&set_bonus.tier29_4pc&eclipse.any_next
-  if S.Wrath:IsCastable() and (VarCDConditionST and Player:HasTier(29, 4) and EclipseAnyNext) then
+  -- wrath,if=variable.cd_condition_st&set_bonus.tier29_4pc&eclipse.any_next|fight_remains>10&(target.time_to_die<=2&astral_power.deficit>20|target.time_to_die<=5&buff.primordial_arcanic_pulsar.value>=550)
+  if S.Wrath:IsCastable() and (VarCDConditionST and Player:HasTier(29, 4) and EclipseAnyNext or FightRemains > 10 and (Target:TimeToDie() <= 2 and Player:AstralPowerDeficit() > 20 or Target:TimeToDie() <= 5 and PAPValue >= 550)) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath st 12"; end
   end
   -- starsurge,if=variable.cd_condition_st&buff.touch_the_cosmos.up|buff.primordial_arcanic_pulsar.value>=560&buff.starweavers_weft.up
@@ -331,7 +334,7 @@ local function St()
   if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:AstralPowerDeficit() < VarPassiveAsp + (8 * (1 + 0.5 * num(S.SouloftheForest:IsAvailable()) * num(Player:BuffUp(S.EclipseSolar)))) or S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemains() < 3 or FightRemains < 5) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 54"; end
   end
-  -- wild_mushroom,if=astral_power.deficit>variable.passive_asp+5&(!talent.fungal_growth|talent.stellar_flare|dot.fungal_growth.remains<2)|fight_remains<10
+  -- wild_mushroom,if=astral_power.deficit>variable.passive_asp+5&(!talent.fungal_growth|talent.stellar_flare|dot.fungal_growth.remains<2)&raid_event.adds.in>30-15*charges|fight_remains<10
   if S.WildMushroom:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 5 and ((not S.FungalGrowth:IsAvailable()) or S.StellarFlare:IsAvailable() or Target:DebuffRemains(S.FungalGrowthDebuff) < 2) or FightRemains < 10) then
     if Cast(S.WildMushroom, nil, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 56"; end
   end
@@ -349,16 +352,16 @@ local function St()
 end
 
 local function AoE()
-  -- sunfire,target_if=refreshable&(target.time_to_die-remains)>8&astral_power.deficit>variable.passive_asp+3
+  -- sunfire,target_if=refreshable&(target.time_to_die-remains)>6-(spell_targets%2)&astral_power.deficit>variable.passive_asp+3
   if S.Sunfire:IsCastable() then
     if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireAoE, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire aoe 2"; end
   end
-  -- moonfire,target_if=refreshable&(target.time_to_die-remains)>8&astral_power.deficit>variable.passive_asp+3
+  -- moonfire,target_if=refreshable&(target.time_to_die-remains)>6&astral_power.deficit>variable.passive_asp+3
   if S.Moonfire:IsCastable() then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireAoE, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire aoe 4"; end
   end
-  -- variable,name=cd_condition_aoe,value=cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.1.time_to_die>10-5*talent.orbital_strike|fight_remains<25+10*talent.incarnation_chosen_of_elune)
-  VarCDConditionAoE = CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 10 - 5 * num(S.OrbitalStrike:IsAvailable()) or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable()))
+  -- variable,name=cd_condition_aoe,value=cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>10|fight_remains<25+10*talent.incarnation_chosen_of_elune)
+  VarCDConditionAoE = CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 10 or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable()))
   -- wrath,if=variable.cd_condition_aoe&set_bonus.tier29_4pc&eclipse.any_next
   if S.Wrath:IsCastable() and (VarCDConditionAoE and Player:HasTier(29, 4) and EclipseAnyNext) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath aoe 6"; end
@@ -385,6 +388,10 @@ local function AoE()
   if S.Wrath:IsCastable() and (EclipseAnyNext or Player:BuffRemains(S.EclipseLunar) < S.Wrath:ExecuteTime()) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath aoe 16"; end
   end
+  -- wild_mushroom,if=astral_power.deficit>variable.passive_asp+20&(!talent.fungal_growth|!talent.waning_twilight|dot.fungal_growth.remains<2&target.time_to_die>7)
+  if S.WildMushroom:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 20 and ((not S.FungalGrowth:IsAvailable()) or (not S.WaningTwilight:IsAvailable()) or Target:DebuffRemains(S.FungalGrowthDebuff) < 2 and Target:TimeToDie() > 7)) then
+    if Cast(S.WildMushroom, nil, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom aoe 17"; end
+  end
   -- fury_of_elune,if=astral_power.deficit>variable.passive_asp+8
   if S.FuryofElune:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 8) then
     if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune aoe 18"; end
@@ -392,10 +399,6 @@ local function AoE()
   -- full_moon,if=astral_power.deficit>variable.passive_asp+40&(buff.eclipse_lunar.remains>execute_time|buff.eclipse_solar.remains>execute_time)
   if S.FullMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 40 and (Player:BuffRemains(S.EclipseLunar) > S.FullMoon:ExecuteTime() or Player:BuffRemains(S.EclipseSolar) > S.FullMoon:ExecuteTime())) then
     if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon aoe 20"; end
-  end
-  -- wild_mushroom,if=astral_power.deficit>variable.passive_asp+20&(!talent.fungal_growth|!talent.waning_twilight|dot.fungal_growth.remains<2&target.time_to_die>7)
-  if S.WildMushroom:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 20 and ((not S.FungalGrowth:IsAvailable()) or (not S.WaningTwilight:IsAvailable()) or Target:DebuffRemains(S.FungalGrowthDebuff) < 2 and Target:TimeToDie() > 7)) then
-    if Cast(S.WildMushroom, nil, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom aoe 22"; end
   end
   -- starfire,if=(buff.gathering_starstuff.stack=3|buff.umbral_embrace.up)&astral_power.deficit>variable.passive_asp+(8*(1+0.4*buff.warrior_of_elune.up))
   if S.Starfire:IsCastable() and ((Player:BuffStack(S.GatheringStarstuff) == 3 or Player:BuffUp(S.UmbralEmbraceBuff)) and Player:AstralPowerDeficit() > VarPassiveAsp + (8 * (1 + 0.4 * num(Player:BuffUp(S.WarriorofEluneBuff))))) then
