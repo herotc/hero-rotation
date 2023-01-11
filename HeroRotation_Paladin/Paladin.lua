@@ -52,7 +52,7 @@ Spell.Paladin.Commons = {
   LayonHands                            = Spell(633),
   SanctifiedWrath                       = Spell(53376),
   Seraphim                              = Spell(152262),
-  SeraphimBuff                          = Spell(152262),
+  ZealotsParagon                        = Spell(391142),
   -- Covenants (Shadowlands)
   AshenHallow                           = Spell(316958),
   BlessingofAutumn                      = Spell(328622),
@@ -67,13 +67,6 @@ Spell.Paladin.Commons = {
   SummonSteward                         = Spell(324739),
   VanquishersHammer                     = Spell(328204),
   VanquishersHammerBuff                 = Spell(328204),
-  -- Soulbinds/Conduits (Shadowlands)
-  Expurgation                           = Spell(339371),
-  PustuleEruption                       = Spell(351094),
-  VengefulShock                         = Spell(340006),
-  VengefulShockDebuff                   = Spell(340007),
-  VolatileSolvent                       = Spell(323074),
-  VolatileSolventHumanBuff              = Spell(323491),
   -- Auras
   ConcentrationAura                     = Spell(317920),
   CrusaderAura                          = Spell(32223),
@@ -83,15 +76,10 @@ Spell.Paladin.Commons = {
   AvengingWrathBuff                     = Spell(31884),
   ConsecrationBuff                      = Spell(188370),
   DivinePurposeBuff                     = Spell(223819),
-  ScarsofFraternalStrifeBuff4           = Spell(368638),
+  SeraphimBuff                          = Spell(152262),
   ShieldoftheRighteousBuff              = Spell(132403),
-  TemptationBuff                        = Spell(234143),
   -- Debuffs
   ConsecrationDebuff                    = Spell(204242),
-  CruelGarroteDebuff                    = Spell(230011),
-  -- Legendary Effects
-  DivineResonanceBuff                   = Spell(355455),
-  FinalVerdictBuff                      = Spell(337228),
   JudgmentDebuff                        = Spell(197277),
   -- Pool
   Pool                                  = Spell(999910),
@@ -106,7 +94,6 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   GuardianofAncientKingsBuff            = Spell(86659),
   HammeroftheRighteous                  = Spell(53595),
   Judgment                              = Spell(275779),
-  JudgmentDebuff                        = Spell(197277),
   ShiningLightFreeBuff                  = Spell(327510),
   -- Talents
   BlessedHammer                         = Spell(204019),
@@ -123,28 +110,32 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   AshestoDust                           = Spell(383300),
   BladeofJustice                        = Spell(184575),
   BladeofWrath                          = Spell(231832),
-  Crusade                               = Spell(231895), -- On-bar spell ID. Talent is a different ID for some reason.
-  CrusadeTalent                         = Spell(384392),
+  Crusade                               = Spell(231895),
+  DivineResonance                       = Spell(384027),
   DivineStorm                           = Spell(53385),
   DivineToll                            = Spell(375576),
+  EmpyreanLegacy                        = Spell(387170),
   EmpyreanPower                         = Spell(326732),
   ExecutionSentence                     = Spell(343527),
   ExecutionersWrath                     = Spell(387196),
   Exorcism                              = Spell(383185),
   FinalReckoning                        = Spell(343721),
+  FinalVerdict                          = Spell(383328),
   FiresofJustice                        = Spell(203316),
+  JusticarsVengeance                    = Spell(215661),
   RadiantDecree                         = Spell(383469),
   RadiantDecreeTalent                   = Spell(384052),
   RighteousVerdict                      = Spell(267610),
   ShieldofVengeance                     = Spell(184662),
+  VanguardsMomentum                     = Spell(383314),
   WakeofAshes                           = Spell(255937),
   Zeal                                  = Spell(269569),
   -- Buffs
   CrusadeBuff                           = Spell(231895),
+  DivineResonanceBuff                   = Spell(384029),
+  EmpyreanLegacyBuff                    = Spell(387178),
   EmpyreanPowerBuff                     = Spell(326733),
   -- Debuffs
-  -- Legendary Effects
-  FinalVerdict                          = Spell(336872),
 })
 
 Spell.Paladin.Holy = MergeTableByKey(Spell.Paladin.Commons, {
@@ -152,7 +143,6 @@ Spell.Paladin.Holy = MergeTableByKey(Spell.Paladin.Commons, {
   DivineProtection                      = Spell(498),
   HolyShock                             = Spell(20473),
   Judgment                              = Spell(275773),
-  JudgmentDebuff                        = Spell(197277),
   LightofDawn                           = Spell(85222),
   InfusionofLightBuff                   = Spell(54149),
   -- Talents
@@ -169,42 +159,8 @@ Spell.Paladin.Holy = MergeTableByKey(Spell.Paladin.Commons, {
 -- Items
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Commons = {
-  -- Potion
-  PotionofSpectralIntellect             = Item(171273),
-  PotionofSpectralStrength              = Item(171275),
   -- Trinkets
-  AspirantsBadgeCosmic                  = Item(186906, {13, 14}),
-  AspirantsBadgeSinful                  = Item(175884, {13, 14}),
-  AspirantsBadgeUnchained               = Item(185161, {13, 14}),
-  BloodstainedHandkerchief              = Item(142159, {13, 14}),
-  ChainsofDomination                    = Item(188252, {13, 14}),
-  DarkmoonDeckVoracity                  = Item(173087, {13, 14}),
-  DreadfireVessel                       = Item(184030, {13, 14}),
-  EarthbreakersImpact                   = Item(188264, {13, 14}),
-  EnforcersStunGrenade                  = Item(110017, {13, 14}),
-  FaultyCountermeasure                  = Item(137539, {13, 14}),
-  GiantOrnamentalPearl                  = Item(137369, {13, 14}),
-  GladiatorsBadgeCosmic                 = Item(186866, {13, 14}),
-  GladiatorsBadgeSinful                 = Item(175921, {13, 14}),
-  GladiatorsBadgeUnchained              = Item(185197, {13, 14}),
-  GrimCodex                             = Item(178811, {13, 14}),
-  HeartoftheSwarm                       = Item(188255, {13, 14}),
-  InscrutableQuantumDevice              = Item(179350, {13, 14}),
-  MacabreSheetMusic                     = Item(184024, {13, 14}),
-  MemoryofPastSins                      = Item(184025, {13, 14}),
-  OverwhelmingPowerCrystal              = Item(179342, {13, 14}),
-  RemoteGuidanceDevice                  = Item(169769, {13, 14}),
-  SalvagedFusionAmplifier               = Item(186432, {13, 14}),
-  ScarsofFraternalStrife                = Item(188253, {13, 14}),
-  SkulkersWing                          = Item(184016, {13, 14}),
-  SpareMeatHook                         = Item(178751, {13, 14}),
-  TheFirstSigil                         = Item(188271, {13, 14}),
-  ToeKneesPromise                       = Item(142164, {13, 14}),
-  WindscarWhetstone                     = Item(137486, {13, 14}),
-  -- Other On-Use Items
-  AnodizedDeflectors                    = Item(168978),
-  GaveloftheFirstArbiter                = Item(189862),
-  RingofCollapsingFutures               = Item(142173, {11, 12}),
+  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
 }
 
 Item.Paladin.Protection = MergeTableByKey(Item.Paladin.Commons, {
