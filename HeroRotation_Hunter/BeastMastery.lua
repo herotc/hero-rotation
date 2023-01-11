@@ -46,19 +46,7 @@ local SummonPetSpells = { S.SummonPet, S.SummonPet2, S.SummonPet3, S.SummonPet4,
 -- Items
 local I = Item.Hunter.BeastMastery;
 local OnUseExcludes = {
-  I.DMDDance:ID(),
-  I.DMDDanceBox:ID(),
-  I.DMDInferno:ID(),
-  I.DMDInfernoBox:ID(),
-  I.DMDRime:ID(),
-  I.DMDRimeBox:ID(),
-  I.DMDWatcher:ID(),
-  I.DMDWatcherBox:ID(),
-  I.DecorationofFlame:ID(),
-  I.GlobeofJaggedIce:ID(),
-  I.ManicGrieftorch:ID(),
-  I.StormeatersBoon:ID(),
-  I.WindscarWhetstone:ID(),
+  -- I.TrinketName:ID(),
 }
 
 -- Usable Item Objects
@@ -196,6 +184,8 @@ local function Precombat()
 end
 
 local function CDs()
+  -- invoke_external_buff,name=power_infusion,if=cooldown.bestial_wrath.ready
+  -- Note: Not handling external buffs.
   -- berserking,if=!talent.bestial_wrath|buff.bestial_wrath.up|fight_remains<16
   if S.Berserking:IsCastable() and ((not S.BestialWrath:IsAvailable()) or Player:BuffUp(S.BestialWrathBuff) or FightRemains < 16) then
     if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking cds 2"; end
@@ -230,67 +220,6 @@ local function CDs()
     if PotionSelected and PotionSelected:IsReady() then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 14"; end
     end
-  end
-end
-
-local function Trinkets()
-  -- use_items,slots=trinket1,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<31
-  local Trinket1ToUse = Player:GetUseableTrinkets(OnUseExcludes, 13)
-  if Trinket1ToUse and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and (Player:BuffUp(S.BestialWrathBuff) and (Player:BloodlustUp() or Target:HealthPercentage() < 20)) or FightRemains < 31) then
-    if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 trinkets 2"; end
-  end
-  -- use_items,slots=trinket2,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<31
-  local Trinket2ToUse = Player:GetUseableTrinkets(OnUseExcludes, 14)
-  if Trinket2ToUse and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and (Player:BuffUp(S.BestialWrathBuff) and (Player:BloodlustUp() or Target:HealthPercentage() < 20)) or FightRemains < 31) then
-    if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 trinkets 4"; end
-  end
-  -- use_item,name=manic_grieftorch,if=pet.main.buff.frenzy.remains>execute_time
-  if I.ManicGrieftorch:IsEquippedAndReady() and (Pet:BuffRemains(S.FrenzyPetBuff) > Spell(377463):ExecuteTime()) then
-    if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch trinkets 6"; end
-  end
-  -- use_item,name=darkmoon_deck_box_rime
-  if I.DMDRime:IsEquippedAndReady() then
-    if Cast(I.DMDRime, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_rime trinkets 8"; end
-  end
-  if I.DMDRimeBox:IsEquippedAndReady() then
-    if Cast(I.DMDRimeBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_rime trinkets 10"; end
-  end
-  -- use_item,name=darkmoon_deck_box_inferno
-  if I.DMDInferno:IsEquippedAndReady() then
-    if Cast(I.DMDInferno, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_inferno trinkets 12"; end
-  end
-  if I.DMDInfernoBox:IsEquippedAndReady() then
-    if Cast(I.DMDInfernoBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_inferno trinkets 14"; end
-  end
-  -- use_item,name=darkmoon_deck_box_dance
-  if I.DMDDance:IsEquippedAndReady() then
-    if Cast(I.DMDDance, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_dance trinkets 16"; end
-  end
-  if I.DMDDanceBox:IsEquippedAndReady() then
-    if Cast(I.DMDDanceBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_dance trinkets 18"; end
-  end
-  -- use_item,name=darkmoon_deck_box_watcher
-  if I.DMDWatcher:IsEquippedAndReady() then
-    if Cast(I.DMDWatcher, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_watcher trinkets 20"; end
-  end
-  if I.DMDWatcherBox:IsEquippedAndReady() then
-    if Cast(I.DMDWatcherBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_box_watcher trinkets 22"; end
-  end
-  -- use_item,name=decoration_of_flame
-  if I.DecorationofFlame:IsEquippedAndReady() then
-    if Cast(I.DecorationofFlame, nil, Settings.Commons.DisplayStyle.Trinkets) then return "decoration_of_flame trinkets 24"; end
-  end
-  -- use_item,name=stormeaters_boon
-  if I.StormeatersBoon:IsEquippedAndReady() then
-    if Cast(I.StormeatersBoon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "stormeaters_boon trinkets 26"; end
-  end
-  -- use_item,name=windscar_whetstone
-  if I.WindscarWhetstone:IsEquippedAndReady() then
-    if Cast(I.WindscarWhetstone, nil, Settings.Commons.DisplayStyle.Trinkets) then return "windscar_whetstone trinkets 28"; end
-  end
-  -- use_item,name=globe_of_jagged_ice
-  if I.GlobeofJaggedIce:IsEquippedAndReady() then
-    if Cast(I.GlobeofJaggedIce, nil, Settings.Commons.DisplayStyle.Trinkets) then return "globe_of_jagged_ice trinkets 30"; end
   end
 end
 
@@ -482,6 +411,26 @@ local function ST()
   end
 end
 
+local function Trinkets()
+  -- variable,name=sync_up,value=buff.call_of_the_wild.up|cooldown.call_of_the_wild.remains<2|!talent.call_of_the_wild&(prev_gcd.1.bestial_wrath|cooldown.bestial_wrath.remains_guess<2)
+  -- variable,name=sync_remains,op=setif,value=cooldown.bestial_wrath.remains_guess,value_else=cooldown.call_of_the_wild.remains,condition=!talent.call_of_the_wild
+  -- variable,name=trinket_1_stronger,value=!trinket.2.has_cooldown|trinket.1.has_use_buff&(!trinket.2.has_use_buff|trinket.2.cooldown.duration<trinket.1.cooldown.duration|trinket.2.cast_time<trinket.1.cast_time|trinket.2.cast_time=trinket.1.cast_time&trinket.2.cooldown.duration=trinket.1.cooldown.duration)|!trinket.1.has_use_buff&(!trinket.2.has_use_buff&(trinket.2.cooldown.duration<trinket.1.cooldown.duration|trinket.2.cast_time<trinket.1.cast_time|trinket.2.cast_time=trinket.1.cast_time&trinket.2.cooldown.duration=trinket.1.cooldown.duration))
+  -- variable,name=trinket_2_stronger,value=!trinket.1.has_cooldown|trinket.2.has_use_buff&(!trinket.1.has_use_buff|trinket.1.cooldown.duration<trinket.2.cooldown.duration|trinket.1.cast_time<trinket.2.cast_time|trinket.1.cast_time=trinket.2.cast_time&trinket.1.cooldown.duration=trinket.2.cooldown.duration)|!trinket.2.has_use_buff&(!trinket.1.has_use_buff&(trinket.1.cooldown.duration<trinket.2.cooldown.duration|trinket.1.cast_time<trinket.2.cast_time|trinket.1.cast_time=trinket.2.cast_time&trinket.1.cooldown.duration=trinket.2.cooldown.duration))
+  -- use_items,slots=trinket1,if=(trinket.1.has_use_buff&(variable.sync_up&(variable.trinket_1_stronger|trinket.2.cooldown.remains)|!variable.sync_up&(variable.trinket_1_stronger&(variable.sync_remains>trinket.1.cooldown.duration%2|trinket.2.has_use_buff&trinket.2.cooldown.remains>variable.sync_remains-15&trinket.2.cooldown.remains-5<variable.sync_remains&variable.sync_remains+40>fight_remains)|variable.trinket_2_stronger&(trinket.2.cooldown.remains&(trinket.2.cooldown.remains-5<variable.sync_remains&variable.sync_remains>=20|trinket.2.cooldown.remains-5>=variable.sync_remains&(variable.sync_remains>trinket.1.cooldown.duration%2|trinket.1.cooldown.duration<fight_remains&(variable.sync_remains+trinket.1.cooldown.duration>fight_remains)))|trinket.2.cooldown.ready&variable.sync_remains>20&variable.sync_remains<trinket.2.cooldown.duration%2)))|!trinket.1.has_use_buff&((!trinket.2.has_use_buff&(variable.trinket_1_stronger|trinket.2.cooldown.remains)|trinket.2.has_use_buff&(variable.sync_remains>20|trinket.2.cooldown.remains>20)))|target.time_to_die<25&(variable.trinket_1_stronger|trinket.2.cooldown.remains))&pet.main.buff.frenzy.remains>trinket.1.cast_time
+  -- use_items,slots=trinket2,if=(trinket.2.has_use_buff&(variable.sync_up&(variable.trinket_2_stronger|trinket.1.cooldown.remains)|!variable.sync_up&(variable.trinket_2_stronger&(variable.sync_remains>trinket.2.cooldown.duration%2|trinket.1.has_use_buff&trinket.1.cooldown.remains>variable.sync_remains-15&trinket.1.cooldown.remains-5<variable.sync_remains&variable.sync_remains+40>fight_remains)|variable.trinket_1_stronger&(trinket.1.cooldown.remains&(trinket.1.cooldown.remains-5<variable.sync_remains&variable.sync_remains>=20|trinket.1.cooldown.remains-5>=variable.sync_remains&(variable.sync_remains>trinket.2.cooldown.duration%2|trinket.2.cooldown.duration<fight_remains&(variable.sync_remains+trinket.2.cooldown.duration>fight_remains)))|trinket.1.cooldown.ready&variable.sync_remains>20&variable.sync_remains<trinket.1.cooldown.duration%2)))|!trinket.2.has_use_buff&((!trinket.1.has_use_buff&(variable.trinket_2_stronger|trinket.1.cooldown.remains)|trinket.1.has_use_buff&(variable.sync_remains>20|trinket.1.cooldown.remains>20)))|target.time_to_die<25&(variable.trinket_2_stronger|trinket.1.cooldown.remains))&pet.main.buff.frenzy.remains>trinket.2.cast_time
+  -- Note: Currently unable to check trinket cooldown.duration values. Using old use_items lines as a fallback.
+  -- use_items,slots=trinket1,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<31
+  local Trinket1ToUse = Player:GetUseableTrinkets(OnUseExcludes, 13)
+  if Trinket1ToUse and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and (Player:BuffUp(S.BestialWrathBuff) and (Player:BloodlustUp() or Target:HealthPercentage() < 20)) or FightRemains < 31) then
+    if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 trinkets 2"; end
+  end
+  -- use_items,slots=trinket2,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<31
+  local Trinket2ToUse = Player:GetUseableTrinkets(OnUseExcludes, 14)
+  if Trinket2ToUse and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and (Player:BuffUp(S.BestialWrathBuff) and (Player:BloodlustUp() or Target:HealthPercentage() < 20)) or FightRemains < 31) then
+    if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 trinkets 4"; end
+  end
+end
+
 --- ======= MAIN =======
 local function APL()
   -- HeroLib SplashData Tracking Update (used as fallback if pet abilities are not in action bars)
@@ -552,9 +501,8 @@ local function APL()
     if (CDsON()) then
       local ShouldReturn = CDs(); if ShouldReturn then return ShouldReturn; end
     end
-    -- Manually added: call_action_list,name=trinkets
-    -- Note: Shifted Trinket usage from CDs() to its own function so Trinket usage isn't reliant upon CDsON()
-    if (Settings.Commons.Enabled.Trinkets) then
+    -- call_action_list,name=trinkets
+    if Settings.Commons.Enabled.Trinkets then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=st,if=active_enemies<2|!talent.beast_cleave&active_enemies<3
