@@ -54,6 +54,7 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.DeathKnight.Commons,
+  Commons2 = HR.GUISettings.APL.DeathKnight.Commons2,
   Blood = HR.GUISettings.APL.DeathKnight.Blood
 }
 
