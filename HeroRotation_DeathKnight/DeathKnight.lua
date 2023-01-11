@@ -28,7 +28,10 @@ Spell.DeathKnight.Commons = {
   DeathCoil                             = Spell(47541),
   -- Talents
   AbominationLimb                       = Spell(383269),
+  AntiMagicShell                        = Spell(48707),
+  AntiMagicZone                         = Spell(51052),
   Asphyxiate                            = Spell(221562),
+  Assimilation                          = Spell(374383),
   ChainsofIce                           = Spell(45524),
   CleavingStrikes                       = Spell(316916),
   DeathStrike                           = Spell(49998),
