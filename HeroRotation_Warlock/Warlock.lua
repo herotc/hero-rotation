@@ -40,6 +40,7 @@ Spell.Warlock.Commons = {
   InquisitorsGazeBuff                   = Spell(388068),
   Soulburn                              = Spell(385899),
   -- Buffs
+  PowerInfusionBuff                     = Spell(10060),
   -- Debuffs
   -- Command Demon Abilities
   AxeToss                               = Spell(119914),
@@ -99,6 +100,7 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   InevitableDemise                      = Spell(334319),
   MaleficAffliction                     = Spell(389761),
   MaleficRapture                        = Spell(324536),
+  Nightfall                             = Spell(108558),
   PhantomSingularity                    = Spell(205179),
   SowTheSeeds                           = Spell(196226),
   SeedofCorruption                      = Spell(27243),
@@ -108,6 +110,7 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   SoulSwap                              = Spell(386951),
   SoulTap                               = Spell(387073),
   SowtheSeeds                           = Spell(196226),
+  TormentedCrescendo                    = Spell(387075),
   UnstableAffliction                    = Spell(316099),
   VileTaint                             = Spell(278350),
   -- Buffs
@@ -176,6 +179,8 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Commons = {
   -- Trinkets
+  ConjuredChillglobe                    = Item(194300, {13, 14}),
+  DesperateInvokersCodex                = Item(194310, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
 }
 
