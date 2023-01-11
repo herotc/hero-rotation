@@ -40,7 +40,7 @@ local SummonPetSpells = { S.SummonPet, S.SummonPet2, S.SummonPet3, S.SummonPet4,
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  --  I.TrinketName:ID(),
+  I.AlgetharPuzzleBox:ID(),
 }
 
 -- Trinket Item Objects
@@ -50,6 +50,7 @@ local trinket2 = (equip[14]) and Item(equip[14]) or Item(0)
 
 -- Rotation Var
 local SteadyShotTracker = { LastCast = 0, Count = 0 }
+local VarTrueshotReady
 local BossFightRemains = 11111
 local FightRemains = 11111
 
@@ -171,32 +172,38 @@ local function Precombat()
   -- flask
   -- augmentation
   -- food
-  -- summon_pet,if=talent.kill_command|talent.beast_master
-  if S.SummonPet:IsCastable() and (S.KillCommand:IsAvailable() or S.BeastMaster:IsAvailable()) then
+  -- summon_pet,if=!talent.lone_wolf
+  if S.SummonPet:IsCastable() and (not S.LoneWolf:IsAvailable()) then
     if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot], Settings.Commons2.GCDasOffGCD.SummonPet) then return "Summon Pet"; end
   end
   -- snapshot_stats
   -- double_tap,precast_time=10
   if S.DoubleTap:IsReady() then
-    if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap opener"; end
+    if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap precombat 2"; end
+  end
+  -- use_item,name=algethar_puzzle_box
+  if I.AlgetharPuzzleBox:IsEquippedAndReady() then
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 4"; end
   end
   -- aimed_shot,if=active_enemies<3&(!talent.volley|active_enemies<2)
   if S.AimedShot:IsReady() and (not Player:IsCasting(S.AimedShot)) and (EnemiesCount10ySplash < 3 and ((not S.Volley:IsAvailable()) or EnemiesCount10ySplash < 2)) then
-    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot opener"; end
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot precombat 6"; end
   end
   -- wailing_arrow,if=active_enemies>2|!talent.steady_focus
   if S.WailingArrow:IsReady() and (not Player:IsCasting(S.WailingArrow)) and (EnemiesCount10ySplash > 2 or not S.SteadyFocus:IsAvailable()) then
-    if Cast(S.WailingArrow, nil, nil, not TargetInRange40y) then return "wailing_arrow opener"; end
+    if Cast(S.WailingArrow, nil, nil, not TargetInRange40y) then return "wailing_arrow precombat 8"; end
   end
   -- steady_shot,if=active_enemies>2|talent.volley&active_enemies=2
   if S.SteadyShot:IsCastable() and (EnemiesCount10ySplash > 2 or S.Volley:IsAvailable() and EnemiesCount10ySplash == 2) then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot opener"; end
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot precombat 10"; end
   end
 end
 
 local function Cds()
-  -- berserking,if=fight_remains<13
-  if S.Berserking:IsReady() and (FightRemains < 13) then
+  -- invoke_external_buff,name=power_infusion,if=buff.trueshot.remains>12
+  -- Note: Not handling external buffs.
+  -- berserking,if=buff.trueshot.up|fight_remains<13
+  if S.Berserking:IsReady() and (Player:BuffUp(S.TrueshotBuff) or FightRemains < 13) then
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 2"; end
   end
   -- blood_fury,if=buff.trueshot.up|cooldown.trueshot.remains>30|fight_remains<16
@@ -233,8 +240,8 @@ local function St()
   if S.KillShot:IsReady() then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot st 4"; end
   end
-  -- steel_trap
-  if S.SteelTrap:IsCastable() then
+  -- steel_trap,if=buff.trueshot.down
+  if S.SteelTrap:IsCastable() and (Player:BuffDown(S.TrueshotBuff)) then
     if Cast(S.SteelTrap, Settings.Commons2.GCDasOffGCD.SteelTrap, nil, not Target:IsInRange(40)) then return "steel_trap st 6"; end
   end
   -- serpent_sting,target_if=min:dot.serpent_sting.remains,if=refreshable&!talent.serpentstalkers_trickery&buff.trueshot.down
@@ -245,8 +252,8 @@ local function St()
   if S.ExplosiveShot:IsReady() then
     if Cast(S.ExplosiveShot, nil, nil, not TargetInRange40y) then return "explosive_shot st 10"; end
   end
-  -- double_tap,if=(cooldown.rapid_fire.remains<gcd|ca_active|!talent.streamline)&(!raid_event.adds.exists|raid_event.adds.up&(raid_event.adds.in<10&raid_event.adds.remains<3|raid_event.adds.in>cooldown|active_enemies>1)|!raid_event.adds.up&(raid_event.adds.count=1|raid_event.adds.in>cooldown))
-  if S.DoubleTap:IsReady() and ((S.RapidFire:CooldownRemains() < Player:GCD() or Target:HealthPercentage() > 70 or not S.Streamline:IsAvailable())) then
+  -- double_tap,if=(cooldown.rapid_fire.remains<gcd|!talent.streamline)&(!raid_event.adds.exists|raid_event.adds.up&(raid_event.adds.in<10&raid_event.adds.remains<3|raid_event.adds.in>cooldown|active_enemies>1)|!raid_event.adds.up&(raid_event.adds.count=1|raid_event.adds.in>cooldown))
+  if S.DoubleTap:IsReady() and (S.RapidFire:CooldownRemains() < Player:GCD() or not S.Streamline:IsAvailable()) then
     if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap st 12"; end
   end
   -- stampede
@@ -265,12 +272,12 @@ local function St()
   if S.Volley:IsReady() then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley st 20"; end
   end
-  -- rapid_fire,if=talent.surging_shots|buff.double_tap.up&talent.streamline&!ca_active
-  if S.RapidFire:IsCastable() and (S.SurgingShots:IsAvailable() or Player:BuffUp(S.DoubleTapBuff) and S.Streamline:IsAvailable() and Target:HealthPercentage() < 70) then
+  -- rapid_fire,if=talent.surging_shots|buff.double_tap.up&talent.streamline
+  if S.RapidFire:IsCastable() and (S.SurgingShots:IsAvailable() or Player:BuffUp(S.DoubleTapBuff) and S.Streamline:IsAvailable()) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 22"; end
   end
-  -- trueshot,if=!raid_event.adds.exists|!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<25|raid_event.adds.in>60)|raid_event.adds.up&raid_event.adds.remains>10|active_enemies>1|fight_remains<25
-  if S.Trueshot:IsReady() and CDsON() then
+  -- trueshot,if=variable.trueshot_ready
+  if S.Trueshot:IsReady() and CDsON() and (VarTrueshotReady) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot st 24"; end
   end
   -- multishot,if=buff.bombardment.up&buff.trick_shots.down&active_enemies>1|talent.salvo&buff.salvo.down&!talent.volley
@@ -297,6 +304,10 @@ local function St()
   -- wailing_arrow,if=buff.trueshot.down
   if S.WailingArrow:IsReady() and (Player:BuffDown(S.TrueshotBuff)) then
     if Cast(S.WailingArrow, Settings.Marksmanship.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "wailing_arrow st 36"; end
+  end
+  -- kill_command,if=buff.trueshot.down
+  if S.KillCommand:IsCastable() and (Player:BuffDown(S.TrueshotBuff)) then
+    if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command st 37"; end
   end
   -- chimaera_shot,if=buff.precise_shots.up|focus>cost+action.aimed_shot.cost
   if S.ChimaeraShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) or Player:FocusP() > S.ChimaeraShot:Cost() + S.AimedShot:Cost()) then
@@ -325,8 +336,8 @@ local function Trickshots()
   if S.KillShot:IsReady() and (Player:BuffUp(S.RazorFragmentsBuff)) then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot trickshots 4"; end
   end
-  -- double_tap,if=cooldown.rapid_fire.remains<gcd|ca_active|!talent.streamline
-  if S.DoubleTap:IsReady() and (S.RapidFire:CooldownRemains() < Player:GCD() or Target:HealthPercentage() > 70 or not S.Streamline:IsAvailable()) then
+  -- double_tap,if=cooldown.rapid_fire.remains<gcd|!talent.streamline
+  if S.DoubleTap:IsReady() and (S.RapidFire:CooldownRemains() < Player:GCD() or not S.Streamline:IsAvailable()) then
     if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap trickshots 6"; end
   end
   -- explosive_shot
@@ -361,8 +372,8 @@ local function Trickshots()
   if S.Trueshot:IsReady() and CDsON() then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot, nil, not TargetInRange40y) then return "trueshot trickshots 22"; end
   end
-  -- rapid_fire,if=buff.trick_shots.remains>=execute_time&(talent.surging_shots|buff.double_tap.up&talent.streamline&!ca_active)
-  if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime() and (S.SurgingShots:IsAvailable() or Player:BuffUp(S.DoubleTapBuff) and S.Streamline:IsAvailable() and Target:HealthPercentage() < 70)) then
+  -- rapid_fire,if=buff.trick_shots.remains>=execute_time&(talent.surging_shots|buff.double_tap.up&talent.streamline)
+  if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime() and (S.SurgingShots:IsAvailable() or Player:BuffUp(S.DoubleTapBuff) and S.Streamline:IsAvailable())) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire trickshots 24"; end
   end
   -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=talent.serpentstalkers_trickery&(buff.trick_shots.remains>=execute_time&(buff.precise_shots.down|buff.trueshot.up|full_recharge_time<cast_time+gcd))
@@ -389,8 +400,8 @@ local function Trickshots()
   if S.SerpentSting:IsReady() then
     if Everyone.CastTargetIf(S.SerpentSting, Enemies40y, "min", EvaluateTargetIfFilterSerpentRemains, EvaluateTargetIfSerpentSting3, not TargetInRange40y) then return "serpent_sting trickshots 36"; end
   end
-  -- steel_trap
-  if S.SteelTrap:IsCastable() then
+  -- steel_trap,if=buff.trueshot.down
+  if S.SteelTrap:IsCastable() and (Player:BuffDown(S.TrueshotBuff)) then
     if Cast(S.SteelTrap, Settings.Commons2.GCDasOffGCD.SteelTrap, nil, not Target:IsInRange(40)) then return "steel_trap trickshots 38"; end
   end
   -- kill_shot,if=focus>cost+action.aimed_shot.cost
@@ -408,6 +419,27 @@ local function Trickshots()
   -- steady_shot
   if S.SteadyShot:IsCastable() then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot trickshots 46"; end
+  end
+end
+
+local function Trinkets()
+  -- variable,name=sync_ready,value=variable.trueshot_ready
+  -- variable,name=sync_active,value=buff.trueshot.up
+  -- variable,name=sync_remains,value=cooldown.trueshot.remains
+  -- variable,name=trinket_1_stronger,value=!trinket.2.has_cooldown|trinket.1.has_use_buff&(!trinket.2.has_use_buff|trinket.2.cooldown.duration<trinket.1.cooldown.duration|trinket.2.cast_time<trinket.1.cast_time|trinket.2.cast_time=trinket.1.cast_time&trinket.2.cooldown.duration=trinket.1.cooldown.duration)|!trinket.1.has_use_buff&(!trinket.2.has_use_buff&(trinket.2.cooldown.duration<trinket.1.cooldown.duration|trinket.2.cast_time<trinket.1.cast_time|trinket.2.cast_time=trinket.1.cast_time&trinket.2.cooldown.duration=trinket.1.cooldown.duration))
+  -- variable,name=trinket_2_stronger,value=!trinket.1.has_cooldown|trinket.2.has_use_buff&(!trinket.1.has_use_buff|trinket.1.cooldown.duration<trinket.2.cooldown.duration|trinket.1.cast_time<trinket.2.cast_time|trinket.1.cast_time=trinket.2.cast_time&trinket.1.cooldown.duration=trinket.2.cooldown.duration)|!trinket.2.has_use_buff&(!trinket.1.has_use_buff&(trinket.1.cooldown.duration<trinket.2.cooldown.duration|trinket.1.cast_time<trinket.2.cast_time|trinket.1.cast_time=trinket.2.cast_time&trinket.1.cooldown.duration=trinket.2.cooldown.duration))
+  -- use_items,slots=trinket1,if=trinket.1.has_use_buff&(variable.sync_ready&(variable.trinket_1_stronger|trinket.2.cooldown.remains)|!variable.sync_ready&(variable.trinket_1_stronger&(variable.sync_remains>trinket.1.cooldown.duration%2|trinket.2.has_use_buff&trinket.2.cooldown.remains>variable.sync_remains-15&trinket.2.cooldown.remains-5<variable.sync_remains&variable.sync_remains+40>fight_remains)|variable.trinket_2_stronger&(trinket.2.cooldown.remains&(trinket.2.cooldown.remains-5<variable.sync_remains&variable.sync_remains>=20|trinket.2.cooldown.remains-5>=variable.sync_remains&(variable.sync_remains>trinket.1.cooldown.duration%2|trinket.1.cooldown.duration<fight_remains&(variable.sync_remains+trinket.1.cooldown.duration>fight_remains)))|trinket.2.cooldown.ready&variable.sync_remains>20&variable.sync_remains<trinket.2.cooldown.duration%2)))|!trinket.1.has_use_buff&(trinket.1.cast_time=0|!variable.sync_active)&((!trinket.2.has_use_buff&(variable.trinket_1_stronger|trinket.2.cooldown.remains)|trinket.2.has_use_buff&(variable.sync_remains>20|trinket.2.cooldown.remains>20)))|target.time_to_die<25&(variable.trinket_1_stronger|trinket.2.cooldown.remains)
+  -- use_items,slots=trinket2,if=trinket.2.has_use_buff&(variable.sync_ready&(variable.trinket_2_stronger|trinket.1.cooldown.remains)|!variable.sync_ready&(variable.trinket_2_stronger&(variable.sync_remains>trinket.2.cooldown.duration%2|trinket.1.has_use_buff&trinket.1.cooldown.remains>variable.sync_remains-15&trinket.1.cooldown.remains-5<variable.sync_remains&variable.sync_remains+40>fight_remains)|variable.trinket_1_stronger&(trinket.1.cooldown.remains&(trinket.1.cooldown.remains-5<variable.sync_remains&variable.sync_remains>=20|trinket.1.cooldown.remains-5>=variable.sync_remains&(variable.sync_remains>trinket.2.cooldown.duration%2|trinket.2.cooldown.duration<fight_remains&(variable.sync_remains+trinket.2.cooldown.duration>fight_remains)))|trinket.1.cooldown.ready&variable.sync_remains>20&variable.sync_remains<trinket.1.cooldown.duration%2)))|!trinket.2.has_use_buff&(trinket.2.cast_time=0|!variable.sync_active)&((!trinket.1.has_use_buff&(variable.trinket_2_stronger|trinket.1.cooldown.remains)|trinket.1.has_use_buff&(variable.sync_remains>20|trinket.1.cooldown.remains>20)))|target.time_to_die<25&(variable.trinket_2_stronger|trinket.1.cooldown.remains)
+  -- Note: Currently can't track trinket CD length. Using the old trinket suggestion as a fallback.
+  -- use_item,name=algethar_puzzle_box,if=cooldown.trueshot.remains<2|fight_remains<22
+  if I.AlgetharPuzzleBox:IsEquippedAndReady() and (S.Trueshot:CooldownRemains() < 2 or FightRemains < 22) then
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box trinkets 2"; end
+  end
+  -- use_items,slots=trinket1,if=!trinket.1.has_use_buff|buff.trueshot.up
+  -- use_items,slots=trinket2,if=!trinket.2.has_use_buff|buff.trueshot.up
+  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+  if TrinketToUse and ((not TrinketToUse:TrinketHasUseBuff()) or Player:BuffUp(S.TrueshotBuff)) then
+    if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end
 end
 
@@ -444,26 +476,15 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(40, S.CounterShot, Settings.Commons2.OffGCDasOffGCD.CounterShot, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_shot
-    if Settings.Commons.Enabled.Trinkets then
-      -- use_items,slots=trinket1,if=!trinket.1.has_use_buff|buff.trueshot.up
-      local Trinket1ToUse = Player:GetUseableTrinkets(OnUseExcludes, 13)
-      if Trinket1ToUse and ((not Trinket1ToUse:TrinketHasUseBuff()) or Player:BuffUp(S.TrueshotBuff)) then
-        if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 main 2"; end
-      end
-      -- use_items,slots=trinket2,if=!trinket.2.has_use_buff|buff.trueshot.up
-      local Trinket2ToUse = Player:GetUseableTrinkets(OnUseExcludes, 14)
-      if Trinket2ToUse and ((not Trinket2ToUse:TrinketHasUseBuff()) or Player:BuffUp(S.TrueshotBuff)) then
-        if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 main 4"; end
-      end
-      -- use_items
-      if Trinket1ToUse or Trinket2ToUse then
-        local TrinketToUse = Trinket1ToUse or Trinket2ToUse
-        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
-      end
-    end
+    -- variable,name=trueshot_ready,value=cooldown.trueshot.ready&(!raid_event.adds.exists&(!talent.bullseye|fight_remains>cooldown.trueshot.duration_guess+buff.trueshot.duration%2|buff.bullseye.stack=buff.bullseye.max_stack)&(!trinket.1.has_use_buff|trinket.1.cooldown.remains>30|trinket.1.cooldown.ready)&(!trinket.2.has_use_buff|trinket.2.cooldown.remains>30|trinket.2.cooldown.ready)|raid_event.adds.exists&(!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<25|raid_event.adds.in>60)|raid_event.adds.up&raid_event.adds.remains>10)|active_enemies>1|fight_remains<25)
+    VarTrueshotReady = S.Trueshot:CooldownUp()
     -- call_action_list,name=cds
     if (CDsON()) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=trinkets
+    if Settings.Commons.Enabled.Trinkets then
+      local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=st,if=active_enemies<3|!talent.trick_shots
     if (EnemiesCount10ySplash < 3 or not S.TrickShots:IsAvailable()) then
