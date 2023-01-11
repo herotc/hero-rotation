@@ -277,7 +277,7 @@ local function APL()
     end
     -- implosion,if=time_to_die<2*gcd
     if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and HL.FightRemains() < 2 * Player:GCD() then
-      if Cast(S.Implosion, nil, nil, not Target:IsSpellInRange(S.Implosion)) then return "implosion main 39"; end
+      if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsSpellInRange(S.Implosion)) then return "implosion main 39"; end
     end
     -- nether_portal,if=!talent.summon_demonic_tyrant&soul_shard>2|time_to_die<30
     if CDsON() and S.NetherPortal:IsReady() and ((not S.SummonDemonicTyrant:IsAvailable()) and (Player:SoulShardsP() > 2) or HL.FightRemains() < 30) then
@@ -331,7 +331,7 @@ local function APL()
     end
     -- implosion,if=active_enemies>2&buff.wild_imps.stack>=6
     if S.Implosion:IsReady() and EnemiesCount8ySplash > 2 and WildImpsCount() >= 6 then
-      if Cast(S.Implosion, nil, nil, not Target:IsSpellInRange(S.Implosion)) then return "implosion main 52"; end
+      if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsSpellInRange(S.Implosion)) then return "implosion main 52"; end
     end
     -- soul_strike,if=soul_shard<5&active_enemies>1
     if S.SoulStrike:IsReady() and Player:SoulShardsP() < 5 and EnemiesCount8ySplash > 1 then
