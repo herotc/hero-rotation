@@ -186,7 +186,7 @@ local function AoE()
   end
   -- arcane_torrent,if=runic_power.deficit>25
   if S.ArcaneTorrent:IsReady() and (Player:RunicPowerDeficit() > 25) then
-    if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "arcane_torrent aoe 22"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons2.GCDasOffGCD.Racials) then return "arcane_torrent aoe 22"; end
   end
 end
 
@@ -213,7 +213,7 @@ local function BreathOblit()
   end
   -- arcane_torrent,if=runic_power.deficit>20
   if S.ArcaneTorrent:IsReady() and (Player:RunicPowerDeficit() > 20) then
-    if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "arcane_torrent breath_oblit 12"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons2.GCDasOffGCD.Racials) then return "arcane_torrent breath_oblit 12"; end
   end
 end
 
@@ -248,7 +248,7 @@ local function Breath()
   end
   -- death_and_decay,if=runic_power<32&rune.time_to_2>runic_power%16
   if S.DeathAndDecay:IsReady() and (Player:RunicPower() < 32 and Player:RuneTimeToX(2) > Player:RunicPower() / 16) then
-    if Cast(S.DeathAndDecay, Settings.Commons.GCDasOffGCD.DeathAndDecay, nil, not Target:IsSpellInRange(S.DeathAndDecay)) then return "death_and_decay breath 16"; end
+    if Cast(S.DeathAndDecay, Settings.Commons2.GCDasOffGCD.DeathAndDecay, nil, not Target:IsSpellInRange(S.DeathAndDecay)) then return "death_and_decay breath 16"; end
   end
   -- remorseless_winter,if=runic_power<32&rune.time_to_2>runic_power%16
   if S.RemorselessWinter:IsReady() and (Player:RunicPower() < 32 and Player:RuneTimeToX(2) > Player:RunicPower() / 16) then
@@ -268,7 +268,7 @@ local function Breath()
   end
   -- arcane_torrent,if=runic_power<60
   if S.ArcaneTorrent:IsReady() and (Player:RunicPower() < 60) then
-    if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "arcane_torrent breath 26"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons2.GCDasOffGCD.Racials) then return "arcane_torrent breath 26"; end
   end
 end
 
@@ -282,27 +282,27 @@ local function Cooldowns()
   end
   -- empower_rune_weapon,if=talent.obliteration&!buff.empower_rune_weapon.up&rune<6&(cooldown.pillar_of_frost.remains_expected<7&(variable.adds_remain|variable.st_planning)|buff.pillar_of_frost.up)|fight_remains<20
   if S.EmpowerRuneWeapon:IsCastable() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.EmpowerRuneWeaponBuff) and Player:Rune() < 6 and (S.PillarofFrost:CooldownRemains() < 7 and (VarAddsRemain or VarSTPlanning) or Player:BuffUp(S.PillarofFrostBuff)) or FightRemains < 20) then
-    if Cast(S.EmpowerRuneWeapon, Settings.Commons.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 4"; end
+    if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 4"; end
   end
   -- empower_rune_weapon,use_off_gcd=1,if=buff.breath_of_sindragosa.up&talent.breath_of_sindragosa&!buff.empower_rune_weapon.up&(runic_power<70&rune<3|time<10)
   if S.EmpowerRuneWeapon:IsCastable() and (Player:BuffUp(S.BreathofSindragosa) and S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.EmpowerRuneWeaponBuff) and (Player:RunicPower() < 70 and Player:Rune() < 3 or HL.CombatTime() < 10)) then
-    if Cast(S.EmpowerRuneWeapon, Settings.Commons.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 6"; end
+    if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 6"; end
   end
   -- empower_rune_weapon,use_off_gcd=1,if=!talent.breath_of_sindragosa&!talent.obliteration&!buff.empower_rune_weapon.up&rune<5&(cooldown.pillar_of_frost.remains_expected<7|buff.pillar_of_frost.up|!talent.pillar_of_frost)
   if S.EmpowerRuneWeapon:IsCastable() and ((not S.BreathofSindragosa:IsAvailable()) and (not S.Obliteration:IsAvailable()) and Player:BuffDown(S.EmpowerRuneWeaponBuff) and Player:Rune() < 5 and (S.PillarofFrost:CooldownRemains() < 7 or Player:BuffUp(S.PillarofFrostBuff) or not S.PillarofFrost:IsAvailable())) then
-    if Cast(S.EmpowerRuneWeapon, Settings.Commons.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 6"; end
+    if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 6"; end
   end
   -- abomination_limb,if=talent.obliteration&!buff.pillar_of_frost.up&(variable.adds_remain|variable.st_planning)|fight_remains<12
   if S.AbominationLimb:IsCastable() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and (VarAddsRemain or VarSTPlanning) or FightRemains < 12) then
-    if Cast(S.AbominationLimb, Settings.Commons.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb_talent cooldowns 8"; end
+    if Cast(S.AbominationLimb, Settings.Commons2.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb_talent cooldowns 8"; end
   end
   -- abomination_limb,if=talent.breath_of_sindragosa&(variable.adds_remain|variable.st_planning)
   if S.AbominationLimb:IsCastable() and (S.BreathofSindragosa:IsAvailable() and (VarAddsRemain or VarSTPlanning)) then
-    if Cast(S.AbominationLimb, Settings.Commons.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb_talent cooldowns 10"; end
+    if Cast(S.AbominationLimb, Settings.Commons2.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb_talent cooldowns 10"; end
   end
   -- abomination_limb,if=!talent.breath_of_sindragosa&!talent.obliteration&(variable.adds_remain|variable.st_planning)
   if S.AbominationLimb:IsCastable() and ((not S.BreathofSindragosa:IsAvailable()) and (not S.Obliteration:IsAvailable()) and (VarAddsRemain or VarSTPlanning)) then
-    if Cast(S.AbominationLimb, Settings.Commons.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb_talent cooldowns 12"; end
+    if Cast(S.AbominationLimb, Settings.Commons2.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb_talent cooldowns 12"; end
   end
   -- chill_streak,if=active_enemies>=2&(!death_and_decay.ticking&talent.cleaving_strikes|!talent.cleaving_strikes|active_enemies<=5)
   if S.ChillStreak:IsReady() and (EnemiesCount10yd >= 2 and (Player:BuffDown(S.DeathAndDecayBuff) and S.CleavingStrikes:IsAvailable() or (not S.CleavingStrikes:IsAvailable()) or EnemiesCount10yd <= 5)) then
@@ -346,34 +346,34 @@ local function Cooldowns()
   end
   -- sacrificial_pact,if=!talent.glacial_advance&!buff.breath_of_sindragosa.up&pet.ghoul.remains<gcd*2&active_enemies>3
   if S.SacrificialPact:IsReady() and ((not S.GlacialAdvance:IsAvailable()) and Player:BuffDown(S.BreathofSindragosa) and ghoul:remains() < Player:GCD() * 2 and EnemiesCount10yd > 3) then
-    if Cast(S.SacrificialPact, Settings.Commons.GCDasOffGCD.SacrificialPact) then return "sacrificial_pact cooldowns 34"; end
+    if Cast(S.SacrificialPact, Settings.Commons2.GCDasOffGCD.SacrificialPact) then return "sacrificial_pact cooldowns 34"; end
   end
   -- any_dnd,if=!death_and_decay.ticking&variable.adds_remain&(buff.pillar_of_frost.up&buff.pillar_of_frost.remains>5|!buff.pillar_of_frost.up)&(active_enemies>5|talent.cleaving_strikes&active_enemies>=2)
   if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and VarAddsRemain and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffRemains(S.PillarofFrostBuff) > 5 or Player:BuffDown(S.PillarofFrostBuff)) and (EnemiesCount10yd > 5 or S.CleavingStrikes:IsAvailable() and EnemiesCount10yd >= 2)) then
-    if Cast(S.DeathAndDecay, Settings.Commons.GCDasOffGCD.DeathAndDecay) then return "death_and_decay cooldowns 36"; end
+    if Cast(S.DeathAndDecay, Settings.Commons2.GCDasOffGCD.DeathAndDecay) then return "death_and_decay cooldowns 36"; end
   end
 end
 
 local function ColdHeart()
   -- chains_of_ice,if=fight_remains<gcd&(rune<2|!buff.killing_machine.up&(!variable.2h_check&buff.cold_heart.stack>=4|variable.2h_check&buff.cold_heart.stack>8)|buff.killing_machine.up&(!variable.2h_check&buff.cold_heart.stack>8|variable.2h_check&buff.cold_heart.stack>10))
   if S.ChainsofIce:IsReady() and (FightRemains < Player:GCD() and (Player:Rune() < 2 or Player:BuffDown(S.KillingMachineBuff) and ((not Using2H) and Player:BuffStack(S.ColdHeartBuff) >= 4 or Using2H and Player:BuffStack(S.ColdHeartBuff) > 8) or Player:BuffUp(S.KillingMachineBuff) and ((not Using2H) and Player:BuffStack(S.ColdHeartBuff) > 8 or Using2H and Player:BuffStack(S.ColdHeartBuff) > 10))) then
-    if Cast(S.ChainsofIce, Settings.Commons.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 2"; end
+    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 2"; end
   end
   -- chains_of_ice,if=!talent.obliteration&buff.pillar_of_frost.up&buff.cold_heart.stack>=10&(buff.pillar_of_frost.remains<gcd*(1+(talent.frostwyrms_fury&cooldown.frostwyrms_fury.ready))|buff.unholy_strength.up&buff.unholy_strength.remains<gcd)
   if S.ChainsofIce:IsReady() and ((not S.Obliteration:IsAvailable()) and Player:BuffUp(S.PillarofFrostBuff) and Player:BuffStack(S.ColdHeartBuff) >= 10 and (Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() * (1 + num(S.FrostwyrmsFury:IsAvailable() and S.FrostwyrmsFury:IsReady())) or Player:BuffUp(S.UnholyStrengthBuff) and Player:BuffRemains(S.UnholyStrengthBuff) < Player:GCD())) then
-    if Cast(S.ChainsofIce, Settings.Commons.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 4"; end
+    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 4"; end
   end
   -- chains_of_ice,if=!talent.obliteration&death_knight.runeforge.fallen_crusader&!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains_expected>15&(buff.cold_heart.stack>=10&buff.unholy_strength.up|buff.cold_heart.stack>=13)
   if S.ChainsofIce:IsReady() and ((not S.Obliteration:IsAvailable()) and UsingFallenCrusader and Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() > 15 and (Player:BuffStack(S.ColdHeartBuff) >= 10 and Player:BuffUp(S.UnholyStrengthBuff) or Player:BuffStack(S.ColdHeartBuff) >= 13)) then
-    if Cast(S.ChainsofIce, Settings.Commons.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 6"; end
+    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 6"; end
   end
   -- chains_of_ice,if=!talent.obliteration&!death_knight.runeforge.fallen_crusader&buff.cold_heart.stack>=10&!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains_expected>20
   if S.ChainsofIce:IsReady() and ((not S.Obliteration:IsAvailable()) and (not UsingFallenCrusader) and Player:BuffStack(S.ColdHeartBuff) >= 10 and Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() > 20) then
-    if Cast(S.ChainsofIce, Settings.Commons.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 8"; end
+    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 8"; end
   end
   -- chains_of_ice,if=talent.obliteration&!buff.pillar_of_frost.up&(buff.cold_heart.stack>=14&(buff.unholy_strength.up|buff.chaos_bane.up)|buff.cold_heart.stack>=19|cooldown.pillar_of_frost.remains_expected<3&buff.cold_heart.stack>=14)
   if S.ChainsofIce:IsReady() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and (Player:BuffStack(S.ColdHeartBuff) >= 14 and (Player:BuffUp(S.UnholyStrengthBuff)) or Player:BuffStack(S.ColdHeartBuff) >= 19 or S.PillarofFrost:CooldownRemains() < 3 and Player:BuffStack(S.ColdHeartBuff) >= 14)) then
-    if Cast(S.ChainsofIce, Settings.Commons.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 10"; end
+    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 10"; end
   end
 end
 
@@ -408,7 +408,7 @@ local function Obliteration()
   end
   -- frost_strike,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=!buff.killing_machine.react&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1)
   if S.FrostStrike:IsReady() and (Player:BuffDown(S.KillingMachineBuff) and (not VarPoolingRP) and ((not S.GlacialAdvance:IsAvailable()) or EnemiesCount10yd == 1)) then
-    if Cast(S.FrostStrike, Settings.Commons.GCDasOffGCD.FrostStrike, nil, not Target:IsInMeleeRange(5)) then return "frost_strike obliteration 18"; end
+    if Cast(S.FrostStrike, Settings.Commons2.GCDasOffGCD.FrostStrike, nil, not Target:IsInMeleeRange(5)) then return "frost_strike obliteration 18"; end
   end
   -- howling_blast,if=!buff.killing_machine.react&runic_power<25
   if S.HowlingBlast:IsReady() and (Player:BuffDown(S.KillingMachineBuff) and Player:RunicPower() < 25) then
@@ -416,7 +416,7 @@ local function Obliteration()
   end
   -- arcane_torrent,if=rune<1&runic_power<25
   if S.ArcaneTorrent:IsReady() and (Player:Rune() < 1 and Player:RunicPower() < 25) then
-    if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "arcane_torrent obliteration 22"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons2.GCDasOffGCD.Racials) then return "arcane_torrent obliteration 22"; end
   end
   -- glacial_advance,if=!variable.pooling_runic_power&active_enemies>=2
   if S.GlacialAdvance:IsReady() and ((not VarPoolingRP) and EnemiesCount10yd >= 2) then
@@ -479,7 +479,7 @@ local function SingleTarget()
   end
   -- arcane_torrent,if=runic_power.deficit>20
   if S.ArcaneTorrent:IsReady() and (Player:RunicPowerDeficit() > 20) then
-    if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "arcane_torrent single_target 22"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons2.GCDasOffGCD.Racials) then return "arcane_torrent single_target 22"; end
   end
   -- frost_strike,if=!variable.pooling_runic_power
   if S.FrostStrike:IsReady() and (not VarPoolingRP) then
@@ -491,36 +491,36 @@ local function Racials()
   if (VarCDCheck) then
     -- blood_fury,if=variable.cooldown_check
     if S.BloodFury:IsCastable() then
-      if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury racials 2"; end
+      if Cast(S.BloodFury, Settings.Commons2.GCDasOffGCD.Racials) then return "blood_fury racials 2"; end
     end
     -- berserking,if=variable.cooldown_check
     if S.Berserking:IsCastable() then
-      if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking racials 4"; end
+      if Cast(S.Berserking, Settings.Commons2.GCDasOffGCD.Racials) then return "berserking racials 4"; end
     end
     -- arcane_pulse,if=variable.cooldown_check
     if S.ArcanePulse:IsCastable() then
-      if Cast(S.ArcanePulse, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 6"; end
+      if Cast(S.ArcanePulse, Settings.Commons2.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 6"; end
     end
     -- lights_judgment,if=variable.cooldown_check
     if S.LightsJudgment:IsCastable() then
-      if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
+      if Cast(S.LightsJudgment, Settings.Commons2.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
     end
     -- ancestral_call,if=variable.cooldown_check
     if S.AncestralCall:IsCastable() then
-      if Cast(S.AncestralCall, Settings.Commons.GCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
+      if Cast(S.AncestralCall, Settings.Commons2.GCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
     end
     -- fireblood,if=variable.cooldown_check
     if S.Fireblood:IsCastable() then
-      if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood racials 12"; end
+      if Cast(S.Fireblood, Settings.Commons2.GCDasOffGCD.Racials) then return "fireblood racials 12"; end
     end
   end
   -- bag_of_tricks,if=talent.obliteration&!buff.pillar_of_frost.up&buff.unholy_strength.up
   if S.BagofTricks:IsCastable() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and Player:BuffUp(S.UnholyStrengthBuff)) then
-    if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racials 14"; end
+    if Cast(S.BagofTricks, Settings.Commons2.GCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racials 14"; end
   end
   -- bag_of_tricks,if=!talent.obliteration&buff.pillar_of_frost.up&(buff.unholy_strength.up&buff.unholy_strength.remains<gcd*3|buff.pillar_of_frost.remains<gcd*3)
   if S.BagofTricks:IsCastable() and ((not S.Obliteration:IsAvailable()) and Player:BuffUp(S.PillarofFrostBuff) and (Player:BuffUp(S.UnholyStrengthBuff) and Player:BuffRemains(S.UnholyStrengthBuff) < Player:GCD() * 3 or Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() * 3)) then
-    if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racials 16"; end
+    if Cast(S.BagofTricks, Settings.Commons2.GCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racials 16"; end
   end
 end
 
@@ -607,15 +607,15 @@ local function APL()
     -- invoke_external_buff,name=power_infusion,if=(buff.pillar_of_frost.up|!talent.pillar_of_frost)&(talent.obliteration|talent.breath_of_sindragosa&buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa&!talent.obliteration)
     -- Note: Not handling external buffs.
     -- mind_freeze,if=target.debuff.casting.react
-    local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons2.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     if Settings.Commons.UseAMSAMZOffensively then
       -- antimagic_shell,if=runic_power.deficit>40
       if S.AntiMagicShell:IsCastable() and (Player:RunicPowerDeficit() > 40) then
-        if Cast(S.AntiMagicShell, Settings.Commons.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell main 1"; end
+        if Cast(S.AntiMagicShell, Settings.Commons2.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell main 1"; end
       end
       -- antimagic_zone,if=death_knight.amz_absorb_percent>0&runic_power.deficit>70&talent.assimilation&(buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa)
       if S.AntiMagicZone:IsCastable() and (Player:RunicPowerDeficit() > 70 and S.Assimilation:IsAvailable() and (Player:BuffUp(S.BreathofSindragosa) or not S.BreathofSindragosa:IsAvailable())) then
-        if Cast(S.AntiMagicZone, Settings.Commons.GCDasOffGCD.AntiMagicZone) then return "antimagic_zone main 2"; end
+        if Cast(S.AntiMagicZone, Settings.Commons2.GCDasOffGCD.AntiMagicZone) then return "antimagic_zone main 2"; end
       end
     end
     -- howling_blast,if=!dot.frost_fever.ticking&active_enemies>=2&(!talent.obliteration|talent.obliteration&(!buff.pillar_of_frost.up|buff.pillar_of_frost.up&!buff.killing_machine.react))
