@@ -31,12 +31,11 @@ HR.GUISettings.APL.Warrior = {
     VictoryRushHP = 80,
     -- {Display OffGCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      Racials = true,
-      -- Abilities
       BattleShout = true,
     },
     OffGCDasOffGCD = {
       Pummel = true,
+      Racials = true,
     },
   },
   Arms = {

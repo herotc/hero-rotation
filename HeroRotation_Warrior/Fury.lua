@@ -357,27 +357,27 @@ local function APL()
       end
       -- blood_fury
       if S.BloodFury:IsCastable() then
-        if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury main 41"; end
+        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 41"; end
       end
       -- berserking,if=buff.recklessness.up
       if S.Berserking:IsCastable() and Player:BuffUp(S.RecklessnessBuff) then
-        if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking main 42"; end
+        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 42"; end
       end
       -- lights_judgment,if=buff.recklessness.down
       if S.LightsJudgment:IsCastable() and Player:BuffDown(S.RecklessnessBuff) then
-        if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 43"; end
+        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 43"; end
       end
       -- fireblood
       if S.Fireblood:IsCastable() then
-        if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood main 44"; end
+        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 44"; end
       end
       -- ancestral_call
       if S.AncestralCall:IsCastable() then
-        if Cast(S.AncestralCall, Settings.Commons.GCDasOffGCD.Racials) then return "ancestral_call main 45"; end
+        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 45"; end
       end
       -- bag_of_tricks,if=buff.recklessness.down&buff.enrage.up
       if S.BagofTricks:IsCastable() and Player:BuffDown(S.RecklessnessBuff) and EnrageUp then
-        if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 46"; end
+        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 46"; end
       end
       -- avatar,if=talent.titans_torment&buff.enrage.up&raid_event.adds.in>15|!talent.titans_torment&(buff.recklessness.up|target.time_to_die<20)
       if S.Avatar:IsCastable() and (S.TitansTorment:IsAvailable() and EnrageUp or not S.TitansTorment:IsAvailable() and (Player:BuffUp(S.RecklessnessBuff) or HL.FightRemains() < 20)) then

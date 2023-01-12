@@ -356,19 +356,19 @@ local function APL()
     if CDsON() and (Player:BuffUp(S.AvatarBuff) or not S.Avatar:IsAvailable()) then
       -- blood_fury,if=buff.avatar.up|!talent.avatar
       if S.BloodFury:IsCastable() then
-        if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury main 2"; end
+        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 2"; end
       end
       -- berserking,if=buff.avatar.up|!talent.avatar
       if S.Berserking:IsCastable() then
-        if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking main 4"; end
+        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 4"; end
       end
       -- fireblood,if=buff.avatar.up|!talent.avatar
       if S.Fireblood:IsCastable() then
-        if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood main 6"; end
+        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 6"; end
       end
       -- ancestral_call,if=buff.avatar.up|!talent.avatar
       if S.AncestralCall:IsCastable() then
-        if Cast(S.AncestralCall, Settings.Commons.GCDasOffGCD.Racials) then return "ancestral_call main 8"; end
+        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 8"; end
       end
     end
     -- potion,if=buff.avatar.up|target.time_to_die<25
@@ -396,15 +396,15 @@ local function APL()
     if (CDsON()) then
       -- bag_of_tricks
       if S.BagofTricks:IsCastable() then
-        if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racial"; end
+        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racial"; end
       end
       -- arcane_torrent,if=rage<80
       if S.ArcaneTorrent:IsCastable() and (Player:Rage() < 80) then
-        if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent racial"; end
+        if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent racial"; end
       end
       -- lights_judgment
       if S.LightsJudgment:IsCastable() then
-        if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "lights_judgment racial"; end
+        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "lights_judgment racial"; end
       end
     end
     -- shield_wall,if=!buff.last_stand.up&!buff.rallying_cry.up
