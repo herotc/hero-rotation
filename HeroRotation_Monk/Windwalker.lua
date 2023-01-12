@@ -300,28 +300,28 @@ local function CDSerenity()
   if (Player:BuffUp(S.SerenityBuff) or FightRemains < 20) then
     -- ancestral_call,if=buff.serenity.up|fight_remains<20
     if S.AncestralCall:IsCastable() then
-      if Cast(S.AncestralCall, Settings.Commons.GCDasOffGCD.Racials) then return "ancestral_call cd_serenity 16"; end
+      if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cd_serenity 16"; end
     end
     -- blood_fury,if=buff.serenity.up|fight_remains<20
     if S.BloodFury:IsCastable() then
-      if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury cd_serenity 18"; end
+      if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cd_serenity 18"; end
     end
     -- fireblood,if=buff.serenity.up|fight_remains<20
     if S.Fireblood:IsCastable() then
-      if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood cd_serenity 20"; end
+      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cd_serenity 20"; end
     end
     -- berserking,if=buff.serenity.up|fight_remains<20
     if S.Berserking:IsCastable() then
-      if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking cd_serenity 22"; end
+      if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cd_serenity 22"; end
     end
     -- bag_of_tricks,if=buff.serenity.up|fight_remains<20
     if S.BagofTricks:IsCastable() then
-      if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials) then return "bag_of_tricks cd_serenity 24"; end
+      if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks cd_serenity 24"; end
     end
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "lights_judgment cd_serenity 26"; end
+    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment cd_serenity 26"; end
   end
   -- use_items
   if Settings.Commons.Enabled.Trinkets then
@@ -376,27 +376,27 @@ local function CDSEF()
   end
   -- ancestral_call,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
   if S.AncestralCall:IsCastable() and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or VarHoldXuen or FightRemains < 20) then
-    if Cast(S.AncestralCall, Settings.Commons.GCDasOffGCD.Racials) then return "ancestral_call cd_sef 18"; end
+    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cd_sef 18"; end
   end
   -- blood_fury,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
   if S.BloodFury:IsCastable() and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or VarHoldXuen or FightRemains < 20) then
-    if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury cd_sef 20"; end
+    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cd_sef 20"; end
   end
   -- fireblood,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<10
   if S.Fireblood:IsCastable() and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or VarHoldXuen or FightRemains < 10) then
-    if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood cd_sef 22"; end
+    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cd_sef 22"; end
   end
   -- berserking,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<15
   if S.Berserking:IsCastable() and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or VarHoldXuen or FightRemains < 15) then
-    if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking cd_sef 24"; end
+    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cd_sef 24"; end
   end
   -- bag_of_tricks,if=buff.storm_earth_and_fire.down
   if S.BagofTricks:IsCastable() and (Player:BuffDown(S.StormEarthAndFireBuff)) then
-    if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials) then return "bag_of_tricks cd_sef 26"; end
+    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks cd_sef 26"; end
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "lights_judgment cd_sef 28"; end
+    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment cd_sef 28"; end
   end
 end
 
@@ -683,7 +683,7 @@ local function Fallthru()
   end
   -- arcane_torrent,if=chi.max-chi>=1
   if S.ArcaneTorrent:IsCastable() and (Player:ChiDeficit() >= 1) then
-    if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "arcane_torrent fallthru 18"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent fallthru 18"; end
   end
   -- flying_serpent_kick,interrupt=1
   if S.FlyingSerpentKick:IsCastable() and not Settings.Windwalker.IgnoreFSK then

@@ -30,17 +30,14 @@ HR.GUISettings.APL.Monk = {
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      -- Abilities
       LegSweep = true,
       RingOfPeace = true,
       Paralysis = true,
-      -- Racials
-      Racials = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      -- Abilities
       Interrupts = true,
+      Racials = true,
     }
   },
   Brewmaster = {
