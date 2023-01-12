@@ -46,27 +46,11 @@ Spell.Paladin.Commons = {
   WordofGlory                           = Spell(85673),
   -- Talents
   AvengingWrath                         = Spell(31884),
-  HammerofWrath                         = MultiSpell(24275, 326730),
+  HammerofWrath                         = Spell(24275),
   HolyAvenger                           = Spell(105809),
-  HolyAvengerBuff                       = Spell(105809),
   LayonHands                            = Spell(633),
-  SanctifiedWrath                       = Spell(53376),
   Seraphim                              = Spell(152262),
   ZealotsParagon                        = Spell(391142),
-  -- Covenants (Shadowlands)
-  AshenHallow                           = Spell(316958),
-  BlessingofAutumn                      = Spell(328622),
-  BlessingofSpring                      = Spell(328282),
-  BlessingofSummer                      = Spell(328620),
-  BlessingofWinter                      = Spell(328281),
-  DivinePurpose                         = Spell(223817),
-  DivineTollCov                         = Spell(304971),
-  DoorofShadows                         = Spell(300728),
-  Fleshcraft                            = Spell(324631),
-  Soulshape                             = Spell(310143),
-  SummonSteward                         = Spell(324739),
-  VanquishersHammer                     = Spell(328204),
-  VanquishersHammerBuff                 = Spell(328204),
   -- Auras
   ConcentrationAura                     = Spell(317920),
   CrusaderAura                          = Spell(32223),
@@ -74,8 +58,10 @@ Spell.Paladin.Commons = {
   RetributionAura                       = Spell(183435),
   -- Buffs
   AvengingWrathBuff                     = Spell(31884),
+  BlessingofDuskBuff                    = Spell(385126),
   ConsecrationBuff                      = Spell(188370),
   DivinePurposeBuff                     = Spell(223819),
+  HolyAvengerBuff                       = Spell(105809),
   SeraphimBuff                          = Spell(152262),
   ShieldoftheRighteousBuff              = Spell(132403),
   -- Debuffs
@@ -87,20 +73,25 @@ Spell.Paladin.Commons = {
 
 Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   -- Abilities
-  ArdentDefender                        = Spell(31850),
-  ArdentDefenderBuff                    = Spell(31850),
-  AvengersShield                        = Spell(31935),
-  GuardianofAncientKings                = Spell(86659),
-  GuardianofAncientKingsBuff            = Spell(86659),
-  HammeroftheRighteous                  = Spell(53595),
   Judgment                              = Spell(275779),
-  ShiningLightFreeBuff                  = Spell(327510),
   -- Talents
+  ArdentDefender                        = Spell(31850),
+  AvengersShield                        = Spell(31935),
+  BastionofLight                        = Spell(378974),
   BlessedHammer                         = Spell(204019),
   CrusadersJudgment                     = Spell(204023),
-  MomentofGlory                         = Spell(327193),
-  SanctifiedWrath                       = Spell(171648),
   DivineToll                            = Spell(375576),
+  EyeofTyr                              = Spell(387174),
+  GuardianofAncientKings                = Spell(86659),
+  HammeroftheRighteous                  = Spell(53595),
+  MomentofGlory                         = Spell(327193),
+  -- Buffs
+  ArdentDefenderBuff                    = Spell(31850),
+  BastionofLightBuff                    = Spell(378974),
+  GuardianofAncientKingsBuff            = Spell(86659),
+  MomentofGloryBuff                     = Spell(327193),
+  ShiningLightFreeBuff                  = Spell(327510),
+  -- Debuffs
 })
 
 Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {

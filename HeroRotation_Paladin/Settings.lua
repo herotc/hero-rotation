@@ -47,19 +47,17 @@ HR.GUISettings.APL.Paladin = {
     },
     DisplayStyle = {
       Defensives = "SuggestedRight",
+      ShieldOfTheRighteous = "SuggestedRight",
     },
     GCDasOffGCD = {
-      ArdentDefender = true,
-      AvengingWrath = true,
-      BastionOfLight = true,
-      GuardianofAncientKings = true,
       Seraphim = true,
       WordOfGlory = true,
     },
     OffGCDasOffGCD = {
+      AvengingWrath = true,
+      BastionOfLight = true,
       HolyAvenger = true,
       MomentOfGlory = true,
-      ShieldOfTheRighteous = true,
     }
   },
   Retribution = {
