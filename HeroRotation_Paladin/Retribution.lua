@@ -132,7 +132,7 @@ local function Precombat()
     if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice precombat 12" end
   end
   if S.HammerofWrath:IsReady() then
-    if Cast(S.HammerofWrath, Settings.Retribution.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath precombat 14" end
+    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath precombat 14" end
   end
   if S.Judgment:IsCastable() then
     if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment precombat 16" end
@@ -231,7 +231,7 @@ local function Generators()
   end
   -- hammer_of_wrath,if=talent.zealots_paragon
   if S.HammerofWrath:IsReady() and (S.ZealotsParagon:IsAvailable()) then
-    if Cast(S.HammerofWrath, nil, Settings.Retribution.GCDasOffGCD.HammerOfWrath, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 2"; end
+    if Cast(S.HammerofWrath, nil, Settings.Commons.GCDasOffGCD.HammerOfWrath, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 2"; end
   end
   -- wake_of_ashes,if=holy_power<=2&talent.ashes_to_dust&(cooldown.avenging_wrath.remains|cooldown.crusade.remains)
   if S.WakeofAshes:IsCastable() and (Player:HolyPower() <= 2 and S.AshestoDust:IsAvailable() and (S.AvengingWrath:CooldownDown() or S.Crusade:CooldownDown())) then
@@ -263,7 +263,7 @@ local function Generators()
   end
   -- hammer_of_wrath
   if S.HammerofWrath:IsReady() then
-    if Cast(S.HammerofWrath, Settings.Retribution.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 16"; end
+    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 16"; end
   end
   -- blade_of_justice,if=holy_power<=3
   if S.BladeofJustice:IsCastable() and (Player:HolyPower() <= 3) then
@@ -342,7 +342,7 @@ local function ESFRActive()
   end
   -- hammer_of_wrath
   if S.HammerofWrath:IsReady() then
-    if Cast(S.HammerofWrath, Settings.Retribution.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath es_fr_active 18"; end
+    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath es_fr_active 18"; end
   end
   -- crusader_strike
   if S.CrusaderStrike:IsCastable() then
@@ -373,7 +373,7 @@ local function ESFRPooling()
   end
   -- hammer_of_wrath,if=talent.vanguards_momentum
   if S.HammerofWrath:IsReady() and (S.VanguardsMomentum:IsAvailable()) then
-    if Cast(S.HammerofWrath, Settings.Retribution.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath es_fr_pooling 4"; end
+    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath es_fr_pooling 4"; end
   end
   -- wake_of_ashes,if=holy_power<=2&talent.ashes_to_dust&(cooldown.crusade.remains|cooldown.avenging_wrath.remains)
   if S.WakeofAshes:IsCastable() and (Player:HolyPower() <=2 and S.AshestoDust:IsAvailable() and (S.Crusade:CooldownDown() or S.AvengingWrath:CooldownDown())) then
@@ -389,7 +389,7 @@ local function ESFRPooling()
   end
   -- hammer_of_wrath
   if S.HammerofWrath:IsReady() then
-    if Cast(S.HammerofWrath, Settings.Retribution.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath es_fr_pooling 12"; end
+    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath es_fr_pooling 12"; end
   end
   -- crusader_strike,if=cooldown.crusader_strike.charges_fractional>=1.75&(holy_power<=2|holy_power<=3&cooldown.blade_of_justice.remains>gcd*2|holy_power=4&cooldown.blade_of_justice.remains>gcd*2&cooldown.judgment.remains>gcd*2)
   if S.CrusaderStrike:IsCastable() and (S.CrusaderStrike:ChargesFractional() >= 1.75 and (Player:HolyPower() <= 2 or Player:HolyPower() <= 3 and S.BladeofJustice:CooldownRemains() > Player:GCD() * 2 or Player:HolyPower() == 4 and S.BladeofJustice:CooldownRemains() > Player:GCD() * 2 and S.Judgment:CooldownRemains() > Player:GCD() * 2)) then
