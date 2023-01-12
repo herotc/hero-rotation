@@ -29,9 +29,9 @@ HR.GUISettings.APL.Hunter = {
       Items = "Suggested",
     },
     GCDasOffGCD = {
-      Racials = false,
     },
     OffGCDasOffGCD = {
+      Racials = false,
     }
   },
   Commons2 = {
