@@ -319,7 +319,7 @@ local function St()
   end
   -- bag_of_tricks,if=buff.trueshot.down
   if S.BagofTricks:IsReady() then
-    if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks st 42"; end
+    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks st 42"; end
   end
   -- steady_shot
   if S.SteadyShot:IsCastable() then
@@ -414,7 +414,7 @@ local function Trickshots()
   end
   -- bag_of_tricks,if=buff.trueshot.down
   if S.BagofTricks:IsReady() and (Player:BuffDown(S.Trueshot)) then
-    if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks trickshots 44"; end
+    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks trickshots 44"; end
   end
   -- steady_shot
   if S.SteadyShot:IsCastable() then
