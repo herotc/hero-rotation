@@ -514,23 +514,23 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false); if ShouldReturn then return ShouldReturn; end
     -- blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
     if S.BloodFury:IsCastable() and ((not S.Ascendance:IsAvailable()) or Player:BuffUp(S.AscendanceBuff) or S.Ascendance:CooldownRemains() > 50) then
-      if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury main 2"; end
+      if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 2"; end
     end
     -- berserking,if=!talent.ascendance.enabled|buff.ascendance.up
     if S.Berserking:IsCastable() and ((not S.Ascendance:IsAvailable()) or Player:BuffUp(S.AscendanceBuff)) then
-      if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking main 4"; end
+      if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 4"; end
     end
     -- fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
     if S.Fireblood:IsCastable() and ((not S.Ascendance:IsAvailable()) or Player:BuffUp(S.AscendanceBuff) or S.Ascendance:CooldownRemains() > 50) then
-      if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood main 6"; end
+      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 6"; end
     end
     -- ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
     if S.AncestralCall:IsCastable() and ((not S.Ascendance:IsAvailable()) or Player:BuffUp(S.AscendanceBuff) or S.Ascendance:CooldownRemains() > 50) then
-      if Cast(S.AncestralCall, Settings.Commons.GCDasOffGCD.Racials) then return "ancestral_call main 8"; end
+      if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 8"; end
     end
     -- bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
     if S.BagofTricks:IsCastable() and ((not S.Ascendance:IsAvailable()) or Player:BuffUp(S.AscendanceBuff)) then
-      if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials) then return "bag_of_tricks main 10"; end
+      if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks main 10"; end
     end
     -- use_items
     local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)

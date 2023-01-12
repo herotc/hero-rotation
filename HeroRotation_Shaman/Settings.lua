@@ -32,17 +32,14 @@ HR.GUISettings.APL.Shaman = {
     UseBloodlust = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      -- Abilities
       Ascendance = true,
       EarthElemental = true,
       NaturesSwiftness = true,
       TotemicRecall = true,
-      -- Racials
-      Racials = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      -- Abilities
+      Racials = true,
       WindShear = true
     }
   },

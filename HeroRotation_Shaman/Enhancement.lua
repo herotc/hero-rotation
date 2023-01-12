@@ -243,7 +243,7 @@ local function Single()
   end
   -- bag_of_tricks
   if S.BagofTricks:IsCastable() and CDsON() then
-    if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials) then return "bag_of_tricks single 48"; end
+    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks single 48"; end
   end
   -- lightning_bolt,if=buff.maelstrom_weapon.stack>=5&buff.primordial_wave.down
   if S.LightningBolt:IsCastable() and (Player:BuffStack(S.MaelstromWeaponBuff) >= 5 and Player:BuffDown(S.PrimordialWaveBuff)) then
