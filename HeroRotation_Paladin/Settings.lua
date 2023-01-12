@@ -29,9 +29,9 @@ HR.GUISettings.APL.Paladin = {
     },
     GCDasOffGCD = {
       HammerOfWrath = true,
-      Racials = true,
     },
     OffGCDasOffGCD = {
+      Racials = true,
       Rebuke = true,
     }
   },

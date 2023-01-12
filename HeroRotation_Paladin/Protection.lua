@@ -72,11 +72,11 @@ local function Precombat()
   end
   -- lights_judgment
   if CDsON() and S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment precombat 4"; end
+    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment precombat 4"; end
   end
   -- arcane_torrent
   if CDsON() and S.ArcaneTorrent:IsCastable() then
-    if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 6"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 6"; end
   end
   -- consecration
   if S.Consecration:IsCastable() and Target:IsInMeleeRange(8) then
