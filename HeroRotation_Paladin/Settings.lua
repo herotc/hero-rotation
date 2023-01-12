@@ -28,9 +28,9 @@ HR.GUISettings.APL.Paladin = {
       Items = "Suggested",
     },
     GCDasOffGCD = {
+      Racials = true,
     },
     OffGCDasOffGCD = {
-      Racials = true,
       Rebuke = true,
     }
   },

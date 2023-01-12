@@ -107,7 +107,7 @@ local function Precombat()
   end
   -- arcane_torrent,if=talent.final_reckoning&talent.seraphim
   if S.ArcaneTorrent:IsCastable() and Target:IsInRange(8) and (S.FinalReckoning:IsAvailable() and S.Seraphim:IsAvailable()) then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent precombat 4"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "arcane_torrent precombat 4"; end
   end
   -- shield_of_vengeance
   if S.ShieldofVengeance:IsCastable() then
@@ -293,7 +293,7 @@ local function Generators()
   end
   -- arcane_torrent
   if S.ArcaneTorrent:IsCastable() then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent generators 28"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent generators 28"; end
   end
   -- consecration
   if S.Consecration:IsCastable() then
@@ -304,7 +304,7 @@ end
 local function ESFRActive()
   -- fireblood
   if S.Fireblood:IsCastable() then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood es_fr_active 2"; end
+    if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood es_fr_active 2"; end
   end
   -- call_action_list,name=finishers,if=holy_power=5|debuff.judgment.up|debuff.final_reckoning.up&(debuff.final_reckoning.remains<gcd.max|spell_targets.divine_storm>=2&!talent.execution_sentence)|debuff.execution_sentence.up&debuff.execution_sentence.remains<gcd.max
   if (Player:HolyPower() == 5 or Target:DebuffUp(S.JudgmentDebuff) or Target:DebuffUp(S.FinalReckoning) and (Target:DebuffRemains(S.FinalReckoning) < Player:GCD() + 0.5 or EnemiesCount8y >= 2 and not S.ExecutionSentence:IsAvailable()) or Target:DebuffUp(S.ExecutionSentence) and Target:DebuffRemains(S.ExecutionSentence) < Player:GCD() + 0.5) then
@@ -350,7 +350,7 @@ local function ESFRActive()
   end
   -- arcane_torrent
   if S.ArcaneTorrent:IsCastable() then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent es_fr_active 22"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent es_fr_active 22"; end
   end
   -- exorcism
   if S.Exorcism:IsCastable() then
@@ -407,7 +407,7 @@ local function ESFRPooling()
   end
   -- arcane_torrent,if=holy_power<=4
   if S.ArcaneTorrent:IsCastable() and (Player:HolyPower() <= 4) then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent es_fr_pooling 20"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent es_fr_pooling 20"; end
   end
   -- exorcism
   if S.Exorcism:IsCastable() then
