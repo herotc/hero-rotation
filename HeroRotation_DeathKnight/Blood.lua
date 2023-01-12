@@ -159,35 +159,35 @@ end
 local function Racials()
   -- blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
   if S.BloodFury:IsCastable() and (S.DancingRuneWeapon:CooldownUp() and (not S.Blooddrinker:IsReady() or not S.Blooddrinker:IsAvailable()))  then
-    if Cast(S.BloodFury, Settings.Commons2.GCDasOffGCD.Racials) then return "blood_fury racials 2"; end
+    if Cast(S.BloodFury, Settings.Commons2.OffGCDasOffGCD.Racials) then return "blood_fury racials 2"; end
   end
   -- berserking
   if S.Berserking:IsCastable() then
-    if Cast(S.Berserking, Settings.Commons2.GCDasOffGCD.Racials) then return "berserking racials 4"; end
+    if Cast(S.Berserking, Settings.Commons2.OffGCDasOffGCD.Racials) then return "berserking racials 4"; end
   end
   -- arcane_pulse,if=active_enemies>=2|rune<1&runic_power.deficit>60
   if S.ArcanePulse:IsCastable() and (EnemiesMeleeCount >= 2 or Player:Rune() < 1 and Player:RunicPowerDeficit() > 60) then
-    if Cast(S.ArcanePulse, Settings.Commons2.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 6"; end
+    if Cast(S.ArcanePulse, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 6"; end
   end
   -- lights_judgment,if=buff.unholy_strength.up
   if S.LightsJudgment:IsCastable() and (Player:BuffUp(S.UnholyStrengthBuff)) then
-    if Cast(S.LightsJudgment, Settings.Commons2.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
+    if Cast(S.LightsJudgment, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
   end
   -- ancestral_call
   if S.AncestralCall:IsCastable() then
-    if Cast(S.AncestralCall, Settings.Commons2.GCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
+    if Cast(S.AncestralCall, Settings.Commons2.OffGCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
   end
   -- fireblood
   if S.Fireblood:IsCastable() then
-    if Cast(S.Fireblood, Settings.Commons2.GCDasOffGCD.Racials) then return "fireblood racials 12"; end
+    if Cast(S.Fireblood, Settings.Commons2.OffGCDasOffGCD.Racials) then return "fireblood racials 12"; end
   end
   -- bag_of_tricks
   if S.BagofTricks:IsCastable() then
-    if Cast(S.BagofTricks, Settings.Commons2.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks racials 14"; end
+    if Cast(S.BagofTricks, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks racials 14"; end
   end
   -- arcane_torrent,if=runic_power.deficit>20
   if S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 20) then
-    if Cast(S.ArcaneTorrent, Settings.Commons2.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent racials 16"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent racials 16"; end
   end
 end
 

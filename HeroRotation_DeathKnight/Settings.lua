@@ -40,11 +40,11 @@ HR.GUISettings.APL.DeathKnight = {
       AntiMagicZone = true,
       DeathAndDecay = false,
       EmpowerRuneWeapon = true,
-      Racials = true,
       SacrificialPact = true
     },
     OffGCDasOffGCD = {
       MindFreeze = true,
+      Racials = true,
     }
   },
   Blood = {

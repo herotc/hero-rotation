@@ -187,7 +187,7 @@ local function AoE()
   end
   -- arcane_torrent,if=runic_power.deficit>25
   if S.ArcaneTorrent:IsReady() and (Player:RunicPowerDeficit() > 25) then
-    if Cast(S.ArcaneTorrent, Settings.Commons2.GCDasOffGCD.Racials) then return "arcane_torrent aoe 22"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials) then return "arcane_torrent aoe 22"; end
   end
 end
 
@@ -214,7 +214,7 @@ local function BreathOblit()
   end
   -- arcane_torrent,if=runic_power.deficit>20
   if S.ArcaneTorrent:IsReady() and (Player:RunicPowerDeficit() > 20) then
-    if Cast(S.ArcaneTorrent, Settings.Commons2.GCDasOffGCD.Racials) then return "arcane_torrent breath_oblit 12"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials) then return "arcane_torrent breath_oblit 12"; end
   end
 end
 
@@ -269,7 +269,7 @@ local function Breath()
   end
   -- arcane_torrent,if=runic_power<60
   if S.ArcaneTorrent:IsReady() and (Player:RunicPower() < 60) then
-    if Cast(S.ArcaneTorrent, Settings.Commons2.GCDasOffGCD.Racials) then return "arcane_torrent breath 26"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials) then return "arcane_torrent breath 26"; end
   end
 end
 
@@ -417,7 +417,7 @@ local function Obliteration()
   end
   -- arcane_torrent,if=rune<1&runic_power<25
   if S.ArcaneTorrent:IsReady() and (Player:Rune() < 1 and Player:RunicPower() < 25) then
-    if Cast(S.ArcaneTorrent, Settings.Commons2.GCDasOffGCD.Racials) then return "arcane_torrent obliteration 22"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials) then return "arcane_torrent obliteration 22"; end
   end
   -- glacial_advance,if=!variable.pooling_runic_power&active_enemies>=2
   if S.GlacialAdvance:IsReady() and ((not VarPoolingRP) and EnemiesCount10yd >= 2) then
@@ -480,7 +480,7 @@ local function SingleTarget()
   end
   -- arcane_torrent,if=runic_power.deficit>20
   if S.ArcaneTorrent:IsReady() and (Player:RunicPowerDeficit() > 20) then
-    if Cast(S.ArcaneTorrent, Settings.Commons2.GCDasOffGCD.Racials) then return "arcane_torrent single_target 22"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials) then return "arcane_torrent single_target 22"; end
   end
   -- frost_strike,if=!variable.pooling_runic_power
   if S.FrostStrike:IsReady() and (not VarPoolingRP) then
@@ -492,36 +492,36 @@ local function Racials()
   if (VarCDCheck) then
     -- blood_fury,if=variable.cooldown_check
     if S.BloodFury:IsCastable() then
-      if Cast(S.BloodFury, Settings.Commons2.GCDasOffGCD.Racials) then return "blood_fury racials 2"; end
+      if Cast(S.BloodFury, Settings.Commons2.OffGCDasOffGCD.Racials) then return "blood_fury racials 2"; end
     end
     -- berserking,if=variable.cooldown_check
     if S.Berserking:IsCastable() then
-      if Cast(S.Berserking, Settings.Commons2.GCDasOffGCD.Racials) then return "berserking racials 4"; end
+      if Cast(S.Berserking, Settings.Commons2.OffGCDasOffGCD.Racials) then return "berserking racials 4"; end
     end
     -- arcane_pulse,if=variable.cooldown_check
     if S.ArcanePulse:IsCastable() then
-      if Cast(S.ArcanePulse, Settings.Commons2.GCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 6"; end
+      if Cast(S.ArcanePulse, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 6"; end
     end
     -- lights_judgment,if=variable.cooldown_check
     if S.LightsJudgment:IsCastable() then
-      if Cast(S.LightsJudgment, Settings.Commons2.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
+      if Cast(S.LightsJudgment, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
     end
     -- ancestral_call,if=variable.cooldown_check
     if S.AncestralCall:IsCastable() then
-      if Cast(S.AncestralCall, Settings.Commons2.GCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
+      if Cast(S.AncestralCall, Settings.Commons2.OffGCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
     end
     -- fireblood,if=variable.cooldown_check
     if S.Fireblood:IsCastable() then
-      if Cast(S.Fireblood, Settings.Commons2.GCDasOffGCD.Racials) then return "fireblood racials 12"; end
+      if Cast(S.Fireblood, Settings.Commons2.OffGCDasOffGCD.Racials) then return "fireblood racials 12"; end
     end
   end
   -- bag_of_tricks,if=talent.obliteration&!buff.pillar_of_frost.up&buff.unholy_strength.up
   if S.BagofTricks:IsCastable() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and Player:BuffUp(S.UnholyStrengthBuff)) then
-    if Cast(S.BagofTricks, Settings.Commons2.GCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racials 14"; end
+    if Cast(S.BagofTricks, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racials 14"; end
   end
   -- bag_of_tricks,if=!talent.obliteration&buff.pillar_of_frost.up&(buff.unholy_strength.up&buff.unholy_strength.remains<gcd*3|buff.pillar_of_frost.remains<gcd*3)
   if S.BagofTricks:IsCastable() and ((not S.Obliteration:IsAvailable()) and Player:BuffUp(S.PillarofFrostBuff) and (Player:BuffUp(S.UnholyStrengthBuff) and Player:BuffRemains(S.UnholyStrengthBuff) < Player:GCD() * 3 or Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() * 3)) then
-    if Cast(S.BagofTricks, Settings.Commons2.GCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racials 16"; end
+    if Cast(S.BagofTricks, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racials 16"; end
   end
 end
 
