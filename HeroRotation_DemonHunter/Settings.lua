@@ -32,10 +32,10 @@ HR.GUISettings.APL.DemonHunter = {
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      Racials = true,
     },
     OffGCDasOffGCD = {
       Disrupt = true,
+      Racials = true,
     },
   },
   Vengeance = {
