@@ -31,13 +31,10 @@ HR.GUISettings.APL.Warlock = {
     HidePetSummon = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      -- Racials
-      Racials = true,
-      -- Abilities
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      -- Abilities
+      Racials = true,
       SpellLock = true,
     }
   },

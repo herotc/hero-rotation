@@ -160,15 +160,15 @@ local function oGCD()
     end
     -- berserking,if=pet.infernal.active|!talent.summon_infernal|(time_to_die<(cooldown.summon_infernal.remains+cooldown.berserking.duration)&(time_to_die>cooldown.berserking.duration))|time_to_die<cooldown.summon_infernal.remains
     if S.Berserking:IsCastable() and (FightRemains < (S.SummonInfernal:CooldownRemains() + 12) and (FightRemains > 12) or FightRemains < S.SummonInfernal:CooldownRemains()) then
-      if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking cds 10"; end
+      if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 10"; end
     end
     -- blood_fury,if=pet.infernal.active|!talent.summon_infernal|(time_to_die<cooldown.summon_infernal.remains+10+cooldown.blood_fury.duration&time_to_die>cooldown.blood_fury.duration)|time_to_die<cooldown.summon_infernal.remains
     if S.BloodFury:IsCastable() and (FightRemains < (S.SummonInfernal:CooldownRemains() + 10 + 15) and (FightRemains > 15) or FightRemains < S.SummonInfernal:CooldownRemains()) then
-      if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury cds 12"; end
+      if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 12"; end
     end
     -- fireblood,if=pet.infernal.active|!talent.summon_infernal|(time_to_die<cooldown.summon_infernal.remains+10+cooldown.fireblood.duration&time_to_die>cooldown.fireblood.duration)|time_to_die<cooldown.summon_infernal.remains
     if S.Fireblood:IsCastable() and (FightRemains < (S.SummonInfernal:CooldownRemains() + 10 + 8) and (FightRemains > 8) or FightRemains < S.SummonInfernal:CooldownRemains()) then
-      if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood cds 14"; end
+      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 14"; end
     end
   end
 end

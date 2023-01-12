@@ -207,15 +207,15 @@ local function Ogcd()
   end
   --berserking
   if S.Berserking:IsCastable() then
-    if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking ogcd 66"; end
+    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking ogcd 66"; end
   end
   --blood_fury
   if S.BloodFury:IsCastable() then
-    if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury ogcd 67"; end
+    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury ogcd 67"; end
   end
   --fireblood
   if S.Fireblood:IsCastable() then
-    if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood ogcd 68"; end
+    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood ogcd 68"; end
   end
 end
 

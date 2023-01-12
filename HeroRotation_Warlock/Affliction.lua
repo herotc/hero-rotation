@@ -166,17 +166,17 @@ local function oGCD()
     end
     -- berserking,if=variable.cds_active
     if S.Berserking:IsCastable() then
-      if Cast(S.Berserking, Settings.Commons.GCDasOffGCD.Racials) then return "berserking ogcd 4"; end
+      if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking ogcd 4"; end
     end
     -- blood_fury,if=variable.cds_active
     if S.BloodFury:IsCastable() then
-      if Cast(S.BloodFury, Settings.Commons.GCDasOffGCD.Racials) then return "blood_fury ogcd 6"; end
+      if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury ogcd 6"; end
     end
     -- invoke_external_buff,name=power_infusion,if=variable.cds_active
     -- Note: Not handling external buffs
     -- fireblood,if=variable.cds_active
     if S.Fireblood:IsCastable() then
-      if Cast(S.Fireblood, Settings.Commons.GCDasOffGCD.Racials) then return "fireblood ogcd 8"; end
+      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood ogcd 8"; end
     end
   end
 end
