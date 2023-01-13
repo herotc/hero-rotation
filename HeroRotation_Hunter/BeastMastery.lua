@@ -190,18 +190,6 @@ local function CDs()
   if S.Berserking:IsCastable() and ((not S.BestialWrath:IsAvailable()) or Player:BuffUp(S.BestialWrathBuff) or FightRemains < 16) then
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 2"; end
   end
-  -- use_items,slots=trinket1,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<31
-  -- use_items,slots=trinket2,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<31
-  -- use_item,name=manic_grieftorch,if=pet.main.buff.frenzy.remains>execute_time
-  -- use_item,name=darkmoon_deck_box_rime
-  -- use_item,name=darkmoon_deck_box_inferno
-  -- use_item,name=darkmoon_deck_box_dance
-  -- use_item,name=darkmoon_deck_box_watcher
-  -- use_item,name=decoration_of_flame
-  -- use_item,name=stormeaters_boon
-  -- use_item,name=windscar_whetstone
-  -- use_item,name=globe_of_jagged_ice
-  -- Moved to Trinkets() so trinkets aren't relying on CDsON
   -- blood_fury,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<16
   if S.BloodFury:IsCastable() and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and (Player:BuffUp(S.BestialWrathBuff) and (Player:BloodlustUp() or Target:HealthPercentage() < 20)) or FightRemains < 16) then
     if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 8"; end
