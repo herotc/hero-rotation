@@ -443,8 +443,8 @@ local function APL()
     if CDsON() and S.PhantomSingularity:IsCastable() and ((not S.SoulRot:IsAvailable()) or S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or not S.SummonDarkglare:IsAvailable()) then
       if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity main 18"; end
     end
-    -- vile_taint
-    if CDsON() and S.VileTaint:IsReady() then
+    -- vile_taint,if=!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|talent.souleaters_gluttony.rank<2&cooldown.soul_rot.remains>=12
+    if CDsON() and S.VileTaint:IsReady() and ((not S.SoulRot:IsAvailable()) or S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() or S.SouleatersGluttony:TalentRank() < 2 and S.SoulRot:CooldownRemains() >= 12) then
       if Cast(S.VileTaint, nil, nil, not Target:IsSpellInRange(S.VileTaint)) then return "vile_taint main 20"; end
     end
     -- soul_rot,if=variable.ps_up&variable.vt_up|!talent.summon_darkglare
@@ -456,7 +456,7 @@ local function APL()
     if CDsON() and S.SummonDarkglare:IsCastable() and (VarPSUp and VarVTUp and VarSRUp) then
       if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare main 24"; end
     end
-    if S.MaleficRapture:IsReady() and
+    if S.MaleficRapture:IsReady() and (
       -- malefic_rapture,if=soul_shard>4|(talent.tormented_crescendo&buff.tormented_crescendo.stack=1&soul_shard>3)
       (Player:SoulShardsP() > 4 or (S.TormentedCrescendo:IsAvailable() and Player:BuffStack(S.TormentedCrescendoBuff) == 1 and Player:SoulShardsP() > 3)) or
       -- malefic_rapture,if=talent.dread_touch&talent.malefic_affliction&debuff.dread_touch.remains<2&buff.malefic_affliction.stack=3
@@ -470,7 +470,8 @@ local function APL()
       -- malefic_rapture,if=variable.cd_dots_up
       (VarCDDoTsUp) or
       -- malefic_rapture,if=talent.tormented_crescendo&talent.nightfall&buff.tormented_crescendo.react&buff.nightfall.react
-      (S.TormentedCrescendo:IsAvailable() and S.Nightfall:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Player:BuffUp(S.NightfallBuff)) then
+      (S.TormentedCrescendo:IsAvailable() and S.Nightfall:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Player:BuffUp(S.NightfallBuff))
+    ) then
         if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 26"; end
     end
     -- drain_life,if=buff.inevitable_demise.stack>48|buff.inevitable_demise.stack>20&time_to_die<4

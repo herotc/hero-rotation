@@ -109,6 +109,7 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   SoulRot                               = Spell(386997),
   SoulSwap                              = Spell(386951),
   SoulTap                               = Spell(387073),
+  SouleatersGluttony                    = Spell(389630),
   SowtheSeeds                           = Spell(196226),
   TormentedCrescendo                    = Spell(387075),
   UnstableAffliction                    = Spell(316099),
