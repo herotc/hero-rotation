@@ -29,13 +29,10 @@ HR.GUISettings.APL.Priest = {
       Signature = "Suggested",
     },
     GCDasOffGCD = {
-      -- Abilities
       PowerWordFortitude = true,
     },
     OffGCDasOffGCD = {
-      -- Racials
       Racials = true,
-      -- Abilities
       Silence = true,
     }
   },
@@ -48,21 +45,20 @@ HR.GUISettings.APL.Priest = {
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      -- Abilities
+      DarkAscension = true,
+      DarkVoid = true,
+      DivineStar = true,
+      Halo = false,
       Mindbender = true,
       ShadowCrash = false,
       Shadowform = true,
       ShadowWordDeath = false,
       VoidEruption = true,
-      DarkAscension = true,
-      DarkVoid = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      -- Abilities
       Dispersion = true,
       PowerInfusion = false,
-      -- Items
     }
   },
   Discipline = {
@@ -71,15 +67,12 @@ HR.GUISettings.APL.Priest = {
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      -- Abilities
       Mindbender = true,
       PowerInfusion = true,
       ShadowCovenant = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      -- Abilities
-      -- Items
     }
   },
   Holy = {

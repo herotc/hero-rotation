@@ -45,10 +45,16 @@ HL.AddCoreOverride ("Player.Insanity",
     else
       if Player:IsCasting(SpellShadow.MindBlast) then
         return Insanity + 6
-      elseif Player:IsCasting(SpellShadow.VampiricTouch) then
+      elseif Player:IsCasting(SpellShadow.VampiricTouch) or Player:IsCasting(SpellShadow.MindSpike) then
         return Insanity + 4
       elseif Player:IsCasting(SpellShadow.MindFlay) then
         return Insanity + (12 / SpellShadow.MindFlay:BaseDuration())
+      elseif Player:IsCasting(SpellShadow.DarkVoid) then
+        return Insanity + 15
+      elseif Player:IsCasting(SpellShadow.DarkAscension) then
+        return Insanity + 30
+      elseif Player:IsCasting(SpellShadow.VoidTorrent) then
+        return Insanity + (60 / SpellShadow.VoidTorrent:BaseDuration())
       else
         return Insanity
       end
