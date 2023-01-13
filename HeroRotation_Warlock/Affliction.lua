@@ -125,7 +125,7 @@ end
 local function Variables()
   -- variable,name=ps_up,op=set,value=dot.phantom_singularity.ticking|!talent.phantom_singularity
   VarPSUp = (Target:DebuffUp(S.PhantomSingularityDebuff) or not S.PhantomSingularity:IsAvailable())
-  -- variable,name=vt_up,op=set,value=dot.vile_taint.ticking|!talent.vile_taint
+  -- variable,name=vt_up,op=set,value=dot.vile_taint_dot.ticking|!talent.vile_taint
   VarVTUp = (Target:DebuffUp(S.VileTaintDebuff) or not S.VileTaint:IsAvailable())
   -- variable,name=sr_up,op=set,value=dot.soul_rot.ticking|!talent.soul_rot
   VarSRUp = (Target:DebuffUp(S.SoulRotDebuff) or not S.SoulRot:IsAvailable())
@@ -321,7 +321,7 @@ local function Cleave()
   if S.MaleficRapture:IsReady() and not S.DreadTouch:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) then
     if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 32"; end
   end
-  -- malefic_rapture,if=!talent.dread_touch&(dot.soul_rot.remains>cast_time|dot.phantom_singularity.remains>cast_time|dot.vile_taint.remains>cast_time|pet.darkglare.active)
+  -- malefic_rapture,if=!talent.dread_touch&(dot.soul_rot.remains>cast_time|dot.phantom_singularity.remains>cast_time|dot.vile_taint_dot.remains>cast_time|pet.darkglare.active)
   if S.MaleficRapture:IsReady() and not S.DreadTouch:IsAvailable() and (Target:DebuffRemains(S.SoulRotDebuff) > S.MaleficRapture:CastTime() or Target:DebuffRemains(S.PhantomSingularityDebuff) > S.MaleficRapture:CastTime() or Target:DebuffRemains(S.VileTaintDebuff) > S.MaleficRapture:CastTime() or HL.GuardiansTable.DarkglareDuration > 0) then
     if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 34"; end
   end
