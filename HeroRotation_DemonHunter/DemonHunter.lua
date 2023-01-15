@@ -26,6 +26,7 @@ Spell.DemonHunter.Commons = {
   -- Racials
   ArcaneTorrent                         = Spell(50613),
   -- Abilities
+  Glide                                 = Spell(131347),
   ImmolationAura                        = Spell(258920),
   ImmolationAuraBuff                    = Spell(258920),
   -- Talents
