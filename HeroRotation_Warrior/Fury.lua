@@ -65,7 +65,7 @@ local function Precombat()
     if Cast(S.BerserkerStance) then return "berserker_stance 28"; end
   end
   -- use_item,name=algethar_puzzle_box
-  if I.AlgethaPuzzleBox:IsEquippedAndReady() then
+  if CDsON() and I.AlgethaPuzzleBox:IsEquippedAndReady() then
     if Cast(I.AlgethaPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box main 2"; end
   end
   -- Manually Added: Charge if not in melee. Bloodthirst if in melee
@@ -321,7 +321,7 @@ local function APL()
       if Cast(S.HeroicLeap, nil, Settings.Commons.DisplayStyle.HeroicLeap) then return "heroic_leap main 36"; end
     end
     -- potion
-    if Settings.Commons.Enabled.Potions then
+    if CDsON() and Settings.Commons.Enabled.Potions then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
         if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 37"; end
@@ -338,18 +338,18 @@ local function APL()
         if Cast(S.ImpendingVictory, nil, nil, not TargetInMeleeRange) then return "impending_victory heal"; end
       end
     end
-    --use_item,name=manic_grieftorch,if=buff.recklessness.down&buff.avatar.down
-    if Settings.Commons.Enabled.Trinkets then
-      if I.ManicGrieftorch:IsEquippedAndReady() and Player:BuffDown(S.RecklessnessBuff) and Player:BuffDown(S.Avatar) then
-        if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch main 38"; end
-      end
-      -- Manually added: use_items generic
-      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
-      end
-    end
     if CDsON() then
+      --use_item,name=manic_grieftorch,if=buff.recklessness.down&buff.avatar.down
+      if Settings.Commons.Enabled.Trinkets then
+        if I.ManicGrieftorch:IsEquippedAndReady() and Player:BuffDown(S.RecklessnessBuff) and Player:BuffDown(S.Avatar) then
+          if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch main 38"; end
+        end
+        -- Manually added: use_items generic
+        local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+        if TrinketToUse then
+          if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+        end
+      end
       -- ravager,if=cooldown.avatar.remains<3
       -- Note: manually added cast if avatar was pressed before ravager and end of fight
       if S.Ravager:IsCastable() and (S.Avatar:CooldownRemains() < 3 or Player:BuffRemains(S.AvatarBuff) >= 10 or HL.FightRemains() < 10) then
