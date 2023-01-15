@@ -27,7 +27,7 @@ HavocOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
       local HMIA = HR.GUISettings.APL.DemonHunter.Havoc.HideMetaIfActive
       return BaseCheck and ((HMIA and Player:BuffDown(SpellHavoc.MetamorphosisBuff)) or not HMIA)
     elseif self == SpellHavoc.FelRush then
-      return BaseCheck or (Player:BuffUp(SpellHavoc.Glide) and and SpellHavoc.FelRush:Charges() >= 1)
+      return BaseCheck or (Player:BuffUp(SpellHavoc.Glide) and SpellHavoc.FelRush:Charges() >= 1)
     elseif self == SpellHavoc.VengefulRetreat then
       return BaseCheck or (Player:BuffUp(SpellHavoc.Glide) and SpellHavoc.VengefulRetreat:IsLearned() and SpellHavoc.VengefulRetreat:CooldownRemains() < 0.3)
     else
