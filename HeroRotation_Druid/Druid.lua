@@ -244,6 +244,7 @@ Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Commons, {
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Commons = {
   -- Trinkets
+  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
   -- Other On-Use Items
   Jotungeirr                            = Item(186404),

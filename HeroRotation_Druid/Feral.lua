@@ -262,6 +262,10 @@ local function Precombat()
   if S.MarkoftheWild:IsCastable() and (Player:BuffDown(S.MarkoftheWildBuff, true) or Everyone.GroupBuffMissing(S.MarkoftheWildBuff)) then
     if Cast(S.MarkoftheWild, Settings.Commons.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat"; end
   end
+  -- use_item,name=algethar_puzzle_box
+  if I.AlgetharPuzzleBox:IsEquippedAndReady() then
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 1"; end
+  end
   -- cat_form
   if S.CatForm:IsCastable() then
     if Cast(S.CatForm) then return "cat_form precombat 2"; end
