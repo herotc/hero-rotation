@@ -351,7 +351,7 @@ local function Filler()
   end
   -- shadow_word_death,target_if=target.health.pct<20
   if S.ShadowWordDeath:IsReady() then
-    if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateCycleSWDFiller, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 22"; end
+    if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateTargetIfSWDFiller, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 22"; end
   end
   -- divine_star
   -- Note: Handled in above divine_star line, as we're not checking raid_event.adds.in
