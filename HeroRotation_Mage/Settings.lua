@@ -89,17 +89,14 @@ HR.GUISettings.APL.Mage = {
     Enabled={
       ManaGem = true,
     },
-    AMSpamRotation = false,
     StayDistance = false,
     UseTemporalWarp = true,
     MovingRotation = false,
-    MirrorImagesBeforePull = false,
-    UseFishingOpener = false,
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
       RuneOfPower = true,
-      ArcanePower = true,
+      ArcaneSurge = true,
       MirrorImage = true,
       TouchOfTheMagi = true,
       Evocation = true,
@@ -127,12 +124,8 @@ local CP_Frost = CreateChildPanel(CP_Mage, "Frost")
 CreateARPanelOptions(CP_Mage, "APL.Mage.Commons")
 
 -- Arcane
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AMSpamRotation", "Use AM spam rotation", "Enable the use of the Arcane Missile Spam rotation.")
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseFishingOpener", "Use Fishing Opener", "The fishing opener begins with RoP and fishes for CC procs to use during TotM/AP.")
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).")
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.StayDistance", "Stay at distance", "Only use Arcane Explosion if in range or on the left icon.")
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MovingRotation", "Disable cast abilities when moving", "Don't show abilities where a ca&st is needed (makes the rotation a bit clunky with small steps).")
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseTemporalWarp", "Suggest Time Warp with Temporal Warp legendary", "Show time warp ability when using the Temporal Warp legendary")
 CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane")
 
 -- Fire

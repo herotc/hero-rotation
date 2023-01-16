@@ -44,9 +44,9 @@ end
 local ArcaneOldPlayerAffectingCombat
 ArcaneOldPlayerAffectingCombat = HL.AddCoreOverride("Player.AffectingCombat",
   function (self)
-    return SpellArcane.Frostbolt:InFlight() or SpellArcane.ArcaneBlast:InFlight() or ArcaneOldPlayerAffectingCombat(self)
+    return SpellArcane.ArcaneBlast:InFlight() or ArcaneOldPlayerAffectingCombat(self)
   end
-, 64)
+, 62)
 
 local ArcaneOldSpellCooldownRemains
 ArcaneOldSpellCooldownRemains = HL.AddCoreOverride("Spell.CooldownRemains",
@@ -76,12 +76,6 @@ ArcanePlayerBuff = HL.AddCoreOverride("Player.BuffUp",
     local BaseCheck = ArcanePlayerBuff(self, Spell, AnyCaster, Offset)
     if Spell == SpellArcane.RuneofPowerBuff then
       return self:IsCasting(SpellArcane.RuneofPower) or (ROPRemains(Spell) > 0)
-    elseif Spell == SpellArcane.RuleofThreesBuff then
-      if self:IsCasting(SpellArcane.ArcaneBlast) then
-        return self:ArcaneCharges() == 2
-      else
-        return BaseCheck
-      end
     else
       return BaseCheck
     end
@@ -103,17 +97,11 @@ HL.AddCoreOverride("Spell.IsCastable",
     local BaseCheck = self:IsLearned() and self:CooldownRemains( BypassRecovery, Offset or "Auto") == 0 and RangeOK and Player:Mana() >= self:Cost()
     if self == SpellArcane.PresenceofMind then
       return BaseCheck  and Player:BuffDown(SpellArcane.PresenceofMind)
-    elseif self == SpellArcane.MirrorsofTorment then
-      return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellArcane.RadiantSpark then
       return BaseCheck and not Player:IsCasting(self)    
     elseif self == SpellArcane.ShiftingPower then
       return BaseCheck and not Player:IsCasting(self)    
-    elseif self == SpellArcane.Deathborne then
-      return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellArcane.TouchoftheMagi then
-      return BaseCheck and not Player:IsCasting(self)
-    elseif self == SpellArcane.Frostbolt then
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellArcane.ConjureManaGem then
       local ManaGem = Item.Mage.Arcane.ManaGem

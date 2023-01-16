@@ -65,40 +65,56 @@ Spell.Mage.Commons = {
   IceNova                               = Spell(157997), --splash, 8
   Meteor                                = Spell(153561),
   ShiftingPower                         = Spell(382440), --Melee 15
+  TemporalWarp                          = Spell(386539),
+  TemporalWarpBuff                      = Spell(386540),
 }
 
 Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   -- Abilities
-  ArcaneBarrage                         = Spell(44425), --Splash, 10
   ArcaneBlast                           = Spell(30451),
-  ArcaneMissiles                        = Spell(5143),
-  ArcanePower                           = Spell(12042),
   ClearcastingBuff                      = Spell(263725),
-  ConjureManaGem                        = Spell(759),
-  Evocation                             = Spell(12051),
   FireBlast                             = Spell(319836),
-  PresenceofMind                        = Spell(205025),
-  TouchoftheMagi                        = Spell(321507), --Splash, 8
-  TouchoftheMagiDebuff                  = Spell(210824),
-  PrismaticBarrier                      = Spell(235450),
-  GreaterInvisibility                   = Spell(110959),
   -- Talents
   Amplification                         = Spell(236628),
+  ArcaneBarrage                         = Spell(44425), --Splash, 10
+  ArcaneBombardment                     = Spell(384581),
   ArcaneEcho                            = Spell(342231), --Splash, 8
+  ArcaneHarmony                         = Spell(384452),
+  ArcaneHarmonyBuff                     = Spell(384455),
   ArcaneFamiliar                        = Spell(205022),
   ArcaneFamiliarBuff                    = Spell(210126),
+  ArcaneMissiles                        = Spell(5143),
   ArcaneOrb                             = Spell(153626), --Splash, 16
+  ArcanePower                           = Spell(321739),
+  ArcaneSurge                           = Spell(365350),--for whatever reason, the spell id is not 365350 when you have Arcane Power talented
+  ArcaneSurgeBuff                       = Spell(365362),
+  CascadingPower                        = Spell(384276),
+  ConjureManaGem                        = Spell(759),
+  Concentration                         = Spell(384374),
+  ConcentrationBuff                     = Spell(384379),
   Enlightened                           = Spell(321387),
+  Evocation                             = Spell(12051),
+  GreaterInvisibility                   = Spell(110959),
   NetherTempest                         = Spell(114923), --Splash, 10
+  NetherTempestDebuff                   = Spell(114923), --Splash, 10
+  NetherPrecision                       = Spell(383782),
+  NetherPrecisionBuff                   = Spell(383783),
   Overpowered                           = Spell(155147),
+  PresenceofMind                        = Spell(205025),
+  PresenceofMindBuff                    = Spell(205025),
+  PrismaticBarrier                      = Spell(235450),
+  RadiantSpark                          = Spell(376103),
+  RadiantSparkDebuff                    = Spell(376103),
+  RadiantSparkVulnerability             = Spell(376104),
   Resonance                             = Spell(205028),
   RuleofThrees                          = Spell(264354),
   RuleofThreesBuff                      = Spell(264774),
+  SiphonStorm                           = Spell(384187),
+  SiphonStormBuff                       = Spell(384267),
   Slipstream                            = Spell(236457),
   Supernova                             = Spell(157980), --Splash, 8
-  -- Legendaries (Shadowlands)
-  ArcaneHarmonyBuff                     = Spell(332777),
-  SiphonStormBuff                       = Spell(332934),
+  TouchoftheMagi                        = Spell(321507), --Splash, 8
+  TouchoftheMagiDebuff                  = Spell(210824),
 })
 
 Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {

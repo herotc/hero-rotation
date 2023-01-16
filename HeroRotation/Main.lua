@@ -329,7 +329,7 @@
       [254]   = "HeroRotation_Hunter",        -- Marksmanship
       [255]   = "HeroRotation_Hunter",        -- Survival
     -- Mage
-      --[62]    = "HeroRotation_Mage",          -- Arcane
+      [62]    = "HeroRotation_Mage",          -- Arcane
       --[63]    = "HeroRotation_Mage",          -- Fire
       [64]    = "HeroRotation_Mage",          -- Frost
     -- Monk
