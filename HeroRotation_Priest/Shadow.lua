@@ -397,7 +397,7 @@ local function CDs()
   -- invoke_external_buff,name=power_infusion,if=(buff.voidform.up|buff.dark_ascension.up)&!buff.power_infusion.up
   -- Note: Not handling external buffs
   -- void_eruption,if=!cooldown.fiend.up&(pet.fiend.active|!talent.mindbender|spell_targets.mind_sear>2&talent.inescapable_torment.rank<2)&(cooldown.mind_blast.charges=0|time>15|buff.shadowy_insight.up&cooldown.mind_blast.charges=buff.shadowy_insight.stack)
-  if S.VoidEruption:IsCastable() and (Fiend:CooldownDown() and (VarFiendUp or (not S.Mindbender:IsAvailable()) or EnemiesCount10ySplash > 2 and S.InescapableTorment:TalentRank() < 2) and (S.MindBlast:Charges() == 0 or HL.CombatTime > 15 or Player:BuffUp(S.ShadowyInsightBuff) and S.MindBlast:Charges() == Player:BuffStack(S.ShadowyInsightBuff))) then
+  if S.VoidEruption:IsCastable() and (Fiend:CooldownDown() and (VarFiendUp or (not S.Mindbender:IsAvailable()) or EnemiesCount10ySplash > 2 and S.InescapableTorment:TalentRank() < 2) and (S.MindBlast:Charges() == 0 or HL.CombatTime() > 15 or Player:BuffUp(S.ShadowyInsightBuff) and S.MindBlast:Charges() == Player:BuffStack(S.ShadowyInsightBuff))) then
     if Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption) then return "void_eruption cds 14"; end
   end
   -- dark_ascension,if=pet.fiend.active|!talent.mindbender&!cooldown.fiend.up|spell_targets.mind_sear>2&talent.inescapable_torment.rank<2
