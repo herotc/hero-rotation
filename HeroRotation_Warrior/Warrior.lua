@@ -52,6 +52,7 @@ Spell.Warrior.Commons = {
   ImpendingVictory                      = Spell(202168),
   OverwhelmingRage                      = Spell(382767),
   RallyingCry                           = Spell(97462),
+  RumblingEarth                         = Spell(275339),
   Shockwave                             = Spell(46968),
   SonicBoom                             = Spell(390725),
   SpearofBastion                        = Spell(376079),
@@ -158,16 +159,28 @@ Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   ShieldBlock                           = Spell(2565),
   ShieldSlam                            = Spell(23922),
   -- Talents
+  BarbaricTraining                      = Spell(390675),
+  Bolster                               = Spell(280001),
   BoomingVoice                          = Spell(202743),
+  ChampionsBulwark                      = Spell(386328),
   DemoralizingShout                     = Spell(1160),
+  EnduringDefenses                      = Spell(386027),
+  HeavyRepercussions                    = Spell(203177),
   IgnorePain                            = Spell(190456),
   Intervene                             = Spell(3411),
+  ImpenetrableWall                      = Spell(384072),
+  Juggernaut                            = Spell(393967),
   LastStand                             = Spell(12975),
+  Massacre                              = Spell(281001),
   Ravager                               = Spell(228920),
   Rend                                  = Spell(394062),
   Revenge                               = Spell(6572),
+  SeismicReverberation                  = Spell(382956),
   ShieldCharge                          = Spell(385952),
   ShieldWall                            = Spell(871),
+  SuddenDeath                           = Spell(29725),
+  SuddenDeathBuff                       = Spell(52437),
+  UnnervingFocus                        = Spell(384042),
   UnstoppableForce                      = Spell(275336),
   -- Buffs
   LastStandBuff                         = Spell(12975),
@@ -177,7 +190,9 @@ Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   ShieldBlockBuff                       = Spell(132404),
   ShieldWallBuff                        = Spell(871),
   ViolentOutburstBuff                   = Spell(386478),
+  VanguardsDeterminationBuff            = Spell(394056),--T29 2P
   -- Debuffs
+  RendDebuff                            = Spell(388539),
 })
 
 -- Items
