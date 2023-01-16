@@ -178,7 +178,7 @@ local function Cooldowns()
     if Cast(S.ShieldofVengeance, Settings.Retribution.GCDasOffGCD.ShieldOfVengeance) then return "shield_of_vengeance cooldowns 10"; end
   end
   -- avenging_wrath,if=((holy_power>=4&time<5|holy_power>=3&time>5)|talent.holy_avenger&cooldown.holy_avenger.remains=0)&(!talent.seraphim|!talent.final_reckoning|cooldown.seraphim.remains>0)
-  if S.AvengingWrath:IsCastable() and (((Player:HolyPower() >= 4 and HL.CombatTime() < 5 or Player:HolyPower() >= 3 and HL.CombatTime() > 5) or S.HolyAvenger:IsAvailable() and S.HolyAvenger:CooldownUp()) ((not S.Seraphim:IsAvailable()) or (not S.FinalReckoning:IsAvailable()) or S.Seraphim:CooldownDown())) then
+  if S.AvengingWrath:IsCastable() and (((Player:HolyPower() >= 4 and HL.CombatTime() < 5 or Player:HolyPower() >= 3 and HL.CombatTime() > 5) or S.HolyAvenger:IsAvailable() and S.HolyAvenger:CooldownUp()) and ((not S.Seraphim:IsAvailable()) or (not S.FinalReckoning:IsAvailable()) or S.Seraphim:CooldownDown())) then
     if Cast(S.AvengingWrath, Settings.Retribution.OffGCDasOffGCD.AvengingWrath) then return "avenging_wrath cooldowns 12" end
   end
   -- crusade,if=holy_power>=4&time<5|holy_power>=3&time>5
