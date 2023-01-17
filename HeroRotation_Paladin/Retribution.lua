@@ -319,7 +319,7 @@ local function ESFRActive()
     if Cast(S.WakeofAshes, nil, nil, not Target:IsInRange(12)) then return "wake_of_ashes es_fr_active 6"; end
   end
   -- blade_of_justice,if=talent.expurgation&(!talent.divine_resonance&holy_power<=3|holy_power<=2)
-  if S.BladeofJustice:IsCastable() and (S.Expurgation:ConduitEnabled() and ((not S.DivineResonance:IsAvailable()) and Player:HolyPower() <= 3 or Player:HolyPower() <= 2)) then
+  if S.BladeofJustice:IsCastable() and (S.Expurgation:IsAvailable() and ((not S.DivineResonance:IsAvailable()) and Player:HolyPower() <= 3 or Player:HolyPower() <= 2)) then
     if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice es_fr_active 8"; end
   end
   -- judgment,if=!debuff.judgment.up&holy_power>=2

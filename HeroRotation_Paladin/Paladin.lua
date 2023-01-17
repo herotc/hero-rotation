@@ -110,6 +110,7 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   ExecutionSentence                     = Spell(343527),
   ExecutionersWrath                     = Spell(387196),
   Exorcism                              = Spell(383185),
+  Expurgation                           = Spell(383344),
   FinalReckoning                        = Spell(343721),
   FinalVerdict                          = Spell(383328),
   FiresofJustice                        = Spell(203316),
