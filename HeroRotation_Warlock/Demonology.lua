@@ -81,6 +81,17 @@ local function WildImpsCount()
   return HL.GuardiansTable.ImpCount or 0
 end
 
+-- Function to check two_cast_imps or last_cast_imps
+local function CheckImpCasts(count)
+  local ImpCount = 0
+  for _, Pet in pairs(HL.GuardiansTable.Pets) do
+    if Pet.ImpCasts <= count then
+      ImpCount = ImpCount + 1
+    end
+  end
+  return ImpCount
+end
+
 -- Function to check for remaining Grimoire Felguard duration
 local function GrimoireFelguardTime()
   return HL.GuardiansTable.FelGuardDuration or 0
@@ -110,7 +121,7 @@ local function Precombat()
   -- variable,name=next_tyrant,op=set,value=14+talent.grimoire_felguard+talent.summon_vilefiend
   VarNextTyrant = 14 + num(S.GrimoireFelguard:IsAvailable()) + num(S.SummonVilefiend:IsAvailable())
   -- power_siphon
-  if CDsON() and S.PowerSiphon:IsCastable() then
+  if CDsON() and S.PowerSiphon:IsReady() then
     if Cast(S.PowerSiphon) then return "power_siphon precombat 32"; end
   end
   -- demonbolt,if=!buff.power_siphon.up
@@ -128,6 +139,8 @@ local function Tyrant()
   if (VarNextTyrant <= HL.CombatTime()) then
     VarNextTyrant = HL.CombatTime() + 14 + num(S.GrimoireFelguard:CooldownUp()) + num(S.SummonVilefiend:CooldownUp())
   end
+  -- invoke_external_buff,name=power_infusion,if=(buff.nether_portal.up&buff.nether_portal.remains<8&talent.nether_portal)|(buff.dreadstalkers.up&variable.next_tyrant-time<=6&!talent.nether_portal)
+  -- Note: Not handling external buffs
   -- shadow_bolt,if=time<2&soul_shard<5
   if S.ShadowBolt:IsCastable() and HL.CombatTime() < 2 and Player:SoulShardsP() < 5 then
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt tyrant 71"; end
@@ -275,6 +288,8 @@ local function APL()
     if S.SummonDemonicTyrant:IsAvailable() and S.SummonDemonicTyrant:CooldownRemains() < VarTyrantPrepStart then
       local ShouldReturn = Tyrant(); if ShouldReturn then return ShouldReturn; end
     end
+    -- invoke_external_buff,name=power_infusion,if=!talent.nether_portal&!talent.summon_demonic_tyrant|time_to_die<25
+    -- Note: Not handling external buffs
     -- implosion,if=time_to_die<2*gcd
     if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and HL.FightRemains() < 2 * Player:GCD() then
       if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsSpellInRange(S.Implosion)) then return "implosion main 39"; end
@@ -329,41 +344,49 @@ local function APL()
     if S.ShadowBolt:IsReady() and Player:SoulShardsP() < 5 and S.FelCovenant:IsAvailable() and Player:BuffRemains(S.FelCovenantBuff) < 5 then
       if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt main 51"; end
     end
-    -- implosion,if=active_enemies>2&buff.wild_imps.stack>=6
-    if S.Implosion:IsReady() and EnemiesCount8ySplash > 2 and WildImpsCount() >= 6 then
-      if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsSpellInRange(S.Implosion)) then return "implosion main 52"; end
+    -- implosion,if=two_cast_imps>0&buff.tyrant.down&active_enemies>1+(talent.sacrificed_souls.enabled)
+    if S.Implosion:IsReady() and (CheckImpCasts(2) > 0 and DemonicTyrantTime() == 0 and EnemiesCount8ySplash > 1 + num(S.SacrificedSouls:IsAvailable())) then
+      if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion main 52"; end
+    end
+    -- implosion,if=buff.wild_imps.stack>9&buff.tyrant.up&active_enemies>2+(1*talent.sacrificed_souls.enabled)&cooldown.call_dreadstalkers.remains>17&talent.the_expendables
+    if S.Implosion:IsReady() and (WildImpsCount() > 9 and DemonicTyrantTime() > 0 and EnemiesCount8ySplash > 2 + num(S.SacrificedSouls:IsAvailable()) and S.CallDreadstalkers:CooldownRemains() > 17 and S.TheExpendables:IsAvailable()) then
+      if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion main 53"; end
+    end
+    -- implosion,if=active_enemies=1&last_cast_imps>0&buff.tyrant.down&talent.imp_gang_boss.enabled&!talent.sacrificed_souls
+    if S.Implosion:IsReady() and (EnemiesCount8ySplash == 1 and CheckImpCasts(1) > 0 and DemonicTyrantTime() == 0 and S.ImpGangBoss:IsAvailable() and not S.SacrificedSouls:IsAvailable()) then
+      if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion main 54"; end
     end
     -- soul_strike,if=soul_shard<5&active_enemies>1
     if S.SoulStrike:IsReady() and Player:SoulShardsP() < 5 and EnemiesCount8ySplash > 1 then
-      if Cast(S.SoulStrike, nil, nil, not Target:IsSpellInRange(S.SoulStrike)) then return "soul_strike main 53"; end
+      if Cast(S.SoulStrike, nil, nil, not Target:IsSpellInRange(S.SoulStrike)) then return "soul_strike main 55"; end
     end
     -- summon_soulkeeper,if=active_enemies>1&buff.tormented_soul.stack=10
     if S.SummonSoulkeeper:IsReady() and EnemiesCount8ySplash > 1 and S.SummonSoulkeeper:Count() == 10 then
-      if Cast(S.SummonSoulkeeper) then return "soul_strike main 54"; end
+      if Cast(S.SummonSoulkeeper) then return "soul_strike main 56"; end
     end
     -- demonbolt,if=buff.demonic_core.react&soul_shard<4
     if S.Demonbolt:IsReady() and Player:BuffUp(S.DemonicCoreBuff) and Player:SoulShardsP() < 4 then
-      if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 55"; end
+      if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 57"; end
     end
     -- power_siphon,if=buff.demonic_core.stack<1&(buff.dreadstalkers.remains>3|buff.dreadstalkers.down)
     if CDsON() and S.PowerSiphon:IsReady() and Player:BuffDown(S.DemonicCoreBuff) and (GrimoireFelguardTime() > 3 or GrimoireFelguardTime() == 0) then
-      if Cast(S.PowerSiphon) then return "power_siphon main 56"; end
+      if Cast(S.PowerSiphon) then return "power_siphon main 58"; end
     end
     -- hand_of_guldan,if=soul_shard>2&(!talent.summon_demonic_tyrant|cooldown.summon_demonic_tyrant.remains_expected>variable.tyrant_prep_start+2)
     if S.HandofGuldan:IsReady() and Player:SoulShardsP() > 2 and (not S.SummonDemonicTyrant:IsAvailable() or S.SummonDemonicTyrant:CooldownRemains() > VarTyrantPrepStart + 2) then
-      if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 57"; end
+      if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 59"; end
     end
     -- doom,target_if=refreshable
     if S.Doom:IsReady() then
-      if Everyone.CastCycle(S.Doom, Enemies40y, EvaluateDoom, not Target:IsSpellInRange(S.Doom)) then return "doom main 58"; end
+      if Everyone.CastCycle(S.Doom, Enemies40y, EvaluateDoom, not Target:IsSpellInRange(S.Doom)) then return "doom main 60"; end
     end
     -- soul_strike,if=soul_shard<5
     if S.SoulStrike:IsReady() and Player:SoulShardsP() < 5 then
-      if Cast(S.SoulStrike, nil, nil, not Target:IsSpellInRange(S.SoulStrike)) then return "soul_strike main 59"; end
+      if Cast(S.SoulStrike, nil, nil, not Target:IsSpellInRange(S.SoulStrike)) then return "soul_strike main 61"; end
     end
     -- shadow_bolt
     if S.ShadowBolt:IsReady() then
-      if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt main 60"; end
+      if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt main 62"; end
     end
   end
 end
