@@ -32,6 +32,16 @@ local I = Item.Mage.Arcane;
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.ConjuredChillglobe:ID(),
+  I.DesperateInvokersCodex:ID(),
+  I.DMDDance:ID(),
+  I.DMDDanceBox:ID(),
+  I.DMDInferno:ID(),
+  I.DMDInfernoBox:ID(),
+  I.DMDRime:ID(),
+  I.DMDRimeBox:ID(),
+  I.IcebloodDeathsnare:ID(),
+  I.TimebreachingTalon:ID(),
 }
 
 -- GUI Settings
@@ -96,7 +106,7 @@ local function Precombat()
   -- variable,name=opener_min_mana,op=set,value=225000-(25000*!talent.arcane_harmony)
   var_opener_min_mana = 225000 - (25000 * num(not S.ArcaneHarmony:IsAvailable()))
   -- variable,name=steroid_trinket_equipped,op=set,value=equipped.gladiators_badge|equipped.irideus_fragment|equipped.erupting_spear_fragment|equipped.spoils_of_neltharus|equipped.tome_of_unstable_power|equipped.timebreaching_talon|equipped.horn_of_valor
-  -- TODO: manage trinkets
+  var_steroid_trinket_equipped = (I.GladiatorsBadgeofFerocity:IsEquipped() or I.IrideusFragment:IsEquipped() or I.EruptingSpearFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped())
   -- mirror_image
   if S.MirrorImage:IsCastable() and CDsON() and Settings.Arcane.MirrorImagesBeforePull then
     if Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 6"; end
@@ -185,7 +195,9 @@ local function AoeSparkPhase()
     if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe_spark_phase 4"; end
   end
   -- use_item,name=timebreaching_talon,if=cooldown.arcane_surge.remains<=(gcd.max*2)
-  -- TODO: manage trinkets
+  if I.TimebreachingTalon:IsEquippedAndReady() and (S.ArcaneSurge:CooldownRemains() <= GCDMax * 2) then
+    if Cast(I.TimebreachingTalon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timebreaching_talon aoe_spark_phase 6"; end
+  end
   -- arcane_explosion,if=buff.arcane_charge.stack>=3&prev_gcd.1.radiant_spark
   if S.ArcaneExplosion:IsReady() and (Player:ArcaneCharges() >= 3 and Player:PrevGCDP(1, S.RadiantSpark)) then
     if CastAE(S.ArcaneExplosion) then return "arcane_explosion aoe_spark_phase 8"; end
@@ -399,7 +411,9 @@ local function SparkPhase()
     if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark spark_phase 12"; end
   end
   -- use_item,name=timebreaching_talon,if=cooldown.arcane_surge.remains<=(gcd.max*3)
-  -- TODO: manage trinkets
+  if I.TimebreachingTalon:IsEquippedAndReady() and (S.ArcaneSurge:CooldownRemains() <= GCDMax * 3) then
+    if Cast(I.TimebreachingTalon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timebreaching_talon spark_phase 14"; end
+  end
   -- nether_tempest,if=(prev_gcd.4.radiant_spark&cooldown.arcane_surge.remains<=execute_time)|prev_gcd.5.radiant_spark,line_cd=15
   if S.NetherTempest:IsReady() and S.NetherTempest:TimeSinceLastCast() >= 15 and ((Player:PrevGCDP(4, S.RadiantSpark) and S.ArcaneSurge:CooldownRemains() <= S.NetherTempest:ExecuteTime()) or Player:PrevGCDP(5, S.RadiantSpark)) then
     if Cast(S.NetherTempest, nil, nil, not Target:IsSpellInRange(S.NetherTempest)) then return "nether_tempest spark_phase 16"; end
@@ -586,13 +600,42 @@ local function APL()
           end
         end
         -- use_item,name=tinker_breath_of_neltharion,if=cooldown.arcane_surge.remains&buff.rune_of_power.down&buff.arcane_surge.down&debuff.touch_of_the_magi.down
-        -- use_item,name=conjured_chillglobe,if=mana.pct>65&(!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20)
-        -- use_item,name=darkmoon_deck_rime,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
-        -- use_item,name=darkmoon_deck_dance,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
-        -- use_item,name=darkmoon_deck_inferno,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
-        -- use_item,name=desperate_invokers_codex,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
-        -- use_item,name=iceblood_deathsnare,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
-        -- TODO: manage trinkets
+        -- TODO: Handle tinkers
+        if (not var_steroid_trinket_equipped) or S.ArcaneSurge:CooldownRemains() > 20 then
+          -- use_item,name=conjured_chillglobe,if=mana.pct>65&(!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20)
+          if I.ConjuredChillglobe:IsEquippedAndReady() and (Player:ManaPercentage() > 65) then
+            if Cast(I.ConjuredChillglobe, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "conjured_chillglobe main 18"; end
+          end
+          -- use_item,name=darkmoon_deck_rime,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
+          if I.DMDRime:IsEquippedAndReady() then
+            if Cast(I.DMDRime, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "darkmoon_deck_rime main 20"; end
+          end
+          if I.DMDRimeBox:IsEquippedAndReady() then
+            if Cast(I.DMDRimeBox, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "darkmoon_deck_box_rime main 20"; end
+          end
+          -- use_item,name=darkmoon_deck_dance,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
+          if I.DMDDance:IsEquippedAndReady() then
+            if Cast(I.DMDDance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(25)) then return "darkmoon_deck_dance main 22"; end
+          end
+          if I.DMDDanceBox:IsEquippedAndReady() then
+            if Cast(I.DMDDanceBox, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(25)) then return "darkmoon_deck_box_dance main 22"; end
+          end
+          -- use_item,name=darkmoon_deck_inferno,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
+          if I.DMDInferno:IsEquippedAndReady() then
+            if Cast(I.DMDInferno, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "darkmoon_deck_inferno main 24"; end
+          end
+          if I.DMDInfernoBox:IsEquippedAndReady() then
+            if Cast(I.DMDInfernoBox, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "darkmoon_deck_box_inferno main 24"; end
+          end
+          -- use_item,name=desperate_invokers_codex,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
+          if I.DesperateInvokersCodex:IsEquippedAndReady() then
+            if Cast(I.DesperateInvokersCodex, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "desperate_invokers_codex main 26"; end
+          end
+          -- use_item,name=iceblood_deathsnare,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
+          if I.IcebloodDeathsnare:IsEquippedAndReady() then
+            if Cast(I.IcebloodDeathsnare, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "iceblood_deathsnare main 28"; end
+          end
+        end
       end
     end
     -- Var calculations

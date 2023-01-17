@@ -200,6 +200,22 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Commons = {
   -- Trinkets
+  ConjuredChillglobe                    = Item(194300, {13, 14}),
+  DesperateInvokersCodex                = Item(194310, {13, 14}),
+  DMDDance                              = Item(198088, {13, 14}),
+  DMDDanceBox                           = Item(198478, {13, 14}),
+  DMDInferno                            = Item(198086, {13, 14}),
+  DMDInfernoBox                         = Item(194872, {13, 14}),
+  DMDRime                               = Item(198087, {13, 14}),
+  DMDRimeBox                            = Item(198477, {13, 14}),
+  EruptingSpearFragment                 = Item(193769, {13, 14}),
+  GladiatorsBadgeofFerocity             = Item(201807, {13, 14}),
+  HornofValor                           = Item(133642, {13, 14}),
+  IcebloodDeathsnare                    = Item(194304, {13, 14}),
+  IriduesFragment                       = Item(193743, {13, 14}),
+  SpoilsofNeltharus                     = Item(193773, {13, 14}),
+  TimebreachingTalon                    = Item(193791, {13, 14}),
+  TomeofUnstablePower                   = Item(193628, {13, 14}),
   -- Other On-Use Items
 }
 
