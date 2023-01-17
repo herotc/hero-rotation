@@ -62,6 +62,11 @@ local Stuns = {
 local VarHoldTod = false
 local VarFoPPreChan = 0
 
+-- Trinkets
+local equip = Player:GetEquipment()
+local trinket1 = equip[13] and Item(equip[13]) or Item(0)
+local trinket2 = equip[14] and Item(equip[14]) or Item(0)
+
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
 local Monk = HR.Commons.Monk
@@ -80,6 +85,12 @@ end, "PLAYER_REGEN_ENABLED")
 HL:RegisterForEvent(function()
   VarTrinketType = (S.Serenity:IsAvailable()) and 1 or 2
 end, "PLAYER_TALENT_UPDATE")
+
+HL:RegisterForEvent(function()
+  equip = Player:GetEquipment()
+  trinket1 = equip[13] and Item(equip[13]) or Item(0)
+  trinket2 = equip[14] and Item(equip[14]) or Item(0)
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function EnergyTimeToMaxRounded()
   -- Round to the nearesth 10th to reduce prediction instability on very high regen rates
@@ -281,6 +292,10 @@ local function CDSerenity()
   if S.InvokeXuenTheWhiteTiger:IsCastable() and ((not VarHoldXuen) and (not S.BonedustBrew:IsAvailable()) and S.RisingSunKick:CooldownRemains() < 2 or FightRemains < 25) then
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_serenity 6"; end
   end
+  -- use_items
+  if Settings.Commons.Enabled.Trinkets then
+    local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
+  end
   -- bonedust_brew,if=!buff.bonedust_brew.up&(cooldown.serenity.up|cooldown.serenity.remains>15|fight_remains<30&fight_remains>10)|fight_remains<10
   if S.BonedustBrew:IsCastable() and (Player:BuffDown(S.BonedustBrewBuff) and (S.Serenity:CooldownUp() or S.Serenity:CooldownRemains() > 15 or FightRemains < 30 and FightRemains > 10) or FightRemains < 10) then
     if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "bonedust_brew cd_serenity 8"; end
@@ -323,10 +338,6 @@ local function CDSerenity()
   if S.LightsJudgment:IsCastable() then
     if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment cd_serenity 26"; end
   end
-  -- use_items
-  if Settings.Commons.Enabled.Trinkets then
-    local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
-  end
 end
 
 local function CDSEF()
@@ -343,6 +354,10 @@ local function CDSEF()
   -- invoke_xuen_the_white_tiger,if=!variable.hold_xuen&!talent.bonedust_brew&(cooldown.rising_sun_kick.remains<2)&chi>=3
   if S.InvokeXuenTheWhiteTiger:IsCastable() and ((not VarHoldXuen) and (not S.BonedustBrew:IsAvailable()) and S.RisingSunKick:CooldownRemains() < 2 and Player:Chi() >= 3) then
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_sef 6"; end
+  end
+  -- use_items
+  if Settings.Commons.Enabled.Trinkets then
+    local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
   end
   -- storm_earth_and_fire,if=talent.bonedust_brew&(fight_remains<30&cooldown.bonedust_brew.remains<4&chi>=4|buff.bonedust_brew.up|!spinning_crane_kick.max&active_enemies>=3&cooldown.bonedust_brew.remains<=2&chi>=2)&(pet.xuen_the_white_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>cooldown.storm_earth_and_fire.full_recharge_time)
   if S.StormEarthAndFire:IsCastable() and (S.BonedustBrew:IsAvailable() and (FightRemains < 30 and S.BonedustBrew:CooldownRemains() < 4 and Player:Chi() >= 4 or Player:BuffUp(S.BonedustBrewBuff) or (not SCKMax()) and EnemiesCount8y >= 3 and S.BonedustBrew:CooldownRemains() <= 2 and Player:Chi() >= 2) and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > S.StormEarthAndFire:FullRechargeTime())) then
@@ -364,10 +379,6 @@ local function CDSEF()
   -- Note: APL uses different lines for FIGHT_STYLE_DUNGEON_ROUTE. We're not using those.
   if S.TouchofDeath:IsReady() and (ComboStrike(S.TouchofDeath)) then
     if Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath, nil, not Target:IsInMeleeRange(5)) then return "touch_of_death cd_sef 14"; end
-  end
-  -- use_items
-  if Settings.Commons.Enabled.Trinkets then
-    local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
   end
   -- With Xuen: touch_of_karma,target_if=max:target.time_to_die,if=fight_remains>90|pet.xuen_the_white_tiger.active|variable.hold_xuen|fight_remains<16
   -- Without Xuen: touch_of_karma,if=fight_remains>159|variable.hold_xuen
@@ -769,6 +780,10 @@ local function APL()
     -- chi_burst,if=talent.faeline_stomp&cooldown.faeline_stomp.remains&(chi.max-chi>=1&active_enemies=1|chi.max-chi>=2&active_enemies>=2)
     if S.ChiBurst:IsCastable() and (S.FaelineStomp:IsAvailable() and S.FaelineStomp:CooldownDown() and (Player:ChiDeficit() >= 1 and EnemiesCount8y == 1 or Player:ChiDeficit() >= 2 and EnemiesCount8y >= 2)) then
       if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst main 12"; end
+    end
+    -- use_item,name=manic_grieftorch,if=(trinket.1.is.manic_grieftorch&!trinket.2.has_use_buff|trinket.2.is.manic_grieftorch&!trinket.1.has_use_buff)
+    if I.ManicGrieftorch:IsEquippedAndReady() and (trinket1:ID() == I.ManicGrieftorch:ID() and (not trinket2:TrinketHasUseBuff()) or trinket2:ID() == I.ManicGrieftorch:ID() and not trinket1:TrinketHasUseBuff()) then
+      if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "manic_grieftorch main 14"; end
     end
     -- call_action_list,name=cd_sef,if=!talent.serenity
     if (CDsON() and not S.Serenity:IsAvailable()) then
