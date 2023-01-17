@@ -96,37 +96,7 @@ local EnemiesCount10yMelee,EnemiesCount18yMelee
 local Enemies8ySplash,Enemies10yMelee,Enemies18yMelee
 local UnitsWithIgniteCount
 
-local ExpandedPotentialEquipped = Player:HasLegendaryEquipped(6)
-local DisciplinaryCommandEquipped = Player:HasLegendaryEquipped(7)
-local GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
-local TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
-local FeveredIncantationEquipped = Player:HasLegendaryEquipped(10)
-local FirestormEquipped = Player:HasLegendaryEquipped(11)
-local MoltenSkyfallEquipped = Player:HasLegendaryEquipped(12)
-local SunKingsBlessingEquipped = Player:HasLegendaryEquipped(13)
-local DeathFathomEquipped = Player:HasLegendaryEquipped(221)
-local SinfulDelightEquipped = Player:HasLegendaryEquipped(222)
-
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
-
--- Update CovenantID if we change Covenants
 HL:RegisterForEvent(function()
-  CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN")
-
-HL:RegisterForEvent(function()
-  ExpandedPotentialEquipped = Player:HasLegendaryEquipped(6)
-  DisciplinaryCommandEquipped = Player:HasLegendaryEquipped(7)
-  GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
-  TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
-  FeveredIncantationEquipped = Player:HasLegendaryEquipped(10)
-  FirestormEquipped = Player:HasLegendaryEquipped(11)
-  MoltenSkyfallEquipped = Player:HasLegendaryEquipped(12)
-  SunKingsBlessingEquipped = Player:HasLegendaryEquipped(13)
-  DeathFathomEquipped = Player:HasLegendaryEquipped(221)
-  SinfulDelightEquipped = Player:HasLegendaryEquipped(222)
   var_combustion_on_use = (I.SinfulGladiatorsBadge:IsEquipped() or I.SinfulAspirantsBadge:IsEquipped() or I.MacabreSheetMusic:IsEquipped() or I.InscrutableQuantumDevice:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.EmpyrealOrdnance:IsEquipped() or I.FlameofBattle:IsEquipped() or I.WakenersFrond:IsEquipped() or I.InstructorsDivineBell:IsEquipped() or I.ShadowedOrbofTorment:IsEquipped())
 end, "PLAYER_EQUIPMENT_CHANGED")
 

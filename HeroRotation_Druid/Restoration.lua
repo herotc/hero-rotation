@@ -58,23 +58,10 @@ local EclipseLunarNext = false
 local EclipseSolarNext = false
 local EclipseAnyNext = false
 
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
-
--- Update CovenantID if we change Covenants
-HL:RegisterForEvent(function()
-  CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN")
-
 -- Legendaries
-local DeepFocusEquipped = Player:HasLegendaryEquipped(46)
-local ElderDruidEquipped = Player:HasLegendaryEquipped(49)
 local CelestialSpiritsEquipped = (Player:HasLegendaryEquipped(226) or CovenantID == 3 and Player:HasUnity())
 
 HL:RegisterForEvent(function()
-  DeepFocusEquipped = Player:HasLegendaryEquipped(46)
-  ElderDruidEquipped = Player:HasLegendaryEquipped(49)
   CelestialSpiritsEquipped = (Player:HasLegendaryEquipped(226) or CovenantID == 3 and Player:HasUnity())
 end, "PLAYER_EQUIPMENT_CHANGED")
 
