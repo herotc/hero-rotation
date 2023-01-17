@@ -67,6 +67,8 @@ local VarPoolAmount = 60
 local VarMaxVTs = 0
 local VarIsVTPossible = false
 local VarVTsApplied = false
+local VarHoldingCrash = false
+local VarManualVTsApplied = false
 local VarPoolForCDs = false
 local VarDPCutoff = false
 local Fiend = (S.Mindbender:IsAvailable()) and S.Mindbender or S.Shadowfiend
@@ -84,6 +86,8 @@ HL:RegisterForEvent(function()
   VarMaxVTs = 0
   VarIsVTPossible = false
   VarVTsApplied = false
+  VarHoldingCrash = false
+  VarManualVTsApplied = false
   VarPoolForCDs = false
   VarDPCutoff = false
 end, "PLAYER_REGEN_ENABLED")
@@ -184,7 +188,7 @@ local function EvaluateCycleVoidTorrentMain(TargetUnit)
 end
 
 local function EvaluateCycleVTAoE(TargetUnit)
-  -- target_if=refreshable&target.time_to_die>=18&(dot.vampiric_touch.ticking|!variable.vts_applied),if=variable.max_vts>0&(cooldown.shadow_crash.remains>=dot.vampiric_touch.remains&!action.shadow_crash.in_flight|variable.holding_crash)
+  -- target_if=refreshable&target.time_to_die>=18&(dot.vampiric_touch.ticking|!variable.vts_applied)
   if S.ShadowCrash:CooldownRemains() >= TargetUnit:DebuffRemains(S.VampiricTouchDebuff) and (not S.ShadowCrash:InFlight()) or VarHoldingCrash then
     return (TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) and TargetUnit:TimeToDie() >= 18 and (TargetUnit:DebuffUp(S.VampiricTouchDebuff) or not VarVTsApplied))
   else
@@ -250,8 +254,8 @@ local function MainVariables()
 end
 
 local function AoEVariables()
-  -- variable,name=max_vts,op=set,default=8,value=spell_targets.vampiric_touch
-  VarMaxVTs = EnemiesCount10ySplash
+  -- variable,name=max_vts,op=set,default=12,value=spell_targets.vampiric_touch>?12
+  VarMaxVTs = mathmin(EnemiesCount10ySplash, 12)
   -- variable,name=is_vt_possible,op=set,value=0,default=1
   VarIsVTPossible = false
   -- variable,name=is_vt_possible,op=set,value=1,target_if=max:(target.time_to_die*dot.vampiric_touch.refreshable),if=target.time_to_die>=18
@@ -265,6 +269,8 @@ local function AoEVariables()
   if VarHoldingCrash then
     VarHoldingCrash = (VarMaxVTs - S.VampiricTouchDebuff:AuraActiveCount()) < 4
   end
+  -- variable,name=manual_vts_applied,op=set,value=(active_dot.vampiric_touch+8*!variable.holding_crash)>=variable.max_vts|!variable.is_vt_possible
+  VarManualVTsApplied = ((S.VampiricTouchDebuff:AuraActiveCount() + 8 * num(not VarHoldingCrash)) >= VarMaxVTs or not VarIsVTPossible)
   -- variable,name=pool_for_cds,op=set,value=(cooldown.void_eruption.remains<=gcd.max*3&talent.void_eruption|cooldown.dark_ascension.up&talent.dark_ascension)|talent.void_torrent&talent.psychic_link&cooldown.void_torrent.remains<=4&(!raid_event.adds.exists&spell_targets.vampiric_touch>1|raid_event.adds.in<=5|raid_event.adds.remains>=6&!variable.holding_crash)&!buff.voidform.up
   VarPoolForCDs = ((S.VoidEruption:CooldownRemains() <= Player:GCD() * 3 and S.VoidEruption:IsAvailable() or S.DarkAscension:CooldownUp() and S.DarkAscension:IsAvailable()) or S.VoidTorrent:IsAvailable() and S.PsychicLink:IsAvailable() and S.VoidTorrent:CooldownRemains() <= 4 and (not VarHoldingCrash) and Player:BuffDown(S.VoidformBuff))
 end
@@ -417,6 +423,10 @@ end
 local function Main()
   -- call_action_list,name=main_variables
   MainVariables()
+  -- call_action_list,name=cds,if=fight_remains<30|time_to_die>15&(!variable.holding_crash|spell_targets.mind_sear>2)
+  if CDsON() and (FightRemains < 30 or Target:TimeToDie() > 15 and ((not VarHoldingCrash) or EnemiesCount10ySplash > 2)) then
+    local ShouldReturn = CDs(); if ShouldReturn then return ShouldReturn; end
+  end
   -- mindbender,if=(variable.dots_up|action.shadow_crash.in_flight)&(fight_remains<30|time_to_die>15)
   if Fiend:IsCastable() and ((VarDotsUp or S.ShadowCrash:InFlight()) and (FightRemains < 30 or Target:TimeToDie() > 15)) then
     if Cast(Fiend, Settings.Shadow.GCDasOffGCD.Mindbender) then return "mindbender main 2"; end
@@ -465,8 +475,8 @@ local function Main()
   if S.Mindgames:IsReady() and (not Player:IsCasting(S.Mindgames)) and (EnemiesCount10ySplash < 5 and VarAllDotsUp) then
     if Cast(S.Mindgames, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames main 24"; end
   end
-  -- shadow_crash,if=raid_event.adds.in>10
-  if S.ShadowCrash:IsCastable() then
+  -- shadow_crash,if=!variable.holding_crash
+  if S.ShadowCrash:IsCastable() and (not VarHoldingCrash) then
     if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash main 26"; end
   end
   -- dark_void,if=raid_event.adds.in>20
@@ -477,8 +487,8 @@ local function Main()
   if S.DevouringPlague:IsReady() and (Player:BuffUp(S.VoidformBuff) and VarDotsUp and VarDPCutoff) then
     if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 30"; end
   end
-  -- void_torrent,if=insanity<=35,target_if=variable.all_dots_up
-  if S.VoidTorrent:IsCastable() and (Player:Insanity() <= 35) then
+  -- void_torrent,if=insanity<=35&!variable.holding_crash,target_if=variable.all_dots_up
+  if S.VoidTorrent:IsCastable() and (Player:Insanity() <= 35 and not VarHoldingCrash) then
     if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent 32"; end
   end
   -- call_action_list,name=filler
@@ -494,20 +504,20 @@ local function PLTorrent()
   if S.VampiricTouch:IsCastable() and (Target:DebuffRemains(S.VampiricTouchDebuff) <= 6 and S.VoidTorrent:CooldownRemains() < Player:GCD() * 2) then
     if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch pl_torrent 4"; end
   end
-  -- devouring_plague,if=remains<=4&cooldown.void_torrent.remains<gcd&!buff.voidform.up
-  if S.DevouringPlague:IsReady() and (Target:DebuffRemains(S.DevouringPlagueDebuff) <= 4 and S.VoidTorrent:CooldownRemains() < Player:GCD() and Player:BuffDown(S.VoidformBuff)) then
+  -- devouring_plague,if=remains<=4&cooldown.void_torrent.remains<gcd*2&!buff.voidform.up&(spell_targets.mind_sear<=4|!talent.surge_of_darkness&cooldown.mind_blast.full_recharge_time>=3)&!buff.mind_devourer.up
+  if S.DevouringPlague:IsReady() and (Target:DebuffRemains(S.DevouringPlagueDebuff) <= 4 and S.VoidTorrent:CooldownRemains() < Player:GCD() * 2 and Player:BuffDown(S.VoidformBuff) and (EnemiesCount10ySplash <= 4 or (not S.SurgeOfDarkness:IsAvailable()) and S.MindBlast:FullRechargeTime() >= 3) and Player:BuffDown(S.MindDevourerBuff)) then
     if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague pl_torrent 6"; end
   end
-  -- mind_sear,if=buff.voidform.up&insanity>=50
-  if S.MindSear:IsReady() and (Player:BuffUp(S.VoidformBuff) and Player:Insanity() >= 50) then
+  -- mind_sear,if=!variable.dp_cutoff|buff.mind_devourer.up
+  if S.MindSear:IsReady() and ((not VarDPCutoff) or Player:BuffUp(S.MindDevourerBuff)) then
     if Cast(S.MindSear, nil, nil, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear pl_torrent 8"; end
   end
   -- mind_blast,if=!talent.mindgames|cooldown.mindgames.remains>=3&!prev_gcd.1.mind_blast
   if S.MindBlast:IsReady() and ((not S.Mindgames:IsAvailable()) or S.Mindgames:CooldownRemains() >= 3 and not Player:PrevGCD(1, S.MindBlast)) then
     if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast pl_torrent 10"; end
   end
-  -- void_torrent,if=dot.vampiric_touch.ticking&dot.shadow_word_pain.ticking&dot.devouring_plague.ticking|buff.voidform.up
-  if S.VoidTorrent:IsCastable() and (DotsUp(Target, true) or Player:BuffUp(S.VoidformBuff)) then
+  -- void_torrent,if=dot.vampiric_touch.ticking&dot.shadow_word_pain.ticking|buff.voidform.up
+  if S.VoidTorrent:IsCastable() and (DotsUp(Target, false) or Player:BuffUp(S.VoidformBuff)) then
     if Cast(S.VoidTorrent, nil, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent pl_torrent 12"; end
   end
   -- mindgames,if=dot.vampiric_touch.ticking&dot.shadow_word_pain.ticking&dot.devouring_plague.ticking|buff.voidform.up
@@ -519,9 +529,17 @@ end
 local function AoE()
   -- call_action_list,name=aoe_variables
   AoEVariables()
+  -- vampiric_touch,target_if=refreshable&target.time_to_die>=18&(dot.vampiric_touch.ticking|!variable.vts_applied),if=variable.max_vts>0&!variable.manual_vts_applied
+  if S.VampiricTouch:IsCastable() and (VarMaxVTs > 0 and not VarManualVTsApplied) then
+    if Everyone.CastCycle(S.VampiricTouch, Enemies40y, EvaluateCycleVTAoE, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch aoe 1"; end
+  end
   -- shadow_crash,if=!variable.holding_crash
   if S.ShadowCrash:IsCastable() and (not VarHoldingCrash) then
     if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash aoe 2"; end
+  end
+  -- call_action_list,name=cds,if=fight_remains<30|time_to_die>15&(!variable.holding_crash|spell_targets.mind_sear>2)
+  if CDsON() and (FightRemains < 30 or Target:TimeToDie() > 15 and ((not VarHoldingCrash) or EnemiesCount10ySplash > 2)) then
+    local ShouldReturn = CDs(); if ShouldReturn then return ShouldReturn; end
   end
   -- dark_void,if=raid_event.adds.in>10
   if S.DarkVoid:IsCastable() then
@@ -547,8 +565,8 @@ local function AoE()
   if S.MindSear:IsReady() and (Player:BuffUp(S.MindDevourerBuff) and EnemiesCount10ySplash > 1 or EnemiesCount10ySplash > VarMindSearCutoff and (Player:Insanity() >= 75 or ((not Player:HasTier(29, 2)) or Player:BuffDown(S.DarkReveries)) or ((not Player:HasTier(29, 2)) or Player:BuffStack(S.GatheringShadowsBuff) == 3)) and not VarPoolForCDs) then
     if Cast(S.MindSear, nil, nil, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear aoe 14"; end
   end
-  -- call_action_list,name=pl_torrent,if=ptr=1&talent.void_torrent&talent.psychic_link&cooldown.void_torrent.remains<=3&(!variable.holding_crash|raid_event.adds.count%(active_dot.vampiric_touch+raid_event.adds.count)<1.5)&((insanity>=50|dot.devouring_plague.ticking)&!buff.mind_devourer.up|buff.voidform.up)
-  if S.VoidTorrent:IsAvailable() and S.PsychicLink:IsAvailable() and S.VoidTorrent:CooldownRemains() <= 3 and ((not VarHoldingCrash) or EnemiesCount10ySplash / (S.VampiricTouchDebuff:AuraActiveCount() + EnemiesCount10ySplash) < 1.5) and ((Player:Insanity() >= 50 or Target:DebuffUp(S.DevouringPlagueDebuff)) and Player:BuffDown(S.MindDevourerBuff) or Player:BuffUp(S.VoidformBuff)) then
+  -- call_action_list,name=pl_torrent,if=ptr=1&talent.void_torrent&talent.psychic_link&cooldown.void_torrent.remains<=3&(!variable.holding_crash|raid_event.adds.count%(active_dot.vampiric_touch+raid_event.adds.count)<1.5)&((insanity>=50|dot.devouring_plague.ticking|buff.dark_reveries.up)|buff.voidform.up)
+  if S.VoidTorrent:IsAvailable() and S.PsychicLink:IsAvailable() and S.VoidTorrent:CooldownRemains() <= 3 and ((not VarHoldingCrash) or EnemiesCount10ySplash / (S.VampiricTouchDebuff:AuraActiveCount() + EnemiesCount10ySplash) < 1.5) and ((Player:Insanity() >= 50 or Target:DebuffUp(S.DevouringPlagueDebuff) or Player:BuffUp(S.DarkReveriesBuff)) or Player:BuffUp(S.VoidformBuff)) then
     local ShouldReturn = PLTorrent(); if ShouldReturn then return ShouldReturn; end
   end
   -- devouring_plague,if=(refreshable&!variable.pool_for_cds|insanity>75&(!buff.mind_flay_insanity.up&talent.mind_flay_insanity|!talent.psychic_link))&variable.dp_cutoff
@@ -641,10 +659,6 @@ local function APL()
     -- variable,name=holding_crash,op=set,value=raid_event.adds.in<20
     -- Note: We have no way of knowing if adds are coming, so don't ever purposely hold crash
     VarHoldingCrash = false
-    -- call_action_list,name=cds,if=fight_remains<30|time_to_die>15
-    if CDsON() and (FightRemains < 30 or Target:TimeToDie() > 15) then
-      local ShouldReturn = CDs(); if ShouldReturn then return ShouldReturn; end
-    end
     -- run_action_list,name=aoe,if=spell_targets.mind_sear>2|spell_targets.vampiric_touch>3
     if (EnemiesCount10ySplash > 2 or EnemiesCount30y > 3) then
       local ShouldReturn = AoE(); if ShouldReturn then return ShouldReturn; end
