@@ -144,6 +144,7 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   AshenRemains                          = Spell(387252),
   AvatarofDestruction                   = Spell(387159),
   Backdraft                             = Spell(196406),
+  BurntoAshes                           = Spell(387153),
   Cataclysm                             = Spell(152108),
   ChannelDemonfire                      = Spell(196447),
   ChaosBolt                             = Spell(116858),
