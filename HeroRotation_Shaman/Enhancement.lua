@@ -67,17 +67,6 @@ local Settings = {
   Enhancement = HR.GUISettings.APL.Shaman.Enhancement
 }
 
--- Legendaries
-local DoomWindsEquipped = Player:HasLegendaryEquipped(138)
-local PrimalLavaActuatorsEquipped = Player:HasLegendaryEquipped(141)
-local SeedsofRampantGrowthEquipped = Player:HasLegendaryEquipped(246)
-
-HL:RegisterForEvent(function()
-  DoomWindsEquipped = Player:HasLegendaryEquipped(138)
-  PrimalLavaActuatorsEquipped = Player:HasLegendaryEquipped(141)
-  SeedsofRampantGrowthEquipped = Player:HasLegendaryEquipped(246)
-end, "PLAYER_EQUIPMENT_CHANGED")
-
 local function TotemFinder()
   for i = 1, 6, 1 do
     if strmatch(Player:TotemName(i), 'Totem') then
