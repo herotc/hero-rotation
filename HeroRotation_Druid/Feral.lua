@@ -63,28 +63,11 @@ local equip = Player:GetEquipment()
 local trinket1 = equip[13] and Item(equip[13]) or Item(0)
 local trinket2 = equip[14] and Item(equip[14]) or Item(0)
 
--- Legendaries
-local DeepFocusEquipped = Player:HasLegendaryEquipped(46)
-local FrenzybandEquipped = Player:HasLegendaryEquipped(54)
-local CateyeCurioEquipped = Player:HasLegendaryEquipped(57)
-
--- Player Covenant
--- 0: none, 1: Kyrian, 2: Venthyr, 3: Night Fae, 4: Necrolord
-local CovenantID = Player:CovenantID()
-
--- Update CovenantID if we change Covenants
-HL:RegisterForEvent(function()
-  CovenantID = Player:CovenantID()
-end, "COVENANT_CHOSEN")
-
 -- Event Registration
 HL:RegisterForEvent(function()
   equip = Player:GetEquipment()
   trinket1 = equip[13] and Item(equip[13]) or Item(0)
   trinket2 = equip[14] and Item(equip[14]) or Item(0)
-  DeepFocusEquipped = Player:HasLegendaryEquipped(46)
-  FrenzybandEquipped = Player:HasLegendaryEquipped(54)
-  CateyeCurioEquipped = Player:HasLegendaryEquipped(57)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
