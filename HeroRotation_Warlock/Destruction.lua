@@ -122,7 +122,7 @@ local function Precombat()
   end
   -- cataclysm
   if S.Cataclysm:IsCastable() then
-    if Cast(S.Cataclysm, nil, nil, not Target:IsInRange(40)) then return "cataclysm precombat 6"; end
+    if Cast(S.Cataclysm, Settings.Destruction.GCDasOffGCD.Cataclysm, nil, not Target:IsInRange(40)) then return "cataclysm precombat 6"; end
   end
   -- incinerate
   if S.Incinerate:IsCastable() and (not Player:IsCasting(S.Incinerate)) then
@@ -241,7 +241,7 @@ local function Cleave()
   end
   -- cataclysm
   if CDsON() and S.Cataclysm:IsCastable() then
-    if Cast(S.Cataclysm, nil, nil, not Target:IsSpellInRange(S.Cataclysm)) then return "cataclysm cleave 6"; end
+    if Cast(S.Cataclysm, Settings.Destruction.GCDasOffGCD.Cataclysm, nil, not Target:IsSpellInRange(S.Cataclysm)) then return "cataclysm cleave 6"; end
   end
   -- channel_demonfire,if=talent.raging_demonfire
   if S.ChannelDemonfire:IsCastable() and (S.RagingDemonfire:IsAvailable()) then
@@ -367,7 +367,7 @@ local function Aoe()
   end
   -- cataclysm
   if CDsON() and S.Cataclysm:IsCastable() then
-    if Cast(S.Cataclysm, nil, nil, not Target:IsSpellInRange(S.Cataclysm)) then return "cataclysm aoe 10"; end
+    if Cast(S.Cataclysm, Settings.Destruction.GCDasOffGCD.Cataclysm, nil, not Target:IsSpellInRange(S.Cataclysm)) then return "cataclysm aoe 10"; end
   end
   -- channel_demonfire,if=dot.immolate.remains>cast_time&talent.raging_demonfire
   if S.ChannelDemonfire:IsCastable() and (Target:DebuffRemains(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime() and S.RagingDemonfire:IsAvailable()) then
@@ -510,7 +510,7 @@ local function APL()
     end
     -- cataclysm
     if CDsON() and S.Cataclysm:IsReady() then
-      if Cast(S.Cataclysm, nil, nil, not Target:IsInRange(40)) then return "cataclysm main 6"; end
+      if Cast(S.Cataclysm, Settings.Destruction.GCDasOffGCD.Cataclysm, nil, not Target:IsInRange(40)) then return "cataclysm main 6"; end
     end
     -- channel_demonfire,if=talent.raging_demonfire
     if S.ChannelDemonfire:IsReady() and S.RagingDemonfire:IsAvailable() then

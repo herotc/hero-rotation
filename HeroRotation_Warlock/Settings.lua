@@ -47,11 +47,12 @@ HR.GUISettings.APL.Warlock = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-      SummonPet = false,
+      Cataclysm = false,
       GrimoireOfSacrifice = true,
-      SummonInfernal = true,
-      SummonSoulkeeper = false,
       InquisitorsGaze = false,
+      SummonInfernal = true,
+      SummonPet = false,
+      SummonSoulkeeper = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
