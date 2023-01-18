@@ -97,7 +97,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_TALENT_UPDATE")
 
 HL:RegisterForEvent(function()
-  S.ShadowCras:RegisterInFlightEffect(205386)
+  S.ShadowCrash:RegisterInFlightEffect(205386)
   S.ShadowCrash:RegisterInFlight()
 end, "LEARNED_SPELL_IN_TAB")
 S.ShadowCrash:RegisterInFlightEffect(205386)
