@@ -38,7 +38,7 @@ local S = Spell.Hunter.Survival
 -- Items
 local I = Item.Hunter.Survival
 local OnUseExcludes = {
-  -- I.Trinket:ID(),
+  I.AlgetharPuzzleBox:ID(),
 }
 
 -- Trinket Item Objects
@@ -190,6 +190,11 @@ local function CDs()
     if PotionSelected and PotionSelected:IsReady() then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 16"; end
     end
+  end
+  -- use_item,name=algethar_puzzle_box,use_off_gcd=1,if=gcd.remains>gcd.max-0.1
+  -- Note: Widened the available window by half a second to account for player reaction.
+  if I.AlgetharPuzzleBox:IsEquippedAndReady() and (Player:GCDRemains() > Player:GCD() - 0.6) then
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cds 17"; end
   end
   -- use_items
   local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
