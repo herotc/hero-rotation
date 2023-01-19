@@ -492,8 +492,8 @@ local function APL()
     end
     -- bloodlust
     -- Not adding this, as when to use Bloodlust will vary fight to fight
-    -- potion,if=(talent.ascendance.enabled&raid_event.adds.in>=90&cooldown.ascendance.remains<10)|(talent.hot_hand.enabled&buff.molten_weapon.up)|buff.icy_edge.up|(talent.stormflurry.enabled&buff.crackling_surge.up)|active_enemies>1|fight_remains<30
-    if Settings.Commons.Enabled.Potions and ((S.Ascendance:IsAvailable() and S.Ascendance:CooldownRemains() < 10) or (S.HotHand:IsAvailable() and Player:BuffUp(S.MoltenWeaponBuff)) or Player:BuffUp(S.IcyEdgeBuff) or (S.Stormflurry:IsAvailable() and Player:BuffUp(S.CracklingSurgeBuff)) or Enemies10yCount > 1 or FightRemains < 30) then
+    -- potion,if=(talent.ascendance.enabled&raid_event.adds.in>=90&cooldown.ascendance.remains<10)|(talent.doom_winds.enabled&buff.doom_winds.up)|(!talent.doom_winds.enabled&!talent.ascendance.enabled&talent.feral_spirit.enabled&buff.feral_spirit.up)|(!talent.doom_winds.enabled&!talent.ascendance.enabled&!talent.feral_spirit.enabled)|active_enemies>1|fight_remains<30
+    if Settings.Commons.Enabled.Potions and ((S.Ascendance:IsAvailable() and Enemies10yCount == 1 and S.Ascendance:CooldownRemains() < 10) or (S.DoomWinds:IsAvailable() and Player:BuffUp(S.DoomWindsBuff)) or ((not S.DoomWinds:IsAvailable()) and (not S.Ascendance:IsAvailable()) and S.FeralSpirit:IsAvailable() and Player:BuffUp(S.FeralSpiritBuff)) or ((not S.DoomWinds:IsAvailable()) and (not S.Ascendance:IsAvailable()) and not S.FeralSpirit:IsAvailable()) or Enemies10yCount > 1 or FightRemains < 30) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
         if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
