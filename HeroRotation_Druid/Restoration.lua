@@ -58,13 +58,6 @@ local EclipseLunarNext = false
 local EclipseSolarNext = false
 local EclipseAnyNext = false
 
--- Legendaries
-local CelestialSpiritsEquipped = (Player:HasLegendaryEquipped(226) or CovenantID == 3 and Player:HasUnity())
-
-HL:RegisterForEvent(function()
-  CelestialSpiritsEquipped = (Player:HasLegendaryEquipped(226) or CovenantID == 3 and Player:HasUnity())
-end, "PLAYER_EQUIPMENT_CHANGED")
-
 HL:RegisterForEvent(function()
   BossFightRemains = 11111
   FightRemains = 11111
