@@ -467,8 +467,8 @@ local function APL()
       (S.TormentedCrescendo:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Target:DebuffDown(S.DreadTouchDebuff)) or
       -- malefic_rapture,if=talent.tormented_crescendo&buff.tormented_crescendo.stack=2
       (S.TormentedCrescendo:IsAvailable() and Player:BuffStack(S.TormentedCrescendoBuff) == 2) or
-      -- malefic_rapture,if=variable.cd_dots_up
-      (VarCDDoTsUp) or
+      -- malefic_rapture,if=variable.cd_dots_up|dot.vile_taint_dot.ticking&soul_shard>1
+      (VarCDDoTsUp or Target:DebuffUp(S.VileTaintDebuff) and Player:SoulShardsP() > 1) or
       -- malefic_rapture,if=talent.tormented_crescendo&talent.nightfall&buff.tormented_crescendo.react&buff.nightfall.react
       (S.TormentedCrescendo:IsAvailable() and S.Nightfall:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Player:BuffUp(S.NightfallBuff))
     ) then
