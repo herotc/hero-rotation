@@ -228,18 +228,18 @@ local function Defensives()
   -- Demon Spikes
   if S.DemonSpikes:IsCastable() and Player:BuffDown(S.DemonSpikesBuff) and Player:BuffDown(S.MetamorphosisBuff) and (EnemiesCount8yMelee == 1 and Player:BuffDown(S.FieryBrandDebuff) or EnemiesCount8yMelee > 1) then
     if S.DemonSpikes:ChargesFractional() > 1.9 then
-      if Cast(S.DemonSpikes, Settings.Vengeance.DisplayStyle.Defensives) then return "demon_spikes defensives (Capped)"; end
+      if Cast(S.DemonSpikes, nil, Settings.Vengeance.DisplayStyle.Defensives) then return "demon_spikes defensives (Capped)"; end
     elseif (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.DemonSpikesHealthThreshold) then
-      if Cast(S.DemonSpikes, Settings.Vengeance.DisplayStyle.Defensives) then return "demon_spikes defensives (Danger)"; end
+      if Cast(S.DemonSpikes, nil, Settings.Vengeance.DisplayStyle.Defensives) then return "demon_spikes defensives (Danger)"; end
     end
   end
   -- Metamorphosis,if=!buff.metamorphosis.up|target.time_to_die<15
   if S.Metamorphosis:IsCastable() and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold and (Player:BuffDown(S.MetamorphosisBuff) or Target:TimeToDie() < 15) then
-    if Cast(S.Metamorphosis, nil, Settings.Vengeance.DisplayStyle.Defensives) then return "metamorphosis defensives"; end
+    if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis) then return "metamorphosis defensives"; end
   end
   -- Fiery Brand
   if S.FieryBrand:IsCastable() and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
-    if Cast(S.FieryBrand, Settings.Vengeance.DisplayStyle.Defensives, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand defensives"; end
+    if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.Defensives, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand defensives"; end
   end
 end
 
