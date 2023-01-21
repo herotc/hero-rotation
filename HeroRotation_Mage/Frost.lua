@@ -124,6 +124,9 @@ local function Cooldowns()
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name() .. " cd 14" end
     end
   end
+  -- invoke_external_buff,name=power_infusion,if=buff.power_infusion.down
+  -- invoke_external_buff,name=blessing_of_summer,if=buff.blessing_of_summer.down
+  -- Note: Not handling external buffs.
   -- blood_fury
   if S.BloodFury:IsCastable() then
     if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cd 10"; end
