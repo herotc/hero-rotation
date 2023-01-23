@@ -93,8 +93,8 @@ local function EvaluateCycleImmolateHavoc(TargetUnit)
 end
 
 local function EvaluateCycleImmolateCleave(TargetUnit)
-  -- if=((talent.internal_combustion&dot.immolate.refreshable)|dot.immolate.remains<3)&(!talent.cataclysm|cooldown.cataclysm.remains>remains)&(!talent.soul_fire|cooldown.soul_fire.remains>remains)
-  return (((S.InternalCombustion:IsAvailable() and TargetUnit:DebuffRefreshable(S.ImmolateDebuff)) or TargetUnit:DebuffRemains(S.ImmolateDebuff) < 3) and ((not S.Cataclysm:IsAvailable()) or S.Cataclysm:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff)) and ((not S.SoulFire:IsAvailable()) or S.SoulFire:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff)))
+  -- if=((talent.internal_combustion&dot.immolate.refreshable)|dot.immolate.remains<3)&(!talent.cataclysm|cooldown.cataclysm.remains>remains)&(!talent.soul_fire|cooldown.soul_fire.remains+(!talent.mayhem*action.soul_fire.cast_time)>dot.immolate.remains)
+  return (((S.InternalCombustion:IsAvailable() and TargetUnit:DebuffRefreshable(S.ImmolateDebuff)) or TargetUnit:DebuffRemains(S.ImmolateDebuff) < 3) and ((not S.Cataclysm:IsAvailable()) or S.Cataclysm:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff)) and ((not S.SoulFire:IsAvailable()) or S.SoulFire:CooldownRemains() + (num(not S.Mayhem:IsAvailable()) * S.SoulFire:CastTime()) > TargetUnit:DebuffRemains(S.ImmolateDebuff)))
 end
 
 local function EvaluateCycleImmolateAoE(TargetUnit)
@@ -139,8 +139,8 @@ local function Items()
     end
   end
   --TODO manage trinkets
-  --use_item,slot=trinket1,if=pet.infernal.active|!talent.summon_infernal|time_to_die<21|trinket.1.cooldown.duration<cooldown.summon_infernal.remains
-  --use_item,slot=trinket2,if=pet.infernal.active|!talent.summon_infernal|time_to_die<21|trinket.2.cooldown.duration<cooldown.summon_infernal.remains
+  --use_item,slot=trinket1,if=pet.infernal.active|!talent.summon_infernal|time_to_die<21|trinket.1.cooldown.duration<cooldown.summon_infernal.remains+5
+  --use_item,slot=trinket2,if=pet.infernal.active|!talent.summon_infernal|time_to_die<21|trinket.2.cooldown.duration<cooldown.summon_infernal.remains+5
   --use_item,slot=trinket1,if=(!talent.rain_of_chaos&time_to_die<cooldown.summon_infernal.remains+trinket.1.cooldown.duration&time_to_die>trinket.1.cooldown.duration)|time_to_die<cooldown.summon_infernal.remains|(trinket.2.cooldown.remains>0&trinket.2.cooldown.remains<cooldown.summon_infernal.remains)
   --use_item,slot=trinket2,if=(!talent.rain_of_chaos&time_to_die<cooldown.summon_infernal.remains+trinket.2.cooldown.duration&time_to_die>trinket.2.cooldown.duration)|time_to_die<cooldown.summon_infernal.remains|(trinket.1.cooldown.remains>0&trinket.1.cooldown.remains<cooldown.summon_infernal.remains)
   --use_item,name=erupting_spear_fragment,if=(!talent.rain_of_chaos&time_to_die<cooldown.summon_infernal.remains+trinket.erupting_spear_fragment.cooldown.duration&time_to_die>trinket.erupting_spear_fragment.cooldown.duration)|time_to_die<cooldown.summon_infernal.remains|trinket.erupting_spear_fragment.cooldown.duration<cooldown.summon_infernal.remains+5
@@ -178,8 +178,8 @@ local function Havoc()
   if S.Conflagrate:IsCastable() and (S.Backdraft:IsAvailable() and Player:BuffDown(S.BackdraftBuff) and Player:SoulShardsP() >= 1 and Player:SoulShardsP() <= 4) then
     if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate havoc 2"; end
   end
-  -- soul_fire,if=cast_time<havoc_remains&soul_shard<3
-  if S.SoulFire:IsCastable() and (S.SoulFire:CastTime() < VarHavocRemains and Player:SoulShardsP() < 3) then
+  -- soul_fire,if=cast_time<havoc_remains&soul_shard<2.5
+  if S.SoulFire:IsCastable() and (S.SoulFire:CastTime() < VarHavocRemains and Player:SoulShardsP() < 2.5) then
     if Cast(S.SoulFire, nil, nil, not Target:IsSpellInRange(S.SoulFire)) then return "soul_fire havoc 4"; end
   end
   -- channel_demonfire,if=soul_shard<4.5&talent.raging_demonfire.rank=2&active_enemies>2
@@ -247,11 +247,11 @@ local function Cleave()
   if S.ChannelDemonfire:IsCastable() and (S.RagingDemonfire:IsAvailable()) then
     if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire cleave 8"; end
   end
-  -- soul_fire,if=soul_shard<=4&!variable.pool_soul_shards
-  if S.SoulFire:IsCastable() and (Player:SoulShardsP() <= 4 and not VarPoolSoulShards) then
+  -- soul_fire,if=soul_shard<=3.5&(debuff.conflagrate.remains>cast_time+travel_time|!talent.roaring_blaze&buff.backdraft.up)&!variable.pool_soul_shards
+  if S.SoulFire:IsCastable() and (Player:SoulShardsP() <= 3.5 and (Target:DebuffRemains(S.RoaringBlazeDebuff) > S.SoulFire:CastTime() + S.SoulFire:TravelTime() or (not S.RoaringBlaze:IsAvailable()) and Player:BuffUp(S.BackdraftBuff)) and not VarPoolSoulShards) then
     if Cast(S.SoulFire, nil, nil, not Target:IsSpellInRange(S.SoulFire)) then return "soul_fire cleave 10"; end
   end
-  -- immolate,cycle_targets=1,if=((talent.internal_combustion&dot.immolate.refreshable)|dot.immolate.remains<3)&(!talent.cataclysm|cooldown.cataclysm.remains>remains)&(!talent.soul_fire|cooldown.soul_fire.remains>remains)
+  -- immolate,cycle_targets=1,if=((talent.internal_combustion&dot.immolate.refreshable)|dot.immolate.remains<3)&(!talent.cataclysm|cooldown.cataclysm.remains>remains)&(!talent.soul_fire|cooldown.soul_fire.remains+(!talent.mayhem*action.soul_fire.cast_time)>dot.immolate.remains)
   if S.Immolate:IsCastable() then
     if Everyone.CastCycle(S.Immolate, Enemies40y, EvaluateCycleImmolateCleave, not Target:IsSpellInRange(S.Immolate)) then return "immolate cleave 12"; end
   end
@@ -516,12 +516,12 @@ local function APL()
     if S.ChannelDemonfire:IsReady() and S.RagingDemonfire:IsAvailable() then
       if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire main 7"; end
     end
-    -- soul_fire,if=soul_shard<=4
-    if S.SoulFire:IsCastable() and (Player:SoulShardsP() <= 4) then
+    -- soul_fire,if=soul_shard<=3.5&(debuff.conflagrate.remains>cast_time+travel_time|!talent.roaring_blaze&buff.backdraft.up)
+    if S.SoulFire:IsCastable() and (Player:SoulShardsP() <= 3.5 and (Target:DebuffRemains(S.RoaringBlazeDebuff) > S.SoulFire:CastTime() + S.SoulFire:TravelTime() or (not S.RoaringBlaze:IsAvailable()) and Player:BuffUp(S.BackdraftBuff))) then
       if Cast(S.SoulFire, nil, nil, not Target:IsSpellInRange(S.SoulFire)) then return "soul_fire main 8"; end
     end
-    -- immolate,if=((dot.immolate.refreshable&talent.internal_combustion)|dot.immolate.remains<3)&(!talent.cataclysm|cooldown.cataclysm.remains>dot.immolate.remains)&(!talent.soul_fire|cooldown.soul_fire.remains>dot.immolate.remains)
-    if S.Immolate:IsCastable() and (((Target:DebuffRefreshable(S.ImmolateDebuff) and S.InternalCombustion:IsAvailable()) or Target:DebuffRemains(S.ImmolateDebuff) < 3) and ((not S.Cataclysm:IsAvailable()) or S.Cataclysm:CooldownRemains() > Target:DebuffRemains(S.ImmolateDebuff)) and ((not S.SoulFire:IsAvailable()) or S.SoulFire:CooldownRemains() > Target:DebuffRemains(S.ImmolateDebuff))) then
+    -- immolate,if=((dot.immolate.refreshable&talent.internal_combustion)|dot.immolate.remains<3)&(!talent.cataclysm|cooldown.cataclysm.remains>dot.immolate.remains)&(!talent.soul_fire|cooldown.soul_fire.remains+action.soul_fire.cast_time>dot.immolate.remains)
+    if S.Immolate:IsCastable() and (((Target:DebuffRefreshable(S.ImmolateDebuff) and S.InternalCombustion:IsAvailable()) or Target:DebuffRemains(S.ImmolateDebuff) < 3) and ((not S.Cataclysm:IsAvailable()) or S.Cataclysm:CooldownRemains() > Target:DebuffRemains(S.ImmolateDebuff)) and ((not S.SoulFire:IsAvailable()) or S.SoulFire:CooldownRemains() + S.SoulFire:CastTime() > Target:DebuffRemains(S.ImmolateDebuff))) then
       if Cast(S.Immolate, nil, nil, not Target:IsSpellInRange(S.Immolate)) then return "immolate main 10"; end
     end
     -- havoc,if=talent.cry_havoc&((buff.ritual_of_ruin.up&pet.infernal.active&talent.burn_to_ashes)|((buff.ritual_of_ruin.up|pet.infernal.active)&!talent.burn_to_ashes))
@@ -585,6 +585,10 @@ local function APL()
     -- Note: Added time_to_die buffer of 0.5s
     if S.Conflagrate:IsCastable() and (S.Conflagrate:Charges() > (S.Conflagrate:MaxCharges() - 1) or FightRemains < Player:GCD() + 0.5) then
       if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 48"; end
+    end
+    -- summon_soulkeeper,if=buff.tormented_soul.stack=10
+    if S.SummonSoulkeeper:IsCastable() and (Player:BuffStack(S.TormentedSoulBuff) == 10) then
+      if Cast(S.SummonSoulkeeper, Settings.Destruction.GCDasOffGCD.SummonSoulkeeper) then return "summon_soulkeeper main 49"; end
     end
     -- incinerate
     if S.Incinerate:IsCastable() then
