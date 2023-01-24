@@ -184,7 +184,7 @@ local function Precombat()
 end
 
 local function CDs()
-  -- invoke_external_buff,name=power_infusion,if=cooldown.bestial_wrath.ready
+  -- invoke_external_buff,name=power_infusion,if=buff.bestial_wrath.up|cooldown.bestial_wrath.remains<30
   -- Note: Not handling external buffs.
   -- berserking,if=!talent.bestial_wrath|buff.bestial_wrath.up|fight_remains<16
   if S.Berserking:IsCastable() and ((not S.BestialWrath:IsAvailable()) or Player:BuffUp(S.BestialWrathBuff) or FightRemains < 16) then
