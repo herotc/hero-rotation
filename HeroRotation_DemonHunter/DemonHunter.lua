@@ -122,6 +122,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   -- Buffs
   ChaosTheoryBuff                       = Spell(390195),
   FuriousGazeBuff                       = Spell(343312),
+  InnerDemonBuff                        = Spell(390145),
   MetamorphosisBuff                     = Spell(162264),
   MomentumBuff                          = Spell(208628),
   TacticalRetreatBuff                   = Spell(389890),
