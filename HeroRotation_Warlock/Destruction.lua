@@ -387,8 +387,8 @@ local function Aoe()
       end
     end
   end
-  -- summon_soulkeeper,if=buff.tormented_soul.stack=10
-  if S.SummonSoulkeeper:IsCastable() and (Player:BuffStack(S.TormentedSoulBuff) == 10) then
+  -- summon_soulkeeper,if=buff.tormented_soul.stack=10|buff.tormented_soul.stack>3&time_to_die<10
+  if S.SummonSoulkeeper:IsCastable() and (S.SummonSoulkeeper:Count() == 10 or S.SummonSoulkeeper:Count() > 3 and FightRemains < 10) then
     if Cast(S.SummonSoulkeeper, Settings.Destruction.GCDasOffGCD.SummonSoulkeeper) then return "summon_soulkeeper aoe 12"; end
   end
   -- call_action_list,name=ogcd
@@ -473,10 +473,6 @@ local function APL()
   -- Summon Pet
   if S.SummonPet:IsCastable() then
     if Cast(S.SummonPet, Settings.Destruction.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
-  end
-  -- inquisitors_gaze
-  if S.InquisitorsGaze:IsCastable() and not Player:BuffUp(S.InquisitorsGazeBuff) then
-    if Cast(S.InquisitorsGaze, Settings.Destruction.GCDasOffGCD.InquisitorsGaze) then return "inquisitors_gaze ooc"; end
   end
 
   if Everyone.TargetIsValid() then
@@ -585,10 +581,6 @@ local function APL()
     -- Note: Added time_to_die buffer of 0.5s
     if S.Conflagrate:IsCastable() and (S.Conflagrate:Charges() > (S.Conflagrate:MaxCharges() - 1) or FightRemains < Player:GCD() + 0.5) then
       if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 48"; end
-    end
-    -- summon_soulkeeper,if=buff.tormented_soul.stack=10
-    if S.SummonSoulkeeper:IsCastable() and (Player:BuffStack(S.TormentedSoulBuff) == 10) then
-      if Cast(S.SummonSoulkeeper, Settings.Destruction.GCDasOffGCD.SummonSoulkeeper) then return "summon_soulkeeper main 49"; end
     end
     -- incinerate
     if S.Incinerate:IsCastable() then
