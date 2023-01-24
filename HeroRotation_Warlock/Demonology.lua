@@ -115,8 +115,6 @@ local function Precombat()
   -- summon_pet
   -- Moved to APL()
   -- snapshot_stats
-  -- inquisitors_gaze
-  -- Moved to APL()
   -- variable,name=tyrant_prep_start,op=set,value=12
   VarTyrantPrepStart = 12
   -- variable,name=next_tyrant,op=set,value=14+talent.grimoire_felguard+talent.summon_vilefiend
@@ -262,10 +260,6 @@ local function APL()
   if S.SummonPet:IsCastable() then
     if Cast(S.SummonPet, Settings.Demonology.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
   end
-  -- inquisitors_gaze
-  if S.InquisitorsGaze:IsCastable() and Player:BuffDown(S.InquisitorsGazeBuff) then
-    if Cast(S.InquisitorsGaze, Settings.Demonology.GCDasOffGCD.InquisitorsGaze) then return "inquisitors_gaze ooc"; end
-  end
 
   if Everyone.TargetIsValid() then
     -- Update CombatTime, which is used in many spell suggestions
@@ -362,8 +356,8 @@ local function APL()
     if S.SoulStrike:IsReady() and (Player:SoulShardsP() < 5 and EnemiesCount8ySplash > 1) then
       if Cast(S.SoulStrike, nil, nil, not Target:IsSpellInRange(S.SoulStrike)) then return "soul_strike main 30"; end
     end
-    -- summon_soulkeeper,if=active_enemies>1&buff.tormented_soul.stack=10
-    if S.SummonSoulkeeper:IsReady() and (EnemiesCount8ySplash > 1 and S.SummonSoulkeeper:Count() == 10) then
+    -- summon_soulkeeper,if=buff.tormented_soul.stack=10&active_enemies>1
+    if S.SummonSoulkeeper:IsReady() and (S.SummonSoulkeeper:Count() == 10 and EnemiesCount8ySplash > 1) then
       if Cast(S.SummonSoulkeeper) then return "soul_strike main 32"; end
     end
     -- demonbolt,if=buff.demonic_core.react&soul_shard<4
