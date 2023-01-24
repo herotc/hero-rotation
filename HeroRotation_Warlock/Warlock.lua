@@ -41,7 +41,6 @@ Spell.Warlock.Commons = {
   Soulburn                              = Spell(385899),
   -- Buffs
   PowerInfusionBuff                     = Spell(10060),
-  TormentedSoulBuff                     = Spell(386251), -- TODO: Verify spell ID
   -- Debuffs
   -- Command Demon Abilities
   AxeToss                               = Spell(119914),

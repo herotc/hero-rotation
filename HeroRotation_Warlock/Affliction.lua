@@ -227,7 +227,7 @@ local function AoE()
     if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life aoe 20"; end
   end
   -- summon_soulkeeper,if=buff.tormented_soul.stack=10|buff.tormented_soul.stack>3&time_to_die<10
-  if S.SummonSoulkeeper:IsReady() and (S.SummonSoulkeeper:Count() == 10 or Player:BuffStack(S.TormentedSoulBuff) > 3 and FightRemains < 10) then
+  if S.SummonSoulkeeper:IsReady() and (S.SummonSoulkeeper:Count() == 10 or S.SummonSoulkeeper:Count() > 3 and FightRemains < 10) then
     if Cast(S.SummonSoulkeeper) then return "soul_strike aoe 22"; end
   end
   -- siphon_life,target_if=remains<5,if=active_dot.siphon_life<3
