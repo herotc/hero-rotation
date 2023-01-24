@@ -218,10 +218,6 @@ local function Precombat()
   if S.ArcaneTorrent:IsCastable() and CDsON() then
     if Cast(S.ArcaneTorrent, nil, nil, not Target:IsSpellInRange(S.ArcaneTorrent)) then return "arcane_torrent precombat 6"; end
   end
-  -- use_item,name=shadowed_orb_of_torment
-  if Settings.Commons.Enabled.Trinkets and I.ShadowedOrbofTorment:IsEquippedAndReady() then
-    if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment precombat 8"; end
-  end
   -- variable,name=mind_sear_cutoff,op=set,value=2
   -- Note: Handled in variable declarations
   -- variable,name=pool_amount,op=set,value=60
@@ -565,7 +561,7 @@ local function AoE()
   if S.MindSear:IsReady() and (Player:BuffUp(S.MindDevourerBuff) and EnemiesCount10ySplash > 1 or EnemiesCount10ySplash > VarMindSearCutoff and (Player:Insanity() >= 75 or ((not Player:HasTier(29, 2)) or Player:BuffDown(S.DarkReveries)) or ((not Player:HasTier(29, 2)) or Player:BuffStack(S.GatheringShadowsBuff) == 3)) and not VarPoolForCDs) then
     if Cast(S.MindSear, nil, nil, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear aoe 14"; end
   end
-  -- call_action_list,name=pl_torrent,if=ptr=1&talent.void_torrent&talent.psychic_link&cooldown.void_torrent.remains<=3&(!variable.holding_crash|raid_event.adds.count%(active_dot.vampiric_touch+raid_event.adds.count)<1.5)&((insanity>=50|dot.devouring_plague.ticking|buff.dark_reveries.up)|buff.voidform.up)
+  -- call_action_list,name=pl_torrent,if=talent.void_torrent&talent.psychic_link&cooldown.void_torrent.remains<=3&(!variable.holding_crash|raid_event.adds.count%(active_dot.vampiric_touch+raid_event.adds.count)<1.5)&((insanity>=50|dot.devouring_plague.ticking|buff.dark_reveries.up)|buff.voidform.up)
   if S.VoidTorrent:IsAvailable() and S.PsychicLink:IsAvailable() and S.VoidTorrent:CooldownRemains() <= 3 and ((not VarHoldingCrash) or EnemiesCount10ySplash / (S.VampiricTouchDebuff:AuraActiveCount() + EnemiesCount10ySplash) < 1.5) and ((Player:Insanity() >= 50 or Target:DebuffUp(S.DevouringPlagueDebuff) or Player:BuffUp(S.DarkReveriesBuff)) or Player:BuffUp(S.VoidformBuff)) then
     local ShouldReturn = PLTorrent(); if ShouldReturn then return ShouldReturn; end
   end

@@ -178,8 +178,6 @@ Item.Priest.Commons = {
   DMDRime                     = Item(198087, {13, 14}),
   DMDRimeBox                  = Item(198477, {13, 14}),
   VoidmendersShadowgem        = Item(110007, {13, 14}),
-  -- SL Trinkets
-  ShadowedOrbofTorment        = Item(186428, {13, 14}),
 }
 
 Item.Priest.Shadow = MergeTableByKey(Item.Priest.Commons, {
