@@ -1,4 +1,4 @@
-## Interface: 100002
+## Interface: 100005
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFFA330C9Demon Hunter|r]
 ## Author: Cilraaz, Kojiyama
