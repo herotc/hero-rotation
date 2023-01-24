@@ -97,6 +97,18 @@ local function EvaluateFlameShockRefreshable(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.FlameShockDebuff))
 end
 
+local function EvaluateFlameShockRefreshable2(TargetUnit)
+  -- target_if=refreshable,if=dot.flame_shock.remains<target.time_to_die-5
+  -- Note: Trimmed items handled before this function is called
+  return (TargetUnit:DebuffRefreshable(S.FlameShockDebuff) and TargetUnit:DebuffRemains(S.FlameShockDebuff) < TargetUnit:TimeToDie() - 5)
+end
+
+local function EvaluateFlameShockRefreshable3(TargetUnit)
+  -- target_if=refreshable,if=dot.flame_shock.remains<target.time_to_die-5&dot.flame_shock.remains>0
+  -- Note: Trimmed items handled before this function is called
+  return (TargetUnit:DebuffRefreshable(S.FlameShockDebuff) and TargetUnit:DebuffRemains(S.FlameShockDebuff) < TargetUnit:TimeToDie() - 5 and TargetUnit:DebuffRemains(S.FlameShockDebuff) > 0)
+end
+
 local function EvaluateFlameShockRemains(TargetUnit)
   -- target_if=min:dot.flame_shock.remains
   return (TargetUnit:DebuffRemains(S.FlameShockDebuff))
@@ -157,137 +169,153 @@ local function Aoe()
   if IsViable(S.Stormkeeper) and (not Player:StormkeeperP()) then
     if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper aoe 6"; end
   end
-  -- primordial_wave,target_if=min:dot.flame_shock.remains,if=!buff.primordial_wave.up&buff.surge_of_power.up&!buff.splintered_elements.up
-  if IsViable(S.PrimordialWave) and (Player:BuffDown(S.PrimordialWaveBuff) and Player:BuffUp(S.SurgeofPowerBuff) and Player:BuffDown(S.SplinteredElementsBuff)) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 8"; end
-  end
-  -- primordial_wave,target_if=min:dot.flame_shock.remains,if=!buff.primordial_wave.up&talent.deeply_rooted_elements.enabled&!talent.surge_of_power.enabled&!buff.splintered_elements.up
-  if IsViable(S.PrimordialWave) and (Player:BuffDown(S.PrimordialWaveBuff) and S.DeeplyRootedElements:IsAvailable() and (not S.SurgeofPower:IsAvailable()) and Player:BuffDown(S.SplinteredElementsBuff)) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 10"; end
-  end
-  -- primordial_wave,target_if=min:dot.flame_shock.remains,if=!buff.primordial_wave.up&talent.master_of_the_elements.enabled&!talent.lightning_rod.enabled
-  if IsViable(S.PrimordialWave) and (Player:BuffDown(S.PrimordialWaveBuff) and S.MasteroftheElements:IsAvailable() and not S.LightningRod:IsAvailable()) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 12"; end
-  end
-  -- flame_shock,target_if=refreshable,if=buff.surge_of_power.up&(!talent.lightning_rod.enabled|talent.skybreakers_fiery_demise.enabled)
-  if S.FlameShock:IsCastable() and (Player:BuffUp(S.SurgeofPowerBuff) and ((not S.LightningRod:IsAvailable()) or S.SkybreakersFieryDemise:IsAvailable())) then
-    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 14"; end
-  end
-  -- flame_shock,target_if=refreshable,if=talent.master_of_the_elements.enabled&!talent.lightning_rod.enabled
-  if S.FlameShock:IsCastable() and (S.MasteroftheElements:IsAvailable() and not S.LightningRod:IsAvailable()) then
-    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 16"; end
-  end
-  -- flame_shock,target_if=refreshable,if=talent.deeply_rooted_elements.enabled&!talent.surge_of_power.enabled
-  if S.FlameShock:IsCastable() and (S.DeeplyRootedElements:IsAvailable() and not S.SurgeofPower:IsAvailable()) then
-    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 18"; end
-  end
-  -- ascendance
-  if S.Ascendance:IsCastable() then
-    if Cast(S.Ascendance, Settings.Commons.GCDasOffGCD.Ascendance) then return "ascendance aoe 20"; end
+  -- totemic_recall,if=cooldown.liquid_magma_totem.remains>45
+  if S.TotemicRecall:IsCastable() and (S.LiquidMagmaTotem:CooldownRemains() > 45) then
+    if Cast(S.TotemicRecall, Settings.Commons.GCDasOffGCD.TotemicRecall) then return "totemic_recall aoe 8"; end
   end
   -- liquid_magma_totem
   if S.LiquidMagmaTotem:IsCastable() then
-    if Cast(S.LiquidMagmaTotem, Settings.Elemental.GCDasOffGCD.LiquidMagmaTotem, nil, not Target:IsInRange(40)) then return "liquid_magma_totem aoe 22"; end
+    if Cast(S.LiquidMagmaTotem, Settings.Elemental.GCDasOffGCD.LiquidMagmaTotem, nil, not Target:IsInRange(40)) then return "liquid_magma_totem aoe 10"; end
+  end
+  -- primordial_wave,target_if=min:dot.flame_shock.remains,if=!buff.primordial_wave.up&buff.surge_of_power.up&!buff.splintered_elements.up
+  if IsViable(S.PrimordialWave) and (Player:BuffDown(S.PrimordialWaveBuff) and Player:BuffUp(S.SurgeofPowerBuff) and Player:BuffDown(S.SplinteredElementsBuff)) then
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 12"; end
+  end
+  -- primordial_wave,target_if=min:dot.flame_shock.remains,if=!buff.primordial_wave.up&talent.deeply_rooted_elements.enabled&!talent.surge_of_power.enabled&!buff.splintered_elements.up
+  if IsViable(S.PrimordialWave) and (Player:BuffDown(S.PrimordialWaveBuff) and S.DeeplyRootedElements:IsAvailable() and (not S.SurgeofPower:IsAvailable()) and Player:BuffDown(S.SplinteredElementsBuff)) then
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 14"; end
+  end
+  -- primordial_wave,target_if=min:dot.flame_shock.remains,if=!buff.primordial_wave.up&talent.master_of_the_elements.enabled&!talent.lightning_rod.enabled
+  if IsViable(S.PrimordialWave) and (Player:BuffDown(S.PrimordialWaveBuff) and S.MasteroftheElements:IsAvailable() and not S.LightningRod:IsAvailable()) then
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 16"; end
+  end
+  -- flame_shock,target_if=refreshable,if=buff.surge_of_power.up&(!talent.lightning_rod.enabled|talent.skybreakers_fiery_demise.enabled)&dot.flame_shock.remains<target.time_to_die-5&active_dot.flame_shock<6
+  if S.FlameShock:IsCastable() and (Player:BuffUp(S.SurgeofPowerBuff) and ((not S.LightningRod:IsAvailable()) or S.SkybreakersFieryDemise:IsActive()) and S.FlameShockDebuff:AuraActiveCount() < 6) then
+    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable2, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 18"; end
+  end
+  -- flame_shock,target_if=refreshable,if=talent.master_of_the_elements.enabled&!talent.lightning_rod.enabled&dot.flame_shock.remains<target.time_to_die-5&active_dot.flame_shock<6
+  if S.FlameShock:IsCastable() and (S.MasteroftheElements:IsAvailable() and (not S.LightningRod:IsAvailable()) and S.FlameShockDebuff:AuraActiveCount() < 6) then
+    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable2, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 20"; end
+  end
+  -- flame_shock,target_if=refreshable,if=talent.deeply_rooted_elements.enabled&!talent.surge_of_power.enabled&dot.flame_shock.remains<target.time_to_die-5&active_dot.flame_shock<6
+  if S.FlameShock:IsCastable() and (S.DeeplyRootedElements:IsAvailable() and (not S.SurgeofPower:IsAvailable()) and S.FlameShockDebuff:AuraActiveCount() < 6) then
+    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable2, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 22"; end
+  end
+  -- flame_shock,target_if=refreshable,if=buff.surge_of_power.up&(!talent.lightning_rod.enabled|talent.skybreakers_fiery_demise.enabled)&dot.flame_shock.remains<target.time_to_die-5&dot.flame_shock.remains>0
+  if S.FlameShock:IsCastable() and (Player:BuffUp(S.SurgeofPowerBuff) and ((not S.LightningRod:IsAvailable()) or S.SkybreakersFieryDemise:IsAvailable())) then
+    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable3, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 24"; end
+  end
+  -- flame_shock,target_if=refreshable,if=talent.master_of_the_elements.enabled&!talent.lightning_rod.enabled&dot.flame_shock.remains<target.time_to_die-5&dot.flame_shock.remains>0
+  if S.FlameShock:IsCastable() and (S.MasteroftheElements:IsAvailable() and (not S.LightningRod:IsAvailable())) then
+    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable3, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 26"; end
+  end
+  -- flame_shock,target_if=refreshable,if=talent.deeply_rooted_elements.enabled&!talent.surge_of_power.enabled&dot.flame_shock.remains<target.time_to_die-5&dot.flame_shock.remains>0
+  if S.FlameShock:IsCastable() and (S.DeeplyRootedElements:IsAvailable() and (not S.SurgeofPower:IsAvailable())) then
+    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable3, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 28"; end
+  end
+  -- ascendance
+  if S.Ascendance:IsCastable() then
+    if Cast(S.Ascendance, Settings.Commons.GCDasOffGCD.Ascendance) then return "ascendance aoe 30"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains,if=cooldown_react&buff.lava_surge.up&talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&(maelstrom>=60-5*talent.eye_of_the_storm.rank-2*talent.flow_of_power.enabled)&(!talent.echoes_of_great_sundering.enabled|buff.echoes_of_great_sundering.up)&(!buff.ascendance.up&active_enemies>3&talent.unrelenting_calamity.enabled|active_enemies>3&!talent.unrelenting_calamity.enabled|active_enemies=3)
   if IsViable(S.LavaBurst) and (Player:BuffUp(S.LavaSurgeBuff) and S.MasteroftheElements:IsAvailable() and (not Player:MOTEP()) and (Player:MaelstromP() >= 60 - 5 * S.EyeoftheStorm:TalentRank() - 2 * num(S.FlowofPower:IsAvailable())) and ((not S.EchoesofGreatSundering:IsAvailable()) or Player:BuffUp(S.EchoesofGreatSunderingBuff)) and (Player:BuffDown(S.AscendanceBuff) and Shaman.Targets > 3 and S.UnrelentingCalamity:IsAvailable() or Shaman.Targets > 3 and (not S.UnrelentingCalamity:IsAvailable()) or Shaman.Targets == 3)) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 24"; end
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 32"; end
   end
   -- earthquake,if=!talent.echoes_of_great_sundering.enabled&active_enemies>3&(spell_targets.chain_lightning>3|spell_targets.lava_beam>3)
   if S.Earthquake:IsReady() and ((not S.EchoesofGreatSundering:IsAvailable()) and Shaman.Targets > 3 and Shaman.ClusterTargets > 3) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 26"; end
+    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 34"; end
   end
   -- earthquake,if=!talent.echoes_of_great_sundering.enabled&!talent.elemental_blast.enabled&active_enemies=3&(spell_targets.chain_lightning=3|spell_targets.lava_beam=3)
   if S.Earthquake:IsReady() and ((not S.EchoesofGreatSundering:IsAvailable()) and (not S.ElementalBlast:IsAvailable()) and Shaman.Targets == 3 and Shaman.ClusterTargets == 3) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 28"; end
+    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 36"; end
   end
   -- earthquake,if=buff.echoes_of_great_sundering.up
   if S.Earthquake:IsReady() and (Player:BuffUp(S.EchoesofGreatSunderingBuff)) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 30"; end
+    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 38"; end
   end
   -- elemental_blast,target_if=min:debuff.lightning_rod.remains,if=talent.echoes_of_great_sundering.enabled
   if IsViable(S.ElementalBlast) and (S.EchoesofGreatSundering:IsAvailable()) then
-    if Everyone.CastTargetIf(S.ElementalBlast, Enemies10ySplash, "min", EvaluateLightningRodRemains, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 32"; end
+    if Everyone.CastTargetIf(S.ElementalBlast, Enemies10ySplash, "min", EvaluateLightningRodRemains, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 40"; end
   end
   -- elemental_blast,if=talent.echoes_of_great_sundering.enabled
   if IsViable(S.ElementalBlast) and (S.EchoesofGreatSundering:IsAvailable()) then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 34"; end
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 42"; end
   end
   -- elemental_blast,if=enemies=3&!talent.echoes_of_great_sundering.enabled
   if IsViable(S.ElementalBlast) and (Shaman.Targets == 3 and not S.EchoesofGreatSundering:IsAvailable()) then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 36"; end
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 44"; end
   end
   -- earth_shock,target_if=min:debuff.lightning_rod.remains,if=talent.echoes_of_great_sundering.enabled
   if S.EarthShock:IsReady() and (S.EchoesofGreatSundering:IsAvailable()) then
-    if Everyone.CastTargetIf(S.EarthShock, Enemies10ySplash, "min", EvaluateLightningRodRemains, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock aoe 38"; end
+    if Everyone.CastTargetIf(S.EarthShock, Enemies10ySplash, "min", EvaluateLightningRodRemains, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock aoe 46"; end
   end
   -- earth_shock,if=talent.echoes_of_great_sundering.enabled
   if S.EarthShock:IsReady() and (S.EchoesofGreatSundering:IsAvailable()) then
-    if Cast(S.EarthShock, nil, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock aoe 40"; end
+    if Cast(S.EarthShock, nil, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock aoe 48"; end
   end
   -- lava_beam,if=buff.stormkeeper.up
   if IsViable(S.LavaBeam) and (Player:StormkeeperP()) then
-    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 42"; end
+    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 50"; end
   end
   -- chain_lightning,if=buff.stormkeeper.up
   if IsViable(S.ChainLightning) and (Player:StormkeeperP()) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 44"; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 52"; end
   end
   -- lava_beam,if=buff.power_of_the_maelstrom.up&buff.ascendance.remains>cast_time
   if IsViable(S.LavaBeam) and (Player:BuffUp(S.PoweroftheMaelstromBuff) and Player:BuffRemains(S.AscendanceBuff) > S.LavaBeam:CastTime()) then
-    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 46"; end
+    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 54"; end
   end
   -- chain_lightning,if=buff.power_of_the_maelstrom.up
   if IsViable(S.ChainLightning) and (Player:BuffUp(S.PoweroftheMaelstromBuff)) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 48"; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 56"; end
   end
   -- lava_beam,if=active_enemies>=6&buff.surge_of_power.up&buff.ascendance.remains>cast_time
   if IsViable(S.LavaBeam) and (Shaman.Targets >= 6 and Player:BuffUp(S.SurgeofPowerBuff) and Player:BuffRemains(S.AscendanceBuff) > S.LavaBeam:CastTime()) then
-    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 50"; end
+    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 58"; end
   end
   -- chain_lightning,if=active_enemies>=6&buff.surge_of_power.up
   if IsViable(S.ChainLightning) and (Shaman.Targets >= 6 and Player:BuffUp(S.SurgeofPowerBuff)) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 52"; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 60"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains,if=buff.lava_surge.up&talent.deeply_rooted_elements.enabled&buff.windspeakers_lava_resurgence.up
   if IsViable(S.LavaBurst) and (Player:BuffUp(S.LavaSurgeBuff) and S.DeeplyRootedElements:IsAvailable() and Player:BuffUp(S.WindspeakersLavaResurgenceBuff)) then
-    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 54"; end
+    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 62"; end
   end
   -- lava_beam,if=buff.master_of_the_elements.up&buff.ascendance.remains>cast_time
   if IsViable(S.LavaBeam) and (Player:MOTEP() and Player:BuffRemains(S.AscendanceBuff) > S.LavaBeam:CastTime()) then
-    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 56"; end
+    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 64"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains,if=enemies=3&talent.master_of_the_elements.enabled
   if IsViable(S.LavaBurst) and (Shaman.Targets == 3 and S.MasteroftheElements:IsAvailable()) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 58"; end
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 66"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains,if=buff.lava_surge.up&talent.deeply_rooted_elements.enabled
   if IsViable(S.LavaBurst) and (Player:BuffUp(S.LavaSurgeBuff) and S.DeeplyRootedElements:IsAvailable()) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 60"; end
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 68"; end
   end
   -- icefury,if=talent.electrified_shocks.enabled&active_enemies<5
   if IsViable(S.Icefury) and (S.ElectrifiedShocks:IsAvailable() and Shaman.Targets < 5) then
-    if Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury aoe 62"; end
+    if Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury aoe 70"; end
   end
   -- frost_shock,if=buff.icefury.up&talent.electrified_shocks.enabled&!debuff.electrified_shocks.up&active_enemies<5
   if S.FrostShock:IsCastable() and (Player:IcefuryP() and S.ElectrifiedShocks:IsAvailable() and Target:DebuffDown(S.ElectrifiedShocksDebuff) and Shaman.Targets < 5) then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock aoe 64"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock aoe 72"; end
   end
   -- lava_beam,if=buff.ascendance.remains>cast_time
   if IsViable(S.LavaBeam) and (Player:BuffRemains(S.AscendanceBuff) > S.LavaBeam:CastTime()) then
-    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 66"; end
+    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 74"; end
   end
   -- chain_lightning
   if IsViable(S.ChainLightning) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 68"; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 76"; end
   end
   -- flame_shock,moving=1,target_if=refreshable
   if S.FlameShock:IsCastable() then
-    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock moving aoe 70"; end
+    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock moving aoe 78"; end
   end
   -- frost_shock,moving=1
   if S.FrostShock:IsCastable() then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock moving aoe 72"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock moving aoe 80"; end
   end
 end
 
@@ -558,6 +586,8 @@ local function APL()
 end
 
 local function Init()
+  S.FlameShockDebuff:RegisterAuraTracking()
+
   HR.Print("Elemental Shaman rotation is currently a work in progress, but has been updated for patch 10.0.")
 end
 
