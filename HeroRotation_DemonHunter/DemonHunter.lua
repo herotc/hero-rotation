@@ -110,6 +110,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   FuriousGaze                           = Spell(343311),
   GlaiveTempest                         = Spell(342817),
   Initiative                            = Spell(388108),
+  IsolatedPrey                          = Spell(388113),
   Momentum                              = Spell(206476),
   Ragefire                              = Spell(388107),
   SerratedGlaive                        = Spell(390154),

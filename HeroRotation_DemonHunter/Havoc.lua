@@ -291,6 +291,10 @@ local function APL()
     if S.ImmolationAura:IsCastable() and (Player:BuffDown(S.ImmolationAuraBuff)) then
       if Cast(S.ImmolationAura, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura main 26"; end
     end
+    -- fel_rush,if=talent.isolated_prey&active_enemies=1&fury.deficit>=35
+    if S.FelRush:IsCastable() and UseFelRush() and (S.IsolatedPrey:IsAvailable() and EnemiesCount8 == 1 and Player:FuryDeficit() >= 35) then
+      if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush) then return "fel_rush main 27"; end
+    end
     -- felblade,if=fury.deficit>=40
     if S.Felblade:IsCastable() and (Player:FuryDeficit() >= 40) then
       if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade main 28"; end
