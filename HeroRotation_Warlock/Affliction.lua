@@ -96,16 +96,12 @@ local function Precombat()
   -- food
   -- augmentation
   -- summon_pet - Moved to APL()
-  --variable,name=cleave_apl,default=0,op=reset
+  -- variable,name=cleave_apl,default=0,op=reset
   -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
   if S.GrimoireofSacrifice:IsCastable() then
     if Cast(S.GrimoireofSacrifice, Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "grimoire_of_sacrifice precombat 2"; end
   end
   -- snapshot_stats
-  -- inquisitors_gaze
-  if S.InquisitorsGaze:IsCastable() and not Player:BuffUp(S.InquisitorsGazeBuff) then
-    if Cast(S.InquisitorsGaze, Settings.Affliction.GCDasOffGCD.InquisitorsGaze) then return "inquisitors_gaze precombat 4"; end
-  end
   -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>3
   -- NYI precombat multi target
   -- haunt
@@ -230,8 +226,8 @@ local function AoE()
   if S.DrainLife:IsReady() and (Target:DebuffUp(S.SoulRotDebuff) or not S.SoulRot:IsAvailable()) and Player:BuffStack(S.InevitableDemiseBuff) > 10 then
     if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life aoe 20"; end
   end
-  -- summon_soulkeeper,if=buff.tormented_soul.stack=10
-  if S.SummonSoulkeeper:IsReady() and S.SummonSoulkeeper:Count() == 10 then
+  -- summon_soulkeeper,if=buff.tormented_soul.stack=10|buff.tormented_soul.stack>3&time_to_die<10
+  if S.SummonSoulkeeper:IsReady() and (S.SummonSoulkeeper:Count() == 10 or Player:BuffStack(S.TormentedSoulBuff) > 3 and FightRemains < 10) then
     if Cast(S.SummonSoulkeeper) then return "soul_strike aoe 22"; end
   end
   -- siphon_life,target_if=remains<5,if=active_dot.siphon_life<3
@@ -260,10 +256,6 @@ local function Cleave()
   -- haunt
   if S.Haunt:IsReady() then
     if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt cleave 2"; end
-  end
-  -- soul_swap,if=dot.unstable_affliction.remains<5
-  if S.SoulSwap:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
-    if Cast(S.SoulSwap, nil, nil, not Target:IsSpellInRange(S.SoulSwap)) then return "soul_swap cleave 4"; end
   end
   -- unstable_affliction,if=remains<5
   if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
@@ -407,10 +399,6 @@ local function APL()
     if CDsON() and Settings.Commons.Enabled.Trinkets then
       local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
     end
-    -- soul_swap,if=dot.unstable_affliction.remains<5
-    if S.SoulSwap:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
-      if Cast(S.SoulSwap, nil, nil, not Target:IsSpellInRange(S.SoulSwap)) then return "soul_swap main 2"; end
-    end
     -- unstable_affliction,if=remains<5
     if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
       if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction main 4"; end
@@ -493,11 +481,6 @@ local function APL()
     -- corruption,if=refreshable
     if S.Corruption:IsCastable() and (Target:DebuffRefreshable(S.CorruptionDebuff)) then
       if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption main 36"; end
-    end
-    -- soul_tap
-    -- Note: Don't cast if it would over-cap shards
-    if S.SoulTap:IsCastable() and Player:SoulShardsP() < 5 then
-      if Cast(S.SoulTap, Settings.Affliction.GCDasOffGCD.SoulTap) then return "soul_tap main 38"; end
     end
     -- drain_soul,interrupt=1
     if S.DrainSoul:IsReady() then
