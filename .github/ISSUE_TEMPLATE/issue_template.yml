@@ -41,9 +41,9 @@ body:
       label: Icon Behavior
       description: If applicable to your issue, please let us know if the icon disappears entirely when the issue occurs.
       options:
-        - Yes
-        - No
-        - N/A
+        - "Yes"
+        - "No"
+        - "N/A"
     validations:
       required: false
       
