@@ -129,11 +129,11 @@ local function Hac()
     if Cast(S.Warbreaker, nil, nil, not TargetInMeleeRange) then return "warbreaker hac 72"; end
   end
   -- colossus_smash,cycle_targets=1,if=(target.health.pct<20|talent.massacre&target.health.pct<35)
-  if S.ColossusSmash:IsCastable() then
+  if CDsON() and S.ColossusSmash:IsCastable() then
     if Everyone.CastCycle(S.ColossusSmash, Enemies8y, EvaluateCycleColossusSmash, not TargetInMeleeRange) then return "colossus_smash hac 73"; end
   end
   -- colossus_smash
-  if S.ColossusSmash:IsCastable() then
+  if CDsON() and S.ColossusSmash:IsCastable() then
     if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash hac 74"; end
   end
   -- thunderous_roar,if=(buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up)&raid_event.adds.in>15|active_enemies>1&dot.deep_wounds.remains
@@ -185,11 +185,11 @@ local function Hac()
     if Cast(S.Shockwave, Settings.Arms.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave hac 86"; end
   end
   -- overpower,if=active_enemies=1&(charges=2&!talent.battlelord&(debuff.colossus_smash.down|rage.pct<25)|talent.battlelord)
-  if S.Overpower:IsCastable() and EnemiesCount8y == 1 and (S.Overpower:Charges() == 2 and not S.Battlelord:IsAvailable() and (Target:Debuffdown(S.ColossusSmashDebuff) or Player:Rage() < 25) or S.Battlelord:IsAvailable()) then
+  if S.Overpower:IsCastable() and EnemiesCount8y == 1 and (S.Overpower:Charges() == 2 and not S.Battlelord:IsAvailable() and (Target:Debuffdown(S.ColossusSmashDebuff) or Player:RagePercentage() < 25) or S.Battlelord:IsAvailable()) then
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower hac 87"; end
   end
   -- slam,if=active_enemies=1&!talent.battlelord&rage.pct>70
-  if S.Slam:IsReady() and EnemiesCount8y == 1 and not S.Battlelord:IsAvailable() and Player:Rage() > 70 then
+  if S.Slam:IsReady() and EnemiesCount8y == 1 and not S.Battlelord:IsAvailable() and Player:RagePercentage() > 70 then
     if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam hac 88"; end
   end
   -- overpower,if=charges=2&(!talent.test_of_might|talent.test_of_might&debuff.colossus_smash.down|talent.battlelord)|rage<70
@@ -240,7 +240,7 @@ end
 
 local function Execute()
   -- sweeping_strikes,if=spell_targets.whirlwind>1
-  if S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
+  if CDsON() and S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
     if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes execute 51"; end
   end
   -- rend,if=remains<=gcd&(!talent.warbreaker&cooldown.colossus_smash.remains<4|talent.warbreaker&cooldown.warbreaker.remains<4)&target.time_to_die>12
@@ -252,11 +252,11 @@ local function Execute()
     if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar execute 53"; end
   end
   -- warbreaker
-  if S.Warbreaker:IsCastable() then
+  if CDsON() and S.Warbreaker:IsCastable() then
     if Cast(S.Warbreaker, nil, nil, not TargetInMeleeRange) then return "warbreaker execute 54"; end
   end
   -- colossus_smash
-  if S.ColossusSmash:IsCastable() then
+  if CDsON() and S.ColossusSmash:IsCastable() then
     if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash execute 55"; end
   end
   -- thunderous_roar,if=buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up
@@ -303,7 +303,7 @@ end
 
 local function SingleTarget()
   -- sweeping_strikes,if=spell_targets.whirlwind>1
-  if S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
+  if CDsON() and S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
     if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes single_target 98"; end
   end
   -- mortal_strike
@@ -315,7 +315,7 @@ local function SingleTarget()
     if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend single_target 100"; end
   end
   -- avatar,if=talent.warlords_torment&rage.pct<33&(cooldown.colossus_smash.ready|debuff.colossus_smash.up|buff.test_of_might.up)|!talent.warlords_torment&(cooldown.colossus_smash.ready|debuff.colossus_smash.up)
-  if CDsON() and S.Avatar:IsCastable() and ((S.WarlordsTorment:IsAvailable() and Player:Rage() < 33 and (S.ColossusSmash:CooldownUp() or Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff))) or (not S.WarlordsTorment:IsAvailable() and (S.ColossusSmash:CooldownUp() or Target:DebuffUp(S.ColossusSmashDebuff)))) then
+  if CDsON() and S.Avatar:IsCastable() and ((S.WarlordsTorment:IsAvailable() and Player:RagePercentage() < 33 and (S.ColossusSmash:CooldownUp() or Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff))) or (not S.WarlordsTorment:IsAvailable() and (S.ColossusSmash:CooldownUp() or Target:DebuffUp(S.ColossusSmashDebuff)))) then
     if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar single_target 101"; end
   end
   -- spear_of_bastion,if=cooldown.colossus_smash.remains<=gcd|cooldown.warbreaker.remains<=gcd
@@ -323,15 +323,15 @@ local function SingleTarget()
     if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion single_target 102"; end
   end
   -- warbreaker
-  if S.Warbreaker:IsCastable() then
+  if CDsON() and S.Warbreaker:IsCastable() then
     if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker single_target 103"; end
   end
   -- colossus_smash
-  if S.ColossusSmash:IsCastable() then
+  if CDsON() and S.ColossusSmash:IsCastable() then
     if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash single_target 104"; end
   end
   -- thunderous_roar,if=buff.test_of_might.up|talent.test_of_might&debuff.colossus_smash.up&rage.pct<33|!talent.test_of_might&debuff.colossus_smash.up
-  if CDsON() and S.ThunderousRoar:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or (S.TestofMight:IsAvailable() and Target:DebuffUp(S.ColossusSmashDebuff) and Player:Rage() < 33) or (not S.TestofMight:IsAvailable() and Target:DebuffUp(S.ColossusSmashDebuff))) then
+  if CDsON() and S.ThunderousRoar:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or (S.TestofMight:IsAvailable() and Target:DebuffUp(S.ColossusSmashDebuff) and Player:RagePercentage() < 33) or (not S.TestofMight:IsAvailable() and Target:DebuffUp(S.ColossusSmashDebuff))) then
     if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 105"; end
   end
   -- bladestorm,if=talent.hurricane&(buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up)|talent.unhinged&(buff.test_of_might.up|!talent.test_of_might&debuff.colossus_smash.up)
@@ -355,11 +355,11 @@ local function SingleTarget()
     if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "ignore_pain single_target 110"; end
   end
   -- whirlwind,if=talent.storm_of_swords&talent.battlelord&rage.pct>80&debuff.colossus_smash.up
-  if S.Whirlwind:IsReady() and (S.StormofSwords:IsAvailable() and S.Battlelord:IsAvailable() and Player:Rage() > 80 and Target:DebuffUp(S.ColossusSmashDebuff)) then
+  if S.Whirlwind:IsReady() and (S.StormofSwords:IsAvailable() and S.Battlelord:IsAvailable() and Player:RagePercentage() > 80 and Target:DebuffUp(S.ColossusSmashDebuff)) then
     if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 113"; end
   end
   -- overpower,if=charges=2&!talent.battlelord&(debuff.colossus_smash.down|rage.pct<25)|talent.battlelord
-  if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2 and not S.Battlelord:IsAvailable() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:Rage() < 25) or S.Battlelord:IsAvailable()) then
+  if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2 and not S.Battlelord:IsAvailable() and (Target:DebuffUp(S.ColossusSmashDebuff) or Player:RagePercentage() < 25) or S.Battlelord:IsAvailable()) then
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower single_target 114"; end
   end
   -- whirlwind,if=talent.storm_of_swords|talent.fervor_of_battle&active_enemies>1
@@ -371,7 +371,7 @@ local function SingleTarget()
     if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap single_target 90"; end
   end
   -- overpower,if=debuff.colossus_smash.down&rage.pct<50&!talent.battlelord|rage.pct<25
-  if S.Overpower:IsCastable() and (Target:DebuffDown(S.ColossusSmashDebuff) and Player:Rage() < 50 and not S.Battlelord:IsAvailable() or Player:Rage() < 25) then
+  if S.Overpower:IsCastable() and (Target:DebuffDown(S.ColossusSmashDebuff) and Player:RagePercentage() < 50 and not S.Battlelord:IsAvailable() or Player:RagePercentage() < 25) then
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower single_target 114"; end
   end
   -- whirlwind,if=buff.merciless_bonegrinder.up
@@ -486,7 +486,7 @@ local function APL()
         end
       end
     end
-    if (Settings.Commons.Enabled.Trinkets) then
+    if CDsON() and (Settings.Commons.Enabled.Trinkets) then
       -- use_items
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
