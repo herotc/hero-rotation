@@ -1,0 +1,17 @@
+name: Feature Request
+description: Submit a feature request
+title: "[Enhancement]: "
+labels: "Enhancement"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please feel free to use this form to submit a request for feature additions to the addon.
+        If you are experiencing a bug, please use that form instead.
+  - type: textarea
+    id: feature-request
+    attributes:
+      label: What feature would you like to have added?
+      description: Please include a detailed description of what feature you would like us to add to the addon.
+    validations:
+      required: true

@@ -1,0 +1,49 @@
+name: Bug Report
+description: Submit a bug report
+title: "[Bug]: "
+labels: "Bug"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please change "Bug" in the title to the Class/Specialization experiencing the issue.
+  - type: input
+    id: hrversion
+    attributes:
+      label: What version of HeroRotation are you using?
+      placeholder: e.g. 10.0.5.01
+    validations:
+      required: true
+  - type: input
+    id: hlversion
+    attributes:
+      label: What version of HeroLib are you using?
+      placeholder: e.g. 10.0.5.01
+    validations:
+      required: true
+  - type: input
+    id: hdversion
+    attributes:
+      label: What version of HeroDBC are you using?
+      placeholder: e.g. 10.0.5.01
+    validations:
+      required: true
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: What is the issue?
+      description: Please include a detailed description of what issue occurred, as well as any lua errors that accompany the issue. You may also include a screenshot, if you wish.
+    validations:
+      required: true
+  - type: dropdown
+    id: icon-disappear
+    attributes:
+      label: Icon Behavior
+      description: If applicable to your issue, please let us know if the icon disappears entirely when the issue occurs.
+      options:
+        - Yes
+        - No
+        - N/A
+    validations:
+      required: false
+      

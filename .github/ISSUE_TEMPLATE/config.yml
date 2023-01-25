@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: If you have a general question
+    url: https://discord.com/channels/244067101478879234/244072504304467968
+    about: If you have a question about the addon, please feel free to visit our Discord channel.
+  - name: If you have a HeroLib or HeroCache issue
+    url: https://github.com/herotc/hero-lib/issues/new
+    about: If you have an issue with the HeroLib addon, you can log it here.
+  - name: If you hvae a HeroDBC issue
+    url: https://github.com/herotc/hero-dbc/issues/new
+    about: If you have an issue with the HeroDBC addon, you can log it here.
