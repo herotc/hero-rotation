@@ -81,6 +81,7 @@ HR.GUISettings.APL.Hunter = {
       WailingArrow = false,
     },
     OffGCDasOffGCD = {
+      Salvo = true,
       Trueshot = true,
     }
   },

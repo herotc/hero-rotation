@@ -181,6 +181,10 @@ local function Precombat()
   if S.DoubleTap:IsReady() then
     if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap precombat 2"; end
   end
+  -- salvo,precast_time=10
+  if S.Salvo:IsCastable() then
+    if Cast(S.Salvo, Settings.Marksmanship.OffGCDasOffGCD.Salvo) then return "salvo precombat 3"; end
+  end
   -- use_item,name=algethar_puzzle_box
   if I.AlgetharPuzzleBox:IsEquippedAndReady() then
     if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 4"; end
@@ -228,6 +232,10 @@ local function Cds()
     if PotionSelected and PotionSelected:IsReady() then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 12"; end
     end
+  end
+  -- salvo
+  if S.Salvo:IsCastable() then
+    if Cast(S.Salvo, Settings.Marksmanship.OffGCDasOffGCD.Salvo) then return "salvo cds 14"; end
   end
 end
 
