@@ -132,7 +132,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   HungeringVoidDebuff         = Spell(345219),
   VampiricTouchDebuff         = Spell(34914),
   -- Tier Set Effects
-  DarkReveries                = Spell(394963),
+  DarkReveriesBuff            = Spell(394963),
   GatheringShadowsBuff        = Spell(394961),
 })
 
