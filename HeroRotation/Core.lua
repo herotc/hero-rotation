@@ -101,7 +101,10 @@
       if CustomTime then
         TimeToResource = CustomTime
       else
-        TimeToResource = Player.TimeToXResourceMap[Object:CostInfo(nil, "type")](Object:Cost())
+        local Resource = Object:CostInfo(nil, "type")
+        if Resource then
+          TimeToResource = Player.TimeToXResourceMap[Resource](Object:Cost())
+        end
       end
       if TimeToResource and TimeToResource > 0 then
         -- Only display the resource-based swirl if the duration is greater than the GCD/Cast swirl
