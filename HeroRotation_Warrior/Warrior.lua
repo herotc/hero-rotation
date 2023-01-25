@@ -113,6 +113,7 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   Execute                               = MultiSpell(163201, 281000),
   Whirlwind                             = Spell(1680),
   -- Talents
+  AngerManagement                       = Spell(152278),
   Battlelord                            = Spell(386630),
   BattlelordBuff                        = Spell(386631),
   BlademastersTorment                   = Spell(390138),
@@ -161,7 +162,6 @@ Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   ShieldBlock                           = Spell(2565),
   ShieldSlam                            = Spell(23922),
   -- Talents
-  AngerManagement                       = Spell(152278),
   BarbaricTraining                      = Spell(390675),
   Bolster                               = Spell(280001),
   BoomingVoice                          = Spell(202743),
