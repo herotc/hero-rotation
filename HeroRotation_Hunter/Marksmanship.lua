@@ -177,10 +177,6 @@ local function Precombat()
     if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot], Settings.Commons2.GCDasOffGCD.SummonPet) then return "Summon Pet"; end
   end
   -- snapshot_stats
-  -- double_tap,precast_time=10
-  if S.DoubleTap:IsReady() then
-    if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap precombat 2"; end
-  end
   -- salvo,precast_time=10
   if S.Salvo:IsCastable() then
     if Cast(S.Salvo, Settings.Marksmanship.OffGCDasOffGCD.Salvo) then return "salvo precombat 3"; end
@@ -233,8 +229,8 @@ local function Cds()
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 12"; end
     end
   end
-  -- salvo
-  if S.Salvo:IsCastable() then
+  -- salvo,if=active_enemies>2|cooldown.volley.remains<10
+  if S.Salvo:IsCastable() and (EnemiesCount10ySplash > 2 or S.Volley:CooldownRemains() < 10) then
     if Cast(S.Salvo, Settings.Marksmanship.OffGCDasOffGCD.Salvo) then return "salvo cds 14"; end
   end
 end
@@ -248,6 +244,10 @@ local function St()
   if S.KillShot:IsReady() then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot st 4"; end
   end
+  -- volley,if=buff.salvo.up
+  if S.Volley:IsReady() and (Player:BuffUp(S.SalvoBuff)) then
+    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley st 5"; end
+  end
   -- steel_trap,if=buff.trueshot.down
   if S.SteelTrap:IsCastable() and (Player:BuffDown(S.TrueshotBuff)) then
     if Cast(S.SteelTrap, Settings.Commons2.GCDasOffGCD.SteelTrap, nil, not Target:IsInRange(40)) then return "steel_trap st 6"; end
@@ -259,10 +259,6 @@ local function St()
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
     if Cast(S.ExplosiveShot, nil, nil, not TargetInRange40y) then return "explosive_shot st 10"; end
-  end
-  -- double_tap,if=(cooldown.rapid_fire.remains<gcd|!talent.streamline)&(!raid_event.adds.exists|raid_event.adds.up&(raid_event.adds.in<10&raid_event.adds.remains<3|raid_event.adds.in>cooldown|active_enemies>1)|!raid_event.adds.up&(raid_event.adds.count=1|raid_event.adds.in>cooldown))
-  if S.DoubleTap:IsReady() and (S.RapidFire:CooldownRemains() < Player:GCD() or not S.Streamline:IsAvailable()) then
-    if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap st 12"; end
   end
   -- stampede
   if S.Stampede:IsCastable() then
@@ -280,8 +276,8 @@ local function St()
   if S.Volley:IsReady() then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley st 20"; end
   end
-  -- rapid_fire,if=talent.surging_shots|buff.double_tap.up&talent.streamline
-  if S.RapidFire:IsCastable() and (S.SurgingShots:IsAvailable() or Player:BuffUp(S.DoubleTapBuff) and S.Streamline:IsAvailable()) then
+  -- rapid_fire,if=talent.surging_shots
+  if S.RapidFire:IsCastable() and (S.SurgingShots:IsAvailable()) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 22"; end
   end
   -- trueshot,if=variable.trueshot_ready
@@ -344,10 +340,6 @@ local function Trickshots()
   if S.KillShot:IsReady() and (Player:BuffUp(S.RazorFragmentsBuff)) then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot trickshots 4"; end
   end
-  -- double_tap,if=cooldown.rapid_fire.remains<gcd|!talent.streamline
-  if S.DoubleTap:IsReady() and (S.RapidFire:CooldownRemains() < Player:GCD() or not S.Streamline:IsAvailable()) then
-    if Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap trickshots 6"; end
-  end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
     if Cast(S.ExplosiveShot, nil, nil, not TargetInRange40y) then return "explosive_shot trickshots 8"; end
@@ -380,8 +372,8 @@ local function Trickshots()
   if S.Trueshot:IsReady() and CDsON() then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot, nil, not TargetInRange40y) then return "trueshot trickshots 22"; end
   end
-  -- rapid_fire,if=buff.trick_shots.remains>=execute_time&(talent.surging_shots|buff.double_tap.up&talent.streamline)
-  if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime() and (S.SurgingShots:IsAvailable() or Player:BuffUp(S.DoubleTapBuff) and S.Streamline:IsAvailable())) then
+  -- rapid_fire,if=buff.trick_shots.remains>=execute_time&talent.surging_shots
+  if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime() and S.SurgingShots:IsAvailable()) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire trickshots 24"; end
   end
   -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=talent.serpentstalkers_trickery&(buff.trick_shots.remains>=execute_time&(buff.precise_shots.down|buff.trueshot.up|full_recharge_time<cast_time+gcd))
