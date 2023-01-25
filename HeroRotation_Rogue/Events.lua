@@ -208,8 +208,9 @@ do
     function(_, _, _, _, _, _, _, _, _, _, _, SpellID, _, _, Amount, Over )
       if SpellID == 185763 then
         if (GetTime() - FanStart) > 0.5 then
+          -- Subsequent Fan the Hammer procs are reduced by 1 CP
+          FanCP = mathmin(Rogue.CPMaxSpend(), Player:ComboPoints() + Amount + (mathmax(0, Amount - 1) * mathmin(2, Player:BuffStack(OpportunityBuff) - 1)))
           FanStart = GetTime()
-          FanCP = mathmin(Rogue.CPMaxSpend(), Player:ComboPoints() + (Amount * mathmin(3, Player:BuffStack(OpportunityBuff))))
         end
       end
     end,
