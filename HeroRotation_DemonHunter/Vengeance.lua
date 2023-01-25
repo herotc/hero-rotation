@@ -506,7 +506,7 @@ local function APL()
       VarFD = true
     end
     -- variable,name=fiery_demise_in_progress,value=0,if=talent.fiery_brand.enabled&talent.fiery_demise.enabled&cooldown.fiery_brand.charges_fractional<1.65&((talent.fel_devastation.enabled&cooldown.fel_devastation.remains>10)|(talent.soul_carver.enabled&cooldown.soul_carver.remains>10))
-    if S.FieryBrand:IsAvailable() and S.FieryDemise:IsAvailable() and S.FieryBrand:ChargesFractional() < 1.65 and ((S.FelDevastation:IsAvailable() and S.FelDevastation:CooldownRemains() > 10) or (S.SoulCarver:IsAvailable() and S.SoulCarver:CooldownRemains() > 10)) then
+    if S.FieryBrand:IsAvailable() and S.FieryDemise:IsAvailable() and S.FieryBrand:ChargesFractional() < 1.65 and ((S.FelDevastation:IsAvailable() and S.FelDevastation:CooldownRemains() > 10) or ((not S.FelDevastation:IsAvailable()) and S.SoulCarver:IsAvailable() and S.SoulCarver:CooldownRemains() > 10)) then
       VarFD = false
     end
     -- run_action_list,name=the_hunt_ramp,if=variable.the_hunt_ramp_in_progress
