@@ -77,6 +77,7 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   Execute                               = MultiSpell(5308, 280735),
   Whirlwind                             = Spell(190411),
   -- Talents
+  AngerManagement                       = Spell(152278),
   Annihilator                           = Spell(383916),
   AshenJuggernaut                       = Spell(392536),
   AshenJuggernautBuff                   = Spell(392537),
