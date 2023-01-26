@@ -90,8 +90,8 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_buff.strength|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_buff.strength|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit
+  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff.strength|trinket.1.has_use_buff.mastery|trinket.1.has_use_buff.versatility|trinket.1.has_use_buff.haste|trinket.1.has_use_buff.crit
+  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff.strength|trinket.2.has_use_buff.mastery|trinket.2.has_use_buff.versatility|trinket.2.has_use_buff.haste|trinket.2.has_use_buff.crit
   -- Note: Can't handle checking for specific stat buffs.
   -- Manually added: Openers
   if S.DeathsCaress:IsReady() then
