@@ -53,14 +53,14 @@ local trinket2 = equip[14] and Item(equip[14]) or Item(0)
 -- Rotation Variables
 local VarInit = false
 local VarNoCDTalent
-local Var4pcStarfallST
+local VarSolarEclipseST
 local VarOnUseTrinket
 local VarIsAoe
 local VarIsCleave
 local VarPassiveAsp
 local VarCDConditionST
 local VarCDConditionAoE
-local VarEnterLunar
+local VarEnterEclipse
 local VarConvokeCondition
 local PAPValue
 local CAIncBuffUp
@@ -175,8 +175,8 @@ end
 local function InitVars()
   -- variable,name=no_cd_talent,value=!talent.celestial_alignment&!talent.incarnation_chosen_of_elune
   VarNoCDTalent = (not S.CelestialAlignment:IsAvailable()) and (not S.IncarnationTalent:IsAvailable())
-  -- variable,name=4pc_starfall_st,value=talent.aetherial_kindling.rank=2&!talent.power_of_goldrinn
-  Var4pcStarfallST = S.AetherialKindling:TalentRank() == 2 and not S.PowerofGoldrinn:IsAvailable()
+  -- variable,name=solar_eclipse_st,value=talent.umbral_intensity.rank=2
+  VarSolarEclipseST = S.UmbralIntensity:TalentRank() == 2
   -- variable,name=on_use_trinket,value=0
   VarOnUseTrinket = 0
   -- variable,name=on_use_trinket,op=add,value=trinket.1.has_proc.any&trinket.1.cooldown.duration
@@ -207,6 +207,10 @@ local function Precombat()
   -- wrath
   if S.Wrath:IsCastable() and (Player:IsCasting(S.Wrath) and S.Wrath:Count() == 2 or Player:PrevGCD(1, S.Wrath) and S.Wrath:Count() == 1) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath precombat 4"; end
+  end
+  -- stellar_flare
+  if S.StellarFlare:IsCastable() then
+    if Cast(S.StellarFlare, nil, nil, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare precombat 6"; end
   end
 end
 
@@ -270,10 +274,14 @@ local function St()
   if S.WarriorofElune:IsCastable() then
     if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune st 24"; end
   end
-  -- variable,name=enter_lunar,value=eclipse.any_next|buff.eclipse_lunar.up&buff.eclipse_lunar.remains<action.wrath.execute_time
-  VarEnterLunar = EclipseAnyNext or Player:BuffUp(S.EclipseLunar) and Player:BuffRemains(S.EclipseLunar) < S.Wrath:ExecuteTime()
-  -- wrath,if=variable.enter_lunar
-  if S.Wrath:IsCastable() and (VarEnterLunar) then
+  -- variable,name=enter_eclipse,value=eclipse.any_next|buff.eclipse_lunar.up&(buff.eclipse_lunar.remains<action.wrath.execute_time)|buff.eclipse_solar.up&(buff.eclipse_solar.remains<action.wrath.execute_time)
+  VarEnterEclipse = (EclipseAnyNext or Player:BuffUp(S.EclipseLunar) and (Player:BuffRemains(S.EclipseLunar) < S.Wrath:ExecuteTime()) or Player:BuffUp(S.EclipseSolar) and (Player:BuffRemains(S.EclipseSolar) < S.Wrath:ExecuteTime()))
+  -- starfire,if=variable.enter_eclipse&variable.solar_eclipse_st
+  if S.Starfire:IsCastable() and (VarEnterEclipse and VarSolarEclipseST) then
+    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire st 25"; end
+  end
+  -- wrath,if=variable.enter_eclipse
+  if S.Wrath:IsCastable() and (VarEnterEclipse) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath st 26"; end
   end
   -- variable,name=convoke_condition,value=buff.ca_inc.remains>4|(cooldown.ca_inc.remains>30|variable.no_cd_talent)&(buff.eclipse_lunar.remains>4|buff.eclipse_solar.remains>4)
@@ -370,6 +378,10 @@ local function AoE()
   -- wrath,if=variable.cd_condition_aoe&set_bonus.tier29_4pc&eclipse.any_next
   if S.Wrath:IsCastable() and (VarCDConditionAoE and Player:HasTier(29, 4) and EclipseAnyNext) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath aoe 8"; end
+  end
+  -- stellar_flare,target_if=refreshable&(target.time_to_die-remains-spell_targets.starfire)>8+spell_targets.starfire,if=astral_power.deficit>variable.passive_asp+8&spell_targets.starfire<(11-talent.umbral_intensity.rank-talent.astral_smolder.rank)&variable.cd_condition_aoe
+  if S.StellarFlare:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 8 and EnemiesCount8ySplash < (11 - S.UmbralIntensity:TalentRank() - S.AstralSmolder:TalentRank()) and VarCDConditionAoE) then
+    if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareAoE, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare aoe 9"; end
   end
   -- starfall,if=variable.cd_condition_aoe&(talent.orbital_strike&astral_power.deficit<variable.passive_asp+8*spell_targets|buff.touch_the_cosmos.up)|astral_power.deficit<(variable.passive_asp+8+12*(buff.eclipse_lunar.remains<4|buff.eclipse_solar.remains<4))
   if S.Starfall:IsReady() and (VarCDConditionAoE and (S.OrbitalStrike:IsAvailable() and Player:AstralPowerDeficit() < VarPassiveAsp + 8 * EnemiesCount40y or Player:BuffUp(S.TouchtheCosmos)) or Player:AstralPowerDeficit() < (VarPassiveAsp + 8 + 12 * num(Player:BuffRemains(S.EclipseLunar) < 4 or Player:BuffRemains(S.EclipseSolar) < 4))) then
