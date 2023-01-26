@@ -386,8 +386,8 @@ local function Rotation()
 end
 
 local function SparkPhase()
-  -- nether_tempest,if=!ticking&variable.opener&buff.bloodlust.up,line_cd=15
-  if S.NetherTempest:IsReady() and S.NetherTempest:TimeSinceLastCast() >= 15 and (Target:DebuffDown(S.NetherTempestDebuff) and var_opener and Player:BloodlustUp()) then
+  -- nether_tempest,if=!ticking&variable.opener&buff.bloodlust.up,line_cd=45
+  if S.NetherTempest:IsReady() and S.NetherTempest:TimeSinceLastCast() >= 45 and (Target:DebuffDown(S.NetherTempestDebuff) and var_opener and Player:BloodlustUp()) then
     if Cast(S.NetherTempest, nil, nil, not Target:IsSpellInRange(S.NetherTempest)) then return "nether_tempest spark_phase 2"; end
   end
   -- rune_of_power
