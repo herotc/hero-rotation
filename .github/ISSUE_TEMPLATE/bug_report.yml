@@ -41,8 +41,8 @@ body:
       label: Icon Behavior
       description: If applicable to your issue, please let us know if the icon disappears entirely when the issue occurs.
       options:
-        - "Yes"
-        - "No"
+        - "Icon disappears"
+        - "Icon does NOT disappear"
         - "N/A"
     validations:
       required: false
