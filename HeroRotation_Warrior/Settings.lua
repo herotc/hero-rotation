@@ -63,7 +63,6 @@ HR.GUISettings.APL.Warrior = {
     },
     GCDasOffGCD = {
       Avatar = false,
-      OdinsFury = false,
       Ravager = false,
       Recklessness = false,
       Shockwave = true,
