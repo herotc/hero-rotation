@@ -53,6 +53,7 @@ local Settings = {
 };
 
 S.ArcaneBlast:RegisterInFlight()
+S.ArcaneBarrage:RegisterInFlight()
 
 -- Variables
 local Enemies8ySplash, EnemiesCount8ySplash --Enemies arround target
