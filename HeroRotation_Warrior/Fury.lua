@@ -91,7 +91,7 @@ local function SingleTarget()
   end
   -- odyns_fury,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)&(talent.dancing_blades&buff.dancing_blades.remains<5|!talent.dancing_blades)
   if CDsON() and S.OdynsFury:IsCastable() and EnrageUp and (S.DancingBlades:IsAvailable() and Player:BuffRemains(S.DancingBladesBuff) < 5 or not S.DancingBlades:IsAvailable()) then
-    if Cast(S.OdynsFury, nil, nil, not Target:IsInMeleeRange(12)) then return "odyns_fury single_target 8"; end
+    if Cast(S.OdynsFury, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury single_target 8"; end
   end
   -- rampage,if=talent.anger_management&(buff.recklessness.up|buff.enrage.remains<gcd|rage.pct>85)
   if S.Rampage:IsReady() and S.AngerManagement:IsAvailable() and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffRemains(S.EnrageBuff) < Player:GCD() or Player:RagePercentage() > 85) then
@@ -194,7 +194,7 @@ local function MultiTarget()
   end
   -- odyns_fury,if=active_enemies>1&talent.titanic_rage&(!buff.meat_cleaver.up|buff.avatar.up|buff.recklessness.up)
   if CDsON() and S.OdynsFury:IsCastable() and EnemiesCount8y > 1 and S.TitanicRage:IsAvailable() and (Player:BuffDown(S.MeatCleaverBuff) or Player:BuffUp(S.AvatarBuff) or Player:BuffUp(S.RecklessnessBuff)) then
-    if Cast(S.OdynsFury, Settings.Fury.GCDasOffGCD.OdynsFury, nil, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 4"; end
+    if Cast(S.OdynsFury, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 4"; end
   end
   -- whirlwind,if=spell_targets.whirlwind>1&talent.improved_whirlwind&!buff.meat_cleaver.up|raid_event.adds.in<2&talent.improved_whirlwind&!buff.meat_cleaver.up
   if S.Whirlwind:IsCastable() and EnemiesCount8y > 1 and S.ImprovedWhilwind:IsAvailable() and Player:BuffDown(S.MeatCleaverBuff) then
@@ -210,7 +210,7 @@ local function MultiTarget()
   end
   -- odyns_fury,if=active_enemies>1&buff.enrage.up&raid_event.adds.in>15
   if CDsON() and S.OdynsFury:IsCastable() and EnemiesCount8y > 1 and EnrageUp then
-    if Cast(S.OdynsFury, nil, nil, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 12"; end
+    if Cast(S.OdynsFury, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 12"; end
   end
   -- crushing_blow,if=talent.wrath_and_fury&buff.enrage.up
   if S.CrushingBlow:IsCastable() and S.WrathandFury:IsAvailable() and EnrageUp then
@@ -222,7 +222,7 @@ local function MultiTarget()
   end
   -- odyns_fury,if=buff.enrage.up&raid_event.adds.in>15
   if CDsON() and S.OdynsFury:IsCastable() and EnrageUp then
-    if Cast(S.OdynsFury, nil, nil, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 18"; end
+    if Cast(S.OdynsFury, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 18"; end
   end
   -- rampage,if=buff.recklessness.up|buff.enrage.remains<gcd|(rage>110&talent.overwhelming_rage)|(rage>80&!talent.overwhelming_rage)
   if S.Rampage:IsReady() and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffRemains(S.EnrageBuff) < Player:GCD() or (Player:Rage() > 110 and S.OverwhelmingRage:IsAvailable()) or (Player:Rage() > 80 and not S.OverwhelmingRage:IsAvailable())) then
