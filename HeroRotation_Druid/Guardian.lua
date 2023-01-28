@@ -261,8 +261,8 @@ local function Bear()
   if S.Raze:IsReady() and ((Player:BuffUp(S.ToothandClawBuff) and Player:BuffRemains(S.ToothandClawBuff) < 1.5) and MeleeEnemies11yCount > 1) then
     if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 35"; end
   end
-  -- raze,if=active_enemies<=5&buff.vicious_cycle_maul.stack>=3|active_enemies>1&!talent.vicious_cycle_maul.enabled
-  if S.Raze:IsReady() and (MeleeEnemies11yCount <= 5 and Player:BuffStack(S.ViciousCycleMaulBuff) >= 3 or MeleeEnemies11yCount > 1 and not S.ViciousCycle:IsAvailable()) then
+  -- raze,if=active_enemies>1&buff.vicious_cycle_maul.stack>=3|active_enemies>1&!talent.vicious_cycle_maul.enabled
+  if S.Raze:IsReady() and (MeleeEnemies11yCount > 1 and Player:BuffStack(S.ViciousCycleMaulBuff) >= 3 or MeleeEnemies11yCount > 1 and not S.ViciousCycle:IsAvailable()) then
     if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 36"; end
   end
   -- mangle,if=(buff.incarnation.up&active_enemies<=4)|(buff.incarnation.up&talent.soul_of_the_forest.enabled&active_enemies<=5)|((rage<90)&active_enemies<11)|((rage<85)&active_enemies<11&talent.soul_of_the_forest.enabled)
