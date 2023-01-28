@@ -212,6 +212,7 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   Incarnation                           = Spell(102558),
   Pulverize                             = Spell(80313),
   RageoftheSleeper                      = Spell(200851),
+  Raze                                  = Spell(400254),
   SouloftheForest                       = Spell(158477),
   Swipe                                 = Spell(213771),
   ViciousCycle                          = Spell(371999),

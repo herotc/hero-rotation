@@ -219,6 +219,10 @@ local function Bear()
   if S.Maul:IsReady() and UseMaul and (Player:BuffUp(S.RageoftheSleeper) and Player:BuffStack(S.ToothandClawBuff) > 0 and MeleeEnemies11yCount <= 6) then
     if Cast(S.Maul, nil, nil, not Target:IsInMeleeRange(8)) then return "maul bear 20"; end
   end
+  -- raze,if=buff.rage_of_the_sleeper.up&buff.tooth_and_claw.stack>0&active_enemies>1
+  if S.Raze:IsReady() and (Player:BuffUp(S.RageoftheSleeper) and Player:BuffStack(S.ToothandClawBuff) > 0 and MeleeEnemies11yCount > 1) then
+    if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 21"; end
+  end
   -- ironfur,target_if=!debuff.tooth_and_claw_debuff.up,if=!buff.ironfur.up&!cooldown.pause_action.remains|rage>90
   -- Note: ironfur handled in Defensives
   -- moonfire,if=buff.galactic_guardian.up&buff.galactic_guardian.remains<=gcd+0.5
@@ -232,6 +236,10 @@ local function Bear()
   -- maul,if=((buff.incarnation.up|buff.berserk_bear.up)&active_enemies<=5&(buff.tooth_and_claw.stack>=2))
   if S.Maul:IsReady() and UseMaul and (((Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S.BerserkBuff)) and MeleeEnemies11yCount <= 5 and Player:BuffStack(S.ToothandClawBuff) >= 2)) then
     if Cast(S.Maul, nil, nil, not Target:IsInMeleeRange(8)) then return "maul bear 26"; end
+  end
+  -- raze,if=((buff.incarnation.up|buff.berserk_bear.up)&active_enemies>1&(buff.tooth_and_claw.stack>=2))
+  if S.Raze:IsReady() and ((Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S>BerserkBuff)) and MeleeEnemies11yCount > 1 and Player:BuffStack(S.ToothandClawBuff) >= 2) then
+    if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 27"; end
   end
   -- thrash_bear,target_if=refreshable|dot.thrash_bear.stack<3|active_enemies>=5
   if S.Thrash:IsCastable() then
@@ -249,9 +257,17 @@ local function Bear()
   if S.Maul:IsReady() and UseMaul and (MeleeEnemies11yCount <= 5 and Player:BuffStack(S.ViciousCycleMaulBuff) >= 3 or MeleeEnemies11yCount < 4 and not S.ViciousCycle:IsAvailable()) then
     if Cast(S.Maul, nil, nil, not Target:IsInMeleeRange(8)) then return "maul bear 34"; end
   end
+  -- raze,if=((buff.tooth_and_claw.up&buff.tooth_and_claw.remains<1.5)&active_enemies>1)
+  if S.Raze:IsReady() and ((Player:BuffUp(S.ToothandClawBuff) and Player:BuffRemains(S.ToothandClawBuff) < 1.5) and MeleeEnemies11yCount > 1) then
+    if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 35"; end
+  end
+  -- raze,if=active_enemies<=5&buff.vicious_cycle_maul.stack>=3|active_enemies>1&!talent.vicious_cycle_maul.enabled
+  if S.Raze:IsReady() and (MeleeEnemies11yCount <= 5 and Player:BuffStack(S.ViciousCycleMaulBuff) >= 3 or MeleeEnemies11yCount > 1 and not S.ViciousCycle:IsAvailable()) then
+    if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 36"; end
+  end
   -- mangle,if=(buff.incarnation.up&active_enemies<=4)|(buff.incarnation.up&talent.soul_of_the_forest.enabled&active_enemies<=5)|((rage<90)&active_enemies<11)|((rage<85)&active_enemies<11&talent.soul_of_the_forest.enabled)
   if S.Mangle:IsCastable() and ((Player:BuffUp(S.IncarnationBuff) and MeleeEnemies11yCount <= 4) or (Player:BuffUp(S.IncarnationBuff) and S.SouloftheForest:IsAvailable() and MeleeEnemies11yCount <= 5) or (Player:Rage() < 90 and MeleeEnemies11yCount < 11) or (Player:Rage() < 85 and MeleeEnemies11yCount < 11 and S.SouloftheForest:IsAvailable())) then
-    if Cast(S.Mangle, nil, nil, not Target:IsInMeleeRange(8)) then return "mangle bear 36"; end
+    if Cast(S.Mangle, nil, nil, not Target:IsInMeleeRange(8)) then return "mangle bear 37"; end
   end
   -- thrash_bear,if=active_enemies>1
   if S.Thrash:IsCastable() and (MeleeEnemies11yCount > 1) then
