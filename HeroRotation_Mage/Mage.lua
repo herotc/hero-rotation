@@ -34,15 +34,12 @@ Spell.Mage.Commons = {
   AncestralCall                         = Spell(274738),
   BagofTricks                           = Spell(312411),
   Berserking                            = Spell(26297),
-  BerserkingBuff                        = Spell(26297),
   BloodFury                             = Spell(20572),
-  BloodFuryBuff                         = Spell(20572),
   Fireblood                             = Spell(265221),
   LightsJudgment                        = Spell(255647),
   -- Abilities
   ArcaneExplosion                       = Spell(1449), --Melee, 10
   ArcaneIntellect                       = Spell(1459),
-  ArcaneIntellectBuff                   = Spell(1459),
   Blink                                 = MultiSpell(1953, 212653),
   Frostbolt                             = Spell(116),
   FrostNova                             = Spell(122),
@@ -50,23 +47,29 @@ Spell.Mage.Commons = {
   TimeWarp                              = Spell(80353),
   -- Talents
   AlterTime                             = Spell(342245),
-  IceBlock                              = Spell(45438),
-  Counterspell                          = Spell(2139),
-  SpellSteal                            = Spell(30449),
-  Invisibility                          = Spell(66),
-  MirrorImage                           = Spell(55342),
-  RemoveCurse                           = Spell(475),
-  FocusMagic                            = Spell(321358),
-  RingOfFrost                           = Spell(113724),
-  RuneofPower                           = Spell(116011),
-  RuneofPowerBuff                       = Spell(116014),
   BlastWave                             = Spell(157981),
+  Counterspell                          = Spell(2139),
+  DragonsBreath                         = Spell(31661),
+  FocusMagic                            = Spell(321358),
+  IceBlock                              = Spell(45438),
   IceFloes                              = Spell(108839),
   IceNova                               = Spell(157997), --splash, 8
+  Invisibility                          = Spell(66),
   Meteor                                = Spell(153561),
+  MirrorImage                           = Spell(55342),
+  RemoveCurse                           = Spell(475),
+  RingOfFrost                           = Spell(113724),
+  RuneofPower                           = Spell(116011),
   ShiftingPower                         = Spell(382440), --Melee 15
+  SpellSteal                            = Spell(30449),
   TemporalWarp                          = Spell(386539),
+  -- Buffs
+  ArcaneIntellectBuff                   = Spell(1459),
+  BerserkingBuff                        = Spell(26297),
+  BloodFuryBuff                         = Spell(20572),
+  RuneofPowerBuff                       = Spell(116014),
   TemporalWarpBuff                      = Spell(386540),
+  -- Debuffs
 }
 
 Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
@@ -122,7 +125,6 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   BlazingBarrier                        = Spell(235313),
   Combustion                            = Spell(190319),
   CombustionBuff                        = Spell(190319),
-  DragonsBreath                         = Spell(31661),
   FireBlast                             = Spell(108853),
   Fireball                              = Spell(133),
   Flamestrike                           = Spell(2120),
