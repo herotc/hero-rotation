@@ -67,12 +67,20 @@ local function Precombat()
   if CDsON() and I.AlgethaPuzzleBox:IsEquippedAndReady() then
     if Cast(I.AlgethaPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 4"; end
   end
+  -- avatar,if=!talent.titans_torment
+  if S.Avatar:IsCastable() and (not S.TitansTorment:IsAvailable()) then
+    if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar precombat 6"; end
+  end
+  -- recklessness,if=!talent.reckless_abandon
+  if S.Recklessness:IsCastable() and (not S.RecklessAbandon:IsAvailable()) then
+    if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat 8"; end
+  end
   -- Manually Added: Charge if not in melee range. Bloodthirst if in melee range
   if S.Bloodthirst:IsCastable() and TargetInMeleeRange then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst precombat 6"; end
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst precombat 10"; end
   end
   if S.Charge:IsReady() and not TargetInMeleeRange then
-    if Cast(S.Charge) then return "charge precombat 8"; end
+    if Cast(S.Charge) then return "charge precombat 12"; end
   end
 end
 
@@ -173,17 +181,21 @@ local function SingleTarget()
   if S.CrushingBlow:IsCastable() then
     if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 48"; end
   end
+  -- bloodthirst
+  if S.Bloodthirst:IsCastable() then
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 50"; end
+  end
   -- whirlwind
   if AoEON() and S.Whirlwind:IsCastable() then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 50"; end
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 52"; end
   end
   -- wrecking_throw
   if S.WreckingThrow:IsCastable() then
-    if Cast(S.WreckingThrow, nil, nil, not Target:IsInRange(30)) then return "wrecking_throw single_target 52"; end
+    if Cast(S.WreckingThrow, nil, nil, not Target:IsInRange(30)) then return "wrecking_throw single_target 54"; end
   end
   -- storm_bolt
   if S.StormBolt:IsCastable() then
-    if Cast(S.StormBolt, nil, nil, not TargetInMeleeRange) then return "storm_bolt single_target 54"; end
+    if Cast(S.StormBolt, nil, nil, not TargetInMeleeRange) then return "storm_bolt single_target 56"; end
   end
 end
 
@@ -357,9 +369,9 @@ local function APL()
           if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
         end
       end
-      -- ravager,if=cooldown.recklessness.remains<3
-      -- Note: manually added cast if avatar was pressed before ravager and end of fight
-      if S.Ravager:IsCastable() and (S.Avatar:CooldownRemains() < 3 or Player:BuffRemains(S.RecklessnessBuff) >= 10 or HL.FightRemains() < 10) then
+      -- ravager,if=cooldown.recklessness.remains<3|buff.recklessness.up
+      -- Note: manually added end of fight
+      if S.Ravager:IsCastable() and (S.Avatar:CooldownRemains() < 3 or Player:BuffUp(S.RecklessnessBuff) or HL.FightRemains() < 10) then
         if Cast(S.Ravager, Settings.Fury.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager main 10"; end
       end
       -- blood_fury
