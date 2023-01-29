@@ -558,7 +558,7 @@ local function AoE()
     if Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt aoe 12"; end
   end
   -- mind_sear,target_if=max:spell_targets.mind_sear,if=buff.mind_devourer.up&spell_targets.mind_sear>1|spell_targets.mind_sear>variable.mind_sear_cutoff&(insanity>=75|((!set_bonus.tier29_4pc&!set_bonus.tier29_2pc)|!buff.dark_reveries.up)|(!set_bonus.tier29_2pc|buff.gathering_shadows.stack=3))&!variable.pool_for_cds,early_chain_if=ticks>=2&!buff.mind_devourer_ms_active.up,interrupt_immediate=1,interrupt_if=ticks>=2&!buff.mind_devourer_ms_active.up
-  if S.MindSear:IsReady() and (Player:BuffUp(S.MindDevourerBuff) and EnemiesCount10ySplash > 1 or EnemiesCount10ySplash > VarMindSearCutoff and (Player:Insanity() >= 75 or ((not Player:HasTier(29, 2)) or Player:BuffDown(S.DarkReveries)) or ((not Player:HasTier(29, 2)) or Player:BuffStack(S.GatheringShadowsBuff) == 3)) and not VarPoolForCDs) then
+  if S.MindSear:IsReady() and (Player:BuffUp(S.MindDevourerBuff) and EnemiesCount10ySplash > 1 or EnemiesCount10ySplash > VarMindSearCutoff and (Player:Insanity() >= 75 or ((not Player:HasTier(29, 2)) or Player:BuffDown(S.DarkReveriesBuff)) or ((not Player:HasTier(29, 2)) or Player:BuffStack(S.GatheringShadowsBuff) == 3)) and not VarPoolForCDs) then
     if Cast(S.MindSear, nil, nil, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear aoe 14"; end
   end
   -- call_action_list,name=pl_torrent,if=talent.void_torrent&talent.psychic_link&cooldown.void_torrent.remains<=3&(!variable.holding_crash|raid_event.adds.count%(active_dot.vampiric_touch+raid_event.adds.count)<1.5)&((insanity>=50|dot.devouring_plague.ticking|buff.dark_reveries.up)|buff.voidform.up)
