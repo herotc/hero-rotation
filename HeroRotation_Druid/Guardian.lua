@@ -238,7 +238,7 @@ local function Bear()
     if Cast(S.Maul, nil, nil, not Target:IsInMeleeRange(8)) then return "maul bear 26"; end
   end
   -- raze,if=((buff.incarnation.up|buff.berserk_bear.up)&active_enemies>1&(buff.tooth_and_claw.stack>=2))
-  if S.Raze:IsReady() and ((Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S>BerserkBuff)) and MeleeEnemies11yCount > 1 and Player:BuffStack(S.ToothandClawBuff) >= 2) then
+  if S.Raze:IsReady() and ((Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S.BerserkBuff)) and MeleeEnemies11yCount > 1 and Player:BuffStack(S.ToothandClawBuff) >= 2) then
     if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 27"; end
   end
   -- thrash_bear,target_if=refreshable|dot.thrash_bear.stack<3|active_enemies>=5
