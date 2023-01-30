@@ -343,7 +343,7 @@ local function St()
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 54"; end
   end
   -- wild_mushroom,if=!fight_style.dungeonroute|target.time_to_die>(full_recharge_time-7)|fight_remains<10
-  local DungeonRoute = Player:IsInParty() and not Plyaer:IsInRaid()
+  local DungeonRoute = Player:IsInParty() and not Player:IsInRaid()
   if S.WildMushroom:IsCastable() and ((not DungeonRoute) or Target:TimeToDie() > (S.WildMushroom:FullRechargeTime() - 7) or FightRemains < 10) then
     if Cast(S.WildMushroom, nil, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 56"; end
   end
