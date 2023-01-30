@@ -457,9 +457,13 @@ local function AoE()
   if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) and EnemiesCount8ySplash < 17) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge aoe 44"; end
   end
-  -- starfire
-  if S.Starfire:IsCastable() and not Player:IsMoving() then
+  -- starfire,if=spell_targets>1
+  if S.Starfire:IsCastable() and not Player:IsMoving() and (EnemiesCount8ySplash > 1) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire aoe 46"; end
+  end
+  -- wrath
+  if S.Wrath:IsCastable() and not Player:IsMoving() then
+    if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath aoe 48"; end
   end
   -- run_action_list,name=fallthru
   local ShouldReturn = Fallthru(); if ShouldReturn then return ShouldReturn; end
