@@ -130,8 +130,6 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   -- flametongue_weapon,if=talent.imporved_flametongue_weapon.enabled
-  -- potion
-  -- Note: Skipping potion precombat, as that's not necessarily optimal
   -- Manually added: Opener abilities
   if IsViable(S.Stormkeeper) then
     if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper precombat 2"; end
@@ -572,6 +570,13 @@ local function APL()
     end
     -- invoke_external_buff,name=power_infusion,if=talent.ascendance.enabled&buff.ascendance.up|!talent.ascendance.enabled
     -- Note: Not handling external buffs.
+    -- potion
+    if Settings.Commons.Enabled.Potions then
+      local PotionSelected = Everyone.PotionSelected()
+      if PotionSelected and PotionSelected:IsReady() then
+        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 14"; end
+      end
+    end
     -- run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
     if (AoEON() and Shaman.Targets > 2 and Shaman.ClusterTargets > 2) then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
