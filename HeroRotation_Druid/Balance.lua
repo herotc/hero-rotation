@@ -342,8 +342,9 @@ local function St()
   if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:AstralPowerDeficit() < VarPassiveAsp + (8 * (1 + 0.5 * num(S.SouloftheForest:IsAvailable()) * num(Player:BuffUp(S.EclipseSolar)))) or S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemains() < 3 or FightRemains < 5) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 54"; end
   end
-  -- wild_mushroom,if=astral_power.deficit>variable.passive_asp+5&(!talent.fungal_growth|talent.stellar_flare|dot.fungal_growth.remains<2)&raid_event.adds.in>30-15*charges|fight_remains<10
-  if S.WildMushroom:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 5 and ((not S.FungalGrowth:IsAvailable()) or S.StellarFlare:IsAvailable() or Target:DebuffRemains(S.FungalGrowthDebuff) < 2) or FightRemains < 10) then
+  -- wild_mushroom,if=!fight_style.dungeonroute|target.time_to_die>(full_recharge_time-7)|fight_remains<10
+  local DungeonRoute = Player:IsInParty() and not Plyaer:IsInRaid()
+  if S.WildMushroom:IsCastable() and ((not DungeonRoute) or Target:TimeToDie() > (S.WildMushroom:FullRechargeTime() - 7) or FightRemains < 10) then
     if Cast(S.WildMushroom, nil, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 56"; end
   end
   -- starfire,if=eclipse.in_lunar&buff.umbral_embrace.react|buff.eclipse_lunar.up&buff.warrior_of_elune.up
