@@ -151,7 +151,7 @@ end
 
 local function Aoe()
   -- cone_of_cold,if=buff.snowstorm.stack=buff.snowstorm.max_stack&debuff.frozen.up&(prev_gcd.1.frost_nova|prev_gcd.1.ice_nova|prev_off_gcd.freeze)
-  if S.ConeofCold:IsCastable() and (Player:BuffStackP(S.SnowstormBuff) == var_snowstorm_max_stack and FrozenRemains > 0 and (Player:PrevGCDP(1, S.FrostNova) or Player:PrevGCDP(1, S.IceNova) or Player:PrevGCDP(1, S.Freeze))) then
+  if S.ConeofCold:IsCastable() and (Player:BuffStackP(S.SnowstormBuff) == var_snowstorm_max_stack and FrozenRemains() > 0 and (Player:PrevGCDP(1, S.FrostNova) or Player:PrevGCDP(1, S.IceNova) or Player:PrevGCDP(1, S.Freeze))) then
     if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold aoe 2"; end
   end
   -- frozen_orb
@@ -167,7 +167,7 @@ local function Aoe()
     if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm aoe 8"; end
   end
   -- freeze,if=(target.level<level+3|target.is_add)&(!talent.snowstorm&debuff.frozen.down|cooldown.cone_of_cold.ready&buff.snowstorm.stack=buff.snowstorm.max_stack)
-  if Pet:IsActive() and S.Freeze:IsReady() and (Target:Level() < Player:Level() + 3 and ((not S.Snowstorm:IsAvailable()) and FrozenRemains == 0 or S.ConeofCold:CooldownUp() and Player:BuffStackP(S.SnowstormBuff) == var_snowstorm_max_stack)) then
+  if Pet:IsActive() and S.Freeze:IsReady() and (Target:Level() < Player:Level() + 3 and ((not S.Snowstorm:IsAvailable()) and FrozenRemains() == 0 or S.ConeofCold:CooldownUp() and Player:BuffStackP(S.SnowstormBuff) == var_snowstorm_max_stack)) then
     if Cast(S.Freeze, nil, nil, not Target:IsSpellInRange(S.Freeze)) then return "freeze aoe 10"; end
   end
   -- ice_nova,if=(target.level<level+3|target.is_add)&(prev_gcd.1.comet_storm|cooldown.cone_of_cold.ready&buff.snowstorm.stack=buff.snowstorm.max_stack&gcd.max<1)
