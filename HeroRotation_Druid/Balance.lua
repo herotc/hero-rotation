@@ -173,8 +173,8 @@ local function EclipseCheck()
 end
 
 local function InitVars()
-  -- variable,name=no_cd_talent,value=!talent.celestial_alignment&!talent.incarnation_chosen_of_elune
-  VarNoCDTalent = (not S.CelestialAlignment:IsAvailable()) and (not S.IncarnationTalent:IsAvailable())
+  -- variable,name=no_cd_talent,value=!talent.celestial_alignment&!talent.incarnation_chosen_of_elune|druid.no_cds
+  VarNoCDTalent = (not S.CelestialAlignment:IsAvailable()) and (not S.IncarnationTalent:IsAvailable()) or not CDsON()
   -- variable,name=solar_eclipse_st,value=talent.umbral_intensity.rank=2
   VarSolarEclipseST = S.UmbralIntensity:TalentRank() == 2
   -- variable,name=on_use_trinket,value=0
@@ -246,8 +246,8 @@ local function St()
   if S.StellarFlare:IsCastable() then
     if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareST, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare st 10"; end
   end
-  -- variable,name=cd_condition_st,value=cooldown.ca_inc.remains<15&!buff.ca_inc.up&(target.time_to_die>15|fight_remains<25+10*talent.incarnation_chosen_of_elune)
-  VarCDConditionST = CaInc:CooldownRemains() < 15 and (not CAIncBuffUp) and (Target:TimeToDie() > 15 or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable()))
+  -- variable,name=cd_condition_st,value=!druid.no_cds&(cooldown.ca_inc.remains<15&!buff.ca_inc.up&(target.time_to_die>15|fight_remains<25+10*talent.incarnation_chosen_of_elune))
+  VarCDConditionST = CDsON() and (CaInc:CooldownRemains() < 15 and (not CAIncBuffUp) and (Target:TimeToDie() > 15 or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable())))
   -- wrath,if=variable.cd_condition_st&set_bonus.tier29_4pc&eclipse.any_next|fight_remains>10&(target.time_to_die<=2&astral_power.deficit>20|target.time_to_die<=5&buff.primordial_arcanic_pulsar.value>=550)
   if S.Wrath:IsCastable() and (VarCDConditionST and Player:HasTier(29, 4) and EclipseAnyNext or FightRemains > 10 and (Target:TimeToDie() <= 2 and Player:AstralPowerDeficit() > 20 or Target:TimeToDie() <= 5 and PAPValue >= 550)) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath st 12"; end
@@ -374,8 +374,8 @@ local function AoE()
   if S.Moonfire:IsCastable() and (not DungeonRoute) then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireAoE, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire aoe 6"; end
   end
-  -- variable,name=cd_condition_aoe,value=cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>10|fight_remains<25+10*talent.incarnation_chosen_of_elune)
-  VarCDConditionAoE = CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 10 or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable()))
+  -- variable,name=cd_condition_aoe,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>10|fight_remains<25+10*talent.incarnation_chosen_of_elune))
+  VarCDConditionAoE = CDsON() and (CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 10 or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable())))
   -- wrath,if=variable.cd_condition_aoe&set_bonus.tier29_4pc&eclipse.any_next
   if S.Wrath:IsCastable() and (VarCDConditionAoE and Player:HasTier(29, 4) and EclipseAnyNext) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath aoe 8"; end
@@ -536,7 +536,8 @@ local function APL()
     if S.Berserking:IsCastable() and CDsON() and (CAIncBuffRemains >= 20 or VarNoCDTalent or FightRemains < 15) then
       if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 2"; end
     end
-    -- potion,if=buff.ca_inc.remains>=20|variable.no_cd_talent|fight_remains<30
+    -- potion,if=!druid.no_cds&(buff.ca_inc.remains>=20|variable.no_cd_talent|fight_remains<30)
+    -- Note: Using Enabled.Potions instead of !druid.no_cds
     if Settings.Commons.Enabled.Potions and (CAIncBuffRemains >= 20 or VarNoCDTalent or FightRemains < 30) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
