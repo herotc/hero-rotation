@@ -284,8 +284,8 @@ local function St()
   if S.Trueshot:IsReady() and CDsON() and (VarTrueshotReady) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot st 24"; end
   end
-  -- multishot,if=buff.bombardment.up&buff.trick_shots.down&active_enemies>1|talent.salvo&buff.salvo.down&!talent.volley
-  if S.MultiShot:IsReady() and (Player:BuffUp(S.BombardmentBuff) and (not TrickShotsBuffCheck()) and EnemiesCount10ySplash > 1 or S.Salvo:IsAvailable() and not S.Volley:IsAvailable()) then
+  -- multishot,if=buff.bombardment.up&buff.trick_shots.down&active_enemies>1|buff.salvo.up&!talent.volley
+  if S.MultiShot:IsReady() and (Player:BuffUp(S.BombardmentBuff) and (not TrickShotsBuffCheck()) and EnemiesCount10ySplash > 1 or Player:BuffUp(S.SalvoBuff) and not S.Volley:IsAvailable()) then
     if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot st 26"; end
   end
   -- aimed_shot,target_if=min:dot.serpent_sting.remains+action.serpent_sting.in_flight_to_target*99,if=talent.serpentstalkers_trickery&(buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2|ca_active)|buff.trick_shots.remains>execute_time&active_enemies>1)
