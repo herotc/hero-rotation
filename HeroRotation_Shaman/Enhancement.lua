@@ -43,7 +43,7 @@ local OnUseExcludes = {
 -- Rotation Var
 local HasMainHandEnchant, HasOffHandEnchant
 local MHEnchantTimeRemains, OHEnchantTimeRemains
-local Enemies40y, Enemies10y, Enemies10yCount, Enemies40yCount
+local Enemies10y, Enemies10yCount
 local MaxEBCharges = S.LavaBurst:IsAvailable() and 2 or 1
 local TIAction = S.LightningBolt
 local BossFightRemains = 11111
@@ -291,7 +291,7 @@ local function Aoe()
   end
   -- primordial_wave,target_if=min:dot.flame_shock.remains,cycle_targets=1,if=!buff.primordial_wave.up
   if S.PrimordialWave:IsReady() and (Player:BuffDown(S.PrimordialWaveBuff)) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies40y, "min", EvaluateTargetIfFilterPrimordialWave, EvaluateTargetIfPrimordialWave, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 12"; end
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10y, "min", EvaluateTargetIfFilterPrimordialWave, EvaluateTargetIfPrimordialWave, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 12"; end
   end
   -- windstrike,if=talent.thorims_invocation.enabled&ti_chain_lightning&buff.maelstrom_weapon.stack>1
   if S.Windstrike:IsReady() and (S.ThorimsInvocation:IsAvailable() and TIAction == S.ChainLightning and Player:BuffStack(S.MaelstromWeaponBuff) > 1) then
@@ -311,7 +311,7 @@ local function Aoe()
   end
   -- flame_shock,target_if=min:dot.flame_shock.remains,cycle_targets=1,if=talent.fire_nova.enabled&(active_dot.flame_shock<active_enemies)&active_dot.flame_shock<6
   if S.FlameShock:IsReady() and (S.FireNova:IsAvailable() and S.FlameShockDebuff:AuraActiveCount() < Enemies10yCount and S.FlameShockDebuff:AuraActiveCount() < 6) then
-    if Everyone.CastCycle(S.FlameShock, Enemies40y, EvaluateCycleFlameShock, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 20"; end
+    if Everyone.CastCycle(S.FlameShock, Enemies10y, EvaluateCycleFlameShock, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 20"; end
   end
   -- ice_strike,if=talent.hailstorm.enabled
   if S.IceStrike:IsReady() and (S.Hailstorm:IsAvailable()) then
@@ -421,7 +421,7 @@ local function Aoe()
   end
   -- flame_shock,target_if=refreshable,cycle_targets=1
   if S.FlameShock:IsReady() then
-    if Everyone.CastCycle(S.FlameShock, Enemies40y, EvaluateCycleFlameShock, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 68"; end
+    if Everyone.CastCycle(S.FlameShock, Enemies10y, EvaluateCycleFlameShock, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 68"; end
   end
   -- frost_shock
   if S.FrostShock:IsReady() then
@@ -448,13 +448,9 @@ local function APL()
 
   -- Unit Update
   if AoEON() then
-    Enemies40y = Player:GetEnemiesInRange(40)
-    Enemies40yCount = #Enemies40y
     Enemies10y = Player:GetEnemiesInMeleeRange(10)
     Enemies10yCount = #Enemies10y
   else
-    Enemies40y = {}
-    Enemies40yCount = 1
     Enemies10y = {}
     Enemies10yCount = 1
   end
