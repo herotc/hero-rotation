@@ -79,6 +79,7 @@ HR.GUISettings.APL.Druid = {
     }
   },
   Guardian = {
+    UseIronfurOffensively = true,
     UseRageDefensively = true,
     BarkskinHP = 50,
     FrenziedRegenHP = 70,
@@ -141,6 +142,7 @@ CreateARPanelOptions(CP_Feral, "APL.Druid.Feral")
 
 -- Guardian
 CreateARPanelOptions(CP_Guardian, "APL.Druid.Guardian")
+CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseIronfurOffensively", "Use Ironfur Offensively", "Enable this if you want offensive Ironfur suggestions (e.g. with Thorns of Iron).")
 CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseRageDefensively", "Use Rage Defensively", "Enable this if you want to save rage for defensive use, disabling Maul suggestions.")
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.BarkskinHP", {0, 100, 1}, "Barkskin Threshold", "Set the HP percentage threshold of when to use Barkskin.")
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.FrenziedRegenHP", {0, 100, 1}, "Frenzied Regen Threshold", "Set the HP percentage threshold of when to use Frenzied Regeneration.")
