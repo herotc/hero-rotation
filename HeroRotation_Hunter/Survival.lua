@@ -39,6 +39,7 @@ local S = Spell.Hunter.Survival
 local I = Item.Hunter.Survival
 local OnUseExcludes = {
   I.AlgetharPuzzleBox:ID(),
+  I.ManicGrieftorch:ID(),
 }
 
 -- Trinket Item Objects
@@ -196,6 +197,10 @@ local function CDs()
   if I.AlgetharPuzzleBox:IsEquippedAndReady() and (Player:GCDRemains() > Player:GCD() - 0.6) then
     if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cds 17"; end
   end
+  -- use_item,name=manic_grieftorch,use_off_gcd=1,if=gcd.remains>gcd.max-0.1&!buff.spearhead.up
+  if I.ManicGrieftorch:IsEquippedAndReady() and (Player:GCDRemains() > Player:GCD() - 0.6 and Player:BuffDown(S.SpearheadBuff)) then
+    if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch cds 18"; end
+  end
   -- use_items
   local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
   if TrinketToUse then
@@ -203,7 +208,7 @@ local function CDs()
   end
   -- aspect_of_the_eagle,if=target.distance>=6
   if S.AspectoftheEagle:IsCastable() and Settings.Survival.AspectOfTheEagle and not Target:IsInRange(6) then
-    if Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectOfTheEagle) then return "aspect_of_the_eagle cds 18"; end
+    if Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectOfTheEagle) then return "aspect_of_the_eagle cds 19"; end
   end
 end
 
