@@ -57,6 +57,7 @@ HR.GUISettings.APL.Druid = {
       MoonkinForm = false,
       Starfall = false,
       WarriorOfElune = true,
+      WildMushroom = false,
     },
     OffGCDasOffGCD = {
       Barkskin = true,
@@ -128,10 +129,7 @@ local CP_Restoration = CreateChildPanel(CP_Druid, "Restoration")
 CreateARPanelOptions(CP_Druid, "APL.Druid.Commons")
 
 -- Balance
-CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.BarkskinHP", {0, 100, 1}, "Barkskin HP", "Set the Barkskin HP threshold.")
-CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.")
 CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMoonkinFormOOC", "Show Moonkin Form Out of Combat", "Enable this if you want the addon to show you the Moonkin Form reminder out of combat.")
-CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.DelayBerserking", "Delay Berserking", "Delay Berserking usage by 0.3 seconds, which aligns timing with the timing used in early patch 9.2.")
 CreateARPanelOptions(CP_Balance, "APL.Druid.Balance")
 
 -- Feral
