@@ -485,7 +485,7 @@ local function Main()
   end
   -- void_torrent,if=insanity<=35&!variable.holding_crash,target_if=variable.all_dots_up
   if S.VoidTorrent:IsCastable() and (Player:Insanity() <= 35 and not VarHoldingCrash) then
-    if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent 32"; end
+    if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent 32"; end
   end
   -- call_action_list,name=filler
   local ShouldReturn = Filler(); if ShouldReturn then return ShouldReturn; end
@@ -514,7 +514,7 @@ local function PLTorrent()
   end
   -- void_torrent,if=dot.vampiric_touch.ticking&dot.shadow_word_pain.ticking|buff.voidform.up
   if S.VoidTorrent:IsCastable() and (DotsUp(Target, false) or Player:BuffUp(S.VoidformBuff)) then
-    if Cast(S.VoidTorrent, nil, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent pl_torrent 12"; end
+    if Cast(S.VoidTorrent, Settings.Shadow.GCDasOffGCD.VoidTorrent, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent pl_torrent 12"; end
   end
   -- mindgames,if=dot.vampiric_touch.ticking&dot.shadow_word_pain.ticking&dot.devouring_plague.ticking|buff.voidform.up
   if S.Mindgames:IsReady() and (DotsUp(Target, true) or Player:BuffUp(S.VoidformBuff)) then
@@ -595,7 +595,7 @@ local function AoE()
   end
   -- void_torrent,if=insanity<=35&!talent.psychic_link,target_if=variable.dots_up
   if S.VoidTorrent:IsCastable() and (Player:Insanity() <= 35 and not S.PsychicLink:IsAvailable()) then
-    if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVTAoE2, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent aoe 30"; end
+    if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVTAoE2, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent aoe 30"; end
   end
   -- mind_flay,if=buff.mind_flay_insanity.up&buff.surge_of_darkness.remains>=5,interrupt_if=ticks>=2,interrupt_immediate=1
   if Flay:IsCastable() and (Player:BuffUp(S.MindFlayInsanityBuff) and Player:BuffRemains(S.SurgeOfDarknessBuff) >= 5) then

@@ -54,6 +54,7 @@ HR.GUISettings.APL.Priest = {
       Shadowform = true,
       ShadowWordDeath = false,
       VoidEruption = true,
+      VoidTorrent = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
