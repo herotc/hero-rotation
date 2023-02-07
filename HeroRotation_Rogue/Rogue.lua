@@ -126,6 +126,7 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   WoundPoison             = Spell(8679),
   WoundPoisonDebuff       = Spell(8680),
   -- Talents
+  ArterialPrecision       = Spell(400783),
   AtrophicPoisonDebuff    = Spell(392388),
   BlindsideBuff           = Spell(121153),
   CrimsonTempest          = Spell(121411),
