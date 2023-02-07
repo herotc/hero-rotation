@@ -73,7 +73,9 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   ShearFury                             = Spell(389997),
   SoulBarrier                           = Spell(263648),
   SoulCarver                            = Spell(207407),
+  SoulCrush                             = Spell(389985),
   SpiritBomb                            = Spell(247454),
+  Vulnerability                         = Spell(389976),
   -- Utility
   Metamorphosis                         = Spell(187827),
   -- Buffs
