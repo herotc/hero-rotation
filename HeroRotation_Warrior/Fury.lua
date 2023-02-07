@@ -358,9 +358,9 @@ local function APL()
       end
     end
     if CDsON() then
-      --use_item,name=manic_grieftorch,if=buff.recklessness.down&buff.avatar.down
+      --use_item,name=manic_grieftorch,if=buff.avatar.down
       if Settings.Commons.Enabled.Trinkets then
-        if I.ManicGrieftorch:IsEquippedAndReady() and Player:BuffDown(S.RecklessnessBuff) and Player:BuffDown(S.Avatar) then
+        if I.ManicGrieftorch:IsEquippedAndReady() and Player:BuffDown(S.Avatar) then
           if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch main 8"; end
         end
         -- Manually added: use_items generic
