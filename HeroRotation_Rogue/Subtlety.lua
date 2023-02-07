@@ -752,7 +752,7 @@ local function APL ()
 
   -- Unit Update
   MeleeRange = S.AcrobaticStrikes:IsAvailable() and 8 or 5
-  AoERange = S.AcrobaticStrikes:IsAvailable() and 10 or 13
+  AoERange = S.AcrobaticStrikes:IsAvailable() and 13 or 10
   TargetInMeleeRange = Target:IsInMeleeRange(MeleeRange)
   TargetInAoERange = Target:IsInMeleeRange(AoERange)
   if AoEON() then
