@@ -217,7 +217,7 @@ local function Hac()
     if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave hac 94"; end
   end
   -- ignore_pain,if=talent.battlelord&talent.anger_management&rage>30&(target.health.pct>20|talent.massacre&target.health.pct>35)
-  if S.IgnorePain:IsReady() and S.Battlelord:IsAvailable() and S.AngerManagement:IsAvailable() and Player:Rage() > 30 and (Target:HealthPercentage() < 20 or S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) then
+  if S.IgnorePain:IsReady() and (S.Battlelord:IsAvailable() and S.AngerManagement:IsAvailable() and Player:Rage() > 30 and (Target:HealthPercentage() > 20 or S.Massacre:IsAvailable() and Target:HealthPercentage() > 35)) then
     if Cast(S.IgnorePain, Settings.Arms.GCDasOffGCD.IgnorePain) then return "ignore_pain hac 95"; end
   end
   -- slam,if=talent.crushing_force&rage>30&(talent.fervor_of_battle&active_enemies=1|!talent.fervor_of_battle)
@@ -351,7 +351,7 @@ local function SingleTarget()
     if Cast(S.Shockwave, Settings.Arms.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave single_target 109"; end
   end
   -- ignore_pain,if=talent.anger_management|talent.test_of_might&debuff.colossus_smash.up
-  if S.IgnorePain:IsReady() and S.AngerManagement:IsAvailable() or S.TestofMight:IsAvailable() and Target:DebuffUp(S.ColossusSmashDebuff) then
+  if S.IgnorePain:IsReady() and (S.AngerManagement:IsAvailable() or S.TestofMight:IsAvailable() and Target:DebuffUp(S.ColossusSmashDebuff)) then
     if Cast(S.IgnorePain, Settings.Arms.GCDasOffGCD.IgnorePain) then return "ignore_pain single_target 110"; end
   end
   -- whirlwind,if=talent.storm_of_swords&talent.battlelord&rage.pct>80&debuff.colossus_smash.up
