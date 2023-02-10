@@ -296,7 +296,8 @@ local function APL()
       if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver main 22"; end
     end
     -- soul_carver,if=variable.fiery_demise_fiery_brand_is_ticking_on_current_target&soul_fragments<=3&debuff.frailty.stack>=variable.cooldown_frailty_requirement
-    if S.SoulCarver:IsCastable() and (VarFDFBTicking and SoulFragments <= 3 and Target:DebuffStack(S.FrailtyDebuff) >= VarCDFrailtyReq) then
+    -- Note: Removing Frailty stack requirement for now, as we rarely hit enough stacks during FB while saving Fury for FelDevastation.
+    if S.SoulCarver:IsCastable() and (VarFDFBTicking and SoulFragments <= 3) then
       if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver main 24"; end
     end
     -- fel_devastation,if=variable.fiery_demise_fiery_brand_is_ticking_on_current_target&dot.fiery_brand.remains<3
