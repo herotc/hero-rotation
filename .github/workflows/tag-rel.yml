@@ -49,5 +49,8 @@ jobs:
           asset_name: HeroRotation-${{ env.tag }}.zip
           asset_content_type: application/zip
       # Use the BigWigs packager for Wago output
-      - name: Package and Release
-        uses: BigWigsMods/packager@v1
+      #- name: Package and Release
+      #  uses: BigWigsMods/packager@v2
+      #  with:
+      #    args: -p 103143 -a xxxxxxxxx
+      # Note: -p is project ID on CurseForge, -a is ID on wago.io
