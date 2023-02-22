@@ -270,7 +270,7 @@
       );
 
       -- Keybind
-      if Keybinds then
+      if Keybinds[i] then
         PartFrame.Keybind:SetText(Keybinds[i]);
         PartFrame.Keybind:SetScale(HR.GUISettings.Scaling.ScaleHotkey);
       else
