@@ -38,10 +38,10 @@ local OnUseExcludes = {
 }
 
 -- Rotation Var
-local VarDeathStrikeDumpAmt
-local VarBoneShieldRefreshValue
-local VarHeartStrikeRP
-local VarHeartStrikeRPDRW
+local VarDeathStrikeDumpAmt = 65
+local VarBoneShieldRefreshValue = ((not S.DeathsCaress:IsAvailable()) or S.Consumption:IsAvailable() or S.Blooddrinker:IsAvailable()) and 4 or 5
+local VarHeartStrikeRP = 0
+local VarHeartStrikeRPDRW = 0
 local IsTanking
 local EnemiesMelee
 local EnemiesMeleeCount
@@ -62,6 +62,11 @@ local Settings = {
 local StunInterrupts = {
   {S.Asphyxiate, "Cast Asphyxiate (Interrupt)", function () return true; end},
 }
+
+-- Register for talent changes
+HL:RegisterForEvent(function()
+  VarBoneShieldRefreshValue = ((not S.DeathsCaress:IsAvailable()) or S.Consumption:IsAvailable() or S.Blooddrinker:IsAvailable()) and 4 or 5
+end, "PLAYER_TALENT_UPDATE")
 
 --Functions
 local function UnitsWithoutBP(enemies)
@@ -340,9 +345,9 @@ local function APL()
     end
     -- auto_attack
     -- variable,name=death_strike_dump_amount,value=65
-    VarDeathStrikeDumpAmt = 65
+    -- Moved to variable declarations, since this is currently a static value.
     -- variable,name=bone_shield_refresh_value,value=4,op=setif,condition=!talent.deaths_caress.enabled|talent.consumption.enabled|talent.blooddrinker.enabled,value_else=5
-    VarBoneShieldRefreshValue = ((not S.DeathsCaress:IsAvailable()) or S.Consumption:IsAvailable() or S.Blooddrinker:IsAvailable()) and 4 or 5
+    -- Moved to variable declarations and PLAYER_TALENT_UPDATE registration. No need to keep checking during combat, as talents can't change at that point.
     -- mind_freeze,if=target.debuff.casting.react
     -- Note: Handled above in Interrupts
     -- invoke_external_buff,name=power_infusion,if=buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon
