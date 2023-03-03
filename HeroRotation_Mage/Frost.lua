@@ -99,7 +99,7 @@ end
 
 local function Cooldowns()
   -- time_warp,if=buff.exhaustion.up&buff.bloodlust.down
-  if S.TimeWarp:IsCastable() and Settings.Frost.UseTemporalWarp and Player:BloodlustExhaustUp() and Player:BloodlustDown() then
+  if S.TimeWarp:IsCastable() and S.TemporalWarp:IsAvailable() and Settings.Frost.UseTemporalWarp and Player:BloodlustExhaustUp() and Player:BloodlustDown() then
     if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 2"; end
   end
   -- potion,if=prev_off_gcd.icy_veins|fight_remains<60
