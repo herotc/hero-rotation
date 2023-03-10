@@ -211,6 +211,7 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   Maul                                  = Spell(6807),
   Incarnation                           = Spell(102558),
   LayeredMane                           = Spell(384721),
+  LunarBeam                             = Spell(204066),
   Pulverize                             = Spell(80313),
   RageoftheSleeper                      = Spell(200851),
   Raze                                  = Spell(400254),
