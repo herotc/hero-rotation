@@ -179,6 +179,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   DoubleClawedRake                      = Spell(391700),
   FeralFrenzy                           = Spell(274837),
   Incarnation                           = Spell(102543),
+  LionsStrength                         = Spell(391972),
   LunarInspiration                      = Spell(155580),
   LIMoonfire                            = Spell(155625), -- Lunar Inspiration Moonfire
   MomentofClarity                       = Spell(236068),

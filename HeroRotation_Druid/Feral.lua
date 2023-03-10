@@ -80,8 +80,10 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
+  S.AdaptiveSwarm:RegisterInFlightEffect(391889)
   S.AdaptiveSwarm:RegisterInFlight()
 end, "LEARNED_SPELL_IN_TAB")
+S.AdaptiveSwarm:RegisterInFlightEffect(391889)
 S.AdaptiveSwarm:RegisterInFlight()
 
 -- Interrupt Stuns
@@ -276,8 +278,8 @@ local function Clearcasting()
   if S.Swipe:IsReady() and (EnemiesCount11y > 1) then
     if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(11)) then return "swipe clearcasting 4"; end
   end
-  -- brutal_slash,if=spell_targets.brutal_slash>5&talent.moment_of_clarity.enabled
-  if S.BrutalSlash:IsReady() and (EnemiesCount11y > 5 and S.MomentofClarity:IsAvailable()) then
+  -- brutal_slash,if=spell_targets.brutal_slash>2&talent.moment_of_clarity.enabled
+  if S.BrutalSlash:IsReady() and (EnemiesCount11y > 2 and S.MomentofClarity:IsAvailable()) then
     if Cast(S.BrutalSlash, nil, nil, not Target:IsInMeleeRange(8)) then return "brutal_slash clearcasting 6"; end
   end
   -- shred
@@ -328,17 +330,21 @@ local function BerserkBuilders()
   if S.Swipe:IsReady() and (EnemiesCount11y > 1) then
     if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(11)) then return "swipe berserk_builders 4"; end
   end
+  -- shred,if=active_bt_triggers=2&buff.bt_shred.down
+  if S.Shred:IsReady() and (CountActiveBtTriggers() == 2 and BTBuffDown(S.Shred)) then
+    if Cast(S.Shred, nil, nil, not Target:IsInMeleeRange(8)) then return "shred berserk_builders 6"; end
+  end
   -- brutal_slash,if=active_bt_triggers=2&buff.bt_brutal_slash.down
   if S.BrutalSlash:IsReady() and (CountActiveBtTriggers() == 2 and BTBuffDown(S.BrutalSlash)) then
-    if Cast(S.BrutalSlash, nil, nil, not Target:IsInMeleeRange(11)) then return "brutal_slash berserk_builders 6"; end
+    if Cast(S.BrutalSlash, nil, nil, not Target:IsInMeleeRange(11)) then return "brutal_slash berserk_builders 8"; end
   end
   -- moonfire_cat,target_if=refreshable
   if S.LIMoonfire:IsReady() then
-    if Everyone.CastCycle(S.LIMoonfire, Enemies11y, EvaluateCycleLIMoonfire, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat berserk_builder 8"; end
+    if Everyone.CastCycle(S.LIMoonfire, Enemies11y, EvaluateCycleLIMoonfire, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat berserk_builders 10"; end
   end
   -- shred
   if S.Shred:IsReady() then
-    if Cast(S.Shred, nil, nil, not Target:IsInMeleeRange(8)) then return "shred berserk_builders 10"; end
+    if Cast(S.Shred, nil, nil, not Target:IsInMeleeRange(8)) then return "shred berserk_builders 12"; end
   end
 end
 
@@ -358,7 +364,7 @@ local function Finisher()
   -- pool_resource,for_next=1
   -- ferocious_bite,max_energy=1,if=!buff.bs_inc.up|(buff.bs_inc.up&!talent.soul_of_the_forest.enabled)
   if S.FerociousBite:IsReady() and (Player:BuffDown(BsInc) or (Player:BuffUp(BsInc) and not S.SouloftheForest:IsAvailable())) then
-    if CastPooling(S.FerociousBite, Player:EnergyTimeToX(50)) then return "ferocious_bite finisher 14"; end
+    if CastPooling(S.FerociousBite, Player:EnergyTimeToX(50)) then return "ferocious_bite finisher 8"; end
   end
   -- ferocious_bite,if=(buff.bs_inc.up&talent.soul_of_the_forest.enabled)
   if S.FerociousBite:IsReady() and (Player:BuffUp(BsInc) and S.SouloftheForest:IsAvailable()) then
@@ -367,32 +373,32 @@ local function Finisher()
 end
 
 local function Cooldown()
-  -- berserk
-  if S.Berserk:IsReady() then
-    if Cast(S.Berserk, Settings.Feral.GCDasOffGCD.BsInc) then return "berserk cooldown 2"; end
-  end
   -- incarnation
   if S.Incarnation:IsReady() then
-    if Cast(S.Incarnation, Settings.Feral.GCDasOffGCD.BsInc) then return "incarnation cooldown 4"; end
+    if Cast(S.Incarnation, Settings.Feral.GCDasOffGCD.BsInc) then return "incarnation cooldown 2"; end
   end
-  -- convoke_the_spirits,if=buff.tigers_fury.up&combo_points<3|fight_remains<5
-  if S.ConvoketheSpirits:IsReady() and (Player:BuffUp(S.TigersFury) and ComboPoints < 3 or FightRemains < 5) then
-    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(8)) then return "convoke_the_spirits cooldown 6"; end
+  -- berserk,if=!talent.convoke_the_spirits.enabled|talent.convoke_the_spirits.enabled&!(fight_remains<cooldown.convoke_the_spirits.remains)|talent.convoke_the_spirits.enabled&cooldown.convoke_the_spirits.remains<10|talent.convoke_the_spirits.enabled&fight_remains>120&cooldown.convoke_the_spirits.remains>25
+  if S.Berserk:IsReady() and ((not S.ConvoketheSpirits:IsAvailable()) or S.ConvoketheSpirits:IsAvailable() and (not FightRemains < S.ConvoketheSpirits:CooldownRemains()) or S.ConvoketheSpirits:IsAvailable() and S.ConvoketheSpirits:CooldownRemains() < 10 or S.ConvoketheSpirits:IsAvailable() and FightRemains < 120 and S.ConvoketheSpirits:CooldownRemains() > 25) then
+    if Cast(S.Berserk, Settings.Feral.GCDasOffGCD.BsInc) then return "berserk cooldown 4"; end
   end
-  -- berserking
-  if S.Berserking:IsCastable() then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cooldown 8"; end
+  -- potion,if=buff.bs_inc.up|fight_remains<32|buff.tigers_fury.up&cooldown.convoke_the_spirits.up&talent.convoke_the_spirits.enabled&fight_remains<cooldown.bs_inc.remains
+  if Settings.Commons.Enabled.Potions and (Player:BuffUp(BsInc) or FightRemains < 32 or Player:BuffUp(S.TigersFury) and S.ConvoketheSpirits:CooldownUp() and S.ConvoketheSpirits:IsAvailable() and FightRemains < BsInc:CooldownRemains()) then
+    local PotionSelected = Everyone.PotionSelected()
+    if PotionSelected and PotionSelected:IsReady() then
+      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldown 6"; end
+    end
+  end
+  -- convoke_the_spirits,if=dot.rip.duration>5&(buff.tigers_fury.up&combo_points<4&cooldown.bs_inc.remains>20|fight_remains<5)
+  if S.ConvoketheSpirits:IsReady() and (Target:DebuffRemains(S.RipDebuff) > 5 and (Player:BuffUp(S.TigersFury) and ComboPoints < 4 and BsInc:CooldownRemains() > 20 or FightRemains < 5)) then
+    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(8)) then return "convoke_the_spirits cooldown 8"; end
+  end
+  -- berserking,if=buff.bs_inc.up|fight_remains<15
+  if S.Berserking:IsCastable() and (Player:BuffUp(BsInc) or FightRemains < 15) then
+    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cooldown 10"; end
   end
   -- shadowmeld,if=buff.tigers_fury.up&buff.bs_inc.down&combo_points<4&buff.sudden_ambush.down&dot.rake.pmultiplier<1.6&energy>40&druid.rake.ticks_gained_on_refresh>spell_targets.swipe_cat*2-2&target.time_to_die>5
   if S.Shadowmeld:IsCastable() and (Player:BuffUp(S.TigersFury) and Player:BuffDown(BsInc) and ComboPoints < 4 and Player:BuffDown(S.SuddenAmbushBuff) and Target:PMultiplier(S.Rake) < 1.6 and Player:Energy() > 40 and TicksGainedOnRefresh(S.RakeDebuff) > EnemiesCount11y * 2 - 2 and Target:TimeToDie() > 5) then
-    if Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "shadowmeld cooldown 10"; end
-  end
-  -- potion,if=buff.bs_inc.up|fight_remains<cooldown.bs_inc.remains|fight_remains<35
-  if Settings.Commons.Enabled.Potions and (Player:BuffUp(BsInc) or FightRemains < BsInc:CooldownRemains() or FightRemains < 35) then
-    local PotionSelected = Everyone.PotionSelected()
-    if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldown 12"; end
-    end
+    if Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "shadowmeld cooldown 12"; end
   end
   -- use_item,name=manic_grieftorch,if=energy.deficit>40
   if I.ManicGrieftorch:IsEquippedAndReady() and (Player:EnergyDeficit() > 40) then
@@ -411,12 +417,12 @@ local function Owlweaving()
   if (Player:BuffUp(S.MoonkinForm)) then
     -- sunfire,line_cd=4*gcd
     if S.Sunfire:IsReady() and (S.Sunfire:TimeSinceLastCast() > 4 * Player:GCD()) then
-      if Cast(S.Sunfire, nil, nil, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire owlweaving 4"; end
+      if Cast(S.Sunfire, nil, nil, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire owlweaving 2"; end
     end
   end
   -- Manually added: moonkin_form,if=!buff.moonkin_form.up
   if S.MoonkinForm:IsCastable() and (Player:BuffDown(S.MoonkinForm)) then
-    if Cast(S.MoonkinForm) then return "moonkin_form owlweave 10"; end
+    if Cast(S.MoonkinForm) then return "moonkin_form owlweave 4"; end
   end
 end
 
@@ -425,53 +431,100 @@ local function Bloodtalons()
   if S.Rake:IsReady() and (BTBuffDown(S.Rake)) then
     if Everyone.CastTargetIf(S.Rake, EnemiesMelee, "max", EvaluateTargetIfFilterRakeTicks, EvaluateTargetIfRakeBloodtalons, not Target:IsInRange(8)) then return "rake bloodtalons 2"; end
   end
+  -- shred,if=buff.bt_shred.down&buff.clearcasting.up&spell_targets.swipe_cat=1
+  if S.Shred:IsReady() and (BTBuffDown(S.Shred) and Player:BuffUp(S.Clearcasting) and EnemiesCount11y == 1) then
+    if Cast(S.Shred, nil, nil, not Target:IsInMeleeRange(8)) then return "shred bloodtalons 4"; end
+  end
   -- lunar_inspiration,if=refreshable&buff.bt_moonfire.down
   if S.LunarInspiration:IsAvailable() and S.LIMoonfire:IsReady() and (Target:DebuffRefreshable(S.LIMoonfireDebuff) and BTBuffDown(S.LIMoonfire)) then
-    if Cast(S.LIMoonfire, nil, nil, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire bloodtalons 4"; end
+    if Cast(S.LIMoonfire, nil, nil, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire bloodtalons 6"; end
   end
-  -- brutal_slash,if=buff.bt_brutal_slash.down
-  if S.BrutalSlash:IsReady() and (BTBuffDown(S.BrutalSlash)) then
-    if Cast(S.BrutalSlash, nil, nil, not Target:IsInMeleeRange(8)) then return "brutal_slash bloodtalons 6"; end
+  -- shred,if=buff.bt_shred.down
+  if S.Shred:IsReady() and (BTBuffDown(S.Shred)) then
+    if Cast(S.Shred, nil, nil, not Target:IsInMeleeRange(8)) then return "shred bloodtalons 8"; end
   end
   -- thrash_cat,target_if=refreshable&buff.bt_thrash.down
   if S.Thrash:IsReady() and (BTBuffDown(S.Thrash)) then
-    if Everyone.CastCycle(S.Thrash, Enemies11y, EvaluateCycleThrash, not Target:IsInMeleeRange(8)) then return "thrash bloodtalons 8"; end
+    if Everyone.CastCycle(S.Thrash, Enemies11y, EvaluateCycleThrash, not Target:IsInMeleeRange(8)) then return "thrash bloodtalons 10"; end
+  end
+  -- brutal_slash,if=buff.bt_brutal_slash.down
+  if S.BrutalSlash:IsReady() and (BTBuffDown(S.BrutalSlash)) then
+    if Cast(S.BrutalSlash, nil, nil, not Target:IsInMeleeRange(8)) then return "brutal_slash bloodtalons 12"; end
   end
   -- swipe_cat,if=spell_targets.swipe_cat>1&buff.bt_swipe.down
   if S.Swipe:IsReady() and (EnemiesCount11y > 1 and BTBuffDown(S.Swipe)) then
     if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(8)) then return "swipe bloodtalons 14"; end
   end
-  -- shred,if=buff.bt_shred.down
-  if S.Shred:IsReady() and (BTBuffDown(S.Shred)) then
-    if Cast(S.Shred, nil, nil, not Target:IsInMeleeRange(8)) then return "shred bloodtalons 10"; end
-  end
   -- swipe_cat,if=buff.bt_swipe.down
   if S.Swipe:IsReady() and (BTBuffDown(S.Swipe)) then
-    if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(8)) then return "swipe bloodtalons 12"; end
+    if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(8)) then return "swipe bloodtalons 16"; end
   end
   -- thrash_cat,if=buff.bt_thrash.down
   if S.Thrash:IsReady() and (BTBuffDown(S.Thrash)) then
-    if Cast(S.Thrash, nil, nil, not Target:IsInMeleeRange(8)) then return "thrash bloodtalons 16"; end
+    if Cast(S.Thrash, nil, nil, not Target:IsInMeleeRange(8)) then return "thrash bloodtalons 18"; end
   end
   -- rake,if=buff.bt_rake.down&combo_points>4
   if S.Rake:IsReady() and (BTBuffDown(S.Rake) and ComboPoints > 4) then
-    if Cast(S.Rake, nil, nil, not Target:IsInMeleeRange(8)) then return "rake bloodtalons 18"; end
+    if Cast(S.Rake, nil, nil, not Target:IsInMeleeRange(8)) then return "rake bloodtalons 20"; end
+  end
+end
+
+local function BloodtalonsAoE()
+  -- rake,target_if=max:druid.rake.ticks_gained_on_refresh,if=(refreshable|1.4*persistent_multiplier>dot.rake.pmultiplier)&buff.bt_rake.down
+  if S.Rake:IsReady() then
+    if Everyone.CastTargetIf(S.Rake, EnemiesMelee, "max", EvaluateTargetIfFilterRakeTicks, EvaluateTargetIfRakeBloodtalons, not Target:IsInRange(8)) then return "rake bloodtalons_aoe 2"; end
+  end
+  -- lunar_inspiration,if=refreshable&buff.bt_moonfire.down
+  if S.LunarInspiration:IsAvailable() and S.LIMoonfire:IsReady() and (Target:DebuffRefreshable(S.LIMoonfireDebuff) and BTBuffDown(S.LIMoonfire)) then
+    if Cast(S.LIMoonfire, nil, nil, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire bloodtalons_aoe 4"; end
+  end
+  -- shred,if=buff.bt_shred.down&buff.clearcasting.up&spell_targets.swipe_cat=1
+  if S.Shred:IsReady() and (BTBuffDown(S.Shred) and Player:BuffUp(S.Clearcasting) and EnemiesCount11y == 1) then
+    if Cast(S.Shred, nil, nil, not Target:IsInMeleeRange(8)) then return "shred bloodtalons_aoe 6"; end
+  end
+  -- brutal_slash,if=buff.bt_brutal_slash.down
+  if S.BrutalSlash:IsReady() and (BTBuffDown(S.BrutalSlash)) then
+    if Cast(S.BrutalSlash, nil, nil, not Target:IsInMeleeRange(8)) then return "brutal_slash bloodtalons_aoe 8"; end
+  end
+  -- thrash_cat,target_if=refreshable&buff.bt_thrash.down
+  if S.Thrash:IsReady() and (BTBuffDown(S.Thrash)) then
+    if Everyone.CastCycle(S.Thrash, Enemies11y, EvaluateCycleThrash, not Target:IsInMeleeRange(8)) then return "thrash bloodtalons_aoe 10"; end
+  end
+  -- swipe_cat,if=spell_targets.swipe_cat>1&buff.bt_swipe.down
+  if S.Swipe:IsReady() and (EnemiesCount11y > 1 and BTBuffDown(S.Swipe)) then
+    if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(8)) then return "swipe bloodtalons_aoe 12"; end
+  end
+  -- shred,if=buff.bt_shred.down
+  if S.Shred:IsReady() and (BTBuffDown(S.Shred)) then
+    if Cast(S.Shred, nil, nil, not Target:IsInMeleeRange(8)) then return "shred bloodtalons_aoe 14"; end
+  end
+  -- swipe_cat,if=buff.bt_swipe.down
+  if S.Swipe:IsReady() and (BTBuffDown(S.Swipe)) then
+    if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(8)) then return "swipe bloodtalons_aoe 16"; end
+  end
+  -- thrash_cat,if=buff.bt_thrash.down
+  if S.Thrash:IsReady() and (BTBuffDown(S.Thrash)) then
+    if Cast(S.Thrash, nil, nil, not Target:IsInMeleeRange(8)) then return "thrash bloodtalons_aoe 18"; end
+  end
+  -- rake,if=buff.bt_rake.down&combo_points>4
+  if S.Rake:IsReady() and (BTBuffDown(S.Rake) and ComboPoints > 4) then
+    if Cast(S.Rake, nil, nil, not Target:IsInMeleeRange(8)) then return "rake bloodtalons_aoe 20"; end
   end
 end
 
 local function Aoe()
   -- pool_resource,for_next=1
-  -- primal_wrath,if=combo_points=5
-  if S.PrimalWrath:IsCastable() and (ComboPoints == 5) then
+  -- primal_wrath,if=combo_points>3
+  if S.PrimalWrath:IsCastable() and (ComboPoints > 3) then
     if CastPooling(S.PrimalWrath, Player:EnergyTimeToX(20), not Target:IsInMeleeRange(11)) then return "primal_wrath aoe 2"; end
   end
-  -- ferocious_bite,if=buff.apex_predators_craving.up&buff.sabertooth.down
-  if S.FerociousBite:IsReady() and (Player:BuffUp(S.ApexPredatorsCravingBuff) and Player:BuffDown(S.SabertoothBuff)) then
+  -- ferocious_bite,if=buff.apex_predators_craving.up&(!buff.sabertooth.up|(!buff.bloodtalons.stack=1))
+  if S.FerociousBite:IsReady() and (Player:BuffUp(S.ApexPredatorsCravingBuff) and (Player:BuffDown(S.SabertoothBuff) or Player:BuffStack(S.BloodtalonsBuff) ~= 1)) then
     if Cast(S.FerociousBite, nil, nil, not Target:IsInMeleeRange(8)) then return "ferocious_bite aoe 4"; end
   end
-  -- run_action_list,name=bloodtalons,if=variable.need_bt&active_bt_triggers>=1
+  -- run_action_list,name=bloodtalons_aoe,if=variable.need_bt&active_bt_triggers>=1
   if (VarNeedBT and CountActiveBtTriggers() >= 1) then
-    local ShouldReturn = Bloodtalons(); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = BloodtalonsAoE(); if ShouldReturn then return ShouldReturn; end
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for Bloodtalons()"; end
   end
   -- pool_resource,for_next=1
@@ -545,8 +598,8 @@ local function APL()
     end
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(13, S.SkullBash, Settings.Feral.OffGCDasOffGCD.SkullBash, InterruptStuns); if ShouldReturn then return ShouldReturn; end
-    -- prowl
-    if S.Prowl:IsCastable() then
+    -- prowl,if=buff.bs_inc.down
+    if S.Prowl:IsCastable() and (Player:BuffDown(BsInc)) then
       if Cast(S.Prowl) then return "prowl main 2"; end
     end
     -- invoke_external_buff,name=power_infusion,if=buff.bs_inc.up|fight_remains<cooldown.bs_inc.remains
@@ -591,8 +644,8 @@ local function APL()
     if (VarNeedBT and Player:BuffDown(BsInc)) then
       local ShouldReturn = Bloodtalons(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=finisher,if=combo_points=5
-    if (ComboPoints == 5) then
+    -- call_action_list,name=finisher,if=(combo_points>3&talent.lions_strength.enabled)|combo_points=5&!talent.lions_strength.enabled
+    if (ComboPoints > 3 and S.LionsStrength:IsAvailable()) or ComboPoints == 5 then
       local ShouldReturn = Finisher(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=berserk_builders,if=combo_points<5&buff.bs_inc.up
