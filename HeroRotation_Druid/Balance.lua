@@ -252,6 +252,10 @@ local function St()
   if S.Wrath:IsCastable() and (VarCDConditionST and Player:HasTier(29, 4) and EclipseAnyNext or FightRemains > 10 and (Target:TimeToDie() <= 2 and Player:AstralPowerDeficit() > 20 or Target:TimeToDie() <= 5 and PAPValue >= 550)) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath st 12"; end
   end
+  -- starfall,if=variable.cd_condition_st&buff.touch_the_cosmos.up&cooldown.ca_inc.up
+  if S.Starfall:IsReady() and (VarCDConditionST and Player:BuffUp(S.TouchtheCosmos) and CaInc:CooldownUp()) then
+    if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall st 12.5"; end
+  end
   -- starsurge,if=variable.cd_condition_st&buff.touch_the_cosmos.up|buff.primordial_arcanic_pulsar.value>=560&buff.starweavers_weft.up
   if S.Starsurge:IsReady() and (VarCDConditionST and Player:BuffUp(S.TouchtheCosmos) or PAPValue >= 560 and Player:BuffUp(S.StarweaversWeft)) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 13"; end
@@ -418,21 +422,21 @@ local function AoE()
   if S.FullMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 40 and (Player:BuffRemains(S.EclipseLunar) > S.FullMoon:ExecuteTime() or Player:BuffRemains(S.EclipseSolar) > S.FullMoon:ExecuteTime())) then
     if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon aoe 24"; end
   end
-  -- stellar_flare,target_if=refreshable&(target.time_to_die-remains-spell_targets.starfire)>8+spell_targets.starfire,if=astral_power.deficit>variable.passive_asp+8&spell_targets.starfire<(11-talent.umbral_intensity.rank-talent.astral_smolder.rank)
-  if S.StellarFlare:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 8 and EnemiesCount8ySplash < (11 - S.UmbralIntensity:TalentRank() - S.AstralSmolder:TalentRank())) then
-    if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareAoE, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare aoe 26"; end
-  end
   -- starfall,if=target.time_to_die>4&(buff.starweavers_warp.up|talent.starlord&buff.starlord.stack<3)
   if S.Starfall:IsReady() and (Target:TimeToDie() > 4 and (Player:BuffUp(S.StarweaversWarp) or S.Starlord:IsAvailable() and Player:BuffStack(S.StarlordBuff) < 3)) then
-    if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall aoe 28"; end
+    if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall aoe 26"; end
+  end
+  -- starfire,if=(buff.gathering_starstuff.stack=3|buff.umbral_embrace.up)&astral_power.deficit>variable.passive_asp+(8*(1+0.4*buff.warrior_of_elune.up))
+  if S.Starfire:IsCastable() and ((Player:BuffStack(S.GatheringStarstuff) == 3 or Player:BuffUp(S.UmbralEmbraceBuff)) and Player:AstralPowerDeficit() > VarPassiveAsp + (8 * (1 + 0.4 * num(Player:BuffUp(S.WarriorofEluneBuff))))) then
+    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire aoe 28"; end
   end
   -- starsurge,if=buff.starweavers_weft.up&spell_targets.starfire<3
   if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) and EnemiesCount8ySplash < 3) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge aoe 30"; end
   end
-  -- starfire,if=(buff.gathering_starstuff.stack>1|buff.umbral_embrace.up)&astral_power.deficit>variable.passive_asp+(8*(1+0.4*buff.warrior_of_elune.up))
-  if S.Starfire:IsCastable() and ((Player:BuffStack(S.GatheringStarstuff) > 1 or Player:BuffUp(S.UmbralEmbraceBuff)) and Player:AstralPowerDeficit() > VarPassiveAsp + (8 * (1 + 0.4 * num(Player:BuffUp(S.WarriorofEluneBuff))))) then
-    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire aoe 32"; end
+  -- stellar_flare,target_if=refreshable&(target.time_to_die-remains-spell_targets.starfire)>8+spell_targets.starfire,if=astral_power.deficit>variable.passive_asp+8&spell_targets.starfire<(11-talent.umbral_intensity.rank-talent.astral_smolder.rank)
+  if S.StellarFlare:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 8 and EnemiesCount8ySplash < (11 - S.UmbralIntensity:TalentRank() - S.AstralSmolder:TalentRank())) then
+    if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareAoE, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare aoe 32"; end
   end
   -- astral_communion,if=astral_power.deficit>variable.passive_asp+50
   if S.AstralCommunion:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 50) then
@@ -561,6 +565,8 @@ local function APL()
         if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
+    -- invoke_external_buff,name=power_infusion,if=target.time_to_die>12|fight_remains<20
+    -- Note: Not handling external buffs
     -- run_action_list,name=aoe,if=variable.is_aoe
     if VarIsAoe and AoEON() then
       local ShouldReturn = AoE(); if ShouldReturn then return ShouldReturn; end
