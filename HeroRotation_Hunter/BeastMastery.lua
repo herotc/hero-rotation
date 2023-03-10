@@ -467,14 +467,16 @@ local function APL()
   end
 
   -- Pet Management
-  if S.SummonPet:IsCastable() then
-    if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot], Settings.Commons2.GCDasOffGCD.SummonPet) then return "Summon Pet"; end
-  end
-  if Pet:IsDeadOrGhost() and S.RevivePet:IsCastable() then
-    if Cast(S.RevivePet, Settings.Commons2.GCDasOffGCD.RevivePet) then return "Revive Pet"; end
-  end
-  if (not Pet:IsDeadOrGhost()) and S.MendPet:IsCastable() and Pet:HealthPercentage() <= Settings.Commons2.MendPetHighHP then
-    if Cast(S.MendPet) then return "Mend Pet High Priority"; end
+  if not (Player:IsMounted() or Player:IsInVehicle()) then
+    if S.SummonPet:IsCastable() then
+      if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot], Settings.Commons2.GCDasOffGCD.SummonPet) then return "Summon Pet"; end
+    end
+    if Pet:IsDeadOrGhost() and S.RevivePet:IsCastable() then
+      if Cast(S.RevivePet, Settings.Commons2.GCDasOffGCD.RevivePet) then return "Revive Pet"; end
+    end
+    if (not Pet:IsDeadOrGhost()) and S.MendPet:IsCastable() and Pet:HealthPercentage() <= Settings.Commons2.MendPetHighHP then
+      if Cast(S.MendPet) then return "Mend Pet High Priority"; end
+    end
   end
 
   if Everyone.TargetIsValid() then
@@ -502,7 +504,7 @@ local function APL()
       local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
     end
     -- Manually added pet healing
-    if not Pet:IsDeadOrGhost() and S.MendPet:IsCastable() and Pet:HealthPercentage() <= Settings.Commons2.MendPetLowHP then
+    if (not (Player:IsMounted() or Player:IsInVehicle())) and (not Pet:IsDeadOrGhost()) and S.MendPet:IsCastable() and Pet:HealthPercentage() <= Settings.Commons2.MendPetLowHP then
       if Cast(S.MendPet) then return "Mend Pet Low Priority (w/ Target)"; end
     end
     -- Pool Focus if nothing else to do
@@ -510,7 +512,7 @@ local function APL()
   end
 
   -- Note: We have to put it again in case we don't have a target but our pet is dying.
-  if not Pet:IsDeadOrGhost() and S.MendPet:IsCastable() and Pet:HealthPercentage() <= Settings.Commons2.MendPetLowHP then
+  if (not (Player:IsMounted() or Player:IsInVehicle())) and (not Pet:IsDeadOrGhost()) and S.MendPet:IsCastable() and Pet:HealthPercentage() <= Settings.Commons2.MendPetLowHP then
     if Cast(S.MendPet) then return "Mend Pet Low Priority (w/o Target)"; end
   end
 end
