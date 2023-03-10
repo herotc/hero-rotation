@@ -244,33 +244,45 @@ local function Aoe()
   if S.AzureStrike:IsCastable() and (S.Dragonrage:CooldownRemains() < GCDMax * 6 and S.FireBreath:CooldownRemains() < 6 * GCDMax and S.EternitySurge:CooldownRemains() < 6 * GCDMax) then
     if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike aoe 16"; end
   end
-  -- pyre,if=talent.volatility
-  if S.Pyre:IsReady() and (S.Volatility:IsAvailable()) then
+  -- pyre,if=talent.volatility&buff.charged_blast.stack>=10
+  if S.Pyre:IsReady() and (S.Volatility:IsAvailable() and Player:BuffStack(S.ChargedBlastBuff) >= 10) then
     if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 18"; end
+  end
+  -- pyre,if=talent.volatility&spell_targets.pyre>=4
+  if S.Pyre:IsReady() and (S.Volatility:IsAvailable() and EnemiesCount8ySplash >= 4) then
+    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 20"; end
   end
   -- living_flame,if=buff.burnout.up&buff.leaping_flames.up&!buff.essence_burst.up
   if S.LivingFlame:IsCastable() and (Player:BuffUp(S.BurnoutBuff) and Player:BuffUp(S.LeapingFlamesBuff) and Player:BuffDown(S.EssenceBurstBuff)) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 20"; end
+    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 22"; end
   end
-  -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=4
-  if S.Pyre:IsReady() and (S.Dragonrage:CooldownRemains() >= 10 and EnemiesCount8ySplash >= 4) then
-    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 22"; end
-  end
-  -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre=3&buff.charged_blast.stack>=10
-  if S.Pyre:IsReady() and (S.Dragonrage:CooldownRemains() >= 10 and EnemiesCount8ySplash == 3 and Player:BuffStack(S.ChargedBlastBuff) >= 10) then
+  -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=6
+  if S.Pyre:IsReady() and (S.Dragonrage:CooldownRemains() >= 10 and EnemiesCount8ySplash >= 6) then
     if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 24"; end
+  end
+  -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=5&buff.charged_blast.stack>=3
+  if S.Pyre:IsReady() and (S.Dragonrage:CooldownRemains() >= 10 and EnemiesCount8ySplash >= 5 and Player:BuffStack(S.ChargedBlastBuff) >= 3) then
+    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 26"; end
+  end
+  -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=4&buff.charged_blast.stack>=12
+  if S.Pyre:IsReady() and (S.Dragonrage:CooldownRemains() >= 10 and EnemiesCount8ySplash >= 4 and Player:BuffStack(S.ChargedBlastBuff) >= 12) then
+    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 28"; end
+  end
+  -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre=3&buff.charged_blast.stack>=16
+  if S.Pyre:IsReady() and (S.Dragonrage:CooldownRemains() >= 10 and EnemiesCount8ySplash == 3 and Player:BuffStack(S.ChargedBlastBuff) >= 16) then
+    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 30"; end
   end
   -- disintegrate,chain=1,if=!talent.shattering_star|cooldown.shattering_star.remains>5|essence>essence.max-1|buff.essence_burst.stack==buff.essence_burst.max_stack
   if S.Disintegrate:IsReady() and ((not S.ShatteringStar:IsAvailable()) or S.ShatteringStar:CooldownRemains() > 5 or Player:Essence() > Player:EssenceMax() - 1 or Player:BuffStack(S.EssenceBurstBuff) == MaxEssenceBurstStack) then
-    if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate aoe 26"; end
+    if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate aoe 32"; end
   end
   -- living_flame,if=talent.snapfire&buff.burnout.up
   if S.LivingFlame:IsCastable() and (S.Snapfire:IsAvailable() and Player:BuffUp(S.BurnoutBuff)) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 28"; end
+    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 34"; end
   end
   -- azure_strike
   if S.AzureStrike:IsCastable() then
-    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike aoe 30"; end
+    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike aoe 36"; end
   end
 end
 
