@@ -67,13 +67,14 @@ HR.GUISettings.APL.Warlock = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-      SummonPet = false,
-      GrimoireFelguard = false,
-      SummonDemonicTyrant = false,
       DemonicStrength = false,
-      NetherPortal = true,
+      GrimoireFelguard = false,
       Implosion = false,
       InquisitorsGaze = false,
+      NetherPortal = true,
+      PowerSiphon = true,
+      SummonDemonicTyrant = false,
+      SummonPet = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {

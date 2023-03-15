@@ -121,7 +121,7 @@ local function Precombat()
   VarNextTyrant = 14 + num(S.GrimoireFelguard:IsAvailable()) + num(S.SummonVilefiend:IsAvailable())
   -- power_siphon
   if S.PowerSiphon:IsReady() then
-    if Cast(S.PowerSiphon) then return "power_siphon precombat 2"; end
+    if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon precombat 2"; end
   end
   -- demonbolt,if=!buff.power_siphon.up
   if S.Demonbolt:IsReady() and Player:BuffDown(S.DemonicCoreBuff) then
@@ -182,7 +182,7 @@ local function Tyrant()
   end
   -- power_siphon,if=buff.wild_imps.stack>1&!buff.nether_portal.up
   if S.PowerSiphon:IsCastable() and (WildImpsCount() > 1 and not Player:BuffUp(S.NetherPortalBuff)) then
-    if Cast(S.PowerSiphon) then return "power_siphon tyrant 22"; end
+    if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon tyrant 22"; end
   end
   -- soul_strike
   if S.SoulStrike:IsReady() then
@@ -257,7 +257,7 @@ local function APL()
   end
 
   -- summon_pet
-  if S.SummonPet:IsCastable() then
+  if S.SummonPet:IsCastable() and not (Player:IsMounted() or Player:IsInVehicle()) then
     if Cast(S.SummonPet, Settings.Demonology.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
   end
 
@@ -366,7 +366,7 @@ local function APL()
     end
     -- power_siphon,if=buff.demonic_core.stack<1&(buff.dreadstalkers.remains>3|buff.dreadstalkers.down)
     if S.PowerSiphon:IsReady() and (Player:BuffDown(S.DemonicCoreBuff) and (GrimoireFelguardTime() > 3 or GrimoireFelguardTime() == 0)) then
-      if Cast(S.PowerSiphon) then return "power_siphon main 36"; end
+      if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon main 36"; end
     end
     -- hand_of_guldan,if=soul_shard>2&(!talent.summon_demonic_tyrant|cooldown.summon_demonic_tyrant.remains_expected>variable.tyrant_prep_start+2)
     if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 2 and ((not S.SummonDemonicTyrant:IsAvailable()) or S.SummonDemonicTyrant:CooldownRemains() > VarTyrantPrepStart + 2 or not CDsON())) then
