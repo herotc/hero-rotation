@@ -137,11 +137,11 @@ local function Defensive()
     if Cast(S.ShieldWall, nil, Settings.Protection.DisplayStyle.Defensive) then return "shield_wall defensive"; end
   end
   -- last_stand,if=(target.health.pct>=90&talent.unnerving_focus.enabled|target.health.pct<=20&talent.unnerving_focus.enabled)|talent.bolster.enabled
-  if S.LastStand:IsCastable() and ((Target:HealthPercentage() >= 90 and S.UnnervingFocus:IsAvailable() or Target:HealthPercentage() <= 20 and S.UnnervingFocus:IsAvailable()) or S.Bolster:IsAvailable()) then
+  if S.LastStand:IsCastable() and Player:BuffDown(S.ShieldWallBuff) and ((Target:HealthPercentage() >= 90 and S.UnnervingFocus:IsAvailable() or Target:HealthPercentage() <= 20 and S.UnnervingFocus:IsAvailable()) or S.Bolster:IsAvailable()) then
     if Cast(S.LastStand, nil, Settings.Protection.DisplayStyle.Defensive) then return "last_stand defensive"; end
   end
   -- rallying_cry,if=!buff.last_stand.up&!buff.shield_wall.up
-  if S.RallyingCry:IsCastable() and (Player:BuffDown(S.LastStandBuff) and Player:BuffDown(S.ShieldWallBuff)) then
+  if S.RallyingCry:IsCastable() and (not Settings.Protection.DisableRallyingCry) and (Player:BuffDown(S.LastStandBuff) and Player:BuffDown(S.ShieldWallBuff)) then
     if Cast(S.RallyingCry, nil, Settings.Protection.DisplayStyle.Defensive) then return "rallying_cry defensive"; end
   end
   --demoralizing_shout,if=talent.booming_voice.enabled
