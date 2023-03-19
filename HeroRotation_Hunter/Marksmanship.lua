@@ -258,7 +258,7 @@ local function St()
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
-    if Cast(S.ExplosiveShot, nil, nil, not TargetInRange40y) then return "explosive_shot st 10"; end
+    if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot st 10"; end
   end
   -- stampede
   if S.Stampede:IsCastable() then
@@ -342,7 +342,7 @@ local function Trickshots()
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
-    if Cast(S.ExplosiveShot, nil, nil, not TargetInRange40y) then return "explosive_shot trickshots 8"; end
+    if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot trickshots 8"; end
   end
   -- death_chakram
   if S.DeathChakram:IsReady() then

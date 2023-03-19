@@ -234,7 +234,7 @@ local function Cleave()
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
-    if Cast(S.ExplosiveShot, nil, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot cleave 12"; end
+    if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot cleave 12"; end
   end
   -- stampede,if=buff.bestial_wrath.up|target.time_to_die<15
   if S.Stampede:IsCastable() and CDsON() and (Player:BuffUp(S.BestialWrathBuff) or FightRemains < 15) then
@@ -349,7 +349,7 @@ local function ST()
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
-    if Cast(S.ExplosiveShot, nil, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot st 18"; end
+    if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot st 18"; end
   end
   -- bestial_wrath
   if S.BestialWrath:IsCastable() and CDsON() then

@@ -239,7 +239,7 @@ local function Cleave()
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
-    if Cast(S.ExplosiveShot, nil, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot cleave 12"; end
+    if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot cleave 12"; end
   end
   -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
   if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
@@ -396,7 +396,7 @@ local function ST()
   end
   -- explosive_shot,if=talent.ranger
   if S.ExplosiveShot:IsReady() and (S.Ranger:IsAvailable()) then
-    if Cast(S.ExplosiveShot, nil, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot st 37"; end
+    if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot st 37"; end
   end
   -- wildfire_bomb,if=full_recharge_time<gcd
   if (S.WildfireBomb:FullRechargeTime() < Player:GCD()) then

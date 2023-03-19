@@ -41,6 +41,7 @@ HR.GUISettings.APL.Hunter = {
     MendPetLowHP = 80,
     GCDasOffGCD = {
       Exhilaration = true,
+      ExplosiveShot = false,
       Flare = false,
       FreezingTrap = false,
       MendPet = false,
