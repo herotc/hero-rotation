@@ -86,20 +86,20 @@ local function Precombat()
   -- Manually added: pre-pull
   if TargetInMeleeRange then
     if S.Skullsplitter:IsCastable() then
-      if Cast(S.Skullsplitter) then return "skullsplitter precombat"; end
+      if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter precombat"; end
     end
     if S.ColossusSmash:IsCastable() then
-      if Cast(S.ColossusSmash) then return "colossus_smash precombat"; end
+      if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash precombat"; end
     end
     if S.Warbreaker:IsCastable() then
-      if Cast(S.Warbreaker) then return "warbreaker precombat"; end
+      if Cast(S.Warbreaker, nil, nil, not Target:IsInMeleeRange(8)) then return "warbreaker precombat"; end
     end
     if S.Overpower:IsCastable() then
-      if Cast(S.Overpower) then return "overpower precombat"; end
+      if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower precombat"; end
     end
   end
   if S.Charge:IsCastable() then
-    if Cast(S.Charge) then return "charge precombat"; end
+    if Cast(S.Charge, nil, nil, not Target:IsSpellInRange(S.Charge)) then return "charge precombat"; end
   end
 end
 
