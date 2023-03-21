@@ -378,7 +378,7 @@ local function Cooldown()
     if Cast(S.Incarnation, Settings.Feral.GCDasOffGCD.BsInc) then return "incarnation cooldown 2"; end
   end
   -- berserk,if=!talent.convoke_the_spirits.enabled|talent.convoke_the_spirits.enabled&!(fight_remains<cooldown.convoke_the_spirits.remains)|talent.convoke_the_spirits.enabled&cooldown.convoke_the_spirits.remains<10|talent.convoke_the_spirits.enabled&fight_remains>120&cooldown.convoke_the_spirits.remains>25
-  if S.Berserk:IsReady() and ((not S.ConvoketheSpirits:IsAvailable()) or S.ConvoketheSpirits:IsAvailable() and (not FightRemains < S.ConvoketheSpirits:CooldownRemains()) or S.ConvoketheSpirits:IsAvailable() and S.ConvoketheSpirits:CooldownRemains() < 10 or S.ConvoketheSpirits:IsAvailable() and FightRemains < 120 and S.ConvoketheSpirits:CooldownRemains() > 25) then
+  if S.Berserk:IsReady() and ((not S.ConvoketheSpirits:IsAvailable()) or S.ConvoketheSpirits:IsAvailable() and FightRemains >= S.ConvoketheSpirits:CooldownRemains() or S.ConvoketheSpirits:IsAvailable() and S.ConvoketheSpirits:CooldownRemains() < 10 or S.ConvoketheSpirits:IsAvailable() and FightRemains < 120 and S.ConvoketheSpirits:CooldownRemains() > 25) then
     if Cast(S.Berserk, Settings.Feral.GCDasOffGCD.BsInc) then return "berserk cooldown 4"; end
   end
   -- potion,if=buff.bs_inc.up|fight_remains<32|buff.tigers_fury.up&cooldown.convoke_the_spirits.up&talent.convoke_the_spirits.enabled&fight_remains<cooldown.bs_inc.remains
