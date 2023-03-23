@@ -82,14 +82,14 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   CrusadersJudgment                     = Spell(204023),
   DivineToll                            = Spell(375576),
   EyeofTyr                              = Spell(387174),
-  GuardianofAncientKings                = Spell(86659),
+  GuardianofAncientKings                = MultiSpell(86659,212641),
   HammeroftheRighteous                  = Spell(53595),
   MomentofGlory                         = Spell(327193),
   RighteousProtector                    = Spell(204074),
   -- Buffs
   ArdentDefenderBuff                    = Spell(31850),
   BastionofLightBuff                    = Spell(378974),
-  GuardianofAncientKingsBuff            = Spell(86659),
+  GuardianofAncientKingsBuff            = MultiSpell(86659,212641),
   MomentofGloryBuff                     = Spell(327193),
   ShiningLightFreeBuff                  = Spell(327510),
   -- Debuffs
