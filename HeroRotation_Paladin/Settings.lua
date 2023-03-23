@@ -66,6 +66,7 @@ HR.GUISettings.APL.Paladin = {
     },
     GCDasOffGCD = {
       ExecutionSentence = false,
+      FinalReckoning = false,
       Seraphim = false,
       ShieldOfVengeance = true,
     },
