@@ -117,9 +117,11 @@ local function Defensives()
       if HR.CastAnnotated(S.WordofGlory, false, "KITE") then return "word_of_glory defensive 10"; end
     end
   end
-
   if S.ShieldoftheRighteous:IsReady() and (Player:BuffRefreshable(S.ShieldoftheRighteousBuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP)) then
-    if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous defensive 12"; end
+    if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous defensive 14"; end
+  end
+  if S.Sentinel:IsReady() and (Player:BuffDown(S.GuardianofAncientKingsBuff) and Player:BuffDown(S.ArdentDefenderBuff) and (Player:BuffDown(S.ShieldoftheRighteousBuff) or Player:HealthPercentage() <= Settings.Protection.SentinelHP)) then
+    if Cast(S.Sentinel, nil, Settings.Protection.DisplayStyle.Defensives) then return "sentinel defensive 12"; end
   end
 end
 
