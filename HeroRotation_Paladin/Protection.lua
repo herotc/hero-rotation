@@ -140,9 +140,7 @@ local function Cooldowns()
     if Cast(S.MomentofGlory, Settings.Protection.OffGCDasOffGCD.MomentOfGlory) then return "moment_of_glory cooldowns 6"; end
   end
   -- holy_avenger,if=buff.avenging_wrath.up|cooldown.avenging_wrath.remains>60
-  if S.HolyAvenger:IsCastable() and (Player:BuffUp(S.AvengingWrathBuff) or S.AvengingWrath:CooldownRemains() > 60) then
-    if Cast(S.HolyAvenger, Settings.Protection.OffGCDasOffGCD.HolyAvenger) then return "holy_avenger cooldowns 8"; end
-  end
+  -- Note: Appears to have been removed in 10.0.7
   -- bastion_of_light,if=buff.avenging_wrath.up
   if S.BastionofLight:IsCastable() and (Player:BuffUp(S.AvengingWrathBuff)) then
     if Cast(S.BastionofLight, Settings.Protection.OffGCDasOffGCD.BastionOfLight) then return "bastion_of_light cooldowns 10"; end
