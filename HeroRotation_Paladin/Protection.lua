@@ -124,32 +124,28 @@ local function Defensives()
 end
 
 local function Cooldowns()
-  -- seraphim
-  if S.Seraphim:IsReady() then
-    if Cast(S.Seraphim, Settings.Protection.GCDasOffGCD.Seraphim) then return "seraphim cooldowns 2"; end
-  end
-  -- avenging_wrath,if=(buff.seraphim.up|!talent.seraphim.enabled)
-  if S.AvengingWrath:IsCastable() and (Player:BuffUp(S.SeraphimBuff) or not S.Seraphim:IsAvailable()) then
-    if Cast(S.AvengingWrath, Settings.Protection.OffGCDasOffGCD.AvengingWrath) then return "avenging_wrath cooldowns 4"; end
+  -- avenging_wrath
+  if S.AvengingWrath:IsCastable() then
+    if Cast(S.AvengingWrath, Settings.Protection.OffGCDasOffGCD.AvengingWrath) then return "avenging_wrath cooldowns 2"; end
   end
   -- potion,if=buff.avenging_wrath.up
   if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.AvengingWrathBuff)) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldowns 6"; end
+      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldowns 4"; end
     end
   end
   -- moment_of_glory,if=(buff.avenging_wrath.remains<15|(time>10|(cooldown.avenging_wrath.remains>15))&(cooldown.avengers_shield.remains&cooldown.judgment.remains&cooldown.hammer_of_wrath.remains))
   if S.MomentofGlory:IsCastable() and (Player:BuffRemains(S.AvengingWrathBuff) < 15 or (HL.CombatTime() > 10 or (S.AvengingWrath:CooldownRemains() > 15)) and (S.AvengersShield:CooldownDown() and S.Judgment:CooldownDown() and S.HammerofWrath:CooldownDown())) then
-    if Cast(S.MomentofGlory, Settings.Protection.OffGCDasOffGCD.MomentOfGlory) then return "moment_of_glory cooldowns 8"; end
+    if Cast(S.MomentofGlory, Settings.Protection.OffGCDasOffGCD.MomentOfGlory) then return "moment_of_glory cooldowns 6"; end
   end
   -- holy_avenger,if=buff.avenging_wrath.up|cooldown.avenging_wrath.remains>60
   if S.HolyAvenger:IsCastable() and (Player:BuffUp(S.AvengingWrathBuff) or S.AvengingWrath:CooldownRemains() > 60) then
-    if Cast(S.HolyAvenger, Settings.Protection.OffGCDasOffGCD.HolyAvenger) then return "holy_avenger cooldowns 10"; end
+    if Cast(S.HolyAvenger, Settings.Protection.OffGCDasOffGCD.HolyAvenger) then return "holy_avenger cooldowns 8"; end
   end
   -- bastion_of_light,if=buff.avenging_wrath.up
   if S.BastionofLight:IsCastable() and (Player:BuffUp(S.AvengingWrathBuff)) then
-    if Cast(S.BastionofLight, Settings.Protection.OffGCDasOffGCD.BastionOfLight) then return "bastion_of_light cooldowns 12"; end
+    if Cast(S.BastionofLight, Settings.Protection.OffGCDasOffGCD.BastionOfLight) then return "bastion_of_light cooldowns 10"; end
   end
 end
 
@@ -169,8 +165,9 @@ local function Trinkets()
 end
 
 local function Standard()
-  -- shield_of_the_righteous,if=(cooldown.seraphim.remains>=5|!talent.seraphim.enabled)&(((holy_power=3&!buff.blessing_of_dusk.up&!buff.holy_avenger.up)|(holy_power=5)|buff.bastion_of_light.up|buff.divine_purpose.up))
-  if S.ShieldoftheRighteous:IsReady() and ((S.Seraphim:CooldownRemains() >= 5 or not S.Seraphim:IsAvailable()) and ((Player:HolyPower() == 3 and Player:BuffDown(S.BlessingofDuskBuff) and Player:BuffDown(S.HolyAvengerBuff)) or (Player:HolyPower() == 5) or Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff))) then
+  -- shield_of_the_righteous,if=(!talent.righteous_protector.enabled|cooldown.righteous_protector_icd.remains=0)&(buff.bastion_of_light.up|buff.divine_purpose.up|holy_power>2)
+  -- TODO: Find a way to track RighteousProtector ICD.
+  if S.ShieldoftheRighteous:IsReady() and (Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff) or Player:HolyPower() > 2) then
     if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous standard 2"; end
   end
   -- avengers_shield,if=buff.moment_of_glory.up|!talent.moment_of_glory.enabled
@@ -185,8 +182,8 @@ local function Standard()
   if S.Judgment:IsReady() and (S.Judgment:Charges() == 2 or not S.CrusadersJudgment:IsAvailable()) then
     if Everyone.CastTargetIf(S.Judgment, Enemies30y, "min", EvaluateTargetIfFilterJudgment, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment standard 8"; end
   end
-  -- divine_toll,if=time>20|((!talent.seraphim.enabled|buff.seraphim.up)&(buff.avenging_wrath.up|!talent.avenging_wrath.enabled)&(buff.moment_of_glory.up|!talent.moment_of_glory.enabled))
-  if CDsON() and S.DivineToll:IsReady() and (HL.CombatTime() > 20 or (((not S.Seraphim:IsAvailable()) or Player:BuffUp(S.SeraphimBuff)) and (Player:BuffUp(S.AvengingWrathBuff) or not S.AvengingWrath:IsAvailable()) and (Player:BuffUp(S.MomentofGloryBuff) or not S.MomentofGlory:IsAvailable()))) then
+  -- divine_toll,if=time>20|((buff.avenging_wrath.up|!talent.avenging_wrath.enabled)&(buff.moment_of_glory.up|!talent.moment_of_glory.enabled))
+  if CDsON() and S.DivineToll:IsReady() and (HL.CombatTime() > 20 or ((Player:BuffUp(S.AvengingWrathBuff) or not S.AvengingWrath:IsAvailable()) and (Player:BuffUp(S.MomentofGloryBuff) or not S.MomentofGlory:IsAvailable()))) then
     if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll standard 10"; end
   end
   -- avengers_shield
