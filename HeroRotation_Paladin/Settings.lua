@@ -99,6 +99,7 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 local ARPanel = HR.GUI.Panel
 local CP_Paladin = CreateChildPanel(ARPanel, "Paladin")
 local CP_Protection = CreateChildPanel(CP_Paladin, "Protection")
+local CP_Protection2 = CreateChildPanel(CP_Paladin, "Protection2")
 local CP_Retribution = CreateChildPanel(CP_Paladin, "Retribution")
 local CP_Holy = CreateChildPanel(CP_Paladin, "Holy")
 
@@ -112,7 +113,7 @@ CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.WordofGloryHP
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.ArdentDefenderHP", {0, 100, 1}, "Ardent Defender HP", "Set the Ardent Defender HP threshold.")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.ShieldoftheRighteousHP", {0, 100, 1}, "Shield of the Righteous HP", "Set the Shield of the Righteous HP threshold.")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.SentinelHP", {0, 100, 1}, "Sentinel HP", "Set the Sentinel HP threshold.")
-CreateARPanelOptions(CP_Protection, "APL.Paladin.Protection")
+CreateARPanelOptions(CP_Protection2, "APL.Paladin.Protection")
 
 -- Retribution
 CreateARPanelOptions(CP_Retribution, "APL.Paladin.Retribution")
