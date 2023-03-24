@@ -86,7 +86,7 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   HammeroftheRighteous                  = Spell(53595),
   MomentofGlory                         = Spell(327193),
   RighteousProtector                    = Spell(204074),
-  Sentinel                              = Spell(385438),
+  Sentinel                              = MultiSpell(385438,389539),
   -- Buffs
   ArdentDefenderBuff                    = Spell(31850),
   BastionofLightBuff                    = Spell(378974),
