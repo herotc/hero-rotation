@@ -192,7 +192,7 @@ local function AoE()
   end
   -- vile_taint
   if CDsON() and S.VileTaint:IsReady() then
-    if Cast(S.VileTaint, nil, nil, not Target:IsSpellInRange(S.VileTaint)) then return "vile_taint aoe 4"; end
+    if Cast(S.VileTaint, nil, nil, not Target:IsInRange(40)) then return "vile_taint aoe 4"; end
   end
   -- phantom_singularity
   if CDsON() and S.PhantomSingularity:IsCastable() then
@@ -291,7 +291,7 @@ local function Cleave()
   end
   -- vile_taint
   if CDsON() and S.VileTaint:IsReady() then
-    if Cast(S.VileTaint, nil, nil, not Target:IsSpellInRange(S.VileTaint)) then return "vile_taint cleave 22"; end
+    if Cast(S.VileTaint, nil, nil, not Target:IsInRange(40)) then return "vile_taint cleave 22"; end
   end
   -- soul_rot
   if CDsON() and S.SoulRot:IsReady() then
@@ -433,7 +433,7 @@ local function APL()
     end
     -- vile_taint,if=!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|talent.souleaters_gluttony.rank<2&cooldown.soul_rot.remains>=12
     if CDsON() and S.VileTaint:IsReady() and ((not S.SoulRot:IsAvailable()) or S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() or S.SouleatersGluttony:TalentRank() < 2 and S.SoulRot:CooldownRemains() >= 12) then
-      if Cast(S.VileTaint, nil, nil, not Target:IsSpellInRange(S.VileTaint)) then return "vile_taint main 20"; end
+      if Cast(S.VileTaint, nil, nil, not Target:IsInRange(40)) then return "vile_taint main 20"; end
     end
     -- soul_rot,if=variable.ps_up&variable.vt_up|!talent.summon_darkglare
     if CDsON() and S.SoulRot:IsReady() and (VarPSUp and VarVTUp or not S.SummonDarkglare:IsAvailable()) then
