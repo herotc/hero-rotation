@@ -120,15 +120,17 @@ local function Defensives()
   if S.ShieldoftheRighteous:IsReady() and (Player:BuffRefreshable(S.ShieldoftheRighteousBuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP)) then
     if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous defensive 14"; end
   end
-  if S.Sentinel:IsReady() and (Player:BuffDown(S.GuardianofAncientKingsBuff) and Player:BuffDown(S.ArdentDefenderBuff) and (Player:BuffDown(S.ShieldoftheRighteousBuff) or Player:HealthPercentage() <= Settings.Protection.SentinelHP)) then
-    if Cast(S.Sentinel, nil, Settings.Protection.DisplayStyle.Defensives) then return "sentinel defensive 12"; end
-  end
 end
 
 local function Cooldowns()
   -- avenging_wrath
   if S.AvengingWrath:IsCastable() then
     if Cast(S.AvengingWrath, Settings.Protection.OffGCDasOffGCD.AvengingWrath) then return "avenging_wrath cooldowns 2"; end
+  end
+  -- sentinel
+  -- Note: Protection Paladin APL has back-end code to replace AW with Sentinel when talented.
+  if S.Sentinel:IsCastable() then
+    if Cast(S.Sentinel, Settings.Protection.OffGCDasOffGCD.Sentinel) then return "sentinel cooldowns 3"; end
   end
   -- potion,if=buff.avenging_wrath.up
   if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.AvengingWrathBuff)) then

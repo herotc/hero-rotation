@@ -18,6 +18,49 @@ local SpellProt = Spell.Paladin.Protection
 -- Holy, ID: 65
 
 -- Protection, ID: 66
+ProtPalBuffUp = HL.AddCoreOverride("Player.BuffUp",
+  function(self, Spell, AnyCaster, BypassRecovery)
+    local BaseCheck = ProtPalBuffUp(self, Spell, AnyCaster, BypassRecovery)
+    if Spell == SpellProt.AvengingWrathBuff and SpellProt.Sentinel:IsAvailable() then
+      return Player:BuffUp(SpellProt.SentinelBuff)
+    else
+      return BaseCheck
+    end
+  end
+, 66)
+
+ProtPalBuffRemains = HL.AddCoreOverride("Player.BuffRemains",
+  function(self, Spell, AnyCaster, BypassRecovery)
+    local BaseCheck = ProtPalBuffRemains(self, Spell, AnyCaster, BypassRecovery)
+    if Spell == SpellProt.AvengingWrathBuff and SpellProt.Sentinel:IsAvailable() then
+      return Player:BuffRemains(SpellProt.SentinelBuff)
+    else
+      return BaseCheck
+    end
+  end
+, 66)
+
+ProtPalCDRemains = HL.AddCoreOverride("Spell.CooldownRemains",
+  function(self, BypassRecovery)
+    local BaseCheck = ProtPalCDRemains(self, BypassRecovery)
+    if self == SpellProt.AvengingWrath and SpellProt.Sentinel:IsAvailable() then
+      return SpellProt.Sentinel:CooldownRemains()
+    else
+      return BaseCheck
+    end
+  end
+, 66)
+
+ProtPalIsAvail = HL.AddCoreOverride("Spell.IsAvailable",
+  function(self, CheckPet)
+    local BaseCheck = ProtPalIsAvail(self, CheckPet)
+    if self == SpellProt.AvengingWrath and SpellProt.Sentinel:IsAvailable() then
+      return SpellProt.Sentinel:IsAvailable()
+    else
+      return BaseCheck
+    end
+  end
+, 66)
 
 -- Retribution, ID: 70
 

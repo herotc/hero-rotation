@@ -42,7 +42,6 @@ HR.GUISettings.APL.Paladin = {
     WordofGloryHP = 50,
     ArdentDefenderHP = 60,
     ShieldoftheRighteousHP = 70,
-    SentinelHP = 40,
     PotionType = {
       Selected = "Power",
     },
@@ -59,6 +58,7 @@ HR.GUISettings.APL.Paladin = {
       BastionOfLight = true,
       HolyAvenger = true,
       MomentOfGlory = true,
+      Sentinel = true,
     }
   },
   Retribution = {
@@ -112,7 +112,6 @@ CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.GoAKHP", {0, 
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.WordofGloryHP", {0, 100, 1}, "Word of Glory HP", "Set the Word of Glory HP threshold.")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.ArdentDefenderHP", {0, 100, 1}, "Ardent Defender HP", "Set the Ardent Defender HP threshold.")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.ShieldoftheRighteousHP", {0, 100, 1}, "Shield of the Righteous HP", "Set the Shield of the Righteous HP threshold.")
-CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.SentinelHP", {0, 100, 1}, "Sentinel HP", "Set the Sentinel HP threshold.")
 CreateARPanelOptions(CP_Protection2, "APL.Paladin.Protection")
 
 -- Retribution
