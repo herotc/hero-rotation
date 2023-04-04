@@ -218,7 +218,7 @@ local function Generators()
     if Cast(S.WakeofAshes, nil, nil, not Target:IsInMeleeRange(12)) then return "wake_of_ashes generators 2"; end
   end
   -- divine_toll,if=holy_power<=2&!debuff.judgment.up&(!raid_event.adds.exists|raid_event.adds.in>30|raid_event.adds.up)&(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15|fight_remains<8)
-  if S.DivineToll:IsCastable() and (HolyPower <= 2 and Target:DebuffDown(S.JudgmentDebuff) and ((not S.Seraphim:IsAvailable()) or Player:BuffUp(S.SeraphimBuff)) and (not S.FinalReckoning:IsAvailable()) and ((not S.ExecutionSentence) or FightRemains < 8 or EnemiesCount8y >= 5) and (S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15 or FightRemains < 8)) then
+  if S.DivineToll:IsCastable() and (HolyPower <= 2 and Target:DebuffDown(S.JudgmentDebuff) and (S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15 or FightRemains < 8)) then
     if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll generators 6"; end
   end
   -- call_action_list,name=finishers,if=holy_power>=3&buff.crusade.up&buff.crusade.stack<10
