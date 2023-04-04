@@ -47,6 +47,7 @@ Spell.Warrior.Commons = {
   DoubleTime                            = Spell(103827),
   CrushingForce                         = Spell(382764),
   FrothingBerserker                     = Spell(215571),
+  ImmovableObject                       = Spell(394307),
   IntimidatingShout                     = Spell(5246),
   HeroicLeap                            = Spell(6544),
   ImpendingVictory                      = Spell(202168),
