@@ -201,6 +201,11 @@ local function Finishers()
   if VerdictSpell:IsReady() and (((not S.Crusade:IsAvailable()) or S.Crusade:CooldownRemains() > PlayerGCD * 3) and ((not S.ExecutionSentence:IsAvailable()) or S.DivineAuxiliary:IsAvailable() or FightRemains < 8 or S.ExecutionSentence:CooldownRemains() > PlayerGCD * 2) and ((not S.FinalReckoning:IsAvailable()) or S.DivineAuxiliary:IsAvailable() or S.FinalReckoning:CooldownRemains() > PlayerGCD * 2) or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
     if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(5)) then return "either verdict finishers 6" end
   end
+  -- Manually added: templars_verdict,if=no_cds
+  -- Note: Purpose is to avoid above line hanging when ignoring CDs.
+  if VerdictSpell:IsReady() and (not CDsON()) then
+    if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(5)) then return "either verdict no_cds finishers 8"; end
+  end
 end
 
 local function Generators()
