@@ -203,7 +203,7 @@ local function Finishers()
   end
   -- Manually added: templars_verdict,if=no_cds
   -- Note: Purpose is to avoid above line hanging when ignoring CDs.
-  if VerdictSpell:IsReady() and (not CDsON()) then
+  if VerdictSpell:IsReady() and (Settings.Retribution.DisableVerdictCDCheck or not CDsON()) then
     if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(5)) then return "either verdict no_cds finishers 8"; end
   end
 end
