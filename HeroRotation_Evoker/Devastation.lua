@@ -21,6 +21,7 @@ local Cast          = HR.Cast
 local CastPooling   = HR.CastPooling
 local CastAnnotated = HR.CastAnnotated
 local CastSuggested = HR.CastSuggested
+local Evoker        = HR.Commons.Evoker
 -- Num/Bool Helper Functions
 local num           = HR.Commons.Everyone.num
 local bool          = HR.Commons.Everyone.bool
@@ -94,7 +95,21 @@ end, "PLAYER_TALENT_UPDATE")
 HL:RegisterForEvent(function()
   BossFightRemains = 11111
   FightRemains = 11111
+  for k in pairs(Evoker.FirestormTracker) do
+    Evoker.FirestormTracker[k] = nil
+  end
 end, "PLAYER_REGEN_ENABLED")
+
+-- Check if target is in Firestorm
+local function InFirestorm()
+  if S.Firestorm:TimeSinceLastCast() > 12 then return false end
+  if Evoker.FirestormTracker[Target:GUID()] then
+    if Evoker.FirestormTracker[Target:GUID()] > GetTime() - 2.5 then
+      return true
+    end
+  end
+  return false
+end
 
 local function Precombat()
   -- flask
@@ -191,34 +206,38 @@ local function FB()
 end
 
 local function Aoe()
+  -- deep_breath,if=talent.imminent_destruction&cooldown.fire_breath.remains<=gcd.max*7&cooldown.eternity_surge.remains<gcd.max*7
+  if S.DeepBreath:IsCastable() and (S.ImminentDestruction:IsAvailable() and S.FireBreath:CooldownRemains() <= GCDMax * 7 and S.EternitySurge:CooldownRemains() < GCDMax * 7) then
+    if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath aoe 2"; end
+  end
   -- dragonrage,if=cooldown.fire_breath.remains<=gcd.max&cooldown.eternity_surge.remains<3*gcd.max
   if S.Dragonrage:IsCastable() and CDsON() and (S.FireBreath:CooldownRemains() <= GCDMax and S.EternitySurge:CooldownRemains() < 3 * GCDMax) then
-    if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage aoe 2"; end
+    if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage aoe 4"; end
   end
   -- tip_the_scales,if=buff.dragonrage.up&(spell_targets.pyre<=6|!cooldown.fire_breath.up)
   if S.TipTheScales:IsCastable() and CDsON() and (VarDragonrageUp and (EnemiesCount8ySplash <= 6 or S.FireBreath:CooldownDown())) then
-    if Cast(S.TipTheScales, Settings.Devastation.GCDasOffGCD.TipTheScales) then return "tip_the_scales aoe 4"; end
+    if Cast(S.TipTheScales, Settings.Devastation.GCDasOffGCD.TipTheScales) then return "tip_the_scales aoe 6"; end
   end
-  -- call_action_list,name=fb,if=buff.dragonrage.up|!talent.dragonrage|cooldown.dragonrage.remains>10&talent.everburning_flame
-  if S.FireBreath:IsCastable() and (VarDragonrageUp or (not S.Dragonrage:IsAvailable()) or S.Dragonrage:CooldownRemains() > 10 and S.EverburningFlame:IsAvailable()) then
-    local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
-  end
-  if S.FireBreath:IsCastable() and S.Dragonrage:CooldownRemains() > 10 then
+  -- Handle FireBreath
+  if S.FireBreath:IsCastable() then
     local FBEmpower = 0
-    -- fire_breath,empower_to=1,if=cooldown.dragonrage.remains>10&spell_targets.pyre>=7
-    if EnemiesCount8ySplash >= 7 then
+    local SpellHaste = Player:SpellHaste()
+    -- fire_breath,empower_to=1,if=buff.dragonrage.remains<1.75*spell_haste&buff.dragonrage.remains>=1*spell_haste|cooldown.dragonrage.remains>10&(spell_targets.pyre>=8|spell_targets.pyre<=3)&buff.dragonrage.up&buff.dragonrage.remains>=10|buff.dragonrage.up&spell_targets.pyre<=3&!talent.raging_inferno&talent.catalyze
+    if (VarDragonrageRemains < 1.75 * SpellHaste and VarDragonrageRemains >= 1 * SpellHaste or S.Dragonrage:CooldownRemains() > 10 and (EnemiesCount8ySplash >= 8 or EnemiesCount8ySplash <= 3) and VarDragonrageUp and VarDragonrageRemains >= 10 or VarDragonrageUp and EnemiesCount8ySplash <= 3 and (not S.RagingInferno:IsAvailable()) and S.Catalyze:IsAvailable()) then
       FBEmpower = 1
-    -- fire_breath,empower_to=2,if=cooldown.dragonrage.remains>10&spell_targets.pyre>=6
-    elseif EnemiesCount8ySplash >= 6 then
+    -- fire_breath,empower_to=2,if=buff.dragonrage.remains<2.5*spell_haste&buff.dragonrage.remains>=1.75*spell_haste
+    elseif (VarDragonrageRemains < 2.5 * SpellHaste and VarDragonrageRemains >= 1.75 * SpellHaste) then
       FBEmpower = 2
-    -- fire_breath,empower_to=3,if=cooldown.dragonrage.remains>10&spell_targets.pyre>=4
-    elseif EnemiesCount8ySplash >= 4 then
+    -- fire_breath,empower_to=3,if=(!talent.font_of_magic|(spell_targets.pyre==5&!talent.volatility&!talent.charged_blast&talent.catalyze&!talent.raging_inferno))&cooldown.dragonrage.remains>10|buff.dragonrage.remains<=3.25*spell_haste&buff.dragonrage.remains>=2.5*spell_haste
+    elseif (((not S.FontofMagic:IsAvailable()) or (EnemiesCount8ySplash == 5 and (not S.Volatility:IsAvailable()) and (not S.ChargedBlast:IsAvailable()) and S.Catalyze:IsAvailable() and not S.RagingInferno:IsAvailable())) and S.Dragonrage:CooldownRemains() > 10 or VarDragonrageRemains <= 3.25 * SpellHaste and VarDragonrageRemains >= 2.5 * SpellHaste) then
       FBEmpower = 3
-    -- fire_breath,empower_to=2,if=cooldown.dragonrage.remains>10
-    else
-      FBEmpower = 2
+    -- fire_breath,empower_to=4,if=cooldown.dragonrage.remains>10
+    elseif (S.Dragonrage:CooldownRemains() > 10) then
+      FBEmpower = 4
     end
-    if CastAnnotated(S.FireBreath, false, FBEmpower) then return "fire_breath empower " .. FBEmpower .. " aoe 6"; end
+    if FBEmpower > 0 then
+      if CastAnnotated(S.FireBreath, false, FBEmpower) then return "fire_breath empower " .. FBEmpower .. " aoe 8"; end
+    end
   end
   -- call_action_list,name=es,if=buff.dragonrage.up|!talent.dragonrage|cooldown.dragonrage.remains>15
   if S.EternitySurge:IsCastable() and (VarDragonrageUp or (not S.Dragonrage:IsAvailable()) or S.Dragonrage:CooldownRemains() > 15) then
@@ -226,15 +245,11 @@ local function Aoe()
   end
   -- azure_strike,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max
   if S.AzureStrike:IsCastable() and (VarDragonrageUp and VarDragonrageRemains < (MaxEssenceBurstStack - Player:BuffStack(S.EssenceBurstBuff)) * GCDMax) then
-    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike aoe 8"; end
+    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike aoe 10"; end
   end
-  -- deep_breath,if=!buff.dragonrage.up
-  if S.DeepBreath:IsCastable() and CDsON() and (not VarDragonrageUp) then
-    if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath aoe 10"; end
-  end
-  -- firestorm
-  if S.Firestorm:IsCastable() then
-    if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 12"; end
+  -- deep_breath,if=!buff.dragonrage.up&!talent.imminent_destruction
+  if S.DeepBreath:IsCastable() and CDsON() and ((not VarDragonrageUp) and not S.ImminentDestruction:IsAvailable()) then
+    if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath aoe 12"; end
   end
   -- shattering_star
   if S.ShatteringStar:IsCastable() then
@@ -244,45 +259,56 @@ local function Aoe()
   if S.AzureStrike:IsCastable() and (S.Dragonrage:CooldownRemains() < GCDMax * 6 and S.FireBreath:CooldownRemains() < 6 * GCDMax and S.EternitySurge:CooldownRemains() < 6 * GCDMax) then
     if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike aoe 16"; end
   end
+  -- firestorm
+  if S.Firestorm:IsCastable() then
+    if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 18"; end
+  end
   -- pyre,if=talent.volatility&buff.charged_blast.stack>=10
   if S.Pyre:IsReady() and (S.Volatility:IsAvailable() and Player:BuffStack(S.ChargedBlastBuff) >= 10) then
-    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 18"; end
+    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 20"; end
   end
   -- pyre,if=talent.volatility&spell_targets.pyre>=4
   if S.Pyre:IsReady() and (S.Volatility:IsAvailable() and EnemiesCount8ySplash >= 4) then
-    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 20"; end
+    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 22"; end
   end
   -- living_flame,if=buff.burnout.up&buff.leaping_flames.up&!buff.essence_burst.up
   if S.LivingFlame:IsCastable() and (Player:BuffUp(S.BurnoutBuff) and Player:BuffUp(S.LeapingFlamesBuff) and Player:BuffDown(S.EssenceBurstBuff)) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 22"; end
+    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 24"; end
   end
-  -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=6
-  if S.Pyre:IsReady() and (S.Dragonrage:CooldownRemains() >= 10 and EnemiesCount8ySplash >= 6) then
-    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 24"; end
+  -- Handle Pyre
+  if S.Pyre:IsReady() and S.Dragonrage:CooldownRemains() >= 10 then
+    -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=6
+    if EnemiesCount8ySplash >= 6 then
+      if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 26"; end
+    end
+    -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=5&((buff.charged_blast.stack>=3)|(talent.raging_inferno&debuff.in_firestorm.up))
+    if EnemiesCount8ySplash >= 5 and (Player:BuffStack(S.ChargedBlastBuff) >= 3 or (S.RagingInferno:IsAvailable() and InFirestorm())) then
+      if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 28"; end
+    end
+    -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=4&((buff.charged_blast.stack>=12)|(talent.raging_inferno&debuff.in_firestorm.up))
+    if EnemiesCount8ySplash >= 4 and (Player:BuffStack(S.ChargedBlastBuff) >= 12 or (S.RagingInferno:IsAvailable() and InFirestorm())) then
+      if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 30"; end
+    end
+    -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre=3&buff.charged_blast.stack>=16
+    if EnemiesCount8ySplash == 3 and Player:BuffStack(S.ChargedBlastBuff) >= 16 then
+      if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 32"; end
+    end
   end
-  -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=5&buff.charged_blast.stack>=3
-  if S.Pyre:IsReady() and (S.Dragonrage:CooldownRemains() >= 10 and EnemiesCount8ySplash >= 5 and Player:BuffStack(S.ChargedBlastBuff) >= 3) then
-    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 26"; end
+  -- use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down
+  if I.KharnalexTheFirstLight:IsEquippedAndReady() and ((not VarDragonrageUp) and Target:DebuffDown(S.ShatteringStar)) then
+    if Cast(I.KharnalexTheFirstLight, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "kharnalex_the_first_light aoe 34"; end
   end
-  -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=4&buff.charged_blast.stack>=12
-  if S.Pyre:IsReady() and (S.Dragonrage:CooldownRemains() >= 10 and EnemiesCount8ySplash >= 4 and Player:BuffStack(S.ChargedBlastBuff) >= 12) then
-    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 28"; end
-  end
-  -- pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre=3&buff.charged_blast.stack>=16
-  if S.Pyre:IsReady() and (S.Dragonrage:CooldownRemains() >= 10 and EnemiesCount8ySplash == 3 and Player:BuffStack(S.ChargedBlastBuff) >= 16) then
-    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 30"; end
-  end
-  -- disintegrate,chain=1,if=!talent.shattering_star|cooldown.shattering_star.remains>5|essence>essence.max-1|buff.essence_burst.stack==buff.essence_burst.max_stack
-  if S.Disintegrate:IsReady() and ((not S.ShatteringStar:IsAvailable()) or S.ShatteringStar:CooldownRemains() > 5 or Player:Essence() > Player:EssenceMax() - 1 or Player:BuffStack(S.EssenceBurstBuff) == MaxEssenceBurstStack) then
-    if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate aoe 32"; end
+  -- disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&buff.dragonrage.up&ticks>=2,interrupt_if=buff.dragonrage.up&ticks>=2&(evoker.use_clipping|cooldown.fire_breath.up|cooldown.eternity_surge.up),if=buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence>essence.max-1|buff.essence_burst.stack==buff.essence_burst.max_stack)
+  if S.Disintegrate:IsReady() and (VarDragonrageUp or ((not S.ShatteringStar:IsAvailable()) or S.ShatteringStar:CooldownRemains() > 6 or Player:Essence() > Player:EssenceMax() - 1 or Player:BuffStack(S.EssenceBurstBuff) == MaxEssenceBurstStack)) then
+    if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate aoe 36"; end
   end
   -- living_flame,if=talent.snapfire&buff.burnout.up
   if S.LivingFlame:IsCastable() and (S.Snapfire:IsAvailable() and Player:BuffUp(S.BurnoutBuff)) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 34"; end
+    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 38"; end
   end
   -- azure_strike
   if S.AzureStrike:IsCastable() then
-    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike aoe 36"; end
+    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike aoe 40"; end
   end
 end
 
