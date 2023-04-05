@@ -99,7 +99,7 @@ end, "PLAYER_REGEN_ENABLED")
 HL:RegisterForEvent(function()
   CaInc = S.IncarnationTalent:IsAvailable() and S.Incarnation or S.CelestialAlignment
   VarInit = false
-end, "PLAYER_TALENT_UPDATE")
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 -- Enemy Variables
 local Enemies40y, EnemiesCount40y

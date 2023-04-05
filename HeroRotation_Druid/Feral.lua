@@ -72,7 +72,7 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
   BsInc = S.Incarnation:IsAvailable() and S.Incarnation or S.Berserk
-end, "PLAYER_TALENT_UPDATE")
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
   BossFightRemains = 11111

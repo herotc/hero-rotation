@@ -94,7 +94,7 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   Fiend = (S.Mindbender:IsAvailable()) and S.Mindbender or S.Shadowfiend
-end, "PLAYER_TALENT_UPDATE")
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
   S.ShadowCrash:RegisterInFlightEffect(205386)

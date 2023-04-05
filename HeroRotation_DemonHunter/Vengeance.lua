@@ -84,7 +84,7 @@ HL:RegisterForEvent(function()
   VarVulnFrailtyStack = (S.Vulnerability:IsAvailable()) and 1 or 0
   VarCDFrailtyReqAoE = (S.SoulCrush:IsAvailable()) and 5 * VarVulnFrailtyStack or VarVulnFrailtyStack
   VarCDFrailtyReqST = (S.SoulCrush:IsAvailable()) and 6 * VarVulnFrailtyStack or VarVulnFrailtyStack
-end, "PLAYER_EQUIPMENT_CHANGED", "PLAYER_TALENT_UPDATE")
+end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 -- Soul Fragments function taking into consideration aura lag
 local function UpdateSoulFragments()

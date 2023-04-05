@@ -84,7 +84,7 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   VarTrinketType = (S.Serenity:IsAvailable()) and 1 or 2
-end, "PLAYER_TALENT_UPDATE")
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
   equip = Player:GetEquipment()

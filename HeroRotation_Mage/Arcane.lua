@@ -81,7 +81,7 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   ArcaneSurge = (S.ArcanePower:IsAvailable()) and S.ArcanePower or S.ArcaneSurge
-end, "PLAYER_TALENT_UPDATE")
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 local function Precombat()
   -- flask

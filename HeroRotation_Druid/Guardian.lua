@@ -68,7 +68,7 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
   IFBuild = (S.ThornsofIron:IsAvailable() and S.ReinforcedFur:IsAvailable())
-end, "PLAYER_TALENT_UPDATE")
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 -- Functions
 local function NoToothandClaw(enemies)

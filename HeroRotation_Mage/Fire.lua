@@ -131,7 +131,7 @@ HL:RegisterForEvent(function()
   var_hard_cast_flamestrike = (S.FlamePatch:IsAvailable()) and 3 or 6
   var_combustion_flamestrike = (S.FlamePatch:IsAvailable()) and 3 or 6
   var_arcane_explosion = (S.FlamePatch:IsAvailable()) and 99 or 2
-end, "PLAYER_TALENT_UPDATE")
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 function S.Firestarter:ActiveStatus()
     return (S.Firestarter:IsAvailable() and (Target:HealthPercentage() > 90)) and 1 or 0

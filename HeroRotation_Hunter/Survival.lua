@@ -63,7 +63,7 @@ local MBRSCost = S.MongooseBite:IsAvailable() and S.MongooseBite:Cost() or S.Rap
 
 HL:RegisterForEvent(function()
   MBRSCost = S.MongooseBite:IsAvailable() and S.MongooseBite:Cost() or S.RaptorStrike:Cost()
-end, "PLAYER_TALENT_UPDATE")
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
   BossFightRemains = 11111

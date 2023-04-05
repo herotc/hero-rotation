@@ -66,7 +66,7 @@ local StunInterrupts = {
 -- Register for talent changes
 HL:RegisterForEvent(function()
   VarBoneShieldRefreshValue = ((not S.DeathsCaress:IsAvailable()) or S.Consumption:IsAvailable() or S.Blooddrinker:IsAvailable()) and 4 or 5
-end, "PLAYER_TALENT_UPDATE")
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 --Functions
 local function UnitsWithoutBP(enemies)

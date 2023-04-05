@@ -51,7 +51,7 @@ local FightRemains = 11111
 
 HL:RegisterForEvent(function()
   MaxEBCharges = S.LavaBurst:IsAvailable() and 2 or 1
-end, "PLAYER_TALENT_UPDATE")
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
   TIAction = S.LightningBolt

@@ -89,7 +89,7 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 HL:RegisterForEvent(function()
   MaxEssenceBurstStack = (S.EssenceAttunement:IsAvailable()) and 2 or 1
   BFRank = S.BlastFurnace:TalentRank()
-end, "PLAYER_TALENT_UPDATE")
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 -- Reset variables after fights
 HL:RegisterForEvent(function()
