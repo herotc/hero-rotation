@@ -201,10 +201,20 @@ local function Finishers()
   if VerdictSpell:IsReady() and (((not S.Crusade:IsAvailable()) or S.Crusade:CooldownRemains() > PlayerGCD * 3) and ((not S.ExecutionSentence:IsAvailable()) or S.DivineAuxiliary:IsAvailable() or FightRemains < 8 or S.ExecutionSentence:CooldownRemains() > PlayerGCD * 2) and ((not S.FinalReckoning:IsAvailable()) or S.DivineAuxiliary:IsAvailable() or S.FinalReckoning:CooldownRemains() > PlayerGCD * 2) or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
     if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(5)) then return "either verdict finishers 6" end
   end
-  -- Manually added: templars_verdict,if=no_cds
-  -- Note: Purpose is to avoid above line hanging when ignoring CDs.
-  if VerdictSpell:IsReady() and (Settings.Retribution.DisableVerdictCDCheck or not CDsON()) then
-    if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(5)) then return "either verdict no_cds finishers 8"; end
+  -- Note: Purpose of no_cds lines is to avoid the rotation hanging when delaying CD usage.
+  if Settings.Retribution.DisableFinisherCDCheck or not CDsON() then
+    -- Manually added: divine_storm,if=no_cds
+    if S.DivineStorm:IsReady() and (VarDSCastable and Player:BuffDown(S.EmpyreanLegacyBuff) and (not (Player:BuffUp(S.DivineArbiterBuff) and Player:BuffStack(S.DivineArbiterBuff) > 24))) then
+      if Cast(S.DivineStorm, nil, nil, not Target:IsInRange(8)) then return "divine_storm no_cds finishers 8" end
+    end
+    -- Manually added: justicars_vengeance,if=no_cds
+    if S.JusticarsVengeance:IsReady() then
+      if Cast(S.JusticarsVengeance, nil, nil, not Target:IsInMeleeRange(5)) then return "justicars_vengeance no_cds finishers 10"; end
+    end
+    -- Manually added: templars_verdict,if=no_cds
+    if VerdictSpell:IsReady() then
+      if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(5)) then return "either verdict no_cds finishers 12"; end
+    end
   end
 end
 
