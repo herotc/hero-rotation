@@ -59,6 +59,17 @@ local HolyPower = 0
 local PlayerGCD = 0
 local VarDSCastable
 local VerdictSpell = (S.FinalVerdict:IsLearned()) and S.FinalVerdict or S.TemplarsVerdict
+local VerdictRange
+if VerdictSpell:ID() == S.TemplarsVerdict:ID() then 
+  VerdictRange = 5
+end
+if VerdictSpell:ID() == S.FinalVerdict:ID() then
+  if S.Jurisdiction:IsAvailable() then
+    VerdictRange = 20
+  else
+    VerdictRange = 12
+  end
+end
 
 HL:RegisterForEvent(function()
   BossFightRemains = 11111
@@ -67,6 +78,16 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   VerdictSpell = (S.FinalVerdict:IsAvailable()) and S.FinalVerdict or S.TemplarsVerdict
+  if VerdictSpell:ID() == S.TemplarsVerdict:ID() then 
+    VerdictRange = 5
+  end
+  if VerdictSpell:ID() == S.FinalVerdict:ID() then
+    if S.Jurisdiction:IsAvailable() then
+      VerdictRange = 20
+    else
+      VerdictRange = 12
+    end
+  end
 end, "PLAYER_TALENT_UPDATE")
 
 -- Interrupts
@@ -117,7 +138,7 @@ local function Precombat()
   -- Note: Currently unable to handle some of the above trinket conditions.
   -- Manually added: openers
   if VerdictSpell:IsReady() and HolyPower >= 4 and Target:IsInMeleeRange(5) then
-    if Cast(VerdictSpell) then return "either verdict precombat 2" end
+    if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(VerdictRange)) then return "either verdict precombat 2" end
   end
   if S.BladeofJustice:IsCastable() then
     if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice precombat 4" end
@@ -199,7 +220,7 @@ local function Finishers()
   end
   -- templars_verdict,if=(!talent.crusade|cooldown.crusade.remains>gcd*3)&(!talent.execution_sentence|talent.divine_auxiliary|target.time_to_die<8|cooldown.execution_sentence.remains>gcd*2)&(!talent.final_reckoning|talent.divine_auxiliary|cooldown.final_reckoning.remains>gcd*2)|buff.crusade.up&buff.crusade.stack<10
   if VerdictSpell:IsReady() and (((not S.Crusade:IsAvailable()) or S.Crusade:CooldownRemains() > PlayerGCD * 3) and ((not S.ExecutionSentence:IsAvailable()) or S.DivineAuxiliary:IsAvailable() or FightRemains < 8 or S.ExecutionSentence:CooldownRemains() > PlayerGCD * 2) and ((not S.FinalReckoning:IsAvailable()) or S.DivineAuxiliary:IsAvailable() or S.FinalReckoning:CooldownRemains() > PlayerGCD * 2) or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
-    if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(5)) then return "either verdict finishers 6" end
+    if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(VerdictRange)) then return "either verdict finishers 6" end
   end
   -- Note: Purpose of no_cds lines is to avoid the rotation hanging when delaying CD usage.
   if Settings.Retribution.DisableFinisherCDCheck or not CDsON() then
@@ -213,7 +234,7 @@ local function Finishers()
     end
     -- Manually added: templars_verdict,if=no_cds
     if VerdictSpell:IsReady() then
-      if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(5)) then return "either verdict no_cds finishers 12"; end
+      if Cast(VerdictSpell, nil, nil, not Target:IsInMeleeRange(VerdictRange)) then return "either verdict no_cds finishers 12"; end
     end
   end
 end

@@ -122,6 +122,7 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   FinalVerdict                          = Spell(383328),
   FiresofJustice                        = Spell(203316),
   HolyBlade                             = Spell(383342),
+  Jurisdiction                          = Spell(402971),
   JusticarsVengeance                    = Spell(215661),
   RadiantDecree                         = Spell(383469),
   RadiantDecreeTalent                   = Spell(384052),
