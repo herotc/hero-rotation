@@ -467,14 +467,16 @@ local function APL()
   end
 
   -- Pet Management; Conditions handled via override
-  if S.SummonPet:IsCastable() then
-    if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot]) then return "Summon Pet"; end
-  end
-  if S.RevivePet:IsCastable() then
-    if Cast(S.RevivePet, Settings.Commons2.GCDasOffGCD.RevivePet) then return "Revive Pet"; end
-  end
-  if S.MendPet:IsCastable() then
-    if Cast(S.MendPet, Settings.Commons2.GCDasOffGCD.MendPet) then return "Mend Pet"; end
+  if not (Player:IsMounted() or Player:IsInVehicle()) then
+    if S.SummonPet:IsCastable() then
+      if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot]) then return "Summon Pet"; end
+    end
+    if S.RevivePet:IsCastable() then
+      if Cast(S.RevivePet, Settings.Commons2.GCDasOffGCD.RevivePet) then return "Revive Pet"; end
+    end
+    if S.MendPet:IsCastable() then
+      if Cast(S.MendPet, Settings.Commons2.GCDasOffGCD.MendPet) then return "Mend Pet"; end
+    end
   end
 
   if Everyone.TargetIsValid() then
