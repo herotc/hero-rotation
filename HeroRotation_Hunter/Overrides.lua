@@ -28,9 +28,9 @@ function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   if self == SpellBM.SummonPet then
     return (not Pet:IsActive()) and (not Pet:IsDeadOrGhost()) and BaseCheck
   elseif self == SpellBM.RevivePet then
-    return (Pet:IsDeadOrGhost() or Pet:HealthPercentage() <= 0) and BaseCheck
+    return Pet:IsDeadOrGhost() and BaseCheck
   elseif self == SpellBM.MendPet then
-    return (not Pet:IsDeadOrGhost()) and Pet:HealthPercentage() <= HR.GUISettings.APL.Hunter.Commons2.MendPetHighHP and BaseCheck
+    return (not Pet:IsDeadOrGhost()) and Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= HR.GUISettings.APL.Hunter.Commons2.MendPetHighHP and BaseCheck
   else
     return BaseCheck
   end
@@ -139,9 +139,9 @@ function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   if self == SpellSV.SummonPet then
     return (not Pet:IsActive()) and (not Pet:IsDeadOrGhost()) and BaseCheck
   elseif self == SpellSV.RevivePet then
-    return (Pet:IsDeadOrGhost() or Pet:HealthPercentage() <= 0) and BaseCheck
+    return Pet:IsDeadOrGhost() and BaseCheck
   elseif self == SpellSV.MendPet then
-    return (not Pet:IsDeadOrGhost()) and Pet:HealthPercentage() <= HR.GUISettings.APL.Hunter.Commons2.MendPetHighHP and BaseCheck
+    return (not Pet:IsDeadOrGhost()) and Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= HR.GUISettings.APL.Hunter.Commons2.MendPetHighHP and BaseCheck
   elseif self == SpellSV.AspectoftheEagle then
     return HR.GUISettings.APL.Hunter.Survival.AspectOfTheEagle and BaseCheck
   elseif self == SpellSV.Harpoon then
