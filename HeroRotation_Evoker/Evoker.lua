@@ -78,6 +78,7 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   ShatteringStar                        = Spell(370452),
   Snapfire                              = Spell(370783),
   Tyranny                               = Spell(376888),
+  Unravel                               = Spell(368432),
   Volatility                            = Spell(369089),
   -- Buffs
   BurnoutBuff                           = Spell(375802),
