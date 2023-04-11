@@ -236,7 +236,7 @@ local function Precombat()
     if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast precombat 12"; end
   end
   -- vampiric_touch,if=!talent.damnation.enabled&(!talent.shadow_crash.enabled|raid_event.adds.in<25|spell_targets.shadow_crash>8)&!fight_style.dungeonslice
-  if S.VampiricTouch:IsCastable() and (not S.Damnation:IsAvailable()) then
+  if S.VampiricTouch:IsCastable() and (not S.ShadowCrash:InFlight()) and (not S.Damnation:IsAvailable()) then
     if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch precombat 14"; end
   end
   -- Manually added: shadow_word_pain,if=!talent.misery.enabled
