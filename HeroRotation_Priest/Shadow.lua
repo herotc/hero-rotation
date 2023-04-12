@@ -485,7 +485,7 @@ local function Main()
     if Cast(S.DarkVoid, Settings.Shadow.GCDasOffGCD.DarkVoid, nil, not Target:IsInRange(40)) then return "dark_void main 28"; end
   end
   -- devouring_plague,if=buff.voidform.up&variable.dots_up&variable.dp_cutoff
-  if S.DevouringPlague:IsReady() and (Player:BuffUp(S.VoidformBuff) and VarDotsUp and VarDPCutoff) then
+  if S.DevouringPlague:IsReady() and Target:DebuffRefreshable(S.DevouringPlagueDebuff) and (Player:BuffUp(S.VoidformBuff) and VarDotsUp and VarDPCutoff) then
     if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 30"; end
   end
   -- void_torrent,if=insanity<=35&!variable.holding_crash,target_if=variable.all_dots_up
