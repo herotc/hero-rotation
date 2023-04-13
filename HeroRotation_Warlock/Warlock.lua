@@ -188,6 +188,8 @@ Item.Warlock.Commons = {
   -- Trinkets
   ConjuredChillglobe                    = Item(194300, {13, 14}),
   DesperateInvokersCodex                = Item(194310, {13, 14}),
+  EruptingSpearFragment                 = Item(193769, {13, 14}),
+  IcebloodDeathsnare                    = Item(194304, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
 }
 
