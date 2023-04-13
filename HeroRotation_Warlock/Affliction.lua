@@ -202,9 +202,17 @@ local function AoE()
   if CDsON() and S.SoulRot:IsReady() then
     if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot aoe 8"; end
   end
+  -- unstable_affliction,if=remains<5
+  if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
+    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction aoe 9"; end
+  end
   -- seed_of_corruption,if=dot.corruption.remains<5
   if S.SeedofCorruption:IsReady() and Target:DebuffRemains(S.SeedofCorruptionDebuff) < 5 then
     if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "soul_rot aoe 10"; end
+  end
+  -- malefic_rapture,if=talent.malefic_affliction&buff.malefic_affliction.stack<3&talent.doom_blossom
+  if S.MaleficRapture:IsReady() and (S.MaleficAffliction:IsAvailable() and Player:BuffStack(S.MaleficAfflictionBuff) < 3 and S.DoomBlossom:IsAvailable()) then
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture aoe 11"; end
   end
   -- agony,target_if=remains<5,if=active_dot.agony<5
   if S.Agony:IsReady() then
@@ -399,6 +407,10 @@ local function APL()
     if CDsON() and Settings.Commons.Enabled.Trinkets then
       local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
     end
+    -- malefic_rapture,if=talent.dread_touch&talent.malefic_affliction&debuff.dread_touch.remains<2&buff.malefic_affliction.stack=3
+    if S.MaleficRapture:IsReady() and (S.DreadTouch:IsAvailable() and S.MaleficAffliction:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < 2 and Player:BuffStack(S.MaleficAfflictionBuff) == 3) then
+      if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 2"; end
+    end
     -- unstable_affliction,if=remains<5
     if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
       if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction main 4"; end
@@ -427,16 +439,16 @@ local function APL()
     if S.ShadowBolt:IsReady() and (S.ShadowEmbrace:IsAvailable() and (Target:DebuffStack(S.ShadowEmbraceDebuff) < 3 or Target:DebuffRemains(S.ShadowEmbraceDebuff) < 3)) then
       if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt main 16"; end
     end
-    -- phantom_singularity,if=!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|!talent.summon_darkglare
-    if CDsON() and S.PhantomSingularity:IsCastable() and ((not S.SoulRot:IsAvailable()) or S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or not S.SummonDarkglare:IsAvailable()) then
+    -- phantom_singularity,if=!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|cooldown.soul_rot.remains>=25
+    if CDsON() and S.PhantomSingularity:IsCastable() and ((not S.SoulRot:IsAvailable()) or S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or S.SoulRot:CooldownRemains() >= 25) then
       if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity main 18"; end
     end
     -- vile_taint,if=!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|talent.souleaters_gluttony.rank<2&cooldown.soul_rot.remains>=12
     if CDsON() and S.VileTaint:IsReady() and ((not S.SoulRot:IsAvailable()) or S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() or S.SouleatersGluttony:TalentRank() < 2 and S.SoulRot:CooldownRemains() >= 12) then
       if Cast(S.VileTaint, nil, nil, not Target:IsInRange(40)) then return "vile_taint main 20"; end
     end
-    -- soul_rot,if=variable.ps_up&variable.vt_up|!talent.summon_darkglare
-    if CDsON() and S.SoulRot:IsReady() and (VarPSUp and VarVTUp or not S.SummonDarkglare:IsAvailable()) then
+    -- soul_rot,if=variable.vt_up&variable.ps_up
+    if CDsON() and S.SoulRot:IsReady() and (VarVTUp and VarPSUp) then
       if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot main 22"; end
     end
     -- summon_darkglare,if=variable.ps_up&variable.vt_up&variable.sr_up|cooldown.invoke_power_infusion_0.duration>0&cooldown.invoke_power_infusion_0.up&!talent.soul_rot
@@ -447,16 +459,14 @@ local function APL()
     if S.MaleficRapture:IsReady() and (
       -- malefic_rapture,if=soul_shard>4|(talent.tormented_crescendo&buff.tormented_crescendo.stack=1&soul_shard>3)
       (Player:SoulShardsP() > 4 or (S.TormentedCrescendo:IsAvailable() and Player:BuffStack(S.TormentedCrescendoBuff) == 1 and Player:SoulShardsP() > 3)) or
-      -- malefic_rapture,if=talent.dread_touch&talent.malefic_affliction&debuff.dread_touch.remains<2&buff.malefic_affliction.stack=3
-      (S.DreadTouch:IsAvailable() and S.MaleficAffliction:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < 2 and Player:BuffStack(S.MaleficAfflictionBuff) == 3) or
       -- malefic_rapture,if=talent.malefic_affliction&buff.malefic_affliction.stack<3
       (S.MaleficAffliction:IsAvailable() and Player:BuffStack(S.MaleficAfflictionBuff) < 3) or
       -- malefic_rapture,if=talent.tormented_crescendo&buff.tormented_crescendo.react&!debuff.dread_touch.react
       (S.TormentedCrescendo:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Target:DebuffDown(S.DreadTouchDebuff)) or
       -- malefic_rapture,if=talent.tormented_crescendo&buff.tormented_crescendo.stack=2
       (S.TormentedCrescendo:IsAvailable() and Player:BuffStack(S.TormentedCrescendoBuff) == 2) or
-      -- malefic_rapture,if=variable.cd_dots_up|dot.vile_taint_dot.ticking&soul_shard>1
-      (VarCDDoTsUp or Target:DebuffUp(S.VileTaintDebuff) and Player:SoulShardsP() > 1) or
+      -- malefic_rapture,if=variable.cd_dots_up|variable.vt_up&soul_shard>1
+      (VarCDDoTsUp or VarVTUp and Player:SoulShardsP() > 1) or
       -- malefic_rapture,if=talent.tormented_crescendo&talent.nightfall&buff.tormented_crescendo.react&buff.nightfall.react
       (S.TormentedCrescendo:IsAvailable() and S.Nightfall:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Player:BuffUp(S.NightfallBuff))
     ) then
