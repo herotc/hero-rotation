@@ -148,6 +148,7 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   Cataclysm                             = Spell(152108),
   ChannelDemonfire                      = Spell(196447),
   ChaosBolt                             = Spell(116858),
+  ChaosIncarnate                        = Spell(387275),
   Conflagrate                           = Spell(17962),
   CryHavoc                              = Spell(387522),
   DiabolicEmbers                        = Spell(387173),
@@ -169,6 +170,8 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   -- Buffs
   BackdraftBuff                         = Spell(117828),
   MadnessCBBuff                         = Spell(387409),
+  MadnessRoFBuff                        = Spell(387413),
+  MadnessSBBuff                         = Spell(387414),
   RainofChaosBuff                       = Spell(266087),
   RitualofRuinBuff                      = Spell(387157),
   BurntoAshesBuff                       = Spell(387154),
