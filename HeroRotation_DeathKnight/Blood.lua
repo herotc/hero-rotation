@@ -374,8 +374,8 @@ local function APL()
     if S.DeathsCaress:IsReady() and (Player:BuffDown(S.BoneShieldBuff)) then
       if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress main 6"; end
     end
-    -- death_and_decay,if=!death_and_decay.ticking&(talent.unholy_ground|talent.sanguine_ground|spell_targets.death_and_decay>3|buff.crimson_scourge.up)
-    if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and (S.UnholyGround:IsAvailable() or S.SanguineGround:IsAvailable() or EnemiesCount10y > 3 or Player:BuffUp(S.CrimsonScourgeBuff))) then
+    -- death_and_decay,if=!death_and_decay.ticking&(talent.unholy_ground|talent.sanguine_ground)|spell_targets.death_and_decay>3|buff.crimson_scourge.up
+    if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and (S.UnholyGround:IsAvailable() or S.SanguineGround:IsAvailable()) or EnemiesCount10y > 3 or Player:BuffUp(S.CrimsonScourgeBuff)) then
       if Cast(S.DeathAndDecay, Settings.Commons2.GCDasOffGCD.DeathAndDecay, nil, not Target:IsInRange(30)) then return "death_and_decay main 8"; end
     end
     -- death_strike,if=buff.coagulopathy.remains<=gcd|buff.icy_talons.remains<=gcd|runic_power>=variable.death_strike_dump_amount|runic_power.deficit<=variable.heart_strike_rp|target.time_to_die<10
