@@ -59,6 +59,7 @@ Spell.Monk.Commons = {
   DiffuseMagic                          = Spell(122783),
   EyeoftheTiger                         = Spell(196607),
   FastFeet                              = Spell(388809),
+  ImpTouchofDeath                       = Spell(322113),
   InnerStrengthBuff                     = Spell(261769),
   Paralysis                             = Spell(115078),
   RingofPeace                           = Spell(116844),
@@ -69,6 +70,7 @@ Spell.Monk.Commons = {
   TigersLust                            = Spell(116841),
   -- Buffs
   BonedustBrewBuff                      = Spell(386276),
+  BonedustBrewDebuff                    = Spell(386276),
   DampenHarmBuff                        = Spell(122278),
   RushingJadeWindBuff                   = Spell(116847),
   -- Debuffs
@@ -86,7 +88,6 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   FlyingSerpentKickLand                 = Spell(115057),
   SpinningCraneKick                     = Spell(101546),
   -- Talents
-  BonedustBrew                          = Spell(386276),
   CraneVortex                           = Spell(388848),
   FaelineHarmony                        = Spell(391412),
   FaelineStomp                          = Spell(388193),
