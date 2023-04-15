@@ -474,9 +474,8 @@ local function SingleTarget()
   if IsViable(S.LightningBolt) and (Pet:IsActive() and Pet:Name() == "Primal Storm Elemental" and Target:DebuffUp(S.LightningRodDebuff) and (Target:DebuffUp(S.ElectrifiedShocksDebuff) or Player:BuffUp(S.PoweroftheMaelstromBuff))) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 62"; end
   end
-  -- frost_shock,if=buff.icefury.up&buff.master_of_the_elements.up&!buff.lava_surge.up&!talent.electrified_shocks.enabled&!talent.flux_melting.enabled&cooldown.lava_burst.charges_fractional<1.0&talent.echoes_of_the_elements.enabled
-  -- Note: echoes_of_the_elements doesn't appear to exist???
-  if S.FrostShock:IsCastable() and (Player:IcefuryP() and Player:MOTEP() and Player:BuffDown(S.LavaSurgeBuff) and (not S.ElectrifiedShocks:IsAvailable()) and (not S.FluxMelting:IsAvailable()) and S.LavaBurst:ChargesFractional() < 1.0) then
+  -- frost_shock,if=buff.icefury.up&buff.master_of_the_elements.up&!buff.lava_surge.up&!talent.electrified_shocks.enabled&!talent.flux_melting.enabled&cooldown.lava_burst.charges_fractional<1.0&talent.echo_of_the_elements.enabled
+  if S.FrostShock:IsCastable() and (Player:IcefuryP() and Player:MOTEP() and Player:BuffDown(S.LavaSurgeBuff) and (not S.ElectrifiedShocks:IsAvailable()) and (not S.FluxMelting:IsAvailable()) and S.LavaBurst:ChargesFractional() < 1.0 and S.EchooftheElements:IsAvailable()) then
     if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 63"; end
   end
   -- frost_shock,if=buff.icefury.up&talent.flux_melting.enabled
