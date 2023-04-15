@@ -103,6 +103,11 @@ local function DemonicTyrantTime()
   return HL.GuardiansTable.DemonicTyrantDuration or 0
 end
 
+-- Function to check for Dreadstalker duration
+local function DreadstalkerTime()
+  return HL.GuardiansTable.DreadstalkerDuration or 0
+end
+
 local function EvaluateDoom(TargetUnit)
   -- target_if=refreshable
   return (TargetUnit:DebuffRefreshable(S.Doom))
@@ -172,8 +177,8 @@ local function Tyrant()
   if S.HandofGuldan:IsReady() and (S.SoulboundTyrant:IsAvailable() and VarNextTyrant - CombatTime < 4 and VarNextTyrant - CombatTime > S.SummonDemonicTyrant:CastTime()) then
     if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan tyrant 16"; end
   end
-  -- summon_demonic_tyrant,if=variable.next_tyrant-time<cast_time*2
-  if S.SummonDemonicTyrant:IsCastable() and (VarNextTyrant - CombatTime < S.SummonDemonicTyrant:CastTime() * 2) then
+  -- summon_demonic_tyrant,if=variable.next_tyrant-time<cast_time*2+1|buff.dreadstalkers.remains<cast_time+gcd
+  if S.SummonDemonicTyrant:IsCastable() and (VarNextTyrant - CombatTime < S.SummonDemonicTyrant:CastTime() * 2 + 1 or DreadstalkerTime() < S.SummonDemonicTyrant:CastTime() + Player:GCD()) then
     if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant tyrant 18"; end
   end
   -- demonbolt,if=buff.demonic_core.up
@@ -364,12 +369,12 @@ local function APL()
     if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and Player:SoulShardsP() < 4) then
       if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 34"; end
     end
-    -- power_siphon,if=buff.demonic_core.stack<1&(buff.dreadstalkers.remains>3|buff.dreadstalkers.down)
-    if S.PowerSiphon:IsReady() and (Player:BuffDown(S.DemonicCoreBuff) and (GrimoireFelguardTime() > 3 or GrimoireFelguardTime() == 0)) then
+    -- power_siphon,if=buff.demonic_core.stack<2&(buff.dreadstalkers.remains>gcd*3|buff.dreadstalkers.down)
+    if S.PowerSiphon:IsReady() and (Player:BuffStack(S.DemonicCoreBuff) < 2 and (DreadstalkerTime() > Player:GCD() * 3 or DreadstalkerTime() == 0)) then
       if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon main 36"; end
     end
-    -- hand_of_guldan,if=soul_shard>2&(!talent.summon_demonic_tyrant|cooldown.summon_demonic_tyrant.remains_expected>variable.tyrant_prep_start+2)
-    if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 2 and ((not S.SummonDemonicTyrant:IsAvailable()) or S.SummonDemonicTyrant:CooldownRemains() > VarTyrantPrepStart + 2 or not CDsON())) then
+    -- hand_of_guldan,if=soul_shard>2&(!talent.summon_demonic_tyrant|cooldown.summon_demonic_tyrant.remains_expected>variable.tyrant_prep_start+2)&(buff.demonic_calling.up|soul_shard>4|cooldown.call_dreadstalkers.remains>gcd)
+    if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 2 and ((not S.SummonDemonicTyrant:IsAvailable()) or S.SummonDemonicTyrant:CooldownRemains() > VarTyrantPrepStart + 2 or not CDsON()) and (Player:BuffUp(S.DemonicCallingBuff) or Player:SoulShardsP() > 4 or S.CallDreadstalkers:CooldownRemains() > Player:GCD())) then
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 38"; end
     end
     -- doom,target_if=refreshable
