@@ -50,6 +50,7 @@ HR.GUISettings.APL.Evoker = {
       DeepBreath = true,
       Dragonrage = true,
       TipTheScales = true,
+      Unravel = true,
     },
   },
 }

@@ -37,6 +37,7 @@ Spell.Evoker.Commons = {
   BlastFurnace                          = Spell(375510),
   ObsidianScales                        = Spell(363916),
   TipTheScales                          = Spell(370553),
+  Unravel                               = Spell(368432),
   -- Buffs/Debuffs
   BlessingoftheBronzeBuff               = Spell(381748),
   FireBreathDebuff                      = Spell(357209),
@@ -78,7 +79,6 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   ShatteringStar                        = Spell(370452),
   Snapfire                              = Spell(370783),
   Tyranny                               = Spell(376888),
-  Unravel                               = Spell(368432),
   Volatility                            = Spell(369089),
   -- Buffs
   BurnoutBuff                           = Spell(375802),
