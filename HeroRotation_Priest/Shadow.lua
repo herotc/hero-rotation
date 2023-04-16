@@ -236,7 +236,7 @@ local function Precombat()
     if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast precombat 12"; end
   end
   -- vampiric_touch,if=!talent.damnation.enabled&(!talent.shadow_crash.enabled|raid_event.adds.in<25|spell_targets.shadow_crash>8)&!fight_style.dungeonslice
-  if S.VampiricTouch:IsCastable() and (not S.ShadowCrash:InFlight()) and (not S.Damnation:IsAvailable()) then
+  if S.VampiricTouch:IsCastable() and (not S.Damnation:IsAvailable()) then
     if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch precombat 14"; end
   end
   -- Manually added: shadow_word_pain,if=!talent.misery.enabled
@@ -498,7 +498,7 @@ end
 
 local function PLTorrent()
   -- void_bolt
-  if S.VoidBolt:IsReady() then
+  if S.VoidBolt:IsCastable() then
     if Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt pl_torrent 2"; end
   end
   -- vampiric_touch,if=remains<=6&cooldown.void_torrent.remains<gcd*2
@@ -559,7 +559,7 @@ local function AoE()
     if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast aoe 10"; end
   end
   -- void_bolt,if=insanity<=85
-  if S.VoidBolt:IsReady() and (Player:Insanity() <= 85) then
+  if S.VoidBolt:IsCastable() and (Player:Insanity() <= 85) then
     if Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt aoe 12"; end
   end
   -- mind_sear,target_if=max:spell_targets.mind_sear,if=buff.mind_devourer.up&spell_targets.mind_sear>1|spell_targets.mind_sear>variable.mind_sear_cutoff&(insanity>=75|((!set_bonus.tier29_4pc&!set_bonus.tier29_2pc)|!buff.dark_reveries.up)|(!set_bonus.tier29_2pc|buff.gathering_shadows.stack=3))&!variable.pool_for_cds,early_chain_if=ticks>=2&!buff.mind_devourer_ms_active.up,interrupt_immediate=1,interrupt_if=ticks>=2&!buff.mind_devourer_ms_active.up
