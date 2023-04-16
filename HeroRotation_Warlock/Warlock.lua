@@ -180,6 +180,7 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   EradicationDebuff                     = Spell(196414),
   HavocDebuff                           = Spell(80240),
   ImmolateDebuff                        = Spell(157736),
+  PyrogenicsDebuff                      = Spell(387096),
   RoaringBlazeDebuff                    = Spell(265931),
 })
 
