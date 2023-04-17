@@ -310,7 +310,22 @@ local function Cleave()
   end
   -- havoc,target_if=min:((-target.time_to_die)<?-15)+dot.immolate.remains+99*(self.target=target),if=(!cooldown.summon_infernal.up|!talent.summon_infernal)&target.time_to_die>8
   if S.Havoc:IsCastable() and (S.SummonInfernal:CooldownDown() or not S.SummonInfernal:IsAvailable()) then
-    if Everyone.CastTargetIf(S.Havoc, Enemies40y, "min", EvaluateTargetIfFilterHavoc, EvaluateTargetIfHavoc, not Target:IsSpellInRange(S.Havoc)) then return "havoc cleave 14"; end
+    --if Everyone.CastTargetIf(S.Havoc, Enemies40y, "min", EvaluateTargetIfFilterHavoc, EvaluateTargetIfHavoc, not Target:IsSpellInRange(S.Havoc)) then return "havoc cleave 14"; end
+    local BestUnit, BestConditionValue, CUCV = nil, nil
+    for _, CycleUnit in pairs(Enemies40y) do
+      if CycleUnit:GUID() ~= Target:GUID() then
+        if BestConditionValue then
+          CUCV = EvaluateTargetIfFilterHavoc(CycleUnit)
+        end
+        if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy())
+          and ((not BestConditionValue) or Utils.CompareThis("min", CUCV, BestConditionValue)) then
+          BestUnit, BestConditionValue = CycleUnit, CUCV
+        end
+      end
+    end
+    if BestUnit and EvaluateTargetIfHavoc(BestUnit) then
+      HR.CastLeftNameplate(BestUnit, S.Havoc)
+    end
   end
   -- chaos_bolt,if=pet.infernal.active|pet.blasphemy.active|soul_shard>=4
   if S.ChaosBolt:IsReady() and (InfernalTime() > 0 or BlasphemyTime() > 0 or Player:SoulShardsP() >= 4) then
