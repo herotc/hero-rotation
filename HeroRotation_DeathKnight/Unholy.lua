@@ -287,29 +287,17 @@ or S.SummonGargoyle:CooldownRemains() > 60 or S.SummonGargoyle:CooldownUp()) and
       if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead cooldowns 12 displaystyle"; end
     end
   end
-  --[[ 10.1 Update - Replaces dark_transformation line below
   -- dark_transformation,if=variable.st_planning
   if S.DarkTransformation:IsCastable() and (VarSTPlanning) then
-    if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cooldowns 14"; end
-  end
-  ]]
-  -- dark_transformation,if=variable.st_planning&(talent.commander_of_the_dead&cooldown.apocalypse.remains<gcd*2|cooldown.apocalypse.remains>30|!talent.commander_of_the_dead)
-  if S.DarkTransformation:IsCastable() and (VarSTPlanning and (S.CommanderoftheDead:IsAvailable() and S.Apocalypse:CooldownRemains() < Player:GCD() * 2 or S.Apocalypse:CooldownRemains() > 30 or not S.CommanderoftheDead:IsAvailable())) then
     if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cooldowns 14"; end
   end
   -- dark_transformation,if=variable.adds_remain&(cooldown.any_dnd.remains<10&talent.infected_claws&((cooldown.vile_contagion.remains|raid_event.adds.exists&raid_event.adds.in>10)&death_knight.fwounded_targets<active_enemies|!talent.vile_contagion)&(raid_event.adds.remains>5|!raid_event.adds.exists)|!talent.infected_claws)
   if S.DarkTransformation:IsCastable() and (VarAddsRemain and (AnyDnD:CooldownRemains() < 10 and S.InfectedClaws:IsAvailable() and (S.VileContagion:CooldownDown() and S.FesteringWoundDebuff:AuraActiveCount() < EnemiesMeleeCount or not S.VileContagion:IsAvailable()) or not S.InfectedClaws:IsAvailable())) then
     if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cooldowns 16"; end
   end
-  --[[ 10.1 Update - Replaces apocalypse line below
   -- apocalypse,target_if=max:debuff.festering_wound.stack,if=variable.st_planning&debuff.festering_wound.stack>=4
   if S.Apocalypse:IsReady() and (VarSTPlanning) then
     if Everyone.CastTargetIf(S.Apocalypse, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfApocalypse, not Target:IsInMeleeRange(5), Settings.Unholy.GCDasOffGCD.Apocalypse) then return "apocalypse cooldowns 18"; end
-  end
-  ]]
-  -- apocalypse,target_if=max:debuff.festering_wound.stack,if=active_enemies<=3&(buff.commander_of_the_dead_window.up|!talent.commander_of_the_dead|cooldown.dark_transformation.remains>30)
-  if S.Apocalypse:IsReady() and (EnemiesMeleeCount <= 3 and (VarCommanderBuffUp or (not S.CommanderoftheDead:IsAvailable()) or S.DarkTransformation:CooldownRemains() > 30)) then
-    if Everyone.CastTargetIf(S.Apocalypse, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, nil, not Target:IsInMeleeRange(5), Settings.Unholy.GCDasOffGCD.Apocalypse) then return "apocalypse cooldowns 18"; end
   end
   -- apocalypse,target_if=min:debuff.festering_wound.stack,if=debuff.festering_wound.up&variable.adds_remain&(!death_and_decay.ticking&cooldown.death_and_decay.remains&rune<3|death_and_decay.ticking&rune=0)
   if S.Apocalypse:IsReady() and (VarAddsRemain and (Player:BuffDown(S.DeathAndDecayBuff) and AnyDnD:CooldownDown() and Player:Rune() < 3 or Player:BuffUp(S.DeathAndDecayBuff) and Player:Rune() == 0)) then
@@ -335,14 +323,8 @@ or S.SummonGargoyle:CooldownRemains() > 60 or S.SummonGargoyle:CooldownUp()) and
   if S.UnholyAssault:IsCastable() and (VarAddsRemain) then
     if Everyone.CastTargetIf(S.UnholyAssault, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfUnholyAssault, not Target:IsInMeleeRange(5), Settings.Unholy.GCDasOffGCD.UnholyAssault) then return "unholy_assault cooldowns 32"; end
   end
-  --[[ 10.1 Update - Repalces soul_reaper line below
   -- soul_reaper,if=active_enemies=1&target.time_to_pct_35<5&target.time_to_die>5
   if S.SoulReaper:IsReady() and (EnemiesMeleeCount == 1 and (Target:TimeToX(35) < 5 or Target:HealthPercentage() <= 35) and Target:TimeToDie() > 5) then
-    if Cast(S.SoulReaper, nil, nil, not Target:IsSpellInRange(S.SoulReaper)) then return "soul_reaper cooldowns 34"; end
-  end
-  ]]
-  -- soul_reaper,if=active_enemies=1&target.time_to_pct_35<5&target.time_to_die>5&(!buff.commander_of_the_dead_window.up|cooldown.apocalypse.remains>3)
-  if S.SoulReaper:IsReady() and (EnemiesMeleeCount == 1 and (Target:TimeToX(35) < 5 or Target:HealthPercentage() <= 35) and Target:TimeToDie() > 5 and ((not VarCommanderBuffUp) or S.Apocalypse:CooldownRemains() > 3)) then
     if Cast(S.SoulReaper, nil, nil, not Target:IsSpellInRange(S.SoulReaper)) then return "soul_reaper cooldowns 34"; end
   end
   -- soul_reaper,target_if=min:dot.soul_reaper.remains,if=target.time_to_pct_35<5&active_enemies>=2&target.time_to_die>(dot.soul_reaper.remains+5)
@@ -356,7 +338,6 @@ or S.SummonGargoyle:CooldownRemains() > 60 or S.SummonGargoyle:CooldownUp()) and
 end
 
 local function GargSetup()
-  --[[ 10.1 Update - Replaces the apocalypse/AotD/soul_reaper/summon_gargoyle lines below
   -- apocalypse,if=buff.commander_of_the_dead.up|cooldown.dark_transformation.remains>20|!talent.commander_of_the_dead&debuff.festering_wound.stack>=4
   if S.Apocalypse:IsReady() and (VarCommanderBuffUp or S.DarkTransformation:CooldownRemains() > 20 or (not S.CommanderoftheDead:IsAvailable()) and FesterStacks >= 4) then
     if Cast(S.Apocalypse, Settings.Unholy.GCDasOffGCD.Apocalypse, nil, not Target:IsInMeleeRange(5)) then return "apocalypse garg_setup 2"; end
@@ -370,23 +351,6 @@ local function GargSetup()
     if Cast(S.SoulReaper, nil, nil, not Target:IsInMeleeRange(5)) then return "soul_reaper garg_setup 6"; end
   end
   -- summon_gargoyle,use_off_gcd=1,if=buff.commander_of_the_dead.up|!talent.commander_of_the_dead&runic_power>40
-  if S.SummonGargoyle:IsCastable() and (VarCommanderBuffUp or (not S.CommanderoftheDead:IsAvailable()) and Player:RunicPower() > 40) then
-    if Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return "summon_gargoyle garg_setup 8"; end
-  end
-  ]]
-  -- apocalypse,if=buff.commander_of_the_dead_window.up|cooldown.dark_transformation.remains>20|!talent.commander_of_the_dead&debuff.festering_wound.stack>=4
-  if S.Apocalypse:IsReady() and (VarCommanderBuffUp or S.DarkTransformation:CooldownRemains() > 20 or (not S.CommanderoftheDead:IsAvailable()) and FesterStacks >= 4) then
-    if Cast(S.Apocalypse, Settings.Unholy.GCDasOffGCD.Apocalypse, nil, not Target:IsInMeleeRange(5)) then return "apocalypse garg_setup 2"; end
-  end
-  -- army_of_the_dead,if=talent.commander_of_the_dead&(cooldown.dark_transformation.remains<3|buff.commander_of_the_dead_window.up)|!talent.commander_of_the_dead&talent.unholy_assault&cooldown.unholy_assault.remains<10|!talent.unholy_assault&!talent.commander_of_the_dead
-  if S.ArmyoftheDead:IsReady() and (S.CommanderoftheDead:IsAvailable() and (S.DarkTransformation:CooldownRemains() < 3 or VarCommanderBuffUp) or (not S.CommanderoftheDead:IsAvailable()) and S.UnholyAssault:IsAvailable() and S.UnholyAssault:CooldownRemains() < 10 or (not S.UnholyAssault:IsAvailable()) and not S.CommanderoftheDead:IsAvailable()) then
-    if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyOfTheDead) then return "army_of_the_dead garg_setup 4"; end
-  end
-  -- soul_reaper,if=active_enemies=1&target.time_to_pct_35<5&target.time_to_die>5&(!buff.commander_of_the_dead_window.up|cooldown.apocalypse.remains>3)
-  if S.SoulReaper:IsReady() and (EnemiesMeleeCount == 1 and (Target:TimeToX(35) < 5 or Target:HealthPercentage() <= 35) and Target:TimeToDie() > 5 and ((not VarCommanderBuffUp) or S.Apocalypse:CooldownRemains() > 3)) then
-    if Cast(S.SoulReaper, nil, nil, not Target:IsInMeleeRange(5)) then return "soul_reaper garg_setup 6"; end
-  end
-  -- summon_gargoyle,use_off_gcd=1,if=buff.commander_of_the_dead_window.up|!talent.commander_of_the_dead&runic_power>40
   if S.SummonGargoyle:IsCastable() and (VarCommanderBuffUp or (not S.CommanderoftheDead:IsAvailable()) and Player:RunicPower() > 40) then
     if Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return "summon_gargoyle garg_setup 8"; end
   end
@@ -542,22 +506,12 @@ local function APL()
     -- mind_freeze,if=target.debuff.casting.react
     local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons2.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     if Settings.Commons.UseAMSAMZOffensively then
-      --[[10.1 Update - Replaces AMS/AMZ lines below
       -- antimagic_shell,if=runic_power.deficit>40&(pet.gargoyle.active|!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>cooldown.antimagic_shell.duration)
       if S.AntiMagicShell:IsCastable() and (Player:RunicPowerDeficit() > 40 and (ghoul:gargactive() or (not S.SummonGargoyle:IsAvailable()) or S.SummonGargoyle:CooldownRemains() > 40)) then
         if Cast(S.AntiMagicShell, Settings.Commons2.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell ams_amz 2"; end
       end
       -- antimagic_zone,if=death_knight.amz_absorb_percent>0&runic_power.deficit>70&talent.assimilation&(pet.gargoyle.active|!talent.summon_gargoyle)
       if S.AntiMagicZone:IsCastable() and (Player:RunicPowerDeficit() > 70 and S.Assimilation:IsAvailable() and (ghoul:gargactive() or not S.SummonGargoyle:IsAvailable())) then
-        if Cast(S.AntiMagicZone, Settings.Commons2.GCDasOffGCD.AntiMagicZone) then return "antimagic_zone ams_amz 4"; end
-      end
-      ]]
-      -- antimagic_shell,if=(!buff.commander_of_the_dead_window.up|buff.commander_of_the_dead_window.up&cooldown.apocalypse.remains>5)&runic_power.deficit>40&(pet.gargoyle.active|!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>cooldown.antimagic_shell.duration)
-      if S.AntiMagicShell:IsCastable() and (((not VarCommanderBuffUp) or VarCommanderBuffUp and S.Apocalypse:CooldownRemains() > 5) and Player:RunicPowerDeficit() > 40 and (ghoul:gargactive() or (not S.SummonGargoyle:IsAvailable()) or S.SummonGargoyle:CooldownRemains() > 40)) then
-        if Cast(S.AntiMagicShell, Settings.Commons2.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell ams_amz 2"; end
-      end
-      -- antimagic_zone,if=(!buff.commander_of_the_dead_window.up|buff.commander_of_the_dead_window.up&cooldown.apocalypse.remains>5)&death_knight.amz_absorb_percent>0&runic_power.deficit>70&talent.assimilation&(pet.gargoyle.active|!talent.summon_gargoyle)
-      if S.AntiMagicZone:IsCastable() and (((not VarCommanderBuffUp) and VarCommanderBuffUp and S.Apocalypse:CooldownRemains() > 5) and Player:RunicPowerDeficit() > 70 and S.Assimilation:IsAvailable() and (ghoul:gargactive() or not S.SummonGargoyle:IsAvailable())) then
         if Cast(S.AntiMagicZone, Settings.Commons2.GCDasOffGCD.AntiMagicZone) then return "antimagic_zone ams_amz 4"; end
       end
     end
@@ -595,14 +549,8 @@ local function APL()
         if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil out_of_range"; end
       end
     end
-    --[[ 10.1 Update - Replaces below AotD line and wait_for_cooldown line below
     -- army_of_the_dead,if=talent.summon_gargoyle&cooldown.summon_gargoyle.remains<3|!talent.summon_gargoyle|fight_remains<35
-    if S.ArmyOfTheDead:IsReady() and (S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:CooldownRemains() < 3 or (not S.SummonGargoyle:IsAvailable()) or FightRemains < 35) then
-      if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyOfTheDead) then return "army_of_the_dead main 2"; end
-    end
-    ]]
-    -- army_of_the_dead,if=talent.commander_of_the_dead&(cooldown.dark_transformation.remains<3|buff.commander_of_the_dead_window.up)|!talent.commander_of_the_dead&talent.unholy_assault&cooldown.unholy_assault.remains<10|!talent.unholy_assault&!talent.commander_of_the_dead|fight_remains<=34
-    if S.ArmyoftheDead:IsReady() and CDsON() and (S.CommanderoftheDead:IsAvailable() and (S.DarkTransformation:CooldownRemains() < 3 or VarCommanderBuffUp) or (not S.CommanderoftheDead:IsAvailable()) and S.UnholyAssault:IsAvailable() and S.UnholyAssault:CooldownRemains() < 10 or (not S.UnholyAssault:IsAvailable()) and (not S.CommanderoftheDead:IsAvailable()) or FightRemains <= 34) then
+    if S.ArmyoftheDead:IsReady() and (S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:CooldownRemains() < 3 or (not S.SummonGargoyle:IsAvailable()) or FightRemains < 35) then
       if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyOfTheDead) then return "army_of_the_dead main 2"; end
     end
     -- wait_for_cooldown,name=apocalypse,if=cooldown.apocalypse.remains<gcd&buff.commander_of_the_dead_window.up
@@ -610,7 +558,6 @@ local function APL()
     if S.Apocalypse:IsAvailable() and FesterStacks > 0 and (S.Apocalypse:CooldownRemains() < Player:GCD() and VarCommanderBuffUp) then
       if HR.CastPooling(S.Apocalypse, S.Apocalypse:CooldownRemains(), not Target:IsInMeleeRange(5)) then return "apocalypse main 3"; end
     end
-    --[[ 10.1 Update - Replaces the DC/Epidemic/UB/Outbreak lines below
     -- death_coil,if=(active_enemies<=3|!talent.epidemic)&(talent.commander_of_the_dead&buff.commander_of_the_dead.up&cooldown.apocalypse.remains<5|debuff.death_rot.up&debuff.death_rot.remains<gcd)
     -- Note: Added 0.25s buffer 
     if S.DeathCoil:IsReady() and ((EnemiesMeleeCount <= 3 or not S.Epidemic:IsAvailable()) and (S.CommanderoftheDead:IsAvailable() and VarCommanderBuffUp and S.Apocalypse:CooldownRemains() < 5 or Target:DebuffUp(S.DeathRotDebuff) and Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD() + 0.25)) then
@@ -629,32 +576,9 @@ local function APL()
     if S.Outbreak:IsReady() and (EnemiesWithoutVP > 0) then
       if Everyone.CastCycle(S.Outbreak, Enemies10ySplash, EvaluateCycleOutbreak, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak main 8"; end
     end
-    ]]
-    -- death_coil,if=(active_enemies<=3|!talent.epidemic)&(pet.gargoyle.active&buff.commander_of_the_dead_window.up&buff.commander_of_the_dead_window.remains>gcd*1.1&cooldown.apocalypse.remains<gcd|(!buff.commander_of_the_dead_window.up|buff.commander_of_the_dead_window.up&cooldown.apocalypse.remains>5)&debuff.death_rot.up&debuff.death_rot.remains<gcd)
-    if S.DeathCoil:IsReady() and ((EnemiesMeleeCount <= 3 or not S.Epidemic:IsAvailable()) and (ghoul:gargactive() and VarCommanderBuffUp and VarCommanderBuffRemains > Player:GCD() * 1.1 and S.Apocalypse:CooldownRemains() < Player:GCD() or ((not VarCommanderBuffUp) or VarCommanderBuffUp and S.Apocalypse:CooldownRemains() > 5) and Target:DebuffUp(S.DeathRotDebuff) and Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD())) then
-      if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil main 4"; end
-    end
-    -- epidemic,if=active_enemies>=4&(pet.gargoyle.active&buff.commander_of_the_dead_window.up&buff.commander_of_the_dead_window.remains>gcd&cooldown.apocalypse.remains<gcd|(!buff.commander_of_the_dead_window.up|buff.commander_of_the_dead_window.up&cooldown.apocalypse.remains>5)&debuff.death_rot.up&debuff.death_rot.remains<gcd)
-    if S.Epidemic:IsReady() and (Enemies10ySplashCount >= 4 and (ghoul:gargactive() and VarCommanderBuffUp and VarCommanderBuffRemains > Player:GCD() and S.Apocalypse:CooldownRemains() < Player:GCD() or ((not VarCommanderBuffUp) or VarCommanderBuffUp and S.Apocalypse:CooldownRemains() > 5) and Target:DebuffUp(S.DeathRotDebuff) and Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD())) then
-      if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic main 6"; end
-    end
-    -- unholy_blight,if=!buff.commander_of_the_dead_window.up&(variable.st_planning&((!talent.apocalypse|cooldown.apocalypse.remains)&talent.morbidity|!talent.morbidity)|variable.adds_remain|fight_remains<21)
-    if S.UnholyBlight:IsReady() and ((not VarCommanderBuffUp) and (VarSTPlanning and (((not S.Apocalypse:IsAvailable()) or S.Apocalypse:CooldownDown()) and S.Morbidity:IsAvailable() or not S.Morbidity:IsAvailable()) or VarAddsRemain or FightRemains < 21)) then
-      if Cast(S.UnholyBlight, Settings.Unholy.GCDasOffGCD.UnholyBlight, nil, not Target:IsInRange(8)) then return "unholy_blight main 7"; end
-    end
-    -- outbreak,target_if=target.time_to_die>dot.virulent_plague.remains&(!buff.commander_of_the_dead_window.up|buff.commander_of_the_dead_window.up&cooldown.apocalypse.remains>5)&(dot.virulent_plague.refreshable|talent.superstrain&(dot.frost_fever_superstrain.refreshable|dot.blood_plague_superstrain.refreshable))&(!talent.unholy_blight|talent.unholy_blight&cooldown.unholy_blight.remains>15%((talent.superstrain*3)+(talent.plaguebringer*2)+(talent.ebon_fever*2)))
-    if S.Outbreak:IsReady() and (Target:TimeToDie() > Target:DebuffRemains(S.VirulentPlagueDebuff) and ((not VarCommanderBuffUp) or VarCommanderBuffRemains and S.Apocalypse:CooldownRemains() > 5) and (Target:DebuffRefreshable(S.VirulentPlagueDebuff) or S.Superstrain:IsAvailable() and (Target:DebuffRefreshable(S.FrostFeverDebuff) or Target:DebuffRefreshable(S.BloodPlagueDebuff))) and ((not S.UnholyBlight:IsAvailable()) or S.UnholyBlight:IsAvailable() and S.UnholyBlight:CooldownRemains() > 15 / ((num(S.Superstrain:IsAvailable()) * 3) + (num(S.Plaguebringer:IsAvailable()) * 2) + (num(S.EbonFever:IsAvailable()) * 2)))) then
-      if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak main 8"; end
-    end
-    --[[ 10.1 Update - Replaces wound_spender line below
     -- wound_spender,if=cooldown.apocalypse.remains>variable.apoc_timing&talent.plaguebringer&talent.superstrain&buff.plaguebringer.remains<gcd
     -- Note: Added 0.25s buffer
     if WoundSpender:IsReady() and (S.Apocalypse:CooldownRemains() > VarApocTiming and S.Plaguebringer:IsAvailable() and S.Superstrain:IsAvailable() and Player:BuffRemains(S.PlaguebringerBuff) < Player:GCD() + 0.25) then
-      if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender main 10"; end
-    end
-    ]]
-    -- wound_spender,if=(!buff.commander_of_the_dead_window.up|buff.commander_of_the_dead_window.up&cooldown.apocalypse.remains>5)&cooldown.apocalypse.remains>variable.apoc_timing&talent.plaguebringer&talent.superstrain&buff.plaguebringer.remains<gcd
-    if WoundSpender:IsReady() and (((not VarCommanderBuffUp) or VarCommanderBuffUp and S.Apocalypse:CooldownRemains() > 5) and S.Apocalypse:CooldownRemains() > VarApocTiming and S.Plaguebringer:IsAvailable() and S.Superstrain:IsAvailable() and Player:BuffRemains(S.PlaguebringerBuff) < Player:GCD()) then
       if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender main 10"; end
     end
     -- run_action_list,name=garg_setup,if=variable.garg_setup=0
