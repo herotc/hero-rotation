@@ -193,36 +193,9 @@ local function AoE()
   end
 end
 
-local function BreathOblit()
-  -- frostscythe,if=buff.killing_machine.up&variable.frostscythe_priority
-  if S.Frostscythe:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and VarFrostscythePriority) then
-    if Cast(S.Frostscythe, nil, nil, not Target:IsInMeleeRange(8)) then return "frostscythe breath_oblit 2"; end
-  end
-  -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=buff.killing_machine.up
-  if S.Obliterate:IsReady() and (Player:BuffUp(S.KillingMachineBuff)) then
-    if Everyone.CastTargetIf(S.Obliterate, Enemies10yd, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5)) then return "obliterate breath_oblit 4"; end
-  end
-  -- howling_blast,if=buff.rime.react
-  if S.HowlingBlast:IsReady() and (Player:BuffUp(S.RimeBuff)) then
-    if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast breath_oblit 6"; end
-  end
-  -- howling_blast,if=!buff.killing_machine.up
-  if S.HowlingBlast:IsReady() and (Player:BuffDown(S.KillingMachineBuff)) then
-    if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast breath_oblit 8"; end
-  end
-  -- horn_of_winter,if=runic_power.deficit>25
-  if S.HornofWinter:IsReady() and (Player:RunicPowerDeficit() > 25) then
-    if Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornOfWinter) then return "horn_of_winter breath_oblit 10"; end
-  end
-  -- arcane_torrent,if=runic_power.deficit>20
-  if S.ArcaneTorrent:IsReady() and (Player:RunicPowerDeficit() > 20) then
-    if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials) then return "arcane_torrent breath_oblit 12"; end
-  end
-end
-
 local function Breath()
-  -- remorseless_winter,if=variable.rw_buffs&variable.adds_remain
-  if S.RemorselessWinter:IsReady() and (VarRWBuffs and VarAddsRemain) then
+  -- remorseless_winter,if=variable.rw_buffs|variable.adds_remain
+  if S.RemorselessWinter:IsReady() and (VarRWBuffs or VarAddsRemain) then
     if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter breath 2"; end
   end
   -- howling_blast,if=variable.rime_buffs&runic_power>(45-talent.rage_of_the_frozen_champion*8)
@@ -272,6 +245,56 @@ local function Breath()
   -- arcane_torrent,if=runic_power<60
   if S.ArcaneTorrent:IsReady() and (Player:RunicPower() < 60) then
     if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials) then return "arcane_torrent breath 26"; end
+  end
+end
+
+local function BreathOblit()
+  -- frostscythe,if=buff.killing_machine.up&variable.frostscythe_priority
+  if S.Frostscythe:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and VarFrostscythePriority) then
+    if Cast(S.Frostscythe, nil, nil, not Target:IsInMeleeRange(8)) then return "frostscythe breath_oblit 2"; end
+  end
+  -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=buff.killing_machine.up
+  if S.Obliterate:IsReady() and (Player:BuffUp(S.KillingMachineBuff)) then
+    if Everyone.CastTargetIf(S.Obliterate, Enemies10yd, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5)) then return "obliterate breath_oblit 4"; end
+  end
+  -- howling_blast,if=buff.rime.react
+  if S.HowlingBlast:IsReady() and (Player:BuffUp(S.RimeBuff)) then
+    if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast breath_oblit 6"; end
+  end
+  -- howling_blast,if=!buff.killing_machine.up
+  if S.HowlingBlast:IsReady() and (Player:BuffDown(S.KillingMachineBuff)) then
+    if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast breath_oblit 8"; end
+  end
+  -- horn_of_winter,if=runic_power.deficit>25
+  if S.HornofWinter:IsReady() and (Player:RunicPowerDeficit() > 25) then
+    if Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornOfWinter) then return "horn_of_winter breath_oblit 10"; end
+  end
+  -- arcane_torrent,if=runic_power.deficit>20
+  if S.ArcaneTorrent:IsReady() and (Player:RunicPowerDeficit() > 20) then
+    if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials) then return "arcane_torrent breath_oblit 12"; end
+  end
+end
+
+local function ColdHeart()
+  -- chains_of_ice,if=fight_remains<gcd&(rune<2|!buff.killing_machine.up&(!variable.2h_check&buff.cold_heart.stack>=4|variable.2h_check&buff.cold_heart.stack>8)|buff.killing_machine.up&(!variable.2h_check&buff.cold_heart.stack>8|variable.2h_check&buff.cold_heart.stack>10))
+  if S.ChainsofIce:IsReady() and (FightRemains < Player:GCD() and (Player:Rune() < 2 or Player:BuffDown(S.KillingMachineBuff) and ((not Using2H) and Player:BuffStack(S.ColdHeartBuff) >= 4 or Using2H and Player:BuffStack(S.ColdHeartBuff) > 8) or Player:BuffUp(S.KillingMachineBuff) and ((not Using2H) and Player:BuffStack(S.ColdHeartBuff) > 8 or Using2H and Player:BuffStack(S.ColdHeartBuff) > 10))) then
+    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 2"; end
+  end
+  -- chains_of_ice,if=!talent.obliteration&buff.pillar_of_frost.up&buff.cold_heart.stack>=10&(buff.pillar_of_frost.remains<gcd*(1+(talent.frostwyrms_fury&cooldown.frostwyrms_fury.ready))|buff.unholy_strength.up&buff.unholy_strength.remains<gcd)
+  if S.ChainsofIce:IsReady() and ((not S.Obliteration:IsAvailable()) and Player:BuffUp(S.PillarofFrostBuff) and Player:BuffStack(S.ColdHeartBuff) >= 10 and (Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() * (1 + num(S.FrostwyrmsFury:IsAvailable() and S.FrostwyrmsFury:IsReady())) or Player:BuffUp(S.UnholyStrengthBuff) and Player:BuffRemains(S.UnholyStrengthBuff) < Player:GCD())) then
+    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 4"; end
+  end
+  -- chains_of_ice,if=!talent.obliteration&death_knight.runeforge.fallen_crusader&!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains_expected>15&(buff.cold_heart.stack>=10&buff.unholy_strength.up|buff.cold_heart.stack>=13)
+  if S.ChainsofIce:IsReady() and ((not S.Obliteration:IsAvailable()) and UsingFallenCrusader and Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() > 15 and (Player:BuffStack(S.ColdHeartBuff) >= 10 and Player:BuffUp(S.UnholyStrengthBuff) or Player:BuffStack(S.ColdHeartBuff) >= 13)) then
+    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 6"; end
+  end
+  -- chains_of_ice,if=!talent.obliteration&!death_knight.runeforge.fallen_crusader&buff.cold_heart.stack>=10&!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains_expected>20
+  if S.ChainsofIce:IsReady() and ((not S.Obliteration:IsAvailable()) and (not UsingFallenCrusader) and Player:BuffStack(S.ColdHeartBuff) >= 10 and Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() > 20) then
+    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 8"; end
+  end
+  -- chains_of_ice,if=talent.obliteration&!buff.pillar_of_frost.up&(buff.cold_heart.stack>=14&(buff.unholy_strength.up|buff.chaos_bane.up)|buff.cold_heart.stack>=19|cooldown.pillar_of_frost.remains_expected<3&buff.cold_heart.stack>=14)
+  if S.ChainsofIce:IsReady() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and (Player:BuffStack(S.ColdHeartBuff) >= 14 and (Player:BuffUp(S.UnholyStrengthBuff)) or Player:BuffStack(S.ColdHeartBuff) >= 19 or S.PillarofFrost:CooldownRemains() < 3 and Player:BuffStack(S.ColdHeartBuff) >= 14)) then
+    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 10"; end
   end
 end
 
@@ -357,29 +380,6 @@ local function Cooldowns()
   end
 end
 
-local function ColdHeart()
-  -- chains_of_ice,if=fight_remains<gcd&(rune<2|!buff.killing_machine.up&(!variable.2h_check&buff.cold_heart.stack>=4|variable.2h_check&buff.cold_heart.stack>8)|buff.killing_machine.up&(!variable.2h_check&buff.cold_heart.stack>8|variable.2h_check&buff.cold_heart.stack>10))
-  if S.ChainsofIce:IsReady() and (FightRemains < Player:GCD() and (Player:Rune() < 2 or Player:BuffDown(S.KillingMachineBuff) and ((not Using2H) and Player:BuffStack(S.ColdHeartBuff) >= 4 or Using2H and Player:BuffStack(S.ColdHeartBuff) > 8) or Player:BuffUp(S.KillingMachineBuff) and ((not Using2H) and Player:BuffStack(S.ColdHeartBuff) > 8 or Using2H and Player:BuffStack(S.ColdHeartBuff) > 10))) then
-    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 2"; end
-  end
-  -- chains_of_ice,if=!talent.obliteration&buff.pillar_of_frost.up&buff.cold_heart.stack>=10&(buff.pillar_of_frost.remains<gcd*(1+(talent.frostwyrms_fury&cooldown.frostwyrms_fury.ready))|buff.unholy_strength.up&buff.unholy_strength.remains<gcd)
-  if S.ChainsofIce:IsReady() and ((not S.Obliteration:IsAvailable()) and Player:BuffUp(S.PillarofFrostBuff) and Player:BuffStack(S.ColdHeartBuff) >= 10 and (Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() * (1 + num(S.FrostwyrmsFury:IsAvailable() and S.FrostwyrmsFury:IsReady())) or Player:BuffUp(S.UnholyStrengthBuff) and Player:BuffRemains(S.UnholyStrengthBuff) < Player:GCD())) then
-    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 4"; end
-  end
-  -- chains_of_ice,if=!talent.obliteration&death_knight.runeforge.fallen_crusader&!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains_expected>15&(buff.cold_heart.stack>=10&buff.unholy_strength.up|buff.cold_heart.stack>=13)
-  if S.ChainsofIce:IsReady() and ((not S.Obliteration:IsAvailable()) and UsingFallenCrusader and Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() > 15 and (Player:BuffStack(S.ColdHeartBuff) >= 10 and Player:BuffUp(S.UnholyStrengthBuff) or Player:BuffStack(S.ColdHeartBuff) >= 13)) then
-    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 6"; end
-  end
-  -- chains_of_ice,if=!talent.obliteration&!death_knight.runeforge.fallen_crusader&buff.cold_heart.stack>=10&!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains_expected>20
-  if S.ChainsofIce:IsReady() and ((not S.Obliteration:IsAvailable()) and (not UsingFallenCrusader) and Player:BuffStack(S.ColdHeartBuff) >= 10 and Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() > 20) then
-    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 8"; end
-  end
-  -- chains_of_ice,if=talent.obliteration&!buff.pillar_of_frost.up&(buff.cold_heart.stack>=14&(buff.unholy_strength.up|buff.chaos_bane.up)|buff.cold_heart.stack>=19|cooldown.pillar_of_frost.remains_expected<3&buff.cold_heart.stack>=14)
-  if S.ChainsofIce:IsReady() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and (Player:BuffStack(S.ColdHeartBuff) >= 14 and (Player:BuffUp(S.UnholyStrengthBuff)) or Player:BuffStack(S.ColdHeartBuff) >= 19 or S.PillarofFrost:CooldownRemains() < 3 and Player:BuffStack(S.ColdHeartBuff) >= 14)) then
-    if Cast(S.ChainsofIce, Settings.Commons2.GCDasOffGCD.ChainsOfIce, nil, not Target:IsSpellInRange(S.ChainsofIce)) then return "chains_of_ice cold_heart 10"; end
-  end
-end
-
 local function Obliteration()
   -- remorseless_winter,if=active_enemies>3
   if S.RemorselessWinter:IsReady() and (EnemiesCount10yd > 3) then
@@ -439,6 +439,43 @@ local function Obliteration()
   end
 end
 
+local function Racials()
+  if (VarCDCheck) then
+    -- blood_fury,if=variable.cooldown_check
+    if S.BloodFury:IsCastable() then
+      if Cast(S.BloodFury, Settings.Commons2.OffGCDasOffGCD.Racials) then return "blood_fury racials 2"; end
+    end
+    -- berserking,if=variable.cooldown_check
+    if S.Berserking:IsCastable() then
+      if Cast(S.Berserking, Settings.Commons2.OffGCDasOffGCD.Racials) then return "berserking racials 4"; end
+    end
+    -- arcane_pulse,if=variable.cooldown_check
+    if S.ArcanePulse:IsCastable() then
+      if Cast(S.ArcanePulse, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 6"; end
+    end
+    -- lights_judgment,if=variable.cooldown_check
+    if S.LightsJudgment:IsCastable() then
+      if Cast(S.LightsJudgment, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
+    end
+    -- ancestral_call,if=variable.cooldown_check
+    if S.AncestralCall:IsCastable() then
+      if Cast(S.AncestralCall, Settings.Commons2.OffGCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
+    end
+    -- fireblood,if=variable.cooldown_check
+    if S.Fireblood:IsCastable() then
+      if Cast(S.Fireblood, Settings.Commons2.OffGCDasOffGCD.Racials) then return "fireblood racials 12"; end
+    end
+  end
+  -- bag_of_tricks,if=talent.obliteration&!buff.pillar_of_frost.up&buff.unholy_strength.up
+  if S.BagofTricks:IsCastable() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and Player:BuffUp(S.UnholyStrengthBuff)) then
+    if Cast(S.BagofTricks, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racials 14"; end
+  end
+  -- bag_of_tricks,if=!talent.obliteration&buff.pillar_of_frost.up&(buff.unholy_strength.up&buff.unholy_strength.remains<gcd*3|buff.pillar_of_frost.remains<gcd*3)
+  if S.BagofTricks:IsCastable() and ((not S.Obliteration:IsAvailable()) and Player:BuffUp(S.PillarofFrostBuff) and (Player:BuffUp(S.UnholyStrengthBuff) and Player:BuffRemains(S.UnholyStrengthBuff) < Player:GCD() * 3 or Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() * 3)) then
+    if Cast(S.BagofTricks, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racials 16"; end
+  end
+end
+
 local function SingleTarget()
   -- remorseless_winter,if=variable.rw_buffs|variable.adds_remain
   if S.RemorselessWinter:IsReady() and (VarRWBuffs or VarAddsRemain) then
@@ -490,43 +527,6 @@ local function SingleTarget()
   end
 end
 
-local function Racials()
-  if (VarCDCheck) then
-    -- blood_fury,if=variable.cooldown_check
-    if S.BloodFury:IsCastable() then
-      if Cast(S.BloodFury, Settings.Commons2.OffGCDasOffGCD.Racials) then return "blood_fury racials 2"; end
-    end
-    -- berserking,if=variable.cooldown_check
-    if S.Berserking:IsCastable() then
-      if Cast(S.Berserking, Settings.Commons2.OffGCDasOffGCD.Racials) then return "berserking racials 4"; end
-    end
-    -- arcane_pulse,if=variable.cooldown_check
-    if S.ArcanePulse:IsCastable() then
-      if Cast(S.ArcanePulse, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 6"; end
-    end
-    -- lights_judgment,if=variable.cooldown_check
-    if S.LightsJudgment:IsCastable() then
-      if Cast(S.LightsJudgment, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
-    end
-    -- ancestral_call,if=variable.cooldown_check
-    if S.AncestralCall:IsCastable() then
-      if Cast(S.AncestralCall, Settings.Commons2.OffGCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
-    end
-    -- fireblood,if=variable.cooldown_check
-    if S.Fireblood:IsCastable() then
-      if Cast(S.Fireblood, Settings.Commons2.OffGCDasOffGCD.Racials) then return "fireblood racials 12"; end
-    end
-  end
-  -- bag_of_tricks,if=talent.obliteration&!buff.pillar_of_frost.up&buff.unholy_strength.up
-  if S.BagofTricks:IsCastable() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and Player:BuffUp(S.UnholyStrengthBuff)) then
-    if Cast(S.BagofTricks, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racials 14"; end
-  end
-  -- bag_of_tricks,if=!talent.obliteration&buff.pillar_of_frost.up&(buff.unholy_strength.up&buff.unholy_strength.remains<gcd*3|buff.pillar_of_frost.remains<gcd*3)
-  if S.BagofTricks:IsCastable() and ((not S.Obliteration:IsAvailable()) and Player:BuffUp(S.PillarofFrostBuff) and (Player:BuffUp(S.UnholyStrengthBuff) and Player:BuffRemains(S.UnholyStrengthBuff) < Player:GCD() * 3 or Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() * 3)) then
-    if Cast(S.BagofTricks, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks racials 16"; end
-  end
-end
-
 local function Trinkets()
   -- use_item,name=algethar_puzzle_box,if=!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains<2&(!talent.breath_of_sindragosa|runic_power>60&(buff.breath_of_sindragosa.up|cooldown.breath_of_sindragosa.remains<2))
   if I.AlgetharPuzzleBox:IsEquippedAndReady() and (Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() < 2 and ((not S.BreathofSindragosa:IsAvailable()) or Player:RunicPower() > 60 and (Player:BuffUp(S.BreathofSindragosa) or S.BreathofSindragosa:CooldownRemains() < 2))) then
@@ -537,11 +537,9 @@ local function Trinkets()
   -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|(trinket.1.cast_time>0&!buff.pillar_of_frost.up|!trinket.1.cast_time>0)|talent.pillar_of_frost&cooldown.pillar_of_frost.remains_expected>20|!talent.pillar_of_frost)
   -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|(trinket.2.cast_time>0&!buff.pillar_of_frost.up|!trinket.2.cast_time>0)|talent.pillar_of_frost&cooldown.pillar_of_frost.remains_expected>20|!talent.pillar_of_frost)
   -- TODO: Trinket stuff. Until then, have a generic trinket usage function.
-  if Settings.Commons.Enabled.Trinkets then
-    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-    if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
-    end
+  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+  if TrinketToUse then
+    if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end
 end
 
@@ -658,13 +656,17 @@ local function APL()
       if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter main 18"; end
     end
     -- call_action_list,name=trinkets
-    local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
+    if Settings.Commons.Enabled.Trinkets then
+      local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
+    end
     -- call_action_list,name=cooldowns
     if CDsON() then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=racials
-    local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
+    if CDsON() then
+      local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
+    end
     -- call_action_list,name=cold_heart,if=talent.cold_heart&(!buff.killing_machine.up|talent.breath_of_sindragosa)&((debuff.razorice.stack=5|!death_knight.runeforge.razorice&!talent.glacial_advance&!talent.avalanche)|fight_remains<=gcd)
     if (S.ColdHeart:IsAvailable() and (Player:BuffDown(S.KillingMachineBuff) or S.BreathofSindragosa:IsAvailable()) and ((Target:DebuffStack(S.RazoriceDebuff) == 5 or (not UsingRazorice) and (not S.GlacialAdvance:IsAvailable()) and not S.Avalanche:IsAvailable()) or FightRemains <= Player:GCD() + 0.5)) then
       local ShouldReturn = ColdHeart(); if ShouldReturn then return ShouldReturn; end
