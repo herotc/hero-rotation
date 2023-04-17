@@ -462,7 +462,7 @@ local function APL()
   Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
   if AoEON() then
     EnemiesMeleeCount = #EnemiesMelee
-    Enemies10ySplashCount = #Enemies10ySplash
+    Enemies10ySplashCount = Target:GetEnemiesInSplashRangeCount(10)
   else
     EnemiesMeleeCount = 1
     Enemies10ySplashCount = 1

@@ -523,7 +523,7 @@ local function APL()
   Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
   if AoEON() then
     Shaman.Targets = #Enemies40y
-    Shaman.ClusterTargets = #Enemies10ySplash
+    Shaman.ClusterTargets = Target:GetEnemiesInSplashRangeCount(10)
   else
     Shaman.Targets = 1
     Shaman.ClusterTargets = 1
