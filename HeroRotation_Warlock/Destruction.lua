@@ -507,7 +507,7 @@ local function APL()
   Enemies40y = Player:GetEnemiesInRange(40)
   Enemies8ySplash = Target:GetEnemiesInSplashRange(12)
   if AoEON() then
-    EnemiesCount8ySplash = #Enemies8ySplash
+    EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(12)
   else
     EnemiesCount8ySplash = 1
   end
