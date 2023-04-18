@@ -7,6 +7,7 @@ local DBC        = HeroDBC.DBC
 -- HeroLib
 local HL         = HeroLib
 local Cache      = HeroCache
+local Utils      = HL.Utils
 local Unit       = HL.Unit
 local Player     = Unit.Player
 local Target     = Unit.Target
