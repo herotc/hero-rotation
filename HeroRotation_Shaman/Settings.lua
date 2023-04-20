@@ -30,14 +30,12 @@ HR.GUISettings.APL.Shaman = {
       SpiritwalkersGrace = "SuggestedRight",
     },
     UseBloodlust = false,
-    -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       Ascendance = true,
       EarthElemental = true,
       NaturesSwiftness = true,
       TotemicRecall = true,
     },
-    -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       Racials = true,
       WindShear = true
@@ -45,23 +43,20 @@ HR.GUISettings.APL.Shaman = {
   },
   Enhancement = {
     PreferEarthShield = false,
+    HealWith5Maelstrom = 50,
+    HealWithout5Maelstrom = 30,
     PotionType = {
       Selected = "Power",
     },
-    -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
       CrashLightning = false,
       FeralSpirit = true,
+      HealingSurge = false,
       Shield = false,
       WindfuryTotem = false
     },
-    -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      -- Racials
-
-      -- Abilities
-
     },
   },
   Elemental = {
@@ -73,7 +68,6 @@ HR.GUISettings.APL.Shaman = {
       Meteor = "Suggested",
       EyeOfTheStorm = "Suggested",
     },
-    -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
       EchoingShock = true,
@@ -85,8 +79,6 @@ HR.GUISettings.APL.Shaman = {
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      -- Racials
-      -- Abilities
     }
   },
   Restoration = {
@@ -94,10 +86,8 @@ HR.GUISettings.APL.Shaman = {
       Selected = "Power",
     },
     GCDasOffGCD = {
-
     },
     OffGCDasOffGCD = {
-
     }
   }
 }
@@ -117,6 +107,8 @@ CreateARPanelOptions(CP_Shaman, "APL.Shaman.Commons")
 -- Enhancement
 CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement")
 CreatePanelOption("CheckButton", CP_Enhancement, "APL.Shaman.Enhancement.PreferEarthShield", "Prefer Earth Shield", "Prefer using Earth Shield over Lightning Shield, when it's available.")
+CreatePanelOption("Slider", CP_Enhancement, "APL.Shaman.Enhancement.HealWith5Maelstrom", {0, 100, 1}, "Heal Pct with 5 Maelstrom", "Sets the health percentage under which Healing Surge should be suggested with 5 Maelstrom. Set this to 0 to disable healing suggestions.")
+CreatePanelOption("Slider", CP_Enhancement, "APL.Shaman.Enhancement.HealWithout5Maelstrom", {0, 100, 1}, "Heal Pct without 5 Maelstrom", "Sets the health percentage under which Healing Surge should be suggested when below 5 Maelstrom. Set this to 0 to disable healing suggestions.")
 
 -- Elemental
 CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental")
