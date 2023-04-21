@@ -178,10 +178,6 @@ local function Generic()
   if S.Execute:IsReady() and EnemiesCount8 == 1 and (S.Massacre:IsAvailable() or S.Juggernaut:IsAvailable()) and Player:Rage() >= 50 then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute generic 6"; end
   end
-  -- revenge,if=buff.vanguards_determination.down&rage>=40
-  if S.Revenge:IsReady() and Player:BuffUp(S.VanguardsDeterminationBuff) and Player:Rage() >= 40 then
-    if Cast(S.Revenge, nil, nil, not TargetInMeleeRange) then return "revenge generic 8"; end
-  end
   -- execute,if=spell_targets.revenge=1&rage>=50
   if S.Execute:IsReady() and EnemiesCount8 == 1 and Player:Rage() >= 50 then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute generic 10"; end
@@ -335,8 +331,9 @@ local function APL()
       or Player:RageDeficit() <= 18 and S.ShieldSlam:CooldownUp() and S.ImpenetrableWall:IsAvailable())) then
       if Cast(S.IgnorePain, nil, Settings.Protection.DisplayStyle.Defensive) then return "ignore_pain main 22"; end
     end
-    -- last_stand,if=(target.health.pct>=90&talent.unnerving_focus.enabled|target.health.pct<=20&talent.unnerving_focus.enabled)|talent.bolster.enabled
-    if IsCurrentlyTanking() and S.LastStand:IsCastable() and Player:BuffDown(S.ShieldWallBuff) and ((Target:HealthPercentage() >= 90 and S.UnnervingFocus:IsAvailable() or Target:HealthPercentage() <= 20 and S.UnnervingFocus:IsAvailable()) or S.Bolster:IsAvailable()) then
+    -- last_stand,if=(target.health.pct>=90&talent.unnerving_focus.enabled|target.health.pct<=20&talent.unnerving_focus.enabled)|talent.bolster.enabled|set_bonus.tier30_2pc|set_bonus.tier30_4pc
+    -- Note: If set_bonus.tier30_4pc is true, then tier30_2pc would be true as well, so just check for 2pc
+    if IsCurrentlyTanking() and S.LastStand:IsCastable() and Player:BuffDown(S.ShieldWallBuff) and ((Target:HealthPercentage() >= 90 and S.UnnervingFocus:IsAvailable() or Target:HealthPercentage() <= 20 and S.UnnervingFocus:IsAvailable()) or S.Bolster:IsAvailable() or Player:HasTier(30, 2)) then
       if Cast(S.LastStand, nil, Settings.Protection.DisplayStyle.Defensive) then return "last_stand main 24"; end
     end
     -- ravager
