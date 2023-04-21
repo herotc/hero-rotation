@@ -143,6 +143,7 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   MagmaChamber                          = Spell(381932),
   MasteroftheElements                   = Spell(16166),
   PrimalElementalist                    = Spell(117013),
+  PrimordialSurge                       = Spell(386474),
   SearingFlames                         = Spell(381782),
   SkybreakersFieryDemise                = Spell(378310),
   StaticDischarge                       = Spell(342243),
