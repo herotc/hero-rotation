@@ -442,7 +442,7 @@ local function Main()
   end
   -- void_bolt,if=variable.dots_up&insanity<=85
   if S.VoidBolt:IsCastable() and (VarDotsUp and Player:Insanity() <= 85) then
-    if Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt main 8"; end
+    if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt main 8"; end
   end
   -- mind_sear,target_if=spell_targets.mind_sear>1&buff.mind_devourer.up
   if S.MindSear:IsReady() and (EnemiesCount10ySplash > 1 and Player:BuffUp(S.MindDevourerBuff)) then
@@ -499,7 +499,7 @@ end
 local function PLTorrent()
   -- void_bolt
   if S.VoidBolt:IsCastable() then
-    if Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt pl_torrent 2"; end
+    if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt pl_torrent 2"; end
   end
   -- vampiric_touch,if=remains<=6&cooldown.void_torrent.remains<gcd*2
   if S.VampiricTouch:IsCastable() and (Target:DebuffRemains(S.VampiricTouchDebuff) <= 6 and S.VoidTorrent:CooldownRemains() < Player:GCD() * 2) then
@@ -560,7 +560,7 @@ local function AoE()
   end
   -- void_bolt,if=insanity<=85
   if S.VoidBolt:IsCastable() and (Player:Insanity() <= 85) then
-    if Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt aoe 12"; end
+    if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt aoe 12"; end
   end
   -- mind_sear,target_if=max:spell_targets.mind_sear,if=buff.mind_devourer.up&spell_targets.mind_sear>1|spell_targets.mind_sear>variable.mind_sear_cutoff&(insanity>=75|((!set_bonus.tier29_4pc&!set_bonus.tier29_2pc)|!buff.dark_reveries.up)|(!set_bonus.tier29_2pc|buff.gathering_shadows.stack=3))&!variable.pool_for_cds,early_chain_if=ticks>=2&!buff.mind_devourer_ms_active.up,interrupt_immediate=1,interrupt_if=ticks>=2&!buff.mind_devourer_ms_active.up
   if S.MindSear:IsReady() and (Player:BuffUp(S.MindDevourerBuff) and EnemiesCount10ySplash > 1 or EnemiesCount10ySplash > VarMindSearCutoff and (Player:Insanity() >= 75 or ((not Player:HasTier(29, 2)) or Player:BuffDown(S.DarkReveriesBuff)) or ((not Player:HasTier(29, 2)) or Player:BuffStack(S.GatheringShadowsBuff) == 3)) and not VarPoolForCDs) then
