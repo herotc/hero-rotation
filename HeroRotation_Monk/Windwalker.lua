@@ -171,6 +171,7 @@ end
 local function EvaluateTargetIfFilterMarkoftheCrane102(TargetUnit)
   -- target_if=min:debuff.mark_of_the_crane.remains+spinning_crane_kick.max*target.time_to_die
   return TargetUnit:DebuffRemains(S.MarkoftheCraneDebuff) + num(SCKMax()) * TargetUnit:TimeToDie()
+end
 
 local function EvaluateTargetIfFilterFaeExposure(TargetUnit)
   -- target_if=min:debuff.fae_exposure_damage.remains
