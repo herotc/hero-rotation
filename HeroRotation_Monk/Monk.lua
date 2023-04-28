@@ -112,6 +112,7 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   BlackoutKickBuff                      = Spell(116768),
   ChiEnergyBuff                         = Spell(393057),
   DanceofChijiBuff                      = Spell(325202),
+  HiddenMastersForbiddenTouch           = Spell(213114),
   HitComboBuff                          = Spell(196741),
   PowerStrikesBuff                      = Spell(129914),
   PressurePointBuff                     = Spell(337482),
