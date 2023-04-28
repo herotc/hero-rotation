@@ -166,7 +166,7 @@ end
 
 local function Bear()
   -- bear_form,if=!buff.bear_form.up
-  if S.BearForm:IsCastable() and (Player:BuffDown(S.BearForm)) then
+  if S.BearForm:IsCastable() then
     if Cast(S.BearForm) then return "bear_form bear 2"; end
   end
   -- heart_of_the_wild,if=talent.heart_of_the_wild.enabled
