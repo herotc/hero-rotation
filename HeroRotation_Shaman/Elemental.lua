@@ -188,7 +188,7 @@ local function Aoe()
     if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 16"; end
   end
   -- flame_shock,target_if=refreshable,if=buff.surge_of_power.up&(!talent.lightning_rod.enabled|talent.skybreakers_fiery_demise.enabled)&dot.flame_shock.remains<target.time_to_die-5&active_dot.flame_shock<6
-  if S.FlameShock:IsCastable() and (Player:BuffUp(S.SurgeofPowerBuff) and ((not S.LightningRod:IsAvailable()) or S.SkybreakersFieryDemise:IsActive()) and S.FlameShockDebuff:AuraActiveCount() < 6) then
+  if S.FlameShock:IsCastable() and (Player:BuffUp(S.SurgeofPowerBuff) and ((not S.LightningRod:IsAvailable()) or S.SkybreakersFieryDemise:IsAvailable()) and S.FlameShockDebuff:AuraActiveCount() < 6) then
     if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable2, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 18"; end
   end
   -- flame_shock,target_if=refreshable,if=talent.master_of_the_elements.enabled&!talent.lightning_rod.enabled&dot.flame_shock.remains<target.time_to_die-5&active_dot.flame_shock<6
