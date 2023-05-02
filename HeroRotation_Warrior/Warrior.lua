@@ -83,6 +83,7 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   AshenJuggernaut                       = Spell(392536),
   AshenJuggernautBuff                   = Spell(392537),
   Bloodthirst                           = Spell(23881),
+  ColdSteelHotBlood                     = Spell(383959),
   DancingBlades                         = Spell(391683),
   DancingBladesBuff                     = Spell(391688),
   Frenzy                                = Spell(335077),
