@@ -31,7 +31,11 @@ local I = Item.Warrior.Arms
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.AlgetharPuzzleBox:ID(),
+  I.CrimsonGladiatorsBadgeofFerocity:ID(),
+  I.IrideusFragment:ID(),
   I.ManicGrieftorch:ID(),
+  I.VialofAnimatedBlood:ID(),
 }
 
 -- Variables
@@ -80,9 +84,12 @@ local function Precombat()
   end
   --battle_stance,toggle=on
   if S.BattleStance:IsCastable() and Player:BuffDown(S.BattleStance, true) then
-    if Cast(S.BattleStance) then return "battle_stance 28"; end
+    if Cast(S.BattleStance) then return "battle_stance precombat"; end
   end
-  --use_item,name=algethar_puzzle_box
+  -- use_item,name=algethar_puzzle_box
+  if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() then
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat"; end
+  end
   -- Manually added: pre-pull
   if TargetInMeleeRange then
     if S.Skullsplitter:IsCastable() then
@@ -163,6 +170,11 @@ local function Hac()
   -- skullsplitter,if=rage<40|talent.tide_of_blood&dot.rend.remains&(buff.sweeping_strikes.up&active_enemies>=2|debuff.colossus_smash.up|buff.test_of_might.up)
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 40 or S.TideofBlood:IsAvailable() and Target:DebuffRemains(S.RendDebuff) > 0 and (Player:BuffUp(S.SweepingStrikes) and EnemiesCount8y > 2 or Target:DebuffUp(S.ColossusSmashDebuff) or Player:BuffUp(S.TestofMightBuff))) then
     if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes execute 81"; end
+  end
+  -- mortal_strike,if=buff.sweeping_strikes.up&buff.crushing_advance.stack=3,if=set_bonus.tier30_4pc
+  -- Note: crushing_advance is the tier30_4pc bonus, so don't need to check for tier.
+  if S.MortalStrike:IsReady() and (Player:BuffUp(S.SweepingStrikes) and Player:BuffStack(S.CrushingAdvanceBuff) == 3) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike hac 81.5"; end
   end
   -- overpower,if=buff.sweeping_strikes.up&talent.dreadnaught
   if S.Overpower:IsCastable() and (Player:BuffUp(S.SweepingStrikes) and S.Dreadnaught:IsAvailable()) then
@@ -444,10 +456,27 @@ local function APL()
         if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 36"; end
       end
     end
-    -- use_item,name=manic_grieftorch,if=!buff.avatar.up&!debuff.colossus_smash.up
+    -- pummel,if=target.debuff.casting.react
     if Settings.Commons.Enabled.Trinkets then
+      -- use_item,name=algethar_puzzle_box,if=cooldown.avatar.remains<3
+      if I.AlgetharPuzzleBox:IsEquippedAndReady() and (S.Avatar:CooldownRemains() < 3) then
+        if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box main 38"; end
+      end
+      -- use_item,name=vial_of_animated_blood,if=buff.avatar.up
+      if I.VialofAnimatedBlood:IsEquippedAndReady() and (Player:BuffUp(S.Avatar)) then
+        if Cast(I.VialofAnimatedBlood, nil, Settings.Commons.DisplayStyle.Trinkets) then return "vial_of_animated_blood main 40"; end
+      end
+      -- use_item,name=irideus_fragment,if=buff.avatar.up
+      if I.IrideusFragment:IsEquippedAndReady() and (Player:BuffUp(S.Avatar)) then
+        if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment main 42"; end
+      end
+      -- use_item,name=manic_grieftorch,if=!buff.avatar.up&!debuff.colossus_smash.up
       if I.ManicGrieftorch:IsEquippedAndReady() and (not Player:BuffUp(S.Avatar)) and not Target:DebuffRemains(S.ColossusSmashDebuff) then
-        if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch main 38"; end
+        if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch main 44"; end
+      end
+      -- use_item,name=gladiators_badge,if=gcd.remains=0&debuff.colossus_smash.remains>8|target.time_to_die<25
+      if I.CrimsonGladiatorsBadgeofFerocity:IsEquippedAndReady() and (Target:DebuffRemains(S.ColossusSmashDebuff) > 8 or FightRemains < 25) then
+        if Cast(I.CrimsonGladiatorsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge main 46"; end
       end
     end
     if CDsON() then
