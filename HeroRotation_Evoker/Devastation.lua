@@ -174,6 +174,7 @@ local function Trinkets()
 end
 
 local function ES()
+  if S.EternitySurge:CooldownDown() then return nil end
   local ESEmpower = 0
   -- eternity_surge,empower_to=1,if=active_enemies<=1+talent.eternitys_span|buff.dragonrage.remains<1.75*spell_haste&buff.dragonrage.remains>=1*spell_haste|buff.dragonrage.up&(active_enemies==5|!talent.eternitys_span&active_enemies>=6|talent.eternitys_span&active_enemies>=8)
   if (EnemiesCount8ySplash <= 1 + num(S.EternitysSpan:IsAvailable()) or VarDragonrageRemains < 1.75 * PlayerHaste and VarDragonrageRemains >= 1 * PlayerHaste or VarDragonrageUp and (EnemiesCount8ySplash == 5 or (not S.EternitysSpan:IsAvailable()) and EnemiesCount8ySplash >= 6 or S.EternitysSpan:IsAvailable() and EnemiesCount8ySplash >= 8)) then
@@ -192,6 +193,7 @@ local function ES()
 end
 
 local function FB()
+  if S.FireBreath:CooldownDown() then return nil end
   local FBEmpower = 0
   local FBRemains = Target:DebuffRemains(S.FireBreath)
   -- fire_breath,empower_to=1,if=(buff.dragonrage.up&active_enemies<=2)|(active_enemies=1&!talent.everburning_flame)|(buff.dragonrage.remains<1.75*spell_haste&buff.dragonrage.remains>=1*spell_haste)
@@ -201,7 +203,7 @@ local function FB()
   elseif (((not InFirestorm()) and S.EverburningFlame:IsAvailable() and EnemiesCount8ySplash <= 3) or (EnemiesCount8ySplash == 2 and not S.EverburningFlame:IsAvailable()) or (VarDragonrageRemains < 2.5 * PlayerHaste and VarDragonrageRemains >= 1.75 * PlayerHaste)) then
     FBEmpower = 2
   -- fire_breath,empower_to=3,if=!talent.font_of_magic|(debuff.in_firestorm.up&talent.everburning_flame&active_enemies<=3)|(buff.dragonrage.remains<=3.25*spell_haste&buff.dragonrage.remains>=2.5*spell_haste)
-  elseif ((not S.FontofMagic:IsAvailable()) or (InFirestorm() and S.EverburningFlame:IsAvailable() and EnemiesCount8ySplash <= 3) or (VarDragonrageRemains <= 3.25 * PlayerHaste and VarDragonrageRemains >= 2.5 PlayerHaste)) then
+  elseif ((not S.FontofMagic:IsAvailable()) or (InFirestorm() and S.EverburningFlame:IsAvailable() and EnemiesCount8ySplash <= 3) or (VarDragonrageRemains <= 3.25 * PlayerHaste and VarDragonrageRemains >= 2.5 * PlayerHaste)) then
     FBEmpower = 3
   -- fire_breath,empower_to=4
   else
@@ -234,7 +236,7 @@ local function Aoe()
     if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath aoe 6"; end
   end
   -- shattering_star,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
-  if S.ShatteringStar:IsCastable() (Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack or not S.ArcaneVigor:IsAvailable()) then
+  if S.ShatteringStar:IsCastable() and (Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack or not S.ArcaneVigor:IsAvailable()) then
     if Cast(S.ShatteringStar, nil, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star aoe 8"; end
   end
   -- firestorm
