@@ -31,7 +31,11 @@ local I = Item.Warrior.Fury
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.AlgetharPuzzleBox:ID(),
+  I.CrimsonGladiatorsBadgeofFerocity:ID(),
+  I.IrideusFragment:ID(),
   I.ManicGrieftorch:ID(),
+  I.VialofAnimatedBlood:ID(),
 }
 
 -- Variables
@@ -64,8 +68,8 @@ local function Precombat()
     if Cast(S.BerserkerStance) then return "berserker_stance precombat 2"; end
   end
   -- use_item,name=algethar_puzzle_box
-  if CDsON() and I.AlgethaPuzzleBox:IsEquippedAndReady() then
-    if Cast(I.AlgethaPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 4"; end
+  if CDsON() and I.AlgetharPuzzleBox:IsEquippedAndReady() then
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 4"; end
   end
   -- avatar,if=!talent.titans_torment
   if S.Avatar:IsCastable() and (not S.TitansTorment:IsAvailable()) then
@@ -105,97 +109,106 @@ local function SingleTarget()
   if S.Rampage:IsReady() and S.AngerManagement:IsAvailable() and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffRemains(S.EnrageBuff) < Player:GCD() or Player:RagePercentage() > 85) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 10"; end
   end
+  local BTCritChance = Player:CritChancePct() + Player:BuffStack(S.BloodcrazeBuff) * 15
+  -- bloodbath,if=action.bloodbath.crit_pct_current>=95|!talent.cold_steel_hot_blood&set_bonus.tier30_4pc
+  if S.Bloodbath:IsCastable() and (BTCritChance >= 95 or (not S.ColdSteelHotBlood:IsAvailable()) and Player:HasTier(30, 4)) then
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 12"; end
+  end
+  -- bloodthirst,if=action.bloodthirst.crit_pct_current>=95
+  if S.Bloodthirst:IsCastable() and (BTCritChance >= 95) then
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 14"; end
+  end
   -- execute,if=buff.enrage.up
   if S.Execute:IsReady() and EnrageUp then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 12"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 16"; end
   end
   -- onslaught,if=buff.enrage.up|talent.tenderize
   if S.Onslaught:IsReady() and (EnrageUp or S.Tenderize:IsAvailable()) then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught single_target 14"; end
+    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught single_target 18"; end
   end
   -- crushing_blow,if=talent.wrath_and_fury&buff.enrage.up
   if S.CrushingBlow:IsCastable() and S.WrathandFury:IsAvailable() and EnrageUp then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 16"; end
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 20"; end
   end
   -- rampage,if=talent.reckless_abandon&(buff.recklessness.up|buff.enrage.remains<gcd|rage.pct>85)
   if S.Rampage:IsReady() and S.RecklessAbandon:IsAvailable() and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffRemains(S.EnrageBuff) < Player:GCD() or Player:RagePercentage() > 85) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 18"; end
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 22"; end
   end
   -- rampage,if=talent.anger_management
   if S.Rampage:IsReady() and S.AngerManagement:IsAvailable() then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 20"; end
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 24"; end
   end
   -- execute
   if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 22"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 26"; end
   end
   -- bloodbath,if=buff.enrage.up&talent.reckless_abandon&!talent.wrath_and_fury
   if S.Bloodbath:IsCastable() and EnrageUp and S.RecklessAbandon:IsAvailable() and not S.WrathandFury:IsAvailable() then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 24"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 28"; end
   end
   -- bloodthirst,if=buff.enrage.down|(talent.annihilator&!buff.recklessness.up)
   if S.Bloodthirst:IsCastable() and ((not EnrageUp) or (S.Annihilator:IsAvailable() and Player:BuffDown(S.RecklessnessBuff))) then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 26"; end
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 30"; end
   end
   -- raging_blow,if=charges>1&talent.wrath_and_fury
   if S.RagingBlow:IsCastable() and S.RagingBlow:Charges() > 1 and S.WrathandFury:IsAvailable() then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 28"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 32"; end
   end
   -- crushing_blow,if=charges>1&talent.wrath_and_fury
   if S.CrushingBlow:IsCastable() and S.CrushingBlow:Charges() > 1 and S.WrathandFury:IsAvailable() then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 30"; end
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 34"; end
   end
   -- bloodbath,if=buff.enrage.down|!talent.wrath_and_fury
   if S.Bloodbath:IsCastable() and ((not EnrageUp) or not S.WrathandFury:IsAvailable()) then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 32"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 36"; end
   end
   -- crushing_blow,if=buff.enrage.up&talent.reckless_abandon
   if S.CrushingBlow:IsCastable() and EnrageUp and S.RecklessAbandon:IsAvailable() then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 34"; end
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 38"; end
   end
   -- bloodthirst,if=!talent.wrath_and_fury
   if S.Bloodthirst:IsCastable() and not S.WrathandFury:IsAvailable() then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 36"; end
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 40"; end
   end
   -- raging_blow,if=charges>1
   if S.RagingBlow:IsCastable() and S.RagingBlow:Charges() > 1 then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 38"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 42"; end
   end
   -- rampage
   if S.Rampage:IsReady() then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 40"; end
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 44"; end
   end
   -- slam,if=talent.annihilator
   if S.Slam:IsReady() and (S.Annihilator:IsAvailable()) then
-    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam single_target 42"; end
+    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam single_target 46"; end
   end
   -- bloodbath
   if S.Bloodbath:IsCastable() then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 44"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 48"; end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 46"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow single_target 50"; end
   end
   -- crushing_blow
   if S.CrushingBlow:IsCastable() then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 48"; end
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow single_target 52"; end
   end
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 50"; end
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 54"; end
   end
   -- whirlwind
   if AoEON() and S.Whirlwind:IsCastable() then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 52"; end
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 56"; end
   end
   -- wrecking_throw
   if S.WreckingThrow:IsCastable() then
-    if Cast(S.WreckingThrow, nil, nil, not Target:IsInRange(30)) then return "wrecking_throw single_target 54"; end
+    if Cast(S.WreckingThrow, nil, nil, not Target:IsInRange(30)) then return "wrecking_throw single_target 58"; end
   end
   -- storm_bolt
   if S.StormBolt:IsCastable() then
-    if Cast(S.StormBolt, nil, nil, not TargetInMeleeRange) then return "storm_bolt single_target 56"; end
+    if Cast(S.StormBolt, nil, nil, not TargetInMeleeRange) then return "storm_bolt single_target 60"; end
   end
 end
 
@@ -224,85 +237,96 @@ local function MultiTarget()
   if CDsON() and S.OdynsFury:IsCastable() and EnemiesCount8y > 1 and EnrageUp then
     if Cast(S.OdynsFury, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 12"; end
   end
+  local BTCritChance = Player:CritChancePct() + Player:BuffStack(S.BloodcrazeBuff) * 15
+  if (BTCritChance >= 95 or (not S.ColdSteelHotBlood:IsAvailable()) and Player:HasTier(30, 4)) then
+    -- bloodbath,if=action.bloodbath.crit_pct_current>=95|!talent.cold_steel_hot_blood&set_bonus.tier30_4pc
+    if S.Bloodbath:IsCastable() then
+      if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath multi_target 14"; end
+    end
+    -- bloodthirst,if=action.bloodthirst.crit_pct_current>=95|!talent.cold_steel_hot_blood&set_bonus.tier30_4pc
+    if S.Bloodthirst:IsCastable() then
+      if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst multi_target 16"; end
+    end
+  end
   -- crushing_blow,if=talent.wrath_and_fury&buff.enrage.up
   if S.CrushingBlow:IsCastable() and S.WrathandFury:IsAvailable() and EnrageUp then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow multi_target 14"; end
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow multi_target 18"; end
   end
   -- execute,if=buff.enrage.up
   if S.Execute:IsReady() and EnrageUp then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute multi_target 16"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute multi_target 20"; end
   end
   -- odyns_fury,if=buff.enrage.up&raid_event.adds.in>15
   if CDsON() and S.OdynsFury:IsCastable() and EnrageUp then
-    if Cast(S.OdynsFury, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 18"; end
+    if Cast(S.OdynsFury, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 22"; end
   end
   -- rampage,if=buff.recklessness.up|buff.enrage.remains<gcd|(rage>110&talent.overwhelming_rage)|(rage>80&!talent.overwhelming_rage)
   if S.Rampage:IsReady() and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffRemains(S.EnrageBuff) < Player:GCD() or (Player:Rage() > 110 and S.OverwhelmingRage:IsAvailable()) or (Player:Rage() > 80 and not S.OverwhelmingRage:IsAvailable())) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage multi_target 20"; end
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage multi_target 24"; end
   end
   -- execute
   if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute multi_target 22"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute multi_target 26"; end
   end
   -- bloodbath,if=buff.enrage.up&talent.reckless_abandon&!talent.wrath_and_fury
   if S.Bloodbath:IsCastable() and EnrageUp and S.RecklessAbandon:IsAvailable() and not S.WrathandFury:IsAvailable() then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath multi_target 24"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath multi_target 28"; end
   end
   -- bloodthirst,if=buff.enrage.down|(talent.annihilator&!buff.recklessness.up)
   if S.Bloodthirst:IsCastable() and ((not EnrageUp) or (S.Annihilator:IsAvailable() and Player:BuffDown(S.RecklessnessBuff))) then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst multi_target 26"; end
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst multi_target 30"; end
   end
   -- onslaught,if=!talent.annihilator&buff.enrage.up|talent.tenderize
   if S.Onslaught:IsReady() and ((not S.Annihilator:IsAvailable()) and EnrageUp or S.Tenderize:IsAvailable()) then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught multi_target 28"; end
+    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught multi_target 32"; end
   end
   -- raging_blow,if=charges>1&talent.wrath_and_fury
   if S.RagingBlow:IsCastable() and S.RagingBlow:Charges() > 1 and S.WrathandFury:IsAvailable() then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow multi_target 30"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow multi_target 34"; end
   end
   -- crushing_blow,if=charges>1&talent.wrath_and_fury
   if S.CrushingBlow:IsCastable() and S.CrushingBlow:Charges() > 1 and S.WrathandFury:IsAvailable() then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow multi_target 32"; end
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow multi_target 36"; end
   end
   -- bloodbath,if=buff.enrage.down|!talent.wrath_and_fury
   if S.Bloodbath:IsCastable() and ((not EnrageUp) or not S.WrathandFury:IsAvailable()) then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath multi_target 34"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath multi_target 38"; end
   end
   -- crushing_blow,if=buff.enrage.up&talent.reckless_abandon
   if S.CrushingBlow:IsCastable() and EnrageUp and S.RecklessAbandon:IsAvailable() then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow multi_target 36"; end
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow multi_target 40"; end
   end
   -- bloodthirst,if=!talent.wrath_and_fury
   if S.Bloodthirst:IsCastable() and not S.WrathandFury:IsAvailable() then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst multi_target 38"; end
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst multi_target 42"; end
   end
   -- raging_blow,if=charges>=1
   if S.RagingBlow:IsCastable() and S.RagingBlow:Charges() > 1 then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow multi_target 40"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow multi_target 44"; end
   end
   -- rampage
   if S.Rampage:IsReady() then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage multi_target 42"; end
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage multi_target 46"; end
   end
   -- slam,if=talent.annihilator
   if S.Slam:IsReady() and (S.Annihilator:IsAvailable()) then
-    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam multi_target 44"; end
+    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam multi_target 48"; end
   end
   -- bloodbath
   if S.Bloodbath:IsCastable() then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath multi_target 46"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath multi_target 50"; end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow multi_target 48"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow multi_target 52"; end
   end
   -- crushing_blow
   if S.CrushingBlow:IsCastable() then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow multi_target 50"; end
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow multi_target 54"; end
   end
   -- whirlwind
   if S.Whirlwind:IsCastable() then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind multi_target 52"; end
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind multi_target 56"; end
   end
 end
 --- ======= ACTION LISTS =======
@@ -358,10 +382,26 @@ local function APL()
       end
     end
     if CDsON() then
-      --use_item,name=manic_grieftorch,if=buff.avatar.down
       if Settings.Commons.Enabled.Trinkets then
-        if I.ManicGrieftorch:IsEquippedAndReady() and Player:BuffDown(S.Avatar) then
-          if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch main 8"; end
+        -- use_item,name=algethar_puzzle_box,if=cooldown.recklessness.remains<3|(talent.anger_management&cooldown.avatar.remains<3)
+        if I.AlgetharPuzzleBox:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() < 3 or (S.AngerManagement:IsAvailable() and S.Avatar:CooldownRemains() < 3)) then
+          if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box main 8"; end
+        end
+        -- use_item,name=vial_of_animated_blood,if=buff.avatar.up
+        if I.VialofAnimatedBlood:IsEquippedAndReady() and (Player:BuffUp(S.AvatarBuff)) then
+          if Cast(I.VialofAnimatedBlood, nil, Settings.Commons.DisplayStyle.Trinkets) then return "vial_of_animated_blood main 10"; end
+        end
+        -- use_item,name=irideus_fragment,if=buff.avatar.up
+        if I.IrideusFragment:IsEquippedAndReady() and (Player:BuffUp(S.AvatarBuff)) then
+          if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment main 12"; end
+        end
+        -- use_item,name=manic_grieftorch,if=buff.avatar.down
+        if I.ManicGrieftorch:IsEquippedAndReady() and (Player:BuffDown(S.Avatar)) then
+          if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch main 14"; end
+        end
+        -- use_item,name=gladiators_badge,if=cooldown.recklessness.remains>10&(buff.recklessness.up|target.time_to_die<11|target.time_to_die>65)
+        if I.CrimsonGladiatorsBadgeofFerocity:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or FightRemains < 11 or FightRemains > 65)) then
+          if Cast(I.CrimsonGladiatorsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge main 16"; end
         end
         -- Manually added: use_items generic
         local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
@@ -372,47 +412,47 @@ local function APL()
       -- ravager,if=cooldown.recklessness.remains<3|buff.recklessness.up
       -- Note: manually added end of fight
       if S.Ravager:IsCastable() and (S.Avatar:CooldownRemains() < 3 or Player:BuffUp(S.RecklessnessBuff) or HL.FightRemains() < 10) then
-        if Cast(S.Ravager, Settings.Fury.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager main 10"; end
+        if Cast(S.Ravager, Settings.Fury.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager main 18"; end
       end
       -- blood_fury
       if S.BloodFury:IsCastable() then
-        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 12"; end
+        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 20"; end
       end
       -- berserking,if=buff.recklessness.up
       if S.Berserking:IsCastable() and Player:BuffUp(S.RecklessnessBuff) then
-        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 14"; end
+        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 22"; end
       end
       -- lights_judgment,if=buff.recklessness.down
       if S.LightsJudgment:IsCastable() and Player:BuffDown(S.RecklessnessBuff) then
-        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 16"; end
+        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 24"; end
       end
       -- fireblood
       if S.Fireblood:IsCastable() then
-        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 18"; end
+        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 26"; end
       end
       -- ancestral_call
       if S.AncestralCall:IsCastable() then
-        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 20"; end
+        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 28"; end
       end
       -- bag_of_tricks,if=buff.recklessness.down&buff.enrage.up
       -- if S.BagofTricks:IsCastable() and Player:BuffDown(S.RecklessnessBuff) and EnrageUp then
-      --   if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 22"; end
+      --   if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 30"; end
       -- end
       -- avatar,if=talent.titans_torment&buff.enrage.up&raid_event.adds.in>15|!talent.titans_torment&(buff.recklessness.up|target.time_to_die<20)
       if S.Avatar:IsCastable() and (S.TitansTorment:IsAvailable() and EnrageUp or not S.TitansTorment:IsAvailable() and (Player:BuffUp(S.RecklessnessBuff) or HL.FightRemains() < 20)) then
-        if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar main 24"; end
+        if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar main 32"; end
       end
       -- recklessness,if=!raid_event.adds.exists&(talent.annihilator&cooldown.avatar.remains<1|cooldown.avatar.remains>40|!talent.avatar|target.time_to_die<12)
       if S.Recklessness:IsCastable() and (S.Annihilator:IsAvailable() and S.Avatar:CooldownRemains() < 1 or S.Avatar:CooldownRemains() > 40 or (not S.Avatar:IsAvailable()) or HL.FightRemains() < 12) then
-        if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 26"; end
+        if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 34"; end
       end
       -- recklessness,if=!raid_event.adds.exists&!talent.annihilator|target.time_to_die<12
       if S.Recklessness:IsCastable() and (not S.Annihilator:IsAvailable() or HL.FightRemains() < 12) then
-        if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 28"; end
+        if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 36"; end
       end
       -- spear_of_bastion,if=buff.enrage.up&(buff.recklessness.up|buff.avatar.up|target.time_to_die<20|active_enemies>1)&raid_event.adds.in>15
       if S.SpearofBastion:IsCastable() and (EnrageUp and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffUp(S.AvatarBuff) or HL.FightRemains() < 20 or EnemiesCount8y > 1)) then
-        if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "spear_of_bastion main 30"; end
+        if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "spear_of_bastion main 38"; end
       end
     end
     -- call_action_list,name=multi_target,if=raid_event.adds.exists|active_enemies>2
@@ -427,7 +467,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Fury Warrior rotation is currently a work in progress, but has been updated for patch 10.0.")
+  HR.Print("Fury Warrior rotation is currently a work in progress, but has been updated for patch 10.1.0.")
 end
 
 HR.SetAPL(72, APL, Init)

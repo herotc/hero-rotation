@@ -106,6 +106,7 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   TitansTorment                         = Spell(390135),
   WrathandFury                          = Spell(392936),
   -- Buffs
+  BloodcrazeBuff                        = Spell(393951),
   EnrageBuff                            = Spell(184362),
 })
 
@@ -152,7 +153,8 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   Unhinged                              = Spell(386628),
   Warbreaker                            = Spell(262161),
   WarlordsTorment                       = Spell(390140),
-  -- Debuffs
+  -- Buffs/Debuffs
+  CrushingAdvanceBuff                   = Spell(410138),
   DeepWoundsDebuff                      = Spell(262115),
 })
 
@@ -204,8 +206,11 @@ Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Commons = {
   -- Trinkets
-  AlgethaPuzzleBox                      = Item(193701, {13, 14}),
+  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
+  CrimsonGladiatorsBadgeofFerocity      = Item(201807, {13, 14}),
+  IrideusFragment                       = Item(193743, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
+  VialofAnimatedBlood                   = Item(159625, {13, 14}),
 }
 
 Item.Warrior.Fury = MergeTableByKey(Item.Warrior.Commons, {
