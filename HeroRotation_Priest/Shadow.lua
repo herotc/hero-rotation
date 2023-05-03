@@ -333,10 +333,6 @@ local function Filler()
   if S.MindFlay:IsCastable() and (Player:BuffUp(S.MindFlayInsanityBuff)) then
     if Cast(S.MindSpike, nil, nil, not Target:IsSpellInRange(S.MindSpike)) then return "mind_flay filler 6"; end
   end
-  -- lights_judgment,if=!raid_event.adds.exists|raid_event.adds.in>75|spell_targets.lights_judgment>1
-  if CDsON() and S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment filler 8"; end
-  end
   -- halo,if=raid_event.adds.in>20
   if S.Halo:IsReady() then
     if Cast(S.Halo, Settings.Shadow.GCDasOffGCD.Halo, nil, not Target:IsInRange(30)) then return "halo filler 10"; end
