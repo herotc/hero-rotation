@@ -91,6 +91,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   DeathSpeaker                = Spell(392507),
   DevouringPlague             = Spell(335467),
   Dispersion                  = Spell(47585),
+  DistortedReality            = Spell(409044),
   DivineStar                  = Spell(122121),
   FortressOfTheMind           = Spell(193195),
   Halo                        = Spell(120644),
@@ -104,6 +105,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   MindFlayInsanityTalent      = Spell(391399),
   MindMelt                    = Spell(391090),
   MindSpike                   = Spell(73510),
+  MindSpikeInsanity           = Spell(407466),
   Misery                      = Spell(238558),
   PsychicLink                 = Spell(199484),
   ScreamsOfTheVoid            = Spell(375767),
@@ -116,6 +118,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   TwistofFate                 = Spell(109142),
   UnfurlingDarkness           = Spell(341273),
   VoidTorrent                 = Spell(263165),
+  WhisperingShadows           = Spell(406777),
   -- Buffs
   DarkAscensionBuff           = Spell(391109),
   DarkThoughtBuff             = Spell(341207),
@@ -170,6 +173,7 @@ Spell.Priest.Holy = MergeTableByKey(Spell.Priest.Commons, {
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Commons = {
   -- Trinkets
+  BeacontotheBeyond           = Item(203963, {13, 14}),
   DesperateInvokersCodex      = Item(194310, {13, 14}),
   DMDDance                    = Item(198088, {13, 14}),
   DMDDanceBox                 = Item(198478, {13, 14}),
@@ -177,6 +181,7 @@ Item.Priest.Commons = {
   DMDInfernoBox               = Item(194872, {13, 14}),
   DMDRime                     = Item(198087, {13, 14}),
   DMDRimeBox                  = Item(198477, {13, 14}),
+  EruptingSpearFragment       = Item(193769, {13, 14}),
   VoidmendersShadowgem        = Item(110007, {13, 14}),
 }
 
