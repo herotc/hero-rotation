@@ -61,6 +61,7 @@ local VarPassiveAsp
 local VarCDConditionST
 local VarCDConditionAoE
 local VarEnterEclipse
+local VarEnterSolar
 local VarConvokeCondition
 local PAPValue
 local CAIncBuffUp
@@ -175,8 +176,8 @@ end
 local function InitVars()
   -- variable,name=no_cd_talent,value=!talent.celestial_alignment&!talent.incarnation_chosen_of_elune|druid.no_cds
   VarNoCDTalent = (not S.CelestialAlignment:IsAvailable()) and (not S.IncarnationTalent:IsAvailable()) or not CDsON()
-  -- variable,name=solar_eclipse_st,value=talent.umbral_intensity.rank=2
-  VarSolarEclipseST = S.UmbralIntensity:TalentRank() == 2
+  -- variable,name=solar_eclipse_st,value=talent.soul_of_the_forest&talent.warrior_of_elune
+  VarSolarEclipseST = S.SouloftheForest:IsAvailable() and S.WarriorofElune:IsAvailable()
   -- variable,name=on_use_trinket,value=0
   VarOnUseTrinket = 0
   -- variable,name=on_use_trinket,op=add,value=trinket.1.has_proc.any&trinket.1.cooldown.duration
@@ -211,6 +212,10 @@ local function Precombat()
   -- stellar_flare
   if S.StellarFlare:IsCastable() then
     if Cast(S.StellarFlare, nil, nil, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare precombat 6"; end
+  end
+  -- starfire,if=!talent.stellar_flare
+  if S.Starfire:IsCastable() and (not S.StellarFlare:IsAvailable()) then
+    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire precombat 8"; end
   end
 end
 
@@ -248,21 +253,13 @@ local function St()
   end
   -- variable,name=cd_condition_st,value=!druid.no_cds&(cooldown.ca_inc.remains<15&!buff.ca_inc.up&(target.time_to_die>15|fight_remains<25+10*talent.incarnation_chosen_of_elune))
   VarCDConditionST = CDsON() and (CaInc:CooldownRemains() < 15 and (not CAIncBuffUp) and (Target:TimeToDie() > 15 or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable())))
-  -- wrath,if=variable.cd_condition_st&set_bonus.tier29_4pc&eclipse.any_next|fight_remains>10&(target.time_to_die<=2&astral_power.deficit>20|target.time_to_die<=5&buff.primordial_arcanic_pulsar.value>=550)
-  if S.Wrath:IsCastable() and (VarCDConditionST and Player:HasTier(29, 4) and EclipseAnyNext or FightRemains > 10 and (Target:TimeToDie() <= 2 and Player:AstralPowerDeficit() > 20 or Target:TimeToDie() <= 5 and PAPValue >= 550)) then
-    if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath st 12"; end
-  end
-  -- starfall,if=variable.cd_condition_st&buff.touch_the_cosmos.up&cooldown.ca_inc.up
-  if S.Starfall:IsReady() and (VarCDConditionST and Player:BuffUp(S.TouchtheCosmos) and CaInc:CooldownUp()) then
+  -- starfall,if=buff.primordial_arcanic_pulsar.value>=550&!buff.ca_inc.up&buff.starweavers_warp.up
+  if S.Starfall:IsReady() and (PAPValue >= 550 and (not CAIncBuffUp) and Player:BuffUp(S.StarweaversWarp)) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall st 12.5"; end
   end
-  -- starsurge,if=variable.cd_condition_st&buff.touch_the_cosmos.up|buff.primordial_arcanic_pulsar.value>=560&buff.starweavers_weft.up
-  if S.Starsurge:IsReady() and (VarCDConditionST and Player:BuffUp(S.TouchtheCosmos) or PAPValue >= 560 and Player:BuffUp(S.StarweaversWeft)) then
+  -- starsurge,if=buff.primordial_arcanic_pulsar.value>=560&buff.starweavers_weft.up
+  if S.Starsurge:IsReady() and (PAPValue >= 560 and Player:BuffUp(S.StarweaversWeft)) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 13"; end
-  end
-  -- starfall,if=buff.primordial_arcanic_pulsar.value>=550&!buff.ca_inc.up
-  if S.Starfall:IsReady() and (PAPValue >= 550 and not CAIncBuffUp) then
-    if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall st 14"; end
   end
   if CDsON() then
     -- celestial_alignment,if=variable.cd_condition_st
@@ -278,8 +275,8 @@ local function St()
   if S.WarriorofElune:IsCastable() then
     if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune st 24"; end
   end
-  -- variable,name=enter_eclipse,value=eclipse.any_next|buff.eclipse_lunar.up&(buff.eclipse_lunar.remains<action.wrath.execute_time)|buff.eclipse_solar.up&(buff.eclipse_solar.remains<action.wrath.execute_time)
-  VarEnterEclipse = (EclipseAnyNext or Player:BuffUp(S.EclipseLunar) and (Player:BuffRemains(S.EclipseLunar) < S.Wrath:ExecuteTime()) or Player:BuffUp(S.EclipseSolar) and (Player:BuffRemains(S.EclipseSolar) < S.Wrath:ExecuteTime()))
+  -- variable,name=enter_eclipse,value=eclipse.any_next|variable.solar_eclipse_st&buff.eclipse_solar.up&(buff.eclipse_solar.remains<action.starfire.cast_time)|!variable.solar_eclipse_st&buff.eclipse_lunar.up&(buff.eclipse_lunar.remains<action.wrath.cast_time)
+  VarEnterEclipse = (EclipseAnyNext or VarSolarEclipseST and Player:BuffUp(S.EclipseSolar) and (Player:BuffRemains(S.EclipseSolar) < S.Starfire:CastTime()) or (not VarSolarEclipseST) and Player:BuffUp(S.EclipseLunar) and (Player:BuffRemains(S.EclipseLunar) < S.Wrath:CastTime()))
   -- starfire,if=variable.enter_eclipse&variable.solar_eclipse_st
   if S.Starfire:IsCastable() and (VarEnterEclipse and VarSolarEclipseST) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire st 25"; end
@@ -310,8 +307,8 @@ local function St()
   if S.FuryofElune:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 8 and Target:TimeToDie() > 2) then
     if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not Target:IsSpellInRange(S.FuryofElune)) then return "fury_of_elune st 36"; end
   end
-  -- starfall,if=buff.starweavers_warp.up&!buff.touch_the_cosmos.up
-  if S.Starfall:IsReady() and (Player:BuffUp(S.StarweaversWarp) and Player:BuffDown(S.TouchtheCosmos)) then
+  -- starfall,if=buff.starweavers_warp.up
+  if S.Starfall:IsReady() and (Player:BuffUp(S.StarweaversWarp)) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall st 38"; end
   end
   -- starsurge,if=talent.starlord&buff.starlord.stack<3|talent.rattle_the_stars&buff.rattled_stars.up&buff.rattled_stars.remains<gcd.max
@@ -346,13 +343,13 @@ local function St()
   if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:AstralPowerDeficit() < VarPassiveAsp + (8 * (1 + 0.5 * num(S.SouloftheForest:IsAvailable()) * num(Player:BuffUp(S.EclipseSolar)))) or S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemains() < 3 or FightRemains < 5) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 54"; end
   end
-  -- wild_mushroom,if=!fight_style.dungeonroute|target.time_to_die>(full_recharge_time-7)|fight_remains<10
+  -- wild_mushroom,if=talent.fungal_growth&(!fight_style.dungeonroute|target.time_to_die>(full_recharge_time-7)|fight_remains<10)
   local DungeonRoute = Player:IsInParty() and not Player:IsInRaid()
-  if S.WildMushroom:IsCastable() and ((not DungeonRoute) or Target:TimeToDie() > (S.WildMushroom:FullRechargeTime() - 7) or FightRemains < 10) then
+  if S.WildMushroom:IsCastable() and (S.FungalGrowth:IsAvailable() and ((not DungeonRoute) or Target:TimeToDie() > (S.WildMushroom:FullRechargeTime() - 7) or FightRemains < 10)) then
     if Cast(S.WildMushroom, Settings.Balance.GCDasOffGCD.WildMushroom, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 56"; end
   end
-  -- starfire,if=eclipse.in_lunar&buff.umbral_embrace.react|buff.eclipse_lunar.up&buff.warrior_of_elune.up
-  if S.Starfire:IsCastable() and (EclipseInLunar and Player:BuffUp(S.UmbralEmbraceBuff) or Player:BuffUp(S.EclipseLunar) and Player:BuffUp(S.WarriorofEluneBuff)) then
+  -- starfire,if=eclipse.in_lunar&buff.umbral_embrace.react|buff.ca_inc.up&buff.warrior_of_elune.up&buff.warrior_of_elune.stack=1
+  if S.Starfire:IsCastable() and (EclipseInLunar and Player:BuffUp(S.UmbralEmbraceBuff) or CAIncBuffUp and Player:BuffUp(S.WarriorofEluneBuff) and Player:BuffStack(S.WarriorofEluneBuff) == 1) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire st 58"; end
   end
   -- wrath
@@ -380,10 +377,6 @@ local function AoE()
   end
   -- variable,name=cd_condition_aoe,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>10|fight_remains<25+10*talent.incarnation_chosen_of_elune))
   VarCDConditionAoE = CDsON() and (CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 10 or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable())))
-  -- wrath,if=variable.cd_condition_aoe&set_bonus.tier29_4pc&eclipse.any_next
-  if S.Wrath:IsCastable() and (VarCDConditionAoE and Player:HasTier(29, 4) and EclipseAnyNext) then
-    if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath aoe 8"; end
-  end
   -- stellar_flare,target_if=refreshable&(target.time_to_die-remains-spell_targets.starfire)>8+spell_targets.starfire,if=astral_power.deficit>variable.passive_asp+8&spell_targets.starfire<(11-talent.umbral_intensity.rank-talent.astral_smolder.rank)&variable.cd_condition_aoe
   if S.StellarFlare:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 8 and EnemiesCount8ySplash < (11 - S.UmbralIntensity:TalentRank() - S.AstralSmolder:TalentRank()) and VarCDConditionAoE) then
     if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareAoE, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare aoe 9"; end
@@ -406,8 +399,14 @@ local function AoE()
   if S.WarriorofElune:IsCastable() then
     if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune aoe 16"; end
   end
-  -- wrath,if=eclipse.any_next|buff.eclipse_lunar.remains<action.wrath.execute_time
-  if S.Wrath:IsCastable() and (EclipseAnyNext or Player:BuffRemains(S.EclipseLunar) < S.Wrath:ExecuteTime()) then
+  -- variable,name=enter_solar,value=spell_targets.starfire<3
+  local VarEnterSolar = EnemiesCount8ySplash < 3
+  -- starfire,if=variable.enter_solar&(eclipse.any_next|buff.eclipse_solar.remains<action.starfire.execute_time)
+  if S.Starfire:IsCastable() and (VarEnterSolar and (EclipseAnyNext or Player:BuffRemains(S.EclipseSolar) < S.Starfire:ExecuteTime())) then
+    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire aoe 17"; end
+  end
+  -- wrath,if=!variable.enter_solar&(eclipse.any_next|buff.eclipse_lunar.remains<action.wrath.execute_time)
+  if S.Wrath:IsCastable() and ((not VarEnterSolar) and (EclipseAnyNext or Player:BuffRemains(S.EclipseLunar) < S.Wrath:ExecuteTime())) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath aoe 18"; end
   end
   -- wild_mushroom,if=astral_power.deficit>variable.passive_asp+20&(!talent.fungal_growth|!talent.waning_twilight|dot.fungal_growth.remains<2&target.time_to_die>7&!prev_gcd.1.wild_mushroom)
@@ -462,8 +461,8 @@ local function AoE()
   if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) and EnemiesCount8ySplash < 17) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge aoe 44"; end
   end
-  -- starfire,if=spell_targets>1
-  if S.Starfire:IsCastable() and not Player:IsMoving() and (EnemiesCount8ySplash > 1) then
+  -- starfire,if=spell_targets>2&buff.eclipse_lunar.up
+  if S.Starfire:IsCastable() and not Player:IsMoving() and (EnemiesCount8ySplash > 2 and Player:BuffUp(S.EclipseLunar)) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire aoe 46"; end
   end
   -- wrath
@@ -565,7 +564,7 @@ local function APL()
         if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
-    -- invoke_external_buff,name=power_infusion,if=target.time_to_die>12|fight_remains<20
+    -- invoke_external_buff,name=power_infusion
     -- Note: Not handling external buffs
     -- run_action_list,name=aoe,if=variable.is_aoe
     if VarIsAoe and AoEON() then
