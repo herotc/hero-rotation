@@ -34,6 +34,8 @@ local I = Item.Warlock.Demonology
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.TimebreachingTalon:ID(),
+  I.VoidmendersShadowgem:ID(),
 }
 
 -- Trinket Item Objects
@@ -42,8 +44,11 @@ local equip = Player:GetEquipment()
 -- Rotation Var
 local BossFightRemains = 11111
 local FightRemains = 11111
-local VarTyrantPrepStart = 0
 local VarNextTyrant = 0
+local VarNPCondition = false
+local VarShadowTimings = 0
+local VarTyrantCD = 120
+local VarTyrantPrepStart = 0
 local CombatTime = 0
 
 -- Enemy Variables
@@ -108,6 +113,11 @@ local function DreadstalkerTime()
   return HL.GuardiansTable.DreadstalkerDuration or 0
 end
 
+-- Function to check for Pit Lord duration
+local function PitLordTime()
+  return HL.GuardiansTable.PitLordDuration or 0
+end
+
 local function EvaluateDoom(TargetUnit)
   -- target_if=refreshable
   return (TargetUnit:DebuffRefreshable(S.Doom))
@@ -124,6 +134,10 @@ local function Precombat()
   VarTyrantPrepStart = 12
   -- variable,name=next_tyrant,op=set,value=14+talent.grimoire_felguard+talent.summon_vilefiend
   VarNextTyrant = 14 + num(S.GrimoireFelguard:IsAvailable()) + num(S.SummonVilefiend:IsAvailable())
+  -- variable,name=shadow_timings,default=0,op=reset
+  -- variable,name=shadow_timings,op=set,value=0,if=cooldown.invoke_power_infusion_0.duration!=120
+  -- Note: We're not handling external PI
+  VarShadowTimings = 0
   -- power_siphon
   if S.PowerSiphon:IsReady() then
     if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon precombat 2"; end
@@ -138,20 +152,31 @@ local function Precombat()
   end
 end
 
+local function Variables()
+  -- variable,name=tyrant_cd,op=setif,value=cooldown.invoke_power_infusion_0.remains,value_else=cooldown.summon_demonic_tyrant.remains_expected,condition=((((fight_remains+time)%%120<=75&(fight_remains+time)%%120>=15)|time>=210)&variable.shadow_timings)&cooldown.invoke_power_infusion_0.duration>0&!talent.grand_warlocks_design
+  -- Note: Not handling external PI. Leaving VarTyrantCD set to 120.
+  -- variable,name=np_condition,op=set,value=cooldown.nether_portal.up|buff.nether_portal.up|pet.pit_lord.active|!talent.nether_portal|cooldown.nether_portal.remains>30
+  VarNPCondition = (S.NetherPortal:CooldownUp() or Player:BuffUp(S.NetherPortalBuff) or PitLordTime() > 0 or (not S.NetherPortal:IsAvailable()) or S.NetherPortal:CooldownRemains() > 30)
+end
+
 local function Tyrant()
-  -- variable,name=next_tyrant,op=set,value=time+14+cooldown.grimoire_felguard.ready+cooldown.summon_vilefiend.ready,if=variable.next_tyrant<=time
-  if (VarNextTyrant <= CombatTime) then
-    VarNextTyrant = CombatTime + 14 + num(S.GrimoireFelguard:CooldownUp()) + num(S.SummonVilefiend:CooldownUp())
+  -- variable,name=next_tyrant,op=set,value=time+13+cooldown.grimoire_felguard.ready+cooldown.summon_vilefiend.ready,if=variable.next_tyrant<=time&!equipped.neltharions_call_to_dominance
+  if (VarNextTyrant <= CombatTime and not I.NeltharionsCallToDominance:IsEquipped()) then
+    VarNextTyrant = CombatTime + 13 + num(S.GrimoireFelguard:CooldownUp()) + num(S.SummonVilefiend:CooldownUp())
   end
-  -- invoke_external_buff,name=power_infusion,if=(buff.nether_portal.up&buff.nether_portal.remains<8&talent.nether_portal)|(buff.dreadstalkers.up&variable.next_tyrant-time<=6&!talent.nether_portal)
+  -- invoke_external_buff,name=power_infusion,if=(buff.nether_portal.up&buff.nether_portal.remains<8&talent.nether_portal)|(buff.dreadstalkers.up&variable.next_tyrant-time<=6&(!talent.nether_portal|variable.shadow_timings))
   -- Note: Not handling external buffs
   -- shadow_bolt,if=time<2&soul_shard<5
-  if S.ShadowBolt:IsReady() and (CombatTime < 2 and Player:SoulShardsP() < 5) then
+  if S.ShadowBolt:IsCastable() and (CombatTime < 2 and Player:SoulShardsP() < 5) then
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt tyrant 2"; end
   end
   -- nether_portal
   if S.NetherPortal:IsReady() then
     if Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal) then return "nether_portal tyrant 4"; end
+  end
+  -- variable,name=next_tyrant,op=set,value=time+13+cooldown.grimoire_felguard.ready+cooldown.summon_vilefiend.ready,if=variable.next_tyrant<=time&equipped.neltharions_call_to_dominance
+  if VarNextTyrant <= CombatTime and I.NeltharionsCallToDominance:IsEquipped() then
+    VarNextTyrant = CombatTime + 13 + num(S.GrimoireFelguard:CooldownUp()) + num(S.SummonVilefiend:CooldownUp())
   end
   -- grimoire_felguard
   if S.GrimoireFelguard:IsReady() then
@@ -169,20 +194,21 @@ local function Tyrant()
   if S.Soulburn:IsReady() and S.Soulburn:TimeSinceLastCast() >= 40 and (Player:BuffUp(S.NetherPortalBuff) and Player:SoulShardsP() > 2) then
     if Cast(S.Soulburn) then return "soulburn tyrant 12"; end
   end
-  -- hand_of_guldan,if=variable.next_tyrant-time>2&(buff.nether_portal.up|soul_shard>2&variable.next_tyrant-time<12|soul_shard=5)
-  if S.HandofGuldan:IsReady() and (VarNextTyrant > 2 and (Player:BuffUp(S.NetherPortalBuff) or Player:SoulShardsP() > 2 and VarNextTyrant - CombatTime < 12 or Player:SoulShardsP() == 5)) then
+  -- hand_of_guldan,if=variable.next_tyrant-time>2&(buff.nether_portal.up|soul_shard>2&variable.next_tyrant-time<12|soul_shard=5)&!cooldown.call_dreadstalkers.up
+  if S.HandofGuldan:IsReady() and (VarNextTyrant - CombatTime > 2 and (Player:BuffUp(S.NetherPortalBuff) or Player:SoulShardsP() > 2 and VarNextTyrant - CombatTime < 12 or Player:SoulShardsP() == 5) and S.CallDreadstalkers:CooldownDown()) then
     if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan tyrant 14"; end
   end
   -- hand_of_guldan,if=talent.soulbound_tyrant&variable.next_tyrant-time<4&variable.next_tyrant-time>action.summon_demonic_tyrant.cast_time
   if S.HandofGuldan:IsReady() and (S.SoulboundTyrant:IsAvailable() and VarNextTyrant - CombatTime < 4 and VarNextTyrant - CombatTime > S.SummonDemonicTyrant:CastTime()) then
     if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan tyrant 16"; end
   end
-  -- summon_demonic_tyrant,if=variable.next_tyrant-time<cast_time*2+1|buff.dreadstalkers.remains<cast_time+gcd
-  if S.SummonDemonicTyrant:IsCastable() and (VarNextTyrant - CombatTime < S.SummonDemonicTyrant:CastTime() * 2 + 1 or DreadstalkerTime() < S.SummonDemonicTyrant:CastTime() + Player:GCD()) then
+  -- summon_demonic_tyrant,if=variable.next_tyrant-time<cast_time*2+1|(buff.dreadstalkers.remains<cast_time+gcd&buff.call_dreadstalkers.up)
+  if S.SummonDemonicTyrant:IsCastable() and (VarNextTyrant - CombatTime < S.SummonDemonicTyrant:CastTime() * 2 + 1 or (DreadstalkerTime() < S.SummonDemonicTyrant:CastTime() + Player:GCD() and DreadstalkerTime() > 0)) then
     if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant tyrant 18"; end
   end
   -- demonbolt,if=buff.demonic_core.up
-  if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff)) then 
+  -- Note: Sometimes suggested during Tyrant cast, which shouldn't happen as it would over-cap shards.
+  if S.Demonbolt:IsReady() and (not Player:IsCasting(S.SummonDemonicTyrant)) and (Player:BuffUp(S.DemonicCoreBuff)) then 
     if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyrant 20"; end
   end
   -- power_siphon,if=buff.wild_imps.stack>1&!buff.nether_portal.up
@@ -194,7 +220,7 @@ local function Tyrant()
     if Cast(S.SoulStrike, nil, nil, not Target:IsSpellInRange(S.SoulStrike)) then return "soul_strike tyrant 24"; end
   end
   -- shadow_bolt
-  if S.ShadowBolt:IsReady() then
+  if S.ShadowBolt:IsCastable() then
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt tyrant 26"; end
   end
 end
@@ -204,12 +230,16 @@ local function Items()
   if I.TimebreachingTalon:IsEquippedAndReady() and (Player:BuffUp(S.DemonicPowerBuff) or not S.SummonDemonicTyrant:IsAvailable() and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())) then
     if Cast(I.TimebreachingTalon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timebreaching_talon items 2"; end
   end
-  -- use_items,if=!talent.summon_demonic_tyrant|buff.demonic_power.up
-  if (not S.SummonDemonicTyrant:IsAvailable()) or Player:BuffUp(S.DemonicPowerBuff) then
+  -- use_items,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)
+  if Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())  then
     local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
+  end
+  -- use_item,name=voidmenders_shadowgem,if=!variable.shadow_timings|(variable.shadow_timings&(buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)))
+  if I.VoidmendersShadowgem:IsEquippedAndReady() and ((not VarShadowTimings) or (VarShadowTimings and (Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())))) then
+    if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem items 4"; end
   end
 end
 
@@ -259,6 +289,9 @@ local function APL()
     if FightRemains == 11111 then
       FightRemains = HL.FightRemains(Enemies8ySplash, false)
     end
+
+    -- Update CombatTime, which is used in many spell suggestions
+    CombatTime = HL.CombatTime()
   end
 
   -- summon_pet
@@ -267,8 +300,6 @@ local function APL()
   end
 
   if Everyone.TargetIsValid() then
-    -- Update CombatTime, which is used in many spell suggestions
-    CombatTime = HL.CombatTime()
     -- call precombat
     if not Player:AffectingCombat() and not Player:IsCasting(S.Demonbolt) then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
@@ -281,15 +312,18 @@ local function APL()
     if S.UnendingResolve:IsReady() and (Player:HealthPercentage() < Settings.Demonology.UnendingResolveHP) then
       if Cast(S.UnendingResolve, Settings.Demonology.OffGCDasOffGCD.UnendingResolve) then return "unending_resolve defensive"; end
     end
-    -- call_action_list,name=tyrant,if=talent.summon_demonic_tyrant&(time-variable.next_tyrant)<=(variable.tyrant_prep_start+2)&cooldown.summon_demonic_tyrant.up
-    if CDsON() and S.SummonDemonicTyrant:IsAvailable() and (CombatTime - VarNextTyrant) <= (VarTyrantPrepStart + 2) and S.SummonDemonicTyrant:CooldownUp() then
+    -- call_action_list,name=variables
+    Variables()
+    -- call_action_list,name=tyrant,if=talent.summon_demonic_tyrant&(time-variable.next_tyrant)<=(variable.tyrant_prep_start+2)&cooldown.summon_demonic_tyrant.up&variable.np_condition
+    -- Note: Reversed VarNextTyrant and CombatTime in the calculation, as otherwise the condition was never true after the initial Tyrant.
+    if CDsON() and S.SummonDemonicTyrant:IsAvailable() and (VarNextTyrant - CombatTime) <= (VarTyrantPrepStart + 2) and S.SummonDemonicTyrant:CooldownUp() and VarNPCondition then
       local ShouldReturn = Tyrant(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=tyrant,if=talent.summon_demonic_tyrant&cooldown.summon_demonic_tyrant.remains_expected<variable.tyrant_prep_start
-    if CDsON() and S.SummonDemonicTyrant:IsAvailable() and S.SummonDemonicTyrant:CooldownRemains() < VarTyrantPrepStart then
+    -- call_action_list,name=tyrant,if=talent.summon_demonic_tyrant&(variable.tyrant_cd<=variable.tyrant_prep_start|cooldown.summon_demonic_tyrant.up&(buff.power_infusion.up|buff.nether_portal.up))&variable.np_condition
+    if CDsON() and S.SummonDemonicTyrant:IsAvailable() and (S.SummonDemonicTyrant:CooldownUp() and (Player:BuffUp(S.PowerInfusionBuff) or Player:BuffUp(S.NetherPortalBuff))) and VarNPCondition then
       local ShouldReturn = Tyrant(); if ShouldReturn then return ShouldReturn; end
     end
-    -- invoke_external_buff,name=power_infusion,if=!talent.nether_portal&!talent.summon_demonic_tyrant|time_to_die<25
+    -- invoke_external_buff,name=power_infusion,if=!talent.nether_portal&!talent.summon_demonic_tyrant|time_to_die<25|(buff.tyrant.up&variable.shadow_timings)
     -- Note: Not handling external buffs
     -- implosion,if=time_to_die<2*gcd
     if S.Implosion:IsReady() and (FightRemains < 2 * Player:GCD()) then
@@ -311,8 +345,8 @@ local function APL()
     if CDsON() and (Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())) then
       local ShouldReturn = Ogcd(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_dreadstalkers,if=cooldown.summon_demonic_tyrant.remains_expected>cooldown
-    if S.CallDreadstalkers:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() > 20) then
+    -- call_dreadstalkers,if=variable.tyrant_cd>cooldown+8*variable.shadow_timings
+    if S.CallDreadstalkers:IsReady() and (VarTyrantCD > 20 + 8 * VarShadowTimings) then
       if Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers main 8"; end
     end
     -- call_dreadstalkers,if=!talent.summon_demonic_tyrant|time_to_die<14
@@ -323,8 +357,8 @@ local function APL()
     if CDsON() and S.GrimoireFelguard:IsReady() and ((not S.SummonDemonicTyrant:IsAvailable()) or FightRemains < S.SummonDemonicTyrant:CooldownRemains()) then
       if Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, not Target:IsSpellInRange(S.GrimoireFelguard)) then return "grimoire_felguard main 12"; end
     end
-    -- summon_vilefiend,if=!talent.summon_demonic_tyrant|cooldown.summon_demonic_tyrant.remains_expected>cooldown+variable.tyrant_prep_start|time_to_die<cooldown.summon_demonic_tyrant.remains_expected
-    if S.SummonVilefiend:IsReady() and ((not S.SummonDemonicTyrant:IsAvailable()) or S.SummonDemonicTyrant:CooldownRemains() > 45 + VarTyrantPrepStart or FightRemains < S.SummonDemonicTyrant:CooldownRemains()) then
+    -- summon_vilefiend,if=!talent.summon_demonic_tyrant|variable.tyrant_cd>cooldown+variable.tyrant_prep_start|time_to_die<cooldown.summon_demonic_tyrant.remains_expected
+    if S.SummonVilefiend:IsReady() and ((not S.SummonDemonicTyrant:IsAvailable()) or VarTyrantCD > 45 + VarTyrantPrepStart or FightRemains < S.SummonDemonicTyrant:CooldownRemains()) then
       if Cast(S.SummonVilefiend) then return "summon_vilefiend main 14"; end
     end
     -- guillotine,if=cooldown.demonic_strength.remains
@@ -342,7 +376,7 @@ local function APL()
       if Cast(S.BilescourgeBombers, nil, nil, not Target:IsInRange(40)) then return "bilescourge_bombers main 20"; end
     end
     -- shadow_bolt,if=soul_shard<5&talent.fel_covenant&buff.fel_covenant.remains<5
-    if S.ShadowBolt:IsReady() and (Player:SoulShardsP() < 5 and S.FelCovenant:IsAvailable() and Player:BuffRemains(S.FelCovenantBuff) < 5) then
+    if S.ShadowBolt:IsCastable() and (Player:SoulShardsP() < 5 and S.FelCovenant:IsAvailable() and Player:BuffRemains(S.FelCovenantBuff) < 5) then
       if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt main 22"; end
     end
     -- implosion,if=two_cast_imps>0&buff.tyrant.down&active_enemies>1+(talent.sacrificed_souls.enabled)
@@ -365,16 +399,16 @@ local function APL()
     if S.SummonSoulkeeper:IsReady() and (S.SummonSoulkeeper:Count() == 10 and EnemiesCount8ySplash > 1) then
       if Cast(S.SummonSoulkeeper) then return "soul_strike main 32"; end
     end
-    -- demonbolt,if=buff.demonic_core.react&soul_shard<4
-    if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and Player:SoulShardsP() < 4) then
+    -- demonbolt,if=buff.demonic_core.react&soul_shard<4&variable.tyrant_cd>5
+    if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and Player:SoulShardsP() < 4 and VarTyrantCD > 5) then
       if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 34"; end
     end
     -- power_siphon,if=buff.demonic_core.stack<2&(buff.dreadstalkers.remains>gcd*3|buff.dreadstalkers.down)
     if S.PowerSiphon:IsReady() and (Player:BuffStack(S.DemonicCoreBuff) < 2 and (DreadstalkerTime() > Player:GCD() * 3 or DreadstalkerTime() == 0)) then
       if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon main 36"; end
     end
-    -- hand_of_guldan,if=soul_shard>2&(!talent.summon_demonic_tyrant|cooldown.summon_demonic_tyrant.remains_expected>variable.tyrant_prep_start+2)&(buff.demonic_calling.up|soul_shard>4|cooldown.call_dreadstalkers.remains>gcd)
-    if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 2 and ((not S.SummonDemonicTyrant:IsAvailable()) or S.SummonDemonicTyrant:CooldownRemains() > VarTyrantPrepStart + 2 or not CDsON()) and (Player:BuffUp(S.DemonicCallingBuff) or Player:SoulShardsP() > 4 or S.CallDreadstalkers:CooldownRemains() > Player:GCD())) then
+    -- hand_of_guldan,if=soul_shard>2&(!talent.summon_demonic_tyrant|variable.tyrant_cd>variable.tyrant_prep_start+2)&(buff.demonic_calling.up|soul_shard>4|cooldown.call_dreadstalkers.remains>gcd)
+    if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 2 and ((not S.SummonDemonicTyrant:IsAvailable()) or VarTyrantCD > VarTyrantPrepStart + 2 or not CDsON()) and (Player:BuffUp(S.DemonicCallingBuff) or Player:SoulShardsP() > 4 or S.CallDreadstalkers:CooldownRemains() > Player:GCD())) then
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 38"; end
     end
     -- doom,target_if=refreshable
@@ -386,14 +420,14 @@ local function APL()
       if Cast(S.SoulStrike, nil, nil, not Target:IsSpellInRange(S.SoulStrike)) then return "soul_strike main 42"; end
     end
     -- shadow_bolt
-    if S.ShadowBolt:IsReady() then
+    if S.ShadowBolt:IsCastable() then
       if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt main 44"; end
     end
   end
 end
 
 local function Init()
-  HR.Print("Demonology Warlock rotation is currently a work in progress, but has been updated for patch 10.0.")
+  HR.Print("Demonology Warlock rotation is currently a work in progress, but has been updated for patch 10.1.0.")
 end
 
 HR.SetAPL(266, APL, Init)

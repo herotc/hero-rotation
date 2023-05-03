@@ -64,6 +64,7 @@ Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
   Doom                                  = Spell(603),
   FelCovenant                           = Spell(387432),
   FromtheShadows                        = Spell(267170),
+  GrandWarlocksDesign                   = Spell(387084),
   GrimoireFelguard                      = Spell(111898),
   Guillotine                            = Spell(386833),
   ImpGangBoss                           = Spell(387445),
@@ -192,7 +193,9 @@ Item.Warlock.Commons = {
   DesperateInvokersCodex                = Item(194310, {13, 14}),
   EruptingSpearFragment                 = Item(193769, {13, 14}),
   IcebloodDeathsnare                    = Item(194304, {13, 14}),
+  NeltharionsCallToDominance            = Item(204202, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
+  VoidmendersShadowgem                  = Item(110007, {13, 14}),
 }
 
 Item.Warlock.Affliction = MergeTableByKey(Item.Warlock.Commons, {

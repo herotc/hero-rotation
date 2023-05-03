@@ -92,6 +92,7 @@ HL.GuardiansTable = {
   DreadstalkerDuration = 0,
   DemonicTyrantDuration = 0,
   VilefiendDuration = 0,
+  PitLordDuration = 0,
   Infernal = 0,
   Blasphemy = 0,
   DarkglareDuration = 0,
@@ -125,6 +126,10 @@ local PetsData = {
   [135816] = {
     name = "Vilefiend",
     duration = 15
+  },
+  [196111] = {
+    name = "Pit Lord",
+    duration = 10
   },
   [89] = {
     name = "Infernal",
@@ -217,6 +222,8 @@ function Warlock.UpdatePetTable()
           HL.GuardiansTable.DemonicTyrantDuration = 0
         elseif petTable.name == "Vilefiend" then
           HL.GuardiansTable.VilefiendDuration = 0
+        elseif petTable.name == "Pit Lord" then
+          HL.GuardiansTable.PitLordDuration = 0
         elseif petTable.name == "Infernal" then
           HL.GuardiansTable.InfernalDuration = 0
         elseif petTable.name == "Blasphemy" then
@@ -243,6 +250,8 @@ function Warlock.UpdatePetTable()
         HL.GuardiansTable.DemonicTyrantDuration = petTable.Duration
       elseif petTable.name == "Vilefiend" then
         HL.GuardiansTable.VilefiendDuration = petTable.Duration
+      elseif petTable.name == "Pit Lord" then
+        HL.GuardiansTable.PitLordDuration = petTable.Duration
       elseif petTable.name == "Infernal" then
         HL.GuardiansTable.InfernalDuration = petTable.Duration
       elseif petTable.name == "Blasphy" then
@@ -282,6 +291,9 @@ HL:RegisterForSelfCombatEvent(
       elseif summonedPet.name == "Vilefiend" then
         HL.GuardiansTable.VilefiendDuration = summonedPet.duration
         petDuration = summonedPet.duration
+      elseif summonedPet.name == "Pit Lord" then
+        HL.GuardiansTable.PitLordDuration = summonedPet.duration
+        petDuration = summonedPet.duration
       elseif summonedPet.name == "Infernal" then
         HL.GuardiansTable.InfernalDuration = summonedPet.duration
         petDuration = summonedPet.duration
@@ -306,7 +318,7 @@ HL:RegisterForSelfCombatEvent(
     -- Add 15 seconds and 7 casts to all pets when Tyrant is cast
     if PetsData[UnitPetID] and PetsData[UnitPetID].name == "Demonic Tyrant" then
       for key, petTable in pairs(HL.GuardiansTable.Pets) do
-        if (petTable and petTable.name ~= "Demonic Tyrant") then
+        if (petTable and petTable.name ~= "Demonic Tyrant" and petTable.name ~= "Pit Lord") then
           petTable.despawnTime = petTable.despawnTime + 15
           petTable.ImpCasts = petTable.ImpCasts + 7
         end
