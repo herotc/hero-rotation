@@ -125,6 +125,8 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   CarefulAim                            = Spell(260228),
   ChimaeraShot                          = Spell(342049),
   DoubleTap                             = Spell(260402),
+  InTheRhythm                           = Spell(407404),
+  LegacyoftheWindrunners                = Spell(406425),
   LoneWolf                              = Spell(155228),
   MultiShot                             = Spell(257620),
   RapidFire                             = Spell(257044),
@@ -136,10 +138,12 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   TrickShots                            = Spell(257621),
   Trueshot                              = Spell(288613),
   Volley                                = Spell(260243),
+  WindrunnersGuidance                   = Spell(378905),
   -- Buffs
   BombardmentBuff                       = Spell(386875),
   BulletstormBuff                       = Spell(389020),
   DoubleTapBuff                         = Spell(260402),
+  InTheRhythmBuff                       = Spell(407405),
   LockandLoadBuff                       = Spell(194594),
   PreciseShotsBuff                      = Spell(260242),
   RazorFragmentsBuff                    = Spell(388998),
@@ -162,6 +166,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   WildfireBomb                          = Spell(259495),
   -- Talents
   AspectoftheEagle                      = Spell(186289),
+  Bombardier                            = Spell(389880),
   Butchery                              = Spell(212436),
   Carve                                 = Spell(187708),
   CoordinatedAssault                    = Spell(360952),
@@ -190,6 +195,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   InternalBleedingDebuff                = Spell(270343),
   PheromoneBombDebuff                   = Spell(270332),
   ShrapnelBombDebuff                    = Spell(270339),
+  ShreddedArmorDebuff                   = Spell(410167),
   VolatileBombDebuff                    = Spell(271049),
   WildfireBombDebuff                    = Spell(269747),
 })
