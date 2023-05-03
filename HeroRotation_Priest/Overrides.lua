@@ -70,6 +70,8 @@ OldShadowIsCastable = HL.AddCoreOverride("Spell.IsCastable",
       return BaseCheck and (not SpellShadow.ShadowCrash:InFlight()) and (SpellShadow.UnfurlingDarkness:IsAvailable() or not Player:IsCasting(self))
     elseif self == SpellShadow.MindBlast then
       return BaseCheck and (self:Charges() >= 2 or not Player:IsCasting(self))
+    elseif self == SpellShadow.VoidEruption then
+      return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellShadow.VoidBolt then
       return BaseCheck or Player:IsCasting(SpellShadow.VoidEruption)
     else
