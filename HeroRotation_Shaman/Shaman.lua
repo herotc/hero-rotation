@@ -86,6 +86,7 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   LavaLash                              = Spell(60103),
   MoltenAssault                         = Spell(334033),
   OverflowingMaelstrom                  = Spell(384149),
+  StaticAccumulation                    = Spell(384411),
   Stormblast                            = Spell(319930),
   Stormflurry                           = Spell(344357),
   Stormstrike                           = Spell(17364),
