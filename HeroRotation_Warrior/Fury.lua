@@ -110,13 +110,15 @@ local function SingleTarget()
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 10"; end
   end
   local BTCritChance = Player:CritChancePct() + Player:BuffStack(S.BloodcrazeBuff) * 15
-  -- bloodbath,if=action.bloodbath.crit_pct_current>=95|!talent.cold_steel_hot_blood&set_bonus.tier30_4pc
-  if S.Bloodbath:IsCastable() and (BTCritChance >= 95 or (not S.ColdSteelHotBlood:IsAvailable()) and Player:HasTier(30, 4)) then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 12"; end
-  end
-  -- bloodthirst,if=action.bloodthirst.crit_pct_current>=95
-  if S.Bloodthirst:IsCastable() and (BTCritChance >= 95) then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 14"; end
+  if (BTCritChance >= 95 or (not S.ColdSteelHotBlood:IsAvailable()) and Player:HasTier(30, 4)) then
+    -- bloodbath,if=action.bloodbath.crit_pct_current>=95|!talent.cold_steel_hot_blood&set_bonus.tier30_4pc
+    if S.Bloodbath:IsCastable() then
+      if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 12"; end
+    end
+    -- bloodthirst,if=action.bloodthirst.crit_pct_current>=95|!talent.cold_steel_hot_blood&set_bonus.tier30_4pc
+    if S.Bloodthirst:IsCastable() then
+      if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 14"; end
+    end
   end
   -- execute,if=buff.enrage.up
   if S.Execute:IsReady() and EnrageUp then
