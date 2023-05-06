@@ -201,8 +201,13 @@ if not Item.Monk then Item.Monk = {}; end
 Item.Monk.Commons = {
   -- Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
+  EruptingSpearFragment                 = Item(193769, {13, 14}),
   HornofValor                           = Item(133642, {13, 14}),
+  IrideusFragment                       = Item(193743, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
+  StormeatersBoon                       = Item(194302, {13, 14}),
+  -- Other On-Use Items
+  Djaruun                               = Item(202569),
 }
 
 Item.Monk.Windwalker = MergeTableByKey(Item.Monk.Commons, {
