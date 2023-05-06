@@ -89,7 +89,7 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   ArcaneMissiles                        = Spell(5143),
   ArcaneOrb                             = Spell(153626), --Splash, 16
   ArcanePower                           = Spell(321739),
-  ArcaneSurge                           = Spell(365350),--for whatever reason, the spell id is not 365350 when you have Arcane Power talented
+  ArcaneSurge                           = Spell(365350), --for whatever reason, the spell does not respond properly to IsReady
   ArcaneSurgeBuff                       = Spell(365362),
   CascadingPower                        = Spell(384276),
   ConjureManaGem                        = Spell(759),
@@ -118,6 +118,8 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   Supernova                             = Spell(157980), --Splash, 8
   TouchoftheMagi                        = Spell(321507), --Splash, 8
   TouchoftheMagiDebuff                  = Spell(210824),
+  -- Misc
+  StopAM                                = Spell(363653),
 })
 
 Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {

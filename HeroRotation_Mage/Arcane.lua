@@ -512,6 +512,10 @@ local function TouchPhase()
   if S.ArcaneBlast:IsReady() and (Player:BuffUp(S.NetherPrecisionBuff)) then
     if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast touch_phase 12"; end
   end
+  -- cancel_action,if=debuff.touch_of_the_magi.up&action.arcane_missiles.channeling&gcd.remains=0&(buff.arcane_surge.up|talent.conjure_mana_gem|set_bonus.tier30_4pc)&mana.pct>30
+  if Player:IsChanneling(S.ArcaneMissiles) and Target:DebuffUp(S.TouchoftheMagiDebuff) and Player:GCDRemains() == 0 and (Player:BuffUp(S.ArcaneSurgeBuff) or S.ConjureManaGem:IsAvailable() or Player:HasTier(30, 4)) and Player:ManaPercentage() > 30 then
+    if HR.CastAnnotated(S.StopAM, false, "STOP AM") then return "cancel_action arcane_missiles touch_phase 13"; end
+  end
   -- arcane_missiles,if=buff.clearcasting.react&(debuff.touch_of_the_magi.remains>execute_time|!talent.presence_of_mind),chain=1
   if S.ArcaneMissiles:IsCastable() and (Player:BuffUp(S.ClearcastingBuff) and (Target:DebuffRemains(S.TouchoftheMagiDebuff) > S.ArcaneMissiles:CastTime() or not S.PresenceofMind:IsAvailable())) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles touch_phase 14"; end

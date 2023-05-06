@@ -126,7 +126,7 @@ CreateARPanelOptions(CP_Mage, "APL.Mage.Commons")
 
 -- Arcane
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.StayDistance", "Stay at distance", "Only use Arcane Explosion if in range or on the left icon.")
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MovingRotation", "Disable cast abilities when moving", "Don't show abilities where a ca&st is needed (makes the rotation a bit clunky with small steps).")
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MovingRotation", "Disable cast abilities when moving", "While moving, don't show abilities where a cast time is needed (makes the rotation a bit clunky with small steps).")
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MirrorImagesBeforePull", "Use Mirror Images Precombat", "Enable this option to show Mirror Images during Precombat.")
 CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane")
 

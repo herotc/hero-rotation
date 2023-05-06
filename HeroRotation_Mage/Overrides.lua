@@ -113,6 +113,27 @@ HL.AddCoreOverride("Spell.IsCastable",
   end
 , 62)
 
+HL.AddCoreOverride("Spell.IsReady",
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    if self:CastTime() > 0 and Player:IsMoving() and Settings.Arcane.MovingRotation then
+      return false
+    end
+
+    local RangeOK = true
+    if Range then
+      local RangeUnit = ThisUnit or Target
+      RangeOK = RangeUnit:IsInRange( Range, AoESpell )
+    end
+
+    local BaseCheck = self:IsUsableP() and self:IsCastable()
+    if self == SpellArcane.ArcaneSurge then
+      return BaseCheck or self:CooldownUp()
+    else
+      return BaseCheck
+    end
+  end
+, 62)
+
 -- Fire, ID: 63
 local FireOldPlayerBuffStack
 FireOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffStack",
