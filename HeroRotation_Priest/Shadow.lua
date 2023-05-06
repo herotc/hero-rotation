@@ -163,7 +163,7 @@ end
 
 local function EvaluateCycleMindGamesMain(TargetUnit)
   -- target_if=variable.all_dots_up&dot.devouring_plague.remains>=cast_time
-  return (DotsUp(TargetUnit, true) and TargetUnit:DebuffRemains(S.DevouringPlagueDebuff) >= S.MindGames:CastTime())
+  return (DotsUp(TargetUnit, true) and TargetUnit:DebuffRemains(S.DevouringPlagueDebuff) >= S.Mindgames:CastTime())
 end
 
 local function EvaluateCycleShadowCrashAoE(TargetUnit)
