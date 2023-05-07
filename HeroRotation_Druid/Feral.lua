@@ -694,6 +694,10 @@ local function APL()
       if Everyone.CastCycle(S.Rake, EnemiesMelee, EvaluateCycleRake, not Target:IsInMeleeRange(8)) then return "rake main 10"; end
     end
     -- auto_attack,if=!buff.prowl.up&!buff.shadowmeld.up
+    -- natures_vigil
+    if S.NaturesVigil:IsCastable() then
+      if Cast(S.NaturesVigil, Settings.Feral.OffGCDasOffGCD.NaturesVigil) then return "natures_vigil main 11"; end
+    end
     -- adaptive_swarm,target_if=((!dot.adaptive_swarm_damage.ticking|dot.adaptive_swarm_damage.remains<2)&(dot.adaptive_swarm_damage.stack<3|!dot.adaptive_swarm_heal.stack>1)&!action.adaptive_swarm_heal.in_flight&!action.adaptive_swarm_damage.in_flight&!action.adaptive_swarm.in_flight)&target.time_to_die>5|active_enemies>2&!dot.adaptive_swarm_damage.ticking&energy<35&target.time_to_die>5,if=!(variable.need_bt&active_bt_triggers=2)
     if S.AdaptiveSwarm:IsReady() and (not (VarNeedBT and CountActiveBtTriggers() == 2)) then
       if Everyone.CastCycle(S.AdaptiveSwarm, Enemies11y, EvaluateCycleAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm main 12"; end

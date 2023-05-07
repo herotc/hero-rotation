@@ -44,6 +44,7 @@ Spell.Druid.Commons = {
   Maim                                  = Spell(22570),
   MightyBash                            = Spell(5211),
   MoonkinForm                           = MultiSpell(24858,197625),
+  NaturesVigil                          = Spell(124974),
   Rake                                  = Spell(1822),
   Rip                                   = Spell(1079),
   SkullBash                             = Spell(106839),
