@@ -207,6 +207,8 @@ local function oGCD()
         if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 2"; end
       end
     end
+    -- invoke_external_buff,name=power_infusion,if=pet.infernal.active|!talent.summon_infernal|(fight_remains<cooldown.summon_infernal.remains+10+cooldown.invoke_power_infusion_0.duration&fight_remains>cooldown.invoke_power_infusion_0.duration)|fight_remains<cooldown.summon_infernal.remains+15
+    -- Note: Not handling external PI.
     -- berserking,if=pet.infernal.active|!talent.summon_infernal|(fight_remains<(cooldown.summon_infernal.remains+cooldown.berserking.duration)&(fight_remains>cooldown.berserking.duration))|fight_remains<cooldown.summon_infernal.remains
     if S.Berserking:IsCastable() and (FightRemains < (S.SummonInfernal:CooldownRemains() + 12) and (FightRemains > 12) or FightRemains < S.SummonInfernal:CooldownRemains()) then
       if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 4"; end
