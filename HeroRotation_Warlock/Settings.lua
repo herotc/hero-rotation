@@ -60,6 +60,7 @@ HR.GUISettings.APL.Warlock = {
     }
   },
   Demonology = {
+    PISource = "None",
     PotionType = {
       Selected = "Power",
     },
@@ -121,6 +122,7 @@ CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.Ignore
 CreateARPanelOptions(CP_Destruction, "APL.Warlock.Destruction")
 
 -- Demonology
+CreatePanelOption("Dropdown", CP_Demonology, "APL.Warlock.Demonology.PISource", {"None", "Shadow", "Disc/Holy"}, "Power Infusion Source", "If you are receiving Power Infusion, selected what spec Priest is supplying it. Otherwise, leave this set to None.")
 CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.")
 CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology")
 

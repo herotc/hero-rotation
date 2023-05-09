@@ -34,6 +34,11 @@ local I = Item.Warlock.Demonology
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.BeacontotheBeyond:ID(),
+  I.EruptingSpearFragment:ID(),
+  I.IrideusFragment:ID(),
+  I.RotcrustedVoodooDoll:ID(),
+  I.SpoilsofNeltharus:ID(),
   I.TimebreachingTalon:ID(),
   I.VoidmendersShadowgem:ID(),
 }
@@ -135,9 +140,11 @@ local function Precombat()
   -- variable,name=next_tyrant,op=set,value=14+talent.grimoire_felguard+talent.summon_vilefiend
   VarNextTyrant = 14 + num(S.GrimoireFelguard:IsAvailable()) + num(S.SummonVilefiend:IsAvailable())
   -- variable,name=shadow_timings,default=0,op=reset
-  -- variable,name=shadow_timings,op=set,value=0,if=cooldown.invoke_power_infusion_0.duration!=120
-  -- Note: We're not handling external PI
   VarShadowTimings = 0
+  -- variable,name=shadow_timings,op=set,value=0,if=cooldown.invoke_power_infusion_0.duration!=120
+  if Settings.Demonology.PISource == "Shadow" then
+    VarShadowTimings = 1
+  end
   -- power_siphon
   if S.PowerSiphon:IsReady() then
     if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon precombat 2"; end
@@ -153,8 +160,15 @@ local function Precombat()
 end
 
 local function Variables()
-  -- variable,name=tyrant_cd,op=setif,value=cooldown.invoke_power_infusion_0.remains,value_else=cooldown.summon_demonic_tyrant.remains_expected,condition=((((fight_remains+time)%%120<=75&(fight_remains+time)%%120>=15)|time>=210)&variable.shadow_timings)&cooldown.invoke_power_infusion_0.duration>0&!talent.grand_warlocks_design
-  -- Note: Not handling external PI. Leaving VarTyrantCD set to 120.
+  -- variable,name=tyrant_cd,op=setif,value=cooldown.invoke_power_infusion_0.remains,value_else=cooldown.summon_demonic_tyrant.remains_expected,condition=((((fight_remains+time)%%120<=85&(fight_remains+time)%%120>=25)|time>=210)&variable.shadow_timings)&cooldown.invoke_power_infusion_0.duration>0&!talent.grand_warlocks_design
+  VarTyrantCD = S.SummonDemonicTyrant:CooldownRemains()
+  if bool(VarShadowTimings) then
+    local VarPICD = 120 - (GetTime() - Warlock.LastPI)
+    -- Note: Moved VarPICD check to the front to avoid unnecessary calculations.
+    if VarPICD > 0 and ((((FightRemains + CombatTime) % 120 <= 85 and (FightRemains + CombatTime) % 120 >= 25) or CombatTime >= 210) and VarShadowTimings) and not S.GrandWarlocksDesign:IsAvailable() then
+      VarTyrantCD = VarPICD
+    end
+  end
   -- variable,name=np_condition,op=set,value=cooldown.nether_portal.up|buff.nether_portal.up|pet.pit_lord.active|!talent.nether_portal|cooldown.nether_portal.remains>30
   VarNPCondition = (S.NetherPortal:CooldownUp() or Player:BuffUp(S.NetherPortalBuff) or PitLordTime() > 0 or (not S.NetherPortal:IsAvailable()) or S.NetherPortal:CooldownRemains() > 30)
 end
@@ -226,20 +240,43 @@ local function Tyrant()
 end
 
 local function Items()
-  -- use_item,name=timebreaching_talon,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)
-  if I.TimebreachingTalon:IsEquippedAndReady() and (Player:BuffUp(S.DemonicPowerBuff) or not S.SummonDemonicTyrant:IsAvailable() and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())) then
-    if Cast(I.TimebreachingTalon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timebreaching_talon items 2"; end
+  -- use_item,name=irideus_fragment,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)|time_to_die<=21
+  -- use_item,name=timebreaching_talon,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)|time_to_die<=21
+  -- use_item,name=spoils_of_neltharus,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)|time_to_die<=21
+  if (Player:BuffUp(S.DemonicPowerBuff) or not S.SummonDemonicTyrant:IsAvailable() and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable()) or FightRemains <= 21) then
+    if I.IrideusFragment:IsEquippedAndReady() then
+      if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment items 2"; end
+    end
+    if I.TimebreachingTalon:IsEquippedAndReady() then
+      if Cast(I.TimebreachingTalon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timebreaching_talon items 4"; end
+    end
+    if I.SpoilsofNeltharus:IsEquippedAndReady() then
+      if Cast(I.SpoilsofNeltharus, nil, Settings.Commons.DisplayStyle.Trinkets) then return "spoils_of_neltharus items 6"; end
+    end
   end
-  -- use_items,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)
-  if Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())  then
+  -- use_item,name=voidmenders_shadowgem,if=!variable.shadow_timings|(variable.shadow_timings&(buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)))
+  if I.VoidmendersShadowgem:IsEquippedAndReady() and ((not VarShadowTimings) or (VarShadowTimings and (Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())))) then
+    if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem items 8"; end
+  end
+  -- use_item,name=erupting_spear_fragment,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)|time_to_die<=11
+  if I.EruptingSpearFragment:IsEquippedAndReady() and (Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable()) or FightRemains <= 11) then
+    if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment items 10"; end
+  end
+  -- use_items,if=(buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal))&(!equipped.irideus_fragment&!equipped.timebreaching_talon&!equipped.spoils_of_neltharus&!equipped.erupting_spear_fragment&!equipped.voidmenders_shadowgem)
+  -- Note: Excluded trinkets are excluded via OnUseExcludes, so ignoring that portion of the condition.
+  if (Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())) then
     local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
   end
-  -- use_item,name=voidmenders_shadowgem,if=!variable.shadow_timings|(variable.shadow_timings&(buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)))
-  if I.VoidmendersShadowgem:IsEquippedAndReady() and ((not VarShadowTimings) or (VarShadowTimings and (Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())))) then
-    if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem items 4"; end
+  -- use_item,name=rotcrusted_voodoo_doll
+  if I.RotcrustedVoodooDoll:IsEquippedAndReady() then
+    if Cast(I.RotcrustedVoodooDoll, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "rotcrusted_voodoo_doll items 12"; end
+  end
+  -- use_item,name=beacon_to_the_beyond
+  if I.BeacontotheBeyond:IsEquippedAndReady() then
+    if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond items 14"; end
   end
 end
 
@@ -333,10 +370,6 @@ local function APL()
     if CDsON() and S.NetherPortal:IsReady() and ((not S.SummonDemonicTyrant:IsAvailable()) and (Player:SoulShardsP() > 2) or FightRemains < 30) then
       if Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal) then return "nether_portal main 4"; end
     end
-    -- hand_of_guldan,if=buff.nether_portal.up
-    if S.HandofGuldan:IsReady() and (Player:BuffUp(S.NetherPortalBuff)) then
-      if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 6"; end
-    end
     -- call_action_list,name=items
     if Settings.Commons.Enabled.Trinkets then
       local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
@@ -344,6 +377,10 @@ local function APL()
     -- call_action_list,name=ogcd,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)
     if CDsON() and (Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())) then
       local ShouldReturn = Ogcd(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- hand_of_guldan,if=buff.nether_portal.up
+    if S.HandofGuldan:IsReady() and (Player:BuffUp(S.NetherPortalBuff)) then
+      if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 6"; end
     end
     -- call_dreadstalkers,if=variable.tyrant_cd>cooldown+8*variable.shadow_timings
     if S.CallDreadstalkers:IsReady() and (VarTyrantCD > 20 + 8 * VarShadowTimings) then

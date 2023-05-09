@@ -372,6 +372,21 @@ HL:RegisterForCombatEvent(
   , "SPELL_CAST_SUCCESS"
 )
 
+-- Track when we last received PI
+Warlock.LastPI = 0
+HL:RegisterForCombatEvent(
+  function (...)
+    DestGUID, _, _, _, SpellID = select(8, ...)
+
+    --- Record the Immolate
+    if SpellID == 10060 and DestGUID == Player:GUID() then
+      Warlock.LastPI = GetTime()
+    end
+  end
+  , "SPELL_AURA_APPLIED"
+  , "SPELL_AURA_REFRESH"
+)
+
 -- Keep track how many Soul Shards we have
 Warlock.SoulShards = 0
 function Warlock.UpdateSoulShards()
