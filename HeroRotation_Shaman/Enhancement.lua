@@ -143,8 +143,8 @@ local function Single()
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 6"; end
   end
   -- sundering,if=set_bonus.tier30_2pc&raid_event.adds.in>=40
-  if S.Sundering:IsReady() and (Player:HasTier(30, 2)) then
-    if Cast(S.Sundering, nil, nil, not Target:IsInRange(11)) then return "sundering single 8"; end
+  if S.Sundering:IsReady() and CDsON() and (Player:HasTier(30, 2)) then
+    if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInRange(11)) then return "sundering single 8"; end
   end
   -- windstrike,if=talent.thorims_invocation.enabled&buff.maelstrom_weapon.stack>=1&(talent.deeply_rooted_elements.enabled|(talent.stormblast.enabled&buff.stormbringer.up)|(talent.elemental_assault.enabled&buff.maelstrom_weapon.stack<buff.maelstrom_weapon.max_stack)|ti_lightning_bolt)
   if S.Windstrike:IsCastable() and (S.ThorimsInvocation:IsAvailable() and MaelstromStacks >= 1 and (S.DeeplyRootedElements:IsAvailable() or (S.Stormblast:IsAvailable() and Player:BuffUp(S.StormbringerBuff)) or (S.ElementalAssault:IsAvailable() and MaelstromStacks < MaxMaelstromStacks) or TIAction == S.LightningBolt)) then
@@ -196,8 +196,8 @@ local function Single()
       if Cast(S.IceStrike, nil, nil, not Target:IsInMeleeRange(5)) then return "ice_strike single 32"; end
     end
     -- sundering,if=buff.doom_winds.up&raid_event.adds.in>=40
-    if S.Sundering:IsReady() then
-      if Cast(S.Sundering, nil, nil, not Target:IsInRange(11)) then return "sundering single 34"; end
+    if S.Sundering:IsReady() and CDsON() then
+      if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInRange(11)) then return "sundering single 34"; end
     end
     -- crash_lightning,if=buff.doom_winds.up
     if S.CrashLightning:IsReady() then
@@ -237,8 +237,8 @@ local function Single()
     if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 52"; end
   end
   -- sundering,if=raid_event.adds.in>=40
-  if S.Sundering:IsReady() then
-    if Cast(S.Sundering, nil, nil, not Target:IsInRange(11)) then return "sundering single 54"; end
+  if S.Sundering:IsReady() and CDsON() then
+    if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInRange(11)) then return "sundering single 54"; end
   end
   -- bag_of_tricks
   if S.BagofTricks:IsCastable() and CDsON() then
@@ -308,8 +308,8 @@ local function Aoe()
     if Cast(S.CrashLightning, nil, nil, not Target:IsInRange(8)) then return "crash_lightning aoe 2"; end
   end
   -- sundering,if=buff.doom_winds.up|set_bonus.tier30_2pc
-  if S.Sundering:IsReady() and (Player:BuffUp(S.DoomWindsBuff) or Player:HasTier(30, 2)) then
-    if Cast(S.Sundering, nil, nil, not Target:IsInRange(11)) then return "sundering aoe 8"; end
+  if S.Sundering:IsReady() and CDsON() and (Player:BuffUp(S.DoomWindsBuff) or Player:HasTier(30, 2)) then
+    if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInRange(11)) then return "sundering aoe 8"; end
   end
   -- fire_nova,if=active_dot.flame_shock=6|(active_dot.flame_shock>=4&active_dot.flame_shock=active_enemies)
   if S.FireNova:IsReady() and (S.FlameShockDebuff:AuraActiveCount() == 6 or (S.FlameShockDebuff:AuraActiveCount() >= 4 and S.FlameShockDebuff:AuraActiveCount() >= Enemies10yCount)) then
@@ -336,8 +336,8 @@ local function Aoe()
     if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash aoe 17"; end
   end
   -- sundering
-  if S.Sundering:IsReady() then
-    if Cast(S.Sundering, nil, nil, not Target:IsInRange(11)) then return "sundering aoe 26"; end
+  if S.Sundering:IsReady() and CDsON() then
+    if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInRange(11)) then return "sundering aoe 26"; end
   end
   -- flame_shock,if=talent.molten_assault.enabled&!ticking
   if S.FlameShock:IsReady() and (S.MoltenAssault:IsAvailable() and Target:DebuffDown(S.FlameShockDebuff)) then
@@ -460,7 +460,7 @@ local function APL()
     -- bloodlust,line_cd=600
     -- Not adding this, as when to use Bloodlust will vary fight to fight
     -- potion,if=(talent.ascendance.enabled&raid_event.adds.in>=90&cooldown.ascendance.remains<10)|(talent.doom_winds.enabled&buff.doom_winds.up)|(!talent.doom_winds.enabled&!talent.ascendance.enabled&talent.feral_spirit.enabled&buff.feral_spirit.up)|(!talent.doom_winds.enabled&!talent.ascendance.enabled&!talent.feral_spirit.enabled)|active_enemies>1|fight_remains<30
-    if Settings.Commons.Enabled.Potions and ((S.Ascendance:IsAvailable() and Enemies10yCount == 1 and S.Ascendance:CooldownRemains() < 10) or (S.DoomWinds:IsAvailable() and Player:BuffUp(S.DoomWindsBuff)) or ((not S.DoomWinds:IsAvailable()) and (not S.Ascendance:IsAvailable()) and S.FeralSpirit:IsAvailable() and Player:BuffUp(S.FeralSpiritBuff)) or ((not S.DoomWinds:IsAvailable()) and (not S.Ascendance:IsAvailable()) and not S.FeralSpirit:IsAvailable()) or Enemies10yCount > 1 or FightRemains < 30) then
+    if Settings.Commons.Enabled.Potions and CDsON() and ((S.Ascendance:IsAvailable() and Enemies10yCount == 1 and S.Ascendance:CooldownRemains() < 10) or (S.DoomWinds:IsAvailable() and Player:BuffUp(S.DoomWindsBuff)) or ((not S.DoomWinds:IsAvailable()) and (not S.Ascendance:IsAvailable()) and S.FeralSpirit:IsAvailable() and Player:BuffUp(S.FeralSpiritBuff)) or ((not S.DoomWinds:IsAvailable()) and (not S.Ascendance:IsAvailable()) and not S.FeralSpirit:IsAvailable()) or Enemies10yCount > 1 or FightRemains < 30) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
         if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
@@ -521,7 +521,7 @@ local function APL()
     end
     -- doom_winds,if=raid_event.adds.in>=90|active_enemies>1
     if S.DoomWinds:IsCastable() and CDsON() then
-      if Cast(S.DoomWinds, nil, nil, not Target:IsInMeleeRange(5)) then return "doom_winds main 16"; end
+      if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsInMeleeRange(5)) then return "doom_winds main 16"; end
     end
     -- call_action_list,name=single,if=active_enemies=1
     if Enemies10yCount == 1 then

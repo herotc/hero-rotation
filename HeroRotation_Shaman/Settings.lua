@@ -54,7 +54,9 @@ HR.GUISettings.APL.Shaman = {
       FeralSpirit = true,
       HealingSurge = false,
       Shield = false,
-      WindfuryTotem = false
+      WindfuryTotem = false,
+      DoomWinds = false,
+      Sundering = false
     },
     OffGCDasOffGCD = {
     },
