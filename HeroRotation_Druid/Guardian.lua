@@ -333,11 +333,15 @@ local function APL()
         if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
+    -- use_item,name=djaruun_pillar_of_the_elder_flame
+    if I.Djaruun:IsEquippedAndReady() then
+      if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame main 4"; end
+    end
     -- potion,if=((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)|((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!druid.catweave_bear&!druid.owlweave_bear)))
     if Settings.Commons.Enabled.Potions and ((S.HeartoftheWild:IsAvailable() and Player:BuffUp(S.HeartoftheWild)) or (Player:BuffUp(S.BerserkBuff) or Player:BuffUp(S.Incarnation))) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 8"; end
+        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 6"; end
       end
     end
     -- run_action_list,name=catweave,if=(target.cooldown.pause_action.remains|time>=30)&druid.catweave_bear=1&buff.tooth_and_claw.remains>1.5&(buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down)&(cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=2)|(buff.cat_form.up&energy>25&druid.catweave_bear=1&buff.tooth_and_claw.remains>1.5)|(buff.heart_of_the_wild.up&energy>90&druid.catweave_bear=1&buff.tooth_and_claw.remains>1.5)
