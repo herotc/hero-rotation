@@ -255,11 +255,6 @@ local function EvaluateCycleThrash(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.ThrashDebuff))
 end
 
-local function EvaluateCycleTTD(TargetUnit)
-  -- target_if=max:target.time_to_die
-  return (TargetUnit:TimeToDie())
-end
-
 -- APL Functions
 local function Precombat()
   -- Manually added: Group buff check
@@ -423,7 +418,7 @@ local function AoeBuilder()
   end
   -- shred,target_if=max:target.time_to_die,if=action.shred.damage>action.thrash_cat.damage&!buff.sudden_ambush.up
   if S.Shred:IsReady() and (S.Shred:Damage() > S.Thrash:Damage() * EnemiesCount11y and Player:BuffDown(S.SuddenAmbushBuff)) then
-    if Everyone.CastTargetIf(S.Shred, EnemiesMelee, EvaluateCycleTTD, not Target:IsInMeleeRange(8)) then return "shred aoe_builder 24"; end
+    if Everyone.CastTargetIf(S.Shred, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, not Target:IsInMeleeRange(8)) then return "shred aoe_builder 24"; end
   end
   -- thrash_cat
   if S.Thrash:IsReady() then
@@ -708,11 +703,11 @@ local function APL()
     end
     -- feral_frenzy,target_if=max:target.time_to_die,if=combo_points<2|combo_points<3&buff.bs_inc.up
     if S.FeralFrenzy:IsReady() and (ComboPoints < 2 or ComboPoints < 3 and Player:BuffUp(BsInc)) then
-      if Everyone.CastTargetIf(S.FeralFrenzy, EnemiesMelee, EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(8)) then return "feral_frenzy main 14"; end
+      if Everyone.CastTargetIf(S.FeralFrenzy, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(8)) then return "feral_frenzy main 14"; end
     end
     -- ferocious_bite,target_if=max:target.time_to_die,if=buff.apex_predators_craving.up&(spell_targets.swipe_cat=1|!talent.primal_wrath.enabled|!buff.sabertooth.up)&!(variable.need_bt&active_bt_triggers=2)
     if S.FerociousBite:IsReady() and (Player:BuffUp(S.ApexPredatorsCravingBuff) and (EnemiesCount11y == 1 or (not S.PrimalWrath:IsAvailable()) or Player:BuffDown(S.SabertoothBuff)) and not (VarNeedBT and CountActiveBtTriggers() == 2)) then
-      if Everyone.CastTargetIf(S.FerociousBite, EnemiesMelee, EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(8)) then return "ferocious_bite main 16"; end
+      if Everyone.CastTargetIf(S.FerociousBite, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(8)) then return "ferocious_bite main 16"; end
     end
     -- call_action_list,name=berserk,if=buff.bs_inc.up
     if Player:BuffUp(BsInc) then
