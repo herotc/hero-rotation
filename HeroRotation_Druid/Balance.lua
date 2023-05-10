@@ -53,6 +53,8 @@ local trinket2 = equip[14] and Item(equip[14]) or Item(0)
 -- Rotation Variables
 local VarInit = false
 local VarNoCDTalent
+local VarWrathBaseAsp
+local VarStarfireBaseAsp
 local VarSolarEclipseST
 local VarOnUseTrinket
 local VarIsAoe
@@ -176,8 +178,10 @@ end
 local function InitVars()
   -- variable,name=no_cd_talent,value=!talent.celestial_alignment&!talent.incarnation_chosen_of_elune|druid.no_cds
   VarNoCDTalent = (not S.CelestialAlignment:IsAvailable()) and (not S.IncarnationTalent:IsAvailable()) or not CDsON()
-  -- variable,name=solar_eclipse_st,value=talent.soul_of_the_forest&talent.warrior_of_elune
-  VarSolarEclipseST = S.SouloftheForest:IsAvailable() and S.WarriorofElune:IsAvailable()
+  -- variable,name=wrath_base_asp,value=8+2*talent.wild_surges
+  VarWrathBaseAsp = 8 + 2 * num(S.WildSurges:IsAvailable())
+  -- variable,name=starfire_base_asp,value=10+2*talent.wild_surges
+  VarStarfireBaseAsp = 10 + 2 * num(S.WildSurges:IsAvailable())
   -- variable,name=on_use_trinket,value=0
   VarOnUseTrinket = 0
   -- variable,name=on_use_trinket,op=add,value=trinket.1.has_proc.any&trinket.1.cooldown.duration
@@ -275,6 +279,8 @@ local function St()
   if S.WarriorofElune:IsCastable() then
     if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune st 24"; end
   end
+  -- variable,name=solar_eclipse_st,value=buff.primordial_arcanic_pulsar.value<520&cooldown.ca_inc.remains>5
+  VarSolarEclipseST = PAPValue < 520 and CaInc:CooldownRemains() > 5
   -- variable,name=enter_eclipse,value=eclipse.any_next|variable.solar_eclipse_st&buff.eclipse_solar.up&(buff.eclipse_solar.remains<action.starfire.cast_time)|!variable.solar_eclipse_st&buff.eclipse_lunar.up&(buff.eclipse_lunar.remains<action.wrath.cast_time)
   VarEnterEclipse = (EclipseAnyNext or VarSolarEclipseST and Player:BuffUp(S.EclipseSolar) and (Player:BuffRemains(S.EclipseSolar) < S.Starfire:CastTime()) or (not VarSolarEclipseST) and Player:BuffUp(S.EclipseLunar) and (Player:BuffRemains(S.EclipseLunar) < S.Wrath:CastTime()))
   -- starfire,if=variable.enter_eclipse&variable.solar_eclipse_st
@@ -339,8 +345,8 @@ local function St()
   if S.FullMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 40 and (Player:BuffRemains(S.EclipseLunar) > S.FullMoon:ExecuteTime() or Player:BuffRemains(S.EclipseSolar) > S.FullMoon:ExecuteTime())) then
     if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon st 52"; end
   end
-  -- starsurge,if=buff.starweavers_weft.up|astral_power.deficit<variable.passive_asp+(8*(1+0.5*talent.soul_of_the_forest*buff.eclipse_solar.up))|talent.astral_communion&cooldown.astral_communion.remains<3|fight_remains<5
-  if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:AstralPowerDeficit() < VarPassiveAsp + (8 * (1 + 0.5 * num(S.SouloftheForest:IsAvailable()) * num(Player:BuffUp(S.EclipseSolar)))) or S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemains() < 3 or FightRemains < 5) then
+  -- starsurge,if=buff.starweavers_weft.up|astral_power.deficit<variable.passive_asp+(variable.wrath_base_asp*(1+0.6*talent.soul_of_the_forest*buff.eclipse_solar.up))+(variable.starfire_base_asp*(1+buff.warrior_of_elune.up*0.4)+variable.passive_asp)*(buff.eclipse_solar.remains<(gcd.max*3))|talent.astral_communion&cooldown.astral_communion.remains<3|fight_remains<5
+  if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:AstralPowerDeficit() < VarPassiveAsp + (VarWrathBaseAsp * (1 + 0.6 * num(S.SouloftheForest:IsAvailable()) * num(Player:BuffUp(S.EclipseSolar)))) + (VarStarfireBaseAsp * (1 + num(Player:BuffUp(S.WarriorofEluneBuff)) * 0.4) + VarPassiveAsp) * (num(Player:BuffRemains(S.EclipseSolar) < Player:GCD() * 3)) or S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemains() < 3 or FightRemains < 5) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 54"; end
   end
   -- wild_mushroom,if=talent.fungal_growth&(!fight_style.dungeonroute|target.time_to_die>(full_recharge_time-7)|fight_remains<10)
@@ -348,8 +354,8 @@ local function St()
   if S.WildMushroom:IsCastable() and (S.FungalGrowth:IsAvailable() and ((not DungeonRoute) or Target:TimeToDie() > (S.WildMushroom:FullRechargeTime() - 7) or FightRemains < 10)) then
     if Cast(S.WildMushroom, Settings.Balance.GCDasOffGCD.WildMushroom, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 56"; end
   end
-  -- starfire,if=eclipse.in_lunar&buff.umbral_embrace.react|buff.ca_inc.up&buff.warrior_of_elune.up&buff.warrior_of_elune.stack=1
-  if S.Starfire:IsCastable() and (EclipseInLunar and Player:BuffUp(S.UmbralEmbraceBuff) or CAIncBuffUp and Player:BuffUp(S.WarriorofEluneBuff) and Player:BuffStack(S.WarriorofEluneBuff) == 1) then
+  -- starfire,if=buff.ca_inc.up&buff.warrior_of_elune.up&buff.warrior_of_elune.stack=1
+  if S.Starfire:IsCastable() and (CAIncBuffUp and Player:BuffUp(S.WarriorofEluneBuff) and Player:BuffStack(S.WarriorofEluneBuff) == 1) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire st 58"; end
   end
   -- wrath
@@ -425,10 +431,6 @@ local function AoE()
   if S.Starfall:IsReady() and (Target:TimeToDie() > 4 and (Player:BuffUp(S.StarweaversWarp) or S.Starlord:IsAvailable() and Player:BuffStack(S.StarlordBuff) < 3)) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall aoe 26"; end
   end
-  -- starfire,if=(buff.gathering_starstuff.stack=3|buff.umbral_embrace.up)&astral_power.deficit>variable.passive_asp+(8*(1+0.4*buff.warrior_of_elune.up))
-  if S.Starfire:IsCastable() and ((Player:BuffStack(S.GatheringStarstuff) == 3 or Player:BuffUp(S.UmbralEmbraceBuff)) and Player:AstralPowerDeficit() > VarPassiveAsp + (8 * (1 + 0.4 * num(Player:BuffUp(S.WarriorofEluneBuff))))) then
-    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire aoe 28"; end
-  end
   -- starsurge,if=buff.starweavers_weft.up&spell_targets.starfire<3
   if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) and EnemiesCount8ySplash < 3) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge aoe 30"; end
@@ -461,8 +463,8 @@ local function AoE()
   if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) and EnemiesCount8ySplash < 17) then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge aoe 44"; end
   end
-  -- starfire,if=spell_targets>2&buff.eclipse_lunar.up
-  if S.Starfire:IsCastable() and not Player:IsMoving() and (EnemiesCount8ySplash > 2 and Player:BuffUp(S.EclipseLunar)) then
+  -- starfire,if=spell_targets>3&buff.eclipse_lunar.up|eclipse.in_lunar
+  if S.Starfire:IsCastable() and not Player:IsMoving() and (EnemiesCount8ySplash > 3 and Player:BuffUp(S.EclipseLunar) or EclipseInLunar) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire aoe 46"; end
   end
   -- wrath
@@ -563,6 +565,10 @@ local function APL()
       if TrinketToUse then
         if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
+    end
+    -- natures_vigil
+    if S.NaturesVigil:IsCastable() then
+      if Cast(S.NaturesVigil) then return "natures_vigil main 10"; end
     end
     -- invoke_external_buff,name=power_infusion
     -- Note: Not handling external buffs
