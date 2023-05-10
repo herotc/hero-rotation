@@ -34,14 +34,20 @@ Spell.Evoker.Commons = {
   FireBreath                            = MultiSpell(357208,382266), -- with and without Font of Magic
   LivingFlame                           = Spell(361469),
   -- Talents
+  AncientFlame                          = Spell(369990),
   BlastFurnace                          = Spell(375510),
   ObsidianScales                        = Spell(363916),
+  ScarletAdaptation                     = Spell(372469),
   TipTheScales                          = Spell(370553),
   Unravel                               = Spell(368432),
+  VerdantEmbrace                        = Spell(360995),
   -- Buffs/Debuffs
+  AncientFlameBuff                      = Spell(375583),
   BlessingoftheBronzeBuff               = Spell(381748),
   FireBreathDebuff                      = Spell(357209),
+  HoverBuff                             = Spell(358267),
   LeapingFlamesBuff                     = Spell(370901),
+  PowerInfusionBuff                     = Spell(10060),
   -- Trinket Effects
   SpoilsofNeltharusCrit                 = Spell(381954),
   SpoilsofNeltharusHaste                = Spell(381955),
@@ -85,6 +91,10 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   BurnoutBuff                           = Spell(375802),
   ChargedBlastBuff                      = Spell(370454),
   EssenceBurstBuff                      = Spell(359618),
+  IridescenceBlueBuff                   = MultiSpell(386399,399370),
+  IridescenceRedBuff                    = Spell(386353),
+  LimitlessPotentialBuff                = Spell(394402),
+  PowerSwellBuff                        = Spell(376850),
   SnapfireBuff                          = Spell(370818),
   -- Debuffs
   LivingFlameDebuff                     = Spell(361500),
