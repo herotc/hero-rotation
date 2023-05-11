@@ -61,6 +61,7 @@ HR.GUISettings.APL.Druid = {
     },
     OffGCDasOffGCD = {
       Barkskin = true,
+      NaturesVigil = true,
       Renewal = true,
     }
   },

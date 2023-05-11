@@ -568,7 +568,7 @@ local function APL()
     end
     -- natures_vigil
     if S.NaturesVigil:IsCastable() then
-      if Cast(S.NaturesVigil) then return "natures_vigil main 10"; end
+      if Cast(S.NaturesVigil, Settings.Balance.OffGCDasOffGCD.NaturesVigil) then return "natures_vigil main 10"; end
     end
     -- invoke_external_buff,name=power_infusion
     -- Note: Not handling external buffs
