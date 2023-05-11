@@ -48,6 +48,7 @@ Spell.Evoker.Commons = {
   HoverBuff                             = Spell(358267),
   LeapingFlamesBuff                     = Spell(370901),
   PowerInfusionBuff                     = Spell(10060),
+  ScarletAdaptationBuff                 = Spell(372470),
   -- Trinket Effects
   SpoilsofNeltharusCrit                 = Spell(381954),
   SpoilsofNeltharusHaste                = Spell(381955),
