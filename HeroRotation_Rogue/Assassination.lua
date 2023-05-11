@@ -394,11 +394,11 @@ local function CDs ()
     end
   end
 
-  if not TargetInAoERange or not HR.CDsON() then
+  if not TargetInAoERange then
     return
   end
 
-  if not Player:StealthUp(true, false) then
+  if not Player:StealthUp(true, false) and HR.CDsON() then
     -- actions.cds+=/sepsis,if=!stealthed.rogue&!stealthed.improved_garrote&(!talent.improved_garrote&dot.garrote.ticking|talent.improved_garrote&cooldown.garrote.up)&(target.time_to_die>10|fight_remains<10)
     if S.Sepsis:IsReady() and ImprovedGarroteRemains() == 0 and (S.ImprovedGarrote:IsAvailable() and S.Garrote:CooldownUp() or Target:DebuffUp(S.Garrote))
       and (Target:FilteredTimeToDie(">", 10) or HL.BossFilteredFightRemains("<=", 10)) then
@@ -456,9 +456,6 @@ local function CDs ()
           if Cast(S.Exsanguinate, Settings.Assassination.GCDasOffGCD.Exsanguinate) then return "Cast Exsanguinate" end
         end
       end
-      if S.ResoundingClarity:IsAvailable() and S.EchoingReprimand:IsReady() and ExsanguinateSyncRemains > 40 then
-        if Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle, not TargetInMeleeRange) then return "Cast Echoing Reprimand (Exsang Desync)" end
-      end
     end
   end
   -- actions.cds+=/shiv,if=talent.kingsbane&!debuff.shiv.up&dot.kingsbane.ticking&dot.garrote.ticking&dot.rupture.ticking&(!talent.crimson_tempest.enabled|variable.single_target|dot.crimson_tempest.ticking)
@@ -495,11 +492,15 @@ local function CDs ()
       or HL.BossFilteredFightRemains("<", S.ThistleTea:Charges() * 6)) then
     if HR.Cast(S.ThistleTea, Settings.Commons.OffGCDasOffGCD.ThistleTea) then return "Cast Thistle Tea" end
   end
+
+  if not HR.CDsON() then
+    return
+  end
+
   -- actions.cds+=/indiscriminate_carnage,if=(spell_targets.fan_of_knives>desired_targets|spell_targets.fan_of_knives>1&raid_event.adds.in>60)&(!talent.improved_garrote|cooldown.vanish.remains>45)
   if S.IndiscriminateCarnage:IsReady() and MeleeEnemies10yCount > 1 and (not S.ImprovedGarrote:IsAvailable() or S.Vanish:CooldownRemains() > 45) then
     if Cast(S.IndiscriminateCarnage, Settings.Assassination.OffGCDasOffGCD.IndiscriminateCarnage) then return "Cast Indiscriminate Carnage" end
   end
-
   -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|debuff.vendetta.up&cooldown.vanish.remains<5
   -- Racials
   if S.Deathmark:AnyDebuffUp() and (not ShouldReturn or Settings.Commons.OffGCDasOffGCD.Racials) then
@@ -698,7 +699,7 @@ local function Direct ()
     end
   end
   -- actions.direct+=/echoing_reprimand,if=(!talent.exsanguinate|!talent.resounding_clarity)&variable.use_filler&cooldown.deathmark.remains>10|fight_remains<20
-  if CDsON() and S.EchoingReprimand:IsReady() and ((not S.Exsanguinate:IsAvailable() or not S.ResoundingClarity:IsAvailable())
+  if CDsON() and S.EchoingReprimand:IsReady() and ((not S.Exsanguinate:IsAvailable() or not S.ResoundingClarity:IsAvailable() or ExsanguinateSyncRemains > 40)
     and (not S.Deathmark:IsAvailable() or S.Deathmark:CooldownRemains() > 10) or HL.BossFilteredFightRemains("<=", 20)) then
     if Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle, not TargetInMeleeRange) then return "Cast Echoing Reprimand" end
   end
