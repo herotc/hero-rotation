@@ -467,20 +467,10 @@
   -- Is the player ready ?
   function HR.Ready ()
     local AreWeReady
-    local VehicleException = false
-    local VehicleExceptionSpells = {
-      377222, -- Treemouth Consume
-    }
-    for i = 1, #VehicleExceptionSpells do
-      if Player:DebuffUp(Spell(VehicleExceptionSpells[i])) or Player:BuffUp(Spell(VehicleExceptionSpells[i])) then
-        VehicleException = true
-        break
-      end
-    end
     if HR.GUISettings.General.ShowWhileMounted then
-      AreWeReady = not Player:IsDeadOrGhost() and ((not Player:IsInVehicle()) or VehicleException) and not C_PetBattles.IsInBattle();
+      AreWeReady = not Player:IsDeadOrGhost() and not Player:IsInVehicle() and not C_PetBattles.IsInBattle();
     else
-      AreWeReady = not Player:IsDeadOrGhost() and not Player:IsMounted() and ((not Player:IsInVehicle()) or VehicleException) and not C_PetBattles.IsInBattle();
+      AreWeReady = not Player:IsDeadOrGhost() and not Player:IsMounted() and not Player:IsInVehicle() and not C_PetBattles.IsInBattle();
     end
     return AreWeReady
   end
