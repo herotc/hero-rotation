@@ -253,14 +253,14 @@ local function APL()
     end
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,slot=trinket1
-      local Trinket1ToUse = Player:GetUseableTrinkets(OnUseExcludes, 13)
+      local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
       if Trinket1ToUse then
-        if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 main 14"; end
+        if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 main 14"; end
       end
       -- use_item,slot=trinket2
-      local Trinket2ToUse = Player:GetUseableTrinkets(OnUseExcludes, 14)
+      local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
       if Trinket2ToUse then
-        if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 main 16"; end
+        if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 main 16"; end
       end
     end
     -- variable,name=the_hunt_on_cooldown,value=talent.the_hunt&cooldown.the_hunt.remains|!talent.the_hunt

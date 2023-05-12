@@ -182,7 +182,7 @@ local function Precombat()
     if Cast(S.Salvo, Settings.Marksmanship.OffGCDasOffGCD.Salvo) then return "salvo precombat 3"; end
   end
   -- use_item,name=algethar_puzzle_box
-  if I.AlgetharPuzzleBox:IsEquippedAndReady() then
+  if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() then
     if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 4"; end
   end
   -- aimed_shot,if=active_enemies<3&(!talent.volley|active_enemies<2)
@@ -444,10 +444,14 @@ local function Trinkets()
     if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box trinkets 2"; end
   end
   -- use_items,slots=trinket1,if=!trinket.1.has_use_buff|buff.trueshot.up
+  local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes)
+  if Trinket1ToUse and ((not Trinket1ToUse:TrinketHasUseBuff()) or Player:BuffUp(S.TrueshotBuff)) then
+    if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name(); end
+  end
   -- use_items,slots=trinket2,if=!trinket.2.has_use_buff|buff.trueshot.up
-  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-  if TrinketToUse and ((not TrinketToUse:TrinketHasUseBuff()) or Player:BuffUp(S.TrueshotBuff)) then
-    if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+  local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes)
+  if Trinket2ToUse and ((not Trinket2ToUse:TrinketHasUseBuff()) or Player:BuffUp(S.TrueshotBuff)) then
+    if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name(); end
   end
 end
 

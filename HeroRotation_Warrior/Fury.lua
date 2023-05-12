@@ -68,7 +68,7 @@ local function Precombat()
     if Cast(S.BerserkerStance) then return "berserker_stance precombat 2"; end
   end
   -- use_item,name=algethar_puzzle_box
-  if CDsON() and I.AlgetharPuzzleBox:IsEquippedAndReady() then
+  if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() then
     if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 4"; end
   end
   -- avatar,if=!talent.titans_torment
@@ -405,10 +405,16 @@ local function APL()
         if I.CrimsonGladiatorsBadgeofFerocity:IsEquippedAndReady() and (S.Recklessness:CooldownRemains() > 10 and (Player:BuffUp(S.RecklessnessBuff) or FightRemains < 11 or FightRemains > 65)) then
           if Cast(I.CrimsonGladiatorsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge main 16"; end
         end
+      end
+      if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
         -- Manually added: use_items generic
-        local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-        if TrinketToUse then
-          if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+        local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+        if ItemToUse then
+          local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+          if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+          if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+            if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+          end
         end
       end
       -- ravager,if=cooldown.recklessness.remains<3|buff.recklessness.up

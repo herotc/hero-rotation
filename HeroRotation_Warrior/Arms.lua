@@ -509,17 +509,19 @@ local function APL()
         if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 10"; end
       end
       -- use_item,name=manic_grieftorch
-      if Settings.Commons.Enabled.Trinkets then
-        if I.ManicGrieftorch:IsEquippedAndReady() then
-          if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch main 46"; end
-        end
+      if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() then
+        if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch main 46"; end
       end
     end
-    if CDsON() and (Settings.Commons.Enabled.Trinkets) then
+    if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
       -- use_items
-      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+      local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+      if ItemToUse then
+        local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+        if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+          if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+        end
       end
     end
     -- run_action_list,name=hac,if=raid_event.adds.exists|active_enemies>2

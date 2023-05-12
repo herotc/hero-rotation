@@ -469,7 +469,7 @@ local function APL()
     -- wind_shear
     local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
-    if (Settings.Commons.Enabled.Trinkets) then
+    if Settings.Commons.Enabled.Trinkets then
       -- use_item,name=the_first_sigil,if=(talent.ascendance.enabled&raid_event.adds.in>=90&cooldown.ascendance.remains<10)|(talent.hot_hand.enabled&buff.molten_weapon.up)|buff.icy_edge.up|(talent.stormflurry.enabled&buff.crackling_surge.up)|active_enemies>1|fight_remains<30
       if I.TheFirstSigil:IsEquippedAndReady() and ((S.Ascendance:IsAvailable() and S.Ascendance:CooldownRemains() < 10) or (S.HotHand:IsAvailable() and Player:BuffUp(S.MoltenWeaponBuff)) or Player:BuffUp(S.IcyEdgeBuff) or (S.Stormflurry:IsAvailable() and Player:BuffUp(S.CracklingSurgeBuff)) or Enemies10yCount > 1 or FightRemains < 30) then
         if Cast(I.TheFirstSigil, nil, Settings.Commons.DisplayStyle.Trinkets) then return "the_first_sigil main 6"; end
@@ -482,13 +482,19 @@ local function APL()
       if I.ScarsofFraternalStrife:IsEquippedAndReady() and (Player:BuffDown(S.ScarsofFraternalStrifeBuff4) or FightRemains < 31 or Enemies10yCount > 1) then
         if Cast(I.ScarsofFraternalStrife, nil, Settings.Commons.DisplayStyle.Trinkets) then return "scars_of_fraternal_strife main 10"; end
       end
-      -- use_items,slots=trinket1,if=!variable.trinket1_is_weird
-      -- use_items,slots=trinket2,if=!variable.trinket2_is_weird
-      -- Note: These variables just exclude the above three trinkets from the generic use_items. We'll just use HR's OnUseExcludes instead.
-      -- use_items
-      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
+    -- use_items,slots=trinket1,if=!variable.trinket1_is_weird
+    -- use_items,slots=trinket2,if=!variable.trinket2_is_weird
+    -- Note: These variables just exclude the above three trinkets from the generic use_items. We'll just use HR's OnUseExcludes instead.
+    -- use_items
+    if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
+      local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+      if ItemToUse then
+        local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+        if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+          if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+        end
       end
     end
     if (CDsON()) then

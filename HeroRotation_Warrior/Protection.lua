@@ -113,7 +113,7 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   -- use_item,name=algethar_puzzle_box
-  if CDsON() and I.AlgethaPuzzleBox:IsEquippedAndReady() then
+  if Settings.Commons.Enabled.Trinkets and I.AlgethaPuzzleBox:IsEquippedAndReady() then
     if Cast(I.AlgethaPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat"; end
   end
   -- Manually added opener
@@ -252,10 +252,14 @@ local function APL()
     -- charge,if=time=0
     -- Note: Handled in Precombat
     -- use_items
-    if CDsON() and Settings.Commons.Enabled.Trinkets then
-      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
+      local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+      if ItemToUse then
+        local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+        if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+          if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+        end
       end
     end
     -- avatar

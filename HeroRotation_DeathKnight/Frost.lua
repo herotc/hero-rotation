@@ -39,11 +39,6 @@ local OnUseExcludes = {
   I.AlgetharPuzzleBox:ID(),
 }
 
--- Trinket Item Objects
-local equip = Player:GetEquipment()
-local trinket1 = equip[13] and Item(equip[13]) or Item(0)
-local trinket2 = equip[14] and Item(equip[14]) or Item(0)
-
 -- Rotation Var
 local no_heal
 local UsingRazorice
@@ -94,10 +89,6 @@ local UsingHysteria = (MainHandRuneforge == "6243" or OffHandRuneforge == "6243"
 local Using2H = IsEquippedItemType("Two-Hand")
 
 HL:RegisterForEvent(function()
-  equip = Player:GetEquipment()
-  trinket1 = equip[13] and Item(equip[13]) or Item(0)
-  trinket2 = equip[14] and Item(equip[14]) or Item(0)
-
   MainHandLink = GetInventoryItemLink("player", 16) or ""
   OffHandLink = GetInventoryItemLink("player", 17) or ""
   _, _, MainHandRuneforge = strsplit(":", MainHandLink)
@@ -529,7 +520,7 @@ end
 
 local function Trinkets()
   -- use_item,name=algethar_puzzle_box,if=!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains<2&(!talent.breath_of_sindragosa|runic_power>60&(buff.breath_of_sindragosa.up|cooldown.breath_of_sindragosa.remains<2))
-  if I.AlgetharPuzzleBox:IsEquippedAndReady() and (Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() < 2 and ((not S.BreathofSindragosa:IsAvailable()) or Player:RunicPower() > 60 and (Player:BuffUp(S.BreathofSindragosa) or S.BreathofSindragosa:CooldownRemains() < 2))) then
+  if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() and (Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() < 2 and ((not S.BreathofSindragosa:IsAvailable()) or Player:RunicPower() > 60 and (Player:BuffUp(S.BreathofSindragosa) or S.BreathofSindragosa:CooldownRemains() < 2))) then
     if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box trinkets 2"; end
   end
   -- use_item,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!buff.pillar_of_frost.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&(buff.breath_of_sindragosa.up|buff.pillar_of_frost.up)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
@@ -537,9 +528,13 @@ local function Trinkets()
   -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|(trinket.1.cast_time>0&!buff.pillar_of_frost.up|!trinket.1.cast_time>0)|talent.pillar_of_frost&cooldown.pillar_of_frost.remains_expected>20|!talent.pillar_of_frost)
   -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|(trinket.2.cast_time>0&!buff.pillar_of_frost.up|!trinket.2.cast_time>0)|talent.pillar_of_frost&cooldown.pillar_of_frost.remains_expected>20|!talent.pillar_of_frost)
   -- TODO: Trinket stuff. Until then, have a generic trinket usage function.
-  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-  if TrinketToUse then
-    if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+  local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+  if ItemToUse then
+    local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+    if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+    if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+      if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+    end
   end
 end
 
@@ -656,7 +651,7 @@ local function APL()
       if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter main 18"; end
     end
     -- call_action_list,name=trinkets
-    if Settings.Commons.Enabled.Trinkets then
+    if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cooldowns

@@ -582,9 +582,15 @@ local function APL()
       if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks main 10"; end
     end
     -- use_items
-    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-    if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "General use_items for " .. TrinketToUse:Name(); end
+    if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
+      local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+      if ItemToUse then
+        local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+        if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+          if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+        end
+      end
     end
     -- auto_attack
     -- natures_swiftness

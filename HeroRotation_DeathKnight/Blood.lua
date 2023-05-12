@@ -156,9 +156,13 @@ local function Trinkets()
   -- Note: Can't handle trinket stat buff checking, so using a generic trinket call
   -- use_items,if=(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)
   if (Player:BuffUp(S.DancingRuneWeaponBuff) or (not S.DancingRuneWeapon:IsAvailable()) or S.DancingRuneWeapon:CooldownRemains() > 20) then
-    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-    if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+    if ItemToUse then
+      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+      end
     end
   end
 end
@@ -360,7 +364,7 @@ local function APL()
       end
     end
     -- call_action_list,name=trinkets
-    if (Settings.Commons.Enabled.Trinkets) then
+    if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- raise_dead

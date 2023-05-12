@@ -274,48 +274,54 @@ local function AoEVariables()
 end
 
 local function Trinkets()
-  -- use_item,name=voidmenders_shadowgem,if=buff.power_infusion.up|fight_remains<20
-  if I.VoidmendersShadowgem:IsEquippedAndReady() and (Player:BuffUp(S.PowerInfusionBuff) or FightRemains < 20) then
-    if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem trinkets 2"; end
-  end
-  -- use_item,name=darkmoon_deck_box_inferno
-  if I.DMDInferno:IsEquippedAndReady() then
-    if Cast(I.DMDInferno, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_inferno trinkets 4"; end
-  end
-  if I.DMDInfernoBox:IsEquippedAndReady() then
-    if Cast(I.DMDInfernoBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_inferno_box trinkets 6"; end
-  end
-  -- use_item,name=darkmoon_deck_box_rime
-  if I.DMDRime:IsEquippedAndReady() then
-    if Cast(I.DMDRime, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_rime trinkets 8"; end
-  end
-  if I.DMDRimeBox:IsEquippedAndReady() then
-    if Cast(I.DMDRimeBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_rime_box trinkets 10"; end
-  end
-  -- use_item,name=darkmoon_deck_box_dance
-  if I.DMDDance:IsEquippedAndReady() then
-    if Cast(I.DMDDance, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_dance trinkets 12"; end
-  end
-  if I.DMDDanceBox:IsEquippedAndReady() then
-    if Cast(I.DMDDanceBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_dance_box trinkets 14"; end
-  end
-  -- use_item,name=erupting_spear_fragment,if=buff.power_infusion.up|raid_event.adds.up|fight_remains<20
-  if I.EruptingSpearFragment:IsEquippedAndReady() and (Player:BuffUp(S.PowerInfusionBuff) or FightRemains < 20) then
-    if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment trinkets 16"; end
-  end
-  -- use_item,name=beacon_to_the_beyond,if=!raid_event.adds.exists|raid_event.adds.up|spell_targets.beacon_to_the_beyond>=5|fight_remains<20
-  if I.BeacontotheBeyond:IsEquippedAndReady() then
-    if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond trinkets 18"; end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,name=voidmenders_shadowgem,if=buff.power_infusion.up|fight_remains<20
+    if I.VoidmendersShadowgem:IsEquippedAndReady() and (Player:BuffUp(S.PowerInfusionBuff) or FightRemains < 20) then
+      if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem trinkets 2"; end
+    end
+    -- use_item,name=darkmoon_deck_box_inferno
+    if I.DMDInferno:IsEquippedAndReady() then
+      if Cast(I.DMDInferno, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_inferno trinkets 4"; end
+    end
+    if I.DMDInfernoBox:IsEquippedAndReady() then
+      if Cast(I.DMDInfernoBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_inferno_box trinkets 6"; end
+    end
+    -- use_item,name=darkmoon_deck_box_rime
+    if I.DMDRime:IsEquippedAndReady() then
+      if Cast(I.DMDRime, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_rime trinkets 8"; end
+    end
+    if I.DMDRimeBox:IsEquippedAndReady() then
+      if Cast(I.DMDRimeBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_rime_box trinkets 10"; end
+    end
+    -- use_item,name=darkmoon_deck_box_dance
+    if I.DMDDance:IsEquippedAndReady() then
+      if Cast(I.DMDDance, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_dance trinkets 12"; end
+    end
+    if I.DMDDanceBox:IsEquippedAndReady() then
+      if Cast(I.DMDDanceBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_dance_box trinkets 14"; end
+    end
+    -- use_item,name=erupting_spear_fragment,if=buff.power_infusion.up|raid_event.adds.up|fight_remains<20
+    if I.EruptingSpearFragment:IsEquippedAndReady() and (Player:BuffUp(S.PowerInfusionBuff) or FightRemains < 20) then
+      if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment trinkets 16"; end
+    end
+    -- use_item,name=beacon_to_the_beyond,if=!raid_event.adds.exists|raid_event.adds.up|spell_targets.beacon_to_the_beyond>=5|fight_remains<20
+    if I.BeacontotheBeyond:IsEquippedAndReady() then
+      if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond trinkets 18"; end
+    end
   end
   -- use_items,if=buff.voidform.up|buff.power_infusion.up|buff.dark_ascension.up|(cooldown.void_eruption.remains>10&trinket.cooldown.duration<=60)|fight_remains<20
   if (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or Player:BuffUp(S.DarkAscensionBuff) or FightRemains < 20) then
-    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-    if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+    if ItemToUse then
+      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+      end
     end
   end
   -- use_item,name=desperate_invokers_codex
-  if I.DesperateInvokersCodex:IsEquippedAndReady() then
+  if Settings.Commons.Enabled.Trinkets and I.DesperateInvokersCodex:IsEquippedAndReady() then
     if Cast(I.DesperateInvokersCodex, nil, Settings.Commons.DisplayStyle.Trinkets) then return "desperate_invokers_codex trinkets 20"; end
   end
 end
@@ -421,7 +427,7 @@ local function CDs()
     if Cast(S.DarkAscension, Settings.Shadow.GCDasOffGCD.DarkAscension) then return "dark_ascension cds 16"; end
   end
   -- call_action_list,name=trinkets
-  if Settings.Commons.Enabled.Trinkets then
+  if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
     local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
   end
   -- desperate_prayer,if=health.pct<=75
@@ -606,7 +612,7 @@ local function APL()
     VarFiendRemains = 15 - Fiend:TimeSinceLastCast()
     if VarFiendRemains < 0 then VarFiendRemains = 0 end
 
-    -- If MF:Insanity buff is up, change which flay we use_item
+    -- If MF:Insanity buff is up, change which flay we use
     Flay = (Player:BuffUp(S.MindFlayInsanityBuff)) and S.MindFlayInsanity or S.MindFlay
 
     -- Calculate GCDMax for gcd.max

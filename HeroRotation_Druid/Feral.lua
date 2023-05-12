@@ -270,7 +270,7 @@ local function Precombat()
     if Cast(S.HeartoftheWild) then return "heart_of_the_wild precombat 4"; end
   end
   -- use_item,name=algethar_puzzle_box
-  if I.AlgetharPuzzleBox:IsEquippedAndReady() then
+  if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() then
     if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 6"; end
   end
   -- prowl,if=!buff.prowl.up
@@ -577,13 +577,15 @@ local function Berserk()
 end
 
 local function Cooldown()
-  -- use_item,name=algethar_puzzle_box,if=fight_remains<35|(!variable.align_3minutes)
-  if I.AlgetharPuzzleBox:IsEquippedAndReady() and (FightRemains < 35 or not VarAlign3Mins) then
-    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldown 2"; end
-  end
-  -- use_item,name=algethar_puzzle_box,if=variable.align_3minutes&(cooldown.bs_inc.remains<3&(!variable.lastZerk|!variable.lastConvoke|(variable.lastConvoke&cooldown.convoke_the_spirits.remains<13)))
-  if I.AlgetharPuzzleBox:IsEquippedAndReady() and (VarAlign3Mins and (BsInc:CooldownRemains() < 3 and ((not VarLastZerk) or (not VarLastConvoke) or (VarLastConvoke and S.ConvoketheSpirits:CooldownRemains() < 13)))) then
-    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldown 4"; end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,name=algethar_puzzle_box,if=fight_remains<35|(!variable.align_3minutes)
+    if I.AlgetharPuzzleBox:IsEquippedAndReady() and (FightRemains < 35 or not VarAlign3Mins) then
+      if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldown 2"; end
+    end
+    -- use_item,name=algethar_puzzle_box,if=variable.align_3minutes&(cooldown.bs_inc.remains<3&(!variable.lastZerk|!variable.lastConvoke|(variable.lastConvoke&cooldown.convoke_the_spirits.remains<13)))
+    if I.AlgetharPuzzleBox:IsEquippedAndReady() and (VarAlign3Mins and (BsInc:CooldownRemains() < 3 and ((not VarLastZerk) or (not VarLastConvoke) or (VarLastConvoke and S.ConvoketheSpirits:CooldownRemains() < 13)))) then
+      if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldown 4"; end
+    end
   end
   -- incarnation
   if S.Incarnation:IsReady() then
@@ -613,14 +615,18 @@ local function Cooldown()
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(8)) then return "convoke_the_spirits cooldown 16"; end
   end
   -- use_item,name=manic_grieftorch,target_if=max:target.time_to_die,if=energy.deficit>40
-  if I.ManicGrieftorch:IsEquippedAndReady() and (Player:EnergyDeficit() > 40) then
+  if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() and (Player:EnergyDeficit() > 40) then
     if Everyone.CastTargetIf(I.ManicGrieftorch, Enemies11y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch cooldown 18"; end
   end
   -- use_items
-  if (Settings.Commons.Enabled.Trinkets) then
-    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-    if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+  if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
+    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+    if ItemToUse then
+      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+      end
     end
   end
 end

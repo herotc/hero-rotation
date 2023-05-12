@@ -170,31 +170,37 @@ end
 local function Items()
   -- use_items,if=pet.infernal.active|!talent.summon_infernal|time_to_die<21
   if (InfernalTime() > 0 or (not S.SummonInfernal:IsAvailable()) or FightRemains < 21) then
-    local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
-    if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+    if ItemToUse then
+      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+      end
     end
   end
-  --TODO manage trinkets
-  --use_item,slot=trinket1,if=pet.infernal.active|!talent.summon_infernal|fight_remains<21|trinket.1.cooldown.duration<cooldown.summon_infernal.remains+5
-  --use_item,slot=trinket2,if=pet.infernal.active|!talent.summon_infernal|fight_remains<21|trinket.2.cooldown.duration<cooldown.summon_infernal.remains+5
-  --use_item,slot=trinket1,if=(!talent.rain_of_chaos&fight_remains<cooldown.summon_infernal.remains+trinket.1.cooldown.duration&fight_remains>trinket.1.cooldown.duration)|fight_remains<cooldown.summon_infernal.remains|(trinket.2.cooldown.remains>0&trinket.2.cooldown.remains<cooldown.summon_infernal.remains)
-  --use_item,slot=trinket2,if=(!talent.rain_of_chaos&fight_remains<cooldown.summon_infernal.remains+trinket.2.cooldown.duration&fight_remains>trinket.2.cooldown.duration)|fight_remains<cooldown.summon_infernal.remains|(trinket.1.cooldown.remains>0&trinket.1.cooldown.remains<cooldown.summon_infernal.remains)
-  --use_item,name=erupting_spear_fragment,if=(!talent.rain_of_chaos&fight_remains<cooldown.summon_infernal.remains+trinket.erupting_spear_fragment.cooldown.duration&fight_remains>trinket.erupting_spear_fragment.cooldown.duration)|fight_remains<cooldown.summon_infernal.remains|trinket.erupting_spear_fragment.cooldown.duration<cooldown.summon_infernal.remains+5
-  if I.EruptingSpearFragment:IsEquippedAndReady() and (((not S.RainofChaos:IsAvailable()) and FightRemains < S.SummonInfernal:CooldownRemains() + 90 and FightRemains > 90) or FightRemains < S.SummonInfernal:CooldownRemains() or 90 < S.SummonInfernal:CooldownRemains() + 5) then
-    if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment items 2"; end
-  end
-  --use_item,name=desperate_invokers_codex
-  if I.DesperateInvokersCodex:IsEquippedAndReady() then
-    if Cast(I.DesperateInvokersCodex, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "desperate_invokers_codex items 4"; end
-  end
-  --use_item,name=iceblood_deathsnare
-  if I.IcebloodDeathsnare:IsEquippedAndReady() then
-    if Cast(I.IcebloodDeathsnare, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "iceblood_deathsnare items 6"; end
-  end
-  --use_item,name=conjured_chillglobe
-  if I.ConjuredChillglobe:IsEquippedAndReady() then
-    if Cast(I.ConjuredChillglobe, nil, Settings.Commons.DisplayStyle.Trinkets) then return "conjured_chillglobe items 8"; end
+  if Settings.Commons.Enabled.Trinkets then
+    --TODO manage trinkets
+    --use_item,slot=trinket1,if=pet.infernal.active|!talent.summon_infernal|fight_remains<21|trinket.1.cooldown.duration<cooldown.summon_infernal.remains+5
+    --use_item,slot=trinket2,if=pet.infernal.active|!talent.summon_infernal|fight_remains<21|trinket.2.cooldown.duration<cooldown.summon_infernal.remains+5
+    --use_item,slot=trinket1,if=(!talent.rain_of_chaos&fight_remains<cooldown.summon_infernal.remains+trinket.1.cooldown.duration&fight_remains>trinket.1.cooldown.duration)|fight_remains<cooldown.summon_infernal.remains|(trinket.2.cooldown.remains>0&trinket.2.cooldown.remains<cooldown.summon_infernal.remains)
+    --use_item,slot=trinket2,if=(!talent.rain_of_chaos&fight_remains<cooldown.summon_infernal.remains+trinket.2.cooldown.duration&fight_remains>trinket.2.cooldown.duration)|fight_remains<cooldown.summon_infernal.remains|(trinket.1.cooldown.remains>0&trinket.1.cooldown.remains<cooldown.summon_infernal.remains)
+    --use_item,name=erupting_spear_fragment,if=(!talent.rain_of_chaos&fight_remains<cooldown.summon_infernal.remains+trinket.erupting_spear_fragment.cooldown.duration&fight_remains>trinket.erupting_spear_fragment.cooldown.duration)|fight_remains<cooldown.summon_infernal.remains|trinket.erupting_spear_fragment.cooldown.duration<cooldown.summon_infernal.remains+5
+    if I.EruptingSpearFragment:IsEquippedAndReady() and (((not S.RainofChaos:IsAvailable()) and FightRemains < S.SummonInfernal:CooldownRemains() + 90 and FightRemains > 90) or FightRemains < S.SummonInfernal:CooldownRemains() or 90 < S.SummonInfernal:CooldownRemains() + 5) then
+      if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment items 2"; end
+    end
+    --use_item,name=desperate_invokers_codex
+    if I.DesperateInvokersCodex:IsEquippedAndReady() then
+      if Cast(I.DesperateInvokersCodex, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "desperate_invokers_codex items 4"; end
+    end
+    --use_item,name=iceblood_deathsnare
+    if I.IcebloodDeathsnare:IsEquippedAndReady() then
+      if Cast(I.IcebloodDeathsnare, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "iceblood_deathsnare items 6"; end
+    end
+    --use_item,name=conjured_chillglobe
+    if I.ConjuredChillglobe:IsEquippedAndReady() then
+      if Cast(I.ConjuredChillglobe, nil, Settings.Commons.DisplayStyle.Trinkets) then return "conjured_chillglobe items 8"; end
+    end
   end
 end
 
@@ -273,7 +279,7 @@ end
 
 local function Cleave()
   -- call_action_list,name=items
-  if CDsON() and Settings.Commons.Enabled.Trinkets then
+  if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=ogcd
@@ -410,7 +416,7 @@ local function Aoe()
     local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=items
-  if CDsON() and Settings.Commons.Enabled.Trinkets then
+  if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Trinkets) then
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=havoc,if=havoc_active&havoc_remains>gcd.max&active_enemies<5+(talent.cry_havoc&!talent.inferno)&(!cooldown.summon_infernal.up|!talent.summon_infernal)
@@ -551,7 +557,7 @@ local function APL()
       local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=items
-    if CDsON() and Settings.Commons.Enabled.Trinkets then
+    if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Trinkets) then
       local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=ogcd

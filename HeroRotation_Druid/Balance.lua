@@ -549,21 +549,27 @@ local function APL()
         if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion 4"; end
       end
     end
-    if (Settings.Commons.Enabled.Trinkets) then
+    if Settings.Commons.Enabled.Trinkets then
       -- use_items,slots=trinket1,if=variable.on_use_trinket!=1&!trinket.2.ready_cooldown|(variable.on_use_trinket=1|variable.on_use_trinket=3)&buff.ca_inc.up|variable.no_cd_talent|fight_remains<20|variable.on_use_trinket=0
-      local Trinket1ToUse = Player:GetUseableTrinkets(OnUseExcludes, 13)
+      local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
       if Trinket1ToUse and (VarOnUseTrinket ~= 1 and (not trinket2:IsReady()) or (VarOnUseTrinket == 1 or VarOnUseTrinket == 3) and CAIncBuffUp or VarNoCDTalent or FightRemains < 20 or VarOnUseTrinket == 0) then
-        if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket1 main 6"; end
+        if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 main 6"; end
       end
       -- use_items,slots=trinket2,if=variable.on_use_trinket!=2&!trinket.1.ready_cooldown|variable.on_use_trinket=2&buff.ca_inc.up|variable.no_cd_talent|fight_remains<20|variable.on_use_trinket=0
-      local Trinket2ToUse = Player:GetUseableTrinkets(OnUseExcludes, 14)
+      local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
       if Trinket2ToUse and (VarOnUseTrinket ~= 2 and (not trinket1:IsReady()) or VarOnUseTrinket == 2 and CAIncBuffUp or VarNoCDTalent or FightRemains < 20 or VarOnUseTrinket == 0) then
-        if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets) then return "trinket2 main 8"; end
+        if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 main 8"; end
       end
-      -- use_items
-      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
+    -- use_items
+    if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
+      local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+      if ItemToUse then
+        local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+        if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+          if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+        end
       end
     end
     -- natures_vigil

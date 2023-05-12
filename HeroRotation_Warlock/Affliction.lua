@@ -136,18 +136,24 @@ end
 local function Items()
   -- use_items,if=variable.cds_active
   if (VarCDsActive) then
-    local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
-    if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+    if ItemToUse then
+      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+      end
     end
   end
-  -- use_item,name=desperate_invokers_codex
-  if I.DesperateInvokersCodex:IsEquippedAndReady() then
-    if Cast(I.DesperateInvokersCodex, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "desperate_invokers_codex items 2"; end
-  end
-  -- use_item,name=conjured_chillglobe
-  if I.ConjuredChillglobe:IsEquippedAndReady() then
-    if Cast(I.ConjuredChillglobe, nil, Settings.Commons.DisplayStyle.Trinkets) then return "conjured_chillglobe items 4"; end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,name=desperate_invokers_codex
+    if I.DesperateInvokersCodex:IsEquippedAndReady() then
+      if Cast(I.DesperateInvokersCodex, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "desperate_invokers_codex items 2"; end
+    end
+    -- use_item,name=conjured_chillglobe
+    if I.ConjuredChillglobe:IsEquippedAndReady() then
+      if Cast(I.ConjuredChillglobe, nil, Settings.Commons.DisplayStyle.Trinkets) then return "conjured_chillglobe items 4"; end
+    end
   end
 end
 
@@ -183,7 +189,7 @@ local function AoE()
     local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=items
-  if CDsON() and Settings.Commons.Enabled.Trinkets then
+  if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
   end
   -- haunt
@@ -258,7 +264,7 @@ local function Cleave()
     local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=items
-  if CDsON() and Settings.Commons.Enabled.Trinkets then
+  if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
   end
   -- haunt
@@ -404,7 +410,7 @@ local function APL()
       local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=items
-    if CDsON() and Settings.Commons.Enabled.Trinkets then
+    if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
       local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
     end
     -- malefic_rapture,if=talent.dread_touch&talent.malefic_affliction&debuff.dread_touch.remains<2&buff.malefic_affliction.stack=3

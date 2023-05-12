@@ -171,7 +171,7 @@ end
 
 local function Trinkets()
   -- use_item,name=spoils_of_neltharus,if=buff.dragonrage.up&(active_enemies>=3|!buff.spoils_of_neltharus_vers.up|buff.dragonrage.remains+4*(cooldown.eternity_surge.remains<=gcd.max*2+cooldown.fire_breath.remains<=gcd.max*2)<=18)|fight_remains<=20
-  if I.SpoilsofNeltharus:IsEquippedAndReady() and (VarDragonrageUp and (EnemiesCount8ySplash >= 3 or Player:BuffDown(S.SpoilsofNeltharusVers) or VarDragonrageRemains + 4 * num(S.EternitySurge:CooldownRemains() <= GCDMax * 2 + num(S.FireBreath:CooldownRemains() <= GCDMax * 2)) <= 18) or FightRemains <= 20) then
+  if Settings.Commons.Enabled.Trinkets and I.SpoilsofNeltharus:IsEquippedAndReady() and (VarDragonrageUp and (EnemiesCount8ySplash >= 3 or Player:BuffDown(S.SpoilsofNeltharusVers) or VarDragonrageRemains + 4 * num(S.EternitySurge:CooldownRemains() <= GCDMax * 2 + num(S.FireBreath:CooldownRemains() <= GCDMax * 2)) <= 18) or FightRemains <= 20) then
     if Cast(I.SpoilsofNeltharus, nil, Settings.Commons.DisplayStyle.Trinkets) then return "spoils_of_neltharus trinkets 2"; end
   end
   -- use_item,slot=trinket1,if=buff.dragonrage.up&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1|variable.trinket_2_exclude)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)
@@ -181,9 +181,13 @@ local function Trinkets()
   -- Note: Can't handle above trinket tracking, so let's use a generic fallback. When we can do above tracking, the below can be removed.
   -- use_items,if=buff.dragonrage.up|variable.next_dragonrage>20|!talent.dragonrage
   if (VarDragonrageUp or VarNextDragonrage > 20 or not S.Dragonrage:IsAvailable()) then
-    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-    if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+    if ItemToUse then
+      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+      end
     end
   end
 end
@@ -456,7 +460,7 @@ local function APL()
       if Cast(S.Unravel, Settings.Devastation.GCDasOffGCD.Unravel, nil, not Target:IsSpellInRange(S.Unravel)) then return "unravel main 4"; end
     end
     -- call_action_list,name=trinkets
-    if Settings.Commons.Enabled.Trinkets then
+    if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=aoe,if=active_enemies>=3

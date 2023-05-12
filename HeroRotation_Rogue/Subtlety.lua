@@ -655,7 +655,7 @@ local function CDs ()
       local DefaultTrinketCondition = Player:BuffUp(S.SymbolsofDeath) or HL.BossFilteredFightRemains("<", 20)
       -- actions.cds+=/use_items,if=buff.symbols_of_death.up|fight_remains<20
       if DefaultTrinketCondition then
-        local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+        local TrinketToUse = Player:GetUseableItems(OnUseExcludes)
         if TrinketToUse then
           if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name() end
         end

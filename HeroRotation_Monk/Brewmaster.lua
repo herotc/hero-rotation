@@ -63,9 +63,13 @@ local Settings = {
 
 local function UseItems()
   -- use_items
-  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-  if TrinketToUse then
-    if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+  local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+  if ItemToUse then
+    local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+    if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+    if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+      if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+    end
   end
 end
 
@@ -186,7 +190,7 @@ local function APL()
       if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 3"; end
     end]]
     -- use_items
-    if (Settings.Commons.Enabled.Trinkets) then
+    if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
     end
     -- gift_of_the_ox

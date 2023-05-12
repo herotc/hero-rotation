@@ -42,7 +42,8 @@ local S = Spell.Druid.Guardian
 -- Items
 local I = Item.Druid.Guardian
 local OnUseExcludes = {
-  --  I.TrinketName:ID(),
+  I.Djaruun:ID(),
+  I.Jotungeirr:ID(),
 }
 
 -- Trinket Item Objects
@@ -322,19 +323,23 @@ local function APL()
     end
     -- auto_attack,if=!buff.prowl.up
     -- use_item,name=jotungeirr_destinys_call,if=!buff.prowl.up&!covenant.venthyr
-    if I.Jotungeirr:IsEquippedAndReady() then
+    if Settings.Commons.Enabled.Items and I.Jotungeirr:IsEquippedAndReady() then
       if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 2"; end
     end
     -- use_item,slot=trinket1
     -- use_item,slot=trinket2
     if Settings.Commons.Enabled.Trinkets then
-      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+      local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
+      if Trinket1ToUse then
+        if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name(); end
+      end
+      local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
+      if Trinket2ToUse then
+        if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name(); end
       end
     end
     -- use_item,name=djaruun_pillar_of_the_elder_flame
-    if I.Djaruun:IsEquippedAndReady() then
+    if Settings.Commons.Enabled.Items and I.Djaruun:IsEquippedAndReady() then
       if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame main 4"; end
     end
     -- potion,if=((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)|((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!druid.catweave_bear&!druid.owlweave_bear)))
