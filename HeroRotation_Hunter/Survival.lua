@@ -254,7 +254,7 @@ local function Cleave()
     if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault cleave 8"; end
   end
   -- kill_shot,if=buff.coordinated_assault_empower.up
-  if S.KillShot:IsReady() and (Player:BuffUp(S.CoordinatedAssaultBuff)) then
+  if S.KillShot:IsReady() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Settings.Survival.CAKSMacro and Player:BuffUp(S.CoordinatedAssault) and (S.Bite:IsReady() or S.Claw:IsReady() or S.Smack:IsReady())) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot cleave 10"; end
   end
   -- explosive_shot
@@ -347,7 +347,7 @@ local function ST()
     if Cast(S.Spearhead, nil, nil, not Target:IsSpellInRange(S.Spearhead)) then return "spearhead st 4"; end
   end
   -- kill_shot,if=buff.coordinated_assault_empower.up
-  if S.KillShot:IsReady() and (Player:BuffUp(S.CoordinatedAssaultBuff)) then
+  if S.KillShot:IsReady() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Settings.Survival.CAKSMacro and Player:BuffUp(S.CoordinatedAssault) and (S.Bite:IsReady() or S.Claw:IsReady() or S.Smack:IsReady())) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot st 6"; end
   end
   -- wildfire_bomb,if=(raid_event.adds.in>cooldown.wildfire_bomb.full_recharge_time-(cooldown.wildfire_bomb.full_recharge_time%3.5)&debuff.shredded_armor.up&(full_recharge_time<2*gcd|talent.bombardier&!cooldown.coordinated_assault.remains|talent.bombardier&buff.coordinated_assault.up&buff.coordinated_assault.remains<2*gcd)|!raid_event.adds.exists&time_to_die<7)&set_bonus.tier30_4pc

@@ -81,11 +81,11 @@ Spell.Hunter.Commons = {
 Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   -- Abilities
   -- Pet Abilities
-  Bite                                 = Spell(17253, "pet"),
-  BloodBolt                            = Spell(288962, "pet"),
-  Claw                                 = Spell(16827, "pet"),
-  Growl                                = Spell(2649, "pet"),
-  Smack                                = Spell(49966, "pet"),
+  Bite                                 = Spell(17253, "Pet"),
+  BloodBolt                            = Spell(288962, "Pet"),
+  Claw                                 = Spell(16827, "Pet"),
+  Growl                                = Spell(2649, "Pet"),
+  Smack                                = Spell(49966, "Pet"),
   -- Talents
   AMurderofCrows                        = Spell(131894),
   AnimalCompanion                       = Spell(267116),
@@ -106,12 +106,12 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   WildInstincts                         = Spell(378442),
   -- Buffs
   AspectoftheWildBuff                   = Spell(193530),
-  BeastCleavePetBuff                    = Spell(118455, "pet"),
+  BeastCleavePetBuff                    = Spell(118455, "Pet"),
   BeastCleaveBuff                       = Spell(268877),
   BestialWrathBuff                      = Spell(19574),
-  BestialWrathPetBuff                   = Spell(186254, "pet"),
+  BestialWrathPetBuff                   = Spell(186254, "Pet"),
   CalloftheWildBuff                     = Spell(359844),
-  FrenzyPetBuff                         = Spell(272790, "pet"),
+  FrenzyPetBuff                         = Spell(272790, "Pet"),
   -- Debuffs
   BarbedShotDebuff                      = Spell(217200),
 })
@@ -159,6 +159,12 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
 
 Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   -- Abilities
+  -- Pet Abilities
+  Bite                                 = Spell(17253, "Pet"),
+  BloodBolt                            = Spell(288962, "Pet"),
+  Claw                                 = Spell(16827, "Pet"),
+  Growl                                = Spell(2649, "Pet"),
+  Smack                                = Spell(49966, "Pet"),
   -- Bombs
   PheromoneBomb                         = Spell(270323),
   ShrapnelBomb                          = Spell(270335),
