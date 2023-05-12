@@ -213,9 +213,14 @@ local function CDs()
     if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch cds 18"; end
   end
   -- use_items,use_off_gcd=1,if=gcd.remains>gcd.max-0.1&!buff.spearhead.up
-  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-  if TrinketToUse then
-    if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+  if Player:BuffDown(S.SpearheadBuff) then
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
+    if I.Djaruun:IsEquippedAndReady() then
+      if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "Generic use_items for Djaruun"; end
+    end
   end
   -- aspect_of_the_eagle,if=target.distance>=6
   if S.AspectoftheEagle:IsCastable() and Settings.Survival.AspectOfTheEagle and not Target:IsInRange(6) then
