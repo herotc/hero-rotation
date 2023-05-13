@@ -279,7 +279,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
         end
       end
     end
-    if not S.ColdBlood:IsAvailable() or S.ColdBlood:IsReady() or S.ColdBlood:CooldownRemains() > (ShadowDanceBuffRemains - 2) then
+    if not S.ColdBlood:IsAvailable() or S.ColdBlood:IsReady() or Player:BuffUp(S.ColdBlood) or S.ColdBlood:CooldownRemains() > (ShadowDanceBuffRemains - 2) then
       if ReturnSpellOnly then
         return S.SecretTechnique
       else
