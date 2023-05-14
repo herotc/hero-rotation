@@ -467,9 +467,7 @@ local function APL()
     if EnemiesCount8ySplash >= 3 then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
       if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for Aoe()"; end
-    end
-    -- run_action_list,name=st
-    if true then
+    else -- run_action_list,name=st
       local ShouldReturn = ST(); if ShouldReturn then return ShouldReturn; end
       if CastAnnotated(S.Pool, false, "WAIT") then return "Pool for ST()"; end
     end
