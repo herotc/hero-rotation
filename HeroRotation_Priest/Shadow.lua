@@ -380,7 +380,7 @@ local function Filler()
   -- shadow_word_death
   -- Note: APL comments reference using this while moving
   if S.ShadowWordDeath:IsReady() and Player:IsMoving() then
-    if Cast(S.ShadowWordDeath, nil, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death movement filler 24"; end
+    if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death movement filler 24"; end
   end
   -- shadow_word_pain,target_if=min:remains
   if S.ShadowWordPain:IsReady() then
@@ -481,7 +481,7 @@ local function Main()
   end
   -- void_torrent,if=!variable.holding_crash,target_if=variable.all_dots_up&dot.devouring_plague.remains>=2
   if S.VoidTorrent:IsCastable() and (not VarHoldingCrash) then
-    if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 28"; end
+    if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent main 28"; end
   end
   -- mindgames,target_if=variable.all_dots_up&dot.devouring_plague.remains>=cast_time
   if S.Mindgames:IsReady() then
