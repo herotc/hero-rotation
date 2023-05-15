@@ -65,11 +65,10 @@ local MaxBurnoutStack = 2
 local VarTrinket1Sync, VarTrinket2Sync, TrinketPriority
 local VarNextDragonrage
 local VarDragonrageUp, VarDragonrageRemains
-local VarR1CastTime
 local VarDRPrepTimeAoe = 4
 local VarDRPrepTimeST = 13
-local BFRank = S.BlastFurnace:TalentRank()
-local PlayerHaste
+local PlayerHaste = Player:SpellHaste()
+local VarR1CastTime = 1.0 * PlayerHaste
 local BossFightRemains = 11111
 local FightRemains = 11111
 local GCDMax
@@ -90,7 +89,6 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 -- Talent change registrations
 HL:RegisterForEvent(function()
   MaxEssenceBurstStack = (S.EssenceAttunement:IsAvailable()) and 2 or 1
-  BFRank = S.BlastFurnace:TalentRank()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 -- Reset variables after fights
