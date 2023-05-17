@@ -42,7 +42,7 @@ local S = Spell.Warlock.Destruction
 
 -- Items
 local I = Item.Warlock.Destruction
-local TrinketsOnUseExcludes = {
+local OnUseExcludes = {
   I.ConjuredChillglobe:ID(),
   I.DesperateInvokersCodex:ID(),
   I.EruptingSpearFragment:ID(),
