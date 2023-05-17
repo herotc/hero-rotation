@@ -178,6 +178,7 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   RitualofRuinBuff                      = Spell(387157),
   BurntoAshesBuff                       = Spell(387154),
   -- Debuffs
+  ConflagrateDebuff                     = Spell(265931),
   EradicationDebuff                     = Spell(196414),
   HavocDebuff                           = Spell(80240),
   ImmolateDebuff                        = Spell(157736),
