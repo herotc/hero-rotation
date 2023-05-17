@@ -109,7 +109,7 @@ local function SingleTarget()
   if S.Rampage:IsReady() and S.AngerManagement:IsAvailable() and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffRemains(S.EnrageBuff) < Player:GCD() or Player:RagePercentage() > 85) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 10"; end
   end
-  local BTCritChance = Player:CritChancePct() + num(Player:BuffUp(S.RecklessnessBuff)) * 20 + num(Player:BuffUp(S.MercilessAssaultBuff)) * 10 + Player:BuffStack(S.BloodcrazeBuff) * 15
+  local BTCritChance = Player:CritChancePct() + num(Player:BuffUp(S.RecklessnessBuff)) * 20 + Player:BuffStack(S.MercilessAssaultBuff) * 10 + Player:BuffStack(S.BloodcrazeBuff) * 15
   if (BTCritChance >= 95 or (not S.ColdSteelHotBlood:IsAvailable()) and Player:HasTier(30, 4)) then
     -- bloodbath,if=action.bloodbath.crit_pct_current>=95|!talent.cold_steel_hot_blood&set_bonus.tier30_4pc
     if S.Bloodbath:IsCastable() then
@@ -239,7 +239,7 @@ local function MultiTarget()
   if CDsON() and S.OdynsFury:IsCastable() and EnemiesCount8y > 1 and EnrageUp then
     if Cast(S.OdynsFury, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 12"; end
   end
-  local BTCritChance = Player:CritChancePct() + num(Player:BuffUp(S.RecklessnessBuff)) * 20 + num(Player:BuffUp(S.MercilessAssaultBuff)) * 10 + Player:BuffStack(S.BloodcrazeBuff) * 15
+  local BTCritChance = Player:CritChancePct() + num(Player:BuffUp(S.RecklessnessBuff)) * 20 + Player:BuffStack(S.MercilessAssaultBuff) * 10 + Player:BuffStack(S.BloodcrazeBuff) * 15
   if (BTCritChance >= 95 or (not S.ColdSteelHotBlood:IsAvailable()) and Player:HasTier(30, 4)) then
     -- bloodbath,if=action.bloodbath.crit_pct_current>=95|!talent.cold_steel_hot_blood&set_bonus.tier30_4pc
     if S.Bloodbath:IsCastable() then
