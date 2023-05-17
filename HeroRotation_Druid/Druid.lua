@@ -207,6 +207,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   AdaptiveSwarmDebuff                   = Spell(391889),
   AdaptiveSwarmHeal                     = Spell(391891),
   LIMoonfireDebuff                      = Spell(155625),
+  ThrashDebuff                          = Spell(405233),
 })
 
 Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
