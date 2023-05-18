@@ -73,7 +73,7 @@ FeralOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     if self == SpellFeral.CatForm or self == SpellFeral.MoonkinForm then
       return BaseCheck and Player:BuffDown(self)
     elseif self == SpellFeral.Prowl then
-      return BaseCheck and self:IsUsable()
+      return BaseCheck and self:IsUsable() and not Player:StealthUp(true, true)
     else
       return BaseCheck
     end
