@@ -153,7 +153,7 @@ end
 
 local function CDs()
   -- blood_fury,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault
-  if S.BloodFury:IsCastable() and (Player:BuffUp(S.CoordinatedAssault) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
+  if S.BloodFury:IsCastable() and (Pet:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
     if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 2"; end
   end
   -- harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
@@ -179,13 +179,13 @@ local function CDs()
     if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks cds 12"; end
   end
   -- berserking,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault|time_to_die<13
-  if S.Berserking:IsCastable() and (Player:BuffUp(S.CoordinatedAssault) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and (not S.CoordinatedAssault:IsAvailable()) or FightRemains < 13) then
+  if S.Berserking:IsCastable() and (Pet:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and (not S.CoordinatedAssault:IsAvailable()) or FightRemains < 13) then
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 14"; end
   end
   -- muzzle
   -- Handled via Interrupt in APL()
   -- potion,if=target.time_to_die<25|buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault
-  if Settings.Commons.Enabled.Potions and (FightRemains < 25 or Player:BuffUp(S.CoordinatedAssault) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
+  if Settings.Commons.Enabled.Potions and (FightRemains < 25 or Pet:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 16"; end
@@ -247,7 +247,7 @@ local function Cleave()
     if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault cleave 8"; end
   end
   -- kill_shot,if=buff.coordinated_assault_empower.up
-  if S.KillShot:IsReady() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Settings.Survival.CAKSMacro and Player:BuffUp(S.CoordinatedAssault) and (S.Bite:IsReady() or S.Claw:IsReady() or S.Smack:IsReady())) then
+  if S.KillShot:IsReady() and (Player:BuffUp(S.CoordinatedAssault) or Settings.Survival.CAKSMacro and Player:BuffUp(S.CoordinatedAssault) and (S.Bite:IsReady() or S.Claw:IsReady() or S.Smack:IsReady())) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot cleave 10"; end
   end
   -- explosive_shot
@@ -301,7 +301,7 @@ local function Cleave()
     if Cast(S.Carve, nil, nil, not Target:IsInMeleeRange(5)) then return "carve cleave 36"; end
   end
   -- kill_shot,if=!buff.coordinated_assault.up
-  if S.KillShot:IsReady() and (Player:BuffDown(S.CoordinatedAssaultBuff)) then
+  if S.KillShot:IsReady() and (Pet:BuffDown(S.CoordinatedAssaultBuff)) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot cleave 38"; end
   end
   -- steel_trap,if=focus+cast_regen<focus.max
@@ -340,11 +340,11 @@ local function ST()
     if Cast(S.Spearhead, nil, nil, not Target:IsSpellInRange(S.Spearhead)) then return "spearhead st 4"; end
   end
   -- kill_shot,if=buff.coordinated_assault_empower.up
-  if S.KillShot:IsReady() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Settings.Survival.CAKSMacro and Player:BuffUp(S.CoordinatedAssault) and (S.Bite:IsReady() or S.Claw:IsReady() or S.Smack:IsReady())) then
+  if S.KillShot:IsReady() and (Player:BuffUp(S.CoordinatedAssault) or Settings.Survival.CAKSMacro and Player:BuffUp(S.CoordinatedAssault) and (S.Bite:IsReady() or S.Claw:IsReady() or S.Smack:IsReady())) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot st 6"; end
   end
   -- wildfire_bomb,if=(raid_event.adds.in>cooldown.wildfire_bomb.full_recharge_time-(cooldown.wildfire_bomb.full_recharge_time%3.5)&debuff.shredded_armor.up&(full_recharge_time<2*gcd|talent.bombardier&!cooldown.coordinated_assault.remains|talent.bombardier&buff.coordinated_assault.up&buff.coordinated_assault.remains<2*gcd)|!raid_event.adds.exists&time_to_die<7)&set_bonus.tier30_4pc
-  if (Target:DebuffUp(S.ShreddedArmorDebuff) and (S.WildfireBomb:FullRechargeTime() < 2 * Player:GCD() or S.Bombardier:IsAvailable() and S.CoordinatedAssault:CooldownUp() or S.Bombardier:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff) and Player:BuffRemains(S.CoordinatedAssaultBuff) < 2 * Player:GCD()) or FightRemains < 7) then
+  if (Target:DebuffUp(S.ShreddedArmorDebuff) and (S.WildfireBomb:FullRechargeTime() < 2 * Player:GCD() or S.Bombardier:IsAvailable() and S.CoordinatedAssault:CooldownUp() or S.Bombardier:IsAvailable() and Pet:BuffUp(S.CoordinatedAssaultBuff) and Pet:BuffRemains(S.CoordinatedAssaultBuff) < 2 * Player:GCD()) or FightRemains < 7) then
     for _, Bomb in pairs(Bombs) do
       if Bomb:IsCastable() then
         if Cast(Bomb, nil, nil, not Target:IsSpellInRange(Bomb)) then return "wildfire_bomb st 7"; end
@@ -368,7 +368,7 @@ local function ST()
     if Cast(S.MongooseBite, nil, nil, not Target:IsInMeleeRange(5)) then return "mongoose_bite st 12"; end
   end
   -- kill_shot,if=!buff.coordinated_assault.up
-  if S.KillShot:IsReady() and (Player:BuffDown(S.CoordinatedAssaultBuff)) then
+  if S.KillShot:IsReady() and (Pet:BuffDown(S.CoordinatedAssaultBuff)) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot st 14"; end
   end
   -- raptor_strike,if=active_enemies=1&target.time_to_die<focus%(variable.mb_rs_cost-cast_regen)*gcd

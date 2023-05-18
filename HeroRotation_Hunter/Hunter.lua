@@ -190,7 +190,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   WildfireInfusion                      = Spell(271014),
   -- Buffs
   BloodseekerBuff                       = Spell(260249),
-  CoordinatedAssaultBuff                = Spell(361738),
+  CoordinatedAssaultBuff                = Spell(361736),
   DeadlyDuoBuff                         = Spell(397568),
   MongooseFuryBuff                      = Spell(259388),
   SpearheadBuff                         = Spell(360966),
