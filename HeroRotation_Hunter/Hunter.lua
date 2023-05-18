@@ -180,6 +180,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   FlankingStrike                        = Spell(269751),
   FuryoftheEagle                        = Spell(203415),
   Harpoon                               = Spell(190925),
+  Lunge                                 = Spell(378934),
   MongooseBite                          = Spell(259387),
   Ranger                                = Spell(385695),
   RaptorStrike                          = Spell(259387),
