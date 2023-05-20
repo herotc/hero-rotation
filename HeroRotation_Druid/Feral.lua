@@ -223,6 +223,11 @@ local function EvaluateTargetIfRakeBloodtalons(TargetUnit)
   return ((TargetUnit:DebuffRefreshable(S.RakeDebuff) or 1.4 * Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake)) and BTBuffDown(S.Rake))
 end
 
+local function EvaluateTargetIfFerociousBiteBerserk(TargetUnit)
+  -- if=combo_points=5&dot.rip.remains>8&variable.zerk_biteweave&spell_targets.swipe_cat>1
+  return TargetUnit:DebuffRemains(S.RipDebuff) > 5
+end
+
 -- CastCycle Conditions
 local function EvaluateCycleAdaptiveSwarm(TargetUnit)
   -- target_if=((!dot.adaptive_swarm_damage.ticking|dot.adaptive_swarm_damage.remains<2)&(dot.adaptive_swarm_damage.stack<3|!dot.adaptive_swarm_heal.stack>1)&!action.adaptive_swarm_heal.in_flight&!action.adaptive_swarm_damage.in_flight&!action.adaptive_swarm.in_flight)&target.time_to_die>5|active_enemies>2&!dot.adaptive_swarm_damage.ticking&energy<35&target.time_to_die>5

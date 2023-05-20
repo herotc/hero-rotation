@@ -323,7 +323,7 @@ local function Cleave()
   -- havoc,target_if=min:((-target.time_to_die)<?-15)+dot.immolate.remains+99*(self.target=target),if=(!cooldown.summon_infernal.up|!talent.summon_infernal)&target.time_to_die>8
   if S.Havoc:IsCastable() and (S.SummonInfernal:CooldownDown() or not S.SummonInfernal:IsAvailable()) then
     --if Everyone.CastTargetIf(S.Havoc, Enemies40y, "min", EvaluateTargetIfFilterHavoc, EvaluateTargetIfHavoc, not Target:IsSpellInRange(S.Havoc)) then return "havoc cleave 14"; end
-    local BestUnit, BestConditionValue, CUCV = nil, nil
+    local BestUnit, BestConditionValue, CUCV = nil, nil, nil
     for _, CycleUnit in pairs(Enemies40y) do
       if CycleUnit:GUID() ~= Target:GUID() then
         if BestConditionValue then
