@@ -357,7 +357,7 @@ local function Aoe()
   end
   -- crash_lightning,if=talent.crashing_storms.enabled&buff.cl_crash_lightning.up&active_enemies>=4
   if S.CrashLightning:IsReady() and (S.CrashingStorms:IsAvailable() and Player:BuffUp(S.CLCrashLightningBuff) and Enemies10yCount >= 4) then
-    if Cast(S.CrashLightning, nil, nil, not Target:IsSpellInRange(S.CrashLightning)) then return "crash_lightning aoe "; end
+    if Cast(S.CrashLightning, nil, nil, not Target:IsInRange(8)) then return "crash_lightning aoe "; end
   end
   -- windstrike
   if S.Windstrike:IsReady() then
