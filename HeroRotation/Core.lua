@@ -161,8 +161,8 @@
     return nil;
   end
   -- Overload for Main Cast (with text)
-  function HR.CastAnnotated (Object, OffGCD, Text)
-    local Result = HR.Cast(Object, OffGCD);
+  function HR.CastAnnotated (Object, OffGCD, Text, OutofRange)
+    local Result = HR.Cast(Object, OffGCD, nil, OutofRange);
     -- TODO: handle small icon frame if OffGCD is true
     if not OffGCD then
       HR.MainIconFrame:OverlayText(Text);
