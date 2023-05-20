@@ -180,7 +180,13 @@
     end
   end
   -- Set text on frame
-  function HR.MainIconFrame:OverlayText(Text)
+  function HR.MainIconFrame:OverlayText(Text, FontSize)
+    local Font = self.Text:GetFont()
+    if FontSize then
+      self.Text:SetFont(Font, FontSize)
+    else
+      self.Text:SetFont(Font, 12)
+    end
     self.Text:SetText(Text);
   end
   -- Set a Cooldown Frame
