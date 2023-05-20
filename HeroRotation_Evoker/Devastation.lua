@@ -207,7 +207,7 @@ local function ES()
     ESEmpower = 4
   end
   -- We should (usually, if not always) be hitting all targets anyway, so keeping CastAnnotated over CastTargetIf.
-  if CastAnnotated(S.EternitySurge, false, ESEmpower) then return "eternity_surge empower " .. ESEmpower .. " ES 2"; end
+  if CastAnnotated(S.EternitySurge, false, ESEmpower, not Target:IsInRange(25)) then return "eternity_surge empower " .. ESEmpower .. " ES 2"; end
 end
 
 local function FB()
@@ -228,7 +228,7 @@ local function FB()
     FBEmpower = 4
   end
   -- We should (usually, if not always) be hitting all targets anyway, so keeping CastAnnotated over CastTargetIf.
-  if CastAnnotated(S.FireBreath, false, FBEmpower) then return "fire_breath empower " .. FBEmpower .. " FB 2"; end
+  if CastAnnotated(S.FireBreath, false, FBEmpower, not Target:IsInRange(25)) then return "fire_breath empower " .. FBEmpower .. " FB 2"; end
 end
 
 local function Aoe()
@@ -394,8 +394,7 @@ local function ST()
     if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 34"; end
   end
   -- azure_strike
-  -- Note: This is a moving fallback.
-  if S.AzureStrike:IsCastable() and Player:IsMoving() then
+  if S.AzureStrike:IsCastable() then
     if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 36"; end
   end
 end
