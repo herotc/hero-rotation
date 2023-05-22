@@ -40,7 +40,8 @@ local I = Item.DemonHunter.Vengeance
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- I.TrinketName:ID(),
+  I.DragonfireBombDispenser:ID(),
+  I.ElementiumPocketAnvil:ID(),
 }
 
 -- GUI Settings
@@ -59,6 +60,8 @@ local ActiveMitigationNeeded
 local IsTanking
 local Enemies8yMelee
 local EnemiesCount8yMelee
+local BossFightRemains = 11111
+local FightRemains = 11111
 -- Vars to calculate SpB Fragments generated
 local VarSpiritBombFragmentsInMeta = (S.Fracture:IsAvailable()) and 3 or 4
 local VarSpiritBombFragmentsNotInMeta = (S.Fracture:IsAvailable()) and 4 or 5
@@ -85,6 +88,11 @@ HL:RegisterForEvent(function()
   VarCDFrailtyReqAoE = (S.SoulCrush:IsAvailable()) and 5 * VarVulnFrailtyStack or VarVulnFrailtyStack
   VarCDFrailtyReqST = (S.SoulCrush:IsAvailable()) and 6 * VarVulnFrailtyStack or VarVulnFrailtyStack
 end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
+
+HL:RegisterForEvent(function()
+  BossFightRemains = 11111
+  FightRemains = 11111
+end, "PLAYER_REGEN_ENABLED")
 
 -- Soul Fragments function taking into consideration aura lag
 local function UpdateSoulFragments()
@@ -153,7 +161,7 @@ local function Precombat()
   -- variable,name=vulnerability_frailty_stack,op=setif,value=1,value_else=0,condition=talent.vulnerability
   -- variable,name=cooldown_frailty_requirement_st,op=setif,value=6*variable.vulnerability_frailty_stack,value_else=variable.vulnerability_frailty_stack,condition=talent.soulcrush
   -- variable,name=cooldown_frailty_requirement_aoe,op=setif,value=5*variable.vulnerability_frailty_stack,value_else=variable.vulnerability_frailty_stack,condition=talent.soulcrush
-  -- Note: Handling variable resets via PLAYER_REGEN_ENABLED/PLAYER_TALENT_UPDATE/PLAYER_EQUIPMENT_CHANGED registrations
+  -- Note: Handling variable resets via PLAYER_EQUIPMENT_CHANGED/SPELLS_CHANGED/LEARNED_SPELL_IN_TAB registrations
   -- snapshot_stats
   -- sigil_of_flame
   if (not S.ConcentratedSigils:IsAvailable()) and S.SigilofFlame:IsCastable() then
@@ -209,6 +217,15 @@ local function APL()
   ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
 
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies8y, false)
+    end
+  end
+
   if Everyone.TargetIsValid() then
     -- Precombat
     if not Player:AffectingCombat() then
@@ -252,15 +269,27 @@ local function APL()
       end
     end
     if Settings.Commons.Enabled.Trinkets then
+      -- use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1,if=fight_remains<20|charges=3
+      if I.DragonfireBombDispenser:IsEquipped() then
+        local DBDSpell = I.DragonfireBombDispenser:OnUseSpell()
+        local DBDCharges = DBDSpell:Charges()
+        if I.DragonfireBombDispenser:IsReady() and (FightRemains < 20 or DBDCharges == 3) then
+          if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser main 14"; end
+        end
+      end
+      -- use_item,name=elementium_pocket_anvil,use_off_gcd=1
+      if I.ElementiumPocketAnvil:IsEquippedAndReady() then
+        if Cast(I.ElementiumPocketAnvil, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(100)) then return "elementium_pocket_anvil main 16"; end
+      end
       -- use_item,slot=trinket1
       local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
       if Trinket1ToUse then
-        if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 main 14"; end
+        if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 main 18"; end
       end
       -- use_item,slot=trinket2
       local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
       if Trinket2ToUse then
-        if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 main 16"; end
+        if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 main 20"; end
       end
     end
     -- variable,name=the_hunt_on_cooldown,value=talent.the_hunt&cooldown.the_hunt.remains|!talent.the_hunt
@@ -285,78 +314,78 @@ local function APL()
     VarCDFrailtyReq = (S.SpiritBomb:IsAvailable() and (EnemiesCount8yMelee > 1 or VarFDFBTickingAny)) and VarCDFrailtyReqAoE or VarCDFrailtyReqST
     -- the_hunt,if=variable.fiery_demise_fiery_brand_is_not_ticking_on_current_target&debuff.frailty.stack>=variable.cooldown_frailty_requirement
     if S.TheHunt:IsCastable() and (VarFDFBNotTicking and Target:DebuffStack(S.FrailtyDebuff) >= VarCDFrailtyReq) then
-      if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt main 18"; end
+      if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt main 22"; end
     end
     -- elysian_decree,if=variable.fiery_demise_fiery_brand_is_not_ticking_on_current_target&debuff.frailty.stack>=variable.cooldown_frailty_requirement
     if S.ElysianDecree:IsCastable() and (VarFDFBNotTicking and Target:DebuffStack(S.FrailtyDebuff) >= VarCDFrailtyReq) then
-      if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree main 20"; end
+      if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree main 24"; end
     end
     -- soul_carver,if=!talent.fiery_demise&soul_fragments<=3&debuff.frailty.stack>=variable.cooldown_frailty_requirement
     if S.SoulCarver:IsCastable() and ((not S.FieryDemise:IsAvailable()) and SoulFragments <= 3 and Target:DebuffStack(S.FrailtyDebuff) >= VarCDFrailtyReq) then
-      if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver main 22"; end
+      if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver main 26"; end
     end
     -- soul_carver,if=variable.fiery_demise_fiery_brand_is_ticking_on_current_target&soul_fragments<=3&debuff.frailty.stack>=variable.cooldown_frailty_requirement
     -- Note: Removing Frailty stack requirement for now, as we rarely hit enough stacks during FB while saving Fury for FelDevastation.
     if S.SoulCarver:IsCastable() and (VarFDFBTicking and SoulFragments <= 3) then
-      if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver main 24"; end
+      if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver main 28"; end
     end
     -- fel_devastation,if=variable.fiery_demise_fiery_brand_is_ticking_on_current_target&dot.fiery_brand.remains<3
     if S.FelDevastation:IsReady() and (VarFDFBTicking and Target:DebuffRemains(S.FieryBrandDebuff) < 3) then
-      if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(13)) then return "fel_devastation main 26"; end
+      if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(13)) then return "fel_devastation main 30"; end
     end
     -- fiery_brand,if=variable.fiery_demise_fiery_brand_is_not_ticking_on_any_target&variable.the_hunt_on_cooldown&variable.elysian_decree_on_cooldown&((talent.soul_carver&(cooldown.soul_carver.up|cooldown.soul_carver.remains<10))|(talent.fel_devastation&(cooldown.fel_devastation.up|cooldown.fel_devastation.remains<10)))
     if S.FieryBrand:IsCastable() and (VarFDFBNotTickingAny and VarHuntOnCD and VarEDOnCD and ((S.SoulCarver:IsAvailable() and (S.SoulCarver:CooldownUp() or S.SoulCarver:CooldownRemains() < 10)) or (S.FelDevastation:IsAvailable() and (S.FelDevastation:CooldownUp() or S.FelDevastation:CooldownRemains() < 10)))) then
-      if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsInRange(30)) then return "fiery_brand main 28"; end
+      if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsInRange(30)) then return "fiery_brand main 32"; end
     end
     -- immolation_aura,if=talent.fiery_demise&variable.fiery_demise_fiery_brand_is_ticking_on_any_target
     if S.ImmolationAura:IsCastable() and (S.FieryDemise:IsAvailable() and VarFDFBTickingAny) then
-      if Cast(S.ImmolationAura) then return "immolation_aura main 30"; end
+      if Cast(S.ImmolationAura) then return "immolation_aura main 34"; end
     end
     -- sigil_of_flame,if=talent.fiery_demise&variable.fiery_demise_fiery_brand_is_ticking_on_any_target
     if S.SigilofFlame:IsCastable() and ((IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRefreshable(S.SigilofFlameDebuff)) and (S.FieryDemise:IsAvailable() and VarFDFBTickingAny) then
       if S.ConcentratedSigils:IsAvailable() then
-        if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not IsInAoERange) then return "sigil_of_flame main 32 (Concentrated)"; end
+        if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not IsInAoERange) then return "sigil_of_flame main 36 (Concentrated)"; end
       else
-        if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame main 32 (Normal)"; end
+        if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame main 36 (Normal)"; end
       end
     end
     -- spirit_bomb,if=soul_fragments>=variable.spirit_bomb_soul_fragments&(spell_targets>1|variable.fiery_demise_fiery_brand_is_ticking_on_any_target)
     -- Note: Adding Fury buffer to ensure we can always use FelDevastation when we should
     if S.SpiritBomb:IsReady() and (VarFDFBTickingAny and Player:Fury() > S.FelDevastation:Cost() + 40 or VarFDFBNotTickingAny or not S.FelDevastation:IsAvailable()) and (SoulFragments >= VarSpiritBombFragments and (EnemiesCount8yMelee > 1 or VarFDFBTickingAny)) then
-      if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb main 34"; end
+      if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb main 38"; end
     end
     -- soul_cleave,if=(soul_fragments<=1&spell_targets>1)|spell_targets=1
     -- Note: Adding Fury buffer to ensure we can always use FelDevastation when we should
     if S.SoulCleave:IsReady() and (VarFDFBTickingAny and Player:Fury() > S.FelDevastation:Cost() + 30 or VarFDFBNotTickingAny or not S.FelDevastation:IsAvailable()) and ((SoulFragments <= 1 and EnemiesCount8yMelee > 1) or EnemiesCount8yMelee == 1) then
-      if Cast(S.SoulCleave, nil, nil, not Target:IsInMeleeRange(8)) then return "soul_cleave main 36"; end
+      if Cast(S.SoulCleave, nil, nil, not Target:IsInMeleeRange(8)) then return "soul_cleave main 40"; end
     end
     -- sigil_of_flame
     if S.SigilofFlame:IsCastable() and ((IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRefreshable(S.SigilofFlameDebuff)) then
       if S.ConcentratedSigils:IsAvailable() then
-        if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not IsInAoERange) then return "sigil_of_flame main 38 (Concentrated)"; end
+        if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not IsInAoERange) then return "sigil_of_flame main 42 (Concentrated)"; end
       else
-        if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame main 38 (Normal)"; end
+        if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame main 42 (Normal)"; end
       end
     end
     -- immolation_aura
     if S.ImmolationAura:IsCastable() then
-      if Cast(S.ImmolationAura) then return "immolation_aura main 40"; end
+      if Cast(S.ImmolationAura) then return "immolation_aura main 44"; end
     end
     -- fracture
     if S.Fracture:IsCastable() and IsInMeleeRange then
-      if Cast(S.Fracture) then return "fracture main 42"; end
+      if Cast(S.Fracture) then return "fracture main 46"; end
     end
     -- shear
     if S.Shear:IsCastable() and IsInMeleeRange then
-      if Cast(S.Shear) then return "shear main 44"; end
+      if Cast(S.Shear) then return "shear main 48"; end
     end
     -- throw_glaive
     if S.ThrowGlaive:IsCastable() then
-      if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 46"; end
+      if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 50"; end
     end
     -- felblade
     if S.Felblade:IsCastable() then
-      if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade main 48"; end
+      if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade main 52"; end
     end
     -- If nothing else to do, show the Pool icon
     if CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
