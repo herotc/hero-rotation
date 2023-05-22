@@ -155,14 +155,14 @@ end
 
 local function CDs()
   -- blood_fury,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault
-  if S.BloodFury:IsCastable() and (Player:BuffUp(S.CoordinatedAssault) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
+  if S.BloodFury:IsCastable() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
     if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 2"; end
   end
   -- harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
   if S.Harpoon:IsCastable() and (S.TermsofEngagement:IsAvailable() and Player:Focus() < Player:FocusMax()) then
     if Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon cds 4"; end
   end
-  if (Player:BuffUp(S.CoordinatedAssault) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
+  if (Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
     -- ancestral_call,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault
     if S.AncestralCall:IsCastable() then
       if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cds 6"; end
@@ -181,13 +181,13 @@ local function CDs()
     if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks cds 12"; end
   end
   -- berserking,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault|time_to_die<13
-  if S.Berserking:IsCastable() and (Player:BuffUp(S.CoordinatedAssault) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and (not S.CoordinatedAssault:IsAvailable()) or FightRemains < 13) then
+  if S.Berserking:IsCastable() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and (not S.CoordinatedAssault:IsAvailable()) or FightRemains < 13) then
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 14"; end
   end
   -- muzzle
   -- Handled via Interrupt in APL()
   -- potion,if=target.time_to_die<25|buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault
-  if Settings.Commons.Enabled.Potions and (FightRemains < 25 or Player:BuffUp(S.CoordinatedAssault) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
+  if Settings.Commons.Enabled.Potions and (FightRemains < 25 or Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 16"; end
@@ -226,48 +226,48 @@ end
 local function Cleave()
   -- kill_command,if=debuff.shredded_armor.down&set_bonus.tier30_4pc
   if S.KillCommand:IsCastable() and (Target:DebuffDown(S.ShreddedArmorDebuff) and Player:HasTier(30, 4)) then
-    if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 1"; end
+    if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 2"; end
   end
-  -- wildfire_bomb,if=full_recharge_time<gcd|talent.bombardier&!cooldown.coordinated_assault.remains
-  if (S.WildfireBomb:FullRechargeTime() < Player:GCD() or S.Bombardier:IsAvailable() and S.CoordinatedAssault:CooldownUp()) then
+  -- kill_shot,if=buff.coordinated_assault_empower.up
+  if S.KillShot:IsReady() and (Player:BuffUp(S.CoordinatedAssaultEmpowerBuff) or Settings.Survival.CAKSMacro and Player:BuffUp(S.CoordinatedAssaultBuff) and (S.Bite:IsReady() or S.Claw:IsReady() or S.Smack:IsReady())) then
+    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot cleave 4"; end
+  end
+  -- wildfire_bomb,if=full_recharge_time<gcd|!cooldown.coordinated_assault.remains|buff.coordinated_assault.remains&!buff.coordinated_assault_empower.up
+  if (S.WildfireBomb:FullRechargeTime() < Player:GCD() or S.CoordinatedAssault:CooldownUp() or Player:BuffRemains(S.CoordinatedAssaultBuff) and Player:BuffDown(S.CoordinatedAssaultEmpowerBuff)) then
     for _, Bomb in pairs(Bombs) do
       if Bomb:IsCastable() then
-        if Cast(Bomb, nil, nil, not Target:IsSpellInRange(Bomb)) then return "wildfire_bomb cleave 2"; end
+        if Cast(Bomb, nil, nil, not Target:IsSpellInRange(Bomb)) then return "wildfire_bomb cleave 6"; end
       end
     end
   end
   -- death_chakram
   if S.DeathChakram:IsCastable() then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram cleave 4"; end
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram cleave 8"; end
   end
   -- stampede
   if S.Stampede:IsCastable() and CDsON() then
-    if Cast(S.Stampede, nil, nil, not Target:IsSpellInRange(S.Stampede)) then return "stampede cleave 6"; end
+    if Cast(S.Stampede, nil, nil, not Target:IsSpellInRange(S.Stampede)) then return "stampede cleave 10"; end
   end
-  -- coordinated_assault
-  if S.CoordinatedAssault:IsCastable() and CDsON() then
-    if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault cleave 8"; end
-  end
-  -- kill_shot,if=buff.coordinated_assault_empower.up
-  if S.KillShot:IsReady() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Settings.Survival.CAKSMacro and Player:BuffUp(S.CoordinatedAssault) and (S.Bite:IsReady() or S.Claw:IsReady() or S.Smack:IsReady())) then
-    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot cleave 10"; end
+  -- coordinated_assault,if=cooldown.fury_of_the_eagle.remains|!talent.fury_of_the_eagle
+  if S.CoordinatedAssault:IsCastable() and CDsON() and (S.FuryoftheEagle:CooldownDown() or not S.FuryoftheEagle:IsAvailable()) then
+    if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault cleave 12"; end
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
-    if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot cleave 12"; end
+    if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot cleave 14"; end
   end
   -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
   if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
-    if Cast(S.Carve, nil, nil, not Target:IsInMeleeRange(MeleeRange)) then return "carve cleave 14"; end
+    if Cast(S.Carve, nil, nil, not Target:IsInMeleeRange(MeleeRange)) then return "carve cleave 16"; end
   end
   -- butchery,if=full_recharge_time<gcd|dot.shrapnel_bomb.ticking&(dot.internal_bleeding.stack<2|dot.shrapnel_bomb.remains<gcd)
   if S.Butchery:IsReady() and (S.Butchery:FullRechargeTime() < Player:GCD() or Target:DebuffUp(S.ShrapnelBombDebuff) and (Target:DebuffStack(S.InternalBleedingDebuff) < 2 or Target:DebuffRemains(S.ShrapnelBombDebuff) < Player:GCD())) then
-    if Cast(S.Butchery, nil, nil, not Target:IsInMeleeRange(MeleeRange)) then return "butchery cleave 16"; end
+    if Cast(S.Butchery, nil, nil, not Target:IsInMeleeRange(MeleeRange)) then return "butchery cleave 18"; end
   end
   -- wildfire_bomb,if=!dot.wildfire_bomb.ticking
   for BombNum, Bomb in pairs(Bombs) do
     if Bomb:IsCastable() and (Target:DebuffDown(BombDebuffs[BombNum])) then
-      if Cast(Bomb, nil, nil, not Target:IsSpellInRange(Bomb)) then return "wildfire_bomb cleave 18"; end
+      if Cast(Bomb, nil, nil, not Target:IsSpellInRange(Bomb)) then return "wildfire_bomb cleave 20"; end
     end
   end
   -- fury_of_the_eagle
@@ -342,7 +342,7 @@ local function ST()
     if Cast(S.Spearhead, nil, nil, not Target:IsSpellInRange(S.Spearhead)) then return "spearhead st 4"; end
   end
   -- kill_shot,if=buff.coordinated_assault_empower.up
-  if S.KillShot:IsReady() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Settings.Survival.CAKSMacro and Player:BuffUp(S.CoordinatedAssault) and (S.Bite:IsReady() or S.Claw:IsReady() or S.Smack:IsReady())) then
+  if S.KillShot:IsReady() and (Player:BuffUp(S.CoordinatedAssaultEmpowerBuff) or Settings.Survival.CAKSMacro and Player:BuffUp(S.CoordinatedAssaultBuff) and (S.Bite:IsReady() or S.Claw:IsReady() or S.Smack:IsReady())) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot st 6"; end
   end
   -- wildfire_bomb,if=(raid_event.adds.in>cooldown.wildfire_bomb.full_recharge_time-(cooldown.wildfire_bomb.full_recharge_time%3.5)&debuff.shredded_armor.up&(full_recharge_time<2*gcd|talent.bombardier&!cooldown.coordinated_assault.remains|talent.bombardier&buff.coordinated_assault.up&buff.coordinated_assault.remains<2*gcd)|!raid_event.adds.exists&time_to_die<7)&set_bonus.tier30_4pc
