@@ -113,8 +113,8 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   -- use_item,name=algethar_puzzle_box
-  if Settings.Commons.Enabled.Trinkets and I.AlgethaPuzzleBox:IsEquippedAndReady() then
-    if Cast(I.AlgethaPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat"; end
+  if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() then
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat"; end
   end
   -- Manually added opener
   if Target:IsInMeleeRange(12) then
