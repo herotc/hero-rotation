@@ -43,6 +43,7 @@ Spell.Warrior.Commons = {
   Avatar                                = Spell(107574),
   AvatarBuff                            = Spell(107574),
   BerserkerRage                         = Spell(18499),
+  BerserkersTorment                     = Spell(390123),
   BloodandThunder                       = Spell(384277),
   DoubleTime                            = Spell(103827),
   CrushingForce                         = Spell(382764),

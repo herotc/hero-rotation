@@ -227,7 +227,7 @@ end
 
 local function MultiTarget()
   -- recklessness,if=raid_event.adds.in>15|active_enemies>1|target.time_to_die<12
-  if CDsON() and S.Recklessness:IsCastable() and (EnemiesCount8y > 1 or HL.FightRemains() < 12) then
+  if CDsON() and S.Recklessness:IsCastable() and (EnemiesCount8y > 1 or FightRemains < 12) then
     if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness multi_target 2"; end
   end
   -- odyns_fury,if=active_enemies>1&talent.titanic_rage&(!buff.meat_cleaver.up|buff.avatar.up|buff.recklessness.up)
@@ -439,47 +439,49 @@ local function APL()
       end
       -- ravager,if=cooldown.recklessness.remains<3|buff.recklessness.up
       -- Note: manually added end of fight
-      if S.Ravager:IsCastable() and (S.Avatar:CooldownRemains() < 3 or Player:BuffUp(S.RecklessnessBuff) or HL.FightRemains() < 10) then
+      if S.Ravager:IsCastable() and (S.Avatar:CooldownRemains() < 3 or Player:BuffUp(S.RecklessnessBuff) or FightRemains < 10) then
         if Cast(S.Ravager, Settings.Fury.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager main 18"; end
       end
-      -- blood_fury
-      if S.BloodFury:IsCastable() then
-        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 20"; end
+      if CDsON() then
+        -- arcane_torrent
+        -- Note: Commented out in the APL currently
+        -- lights_judgment,if=buff.recklessness.down
+        if S.LightsJudgment:IsCastable() and Player:BuffDown(S.RecklessnessBuff) then
+          if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 24"; end
+        end
+        -- bag_of_tricks
+        -- Note: Commented out in the APL currently
+        -- berserking,if=buff.recklessness.up
+        if S.Berserking:IsCastable() and Player:BuffUp(S.RecklessnessBuff) then
+          if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 22"; end
+        end
+        -- blood_fury
+        if S.BloodFury:IsCastable() then
+          if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 20"; end
+        end
+        -- fireblood
+        if S.Fireblood:IsCastable() then
+          if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 26"; end
+        end
+        -- ancestral_call
+        if S.AncestralCall:IsCastable() then
+          if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 28"; end
+        end
       end
-      -- berserking,if=buff.recklessness.up
-      if S.Berserking:IsCastable() and Player:BuffUp(S.RecklessnessBuff) then
-        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 22"; end
-      end
-      -- lights_judgment,if=buff.recklessness.down
-      if S.LightsJudgment:IsCastable() and Player:BuffDown(S.RecklessnessBuff) then
-        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 24"; end
-      end
-      -- fireblood
-      if S.Fireblood:IsCastable() then
-        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 26"; end
-      end
-      -- ancestral_call
-      if S.AncestralCall:IsCastable() then
-        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 28"; end
-      end
-      -- bag_of_tricks,if=buff.recklessness.down&buff.enrage.up
-      -- if S.BagofTricks:IsCastable() and Player:BuffDown(S.RecklessnessBuff) and EnrageUp then
-      --   if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 30"; end
-      -- end
-      -- avatar,if=talent.titans_torment&buff.enrage.up&raid_event.adds.in>15|!talent.titans_torment&(buff.recklessness.up|target.time_to_die<20)
-      if S.Avatar:IsCastable() and (S.TitansTorment:IsAvailable() and EnrageUp or not S.TitansTorment:IsAvailable() and (Player:BuffUp(S.RecklessnessBuff) or HL.FightRemains() < 20)) then
+      -- avatar,if=talent.titans_torment&buff.enrage.up&raid_event.adds.in>15|talent.berserkers_torment&buff.enrage.up&!buff.avatar.up&raid_event.adds.in>15|!talent.titans_torment&!talent.berserkers_torment&(buff.recklessness.up|target.time_to_die<20)
+      if S.Avatar:IsCastable() and (S.TitansTorment:IsAvailable() and EnrageUp or S.BerserkersTorment:IsAvailable() and EnrageUp and Player:BuffDown(S.AvatarBuff) or (not S.TitansTorment:IsAvailable()) and (not S.BerserkersTorment:IsAvailable()) and (Player:BuffUp(S.RecklessnessBuff) or FightRemains < 20)) then
         if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar main 32"; end
       end
       -- recklessness,if=!raid_event.adds.exists&(talent.annihilator&cooldown.avatar.remains<1|cooldown.avatar.remains>40|!talent.avatar|target.time_to_die<12)
-      if S.Recklessness:IsCastable() and (S.Annihilator:IsAvailable() and S.Avatar:CooldownRemains() < 1 or S.Avatar:CooldownRemains() > 40 or (not S.Avatar:IsAvailable()) or HL.FightRemains() < 12) then
+      if S.Recklessness:IsCastable() and (S.Annihilator:IsAvailable() and S.Avatar:CooldownRemains() < 1 or S.Avatar:CooldownRemains() > 40 or (not S.Avatar:IsAvailable()) or FightRemains < 12) then
         if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 34"; end
       end
       -- recklessness,if=!raid_event.adds.exists&!talent.annihilator|target.time_to_die<12
-      if S.Recklessness:IsCastable() and (not S.Annihilator:IsAvailable() or HL.FightRemains() < 12) then
+      if S.Recklessness:IsCastable() and (not S.Annihilator:IsAvailable() or FightRemains < 12) then
         if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 36"; end
       end
       -- spear_of_bastion,if=buff.enrage.up&(buff.recklessness.up|buff.avatar.up|target.time_to_die<20|active_enemies>1)&raid_event.adds.in>15
-      if S.SpearofBastion:IsCastable() and (EnrageUp and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffUp(S.AvatarBuff) or HL.FightRemains() < 20 or EnemiesCount8y > 1)) then
+      if S.SpearofBastion:IsCastable() and (EnrageUp and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffUp(S.AvatarBuff) or FightRemains < 20 or EnemiesCount8y > 1)) then
         if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "spear_of_bastion main 38"; end
       end
     end
