@@ -499,41 +499,7 @@ local function APL()
         if Cast(I.CrimsonGladiatorsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge main 46"; end
       end
     end
-    if CDsON() then
-      -- blood_fury,if=debuff.colossus_smash.up
-      if S.BloodFury:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
-        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 39"; end
-      end
-      -- berserking,if=debuff.colossus_smash.remains>6
-      if S.Berserking:IsCastable() and (Target:DebuffRemains(S.ColossusSmashDebuff) > 6) then
-        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 40"; end
-      end
-      -- arcane_torrent,if=cooldown.mortal_strike.remains>1.5&rage<50
-      if S.ArcaneTorrent:IsCastable() and (S.MortalStrike:CooldownRemains() > 1.5 and Player:Rage() < 50) then
-        if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent main 41"; end
-      end
-      -- lights_judgment,if=debuff.colossus_smash.down&cooldown.mortal_strike.remains
-      if S.LightsJudgment:IsCastable() and (Target:DebuffDown(S.ColossusSmashDebuff) and not S.MortalStrike:CooldownUp()) then
-        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 42"; end
-      end
-      -- fireblood,if=debuff.colossus_smash.up
-      if S.Fireblood:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
-        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 43"; end
-      end
-      -- ancestral_call,if=debuff.colossus_smash.up
-      if S.AncestralCall:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
-        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 44"; end
-      end
-      -- bag_of_tricks,if=debuff.colossus_smash.down&cooldown.mortal_strike.remains
-      if S.BagofTricks:IsCastable() and (Target:DebuffDown(S.ColossusSmashDebuff) and not S.MortalStrike:CooldownUp()) then
-        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 10"; end
-      end
-      -- use_item,name=manic_grieftorch
-      if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() then
-        if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch main 46"; end
-      end
-    end
-    if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
+    if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
       -- use_items
       local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
       if ItemToUse then
@@ -542,6 +508,36 @@ local function APL()
         if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
           if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
         end
+      end
+    end
+    if CDsON() then
+      -- arcane_torrent,if=cooldown.mortal_strike.remains>1.5&rage<50
+      if S.ArcaneTorrent:IsCastable() and (S.MortalStrike:CooldownRemains() > 1.5 and Player:Rage() < 50) then
+        if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent main 41"; end
+      end
+      -- lights_judgment,if=debuff.colossus_smash.down&cooldown.mortal_strike.remains
+      if S.LightsJudgment:IsCastable() and (Target:DebuffDown(S.ColossusSmashDebuff) and not S.MortalStrike:CooldownUp()) then
+        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 42"; end
+      end
+      -- bag_of_tricks,if=debuff.colossus_smash.down&cooldown.mortal_strike.remains
+      if S.BagofTricks:IsCastable() and (Target:DebuffDown(S.ColossusSmashDebuff) and not S.MortalStrike:CooldownUp()) then
+        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 10"; end
+      end
+      -- berserking,if=debuff.colossus_smash.remains>6
+      if S.Berserking:IsCastable() and (Target:DebuffRemains(S.ColossusSmashDebuff) > 6) then
+        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 40"; end
+      end
+      -- blood_fury,if=debuff.colossus_smash.up
+      if S.BloodFury:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
+        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 39"; end
+      end
+      -- fireblood,if=debuff.colossus_smash.up
+      if S.Fireblood:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
+        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 43"; end
+      end
+      -- ancestral_call,if=debuff.colossus_smash.up
+      if S.AncestralCall:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
+        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 44"; end
       end
     end
     -- run_action_list,name=hac,if=raid_event.adds.exists|active_enemies>2
@@ -560,7 +556,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Arms Warrior rotation is currently a work in progress, but has been updated for patch 10.0.")
+  HR.Print("Arms Warrior rotation is currently a work in progress, but has been updated for patch 10.1.0.")
 end
 
 HR.SetAPL(71, APL, Init)
