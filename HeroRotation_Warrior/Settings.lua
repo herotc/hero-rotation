@@ -28,6 +28,7 @@ HR.GUISettings.APL.Warrior = {
       Charge = "Suggested",
       HeroicLeap = "Suggested",
     },
+    ShoutDuringCombat = true,
     VictoryRushHP = 80,
     -- {Display OffGCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -100,6 +101,7 @@ local CP_Fury = CreateChildPanel(CP_Warrior, "Fury")
 local CP_Protection = CreateChildPanel(CP_Warrior, "Protection")
 
 CreateARPanelOptions(CP_Warrior, "APL.Warrior.Commons")
+CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.ShoutDuringCombat", "Battle Shout during combat", "Enable this option to allow Battle Shout to be suggested during combat (for re-buffing fallen allies or when the buff expires during combat).")
 CreatePanelOption("Slider", CP_Warrior, "APL.Warrior.Commons.VictoryRushHP", {0, 100, 1}, "Victory Rush HP", "Set the Victory Rush/Impending Victory HP threshold. Set to 0 to disable.")
 
 -- Arms Settings

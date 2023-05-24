@@ -70,6 +70,10 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
+  -- Manually added: Group Battle Shout check
+  if S.BattleShout:IsCastable() and (Player:BuffDown(S.BattleShoutBuff, true) or Everyone.GroupBuffMissing(S.BattleShoutBuff)) then
+    if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat"; end
+  end
   -- berserker_stance,toggle=on
   if S.BerserkerStance:IsCastable() and Player:BuffDown(S.BerserkerStance, true) then
     if Cast(S.BerserkerStance) then return "berserker_stance precombat 2"; end
@@ -363,15 +367,15 @@ local function APL()
   end
 
   if Everyone.TargetIsValid() then
-    -- Manually added: Group buff check
-    if S.BattleShout:IsCastable() and (Player:BuffDown(S.BattleShoutBuff, true) or Everyone.GroupBuffMissing(S.BattleShoutBuff)) then
-      if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat"; end
-    end
     -- call Precombat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- In Combat
+    -- Manually added: battle_shout during combat
+    if S.BattleShout:IsCastable() and Settings.Commons.ShoutDuringCombat and (Player:BuffDown(S.BattleShoutBuff, true) or Everyone.GroupBuffMissing(S.BattleShoutBuff)) then
+      if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout main 1"; end
+    end
     -- auto_attack
     -- charge,if=time<=0.5|movement.distance>5
     if S.Charge:IsCastable() then
