@@ -98,6 +98,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   Metamorphosis                         = Spell(191427),
   ThrowGlaive                           = Spell(185123),
   -- Talents
+  AnyMeansNecessary                     = Spell(388114),
   BlindFury                             = Spell(203550),
   BurningWound                          = Spell(391189),
   ChaosTheory                           = Spell(389687),
@@ -115,7 +116,9 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   IsolatedPrey                          = Spell(388113),
   Momentum                              = Spell(206476),
   Ragefire                              = Spell(388107),
+  RestlessHunter                        = Spell(390142),
   SerratedGlaive                        = Spell(390154),
+  ShatteredDestiny                      = Spell(388116),
   Soulrend                              = Spell(388106),
   TacticalRetreat                       = Spell(389688),
   TrailofRuin                           = Spell(258881),
@@ -124,6 +127,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   -- Buffs
   ChaosTheoryBuff                       = Spell(390195),
   FuriousGazeBuff                       = Spell(343312),
+  InitiativeBuff                        = Spell(391215),
   InnerDemonBuff                        = Spell(390145),
   MetamorphosisBuff                     = Spell(162264),
   MomentumBuff                          = Spell(208628),
@@ -141,6 +145,8 @@ Item.DemonHunter.Commons = {
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   DragonfireBombDispenser               = Item(202610, {13, 14}),
   ElementiumPocketAnvil                 = Item(202617, {13, 14}),
+  ManicGrieftorch                       = Item(194308, {13, 14}),
+  StormEatersBoon                       = Item(194302, {13, 14}),
 }
 
 Item.DemonHunter.Vengeance = MergeTableByKey(Item.DemonHunter.Commons, {
