@@ -187,6 +187,7 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   -- Debuffs
   DeathRotDebuff                        = Spell(377540),
   FesteringWoundDebuff                  = Spell(194310),
+  RottenTouchDebuff                     = Spell(390276),
   UnholyBlightDebuff                    = Spell(115994),
 })
 
@@ -195,6 +196,7 @@ if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Commons = {
   -- Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
+  IrideusFragment                       = Item(193743, {13, 14}),
 }
 
 Item.DeathKnight.Blood = MergeTableByKey(Item.DeathKnight.Commons, {
