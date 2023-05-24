@@ -135,7 +135,7 @@ local function Hac()
     if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend hac 70"; end
   end
   -- avatar,if=raid_event.adds.in>15|talent.blademasters_torment&active_enemies>1|target.time_to_die<20
-  if CDsON() and S.Avatar:IsCastable() and ((S.BlademastersTorment:IsAvailable() and EnemiesCount8y > 1) or HL.FightRemains() < 20) then
+  if CDsON() and S.Avatar:IsCastable() and ((S.BlademastersTorment:IsAvailable() and EnemiesCount8y > 1) or FightRemains < 20) then
     if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar hac 71"; end
   end
   -- warbreaker,if=raid_event.adds.in>22|active_enemies>1
@@ -267,7 +267,7 @@ local function Execute()
     if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend execute 52"; end
   end
   -- avatar,if=cooldown.colossus_smash.ready|debuff.colossus_smash.up|target.time_to_die<20
-  if CDsON() and S.Avatar:IsCastable() and (S.ColossusSmash:CooldownUp() or Target:DebuffUp(S.ColossusSmashDebuff) or HL.FightRemains() < 20) then
+  if CDsON() and S.Avatar:IsCastable() and (S.ColossusSmash:CooldownUp() or Target:DebuffUp(S.ColossusSmashDebuff) or FightRemains < 20) then
     if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar execute 53"; end
   end
   -- warbreaker
