@@ -300,11 +300,6 @@ local function St()
   if S.AimedShot:IsReady() then
     if Everyone.CastTargetIf(S.AimedShot, Enemies40y, "max", EvaluateTargetIfFilterLatentPoison, EvaluateTargetIfAimedShot2, not TargetInRange40y) then return "aimed_shot st 32"; end
   end
-  -- steady_shot,if=talent.steady_focus&buff.steady_focus.remains<execute_time*2
-  -- Note: Added SteadyShotTracker.Count ~= 2 so we don't suggest this during the cast that will grant us SteadyFocusBuff
-  if S.SteadyShot:IsCastable() and (S.SteadyFocus:IsAvailable() and Player:BuffRemains(S.SteadyFocusBuff) < S.SteadyShot:ExecuteTime() * 2) and SteadyShotTracker.Count ~= 2 then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 34"; end
-  end
   -- volley
   if S.Volley:IsReady() then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley)  then return "volley trickshots 36"; end
