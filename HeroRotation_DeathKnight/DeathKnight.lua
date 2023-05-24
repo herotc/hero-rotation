@@ -103,7 +103,8 @@ Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
   HemostasisBuff                        = Spell(273947),
   IceboundFortitudeBuff                 = Spell(48792),
   RuneTapBuff                           = Spell(194679),
-  VampiricBloodBuff                     = Spell(55233)
+  VampiricBloodBuff                     = Spell(55233),
+  VampiricStrengthBuff                  = Spell(408356), -- Tier 30 4pc
 })
 
 Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
