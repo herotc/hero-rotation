@@ -107,6 +107,7 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   BlessedChampion                       = Spell(403010),
   BoundlessJudgment                     = Spell(405278),
   Crusade                               = Spell(231895),
+  CrusadingStrikes                      = Spell(404542),
   DivineAuxiliary                       = Spell(406158),
   DivineHammer                          = Spell(198034),
   DivineResonance                       = Spell(384027),
@@ -171,6 +172,8 @@ Item.Paladin.Protection = MergeTableByKey(Item.Paladin.Commons, {
 })
 
 Item.Paladin.Retribution = MergeTableByKey(Item.Paladin.Commons, {
+  -- Other On-Use Items
+  ShadowedRazingAnnihilator             = Item(205046),
 })
 
 Item.Paladin.Holy = MergeTableByKey(Item.Paladin.Commons, {
