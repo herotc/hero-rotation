@@ -440,12 +440,12 @@ local function Trinkets()
   end
   -- use_items,slots=trinket1,if=!trinket.1.has_use_buff|buff.trueshot.up
   local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes)
-  if Trinket1ToUse and ((not Trinket1ToUse:TrinketHasUseBuff()) or Player:BuffUp(S.TrueshotBuff)) then
+  if Trinket1ToUse and ((not Trinket1ToUse:HasUseBuff()) or Player:BuffUp(S.TrueshotBuff)) then
     if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name(); end
   end
   -- use_items,slots=trinket2,if=!trinket.2.has_use_buff|buff.trueshot.up
   local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes)
-  if Trinket2ToUse and ((not Trinket2ToUse:TrinketHasUseBuff()) or Player:BuffUp(S.TrueshotBuff)) then
+  if Trinket2ToUse and ((not Trinket2ToUse:HasUseBuff()) or Player:BuffUp(S.TrueshotBuff)) then
     if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name(); end
   end
 end

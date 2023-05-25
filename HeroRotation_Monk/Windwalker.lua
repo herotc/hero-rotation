@@ -219,7 +219,7 @@ end
 
 local function Trinkets()
   -- use_item,name=manic_grieftorch,if=(trinket.1.is.manic_grieftorch&!trinket.2.has_use_buff|trinket.2.is.manic_grieftorch&!trinket.1.has_use_buff)
-  if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() and (trinket1:ID() == I.ManicGrieftorch:ID() and (not trinket2:TrinketHasUseBuff()) or trinket2:ID() == I.ManicGrieftorch:ID() and not trinket1:TrinketHasUseBuff()) then
+  if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() and (trinket1:ID() == I.ManicGrieftorch:ID() and (not trinket2:HasUseBuff()) or trinket2:ID() == I.ManicGrieftorch:ID() and not trinket1:HasUseBuff()) then
     if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "manic_grieftorch trinkets 2"; end
   end
   if VarTrinketType == 1 then
