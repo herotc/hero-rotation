@@ -74,9 +74,9 @@ local TrinketItem2 = Equipment[14] and Item(Equipment[14]) or Item(0)
 local function SetTrinketVariables ()
   -- actions.precombat+=/variable,name=trinket_sync_slot,value=1,if=trinket.1.has_stat.any_dps&(!trinket.2.has_stat.any_dps|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)
   -- actions.precombat+=/variable,name=trinket_sync_slot,value=2,if=trinket.2.has_stat.any_dps&(!trinket.1.has_stat.any_dps|trinket.2.cooldown.duration>trinket.1.cooldown.duration)
-  if TrinketItem1:TrinketHasStatAnyDps() and (not TrinketItem2:TrinketHasStatAnyDps() or TrinketItem1:Cooldown() >= TrinketItem2:Cooldown()) then
+  if TrinketItem1:HasStatAnyDps() and (not TrinketItem2:HasStatAnyDps() or TrinketItem1:Cooldown() >= TrinketItem2:Cooldown()) then
     TrinketSyncSlot = 1
-  elseif TrinketItem2:TrinketHasStatAnyDps() and (not TrinketItem1:TrinketHasStatAnyDps() or TrinketItem2:Cooldown() > TrinketItem1:Cooldown()) then
+  elseif TrinketItem2:HasStatAnyDps() and (not TrinketItem1:HasStatAnyDps() or TrinketItem2:Cooldown() > TrinketItem1:Cooldown()) then
     TrinketSyncSlot = 2
   else
     TrinketSyncSlot = 0
