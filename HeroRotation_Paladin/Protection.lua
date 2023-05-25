@@ -123,37 +123,49 @@ local function Defensives()
 end
 
 local function Cooldowns()
+  -- avengers_shield,if=time=0&set_bonus.tier29_2pc
+  -- Note: time=0 would effectively be Precombat, where we're suggesting this anyway.
+  -- lights_judgment,if=spell_targets.lights_judgment>=2|!raid_event.adds.exists|raid_event.adds.in>75|raid_event.adds.up
+  if S.LightsJudgment:IsCastable() then
+    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cooldowns 2"; end
+  end
   -- avenging_wrath
   if S.AvengingWrath:IsCastable() then
-    if Cast(S.AvengingWrath, Settings.Protection.OffGCDasOffGCD.AvengingWrath) then return "avenging_wrath cooldowns 2"; end
+    if Cast(S.AvengingWrath, Settings.Protection.OffGCDasOffGCD.AvengingWrath) then return "avenging_wrath cooldowns 4"; end
   end
   -- sentinel
-  -- Note: Protection Paladin APL has back-end code to replace AW with Sentinel when talented.
+  -- Note: Simc's Paladin module has back-end code to automatically replace AW with Sentinel when talented.
   if S.Sentinel:IsCastable() then
-    if Cast(S.Sentinel, Settings.Protection.OffGCDasOffGCD.Sentinel) then return "sentinel cooldowns 3"; end
+    if Cast(S.Sentinel, Settings.Protection.OffGCDasOffGCD.Sentinel) then return "sentinel cooldowns 6"; end
   end
   -- potion,if=buff.avenging_wrath.up
   if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.AvengingWrathBuff)) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldowns 4"; end
+      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldowns 8"; end
     end
   end
   -- moment_of_glory,if=(buff.avenging_wrath.remains<15|(time>10|(cooldown.avenging_wrath.remains>15))&(cooldown.avengers_shield.remains&cooldown.judgment.remains&cooldown.hammer_of_wrath.remains))
   if S.MomentofGlory:IsCastable() and (Player:BuffRemains(S.AvengingWrathBuff) < 15 or (HL.CombatTime() > 10 or (S.AvengingWrath:CooldownRemains() > 15)) and (S.AvengersShield:CooldownDown() and S.Judgment:CooldownDown() and S.HammerofWrath:CooldownDown())) then
-    if Cast(S.MomentofGlory, Settings.Protection.OffGCDasOffGCD.MomentOfGlory) then return "moment_of_glory cooldowns 6"; end
+    if Cast(S.MomentofGlory, Settings.Protection.OffGCDasOffGCD.MomentOfGlory) then return "moment_of_glory cooldowns 10"; end
   end
-  -- holy_avenger,if=buff.avenging_wrath.up|cooldown.avenging_wrath.remains>60
-  -- Note: Appears to have been removed in 10.0.7
+  -- divine_toll,if=spell_targets.shield_of_the_righteous>=3
+  if S.DivineToll:IsReady() and (EnemiesCount8y >= 3) then
+    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll cooldowns 12"; end
+  end
+  -- eye_of_tyr,if=talent.inmost_light.enabled&spell_targets.shield_of_the_righteous>=3
+  if S.EyeofTyr:IsCastable() and (S.InmostLight:IsAvailable() and EnemiesCount8y >= 3) then
+    if Cast(S.EyeofTyr, nil, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr cooldowns 14"; end
+  end
   -- bastion_of_light,if=buff.avenging_wrath.up
   if S.BastionofLight:IsCastable() and (Player:BuffUp(S.AvengingWrathBuff)) then
-    if Cast(S.BastionofLight, Settings.Protection.OffGCDasOffGCD.BastionOfLight) then return "bastion_of_light cooldowns 10"; end
+    if Cast(S.BastionofLight, Settings.Protection.OffGCDasOffGCD.BastionOfLight) then return "bastion_of_light cooldowns 16"; end
   end
 end
 
 local function Trinkets()
-  -- use_item,slot=trinket1,if=(buff.moment_of_glory.up|!talent.moment_of_glory_enabled&buff.avenging_wrath.up)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
-  -- use_item,slot=trinket2,if=(buff.moment_of_glory.up|!talent.moment_of_glory_enabled&buff.avenging_wrath.up)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
+  -- use_item,slot=trinket1,if=(buff.moment_of_glory.up|!talent.moment_of_glory.enabled&buff.avenging_wrath.up)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
+  -- use_item,slot=trinket2,if=(buff.moment_of_glory.up|!talent.moment_of_glory.enabled&buff.avenging_wrath.up)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs|(cooldown.moment_of_glory.remains>20|(!talent.moment_of_glory.enabled&cooldown.avenging_wrath.remains>20)))
   -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs|(cooldown.moment_of_glory.remains>20|(!talent.moment_of_glory.enabled&cooldown.avenging_wrath.remains>20)))
   -- Note: Unable to handle some trinket conditionals, such as cooldown.duration. Using a generic fallback instead.
@@ -171,24 +183,29 @@ local function Trinkets()
 end
 
 local function Standard()
+  -- shield_of_the_righteous,if=((!talent.righteous_protector.enabled|cooldown.righteous_protector_icd.remains=0)&holy_power>2)|buff.bastion_of_light.up|buff.divine_purpose.up"
   -- shield_of_the_righteous,if=(!talent.righteous_protector.enabled|cooldown.righteous_protector_icd.remains=0)&(buff.bastion_of_light.up|buff.divine_purpose.up|holy_power>2)
   -- TODO: Find a way to track RighteousProtector ICD.
-  if S.ShieldoftheRighteous:IsReady() and (Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff) or Player:HolyPower() > 2) then
+  local RPReady = false
+  if S.RighteousProtector:IsAvailable() then
+    RPReady = (S.ShieldoftheRighteous:TimeSinceLastCast() > 1 and S.WordofGlory:TimeSinceLastCast() > 1)
+  end
+  if S.ShieldoftheRighteous:IsReady() and ((((not S.RighteousProtector:IsAvailable()) or RPReady) and Player:HolyPower() > 2) or Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff)) then
     if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous standard 2"; end
   end
-  -- avengers_shield,if=buff.moment_of_glory.up|!talent.moment_of_glory.enabled
-  if S.AvengersShield:IsCastable() and (Player:BuffUp(S.MomentofGloryBuff) or not S.MomentofGlory:IsAvailable()) then
+  -- avengers_shield,if=buff.moment_of_glory.up|(set_bonus.tier29_2pc&(!buff.ally_of_the_light.up|buff.ally_of_the_light.remains<gcd))
+  if S.AvengersShield:IsCastable() and (Player:BuffUp(S.MomentofGloryBuff) or (Player:HasTier(29, 2) and (Player:BuffDown(S.AllyoftheLightBuff) or Player:BuffRemains(S.AllyoftheLightBuff) < Player:GCD()))) then
     if Cast(S.AvengersShield, nil, nil, not Target:IsSpellInRange(S.AvengersShield)) then return "avengers_shield standard 4"; end
   end
   -- hammer_of_wrath,if=buff.avenging_wrath.up
   if S.HammerofWrath:IsReady() and (Player:BuffUp(S.AvengingWrathBuff)) then
     if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath standard 6"; end
   end
-  -- judgment,target_if=min:debuff.judgment.remains,if=charges=2|!talent.crusaders_judgment.enabled
-  if S.Judgment:IsReady() and (S.Judgment:Charges() == 2 or not S.CrusadersJudgment:IsAvailable()) then
+  -- judgment,target_if=min:debuff.judgment.remains,if=talent.crusaders_judgment.enabled&(charges=2|cooldown.judgment.remains<4)|!talent.crusaders_judgment.enabled
+  if S.Judgment:IsReady() and (S.CrusadersJudgment:IsAvailable() and (S.Judgment:Charges() == 2 or S.Judgment:CooldownRemains() < 4) or not S.CrusadersJudgment:IsAvailable()) then
     if Everyone.CastTargetIf(S.Judgment, Enemies30y, "min", EvaluateTargetIfFilterJudgment, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment standard 8"; end
   end
-  -- divine_toll,if=time>20|((buff.avenging_wrath.up|!talent.avenging_wrath.enabled)&(buff.moment_of_glory.up|!talent.moment_of_glory.enabled))
+  -- divine_toll,if=(time>20&(!raid_event.adds.exists|raid_event.adds.in>10))|((buff.avenging_wrath.up|!talent.avenging_wrath.enabled)&(buff.moment_of_glory.up|!talent.moment_of_glory.enabled))
   if CDsON() and S.DivineToll:IsReady() and (HL.CombatTime() > 20 or ((Player:BuffUp(S.AvengingWrathBuff) or not S.AvengingWrath:IsAvailable()) and (Player:BuffUp(S.MomentofGloryBuff) or not S.MomentofGlory:IsAvailable()))) then
     if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll standard 10"; end
   end
@@ -208,7 +225,8 @@ local function Standard()
   if S.Consecration:IsCastable() and (Player:BuffDown(S.ConsecrationBuff)) then
     if Cast(S.Consecration) then return "consecration standard 18"; end
   end
-  -- eye_of_tyr
+  -- eye_of_tyr,if=!talent.inmost_light.enabled|raid_event.adds.in>=45
+  -- Note: We have no way of tracking how long until adds spawn.
   if CDsON() and S.EyeofTyr:IsCastable() then
     if Cast(S.EyeofTyr, nil, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr standard 20"; end
   end
@@ -289,7 +307,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Protection Paladin rotation is currently a work in progress, but has been updated for patch 10.0.")
+  HR.Print("Protection Paladin rotation is currently a work in progress, but has been updated for patch 10.1.0.")
 end
 
 HR.SetAPL(66, APL, Init)
