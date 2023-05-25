@@ -118,6 +118,7 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   ChillStreak                           = Spell(305392),
   ColdHeart                             = Spell(281208),
   Everfrost                             = Spell(376938),
+  FatalFixation                         = Spell(405166),
   Frostscythe                           = Spell(207230),
   FrostwyrmsFury                        = Spell(279302),
   GatheringStorm                        = Spell(194912),
