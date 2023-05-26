@@ -15,12 +15,15 @@ local Spell      = HL.Spell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
-local AoEON      = HR.AoEON
-local CDsON      = HR.CDsON
 local Cast       = HR.Cast
 -- Num/Bool Helper Functions
 local num        = HR.Commons.Everyone.num
 local bool       = HR.Commons.Everyone.bool
+
+-- WoW API
+local mathfloor  = math.floor
+local GetTotemInfo = GetTotemInfo
+local GetTime      = GetTime
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -39,11 +42,14 @@ local StunInterrupts = {
   {S.HammerofJustice, "Cast Hammer of Justice (Interrupt)", function () return true; end},
 }
 
--- Rotation Var
-local ActiveMitigationNeeded
-local IsTanking
+local GCDMax
 local Enemies8y, Enemies30y
 local EnemiesCount8y, EnemiesCount30y
+local InterruptibleEnemyUnits
+local WrathableEnemyUnits
+local HighestHPEnemyUnit
+local PartyHealCandidates
+local PartyDispelCandidates
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -53,126 +59,133 @@ local Settings = {
   Protection = HR.GUISettings.APL.Paladin.Protection
 }
 
--- Feature requests: all abilities (even non-targetted) appear on name plates
--- Make sure to use utility abilities inside of "dead globals" where hammer is recharging and judgment is recharging
+-- Feature requests: all abilities appear on name plates
 
-local function EvaluateTargetIfFilterJudgment(TargetUnit)
-  return TargetUnit:DebuffRemains(S.JudgmentDebuff)
+local function ConsecrationTimeRemaining()
+  for index=1,4 do
+    local _, totemName, startTime, duration = GetTotemInfo(index)
+    if totemName == S.Consecration:Name() then
+      return (mathfloor(startTime + duration - GetTime() + 0.5)) or 0
+    end
+  end
+  return 0
 end
 
 local function MissingAura()
   return (Player:BuffDown(S.RetributionAura) and Player:BuffDown(S.DevotionAura) and Player:BuffDown(S.ConcentrationAura) and Player:BuffDown(S.CrusaderAura))
 end
 
+local function ScanBattlefield()
+  InterruptibleEnemyUnits = {}
+  WrathableEnemyUnits = {}
+  HighestHPEnemyUnit = nil
+  local highest_health = 0
+  for _, CycleUnit in pairs(Enemies30y) do
+    if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() then
+      if CycleUnit:IsInterruptible() then
+        table.insert(InterruptibleEnemyUnits, {CycleUnit, CycleUnit:Health()})
+      end
+      if CycleUnit:HealthPercentage() <= 20 or Player:BuffUp(S.AvengingWrathBuff) then
+        table.insert(WrathableEnemyUnits, {CycleUnit, CycleUnit:Health()})
+      end
+      -- TODO: cycle judgment debuffs around rather than hit highest HP?
+      if CycleUnit:Health() >= highest_health then
+        highest_health = CycleUnit:Health()
+        HighestHPEnemyUnit = CycleUnit
+      end
+    end
+  end
+
+  PartyHealCandidates = {}
+  PartyDispelCandidates = {} -- TODO: add some whitelist code for dispellable debuffs on players (consider cleanse, freedom, bop, spellwarding)
+  if Player:IsInParty() and not Player:IsInRaid() then
+    for _, Char in pairs(Unit.Party) do
+      if Char:Exists() and Char:IsInRange(40) and Char:HealthPercentage() < Settings.Protection.FriendlyWordofGloryHP then
+        table.insert(PartyHealCandidates, {Char, Char:HealthPercentage()})
+      end
+    end
+  end
+
+  table.sort(InterruptibleEnemyUnits, function (a, b) return a[2] < b[2] end)
+  table.sort(WrathableEnemyUnits, function (a, b) return a[2] < b[2] end)
+  table.sort(PartyHealCandidates, function (a, b) return a[2] > b[2] end)
+end
+
+-- Returns `true` if it's safe to dump SOTR or healing without incurring the ICD bug, `false` if you should wait a bit
+local function RPSafe()
+  return not S.RighteousProtector:IsAvailable() or (S.ShieldoftheRighteous:TimeSinceLastCast() > 1 and S.WordofGlory:TimeSinceLastCast() > 1)
+end
+
 local function Precombat()
-  -- flask
-  -- food
-  -- augmentation
-  -- snapshot_stats
-  -- Manually added: devotion_aura
   if S.DevotionAura:IsCastable() and (MissingAura()) then
-    if Cast(S.DevotionAura) then return "devotion_aura precombat 2"; end
+    if Cast(S.DevotionAura) then return "devotion_aura precombat"; end
   end
-  -- lights_judgment
-  if CDsON() and S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment precombat 4"; end
+  if S.HammerofWrath:IsReady() then
+    if Cast(S.HammerofWrath, nil, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer of wrath precombat"; end
   end
-  -- arcane_torrent
-  if CDsON() and S.ArcaneTorrent:IsCastable() then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 6"; end
+  if S.Judgment:FullRechargeTime() < GCDMax and S.Judgment:IsReady() then
+    if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "max charges judgment precombat"; end
   end
-  -- consecration
+  if S.AvengersShield:IsCastable() then
+    if Cast(S.AvengersShield, nil, nil, not Target:IsSpellInRange(S.AvengersShield)) then return "avengers_shield precombat"; end
+  end
+  if S.Judgment:IsReady() then
+    if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment precombat"; end
+  end
   if S.Consecration:IsCastable() and Target:IsInMeleeRange(8) then
     if Cast(S.Consecration) then return "consecration precombat 8"; end
-  end
-  -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&((talent.moment_of_glory.enabled&trinket.1.cooldown.duration%%cooldown.moment_of_glory.duration=0)|(!talent.moment_of_glory.enabled&trinket.1.cooldown.duration%%cooldown.avenging_wrath.duration=0))
-  -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&((talent.moment_of_glory.enabled&trinket.2.cooldown.duration%%cooldown.moment_of_glory.duration=0)|(!talent.moment_of_glory.enabled&trinket.2.cooldown.duration%%cooldown.avenging_wrath.duration=0))
-  -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!trinket.1.has_use_buff&trinket.2.has_use_buff|trinket.2.has_use_buff&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync))
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_buff.strength|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_buff.strength|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit
-  -- Note: Unable to handle some trinket conditionals, such as cooldown.duration.
-  -- Manually added: avengers_shield
-  if S.AvengersShield:IsCastable() then
-    if Cast(S.AvengersShield, nil, nil, not Target:IsSpellInRange(S.AvengersShield)) then return "avengers_shield precombat 10"; end
-  end
-  -- Manually added: judgment
-  if S.Judgment:IsReady() then
-    if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment precombat 12"; end
   end
 end
 
 local function Defensives()
+  if Player:HealthPercentage() <= Settings.Protection.BubbleHP and S.DivineShield:IsCastable() then
+    if Cast(S.DivineShield, nil, Settings.Protection.DisplayStyle.Defensives) then return "bubble defensive"; end
+  end
   if Player:HealthPercentage() <= Settings.Protection.LoHHP and S.LayonHands:IsCastable() then
-    if Cast(S.LayonHands, nil, Settings.Protection.DisplayStyle.Defensives) then return "lay_on_hands defensive 2"; end
+    if HR.CastAnnotated(S.LayonHands, nil, "SELF") then return "lay_on_hands self defensive"; end
   end
   if S.GuardianofAncientKings:IsCastable() and (Player:HealthPercentage() <= Settings.Protection.GoAKHP and Player:BuffDown(S.ArdentDefenderBuff)) then
-    if Cast(S.GuardianofAncientKings, nil, Settings.Protection.DisplayStyle.Defensives) then return "guardian_of_ancient_kings defensive 4"; end
+    if Cast(S.GuardianofAncientKings, nil, Settings.Protection.DisplayStyle.Defensives) then return "guardian_of_ancient_kings defensive"; end
   end
   if S.ArdentDefender:IsCastable() and (Player:HealthPercentage() <= Settings.Protection.ArdentDefenderHP and Player:BuffDown(S.GuardianofAncientKingsBuff)) then
-    if Cast(S.ArdentDefender, nil, Settings.Protection.DisplayStyle.Defensives) then return "ardent_defender defensive 6"; end
+    if Cast(S.ArdentDefender, nil, Settings.Protection.DisplayStyle.Defensives) then return "ardent_defender defensive"; end
   end
-  if S.WordofGlory:IsReady() and (Player:HealthPercentage() <= Settings.Protection.WordofGloryHP and not Player:HealingAbsorbed()) then
-    -- cast word of glory on us if it's a) free or b) probably not going to drop sotr
-    if (Player:BuffRemains(S.ShieldoftheRighteousBuff) >= 5 or Player:BuffUp(S.DivinePurposeBuff) or Player:BuffUp(S.ShiningLightFreeBuff)) then
-      if Cast(S.WordofGlory) then return "word_of_glory defensive 8"; end
-    else
-      -- cast it anyway but run the fuck away
-      if HR.CastAnnotated(S.WordofGlory, false, "KITE") then return "word_of_glory defensive 10"; end
-    end
-  end
-  if S.ShieldoftheRighteous:IsReady() and (Player:BuffRefreshable(S.ShieldoftheRighteousBuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP)) then
-    if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous defensive 14"; end
+  if S.ShieldoftheRighteous:IsReady() and Player:BuffRefreshable(S.ShieldoftheRighteousBuff) and RPSafe() then
+    if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous refresh defensive"; end
   end
 end
 
 local function Cooldowns()
-  -- avengers_shield,if=time=0&set_bonus.tier29_2pc
-  -- Note: time=0 would effectively be Precombat, where we're suggesting this anyway.
-  -- lights_judgment,if=spell_targets.lights_judgment>=2|!raid_event.adds.exists|raid_event.adds.in>75|raid_event.adds.up
   if S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cooldowns 2"; end
+    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cooldowns"; end
   end
-  -- avenging_wrath
   if S.AvengingWrath:IsCastable() then
-    if Cast(S.AvengingWrath, Settings.Protection.OffGCDasOffGCD.AvengingWrath) then return "avenging_wrath cooldowns 4"; end
+    if Cast(S.AvengingWrath, Settings.Protection.OffGCDasOffGCD.AvengingWrath) then return "avenging_wrath cooldowns"; end
   end
-  -- sentinel
-  -- Note: Simc's Paladin module has back-end code to automatically replace AW with Sentinel when talented.
   if S.Sentinel:IsCastable() then
-    if Cast(S.Sentinel, Settings.Protection.OffGCDasOffGCD.Sentinel) then return "sentinel cooldowns 6"; end
+    if Cast(S.Sentinel, Settings.Protection.OffGCDasOffGCD.Sentinel) then return "sentinel cooldowns"; end
   end
-  -- potion,if=buff.avenging_wrath.up
   if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.AvengingWrathBuff)) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldowns 8"; end
+      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldowns"; end
     end
   end
-  -- moment_of_glory,if=(buff.avenging_wrath.remains<15|(time>10|(cooldown.avenging_wrath.remains>15))&(cooldown.avengers_shield.remains&cooldown.judgment.remains&cooldown.hammer_of_wrath.remains))
   if S.MomentofGlory:IsCastable() and (Player:BuffRemains(S.AvengingWrathBuff) < 15 or (HL.CombatTime() > 10 or (S.AvengingWrath:CooldownRemains() > 15)) and (S.AvengersShield:CooldownDown() and S.Judgment:CooldownDown() and S.HammerofWrath:CooldownDown())) then
-    if Cast(S.MomentofGlory, Settings.Protection.OffGCDasOffGCD.MomentOfGlory) then return "moment_of_glory cooldowns 10"; end
+    if Cast(S.MomentofGlory, Settings.Protection.OffGCDasOffGCD.MomentOfGlory) then return "moment_of_glory cooldowns"; end
   end
-  -- divine_toll,if=spell_targets.shield_of_the_righteous>=3
   if S.DivineToll:IsReady() and (EnemiesCount8y >= 3) then
-    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll cooldowns 12"; end
+    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll cooldowns"; end
   end
-  -- eye_of_tyr,if=talent.inmost_light.enabled&spell_targets.shield_of_the_righteous>=3
   if S.EyeofTyr:IsCastable() and (S.InmostLight:IsAvailable() and EnemiesCount8y >= 3) then
-    if Cast(S.EyeofTyr, nil, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr cooldowns 14"; end
+    if Cast(S.EyeofTyr, nil, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr cooldowns"; end
   end
-  -- bastion_of_light,if=buff.avenging_wrath.up
   if S.BastionofLight:IsCastable() and (Player:BuffUp(S.AvengingWrathBuff)) then
-    if Cast(S.BastionofLight, Settings.Protection.OffGCDasOffGCD.BastionOfLight) then return "bastion_of_light cooldowns 16"; end
+    if Cast(S.BastionofLight, Settings.Protection.OffGCDasOffGCD.BastionOfLight) then return "bastion_of_light cooldowns"; end
   end
 end
 
 local function Trinkets()
-  -- use_item,slot=trinket1,if=(buff.moment_of_glory.up|!talent.moment_of_glory.enabled&buff.avenging_wrath.up)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
-  -- use_item,slot=trinket2,if=(buff.moment_of_glory.up|!talent.moment_of_glory.enabled&buff.avenging_wrath.up)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
-  -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs|(cooldown.moment_of_glory.remains>20|(!talent.moment_of_glory.enabled&cooldown.avenging_wrath.remains>20)))
-  -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs|(cooldown.moment_of_glory.remains>20|(!talent.moment_of_glory.enabled&cooldown.avenging_wrath.remains>20)))
-  -- Note: Unable to handle some trinket conditionals, such as cooldown.duration. Using a generic fallback instead.
-  -- use_items,if=(buff.moment_of_glory.up|!talent.moment_of_glory.enabled&buff.avenging_wrath.up)|(cooldown.moment_of_glory.remains>20|!talent.moment_of_glory.enabled&cooldown.avenging_wrath.remains>20)
   if ((Player:BuffUp(S.MomentofGloryBuff) or (not S.MomentofGlory:IsAvailable()) and Player:BuffUp(S.AvengingWrathBuff)) or (S.MomentofGlory:CooldownRemains() > 20 or (not S.MomentofGlory:IsAvailable()) and S.AvengingWrath:CooldownRemains() > 20)) then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
@@ -185,84 +198,141 @@ local function Trinkets()
   end
 end
 
-local function Standard()
-  -- shield_of_the_righteous,if=((!talent.righteous_protector.enabled|cooldown.righteous_protector_icd.remains=0)&holy_power>2)|buff.bastion_of_light.up|buff.divine_purpose.up"
-  -- shield_of_the_righteous,if=(!talent.righteous_protector.enabled|cooldown.righteous_protector_icd.remains=0)&(buff.bastion_of_light.up|buff.divine_purpose.up|holy_power>2)
-  -- TODO: Find a way to track RighteousProtector ICD.
-  local RPReady = false
-  if S.RighteousProtector:IsAvailable() then
-    RPReady = (S.ShieldoftheRighteous:TimeSinceLastCast() > 1 and S.WordofGlory:TimeSinceLastCast() > 1)
+-- Return a (unit, spell) pair that generates at least one holy power; or (nil, nil) if no holy power generating spell is ready.
+-- uses Rebuke (the kick) as a last ditch priority, assuming you have punishment
+local function ForceGenerateHolyPowerGlobal()
+  if S.AvengersShield:IsReady() and #InterruptibleEnemyUnits > 0 then
+    return InterruptibleEnemyUnits[1][1], S.AvengersShield
   end
-  if S.ShieldoftheRighteous:IsReady() and ((((not S.RighteousProtector:IsAvailable()) or RPReady) and Player:HolyPower() > 2) or Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff)) then
-    if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous standard 2"; end
+  if S.HammerofWrath:IsReady() and #WrathableEnemyUnits > 0 then
+    return WrathableEnemyUnits[1][1], S.HammerofWrath
   end
-  -- avengers_shield,if=buff.moment_of_glory.up|(set_bonus.tier29_2pc&(!buff.ally_of_the_light.up|buff.ally_of_the_light.remains<gcd))
-  if S.AvengersShield:IsCastable() and (Player:BuffUp(S.MomentofGloryBuff) or (Player:HasTier(29, 2) and (Player:BuffDown(S.AllyoftheLightBuff) or Player:BuffRemains(S.AllyoftheLightBuff) < Player:GCD()))) then
-    if Cast(S.AvengersShield, nil, nil, not Target:IsSpellInRange(S.AvengersShield)) then return "avengers_shield standard 4"; end
-  end
-  -- hammer_of_wrath,if=buff.avenging_wrath.up
-  if S.HammerofWrath:IsReady() and (Player:BuffUp(S.AvengingWrathBuff)) then
-    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath standard 6"; end
-  end
-  -- judgment,target_if=min:debuff.judgment.remains,if=talent.crusaders_judgment.enabled&(charges=2|cooldown.judgment.remains<4)|!talent.crusaders_judgment.enabled
-  if S.Judgment:IsReady() and (S.CrusadersJudgment:IsAvailable() and (S.Judgment:Charges() == 2 or S.Judgment:CooldownRemains() < 4) or not S.CrusadersJudgment:IsAvailable()) then
-    if Everyone.CastTargetIf(S.Judgment, Enemies30y, "min", EvaluateTargetIfFilterJudgment, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment standard 8"; end
-  end
-  -- divine_toll,if=(time>20&(!raid_event.adds.exists|raid_event.adds.in>10))|((buff.avenging_wrath.up|!talent.avenging_wrath.enabled)&(buff.moment_of_glory.up|!talent.moment_of_glory.enabled))
-  if CDsON() and S.DivineToll:IsReady() and (HL.CombatTime() > 20 or ((Player:BuffUp(S.AvengingWrathBuff) or not S.AvengingWrath:IsAvailable()) and (Player:BuffUp(S.MomentofGloryBuff) or not S.MomentofGlory:IsAvailable()))) then
-    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll standard 10"; end
-  end
-  -- avengers_shield
-  if S.AvengersShield:IsCastable() then
-    if Cast(S.AvengersShield, nil, nil, not Target:IsSpellInRange(S.AvengersShield)) then return "avengers_shield standard 12"; end
-  end
-  -- hammer_of_wrath
-  if S.HammerofWrath:IsReady() then
-    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath standard 14"; end
-  end
-  -- judgment,target_if=min:debuff.judgment.remains
   if S.Judgment:IsReady() then
-    if Everyone.CastTargetIf(S.Judgment, Enemies30y, "min", EvaluateTargetIfFilterJudgment, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment standard 16"; end
+    return HighestHPEnemyUnit, S.Judgment
   end
-  -- consecration,if=!consecration.up
-  if S.Consecration:IsCastable() and (Player:BuffDown(S.ConsecrationBuff)) then
-    if Cast(S.Consecration) then return "consecration standard 18"; end
+  if S.BlessedHammer:IsReady() then
+    return HighestHPEnemyUnit, S.BlessedHammer
   end
-  -- eye_of_tyr,if=!talent.inmost_light.enabled|raid_event.adds.in>=45
-  -- Note: We have no way of tracking how long until adds spawn.
-  if CDsON() and S.EyeofTyr:IsCastable() then
-    if Cast(S.EyeofTyr, nil, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr standard 20"; end
+  return nil, nil
+end
+
+-- Returns the appropriate economy {target, global, generated_hpower} from the set {avengers_shield, hammer_of_wrath, judgment, blessed_hammer}
+-- if we have avengers_shield + hammer of wrath on CD and judgment + blessed_hammer recharging appropriately, we return {nil, nil} to indicate that we can do a utility global here.
+local function EconomyGlobal()
+  if S.AvengersShield:IsReady() and #InterruptibleEnemyUnits > 0 then
+    return InterruptibleEnemyUnits[1][1], S.AvengersShield, 1
   end
-  -- blessed_hammer
-  if S.BlessedHammer:IsCastable() then
-    if Cast(S.BlessedHammer, nil, nil, not Target:IsInMeleeRange(5)) then return "blessed_hammer standard 22"; end
+  if S.AvengersShield:IsReady() and (Player:BuffUp(S.MomentofGloryBuff) or (Player:HasTier(29, 2) and (Player:BuffDown(S.AllyoftheLightBuff) or Player:BuffRemains(S.AllyoftheLightBuff) < Player:GCD()))) then
+    return HighestHPEnemyUnit, S.AvengersShield, 0
   end
-  -- hammer_of_the_righteous
-  if S.HammeroftheRighteous:IsCastable() then
-    if Cast(S.HammeroftheRighteous, nil, nil, not Target:IsInMeleeRange(5)) then return "hammer_of_the_righteous standard 24"; end
+  if S.AvengersShield:IsReady() and EnemiesCount8y >= 4 then
+    return HighestHPEnemyUnit, S.AvengersShield, 0
   end
-  -- crusader_strike
-  if S.CrusaderStrike:IsCastable() then
-    if Cast(S.CrusaderStrike, nil, nil, not Target:IsInMeleeRange(5)) then return "crusader_strike standard 26"; end
+  if S.HammerofWrath:IsReady() and #WrathableEnemyUnits > 0 then
+    return WrathableEnemyUnits[1][1], S.HammerofWrath, 1
   end
-  -- word_of_glory,if=buff.shining_light_free.up
-  if S.WordofGlory:IsReady() and (Player:BuffUp(S.ShiningLightFreeBuff)) then
-    -- Is our health ok? Are we in a party with a wounded party member? Heal them instead.
-    if Player:HealthPercentage() > 90 and Player:IsInParty() and not Player:IsInRaid() then
-      for _, Char in pairs(Unit.Party) do
-        if Char:Exists() and Char:IsInRange(40) and Char:HealthPercentage() <= 80 then
-          if HR.CastAnnotated(S.WordofGlory, false, Char:Name()) then return "word_of_glory standard party 28"; end
-        end
-      end
-      -- Nobody in the party needs it. We might as well heal ourselves for the extra block chance.
-      if Cast(S.WordofGlory, Settings.Protection.GCDasOffGCD.WordOfGlory) then return "word_of_glory standard self 30"; end
-    else
-      -- We're either solo, in a raid, or injured. Heal ourselves.
-      if Cast(S.WordofGlory, Settings.Protection.GCDasOffGCD.WordOfGlory) then return "word_of_glory standard self 32"; end
+
+  -- not sure which order on these is better
+  if S.Judgment:IsReady() and S.Judgment:FullRechargeTime() < GCDMax then
+    return HighestHPEnemyUnit, S.Judgment, 1 + num(Player:BuffUp(S.AvengingWrathBuff))
+  end
+  if S.AvengersShield:IsReady() and EnemiesCount8y >= 2 then
+    return HighestHPEnemyUnit, S.AvengersShield, 0
+  end
+
+  if S.AvengersShield:IsReady() then
+    return HighestHPEnemyUnit, S.AvengersShield, 0 -- single target
+  end
+  if S.Judgment:IsReady() then
+    return HighestHPEnemyUnit, S.Judgment, 1
+  end
+  -- Only dump a hammer charge if it's about to cap, otherwise go to a utility global here.
+  if S.BlessedHammer:FullRechargeTime() < GCDMax then
+    return HighestHPEnemyUnit, S.BlessedHammer, 1
+  end
+  return nil, nil, nil
+end
+
+-- Returns the appropriate low priority {target, global} from the set {word of glory, consecration, blessed_hammer, eye_of_tyr, ... eventually cleanses (cleanse/bop/freedom), flash of light?}
+local function LowPrioGlobal()
+  if Player:BuffUp(S.ShiningLightFreeBuff) and Player:HealthPercentage() < 100 then
+    return Player, S.WordofGlory
+  end
+  if Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff) or not Player:BuffRefreshable(S.ShieldoftheRighteousBuff)  then
+    if Player:HealthPercentage() < Settings.Protection.SelfWordofGloryHP then
+      return Player, S.WordofGlory
+    end
+    if #PartyHealCandidates > 0 then
+      return PartyHealCandidates[1], S.WordofGlory
     end
   end
-  if S.Consecration:IsCastable() then
-    if Cast(S.Consecration) then return "consecration standard 34"; end
+  if S.EyeofTyr:IsReady() then
+    return HighestHPEnemyUnit, S.EyeofTyr
+  end
+  if S.Consecration:IsCastable() and not Player:IsMoving() and ConsecrationTimeRemaining() <= 3 then
+    return HighestHPEnemyUnit, S.Consecration
+  end
+  if S.BlessedHammer:IsReady() then
+    return HighestHPEnemyUnit, S.BlessedHammer
+  end
+  if S.Consecration:IsCastable() and not Player:IsMoving() then
+    return HighestHPEnemyUnit, S.Consecration
+  end
+  if Player:BuffUp(S.ShiningLightFreeBuff) then
+    return Player, S.WordofGlory
+  end
+end
+
+
+local function Core()
+  -- Save allies from death with Lay on Hands where possible, when we're probably not going to die.
+  if Player:HealthPercentage() > 40 and #PartyHealCandidates > 0 then
+    local friend, friend_hp_percentage = PartyHealCandidates[1]
+    if friend_hp_percentage <= 15 then
+      if HR.CastAnnotated(S.LayonHands, false, friend:Name()) then return "lay_on_hands party_member core"; end
+    end
+  end
+  ----------------------------------------------------------------------
+  -- Guarantee defensive SOTR uptime > Consecration uptime > then other stuff
+  -- TODO: consider adding a condition for being "non-scared" if Player:CooldownRemains(S.DivineToll) < Player:BuffRemains(S.ShieldoftheRighteousBuff)
+  if not (Player:BuffUp(S.DivinePurposeBuff) or Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.AvengingWrathBuff)) then
+    local target = nil
+    local spell = nil
+    -- You drop SOTR in (one/two/three) globals, but you're short holy power, so you *MUST* generate holy power this turn.
+    if (1.0*Player:HolyPower() + Player:BuffRemains(S.ShieldoftheRighteousBuff) <= 3) then
+      target, spell = ForceGenerateHolyPowerGlobal()
+    end
+    if target ~= nil and spell ~= nil then
+      if Cast(spell, nil) then return "force_generated_holy_power_global standard"; end
+    end
+    -- This is a bad case, it means there was no holy power generator available when we really needed one.
+  end
+
+  if S.Consecration:IsCastable() and ConsecrationTimeRemaining() < 2 and not Player:IsMoving() then
+    if Cast(S.Consecration) then return "defensive_consecration standard"; end
+  end
+
+  -- divine_toll,if=(time>20&(!raid_event.adds.exists|raid_event.adds.in>10))|((buff.avenging_wrath.up|!talent.avenging_wrath.enabled)&(buff.moment_of_glory.up|!talent.moment_of_glory.enabled))
+  if S.DivineToll:IsReady() and (Player:BuffUp(S.AvengingWrathBuff) or not S.AvengingWrath:IsAvailable()) and (Player:BuffUp(S.MomentofGloryBuff) or not S.MomentofGlory:IsAvailable()) then
+    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll standard"; end
+  end
+
+  -------------------------------------------------------------------
+  local econ_target, econ_global, econ_hpower = EconomyGlobal()
+  -- Dump HOLY POWER into SOTR. We want to do this if our next global is a builder and we're capped on holy power already.
+  -- Decide what to do with excess holy power here: we can either over-cap on SOTR for damage (we already handle the below-cap state in the `defensives` section)
+  -- or we can cast a WOG on ourselves or another person. The trick is that SOTR is off global and WOG is on...
+  --if econ_global ~= nil and S.ShieldoftheRighteous:IsReady() and RPSafe() and ((econ_hpower + Player:HolyPower() > 4) or Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff)) then
+  if econ_global ~= nil and S.ShieldoftheRighteous:IsReady() and ((econ_hpower + Player:HolyPower() > 4) or Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff)) then
+    if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous holy power dump standard"; end
+  end
+  if econ_global ~= nil then
+    if Cast(econ_global, nil) then return "econ_global standard"; end
+  end
+  -------------------------------------------------------------------
+  local low_prio_target, low_prio_global = LowPrioGlobal()
+  if low_prio_global ~= nil then
+    if Cast(low_prio_global, nil) then return "low_prio standard"; end
   end
 end
 
@@ -273,24 +343,27 @@ local function APL()
   EnemiesCount8y = #Enemies8y
   EnemiesCount30y = #Enemies30y
 
-  ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
-  IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
+  -- constant term to account for human reaction time; tunable a bit.
+  GCDMax = Player:GCD() + 0.050
+
+  -- Get information on targets
+  ScanBattlefield()
+
+  -- Even if you're not in combat and don't have a target, press blessed hammer if you're capped on charges and at less than max holy power
+  if not Player:AffectingCombat() and S.BlessedHammer:FullRechargeTime() < GCDMax and Player:HolyPower() < 5 then
+    if Cast(S.BlessedHammer) then return "out of combat blessed hammer"; end
+  end
 
   if Everyone.TargetIsValid() then
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
+
     local ShouldReturn = Everyone.Interrupt(5, S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, StunInterrupts); if ShouldReturn then return ShouldReturn; end
-    if IsTanking then
-      local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
-    end
-    if CDsON() then
-      local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
-    end
-    if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
-      local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
-    end
-    local ShouldReturn = Standard(); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Core(); if ShouldReturn then return ShouldReturn; end
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
 end

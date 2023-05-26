@@ -37,11 +37,12 @@ HR.GUISettings.APL.Paladin = {
   },
   Protection = {
     -- CDs HP %
+    BubbleHP = 15,
     LoHHP = 15,
     GoAKHP = 40,
-    WordofGloryHP = 50,
+    SelfWordofGloryHP = 80,
+    FriendlyWordofGloryHP = 40,
     ArdentDefenderHP = 60,
-    ShieldoftheRighteousHP = 70,
     PotionType = {
       Selected = "Power",
     },
@@ -108,11 +109,12 @@ local CP_Holy = CreateChildPanel(CP_Paladin, "Holy")
 CreateARPanelOptions(CP_Paladin, "APL.Paladin.Commons")
 
 -- Protection
+CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.BubbleHP", {0, 100, 1}, "Bubble HP", "Set the Bubble HP threshold.")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.LoHHP", {0, 100, 1}, "Lay on Hands HP", "Set the Lay on Hands HP threshold.")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.GoAKHP", {0, 100, 1}, "GoAK HP", "Set the Guardian of Ancient Kings HP threshold.")
-CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.WordofGloryHP", {0, 100, 1}, "Word of Glory HP", "Set the Word of Glory HP threshold.")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.ArdentDefenderHP", {0, 100, 1}, "Ardent Defender HP", "Set the Ardent Defender HP threshold.")
-CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.ShieldoftheRighteousHP", {0, 100, 1}, "Shield of the Righteous HP", "Set the Shield of the Righteous HP threshold.")
+CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.SelfWordofGloryHP", {0, 100, 1}, "Word of Glory HP", "Set the Word of Glory HP threshold for casting on ourself vs overcapping SOTR.")
+CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.FriendlyWordofGloryHP", {0, 100, 1}, "Word of Glory HP", "Set the friendly Word of Glory HP threshold for casting on a friendly.")
 CreateARPanelOptions(CP_Protection2, "APL.Paladin.Protection")
 
 -- Retribution
