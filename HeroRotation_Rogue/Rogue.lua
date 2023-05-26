@@ -218,6 +218,8 @@ Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
   -- Talents
   DanseMacabre            = Spell(382528),
   DanseMacabreBuff        = Spell(393969),
+  DeeperDaggers           = Spell(382517),
+  DeeperDaggersBuff       = Spell(383405),
   DarkBrew                = Spell(382504),
   DarkShadow              = Spell(245687),
   EnvelopingShadows       = Spell(238104),
