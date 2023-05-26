@@ -144,6 +144,9 @@ local function Defensives()
   if Player:HealthPercentage() <= Settings.Protection.LoHHP and S.LayonHands:IsCastable() then
     if HR.CastAnnotated(S.LayonHands, nil, "SELF") then return "lay_on_hands self defensive"; end
   end
+  if Player:HealthPercentage() < Settings.Protection.PrioSelfWordofGloryHP and Player:BuffUp(S.ShiningLightFreeBuff) then
+    if HR.CastAnnotated(S.WordofGlory, nil, "FREE") then return "free WOG self defensive"; end
+  end
   if S.GuardianofAncientKings:IsCastable() and (Player:HealthPercentage() <= Settings.Protection.GoAKHP and Player:BuffDown(S.ArdentDefenderBuff)) then
     if Cast(S.GuardianofAncientKings, nil, Settings.Protection.DisplayStyle.Defensives) then return "guardian_of_ancient_kings defensive"; end
   end
@@ -165,6 +168,9 @@ local function Cooldowns()
   if S.Sentinel:IsCastable() then
     if Cast(S.Sentinel, Settings.Protection.OffGCDasOffGCD.Sentinel) then return "sentinel cooldowns"; end
   end
+  if S.DivineToll:IsCastable() and (Player:BuffUp(S.AvengingWrathBuff) or not S.AvengingWrath:IsAvailable()) and (Player:BuffUp(S.MomentofGloryBuff) or not S.MomentofGlory:IsAvailable()) then
+    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll standard"; end
+  end
   if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.AvengingWrathBuff)) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
@@ -176,9 +182,6 @@ local function Cooldowns()
   end
   if S.DivineToll:IsReady() and (EnemiesCount8y >= 3) then
     if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll cooldowns"; end
-  end
-  if S.EyeofTyr:IsCastable() and (S.InmostLight:IsAvailable() and EnemiesCount8y >= 3) then
-    if Cast(S.EyeofTyr, nil, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr cooldowns"; end
   end
   if S.BastionofLight:IsCastable() and (Player:BuffUp(S.AvengingWrathBuff)) then
     if Cast(S.BastionofLight, Settings.Protection.OffGCDasOffGCD.BastionOfLight) then return "bastion_of_light cooldowns"; end
@@ -216,9 +219,12 @@ local function ForceGenerateHolyPowerGlobal()
   return nil, nil
 end
 
--- Returns the appropriate economy {target, global, generated_hpower} from the set {avengers_shield, hammer_of_wrath, judgment, blessed_hammer}
--- if we have avengers_shield + hammer of wrath on CD and judgment + blessed_hammer recharging appropriately, we return {nil, nil} to indicate that we can do a utility global here.
-local function EconomyGlobal()
+-- Returns the appropriate {target, global, generated_hpower} based on our priorities.
+-- if we have avengers_shield + hammer of wrath on CD and judgment + blessed_hammer recharging appropriately, we return {nil, nil} to indicate that we can do a low priority global here.
+local function PrioGlobal()
+  if Player:HealthPercentage() < Settings.Protection.PrioSelfWordofGloryHP and (Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff) or Player:BuffUp(S.ShiningLightFreeBuff) or not Player:BuffRefreshable(S.ShieldoftheRighteousBuff)) then
+    return Player, S.WordofGlory, 0
+  end
   if S.AvengersShield:IsReady() and #InterruptibleEnemyUnits > 0 then
     return InterruptibleEnemyUnits[1][1], S.AvengersShield, 1
   end
@@ -243,32 +249,31 @@ local function EconomyGlobal()
   if S.AvengersShield:IsReady() then
     return HighestHPEnemyUnit, S.AvengersShield, 0 -- single target
   end
-  if S.Judgment:IsReady() then
-    return HighestHPEnemyUnit, S.Judgment, 1
+
+  -- use OPPORTUNISTIC threshold for healing here - cast the heal on us or a party member if it (probably) won't overheal
+  if Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff) or Player:BuffUp(S.ShiningLightFreeBuff) then
+    if Player:HealthPercentage() < Settings.Protection.OpportunisticSelfWordofGloryHP then
+      return Player, S.WordofGlory, 0
+    end
+    if #PartyHealCandidates > 0 then
+      return PartyHealCandidates[1], S.WordofGlory, 0
+    end
   end
-  -- Only dump a hammer charge if it's about to cap, otherwise go to a utility global here.
+
+  if S.EyeofTyr:IsReady() then
+    return HighestHPEnemyUnit, S.EyeofTyr, 0
+  end
+  if S.Judgment:IsReady() then
+    return HighestHPEnemyUnit, S.Judgment, 1 + num(Player:BuffUp(S.AvengingWrathBuff))
+  end
   if S.BlessedHammer:FullRechargeTime() < GCDMax then
     return HighestHPEnemyUnit, S.BlessedHammer, 1
   end
+
   return nil, nil, nil
 end
 
--- Returns the appropriate low priority {target, global} from the set {word of glory, consecration, blessed_hammer, eye_of_tyr, ... eventually cleanses (cleanse/bop/freedom), flash of light?}
 local function LowPrioGlobal()
-  if Player:BuffUp(S.ShiningLightFreeBuff) and Player:HealthPercentage() < 100 then
-    return Player, S.WordofGlory
-  end
-  if Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff) or not Player:BuffRefreshable(S.ShieldoftheRighteousBuff)  then
-    if Player:HealthPercentage() < Settings.Protection.SelfWordofGloryHP then
-      return Player, S.WordofGlory
-    end
-    if #PartyHealCandidates > 0 then
-      return PartyHealCandidates[1], S.WordofGlory
-    end
-  end
-  if S.EyeofTyr:IsReady() then
-    return HighestHPEnemyUnit, S.EyeofTyr
-  end
   if S.Consecration:IsCastable() and not Player:IsMoving() and ConsecrationTimeRemaining() <= 3 then
     return HighestHPEnemyUnit, S.Consecration
   end
@@ -281,6 +286,7 @@ local function LowPrioGlobal()
   if Player:BuffUp(S.ShiningLightFreeBuff) then
     return Player, S.WordofGlory
   end
+  return nil, nil
 end
 
 
@@ -308,26 +314,20 @@ local function Core()
     -- This is a bad case, it means there was no holy power generator available when we really needed one.
   end
 
+  -- Dump HOLY POWER into SOTR. We want to do this if our next global is a builder and we're capped on holy power already.
+  local prio_target, prio_global, prio_hpower = PrioGlobal()
+  if prio_global ~= nil and S.ShieldoftheRighteous:IsReady() and ((prio_hpower + Player:HolyPower() > 4) or Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff)) then
+    if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous holy power dump standard"; end
+  end
+
   if S.Consecration:IsCastable() and ConsecrationTimeRemaining() < 2 and not Player:IsMoving() then
     if Cast(S.Consecration) then return "defensive_consecration standard"; end
   end
 
-  -- divine_toll,if=(time>20&(!raid_event.adds.exists|raid_event.adds.in>10))|((buff.avenging_wrath.up|!talent.avenging_wrath.enabled)&(buff.moment_of_glory.up|!talent.moment_of_glory.enabled))
-  if S.DivineToll:IsReady() and (Player:BuffUp(S.AvengingWrathBuff) or not S.AvengingWrath:IsAvailable()) and (Player:BuffUp(S.MomentofGloryBuff) or not S.MomentofGlory:IsAvailable()) then
-    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll standard"; end
-  end
+   -------------------------------------------------------------------
 
-  -------------------------------------------------------------------
-  local econ_target, econ_global, econ_hpower = EconomyGlobal()
-  -- Dump HOLY POWER into SOTR. We want to do this if our next global is a builder and we're capped on holy power already.
-  -- Decide what to do with excess holy power here: we can either over-cap on SOTR for damage (we already handle the below-cap state in the `defensives` section)
-  -- or we can cast a WOG on ourselves or another person. The trick is that SOTR is off global and WOG is on...
-  --if econ_global ~= nil and S.ShieldoftheRighteous:IsReady() and RPSafe() and ((econ_hpower + Player:HolyPower() > 4) or Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff)) then
-  if econ_global ~= nil and S.ShieldoftheRighteous:IsReady() and ((econ_hpower + Player:HolyPower() > 4) or Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff)) then
-    if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous holy power dump standard"; end
-  end
-  if econ_global ~= nil then
-    if Cast(econ_global, nil) then return "econ_global standard"; end
+  if prio_global ~= nil then
+    if Cast(prio_global, nil) then return "prio_global standard"; end
   end
   -------------------------------------------------------------------
   local low_prio_target, low_prio_global = LowPrioGlobal()
