@@ -53,6 +53,9 @@ local Settings = {
   Protection = HR.GUISettings.APL.Paladin.Protection
 }
 
+-- Feature requests: all abilities (even non-targetted) appear on name plates
+-- Make sure to use utility abilities inside of "dead globals" where hammer is recharging and judgment is recharging
+
 local function EvaluateTargetIfFilterJudgment(TargetUnit)
   return TargetUnit:DebuffRemains(S.JudgmentDebuff)
 end
@@ -258,7 +261,6 @@ local function Standard()
       if Cast(S.WordofGlory, Settings.Protection.GCDasOffGCD.WordOfGlory) then return "word_of_glory standard self 32"; end
     end
   end
-  -- consecration
   if S.Consecration:IsCastable() then
     if Cast(S.Consecration) then return "consecration standard 34"; end
   end
@@ -268,46 +270,33 @@ end
 local function APL()
   Enemies8y = Player:GetEnemiesInMeleeRange(8)
   Enemies30y = Player:GetEnemiesInRange(30)
-  if (AoEON()) then
-    EnemiesCount8y = #Enemies8y
-    EnemiesCount30y = #Enemies30y
-  else
-    EnemiesCount8y = 1
-    EnemiesCount30y = 1
-  end
+  EnemiesCount8y = #Enemies8y
+  EnemiesCount30y = #Enemies30y
 
   ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
 
   if Everyone.TargetIsValid() then
-    -- Precombat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
-    -- auto_attack
-    -- Interrupts
     local ShouldReturn = Everyone.Interrupt(5, S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, StunInterrupts); if ShouldReturn then return ShouldReturn; end
-    -- Manually added: Defensives!
     if IsTanking then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=cooldowns
     if CDsON() then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=trinkets
     if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=standard
     local ShouldReturn = Standard(); if ShouldReturn then return ShouldReturn; end
-    -- Manually added: Pool, if nothing else to do
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
 end
 
 local function Init()
-  HR.Print("Protection Paladin rotation is currently a work in progress, but has been updated for patch 10.1.0.")
+  HR.Print("This is a Work In Progress APL optimized for M+ tanking, by Synecd0che")
 end
 
 HR.SetAPL(66, APL, Init)
