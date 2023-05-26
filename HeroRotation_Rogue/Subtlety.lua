@@ -287,8 +287,12 @@ local function Finish (ReturnSpellOnly, StealthSpell)
 
   -- actions.finish+=/cold_blood,if=variable.secret_condition&cooldown.secret_technique.ready
   if S.ColdBlood:IsReady() and Secret_Condition() and S.SecretTechnique:CooldownUp() then
-    if ReturnSpellOnly then return S.ColdBlood end
-    if HR.Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
+    if Settings.Commons.OffGCDasOffGCD.ColdBlood then
+      HR.Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood)
+    else
+      if ReturnSpellOnly then return S.ColdBlood end
+      if HR.Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood (SecTec)" end
+    end
   end
   -- actions.finish+=/secret_technique,if=variable.secret_condition&(!talent.cold_blood|cooldown.cold_blood.remains>buff.shadow_dance.remains-2)
   if S.SecretTechnique:IsReady() and Secret_Condition()
@@ -380,11 +384,11 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
 
     -- actions.stealthed+=/shuriken_storm,if=variable.gloomblade_condition&buff.silent_storm.up&!debuff.find_weakness.remains&talent.improved_shuriken_storm.enabled|combo_points<=1&!used_for_danse&spell_targets.shuriken_storm=2&talent.danse_macabre
     if (Player:BuffUp(S.SilentStormBuff) and Target:DebuffDown(S.FindWeaknessDebuff) and S.ImprovedShurikenStorm:IsAvailable())
-      or (ComboPoints <= 1 and not Used_For_Danse(S.ShurikenStorm) and MeleeEnemies10yCount == 2 and S.DanseMacabre:IsAvailable()) then
+        or (ComboPoints <= 1 and not Used_For_Danse(S.ShurikenStorm) and MeleeEnemies10yCount == 2 and S.DanseMacabre:IsAvailable()) then
       if ReturnSpellOnly then
-          return S.ShurikenStorm
+        return S.ShurikenStorm
       else
-          if HR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm (FW)" end
+        if HR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm (FW)" end
       end
     end
 
@@ -693,8 +697,8 @@ local function CDs ()
       -- actions.cds+=/use_item,name=manic_grieftorch,use_off_gcd=1,if=!stealthed.all&(!raid_event.adds.up|!equipped.stormeaters_boon|trinket.stormeaters_boon.cooldown.remains>20)
       if I.ManicGrieftorch:IsEquippedAndReady() then
         if (not Player:StealthUp(true, true)
-            and (not I.StormeatersBoon:IsEquipped()
-                or I.StormeatersBoon:CooldownRemains() > 20)) then
+            and (not I.StormEatersBoon:IsEquipped()
+                or I.StormEatersBoon:CooldownRemains() > 20)) then
             if HR.Cast(I.ManicGrieftorch, nil, Settings.Commons.TrinketDisplayStyle) then return "Manic Grieftorch" end
         end
       end
@@ -703,8 +707,8 @@ local function CDs ()
         if (not Player:StealthUp(true, true)
             and (Player:BuffUp(S.DeeperDaggersBuff)
                 or not S.DeeperDaggers:IsAvailable())
-            and (not I.StormeatersBoon:IsEquipped()
-                or I.StormeatersBoon:CooldownRemains() > 20)) then
+            and (not I.StormEatersBoon:IsEquipped()
+                or I.StormEatersBoon:CooldownRemains() > 20)) then
             if HR.Cast(I.BeaconToTheBeyond, nil, Settings.Commons.TrinketDisplayStyle) then return "Beacon To The Beyond" end
         end
       end
