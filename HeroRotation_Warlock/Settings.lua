@@ -48,6 +48,7 @@ HR.GUISettings.APL.Warlock = {
     GCDasOffGCD = {
       -- Abilities
       Cataclysm = false,
+      DimensionalRift = false,
       GrimoireOfSacrifice = true,
       InquisitorsGaze = false,
       SummonInfernal = true,
