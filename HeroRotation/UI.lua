@@ -27,6 +27,7 @@
   HR.SmallIconFrame = CreateFrame("Frame", "HeroRotation_SmallIconFrame", UIParent);
   HR.LeftIconFrame = CreateFrame("Frame", "HeroRotation_LeftIconFrame", UIParent);
   HR.NameplateIconFrame = CreateFrame("Frame", "HeroRotation_NameplateIconFrame", UIParent);
+  HR.NameplateSuggestedIconFrame = CreateFrame("Frame", "HeroRotation_NameplateSuggestedIconFrame", UIParent);
   HR.SuggestedIconFrame = CreateFrame("Frame", "HeroRotation_SuggestedIconFrame", UIParent);
   HR.RightSuggestedIconFrame = CreateFrame("Frame", "HeroRotation_RightSuggestedIconFrame", UIParent);
   HR.ToggleIconFrame = CreateFrame("Frame", "HeroRotation_ToggleIconFrame", UIParent);
@@ -54,10 +55,10 @@
     if HR.GUISettings.General.BlackBorderIcon then HR.SuggestedIconFrame.Backdrop:Hide(); end
     HR.CastSuggestedOffset = 1;
 
-	-- Right Suggested Icon
-	HR.RightSuggestedIconFrame:HideIcon();
-	if HR.GUISettings.General.BlackBorderIcon then HR.RightSuggestedIconFrame.Backdrop:Hide(); end
-	HR.CastRightSuggestedOffset = 1;
+    -- Right Suggested Icon
+    HR.RightSuggestedIconFrame:HideIcon();
+    if HR.GUISettings.General.BlackBorderIcon then HR.RightSuggestedIconFrame.Backdrop:Hide(); end
+    HR.CastRightSuggestedOffset = 1;
 
     -- Toggle icons
     if HR.GUISettings.General.HideToggleIcons then HR.ToggleIconFrame:Hide(); end
@@ -457,7 +458,8 @@
 
 --- ======= NAMEPLATES =======
   HR.Nameplate = {
-    Initialized = false
+    MainInitialized = false,
+    SuggestedInitialized = false
   };
   -- Add the Icon on Nameplates
   function HR.Nameplate.AddIcon (ThisUnit, Object)
@@ -485,7 +487,7 @@
       local IconFrame = HR.NameplateIconFrame;
 
       -- Init Frame if not already
-      if not HR.Nameplate.Initialized then
+      if not HR.Nameplate.MainInitialized then
         -- Frame
         IconFrame:SetFrameStrata(Nameplate:GetFrameStrata());
         IconFrame:SetFrameLevel(Nameplate:GetFrameLevel() + 50);
@@ -499,22 +501,13 @@
           HR:CreateBackdrop(IconFrame);
         end
 
-        HR.Nameplate.Initialized = true;
+        HR.Nameplate.MainInitialized = true;
       end
 
       -- Set the Texture
       IconFrame.Texture:SetTexture(HR.GetTexture(Object));
       IconFrame.Texture:SetAllPoints(IconFrame);
       local SpellAlpha = 1;
-      if (Object.SpellName) then
-        if (Object:BookIndex() ~= nil) then
-          SpellAlpha = (ThisUnit:IsSpellInRange(Object) and 1 or 0.4);
-        else
-          SpellAlpha = 1;
-        end
-      else
-        SpellAlpha = 1;
-      end
       IconFrame.Texture:SetAlpha(SpellAlpha);
       IconFrame:ClearAllPoints();
       IconFrame:SetAlpha(HR.GUISettings.General.SetAlpha);
@@ -535,12 +528,83 @@
     end
     return false;
   end
+
+  function HR.Nameplate.AddSuggestedIcon (ThisUnit, Object)
+    if HR.GUISettings.General.NamePlateIconAnchor == "Disable" then return true end
+    local Token = stringlower(ThisUnit.UnitID);
+    local Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
+    if Nameplate then
+      -- Locals
+      local ScreenHeight = GetScreenHeight();
+      local NameplateScaler = (ScreenHeight > 768) and (768 / ScreenHeight) or 1;
+      local NameplateIconSize = Nameplate:GetHeight() / NameplateScaler;
+      local HealthBar;
+      if HR.GUISettings.General.NamePlateIconAnchor == "Life Bar" then
+        if _G.ElvUI and _G.ElvUI[1].charSettings.profile.nameplates.enable then
+          HealthBar = Nameplate.unitFrame.Health;
+          NameplateIconSize = HealthBar:GetWidth() / 3.5;
+        elseif _G.ShestakUI and _G.ShestakUI[2].nameplate.enable then
+          HealthBar = Nameplate.unitFrame.Health;
+          NameplateIconSize = (HealthBar:GetWidth() / NameplateScaler) / 3.5;
+        else
+          HealthBar = Nameplate.UnitFrame.healthBar;
+          NameplateIconSize = (HealthBar:GetWidth() / NameplateScaler) / 3.5;
+        end
+      end
+      local SuggestedIconFrame = HR.NameplateSuggestedIconFrame;
+
+      -- Init Frame if not already
+      if not HR.Nameplate.SuggestedInitialized then
+        -- Frame
+        SuggestedIconFrame:SetFrameStrata(Nameplate:GetFrameStrata());
+        SuggestedIconFrame:SetFrameLevel(Nameplate:GetFrameLevel() + 50);
+        SuggestedIconFrame:SetWidth(NameplateIconSize);
+        SuggestedIconFrame:SetHeight(NameplateIconSize);
+        -- Texture
+        SuggestedIconFrame.Texture = SuggestedIconFrame:CreateTexture(nil, "BACKGROUND");
+
+        if HR.GUISettings.General.BlackBorderIcon then
+          SuggestedIconFrame.Texture:SetTexCoord(.08, .92, .08, .92);
+          HR:CreateBackdrop(SuggestedIconFrame);
+        end
+
+        HR.Nameplate.SuggestedInitialized = true;
+      end
+
+
+
+      -- Set the Texture
+      SuggestedIconFrame.Texture:SetTexture(HR.GetTexture(Object));
+      SuggestedIconFrame.Texture:SetAllPoints(SuggestedIconFrame);
+      local SpellAlpha = 1;
+      SuggestedIconFrame.Texture:SetAlpha(SpellAlpha);
+      SuggestedIconFrame:ClearAllPoints();
+      SuggestedIconFrame:SetAlpha(HR.GUISettings.General.SetAlpha);
+      if not SuggestedIconFrame:IsVisible() then
+        if HR.GUISettings.General.NamePlateIconAnchor == "Life Bar" then
+          SuggestedIconFrame:SetPoint("RIGHT", HealthBar);
+        else
+          SuggestedIconFrame:SetPoint("RIGHT", Nameplate);
+        end
+        SuggestedIconFrame:Show();
+      end
+
+      -- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
+      HR.LastUnitCycled = ThisUnit;
+      HR.LastUnitCycledTime = GetTime();
+
+      return true;
+    end
+    return false;
+  end
   -- Remove Icons
   function HR.Nameplate.HideIcons ()
     -- Nameplate Icon
     HR.NameplateIconFrame:Hide();
     -- Left Icon
     HR.LeftIconFrame:Hide();
+    -- Suggested
+    HR.NameplateSuggestedIconFrame:Hide();
   end
 
 --- ======= SUGGESTED ICON =======

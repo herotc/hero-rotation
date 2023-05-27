@@ -234,9 +234,25 @@
     end
     return false;
   end
+
   function HR.CastLeftNameplate (ThisUnit, Object)
     if HR.CastLeftOffset == 1 and HR.Nameplate.AddIcon(ThisUnit, Object) then
       HR.CastLeftCommon(Object);
+    end
+    return false;
+  end
+
+  -- Used by experimental protection paladin module
+  function HR.CastMainNameplate (ThisUnit, Object)
+    if HR.Nameplate.AddIcon(ThisUnit, Object) then
+      return HR.Cast(Object);
+    end
+    return false;
+  end
+
+  function HR.CastMainNameplateSuggested(ThisUnit, Object)
+    if HR.Nameplate.AddSuggestedIcon(ThisUnit, Object) then
+      return HR.CastRightSuggested(Object);
     end
     return false;
   end

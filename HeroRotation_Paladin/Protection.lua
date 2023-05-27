@@ -16,6 +16,8 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 local Cast       = HR.Cast
+local CastMainNameplate = HR.CastMainNameplate
+local CastMainNameplateSuggested = HR.CastMainNameplateSuggested
 -- Num/Bool Helper Functions
 local num        = HR.Commons.Everyone.num
 local bool       = HR.Commons.Everyone.bool
@@ -75,6 +77,8 @@ local function MissingAura()
   return (Player:BuffDown(S.RetributionAura) and Player:BuffDown(S.DevotionAura) and Player:BuffDown(S.ConcentrationAura) and Player:BuffDown(S.CrusaderAura))
 end
 
+
+
 local function ScanBattlefield()
   InterruptibleEnemyUnits = {}
   WrathableEnemyUnits = {}
@@ -106,9 +110,9 @@ local function ScanBattlefield()
     end
   end
 
-  table.sort(InterruptibleEnemyUnits, function (a, b) return a[2] < b[2] end)
-  table.sort(WrathableEnemyUnits, function (a, b) return a[2] < b[2] end)
-  table.sort(PartyHealCandidates, function (a, b) return a[2] > b[2] end)
+  table.sort(InterruptibleEnemyUnits, function (a, b) return a[2] > b[2] end)
+  table.sort(WrathableEnemyUnits, function (a, b) return a[2] > b[2] end)
+  table.sort(PartyHealCandidates, function (a, b) return a[2] < b[2] end)
 end
 
 -- Returns `true` if it's safe to dump SOTR or healing without incurring the ICD bug, `false` if you should wait a bit
@@ -121,19 +125,19 @@ local function Precombat()
     if Cast(S.DevotionAura) then return "devotion_aura precombat"; end
   end
   if S.HammerofWrath:IsReady() then
-    if Cast(S.HammerofWrath, nil, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer of wrath precombat"; end
+    if CastMainNameplate(Target, S.HammerofWrath) then return "hammer of wrath precombat"; end
   end
   if S.Judgment:FullRechargeTime() < GCDMax and S.Judgment:IsReady() then
-    if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "max charges judgment precombat"; end
+    if CastMainNameplate(Target, S.Judgment) then return "max charges judgment precombat"; end
   end
   if S.AvengersShield:IsCastable() then
-    if Cast(S.AvengersShield, nil, nil, not Target:IsSpellInRange(S.AvengersShield)) then return "avengers_shield precombat"; end
+    if CastMainNameplate(Target, S.AvengersShield) then return "avengers_shield precombat"; end
   end
   if S.Judgment:IsReady() then
-    if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment precombat"; end
+    if CastMainNameplate(Target, S.Judgment) then return "judgment precombat"; end
   end
   if S.Consecration:IsCastable() and Target:IsInMeleeRange(8) then
-    if Cast(S.Consecration) then return "consecration precombat 8"; end
+    if CastMainNameplate(Target, S.Consecration) then return "consecration precombat 8"; end
   end
 end
 
@@ -142,7 +146,7 @@ local function Defensives()
     if Cast(S.DivineShield, nil, Settings.Protection.DisplayStyle.Defensives) then return "bubble defensive"; end
   end
   if Player:HealthPercentage() <= Settings.Protection.LoHHP and S.LayonHands:IsCastable() then
-    if HR.CastAnnotated(S.LayonHands, nil, "SELF") then return "lay_on_hands self defensive"; end
+    if HR.CastAnnotated(S.LayonHands, nil, "HEAL") then return "lay_on_hands self defensive"; end
   end
   if Player:HealthPercentage() < Settings.Protection.PrioSelfWordofGloryHP and Player:BuffUp(S.ShiningLightFreeBuff) then
     if HR.CastAnnotated(S.WordofGlory, nil, "FREE") then return "free WOG self defensive"; end
@@ -154,7 +158,8 @@ local function Defensives()
     if Cast(S.ArdentDefender, nil, Settings.Protection.DisplayStyle.Defensives) then return "ardent_defender defensive"; end
   end
   if S.ShieldoftheRighteous:IsReady() and Player:BuffRefreshable(S.ShieldoftheRighteousBuff) and RPSafe() then
-    if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous refresh defensive"; end
+    -- TODO: figure out how to do this on nameplates too?
+    if CastMainNameplateSuggested(Target, S.ShieldoftheRighteous) then return "shield_of_the_righteous refresh defensive"; end
   end
 end
 
@@ -211,10 +216,10 @@ local function ForceGenerateHolyPowerGlobal()
     return WrathableEnemyUnits[1][1], S.HammerofWrath
   end
   if S.Judgment:IsReady() then
-    return HighestHPEnemyUnit, S.Judgment
+    return Target, S.Judgment
   end
   if S.BlessedHammer:IsReady() then
-    return HighestHPEnemyUnit, S.BlessedHammer
+    return Target, S.BlessedHammer
   end
   return nil, nil
 end
@@ -229,10 +234,10 @@ local function PrioGlobal()
     return InterruptibleEnemyUnits[1][1], S.AvengersShield, 1
   end
   if S.AvengersShield:IsReady() and (Player:BuffUp(S.MomentofGloryBuff) or (Player:HasTier(29, 2) and (Player:BuffDown(S.AllyoftheLightBuff) or Player:BuffRemains(S.AllyoftheLightBuff) < Player:GCD()))) then
-    return HighestHPEnemyUnit, S.AvengersShield, 0
+    return Target, S.AvengersShield, 0
   end
   if S.AvengersShield:IsReady() and EnemiesCount8y >= 4 then
-    return HighestHPEnemyUnit, S.AvengersShield, 0
+    return Target, S.AvengersShield, 0
   end
   if S.HammerofWrath:IsReady() and #WrathableEnemyUnits > 0 then
     return WrathableEnemyUnits[1][1], S.HammerofWrath, 1
@@ -243,11 +248,11 @@ local function PrioGlobal()
     return HighestHPEnemyUnit, S.Judgment, 1 + num(Player:BuffUp(S.AvengingWrathBuff))
   end
   if S.AvengersShield:IsReady() and EnemiesCount8y >= 2 then
-    return HighestHPEnemyUnit, S.AvengersShield, 0
+    return Target, S.AvengersShield, 0
   end
 
   if S.AvengersShield:IsReady() then
-    return HighestHPEnemyUnit, S.AvengersShield, 0 -- single target
+    return Target, S.AvengersShield, 0 -- single target
   end
 
   -- use OPPORTUNISTIC threshold for healing here - cast the heal on us or a party member if it (probably) won't overheal
@@ -261,13 +266,13 @@ local function PrioGlobal()
   end
 
   if S.EyeofTyr:IsReady() then
-    return HighestHPEnemyUnit, S.EyeofTyr, 0
+    return Target, S.EyeofTyr, 0
   end
   if S.Judgment:IsReady() then
-    return HighestHPEnemyUnit, S.Judgment, 1 + num(Player:BuffUp(S.AvengingWrathBuff))
+    return Target, S.Judgment, 1 + num(Player:BuffUp(S.AvengingWrathBuff))
   end
   if S.BlessedHammer:FullRechargeTime() < GCDMax then
-    return HighestHPEnemyUnit, S.BlessedHammer, 1
+    return Target, S.BlessedHammer, 1
   end
 
   return nil, nil, nil
@@ -275,13 +280,13 @@ end
 
 local function LowPrioGlobal()
   if S.Consecration:IsCastable() and not Player:IsMoving() and ConsecrationTimeRemaining() <= 3 then
-    return HighestHPEnemyUnit, S.Consecration
+    return Target, S.Consecration
   end
   if S.BlessedHammer:IsReady() then
-    return HighestHPEnemyUnit, S.BlessedHammer
+    return Target, S.BlessedHammer
   end
   if S.Consecration:IsCastable() and not Player:IsMoving() then
-    return HighestHPEnemyUnit, S.Consecration
+    return Target, S.Consecration
   end
   if Player:BuffUp(S.ShiningLightFreeBuff) then
     return Player, S.WordofGlory
@@ -309,7 +314,7 @@ local function Core()
       target, spell = ForceGenerateHolyPowerGlobal()
     end
     if target ~= nil and spell ~= nil then
-      if Cast(spell, nil) then return "force_generated_holy_power_global standard"; end
+      if CastMainNameplate(target, spell) then return "force_generated_holy_power_global standard"; end
     end
     -- This is a bad case, it means there was no holy power generator available when we really needed one.
   end
@@ -317,22 +322,22 @@ local function Core()
   -- Dump HOLY POWER into SOTR. We want to do this if our next global is a builder and we're capped on holy power already.
   local prio_target, prio_global, prio_hpower = PrioGlobal()
   if prio_global ~= nil and S.ShieldoftheRighteous:IsReady() and ((prio_hpower + Player:HolyPower() > 4) or Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff)) then
-    if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous holy power dump standard"; end
+    if CastMainNameplateSuggested(prio_target, S.ShieldoftheRighteous) then return "shield_of_the_righteous holy power dump standard"; end
   end
 
   if S.Consecration:IsCastable() and ConsecrationTimeRemaining() < 2 and not Player:IsMoving() then
-    if Cast(S.Consecration) then return "defensive_consecration standard"; end
+    if CastMainNameplate(Target, S.Consecration) then return "defensive_consecration standard"; end
   end
 
    -------------------------------------------------------------------
 
   if prio_global ~= nil then
-    if Cast(prio_global, nil) then return "prio_global standard"; end
+    if CastMainNameplate(prio_target, prio_global) then return "prio_global standard"; end
   end
   -------------------------------------------------------------------
   local low_prio_target, low_prio_global = LowPrioGlobal()
   if low_prio_global ~= nil then
-    if Cast(low_prio_global, nil) then return "low_prio standard"; end
+    if CastMainNameplate(low_prio_target, low_prio_global) then return "low_prio standard"; end
   end
 end
 
