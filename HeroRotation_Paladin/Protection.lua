@@ -61,8 +61,6 @@ local Settings = {
   Protection = HR.GUISettings.APL.Paladin.Protection
 }
 
--- Feature requests: all abilities appear on name plates
-
 local function ConsecrationTimeRemaining()
   for index=1,4 do
     local _, totemName, startTime, duration = GetTotemInfo(index)
@@ -76,8 +74,6 @@ end
 local function MissingAura()
   return (Player:BuffDown(S.RetributionAura) and Player:BuffDown(S.DevotionAura) and Player:BuffDown(S.ConcentrationAura) and Player:BuffDown(S.CrusaderAura))
 end
-
-
 
 local function ScanBattlefield()
   InterruptibleEnemyUnits = {}
@@ -104,7 +100,7 @@ local function ScanBattlefield()
   PartyDispelCandidates = {} -- TODO: add some whitelist code for dispellable debuffs on players (consider cleanse, freedom, bop, spellwarding)
   if Player:IsInParty() and not Player:IsInRaid() then
     for _, Char in pairs(Unit.Party) do
-      if Char:Exists() and Char:IsInRange(40) and Char:HealthPercentage() < Settings.Protection.FriendlyWordofGloryHP then
+      if Char ~= nil and Char:Exists() and Char:IsInRange(40) and Char:HealthPercentage() < Settings.Protection.FriendlyWordofGloryHP then
         table.insert(PartyHealCandidates, {Char, Char:HealthPercentage()})
       end
     end
@@ -146,10 +142,10 @@ local function Defensives()
     if Cast(S.DivineShield, nil, Settings.Protection.DisplayStyle.Defensives) then return "bubble defensive"; end
   end
   if Player:HealthPercentage() <= Settings.Protection.LoHHP and S.LayonHands:IsCastable() then
-    if HR.CastAnnotated(S.LayonHands, nil, "HEAL") then return "lay_on_hands self defensive"; end
+    if HR.CastAnnotated(S.LayonHands, nil, "SELF") then return "lay_on_hands self defensive"; end
   end
   if Player:HealthPercentage() < Settings.Protection.PrioSelfWordofGloryHP and Player:BuffUp(S.ShiningLightFreeBuff) then
-    if HR.CastAnnotated(S.WordofGlory, nil, "FREE") then return "free WOG self defensive"; end
+    if HR.CastAnnotated(S.WordofGlory, nil, "SELF") then return "free WOG self defensive"; end
   end
   if S.GuardianofAncientKings:IsCastable() and (Player:HealthPercentage() <= Settings.Protection.GoAKHP and Player:BuffDown(S.ArdentDefenderBuff)) then
     if Cast(S.GuardianofAncientKings, nil, Settings.Protection.DisplayStyle.Defensives) then return "guardian_of_ancient_kings defensive"; end
@@ -261,7 +257,7 @@ local function PrioGlobal()
       return Player, S.WordofGlory, 0
     end
     if #PartyHealCandidates > 0 then
-      return PartyHealCandidates[1], S.WordofGlory, 0
+      return PartyHealCandidates[1][1], S.WordofGlory, 0
     end
   end
 
@@ -298,9 +294,11 @@ end
 local function Core()
   -- Save allies from death with Lay on Hands where possible, when we're probably not going to die.
   if Player:HealthPercentage() > 40 and #PartyHealCandidates > 0 then
-    local friend, friend_hp_percentage = PartyHealCandidates[1]
-    if friend_hp_percentage <= 15 then
-      if HR.CastAnnotated(S.LayonHands, false, friend:Name()) then return "lay_on_hands party_member core"; end
+    local BestCandidate = PartyHealCandidates[1]
+    local Friend = BestCandidate[1]
+    local FriendHP = BestCandidate[2]
+    if FriendHP <= 15 then -- TODO: handle forbearance here
+      if HR.CastAnnotated(S.LayonHands, false, Friend:Name()) then return "lay_on_hands party_member core"; end
     end
   end
   ----------------------------------------------------------------------
@@ -332,12 +330,20 @@ local function Core()
    -------------------------------------------------------------------
 
   if prio_global ~= nil then
-    if CastMainNameplate(prio_target, prio_global) then return "prio_global standard"; end
+    if prio_global == S.WordofGlory then
+      if HR.CastAnnotated(S.WordofGlory, false, prio_target:Name()) then return "prio_global heal standard"; end
+    else
+      if CastMainNameplate(prio_target, prio_global) then return "prio_global standard"; end
+    end
   end
   -------------------------------------------------------------------
   local low_prio_target, low_prio_global = LowPrioGlobal()
   if low_prio_global ~= nil then
-    if CastMainNameplate(low_prio_target, low_prio_global) then return "low_prio standard"; end
+    if low_prio_global == S.WordofGlory then
+      if HR.CastAnnotated(S.WordofGlory, false, low_prio_target:Name()) then return "low_prio heal standard"; end
+    else
+      if CastMainNameplate(low_prio_target, low_prio_global) then return "low_prio standard"; end
+    end
   end
 end
 

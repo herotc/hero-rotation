@@ -67,6 +67,7 @@ Spell.Paladin.Commons = {
   -- Debuffs
   ConsecrationDebuff                    = Spell(204242),
   JudgmentDebuff                        = Spell(197277),
+  ForbearanceDebuff                     = Spell(25771),
   -- Pool
   Pool                                  = Spell(999910),
 }
