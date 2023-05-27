@@ -296,7 +296,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   end
   -- actions.finish+=/secret_technique,if=variable.secret_condition&(!talent.cold_blood|cooldown.cold_blood.remains>buff.shadow_dance.remains-2)
   if S.SecretTechnique:IsReady() and Secret_Condition()
-    and (not S.ColdBlood:IsAvailable() or Player:BuffUp(S.ColdBlood) or S.ColdBlood:CooldownRemains() > Player:BuffRemains(S.ShadowDanceBuff) - 2) then
+    and (not S.ColdBlood:IsAvailable() or Settings.Commons.OffGCDasOffGCD.ColdBlood or Player:BuffUp(S.ColdBlood) or S.ColdBlood:CooldownRemains() > Player:BuffRemains(S.ShadowDanceBuff) - 2) then
       if ReturnSpellOnly then return S.SecretTechnique end
       if HR.Cast(S.SecretTechnique) then return "Cast Secret Technique" end
   end
