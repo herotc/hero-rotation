@@ -81,10 +81,6 @@ local function EvaluateCycleFlameShock(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.FlameShockDebuff))
 end
 
-local function EvaluateCycleLavaLash(TargetUnit)
-  return (TargetUnit:DebuffRefreshable(S.LashingFlamesDebuff))
-end
-
 local function EvaluateTargetIfFilterPrimordialWave(TargetUnit)
   return (TargetUnit:DebuffRemains(S.FlameShockDebuff))
 end
@@ -95,14 +91,6 @@ end
 
 local function EvaluateTargetIfFilterLavaLash(TargetUnit)
   return (Target:DebuffRemains(S.LashingFlamesDebuff))
-end
-
-local function EvaluateTargetIfLavaLash(TargetUnit)
-  return (S.LashingFlames:IsAvailable())
-end
-
-local function EvaluateTargetIfLavaLash2(TargetUnit)
-  return (TargetUnit:DebuffUp(S.FlameShockDebuff) and (S.FlameShockDebuff:AuraActiveCount() < Enemies10yCount and S.FlameShockDebuff:AuraActiveCount() < 6))
 end
 
 local function Precombat()
@@ -131,7 +119,7 @@ end
 
 local function Single()
   -- primordial_wave,if=!dot.flame_shock.ticking&talent.lashing_flames.enabled&(raid_event.adds.in>42|raid_event.adds.in<6)
-  if S.PrimordialWave:IsReady() and (Target:DebuffUp(S.FlameShockDebuff) and S.LashingFlames:IsAvailable()) then
+  if S.PrimordialWave:IsReady() and CDsON() and (Target:DebuffUp(S.FlameShockDebuff) and S.LashingFlames:IsAvailable()) then
     if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "primordial_wave single 2"; end
   end
   -- flame_shock,if=!ticking&talent.lashing_flames.enabled
@@ -205,7 +193,7 @@ local function Single()
     end
   end
   -- primordial_wave,if=raid_event.adds.in>42|raid_event.adds.in<6
-  if S.PrimordialWave:IsReady() then
+  if S.PrimordialWave:IsReady() and CDsON() then
     if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "primordial_wave single 38"; end
   end
   -- flame_shock,if=!ticking
@@ -292,7 +280,7 @@ local function Aoe()
     if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash aoe "; end
   end
   -- primordial_wave,target_if=min:dot.flame_shock.remains,cycle_targets=1,if=!buff.primordial_wave.up
-  if S.PrimordialWave:IsReady() and (Player:BuffDown(S.PrimordialWaveBuff)) then
+  if S.PrimordialWave:IsReady() and CDsON() and (Player:BuffDown(S.PrimordialWaveBuff)) then
     if Everyone.CastTargetIf(S.PrimordialWave, Enemies10y, "min", EvaluateTargetIfFilterPrimordialWave, EvaluateTargetIfPrimordialWave, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 12"; end
   end
   -- elemental_blast,if=(!talent.elemental_spirits.enabled|(talent.elemental_spirits.enabled&(charges=max_charges|buff.feral_spirit.up)))&buff.maelstrom_weapon.stack=10&(!talent.crashing_storms.enabled|active_enemies<=3)
@@ -518,7 +506,7 @@ local function APL()
     -- invoke_external_buff,name=power_infusion,if=(talent.ascendance.enabled&talent.thorims_invocation.enabled&buff.ascendance.up)|(!talent.thorims_invocation.enabled&talent.feral_spirit.enabled&buff.feral_spirit.up)|(!talent.thorims_invocation.enabled&!talent.feral_spirit.enabled)|fight_remains<=20
     -- Note: Not handling external PI.
     -- feral_spirit
-    if S.FeralSpirit:IsCastable() then
+    if S.FeralSpirit:IsCastable() and CDsON() then
       if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit main 12"; end
     end
     -- ascendance,if=dot.flame_shock.ticking&((ti_lightning_bolt&active_enemies=1&raid_event.adds.in>=90)|(ti_chain_lightning&active_enemies>1))
