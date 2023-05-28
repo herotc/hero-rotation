@@ -295,8 +295,9 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     end
   end
   -- actions.finish+=/secret_technique,if=variable.secret_condition&(!talent.cold_blood|cooldown.cold_blood.remains>buff.shadow_dance.remains-2)
+  -- Attention: Due to the SecTec/ColdBlood interaction, this adaption has additional checks not found in the APL string
   if S.SecretTechnique:IsReady() and Secret_Condition()
-    and (not S.ColdBlood:IsAvailable() or Settings.Commons.OffGCDasOffGCD.ColdBlood or Player:BuffUp(S.ColdBlood) or S.ColdBlood:CooldownRemains() > Player:BuffRemains(S.ShadowDanceBuff) - 2) then
+    and (not S.ColdBlood:IsAvailable() or (Settings.Commons.OffGCDasOffGCD.ColdBlood or Player:BuffUp(S.ColdBlood)) or S.ColdBlood:CooldownRemains() > Player:BuffRemains(S.ShadowDanceBuff) - 2) then
       if ReturnSpellOnly then return S.SecretTechnique end
       if HR.Cast(S.SecretTechnique) then return "Cast Secret Technique" end
   end
@@ -324,9 +325,10 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     end
   end
   -- actions.finish+=/black_powder,if=!variable.priority_rotation&spell_targets>=3|!used_for_danse&buff.shadow_dance.up&spell_targets.shuriken_storm=2&talent.danse_macabre
-  if S.BlackPowder:IsCastable()
-    and (not PriorityRotation and MeleeEnemies10yCount >= 3
-    or not Used_For_Danse(S.BlackPowder) and Player:BuffUp(S.ShadowDanceBuff) and MeleeEnemies10yCount == 2 and S.DanseMacabre:IsAvailable()) then
+  if S.BlackPowder:IsCastable() and (
+        not PriorityRotation and MeleeEnemies10yCount >= 3 and MeleeEnemies10yCount == 2
+        or not Used_For_Danse(S.BlackPowder) and Player:BuffUp(S.ShadowDanceBuff) and S.DanseMacabre:IsAvailable())
+  then
     if ReturnSpellOnly then
       return S.BlackPowder
     else
@@ -383,8 +385,8 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     and (MeleeEnemies10yCount <= 8 or S.LingeringShadow:IsAvailable()) then
 
     -- actions.stealthed+=/shuriken_storm,if=variable.gloomblade_condition&buff.silent_storm.up&!debuff.find_weakness.remains&talent.improved_shuriken_storm.enabled|combo_points<=1&!used_for_danse&spell_targets.shuriken_storm=2&talent.danse_macabre
-    if (Player:BuffUp(S.SilentStormBuff) and Target:DebuffDown(S.FindWeaknessDebuff) and S.ImprovedShurikenStorm:IsAvailable())
-        or (ComboPoints <= 1 and not Used_For_Danse(S.ShurikenStorm) and MeleeEnemies10yCount == 2 and S.DanseMacabre:IsAvailable()) then
+    if (MeleeEnemies10yCount == 2 and Player:BuffUp(S.SilentStormBuff) and Target:DebuffDown(S.FindWeaknessDebuff) and S.ImprovedShurikenStorm:IsAvailable())
+        or (ComboPoints <= 1 and not Used_For_Danse(S.ShurikenStorm) and S.DanseMacabre:IsAvailable()) then
       if ReturnSpellOnly then
         return S.ShurikenStorm
       else
