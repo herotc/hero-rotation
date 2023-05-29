@@ -159,7 +159,7 @@ local function AoE()
   end
   -- glacial_advance,if=!variable.pooling_runic_power&variable.rp_buffs
   if S.GlacialAdvance:IsReady() and ((not VarPoolingRP) and VarRPBuffs) then
-    if Cast(S.GlacialAdvance, nil, nil, not Target:IsSpellInRange(S.GlacialAdvance)) then return "glacial_advance aoe 8"; end
+    if Cast(S.GlacialAdvance, nil, nil, not Target:IsInRange(100)) then return "glacial_advance aoe 8"; end
   end
   -- obliterate,if=buff.killing_machine.react&talent.cleaving_strikes&death_and_decay.ticking&!variable.frostscythe_priority
   if S.Obliterate:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and S.CleavingStrikes:IsAvailable() and Player:BuffUp(S.DeathAndDecayBuff) and not VarFrostscythePriority) then
@@ -167,7 +167,7 @@ local function AoE()
   end
   -- glacial_advance,if=!variable.pooling_runic_power
   if S.GlacialAdvance:IsReady() and (not VarPoolingRP) then
-    if Cast(S.GlacialAdvance, nil, nil, not Target:IsSpellInRange(S.GlacialAdvance)) then return "glacial_advance aoe 12"; end
+    if Cast(S.GlacialAdvance, nil, nil, not Target:IsInRange(100)) then return "glacial_advance aoe 12"; end
   end
   -- frostscythe,if=variable.frostscythe_priority
   if S.Frostscythe:IsReady() and (VarFrostscythePriority) then
@@ -399,15 +399,15 @@ local function HighPrioActions()
   end
   -- glacial_advance,if=active_enemies>=2&variable.rp_buffs&talent.obliteration&talent.breath_of_sindragosa&!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains>variable.breath_pooling_time
   if S.GlacialAdvance:IsReady() and (EnemiesCount10yd >= 2 and VarRPBuffs and S.Obliteration:IsAvailable() and S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownRemains() > VarBreathPoolingTime) then
-    if Cast(S.GlacialAdvance, nil, nil, not Target:IsSpellInRange(S.GlacialAdvance)) then return "glacial_advance high_prio_actions 8"; end
+    if Cast(S.GlacialAdvance, nil, nil, not Target:IsInRange(100)) then return "glacial_advance high_prio_actions 8"; end
   end
   -- glacial_advance,if=active_enemies>=2&variable.rp_buffs&talent.breath_of_sindragosa&!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains>variable.breath_pooling_time
   if S.GlacialAdvance:IsReady() and (EnemiesCount10yd >= 2 and VarRPBuffs and S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownRemains() > VarBreathPoolingTime) then
-    if Cast(S.GlacialAdvance, nil, nil, not Target:IsSpellInRange(S.GlacialAdvance)) then return "glacial_advance high_prio_actions 10"; end
+    if Cast(S.GlacialAdvance, nil, nil, not Target:IsInRange(100)) then return "glacial_advance high_prio_actions 10"; end
   end
   -- glacial_advance,if=active_enemies>=2&variable.rp_buffs&!talent.breath_of_sindragosa&talent.obliteration&!buff.pillar_of_frost.up
   if S.GlacialAdvance:IsReady() and (EnemiesCount10yd >= 2 and VarRPBuffs and (not S.BreathofSindragosa:IsAvailable()) and S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff)) then
-    if Cast(S.GlacialAdvance, nil, nil, not Target:IsSpellInRange(S.GlacialAdvance)) then return "glacial_advance high_prio_actions 12"; end
+    if Cast(S.GlacialAdvance, nil, nil, not Target:IsInRange(100)) then return "glacial_advance high_prio_actions 12"; end
   end
   -- frost_strike,if=active_enemies=1&variable.rp_buffs&talent.obliteration&talent.breath_of_sindragosa&!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains>variable.breath_pooling_time
   if S.FrostStrike:IsReady() and (EnemiesCount10yd == 1 and VarRPBuffs and S.Obliteration:IsAvailable() and S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownRemains() > VarBreathPoolingTime) then
