@@ -31,6 +31,7 @@ Spell.Evoker.Commons = {
   BlessingoftheBronze                   = Spell(364342),
   DeepBreath                            = Spell(357210),
   Disintegrate                          = Spell(356995),
+  EmeraldBlossom                        = Spell(355913),
   FireBreath                            = MultiSpell(357208,382266), -- with and without Font of Magic
   LivingFlame                           = Spell(361469),
   -- Talents

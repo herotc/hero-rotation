@@ -43,6 +43,7 @@ HR.GUISettings.APL.Evoker = {
   },
   Devastation = {
     UseDefensives = true,
+    UseGreen = true,
     ObsidianScalesThreshold = 60,
     PotionType = {
       Selected = "Power",
@@ -69,5 +70,6 @@ CreatePanelOption("Slider", CP_Evoker, "APL.Evoker.Commons.EmpoweredFontSize", {
 
 -- Devastation
 CreatePanelOption("CheckButton", CP_Devastation, "APL.Evoker.Devastation.UseDefensives", "Suggest Defensives", "Enable this option to have the addon suggest defensive spells.")
+CreatePanelOption("CheckButton", CP_Devastation, "APL.Evoker.Devastation.UseGreen", "Suggest Green Spells", "Enable this option to have the addon suggest Green Evoker spells, as per the APL. Disable if you want to decide for yourself when to use them.")
 CreatePanelOption("Slider", CP_Devastation, "APL.Evoker.Devastation.ObsidianScalesThreshold", {5, 100, 5}, "Obsidian Scales Threshold", "Suggest Obsidian Scales when below this health percentage.")
 CreateARPanelOptions(CP_Devastation, "APL.Evoker.Devastation")
