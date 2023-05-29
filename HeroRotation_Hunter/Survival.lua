@@ -468,6 +468,8 @@ end
 local function APL()
   -- Target Count Checking
   local EagleUp = Player:BuffUp(S.AspectoftheEagle)
+  local AddedRange = S.Lunge:IsAvailable() and 3 or 0
+  MeleeRange = EagleUp and (40 + AddedRange) or (5 + AddedRange)
   if AoEON() then
     if EagleUp and not Target:IsInMeleeRange(8) then
       EnemyCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
