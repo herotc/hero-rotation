@@ -40,6 +40,7 @@ HR.GUISettings.APL.Paladin = {
     BubbleHP = 15,
     LoHHP = 15,
     GoAKHP = 40,
+    SotRHP = 70,
     PrioSelfWordofGloryHP = 40,
     OpportunisticSelfWordofGloryHP = 75,
     FriendlyWordofGloryHP = 60,
@@ -113,6 +114,7 @@ CreateARPanelOptions(CP_Paladin, "APL.Paladin.Commons")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.BubbleHP", {0, 100, 1}, "Bubble HP", "Set the Bubble HP threshold.")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.LoHHP", {0, 100, 1}, "Lay on Hands HP", "Set the Lay on Hands HP threshold.")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.GoAKHP", {0, 100, 1}, "GoAK HP", "Set the Guardian of Ancient Kings HP threshold.")
+CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.SotRHP", {0, 100, 1}, "SotR HP", "Set the Shield of the Righteous HP threshold.")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.ArdentDefenderHP", {0, 100, 1}, "Ardent Defender HP", "Set the Ardent Defender HP threshold.")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.PrioSelfWordofGloryHP", {0, 100, 1}, "Prio Self Word of Glory HP", "Set the Word of Glory HP threshold for casting on ourself: if we drop below this HP, we'll prio WOG over economy globals.")
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.OpportunisticSelfWordofGloryHP", {0, 100, 1}, "Opportunistic Self Word of Glory HP", "Set the Word of Glory HP threshold for casting on ourself behind economy globals.")
