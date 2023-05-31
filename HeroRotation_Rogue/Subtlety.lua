@@ -663,7 +663,7 @@ local function CDs ()
       -- |cooldown.thistle_tea.charges_fractional>=2.75&buff.shadow_dance.up)
       or (S.ThistleTea:ChargesFractional() >= 2.75 and Player:BuffUp(S.ShadowDance))))
       -- |buff.shadow_dance.remains>=4&!buff.thistle_tea.up&spell_targets.shuriken_storm>=3
-      or (Player:BuffRemains(S.ShadowDance) >= 4 and not Player:BuffUp(S.ThistleTea) and MeleeEnemies10yCount >= 3)
+      or (Player:BuffRemains(S.ShadowDanceBuff) >= 4 and not Player:BuffUp(S.ThistleTea) and MeleeEnemies10yCount >= 3)
       -- |!buff.thistle_tea.up&fight_remains<=(6*cooldown.thistle_tea.charges)
       or (not Player:BuffUp(S.ThistleTea) and HL.BossFilteredFightRemains("<=", 6 * S.ThistleTea:Charges()))
       -- Then cast Thistle Tea
