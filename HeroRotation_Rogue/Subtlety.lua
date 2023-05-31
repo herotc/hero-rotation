@@ -211,7 +211,7 @@ local function Rotten_Condition ()
 end
 local function Rotten_Threshold ()
   -- variable,name=rotten_threshold,value=!buff.the_rotten.up|spell_targets.shuriken_storm>1|combo_points<=2&buff.the_rotten.up&!set_bonus.tier30_2pc
-  return not Player:BuffUp(S.TheRotten) or MeleeEnemies10yCount > 1 or (ComboPoints <= 2 and Player:BuffUp(S.TheRotten) and not Player:HasTier(30, 2))
+  return not Player:BuffUp(S.TheRottenBuff) or MeleeEnemies10yCount > 1 or (ComboPoints <= 2 and Player:BuffUp(S.TheRottenBuff) and not Player:HasTier(30, 2))
 end
 local function Secret_Condition(ShadowDanceBuff)
   -- actions.finish=variable,name=secret_condition,value=buff.shadow_dance.up&(buff.danse_macabre.stack>=3|!talent.danse_macabre)&(!buff.premeditation.up|spell_targets.shuriken_storm!=2)
