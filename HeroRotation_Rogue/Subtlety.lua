@@ -219,7 +219,7 @@ local function Secret_Condition(ShadowDanceBuff)
       and (not Player:BuffUp(S.Premeditation) or MeleeEnemies10yCount ~= 2)
 end
 local function Used_For_Danse(Spell)
-  return Spell:TimeSinceLastCast() < S.ShadowDance:TimeSinceLastCast()
+  return Player:BuffUp(S.ShadowDanceBuff) and Spell:TimeSinceLastCast() < S.ShadowDance:TimeSinceLastCast()
 end
 
 
