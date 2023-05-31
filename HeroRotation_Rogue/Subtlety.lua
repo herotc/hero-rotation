@@ -326,7 +326,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   end
   -- actions.finish+=/black_powder,if=!variable.priority_rotation&spell_targets>=3|!used_for_danse&buff.shadow_dance.up&spell_targets.shuriken_storm=2&talent.danse_macabre
   if S.BlackPowder:IsCastable() and (
-        not PriorityRotation and MeleeEnemies10yCount >= 3 and MeleeEnemies10yCount == 2
+        not PriorityRotation and MeleeEnemies10yCount >= 3
         or not Used_For_Danse(S.BlackPowder) and Player:BuffUp(S.ShadowDanceBuff) and S.DanseMacabre:IsAvailable())
   then
     if ReturnSpellOnly then
