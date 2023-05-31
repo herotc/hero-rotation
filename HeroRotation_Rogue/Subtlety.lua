@@ -385,7 +385,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   end
 
   local StealthEffectiveComboPoints = Rogue.EffectiveComboPoints(StealthComboPoints)
-  local ShadowstrikeIsCastable = S.Shadowstrike:IsCastable() or StealthBuff or VanishBuffCheck or ShadowDanceBuff
+  local ShadowstrikeIsCastable = S.Shadowstrike:IsCastable() or StealthBuff or VanishBuffCheck or ShadowDanceBuff or Player:BuffUp(S.SepsisBuff)
   if StealthBuff or VanishBuffCheck then
     ShadowstrikeIsCastable = ShadowstrikeIsCastable and Target:IsInRange(25)
   else
