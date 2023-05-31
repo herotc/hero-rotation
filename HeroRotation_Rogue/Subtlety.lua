@@ -659,13 +659,13 @@ local function CDs ()
       -- &!buff.thistle_tea.up
       and not Player:BuffUp(S.ThistleTea)
       -- &(energy.deficit>=100&(combo_points.deficit>=2|spell_targets.shuriken_storm>=3)
-      and ((Player:EnergyDeficitPredicted() >= 100 and (Player:ComboPointsDeficit() >= 2 or MeleeEnemies10yCount >= 3))
+      and (Player:EnergyDeficitPredicted() >= 100 and (Player:ComboPointsDeficit() >= 2 or MeleeEnemies10yCount >= 3)
       -- |cooldown.thistle_tea.charges_fractional>=2.75&buff.shadow_dance.up)
-      or (S.ThistleTea:ChargesFractional() >= 2.75 and Player:BuffUp(S.ShadowDance))))
+      or S.ThistleTea:ChargesFractional() >= 2.75 and Player:BuffUp(S.ShadowDance))
       -- |buff.shadow_dance.remains>=4&!buff.thistle_tea.up&spell_targets.shuriken_storm>=3
-      or (Player:BuffRemains(S.ShadowDanceBuff) >= 4 and not Player:BuffUp(S.ThistleTea) and MeleeEnemies10yCount >= 3)
+      or Player:BuffRemains(S.ShadowDanceBuff) >= 4 and not Player:BuffUp(S.ThistleTea) and MeleeEnemies10yCount >= 3
       -- |!buff.thistle_tea.up&fight_remains<=(6*cooldown.thistle_tea.charges)
-      or (not Player:BuffUp(S.ThistleTea) and HL.BossFilteredFightRemains("<=", 6 * S.ThistleTea:Charges()))
+      or not Player:BuffUp(S.ThistleTea) and HL.BossFilteredFightRemains("<=", 6 * S.ThistleTea:Charges()))
       -- Then cast Thistle Tea
     then
       if HR.Cast(S.ThistleTea, nil, Settings.Commons.TrinketDisplayStyle) then return "Thistle Tea"; end
