@@ -540,13 +540,13 @@ local function StealthMacro (StealthSpell, EnergyThreshold)
 
   -- Handle StealthMacro GUI options
   -- If false, just suggest them as off-GCD and bail out of the macro functionality
-  if StealthSpell == S.Vanish and (not Settings.Subtlety.StealthMacro.Vanish or not MacroAbility) then
+  if StealthSpell:ID() == S.Vanish:ID() and (not Settings.Subtlety.StealthMacro.Vanish or not MacroAbility) then
     if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish" end
     return false
-  elseif StealthSpell == S.Shadowmeld and (not Settings.Subtlety.StealthMacro.Shadowmeld or not MacroAbility) then
+  elseif StealthSpell:ID() == S.Shadowmeld:ID() and (not Settings.Subtlety.StealthMacro.Shadowmeld or not MacroAbility) then
     if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
     return false
-  elseif StealthSpell == S.ShadowDance and (not Settings.Subtlety.StealthMacro.ShadowDance or not MacroAbility) then
+  elseif StealthSpell:ID() == S.ShadowDance:ID() and (not Settings.Subtlety.StealthMacro.ShadowDance or not MacroAbility) then
     if HR.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
     return false
   end
@@ -559,14 +559,8 @@ local function StealthMacro (StealthSpell, EnergyThreshold)
     return false
   end
 
-   -- Note: In case DfA is adviced (which can only be a combo for ShD), we swap them to let understand it's DfA then ShD during DfA (DfA - ShD bug)
-  if MacroTable[1] == S.ShadowDance and MacroTable[2] == S.DeathfromAbove then
-    ShouldReturn = HR.CastQueue(MacroTable[2], MacroTable[1])
-    if ShouldReturn then return "| " .. MacroTable[1]:Name() end
-  else
-    ShouldReturn = HR.CastQueue(unpack(MacroTable))
-    if ShouldReturn then return "| " .. MacroTable[2]:Name() end
-  end
+  ShouldReturn = HR.CastQueue(unpack(MacroTable))
+  if ShouldReturn then return "| " .. MacroTable[2]:Name() end
 
   return false
 end
