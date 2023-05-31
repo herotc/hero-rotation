@@ -386,8 +386,8 @@ local function APL()
     if CDsON() and (Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())) then
       local ShouldReturn = Ogcd(); if ShouldReturn then return ShouldReturn; end
     end
-    -- hand_of_guldan,if=buff.nether_portal.up
-    if S.HandofGuldan:IsReady() and (Player:BuffUp(S.NetherPortalBuff)) then
+    -- hand_of_guldan,if=buff.nether_portal.remains>cast_time
+    if S.HandofGuldan:IsReady() and (Player:BuffRemains(S.NetherPortalBuff) > S.HandofGuldan:CastTime()) then
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 6"; end
     end
     -- call_dreadstalkers,if=variable.tyrant_cd>cooldown+8*variable.shadow_timings
