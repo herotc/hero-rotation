@@ -118,9 +118,9 @@ local function EvaluateTargetIfFilterImmolate(TargetUnit)
 end
 
 local function EvaluateTargetIfImmolateAoE(TargetUnit)
-  -- if=dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&(!talent.raging_demonfire|cooldown.channel_demonfire.remains>remains)&active_dot.immolate<=4&target.time_to_die>18
+  -- if=dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&(!talent.raging_demonfire|cooldown.channel_demonfire.remains>remains|time<5)&active_dot.immolate<=4&target.time_to_die>18
   -- Note: active_dot.immolate handled before CastCycle
-  return (TargetUnit:DebuffRefreshable(S.ImmolateDebuff) and ((not S.Cataclysm:IsAvailable()) or S.Cataclysm:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff)) and (not S.RagingDemonfire:IsAvailable() or S.ChannelDemonfire:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff)) and TargetUnit:TimeToDie() > 18)
+  return (TargetUnit:DebuffRefreshable(S.ImmolateDebuff) and ((not S.Cataclysm:IsAvailable()) or S.Cataclysm:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff)) and (not S.RagingDemonfire:IsAvailable() or S.ChannelDemonfire:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff) or HL.CombatTime() < 5) and TargetUnit:TimeToDie() > 18)
 end
 
 local function EvaluateTargetIfImmolateAoE2(TargetUnit)
@@ -243,8 +243,8 @@ local function Havoc()
   if S.SoulFire:IsCastable() and (S.SoulFire:CastTime() < VarHavocRemains and Player:SoulShardsP() < 2.5) then
     if Cast(S.SoulFire, nil, nil, not Target:IsSpellInRange(S.SoulFire)) then return "soul_fire havoc 4"; end
   end
-  -- channel_demonfire,if=soul_shard<4.5&talent.raging_demonfire.rank=2&active_enemies>2
-  if S.ChannelDemonfire:IsReady() and (Player:SoulShardsP() < 4.5 and S.RagingDemonfire:TalentRank() == 2 and EnemiesCount8ySplash > 2) then
+  -- channel_demonfire,if=soul_shard<4.5&talent.raging_demonfire.rank=2
+  if S.ChannelDemonfire:IsReady() and (Player:SoulShardsP() < 4.5 and S.RagingDemonfire:TalentRank() == 2) then
     if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire havoc 6"; end
   end
   -- immolate,target_if=min:dot.immolate.remains+100*debuff.havoc.remains,if=(((dot.immolate.refreshable&variable.havoc_immo_time<5.4)&target.time_to_die>5)|((dot.immolate.remains<2&dot.immolate.remains<havoc_remains)|!dot.immolate.ticking|variable.havoc_immo_time<2)&target.time_to_die>11)&soul_shard<4.5
@@ -270,6 +270,10 @@ local function Havoc()
   -- rain_of_fire,if=active_enemies>2&(talent.avatar_of_destruction|(talent.rain_of_chaos&buff.rain_of_chaos.up))&talent.inferno.enabled
   if S.RainofFire:IsReady() and (EnemiesCount8ySplash > 2 and (S.AvatarofDestruction:IsAvailable() or (S.RainofChaos:IsAvailable() and Player:BuffUp(S.RainofChaosBuff))) and S.Inferno:IsAvailable()) then
     if Cast(S.RainofFire, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "rain_of_fire havoc 18"; end
+  end
+  -- channel_demonfire,if=soul_shard<4.5
+  if S.ChannelDemonfire:IsReady() and (Player:SoulShardsP() < 4.5) then
+    if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire havoc 19"; end
   end
   -- conflagrate,if=!talent.backdraft
   if S.Conflagrate:IsCastable() and not S.Backdraft:IsAvailable() then
@@ -308,8 +312,8 @@ local function Cleave()
   if CDsON() and S.Cataclysm:IsCastable() then
     if Cast(S.Cataclysm, Settings.Destruction.GCDasOffGCD.Cataclysm, nil, not Target:IsSpellInRange(S.Cataclysm)) then return "cataclysm cleave 6"; end
   end
-  -- channel_demonfire,if=talent.raging_demonfire
-  if S.ChannelDemonfire:IsReady() and (S.RagingDemonfire:IsAvailable()) then
+  -- channel_demonfire,if=talent.raging_demonfire&active_dot.immolate=2
+  if S.ChannelDemonfire:IsReady() and (S.RagingDemonfire:IsAvailable() and S.ImmolateDebuff:AuraActiveCount() == 2) then
     if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire cleave 8"; end
   end
   -- soul_fire,if=soul_shard<=3.5&(debuff.conflagrate.remains>cast_time+travel_time|!talent.roaring_blaze&buff.backdraft.up)&!variable.pool_soul_shards
@@ -451,17 +455,17 @@ local function Aoe()
   if CDsON() and S.Cataclysm:IsCastable() then
     if Cast(S.Cataclysm, Settings.Destruction.GCDasOffGCD.Cataclysm, nil, not Target:IsSpellInRange(S.Cataclysm)) then return "cataclysm aoe 12"; end
   end
-  -- channel_demonfire,if=dot.immolate.remains>cast_time&talent.raging_demonfire
-  if S.ChannelDemonfire:IsReady() and (Target:DebuffRemains(S.ImmolateDebuff) > ChannelDemonfireExecuteTime() and S.RagingDemonfire:IsAvailable()) then
-    if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire aoe 14"; end
-  end
   -- havoc,target_if=min:((-target.time_to_die)<?-15)+dot.immolate.remains+99*(self.target=target),if=(!cooldown.summon_infernal.up|!talent.summon_infernal|(talent.inferno&active_enemies>4))&target.time_to_die>8
   if S.Havoc:IsReady() and (S.SummonInfernal:CooldownDown() or (not S.SummonInfernal:IsAvailable()) or (S.Inferno:IsAvailable() and EnemiesCount8ySplash > 4)) then
-    if Everyone.CastTargetIf(S.Havoc, Enemies40y, "min", EvaluateTargetIfFilterHavoc, EvaluateTargetIfHavoc, not Target:IsSpellInRange(S.Havoc)) then return "havoc aoe 15"; end
+    if Everyone.CastTargetIf(S.Havoc, Enemies40y, "min", EvaluateTargetIfFilterHavoc, EvaluateTargetIfHavoc, not Target:IsSpellInRange(S.Havoc)) then return "havoc aoe 14"; end
   end
-  -- immolate,target_if=min:dot.immolate.remains+99*debuff.havoc.remains,if=dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&(!talent.raging_demonfire|cooldown.channel_demonfire.remains>remains)&active_dot.immolate<=4&target.time_to_die>18
+  -- immolate,target_if=min:dot.immolate.remains+99*debuff.havoc.remains,if=dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&(!talent.raging_demonfire|cooldown.channel_demonfire.remains>remains|time<5)&active_dot.immolate<=4&target.time_to_die>18
   if S.Immolate:IsCastable() and (S.ImmolateDebuff:AuraActiveCount() <= 4) then
     if Everyone.CastTargetIf(S.Immolate, Enemies40y, "min", EvaluateTargetIfFilterImmolate, EvaluateTargetIfImmolateAoE, not Target:IsSpellInRange(S.Immolate)) then return "immolate aoe 16"; end
+  end
+  -- channel_demonfire,if=dot.immolate.remains>cast_time&talent.raging_demonfire
+  if S.ChannelDemonfire:IsReady() and (Target:DebuffRemains(S.ImmolateDebuff) > ChannelDemonfireExecuteTime() and S.RagingDemonfire:IsAvailable()) then
+    if Cast(S.ChannelDemonfire, nil, nil, not Target:IsInRange(40)) then return "channel_demonfire aoe 17"; end
   end
   -- summon_soulkeeper,if=buff.tormented_soul.stack=10|buff.tormented_soul.stack>3&fight_remains<10
   if S.SummonSoulkeeper:IsCastable() and (S.SummonSoulkeeper:Count() == 10 or S.SummonSoulkeeper:Count() > 3 and FightRemains < 10) then
@@ -591,10 +595,6 @@ local function APL()
     -- immolate,if=(((dot.immolate.remains-5*(action.chaos_bolt.in_flight&talent.internal_combustion))<dot.immolate.duration*0.3)|dot.immolate.remains<3|(dot.immolate.remains-action.chaos_bolt.execute_time)<5&talent.infernal_combustion&action.chaos_bolt.usable)&(!talent.cataclysm|cooldown.cataclysm.remains>dot.immolate.remains)&(!talent.soul_fire|cooldown.soul_fire.remains+action.soul_fire.cast_time>(dot.immolate.remains-5*talent.internal_combustion))&target.time_to_die>8
     if S.Immolate:IsCastable() and ((((Target:DebuffRemains(S.ImmolateDebuff) - 5 * num(S.ChaosBolt:InFlight() and S.InternalCombustion:IsAvailable())) < S.ImmolateDebuff:PandemicThreshold()) or Target:DebuffRemains(S.ImmolateDebuff) < 3 or (Target:DebuffRemains(S.ImmolateDebuff) - S.ChaosBolt:ExecuteTime()) < 5 and S.InternalCombustion:IsAvailable() and S.ChaosBolt:IsReady()) and ((not S.Cataclysm:IsAvailable()) or S.Cataclysm:CooldownRemains() > Target:DebuffRemains(S.ImmolateDebuff)) and ((not S.SoulFire:IsAvailable()) or S.SoulFire:CooldownRemains() + S.SoulFire:CastTime() > (Target:DebuffRemains(S.ImmolateDebuff) - 5 * num(S.InternalCombustion:IsAvailable()))) and Target:TimeToDie() > 8) then
       if Cast(S.Immolate, nil, nil, not Target:IsSpellInRange(S.Immolate)) then return "immolate main 12"; end
-    end
-    -- havoc,if=talent.cry_havoc&((buff.ritual_of_ruin.up&pet.infernal.active&talent.burn_to_ashes)|((buff.ritual_of_ruin.up|pet.infernal.active)&!talent.burn_to_ashes))
-    if S.Havoc:IsCastable() and (not Settings.Destruction.IgnoreSTHavoc) and (S.CryHavoc:IsAvailable() and ((Player:BuffUp(S.RitualofRuinBuff) or InfernalTime() > 0 and S.BurntoAshes:IsAvailable()) or ((Player:BuffUp(S.RitualofRuinBuff) or InfernalTime() > 0) and not S.BurntoAshes:IsAvailable()))) then
-      if Cast(S.Havoc, nil, nil, not Target:IsSpellInRange(S.Havoc)) then return "havoc (st) main 14"; end
     end
     -- channel_demonfire,if=dot.immolate.remains>cast_time&set_bonus.tier30_4pc
     if S.ChannelDemonfire:IsReady() and (Target:DebuffRemains(S.ImmolateDebuff) > ChannelDemonfireExecuteTime() and Player:HasTier(30, 4)) then
