@@ -278,6 +278,11 @@ local function Vanish_DPS_Condition ()
   return Settings.Outlaw.UseDPSVanish and CDsON() and not (Everyone.IsSoloMode() and Player:IsTanking(Target))
 end
 
+-- Determine if we are allowed to use Killing Spree in the current situation
+local function Killing_Spree_Condition ()
+  return Settings.Outlaw.UseKillingSpree and CDsON()
+end
+
 -- Marked for Death Target_if Functions
 -- actions.cds+=/marked_for_death,line_cd=1.5,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|combo_points.deficit>=cp_max_spend-1)&!buff.dreadblades.up
 local function EvaluateMfDTargetIfCondition(TargetUnit)
@@ -387,7 +392,7 @@ local function CDs ()
     if HR.Cast(S.ThistleTea, Settings.Commons.OffGCDasOffGCD.ThistleTea) then return "Cast Thistle Tea" end
   end
   -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&!stealthed.rogue&debuff.between_the_eyes.up&energy.base_time_to_max>4
-  if CDsON() and S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and Blade_Flurry_Sync()
+  if Settings.Outlaw.UseKillingSpree and CDsON() and S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and Blade_Flurry_Sync()
     and not Player:StealthUp(true, false) and Target:DebuffUp(S.BetweentheEyes) and EnergyTimeToMax > 4 then
     if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree" end
   end
