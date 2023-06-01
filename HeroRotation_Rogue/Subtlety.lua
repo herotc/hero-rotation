@@ -290,8 +290,12 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   if not SkipRupture and S.Rupture:IsCastable() then
     if MeleeEnemies10yCount == 1 and Player:BuffUp(S.FinalityRuptureBuff) and (S.DarkBrew:IsAvailable() or S.DanseMacabre:IsAvailable())
       and S.ShadowDance:CooldownRemains() < 12 and S.ShadowDance:ChargesFractional() <= 1 then
-      if S.Rupture:IsReady() and HR.Cast(S.Rupture) then return "Cast Rupture (Finality)" end
-      SetPoolingFinisher(S.Rupture)
+      if ReturnSpellOnly then
+        return S.Rupture
+      else
+        if S.Rupture:IsReady() and HR.Cast(S.Rupture) then return "Cast Rupture (Finality)" end
+        SetPoolingFinisher(S.Rupture)
+      end
     end
   end
 
