@@ -235,6 +235,7 @@ Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
   LingeringShadow         = Spell(382524),
   LingeringShadowBuff     = Spell(385960),
   MasterofShadows         = Spell(196976),
+  PerforatedVeins         = Spell(382518),
   PerforatedVeinsBuff     = Spell(394254),
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
