@@ -207,7 +207,7 @@ local function Skip_Rupture (ShadowDanceBuff)
 end
 local function Rotten_Condition ()
   -- variable,name=rotten_condition,value=!buff.premeditation.up&spell_targets.shuriken_storm=1|!talent.the_rotten|spell_targets.shuriken_storm>1
-  return not Player:BuffUp(S.Premeditation) and MeleeEnemies10yCount == 1 or not S.TheRotten:IsAvailable() or MeleeEnemies10yCount > 1
+  return Player:BuffDown(S.PremeditationBuff) and MeleeEnemies10yCount == 1 or not S.TheRotten:IsAvailable() or MeleeEnemies10yCount > 1
 end
 local function Rotten_Threshold ()
   -- variable,name=rotten_threshold,value=!buff.the_rotten.up|spell_targets.shuriken_storm>1|combo_points<=2&buff.the_rotten.up&!set_bonus.tier30_2pc
