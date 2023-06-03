@@ -379,7 +379,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   if StealthSpell and StealthSpell:ID() == S.ShadowDance:ID() then
     ShadowDanceBuff = true
     ShadowDanceBuffRemains = 8 + S.ImprovedShadowDance:TalentRank()
-    if Player:HasTier(30, 2) then
+    if S.TheRotten:IsAvailable() and Player:HasTier(30, 2) then
       TheRottenBuff = true
     end
     if S.TheFirstDance:IsAvailable() then
@@ -425,12 +425,12 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       -- If calling from a Stealth macro, we don't need the PV suggestion since it's already a macro cast
       if StealthSpell then
-          return S.Gloomblade
+        return S.Gloomblade
       else
-          return { S.Gloomblade, S.Stealth }
+        return { S.Gloomblade, S.Stealth }
       end
     else
-        if HR.CastQueue(S.Gloomblade, S.Stealth) then return "Cast Gloomblade (Stealth)" end
+      if HR.CastQueue(S.Gloomblade, S.Stealth) then return "Cast Gloomblade (Stealth)" end
     end
   end
   -- actions.stealthed+=/backstab,if=variable.gloomblade_condition&talent.danse_macabre&buff.danse_macabre.stack<=2&spell_targets.shuriken_storm<=2
