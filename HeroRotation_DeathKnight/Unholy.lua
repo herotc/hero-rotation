@@ -460,6 +460,20 @@ local function Generic()
 end
 
 local function HighPrioActions()
+  -- mind_freeze,if=target.debuff.casting.react
+  -- Note: Kept interrupts in APL()
+  if Settings.Commons.UseAMSAMZOffensively then
+    -- antimagic_shell,if=runic_power.deficit>40&(pet.gargoyle.active|!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>cooldown.antimagic_shell.duration)
+    if S.AntiMagicShell:IsCastable() and (Player:RunicPowerDeficit() > 40 and (VarGargActive or (not S.SummonGargoyle:IsAvailable()) or S.SummonGargoyle:CooldownRemains() > 40)) then
+      if Cast(S.AntiMagicShell, Settings.Commons2.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell ams_amz 2"; end
+    end
+    -- antimagic_zone,if=death_knight.amz_absorb_percent>0&runic_power.deficit>70&talent.assimilation&(pet.gargoyle.active|!talent.summon_gargoyle)
+    if S.AntiMagicZone:IsCastable() and (Player:RunicPowerDeficit() > 70 and S.Assimilation:IsAvailable() and (VarGargActive or not S.SummonGargoyle:IsAvailable())) then
+      if Cast(S.AntiMagicZone, Settings.Commons2.GCDasOffGCD.AntiMagicZone) then return "antimagic_zone ams_amz 4"; end
+    end
+  end
+  -- invoke_external_buff,name=power_infusion,if=variable.st_planning&(pet.gargoyle.active&pet.gargoyle.remains<=20|!talent.summon_gargoyle&talent.army_of_the_dead&pet.army_ghoul.active&pet.apoc_ghoul.active|!talent.summon_gargoyle&!talent.army_of_the_dead&buff.dark_transformation.up|!talent.summon_gargoyle&buff.dark_transformation.up|!pet.gargoyle.active&cooldown.summon_gargoyle.remains+5>cooldown.invoke_external_buff.duration|active_enemies>=3&(buff.dark_transformation.up|death_and_decay.ticking))|fight_remains<=21
+  -- Note: Not handling external buffs.
   -- potion,if=(30>=pet.gargoyle.remains&pet.gargoyle.active)|(!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>60|cooldown.summon_gargoyle.ready)&(buff.dark_transformation.up&30>=buff.dark_transformation.remains|pet.army_ghoul.active&pet.army_ghoul.remains<=30|pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=30)|fight_remains<=30
   if Settings.Commons.Enabled.Potions then
     local PotionSelected = Everyone.PotionSelected()
@@ -560,6 +574,29 @@ local function Trinkets()
   end
 end
 
+local function Variables()
+  -- variable,name=epidemic_priority,op=setif,value=1,value_else=0,condition=talent.improved_death_coil&!talent.coil_of_devastation&active_enemies>=3|talent.coil_of_devastation&active_enemies>=4|!talent.improved_death_coil&active_enemies>=2
+  VarEpidemicPriority = (S.ImprovedDeathCoil:IsAvailable() and (not S.CoilofDevastation:IsAvailable()) and EnemiesMeleeCount >= 3 or S.CoilofDevastation:IsAvailable() and EnemiesMeleeCount >= 4 or (not S.ImprovedDeathCoil:IsAvailable()) and EnemiesMeleeCount >= 2)
+  -- variable,name=garg_setup,op=setif,value=1,value_else=0,condition=active_enemies>=3|cooldown.summon_gargoyle.remains>1&cooldown.apocalypse.remains>1|!talent.apocalypse&cooldown.summon_gargoyle.remains>1|!talent.summon_gargoyle|time>20
+  VarGargSetup = (EnemiesMeleeCount >= 3 or S.SummonGargoyle:CooldownRemains() > 1 and S.Apocalypse:CooldownRemains() > 1 or (not S.Apocalypse:IsAvailable()) and S.SummonGargoyle:CooldownRemains() > 1 or (not S.SummonGargoyle:IsAvailable()) or HL.CombatTime() > 20)
+  -- variable,name=apoc_timing,op=setif,value=10,value_else=2,condition=cooldown.apocalypse.remains<10&debuff.festering_wound.stack<=4&cooldown.unholy_assault.remains>10
+  VarApocTiming = (S.Apocalypse:CooldownRemains() < 10 and FesterStacks <= 4 and S.UnholyAssault:CooldownRemains() > 10) and 10 or 2
+  -- variable,name=festermight_tracker,op=setif,value=debuff.festering_wound.stack>=1,value_else=debuff.festering_wound.stack>=(3-talent.infected_claws),condition=!pet.gargoyle.active&talent.festermight&buff.festermight.up&(buff.festermight.remains%(5*gcd.max))>=1
+  if ((not VarGargActive) and S.Festermight:IsAvailable() and Player:BuffUp(S.FestermightBuff) and (Player:BuffRemains(S.FestermightBuff) / (5 * Player:GCD())) >= 1) then
+    VarFesterTracker = FesterStacks >= 1
+  else
+    VarFesterTracker = FesterStacks >= (3 - num(S.InfectedClaws:IsAvailable()))
+  end
+  -- variable,name=pop_wounds,op=setif,value=1,value_else=0,condition=(cooldown.apocalypse.remains>variable.apoc_timing|!talent.apocalypse)&(variable.festermight_tracker|debuff.festering_wound.stack>=1&!talent.apocalypse|debuff.festering_wound.stack>=1&cooldown.unholy_assault.remains<20&talent.unholy_assault&variable.st_planning|debuff.rotten_touch.up&debuff.festering_wound.stack>=1|debuff.festering_wound.stack>4)|fight_remains<5&debuff.festering_wound.stack>=1
+  VarPopWounds = ((S.Apocalypse:CooldownRemains() > VarApocTiming or not S.Apocalypse:IsAvailable()) and (VarFesterTracker or FesterStacks >= 1 and (not S.Apocalypse:IsAvailable()) or FesterStacks >= 1 and S.UnholyAssault:CooldownRemains() < 20 and S.UnholyAssault:IsAvailable() and VarSTPlanning or Target:DebuffUp(S.RottenTouchDebuff) and FesterStacks >= 1 or FesterStacks > 4) or FightRemains < 5 and FesterStacks >= 1)
+  -- variable,name=pooling_runic_power,op=setif,value=1,value_else=0,condition=talent.vile_contagion&cooldown.vile_contagion.remains<3&runic_power<60&!variable.st_planning
+  VarPoolingRunicPower = (S.VileContagion:IsAvailable() and S.VileContagion:CooldownRemains() < 3 and Player:RunicPower() < 60 and not VarSTPlanning)
+  -- variable,name=st_planning,op=setif,value=1,value_else=0,condition=active_enemies<=3&(!raid_event.adds.exists|raid_event.adds.in>15)
+  VarSTPlanning = (EnemiesMeleeCount <= 3 or not AoEON())
+  -- variable,name=adds_remain,op=setif,value=1,value_else=0,condition=active_enemies>=4&(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.remains>6)
+  VarAddsRemain = (EnemiesMeleeCount >= 4 and AoEON())
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
   no_heal = not DeathStrikeHeal()
@@ -612,40 +649,8 @@ local function APL()
       if Cast(S.DeathStrike) then return "death_strike low hp or proc"; end
     end
     -- auto_attack
-    -- mind_freeze,if=target.debuff.casting.react
+    -- Interrupts (here instead of HighPrioActions)
     local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons2.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
-    if Settings.Commons.UseAMSAMZOffensively then
-      -- antimagic_shell,if=runic_power.deficit>40&(pet.gargoyle.active|!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>cooldown.antimagic_shell.duration)
-      if S.AntiMagicShell:IsCastable() and (Player:RunicPowerDeficit() > 40 and (VarGargActive or (not S.SummonGargoyle:IsAvailable()) or S.SummonGargoyle:CooldownRemains() > 40)) then
-        if Cast(S.AntiMagicShell, Settings.Commons2.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell ams_amz 2"; end
-      end
-      -- antimagic_zone,if=death_knight.amz_absorb_percent>0&runic_power.deficit>70&talent.assimilation&(pet.gargoyle.active|!talent.summon_gargoyle)
-      if S.AntiMagicZone:IsCastable() and (Player:RunicPowerDeficit() > 70 and S.Assimilation:IsAvailable() and (VarGargActive or not S.SummonGargoyle:IsAvailable())) then
-        if Cast(S.AntiMagicZone, Settings.Commons2.GCDasOffGCD.AntiMagicZone) then return "antimagic_zone ams_amz 4"; end
-      end
-    end
-    -- variable,name=epidemic_priority,op=setif,value=1,value_else=0,condition=talent.improved_death_coil&!talent.coil_of_devastation&active_enemies>=3|talent.coil_of_devastation&active_enemies>=4|!talent.improved_death_coil&active_enemies>=2
-    VarEpidemicPriority = (S.ImprovedDeathCoil:IsAvailable() and (not S.CoilofDevastation:IsAvailable()) and EnemiesMeleeCount >= 3 or S.CoilofDevastation:IsAvailable() and EnemiesMeleeCount >= 4 or (not S.ImprovedDeathCoil:IsAvailable()) and EnemiesMeleeCount >= 2)
-    -- variable,name=garg_setup,op=setif,value=1,value_else=0,condition=active_enemies>=3|cooldown.summon_gargoyle.remains>1&cooldown.apocalypse.remains>1|!talent.apocalypse&cooldown.summon_gargoyle.remains>1|!talent.summon_gargoyle|time>20
-    VarGargSetup = (EnemiesMeleeCount >= 3 or S.SummonGargoyle:CooldownRemains() > 1 and S.Apocalypse:CooldownRemains() > 1 or (not S.Apocalypse:IsAvailable()) and S.SummonGargoyle:CooldownRemains() > 1 or (not S.SummonGargoyle:IsAvailable()) or HL.CombatTime() > 20)
-    -- variable,name=apoc_timing,op=setif,value=10,value_else=2,condition=cooldown.apocalypse.remains<10&debuff.festering_wound.stack<=4&cooldown.unholy_assault.remains>10
-    VarApocTiming = (S.Apocalypse:CooldownRemains() < 10 and FesterStacks <= 4 and S.UnholyAssault:CooldownRemains() > 10) and 10 or 2
-    -- variable,name=festermight_tracker,op=setif,value=debuff.festering_wound.stack>=1,value_else=debuff.festering_wound.stack>=(3-talent.infected_claws),condition=!pet.gargoyle.active&talent.festermight&buff.festermight.up&(buff.festermight.remains%(5*gcd.max))>=1
-    if ((not VarGargActive) and S.Festermight:IsAvailable() and Player:BuffUp(S.FestermightBuff) and (Player:BuffRemains(S.FestermightBuff) / (5 * Player:GCD())) >= 1) then
-      VarFesterTracker = FesterStacks >= 1
-    else
-      VarFesterTracker = FesterStacks >= (3 - num(S.InfectedClaws:IsAvailable()))
-    end
-    -- variable,name=pop_wounds,op=setif,value=1,value_else=0,condition=(cooldown.apocalypse.remains>variable.apoc_timing|!talent.apocalypse)&(variable.festermight_tracker|debuff.festering_wound.stack>=1&!talent.apocalypse|debuff.festering_wound.stack>=1&cooldown.unholy_assault.remains<20&talent.unholy_assault&variable.st_planning|debuff.rotten_touch.up&debuff.festering_wound.stack>=1|debuff.festering_wound.stack>4)|fight_remains<5&debuff.festering_wound.stack>=1
-    VarPopWounds = ((S.Apocalypse:CooldownRemains() > VarApocTiming or not S.Apocalypse:IsAvailable()) and (VarFesterTracker or FesterStacks >= 1 and (not S.Apocalypse:IsAvailable()) or FesterStacks >= 1 and S.UnholyAssault:CooldownRemains() < 20 and S.UnholyAssault:IsAvailable() and VarSTPlanning or Target:DebuffUp(S.RottenTouchDebuff) and FesterStacks >= 1 or FesterStacks > 4) or FightRemains < 5 and FesterStacks >= 1)
-    -- variable,name=pooling_runic_power,op=setif,value=1,value_else=0,condition=talent.vile_contagion&cooldown.vile_contagion.remains<3&runic_power<60&!variable.st_planning
-    VarPoolingRunicPower = (S.VileContagion:IsAvailable() and S.VileContagion:CooldownRemains() < 3 and Player:RunicPower() < 60 and not VarSTPlanning)
-    -- variable,name=st_planning,op=setif,value=1,value_else=0,condition=active_enemies<=3&(!raid_event.adds.exists|raid_event.adds.in>15)
-    VarSTPlanning = (EnemiesMeleeCount <= 3 or not AoEON())
-    -- variable,name=adds_remain,op=setif,value=1,value_else=0,condition=active_enemies>=4&(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.remains>6)
-    VarAddsRemain = (EnemiesMeleeCount >= 4 and AoEON())
-    -- invoke_external_buff,name=power_infusion,if=variable.st_planning&(pet.gargoyle.active&pet.gargoyle.remains<=20|!talent.summon_gargoyle&talent.army_of_the_dead&pet.army_ghoul.active&pet.apoc_ghoul.active|!talent.summon_gargoyle&!talent.army_of_the_dead&buff.dark_transformation.up|!talent.summon_gargoyle&buff.dark_transformation.up|!pet.gargoyle.active&cooldown.summon_gargoyle.remains+5>cooldown.invoke_external_buff.duration|active_enemies>=3&(buff.dark_transformation.up|death_and_decay.ticking))|fight_remains<=21
-    -- Note: Not handling external buffs.
     if EnemiesMeleeCount == 0 then
       -- Manually added: Outbreak if targets are missing VP and out of range
       if S.Outbreak:IsReady() and (EnemiesWithoutVP > 0) then
@@ -660,6 +665,8 @@ local function APL()
         if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil out_of_range"; end
       end
     end
+    -- call_action_list,name=variables
+    Variables()
     -- call_action_list,name=high_prio_actions
     local ShouldReturn = HighPrioActions(); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=trinkets

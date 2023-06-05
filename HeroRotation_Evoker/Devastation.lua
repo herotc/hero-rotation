@@ -143,8 +143,8 @@ local function Precombat()
   -- Note: Variables are never changed. Moving to variable declaration instead.
   -- variable,name=has_external_pi,value=cooldown.invoke_power_infusion_0.duration>0
   -- Note: Not handling external PI.
-  -- verdant_embrace,if=talent.ancient_flame&talent.firestorm
-  if Settings.Devastation.UseGreen and S.VerdantEmbrace:IsCastable() and (S.AncientFlame:IsAvailable() and S.Firestorm:IsAvailable()) then
+  -- verdant_embrace,if=talent.scarlet_adaptation&talent.firestorm
+  if Settings.Devastation.UseGreen and S.VerdantEmbrace:IsCastable() and (S.ScarletAdaptation:IsAvailable() and S.Firestorm:IsAvailable()) then
     if Cast(S.VerdantEmbrace) then return "verdant_embrace precombat 2"; end
   end
   -- use_item,name=shadowed_orb_of_torment
@@ -155,13 +155,9 @@ local function Precombat()
   if S.Firestorm:IsCastable() then
     if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm precombat 6"; end
   end
-  -- verdant_embrace,if=talent.ancient_flame&!talent.firestorm
-  if Settings.Devastation.UseGreen and S.VerdantEmbrace:IsCastable() and (S.AncientFlame:IsAvailable() and not S.Firestorm:IsAvailable()) then
-    if Cast(S.VerdantEmbrace) then return "verdant_embrace precombat 8"; end
-  end
   -- living_flame,if=!talent.firestorm
   if S.LivingFlame:IsCastable() and (not S.Firestorm:IsAvailable()) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame precombat 10"; end
+    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame precombat 8"; end
   end
 end
 
@@ -328,10 +324,6 @@ local function ST()
   if S.Firestorm:IsCastable() and (Player:BuffUp(S.SnapfireBuff)) then
     if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm st 4"; end
   end
-  -- call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up&talent.dragonrage&cooldown.dragonrage.ready&(cooldown.fire_breath.remains<4&cooldown.eternity_surge.remains<10&target.time_to_die>=32|fight_remains<30)
-  if Settings.Devastation.UseGreen and (S.AncientFlame:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and S.Dragonrage:IsAvailable() and S.Dragonrage:CooldownUp() and (S.FireBreath:CooldownRemains() < 4 and S.EternitySurge:CooldownRemains() < 10 and Target:TimeToDie() >= 32 or FightRemains < 30)) then
-    local ShouldReturn = Green(); if ShouldReturn then return ShouldReturn; end
-  end
   -- dragonrage,if=cooldown.fire_breath.remains<4&cooldown.eternity_surge.remains<10&target.time_to_die>=32|fight_remains<30
   if S.Dragonrage:IsCastable() and CDsON() and (S.FireBreath:CooldownRemains() < GCDMax and S.EternitySurge:CooldownRemains() < 2 * GCDMax or FightRemains < 30) then
     if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage st 6"; end
@@ -376,10 +368,6 @@ local function ST()
   if S.AzureStrike:IsCastable() and (VarDragonrageUp and VarDragonrageRemains < (MaxEssenceBurstStack - Player:BuffStack(S.EssenceBurstBuff)) * GCDMax) then
     if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 18"; end
   end
-  -- call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up&buff.burnout.up
-  if Settings.Devastation.UseGreen and (S.AncientFlame:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and Player:BuffUp(S.BurnoutBuff)) then
-    local ShouldReturn = Green(); if ShouldReturn then return ShouldReturn; end
-  end
   -- living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)&essence.deficit>=2
   -- living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)&essence<essence.max-1
   if S.LivingFlame:IsCastable() and (Player:BuffUp(S.BurnoutBuff) and (Player:BuffUp(S.LeapingFlamesBuff) and Player:BuffDown(S.EssenceBurstBuff) or Player:BuffDown(S.LeapingFlamesBuff) and Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack) and Player:EssenceDeficit() >= 2) then
@@ -408,18 +396,18 @@ local function ST()
   if S.DeepBreath:IsCastable() and CDsON() and ((not VarDragonrageUp) and S.ImminentDestruction:IsAvailable() and Target:DebuffDown(S.ShatteringStar)) then
     if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath st 30"; end
   end
-  -- call_action_list,name=green,,if=talent.ancient_flame&!buff.ancient_flame.up
-  if Settings.Devastation.UseGreen and (S.AncientFlame:IsAvailable() and Player:BuffDown(S.AncientFlameBuff)) then
+  -- call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up&!buff.shattering_star_debuff.up&talent.scarlet_adaptation&!buff.dragonrage.up
+  if Settings.Devastation.UseGreen and (S.AncientFlame:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and Target:DebuffDown(S.ShatteringStar) and S.ScarletAdaptation:IsAvailable() and not VarDragonrageUp) then
     local ShouldReturn = Green(); if ShouldReturn then return ShouldReturn; end
   end
-  -- living_flame,if=!buff.dragonrage.up&(!buff.ancient_flame.up|cooldown.verdant_embrace.up|cooldown.emerald_blossom.up|buff.iridescence_red.remains>execute_time)|(buff.iridescence_red.remains>execute_time|buff.iridescence_blue.up)&active_enemies==1&!buff.ancient_flame.up
+  -- living_flame,if=!buff.dragonrage.up|(buff.iridescence_red.remains>execute_time|buff.iridescence_blue.up)&active_enemies==1
   -- Note: Added moving check to allow fallthru to azure_strike.
-  if S.LivingFlame:IsCastable() and (not Player:IsMoving()) and ((not VarDragonrageUp) or (Player:BuffDown(S.AncientFlameBuff) or S.VerdantEmbrace:CooldownUp() or S.EmeraldBlossom:CooldownUp() or Player:BuffRemains(S.IridescenceRedBuff) > S.LivingFlame:ExecuteTime()) or (Player:BuffRemains(S.IridescenceRedBuff) > S.LivingFlame:ExecuteTime() or Player:BuffUp(S.IridescenceBlueBuff)) and EnemiesCount8ySplash == 1 and Player:BuffDown(S.AncientFlameBuff)) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 34"; end
+  if S.LivingFlame:IsCastable() and (not Player:IsMoving()) and ((not VarDragonrageUp) or (Player:BuffRemains(S.IridescenceRedBuff) > S.LivingFlame:ExecuteTime() or Player:BuffUp(S.IridescenceBlueBuff)) and EnemiesCount8ySplash == 1) then
+    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 32"; end
   end
   -- azure_strike
   if S.AzureStrike:IsCastable() then
-    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 36"; end
+    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 34"; end
   end
 end
 
