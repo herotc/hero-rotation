@@ -232,7 +232,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   local FinishComboPoints = ComboPoints
 
   -- State changes based on predicted Stealth casts
-  local PremeditationBuff = StealthSpell or Player:BuffUp(S.PremeditationBuff)
+  local PremeditationBuff = Player:BuffUp(S.PremeditationBuff) or (StealthSpell and S.Premeditation:IsAvailable())
   if StealthSpell and StealthSpell:ID() == S.ShadowDance:ID() then
     ShadowDanceBuff = true
     ShadowDanceBuffRemains = 8 + S.ImprovedShadowDance:TalentRank()
