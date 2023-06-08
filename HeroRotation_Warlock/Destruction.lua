@@ -557,7 +557,7 @@ local function APL()
     -- cycling_variable,name=havoc_immo_time,op=add,value=dot.immolate.remains*debuff.havoc.up
     -- Note: Above lines are to check how long Immolate remains on our Havoc target. This is included in UnitWithHavoc() now.
     -- call_action_list,name=aoe,if=(active_enemies>=3-(talent.inferno&!talent.madness_of_the_azjaqir))&!(!talent.inferno&talent.madness_of_the_azjaqir&talent.chaos_incarnate&active_enemies<4)&!variable.cleave_apl
-    if ((EnemiesCount8ySplash >= 3 - (num(S.Inferno:IsAvailable() and not S.MadnessoftheAzjAqir:IsAvailable()))) and (not ((not S.Inferno:IsAvailable()) and S.MadnessoftheAzjAqir:IsAvailable() and S.ChaosIncarnate:IsAvailable()) and EnemiesCount8ySplash < 4) and not VarCleaveAPL) then
+    if ((EnemiesCount8ySplash >= 3 - (num(S.Inferno:IsAvailable() and not S.MadnessoftheAzjAqir:IsAvailable()))) and (not ((not S.Inferno:IsAvailable()) and S.MadnessoftheAzjAqir:IsAvailable() and S.ChaosIncarnate:IsAvailable() and EnemiesCount8ySplash < 4)) and not VarCleaveAPL) then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cleave,if=active_enemies!=1|variable.cleave_apl
