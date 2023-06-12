@@ -304,7 +304,7 @@ local function Cleave()
   if S.Conflagrate:IsCastable() and ((S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.RoaringBlazeDebuff) < 1.5) or S.Conflagrate:Charges() == S.Conflagrate:MaxCharges()) then
     if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate cleave 2"; end
   end
-  -- dimensional_rift,if=soul_shard<4.7&(charges>2|time_to_die<cooldown.dimensional_rift.duration)
+  -- dimensional_rift,if=soul_shard<4.7&(charges>2|fight_remains<cooldown.dimensional_rift.duration)
   if CDsON() and S.DimensionalRift:IsCastable() and (Player:SoulShardsP() < 4.7 and (S.DimensionalRift:Charges() > 2 or FightRemains < S.DimensionalRift:Cooldown())) then
     if Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift cleave 4"; end
   end
@@ -399,7 +399,7 @@ local function Cleave()
   if S.ChaosBolt:IsReady() and ((not VarPoolSoulShards) and (S.SoulConduit:IsAvailable() and (not S.MadnessoftheAzjAqir:IsAvailable()) or not S.Backdraft:IsAvailable())) then
     if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt cleave 42"; end
   end
-  -- chaos_bolt,if=fight_remains<5&time_to_die>cast_time+travel_time
+  -- chaos_bolt,if=fight_remains<5&fight_remains>cast_time+travel_time
   -- Note: Added a buffer of 0.25s
   if S.ChaosBolt:IsReady() and (FightRemains < 5.25 and Target:TimeToDie() > S.ChaosBolt:CastTime() + S.ChaosBolt:TravelTime() + 0.25) then
     if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt cleave 44"; end
@@ -408,7 +408,7 @@ local function Cleave()
   if S.SummonSoulkeeper:IsCastable() and (S.SummonSoulkeeper:Count() == 10 or S.SummonSoulkeeper:Count() > 3 and FightRemains < 10) then
     if Cast(S.SummonSoulkeeper, Settings.Destruction.GCDasOffGCD.SummonSoulkeeper) then return "summon_soulkeeper cleave 46"; end
   end
-  -- conflagrate,if=charges>(max_charges-1)|time_to_die<gcd.max*charges
+  -- conflagrate,if=charges>(max_charges-1)|fight_remains<gcd.max*charges
   if S.Conflagrate:IsCastable() and (S.Conflagrate:Charges() > (S.Conflagrate:MaxCharges() - 1) or FightRemains < GCDMax * S.Conflagrate:Charges()) then
     if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate cleave 48"; end
   end
@@ -576,7 +576,7 @@ local function APL()
     if S.Conflagrate:IsReady() and ((S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.RoaringBlazeDebuff) < 1.5) or S.Conflagrate:Charges() == S.Conflagrate:MaxCharges()) then
       if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 2"; end
     end
-    -- dimensional_rift,if=soul_shard<4.7&(charges>2|time_to_die<cooldown.dimensional_rift.duration)
+    -- dimensional_rift,if=soul_shard<4.7&(charges>2|fight_remains<cooldown.dimensional_rift.duration)
     if CDsON() and S.DimensionalRift:IsCastable() and (Player:SoulShardsP() < 4.7 and (S.DimensionalRift:Charges() > 2 or FightRemains < S.DimensionalRift:Cooldown())) then
       if Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift main 4"; end
     end
