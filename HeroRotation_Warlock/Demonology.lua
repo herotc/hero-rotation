@@ -241,9 +241,9 @@ end
 
 local function Items()
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=irideus_fragment,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)|time_to_die<=21
-    -- use_item,name=timebreaching_talon,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)|time_to_die<=21
-    -- use_item,name=spoils_of_neltharus,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)|time_to_die<=21
+    -- use_item,name=irideus_fragment,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)|fight_remains<=21
+    -- use_item,name=timebreaching_talon,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)|fight_remains<=21
+    -- use_item,name=spoils_of_neltharus,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)|fight_remains<=21
     if (Player:BuffUp(S.DemonicPowerBuff) or not S.SummonDemonicTyrant:IsAvailable() and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable()) or FightRemains <= 21) then
       if I.IrideusFragment:IsEquippedAndReady() then
         if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment items 2"; end
@@ -259,7 +259,7 @@ local function Items()
     if I.VoidmendersShadowgem:IsEquippedAndReady() and ((not VarShadowTimings) or (VarShadowTimings and (Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())))) then
       if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem items 8"; end
     end
-    -- use_item,name=erupting_spear_fragment,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)|time_to_die<=11
+    -- use_item,name=erupting_spear_fragment,if=buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)|fight_remains<=11
     if I.EruptingSpearFragment:IsEquippedAndReady() and (Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable()) or FightRemains <= 11) then
       if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment items 10"; end
     end
@@ -368,13 +368,13 @@ local function APL()
     if CDsON() and S.SummonDemonicTyrant:IsAvailable() and (S.SummonDemonicTyrant:CooldownUp() and (Player:BuffUp(S.PowerInfusionBuff) or Player:BuffUp(S.NetherPortalBuff))) and VarNPCondition then
       local ShouldReturn = Tyrant(); if ShouldReturn then return ShouldReturn; end
     end
-    -- invoke_external_buff,name=power_infusion,if=!talent.nether_portal&!talent.summon_demonic_tyrant|time_to_die<25|(buff.tyrant.up&variable.shadow_timings)
+    -- invoke_external_buff,name=power_infusion,if=!talent.nether_portal&!talent.summon_demonic_tyrant|fight_remains<25|(buff.tyrant.up&variable.shadow_timings)
     -- Note: Not handling external buffs
-    -- implosion,if=time_to_die<2*gcd
+    -- implosion,if=fight_remains<2*gcd
     if S.Implosion:IsReady() and (FightRemains < 2 * Player:GCD()) then
       if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsSpellInRange(S.Implosion)) then return "implosion main 2"; end
     end
-    -- nether_portal,if=!talent.summon_demonic_tyrant&soul_shard>2|time_to_die<30
+    -- nether_portal,if=!talent.summon_demonic_tyrant&soul_shard>2|fight_remains<30
     if CDsON() and S.NetherPortal:IsReady() and ((not S.SummonDemonicTyrant:IsAvailable()) and (Player:SoulShardsP() > 2) or FightRemains < 30) then
       if Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal) then return "nether_portal main 4"; end
     end
@@ -394,15 +394,15 @@ local function APL()
     if S.CallDreadstalkers:IsReady() and (VarTyrantCD > 20 + 8 * VarShadowTimings) then
       if Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers main 8"; end
     end
-    -- call_dreadstalkers,if=!talent.summon_demonic_tyrant|time_to_die<14
+    -- call_dreadstalkers,if=!talent.summon_demonic_tyrant|fight_remains<14
     if S.CallDreadstalkers:IsReady() and ((not S.SummonDemonicTyrant:IsAvailable()) or FightRemains < 14) then
       if Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers main 10"; end
     end
-    -- grimoire_felguard,if=!talent.summon_demonic_tyrant|time_to_die<cooldown.summon_demonic_tyrant.remains_expected
+    -- grimoire_felguard,if=!talent.summon_demonic_tyrant|fight_remains<cooldown.summon_demonic_tyrant.remains_expected
     if CDsON() and S.GrimoireFelguard:IsReady() and ((not S.SummonDemonicTyrant:IsAvailable()) or FightRemains < S.SummonDemonicTyrant:CooldownRemains()) then
       if Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, not Target:IsSpellInRange(S.GrimoireFelguard)) then return "grimoire_felguard main 12"; end
     end
-    -- summon_vilefiend,if=!talent.summon_demonic_tyrant|variable.tyrant_cd>cooldown+variable.tyrant_prep_start|time_to_die<cooldown.summon_demonic_tyrant.remains_expected
+    -- summon_vilefiend,if=!talent.summon_demonic_tyrant|variable.tyrant_cd>cooldown+variable.tyrant_prep_start|fight_remains<cooldown.summon_demonic_tyrant.remains_expected
     if S.SummonVilefiend:IsReady() and ((not S.SummonDemonicTyrant:IsAvailable()) or VarTyrantCD > 45 + VarTyrantPrepStart or FightRemains < S.SummonDemonicTyrant:CooldownRemains()) then
       if Cast(S.SummonVilefiend) then return "summon_vilefiend main 14"; end
     end
