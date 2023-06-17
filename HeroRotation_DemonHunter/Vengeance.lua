@@ -351,12 +351,12 @@ local function APL()
     end
     -- spirit_bomb,if=soul_fragments>=variable.spirit_bomb_soul_fragments&(spell_targets>1|variable.fiery_demise_fiery_brand_is_ticking_on_any_target)
     -- Note: Adding Fury buffer to ensure we can always use FelDevastation when we should
-    if S.SpiritBomb:IsReady() and (VarFDFBTickingAny and Player:Fury() > S.FelDevastation:Cost() + 40 or VarFDFBNotTickingAny or not S.FelDevastation:IsAvailable()) and (SoulFragments >= VarSpiritBombFragments and (EnemiesCount8yMelee > 1 or VarFDFBTickingAny)) then
+    if S.SpiritBomb:IsReady() and (VarFDFBTickingAny and (Player:Fury() > S.FelDevastation:Cost() + 40 or Target:DebuffRemains(S.FieryBrandDebuff) > 3 + 2 * Player:GCD()) or VarFDFBNotTickingAny or (not S.FelDevastation:IsAvailable()) or S.FelDevastation:CooldownRemains() > Target:DebuffRemains(S.FieryBrandDebuff)) and (SoulFragments >= VarSpiritBombFragments and (EnemiesCount8yMelee > 1 or VarFDFBTickingAny)) then
       if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb main 38"; end
     end
     -- soul_cleave,if=(soul_fragments<=1&spell_targets>1)|spell_targets=1
     -- Note: Adding Fury buffer to ensure we can always use FelDevastation when we should
-    if S.SoulCleave:IsReady() and (VarFDFBTickingAny and Player:Fury() > S.FelDevastation:Cost() + 30 or VarFDFBNotTickingAny or not S.FelDevastation:IsAvailable()) and ((SoulFragments <= 1 and EnemiesCount8yMelee > 1) or EnemiesCount8yMelee == 1) then
+    if S.SoulCleave:IsReady() and (VarFDFBTickingAny and (Player:Fury() > S.FelDevastation:Cost() + 30 or Target:DebuffRemains(S.FieryBrandDebuff) > 3 + 2 * Player:GCD()) or VarFDFBNotTickingAny or (not S.FelDevastation:IsAvailable()) or S.FelDevastation:CooldownRemains() > Target:DebuffRemains(S.FieryBrandDebuff)) and ((SoulFragments <= 1 and EnemiesCount8yMelee > 1) or EnemiesCount8yMelee == 1) then
       if Cast(S.SoulCleave, nil, nil, not Target:IsInMeleeRange(8)) then return "soul_cleave main 40"; end
     end
     -- sigil_of_flame
@@ -395,7 +395,7 @@ end
 local function Init()
   S.FieryBrandDebuff:RegisterAuraTracking()
 
-  HR.Print("Vengeance DH rotation is currently a work in progress, but has been updated for patch 10.0.")
+  HR.Print("Vengeance DH rotation is currently a work in progress, but has been updated for patch 10.1.0.")
 end
 
 HR.SetAPL(581, APL, Init);
