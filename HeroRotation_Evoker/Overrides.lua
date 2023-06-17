@@ -38,6 +38,14 @@ DevOldIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   end
 , 1467)
 
+local DevOldIsMoving
+DevOldIsMoving = HL.AddCoreOverride ("Player.IsMoving",
+  function(self)
+    local BaseCheck = DevOldIsMoving(self)
+    return BaseCheck and Player:BuffDown(SpellDeva.HoverBuff) and Player:BuffDown(SpellDeva.BurnoutBuff)
+  end
+, 1467)
+
 HL.AddCoreOverride ("Player.EssenceTimeToMax",
   function()
     local Deficit = Player:EssenceDeficit()
