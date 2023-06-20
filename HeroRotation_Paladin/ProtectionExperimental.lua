@@ -239,13 +239,14 @@ local function PrioGlobal()
     return WrathableEnemyUnits[1][1], S.HammerofWrath, 1
   end
 
-  -- not sure which order on these is better
-  if S.Judgment:IsReady() and S.Judgment:FullRechargeTime() < GCDMax then
-    return HighestHPEnemyUnit, S.Judgment, 1 + num(Player:BuffUp(S.AvengingWrathBuff))
-  end
+  -- not sure which order on these two is better - do we prefer AS or keeping judge on CD?
   if S.AvengersShield:IsReady() and EnemiesCount8y >= 2 then
     return Target, S.AvengersShield, 0
   end
+  if S.Judgment:IsReady() and S.Judgment:FullRechargeTime() < GCDMax then
+    return HighestHPEnemyUnit, S.Judgment, 1 + num(Player:BuffUp(S.AvengingWrathBuff))
+  end
+
 
   if S.AvengersShield:IsReady() then
     return Target, S.AvengersShield, 0 -- single target
@@ -297,7 +298,7 @@ local function Core()
     local BestCandidate = PartyHealCandidates[1]
     local Friend = BestCandidate[1]
     local FriendHP = BestCandidate[2]
-    if FriendHP <= 15 then -- TODO: handle forbearance here
+    if FriendHP <= 15 and S.LayonHands:IsCastable() then -- TODO: handle forbearance here
       if HR.CastAnnotated(S.LayonHands, false, Friend:Name()) then return "lay_on_hands party_member core"; end
     end
   end
@@ -319,7 +320,7 @@ local function Core()
 
   -- Dump HOLY POWER into SOTR. We want to do this if our next global is a builder and we're capped on holy power already.
   local prio_target, prio_global, prio_hpower = PrioGlobal()
-  if prio_global ~= nil and S.ShieldoftheRighteous:IsReady() and ((prio_hpower + Player:HolyPower() > 4) or Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff)) then
+  if prio_target ~= nil and prio_global ~= nil and S.ShieldoftheRighteous:IsReady() and ((prio_hpower + Player:HolyPower() > 4) or Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff)) then
     if CastMainNameplateSuggested(prio_target, S.ShieldoftheRighteous) then return "shield_of_the_righteous holy power dump standard"; end
   end
 
@@ -329,7 +330,7 @@ local function Core()
 
    -------------------------------------------------------------------
 
-  if prio_global ~= nil then
+  if prio_global ~= nil and prio_target ~= nil then
     if prio_global == S.WordofGlory then
       if HR.CastAnnotated(S.WordofGlory, false, prio_target:Name()) then return "prio_global heal standard"; end
     else
@@ -338,7 +339,7 @@ local function Core()
   end
   -------------------------------------------------------------------
   local low_prio_target, low_prio_global = LowPrioGlobal()
-  if low_prio_global ~= nil then
+  if low_prio_global ~= nil and low_prio_target ~= nil then
     if low_prio_global == S.WordofGlory then
       if HR.CastAnnotated(S.WordofGlory, false, low_prio_target:Name()) then return "low_prio heal standard"; end
     else
