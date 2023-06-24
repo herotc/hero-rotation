@@ -284,7 +284,7 @@ local function AoECDs()
   end
   -- unholy_assault,target_if=min:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=2|buff.dark_transformation.up
   if S.UnholyAssault:IsCastable() then
-    if Everyone.CastTargetIf(S.UnholyAssault, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfUnholyAssaultAoECDs, not Target:IsInMeleeRange(5)) then return "unholy_assault aoe_cooldowns 10"; end
+    if Everyone.CastTargetIf(S.UnholyAssault, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfUnholyAssaultAoECDs, not Target:IsInMeleeRange(5), Settings.Unholy.GCDasOffGCD.UnholyAssault) then return "unholy_assault aoe_cooldowns 10"; end
   end
   -- raise_dead,if=!pet.ghoul.active
   if S.RaiseDead:IsCastable() then
