@@ -345,8 +345,8 @@ local function Rotation()
   if S.ArcaneMissiles:IsCastable() and (Player:BuffUp(S.ClearcastingBuff) and Player:BuffStack(S.ClearcastingBuff) == ClearCastingMaxStack) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles rotation 10"; end
   end
-  -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&(buff.temporal_warp.up|mana.pct<10|!talent.shifting_power)&buff.arcane_surge.down&fight_remains>=12
-  if S.NetherTempest:IsReady() and (Target:DebuffRefreshable(S.NetherTempestDebuff) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and (Player:BuffUp(S.TemporalWarpBuff) or Player:ManaPercentage() < 10 or not S.ShiftingPower:IsAvailable()) and Player:BuffDown(S.ArcaneSurgeBuff) and FightRemains >= 12) then
+  -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&(((buff.temporal_warp.up|mana.pct<10|!talent.shifting_power)&buff.arcane_surge.down)|equipped.neltharions_call_to_chaos)&fight_remains>=12
+  if S.NetherTempest:IsReady() and (Target:DebuffRefreshable(S.NetherTempestDebuff) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and (((Player:BuffUp(S.TemporalWarpBuff) or Player:ManaPercentage() < 10 or not S.ShiftingPower:IsAvailable()) and Player:BuffDown(S.ArcaneSurgeBuff)) or I.NeltharionsCalltoChaos:IsEquipped()) and FightRemains >= 12) then
     if Cast(S.NetherTempest, nil, nil, not Target:IsSpellInRange(S.NetherTempest)) then return "nether_tempest rotation 12"; end
   end
   -- arcane_barrage,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&mana.pct<50&!talent.evocation&fight_remains>20
@@ -519,42 +519,46 @@ local function T30BurstPhase()
   if S.ArcaneSurge:IsReady() and (((not S.NetherTempest:IsAvailable()) and Player:PrevGCDP(2, S.RadiantSpark)) or Player:PrevGCDP(1, S.NetherTempest)) then
     if Cast(S.ArcaneSurge, Settings.Arcane.GCDasOffGCD.ArcaneSurge) then return "arcane_surge t30_burst_phase 16"; end
   end
+  -- use_item,name=timebreaching_talon,if=prev_gcd.1.arcane_surge
+  if Settings.Commons.Enabled.Trinkets and I.TimebreachingTalon:IsEquippedAndReady() and (Player:PrevGCDP(1, S.ArcaneSurge)) then
+    if Cast(I.TimebreachingTalon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timebreaching_talon t30_burst_phase 18"; end
+  end
   -- rune_of_power,if=buff.rune_of_power.down&debuff.touch_of_the_magi.down&cooldown.arcane_surge.remains>22
   if S.RuneofPower:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffDown(S.TouchoftheMagiDebuff) and S.ArcaneSurge:CooldownRemains() > 22) then
-    if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power t30_burst_phase 18"; end
+    if Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power t30_burst_phase 20"; end
   end
   -- wait,sec=0.05,if=prev_gcd.1.arcane_surge,line_cd=15
   -- arcane_barrage,if=prev_gcd.1.arcane_surge
   if S.ArcaneBarrage:IsCastable() and (Player:PrevGCDP(1, S.ArcaneSurge)) then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage t30_burst_phase 20"; end
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage t30_burst_phase 22"; end
   end
   -- meteor,if=debuff.radiant_spark_vulnerability.stack=3
   if S.Meteor:IsReady() and (Target:DebuffStack(S.RadiantSparkVulnerability) == 3) then
-    if Cast(S.Meteor, nil, nil, not Target:IsInRange(40)) then return "meteor t30_burst_phase 22"; end
+    if Cast(S.Meteor, nil, nil, not Target:IsInRange(40)) then return "meteor t30_burst_phase 24"; end
   end
-  -- arcane_blast,if=debuff.radiant_spark_vulnerability.up
-  if S.ArcaneBlast:IsReady() and (Target:DebuffUp(S.RadiantSparkVulnerability)) then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast t30_burst_phase 24"; end
+  -- arcane_blast,if=(debuff.radiant_spark_vulnerability.stack>0&debuff.radiant_spark_vulnerability.stack<4)|(cast_time<gcd&debuff.radiant_spark_vulnerability.stack=4)
+  if S.ArcaneBlast:IsReady() and ((Target:DebuffUp(S.RadiantSparkVulnerability) and Target:DebuffStack(S.RadiantSparkVulnerability) < 4) or (S.ArcaneBlast:CastTime() < Player:GCD() and Target:DebuffStack(S.RadiantSparkVulnerability) == 4)) then
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast t30_burst_phase 26"; end
   end
   -- presence_of_mind,if=debuff.touch_of_the_magi.remains<=gcd.max
   if S.PresenceofMind:IsCastable() and (Target:DebuffRemains(S.TouchoftheMagiDebuff) <= GCDMax) then
-    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceOfMind) then return "presence_of_mind t30_burst_phase 26"; end
+    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceOfMind) then return "presence_of_mind t30_burst_phase 28"; end
   end
   -- arcane_blast,if=buff.presence_of_mind.up&buff.arcane_charge.stack=buff.arcane_charge.max_stack
   if S.ArcaneBlast:IsReady() and (Player:BuffUp(S.PresenceofMindBuff) and Player:ArcaneCharges() == Player:ArcaneChargesMax()) then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast t30_burst_phase 28"; end
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast t30_burst_phase 30"; end
   end
   -- cancel_action,if=action.arcane_missiles.channeling&gcd.remains=0&mana.pct>30&buff.nether_precision.up
   if Player:IsChanneling(S.ArcaneMissiles) and Player:GCDRemains() == 0 and Player:ManaPercentage() > 30 and Player:BuffUp(S.NetherPrecisionBuff) then
-    if HR.CastAnnotated(S.StopAM, false, "STOP AM") then return "cancel_action arcane_missiles t30_burst_phase 30"; end
+    if HR.CastAnnotated(S.StopAM, false, "STOP AM") then return "cancel_action arcane_missiles t30_burst_phase 32"; end
   end
   -- arcane_missiles,if=buff.nether_precision.down&buff.clearcasting.react
   if S.ArcaneMissiles:IsReady() and (Player:BuffDown(S.NetherPrecisionBuff) and Player:BuffUp(S.ClearcastingBuff)) then
-    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles t30_burst_phase 32"; end
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles t30_burst_phase 34"; end
   end
   -- arcane_blast
   if S.ArcaneBlast:IsReady() then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast t30_burst_phase 34"; end
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast t30_burst_phase 36"; end
   end
 end
 
@@ -583,8 +587,8 @@ local function T30Mini()
   if S.TouchoftheMagi:IsReady() and (Player:PrevGCDP(1, S.ArcaneBarrage) and (S.ArcaneBarrage:InFlight() and S.ArcaneBarrage:TravelTime() - S.ArcaneBarrage:TimeSinceLastCast() <= 0.2 or Player:GCDRemains() <= 0.2)) then
     if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi t30_mini 10"; end
   end
-  -- arcane_blast,if=(debuff.radiant_spark_vulnerability.stack>0&debuff.radiant_spark_vulnerability.stack<4)|buff.nether_precision.up
-  if S.ArcaneBlast:IsReady() and ((Target:DebuffUp(S.RadiantSparkVulnerability) and Target:DebuffStack(S.RadiantSparkVulnerability) < 4) or Player:BuffUp(S.NetherPrecisionBuff)) then
+  -- arcane_blast,if=((debuff.radiant_spark_vulnerability.stack>0&debuff.radiant_spark_vulnerability.stack<4)|(cast_time<gcd&debuff.radiant_spark_vulnerability.stack=4))|buff.nether_precision.up
+  if S.ArcaneBlast:IsReady() and (((Target:DebuffUp(S.RadiantSparkVulnerability) and Target:DebuffStack(S.RadiantSparkVulnerability) < 4) or (S.ArcaneBlast:CastTime() < Player:GCD() and Target:DebuffStack(S.RadiantSparkVulnerability) == 4)) or Player:BuffUp(S.NetherPrecisionBuff)) then
     if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast t30_mini 12"; end
   end
   -- presence_of_mind,if=(debuff.touch_of_the_magi.remains<=gcd.max|buff.rune_of_power.remains<=gcd.max)
@@ -636,8 +640,8 @@ local function T30Rotation()
   if S.ArcaneMissiles:IsCastable() and (Player:BuffStack(S.ClearcastingBuff) == ClearCastingMaxStack) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles t30_rotation 12"; end
   end
-  -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&(buff.temporal_warp.up|mana.pct<10|!talent.shifting_power)&buff.arcane_surge.down&fight_remains>=12
-  if S.NetherTempest:IsReady() and ((Target:DebuffRefreshable(S.NetherTempestDebuff) or Target:DebuffDown(S.NetherTempestDebuff)) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and (Player:BuffUp(S.TemporalWarpBuff) or Player:ManaPercentage() < 10 or not S.ShiftingPower:IsAvailable()) and Player:BuffDown(S.ArcaneSurgeBuff) and FightRemains >= 12) then
+  -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&(((buff.temporal_warp.up|mana.pct<10|!talent.shifting_power)&buff.arcane_surge.down)|equipped.neltharions_call_to_chaos)&fight_remains>=12
+  if S.NetherTempest:IsReady() and ((Target:DebuffRefreshable(S.NetherTempestDebuff) or Target:DebuffDown(S.NetherTempestDebuff)) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and (((Player:BuffUp(S.TemporalWarpBuff) or Player:ManaPercentage() < 10 or not S.ShiftingPower:IsAvailable()) and Player:BuffDown(S.ArcaneSurgeBuff)) or I.NeltharionsCalltoChaos:IsEquipped()) and FightRemains >= 12) then
     if Cast(S.NetherTempest, nil, nil, not Target:IsSpellInRange(S.NetherTempest)) then return "nether_tempest t30_rotation 14"; end
   end
   -- arcane_barrage,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&mana.pct<50&!talent.evocation&fight_remains>20
@@ -795,8 +799,8 @@ local function APL()
       -- invoke_external_buff,name=power_infusion,if=!talent.radiant_spark&prev_gcd.1.arcane_surge
       -- Note: Not handling external buffs
       if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
-        -- use_items,if=buff.arcane_surge.up&(debuff.touch_of_the_magi.up&equipped.irideus_fragment&set_bonus.tier30_4pc)
-        if Player:BuffUp(S.ArcaneSurgeBuff) and (Target:DebuffUp(S.TouchoftheMagiDebuff) and I.IrideusFragment:IsEquipped() and Player:HasTier(30, 4)) then
+        -- use_items,if=(prev_gcd.1.arcane_surge&!set_bonus.tier30_4pc)|(prev_gcd.2.arcane_surge&debuff.touch_of_the_magi.up&set_bonus.tier30_4pc)
+        if (Player:PrevGCDP(1, S.ArcaneSurge) and not Player:HasTier(30, 4)) or (Player:PrevGCDP(2, S.ArcaneSurge) and Target:DebuffUp(S.TouchoftheMagiDebuff) and Player:HasTier(30, 4)) then
           local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
           if ItemToUse then
             local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
@@ -809,37 +813,41 @@ local function APL()
         if Settings.Commons.Enabled.Trinkets then
           -- use_item,name=tinker_breath_of_neltharion,if=cooldown.arcane_surge.remains&buff.rune_of_power.down&buff.arcane_surge.down&debuff.touch_of_the_magi.down
           -- TODO: Handle tinkers
-          if (not var_steroid_trinket_equipped) or S.ArcaneSurge:CooldownRemains() > 20 then
-            -- use_item,name=conjured_chillglobe,if=mana.pct>65&(!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20)
+          if (not var_steroid_trinket_equipped) or (S.ArcaneSurge:CooldownRemains() > 20 and Player:BuffRemains(S.ArcaneSurgeBuff) < 10) then
+            -- use_item,name=conjured_chillglobe,if=mana.pct>65&(!variable.steroid_trinket_equipped|(cooldown.arcane_surge.remains>20&buff.arcane_surge.remains<10))
             if I.ConjuredChillglobe:IsEquippedAndReady() and (Player:ManaPercentage() > 65) then
               if Cast(I.ConjuredChillglobe, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "conjured_chillglobe main 18"; end
             end
-            -- use_item,name=darkmoon_deck_rime,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
+            -- use_item,name=beacon_to_the_beyond,if=!variable.steroid_trinket_equipped|(cooldown.arcane_surge.remains>20&buff.arcane_surge.remains<10)
+            if I.BeacontotheBeyond:IsEquippedAndReady() then
+              if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond main 19"; end
+            end
+            -- use_item,name=darkmoon_deck_rime,if=!variable.steroid_trinket_equipped|(cooldown.arcane_surge.remains>20&buff.arcane_surge.remains<10)
             if I.DMDRime:IsEquippedAndReady() then
               if Cast(I.DMDRime, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "darkmoon_deck_rime main 20"; end
             end
             if I.DMDRimeBox:IsEquippedAndReady() then
               if Cast(I.DMDRimeBox, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "darkmoon_deck_box_rime main 20"; end
             end
-            -- use_item,name=darkmoon_deck_dance,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
+            -- use_item,name=darkmoon_deck_dance,if=!variable.steroid_trinket_equipped|(cooldown.arcane_surge.remains>20&buff.arcane_surge.remains<10)
             if I.DMDDance:IsEquippedAndReady() then
               if Cast(I.DMDDance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(25)) then return "darkmoon_deck_dance main 22"; end
             end
             if I.DMDDanceBox:IsEquippedAndReady() then
               if Cast(I.DMDDanceBox, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(25)) then return "darkmoon_deck_box_dance main 22"; end
             end
-            -- use_item,name=darkmoon_deck_inferno,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
+            -- use_item,name=darkmoon_deck_inferno,if=!variable.steroid_trinket_equipped|(cooldown.arcane_surge.remains>20&buff.arcane_surge.remains<10)
             if I.DMDInferno:IsEquippedAndReady() then
               if Cast(I.DMDInferno, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "darkmoon_deck_inferno main 24"; end
             end
             if I.DMDInfernoBox:IsEquippedAndReady() then
               if Cast(I.DMDInfernoBox, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "darkmoon_deck_box_inferno main 24"; end
             end
-            -- use_item,name=desperate_invokers_codex,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
+            -- use_item,name=desperate_invokers_codex,if=!variable.steroid_trinket_equipped|(cooldown.arcane_surge.remains>20&buff.arcane_surge.remains<10)
             if I.DesperateInvokersCodex:IsEquippedAndReady() then
               if Cast(I.DesperateInvokersCodex, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "desperate_invokers_codex main 26"; end
             end
-            -- use_item,name=iceblood_deathsnare,if=!variable.steroid_trinket_equipped|cooldown.arcane_surge.remains>20
+            -- use_item,name=iceblood_deathsnare,if=!variable.steroid_trinket_equipped|(cooldown.arcane_surge.remains>20&buff.arcane_surge.remains<10)
             if I.IcebloodDeathsnare:IsEquippedAndReady() then
               if Cast(I.IcebloodDeathsnare, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "iceblood_deathsnare main 28"; end
             end

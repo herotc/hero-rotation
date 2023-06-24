@@ -207,6 +207,7 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Commons = {
   -- Trinkets
+  BeacontotheBeyond                     = Item(203963, {13, 14}),
   ConjuredChillglobe                    = Item(194300, {13, 14}),
   DesperateInvokersCodex                = Item(194310, {13, 14}),
   DMDDance                              = Item(198088, {13, 14}),
@@ -220,6 +221,7 @@ Item.Mage.Commons = {
   HornofValor                           = Item(133642, {13, 14}),
   IcebloodDeathsnare                    = Item(194304, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
+  NeltharionsCalltoChaos                = Item(204201, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
   TomeofUnstablePower                   = Item(193628, {13, 14}),
