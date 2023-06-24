@@ -207,7 +207,11 @@ local function ES()
     ESEmpower = 4
   end
   -- We should (usually, if not always) be hitting all targets anyway, so keeping CastAnnotated over CastTargetIf.
-  if CastAnnotated(S.EternitySurge, false, ESEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "eternity_surge empower " .. ESEmpower .. " ES 2"; end
+  if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and ((not (Player:BuffUp(S.PowerInfusionBuff) and Player:BloodlustUp())) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
+    if CastAnnotated(S.EternitySurge, nil, ESEmpower.." CLIP", not Target:IsInRange(25), Settings.Commons.DisintegrateFontSize) then return "eternity_surge empower " .. ESEmpower .. " clip ES 2"; end
+  else
+    if CastAnnotated(S.EternitySurge, false, ESEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "eternity_surge empower " .. ESEmpower .. " ES 2"; end
+  end
 end
 
 local function FB()
@@ -228,7 +232,11 @@ local function FB()
     FBEmpower = 4
   end
   -- We should (usually, if not always) be hitting all targets anyway, so keeping CastAnnotated over CastTargetIf.
-  if CastAnnotated(S.FireBreath, false, FBEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower " .. FBEmpower .. " FB 2"; end
+  if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and ((not (Player:BuffUp(S.PowerInfusionBuff) and Player:BloodlustUp())) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
+    if CastAnnotated(S.FireBreath, nil, FBEmpower.." CLIP", not Target:IsInRange(25), Settings.Commons.DisintegrateFontSize) then return "fire_breath empower " .. FBEmpower .. " clip FB 2"; end
+  else
+    if CastAnnotated(S.FireBreath, false, FBEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower " .. FBEmpower .. " FB 2"; end
+  end
 end
 
 local function Green()
@@ -332,24 +340,24 @@ local function ST()
   if S.TipTheScales:IsCastable() and CDsON() and (VarDragonrageUp and ((((not S.FontofMagic:IsAvailable()) or S.EverburningFlame:IsAvailable()) and S.FireBreath:CooldownUp() and S.EternitySurge:CooldownDown() and VarDragonrageRemains < 14) or (S.EternitySurge:CooldownUp() and S.FireBreath:CooldownDown() and (not S.EverburningFlame) and S.FontofMagic:IsAvailable()))) then
     if Cast(S.TipTheScales, Settings.Devastation.GCDasOffGCD.TipTheScales) then return "tip_the_scales st 8"; end
   end
-  -- call_action_list,name=fb,if=set_bonus.tier30_4pc&(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.power_swell.remains<variable.r1_cast_time|buff.bloodlust.up|buff.power_infusion.up|buff.dragonrage.up)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up))&(!cooldown.eternity_surge.up|!talent.event_horizon|!buff.dragonrage.up)&(target.time_to_die>=8|fight_remains<30)
-  if (Player:HasTier(30, 4) and ((not S.Dragonrage:IsAvailable()) or VarNextDragonrage > VarDRPrepTimeST or not S.Animosity:IsAvailable()) and ((Player:BuffRemains(S.PowerSwellBuff) < VarR1CastTime or Player:BloodlustUp() or Player:BuffUp(S.PowerInfusionBuff) or VarDragonrageUp) and (Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime or VarDragonrageUp)) and (S.EternitySurge:CooldownDown() or (not S.EventHorizon:IsAvailable()) or not VarDragonrageUp) and (Target:TimeToDie() >= 8 or FightRemains < 30)) then
+  -- call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.power_swell.remains<variable.r1_cast_time|buff.bloodlust.up|buff.power_infusion.up|buff.dragonrage.up)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up))&(!cooldown.eternity_surge.up|!talent.event_horizon|!buff.dragonrage.up)&(target.time_to_die>=8|fight_remains<30)
+  if ((not S.Dragonrage:IsAvailable()) or VarNextDragonrage > VarDRPrepTimeST or not S.Animosity:IsAvailable()) and ((Player:BuffRemains(S.PowerSwellBuff) < VarR1CastTime or Player:BloodlustUp() or Player:BuffUp(S.PowerInfusionBuff) or VarDragonrageUp) and (Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime or VarDragonrageUp)) and (S.EternitySurge:CooldownDown() or (not S.EventHorizon:IsAvailable()) or not VarDragonrageUp) and (Target:TimeToDie() >= 8 or FightRemains < 30) then
     local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
   end
-  -- call_action_list,name=fb,if=!set_bonus.tier30_4pc&(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.limitless_potential.remains<variable.r1_cast_time|!buff.power_infusion.up)&buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
-  if ((not Player:HasTier(30, 4)) and ((not S.Dragonrage:IsAvailable()) or VarNextDragonrage > VarDRPrepTimeST or not S.Animosity:IsAvailable()) and ((Player:BuffRemains(S.LimitlessPotentialBuff) < VarR1CastTime or Player:BuffDown(S.PowerInfusionBuff)) and Player:BuffRemains(S.PowerSwellBuff) < VarR1CastTime and Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime) and (Target:TimeToDie() >= 8 or FightRemains < 30)) then
-    local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
+  -- disintegrate,if=buff.dragonrage.remains>19&cooldown.fire_breath.remains>28&talent.eye_of_infinity
+  if S.Disintegrate:IsReady() and (VarDragonrageRemains > 19 and S.FireBreath:CooldownRemains() > 28 and S.EyeofInfinity:IsAvailable()) then
+    if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate st 9"; end
   end
   -- shattering_star,if=(buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor)&(!cooldown.fire_breath.up|!talent.event_horizon)
   if S.ShatteringStar:IsCastable() and ((Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack or not S.ArcaneVigor:IsAvailable()) and (S.FireBreath:CooldownDown() or not S.EventHorizon:IsAvailable())) then
-    if Cast(S.ShatteringStar, nil, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star st 10"; end
+    if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and ((not (Player:BuffUp(S.PowerInfusionBuff) and Player:BloodlustUp())) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
+      if CastAnnotated(S.ShatteringStar, nil, "CLIP", not Target:IsSpellInRange(S.ShatteringStar), Settings.Commons.DisintegrateFontSize) then return "shattering_star clip st 10"; end
+    else
+      if Cast(S.ShatteringStar, nil, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star st 10"; end
+    end
   end
-  -- call_action_list,name=es,if=set_bonus.tier30_4pc&(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.power_swell.remains<variable.r1_cast_time|buff.bloodlust.up|buff.power_infusion.up)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up))&(target.time_to_die>=8|fight_remains<30)
-  if (Player:HasTier(30, 4) and ((not S.Dragonrage:IsAvailable()) or VarNextDragonrage > VarDRPrepTimeST or not S.Animosity:IsAvailable()) and ((Player:BuffRemains(S.PowerSwellBuff) < VarR1CastTime or Player:BloodlustUp() or Player:BuffUp(S.PowerInfusionBuff)) and (Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime or VarDragonrageUp)) and (Target:TimeToDie() >= 8 or FightRemains < 30)) then
-    local ShouldReturn = ES(); if ShouldReturn then return ShouldReturn; end
-  end
-  -- call_action_list,name=es,if=!set_bonus.tier30_4pc&(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.limitless_potential.remains<variable.r1_cast_time|!buff.power_infusion.up)&buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
-  if ((not Player:HasTier(30, 4)) and ((not S.Dragonrage:IsAvailable()) or VarNextDragonrage > VarDRPrepTimeST or not S.Animosity:IsAvailable()) and ((Player:BuffRemains(S.LimitlessPotentialBuff) < VarR1CastTime or Player:BuffDown(S.PowerInfusionBuff)) and Player:BuffRemains(S.PowerSwellBuff) < VarR1CastTime and Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime) and (Target:TimeToDie() >= 8 or FightRemains < 30)) then
+  -- call_action_list,name=es,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.power_swell.remains<variable.r1_cast_time|buff.bloodlust.up|buff.power_infusion.up)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up))&(target.time_to_die>=8|fight_remains<30)
+  if ((not S.Dragonrage:IsAvailable()) or VarNextDragonrage > VarDRPrepTimeST or not S.Animosity:IsAvailable()) and ((Player:BuffRemains(S.PowerSwellBuff) < VarR1CastTime or Player:BloodlustUp() or Player:BuffUp(S.PowerInfusionBuff)) and (Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime or VarDragonrageUp)) and (Target:TimeToDie() >= 8 or FightRemains < 30) then
     local ShouldReturn = ES(); if ShouldReturn then return ShouldReturn; end
   end
   -- wait,sec=cooldown.fire_breath.remains,if=talent.animosity&buff.dragonrage.up&buff.dragonrage.remains<gcd.max+variable.r1_cast_time*buff.tip_the_scales.down&buff.dragonrage.remains-cooldown.fire_breath.remains>=variable.r1_cast_time*buff.tip_the_scales.down
@@ -362,26 +370,39 @@ local function ST()
   end
   -- living_flame,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max&buff.burnout.up
   if S.LivingFlame:IsCastable() and (VarDragonrageUp and VarDragonrageRemains < (MaxEssenceBurstStack - Player:BuffStack(S.EssenceBurstBuff)) * GCDMax and Player:BuffUp(S.BurnoutBuff)) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 16"; end
+    if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and ((not (Player:BuffUp(S.PowerInfusionBuff) and Player:BloodlustUp())) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
+      if CastAnnotated(S.LivingFlame, nil, "CLIP", not Target:IsSpellInRange(S.LivingFlame), Settings.Commons.DisintegrateFontSize) then return "living_flame clip st 16"; end
+    else
+      if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 16"; end
+    end
   end
   -- azure_strike,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max
   if S.AzureStrike:IsCastable() and (VarDragonrageUp and VarDragonrageRemains < (MaxEssenceBurstStack - Player:BuffStack(S.EssenceBurstBuff)) * GCDMax) then
     if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 18"; end
   end
   -- living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)&essence.deficit>=2
-  -- living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)&essence<essence.max-1
   if S.LivingFlame:IsCastable() and (Player:BuffUp(S.BurnoutBuff) and (Player:BuffUp(S.LeapingFlamesBuff) and Player:BuffDown(S.EssenceBurstBuff) or Player:BuffDown(S.LeapingFlamesBuff) and Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack) and Player:EssenceDeficit() >= 2) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 20"; end
+    if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and ((not (Player:BuffUp(S.PowerInfusionBuff) and Player:BloodlustUp())) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
+      if CastAnnotated(S.LivingFlame, nil, "CLIP", not Target:IsSpellInRange(S.LivingFlame), Settings.Commons.DisintegrateFontSize) then return "living_flame clip st 20"; end
+    else
+      if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 20"; end
+    end
   end
   -- pyre,if=debuff.in_firestorm.up&talent.raging_inferno&buff.charged_blast.stack==20&active_enemies>=2
   if S.Pyre:IsReady() and (InFirestorm() and S.RagingInferno:IsAvailable() and Player:BuffStack(S.ChargedBlastBuff) == 20 and EnemiesCount8ySplash >= 2) then
     if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre st 22"; end
   end
-  -- disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&buff.dragonrage.up&!(buff.power_infusion.up&buff.bloodlust.up)&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(!(buff.power_infusion.up&buff.bloodlust.up)|cooldown.fire_breath.up|cooldown.eternity_surge.up)&(raid_event.movement.in>2|buff.hover.up),if=set_bonus.tier30_4pc&raid_event.movement.in>2|buff.hover.up
-  -- disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=!set_bonus.tier30_4pc&raid_event.movement.in>2|buff.hover.up
-  -- Note: Combining both lines. When to chain is up to the user.
+  -- disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&buff.dragonrage.up&!(buff.power_infusion.up&buff.bloodlust.up)&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(!(buff.power_infusion.up&buff.bloodlust.up)|cooldown.fire_breath.up|cooldown.eternity_surge.up)&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
   if S.Disintegrate:IsReady() then
-    if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate st 24"; end
+    if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) then
+      local DisNote = "NO CHAIN"
+      if VarDragonrageUp and (not (Player:BuffUp(S.PowerInfusionBuff) and Player:BloodlustUp())) then
+        DisNote = "CHAIN"
+      end
+      if CastAnnotated(S.Disintegrate, nil, DisNote, not Target:IsSpellInRange(S.Disintegrate), Settings.Commons.DisintegrateFontSize) then return "disintegrate st 24"; end
+    else
+      if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate st 25"; end
+    end
   end
   -- firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down
   if S.Firestorm:IsCastable() and ((not VarDragonrageUp) and Target:DebuffDown(S.ShatteringStar)) then
