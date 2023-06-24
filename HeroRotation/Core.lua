@@ -335,11 +335,15 @@
       end
     elseif Argument1 == "resetbuttons" then
       HR.ToggleIconFrame:ResetAnchor();
+    elseif Argument1 == "debug" then
+      HeroRotationCharDB.Toggles[4] = not HeroRotationCharDB.Toggles[4]
+      HR.Print("Debug Output is now " .. (HeroRotationCharDB.Toggles[4] == true and "|cff00ff00enabled|r." or "|cffff0000disabled|r."))
     elseif Argument1 == "help" then
       HR.Print("|cffffff00--[Toggles]--|r");
       HR.Print("  On/Off: |cff8888ff/hr toggle|r");
       HR.Print("  CDs: |cff8888ff/hr cds|r");
       HR.Print("  AoE: |cff8888ff/hr aoe|r");
+      HR.Print("  Debug: |cff8888ff/hr debug|r");
       HR.Print("|cffffff00--[User Interface]--|r");
       HR.Print("  UI Lock: |cff8888ff/hr lock|r");
       HR.Print("  UI Unlock: |cff8888ff/hr unlock|r");
@@ -359,6 +363,11 @@
   -- Get if the CDs are enabled.
   function HR.CDsON ()
     return HeroRotationCharDB.Toggles[1];
+  end
+
+  -- Check if debug is enabled
+  function HR.DebugON ()
+    return HeroRotationCharDB.Toggles[4];
   end
 
   -- Get if the AoE is enabled.

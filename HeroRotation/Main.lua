@@ -445,7 +445,7 @@
           HL.CacheHasBeenReset = false;
           Cache.Reset();
           -- Rotational Debug Output
-          if HR.GUISettings.General.RotationDebugOutput then
+          if HR.DebugON() then
             CurrResult = HR.APLs[SpecID]();
             if CurrResult and CurrResult ~= PrevResult then
               HR.Print(CurrResult);
