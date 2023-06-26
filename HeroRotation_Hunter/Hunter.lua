@@ -69,6 +69,7 @@ Spell.Hunter.Commons = {
   -- Buffs
   BerserkingBuff                        = Spell(26297),
   BloodFuryBuff                         = Spell(20572),
+  SeethingRageBuff                      = Spell(408835), -- Buff from Djaruun
   -- Debuffs
   HuntersMarkDebuff                     = Spell(257284),
   LatentPoisonDebuff                    = Spell(336903),
@@ -172,6 +173,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   WildfireBomb                          = Spell(259495),
   -- Talents
   AspectoftheEagle                      = Spell(186289),
+  BirdsofPrey                           = Spell(260331),
   Bombardier                            = Spell(389880),
   Butchery                              = Spell(212436),
   Carve                                 = Spell(187708),
@@ -184,6 +186,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   MongooseBite                          = MultiSpell(259387,265888),
   Ranger                                = Spell(385695),
   RaptorStrike                          = MultiSpell(186270,265189),
+  RuthlessMarauder                      = Spell(385718),
   Spearhead                             = Spell(360966),
   TermsofEngagement                     = Spell(265895),
   TipoftheSpear                         = Spell(260285),
