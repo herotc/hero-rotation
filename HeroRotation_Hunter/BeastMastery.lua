@@ -228,8 +228,8 @@ local function Cleave()
   if S.BestialWrath:IsCastable() and CDsON() then
     if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath cleave 8"; end
   end
-  -- kill_command,if=full_recharge_time<gcd&talent.alpha_predator&talent.kill_cleave
-  if S.KillCommand:IsReady() and (S.KillCommand:FullRechargeTime() < GCDMax and S.AlphaPredator:IsAvailable() and S.KillCleave:IsAvailable()) then
+  -- kill_command,if=talent.kill_cleave
+  if S.KillCommand:IsReady() and (S.KillCleave:IsAvailable()) then
     if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command cleave 10"; end
   end
   -- call_of_the_wild
