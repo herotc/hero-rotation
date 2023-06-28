@@ -84,6 +84,7 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   EyeofTyr                              = Spell(387174),
   GuardianofAncientKings                = MultiSpell(86659,212641),
   HammeroftheRighteous                  = Spell(53595),
+  InmostLight                           = Spell(405757),
   MomentofGlory                         = Spell(327193),
   RighteousProtector                    = Spell(204074),
   Sentinel                              = Spell(389539),
