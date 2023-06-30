@@ -230,17 +230,17 @@ local function Bear()
   if S.Moonfire:IsReady() and (Player:BuffUp(S.GalacticGuardianBuff) and Player:BuffRemains(S.GalacticGuardianBuff) <= 2) then
     if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 28"; end
   end
-  -- mangle,if=buff.gore.up&active_enemies<11|buff.vicious_cycle_mangle.stack=3
-  if S.Mangle:IsCastable() and (Player:BuffUp(S.GoreBuff) and MeleeEnemies11yCount < 11 or Player:BuffStack(S.ViciousCycleMaulBuff) == 3) then
-    if Cast(S.Mangle, nil, nil, not Target:IsInMeleeRange(8)) then return "mangle bear 30"; end
-  end
   -- maul,if=((buff.incarnation.up|buff.berserk_bear.up)&active_enemies<=5&(buff.tooth_and_claw.stack>=2))&variable.If_build=0&!talent.thorns_of_iron.enabled
   if S.Maul:IsReady() and UseMaul and (not VarIFBuild) and (((Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S.BerserkBuff)) and MeleeEnemies11yCount <= 5 and Player:BuffStack(S.ToothandClawBuff) >= 2) and not S.ThornsofIron:IsAvailable()) then
-    if Cast(S.Maul, nil, nil, not Target:IsInMeleeRange(8)) then return "maul bear 32"; end
+    if Cast(S.Maul, nil, nil, not Target:IsInMeleeRange(8)) then return "maul bear 30"; end
   end
-  -- raze,if=((buff.incarnation.up|buff.berserk_bear.up)&(buff.tooth_and_claw.stack>=2))&variable.If_build=0&!talent.thorns_of_iron.enabled
-  if S.Raze:IsReady() and (not VarIFBuild) and (((Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S.BerserkBuff)) and Player:BuffStack(S.ToothandClawBuff) >= 2) and not S.ThornsofIron:IsAvailable()) then
-    if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 34"; end
+  -- raze,if=((buff.incarnation.up|buff.berserk_bear.up)&variable.If_build=0&!talent.thorns_of_iron.enabled
+  if S.Raze:IsReady() and (not VarIFBuild) and ((Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S.BerserkBuff)) and not S.ThornsofIron:IsAvailable()) then
+    if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 32"; end
+  end
+  -- mangle,if=buff.gore.up&active_enemies<11|buff.vicious_cycle_mangle.stack=3
+  if S.Mangle:IsCastable() and (Player:BuffUp(S.GoreBuff) and MeleeEnemies11yCount < 11 or Player:BuffStack(S.ViciousCycleMaulBuff) == 3) then
+    if Cast(S.Mangle, nil, nil, not Target:IsInMeleeRange(8)) then return "mangle bear 34"; end
   end
   -- thrash_bear,target_if=refreshable|dot.thrash_bear.stack<3|active_enemies>=5
   if S.Thrash:IsCastable() then
