@@ -116,10 +116,6 @@ local function Precombat()
   if S.BattleShout:IsCastable() and (Player:BuffDown(S.BattleShoutBuff, true) or Everyone.GroupBuffMissing(S.BattleShoutBuff)) then
     if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat"; end
   end
-  -- use_item,name=algethar_puzzle_box
-  if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() then
-    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat"; end
-  end
   -- Manually added opener
   if Target:IsInMeleeRange(12) then
     if S.ThunderClap:IsCastable() then
@@ -138,6 +134,11 @@ local function Aoe()
     SuggestRageDump(5)
     if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap aoe 2"; end
   end
+  -- shield_slam,if=(set_bonus.tier30_2pc|set_bonus.tier30_4pc)&spell_targets.thunder_clap<=7|buff.earthen_tenacity.up
+  -- Note: If set_bonus.tier30_2pc is true, then tier30_4pc would be true also, so just checking for 2pc.
+  if S.ShieldSlam:IsCastable() and (Player:HasTier(30, 2) and EnemiesCount8 <= 7 or Player:BuffUp(S.EarthenTenacityBuff)) then
+    if Cast(S.ShieldSlam, nil, nil, not TargetInMeleeRange) then return "shield_slam aoe 3"; end
+  end
   --thunder_clap,if=buff.violent_outburst.up&spell_targets.thunderclap>5&buff.avatar.up&talent.unstoppable_force.enabled
   if S.ThunderClap:IsCastable() and Player:BuffUp(S.ViolentOutburstBuff) and EnemiesCount8 > 5 and Player:BuffUp(S.AvatarBuff) and S.UnstoppableForce:IsAvailable() then
     SuggestRageDump(5)
@@ -147,8 +148,8 @@ local function Aoe()
   if S.Revenge:IsReady() and Player:Rage() >= 70 and S.SeismicReverberation:IsAvailable() and EnemiesCount8 >= 3 then
     if Cast(S.Revenge, nil, nil, not TargetInMeleeRange) then return "revenge aoe 6"; end
   end
-  --shield_slam,if=rage<=60|buff.violent_outburst.up&spell_targets.thunderclap<=4
-  if S.ShieldSlam:IsCastable() and (Player:Rage() <= 60 or Player:BuffUp(S.ViolentOutburstBuff) and EnemiesCount8 <= 4) then
+  --shield_slam,if=rage<=60|buff.violent_outburst.up&spell_targets.thunderclap<=7
+  if S.ShieldSlam:IsCastable() and (Player:Rage() <= 60 or Player:BuffUp(S.ViolentOutburstBuff) and EnemiesCount8 <= 7) then
     SuggestRageDump(20)
     if Cast(S.ShieldSlam, nil, nil, not TargetInMeleeRange) then return "shield_slam aoe 8"; end
   end

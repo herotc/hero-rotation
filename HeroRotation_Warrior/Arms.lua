@@ -89,7 +89,7 @@ local function Precombat()
   if S.BattleShout:IsCastable() and (Player:BuffDown(S.BattleShoutBuff, true) or Everyone.GroupBuffMissing(S.BattleShoutBuff)) then
     if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
   end
-  --battle_stance,toggle=on
+  -- battle_stance,toggle=on
   if S.BattleStance:IsCastable() and Player:BuffDown(S.BattleStance, true) then
     if Cast(S.BattleStance) then return "battle_stance precombat 4"; end
   end
