@@ -276,8 +276,8 @@ local function St()
   if S.WailingArrow:IsReady() and (EnemiesCount10ySplash > 1) then
     if Cast(S.WailingArrow, Settings.Marksmanship.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "wailing_arrow st 20"; end
   end
-  -- rapid_fire,if=talent.surging_shots
-  if S.RapidFire:IsCastable() and (S.SurgingShots:IsAvailable()) then
+  -- rapid_fire,if=talent.surging_shots|action.aimed_shot.full_recharge_time>action.aimed_shot.cast_time+cast_time
+  if S.RapidFire:IsCastable() and (S.SurgingShots:IsAvailable() or S.AimedShot:FullRechargeTime() > S.AimedShot:CastTime() + S.RapidFire:CastTime()) then
     if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 22"; end
   end
   -- kill_shot
