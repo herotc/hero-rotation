@@ -583,7 +583,8 @@ local function CDs ()
 
   -- actions.cds+=/vanish,if=buff.danse_macabre.stack>3&combo_points<=2&(cooldown.secret_technique.remains>=30|!talent.secret_technique)
   if S.Vanish:IsCastable() and ComboPoints <= 2 and Player:BuffStack(S.DanseMacabreBuff) > 3
-   and (S.SecretTechnique:CooldownRemains() >= 30 or not S.SecretTechnique:IsAvailable()) then
+   and (S.SecretTechnique:CooldownRemains() >= 30 or not S.SecretTechnique:IsAvailable())
+   and not (Everyone.IsSoloMode() and Player:IsTanking(Target)) then
     ShouldReturn = StealthMacro(S.Vanish)
     if ShouldReturn then return "Vanish Macro (DM) " .. ShouldReturn end
   end
@@ -739,7 +740,8 @@ end
 
 -- # Stealth Cooldowns
 local function Stealth_CDs (EnergyThreshold)
-  if HR.CDsON() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) then
+  if HR.CDsON() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3
+    and not (Everyone.IsSoloMode() and Player:IsTanking(Target)) then
     -- actions.stealth_cds+=/vanish,if=(!talent.danse_macabre|spell_targets.shuriken_storm>=3)&!variable.shd_threshold&combo_points.deficit>1&(cooldown.flagellation.remains>=60|!talent.flagellation|fight_remains<=(30*cooldown.vanish.charges))
     if S.Vanish:IsCastable()
       and (not S.DanseMacabre:IsAvailable() or MeleeEnemies10yCount >= 3) and not ShD_Threshold() and ComboPointsDeficit > 1
