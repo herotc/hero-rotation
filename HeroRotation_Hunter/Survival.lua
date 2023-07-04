@@ -234,17 +234,15 @@ local function Cleave()
   if S.KillShot:IsReady() and ((Player:BuffUp(S.CoordinatedAssaultEmpowerBuff) or Settings.Survival.CAKSMacro and Player:BuffUp(S.CoordinatedAssaultBuff) and (S.Bite:IsReady() or S.Claw:IsReady() or S.Smack:IsReady())) and S.BirdsofPrey:IsAvailable()) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot cleave 2"; end
   end
-  -- wildfire_bomb,if=full_recharge_time<gcd|!cooldown.coordinated_assault.remains|buff.coordinated_assault.remains&(!buff.coordinated_assault_empower.up)|talent.bombardier
-  if (S.WildfireBomb:FullRechargeTime() < Player:GCD() or S.CoordinatedAssault:CooldownUp() or Player:BuffUp(S.CoordinatedAssaultBuff) and Player:BuffDown(S.CoordinatedAssaultEmpowerBuff) or S.Bombardier:IsAvailable()) then
-    for _, Bomb in pairs(Bombs) do
-      if Bomb:IsCastable() then
-        if Cast(Bomb, nil, nil, not Target:IsSpellInRange(Bomb)) then return "wildfire_bomb cleave 4"; end
-      end
-    end
-  end
   -- death_chakram
   if S.DeathChakram:IsCastable() then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram cleave 6"; end
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram cleave 4"; end
+  end
+  -- wildfire_bomb
+  for _, Bomb in pairs(Bombs) do
+    if Bomb:IsCastable() then
+      if Cast(Bomb, nil, nil, not Target:IsSpellInRange(Bomb)) then return "wildfire_bomb cleave 6"; end
+    end
   end
   -- stampede
   if S.Stampede:IsCastable() and CDsON() then
@@ -262,21 +260,23 @@ local function Cleave()
   if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
     if Cast(S.Carve, nil, nil, not Target:IsInMeleeRange(MeleeRange)) then return "carve cleave 14"; end
   end
-  -- butchery,if=full_recharge_time<gcd|dot.shrapnel_bomb.ticking&(dot.internal_bleeding.stack<2|dot.shrapnel_bomb.remains<gcd)
-  if S.Butchery:IsReady() and (S.Butchery:FullRechargeTime() < Player:GCD() or Target:DebuffUp(S.ShrapnelBombDebuff) and (Target:DebuffStack(S.InternalBleedingDebuff) < 2 or Target:DebuffRemains(S.ShrapnelBombDebuff) < Player:GCD())) then
-    if Cast(S.Butchery, nil, nil, not Target:IsInMeleeRange(MeleeRange)) then return "butchery cleave 16"; end
-  end
-  -- wildfire_bomb,if=!dot.wildfire_bomb.ticking
-  for BombNum, Bomb in pairs(Bombs) do
-    if Bomb:IsCastable() and (Target:DebuffDown(BombDebuffs[BombNum])) then
-      if Cast(Bomb, nil, nil, not Target:IsSpellInRange(Bomb)) then return "wildfire_bomb cleave 18"; end
-    end
-  end
   -- use_item,name=djaruun_pillar_of_the_elder_flame
   if I.Djaruun:IsEquippedAndReady() then
-    if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame cleave 20"; end
+    if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame cleave 16"; end
   end
-  -- fury_of_the_eagle
+  -- fury_of_the_eagle,if=cooldown.butchery.full_recharge_time>cast_time&raid_event.adds.exists
+  if S.FuryoftheEagle:IsCastable() and (S.Butchery:FullRechargeTime() > S.FuryoftheEagle:CastTime()) then
+    if Cast(S.FuryoftheEagle, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle cleave 18"; end
+  end
+  -- butchery,if=raid_event.adds.exists
+  if S.Butchery:IsReady() then
+    if Cast(S.Butchery, nil, nil, not Target:IsInMeleeRange(MeleeRange)) then return "butchery cleave 20"; end
+  end
+  -- butchery,if=(full_recharge_time<gcd|dot.shrapnel_bomb.ticking&(dot.internal_bleeding.stack<2|dot.shrapnel_bomb.remains<gcd|raid_event.adds.remains<10))&!raid_event.adds.exists
+  if S.Butchery:IsReady() and (S.Butchery:FullRechargeTime() < Player:GCD() or Target:DebuffUp(S.ShrapnelBombDebuff) and (Target:DebuffStack(S.InternalBleedingDebuff) < 2 or Target:DebuffRemains(S.ShrapnelBombDebuff) < Player:GCD())) then
+    if Cast(S.Butchery, nil, nil, not Target:IsInMeleeRange(MeleeRange)) then return "butchery cleave 22"; end
+  end
+  -- fury_of_the_eagle,if=!raid_event.adds.exists
   if S.FuryoftheEagle:IsCastable() then
     if Cast(S.FuryoftheEagle, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle cleave 22"; end
   end
@@ -284,25 +284,25 @@ local function Cleave()
   if S.Carve:IsReady() and (Target:DebuffUp(S.ShrapnelBombDebuff)) then
     if Cast(S.Carve, nil, nil, not Target:IsInMeleeRange(MeleeRange)) then return "carve cleave 24"; end
   end
-  -- flanking_strike,if=focus+cast_regen<focus.max
-  if S.FlankingStrike:IsCastable() and (CheckFocusCap(S.FlankingStrike:ExecuteTime(), 30)) then
-    if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike cleave 26"; end
-  end
   -- butchery,if=(!next_wi_bomb.shrapnel|!talent.wildfire_infusion)
   if S.Butchery:IsReady() and ((not S.ShrapnelBomb:IsCastable()) or not S.WildfireInfusion:IsAvailable()) then
-    if Cast(S.Butchery, nil, nil, not Target:IsInMeleeRange(8)) then return "butchery cleave 28"; end
+    if Cast(S.Butchery, nil, nil, not Target:IsInMeleeRange(8)) then return "butchery cleave 26"; end
   end
   -- mongoose_bite,target_if=max:debuff.latent_poison.stack,if=debuff.latent_poison.stack>8
   if S.MongooseBite:IsReady() then
-    if Everyone.CastTargetIf(S.MongooseBite, EnemyList, "max", EvaluateTargetIfFilterLatentStacks, EvaluateTargetIfRaptorStrikeCleave, not Target:IsInMeleeRange(MeleeRange)) then return "mongoose_bite cleave 30"; end
+    if Everyone.CastTargetIf(S.MongooseBite, EnemyList, "max", EvaluateTargetIfFilterLatentStacks, EvaluateTargetIfRaptorStrikeCleave, not Target:IsInMeleeRange(MeleeRange)) then return "mongoose_bite cleave 28"; end
   end
   -- raptor_strike,target_if=max:debuff.latent_poison.stack,if=debuff.latent_poison.stack>8
   if S.RaptorStrike:IsReady() then
-    if Everyone.CastTargetIf(S.RaptorStrike, EnemyList, "max", EvaluateTargetIfFilterLatentStacks, EvaluateTargetIfRaptorStrikeCleave, not Target:IsInMeleeRange(MeleeRange)) then return "raptor_strike cleave 32"; end
+    if Everyone.CastTargetIf(S.RaptorStrike, EnemyList, "max", EvaluateTargetIfFilterLatentStacks, EvaluateTargetIfRaptorStrikeCleave, not Target:IsInMeleeRange(MeleeRange)) then return "raptor_strike cleave 30"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&full_recharge_time<gcd
   if S.KillCommand:IsCastable() and (CheckFocusCap(S.KillCommand:ExecuteTime()) and S.KillCommand:FullRechargeTime() < Player:GCD()) then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 34"; end
+    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command cleave 32"; end
+  end
+  -- flanking_strike,if=focus+cast_regen<focus.max
+  if S.FlankingStrike:IsCastable() and (CheckFocusCap(S.FlankingStrike:ExecuteTime(), 30)) then
+    if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike cleave 34"; end
   end
   -- carve
   if S.Carve:IsReady() then
@@ -328,21 +328,13 @@ local function Cleave()
   if S.SerpentSting:IsReady() then
     if Everyone.CastTargetIf(S.SerpentSting, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfSerpentStingCleave, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting cleave 46"; end
   end
-  -- flanking_strike,if=focus+cast_regen<focus.max
-  if S.FlankingStrike:IsCastable() and (CheckFocusCap(S.FlankingStrike:ExecuteTime())) then
-    if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike cleave 48"; end
-  end
   -- mongoose_bite,target_if=min:dot.serpent_sting.remains
   if S.MongooseBite:IsReady() then
-    if Everyone.CastTargetIf(S.MongooseBite, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, nil, not Target:IsInMeleeRange(MeleeRange)) then return "mongoose_bite cleave 50"; end
+    if Everyone.CastTargetIf(S.MongooseBite, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, nil, not Target:IsInMeleeRange(MeleeRange)) then return "mongoose_bite cleave 48"; end
   end
   -- raptor_strike,target_if=min:dot.serpent_sting.remains
   if S.RaptorStrike:IsReady() then
-    if Everyone.CastTargetIf(S.RaptorStrike, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, nil, not Target:IsInMeleeRange(MeleeRange)) then return "raptor_strike cleave 52"; end
-  end
-  -- flanking_strike
-  if S.FlankingStrike:IsCastable() then
-    if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike cleave 54"; end
+    if Everyone.CastTargetIf(S.RaptorStrike, EnemyList, "min", EvaluateTargetIfFilterSerpentStingRemains, nil, not Target:IsInMeleeRange(MeleeRange)) then return "raptor_strike cleave 50"; end
   end
 end
 
