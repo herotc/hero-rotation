@@ -263,6 +263,7 @@ Item.Druid.Commons = {
   -- Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
+  SpoilsofNeltharus                     = Item(193773, {13, 14}),
   -- Other On-Use Items
   Djaruun                               = Item(202569),
   Jotungeirr                            = Item(186404),
