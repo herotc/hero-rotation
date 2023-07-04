@@ -70,6 +70,13 @@ Spell.Mage.Commons = {
   RuneofPowerBuff                       = Spell(116014),
   TemporalWarpBuff                      = Spell(386540),
   -- Debuffs
+  -- Trinket Effects
+  SpoilsofNeltharusCrit                 = Spell(381954),
+  SpoilsofNeltharusHaste                = Spell(381955),
+  SpoilsofNeltharusMastery              = Spell(381956),
+  SpoilsofNeltharusVers                 = Spell(381957),
+  -- Pool
+  Pool                                  = Spell(999910)
 }
 
 Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
@@ -173,12 +180,14 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   BoneChilling                          = Spell(205766),
   ChainReaction                         = Spell(278309),
   CometStorm                            = Spell(153595), --splash, 6
+  DeepShatter                           = Spell(378749),
   Ebonbolt                              = Spell(257537), --splash, 8 (with splitting ice)
   Flurry                                = Spell(44614),
   FreezingRain                          = Spell(270233),
   FreezingWinds                         = Spell(382103),
   Frostbite                             = Spell(198121),
   FrozenOrb                             = Spell(84714), --splash, 16
+  FrozenTouch                           = Spell(205030),
   GlacialSpike                          = Spell(199786), --splash, 8 (with splitting ice)
   IceBarrier                            = Spell(11426),
   IceCaller                             = Spell(236662),
