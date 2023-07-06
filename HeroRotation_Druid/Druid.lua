@@ -216,10 +216,12 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   -- Talents
   Berserk                               = Spell(50334),
   BristlingFur                          = Spell(155835),
-  Maul                                  = Spell(6807),
+  FlashingClaws                         = Spell(393427),
+  FuryofNature                          = Spell(370695),
   Incarnation                           = Spell(102558),
   LayeredMane                           = Spell(384721),
   LunarBeam                             = Spell(204066),
+  Maul                                  = Spell(6807),
   Pulverize                             = Spell(80313),
   RageoftheSleeper                      = Spell(200851),
   Raze                                  = Spell(400254),
