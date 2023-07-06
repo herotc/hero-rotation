@@ -61,6 +61,12 @@ Spell.Evoker.Commons = {
   Pool                                  = Spell(999910)
 }
 
+Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
+  -- Talents
+  -- Buffs
+  -- Debuffs
+})
+
 Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   -- Talents
   Animosity                             = Spell(375797),
@@ -115,6 +121,9 @@ Item.Evoker.Commons = {
   -- Trinkets (SL)
   ShadowedOrbofTorment                  = Item(186428, {13, 14}),
 }
+
+Item.Evoker.Augmentation = MergeTableByKey(Item.Evoker.Commons, {
+})
 
 Item.Evoker.Devastation = MergeTableByKey(Item.Evoker.Commons, {
 })

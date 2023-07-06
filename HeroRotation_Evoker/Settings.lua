@@ -42,6 +42,10 @@ HR.GUISettings.APL.Evoker = {
       Quell = true,
     }
   },
+  Augmentation = {
+    GCDasOffGCD = {
+    },
+  },
   Devastation = {
     UseDefensives = true,
     UseGreen = true,
@@ -64,12 +68,16 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Child Panels
 local ARPanel = HR.GUI.Panel
 local CP_Evoker = CreateChildPanel(ARPanel, "Evoker")
+local CP_Augmentation = CreateChildPanel(CP_Evoker, "Augmentation")
 local CP_Devastation = CreateChildPanel(CP_Evoker, "Devastation")
 
 -- Evoker
 CreateARPanelOptions(CP_Evoker, "APL.Evoker.Commons")
 CreatePanelOption("Slider", CP_Evoker, "APL.Evoker.Commons.EmpoweredFontSize", {1, 100, 1}, "Empowered Spell Font Size", "Select the font size you would like shown for the overlay on your empowered spell casts (Fire Breath/Eternity Surge).")
 CreatePanelOption("Slider", CP_Evoker, "APL.Evoker.Commons.DisintegrateFontSize", {1, 100, 1}, "Disintegrate Spell Font Size", "Select the font size you would like shown for the overlay on your Disintegrate spell casts.")
+
+-- Augmentation
+CreateARPanelOptions(CP_Augmentation, "APL.Evoker.Augmentation")
 
 -- Devastation
 CreatePanelOption("CheckButton", CP_Devastation, "APL.Evoker.Devastation.UseDefensives", "Suggest Defensives", "Enable this option to have the addon suggest defensive spells.")

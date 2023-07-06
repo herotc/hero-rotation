@@ -11,5 +11,6 @@
 Settings.lua
 Evoker.lua
 Events.lua
+Augmentation.lua
 Devastation.lua
 Overrides.lua
