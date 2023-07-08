@@ -249,7 +249,7 @@ local function AoEBurst()
   end
   -- wound_spender,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=1
   if WoundSpender:IsReady() then
-    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfWoundSpenderAoEBurst, not Target:IsInMeleeRange(5)) then return "wound_spender aoe_burst 4"; end
+    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfWoundSpenderAoEBurst, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender aoe_burst 4"; end
   end
   -- epidemic,if=!variable.pooling_runic_power|fight_remains<10
   if S.Epidemic:IsReady() and ((not VarPoolingRunicPower) or FightRemains < 10) then
@@ -261,7 +261,7 @@ local function AoEBurst()
   end
   -- wound_spender
   if WoundSpender:IsReady() then
-    if Cast(WoundSpender, nil, nil, not Target:IsInMeleeRange(5)) then return "wound_spender aoe_burst 10"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender aoe_burst 10"; end
   end
 end
 
@@ -498,7 +498,7 @@ local function HighPrioActions()
   end
   -- wound_spender,if=(cooldown.apocalypse.remains>variable.apoc_timing+3|active_enemies>=3)&talent.plaguebringer&(talent.superstrain|talent.unholy_blight)&buff.plaguebringer.remains<gcd
   if WoundSpender:IsReady() and ((S.Apocalypse:CooldownRemains() > VarApocTiming + 3 or EnemiesMeleeCount >= 3) and S.Plaguebringer:IsAvailable() and (S.Superstrain:IsAvailable() or S.UnholyBlight:IsAvailable()) and Player:BuffRemains(S.PlaguebringerBuff) < Player:GCD()) then
-    if Cast(WoundSpender, nil, nil, not Target:IsInMeleeRange(5)) then return "wound_spender high_prio_actions 10"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender high_prio_actions 10"; end
   end
   -- unholy_blight,if=variable.st_planning&((!talent.apocalypse|cooldown.apocalypse.remains)&talent.morbidity|!talent.morbidity)|variable.adds_remain|fight_remains<21
   if S.UnholyBlight:IsReady() and (VarSTPlanning and (((not S.Apocalypse:IsAvailable()) or S.Apocalypse:CooldownDown()) and S.Morbidity:IsAvailable() or not S.Morbidity:IsAvailable()) or VarAddsRemain or FightRemains < 21) then
