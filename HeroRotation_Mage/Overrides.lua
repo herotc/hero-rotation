@@ -237,11 +237,7 @@ FrostOldSpellIsCastable = HL.AddCoreOverride("Spell.IsCastable",
       return self:IsLearned() and RangeOK and MovingOK and not Player:IsCasting(self) and (Player:BuffUp(SpellFrost.GlacialSpikeBuff) or (Player:BuffStack(SpellFrost.IciclesBuff) == 5))
     else
       local BaseCheck = FrostOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-      if self == SpellFrost.SummonWaterElemental then
-        return BaseCheck and not Pet:IsActive()
-      elseif self == SpellFrost.RuneofPower then
-        return BaseCheck and not Player:IsCasting(self) and Player:BuffDown(SpellFrost.RuneofPowerBuff)
-      elseif self == SpellFrost.MirrorsofTorment then
+      if self == SpellFrost.MirrorsofTorment then
         return BaseCheck and not Player:IsCasting(self)
       elseif self == SpellFrost.RadiantSpark then
         return BaseCheck and not Player:IsCasting(self)    
@@ -261,8 +257,6 @@ FrostOldSpellCooldownRemains = HL.AddCoreOverride("Spell.CooldownRemains",
   function (self, BypassRecovery, Offset)
     if self == SpellFrost.Blizzard and Player:IsCasting(self) then
       return 8
-    elseif self == SpellFrost.Ebonbolt and Player:IsCasting(self) then
-      return 45
     else
       return FrostOldSpellCooldownRemains(self, BypassRecovery, Offset)
     end

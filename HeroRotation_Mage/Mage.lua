@@ -181,7 +181,6 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   ChainReaction                         = Spell(278309),
   CometStorm                            = Spell(153595), --splash, 6
   DeepShatter                           = Spell(378749),
-  Ebonbolt                              = Spell(257537), --splash, 8 (with splitting ice)
   Flurry                                = Spell(44614),
   FreezingRain                          = Spell(270233),
   FreezingWinds                         = Spell(382103),
@@ -199,8 +198,8 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   SplittingIce                          = Spell(56377), --splash, 8
   SummonWaterElemental                  = Spell(31687),
   -- Pet Abilities
-  Freeze                                = Spell(33395, "pet"), --splash, 8
-  WaterJet                              = Spell(135029, "pet"),
+  Freeze                                = Spell(33395), --splash, 8
+  WaterJet                              = Spell(135029),
   -- Buffs
   BrainFreezeBuff                       = Spell(190446),
   FingersofFrostBuff                    = Spell(44544),
