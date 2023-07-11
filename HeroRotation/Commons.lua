@@ -181,7 +181,7 @@ function Commons.PotionSelected()
     -- Druid
     [102] = "Balance", [103] = "Feral", [104] = "Guardian", [105] = "Restoration", 
     -- Evoker
-    [1467] = "Devastation", [1468] = "Preservation",
+    [1467] = "Devastation", [1468] = "Preservation", [1473] = "Augmentation",
     -- Hunter
     [253] = "BeastMastery", [254] = "Marksmanship", [255] = "Survival",
     -- Mage
