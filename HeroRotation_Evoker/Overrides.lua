@@ -12,6 +12,7 @@ local Item    = HL.Item
 local HR      = HeroRotation
 -- Spells
 local SpellDeva = Spell.Evoker.Devastation
+local SpellAug  = Spell.Evoker.Augmentation
 -- Lua
 -- API
 local GetPowerRegenForPowerType = GetPowerRegenForPowerType
@@ -69,4 +70,87 @@ HL.AddCoreOverride ("Player.EssenceTimeToX",
   end
 , 1467)
 
--- Preservation, ID: ????
+-- Preservation, ID: 1468
+
+-- Augmentation, ID: 1473
+local AugOldIsCastable
+AugOldIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local RangeOK = true
+    if Range then
+      local RangeUnit = ThisUnit or Target
+      RangeOK = RangeUnit:IsInRange( Range, AoESpell )
+    end
+    local BaseCheck = AugOldIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    if self == SpellAug.TipTheScales then
+      return BaseCheck and not Player:BuffUp(self)
+    else
+      return BaseCheck
+    end
+  end
+, 1473)
+
+local AugOldIsReady
+AugOldIsReady = HL.AddCoreOverride ("Spell.IsReady",
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local RangeOK = true
+    if Range then
+      local RangeUnit = ThisUnit or Target
+      RangeOK = RangeUnit:IsInRange( Range, AoESpell )
+    end
+    local BaseCheck = AugOldIsReady(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    if self == SpellAug.Eruption then
+      return BaseCheck and Player:EssenceP() >= 2
+    elseif self == SpellAug.EbonMight then
+      return BaseCheck and not Player:IsCasting(self)
+    else
+      return BaseCheck
+    end
+  end
+, 1473)
+
+local AugOldIsMoving
+AugOldIsMoving = HL.AddCoreOverride ("Player.IsMoving",
+  function(self)
+    local BaseCheck = AugOldIsMoving(self)
+    return BaseCheck and Player:BuffDown(SpellAug.HoverBuff)
+  end
+, 1473)
+
+HL.AddCoreOverride ("Player.EssenceP",
+  function()
+    local Essence = Player:Essence()
+    if (not Player:IsCasting()) and not Player:IsChanneling() then
+      return Essence
+    else
+      if Player:IsCasting(SpellAug.Eruption) and Player:BuffDown(SpellAug.EssenceBurstBuff) then
+        return Essence - 2
+      else
+        return Essence
+      end
+    end
+  end
+, 1473)
+
+HL.AddCoreOverride ("Player.EssenceTimeToMax",
+  function()
+    local Deficit = Player:EssenceDeficit()
+    if Deficit == 0 then return 0; end
+    local Regen = GetPowerRegenForPowerType(EssencePowerType)
+    if not Regen or Regen < 0.2 then Regen = 0.2; end
+    local TimeToOneEssence = 1 / Regen
+    local LastUpdate = Cache.Persistent.Player.LastPowerUpdate
+    return Deficit * TimeToOneEssence - (GetTime() - LastUpdate)
+  end
+, 1473)
+
+HL.AddCoreOverride ("Player.EssenceTimeToX",
+  function(Amount)
+    local Essence = Player:Essence()
+    if Essence >= Amount then return 0; end
+    local Regen = GetPowerRegenForPowerType(EssencePowerType)
+    local TimeToOneEssence = 1 / Regen
+    local LastUpdate = Cache.Persistent.Player.LastPowerUpdate
+    return ((Amount - Essence) * TimeToOneEssence) - (GetTime() - LastUpdate)
+  end
+, 1473)

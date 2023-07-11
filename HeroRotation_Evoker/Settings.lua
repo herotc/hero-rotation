@@ -35,6 +35,7 @@ HR.GUISettings.APL.Evoker = {
     GCDasOffGCD = {
       -- Abilities
       BlessingOfTheBronze = true,
+      TipTheScales = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -43,7 +44,15 @@ HR.GUISettings.APL.Evoker = {
     }
   },
   Augmentation = {
+    DisplayStyle = {
+      AugBuffs = "SuggestedRight",
+    },
+    PotionType = {
+      Selected = "Power",
+    },
     GCDasOffGCD = {
+      BreathOfEons = true,
+      TimeSkip = true,
     },
   },
   Devastation = {
@@ -57,7 +66,6 @@ HR.GUISettings.APL.Evoker = {
     GCDasOffGCD = {
       DeepBreath = true,
       Dragonrage = true,
-      TipTheScales = true,
       Unravel = true,
     },
   },

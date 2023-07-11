@@ -63,7 +63,16 @@ Spell.Evoker.Commons = {
 
 Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
   -- Talents
+  BlisteringScales                      = Spell(360827),
+  BreathofEons                          = Spell(403631),
+  EbonMight                             = Spell(395152),
+  Eruption                              = Spell(395160),
+  FontofMagic                           = Spell(408083),
+  Prescience                            = Spell(409311),
+  TimeSkip                              = Spell(404977),
+  Upheaval                              = Spell(408092),
   -- Buffs
+  EssenceBurstBuff                      = Spell(392268),
   -- Debuffs
 })
 
