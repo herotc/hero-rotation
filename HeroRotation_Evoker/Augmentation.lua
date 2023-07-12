@@ -80,7 +80,7 @@ local function Precombat()
   end
   -- ebon_might
   if S.EbonMight:IsReady() then
-    if Cast(S.EbonMight) then return "ebon_might precombat 8"; end
+    if Cast(S.EbonMight, Settings.Augmentation.GCDasOffGCD.EbonMight) then return "ebon_might precombat 8"; end
   end
   -- living_flame
   if S.LivingFlame:IsCastable() then
@@ -212,7 +212,7 @@ local function APL()
     end
     -- ebon_might
     if S.EbonMight:IsReady() then
-      if Cast(S.EbonMight) then return "ebon_might main 10"; end
+      if Cast(S.EbonMight, Settings.Augmentation.GCDasOffGCD.EbonMight) then return "ebon_might main 10"; end
     end
     -- fire_breath,empower_to=active_enemies-1
     if S.FireBreath:IsCastable() then
