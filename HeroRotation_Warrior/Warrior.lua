@@ -214,7 +214,9 @@ if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Commons = {
   -- Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
+  BeacontotheBeyond                     = Item(203963, {13, 14}),
   CrimsonGladiatorsBadgeofFerocity      = Item(201807, {13, 14}),
+  ElementiumPocketAnvil                 = Item(202617, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
   VialofAnimatedBlood                   = Item(159625, {13, 14}),

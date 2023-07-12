@@ -32,7 +32,9 @@ local I = Item.Warrior.Fury
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
   I.AlgetharPuzzleBox:ID(),
+  I.BeacontotheBeyond:ID(),
   I.CrimsonGladiatorsBadgeofFerocity:ID(),
+  I.ElementiumPocketAnvil:ID(),
   I.IrideusFragment:ID(),
   I.ManicGrieftorch:ID(),
   I.VialofAnimatedBlood:ID(),
@@ -413,9 +415,17 @@ local function APL()
         if I.VialofAnimatedBlood:IsEquippedAndReady() and (Player:BuffUp(S.AvatarBuff)) then
           if Cast(I.VialofAnimatedBlood, nil, Settings.Commons.DisplayStyle.Trinkets) then return "vial_of_animated_blood main 10"; end
         end
+        -- use_item,name=elementium_pocket_anvil,use_off_gcd=1,if=gcd.remains>0.7
+        if I.ElementiumPocketAnvil:IsEquippedAndReady() then
+          if Cast(I.ElementiumPocketAnvil, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(100)) then return "elementium_pocket_anvil main 11"; end
+        end
+        -- use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=gcd.remains>0.7
+        if I.BeacontotheBeyond:IsEquippedAndReady() then
+          if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond main 12"; end
+        end
         -- use_item,name=irideus_fragment,if=buff.avatar.up
         if I.IrideusFragment:IsEquippedAndReady() and (Player:BuffUp(S.AvatarBuff)) then
-          if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment main 12"; end
+          if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment main 13"; end
         end
         -- use_item,name=manic_grieftorch,if=buff.avatar.down
         if I.ManicGrieftorch:IsEquippedAndReady() and (Player:BuffDown(S.Avatar)) then
