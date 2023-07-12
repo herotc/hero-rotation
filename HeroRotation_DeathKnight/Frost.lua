@@ -216,20 +216,20 @@ local function Breath()
   if S.Frostscythe:IsReady() and (VarFrostscythePriority and Player:RunicPower() > 45) then
     if Cast(S.Frostscythe, nil, nil, not Target:IsInMeleeRange(8)) then return "frostscythe breath 12"; end
   end
-  -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit>40|buff.pillar_of_frost.up&runic_power.deficit>15
-  if S.Obliterate:IsReady() and (Player:RunicPowerDeficit() > 40 or Player:BuffUp(S.PillarofFrostBuff) and Player:RunicPowerDeficit() > 15) then
+  -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit>40|buff.pillar_of_frost.up&runic_power.deficit>17
+  if S.Obliterate:IsReady() and (Player:RunicPowerDeficit() > 40 or Player:BuffUp(S.PillarofFrostBuff) and Player:RunicPowerDeficit() > 17) then
     if Everyone.CastTargetIf(S.Obliterate, Enemies10yd, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5)) then return "obliterate breath 14"; end
   end
-  -- death_and_decay,if=runic_power<32&rune.time_to_2>runic_power%16
-  if S.DeathAndDecay:IsReady() and (Player:RunicPower() < 32 and Player:RuneTimeToX(2) > Player:RunicPower() / 16) then
+  -- death_and_decay,if=runic_power<36&rune.time_to_2>runic_power%18
+  if S.DeathAndDecay:IsReady() and (Player:RunicPower() < 36 and Player:RuneTimeToX(2) > Player:RunicPower() / 18) then
     if Cast(S.DeathAndDecay, Settings.Commons2.GCDasOffGCD.DeathAndDecay, nil, not Target:IsSpellInRange(S.DeathAndDecay)) then return "death_and_decay breath 16"; end
   end
-  -- remorseless_winter,if=runic_power<32&rune.time_to_2>runic_power%16
-  if S.RemorselessWinter:IsReady() and (Player:RunicPower() < 32 and Player:RuneTimeToX(2) > Player:RunicPower() / 16) then
+  -- remorseless_winter,if=runic_power<36&rune.time_to_2>runic_power%18
+  if S.RemorselessWinter:IsReady() and (Player:RunicPower() < 36 and Player:RuneTimeToX(2) > Player:RunicPower() / 18) then
     if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter breath 18"; end
   end
-  -- howling_blast,if=runic_power<32&rune.time_to_2>runic_power%16
-  if S.HowlingBlast:IsReady() and (Player:RunicPower() < 32 and Player:RuneTimeToX(2) > Player:RunicPower() / 16) then
+  -- howling_blast,if=runic_power<36&rune.time_to_2>runic_power%18
+  if S.HowlingBlast:IsReady() and (Player:RunicPower() < 36 and Player:RuneTimeToX(2) > Player:RunicPower() / 18) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast breath 20"; end
   end
   -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=runic_power.deficit>25
