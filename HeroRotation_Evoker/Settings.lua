@@ -36,6 +36,7 @@ HR.GUISettings.APL.Evoker = {
       -- Abilities
       BlessingOfTheBronze = true,
       TipTheScales = true,
+      Unravel = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -67,7 +68,6 @@ HR.GUISettings.APL.Evoker = {
     GCDasOffGCD = {
       DeepBreath = true,
       Dragonrage = true,
-      Unravel = true,
     },
   },
 }

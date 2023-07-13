@@ -82,7 +82,7 @@ AugOldIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
     local BaseCheck = AugOldIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-    if self == SpellAug.TipTheScales then
+    if self == SpellAug.TipTheScales or self == SpellAug.Upheaval or self == SpellAug.FireBreath then
       return BaseCheck and not Player:BuffUp(self)
     else
       return BaseCheck
@@ -114,6 +114,17 @@ AugOldIsMoving = HL.AddCoreOverride ("Player.IsMoving",
   function(self)
     local BaseCheck = AugOldIsMoving(self)
     return BaseCheck and Player:BuffDown(SpellAug.HoverBuff)
+  end
+, 1473)
+
+local AugOldBuffRemains
+AugOldBuffRemains = HL.AddCoreOverride ("Player.BuffRemains",
+  function(self, Spell, AnyCaster, Offset)
+    if Spell == SpellAug.EbonMightSelfBuff then
+      return self:IsCasting(SpellAug.EbonMight) and 10 or AugOldBuffRemains(self, Spell, AnyCaster, Offset)
+    else
+      return AugOldBuffRemains(self, Spell, AnyCaster, Offset)
+    end
   end
 , 1473)
 

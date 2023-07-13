@@ -69,11 +69,16 @@ Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
   Eruption                              = Spell(395160),
   FontofMagic                           = Spell(408083),
   Prescience                            = Spell(409311),
+  PupilofAlexstrasza                    = Spell(407814),
   TimeSkip                              = Spell(404977),
   Upheaval                              = Spell(408092),
   -- Buffs
+  BlisteringScalesBuff                  = Spell(360827),
+  EbonMightOtherBuff                    = Spell(395152),
+  EbonMightSelfBuff                     = Spell(395296),
   EssenceBurstBuff                      = Spell(392268),
   -- Debuffs
+  TemporalWoundDebuff                   = Spell(409560),
 })
 
 Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
