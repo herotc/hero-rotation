@@ -494,7 +494,7 @@ local function APL()
       end
       -- use_item,name=elementium_pocket_anvil,use_off_gcd=1,if=gcd.remains>0.7
       if I.ElementiumPocketAnvil:IsEquippedAndReady() then
-        if Cast(I.ElementiumPocketAnvil, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(100)) then return "elementium_pocket_anvil main 11"; end
+        if Cast(I.ElementiumPocketAnvil, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(8)) then return "elementium_pocket_anvil main 11"; end
       end
       -- use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=gcd.remains>0.7
       if I.BeacontotheBeyond:IsEquippedAndReady() then

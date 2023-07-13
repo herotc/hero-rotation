@@ -240,7 +240,7 @@ local function Cooldown()
     end
     -- use_item,name=elementium_pocket_anvil,use_off_gcd=1,if=!prev_gcd.1.fel_rush&gcd.remains
     if I.ElementiumPocketAnvil:IsEquippedAndReady() and (not Player:PrevGCDP(1, S.FelRush)) then
-      if Cast(I.ElementiumPocketAnvil, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(100)) then return "elementium_pocket_anvil cooldown 26"; end
+      if Cast(I.ElementiumPocketAnvil, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(8)) then return "elementium_pocket_anvil cooldown 26"; end
     end
   end
 end
