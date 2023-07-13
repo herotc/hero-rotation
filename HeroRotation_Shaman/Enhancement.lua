@@ -108,6 +108,8 @@ local function Precombat()
   -- flask
   -- food
   -- augmentation
+  -- Check weapon enchants
+  HasMainHandEnchant, MHEnchantTimeRemains, _, _, HasOffHandEnchant, OHEnchantTimeRemains = GetWeaponEnchantInfo()
   -- windfury_weapon
   if ((not HasMainHandEnchant) or MHEnchantTimeRemains < 600000) and S.WindfuryWeapon:IsCastable() then
     if Cast(S.WindfuryWeapon) then return "windfury_weapon enchant"; end
@@ -416,9 +418,6 @@ end
 
 --- ======= MAIN =======
 local function APL()
-  -- Check weapon enchants
-  HasMainHandEnchant, MHEnchantTimeRemains, _, _, HasOffHandEnchant, OHEnchantTimeRemains = GetWeaponEnchantInfo()
-
   -- Unit Update
   if AoEON() then
     Enemies10y = Player:GetEnemiesInMeleeRange(10)
