@@ -660,7 +660,7 @@ end
 local function Init()
   S.VampiricTouchDebuff:RegisterAuraTracking()
 
-  HR.Print("Shadow Priest rotation is currently a work in progress, but has been updated for patch 10.1.0.")
+  HR.Print("Shadow Priest rotation is currently a work in progress, but has been updated for patch 10.1.5.")
 end
 
 HR.SetAPL(258, APL, Init)
