@@ -413,8 +413,8 @@ local function APL()
     if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
       local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
     end
-    -- malefic_rapture,if=talent.dread_touch&talent.malefic_affliction&debuff.dread_touch.remains<2&buff.malefic_affliction.stack=3
-    if S.MaleficRapture:IsReady() and (S.DreadTouch:IsAvailable() and S.MaleficAffliction:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < 2 and Player:BuffStack(S.MaleficAfflictionBuff) == 3) then
+    -- malefic_rapture,if=talent.dread_touch&debuff.dread_touch.remains<2&debuff.dread_touch.up
+    if S.MaleficRapture:IsReady() and (S.DreadTouch:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < 2 and Target:DebuffUp(S.DreadTouchDebuff)) then
       if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 2"; end
     end
     -- unstable_affliction,if=remains<5
