@@ -53,7 +53,7 @@ Spell.Shaman.Commons = {
   WindShear                             = Spell(57994),
   -- Buffs
   LightningShieldBuff                   = Spell(192106),
-  PrimordialWaveBuff                    = Spell(375986),
+  PrimordialWaveBuff                    = Spell(327164),
   SpiritwalkersGraceBuff                = Spell(79206),
   SplinteredElementsBuff                = Spell(382043),
   -- Debuffs
@@ -69,6 +69,7 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   -- Abilities
   Windstrike                            = Spell(115356),
   -- Talents
+  AlphaWolf                             = Spell(198434),
   Ascendance                            = Spell(114051),
   AshenCatalyst                         = Spell(390370),
   ConvergingStorms                      = Spell(384363),
@@ -93,8 +94,10 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   Sundering                             = Spell(197214),
   SwirlingMaelstrom                     = Spell(384359),
   ThorimsInvocation                     = Spell(384444),
+  UnrulyWinds                           = Spell(390288),
   WindfuryTotem                         = Spell(8512),
   WindfuryWeapon                        = Spell(33757),
+  WitchDoctorsAncestry                  = Spell(384447),
   -- Buffs
   AscendanceBuff                        = Spell(114051),
   AshenCatalystBuff                     = Spell(390371),
@@ -107,6 +110,7 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   GatheringStormsBuff                   = Spell(198300),
   HailstormBuff                         = Spell(334196),
   HotHandBuff                           = Spell(215785),
+  IceStrikeBuff                         = Spell(384357),
   MaelstromWeaponBuff                   = Spell(344179),
   StormbringerBuff                      = Spell(201846),
   WindfuryTotemBuff                     = Spell(327942),
@@ -184,9 +188,10 @@ Spell.Shaman.Restoration = MergeTableByKey(Spell.Shaman.Commons, {
 if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Commons = {
   -- Trinkets
-  CacheofAcquiredTreasures              = Item(188265, {13, 14}),
-  ScarsofFraternalStrife                = Item(188253, {13, 14}),
-  TheFirstSigil                         = Item(188271, {13, 14}),
+  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
+  BeacontotheBeyond                     = Item(203963, {13, 14}),
+  ElementiumPocketAnvil                 = Item(202617, {13, 14}),
+  ManicGrieftorch                       = Item(194308, {13, 14}),
 }
 Item.Shaman.Enhancement = MergeTableByKey(Item.Shaman.Commons, {
 })
