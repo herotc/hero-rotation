@@ -90,8 +90,8 @@ local function EvaluateCycleMoonfire(TargetUnit)
 end
 
 local function EvaluateCycleThrash(TargetUnit)
-  -- target_if=refreshable|(dot.thrash_bear.stack<5&talent.flashing_claws.enabled|dot.thrash_bear.stack<3&!talent.flashing_claws.enabled)
-  return (TargetUnit:DebuffRefreshable(S.ThrashDebuff) or (Target:DebuffStack(S.ThrashDebuff) < 5 and S.FlashingClaws:IsAvailable() or Target:DebuffStack(S.ThrashDebuff) < 3 and not S.FlashingClaws:IsAvailable()))
+  -- target_if=refreshable|(dot.thrash_bear.stack<5&talent.flashing_claws.rank=2|dot.thrash_bear.stack<4&talent.flashing_claws.rank=1|dot.thrash_bear.stack<3&!talent.flashing_claws.enabled)
+  return (TargetUnit:DebuffRefreshable(S.ThrashDebuff) or (Target:DebuffStack(S.ThrashDebuff) < 5 and S.FlashingClaws:TalentRank() == 2 or Target:DebuffStack(S.ThrashDebuff) < 4 and S.FlashingClaws:TalentRank() == 1 or Target:DebuffStack(S.ThrashDebuff) < 3 and not S.FlashingClaws:IsAvailable()))
 end
 
 local function EvaluateCycleThrash2(TargetUnit)
@@ -185,7 +185,7 @@ local function Bear()
   if S.Moonfire:IsReady() then
     if Everyone.CastCycle(S.Moonfire, MeleeEnemies11y, EvaluateCycleMoonfire, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 6"; end
   end
-  -- thrash_bear,target_if=refreshable|(dot.thrash_bear.stack<5&talent.flashing_claws.enabled|dot.thrash_bear.stack<3&!talent.flashing_claws.enabled)
+  -- thrash_bear,target_if=refreshable|(dot.thrash_bear.stack<5&talent.flashing_claws.rank=2|dot.thrash_bear.stack<4&talent.flashing_claws.rank=1|dot.thrash_bear.stack<3&!talent.flashing_claws.enabled)
   if S.Thrash:IsCastable() then
     if Everyone.CastCycle(S.Thrash, MeleeEnemies11y, EvaluateCycleThrash, not Target:IsInMeleeRange(8)) then return "thrash bear 8"; end
   end
