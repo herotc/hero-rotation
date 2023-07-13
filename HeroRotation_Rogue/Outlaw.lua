@@ -46,6 +46,8 @@ local I = Item.Rogue.Outlaw
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
   I.ManicGrieftorch:ID(),
+  I.BeaconToTheBeyond:ID(),
+  I.DragonfireBombDispenser:ID(),
 }
 
 S.Dispatch:RegisterDamageFormula(
@@ -200,8 +202,7 @@ local function RtB_Reroll ()
         RtB_Buffs() -- Update cache
         if (Player:BuffDown(S.SkullandCrossbones) or Player:BuffRemains(S.SkullandCrossbones) > Rogue.RtBRemains())
           and Player:BuffDown(S.SubterfugeBuff) and Player:BuffDown(S.ShadowDanceBuff)
-          and ((Cache.APLVar.RtB_Buffs.Normal + Cache.APLVar.RtB_Buffs.Shorter) -
-            num(Player:BuffUp(S.GrandMelee) and Player:BuffRemains(S.GrandMelee) <= Rogue.RtBRemains())) < 2 then
+          and (Cache.APLVar.RtB_Buffs.Normal + Cache.APLVar.RtB_Buffs.Shorter) < 2 then
           Cache.APLVar.RtB_Reroll = true
         else
           Cache.APLVar.RtB_Reroll = false
@@ -210,12 +211,11 @@ local function RtB_Reroll ()
         if RtB_Buffs() == 2 then
           if Player:BuffUp(S.BuriedTreasure) and Player:BuffUp(S.GrandMelee) then
             Cache.APLVar.RtB_Reroll = true
-          elseif Player:BuffUp(S.LoadedDiceBuff) and not Player:BuffUp(S.Broadside) and not Player:BuffUp(S.TrueBearing) then
+	        elseif Player:BuffUp(S.LoadedDiceBuff) and not Player:BuffUp(S.Broadside) and not Player:BuffUp(S.TrueBearing) and not Player:BuffUp(S.SkullandCrossbones) then
             Cache.APLVar.RtB_Reroll = true
           end
         elseif RtB_Buffs() < 2
-          and (not Player:BuffUp(S.Broadside) and (not S.FanTheHammer:IsAvailable() or not Player:BuffUp(S.SkullandCrossbones))
-            and not Player:BuffUp(S.TrueBearing) or Player:BuffUp(S.LoadedDiceBuff)) then
+          and ((not Player:BuffUp(S.Broadside) and not Player:BuffUp(S.SkullandCrossbones) and not Player:BuffUp(S.TrueBearing)) or Player:BuffUp(S.LoadedDiceBuff)) then
           Cache.APLVar.RtB_Reroll = true
         else
           Cache.APLVar.RtB_Reroll = false
@@ -314,8 +314,12 @@ local function StealthCDs ()
         return
       end
     end
+    if S.KeepItRolling:IsAvailable() and S.Audacity:IsAvailable() and S.FindWeakness:IsAvailable() and Target:DebuffUp(S.BetweentheEyes) and Finish_Condition() then
+      if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish with Dispatch if KIR" end
+      return
+    end
   end
-  if S.ShadowDance:IsCastable() then
+  if S.ShadowDance:IsCastable() and CDsON() then
     -- actions.stealth_cds+=/variable,name=shadow_dance_condition,value=talent.shadow_dance&debuff.between_the_eyes.up&(!talent.ghostly_strike|debuff.ghostly_strike.up)&(!talent.dreadblades|!cooldown.dreadblades.ready)&(!talent.hidden_opportunity|!buff.audacity.up&(talent.fan_the_hammer.rank<2|!buff.opportunity.up))
     -- actions.stealth_cds+=/shadow_dance,if=!talent.keep_it_rolling&variable.shadow_dance_condition&buff.slice_and_dice.up&(variable.finish_condition|talent.hidden_opportunity)&(!talent.hidden_opportunity|!cooldown.vanish.ready)
     -- actions.stealth_cds+=/shadow_dance,if=talent.keep_it_rolling&variable.shadow_dance_condition&(cooldown.keep_it_rolling.remains<=30|cooldown.keep_it_rolling.remains>120&(variable.finish_condition|talent.hidden_opportunity))
@@ -337,21 +341,21 @@ local function StealthCDs ()
     end
   end
 end
-
+-- moved BF above AR according to priority - feel free to move back.
 local function CDs ()
-  -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!talent.improved_adrenaline_rush|combo_points<=2)
-  if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush)
-    and (not S.ImprovedAdrenalineRush:IsAvailable() or ComboPoints <= 2) then
-    if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
-  end
-  -- actions.cds+=/blade_flurry,if=spell_targets>=2&buff.blade_flurry.remains<gcd
-  if S.BladeFlurry:IsReady() and AoEON() and EnemiesBFCount >= 2
-    and Player:BuffRemains(S.BladeFlurry) < (Player:BuffUp(S.AdrenalineRush) and 0.8 or 1) then
+	-- actions.cds+=/blade_flurry,if=(spell_targets>=2|((buff.grand_melee.up&talent.hidden_opportunity)|(buff.grand_melee.remains>10))&!stealthed.rogue&!buff.dreadblades.up)&buff.blade_flurry.remains<gcd
+  if S.BladeFlurry:IsReady() and AoEON() and (EnemiesBFCount >= 2 or ((Player:BuffUp(S.GrandMelee) and S.HiddenOpportunity:IsAvailable()) or (Player:BuffRemains(S.GrandMelee) > 10))
+  and not Player:StealthUp(true, true, true) and not Player:BuffUp(S.Dreadblades)) and Player:BuffRemains(S.BladeFlurry) < (Player:GCD() + 0.1) then
     if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
       HR.CastSuggested(S.BladeFlurry)
     else
       if HR.Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
     end
+  end
+	-- actions.cds=adrenaline_rush,if=!buff.adrenaline_rush.up&(!talent.improved_adrenaline_rush|combo_points<=2)
+  if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush)
+    and (not S.ImprovedAdrenalineRush:IsAvailable() or ComboPoints <= 2) then
+    if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
   end
   -- actions.cds+=/roll_the_bones,if=buff.dreadblades.down&(rtb_buffs.total=0|variable.rtb_reroll)
   if S.RolltheBones:IsReady() and not Player:DebuffUp(S.Dreadblades) and (RtB_Buffs() == 0 or RtB_Reroll()) then
@@ -424,6 +428,11 @@ local function CDs ()
       if I.ManicGrieftorch:IsEquippedAndReady() and Target:FilteredTimeToDie(">", 2) and not Player:StealthUp(true, true) then
         if HR.Cast(I.ManicGrieftorch, nil, Settings.Commons.TrinketDisplayStyle) then return "Manic Grieftorch"; end
       end
+      -- beacon implement of my own, ownly suggests 0.25 after a gcd, may need changing to allow for reaction time. 
+      if I.BeaconToTheBeyond:IsEquippedAndReady() and not Player:StealthUp(true, true) and ((Target:DebuffRemains(S.BetweentheEyes) >= 3 and (not S.GhostlyStrike:IsAvailable() or Target:DebuffRemains(S.GhostlyStrike) >= 3)) or EnemiesBFCount > 2) 
+      and Player:GCDRemains() > Player:GCD() - 0.25 then
+        if HR.Cast(I.BeaconToTheBeyond, nil, Settings.Commons.TrinketDisplayStyle) then return "Beacon To The Beyond"; end
+	    end    
       -- actions.cds+=/use_item,name=windscar_whetstone,if=spell_targets.blade_flurry>desired_targets|raid_event.adds.in>60|fight_remains<7
       -- actions.cds+=/use_items,slots=trinket1,if=debuff.between_the_eyes.up|trinket.1.has_stat.any_dps|fight_remains<=20
       -- actions.cds+=/use_items,slots=trinket2,if=debuff.between_the_eyes.up|trinket.2.has_stat.any_dps|fight_remains<=20
@@ -488,6 +497,13 @@ end
 local function Build ()
   -- actions.build=sepsis,target_if=max:target.time_to_die*debuff.between_the_eyes.up,if=target.time_to_die>11&debuff.between_the_eyes.up|fight_remains<11
   -- TODO: target_if
+  -- Bomb Dispenser implementation of my own (this is not the same as the new one added to the apl as mine predates it - mine is setup to work alongside beacon. its also not in CDs because i don't think it should be treated as a cd)
+  if Settings.Commons.UseTrinkets then
+    if I.DragonfireBombDispenser:IsEquippedAndReady() and (Target:FilteredTimeToDie(">", 8) or EnemiesBFCount > 2 and Target:FilteredTimeToDie("<", 4)) and not Player:StealthUp(true, false) and ((Target:DebuffUp(S.BetweentheEyes) 
+    and (not S.GhostlyStrike:IsAvailable() or Target:DebuffRemains(S.GhostlyStrike) > 7)) or EnemiesBFCount > 2) and (I.BeaconToTheBeyond:CooldownRemains() >= 11 and not I.BeaconToTheBeyond:IsEquippedAndReady()) then
+      if HR.Cast(I.DragonfireBombDispenser, nil, Settings.Commons.TrinketDisplayStyle) then return "Dragonfire Bomb Dispenser"; end
+	  end
+  end
   if CDsON() and S.Sepsis:IsReady() and Target:IsSpellInRange(S.Sepsis)
     and (Target:FilteredTimeToDie(">", 11) and Target:DebuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 11)) then
     if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
@@ -497,15 +513,20 @@ local function Build ()
     and (EnemiesBFCount <= 2 or Player:BuffUp(S.Dreadblades)) and Player:BuffDown(S.SubterfugeBuff) and Target:FilteredTimeToDie(">=", 5) then
     if HR.Cast(S.GhostlyStrike, Settings.Outlaw.GCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike" end
   end
-  -- actions.build+=/ambush,if=(talent.hidden_opportunity|talent.keep_it_rolling)&(buff.audacity.up|buff.sepsis_buff.up|buff.subterfuge.up&cooldown.keep_it_rolling.ready)|talent.find_weakness&debuff.find_weakness.down
-  if S.Ambush:IsReady() then
-    if S.FindWeakness:IsAvailable() and not Target:DebuffUp(S.FindWeaknessDebuff) then
-      if HR.Cast(S.Ambush) then return "Cast Ambush (High-Prio FW)" end
+  -- actions.build+=/ambush,if=talent.keep_it_rolling&((buff.audacity.up|buff.sepsis_buff.up)&talent.find_weakness&debuff.find_weakness.remains<2|buff.subterfuge.up&cooldown.keep_it_rolling.ready)
+  -- actions.build+=/ambush,if=talent.hidden_opportunity&(buff.audacity.up|buff.sepsis_buff.up)
+	if S.Ambush:IsReady() then
+    if S.KeepItRolling:IsAvailable() and ((Player:BuffUp(S.AudacityBuff) or Player:BuffUp(S.SepsisBuff)) and S.FindWeakness:IsAvailable() and Target:DebuffRemains(S.FindWeaknessDebuff) < 2 or Player:BuffUp(S.SubterfugeBuff) and S.KeepItRolling:IsReady()) then
+      if HR.Cast(S.Ambush) then return "Cast Ambush (KIR)" end
     end
-    if (S.HiddenOpportunity:IsAvailable() or S.KeepItRolling:IsAvailable())
-      and (Player:BuffUp(S.AudacityBuff) or Player:BuffUp(S.SepsisBuff) or Player:BuffUp(S.SubterfugeBuff) and S.KeepItRolling:IsReady()) then
+    --"High priority Ambush line to apply Find Weakness or consume Audacity/Sepsis buff before Pistol Shot"
+    if S.HiddenOpportunity:IsAvailable() and (Player:BuffUp(S.AudacityBuff) or Player:BuffUp(S.SepsisBuff)) then
       if HR.Cast(S.Ambush) then return "Cast Ambush (High-Prio Buffed)" end
     end
+    --if (S.HiddenOpportunity:IsAvailable() or S.KeepItRolling:IsAvailable())
+    --  and (Player:BuffUp(S.AudacityBuff) or Player:BuffUp(S.SepsisBuff) or Player:BuffUp(S.SubterfugeBuff) and S.KeepItRolling:IsReady()) then
+    --  if HR.Cast(S.Ambush) then return "Cast Ambush (High-Prio Buffed)" end
+    --end
   end
   -- actions.build+=/pistol_shot,if=talent.fan_the_hammer&talent.audacity&talent.hidden_opportunity&buff.opportunity.up&!buff.audacity.up&!buff.subterfuge.up&!buff.shadow_dance.up
   -- actions.build+=/pistol_shot,if=buff.greenskins_wickers.up&(!talent.fan_the_hammer&buff.opportunity.up|buff.greenskins_wickers.remains<1.5)
@@ -529,8 +550,8 @@ local function Build ()
       end
     end
   end
-  -- actions.build+=/echoing_reprimand,if=!buff.dreadblades.up
-  if CDsON() and S.EchoingReprimand:IsReady() and not Player:DebuffUp(S.Dreadblades) then
+  -- actions.build+=/echoing_reprimand
+  if CDsON() and S.EchoingReprimand:IsReady() then
     if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
   end
   -- actions.build+=/pool_resource,for_next=1
@@ -722,7 +743,7 @@ end
 HR.SetAPL(260, APL, Init)
 
 --- ======= SIMC =======
--- Last Update: 2023-01-31
+-- Last Update: 2023-07-23
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=apply_poison
@@ -749,7 +770,7 @@ HR.SetAPL(260, APL, Init)
 -- # Additional Reroll Conditions for Keep it Rolling or Count the Odds
 -- actions+=/variable,name=rtb_reroll,if=!talent.hidden_opportunity&(talent.keep_it_rolling|talent.count_the_odds),value=variable.rtb_reroll|((rtb_buffs.normal=0&rtb_buffs.longer>=1)&!(buff.broadside.up&buff.true_bearing.up&buff.skull_and_crossbones.up)&!(buff.broadside.remains>39|buff.true_bearing.remains>39|buff.ruthless_precision.remains>39|buff.skull_and_crossbones.remains>39))
 -- # With Hidden Opportunity, prioritize rerolling for Skull and Crossbones over everything else
--- actions+=/variable,name=rtb_reroll,if=talent.hidden_opportunity,value=!rtb_buffs.will_lose.skull_and_crossbones&(rtb_buffs.will_lose-rtb_buffs.will_lose.grand_melee)<2&buff.shadow_dance.down&buff.subterfuge.down
+-- actions+=/variable,name=rtb_reroll,if=talent.hidden_opportunity,value=!rtb_buffs.will_lose.skull_and_crossbones&rtb_buffs.will_lose<2&buff.shadow_dance.down&buff.subterfuge.down
 -- # Avoid rerolls when we will not have time remaining on the fight or add wave to recoup the opportunity cost of the global
 -- actions+=/variable,name=rtb_reroll,op=reset,if=!(raid_event.adds.remains>12|raid_event.adds.up&(raid_event.adds.in-raid_event.adds.remains)<6|target.time_to_die>12)|fight_remains<12
 -- # Ensure we want to cast Ambush prior to triggering a Stealth cooldown
@@ -774,7 +795,8 @@ HR.SetAPL(260, APL, Init)
 -- actions.build=sepsis,target_if=max:target.time_to_die*debuff.between_the_eyes.up,if=target.time_to_die>11&debuff.between_the_eyes.up|fight_remains<11
 -- actions.build+=/ghostly_strike,if=debuff.ghostly_strike.remains<=3&(spell_targets.blade_flurry<=2|buff.dreadblades.up)&!buff.subterfuge.up&target.time_to_die>=5
 -- # High priority Ambush line to apply Find Weakness or consume Audacity/Sepsis buff before Pistol Shot
--- actions.build+=/ambush,if=(talent.hidden_opportunity|talent.keep_it_rolling)&(buff.audacity.up|buff.sepsis_buff.up|buff.subterfuge.up&cooldown.keep_it_rolling.ready)|talent.find_weakness&debuff.find_weakness.down
+-- actions.build+=/ambush,if=talent.keep_it_rolling&((buff.audacity.up|buff.sepsis_buff.up)&talent.find_weakness&debuff.find_weakness.remains<2|buff.subterfuge.up&cooldown.keep_it_rolling.ready)
+-- actions.build+=/ambush,if=talent.hidden_opportunity&(buff.audacity.up|buff.sepsis_buff.up)
 -- # With Audacity + Hidden Opportunity + Fan the Hammer, use Pistol Shot to proc Audacity any time Ambush is not available
 -- actions.build+=/pistol_shot,if=talent.fan_the_hammer&talent.audacity&talent.hidden_opportunity&buff.opportunity.up&!buff.audacity.up&!buff.subterfuge.up&!buff.shadow_dance.up
 -- # Use Greenskins Wickers buff immediately with Opportunity unless running Fan the Hammer
@@ -782,7 +804,7 @@ HR.SetAPL(260, APL, Init)
 -- # With Fan the Hammer, consume Opportunity at max stacks or if we will get max 4+ CP and Dreadblades is not up
 -- actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&(buff.opportunity.stack>=buff.opportunity.max_stack|buff.opportunity.remains<2)
 -- actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&combo_points.deficit>((1+talent.quick_draw)*talent.fan_the_hammer.rank)&!buff.dreadblades.up&(!talent.hidden_opportunity|!buff.subterfuge.up&!buff.shadow_dance.up)
--- actions.build+=/echoing_reprimand,if=!buff.dreadblades.up
+-- actions.build+=/echoing_reprimand
 -- actions.build+=/pool_resource,for_next=1
 -- actions.build+=/ambush,if=talent.hidden_opportunity|talent.find_weakness&debuff.find_weakness.down
 -- # Use Pistol Shot with Opportunity if Combat Potency won't overcap energy, when it will exactly cap CP, or when using Quick Draw
@@ -791,9 +813,9 @@ HR.SetAPL(260, APL, Init)
 
 -- # Cooldowns
 -- actions.cds=adrenaline_rush,if=!buff.adrenaline_rush.up&(!talent.improved_adrenaline_rush|combo_points<=2)
--- actions.cds+=/blade_flurry,if=spell_targets>=2&buff.blade_flurry.remains<gcd
+-- actions.cds+=/blade_flurry,if=(spell_targets>=2|((buff.grand_melee.up&talent.hidden_opportunity)|(buff.grand_melee.remains>10))&!stealthed.rogue&!buff.dreadblades.up)&buff.blade_flurry.remains<gcd
 -- actions.cds+=/roll_the_bones,if=buff.dreadblades.down&(rtb_buffs.total=0|variable.rtb_reroll)
--- actions.cds+=/keep_it_rolling,if=!variable.rtb_reroll&(buff.broadside.up+buff.true_bearing.up+buff.skull_and_crossbones.up+buff.ruthless_precision.up)>2&(buff.shadow_dance.down|rtb_buffs>=6)
+-- actions.cds+=/keep_it_rolling,if=!variable.rtb_reroll&(buff.broadside.up+buff.true_bearing.up+buff.skull_and_crossbones.up+buff.ruthless_precision.up+buff.grand_melee.up)>2&(buff.shadow_dance.down|rtb_buffs>=6)
 -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&!buff.dreadblades.up&(energy.base_time_to_max>4+stealthed.rogue-spell_targets%3)
 -- actions.cds+=/call_action_list,name=stealth_cds,if=!stealthed.all|talent.count_the_odds&!talent.hidden_opportunity&!variable.stealthed_cto
 -- actions.cds+=/dreadblades,if=!(variable.stealthed_cto|stealthed.basic|talent.hidden_opportunity&stealthed.rogue)&combo_points<=2&(!talent.marked_for_death|!cooldown.marked_for_death.ready)&target.time_to_die>=10
@@ -810,7 +832,9 @@ HR.SetAPL(260, APL, Init)
 -- actions.cds+=/fireblood
 -- actions.cds+=/ancestral_call
 -- # Default conditions for usable items.
--- actions.cds+=/use_item,name=manic_grieftorch,if=!stealthed.all&!buff.adrenaline_rush.up|fight_remains<5
+-- actions.cds+=/use_item,name=manic_grieftorch,use_off_gcd=1,if=gcd.remains>gcd.max-0.1&!stealthed.all&debuff.between_the_eyes.up&(!talent.ghostly_strike|debuff.ghostly_strike.up|spell_targets.blade_flurry>2)|fight_remains<=5
+-- actions.cds+=/use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1,if=(!trinket.1.is.dragonfire_bomb_dispenser&trinket.1.cooldown.remains>10|trinket.2.cooldown.remains>10)|cooldown.dragonfire_bomb_dispenser.charges>2|fight_remains<20|!trinket.2.has_cooldown|!trinket.1.has_cooldown
+-- actions.cds+=/use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=gcd.remains>gcd.max-0.1&!stealthed.all&debuff.between_the_eyes.up&(!talent.ghostly_strike|debuff.ghostly_strike.up|spell_targets.blade_flurry>2)|fight_remains<=5
 -- actions.cds+=/use_item,name=stormeaters_boon,if=spell_targets.blade_flurry>desired_targets|raid_event.adds.in>60|fight_remains<10
 -- actions.cds+=/use_item,name=windscar_whetstone,if=spell_targets.blade_flurry>desired_targets|raid_event.adds.in>60|fight_remains<7
 -- actions.cds+=/use_items,slots=trinket1,if=debuff.between_the_eyes.up|trinket.1.has_stat.any_dps|fight_remains<=20
@@ -828,8 +852,8 @@ HR.SetAPL(260, APL, Init)
 
 -- # Finishers
 -- # BtE to keep the Crit debuff up, if RP is up, or for Greenskins, unless the target is about to die.
--- actions.finish=between_the_eyes,if=target.time_to_die>3&(debuff.between_the_eyes.remains<4|talent.greenskins_wickers&!buff.greenskins_wickers.up|!talent.greenskins_wickers&talent.improved_between_the_eyes&buff.ruthless_precision.up)
--- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&refreshable&buff.grand_melee.down&(!talent.swift_slasher|combo_points>=cp_max_spend)
+-- actions.finish=between_the_eyes,if=target.time_to_die>3&(debuff.between_the_eyes.remains<4|talent.greenskins_wickers&!buff.greenskins_wickers.up|!talent.greenskins_wickers&talent.improved_between_the_eyes&buff.ruthless_precision.up|!talent.greenskins_wickers&set_bonus.tier30_4pc)
+-- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&refreshable&(!talent.swift_slasher|combo_points>=cp_max_spend)
 -- actions.finish+=/cold_blood
 -- actions.finish+=/dispatch
 
