@@ -413,8 +413,8 @@ local function APL()
     if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
       local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
     end
-    -- malefic_rapture,if=talent.dread_touch&debuff.dread_touch.remains<2&debuff.dread_touch.up
-    if S.MaleficRapture:IsReady() and (S.DreadTouch:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < 2 and Target:DebuffUp(S.DreadTouchDebuff)) then
+    -- malefic_rapture,if=talent.dread_touch&debuff.dread_touch.remains<2&(dot.agony.ticking&dot.corruption.ticking&(!talent.siphon_life|dot.siphon_life.ticking))&(!talent.phantom_singularity|!cooldown.phantom_singularity.ready)&(!talent.vile_taint|!cooldown.vile_taint.ready)&(!talent.soul_rot|!cooldown.soul_rot.ready)
+    if S.MaleficRapture:IsReady() and (S.DreadTouch:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < 2 and (Target:DebuffUp(S.AgonyDebuff) and Target:DebuffUp(S.CorruptionDebuff) and ((not S.SiphonLife:IsAvailable()) or Target:DebuffUp(S.SiphonLifeDebuff))) and ((not S.PhantomSingularity:IsAvailable()) or S.PhantomSingularity:CooldownDown()) and ((not S.VileTaint:IsAvailable()) or S.VileTaint:CooldownDown()) and ((not S.SoulRot:IsAvailable()) or S.SoulRot:CooldownDown())) then
       if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 2"; end
     end
     -- unstable_affliction,if=remains<5
@@ -465,8 +465,6 @@ local function APL()
     if S.MaleficRapture:IsReady() and (
       -- malefic_rapture,if=soul_shard>4|(talent.tormented_crescendo&buff.tormented_crescendo.stack=1&soul_shard>3)
       (Player:SoulShardsP() > 4 or (S.TormentedCrescendo:IsAvailable() and Player:BuffStack(S.TormentedCrescendoBuff) == 1 and Player:SoulShardsP() > 3)) or
-      -- malefic_rapture,if=talent.malefic_affliction&buff.malefic_affliction.stack<3
-      (S.MaleficAffliction:IsAvailable() and Player:BuffStack(S.MaleficAfflictionBuff) < 3) or
       -- malefic_rapture,if=talent.tormented_crescendo&buff.tormented_crescendo.react&!debuff.dread_touch.react
       (S.TormentedCrescendo:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Target:DebuffDown(S.DreadTouchDebuff)) or
       -- malefic_rapture,if=talent.tormented_crescendo&buff.tormented_crescendo.stack=2
