@@ -87,8 +87,8 @@ local function BlisteringScalesCheck()
   if Group == Player then
     return Player:BuffStack(S.BlisteringScalesBuff)
   else
-    for _, Char in pairs(Group) do
-      if Char:Exists() and (Char:IsTankingAoE(8) or Char:IsTanking(Target)) and Char:BuffUp(S.BlisteringScalesBuff) then
+    for unitID, Char in pairs(Group) do
+      if Char:Exists() and (Char:IsTankingAoE(8) or Char:IsTanking(Target)) and UnitGroupRolesAssigned(unitID) == "TANK" then
         return Char:BuffStack(S.BlisteringScalesBuff)
       end
     end
@@ -151,7 +151,7 @@ local function APL()
     -- interrupts
     local ShouldReturn = Everyone.Interrupt(25, S.Quell, Settings.Commons.OffGCDasOffGCD.Quell, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- unravel
-    if S.Unravel:IsReady() then
+    if S.Unravel:IsReady() and Target:EnemyAbsorb() then
       if Cast(S.Unravel, Settings.Commons.GCDasOffGCD.Unravel, nil, not Target:IsSpellInRange(S.Unravel)) then return "unravel main 2"; end
     end
     -- living_flame,if=time<cast_time*2
