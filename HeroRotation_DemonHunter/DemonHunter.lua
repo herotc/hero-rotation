@@ -34,6 +34,7 @@ Spell.DemonHunter.Commons = {
   Demonic                               = Spell(213410),
   ElysianDecree                         = Spell(390163),
   Felblade                              = Spell(232893),
+  FirstoftheIllidari                    = Spell(235893),
   FoddertotheFlame                      = Spell(391429),
   SigilofFlame                          = MultiSpell(204596, 204513, 389810), -- 204596: Base ID, 204513: Concentrated, 389810: Precise
   TheHunt                               = Spell(370965),
@@ -68,19 +69,22 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   FelDevastation                        = Spell(212084),
   FieryBrand                            = Spell(204021),
   FieryDemise                           = Spell(389220),
+  FocusedCleave                         = Spell(343207),
   Frailty                               = Spell(389958),
   Fracture                              = Spell(263642),
   ShearFury                             = Spell(389997),
   SoulBarrier                           = Spell(263648),
   SoulCarver                            = Spell(207407),
-  SoulCrush                             = Spell(389985),
+  Soulcrush                             = Spell(389985),
   SpiritBomb                            = Spell(247454),
+  StoketheFlames                        = Spell(393827),
   Vulnerability                         = Spell(389976),
   -- Utility
   Metamorphosis                         = Spell(187827),
   -- Buffs
   DemonSpikesBuff                       = Spell(203819),
   MetamorphosisBuff                     = Spell(187827),
+  RecriminationBuff                     = Spell(409877), -- Tier 30 4pc
   -- Debuffs
   FieryBrandDebuff                      = Spell(207771),
   FrailtyDebuff                         = Spell(247456),
