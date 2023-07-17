@@ -72,7 +72,6 @@ HR.GUISettings.APL.Warlock = {
       DemonicStrength = false,
       GrimoireFelguard = false,
       Implosion = false,
-      InquisitorsGaze = false,
       NetherPortal = true,
       PowerSiphon = true,
       SummonDemonicTyrant = false,
