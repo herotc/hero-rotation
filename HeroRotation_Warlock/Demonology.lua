@@ -261,7 +261,7 @@ local function Tyrant()
   if S.CallDreadstalkers:IsReady() and ((VilefiendActive() or (not S.SummonVilefiend:IsAvailable()) and ((not S.NetherPortal:IsAvailable()) or Player:BuffUp(S.NetherPortalBuff) or S.NetherPortal:CooldownRemains() > 30) and (Player:BuffUp(S.NetherPortalBuff) or GrimoireFelguardActive() or Player:SoulShardsP() == 5)) and S.SummonDemonicTyrant:CooldownRemains() < 11 and VarNP) then
     if Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers tyrant 20"; end
   end
-  -- grimoire_felguard,if=buff.vilefiend.up|!talent.summon_vilefiend&(!talent.nether_portal|buff.nether_portal.up|cooldown.nether_portal.remains>30)&(buff.nether_portal.up|buff.dreadstalkers.up|soul_shard=5)&variable.np
+  -- grimoire_felguard,if=buff.vilefiend.up|!talent.summon_vilefiend&(!talent.nether_portal|buff.nether_portal.up|cooldown.nether_portal.remains>30)&(buff.nether_portal.up|buff.dreadstalkers.up|soul_shard=5)&variable.np&(!raid_event.adds.in<15-raid_event.add.duration)
   if S.GrimoireFelguard:IsReady() and (VilefiendActive() or (not S.SummonVilefiend:IsAvailable()) and ((not S.NetherPortal:IsAvailable()) or Player:BuffUp(S.NetherPortalBuff) or S.NetherPortal:CooldownRemains() > 30) and (Player:BuffUp(S.NetherPortalBuff) or DreadstalkerActive() or Player:SoulShardsP() == 5) and VarNP) then
     if Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, not Target:IsSpellInRange(S.GrimoireFelguard)) then return "grimoire_felguard tyrant 22"; end
   end
