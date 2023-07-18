@@ -211,23 +211,13 @@ local function Cooldown()
     if I.IrideusFragment:IsEquippedAndReady() and (S.Metamorphosis:CooldownRemains() <= GCDMax and CombatTime > 2 and FightRemains % 180 > 10 and FightRemains % 180 < 22 or FightRemains < 22) then
       if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment cooldown 14"; end
     end
-    local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
-    local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
-    -- use_items,slots=trinket1,if=(variable.trinket_sync_slot=1&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.1.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready)|!variable.trinket_sync_slot)&(!talent.initiative|buff.initiative.up)
-    if Trinket1ToUse and ((VarTrinketSyncSlot == 1 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > (mathmin(FightRemains, Trinket1ToUse:Cooldown()))) or FightRemains <= 20) or (VarTrinketSyncSlot == 2 and not Trinket2ToUse) or VarTrinketSyncSlot == 0) and ((not S.Initiative:IsAvailable()) or Player:BuffUp(S.InitiativeBuff))) then
-      if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 cooldown 16"; end
-    end
-    -- use_items,slots=trinket2,if=(variable.trinket_sync_slot=2&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.2.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=1&!trinket.1.cooldown.ready)|!variable.trinket_sync_slot)&(!talent.initiative|buff.initiative.up)
-    if Trinket2ToUse and ((VarTrinketSyncSlot == 2 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > (mathmin(FightRemains, Trinket2ToUse:Cooldown()))) or FightRemains <= 20) or (VarTrinketSyncSlot == 1 and not Trinket1ToUse) or VarTrinketSyncSlot == 0) and ((not S.Initiative:IsAvailable()) or Player:BuffUp(S.InitiativeBuff))) then
-      if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 cooldown 18"; end
-    end
     -- use_item,name=stormeaters_boon,use_off_gcd=1,if=cooldown.metamorphosis.remains&(!talent.momentum|buff.momentum.remains>5)&(active_enemies>1|raid_event.adds.in>140)
     if I.StormEatersBoon:IsEquippedAndReady() and (S.Metamorphosis:CooldownDown() and ((not S.Momentum:IsAvailable()) or Player:BuffRemains(S.MomentumBuff) > 5)) then
-      if Cast(I.StormEatersBoon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "stormeaters_boon cooldown 20"; end
+      if Cast(I.StormEatersBoon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "stormeaters_boon cooldown 16"; end
     end
     -- use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=buff.vengeful_retreat_movement.down&debuff.essence_break.down&!prev_gcd.1.essence_break&(!equipped.irideus_fragment|trinket.1.cooldown.remains>20|trinket.2.cooldown.remains>20)
     if I.BeacontotheBeyond:IsEquippedAndReady() and (Target:DebuffDown(S.EssenceBreakDebuff) and (not Player:PrevGCDP(1, S.EssenceBreak)) and ((not I.IrideusFragment:IsEquipped()) or trinket1:CooldownRemains() > 20 or trinket2:CooldownRemains() > 20)) then
-      if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond cooldown 22"; end
+      if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond cooldown 18"; end
     end
     -- use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1,if=(time_to_die<30|cooldown.vengeful_retreat.remains<5|equipped.beacon_to_the_beyond|equipped.irideus_fragment)&(trinket.1.cooldown.remains>10|trinket.2.cooldown.remains>10|trinket.1.cooldown.duration=0|trinket.2.cooldown.duration=0|equipped.elementium_pocket_anvil|equipped.screaming_black_dragonscale|equipped.mark_of_dargrul)|(trinket.1.cooldown.duration>0|trinket.2.cooldown.duration>0)&(trinket.1.cooldown.remains|trinket.2.cooldown.remains)&!equipped.elementium_pocket_anvil&time<25
     if I.DragonfireBombDispenser:IsEquippedAndReady() then
@@ -235,12 +225,22 @@ local function Cooldown()
       -- local DBDSpell = I.DragonfireBombDispenser:OnUseSpell()
       -- local DBDCharges = DBDSpell and DBDSpell:Charges() or 0
       if (Target:TimeToDie() < 30 or I.BeacontotheBeyond:IsEquipped() or I.IrideusFragment:IsEquipped()) and (trinket1:CooldownRemains() > 10 or trinket2:CooldownRemains() > 10 or trinket1:Cooldown() == 0 or trinket2:Cooldown() == 0 or I.ElementiumPocketAnvil:IsEquipped() or I.ScreamingBlackDragonscale:IsEquipped() or I.MarkofDargrul:IsEquipped()) or (trinket1:Cooldown() > 0 and trinket2:Cooldown() > 0) and (trinket1:CooldownDown() or trinket2:CooldownDown()) and (not I.ElementiumPocketAnvil:IsEquipped()) and CombatTime < 25 then
-        if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser cooldown 24"; end
+        if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser cooldown 20"; end
       end
     end
     -- use_item,name=elementium_pocket_anvil,use_off_gcd=1,if=!prev_gcd.1.fel_rush&gcd.remains
     if I.ElementiumPocketAnvil:IsEquippedAndReady() and (not Player:PrevGCDP(1, S.FelRush)) then
-      if Cast(I.ElementiumPocketAnvil, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(8)) then return "elementium_pocket_anvil cooldown 26"; end
+      if Cast(I.ElementiumPocketAnvil, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(8)) then return "elementium_pocket_anvil cooldown 22"; end
+    end
+    local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
+    local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
+    -- use_items,slots=trinket1,if=(variable.trinket_sync_slot=1&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.1.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready)|!variable.trinket_sync_slot)&(!talent.initiative|buff.initiative.up)
+    if Trinket1ToUse and ((VarTrinketSyncSlot == 1 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > (mathmin(FightRemains, Trinket1ToUse:Cooldown()))) or FightRemains <= 20) or (VarTrinketSyncSlot == 2 and not Trinket2ToUse) or VarTrinketSyncSlot == 0) and ((not S.Initiative:IsAvailable()) or Player:BuffUp(S.InitiativeBuff))) then
+      if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 cooldown 24"; end
+    end
+    -- use_items,slots=trinket2,if=(variable.trinket_sync_slot=2&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.2.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=1&!trinket.1.cooldown.ready)|!variable.trinket_sync_slot)&(!talent.initiative|buff.initiative.up)
+    if Trinket2ToUse and ((VarTrinketSyncSlot == 2 and (Player:BuffUp(S.MetamorphosisBuff) or ((not S.Demonic:IsAvailable()) and S.Metamorphosis:CooldownRemains() > (mathmin(FightRemains, Trinket2ToUse:Cooldown()))) or FightRemains <= 20) or (VarTrinketSyncSlot == 1 and not Trinket1ToUse) or VarTrinketSyncSlot == 0) and ((not S.Initiative:IsAvailable()) or Player:BuffUp(S.InitiativeBuff))) then
+      if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 cooldown 26"; end
     end
   end
 end
