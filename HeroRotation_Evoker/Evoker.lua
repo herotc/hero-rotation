@@ -37,8 +37,10 @@ Spell.Evoker.Commons = {
   -- Talents
   AncientFlame                          = Spell(369990),
   BlastFurnace                          = Spell(375510),
+  LeapingFlames                         = Spell(369939),
   ObsidianScales                        = Spell(363916),
   ScarletAdaptation                     = Spell(372469),
+  SourceofMagic                         = Spell(369459),
   TipTheScales                          = Spell(370553),
   Unravel                               = Spell(368432),
   VerdantEmbrace                        = Spell(360995),
@@ -50,6 +52,7 @@ Spell.Evoker.Commons = {
   LeapingFlamesBuff                     = Spell(370901),
   PowerInfusionBuff                     = Spell(10060),
   ScarletAdaptationBuff                 = Spell(372470),
+  SourceofMagicBuff                     = Spell(369459),
   -- Trinket Effects
   SpoilsofNeltharusCrit                 = Spell(381954),
   SpoilsofNeltharusHaste                = Spell(381955),
@@ -62,18 +65,25 @@ Spell.Evoker.Commons = {
 }
 
 Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
+  -- Attunements
+  BlackAttunement                       = Spell(403264),
+  BronzeAttunement                      = Spell(403265),
   -- Talents
   BlisteringScales                      = Spell(360827),
   BreathofEons                          = Spell(403631),
+  DreamofSpring                         = Spell(414969),
   EbonMight                             = Spell(395152),
   Eruption                              = Spell(395160),
   FontofMagic                           = Spell(408083),
+  InterwovenThreads                     = Spell(412713),
   Prescience                            = Spell(409311),
   PupilofAlexstrasza                    = Spell(407814),
   TimeSkip                              = Spell(404977),
   Upheaval                              = Spell(408092),
   -- Buffs
+  BlackAttunementBuff                   = Spell(403264),
   BlisteringScalesBuff                  = Spell(360827),
+  BronzeAttunementBuff                  = Spell(403265),
   EbonMightOtherBuff                    = Spell(395152),
   EbonMightSelfBuff                     = Spell(395296),
   EssenceBurstBuff                      = Spell(392268),

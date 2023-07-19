@@ -103,6 +103,8 @@ AugOldIsReady = HL.AddCoreOverride ("Spell.IsReady",
       return BaseCheck and Player:EssenceP() >= 2
     elseif self == SpellAug.EbonMight then
       return BaseCheck and not Player:IsCasting(self)
+    elseif self == SpellAug.Unravel then
+      return BaseCheck and Target:EnemyAbsorb()
     else
       return BaseCheck
     end
@@ -125,6 +127,16 @@ AugOldBuffRemains = HL.AddCoreOverride ("Player.BuffRemains",
     else
       return AugOldBuffRemains(self, Spell, AnyCaster, Offset)
     end
+  end
+, 1473)
+
+HL.AddCoreOverride ("Player.EmpowerCastTime",
+  function(self, stage)
+    local Haste = Player:SpellHaste()
+    local FoMEmpowerMod = (SpellAug.FontofMagic:IsAvailable()) and 0.8 or 1
+    local MaxEmpower = (SpellAug.FontofMagic:IsAvailable()) and 4 or 3
+    if not stage then stage = MaxEmpower end
+    return ((1 + 0.75 * (stage - 1)) * Haste * FoMEmpowerMod)
   end
 , 1473)
 
