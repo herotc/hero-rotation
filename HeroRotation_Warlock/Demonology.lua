@@ -341,6 +341,10 @@ local function Racials()
   if S.Fireblood:IsCastable() then
     if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood racials 6"; end
   end
+  -- ancestral_call
+  if S.AncestralCall:IsCastable() then
+    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call racials 8"; end
+  end
 end
 
 local function Items()

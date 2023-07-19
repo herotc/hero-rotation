@@ -180,6 +180,10 @@ local function oGCD()
     if S.Fireblood:IsCastable() then
       if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood ogcd 8"; end
     end
+    -- ancestral_call,if=variable.cds_active
+    if S.AncestralCall:IsCastable() then
+      if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call ogcd 10"; end
+    end
   end
 end
 

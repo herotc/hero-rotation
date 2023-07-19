@@ -209,28 +209,31 @@ local function Items()
 end
 
 local function oGCD()
-  if InfernalTime() > 0 or not S.SummonInfernal:IsAvailable() then
-    -- potion,if=pet.infernal.active|!talent.summon_infernal
-    if Settings.Commons.Enabled.Potions then
-      local PotionSelected = Everyone.PotionSelected()
-      if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 2"; end
-      end
+  -- potion,if=pet.infernal.active|!talent.summon_infernal
+  if Settings.Commons.Enabled.Potions and (InfernalTime() > 0 or not S.SummonInfernal:IsAvailable()) then
+    local PotionSelected = Everyone.PotionSelected()
+    if PotionSelected and PotionSelected:IsReady() then
+      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 2"; end
     end
-    -- invoke_external_buff,name=power_infusion,if=pet.infernal.active|!talent.summon_infernal|(fight_remains<cooldown.summon_infernal.remains+10+cooldown.invoke_power_infusion_0.duration&fight_remains>cooldown.invoke_power_infusion_0.duration)|fight_remains<cooldown.summon_infernal.remains+15
-    -- Note: Not handling external PI.
-    -- berserking,if=pet.infernal.active|!talent.summon_infernal|(fight_remains<(cooldown.summon_infernal.remains+cooldown.berserking.duration)&(fight_remains>cooldown.berserking.duration))|fight_remains<cooldown.summon_infernal.remains
-    if S.Berserking:IsCastable() and (FightRemains < (S.SummonInfernal:CooldownRemains() + 12) and (FightRemains > 12) or FightRemains < S.SummonInfernal:CooldownRemains()) then
-      if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 4"; end
-    end
-    -- blood_fury,if=pet.infernal.active|!talent.summon_infernal|(fight_remains<cooldown.summon_infernal.remains+10+cooldown.blood_fury.duration&fight_remains>cooldown.blood_fury.duration)|fight_remains<cooldown.summon_infernal.remains
-    if S.BloodFury:IsCastable() and (FightRemains < (S.SummonInfernal:CooldownRemains() + 10 + 15) and (FightRemains > 15) or FightRemains < S.SummonInfernal:CooldownRemains()) then
-      if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 6"; end
-    end
-    -- fireblood,if=pet.infernal.active|!talent.summon_infernal|(fight_remains<cooldown.summon_infernal.remains+10+cooldown.fireblood.duration&fight_remains>cooldown.fireblood.duration)|fight_remains<cooldown.summon_infernal.remains
-    if S.Fireblood:IsCastable() and (FightRemains < (S.SummonInfernal:CooldownRemains() + 10 + 8) and (FightRemains > 8) or FightRemains < S.SummonInfernal:CooldownRemains()) then
-      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 8"; end
-    end
+  end
+  -- invoke_external_buff,name=power_infusion,if=pet.infernal.active|!talent.summon_infernal|(fight_remains<cooldown.summon_infernal.remains+10+cooldown.invoke_power_infusion_0.duration&fight_remains>cooldown.invoke_power_infusion_0.duration)|fight_remains<cooldown.summon_infernal.remains+15
+  -- Note: Not handling external PI.
+  -- berserking,if=pet.infernal.active|!talent.summon_infernal|(fight_remains<(cooldown.summon_infernal.remains+cooldown.berserking.duration)&(fight_remains>cooldown.berserking.duration))|fight_remains<cooldown.summon_infernal.remains
+  if S.Berserking:IsCastable() and (InfernalTime() > 0 or (not S.SummonInfernal:IsAvailable()) or (FightRemains < (S.SummonInfernal:CooldownRemains() + 12) and (FightRemains > 12)) or FightRemains < S.SummonInfernal:CooldownRemains()) then
+    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 4"; end
+  end
+  -- blood_fury,if=pet.infernal.active|!talent.summon_infernal|(fight_remains<cooldown.summon_infernal.remains+10+cooldown.blood_fury.duration&fight_remains>cooldown.blood_fury.duration)|fight_remains<cooldown.summon_infernal.remains
+  if S.BloodFury:IsCastable() and (InfernalTime() > 0 or (not S.SummonInfernal:IsAvailable()) or (FightRemains < (S.SummonInfernal:CooldownRemains() + 10 + 15) and (FightRemains > 15)) or FightRemains < S.SummonInfernal:CooldownRemains()) then
+    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 6"; end
+  end
+  -- fireblood,if=pet.infernal.active|!talent.summon_infernal|(fight_remains<cooldown.summon_infernal.remains+10+cooldown.fireblood.duration&fight_remains>cooldown.fireblood.duration)|fight_remains<cooldown.summon_infernal.remains
+  if S.Fireblood:IsCastable() and (InfernalTime() > 0 or (not S.SummonInfernal:IsAvailable()) or (FightRemains < (S.SummonInfernal:CooldownRemains() + 10 + 8) and (FightRemains > 8)) or FightRemains < S.SummonInfernal:CooldownRemains()) then
+    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 8"; end
+  end
+  -- ancestral_call,if=variable.infernal_active|!talent.summon_infernal|(fight_remains<(cooldown.summon_infernal.remains_expected+cooldown.berserking.duration)&(fight_remains>cooldown.berserking.duration))|fight_remains<cooldown.summon_infernal.remains_expected
+  -- Note: Assume they copied from berserking and actually meant to use ancestral_call durations
+  if S.AncestralCall:IsCastable() and (InfernalTime() > 0 or (not S.SummonInfernal:IsAvailable()) or (FightRemains < (S.SummonInfernal:CooldownRemains() + 15) and (FightRemains > 15)) or FightRemains < S.SummonInfernal:CooldownRemains()) then
+    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call ogcd 10"; end
   end
 end
 

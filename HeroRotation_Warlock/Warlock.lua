@@ -24,6 +24,7 @@ local HR         = HeroRotation
 if not Spell.Warlock then Spell.Warlock = {} end
 Spell.Warlock.Commons = {
   -- Racials
+  AncestralCall                         = Spell(274738),
   Berserking                            = Spell(26297),
   BloodFury                             = Spell(33702),
   Fireblood                             = Spell(265221),
