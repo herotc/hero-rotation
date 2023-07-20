@@ -501,8 +501,6 @@ local function APL()
   else
     EnemiesCount8yMelee = 1
   end
-  -- DEBUG REMOVE ME
-  EnemiesCount8yMelee = 8
 
   UpdateSoulFragments()
   UpdateIsInMeleeRange()
