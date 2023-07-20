@@ -215,16 +215,6 @@ local function Filler()
 end
 
 local function Trinkets()
-  if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=elementium_pocket_anvil,use_off_gcd=1
-    if I.ElementiumPocketAnvil:IsEquippedAndReady() then
-      if Cast(I.ElementiumPocketAnvil, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(8)) then return "elementium_pocket_anvil trinkets 2"; end
-    end
-    -- use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1
-    if I.DragonfireBombDispenser:IsEquippedAndReady() then
-      if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser trinkets 4"; end
-    end
-  end
   -- use_items
   if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
@@ -236,21 +226,27 @@ local function Trinkets()
       end
     end
   end
+  -- use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1
+  if Settings.Commons.Enabled.Trinkets and I.DragonfireBombDispenser:IsEquippedAndReady() then
+    if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser trinkets 2"; end
+  end
 end
 
 local function Maintenance()
+  -- invoke_external_buff,name=symbol_of_hope,if=cooldown.fiery_brand.charges=0
+  -- Note: Not handling external buffs.
+  -- metamorphosis,if=talent.first_of_the_illidari
+  if S.Metamorphosis:IsCastable() and (S.FirstoftheIllidari:IsAvailable()) then
+    if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis) then return "metamorphosis maintenance 2"; end
+  end
   -- call_action_list,name=trinkets
   local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
   -- potion
   if Settings.Commons.Enabled.Potions then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion maintenance 2"; end
+      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion maintenance 4"; end
     end
-  end
-  -- metamorphosis,if=talent.first_of_the_illidari
-  if S.Metamorphosis:IsCastable() and (S.FirstoftheIllidari:IsAvailable()) then
-    if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis) then return "metamorphosis maintenance 4"; end
   end
   -- fiery_brand,if=charges>=2|(!ticking&((variable.next_fire_cd_time<7)|(variable.next_fire_cd_time>28)))
   if S.FieryBrand:IsCastable() and (S.FieryBrand:Charges() >= 2 or (Target:DebuffDown(S.FieryBrandDebuff) and (VarNextFireCDTime < 7 or VarNextFireCDTime > 28))) then
@@ -263,10 +259,6 @@ local function Maintenance()
   -- fracture,target_if=max:dot.fiery_brand.remains,if=dot.fiery_brand.ticking&buff.recrimination.up
   if S.Fracture:IsCastable() and (Player:BuffUp(S.RecriminationBuff)) then
     if Everyone.CastTargetIf(S.Fracture, Enemies8yMelee, "max", EvaluateTargetIfFilterFBRemains, EvaluateTargetIfFractureMaintenance, not IsInMeleeRange) then return "fracture maintenance 10"; end
-  end
-  -- fracture,if=buff.recrimination.up
-  if S.Fracture:IsCastable() and (Player:BuffUp(S.RecriminationBuff)) then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture maintenance 12"; end
   end
   -- fracture,if=(full_recharge_time<=cast_time+gcd.remains)
   if S.Fracture:IsCastable() and (S.Fracture:FullRechargeTime() <= S.Fracture:CastTime() + Player:GCDRemains()) then
@@ -319,41 +311,49 @@ local function SingleTarget()
   if S.FelDevastation:IsReady() and (not (S.Demonic:IsAvailable() and Player:BuffUp(S.MetamorphosisBuff))) then
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation single_target 14"; end
   end
+  -- sigil_of_flame,if=fury<70
+  if S.SigilofFlame:IsCastable() and (Player:Fury() < 70) then
+    if S.ConcentratedSigils:IsAvailable() then
+      if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not IsInAoERange) then return "sigil_of_flame single_target 16 (Concentrated)"; end
+    else
+      if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame single_target 16 (Normal)"; end
+    end
+  end
   -- spirit_bomb,if=((variable.fd&soul_fragments>=4)|soul_fragments>=5)
   if S.SpiritBomb:IsReady() and ((VarFD and SoulFragments >= 4) or SoulFragments >= 5) then
-    if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb single_target 16"; end
+    if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb single_target 18"; end
   end
   -- fracture,if=set_bonus.tier30_4pc&variable.fd
   if S.Fracture:IsCastable() and (Player:HasTier(30, 4) and VarFD) then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture single_target 18"; end
-  end
-  -- spirit_bomb,if=((variable.fd&soul_fragments>=3)|soul_fragments>=4)
-  if S.SpiritBomb:IsReady() and ((VarFD and SoulFragments >= 3) or SoulFragments >= 4) then
-    if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb single_target 20"; end
+    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture single_target 20"; end
   end
   -- soul_cleave,if=talent.focused_cleave
   if S.SoulCleave:IsReady() and (S.FocusedCleave:IsAvailable()) then
     if Cast(S.SoulCleave, nil, nil, not IsInMeleeRange) then return "soul_cleave single_target 22"; end
   end
+  -- spirit_bomb,if=((variable.fd&soul_fragments>=3)|soul_fragments>=4)
+  if S.SpiritBomb:IsReady() and ((VarFD and SoulFragments >= 3) or SoulFragments >= 4) then
+    if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb single_target 24"; end
+  end
+  -- soul_cleave
+  if S.SoulCleave:IsReady() then
+    if Cast(S.SoulCleave, nil, nil, not IsInMeleeRange) then return "soul_cleave single_target 26"; end
+  end
   -- fracture
   if S.Fracture:IsCastable() then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture single_target 24"; end
+    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture single_target 28"; end
   end
   -- spirit_bomb,if=((variable.fd&soul_fragments>=2)|soul_fragments>=3)
   if S.SpiritBomb:IsReady() and ((VarFD and SoulFragments >= 2) or SoulFragments >= 3) then
-    if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb single_target 26"; end
+    if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb single_target 30"; end
   end
   -- sigil_of_flame
   if S.SigilofFlame:IsCastable() then
     if S.ConcentratedSigils:IsAvailable() then
-      if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not IsInAoERange) then return "sigil_of_flame single_target 28 (Concentrated)"; end
+      if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not IsInAoERange) then return "sigil_of_flame single_target 32 (Concentrated)"; end
     else
-      if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame single_target 28 (Normal)"; end
+      if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame single_target 32 (Normal)"; end
     end
-  end
-  -- soul_cleave
-  if S.SoulCleave:IsReady() then
-    if Cast(S.SoulCleave, nil, nil, not IsInMeleeRange) then return "soul_cleave single_target 30"; end
   end
   -- call_action_list,name=filler
   local ShouldReturn = Filler(); if ShouldReturn then return ShouldReturn; end
@@ -549,6 +549,10 @@ local function APL()
     -- variable,name=frailty_ready,value=!talent.soulcrush|debuff.frailty.stack>=2
     VarFrailtyReady = (not S.Soulcrush:IsAvailable()) or Target:DebuffStack(S.FrailtyDebuff) >= 2
     -- auto_attack
+    -- use_item,name=elementium_pocket_anvil,use_off_gcd=1
+    if Settings.Commons.Enabled.Trinkets and I.ElementiumPocketAnvil:IsEquippedAndReady() then
+      if Cast(I.ElementiumPocketAnvil, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(8)) then return "elementium_pocket_anvil main 1"; end
+    end
     -- disrupt,if=target.debuff.casting.react (Interrupts)
     local ShouldReturn = Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, false); if ShouldReturn then return ShouldReturn; end
     -- Manually added: Defensives
