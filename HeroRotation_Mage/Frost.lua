@@ -357,10 +357,6 @@ local function APL()
     end
     -- counterspell
     local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
-    -- water_jet
-    if Pet:IsActive() and S.WaterJet:IsReady() then
-      if Cast(S.WaterJet, Settings.Frost.GCDasOffGCD.WaterJet, nil, not Target:IsSpellInRange(S.WaterJet)) then return "water_jet main 2"; end
-    end
     -- call_action_list,name=cds
     if CDsON() then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
