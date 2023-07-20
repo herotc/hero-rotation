@@ -14,6 +14,8 @@ local HR      = HeroRotation
 local SpellArcane = Spell.Mage.Arcane
 local SpellFire   = Spell.Mage.Fire
 local SpellFrost  = Spell.Mage.Frost
+-- lua
+local mathmin     = math.min
 
 local Settings = {
   General = HR.GUISettings.General,
@@ -268,7 +270,10 @@ FrostOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffStackP",
   function (self, Spell, AnyCaster, Offset)
     local BaseCheck = Player:BuffStack(Spell)
     if Spell == SpellFrost.IciclesBuff then
-      return self:IsCasting(SpellFrost.GlacialSpike) and 0 or math.min(BaseCheck + (self:IsCasting(SpellFrost.Frostbolt) and 1 or 0), 5)
+      local Icicles = BaseCheck
+      if self:IsCasting(SpellFrost.GlacialSpike) then return 0 end
+      if (not SpellFrost.GlacialSpike:IsAvailable()) and SpellFrost.IceLance:TimeSinceLastCast() < 2 * Player:SpellHaste() then Icicles = 0 end
+      return mathmin(Icicles + (self:IsCasting(SpellFrost.Frostbolt) and 1 or 0), 5)
     elseif Spell == SpellFrost.GlacialSpikeBuff then
       return self:IsCasting(SpellFrost.GlacialSpike) and 0 or BaseCheck
     elseif Spell == SpellFrost.WintersReachBuff then

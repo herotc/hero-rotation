@@ -49,12 +49,16 @@ HR.GUISettings.APL.Mage = {
     PotionType = {
       Selected = "Power",
     },
+    DisplayStyle = {
+      Movement = "Suggested",
+    },
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
-      RuneOfPower = true,
-      IcyVeins = true,
+      Freeze = false,
       FrozenOrb = true,
+      IcyVeins = true,
+      WaterJet = false,
     },
     -- {Display OffGCD as OffGCD}
     OffGCDasOffGCD = {
@@ -74,7 +78,6 @@ HR.GUISettings.APL.Mage = {
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
-      RuneOfPower = true,
     },
     -- {Display OffGCD as OffGCD}
     OffGCDasOffGCD = {
@@ -96,7 +99,6 @@ HR.GUISettings.APL.Mage = {
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
-      RuneOfPower = true,
       ArcaneSurge = true,
       MirrorImage = true,
       TouchOfTheMagi = true,

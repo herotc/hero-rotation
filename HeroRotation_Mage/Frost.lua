@@ -25,7 +25,7 @@ local Mage       = HR.Commons.Mage
 local num        = HR.Commons.Everyone.num
 local bool       = HR.Commons.Everyone.bool
 -- lua
-local max        = math.max
+local mathmax        = math.max
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -45,9 +45,10 @@ local EnemiesCount8ySplash, EnemiesCount16ySplash --Enemies arround target
 local EnemiesCount15yMelee  --Enemies arround player
 local Enemies16ySplash
 local RemainingWintersChill = 0
-local var_snowstorm_max_stack = 30
+local var_snowstorm_max_stack = 15
 local BossFightRemains = 11111
 local FightRemains = 11111
+local GCDMax
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -60,7 +61,7 @@ local Settings = {
 S.FrozenOrb:RegisterInFlightEffect(84721)
 S.FrozenOrb:RegisterInFlight()
 HL:RegisterForEvent(function() S.FrozenOrb:RegisterInFlight() end, "LEARNED_SPELL_IN_TAB")
-S.Frostbolt:RegisterInFlightEffect(228597)--also register hitting spell to track in flight (spell book id ~= hitting id)
+S.Frostbolt:RegisterInFlightEffect(228597)
 S.Frostbolt:RegisterInFlight()
 S.Flurry:RegisterInFlightEffect(228354)
 S.Flurry:RegisterInFlight()
@@ -74,7 +75,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 local function FrozenRemains()
-  return max(Target:DebuffRemains(S.Frostbite), Target:DebuffRemains(S.Freeze), Target:DebuffRemains(S.FrostNova))
+  return mathmax(Player:BuffRemains(S.FingersofFrostBuff), Target:DebuffRemains(S.WintersChillDebuff), Target:DebuffRemains(S.Frostbite), Target:DebuffRemains(S.Freeze), Target:DebuffRemains(S.FrostNova))
 end
 
 local function Precombat()
@@ -95,8 +96,9 @@ local function Precombat()
 end
 
 local function Cooldowns()
-  -- time_warp,if=buff.exhaustion.up&buff.bloodlust.down
-  if S.TimeWarp:IsCastable() and S.TemporalWarp:IsAvailable() and Settings.Frost.UseTemporalWarp and (Player:BloodlustExhaustUp() and Player:BloodlustDown()) then
+  -- time_warp,if=buff.bloodlust.down&prev_off_gcd.icy_veins
+  -- Note: Keeping this as TemporalWarp time_warp, as we won't suggest time_warp otherwise.
+  if S.TimeWarp:IsCastable() and S.TemporalWarp:IsAvailable() and Settings.Frost.UseTemporalWarp and (Player:BloodlustExhaustUp() and Player:BloodlustDown() and Player:PrevGCDP(1, S.IcyVeins)) then
     if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 2"; end
   end
   -- use_item,name=spoils_of_neltharus,if=buff.spoils_of_neltharus_mastery.up|buff.spoils_of_neltharus_haste.up&buff.bloodlust.down&buff.temporal_warp.down&time>0|buff.spoils_of_neltharus_vers.up&(buff.bloodlust.up|buff.temporal_warp.up)
@@ -152,137 +154,167 @@ local function Cooldowns()
   end
 end
 
-local function Aoe()
-  -- cone_of_cold,if=buff.snowstorm.stack=buff.snowstorm.max_stack&debuff.frozen.up&(prev_gcd.1.frost_nova|prev_gcd.1.ice_nova|prev_off_gcd.freeze)
-  if S.ConeofCold:IsCastable() and (Player:BuffStackP(S.SnowstormBuff) == var_snowstorm_max_stack and FrozenRemains() > 0 and (Player:PrevGCDP(1, S.FrostNova) or Player:PrevGCDP(1, S.IceNova) or Player:PrevGCDP(1, S.Freeze))) then
-    if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold aoe 2"; end
-  end
-  -- frozen_orb
-  if S.FrozenOrb:IsCastable() then
-    if Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb, nil, not Target:IsInRange(40)) then return "frozen_orb aoe 4"; end
-  end
-  -- blizzard
-  if S.Blizzard:IsCastable() then
-    if Cast(S.Blizzard, nil, nil, not Target:IsInRange(40)) then return "blizzard aoe 6"; end
-  end
-  -- comet_storm
-  if S.CometStorm:IsCastable() then
-    if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm aoe 8"; end
-  end
-  -- freeze,if=(target.level<level+3|target.is_add)&(!talent.snowstorm&debuff.frozen.down|cooldown.cone_of_cold.ready&buff.snowstorm.stack=buff.snowstorm.max_stack)
-  if Pet:IsActive() and S.Freeze:IsReady() and (Target:Level() < Player:Level() + 3 and ((not S.Snowstorm:IsAvailable()) and FrozenRemains() == 0 or S.ConeofCold:CooldownUp() and Player:BuffStackP(S.SnowstormBuff) == var_snowstorm_max_stack)) then
-    if Cast(S.Freeze, nil, nil, not Target:IsSpellInRange(S.Freeze)) then return "freeze aoe 10"; end
-  end
-  -- ice_nova,if=(target.level<level+3|target.is_add)&(prev_gcd.1.comet_storm|cooldown.cone_of_cold.ready&buff.snowstorm.stack=buff.snowstorm.max_stack&gcd.max<1)
-  if S.IceNova:IsCastable() and (Target:Level() < Player:Level() + 3 and (Player:PrevGCDP(1, S.CometStorm) or S.ConeofCold:CooldownUp() and Player:BuffStackP(S.SnowstormBuff) == var_snowstorm_max_stack and Player:GCD() < 1)) then
-    if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova aoe 11"; end
-  end
-  -- frost_nova,if=(target.level<level+3|target.is_add)&active_enemies>=5&cooldown.cone_of_cold.ready&buff.snowstorm.stack=buff.snowstorm.max_stack&gcd.max<1
-  if S.FrostNova:IsCastable() and (Target:Level() < Player:Level() + 3 and (EnemiesCount16ySplash >= 5 and S.ConeofCold:CooldownUp() and Player:BuffStackP(S.SnowstormBuff) == var_snowstorm_max_stack and Player:GCD() < 1)) then
-    if Cast(S.FrostNova, nil, nil, not Target:IsInRange(12)) then return "frost_nova aoe 12"; end
-  end
-  -- cone_of_cold,if=buff.snowstorm.stack=buff.snowstorm.max_stack
-  if S.ConeofCold:IsCastable() and (Player:BuffStackP(S.SnowstormBuff) == var_snowstorm_max_stack) then
-    if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold aoe 14"; end
-  end
-  -- flurry,if=cooldown_react&remaining_winters_chill=0
-  if S.Flurry:IsCastable() and (RemainingWintersChill == 0) then
-    if Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 16"; end
-  end
-  -- ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time|remaining_winters_chill
-  if S.IceLance:IsCastable() and (Player:BuffUp(S.FingersofFrostBuff) or FrozenRemains() > S.IceLance:TravelTime() or bool(RemainingWintersChill)) then
-    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 18"; end
-  end
-  -- shifting_power
-  if S.ShiftingPower:IsCastable() and CDsON() then
-    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power aoe 20"; end
+local function Movement()
+  -- any_blink,if=movement.distance>10
+  -- Note: Not handling blink.
+  -- ice_floes,if=buff.ice_floes.down
+  if S.IceFloes:IsCastable() and (Player:BuffDown(S.IceFloes)) then
+    if Cast(S.IceFloes, nil, Settings.Frost.DisplayStyle.Movement) then return "ice_floes movement 2"; end
   end
   -- ice_nova
   if S.IceNova:IsCastable() then
-    if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova aoe 22"; end
+    if Cast(S.IceNova, nil, Settings.Frost.DisplayStyle.Movement, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova movement 4"; end
+  end
+  -- arcane_explosion,if=mana.pct>30&active_enemies>=2
+  -- Note: If we're not in ArcaneExplosion range, just move to the next suggestion.
+  if S.ArcaneExplosion:IsReady() and Target:IsInRange(10) and (Player:ManaPercentage() > 30 and EnemiesCount8ySplash >= 2) then
+    if Cast(S.ArcaneExplosion, nil, Settings.Frost.DisplayStyle.Movement) then return "arcane_explosion movement 6"; end
+  end
+  -- fire_blast
+  if S.FireBlast:IsReady() then
+    if Cast(S.FireBlast, nil, Settings.Frost.DisplayStyle.Movement, not Target:IsSpellInRange(S.FireBlast)) then return "fire_blast movement 8"; end
+  end
+  -- ice_lance
+  if S.IceLance:IsReady() then
+    if Cast(S.IceLance, nil, Settings.Frost.DisplayStyle.Movement, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance movement 10"; end
+  end
+end
+
+local function Aoe()
+  -- cone_of_cold,if=talent.coldest_snap&(prev_gcd.1.comet_storm|prev_gcd.1.frozen_orb&!talent.comet_storm)
+  if S.ConeofCold:IsCastable() and (S.ColdestSnap:IsAvailable() and (Player:PrevGCDP(1, S.CometStorm) or Player:PrevGCDP(1, S.FrozenOrb) and not S.CometStorm:IsAvailable())) then
+    if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold aoe 2"; end
+  end
+  -- frozen_orb,if=!prev_gcd.1.glacial_spike|target.level>=level+3&!target.is_add
+  if S.FrozenOrb:IsCastable() and ((not Player:PrevGCDP(1, S.GlacialSpike)) or Target:IsInBossList()) then
+    if Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb, nil, not Target:IsInRange(40)) then return "frozen_orb aoe 4"; end
+  end
+  -- blizzard,if=!prev_gcd.1.glacial_spike|target.level>=level+3&!target.is_add
+  if S.Blizzard:IsCastable() and ((not Player:PrevGCDP(1, S.GlacialSpike)) or Target:IsInBossList()) then
+    if Cast(S.Blizzard, nil, nil, not Target:IsInRange(40)) then return "blizzard aoe 6"; end
+  end
+  -- comet_storm,if=!prev_gcd.1.glacial_spike&(!talent.coldest_snap|cooldown.cone_of_cold.ready&cooldown.frozen_orb.remains>25|cooldown.cone_of_cold.remains>20)
+  if S.CometStorm:IsCastable() and ((not Player:PrevGCDP(1, S.GlacialSpike)) and ((not S.ColdestSnap:IsAvailable()) or S.ConeofCold:CooldownUp() and S.FrozenOrb:CooldownRemains() > 25 or S.ConeofCold:CooldownRemains() > 20)) then
+    if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm aoe 8"; end
+  end
+  -- freeze,if=(target.level<level+3|target.is_add)&debuff.frozen.down&(!talent.glacial_spike&!talent.snowstorm|prev_gcd.1.glacial_spike|cooldown.cone_of_cold.ready&buff.snowstorm.stack=buff.snowstorm.max_stack)
+  if Pet:IsActive() and S.Freeze:IsReady() and ((not Target:IsInBossList()) and FrozenRemains() == 0 and ((not S.GlacialSpike:IsAvailable()) and (not S.Snowstorm:IsAvailable()) or Player:PrevGCDP(1, S.GlacialSpike) or S.ConeofCold:CooldownUp() and Player:BuffStack(S.SnowstormBuff) == var_snowstorm_max_stack)) then
+    if Cast(S.Freeze, nil, nil, not Target:IsSpellInRange(S.Freeze)) then return "freeze aoe 10"; end
+  end
+  -- ice_nova,if=(target.level<level+3|target.is_add)&!prev_off_gcd.freeze&(prev_gcd.1.glacial_spike|cooldown.cone_of_cold.ready&buff.snowstorm.stack=buff.snowstorm.max_stack&gcd.max<1)
+  if S.IceNova:IsCastable() and ((not Target:IsInBossList()) and (not Player:PrevOffGCDP(1, S.Freeze)) and (Player:PrevGCDP(1, S.GlacialSpike) or S.ConeofCold:CooldownUp() and Player:BuffStack(S.SnowstormBuff) == var_snowstorm_max_stack and GCDMax < 1)) then
+    if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova aoe 12"; end
+  end
+  -- frost_nova,if=(target.level<level+3|target.is_add)&!prev_off_gcd.freeze&(prev_gcd.1.glacial_spike&!remaining_winters_chill|cooldown.cone_of_cold.ready&buff.snowstorm.stack=buff.snowstorm.max_stack&gcd.max<1)
+  if S.FrostNova:IsCastable() and ((not Target:IsInBossList()) and (not Player:PrevOffGCDP(1, S.Freeze)) and (Player:PrevGCDP(1, S.GlacialSpike) and RemainingWintersChill == 0 or S.ConeofCold:CooldownUp() and Player:BuffStack(S.SnowstormBuff) == var_snowstorm_max_stack and GCDMax < 1)) then
+    if Cast(S.FrostNova, nil, nil, not Target:IsInRange(12)) then return "frost_nova aoe 14"; end
+  end
+  -- cone_of_cold,if=buff.snowstorm.stack=buff.snowstorm.max_stack
+  if S.ConeofCold:IsCastable() and (Player:BuffStackP(S.SnowstormBuff) == var_snowstorm_max_stack) then
+    if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold aoe 16"; end
+  end
+  -- shifting_power
+  if S.ShiftingPower:IsCastable() and CDsON() then
+    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power aoe 18"; end
+  end
+  -- glacial_spike,if=buff.icicles.react=5&cooldown.blizzard.remains>gcd.max
+  if S.GlacialSpike:IsReady() and (Player:BuffStackP(S.IciclesBuff) == 5 and S.Blizzard:CooldownRemains() > GCDMax) then
+    if Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike aoe 20"; end
+  end
+  -- flurry,if=target.level>=level+3&!target.is_add&cooldown_react&!debuff.winters_chill.remains&(prev_gcd.1.glacial_spike|charges_fractional>1.8)
+  if S.Flurry:IsCastable() and (Target:IsInBossList() and RemainingWintersChill == 0 and (Player:PrevGCDP(1, S.GlacialSpike) or S.Flurry:ChargesFractional() > 1.8)) then
+    if Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 22"; end
+  end
+  -- flurry,if=cooldown_react&!debuff.winters_chill.remains&(buff.brain_freeze.react|!buff.fingers_of_frost.react)
+  if S.Flurry:IsCastable() and (RemainingWintersChill == 0 and (Player:BuffUp(S.BrainFreezeBuff) or Player:BuffUp(S.FingersofFrostBuff))) then
+    if Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 24"; end
+  end
+  -- ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time|remaining_winters_chill
+  if S.IceLance:IsReady() and (Player:BuffUp(S.FingersofFrostBuff) or FrozenRemains() > S.IceLance:TravelTime() or bool(RemainingWintersChill)) then
+    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 26"; end
+  end
+  -- ice_nova,if=active_enemies>=4&(!talent.snowstorm&!talent.glacial_spike|target.level>=level+3&!target.is_add)
+  if S.IceNova:IsCastable() and (EnemiesCount8ySplash >= 4 and ((not S.Snowstorm:IsAvailable()) and (not S.GlacialSpike:IsAvailable()) or not Target:IsInBossList())) then
+    if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova aoe 28"; end
   end
   -- dragons_breath,if=active_enemies>=7
   if S.DragonsBreath:IsCastable() and (EnemiesCount16ySplash >= 7) then
-    if Cast(S.DragonsBreath, nil, nil, not Target:IsInRange(12)) then return "dragons_breath aoe 26"; end
+    if Cast(S.DragonsBreath, nil, nil, not Target:IsInRange(12)) then return "dragons_breath aoe 30"; end
   end
   -- arcane_explosion,if=mana.pct>30&active_enemies>=7
   if S.ArcaneExplosion:IsCastable() and (Player:ManaPercentage() > 30 and EnemiesCount16ySplash >= 7) then
     if Settings.Frost.StayDistance and not Target:IsInRange(10) then
-      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion aoe 28 left"; end
+      if CastLeft(S.ArcaneExplosion) then return "arcane_explosion aoe 32 left"; end
     else
-      if Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 28"; end
+      if Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 32"; end
     end
   end
   -- frostbolt
   if S.Frostbolt:IsCastable() then
-    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 32"; end
-  end
-  -- Manually added: ice_lance as a fallthrough when moving
-  if S.IceLance:IsCastable() then
-    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 34"; end
+    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 34"; end
   end
   -- call_action_list,name=movement
-  -- Note: Not handling Movement(), as it gets fiddly during small movement.
+  if Player:IsMoving() then
+    local ShouldReturn = Movement(); if ShouldReturn then return ShouldReturn; end
+  end
 end
 
 local function ST()
-  -- comet_storm,if=prev_gcd.1.flurry
-  if S.CometStorm:IsCastable() and Player:PrevGCDP(1, S.Flurry) then
+  -- comet_storm,if=prev_gcd.1.flurry|prev_gcd.1.cone_of_cold
+  if S.CometStorm:IsCastable() and (Player:PrevGCDP(1, S.Flurry) or Player:PrevGCDP(1, S.ConeofCold)) then
     if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm single 4"; end
   end
-  -- flurry,if=cooldown_react&remaining_winters_chill=0&debuff.winters_chill.down&(prev_gcd.1.frostbolt|prev_gcd.1.glacial_spike)
-  if S.Flurry:IsCastable() and (RemainingWintersChill == 0 and (Player:IsCasting(S.Frostbolt))) then
+  -- flurry,if=cooldown_react&remaining_winters_chill=0&debuff.winters_chill.down&(prev_gcd.1.frostbolt|prev_gcd.1.glacial_spike|talent.glacial_spike&buff.icicles.react=4&!buff.fingers_of_frost.react)
+  if S.Flurry:IsCastable() and (RemainingWintersChill == 0 and Target:DebuffDown(S.WintersChillDebuff) and (Player:PrevGCDP(1, S.Frostbolt) or Player:PrevGCDP(1, S.GlacialSpike) or S.GlacialSpike:IsAvailable() and Player:BuffStackP(S.IciclesBuff) ==4 and Player:BuffDown(S.FingersofFrostBuff))) then
     if Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry single 6"; end
   end
-  -- ray_of_frost,if=remaining_winters_chill=1&buff.freezing_winds.down
-  if S.RayofFrost:IsCastable() and (RemainingWintersChill == 1 and Player:BuffDown(S.FreezingWindsBuff)) then
+  -- ice_lance,if=talent.glacial_spike&debuff.winters_chill.down&buff.icicles.react=4&buff.fingers_of_frost.react
+  if S.IceLance:IsReady() and (S.GlacialSpike:IsAvailable() and RemainingWintersChill == 0 and Player:BuffStackP(S.IciclesBuff) == 4 and Player:BuffUp(S.FingersofFrostBuff)) then
+    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single "; end
+  end
+  -- ray_of_frost,if=remaining_winters_chill=1
+  if S.RayofFrost:IsCastable() and (RemainingWintersChill == 1) then
     if Cast(S.RayofFrost, nil, nil, not Target:IsSpellInRange(S.RayofFrost)) then return "ray_of_frost single 8"; end
   end
-  -- glacial_spike,if=remaining_winters_chill
-  if S.GlacialSpike:IsReady() and (bool(RemainingWintersChill)) then
+  -- glacial_spike,if=buff.icicles.react=5&(action.flurry.cooldown_react|remaining_winters_chill)
+  if S.GlacialSpike:IsReady() and (Player:BuffStackP(S.IciclesBuff) == 5 and (S.Flurry:Charges() >= 1 or RemainingWintersChill > 0)) then
     if Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike single 10"; end
   end
-  -- cone_of_cold,if=buff.snowstorm.stack=buff.snowstorm.max_stack&remaining_winters_chill
-  if S.ConeofCold:IsCastable() and (Player:BuffStackP(S.SnowstormBuff) == var_snowstorm_max_stack and bool(RemainingWintersChill)) then
-    if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold single 12"; end
-  end
-  -- frozen_orb
-  if S.FrozenOrb:IsCastable() then
+  -- frozen_orb,if=buff.fingers_of_frost.react<2&(!talent.ray_of_frost|cooldown.ray_of_frost.remains)
+  if S.FrozenOrb:IsCastable() and (Player:BuffStackP(S.FingersofFrostBuff) < 2 and ((not S.RayofFrost:IsAvailable()) or S.RayofFrost:CooldownDown())) then
     if Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb, nil, not Target:IsInRange(40)) then return "frozen_orb single 14"; end
   end
-  -- blizzard,if=active_enemies>=2&talent.ice_caller&talent.freezing_rain
-  if S.Blizzard:IsCastable() and EnemiesCount16ySplash >= 2 and S.IceCaller:IsAvailable() and S.FreezingRain:IsAvailable() then
+  -- cone_of_cold,if=talent.coldest_snap&cooldown.comet_storm.remains>10&cooldown.frozen_orb.remains>10&remaining_winters_chill=0&active_enemies>=3
+  if S.ConeofCold:IsCastable() and (S.ColdestSnap:IsAvailable() and S.CometStorm:CooldownRemains() > 10 and S.FrozenOrb:CooldownRemains() > 10 and RemainingWintersChill == 0 and EnemiesCount8ySplash >= 3) then
+    if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold single 12"; end
+  end
+  -- blizzard,if=active_enemies>=2&talent.ice_caller&talent.freezing_rain&(!talent.splintering_cold&!talent.ray_of_frost|buff.freezing_rain.up|active_enemies>=3)
+  if S.Blizzard:IsCastable() and (EnemiesCount8ySplash >= 2 and S.IceCaller:IsAvailable() and S.FreezingRain:IsAvailable() and ((not S.SplinteringCold:IsAvailable()) and (not S.RayofFrost:IsAvailable()) or Player:BuffUp(S.FreezingRainBuff) or EnemiesCount8ySplash >= 3)) then
     if Cast(S.Blizzard, nil, nil, not Target:IsInRange(40)) then return "blizzard single 16"; end
   end
-  -- shifting_power,if=buff.icy_veins.down|cooldown.icy_veins.remains<20
-  if S.ShiftingPower:IsCastable() and (Player:BuffDown(S.IcyVeinsBuff) or S.IcyVeins:CooldownRemains() < 20) then
+  -- shifting_power,if=cooldown.frozen_orb.remains>10&(!talent.comet_storm|cooldown.comet_storm.remains>10)&(!talent.ray_of_frost|cooldown.ray_of_frost.remains>10)|cooldown.icy_veins.remains<20
+  if S.ShiftingPower:IsCastable() and (S.FrozenOrb:CooldownRemains() > 10 and ((not S.CometStorm:IsAvailable()) or S.CometStorm:CooldownRemains() > 10) and ((not S.RayofFrost:IsAvailable()) or S.RayofFrost:CooldownRemains() > 10) or S.IcyVeins:CooldownRemains() < 20) then
     if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power single 18"; end
   end
   -- ice_lance,if=buff.fingers_of_frost.react&!prev_gcd.1.glacial_spike|remaining_winters_chill
-  if S.IceLance:IsCastable() and (Player:BuffUp(S.FingersofFrostBuff) and (not Player:PrevGCDP(1, S.GlacialSpike)) or bool(RemainingWintersChill)) then
+  if S.IceLance:IsReady() and (Player:BuffUp(S.FingersofFrostBuff) and (not Player:PrevGCDP(1, S.GlacialSpike)) or bool(RemainingWintersChill)) then
     if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single 20"; end
   end
   -- ice_nova,if=active_enemies>=4
   if S.IceNova:IsCastable() and (EnemiesCount16ySplash >= 4) then
     if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova single 22"; end
   end
-  -- glacial_spike,if=buff.brain_freeze.react
-  if S.GlacialSpike:IsCastable() and Player:BuffUp(S.BrainFreezeBuff) then
+  -- glacial_spike,if=buff.icicles.react=5&buff.icy_veins.up
+  if S.GlacialSpike:IsCastable() and (Player:BuffStackP(S.IciclesBuff) == 5 and Player:BuffUp(S.IcyVeinsBuff)) then
     if Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike single 34"; end
-  end
-  -- bag_of_tricks
-  if CDsON() and S.BagofTricks:IsCastable() then
-    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks cd 40"; end
   end
   -- frostbolt
   if S.Frostbolt:IsCastable() then
     if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt single 42"; end
   end
   -- call_action_list,name=movement
-  -- Note: Not handling Movement(), as it gets fiddly during small movement.
-  -- Manually added: ice_lance as a fallthrough when moving
-  if S.IceLance:IsCastable() then
-    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single 44"; end
+  if Player:IsMoving() then
+    local ShouldReturn = Movement(); if ShouldReturn then return ShouldReturn; end
   end
 end
 
@@ -313,6 +345,9 @@ local function APL()
 
     -- Calculate remaining_winters_chill, as it's used in many lines
     RemainingWintersChill = Target:DebuffStack(S.WintersChillDebuff)
+
+    -- Calculate GCDMax
+    GCDMax = Player:GCD() + 0.25
   end
 
   if Everyone.TargetIsValid() then
@@ -324,7 +359,7 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
     -- water_jet
     if Pet:IsActive() and S.WaterJet:IsReady() then
-      if Cast(S.WaterJet, nil, nil, not Target:IsSpellInRange(S.WaterJet)) then return "water_jet main 2"; end
+      if Cast(S.WaterJet, Settings.Frost.GCDasOffGCD.WaterJet, nil, not Target:IsSpellInRange(S.WaterJet)) then return "water_jet main 2"; end
     end
     -- call_action_list,name=cds
     if CDsON() then
@@ -342,7 +377,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Frost Mage rotation is currently a work in progress, but has been updated for patch 10.0.")
+  HR.Print("Frost Mage rotation is currently a work in progress, but has been updated for patch 10.1.5.")
 end
 
 HR.SetAPL(64, APL, Init)

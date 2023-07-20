@@ -174,20 +174,19 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
 
 Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   -- Abilities
+  Blizzard                              = Spell(190356), --splash, 16
   ConeofCold                            = Spell(120),--Melee, 12
-  IciclesBuff                           = Spell(205473),
-  WintersChillDebuff                    = Spell(228358),
   FireBlast                             = Spell(319836),
   -- Talents
-  Blizzard                              = Spell(190356), --splash, 16
-  BoneChilling                          = Spell(205766),
+  BoneChilling                          = Spell(205027),
   ChainReaction                         = Spell(278309),
+  ColdestSnap                           = Spell(417493),
   CometStorm                            = Spell(153595), --splash, 6
   DeepShatter                           = Spell(378749),
   Flurry                                = Spell(44614),
   FreezingRain                          = Spell(270233),
   FreezingWinds                         = Spell(382103),
-  Frostbite                             = Spell(198121),
+  Frostbite                             = Spell(378756),
   FrozenOrb                             = Spell(84714), --splash, 16
   FrozenTouch                           = Spell(205030),
   GlacialSpike                          = Spell(199786), --splash, 8 (with splitting ice)
@@ -198,20 +197,24 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   RayofFrost                            = Spell(205021),
   SlickIce                              = Spell(382144),
   Snowstorm                             = Spell(381706),
+  SplinteringCold                       = Spell(379049),
   SplittingIce                          = Spell(56377), --splash, 8
-  SummonWaterElemental                  = Spell(31687),
   -- Pet Abilities
   Freeze                                = Spell(33395), --splash, 8
   WaterJet                              = Spell(135029),
   -- Buffs
+  BoneChillingBuff                      = Spell(205766),
   BrainFreezeBuff                       = Spell(190446),
   FingersofFrostBuff                    = Spell(44544),
   FreezingRainBuff                      = Spell(270232),
   FreezingWindsBuff                     = Spell(382106),
   GlacialSpikeBuff                      = Spell(199844),
+  IciclesBuff                           = Spell(205473),
   IcyVeinsBuff                          = Spell(12472),
   SnowstormBuff                         = Spell(381522),
   -- Debuffs
+  FrostbiteDebuff                       = Spell(378760),
+  WintersChillDebuff                    = Spell(228358),
 })
 
 -- Items
