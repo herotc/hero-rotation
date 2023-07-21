@@ -210,7 +210,7 @@ local function Standard()
   end
   -- eye_of_tyr,if=talent.inmost_light.enabled&raid_event.adds.in>=45
   if CDsON() and S.EyeofTyr:IsCastable() and (S.InmostLight:IsAvailable()) then
-    if Cast(S.EyeofTyr, nil, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr standard 20"; end
+    if Cast(S.EyeofTyr, Settings.Protection.GCDasOffGCD.EyeOfTyr, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr standard 20"; end
   end
   -- blessed_hammer
   if S.BlessedHammer:IsCastable() then
@@ -226,7 +226,7 @@ local function Standard()
   end
   -- eye_of_tyr,if=!talent.inmost_light.enabled&raid_event.adds.in>=60
   if CDsON() and S.EyeofTyr:IsCastable() and (not S.InmostLight:IsAvailable()) then
-    if Cast(S.EyeofTyr, nil, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr standard 27"; end
+    if Cast(S.EyeofTyr, Settings.Protection.GCDasOffGCD.EyeOfTyr, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr standard 27"; end
   end
   -- word_of_glory,if=buff.shining_light_free.up
   if S.WordofGlory:IsReady() and (Player:BuffUp(S.ShiningLightFreeBuff)) then

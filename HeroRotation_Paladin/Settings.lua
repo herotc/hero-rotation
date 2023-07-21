@@ -53,6 +53,7 @@ HR.GUISettings.APL.Paladin = {
       ShieldOfTheRighteous = "SuggestedRight",
     },
     GCDasOffGCD = {
+      EyeOfTyr = false,
       Seraphim = true,
       WordOfGlory = true,
     },
