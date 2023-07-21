@@ -298,7 +298,7 @@ local function FightEnd()
       if Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard) then return "grimoire_felguard fight_end 2"; end
     end
     -- call_dreadstalkers,if=fight_remains<20
-    if CallDreadstalkers:IsReady() then
+    if S.CallDreadstalkers:IsReady() then
       if Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers fight_end 4"; end
     end
     -- summon_vilefiend,if=fight_remains<20
