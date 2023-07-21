@@ -91,22 +91,27 @@ local StaggerDamage = {}
 local IncomingDamage = {}
 
 local function RegisterStaggerFullAbsorb(Amount)
+  -- New Stagger DoT. Add to our full Stagger amount and then remove that amount after the allotted time.
   local StaggerDuration = 10 + (BobandWeave:IsAvailable() and 3 or 0)
   StaggerFull = StaggerFull + Amount
   C_Timer.After(StaggerDuration, function() StaggerFull = StaggerFull - Amount; end)
 end
 
 local function RegisterStaggerDamageTaken(Amount)
+  -- We only keep 10 values, so if this is number 11, get rid of the oldest.
   if #StaggerDamage == 10 then
     tableremove(StaggerDamage, 10)
   end
+  -- Add the last Stagger damage taken amount to the front of the table.
   tableinsert(StaggerDamage, 1, Amount)
 end
 
 local function RegisterIncomingDamageTaken(Amount)
+  -- If we have table values and any are older than 6 seconds, remove them.
   while #IncomingDamage > 0 and IncomingDamage[#IncomingDamage][1] < GetTime() - 6 do
     tableremove(IncomingDamage, #IncomingDamage)
   end
+  -- Add the incoming damage taken time and amount to the front of the table.
   tableinsert(IncomingDamage, 1, {GetTime(), Amount})
 end
 
@@ -114,8 +119,10 @@ function Player:StaggerFull()
   return StaggerFull
 end
 
+-- stagger.last_tick_damage_x isn't in the current APL, but we may want to use this for Defensives().
 function Player:StaggerLastTickDamage(Count)
   local TickDamage = 0
+  -- If higher Count is requested than we have, just return all we have.
   if Count > #StaggerDamage then
     Count = #StaggerDamage
   end
@@ -125,8 +132,10 @@ function Player:StaggerLastTickDamage(Count)
   return TickDamage
 end
 
+-- incoming_damage_xxxxms isn't in the current APL, but we may want to use this for Defensives().
 function Player:IncomingDamageTaken(Milliseconds)
   local DamageTaken = 0
+  -- APL uses milliseconds. Convert to seconds.
   local TimeOffset = Milliseconds / 1000
   for i=1, #IncomingDamage do
     if IncomingDamage[i][1] > GetTime() - TimeOffset then
@@ -140,14 +149,18 @@ HL:RegisterForCombatEvent(
   function (...)
     local args = {...}
     -- Absorb is coming from a spell damage
+    -- TODO: Verify this is still the case
     if #args == 23 then
-      local _, _, _, _, _, _, _, DestGUID, _, _, _, _, _, _, _, _, _, _, SpellID, _, _, Amount = ...
+      local DestGUID, _, _, _, _, _, _, _, _, _, _, SpellID, _, _, Amount = select(8, ...)
       if DestGUID == Player:GUID() and SpellID == StaggerSpellID then
+        -- Register the full amount of the current Stagger
         RegisterStaggerFullAbsorb(Amount)
       end
+    -- Absorb is coming from a melee hit
     else
-      local _, _, _, _, _, _, _, DestGUID, _, _, _, _, _, _, _, SpellID, _, _, Amount = ...
+      local DestGUID, _, _, _, _, _, _, _, SpellID, _, _, Amount = select(8, ...)
       if DestGUID == Player:GUID() and SpellID == StaggerSpellID then
+        -- Register the full amount of the current Stagger
         RegisterStaggerFullAbsorb(Amount)
       end
     end
@@ -157,19 +170,17 @@ HL:RegisterForCombatEvent(
 
 HL:RegisterForCombatEvent(
   function(...)
-    local _, _, _, _, _, _, _, DestGUID, _, _, _, SpellID, _, _, Amount = ...
-    if DestGUID == Player:GUID() and SpellID == StaggerDoTID and Amount > 0 then
-      RegisterStaggerDamageTaken(Amount)
-    end
-  end
-  , "SPELL_PERIODIC_DAMAGE"
-)
-
-HL:RegisterForCombatEvent(
-  function(...)
-    local _, _, _, _, _, _, _, DestGUID, _, _, _, _, _, _, Amount = ...
-    if Cache.Persistent.Player.Spec[1] == 268 and DestGUID == Player:GUID() and Amount ~= nil and Amount > 0 then
-      RegisterIncomingDamageTaken(Amount)
+    local DestGUID, _, _, _, SpellID, _, _, Amount = select(8, ...)
+    if Cache.Persistent.Player.Spec[1] == 268 and DestGUID == Player:GUID() then
+      -- Damage is coming from our Stagger
+      if SpellID == STaggerDoTID and Amount and Amount > 0 then
+        -- Add to our table of Stagger damage taken
+        RegisterStaggerDamageTaken(Amount)
+      -- Damage is from some other source
+      elseif Amount and Amount > 0 then
+        -- Add to our table of incoming damage taken
+        RegisterIncomingDamageTaken(Amount)
+      end
     end
   end
   , "SWING_DAMAGE"
@@ -178,6 +189,7 @@ HL:RegisterForCombatEvent(
 )
 
 HL:RegisterForEvent(
+  -- Reset our damage tables when we exit combat
   function()
     if #StaggerDamage > 0 then
       for i=0, #StaggerDamage do

@@ -41,6 +41,7 @@ HR.GUISettings.APL.Monk = {
     }
   },
   Brewmaster = {
+    ExpelHarmHP = 70,
     PotionType = {
       Selected = "Power",
     },
@@ -54,6 +55,9 @@ HR.GUISettings.APL.Monk = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
+      BreathofFire           = false,
+      ExpelHarm              = false,
+      ExplodingKeg           = false,
       InvokeNiuzaoTheBlackOx = true,
       TouchOfDeath           = true,
     },
@@ -137,12 +141,13 @@ CreateARPanelOptions(CP_Windwalker, "APL.Monk.Windwalker")
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.ShowFortifyingBrewCD", "Fortifying Brew", "Enable or disable Fortifying Brew recommendations.")
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.IgnoreToK", "Ignore Touch of Karma", "Enable this setting to allow you to ignore Touch of Karma without stalling the rotation. (NOTE: Touch of Karma will never be suggested if this is enabled)")
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.IgnoreFSK", "Ignore Flying Serpent Kick", "Enable this setting to allow you to ignore Flying Serpent Kick without stalling the rotation. (NOTE: Flying Serpent Kick will never be suggested if this is enabled)")
-CreatePanelOption("Slider", CP_Windwalker, "APL.Monk.Windwalker.FortifyingBrewHP", {1, 100, 1}, "Fortifying Brew HP Threshold", "Set the HP threshold for when to suggest Fortifying Brew.)")
+CreatePanelOption("Slider", CP_Windwalker, "APL.Monk.Windwalker.FortifyingBrewHP", {1, 100, 1}, "Fortifying Brew HP Threshold", "Set the HP threshold for when to suggest Fortifying Brew.")
 
 -- Brewmaster
+CreatePanelOption("Slider", CP_Brewmaster, "APL.Monk.Brewmaster.ExpelHarmHP", {1, 100, 1}, "Expel Harm HP Threshold", "Set the HP threshold for when to suggest Expel Harm.")
 CreateARPanelOptions(CP_Brewmaster, "APL.Monk.Brewmaster")
 
 -- Mistweaver
-CreatePanelOption("Slider", CP_Mistweaver, "APL.Monk.Mistweaver.DampenHarmHP", {1, 100, 1}, "Dampen Harm HP Threshold", "Set the HP threshold for when to suggest Dampen Harm.)")
+CreatePanelOption("Slider", CP_Mistweaver, "APL.Monk.Mistweaver.DampenHarmHP", {1, 100, 1}, "Dampen Harm HP Threshold", "Set the HP threshold for when to suggest Dampen Harm.")
 CreatePanelOption("Slider", CP_Mistweaver, "APL.Monk.Mistweaver.FortifyingBrewHP", {1, 100, 1}, "Fortifying Brew HP Threshold", "Set the HP threshold for when to suggest Fortifying Brew.)")
 CreateARPanelOptions(CP_Mistweaver, "APL.Monk.Mistweaver")
