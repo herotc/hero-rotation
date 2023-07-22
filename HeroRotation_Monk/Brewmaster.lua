@@ -131,7 +131,7 @@ local function Defensives()
   if S.PurifyingBrew:IsCastable() and Player:BuffDown(S.BlackoutComboBuff) and ShouldPurify() then
     if Cast(S.PurifyingBrew, nil, Settings.Brewmaster.DisplayStyle.Purify) then return "Purifying Brew"; end
   end
-  if Player:HealthPercentage() <= Settings.Brewmaster.ExpelHarmHP then
+  if S.ExpelHarm:IsReady() and Player:HealthPercentage() <= Settings.Brewmaster.ExpelHarmHP then
     local ExpelHarmMod = (S.StrengthofSpirit:IsAvailable()) and (1 + (1 - Player:HealthPercentage() / 100) * 100) or 1
     local HealingSphereValue = Player:AttackPowerDamageMod() * 3
     local ExpelHarmHeal = (GetSpellBonusDamage(4) * 1.2 * ExpelHarmMod) + (S.ExpelHarm:Count() * HealingSphereValue)
