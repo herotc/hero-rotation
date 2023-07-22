@@ -59,13 +59,13 @@ S.ArcaneBarrage:RegisterInFlight()
 
 -- Variables
 local Enemies8ySplash, EnemiesCount8ySplash --Enemies arround target
-local var_aoe_target_count
-local var_conserve_mana
-local var_opener
-local var_opener_min_mana
-local var_totm_on_last_spark_stack
-local var_steroid_trinket_equipped
-local var_talon_double_on_use
+local var_aoe_target_count = 3
+local var_conserve_mana = false
+local var_opener = true
+local var_opener_min_mana = (S.ArcaneHarmony:IsAvailable()) and 225000 or 200000
+local var_totm_on_last_spark_stack = not Player:HasTier(30, 4)
+local var_steroid_trinket_equipped = (I.GladiatorsBadgeofFerocity:IsEquipped() or I.IrideusFragment:IsEquipped() or I.EruptingSpearFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped())
+local var_talon_double_on_use = I.TimebreachingTalon:IsEquipped() and I.IrideusFragment:IsEquipped()
 local var_aoe_spark_phase
 local var_spark_phase
 
@@ -76,10 +76,18 @@ local CastAE
 local GCDMax
 
 HL:RegisterForEvent(function()
-  VarConserveMana = 0
+  var_conserve_mana = false
+  var_opener = true
+  var_opener_min_mana = (S.ArcaneHarmony:IsAvailable()) and 225000 or 200000
   BossFightRemains = 11111
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
+
+HL:RegisterForEvent(function()
+  var_totm_on_last_spark_stack = not Player:HasTier(30, 4)
+  var_steroid_trinket_equipped = (I.GladiatorsBadgeofFerocity:IsEquipped() or I.IrideusFragment:IsEquipped() or I.EruptingSpearFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped())
+  var_talon_double_on_use = I.TimebreachingTalon:IsEquipped() and I.IrideusFragment:IsEquipped()
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function Precombat()
   -- flask
@@ -97,19 +105,13 @@ local function Precombat()
     if Cast(S.ConjureManaGem) then return "conjure_mana_gem precombat 4"; end
   end
   -- variable,name=aoe_target_count,op=reset,default=3
-  var_aoe_target_count = 3
   -- variable,name=conserve_mana,op=set,value=0
-  var_conserve_mana = false
   -- variable,name=opener,op=set,value=1
-  var_opener = true
   -- variable,name=opener_min_mana,default=-1,op=set,if=variable.opener_min_mana=-1,value=225000-(25000*!talent.arcane_harmony)
-  var_opener_min_mana = (S.ArcaneHarmony:IsAvailable()) and 225000 or 200000
   -- variable,name=totm_on_last_spark_stack,default=-1,op=set,if=variable.totm_on_last_spark_stack=-1,value=!set_bonus.tier30_4pc
-  var_totm_on_last_spark_stack = not Player:HasTier(30, 4)
   -- variable,name=steroid_trinket_equipped,op=set,value=equipped.gladiators_badge|equipped.irideus_fragment|equipped.erupting_spear_fragment|equipped.spoils_of_neltharus|equipped.tome_of_unstable_power|equipped.timebreaching_talon|equipped.horn_of_valor
-  var_steroid_trinket_equipped = (I.GladiatorsBadgeofFerocity:IsEquipped() or I.IrideusFragment:IsEquipped() or I.EruptingSpearFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped())
   -- variable,name=talon_double_on_use,op=set,value=equipped.timebreaching_talon&equipped.irideus_fragment
-  var_talon_double_on_use = I.TimebreachingTalon:IsEquipped() and I.IrideusFragment:IsEquipped()
+  -- Note: Moved to variable declarations and event registrations to avoid potential issue from entering combat before targeting an enemy.
   -- snapshot_stats
   -- mirror_image
   if S.MirrorImage:IsCastable() and CDsON() and Settings.Arcane.MirrorImagesBeforePull then
