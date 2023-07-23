@@ -168,8 +168,8 @@ local function Defensives()
 end
 
 local function Trinkets()
-  -- use_item,name=spoils_of_neltharus,if=buff.dragonrage.up&(active_enemies>=3|!buff.spoils_of_neltharus_vers.up|buff.dragonrage.remains+4*(cooldown.eternity_surge.remains<=gcd.max*2+cooldown.fire_breath.remains<=gcd.max*2)<=18)|fight_remains<=20
-  if Settings.Commons.Enabled.Trinkets and I.SpoilsofNeltharus:IsEquippedAndReady() and (VarDragonrageUp and (EnemiesCount8ySplash >= 3 or Player:BuffDown(S.SpoilsofNeltharusVers) or VarDragonrageRemains + 4 * num(S.EternitySurge:CooldownRemains() <= GCDMax * 2 + num(S.FireBreath:CooldownRemains() <= GCDMax * 2)) <= 18) or FightRemains <= 20) then
+  -- use_item,name=spoils_of_neltharus,if=buff.dragonrage.up&(!cooldown.fire_breath.up&!cooldown.shattering_star.up|active_enemies>=3)|fight_remains<=20
+  if Settings.Commons.Enabled.Trinkets and I.SpoilsofNeltharus:IsEquippedAndReady() and (VarDragonrageUp and (S.FireBreath:CooldownDown() and S.ShatteringStar:CooldownDown() or EnemiesCount8ySplash >= 3) or FightRemains <= 20) then
     if Cast(I.SpoilsofNeltharus, nil, Settings.Commons.DisplayStyle.Trinkets) then return "spoils_of_neltharus trinkets 2"; end
   end
   -- use_item,slot=trinket1,if=buff.dragonrage.up&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1|variable.trinket_2_exclude)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)
