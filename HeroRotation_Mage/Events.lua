@@ -74,71 +74,32 @@ local C_Timer = C_Timer
 
   --- End Combat Log Arguments
 
-  -- Arguments Variables
-  HL.RoPTime = 0
+--------------------------
+-------- Arcane ----------
+--------------------------
 
-  --------------------------
-  -------- Arcane ----------
-  --------------------------
 
-  HL:RegisterForSelfCombatEvent(
-    function (...)
-      DateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
-      if SpellID == 116014 and Player:GUID() == DestGUID then --void RuneofPower
-        HL.RoPTime = GetTime()
-      end
+--------------------------
+-------- Frost -----------
+--------------------------
 
-    end
-    , "SPELL_AURA_APPLIED"
-  )
+-- Note: We don't currently use FrozenOrbGroundAoeRemains, so let's comment this out.
+-- Keeping it around, just in case we need it again in the future.
+--[[local FrozenOrbFirstHit = true
+local FrozenOrbHitTime = 0
 
-  HL:RegisterForSelfCombatEvent(
-    function (...)
-      DateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
-      if SpellID == 116014 and Player:GUID() == DestGUID then --void erruption
-        HL.RoPTime = 0
-      end
-    end
-    , "SPELL_AURA_REMOVED"
-  )
-
-  --------------------------
-  -------- Frost -----------
-  --------------------------
-
-  local FrozenOrbFirstHit = true
-  local FrozenOrbHitTime = 0
-
-  HL:RegisterForSelfCombatEvent(function(...)
-    local spellID = select(12, ...)
-    if spellID == 84721 and FrozenOrbFirstHit then
-      FrozenOrbFirstHit = false
-      FrozenOrbHitTime = GetTime()
-      C_Timer.After(10, function()
-        FrozenOrbFirstHit = true
-        FrozenOrbHitTime = 0
-      end)
-    end
-  end, "SPELL_DAMAGE")
-
-  function Player:FrozenOrbGroundAoeRemains()
-    return math.max((FrozenOrbHitTime - (GetTime() - 10) - HL.RecoveryTimer()), 0)
+HL:RegisterForSelfCombatEvent(function(...)
+  local spellID = select(12, ...)
+  if spellID == 84721 and FrozenOrbFirstHit then
+    FrozenOrbFirstHit = false
+    FrozenOrbHitTime = GetTime()
+    C_Timer.After(10, function()
+      FrozenOrbFirstHit = true
+      FrozenOrbHitTime = 0
+    end)
   end
+end, "SPELL_DAMAGE")
 
-  local brain_freeze_active = false
-
-  HL:RegisterForSelfCombatEvent(function(...)
-    local spellID = select(12, ...)
-    if spellID == Spell.Mage.Frost.Flurry:ID() then
-      brain_freeze_active =     Player:BuffUp(Spell.Mage.Frost.BrainFreezeBuff)
-                            or  Spell.Mage.Frost.BrainFreezeBuff:TimeSinceLastRemovedOnPlayer() < 0.1
-    end
-  end, "SPELL_CAST_SUCCESS")
-
-  function Player:BrainFreezeActive()
-    if self:IsCasting(Spell.Mage.Frost.Flurry) then
-      return false
-    else
-      return brain_freeze_active
-    end
-  end
+function Player:FrozenOrbGroundAoeRemains()
+  return math.max((FrozenOrbHitTime - (GetTime() - 10) - HL.RecoveryTimer()), 0)
+end]]
