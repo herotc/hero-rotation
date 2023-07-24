@@ -103,7 +103,7 @@ end
 local function Cooldowns()
   -- time_warp,if=buff.bloodlust.down&prev_off_gcd.icy_veins
   -- Note: Keeping this as TemporalWarp time_warp, as we won't suggest time_warp otherwise.
-  if S.TimeWarp:IsCastable() and S.TemporalWarp:IsAvailable() and Settings.Frost.UseTemporalWarp and (Player:BloodlustExhaustUp() and Player:BloodlustDown() and Player:PrevGCDP(1, S.IcyVeins)) then
+  if Settings.Commons.UseTemporalWarp and S.TimeWarp:IsCastable() and S.TemporalWarp:IsAvailable() and (Player:BloodlustExhaustUp() and Player:BloodlustDown() and Player:PrevGCDP(1, S.IcyVeins)) then
     if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 2"; end
   end
   -- use_item,name=spoils_of_neltharus,if=buff.spoils_of_neltharus_mastery.up|buff.spoils_of_neltharus_haste.up&buff.bloodlust.down&buff.temporal_warp.down&time>0|buff.spoils_of_neltharus_vers.up&(buff.bloodlust.up|buff.temporal_warp.up)

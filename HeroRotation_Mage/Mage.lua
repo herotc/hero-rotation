@@ -59,7 +59,6 @@ Spell.Mage.Commons = {
   MirrorImage                           = Spell(55342),
   RemoveCurse                           = Spell(475),
   RingOfFrost                           = Spell(113724),
-  RuneofPower                           = Spell(116011),
   ShiftingPower                         = Spell(382440), --Melee 15
   SpellSteal                            = Spell(30449),
   TemporalWarp                          = Spell(386539),
@@ -67,7 +66,6 @@ Spell.Mage.Commons = {
   ArcaneIntellectBuff                   = Spell(1459),
   BerserkingBuff                        = Spell(26297),
   BloodFuryBuff                         = Spell(20572),
-  RuneofPowerBuff                       = Spell(116014),
   TemporalWarpBuff                      = Spell(386540),
   -- Debuffs
   -- Trinket Effects
@@ -137,39 +135,32 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
 
 Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   -- Abilities
-  BlazingBarrier                        = Spell(235313),
-  Combustion                            = Spell(190319),
-  CombustionBuff                        = Spell(190319),
-  FireBlast                             = Spell(108853),
   Fireball                              = Spell(133),
   Flamestrike                           = Spell(2120),
-  HeatingUpBuff                         = Spell(48107),
-  HotStreakBuff                         = Spell(48108),
-  Ignite                                = Spell(12654),
-  PhoenixFlames                         = Spell(257541),
-  Pyroblast                             = Spell(11366),
-  Scorch                                = Spell(2948),
   -- Talents
   AlexstraszasFury                      = Spell(235870),
+  BlazingBarrier                        = Spell(235313),
+  Combustion                            = Spell(190319),
+  FireBlast                             = Spell(108853),
   Firestarter                           = Spell(205026),
   FlameOn                               = Spell(205029),
   FlamePatch                            = Spell(205037),
   FromTheAshes                          = Spell(342344),
   Kindling                              = Spell(155148),
   LivingBomb                            = Spell(44457),
-  Pyroclasm                             = Spell(269650),
-  PyroclasmBuff                         = Spell(269651),
+  PhoenixFlames                         = Spell(257541),
+  Pyroblast                             = Spell(11366),
+  Scorch                                = Spell(2948),
   SearingTouch                          = Spell(269644),
-  -- Conduit
-  FlameAccretion                        = Spell(337224),
-  InfernalCascade                       = Spell(336821),
-  InfernalCascadeBuff                   = Spell(336832),
-  -- Legendaries (Shadowlands)
-  FirestormBuff                         = Spell(333100),
-  GrislyIcicleBuff                      = Spell(333393),
-  GrislyIcicleDebuff                    = Spell(348007),
-  SunKingsBlessingBuff                  = Spell(333314),
-  SunKingsBlessingBuffReady             = Spell(333315),
+  SunKingsBlessing                      = Spell(383886),
+  -- Buffs
+  CombustionBuff                        = Spell(190319),
+  HeatingUpBuff                         = Spell(48107),
+  HotStreakBuff                         = Spell(48108),
+  SunKingsBlessingBuff                  = Spell(383882),
+  SunKingsBlessingBuffReady             = Spell(383883),
+  -- Debuffs
+  IgniteDebuff                          = Spell(12654),
 })
 
 Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
@@ -231,7 +222,6 @@ Item.Mage.Commons = {
   DMDRime                               = Item(198087, {13, 14}),
   DMDRimeBox                            = Item(198477, {13, 14}),
   EruptingSpearFragment                 = Item(193769, {13, 14}),
-  GladiatorsBadgeofFerocity             = Item(201807, {13, 14}),
   HornofValor                           = Item(133642, {13, 14}),
   IcebloodDeathsnare                    = Item(194304, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
@@ -239,6 +229,9 @@ Item.Mage.Commons = {
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
   TomeofUnstablePower                   = Item(193628, {13, 14}),
+  -- Gladiator's Badges
+  CrimsonGladiatorsBadge                = Item(201807, {13, 14}),
+  ObsidianGladiatorsBadge               = Item(205708, {13, 14}),
   -- Other On-Use Items
 }
 

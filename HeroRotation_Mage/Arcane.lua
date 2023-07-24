@@ -64,7 +64,7 @@ local var_conserve_mana = false
 local var_opener = true
 local var_opener_min_mana = (S.ArcaneHarmony:IsAvailable()) and 225000 or 200000
 local var_totm_on_last_spark_stack = not Player:HasTier(30, 4)
-local var_steroid_trinket_equipped = (I.GladiatorsBadgeofFerocity:IsEquipped() or I.IrideusFragment:IsEquipped() or I.EruptingSpearFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped())
+local var_steroid_trinket_equipped = (I.CrimsonGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.IrideusFragment:IsEquipped() or I.EruptingSpearFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped())
 local var_talon_double_on_use = I.TimebreachingTalon:IsEquipped() and I.IrideusFragment:IsEquipped()
 local var_aoe_spark_phase
 local var_spark_phase
@@ -85,7 +85,7 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   var_totm_on_last_spark_stack = not Player:HasTier(30, 4)
-  var_steroid_trinket_equipped = (I.GladiatorsBadgeofFerocity:IsEquipped() or I.IrideusFragment:IsEquipped() or I.EruptingSpearFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped())
+  var_steroid_trinket_equipped = (I.CrimsonGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.IrideusFragment:IsEquipped() or I.EruptingSpearFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped())
   var_talon_double_on_use = I.TimebreachingTalon:IsEquipped() and I.IrideusFragment:IsEquipped()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -523,7 +523,7 @@ local function APL()
     end
     if CDsON() then
       -- time_warp,if=talent.temporal_warp&buff.exhaustion.up&(cooldown.arcane_surge.ready|fight_remains<=40|buff.arcane_surge.up&fight_remains<=80)
-      if S.TimeWarp:IsReady() and (S.TemporalWarp:IsAvailable() and Player:BloodlustExhaustUp() and (S.ArcaneSurge:CooldownUp() or FightRemains <= 40 or S.ArcaneSurge:CooldownUp() and FightRemains <= 80)) then
+      if S.TimeWarp:IsReady() and Settings.Commons.UseTemporalWarp and (S.TemporalWarp:IsAvailable() and Player:BloodlustExhaustUp() and (S.ArcaneSurge:CooldownUp() or FightRemains <= 40 or S.ArcaneSurge:CooldownUp() and FightRemains <= 80)) then
         if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp main 4"; end
       end
       -- lights_judgment,if=buff.arcane_surge.down&debuff.touch_of_the_magi.down&active_enemies>=2
