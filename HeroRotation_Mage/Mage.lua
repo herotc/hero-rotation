@@ -141,11 +141,14 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   AlexstraszasFury                      = Spell(235870),
   BlazingBarrier                        = Spell(235313),
   Combustion                            = Spell(190319),
+  FeeltheBurn                           = Spell(383391),
   FireBlast                             = Spell(108853),
   Firestarter                           = Spell(205026),
   FlameOn                               = Spell(205029),
   FlamePatch                            = Spell(205037),
   FromTheAshes                          = Spell(342344),
+  Hyperthermia                          = Spell(383860),
+  ImprovedScorch                        = Spell(383604),
   Kindling                              = Spell(155148),
   LivingBomb                            = Spell(44457),
   PhoenixFlames                         = Spell(257541),
@@ -153,14 +156,21 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   Scorch                                = Spell(2948),
   SearingTouch                          = Spell(269644),
   SunKingsBlessing                      = Spell(383886),
+  TemperedFlames                        = Spell(383659),
   -- Buffs
   CombustionBuff                        = Spell(190319),
+  FeeltheBurnBuff                       = Spell(383395),
+  FlameAccelerantBuff                   = Spell(203277),
+  FlamesFuryBuff                        = Spell(409964), -- T30 4pc bonus
   HeatingUpBuff                         = Spell(48107),
   HotStreakBuff                         = Spell(48108),
+  HyperthermiaBuff                      = Spell(383874),
   SunKingsBlessingBuff                  = Spell(383882),
-  SunKingsBlessingBuffReady             = Spell(383883),
+  FuryoftheSunKingBuff                  = Spell(383883),
   -- Debuffs
+  CharringEmbersDebuff                  = Spell(408665), -- T30 2pc bonus
   IgniteDebuff                          = Spell(12654),
+  ImprovedScorchDebuff                  = Spell(383608),
 })
 
 Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
@@ -221,14 +231,17 @@ Item.Mage.Commons = {
   DMDInfernoBox                         = Item(194872, {13, 14}),
   DMDRime                               = Item(198087, {13, 14}),
   DMDRimeBox                            = Item(198477, {13, 14}),
+  DragonfireBombDispenser               = Item(202610, {13, 14}),
   EruptingSpearFragment                 = Item(193769, {13, 14}),
   HornofValor                           = Item(133642, {13, 14}),
   IcebloodDeathsnare                    = Item(194304, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
+  MoonlitPrism                          = Item(137541, {13, 14}),
   NeltharionsCalltoChaos                = Item(204201, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
   TomeofUnstablePower                   = Item(193628, {13, 14}),
+  VoidmendersShadowgem                  = Item(110007, {13, 14}),
   -- Gladiator's Badges
   CrimsonGladiatorsBadge                = Item(201807, {13, 14}),
   ObsidianGladiatorsBadge               = Item(205708, {13, 14}),

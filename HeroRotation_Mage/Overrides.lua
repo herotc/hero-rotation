@@ -104,6 +104,7 @@ FirePlayerBuffRemains = HL.AddCoreOverride("Player.BuffRemains",
 
 HL.AddCoreOverride("Spell.IsReady",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = self:IsCastable() and self:IsUsableP()
     local MovingOK = true
     if self:CastTime() > 0 and Player:IsMoving() and Settings.Fire.MovingRotation then
       if self == SpellFire.Scorch or (self == SpellFire.Pyroblast and Player:BuffUp(SpellFire.HotStreakBuff)) or (self == SpellFire.Flamestrike and Player:BuffUp(SpellFire.HotStreakBuff)) then
@@ -111,6 +112,8 @@ HL.AddCoreOverride("Spell.IsReady",
       else
         return false
       end
+    else
+      return BaseCheck
     end
   end
 , 63)
@@ -128,15 +131,9 @@ HL.AddCoreOverride("Spell.IsCastable",
     end
 
     local BaseCheck = self:IsLearned() and self:CooldownRemains( BypassRecovery, Offset or "Auto") == 0 and RangeOK
-    if self == SpellFire.MirrorsofTorment then
+    if self == SpellFire.RadiantSpark then
       return BaseCheck and not Player:IsCasting(self)
-    elseif self == SpellFire.RadiantSpark then
-      return BaseCheck and not Player:IsCasting(self)    
     elseif self == SpellFire.ShiftingPower then
-      return BaseCheck and not Player:IsCasting(self)    
-    elseif self == SpellFire.Deathborne then
-      return BaseCheck and not Player:IsCasting(self)
-    elseif self == SpellFire.Frostbolt then
       return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
@@ -148,9 +145,14 @@ local FireOldPlayerAffectingCombat
 FireOldPlayerAffectingCombat = HL.AddCoreOverride("Player.AffectingCombat",
   function (self)
     return FireOldPlayerAffectingCombat(self)
-      or SpellFire.Pyroblast:InFlight()
-      or SpellFire.Fireball:InFlight()
-      or SpellFire.PhoenixFlames:InFlight()
+      or Player:IsCasting(SpellFire.Pyroblast)
+      or Player:IsCasting(SpellFire.Fireball)
+  end
+, 63)
+
+HL.AddCoreOverride("Spell.InFlightRemains",
+  function(self)
+    return self:TravelTime() - self:TimeSinceLastCast()
   end
 , 63)
 

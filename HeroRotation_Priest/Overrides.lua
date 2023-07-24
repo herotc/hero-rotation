@@ -80,6 +80,18 @@ OldShadowIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   end
 , 258)
 
+local OldShadowInFlight
+OldShadowInFlight = HL.AddCoreOverride("Spell.InFlight",
+  function(self)
+    local BaseCheck = OldShadowInFlight(self)
+    if self == SpellShadow.ShadowCrash then
+      return SpellShadow.ShadowCrash:TimeSinceLastCast() < SpellShadow.ShadowCrash:TravelTime()
+    else
+      return BaseCheck
+    end
+  end
+, 258)
+
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP", 
 -- function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
