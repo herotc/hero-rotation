@@ -94,11 +94,11 @@ local function UpdateSoulFragments()
   else
     -- If we have a soul fragement "snapshot", see if we should invalidate it based on time
     local Prev = Player:PrevGCD(1)
-    if Prev == 207407 and S.SoulCarver:TimeSinceLastCast() >= Player:GCD() then
+    if Prev == S.SoulCarver:ID() and S.SoulCarver:TimeSinceLastCast() >= Player:GCD() then
       SoulFragmentsAdjusted = 0
-    elseif Prev == 263642 and S.Fracture:TimeSinceLastCast() >= Player:GCD() then
+    elseif Prev == S.Fracture:ID() and S.Fracture:TimeSinceLastCast() >= Player:GCD() then
       SoulFragmentsAdjusted = 0
-    elseif Prev == 203782 and S.Shear:TimeSinceLastCast() >= Player:GCD() then
+    elseif Prev == S.Shear:ID() and S.Shear:TimeSinceLastCast() >= Player:GCD() then
       SoulFragmentsAdjusted = 0
     end
   end
