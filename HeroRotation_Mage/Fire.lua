@@ -272,7 +272,7 @@ local function ActiveTalents()
     if Settings.Fire.StayDistance and not Target:IsInRange(12) then
       if CastLeft(S.DragonsBreath) then return "dragons_breath active_talents 6 left"; end
     else
-      if Cast(S.DragonsBreath) then return "dragons_breath active_talents 6"; end
+      if Cast(S.DragonsBreath, Settings.Fire.GCDasOffGCD.DragonsBreath) then return "dragons_breath active_talents 6"; end
     end
   end
   -- dragons_breath,if=talent.alexstraszas_fury&(buff.combustion.down&!buff.hot_streak.react)&(buff.feel_the_burn.up|time>15)&talent.tempered_flames
@@ -280,7 +280,7 @@ local function ActiveTalents()
     if Settings.Fire.StayDistance and not Target:IsInRange(12) then
       if CastLeft(S.DragonsBreath) then return "dragons_breath active_talents 8 left"; end
     else
-      if Cast(S.DragonsBreath) then return "dragons_breath active_talents 8"; end
+      if Cast(S.DragonsBreath, Settings.Fire.GCDasOffGCD.DragonsBreath) then return "dragons_breath active_talents 8"; end
     end
   end
 end
@@ -574,7 +574,7 @@ local function StandardRotation()
     if Settings.Fire.StayDistance and not Target:IsInRange(12) then
       if CastLeft(S.DragonsBreath) then return "dragons_breath standard_rotation 28 left"; end
     else
-      if Cast(S.DragonsBreath) then return "dragons_breath standard_rotation 28"; end
+      if Cast(S.DragonsBreath, Settings.Fire.GCDasOffGCD.DragonsBreath) then return "dragons_breath standard_rotation 28"; end
     end
   end
   -- scorch,if=searing_touch.active

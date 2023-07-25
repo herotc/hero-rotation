@@ -77,6 +77,7 @@ HR.GUISettings.APL.Mage = {
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
+      DragonsBreath = true,
       Meteor = false,
     },
     -- {Display OffGCD as OffGCD}
