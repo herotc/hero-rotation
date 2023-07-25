@@ -512,6 +512,8 @@ local function APL()
 end
 
 local function OnInit()
+  S.UnstableAfflictionDebuff:RegisterAuraTracking()
+
   HR.Print("Affliction Warlock rotation is currently a work in progress, but has been updated for patch 10.1.5.")
 end
 
