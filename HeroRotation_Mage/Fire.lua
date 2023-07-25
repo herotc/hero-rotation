@@ -264,7 +264,7 @@ local function ActiveTalents()
   end
   -- meteor,if=variable.time_to_combustion<=0|buff.combustion.remains>travel_time|!talent.sun_kings_blessing&(cooldown.meteor.duration<variable.time_to_combustion|fight_remains<variable.time_to_combustion)
   if S.Meteor:IsReady() and (var_time_to_combustion <= 0 or Player:BuffRemains(S.CombustionBuff) > S.Meteor:TravelTime() or (not S.SunKingsBlessing:IsAvailable()) and (45 < var_time_to_combustion or FightRemains < var_time_to_combustion)) then
-    if Cast(S.Meteor, nil, nil, not Target:IsInRange(40)) then return "meteor active_talents 4"; end
+    if Cast(S.Meteor, Settings.Fire.GCDasOffGCD.Meteor, nil, not Target:IsInRange(40)) then return "meteor active_talents 4"; end
   end
   -- dragons_breath,if=talent.alexstraszas_fury&(buff.combustion.down&!buff.hot_streak.react)&(buff.feel_the_burn.up|time>15)&!firestarter.remains&!talent.tempered_flames
   -- dragons_breath,if=talent.alexstraszas_fury&(buff.combustion.down&!buff.hot_streak.react)
