@@ -226,8 +226,8 @@ local function Trinkets()
       end
     end
   end
-  -- use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1
-  if Settings.Commons.Enabled.Trinkets and I.DragonfireBombDispenser:IsEquippedAndReady() then
+  -- use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1,if=trinket.beacon_to_the_beyond.cooldown.remains>5
+  if Settings.Commons.Enabled.Trinkets and I.DragonfireBombDispenser:IsEquippedAndReady() and (I.BeacontotheBeyond:IsEquipped() and I.BeacontotheBeyond:CooldownRemains() > 5 or not I.BeacontotheBeyond:IsEquipped()) then
     if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser trinkets 2"; end
   end
 end
@@ -235,8 +235,8 @@ end
 local function Maintenance()
   -- invoke_external_buff,name=symbol_of_hope,if=cooldown.fiery_brand.charges=0
   -- Note: Not handling external buffs.
-  -- metamorphosis,if=talent.first_of_the_illidari
-  if S.Metamorphosis:IsCastable() and (S.FirstoftheIllidari:IsAvailable()) then
+  -- metamorphosis,if=talent.first_of_the_illidari&trinket.beacon_to_the_beyond.cooldown.remains<10|fight_remains<20
+  if S.Metamorphosis:IsCastable() and (S.FirstoftheIllidari:IsAvailable() and (I.BeacontotheBeyond:IsEquipped() and I.BeacontotheBeyond:CooldownRemains() < 10 or not I.BeacontotheBeyond:IsEquipped()) or FightRemains < 20) then
     if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis) then return "metamorphosis maintenance 2"; end
   end
   -- call_action_list,name=trinkets
