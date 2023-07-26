@@ -280,36 +280,36 @@ end
 
 local function Trinkets()
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=voidmenders_shadowgem,if=buff.power_infusion.up|fight_remains<20
+    -- use_item,name=voidmenders_shadowgem,if=(buff.power_infusion.up|fight_remains<20)&equipped.voidmenders_shadowgem
     if I.VoidmendersShadowgem:IsEquippedAndReady() and (Player:BuffUp(S.PowerInfusionBuff) or FightRemains < 20) then
       if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem trinkets 2"; end
     end
-    -- use_item,name=darkmoon_deck_box_inferno
+    -- use_item,name=darkmoon_deck_box_inferno,if=equipped.darkmoon_deck_box_inferno
     if I.DMDInferno:IsEquippedAndReady() then
       if Cast(I.DMDInferno, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_inferno trinkets 4"; end
     end
     if I.DMDInfernoBox:IsEquippedAndReady() then
       if Cast(I.DMDInfernoBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_inferno_box trinkets 6"; end
     end
-    -- use_item,name=darkmoon_deck_box_rime
+    -- use_item,name=darkmoon_deck_box_rime,if=equipped.darkmoon_deck_box_rime
     if I.DMDRime:IsEquippedAndReady() then
       if Cast(I.DMDRime, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_rime trinkets 8"; end
     end
     if I.DMDRimeBox:IsEquippedAndReady() then
       if Cast(I.DMDRimeBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_rime_box trinkets 10"; end
     end
-    -- use_item,name=darkmoon_deck_box_dance
+    -- use_item,name=darkmoon_deck_box_dance,if=equipped.darkmoon_deck_box_dance
     if I.DMDDance:IsEquippedAndReady() then
       if Cast(I.DMDDance, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_dance trinkets 12"; end
     end
     if I.DMDDanceBox:IsEquippedAndReady() then
       if Cast(I.DMDDanceBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_dance_box trinkets 14"; end
     end
-    -- use_item,name=erupting_spear_fragment,if=buff.power_infusion.up|raid_event.adds.up|fight_remains<20
+    -- use_item,name=erupting_spear_fragment,if=(buff.power_infusion.up|raid_event.adds.up|fight_remains<20)&equipped.erupting_spear_fragment
     if I.EruptingSpearFragment:IsEquippedAndReady() and (Player:BuffUp(S.PowerInfusionBuff) or FightRemains < 20) then
       if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment trinkets 16"; end
     end
-    -- use_item,name=beacon_to_the_beyond,if=!raid_event.adds.exists|raid_event.adds.up|spell_targets.beacon_to_the_beyond>=5|fight_remains<20
+    -- use_item,name=beacon_to_the_beyond,if=(!raid_event.adds.exists|raid_event.adds.up|spell_targets.beacon_to_the_beyond>=5|fight_remains<20)&equipped.beacon_to_the_beyond
     if I.BeacontotheBeyond:IsEquippedAndReady() then
       if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond trinkets 18"; end
     end
@@ -325,7 +325,7 @@ local function Trinkets()
       end
     end
   end
-  -- use_item,name=desperate_invokers_codex
+  -- use_item,name=desperate_invokers_codex,if=equipped.desperate_invokers_codex
   if Settings.Commons.Enabled.Trinkets and I.DesperateInvokersCodex:IsEquippedAndReady() then
     if Cast(I.DesperateInvokersCodex, nil, Settings.Commons.DisplayStyle.Trinkets) then return "desperate_invokers_codex trinkets 20"; end
   end
@@ -338,27 +338,27 @@ local function Filler()
   end
   -- shadow_word_death,target_if=target.health.pct<20|buff.deathspeaker.up
   if S.ShadowWordDeath:IsReady() then
-    if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateCycleSWDFiller, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 3"; end
+    if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateCycleSWDFiller, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 4"; end
   end
   -- mind_spike_insanity
   if S.MindSpikeInsanity:IsReady() then
-    if Cast(S.MindSpikeInsanity, nil, nil, not Target:IsSpellInRange(S.MindSpikeInsanity)) then return "mind_spike_insanity filler 4"; end
+    if Cast(S.MindSpikeInsanity, nil, nil, not Target:IsSpellInRange(S.MindSpikeInsanity)) then return "mind_spike_insanity filler 6"; end
   end
   -- mind_flay,if=buff.mind_flay_insanity.up
   if S.MindFlay:IsCastable() and (Player:BuffUp(S.MindFlayInsanityBuff)) then
-    if Cast(S.MindSpike, nil, nil, not Target:IsSpellInRange(S.MindSpike)) then return "mind_flay filler 6"; end
+    if Cast(S.MindSpike, nil, nil, not Target:IsSpellInRange(S.MindSpike)) then return "mind_flay filler 8"; end
   end
-  -- halo,if=raid_event.adds.in>20
-  if S.Halo:IsReady() then
-    if Cast(S.Halo, Settings.Shadow.GCDasOffGCD.Halo, nil, not Target:IsInRange(30)) then return "halo filler 10"; end
+  -- mindgames
+  if S.Mindgames:IsReady() then
+    if Cast(S.Mindgames, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "mindgames filler 10"; end
   end
   -- shadow_word_death,target_if=min:target.time_to_die,if=talent.inescapable_torment&pet.fiend.active
   if S.ShadowWordDeath:IsReady() and (S.InescapableTorment:IsAvailable() and VarFiendUp) then
     if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "min", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 12"; end
   end
-  -- divine_star,if=raid_event.adds.in>10
-  if S.DivineStar:IsReady() then
-    if Cast(S.DivineStar, Settings.Shadow.GCDasOffGCD.DivineStar, nil, not Target:IsInRange(30)) then return "divine_star filler 14"; end
+  -- halo,if=raid_event.adds.in>20
+  if S.Halo:IsReady() then
+    if Cast(S.Halo, Settings.Shadow.GCDasOffGCD.Halo, nil, not Target:IsInRange(30)) then return "halo filler 14"; end
   end
   -- devouring_plague,if=buff.voidform.up
   if S.DevouringPlague:IsReady() and (Player:BuffUp(S.VoidformBuff)) then
@@ -378,18 +378,18 @@ local function Filler()
   end
   -- shadow_word_death,target_if=target.health.pct<20
   if S.ShadowWordDeath:IsReady() then
-    if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateTargetIfSWDFiller, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 22"; end
+    if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateTargetIfSWDFiller, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 24"; end
   end
   -- divine_star
   -- Note: Handled in above divine_star line, as we're not checking raid_event.adds.in
   -- shadow_word_death
   -- Note: APL comments reference using this while moving
   if S.ShadowWordDeath:IsReady() and Player:IsMoving() then
-    if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death movement filler 24"; end
+    if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death movement filler 26"; end
   end
   -- shadow_word_pain,target_if=min:remains
   if S.ShadowWordPain:IsReady() then
-    if Everyone.CastCycle(S.ShadowWordPain, Enemies40y, EvaluateCycleSWPFiller, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain filler 26"; end
+    if Everyone.CastCycle(S.ShadowWordPain, Enemies40y, EvaluateCycleSWPFiller, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain filler 28"; end
   end
 end
 
@@ -492,10 +492,6 @@ local function Main()
   if S.VoidTorrent:IsCastable() and (not VarHoldingCrash) then
     if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent main 28"; end
   end
-  -- mindgames,target_if=variable.all_dots_up&dot.devouring_plague.remains>=cast_time
-  if S.Mindgames:IsReady() then
-    if Everyone.CastCycle(S.Mindgames, Enemies40y, EvaluateCycleMindGamesMain, not Target:IsSpellInRange(S.Mindgames), nil, Settings.Commons.DisplayStyle.Signature) then return "mindgames main 30"; end
-  end
   -- call_action_list,name=filler
   local ShouldReturn = Filler(); if ShouldReturn then return ShouldReturn; end
 end
@@ -513,17 +509,13 @@ local function PLTorrent()
   if S.DevouringPlague:IsReady() and (Target:DebuffRemains(S.DevouringPlagueDebuff) <= 4 and S.VoidTorrent:CooldownRemains() < Player:GCD() * 2) then
     if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague pl_torrent 6"; end
   end
-  -- mind_blast,if=!talent.mindgames|cooldown.mindgames.remains>=3&!prev_gcd.1.mind_blast
-  if S.MindBlast:IsReady() and ((not S.Mindgames:IsAvailable()) or S.Mindgames:CooldownRemains() >= 3 and not Player:PrevGCD(1, S.MindBlast)) then
+  -- mind_blast,if=!prev_gcd.1.mind_blast
+  if S.MindBlast:IsReady() and (not Player:PrevGCD(1, S.MindBlast)) then
     if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast pl_torrent 8"; end
   end
   -- void_torrent,if=dot.vampiric_touch.ticking&dot.shadow_word_pain.ticking|buff.voidform.up
   if S.VoidTorrent:IsCastable() and (DotsUp(Target, false) or Player:BuffUp(S.VoidformBuff)) then
     if Cast(S.VoidTorrent, Settings.Shadow.GCDasOffGCD.VoidTorrent, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent pl_torrent 10"; end
-  end
-  -- mindgames,if=dot.vampiric_touch.ticking&dot.shadow_word_pain.ticking&dot.devouring_plague.ticking|buff.voidform.up
-  if S.Mindgames:IsReady() and (VarAllDotsUp or Player:BuffUp(S.VoidformBuff)) then
-    if Cast(S.Mindgames, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "mindgames pl_torrent 12"; end
   end
 end
 
@@ -577,10 +569,6 @@ local function AoE()
   -- call_action_list,name=pl_torrent,target_if=talent.void_torrent&talent.psychic_link&cooldown.void_torrent.remains<=3&(!variable.holding_crash|raid_event.adds.count%(active_dot.vampiric_touch+raid_event.adds.count)<1.5)&((insanity>=50|dot.devouring_plague.ticking|buff.dark_reveries.up)|buff.voidform.up|buff.dark_ascension.up)
   if S.VoidTorrent:IsAvailable() and S.PsychicLink:IsAvailable() and S.VoidTorrent:CooldownRemains() <= 3 and ((not VarHoldingCrash) or EnemiesCount10ySplash / (S.VampiricTouchDebuff:AuraActiveCount() + EnemiesCount10ySplash) < 1.5) and ((Player:Insanity() >= 50 or Target:DebuffUp(S.DevouringPlagueDebuff) or Player:BuffUp(S.DarkReveriesBuff)) or Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscensionBuff)) then
     local ShouldReturn = PLTorrent(); if ShouldReturn then return ShouldReturn; end
-  end
-  -- mindgames,if=active_enemies<5&dot.devouring_plague.ticking|talent.psychic_link
-  if S.Mindgames:IsReady() and (EnemiesCount10ySplash < 5 and Target:DebuffUp(S.DevouringPlagueDebuff) or S.PsychicLink:IsAvailable()) then
-    if Cast(S.Mindgames, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames aoe 24"; end
   end
   -- void_torrent,if=!talent.psychic_link,target_if=variable.dots_up
   if S.VoidTorrent:IsCastable() and (not S.PsychicLink:IsAvailable()) then
