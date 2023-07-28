@@ -84,6 +84,9 @@ HR.GUISettings.APL.Druid = {
   Guardian = {
     UseIronfurOffensively = true,
     UseRageDefensively = true,
+    DoCRegrowthNoPoPHP = 30,
+    DoCRegrowthWithPoPHP = 45,
+    RenewalHP = 60,
     BarkskinHP = 50,
     FrenziedRegenHP = 70,
     SurvivalInstinctsHP = 30,
@@ -142,6 +145,9 @@ CreateARPanelOptions(CP_Feral, "APL.Druid.Feral")
 CreateARPanelOptions(CP_Guardian, "APL.Druid.Guardian")
 CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseIronfurOffensively", "Use Ironfur Offensively", "Enable this if you want offensive Ironfur suggestions (e.g. with Thorns of Iron).")
 CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseRageDefensively", "Use Rage Defensively", "Enable this if you want to save rage for defensive use, disabling Maul suggestions.")
+CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.RenewalHP", "Renewal HP", "Set the HP percentage threshold of when you want the addon to suggest defensive usgae of Renewal, if talented. (Set to 0 to disable)")
+CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.DoCRegrowthWithPoPHP", "DoC Regrowth With PoP HP", "Set the HP percentage threshold of when you want the addon to suggest defensive usage of a Dream of Cenarius buffed Regrowth with the Protector of the Pack buff active. (Set to 0 to disable)")
+CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.DoCRegrowthNoPoPHP", "DoC Regrowth Without PoP HP", "Set the HP precentage threshold of when you want the addon to suggest defensive usage of a Dream of Cenarius buffed Regrowth without the Protector of the Pack buff active. (Set to 0 to disable)")
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.BarkskinHP", {0, 100, 1}, "Barkskin Threshold", "Set the HP percentage threshold of when to use Barkskin.")
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.FrenziedRegenHP", {0, 100, 1}, "Frenzied Regen Threshold", "Set the HP percentage threshold of when to use Frenzied Regeneration.")
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.SurvivalInstinctsHP", {0, 100, 1}, "Survival Instincts Threshold", "Set the HP percentage threshold of when to use Survival Instincts.")

@@ -34,6 +34,7 @@ Spell.Druid.Commons = {
   MarkoftheWild                         = Spell(1126),
   Moonfire                              = Spell(8921),
   Prowl                                 = Spell(5215),
+  Regrowth                              = Spell(8936),
   Shred                                 = Spell(5221),
   -- Talents
   ConvoketheSpirits                     = Spell(391528),
@@ -45,7 +46,9 @@ Spell.Druid.Commons = {
   MightyBash                            = Spell(5211),
   MoonkinForm                           = MultiSpell(24858,197625),
   NaturesVigil                          = Spell(124974),
+  ProtectorofthePack                    = Spell(378986),
   Rake                                  = Spell(1822),
+  Renewal                               = Spell(108238),
   Rip                                   = Spell(1079),
   SkullBash                             = Spell(106839),
   Starfire                              = Spell(194153),
@@ -59,6 +62,7 @@ Spell.Druid.Commons = {
   HeartoftheWildBuff                    = Spell(319454),
   IronfurBuff                           = Spell(192081),
   MarkoftheWildBuff                     = Spell(1126),
+  PoPHealBuff                           = Spell(395336),
   -- Debuffs
   MoonfireDebuff                        = Spell(164812),
   RakeDebuff                            = Spell(155722),
@@ -222,6 +226,7 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   -- Talents
   Berserk                               = Spell(50334),
   BristlingFur                          = Spell(155835),
+  DreamofCenarius                       = Spell(372119),
   FlashingClaws                         = Spell(393427),
   FuryofNature                          = Spell(370695),
   Incarnation                           = Spell(102558),
@@ -240,6 +245,7 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   VulnerableFlesh                       = Spell(372618),
   -- Buffs
   BerserkBuff                           = Spell(50334),
+  DreamofCenariusBuff                   = Spell(372152),
   GalacticGuardianBuff                  = Spell(213708),
   GoreBuff                              = Spell(93662),
   IncarnationBuff                       = Spell(102558),
