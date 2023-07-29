@@ -375,8 +375,8 @@ local function ST()
       end
     end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=full_recharge_time<gcd&focus+cast_regen<focus.max&(buff.deadly_duo.stack>2|buff.spearhead.remains&dot.pheromone_bomb.remains)
-  if S.KillCommand:IsCastable() and (S.KillCommand:FullRechargeTime() < Player:GCD() and CheckFocusCap(S.KillCommand:ExecuteTime(), 21) and (Player:BuffStack(S.DeadlyDuoBuff) > 2 or Player:BuffUp(S.SpearheadBuff) and Target:DebuffRemains(S.PheromoneBombDebuff))) then
+  -- kill_command,target_if=min:bloodseeker.remains,if=full_recharge_time<gcd&focus+cast_regen<focus.max&(buff.deadly_duo.stack>2|talent.flankers_advantage&buff.deadly_duo.stack>1|buff.spearhead.remains&dot.pheromone_bomb.remains)
+  if S.KillCommand:IsCastable() and (S.KillCommand:FullRechargeTime() < Player:GCD() and CheckFocusCap(S.KillCommand:ExecuteTime(), 21) and (Player:BuffStack(S.DeadlyDuoBuff) > 2 or S.FlankersAdvantage:IsAvailable() and Player:BuffStack(S.DeadlyDuoBuff) > 1 or Player:BuffUp(S.SpearheadBuff) and Target:DebuffRemains(S.PheromoneBombDebuff))) then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command st 16"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=cooldown.wildfire_bomb.full_recharge_time<3*gcd&debuff.shredded_armor.stack<1&set_bonus.tier30_4pc&!buff.spearhead.remains

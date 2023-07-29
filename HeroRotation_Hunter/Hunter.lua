@@ -179,6 +179,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   Carve                                 = Spell(187708),
   CoordinatedAssault                    = Spell(360952),
   CoordinatedKill                       = Spell(385739),
+  FlankersAdvantage                     = Spell(263186),
   FlankingStrike                        = Spell(269751),
   FuryoftheEagle                        = Spell(203415),
   Harpoon                               = Spell(190925),
