@@ -594,6 +594,9 @@ local function StandardRotation()
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike standard_rotation 34"; end
   end
   -- pyroblast,if=talent.tempered_flames&!buff.flame_accelerant.react
+  if S.Pyroblast:IsReady() and (S.TemperedFlames:IsAvailable() and Player:BuffDown(S.FlameAccelerantBuff)) then
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 35"; end
+  end
   -- fireball
   if S.Fireball:IsReady() then
     if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball standard_rotation 36"; end
