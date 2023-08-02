@@ -10,6 +10,7 @@ local Spell   = HL.Spell
 local Item    = HL.Item
 -- HeroRotation
 local HR      = HeroRotation
+local num     = HR.Commons.Everyone.num
 -- Spells
 local SpellDisc    = Spell.Priest.Discipline
 local SpellShadow  = Spell.Priest.Shadow
@@ -59,6 +60,18 @@ HL.AddCoreOverride ("Player.Insanity",
         return Insanity
       end
     end 
+  end
+, 258)
+
+local OldShadowIsReady
+OldShadowIsReady = HL.AddCoreOverride("Spell.IsReady",
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = OldShadowIsReady(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    if self == SpellShadow.MindSpikeInsanity then
+      return BaseCheck and (Player:BuffStack(SpellShadow.MindSpikeInsanityBuff) - num(Player:IsCasting(SpellShadow.MindSpikeInsanity)) > 0)
+    else
+      return BaseCheck
+    end
   end
 , 258)
 

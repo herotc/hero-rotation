@@ -40,6 +40,7 @@ HR.GUISettings.APL.Priest = {
     DesperatePrayerHP = 75,
     DispersionHP = 30,
     SelfPI = true,
+    UseOpener = true,
     PotionType = {
       Selected = "Power",
     },
@@ -107,6 +108,8 @@ CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", { 0, 10
   "Set the Dispersion HP threshold.")
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume Self-Power Infusion",
   "Assume the player will be using Power Infusion on themselves.")
+CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseOpener", "Use Custom Opener",
+  "Use the custom opener in HeroRotation. If disabled, HeroRotation will follow the Simulationcraft APL without attempting any opener suggestions.")
 CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow")
 
 --Discipline

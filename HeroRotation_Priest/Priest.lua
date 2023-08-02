@@ -129,6 +129,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   DevouredPrideBuff           = Spell(373316), -- Idol of Y'Shaarj buff
   MindDevourerBuff            = Spell(373204),
   MindFlayInsanityBuff        = Spell(391401),
+  MindSpikeInsanityBuff       = Spell(407468),
   ShadowformBuff              = Spell(232698),
   ShadowyInsightBuff          = Spell(375981),
   SurgeOfDarknessBuff         = Spell(87160),
