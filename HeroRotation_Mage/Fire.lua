@@ -159,7 +159,7 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   var_firestarter_combustion = S.SunKingsBlessing:IsAvailable()
-  var_hot_streak_flamestrike = 3 * num(S.FlamePatch:IsAvailable()) + 999 * num(not S.FlamePatch:IsAvailable())
+  var_hot_streak_flamestrike = (S.FlamePatch:IsAvailable()) and 3 or 999
   var_combustion_flamestrike = var_hot_streak_flamestrike
   var_kindling_reduction = (S.Kindling:IsAvailable()) and 0.4 or 1
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
@@ -510,24 +510,16 @@ end
 
 local function StandardRotation()
   -- flamestrike,if=active_enemies>=variable.hot_streak_flamestrike&(buff.hot_streak.react|buff.hyperthermia.react)
-  if AoEON() and S.Flamestrike:IsReady() and (EnemiesCount8ySplash >= var_hot_streak_flamestrike and (Player:BuffUp(S.HotStreakBuff) or Player:BuffUp(S.HyperthermiaBuff))) then
+  if AoEON() and S.Flamestrike:IsReady() and (EnemiesCount8ySplash >= var_hot_streak_flamestrike and FreeCastAvailable()) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike standard_rotation 2"; end
   end
   -- pyroblast,if=buff.hyperthermia.react
-  if S.Pyroblast:IsReady() and (Player:BuffUp(S.HyperthermiaBuff)) then
-    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 4"; end
-  end
   -- pyroblast,if=buff.hot_streak.react&(buff.hot_streak.remains<action.fireball.execute_time)
-  if S.Pyroblast:IsReady() and (Player:BuffUp(S.HotStreakBuff) and Player:BuffRemains(S.HotStreakBuff) < S.Fireball:ExecuteTime()) then
-    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 6"; end
-  end
   -- pyroblast,if=buff.hot_streak.react&(hot_streak_spells_in_flight|firestarter.active|talent.alexstraszas_fury&action.phoenix_flames.charges)
-  if S.Pyroblast:IsReady() and (Player:BuffUp(S.HotStreakBuff) and (HotStreakInFlight() > 0 or FirestarterActive() or S.AlexstraszasFury:IsAvailable() and S.PhoenixFlames:Charges() > 0)) then
-    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 8"; end
-  end
   -- pyroblast,if=buff.hot_streak.react&searing_touch.active
-  if S.Pyroblast:IsReady() and (Player:BuffUp(S.HotStreakBuff) and SearingTouchActive()) then
-    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 10"; end
+  -- Note: Combining free Pyroblast lines
+  if S.Pyroblast:IsReady() and (FreeCastAvailable()) then
+    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 4"; end
   end
   -- flamestrike,if=active_enemies>=variable.skb_flamestrike&buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.expiration_delay_remains=0"
   if AoEON() and S.Flamestrike:IsReady() and (not Player:IsCasting(S.Flamestrike)) and (EnemiesCount8ySplash >= var_skb_flamestrike and Player:BuffUp(S.FuryoftheSunKingBuff)) then
@@ -592,7 +584,7 @@ local function StandardRotation()
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 35"; end
   end
   -- fireball
-  if S.Fireball:IsReady() then
+  if S.Fireball:IsReady() and (not FreeCastAvailable()) then
     if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball standard_rotation 36"; end
   end
 end
@@ -660,10 +652,6 @@ local function APL()
     -- call precombat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- Manually added: Cast Pyroblast if we have a freebie
-    if S.Pyroblast:IsReady() and FreeCastAvailable() then
-      if PBCast(S.Pyroblast) then return "pyroblast free"; end
     end
     -- counterspell
     local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
