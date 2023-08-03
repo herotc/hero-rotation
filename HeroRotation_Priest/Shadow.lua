@@ -374,9 +374,9 @@ local function Opener()
     if Cast(S.DarkAscension, Settings.Shadow.GCDasOffGCD.DarkAscension) then return "dark_ascension opener 6"; end
   end
   if S.VoidEruption:IsAvailable() then
-    -- shadow_word_death,if=talent.void_eruption&prev_gcd.mind_blast
+    -- shadow_word_death,if=talent.inescapable_torment&talent.void_eruption&prev_gcd.mind_blast
     -- Note: 20+ seconds since last cast, since we only want one cast during the opener.
-    if S.ShadowWordDeath:IsCastable() and Player:PrevGCDP(1, S.MindBlast) and S.ShadowWordDeath:TimeSinceLastCast() > 20 then
+    if S.ShadowWordDeath:IsCastable() and S.InescapableTorment:IsAvailable() and Player:PrevGCDP(1, S.MindBlast) and S.ShadowWordDeath:TimeSinceLastCast() > 20 then
       if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death opener 8"; end
     end
     -- mind_blast,if=talent.void_eruption
