@@ -361,8 +361,8 @@ local function Trinkets()
 end
 
 local function Opener()
-  -- shadow_crash
-  if S.ShadowCrash:IsCastable() then
+  -- shadow_crash,if=!debuff.vampiric_touch.up
+  if S.ShadowCrash:IsCastable() and (Target:DebuffDown(S.VampiricTouchDebuff)) then
     if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash opener 2"; end
   end
   -- mindbender
