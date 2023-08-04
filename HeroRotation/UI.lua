@@ -66,7 +66,7 @@
   end
 
   -- Create a Backdrop
-  function HR:CreateBackdrop (Frame)
+  function HR:CreateBackdrop (Frame, Strata)
     if Frame.Backdrop or not HR.GUISettings.General.BlackBorderIcon then return; end
 
     local Backdrop = CreateFrame("Frame", nil, Frame, BackdropTemplateMixin and "BackdropTemplate");
@@ -87,7 +87,8 @@
     Backdrop:SetBackdropBorderColor(0, 0, 0);
     Backdrop:SetBackdropColor(0, 0, 0, 1);
 
-    Backdrop:SetFrameStrata(HR.MainFrame:GetFrameStrata());
+    if not Strata then Strata = HR.MainFrame:GetFrameStrata() end
+    Backdrop:SetFrameStrata(Strata);
     if Frame:GetFrameLevel() - 2 >= 0 then
       Backdrop:SetFrameLevel(Frame:GetFrameLevel() - 2);
     else
@@ -498,7 +499,7 @@
 
         if HR.GUISettings.General.BlackBorderIcon then
           IconFrame.Texture:SetTexCoord(.08, .92, .08, .92);
-          HR:CreateBackdrop(IconFrame);
+          HR:CreateBackdrop(IconFrame, Nameplate:GetFrameStrata());
         end
 
         HR.Nameplate.MainInitialized = true;
@@ -565,7 +566,7 @@
 
         if HR.GUISettings.General.BlackBorderIcon then
           SuggestedIconFrame.Texture:SetTexCoord(.08, .92, .08, .92);
-          HR:CreateBackdrop(SuggestedIconFrame);
+          HR:CreateBackdrop(SuggestedIconFrame, Nameplate:GetFrameStrata());
         end
 
         HR.Nameplate.SuggestedInitialized = true;
