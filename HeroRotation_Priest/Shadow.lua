@@ -476,7 +476,8 @@ local function Filler()
     if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death movement filler 26"; end
   end
   -- shadow_word_pain,target_if=min:remains
-  if S.ShadowWordPain:IsReady() then
+  -- Note: Per APL note, intent is to be used as a movement filler.
+  if S.ShadowWordPain:IsReady() and Player:IsMoving() then
     if Everyone.CastTargetIf(S.ShadowWordPain, Enemies40y, "min", EvaluateTargetIfFilterSWP, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain filler 28"; end
   end
 end
