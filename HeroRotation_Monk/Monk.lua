@@ -129,6 +129,7 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   -- Debuffs
   FaeExposureDebuff                     = Spell(395414),
   MarkoftheCraneDebuff                  = Spell(228287),
+  SkyreachCritDebuff                    = Spell(393047),
   SkyreachExhaustionDebuff              = Spell(393050),
   -- Tier 29 Effects
   KicksofFlowingMomentumBuff            = Spell(394944),
