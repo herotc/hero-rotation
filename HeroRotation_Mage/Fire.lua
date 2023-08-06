@@ -309,7 +309,7 @@ local function CombustionCooldowns()
   -- invoke_external_buff,name=blessing_of_summer,if=buff.blessing_of_summer.down
   -- Note: Not handling external buffs
   -- time_warp,if=talent.temporal_warp&buff.exhaustion.up
-  if S.TimeWarp:IsReady() and Settings.Fire.UseTemporalWarp and (S.TemporalWarp:IsAvailable() and Player:BloodlustExhaustUp()) then
+  if S.TimeWarp:IsReady() and Settings.Commons.UseTemporalWarp and (S.TemporalWarp:IsAvailable() and Player:BloodlustExhaustUp()) then
     if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp combustion_cooldowns 12"; end
   end
   if Settings.Commons.Enabled.Trinkets then
@@ -367,8 +367,8 @@ local function CombustionPhase()
   -- use_item,name=hyperthread_wristwraps,if=hyperthread_wristwraps.fire_blast>=2&action.fire_blast.charges=0
   -- use_item,name=neural_synapse_enhancer,if=variable.time_to_combustion>60
   -- Note: Not handling items from Mechagon...
-  -- phoenix_flames,if=set_bonus.tier30_2pc&!action.phoenix_flames.in_flight&debuff.charring_embers.remains<2*gcd.max
-  if S.PhoenixFlames:IsCastable() and (Player:HasTier(30, 2) and (not S.PhoenixFlames:InFlight()) and Target:DebuffRemains(S.CharringEmbersDebuff) < 2 * GCDMax) then
+  -- phoenix_flames,if=set_bonus.tier30_2pc&!action.phoenix_flames.in_flight&debuff.charring_embers.remains<4*gcd.max&!buff.hot_streak.react
+  if S.PhoenixFlames:IsCastable() and (Player:HasTier(30, 2) and (not S.PhoenixFlames:InFlight()) and Target:DebuffRemains(S.CharringEmbersDebuff) < 4 * GCDMax and Player:BuffDown(S.HotStreakBuff)) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 8"; end
   end
   -- call_action_list,name=active_talents
@@ -416,8 +416,8 @@ local function CombustionPhase()
   if S.Pyroblast:IsReady() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffUp(S.HeatingUpBuff) and EnemiesCount8ySplash < var_combustion_flamestrike and CombustionUp) then
     if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 28"; end
   end
-  -- shifting_power,if=buff.combustion.up&!action.fire_blast.charges&(action.phoenix_flames.charges<action.phoenix_flames.max_charges|talent.alexstraszas_fury)&variable.combustion_shifting_power
-  if S.ShiftingPower:IsReady() and (CombustionUp and S.FireBlast:Charges() == 0 and (S.PhoenixFlames:Charges() < S.PhoenixFlames:MaxCharges() or S.AlexstraszasFury:IsAvailable()) and var_combustion_shifting_power) then
+  -- shifting_power,if=buff.combustion.up&!action.fire_blast.charges&(action.phoenix_flames.charges<action.phoenix_flames.max_charges|talent.alexstraszas_fury)&variable.combustion_shifting_power<=active_enemies
+  if S.ShiftingPower:IsReady() and (CombustionUp and S.FireBlast:Charges() == 0 and (S.PhoenixFlames:Charges() < S.PhoenixFlames:MaxCharges() or S.AlexstraszasFury:IsAvailable()) and var_combustion_shifting_power <= EnemiesCount8ySplash) then
     if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power combustion_phase 30"; end
   end
   -- flamestrike,if=buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.remains>cast_time&active_enemies>=variable.skb_flamestrike&buff.fury_of_the_sun_king.expiration_delay_remains=0
@@ -537,8 +537,8 @@ local function StandardRotation()
   if S.Pyroblast:IsReady() and ((Player:IsCasting(S.Scorch) or Player:PrevGCDP(1, S.Scorch)) and Player:BuffUp(S.HeatingUpBuff) and SearingTouchActive() and EnemiesCount8ySplash < var_hot_streak_flamestrike) then
     if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 18"; end
   end
-  -- phoenix_flames,if=set_bonus.tier30_2pc&debuff.charring_embers.remains<2*gcd.max
-  if S.PhoenixFlames:IsCastable() and (Player:HasTier(30, 2) and Target:DebuffRemains(S.CharringEmbersDebuff) < 2 * GCDMax) then
+  -- phoenix_flames,if=set_bonus.tier30_2pc&debuff.charring_embers.remains<2*gcd.max&!buff.hot_streak.react
+  if S.PhoenixFlames:IsCastable() and (Player:HasTier(30, 2) and Target:DebuffRemains(S.CharringEmbersDebuff) < 2 * GCDMax and Player:BuffDown(S.HotStreakBuff)) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames standard_rotation 20"; end
   end
   -- scorch,if=improved_scorch.active&debuff.improved_scorch.stack<debuff.improved_scorch.max_stack
@@ -659,8 +659,8 @@ local function APL()
     if not var_disable_combustion then
       CombustionTiming()
     end
-    -- time_warp,if=talent.temporal_warp&(buff.exhaustion.up|interpolated_fight_remains<buff.bloodlust.duration)
-    if CDsON() and S.TimeWarp:IsReady() and (S.TemporalWarp:IsAvailable() and Player:BloodlustExhaustUp()) then
+    -- time_warp,if=buff.exhaustion.up&talent.temporal_warp&(firestarter.active|interpolated_fight_remains<buff.bloodlust.duration)
+    if CDsON() and S.TimeWarp:IsReady() and Settings.Commons.UseTemporalWarp and (Player:BloodlustExhaustUp() and S.TemporalWarp:IsAvailable() and (FirestarterActive() or FightRemains < 40)) then
       if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp main 2"; end
     end
     -- potion,if=buff.potion.duration>variable.time_to_combustion+buff.combustion.duration
