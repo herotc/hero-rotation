@@ -153,6 +153,9 @@ function HR.Cast(Object, OffGCD, DisplayStyle, OutofRange, CustomTime)
   local ObjectTexture = HR.GetTexture(Object)
   local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.Action.TextureHotKey(ObjectTexture)
   FlashIcon(Object)
+  if OutofRange == nil then
+    OutofRange = not Target:IsSpellInRange(Object)
+  end
   if OffGCD or DisplayStyle == "Cooldown" then
     -- If this is the second cooldown, check to ensure we don't have a duplicate icon in the first slot
     if HR.CastOffGCDOffset == 1 or (HR.CastOffGCDOffset == 2 and HR.SmallIconFrame:GetIcon(1) ~= ObjectTexture) then
