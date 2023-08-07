@@ -42,7 +42,7 @@ local S = Spell.Druid.Balance
 -- Items
 local I = Item.Druid.Balance
 local OnUseExcludes = {
-  --  I.TrinketName:ID(),
+  I.MirrorofFracturedTomorrows:ID(),
 }
 
 -- Trinket Item Objects
@@ -274,7 +274,13 @@ end
 local function St()
   -- sunfire,target_if=refreshable&remains<2&(target.time_to_die-remains)>6
   if S.Sunfire:IsCastable() then
-    if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireST, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire st 4"; end
+    if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireST, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire st 2"; end
+  end
+  -- variable,name=cd_condition_st,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>15|fight_remains<25+10*talent.incarnation_chosen_of_elune))
+  VarCDConditionST = CDsON() and (CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 15 or FightRemains < 25 + 10 * num(S.Incarnation:IsAvailable())))
+  -- use_item,name=mirror_of_fractured_tomorrows,if=variable.cd_condition_st
+  if Settings.Commons.Enabled.Trinkets and I.MirrorofFracturedTomorrows:IsEquippedAndReady() and (VarCDConditionST) then
+    if Cast(I.MirrorofFracturedTomorrows, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows st 4"; end
   end
   -- moonfire,target_if=refreshable&remains<2&(target.time_to_die-remains)>6
   if S.Moonfire:IsCastable() then
@@ -284,8 +290,6 @@ local function St()
   if S.StellarFlare:IsCastable() then
     if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareST, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare st 10"; end
   end
-  -- variable,name=cd_condition_st,value=!druid.no_cds&(cooldown.ca_inc.remains<15&!buff.ca_inc.up&(target.time_to_die>15|fight_remains<25+10*talent.incarnation_chosen_of_elune))
-  VarCDConditionST = CDsON() and (CaInc:CooldownRemains() < 15 and (not CAIncBuffUp) and (Target:TimeToDie() > 15 or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable())))
   -- cancel_buff,name=starlord,if=buff.starlord.remains<2&(buff.primordial_arcanic_pulsar.value>=550&!buff.ca_inc.up&buff.starweavers_warp.up|buff.primordial_arcanic_pulsar.value>=560&buff.starweavers_weft.up)
   -- TODO: Handle cancel_buff
   -- starfall,if=buff.primordial_arcanic_pulsar.value>=550&!buff.ca_inc.up&buff.starweavers_warp.up
@@ -408,6 +412,12 @@ local function AoE()
   if S.Moonfire:IsCastable() and (DungeonRoute) then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireAoE, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire aoe 2"; end
   end
+  -- variable,name=cd_condition_aoe,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>10|fight_remains<25+10*talent.incarnation_chosen_of_elune))
+  VarCDConditionAoE = CDsON() and (CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 10 or FightRemains < 25 + 10 * num(S.Incarnation:IsAvailable())))
+  -- use_item,name=mirror_of_fractured_tomorrows,if=variable.cd_condition_aoe
+  if Settings.Commons.Enabled.Trinkets and I.MirrorofFracturedTomorrows:IsEquippedAndReady() and (VarCDConditionAoE) then
+    if Cast(I.MirrorofFracturedTomorrows, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows aoe 3"; end
+  end
   -- sunfire,target_if=refreshable&(target.time_to_die-remains)>6-(spell_targets%2)&astral_power.deficit>variable.passive_asp+3
   if S.Sunfire:IsCastable() then
     if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireAoE, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire aoe 4"; end
@@ -416,8 +426,6 @@ local function AoE()
   if S.Moonfire:IsCastable() and (not DungeonRoute) then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireAoE, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire aoe 6"; end
   end
-  -- variable,name=cd_condition_aoe,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>10|fight_remains<25+10*talent.incarnation_chosen_of_elune))
-  VarCDConditionAoE = CDsON() and (CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 10 or FightRemains < 25 + 10 * num(S.IncarnationTalent:IsAvailable())))
   -- stellar_flare,target_if=refreshable&(target.time_to_die-remains-spell_targets.starfire)>8+spell_targets.starfire,if=astral_power.deficit>variable.passive_asp+8&spell_targets.starfire<(11-talent.umbral_intensity.rank-talent.astral_smolder.rank)&variable.cd_condition_aoe
   if S.StellarFlare:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 8 and EnemiesCount8ySplash < (11 - S.UmbralIntensity:TalentRank() - S.AstralSmolder:TalentRank()) and VarCDConditionAoE) then
     if Everyone.CastCycle(S.StellarFlare, Enemies40y, EvaluateCycleStellarFlareAoE, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare aoe 9"; end
