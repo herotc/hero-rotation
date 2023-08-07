@@ -41,6 +41,8 @@ local I = Item.DemonHunter.Vengeance
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.BeacontotheBeyond:ID(),
+  I.DragonfireBombDispenser:ID(),
 }
 
 -- GUI Settings
@@ -226,9 +228,15 @@ local function Trinkets()
       end
     end
   end
-  -- use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1,if=trinket.beacon_to_the_beyond.cooldown.remains>5
-  if Settings.Commons.Enabled.Trinkets and I.DragonfireBombDispenser:IsEquippedAndReady() and (I.BeacontotheBeyond:IsEquipped() and I.BeacontotheBeyond:CooldownRemains() > 5 or not I.BeacontotheBeyond:IsEquipped()) then
-    if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser trinkets 2"; end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=buff.metamorphosis.up|fight_remains<=10|!talent.first_of_the_illidari
+    if I.BeacontotheBeyond:IsEquippedAndReady() and (Player:BuffUp(S.MetamorphosisBuff) or FightRemains <= 10 or not S.FirstoftheIllidari:IsAvailable()) then
+      if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond trinkets 2"; end
+    end
+    -- use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1,if=!trinket.beacon_to_the_beyond.cooldown.remains<=5&!buff.metamorphosis.up|!equipped.beacon_to_the_beyond
+    if I.DragonfireBombDispenser:IsEquippedAndReady() and (I.BeacontotheBeyond:CooldownRemains() > 5 and Player:BuffDown(S.MetamorphosisBuff) or not I.BeacontotheBeyond:IsEquipped()) then
+      if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser trinkets 4"; end
+    end
   end
 end
 
