@@ -42,6 +42,7 @@ HR.GUISettings.APL.Shaman = {
     }
   },
   Enhancement = {
+    Rotation = "Standard",
     PreferEarthShield = false,
     HealWith5Maelstrom = 50,
     HealWithout5Maelstrom = 30,
@@ -108,6 +109,7 @@ CreateARPanelOptions(CP_Shaman, "APL.Shaman.Commons")
 
 -- Enhancement
 CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement")
+CreatePanelOption("Dropdown", CP_Enhancement, "APL.Shaman.Enhancement.Rotation", {"Standard", "Funnel"}, "Rotation Type", "Select to choose between the Standard or Funnel rotations.")
 CreatePanelOption("CheckButton", CP_Enhancement, "APL.Shaman.Enhancement.PreferEarthShield", "Prefer Earth Shield", "Prefer using Earth Shield over Lightning Shield, when it's available.")
 CreatePanelOption("Slider", CP_Enhancement, "APL.Shaman.Enhancement.HealWith5Maelstrom", {0, 100, 1}, "Heal Pct with 5 Maelstrom", "Sets the health percentage under which Healing Surge should be suggested with 5 Maelstrom. Set this to 0 to disable healing suggestions.")
 CreatePanelOption("Slider", CP_Enhancement, "APL.Shaman.Enhancement.HealWithout5Maelstrom", {0, 100, 1}, "Heal Pct without 5 Maelstrom", "Sets the health percentage under which Healing Surge should be suggested when below 5 Maelstrom. Set this to 0 to disable healing suggestions.")

@@ -124,6 +124,8 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   MoltenWeaponBuff                      = Spell(224125),
   -- Tier 29 Buffs
   MaelstromofElementsBuff               = Spell(394677),
+  -- Tier 30 Buffs
+  VolcanicStrengthBuff                  = Spell(409833),
 })
 
 Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
