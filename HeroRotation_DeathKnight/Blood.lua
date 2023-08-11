@@ -329,7 +329,9 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- Defensives
-    local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+    if IsTanking then
+      local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+    end
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons2.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- Display Pool icon if PoolDuringBlooddrinker is true
