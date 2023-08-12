@@ -261,13 +261,13 @@ local function Precombat()
   if S.ArcaneTorrent:IsCastable() and CDsON() then
     if Cast(S.ArcaneTorrent, nil, nil, not Target:IsSpellInRange(S.ArcaneTorrent)) then return "arcane_torrent precombat 6"; end
   end
-  -- shadow_crash,if=raid_event.adds.in>=25&spell_targets.shadow_crash<=8&!fight_style.dungeonslice&(spell_targets.shadow_crash>1|talent.mental_decay)
+  -- shadow_crash,if=raid_event.adds.in>=25&spell_targets.shadow_crash<=8&!fight_style.dungeonslice
   -- Note: Can't do target counts in Precombat
   local DungeonSlice = Player:IsInParty() and not Player:IsInRaid()
   if S.ShadowCrash:IsCastable() and (not DungeonSlice) then
     if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash precombat 8"; end
   end
-  -- vampiric_touch,if=!talent.shadow_crash.enabled|raid_event.adds.in<25|spell_targets.shadow_crash>8|spell_targets.shadow_crash=1&!talent.mental_decay|fight_style.dungeonslice
+  -- vampiric_touch,if=!talent.shadow_crash.enabled|raid_event.adds.in<25|spell_targets.shadow_crash>8|fight_style.dungeonslice
   -- Note: Manually added VT suggestion if Shadow Crash is on CD and wasn't just used.
   if S.VampiricTouch:IsCastable() and ((not S.ShadowCrash:IsAvailable()) or (S.ShadowCrash:CooldownDown() and not S.ShadowCrash:InFlight()) or DungeonSlice) then
     if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch precombat 10"; end
