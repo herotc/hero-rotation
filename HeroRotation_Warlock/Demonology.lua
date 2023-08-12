@@ -38,6 +38,7 @@ local I = Item.Warlock.Demonology
 local OnUseExcludes = {
   I.BeacontotheBeyond:ID(),
   I.EruptingSpearFragment:ID(),
+  I.Iridal:ID(),
   I.IrideusFragment:ID(),
   I.RotcrustedVoodooDoll:ID(),
   I.SpoilsofNeltharus:ID(),
@@ -393,6 +394,10 @@ local function Items()
     if I.BeacontotheBeyond:IsEquippedAndReady() then
       if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond items 14"; end
     end
+  end
+  -- use_item,name=iridal_the_earths_master,if=buff.demonic_power.down&cooldown.summon_demonic_tyrant.remains>30
+  if Settings.Commons.Enabled.Items and I.Iridal:IsEquippedAndReady() and (Player:BuffDown(S.DemonicPowerBuff) and S.SummonDemonicTyrant:CooldownRemains() > 30) then
+    if Cast(I.Iridal, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master items 16"; end
   end
 end
 

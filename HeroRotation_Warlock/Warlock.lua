@@ -204,6 +204,8 @@ Item.Warlock.Commons = {
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
   VoidmendersShadowgem                  = Item(110007, {13, 14}),
+  -- Other Items
+  Iridal                                = Item(208321),
 }
 
 Item.Warlock.Affliction = MergeTableByKey(Item.Warlock.Commons, {

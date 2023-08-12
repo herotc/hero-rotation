@@ -47,6 +47,7 @@ local OnUseExcludes = {
   I.DesperateInvokersCodex:ID(),
   I.EruptingSpearFragment:ID(),
   I.IcebloodDeathsnare:ID(),
+  I.Iridal:ID(),
 }
 
 -- Enemies
@@ -205,6 +206,10 @@ local function Items()
     if I.ConjuredChillglobe:IsEquippedAndReady() then
       if Cast(I.ConjuredChillglobe, nil, Settings.Commons.DisplayStyle.Trinkets) then return "conjured_chillglobe items 8"; end
     end
+  end
+  -- use_item,name=iridal_the_earths_master
+  if Settings.Commons.Enabled.Items and I.Iridal:IsEquippedAndReady() then
+    if Cast(I.Iridal, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master items 10"; end
   end
 end
 
