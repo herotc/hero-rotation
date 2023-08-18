@@ -393,6 +393,10 @@ local function Rotation()
   if S.ShiftingPower:IsReady() and ((not var_totm_on_last_spark_stack) and Player:BuffDown(S.ArcaneSurgeBuff) and S.ArcaneSurge:CooldownRemains() > 45 and FightRemains > 15) then
     if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power rotation 6"; end
   end
+  -- nether_tempest,if=(refreshable|!ticking)&equipped.neltharions_call_to_chaos&fight_remains>=12
+  if S.NetherTempest:IsReady() and (Target:DebuffRefreshable(S.NetherTempestDebuff) and I.NeltharionsCalltoChaos:IsEquipped() and FightRemains >= 12) then
+    if Cast(S.NetherTempest, nil, nil, not Target:IsSpellInRange(S.NetherTempest)) then return "nether_tempest rotation 7"; end
+  end
   -- presence_of_mind,if=buff.arcane_charge.stack<3&target.health.pct<35&talent.arcane_bombardment
   if S.PresenceofMind:IsCastable() and (Player:ArcaneCharges() < 3 and Target:HealthPercentage() < 35 and S.ArcaneBombardment:IsAvailable()) then
     if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceOfMind) then return "presence_of_mind rotation 8"; end
@@ -633,8 +637,8 @@ local function APL()
     if S.Evocation:IsCastable() and (not var_opener) and (Player:BuffDown(S.ArcaneSurgeBuff) and Target:DebuffDown(S.TouchoftheMagiDebuff) and ((Player:ManaPercentage() < 10 and S.TouchoftheMagi:CooldownRemains() < 20) or S.TouchoftheMagi:CooldownRemains() < 15) and (Player:ManaPercentage() < FightRemains * 4)) then
       if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation main 36"; end
     end
-    -- conjure_mana_gem,if=debuff.touch_of_the_magi.down&buff.arcane_surge.down&cooldown.arcane_surge.remains<fight_remains&!mana_gem_charges
-    if S.ConjureManaGem:IsCastable() and (Target:DebuffDown(S.TouchoftheMagiDebuff) and Player:BuffDown(S.ArcaneSurgeBuff) and S.ArcaneSurge:CooldownRemains() < FightRemains and (not I.ManaGem:Exists())) then
+    -- conjure_mana_gem,if=debuff.touch_of_the_magi.down&buff.arcane_surge.down&cooldown.arcane_surge.remains<30&cooldown.arcane_surge.remains<fight_remains&!mana_gem_charges
+    if S.ConjureManaGem:IsCastable() and (Target:DebuffDown(S.TouchoftheMagiDebuff) and Player:BuffDown(S.ArcaneSurgeBuff) and S.ArcaneSurge:CooldownRemains() < 30 and S.ArcaneSurge:CooldownRemains() < FightRemains and (not I.ManaGem:Exists())) then
       if Cast(S.ConjureManaGem) then return "conjure_mana_gem main 38"; end
     end
     -- use_mana_gem,if=talent.cascading_power&buff.clearcasting.stack<2&buff.arcane_surge.up
