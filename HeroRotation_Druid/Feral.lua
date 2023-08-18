@@ -473,7 +473,7 @@ local function AoeBuilder()
   end
   -- shred,target_if=max:target.time_to_die,if=action.shred.damage>action.thrash_cat.damage&!buff.sudden_ambush.up&!(variable.lazy_swipe&talent.wild_slashes)
   if S.Shred:IsReady() and (S.Shred:Damage() > S.Thrash:Damage() * EnemiesCount11y and Player:BuffDown(S.SuddenAmbushBuff) and not (VarLazySwipe and S.WildSlashes:IsAvailable())) then
-    if Everyone.CastTargetIf(S.Shred, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, not Target:IsInMeleeRange(8)) then return "shred aoe_builder 24"; end
+    if Everyone.CastTargetIf(S.Shred, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(8)) then return "shred aoe_builder 24"; end
   end
   -- thrash_cat
   if S.Thrash:IsReady() then
