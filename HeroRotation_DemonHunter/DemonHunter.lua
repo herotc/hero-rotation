@@ -37,6 +37,7 @@ Spell.DemonHunter.Commons = {
   FirstoftheIllidari                    = Spell(235893),
   FoddertotheFlame                      = Spell(391429),
   SigilofFlame                          = MultiSpell(204596, 204513, 389810), -- 204596: Base ID, 204513: Concentrated, 389810: Precise
+  SoulSigils                            = Spell(395446),
   TheHunt                               = Spell(370965),
   -- Utility
   Disrupt                               = Spell(183752),
@@ -73,6 +74,8 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   Frailty                               = Spell(389958),
   Fracture                              = Spell(263642),
   ShearFury                             = Spell(389997),
+  SigilofChains                         = Spell(202138),
+  SigilofSilence                        = Spell(202137),
   SoulBarrier                           = Spell(263648),
   SoulCarver                            = Spell(207407),
   Soulcrush                             = Spell(389985),
