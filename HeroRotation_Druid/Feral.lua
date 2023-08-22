@@ -204,12 +204,13 @@ end
 -- CastCycle/CastTargetIf Functions
 -- CastTargetIf Filters
 local function EvaluateTargetIfFilterAdaptiveSwarm(TargetUnit)
-  -- target_if=max:(dot.adaptive_swarm_damage.stack*dot.adaptive_swarm_damage.stack<3*time_to_die)
-  local Stacks = TargetUnit:DebuffStack(S.AdaptiveSwarmDebuff)
-  if Stacks < 3 then
-    return (Stacks * TargetUnit:TimeToDie())
-  end
-  return 0
+  -- target_if=max:((1+dot.adaptive_swarm_damage.stack)*dot.adaptive_swarm_damage.stack<3*time_to_die)
+  return ((1 + Target:DebuffStack(S.AdaptiveSwarmDebuff)) * Target:DebuffStack(S.AdaptiveSwarmDebuff) < 3 * TargetUnit:TimeToDie())
+end
+
+local function EvaluateTargetIfFilterLIMoonfire(TargetUnit)
+  -- target_if=max:(3*refreshable)+dot.adaptive_swarm_damage.ticking
+  return ((3 * num(TargetUnit:DebuffRefreshable(S.LIMoonfireDebuff))) + num(TargetUnit:DebuffUp(S.LIMoonfireDebuff)))
 end
 
 local function EvaluateTargetIfFilterRake(TargetUnit)
@@ -245,8 +246,16 @@ local function EvaluateTargetIfBrutalSlashBT(TargetUnit)
 end
 
 local function EvaluateTargetIfConvokeCD(TargetUnit)
-  -- if=((target.time_to_die<fight_remains&target.time_to_die>5)|target.time_to_die=fight_remains)&(fight_remains<5|(dot.rip.remains>5&buff.tigers_fury.up&(combo_points<2|(buff.bs_inc.up&combo_points=2))&(!variable.lastConvoke|!variable.lastZerk|buff.bs_inc.up)))
-  return (((TargetUnit:TimeToDie() < FightRemains and TargetUnit:TimeToDie() > 5) or TargetUnit:TimeToDie() == FightRemains) and (FightRemains < 5 or (TargetUnit:DebuffRemains(S.RipDebuff) > 5 and Player:BuffUp(S.TigersFury) and (ComboPoints < 2 or (Player:BuffUp(BsInc) and ComboPoints == 2)) and ((not VarLastConvoke) or (not VarLastZerk) or Player:BuffUp(BsInc)))))
+  -- if=((target.time_to_die<fight_remains&target.time_to_die>5-talent.ashamanes_guidance.enabled)|target.time_to_die=fight_remains)&(fight_remains<5|(dot.rip.remains>5&buff.tigers_fury.up&(combo_points<2|(buff.bs_inc.up&combo_points<=3))))&(!variable.lastConvoke|buff.potion.up|(time+fight_remains+10)%%300>time%%300)&(talent.dire_fixation.enabled&debuff.dire_fixation.up|!talent.dire_fixation.enabled|spell_targets.swipe_cat>1)
+  local PotionSelected = Everyone.PotionSelected()
+  local CombatTime = HL.CombatTime()
+  return (((TargetUnit:TimeToDie() < FightRemains and TargetUnit:TimeToDie() > 5 - num(S.AshamanesGuidance:IsAvailable())) or TargetUnit:TimeToDie() == FightRemains) and (FightRemains < 5 or (TargetUnit:DebuffRemains(S.RipDebuff) > 5 and Player:BuffUp(S.TigersFury) and (ComboPoints < 2 or (Player:BuffUp(BsInc) and ComboPoints <= 3)))) and ((not VarLastConvoke) or PotionSelected:TimeSinceLastCast() < 30 or (CombatTime + FightRemains + 10) % 300 > CombatTime % 300) and (S.DireFixation:IsAvailable() and TargetUnit:DebuffUp(S.DireFixationDebuff) or (not S.DireFixation:IsAvailable()) or EnemiesCount11y > 1))
+end
+
+local function EvaluateTargetIfLIMoonfireAoEBuilder(TargetUnit)
+  -- if=spell_targets.swipe_cat<5&dot.moonfire.refreshable
+  -- Note: Target count checked before CastTargetIf call.
+  return (TargetUnit:DebuffRefreshable(S.LIMoonfireDebuff))
 end
 
 local function EvaluateTargetIfLIMoonfireBT(TargetUnit)
@@ -262,6 +271,11 @@ end
 local function EvaluateTargetIfRakeBloodtalons(TargetUnit)
   -- if=(refreshable|buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier)&buff.bt_rake.down
   return ((TargetUnit:DebuffRefreshable(S.RakeDebuff) or Player:BuffUp(S.SuddenAmbushBuff) and Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake)) and BTBuffDown(S.Rake))
+end
+
+local function EvaluateTargetIfFeralFrenzy(TargetUnit)
+  -- if=((talent.dire_fixation.enabled&debuff.dire_fixation.up)|!talent.dire_fixation.enabled|spell_targets.swipe_cat>1)&(combo_points<2|combo_points<3&buff.bs_inc.up|time<10)
+  return ((S.DireFixation:IsAvailable() and TargetUnit:DebuffUp(S.DireFixationDebuff)) or (not S.DireFixation:IsAvailable()) or EnemiesCount11y > 1)
 end
 
 local function EvaluateTargetIfFerociousBiteBerserk(TargetUnit)
@@ -292,13 +306,13 @@ local function EvaluateCycleRake(TargetUnit)
 end
 
 local function EvaluateCycleRakeMain(TargetUnit)
-  -- target_if=1.4*persistent_multiplier>dot.rake.pmultiplier
-  return (1.4 * Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake))
+  -- target_if=persistent_multiplier>dot.rake.pmultiplier
+  return (Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake))
 end
 
 local function EvaluateCycleRip(TargetUnit)
-  -- target_if=refreshable
-  return (TargetUnit:DebuffRefreshable(S.RipDebuff))
+  -- target_if=refreshable&(!talent.primal_wrath.enabled|spell_targets.swipe_cat=1)
+  return (TargetUnit:DebuffRefreshable(S.RipDebuff) and ((not S.PrimalWrath:IsAvailable()) or EnemiesCount11y == 1))
 end
 
 local function EvaluateCycleThrash(TargetUnit)
@@ -339,8 +353,8 @@ local function Precombat()
 end
 
 local function Variables()
-  -- variable,name=need_bt,value=talent.bloodtalons.enabled&buff.bloodtalons.stack<2
-  VarNeedBT = (S.Bloodtalons:IsAvailable() and Player:BuffStack(S.BloodtalonsBuff) < 2)
+  -- variable,name=need_bt,value=talent.bloodtalons.enabled&buff.bloodtalons.stack<=1
+  VarNeedBT = (S.Bloodtalons:IsAvailable() and Player:BuffStack(S.BloodtalonsBuff) <= 1)
   -- variable,name=align_3minutes,value=spell_targets.swipe_cat=1&!fight_style.dungeonslice
   local DungeonSlice = Player:IsInParty() and not Player:IsInRaid()
   VarAlign3Mins = EnemiesCount11y == 1 and not DungeonSlice
@@ -349,11 +363,11 @@ local function Variables()
   -- variable,name=lastZerk,value=fight_remains>(30+(cooldown.bs_inc.remains%1.6))&((talent.berserk_heart_of_the_lion.enabled&fight_remains<(90+(cooldown.bs_inc.remains%1.6)))|(!talent.berserk_heart_of_the_lion.enabled&fight_remains<(180+cooldown.bs_inc.remains)))
   VarLastZerk = FightRemains > (30 + (BsInc:CooldownRemains() / 1.6)) and ((S.BerserkHeartoftheLion:IsAvailable() and FightRemains < (90 + (BsInc:CooldownRemains() / 1.6))) or ((not S.BerserkHeartoftheLion:IsAvailable()) and FightRemains < (180 + BsInc:CooldownRemains())))
   -- variable,name=zerk_biteweave,op=reset
-  VarZerkBiteweave = true
+  VarZerkBiteweave = Settings.Feral.UseZerkBiteweave
   -- variable,name=regrowth,op=reset
-  VarRegrowth = true
+  VarRegrowth = Settings.Feral.ShowHealSpells
   -- variable,name=lazy_swipe,op=reset
-  VarLazySwipe = true
+  VarLazySwipe = Settings.Feral.UseLazySwipe
 end
 
 local function Clearcasting()
@@ -393,8 +407,8 @@ local function Builder()
   if S.Shadowmeld:IsCastable() and (S.Rake:IsReady() and Player:BuffDown(S.SuddenAmbushBuff) and (Target:DebuffRefreshable(S.RakeDebuff) or Target:PMultiplier(S.Rake) < 1.4) and Player:BuffDown(S.Prowl) and Player:BuffDown(S.ApexPredatorsCravingBuff)) then
     if Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "shadowmeld builder 4"; end
   end
-  -- rake,if=refreshable|(buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier&dot.rake.remains>6)
-  if S.Rake:IsReady() and (Target:DebuffRefreshable(S.RakeDebuff) or (Player:BuffUp(S.SuddenAmbushBuff) and Player:PMultiplier(S.Rake) > Target:PMultiplier(S.Rake) and Target:DebuffRemains(S.RakeDebuff) > 6)) then
+  -- rake,if=refreshable|(buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier)
+  if S.Rake:IsReady() and (Target:DebuffRefreshable(S.RakeDebuff) or (Player:BuffUp(S.SuddenAmbushBuff) and Player:PMultiplier(S.Rake) > Target:PMultiplier(S.Rake))) then
     if Cast(S.Rake, nil, nil, not Target:IsInMeleeRange(8)) then return "rake builder 6"; end
   end
   -- run_action_list,name=clearcasting,if=buff.clearcasting.react
@@ -459,20 +473,20 @@ local function AoeBuilder()
   if S.BrutalSlash:IsReady() then
     if Cast(S.BrutalSlash, nil, nil, not Target:IsInMeleeRange(11)) then return "brutal_slash aoe_builder 16"; end
   end
-  -- moonfire_cat,target_if=refreshable,if=spell_targets.swipe_cat<5
+  -- moonfire_cat,target_if=max:(3*refreshable)+dot.adaptive_swarm_damage.ticking,if=spell_targets.swipe_cat<5&dot.moonfire.refreshable
   if S.LIMoonfire:IsReady() and (EnemiesCount11y < 5) then
-    if Everyone.CastCycle(S.LIMoonfire, Enemies11y, EvaluateCycleLIMoonfire, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat aoe_builders 18"; end
+    if Everyone.CastTargetIf(S.LIMoonfire, Enemies11y, "max", EvaluateTargetIfFilterLIMoonfire, EvaluateTargetIfLIMoonfireAoEBuilder, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat aoe_builders 18"; end
   end
   -- swipe_cat
   if S.Swipe:IsReady() then
     if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(11)) then return "swipe aoe_builder 20"; end
   end
-  -- moonfire_cat,target_if=refreshable
+  -- moonfire_cat,target_if=max:(3*refreshable)+dot.adaptive_swarm_damage.ticking,if=dot.moonfire.refreshable
   if S.LIMoonfire:IsReady() then
-    if Everyone.CastCycle(S.LIMoonfire, Enemies11y, EvaluateCycleLIMoonfire, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat aoe_builders 22"; end
+    if Everyone.CastTargetIf(S.LIMoonfire, Enemies11y, "max", EvaluateTargetIfFilterLIMoonfire, EvaluateTargetIfLIMoonfireAoEBuilder, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat aoe_builders 22"; end
   end
-  -- shred,target_if=max:target.time_to_die,if=action.shred.damage>action.thrash_cat.damage&!buff.sudden_ambush.up&!(variable.lazy_swipe&talent.wild_slashes)
-  if S.Shred:IsReady() and (S.Shred:Damage() > S.Thrash:Damage() * EnemiesCount11y and Player:BuffDown(S.SuddenAmbushBuff) and not (VarLazySwipe and S.WildSlashes:IsAvailable())) then
+  -- shred,target_if=max:target.time_to_die,if=(spell_targets.swipe_cat<4|talent.dire_fixation.enabled)&!buff.sudden_ambush.up&!(variable.lazy_swipe&talent.wild_slashes)
+  if S.Shred:IsReady() and ((EnemiesCount11y < 4 or S.DireFixation:IsAvailable()) and Player:BuffDown(S.SuddenAmbushBuff) and not (VarLazySwipe and S.WildSlashes:IsAvailable())) then
     if Everyone.CastTargetIf(S.Shred, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(8)) then return "shred aoe_builder 24"; end
   end
   -- thrash_cat
@@ -530,28 +544,28 @@ local function Bloodtalons()
   if S.Swipe:IsReady() and (BTBuffDown(S.Swipe) and S.WildSlashes:IsAvailable()) then
     if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(11)) then return "swipe bloodtalons 24"; end
   end
-  -- moonfire_cat,target_if=max:ticks_gained_on_refresh,if=buff.bt_moonfire.down&spell_targets.swipe_cat<5
+  -- moonfire_cat,target_if=max:(3*refreshable)+dot.adaptive_swarm_damage.ticking,if=buff.bt_moonfire.down&spell_targets.swipe_cat<5
   if S.LIMoonfire:IsReady() and (BTBuffDown(S.LIMoonfire) and EnemiesCount11y < 5) then
-    if Everyone.CastTargetIf(S.LIMoonfire, Enemies11y, "max", EvaluateTargetIfLIMoonfireBT, nil, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat bloodtalons 26"; end
+    if Everyone.CastTargetIf(S.LIMoonfire, Enemies11y, "max", EvaluateTargetIfFilterLIMoonfire, nil, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat bloodtalons 18"; end
   end
   -- swipe_cat,if=buff.bt_swipe.down
   if S.Swipe:IsReady() and (BTBuffDown(S.Swipe)) then
     if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(8)) then return "swipe bloodtalons 28"; end
   end
-  -- moonfire_cat,target_if=max:ticks_gained_on_refresh,if=buff.bt_moonfire.down
+  -- moonfire_cat,target_if=max:(3*refreshable)+dot.adaptive_swarm_damage.ticking,if=buff.bt_moonfire.down
   if S.LIMoonfire:IsReady() and (BTBuffDown(S.LIMoonfire)) then
-    if Everyone.CastTargetIf(S.LIMoonfire, Enemies11y, "max", EvaluateTargetIfLIMoonfireBT, nil, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat bloodtalons 30"; end
+    if Everyone.CastTargetIf(S.LIMoonfire, Enemies11y, "max", EvaluateTargetIfFilterLIMoonfire, nil, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat bloodtalons 30"; end
   end
-  -- shred,target_if=max:target.time_to_die,if=action.shred.damage>action.thrash_cat.damage&buff.bt_shred.down&!buff.sudden_ambush.up&!(variable.lazy_swipe&talent.wild_slashes)
-  if S.Shred:IsReady() and (S.Shred:Damage() > S.Thrash:Damage() * EnemiesCount11y and BTBuffDown(S.Shred) and Player:BuffDown(S.SuddenAmbushBuff) and not (VarLazySwipe and S.WildSlashes:IsAvailable())) then
+  -- shred,target_if=max:target.time_to_die,if=(spell_targets>5|talent.dire_fixation.enabled)&buff.bt_shred.down&!buff.sudden_ambush.up&!(variable.lazy_swipe&talent.wild_slashes)
+  if S.Shred:IsReady() and ((EnemiesCountMelee > 5 or S.DireFixation:IsAvailable()) and BTBuffDown(S.Shred) and Player:BuffDown(S.SuddenAmbushBuff) and not (VarLazySwipe and S.WildSlashes:IsAvailable())) then
     if Everyone.CastTargetIf(S.Shred, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(8)) then return "shred bloodtalons 32"; end
   end
   -- thrash_cat,if=buff.bt_thrash.down
   if S.Thrash:IsReady() and (BTBuffDown(S.Thrash)) then
     if Cast(S.Thrash, nil, nil, not Target:IsInMeleeRange(8)) then return "thrash bloodtalons 34"; end
   end
-  -- rake,target_if=min:(25*(persistent_multiplier<dot.rake.pmultiplier)+dot.rake.remains),if=buff.bt_rake.down&variable.lazy_swipe&talent.wild_slashes
-  if S.Rake:IsReady() and (BTBuffDown(S.Rake) and VarLazySwipe and S.WildSlashes:IsAvailable()) then
+  -- rake,target_if=min:(25*(persistent_multiplier<dot.rake.pmultiplier)+dot.rake.remains),if=buff.bt_rake.down&(spell_targets.swipe_cat>4&!talent.dire_fixation|talent.wild_slashes&variable.lazy_swipe)
+  if S.Rake:IsReady() and (BTBuffDown(S.Rake) and (EnemiesCount11y > 4 and (not S.DireFixation:IsAvailable()) or S.WildSlashes:IsAvailable() and VarLazySwipe)) then
     if Everyone.CastTargetIf(S.Rake, EnemiesCountMelee, "min", EvaluateTargetIfFilterRake, nil, not Target:IsInMeleeRange(8)) then return "rake bloodtalons 36"; end
   end
 end
@@ -561,7 +575,7 @@ local function Finisher()
   if S.PrimalWrath:IsReady() and (((Target:DebuffRefreshable(S.PrimalWrath) and not S.CircleofLifeandDeath:IsAvailable()) or Target:DebuffRemains(S.PrimalWrath) < 6 or (S.TearOpenWounds:IsAvailable() or (EnemiesCount11y > 4 and not S.RampantFerocity:IsAvailable()))) and EnemiesCount11y > 1 and S.PrimalWrath:IsAvailable()) then
     if Cast(S.PrimalWrath, nil, nil, not Target:IsInMeleeRange(11)) then return "primal_wrath finisher 2"; end
   end
-  -- rip,target_if=refreshable
+  -- rip,target_if=refreshable&(!talent.primal_wrath.enabled|spell_targets.swipe_cat=1)
   if S.Rip:IsReady() then
     if Everyone.CastCycle(S.Rip, EnemiesMelee, EvaluateCycleRip, not Target:IsInRange(8)) then return "rip finisher 4"; end
   end
@@ -601,13 +615,12 @@ local function Berserk()
   if S.Shadowmeld:IsCastable() and ((not (BTBuffUp(S.Rake) and CountActiveBtTriggers() == 2)) and S.Rake:IsReady() and Player:BuffDown(S.SuddenAmbushBuff) and (Target:DebuffRefreshable(S.RakeDebuff) or Target:PMultiplier(S.Rake) < 1.4) and Player:BuffDown(S.Prowl) and Player:BuffDown(S.ApexPredatorsCravingBuff)) then
     if Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "shadowmeld berserk 6"; end
   end
-  -- rake,if=!(buff.bt_rake.up&active_bt_triggers=2)&(refreshable|(buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier&!dot.rake.refreshable))
-  -- rake,if=refreshable|(buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier&!dot.rake.refreshable)
-  if S.Rake:IsReady() and ((not (BTBuffUp(S.Rake) and CountActiveBtTriggers() == 2)) and (Target:DebuffRefreshable(S.RakeDebuff) or (Player:BuffUp(S.SuddenAmbushBuff) and Player:PMultiplier(S.Rake) > Target:PMultiplier(S.Rake) and not Target:DebuffRefreshable(S.RakeDebuff)))) then
+  -- rake,if=!(buff.bt_rake.up&active_bt_triggers=2)&(refreshable|(buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier))
+  if S.Rake:IsReady() and ((not (BTBuffUp(S.Rake) and CountActiveBtTriggers() == 2)) and (Target:DebuffRefreshable(S.RakeDebuff) or (Player:BuffUp(S.SuddenAmbushBuff) and Player:PMultiplier(S.Rake) > Target:PMultiplier(S.Rake)))) then
     if Cast(S.Rake, nil, nil, not Target:IsInMeleeRange(8)) then return "rake berserk 8"; end
   end
-  -- shred,if=active_bt_triggers=2&buff.bt_shred.down
-  if S.Shred:IsReady() and (CountActiveBtTriggers() == 2 and BTBuffDown(S.Shred)) then
+  -- shred,if=(active_bt_triggers=2|(talent.dire_fixation.enabled&!debuff.dire_fixation.up))&buff.bt_shred.down
+  if S.Shred:IsReady() and ((CountActiveBtTriggers() == 2 or (S.DireFixation:IsAvailable() and Target:DebuffDown(S.DireFixationDebuff))) and BTBuffDown(S.Shred)) then
     if Cast(S.Shred, nil, nil, not Target:IsInMeleeRange(8)) then return "shred berserk 10"; end
   end
   -- brutal_slash,if=active_bt_triggers=2&buff.bt_brutal_slash.down
@@ -619,7 +632,6 @@ local function Berserk()
     if Cast(S.LIMoonfire, nil, nil, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat berserk 14"; end
   end
   -- thrash_cat,if=active_bt_triggers=2&buff.bt_thrash.down&!talent.thrashing_claws&variable.need_bt&(refreshable|talent.brutal_slash.enabled)
-  -- thrash_cat,if=active_bt_triggers=2&buff.bt_thrash.down&!talent.thrashing_claws&variable.need_bt
   if S.Thrash:IsReady() and (CountActiveBtTriggers() == 2 and BTBuffDown(S.Thrash) and (not S.ThrashingClaws:IsAvailable()) and VarNeedBT and (Target:DebuffRefreshable(S.ThrashDebuff) or S.BrutalSlash:IsAvailable())) then
     if Cast(S.Thrash, nil, nil, not Target:IsInMeleeRange(11)) then return "thrash berserk 16"; end
   end
@@ -670,14 +682,14 @@ local function Cooldown()
       if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment cooldown "; end
     end
   end
-  -- potion,if=buff.bs_inc.up|fight_remains<32|(fight_remains<cooldown.bs_inc.remains&variable.lastConvoke&cooldown.convoke_the_spirits.remains<10)
-  if Settings.Commons.Enabled.Potions and (Player:BuffUp(BsInc) or FightRemains < 32 or (FightRemains < BsInc:CooldownRemains() and VarLastConvoke and S.ConvoketheSpirits:CooldownRemains() < 10)) then
+  -- potion,if=buff.bs_inc.up|fight_remains<32|(!variable.lastZerk&variable.lastConvoke&cooldown.convoke_the_spirits.remains<10)
+  if Settings.Commons.Enabled.Potions and (Player:BuffUp(BsInc) or FightRemains < 32 or ((not VarLastZerk) and VarLastConvoke and S.ConvoketheSpirits:CooldownRemains() < 10)) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldown 14"; end
     end
   end
-  -- convoke_the_spirits,target_if=max:target.time_to_die,if=((target.time_to_die<fight_remains&target.time_to_die>5)|target.time_to_die=fight_remains)&(fight_remains<5|(dot.rip.remains>5&buff.tigers_fury.up&(combo_points<2|(buff.bs_inc.up&combo_points=2))&(!variable.lastConvoke|!variable.lastZerk|buff.bs_inc.up)))
+  -- convoke_the_spirits,target_if=max:target.time_to_die,if=((target.time_to_die<fight_remains&target.time_to_die>5-talent.ashamanes_guidance.enabled)|target.time_to_die=fight_remains)&(fight_remains<5|(dot.rip.remains>5&buff.tigers_fury.up&(combo_points<2|(buff.bs_inc.up&combo_points<=3))))&(!variable.lastConvoke|buff.potion.up|(time+fight_remains+10)%%300>time%%300)&(talent.dire_fixation.enabled&debuff.dire_fixation.up|!talent.dire_fixation.enabled|spell_targets.swipe_cat>1)
   if S.ConvoketheSpirits:IsReady() then
     if Everyone.CastTargetIf(S.ConvoketheSpirits, Enemies11y, "max", EvaluateTargetIfFilterTTD, EvaluateTargetIfConvokeCD, not Target:IsInMeleeRange(8)) then return "convoke_the_spirits cooldown 16"; end
   end
@@ -749,42 +761,46 @@ local function APL()
     -- Note: We're not handling external buffs
     -- call_action_list,name=variables
     Variables()
-    -- tigers_fury,if=!talent.convoke_the_spirits.enabled&(!buff.tigers_fury.up|energy.deficit>65)
-    if S.TigersFury:IsCastable() and ((not S.ConvoketheSpirits:IsAvailable()) and (Player:BuffDown(S.TigersFury) or Player:EnergyDeficit() > 65)) then
+    -- tigers_fury,target_if=min:target.time_to_die,if=talent.convoke_the_spirits.enabled|!talent.convoke_the_spirits.enabled&(!buff.tigers_fury.up|energy.deficit>65)|(target.time_to_die<15&talent.predator.enabled)
+    if S.TigersFury:IsCastable() and (S.ConvoketheSpirits:IsAvailable() or (not S.ConvoketheSpirits:IsAvailable()) and (Player:BuffDown(S.TigersFury) or Player:EnergyDeficit() > 65) or (FightRemains < 15 and S.Predator:IsAvailable())) then
       if Cast(S.TigersFury, Settings.Feral.OffGCDasOffGCD.TigersFury) then return "tigers_fury main 6"; end
     end
-    -- tigers_fury,if=talent.convoke_the_spirits.enabled&(!variable.lastConvoke|(variable.lastConvoke&!buff.tigers_fury.up))
-    if S.TigersFury:IsCastable() and (S.ConvoketheSpirits:IsAvailable() and ((not VarLastConvoke) or (VarLastConvoke and Player:BuffDown(S.TigersFury)))) then
-      if Cast(S.TigersFury, Settings.Feral.OffGCDasOffGCD.TigersFury) then return "tigers_fury main 8"; end
-    end
-    -- rake,target_if=1.4*persistent_multiplier>dot.rake.pmultiplier,if=buff.prowl.up|buff.shadowmeld.up
+    -- rake,target_if=persistent_multiplier>dot.rake.pmultiplier,if=buff.prowl.up|buff.shadowmeld.up
     if S.Rake:IsReady() and (Player:StealthUp(false, true)) then
-      if Everyone.CastCycle(S.Rake, EnemiesMelee, EvaluateCycleRakeMain, not Target:IsInMeleeRange(8)) then return "rake main 10"; end
+      if Everyone.CastCycle(S.Rake, EnemiesMelee, EvaluateCycleRakeMain, not Target:IsInMeleeRange(8)) then return "rake main 8"; end
     end
     -- auto_attack,if=!buff.prowl.up&!buff.shadowmeld.up
-    -- natures_vigil,if=in_combat
-    if S.NaturesVigil:IsCastable() and (Player:AffectingCombat()) then
-      if Cast(S.NaturesVigil, Settings.Feral.OffGCDasOffGCD.NaturesVigil) then return "natures_vigil main 11"; end
+    -- natures_vigil,if=spell_targets.swipe_cat>0
+    if S.NaturesVigil:IsCastable() then
+      if Cast(S.NaturesVigil, Settings.Feral.OffGCDasOffGCD.NaturesVigil) then return "natures_vigil main 10"; end
+    end
+    -- renewal,if=variable.regrowth
+    if S.Renewal:IsCastable() and (VarRegrowth) then
+      if Cast(S.Renewal, Settings.Feral.GCDasOffGCD.Renewal) then return "renewal main 12"; end
+    end
+    -- adaptive_swarm,target=self,if=talent.unbridled_swarm&spell_targets.swipe_cat<=1&dot.adaptive_swarm_heal.stack<4&dot.adaptive_swarm_heal.remains>4
+    if S.AdaptiveSwarm:IsReady() and (S.UnbridledSwarm:IsAvailable() and EnemiesCount11y <= 1 and Player:BuffStack(S.AdaptiveSwarmHeal) < 4 and Player:BuffRemains(S.AdaptiveSwarmHeal) > 4) then
+      if HR.CastAnnotated(S.AdaptiveSwarm, false, "SELF") then return "adaptive_swarm self main 14"; end
     end
     -- adaptive_swarm,target_if=((!dot.adaptive_swarm_damage.ticking|dot.adaptive_swarm_damage.remains<2)&(dot.adaptive_swarm_damage.stack<3)&!action.adaptive_swarm_damage.in_flight&!action.adaptive_swarm.in_flight)&target.time_to_die>5,if=!(variable.need_bt&active_bt_triggers=2)&(!talent.unbridled_swarm.enabled|spell_targets.swipe_cat=1)
     if S.AdaptiveSwarm:IsReady() and ((not (VarNeedBT and CountActiveBtTriggers() == 2)) and ((not S.UnbridledSwarm:IsAvailable()) or EnemiesCount11y == 1)) then
-      if Everyone.CastCycle(S.AdaptiveSwarm, Enemies11y, EvaluateCycleAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm main 12"; end
+      if Everyone.CastCycle(S.AdaptiveSwarm, Enemies11y, EvaluateCycleAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm main 16"; end
     end
-    -- adaptive_swarm,target_if=max:(dot.adaptive_swarm_damage.stack*dot.adaptive_swarm_damage.stack<3*time_to_die),if=dot.adaptive_swarm_damage.stack<3&talent.unbridled_swarm.enabled&spell_targets.swipe_cat>1&!(variable.need_bt&active_bt_triggers=2)
+    -- adaptive_swarm,target_if=max:((1+dot.adaptive_swarm_damage.stack)*dot.adaptive_swarm_damage.stack<3*time_to_die),if=dot.adaptive_swarm_damage.stack<3&talent.unbridled_swarm.enabled&spell_targets.swipe_cat>1&!(variable.need_bt&active_bt_triggers=2)
     if S.AdaptiveSwarm:IsReady() and (S.UnbridledSwarm:IsAvailable() and EnemiesCount11y > 1 and not (VarNeedBT and CountActiveBtTriggers() == 2)) then
-      if Everyone.CastTargetIf(S.AdaptiveSwarm, Enemies11y, "max", EvaluateTargetIfFilterAdaptiveSwarm, EvaluateTargetIfAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm main 13"; end
+      if Everyone.CastTargetIf(S.AdaptiveSwarm, Enemies11y, "max", EvaluateTargetIfFilterAdaptiveSwarm, EvaluateTargetIfAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm main 18"; end
     end
     -- call_action_list,name=cooldown
     if CDsON() then
       local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
     end
-    -- feral_frenzy,target_if=max:target.time_to_die,if=combo_points<2|combo_points<3&buff.bs_inc.up
-    if S.FeralFrenzy:IsReady() and (ComboPoints < 2 or ComboPoints < 3 and Player:BuffUp(BsInc)) then
-      if Everyone.CastTargetIf(S.FeralFrenzy, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(8)) then return "feral_frenzy main 14"; end
+    -- feral_frenzy,target_if=max:target.time_to_die,if=((talent.dire_fixation.enabled&debuff.dire_fixation.up)|!talent.dire_fixation.enabled|spell_targets.swipe_cat>1)&(combo_points<2|combo_points<3&buff.bs_inc.up|time<10)
+    if S.FeralFrenzy:IsReady() and (ComboPoints < 2 or ComboPoints < 3 and Player:BuffUp(BsInc) or HL.CombatTime() < 10) then
+      if Everyone.CastTargetIf(S.FeralFrenzy, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, EvaluateTargetIfFeralFrenzy, not Target:IsInMeleeRange(8)) then return "feral_frenzy main 20"; end
     end
     -- ferocious_bite,target_if=max:target.time_to_die,if=buff.apex_predators_craving.up&(spell_targets.swipe_cat=1|!talent.primal_wrath.enabled|!buff.sabertooth.up)&!(variable.need_bt&active_bt_triggers=2)
     if S.FerociousBite:IsReady() and (Player:BuffUp(S.ApexPredatorsCravingBuff) and (EnemiesCount11y == 1 or (not S.PrimalWrath:IsAvailable()) or Player:BuffDown(S.SabertoothBuff)) and not (VarNeedBT and CountActiveBtTriggers() == 2)) then
-      if Everyone.CastTargetIf(S.FerociousBite, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(8)) then return "ferocious_bite main 16"; end
+      if Everyone.CastTargetIf(S.FerociousBite, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(8)) then return "ferocious_bite main 22"; end
     end
     -- call_action_list,name=berserk,if=buff.bs_inc.up
     if Player:BuffUp(BsInc) then
@@ -810,6 +826,10 @@ local function APL()
     if Player:BuffDown(BsInc) and ComboPoints < 5 then
       local ShouldReturn = Builder(); if ShouldReturn then return ShouldReturn; end
     end
+    -- regrowth,if=energy<25&buff.predatory_swiftness.up&!buff.clearcasting.up&variable.regrowth
+    if S.Regrowth:IsReady() and VarRegrowth and (Player:Energy() < 25 and Player:BuffUp(S.PredatorySwiftnessBuff) and Player:BuffDown(S.Clearcasting)) then
+      if Cast(S.Regrowth, Settings.Feral.GCDasOffGCD.Regrowth) then return "regrowth main 24"; end
+    end
     -- Pool if nothing else to do
     if (true) then
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool Energy"; end
@@ -820,7 +840,7 @@ end
 local function OnInit()
   S.RipDebuff:RegisterAuraTracking()
 
-  HR.Print("Feral Druid rotation is currently a work in progress, but has been updated for patch 10.0.")
+  HR.Print("Feral Druid rotation is currently a work in progress, but has been updated for patch 10.1.5.")
 end
 
 HR.SetAPL(103, APL, OnInit)
