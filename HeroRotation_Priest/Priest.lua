@@ -53,26 +53,6 @@ Spell.Priest.Commons = {
   -- Buffs
   PowerWordFortitudeBuff      = Spell(21562),
   -- Debuffs
-  -- Covenant Abilities
-  AscendedNova                = Spell(325020), -- Melee, 8
-  BoonoftheAscended           = Spell(325013),
-  BoonoftheAscendedBuff       = Spell(325013),
-  FaeGuardians                = Spell(327661),
-  FaeGuardiansBuff            = Spell(327661),
-  Fleshcraft                  = Spell(324631),
-  MindgamesCov                = Spell(323673),
-  UnholyNova                  = Spell(324724), -- Melee, 15
-  WrathfulFaerieDebuff        = Spell(342132),
-  -- Soulbind Abilities
-  FieldofBlossoms             = Spell(319191),
-  GroveInvigoration           = Spell(322721),
-  PustuleEruption             = Spell(351094),
-  VolatileSolvent             = Spell(323074),
-  VolatileSolventHumanBuff    = Spell(323491),
-  -- Trinket Effects
-  ScarsofFraternalStrifeBuff4 = Spell(368638),
-  -- Other Item Effects
-  TemptationBuff              = Spell(234143),
   -- Other
   Pool                        = Spell(999910)
 }

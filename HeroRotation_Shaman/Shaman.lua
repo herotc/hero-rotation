@@ -58,9 +58,6 @@ Spell.Shaman.Commons = {
   SplinteredElementsBuff                = Spell(382043),
   -- Debuffs
   FlameShockDebuff                      = Spell(188389),
-  -- Trinket Effects
-  AcquiredSwordBuff                     = Spell(368657),
-  ScarsofFraternalStrifeBuff4           = Spell(368638),
   -- Misc
   Pool                                  = Spell(999910),
 }
