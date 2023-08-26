@@ -401,7 +401,7 @@ local function Aoe()
   end
   -- chain_lightning,if=buff.maelstrom_weapon.stack>=5
   if S.ChainLightning:IsReady() and (MaelstromStacks >= 5) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.CrashLightning)) then return "chain_lightning aoe 56"; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 56"; end
   end
   -- windfury_totem,if=buff.windfury_totem.remains<30
   if S.WindfuryTotem:IsReady() and (Player:BuffDown(S.WindfuryTotemBuff, true) or S.WindfuryTotem:TimeSinceLastCast() > 90) then
