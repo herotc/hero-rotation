@@ -152,6 +152,9 @@ local function ToDTarget()
       BestUnit, BestConditionValue = CycleUnit, CycleUnit:Health()
     end
   end
+  if BestUnit and BestUnit == Target then
+    if not S.TouchofDeath:IsReady() then return nil; end
+  end
   return BestUnit
 end
 
