@@ -1,27 +1,30 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, HR = ...;
+local addonName, HR     = ...
+local AoEON             = HR.AoEON
+local Cast              = HR.Cast
+local CastLeftNameplate = HR.CastLeftNameplate
 -- HeroLib
-local HL = HeroLib;
-local Cache, Utils = HeroCache, HL.Utils;
-local Unit = HL.Unit;
-local Player = Unit.Player;
-local Target = Unit.Target;
-local Spell = HL.Spell;
-local Item = HL.Item;
+local HL                = HeroLib
+local Cache, Utils      = HeroCache, HL.Utils
+local Unit              = HL.Unit
+local Player            = Unit.Player
+local Target            = Unit.Target
+local Spell             = HL.Spell
+local Item              = HL.Item
 -- Lua
-local pairs = pairs;
-local gsub = string.gsub;
+local pairs             = pairs
+local gsub              = string.gsub
 -- API
-local UnitInParty = UnitInParty
-local UnitInRaid = UnitInRaid
+local UnitInParty       = UnitInParty
+local UnitInRaid        = UnitInRaid
 -- File Locals
-HR.Commons = {};
-local Commons = {};
-HR.Commons.Everyone = Commons;
-local Settings = HR.GUISettings.General;
-local AbilitySettings = HR.GUISettings.Abilities;
+HR.Commons              = {}
+local Commons           = {}
+HR.Commons.Everyone     = Commons
+local Settings          = HR.GUISettings.General
+local AbilitySettings   = HR.GUISettings.Abilities
 
 --- ============================ CONTENT ============================
 -- Num/Bool helper functions
@@ -35,29 +38,29 @@ end
 
 -- Is the current target valid?
 function Commons.TargetIsValid()
-  return Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost();
+  return Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost()
 end
 
 -- Is the current unit valid during cycle?
 function Commons.UnitIsCycleValid(Unit, BestUnitTTD, TimeToDieOffset)
-  return not Unit:IsFacingBlacklisted() and not Unit:IsUserCycleBlacklisted() and (not BestUnitTTD or Unit:FilteredTimeToDie(">", BestUnitTTD, TimeToDieOffset));
+  return not Unit:IsFacingBlacklisted() and not Unit:IsUserCycleBlacklisted() and (not BestUnitTTD or Unit:FilteredTimeToDie(">", BestUnitTTD, TimeToDieOffset))
 end
 
 -- Is it worth to DoT the unit?
 function Commons.CanDoTUnit(Unit, HealthThreshold)
-  return Unit:Health() >= HealthThreshold or Unit:IsDummy();
+  return Unit:Health() >= HealthThreshold or Unit:IsDummy()
 end
 
 -- Interrupt
 function Commons.Interrupt(Range, Spell, Setting, StunSpells)
   if Settings.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(Range) then
     if Spell:IsCastable(true) then
-      if HR.Cast(Spell, Setting) then return "Cast " .. Spell:Name() .. " (Interrupt)"; end
+      if Cast(Spell, Setting) then return "Cast " .. Spell:Name() .. " (Interrupt)"; end
     elseif Settings.InterruptWithStun and Target:CanBeStunned() then
       if StunSpells then
         for i = 1, #StunSpells do
           if StunSpells[i][1]:IsCastable() and StunSpells[i][3]() then
-            if HR.Cast(StunSpells[i][1]) then return StunSpells[i][2]; end
+            if Cast(StunSpells[i][1]) then return StunSpells[i][2]; end
           end
         end
       end
@@ -67,19 +70,19 @@ end
 
 -- Is in Solo Mode?
 function Commons.IsSoloMode()
-  return Settings.SoloMode and not Player:IsInRaidArea() and not Player:IsInDungeonArea();
+  return Settings.SoloMode and not Player:IsInRaidArea() and not Player:IsInDungeonArea()
 end
 
 -- Cycle Unit Helper
 function Commons.CastCycle(Object, Enemies, Condition, OutofRange, OffGCD, DisplayStyle)
   if Condition(Target) then
-    return HR.Cast(Object, OffGCD, DisplayStyle, OutofRange)
+    return Cast(Object, OffGCD, DisplayStyle, OutofRange)
   end
-  if HR.AoEON() then
+  if AoEON() then
     local TargetGUID = Target:GUID()
     for _, CycleUnit in pairs(Enemies) do
-      if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and Condition(CycleUnit) then
-        HR.CastLeftNameplate(CycleUnit, Object)
+      if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:IsFacingBlacklisted() and (not CycleUnit:IsUserCycleBlacklisted()) and Condition(CycleUnit) then
+        CastLeftNameplate(CycleUnit, Object)
         break
       end
     end
@@ -89,10 +92,10 @@ end
   -- Target If Helper
 function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, Condition, OutofRange, OffGCD, DisplayStyle)
   local TargetCondition = (not Condition or (Condition and Condition(Target)))
-  if not HR.AoEON() and TargetCondition then
-    return HR.Cast(Object, OffGCD, DisplayStyle, OutofRange)
+  if not AoEON() and TargetCondition then
+    return Cast(Object, OffGCD, DisplayStyle, OutofRange)
   end
-  if HR.AoEON() then
+  if AoEON() then
     local BestUnit, BestConditionValue = nil, nil
     for _, CycleUnit in pairs(Enemies) do
       if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy())
@@ -102,9 +105,9 @@ function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, 
     end
     if BestUnit then
       if TargetCondition and (BestUnit:GUID() == Target:GUID() or BestConditionValue == TargetIfCondition(Target)) then
-        return HR.Cast(Object, OffGCD, DisplayStyle, OutofRange)
+        return Cast(Object, OffGCD, DisplayStyle, OutofRange)
       elseif ((Condition and Condition(BestUnit)) or not Condition) then
-        HR.CastLeftNameplate(BestUnit, Object)
+        CastLeftNameplate(BestUnit, Object)
       end
     end
   end
@@ -112,7 +115,7 @@ end
 
 function Commons.GroupBuffMissing(spell)
   local range = 40
-  local buffIDs = { 381732, 381741, 381746, 381748, 381749, 381750, 381751, 381752, 381753, 381754, 381756, 381757, 381758 }
+  local BotBBuffIDs = { 381732, 381741, 381746, 381748, 381749, 381750, 381751, 381752, 381753, 381754, 381756, 381757, 381758 }
   if spell:Name() == "Battle Shout" then range = 100 end
   local Group
   if UnitInRaid("player") then
@@ -123,15 +126,13 @@ function Commons.GroupBuffMissing(spell)
     return false
   end
   for _, Char in pairs(Group) do
-    if spell:Name() == "Blessing of the Bronze" then
-      if Char:Exists() and Char:IsInRange(range) then
-        for _, v in pairs(buffIDs) do
-          if Char:BuffUp(HL.Spell(v), true) then return false end
+    if Char:Exists() and (not Char:IsDeadOrGhost()) and Char:IsInRange(range) then
+      if spell:Name() == "Blessing of the Bronze" then
+        for _, v in pairs(BotBBuffIDs) do
+          if Char:BuffUp(Spell(v), true) then return false end
         end
         return true
-      end
-    else
-      if Char:Exists() and Char:IsInRange(range) and Char:BuffDown(spell, true) then
+      elseif Char:BuffDown(spell, true) then
         return true
       end
     end
