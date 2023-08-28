@@ -190,7 +190,7 @@ local function APL()
     -- cauterizing_flame
     -- Note: Too situational. Not suggesting CF.
     -- living_flame,if=time<cast_time*2
-    if S.LivingFlame:IsReady() and (HL.CombatTime() < S.LivingFlame:CastTime() * 2) then
+    if S.LivingFlame:IsReady() and (HL.CombatTime() < S.LivingFlame:CastTime() * Settings.Augmentation.LeadingLFs) then
       if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame main 4"; end
     end
     -- hover,if=moving&buff.hover.down&buff.breath_of_eons.down

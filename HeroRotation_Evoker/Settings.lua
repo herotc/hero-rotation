@@ -45,6 +45,7 @@ HR.GUISettings.APL.Evoker = {
     }
   },
   Augmentation = {
+    LeadingLFs = 2,
     DisplayStyle = {
       AugBuffs = "SuggestedRight",
     },
@@ -89,6 +90,7 @@ CreatePanelOption("Slider", CP_Evoker, "APL.Evoker.Commons.DisintegrateFontSize"
 
 -- Augmentation
 CreateARPanelOptions(CP_Augmentation, "APL.Evoker.Augmentation")
+CreatePanelOption("Slider", CP_Augmentation, "APL.Evoker.Augmentation.LeadingLFs", {0, 5, 1}, "Leading Living Flame Casts", "Select the number of Living Flames to suggest at the start of your rotation (default: 2). This does not include the Precombat Living Flame suggestion.")
 
 -- Devastation
 CreatePanelOption("CheckButton", CP_Devastation, "APL.Evoker.Devastation.UseDefensives", "Suggest Defensives", "Enable this option to have the addon suggest defensive spells.")
