@@ -210,11 +210,11 @@ local function InitVars()
   VarNoCDTalent = (not S.CelestialAlignment:IsAvailable()) and (not S.IncarnationTalent:IsAvailable()) or not CDsON()
   -- variable,name=on_use_trinket,value=0
   VarOnUseTrinket = 0
-  -- variable,name=on_use_trinket,op=add,value=trinket.1.has_proc.any&trinket.1.cooldown.duration|trinket.1.is.spoils_of_neltharus
-  local T1Add = (trinket1:IsReady() or trinket1:CooldownDown() or trinket1:ID() == I.SpoilsofNeltharus:ID()) and 1 or 0
+  -- variable,name=on_use_trinket,op=add,value=trinket.1.has_proc.any&trinket.1.cooldown.duration|trinket.1.is.spoils_of_neltharus|trinket.1.is.mirror_of_fractured_tomorrows
+  local T1Add = (trinket1:IsUsable() or trinket1:ID() == I.SpoilsofNeltharus:ID() or trinket1:ID() == I.MirrorofFracturedTomorrows:ID()) and 1 or 0
   VarOnUseTrinket = VarOnUseTrinket + T1Add
-  -- variable,name=on_use_trinket,op=add,value=(trinket.2.has_proc.any&trinket.2.cooldown.duration)*2|trinket.2.is.spoils_of_neltharus
-  local T2Add = (trinket2:IsReady() or trinket2:CooldownDown()) and 2 or 0
+  -- variable,name=on_use_trinket,op=add,value=(trinket.2.has_proc.any&trinket.2.cooldown.duration|trinket.2.is.spoils_of_neltharus|trinket.1.is.mirror_of_fractured_tomorrows)*2
+  local T2Add = (trinket2:IsUsable() or trinket2:ID() == I.SpoilsofNeltharus:ID() or trinket2:ID() == I.MirrorofFracturedTomorrows:ID()) and 2 or 0
   T2Add = (trinket2:ID() == I.SpoilsofNeltharus:ID()) and 1 or 0
   VarOnUseTrinket = VarOnUseTrinket + T2Add
 
@@ -278,10 +278,6 @@ local function St()
   end
   -- variable,name=cd_condition_st,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>15|fight_remains<25+10*talent.incarnation_chosen_of_elune))
   VarCDConditionST = CDsON() and (CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 15 or FightRemains < 25 + 10 * num(S.Incarnation:IsAvailable())))
-  -- use_item,name=mirror_of_fractured_tomorrows,if=variable.cd_condition_st
-  if Settings.Commons.Enabled.Trinkets and I.MirrorofFracturedTomorrows:IsEquippedAndReady() and (VarCDConditionST) then
-    if Cast(I.MirrorofFracturedTomorrows, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows st 4"; end
-  end
   -- moonfire,target_if=refreshable&remains<2&(target.time_to_die-remains)>6
   if S.Moonfire:IsCastable() then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireST, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire st 6"; end
@@ -414,10 +410,6 @@ local function AoE()
   end
   -- variable,name=cd_condition_aoe,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>10|fight_remains<25+10*talent.incarnation_chosen_of_elune))
   VarCDConditionAoE = CDsON() and (CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 10 or FightRemains < 25 + 10 * num(S.Incarnation:IsAvailable())))
-  -- use_item,name=mirror_of_fractured_tomorrows,if=variable.cd_condition_aoe
-  if Settings.Commons.Enabled.Trinkets and I.MirrorofFracturedTomorrows:IsEquippedAndReady() and (VarCDConditionAoE) then
-    if Cast(I.MirrorofFracturedTomorrows, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows aoe 3"; end
-  end
   -- sunfire,target_if=refreshable&(target.time_to_die-remains)>6-(spell_targets%2)&astral_power.deficit>variable.passive_asp+3
   if S.Sunfire:IsCastable() then
     if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireAoE, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire aoe 4"; end
