@@ -613,6 +613,7 @@ local function APL()
 
   -- Update our enemy tables
   Enemies8ySplash = Target:GetEnemiesInSplashRange(8)
+  Enemies16ySplash = Target:GetEnemiesInSplashRange(16)
   Enemies10yMelee = Player:GetEnemiesInMeleeRange(10)
   Enemies18yMelee = Player:GetEnemiesInMeleeRange(18)
   if AoEON() then
@@ -663,6 +664,14 @@ local function APL()
     end
     -- counterspell
     local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
+    -- Manually added: Scorch sniping
+    if Settings.Fire.UseScorchSniping and S.SearingTouch:IsAvailable() and AoEON() then
+      for _, CycleUnit in pairs(Enemies16ySplash) do
+        if CycleUnit:Exists() and CycleUnit:GUID() ~= Target:GUID() and not CycleUnit:IsDeadOrGhost() and CycleUnit:HealthPercentage() < 30 and CycleUnit:IsSpellInRange(S.Scorch) then
+          if HR.CastLeftNameplate(CycleUnit, S.Scorch) then return "Scorch Sniping on "..CycleUnit:Name(); end
+        end
+      end
+    end
     -- call_action_list,name=combustion_timing,if=!variable.disable_combustion
     if not var_disable_combustion then
       CombustionTiming()

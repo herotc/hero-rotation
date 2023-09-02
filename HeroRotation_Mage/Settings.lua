@@ -72,6 +72,7 @@ HR.GUISettings.APL.Mage = {
     StayDistance = true,
     ShowFireBlastLeft = false,
     ShowPyroblastLeft = false,
+    UseScorchSniping = false,
     PotionType = {
       Selected = "Power",
     },
@@ -141,6 +142,7 @@ CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.ShowFireBlastLeft", "Sh
 CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.ShowPyroblastLeft", "Show Free Pyroblast on left icon", "Show free Pyroblast casts on left icon while casting")
 CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat.")
 CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.MovingRotation", "Disable abilities with cast time when moving", "Don't show abilities with a cast time while moving (makes the rotation a bit clunky with small steps).")
+CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.UseScorchSniping", "Enable Scorch sniping", "Enable this option to show a Scorch suggestion in the CastLeft area when Searing Touch is talented and one of your non-primary targets is under 30% health.")
 
 -- Frost
 CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.StayDistance", "Stay at distance", "Only use Arcane Explosion if in range. If out of range, display it on the left icon.")
