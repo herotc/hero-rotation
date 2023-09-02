@@ -67,8 +67,6 @@ local VarPopWounds
 local VarPoolingRunicPower
 local VarSTPlanning
 local VarAddsRemain
-local VarCommanderBuffUp
-local VarCommanderBuffRemains
 local VarApocGhoulActive, VarApocGhoulRemains
 local VarArmyGhoulActive, VarArmyGhoulRemains
 local VarGargActive, VarGargRemains
@@ -343,7 +341,7 @@ end
 
 local function Cooldowns()
   -- summon_gargoyle,if=buff.commander_of_the_dead.up|!talent.commander_of_the_dead
-  if S.SummonGargoyle:IsCastable() and (VarCommanderBuffUp or not S.CommanderoftheDead:IsAvailable()) then
+  if S.SummonGargoyle:IsCastable() and (Player:BuffUp(S.CommanderoftheDeadBuff) or not S.CommanderoftheDead:IsAvailable()) then
     if Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return "summon_gargoyle cooldowns 2"; end
   end
   -- raise_dead,if=!pet.ghoul.active
@@ -386,11 +384,11 @@ end
 
 local function GargSetup()
   -- apocalypse,if=debuff.festering_wound.stack>=4&(buff.commander_of_the_dead.up&pet.gargoyle.remains<23|!talent.commander_of_the_dead)
-  if S.Apocalypse:IsReady() and (FesterStacks >= 4 and (VarCommanderBuffUp and VarGargRemains < 23 or not S.CommanderoftheDead:IsAvailable())) then
+  if S.Apocalypse:IsReady() and (FesterStacks >= 4 and (Player:BuffUp(S.CommanderoftheDeadBuff) and VarGargRemains < 23 or not S.CommanderoftheDead:IsAvailable())) then
     if Cast(S.Apocalypse, Settings.Unholy.GCDasOffGCD.Apocalypse, nil, not Target:IsInMeleeRange(5)) then return "apocalypse garg_setup 2"; end
   end
   -- army_of_the_dead,if=talent.commander_of_the_dead&(cooldown.dark_transformation.remains<3|buff.commander_of_the_dead.up)|!talent.commander_of_the_dead&talent.unholy_assault&cooldown.unholy_assault.remains<10|!talent.unholy_assault&!talent.commander_of_the_dead
-  if S.ArmyoftheDead:IsReady() and (S.CommanderoftheDead:IsAvailable() and (S.DarkTransformation:CooldownRemains() < 3 or VarCommanderBuffUp) or (not S.CommanderoftheDead:IsAvailable()) and S.UnholyAssault:IsAvailable() and S.UnholyAssault:CooldownRemains() < 10 or (not S.UnholyAssault:IsAvailable()) and not S.CommanderoftheDead:IsAvailable()) then
+  if S.ArmyoftheDead:IsReady() and (S.CommanderoftheDead:IsAvailable() and (S.DarkTransformation:CooldownRemains() < 3 or Player:BuffUp(S.CommanderoftheDeadBuff)) or (not S.CommanderoftheDead:IsAvailable()) and S.UnholyAssault:IsAvailable() and S.UnholyAssault:CooldownRemains() < 10 or (not S.UnholyAssault:IsAvailable()) and not S.CommanderoftheDead:IsAvailable()) then
     if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyOfTheDead) then return "army_of_the_dead garg_setup 4"; end
   end
   -- soul_reaper,if=active_enemies=1&target.time_to_pct_35<5&target.time_to_die>5
@@ -398,7 +396,7 @@ local function GargSetup()
     if Cast(S.SoulReaper, nil, nil, not Target:IsInMeleeRange(5)) then return "soul_reaper garg_setup 6"; end
   end
   -- summon_gargoyle,use_off_gcd=1,if=buff.commander_of_the_dead.up|!talent.commander_of_the_dead&runic_power>=40
-  if S.SummonGargoyle:IsCastable() and CDsON() and (VarCommanderBuffUp or (not S.CommanderoftheDead:IsAvailable()) and Player:RunicPower() >= 40) then
+  if S.SummonGargoyle:IsCastable() and CDsON() and (Player:BuffUp(S.CommanderoftheDeadBuff) or (not S.CommanderoftheDead:IsAvailable()) and Player:RunicPower() >= 40) then
     if Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return "summon_gargoyle garg_setup 8"; end
   end
   if CDsON() and (VarGargActive and VarGargRemains <= 23) then
@@ -499,11 +497,11 @@ local function HighPrioActions()
     if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyOfTheDead) then return "army_of_the_dead high_prio_actions 4"; end
   end
   -- death_coil,if=(active_enemies<=3|!talent.epidemic)&(pet.gargoyle.active&talent.commander_of_the_dead&buff.commander_of_the_dead.up&cooldown.apocalypse.remains<5&buff.commander_of_the_dead.remains>27|debuff.death_rot.up&debuff.death_rot.remains<gcd)
-  if S.DeathCoil:IsReady() and ((EnemiesMeleeCount <= 3 or not S.Epidemic:IsAvailable()) and (VarGargActive and S.CommanderoftheDead:IsAvailable() and VarCommanderBuffUp and S.Apocalypse:CooldownRemains() < 5 and VarCommanderBuffRemains > 27 or Target:DebuffUp(S.DeathRotDebuff) and Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD())) then
+  if S.DeathCoil:IsReady() and ((EnemiesMeleeCount <= 3 or not S.Epidemic:IsAvailable()) and (VarGargActive and S.CommanderoftheDead:IsAvailable() and Player:BuffUp(S.CommanderoftheDeadBuff) and S.Apocalypse:CooldownRemains() < 5 and Player:BuffRemains(S.CommanderoftheDeadBuff) > 27 or Target:DebuffUp(S.DeathRotDebuff) and Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD())) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil high_prio_actions 6"; end
   end
   -- epidemic,if=active_enemies>=4&(talent.commander_of_the_dead&buff.commander_of_the_dead.up&cooldown.apocalypse.remains<5|debuff.death_rot.up&debuff.death_rot.remains<gcd)
-  if S.Epidemic:IsReady() and (Enemies10ySplashCount >= 4 and (S.CommanderoftheDead:IsAvailable() and VarCommanderBuffUp and S.Apocalypse:CooldownRemains() < 5 or Target:DebuffUp(S.DeathRotDebuff) and Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD())) then
+  if S.Epidemic:IsReady() and (Enemies10ySplashCount >= 4 and (S.CommanderoftheDead:IsAvailable() and Player:BuffUp(S.CommanderoftheDeadBuff) and S.Apocalypse:CooldownRemains() < 5 or Target:DebuffUp(S.DeathRotDebuff) and Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD())) then
     if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic high_prio_actions 8"; end
   end
   -- wound_spender,if=(cooldown.apocalypse.remains>variable.apoc_timing+3|active_enemies>=3)&talent.plaguebringer&(talent.superstrain|talent.unholy_blight)&buff.plaguebringer.remains<gcd
@@ -632,10 +630,6 @@ local function APL()
     if FightRemains == 11111 then
       FightRemains = HL.FightRemains(EnemiesMelee, false)
     end
-
-    -- Are we in the buff window for Commander of the Dead?
-    VarCommanderBuffUp = Player:BuffUp(S.CommanderoftheDeadBuff)
-    VarCommanderBuffRemains = Player:BuffRemains(S.CommanderoftheDeadBuff)
 
     -- Check which enemies don't have Virulent Plague
     EnemiesWithoutVP = UnitsWithoutVP(Enemies10ySplash)
