@@ -639,7 +639,7 @@ local function APL()
     VarApocGhoulRemains = (VarApocGhoulActive) and 15 - S.Apocalypse:TimeSinceLastCast() or 0
     -- Is Army active?
     VarArmyGhoulActive = S.ArmyoftheDead:TimeSinceLastCast() <= 30
-    VarArmyGhoulRemains = (VarArmyGhoulRemains) and 30 - S.ArmyoftheDead:TimeSinceLastCast() or 0
+    VarArmyGhoulRemains = (VarArmyGhoulActive) and 30 - S.ArmyoftheDead:TimeSinceLastCast() or 0
     -- Is Gargoyle active?
     VarGargActive = ghoul:gargactive()
     VarGargRemains = ghoul:gargremains()
