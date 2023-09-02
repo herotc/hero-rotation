@@ -60,7 +60,7 @@ local Settings = {
 }
 
 -- Variables
-local VarGargSetup
+local VarGargSetupComplete
 local VarApocTiming
 local VarFesterTracker
 local VarPopWounds
@@ -592,8 +592,8 @@ end
 local function Variables()
   -- variable,name=epidemic_priority,op=setif,value=1,value_else=0,condition=talent.improved_death_coil&!talent.coil_of_devastation&active_enemies>=3|talent.coil_of_devastation&active_enemies>=4|!talent.improved_death_coil&active_enemies>=2
   VarEpidemicPriority = (S.ImprovedDeathCoil:IsAvailable() and (not S.CoilofDevastation:IsAvailable()) and EnemiesMeleeCount >= 3 or S.CoilofDevastation:IsAvailable() and EnemiesMeleeCount >= 4 or (not S.ImprovedDeathCoil:IsAvailable()) and EnemiesMeleeCount >= 2)
-  -- variable,name=garg_setup,op=setif,value=1,value_else=0,condition=active_enemies>=3|cooldown.summon_gargoyle.remains>1&cooldown.apocalypse.remains>1|!talent.apocalypse&cooldown.summon_gargoyle.remains>1|!talent.summon_gargoyle|time>20
-  VarGargSetup = (EnemiesMeleeCount >= 3 or S.SummonGargoyle:CooldownRemains() > 1 and S.Apocalypse:CooldownRemains() > 1 or (not S.Apocalypse:IsAvailable()) and S.SummonGargoyle:CooldownRemains() > 1 or (not S.SummonGargoyle:IsAvailable()) or HL.CombatTime() > 20)
+  -- variable,name=garg_setup_complete,op=setif,value=1,value_else=0,condition=active_enemies>=3|cooldown.summon_gargoyle.remains>1&(cooldown.apocalypse.remains>1|!talent.apocalypse)|!talent.summon_gargoyle|time>20
+  VarGargSetupComplete = (EnemiesMeleeCount >= 3 or S.SummonGargoyle:CooldownRemains() > 1 and (S.Apocalypse:CooldownRemains() > 1 or not S.Apocalypse:IsAvailable()) or (not S.SummonGargoyle:IsAvailable()) or HL.CombatTime() > 20)
   -- variable,name=apoc_timing,op=setif,value=7,value_else=2,condition=cooldown.apocalypse.remains<10&debuff.festering_wound.stack<=4&cooldown.unholy_assault.remains>10
   VarApocTiming = (S.Apocalypse:CooldownRemains() < 10 and FesterStacks <= 4 and S.UnholyAssault:CooldownRemains() > 10) and 7 or 2
   -- variable,name=festermight_tracker,op=setif,value=debuff.festering_wound.stack>=1,value_else=debuff.festering_wound.stack>=(3-talent.infected_claws),condition=!pet.gargoyle.active&talent.festermight&buff.festermight.up&(buff.festermight.remains%(5*gcd.max))>=1
@@ -634,8 +634,8 @@ local function APL()
     end
 
     -- Are we in the buff window for Commander of the Dead?
-    VarCommanderBuffUp = S.DarkTransformation:TimeSinceLastCast() <= 4
-    VarCommanderBuffRemains = (VarCommanderBuffUp) and 4 - S.DarkTransformation:TimeSinceLastCast() or 0
+    VarCommanderBuffUp = Player:BuffUp(S.CommanderoftheDeadBuff)
+    VarCommanderBuffRemains = Player:BuffRemains(S.CommanderoftheDeadBuff)
 
     -- Check which enemies don't have Virulent Plague
     EnemiesWithoutVP = UnitsWithoutVP(Enemies10ySplash)
@@ -689,7 +689,7 @@ local function APL()
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=garg_setup,if=variable.garg_setup=0
-    if not VarGargSetup then
+    if not VarGargSetupComplete then
       local ShouldReturn = GargSetup(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for GargSetup()"; end
     end

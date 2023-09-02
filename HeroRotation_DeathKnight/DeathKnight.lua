@@ -180,6 +180,7 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   UnholyPact                            = Spell(319230),
   VileContagion                         = Spell(390279),
   -- Buffs
+  CommanderoftheDeadBuff                = Spell(390260),
   FestermightBuff                       = Spell(377591),
   PlaguebringerBuff                     = Spell(390178),
   RunicCorruptionBuff                   = Spell(51460),
