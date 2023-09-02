@@ -112,20 +112,20 @@ end, "UNIT_DESTROYED")
     GargoyleExpiration = nil,
   }
 
-  function HL.GhoulTable:remains()
+  function HL.GhoulTable:GhoulRemains()
     if HL.GhoulTable.SummonExpiration == nil then return 0 end
     return HL.GhoulTable.SummonExpiration - GetTime()
   end
 
-  function HL.GhoulTable:active()
-    return HL.GhoulTable.SummonedGhoul ~= nil and HL.GhoulTable:remains() > 0
+  function HL.GhoulTable:GhoulActive()
+    return HL.GhoulTable.SummonedGhoul ~= nil and HL.GhoulTable:GhoulRemains() > 0
   end
 
-  function HL.GhoulTable:gargremains()
+  function HL.GhoulTable:GargRemains()
     if HL.GhoulTable.GargoyleExpiration == nil then return 0 end
     return HL.GhoulTable.GargoyleExpiration - GetTime()
   end
 
-  function HL.GhoulTable:gargactive()
-    return HL.GhoulTable.SummonedGargoyle ~= nil and HL.GhoulTable:gargremains() > 0
+  function HL.GhoulTable:GargActive()
+    return HL.GhoulTable.SummonedGargoyle ~= nil and HL.GhoulTable:GargRemains() > 0
   end

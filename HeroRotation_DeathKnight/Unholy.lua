@@ -75,7 +75,7 @@ local AnyDnD = (S.Defile:IsAvailable()) and S.Defile or S.DeathAndDecay
 local FesterStacks
 local BossFightRemains = 11111
 local FightRemains = 11111
-local ghoul = HL.GhoulTable
+local Ghoul = HL.GhoulTable
 
 -- Enemies Variables
 local EnemiesMelee, EnemiesMeleeCount
@@ -641,8 +641,8 @@ local function APL()
     VarArmyGhoulActive = S.ArmyoftheDead:TimeSinceLastCast() <= 30
     VarArmyGhoulRemains = (VarArmyGhoulActive) and 30 - S.ArmyoftheDead:TimeSinceLastCast() or 0
     -- Is Gargoyle active?
-    VarGargActive = ghoul:gargactive()
-    VarGargRemains = ghoul:gargremains()
+    VarGargActive = Ghoul:GargActive()
+    VarGargRemains = Ghoul:GargRemains()
 
     -- Check our stacks of Festering Wounds
     FesterStacks = Target:DebuffStack(S.FesteringWoundDebuff)
