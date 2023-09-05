@@ -72,6 +72,18 @@ OldUHIsReady = HL.AddCoreOverride("Spell.IsReady",
   end
 , 252)
 
+local OldUHIsAvailable
+OldUHIsAvailable = HL.AddCoreOverride("Spell.IsAvailable",
+  function (self)
+    local BaseCheck = OldUHIsAvailable(self)
+    if not HR.CDsON() and (self == SpellUnholy.Apocalypse or self == SpellUnholy.UnholyAssault) then
+      return false
+    else
+      return BaseCheck
+    end
+  end
+, 252)
+
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP",
 -- function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
