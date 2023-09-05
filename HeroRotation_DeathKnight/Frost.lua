@@ -186,7 +186,7 @@ local function AoE()
     if Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornOfWinter) then return "horn_of_winter aoe 18"; end
   end
   -- arcane_torrent,if=runic_power.deficit>25
-  if S.ArcaneTorrent:IsReady() and (Player:RunicPowerDeficit() > 25) then
+  if CDsON() and S.ArcaneTorrent:IsReady() and (Player:RunicPowerDeficit() > 25) then
     if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials) then return "arcane_torrent aoe 20"; end
   end
 end
@@ -383,7 +383,7 @@ local function HighPrioActions()
   -- Note: Not handling external buffs.
   -- mind_freeze,if=target.debuff.casting.react
   local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons2.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
-  if Settings.Commons.UseAMSAMZOffensively then
+  if Settings.Commons.UseAMSAMZOffensively and CDsON() then
     -- antimagic_shell,if=runic_power.deficit>40
     if S.AntiMagicShell:IsCastable() and (Player:RunicPowerDeficit() > 40) then
       if Cast(S.AntiMagicShell, Settings.Commons2.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell high_prio_actions 2"; end
@@ -485,7 +485,7 @@ local function Obliteration()
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast obliteration 26"; end
   end
   -- arcane_torrent,if=rune<1&runic_power<25
-  if S.ArcaneTorrent:IsReady() and (Player:Rune() < 1 and Player:RunicPower() < 25) then
+  if CDsON() and S.ArcaneTorrent:IsReady() and (Player:Rune() < 1 and Player:RunicPower() < 25) then
     if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials) then return "arcane_torrent obliteration 28"; end
   end
   -- glacial_advance,if=!variable.pooling_runic_power&active_enemies>=2
@@ -593,7 +593,7 @@ local function SingleTarget()
     if Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornOfWinter) then return "horn_of_winter single_target 24"; end
   end
   -- arcane_torrent,if=runic_power.deficit>20
-  if S.ArcaneTorrent:IsReady() and (Player:RunicPowerDeficit() > 20) then
+  if CDsON() and S.ArcaneTorrent:IsReady() and (Player:RunicPowerDeficit() > 20) then
     if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials) then return "arcane_torrent single_target 26"; end
   end
   -- frost_strike,if=!variable.pooling_runic_power
@@ -632,25 +632,25 @@ local function Variables()
   -- variable,name=rime_buffs,value=buff.rime.react&(talent.rage_of_the_frozen_champion|talent.avalanche|talent.icebreaker)
   VarRimeBuffs = (Player:BuffUp(S.RimeBuff) and (S.RageoftheFrozenChampion:IsAvailable() or S.Avalanche:IsAvailable() or S.Icebreaker:IsAvailable()))
   -- variable,name=rp_buffs,value=talent.unleashed_frenzy&(buff.unleashed_frenzy.remains<gcd.max*3|buff.unleashed_frenzy.stack<3)|talent.icy_talons&(buff.icy_talons.remains<gcd.max*3|buff.icy_talons.stack<3)
-    VarRPBuffs = (S.UnleashedFrenzy:IsAvailable() and (Player:BuffRemains(S.UnleashedFrenzyBuff) < GCDMax * 3 or Player:BuffStack(S.UnleashedFrenzyBuff) < 3) or S.IcyTalons:IsAvailable() and (Player:BuffRemains(S.IcyTalonsBuff) < GCDMax * 3 or Player:BuffStack(S.IcyTalonsBuff) < 3))
+  VarRPBuffs = (S.UnleashedFrenzy:IsAvailable() and (Player:BuffRemains(S.UnleashedFrenzyBuff) < GCDMax * 3 or Player:BuffStack(S.UnleashedFrenzyBuff) < 3) or S.IcyTalons:IsAvailable() and (Player:BuffRemains(S.IcyTalonsBuff) < GCDMax * 3 or Player:BuffStack(S.IcyTalonsBuff) < 3))
   -- variable,name=cooldown_check,value=talent.pillar_of_frost&buff.pillar_of_frost.up&(talent.obliteration&buff.pillar_of_frost.remains<6|!talent.obliteration)|!talent.pillar_of_frost&buff.empower_rune_weapon.up|!talent.pillar_of_frost&!talent.empower_rune_weapon|active_enemies>=2&buff.pillar_of_frost.up
   VarCDCheck = (S.PillarofFrost:IsAvailable() and Player:BuffUp(S.PillarofFrostBuff) and (S.Obliteration:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) < 6 or not S.Obliteration:IsAvailable()) or (not S.PillarofFrost:IsAvailable()) and Player:BuffUp(S.EmpowerRuneWeaponBuff) or (not S.PillarofFrost:IsAvailable()) and (not S.EmpowerRuneWeapon:IsAvailable()) or EnemiesMeleeCount >= 2 and Player:BuffUp(S.PillarofFrostBuff))
   -- variable,name=frostscythe_priority,value=talent.frostscythe&(buff.killing_machine.react|active_enemies>=3)&(!talent.improved_obliterate&!talent.frigid_executioner&!talent.frostreaper&!talent.might_of_the_frozen_wastes|!talent.cleaving_strikes|talent.cleaving_strikes&(active_enemies>6|!death_and_decay.ticking&active_enemies>3))
   VarFrostscythePriority = (S.Frostscythe:IsAvailable() and (Player:BuffUp(S.KillingMachineBuff) or EnemiesCount10yd >= 3) and ((not S.ImprovedObliterate:IsAvailable()) and (not S.FrigidExecutioner:IsAvailable()) and (not S.Frostreaper:IsAvailable()) and (not S.MightoftheFrozenWastes:IsAvailable()) or (not S.CleavingStrikes:IsAvailable()) or S.CleavingStrikes:IsAvailable() and (EnemiesCount10yd > 6 or Player:BuffDown(S.DeathAndDecayBuff) and EnemiesCount10yd > 3)))
   -- variable,name=oblit_pooling_time,op=setif,value=((cooldown.pillar_of_frost.remains_expected+1)%gcd.max)%((rune+3)*(runic_power+5))*100,value_else=3,condition=runic_power<35&rune<2&cooldown.pillar_of_frost.remains_expected<10
-    if Player:RunicPower() < 35 and Player:Rune() < 2 and S.PillarofFrost:CooldownRemains() < 10 then
-      VarOblitPoolingTime = (((S.PillarofFrost:CooldownRemains() + 1) / GCDMax) / ((Player:Rune() + 3) * (Player:RunicPower() + 5)) * 100)
-    else
-      VarOblitPoolingTime = 3
-    end
+  if Player:RunicPower() < 35 and Player:Rune() < 2 and S.PillarofFrost:CooldownRemains() < 10 then
+    VarOblitPoolingTime = (((S.PillarofFrost:CooldownRemains() + 1) / GCDMax) / ((Player:Rune() + 3) * (Player:RunicPower() + 5)) * 100)
+  else
+    VarOblitPoolingTime = 3
+  end
   -- variable,name=breath_pooling_time,op=setif,value=((cooldown.breath_of_sindragosa.remains+1)%gcd.max)%((rune+1)*(runic_power+20))*100,value_else=3,condition=runic_power.deficit>10&cooldown.breath_of_sindragosa.remains<10
-    if Player:RunicPowerDeficit() > 10 and S.BreathofSindragosa:CooldownRemains() < 10 then
-      VarBreathPoolingTime = (((S.BreathofSindragosa:CooldownRemains() + 1) / GCDMax) / ((Player:Rune() + 1) * (Player:RunicPower() + 20)) * 100)
-    else
-      VarBreathPoolingTime = 3
-    end
+  if Player:RunicPowerDeficit() > 10 and S.BreathofSindragosa:CooldownRemains() < 10 then
+    VarBreathPoolingTime = (((S.BreathofSindragosa:CooldownRemains() + 1) / GCDMax) / ((Player:Rune() + 1) * (Player:RunicPower() + 20)) * 100)
+  else
+    VarBreathPoolingTime = 3
+  end
   -- variable,name=pooling_runes,value=rune<4&talent.obliteration&cooldown.pillar_of_frost.remains_expected<variable.oblit_pooling_time
-    VarPoolingRunes = (Player:Rune() < 4 and S.Obliteration:IsAvailable() and S.PillarofFrost:CooldownRemains() < VarOblitPoolingTime)
+  VarPoolingRunes = (Player:Rune() < 4 and S.Obliteration:IsAvailable() and S.PillarofFrost:CooldownRemains() < VarOblitPoolingTime)
   -- variable,name=pooling_runic_power,value=talent.breath_of_sindragosa&cooldown.breath_of_sindragosa.remains<variable.breath_pooling_time|talent.obliteration&runic_power<35&cooldown.pillar_of_frost.remains_expected<variable.oblit_pooling_time
   VarPoolingRP = (S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemains() < VarBreathPoolingTime or S.Obliteration:IsAvailable() and Player:RunicPower() < 35 and S.PillarofFrost:CooldownRemains() < VarOblitPoolingTime)
 end
@@ -690,13 +690,9 @@ local function APL()
     end
     -- auto_attack
     -- call_action_list,name=variables
-    if (true) then
-      local ShouldReturn = Variables(); if ShouldReturn then return ShouldReturn; end
-    end
+    Variables()
     -- call_action_list,name=high_prio_actions
-    if (true) then
-      local ShouldReturn = HighPrioActions(); if ShouldReturn then return ShouldReturn; end
-    end
+    local ShouldReturn = HighPrioActions(); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=trinkets
     if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
