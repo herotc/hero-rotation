@@ -47,7 +47,7 @@ local EnemiesMelee
 local EnemiesMeleeCount
 local HeartStrikeCount
 local UnitsWithoutBloodPlague
-local ghoul = HL.GhoulTable
+local Ghoul = HL.GhoulTable
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -250,7 +250,7 @@ end
 
 local function Standard()
   -- tombstone,if=buff.bone_shield.stack>5&rune>=2&runic_power.deficit>=30&!talent.shattering_bone|(talent.shattering_bone.enabled&death_and_decay.ticking)&cooldown.dancing_rune_weapon.remains>=25
-  if S.Tombstone:IsCastable() and (Player:BuffStack(S.BoneShieldBuff) > 5 and Player:Rune() >= 2 and Player:RunicPowerDeficit() >= 30 and ((not S.ShatteringBone:IsAvailable()) or (S.ShatteringBone:IsAvailable() and Player:BuffUp(S.DeathAndDecayBuff))) and S.DancingRuneWeapon:CooldownRemains() >= 25) then
+  if CDsON() and S.Tombstone:IsCastable() and (Player:BuffStack(S.BoneShieldBuff) > 5 and Player:Rune() >= 2 and Player:RunicPowerDeficit() >= 30 and ((not S.ShatteringBone:IsAvailable()) or (S.ShatteringBone:IsAvailable() and Player:BuffUp(S.DeathAndDecayBuff))) and S.DancingRuneWeapon:CooldownRemains() >= 25) then
     if Cast(S.Tombstone, Settings.Blood.GCDasOffGCD.Tombstone) then return "tombstone standard 2"; end
   end
   -- variable,name=heart_strike_rp,value=(10+spell_targets.heart_strike*talent.heartbreaker.enabled*2)
@@ -280,7 +280,7 @@ local function Standard()
     if Everyone.CastTargetIf(S.SoulReaper, EnemiesMelee, "min", EvaluateTargetIfFilterSoulReaper, EvaluateTargetIfSoulReaper, not Target:IsInMeleeRange(5)) then return "soul_reaper standard 14"; end
   end
   -- bonestorm,if=runic_power>=100
-  if S.Bonestorm:IsReady() and (Player:RunicPower() >= 100) then
+  if CDsON() and S.Bonestorm:IsReady() and (Player:RunicPower() >= 100) then
     if Cast(S.Bonestorm, Settings.Blood.GCDasOffGCD.Bonestorm, nil, not Target:IsInMeleeRange(8)) then return "bonestorm standard 16"; end
   end
   -- blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)
@@ -393,27 +393,27 @@ local function APL()
       local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
     end
     -- sacrificial_pact,if=!buff.dancing_rune_weapon.up&(pet.ghoul.remains<2|target.time_to_die<gcd)
-    if S.SacrificialPact:IsReady() and ghoul.active() and (Player:BuffDown(S.DancingRuneWeaponBuff) and (ghoul.remains() < 2 or Target:TimeToDie() < Player:GCD())) then
+    if CDsON() and S.SacrificialPact:IsReady() and Ghoul.GhoulActive() and (Player:BuffDown(S.DancingRuneWeaponBuff) and (Ghoul.GhoulRemains() < 2 or Target:TimeToDie() < Player:GCD())) then
       if Cast(S.SacrificialPact, Settings.Commons2.GCDasOffGCD.SacrificialPact) then return "sacrificial_pact main 14"; end
     end
     -- blood_tap,if=(rune<=2&rune.time_to_4>gcd&charges_fractional>=1.8)|rune.time_to_3>gcd
-    if S.BloodTap:IsCastable() and ((Player:Rune() <= 2 and Player:RuneTimeToX(4) > Player:GCD() and S.BloodTap:ChargesFractional() >= 1.8) or Player:RuneTimeToX(3) > Player:GCD()) then
+    if CDsON() and S.BloodTap:IsCastable() and ((Player:Rune() <= 2 and Player:RuneTimeToX(4) > Player:GCD() and S.BloodTap:ChargesFractional() >= 1.8) or Player:RuneTimeToX(3) > Player:GCD()) then
       if Cast(S.BloodTap, Settings.Blood.OffGCDasOffGCD.BloodTap) then return "blood_tap main 16"; end
     end
     -- gorefiends_grasp,if=talent.tightening_grasp.enabled
-    if S.GorefiendsGrasp:IsCastable() and (S.TighteningGrasp:IsAvailable()) then
+    if CDsON() and S.GorefiendsGrasp:IsCastable() and (S.TighteningGrasp:IsAvailable()) then
       if Cast(S.GorefiendsGrasp, Settings.Blood.GCDasOffGCD.GorefiendsGrasp, nil, not Target:IsSpellInRange(S.GorefiendsGrasp)) then return "gorefiends_grasp main 18"; end
     end
     -- empower_rune_weapon,if=rune<6&runic_power.deficit>5
-    if S.EmpowerRuneWeapon:IsCastable() and (Player:Rune() < 6 and Player:RunicPowerDeficit() > 5) then
+    if CDsON() and S.EmpowerRuneWeapon:IsCastable() and (Player:Rune() < 6 and Player:RunicPowerDeficit() > 5) then
       if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon main 20"; end
     end
     -- abomination_limb
-    if S.AbominationLimb:IsCastable() then
+    if CDsON() and S.AbominationLimb:IsCastable() then
       if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.AbominationLimb)) then return "abomination_limb main 22"; end
     end
     -- dancing_rune_weapon,if=!buff.dancing_rune_weapon.up
-    if S.DancingRuneWeapon:IsCastable() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
+    if CDsON() and S.DancingRuneWeapon:IsCastable() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
       if Cast(S.DancingRuneWeapon, Settings.Blood.GCDasOffGCD.DancingRuneWeapon) then return "dancing_rune_weapon main 24"; end
     end
     -- run_action_list,name=drw_up,if=buff.dancing_rune_weapon.up
