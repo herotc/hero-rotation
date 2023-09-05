@@ -200,44 +200,41 @@ local function AoE()
   if S.Haunt:IsReady() then
     if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt aoe 2"; end
   end
-  -- vile_taint
-  if CDsON() and S.VileTaint:IsReady() then
+  -- vile_taint,if=!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|talent.souleaters_gluttony.rank<2&cooldown.soul_rot.remains>=12
+  if CDsON() and S.VileTaint:IsReady() and ((not S.SoulRot:IsAvailable()) or S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() or S.SouleatersGluttony:TalentRank() < 2 and S.SoulRot:CooldownRemains() >= 12) then
     if Cast(S.VileTaint, nil, nil, not Target:IsInRange(40)) then return "vile_taint aoe 4"; end
   end
   -- phantom_singularity
   if CDsON() and S.PhantomSingularity:IsCastable() then
     if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity aoe 6"; end
   end
-  -- soul_rot
-  if CDsON() and S.SoulRot:IsReady() then
+  -- soul_rot,if=variable.vt_up&variable.ps_up
+  if CDsON() and S.SoulRot:IsReady() and (VarVTUp and VarPSUp) then
     if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot aoe 8"; end
   end
   -- unstable_affliction,if=remains<5
   if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
     if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction aoe 9"; end
   end
-  -- seed_of_corruption,if=dot.corruption.remains<5
-  if S.SeedofCorruption:IsReady() and Target:DebuffRemains(S.SeedofCorruptionDebuff) < 5 then
+  -- seed_of_corruption,if=dot.corruption.remains<5&!(action.seed_of_corruption.in_flight|dot.seed_of_corruption.remains>0)
+  if S.SeedofCorruption:IsReady() and (Target:DebuffRemains(S.CorruptionDebuff) < 5 and not (S.SeedofCorruption:InFlight() or Target:DebuffUp(S.SeedofCorruptionDebuff))) then
     if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "soul_rot aoe 10"; end
-  end
-  -- malefic_rapture,if=talent.malefic_affliction&buff.malefic_affliction.stack<3&talent.doom_blossom
-  if S.MaleficRapture:IsReady() and (S.MaleficAffliction:IsAvailable() and Player:BuffStack(S.MaleficAfflictionBuff) < 3 and S.DoomBlossom:IsAvailable()) then
-    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture aoe 11"; end
   end
   -- agony,target_if=remains<5,if=active_dot.agony<5
   if S.Agony:IsReady() then
     if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateAgony, not Target:IsSpellInRange(S.Agony)) then return "agony aoe 12"; end
   end
-  -- summon_darkglare
-  if CDsON() and S.SummonDarkglare:IsCastable() then
+  -- summon_darkglare,if=variable.ps_up&variable.vt_up&variable.sr_up|cooldown.invoke_power_infusion_0.duration>0&cooldown.invoke_power_infusion_0.up&!talent.soul_rot
+  -- Note: Not handling Power Infusion
+  if CDsON() and S.SummonDarkglare:IsCastable() and (VarPSUp and VarVTUp and VarSRUp) then
     if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare aoe 14"; end
   end
   -- seed_of_corruption,if=talent.sow_the_seeds
   if S.SeedofCorruption:IsReady() and S.SowTheSeeds:IsAvailable() then
     if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "soul_rot aoe 16"; end
   end
-  -- malefic_rapture
-  if S.MaleficRapture:IsReady() then
+  -- malefic_rapture,if=cooldown.summon_darkglare.remains>15|soul_shard>3
+  if S.MaleficRapture:IsReady() and (S.SummonDarkglare:CooldownRemains() > 15 or Player:SoulShardsP() > 3) then
     if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture aoe 18"; end
   end
   -- drain_life,if=(buff.soul_rot.up|!talent.soul_rot)&buff.inevitable_demise.stack>10
