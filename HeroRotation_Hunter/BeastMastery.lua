@@ -73,7 +73,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 -- Enemies
-local Enemies40y, PetEnemiesMixedy, PetEnemiesMixedyCount
+local Enemies40y, PetEnemiesMixed, PetEnemiesMixedCount
 
 -- Range
 local Enemies8y
@@ -442,18 +442,6 @@ local function APL()
     HL.SplashEnemies.ChangeFriendTargetsTracking("All")
   end
 
-  -- Update GCDMax
-  GCDMax = Player:GCD() + 0.150
-
-  if Everyone.TargetIsValid() or Player:AffectingCombat() then
-    -- Calculate fight_remains
-    BossFightRemains = HL.BossFightRemains(nil, true)
-    FightRemains = BossFightRemains
-    if FightRemains == 11111 then
-      FightRemains = HL.FightRemains(Enemies8y, false)
-    end
-  end
-
   -- Enemies Update
   local PetCleaveAbility = (S.BloodBolt:IsPetKnown() and Action.FindBySpellID(S.BloodBolt:ID()) and S.BloodBolt)
     or (S.Bite:IsPetKnown() and Action.FindBySpellID(S.Bite:ID()) and S.Bite)
@@ -464,15 +452,30 @@ local function APL()
   if AoEON() then
     Enemies8y = Player:GetEnemiesInRange(8)
     Enemies40y = Player:GetEnemiesInRange(40) -- Barbed Shot Cycle
-    PetEnemiesMixedyCount = (PetCleaveAbility and #Player:GetEnemiesInSpellActionRange(PetCleaveAbility)) or Target:GetEnemiesInSplashRangeCount(8) -- Beast Cleave (through Multi-Shot)
+    PetEnemiesMixed = (PetCleaveAbility and Player:GetEnemiesInSpellActionRange(PetCleaveAbility)) or Target:GetEnemiesInSplashRange(8)
+    PetEnemiesMixedCount = (PetCleaveAbility and #PetEnemiesMixed) or Target:GetEnemiesInSplashRangeCount(8) -- Beast Cleave (through Multi-Shot)
   else
     Enemies8y = {}
     Enemies40y = {}
-    PetEnemiesMixedyCount = 0
+    PetEnemiesMixed = Target or {}
+    PetEnemiesMixedCount = 0
   end
   TargetInRange40y = Target:IsInRange(40) -- Most abilities
   TargetInRange30y = Target:IsInRange(30) -- Stampede
   TargetInRangePet30y = (PetRangeAbility and Target:IsSpellInActionRange(PetRangeAbility)) or Target:IsInRange(30) -- Kill Command
+
+  -- Update GCDMax
+  GCDMax = Player:GCD() + 0.150
+
+  -- Calculate FightRemains
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Calculate fight_remains
+    BossFightRemains = HL.BossFightRemains(nil, true)
+    FightRemains = BossFightRemains
+    if FightRemains == 11111 then
+      FightRemains = HL.FightRemains(Enemies8y, false)
+    end
+  end
 
   -- Defensives
   -- Exhilaration
