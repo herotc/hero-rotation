@@ -170,7 +170,7 @@ local function Precombat()
   if S.KillCommand:IsReady() and TargetInRangePet30y then
     if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command precombat 12"; end
   end
-  if PetEnemiesMixedyCount > 1 then
+  if PetEnemiesMixedCount > 1 then
     -- Multi Shot
     if S.MultiShot:IsReady()  then
       if Cast(S.MultiShot, nil, nil, not Target:IsSpellInRange(S.MultiShot)) then return "multishot precombat 14"; end
@@ -513,11 +513,11 @@ local function APL()
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=st,if=active_enemies<2|!talent.beast_cleave&active_enemies<3
-    if (PetEnemiesMixedyCount < 2 or (not S.BeastCleave:IsAvailable()) and PetEnemiesMixedyCount < 3) then
+    if (PetEnemiesMixedCount < 2 or (not S.BeastCleave:IsAvailable()) and PetEnemiesMixedCount < 3) then
       local ShouldReturn = ST(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cleave,if=active_enemies>2|talent.beast_cleave&active_enemies>1
-    if (PetEnemiesMixedyCount > 2 or S.BeastCleave:IsAvailable() and PetEnemiesMixedyCount > 1) then
+    if (PetEnemiesMixedCount > 2 or S.BeastCleave:IsAvailable() and PetEnemiesMixedCount > 1) then
       local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
     end
     -- Manually added pet healing
