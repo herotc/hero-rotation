@@ -148,7 +148,7 @@ local function ToDTarget()
   if not (S.TouchofDeath:CooldownUp() or Player:BuffUp(S.HiddenMastersForbiddenTouchBuff)) then return nil end
   local BestUnit, BestConditionValue = nil, nil
   for _, CycleUnit in pairs(Enemies5y) do
-    if (not CycleUnit:IsFacingBlacklisted()) and (not CycleUnit:IsUserCycleBlacklisted()) and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy()) and (S.ImpTouchofDeath:IsAvailable() and CycleUnit:HealthPercentage() <= 15 or CycleUnit:Health() < Player:Health()) and ((not BestConditionValue) or Utils.CompareThis("max", CycleUnit:Health(), BestConditionValue)) then
+    if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy()) and (S.ImpTouchofDeath:IsAvailable() and CycleUnit:HealthPercentage() <= 15 or CycleUnit:Health() < Player:Health()) and (not BestConditionValue or Utils.CompareThis("max", CycleUnit:Health(), BestConditionValue)) then
       BestUnit, BestConditionValue = CycleUnit, CycleUnit:Health()
     end
   end
@@ -161,7 +161,7 @@ end
 local function FoFTarget()
   local BestUnit, BestConditionValue = nil, nil
   for _, CycleUnit in pairs(Enemies8y) do
-    if (not CycleUnit:IsFacingBlacklisted()) and (not CycleUnit:IsUserCycleBlacklisted()) and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy()) and ((not BestConditionValue) or Utils.CompareThis("max", CycleUnit:TimeToDie(), BestConditionValue)) then
+    if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy()) and (not BestConditionValue or Utils.CompareThis("max", CycleUnit:TimeToDie(), BestConditionValue)) then
       BestUnit, BestConditionValue = CycleUnit, CycleUnit:TimeToDie()
     end
   end
@@ -244,7 +244,7 @@ end
 
 local function Trinkets()
   -- use_item,name=manic_grieftorch,if=(trinket.1.is.manic_grieftorch&!trinket.2.has_use_buff|trinket.2.is.manic_grieftorch&!trinket.1.has_use_buff)
-  if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() and (trinket1:ID() == I.ManicGrieftorch:ID() and (not trinket2:HasUseBuff()) or trinket2:ID() == I.ManicGrieftorch:ID() and not trinket1:HasUseBuff()) then
+  if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() and (trinket1:ID() == I.ManicGrieftorch:ID() and not trinket2:HasUseBuff() or trinket2:ID() == I.ManicGrieftorch:ID() and not trinket1:HasUseBuff()) then
     if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "manic_grieftorch trinkets 2"; end
   end
   if VarTrinketType == 1 then
@@ -259,11 +259,11 @@ local function Trinkets()
         if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment serenity_trinkets 6"; end
       end
       -- manic_grieftorch,use_off_gcd=1,if=!pet.xuen_the_white_tiger.active&!buff.serenity.up&(trinket.1.cooldown.remains|trinket.2.cooldown.remains|!trinket.1.cooldown.duration|!trinket.2.cooldown.duration)|fight_remains<5
-      if I.ManicGrieftorch:IsEquippedAndReady() and ((not XuenActive) and Player:BuffDown(S.SerenityBuff) and (trinket1:CooldownDown() or trinket2:CooldownDown() or (not trinket1:IsUsable()) or not trinket2:IsUsable()) or FightRemains < 5) then
+      if I.ManicGrieftorch:IsEquippedAndReady() and (not XuenActive and Player:BuffDown(S.SerenityBuff) and (trinket1:CooldownDown() or trinket2:CooldownDown() or not trinket1:IsUsable() or not trinket2:IsUsable()) or FightRemains < 5) then
         if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch serenity_trinkets 8"; end
       end
       -- beacon_to_the_beyond,use_off_gcd=1,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff&!buff.serenity.up&!pet.xuen_the_white_tiger.active&(debuff.fae_exposure_damage.remains>2|!talent.faeline_harmony)|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>30&cooldown.serenity.remains&(debuff.fae_exposure_damage.remains>2|!talent.faeline_harmony)|fight_remains<10
-      if I.BeacontotheBeyond:IsEquippedAndReady() and ((not trinket1:HasUseBuff()) and (not trinket2:HasUseBuff()) and Player:BuffDown(S.SerenityBuff) and (not XuenActive) and (Target:DebuffRemains(S.FaeExposureDebuff) > 2 or not S.FaelineHarmony:IsAvailable()) or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and S.Serenity:CooldownDown() and (Target:DebuffRemains(S.FaeExposureDebuff) > 2 or not S.FaelineHarmony:IsAvailable()) or FightRemains < 10) then
+      if I.BeacontotheBeyond:IsEquippedAndReady() and (not trinket1:HasUseBuff() and not trinket2:HasUseBuff() and Player:BuffDown(S.SerenityBuff) and not XuenActive and (Target:DebuffRemains(S.FaeExposureDebuff) > 2 or not S.FaelineHarmony:IsAvailable()) or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and S.Serenity:CooldownDown() and (Target:DebuffRemains(S.FaeExposureDebuff) > 2 or not S.FaelineHarmony:IsAvailable()) or FightRemains < 10) then
         if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond trinkets 10"; end
       end
     end
@@ -273,7 +273,7 @@ local function Trinkets()
     end
     if Settings.Commons.Enabled.Trinkets then
       -- dragonfire_bomb_dispenser,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff&(debuff.fae_exposure_damage.remains|!talent.faeline_harmony)|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>10&cooldown.serenity.remains&(debuff.fae_exposure_damage.remains|!talent.faeline_harmony)|fight_remains<10
-      if I.DragonfireBombDispenser:IsEquippedAndReady() and ((not trinket1:HasUseBuff()) and (not trinket2:HasUseBuff()) and (Target:DebuffUp(S.FaeExposureDebuff) or not S.FaelineHarmony:IsAvailable()) or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 and S.Serenity:CooldownDown() and (Target:DebuffUp(S.FaeExposureDebuff) or not S.FaelineHarmony:IsAvailable()) or FightRemains < 10) then
+      if I.DragonfireBombDispenser:IsEquippedAndReady() and (not trinket1:HasUseBuff() and not trinket2:HasUseBuff() and (Target:DebuffUp(S.FaeExposureDebuff) or not S.FaelineHarmony:IsAvailable()) or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 and S.Serenity:CooldownDown() and (Target:DebuffUp(S.FaeExposureDebuff) or not S.FaelineHarmony:IsAvailable()) or FightRemains < 10) then
         if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser trinkets 14"; end
       end
       local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
@@ -286,10 +286,10 @@ local function Trinkets()
         if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name() .. " (serenity_trinkets stat_buff trinket2)"; end
       end
       -- ITEM_DMG_BUFF,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff&(debuff.fae_exposure_damage.remains>5|!talent.faeline_harmony)|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>30&cooldown.serenity.remains&(debuff.fae_exposure_damage.remains>5|!talent.faeline_harmony)
-      if Trinket1ToUse and ((not Trinket1ToUse:HasUseBuff()) and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable()) or Trinket1ToUse:HasUseBuff() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and S.Serenity:CooldownDown() and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable())) then
+      if Trinket1ToUse and (not Trinket1ToUse:HasUseBuff() and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable()) or Trinket1ToUse:HasUseBuff() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and S.Serenity:CooldownDown() and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable())) then
         if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name() .. " (serenity_trinkets dmg_buff trinket1)"; end
       end
-      if Trinket2ToUse and ((not Trinket2ToUse:HasUseBuff()) and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable()) or Trinket2ToUse:HasUseBuff() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and S.Serenity:CooldownDown() and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable())) then
+      if Trinket2ToUse and (not Trinket2ToUse:HasUseBuff() and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable()) or Trinket2ToUse:HasUseBuff() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and S.Serenity:CooldownDown() and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable())) then
         if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket1ToUse:Name() .. " (serenity_trinkets dmg_buff trinket2)"; end
       end
     end
@@ -305,11 +305,11 @@ local function Trinkets()
         if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment sef_trinkets 18"; end
       end
       -- manic_grieftorch,use_off_gcd=1,if=!pet.xuen_the_white_tiger.active&!buff.storm_earth_and_fire.up&(trinket.1.cooldown.remains|trinket.2.cooldown.remains|!trinket.1.cooldown.duration|!trinket.2.cooldown.duration)|fight_remains<5
-      if I.ManicGrieftorch:IsEquippedAndReady() and ((not XuenActive) and Player:BuffDown(S.StormEarthAndFireBuff) and (trinket1:CooldownDown() or trinket2:CooldownDown() or (not trinket1:IsUsable()) or not trinket2:IsUsable()) or FightRemains < 5) then
+      if I.ManicGrieftorch:IsEquippedAndReady() and (not XuenActive and Player:BuffDown(S.StormEarthAndFireBuff) and (trinket1:CooldownDown() or trinket2:CooldownDown() or not trinket1:IsUsable() or not trinket2:IsUsable()) or FightRemains < 5) then
         if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch sef_trinkets 20"; end
       end
       -- beacon_to_the_beyond,use_off_gcd=1,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff&!buff.storm_earth_and_fire.up&!pet.xuen_the_white_tiger.active&(debuff.fae_exposure_damage.remains>2|!talent.faeline_harmony)|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>30&(debuff.fae_exposure_damage.remains>2|!talent.faeline_harmony)|fight_remains<10
-      if I.BeacontotheBeyond:IsEquippedAndReady() and ((not trinket1:HasUseBuff()) and (not trinket2:HasUseBuff()) and Player:BuffDown(S.StormEarthAndFireBuff) and (not XuenActive) and (Target:DebuffRemains(S.FaeExposureDebuff) > 2 or not S.FaelineHarmony:IsAvailable()) or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and (Target:DebuffRemains(S.FaeExposureDebuff) > 2 or not S.FaelineHarmony:IsAvailable()) or FightRemains < 10) then
+      if I.BeacontotheBeyond:IsEquippedAndReady() and (not trinket1:HasUseBuff() and not trinket2:HasUseBuff() and Player:BuffDown(S.StormEarthAndFireBuff) and not XuenActive and (Target:DebuffRemains(S.FaeExposureDebuff) > 2 or not S.FaelineHarmony:IsAvailable()) or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and (Target:DebuffRemains(S.FaeExposureDebuff) > 2 or not S.FaelineHarmony:IsAvailable()) or FightRemains < 10) then
         if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond sef_trinkets 22"; end
       end
     end
@@ -319,7 +319,7 @@ local function Trinkets()
     end
     if Settings.Commons.Enabled.Trinkets then
       -- dragonfire_bomb_dispenser,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff&(debuff.fae_exposure_damage.remains|!talent.faeline_harmony)|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>10&(debuff.fae_exposure_damage.remains|!talent.faeline_harmony)|fight_remains<10
-      if I.DragonfireBombDispenser:IsEquippedAndReady() and ((not trinket1:HasUseBuff()) and (not trinket2:HasUseBuff()) and (Target:DebuffUp(S.FaeExposureDebuff) or not S.FaelineHarmony:IsAvailable()) or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 and (Target:DebuffUp(S.FaeExposureDebuff) or not S.FaelineHarmony:IsAvailable()) or FightRemains < 10) then
+      if I.DragonfireBombDispenser:IsEquippedAndReady() and (not trinket1:HasUseBuff() and not trinket2:HasUseBuff() and (Target:DebuffUp(S.FaeExposureDebuff) or not S.FaelineHarmony:IsAvailable()) or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 and (Target:DebuffUp(S.FaeExposureDebuff) or not S.FaelineHarmony:IsAvailable()) or FightRemains < 10) then
         if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser sef_trinkets 26"; end
       end
       local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
@@ -332,10 +332,10 @@ local function Trinkets()
         if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name() .. " (sef_trinkets stat_buff trinket2)"; end
       end
       -- ITEM_DMG_BUFF,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff&(debuff.fae_exposure_damage.remains>5|!talent.faeline_harmony)|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>30&(debuff.fae_exposure_damage.remains>5|!talent.faeline_harmony)
-      if Trinket1ToUse and ((not Trinket1ToUse:HasUseBuff()) and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable()) or Trinket1ToUse:HasUseBuff() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable())) then
+      if Trinket1ToUse and (not Trinket1ToUse:HasUseBuff() and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable()) or Trinket1ToUse:HasUseBuff() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable())) then
         if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name() .. " (sef_trinkets dmg_buff trinket1)"; end
       end
-      if Trinket2ToUse and ((not Trinket2ToUse:HasUseBuff()) and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable()) or Trinket2ToUse:HasUseBuff() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable())) then
+      if Trinket2ToUse and (not Trinket2ToUse:HasUseBuff() and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable()) or Trinket2ToUse:HasUseBuff() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and (Target:DebuffRemains(S.FaeExposureDebuff) > 5 or not S.FaelineHarmony:IsAvailable())) then
         if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name() .. " (sef_trinkets dmg_buff trinket2)"; end
       end
     end
@@ -387,7 +387,7 @@ local function BDBSetup()
     if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane101, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm bdb_setup 6"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains-spinning_crane_kick.max*(target.time_to_die+debuff.keefers_skyreach.remains*20),if=combo_strike&!talent.whirling_dragon_punch&!spinning_crane_kick.max
-  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and (not S.WhirlingDragonPunch:IsAvailable()) and not SCKMax()) then
+  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and not S.WhirlingDragonPunch:IsAvailable() and not SCKMax()) then
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick bdb_setup 8"; end
   end
   -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains-spinning_crane_kick.max*(target.time_to_die+debuff.keefers_skyreach.remains*20),if=combo_strike&chi>=5&talent.whirling_dragon_punch
@@ -408,15 +408,15 @@ local function CDSEF()
   -- invoke_external_buff,name=power_infusion,if=pet.xuen_the_white_tiger.active
   -- Note: Not handling external buffs.
   -- invoke_xuen_the_white_tiger,if=!variable.hold_xuen&talent.bonedust_brew&cooldown.bonedust_brew.remains<=5&(active_enemies<3&chi>=3|active_enemies>=3&chi>=2)|fight_remains<25
-  if S.InvokeXuenTheWhiteTiger:IsCastable() and ((not VarHoldXuen) and S.BonedustBrew:IsAvailable() and S.BonedustBrew:CooldownRemains() <= 5 and (EnemiesCount8y < 3 and Player:Chi() >= 3 or EnemiesCount8y >= 3 and Player:Chi() >= 2) or FightRemains < 25) then
+  if S.InvokeXuenTheWhiteTiger:IsCastable() and (not VarHoldXuen and S.BonedustBrew:IsAvailable() and S.BonedustBrew:CooldownRemains() <= 5 and (EnemiesCount8y < 3 and Player:Chi() >= 3 or EnemiesCount8y >= 3 and Player:Chi() >= 2) or FightRemains < 25) then
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_sef 4"; end
   end
   -- invoke_xuen_the_white_tiger,if=!variable.hold_xuen&!talent.bonedust_brew&(cooldown.rising_sun_kick.remains<2)&chi>=3
-  if S.InvokeXuenTheWhiteTiger:IsCastable() and ((not VarHoldXuen) and (not S.BonedustBrew:IsAvailable()) and S.RisingSunKick:CooldownRemains() < 2 and Player:Chi() >= 3) then
+  if S.InvokeXuenTheWhiteTiger:IsCastable() and (not VarHoldXuen and not S.BonedustBrew:IsAvailable() and S.RisingSunKick:CooldownRemains() < 2 and Player:Chi() >= 3) then
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_sef 6"; end
   end
   -- storm_earth_and_fire,if=talent.bonedust_brew&(fight_remains<30&cooldown.bonedust_brew.remains<4&chi>=4|buff.bonedust_brew.up|!spinning_crane_kick.max&active_enemies>=3&cooldown.bonedust_brew.remains<=2&chi>=2)&(pet.xuen_the_white_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>cooldown.storm_earth_and_fire.full_recharge_time)
-  if S.StormEarthAndFire:IsCastable() and (S.BonedustBrew:IsAvailable() and (FightRemains < 30 and S.BonedustBrew:CooldownRemains() < 4 and Player:Chi() >= 4 or Player:BuffUp(S.BonedustBrewBuff) or (not SCKMax()) and EnemiesCount8y >= 3 and S.BonedustBrew:CooldownRemains() <= 2 and Player:Chi() >= 2) and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > S.StormEarthAndFire:FullRechargeTime())) then
+  if S.StormEarthAndFire:IsCastable() and (S.BonedustBrew:IsAvailable() and (FightRemains < 30 and S.BonedustBrew:CooldownRemains() < 4 and Player:Chi() >= 4 or Player:BuffUp(S.BonedustBrewBuff) or not SCKMax() and EnemiesCount8y >= 3 and S.BonedustBrew:CooldownRemains() <= 2 and Player:Chi() >= 2) and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > S.StormEarthAndFire:FullRechargeTime())) then
     if Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthAndFire) then return "storm_earth_and_fire cd_sef 8"; end
   end
   -- bonedust_brew,if=(!buff.bonedust_brew.up&buff.storm_earth_and_fire.up&buff.storm_earth_and_fire.remains<11&spinning_crane_kick.max)|(!buff.bonedust_brew.up&fight_remains<30&fight_remains>10&spinning_crane_kick.max&chi>=4)|fight_remains<10|(!debuff.skyreach_exhaustion.up&active_enemies>=4&spinning_crane_kick.modifier>=2)|(pet.xuen_the_white_tiger.active&spinning_crane_kick.max&active_enemies>=4)
@@ -475,7 +475,7 @@ local function CDSEF()
   end
   -- With Xuen: touch_of_karma,target_if=max:target.time_to_die,if=fight_remains>90|pet.xuen_the_white_tiger.active|variable.hold_xuen|fight_remains<16
   -- Without Xuen: touch_of_karma,if=fight_remains>159|variable.hold_xuen
-  if S.TouchofKarma:IsCastable() and (not Settings.Windwalker.IgnoreToK) and ((S.InvokeXuenTheWhiteTiger:IsAvailable() and (FightRemains > 90 or XuenActive or VarHoldXuen or FightRemains < 16)) or ((not S.InvokeXuenTheWhiteTiger:IsAvailable()) and (FightRemains > 159 or VarHoldXuen))) then
+  if S.TouchofKarma:IsCastable() and not Settings.Windwalker.IgnoreToK and ((S.InvokeXuenTheWhiteTiger:IsAvailable() and (FightRemains > 90 or XuenActive or VarHoldXuen or FightRemains < 16)) or (not S.InvokeXuenTheWhiteTiger:IsAvailable() and (FightRemains > 159 or VarHoldXuen))) then
     if Cast(S.TouchofKarma, Settings.Windwalker.GCDasOffGCD.TouchOfKarma, nil, not Target:IsInRange(20)) then return "touch_of_karma cd_sef 20"; end
   end
   -- ancestral_call,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
@@ -512,7 +512,7 @@ local function CDSerenity()
   -- invoke_external_buff,name=power_infusion,if=pet.xuen_the_white_tiger.active
   -- Note: Not handling external buffs.
   -- invoke_xuen_the_white_tiger,if=!variable.hold_xuen&talent.bonedust_brew&cooldown.bonedust_brew.remains<=5&target.time_to_die>25|buff.bloodlust.up|fight_remains<25
-  if S.InvokeXuenTheWhiteTiger:IsCastable() and ((not VarHoldXuen) and S.BonedustBrew:IsAvailable() and S.BonedustBrew:CooldownRemains() <= 5 and Target:TimeToDie() > 25 or Player:BloodlustUp() or FightRemains < 25) then
+  if S.InvokeXuenTheWhiteTiger:IsCastable() and (not VarHoldXuen and S.BonedustBrew:IsAvailable() and S.BonedustBrew:CooldownRemains() <= 5 and Target:TimeToDie() > 25 or Player:BloodlustUp() or FightRemains < 25) then
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_serenity 4"; end
   end
   -- invoke_xuen_the_white_tiger,if=target.time_to_die>25&fight_remains>120|fight_remains<60&(debuff.skyreach_exhaustion.remains<2|debuff.skyreach_exhaustion.remains>55)&!cooldown.serenity.remains&active_enemies<3|buff.bloodlust.up|fight_remains<23
@@ -524,7 +524,7 @@ local function CDSerenity()
     if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "bonedust_brew cd_serenity 8"; end
   end
   -- serenity,if=buff.invokers_delight.up|variable.hold_xuen&(talent.drinking_horn_cover&fight_remains>110|!talent.drinking_horn_cover&fight_remains>105)|!talent.invoke_xuen_the_white_tiger|!talent.invoke_xuen_the_white_tiger|fight_remains<15
-  if S.Serenity:IsCastable() and (Player:BuffUp(S.InvokersDelightBuff) or VarHoldXuen and (S.DrinkingHornCover:IsAvailable() and FightRemains > 105) or (not S.InvokeXuenTheWhiteTiger:IsAvailable()) or FightRemains < 15) then
+  if S.Serenity:IsCastable() and (Player:BuffUp(S.InvokersDelightBuff) or VarHoldXuen and (S.DrinkingHornCover:IsAvailable() and FightRemains > 105) or not S.InvokeXuenTheWhiteTiger:IsAvailable() or FightRemains < 15) then
     if Cast(S.Serenity, Settings.Windwalker.OffGCDasOffGCD.Serenity) then return "serenity cd_serenity 10"; end
   end
   -- Touch of Death handling
@@ -572,7 +572,7 @@ local function CDSerenity()
     end
   end
   -- touch_of_karma,if=fight_remains>90|fight_remains<10
-  if (not Settings.Windwalker.IgnoreToK) and S.TouchofKarma:IsCastable() and (FightRemains > 90 or FightRemains < 10) then
+  if not Settings.Windwalker.IgnoreToK and S.TouchofKarma:IsCastable() and (FightRemains > 90 or FightRemains < 10) then
     if Cast(S.TouchofKarma, Settings.Windwalker.GCDasOffGCD.TouchOfKarma) then return "touch_of_karma cd_serenity 18"; end
   end
   if (Player:BuffUp(S.SerenityBuff) or FightRemains < 20) then
@@ -660,7 +660,7 @@ local function SerenityAoE()
     if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_aoe 2"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains-spinning_crane_kick.max*(target.time_to_die+debuff.keefers_skyreach.remains*20),if=combo_strike&!spinning_crane_kick.max&talent.shadowboxing_treads
-  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and (not SCKMax()) and S.ShadowboxingTreads:IsAvailable()) then
+  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and not SCKMax() and S.ShadowboxingTreads:IsAvailable()) then
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick serenity_aoe 4"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains-spinning_crane_kick.max*(target.time_to_die+debuff.keefers_skyreach.remains*20),if=combo_strike&buff.teachings_of_the_monastery.stack=3&buff.teachings_of_the_monastery.remains<1
@@ -936,7 +936,7 @@ end
 
 local function Serenity2T()
   -- faeline_stomp,if=debuff.fae_exposure_damage.remains<2&!debuff.skyreach_exhaustion.remains<2&!debuff.skyreach_exhaustion.remains
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 2 and (not Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 2) and Target:DebuffDown(S.SkyreachExhaustionDebuff)) then
+  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 2 and not Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 2 and Target:DebuffDown(S.SkyreachExhaustionDebuff)) then
     if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_2t 2"; end
   end
   -- tiger_palm,,target_if=min:debuff.mark_of_the_crane.remains,if=!debuff.skyreach_exhaustion.up*20&combo_strike
@@ -1145,7 +1145,7 @@ local function DefaultAoE()
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains-spinning_crane_kick.max*(target.time_to_die+debuff.keefers_skyreach.remains*20),if=talent.shadowboxing_treads&combo_strike&set_bonus.tier30_2pc&!buff.bonedust_brew.up&active_enemies<15&!talent.crane_vortex
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains-spinning_crane_kick.max*(target.time_to_die+debuff.keefers_skyreach.remains*20),if=talent.shadowboxing_treads&combo_strike&set_bonus.tier30_2pc&!buff.bonedust_brew.up&active_enemies<8
   -- Note: Combining both lines.
-  if S.BlackoutKick:IsReady() and (S.ShadowboxingTreads:IsAvailable() and ComboStrike(S.BlackoutKick) and Player:HasTier(30, 2) and Player:BuffDown(S.BonedustBrewBuff) and (EnemiesCount8y < 15 and (not S.CraneVortex:IsAvailable()) or EnemiesCount8y < 8)) then
+  if S.BlackoutKick:IsReady() and (S.ShadowboxingTreads:IsAvailable() and ComboStrike(S.BlackoutKick) and Player:HasTier(30, 2) and Player:BuffDown(S.BonedustBrewBuff) and (EnemiesCount8y < 15 and not S.CraneVortex:IsAvailable() or EnemiesCount8y < 8)) then
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick default_aoe 28"; end
   end
   -- spinning_crane_kick,if=combo_strike&(cooldown.fists_of_fury.remains>3|chi>4)&spinning_crane_kick.max
@@ -1414,7 +1414,7 @@ local function Default2T()
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick default_2t 32"; end
   end
   -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains-spinning_crane_kick.max*(target.time_to_die+debuff.keefers_skyreach.remains*20),if=!talent.shadowboxing_treads&cooldown.fists_of_fury.remains>4&talent.xuens_battlegear
-  if S.RisingSunKick:IsReady() and ((not S.ShadowboxingTreads:IsAvailable()) and S.FistsofFury:CooldownRemains() > 4 and S.XuensBattlegear:IsAvailable()) then
+  if S.RisingSunKick:IsReady() and (not S.ShadowboxingTreads:IsAvailable() and S.FistsofFury:CooldownRemains() > 4 and S.XuensBattlegear:IsAvailable()) then
     if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick default_2t 34"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains-spinning_crane_kick.max*(target.time_to_die+debuff.keefers_skyreach.remains*20),if=combo_strike&cooldown.rising_sun_kick.remains&cooldown.fists_of_fury.remains&(!buff.bonedust_brew.up|spinning_crane_kick.modifier<1.5)
@@ -1591,7 +1591,7 @@ local function Serenity()
     if Cast(S.FistsofFury, nil, nil, not Target:IsInMeleeRange(8)) then return "fists_of_fury serenity 2"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&!spinning_crane_kick.max&active_enemies>4&talent.shdaowboxing_treads
-  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and (not SCKMax()) and EnemiesCount8y > 4 and S.ShadowboxingTreads:IsAvailable()) then
+  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and not SCKMax() and EnemiesCount8y > 4 and S.ShadowboxingTreads:IsAvailable()) then
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick serenity 4"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&buff.teachings_of_the_monastery.stack=3&buff.teachings_of_the_monastery.remains<1
@@ -1741,7 +1741,7 @@ local function APL()
     -- flying_serpent_kick,if=movement.distance>5
     -- Note: Not handling movement abilities
     -- Manually added: Force landing from FSK
-    if (not Settings.Windwalker.IgnoreFSK) and Player:PrevGCD(1, S.FlyingSerpentKick) then
+    if not Settings.Windwalker.IgnoreFSK and Player:PrevGCD(1, S.FlyingSerpentKick) then
       if Cast(S.FlyingSerpentKickLand) then return "flying_serpent_kick land"; end
     end
     -- spear_hand_strike,if=target.debuff.casting.react
@@ -1751,9 +1751,9 @@ local function APL()
       if Cast(S.FortifyingBrew, Settings.Windwalker.GCDasOffGCD.FortifyingBrew, nil, not Target:IsSpellInRange(S.FortifyingBrew)) then return "fortifying_brew main 2"; end
     end
     -- variable,name=hold_xuen,op=set,value=!talent.invoke_xuen_the_white_tiger|cooldown.invoke_xuen_the_white_tiger.duration>fight_remains
-    VarHoldXuen = (not S.InvokeXuenTheWhiteTiger:IsAvailable()) or 120 > FightRemains
+    VarHoldXuen = not S.InvokeXuenTheWhiteTiger:IsAvailable() or 120 > FightRemains
     -- variable,name=hold_tp_rsk,op=set,value=!debuff.skyreach_exhaustion.remains<1&cooldown.rising_sun_kick.remains<1
-    VarHoldTPRSK = (not (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 1)) and S.RisingSunKick:CooldownRemains() < 1
+    VarHoldTPRSK = not (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 1) and S.RisingSunKick:CooldownRemains() < 1
     -- potion handling
     if Settings.Commons.Enabled.Potions then
       local PotionSelected = Everyone.PotionSelected()
@@ -1773,7 +1773,7 @@ local function APL()
     end
     -- With Xuen: call_action_list,name=opener,if=time<4&chi<5&!pet.xuen_the_white_tiger.active&!talent.serenity
     -- Without Xuen: call_action_list,name=opener,if=time<4&chi<5&!talent.serenity
-    if (HL.CombatTime() < 4 and Player:Chi() < 5 and (not S.Serenity:IsAvailable()) and ((not XuenActive) or not S.InvokeXuenTheWhiteTiger:IsAvailable())) then
+    if (HL.CombatTime() < 4 and Player:Chi() < 5 and not S.Serenity:IsAvailable() and (not XuenActive or not S.InvokeXuenTheWhiteTiger:IsAvailable())) then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=trinkets
@@ -1785,7 +1785,7 @@ local function APL()
       if Everyone.CastTargetIf(S.FaelineStomp, Enemies8y, "min", EvaluateTargetIfFilterFaeExposure, EvaluateTargetIfFaelineStomp, not Target:IsInRange(30)) then return "faeline_stomp main 8"; end
     end
     -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains+(debuff.skyreach_exhaustion.up*20),if=!buff.serenity.up&buff.teachings_of_the_monastery.stack<3&combo_strike&chi.max-chi>=(2+buff.power_strikes.up)&(!talent.invoke_xuen_the_white_tiger&!talent.serenity|((!talent.skyreach&!talent.skytouch)|time>5|pet.xuen_the_white_tiger.active))&!variable.hold_tp_rsk
-    if S.TigerPalm:IsReady() and (Player:BuffDown(S.SerenityBuff) and Player:BuffStack(S.TeachingsoftheMonasteryBuff) < 3 and ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= (2 + num(Player:BuffUp(S.PowerStrikesBuff))) and ((not S.InvokeXuenTheWhiteTiger:IsAvailable()) and (not S.Serenity:IsAvailable()) or (((not S.Skyreach:IsAvailable()) and not S.Skytouch:IsAvailable()) or HL.CombatTime() > 5 or XuenActive)) and not VarHoldTPRSK) then
+    if S.TigerPalm:IsReady() and (Player:BuffDown(S.SerenityBuff) and Player:BuffStack(S.TeachingsoftheMonasteryBuff) < 3 and ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= (2 + num(Player:BuffUp(S.PowerStrikesBuff))) and (not S.InvokeXuenTheWhiteTiger:IsAvailable() and not S.Serenity:IsAvailable() or ((not S.Skyreach:IsAvailable() and not S.Skytouch:IsAvailable()) or HL.CombatTime() > 5 or XuenActive)) and not VarHoldTPRSK) then
       if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane101, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm main 10"; end
     end
     -- chi_burst,if=talent.faeline_stomp&cooldown.faeline_stomp.remains&(chi.max-chi>=1&active_enemies=1|chi.max-chi>=2&active_enemies>=2)&!talent.faeline_harmony
