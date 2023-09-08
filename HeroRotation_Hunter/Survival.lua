@@ -115,7 +115,7 @@ end
 
 local function EvaluateTargetIfSerpentStingCleave(TargetUnit)
   -- if=refreshable&target.time_to_die>12&(!talent.vipers_venom|talent.hydras_bite)
-  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 12 and ((not S.VipersVenom:IsAvailable()) or S.HydrasBite:IsAvailable()))
+  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > 12 and (not S.VipersVenom:IsAvailable() or S.HydrasBite:IsAvailable()))
 end
 
 local function EvaluateTargetIfSerpentStingST(TargetUnit)
@@ -161,14 +161,14 @@ end
 
 local function CDs()
   -- blood_fury,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault
-  if S.BloodFury:IsCastable() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
+  if S.BloodFury:IsCastable() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or not S.Spearhead:IsAvailable() and not S.CoordinatedAssault:IsAvailable()) then
     if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 2"; end
   end
   -- harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
   if S.Harpoon:IsCastable() and (S.TermsofEngagement:IsAvailable() and Player:Focus() < Player:FocusMax()) then
     if Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon, nil, not Target:IsSpellInRange(S.Harpoon)) then return "harpoon cds 4"; end
   end
-  if (Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
+  if (Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or not S.Spearhead:IsAvailable() and not S.CoordinatedAssault:IsAvailable()) then
     -- ancestral_call,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault
     if S.AncestralCall:IsCastable() then
       if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cds 6"; end
@@ -187,13 +187,13 @@ local function CDs()
     if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks cds 12"; end
   end
   -- berserking,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault|time_to_die<13
-  if S.Berserking:IsCastable() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and (not S.CoordinatedAssault:IsAvailable()) or FightRemains < 13) then
+  if S.Berserking:IsCastable() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or not S.Spearhead:IsAvailable() and not S.CoordinatedAssault:IsAvailable() or FightRemains < 13) then
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 14"; end
   end
   -- muzzle
   -- Handled via Interrupt in APL()
   -- potion,if=target.time_to_die<25|buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault
-  if Settings.Commons.Enabled.Potions and (FightRemains < 25 or Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or (not S.Spearhead:IsAvailable()) and not S.CoordinatedAssault:IsAvailable()) then
+  if Settings.Commons.Enabled.Potions and (FightRemains < 25 or Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or not S.Spearhead:IsAvailable() and not S.CoordinatedAssault:IsAvailable()) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 16"; end
@@ -265,7 +265,7 @@ local function Cleave()
     if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame cleave 16"; end
   end
   -- fury_of_the_eagle,if=raid_event.adds.exists&(!talent.butchery|cooldown.butchery.full_recharge_time>cast_time)
-  if S.FuryoftheEagle:IsCastable() and ((not S.Butchery:IsAvailable()) or S.Butchery:FullRechargeTime() > S.FuryoftheEagle:CastTime()) then
+  if S.FuryoftheEagle:IsCastable() and (not S.Butchery:IsAvailable() or S.Butchery:FullRechargeTime() > S.FuryoftheEagle:CastTime()) then
     if Cast(S.FuryoftheEagle, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle cleave 18"; end
   end
   -- butchery,if=raid_event.adds.exists
@@ -285,7 +285,7 @@ local function Cleave()
     if Cast(S.Carve, nil, nil, not Target:IsInMeleeRange(MeleeRange)) then return "carve cleave 24"; end
   end
   -- butchery,if=(!next_wi_bomb.shrapnel|!talent.wildfire_infusion)
-  if S.Butchery:IsReady() and ((not S.ShrapnelBomb:IsCastable()) or not S.WildfireInfusion:IsAvailable()) then
+  if S.Butchery:IsReady() and (not S.ShrapnelBomb:IsCastable() or not S.WildfireInfusion:IsAvailable()) then
     if Cast(S.Butchery, nil, nil, not Target:IsInMeleeRange(8)) then return "butchery cleave 26"; end
   end
   -- mongoose_bite,target_if=max:debuff.latent_poison.stack,if=debuff.latent_poison.stack>8
@@ -356,7 +356,7 @@ local function ST()
     if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram st 6"; end
   end
   -- use_item,name=djaruun_pillar_of_the_elder_flame,if=!talent.fury_of_the_eagle|talent.spearhead
-  if I.Djaruun:IsEquippedAndReady() and ((not S.FuryoftheEagle:IsAvailable()) or S.Spearhead:IsAvailable()) then
+  if I.Djaruun:IsEquippedAndReady() and (not S.FuryoftheEagle:IsAvailable() or S.Spearhead:IsAvailable()) then
     if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame st 8"; end
   end
   -- spearhead,if=focus+action.kill_command.cast_regen>focus.max-10&(cooldown.death_chakram.remains|!talent.death_chakram)
@@ -424,7 +424,7 @@ local function ST()
     if Cast(S.Stampede, Settings.Commons2.GCDasOffGCD.Stampede, nil, not Target:IsSpellInRange(S.Stampede)) then return "stampede st 38"; end
   end
   -- coordinated_assault,if=(!talent.coordinated_kill&target.health.pct<20&(!buff.spearhead.remains&cooldown.spearhead.remains|!talent.spearhead)|talent.coordinated_kill&(!buff.spearhead.remains&cooldown.spearhead.remains|!talent.spearhead))&(!raid_event.adds.exists|raid_event.adds.in>90
-  if S.CoordinatedAssault:IsCastable() and CDsON() and ((not S.CoordinatedKill:IsAvailable()) and Target:HealthPercentage() < 20 and (Player:BuffDown(S.SpearheadBuff) and S.Spearhead:CooldownDown() or not S.Spearhead:IsAvailable()) or S.CoordinatedKill:IsAvailable() and (Player:BuffDown(S.SpearheadBuff) and S.Spearhead:CooldownDown() or not S.Spearhead:IsAvailable())) then
+  if S.CoordinatedAssault:IsCastable() and CDsON() and (not S.CoordinatedKill:IsAvailable() and Target:HealthPercentage() < 20 and (Player:BuffDown(S.SpearheadBuff) and S.Spearhead:CooldownDown() or not S.Spearhead:IsAvailable()) or S.CoordinatedKill:IsAvailable() and (Player:BuffDown(S.SpearheadBuff) and S.Spearhead:CooldownDown() or not S.Spearhead:IsAvailable())) then
     if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault st 40"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=full_recharge_time<gcd&focus+cast_regen<focus.max&(cooldown.flanking_strike.remains|!talent.flanking_strike)
@@ -464,7 +464,7 @@ local function ST()
     if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot st 54"; end
   end
   -- fury_of_the_eagle,if=(!equipped.djaruun_pillar_of_the_elder_flame|cooldown.elder_flame_408821.remains>40)&target.health.pct<65&talent.ruthless_marauder&(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.in>40)
-  if S.FuryoftheEagle:IsCastable() and (((not I.Djaruun:IsEquipped()) or I.Djaruun:CooldownRemains() > 40) and Target:HealthPercentage() < 65 and S.RuthlessMarauder:IsAvailable()) then
+  if S.FuryoftheEagle:IsCastable() and ((not I.Djaruun:IsEquipped() or I.Djaruun:CooldownRemains() > 40) and Target:HealthPercentage() < 65 and S.RuthlessMarauder:IsAvailable()) then
     if Cast(S.FuryoftheEagle, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle st 56"; end
   end
   -- mongoose_bite,target_if=max:debuff.latent_poison.stack,if=focus+action.kill_command.cast_regen>focus.max-10|set_bonus.tier30_4pc
@@ -490,7 +490,7 @@ local function ST()
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command st 66"; end
   end
   -- coordinated_assault,if=!talent.coordinated_kill&time_to_die>140
-  if S.CoordinatedAssault:IsCastable() and ((not S.CoordinatedKill:IsAvailable()) and Target:TimeToDie() > 140) then
+  if S.CoordinatedAssault:IsCastable() and (not S.CoordinatedKill:IsAvailable() and Target:TimeToDie() > 140) then
     if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault st 68"; end
   end
 end
