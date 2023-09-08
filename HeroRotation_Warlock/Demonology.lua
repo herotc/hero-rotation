@@ -204,19 +204,19 @@ local function Variables()
     VarPetExpire = mathmax(VilefiendTime(), DreadstalkerTime()) - Player:GCD() * 0.5
   end
   -- variable,name=pet_expire,op=set,value=(buff.dreadstalkers.remains>?buff.grimoire_felguard.remains)-gcd*0.5,if=!talent.summon_vilefiend&talent.grimoire_felguard&buff.dreadstalkers.up
-  if (not S.SummonVilefiend:IsAvailable()) and S.GrimoireFelguard:IsAvailable() and DreadstalkerActive() then
+  if not S.SummonVilefiend:IsAvailable() and S.GrimoireFelguard:IsAvailable() and DreadstalkerActive() then
     VarPetExpire = mathmax(DreadstalkerTime(), GrimoireFelguardTime()) - Player:GCD() * 0.5
   end
   -- variable,name=pet_expire,op=set,value=(buff.dreadstalkers.remains)-gcd*0.5,if=!talent.summon_vilefiend&(!talent.grimoire_felguard|!set_bonus.tier30_2pc)&buff.dreadstalkers.up
-  if (not S.SummonVilefiend:IsAvailable()) and ((not S.GrimoireFelguard:IsAvailable()) or not Player:HasTier(30, 2)) and DreadstalkerActive() then
+  if not S.SummonVilefiend:IsAvailable() and (not S.GrimoireFelguard:IsAvailable() or not Player:HasTier(30, 2)) and DreadstalkerActive() then
     VarPetExpire = DreadstalkerTime() - Player:GCD() * 0.5
   end
   -- variable,name=pet_expire,op=set,value=0,if=!buff.vilefiend.up&talent.summon_vilefiend|!buff.dreadstalkers.up
-  if (not VilefiendActive()) and S.SummonVilefiend:IsAvailable() or not DreadstalkerActive() then
+  if not VilefiendActive() and S.SummonVilefiend:IsAvailable() or not DreadstalkerActive() then
     VarPetExpire = 0
   end
   -- variable,name=np,op=set,value=(!talent.nether_portal|cooldown.nether_portal.remains>30|buff.nether_portal.up)
-  VarNP = ((not S.NetherPortal:IsAvailable()) or S.NetherPortal:CooldownRemains() > 30 or Player:BuffUp(S.NetherPortalBuff))
+  VarNP = (not S.NetherPortal:IsAvailable() or S.NetherPortal:CooldownRemains() > 30 or Player:BuffUp(S.NetherPortalBuff))
 end
 
 local function Tyrant()
@@ -231,7 +231,7 @@ local function Tyrant()
     if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant tyrant 4"; end
   end
   -- shadow_bolt,if=buff.fel_covenant.remains<15&(!buff.vilefiend.up|!talent.summon_vilefiend&(!buff.dreadstalkers.up))&time>30,line_cd=40
-  if S.ShadowBoltLineCD:IsReady() and S.ShadowBoltLineCD:TimeSinceLastCast() >= 40 and (Player:BuffRemains(S.FelCovenantBuff) < 15 and ((not VilefiendActive()) or (not S.SummonVilefiend:IsAvailable()) and (not DreadstalkerActive())) and CombatTime > 30) then
+  if S.ShadowBoltLineCD:IsReady() and S.ShadowBoltLineCD:TimeSinceLastCast() >= 40 and (Player:BuffRemains(S.FelCovenantBuff) < 15 and (not VilefiendActive() or not S.SummonVilefiend:IsAvailable() and not DreadstalkerActive()) and CombatTime > 30) then
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt tyrant 6"; end
   end
   -- shadow_bolt,if=prev_gcd.1.grimoire_felguard&time>30&buff.nether_portal.down&buff.demonic_core.down|time<10&buff.fel_covenant.stack<2&talent.fel_covenant&fight_remains%%90>40
@@ -239,11 +239,11 @@ local function Tyrant()
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt tyrant 8"; end
   end
   -- power_siphon,if=buff.demonic_core.stack<2&soul_shard=5&(!buff.vilefiend.up|!talent.summon_vilefiend&(!buff.dreadstalkers.up))&(buff.nether_portal.down)
-  if S.PowerSiphon:IsReady() and (Player:BuffStack(S.DemonicCoreBuff) < 2 and Player:SoulShardsP() == 5 and ((not VilefiendActive()) or (not S.SummonVilefiend:IsAvailable()) and DreadstalkerTime()) and Player:BuffDown(S.NetherPortalBuff)) then
+  if S.PowerSiphon:IsReady() and (Player:BuffStack(S.DemonicCoreBuff) < 2 and Player:SoulShardsP() == 5 and (not VilefiendActive() or not S.SummonVilefiend:IsAvailable() and DreadstalkerTime()) and Player:BuffDown(S.NetherPortalBuff)) then
     if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon tyrant 10"; end
   end
   -- shadow_bolt,if=buff.vilefiend.down&buff.nether_portal.down&buff.dreadstalkers.down&soul_shard<5-buff.demonic_core.stack
-  if S.ShadowBolt:IsReady() and ((not VilefiendActive()) and Player:BuffDown(S.NetherPortalBuff) and (not DreadstalkerActive()) and Player:SoulShardsP() < 5 - Player:BuffStack(S.DemonicCoreBuff)) then
+  if S.ShadowBolt:IsReady() and (not VilefiendActive() and Player:BuffDown(S.NetherPortalBuff) and not DreadstalkerActive() and Player:SoulShardsP() < 5 - Player:BuffStack(S.DemonicCoreBuff)) then
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt tyrant 12"; end
   end
   -- nether_portal,if=soul_shard=5
@@ -259,15 +259,15 @@ local function Tyrant()
     if Cast(S.SummonVilefiend) then return "summon_vilefiend tyrant 18"; end
   end
   -- call_dreadstalkers,if=(buff.vilefiend.up|!talent.summon_vilefiend&(!talent.nether_portal|buff.nether_portal.up|cooldown.nether_portal.remains>30)&(buff.nether_portal.up|buff.grimoire_felguard.up|soul_shard=5))&cooldown.summon_demonic_tyrant.remains<11&variable.np
-  if S.CallDreadstalkers:IsReady() and ((VilefiendActive() or (not S.SummonVilefiend:IsAvailable()) and ((not S.NetherPortal:IsAvailable()) or Player:BuffUp(S.NetherPortalBuff) or S.NetherPortal:CooldownRemains() > 30) and (Player:BuffUp(S.NetherPortalBuff) or GrimoireFelguardActive() or Player:SoulShardsP() == 5)) and S.SummonDemonicTyrant:CooldownRemains() < 11 and VarNP) then
+  if S.CallDreadstalkers:IsReady() and ((VilefiendActive() or not S.SummonVilefiend:IsAvailable() and (not S.NetherPortal:IsAvailable() or Player:BuffUp(S.NetherPortalBuff) or S.NetherPortal:CooldownRemains() > 30) and (Player:BuffUp(S.NetherPortalBuff) or GrimoireFelguardActive() or Player:SoulShardsP() == 5)) and S.SummonDemonicTyrant:CooldownRemains() < 11 and VarNP) then
     if Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers tyrant 20"; end
   end
   -- grimoire_felguard,if=buff.vilefiend.up|!talent.summon_vilefiend&(!talent.nether_portal|buff.nether_portal.up|cooldown.nether_portal.remains>30)&(buff.nether_portal.up|buff.dreadstalkers.up|soul_shard=5)&variable.np
-  if S.GrimoireFelguard:IsReady() and (VilefiendActive() or (not S.SummonVilefiend:IsAvailable()) and ((not S.NetherPortal:IsAvailable()) or Player:BuffUp(S.NetherPortalBuff) or S.NetherPortal:CooldownRemains() > 30) and (Player:BuffUp(S.NetherPortalBuff) or DreadstalkerActive() or Player:SoulShardsP() == 5) and VarNP) then
+  if S.GrimoireFelguard:IsReady() and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and (not S.NetherPortal:IsAvailable() or Player:BuffUp(S.NetherPortalBuff) or S.NetherPortal:CooldownRemains() > 30) and (Player:BuffUp(S.NetherPortalBuff) or DreadstalkerActive() or Player:SoulShardsP() == 5) and VarNP) then
     if Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, not Target:IsSpellInRange(S.GrimoireFelguard)) then return "grimoire_felguard tyrant 22"; end
   end
   -- hand_of_guldan,if=soul_shard>2&(buff.vilefiend.up|!talent.summon_vilefiend&buff.dreadstalkers.up)&(soul_shard>2|buff.vilefiend.remains<gcd.max*2+2%spell_haste)|buff.nether_portal.up
-  if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 2 and (VilefiendActive() or (not S.SummonVilefiend:IsAvailable()) and DreadstalkerActive()) and (Player:SoulShardsP() > 2 or VilefiendTime() < GCDMax * 2 + 2 / Player:SpellHaste()) or Player:BuffUp(S.NetherPortalBuff)) then
+  if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 2 and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and DreadstalkerActive()) and (Player:SoulShardsP() > 2 or VilefiendTime() < GCDMax * 2 + 2 / Player:SpellHaste()) or Player:BuffUp(S.NetherPortalBuff)) then
     if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan tyrant 24"; end
   end
   -- power_siphon,if=buff.demonic_core.down
@@ -275,7 +275,7 @@ local function Tyrant()
     if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon tyrant 26"; end
   end
   -- demonbolt,if=soul_shard<4&buff.demonic_core.up&(buff.vilefiend.up|!talent.summon_vilefiend&buff.dreadstalkers.up)
-  if S.Demonbolt:IsReady() and (Player:SoulShardsP() < 4 and Player:BuffUp(S.DemonicCoreBuff) and (VilefiendActive() or (not S.SummonVilefiend:IsAvailable()) and DreadstalkerActive())) then
+  if S.Demonbolt:IsReady() and (Player:SoulShardsP() < 4 and Player:BuffUp(S.DemonicCoreBuff) and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and DreadstalkerActive())) then
     if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyrant 28"; end
   end
   -- power_siphon,if=buff.demonic_core.stack<3&variable.pet_expire>action.summon_demonic_tyrant.execute_time+gcd.max*3|variable.pet_expire=0
@@ -365,7 +365,7 @@ local function Items()
       end
     end
     -- use_item,name=voidmenders_shadowgem,if=!variable.shadow_timings|(variable.shadow_timings&(buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal)))
-    if I.VoidmendersShadowgem:IsEquippedAndReady() and ((not VarShadowTimings) or (VarShadowTimings and (Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())))) then
+    if I.VoidmendersShadowgem:IsEquippedAndReady() and (not VarShadowTimings or (VarShadowTimings and (Player:BuffUp(S.DemonicPowerBuff) or not S.SummonDemonicTyrant:IsAvailable() and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())))) then
       if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem items 8"; end
     end
     -- use_item,name=erupting_spear_fragment,,if=pet.demonic_tyrant.active&(buff.nether_portal.remains<gcd.max*2|!talent.nether_portal)|fight_remains<12
@@ -375,7 +375,7 @@ local function Items()
   end
   -- use_items,if=(buff.demonic_power.up|!talent.summon_demonic_tyrant&(buff.nether_portal.up|!talent.nether_portal))&(!equipped.irideus_fragment&!equipped.timebreaching_talon&!equipped.spoils_of_neltharus&!equipped.erupting_spear_fragment&!equipped.voidmenders_shadowgem)
   -- Note: Excluded trinkets are excluded via OnUseExcludes, so ignoring that portion of the condition.
-  if (Player:BuffUp(S.DemonicPowerBuff) or (not S.SummonDemonicTyrant:IsAvailable()) and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())) then
+  if (Player:BuffUp(S.DemonicPowerBuff) or not S.SummonDemonicTyrant:IsAvailable() and (Player:BuffUp(S.NetherPortalBuff) or not S.NetherPortal:IsAvailable())) then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
       local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
@@ -464,11 +464,11 @@ local function APL()
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 2"; end
     end
     -- call_action_list,name=tyrant,if=cooldown.summon_demonic_tyrant.remains<15&cooldown.summon_vilefiend.remains<gcd.max*5&cooldown.call_dreadstalkers.remains<gcd.max*5&(cooldown.grimoire_felguard.remains<10|!set_bonus.tier30_2pc)&(!variable.shadow_timings|variable.tyrant_cd<15|fight_remains<40|buff.power_infusion.up)&(!raid_event.adds.in<15-raid_event.add.duration)|talent.summon_vilefiend.enabled&cooldown.summon_demonic_tyrant.remains<15&cooldown.summon_vilefiend.remains<gcd.max*5&cooldown.call_dreadstalkers.remains<gcd.max*5&(cooldown.grimoire_felguard.remains<10|!set_bonus.tier30_2pc)&(!variable.shadow_timings|variable.tyrant_cd<15|fight_remains<40|buff.power_infusion.up)
-    if (S.SummonDemonicTyrant:CooldownRemains() < 15 and S.SummonVilefiend:CooldownRemains() < GCDMax * 5 and S.CallDreadstalkers:CooldownRemains() < GCDMax * 5 and (S.GrimoireFelguard:CooldownRemains() < 10 or not Player:HasTier(30, 2)) and ((not VarShadowTimings) or VarTyrantCD < 15 or FightRemains < 40 or Player:BuffUp(S.PowerInfusionBuff)) or S.SummonVilefiend:IsAvailable() and S.SummonDemonicTyrant:CooldownRemains() < 15 and S.SummonVilefiend:CooldownRemains() < GCDMax * 5 and S.CallDreadstalkers:CooldownRemains() < GCDMax * 5 and (S.GrimoireFelguard:CooldownRemains() < 10 or not Player:HasTier(30, 2)) and ((not VarShadowTimings) or VarTyrantCD < 15 or FightRemains < 40 or Player:BuffUp(S.PowerInfusionBuff))) then
+    if (S.SummonDemonicTyrant:CooldownRemains() < 15 and S.SummonVilefiend:CooldownRemains() < GCDMax * 5 and S.CallDreadstalkers:CooldownRemains() < GCDMax * 5 and (S.GrimoireFelguard:CooldownRemains() < 10 or not Player:HasTier(30, 2)) and (not VarShadowTimings or VarTyrantCD < 15 or FightRemains < 40 or Player:BuffUp(S.PowerInfusionBuff)) or S.SummonVilefiend:IsAvailable() and S.SummonDemonicTyrant:CooldownRemains() < 15 and S.SummonVilefiend:CooldownRemains() < GCDMax * 5 and S.CallDreadstalkers:CooldownRemains() < GCDMax * 5 and (S.GrimoireFelguard:CooldownRemains() < 10 or not Player:HasTier(30, 2)) and (not VarShadowTimings or VarTyrantCD < 15 or FightRemains < 40 or Player:BuffUp(S.PowerInfusionBuff))) then
       local ShouldReturn = Tyrant(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=tyrant,if=cooldown.summon_demonic_tyrant.remains<15&(buff.vilefiend.up|!talent.summon_vilefiend&(buff.grimoire_felguard.up|cooldown.grimoire_felguard.up|!set_bonus.tier30_2pc))&(!variable.shadow_timings|variable.tyrant_cd<15|fight_remains<40|buff.power_infusion.up)
-    if (S.SummonDemonicTyrant:CooldownRemains() < 15 and (VilefiendActive() or (not S.SummonVilefiend:IsAvailable()) and (GrimoireFelguardActive() or S.GrimoireFelguard:CooldownUp() or not Player:HasTier(30, 2))) and ((not VarShadowTimings) or VarTyrantCD < 15 or FightRemains < 40 or Player:BuffUp(S.PowerInfusionBuff))) then
+    if (S.SummonDemonicTyrant:CooldownRemains() < 15 and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and (GrimoireFelguardActive() or S.GrimoireFelguard:CooldownUp() or not Player:HasTier(30, 2))) and (not VarShadowTimings or VarTyrantCD < 15 or FightRemains < 40 or Player:BuffUp(S.PowerInfusionBuff))) then
       local ShouldReturn = Tyrant(); if ShouldReturn then return ShouldReturn; end
     end
     -- summon_demonic_tyrant,if=buff.vilefiend.up|buff.grimoire_felguard.up|cooldown.grimoire_felguard.remains>90
@@ -489,7 +489,7 @@ local function APL()
     -- call_action_list,name=items,use_off_gcd=1
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
     -- shadow_bolt,if=talent.fel_covenant&buff.fel_covenant.remains<5&!prev_gcd.1.shadow_bolt&soul_shard<5
-    if S.ShadowBolt:IsReady() and (S.FelCovenant:IsAvailable() and Player:BuffRemains(S.FelCovenantBuff) < 5 and (not Player:PrevGCDP(1, S.ShadowBolt)) and Player:SoulShardsP() < 5) then
+    if S.ShadowBolt:IsReady() and (S.FelCovenant:IsAvailable() and Player:BuffRemains(S.FelCovenantBuff) < 5 and not Player:PrevGCDP(1, S.ShadowBolt) and Player:SoulShardsP() < 5) then
       if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt main 8"; end
     end
     -- hand_of_guldan,if=buff.nether_portal.remains>cast_time
@@ -497,7 +497,7 @@ local function APL()
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 10"; end
     end
     -- demonic_strength,if=buff.nether_portal.remains<gcd.max&(fight_remains>63&!(fight_remains>cooldown.summon_demonic_tyrant.remains+69)|cooldown.summon_demonic_tyrant.remains>30|variable.shadow_timings|buff.rite_of_ruvaraad.up|!talent.summon_demonic_tyrant|!talent.grimoire_felguard|!set_bonus.tier30_2pc)
-    if S.DemonicStrength:IsCastable() and (Player:BuffRemains(S.NetherPortalBuff) < GCDMax and (FightRemains > 63 and (not (FightRemains > S.SummonDemonicTyrant:CooldownRemains() + 69)) or S.SummonDemonicTyrant:CooldownRemains() > 30 or VarShadowTimings or Player:BuffUp(S.RiteofRuvaraadBuff) or (not S.SummonDemonicTyrant:IsAvailable()) or (not S.GrimoireFelguard:IsAvailable()) or not Player:HasTier(30, 2))) then
+    if S.DemonicStrength:IsCastable() and (Player:BuffRemains(S.NetherPortalBuff) < GCDMax and (FightRemains > 63 and not (FightRemains > S.SummonDemonicTyrant:CooldownRemains() + 69) or S.SummonDemonicTyrant:CooldownRemains() > 30 or VarShadowTimings or Player:BuffUp(S.RiteofRuvaraadBuff) or not S.SummonDemonicTyrant:IsAvailable() or not S.GrimoireFelguard:IsAvailable() or not Player:HasTier(30, 2))) then
       if Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength main 12"; end
     end
     -- guillotine,if=buff.nether_portal.remains<gcd.max&(cooldown.demonic_strength.remains|!talent.demonic_strength)
@@ -513,7 +513,7 @@ local function APL()
       if Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers main 18"; end
     end
     -- implosion,if=two_cast_imps>0&buff.tyrant.down&active_enemies>1+(talent.sacrificed_souls.enabled)&!prev_gcd.1.implosion
-    if S.Implosion:IsReady() and (CheckImpCasts(2) > 0 and (not DemonicTyrantActive()) and EnemiesCount8ySplash > 1 + num(S.SacrificedSouls:IsAvailable()) and not Player:PrevGCDP(1, S.Implosion)) then
+    if S.Implosion:IsReady() and (CheckImpCasts(2) > 0 and not DemonicTyrantActive() and EnemiesCount8ySplash > 1 + num(S.SacrificedSouls:IsAvailable()) and not Player:PrevGCDP(1, S.Implosion)) then
       if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion main 20"; end
     end
     -- implosion,if=buff.wild_imps.stack>9&buff.tyrant.up&active_enemies>2+(1*talent.sacrificed_souls.enabled)&cooldown.call_dreadstalkers.remains>17&talent.the_expendables&!prev_gcd.1.implosion
@@ -529,7 +529,7 @@ local function APL()
       if Cast(S.SummonSoulkeeper) then return "soul_strike main 26"; end
     end
     -- power_siphon,if=buff.demonic_core.stack<2&cooldown.summon_demonic_tyrant.remains>38&(buff.dreadstalkers.down|buff.dreadstalkers.remains>gcd.max*5)
-    if S.PowerSiphon:IsReady() and (Player:BuffStack(S.DemonicCoreBuff) < 2 and S.SummonDemonicTyrant:CooldownRemains() > 38 and ((not DreadstalkerActive()) or DreadstalkerTime() > GCDMax * 5)) then
+    if S.PowerSiphon:IsReady() and (Player:BuffStack(S.DemonicCoreBuff) < 2 and S.SummonDemonicTyrant:CooldownRemains() > 38 and (not DreadstalkerActive() or DreadstalkerTime() > GCDMax * 5)) then
       if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon main 28"; end
     end
     -- hand_of_guldan,if=soul_shard>2
@@ -545,11 +545,11 @@ local function APL()
       if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 34"; end
     end
     -- power_siphon,if=buff.demonic_core.stack<2&(cooldown.summon_demonic_tyrant.remains>38|variable.tyrant_cd>38)&(buff.dreadstalkers.down|buff.dreadstalkers.remains>gcd.max*5)
-    if S.PowerSiphon:IsReady() and (Player:BuffStack(S.DemonicCoreBuff) < 2 and (S.SummonDemonicTyrant:CooldownRemains() > 38 or VarTyrantCD > 38) and ((not DreadstalkerActive()) or DreadstalkerTime() > GCDMax * 5)) then
+    if S.PowerSiphon:IsReady() and (Player:BuffStack(S.DemonicCoreBuff) < 2 and (S.SummonDemonicTyrant:CooldownRemains() > 38 or VarTyrantCD > 38) and (not DreadstalkerActive() or DreadstalkerTime() > GCDMax * 5)) then
       if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon main 36"; end
     end
     -- demonic_strength,if=(fight_remains>63&!(fight_remains>cooldown.summon_demonic_tyrant.remains+69)|cooldown.summon_demonic_tyrant.remains>30|buff.rite_of_ruvaraad.up|variable.shadow_timings|!talent.summon_demonic_tyrant|!talent.grimoire_felguard|!set_bonus.tier30_2pc)
-    if S.DemonicStrength:IsCastable() and (FightRemains > 63 and (not (FightRemains > S.SummonDemonicTyrant:CooldownRemains() + 69)) or S.SummonDemonicTyrant:CooldownRemains() > 30 or Player:BuffUp(S.RiteofRuvaraadBuff) or VarShadowTimings or (not S.SummonDemonicTyrant:IsAvailable()) or (not S.GrimoireFelguard:IsAvailable()) or not Player:HasTier(30, 2)) then
+    if S.DemonicStrength:IsCastable() and (FightRemains > 63 and not (FightRemains > S.SummonDemonicTyrant:CooldownRemains() + 69) or S.SummonDemonicTyrant:CooldownRemains() > 30 or Player:BuffUp(S.RiteofRuvaraadBuff) or VarShadowTimings or not S.SummonDemonicTyrant:IsAvailable() or not S.GrimoireFelguard:IsAvailable() or not Player:HasTier(30, 2)) then
       if Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength main 38"; end
     end
     -- summon_vilefiend,if=fight_remains<cooldown.summon_demonic_tyrant.remains+5
