@@ -135,7 +135,7 @@ end
 
 local function EvaluateTargetIfSerpentSting(TargetUnit)
   -- if=refreshable&!talent.serpentstalkers_trickery&buff.trueshot.down
-  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and (not S.SerpentstalkersTrickery:IsAvailable()))
+  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and not S.SerpentstalkersTrickery:IsAvailable())
 end
 
 local function EvaluateTargetIfSerpentSting2(TargetUnit)
@@ -150,12 +150,12 @@ end
 
 local function EvaluateTargetIfAimedShot(TargetUnit)
   -- if=talent.serpentstalkers_trickery&(buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2|ca_active)|buff.trick_shots.remains>execute_time&active_enemies>1)
-  return (S.SerpentstalkersTrickery:IsAvailable() and (Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.TrueshotBuff) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime()) and ((not S.ChimaeraShot:IsAvailable()) or EnemiesCount10ySplash < 2 or TargetUnit:HealthPercentage() > 70) or Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and EnemiesCount10ySplash > 1))
+  return (S.SerpentstalkersTrickery:IsAvailable() and (Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.TrueshotBuff) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime()) and (not S.ChimaeraShot:IsAvailable() or EnemiesCount10ySplash < 2 or TargetUnit:HealthPercentage() > 70) or Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and EnemiesCount10ySplash > 1))
 end
 
 local function EvaluateTargetIfAimedShot2(TargetUnit)
   -- if=(buff.precise_shots.down|(buff.trueshot.up|full_recharge_time<gcd+cast_time)&(!talent.chimaera_shot|active_enemies<2))|buff.trick_shots.remains>execute_time&active_enemies>1
-  return ((Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.TrueshotBuff) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime()) and ((not S.ChimaeraShot:IsAvailable()) or EnemiesCount10ySplash < 2)) or Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and EnemiesCount10ySplash > 1)
+  return ((Player:BuffDown(S.PreciseShotsBuff) or (Player:BuffUp(S.TrueshotBuff) or S.AimedShot:FullRechargeTime() < Player:GCD() + S.AimedShot:CastTime()) and (not S.ChimaeraShot:IsAvailable() or EnemiesCount10ySplash < 2)) or Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and EnemiesCount10ySplash > 1)
 end
 
 local function EvaluateTargetIfAimedShot3(TargetUnit)
@@ -186,11 +186,11 @@ local function Precombat()
     if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 4"; end
   end
   -- aimed_shot,if=active_enemies<3&(!talent.volley|active_enemies<2)
-  if S.AimedShot:IsReady() and (not Player:IsCasting(S.AimedShot)) and (EnemiesCount10ySplash < 3 and ((not S.Volley:IsAvailable()) or EnemiesCount10ySplash < 2)) then
+  if S.AimedShot:IsReady() and not Player:IsCasting(S.AimedShot) and (EnemiesCount10ySplash < 3 and (not S.Volley:IsAvailable() or EnemiesCount10ySplash < 2)) then
     if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot precombat 6"; end
   end
   -- wailing_arrow,if=active_enemies>2|!talent.steady_focus
-  if S.WailingArrow:IsReady() and (not Player:IsCasting(S.WailingArrow)) and (EnemiesCount10ySplash > 2 or not S.SteadyFocus:IsAvailable()) then
+  if S.WailingArrow:IsReady() and not Player:IsCasting(S.WailingArrow) and (EnemiesCount10ySplash > 2 or not S.SteadyFocus:IsAvailable()) then
     if Cast(S.WailingArrow, nil, nil, not TargetInRange40y) then return "wailing_arrow precombat 8"; end
   end
   -- steady_shot,if=active_enemies>2|talent.volley&active_enemies=2
@@ -396,7 +396,7 @@ local function Trickshots()
     if Cast(S.ChimaeraShot, nil, nil, not TargetInRange40y) then return "chimaera_shot trickshots 32"; end
   end
   -- multishot,if=buff.trick_shots.down|(buff.precise_shots.up|buff.bulletstorm.stack=10)&focus>cost+action.aimed_shot.cost
-  if S.MultiShot:IsReady() and ((not TrickShotsBuffCheck()) or (Player:BuffUp(S.PreciseShotsBuff) or Player:BuffStack(S.BulletstormBuff) == 10) and Player:FocusP() > S.MultiShot:Cost() + S.AimedShot:Cost()) then
+  if S.MultiShot:IsReady() and (not TrickShotsBuffCheck() or (Player:BuffUp(S.PreciseShotsBuff) or Player:BuffStack(S.BulletstormBuff) == 10) and Player:FocusP() > S.MultiShot:Cost() + S.AimedShot:Cost()) then
     if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot trickshots 34"; end
   end
   -- serpent_sting,target_if=min:dot.serpent_sting.remains,if=refreshable&talent.poison_injection&!talent.serpentstalkers_trickery
@@ -440,12 +440,12 @@ local function Trinkets()
   end
   -- use_items,slots=trinket1,if=!trinket.1.has_use_buff|buff.trueshot.up
   local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes)
-  if Trinket1ToUse and ((not Trinket1ToUse:HasUseBuff()) or Player:BuffUp(S.TrueshotBuff)) then
+  if Trinket1ToUse and (not Trinket1ToUse:HasUseBuff() or Player:BuffUp(S.TrueshotBuff)) then
     if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name(); end
   end
   -- use_items,slots=trinket2,if=!trinket.2.has_use_buff|buff.trueshot.up
   local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes)
-  if Trinket2ToUse and ((not Trinket2ToUse:HasUseBuff()) or Player:BuffUp(S.TrueshotBuff)) then
+  if Trinket2ToUse and (not Trinket2ToUse:HasUseBuff() or Player:BuffUp(S.TrueshotBuff)) then
     if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name(); end
   end
 end
