@@ -208,15 +208,15 @@ local function APL()
       if Cast(S.TipTheScales, Settings.Commons.GCDasOffGCD.TipTheScales) then return "tip_the_scales main 10"; end
     end
     -- fire_breath,empower_to=1,if=!talent.leaping_flames&talent.time_skip&!talent.interwoven_threads&cooldown.time_skip.remains<=cast_time&buff.ebon_might.remains>cast_time
-    if S.FireBreath:IsCastable() and ((not S.LeapingFlames:IsAvailable()) and S.TimeSkip:IsAvailable() and (not S.InterwovenThreads:IsAvailable()) and S.TimeSkip:CooldownRemains() <= Player:EmpowerCastTime(1) and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1)) then
+    if S.FireBreath:IsCastable() and (not S.LeapingFlames:IsAvailable() and S.TimeSkip:IsAvailable() and not S.InterwovenThreads:IsAvailable() and S.TimeSkip:CooldownRemains() <= Player:EmpowerCastTime(1) and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1)) then
       if CastAnnotated(S.FireBreath, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 1 main 12"; end
     end
     -- fire_breath,empower_to=max,if=talent.leaping_flames&talent.time_skip&!talent.interwoven_threads&cooldown.time_skip.remains<=cast_time&buff.ebon_might.remains>cast_time
-    if S.FireBreath:IsCastable() and (S.LeapingFlames:IsAvailable() and S.TimeSkip:IsAvailable() and (not S.InterwovenThreads:IsAvailable()) and S.TimeSkip:CooldownRemains() <= Player:EmpowerCastTime(MaxEmpower) and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(MaxEmpower)) then
+    if S.FireBreath:IsCastable() and (S.LeapingFlames:IsAvailable() and S.TimeSkip:IsAvailable() and not S.InterwovenThreads:IsAvailable() and S.TimeSkip:CooldownRemains() <= Player:EmpowerCastTime(MaxEmpower) and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(MaxEmpower)) then
       if CastAnnotated(S.FireBreath, false, MaxEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower " .. MaxEmpower .. " main 14"; end
     end
     -- upheaval,empower_to=1,if=talent.time_skip&!talent.interwoven_threads&cooldown.time_skip.remains<=cast_time&buff.ebon_might.remains>cast_time
-    if S.Upheaval:IsCastable() and (S.TimeSkip:IsAvailable() and (not S.InterwovenThreads:IsAvailable()) and S.TimeSkip:CooldownRemains() <= Player:EmpowerCastTime(1) and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1)) then
+    if S.Upheaval:IsCastable() and (S.TimeSkip:IsAvailable() and not S.InterwovenThreads:IsAvailable() and S.TimeSkip:CooldownRemains() <= Player:EmpowerCastTime(1) and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1)) then
       if CastAnnotated(S.Upheaval, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "upheaval emopwer 1 main 16"; end
     end
     -- breath_of_eons,if=buff.ebon_might.up|cooldown.ebon_might.remains<4
@@ -250,7 +250,7 @@ local function APL()
       if Cast(S.TimeSkip, Settings.Augmentation.GCDasOffGCD.TimeSkip) then return "time_skip main 24"; end
     end
     -- fire_breath,empower_to=1,if=!talent.ancient_flame&(buff.ebon_might.remains>cast_time|empowering.fire_breath)
-    if S.FireBreath:IsCastable() and ((not S.AncientFlame:IsAvailable()) and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1))) then
+    if S.FireBreath:IsCastable() and (not S.AncientFlame:IsAvailable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1))) then
       if CastAnnotated(S.FireBreath, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 1 main 26"; end
     end
     -- fire_breath,empower_to=max,if=talent.ancient_flame&(buff.ebon_might.remains>cast_time|empowering.fire_breath)
@@ -285,7 +285,7 @@ local function APL()
       if Cast(S.Eruption, nil, nil, not Target:IsInRange(25)) then return "eruption main 36"; end
     end
     -- emerald_blossom,if=!talent.dream_of_spring&talent.scarlet_adaptation&buff.ebon_might.remains<cast_time&buff.ancient_flame.down
-    if S.EmeraldBlossom:IsReady() and ((not S.DreamofSpring:IsAvailable()) and S.ScarletAdaptation:IsAvailable() and Player:BuffRemains(S.EbonMightSelfBuff) < S.EmeraldBlossom:CastTime() and Player:BuffDown(S.AncientFlameBuff)) then
+    if S.EmeraldBlossom:IsReady() and (not S.DreamofSpring:IsAvailable() and S.ScarletAdaptation:IsAvailable() and Player:BuffRemains(S.EbonMightSelfBuff) < S.EmeraldBlossom:CastTime() and Player:BuffDown(S.AncientFlameBuff)) then
       if Cast(S.EmeraldBlossom, Settings.Augmentation.GCDasOffGCD.EmeraldBlossom) then return "emerald_blossom main 38"; end
     end
     -- verdant_embrace,if=talent.scarlet_adaptation&buff.ebon_might.down&buff.ancient_flame.down
@@ -293,7 +293,7 @@ local function APL()
       if Cast(S.VerdantEmbrace, Settings.Augmentation.GCDasOffGCD.VerdantEmbrace) then return "verdant_embrace main 40"; end
     end
     -- living_flame,if=!moving|buff.hover.up|talent.pupil_of_alexstrasza
-    if S.LivingFlame:IsCastable() and ((not Player:IsMoving()) or S.PupilofAlexstrasza:IsAvailable()) then
+    if S.LivingFlame:IsCastable() and (not Player:IsMoving() or S.PupilofAlexstrasza:IsAvailable()) then
       if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame main 42"; end
     end
     -- azure_strike,if=!talent.pupil_of_alexstrasza&(cooldown.hover.remains>0|action.hover.disabled)
