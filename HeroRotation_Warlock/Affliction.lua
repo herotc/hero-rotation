@@ -47,7 +47,7 @@ local OnUseExcludes = {
 
 -- Enemies
 local Enemies40y, Enemies10ySplash, EnemiesCount10ySplash
-local VarPSUp, VarVTUp, VarSRUp, VarCDDoTsUp, VarHasCDs, VarCDsActive
+local VarPSUp, VarVTUp, VarVTPSUp VarSRUp, VarCDDoTsUp, VarHasCDs, VarCDsActive
 local BossFightRemains = 11111
 local FightRemains = 11111
 
@@ -123,6 +123,8 @@ local function Variables()
   VarPSUp = (Target:DebuffUp(S.PhantomSingularityDebuff) or not S.PhantomSingularity:IsAvailable())
   -- variable,name=vt_up,op=set,value=dot.vile_taint_dot.ticking|!talent.vile_taint
   VarVTUp = (Target:DebuffUp(S.VileTaintDebuff) or not S.VileTaint:IsAvailable())
+  -- variable,name=vt_ps_up,op=set,value=dot.vile_taint_dot.ticking|dot.phantom_singularity.ticking|(!talent.vile_taint&!talent.phantom_singularity)
+  VarVTPSUp = (Target:DebuffUp(S.VileTaintDebuff) or Target:DebuffUp(S.PhantomSingularityDebuff) or (not S.VileTaint:IsAvailable() and not S.PhantomSingularity:IsAvailable()))
   -- variable,name=sr_up,op=set,value=dot.soul_rot.ticking|!talent.soul_rot
   VarSRUp = (Target:DebuffUp(S.SoulRotDebuff) or not S.SoulRot:IsAvailable())
   -- variable,name=cd_dots_up,op=set,value=variable.ps_up&variable.vt_up&variable.sr_up
@@ -470,8 +472,8 @@ local function APL()
       (S.TormentedCrescendo:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Target:DebuffDown(S.DreadTouchDebuff)) or
       -- malefic_rapture,if=talent.tormented_crescendo&buff.tormented_crescendo.stack=2
       (S.TormentedCrescendo:IsAvailable() and Player:BuffStack(S.TormentedCrescendoBuff) == 2) or
-      -- malefic_rapture,if=variable.cd_dots_up|variable.vt_up&soul_shard>1
-      (VarCDDoTsUp or VarVTUp and Player:SoulShardsP() > 1) or
+      -- malefic_rapture,if=variable.cd_dots_up|variable.vt_ps_up&soul_shard>1
+      (VarCDDoTsUp or VarVTPSUp and Player:SoulShardsP() > 1) or
       -- malefic_rapture,if=talent.tormented_crescendo&talent.nightfall&buff.tormented_crescendo.react&buff.nightfall.react
       (S.TormentedCrescendo:IsAvailable() and S.Nightfall:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Player:BuffUp(S.NightfallBuff))
     ) then
