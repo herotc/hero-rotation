@@ -561,6 +561,10 @@ local function APL()
     if (not Player:AffectingCombat()) then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
+    -- Interrupts
+    if S.SpellLock:IsAvailable() then
+      local ShouldReturn = Everyone.Interrupt(40, S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock); if ShouldReturn then return ShouldReturn; end
+    end
     -- variable,name=havoc_immo_time,op=reset
     -- cycling_variable,name=havoc_immo_time,op=add,value=dot.immolate.remains*debuff.havoc.up
     -- Note: Above lines are to check how long Immolate remains on our Havoc target. This is included in UnitWithHavoc() now.
