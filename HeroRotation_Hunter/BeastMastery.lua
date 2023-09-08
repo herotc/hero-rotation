@@ -154,7 +154,7 @@ local function Precombat()
     if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 1"; end
   end
   -- steel_trap,precast_time=1.5,if=!talent.wailing_arrow&talent.steel_trap
-  if S.SteelTrap:IsCastable() and ((not S.WailingArrow:IsAvailable()) and S.SteelTrap:IsAvailable()) then
+  if S.SteelTrap:IsCastable() and (not S.WailingArrow:IsAvailable() and S.SteelTrap:IsAvailable()) then
     if Cast(S.SteelTrap, Settings.Commons2.GCDasOffGCD.SteelTrap, nil, not Target:IsInRange(40)) then return "steel_trap precombat 2"; end
   end
   -- Manually added opener abilities
@@ -187,23 +187,23 @@ local function CDs()
   -- invoke_external_buff,name=power_infusion,if=buff.bestial_wrath.up|cooldown.bestial_wrath.remains<30
   -- Note: Not handling external buffs.
   -- berserking,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&buff.bestial_wrath.up|fight_remains<13
-  if S.Berserking:IsCastable() and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and Player:BuffUp(S.BestialWrathBuff) or FightRemains < 13) then
+  if S.Berserking:IsCastable() and (Player:BuffUp(S.CalloftheWildBuff) or not S.CalloftheWild:IsAvailable() and Player:BuffUp(S.BestialWrathBuff) or FightRemains < 13) then
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 2"; end
   end
   -- blood_fury,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&buff.bestial_wrath.up|fight_remains<16
-  if S.BloodFury:IsCastable() and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and Player:BuffUp(S.BestialWrathBuff) or FightRemains < 16) then
+  if S.BloodFury:IsCastable() and (Player:BuffUp(S.CalloftheWildBuff) or not S.CalloftheWild:IsAvailable() and Player:BuffUp(S.BestialWrathBuff) or FightRemains < 16) then
     if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 8"; end
   end
   -- ancestral_call,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&buff.bestial_wrath.up|fight_remains<16
-  if S.AncestralCall:IsCastable() and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and Player:BuffUp(S.BestialWrathBuff) or FightRemains < 16) then
+  if S.AncestralCall:IsCastable() and (Player:BuffUp(S.CalloftheWildBuff) or not S.CalloftheWild:IsAvailable() and Player:BuffUp(S.BestialWrathBuff) or FightRemains < 16) then
     if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cds 10"; end
   end
   -- fireblood,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&buff.bestial_wrath.up|fight_remains<9
-  if S.Fireblood:IsCastable() and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and Player:BuffUp(S.BestialWrathBuff) or FightRemains < 9) then
+  if S.Fireblood:IsCastable() and (Player:BuffUp(S.CalloftheWildBuff) or not S.CalloftheWild:IsAvailable() and Player:BuffUp(S.BestialWrathBuff) or FightRemains < 9) then
     if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 12"; end
   end
   -- potion,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&(buff.bestial_wrath.up&(buff.bloodlust.up|target.health.pct<20))|fight_remains<31
-  if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable()) and (Player:BuffUp(S.BestialWrathBuff) and (Player:BloodlustUp() or Target:HealthPercentage() < 20)) or FightRemains < 31) then
+  if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.CalloftheWildBuff) or not S.CalloftheWild:IsAvailable() and (Player:BuffUp(S.BestialWrathBuff) and (Player:BloodlustUp() or Target:HealthPercentage() < 20)) or FightRemains < 31) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 14"; end
@@ -421,7 +421,7 @@ local function Trinkets()
   -- Note: Currently unable to check trinket cooldown.duration values. Using a modififed version of an old use_items line as a fallback.
   -- use_items,slots=trinket1,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&buff.bestial_wrath.up|fight_remains<31
   -- use_items,slots=trinket2,if=buff.call_of_the_wild.up|!talent.call_of_the_wild&buff.bestial_wrath.up|fight_remains<31
-  if Player:BuffUp(S.CalloftheWildBuff) or ((not S.CalloftheWild:IsAvailable()) and Player:BuffUp(S.BestialWrathBuff)) or FightRemains < 31 then
+  if Player:BuffUp(S.CalloftheWildBuff) or (not S.CalloftheWild:IsAvailable() and Player:BuffUp(S.BestialWrathBuff)) or FightRemains < 31 then
     local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
     if Trinket1ToUse then
       if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 trinkets 2"; end
@@ -505,7 +505,7 @@ local function APL()
      local ShouldReturn = Everyone.Interrupt(40, S.CounterShot, Settings.Commons2.OffGCDasOffGCD.CounterShot, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_shot
     -- call_action_list,name=cds
-    if (CDsON()) then
+    if CDsON() then
       local ShouldReturn = CDs(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=trinkets
@@ -513,16 +513,16 @@ local function APL()
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=st,if=active_enemies<2|!talent.beast_cleave&active_enemies<3
-    if (PetEnemiesMixedCount < 2 or (not S.BeastCleave:IsAvailable()) and PetEnemiesMixedCount < 3) then
+    if PetEnemiesMixedCount < 2 or not S.BeastCleave:IsAvailable() and PetEnemiesMixedCount < 3 then
       local ShouldReturn = ST(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cleave,if=active_enemies>2|talent.beast_cleave&active_enemies>1
-    if (PetEnemiesMixedCount > 2 or S.BeastCleave:IsAvailable() and PetEnemiesMixedCount > 1) then
+    if PetEnemiesMixedCount > 2 or S.BeastCleave:IsAvailable() and PetEnemiesMixedCount > 1 then
       local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
     end
     -- Manually added pet healing
     -- Conditions handled via Overrides
-    if (not (Player:IsMounted() or Player:IsInVehicle())) and S.MendPet:IsCastable() then
+    if not (Player:IsMounted() or Player:IsInVehicle()) and S.MendPet:IsCastable() then
       if Cast(S.MendPet) then return "Mend Pet Low Priority (w/ Target)"; end
     end
     -- Pool Focus if nothing else to do
@@ -531,7 +531,7 @@ local function APL()
 
   -- Note: We have to put it again in case we don't have a target but our pet is dying.
   -- Conditions handled via Overrides
-  if (not (Player:IsMounted() or Player:IsInVehicle())) and S.MendPet:IsCastable() then
+  if not (Player:IsMounted() or Player:IsInVehicle()) and S.MendPet:IsCastable() then
     if Cast(S.MendPet) then return "Mend Pet Low Priority (w/o Target)"; end
   end
 end
