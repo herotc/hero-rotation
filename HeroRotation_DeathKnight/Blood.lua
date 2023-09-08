@@ -39,7 +39,7 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local VarDeathStrikeDumpAmt = 65
-local VarBoneShieldRefreshValue = ((not S.DeathsCaress:IsAvailable()) or S.Consumption:IsAvailable() or S.Blooddrinker:IsAvailable()) and 4 or 5
+local VarBoneShieldRefreshValue = (not S.DeathsCaress:IsAvailable() or S.Consumption:IsAvailable() or S.Blooddrinker:IsAvailable()) and 4 or 5
 local VarHeartStrikeRP = 0
 local VarHeartStrikeRPDRW = 0
 local IsTanking
@@ -65,7 +65,7 @@ local StunInterrupts = {
 
 -- Register for talent changes
 HL:RegisterForEvent(function()
-  VarBoneShieldRefreshValue = ((not S.DeathsCaress:IsAvailable()) or S.Consumption:IsAvailable() or S.Blooddrinker:IsAvailable()) and 4 or 5
+  VarBoneShieldRefreshValue = (not S.DeathsCaress:IsAvailable() or S.Consumption:IsAvailable() or S.Blooddrinker:IsAvailable()) and 4 or 5
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 --Functions
@@ -148,7 +148,7 @@ local function Trinkets()
   -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)&(variable.trinket_1_exclude|trinket.1.cooldown.remains|!trinket.1.has_cooldown|variable.trinket_1_buffs)
   -- Note: Can't handle trinket stat buff checking, so using a generic trinket call
   -- use_items,if=(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)
-  if (Player:BuffUp(S.DancingRuneWeaponBuff) or (not S.DancingRuneWeapon:IsAvailable()) or S.DancingRuneWeapon:CooldownRemains() > 20) then
+  if (Player:BuffUp(S.DancingRuneWeaponBuff) or not S.DancingRuneWeapon:IsAvailable() or S.DancingRuneWeapon:CooldownRemains() > 20) then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
       local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
@@ -201,7 +201,7 @@ local function DRWUp()
     if Cast(S.BloodBoil, nil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil drw_up 2"; end
   end
   -- tombstone,if=buff.bone_shield.stack>5&rune>=2&runic_power.deficit>=30&!talent.shattering_bone|(talent.shattering_bone.enabled&death_and_decay.ticking)
-  if S.Tombstone:IsReady() and (Player:BuffStack(S.BoneShieldBuff) > 5 and Player:Rune() >= 2 and Player:RunicPowerDeficit() >= 30 and ((not S.ShatteringBone:IsAvailable()) or (S.ShatteringBone:IsAvailable() and Player:BuffUp(S.DeathAndDecayBuff)))) then
+  if S.Tombstone:IsReady() and (Player:BuffStack(S.BoneShieldBuff) > 5 and Player:Rune() >= 2 and Player:RunicPowerDeficit() >= 30 and (not S.ShatteringBone:IsAvailable() or (S.ShatteringBone:IsAvailable() and Player:BuffUp(S.DeathAndDecayBuff)))) then
     if Cast(S.Tombstone, Settings.Blood.GCDasOffGCD.Tombstone) then return "tombstone drw_up 4"; end
   end
   -- death_strike,if=buff.coagulopathy.remains<=gcd|buff.icy_talons.remains<=gcd
@@ -250,7 +250,7 @@ end
 
 local function Standard()
   -- tombstone,if=buff.bone_shield.stack>5&rune>=2&runic_power.deficit>=30&!talent.shattering_bone|(talent.shattering_bone.enabled&death_and_decay.ticking)&cooldown.dancing_rune_weapon.remains>=25
-  if CDsON() and S.Tombstone:IsCastable() and (Player:BuffStack(S.BoneShieldBuff) > 5 and Player:Rune() >= 2 and Player:RunicPowerDeficit() >= 30 and ((not S.ShatteringBone:IsAvailable()) or (S.ShatteringBone:IsAvailable() and Player:BuffUp(S.DeathAndDecayBuff))) and S.DancingRuneWeapon:CooldownRemains() >= 25) then
+  if CDsON() and S.Tombstone:IsCastable() and (Player:BuffStack(S.BoneShieldBuff) > 5 and Player:Rune() >= 2 and Player:RunicPowerDeficit() >= 30 and (not S.ShatteringBone:IsAvailable() or (S.ShatteringBone:IsAvailable() and Player:BuffUp(S.DeathAndDecayBuff))) and S.DancingRuneWeapon:CooldownRemains() >= 25) then
     if Cast(S.Tombstone, Settings.Blood.GCDasOffGCD.Tombstone) then return "tombstone standard 2"; end
   end
   -- variable,name=heart_strike_rp,value=(10+spell_targets.heart_strike*talent.heartbreaker.enabled*2)
@@ -260,7 +260,7 @@ local function Standard()
     if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsInMeleeRange(5)) then return "death_strike standard 4"; end
   end
   -- deaths_caress,if=(buff.bone_shield.remains<=4|(buff.bone_shield.stack<variable.bone_shield_refresh_value+1))&runic_power.deficit>10&!(talent.insatiable_blade&cooldown.dancing_rune_weapon.remains<buff.bone_shield.remains)&!talent.consumption.enabled&!talent.blooddrinker.enabled&rune.time_to_3>gcd
-  if S.DeathsCaress:IsReady() and ((Player:BuffRemains(S.BoneShieldBuff) <= 4 or (Player:BuffStack(S.BoneShieldBuff) < VarBoneShieldRefreshValue + 1)) and Player:RunicPowerDeficit() > 10 and (not (S.InsatiableBlade:IsAvailable() and S.DancingRuneWeapon:CooldownRemains() < Player:BuffRemains(S.BoneShieldBuff))) and (not S.Consumption:IsAvailable()) and (not S.Blooddrinker:IsAvailable()) and Player:RuneTimeToX(3) > Player:GCD()) then
+  if S.DeathsCaress:IsReady() and ((Player:BuffRemains(S.BoneShieldBuff) <= 4 or (Player:BuffStack(S.BoneShieldBuff) < VarBoneShieldRefreshValue + 1)) and Player:RunicPowerDeficit() > 10 and (not (S.InsatiableBlade:IsAvailable() and S.DancingRuneWeapon:CooldownRemains() < Player:BuffRemains(S.BoneShieldBuff))) and not S.Consumption:IsAvailable() and not S.Blooddrinker:IsAvailable() and Player:RuneTimeToX(3) > Player:GCD()) then
     if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress standard 6"; end
   end
   -- marrowrend,if=(buff.bone_shield.remains<=4|buff.bone_shield.stack<variable.bone_shield_refresh_value)&runic_power.deficit>20&!(talent.insatiable_blade&cooldown.dancing_rune_weapon.remains<buff.bone_shield.remains)
