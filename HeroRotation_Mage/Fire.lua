@@ -259,11 +259,11 @@ local function ActiveTalents()
     if Cast(S.LivingBomb, nil, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb active_talents 2"; end
   end
   -- meteor,if=variable.time_to_combustion<=0|buff.combustion.remains>travel_time|!talent.sun_kings_blessing&(cooldown.meteor.duration<variable.time_to_combustion|fight_remains<variable.time_to_combustion)
-  if S.Meteor:IsReady() and (var_time_to_combustion <= 0 or Player:BuffRemains(S.CombustionBuff) > S.Meteor:TravelTime() or (not S.SunKingsBlessing:IsAvailable()) and (45 < var_time_to_combustion or FightRemains < var_time_to_combustion)) then
+  if S.Meteor:IsReady() and (var_time_to_combustion <= 0 or Player:BuffRemains(S.CombustionBuff) > S.Meteor:TravelTime() or not S.SunKingsBlessing:IsAvailable() and (45 < var_time_to_combustion or FightRemains < var_time_to_combustion)) then
     if Cast(S.Meteor, Settings.Fire.GCDasOffGCD.Meteor, nil, not Target:IsInRange(40)) then return "meteor active_talents 4"; end
   end
   -- dragons_breath,if=talent.alexstraszas_fury&(buff.combustion.down&!buff.hot_streak.react)&(buff.feel_the_burn.up|time>15)&(!improved_scorch.active)&!firestarter.remains&!talent.tempered_flames
-  if S.DragonsBreath:IsReady() and (S.AlexstraszasFury:IsAvailable() and (CombustionDown and Player:BuffDown(S.HotStreakBuff)) and (Player:BuffUp(S.FeeltheBurnBuff) or HL.CombatTime() > 15) and (not ImprovedScorchActive()) and FirestarterRemains() == 0 and not S.TemperedFlames:IsAvailable()) then
+  if S.DragonsBreath:IsReady() and (S.AlexstraszasFury:IsAvailable() and (CombustionDown and Player:BuffDown(S.HotStreakBuff)) and (Player:BuffUp(S.FeeltheBurnBuff) or HL.CombatTime() > 15) and not ImprovedScorchActive() and FirestarterRemains() == 0 and not S.TemperedFlames:IsAvailable()) then
     if Settings.Fire.StayDistance and not Target:IsInRange(12) then
       if CastLeft(S.DragonsBreath) then return "dragons_breath active_talents 6 left"; end
     else
@@ -271,7 +271,7 @@ local function ActiveTalents()
     end
   end
   -- dragons_breath,if=talent.alexstraszas_fury&(buff.combustion.down&!buff.hot_streak.react)&(buff.feel_the_burn.up|time>15)&(!improved_scorch.active)&talent.tempered_flames
-  if S.DragonsBreath:IsReady() and (S.AlexstraszasFury:IsAvailable() and (CombustionDown and Player:BuffDown(S.HotStreakBuff)) and (Player:BuffUp(S.FeeltheBurnBuff) or HL.CombatTime() > 15) and (not ImprovedScorchActive()) and S.TemperedFlames:IsAvailable()) then
+  if S.DragonsBreath:IsReady() and (S.AlexstraszasFury:IsAvailable() and (CombustionDown and Player:BuffDown(S.HotStreakBuff)) and (Player:BuffUp(S.FeeltheBurnBuff) or HL.CombatTime() > 15) and not ImprovedScorchActive() and S.TemperedFlames:IsAvailable()) then
     if Settings.Fire.StayDistance and not Target:IsInRange(12) then
       if CastLeft(S.DragonsBreath) then return "dragons_breath active_talents 8 left"; end
     else
@@ -367,7 +367,7 @@ local function CombustionPhase()
   -- use_item,name=neural_synapse_enhancer,if=variable.time_to_combustion>60
   -- Note: Not handling items from Mechagon...
   -- phoenix_flames,if=buff.combustion.down&set_bonus.tier30_2pc&!action.phoenix_flames.in_flight&debuff.charring_embers.remains<4*gcd.max&!buff.hot_streak.react
-  if S.PhoenixFlames:IsCastable() and (Player:BuffDown(S.CombustionBuff) and Player:HasTier(30, 2) and (not S.PhoenixFlames:InFlight()) and Target:DebuffRemains(S.CharringEmbersDebuff) < 4 * GCDMax and Player:BuffDown(S.HotStreakBuff)) then
+  if S.PhoenixFlames:IsCastable() and (Player:BuffDown(S.CombustionBuff) and Player:HasTier(30, 2) and not S.PhoenixFlames:InFlight() and Target:DebuffRemains(S.CharringEmbersDebuff) < 4 * GCDMax and Player:BuffDown(S.HotStreakBuff)) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 8"; end
   end
   -- call_action_list,name=active_talents
@@ -378,11 +378,11 @@ local function CombustionPhase()
   end
   -- flamestrike,if=buff.combustion.down&buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.remains>cast_time&buff.fury_of_the_sun_king.expiration_delay_remains=0&cooldown.combustion.remains<cast_time&active_enemies>=variable.skb_flamestrike
   -- TODO: Handle expiration_delay_remains
-  if AoEON() and S.Flamestrike:IsReady() and (not Player:IsCasting(S.Flamestrike)) and (CombustionDown and Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Flamestrike:CastTime() and S.Combustion:CooldownRemains() < S.Flamestrike:CastTime() and EnemiesCount8ySplash >= var_skb_flamestrike) then
+  if AoEON() and S.Flamestrike:IsReady() and not Player:IsCasting(S.Flamestrike) and (CombustionDown and Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Flamestrike:CastTime() and S.Combustion:CooldownRemains() < S.Flamestrike:CastTime() and EnemiesCount8ySplash >= var_skb_flamestrike) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 12"; end
   end
   -- pyroblast,if=buff.combustion.down&buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.remains>cast_time&buff.fury_of_the_sun_king.expiration_delay_remains=0
-  if S.Pyroblast:IsReady() and (not Player:IsCasting(S.Pyroblast)) and (CombustionDown and Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Pyroblast:CastTime()) then
+  if S.Pyroblast:IsReady() and not Player:IsCasting(S.Pyroblast) and (CombustionDown and Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Pyroblast:CastTime()) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 14"; end
   end
   -- fireball,if=buff.combustion.down&cooldown.combustion.remains<cast_time&active_enemies<2&!improved_scorch.active
@@ -396,7 +396,7 @@ local function CombustionPhase()
   -- combustion,use_off_gcd=1,use_while_casting=1,if=hot_streak_spells_in_flight=0&buff.combustion.down&variable.time_to_combustion<=0&(action.scorch.executing&action.scorch.execute_remains<variable.combustion_cast_remains|action.fireball.executing&action.fireball.execute_remains<variable.combustion_cast_remains|action.pyroblast.executing&action.pyroblast.execute_remains<variable.combustion_cast_remains|action.flamestrike.executing&action.flamestrike.execute_remains<variable.combustion_cast_remains|action.meteor.in_flight&action.meteor.in_flight_remains<variable.combustion_cast_remains)
   -- Note: Moved above the previous four lines, due to use_while_casting.
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&(!improved_scorch.active|action.scorch.executing|debuff.improved_scorch.remains>4*gcd.max)&(buff.fury_of_the_sun_king.down|action.pyroblast.executing)&buff.combustion.up&!buff.hyperthermia.react&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react*(gcd.remains>0)<2
-  if S.FireBlast:IsReady() and (not FreeCastAvailable()) and ((not var_fire_blast_pooling) and ((not ImprovedScorchActive()) or Player:IsCasting(S.Scorch) or Target:DebuffRemains(S.ImprovedScorchDebuff) > 4 * GCDMax) and (Player:BuffDown(S.FuryoftheSunKingBuff) or Player:IsCasting(S.Pyroblast)) and CombustionUp and Player:BuffDown(S.HyperthermiaBuff) and Player:BuffDown(S.HotStreakBuff) and HotStreakInFlight() + num(Player:BuffUp(S.HeatingUpBuff)) * num(Player:GCDRemains() > 0) < 2) then
+  if S.FireBlast:IsReady() and not FreeCastAvailable() and (not var_fire_blast_pooling and (not ImprovedScorchActive() or Player:IsCasting(S.Scorch) or Target:DebuffRemains(S.ImprovedScorchDebuff) > 4 * GCDMax) and (Player:BuffDown(S.FuryoftheSunKingBuff) or Player:IsCasting(S.Pyroblast)) and CombustionUp and Player:BuffDown(S.HyperthermiaBuff) and Player:BuffDown(S.HotStreakBuff) and HotStreakInFlight() + num(Player:BuffUp(S.HeatingUpBuff)) * num(Player:GCDRemains() > 0) < 2) then
     if FBCast(S.FireBlast) then return "fire_blast combustion_phase 20"; end
   end
   -- flamestrike,if=(buff.hot_streak.react&active_enemies>=variable.combustion_flamestrike)|(buff.hyperthermia.react&active_enemies>=variable.combustion_flamestrike-talent.hyperthermia)
@@ -420,11 +420,11 @@ local function CombustionPhase()
     if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power combustion_phase 30"; end
   end
   -- flamestrike,if=buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.remains>cast_time&active_enemies>=variable.skb_flamestrike&buff.fury_of_the_sun_king.expiration_delay_remains=0
-  if AoEON() and S.Flamestrike:IsReady() and (not Player:IsCasting(S.Flamestrike)) and (Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Flamestrike:CastTime() and EnemiesCount8ySplash >= var_skb_flamestrike) then
+  if AoEON() and S.Flamestrike:IsReady() and not Player:IsCasting(S.Flamestrike) and (Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Flamestrike:CastTime() and EnemiesCount8ySplash >= var_skb_flamestrike) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 32"; end
   end
   -- pyroblast,if=buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.remains>cast_time&buff.fury_of_the_sun_king.expiration_delay_remains=0
-  if S.Pyroblast:IsReady() and (not Player:IsCasting(S.Pyroblast)) and (Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Pyroblast:CastTime()) then
+  if S.Pyroblast:IsReady() and not Player:IsCasting(S.Pyroblast) and (Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Pyroblast:CastTime()) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 34"; end
   end
   -- scorch,if=improved_scorch.active&(debuff.improved_scorch.remains<4*gcd.max)&active_enemies<variable.combustion_flamestrike
@@ -440,7 +440,7 @@ local function CombustionPhase()
     if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball combustion_phase 40"; end
   end
   -- phoenix_flames,if=!set_bonus.tier30_2pc&!talent.alexstraszas_fury&travel_time<buff.combustion.remains&buff.heating_up.react+hot_streak_spells_in_flight<2
-  if S.PhoenixFlames:IsCastable() and ((not Player:HasTier(30, 2)) and (not S.AlexstraszasFury:IsAvailable()) and S.PhoenixFlames:TravelTime() < Player:BuffRemains(S.CombustionBuff) and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() < 2) then
+  if S.PhoenixFlames:IsCastable() and (not Player:HasTier(30, 2) and not S.AlexstraszasFury:IsAvailable() and S.PhoenixFlames:TravelTime() < Player:BuffRemains(S.CombustionBuff) and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() < 2) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 42"; end
   end
   -- scorch,if=buff.combustion.remains>cast_time&cast_time>=gcd.max
@@ -493,12 +493,12 @@ end
 
 local function FirestarterFireBlasts()
   -- fire_blast,use_while_casting=1,if=!variable.fire_blast_pooling&!buff.hot_streak.react&(action.fireball.execute_remains>gcd.remains|action.pyroblast.executing)&buff.heating_up.react+hot_streak_spells_in_flight=1&(cooldown.shifting_power.ready|charges>1|buff.feel_the_burn.remains<2*gcd.max)
-  if S.FireBlast:IsReady() and (not FreeCastAvailable()) and ((not var_fire_blast_pooling) and Player:BuffDown(S.HotStreakBuff) and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() == 1 and (S.ShiftingPower:CooldownUp() or S.FireBlast:Charges() > 1 or Player:BuffRemains(S.FeeltheBurnBuff) < 2 * GCDMax)) then
+  if S.FireBlast:IsReady() and not FreeCastAvailable() and (not var_fire_blast_pooling and Player:BuffDown(S.HotStreakBuff) and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() == 1 and (S.ShiftingPower:CooldownUp() or S.FireBlast:Charges() > 1 or Player:BuffRemains(S.FeeltheBurnBuff) < 2 * GCDMax)) then
     if FBCast(S.FireBlast) then return "fire_blast firestarter_fire_blasts 2"; end
   end
   -- fire_blast,use_off_gcd=1,if=!variable.fire_blast_pooling&buff.heating_up.react+hot_streak_spells_in_flight=1&(talent.feel_the_burn&buff.feel_the_burn.remains<gcd.remains|cooldown.shifting_power.ready&(!set_bonus.tier30_2pc|debuff.charring_embers.remains>2*gcd.max))
   -- Note: Added check to not cast Fire Blast when HotStreakBuff is active.
-  if S.FireBlast:IsReady() and (not FreeCastAvailable()) and ((not var_fire_blast_pooling) and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() == 1 and (S.ShiftingPower:CooldownUp() and ((not Player:HasTier(30, 2)) or Target:DebuffRemains(S.CharringEmbersDebuff) > 2 * GCDMax))) then
+  if S.FireBlast:IsReady() and not FreeCastAvailable() and (not var_fire_blast_pooling and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() == 1 and (S.ShiftingPower:CooldownUp() and (not Player:HasTier(30, 2) or Target:DebuffRemains(S.CharringEmbersDebuff) > 2 * GCDMax))) then
     if FBCast(S.FireBlast) then return "fire_blast firestarter_fire_blasts 4"; end
   end
 end
@@ -517,7 +517,7 @@ local function StandardRotation()
     if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 4"; end
   end
   -- flamestrike,if=active_enemies>=variable.skb_flamestrike&buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.expiration_delay_remains=0"
-  if AoEON() and S.Flamestrike:IsReady() and (not Player:IsCasting(S.Flamestrike)) and (EnemiesCount8ySplash >= var_skb_flamestrike and Player:BuffUp(S.FuryoftheSunKingBuff)) then
+  if AoEON() and S.Flamestrike:IsReady() and not Player:IsCasting(S.Flamestrike) and (EnemiesCount8ySplash >= var_skb_flamestrike and Player:BuffUp(S.FuryoftheSunKingBuff)) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike standard_rotation 12"; end
   end
   -- scorch,if=improved_scorch.active&debuff.improved_scorch.remains<action.pyroblast.cast_time+5*gcd.max&buff.fury_of_the_sun_king.up&!action.scorch.in_flight
@@ -526,11 +526,11 @@ local function StandardRotation()
     if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch standard_rotation 13"; end
   end
   -- pyroblast,if=buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.expiration_delay_remains=0
-  if S.Pyroblast:IsReady() and (not Player:IsCasting(S.Pyroblast)) and (Player:BuffUp(S.FuryoftheSunKingBuff)) then
+  if S.Pyroblast:IsReady() and not Player:IsCasting(S.Pyroblast) and (Player:BuffUp(S.FuryoftheSunKingBuff)) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 14"; end
   end
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!firestarter.active&!variable.fire_blast_pooling&buff.fury_of_the_sun_king.down&(((action.fireball.executing&(action.fireball.execute_remains<0.5|!talent.hyperthermia)|action.pyroblast.executing&(action.pyroblast.execute_remains<0.5|!talent.hyperthermia))&buff.heating_up.react)|(searing_touch.active&(!improved_scorch.active|debuff.improved_scorch.stack=debuff.improved_scorch.max_stack|full_recharge_time<3)&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!hot_streak_spells_in_flight)))
-  if S.FireBlast:IsReady() and (not FreeCastAvailable()) and ((not FirestarterActive()) and (not var_fire_blast_pooling) and Player:BuffDown(S.FuryoftheSunKingBuff) and (((Player:IsCasting(S.Fireball) and (S.Fireball:ExecuteRemains() < 0.5 or not S.Hyperthermia:IsAvailable()) or Player:IsCasting(S.Pyroblast) and (S.Pyroblast:ExecuteRemains() < 0.5 or not S.Hyperthermia:IsAvailable())) and Player:BuffUp(S.HeatingUpBuff)) or (SearingTouchActive() and ((not ImprovedScorchActive()) or Target:DebuffStack(S.ImprovedScorchDebuff) == var_improved_scorch_max_stack or S.FireBlast:FullRechargeTime() < 3) and (Player:BuffUp(S.HeatingUpBuff) and (not Player:IsCasting(S.Scorch)) or Player:BuffDown(S.HotStreakBuff) and Player:BuffDown(S.HeatingUpBuff) and Player:IsCasting(S.Scorch) and HotStreakInFlight() == 0)))) then
+  if S.FireBlast:IsReady() and not FreeCastAvailable() and (not FirestarterActive() and not var_fire_blast_pooling and Player:BuffDown(S.FuryoftheSunKingBuff) and (((Player:IsCasting(S.Fireball) and (S.Fireball:ExecuteRemains() < 0.5 or not S.Hyperthermia:IsAvailable()) or Player:IsCasting(S.Pyroblast) and (S.Pyroblast:ExecuteRemains() < 0.5 or not S.Hyperthermia:IsAvailable())) and Player:BuffUp(S.HeatingUpBuff)) or (SearingTouchActive() and (not ImprovedScorchActive() or Target:DebuffStack(S.ImprovedScorchDebuff) == var_improved_scorch_max_stack or S.FireBlast:FullRechargeTime() < 3) and (Player:BuffUp(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDown(S.HotStreakBuff) and Player:BuffDown(S.HeatingUpBuff) and Player:IsCasting(S.Scorch) and HotStreakInFlight() == 0)))) then
     if FBCast(S.FireBlast) then return "fire_blast standard_rotation 16"; end
   end
   -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react&searing_touch.active&active_enemies<variable.hot_streak_flamestrike
@@ -542,7 +542,7 @@ local function StandardRotation()
     if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch standard_rotation 19"; end
   end
   -- phoenix_flames,if=talent.alexstraszas_fury&(!talent.feel_the_burn|buff.feel_the_burn.remains<2*gcd.max)
-  if S.PhoenixFlames:IsCastable() and (S.AlexstraszasFury:IsAvailable() and ((not S.FeeltheBurn:IsAvailable()) or Player:BuffRemains(S.FeeltheBurnBuff) < 2 * GCDMax)) then
+  if S.PhoenixFlames:IsCastable() and (S.AlexstraszasFury:IsAvailable() and (not S.FeeltheBurn:IsAvailable() or Player:BuffRemains(S.FeeltheBurnBuff) < 2 * GCDMax)) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames standard_rotation 20"; end
   end
   -- phoenix_flames,if=set_bonus.tier30_2pc&debuff.charring_embers.remains<2*gcd.max&!buff.hot_streak.react
@@ -554,11 +554,11 @@ local function StandardRotation()
     if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch standard_rotation 22"; end
   end
   -- phoenix_flames,if=!talent.alexstraszas_fury&!buff.hot_streak.react&!variable.phoenix_pooling&buff.flames_fury.up
-  if S.PhoenixFlames:IsCastable() and ((not S.AlexstraszasFury:IsAvailable()) and Player:BuffDown(S.HotStreakBuff) and (not var_phoenix_pooling) and Player:BuffUp(S.FlamesFuryBuff)) then
+  if S.PhoenixFlames:IsCastable() and (not S.AlexstraszasFury:IsAvailable() and Player:BuffDown(S.HotStreakBuff) and not var_phoenix_pooling and Player:BuffUp(S.FlamesFuryBuff)) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames standard_rotation 24"; end
   end
   -- phoenix_flames,if=talent.alexstraszas_fury&!buff.hot_streak.react&hot_streak_spells_in_flight=0&(!variable.phoenix_pooling&buff.flames_fury.up|charges_fractional>2.5|charges_fractional>1.5&(!talent.feel_the_burn|buff.feel_the_burn.remains<3*gcd.max))
-  if S.PhoenixFlames:IsCastable() and (S.AlexstraszasFury:IsAvailable() and Player:BuffDown(S.HotStreakBuff) and HotStreakInFlight() == 0 and ((not var_phoenix_pooling) and Player:BuffUp(S.FlamesFuryBuff) or S.PhoenixFlames:ChargesFractional() > 2.5 or S.PhoenixFlames:ChargesFractional() > 1.5 and ((not S.FeeltheBurn:IsAvailable()) or Player:BuffRemains(S.FeeltheBurnBuff) < 3 * GCDMax))) then
+  if S.PhoenixFlames:IsCastable() and (S.AlexstraszasFury:IsAvailable() and Player:BuffDown(S.HotStreakBuff) and HotStreakInFlight() == 0 and (not var_phoenix_pooling and Player:BuffUp(S.FlamesFuryBuff) or S.PhoenixFlames:ChargesFractional() > 2.5 or S.PhoenixFlames:ChargesFractional() > 1.5 and (not S.FeeltheBurn:IsAvailable() or Player:BuffRemains(S.FeeltheBurnBuff) < 3 * GCDMax))) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames standard_rotation 26"; end
   end
   -- call_action_list,name=active_talents
@@ -722,11 +722,11 @@ local function APL()
       local ShouldReturn = CombustionPhase(); if ShouldReturn then return ShouldReturn; end
     end
     -- variable,use_off_gcd=1,use_while_casting=1,name=fire_blast_pooling,value=searing_touch.active&action.fire_blast.full_recharge_time>3*gcd.max,if=!variable.fire_blast_pooling&talent.sun_kings_blessing
-    if (not var_fire_blast_pooling) and S.SunKingsBlessing:IsAvailable() then
+    if not var_fire_blast_pooling and S.SunKingsBlessing:IsAvailable() then
       var_fire_blast_pooling = SearingTouchActive() and S.FireBlast:FullRechargeTime() > 3 * GCDMax
     end
     -- shifting_power,if=buff.combustion.down&(action.fire_blast.charges=0|variable.fire_blast_pooling)&(!improved_scorch.active|debuff.improved_scorch.remains>cast_time+action.scorch.cast_time&!buff.fury_of_the_sun_king.up)&!buff.hot_streak.react&variable.shifting_power_before_combustion
-    if S.ShiftingPower:IsReady() and (CombustionDown and (S.FireBlast:Charges() == 0 or var_fire_blast_pooling) and ((not ImprovedScorchActive()) or Target:DebuffRemains(S.ImprovedScorchDebuff) > S.ShiftingPower:CastTime() + S.Scorch:CastTime() and Player:BuffDown(S.FuryoftheSunKingBuff)) and Player:BuffDown(S.HotStreakBuff) and var_shifting_power_before_combustion) then
+    if S.ShiftingPower:IsReady() and (CombustionDown and (S.FireBlast:Charges() == 0 or var_fire_blast_pooling) and (not ImprovedScorchActive() or Target:DebuffRemains(S.ImprovedScorchDebuff) > S.ShiftingPower:CastTime() + S.Scorch:CastTime() and Player:BuffDown(S.FuryoftheSunKingBuff)) and Player:BuffDown(S.HotStreakBuff) and var_shifting_power_before_combustion) then
       if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power main 12"; end
     end
     -- variable,name=phoenix_pooling,if=active_enemies<variable.combustion_flamestrike,value=(variable.time_to_combustion+buff.combustion.duration-5<action.phoenix_flames.full_recharge_time+cooldown.phoenix_flames.duration-action.shifting_power.full_reduction*variable.shifting_power_before_combustion&variable.time_to_combustion<fight_remains|talent.sun_kings_blessing)&!talent.alexstraszas_fury
@@ -740,7 +740,7 @@ local function APL()
       var_phoenix_pooling = (S.SunKingsBlessing:IsAvailable() or var_time_to_combustion < S.PhoenixFlames:FullRechargeTime() - ShiftingPowerFullReduction() * num(var_shifting_power_before_combustion) and var_time_to_combustion < FightRemains) and not S.AlexstraszasFury:IsAvailable()
     end
     -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&variable.time_to_combustion>0&active_enemies>=variable.hard_cast_flamestrike&!firestarter.active&!buff.hot_streak.react&(buff.heating_up.react&action.flamestrike.execute_remains<0.5|charges_fractional>=2)
-    if S.FireBlast:IsReady() and (not FreeCastAvailable()) and ((not var_fire_blast_pooling) and var_time_to_combustion > 0 and EnemiesCount8ySplash >= var_hard_cast_flamestrike and (not FirestarterActive()) and Player:BuffDown(S.HotStreakBuff) and (Player:BuffUp(S.HeatingUpBuff) and S.Flamestrike:ExecuteRemains() < 0.5 or S.FireBlast:ChargesFractional() >= 2)) then
+    if S.FireBlast:IsReady() and not FreeCastAvailable() and (not var_fire_blast_pooling and var_time_to_combustion > 0 and EnemiesCount8ySplash >= var_hard_cast_flamestrike and not FirestarterActive() and Player:BuffDown(S.HotStreakBuff) and (Player:BuffUp(S.HeatingUpBuff) and S.Flamestrike:ExecuteRemains() < 0.5 or S.FireBlast:ChargesFractional() >= 2)) then
       if FBCast(S.FireBlast) then return "fire_blast main 14"; end
     end
     -- call_action_list,name=firestarter_fire_blasts,if=buff.combustion.down&firestarter.active&variable.time_to_combustion>0
@@ -748,7 +748,7 @@ local function APL()
       local ShouldReturn = FirestarterFireBlasts(); if ShouldReturn then return ShouldReturn; end
     end
     -- fire_blast,use_while_casting=1,if=action.shifting_power.executing&full_recharge_time<action.shifting_power.tick_reduction
-    if S.FireBlast:IsReady() and (not FreeCastAvailable()) and (Player:IsCasting(S.ShiftingPower) and S.FireBlast:FullRechargeTime() < ShiftingPowerTickReduction) then
+    if S.FireBlast:IsReady() and not FreeCastAvailable() and (Player:IsCasting(S.ShiftingPower) and S.FireBlast:FullRechargeTime() < ShiftingPowerTickReduction) then
       if FBCast(S.FireBlast) then return "fire_blast main 16"; end
     end
     -- call_action_list,name=standard_rotation,if=variable.time_to_combustion>0&buff.combustion.down
