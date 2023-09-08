@@ -158,7 +158,7 @@ local function Trinkets()
   -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs|(cooldown.moment_of_glory.remains>20|(!talent.moment_of_glory.enabled&cooldown.avenging_wrath.remains>20)))
   -- Note: Unable to handle some trinket conditionals, such as cooldown.duration. Using a generic fallback instead.
   -- use_items,if=(buff.moment_of_glory.up|!talent.moment_of_glory.enabled&buff.avenging_wrath.up)|(cooldown.moment_of_glory.remains>20|!talent.moment_of_glory.enabled&cooldown.avenging_wrath.remains>20)
-  if ((Player:BuffUp(S.MomentofGloryBuff) or (not S.MomentofGlory:IsAvailable()) and Player:BuffUp(S.AvengingWrathBuff)) or (S.MomentofGlory:CooldownRemains() > 20 or (not S.MomentofGlory:IsAvailable()) and S.AvengingWrath:CooldownRemains() > 20)) then
+  if ((Player:BuffUp(S.MomentofGloryBuff) or not S.MomentofGlory:IsAvailable() and Player:BuffUp(S.AvengingWrathBuff)) or (S.MomentofGlory:CooldownRemains() > 20 or not S.MomentofGlory:IsAvailable() and S.AvengingWrath:CooldownRemains() > 20)) then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
       local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
