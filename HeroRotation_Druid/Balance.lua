@@ -207,7 +207,7 @@ end
 
 local function InitVars()
   -- variable,name=no_cd_talent,value=!talent.celestial_alignment&!talent.incarnation_chosen_of_elune|druid.no_cds
-  VarNoCDTalent = (not S.CelestialAlignment:IsAvailable()) and (not S.IncarnationTalent:IsAvailable()) or not CDsON()
+  VarNoCDTalent = not S.CelestialAlignment:IsAvailable() and not S.IncarnationTalent:IsAvailable() or not CDsON()
   -- variable,name=on_use_trinket,value=0
   VarOnUseTrinket = 0
   -- variable,name=on_use_trinket,op=add,value=trinket.1.has_proc.any&trinket.1.cooldown.duration|trinket.1.is.spoils_of_neltharus|trinket.1.is.mirror_of_fractured_tomorrows
@@ -277,7 +277,7 @@ local function St()
     if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireST, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire st 2"; end
   end
   -- variable,name=cd_condition_st,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>15|fight_remains<25+10*talent.incarnation_chosen_of_elune))
-  VarCDConditionST = CDsON() and (CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 15 or FightRemains < 25 + 10 * num(S.Incarnation:IsAvailable())))
+  VarCDConditionST = CDsON() and (CaInc:CooldownRemains() < 5 and not CAIncBuffUp and (Target:TimeToDie() > 15 or FightRemains < 25 + 10 * num(S.Incarnation:IsAvailable())))
   -- moonfire,target_if=refreshable&remains<2&(target.time_to_die-remains)>6
   if S.Moonfire:IsCastable() then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireST, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire st 6"; end
@@ -289,7 +289,7 @@ local function St()
   -- cancel_buff,name=starlord,if=buff.starlord.remains<2&(buff.primordial_arcanic_pulsar.value>=550&!buff.ca_inc.up&buff.starweavers_warp.up|buff.primordial_arcanic_pulsar.value>=560&buff.starweavers_weft.up)
   -- TODO: Handle cancel_buff
   -- starfall,if=buff.primordial_arcanic_pulsar.value>=550&!buff.ca_inc.up&buff.starweavers_warp.up
-  if S.Starfall:IsReady() and (PAPValue >= 550 and (not CAIncBuffUp) and Player:BuffUp(S.StarweaversWarp)) then
+  if S.Starfall:IsReady() and (PAPValue >= 550 and not CAIncBuffUp and Player:BuffUp(S.StarweaversWarp)) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not Target:IsInRange(45)) then return "starfall st 12.5"; end
   end
   -- starsurge,if=buff.primordial_arcanic_pulsar.value>=560&buff.starweavers_weft.up
@@ -309,7 +309,7 @@ local function St()
   -- variable,name=solar_eclipse_st,value=buff.primordial_arcanic_pulsar.value<520&cooldown.ca_inc.remains>5&spell_targets.starfire<3
   VarSolarEclipseST = PAPValue < 520 and CaInc:CooldownRemains() > 5 and EnemiesCount8ySplash < 3
   -- variable,name=enter_eclipse,value=eclipse.any_next|variable.solar_eclipse_st&buff.eclipse_solar.up&(buff.eclipse_solar.remains<action.starfire.cast_time)|!variable.solar_eclipse_st&buff.eclipse_lunar.up&(buff.eclipse_lunar.remains<action.wrath.cast_time)
-  VarEnterEclipse = (EclipseAnyNext or VarSolarEclipseST and Player:BuffUp(S.EclipseSolar) and (Player:BuffRemains(S.EclipseSolar) < S.Starfire:CastTime()) or (not VarSolarEclipseST) and Player:BuffUp(S.EclipseLunar) and (Player:BuffRemains(S.EclipseLunar) < S.Wrath:CastTime()))
+  VarEnterEclipse = (EclipseAnyNext or VarSolarEclipseST and Player:BuffUp(S.EclipseSolar) and (Player:BuffRemains(S.EclipseSolar) < S.Starfire:CastTime()) or not VarSolarEclipseST and Player:BuffUp(S.EclipseLunar) and (Player:BuffRemains(S.EclipseLunar) < S.Wrath:CastTime()))
   -- warrior_of_elune,if=variable.solar_eclipse_st&(variable.enter_eclipse|buff.eclipse_solar.remains<7&buff.primordial_arcanic_pulsar.value<280)
   if S.WarriorofElune:IsCastable() and (VarSolarEclipseST and (VarEnterEclipse or Player:BuffRemains(S.EclipseSolar) < 7 and PAPValue < 280)) then
     if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune st 20"; end
@@ -390,7 +390,7 @@ local function St()
   end
   -- wild_mushroom,if=talent.fungal_growth&(!fight_style.dungeonroute|target.time_to_die>(full_recharge_time-7)|fight_remains<10)
   local DungeonRoute = Player:IsInParty() and not Player:IsInRaid()
-  if S.WildMushroom:IsCastable() and (S.FungalGrowth:IsAvailable() and ((not DungeonRoute) or Target:TimeToDie() > (S.WildMushroom:FullRechargeTime() - 7) or FightRemains < 10)) then
+  if S.WildMushroom:IsCastable() and (S.FungalGrowth:IsAvailable() and (not DungeonRoute or Target:TimeToDie() > (S.WildMushroom:FullRechargeTime() - 7) or FightRemains < 10)) then
     if Cast(S.WildMushroom, Settings.Balance.GCDasOffGCD.WildMushroom, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom st 56"; end
   end
   -- wrath
@@ -409,7 +409,7 @@ local function AoE()
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireAoE, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire aoe 2"; end
   end
   -- variable,name=cd_condition_aoe,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>10|fight_remains<25+10*talent.incarnation_chosen_of_elune))
-  VarCDConditionAoE = CDsON() and (CaInc:CooldownRemains() < 5 and (not CAIncBuffUp) and (Target:TimeToDie() > 10 or FightRemains < 25 + 10 * num(S.Incarnation:IsAvailable())))
+  VarCDConditionAoE = CDsON() and (CaInc:CooldownRemains() < 5 and not CAIncBuffUp and (Target:TimeToDie() > 10 or FightRemains < 25 + 10 * num(S.Incarnation:IsAvailable())))
   -- sunfire,target_if=refreshable&(target.time_to_die-remains)>6-(spell_targets%2)&astral_power.deficit>variable.passive_asp+3
   if S.Sunfire:IsCastable() then
     if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireAoE, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire aoe 4"; end
@@ -450,11 +450,11 @@ local function AoE()
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire aoe 17"; end
   end
   -- wrath,if=!variable.enter_solar&(eclipse.any_next|buff.eclipse_lunar.remains<action.wrath.cast_time)
-  if S.Wrath:IsCastable() and ((not VarEnterSolar) and (EclipseAnyNext or Player:BuffRemains(S.EclipseLunar) < S.Wrath:CastTime())) then
+  if S.Wrath:IsCastable() and (not VarEnterSolar and (EclipseAnyNext or Player:BuffRemains(S.EclipseLunar) < S.Wrath:CastTime())) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath aoe 18"; end
   end
   -- wild_mushroom,if=astral_power.deficit>variable.passive_asp+20&(!talent.fungal_growth|!talent.waning_twilight|dot.fungal_growth.remains<2&target.time_to_die>7&!prev_gcd.1.wild_mushroom)
-  if S.WildMushroom:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 20 and ((not S.FungalGrowth:IsAvailable()) or (not S.WaningTwilight:IsAvailable()) or Target:DebuffRemains(S.FungalGrowthDebuff) < 2 and Target:TimeToDie() > 7 and not Player:PrevGCDP(1, S.WildMushroom))) then
+  if S.WildMushroom:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + 20 and (not S.FungalGrowth:IsAvailable() or not S.WaningTwilight:IsAvailable() or Target:DebuffRemains(S.FungalGrowthDebuff) < 2 and Target:TimeToDie() > 7 and not Player:PrevGCDP(1, S.WildMushroom))) then
     if Cast(S.WildMushroom, Settings.Balance.GCDasOffGCD.WildMushroom, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom aoe 20"; end
   end
   -- fury_of_elune,if=target.time_to_die>2&(buff.ca_inc.remains>3|cooldown.ca_inc.remains>30&buff.primordial_arcanic_pulsar.value<=280|buff.primordial_arcanic_pulsar.value>=560&astral_power>50)|fight_remains<10
@@ -574,7 +574,7 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- variable,name=is_aoe,value=spell_targets.starfall>(1+(!talent.aetherial_kindling&!talent.starweaver))&talent.starfall
-    VarIsAoe = (EnemiesCount40y > (1 + num((not S.AetherialKindling:IsAvailable()) and not S.Starweaver:IsAvailable())) and S.Starfall:IsAvailable())
+    VarIsAoe = (EnemiesCount40y > (1 + num(not S.AetherialKindling:IsAvailable() and not S.Starweaver:IsAvailable())) and S.Starfall:IsAvailable())
     -- variable,name=is_cleave,value=spell_targets.starfire>1
     VarIsCleave = (EnemiesCount8ySplash > 1)
     -- variable,name=passive_asp,value=6%spell_haste+talent.natures_balance+talent.orbit_breaker*dot.moonfire.ticking*(buff.orbit_breaker.stack>(27-2*buff.solstice.up))*40
@@ -594,12 +594,12 @@ local function APL()
     if Settings.Commons.Enabled.Trinkets then
       -- use_items,slots=trinket1,if=variable.on_use_trinket!=1&!trinket.2.ready_cooldown|(variable.on_use_trinket=1|variable.on_use_trinket=3)&buff.ca_inc.up|variable.no_cd_talent|fight_remains<20|variable.on_use_trinket=0
       local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
-      if Trinket1ToUse and (VarOnUseTrinket ~= 1 and (not trinket2:IsReady()) or (VarOnUseTrinket == 1 or VarOnUseTrinket == 3) and CAIncBuffUp or VarNoCDTalent or FightRemains < 20 or VarOnUseTrinket == 0) then
+      if Trinket1ToUse and (VarOnUseTrinket ~= 1 and not trinket2:IsReady() or (VarOnUseTrinket == 1 or VarOnUseTrinket == 3) and CAIncBuffUp or VarNoCDTalent or FightRemains < 20 or VarOnUseTrinket == 0) then
         if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 main 6"; end
       end
       -- use_items,slots=trinket2,if=variable.on_use_trinket!=2&!trinket.1.ready_cooldown|variable.on_use_trinket=2&buff.ca_inc.up|variable.no_cd_talent|fight_remains<20|variable.on_use_trinket=0
       local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
-      if Trinket2ToUse and (VarOnUseTrinket ~= 2 and (not trinket1:IsReady()) or VarOnUseTrinket == 2 and CAIncBuffUp or VarNoCDTalent or FightRemains < 20 or VarOnUseTrinket == 0) then
+      if Trinket2ToUse and (VarOnUseTrinket ~= 2 and not trinket1:IsReady() or VarOnUseTrinket == 2 and CAIncBuffUp or VarNoCDTalent or FightRemains < 20 or VarOnUseTrinket == 0) then
         if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 main 8"; end
       end
     end
