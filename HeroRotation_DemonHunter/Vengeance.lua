@@ -177,7 +177,7 @@ local function Precombat()
   -- food
   -- snapshot_stats
   -- sigil_of_flame
-  if (not S.ConcentratedSigils:IsAvailable()) and S.SigilofFlame:IsCastable() then
+  if not S.ConcentratedSigils:IsAvailable() and S.SigilofFlame:IsCastable() then
     if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame precombat 2"; end
   end
   -- immolation_aura
@@ -276,7 +276,7 @@ local function Maintenance()
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture maintenance 10"; end
   end
   -- immolation_aura,if=!talent.fallout|soul_fragments<5
-  if S.ImmolationAura:IsCastable() and ((not S.Fallout:IsAvailable()) or SoulFragments < 5) then
+  if S.ImmolationAura:IsCastable() and (not S.Fallout:IsAvailable() or SoulFragments < 5) then
     if Cast(S.ImmolationAura) then return "immolation_aura maintenance 12"; end
   end
   -- sigil_of_flame
@@ -306,7 +306,7 @@ local function Trinkets()
       if Cast(I.ElementiumPocketAnvil, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(8)) then return "elementium_pocket_anvil trinkets 2"; end
     end
     -- use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=!talent.first_of_the_illidari|buff.metamorphosis.up|fight_remains<=10|cooldown.metamorphosis.remains>25
-    if I.BeacontotheBeyond:IsEquippedAndReady() and ((not S.FirstoftheIllidari:IsAvailable()) or Player:BuffUp(S.MetamorphosisBuff) or FightRemains <= 10 or S.Metamorphosis:CooldownRemains() > 25) then
+    if I.BeacontotheBeyond:IsEquippedAndReady() and (not S.FirstoftheIllidari:IsAvailable() or Player:BuffUp(S.MetamorphosisBuff) or FightRemains <= 10 or S.Metamorphosis:CooldownRemains() > 25) then
       if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond trinkets 4"; end
     end
     -- use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1,if=trinket.beacon_to_the_beyond.cooldown.remains>5|!equipped.beacon_to_the_beyond
@@ -505,7 +505,7 @@ local function APL()
       if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis) then return "metamorphosis main 2"; end
     end
     -- infernal_strike,use_off_gcd=1
-    if S.InfernalStrike:IsCastable() and ((not Settings.Vengeance.ConserveInfernalStrike) or S.InfernalStrike:ChargesFractional() > 1.9) and (S.InfernalStrike:TimeSinceLastCast() > 2) then
+    if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (S.InfernalStrike:TimeSinceLastCast() > 2) then
       if Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike main 4"; end
     end
     -- potion
