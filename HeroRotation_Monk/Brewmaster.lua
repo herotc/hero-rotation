@@ -95,7 +95,7 @@ local function ShouldPurify()
     return true
   end
   -- Purify if about to cap charges, no Imp Niuzao, and we have Stagger damage
-  if ((not S.ImprovedInvokeNiuzao:IsAvailable()) and S.PurifyingBrew:ChargesFractional() >= 1.8 and (Player:DebuffUp(S.HeavyStagger) or Player:DebuffUp(S.ModerateStagger) or Player:DebuffUp(S.LightStagger))) then
+  if (not S.ImprovedInvokeNiuzao:IsAvailable() and S.PurifyingBrew:ChargesFractional() >= 1.8 and (Player:DebuffUp(S.HeavyStagger) or Player:DebuffUp(S.ModerateStagger) or Player:DebuffUp(S.LightStagger))) then
     return true
   end
 
@@ -156,7 +156,7 @@ local function ItemActions()
     local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
     local IsTrinket = ItemSlot == 13 or ItemSlot == 14
     if not IsTrinket then DisplayStyle = Settings.Commons.DisplayStyle.Items end
-    if (IsTrinket and Settings.Commons.Enabled.Trinkets) or ((not IsTrinket) and Settings.Commons.Enabled.Items) then
+    if (IsTrinket and Settings.Commons.Enabled.Trinkets) or (not IsTrinket and Settings.Commons.Enabled.Items) then
       if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
     end
   end
