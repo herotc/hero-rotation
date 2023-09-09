@@ -432,8 +432,8 @@ local function HighPrioActions()
 end
 
 local function Obliteration()
-  -- remorseless_winter,if=active_enemies>3
-  if S.RemorselessWinter:IsReady() and (EnemiesCount10yd > 3) then
+  -- remorseless_winter,if=active_enemies>3|talent.gathering_storm
+  if S.RemorselessWinter:IsReady() and (EnemiesCount10yd > 3 or S.GatheringStorm:IsAvailable()) then
     if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter obliteration 2"; end
   end
   -- howling_blast,if=buff.killing_machine.stack<2&buff.pillar_of_frost.remains<gcd&buff.rime.react
