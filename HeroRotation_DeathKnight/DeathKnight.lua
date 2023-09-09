@@ -170,6 +170,7 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   Outbreak                              = Spell(77575),
   Pestilence                            = Spell(277234),
   Plaguebringer                         = Spell(390175),
+  RaiseDead                             = Spell(46584),
   RottenTouch                           = Spell(390275),
   ScourgeStrike                         = Spell(55090),
   SummonGargoyle                        = MultiSpell(49206, 207349),
