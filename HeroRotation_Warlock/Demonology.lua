@@ -230,12 +230,8 @@ local function Tyrant()
   if S.SummonDemonicTyrant:IsCastable() and (VarPetExpire > 0 and VarPetExpire < S.SummonDemonicTyrant:ExecuteTime() + (num(Player:BuffDown(S.DemonicCoreBuff)) * S.ShadowBolt:ExecuteTime() + num(Player:BuffUp(S.DemonicCoreBuff)) * GCDMax) + GCDMax) then
     if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant tyrant 4"; end
   end
-  -- shadow_bolt,if=buff.fel_covenant.remains<15&(!buff.vilefiend.up|!talent.summon_vilefiend&(!buff.dreadstalkers.up))&time>30,line_cd=40
-  if S.ShadowBoltLineCD:IsReady() and S.ShadowBoltLineCD:TimeSinceLastCast() >= 40 and (Player:BuffRemains(S.FelCovenantBuff) < 15 and (not VilefiendActive() or not S.SummonVilefiend:IsAvailable() and not DreadstalkerActive()) and CombatTime > 30) then
-    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt tyrant 6"; end
-  end
-  -- shadow_bolt,if=prev_gcd.1.grimoire_felguard&time>30&buff.nether_portal.down&buff.demonic_core.down|time<10&buff.fel_covenant.stack<2&talent.fel_covenant&fight_remains%%90>40
-  if S.ShadowBolt:IsReady() and (Player:PrevGCDP(1, S.GrimoireFelguard) and CombatTime > 30 and Player:BuffDown(S.NetherPortalBuff) and Player:BuffDown(S.DemonicCoreBuff) or CombatTime < 10 and Player:BuffStack(S.FelCovenantBuff) < 2 and S.FelCovenant:IsAvailable() and FightRemains % 90 > 40) then
+  -- shadow_bolt,if=prev_gcd.1.grimoire_felguard&time>30&buff.nether_portal.down&buff.demonic_core.down
+  if S.ShadowBolt:IsReady() and (Player:PrevGCDP(1, S.GrimoireFelguard) and CombatTime > 30 and Player:BuffDown(S.NetherPortalBuff) and Player:BuffDown(S.DemonicCoreBuff)) then
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt tyrant 8"; end
   end
   -- power_siphon,if=buff.demonic_core.stack<2&soul_shard=5&(!buff.vilefiend.up|!talent.summon_vilefiend&(!buff.dreadstalkers.up))&(buff.nether_portal.down)
@@ -488,10 +484,6 @@ local function APL()
     end
     -- call_action_list,name=items,use_off_gcd=1
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
-    -- shadow_bolt,if=talent.fel_covenant&buff.fel_covenant.remains<5&!prev_gcd.1.shadow_bolt&soul_shard<5
-    if S.ShadowBolt:IsReady() and (S.FelCovenant:IsAvailable() and Player:BuffRemains(S.FelCovenantBuff) < 5 and not Player:PrevGCDP(1, S.ShadowBolt) and Player:SoulShardsP() < 5) then
-      if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt main 8"; end
-    end
     -- hand_of_guldan,if=buff.nether_portal.remains>cast_time
     if S.HandofGuldan:IsReady() and (Player:BuffRemains(S.NetherPortalBuff) > S.HandofGuldan:CastTime()) then
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 10"; end
