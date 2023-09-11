@@ -16,6 +16,8 @@ local SpellMM = Spell.Hunter.Marksmanship
 local SpellSV = Spell.Hunter.Survival
 -- Settings
 local Settings = HR.GUISettings.APL.Hunter
+-- Hunter Local
+local Hunter  = HR.Commons.Hunter
 -- Lua
 local mathmax = math.max
 -- WoW API
@@ -28,9 +30,9 @@ OldBMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   local BaseCheck = OldBMIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   if self == SpellBM.SummonPet then
-    return not Pet:IsActive() and not Pet:IsDeadOrGhost() and BaseCheck
+    return Hunter.Pet.Status == 0 and BaseCheck
   elseif self == SpellBM.RevivePet then
-    return Pet:IsDeadOrGhost() and BaseCheck
+    return (Pet:IsDeadOrGhost() or Hunter.Pet.Status == 2) and BaseCheck
   elseif self == SpellBM.MendPet then
     return Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= Settings.Commons2.MendPetHighHP and BaseCheck
   else
@@ -66,7 +68,7 @@ OldMMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   local BaseCheck = OldMMIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   if self == SpellMM.SummonPet then
-    return not Pet:IsActive() and not Pet:IsDeadOrGhost() and BaseCheck
+    return Hunter.Pet.Status == 0 and BaseCheck
   else
     return BaseCheck
   end
@@ -139,9 +141,9 @@ OldSVIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   local BaseCheck = OldSVIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   if self == SpellSV.SummonPet then
-    return not Pet:IsActive() and not Pet:IsDeadOrGhost() and BaseCheck
+    return Hunter.Pet.Status == 0 and BaseCheck
   elseif self == SpellSV.RevivePet then
-    return Pet:IsDeadOrGhost() and BaseCheck
+    return (Pet:IsDeadOrGhost() or Hunter.Pet.Status == 2) and BaseCheck
   elseif self == SpellSV.MendPet then
     return Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= Settings.Commons2.MendPetHighHP and BaseCheck
   elseif self == SpellSV.AspectoftheEagle then
