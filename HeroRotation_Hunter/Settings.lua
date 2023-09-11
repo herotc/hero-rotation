@@ -37,8 +37,7 @@ HR.GUISettings.APL.Hunter = {
   Commons2 = {
     SummonPetSlot = 1,
     ExhilarationHP = 20,
-    MendPetHighHP = 40,
-    MendPetLowHP = 80,
+    MendPetHP = 40,
     GCDasOffGCD = {
       Exhilaration = true,
       ExplosiveShot = false,
@@ -123,8 +122,7 @@ CreateARPanelOptions(CP_Hunter, "APL.Hunter.Commons")
 
 -- Hunter 2
 CreatePanelOption("Slider", CP_Hunter2, "APL.Hunter.Commons2.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold. Set to 0 to disable.")
-CreatePanelOption("Slider", CP_Hunter2, "APL.Hunter.Commons2.MendPetHighHP", {0, 100, 1}, "Mend Pet High HP", "Set the Mend Pet HP High Priority (ASAP) threshold. Set to 0 to disable.")
-CreatePanelOption("Slider", CP_Hunter2, "APL.Hunter.Commons2.MendPetLowHP", {0, 100, 1}, "Mend Pet Low HP", "Set the Mend Pet HP Low Priority (Pooling) threshold. Set to 0 to disable.")
+CreatePanelOption("Slider", CP_Hunter2, "APL.Hunter.Commons2.MendPetHP", {0, 100, 1}, "Mend Pet High HP", "Set the Mend Pet HP threshold. Set to 0 to disable.")
 CreatePanelOption("Slider", CP_Hunter2, "APL.Hunter.Commons2.SummonPetSlot", {1, 5, 1}, "Summon Pet Slot", "Which pet stable slot to suggest when summoning a pet.")
 CreateARPanelOptions(CP_Hunter2, "APL.Hunter.Commons2")
 
