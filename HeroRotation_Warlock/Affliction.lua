@@ -47,7 +47,7 @@ local OnUseExcludes = {
 
 -- Enemies
 local Enemies40y, Enemies10ySplash, EnemiesCount10ySplash
-local VarPSUp, VarVTUp, VarVTPSUp VarSRUp, VarCDDoTsUp, VarHasCDs, VarCDsActive
+local VarPSUp, VarVTUp, VarVTPSUp, VarSRUp, VarCDDoTsUp, VarHasCDs, VarCDsActive
 local BossFightRemains = 11111
 local FightRemains = 11111
 
