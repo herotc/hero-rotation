@@ -35,7 +35,6 @@ HR.GUISettings.APL.DeathKnight = {
   },
   Commons2 = {
     GCDasOffGCD = {
-      AbominationLimb = false,
       AntiMagicShell = true,
       AntiMagicZone = true,
       DeathAndDecay = false,
@@ -79,7 +78,7 @@ HR.GUISettings.APL.DeathKnight = {
       Selected = "Power",
     },
     DisplayStyle = {
-      BoS = "Suggested",
+      BreathOfSindragosa = "Suggested",
     },
     GCDasOffGCD = {
       -- Abilities

@@ -372,7 +372,7 @@ local function Cooldowns()
   end
   -- abomination_limb,if=rune<3&variable.st_planning
   if S.AbominationLimb:IsCastable() and (Player:Rune() < 3 and VarSTPlanning) then
-    if Cast(S.AbominationLimb, Settings.Commons2.GCDasOffGCD.AbominationLimb) then return "abomination_limb cooldowns 12"; end
+    if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Signature) then return "abomination_limb cooldowns 12"; end
   end
   -- unholy_assault,target_if=min:debuff.festering_wound.stack,if=variable.st_planning
   if S.UnholyAssault:IsReady() and (VarSTPlanning) then
