@@ -83,3 +83,13 @@ HL:RegisterForEvent(
   end
   , "UNIT_SPELLCAST_SUCCEEDED"
 )
+
+HL:RegisterForEvent(
+  function(...)
+    -- CHALLENGE_MODE_START is called at the start of a Mythic+ dungeon, which despawns the pet
+    Hunter.Pet.GUID = 0
+    Hunter.Pet.FeignGUID = 0
+    Hunter.Pet.Status = 0
+  end
+  , "CHALLENGE_MODE_START"
+)
