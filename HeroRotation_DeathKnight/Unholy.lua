@@ -141,8 +141,8 @@ end
 
 -- CastTargetIf Condition Functions
 local function EvaluateTargetIfApocalypseAoECDs(TargetUnit)
-  -- if=talent.bursting_sores&debuff.festering_wound.up&(!death_and_decay.ticking&cooldown.death_and_decay.remains&rune<3|death_and_decay.ticking&rune=0)|!talent.bursting_sores&debuff.festering_wound.stack>=4
-  return (S.BurstingSores:IsAvailable() and TargetUnit:DebuffUp(S.FesteringWoundDebuff) and (Player:BuffDown(S.DeathAndDecayBuff) and S.DeathAndDecay:CooldownDown() and Player:Rune() < 3 or Player:BuffUp(S.DeathAndDecayBuff) and Player:Rune() == 0) or not S.BurstingSores:IsAvailable() and TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 4)
+  -- if=talent.bursting_sores&debuff.festering_wound.up&(!death_and_decay.ticking&cooldown.death_and_decay.remains&rune<3|death_and_decay.ticking&rune=0)|!talent.bursting_sores&debuff.festering_wound.stack>=4|set_bonus.tier31_2pc&debuff.festering_wound.stack>=1
+  return (S.BurstingSores:IsAvailable() and TargetUnit:DebuffUp(S.FesteringWoundDebuff) and (Player:BuffDown(S.DeathAndDecayBuff) and S.DeathAndDecay:CooldownDown() and Player:Rune() < 3 or Player:BuffUp(S.DeathAndDecayBuff) and Player:Rune() == 0) or not S.BurstingSores:IsAvailable() and TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 4 or Player:HasTier(31, 2) and TargetUnit:DebuffUp(S.FesteringWoundDebuff))
 end
 
 local function EvaluateTargetIfApocalypseCDs(TargetUnit)
@@ -288,7 +288,7 @@ local function AoECDs()
   if S.AbominationLimb:IsCastable() and (Player:Rune() < 2 or FesterStacks > 10 or not S.Festermight:IsAvailable() or Player:BuffUp(S.FestermightBuff) and Player:BuffRemains(S.FestermightBuff) < 12) then
     if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(20)) then return "abomination_limb aoe_cooldowns 6"; end
   end
-  -- apocalypse,target_if=min:debuff.festering_wound.stack,if=talent.bursting_sores&debuff.festering_wound.up&(!death_and_decay.ticking&cooldown.death_and_decay.remains&rune<3|death_and_decay.ticking&rune=0)|!talent.bursting_sores&debuff.festering_wound.stack>=4
+  -- apocalypse,target_if=min:debuff.festering_wound.stack,if=talent.bursting_sores&debuff.festering_wound.up&(!death_and_decay.ticking&cooldown.death_and_decay.remains&rune<3|death_and_decay.ticking&rune=0)|!talent.bursting_sores&debuff.festering_wound.stack>=4|set_bonus.tier31_2pc&debuff.festering_wound.stack>=1
   if S.Apocalypse:IsReady() then
     if Everyone.CastTargetIf(S.Apocalypse, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfApocalypseAoECDs, not Target:IsInMeleeRange(5)) then return "apocalypse aoe_cooldowns 8"; end
   end
@@ -486,7 +486,7 @@ local function HighPrioActions()
       if Cast(S.AntiMagicZone, Settings.Commons2.GCDasOffGCD.AntiMagicZone) then return "antimagic_zone ams_amz 4"; end
     end
   end
-  -- invoke_external_buff,name=power_infusion,if=variable.st_planning&(pet.gargoyle.active&pet.gargoyle.remains<=23|!talent.summon_gargoyle&talent.army_of_the_dead&pet.army_ghoul.active&pet.army_ghoul.remains<=23|!talent.summon_gargoyle&!talent.army_of_the_dead&buff.dark_transformation.up|!talent.summon_gargoyle&buff.dark_transformation.up|!pet.gargoyle.active&cooldown.summon_gargoyle.remains+5>cooldown.invoke_external_buff.duration|active_enemies>=3&(buff.dark_transformation.up|death_and_decay.ticking))|fight_remains<=23
+  -- invoke_external_buff,name=power_infusion,if=variable.st_planning&(pet.gargoyle.active&pet.gargoyle.remains<=18|!talent.summon_gargoyle&talent.army_of_the_dead&pet.army_ghoul.active&pet.army_ghoul.remains<=18|!talent.summon_gargoyle&!talent.army_of_the_dead&buff.dark_transformation.up|!talent.summon_gargoyle&buff.dark_transformation.up|!pet.gargoyle.active&cooldown.summon_gargoyle.remains+10>cooldown.invoke_external_buff.duration|active_enemies>=3&(buff.dark_transformation.up|death_and_decay.ticking))|fight_remains<=18
   -- Note: Not handling external buffs.
   -- potion,if=(30>=pet.gargoyle.remains&pet.gargoyle.active)|(!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>60|cooldown.summon_gargoyle.ready)&(buff.dark_transformation.up&30>=buff.dark_transformation.remains|pet.army_ghoul.active&pet.army_ghoul.remains<=30|pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=30)|fight_remains<=30
   if Settings.Commons.Enabled.Potions then
@@ -605,16 +605,16 @@ local function Variables()
   else
     VarFesterTracker = FesterStacks >= (3 - num(S.InfectedClaws:IsAvailable()))
   end
-  -- variable,name=pop_wounds,op=setif,value=1,value_else=0,condition=(cooldown.apocalypse.remains>variable.apoc_timing|!talent.apocalypse)&(variable.festermight_tracker|debuff.festering_wound.stack>=1&cooldown.unholy_assault.remains<20&talent.unholy_assault&variable.st_planning|debuff.rotten_touch.up&debuff.festering_wound.stack>=1|debuff.festering_wound.stack>4)|fight_remains<5&debuff.festering_wound.stack>=1
-  VarPopWounds = ((S.Apocalypse:CooldownRemains() > VarApocTiming or not S.Apocalypse:IsAvailable()) and (VarFesterTracker or FesterStacks >= 1 and S.UnholyAssault:CooldownRemains() < 20 and S.UnholyAssault:IsAvailable() and VarSTPlanning or Target:DebuffUp(S.RottenTouchDebuff) and FesterStacks >= 1 or FesterStacks > 4) or FightRemains < 5 and FesterStacks >= 1)
+  -- variable,name=pop_wounds,op=setif,value=1,value_else=0,condition=(cooldown.apocalypse.remains>variable.apoc_timing|!talent.apocalypse)&(variable.festermight_tracker|debuff.festering_wound.stack>=1&cooldown.unholy_assault.remains<20&talent.unholy_assault&variable.st_planning|debuff.rotten_touch.up&debuff.festering_wound.stack>=1|debuff.festering_wound.stack>4|set_bonus.tier31_4pc&(pet.apoc_magus.active|pet.army_magus.active)&debuff.festering_wound.stack>=1)|fight_remains<5&debuff.festering_wound.stack>=1
+  VarPopWounds = ((S.Apocalypse:CooldownRemains() > VarApocTiming or not S.Apocalypse:IsAvailable()) and (VarFesterTracker or FesterStacks >= 1 and S.UnholyAssault:CooldownRemains() < 20 and S.UnholyAssault:IsAvailable() and VarSTPlanning or Target:DebuffUp(S.RottenTouchDebuff) and FesterStacks >= 1 or FesterStacks > 4 or Player:HasTier(31, 4) and (Ghoul:ApocMagusActive() or Ghoul:ArmyMagusActive()) and FesterStacks >= 1) or FightRemains < 5 and FesterStacks >= 1)
   -- variable,name=pooling_runic_power,op=setif,value=1,value_else=0,condition=talent.vile_contagion&cooldown.vile_contagion.remains<3&runic_power<60&!variable.st_planning
   VarPoolingRunicPower = (S.VileContagion:IsAvailable() and S.VileContagion:CooldownRemains() < 3 and Player:RunicPower() < 60 and not VarSTPlanning)
   -- variable,name=st_planning,op=setif,value=1,value_else=0,condition=active_enemies=1&(!raid_event.adds.exists|raid_event.adds.in>15)
   VarSTPlanning = (EnemiesMeleeCount == 1 or not AoEON())
   -- variable,name=adds_remain,op=setif,value=1,value_else=0,condition=active_enemies>=2&(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.remains>6)
   VarAddsRemain = (EnemiesMeleeCount >= 2 and AoEON())
-  -- variable,name=spend_rp,op=setif,value=1,value_else=0,condition=(!talent.rotten_touch|talent.rotten_touch&!buff.rotten_touch.up|runic_power.deficit<15)&((talent.improved_death_coil&(active_enemies=2|talent.coil_of_devastation)|rune<3|pet.gargoyle.active|buff.sudden_doom.react|cooldown.apocalypse.remains<10&debuff.festering_wound.stack>3|!variable.pop_wounds&debuff.festering_wound.stack>=4))
-  VarSpendRP = (not S.RottenTouch:IsAvailable() or S.RottenTouch:IsAvailable() and Target:DebuffDown(S.RottenTouchDebuff) or Player:RunicPowerDeficit() < 15) and (S.ImprovedDeathCoil:IsAvailable() and (EnemiesMeleeCount == 2 or S.CoilofDevastation:IsAvailable()) or Player:Rune() < 3 or VarGargActive or Player:BuffUp(S.SuddenDoomBuff) or S.Apocalypse:CooldownRemains() < 10 and FesterStacks > 3 or not VarPopWounds and FesterStacks >= 4)
+  -- variable,name=spend_rp,op=setif,value=1,value_else=0,condition=(!talent.rotten_touch|talent.rotten_touch&!buff.rotten_touch.up|runic_power.deficit<20)&(!set_bonus.tier31_4pc|set_bonus.tier31_4pc&!(pet.apoc_magus.active|pet.army_magus.active)|runic_power.deficit<20|rune<3)&((talent.improved_death_coil&(active_enemies=2|talent.coil_of_devastation)|rune<3|pet.gargoyle.active|buff.sudden_doom.react|cooldown.apocalypse.remains<10&debuff.festering_wound.stack>3|!variable.pop_wounds&debuff.festering_wound.stack>=4))
+  VarSpendRP = (not S.RottenTouch:IsAvailable() or S.RottenTouch:IsAvailable() and Target:DebuffDown(S.RottenTouchDebuff) or Player:RunicPowerDeficit() < 20) and (not Player:HasTier(31, 4) or Player:HasTier(31, 4) and not (Ghoul:ApocMagusActive() or Ghoul:ArmyMagusActive()) or Player:RunicPowerDeficit() < 20 or Player:Rune() < 3) and (S.ImprovedDeathCoil:IsAvailable() and (EnemiesMeleeCount == 2 or S.CoilofDevastation:IsAvailable()) or Player:Rune() < 3 or VarGargActive or Player:BuffUp(S.SuddenDoomBuff) or S.Apocalypse:CooldownRemains() < 10 and FesterStacks > 3 or not VarPopWounds and FesterStacks >= 4)
 end
 
 --- ======= ACTION LISTS =======
