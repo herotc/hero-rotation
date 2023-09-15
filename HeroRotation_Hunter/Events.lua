@@ -60,6 +60,9 @@ HL:RegisterForCombatEvent(
     if DestGUID == Hunter.Pet.GUID then
       Hunter.Pet.Status = 2
       Hunter.Pet.GUID = 0
+    elseif DestGUID == Player:GUID() and Hunter.Pet.Status ~= 2 then
+      Hunter.Pet.Status = 0
+      Hunter.Pet.GUID = 0
     end
   end
   , "UNIT_DIED"
