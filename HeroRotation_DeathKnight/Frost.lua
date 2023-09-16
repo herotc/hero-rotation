@@ -308,8 +308,8 @@ local function Cooldowns()
   if S.EmpowerRuneWeapon:IsCastable() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.EmpowerRuneWeaponBuff) and Player:Rune() < 6 and (S.PillarofFrost:CooldownRemains() < 7 and (VarAddsRemain or VarSTPlanning) or Player:BuffUp(S.PillarofFrostBuff)) or FightRemains < 20) then
     if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 4"; end
   end
-  -- empower_rune_weapon,use_off_gcd=1,if=buff.breath_of_sindragosa.up&talent.breath_of_sindragosa&!buff.empower_rune_weapon.up&(runic_power<70&rune<3|time<10)
-  if S.EmpowerRuneWeapon:IsCastable() and (Player:BuffUp(S.BreathofSindragosa) and S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.EmpowerRuneWeaponBuff) and (Player:RunicPower() < 70 and Player:Rune() < 3 or HL.CombatTime() < 10)) then
+  -- empower_rune_weapon,use_off_gcd=1,if=buff.breath_of_sindragosa.up&talent.breath_of_sindragosa&!buff.empower_rune_weapon.up&runic_power<70&rune<3&(cooldown.breath_of_sindragosa.remains>40|full_recharge_time<10)
+  if S.EmpowerRuneWeapon:IsCastable() and (Player:BuffUp(S.BreathofSindragosa) and S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.EmpowerRuneWeaponBuff) and Player:RunicPower() < 70 and Player:Rune() < 3 and (S.BreathofSindragosa:CooldownRemains() > 40 or S.EmpowerRuneWeapon:FullRechargeTime() < 10)) then
     if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 6"; end
   end
   -- empower_rune_weapon,use_off_gcd=1,if=!talent.breath_of_sindragosa&!talent.obliteration&!buff.empower_rune_weapon.up&rune<5&(cooldown.pillar_of_frost.remains_expected<7|buff.pillar_of_frost.up|!talent.pillar_of_frost)
