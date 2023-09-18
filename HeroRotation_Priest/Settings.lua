@@ -41,6 +41,7 @@ HR.GUISettings.APL.Priest = {
     DispersionHP = 30,
     SelfPI = true,
     UseOpener = true,
+    PreferVTWhenSTinDungeon = false,
     PotionType = {
       Selected = "Power",
     },
@@ -111,6 +112,8 @@ CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume 
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseOpener", "Use Custom Opener",
   "Use the custom opener in HeroRotation. If disabled, HeroRotation will follow the Simulationcraft APL without attempting any opener suggestions.")
 CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow")
+CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.PreferVTWhenSTinDungeon", "Prefer VT for dungeon ST",
+  "Prefer to use Vampiric Touch while in single target combat in dungeon content. (Note: This does not apply to raid content.)")
 
 --Discipline
 CreateARPanelOptions(CP_Discipline, "APL.Priest.Discipline")
