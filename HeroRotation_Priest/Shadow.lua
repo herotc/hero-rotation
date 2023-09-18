@@ -484,7 +484,8 @@ end
 
 local function CDs()
   -- potion,if=buff.voidform.up|buff.power_infusion.up|buff.dark_ascension.up&(fight_remains<=cooldown.power_infusion.remains+15)|fight_remains<=30
-  if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or Player:BuffUp(S.DarkAscensionBuff) and (FightRemains <= S.PowerInfusion:CooldownRemains() + 15) or FightRemains <= 30) then
+  -- Note: The "fight_remains<=30" seems to be for dps sniping the end of a boss fight, so using BossFightRemains instead of FightRemains.
+  if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or Player:BuffUp(S.DarkAscensionBuff) and (FightRemains <= S.PowerInfusion:CooldownRemains() + 15) or BossFightRemains <= 30) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 2"; end
@@ -690,7 +691,7 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    BossFightRemains = HL.BossFightRemains(nil, true)
+    BossFightRemains = HL.BossFightRemains()
     FightRemains = BossFightRemains
     if FightRemains == 11111 then
       FightRemains = HL.FightRemains(Enemies10ySplash, false)
