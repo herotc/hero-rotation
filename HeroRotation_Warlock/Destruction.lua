@@ -544,7 +544,7 @@ local function APL()
     VarHavocActive, VarHavocRemains, VarHavocImmoTime = UnitWithHavoc(Enemies40y)
 
     -- Calculate fight_remains
-    BossFightRemains = HL.BossFightRemains(nil, true)
+    BossFightRemains = HL.BossFightRemains()
     FightRemains = BossFightRemains
     if FightRemains == 11111 then
       FightRemains = HL.FightRemains(Enemies8ySplash, false)

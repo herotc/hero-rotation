@@ -470,7 +470,7 @@ local function APL()
   -- Calculate FightRemains
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
-    BossFightRemains = HL.BossFightRemains(nil, true)
+    BossFightRemains = HL.BossFightRemains()
     FightRemains = BossFightRemains
     if FightRemains == 11111 then
       FightRemains = HL.FightRemains(Enemies8y, false)
