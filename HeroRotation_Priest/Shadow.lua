@@ -70,6 +70,7 @@ local VarVTsApplied = false
 local VarHoldingCrash = false
 local VarManualVTsApplied = false
 local VarPoolForCDs = false
+local VarPreferVT = false
 local Fiend = (S.Mindbender:IsAvailable()) and S.Mindbender or S.Shadowfiend
 local VarFiendUp = false
 local VarFiendRemains = 0
@@ -91,6 +92,7 @@ HL:RegisterForEvent(function()
   VarHoldingCrash = false
   VarManualVTsApplied = false
   VarPoolForCDs = false
+  VarPreferVT = false
   VarFiendUp = false
   VarFiendRemains = 0
   VarOpened = false
@@ -263,7 +265,7 @@ local function Precombat()
   end
   -- shadow_crash,if=raid_event.adds.in>=25&spell_targets.shadow_crash<=8&!fight_style.dungeonslice
   -- Note: Can't do target counts in Precombat
-  local DungeonSlice = Player:IsInParty() and not Player:IsInRaid()
+  local DungeonSlice = Player:IsInParty() and Player:IsInDungeonArea() and not Player:IsInRaidArea()
   if S.ShadowCrash:IsCastable() and (not DungeonSlice) then
     if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash precombat 8"; end
   end
@@ -362,7 +364,7 @@ end
 
 local function Opener()
   -- shadow_crash,if=!debuff.vampiric_touch.up
-  if S.ShadowCrash:IsCastable() and (Target:DebuffDown(S.VampiricTouchDebuff)) then
+  if S.ShadowCrash:IsCastable() and not VarPreferVT and (Target:DebuffDown(S.VampiricTouchDebuff)) then
     if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash opener 2"; end
   end
   -- mindbender
@@ -563,7 +565,7 @@ local function Main()
     if Everyone.CastCycle(S.DevouringPlague, Enemies40y, EvaluateCycleDP, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 8"; end
   end
   -- shadow_crash,if=!variable.holding_crash&dot.vampiric_touch.refreshable
-  if S.ShadowCrash:IsCastable() and (not VarHoldingCrash and Target:DebuffRefreshable(S.VampiricTouchDebuff)) then
+  if S.ShadowCrash:IsCastable() and not VarPreferVT and (not VarHoldingCrash and Target:DebuffRefreshable(S.VampiricTouchDebuff)) then
     if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash main 10"; end
   end
   -- vampiric_touch,target_if=min:remains,if=refreshable&target.time_to_die>=12&(cooldown.shadow_crash.remains>=dot.vampiric_touch.remains&!action.shadow_crash.in_flight|variable.holding_crash|!talent.whispering_shadows)
@@ -723,7 +725,8 @@ local function APL()
     if ShouldReturn then return ShouldReturn; end
     -- variable,name=holding_crash,op=set,value=raid_event.adds.in<15
     -- Note: We have no way of knowing if adds are coming, so don't ever purposely hold crash
-    VarHoldingCrash = Settings.Shadow.PreferVTWhenSTinDungeon and EnemiesCount10ySplash == 1 and Player:IsInDungeonArea() and Player:IsInParty() and not Player:IsInRaidArea()
+    VarHoldingCrash = false
+    VarPreferVT = Settings.Shadow.PreferVTWhenSTinDungeon and EnemiesCount10ySplash == 1 and Player:IsInDungeonArea() and Player:IsInParty() and not Player:IsInRaidArea()
     -- variable,name=pool_for_cds,op=set,value=(cooldown.void_eruption.remains<=gcd.max*3&talent.void_eruption|cooldown.dark_ascension.up&talent.dark_ascension)|talent.void_torrent&talent.psychic_link&cooldown.void_torrent.remains<=4&(!raid_event.adds.exists&spell_targets.vampiric_touch>1|raid_event.adds.in<=5|raid_event.adds.remains>=6&!variable.holding_crash)&!buff.voidform.up
     VarPoolForCDs = ((S.VoidEruption:CooldownRemains() <= Player:GCD() * 3 and S.VoidEruption:IsAvailable() or S.DarkAscension:CooldownUp() and S.DarkAscension:IsAvailable()) or S.VoidTorrent:IsAvailable() and S.PsychicLink:IsAvailable() and S.VoidTorrent:CooldownRemains() <= 4 and Player:BuffDown(S.VoidformBuff))
     -- Manually added: Attempt at an opener
