@@ -43,7 +43,8 @@ local OnUseExcludes = {
 local no_heal
 local UsingRazorice
 local UsingFallenCrusader
-local VarRWBuffs
+local VarRWBuffs = S.GatheringStorm:IsAvailable() or S.Everfrost:IsAvailable()
+local VarERWPoolingTime = (Settings.Frost.AMSAbsorbPercent > 59) and 25 or 45
 local VarTrinket1Sync, VarTrinket2Sync
 local VarTrinket1Buffs, VarTrinket2Buffs
 local VarTrinketPriority
@@ -65,6 +66,10 @@ HL:RegisterForEvent(function()
   BossFightRemains = 11111
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
+
+HL:RegisterForEvent(function()
+  VarRWBuffs = S.GatheringStorm:IsAvailable() or S.Everfrost:IsAvailable()
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -136,9 +141,11 @@ local function Precombat()
   -- variable,name=trinket_2_manual,value=trinket.2.is.algethar_puzzle_box
   -- TODO: Trinket sync/priority stuff. Currently unable to pull trinket CD durations because WoW's API is bad.
   -- variable,name=rw_buffs,value=talent.gathering_storm|talent.everfrost
-  VarRWBuffs = (S.GatheringStorm:IsAvailable() or S.Everfrost:IsAvailable())
+  -- Note: Handling during variable declaration and SPELLS_CHANGED/LEARNED_SPELL_IN_TAB events
   -- variable,name=2h_check,value=main_hand.2h
-  Var2HCheck = (Using2H)
+  -- Note: Handling during variable declaration and PLAYER_EQUIPMENT_CHANGED events
+  -- variable,name=erw_pooling_time,op=setif,value=25,value_else=45,condition=death_knight.ams_absorb_percent>0.59
+  VarERWPoolingTime = (Settings.Frost.AMSAbsorbPercent > 59) and 25 or 45
   -- Manually added openers: HowlingBlast if at range, RemorselessWinter if in melee
   if S.HowlingBlast:IsReady() and not Target:IsInRange(8) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast precombat 2"; end
@@ -308,8 +315,8 @@ local function Cooldowns()
   if S.EmpowerRuneWeapon:IsCastable() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.EmpowerRuneWeaponBuff) and Player:Rune() < 6 and (S.PillarofFrost:CooldownRemains() < 7 and (VarAddsRemain or VarSTPlanning) or Player:BuffUp(S.PillarofFrostBuff)) or FightRemains < 20) then
     if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 4"; end
   end
-  -- empower_rune_weapon,use_off_gcd=1,if=buff.breath_of_sindragosa.up&talent.breath_of_sindragosa&!buff.empower_rune_weapon.up&runic_power<70&rune<3&(cooldown.breath_of_sindragosa.remains>40|full_recharge_time<10)
-  if S.EmpowerRuneWeapon:IsCastable() and (Player:BuffUp(S.BreathofSindragosa) and S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.EmpowerRuneWeaponBuff) and Player:RunicPower() < 70 and Player:Rune() < 3 and (S.BreathofSindragosa:CooldownRemains() > 40 or S.EmpowerRuneWeapon:FullRechargeTime() < 10)) then
+  -- empower_rune_weapon,use_off_gcd=1,if=buff.breath_of_sindragosa.up&!buff.empower_rune_weapon.up&(time<10&buff.bloodlust.up)|(runic_power<70&rune<3&(cooldown.breath_of_sindragosa.remains>variable.erw_pooling_time|full_recharge_time<10))
+  if S.EmpowerRuneWeapon:IsCastable() and (Player:BuffUp(S.BreathofSindragosa) and Player:BuffDown(S.EmpowerRuneWeaponBuff) and (HL.CombatTime() < 10 and Player:BloodlustUp()) or (Player:RunicPower() < 70 and Player:Rune() < 3 and (S.BreathofSindragosa:CooldownRemains() > VarERWPoolingTime or S.EmpowerRuneWeapon:FullRechargeTime() < 10))) then
     if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 6"; end
   end
   -- empower_rune_weapon,use_off_gcd=1,if=!talent.breath_of_sindragosa&!talent.obliteration&!buff.empower_rune_weapon.up&rune<5&(cooldown.pillar_of_frost.remains_expected<7|buff.pillar_of_frost.up|!talent.pillar_of_frost)

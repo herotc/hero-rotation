@@ -74,6 +74,7 @@ HR.GUISettings.APL.DeathKnight = {
   },
   Frost = {
     DisableBoSPooling = false,
+    AMSAbsorbPercent = 0,
     PotionType = {
       Selected = "Power",
     },
@@ -140,6 +141,7 @@ CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood")
 
 --Frost Panels
 CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.DisableBoSPooling", "Disable BoS Pooling", "Enable this option to bypass the BoS Pooling function.")
+CreatePanelOption("Slider", CP_Frost, "APL.DeathKnight.Frost.AMSAbsorbPercent", {0, 100, 1}, "AMS Absorb Percentage", "Set this to the average percentage of AMS's absorb shield that is actively used on any given cast of AMS. Leave at 0 if unsure.")
 CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost")
 
 --Unholy Panels
