@@ -72,6 +72,7 @@ HR.GUISettings.APL.Warrior = {
     }
   },
   Protection = {
+    AllowIPOvercap = false,
     RageCapValue = 80,
     PotionType = {
       Selected = "Power",
@@ -112,4 +113,5 @@ CreateARPanelOptions(CP_Fury, "APL.Warrior.Fury")
 
 -- Protection Settings
 CreatePanelOption("Slider", CP_Protection, "APL.Warrior.Protection.RageCapValue", {30, 100, 5}, "Rage Cap Value", "Set the highest amount of Rage we should allow to pool before dumping Rage with Ignore Pain. Setting this value to 30 will allow you to over-cap Rage.")
+CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.AllowIPOvercap", "Allow Ignore Pain Overcap", "Enable this option to allow Ignore Pain to be suggested, even when it would push the absorb over its maximum absorb value.")
 CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection")

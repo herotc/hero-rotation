@@ -60,12 +60,12 @@ end
 
 local function IgnorePainWillNotCap()
   if Player:BuffUp(S.IgnorePain) then
-    local absorb = Player:AttackPowerDamageMod() * 3.5 * (1 + Player:VersatilityDmgPct() / 100)
-    local spellTable = Player:AuraInfo(S.IgnorePain, nil, true)
-    local IPAmount = spellTable.points[1]
-    --return IPAmount < (0.5 * mathfloor(absorb * 1.3))
-    -- Ignore Pain appears to cap at 2 times its absorb value now
-    return IPAmount < absorb
+    local NewAbsorb = Player:AttackPowerDamageMod() * 4.375 * (1 + Player:VersatilityDmgPct() / 100)
+    local IPBuffTable = Player:AuraInfo(S.IgnorePain, nil, true)
+    local OldAbsorb = IPBuffTable.points[1]
+    -- Ignore Pain appears to cap at 30% of player's max health
+    -- https://github.com/simulationcraft/simc/blob/dragonflight/engine/class_modules/sc_warrior.cpp#L7789 as of Sept 21, 2023
+    return Settings.Protection.AllowIPOvercap or OldAbsorb + NewAbsorb < Player:MaxHealth() * 0.3
   else
     return true
   end
