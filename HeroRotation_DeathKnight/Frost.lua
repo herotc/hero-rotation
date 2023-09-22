@@ -39,6 +39,15 @@ local OnUseExcludes = {
   I.AlgetharPuzzleBox:ID(),
 }
 
+-- GUI Settings
+local Everyone = HR.Commons.Everyone
+local Settings = {
+  General = HR.GUISettings.General,
+  Commons = HR.GUISettings.APL.DeathKnight.Commons,
+  Commons2 = HR.GUISettings.APL.DeathKnight.Commons2,
+  Frost = HR.GUISettings.APL.DeathKnight.Frost
+}
+
 -- Rotation Var
 local no_heal
 local UsingRazorice
@@ -70,15 +79,6 @@ end, "PLAYER_REGEN_ENABLED")
 HL:RegisterForEvent(function()
   VarRWBuffs = S.GatheringStorm:IsAvailable() or S.Everfrost:IsAvailable()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
-
--- GUI Settings
-local Everyone = HR.Commons.Everyone
-local Settings = {
-  General = HR.GUISettings.General,
-  Commons = HR.GUISettings.APL.DeathKnight.Commons,
-  Commons2 = HR.GUISettings.APL.DeathKnight.Commons2,
-  Frost = HR.GUISettings.APL.DeathKnight.Frost
-}
 
 -- Stun Interrupts List
 local StunInterrupts = {
