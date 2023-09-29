@@ -391,7 +391,7 @@ local function Opener()
     end
   end
   -- power_infusion,if=buff.voidform.up|buff.dark_ascension.up
-  if S.PowerInfusion:IsCastable() and Settings.Shadow.SelfPI and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscension)) then
+  if CDsON() and S.PowerInfusion:IsCastable() and Settings.Shadow.SelfPI and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscension)) then
     if Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "power_infusion opener 14"; end
   end
   -- use_items
