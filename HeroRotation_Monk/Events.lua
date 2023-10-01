@@ -173,7 +173,7 @@ HL:RegisterForCombatEvent(
     local DestGUID, _, _, _, SpellID, _, _, Amount = select(8, ...)
     if Cache.Persistent.Player.Spec[1] == 268 and DestGUID == Player:GUID() then
       -- Damage is coming from our Stagger
-      if SpellID == STaggerDoTID and Amount and Amount > 0 then
+      if SpellID == StaggerDoTID and Amount and Amount > 0 then
         -- Add to our table of Stagger damage taken
         RegisterStaggerDamageTaken(Amount)
       -- Damage is from some other source
