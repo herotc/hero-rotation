@@ -252,7 +252,7 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   -- Manually added: Group buff check
-  if S.PowerWordFortitude:IsCastable() and (Player:BuffDown(S.PowerWordFortitudeBuff, true) or Everyone.GroupBuffMissing(S.PowerWordFortitudeBuff)) then
+  if S.PowerWordFortitude:IsCastable() and Everyone.GroupBuffMissing(S.PowerWordFortitudeBuff) then
     if Cast(S.PowerWordFortitude, Settings.Commons.GCDasOffGCD.PowerWordFortitude) then return "power_word_fortitude precombat 2"; end
   end
   -- shadowform,if=!buff.shadowform.up

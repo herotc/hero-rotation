@@ -509,7 +509,7 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- arcane_intellect
     -- Note: moved outside of precombat
-    if S.ArcaneIntellect:IsCastable() and (Player:BuffDown(S.ArcaneIntellect, true) or Everyone.GroupBuffMissing(S.ArcaneIntellect)) then
+    if S.ArcaneIntellect:IsCastable() and Everyone.GroupBuffMissing(S.ArcaneIntellect) then
       if Cast(S.ArcaneIntellect, Settings.Commons.GCDasOffGCD.ArcaneIntellect) then return "arcane_intellect group_buff"; end
     end
     -- call precombat
