@@ -410,7 +410,7 @@ local function APL()
     end
     -- abomination_limb
     if CDsON() and S.AbominationLimb:IsCastable() then
-      if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.AbominationLimb)) then return "abomination_limb main 22"; end
+      if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(20)) then return "abomination_limb main 22"; end
     end
     -- dancing_rune_weapon,if=!buff.dancing_rune_weapon.up
     if CDsON() and S.DancingRuneWeapon:IsCastable() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
