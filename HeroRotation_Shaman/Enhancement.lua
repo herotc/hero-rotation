@@ -90,19 +90,19 @@ local function AlphaWolfMinRemains()
 end
 
 local function EvaluateCycleFlameShock(TargetUnit)
-  return (TargetUnit:DebuffRefreshable(S.FlameShockDebuff))
+  return TargetUnit:DebuffRefreshable(S.FlameShockDebuff)
 end
 
 local function EvaluateTargetIfFilterPrimordialWave(TargetUnit)
-  return (TargetUnit:DebuffRemains(S.FlameShockDebuff))
+  return TargetUnit:DebuffRemains(S.FlameShockDebuff)
 end
 
 local function EvaluateTargetIfPrimordialWave(TargetUnit)
-  return (Player:BuffDown(S.PrimordialWaveBuff))
+  return Player:BuffDown(S.PrimordialWaveBuff)
 end
 
 local function EvaluateTargetIfFilterLavaLash(TargetUnit)
-  return (Target:DebuffRemains(S.LashingFlamesDebuff))
+  return TargetUnit:DebuffRemains(S.LashingFlamesDebuff)
 end
 
 local function Precombat()
