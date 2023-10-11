@@ -276,8 +276,8 @@ local function St()
   if S.Sunfire:IsCastable() then
     if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireST, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire st 2"; end
   end
-  -- variable,name=cd_condition_st,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>15|fight_remains<25+10*talent.incarnation_chosen_of_elune))
-  VarCDConditionST = CDsON() and (CaInc:CooldownRemains() < 5 and not CAIncBuffUp and (Target:TimeToDie() > 15 or FightRemains < 25 + 10 * num(S.Incarnation:IsAvailable())))
+  -- variable,name=cd_condition_st,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>15&buff.primordial_arcanic_pulsar.value<480|fight_remains<25+10*talent.incarnation_chosen_of_elune))
+  VarCDConditionST = CDsON() and (CaInc:CooldownRemains() < 5 and not CAIncBuffUp and (Target:TimeToDie() > 15 and PAPValue < 480 or FightRemains < 25 + 10 * num(S.Incarnation:IsAvailable())))
   -- moonfire,target_if=refreshable&remains<2&(target.time_to_die-remains)>6
   if S.Moonfire:IsCastable() then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireST, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire st 6"; end
@@ -408,8 +408,8 @@ local function AoE()
   if S.Moonfire:IsCastable() and (DungeonRoute) then
     if Everyone.CastCycle(S.Moonfire, Enemies40y, EvaluateCycleMoonfireAoE, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire aoe 2"; end
   end
-  -- variable,name=cd_condition_aoe,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>10|fight_remains<25+10*talent.incarnation_chosen_of_elune))
-  VarCDConditionAoE = CDsON() and (CaInc:CooldownRemains() < 5 and not CAIncBuffUp and (Target:TimeToDie() > 10 or FightRemains < 25 + 10 * num(S.Incarnation:IsAvailable())))
+  -- variable,name=cd_condition_aoe,value=!druid.no_cds&(cooldown.ca_inc.remains<5&!buff.ca_inc.up&(target.time_to_die>10&buff.primordial_arcanic_pulsar.value<500|fight_remains<25+10*talent.incarnation_chosen_of_elune))
+  VarCDConditionAoE = CDsON() and (CaInc:CooldownRemains() < 5 and not CAIncBuffUp and (Target:TimeToDie() > 10 and PAPValue < 500 or FightRemains < 25 + 10 * num(S.Incarnation:IsAvailable())))
   -- sunfire,target_if=refreshable&(target.time_to_die-remains)>6-(spell_targets%2)&astral_power.deficit>variable.passive_asp+3
   if S.Sunfire:IsCastable() then
     if Everyone.CastCycle(S.Sunfire, Enemies40y, EvaluateCycleSunfireAoE, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire aoe 4"; end
@@ -634,7 +634,7 @@ local function APL()
 end
 
 local function OnInit()
-  HR.Print("Balance Druid rotation is currently a work in progress, but has been updated for patch 10.1.5.")
+  HR.Print("Balance Druid rotation is currently a work in progress, but has been updated for patch 10.1.7.")
 end
 
 HR.SetAPL(102, APL, OnInit)
