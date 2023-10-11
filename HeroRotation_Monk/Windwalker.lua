@@ -42,6 +42,7 @@ local OnUseExcludes = {
   I.Djaruun:ID(),
   I.DragonfireBombDispenser:ID(),
   I.EruptingSpearFragment:ID(),
+  I.IrideusFragment:ID(),
   I.ManicGrieftorch:ID(),
 }
 

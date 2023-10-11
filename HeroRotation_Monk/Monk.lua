@@ -215,6 +215,7 @@ Item.Monk.Commons = {
   BeacontotheBeyond                     = Item(203963, {13, 14}),
   DragonfireBombDispenser               = Item(202610, {14, 14}),
   EruptingSpearFragment                 = Item(193769, {13, 14}),
+  IgneusFragment                        = Item(193743, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
   -- Other On-Use Items
   Djaruun                               = Item(202569),
