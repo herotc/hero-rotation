@@ -114,6 +114,7 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   TimeAnomaly                           = Spell(383243),
   TouchoftheMagi                        = Spell(321507), --Splash, 8
   -- Buffs
+  ArcaneArtilleryBuff                   = Spell(424331), -- Tier 31 4pc
   ArcaneFamiliarBuff                    = Spell(210126),
   ArcaneHarmonyBuff                     = Spell(384455),
   ArcaneOverloadBuff                    = Spell(409022), -- Tier 30 4pc
@@ -222,7 +223,10 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Commons = {
   -- Trinkets
+  AshesoftheEmbersoul                   = Item(207167, {13, 14}),
+  BalefireBranch                        = Item(159630, {13, 14}),
   BeacontotheBeyond                     = Item(203963, {13, 14}),
+  BelorrelostheSuncaller                = Item(207172, {13, 14}),
   ConjuredChillglobe                    = Item(194300, {13, 14}),
   DesperateInvokersCodex                = Item(194310, {13, 14}),
   DMDDance                              = Item(198088, {13, 14}),
@@ -236,16 +240,21 @@ Item.Mage.Commons = {
   HornofValor                           = Item(133642, {13, 14}),
   IcebloodDeathsnare                    = Item(194304, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
+  MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
   MoonlitPrism                          = Item(137541, {13, 14}),
   NeltharionsCalltoChaos                = Item(204201, {13, 14}),
+  NymuesUnravelingSpindle               = Item(208615, {13, 14}),
+  SeaStar                               = Item(56290, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
+  TimeThiefsGambit                      = Item(207579, {13, 14}),
   TomeofUnstablePower                   = Item(193628, {13, 14}),
   VoidmendersShadowgem                  = Item(110007, {13, 14}),
   -- Gladiator's Badges
   CrimsonGladiatorsBadge                = Item(201807, {13, 14}),
   ObsidianGladiatorsBadge               = Item(205708, {13, 14}),
   -- Other On-Use Items
+  Dreambinder                           = Item(208616),
 }
 
 Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
