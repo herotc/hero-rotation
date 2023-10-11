@@ -44,6 +44,7 @@ local ActiveMitigationNeeded
 local IsTanking
 local Enemies8y, Enemies30y
 local EnemiesCount8y, EnemiesCount30y
+local VarSanctificationMaxStack = 5
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -171,6 +172,10 @@ local function Trinkets()
 end
 
 local function Standard()
+  -- consecration,if=buff.sanctification.stack=buff.sanctification.max_stack
+  if S.Consecration:IsCastable() and (Player:BuffStack(S.SanctificationBuff) == VarSanctificationMaxStack) then
+    if Cast(S.Consecration) then return "consecration standard 1"; end
+  end
   -- shield_of_the_righteous,if=(!talent.righteous_protector.enabled|cooldown.righteous_protector_icd.remains=0)&(buff.bastion_of_light.up|buff.divine_purpose.up|holy_power>2)
   -- TODO: Find a way to track RighteousProtector ICD.
   if S.ShieldoftheRighteous:IsReady() and (Player:BuffUp(S.BastionofLightBuff) or Player:BuffUp(S.DivinePurposeBuff) or Player:HolyPower() > 2) then
@@ -244,8 +249,8 @@ local function Standard()
       if Cast(S.WordofGlory, Settings.Protection.GCDasOffGCD.WordOfGlory) then return "word_of_glory standard self 32"; end
     end
   end
-  -- consecration
-  if S.Consecration:IsCastable() then
+  -- consecration,if=!buff.sanctification_empower.up
+  if S.Consecration:IsCastable() and (Player:BuffDown(S.SanctificationEmpowerBuff)) then
     if Cast(S.Consecration) then return "consecration standard 34"; end
   end
 end

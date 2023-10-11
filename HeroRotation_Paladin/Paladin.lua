@@ -93,6 +93,8 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   BastionofLightBuff                    = Spell(378974),
   GuardianofAncientKingsBuff            = MultiSpell(86659,212641),
   MomentofGloryBuff                     = Spell(327193),
+  SanctificationBuff                    = Spell(424616), -- T31, 2pc
+  SanctificationEmpowerBuff             = Spell(424622), -- T31, 2pc
   SentinelBuff                          = Spell(389539),
   ShiningLightFreeBuff                  = Spell(327510),
   -- Debuffs
