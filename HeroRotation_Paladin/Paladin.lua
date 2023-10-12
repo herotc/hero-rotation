@@ -178,7 +178,7 @@ Item.Paladin.Protection = MergeTableByKey(Item.Paladin.Commons, {
 
 Item.Paladin.Retribution = MergeTableByKey(Item.Paladin.Commons, {
   -- Other On-Use Items
-  ShadowedRazingAnnihilator             = Item(205046),
+  ShadowedRazingAnnihilator             = Item(205046, {16}),
 })
 
 Item.Paladin.Holy = MergeTableByKey(Item.Paladin.Commons, {

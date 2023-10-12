@@ -254,7 +254,7 @@ Item.Mage.Commons = {
   CrimsonGladiatorsBadge                = Item(201807, {13, 14}),
   ObsidianGladiatorsBadge               = Item(205708, {13, 14}),
   -- Other On-Use Items
-  Dreambinder                           = Item(208616),
+  Dreambinder                           = Item(208616, {16}),
 }
 
 Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {

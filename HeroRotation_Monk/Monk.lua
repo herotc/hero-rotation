@@ -218,7 +218,7 @@ Item.Monk.Commons = {
   IrideusFragment                       = Item(193743, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
   -- Other On-Use Items
-  Djaruun                               = Item(202569),
+  Djaruun                               = Item(202569, {16}),
 }
 
 Item.Monk.Windwalker = MergeTableByKey(Item.Monk.Commons, {

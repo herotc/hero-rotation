@@ -139,7 +139,7 @@ Item.Evoker.Commons = {
   -- Trinkets
   CrimsonAspirantsBadgeofFerocity       = Item(201449, {13, 14}),
   -- Items
-  KharnalexTheFirstLight                = Item(195519),
+  KharnalexTheFirstLight                = Item(195519, {16}),
   -- Trinkets
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   -- Trinkets (SL)

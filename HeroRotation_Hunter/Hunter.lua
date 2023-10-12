@@ -231,7 +231,7 @@ Item.Hunter.Commons = {
   StormeatersBoon                       = Item(194302, {13, 14}),
   WindscarWhetstone                     = Item(137486, {13, 14}),
   -- Other On-Use Items
-  Djaruun                               = Item(202569),
+  Djaruun                               = Item(202569, {16}),
 }
 
 Item.Hunter.BeastMastery = MergeTableByKey(Item.Hunter.Commons, {

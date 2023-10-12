@@ -252,8 +252,8 @@ Item.Druid.Commons = {
   MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   -- Other On-Use Items
-  Djaruun                               = Item(202569),
-  Jotungeirr                            = Item(186404),
+  Djaruun                               = Item(202569, {16}),
+  Jotungeirr                            = Item(186404, {16}),
 }
 
 Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
