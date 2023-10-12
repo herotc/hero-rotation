@@ -230,6 +230,10 @@ local function Generators()
   if (HolyPower >= 5 or (Target:DebuffUp(S.JudgmentDebuff) or HolyPower == 4) and Player:BuffUp(S.DivineResonanceBuff)) then
     local ShouldReturn = Finishers(); if ShouldReturn then return ShouldReturn; end
   end
+  -- blade_of_justice,if=!dot.expurgation.ticking&holy_power<=3&set_bonus.tier31_2pc
+  if S.BladeofJustice:IsCastable() and (Target:DebuffDown(S.ExpurgationDebuff) and HolyPower <= 3 and Player:HasTier(31, 2)) then
+    if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice generators 1"; end
+  end
   -- wake_of_ashes,if=holy_power<=2&(cooldown.avenging_wrath.remains|cooldown.crusade.remains)&(!talent.execution_sentence|cooldown.execution_sentence.remains>4|target.time_to_die<8)&(!raid_event.adds.exists|raid_event.adds.in>20|raid_event.adds.up)
   if S.WakeofAshes:IsCastable() and (HolyPower <= 2 and (S.AvengingWrath:CooldownDown() or S.Crusade:CooldownDown()) and (not S.ExecutionSentence:IsAvailable() or S.ExecutionSentence:CooldownRemains() > 4 or FightRemains < 8)) then
     if Cast(S.WakeofAshes, nil, nil, not Target:IsInMeleeRange(14)) then return "wake_of_ashes generators 2"; end
@@ -237,6 +241,10 @@ local function Generators()
   -- divine_toll,if=holy_power<=2&!debuff.judgment.up&(!raid_event.adds.exists|raid_event.adds.in>30|raid_event.adds.up)&(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15|fight_remains<8)
   if S.DivineToll:IsCastable() and (HolyPower <= 2 and Target:DebuffDown(S.JudgmentDebuff) and (S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15 or FightRemains < 8)) then
     if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll generators 4"; end
+  end
+  -- judgment,if=dot.expurgation.ticking&holy_power<=3&set_bonus.tier31_4pc&!buff.echoes_of_wrath.up
+  if S.Judgment:IsReady() and (Target:DebuffUp(S.ExpurgationDebuff) and HolyPower <= 3 and Player:HasTier(31, 4) and Player:BuffDown(S.EchoesofWrathBuff)) then
+    if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment generators 5"; end
   end
   -- call_action_list,name=finishers,if=holy_power>=3&buff.crusade.up&buff.crusade.stack<10
   if (HolyPower >= 3 and Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
@@ -371,7 +379,7 @@ local function APL()
 end
 
 local function OnInit()
-  HR.Print("Retribution Paladin rotation is currently a work in progress, but has been updated for patch 10.1.5.")
+  HR.Print("Retribution Paladin rotation is currently a work in progress, but has been updated for patch 10.1.7.")
 end
 
 HR.SetAPL(70, APL, OnInit)
