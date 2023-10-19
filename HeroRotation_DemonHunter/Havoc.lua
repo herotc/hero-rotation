@@ -208,7 +208,7 @@ local function Cooldown()
       if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldown 12"; end
     end
     -- use_item,name=irideus_fragment,use_off_gcd=1,if=cooldown.metamorphosis.remains<=gcd.max&time>2|fight_remains%%180>10&fight_remains%%180<22|fight_remains<22
-    if I.IrideusFragment:IsEquippedAndReady() and (S.Metamorphosis:CooldownRemains() <= GCDMax and CombatTime > 2 and FightRemains % 180 > 10 and FightRemains % 180 < 22 or FightRemains < 22) then
+    if I.IrideusFragment:IsEquippedAndReady() and (S.Metamorphosis:CooldownRemains() <= GCDMax and CombatTime > 2 or FightRemains % 180 > 10 and FightRemains % 180 < 22 or FightRemains < 22) then
       if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment cooldown 14"; end
     end
     -- use_item,name=stormeaters_boon,use_off_gcd=1,if=cooldown.metamorphosis.remains&(!talent.momentum|buff.momentum.remains>5)&(active_enemies>1|raid_event.adds.in>140)
