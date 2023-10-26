@@ -224,7 +224,7 @@ local function Cooldown()
       -- Note: Keeping the two below variables in case a later APL change wants DBDCharges
       -- local DBDSpell = I.DragonfireBombDispenser:OnUseSpell()
       -- local DBDCharges = DBDSpell and DBDSpell:Charges() or 0
-      if (Target:TimeToDie() < 30 or I.BeacontotheBeyond:IsEquipped() or I.IrideusFragment:IsEquipped()) and (trinket1:CooldownRemains() > 10 or trinket2:CooldownRemains() > 10 or trinket1:Cooldown() == 0 or trinket2:Cooldown() == 0 or I.ElementiumPocketAnvil:IsEquipped() or I.ScreamingBlackDragonscale:IsEquipped() or I.MarkofDargrul:IsEquipped()) or (trinket1:Cooldown() > 0 and trinket2:Cooldown() > 0) and (trinket1:CooldownDown() or trinket2:CooldownDown()) and not I.ElementiumPocketAnvil:IsEquipped() and CombatTime < 25 then
+      if (Target:TimeToDie() < 30 or S.VengefulRetreat:CooldownRemains() < 5 or I.BeacontotheBeyond:IsEquipped() or I.IrideusFragment:IsEquipped()) and (trinket1:CooldownRemains() > 10 or trinket2:CooldownRemains() > 10 or trinket1:Cooldown() == 0 or trinket2:Cooldown() == 0 or I.ElementiumPocketAnvil:IsEquipped() or I.ScreamingBlackDragonscale:IsEquipped() or I.MarkofDargrul:IsEquipped()) or (trinket1:Cooldown() > 0 or trinket2:Cooldown() > 0) and (trinket1:CooldownDown() or trinket2:CooldownDown()) and not I.ElementiumPocketAnvil:IsEquipped() and CombatTime < 25 then
         if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser cooldown 20"; end
       end
     end
