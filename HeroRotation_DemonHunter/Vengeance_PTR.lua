@@ -179,8 +179,8 @@ local function Precombat()
   -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|(trinket.2.has_buff.strength|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit)
   -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon
   -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
-  -- sigil_of_flame
-  if S.SigilofFlame:IsCastable() then
+  -- sigil_of_flame,if=!talent.fiery_demise
+  if S.SigilofFlame:IsCastable() and (not S.FieryDemise:IsAvailable()) then
     if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame precombat 2"; end
   end
   -- immolation_aura
@@ -296,21 +296,25 @@ local function APL()
     end
     -- fel_devastation,if=!talent.fiery_demise.enabled
     if S.FelDevastation:IsReady() and (not S.FieryDemise:IsAvailable()) then
-    if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation main 6"; end
-  end
+      if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation main 6"; end
+    end
+    -- fiery_brand,if=((remains<tick_time|!ticking)&talent.fiery_demise)
+    if S.FieryBrand:IsCastable() and ((Target:DebuffRemains(S.FieryBrandDebuff) < S.FieryBrandDebuff:TickTime() or Target:DebuffDown(S.FieryBrandDebuff)) and S.FieryDemise:IsAvailable()) then
+      if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand main 8"; end
+    end
     -- fiery_brand,if=!talent.fiery_demise.enabled&!ticking
     if S.FieryBrand:IsCastable() and (not S.FieryDemise:IsAvailable() and Target:DebuffDown(S.FieryBrandDebuff)) then
-    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand main 8"; end
-  end
+      if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand main 10"; end
+    end
     -- bulk_extraction
     if S.BulkExtraction:IsCastable() then
-      if Cast(S.BulkExtraction, Settings.Vengeance.GCDasOffGCD.BulkExtraction, nil, not Target:IsInMeleeRange(8)) then return "bulk_extraction main 10"; end
+      if Cast(S.BulkExtraction, Settings.Vengeance.GCDasOffGCD.BulkExtraction, nil, not Target:IsInMeleeRange(8)) then return "bulk_extraction main 12"; end
     end
     -- potion
     if Settings.Commons.Enabled.Potions then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 12"; end
+        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 14"; end
       end
     end
     -- invoke_external_buff,name=power_infusion
@@ -319,32 +323,28 @@ local function APL()
     local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=racials
     local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
-    -- the_hunt
-    if S.TheHunt:IsCastable() then
-      if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt main 14"; end
-    end
-    -- elysian_decree
-    if S.ElysianDecree:IsCastable() then
-      if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree main 16"; end
-    end
-    -- soul_carver,if=(!talent.fiery_demise|(talent.fiery_demise&dot.fiery_brand.ticking))&soul_fragments<=2
-    if S.SoulCarver:IsCastable() and ((not S.FieryDemise:IsAvailable() or (S.FieryDemise:IsAvailable() and Target:DebuffUp(S.FieryBrandDebuff))) and SoulFragments <= 2) then
-      if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver main 18"; end
-    end
     -- sigil_of_flame
     if S.SigilofFlame:IsCastable() then
-      if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame main 20"; end
+      if Cast(S.SigilofFlame, Settings.Commons.GCDasOffGCD.SigilOfFlame, nil, not Target:IsInRange(30)) then return "sigil_of_flame main 16"; end
     end
     -- fel_devastation
     if S.FelDevastation:IsReady() then
-      if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation main 22"; end
+      if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation main 18"; end
     end
-    -- fiery_brand,if=((remains<tick_time|!ticking)&talent.fiery_demise)
-    if S.FieryBrand:IsCastable() and ((Target:DebuffRemains(S.FieryBrandDebuff) < S.FieryBrandDebuff:TickTime() or Target:DebuffDown(S.FieryBrandDebuff)) and S.FieryDemise:IsAvailable()) then
-      if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand main 24"; end
+    -- the_hunt
+    if S.TheHunt:IsCastable() then
+      if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt main 20"; end
     end
-    -- immolation_aura,if=dot.fiery_brand.ticking&talent.charred_flesh
-    if S.ImmolationAura:IsCastable() and (Target:DebuffUp(S.FieryBrandDebuff) and S.CharredFlesh:IsAvailable()) then
+    -- elysian_decree
+    if S.ElysianDecree:IsCastable() then
+      if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree main 22"; end
+    end
+    -- soul_carver,if=(!talent.fiery_demise|(talent.fiery_demise&dot.fiery_brand.ticking))&soul_fragments<=2
+    if S.SoulCarver:IsCastable() and ((not S.FieryDemise:IsAvailable() or (S.FieryDemise:IsAvailable() and Target:DebuffUp(S.FieryBrandDebuff))) and SoulFragments <= 2) then
+      if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver main 24"; end
+    end
+    -- immolation_aura,if=(dot.fiery_brand.ticking|dot.sigil_of_flame.ticking)&talent.charred_flesh
+    if S.ImmolationAura:IsCastable() and ((Target:DebuffUp(S.FieryBrandDebuff) or Target:DebuffUp(S.SigilofFlameDebuff)) and S.CharredFlesh:IsAvailable()) then
       if Cast(S.ImmolationAura) then return "immolation_aura main 26"; end
     end
     -- felblade,if=fury.deficit>=40
@@ -383,7 +383,7 @@ end
 local function Init()
   S.FieryBrandDebuff:RegisterAuraTracking()
 
-  HR.Print("Vengeance DH rotation is currently a work in progress, but has been updated for patch 10.2.")
+  HR.Print("Vengeance DH rotation is currently a work in progress, but has been updated for patch 10.2.0.")
 end
 
 HR.SetAPL(581, APL, Init);
