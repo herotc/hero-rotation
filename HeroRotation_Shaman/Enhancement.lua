@@ -134,7 +134,7 @@ local function Precombat()
 end
 
 local function Single()
-  -- primordial_wave,if=!dot.flame_shock.ticking&talent.lashing_flames.enabled&(raid_event.adds.in>42|raid_event.adds.in<6)
+  -- primordial_wave,if=!dot.flame_shock.ticking&talent.lashing_flames.enabled&(raid_event.adds.in>(action.primordial_wave.cooldown%(1+set_bonus.tier31_4pc))|raid_event.adds.in<6)
   if S.PrimordialWave:IsReady() and CDsON() and (Target:DebuffUp(S.FlameShockDebuff) and S.LashingFlames:IsAvailable()) then
     if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single 2"; end
   end
@@ -146,7 +146,7 @@ local function Single()
   if S.ElementalBlast:IsReady() and (MaelstromStacks >= 5 and S.ElementalSpirits:IsAvailable()) then
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 6"; end
   end
-  -- sundering,if=set_bonus.tier30_2pc&raid_event.adds.in>=40
+  -- sundering,if=set_bonus.tier30_2pc&raid_event.adds.in>=action.sundering.cooldown
   if S.Sundering:IsReady() and CDsON() and (Player:HasTier(30, 2)) then
     if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInMeleeRange(11)) then return "sundering single 8"; end
   end
@@ -199,7 +199,7 @@ local function Single()
     if S.IceStrike:IsReady() then
       if Cast(S.IceStrike, nil, nil, not Target:IsSpellInRange(S.IceStrike)) then return "ice_strike single 32"; end
     end
-    -- sundering,if=buff.doom_winds.up&raid_event.adds.in>=40
+    -- sundering,if=buff.doom_winds.up&raid_event.adds.in>=action.sundering.cooldown
     if S.Sundering:IsReady() and CDsON() then
       if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInMeleeRange(11)) then return "sundering single 34"; end
     end
@@ -208,7 +208,7 @@ local function Single()
   if S.CrashLightning:IsReady() and (Player:BuffUp(S.DoomWindsBuff) or (S.AlphaWolf:IsAvailable() and Player:BuffUp(S.FeralSpiritBuff) and AlphaWolfMinRemains() == 0)) then
     if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInMeleeRange(8)) then return "crash_lightning single 36"; end
   end
-  -- primordial_wave,if=raid_event.adds.in>42|raid_event.adds.in<6
+  -- primordial_wave,if=raid_event.adds.in>(action.primordial_wave.cooldown%(1+set_bonus.tier31_4pc))|raid_event.adds.in<6
   if S.PrimordialWave:IsReady() and CDsON() then
     if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single 38"; end
   end
@@ -244,7 +244,7 @@ local function Single()
   if S.Stormstrike:IsReady() then
     if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 54"; end
   end
-  -- sundering,if=raid_event.adds.in>=40
+  -- sundering,if=raid_event.adds.in>=action.sundering.cooldown
   if S.Sundering:IsReady() and CDsON() then
     if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInMeleeRange(11)) then return "sundering single 56"; end
   end
@@ -668,6 +668,10 @@ local function APL()
     end
     -- invoke_external_buff,name=power_infusion,if=(buff.ascendance.up|buff.feral_spirit.up|buff.doom_winds.up|(fight_remains%%120<=20)|(variable.min_talented_cd_remains>=120)|(!talent.ascendance.enabled&!talent.feral_spirit.enabled&!talent.doom_winds.enabled))
     -- Note: Not handling external PI.
+    -- primordial_wave,if=set_bonus.tier31_2pc&(raid_event.adds.in>(action.primordial_wave.cooldown%(1+set_bonus.tier31_4pc))|raid_event.adds.in<6)
+    if S.PrimordialWave:IsReady() and (Player:HasTier(31, 2)) then
+      if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave main 21"; end
+    end
     -- feral_spirit
     if S.FeralSpirit:IsCastable() and CDsON() then
       if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit main 22"; end
