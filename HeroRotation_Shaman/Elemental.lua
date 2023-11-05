@@ -447,12 +447,14 @@ local function SingleTarget()
   if S.Earthquake:IsReady() and (Shaman.Targets > 1 and Shaman.ClusterTargets > 1 and not S.EchoesofGreatSundering:IsAvailable() and not S.ElementalBlast:IsAvailable()) then
     if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 62"; end
   end
-  -- elemental_blast
-  if S.ElementalBlast:IsViable() then
+  -- elemental_blast,if=!set_bonus.tier31_2pc&!set_bonus.tier31_4pc
+  -- Note: Not having the 2pc covers not having the 4pc in our code.
+  if S.ElementalBlast:IsViable() and (not Player:HasTier(31, 2)) then
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_target 64"; end
   end
-  -- earth_shock
-  if S.EarthShock:IsReady() then
+  -- earth_shock,if=!set_bonus.tier31_2pc&!set_bonus.tier31_4pc
+  -- Note: Not having the 2pc covers not having the 4pc in our code.
+  if S.EarthShock:IsReady() and (not Player:HasTier(31, 2)) then
     if Cast(S.EarthShock, nil, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock single_target 66"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains>2,if=buff.flux_melting.up&active_enemies>1
@@ -463,13 +465,25 @@ local function SingleTarget()
   if S.LavaBurst:IsViable() and (Shaman.Targets == 1 and S.DeeplyRootedElements:IsAvailable()) then
     if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 70"; end
   end
+  -- lava_burst,if=set_bonus.tier31_2pc&set_bonus.tier31_4pc
+  if S.LavaBurst:IsViable() and (Player:HasTier(31, 4)) then
+    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 71"; end
+  end
+  -- elemental_blast,if=set_bonus.tier31_2pc&set_bonus.tier31_4pc
+  if S.ElementalBlast:IsViable() and (Player:HasTier(31, 4)) then
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_target 72"; end
+  end
+  -- earth_shock,if=set_bonus.tier31_2pc&set_bonus.tier31_4pc
+  if S.EarthShock:IsReady() and (Player:HasTier(31, 4)) then
+    if Cast(S.EarthShock, nil, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock single_target 73"; end
+  end
   -- frost_shock,if=buff.icefury.up&talent.flux_melting.enabled&!buff.flux_melting.up
   if S.FrostShock:IsCastable() and (Player:IcefuryP() and S.FluxMelting:IsAvailable() and Player:BuffDown(S.FluxMeltingBuff)) then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 72"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 74"; end
   end
   -- frost_shock,if=buff.icefury.up&(talent.electrified_shocks.enabled&debuff.electrified_shocks.remains<2|buff.icefury.remains<6)
   if S.FrostShock:IsCastable() and (Player:IcefuryP() and (S.ElectrifiedShocks:IsAvailable() and Target:DebuffRemains(S.ElectrifiedShocksDebuff) < 2 or Player:BuffRemains(S.IcefuryBuff) < 6)) then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 74"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 75"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains>2,if=talent.echo_of_the_elements.enabled|talent.lava_surge.enabled|talent.primordial_surge.enabled|!talent.elemental_blast.enabled|!talent.master_of_the_elements.enabled|buff.stormkeeper.up
   if S.LavaBurst:IsViable() and (S.EchooftheElements:IsAvailable() or S.LavaSurge:IsAvailable() or S.PrimordialSurge:IsAvailable() or not S.ElementalBlast:IsAvailable() or not S.MasteroftheElements:IsAvailable() or Player:StormkeeperP()) then
