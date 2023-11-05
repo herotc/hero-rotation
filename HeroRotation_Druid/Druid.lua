@@ -118,6 +118,7 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   BOATArcaneBuff                        = Spell(394050),
   BOATNatureBuff                        = Spell(394049),
   CABuff                                = Spell(383410),
+  DreamstateBuff                        = Spell(424248), -- T31 2pc
   IncarnationBuff                       = Spell(390414),
   PAPBuff                               = Spell(393961),
   RattledStarsBuff                      = Spell(393955),
