@@ -156,10 +156,6 @@ local function Precombat()
 end
 
 local function AoE()
-  -- remorseless_winter
-  if S.RemorselessWinter:IsReady() then
-    if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter aoe 2"; end
-  end
   -- howling_blast,if=buff.rime.react|!dot.frost_fever.ticking
   if S.HowlingBlast:IsReady() and (Player:BuffUp(S.RimeBuff) or Target:DebuffDown(S.FrostFeverDebuff)) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast aoe 4"; end
@@ -199,10 +195,6 @@ local function AoE()
 end
 
 local function Breath()
-  -- remorseless_winter,if=variable.rw_buffs|variable.adds_remain
-  if S.RemorselessWinter:IsReady() and (VarRWBuffs or VarAddsRemain) then
-    if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter breath 2"; end
-  end
   -- howling_blast,if=variable.rime_buffs&runic_power>(45-talent.rage_of_the_frozen_champion*8)
   if S.HowlingBlast:IsReady() and (VarRimeBuffs and Player:RunicPower() > (45 - num(S.RageoftheFrozenChampion:IsAvailable()) * 8)) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast breath 4"; end
@@ -315,8 +307,8 @@ local function Cooldowns()
   if S.EmpowerRuneWeapon:IsCastable() and (S.Obliteration:IsAvailable() and Player:BuffDown(S.EmpowerRuneWeaponBuff) and Player:Rune() < 6 and (S.PillarofFrost:CooldownRemains() < 7 and (VarAddsRemain or VarSTPlanning) or Player:BuffUp(S.PillarofFrostBuff)) or FightRemains < 20) then
     if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 4"; end
   end
-  -- empower_rune_weapon,use_off_gcd=1,if=buff.breath_of_sindragosa.up&!buff.empower_rune_weapon.up&(time<10&buff.bloodlust.up)|(runic_power<70&rune<3&(cooldown.breath_of_sindragosa.remains>variable.erw_pooling_time|full_recharge_time<10))
-  if S.EmpowerRuneWeapon:IsCastable() and (Player:BuffUp(S.BreathofSindragosa) and Player:BuffDown(S.EmpowerRuneWeaponBuff) and (HL.CombatTime() < 10 and Player:BloodlustUp()) or (Player:RunicPower() < 70 and Player:Rune() < 3 and (S.BreathofSindragosa:CooldownRemains() > VarERWPoolingTime or S.EmpowerRuneWeapon:FullRechargeTime() < 10))) then
+  -- empower_rune_weapon,use_off_gcd=1,if=buff.breath_of_sindragosa.up&!buff.empower_rune_weapon.up&((time<10&buff.bloodlust.up)|(runic_power<70&rune<3&(cooldown.breath_of_sindragosa.remains>variable.erw_pooling_time|full_recharge_time<10)))
+  if S.EmpowerRuneWeapon:IsCastable() and (Player:BuffUp(S.BreathofSindragosa) and Player:BuffDown(S.EmpowerRuneWeaponBuff) and ((HL.CombatTime() < 10 and Player:BloodlustUp()) or (Player:RunicPower() < 70 and Player:Rune() < 3 and (S.BreathofSindragosa:CooldownRemains() > VarERWPoolingTime or S.EmpowerRuneWeapon:FullRechargeTime() < 10)))) then
     if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 6"; end
   end
   -- empower_rune_weapon,use_off_gcd=1,if=!talent.breath_of_sindragosa&!talent.obliteration&!buff.empower_rune_weapon.up&rune<5&(cooldown.pillar_of_frost.remains_expected<7|buff.pillar_of_frost.up|!talent.pillar_of_frost)
@@ -399,8 +391,8 @@ local function HighPrioActions()
     if S.AntiMagicShell:IsCastable() and (Player:RunicPowerDeficit() > 40) then
       if Cast(S.AntiMagicShell, Settings.Commons2.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell high_prio_actions 2"; end
     end
-    -- antimagic_zone,if=!death_knight.amz_specified&(death_knight.amz_absorb_percent>0&runic_power.deficit>70&talent.assimilation&(buff.breath_of_sindragosa.up&cooldown.empower_rune_weapon.charges<2|!talent.breath_of_sindragosa&!buff.pillar_of_frost.up))
-    if S.AntiMagicZone:IsCastable() and (Player:RunicPowerDeficit() > 70 and S.Assimilation:IsAvailable() and (Player:BuffUp(S.BreathofSindragosa) and S.EmpowerRuneWeapon:Charges() < 2 or not S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff))) then
+    -- antimagic_zone,if=!death_knight.amz_specified&(death_knight.amz_absorb_percent>0&runic_power.deficit>70&talent.assimilation&(buff.breath_of_sindragosa.up|cooldown.breath_of_sindragosa.ready|!talent.breath_of_sindragosa&!buff.pillar_of_frost.up))
+    if S.AntiMagicZone:IsCastable() and (Player:RunicPowerDeficit() > 70 and S.Assimilation:IsAvailable() and (Player:BuffUp(S.BreathofSindragosa) or S.BreathofSindragosa:CooldownUp() or not S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff))) then
       if Cast(S.AntiMagicZone, Settings.Commons2.GCDasOffGCD.AntiMagicZone) then return "antimagic_zone high_prio_actions 4"; end
     end
     -- antimagic_zone,if=death_knight.amz_specified&buff.amz_timing.up
@@ -434,30 +426,22 @@ local function HighPrioActions()
   if S.FrostStrike:IsReady() and (EnemiesCount10yd == 1 and VarRPBuffs and not S.BreathofSindragosa:IsAvailable() and S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff)) then
     if Cast(S.FrostStrike, nil, nil, not Target:IsSpellInRange(S.FrostStrike)) then return "frost_strike high_prio_actions 18"; end
   end
-  -- remorseless_winter,if=!talent.breath_of_sindragosa&!talent.obliteration&variable.rw_buffs
-  if S.RemorselessWinter:IsReady() and (not S.BreathofSindragosa:IsAvailable() and not S.Obliteration:IsAvailable() and VarRWBuffs) then
+  -- remorseless_winter,if=variable.rw_buffs|variable.adds_remain
+  if S.RemorselessWinter:IsReady() and (VarRWBuffs or VarAddsRemain) then
     if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter high_prio_actions 20"; end
-  end
-  -- remorseless_winter,if=talent.obliteration&active_enemies>=3&variable.adds_remain
-  if S.RemorselessWinter:IsReady() and (S.Obliteration:IsAvailable() and EnemiesCount10yd >= 3 and VarAddsRemain) then
-    if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter high_prio_actions 22"; end
   end
 end
 
 local function Obliteration()
-  -- remorseless_winter,if=active_enemies>3|talent.gathering_storm
-  if S.RemorselessWinter:IsReady() and (EnemiesCount10yd > 3 or S.GatheringStorm:IsAvailable()) then
-    if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter obliteration 2"; end
-  end
   -- howling_blast,if=buff.killing_machine.stack<2&buff.pillar_of_frost.remains<gcd&buff.rime.react
   if S.HowlingBlast:IsReady() and (Player:BuffStack(S.KillingMachineBuff) < 2 and Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() and Player:BuffUp(S.RimeBuff)) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast obliteration 4"; end
   end
-  -- frost_strike,if=buff.killing_machine.stack<2&buff.pillar_of_frost.remains<gcd&!death_and_decay.ticking
-  if S.FrostStrike:IsReady() and (Player:BuffStack(S.KillingMachineBuff) < 2 and Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() and Player:BuffDown(S.DeathAndDecayBuff)) then
+  -- frost_strike,if=(active_enemies<=1|!talent.glacial_advance)&buff.killing_machine.react<2&buff.pillar_of_frost.remains<gcd&!death_and_decay.ticking
+  if S.FrostStrike:IsReady() and ((EnemiesMeleeCount <= 1 or not S.GlacialAdvance:IsAvailable()) and Player:BuffStack(S.KillingMachineBuff) < 2 and Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() and Player:BuffDown(S.DeathAndDecayBuff)) then
     if Cast(S.FrostStrike, Settings.Frost.GCDasOffGCD.FrostStrike, nil, not Target:IsInMeleeRange(5)) then return "frost_strike obliteration 6"; end
   end
-  -- glacial_advance,if=buff.killing_machine.stack<2&buff.pillar_of_frost.remains<gcd&!death_and_decay.ticking
+  -- glacial_advance,if=buff.killing_machine.react<2&buff.pillar_of_frost.remains<gcd&!death_and_decay.ticking
   if S.GlacialAdvance:IsReady() and (Player:BuffStack(S.KillingMachineBuff) < 2 and Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() and Player:BuffDown(S.DeathAndDecayBuff)) then
     if Cast(S.GlacialAdvance, nil, nil, not Target:IsInRange(100)) then return "glacial_advance obliteration 8"; end
   end
@@ -557,11 +541,7 @@ local function Racials()
 end
 
 local function SingleTarget()
-  -- remorseless_winter,if=variable.rw_buffs|variable.adds_remain
-  if S.RemorselessWinter:IsReady() and (VarRWBuffs or VarAddsRemain) then
-    if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter single_target 2"; end
-  end
-  -- frost_strike,if=buff.killing_machine.stack<2&runic_power.deficit<20&!variable.2h_check
+  -- frost_strike,if=buff.killing_machine.react<2&runic_power.deficit<20&!variable.2h_check
   if S.FrostStrike:IsReady() and (Player:BuffStack(S.KillingMachineBuff) < 2 and Player:RunicPowerDeficit() < 20 and not Using2H) then
     if Cast(S.FrostStrike, Settings.Frost.GCDasOffGCD.FrostStrike, nil, not Target:IsInMeleeRange(5)) then return "frost_strike single_target 4"; end
   end
