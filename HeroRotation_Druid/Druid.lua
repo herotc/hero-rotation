@@ -157,6 +157,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   DireFixation                          = Spell(417710),
   DoubleClawedRake                      = Spell(391700),
   FeralFrenzy                           = Spell(274837),
+  FranticMomentum                       = Spell(391875),
   Incarnation                           = Spell(102543),
   LionsStrength                         = Spell(391972),
   LunarInspiration                      = Spell(155580),
@@ -182,6 +183,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   PredatorRevealedBuff                  = Spell(408468), -- T30 P4
   PredatorySwiftnessBuff                = Spell(69369),
   SabertoothBuff                        = Spell(391722),
+  SmolderingFrenzyBuff                  = Spell(422751), -- T31 P2
   SuddenAmbushBuff                      = Spell(391974),
   -- Debuffs
   AdaptiveSwarmDebuff                   = Spell(391889),
@@ -247,11 +249,15 @@ if not Item.Druid then Item.Druid = {} end
 Item.Druid.Commons = {
   -- Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
+  AshesoftheEmbersoul                   = Item(207167, {13, 14}),
+  BandolierofTwistedBlades              = Item(207165, {13, 14}),
   BeacontotheBeyond                     = Item(203963, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
   MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
+  MydasTalisman                         = Item(158319, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
+  WitherbarksBranch                     = Item(109999, {13, 14}),
   -- Other On-Use Items
   Djaruun                               = Item(202569, {16}),
   Jotungeirr                            = Item(186404, {16}),
