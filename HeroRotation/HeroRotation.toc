@@ -1,8 +1,8 @@
-## Interface: 100107
+## Interface: 100200
 
 ## Title: Hero|cFFA330C9Rotation|r
 ## Author: HeroTC, Aethys
-## Version: 10.1.7.12
+## Version: 10.2.0.01
 ## Notes: Attempt to provide the useful and precise information to execute the best possible DPS rotation in every situation.
 
 ## DefaultState: Enabled
