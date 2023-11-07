@@ -95,6 +95,7 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   BeastCleave                           = Spell(115939),
   BestialWrath                          = Spell(19574),
   Bloodshed                             = Spell(321530),
+  BloodyFrenzy                          = Spell(407412),
   CalloftheWild                         = Spell(359844),
   CobraShot                             = Spell(193455),
   DireBeast                             = Spell(120679),
