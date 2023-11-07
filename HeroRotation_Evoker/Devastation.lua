@@ -38,9 +38,10 @@ local I = Item.Evoker.Devastation
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.KharnalexTheFirstLight:ID(),
+  I.BelorrelostheSuncaller:ID(),
+  I.Dreambinder:ID(),
+  I.NymuesUnravelingSpindle:ID(),
   I.ShadowedOrbofTorment:ID(),
-  I.SpoilsofNeltharus:ID(),
 }
 
 -- GUI Settings
@@ -69,6 +70,7 @@ local VarDRPrepTimeAoe = 4
 local VarDRPrepTimeST = 13
 local PlayerHaste = Player:SpellHaste()
 local VarR1CastTime = 1.0 * PlayerHaste
+local VarHasExternalPI = false
 local BossFightRemains = 11111
 local FightRemains = 11111
 local GCDMax
@@ -93,6 +95,7 @@ end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 -- Reset variables after fights
 HL:RegisterForEvent(function()
+  VarHasExternalPI = false
   BossFightRemains = 11111
   FightRemains = 11111
   for k in pairs(Evoker.FirestormTracker) do
@@ -126,12 +129,12 @@ local function Precombat()
   if S.BlessingoftheBronze:IsCastable() and Everyone.GroupBuffMissing(S.BlessingoftheBronzeBuff) then
     if Cast(S.BlessingoftheBronze, Settings.Commons.GCDasOffGCD.BlessingOfTheBronze) then return "blessing_of_the_bronze precombat"; end
   end
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_buff.intellect|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_buff.intellect|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit
+  -- variable,name=trinket_1_buffs,value=trinket.1.has_buff.intellect|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit|trinket.1.is.mirror_of_fractured_tomorrows
+  -- variable,name=trinket_2_buffs,value=trinket.2.has_buff.intellect|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit|trinket.2.is.mirror_of_fractured_tomorrows
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_1_buffs&(trinket.1.cooldown.duration%%cooldown.dragonrage.duration=0|cooldown.dragonrage.duration%%trinket.1.cooldown.duration=0)
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_2_buffs&(trinket.2.cooldown.duration%%cooldown.dragonrage.duration=0|cooldown.dragonrage.duration%%trinket.2.cooldown.duration=0)
-  -- variable,name=trinket_1_manual,value=trinket.1.is.spoils_of_neltharus
-  -- variable,name=trinket_2_manual,value=trinket.2.is.spoils_of_neltharus
+  -- variable,name=trinket_1_manual,value=trinket.1.is.belorrelos_the_suncaller|trinket.1.is.nymues_unraveling_spindle
+  -- variable,name=trinket_2_manual,value=trinket.2.is.belorrelos_the_suncaller|trinket.2.is.nymues_unraveling_spindle
   -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon
   -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.intellect)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.intellect)*(variable.trinket_1_sync))
@@ -143,13 +146,13 @@ local function Precombat()
   -- Note: Variables are never changed. Moving to variable declaration instead.
   -- variable,name=has_external_pi,value=cooldown.invoke_power_infusion_0.duration>0
   -- Note: Not handling external PI.
-  -- verdant_embrace,if=talent.scarlet_adaptation&talent.firestorm
-  if Settings.Devastation.UseGreen and S.VerdantEmbrace:IsCastable() and (S.ScarletAdaptation:IsAvailable() and S.Firestorm:IsAvailable()) then
-    if Cast(S.VerdantEmbrace) then return "verdant_embrace precombat 2"; end
-  end
   -- use_item,name=shadowed_orb_of_torment
   if Settings.Commons.Enabled.Trinkets and I.ShadowedOrbofTorment:IsEquippedAndReady() then
-    if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment precombat 4"; end
+    if Cast(I.ShadowedOrbofTorment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "shadowed_orb_of_torment precombat 2"; end
+  end
+  -- verdant_embrace,if=talent.scarlet_adaptation
+  if Settings.Devastation.UseGreen and S.VerdantEmbrace:IsCastable() and (S.ScarletAdaptation:IsAvailable()) then
+    if Cast(S.VerdantEmbrace) then return "verdant_embrace precombat 4"; end
   end
   -- firestorm,if=talent.firestorm
   if S.Firestorm:IsCastable() then
@@ -168,12 +171,37 @@ local function Defensives()
 end
 
 local function Trinkets()
-  -- use_item,name=spoils_of_neltharus,if=buff.dragonrage.up&(!cooldown.fire_breath.up&!cooldown.shattering_star.up|active_enemies>=3)|fight_remains<=20
-  if Settings.Commons.Enabled.Trinkets and I.SpoilsofNeltharus:IsEquippedAndReady() and (VarDragonrageUp and (S.FireBreath:CooldownDown() and S.ShatteringStar:CooldownDown() or EnemiesCount8ySplash >= 3) or FightRemains <= 20) then
-    if Cast(I.SpoilsofNeltharus, nil, Settings.Commons.DisplayStyle.Trinkets) then return "spoils_of_neltharus trinkets 2"; end
+  -- Note: Leaving this open for future additions. item_cd_1141 has been used for multiple expansions and multiple items.
+  local ItemCD1141Ready = false
+  if I.DragonfireBombDispenser:IsEquippedAndReady() then
+    ItemCD1141Ready = true
   end
-  -- use_item,slot=trinket1,if=buff.dragonrage.up&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1|variable.trinket_2_exclude)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)
-  -- use_item,slot=trinket2,if=buff.dragonrage.up&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2|variable.trinket_1_exclude)&!variable.trinket_2_manual|trinket.2.proc.any_dps.duration>=fight_remains|trinket.2.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=2)
+  -- use_item,name=dreambinder_loom_of_the_great_cycle
+  if I.Dreambinder:IsEquippedAndReady() then
+    if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle trinkets 2"; end
+  end
+  -- use_item,name=nymues_unraveling_spindle,if=((buff.emerald_trance_stacking.stack>=2&variable.has_external_pi)|(cooldown.dragonrage.remains<=3&cooldown.fire_breath.remains<7&cooldown.eternity_surge.remains<13&target.time_to_die>=35&!variable.has_external_pi))|fight_remains<=20
+  if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (((Player:BuffStack(S.EmeraldTranceBuff) >= 2 and VarHasExternalPI) or (S.Dragonrage:CooldownRemains() <= 3 and S.FireBreath:CooldownRemains() < 7 and S.EternitySurge:CooldownRemains() < 13 and Target:TimeToDie() >= 35 and not VarHasExternalPI)) or FightRemains <- 20) then
+    if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle trinkets 4"; end
+  end
+  -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(gcd.remains>0.5&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle))|fight_remains<=20
+  if I.BelorrelostheSuncaller:IsEquippedAndReady() and ((Player:GCDRemains() > 0.5 and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) or FightRemains <= 20) then
+    if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller trinkets 6"; end
+  end
+  -- living_flame,if=buff.burnout.up&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
+  if S.LivingFlame:IsReady() and (Player:BuffUp(S.BurnoutBuff) and I.BelorrelostheSuncaller:IsEquipped() and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) then
+    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame trinkets 8"; end
+  end
+  -- call_action_list,name=green,if=talent.ancient_flame&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
+  if Settings.Devastation.UseGreen and S.AncientFlame:IsAvailable() and I.BelorrelostheSuncaller:IsEquipped() and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped()) then
+    local ShouldReturn = Green(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- azure_strike,if=equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
+  if S.AzureStrike:IsReady() and (I.BelorrelostheSuncaller:IsEquipped() and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) then
+    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike trinkets 10"; end
+  end
+  -- use_item,slot=trinket1,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=4&set_bonus.tier31_2pc)|(variable.trinket_2_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&!equipped.nymues_unraveling_spindle)|(!cooldown.fire_breath.up&!cooldown.shattering_star.up&!set_bonus.tier31_2pc)|active_enemies>=3)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1|variable.trinket_2_exclude)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)
+  -- use_item,slot=trinket2,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=4&set_bonus.tier31_2pc)|(variable.trinket_1_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&!equipped.nymues_unraveling_spindle)|(!cooldown.fire_breath.up&!cooldown.shattering_star.up&!set_bonus.tier31_2pc)|active_enemies>=3)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2|variable.trinket_1_exclude)&!variable.trinket_2_manual|trinket.2.proc.any_dps.duration>=fight_remains|trinket.2.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=2)
   -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(variable.next_dragonrage>20|!talent.dragonrage)&!variable.trinket_1_manual
   -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)&(variable.next_dragonrage>20|!talent.dragonrage)&!variable.trinket_2_manual
   -- Note: Can't handle above trinket tracking, so let's use a generic fallback. When we can do above tracking, the below can be removed.
@@ -285,23 +313,22 @@ local function Aoe()
   if S.Firestorm:IsCastable() then
     if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 12"; end
   end
-  -- pyre,target_if=max:target.health.pct,if=talent.volatility&(active_enemies>=4|(talent.charged_blast&!buff.essence_burst.up&!buff.iridescence_blue.up)|(!talent.charged_blast&(!buff.essence_burst.up|!buff.iridescence_blue.up))|(buff.charged_blast.stack>=15)|(talent.raging_inferno&debuff.in_firestorm.up))
-  -- Note: Using Cast instead of CastTargetIf, since we hit all targets anyway.
-  if S.Pyre:IsReady() and (S.Volatility:IsAvailable() and (EnemiesCount8ySplash >= 4 or (S.ChargedBlast:IsAvailable() and Player:BuffDown(S.EssenceBurstBuff) and Player:BuffDown(S.IridescenceBlueBuff)) or (not S.ChargedBlast:IsAvailable() and (Player:BuffDown(S.EssenceBurstBuff) or Player:BuffDown(S.IridescenceBlueBuff))) or (Player:BuffStack(S.ChargedBlastBuff) >= 15) or (S.RagingInferno:IsAvailable() and InFirestorm()))) then
+  if S.Pyre:IsReady() and (
+    -- pyre,target_if=max:target.health.pct,if=active_enemies>=5
+    (EnemiesCount8ySplash >= 5) or
+    -- pyre,target_if=max:target.health.pct,if=active_enemies>=4&(!talent.charged_blast|talent.volatility)
+    (EnemiesCount8ySplash >= 4 and (not S.ChargedBlast:IsAvailable() or S.Volatility:IsAvailable())) or
+    -- pyre,target_if=max:target.health.pct,if=active_enemies>=3&talent.volatility&(talent.charged_blast&!buff.essence_burst.up&!buff.iridescence_blue.up|(!talent.charged_blast&(!buff.essence_burst.up|!buff.iridescence_blue.up)))
+    (EnemiesCount8ySplash >= 3 and S.Volatility:IsAvailable() and (S.ChargedBlast:IsAvailable() and Player:BuffDown(S.EssenceBurstBuff) and Player:BuffDown(S.IridescenceBlueBuff) or (not S.ChargedBlast:IsAvailable() and (Player:BuffDown(S.EssenceBurstBuff) or Player:BuffDown(S.IridescenceBlueBuff))))) or
+    -- pyre,target_if=max:target.health.pct,if=buff.charged_blast.stack>=15
+    (Player:BuffStack(S.ChargedBlastBuff) >= 15)
+  ) then
+    -- Note: Using Cast instead of CastTargetIf, since we hit all targets anyway.
     if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 14"; end
-  end
-  -- pyre,target_if=max:target.health.pct,if=(talent.raging_inferno&debuff.in_firestorm.up)|(active_enemies==3&buff.charged_blast.stack>=15)|active_enemies>=4
-  -- Note: Using Cast instead of CastTargetIf, since we hit all targets anyway.
-  if S.Pyre:IsReady() and ((S.RagingInferno:IsAvailable() and InFirestorm()) or (EnemiesCount8ySplash == 3 and Player:BuffStack(S.ChargedBlastBuff) >= 15) or EnemiesCount8ySplash >= 4) then
-    if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 16"; end
   end
   -- living_flame,target_if=max:target.health.pct,if=(!talent.burnout|buff.burnout.up|active_enemies>=4|buff.scarlet_adaptation.up)&buff.leaping_flames.up&!buff.essence_burst.up&essence<essence.max-1
   if S.LivingFlame:IsCastable() and ((not S.Burnout:IsAvailable() or Player:BuffUp(S.BurnoutBuff) or EnemiesCount8ySplash >= 4 or Player:BuffUp(S.ScarletAdaptationBuff)) and Player:BuffUp(S.LeapingFlamesBuff) and Player:BuffDown(S.EssenceBurstBuff) and Player:Essence() < Player:EssenceMax() - 1) then
     if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 18"; end
-  end
-  -- use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&active_enemies<=5
-  if Settings.Commons.Enabled.Items and I.KharnalexTheFirstLight:IsEquippedAndReady() and (not VarDragonrageUp and Target:DebuffDown(S.ShatteringStar) and EnemiesCount8ySplash <= 5) then
-    if Cast(I.KharnalexTheFirstLight, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "kharnalex_the_first_light aoe 20"; end
   end
   -- disintegrate,target_if=max:target.health.pct,chain=1,early_chain_if=evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
   if S.Disintegrate:IsReady() then
@@ -344,8 +371,8 @@ local function ST()
   if (not S.Dragonrage:IsAvailable() or VarNextDragonrage > VarDRPrepTimeST or not S.Animosity:IsAvailable()) and ((Player:BuffRemains(S.PowerSwellBuff) < VarR1CastTime or Player:BloodlustUp() or Player:BuffUp(S.PowerInfusionBuff) or VarDragonrageUp) and (Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime or VarDragonrageUp)) and (S.EternitySurge:CooldownDown() or not S.EventHorizon:IsAvailable() or not VarDragonrageUp) and (Target:TimeToDie() >= 8 or FightRemains < 30) then
     local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
   end
-  -- disintegrate,if=buff.dragonrage.remains>19&cooldown.fire_breath.remains>28&talent.eye_of_infinity
-  if S.Disintegrate:IsReady() and (VarDragonrageRemains > 19 and S.FireBreath:CooldownRemains() > 28 and S.EyeofInfinity:IsAvailable()) then
+  -- disintegrate,if=buff.dragonrage.remains>19&cooldown.fire_breath.remains>28&talent.eye_of_infinity&set_bonus.tier30_2pc
+  if S.Disintegrate:IsReady() and (VarDragonrageRemains > 19 and S.FireBreath:CooldownRemains() > 28 and S.EyeofInfinity:IsAvailable() and Player:HasTier(30, 2)) then
     if Cast(S.Disintegrate, nil, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate st 9"; end
   end
   -- shattering_star,if=(buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor)&(!cooldown.fire_breath.up|!talent.event_horizon)
@@ -392,11 +419,11 @@ local function ST()
   if S.Pyre:IsReady() and (InFirestorm() and S.RagingInferno:IsAvailable() and Player:BuffStack(S.ChargedBlastBuff) == 20 and EnemiesCount8ySplash >= 2) then
     if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre st 22"; end
   end
-  -- disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&buff.dragonrage.up&!(buff.power_infusion.up&buff.bloodlust.up)&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(!(buff.power_infusion.up&buff.bloodlust.up)|cooldown.fire_breath.up|cooldown.eternity_surge.up)&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
+  -- disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&essence.deficit<2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(!(buff.power_infusion.up&buff.bloodlust.up)|cooldown.fire_breath.up|cooldown.eternity_surge.up)&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
   if S.Disintegrate:IsReady() then
     if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) then
       local DisNote = "NO CHAIN"
-      if VarDragonrageUp and not (Player:BuffUp(S.PowerInfusionBuff) and Player:BloodlustUp()) then
+      if Player:EssenceDeficit() < 2 then
         DisNote = "CHAIN"
       end
       if CastAnnotated(S.Disintegrate, nil, DisNote, not Target:IsSpellInRange(S.Disintegrate), Settings.Commons.DisintegrateFontSize) then return "disintegrate st 24"; end
@@ -457,6 +484,11 @@ local function APL()
   -- Player haste value is used in multiple places
   PlayerHaste = Player:SpellHaste()
 
+  -- Are we getting external PI?
+  if Player:BuffUp(S.PowerInfusionBuff) then
+    VarHasExternalPI = true
+  end
+
   -- Set Dragonrage Variables
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     VarDragonrageUp = Player:BuffUp(S.Dragonrage)
@@ -481,7 +513,7 @@ local function APL()
     end
     -- variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?(cooldown.eternity_surge.remains-2*gcd.max)<?(cooldown.fire_breath.remains-gcd.max)
     VarNextDragonrage = mathmax(S.Dragonrage:CooldownRemains(), (S.EternitySurge:CooldownRemains() - 2 * GCDMax), (S.FireBreath:CooldownRemains() - GCDMax))
-    -- invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&!buff.power_infusion.up&!cooldown.fire_breath.up&!cooldown.shattering_star.up
+    -- invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=3&set_bonus.tier31_2pc)|(!cooldown.fire_breath.up&!cooldown.shattering_star.up&!set_bonus.tier31_2pc))
     -- Note: Not handling external buffs.
     -- quell,use_off_gcd=1,if=target.debuff.casting.react
     local ShouldReturn = Everyone.Interrupt(25, S.Quell, Settings.Commons.OffGCDasOffGCD.Quell, StunInterrupts); if ShouldReturn then return ShouldReturn; end
@@ -509,7 +541,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Devastation Evoker rotation is currently a work in progress, but has been updated for patch 10.1.5.")
+  HR.Print("Devastation Evoker rotation is currently a work in progress, but has been updated for patch 10.2.0.")
 end
 
 HR.SetAPL(1467, APL, Init);

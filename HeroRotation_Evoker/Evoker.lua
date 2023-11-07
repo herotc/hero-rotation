@@ -123,6 +123,7 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   BlazingShardsBuff                     = Spell(409848),
   BurnoutBuff                           = Spell(375802),
   ChargedBlastBuff                      = Spell(370454),
+  EmeraldTranceBuff                     = Spell(424155), -- T31 2pc
   EssenceBurstBuff                      = Spell(359618),
   IridescenceBlueBuff                   = MultiSpell(386399,399370),
   IridescenceRedBuff                    = Spell(386353),
@@ -137,11 +138,12 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
 if not Item.Evoker then Item.Evoker = {} end
 Item.Evoker.Commons = {
   -- Trinkets
-  CrimsonAspirantsBadgeofFerocity       = Item(201449, {13, 14}),
+  BelorrelostheSuncaller                = Item(207172, {13, 14}),
+  DragonfireBombDispenser               = Item(202610, {13, 14}),
+  NymuesUnravelingSpindle               = Item(208615, {13, 14}),
   -- Items
+  Dreambinder                           = Item(208616, {16}),
   KharnalexTheFirstLight                = Item(195519, {16}),
-  -- Trinkets
-  SpoilsofNeltharus                     = Item(193773, {13, 14}),
   -- Trinkets (SL)
   ShadowedOrbofTorment                  = Item(186428, {13, 14}),
 }
