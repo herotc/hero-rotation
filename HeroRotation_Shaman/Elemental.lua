@@ -343,8 +343,8 @@ local function SingleTarget()
   if S.PrimordialWave:IsViable() and (Player:BuffDown(S.PrimordialWaveBuff) and Player:BuffDown(S.SplinteredElementsBuff)) then
     if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave single_target 10"; end
   end
-  -- flame_shock,target_if=min:dot.flame_shock.remains,if=active_enemies=1&refreshable&!buff.surge_of_power.up&(!buff.master_of_the_elements.up|(!buff.stormkeeper.up&(talent.elemental_blast.enabled&maelstrom<90-8*talent.eye_of_the_storm.rank|maelstrom<60-5*talent.eye_of_the_storm.rank)))
-  if S.FlameShock:IsCastable() and (Shaman.Targets == 1 and Target:DebuffRefreshable(S.FlameShockDebuff) and Player:BuffDown(S.SurgeofPowerBuff) and (not Player:MOTEP() or (not Player:StormkeeperP() and (S.ElementalBlast:IsAvailable() and Player:MaelstromP() < 90 - 8 * S.EyeoftheStorm:TalentRank() or Player:MaelstromP() < 60 - 5 * S.EyeoftheStorm:TalentRank())))) then
+  -- flame_shock,target_if=min:dot.flame_shock.remains,if=active_enemies=1&refreshable&(dot.flame_shock.remains<cooldown.primordial_wave.remains|!talent.primordial_wave.enabled)&!buff.surge_of_power.up&(!buff.master_of_the_elements.up|(!buff.stormkeeper.up&(talent.elemental_blast.enabled&maelstrom<90-8*talent.eye_of_the_storm.rank|maelstrom<60-5*talent.eye_of_the_storm.rank)))
+  if S.FlameShock:IsCastable() and (Shaman.Targets == 1 and Target:DebuffRefreshable(S.FlameShockDebuff) and (Target:DebuffRemains(S.FlameShockDebuff) < S.PrimordialWave:CooldownRemains() or not S.PrimordialWave:IsAvailable()) and Player:BuffDown(S.SurgeofPowerBuff) and (not Player:MOTEP() or (not Player:StormkeeperP() and (S.ElementalBlast:IsAvailable() and Player:MaelstromP() < 90 - 8 * S.EyeoftheStorm:TalentRank() or Player:MaelstromP() < 60 - 5 * S.EyeoftheStorm:TalentRank())))) then
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 12"; end
   end
   -- flame_shock,target_if=min:dot.flame_shock.remains,if=active_dot.flame_shock=0&active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)&(talent.deeply_rooted_elements.enabled|talent.ascendance.enabled|talent.primordial_wave.enabled|talent.searing_flames.enabled|talent.magma_chamber.enabled)&(!buff.master_of_the_elements.up&(buff.stormkeeper.up|cooldown.stormkeeper.remains=0)|!talent.surge_of_power.enabled)
@@ -395,24 +395,24 @@ local function SingleTarget()
   if S.LightningBolt:IsViable() and (Player:StormkeeperP() and not S.SurgeofPower:IsAvailable() and not S.MasteroftheElements:IsAvailable()) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 36"; end
   end
-  -- lightning_bolt,if=buff.surge_of_power.up
-  if S.LightningBolt:IsViable() and (Player:BuffUp(S.SurgeofPowerBuff)) then
+  -- lightning_bolt,if=buff.surge_of_power.up&talent.lightning_rod.enabled
+  if S.LightningBolt:IsViable() and (Player:BuffUp(S.SurgeofPowerBuff) and S.LightningRod:IsAvailable()) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 38"; end
   end
-  -- icefury,if=talent.electrified_shocks.enabled
-  if S.Icefury:IsViable() and (S.ElectrifiedShocks:IsAvailable()) then
+  -- icefury,if=talent.electrified_shocks.enabled&talent.lightning_rod.enabled
+  if S.Icefury:IsViable() and (S.ElectrifiedShocks:IsAvailable() and S.LightningRod:IsAvailable()) then
     if Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury single_target 40"; end
   end
-  -- frost_shock,if=buff.icefury.up&talent.electrified_shocks.enabled&(debuff.electrified_shocks.remains<2|buff.icefury.remains<=gcd)
-  if S.FrostShock:IsCastable() and (Player:IcefuryP() and S.ElectrifiedShocks:IsAvailable() and (Target:DebuffRemains(S.ElectrifiedShocksDebuff) < 2 or Player:BuffRemains(S.IcefuryBuff) <= Player:GCD())) then
+  -- frost_shock,if=buff.icefury.up&talent.electrified_shocks.enabled&(debuff.electrified_shocks.remains<2|buff.icefury.remains<=gcd)&talent.lightning_rod.enabled
+  if S.FrostShock:IsCastable() and (Player:IcefuryP() and S.ElectrifiedShocks:IsAvailable() and (Target:DebuffRemains(S.ElectrifiedShocksDebuff) < 2 or Player:BuffRemains(S.IcefuryBuff) <= Player:GCD()) and S.LightningRod:IsAvailable()) then
     if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 42"; end
   end
-  -- frost_shock,if=buff.icefury.up&talent.electrified_shocks.enabled&maelstrom>=50&debuff.electrified_shocks.remains<2*gcd&buff.stormkeeper.up
-  if S.FrostShock:IsCastable() and (Player:IcefuryP() and S.ElectrifiedShocks:IsAvailable() and Player:MaelstromP() >= 50 and Target:DebuffRemains(S.ElectrifiedShocksDebuff) < 2 * Player:GCD() and Player:StormkeeperP()) then
+  -- frost_shock,if=buff.icefury.up&talent.electrified_shocks.enabled&maelstrom>=50&debuff.electrified_shocks.remains<2*gcd&buff.stormkeeper.up&talent.lightning_rod.enabled
+  if S.FrostShock:IsCastable() and (Player:IcefuryP() and S.ElectrifiedShocks:IsAvailable() and Player:MaelstromP() >= 50 and Target:DebuffRemains(S.ElectrifiedShocksDebuff) < 2 * Player:GCD() and Player:StormkeeperP() and S.LightningRod:IsAvailable()) then
     if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 44"; end
   end
-  -- lava_beam,if=active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)&buff.power_of_the_maelstrom.up&buff.ascendance.remains>cast_time
-  if S.LavaBeam:IsCastable() and (Shaman.Targets > 1 and Shaman.ClusterTargets > 1 and Player:PotMP() and Player:BuffRemains(S.AscendanceBuff) > S.LavaBeam:CastTime()) then
+  -- lava_beam,if=active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)&buff.power_of_the_maelstrom.up&buff.ascendance.remains>cast_time&!set_bonus.tier31_4pc
+  if S.LavaBeam:IsCastable() and (Shaman.Targets > 1 and Shaman.ClusterTargets > 1 and Player:PotMP() and Player:BuffRemains(S.AscendanceBuff) > S.LavaBeam:CastTime() and not Player:HasTier(31, 4)) then
     if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam single_target 46"; end
   end
   -- frost_shock,if=buff.icefury.up&buff.stormkeeper.up&!talent.lava_surge.enabled&!talent.echo_of_the_elements.enabled&!talent.primordial_surge.enabled&talent.elemental_blast.enabled&(maelstrom>=61&maelstrom<75&cooldown.lava_burst.remains>gcd|maelstrom>=49&maelstrom<63&cooldown.lava_burst.ready)
@@ -431,123 +431,130 @@ local function SingleTarget()
   if S.LavaBurst:IsViable() and (Player:BuffUp(S.LavaSurgeBuff) and (S.EchooftheElements:IsAvailable() or S.LavaSurge:IsAvailable() or S.PrimordialSurge:IsAvailable() or not S.MasteroftheElements:IsAvailable() or not S.ElementalBlast:IsAvailable())) then
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 54"; end
   end
-  -- lava_burst,if=talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&maelstrom>=50&!talent.swelling_maelstrom.enabled&maelstrom<=80
-  if S.LavaBurst:IsViable() and (S.MasteroftheElements:IsAvailable() and not Player:MOTEP() and Player:MaelstromP() >= 50 and not S.SwellingMaelstrom:IsAvailable() and Player:MaelstromP() <= 80) then
-    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 56"; end
+  -- lava_burst,target_if=dot.flame_shock.remains>2,if=buff.ascendance.up&(set_bonus.tier31_4pc|!talent.elemental_blast.enabled)&(!talent.further_beyond.enabled|fb_extension_remaining<2)
+  -- TODO: Determine a way to calculate fb_extension_remaining.
+  if S.LavaBurst:IsViable() and (Player:BuffUp(S.AscendanceBuff) and (Player:HasTier(31, 4) or not S.ElementalBlast:IsAvailable())) then
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 56"; end
+  end
+  -- lava_burst,target_if=dot.flame_shock.remains>2,if=!buff.ascendance.up&(!talent.elemental_blast.enabled|!talent.mountains_will_fall.enabled)&!talent.lightning_rod.enabled&set_bonus.tier31_4pc
+  if S.LavaBurst:IsViable() and (Player:BuffDown(S.AscendanceBuff) and (not S.ElementalBlast:IsAvailable() or not S.MountainsWillFall:IsAvailable()) and not S.LightningRod:IsAvailable() and Player:HasTier(31, 4)) then
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 58"; end
+  end
+  -- lava_burst,target_if=dot.flame_shock.remains>2,if=talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&!talent.lightning_rod.enabled
+  if S.LavaBurst:IsViable() and (S.MasteroftheElements:IsAvailable() and not Player:MOTEP() and not S.LightningRod:IsAvailable()) then
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 60"; end
   end
   -- lava_burst,if=talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&(maelstrom>=75|maelstrom>=50&!talent.elemental_blast.enabled)&talent.swelling_maelstrom.enabled&maelstrom<=130
-  if S.LavaBurst:IsViable() and (S.MasteroftheElements:IsAvailable() and not Player:MOTEP() and (Player:MaelstromP() >= 75 or Player:MaelstromP() >= 50 and not S.SwellingMaelstrom:IsAvailable()) and S.SwellingMaelstrom:IsAvailable() and Player:MaelstromP() <= 130) then
-    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 58"; end
+  if S.LavaBurst:IsViable() and (S.MasteroftheElements:IsAvailable() and not Player:MOTEP() and (Player:MaelstromP() >= 75 or Player:MaelstromP() >= 50 and not S.ElementalBlast:IsAvailable()) and S.SwellingMaelstrom:IsAvailable() and Player:MaelstromP() <= 130) then
+    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 62"; end
   end
   -- earthquake,if=buff.echoes_of_great_sundering.up&(!talent.elemental_blast.enabled&active_enemies<2|active_enemies>1)
   if S.Earthquake:IsReady() and (Player:BuffUp(S.EchoesofGreatSunderingBuff) and (not S.ElementalBlast:IsAvailable() and Shaman.Targets < 2 or Shaman.Targets > 1)) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 60"; end
+    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 64"; end
   end
   -- earthquake,if=active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)&!talent.echoes_of_great_sundering.enabled&!talent.elemental_blast.enabled
   if S.Earthquake:IsReady() and (Shaman.Targets > 1 and Shaman.ClusterTargets > 1 and not S.EchoesofGreatSundering:IsAvailable() and not S.ElementalBlast:IsAvailable()) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 62"; end
+    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 66"; end
   end
-  -- elemental_blast,if=!set_bonus.tier31_2pc&!set_bonus.tier31_4pc
-  -- Note: Not having the 2pc covers not having the 4pc in our code.
-  if S.ElementalBlast:IsViable() and (not Player:HasTier(31, 2)) then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_target 64"; end
+  -- elemental_blast,if=(!talent.master_of_the_elements.enabled|buff.master_of_the_elements.up)&debuff.electrified_shocks.up
+  if S.ElementalBlast:IsViable() and ((not S.MasteroftheElements:IsAvailable() or Player:MOTEP()) and Target:DebuffUp(S.ElectrifiedShocksDebuff)) then
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_target 68"; end
   end
-  -- earth_shock,if=!set_bonus.tier31_2pc&!set_bonus.tier31_4pc
-  -- Note: Not having the 2pc covers not having the 4pc in our code.
-  if S.EarthShock:IsReady() and (not Player:HasTier(31, 2)) then
-    if Cast(S.EarthShock, nil, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock single_target 66"; end
+  -- frost_shock,if=buff.icefury.up&buff.master_of_the_elements.up&maelstrom<110&cooldown.lava_burst.charges_fractional<1.0&talent.electrified_shocks.enabled&talent.elemental_blast.enabled&!talent.lightning_rod.enabled
+  if S.FrostShock:IsViable() and (Player:IcefuryP() and Player:MOTEP() and Player:MaelstromP() < 110 and S.LavaBurst:ChargesFractional() < 1.0 and S.ElectrifiedShocks:IsAvailable() and S.ElementalBlast:IsAvailable() and not S.LightningRod:IsAvailable()) then
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 70"; end
   end
-  -- lava_burst,target_if=dot.flame_shock.remains>2,if=buff.flux_melting.up&active_enemies>1
-  if S.LavaBurst:IsViable() and (Player:BuffUp(S.FluxMeltingBuff) and Shaman.Targets > 1) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 68"; end
-  end
-  -- lava_burst,target_if=dot.flame_shock.remains>2,if=enemies=1&talent.deeply_rooted_elements.enabled
-  if S.LavaBurst:IsViable() and (Shaman.Targets == 1 and S.DeeplyRootedElements:IsAvailable()) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 70"; end
-  end
-  -- lava_burst,if=set_bonus.tier31_2pc&set_bonus.tier31_4pc
-  if S.LavaBurst:IsViable() and (Player:HasTier(31, 4)) then
-    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 71"; end
-  end
-  -- elemental_blast,if=set_bonus.tier31_2pc&set_bonus.tier31_4pc
-  if S.ElementalBlast:IsViable() and (Player:HasTier(31, 4)) then
+  -- elemental_blast,if=buff.master_of_the_elements.up|talent.lightning_rod.enabled
+  if S.ElementalBlast:IsViable() and (Player:MOTEP() or S.LightningRod:IsAvailable()) then
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_target 72"; end
   end
-  -- earth_shock,if=set_bonus.tier31_2pc&set_bonus.tier31_4pc
-  if S.EarthShock:IsReady() and (Player:HasTier(31, 4)) then
-    if Cast(S.EarthShock, nil, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock single_target 73"; end
+  -- earth_shock
+  if S.EarthShock:IsReady() then
+    if Cast(S.EarthShock, nil, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock single_target 74"; end
+  end
+  -- frost_shock,if=buff.icefury.up&talent.electrified_shocks.enabled&buff.master_of_the_elements.up&!talent.lightning_rod.enabled&active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)
+  if S.FrostShock:IsViable() and (Player:IcefuryP() and S.ElectrifiedShocks:IsAvailable() and Player:MOTEP() and not S.LightningRod:IsAvailable() and Shaman.Targets > 1 and Shaman.ClusterTargets > 1) then
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 76"; end
+  end
+  -- lava_burst,target_if=dot.flame_shock.remains>2,if=talent.deeply_rooted_elements.enabled
+  if S.LavaBurst:IsViable() and (S.DeeplyRootedElements:IsAvailable()) then
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 78"; end
   end
   -- frost_shock,if=buff.icefury.up&talent.flux_melting.enabled&!buff.flux_melting.up
   if S.FrostShock:IsCastable() and (Player:IcefuryP() and S.FluxMelting:IsAvailable() and Player:BuffDown(S.FluxMeltingBuff)) then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 74"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 80"; end
   end
   -- frost_shock,if=buff.icefury.up&(talent.electrified_shocks.enabled&debuff.electrified_shocks.remains<2|buff.icefury.remains<6)
   if S.FrostShock:IsCastable() and (Player:IcefuryP() and (S.ElectrifiedShocks:IsAvailable() and Target:DebuffRemains(S.ElectrifiedShocksDebuff) < 2 or Player:BuffRemains(S.IcefuryBuff) < 6)) then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 75"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 82"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains>2,if=talent.echo_of_the_elements.enabled|talent.lava_surge.enabled|talent.primordial_surge.enabled|!talent.elemental_blast.enabled|!talent.master_of_the_elements.enabled|buff.stormkeeper.up
   if S.LavaBurst:IsViable() and (S.EchooftheElements:IsAvailable() or S.LavaSurge:IsAvailable() or S.PrimordialSurge:IsAvailable() or not S.ElementalBlast:IsAvailable() or not S.MasteroftheElements:IsAvailable() or Player:StormkeeperP()) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 76"; end
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 84"; end
+  end
+  -- elemental_blast
+  if S.ElementalBlast:IsViable() then
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_target 86"; end
   end
   -- chain_lightning,if=buff.power_of_the_maelstrom.up&talent.unrelenting_calamity.enabled&active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)
   if S.ChainLightning:IsViable() and (Player:PotMP() and S.UnrelentingCalamity:IsAvailable() and Shaman.Targets > 1 and Shaman.ClusterTargets > 1) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning single_target 78"; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning single_target 88"; end
   end
   -- lightning_bolt,if=buff.power_of_the_maelstrom.up&talent.unrelenting_calamity.enabled
   if S.LightningBolt:IsViable() and (Player:PotMP() and S.UnrelentingCalamity:IsAvailable()) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 80"; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 90"; end
   end
   -- icefury
   if S.Icefury:IsViable() then
-    if Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury single_target 82"; end
+    if Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury single_target 92"; end
   end
   -- chain_lightning,if=pet.storm_elemental.active&debuff.lightning_rod.up&(debuff.electrified_shocks.up|buff.power_of_the_maelstrom.up)&active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)
   if S.ChainLightning:IsViable() and (Pet:IsActive() and Pet:Name() == "Greater Storm Elemental" and Target:DebuffUp(S.LightningRodDebuff) and (Target:DebuffUp(S.ElectrifiedShocksDebuff) or Player:PotMP()) and Shaman.Targets > 1 and Shaman.ClusterTargets > 1) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning single_target 84"; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning single_target 94"; end
   end
   -- lightning_bolt,if=pet.storm_elemental.active&debuff.lightning_rod.up&(debuff.electrified_shocks.up|buff.power_of_the_maelstrom.up)
   if S.LightningBolt:IsViable() and (Pet:IsActive() and Pet:Name() == "Greater Storm Elemental" and Target:DebuffUp(S.LightningRodDebuff) and (Target:DebuffUp(S.ElectrifiedShocksDebuff) or Player:PotMP())) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 86"; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 96"; end
   end
   -- frost_shock,if=buff.icefury.up&buff.master_of_the_elements.up&!buff.lava_surge.up&!talent.electrified_shocks.enabled&!talent.flux_melting.enabled&cooldown.lava_burst.charges_fractional<1.0&talent.echo_of_the_elements.enabled
   if S.FrostShock:IsCastable() and (Player:IcefuryP() and Player:MOTEP() and Player:BuffDown(S.LavaSurgeBuff) and not S.ElectrifiedShocks:IsAvailable() and not S.FluxMelting:IsAvailable() and S.LavaBurst:ChargesFractional() < 1.0 and S.EchooftheElements:IsAvailable()) then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 88"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 98"; end
   end
-  -- frost_shock,if=buff.icefury.up&talent.flux_melting.enabled
-  if S.FrostShock:IsCastable() and (Player:IcefuryP() and S.FluxMelting:IsAvailable()) then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 90"; end
+  -- frost_shock,if=buff.icefury.up&(talent.flux_melting.enabled|talent.electrified_shocks.enabled&!talent.lightning_rod.enabled)
+  if S.FrostShock:IsCastable() and (Player:IcefuryP() and (S.FluxMelting:IsAvailable() or S.ElectrifiedShocks:IsAvailable() and not S.LightningRod:IsAvailable())) then
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 100"; end
   end
   -- chain_lightning,if=buff.master_of_the_elements.up&!buff.lava_surge.up&(cooldown.lava_burst.charges_fractional<1.0&talent.echo_of_the_elements.enabled)&active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)
   if S.ChainLightning:IsViable() and (Player:MOTEP() and Player:BuffDown(S.LavaSurgeBuff) and (S.LavaBurst:ChargesFractional() < 1.0 and S.EchooftheElements:IsAvailable()) and Shaman.Targets > 1 and Shaman.ClusterTargets > 1) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning single_target 92"; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning single_target 102"; end
   end
   -- lightning_bolt,if=buff.master_of_the_elements.up&!buff.lava_surge.up&(cooldown.lava_burst.charges_fractional<1.0&talent.echo_of_the_elements.enabled)
   if S.LightningBolt:IsViable() and (Player:MOTEP() and Player:BuffDown(S.LavaSurgeBuff) and (S.LavaBurst:ChargesFractional() < 1.0 and S.EchooftheElements:IsAvailable())) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 94"; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 104"; end
   end
   -- frost_shock,if=buff.icefury.up&!talent.electrified_shocks.enabled&!talent.flux_melting.enabled
   if S.FrostShock:IsCastable() and (Player:IcefuryP() and not S.ElectrifiedShocks:IsAvailable() and not S.FluxMelting:IsAvailable()) then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 96"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 106"; end
   end
   -- chain_lightning,if=active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)
   if S.ChainLightning:IsViable() and (Shaman.Targets > 1 and Shaman.ClusterTargets > 1) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning single_target 98"; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning single_target 108"; end
   end
   -- lightning_bolt
   if S.LightningBolt:IsViable() then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 100"; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 110"; end
   end
   -- flame_shock,moving=1,target_if=refreshable
   if S.FlameShock:IsCastable() and (Player:IsMoving()) then
-    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 102"; end
+    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateFlameShockRefreshable, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 112"; end
   end
   -- flame_shock,moving=1,if=movement.distance>6
   if S.FlameShock:IsCastable() then
-    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 104"; end
+    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 114"; end
   end
   -- frost_shock,moving=1
   if S.FrostShock:IsCastable() then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 106"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 116"; end
   end
 end
 
@@ -649,7 +656,7 @@ end
 local function Init()
   S.FlameShockDebuff:RegisterAuraTracking()
 
-  HR.Print("Elemental Shaman rotation is currently a work in progress, but has been updated for patch 10.1.5.")
+  HR.Print("Elemental Shaman rotation is currently a work in progress, but has been updated for patch 10.2.0.")
 end
 
 HR.SetAPL(262, APL, Init)
