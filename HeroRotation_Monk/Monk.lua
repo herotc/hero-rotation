@@ -17,6 +17,11 @@ local Item       = HL.Item
 local MergeTableByKey = HL.Utils.MergeTableByKey
 -- HeroRotation
 local HR         = HeroRotation
+-- File Locals
+local Commons    = {}
+
+--- ======= GLOBALIZE =======
+HR.Commons.Monk = Commons
 
 --- ============================ CONTENT ============================
 
@@ -151,6 +156,7 @@ Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Commons, {
   ExplodingKeg                          = Spell(325153),
   HighTolerance                         = Spell(196737),
   ImprovedInvokeNiuzao                  = Spell(322740),
+  ImprovedPurifyingBrew                 = Spell(343743),
   InvokeNiuzaoTheBlackOx                = Spell(132578),
   KegSmash                              = Spell(121253),
   LightBrewing                          = Spell(325093),

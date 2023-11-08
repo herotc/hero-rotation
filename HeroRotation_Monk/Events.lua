@@ -12,6 +12,9 @@ local Arena, Boss, Nameplate = Unit.Arena, Unit.Boss, Unit.Nameplate
 local Party, Raid = Unit.Party, Unit.Raid
 local Spell = HL.Spell
 local Item = HL.Item
+-- HeroRotation
+local HR = HeroRotation
+local Monk = HR.Commons.Monk
 -- Lua
 local C_Timer = C_Timer
 local tableremove = table.remove
@@ -203,4 +206,39 @@ HL:RegisterForEvent(
     end
   end
   , "PLAYER_REGEN_ENABLED"
+)
+
+-- Track Nuizao's Stomp
+local ImpNiuzao = Spell(322740)
+local Stomp     = Spell(227291)
+Monk.NiuzaoGUID = 0
+Monk.LastNiuzaoStomp = 0
+HL:RegisterForCombatEvent(
+  function(...)
+    local SourceGUID, _, _, _, DestGUID, _, _, _, SpellID = select(4, ...)
+    if SourceGUID == Player:GUID() and SpellID == 132578 then
+      Monk.NiuzaoGUID = DestGUID
+    end
+  end
+  , "SPELL_SUMMON"
+)
+
+HL:RegisterForCombatEvent(
+  function(...)
+    local SourceGUID, _, _, _, _, _, _, _, SpellID = select(4, ...)
+    if SourceGUID == Monk.NiuzaoGUID and SpellID == 227291 then
+      Monk.LastNiuzaoStomp = GetTime
+    end
+  end
+  , "SPELL_DAMAGE"
+)
+
+HL:RegisterForCombatEvent(
+  function(...)
+    local DestGUID = select(8, ...)
+    if DestGUID == Monk.NiuzaoGUID then
+      Monk.NiuzaoGUID = 0
+    end
+  end
+  , "UNIT_DIED"
 )

@@ -25,6 +25,7 @@ local bool       = HR.Commons.Everyone.bool
 -- Lua
 -- WoW API
 local UnitHealthMax = UnitHealthMax
+local GetTime       = GetTime
 local GetSpellBonusDamage = GetSpellBonusDamage
 
 --- ============================ CONTENT ===========================
@@ -45,6 +46,15 @@ local Enemies5y
 local Enemies8y
 local EnemiesCount8
 local IsTanking
+
+-- Weapon checks
+local MainHandLink = GetInventoryItemLink("player", 16) or ""
+local Using2H = IsEquippedItemType("Two-Hand")
+
+HL:RegisterForEvent(function()
+  MainHandLink = GetInventoryItemLink("player", 16) or ""
+  Using2H = IsEquippedItemType("Two-Hand")
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- Interrupts
 local Stuns = {
@@ -79,23 +89,8 @@ local function ShouldPurify()
     StaggerCurrent = StaggerTable.points[2]
   end
 
-  -- Note: These are from the Shadowlands APL. There are no entries for defensives in the 10.1.5 APL.
-  -- TODO: See if these are still valid.
-  -- if=stagger.amounttototalpct>=0.7&(((target.cooldown.pause_action.remains>=20|time<=10|target.cooldown.pause_action.duration=0)&cooldown.invoke_niuzao_the_black_ox.remains<5)|buff.invoke_niuzao_the_black_ox.up)
-  if ((StaggerCurrent > 0 and StaggerCurrent >= StaggerFull * 0.7) and (S.InvokeNiuzaoTheBlackOx:CooldownRemains() < 5 or Player:BuffUp(S.InvokeNiuzaoTheBlackOx))) then
-    return true
-  end
-  -- if=buff.invoke_niuzao_the_black_ox.up&buff.invoke_niuzao_the_black_ox.remains<8
-  -- Note: As of 10.0.2, the AP buff is only if the improved talent is selected.
-  if (S.ImprovedInvokeNiuzao:IsAvailable() and Player:BuffUp(S.InvokeNiuzaoTheBlackOx) and Player:BuffRemains(S.InvokeNiuzaoTheBlackOx) < 8) then
-    return true
-  end
-  -- if=cooldown.purifying_brew.charges_fractional>=1.8&(cooldown.invoke_niuzao_the_black_ox.remains>10|buff.invoke_niuzao_the_black_ox.up)
-  if (S.ImprovedInvokeNiuzao:IsAvailable() and S.PurifyingBrew:ChargesFractional() >= 1.8 and (S.InvokeNiuzaoTheBlackOx:CooldownRemains() > 10 or Player:BuffUp(S.InvokeNiuzaoTheBlackOx))) then
-    return true
-  end
-  -- Purify if about to cap charges, no Imp Niuzao, and we have Stagger damage
-  if (not S.ImprovedInvokeNiuzao:IsAvailable() and S.PurifyingBrew:ChargesFractional() >= 1.8 and (Player:DebuffUp(S.HeavyStagger) or Player:DebuffUp(S.ModerateStagger) or Player:DebuffUp(S.LightStagger))) then
+  -- Purify if about to cap charges and we have Stagger damage
+  if (S.PurifyingBrew:ChargesFractional() >= 1.8 and (Player:DebuffUp(S.HeavyStagger) or Player:DebuffUp(S.ModerateStagger) or Player:DebuffUp(S.LightStagger))) then
     return true
   end
 
@@ -128,8 +123,8 @@ local function Defensives()
   if S.CelestialBrew:IsCastable() and (Player:BuffDown(S.BlackoutComboBuff) and Player:IncomingDamageTaken(1999) > (UnitHealthMax("player") * 0.1 + Player:StaggerLastTickDamage(4)) and Player:BuffStack(S.ElusiveBrawlerBuff) < 2) then
     if Cast(S.CelestialBrew, nil, Settings.Brewmaster.DisplayStyle.CelestialBrew) then return "Celestial Brew"; end
   end
-  if S.PurifyingBrew:IsCastable() and Player:BuffDown(S.BlackoutComboBuff) and ShouldPurify() then
-    if Cast(S.PurifyingBrew, nil, Settings.Brewmaster.DisplayStyle.Purify) then return "Purifying Brew"; end
+  if S.PurifyingBrew:IsCastable() and ShouldPurify() then
+    if Cast(S.PurifyingBrew, nil, Settings.Brewmaster.DisplayStyle.Purify) then return "Purifying Brew (Capping Charges)"; end
   end
   if S.ExpelHarm:IsReady() and Player:HealthPercentage() <= Settings.Brewmaster.ExpelHarmHP then
     local ExpelHarmMod = (S.StrengthofSpirit:IsAvailable()) and (1 + (1 - Player:HealthPercentage() / 100) * 100) or 1
@@ -190,74 +185,88 @@ local function RaceActions()
 end
 
 local function RotationPTA()
-  -- invoke_niuzao_the_black_ox,if=debuff.weapons_of_order_debuff.stack>3
-  -- invoke_niuzao_the_black_ox,if=!talent.weapons_of_order.enabled
-  if CDsON() and S.InvokeNiuzaoTheBlackOx:IsCastable() and (Target:DebuffStack(S.WeaponsofOrderDebuff) > 3 or not S.WeaponsofOrder:IsAvailable()) then
+  -- invoke_niuzao_the_black_ox
+  if CDsON() and S.InvokeNiuzaoTheBlackOx:IsCastable() then
     if Cast(S.InvokeNiuzaoTheBlackOx, Settings.Brewmaster.GCDasOffGCD.InvokeNiuzaoTheBlackOx, nil, not Target:IsInRange(40)) then return "invoke_niuzao_the_black_ox rotation_pta 2"; end
   end
-  -- rising_sun_kick,if=(buff.press_the_advantage.stack<6|buff.press_the_advantage.stack>9)&active_enemies<=4
-  if S.RisingSunKick:IsCastable() and ((Player:BuffStack(S.PresstheAdvantageBuff) < 6 or Player:BuffStack(S.PresstheAdvantageBuff) > 9) and EnemiesCount8 <= 4) then
+  if S.RisingSunKick:IsCastable() and (
+    -- rising_sun_kick,if=buff.press_the_advantage.stack<(7+main_hand.2h)
+    (Player:BuffStack(S.PresstheAdvantageBuff) < (7 + num(Using2H))) or
+    -- rising_sun_kick,if=buff.press_the_advantage.stack>9&active_enemies<=3&(buff.blackout_combo.up|!talent.blackout_combo.enabled)
+    (Player:BuffStack(S.PresstheAdvantageBuff) > 9 and EnemiesCount8 <= 3 and (Player:BuffUp(S.BlackoutComboBuff) or not S.BlackoutCombo:IsAvailable()))
+  ) then
     if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick rotation_pta 4"; end
   end
-  -- keg_smash,if=(buff.press_the_advantage.stack<8|buff.press_the_advantage.stack>9)&active_enemies>4
-  if S.KegSmash:IsReady() and ((Player:BuffStack(S.PresstheAdvantageBuff) < 8 or Player:BuffStack(S.PresstheAdvantageBuff) > 9) and EnemiesCount8 > 4) then
+  -- keg_smash,if=(buff.press_the_advantage.stack>9)&active_enemies>3
+  if S.KegSmash:IsReady() and (Player:BuffStack(S.PresstheAdvantageBuff) > 9 and EnemiesCount8 > 3) then
     if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash rotation_pta 6"; end
+  end
+  -- spinning_crane_kick,if=active_enemies>5&buff.exploding_keg.up&buff.charred_passions.up
+  if S.SpinningCraneKick:IsReady() and (EnemiesCount8 > 5 and Player:BuffUp(S.ExplodingKeg) and Player:BuffUp(S.CharredPassionsBuff)) then
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick rotation_pta 8"; end
   end
   -- blackout_kick
   if S.BlackoutKick:IsCastable() then
-    if Cast(S.BlackoutKick, nil, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick rotation_pta 8"; end
+    if Cast(S.BlackoutKick, nil, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick rotation_pta 10"; end
   end
   -- purifying_brew,if=(!buff.blackout_combo.up)
-  -- Note: Handled via Defensives.
+  if S.PurifyingBrew:IsCastable() and Player:StaggerFull() > 0 and (Player:BuffDown(S.BlackoutComboBuff)) then
+    if Cast(S.PurifyingBrew, nil, Settings.Brewmaster.DisplayStyle.Purify) then return "purifying_brew rotation_pta 12"; end
+  end
   -- black_ox_brew,if=energy+energy.regen<=40
   if CDsON() and S.BlackOxBrew:IsCastable() and (Player:Energy() + Player:EnergyRegen() <= 40) then
-    if Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "black_ox_brew rotation_pta 10"; end
+    if Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "black_ox_brew rotation_pta 14"; end
   end
-  -- summon_white_tiger_statue,if=debuff.weapons_of_order_debuff.stack>3
-  -- summon_white_tiger_statue,if=!talent.weapons_of_order.enabled
-  -- Note: Combining both lines.
-  if CDsON() and S.SummonWhiteTigerStatue:IsCastable() and (Target:DebuffStack(S.WeaponsofOrderDebuff) > 3 or not S.WeaponsofOrder:IsAvailable()) then
-    if Cast(S.SummonWhiteTigerStatue, Settings.Brewmaster.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue rotation_pta 12"; end
+  -- breath_of_fire,if=buff.charred_passions.remains<cooldown.blackout_kick.remains&(buff.blackout_combo.up|!talent.blackout_combo.enabled)
+  if S.BreathofFire:IsCastable() and (Player:BuffRemains(S.CharredPassionsBuff) < S.BlackoutKick:CooldownRemains() and (Player:BuffUp(S.BlackoutComboBuff) or not S.BlackoutCombo:IsAvailable())) then
+    if Cast(S.BreathofFire, Settings.Commons.GCDasOffGCD.BreathOfFire, nil, not Target:IsInMeleeRange(12)) then return "breath_of_fire rotation_pta 16"; end
   end
-  -- bonedust_brew,if=(time<10&debuff.weapons_of_order_debuff.stack>3)|(time>10&talent.weapons_of_order.enabled)
-  -- bonedust_brew,if=(!talent.weapons_of_order.enabled)
-  -- Note: Combining both lines.
-  if S.BonedustBrew:IsCastable() and ((CombatTime < 10 and Target:DebuffStack(S.WeaponsofOrderDebuff) > 3) or (CombatTime > 10 and S.WeaponsofOrder:IsAvailable()) or not S.WeaponsofOrder:IsAvailable()) then
-    if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "bonedust_brew rotation_pta 14"; end
+  -- summon_white_tiger_statue
+  if CDsON() and S.SummonWhiteTigerStatue:IsCastable() then
+    if Cast(S.SummonWhiteTigerStatue, Settings.Brewmaster.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue rotation_pta 18"; end
   end
-  -- exploding_keg,if=(buff.bonedust_brew.up)
+  -- bonedust_brew
+  if S.BonedustBrew:IsCastable() then
+    if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "bonedust_brew rotation_pta 20"; end
+  end
+  -- exploding_keg,if=((buff.bonedust_brew.up)|(cooldown.bonedust_brew.remains>=20))
   -- exploding_keg,if=(!talent.bonedust_brew.enabled)
   -- Note: Combining both lines.
-  if S.ExplodingKeg:IsCastable() and (Player:BuffUp(S.BonedustBrewBuff) or not S.BonedustBrew:IsAvailable()) then
-    if Cast(S.ExplodingKeg, Settings.Commons.GCDasOffGCD.ExplodingKeg, nil, not Target:IsInRange(40)) then return "exploding_keg rotation_pta 16"; end
+  if S.ExplodingKeg:IsCastable() and (Player:BuffUp(S.BonedustBrewBuff) or S.BonedustBrew:CooldownRemains() >= 20 or not S.BonedustBrew:IsAvailable()) then
+    if Cast(S.ExplodingKeg, Settings.Commons.GCDasOffGCD.ExplodingKeg, nil, not Target:IsInRange(40)) then return "exploding_keg rotation_pta 22"; end
   end
-  -- breath_of_fire,if=!(buff.press_the_advantage.stack>6&buff.blackout_combo.up)
-  if S.BreathofFire:IsCastable() and (not (Player:BuffStack(S.PresstheAdvantageBuff) > 6 and Player:BuffUp(S.BlackoutComboBuff))) then
-    if Cast(S.BreathofFire, Settings.Commons.GCDasOffGCD.BreathofFire, nil, not Target:IsInMeleeRange(12)) then return "breath_of_fire rotation_pta 18"; end
+  -- breath_of_fire,if=(buff.blackout_combo.up|!talent.blackout_combo.enabled)
+  if S.BreathofFire:IsCastable() and (Player:BuffUp(S.BlackoutComboBuff) or not S.BlackoutCombo:IsAvailable()) then
+    if Cast(S.BreathofFire, Settings.Commons.GCDasOffGCD.BreathofFire, nil, not Target:IsInMeleeRange(12)) then return "breath_of_fire rotation_pta 24"; end
   end
-  -- keg_smash,if=!(buff.press_the_advantage.stack>6&buff.blackout_combo.up)
-  if S.KegSmash:IsReady() and (not (Player:BuffStack(S.PresstheAdvantageBuff) > 6 and Player:BuffUp(S.BlackoutComboBuff))) then
-    if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash rotation_pta 20"; end
+  -- keg_smash,if=buff.press_the_advantage.stack<10
+  if S.KegSmash:IsReady() and (Player:BuffStack(S.PresstheAdvantageBuff) < 10) then
+    if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash rotation_pta 26"; end
   end
   -- rushing_jade_wind,if=talent.rushing_jade_wind.enabled
   if S.RushingJadeWind:IsCastable() then
-    if Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "rushing_jade_wind rotation_pta 22"; end
+    if Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "rushing_jade_wind rotation_pta 28"; end
   end
-  -- spinning_crane_kick,if=active_enemies>1
-  if S.SpinningCraneKick:IsReady() and (EnemiesCount8 > 1) then
-    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick rotation_pta 24"; end
+  -- spinning_crane_kick,if=active_enemies>2
+  -- spinning_crane_kick,if=(1.1>(time-action.melee_main_hand.last_used)*(1+spell_haste))-main_hand.2h
+  -- Note: Combining both lines.
+  if S.SpinningCraneKick:IsReady() and (
+    (EnemiesCount8 > 2) or
+    (1.1 > (GetTime() - Player:PrevGCDTime()) * (1 + Player:SpellHaste()) - num(Using2H))
+  ) then
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick rotation_pta 30"; end
   end
   -- expel_harm
   if S.ExpelHarm:IsReady() then
-    if Cast(S.ExpelHarm, Settings.Brewmaster.GCDasOffGCD.ExpelHarm, nil, not Target:IsInMeleeRange(8)) then return "expel_harm rotation_pta 26"; end
+    if Cast(S.ExpelHarm, Settings.Brewmaster.GCDasOffGCD.ExpelHarm, nil, not Target:IsInMeleeRange(8)) then return "expel_harm rotation_pta 32"; end
   end
-  -- chi_wave,if=talent.chi_wave.enabled
+  -- chi_wave
   if S.ChiWave:IsCastable() then
-    if Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "chi_wave rotation_pta 28"; end
+    if Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "chi_wave rotation_pta 34"; end
   end
-  -- chi_burst,if=talent.chi_burst.enabled
+  -- chi_burst
   if S.ChiBurst:IsCastable() then
-    if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst rotation_pta 30"; end
+    if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst rotation_pta 36"; end
   end
 end
 
@@ -266,95 +275,117 @@ local function RotationBOC()
   if S.BlackoutKick:IsCastable() then
     if Cast(S.BlackoutKick, nil, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick rotation_boc 2"; end
   end
-  -- invoke_niuzao_the_black_ox,if=debuff.weapons_of_order_debuff.stack>3
-  -- invoke_niuzao_the_black_ox,if=!talent.weapons_of_order.enabled
-  -- Note: Combining both lines.
-  if CDsON() and S.InvokeNiuzaoTheBlackOx:IsCastable() and (Target:DebuffStack(S.WeaponsofOrderDebuff) > 3 or not S.WeaponsofOrder:IsAvailable()) then
-    if Cast(S.InvokeNiuzaoTheBlackOx, Settings.Brewmaster.GCDasOffGCD.InvokeNiuzaoTheBlackOx, nil, not Target:IsInRange(40)) then return "invoke_niuzao_the_black_ox rotation_boc 4"; end
+  local RecentPurifiesBuff = S.PurifyingBrew:TimeSinceLastCast() < 6 and Monk.LastNiuzaoStomp < S.PurifyingBrew.LastCastTime
+  -- purifying_brew,if=(buff.blackout_combo.down&(buff.recent_purifies.down|cooldown.purifying_brew.charges_fractional>(1+talent.improved_purifying_brew.enabled-0.1)))&talent.improved_invoke_niuzao_the_black_ox.enabled&(cooldown.weapons_of_order.remains>40|cooldown.weapons_of_order.remains<5)
+  if S.PurifyingBrew:IsCastable() and Player:StaggerFull() > 0 and ((Player:BuffDown(S.BlackoutComboBuff) and (not RecentPurifiesBuff or S.PurifyingBrew:ChargesFractional() > (1 + num(S.ImprovedPurifyingBrew:IsAvailable()) - 0.1))) and S.ImprovedInvokeNiuzao:IsAvailable() and (S.WeaponsofOrder:CooldownRemains() > 40 or S.WeaponsofOrder:CooldownRemains() < 5)) then
+    if Cast(S.PurifyingBrew, nil, Settings.Brewmaster.DisplayStyle.Purify) then return "purifying_brew rotation_boc 4"; end
   end
-  -- weapons_of_order,if=(talent.weapons_of_order.enabled)
-  if CDsON() and S.WeaponsofOrder:IsCastable() then
+  -- weapons_of_order,if=(buff.recent_purifies.up)&talent.improved_invoke_niuzao_the_black_ox.enabled
+  if CDsON() and S.WeaponsofOrder:IsCastable() and (RecentPurifiesBuff and S.ImprovedInvokeNiuzao:IsAvailable()) then
     if Cast(S.WeaponsofOrder, Settings.Brewmaster.GCDasOffGCD.WeaponsOfOrder) then return "weapons_of_order rotation_boc 6"; end
   end
-  -- keg_smash,if=time-action.weapons_of_order.last_used<2&talent.weapons_of_order.enabled
-  if S.KegSmash:IsReady() and (S.WeaponsofOrder:TimeSinceLastCast() < 2 and S.WeaponsofOrder:IsAvailable()) then
-    if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash rotation_boc 8"; end
+  -- invoke_niuzao_the_black_ox,if=(buff.invoke_niuzao_the_black_ox.down&buff.recent_purifies.up&buff.weapons_of_order.remains<14)&talent.improved_invoke_niuzao_the_black_ox.enabled
+  if CDsON() and S.InvokeNiuzaoTheBlackOx:IsCastable() and ((Player:BuffDown(S.InvokeNiuzaoTheBlackOx) and RecentPurifiesBuff and Player:BuffRemains(S.WeaponsofOrderBuff) < 14) and S.ImprovedInvokeNiuzao:IsAvailable()) then
+    if Cast(S.InvokeNiuzaoTheBlackOx, Settings.Brewmaster.GCDasOffGCD.InvokeNiuzaoTheBlackOx, nil, not Target:IsInRange(40)) then return "invoke_niuzao_the_black_ox rotation_boc 8"; end
   end
-  -- purifying_brew,if=(!buff.blackout_combo.up)
-  -- Note: Handled via Defensives.
-  -- rising_sun_kick
-  if S.RisingSunKick:IsCastable() then
-    if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick rotation_boc 10"; end
+  -- invoke_niuzao_the_black_ox,if=(debuff.weapons_of_order_debuff.stack>3)&!talent.improved_invoke_niuzao_the_black_ox.enabled
+  if CDsON() and S.InvokeNiuzaoTheBlackOx:IsCastable() and (Target:DebuffStack(S.WeaponsofOrderDebuff) > 3 and not S.ImprovedInvokeNiuzao:IsAvailable()) then
+    if Cast(S.InvokeNiuzaoTheBlackOx, Settings.Brewmaster.GCDasOffGCD.InvokeNiuzaoTheBlackOx, nil, not Target:IsInRange(40)) then return "invoke_niuzao_the_black_ox rotation_boc 10"; end
   end
-  -- keg_smash,if=buff.weapons_of_order.up&debuff.weapons_of_order_debuff.remains<=gcd*2
-  if S.KegSmash:IsReady() and (Player:BuffUp(S.WeaponsofOrderBuff) and Target:DebuffRemains(S.WeaponsofOrderDebuff) <= Player:GCD() * 2) then
-    if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash rotation_boc 12"; end
+  -- invoke_niuzao_the_black_ox,if=(!talent.weapons_of_order.enabled)
+  if CDsON() and S.InvokeNiuzaoTheBlackOx:IsCastable() and (not S.WeaponsofOrder:IsAvailable()) then
+    if Cast(S.InvokeNiuzaoTheBlackOx, Settings.Brewmaster.GCDasOffGCD.InvokeNiuzaoTheBlackOx, nil, not Target:IsInRange(40)) then return "invoke_niuzao_the_black_ox rotation_boc 12"; end
   end
-  -- black_ox_brew,if=energy+energy.regen<=40
-  if CDsON() and S.BlackOxBrew:IsCastable() and (Player:Energy() + Player:EnergyRegen() <= 40) then
-    if Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "black_ox_brew rotation_boc 14"; end
+  -- weapons_of_order,if=(talent.weapons_of_order.enabled)&!talent.improved_invoke_niuzao_the_black_ox.enabled
+  if CDsON() and S.WeaponsofOrder:IsCastable() and (not S.ImprovedInvokeNiuzao:IsAvailable()) then
+    if Cast(S.WeaponsofOrder, Settings.Brewmaster.GCDasOffGCD.WeaponsOfOrder) then return "weapons_of_order rotation_boc 14"; end
   end
-  -- tiger_palm,if=buff.blackout_combo.up&active_enemies=1
-  if S.TigerPalm:IsReady() and (Player:BuffUp(S.BlackoutComboBuff) and EnemiesCount8 == 1) then
-    if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm rotation_boc 16"; end
+  -- keg_smash,if=(time-action.weapons_of_order.last_used<2)
+  if S.KegSmash:IsReady() and (S.WeaponsofOrder:TimeSinceLastCast() < 2) then
+    if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash rotation_boc 16"; end
   end
-  -- breath_of_fire,if=buff.charred_passions.remains<cooldown.blackout_kick.remains
-  if S.BreathofFire:IsCastable() and (Player:BuffRemains(S.CharredPassionsBuff) < S.BlackoutKick:CooldownRemains()) then
-    if Cast(S.BreathofFire, Settings.Commons.GCDasOffGCD.BreathofFire, nil, not Target:IsInMeleeRange(12)) then return "breath_of_fire rotation_boc 18"; end
+  -- keg_smash,if=(buff.weapons_of_order.remains<gcd*2&buff.weapons_of_order.up)&!talent.improved_invoke_niuzao_the_black_ox.enabled
+  if S.KegSmash:IsReady() and ((Player:BuffRemains(S.WeaponsofOrderBuff) < Player:GCD() * 2 and Player:BuffUp(S.WeaponsofOrderBuff)) and not S.ImprovedInvokeNiuzao:IsAvailable()) then
+    if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash rotation_boc 18"; end
   end
-  -- keg_smash,if=buff.weapons_of_order.up&debuff.weapons_of_order_debuff.stack<=3
-  if S.KegSmash:IsReady() and (Player:BuffUp(S.WeaponsofOrderBuff) and Player:BuffStack(S.WeaponsofOrderBuff) <= 3) then
+  -- keg_smash,if=(buff.weapons_of_order.remains<gcd*2)&talent.improved_invoke_niuzao_the_black_ox.enabled
+  if S.KegSmash:IsReady() and (Player:BuffRemains(S.WeaponsofOrderBuff) < Player:GCD() * 2 and S.ImprovedInvokeNiuzao:IsAvailable()) then
     if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash rotation_boc 20"; end
   end
-  -- summon_white_tiger_statue,if=debuff.weapons_of_order_debuff.stack>3
-  -- summon_white_tiger_statue,if=!talent.weapons_of_order.enabled
+  -- purifying_brew,if=(!buff.blackout_combo.up)&!talent.improved_invoke_niuzao_the_black_ox.enabled
+  if S.PurifyingBrew:IsCastable() and Player:StaggerFull() > 0 and (Player:BuffDown(S.BlackoutComboBuff) and not S.ImprovedInvokeNiuzao:IsAvailable()) then
+    if Cast(S.PurifyingBrew, nil, Settings.Brewmaster.DisplayStyle.Purify) then return "purifying_brew rotation_boc 22"; end
+  end
+  -- rising_sun_kick
+  if S.RisingSunKick:IsCastable() then
+    if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick rotation_boc 24"; end
+  end
+  -- black_ox_brew,if=(energy+energy.regen<=40)
+  if CDsON() and S.BlackOxBrew:IsCastable() and (Player:Energy() + Player:EnergyRegen() <= 40) then
+    if Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "black_ox_brew rotation_boc 26"; end
+  end
+  -- tiger_palm,if=(buff.blackout_combo.up&active_enemies=1)
+  if S.TigerPalm:IsReady() and (Player:BuffUp(S.BlackoutComboBuff) and EnemiesCount8 == 1) then
+    if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm rotation_boc 28"; end
+  end
+  -- breath_of_fire,if=(buff.charred_passions.remains<cooldown.blackout_kick.remains)
+  if S.BreathofFire:IsCastable() and (Player:BuffRemains(S.CharredPassionsBuff) < S.BlackoutKick:CooldownRemains()) then
+    if Cast(S.BreathofFire, Settings.Commons.GCDasOffGCD.BreathofFire, nil, not Target:IsInMeleeRange(12)) then return "breath_of_fire rotation_boc 30"; end
+  end
+  -- keg_smash,if=(buff.weapons_of_order.up&debuff.weapons_of_order_debuff.stack<=3)
+  if S.KegSmash:IsReady() and (Player:BuffUp(S.WeaponsofOrderBuff) and Player:BuffStack(S.WeaponsofOrderBuff) <= 3) then
+    if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash rotation_boc 32"; end
+  end
+  -- summon_white_tiger_statue,if=(debuff.weapons_of_order_debuff.stack>3)
+  -- summon_white_tiger_statue,if=(!talent.weapons_of_order.enabled)
   -- Note: Combining both lines.
   if CDsON() and S.SummonWhiteTigerStatue:IsCastable() and (Target:DebuffStack(S.WeaponsofOrderDebuff) > 3 or not S.WeaponsofOrder:IsAvailable()) then
-    if Cast(S.SummonWhiteTigerStatue, Settings.Brewmaster.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue rotation_boc 22"; end
+    if Cast(S.SummonWhiteTigerStatue, Settings.Brewmaster.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue rotation_boc 34"; end
   end
   -- bonedust_brew,if=(time<10&debuff.weapons_of_order_debuff.stack>3)|(time>10&talent.weapons_of_order.enabled)
   -- bonedust_brew,if=(!talent.weapons_of_order.enabled)
   -- Note: Combining both lines.
   if S.BonedustBrew:IsCastable() and ((CombatTime < 10 and Target:DebuffStack(S.WeaponsofOrderDebuff) > 3) or (CombatTime > 10 and S.WeaponsofOrder:IsAvailable()) or not S.WeaponsofOrder:IsAvailable()) then
-    if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "bonedust_brew rotation_boc 24"; end
+    if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "bonedust_brew rotation_boc 36"; end
   end
   -- exploding_keg,if=(buff.bonedust_brew.up)
+  -- exploding_keg,if=(cooldown.bonedust_brew.remains>=20)
   -- exploding_keg,if=(!talent.bonedust_brew.enabled)
-  -- Note: Combining both lines.
-  if S.ExplodingKeg:IsCastable() and (Player:BuffUp(S.BonedustBrewBuff) or not S.BonedustBrew:IsAvailable()) then
-    if Cast(S.ExplodingKeg, Settings.Commons.GCDasOffGCD.ExplodingKeg, nil, not Target:IsInRange(40)) then return "exploding_keg rotation_boc 26"; end
+  -- Note: Combining all three lines.
+  if S.ExplodingKeg:IsCastable() and (Player:BuffUp(S.BonedustBrewBuff) or S.BonedustBrew:CooldownRemains() >= 20 or not S.BonedustBrew:IsAvailable()) then
+    if Cast(S.ExplodingKeg, Settings.Commons.GCDasOffGCD.ExplodingKeg, nil, not Target:IsInRange(40)) then return "exploding_keg rotation_boc 38"; end
   end
   -- keg_smash
   if S.KegSmash:IsReady() then
-    if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash rotation_boc 28"; end
+    if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash rotation_boc 40"; end
   end
   -- rushing_jade_wind,if=talent.rushing_jade_wind.enabled
   if S.RushingJadeWind:IsCastable() then
-    if Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "rushing_jade_wind rotation_boc 30"; end
+    if Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "rushing_jade_wind rotation_boc 42"; end
   end
   -- breath_of_fire
   if S.BreathofFire:IsCastable() then
-    if Cast(S.BreathofFire, Settings.Commons.GCDasOffGCD.BreathofFire, nil, not Target:IsInMeleeRange(12)) then return "breath_of_fire rotation_boc 32"; end
+    if Cast(S.BreathofFire, Settings.Commons.GCDasOffGCD.BreathofFire, nil, not Target:IsInMeleeRange(12)) then return "breath_of_fire rotation_boc 44"; end
   end
   -- tiger_palm,if=active_enemies=1&!talent.blackout_combo.enabled
   if S.TigerPalm:IsReady() and (EnemiesCount8 == 1 and not S.BlackoutCombo:IsAvailable()) then
-    if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm rotation_boc 34"; end
+    if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm rotation_boc 46"; end
   end
   -- spinning_crane_kick,if=active_enemies>1
   if S.SpinningCraneKick:IsReady() and (EnemiesCount8 > 1) then
-    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick rotation_boc 36"; end
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick rotation_boc 48"; end
   end
   -- expel_harm
   if S.ExpelHarm:IsReady() then
-    if Cast(S.ExpelHarm, Settings.Brewmaster.GCDasOffGCD.ExpelHarm, nil, not Target:IsInMeleeRange(8)) then return "expel_harm rotation_boc 38"; end
+    if Cast(S.ExpelHarm, Settings.Brewmaster.GCDasOffGCD.ExpelHarm, nil, not Target:IsInMeleeRange(8)) then return "expel_harm rotation_boc 50"; end
   end
-  -- chi_wave,if=talent.chi_wave.enabled
+  -- chi_wave
   if S.ChiWave:IsCastable() then
-    if Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "chi_wave rotation_boc 40"; end
+    if Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "chi_wave rotation_boc 52"; end
   end
-  -- chi_burst,if=talent.chi_burst.enabled
+  -- chi_burst
   if S.ChiBurst:IsCastable() then
-    if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst rotation_boc 42"; end
+    if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst rotation_boc 54"; end
   end
 end
 
@@ -428,7 +459,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Brewmaster Monk rotation is currently a work in progress, but has been updated for patch 10.1.5.")
+  HR.Print("Brewmaster Monk rotation is currently a work in progress, but has been updated for patch 10.2.0.")
 end
 
 HR.SetAPL(268, APL, Init)
