@@ -35,7 +35,6 @@ local Rogue = HR.Commons.Rogue
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Rogue.Commons,
-  Commons2 = HR.GUISettings.APL.Rogue.Commons2,
   Outlaw = HR.GUISettings.APL.Rogue.Outlaw,
 }
 
@@ -231,17 +230,8 @@ local function RtB_Reroll ()
         end
       end
     end
-
     -- Defensive Override : Grand Melee if HP < 60
-    if Everyone.IsSoloMode() then
-      if Player:BuffUp(S.GrandMelee) then
-        if Player:IsTanking(Target) or Player:HealthPercentage() < mathmin(Settings.Outlaw.RolltheBonesLeechKeepHP, Settings.Outlaw.RolltheBonesLeechRerollHP) then
-          Cache.APLVar.RtB_Reroll = false
-        end
-      elseif Player:HealthPercentage() < Settings.Outlaw.RolltheBonesLeechRerollHP then
-        Cache.APLVar.RtB_Reroll = true
-      end
-    end
+    -- mrdmnd note 10.2: grand melee does not do leech, removing old code.
   end
 
   return Cache.APLVar.RtB_Reroll
@@ -275,7 +265,8 @@ end
 
 -- Determine if we are allowed to use Vanish offensively in the current situation
 local function Vanish_DPS_Condition ()
-  return Settings.Outlaw.UseDPSVanish and CDsON() and not (Everyone.IsSoloMode() and Player:IsTanking(Target))
+  -- You can vanish if we've set the UseDPSVanish setting, and we're either not tanking or we're solo but the DPS vanish while solo flag is set).
+  return Settings.Commons.UseDPSVanish and (not Player:IsTanking(Target) or Settings.Commons.UseSoloVanish)
 end
 
 -- Marked for Death Target_if Functions
@@ -490,12 +481,12 @@ local function Build ()
   -- TODO: target_if
   if CDsON() and S.Sepsis:IsReady() and Target:IsSpellInRange(S.Sepsis)
     and (Target:FilteredTimeToDie(">", 11) and Target:DebuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 11)) then
-    if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
+    if HR.Cast(S.Sepsis, nil, Settings.Outlaw.GCDasOffGCD.Sepsis) then return "Cast Sepsis" end
   end
   -- actions.build+=/ghostly_strike,if=debuff.ghostly_strike.remains<=3&(spell_targets.blade_flurry<=2|buff.dreadblades.up)&!buff.subterfuge.up&target.time_to_die>=5
   if S.GhostlyStrike:IsReady() and Target:IsSpellInRange(S.GhostlyStrike) and Target:DebuffRemains(S.GhostlyStrike) <= 3
     and (EnemiesBFCount <= 2 or Player:BuffUp(S.Dreadblades)) and Player:BuffDown(S.SubterfugeBuff) and Target:FilteredTimeToDie(">=", 5) then
-    if HR.Cast(S.GhostlyStrike, Settings.Outlaw.GCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike" end
+    if HR.Cast(S.GhostlyStrike, Settings.Outlaw.OffGCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike" end
   end
   -- actions.build+=/ambush,if=(talent.hidden_opportunity|talent.keep_it_rolling)&(buff.audacity.up|buff.sepsis_buff.up|buff.subterfuge.up&cooldown.keep_it_rolling.ready)|talent.find_weakness&debuff.find_weakness.down
   if S.Ambush:IsReady() then
@@ -531,7 +522,7 @@ local function Build ()
   end
   -- actions.build+=/echoing_reprimand,if=!buff.dreadblades.up
   if CDsON() and S.EchoingReprimand:IsReady() and not Player:DebuffUp(S.Dreadblades) then
-    if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
+    if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.GCDasOffGCD.EchoingReprimand) then return "Cast Echoing Reprimand" end
   end
   -- actions.build+=/pool_resource,for_next=1
   -- actions.build+=/ambush,if=talent.hidden_opportunity|talent.find_weakness&debuff.find_weakness.down
@@ -579,9 +570,6 @@ local function APL ()
   -- Crimson Vial
   ShouldReturn = Rogue.CrimsonVial()
   if ShouldReturn then return ShouldReturn end
-  -- Feint
-  ShouldReturn = Rogue.Feint()
-  if ShouldReturn then return ShouldReturn end
 
   -- Poisons
   Rogue.Poisons()
@@ -600,14 +588,6 @@ local function APL ()
     -- Opener
     if Everyone.TargetIsValid() then
       -- Precombat CDs
-      -- actions.precombat+=/marked_for_death,precombat_seconds=10,if=raid_event.adds.in>25
-      if CDsON() and S.MarkedforDeath:IsCastable() and ComboPointsDeficit >= Rogue.CPMaxSpend() - 1 then
-        if Settings.Commons.STMfDAsDPSCD then
-          if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
-        else
-          if HR.CastSuggested(S.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
-        end
-      end
       -- actions.precombat+=/adrenaline_rush,precombat_seconds=3,if=talent.improved_adrenaline_rush
       if S.AdrenalineRush:IsReady() and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2 then
         if HR.Cast(S.AdrenalineRush) then return "Cast Adrenaline Rush (Opener)" end
@@ -645,24 +625,9 @@ local function APL ()
     ComboPoints = mathmax(ComboPoints, Rogue.FanTheHammerCP())
   end
 
-  -- MfD Sniping (Higher Priority than APL)
-  -- actions.cds+=/marked_for_death,line_cd=1.5,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|combo_points.deficit>=cp_max_spend-1)&!buff.dreadblades.up
-  -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend-1&!buff.dreadblades.up
-  if S.MarkedforDeath:IsCastable() then
-    if EnemiesBFCount > 1 and Everyone.CastTargetIf(S.MarkedforDeath, Enemies30y, "min", EvaluateMfDTargetIfCondition, EvaluateMfDCondition, nil, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then
-      return "Cast Marked for Death (Cycle)"
-    elseif EnemiesBFCount == 1 and ComboPointsDeficit >= Rogue.CPMaxSpend() - 1 and not Player:DebuffUp(S.Dreadblades) then
-      if Settings.Commons.STMfDAsDPSCD then
-        if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (ST)" end
-      else
-        HR.CastSuggested(S.MarkedforDeath)
-      end
-    end
-  end
-
   if Everyone.TargetIsValid() then
     -- Interrupts
-    ShouldReturn = Everyone.Interrupt(5, S.Kick, Settings.Commons2.OffGCDasOffGCD.Kick, Interrupts)
+    ShouldReturn = Everyone.Interrupt(5, S.Kick, true, Interrupts)
     if ShouldReturn then return ShouldReturn end
 
     -- # Higher priority Stealth list for Count the Odds or true Stealth/Vanish that will break in a single global
@@ -693,7 +658,7 @@ local function APL ()
     if ShouldReturn then return "Build: " .. ShouldReturn end
     -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
     if S.ArcaneTorrent:IsCastable() and Target:IsSpellInRange(S.SinisterStrike) and EnergyDeficit > 15 + EnergyRegen then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Torrent" end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent" end
     end
     -- actions+=/arcane_pulse
     if S.ArcanePulse:IsCastable() and Target:IsSpellInRange(S.SinisterStrike) then
@@ -701,11 +666,11 @@ local function APL ()
     end
     -- actions+=/lights_judgment
     if S.LightsJudgment:IsCastable() and Target:IsInMeleeRange(5) then
-      if HR.Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Lights Judgment" end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Lights Judgment" end
     end
     -- actions+=/bag_of_tricks
     if S.BagofTricks:IsCastable() and Target:IsInMeleeRange(5) then
-      if HR.Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Bag of Tricks" end
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Bag of Tricks" end
     end
     -- OutofRange Pistol Shot
     if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and not Target:IsInRange(BladeFlurryRange) and not Player:StealthUp(true, true)

@@ -32,7 +32,6 @@ HR.Commons.Rogue = Commons
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Rogue.Commons,
-  Commons2 = HR.GUISettings.APL.Rogue.Commons2,
   Assassination = HR.GUISettings.APL.Rogue.Assassination,
   Outlaw = HR.GUISettings.APL.Rogue.Outlaw,
   Subtlety = HR.GUISettings.APL.Rogue.Subtlety
@@ -284,8 +283,8 @@ end
 
 -- Stealth
 function Commons.Stealth(Stealth, Setting)
-  if Settings.Commons2.StealthOOC and Stealth:IsCastable() and Player:StealthDown() then
-    if HR.Cast(Stealth, Settings.Commons2.OffGCDasOffGCD.Stealth) then return "Cast Stealth (OOC)" end
+  if Stealth:IsCastable() and Player:StealthDown() then
+    if HR.Cast(Stealth) then return "Cast Stealth (OOC)" end
   end
 
   return false
@@ -296,22 +295,11 @@ do
   local CrimsonVial = Spell(185311)
 
   function Commons.CrimsonVial()
-    if CrimsonVial:IsCastable() and Player:HealthPercentage() <= Settings.Commons2.CrimsonVialHP then
-      if HR.Cast(CrimsonVial, Settings.Commons2.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial (Defensives)" end
+    if CrimsonVial:IsCastable() and Player:HealthPercentage() <= Settings.Commons.CrimsonVialHP then
+      if HR.Cast(CrimsonVial, Settings.Commons.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial (Defensives)" end
     end
 
     return false
-  end
-end
-
--- Feint
-do
-  local Feint = Spell(1966)
-
-  function Commons.Feint()
-    if Feint:IsCastable() and Player:BuffDown(Feint) and Player:HealthPercentage() <= Settings.Commons2.FeintHP then
-      if HR.Cast(Feint, Settings.Commons2.GCDasOffGCD.Feint) then return "Cast Feint (Defensives)" end
-    end
   end
 end
 
@@ -330,13 +318,13 @@ do
 
   local function CastPoison(Poison)
     PoisonRemains = Player:BuffRemains(Poison)
-    if PoisonRemains < (Player:AffectingCombat() and Settings.Commons.PoisonRefreshCombat * 60 or Settings.Commons.PoisonRefresh * 60) then
+    if PoisonRemains < (Player:AffectingCombat() and 120 or 300) then
       HR.CastSuggested(Poison)
     end
   end
 
   function Commons.Poisons()
-    local PoisonRefreshTime = Player:AffectingCombat() and Settings.Commons.PoisonRefreshCombat * 60 or Settings.Commons.PoisonRefresh * 60
+    local PoisonRefreshTime = Player:AffectingCombat() and 120 or 300
     local PoisonRemains
     -- Lethal Poison
     UsingWoundPoison = Player:BuffUp(WoundPoison)
@@ -371,28 +359,6 @@ do
       end
     else
       CastPoison(CripplingPoison)
-    end
-  end
-end
-
--- Marked for Death Sniping
-function Commons.MfDSniping(MarkedforDeath)
-  if MarkedforDeath:IsCastable() then
-    local BestUnit, BestUnitTTD = nil, 60
-    local MOTTD = MouseOver:IsInRange(30) and MouseOver:TimeToDie() or 11111
-    for _, ThisUnit in pairs(Player:GetEnemiesInRange(30)) do
-      local TTD = ThisUnit:TimeToDie()
-      -- Note: Increased the SimC condition by 50% since we are slower.
-      if not ThisUnit:IsMfDBlacklisted() and TTD < Player:ComboPointsDeficit()*1.5 and TTD < BestUnitTTD then
-        if MOTTD - TTD > 1 then
-          BestUnit, BestUnitTTD = ThisUnit, TTD
-        else
-          BestUnit, BestUnitTTD = MouseOver, MOTTD
-        end
-      end
-    end
-    if BestUnit and BestUnit:GUID() ~= Target:GUID() then
-      HR.CastLeftNameplate(BestUnit, MarkedforDeath)
     end
   end
 end

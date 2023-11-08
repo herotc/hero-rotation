@@ -892,9 +892,6 @@ local function APL ()
   -- Crimson Vial
   ShouldReturn = Rogue.CrimsonVial()
   if ShouldReturn then return ShouldReturn end
-  -- Feint
-  ShouldReturn = Rogue.Feint()
-  if ShouldReturn then return ShouldReturn end
 
   -- Poisons
   Rogue.Poisons()
@@ -939,13 +936,9 @@ local function APL ()
     return
   end
 
-  -- In Combat
-  -- MfD Sniping
-  Rogue.MfDSniping(S.MarkedforDeath)
-
   if Everyone.TargetIsValid() then
     -- Interrupts
-    ShouldReturn = Everyone.Interrupt(5, S.Kick, Settings.Commons2.OffGCDasOffGCD.Kick, Interrupts)
+    ShouldReturn = Everyone.Interrupt(5, S.Kick, true, Interrupts)
     if ShouldReturn then return ShouldReturn end
 
     -- # Check CDs at first

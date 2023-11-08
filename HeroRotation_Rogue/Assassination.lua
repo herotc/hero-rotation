@@ -41,7 +41,6 @@ local Rogue = HR.Commons.Rogue
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Rogue.Commons,
-  Commons2 = HR.GUISettings.APL.Rogue.Commons2,
   Assassination = HR.GUISettings.APL.Rogue.Assassination
 }
 
@@ -169,11 +168,11 @@ S.Garrote:RegisterPMultiplier(ComputeImprovedGarrotePMultiplier)
 local function UsePriorityRotation()
   if MeleeEnemies10yCount < 2 then
     return false
-  elseif Settings.Commons.UsePriorityRotation == "Always" then
+  elseif Settings.Assassination.UsePriorityRotation == "Always" then
     return true
-  elseif Settings.Commons.UsePriorityRotation == "On Bosses" and Target:IsInBossList() then
+  elseif Settings.Assassination.UsePriorityRotation == "On Bosses" and Target:IsInBossList() then
     return true
-  elseif Settings.Commons.UsePriorityRotation == "Auto" then
+  elseif Settings.Assassination.UsePriorityRotation == "Auto" then
     -- Zul Mythic
     if Player:InstanceDifficulty() == 16 and Target:NPCID() == 138967 then
       return true
@@ -379,21 +378,6 @@ end
 
 -- # Cooldowns
 local function CDs ()
-  if S.MarkedforDeath:IsCastable() then
-    -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit*1.5|combo_points.deficit>=cp_max_spend)
-    if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit() * 1.5) then
-      if Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death" end
-    end
-    -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend
-    if ComboPointsDeficit >= Rogue.CPMaxSpend() then
-      if not Settings.Commons.STMfDAsDPSCD then
-        HR.CastSuggested(S.MarkedforDeath)
-      elseif HR.CDsON() then
-        if Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death" end
-      end
-    end
-  end
-
   if not TargetInAoERange then
     return
   end
@@ -402,7 +386,7 @@ local function CDs ()
     -- actions.cds+=/sepsis,if=!stealthed.rogue&!stealthed.improved_garrote&(!talent.improved_garrote&dot.garrote.ticking|talent.improved_garrote&cooldown.garrote.up)&(target.time_to_die>10|fight_remains<10)
     if S.Sepsis:IsReady() and ImprovedGarroteRemains() == 0 and (S.ImprovedGarrote:IsAvailable() and S.Garrote:CooldownUp() or Target:DebuffUp(S.Garrote))
       and (Target:FilteredTimeToDie(">", 10) or HL.BossFilteredFightRemains("<=", 10)) then
-      if Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
+      if Cast(S.Sepsis, nil, true) then return "Cast Sepsis" end
     end
 
     -- actions.cds+=/use_item,name=algethar_puzzle_box,use_off_gcd=1,if=(!talent.exsanguinate|cooldown.exsanguinate.remains>15|exsanguinated.rupture|exsanguinated.garrote)&dot.rupture.ticking&cooldown.deathmark.remains<2|fight_remains<=22
@@ -449,7 +433,7 @@ local function CDs ()
         if S.ResoundingClarity:IsAvailable() and S.EchoingReprimand:IsReady()
           and Player:ComboPoints() <= 2 and ExsanguinateSyncRemains <= 2
           and not IsDebuffRefreshable(Target, S.Garrote) and Target:DebuffRemains(S.Rupture) > 9.6 then
-          if Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle, not TargetInMeleeRange) then return "Cast Echoing Reprimand (Exsang Sync)" end
+          if Cast(S.EchoingReprimand, nil, Settings.Commons.GCDasOffGCD.EchoingReprimand, not TargetInMeleeRange) then return "Cast Echoing Reprimand (Exsang Sync)" end
         end
         if S.Exsanguinate:IsReady() and not IsDebuffRefreshable(Target, S.Garrote) and Target:DebuffRemains(S.Rupture) > 4 + 4 * ExsanguinateRuptureCP()
           or Target:FilteredTimeToDie("<", Target:DebuffRemains(S.Rupture)*0.5) then
@@ -691,9 +675,9 @@ local function Direct ()
       -- actions.direct+=/serrated_bone_spike,if=variable.use_filler&master_assassin_remains<0.8&!variable.single_target&debuff.shiv.up
       if MasterAssassinRemains() < 0.8 then
         if (HL.BossFightRemains() <= 5 or (S.SerratedBoneSpike:MaxCharges() - S.SerratedBoneSpike:ChargesFractional() <= 0.25)) then
-          if Cast(S.SerratedBoneSpike, nil, Settings.Commons.SerratedBoneSpikeDumpDisplayStyle, not TargetInAoERange) then return "Cast Serrated Bone Spike (Dump Charge)" end
+          if Cast(S.SerratedBoneSpike, nil, true, not TargetInAoERange) then return "Cast Serrated Bone Spike (Dump Charge)" end
         elseif not SingleTarget and Target:DebuffUp(S.ShivDebuff) then
-          if Cast(S.SerratedBoneSpike, nil, Settings.Commons.SerratedBoneSpikeDumpDisplayStyle, not TargetInAoERange) then return "Cast Serrated Bone Spike (Shiv)" end
+          if Cast(S.SerratedBoneSpike, nil, true, not TargetInAoERange) then return "Cast Serrated Bone Spike (Shiv)" end
         end
       end
     end
@@ -701,7 +685,7 @@ local function Direct ()
   -- actions.direct+=/echoing_reprimand,if=(!talent.exsanguinate|!talent.resounding_clarity)&variable.use_filler&cooldown.deathmark.remains>10|fight_remains<20
   if CDsON() and S.EchoingReprimand:IsReady() and ((not S.Exsanguinate:IsAvailable() or not S.ResoundingClarity:IsAvailable() or ExsanguinateSyncRemains > 40)
     and (not S.Deathmark:IsAvailable() or S.Deathmark:CooldownRemains() > 10) or HL.BossFilteredFightRemains("<=", 20)) then
-    if Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle, not TargetInMeleeRange) then return "Cast Echoing Reprimand" end
+    if Cast(S.EchoingReprimand, nil, Settings.Commons.GCDasOffGCD.EchoingReprimand, not TargetInMeleeRange) then return "Cast Echoing Reprimand" end
   end
   if S.FanofKnives:IsCastable() then
     -- actions.direct+=/fan_of_knives,if=variable.use_filler&(!priority_rotation&spell_targets.fan_of_knives>=3+stealthed.rogue+talent.dragontempered_blades)
@@ -776,9 +760,6 @@ local function APL ()
   -- Crimson Vial
   ShouldReturn = Rogue.CrimsonVial()
   if ShouldReturn then return ShouldReturn end
-  -- Feint
-  ShouldReturn = Rogue.Feint()
-  if ShouldReturn then return ShouldReturn end
 
   -- Poisons
   Rogue.Poisons()
@@ -796,13 +777,6 @@ local function APL ()
     -- PrePot w/ Bossmod Countdown
     -- Opener
     if Everyone.TargetIsValid() then
-      -- Precombat CDs
-      if HR.CDsON() then
-        -- actions.precombat+=/marked_for_death,precombat_seconds=10,if=raid_event.adds.in>15
-        if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() and Everyone.TargetIsValid() then
-          if Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
-        end
-      end
       -- actions.precombat+=/slice_and_dice,precombat_seconds=1
       if not Player:BuffUp(S.SliceandDice) then
         if S.SliceandDice:IsReady() and ComboPoints >= 2 then
@@ -812,12 +786,9 @@ local function APL ()
     end
   end
 
-  -- In Combat
-  -- MfD Sniping
-  Rogue.MfDSniping(S.MarkedforDeath)
   if Everyone.TargetIsValid() then
     -- Interrupts
-    ShouldReturn = Everyone.Interrupt(5, S.Kick, Settings.Commons2.OffGCDasOffGCD.Kick, Interrupts)
+    ShouldReturn = Everyone.Interrupt(5, S.Kick, true, Interrupts)
     if ShouldReturn then return ShouldReturn end
   
     PoisonedBleeds = Rogue.PoisonedBleeds()
@@ -870,19 +841,19 @@ local function APL ()
     if HR.CDsON() then
       -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
       if S.ArcaneTorrent:IsCastable() and TargetInMeleeRange and Player:EnergyDeficit() > 15 then
-        if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Torrent" end
+        if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent" end
       end
       -- actions+=/arcane_pulse
       if S.ArcanePulse:IsCastable() and TargetInMeleeRange then
-        if Cast(S.ArcanePulse, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Pulse" end
+        if Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Pulse" end
       end
       -- actions+=/lights_judgment
       if S.LightsJudgment:IsCastable() and TargetInMeleeRange then
-        if Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Lights Judgment" end
+        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Lights Judgment" end
       end
       -- actions+=/bag_of_tricks
       if S.BagofTricks:IsCastable() and TargetInMeleeRange then
-        if Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Bag of Tricks" end
+        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Bag of Tricks" end
       end
     end
     -- Trick to take in consideration the Recovery Setting
