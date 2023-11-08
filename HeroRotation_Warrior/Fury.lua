@@ -253,7 +253,7 @@ local function SingleTarget()
     end
   end
   -- bloodbath
-  if S.bloodbath:IsCastable() then
+  if S.Bloodbath:IsCastable() then
     if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 14"; end
   end
   -- thunderous_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
