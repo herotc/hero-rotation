@@ -366,10 +366,10 @@ local function APL()
     -- icebound_fortitude,if=!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)&(target.cooldown.pause_action.remains>=8|target.cooldown.pause_action.duration>0)
     -- Above Above lines handled via Defensives()
     -- vampiric_blood,if=!buff.vampiric_blood.up&!buff.vampiric_strength.up
-    -- Note: Handling this vampiric_blood here, as it's now used as an offensive CD.
-    if S.VampiricBlood:IsCastable() and (Player:BuffDown(S.VampiricBloodBuff) and Player:BuffDown(S.VampiricStrengthBuff)) then
+    -- Note: Handling this vampiric_blood here, as it's now used as an offensive CD with T31P4.
+    if S.VampiricBlood:IsCastable() and (Player:BuffDown(S.VampiricBloodBuff) and Player:BuffDown(S.VampiricStrengthBuff) and Player:HasTier(30, 4)) then
       if Cast(S.VampiricBlood, Settings.Blood.GCDasOffGCD.VampiricBlood) then return "vampiric_blood main 5"; end
-  end
+    end
     -- vampiric_blood,if=!(buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.vampiric_blood.up|buff.vampiric_strength.up)&(target.cooldown.pause_action.remains>=13|target.cooldown.pause_action.duration>0)
     -- Above Above lines handled via Defensives()
     -- deaths_caress,if=!buff.bone_shield.up
