@@ -473,9 +473,14 @@ local function Filler()
   -- divine_star
   -- Note: Handled in above divine_star line, as we're not checking raid_event.adds.in
   -- shadow_word_death
-  -- Note: APL comments reference using this while moving
+  -- Note: Per APL note, intent is to be used as a movement filler.
   if S.ShadowWordDeath:IsReady() and Player:IsMoving() then
     if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death movement filler 26"; end
+  end
+  -- power_word_shield,if=set_bonus.tier31_4pc
+  -- Note: Per APL note, intent is to be used as a movement filler.
+  if S.PowerWordShield:IsReady() and Player:IsMoving() and (Player:HasTier(31, 4)) then
+    if Cast(S.PowerWordShield) then return "power_word_shield filler 27"; end
   end
   -- shadow_word_pain,target_if=min:remains
   -- Note: Per APL note, intent is to be used as a movement filler.

@@ -43,6 +43,7 @@ Spell.Priest.Commons = {
   PowerInfusion               = Spell(10060),
   PowerInfusionBuff           = Spell(10060),
   PowerWordFortitude          = Spell(21562),
+  PowerWordShield             = Spell(17),
   ShadowWordDeath             = Spell(32379),
   ShadowWordPain              = Spell(589),
   ShadowWordPainDebuff        = Spell(589),
