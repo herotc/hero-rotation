@@ -477,25 +477,25 @@ local function Trinkets()
   if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() and (S.Avatar:CooldownRemains() <= 3) then
     if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box trinkets 2"; end
   end
-  local Trinket1Spell = trinket1:OnUseSpell()
-  local Trinket1Range = (Trinket1Spell and Trinket1Spell.MaximumRange > 0 and Trinket1Spell.MaximumRange <= 100) and Trinket1Spell.MaximumRange or 100
-  local Trinket2Spell = trinket2:OnUseSpell()
-  local Trinket2Range = (Trinket2Spell and Trinket2Spell.MaximumRange > 0 and Trinket2Spell.MaximumRange <= 100) and Trinket2Spell.MaximumRange or 100
+  local Trinket1Item, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
+  local Trinket2Item, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
+  local Trinket1Spell = Trinket1Item and Trinket1Item:OnUseSpell() or Spell(0)
+  local Trinket2Spell = Trinket2Item and Trinket2Item:OnUseSpell() or Spell(0)
   -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!buff.avatar.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&buff.avatar.up&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
-  if trinket1:IsReady() and (VarTrinket1Buffs and not VarTrinket1Manual and (Player:BuffDown(S.AvatarBuff) and Trinket1Spell:CastTime() > 0 or Trinket1Spell:CastTime() == 0) and Player:BuffUp(S.AvatarBuff) and (VarTrinket2Exclude or not trinket2:HasCooldown() or trinket2:CooldownDown() or VarTrinketPriority == 1) or FightRemains <= 30) then
-    if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "use_item for "..trinket1:Name().." trinkets 4"; end
+  if Trinket1Item:IsReady() and (VarTrinket1Buffs and not VarTrinket1Manual and (Player:BuffDown(S.AvatarBuff) and Trinket1Spell:CastTime() > 0 or Trinket1Spell:CastTime() == 0) and Player:BuffUp(S.AvatarBuff) and (VarTrinket2Exclude or not trinket2:HasCooldown() or trinket2:CooldownDown() or VarTrinketPriority == 1) or FightRemains <= 30) then
+    if Cast(Trinket1Item, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "use_item for "..Trinket1Item:Name().." trinkets 4"; end
   end
   -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!buff.avatar.up&trinket.2.cast_time>0|!trinket.2.cast_time>0)&buff.avatar.up&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
-  if trinket2:IsReady() and (VarTrinket2Buffs and not VarTrinket2Manual and (Player:BuffDown(S.AvatarBuff) and Trinket2Spell:CastTime() > 0 or Trinket2Spell:CastTime() == 0) and Player:BuffUp(S.AvatarBuff) and (VarTrinket1Exclude or not trinket1:HasCooldown() or trinket1:CooldownDown() or VarTrinketPriority == 2) or FightRemains <= 30) then
-    if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "use_item for "..trinket2:Name().." trinkets 6"; end
+  if Trinket2Item:IsReady() and (VarTrinket2Buffs and not VarTrinket2Manual and (Player:BuffDown(S.AvatarBuff) and Trinket2Spell:CastTime() > 0 or Trinket2Spell:CastTime() == 0) and Player:BuffUp(S.AvatarBuff) and (VarTrinket1Exclude or not trinket1:HasCooldown() or trinket1:CooldownDown() or VarTrinketPriority == 2) or FightRemains <= 30) then
+    if Cast(Trinket2Item, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "use_item for "..Trinket2Item:Name().." trinkets 6"; end
   end
   -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|(trinket.1.cast_time>0&!buff.avatar.up|!trinket.1.cast_time>0)|cooldown.avatar.remains_expected>20)
-  if trinket1:IsReady() and (not VarTrinket1Buffs and not VarTrinket1Manual and (not VarTrinket1Buffs and (trinket2:CooldownDown() or not VarTrinket2Buffs) or (Trinket1Spell:CastTime() > 0 and Player:BuffDown(S.AvatarBuff) or Trinket1Spell:CastTime() == 0) or S.Avatar:CooldownRemains() > 20)) then
-    if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "use_item for "..trinket1:Name().." trinkets 8"; end
+  if Trinket1Item:IsReady() and (not VarTrinket1Buffs and not VarTrinket1Manual and (not VarTrinket1Buffs and (trinket2:CooldownDown() or not VarTrinket2Buffs) or (Trinket1Spell:CastTime() > 0 and Player:BuffDown(S.AvatarBuff) or Trinket1Spell:CastTime() == 0) or S.Avatar:CooldownRemains() > 20)) then
+    if Cast(Trinket1Item, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "use_item for "..Trinket1Item:Name().." trinkets 8"; end
   end
   -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|(trinket.2.cast_time>0&!buff.avatar.up|!trinket.2.cast_time>0)|cooldown.avatar.remains_expected>20)
-  if trinket2:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and (not VarTrinket2Buffs and (trinket1:CooldownDown() or not VarTrinket1Buffs) or (Trinket2Spell:CastTime() > 0 and Player:BuffDown(S.AvatarBuff) or Trinket2Spell:CastTime() == 0) or S.Avatar:CooldownRemains() > 20)) then
-    if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "use_item for "..trinket2:Name().." trinkets 10"; end
+  if Trinket2Item:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and (not VarTrinket2Buffs and (trinket1:CooldownDown() or not VarTrinket1Buffs) or (Trinket2Spell:CastTime() > 0 and Player:BuffDown(S.AvatarBuff) or Trinket2Spell:CastTime() == 0) or S.Avatar:CooldownRemains() > 20)) then
+    if Cast(Trinket2Item, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "use_item for "..Trinket2Item:Name().." trinkets 10"; end
   end
   -- use_item,use_off_gcd=1,slot=main_hand,if=(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
   local MainHandOnUse, _, MainHandRange = Player:GetUseableItems(OnUseExcludes, 16)
