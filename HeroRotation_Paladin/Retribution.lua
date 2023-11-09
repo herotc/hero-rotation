@@ -121,8 +121,6 @@ local function Precombat()
   end
   -- variable,name=trinket_1_buffs,value=trinket.1.has_buff.strength|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit
   -- variable,name=trinket_2_buffs,value=trinket.2.has_buff.strength|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit
-  -- variable,name=trinket_1_manual,value=trinket.1.is.manic_grieftorch
-  -- variable,name=trinket_2_manual,value=trinket.2.is.manic_grieftorch
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_1_buffs&(trinket.1.cooldown.duration%%cooldown.crusade.duration=0|cooldown.crusade.duration%%trinket.1.cooldown.duration=0|trinket.1.cooldown.duration%%cooldown.avenging_wrath.duration=0|cooldown.avenging_wrath.duration%%trinket.1.cooldown.duration=0)
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_2_buffs&(trinket.2.cooldown.duration%%cooldown.crusade.duration=0|cooldown.crusade.duration%%trinket.2.cooldown.duration=0|trinket.2.cooldown.duration%%cooldown.avenging_wrath.duration=0|cooldown.avenging_wrath.duration%%trinket.2.cooldown.duration=0)
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync))
@@ -163,22 +161,22 @@ local function Cooldowns()
   if S.Fireblood:IsCastable() and (Player:BuffUp(S.AvengingWrathBuff) or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) == 10) then
     if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cooldowns 6" end
   end
-  -- use_item,name=algethar_puzzle_box,if=(cooldown.avenging_wrath.remains<5&!talent.crusade|cooldown.crusade.remains<5&talent.crusade)&(holy_power>=5&time<5|holy_power>=3&time>5)
-  if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() and ((S.AvengingWrath:CooldownRemains() < 5 and not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() < 5 and S.Crusade:IsAvailable()) and (HolyPower >= 5 and HL.CombatTime() < 5 or HolyPower >= 3 and HL.CombatTime() > 5)) then
+  -- use_item,name=algethar_puzzle_box,if=(cooldown.avenging_wrath.remains<5&!talent.crusade|cooldown.crusade.remains<5&talent.crusade)&(holy_power>=4&time<5|holy_power>=3&time>5)
+  if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() and ((S.AvengingWrath:CooldownRemains() < 5 and not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() < 5 and S.Crusade:IsAvailable()) and (HolyPower >= 4 and HL.CombatTime() < 5 or HolyPower >= 3 and HL.CombatTime() > 5)) then
     if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldowns 8"; end
   end
   -- use_item,slot=trinket1,if=(buff.avenging_wrath.up&cooldown.avenging_wrath.remains>40|buff.crusade.up&buff.crusade.stack=10)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket2,if=(buff.avenging_wrath.up&cooldown.avenging_wrath.remains>40|buff.crusade.up&buff.crusade.stack=10)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
-  -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(!variable.trinket_1_manual|buff.avenging_wrath.down&buff.crusade.down)&(trinket.2.cooldown.remains|!variable.trinket_2_buffs|!buff.crusade.up&cooldown.crusade.remains>20|!buff.avenging_wrath.up&cooldown.avenging_wrath.remains>20)
-  -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(!variable.trinket_2_manual|buff.avenging_wrath.down&buff.crusade.down)&(trinket.1.cooldown.remains|!variable.trinket_1_buffs|!buff.crusade.up&cooldown.crusade.remains>20|!buff.avenging_wrath.up&cooldown.avenging_wrath.remains>20)
-  -- Note: Can't handle all of the above trinket conditions, so using a generic use_items instead.
-  if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
+  -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs|!buff.crusade.up&cooldown.crusade.remains>20|!buff.avenging_wrath.up&cooldown.avenging_wrath.remains>20)
+  -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs|!buff.crusade.up&cooldown.crusade.remains>20|!buff.avenging_wrath.up&cooldown.avenging_wrath.remains>20)
+  if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) and (((Player:BuffUp(S.AvengingWrathBuff) and S.AvengingWrath:CooldownRemains() > 40 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) == 10) or FightRemains < 30) or (Player:BuffDown(S.CrusadeBuff) and S.Crusade:CooldownRemains() > 20 or Player:BuffDown(S.AvengingWrathBuff) and S.AvengingWrath:CooldownRemains() > 20)) then
+  -- Note: Can't handle all of the above trinket conditions, so using above simplified use_items instead.
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
       local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
       if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
       if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
-        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "simplified use_items for " .. ItemToUse:Name(); end
       end
     end
   end
@@ -190,8 +188,8 @@ local function Cooldowns()
   if S.ShieldofVengeance:IsCastable() and (FightRemains > 15 and (not S.ExecutionSentence:IsAvailable() or Target:DebuffDown(S.ExecutionSentence))) then
     if Cast(S.ShieldofVengeance, Settings.Retribution.GCDasOffGCD.ShieldOfVengeance) then return "shield_of_vengeance cooldowns 12"; end
   end
-  -- execution_sentence,if=(!buff.crusade.up&cooldown.crusade.remains>15|buff.crusade.stack=10|cooldown.avenging_wrath.remains<0.75|cooldown.avenging_wrath.remains>15)&(holy_power>=3|holy_power>=2&talent.divine_auxiliary)&(target.time_to_die>8|target.time_to_die>12&talent.executioners_will)
-  if S.ExecutionSentence:IsCastable() and ((Player:BuffDown(S.CrusadeBuff) and S.Crusade:CooldownRemains() > 15 or Player:BuffStack(S.CrusadeBuff) == 10 or S.AvengingWrath:CooldownRemains() < 0.75 or S.AvengingWrath:CooldownRemains() > 15) and (HolyPower >= 3 or HolyPower >= 2 and S.DivineAuxiliary:IsAvailable()) and (Target:TimeToDie() > 8 or Target:TimeToDie() > 12 and S.ExecutionersWill:IsAvailable())) then
+  -- execution_sentence,if=(!buff.crusade.up&cooldown.crusade.remains>15|buff.crusade.stack=10|cooldown.avenging_wrath.remains<0.75|cooldown.avenging_wrath.remains>15)&(holy_power>=4&time<5|holy_power>=3&time>5|holy_power>=2&talent.divine_auxiliary)&(target.time_to_die>8&!talent.executioners_will|target.time_to_die>12)
+  if S.ExecutionSentence:IsCastable() and ((Player:BuffDown(S.CrusadeBuff) and S.Crusade:CooldownRemains() > 15 or Player:BuffStack(S.CrusadeBuff) == 10 or S.AvengingWrath:CooldownRemains() < 0.75 or S.AvengingWrath:CooldownRemains() > 15) and (HolyPower >= 4 and HL.CombatTime() < 5 or HolyPower >= 3 and HL.CombatTime() > 5 or HolyPower >= 2 and S.DivineAuxiliary:IsAvailable()) and (Target:TimeToDie() > 8 and not S.ExecutionersWill:IsAvailable() or Target:TimeToDie() > 12)) then
     if Cast(S.ExecutionSentence, Settings.Retribution.GCDasOffGCD.ExecutionSentence, nil, not Target:IsSpellInRange(S.ExecutionSentence)) then return "execution_sentence cooldowns 14"; end
   end
   -- avenging_wrath,if=holy_power>=4&time<5|holy_power>=3&time>5|holy_power>=2&talent.divine_auxiliary&(cooldown.execution_sentence.remains=0|cooldown.final_reckoning.remains=0)
@@ -226,25 +224,25 @@ local function Finishers()
 end
 
 local function Generators()
-  -- call_action_list,name=finishers,if=holy_power=5|(debuff.judgment.up|holy_power=4)&buff.divine_resonance.up
-  if (HolyPower >= 5 or (Target:DebuffUp(S.JudgmentDebuff) or HolyPower == 4) and Player:BuffUp(S.DivineResonanceBuff)) then
+  -- call_action_list,name=finishers,if=holy_power=5|buff.echoes_of_wrath.up&set_bonus.tier31_4pc&talent.crusading_strikes|(debuff.judgment.up|holy_power=4)&buff.divine_resonance.up&!set_bonus.tier31_2pc
+  if (HolyPower >= 5 or Player:BuffUp(S.EchoesofWrathBuff) and Player:HasTier(31, 4) and S.CrusadingStrikes:IsAvailable() or (Target:DebuffUp(S.JudgmentDebuff) or HolyPower == 4) and Player:BuffUp(S.DivineResonanceBuff) and not Player:HasTier(31, 2)) then
     local ShouldReturn = Finishers(); if ShouldReturn then return ShouldReturn; end
-  end
-  -- blade_of_justice,if=!dot.expurgation.ticking&holy_power<=3&set_bonus.tier31_2pc
-  if S.BladeofJustice:IsCastable() and (Target:DebuffDown(S.ExpurgationDebuff) and HolyPower <= 3 and Player:HasTier(31, 2)) then
-    if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice generators 1"; end
   end
   -- wake_of_ashes,if=holy_power<=2&(cooldown.avenging_wrath.remains|cooldown.crusade.remains)&(!talent.execution_sentence|cooldown.execution_sentence.remains>4|target.time_to_die<8)&(!raid_event.adds.exists|raid_event.adds.in>20|raid_event.adds.up)
   if S.WakeofAshes:IsCastable() and (HolyPower <= 2 and (S.AvengingWrath:CooldownDown() or S.Crusade:CooldownDown()) and (not S.ExecutionSentence:IsAvailable() or S.ExecutionSentence:CooldownRemains() > 4 or FightRemains < 8)) then
     if Cast(S.WakeofAshes, nil, nil, not Target:IsInMeleeRange(14)) then return "wake_of_ashes generators 2"; end
   end
-  -- divine_toll,if=holy_power<=2&!debuff.judgment.up&(!raid_event.adds.exists|raid_event.adds.in>30|raid_event.adds.up)&(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15|fight_remains<8)
-  if S.DivineToll:IsCastable() and (HolyPower <= 2 and Target:DebuffDown(S.JudgmentDebuff) and (S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15 or FightRemains < 8)) then
-    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll generators 4"; end
+  -- blade_of_justice,if=!dot.expurgation.ticking&holy_power<=3&set_bonus.tier31_2pc
+  if S.BladeofJustice:IsCastable() and (Target:DebuffDown(S.ExpurgationDebuff) and HolyPower <= 3 and Player:HasTier(31, 2)) then
+    if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice generators 4"; end
   end
-  -- judgment,if=dot.expurgation.ticking&holy_power<=3&set_bonus.tier31_4pc&!buff.echoes_of_wrath.up
-  if S.Judgment:IsReady() and (Target:DebuffUp(S.ExpurgationDebuff) and HolyPower <= 3 and Player:HasTier(31, 4) and Player:BuffDown(S.EchoesofWrathBuff)) then
-    if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment generators 5"; end
+  -- divine_toll,if=holy_power<=2&(!raid_event.adds.exists|raid_event.adds.in>30|raid_event.adds.up)&(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15|fight_remains<8)
+  if S.DivineToll:IsCastable() and (HolyPower <= 2 and (S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15 or FightRemains < 8)) then
+    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll generators 6"; end
+  end
+  -- judgment,if=dot.expurgation.ticking&!buff.echoes_of_wrath.up&set_bonus.tier31_2pc
+  if S.Judgment:IsReady() and (Target:DebuffUp(S.ExpurgationDebuff) and Player:BuffDown(S.EchoesofWrathBuff) and Player:HasTier(31, 2)) then
+    if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment generators 8"; end
   end
   -- call_action_list,name=finishers,if=holy_power>=3&buff.crusade.up&buff.crusade.stack<10
   if (HolyPower >= 3 and Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
@@ -252,31 +250,27 @@ local function Generators()
   end
   -- templar_slash,if=buff.templar_strikes.remains<gcd&spell_targets.divine_storm>=2
   if S.TemplarSlash:IsReady() and (S.TemplarStrike:TimeSinceLastCast() + PlayerGCD < 4 and EnemiesCount8y >= 2) then
-    if Cast(S.TemplarSlash, nil, nil, not Target:IsSpellInRange(S.TemplarSlash)) then return "templar_slash generators 6"; end
+    if Cast(S.TemplarSlash, nil, nil, not Target:IsSpellInRange(S.TemplarSlash)) then return "templar_slash generators 10"; end
   end
   -- blade_of_justice,if=(holy_power<=3|!talent.holy_blade)&(spell_targets.divine_storm>=2&!talent.crusading_strikes|spell_targets.divine_storm>=4)
   if S.BladeofJustice:IsCastable() and ((HolyPower <= 3 or not S.HolyBlade:IsAvailable()) and (EnemiesCount8y >= 2 and not S.CrusadingStrikes:IsAvailable() or EnemiesCount8y >= 4)) then
-    if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice generators 8"; end
+    if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice generators 12"; end
   end
   -- hammer_of_wrath,if=(spell_targets.divine_storm<2|!talent.blessed_champion|set_bonus.tier30_4pc)&(holy_power<=3|target.health.pct>20|!talent.vanguards_momentum)
   if S.HammerofWrath:IsReady() and ((EnemiesCount8y < 2 or not S.BlessedChampion:IsAvailable() or Player:HasTier(30, 4)) and (HolyPower <= 3 or Target:HealthPercentage() > 20 or not S.VanguardsMomentum:IsAvailable())) then
-    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 10"; end
+    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 14"; end
   end
   -- templar_slash,if=buff.templar_strikes.remains<gcd
   if S.TemplarSlash:IsReady() and (S.TemplarStrike:TimeSinceLastCast() + PlayerGCD < 4) then
-    if Cast(S.TemplarSlash, nil, nil, not Target:IsSpellInRange(S.TemplarSlash)) then return "templar_slash generators 12"; end
-  end
-  -- judgment,if=!buff.avenging_wrath.up&(holy_power<=3|!talent.boundless_judgment)&talent.crusading_strikes
-  if S.Judgment:IsReady() and (Player:BuffDown(S.AvengingWrathBuff) and (Player:HolyPower() <= 3 or not S.BoundlessJudgment:IsAvailable()) and S.CrusadingStrikes:IsAvailable()) then
-    if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment generators 14"; end
-  end
-  -- blade_of_justice,if=holy_power<=3|!talent.holy_blade
-  if S.BladeofJustice:IsCastable() and (HolyPower <= 3 or not S.HolyBlade:IsAvailable()) then
-    if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice generators 16"; end
+    if Cast(S.TemplarSlash, nil, nil, not Target:IsSpellInRange(S.TemplarSlash)) then return "templar_slash generators 16"; end
   end
   -- judgment,if=!debuff.judgment.up&(holy_power<=3|!talent.boundless_judgment)
   if S.Judgment:IsReady() and (Target:DebuffDown(S.JudgmentDebuff) and (HolyPower <= 3 or not S.BoundlessJudgment:IsAvailable())) then
     if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment generators 18"; end
+  end
+  -- blade_of_justice,if=holy_power<=3|!talent.holy_blade
+  if S.BladeofJustice:IsCastable() and (HolyPower <= 3 or not S.HolyBlade:IsAvailable()) then
+    if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice generators 20"; end
   end
   -- call_action_list,name=finishers,if=(target.health.pct<=20|buff.avenging_wrath.up|buff.crusade.up|buff.empyrean_power.up)
   if (Target:HealthPercentage() <= 20 or Player:BuffUp(S.AvengingWrathBuff) or Player:BuffUp(S.CrusadeBuff) or Player:BuffUp(S.EmpyreanPowerBuff)) then
@@ -284,49 +278,49 @@ local function Generators()
   end
   -- consecration,if=!consecration.up&spell_targets.divine_storm>=2
   if S.Consecration:IsCastable() and (Target:DebuffDown(S.ConsecrationDebuff) and EnemiesCount8y >= 2) then
-    if Cast(S.Consecration, nil, nil, not Target:IsInMeleeRange(8)) then return "consecration generators 20"; end
+    if Cast(S.Consecration, nil, nil, not Target:IsInMeleeRange(8)) then return "consecration generators 22"; end
   end
   -- divine_hammer,if=spell_targets.divine_storm>=2
   if S.DivineHammer:IsCastable() and (EnemiesCount8y >= 2) then
-    if Cast(S.DivineHammer, nil, nil, not Target:IsInMeleeRange(8)) then return "divine_hammer generators 22"; end
+    if Cast(S.DivineHammer, nil, nil, not Target:IsInMeleeRange(8)) then return "divine_hammer generators 24"; end
   end
   -- crusader_strike,if=cooldown.crusader_strike.charges_fractional>=1.75&(holy_power<=2|holy_power<=3&cooldown.blade_of_justice.remains>gcd*2|holy_power=4&cooldown.blade_of_justice.remains>gcd*2&cooldown.judgment.remains>gcd*2)
   if S.CrusaderStrike:IsCastable() and (S.CrusaderStrike:ChargesFractional() >= 1.75 and (HolyPower <= 2 or HolyPower <= 3 and S.BladeofJustice:CooldownRemains() > PlayerGCD * 2 or HolyPower == 4 and S.BladeofJustice:CooldownRemains() > PlayerGCD * 2 and S.Judgment:CooldownRemains() > PlayerGCD * 2)) then
-    if Cast(S.CrusaderStrike, nil, nil, not Target:IsSpellInRange(S.CrusaderStrike)) then return "crusader_strike generators 24"; end
+    if Cast(S.CrusaderStrike, nil, nil, not Target:IsSpellInRange(S.CrusaderStrike)) then return "crusader_strike generators 26"; end
   end
   -- call_action_list,name=finishers
   local ShouldReturn = Finishers(); if ShouldReturn then return ShouldReturn; end
   -- templar_slash
   if S.TemplarSlash:IsReady() then
-    if Cast(S.TemplarSlash, nil, nil, not Target:IsSpellInRange(S.TemplarSlash)) then return "templar_slash generators 26"; end
+    if Cast(S.TemplarSlash, nil, nil, not Target:IsSpellInRange(S.TemplarSlash)) then return "templar_slash generators 28"; end
   end
   -- templar_strike
   if S.TemplarStrike:IsReady() then
-    if Cast(S.TemplarStrike, nil, nil, not Target:IsSpellInRange(S.TemplarStrike)) then return "templar_strike generators 28"; end
+    if Cast(S.TemplarStrike, nil, nil, not Target:IsSpellInRange(S.TemplarStrike)) then return "templar_strike generators 30"; end
   end
   -- judgment,if=holy_power<=3|!talent.boundless_judgment
   if S.Judgment:IsReady() and (HolyPower <= 3 or not S.BoundlessJudgment:IsAvailable()) then
-    if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment generators 30"; end
+    if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment generators 32"; end
   end
   -- hammer_of_wrath,if=holy_power<=3|target.health.pct>20|!talent.vanguards_momentum
   if S.HammerofWrath:IsReady() and (HolyPower <= 3 or Target:HealthPercentage() > 20 or not S.VanguardsMomentum:IsAvailable()) then
-    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 32"; end
+    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 34"; end
   end
   -- crusader_strike
   if S.CrusaderStrike:IsCastable() then
-    if Cast(S.CrusaderStrike, nil, nil, not Target:IsSpellInRange(S.CrusaderStrike)) then return "crusader_strike generators 34"; end
+    if Cast(S.CrusaderStrike, nil, nil, not Target:IsSpellInRange(S.CrusaderStrike)) then return "crusader_strike generators 36"; end
   end
   -- arcane_torrent
   if S.ArcaneTorrent:IsCastable() then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent generators 36"; end
+    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent generators 38"; end
   end
   -- consecration
   if S.Consecration:IsCastable() then
-    if Cast(S.Consecration, nil, nil, not Target:IsInMeleeRange(8)) then return "consecration generators 38"; end
+    if Cast(S.Consecration, nil, nil, not Target:IsInMeleeRange(8)) then return "consecration generators 40"; end
   end
   -- divine_hammer
   if S.DivineHammer:IsCastable() then
-    if Cast(S.DivineHammer, nil, nil, not Target:IsInMeleeRange(8)) then return "divine_hammer generators 40"; end
+    if Cast(S.DivineHammer, nil, nil, not Target:IsInMeleeRange(8)) then return "divine_hammer generators 42"; end
   end
 end
 
@@ -379,7 +373,7 @@ local function APL()
 end
 
 local function OnInit()
-  HR.Print("Retribution Paladin rotation is currently a work in progress, but has been updated for patch 10.1.7.")
+  HR.Print("Retribution Paladin rotation is currently a work in progress, but has been updated for patch 10.2.0.")
 end
 
 HR.SetAPL(70, APL, OnInit)
