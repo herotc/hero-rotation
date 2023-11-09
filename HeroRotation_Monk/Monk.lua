@@ -82,6 +82,7 @@ Spell.Monk.Commons = {
   -- Debuffs
   -- Item Effects
   CalltoDominanceBuff                   = Spell(403380), -- Neltharion trinket buff
+  DomineeringArroganceBuff              = Spell(411661), -- Neltharion trinket buff2
   TheEmperorsCapacitorBuff              = Spell(235054),
   -- Misc
   PoolEnergy                            = Spell(999910),
@@ -96,6 +97,7 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   SpinningCraneKick                     = Spell(101546),
   -- Talents
   CraneVortex                           = Spell(388848),
+  DanceofChiji                          = Spell(325201),
   DrinkingHornCover                     = Spell(391370),
   FaelineHarmony                        = Spell(391412),
   FaelineStomp                          = Spell(388193),
@@ -139,6 +141,8 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   -- Tier 29 Effects
   KicksofFlowingMomentumBuff            = Spell(394944),
   FistsofFlowingMomentumBuff            = Spell(394949),
+  -- Tier 31 Effects
+  BlackoutReinforcementBuff             = Spell(424454),
 })
 
 Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Commons, {
@@ -218,11 +222,15 @@ if not Item.Monk then Item.Monk = {}; end
 Item.Monk.Commons = {
   -- Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
+  AshesoftheEmbersoul                   = Item(207167, {13, 14}),
   BeacontotheBeyond                     = Item(203963, {13, 14}),
   DragonfireBombDispenser               = Item(202610, {14, 14}),
   EruptingSpearFragment                 = Item(193769, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
+  MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
+  NeltharionsCalltoDominance            = Item(204202, {13, 14}),
+  WitherbarksBranch                     = Item(109999, {13, 14}),
   -- Other On-Use Items
   Djaruun                               = Item(202569, {16}),
 }
