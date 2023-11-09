@@ -41,7 +41,6 @@ Spell.Warlock.Commons = {
   InquisitorsGazeBuff                   = Spell(388068),
   Soulburn                              = Spell(385899),
   -- Buffs
-  PowerInfusionBuff                     = Spell(10060),
   -- Debuffs
   -- Command Demon Abilities
   AxeToss                               = Spell(119914),
