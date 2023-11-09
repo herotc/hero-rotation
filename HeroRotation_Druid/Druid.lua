@@ -33,7 +33,7 @@ Spell.Druid.Commons = {
   FerociousBite                         = Spell(22568),
   MarkoftheWild                         = Spell(1126),
   Moonfire                              = Spell(8921),
-  Prowl                                 = Spell(5215),
+  Prowl                                 = MultiSpell(5215,102547),
   Regrowth                              = Spell(8936),
   Shred                                 = Spell(5221),
   -- Talents
