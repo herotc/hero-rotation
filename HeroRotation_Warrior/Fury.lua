@@ -252,8 +252,8 @@ local function SingleTarget()
       if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 12"; end
     end
   end
-  -- bloodbath
-  if S.Bloodbath:IsCastable() then
+  -- bloodbath,if=set_bonus.tier31_2pc
+  if S.Bloodbath:IsCastable() and (Player:HasTier(31, 2)) then
     if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 14"; end
   end
   -- thunderous_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
@@ -271,10 +271,6 @@ local function SingleTarget()
   -- execute,if=buff.enrage.up&!buff.furious_bloodthirst.up&buff.ashen_juggernaut.up|buff.sudden_death.remains<=gcd&(target.health.pct>35&talent.massacre|target.health.pct>20)
   if S.Execute:IsReady() and (EnrageUp and Player:BuffDown(S.FuriousBloodthirstBuff) and Player:BuffUp(S.AshenJuggernautBuff) or Player:BuffRemains(S.SuddenDeathBuff) <= Player:GCD() and (Target:HealthPercentage() > 35 and S.Massacre:IsAvailable() or Target:HealthPercentage() > 20)) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 22"; end
-  end
-  -- rampage,if=talent.reckless_abandon&(rage.pct=100|(target.health.pct<35&talent.massacre|target.health.pct<20)&rage.pct>=85)
-  if S.Rampage:IsReady() and (S.RecklessAbandon:IsAvailable() and (Player:RagePercentage() == 100 or (Target:HealthPercentage() < 35 and S.Massacre:IsAvailable() or Target:HealthPercentage() < 20) and Player:RagePercentage() >= 85)) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 24"; end
   end
   -- rampage,if=talent.reckless_abandon&(buff.recklessness.up|buff.enrage.remains<gcd|rage.pct>85)
   if S.Rampage:IsReady() and (S.RecklessAbandon:IsAvailable() and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffRemains(S.EnrageBuff) < Player:GCD() or Player:RagePercentage() > 85)) then
@@ -493,8 +489,8 @@ local function APL()
       if S.Recklessness:IsCastable() and (not S.Annihilator:IsAvailable() or FightRemains < 12) then
         if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 24"; end
       end
-      -- spear_of_bastion,if=buff.enrage.up&(buff.furious_bloodthirst.up|target.time_to_die<20|active_enemies>1)&raid_event.adds.in>15
-      if S.SpearofBastion:IsCastable() and (EnrageUp and (Player:BuffUp(S.FuriousBloodthirstBuff) or FightRemains < 20 or EnemiesCount8y > 1)) then
+      -- spear_of_bastion,if=buff.enrage.up&((buff.furious_bloodthirst.up&talent.titans_torment)|!talent.titans_torment|target.time_to_die<20|active_enemies>1|!set_bonus.tier31_2pc)&raid_event.adds.in>15
+      if S.SpearofBastion:IsCastable() and (EnrageUp and ((Player:BuffUp(S.FuriousBloodthirstBuff) and S.TitansTorment:IsAvailable()) or not S.TitansTorment:IsAvailable() or FightRemains < 20 or EnemiesCount8y > 1 or not Player:HasTier(31, 2))) then
         if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "spear_of_bastion main 26"; end
       end
     end
