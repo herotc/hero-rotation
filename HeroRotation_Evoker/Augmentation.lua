@@ -189,10 +189,6 @@ local function APL()
     end
     -- cauterizing_flame
     -- Note: Too situational. Not suggesting CF.
-    -- living_flame,if=time<cast_time*2
-    if S.LivingFlame:IsReady() and (HL.CombatTime() < S.LivingFlame:CastTime() * Settings.Augmentation.LeadingLFs) then
-      if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame main 4"; end
-    end
     -- hover,if=moving&buff.hover.down&buff.breath_of_eons.down
     -- Note: Not handling hover. Just keeping the APL line for completeness.
     -- prescience
@@ -249,12 +245,12 @@ local function APL()
     if CDsON() and S.TimeSkip:IsCastable() and (S.FireBreath:CooldownRemains() + S.Upheaval:CooldownRemains() + S.Prescience:CooldownRemains() > 35) then
       if Cast(S.TimeSkip, Settings.Augmentation.GCDasOffGCD.TimeSkip) then return "time_skip main 24"; end
     end
-    -- fire_breath,empower_to=1,if=!talent.ancient_flame&(buff.ebon_might.remains>cast_time|empowering.fire_breath)
-    if S.FireBreath:IsCastable() and (not S.AncientFlame:IsAvailable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1))) then
+    -- fire_breath,empower_to=1,if=!talent.leaping_flames&(buff.ebon_might.remains>cast_time|empowering.fire_breath)
+    if S.FireBreath:IsCastable() and (not S.LeapingFlames:IsAvailable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1))) then
       if CastAnnotated(S.FireBreath, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 1 main 26"; end
     end
-    -- fire_breath,empower_to=max,if=talent.ancient_flame&(buff.ebon_might.remains>cast_time|empowering.fire_breath)
-    if S.FireBreath:IsCastable() and (S.AncientFlame:IsAvailable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(MaxEmpower))) then
+    -- fire_breath,empower_to=max,if=talent.leaping_flames&(buff.ebon_might.remains>cast_time|empowering.fire_breath)
+    if S.FireBreath:IsCastable() and (S.LeapingFlames:IsAvailable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(MaxEmpower))) then
       if CastAnnotated(S.FireBreath, false, MaxEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower " .. MaxEmpower .. " main 28"; end
     end
     -- upheaval,empower_to=1,if=active_enemies<2&(empowering.upheaval|buff.ebon_might.remains>cast_time)
@@ -280,8 +276,8 @@ local function APL()
     if S.BlisteringScales:IsCastable() and (BlisteringScalesCheck() == 0) then
       if Cast(S.BlisteringScales, nil, Settings.Augmentation.DisplayStyle.AugBuffs) then return "blistering_scales main 34"; end
     end
-    -- eruption,if=buff.ebon_might.remains>cast_time|essence.time_to_max<cast_time|buff.essence_burst.up
-    if S.Eruption:IsReady() and (Player:BuffRemains(S.EbonMightSelfBuff) > S.Eruption:CastTime() or Player:EssenceTimeToMax() < S.Eruption:CastTime() or Player:BuffUp(S.EssenceBurstBuff)) then
+    -- eruption,if=buff.ebon_might.remains>cast_time
+    if S.Eruption:IsReady() and (Player:BuffRemains(S.EbonMightSelfBuff) > S.Eruption:CastTime()) then
       if Cast(S.Eruption, nil, nil, not Target:IsInRange(25)) then return "eruption main 36"; end
     end
     -- emerald_blossom,if=!talent.dream_of_spring&talent.scarlet_adaptation&buff.ebon_might.remains<cast_time&buff.ancient_flame.down
