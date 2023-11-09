@@ -87,6 +87,7 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   DancingBlades                         = Spell(391683),
   Frenzy                                = Spell(335077),
   ImprovedWhilwind                      = Spell(12950),
+  Massacre                              = Spell(206315),
   MeatCleaver                           = Spell(280392),
   OdynsFury                             = Spell(385059),
   Onslaught                             = Spell(315720),
