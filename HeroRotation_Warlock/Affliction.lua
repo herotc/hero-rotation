@@ -132,7 +132,7 @@ local function Variables()
   -- variable,name=has_cds,op=set,value=talent.phantom_singularity|talent.vile_taint|talent.soul_rot|talent.summon_darkglare
   VarHasCDs = (S.PhantomSingularity:IsAvailable() or S.VileTaint:IsAvailable() or S.SoulRot:IsAvailable() or S.SummonDarkglare:IsAvailable())
   -- variable,name=cds_active,op=set,value=!variable.has_cds|(pet.darkglare.active|variable.cd_dots_up|buff.power_infusion.react)
-  VarCDsActive = (not VarHasCDs or (HL.GuardiansTable.DarkglareDuration > 0 or VarCDDoTsUp or Player:BuffUp(S.PowerInfusionBuff)))
+  VarCDsActive = (not VarHasCDs or (HL.GuardiansTable.DarkglareDuration > 0 or VarCDDoTsUp or Player:PowerInfusionUp()))
 end
 
 local function Items()

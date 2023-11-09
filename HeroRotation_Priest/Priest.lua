@@ -41,7 +41,6 @@ Spell.Priest.Commons = {
   MindBlast                   = Spell(8092),
   MindSear                    = Spell(48045), -- Splash, 10
   PowerInfusion               = Spell(10060),
-  PowerInfusionBuff           = Spell(10060),
   PowerWordFortitude          = Spell(21562),
   PowerWordShield             = Spell(17),
   ShadowWordDeath             = Spell(32379),

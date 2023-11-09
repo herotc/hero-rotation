@@ -50,7 +50,6 @@ Spell.Evoker.Commons = {
   FireBreathDebuff                      = Spell(357209),
   HoverBuff                             = Spell(358267),
   LeapingFlamesBuff                     = Spell(370901),
-  PowerInfusionBuff                     = Spell(10060),
   ScarletAdaptationBuff                 = Spell(372470),
   SourceofMagicBuff                     = Spell(369459),
   -- Trinket Effects

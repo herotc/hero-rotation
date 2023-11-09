@@ -312,7 +312,7 @@ end
 local function Trinkets()
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=voidmenders_shadowgem,if=(buff.power_infusion.up|fight_remains<20)&equipped.voidmenders_shadowgem
-    if I.VoidmendersShadowgem:IsEquippedAndReady() and (Player:BuffUp(S.PowerInfusionBuff) or FightRemains < 20) then
+    if I.VoidmendersShadowgem:IsEquippedAndReady() and (Player:PowerInfusionUp() or FightRemains < 20) then
       if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem trinkets 2"; end
     end
     -- use_item,name=darkmoon_deck_box_inferno,if=equipped.darkmoon_deck_box_inferno
@@ -337,7 +337,7 @@ local function Trinkets()
       if Cast(I.DMDDanceBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_dance_box trinkets 14"; end
     end
     -- use_item,name=erupting_spear_fragment,if=(buff.power_infusion.up|raid_event.adds.up|fight_remains<20)&equipped.erupting_spear_fragment
-    if I.EruptingSpearFragment:IsEquippedAndReady() and (Player:BuffUp(S.PowerInfusionBuff) or FightRemains < 20) then
+    if I.EruptingSpearFragment:IsEquippedAndReady() and (Player:PowerInfusionUp() or FightRemains < 20) then
       if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment trinkets 16"; end
     end
     -- use_item,name=beacon_to_the_beyond,if=(!raid_event.adds.exists|raid_event.adds.up|spell_targets.beacon_to_the_beyond>=5|fight_remains<20)&equipped.beacon_to_the_beyond
@@ -346,7 +346,7 @@ local function Trinkets()
     end
   end
   -- use_items,if=buff.voidform.up|buff.power_infusion.up|buff.dark_ascension.up|(cooldown.void_eruption.remains>10&trinket.cooldown.duration<=60)|fight_remains<20
-  if (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or Player:BuffUp(S.DarkAscensionBuff) or FightRemains < 20) then
+  if (Player:BuffUp(S.VoidformBuff) or Player:PowerInfusionUp() or Player:BuffUp(S.DarkAscensionBuff) or FightRemains < 20) then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
       local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
@@ -492,26 +492,26 @@ end
 local function CDs()
   -- potion,if=buff.voidform.up|buff.power_infusion.up|buff.dark_ascension.up&(fight_remains<=cooldown.power_infusion.remains+15)|fight_remains<=30
   -- Note: The "fight_remains<=30" seems to be for dps sniping the end of a boss fight, so using BossFightRemains instead of FightRemains.
-  if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or Player:BuffUp(S.DarkAscensionBuff) and (FightRemains <= S.PowerInfusion:CooldownRemains() + 15) or BossFightRemains <= 30) then
+  if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.VoidformBuff) or Player:PowerInfusionUp() or Player:BuffUp(S.DarkAscensionBuff) and (FightRemains <= S.PowerInfusion:CooldownRemains() + 15) or BossFightRemains <= 30) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 2"; end
     end
   end
   -- fireblood,if=buff.power_infusion.up|fight_remains<=8
-  if S.Fireblood:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff) or FightRemains <= 8) then
+  if S.Fireblood:IsCastable() and (Player:PowerInfusionUp() or FightRemains <= 8) then
     if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 4"; end
   end
   -- berserking,if=buff.power_infusion.up|fight_remains<=12
-  if S.Berserking:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff) or FightRemains <= 12) then
+  if S.Berserking:IsCastable() and (Player:PowerInfusionUp() or FightRemains <= 12) then
     if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 6"; end
   end
   -- blood_fury,if=buff.power_infusion.up|fight_remains<=15
-  if S.BloodFury:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff) or FightRemains <= 15) then
+  if S.BloodFury:IsCastable() and (Player:PowerInfusionUp() or FightRemains <= 15) then
     if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 8"; end
   end
   -- ancestral_call,if=buff.power_infusion.up|fight_remains<=15
-  if S.AncestralCall:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff) or FightRemains <= 15) then
+  if S.AncestralCall:IsCastable() and (Player:PowerInfusionUp() or FightRemains <= 15) then
     if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cds 10"; end
   end
   -- power_infusion,if=(buff.voidform.up|buff.dark_ascension.up)
