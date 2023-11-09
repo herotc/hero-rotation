@@ -786,7 +786,7 @@ local function APL()
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Finisher()"; end
     end
     -- call_action_list,name=finisher,if=combo_points>=4
-    if ComboPoints >= 4 and not (ComboPoints >= 4) then
+    if ComboPoints >= 4 then
       local ShouldReturn = Finisher(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=aoe_builder,if=spell_targets.swipe_cat>1&combo_points<4
