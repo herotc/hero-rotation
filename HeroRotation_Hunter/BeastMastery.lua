@@ -220,8 +220,8 @@ local function Cleave()
   if S.BarbedShot:IsCastable() then
     if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateTargetIfFilterBarbedShot, EvaluateTargetIfBarbedShotCleave2, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot cleave 4"; end
   end
-  -- multishot,if=gcd-pet.main.buff.beast_cleave.remains<0.25+gcd&(!talent.bloody_frenzy|cooldown.call_of_the_wild.remains)
-  if S.MultiShot:IsReady() and (GCDMax - Pet:BuffRemains(S.BeastCleavePetBuff) < 0.25 + GCDMax and (not S.BloodyFrenzy:IsAvailable() or S.CalloftheWild:CooldownDown())) then
+  -- multishot,if=pet.main.buff.beast_cleave.remains<0.25+gcd&(!talent.bloody_frenzy|cooldown.call_of_the_wild.remains)
+  if S.MultiShot:IsReady() and (Pet:BuffRemains(S.BeastCleavePetBuff) < 0.25 + GCDMax and (not S.BloodyFrenzy:IsAvailable() or S.CalloftheWild:CooldownDown())) then
     if Cast(S.MultiShot, nil, nil, not Target:IsSpellInRange(S.MultiShot)) then return "multishot cleave 6"; end
   end
   -- bestial_wrath

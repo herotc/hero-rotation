@@ -147,12 +147,12 @@ local function Cooldowns()
     if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle cd 8"; end
   end
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=gcd.remains>gcd.max-0.1|fight_remains<5
-    if I.BelorrelostheSuncaller:IsEquippedAndReady() and (Player:GCDRemains() > Player:GCD() - 0.1 or FightRemains < 5) then
+    -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(gcd.remains>gcd.max-0.1|fight_remains<5)&time>5
+    if I.BelorrelostheSuncaller:IsEquippedAndReady() and ((Player:GCDRemains() > Player:GCD() - 0.1 or FightRemains < 5) and HL.CombatTime() > 5 then
       if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller cd 10"; end
     end
-    -- use_item,name=balefire_branch,if=cooldown.ray_of_frost.remains<5
-    if I.BalefireBranch:IsEquippedAndReady() and (S.RayofFrost:CooldownRemains() < 5) then
+    -- use_item,name=balefire_branch,if=cooldown.ray_of_frost.up&time>1|fight_remains<20
+    if I.BalefireBranch:IsEquippedAndReady() and (S.RayofFrost:CooldownUp() and HL.CombatTime() > 1 or FightRemains < 20) then
       if Cast(I.BalefireBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "balefire_branch cd 12"; end
     end
   end

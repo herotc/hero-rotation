@@ -43,11 +43,18 @@ local OnUseExcludes = {
   -- GladiatorsBadge
   I.CrimsonGladiatorsBadge:ID(),
   I.ObsidianGladiatorsBadge:ID(),
+  I.VerdantGladiatorsBadge:ID(),
   -- Other Trinkets
+  I.AshesoftheEmbersoul:ID()
+  I.BalefireBranch:ID(),
+  I.BelorrelostheSuncaller:ID(),
+  I.Dreambinder:ID(),
   I.HornofValor:ID(),
   I.IrideusFragment:ID(),
-  I.MoonlitPrism:ID(),
+  I.MirrorofFracturedTomorrows:ID(),
+  I.NymuesUnravelingSpindle:ID(),
   I.SpoilsofNeltharus:ID(),
+  I.TimeThiefsGambit:ID(),
   I.TimebreachingTalon:ID(),
   I.TomeofUnstablePower:ID(),
   I.VoidmendersShadowgem:ID(),
@@ -67,6 +74,8 @@ local Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
 local Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
 
 -- Variables from Precombat
+-- variable,name=steroid_trinket_equipped,op=set,value=equipped.gladiators_badge|equipped.irideus_fragment|equipped.erupting_spear_fragment|equipped.spoils_of_neltharus|equipped.tome_of_unstable_power|equipped.timebreaching_talon|equipped.horn_of_valor|equipped.mirror_of_fractured_tomorrows|equipped.ashes_of_the_embersoul|equipped.balefire_branch|equipped.time_theifs_gambit|equipped.sea_star|equipped.nymues_unraveling_spindle
+local var_steroid_trinket_equipped = I.CrimsonGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.IrideusFragment:IsEquipped() or I.EruptingSpearFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.BalefireBranch:IsEquipped() or I.TimeThiefsGambit:IsEquipped() or I.SeaStar:IsEquipped() or I.NymuesUnravelingSpindle:IsEquipped()
 -- variable,name=disable_combustion,op=reset
 local var_disable_combustion = not CDsON()
 -- variable,name=firestarter_combustion,default=-1,value=talent.sun_kings_blessing,if=variable.firestarter_combustion<0
@@ -77,8 +86,8 @@ local var_hot_streak_flamestrike = (S.FlamePatch:IsAvailable()) and 3 or 999
 local var_hard_cast_flamestrike = 999
 -- variable,name=combustion_flamestrike,if=variable.combustion_flamestrike=0,value=3*talent.flame_patch+999*!talent.flame_patch
 local var_combustion_flamestrike = var_hot_streak_flamestrike
--- variable,name=skb_flamestrike,if=variable.skb_flamestrike=0,value=3
-local var_skb_flamestrike = 3
+-- variable,name=skb_flamestrike,if=variable.skb_flamestrike=0,value=3*talent.fuel_the_fire+999*!talent.fuel_the_fire
+local var_skb_flamestrike = 3 * num(S.FueltheFire:IsAvailable()) + 999 * num(not S.FueltheFire:IsAvailable())
 -- variable,name=arcane_explosion,if=variable.arcane_explosion=0,value=999
 local var_arcane_explosion = 999
 -- variable,name=arcane_explosion_mana,default=40,op=reset
@@ -114,6 +123,7 @@ local var_sun_kings_blessing_max_stack = 8
 local var_improved_scorch_max_stack = 3
 local CombustionUp
 local CombustionDown
+local CombustionRemains
 local ShiftingPowerTickReduction = 3
 local BossFightRemains = 11111
 local FightRemains = 11111
@@ -126,6 +136,7 @@ local Enemies8ySplash,Enemies10yMelee,Enemies18yMelee
 local UnitsWithIgniteCount
 
 HL:RegisterForEvent(function()
+  var_steroid_trinket_equipped = I.CrimsonGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.IrideusFragment:IsEquipped() or I.EruptingSpearFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.BalefireBranch:IsEquipped() or I.TimeThiefsGambit:IsEquipped() or I.SeaStar:IsEquipped() or I.NymuesUnravelingSpindle:IsEquipped()
   var_combustion_on_use = I.CrimsonGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.MoonlitPrism:IsEquipped() or I.IrideusFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped()
   var_on_use_cutoff = (var_combustion_on_use) and 20 or 0
   Equip = Player:GetEquipment()
@@ -216,13 +227,14 @@ local function Precombat()
   if S.ArcaneIntellect:IsCastable() and Everyone.GroupBuffMissing(S.ArcaneIntellect) then
     if Cast(S.ArcaneIntellect, Settings.Commons.GCDasOffGCD.ArcaneIntellect) then return "arcane_intellect precombat 2"; end
   end
+  -- variable,name=steroid_trinket_equipped,op=set,value=equipped.gladiators_badge|equipped.irideus_fragment|equipped.erupting_spear_fragment|equipped.spoils_of_neltharus|equipped.tome_of_unstable_power|equipped.timebreaching_talon|equipped.horn_of_valor|equipped.mirror_of_fractured_tomorrows|equipped.ashes_of_the_embersoul|equipped.balefire_branch|equipped.time_theifs_gambit|equipped.sea_star|equipped.nymues_unraveling_spindle
   -- variable,name=disable_combustion,op=reset
   -- Note: Moved to APL(), since the users may enable or disable CDsON at any time.
   -- variable,name=firestarter_combustion,default=-1,value=talent.sun_kings_blessing,if=variable.firestarter_combustion<0
   -- variable,name=hot_streak_flamestrike,if=variable.hot_streak_flamestrike=0,value=3*talent.flame_patch+999*!talent.flame_patch
   -- variable,name=hard_cast_flamestrike,if=variable.hard_cast_flamestrike=0,value=999
   -- variable,name=combustion_flamestrike,if=variable.combustion_flamestrike=0,value=3*talent.flame_patch+999*!talent.flame_patch
-  -- variable,name=skb_flamestrike,if=variable.skb_flamestrike=0,value=3
+  -- variable,name=skb_flamestrike,if=variable.skb_flamestrike=0,value=3*talent.fuel_the_fire+999*!talent.fuel_the_fire
   -- variable,name=arcane_explosion,if=variable.arcane_explosion=0,value=999
   -- variable,name=arcane_explosion_mana,default=40,op=reset
   -- variable,name=combustion_shifting_power,if=variable.combustion_shifting_power=0,value=999
@@ -259,7 +271,7 @@ local function ActiveTalents()
     if Cast(S.LivingBomb, nil, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb active_talents 2"; end
   end
   -- meteor,if=variable.time_to_combustion<=0|buff.combustion.remains>travel_time|!talent.sun_kings_blessing&(cooldown.meteor.duration<variable.time_to_combustion|fight_remains<variable.time_to_combustion)
-  if S.Meteor:IsReady() and (var_time_to_combustion <= 0 or Player:BuffRemains(S.CombustionBuff) > S.Meteor:TravelTime() or not S.SunKingsBlessing:IsAvailable() and (45 < var_time_to_combustion or FightRemains < var_time_to_combustion)) then
+  if S.Meteor:IsReady() and (var_time_to_combustion <= 0 or CombustionRemains > S.Meteor:TravelTime() or not S.SunKingsBlessing:IsAvailable() and (45 < var_time_to_combustion or FightRemains < var_time_to_combustion)) then
     if Cast(S.Meteor, Settings.Fire.GCDasOffGCD.Meteor, nil, not Target:IsInRange(40)) then return "meteor active_talents 4"; end
   end
   -- dragons_breath,if=talent.alexstraszas_fury&(buff.combustion.down&!buff.hot_streak.react)&(buff.feel_the_burn.up|time>15)&(!improved_scorch.active)&!firestarter.remains&!talent.tempered_flames
@@ -319,29 +331,48 @@ local function CombustionCooldowns()
     if I.ObsidianGladiatorsBadge:IsEquippedAndReady() then
       if Cast(I.ObsidianGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge (obsidian) combustion_cooldowns 16"; end
     end
+    if I.VerdantGladiatorsBadge:IsEquippedAndReady() then
+      if Cast(I.VerdantGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge (verdant) combustion_cooldowns 18"; end
+    end
     -- use_item,name=irideus_fragment
     if I.IrideusFragment:IsEquippedAndReady() then
-      if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment combustion_cooldowns 18"; end
+      if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment combustion_cooldowns 20"; end
     end
     -- use_item,name=spoils_of_neltharus
     if I.SpoilsofNeltharus:IsEquippedAndReady() then
-      if Cast(I.SpoilsofNeltharus, nil, Settings.Commons.DisplayStyle.Trinkets) then return "spoils_of_neltharus combustion_cooldowns 20"; end
+      if Cast(I.SpoilsofNeltharus, nil, Settings.Commons.DisplayStyle.Trinkets) then return "spoils_of_neltharus combustion_cooldowns 22"; end
     end
     -- use_item,name=tome_of_unstable_power
     if I.TomeofUnstablePower:IsEquippedAndReady() then
-      if Cast(I.TomeofUnstablePower, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tome_of_unstable_power combustion_cooldowns 22"; end
+      if Cast(I.TomeofUnstablePower, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tome_of_unstable_power combustion_cooldowns 24"; end
     end
     -- use_item,name=timebreaching_talon
     if I.TimebreachingTalon:IsEquippedAndReady() then
-      if Cast(I.TimebreachingTalon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timebreaching_talon combustion_cooldowns 24"; end
+      if Cast(I.TimebreachingTalon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timebreaching_talon combustion_cooldowns 26"; end
     end
     -- use_item,name=voidmenders_shadowgem
     if I.VoidmendersShadowgem:IsEquippedAndReady() then
-      if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem combustion_cooldowns 26"; end
+      if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem combustion_cooldowns 28"; end
     end
     -- use_item,name=horn_of_valor
     if I.HornofValor:IsEquippedAndReady() then
-      if Cast(I.HornofValor, nil, Settings.Commons.DisplayStyle.Trinkets) then return "horn_of_valor combustion_cooldowns 28"; end
+      if Cast(I.HornofValor, nil, Settings.Commons.DisplayStyle.Trinkets) then return "horn_of_valor combustion_cooldowns 30"; end
+    end
+    -- use_item,name=timethiefs_gambit
+    if I.TimeThiefsGambit:IsEquippedAndReady() then
+      if Cast(I.TimeThiefsGambit, nil, Settings.Commons.DisplayStyle.Trinkets) then return "time_theifs_gambit combustion_cooldowns 32"; end
+    end
+    -- use_item,name=balefire_branch
+    if I.BalefireBranch:IsEquippedAndReady() then
+      if Cast(I.BalefireBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "balefire_branch combustion_cooldowns 34"; end
+    end
+    -- use_item,name=ashes_of_the_embersoul
+    if I.AshesoftheEmbersoul:IsEquippedAndReady() then
+      if Cast(I.AshesoftheEmbersoul, nil, Settings.Commons.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul combustion_cooldowns 36"; end
+    end
+    -- use_item,name=mirror_of_fractured_tomorrows
+    if I.MirrorofFracturedTomorrows:IsEquippedAndReady() then
+      if Cast(I.MirrorofFracturedTomorrows, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows combustion_cooldowns 38"; end
     end
   end
 end
@@ -360,7 +391,7 @@ local function CombustionPhase()
     if Cast(S.LivingBomb, nil, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb combustion_phase 6"; end
   end
   -- call_action_list,name=combustion_cooldowns,if=buff.combustion.remains>variable.skb_duration|fight_remains<20
-  if Player:BuffRemains(S.CombustionBuff) > var_skb_duration or FightRemains < 20 then
+  if CombustionRemains > var_skb_duration or FightRemains < 20 then
     local ShouldReturn = CombustionCooldowns(); if ShouldReturn then return ShouldReturn; end
   end
   -- use_item,name=hyperthread_wristwraps,if=hyperthread_wristwraps.fire_blast>=2&action.fire_blast.charges=0
@@ -432,27 +463,27 @@ local function CombustionPhase()
     if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch combustion_phase 36"; end
   end
   -- phoenix_flames,if=set_bonus.tier30_2pc&travel_time<buff.combustion.remains&buff.heating_up.react+hot_streak_spells_in_flight<2&(debuff.charring_embers.remains<4*gcd.max|buff.flames_fury.stack>1|buff.flames_fury.up)
-  if S.PhoenixFlames:IsCastable() and (Player:HasTier(30, 2) and S.PhoenixFlames:TravelTime() < Player:BuffRemains(S.CombustionBuff) and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() < 2 and (Target:DebuffRemains(S.CharringEmbersDebuff) < 4 * GCDMax or Player:BuffStack(S.FlamesFuryBuff) > 1 or Player:BuffUp(S.FlamesFuryBuff))) then
+  if S.PhoenixFlames:IsCastable() and (Player:HasTier(30, 2) and S.PhoenixFlames:TravelTime() < CombustionRemains and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() < 2 and (Target:DebuffRemains(S.CharringEmbersDebuff) < 4 * GCDMax or Player:BuffStack(S.FlamesFuryBuff) > 1 or Player:BuffUp(S.FlamesFuryBuff))) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 38"; end
   end
   -- fireball,if=buff.combustion.remains>cast_time&buff.flame_accelerant.react
-  if S.Fireball:IsReady() and (Player:BuffRemains(S.CombustionBuff) > S.Fireball:CastTime() and Player:BuffUp(S.FlameAccelerantBuff)) then
+  if S.Fireball:IsReady() and (CombustionRemains > S.Fireball:CastTime() and Player:BuffUp(S.FlameAccelerantBuff)) then
     if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball combustion_phase 40"; end
   end
   -- phoenix_flames,if=!set_bonus.tier30_2pc&!talent.alexstraszas_fury&travel_time<buff.combustion.remains&buff.heating_up.react+hot_streak_spells_in_flight<2
-  if S.PhoenixFlames:IsCastable() and (not Player:HasTier(30, 2) and not S.AlexstraszasFury:IsAvailable() and S.PhoenixFlames:TravelTime() < Player:BuffRemains(S.CombustionBuff) and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() < 2) then
+  if S.PhoenixFlames:IsCastable() and (not Player:HasTier(30, 2) and not S.AlexstraszasFury:IsAvailable() and S.PhoenixFlames:TravelTime() < CombustionRemains and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() < 2) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 42"; end
   end
   -- scorch,if=buff.combustion.remains>cast_time&cast_time>=gcd.max
-  if S.Scorch:IsReady() and (Player:BuffRemains(S.CombustionBuff) > S.Scorch:CastTime() and S.Scorch:CastTime() >= GCDMax) then
+  if S.Scorch:IsReady() and (CombustionRemains > S.Scorch:CastTime() and S.Scorch:CastTime() >= GCDMax) then
     if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch combustion_phase 44"; end
   end
   -- fireball,if=buff.combustion.remains>cast_time
-  if S.Fireball:IsReady() and (Player:BuffRemains(S.CombustionBuff) > S.Fireball:CastTime()) then
+  if S.Fireball:IsReady() and (CombustionRemains > S.Fireball:CastTime()) then
     if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball combustion_phase 46"; end
   end
   -- living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1
-  if S.LivingBomb:IsReady() and (Player:BuffRemains(S.CombustionBuff) < GCDMax and EnemiesCount10ySplash > 1) then
+  if S.LivingBomb:IsReady() and (CombustionRemains < GCDMax and EnemiesCount10ySplash > 1) then
     if Cast(S.LivingBomb, nil, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb combustion_phase 48"; end
   end
 end
@@ -480,7 +511,7 @@ local function CombustionTiming()
     var_time_to_combustion = max(I.ObsidianGladiatorsBadge:CooldownRemains(), var_time_to_combustion)
   end
   -- variable,use_off_gcd=1,use_while_casting=1,name=time_to_combustion,op=max,value=buff.combustion.remains
-  var_time_to_combustion = max(Player:BuffRemains(S.CombustionBuff), var_time_to_combustion)
+  var_time_to_combustion = max(CombustionRemains, var_time_to_combustion)
   -- variable,use_off_gcd=1,use_while_casting=1,name=time_to_combustion,op=max,value=raid_event.adds.in,if=raid_event.adds.exists&raid_event.adds.count>=3&raid_event.adds.duration>15
   -- Note: Skipping this, as we don't handle SimC's raid_event
   -- variable,use_off_gcd=1,use_while_casting=1,name=time_to_combustion,value=raid_event.vulnerable.in*!raid_event.vulnerable.up,if=raid_event.vulnerable.exists&variable.combustion_ready_time<raid_event.vulnerable.in
@@ -563,8 +594,8 @@ local function StandardRotation()
   end
   -- call_action_list,name=active_talents
   local ShouldReturn = ActiveTalents(); if ShouldReturn then return ShouldReturn; end
-  -- dragons_breath,if=active_enemies>1
-  if AoEON() and S.DragonsBreath:IsReady() and (EnemiesCount16ySplash > 1) then
+  -- dragons_breath,if=active_enemies>1&talent.alexstraszas_fury
+  if AoEON() and S.DragonsBreath:IsReady() and (EnemiesCount16ySplash > 1 and S.AlexstraszasFury:IsAvailable()) then
     if Settings.Fire.StayDistance and not Target:IsInRange(12) then
       if CastLeft(S.DragonsBreath) then return "dragons_breath standard_rotation 28 left"; end
     else
@@ -655,6 +686,7 @@ local function APL()
     -- Get our Combustion status
     CombustionUp = Player:BuffUp(S.CombustionBuff)
     CombustionDown = not CombustionUp
+    CombustionRemains = (CombustionUp) and Player:BuffRemains(S.CombustionBuff) or 0
   end
 
   if Everyone.TargetIsValid() then
@@ -691,7 +723,7 @@ local function APL()
     var_shifting_power_before_combustion = var_time_to_combustion > S.ShiftingPower:CooldownRemains()
     if Settings.Commons.Enabled.Trinkets then
       -- variable,name=item_cutoff_active,value=(variable.time_to_combustion<variable.on_use_cutoff|buff.combustion.remains>variable.skb_duration&!cooldown.item_cd_1141.remains)&((trinket.1.has_cooldown&trinket.1.cooldown.remains<variable.on_use_cutoff)+(trinket.2.has_cooldown&trinket.2.cooldown.remains<variable.on_use_cutoff)>1)
-      var_item_cutoff_active = (var_time_to_combustion < var_on_use_cutoff or Player:BuffRemains(S.CombustionBuff) > var_skb_duration and (I.DragonfireBombDispenser:CooldownUp() or not I.DragonfireBombDispenser:IsEquipped())) and (num(Trinket1:Cooldown() > 0 and Trinket1:CooldownRemains() < var_on_use_cutoff) + num(Trinket2:Cooldown() and Trinket2:CooldownRemains() < var_on_use_cutoff) > 1)
+      var_item_cutoff_active = (var_time_to_combustion < var_on_use_cutoff or CombustionRemains > var_skb_duration and (I.DragonfireBombDispenser:CooldownUp() or not I.DragonfireBombDispenser:IsEquipped())) and (num(Trinket1:Cooldown() > 0 and Trinket1:CooldownRemains() < var_on_use_cutoff) + num(Trinket2:Cooldown() and Trinket2:CooldownRemains() < var_on_use_cutoff) > 1)
       -- use_item,effect_name=gladiators_badge,if=variable.time_to_combustion>cooldown-5
       if I.CrimsonGladiatorsBadge:IsEquippedAndReady() and (var_time_to_combustion > I.CrimsonGladiatorsBadge:Cooldown() - 5) then
         if Cast(I.CrimsonGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge (crimson) main 6"; end
@@ -699,19 +731,46 @@ local function APL()
       if I.ObsidianGladiatorsBadge:IsEquippedAndReady() and (var_time_to_combustion > I.ObsidianGladiatorsBadge:Cooldown() - 5) then
         if Cast(I.ObsidianGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge (obsidian) main 8"; end
       end
-      -- use_item,name=moonlit_prism,if=variable.time_to_combustion<=5|fight_remains<variable.time_to_combustion
-      if I.MoonlitPrism:IsEquippedAndReady() and (var_time_to_combustion <= 5 or FightRemains < var_time_to_combustion) then
-        if Cast(I.MoonlitPrism, nil, Settings.Commons.DisplayStyle.Trinkets) then return "moonlit_prism main 10"; end
+      if I.VerdantGladiatorsBadge:IsEquippedAndReady() and (var_time_to_combustion > I.VerdantGladiatorsBadge:Cooldown() - 5) then
+        if Cast(I.VerdantGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge (verdant) main 10"; end
       end
-      -- use_items,if=!variable.item_cutoff_active
-      if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) and not var_item_cutoff_active then
-        local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-        if ItemToUse then
-          local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-          if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
-          if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~=13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
-            if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
-          end
+      -- use_item,name=mirror_of_fractured_tomorrows,if=buff.combustion.up&buff.combustion.remains>11
+      if I.MirrorofFracturedTomorrows:IsEquippedAndReady() and (CombustionUp and CombustionRemains > 11) then
+        if Cast(I.MirrorofFracturedTomorrows, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows main 12"; end
+      end
+      -- use_item,name=timethiefs_gambit,if=buff.combustion.up
+      if I.TimeThiefsGambit:IsEquippedAndReady() and (CombustionUp) then
+        if Cast(I.TimeThiefsGambit, nil, Settings.Commons.DisplayStyle.Trinkets) then return "time_theifs_gambit main 14"; end
+      end
+      -- use_item,name=balefire_branch,if=(variable.time_to_combustion<=3&buff.fury_of_the_sun_king.up)|(buff.combustion.up&buff.combustion.remains>11)
+      if I.BalefireBranch:IsEquippedAndReady() and ((var_time_to_combustion <= 3 and Player:BuffUp(S.FuryoftheSunKingBuff)) or (CombustionUp and CombustionRemains > 11)) then
+        if Cast(I.BalefireBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "balefire_branch main 16"; end
+      end
+      -- use_item,name=ashes_of_the_embersoul,if=(variable.time_to_combustion<=3&buff.fury_of_the_sun_king.up)|(buff.combustion.up&buff.combustion.remains>11)
+      if I.AshesoftheEmbersoul:IsEquippedAndReady() and ((var_time_to_combustion <= 3 and Player:BuffUp(S.FuryoftheSunKingBuff)) or (CombustionUp and CombustionRemains > 11)) then
+        if Cast(I.AshesoftheEmbersoul, nil, Settings.Commons.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul main 18"; end
+      end
+      -- use_item,name=nymues_unraveling_spindle,if=variable.time_to_combustion<=9
+      if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (var_time_to_combustion <= 9) then
+        if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle main 20"; end
+      end
+    end
+    -- use_item,name=dreambinder_loom_of_the_great_cycle
+    if Settings.Commons.Enabled.Items and I.Dreambinder:IsEquippedAndReady() then
+      if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder main 22"; end
+    end
+    -- use_item,name=belorrelos_the_suncaller,if=(!variable.steroid_trinket_equipped&buff.combustion.down)|(variable.steroid_trinket_equipped&trinket.1.has_cooldown&trinket.1.cooldown.remains>20&buff.combustion.down)|(variable.steroid_trinket_equipped&trinket.2.has_cooldown&trinket.2.cooldown.remains>20&buff.combustion.down)
+    if Settings.Commons.Enabled.Trinkets and I.BelorrelostheSuncaller:IsEquippedAndReady() and ((not var_steroid_trinket_equipped and CombustionDown) or (var_steroid_trinket_equipped and trinket1:HasCooldown() and trinket1:CooldownRemains() > 20 and CombustionDown) or (var_steroid_trinket_equipped and trinket2:HasCooldown() and trinket2:CooldownRemains() > 20 and CombustionDown)) then
+      if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller main 24"; end
+    end
+    -- use_items,if=!variable.item_cutoff_active
+    if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) and not var_item_cutoff_active then
+      local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+      if ItemToUse then
+        local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+        if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~=13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+          if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
         end
       end
     end
@@ -727,7 +786,7 @@ local function APL()
     end
     -- shifting_power,if=buff.combustion.down&(action.fire_blast.charges=0|variable.fire_blast_pooling)&(!improved_scorch.active|debuff.improved_scorch.remains>cast_time+action.scorch.cast_time&!buff.fury_of_the_sun_king.up)&!buff.hot_streak.react&variable.shifting_power_before_combustion
     if S.ShiftingPower:IsReady() and (CombustionDown and (S.FireBlast:Charges() == 0 or var_fire_blast_pooling) and (not ImprovedScorchActive() or Target:DebuffRemains(S.ImprovedScorchDebuff) > S.ShiftingPower:CastTime() + S.Scorch:CastTime() and Player:BuffDown(S.FuryoftheSunKingBuff)) and Player:BuffDown(S.HotStreakBuff) and var_shifting_power_before_combustion) then
-      if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power main 12"; end
+      if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power main 26"; end
     end
     -- variable,name=phoenix_pooling,if=active_enemies<variable.combustion_flamestrike,value=(variable.time_to_combustion+buff.combustion.duration-5<action.phoenix_flames.full_recharge_time+cooldown.phoenix_flames.duration-action.shifting_power.full_reduction*variable.shifting_power_before_combustion&variable.time_to_combustion<fight_remains|talent.sun_kings_blessing)&!talent.alexstraszas_fury
     -- Note: Swapped SunKingsBlessing check to the front so we can avoid lots of math if it's talented.
@@ -741,7 +800,7 @@ local function APL()
     end
     -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&variable.time_to_combustion>0&active_enemies>=variable.hard_cast_flamestrike&!firestarter.active&!buff.hot_streak.react&(buff.heating_up.react&action.flamestrike.execute_remains<0.5|charges_fractional>=2)
     if S.FireBlast:IsReady() and not FreeCastAvailable() and (not var_fire_blast_pooling and var_time_to_combustion > 0 and EnemiesCount8ySplash >= var_hard_cast_flamestrike and not FirestarterActive() and Player:BuffDown(S.HotStreakBuff) and (Player:BuffUp(S.HeatingUpBuff) and S.Flamestrike:ExecuteRemains() < 0.5 or S.FireBlast:ChargesFractional() >= 2)) then
-      if FBCast(S.FireBlast) then return "fire_blast main 14"; end
+      if FBCast(S.FireBlast) then return "fire_blast main 28"; end
     end
     -- call_action_list,name=firestarter_fire_blasts,if=buff.combustion.down&firestarter.active&variable.time_to_combustion>0
     if CombustionDown and FirestarterActive() and var_time_to_combustion > 0 then
@@ -749,7 +808,7 @@ local function APL()
     end
     -- fire_blast,use_while_casting=1,if=action.shifting_power.executing&full_recharge_time<action.shifting_power.tick_reduction
     if S.FireBlast:IsReady() and not FreeCastAvailable() and (Player:IsCasting(S.ShiftingPower) and S.FireBlast:FullRechargeTime() < ShiftingPowerTickReduction) then
-      if FBCast(S.FireBlast) then return "fire_blast main 16"; end
+      if FBCast(S.FireBlast) then return "fire_blast main 30"; end
     end
     -- call_action_list,name=standard_rotation,if=variable.time_to_combustion>0&buff.combustion.down
     if var_time_to_combustion > 0 and CombustionDown then
@@ -757,17 +816,17 @@ local function APL()
     end
     -- ice_nova,if=!searing_touch.active
     if S.IceNova:IsCastable() and (not SearingTouchActive()) then
-      if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova main 18"; end
+      if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova main 32"; end
     end
     -- scorch
     if S.Scorch:IsReady() then
-      if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch main 20"; end
+      if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch main 34"; end
     end
   end
 end
 
 local function Init()
-  HR.Print("Fire Mage rotation is currently a work in progress, but has been updated for patch 10.1.5.")
+  HR.Print("Fire Mage rotation is currently a work in progress, but has been updated for patch 10.2.0.")
 end
 
 HR.SetAPL(63, APL, Init)

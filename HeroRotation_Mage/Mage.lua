@@ -148,6 +148,7 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   FlameOn                               = Spell(205029),
   FlamePatch                            = Spell(205037),
   FromTheAshes                          = Spell(342344),
+  FueltheFire                           = Spell(416094),
   Hyperthermia                          = Spell(383860),
   ImprovedScorch                        = Spell(383604),
   Kindling                              = Spell(155148),
@@ -253,8 +254,10 @@ Item.Mage.Commons = {
   -- Gladiator's Badges
   CrimsonGladiatorsBadge                = Item(201807, {13, 14}),
   ObsidianGladiatorsBadge               = Item(205708, {13, 14}),
+  VerdantGladiatorsBadge                = Item(209343, {13, 14}),
   -- Other On-Use Items
   Dreambinder                           = Item(208616, {16}),
+  IridaltheEarthsMaster                 = Item(208321, {16}),
 }
 
 Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {

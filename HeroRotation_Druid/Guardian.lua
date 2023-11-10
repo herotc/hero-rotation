@@ -51,6 +51,12 @@ local equip = Player:GetEquipment()
 local trinket1 = equip[13] and Item(equip[13]) or Item(0)
 local trinket2 = equip[14] and Item(equip[14]) or Item(0)
 
+-- T31 Handling
+S.BlazingThornsBuff = Spell(425407)
+if Player:HasTier(31, 4) then
+  S.BlazingThornsBuff = Spell(425441)
+end
+
 -- Rotation Variables
 local ActiveMitigationNeeded
 local IsTanking
@@ -65,6 +71,10 @@ HL:RegisterForEvent(function()
   equip = Player:GetEquipment()
   trinket1 = equip[13] and Item(equip[13]) or Item(0)
   trinket2 = equip[14] and Item(equip[14]) or Item(0)
+  S.BlazingThornsBuff = Spell(425407)
+  if Player:HasTier(31, 4) then
+    S.BlazingThornsBuff = Spell(425441)
+  end
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -187,7 +197,7 @@ local function Bear()
   if S.HeartoftheWild:IsCastable() then
     if Cast(S.HeartoftheWild, Settings.Guardian.GCDasOffGCD.HeartOfTheWild) then return "heart_of_the_wild bear 4"; end
   end
-  -- moonfire,cycle_targets=1,if=(((!ticking&time_to_die>12)|(refreshable&time_to_die>12))&active_enemies<7&talent.fury_of_nature.enabled)|(((!ticking&time_to_die>12)|(refreshable&time_to_die>12))&active_enemies<4&!talent.fury_of_nature.enabled)
+  -- moonfire,cycle_targets=1,if=(((!ticking&target.time_to_die>12)|(refreshable&target.time_to_die>12))&active_enemies<7&talent.fury_of_nature.enabled)|(((!ticking&target.time_to_die>12)|(refreshable&target.time_to_die>12))&active_enemies<4&!talent.fury_of_nature.enabled)
   if S.Moonfire:IsReady() then
     if Everyone.CastCycle(S.Moonfire, MeleeEnemies11y, EvaluateCycleMoonfire, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 6"; end
   end
@@ -219,8 +229,8 @@ local function Bear()
   if S.LunarBeam:IsReady() and CDsON() then
     if Cast(S.LunarBeam) then return "lunar_beam bear 18"; end
   end
-  -- rage_of_the_sleeper,if=buff.incarnation_guardian_of_ursoc.down&cooldown.incarnation_guardian_of_ursoc.remains>60&rage>75|buff.incarnation_guardian_of_ursoc.up&rage>75|(talent.convoke_the_spirits.enabled)&rage>75
-  if S.RageoftheSleeper:IsCastable() and (IsTanking) and (Player:BuffDown(S.IncarnationBuff) and S.Incarnation:CooldownRemains() > 60 and Player:Rage() > 75 or Player:BuffUp(S.IncarnationBuff) and Player:Rage() > 75 or S.ConvoketheSpirits:IsAvailable() and Player:Rage() > 75) then
+  -- rage_of_the_sleeper,if=((buff.incarnation_guardian_of_ursoc.down&cooldown.incarnation_guardian_of_ursoc.remains>60)|buff.berserk_bear.down)&rage>75&(!talent.convoke_the_spirits.enabled)|(buff.incarnation_guardian_of_ursoc.up|buff.berserk_bear.up)&rage>75&(!talent.convoke_the_spirits.enabled)|(talent.convoke_the_spirits.enabled)&rage>75
+  if S.RageoftheSleeper:IsCastable() and (IsTanking) and (((Player:BuffDown(S.IncarnationBuff) and S.Incarnation:CooldownRemains() > 60) or Player:BuffDown(S.BerserkBuff)) and Player:Rage() > 75 and not S.ConvoketheSpirits:IsAvailable() or (Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S.BerserkBuff)) and Player:Rage() > 75 and not S.ConvoketheSpirits:IsAvailable() or S.ConvoketheSpirits:IsAvailable() and Player:Rage() > 75) then
     if Cast(S.RageoftheSleeper) then return "rage_of_the_sleeper bear 20"; end
   end
   -- berserking,if=(buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)
