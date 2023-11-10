@@ -229,8 +229,8 @@ local function Bear()
   if S.LunarBeam:IsReady() and CDsON() then
     if Cast(S.LunarBeam) then return "lunar_beam bear 18"; end
   end
-  -- rage_of_the_sleeper,if=buff.incarnation_guardian_of_ursoc.down&cooldown.incarnation_guardian_of_ursoc.remains>60&rage>75|buff.incarnation_guardian_of_ursoc.up&rage>75|(talent.convoke_the_spirits.enabled)&rage>75
-  if S.RageoftheSleeper:IsCastable() and (IsTanking) and (Player:BuffDown(S.IncarnationBuff) and S.Incarnation:CooldownRemains() > 60 and Player:Rage() > 75 or Player:BuffUp(S.IncarnationBuff) and Player:Rage() > 75 or S.ConvoketheSpirits:IsAvailable() and Player:Rage() > 75) then
+  -- rage_of_the_sleeper,if=((buff.incarnation_guardian_of_ursoc.down&cooldown.incarnation_guardian_of_ursoc.remains>60)|buff.berserk_bear.down)&rage>75&(!talent.convoke_the_spirits.enabled)|(buff.incarnation_guardian_of_ursoc.up|buff.berserk_bear.up)&rage>75&(!talent.convoke_the_spirits.enabled)|(talent.convoke_the_spirits.enabled)&rage>75
+  if S.RageoftheSleeper:IsCastable() and (IsTanking) and (((Player:BuffDown(S.IncarnationBuff) and S.Incarnation:CooldownRemains() > 60) or Player:BuffDown(S.BerserkBuff)) and Player:Rage() > 75 and not S.ConvoketheSpirits:IsAvailable() or (Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S.BerserkBuff)) and Player:Rage() > 75 and not S.ConvoketheSpirits:IsAvailable() or S.ConvoketheSpirits:IsAvailable() and Player:Rage() > 75) then
     if Cast(S.RageoftheSleeper) then return "rage_of_the_sleeper bear 20"; end
   end
   -- berserking,if=(buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)
