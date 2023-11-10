@@ -51,6 +51,12 @@ local equip = Player:GetEquipment()
 local trinket1 = equip[13] and Item(equip[13]) or Item(0)
 local trinket2 = equip[14] and Item(equip[14]) or Item(0)
 
+-- T31 Handling
+S.BlazingThornsBuff = Spell(425407)
+if Player:HasTier(31, 4) then
+  S.BlazingThornsBuff = Spell(425441)
+end
+
 -- Rotation Variables
 local ActiveMitigationNeeded
 local IsTanking
@@ -65,6 +71,10 @@ HL:RegisterForEvent(function()
   equip = Player:GetEquipment()
   trinket1 = equip[13] and Item(equip[13]) or Item(0)
   trinket2 = equip[14] and Item(equip[14]) or Item(0)
+  S.BlazingThornsBuff = Spell(425407)
+  if Player:HasTier(31, 4) then
+    S.BlazingThornsBuff = Spell(425441)
+  end
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
