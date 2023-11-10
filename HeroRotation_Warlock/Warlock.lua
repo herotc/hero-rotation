@@ -73,6 +73,7 @@ Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
   InnerDemons                           = Spell(267216),
   NetherPortal                          = Spell(267217),
   PowerSiphon                           = Spell(264130),
+  ReignofTyranny                        = Spell(427684),
   SacrificedSouls                       = Spell(267214),
   SoulboundTyrant                       = Spell(334585),
   SoulStrike                            = Spell(264057),
@@ -88,6 +89,7 @@ Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
   RiteofRuvaraadBuff                    = Spell(409725), -- T30 4pc
   -- Debuffs
   DoomDebuff                            = Spell(603),
+  DoomBrandDebuff                       = Spell(423583), -- T31 2pc
   FromtheShadowsDebuff                  = Spell(270569),
 })
 
