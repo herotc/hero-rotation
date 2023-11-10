@@ -19,7 +19,7 @@ local Shaman = HR.Commons.Shaman
 Shaman.LastSKCast = 0
 Shaman.LastSKBuff = 0
 Shaman.LastT302pcBuff = 0
-
+Shaman.FeralSpiritCount = 0
 
 --- ============================ CONTENT ============================
 HL:RegisterForSelfCombatEvent(
@@ -45,4 +45,24 @@ HL:RegisterForSelfCombatEvent(
     end
   end
   , "SPELL_AURA_APPLIED"
+)
+
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local SpellID = select(12, ...)
+    if SpellID == 228562 then
+      Shaman.FeralSpiritCount = Shaman.FeralSpiritCount + 1
+    end
+  end
+  , "SPELL_SUMMON"
+)
+
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local SpellID = select(12, ...)
+    if SpellID == 333957 then
+      Shaman.FeralSpiritCount = 0
+    end
+  end
+  , "SPELL_AURA_REMOVED"
 )
