@@ -46,8 +46,13 @@ local I = Item.Rogue.Outlaw
 local OnUseExcludes = {
   I.ManicGrieftorch:ID(),
   I.DragonfireBombDispenser:ID(),
-  I.BeaconToTheBeyond:ID(),
+  I.BeaconToTheBeyond:ID()
 }
+
+-- Trinkets
+local equip = Player:GetEquipment()
+local trinket1 = equip[13] and Item(equip[13]) or Item(0)
+local trinket2 = equip[14] and Item(equip[14]) or Item(0)
 
 S.Dispatch:RegisterDamageFormula(
   -- Dispatch DMG Formula (Pre-Mitigation):
@@ -344,8 +349,10 @@ local function CDs ()
 
   -- # Use Roll the Bones if reroll conditions are met, or just before buffs expire based on T31 and upcoming stealth cooldowns
   -- actions.cds+=/roll_the_bones,if=variable.rtb_reroll|rtb_buffs.max_remains<=set_bonus.tier31_4pc+(cooldown.shadow_dance.remains<=1|cooldown.vanish.remains<=1)*6
-  if S.RolltheBones:IsReady() and RtB_Reroll() or Rogue.RtBRemains() <= num(Player:HasTier(31, 4)) + (num(S.ShadowDance:CooldownRemains() <=1) or num(S.Vanish:CooldownRemains() <= 1)) * 6 then
-    if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones" end
+  if S.RolltheBones:IsReady() then
+    if RtB_Reroll() or Rogue.RtBRemains() <= num(Player:HasTier(31, 4)) + (num(S.ShadowDance:CooldownRemains() <=1) or num(S.Vanish:CooldownRemains() <= 1)) * 6 then
+      if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones" end
+    end
   end
 
   -- # Use Keep it Rolling with at least 3 buffs (4 with T31)
@@ -417,15 +424,33 @@ local function CDs ()
 
   -- # Default conditions for usable items.
   if Settings.Commons.UseTrinkets then
+    -- actions.cds+=/use_item,name=manic_grieftorch,use_off_gcd=1,if=gcd.remains>gcd.max-0.1&!stealthed.all&buff.between_the_eyes.up|fight_remains<=5
+    if I.ManicGrieftorch:IsEquippedAndReady() and Player:GCDRemains() > Player:GCD()-0.1 and not Player:StealthUp(true, true) and Player:BuffUp(S.BetweentheEyes) or
+      HL.BossFilteredFightRemains("<=", 5) then
+      if HR.Cast(I.ManicGrieftorch, nil, Settings.Commons.TrinketDisplayStyle) then return "Manic Grieftorch"; end
+    end
 
-    -- actions.cds+=/use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1,if=
-    -- (!trinket.1.is.dragonfire_bomb_dispenser&trinket.1.cooldown.remains>10|trinket.2.cooldown.remains>10)
-    -- |cooldown.dragonfire_bomb_dispenser.charges>2|fight_remains<20|!trinket.2.has_cooldown|!trinket.1.has_cooldown
+    -- actions.cds+=/use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1,if=(!trinket.1.is.dragonfire_bomb_dispenser&trinket.1.cooldown.remains>10
+    -- |trinket.2.cooldown.remains>10)|cooldown.dragonfire_bomb_dispenser.charges>2|fight_remains<20|!trinket.2.has_cooldown|!trinket.1.has_cooldown
+    if I.DragonfireBombDispenser:IsEquippedAndReady() then
+      if (not trinket1:ID() == I.DragonfireBombDispenser:ID() and trinket1:CooldownRemains() > 10 or
+        trinket2:CooldownRemains() > 10) or HL.BossFilteredFightRemains("<", 20) or not trinket2:Cooldown() or not trinket1:Cooldown() then
+        if HR.Cast(trinket1, nil, Settings.Commons.TrinketDisplayStyle) then return "Dragonfire Bomb Dispenser"; end
+      end
+    end
 
-    -- actions.cds+=/use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=gcd.remains>gcd.max-0.1&!stealthed.all&buff.between_the_eyes.up&(!talent.ghostly_strike|debuff.ghostly_strike.up|spell_targets.blade_flurry>2)|fight_remains<=5
+   -- actions.cds+=/use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=gcd.remains>gcd.max-0.1&!stealthed.all&buff.between_the_eyes.up|fight_remains<=5
+    if I.BeaconToTheBeyond:IsEquippedAndReady() and not Player:StealthUp(true, true) and Player:BuffUp(S.BetweentheEyes)
+      or HL.BossFilteredFightRemains("<", 5) then
+      if HR.Cast(I.BeaconToTheBeyond, nil, Settings.Commons.TrinketDisplayStyle) then return "Beacon"; end
+    end
 
-    -- actions.cds+=/use_items,slots=trinket1,if=buff.between_the_eyes.up|trinket.1.has_stat.any_dps|fight_remains<=20
-    -- actions.cds+=/use_items,slots=trinket2,if=buff.between_the_eyes.up|trinket.2.has_stat.any_dps|fight_remains<=20
+    -- actions.cds+=/use_items,slots=trinket1,if=debuff.between_the_eyes.up|trinket.1.has_stat.any_dps|fight_remains<=20
+    -- actions.cds+=/use_items,slots=trinket2,if=debuff.between_the_eyes.up|trinket.2.has_stat.any_dps|fight_remains<=20
+    local TrinketToUse = Player:GetUseableItems(OnUseExcludes, 13) or Player:GetUseableItems(OnUseExcludes, 14)
+    if TrinketToUse and (Player:BuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 20) or TrinketToUse:HasStatAnyDps()) then
+      if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name() end
+    end
   end
 end
 
