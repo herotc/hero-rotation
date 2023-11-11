@@ -178,6 +178,8 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   AudacityBuff            = Spell(386270),
   BladeRush               = Spell(271877),
   CountTheOdds            = Spell(381982),
+  Crackshot				        = Spell(423703),
+  DeftManeuvers           = Spell(385835),
   Dreadblades             = Spell(343142),
   FanTheHammer            = Spell(381846),
   GhostlyStrike           = Spell(196937),
@@ -195,6 +197,7 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   SummarilyDispatched     = Spell(381990),
   SwiftSlasher            = Spell(381988),
   TakeEmBySurpriseBuff    = Spell(385907),
+  UnderhandedUpperhand    = Spell(424044),
   Weaponmaster            = Spell(200733),
   -- Utility
   Gouge                   = Spell(1776),
@@ -274,6 +277,8 @@ Item.Rogue.Outlaw = {
   -- Trinkets
   ManicGrieftorch         = Item(194308, {13, 14}),
   WindscarWhetstone       = Item(137486, {13, 14}),
+  BeaconToTheBeyond       = Item(203963, {13, 14}),
+  DragonfireBombDispenser = Item(202610, {13, 14}),
 }
 
 Item.Rogue.Subtlety = {
