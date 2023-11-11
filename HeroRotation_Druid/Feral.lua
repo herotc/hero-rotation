@@ -457,7 +457,7 @@ local function AoeBuilder()
   if S.BrutalSlash:IsReady() then
     if Everyone.CastTargetIf(S.BrutalSlash, Enemies11y, "min", EvaluateTargetIfFilterTTD, EvaluateTargetIfBrutalSlashAoeBuilder, not Target:IsInMeleeRange(11)) then return "brutal_slash aoe_builder 2"; end
   end
-  -- thrash_cat,target_if=refreshable,if=buff.clearcasting.react|(spell_targets.thrash_cat>10|(spell_targets.thrash_cat>5&!talent.double_clawed_rake.enabled))&!talent.thrashing_claws
+  -- thrash_cat,target_if=refreshable,if=buff.clearcasting.react|(spell_targets.thrash_cat>10|(spell_targets.thrash_cat>5&!talent.doubleclawed_rake.enabled))&!talent.thrashing_claws
   if S.Thrash:IsReady() and (Player:BuffUp(S.Clearcasting) or (EnemiesCount11y > 10 or (EnemiesCount11y > 5 and not S.DoubleClawedRake:IsAvailable())) and not S.ThrashingClaws:IsAvailable()) then
     if Everyone.CastCycle(S.Thrash, Enemies11y, EvaluateCycleThrash, not Target:IsInMeleeRange(11)) then return "thrash aoe_builder 4"; end
   end
