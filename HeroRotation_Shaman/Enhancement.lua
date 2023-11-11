@@ -68,6 +68,7 @@ end, "PLAYER_REGEN_ENABLED")
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
+local Shaman = HR.Commons.Shaman
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Shaman.Commons,
