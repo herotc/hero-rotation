@@ -148,7 +148,7 @@ local function Cooldowns()
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(gcd.remains>gcd.max-0.1|fight_remains<5)&time>5
-    if I.BelorrelostheSuncaller:IsEquippedAndReady() and ((Player:GCDRemains() > Player:GCD() - 0.1 or FightRemains < 5) and HL.CombatTime() > 5 then
+    if I.BelorrelostheSuncaller:IsEquippedAndReady() and ((Player:GCDRemains() > Player:GCD() - 0.1 or FightRemains < 5) and HL.CombatTime() > 5) then
       if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller cd 10"; end
     end
     -- use_item,name=balefire_branch,if=cooldown.ray_of_frost.up&time>1|fight_remains<20

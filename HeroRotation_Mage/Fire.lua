@@ -45,7 +45,7 @@ local OnUseExcludes = {
   I.ObsidianGladiatorsBadge:ID(),
   I.VerdantGladiatorsBadge:ID(),
   -- Other Trinkets
-  I.AshesoftheEmbersoul:ID()
+  I.AshesoftheEmbersoul:ID(),
   I.BalefireBranch:ID(),
   I.BelorrelostheSuncaller:ID(),
   I.Dreambinder:ID(),
