@@ -499,6 +499,8 @@ local function APL()
     if S.ThrowGlaive:IsReady() and ((S.DemonBlades:IsAvailable() or not Target:IsInRange(12)) and Target:DebuffDown(S.EssenceBreakDebuff) and Target:IsSpellInRange(S.ThrowGlaive) and not Player:HasTier(31, 2)) then
       if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 86"; end
     end
+    -- Show pooling if nothing else to do
+    if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
 end
 
