@@ -622,7 +622,7 @@ local function APL ()
   if not Player:AffectingCombat() and S.Vanish:TimeSinceLastCast() > 1 then
     -- actions.precombat+=/blade_flurry,precombat_seconds=4,if=talent.underhanded_upper_hand
     -- Blade Flurry Breaks Stealth so must be done first
-    if S.BladeFlurry:IsReady() and S.UnderhandedUpperhand:IsAvailable() then
+    if S.BladeFlurry:IsReady() and S.UnderhandedUpperhand:IsAvailable() and not Player:StealthUp(true, true) then
       if HR.Cast(S.BladeFlurry) then return "Blade Flurry (Opener)" end
     end
 
