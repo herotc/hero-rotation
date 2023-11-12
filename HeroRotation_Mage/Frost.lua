@@ -471,8 +471,8 @@ local function APL()
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "pool for Aoe()"; end
     end
-    -- run_action_list,name=cleave,if=active_enemies=2&set_bonus.tier31_4pc
-    if AoEON() and EnemiesCount16ySplash == 2 and Player:HasTier(31, 4) then
+    -- run_action_list,name=cleave,if=active_enemies=2
+    if AoEON() and EnemiesCount16ySplash == 2 then
       local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "pool for Cleave()"; end
     end
