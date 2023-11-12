@@ -127,6 +127,7 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   NightfallBuff                         = Spell(264571),
   MaleficAfflictionBuff                 = Spell(389845),
   TormentedCrescendoBuff                = Spell(387079),
+  UmbrafireKindlingBuff                 = Spell(423765), -- T31 4pc
   -- Debuffs
   AgonyDebuff                           = Spell(980),
   CorruptionDebuff                      = Spell(146739),
@@ -195,6 +196,7 @@ if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Commons = {
   -- Trinkets
   BeacontotheBeyond                     = Item(203963, {13, 14}),
+  BelorrelostheSuncaller                = Item(207172, {13, 14}),
   ConjuredChillglobe                    = Item(194300, {13, 14}),
   DesperateInvokersCodex                = Item(194310, {13, 14}),
   EruptingSpearFragment                 = Item(193769, {13, 14}),
@@ -203,6 +205,7 @@ Item.Warlock.Commons = {
   NeltharionsCallToDominance            = Item(204202, {13, 14}),
   RotcrustedVoodooDoll                  = Item(159624, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
+  TimeThiefsGambit                      = Item(207579, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
   VoidmendersShadowgem                  = Item(110007, {13, 14}),
   -- Other Items
