@@ -652,6 +652,9 @@ local function APL ()
       if Player:StealthUp(true, false) then
         ShouldReturn = Stealth()
         if ShouldReturn then return "Stealth (Opener): " .. ShouldReturn end
+        if S.KeepItRolling:IsAvailable() and S.GhostlyStrike:IsAvailable() and S.EchoingReprimand:IsAvailable() then
+          if HR.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike KiR (Opener)" end
+        end
         if S.Ambush:IsCastable() then
           if HR.Cast(S.Ambush) then return "Cast Ambush (Opener)" end
         end
