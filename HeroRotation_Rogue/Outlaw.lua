@@ -292,14 +292,14 @@ end
 local function StealthCDs ()
   -- # Hidden Opportunity builds without Crackshot use Vanish if Audacity is not active and when under max Opportunity stacks
   -- actions.stealth_cds+=/vanish,if=talent.hidden_opportunity&!talent.crackshot&!buff.audacity.up&(variable.vanish_opportunity_condition|buff.opportunity.stack<buff.opportunity.max_stack)&variable.ambush_condition
-  if S.Vanish:IsCastable() and S.HiddenOpportunity:IsAvailable() and not S.Crackshot:IsAvailable() and not Player:BuffUp(S.Audacity)
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() and S.HiddenOpportunity:IsAvailable() and not S.Crackshot:IsAvailable() and not Player:BuffUp(S.Audacity)
     and (Vanish_Opportunity_Condition() or Player:BuffStack(S.Opportunity) < 6) and Ambush_Condition() then
     if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (HO)" end
   end
 
   -- # Crackshot builds or builds without Hidden Opportunity use Vanish at finish condition
   -- actions.stealth_cds+=/vanish,if=(!talent.hidden_opportunity|talent.crackshot)&variable.finish_condition
-  if S.Vanish:IsCastable() and S.HiddenOpportunity:IsAvailable() and (not S.HiddenOpportunity:IsAvailable() or S.Crackshot:IsAvailable()) and Finish_Condition() then
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() and (not S.HiddenOpportunity:IsAvailable() or S.Crackshot:IsAvailable()) and Finish_Condition() then
     if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Finish)" end
   end
 
@@ -541,9 +541,7 @@ local function Build ()
 	end
 
 	-- actions.build+=/ambush,if=talent.hidden_opportunity&buff.audacity.up
-  -- took this out here as there's no instance of ambush without HO and S.HiddenOpportunity:IsAvailable()
-  -- but it's just a modifier on audacity anyway
-  if S.Ambush:IsCastable() and Player:BuffUp(S.AudacityBuff) then
+  if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
     if HR.CastPooling(S.Ambush) then return "Cast Ambush (High-Prio Buffed)" end
   end
 
