@@ -139,8 +139,8 @@ local function Precombat()
   if S.BlisteringScales:IsCastable() and (BlisteringScalesCheck() < 10) then
     if Cast(S.BlisteringScales, nil, Settings.Augmentation.DisplayStyle.AugBuffs) then return "blistering_scales precombat 2"; end
   end
-  -- prescience
-  if S.Prescience:IsCastable() then
+  -- prescience,if=time_to_max_charges<gcd.max
+  if S.Prescience:IsCastable() and (S.Prescience:FullRechargeTime() < Player:GCD() + 0.25) then
     if Cast(S.Prescience, nil, Settings.Augmentation.DisplayStyle.AugBuffs) then return "prescience precombat 4"; end
   end
   -- tip_the_scales
@@ -191,8 +191,8 @@ local function APL()
     -- Note: Too situational. Not suggesting CF.
     -- hover,if=moving&buff.hover.down&buff.breath_of_eons.down
     -- Note: Not handling hover. Just keeping the APL line for completeness.
-    -- prescience
-    if S.Prescience:IsCastable() then
+    -- prescience,if=time_to_max_charges<gcd.max
+    if S.Prescience:IsCastable() and (S.Prescience:FullRechargeTime() < Player:GCD() + 0.25) then
       if Cast(S.Prescience, nil, Settings.Augmentation.DisplayStyle.AugBuffs) then return "prescience main 6"; end
     end
     -- ebon_might,if=refreshable
@@ -237,31 +237,32 @@ local function APL()
         if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 20"; end
       end
     end
-    -- living_flame,if=buff.leaping_flames.up&active_dot.fire_breath>0
-    if S.LivingFlame:IsReady() and (Player:BuffUp(S.LeapingFlamesBuff) and S.FireBreathDebuff:AuraActiveCount() > 0) then
+    -- living_flame,if=buff.leaping_flames.up&cooldown.fire_breath.remains<=gcd.max
+    if S.LivingFlame:IsReady() and (Player:BuffUp(S.LeapingFlamesBuff) and S.FireBreathDebuff:CooldownRemains() <= Player:GCD() + 0.25) then
       if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame main 22"; end
-    end
-    -- time_skip,if=cooldown.fire_breath.true_remains+cooldown.upheaval.true_remains+cooldown.prescience.true_remains>35
-    if CDsON() and S.TimeSkip:IsCastable() and (S.FireBreath:CooldownRemains() + S.Upheaval:CooldownRemains() + S.Prescience:CooldownRemains() > 35) then
-      if Cast(S.TimeSkip, Settings.Augmentation.GCDasOffGCD.TimeSkip) then return "time_skip main 24"; end
-    end
-    -- fire_breath,empower_to=1,if=!talent.leaping_flames&(buff.ebon_might.remains>cast_time|empowering.fire_breath)
-    if S.FireBreath:IsCastable() and (not S.LeapingFlames:IsAvailable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1))) then
-      if CastAnnotated(S.FireBreath, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 1 main 26"; end
     end
     -- fire_breath,empower_to=max,if=talent.leaping_flames&(buff.ebon_might.remains>cast_time|empowering.fire_breath)
     if S.FireBreath:IsCastable() and (S.LeapingFlames:IsAvailable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(MaxEmpower))) then
       if CastAnnotated(S.FireBreath, false, MaxEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower " .. MaxEmpower .. " main 28"; end
     end
-    -- upheaval,empower_to=1,if=active_enemies<2&(empowering.upheaval|buff.ebon_might.remains>cast_time)
-    -- upheaval,empower_to=2,if=active_enemies<4&(empowering.upheaval|buff.ebon_might.remains>cast_time)
-    -- upheaval,empower_to=3,if=active_enemies<6&(empowering.upheaval|buff.ebon_might.remains>cast_time)
-    -- upheaval,empower_to=max,if=active_enemies>5&(empowering.upheaval|buff.ebon_might.remains>cast_time)
-    if S.Upheaval:IsCastable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1)) then
-      local UpheavalEmpower = 1
-      if EnemiesCount8ySplash > 1 and EnemiesCount8ySplash < 4 and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(2) then
+    -- fire_breath,empower_to=1,if=!talent.leaping_flames&(buff.ebon_might.remains>cast_time|empowering.fire_breath)
+    if S.FireBreath:IsCastable() and (not S.LeapingFlames:IsAvailable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1))) then
+      if CastAnnotated(S.FireBreath, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 1 main 26"; end
+    end
+    -- time_skip,if=cooldown.fire_breath.true_remains+cooldown.upheaval.true_remains+cooldown.prescience.true_remains>35
+    if CDsON() and S.TimeSkip:IsCastable() and (S.FireBreath:CooldownRemains() + S.Upheaval:CooldownRemains() + S.Prescience:CooldownRemains() > 35) then
+      if Cast(S.TimeSkip, Settings.Augmentation.GCDasOffGCD.TimeSkip) then return "time_skip main 24"; end
+    end
+    -- upheaval,empower_to=1,if=(settings.upheaval_rank_1|active_enemies<2)&(empowering.upheaval|buff.ebon_might.remains>cast_time)
+    -- upheaval,empower_to=2,if=!settings.upheaval_rank_1&active_enemies<4&(empowering.upheaval|buff.ebon_might.remains>cast_time)
+    -- upheaval,empower_to=3,if=!settings.upheaval_rank_1&active_enemies<6&(empowering.upheaval|buff.ebon_might.remains>cast_time)
+    -- upheaval,empower_to=max,if=!settings.upheaval_rank_1&active_enemies>5&(empowering.upheaval|buff.ebon_might.remains>cast_time)
+    if S.Upheaval:IsCastable() then
+      if Settings.Augmentation.UpheavalRank1Only or EnemiesCount8ySplash < 2 then
+        local UpheavalEmpower = 1
+      elseif EnemiesCount8ySplash < 4 and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(2) then
         UpheavalEmpower = 2
-      elseif EnemiesCount8ySplash > 3 and EnemiesCount8ySplash < 6 and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(3) then
+      elseif EnemiesCount8ySplash < 6 and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(3) then
         UpheavalEmpower = 3
       elseif EnemiesCount8ySplash > 5 and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(MaxEmpower) then
         UpheavalEmpower = MaxEmpower
