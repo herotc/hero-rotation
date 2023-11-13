@@ -373,7 +373,7 @@ local function APL()
 end
 
 local function OnInit()
-  HR.Print("Retribution Paladin rotation is currently a work in progress, but has been updated for patch 10.2.0.")
+  HR.Print("Retribution Paladin rotation has been updated for patch 10.2.0.")
 end
 
 HR.SetAPL(70, APL, OnInit)

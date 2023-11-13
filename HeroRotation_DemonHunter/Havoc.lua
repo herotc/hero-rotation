@@ -507,7 +507,7 @@ end
 local function Init()
   S.BurningWoundDebuff:RegisterAuraTracking()
 
-  HR.Print("Havoc DH rotation is currently a work in progress, but has been updated for patch 10.2.0.")
+  HR.Print("Havoc Demon Hunter rotation has been updated for patch 10.2.0.")
 end
 
 HR.SetAPL(577, APL, Init)
