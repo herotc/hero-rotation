@@ -53,6 +53,7 @@ local Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
 local Enemies40y, Enemies10ySplash, EnemiesCount10ySplash
 local VarPSUp, VarVTUp, VarVTPSUp, VarSRUp, VarCDDoTsUp, VarHasCDs, VarCDsActive
 local VarMinAgony
+local SoulShards = 0
 local BossFightRemains = 11111
 local FightRemains = 11111
 
@@ -523,10 +524,10 @@ local function APL()
     if FightRemains == 11111 then
       FightRemains = HL.FightRemains(Enemies10ySplash, false)
     end
-  end
 
-  -- SoulShards variable
-  SoulShards = Player:SoulShardsP()
+    -- SoulShards variable
+    SoulShards = Player:SoulShardsP()
+  end
 
   -- summon_pet 
   if S.SummonPet:IsCastable() then
