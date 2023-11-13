@@ -24,7 +24,7 @@ HR.GUISettings.APL.Rogue = {
     UseDPSVanish = true, -- allow the use of vanish for dps (checking for if you're solo)
     UseTrinkets = true,
     TrinketDisplayStyle = "Suggested",
-    ShowPooling = false,
+    ShowPooling = true,
 
     GCDasOffGCD = {
       EchoingReprimand = true,
