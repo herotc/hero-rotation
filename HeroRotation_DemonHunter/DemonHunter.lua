@@ -63,6 +63,7 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   Torment                               = Spell(185245),
   -- Talents
   AgonizingFlames                       = Spell(207548),
+  AscendingFlame                        = Spell(428603),
   BulkExtraction                        = Spell(320341),
   BurningAlive                          = Spell(207739),
   BurningBlood                          = Spell(390213),
