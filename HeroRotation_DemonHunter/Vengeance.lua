@@ -579,7 +579,7 @@ local function Init()
   S.FieryBrandDebuff:RegisterAuraTracking()
   S.SigilofFlameDebuff:RegisterAuraTracking()
 
-  HR.Print("Vengeance DH rotation has been updated for patch 10.2.0.")
+  HR.Print("Vengeance Demon Hunter rotation has been updated for patch 10.2.0.")
 end
 
 HR.SetAPL(581, APL, Init);
