@@ -140,61 +140,6 @@ local function Defensives()
   end
 end
 
-local function Trinkets()
-  -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs
-  -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs
-  -- use_item,use_off_gcd=1,slot=main_hand,if=(variable.trinket_1_buffs|trinket.1.cooldown.remains)&(variable.trinket_2_buffs|trinket.2.cooldown.remains)
-  -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)&(variable.trinket_2_exclude|trinket.2.cooldown.remains|!trinket.2.has_cooldown|variable.trinket_2_buffs)
-  -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)&(variable.trinket_1_exclude|trinket.1.cooldown.remains|!trinket.1.has_cooldown|variable.trinket_1_buffs)
-  -- Note: Can't handle trinket stat buff checking, so using a generic trinket call
-  -- use_items,if=(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)
-  if (Player:BuffUp(S.DancingRuneWeaponBuff) or not S.DancingRuneWeapon:IsAvailable() or S.DancingRuneWeapon:CooldownRemains() > 20) then
-    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-    if ItemToUse then
-      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
-      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
-        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
-      end
-    end
-  end
-end
-
-local function Racials()
-  -- blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
-  if S.BloodFury:IsCastable() and (S.DancingRuneWeapon:CooldownUp() and (not S.Blooddrinker:IsReady() or not S.Blooddrinker:IsAvailable()))  then
-    if Cast(S.BloodFury, Settings.Commons2.OffGCDasOffGCD.Racials) then return "blood_fury racials 2"; end
-  end
-  -- berserking
-  if S.Berserking:IsCastable() then
-    if Cast(S.Berserking, Settings.Commons2.OffGCDasOffGCD.Racials) then return "berserking racials 4"; end
-  end
-  -- arcane_pulse,if=active_enemies>=2|rune<1&runic_power.deficit>60
-  if S.ArcanePulse:IsCastable() and (EnemiesMeleeCount >= 2 or Player:Rune() < 1 and Player:RunicPowerDeficit() > 60) then
-    if Cast(S.ArcanePulse, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 6"; end
-  end
-  -- lights_judgment,if=buff.unholy_strength.up
-  if S.LightsJudgment:IsCastable() and (Player:BuffUp(S.UnholyStrengthBuff)) then
-    if Cast(S.LightsJudgment, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
-  end
-  -- ancestral_call
-  if S.AncestralCall:IsCastable() then
-    if Cast(S.AncestralCall, Settings.Commons2.OffGCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
-  end
-  -- fireblood
-  if S.Fireblood:IsCastable() then
-    if Cast(S.Fireblood, Settings.Commons2.OffGCDasOffGCD.Racials) then return "fireblood racials 12"; end
-  end
-  -- bag_of_tricks
-  if S.BagofTricks:IsCastable() then
-    if Cast(S.BagofTricks, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks racials 14"; end
-  end
-  -- arcane_torrent,if=runic_power.deficit>20
-  if S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 20) then
-    if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent racials 16"; end
-  end
-end
-
 local function DRWUp()
   -- blood_boil,if=!dot.blood_plague.ticking
   if S.BloodBoil:IsReady() and (Target:DebuffDown(S.BloodPlagueDebuff)) then
@@ -245,6 +190,41 @@ local function DRWUp()
   -- heart_strike,if=rune.time_to_2<gcd|runic_power.deficit>=variable.heart_strike_rp_drw
   if S.HeartStrike:IsReady() and (Player:RuneTimeToX(2) < Player:GCD() or Player:RunicPowerDeficit() >= VarHeartStrikeRPDRW) then
     if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike drw_up 26"; end
+  end
+end
+
+local function Racials()
+  -- blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
+  if S.BloodFury:IsCastable() and (S.DancingRuneWeapon:CooldownUp() and (not S.Blooddrinker:IsReady() or not S.Blooddrinker:IsAvailable()))  then
+    if Cast(S.BloodFury, Settings.Commons2.OffGCDasOffGCD.Racials) then return "blood_fury racials 2"; end
+  end
+  -- berserking
+  if S.Berserking:IsCastable() then
+    if Cast(S.Berserking, Settings.Commons2.OffGCDasOffGCD.Racials) then return "berserking racials 4"; end
+  end
+  -- arcane_pulse,if=active_enemies>=2|rune<1&runic_power.deficit>60
+  if S.ArcanePulse:IsCastable() and (EnemiesMeleeCount >= 2 or Player:Rune() < 1 and Player:RunicPowerDeficit() > 60) then
+    if Cast(S.ArcanePulse, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 6"; end
+  end
+  -- lights_judgment,if=buff.unholy_strength.up
+  if S.LightsJudgment:IsCastable() and (Player:BuffUp(S.UnholyStrengthBuff)) then
+    if Cast(S.LightsJudgment, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
+  end
+  -- ancestral_call
+  if S.AncestralCall:IsCastable() then
+    if Cast(S.AncestralCall, Settings.Commons2.OffGCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
+  end
+  -- fireblood
+  if S.Fireblood:IsCastable() then
+    if Cast(S.Fireblood, Settings.Commons2.OffGCDasOffGCD.Racials) then return "fireblood racials 12"; end
+  end
+  -- bag_of_tricks
+  if S.BagofTricks:IsCastable() then
+    if Cast(S.BagofTricks, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks racials 14"; end
+  end
+  -- arcane_torrent,if=runic_power.deficit>20
+  if S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 20) then
+    if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent racials 16"; end
   end
 end
 
@@ -301,6 +281,26 @@ local function Standard()
   end
 end
 
+local function Trinkets()
+  -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs
+  -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs
+  -- use_item,use_off_gcd=1,slot=main_hand,if=(variable.trinket_1_buffs|trinket.1.cooldown.remains)&(variable.trinket_2_buffs|trinket.2.cooldown.remains)
+  -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)&(variable.trinket_2_exclude|trinket.2.cooldown.remains|!trinket.2.has_cooldown|variable.trinket_2_buffs)
+  -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)&(variable.trinket_1_exclude|trinket.1.cooldown.remains|!trinket.1.has_cooldown|variable.trinket_1_buffs)
+  -- Note: Can't handle trinket stat buff checking, so using a generic trinket call
+  -- use_items,if=(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)
+  if (Player:BuffUp(S.DancingRuneWeaponBuff) or not S.DancingRuneWeapon:IsAvailable() or S.DancingRuneWeapon:CooldownRemains() > 20) then
+    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+    if ItemToUse then
+      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+      end
+    end
+  end
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
   -- Get Enemies Count
@@ -314,14 +314,16 @@ local function APL()
     EnemiesCount10y   = 1
   end
 
-  -- HeartStrike is limited to 5 targets maximum
-  HeartStrikeCount = mathmin(EnemiesMeleeCount, Player:BuffUp(S.DeathAndDecayBuff) and 5 or 2)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- HeartStrike is limited to 5 targets maximum
+    HeartStrikeCount = mathmin(EnemiesMeleeCount, Player:BuffUp(S.DeathAndDecayBuff) and 5 or 2)
 
-  -- Check Units without Blood Plague
-  UnitsWithoutBloodPlague = UnitsWithoutBP(Enemies10y)
+    -- Check Units without Blood Plague
+    UnitsWithoutBloodPlague = UnitsWithoutBP(Enemies10y)
 
-  -- Are we actively tanking?
-  IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
+    -- Are we actively tanking?
+    IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
+  end
 
   if Everyone.TargetIsValid() then
     -- call precombat
@@ -366,7 +368,7 @@ local function APL()
     -- icebound_fortitude,if=!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)&(target.cooldown.pause_action.remains>=8|target.cooldown.pause_action.duration>0)
     -- Above Above lines handled via Defensives()
     -- vampiric_blood,if=!buff.vampiric_blood.up&!buff.vampiric_strength.up
-    -- Note: Handling this vampiric_blood here, as it's now used as an offensive CD with T31P4.
+    -- Note: Handling this vampiric_blood here, as it's used as an offensive CD with T30P4.
     if S.VampiricBlood:IsCastable() and (Player:BuffDown(S.VampiricBloodBuff) and Player:BuffDown(S.VampiricStrengthBuff) and Player:HasTier(30, 4)) then
       if Cast(S.VampiricBlood, Settings.Blood.GCDasOffGCD.VampiricBlood) then return "vampiric_blood main 5"; end
     end
@@ -431,7 +433,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Blood DK rotation is currently a work in progress, but has been updated for patch 10.1.5.")
+  HR.Print("Blood Death Knight rotation has been updated for patch 10.2.0.")
 end
 
 HR.SetAPL(250, APL, Init)

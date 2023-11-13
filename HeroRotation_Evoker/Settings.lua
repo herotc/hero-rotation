@@ -45,6 +45,7 @@ HR.GUISettings.APL.Evoker = {
     }
   },
   Augmentation = {
+    UpheavalRank1Only = true,
     DisplayStyle = {
       AugBuffs = "SuggestedRight",
     },
@@ -89,6 +90,7 @@ CreatePanelOption("Slider", CP_Evoker, "APL.Evoker.Commons.DisintegrateFontSize"
 
 -- Augmentation
 CreateARPanelOptions(CP_Augmentation, "APL.Evoker.Augmentation")
+CreatePanelOption("CheckButton", CP_Augmentation, "APL.Evoker.Augmentation.UpheavalRank1Only", "Only Use Rank 1 Upheaval", "Enable this option to only suggest Rank 1 Upheaval. When disabled, Upheaval will be recommended at higher ranks depending on target count.")
 
 -- Devastation
 CreatePanelOption("CheckButton", CP_Devastation, "APL.Evoker.Devastation.UseDefensives", "Suggest Defensives", "Enable this option to have the addon suggest defensive spells.")

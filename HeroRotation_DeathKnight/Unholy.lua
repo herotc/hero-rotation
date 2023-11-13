@@ -219,8 +219,8 @@ local function Precombat()
   -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|(trinket.2.has_buff.strength|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit)&!variable.trinket_2_exclude
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_1_buffs&(trinket.1.cooldown.duration%%45=0)
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_2_buffs&(trinket.2.cooldown.duration%%45=0)
-  -- variable,name=trinket_1_manual,value=trinket.1.is.algethar_puzzle_box|trinket.1.is.irideus_fragment
-  -- variable,name=trinket_2_manual,value=trinket.2.is.algethar_puzzle_box|trinket.2.is.irideus_fragment
+  -- variable,name=trinket_1_manual,value=trinket.1.is.algethar_puzzle_box|trinket.1.is.irideus_fragment|trinket.1.is.vial_of_animated_blood
+  -- variable,name=trinket_2_manual,value=trinket.2.is.algethar_puzzle_box|trinket.2.is.irideus_fragment|trinket.2.is.vial_of_animated_blood
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs&(trinket.2.has_cooldown&!variable.trinket_2_exclude|!trinket.1.has_cooldown)|variable.trinket_2_buffs&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync))
   -- TODO: Trinket sync/priority stuff. Currently unable to pull trinket CD durations because WoW's API is bad.
   -- Manually added: outbreak
@@ -442,37 +442,6 @@ local function GargSetup()
   end
 end
 
-local function ST()
-  -- death_coil,if=!variable.epidemic_priority&(!variable.pooling_runic_power&variable.spend_rp|fight_remains<10)
-  if S.DeathCoil:IsReady() and (not VarEpidemicPriority and (not VarPoolingRunicPower and VarSpendRP or FightRemains < 10)) then
-    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil st 2"; end
-  end
-  -- epidemic,if=variable.epidemic_priority&(!variable.pooling_runic_power&variable.spend_rp|fight_remains<10)
-  if S.Epidemic:IsReady() and (VarEpidemicPriority and (not VarPoolingRunicPower and VarSpendRP or FightRemains < 10)) then
-    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic st 4"; end
-  end
-  -- any_dnd,if=!death_and_decay.ticking&(active_enemies>=2|talent.unholy_ground&(pet.apoc_ghoul.active&pet.apoc_ghoul.remains>=13|pet.gargoyle.active&pet.gargoyle.remains>8|pet.army_ghoul.active&pet.army_ghoul.remains>8|!variable.pop_wounds&debuff.festering_wound.stack>=4)|talent.defile&(pet.gargoyle.active|pet.apoc_ghoul.active|pet.army_ghoul.active|buff.dark_transformation.up))&(death_knight.fwounded_targets=active_enemies|active_enemies=1)
-  if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and (EnemiesMeleeCount >= 2 or S.UnholyGround:IsAvailable() and (VarApocGhoulActive and VarApocGhoulRemains >= 13 or VarGargActive and VarGargRemains > 8 or VarArmyGhoulActive and VarArmyGhoulRemains > 8 or not VarPopWounds and FesterStacks >= 4) or S.Defile:IsAvailable() and (VarGargActive or VarApocGhoulActive or VarArmyGhoulActive or Pet:BuffUp(S.DarkTransformation))) and (S.FesteringWoundDebuff:AuraActiveCount() == EnemiesMeleeCount or EnemiesMeleeCount == 1)) then
-    if Cast(AnyDnD, Settings.Commons2.GCDasOffGCD.DeathAndDecay) then return "any_dnd st 6"; end
-  end
-  -- wound_spender,target_if=max:debuff.festering_wound.stack,if=variable.pop_wounds|active_enemies>=2&death_and_decay.ticking
-  if WoundSpender:IsReady() and (VarPopWounds or EnemiesMeleeCount >= 2 and Player:BuffUp(S.DeathAndDecayBuff)) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 8"; end
-  end
-  -- festering_strike,target_if=min:debuff.festering_wound.stack,if=!variable.pop_wounds&debuff.festering_wound.stack<4
-  if S.FesteringStrike:IsReady() and (not VarPopWounds) then
-    if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeST, not Target:IsInMeleeRange(5)) then return "festering_strike st 10"; end
-  end
-  -- death_coil
-  if S.DeathCoil:IsReady() then
-    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil st 12"; end
-  end
-  -- wound_spender,target_if=max:debuff.festering_wound.stack,if=!variable.pop_wounds&debuff.festering_wound.stack>=4
-  if WoundSpender:IsReady() and (not VarPopWounds) then
-    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeST2, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 14"; end
-  end
-end
-
 local function HighPrioActions()
   -- mind_freeze,if=target.debuff.casting.react
   -- Note: Kept interrupts in APL()
@@ -560,6 +529,37 @@ local function Racials()
   end
 end
 
+local function ST()
+  -- death_coil,if=!variable.epidemic_priority&(!variable.pooling_runic_power&variable.spend_rp|fight_remains<10)
+  if S.DeathCoil:IsReady() and (not VarEpidemicPriority and (not VarPoolingRunicPower and VarSpendRP or FightRemains < 10)) then
+    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil st 2"; end
+  end
+  -- epidemic,if=variable.epidemic_priority&(!variable.pooling_runic_power&variable.spend_rp|fight_remains<10)
+  if S.Epidemic:IsReady() and (VarEpidemicPriority and (not VarPoolingRunicPower and VarSpendRP or FightRemains < 10)) then
+    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic st 4"; end
+  end
+  -- any_dnd,if=!death_and_decay.ticking&(active_enemies>=2|talent.unholy_ground&(pet.apoc_ghoul.active&pet.apoc_ghoul.remains>=13|pet.gargoyle.active&pet.gargoyle.remains>8|pet.army_ghoul.active&pet.army_ghoul.remains>8|!variable.pop_wounds&debuff.festering_wound.stack>=4)|talent.defile&(pet.gargoyle.active|pet.apoc_ghoul.active|pet.army_ghoul.active|buff.dark_transformation.up))&(death_knight.fwounded_targets=active_enemies|active_enemies=1)
+  if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and (EnemiesMeleeCount >= 2 or S.UnholyGround:IsAvailable() and (VarApocGhoulActive and VarApocGhoulRemains >= 13 or VarGargActive and VarGargRemains > 8 or VarArmyGhoulActive and VarArmyGhoulRemains > 8 or not VarPopWounds and FesterStacks >= 4) or S.Defile:IsAvailable() and (VarGargActive or VarApocGhoulActive or VarArmyGhoulActive or Pet:BuffUp(S.DarkTransformation))) and (S.FesteringWoundDebuff:AuraActiveCount() == EnemiesMeleeCount or EnemiesMeleeCount == 1)) then
+    if Cast(AnyDnD, Settings.Commons2.GCDasOffGCD.DeathAndDecay) then return "any_dnd st 6"; end
+  end
+  -- wound_spender,target_if=max:debuff.festering_wound.stack,if=variable.pop_wounds|active_enemies>=2&death_and_decay.ticking
+  if WoundSpender:IsReady() and (VarPopWounds or EnemiesMeleeCount >= 2 and Player:BuffUp(S.DeathAndDecayBuff)) then
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 8"; end
+  end
+  -- festering_strike,target_if=min:debuff.festering_wound.stack,if=!variable.pop_wounds&debuff.festering_wound.stack<4
+  if S.FesteringStrike:IsReady() and (not VarPopWounds) then
+    if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeST, not Target:IsInMeleeRange(5)) then return "festering_strike st 10"; end
+  end
+  -- death_coil
+  if S.DeathCoil:IsReady() then
+    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil st 12"; end
+  end
+  -- wound_spender,target_if=max:debuff.festering_wound.stack,if=!variable.pop_wounds&debuff.festering_wound.stack>=4
+  if WoundSpender:IsReady() and (not VarPopWounds) then
+    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeST2, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 14"; end
+  end
+end
+
 local function Trinkets()
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,use_off_gcd=1,name=algethar_puzzle_box,if=cooldown.summon_gargoyle.remains<5&rune<=4|!talent.summon_gargoyle&pet.army_ghoul.active|active_enemies>3&variable.adds_remain&(buff.dark_transformation.up|talent.bursting_sores&cooldown.any_dnd.remains<10&!death_and_decay.ticking)
@@ -615,7 +615,7 @@ local function Variables()
   VarSTPlanning = (EnemiesMeleeCount == 1 or not AoEON())
   -- variable,name=adds_remain,op=setif,value=1,value_else=0,condition=active_enemies>=2&(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.remains>6)
   VarAddsRemain = (EnemiesMeleeCount >= 2 and AoEON())
-  -- variable,name=spend_rp,op=setif,value=1,value_else=0,condition=(!talent.rotten_touch|talent.rotten_touch&!buff.rotten_touch.up|runic_power.deficit<20)&(!set_bonus.tier31_4pc|set_bonus.tier31_4pc&!(pet.apoc_magus.active|pet.army_magus.active)|runic_power.deficit<20|rune<3)&((talent.improved_death_coil&(active_enemies=2|talent.coil_of_devastation)|rune<3|pet.gargoyle.active|buff.sudden_doom.react|cooldown.apocalypse.remains<10&debuff.festering_wound.stack>3|!variable.pop_wounds&debuff.festering_wound.stack>=4))
+  -- variable,name=spend_rp,op=setif,value=1,value_else=0,condition=(!talent.rotten_touch|talent.rotten_touch&!debuff.rotten_touch.up|runic_power.deficit<20)&(!set_bonus.tier31_4pc|set_bonus.tier31_4pc&!(pet.apoc_magus.active|pet.army_magus.active)|runic_power.deficit<20|rune<3)&((talent.improved_death_coil&(active_enemies=2|talent.coil_of_devastation)|rune<3|pet.gargoyle.active|buff.sudden_doom.react|cooldown.apocalypse.remains<10&debuff.festering_wound.stack>3|!variable.pop_wounds&debuff.festering_wound.stack>=4))
   VarSpendRP = (not S.RottenTouch:IsAvailable() or S.RottenTouch:IsAvailable() and Target:DebuffDown(S.RottenTouchDebuff) or Player:RunicPowerDeficit() < 20) and (not Player:HasTier(31, 4) or Player:HasTier(31, 4) and not (Ghoul:ApocMagusActive() or Ghoul:ArmyMagusActive()) or Player:RunicPowerDeficit() < 20 or Player:Rune() < 3) and (S.ImprovedDeathCoil:IsAvailable() and (EnemiesMeleeCount == 2 or S.CoilofDevastation:IsAvailable()) or Player:Rune() < 3 or VarGargActive or Player:BuffUp(S.SuddenDoomBuff) or S.Apocalypse:CooldownRemains() < 10 and FesterStacks > 3 or not VarPopWounds and FesterStacks >= 4)
 end
 
@@ -735,7 +735,7 @@ local function Init()
   S.VirulentPlagueDebuff:RegisterAuraTracking()
   S.FesteringWoundDebuff:RegisterAuraTracking()
 
-  HR.Print("Unholy DK rotation is currently a work in progress, but has been updated for patch 10.1.5.")
+  HR.Print("Unholy DK rotation has been updated for patch 10.2.0.")
 end
 
 HR.SetAPL(252, APL, Init)
