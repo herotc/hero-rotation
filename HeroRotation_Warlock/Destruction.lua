@@ -64,6 +64,9 @@ local VarCleaveAPL = false
 local VarHavocActive = false
 local VarHavocRemains = 0
 local VarHavocImmoTime = 0
+local VarT1WillLoseCast = false
+local VarT2WillLoseCast = false
+local VarInfernalActive = 0
 local SoulShards = 0
 local BossFightRemains = 11111
 local FightRemains = 11111
@@ -207,8 +210,7 @@ local function Items()
       if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller items 2"; end
     end
     -- use_item,use_off_gcd=1,name=nymues_unraveling_spindle,if=(variable.infernal_active|!talent.summon_infernal|(variable.trinket_1_will_lose_cast&trinket.1.is.nymues_unraveling_spindle)|(variable.trinket_2_will_lose_cast&trinket.2.is.nymues_unraveling_spindle))|fight_remains<20
-    -- Note: Unsure how to calculate trinket_1_will_lose_cast.
-    if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (VarInfernalActive or not S.SummonInfernal:IsAvailable()) then
+    if I.NymuesUnravelingSpindle:IsEquippedAndReady() and ((VarInfernalActive or not S.SummonInfernal:IsAvailable() or (VarT1WillLoseCast and Trinket1:ID() == I.NymuesUnravelingSpindle:ID()) or (VarT2WillLoseCast and Trinket2:ID() == I.NymuesUnravelingSpindle:ID())) or FightRemains < 20) then
       if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle items 4"; end
     end
     -- use_item,slot=trinket1,if=(variable.infernal_active|!talent.summon_infernal|variable.trinket_1_will_lose_cast)&(variable.trinket_priority=1|variable.trinket_2_exclude|!trinket.2.has_cooldown|(trinket.2.cooldown.remains|variable.trinket_priority=2&cooldown.summon_infernal.remains>20&!variable.infernal_active&trinket.2.cooldown.remains<cooldown.summon_infernal.remains))&variable.trinket_1_buffs&!variable.trinket_1_manual|(variable.trinket_1_buff_duration+1>=fight_remains)", "We want to use trinkets with Infernal unless we will miss a trinket use. The trinket with highest estimated value, will be used first.
