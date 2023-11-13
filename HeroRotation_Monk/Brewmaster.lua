@@ -248,7 +248,7 @@ local function RotationPTA()
     if Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "rushing_jade_wind rotation_pta 28"; end
   end
   -- spinning_crane_kick,if=active_enemies>2
-  -- spinning_crane_kick,if=(1.1>(time-action.melee_main_hand.last_used)*(1+spell_haste))-main_hand.2h
+  -- spinning_crane_kick,if=(1.1>(time-action.melee_main_hand.last_used)*(1+spell_haste)-main_hand.2h)
   -- Note: Combining both lines.
   if S.SpinningCraneKick:IsReady() and (
     (EnemiesCount8 > 2) or

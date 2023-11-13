@@ -37,7 +37,8 @@ Spell.DemonHunter.Commons = {
   Felblade                              = Spell(232893),
   FirstoftheIllidari                    = Spell(235893),
   FoddertotheFlame                      = Spell(391429),
-  SigilofFlame                          = MultiSpell(204596, 204513, 389810), -- 204596: Base ID, 204513: Concentrated, 389810: Precise
+  SigilofFlame                          = MultiSpell(204596, 389810), -- 204596: Base ID, 389810: Precise
+  SigilofMisery                         = MultiSpell(207684, 389813), -- 207684: Base ID, 389813: Precise
   SoulSigils                            = Spell(395446),
   TheHunt                               = Spell(370965),
   -- Utility
@@ -45,6 +46,7 @@ Spell.DemonHunter.Commons = {
   -- Buffs
   -- Debuffs
   SigilofFlameDebuff                    = Spell(204598),
+  SigilofMiseryDebuff                   = Spell(207685),
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -61,6 +63,7 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   Torment                               = Spell(185245),
   -- Talents
   AgonizingFlames                       = Spell(207548),
+  AscendingFlame                        = Spell(428603),
   BulkExtraction                        = Spell(320341),
   BurningAlive                          = Spell(207739),
   BurningBlood                          = Spell(390213),
@@ -77,8 +80,8 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   Frailty                               = Spell(389958),
   Fracture                              = Spell(263642),
   ShearFury                             = Spell(389997),
-  SigilofChains                         = Spell(202138),
-  SigilofSilence                        = Spell(202137),
+  SigilofChains                         = MultiSpell(202138, 389807), -- 202138: Base ID, 389807: Precise
+  SigilofSilence                        = MultiSpell(202137, 389809), -- 202137: Base ID, 389809: Precise
   SoulBarrier                           = Spell(263648),
   SoulCarver                            = Spell(207407),
   Soulcrush                             = Spell(389985),
@@ -94,6 +97,8 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   -- Debuffs
   FieryBrandDebuff                      = Spell(207771),
   FrailtyDebuff                         = Spell(247456),
+  SigilofChainsDebuff                   = Spell(204843),
+  SigilofSilenceDebuff                  = Spell(204490),
 })
 
 Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
