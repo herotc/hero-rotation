@@ -200,6 +200,7 @@ Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   -- Buffs
   AvatarBuff                            = Spell(401150),
   EarthenTenacityBuff                   = Spell(410218), -- T30 4P
+  FervidBuff                            = Spell(425517), -- T31 2P
   LastStandBuff                         = Spell(12975),
   RallyingCryBuff                       = Spell(97463),
   RevengeBuff                           = Spell(5302),

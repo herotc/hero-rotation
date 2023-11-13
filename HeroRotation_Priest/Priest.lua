@@ -37,6 +37,7 @@ Spell.Priest.Commons = {
   -- Abilities
   DeathAndMadness             = Spell(321291),
   DesperatePrayer             = Spell(19236),
+  DivineStar                  = Spell(122121),
   HolyNova                    = Spell(132157), -- Melee, 12
   MindBlast                   = Spell(8092),
   MindSear                    = Spell(48045), -- Splash, 10
@@ -77,7 +78,9 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   Halo                        = Spell(120644),
   HungeringVoid               = Spell(345218),
   IdolOfCthun                 = Spell(377349),
+  IdolOfYoggSaron             = Spell(373273),
   InescapableTorment          = Spell(373427),
+  InsidiousIre                = Spell(373212),
   MentalDecay                 = Spell(375994),
   Mindbender                  = Spell(200174),
   MindDevourer                = Spell(373202),
@@ -104,6 +107,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   DarkAscensionBuff           = Spell(391109),
   DarkEvangelismBuff          = Spell(391099),
   DarkThoughtBuff             = Spell(341207),
+  DeathsTormentBuff           = Spell(423760), -- Tier 31 4pc
   DeathspeakerBuff            = Spell(392511),
   DevouredFearBuff            = Spell(373319), -- Idol of Y'Shaarj buff
   DevouredPrideBuff           = Spell(373316), -- Idol of Y'Shaarj buff
@@ -159,6 +163,7 @@ if not Item.Priest then Item.Priest = {} end
 Item.Priest.Commons = {
   -- Trinkets
   BeacontotheBeyond           = Item(203963, {13, 14}),
+  BelorrelostheSuncaller     = Item(207172, {13, 14}),
   DesperateInvokersCodex      = Item(194310, {13, 14}),
   DMDDance                    = Item(198088, {13, 14}),
   DMDDanceBox                 = Item(198478, {13, 14}),
@@ -167,7 +172,11 @@ Item.Priest.Commons = {
   DMDRime                     = Item(198087, {13, 14}),
   DMDRimeBox                  = Item(198477, {13, 14}),
   EruptingSpearFragment       = Item(193769, {13, 14}),
+  NymuesUnravelingSpindle     = Item(208615, {13, 14}),
   VoidmendersShadowgem        = Item(110007, {13, 14}),
+  -- Other Items
+  Dreambinder                 = Item(208616, {16}),
+  Iridal                      = Item(208321, {16}),
 }
 
 Item.Priest.Shadow = MergeTableByKey(Item.Priest.Commons, {

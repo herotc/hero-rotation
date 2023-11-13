@@ -79,6 +79,7 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   AvengersShield                        = Spell(31935),
   BastionofLight                        = Spell(378974),
   BlessedHammer                         = Spell(204019),
+  BulwarkofRighteousFury                = Spell(386653),
   CrusadersJudgment                     = Spell(204023),
   DivineToll                            = Spell(375576),
   EyeofTyr                              = Spell(387174),
@@ -91,6 +92,7 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   -- Buffs
   ArdentDefenderBuff                    = Spell(31850),
   BastionofLightBuff                    = Spell(378974),
+  BulwarkofRighteousFuryBuff            = Spell(386652),
   GuardianofAncientKingsBuff            = MultiSpell(86659,212641),
   MomentofGloryBuff                     = Spell(327193),
   SanctificationBuff                    = Spell(424616), -- T31, 2pc
