@@ -319,9 +319,9 @@ local function APL()
     if S.FelRush:IsCastable() and UseFelRush() and (Player:BuffUp(S.UnboundChaosBuff) and S.ImmolationAura:Charges() == 2 and Target:DebuffDown(S.EssenceBreakDebuff)) then
       if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush) then return "fel_rush main 6"; end
     end
-    -- the_hunt,if=time<10&buff.potion.up
+    -- the_hunt,if=time<10&buff.potion.up&(!talent.inertia|buff.metamorphosis.up&debuff.essence_break.down)
     local PotionSelected = Everyone.PotionSelected()
-    if S.TheHunt:IsCastable() and (CombatTime < 10 and (not PotionSelected or PotionSelected:TimeSinceLastCast() < 30)) then
+    if S.TheHunt:IsCastable() and (CombatTime < 10 and (not PotionSelected or PotionSelected:TimeSinceLastCast() < 30) and (not S.Inertia:IsAvailable() or Player:BuffUp(S.MetamorphosisBuff) and Target:DebuffDown(S.EssenceBreakDebuff))) then
       if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt main 8"; end
     end
     -- immolation_aura,if=talent.inertia&(cooldown.eye_beam.remains<gcd.max*2|buff.metamorphosis.up)&cooldown.essence_break.remains<gcd.max*3&buff.unbound_chaos.down&buff.inertia.down&debuff.essence_break.down

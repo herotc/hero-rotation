@@ -40,6 +40,30 @@ HL.AddCoreOverride ("Player.AstralPowerP",
   end
 , 102)
 
+HL.AddCoreOverride ("Spell.EnergizeAmount",
+  function(self)
+    local Amount = 0
+    if self == SpellBalance.StellarFlare then
+      Amount = 12
+    elseif self == SpellBalance.AstralCommunion then
+      Amount = 60
+    elseif self == SpellBalance.ForceofNature then
+      Amount = 20
+    elseif self == SpellBalance.Sunfire then
+      Amount = 8
+    elseif self == SpellBalance.Moonfire then
+      Amount = 6
+    elseif self == SpellBalance.NewMoon then
+      Amount = 12
+    elseif self == SpellBalance.HalfMoon then
+      Amount = 24
+    elseif self == SpellBalance.FullMoon then
+      Amount = 50
+    end
+    return Amount
+  end
+, 102)
+
 local BalOldSpellIsCastable
 BalOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)

@@ -107,6 +107,7 @@ Spell.Rogue.Commons = {
 Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   -- Abilities
   Ambush                  = Spell(8676),
+  AmbushOverride          = Spell(430023),
   AmplifyingPoison        = Spell(381664),
   AmplifyingPoisonDebuff  = Spell(383414),
   AmplifyingPoisonDebuffDeathmark = Spell(394328),
@@ -128,6 +129,8 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   ArterialPrecision       = Spell(400783),
   AtrophicPoisonDebuff    = Spell(392388),
   BlindsideBuff           = Spell(121153),
+  CausticSpatter          = Spell(421975),
+  CausticSpatterDebuff    = Spell(421976),
   CrimsonTempest          = Spell(121411),
   CutToTheChase           = Spell(51667),
   DashingScoundrel        = Spell(381797),
@@ -135,17 +138,21 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   Doomblade               = Spell(381673),
   DragonTemperedBlades    = Spell(381801),
   Elusiveness             = Spell(79008),
-  Exsanguinate            = Spell(200806),
   ImprovedGarrote         = Spell(381632),
   ImprovedGarroteBuff     = Spell(392401),
   ImprovedGarroteAura     = Spell(392403),
   IndiscriminateCarnage   = Spell(381802),
+  IndiscriminateCarnageAura = Spell(385754),
+  IndiscriminateCarnageBuff = Spell(385747),
   InternalBleeding        = Spell(154953),
   Kingsbane               = Spell(385627),
+  LightweightShiv         = Spell(394983),
   MasterAssassin          = Spell(255989),
   MasterAssassinBuff      = Spell(256735),
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
+  ScentOfBlood            = Spell(381799),
+  ScentOfBloodBuff        = Spell(394080),
   SerratedBoneSpike       = Spell(385424),
   SerratedBoneSpikeDebuff = Spell(394036),
   ShivDebuff              = Spell(319504),
@@ -157,6 +164,7 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   -- Abilities
   AdrenalineRush          = Spell(13750),
   Ambush                  = Spell(8676),
+  AmbushOverride          = Spell(430023),
   BetweentheEyes          = Spell(315341),
   BladeFlurry             = Spell(13877),
   Dispatch                = Spell(2098),
@@ -261,6 +269,8 @@ if not Item.Rogue then Item.Rogue = {} end
 Item.Rogue.Assassination = {
   -- Trinkets
   AlgetharPuzzleBox       = Item(193701, {13, 14}),
+  AshesoftheEmbersoul     = Item(207167, {13, 14}),
+  WitherbarksBranch       = Item(109999, {13, 14}),
 }
 
 Item.Rogue.Outlaw = {
