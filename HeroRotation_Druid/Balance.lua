@@ -644,7 +644,7 @@ local function APL()
         end
       end
     end
-    -- natures_vigil
+    -- natures_vigil,if=active_enemies
     if S.NaturesVigil:IsCastable() then
       if Cast(S.NaturesVigil, Settings.Balance.OffGCDasOffGCD.NaturesVigil) then return "natures_vigil main 10"; end
     end
