@@ -50,9 +50,15 @@ local OnUseExcludes = {
 }
 
 -- Trinkets
-local equip = Player:GetEquipment()
-local trinket1 = equip[13] and Item(equip[13]) or Item(0)
-local trinket2 = equip[14] and Item(equip[14]) or Item(0)
+local Equipment = Player:GetEquipment()
+local trinket1 = Equipment[13] and Item(Equipment[13]) or Item(0)
+local trinket2 = Equipment[14] and Item(Equipment[14]) or Item(0)
+
+HL:RegisterForEvent(function()
+  Equipment = Player:GetEquipment()
+  trinket1 = Equipment[13] and Item(Equipment[13]) or Item(0)
+  trinket2 = Equipment[14] and Item(Equipment[14]) or Item(0)
+end, "PLAYER_EQUIPMENT_CHANGED" )
 
 S.Dispatch:RegisterDamageFormula(
   -- Dispatch DMG Formula (Pre-Mitigation):
@@ -345,7 +351,7 @@ local function CDs ()
   -- # Maintain Blade Flurry on 2+ targets, and on single target with Underhanded, or on cooldown at 5+ targets with Deft Maneuvers
   -- actions.cds+=/blade_flurry,if=(spell_targets>=2-talent.underhanded_upper_hand&!stealthed.rogue)
   -- &buff.blade_flurry.remains<gcd|talent.deft_maneuvers&spell_targets>=5&!variable.finish_condition
-  if S.BladeFlurry:IsReady() and (EnemiesBFCount >= 2 - num(S.UnderhandedUpperhand:IsAvailable()) and not Player:StealthUp(true, true))
+  if S.BladeFlurry:IsReady() and (EnemiesBFCount >= 2 - num(S.UnderhandedUpperhand:IsAvailable()) and not Player:StealthUp(true, false))
     and Player:BuffRemains(S.BladeFlurry) < Player:GCDRemains() or S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 5 and not Finish_Condition() then
     if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
       HR.CastSuggested(S.BladeFlurry)
@@ -357,7 +363,7 @@ local function CDs ()
   -- # Use Roll the Bones if reroll conditions are met, or just before buffs expire based on T31 and upcoming stealth cooldowns
   -- actions.cds+=/roll_the_bones,if=variable.rtb_reroll|rtb_buffs.max_remains<=set_bonus.tier31_4pc+(cooldown.shadow_dance.remains<=1|cooldown.vanish.remains<=1)*6
   if S.RolltheBones:IsReady() then
-    if RtB_Reroll() or Rogue.RtBRemains() <= num(Player:HasTier(31, 4)) + (num(S.ShadowDance:CooldownRemains() <=1) or num(S.Vanish:CooldownRemains() <= 1)) * 6 then
+    if RtB_Reroll() or Rogue.RtBRemains() <= num(Player:HasTier(31, 4)) + num(S.ShadowDance:CooldownRemains() <=1 or S.Vanish:CooldownRemains() <= 1) * 6 then
       if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones" end
     end
   end
@@ -379,7 +385,7 @@ local function CDs ()
   if CDsON() and S.Sepsis:IsAvailable() and S.Sepsis:IsReady() then
     if S.Crackshot:IsAvailable() and S.BetweentheEyes:IsReady() and Finish_Condition() and not Player:StealthUp(true, true)
       or not S.Crackshot:IsAvailable() and Target:FilteredTimeToDie(">", 11) and Player:BuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 11) then
-      if HR.cast(S.Sepsis, Settings.Outlaw.GCDasOffGCD.Sepsis) then return "Cast Sepsis" end
+      if HR.Cast(S.Sepsis, Settings.Outlaw.GCDasOffGCD.Sepsis) then return "Cast Sepsis" end
     end
   end
 
@@ -506,7 +512,7 @@ local function Finish ()
 	-- &!buff.greenskins_wickers.up
 	if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and not S.Crackshot:IsAvailable()
 		and (Player:BuffRemains(S.BetweentheEyes) < 4 or S.ImprovedBetweenTheEyes:IsAvailable() or S.GreenskinsWickers:IsAvailable()
-    or Player:HasTier(31, 4)) and Player:BuffDown(S.GreenskinsWickers) then
+    or Player:HasTier(30, 4)) and Player:BuffDown(S.GreenskinsWickers) then
 		if HR.CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
 	end
 
@@ -692,7 +698,7 @@ local function APL ()
     if ShouldReturn then return "CDs: " .. ShouldReturn end
 
     -- actions+=/call_action_list,name=stealth,if=stealthed.all
-    if Player:StealthUp(true, true) or Player:BuffUp(S.Shadowmeld) then
+    if Player:StealthUp(true, true) then
       ShouldReturn = Stealth()
       if ShouldReturn then return "Stealth: " .. ShouldReturn end
     end
