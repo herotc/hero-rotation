@@ -24,23 +24,6 @@ local SpellVDH         = Spell.DemonHunter.Vengeance
 
 --- ======= COMBATLOG =======
 
--------------------
------ DGB CDR -----
--------------------
-HL:RegisterForSelfCombatEvent(
-  function (...)
-    local SourceGUID, _, _, _, _, _, _, _, SpellID, _, _, Amount = select(4, ...)
-
-    if SourceGUID == Player:GUID() then
-      if SpellID == 391345 then
-        DemonHunter.DGBCDR = (Amount / 100) * 60
-        DemonHunter.DGBCDRLastUpdate = GetTime()
-      end
-    end
-  end
-  , "SPELL_ENERGIZE"
-)
-
   --- Combat Log Arguments
     ------- Base -------
       --     1        2         3           4           5           6              7             8         9        10           11
