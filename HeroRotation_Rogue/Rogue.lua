@@ -384,6 +384,32 @@ function Commons.CanDoTUnit(ThisUnit, HealthThreshold)
   return Everyone.CanDoTUnit(ThisUnit, HealthThreshold)
 end
 
+-- PMultipliers
+
+do
+  -- Rupture and Nightstalker spell IDs and PMultipliers are shared between Subtlety and Assassination
+  -- Need to register here so we don't end up registering it twice and overwriting the reference
+  local AssassinationSpell = Spell.Rogue.Assassination
+  local SubtletySpell = Spell.Rogue.Subtlety
+
+  local function ComputeNighstalkerPMultiplier ()
+    if AssassinationSpell.Nightstalker:IsAvailable() and Player:StealthUp(true, false, true) then
+      return 1 + (0.05 * AssassinationSpell.Nightstalker:TalentRank())
+    end
+    return 1
+  end
+  local function ComputeImprovedGarrotePMultiplier ()
+    if AssassinationSpell.ImprovedGarrote:IsAvailable() and (Player:BuffUp(AssassinationSpell.ImprovedGarroteAura, nil, true)
+      or Player:BuffUp(AssassinationSpell.ImprovedGarroteBuff, nil, true) or Player:BuffUp(AssassinationSpell.SepsisBuff, nil, true)) then
+      return 1.5
+    end
+    return 1
+  end
+
+  AssassinationSpell.Rupture:RegisterPMultiplier( ComputeNighstalkerPMultiplier, { SubtletySpell.FinalityRuptureBuff, 1.3 } )
+  AssassinationSpell.Garrote:RegisterPMultiplier( ComputeNighstalkerPMultiplier, ComputeImprovedGarrotePMultiplier )
+end
+
 --- ======= SIMC CUSTOM FUNCTION / EXPRESSION =======
 -- cp_max_spend
 do

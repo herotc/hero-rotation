@@ -36,7 +36,7 @@ local I = Item.Warlock.Demonology
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- I.ItemName:ID(),
+  I.NymuesUnravelingSpindle:ID(),
 }
 
 -- Trinket Item Objects
@@ -283,13 +283,22 @@ end
 local function Items()
   -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!pet.demonic_tyrant.active&trinket.1.cast_time>0|!trinket.1.cast_time>0)&(pet.demonic_tyrant.active)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
   -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!pet.demonic_tyrant.active&trinket.2.cast_time>0|!trinket.2.cast_time>0)&(pet.demonic_tyrant.active)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
-  -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|(trinket.1.cast_time>0&!pet.demonic_tyrant.active|!trinket.1.cast_time>0)|cooldown.demonic_tyrant.remains_expected>20)
-  -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|(trinket.2.cast_time>0&!pet.demonic_tyrant.active|!trinket.2.cast_time>0)|cooldown.demonic_tyrant.remains_expected>20)
+  -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|(trinket.1.cast_time>0&!pet.summon_demonic_tyrant.active|!trinket.1.cast_time>0)|cooldown.demonic_tyrant.remains_expected>20)
+  -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|(trinket.2.cast_time>0&!pet.summon_demonic_tyrant.active|!trinket.2.cast_time>0)|cooldown.demonic_tyrant.remains_expected>20)
   -- use_item,use_off_gcd=1,slot=main_hand,if=(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
+  if Settings.Commons.Enabled.Items then
+    local MainHandOnUse, _, MainHandRange = Player:GetUseableItems(OnUseExcludes, 16)
+    if MainHandOnUse and MainHandOnUse:IsReady() and ((Trinket1:Cooldown() == 0 or Trinket1:CooldownDown()) and (Trinket2:Cooldown() == 0 or Trinket2:CooldownDown())) then
+      if Cast(MainHandOnUse, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(MainHandRange)) then return "use_item for main_hand (" .. MainHandOnUse:Name() .. ") items 2"; end
+    end
+  end
   -- use_item,name=nymues_unraveling_spindle,if=pet.demonic_tyrant.active&!cooldown.demonic_strength.ready|fight_remains<22
+  if Settings.Commons.Enabled.Trinkets and I.NymuesUnravelingSpindle:IsEquippedAndReady() and (DemonicTyrantActive() and S.DemonicStrength:CooldownDown() or FightRemains < 22) then
+    if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle items 4"; end
+  end
   -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)
   -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)
-  -- Note: Can't handle the above conditions, so using a generic use_items
+  -- Note: Can't handle some of the above conditions, so using a generic use_items.
   if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
@@ -311,7 +320,9 @@ local function Tyrant()
   end
   if VarPetExpire > 0 and VarPetExpire < S.SummonDemonicTyrant:ExecuteTime() + (num(Player:BuffDown(S.DemonicCoreBuff)) * S.ShadowBolt:ExecuteTime() + num(Player:BuffUp(S.DemonicCoreBuff)) * GCDMax) + GCDMax then
     -- call_action_list,name=items,if=variable.pet_expire>0&variable.pet_expire<action.summon_demonic_tyrant.execute_time+(buff.demonic_core.down*action.shadow_bolt.execute_time+buff.demonic_core.up*gcd.max)+gcd.max,use_off_gcd=1
-    local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
+    if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
+      local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
+    end
     -- call_action_list,name=racials,if=variable.pet_expire>0&variable.pet_expire<action.summon_demonic_tyrant.execute_time+(buff.demonic_core.down*action.shadow_bolt.execute_time+buff.demonic_core.up*gcd.max)+gcd.max,use_off_gcd=1
     local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
     -- potion,if=variable.pet_expire>0&variable.pet_expire<action.summon_demonic_tyrant.execute_time+(buff.demonic_core.down*action.shadow_bolt.execute_time+buff.demonic_core.up*gcd.max)+gcd.max,use_off_gcd=1
@@ -326,8 +337,8 @@ local function Tyrant()
   if S.SummonDemonicTyrant:IsCastable() and (VarPetExpire > 0 and VarPetExpire < S.SummonDemonicTyrant:ExecuteTime() + (num(Player:BuffDown(S.DemonicCoreBuff)) * S.ShadowBolt:ExecuteTime() + num(Player:BuffUp(S.DemonicCoreBuff)) * GCDMax) + GCDMax) then
     if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant tyrant 6"; end
   end
-  -- implosion,if=pet_count>2&(buff.dreadstalkers.down&buff.grimoire_felguard.down&buff.vilefiend.down)&(active_enemies>3|active_enemies>2&talent.grand_warlocks_design)
-  if S.Implosion:IsReady() and (WildImpsCount() > 2 and (not DreadstalkerActive() and not GrimoireFelguardActive() and not VilefiendActive()) and (EnemiesCount8ySplash > 3 or EnemiesCount8ySplash > 2 and S.GrandWarlocksDesign:IsAvailable())) then
+  -- implosion,if=pet_count>2&(buff.dreadstalkers.down&buff.grimoire_felguard.down&buff.vilefiend.down)&(active_enemies>3|active_enemies>2&talent.grand_warlocks_design)&!prev_gcd.1.implosion
+  if S.Implosion:IsReady() and (WildImpsCount() > 2 and (not DreadstalkerActive() and not GrimoireFelguardActive() and not VilefiendActive()) and (EnemiesCount8ySplash > 3 or EnemiesCount8ySplash > 2 and S.GrandWarlocksDesign:IsAvailable()) and not Player:PrevGCDP(1, S.Implosion)) then
     if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion tyrant 8"; end
   end
   -- shadow_bolt,if=prev_gcd.1.grimoire_felguard&time>30&buff.nether_portal.down&buff.demonic_core.down
@@ -362,8 +373,8 @@ local function Tyrant()
   if S.HandofGuldan:IsReady() and (SoulShards > 2 and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and DreadstalkerActive()) and (SoulShards > 2 or VilefiendTime() < GCDMax * 2 + 2 / Player:SpellHaste())) then
     if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan tyrant 24"; end
   end
-  -- demonbolt,cycle_targets=1,if=soul_shard<4&buff.demonic_core.up&(buff.vilefiend.up|!talent.summon_vilefiend&buff.dreadstalkers.up)
-  if S.Demonbolt:IsReady() and (SoulShards < 4 and Player:BuffUp(S.DemonicCoreBuff) and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and DreadstalkerActive())) then
+  -- demonbolt,cycle_targets=1,if=soul_shard<4&(buff.demonic_core.stack>1&set_bonus.tier31_2pc|buff.demonic_core.up&!set_bonus.tier31_2pc)&(buff.vilefiend.up|!talent.summon_vilefiend&buff.dreadstalkers.up)
+  if S.Demonbolt:IsReady() and (SoulShards < 4 and (Player:BuffStack(S.DemonicCoreBuff) > 1 and Player:HasTier(31, 2) or Player:BuffUp(S.DemonicCoreBuff) and not Player:HasTier(31, 2)) and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and DreadstalkerActive())) then
     if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyrant 26"; end
   end
   -- power_siphon,if=buff.demonic_core.stack<3&variable.pet_expire>action.summon_demonic_tyrant.execute_time+gcd.max*3|variable.pet_expire=0
@@ -473,7 +484,9 @@ local function APL()
       local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=items,use_off_gcd=1
-    local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
+    if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
+      local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
+    end
     -- invoke_external_buff,name=power_infusion,if=(buff.nether_portal.up&buff.nether_portal.remains<3&talent.nether_portal)|fight_remains<20|pet.demonic_tyrant.active&fight_remains<100|fight_remains<25|(pet.demonic_tyrant.active|!talent.summon_demonic_tyrant&buff.dreadstalkers.up)
     -- Note: Not handling external buffs
     -- call_action_list,name=fight_end,if=fight_remains<30
