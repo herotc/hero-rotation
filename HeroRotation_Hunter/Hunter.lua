@@ -102,6 +102,7 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   KillCleave                            = Spell(378207),
   MultiShot                             = Spell(2643),
   OneWithThePack                        = Spell(199528),
+  Savagery                              = Spell(424557),
   ScentofBlood                          = Spell(193532),
   Stomp                                 = Spell(199530),
   WildCall                              = Spell(185789),
