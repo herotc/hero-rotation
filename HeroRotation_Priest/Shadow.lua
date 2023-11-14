@@ -379,6 +379,10 @@ local function Opener()
   if S.ShadowCrash:IsCastable() and not VarPreferVT and (Target:DebuffDown(S.VampiricTouchDebuff)) then
     if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash opener 2"; end
   end
+  -- vampiric_touch,if=!debuff.vampiric_touch.up&(!cooldown.shadow_crash.ready|!talent.shadow_crash)
+  if S.VampiricTouch:IsCastable() and (Target:DebuffDown(S.VampiricTouchDebuff) and (S.ShadowCrash:CooldownDown() or not S.ShadowCrash:IsAvailable())) then
+    if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch opener 3"; end
+  end
   -- mindbender
   if Fiend:IsCastable() then
     if Cast(Fiend, Settings.Shadow.GCDasOffGCD.Mindbender) then return "mindbender opener 4"; end
@@ -543,7 +547,7 @@ local function Filler()
   end
   -- divine_star
   if S.DivineStar:IsReady() then
-    if Cast(I.DivineStar, Settings.Shadow.GCDasOffGCD.DivineStar, not Target:IsInRange(30)) then return "divine_star filler 24"; end
+    if Cast(S.DivineStar, Settings.Shadow.GCDasOffGCD.DivineStar, not Target:IsInRange(30)) then return "divine_star filler 24"; end
   end
   -- shadow_word_death
   -- Note: Per APL note, intent is to be used as a movement filler.
