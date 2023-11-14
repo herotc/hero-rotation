@@ -53,8 +53,10 @@ local Settings = {
 }
 
 -- Rotation Var
-local SoulFragments, LastSoulFragmentAdjustment
-local SoulFragmentsAdjusted = 0
+local SoulFragments
+--local LastSoulFragmentAdjustment
+--local SoulFragmentsAdjusted = 0
+local AuraSoulFragments, IncSoulFragments
 local IsInMeleeRange, IsInAoERange
 local ActiveMitigationNeeded
 local IsTanking
@@ -69,7 +71,8 @@ HL:RegisterForEvent(function()
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
--- Soul Fragments function taking into consideration aura lag
+-- Supplanted by event-based tracking. Leaving here in case a revert is needed.
+--[[ Soul Fragments function taking into consideration aura lag
 local function UpdateSoulFragments()
   SoulFragments = Player:BuffStack(S.SoulFragments)
 
@@ -131,7 +134,7 @@ local function UpdateSoulFragments()
     -- Relevant in cases where we use a generator two GCDs in a row
     SoulFragmentsAdjusted = 0
   end
-end
+end]]
 
 -- Melee Is In Range w/ Movement Handlers
 local function UpdateIsInMeleeRange()
@@ -468,12 +471,6 @@ local function APL()
     EnemiesCount8yMelee = 1
   end
 
-  UpdateSoulFragments()
-  UpdateIsInMeleeRange()
-
-  ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
-  IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
-
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
     BossFightRemains = HL.BossFightRemains()
@@ -481,6 +478,19 @@ local function APL()
     if FightRemains == 11111 then
       FightRemains = HL.FightRemains(Enemies8yMelee, false)
     end
+
+    -- Update Soul Fragment Totals
+    --UpdateSoulFragments()
+    AuraSoulFragments = DemonHunter.Souls.AuraSouls
+    IncSoulFragments = DemonHunter.Souls.IncomingSouls
+    SoulFragments = AuraSoulFragments + IncSoulFragments
+
+    -- Update if target is in melee range
+    UpdateIsInMeleeRange()
+
+    -- Set Tanking Variables
+    ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
+    IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
   end
 
   if Everyone.TargetIsValid() then

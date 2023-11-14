@@ -13,6 +13,7 @@ local Spell            = HL.Spell
 local Item             = HL.Item
 -- Lua
 local GetTime          = GetTime
+local mathmax          = math.max
 -- File Locals
 HR.Commons.DemonHunter = {}
 local DemonHunter      = HR.Commons.DemonHunter
@@ -23,6 +24,89 @@ local SpellVDH         = Spell.DemonHunter.Vengeance
 --- ======= NON-COMBATLOG =======
 
 --- ======= COMBATLOG =======
+-- Soul Fragment Tracker
+DemonHunter.Souls = {}
+local Soul = DemonHunter.Souls
+Soul.AuraSouls = 0
+Soul.IncomingSouls = 0
+
+-- Casted abilities that generate delayed Soul Fragments.
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local SpellID = select(12, ...)
+    local IncAmt = 0
+    if SpellID == SpellVDH.Fracture:ID() or SpellID == SpellVDH.Shear:ID() then
+      IncAmt = 2
+    elseif SpellID == SpellVDH.SoulCarver:ID() then
+      IncAmt = 3
+      C_Timer.After(1, function() Soul.IncomingSouls = Soul.IncomingSouls + 1; end)
+      C_Timer.After(2, function() Soul.IncomingSouls = Soul.IncomingSouls + 1; end)
+      C_Timer.After(3, function() Soul.IncomingSouls = Soul.IncomingSouls + 1; end)
+    elseif SpellID == SpellVDH.ElysianDecree:ID() then
+      IncAmt = (SpellVDH.SoulSigils:IsAvailable()) and 4 or 3
+    elseif SpellVDH.SoulSigils:IsAvailable() and
+      (SpellID == SpellVDH.SigilofFlame:ID() or SpellID == SpellVDH.SigilofMisery:ID() or SpellID == SpellVDH.SigilofChains:ID() or SpellID == SpellVDH.SigilofSilence:ID()) then
+      IncAmt = 1
+    else
+      IncAmt = 0
+    end
+    if IncAmt > 0 then
+      Soul.IncomingSouls = Soul.IncomingSouls + IncAmt
+    end
+  end
+, "SPELL_CAST_SUCCESS")
+
+-- T31 4pc "flare-up" Sigil damage, which spawns a delayed Soul Fragment.
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local SpellID = select(12, ...)
+    if SpellID == 425672 then
+      Soul.IncomingSouls = Soul.IncomingSouls + 1
+    end
+  end
+, "SPELL_DAMAGE")
+
+-- The initial application of the Soul Fragments buff.
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local SpellID = select(12, ...)
+    if SpellID == 203981 then
+      Soul.AuraSouls = 1
+      Soul.IncomingSouls = mathmax(0, Soul.IncomingSouls - 1)
+    end
+  end
+, "SPELL_AURA_APPLIED")
+
+-- Triggers every time we add stacks to the Soul Fragments buff.
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local SpellID, _, _, _, Amount = select(12, ...)
+    if SpellID == 203981 then
+      Soul.AuraSouls = Amount
+      Soul.IncomingSouls = mathmax(0, Soul.IncomingSouls - Amount)
+    end
+  end
+, "SPELL_AURA_APPLIED_DOSE")
+
+-- Triggers every time we remove stacks from the Soul Fragments buff.
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local SpellID, _, _, _, Amount = select(12, ...)
+    if SpellID == 203981 then
+      Soul.AuraSouls = Amount
+    end
+  end
+, "SPELL_AURA_REMOVED_DOSE")
+
+-- Triggers when the soul Fragments buff is removed entirely.
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local SpellID, _, _, _, Amount = select(12, ...)
+    if SpellID == 203981 then
+      Soul.AuraSouls = 0
+    end
+  end
+, "SPELL_AURA_REMOVED")
 
   --- Combat Log Arguments
     ------- Base -------
