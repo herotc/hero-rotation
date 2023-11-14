@@ -167,28 +167,6 @@ local function IndiscriminateCarnageRemains ()
   return Player:BuffRemains(S.IndiscriminateCarnageBuff)
 end
 
-local function ComputeRupturePMultiplier ()
-  local multiplier = 1
-  if S.Nightstalker:IsAvailable() and Player:StealthUp(true, false) then
-    multiplier = multiplier * (1 + (0.05 * S.Nightstalker:TalentRank()))
-  end
-  return multiplier
-end
-S.Rupture:RegisterPMultiplier(ComputeRupturePMultiplier)
-
-local function ComputeImprovedGarrotePMultiplier ()
-  local multiplier = 1
-  if S.ImprovedGarrote:IsAvailable() and (Player:BuffUp(S.ImprovedGarroteAura, nil, true)
-    or Player:BuffUp(S.ImprovedGarroteBuff, nil, true) or Player:BuffUp(S.SepsisBuff, nil, true)) then
-    multiplier = multiplier * 1.5
-  end
-  if S.Nightstalker:IsAvailable() and Player:StealthUp(true, false) then
-    multiplier = multiplier * (1 + (0.05 * S.Nightstalker:TalentRank()))
-  end
-  return multiplier
-end
-S.Garrote:RegisterPMultiplier(ComputeImprovedGarrotePMultiplier)
-
 --- ======= HELPERS =======
 -- Check if the Priority Rotation variable should be set
 local function UsePriorityRotation()
@@ -787,7 +765,7 @@ local function APL ()
   ComboPoints = Rogue.EffectiveComboPoints(Player:ComboPoints())
   ComboPointsDeficit = Player:ComboPointsMax() - ComboPoints
   RuptureThreshold = (4 + ComboPoints * 4) * 0.3
-  CrimsonTempestThreshold = (2 + ComboPoints * 2) * 0.3
+  CrimsonTempestThreshold = (4 + ComboPoints * 2) * 0.3
   RuptureDMGThreshold = S.Envenom:Damage() * Settings.Assassination.EnvenomDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
   GarroteDMGThreshold = S.Mutilate:Damage() * Settings.Assassination.MutilateDMGOffset; -- Used as TTD Not Valid fallback since it's a generator.
   PriorityRotation = UsePriorityRotation()
