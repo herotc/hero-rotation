@@ -156,6 +156,7 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   SerratedBoneSpike       = Spell(385424),
   SerratedBoneSpikeDebuff = Spell(394036),
   ShivDebuff              = Spell(319504),
+  ShroudedSuffocation     = Spell(385478),
   VenomRush               = Spell(152152),
   -- PvP
 })
@@ -408,6 +409,7 @@ do
 
   AssassinationSpell.Rupture:RegisterPMultiplier( ComputeNighstalkerPMultiplier, { SubtletySpell.FinalityRuptureBuff, 1.3 } )
   AssassinationSpell.Garrote:RegisterPMultiplier( ComputeNighstalkerPMultiplier, ComputeImprovedGarrotePMultiplier )
+  AssassinationSpell.CrimsonTempest:RegisterPMultiplier( ComputeNighstalkerPMultiplier )
 end
 
 --- ======= SIMC CUSTOM FUNCTION / EXPRESSION =======
