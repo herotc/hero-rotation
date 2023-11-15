@@ -117,8 +117,8 @@ local function Precombat()
     if Cast(S.WindfuryWeapon) then return "windfury_weapon enchant"; end
   end
   -- flametongue_weapon
-  if (not HasOffHandEnchant or OHEnchantTimeRemains < 600000) and S.FlamentongueWeapon:IsCastable() then
-    if Cast(S.FlamentongueWeapon) then return "flametongue_weapon enchant"; end
+  if (not HasOffHandEnchant or OHEnchantTimeRemains < 600000) and S.FlametongueWeapon:IsCastable() then
+    if Cast(S.FlametongueWeapon) then return "flametongue_weapon enchant"; end
   end
   -- lightning_shield
   -- Note: Moved to APL() for in-combat suggestions.
