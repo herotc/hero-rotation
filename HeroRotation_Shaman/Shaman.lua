@@ -32,7 +32,7 @@ Spell.Shaman.Commons = {
   -- Abilities
   Bloodlust                             = MultiSpell(2825,32182), -- Bloodlust/Heroism
   FlameShock                            = Spell(188389),
-  FlamentongueWeapon                    = Spell(318038),
+  FlametongueWeapon                     = Spell(318038),
   FrostShock                            = Spell(196840),
   HealingSurge                          = Spell(8004),
   LightningBolt                         = Spell(188196),
