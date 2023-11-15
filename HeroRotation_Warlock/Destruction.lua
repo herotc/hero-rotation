@@ -75,7 +75,7 @@ local FightRemains = 11111
 HL:RegisterForEvent(function()
   Equip = Player:GetEquipment()
   Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
-  Trinket2 = Equip[14] and ITem(Equip[14]) or Item(0)
+  Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
