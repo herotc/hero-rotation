@@ -44,6 +44,7 @@ local VarTrinket1Exclude, VarTrinket2Exclude
 local VarTrinket1Buffs, VarTrinket2Buffs
 local VarTrinket1Manual, VarTrinket2Manual
 local VarTrinketPriority
+local VarAddsRemain, VarSTPlanning
 local TargetInMeleeRange
 local BossFightRemains = 11111
 local FightRemains = 11111
@@ -147,8 +148,8 @@ local function Precombat()
 end
 
 local function Execute()
-  -- sweeping_strikes,if=spell_targets.whirlwind>1
-  if CDsON() and S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
+  -- sweeping_strikes,if=active_enemies>=2&variable.adds_remain
+  if CDsON() and S.SweepingStrikes:IsCastable() and (EnemiesCount8y >= 2 and VarAddsRemain) then
     if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes execute 2"; end
   end
   -- rend,if=remains<=gcd&!talent.bloodletting&(!talent.warbreaker&cooldown.colossus_smash.remains<4|talent.warbreaker&cooldown.warbreaker.remains<4)&target.time_to_die>12
@@ -335,10 +336,6 @@ local function Hac()
   if S.Cleave:IsReady() and (not S.CrushingForce:IsAvailable()) then
     if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave hac 58"; end
   end
-  -- ignore_pain,if=talent.battlelord&talent.anger_management&rage>30&(target.health.pct>20|talent.massacre&target.health.pct>35)
-  if S.IgnorePain:IsReady() and (S.Battlelord:IsAvailable() and S.AngerManagement:IsAvailable() and Player:Rage() > 30 and (Target:HealthPercentage() > 20 or S.Massacre:IsAvailable() and Target:HealthPercentage() > 35)) then
-    if Cast(S.IgnorePain, Settings.Arms.GCDasOffGCD.IgnorePain) then return "ignore_pain hac 60"; end
-  end
   -- slam,if=talent.crushing_force&rage>30&(talent.fervor_of_battle&active_enemies=1|!talent.fervor_of_battle)
   if S.Slam:IsReady() and (S.CrushingForce:IsAvailable() and Player:Rage() > 30 and (S.FervorofBattle:IsAvailable() and EnemiesCount8y == 1 or not S.FervorofBattle:IsAvailable())) then
     if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam hac 62"; end
@@ -358,8 +355,8 @@ local function Hac()
 end
 
 local function SingleTarget()
-  -- sweeping_strikes,if=spell_targets.whirlwind>1
-  if CDsON() and S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
+  -- sweeping_strikes,if=active_enemies>=2
+  if CDsON() and S.SweepingStrikes:IsCastable() and (EnemiesCount8y >= 2) then
     if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes single_target 2"; end
   end
   -- execute,if=buff.sudden_death.react
@@ -511,6 +508,13 @@ local function Trinkets()
   end
 end
 
+local function Variables()
+  -- variable,name=st_planning,value=active_enemies=1&(raid_event.adds.in>15|!raid_event.adds.exists)
+  VarSTPlanning = (EnemiesCount8y == 1)
+  -- variable,name=adds_remain,value=active_enemies>=2&(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.remains>5)
+  VarAddsRemain = (EnemiesCount8y >= 2)
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
   if AoEON() then
@@ -598,8 +602,8 @@ local function APL()
         if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 20"; end
       end
     end
-    -- run_action_list,name=hac,if=raid_event.adds.up&active_enemies>2|!raid_event.adds.up&active_enemies>2
-    if AoEON() and EnemiesCount8y > 2 then
+    -- run_action_list,name=hac,if=active_enemies>=3
+    if AoEON() and EnemiesCount8y >= 3 then
       local ShouldReturn = Hac(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Hac()"; end
     end
@@ -607,8 +611,10 @@ local function APL()
     if (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20 then
       local ShouldReturn = Execute(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=single_target,if=!raid_event.adds.exists
-    local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
+    -- run_action_list,name=single_target,if=active_enemies<=2
+    if EnemiesCount8y <= 2 then
+      local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
+    end
     -- Pool if nothing else to suggest
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
