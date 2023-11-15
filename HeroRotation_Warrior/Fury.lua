@@ -36,6 +36,7 @@ local OnUseExcludes = {
 
 -- Variables
 local EnrageUp
+local VarSTPlanning, VarAddsRemain
 local BossFightRemains = 11111
 local FightRemains = 11111
 
@@ -385,6 +386,13 @@ local function Trinkets()
   end
 end
 
+local function Variables()
+  -- variable,name=st_planning,value=active_enemies=1&(raid_event.adds.in>15|!raid_event.adds.exists)
+  VarSTPlanning = (EnemiesCount8y == 1)
+  -- variable,name=adds_remain,value=active_enemies>=2&(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.remains>5)
+  VarAddsRemain = (EnemiesCount8y >= 2)
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
   if AoEON() then
@@ -494,12 +502,14 @@ local function APL()
         if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "spear_of_bastion main 26"; end
       end
     end
-    -- call_action_list,name=multi_target,if=raid_event.adds.exists|active_enemies>2
-    if AoEON() and EnemiesCount8y > 2 then
+    -- call_action_list,name=multi_target,if=active_enemies>=2
+    if AoEON() and EnemiesCount8y >= 2 then
       local ShouldReturn = MultiTarget(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=single_target,if=!raid_event.adds.exists
-    local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
+    -- call_action_list,name=single_target,if=active_enemies=1
+    if EnemiesCount8y == 1 then
+      local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
+    end
     -- Pool if nothing else to suggest
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
