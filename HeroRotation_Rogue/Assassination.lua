@@ -138,9 +138,12 @@ S.Mutilate:RegisterDamageFormula(
 )
 
 -- Master Assassin Remains Check
+local function MasterAssassinAuraUp()
+  return Player:BuffRemains(S.MasterAssassinBuff) == 9999
+end
 local function MasterAssassinRemains ()
   -- Currently stealthed (i.e. Aura)
-  if Player:BuffRemains(S.MasterAssassinBuff) == 9999 then
+  if MasterAssassinAuraUp() then
     return Player:GCDRemains() + 3
   end
   -- Broke stealth recently (i.e. Buff)
@@ -376,7 +379,7 @@ local function Vanish ()
   if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
     -- actions.vanish+=/vanish,if=!talent.master_assassin&!talent.indiscriminate_carnage&talent.improved_garrote&cooldown.garrote.up&(dot.garrote.pmultiplier<=1|dot.garrote.refreshable)&(debuff.deathmark.up|cooldown.deathmark.remains<4)&combo_points.deficit>=(spell_targets.fan_of_knives>?4)
     -- actions.vanish+=/vanish,if=!talent.master_assassin&talent.indiscriminate_carnage&talent.improved_garrote&cooldown.garrote.up&(dot.garrote.pmultiplier<=1|dot.garrote.refreshable)&spell_targets.fan_of_knives>2
-    if S.ImprovedGarrote:IsAvailable() and not S.MasterAssassin:IsAvailable() and S.Garrote:CooldownUp() and not Rogue.Exsanguinated(Target, S.Garrote)
+    if S.ImprovedGarrote:IsAvailable() and not S.MasterAssassin:IsAvailable() and S.Garrote:CooldownUp()
       and (Target:PMultiplier(S.Garrote) <= 1 or IsDebuffRefreshable(Target, S.Garrote)) then      
       if not S.IndiscriminateCarnage:IsAvailable() and (S.Deathmark:AnyDebuffUp() or S.Deathmark:CooldownRemains() < 4)
         and ComboPointsDeficit >= mathmin(MeleeEnemies10yCount, 4) then
@@ -409,6 +412,10 @@ end
 
 local function UsableItems ()
   if not Settings.Commons.UseTrinkets then
+    return
+  end
+
+  if not Player:StealthUp(true, false) then
     return
   end
 
@@ -448,7 +455,6 @@ local function CDs ()
     return
   end
 
-  -- actions.cds+=/sepsis,if=!stealthed.rogue&!stealthed.improved_garrote&(!talent.improved_garrote&dot.garrote.ticking|talent.improved_garrote&cooldown.garrote.up)&(target.time_to_die>10|fight_remains<10)
   -- actions.cds+=/sepsis,if=dot.rupture.remains>20&(!talent.improved_garrote&dot.garrote.ticking|talent.improved_garrote&cooldown.garrote.up&dot.garrote.pmultiplier<=1)&(target.time_to_die>10|fight_remains<10)
   if S.Sepsis:IsReady() and Target:DebuffRemains(S.Rupture) > 20 and (not S.ImprovedGarrote:IsAvailable() and Target:DebuffUp(S.Garrote)
     or S.ImprovedGarrote:IsAvailable() and S.Garrote:CooldownUp() and Target:PMultiplier(S.Garrote) <= 1)
@@ -456,27 +462,23 @@ local function CDs ()
     if Cast(S.Sepsis, nil, true) then return "Cast Sepsis" end
   end
 
-  if not Player:StealthUp(true, false) then
-    if Settings.Commons.UseTrinkets then
-      if ShouldReturn then
-        UsableItems()
-      else
-        ShouldReturn = UsableItems()
-      end
+  if Settings.Commons.UseTrinkets then
+    if ShouldReturn then
+      UsableItems()
+    else
+      ShouldReturn = UsableItems()
     end
+  end
 
-    if S.Deathmark:IsCastable() then
-      -- actions.cds=variable,name=deathmark_ma_condition,value=!talent.master_assassin.enabled|dot.garrote.ticking
-      -- actions.cds+=/variable,name=deathmark_kingsbane_condition,value=!talent.kingsbane|cooldown.kingsbane.remains<=2
-      -- actions.cds+=/variable,name=deathmark_condition,value=!stealthed.rogue&dot.rupture.ticking&buff.envenom.up&!debuff.deathmark.up&variable.deathmark_ma_condition&variable.deathmark_kingsbane_condition
-      -- actions.cds+=/deathmark,if=variable.deathmark_condition|fight_remains<=20
-      if Target:DebuffUp(S.Rupture) and Player:BuffUp(S.Envenom) and not S.Deathmark:AnyDebuffUp()
-        and (not S.MasterAssassin:IsAvailable() or Target:DebuffUp(S.Garrote))
-        and (not S.Kingsbane:IsAvailable() or S.Kingsbane:CooldownRemains() <= 2)
-        or HL.BossFilteredFightRemains("<=", 20) then
-        if Cast(S.Deathmark, Settings.Assassination.OffGCDasOffGCD.Deathmark) then return "Cast Deathmark" end
-      end
-    end
+  -- actions.cds=variable,name=deathmark_ma_condition,value=!talent.master_assassin.enabled|dot.garrote.ticking
+  -- actions.cds+=/variable,name=deathmark_kingsbane_condition,value=!talent.kingsbane|cooldown.kingsbane.remains<=2
+  -- actions.cds+=/variable,name=deathmark_condition,value=!stealthed.rogue&dot.rupture.ticking&buff.envenom.up&!debuff.deathmark.up&variable.deathmark_ma_condition&variable.deathmark_kingsbane_condition
+  -- actions.cds+=/deathmark,if=variable.deathmark_condition|fight_remains<=20
+  local DeathmarkCondition = not Player:StealthUp(true, false) and Target:DebuffUp(S.Rupture) and Player:BuffUp(S.Envenom) and not S.Deathmark:AnyDebuffUp()
+    and (not S.MasterAssassin:IsAvailable() or Target:DebuffUp(S.Garrote))
+    and (not S.Kingsbane:IsAvailable() or S.Kingsbane:CooldownRemains() <= 2)
+  if S.Deathmark:IsCastable() and (DeathmarkCondition or HL.BossFilteredFightRemains("<=", 20)) then
+    if Cast(S.Deathmark, Settings.Assassination.OffGCDasOffGCD.Deathmark) then return "Cast Deathmark" end
   end
 
   -- actions.shiv=/shiv,if=talent.kingsbane&!talent.lightweight_shiv.enabled&buff.envenom.up&!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking&(dot.kingsbane.ticking&dot.kingsbane.remains<8|cooldown.kingsbane.remains>=24)&(!talent.crimson_tempest.enabled|variable.single_target|dot.crimson_tempest.ticking)|fight_remains<=charges*8
@@ -514,9 +516,9 @@ local function CDs ()
     end
   end
 
-  -- # Special Handling to Sync Shadow Dance to Kingsbane
-  -- actions.cds+=/shadow_dance,if=talent.kingsbane&cooldown.kingsbane.remains<=2&buff.envenom.up
-  if S.ShadowDance:IsCastable() and S.Kingsbane:IsAvailable() and S.Kingsbane:CooldownRemains() <= 2 and Player:BuffUp(S.Envenom) then
+  -- actions.cds+=/shadow_dance,if=talent.kingsbane&buff.envenom.up&(cooldown.deathmark.remains>=50|variable.deathmark_condition)
+  if S.ShadowDance:IsCastable() and S.Kingsbane:IsAvailable() and Player:BuffUp(S.Envenom)
+    and (S.Deathmark:CooldownRemains() >= 50 or DeathmarkCondition) then
     if Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance (Kingsbane Sync)" end
   end
   -- actions.cds+=/kingsbane,if=(debuff.shiv.up|cooldown.shiv.remains<6)&buff.envenom.up&(cooldown.deathmark.remains>=50|dot.deathmark.ticking)|fight_remains<=15
@@ -579,7 +581,7 @@ local function Stealthed ()
     if Target:DebuffUp(S.Kingsbane) and Player:BuffRemains(S.Envenom) <= 2 then
       if Cast(S.Envenom, nil, nil, not TargetInMeleeRange) then return "Cast Envenom (Stealth Kingsbane)" end
     end
-    if SingleTarget and MasterAssassinRemains() > 0 and Player:BuffDown(S.ShadowDanceBuff) then
+    if SingleTarget and MasterAssassinAuraUp() and Player:BuffDown(S.ShadowDanceBuff) then
       if Cast(S.Envenom, nil, nil, not TargetInMeleeRange) then return "Cast Envenom (Master Assassin)" end
     end
   end
