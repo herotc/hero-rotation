@@ -160,8 +160,12 @@ local function Precombat()
   if S.SigilofFlame:IsCastable() and (not I.AlgetharPuzzleBox:IsEquipped()) then
     if Cast(S.SigilofFlame, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame precombat 8"; end
   end
+  -- Manually added: Felblade if out of range
+  if not Target:IsInMeleeRange(5) and S.Felblade:IsCastable() then
+    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade precombat 9"; end
+  end
   -- Manually added: Fel Rush if out of range
-  if not Target:IsInMeleeRange(5) and S.FelRush:IsCastable() then
+  if not Target:IsInMeleeRange(5) and S.FelRush:IsCastable() and (not S.Felblade:IsAvailable() or S.Felblade:CooldownDown() and not Player:PrevGCDP(1, S.Felblade)) then
     if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush, not Target:IsInRange(15)) then return "fel_rush precombat 10"; end
   end
   -- Manually added: Demon's Bite/Demon Blades if in melee range
