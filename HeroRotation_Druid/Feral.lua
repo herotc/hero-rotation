@@ -383,10 +383,10 @@ local function Variables()
   VarEasySwipe = Settings.Feral.UseEasySwipe
   -- variable,name=force_align_2min,op=reset
   VarForceAlign2Min = Settings.Feral.Align2Min
-  -- variable,name=align_cds,value=(variable.force_align_2min|equipped.witherbarks_branch|equipped.ashes_of_the_embersoul&(time+fight_remains>145&time+fight_remains<210|time+fight_remains>265&time+fight_remains<315|time+fight_remains>380&time+fight_remains<415|time+fight_remains>480&time+fight_remains<510)|(time+fight_remains>150&time+fight_remains<200|time+fight_remains>270&time+fight_remains<295|time+fight_remains>395&time+fight_remains<400|time+fight_remains>490&time+fight_remains<495))&talent.convoke_the_spirits.enabled&fight_style.patchwerk&spell_targets.swipe_cat=1&set_bonus.tier31_2pc
+  -- variable,name=align_cds,value=(variable.force_align_2min|equipped.witherbarks_branch|equipped.ashes_of_the_embersoul|(time+fight_remains>150&time+fight_remains<200|time+fight_remains>270&time+fight_remains<295|time+fight_remains>395&time+fight_remains<400|time+fight_remains>490&time+fight_remains<495))&talent.convoke_the_spirits.enabled&fight_style.patchwerk&spell_targets.swipe_cat=1&set_bonus.tier31_2pc
   local CombatTime = HL.CombatTime()
   local TimeCheck = CombatTime + FightRemains
-  VarAlignCDs = (VarForceAlign2Min or I.WitherbarksBranch:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() and (TimeCheck > 145 and TimeCheck < 210 or TimeCheck > 265 and TimeCheck < 315 or TimeCheck > 380 and TimeCheck < 415 or TimeCheck > 480 and TimeCheck < 510) or (TimeCheck > 150 and TimeCheck < 200 or TimeCheck > 270 and TimeCheck < 295 or TimeCheck > 395 and TimeCheck < 400 or TimeCheck > 490 and TimeCheck < 495)) and S.ConvoketheSpirits:IsAvailable() and not DungeonSlice and EnemiesCount11y == 1 and Player:HasTier(31, 2)
+  VarAlignCDs = (VarForceAlign2Min or I.WitherbarksBranch:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or (TimeCheck > 150 and TimeCheck < 200 or TimeCheck > 270 and TimeCheck < 295 or TimeCheck > 395 and TimeCheck < 400 or TimeCheck > 490 and TimeCheck < 495)) and S.ConvoketheSpirits:IsAvailable() and not DungeonSlice and EnemiesCount11y == 1 and Player:HasTier(31, 2)
 end
 
 local function Builder()
@@ -612,8 +612,8 @@ local function Cooldown()
   if S.Berserk:IsReady() and (not VarAlignCDs and not (not S.FranticMomentum:IsAvailable() and I.WitherbarksBranch:IsEquipped() and EnemiesCount11y == 1) and ((not VarLastZerk) or (VarLastZerk and not VarLastConvoke) or (VarLastConvoke and (S.ConvoketheSpirits:CooldownRemains() < 10 and (not Player:HasTier(31, 2) or Player:HasTier(31, 2) and Player:BuffUp(S.SmolderingFrenzyBuff))))) and ((Target:TimeToDie() < FightRemains and Target:TimeToDie() > 18) or Target:TimeToDie() == FightRemains)) then
     if Cast(S.Berserk, Settings.Feral.GCDasOffGCD.BsInc) then return "berserk cooldown 10"; end
   end
-  -- berserk,if=fight_remains<23|(time+118)%%120<30&!talent.frantic_momentum.enabled&equipped.witherbarks_branch&spell_targets.swipe_cat=1
-  if S.Berserk:IsReady() and (FightRemains < 23 or (HL.CombatTime() + 118) % 120 < 30 and not S.FranticMomentum:IsAvailable() and I.WitherbarksBranch:IsEquipped() and EnemiesCount11y == 1) then
+  -- berserk,if=fight_remains<23|(time+118)%%120<30&!talent.frantic_momentum.enabled&(equipped.witherbarks_branch|equipped.ashes_of_the_embersoul)&spell_targets.swipe_cat=1
+  if S.Berserk:IsReady() and (FightRemains < 23 or (HL.CombatTime() + 118) % 120 < 30 and not S.FranticMomentum:IsAvailable() and (I.WitherbarksBranch:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped()) and EnemiesCount11y == 1) then
     if Cast(S.Berserk, Settings.Feral.GCDasOffGCD.BsInc) then return "berserk cooldown 12"; end
   end
   -- berserking,if=!variable.align_3minutes|buff.bs_inc.up
@@ -628,12 +628,12 @@ local function Cooldown()
     end
   end
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=ashes_of_the_embersoul,if=(buff.smoldering_frenzy.up|!set_bonus.tier31_4pc&(cooldown.convoke_the_spirits.remains=0|!talent.convoke_the_spirits.enabled&buff.bs_inc.up))&(target.time_to_die<fight_remains&target.time_to_die>16|target.time_to_die=fight_remains)
-    if I.AshesoftheEmbersoul:IsEquippedAndReady() and ((Player:BuffUp(S.SmolderingFrenzyBuff) or not Player:HasTier(31, 4) and (S.ConvoketheSpirits:CooldownUp() or not S.ConvoketheSpirits:IsAvailable() and Player:BuffUp(BsInc))) and (Target:TimeToDie() < FightRemains and Target:TimeToDie() > 16 or Target:TimeToDie() == FightRemains)) then
+    -- use_item,name=ashes_of_the_embersoul,if=((buff.smoldering_frenzy.up&(!talent.convoke_the_spirits.enabled|cooldown.convoke_the_spirits.remains<10))|!set_bonus.tier31_4pc&(cooldown.convoke_the_spirits.remains=0|!talent.convoke_the_spirits.enabled&buff.bs_inc.up))
+    if I.AshesoftheEmbersoul:IsEquippedAndReady() and ((Player:BuffUp(S.SmolderingFrenzyBuff) and (not S.ConvoketheSpirits:IsAvailable() or S.ConvoketheSpirits:CooldownRemains() < 10)) or not Player:HasTier(31, 4) and (S.ConvoketheSpirits:CooldownUp() or not S.ConvoketheSpirits:IsAvailable() and Player:BuffUp(BsInc))) then
       if Cast(I.AshesoftheEmbersoul, nil, Settings.Commons.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul cooldown 18"; end
     end
-    -- use_item,name=witherbarks_branch,if=(!talent.convoke_the_spirits.enabled|action.feral_frenzy.ready|!set_bonus.tier31_4pc)&(target.time_to_die<fight_remains&target.time_to_die>16|target.time_to_die=fight_remains)
-    if I.WitherbarksBranch:IsEquippedAndReady() and ((not S.ConvoketheSpirits:IsAvailable() or S.FeralFrenzy:IsReady() or not Player:HasTier(31, 4)) and (Target:TimeToDie() < FightRemains and Target:TimeToDie() > 16 or Target:TimeToDie() == FightRemains)) then
+    -- use_item,name=witherbarks_branch,if=(!talent.convoke_the_spirits.enabled|action.feral_frenzy.ready|!set_bonus.tier31_4pc)&!(trinket.1.is.ashes_of_the_embersoul&trinket.1.cooldown.remains<20|trinket.2.is.ashes_of_the_embersoul&trinket.2.cooldown.remains<20)
+    if I.WitherbarksBranch:IsEquippedAndReady() and ((not S.ConvoketheSpirits:IsAvailable() or S.FeralFrenzy:IsReady() or not Player:HasTier(31, 4)) and not (trinket1:ID() == I.AshesoftheEmbersoul:ID() and trinket1:CooldownRemains() < 20 or trinket2:ID() == I.AshesoftheEmbersoul:ID() and trinket2:CooldownRemains() < 20)) then
       if Cast(I.WitherbarksBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "witherbarks_branch cooldown 20"; end
     end
     -- use_item,name=mirror_of_fractured_tomorrows,if=(!variable.align_3minutes|buff.bs_inc.up&buff.bs_inc.remains>15|variable.lastConvoke&!variable.lastZerk&cooldown.convoke_the_spirits.remains<1)&(target.time_to_die<fight_remains&target.time_to_die>16|target.time_to_die=fight_remains)
@@ -653,14 +653,18 @@ local function Cooldown()
   if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() and (Player:EnergyDeficit() > 40) then
     if Everyone.CastTargetIf(I.ManicGrieftorch, Enemies11y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch cooldown 28"; end
   end
-  -- use_item,name=mydas_talisman,if=((trinket.2.is.witherbarks_branch|trinket.2.is.ashes_of_the_embersoul)&trinket.2.cooldown.remains>20)|((trinket.1.is.witherbarks_branch|trinket.1.is.ashes_of_the_embersoul)&trinket.1.cooldown.remains>20)
-  -- use_item,name=bandolier_of_twisted_blades,if=((trinket.2.is.witherbarks_branch|trinket.2.is.ashes_of_the_embersoul)&trinket.2.cooldown.remains>20)|((trinket.1.is.witherbarks_branch|trinket.1.is.ashes_of_the_embersoul)&trinket.1.cooldown.remains>20)
-  if (((trinket2:ID() == I.WitherbarksBranch:ID() or trinket2:ID() == I.AshesoftheEmbersoul:ID()) and trinket2:CooldownRemains() > 20) or ((trinket1:ID() == I.WitherbarksBranch:ID() or trinket1:ID() == I.AshesoftheEmbersoul:ID()) and trinket1:CooldownRemains() > 20)) then
+  -- use_item,name=mydas_talisman,if=!equipped.ashes_of_the_embersoul&!equipped.witherbarks_branch|((trinket.2.is.witherbarks_branch|trinket.2.is.ashes_of_the_embersoul)&trinket.2.cooldown.remains>20)|((trinket.1.is.witherbarks_branch|trinket.1.is.ashes_of_the_embersoul)&trinket.1.cooldown.remains>20)
+  -- use_item,name=bandolier_of_twisted_blades,if=!equipped.ashes_of_the_embersoul&!equipped.witherbarks_branch|((trinket.2.is.witherbarks_branch|trinket.2.is.ashes_of_the_embersoul)&trinket.2.cooldown.remains>20)|((trinket.1.is.witherbarks_branch|trinket.1.is.ashes_of_the_embersoul)&trinket.1.cooldown.remains>20)
+  -- use_item,name=fyrakks_tainted_rageheart,if=!equipped.ashes_of_the_embersoul&!equipped.witherbarks_branch|((trinket.2.is.witherbarks_branch|trinket.2.is.ashes_of_the_embersoul)&trinket.2.cooldown.remains>20)|((trinket.1.is.witherbarks_branch|trinket.1.is.ashes_of_the_embersoul)&trinket.1.cooldown.remains>20)
+  if (not I.AshesoftheEmbersoul:IsEquipped() and not I.WitherbarksBranch:IsEquipped() or ((trinket2:ID() == I.WitherbarksBranch:ID() or trinket2:ID() == I.AshesoftheEmbersoul:ID()) and trinket2:CooldownRemains() > 20) or ((trinket1:ID() == WitherbarksBranch:ID() or trinket1:ID() == I.AshesoftheEmbersoul:ID()) and trinket1:CooldownRemains() > 20)) then
     if I.MydasTalilsman:IsEquippedAndReady() then
       if Cast(I.MydasTalilsman, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mydas_talisman cooldown 30"; end
     end
     if I.BandolierofTwistedBlades:IsEquippedAndReady() then
       if Cast(I.BandolierofTwistedBlades, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInMeleeRange(6)) then return "bandolier_of_twisted_blades cooldown 32"; end
+    end
+    if I.FyrakksTaintedRageheart:IsEquippedAndReady() then
+      if Cast(I.FyrakksTaintedRageheart, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInMeleeRange(10)) then return "fyrakks_tainted_rageheart cooldown 34"; end
     end
   end
   -- use_items
