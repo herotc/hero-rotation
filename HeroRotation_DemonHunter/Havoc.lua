@@ -497,7 +497,7 @@ local function APL()
       if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush) then return "fel_rush main 80"; end
     end
     -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum)
-    if S.FelRush:IsCastable() and (not IsInMeleeRange() and not S.Momentum:IsAvailable() and UseFelRush()) then
+    if S.FelRush:IsCastable() and (not IsInMeleeRange(8) and not S.Momentum:IsAvailable() and UseFelRush()) then
       if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush) then return "fel_rush main 82"; end
     end
     -- vengeful_retreat,if=!talent.initiative&movement.distance>15
