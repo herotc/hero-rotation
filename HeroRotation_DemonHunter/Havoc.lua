@@ -321,7 +321,8 @@ local function APL()
     end
     -- the_hunt,if=time<10&buff.potion.up&(!talent.inertia|buff.metamorphosis.up&debuff.essence_break.down)
     local PotionSelected = Everyone.PotionSelected()
-    if S.TheHunt:IsCastable() and (CombatTime < 10 and (not PotionSelected or PotionSelected:TimeSinceLastCast() < 30) and (not S.Inertia:IsAvailable() or Player:BuffUp(S.MetamorphosisBuff) and Target:DebuffDown(S.EssenceBreakDebuff))) then
+    local PotionCondition = not Settings.Commons.Enabled.Potions or not PotionSelected or PotionSelected:TimeSinceLastCast() < 30 or not PotionSelected:IsReady()
+    if S.TheHunt:IsCastable() and (CombatTime < 10 and PotionCondition and (not S.Inertia:IsAvailable() or Player:BuffUp(S.MetamorphosisBuff) and Target:DebuffDown(S.EssenceBreakDebuff))) then
       if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt main 8"; end
     end
     -- immolation_aura,if=talent.inertia&(cooldown.eye_beam.remains<gcd.max*2|buff.metamorphosis.up)&cooldown.essence_break.remains<gcd.max*3&buff.unbound_chaos.down&buff.inertia.down&debuff.essence_break.down
@@ -346,9 +347,7 @@ local function APL()
     end
     -- call_action_list,name=cooldown
     -- Note: CDsON check is within Cooldown(), as the function also includes trinkets and potions
-    if (true) then
-      local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
-    end
+    local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=meta_end,if=buff.metamorphosis.up&buff.metamorphosis.remains<gcd.max&active_enemies<3
     if Player:BuffUp(S.MetamorphosisBuff) and Player:BuffRemains(S.MetamorphosisBuff) < GCDMax and EnemiesCount8 < 3 then
       local ShouldReturn = MetaEnd(); if ShouldReturn then return ShouldReturn; end
@@ -418,11 +417,17 @@ local function APL()
       if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not IsInMeleeRange(20)) then return "eye_beam main 46"; end
     end
     -- blade_dance,if=variable.blade_dance&(cooldown.eye_beam.remains>5|equipped.algethar_puzzle_box&cooldown.metamorphosis.remains>(cooldown.blade_dance.duration)|!talent.demonic|(raid_event.adds.in>cooldown&raid_event.adds.in<25))&buff.fel_barrage.down|set_bonus.tier31_2pc
+    if S.BladeDance:IsReady() and (VarBladeDance and (S.EyeBeam:CooldownRemains() > 5 or I.AlgetharPuzzleBox:IsEquipped() and S.Metamorphosis:CooldownRemains() > (10 * Player:SpellHaste()) or not S.Demonic:IsAvailable()) and Player:BuffDown(S.FelBarrage) or Player:HasTier(31, 2)) then
+      if Cast(S.BladeDance, nil, nil, not IsInMeleeRange(8)) then return "blade_dance main 47"; end
+    end
     -- sigil_of_flame,if=talent.any_means_necessary&debuff.essence_break.down&active_enemies>=4
     if S.SigilofFlame:IsCastable() and (S.AnyMeansNecessary:IsAvailable() and Target:DebuffDown(S.EssenceBreakDebuff) and EnemiesCount8 >= 4) then
       if Cast(S.SigilofFlame, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame main 48"; end
     end
     -- throw_glaive,if=talent.soulscar&(active_enemies>desired_targets|raid_event.adds.in>full_recharge_time+9)&spell_targets>=(2-talent.furious_throws)&!debuff.essence_break.up&(full_recharge_time<gcd.max*3|active_enemies>1)&!set_bonus.tier31_2pc
+    if S.ThrowGlaive:IsCastable() and (S.Soulscar:IsAvailable() and EnemiesCount8 >= (2 - num(S.FuriousThrows:IsAvailable())) and Target:DebuffDown(S.EssenceBreakDebuff) and (S.ThrowGlaive:FullRechargeTime() < GCDMax * 3 or EnemiesCount8 > 1) and not Player:HasTier(31, 2)) then
+      if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsInRange(30)) then return "throw_glaive main 49"; end
+    end
     -- immolation_aura,if=active_enemies>=2&fury<70&debuff.essence_break.down
     if S.ImmolationAura:IsCastable() and (EnemiesCount8 >= 2 and Player:Fury() < 70 and Target:DebuffDown(S.EssenceBreakDebuff)) then
       if Cast(S.ImmolationAura, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura main 50"; end
