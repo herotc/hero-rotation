@@ -40,6 +40,7 @@ local I = Item.Evoker.Devastation
 local OnUseExcludes = {
   I.BelorrelostheSuncaller:ID(),
   I.Dreambinder:ID(),
+  I.Iridal:ID(),
   I.NymuesUnravelingSpindle:ID(),
   I.ShadowedOrbofTorment:ID(),
 }
@@ -187,6 +188,10 @@ local function Trinkets()
   -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(gcd.remains>0.5&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle))|fight_remains<=20
   if I.BelorrelostheSuncaller:IsEquippedAndReady() and ((Player:GCDRemains() > 0.5 and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) or FightRemains <= 20) then
     if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller trinkets 6"; end
+  end
+  -- use_item,name=iridal_the_earths_master,use_off_gcd=1,if=gcd.remains>0|fight_remains<20
+  if I.Iridal:IsEquippedAndReady() then
+    if Cast(I.Iridal, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master trinkets 7"; end
   end
   -- living_flame,if=buff.burnout.up&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
   if S.LivingFlame:IsReady() and (Player:BuffUp(S.BurnoutBuff) and I.BelorrelostheSuncaller:IsEquipped() and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) then

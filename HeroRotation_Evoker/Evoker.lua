@@ -151,6 +151,7 @@ Item.Evoker.Commons = {
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   -- Items
   Dreambinder                           = Item(208616, {16}),
+  Iridal                                = Item(208321, {16}),
   KharnalexTheFirstLight                = Item(195519, {16}),
   -- Trinkets (SL)
   ShadowedOrbofTorment                  = Item(186428, {13, 14}),
