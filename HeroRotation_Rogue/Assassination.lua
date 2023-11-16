@@ -738,7 +738,7 @@ local function Direct ()
   end
   -- actions.direct+=/echoing_reprimand,if=variable.use_filler|fight_remains<20
   if CDsON() and S.EchoingReprimand:IsReady() then
-    if Cast(S.EchoingReprimand, nil, Settings.Commons.GCDasOffGCD.EchoingReprimand, not TargetInMeleeRange) then return "Cast Echoing Reprimand" end
+    if Cast(S.EchoingReprimand, Settings.Commons.GCDasOffGCD.EchoingReprimand, nil, not TargetInMeleeRange) then return "Cast Echoing Reprimand" end
   end
   if S.FanofKnives:IsCastable() then
     -- actions.direct+=/fan_of_knives,if=variable.use_filler&(!priority_rotation&spell_targets.fan_of_knives>=2+stealthed.rogue+talent.dragontempered_blades)

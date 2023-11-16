@@ -547,7 +547,7 @@ end
 local function Build ()
 	-- actions.build+=/echoing_reprimand
 	if CDsON() and S.EchoingReprimand:IsReady() then
-		if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.GCDasOffGCD.EchoingReprimand) then
+		if HR.Cast(S.EchoingReprimand, Settings.Commons.GCDasOffGCD.EchoingReprimand) then
 			return "Cast Echoing Reprimand"
 		end
 	end
