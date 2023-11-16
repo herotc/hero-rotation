@@ -340,8 +340,8 @@ local function AoE()
   if CDsON() and S.SummonDarkglare:IsCastable() and (VarPSUp and VarVTUp and VarSRUp) then
     if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare aoe 18"; end
   end
-  -- malefic_rapture,if=buff.umbrafire_kindling.up
-  if S.MaleficRapture:IsReady() and (Player:BuffUp(S.UmbrafireKindlingBuff)) then
+  -- malefic_rapture,if=buff.umbrafire_kindling.up&(pet.darkglare.active|!talent.doom_blossom)
+  if S.MaleficRapture:IsReady() and (Player:BuffUp(S.UmbrafireKindlingBuff) and (HL.GuardiansTable.DarkglareDuration > 0 or not S.DoomBlossom:IsAvailable())) then
     if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture aoe 20"; end
   end
   -- seed_of_corruption,if=talent.sow_the_seeds
