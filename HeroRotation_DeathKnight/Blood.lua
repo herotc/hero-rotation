@@ -170,7 +170,7 @@ local function DRWUp()
     if Cast(S.DeathAndDecay, Settings.Commons2.GCDasOffGCD.DeathAndDecay, nil, not Target:IsInRange(30)) then return "death_and_decay drw_up 16"; end
   end
   -- blood_boil,if=spell_targets.blood_boil>2&charges_fractional>=1.1
-  if S.BloodBoil:IsCastable() and (EnemiesCount10y > 2 and S.BloodBoil:ChargesFractional() >= 1.1) then
+  if S.BloodBoil:IsCastable() and (EnemiesMeleeCount > 2 and S.BloodBoil:ChargesFractional() >= 1.1) then
     if Cast(S.BloodBoil, Settings.Blood.GCDasOffGCD.BloodBoil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil drw_up 18"; end
   end
   -- variable,name=heart_strike_rp_drw,value=(25+spell_targets.heart_strike*talent.heartbreaker.enabled*2)
@@ -264,7 +264,7 @@ local function Standard()
     if Cast(S.Bonestorm, Settings.Blood.GCDasOffGCD.Bonestorm, nil, not Target:IsInMeleeRange(8)) then return "bonestorm standard 16"; end
   end
   -- blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)
-  if S.BloodBoil:IsCastable() and (S.BloodBoil:ChargesFractional() >= 1.8 and (Player:BuffStack(S.HemostasisBuff) <= (5 - EnemiesCount10y) or EnemiesCount10y > 2)) then
+  if S.BloodBoil:IsCastable() and (S.BloodBoil:ChargesFractional() >= 1.8 and (Player:BuffStack(S.HemostasisBuff) <= (5 - EnemiesMeleeCount) or EnemiesMeleeCount > 2)) then
     if Cast(S.BloodBoil, Settings.Blood.GCDasOffGCD.BloodBoil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil standard 18"; end
   end
   -- heart_strike,if=rune.time_to_4<gcd
@@ -304,14 +304,11 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   -- Get Enemies Count
-  Enemies10y          = Player:GetEnemiesInRange(10)
+  EnemiesMelee      = Player:GetEnemiesInMeleeRange(8, S.HeartStrike)
   if AoEON() then
-    EnemiesMelee      = Player:GetEnemiesInMeleeRange(8)
     EnemiesMeleeCount = #EnemiesMelee
-    EnemiesCount10y   = #Enemies10y
   else
     EnemiesMeleeCount = 1
-    EnemiesCount10y   = 1
   end
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
@@ -319,7 +316,7 @@ local function APL()
     HeartStrikeCount = mathmin(EnemiesMeleeCount, Player:BuffUp(S.DeathAndDecayBuff) and 5 or 2)
 
     -- Check Units without Blood Plague
-    UnitsWithoutBloodPlague = UnitsWithoutBP(Enemies10y)
+    UnitsWithoutBloodPlague = UnitsWithoutBP(EnemiesMelee)
 
     -- Are we actively tanking?
     IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
@@ -379,7 +376,7 @@ local function APL()
       if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress main 6"; end
     end
     -- death_and_decay,if=!death_and_decay.ticking&(talent.unholy_ground|talent.sanguine_ground|spell_targets.death_and_decay>3|buff.crimson_scourge.up)
-    if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and (S.UnholyGround:IsAvailable() or S.SanguineGround:IsAvailable() or EnemiesCount10y > 3 or Player:BuffUp(S.CrimsonScourgeBuff))) then
+    if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and (S.UnholyGround:IsAvailable() or S.SanguineGround:IsAvailable() or EnemiesMeleeCount > 3 or Player:BuffUp(S.CrimsonScourgeBuff))) then
       if Cast(S.DeathAndDecay, Settings.Commons2.GCDasOffGCD.DeathAndDecay, nil, not Target:IsInRange(30)) then return "death_and_decay main 8"; end
     end
     -- death_strike,if=buff.coagulopathy.remains<=gcd|buff.icy_talons.remains<=gcd|runic_power>=variable.death_strike_dump_amount|runic_power.deficit<=variable.heart_strike_rp|target.time_to_die<10
