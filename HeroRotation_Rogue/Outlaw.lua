@@ -226,7 +226,7 @@ local function RtB_Reroll ()
       -- actions+=/variable,name=rtb_reroll,if=talent.crackshot&set_bonus.tier31_4pc,value=
       -- (rtb_buffs.will_lose<=1+buff.loaded_dice.up)&(talent.hidden_opportunity|!buff.broadside.up)
       if S.Crackshot:IsAvailable() and Player:HasTier(31, 4)
-        and (RtB_Buffs() <= 1 + Player:BuffUp(S.LoadedDiceBuff)) and (S.HiddenOpportunity:IsAvailable() or Player:BuffDown(S.Broadside)) then
+        and (RtB_Buffs() <= 1 + num(Player:BuffUp(S.LoadedDiceBuff))) and (S.HiddenOpportunity:IsAvailable() or Player:BuffDown(S.Broadside)) then
         Cache.APLVar.RtB_Reroll = true
       end
 
@@ -351,12 +351,14 @@ local function CDs ()
   -- # Maintain Blade Flurry on 2+ targets, and on single target with Underhanded, or on cooldown at 5+ targets with Deft Maneuvers
   -- actions.cds+=/blade_flurry,if=(spell_targets>=2-talent.underhanded_upper_hand&!stealthed.rogue)
   -- &buff.blade_flurry.remains<gcd|talent.deft_maneuvers&spell_targets>=5&!variable.finish_condition
-  if S.BladeFlurry:IsReady() and ((EnemiesBFCount >= 2 - num(S.UnderhandedUpperhand:IsAvailable()) and not Player:StealthUp(true, false))
-    and Player:BuffRemains(S.BladeFlurry) < Player:GCDRemains() or S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 5 and not Finish_Condition()) then
-    if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
-      HR.CastSuggested(S.BladeFlurry)
-    else
-      if HR.Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
+  if S.BladeFlurry:IsReady() then
+    if (EnemiesBFCount >= 2 - num(S.UnderhandedUpperhand:IsAvailable()) and not Player:StealthUp(true, false))
+      and Player:BuffRemains(S.BladeFlurry) < Player:GCDRemains() or S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 5 and not Finish_Condition() then
+      if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
+        HR.CastSuggested(S.BladeFlurry)
+      else
+        if HR.Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
+      end
     end
   end
 
@@ -370,7 +372,7 @@ local function CDs ()
 
   -- # Use Keep it Rolling with at least 3 buffs (4 with T31)
   -- actions.cds+=/keep_it_rolling,if=!variable.rtb_reroll&rtb_buffs>=3+set_bonus.tier31_4pc&(buff.shadow_dance.down|rtb_buffs>=6)
-  if S.KeepItRolling:IsReady() and not RtB_Reroll() and  RtB_Buffs() >=3 + num(Player:HasTier(31, 4)) and (Player:BuffDown(S.ShadowDance) or RtB_Buffs() >= 6) then
+  if S.KeepItRolling:IsReady() and not RtB_Reroll() and  RtB_Buffs() >= 3 + num(Player:HasTier(31, 4)) and (Player:BuffDown(S.ShadowDance) or RtB_Buffs() >= 6) then
     if HR.Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then return "Cast Keep it Rolling" end
   end
 
