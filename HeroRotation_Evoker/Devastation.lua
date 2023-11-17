@@ -178,20 +178,18 @@ local function Trinkets()
     ItemCD1141Ready = true
   end
   -- use_item,name=dreambinder_loom_of_the_great_cycle
-  if I.Dreambinder:IsEquippedAndReady() then
+  if Settings.Commons.Enabled.Items and I.Dreambinder:IsEquippedAndReady() then
     if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle trinkets 2"; end
   end
-  -- use_item,name=nymues_unraveling_spindle,if=((buff.emerald_trance_stacking.stack>=2&variable.has_external_pi)|(cooldown.dragonrage.remains<=3&cooldown.fire_breath.remains<7&cooldown.eternity_surge.remains<13&target.time_to_die>=35&!variable.has_external_pi))|fight_remains<=20
-  if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (((Player:BuffStack(S.EmeraldTranceBuff) >= 2 and VarHasExternalPI) or (S.Dragonrage:CooldownRemains() <= 3 and S.FireBreath:CooldownRemains() < 7 and S.EternitySurge:CooldownRemains() < 13 and Target:TimeToDie() >= 35 and not VarHasExternalPI)) or FightRemains <- 20) then
-    if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle trinkets 4"; end
-  end
-  -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(gcd.remains>0.5&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle))|fight_remains<=20
-  if I.BelorrelostheSuncaller:IsEquippedAndReady() and ((Player:GCDRemains() > 0.5 and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) or FightRemains <= 20) then
-    if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller trinkets 6"; end
-  end
-  -- use_item,name=iridal_the_earths_master,use_off_gcd=1,if=gcd.remains>0|fight_remains<20
-  if I.Iridal:IsEquippedAndReady() then
-    if Cast(I.Iridal, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master trinkets 7"; end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,name=nymues_unraveling_spindle,if=((buff.emerald_trance_stacking.stack>=2&variable.has_external_pi)|(cooldown.dragonrage.remains<=3&cooldown.fire_breath.remains<7&cooldown.eternity_surge.remains<13&target.time_to_die>=35&(!variable.has_external_pi|!set_bonus.tier31_2pc)))|fight_remains<=20
+    if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (((Player:BuffStack(S.EmeraldTranceBuff) >= 2 and VarHasExternalPI) or (S.Dragonrage:CooldownRemains() <= 3 and S.FireBreath:CooldownRemains() < 7 and S.EternitySurge:CooldownRemains() < 13 and Target:TimeToDie() >= 35 and (not VarHasExternalPI or not Player:HasTier(31, 2))) or FightRemains <- 20) then
+      if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle trinkets 4"; end
+    end
+    -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(gcd.remains>0.5&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle))|fight_remains<=20
+    if I.BelorrelostheSuncaller:IsEquippedAndReady() and ((Player:GCDRemains() > 0.5 and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) or FightRemains <= 20) then
+      if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller trinkets 6"; end
+    end
   end
   -- living_flame,if=buff.burnout.up&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
   if S.LivingFlame:IsReady() and (Player:BuffUp(S.BurnoutBuff) and I.BelorrelostheSuncaller:IsEquipped() and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) then
@@ -285,6 +283,10 @@ local function Green()
 end
 
 local function Aoe()
+  -- use_item,name=iridal_the_earths_master,use_off_gcd=1,if=gcd.remains>0.5"
+  if Settings.Commons.Enabled.Items and I.Iridal:IsEquippedAndReady() then
+    if Cast(I.Iridal, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master aoe 1"; end
+  end
   -- shattering_star,target_if=max:target.health.pct,if=cooldown.dragonrage.up
   if S.ShatteringStar:IsCastable() and (S.Dragonrage:CooldownUp()) then
     if Everyone.CastTargetIf(S.ShatteringStar, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star aoe 2"; end
@@ -297,20 +299,19 @@ local function Aoe()
   if S.TipTheScales:IsCastable() and CDsON() and (VarDragonrageUp and (EnemiesCount8ySplash <= 3 + 3 * num(S.EternitysSpan:IsAvailable()) or S.FireBreath:CooldownDown())) then
     if Cast(S.TipTheScales, Settings.Commons.GCDasOffGCD.TipTheScales) then return "tip_the_scales aoe 6"; end
   end
-  -- call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_aoe|!talent.animosity)&(buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)&(target.time_to_die>=8|fight_remains<30)
-  if ((not S.Dragonrage:IsAvailable() or VarNextDragonrage > VarDRPrepTimeAoe or not S.Animosity:IsAvailable()) and (Player:BuffRemains(S.PowerSwellBuff) < VarR1CastTime and Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime or VarDragonrageUp) and (Target:TimeToDie() >= 8 or FightRemains < 30)) then
+  -- call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_aoe|!talent.animosity)&((buff.power_swell.remains<variable.r1_cast_time|(!talent.volatility&active_enemies=3))&buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)&(target.time_to_die>=8|fight_remains<30)
+  if ((not S.Dragonrage:IsAvailable() or VarNextDragonrage > VarDRPrepTimeAoe or not S.Animosity:IsAvailable()) and ((Player:BuffRemains(S.PowerSwellBuff) < VarR1CastTime or (not S.Volatility:IsAvailable() and EnemiesCount8ySplash == 3)) and Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime or VarDragonrageUp) and (Target:TimeToDie() >= 8 or FightRemains < 30)) then
     local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
   end
-  -- call_action_list,name=es,if=buff.dragonrage.up|!talent.dragonrage|(cooldown.dragonrage.remains>variable.dr_prep_time_aoe&buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
-  if (VarDragonrageUp or not S.Dragonrage:IsAvailable() or (S.Dragonrage:CooldownRemains() > VarDRPrepTimeAoe and Player:BuffRemains(S.PowerSwellBuff) < VarR1CastTime and Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime) and (Target:TimeToDie() >= 8 or FightRemains < 30)) then
+  -- call_action_list,name=es,if=buff.dragonrage.up|!talent.dragonrage|(cooldown.dragonrage.remains>variable.dr_prep_time_aoe&(buff.power_swell.remains<variable.r1_cast_time|(!talent.volatility&active_enemies=3))&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
+  if (VarDragonrageUp or not S.Dragonrage:IsAvailable() or (S.Dragonrage:CooldownRemains() > VarDRPrepTimeAoe and (Player:BuffRemains(S.PowerSwellBuff) < VarR1CastTime or (not S.Volatility:IsAvailable() and EnemiesCount8ySplash == 3)) and Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime) and (Target:TimeToDie() >= 8 or FightRemains < 30)) then
     local ShouldReturn = ES(); if ShouldReturn then return ShouldReturn; end
   end
-  -- deep_breath,if=!buff.dragonrage.up
-  if S.DeepBreath:IsCastable() and CDsON() and (not VarDragonrageUp) then
+  -- deep_breath,if=!buff.dragonrage.up&essence.deficit>3
+  if S.DeepBreath:IsCastable() and CDsON() and (not VarDragonrageUp and Player:EssenceDeficit() > 3) then
     if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath aoe 8"; end
   end
   -- shattering_star,target_if=max:target.health.pct,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
-  -- shattering_star,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
   if S.ShatteringStar:IsCastable() and (Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack or not S.ArcaneVigor:IsAvailable()) then
     if Everyone.CastTargetIf(S.ShatteringStar, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star aoe 10"; end
   end
@@ -321,10 +322,14 @@ local function Aoe()
   if S.Pyre:IsReady() and (
     -- pyre,target_if=max:target.health.pct,if=active_enemies>=5
     (EnemiesCount8ySplash >= 5) or
-    -- pyre,target_if=max:target.health.pct,if=active_enemies>=4&(!talent.charged_blast|talent.volatility)
-    (EnemiesCount8ySplash >= 4 and (not S.ChargedBlast:IsAvailable() or S.Volatility:IsAvailable())) or
-    -- pyre,target_if=max:target.health.pct,if=active_enemies>=3&talent.volatility&(talent.charged_blast&!buff.essence_burst.up&!buff.iridescence_blue.up|(!talent.charged_blast&(!buff.essence_burst.up|!buff.iridescence_blue.up)))
-    (EnemiesCount8ySplash >= 3 and S.Volatility:IsAvailable() and (S.ChargedBlast:IsAvailable() and Player:BuffDown(S.EssenceBurstBuff) and Player:BuffDown(S.IridescenceBlueBuff) or (not S.ChargedBlast:IsAvailable() and (Player:BuffDown(S.EssenceBurstBuff) or Player:BuffDown(S.IridescenceBlueBuff))))) or
+    -- pyre,target_if=max:target.health.pct,if=active_enemies>=4&(!buff.essence_burst.up&!buff.iridescence_blue.up|!talent.eternitys_span)
+    (EnemiesCount8ySplash >= 4 and (Player:BuffDown(S.EssenceBurstBuff) and Player:BuffDown(S.IridescenceBlueBuff) or not S.EternitysSpan:IsAvailable())) or
+    -- pyre,target_if=max:target.health.pct,if=active_enemies>=4&talent.volatility
+    (EnemiesCount8ySplash >= 4 and S.Volatility:IsAvailable()) or
+    -- pyre,target_if=max:target.health.pct,if=active_enemies>=3&talent.volatility&talent.charged_blast&!buff.essence_burst.up&!buff.iridescence_blue.up
+    (EnemiesCount8ySplash >= 3 and S.Volatility:IsAvailable() and S.ChargedBlast:IsAvailable() and Player:BuffDown(S.EssenceBurstBuff) and Player:BuffDown(S.IridescenceBlueBuff)) or
+    -- pyre,target_if=max:target.health.pct,if=active_enemies>=3&talent.volatility&!talent.charged_blast&(buff.iridescence_red.up|!buff.essence_burst.up)
+    (EnemiesCount8ySplash >= 3 and S.Volatility:IsAvailable() and not S.ChargedBlast:IsAvailable() and (Player:BuffUp(S.IridescenceRedBuff) or Player:BuffDown(S.EssenceBurstBuff))) or
     -- pyre,target_if=max:target.health.pct,if=buff.charged_blast.stack>=15
     (Player:BuffStack(S.ChargedBlastBuff) >= 15)
   ) then
@@ -335,13 +340,17 @@ local function Aoe()
   if S.LivingFlame:IsCastable() and ((not S.Burnout:IsAvailable() or Player:BuffUp(S.BurnoutBuff) or EnemiesCount8ySplash >= 4 or Player:BuffUp(S.ScarletAdaptationBuff)) and Player:BuffUp(S.LeapingFlamesBuff) and Player:BuffDown(S.EssenceBurstBuff) and Player:Essence() < Player:EssenceMax() - 1) then
     if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 18"; end
   end
-  -- disintegrate,target_if=max:target.health.pct,chain=1,early_chain_if=evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
+  -- disintegrate,target_if=max:target.health.pct,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&essence.deficit<2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(!(buff.power_infusion.up&buff.bloodlust.up)|cooldown.fire_breath.up|cooldown.eternity_surge.up)&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
   if S.Disintegrate:IsReady() then
     if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate aoe 22"; end
   end
   -- living_flame,target_if=max:target.health.pct,if=talent.snapfire&buff.burnout.up
   if S.LivingFlame:IsCastable() and (S.Snapfire:IsAvailable() and Player:BuffUp(S.BurnoutBuff)) then
     if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 24"; end
+  end
+  -- call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up&!buff.dragonrage.up
+  if Settings.Devastation.UseGreen and S.AncientFlame:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and not VarDragonrageUp then
+    local ShouldReturn = Green(); if ShouldReturn then return ShouldReturn; end
   end
   -- azure_strike,target_if=max:target.health.pct
   -- Note: Since this is a filler, going to use both Cast and CastTargetIf.
@@ -354,9 +363,15 @@ local function Aoe()
 end
 
 local function ST()
-  -- use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&raid_event.movement.in>6
-  if Settings.Commons.Enabled.Items and I.KharnalexTheFirstLight:IsEquippedAndReady() and (not VarDragonrageUp and Target:DebuffDown(S.ShatteringStar)) then
-    if Cast(I.KharnalexTheFirstLight, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "kharnalex_the_first_light st 2"; end
+  if Settings.Commons.Enabled.Items then
+    -- use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&raid_event.movement.in>6
+    if I.KharnalexTheFirstLight:IsEquippedAndReady() and (not VarDragonrageUp and Target:DebuffDown(S.ShatteringStar)) then
+      if Cast(I.KharnalexTheFirstLight, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "kharnalex_the_first_light st 2"; end
+    end
+    -- use_item,name=iridal_the_earths_master,use_off_gcd=1,if=gcd.remains>0.5
+    if I.Iridal:IsEquippedAndReady() then
+      if CasT(I.Iridal, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master st 3"; end
+    end
   end
   -- hover,use_off_gcd=1,if=raid_event.movement.in<2&!buff.hover.up
   -- Note: Not handling movement ability.
