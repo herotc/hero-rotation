@@ -220,7 +220,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   if AoEON() then
-    Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
+    Enemies8y = Player:GetEnemiesInMeleeRange(8, S.Revenge) -- Multiple Abilities
     EnemiesCount8 = #Enemies8y
   else
     EnemiesCount8 = 1
@@ -228,7 +228,7 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Range check
-    TargetInMeleeRange = Target:IsInMeleeRange(5)
+    TargetInMeleeRange = Target:IsSpellInRange(S.Revenge)
   end
 
   if Everyone.TargetIsValid() then

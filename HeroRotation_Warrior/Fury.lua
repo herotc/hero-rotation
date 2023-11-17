@@ -396,7 +396,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   if AoEON() then
-    Enemies8y = Player:GetEnemiesInMeleeRange(8)
+    Enemies8y = Player:GetEnemiesInMeleeRange(8, S.Bloodthirst)
     EnemiesCount8y = #Enemies8y
   else
     EnemiesCount8y = 1
@@ -406,7 +406,7 @@ local function APL()
   EnrageUp = Player:BuffUp(S.EnrageBuff)
 
   -- Range check
-  TargetInMeleeRange = Target:IsInMeleeRange(5)
+  TargetInMeleeRange = Target:IsSpellInRange(S.Bloodthirst)
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
