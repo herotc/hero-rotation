@@ -683,8 +683,9 @@ end
 local function APL()
   -- Update Enemies
   if AoEON() then
-    EnemiesMelee = Player:GetEnemiesInMeleeRange(8)
-    Enemies11y = Player:GetEnemiesInMeleeRange(11)
+    EnemiesMelee = Player:GetEnemiesInMeleeRange(8, S.Shred)
+    local RangeSpell = (S.BrutalSlash:IsAvailable()) and S.BrutalSlash or S.Swipe
+    Enemies11y = Player:GetEnemiesInMeleeRange(11, RangeSpell)
     EnemiesCountMelee = #EnemiesMelee
     EnemiesCount11y = #Enemies11y
   else

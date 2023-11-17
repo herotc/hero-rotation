@@ -330,7 +330,7 @@ end
 local function APL()
   -- Enemies Update
   if AoEON() then
-    MeleeEnemies11y = Player:GetEnemiesInMeleeRange(11)
+    MeleeEnemies11y = Player:GetEnemiesInMeleeRange(11, S.Swipe)
     MeleeEnemies11yCount = #MeleeEnemies11y
   else
     MeleeEnemies11y = {}
