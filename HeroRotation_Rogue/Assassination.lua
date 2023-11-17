@@ -788,13 +788,13 @@ local function APL ()
   AoERange = S.AcrobaticStrikes:IsAvailable() and 10 or 13
   -- TargetInMeleeRange = Target:IsInMeleeRange(MeleeRange)
   -- TargetInAoERange = Target:IsInMeleeRange(AoERange)
-  TargetInMeleeRange = Target:IsSpellInRange(S.Mutilate)
+  TargetInMeleeRange = Target:IsSpellInRange(S.Garrote)
   TargetInAoERange = Target:IsSpellInRange(S.PickPocket)
   if AoEON() then
     Enemies30y = Player:GetEnemiesInRange(30) -- Poisoned Knife & Serrated Bone Spike
     MeleeEnemies10y = Player:GetEnemiesInMeleeRange(AoERange, S.PickPocket) -- Fan of Knives & Crimson Tempest
     MeleeEnemies10yCount = #MeleeEnemies10y
-    MeleeEnemies5y = Player:GetEnemiesInMeleeRange(MeleeRange, S.Mutilate) -- Melee cycle
+    MeleeEnemies5y = Player:GetEnemiesInMeleeRange(MeleeRange, S.Garrote) -- Melee cycle
   else
     Enemies30y = {}
     MeleeEnemies10y = {}
@@ -843,6 +843,7 @@ local function APL ()
   end
 
   if Everyone.TargetIsValid() then
+    HR.Print("TargetInMeleeRange: "..tostring(TargetInMeleeRange))
     -- Interrupts
     ShouldReturn = Everyone.Interrupt(5, S.Kick, true, Interrupts)
     if ShouldReturn then return ShouldReturn end
