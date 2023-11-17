@@ -543,7 +543,7 @@ end
 local function APL()
   -- Unit Update
   if AoEON() then
-    Enemies10y = Player:GetEnemiesInMeleeRange(10)
+    Enemies10y = Player:GetEnemiesInMeleeRange(10, S.Stormstrike)
     Enemies10yCount = #Enemies10y
   else
     Enemies10y = {}
