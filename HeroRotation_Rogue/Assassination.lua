@@ -843,7 +843,6 @@ local function APL ()
   end
 
   if Everyone.TargetIsValid() then
-    HR.Print("TargetInMeleeRange: "..tostring(TargetInMeleeRange))
     -- Interrupts
     ShouldReturn = Everyone.Interrupt(5, S.Kick, true, Interrupts)
     if ShouldReturn then return ShouldReturn end
