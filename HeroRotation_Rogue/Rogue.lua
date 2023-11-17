@@ -61,6 +61,7 @@ Spell.Rogue.Commons = {
   CheapShot               = Spell(1833),
   Kick                    = Spell(1766),
   KidneyShot              = Spell(408),
+  PickPocket              = Spell(921),
   Sap                     = Spell(6770),
   Shiv                    = Spell(5938),
   SliceandDice            = Spell(315496),

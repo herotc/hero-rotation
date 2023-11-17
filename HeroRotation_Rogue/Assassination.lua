@@ -789,10 +789,10 @@ local function APL ()
   -- TargetInMeleeRange = Target:IsInMeleeRange(MeleeRange)
   -- TargetInAoERange = Target:IsInMeleeRange(AoERange)
   TargetInMeleeRange = Target:IsSpellInRange(S.Mutilate)
-  TargetInAoERange = Target:IsSpellInRange(S.FanofKnives)
+  TargetInAoERange = Target:IsSpellInRange(S.PickPocket)
   if AoEON() then
     Enemies30y = Player:GetEnemiesInRange(30) -- Poisoned Knife & Serrated Bone Spike
-    MeleeEnemies10y = Player:GetEnemiesInMeleeRange(AoERange, S.FanofKnives) -- Fan of Knives & Crimson Tempest
+    MeleeEnemies10y = Player:GetEnemiesInMeleeRange(AoERange, S.PickPocket) -- Fan of Knives & Crimson Tempest
     MeleeEnemies10yCount = #MeleeEnemies10y
     MeleeEnemies5y = Player:GetEnemiesInMeleeRange(MeleeRange, S.Mutilate) -- Melee cycle
   else

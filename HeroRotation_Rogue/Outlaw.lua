@@ -614,7 +614,8 @@ local function APL ()
   -- Unit Update
   if AoEON() then
     Enemies30y = Player:GetEnemiesInRange(30) -- Serrated Bone Spike cycle
-    EnemiesBF = Player:GetEnemiesInRange(BladeFlurryRange, S.SinisterStrike)
+    local RangeSpell = (S.AcrobaticStrikes:IsAvailable()) and S.PickPocket or S.SinisterStrike
+    EnemiesBF = Player:GetEnemiesInRange(BladeFlurryRange, RangeSpell)
     EnemiesBFCount = #EnemiesBF
   else
     EnemiesBFCount = 1
