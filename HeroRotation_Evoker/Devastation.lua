@@ -183,7 +183,7 @@ local function Trinkets()
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=nymues_unraveling_spindle,if=((buff.emerald_trance_stacking.stack>=2&variable.has_external_pi)|(cooldown.dragonrage.remains<=3&cooldown.fire_breath.remains<7&cooldown.eternity_surge.remains<13&target.time_to_die>=35&(!variable.has_external_pi|!set_bonus.tier31_2pc)))|fight_remains<=20
-    if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (((Player:BuffStack(S.EmeraldTranceBuff) >= 2 and VarHasExternalPI) or (S.Dragonrage:CooldownRemains() <= 3 and S.FireBreath:CooldownRemains() < 7 and S.EternitySurge:CooldownRemains() < 13 and Target:TimeToDie() >= 35 and (not VarHasExternalPI or not Player:HasTier(31, 2))) or FightRemains <- 20) then
+    if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (((Player:BuffStack(S.EmeraldTranceBuff) >= 2 and VarHasExternalPI) or (S.Dragonrage:CooldownRemains() <= 3 and S.FireBreath:CooldownRemains() < 7 and S.EternitySurge:CooldownRemains() < 13 and Target:TimeToDie() >= 35 and (not VarHasExternalPI or not Player:HasTier(31, 2)))) or FightRemains <- 20) then
       if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle trinkets 4"; end
     end
     -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(gcd.remains>0.5&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle))|fight_remains<=20
