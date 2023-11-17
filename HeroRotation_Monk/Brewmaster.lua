@@ -44,7 +44,7 @@ local OnUseExcludes = {
 -- Rotation Var
 local Enemies5y
 local Enemies8y
-local EnemiesCount8
+local EnemiesCount5
 local IsTanking
 
 -- Weapon checks
@@ -193,16 +193,16 @@ local function RotationPTA()
     -- rising_sun_kick,if=buff.press_the_advantage.stack<(7+main_hand.2h)
     (Player:BuffStack(S.PresstheAdvantageBuff) < (7 + num(Using2H))) or
     -- rising_sun_kick,if=buff.press_the_advantage.stack>9&active_enemies<=3&(buff.blackout_combo.up|!talent.blackout_combo.enabled)
-    (Player:BuffStack(S.PresstheAdvantageBuff) > 9 and EnemiesCount8 <= 3 and (Player:BuffUp(S.BlackoutComboBuff) or not S.BlackoutCombo:IsAvailable()))
+    (Player:BuffStack(S.PresstheAdvantageBuff) > 9 and EnemiesCount5 <= 3 and (Player:BuffUp(S.BlackoutComboBuff) or not S.BlackoutCombo:IsAvailable()))
   ) then
     if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick rotation_pta 4"; end
   end
   -- keg_smash,if=(buff.press_the_advantage.stack>9)&active_enemies>3
-  if S.KegSmash:IsReady() and (Player:BuffStack(S.PresstheAdvantageBuff) > 9 and EnemiesCount8 > 3) then
+  if S.KegSmash:IsReady() and (Player:BuffStack(S.PresstheAdvantageBuff) > 9 and EnemiesCount5 > 3) then
     if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash rotation_pta 6"; end
   end
   -- spinning_crane_kick,if=active_enemies>5&buff.exploding_keg.up&buff.charred_passions.up
-  if S.SpinningCraneKick:IsReady() and (EnemiesCount8 > 5 and Player:BuffUp(S.ExplodingKeg) and Player:BuffUp(S.CharredPassionsBuff)) then
+  if S.SpinningCraneKick:IsReady() and (EnemiesCount5 > 5 and Player:BuffUp(S.ExplodingKeg) and Player:BuffUp(S.CharredPassionsBuff)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick rotation_pta 8"; end
   end
   -- blackout_kick
@@ -251,7 +251,7 @@ local function RotationPTA()
   -- spinning_crane_kick,if=(1.1>(time-action.melee_main_hand.last_used)*(1+spell_haste)-main_hand.2h)
   -- Note: Combining both lines.
   if S.SpinningCraneKick:IsReady() and (
-    (EnemiesCount8 > 2) or
+    (EnemiesCount5 > 2) or
     (1.1 > (GetTime() - Player:PrevGCDTime()) * (1 + Player:SpellHaste()) - num(Using2H))
   ) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick rotation_pta 30"; end
@@ -325,7 +325,7 @@ local function RotationBOC()
     if Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "black_ox_brew rotation_boc 26"; end
   end
   -- tiger_palm,if=(buff.blackout_combo.up&active_enemies=1)
-  if S.TigerPalm:IsReady() and (Player:BuffUp(S.BlackoutComboBuff) and EnemiesCount8 == 1) then
+  if S.TigerPalm:IsReady() and (Player:BuffUp(S.BlackoutComboBuff) and EnemiesCount5 == 1) then
     if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm rotation_boc 28"; end
   end
   -- breath_of_fire,if=(buff.charred_passions.remains<cooldown.blackout_kick.remains)
@@ -368,11 +368,11 @@ local function RotationBOC()
     if Cast(S.BreathofFire, Settings.Commons.GCDasOffGCD.BreathofFire, nil, not Target:IsInMeleeRange(12)) then return "breath_of_fire rotation_boc 44"; end
   end
   -- tiger_palm,if=active_enemies=1&!talent.blackout_combo.enabled
-  if S.TigerPalm:IsReady() and (EnemiesCount8 == 1 and not S.BlackoutCombo:IsAvailable()) then
+  if S.TigerPalm:IsReady() and (EnemiesCount5 == 1 and not S.BlackoutCombo:IsAvailable()) then
     if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm rotation_boc 46"; end
   end
   -- spinning_crane_kick,if=active_enemies>1
-  if S.SpinningCraneKick:IsReady() and (EnemiesCount8 > 1) then
+  if S.SpinningCraneKick:IsReady() and (EnemiesCount5 > 1) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick rotation_boc 48"; end
   end
   -- expel_harm
@@ -392,16 +392,16 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   -- Unit Update
-  Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
-  Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
-  EnemiesCount8 = #Enemies8y -- AOE Toogle
+  Enemies5y = Player:GetEnemiesInMeleeRange(5, S.TigerPalm) -- Multiple Abilities
+  --Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
+  EnemiesCount5 = #Enemies5y -- AOE Toogle
   
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
     BossFightRemains = HL.BossFightRemains()
     FightRemains = BossFightRemains
     if FightRemains == 11111 then
-      FightRemains = HL.FightRemains(Enemies8ySplash, false)
+      FightRemains = HL.FightRemains(Enemies5y, false)
     end
 
     -- Are we tanking?
