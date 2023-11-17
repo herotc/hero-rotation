@@ -285,10 +285,10 @@ local function Items()
   -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!pet.demonic_tyrant.active&trinket.2.cast_time>0|!trinket.2.cast_time>0)&(pet.demonic_tyrant.active)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
   -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|(trinket.1.cast_time>0&!pet.summon_demonic_tyrant.active|!trinket.1.cast_time>0)|cooldown.demonic_tyrant.remains_expected>20)
   -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|(trinket.2.cast_time>0&!pet.summon_demonic_tyrant.active|!trinket.2.cast_time>0)|cooldown.demonic_tyrant.remains_expected>20)
-  -- use_item,use_off_gcd=1,slot=main_hand,if=(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
+  -- use_item,use_off_gcd=1,slot=main_hand
   if Settings.Commons.Enabled.Items then
     local MainHandOnUse, _, MainHandRange = Player:GetUseableItems(OnUseExcludes, 16)
-    if MainHandOnUse and MainHandOnUse:IsReady() and ((Trinket1:Cooldown() == 0 or Trinket1:CooldownDown()) and (Trinket2:Cooldown() == 0 or Trinket2:CooldownDown())) then
+    if MainHandOnUse then
       if Cast(MainHandOnUse, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(MainHandRange)) then return "use_item for main_hand (" .. MainHandOnUse:Name() .. ") items 2"; end
     end
   end
