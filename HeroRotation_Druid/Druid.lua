@@ -252,6 +252,7 @@ Item.Druid.Commons = {
   AshesoftheEmbersoul                   = Item(207167, {13, 14}),
   BandolierofTwistedBlades              = Item(207165, {13, 14}),
   BeacontotheBeyond                     = Item(203963, {13, 14}),
+  FyrakksTaintedRageheart               = Item(207174, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
   MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
