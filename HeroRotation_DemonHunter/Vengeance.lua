@@ -464,7 +464,7 @@ end
 
 -- APL Main
 local function APL()
-  Enemies8yMelee = Player:GetEnemiesInMeleeRange(8)
+  Enemies8yMelee = Player:GetEnemiesInMeleeRange(8, S.SoulCleave)
   if (AoEON()) then
     EnemiesCount8yMelee = #Enemies8yMelee
   else

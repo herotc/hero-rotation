@@ -259,7 +259,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   if AoEON() then
-    Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
+    Enemies8y = Player:GetEnemiesInMeleeRange(8, S.ChaosStrike) -- Multiple Abilities
     Enemies20y = Player:GetEnemiesInMeleeRange(20) -- Eye Beam
     EnemiesCount8 = #Enemies8y
     EnemiesCount20 = #Enemies20y
