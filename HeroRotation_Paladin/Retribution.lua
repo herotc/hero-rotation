@@ -328,9 +328,9 @@ end
 local function APL()
   -- Enemies Update
   if AoEON() then
-    Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Divine Storm
+    Enemies8y = Player:GetEnemiesInMeleeRange(8, S.DivineStorm) -- Divine Storm
     EnemiesCount8y = #Enemies8y
-    Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Light's Judgment
+    Enemies5y = Player:GetEnemiesInMeleeRange(5, S.DivineStorm) -- Light's Judgment
   else
     Enemies8y = {}
     EnemiesCount8y = 1
