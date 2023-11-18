@@ -90,6 +90,7 @@ HR.GUISettings.APL.Mage = {
   },
   Arcane = {
     MirrorImagesBeforePull = true,
+    AEMainIcon = false,
     PotionType = {
       Selected = "Power",
     },
@@ -130,7 +131,7 @@ CreateARPanelOptions(CP_Mage, "APL.Mage.Commons")
 CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTemporalWarp", "Suggest Time Warp with Temporal Warp", "Show Time Warp when the Temporal Warp talent is selected.")
 
 -- Arcane
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.StayDistance", "Stay at distance", "Only use Arcane Explosion if in range or on the left icon.")
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AEMainIcon", "Show Arcane Explosion in Main Icon", "Enable this to show Arcane Explosion in the main icon. When not enabled, Arcane Explosion will be shown in the left icon.")
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MovingRotation", "Disable cast abilities when moving", "While moving, don't show abilities where a cast time is needed (makes the rotation a bit clunky with small steps).")
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MirrorImagesBeforePull", "Use Mirror Images Precombat", "Enable this option to show Mirror Images during Precombat.")
 CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane")

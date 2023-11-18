@@ -567,7 +567,7 @@ local function APL()
   GCDMax = Player:GCD() + 0.25
 
   -- Set which cast function to use for ArcaneExplosion
-  CastAE = (Settings.Arcane.StayDistance and not Target:IsInRange(10)) and CastLeft or Cast
+  CastAE = (Settings.Arcane.AEMainIcon) and Cast or CastLeft
 
   if Everyone.TargetIsValid() then
     -- arcane_intellect
