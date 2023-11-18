@@ -103,7 +103,7 @@ local function Precombat()
     if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst precombat 10"; end
   end
   if S.Charge:IsReady() and not TargetInMeleeRange then
-    if Cast(S.Charge) then return "charge precombat 12"; end
+    if Cast(S.Charge, nil, nil, not Target:IsInRange(25)) then return "charge precombat 12"; end
   end
 end
 
@@ -406,7 +406,7 @@ local function APL()
   EnrageUp = Player:BuffUp(S.EnrageBuff)
 
   -- Range check
-  TargetInMeleeRange = Target:IsSpellInRange(S.Bloodthirst)
+  TargetInMeleeRange = Target:IsInRange(5)
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
@@ -433,7 +433,7 @@ local function APL()
       if Cast(S.Charge, nil, Settings.Commons.DisplayStyle.Charge, not Target:IsSpellInRange(S.Charge)) then return "charge main 2"; end
     end
     -- heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
-    if S.HeroicLeap:IsCastable() and (not Target:IsInRange(25)) then
+    if S.HeroicLeap:IsCastable() and not TargetInMeleeRange and (not Target:IsInRange(25)) then
       if Cast(S.HeroicLeap, nil, Settings.Commons.DisplayStyle.HeroicLeap) then return "heroic_leap main 4"; end
     end
     -- potion
@@ -499,7 +499,7 @@ local function APL()
       end
       -- spear_of_bastion,if=buff.enrage.up&((buff.furious_bloodthirst.up&talent.titans_torment)|!talent.titans_torment|target.time_to_die<20|active_enemies>1|!set_bonus.tier31_2pc)&raid_event.adds.in>15
       if S.SpearofBastion:IsCastable() and (EnrageUp and ((Player:BuffUp(S.FuriousBloodthirstBuff) and S.TitansTorment:IsAvailable()) or not S.TitansTorment:IsAvailable() or FightRemains < 20 or EnemiesMeleeCount > 1 or not Player:HasTier(31, 2))) then
-        if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "spear_of_bastion main 26"; end
+        if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "spear_of_bastion main 26"; end
       end
     end
     -- call_action_list,name=multi_target,if=active_enemies>=2
