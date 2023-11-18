@@ -53,10 +53,9 @@ local Settings = {
 }
 
 -- Rotation Var
-local SoulFragments
---local LastSoulFragmentAdjustment
---local SoulFragmentsAdjusted = 0
+local SoulFragments, AllSoulFragments
 local AuraSoulFragments, IncSoulFragments
+local VarEDFragments = (S.SoulSigils:IsAvailable()) and 4 or 3
 local IsInMeleeRange, IsInAoERange
 local ActiveMitigationNeeded
 local IsTanking
@@ -71,70 +70,9 @@ HL:RegisterForEvent(function()
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
--- Supplanted by event-based tracking. Leaving here in case a revert is needed.
---[[ Soul Fragments function taking into consideration aura lag
-local function UpdateSoulFragments()
-  SoulFragments = Player:BuffStack(S.SoulFragments)
-
-  -- Check if we have cast Soul Carver, Fracture, or Shear within the last GCD and haven't "snapshot" yet
-  local MetaMod = (Player:BuffUp(S.MetamorphosisBuff)) and 1 or 0
-  if S.SoulCarver:IsAvailable() and S.SoulCarver:TimeSinceLastCast() < Player:GCD() and S.SoulCarver.LastCastTime ~= LastSoulFragmentAdjustment then
-    SoulFragmentsAdjusted = mathmin(SoulFragments + 2, 5)
-    LastSoulFragmentAdjustment = S.SoulCarver.LastCastTime
-  elseif S.Fracture:IsAvailable() and S.Fracture:TimeSinceLastCast() < Player:GCD() and S.Fracture.LastCastTime ~= LastSoulFragmentAdjustment then
-    SoulFragmentsAdjusted = mathmin(SoulFragments + 2 + MetaMod, 5)
-    LastSoulFragmentAdjustment = S.Fracture.LastCastTime
-  elseif S.Shear:TimeSinceLastCast() < Player:GCD() and S.Fracture.Shear ~= LastSoulFragmentAdjustment then
-    SoulFragmentsAdjusted = mathmin(SoulFragments + 1 + MetaMod, 5)
-    LastSoulFragmentAdjustment = S.Shear.LastCastTime
-  elseif S.ElysianDecree:TimeSinceLastCast() < Player:GCD() and S.ElysianDecree ~= LastSoulFragmentAdjustment then
-    local NewFrags = (S.SoulSigils:IsAvailable()) and 4 or 3
-    SoulFragmentsAdjusted = mathmin(SoulFragments + NewFrags, 5)
-    LastSoulFragmentAdjustment = S.ElysianDecree.LastCastTime
-  elseif S.SoulSigils:IsAvailable() then
-    local SigilLastCastTime = mathmax(S.SigilofFlame.LastCastTime, S.SigilofSilence.LastCastTime, S.SigilofChains.LastCastTime)
-    local SigilTSLC = mathmin(S.SigilofFlame:TimeSinceLastCast(), S.SigilofSilence:TimeSinceLastCast(), S.SigilofChains:TimeSinceLastCast())
-    if SigilTSLC < Player:GCD() and SigilLastCastTime ~= LastSoulFragmentAdjustment then
-      SoulFragmentsAdjusted = mathmin(SoulFragments + 1, 5)
-      LastSoulFragmentAdjustment = SigilLastCastTime
-    end
-  elseif S.Fallout:IsAvailable() and S.ImmolationAura:TimeSinceLastCast() < Player:GCD() and S.ImmolationAura.LastCastTime ~= LastSoulFragmentAdjustment then
-    local NewFrags = 0.6 * mathmin(EnemiesCount8yMelee, 5)
-    SoulFragmentsAdjusted = mathmin(SoulFragments + NewFrags, 5)
-    LastSoulFragmentAdjustment = S.ImmolationAura.LastCastTime
-  elseif S.BulkExtraction:IsAvailable() and S.BulkExtraction:TimeSinceLastCast() < Player:GCD() and S.BulkExtraction.LastCastTime ~= LastSoulFragmentAdjustment then
-    local NewFrags = mathmin(EnemiesCount8yMelee, 5)
-    SoulFragmentsAdjusted = mathmin(SoulFragments + NewFrags, 5)
-    LastSoulFragmentAdjustment = S.BulkExtraction.LastCastTime
-  end
-  -- If we have a soul fragement "snapshot", see if we should invalidate it based on time
-  local Prev = Player:PrevGCD(1)
-  local FragAbilities = { S.SoulCarver, S.Fracture, S.Shear, S.BulkExtraction }
-  if S.SoulSigils:IsAvailable() then
-    tableinsert(FragAbilities, S.SigilofFlame)
-    tableinsert(FragAbilities, S.SigilofSilence)
-    tableinsert(FragAbilities, S.SigilofChains)
-    tableinsert(FragAbilities, S.ElysianDecree)
-  end
-  if S.Fallout:IsAvailable() then
-    tableinsert(FragAbilities, S.ImmolationAura)
-  end
-  for _, FragAbility in pairs(FragAbilities) do
-    if Prev == FragAbility:ID() and FragAbility:TimeSinceLastCast() >= Player:GCD() then
-      SoulFragmentsAdjusted = 0
-      break
-    end
-  end
-
-  -- If we have a higher Soul Fragment "snapshot", use it instead
-  if SoulFragmentsAdjusted > SoulFragments then
-    SoulFragments = SoulFragmentsAdjusted
-  elseif SoulFragmentsAdjusted > 0 then
-    -- Otherwise, the "snapshot" is invalid, so reset it if it has a value
-    -- Relevant in cases where we use a generator two GCDs in a row
-    SoulFragmentsAdjusted = 0
-  end
-end]]
+HL:RegisterForEvent(function()
+  VarEDFragments = (S.SoulSigils:IsAvailable()) and 4 or 3
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 -- Melee Is In Range w/ Movement Handlers
 local function UpdateIsInMeleeRange()
@@ -224,6 +162,9 @@ local function Maintenance()
     if Cast(S.BulkExtraction, Settings.Vengeance.GCDasOffGCD.BulkExtraction, nil, not Target:IsInMeleeRange(8)) then return "bulk_extraction maintenance 8"; end
   end
   -- spirit_bomb,if=variable.can_spb
+  if VarNoMaintCleave and not VarCanSpB then
+    if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Spirit Bomb"; end
+  end
   if S.SpiritBomb:IsReady() and (VarCanSpB) then
     if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb maintenance 10"; end
   end
@@ -240,11 +181,14 @@ local function Maintenance()
     if Cast(S.Shear, nil, nil, not IsInMeleeRange) then return "shear maintenance 16"; end
   end
   -- spirit_bomb,if=fury.deficit<=30&spell_targets>1&soul_fragments>=4
+  if Player:FuryDeficit() <= 30 and EnemiesCount8yMelee > 1 and AllSoulFragments >= 4 and SoulFragments < 4 then
+    if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Spirit Bomb"; end
+  end
   if S.SpiritBomb:IsReady() and (Player:FuryDeficit() <= 30 and EnemiesCount8yMelee > 1 and SoulFragments >= 4) then
     if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb maintenance 18"; end
   end
   -- soul_cleave,if=fury.deficit<=30
-  if S.SoulCleave:IsReady() and (Player:FuryDeficit() <= 30) then
+  if S.SoulCleave:IsReady() and not VarNoMaintCleave and (Player:FuryDeficit() <= 30) then
     if Cast(S.SoulCleave, nil, nil, not IsInMeleeRange) then return "soul_cleave maintenance 20"; end
   end
 end
@@ -267,7 +211,7 @@ local function FieryDemise()
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation fiery_demise 8"; end
   end
   -- soul_carver
-  if S.SoulCarver:IsCastable() then
+  if S.SoulCarver:IsCastable() and AllSoulFragments < 3 then
     if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver fiery_demise 10"; end
   end
   -- the_hunt
@@ -275,10 +219,13 @@ local function FieryDemise()
     if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt fiery_demise 12"; end
   end
   -- elysian_decree,line_cd=1.85
-  if S.ElysianDecree:IsCastable() and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
+  if S.ElysianDecree:IsCastable() and AllSoulFragments + VarEDFragments <= 5 and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree fiery_demise 14"; end
   end
   -- spirit_bomb,if=variable.can_spb
+  if VarNoMaintCleave and not VarCanSpB then
+    if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Spirit Bomb"; end
+  end
   if S.SpiritBomb:IsReady() and (VarCanSpB) then
     if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb fiery_demise 16"; end
   end
@@ -313,7 +260,7 @@ local function SingleTarget()
     if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt single_target 2"; end
   end
   -- soul_carver
-  if S.SoulCarver:IsCastable() then
+  if S.SoulCarver:IsCastable() and AllSoulFragments < 3 then
     if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver single_target 4"; end
   end
   -- fel_devastation,if=talent.collective_anguish|(talent.stoke_the_flames&talent.burning_blood)
@@ -321,7 +268,7 @@ local function SingleTarget()
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation single_target 6"; end
   end
   -- elysian_decree
-  if S.ElysianDecree:IsCastable() then
+  if S.ElysianDecree:IsCastable() and AllSoulFragments + VarEDFragments <= 5 then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree single_target 8"; end
   end
   -- fel_devastation
@@ -358,7 +305,7 @@ local function SmallAoE()
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation small_aoe 4"; end
   end
   -- elysian_decree,line_cd=1.85
-  if S.ElysianDecree:IsCastable() and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
+  if S.ElysianDecree:IsCastable() and AllSoulFragments + VarEDFragments <= 5 and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree small_aoe 6"; end
   end
   -- fel_devastation
@@ -366,10 +313,13 @@ local function SmallAoE()
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation small_aoe 8"; end
   end
   -- soul_carver
-  if S.SoulCarver:IsCastable() then
+  if S.SoulCarver:IsCastable() and AllSoulFragments < 3 then
     if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver small_aoe 10"; end
   end
   -- spirit_bomb,if=soul_fragments>=5
+  if AllSoulFragments >= 5 and SoulFragments < 5 then
+    if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Spirit Bomb"; end
+  end
   if S.SpiritBomb:IsReady() and (SoulFragments >= 5) then
     if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb small_aoe 12"; end
   end
@@ -403,7 +353,7 @@ local function BigAoE()
     if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt big_aoe 4"; end
   end
   -- elysian_decree,line_cd=1.85
-  if S.ElysianDecree:IsCastable() and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
+  if S.ElysianDecree:IsCastable() and AllSoulFragments + VarEDFragments <= 5 and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree big_aoe 6"; end
   end
   -- fel_devastation
@@ -411,10 +361,13 @@ local function BigAoE()
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation big_aoe 8"; end
   end
   -- soul_carver
-  if S.SoulCarver:IsCastable() then
+  if S.SoulCarver:IsCastable() and AllSoulFragments < 3 then
     if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver big_aoe 10"; end
   end
   -- spirit_bomb,if=soul_fragments>=4
+  if AllSoulFragments >= 4 and SoulFragments < 4 then
+    if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Spirit Bomb"; end
+  end
   if S.SpiritBomb:IsReady() and (SoulFragments >= 4) then
     if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb big_aoe 12"; end
   end
@@ -464,7 +417,7 @@ end
 
 -- APL Main
 local function APL()
-  Enemies8yMelee = Player:GetEnemiesInMeleeRange(8, S.SoulCleave)
+  Enemies8yMelee = Player:GetEnemiesInMeleeRange(8)
   if (AoEON()) then
     EnemiesCount8yMelee = #Enemies8yMelee
   else
@@ -483,7 +436,8 @@ local function APL()
     --UpdateSoulFragments()
     AuraSoulFragments = DemonHunter.Souls.AuraSouls
     IncSoulFragments = DemonHunter.Souls.IncomingSouls
-    SoulFragments = AuraSoulFragments + IncSoulFragments
+    SoulFragments = AuraSoulFragments
+    AllSoulFragments = SoulFragments + IncSoulFragments
 
     -- Update if target is in melee range
     UpdateIsInMeleeRange()
@@ -505,7 +459,7 @@ local function APL()
     -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
     -- Note: Ruby Whelp Shell is already globally excluded.
     -- variable,name=dont_cleave,value=(cooldown.fel_devastation.remains<=(action.soul_cleave.execute_time+gcd.remains))&fury<80
-    VarDontCleave = ((S.FelDevastation:CooldownRemains() <= (S.SoulCleave:ExecuteTime() + Player:GCDRemains())) and Player:Fury() < 80)
+    VarDontCleave = ((S.FelDevastation:CooldownRemains() <= (S.SoulCleave:ExecuteTime() + Player:GCDRemains())) and Player:Fury() < 80 or IncSoulFragments > 1 or AllSoulFragments >= 5)
     -- variable,name=fd_ready,value=talent.fiery_brand&talent.fiery_demise&active_dot.fiery_brand>0
     VarFDReady = S.FieryBrand:IsAvailable() and S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() > 0
     -- variable,name=dont_cleave,value=(cooldown.fel_devastation.remains<=(action.soul_cleave.execute_time+gcd.remains))&fury<80
@@ -521,6 +475,12 @@ local function APL()
       VarCanSpB = (VarST and SoulFragments >= 5) or (VarSmallAoE and SoulFragments >= 4) or (VarBigAoE and SoulFragments >= 3)
     else
       VarCanSpB = (VarSmallAoE and SoulFragments >= 5) or (VarBigAoE and SoulFragments >= 4)
+    end
+    -- Note: Manually added variable for holding maintenance SoulCleave if incoming souls would make VarCanSpB true
+    if VarFDReady then
+      VarNoMaintCleave = (VarST and AllSoulFragments >= 5) or (VarSmallAoE and AllSoulFragments >= 4) or (VarBigAoE and AllSoulFragments >= 3)
+    else
+      VarNoMaintCleave = (VarSmallAoE and AllSoulFragments >= 5) or (VarBigAoE and AllSoulFragments >= 4)
     end
     -- auto_attack
     -- disrupt,if=target.debuff.casting.react (Interrupts)
