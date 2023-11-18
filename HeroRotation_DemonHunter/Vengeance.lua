@@ -260,7 +260,7 @@ local function SingleTarget()
     if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt single_target 2"; end
   end
   -- soul_carver
-  if S.SoulCarver:IsCastable() and AllSoulFragments < 3 then
+  if S.SoulCarver:IsCastable() then
     if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver single_target 4"; end
   end
   -- fel_devastation,if=talent.collective_anguish|(talent.stoke_the_flames&talent.burning_blood)
@@ -268,7 +268,7 @@ local function SingleTarget()
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation single_target 6"; end
   end
   -- elysian_decree
-  if S.ElysianDecree:IsCastable() and AllSoulFragments + VarEDFragments <= 5 then
+  if S.ElysianDecree:IsCastable() then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree single_target 8"; end
   end
   -- fel_devastation
@@ -305,7 +305,7 @@ local function SmallAoE()
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation small_aoe 4"; end
   end
   -- elysian_decree,line_cd=1.85
-  if S.ElysianDecree:IsCastable() and AllSoulFragments + VarEDFragments <= 5 and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
+  if S.ElysianDecree:IsCastable() and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree small_aoe 6"; end
   end
   -- fel_devastation
@@ -353,7 +353,7 @@ local function BigAoE()
     if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt big_aoe 4"; end
   end
   -- elysian_decree,line_cd=1.85
-  if S.ElysianDecree:IsCastable() and AllSoulFragments + VarEDFragments <= 5 and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
+  if S.ElysianDecree:IsCastable() and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree big_aoe 6"; end
   end
   -- fel_devastation
@@ -459,7 +459,7 @@ local function APL()
     -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
     -- Note: Ruby Whelp Shell is already globally excluded.
     -- variable,name=dont_cleave,value=(cooldown.fel_devastation.remains<=(action.soul_cleave.execute_time+gcd.remains))&fury<80
-    VarDontCleave = ((S.FelDevastation:CooldownRemains() <= (S.SoulCleave:ExecuteTime() + Player:GCDRemains())) and Player:Fury() < 80 or IncSoulFragments > 1 or AllSoulFragments >= 5)
+    -- Note: Moved below VarST/VarSmallAoE/VarBigAoE definitions, as we've manually added a VarST check.
     -- variable,name=fd_ready,value=talent.fiery_brand&talent.fiery_demise&active_dot.fiery_brand>0
     VarFDReady = S.FieryBrand:IsAvailable() and S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() > 0
     -- variable,name=dont_cleave,value=(cooldown.fel_devastation.remains<=(action.soul_cleave.execute_time+gcd.remains))&fury<80
@@ -470,6 +470,8 @@ local function APL()
     VarSmallAoE = EnemiesCount8yMelee >= 2 and EnemiesCount8yMelee <= 5
     -- variable,name=big_aoe,value=spell_targets.spirit_bomb>=6
     VarBigAoE = EnemiesCount8yMelee >= 6
+    -- Note: Below line moved from above.
+    VarDontCleave = ((S.FelDevastation:CooldownRemains() <= (S.SoulCleave:ExecuteTime() + Player:GCDRemains())) and Player:Fury() < 80 or (IncSoulFragments > 1 or AllSoulFragments >= 5) and not VarST)
     -- variable,name=can_spb,op=setif,condition=variable.fd_ready,value=(variable.single_target&soul_fragments>=5)|(variable.small_aoe&soul_fragments>=4)|(variable.big_aoe&soul_fragments>=3),value_else=(variable.small_aoe&soul_fragments>=5)|(variable.big_aoe&soul_fragments>=4)
     if VarFDReady then
       VarCanSpB = (VarST and SoulFragments >= 5) or (VarSmallAoE and SoulFragments >= 4) or (VarBigAoE and SoulFragments >= 3)
