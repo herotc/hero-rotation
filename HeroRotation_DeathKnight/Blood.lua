@@ -99,6 +99,7 @@ local function Precombat()
   -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|(trinket.2.has_buff.strength|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit)
   -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon
   -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
+  -- variable,name=damage_trinket_priority,op=setif,value=2,value_else=1,condition=trinket.2.ilvl>trinket.1.ilvl
   -- Note: Can't handle checking for specific stat buffs.
   -- Manually added: Openers
   if S.DeathsCaress:IsReady() then
@@ -282,8 +283,8 @@ local function Standard()
 end
 
 local function Trinkets()
-  -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs
-  -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs
+  -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|!trinket.2.has_cooldown)
+  -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains|!trinket.1.has_cooldown)
   -- use_item,use_off_gcd=1,slot=main_hand,if=(variable.trinket_1_buffs|trinket.1.cooldown.remains)&(variable.trinket_2_buffs|trinket.2.cooldown.remains)
   -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)&(variable.trinket_2_exclude|trinket.2.cooldown.remains|!trinket.2.has_cooldown|variable.trinket_2_buffs)
   -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)&(variable.trinket_1_exclude|trinket.1.cooldown.remains|!trinket.1.has_cooldown|variable.trinket_1_buffs)
@@ -421,9 +422,7 @@ local function APL()
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool for DRWUp"; end
     end
     -- call_action_list,name=standard
-    if (true) then
-      local ShouldReturn = Standard(); if ShouldReturn then return ShouldReturn; end
-    end
+    local ShouldReturn = Standard(); if ShouldReturn then return ShouldReturn; end
     -- Pool if nothing else to do
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
