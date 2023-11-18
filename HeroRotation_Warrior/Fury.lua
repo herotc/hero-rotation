@@ -46,7 +46,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 -- Enemies Variables
-local Enemies8y, EnemiesCount8y
+local EnemiesMelee, EnemiesMeleeCount
 local TargetInMeleeRange
 
 -- GUI Settings
@@ -109,15 +109,15 @@ end
 
 local function MultiTarget()
   -- recklessness,if=raid_event.adds.in>15|active_enemies>1|target.time_to_die<12
-  if CDsON() and S.Recklessness:IsCastable() and (EnemiesCount8y > 1 or FightRemains < 12) then
+  if CDsON() and S.Recklessness:IsCastable() and (EnemiesMeleeCount > 1 or FightRemains < 12) then
     if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness multi_target 2"; end
   end
   -- odyns_fury,if=active_enemies>1&talent.titanic_rage&(!buff.meat_cleaver.up|buff.avatar.up|buff.recklessness.up)
-  if CDsON() and S.OdynsFury:IsCastable() and (EnemiesCount8y > 1 and S.TitanicRage:IsAvailable() and (Player:BuffDown(S.MeatCleaverBuff) or Player:BuffUp(S.AvatarBuff) or Player:BuffUp(S.RecklessnessBuff))) then
+  if CDsON() and S.OdynsFury:IsCastable() and (EnemiesMeleeCount > 1 and S.TitanicRage:IsAvailable() and (Player:BuffDown(S.MeatCleaverBuff) or Player:BuffUp(S.AvatarBuff) or Player:BuffUp(S.RecklessnessBuff))) then
     if Cast(S.OdynsFury, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 4"; end
   end
   -- whirlwind,if=spell_targets.whirlwind>1&talent.improved_whirlwind&!buff.meat_cleaver.up|raid_event.adds.in<2&talent.improved_whirlwind&!buff.meat_cleaver.up
-  if S.Whirlwind:IsCastable() and (EnemiesCount8y > 1 and S.ImprovedWhilwind:IsAvailable() and Player:BuffDown(S.MeatCleaverBuff)) then
+  if S.Whirlwind:IsCastable() and (EnemiesMeleeCount > 1 and S.ImprovedWhilwind:IsAvailable() and Player:BuffDown(S.MeatCleaverBuff)) then
     if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind multi_target 6"; end
   end
   -- execute,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd
@@ -129,7 +129,7 @@ local function MultiTarget()
     if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar multi_target 10"; end
   end
   -- odyns_fury,if=active_enemies>1&buff.enrage.up&raid_event.adds.in>15
-  if CDsON() and S.OdynsFury:IsCastable() and (EnemiesCount8y > 1 and EnrageUp) then
+  if CDsON() and S.OdynsFury:IsCastable() and (EnemiesMeleeCount > 1 and EnrageUp) then
     if Cast(S.OdynsFury, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 12"; end
   end
   local BTCritChance = Player:CritChancePct() + num(Player:BuffUp(S.RecklessnessBuff)) * 20 + Player:BuffStack(S.MercilessAssaultBuff) * 10 + Player:BuffStack(S.BloodcrazeBuff) * 15
@@ -227,7 +227,7 @@ end
 
 local function SingleTarget()
   -- whirlwind,if=spell_targets.whirlwind>1&talent.improved_whirlwind&!buff.meat_cleaver.up|raid_event.adds.in<2&talent.improved_whirlwind&!buff.meat_cleaver.up
-  if S.Whirlwind:IsCastable() and (EnemiesCount8y > 1 and S.ImprovedWhilwind:IsAvailable() and Player:BuffDown(S.MeatCleaverBuff)) then
+  if S.Whirlwind:IsCastable() and (EnemiesMeleeCount > 1 and S.ImprovedWhilwind:IsAvailable() and Player:BuffDown(S.MeatCleaverBuff)) then
     if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 2"; end
   end
   -- execute,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd
@@ -388,18 +388,18 @@ end
 
 local function Variables()
   -- variable,name=st_planning,value=active_enemies=1&(raid_event.adds.in>15|!raid_event.adds.exists)
-  VarSTPlanning = (EnemiesCount8y == 1)
+  VarSTPlanning = (EnemiesMeleeCount == 1)
   -- variable,name=adds_remain,value=active_enemies>=2&(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.remains>5)
-  VarAddsRemain = (EnemiesCount8y >= 2)
+  VarAddsRemain = (EnemiesMeleeCount >= 2)
 end
 
 --- ======= ACTION LISTS =======
 local function APL()
   if AoEON() then
-    Enemies8y = Player:GetEnemiesInMeleeRange(8, S.Bloodthirst)
-    EnemiesCount8y = #Enemies8y
+    EnemiesMelee = Player:GetEnemiesInMeleeRange(5)
+    EnemiesMeleeCount = #EnemiesMelee
   else
-    EnemiesCount8y = 1
+    EnemiesMeleeCount = 1
   end
 
   -- Enrage check
@@ -413,7 +413,7 @@ local function APL()
     BossFightRemains = HL.BossFightRemains()
     FightRemains = BossFightRemains
     if FightRemains == 11111 then
-      FightRemains = HL.FightRemains(Enemies10yd, false)
+      FightRemains = HL.FightRemains(EnemiesMelee, false)
     end
   end
 
@@ -498,16 +498,16 @@ local function APL()
         if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 24"; end
       end
       -- spear_of_bastion,if=buff.enrage.up&((buff.furious_bloodthirst.up&talent.titans_torment)|!talent.titans_torment|target.time_to_die<20|active_enemies>1|!set_bonus.tier31_2pc)&raid_event.adds.in>15
-      if S.SpearofBastion:IsCastable() and (EnrageUp and ((Player:BuffUp(S.FuriousBloodthirstBuff) and S.TitansTorment:IsAvailable()) or not S.TitansTorment:IsAvailable() or FightRemains < 20 or EnemiesCount8y > 1 or not Player:HasTier(31, 2))) then
+      if S.SpearofBastion:IsCastable() and (EnrageUp and ((Player:BuffUp(S.FuriousBloodthirstBuff) and S.TitansTorment:IsAvailable()) or not S.TitansTorment:IsAvailable() or FightRemains < 20 or EnemiesMeleeCount > 1 or not Player:HasTier(31, 2))) then
         if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "spear_of_bastion main 26"; end
       end
     end
     -- call_action_list,name=multi_target,if=active_enemies>=2
-    if AoEON() and EnemiesCount8y >= 2 then
+    if AoEON() and EnemiesMeleeCount >= 2 then
       local ShouldReturn = MultiTarget(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=single_target,if=active_enemies=1
-    if EnemiesCount8y == 1 then
+    if EnemiesMeleeCount == 1 then
       local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
     end
     -- Pool if nothing else to suggest

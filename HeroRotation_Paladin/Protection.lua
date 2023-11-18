@@ -270,7 +270,7 @@ end
 
 -- APL Main
 local function APL()
-  Enemies8y = Player:GetEnemiesInMeleeRange(8, S.ShieldoftheRighteous)
+  Enemies8y = Player:GetEnemiesInMeleeRange(8)
   Enemies30y = Player:GetEnemiesInRange(30)
   if (AoEON()) then
     EnemiesCount8y = #Enemies8y

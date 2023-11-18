@@ -683,9 +683,8 @@ end
 local function APL()
   -- Update Enemies
   if AoEON() then
-    EnemiesMelee = Player:GetEnemiesInMeleeRange(8, S.Shred)
-    local RangeSpell = (S.BrutalSlash:IsAvailable()) and S.BrutalSlash or S.Swipe
-    Enemies11y = Player:GetEnemiesInMeleeRange(11, RangeSpell)
+    EnemiesMelee = Player:GetEnemiesInMeleeRange(5)
+    Enemies11y = Player:GetEnemiesInMeleeRange(13)
     EnemiesCountMelee = #EnemiesMelee
     EnemiesCount11y = #Enemies11y
   else
@@ -695,10 +694,6 @@ local function APL()
     EnemiesCount11y = 1
   end
 
-  -- Combo Points
-  ComboPoints = Player:ComboPoints()
-  ComboPointsDeficit = Player:ComboPointsDeficit()
-
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
     BossFightRemains = HL.BossFightRemains()
@@ -706,6 +701,10 @@ local function APL()
     if FightRemains == 11111 then
       FightRemains = HL.FightRemains(Enemies11y, false)
     end
+
+    -- Combo Points
+    ComboPoints = Player:ComboPoints()
+    ComboPointsDeficit = Player:ComboPointsDeficit()
   end
 
   -- cat_form OOC, if setting is true

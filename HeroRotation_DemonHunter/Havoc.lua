@@ -51,8 +51,8 @@ local trinket1 = equip[13] and Item(equip[13]) or Item(0)
 local trinket2 = equip[14] and Item(equip[14]) or Item(0)
 
 -- Rotation Var
-local Enemies8y, Enemies20y
-local EnemiesCount8, EnemiesCount20
+local EnemiesMelee, Enemies20y
+local EnemiesMeleeCount, Enemies20yCount
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -125,7 +125,7 @@ end
 
 local function EvaluateTargetIfDemonsBite(TargetUnit)
   -- if=talent.burning_wound&debuff.burning_wound.remains<4&active_dot.burning_wound<(spell_targets>?3)
-  return S.BurningWound:IsAvailable() and TargetUnit:DebuffRemains(S.BurningWoundDebuff) < 4 and S.BurningWoundDebuff:AuraActiveCount() < mathmin(EnemiesCount8, 3)
+  return S.BurningWound:IsAvailable() and TargetUnit:DebuffRemains(S.BurningWoundDebuff) < 4 and S.BurningWoundDebuff:AuraActiveCount() < mathmin(EnemiesMeleeCount, 3)
 end
 
 local function Precombat()
@@ -259,13 +259,13 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   if AoEON() then
-    Enemies8y = Player:GetEnemiesInMeleeRange(8, S.ChaosStrike) -- Multiple Abilities
+    EnemiesMelee = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
     Enemies20y = Player:GetEnemiesInMeleeRange(20) -- Eye Beam
-    EnemiesCount8 = #Enemies8y
-    EnemiesCount20 = #Enemies20y
+    EnemiesMeleeCount = #EnemiesMelee
+    Enemies20yCount = #Enemies20y
   else
-    EnemiesCount8 = 1
-    EnemiesCount20 = 1
+    EnemiesMeleeCount = 1
+    Enemies20yCount = 1
   end
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
@@ -273,7 +273,7 @@ local function APL()
     BossFightRemains = HL.BossFightRemains()
     FightRemains = BossFightRemains
     if FightRemains == 11111 then
-      FightRemains = HL.FightRemains(Enemies8y, false)
+      FightRemains = HL.FightRemains(EnemiesMelee, false)
     end
 
     -- Calculate gcd.max
@@ -296,7 +296,7 @@ local function APL()
     -- retarget_auto_attack,line_cd=1,target_if=min:debuff.burning_wound.remains,if=talent.burning_wound&talent.demon_blades&active_dot.burning_wound<(spell_targets>?3)
     -- retarget_auto_attack,line_cd=1,target_if=min:!target.is_boss,if=talent.burning_wound&talent.demon_blades&active_dot.burning_wound=(spell_targets>?3)
     -- variable,name=blade_dance,value=talent.first_blood|talent.trail_of_ruin|talent.chaos_theory&buff.chaos_theory.down|spell_targets.blade_dance1>1
-    VarBladeDance = (S.FirstBlood:IsAvailable() or S.TrailofRuin:IsAvailable() or S.ChaosTheory:IsAvailable() and Player:BuffDown(S.ChaosTheoryBuff) or EnemiesCount8 > 1)
+    VarBladeDance = (S.FirstBlood:IsAvailable() or S.TrailofRuin:IsAvailable() or S.ChaosTheory:IsAvailable() and Player:BuffDown(S.ChaosTheoryBuff) or EnemiesMeleeCount > 1)
     -- variable,name=pooling_for_blade_dance,value=variable.blade_dance&fury<(75-talent.demon_blades*20)&cooldown.blade_dance.remains<gcd.max
     VarPoolingForBladeDance = (VarBladeDance and Player:Fury() < (75 - num(S.DemonBlades:IsAvailable()) * 20) and S.BladeDance:CooldownRemains() < GCDMax)
     -- variable,name=pooling_for_eye_beam,value=talent.demonic&!talent.blind_fury&cooldown.eye_beam.remains<(gcd.max*3)&fury.deficit>30
@@ -310,7 +310,7 @@ local function APL()
     -- invoke_external_buff,name=power_infusion,if=buff.metamorphosis.up
     -- Note: Not handling external buffs
     -- immolation_aura,if=talent.ragefire&active_enemies>=3&(cooldown.blade_dance.remains|debuff.essence_break.down)
-    if S.ImmolationAura:IsCastable() and (S.Ragefire:IsAvailable() and EnemiesCount8 >= 3 and (S.BladeDance:CooldownDown() or Target:DebuffDown(S.EssenceBreakDebuff))) then
+    if S.ImmolationAura:IsCastable() and (S.Ragefire:IsAvailable() and EnemiesMeleeCount >= 3 and (S.BladeDance:CooldownDown() or Target:DebuffDown(S.EssenceBreakDebuff))) then
       if Cast(S.ImmolationAura, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura main 2"; end
     end
     -- disrupt (and stun interrupts)
@@ -353,7 +353,7 @@ local function APL()
     -- Note: CDsON check is within Cooldown(), as the function also includes trinkets and potions
     local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=meta_end,if=buff.metamorphosis.up&buff.metamorphosis.remains<gcd.max&active_enemies<3
-    if Player:BuffUp(S.MetamorphosisBuff) and Player:BuffRemains(S.MetamorphosisBuff) < GCDMax and EnemiesCount8 < 3 then
+    if Player:BuffUp(S.MetamorphosisBuff) and Player:BuffRemains(S.MetamorphosisBuff) < GCDMax and EnemiesMeleeCount < 3 then
       local ShouldReturn = MetaEnd(); if ShouldReturn then return ShouldReturn; end
     end
     -- pick_up_fragment,type=demon,if=demon_soul_fragments>0&(cooldown.eye_beam.remains<6|buff.metamorphosis.remains>5)&buff.empowered_demon_soul.remains<3|fight_remains<17
@@ -397,15 +397,15 @@ local function APL()
       if Cast(S.DeathSweep, nil, nil, not IsInMeleeRange(8)) then return "death_sweep main 34"; end
     end
     -- the_hunt,if=debuff.essence_break.down&(time<10|cooldown.metamorphosis.remains>10|!equipped.algethar_puzzle_box)&(raid_event.adds.in>90|active_enemies>3|time_to_die<10)&(debuff.essence_break.down&(!talent.furious_gaze|buff.furious_gaze.up|set_bonus.tier31_4pc)|!set_bonus.tier30_2pc)&time>10
-    if S.TheHunt:IsCastable() and (Target:DebuffDown(S.EssenceBreakDebuff) and (CombatTime < 10 or S.Metamorphosis:CooldownRemains() > 10 or not I.AlgetharPuzzleBox:IsEquipped()) and (EnemiesCount8 == 1 or EnemiesCount8 > 3 or FightRemains < 10) and (Target:DebuffDown(S.EssenceBreakDebuff) and (not S.FuriousGaze:IsAvailable() or Player:BuffUp(S.FuriousGazeBuff) or Player:HasTier(31, 4)) or not Player:HasTier(30, 2)) and CombatTime > 10) then
+    if S.TheHunt:IsCastable() and (Target:DebuffDown(S.EssenceBreakDebuff) and (CombatTime < 10 or S.Metamorphosis:CooldownRemains() > 10 or not I.AlgetharPuzzleBox:IsEquipped()) and (EnemiesMeleeCount == 1 or EnemiesMeleeCount > 3 or FightRemains < 10) and (Target:DebuffDown(S.EssenceBreakDebuff) and (not S.FuriousGaze:IsAvailable() or Player:BuffUp(S.FuriousGazeBuff) or Player:HasTier(31, 4)) or not Player:HasTier(30, 2)) and CombatTime > 10) then
       if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt main 36"; end
     end
     -- fel_barrage,if=active_enemies>desired_targets|raid_event.adds.in>30&fury.deficit<20&buff.metamorphosis.down
-    if S.FelBarrage:IsCastable() and (EnemiesCount8 > 1 or EnemiesCount8 == 1 and Player:FuryDeficit() < 20 and Player:BuffDown(S.MetamorphosisBuff)) then
+    if S.FelBarrage:IsCastable() and (EnemiesMeleeCount > 1 or EnemiesMeleeCount == 1 and Player:FuryDeficit() < 20 and Player:BuffDown(S.MetamorphosisBuff)) then
       if Cast(S.FelBarrage, nil, nil, not IsInMeleeRange(8)) then return "fel_barrage main 38"; end
     end
     -- glaive_tempest,if=(active_enemies>desired_targets|raid_event.adds.in>10)&(debuff.essence_break.down|active_enemies>1)&buff.fel_barrage.down
-    if S.GlaiveTempest:IsReady() and ((Target:DebuffDown(S.EssenceBreakDebuff) or EnemiesCount8 > 1) and Player:BuffDown(S.FelBarrage)) then
+    if S.GlaiveTempest:IsReady() and ((Target:DebuffDown(S.EssenceBreakDebuff) or EnemiesMeleeCount > 1) and Player:BuffDown(S.FelBarrage)) then
       if Cast(S.GlaiveTempest, Settings.Havoc.GCDasOffGCD.GlaiveTempest) then return "glaive_tempest main 40"; end
     end
     -- annihilation,if=buff.inner_demon.up&cooldown.eye_beam.remains<=gcd&buff.fel_barrage.down
@@ -425,15 +425,15 @@ local function APL()
       if Cast(S.BladeDance, nil, nil, not IsInMeleeRange(8)) then return "blade_dance main 47"; end
     end
     -- sigil_of_flame,if=talent.any_means_necessary&debuff.essence_break.down&active_enemies>=4
-    if S.SigilofFlame:IsCastable() and (S.AnyMeansNecessary:IsAvailable() and Target:DebuffDown(S.EssenceBreakDebuff) and EnemiesCount8 >= 4) then
+    if S.SigilofFlame:IsCastable() and (S.AnyMeansNecessary:IsAvailable() and Target:DebuffDown(S.EssenceBreakDebuff) and EnemiesMeleeCount >= 4) then
       if Cast(S.SigilofFlame, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame main 48"; end
     end
     -- throw_glaive,if=talent.soulscar&(active_enemies>desired_targets|raid_event.adds.in>full_recharge_time+9)&spell_targets>=(2-talent.furious_throws)&!debuff.essence_break.up&(full_recharge_time<gcd.max*3|active_enemies>1)&!set_bonus.tier31_2pc
-    if S.ThrowGlaive:IsCastable() and (S.Soulscar:IsAvailable() and EnemiesCount8 >= (2 - num(S.FuriousThrows:IsAvailable())) and Target:DebuffDown(S.EssenceBreakDebuff) and (S.ThrowGlaive:FullRechargeTime() < GCDMax * 3 or EnemiesCount8 > 1) and not Player:HasTier(31, 2)) then
+    if S.ThrowGlaive:IsCastable() and (S.Soulscar:IsAvailable() and EnemiesMeleeCount >= (2 - num(S.FuriousThrows:IsAvailable())) and Target:DebuffDown(S.EssenceBreakDebuff) and (S.ThrowGlaive:FullRechargeTime() < GCDMax * 3 or EnemiesMeleeCount > 1) and not Player:HasTier(31, 2)) then
       if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsInRange(30)) then return "throw_glaive main 49"; end
     end
     -- immolation_aura,if=active_enemies>=2&fury<70&debuff.essence_break.down
-    if S.ImmolationAura:IsCastable() and (EnemiesCount8 >= 2 and Player:Fury() < 70 and Target:DebuffDown(S.EssenceBreakDebuff)) then
+    if S.ImmolationAura:IsCastable() and (EnemiesMeleeCount >= 2 and Player:Fury() < 70 and Target:DebuffDown(S.EssenceBreakDebuff)) then
       if Cast(S.ImmolationAura, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura main 50"; end
     end
     -- annihilation,if=!variable.pooling_for_blade_dance&(cooldown.essence_break.remains|!talent.essence_break)&buff.fel_barrage.down|set_bonus.tier30_2pc
@@ -449,7 +449,7 @@ local function APL()
       if Cast(S.SigilofFlame, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame main 56"; end
     end
     -- throw_glaive,if=talent.soulscar&(active_enemies>desired_targets|raid_event.adds.in>full_recharge_time+9)&spell_targets>=(2-talent.furious_throws)&!debuff.essence_break.up&!set_bonus.tier31_2pc
-    if S.ThrowGlaive:IsReady() and (S.Soulscar:IsAvailable() and EnemiesCount20 >= (2 - num(S.FuriousThrows:IsAvailable())) and Target:DebuffDown(S.EssenceBreakDebuff) and not Player:HasTier(31, 2)) then
+    if S.ThrowGlaive:IsReady() and (S.Soulscar:IsAvailable() and Enemies20yCount >= (2 - num(S.FuriousThrows:IsAvailable())) and Target:DebuffDown(S.EssenceBreakDebuff) and not Player:HasTier(31, 2)) then
       if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive main 58"; end
     end
     -- immolation_aura,if=buff.immolation_aura.stack<buff.immolation_aura.max_stack&(!talent.ragefire|active_enemies>desired_targets|raid_event.adds.in>15)&buff.out_of_range.down&(!buff.unbound_chaos.up|!talent.unbound_chaos)&(recharge_time<cooldown.essence_break.remains|!talent.essence_break&cooldown.eye_beam.remains>recharge_time)
@@ -465,7 +465,7 @@ local function APL()
       if Cast(S.ChaosStrike, nil, nil, not Target:IsSpellInRange(S.ChaosStrike)) then return "chaos_strike main 64"; end
     end
     -- sigil_of_flame,if=raid_event.adds.in>15&fury.deficit>=30&buff.out_of_range.down
-    if S.SigilofFlame:IsCastable() and (EnemiesCount8 == 1 and Player:FuryDeficit() >= 30 and Target:IsInRange(30)) then
+    if S.SigilofFlame:IsCastable() and (EnemiesMeleeCount == 1 and Player:FuryDeficit() >= 30 and Target:IsInRange(30)) then
       if Cast(S.SigilofFlame, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame main 66"; end
     end
     -- felblade,if=fury.deficit>=40
@@ -478,10 +478,10 @@ local function APL()
     end
     -- demons_bite,target_if=min:debuff.burning_wound.remains,if=talent.burning_wound&debuff.burning_wound.remains<4&active_dot.burning_wound<(spell_targets>?3)
     if S.DemonsBite:IsCastable() then
-      if Everyone.CastTargetIf(S.DemonsBite, Enemies8y, "min", EvalutateTargetIfFilterDemonsBite, EvaluateTargetIfDemonsBite, not Target:IsSpellInRange(S.DemonsBite)) then return "demons_bite main 72"; end
+      if Everyone.CastTargetIf(S.DemonsBite, EnemiesMelee, "min", EvalutateTargetIfFilterDemonsBite, EvaluateTargetIfDemonsBite, not Target:IsSpellInRange(S.DemonsBite)) then return "demons_bite main 72"; end
     end
     -- fel_rush,if=!talent.momentum&!talent.demon_blades&spell_targets>1&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))&(buff.unbound_chaos.down)
-    if S.FelRush:IsCastable() and UseFelRush() and (not S.Momentum:IsAvailable() and not S.DemonBlades:IsAvailable() and Enemies8y > 1 and Player:BuffDown(S.UnboundChaosBuff)) then
+    if S.FelRush:IsCastable() and UseFelRush() and (not S.Momentum:IsAvailable() and not S.DemonBlades:IsAvailable() and EnemiesMeleeCount > 1 and Player:BuffDown(S.UnboundChaosBuff)) then
       if Cast(S.FelRush, nil, Settings.Commons.DisplayStyle.FelRush) then return "fel_rush main 74"; end
     end
     -- sigil_of_flame,if=raid_event.adds.in>15&fury.deficit>=30&buff.out_of_range.down

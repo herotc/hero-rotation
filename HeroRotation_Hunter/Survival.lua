@@ -49,11 +49,10 @@ local EnemyCount8ySplash, EnemyList
 local BossFightRemains = 11111
 local FightRemains = 11111
 local MBRSCost = S.MongooseBite:IsAvailable() and S.MongooseBite:Cost() or S.RaptorStrike:Cost()
-local MeleeRange = S.Lunge:IsAvailable() and 8 or 5
+local MeleeRange = 5
 
 HL:RegisterForEvent(function()
   MBRSCost = S.MongooseBite:IsAvailable() and S.MongooseBite:Cost() or S.RaptorStrike:Cost()
-  MeleeRange = S.Lunge:IsAvailable() and 8 or 5
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
@@ -482,8 +481,7 @@ end
 local function APL()
   -- Target Count Checking
   local EagleUp = Player:BuffUp(S.AspectoftheEagle)
-  local AddedRange = S.Lunge:IsAvailable() and 3 or 0
-  MeleeRange = EagleUp and (40 + AddedRange) or (5 + AddedRange)
+  MeleeRange = EagleUp and 40 or 5
   if AoEON() then
     if EagleUp and not Target:IsInMeleeRange(8) then
       EnemyCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)

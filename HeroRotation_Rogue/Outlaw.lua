@@ -602,7 +602,7 @@ end
 --- ======= MAIN =======
 local function APL ()
   -- Local Update
-  BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 9 or 6
+  BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 10 or 6
   BetweenTheEyesDMGThreshold = S.Dispatch:Damage() * 1.25
   ComboPoints = Player:ComboPoints()
   EffectiveComboPoints = Rogue.EffectiveComboPoints(ComboPoints)
@@ -616,8 +616,7 @@ local function APL ()
   -- Unit Update
   if AoEON() then
     Enemies30y = Player:GetEnemiesInRange(30) -- Serrated Bone Spike cycle
-    local RangeSpell = (S.AcrobaticStrikes:IsAvailable()) and S.PickPocket or S.SinisterStrike
-    EnemiesBF = Player:GetEnemiesInRange(BladeFlurryRange, RangeSpell)
+    EnemiesBF = Player:GetEnemiesInRange(BladeFlurryRange)
     EnemiesBFCount = #EnemiesBF
   else
     EnemiesBFCount = 1

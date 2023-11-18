@@ -392,7 +392,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   -- Unit Update
-  Enemies5y = Player:GetEnemiesInMeleeRange(5, S.TigerPalm) -- Multiple Abilities
+  Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
   --Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   EnemiesCount5 = #Enemies5y -- AOE Toogle
   

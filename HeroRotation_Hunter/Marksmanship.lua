@@ -447,7 +447,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   TargetInRange40y = Target:IsSpellInRange(S.AimedShot) -- Ranged abilities; Distance varies by Mastery
-  Enemies40y = Player:GetEnemiesInRange(S.AimedShot.MaximumRange)
+  Enemies40y = Player:GetEnemiesInRange(40)
   Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
   if AoEON() then
     EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)

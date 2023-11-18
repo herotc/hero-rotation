@@ -64,7 +64,6 @@ end, "PLAYER_REGEN_ENABLED")
 local Enemies40y, PetEnemiesMixed, PetEnemiesMixedCount
 
 -- Range
-local Enemies8y
 local TargetInRange40y, TargetInRange30y
 local TargetInRangePet30y
 
@@ -430,12 +429,10 @@ local function APL()
     or nil
   local PetRangeAbility = (S.Growl:IsPetKnown() and Action.FindBySpellID(S.Growl:ID()) and S.Growl) or nil
   if AoEON() then
-    Enemies8y = Player:GetEnemiesInRange(8)
     Enemies40y = Player:GetEnemiesInRange(40) -- Barbed Shot Cycle
     PetEnemiesMixed = (PetCleaveAbility and Player:GetEnemiesInSpellActionRange(PetCleaveAbility)) or Target:GetEnemiesInSplashRange(8)
     PetEnemiesMixedCount = (PetCleaveAbility and #PetEnemiesMixed) or Target:GetEnemiesInSplashRangeCount(8) -- Beast Cleave (through Multi-Shot)
   else
-    Enemies8y = {}
     Enemies40y = {}
     PetEnemiesMixed = Target or {}
     PetEnemiesMixedCount = 0
@@ -453,7 +450,7 @@ local function APL()
     BossFightRemains = HL.BossFightRemains()
     FightRemains = BossFightRemains
     if FightRemains == 11111 then
-      FightRemains = HL.FightRemains(Enemies8y, false)
+      FightRemains = HL.FightRemains(Enemies40y, false)
     end
   end
 

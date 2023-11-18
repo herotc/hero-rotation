@@ -518,16 +518,16 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   if AoEON() then
-    Enemies8y = Player:GetEnemiesInMeleeRange(8, S.MortalStrike) -- Multiple Abilities
+    Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
     EnemiesCount8y = #Enemies8y
   else
     EnemiesCount8y = 1
   end
 
-  -- Range check
-  TargetInMeleeRange = Target:IsSpellInRange(S.MortalStrike)
-
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Range check
+    TargetInMeleeRange = Target:IsSpellInRange(S.MortalStrike)
+
     -- Calculate fight_remains
     BossFightRemains = HL.BossFightRemains()
     FightRemains = BossFightRemains

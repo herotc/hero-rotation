@@ -220,7 +220,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   if AoEON() then
-    Enemies8y = Player:GetEnemiesInMeleeRange(8, S.Revenge) -- Multiple Abilities
+    Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
     EnemiesCount8 = #Enemies8y
   else
     EnemiesCount8 = 1

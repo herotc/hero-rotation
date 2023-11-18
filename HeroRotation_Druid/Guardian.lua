@@ -330,19 +330,21 @@ end
 local function APL()
   -- Enemies Update
   if AoEON() then
-    MeleeEnemies11y = Player:GetEnemiesInMeleeRange(11, S.Swipe)
+    MeleeEnemies11y = Player:GetEnemiesInMeleeRange(13)
     MeleeEnemies11yCount = #MeleeEnemies11y
   else
     MeleeEnemies11y = {}
     MeleeEnemies11yCount = 1
   end
 
-  ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
-  IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
+  if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
+    IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
 
-  UseMaul = false
-  if ((Player:Rage() >= S.Maul:Cost() + 20 and not IsTanking) or Player:RageDeficit() <= 10 or not Settings.Guardian.UseRageDefensively) then
-    UseMaul = true
+    UseMaul = false
+    if ((Player:Rage() >= S.Maul:Cost() + 20 and not IsTanking) or Player:RageDeficit() <= 10 or not Settings.Guardian.UseRageDefensively) then
+      UseMaul = true
+    end
   end
 
   if Everyone.TargetIsValid() then

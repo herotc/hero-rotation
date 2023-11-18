@@ -1976,9 +1976,8 @@ end
 
 -- APL Main
 local function APL()
-  Enemies5y = Player:GetEnemiesInMeleeRange(5, S.TigerPalm) -- Multiple Abilities
-  local RangeSpell = (S.StrikeoftheWindlord:IsAvailable()) and S.StrikeoftheWindlord or S.TigerPalm
-  Enemies8y = Player:GetEnemiesInMeleeRange(8, RangeSpell) -- Multiple Abilities
+  Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
+  Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   if AoEON() then
     EnemiesCount8y = #Enemies8y -- AOE Toogle
   else

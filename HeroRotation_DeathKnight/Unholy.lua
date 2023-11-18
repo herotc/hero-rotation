@@ -622,7 +622,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   no_heal = not DeathStrikeHeal()
-  EnemiesMelee = Player:GetEnemiesInMeleeRange(8, S.FesteringStrike)
+  EnemiesMelee = Player:GetEnemiesInMeleeRange(5)
   Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
   if AoEON() then
     EnemiesMeleeCount = #EnemiesMelee
