@@ -59,6 +59,7 @@ HR.GUISettings.APL.Monk = {
       ExpelHarm              = false,
       ExplodingKeg           = false,
       InvokeNiuzaoTheBlackOx = true,
+      SummonWhiteTigerStatue = true,
       TouchOfDeath           = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
