@@ -60,36 +60,10 @@ HL:RegisterForEvent(function()
   trinket2 = Equipment[14] and Item(Equipment[14]) or Item(0)
 end, "PLAYER_EQUIPMENT_CHANGED" )
 
-S.Dispatch:RegisterDamageFormula(
-  -- Dispatch DMG Formula (Pre-Mitigation):
-  --- Player Modifier
-    -- AP * CP * EviscR1_APCoef * Aura_M * NS_M * DS_M * DSh_M * SoD_M * Finality_M * Mastery_M * Versa_M
-  --- Target Modifier
-    -- Ghostly_M * Sinful_M
-  function ()
-    return
-      --- Player Modifier
-        -- Attack Power
-        Player:AttackPowerDamageMod() *
-        -- Combo Points
-        Rogue.CPSpend() *
-        -- Eviscerate R1 AP Coef
-        0.3 *
-        -- Aura Multiplier (SpellID: 137036)
-        1.0 *
-        -- Versatility Damage Multiplier
-        (1 + Player:VersatilityDmgPct() / 100) *
-      --- Target Modifier
-        -- Ghostly Strike Multiplier
-        (Target:DebuffUp(S.GhostlyStrike) and 1.1 or 1)
-  end
-)
-
 -- Rotation Var
 local Enemies30y, EnemiesBF, EnemiesBFCount
 local ShouldReturn; -- Used to get the return string
 local BladeFlurryRange = 6
-local BetweenTheEyesDMGThreshold
 local EffectiveComboPoints, ComboPoints, ComboPointsDeficit
 local Energy, EnergyRegen, EnergyDeficit, EnergyTimeToMax, EnergyMaxOffset
 local Interrupts = {
@@ -124,35 +98,7 @@ local RtB_BuffsList = {
   S.SkullandCrossbones,
   S.TrueBearing
 }
-local function RtB_List (Type, List)
-  if not Cache.APLVar.RtB_List then Cache.APLVar.RtB_List = {} end
-  if not Cache.APLVar.RtB_List[Type] then Cache.APLVar.RtB_List[Type] = {} end
-  local Sequence = table.concat(List)
-  -- All
-  if Type == "All" then
-    if not Cache.APLVar.RtB_List[Type][Sequence] then
-      local Count = 0
-      for i = 1, #List do
-        if Player:BuffUp(RtB_BuffsList[List[i]]) then
-          Count = Count + 1
-        end
-      end
-      Cache.APLVar.RtB_List[Type][Sequence] = Count == #List and true or false
-    end
-  -- Any
-  else
-    if not Cache.APLVar.RtB_List[Type][Sequence] then
-      Cache.APLVar.RtB_List[Type][Sequence] = false
-      for i = 1, #List do
-        if Player:BuffUp(RtB_BuffsList[List[i]]) then
-          Cache.APLVar.RtB_List[Type][Sequence] = true
-          break
-        end
-      end
-    end
-  end
-  return Cache.APLVar.RtB_List[Type][Sequence]
-end
+
 -- Get the number of Roll the Bones buffs currently on
 local function RtB_Buffs ()
   if not Cache.APLVar.RtB_Buffs then
@@ -268,12 +214,6 @@ local function Ambush_Condition ()
   return (S.HiddenOpportunity:IsAvailable() or ComboPointsDeficit >=2 + num(S.ImprovedAmbush:IsAvailable()) + num(Player:BuffUp(S.Broadside))) and Energy >= 50
 end
 
--- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
--- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.remains>1+talent.killing_spree.enabled
-local function Blade_Flurry_Sync ()
-  return not AoEON() or EnemiesBFCount < 2 or (Player:BuffRemains(S.BladeFlurry) > 1 + num(S.KillingSpree:IsAvailable()))
-end
-
 -- Determine if we are allowed to use Vanish offensively in the current situation
 local function Vanish_DPS_Condition ()
   -- You can vanish if we've set the UseDPSVanish setting, and we're either not tanking or we're solo but the DPS vanish while solo flag is set).
@@ -311,7 +251,8 @@ local function StealthCDs ()
 
   -- # Crackshot builds use Dance at finish condition
   -- actions.stealth_cds+=/shadow_dance,if=talent.crackshot&variable.finish_condition
-  if S.ShadowDance:IsAvailable() and S.ShadowDance:IsCastable() and S.Crackshot:IsAvailable() and Finish_Condition() then
+  -- synecdoche note: DPS gain in testing to hold off on shadow dance if vanish is coming up in the next 6 seconds to avoid wasting vanish CDR
+  if S.ShadowDance:IsAvailable() and S.ShadowDance:IsCastable() and S.Crackshot:IsAvailable() and Finish_Condition() and S.Vanish:CooldownRemains() >= 6 then
     if HR.Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
   end
 
@@ -351,9 +292,11 @@ local function CDs ()
   -- # Maintain Blade Flurry on 2+ targets, and on single target with Underhanded, or on cooldown at 5+ targets with Deft Maneuvers
   -- actions.cds+=/blade_flurry,if=(spell_targets>=2-talent.underhanded_upper_hand&!stealthed.rogue)
   -- &buff.blade_flurry.remains<gcd|talent.deft_maneuvers&spell_targets>=5&!variable.finish_condition
+  -- synecdoche note: ravenholdt testing suggests this is a damage gain on 3+ targets if flurrying will cap your CP
   if S.BladeFlurry:IsReady() then
+    local bf_cp_gen = EnemiesBFCount + num(Player:BuffUp(S.Broadside))
     if (EnemiesBFCount >= 2 - num(S.UnderhandedUpperhand:IsAvailable()) and not Player:StealthUp(true, false))
-      and Player:BuffRemains(S.BladeFlurry) < Player:GCDRemains() or S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 5 and not Finish_Condition() then
+      and Player:BuffRemains(S.BladeFlurry) < Player:GCDRemains() or S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 3 and bf_cp_gen >= ComboPointsDeficit and not Finish_Condition() then
       if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
         HR.CastSuggested(S.BladeFlurry)
       else
@@ -364,8 +307,10 @@ local function CDs ()
 
   -- # Use Roll the Bones if reroll conditions are met, or just before buffs expire based on T31 and upcoming stealth cooldowns
   -- actions.cds+=/roll_the_bones,if=variable.rtb_reroll|rtb_buffs.max_remains<=set_bonus.tier31_4pc+(cooldown.shadow_dance.remains<=1|cooldown.vanish.remains<=1)*6
+  -- synecdoche note: also don't want to roll the bones inside a crackshot window; this isn't actually captured by the APL, but is a damage gain in local testing
   if S.RolltheBones:IsReady() then
-    if RtB_Reroll() or Rogue.RtBRemains() <= num(Player:HasTier(31, 4)) + num(S.ShadowDance:CooldownRemains() <=1 or S.Vanish:CooldownRemains() <= 1) * 6 then
+    local outside_crackshot_window = not Player:StealthUp(true, true) or not S.Crackshot:IsAvailable()
+    if outside_crackshot_window and (RtB_Reroll() or Rogue.RtBRemains() <= num(Player:HasTier(31, 4)) + num(S.ShadowDance:CooldownRemains() <=1 or S.Vanish:CooldownRemains() <= 1) * 6) then
       if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones" end
     end
   end
@@ -603,7 +548,6 @@ end
 local function APL ()
   -- Local Update
   BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 10 or 6
-  BetweenTheEyesDMGThreshold = S.Dispatch:Damage() * 1.25
   ComboPoints = Player:ComboPoints()
   EffectiveComboPoints = Rogue.EffectiveComboPoints(ComboPoints)
   ComboPointsDeficit = Player:ComboPointsDeficit()
@@ -688,6 +632,8 @@ local function APL ()
   -- Fan the Hammer Combo Point Prediction
   if S.FanTheHammer:IsAvailable() and S.PistolShot:TimeSinceLastCast() < Player:GCDRemains() then
     ComboPoints = mathmax(ComboPoints, Rogue.FanTheHammerCP())
+    EffectiveComboPoints = Rogue.EffectiveComboPoints(ComboPoints)
+    ComboPointsDeficit = Player:ComboPointsDeficit()
   end
 
   if Everyone.TargetIsValid() then
