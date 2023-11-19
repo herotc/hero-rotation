@@ -219,7 +219,7 @@ local function FieryDemise()
     if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt fiery_demise 12"; end
   end
   -- elysian_decree,line_cd=1.85
-  if S.ElysianDecree:IsCastable() and AllSoulFragments + VarEDFragments <= 5 and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
+  if S.ElysianDecree:IsCastable() and (S.ElysianDecree:TimeSinceLastCast() >= 1.85 and Player:Fury() >= 40 and (AllSoulFragments <= 1 or AllSoulFragments >= 4)) then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree fiery_demise 14"; end
   end
   -- spirit_bomb,if=variable.can_spb
@@ -268,7 +268,7 @@ local function SingleTarget()
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation single_target 6"; end
   end
   -- elysian_decree
-  if S.ElysianDecree:IsCastable() then
+  if S.ElysianDecree:IsCastable() and (Player:Fury() >= 40 and (AllSoulFragments <= 1 or AllSoulFragments >= 4)) then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree single_target 8"; end
   end
   -- fel_devastation
@@ -305,7 +305,7 @@ local function SmallAoE()
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation small_aoe 4"; end
   end
   -- elysian_decree,line_cd=1.85
-  if S.ElysianDecree:IsCastable() and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
+  if S.ElysianDecree:IsCastable() and (S.ElysianDecree:TimeSinceLastCast() >= 1.85 and Player:Fury() >= 40 and (AllSoulFragments <= 1 or AllSoulFragments >= 4)) then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree small_aoe 6"; end
   end
   -- fel_devastation
@@ -353,7 +353,7 @@ local function BigAoE()
     if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt big_aoe 4"; end
   end
   -- elysian_decree,line_cd=1.85
-  if S.ElysianDecree:IsCastable() and (S.ElysianDecree:TimeSinceLastCast() >= 1.85) then
+  if S.ElysianDecree:IsCastable() and (S.ElysianDecree:TimeSinceLastCast() >= 1.85 and Player:Fury() >= 40 and (AllSoulFragments <= 1 or AllSoulFragments >= 4)) then
     if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree big_aoe 6"; end
   end
   -- fel_devastation
