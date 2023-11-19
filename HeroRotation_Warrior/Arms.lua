@@ -395,7 +395,7 @@ local function SingleTarget()
   if S.Skullsplitter:IsCastable() and (S.TestofMight:IsAvailable() and Target:DebuffUp(S.DeepWoundsDebuff)) then
     if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter single_target 20"; end
   end
-  -- thunderous_roar,if=buff.test_of_might.up|debuff.colossus_smash.up|debuff.colossus_smash.up|cooldown.colossus_smash.remains<3|buff.avatar.up
+  -- thunderous_roar,if=buff.test_of_might.up|debuff.colossus_smash.up|cooldown.colossus_smash.remains<3|buff.avatar.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or Target:DebuffUp(S.ColossusSmashDebuff) or S.ColossusSmash:CooldownRemains() < 3 or Player:BuffUp(S.AvatarBuff)) then
     if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 22"; end
   end
