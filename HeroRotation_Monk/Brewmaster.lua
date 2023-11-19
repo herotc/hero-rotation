@@ -115,7 +115,7 @@ local function Precombat()
   end
   -- Manually added opener
   if S.KegSmash:IsCastable() then 
-    if Cast(S.KegSmash, nil, nil, not Target:IsInRange(40)) then return "keg_smash precombat 6"; end
+    if Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "keg_smash precombat 6"; end
   end
 end
 
