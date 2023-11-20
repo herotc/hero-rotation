@@ -48,7 +48,6 @@ local OnUseExcludes = {
 }
 
 -- Enemies
-local Enemies5y
 local Enemies8y
 local EnemiesCount8y
 
@@ -182,7 +181,7 @@ local function Cooldowns()
   end
   -- use_item,name=shadowed_razing_annihilator,if=(trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)
   if I.ShadowedRazingAnnihilator:IsEquippedAndReady() and ((Trinket1:CooldownDown() or not Trinket1:HasUseBuff()) and (Trinket2:CooldownDown() or not Trinket2:HasUseBuff())) then
-    if Cast(I.ShadowedRazingAnnihilator, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInMeleeRange(5)) then return "shadowed_razing_annihilator cooldowns 10"; end
+    if Cast(I.ShadowedRazingAnnihilator, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(8)) then return "shadowed_razing_annihilator cooldowns 10"; end
   end
   -- shield_of_vengeance,if=fight_remains>15&(!talent.execution_sentence|!debuff.execution_sentence.up)
   if S.ShieldofVengeance:IsCastable() and (FightRemains > 15 and (not S.ExecutionSentence:IsAvailable() or Target:DebuffDown(S.ExecutionSentence))) then
@@ -211,7 +210,7 @@ local function Finishers()
   VarDSCastable = ((EnemiesCount8y >= 3 or EnemiesCount8y >= 2 and not S.DivineArbiter:IsAvailable() or Player:BuffUp(S.EmpyreanPowerBuff)) and Player:BuffDown(S.EmpyreanLegacyBuff) and not (Player:BuffUp(S.DivineArbiterBuff) and Player:BuffStack(S.DivineArbiterBuff) > 24))
   -- divine_storm,if=variable.ds_castable&(!talent.crusade|cooldown.crusade.remains>gcd*3|buff.crusade.up&buff.crusade.stack<10)
   if S.DivineStorm:IsReady() and (VarDSCastable and (not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10)) then
-    if Cast(S.DivineStorm, nil, nil, not Target:IsInMeleeRange(8)) then return "divine_storm finishers 2" end
+    if Cast(S.DivineStorm, nil, nil, not Target:IsInRange(8)) then return "divine_storm finishers 2" end
   end
   -- justicars_vengeance,if=!talent.crusade|cooldown.crusade.remains>gcd*3|buff.crusade.up&buff.crusade.stack<10
   if S.JusticarsVengeance:IsReady() and (not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
@@ -230,7 +229,7 @@ local function Generators()
   end
   -- wake_of_ashes,if=holy_power<=2&(cooldown.avenging_wrath.remains|cooldown.crusade.remains)&(!talent.execution_sentence|cooldown.execution_sentence.remains>4|target.time_to_die<8)&(!raid_event.adds.exists|raid_event.adds.in>20|raid_event.adds.up)
   if S.WakeofAshes:IsCastable() and (HolyPower <= 2 and (S.AvengingWrath:CooldownDown() or S.Crusade:CooldownDown()) and (not S.ExecutionSentence:IsAvailable() or S.ExecutionSentence:CooldownRemains() > 4 or FightRemains < 8)) then
-    if Cast(S.WakeofAshes, nil, nil, not Target:IsInMeleeRange(14)) then return "wake_of_ashes generators 2"; end
+    if Cast(S.WakeofAshes, nil, nil, not Target:IsInRange(14)) then return "wake_of_ashes generators 2"; end
   end
   -- blade_of_justice,if=!dot.expurgation.ticking&holy_power<=3&set_bonus.tier31_2pc
   if S.BladeofJustice:IsCastable() and (Target:DebuffDown(S.ExpurgationDebuff) and HolyPower <= 3 and Player:HasTier(31, 2)) then
@@ -278,11 +277,11 @@ local function Generators()
   end
   -- consecration,if=!consecration.up&spell_targets.divine_storm>=2
   if S.Consecration:IsCastable() and (Target:DebuffDown(S.ConsecrationDebuff) and EnemiesCount8y >= 2) then
-    if Cast(S.Consecration, nil, nil, not Target:IsInMeleeRange(8)) then return "consecration generators 22"; end
+    if Cast(S.Consecration, nil, nil, not Target:IsInRange(8)) then return "consecration generators 22"; end
   end
   -- divine_hammer,if=spell_targets.divine_storm>=2
   if S.DivineHammer:IsCastable() and (EnemiesCount8y >= 2) then
-    if Cast(S.DivineHammer, nil, nil, not Target:IsInMeleeRange(8)) then return "divine_hammer generators 24"; end
+    if Cast(S.DivineHammer, nil, nil, not Target:IsInRange(8)) then return "divine_hammer generators 24"; end
   end
   -- crusader_strike,if=cooldown.crusader_strike.charges_fractional>=1.75&(holy_power<=2|holy_power<=3&cooldown.blade_of_justice.remains>gcd*2|holy_power=4&cooldown.blade_of_justice.remains>gcd*2&cooldown.judgment.remains>gcd*2)
   if S.CrusaderStrike:IsCastable() and (S.CrusaderStrike:ChargesFractional() >= 1.75 and (HolyPower <= 2 or HolyPower <= 3 and S.BladeofJustice:CooldownRemains() > PlayerGCD * 2 or HolyPower == 4 and S.BladeofJustice:CooldownRemains() > PlayerGCD * 2 and S.Judgment:CooldownRemains() > PlayerGCD * 2)) then
@@ -316,11 +315,11 @@ local function Generators()
   end
   -- consecration
   if S.Consecration:IsCastable() then
-    if Cast(S.Consecration, nil, nil, not Target:IsInMeleeRange(8)) then return "consecration generators 40"; end
+    if Cast(S.Consecration, nil, nil, not Target:IsInRange(8)) then return "consecration generators 40"; end
   end
   -- divine_hammer
   if S.DivineHammer:IsCastable() then
-    if Cast(S.DivineHammer, nil, nil, not Target:IsInMeleeRange(8)) then return "divine_hammer generators 42"; end
+    if Cast(S.DivineHammer, nil, nil, not Target:IsInRange(8)) then return "divine_hammer generators 42"; end
   end
 end
 
@@ -328,19 +327,17 @@ end
 local function APL()
   -- Enemies Update
   if AoEON() then
-    Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Divine Storm
+    Enemies8y = Player:GetEnemiesInRange(8) -- Divine Storm
     EnemiesCount8y = #Enemies8y
-    Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Light's Judgment
   else
     Enemies8y = {}
     EnemiesCount8y = 1
-    Enemies5y = {}
   end
 
-  -- Rotation Variables Update
-  TimeToHPG = ComputeTimeToHPG()
-
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
+    -- Rotation Variables Update
+    TimeToHPG = ComputeTimeToHPG()
+
     -- Calculate fight_remains
     BossFightRemains = HL.BossFightRemains()
     FightRemains = BossFightRemains
