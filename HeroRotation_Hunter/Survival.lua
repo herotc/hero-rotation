@@ -264,8 +264,8 @@ local function Cleave()
   if I.Djaruun:IsEquippedAndReady() then
     if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame cleave 16"; end
   end
-  -- fury_of_the_eagle,if=cooldown.butchery.full_recharge_time>cast_time&raid_event.adds.exists|!talent.butchery
-  if S.FuryoftheEagle:IsCastable() and (S.Butchery:FullRechargeTime() > S.FuryoftheEagle:CastTime() or not S.Butchery:IsAvailable()) then
+  -- fury_of_the_eagle,if=raid_event.adds.exists
+  if S.FuryoftheEagle:IsCastable() then
     if Cast(S.FuryoftheEagle, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle cleave 18"; end
   end
   -- butchery,if=raid_event.adds.exists
