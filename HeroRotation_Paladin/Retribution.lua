@@ -357,7 +357,7 @@ local function APL()
     end
     -- auto_attack
     -- rebuke
-    local ShouldReturn = Everyone.Interrupt(5, S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, Interrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(8, S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, Interrupts); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=cooldowns
     if (CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
