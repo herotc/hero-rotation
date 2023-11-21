@@ -66,6 +66,7 @@ Spell.Warrior.Commons = {
   -- Buffs
   AvatarBuff                            = Spell(107574),
   BattleShoutBuff                       = Spell(6673),
+  ElysianMightBuff                      = Spell(386286),
   WarMachineBuff                        = Spell(262232),
   -- Pool
   Pool                                  = Spell(999910),
@@ -113,6 +114,8 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   MercilessAssaultBuff                  = Spell(409983),
   RecklessnessBuff                      = Spell(1719),
   SuddenDeathBuff                       = Spell(280776),
+  -- Debuffs
+  GushingWoundDebuff                    = Spell(385042),
 })
 
 Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {

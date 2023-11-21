@@ -133,15 +133,13 @@ local function MultiTarget()
     if Cast(S.OdynsFury, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 12"; end
   end
   local BTCritChance = Player:CritChancePct() + num(Player:BuffUp(S.RecklessnessBuff)) * 20 + Player:BuffStack(S.MercilessAssaultBuff) * 10 + Player:BuffStack(S.BloodcrazeBuff) * 15
-  if (Player:HasTier(30, 4) and BTCritChance >= 95) then
-    -- bloodbath,if=set_bonus.tier30_4pc&action.bloodthirst.crit_pct_current>=95
-    if S.Bloodbath:IsCastable() then
-      if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath multi_target 14"; end
-    end
-    -- bloodthirst,if=set_bonus.tier30_4pc&action.bloodthirst.crit_pct_current>=95
-    if S.Bloodthirst:IsCastable() then
-      if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst multi_target 16"; end
-    end
+  -- bloodbath,if=set_bonus.tier30_4pc&action.bloodthirst.crit_pct_current>=95
+  if S.Bloodbath:IsCastable() and (Player:HasTier(30, 4) and BTCritChance >= 95) then
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath multi_target 14"; end
+  end
+  -- bloodthirst,if=(set_bonus.tier30_4pc&action.bloodthirst.crit_pct_current>=95)|(!talent.reckless_abandon&buff.furious_bloodthirst.up&buff.enrage.up)
+  if S.Bloodthirst:IsCastable() and ((Player:HasTier(30, 4) and BTCritChance >= 95) or (not S.RecklessAbandon:IsAvailable() and Player:BuffUp(S.FuriousBloodthirstBuff) and EnrageUp))  then
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst multi_target 16"; end
   end
   -- crushing_blow,if=talent.wrath_and_fury&buff.enrage.up
   if S.CrushingBlow:IsCastable() and (S.WrathandFury:IsAvailable() and EnrageUp) then
@@ -243,15 +241,13 @@ local function SingleTarget()
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage single_target 8"; end
   end
   local BTCritChance = Player:CritChancePct() + num(Player:BuffUp(S.RecklessnessBuff)) * 20 + Player:BuffStack(S.MercilessAssaultBuff) * 10 + Player:BuffStack(S.BloodcrazeBuff) * 15
-  if (Player:HasTier(30, 4) and BTCritChance >= 95) then
-    -- bloodbath,if=set_bonus.tier30_4pc&action.bloodthirst.crit_pct_current>=95
-    if S.Bloodbath:IsCastable() then
-      if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 10"; end
-    end
-    -- bloodthirst,if=set_bonus.tier30_4pc&action.bloodthirst.crit_pct_current>=95
-    if S.Bloodthirst:IsCastable() then
-      if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 12"; end
-    end
+  -- bloodbath,if=set_bonus.tier30_4pc&action.bloodthirst.crit_pct_current>=95
+  if S.Bloodbath:IsCastable() and (Player:HasTier(30, 4) and BTCritChance >= 95) then
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath single_target 10"; end
+  end
+  -- bloodthirst,if=(set_bonus.tier30_4pc&action.bloodthirst.crit_pct_current>=95)|(!talent.reckless_abandon&buff.furious_bloodthirst.up&buff.enrage.up&(!dot.gushing_wound.remains|buff.elysian_might.up))
+  if S.Bloodthirst:IsCastable() and ((Player:HasTier(30, 4) and BTCritChance >= 95) or (not S.RecklessAbandon:IsAvailable() and Player:BuffUp(S.FuriousBloodthirstBuff) and EnrageUp and (Target:DebuffDown(S.GushingWoundDebuff) or Player:BuffUp(S.ElysianMightBuff)))) then
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst single_target 12"; end
   end
   -- bloodbath,if=set_bonus.tier31_2pc
   if S.Bloodbath:IsCastable() and (Player:HasTier(31, 2)) then
@@ -502,13 +498,15 @@ local function APL()
         if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "spear_of_bastion main 26"; end
       end
     end
-    -- call_action_list,name=multi_target,if=active_enemies>=2
+    -- run_action_list,name=multi_target,if=active_enemies>=2
     if AoEON() and EnemiesMeleeCount >= 2 then
       local ShouldReturn = MultiTarget(); if ShouldReturn then return ShouldReturn; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for MultiTarget()"; end
     end
-    -- call_action_list,name=single_target,if=active_enemies=1
+    -- run_action_list,name=single_target,if=active_enemies=1
     if EnemiesMeleeCount == 1 then
       local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for SingleTarget()"; end
     end
     -- Pool if nothing else to suggest
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
