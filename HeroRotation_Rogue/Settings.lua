@@ -69,6 +69,7 @@ HR.GUISettings.APL.Rogue = {
       BladeFlurry = false,
       BladeRush = false,
       KeepItRolling = false,
+      RollTheBones = false,
       Sepsis = false,
     },
     OffGCDasOffGCD = {

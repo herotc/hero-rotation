@@ -311,7 +311,7 @@ local function CDs ()
   if S.RolltheBones:IsReady() then
     local outside_crackshot_window = not Player:StealthUp(true, true) or not S.Crackshot:IsAvailable()
     if outside_crackshot_window and (RtB_Reroll() or Rogue.RtBRemains() <= num(Player:HasTier(31, 4)) + num(S.ShadowDance:CooldownRemains() <=1 or S.Vanish:CooldownRemains() <= 1) * 6) then
-      if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones" end
+      if HR.Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then return "Cast Roll the Bones" end
     end
   end
 
@@ -601,7 +601,7 @@ local function APL ()
       -- actions.precombat+=/roll_the_bones,precombat_seconds=2
       -- Use same extended logic as a normal rotation for between pulls
       if S.RolltheBones:IsReady() and not Player:DebuffUp(S.Dreadblades) and (RtB_Buffs() == 0 or RtB_Reroll()) then
-        if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones (Opener)" end
+        if HR.Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then return "Cast Roll the Bones (Opener)" end
       end
       -- actions.precombat+=/slice_and_dice,precombat_seconds=1
       if S.SliceandDice:IsReady() and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints) * 1.8 then
