@@ -148,6 +148,10 @@ local function Precombat()
 end
 
 local function Execute()
+  -- whirlwind,if=buff.collateral_damage.up&cooldown.sweeping_strikes.remains<3
+  if S.Whirlwind:IsReady() and (Player:BuffUp(S.CollateralDamageBuff) and S.SweepingStrikes:CooldownRemains() < 3) then
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind execute 1"; end
+  end
   -- sweeping_strikes,if=active_enemies>1
   if CDsON() and S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
     if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes execute 2"; end
@@ -234,6 +238,10 @@ local function AoE()
   -- execute,if=buff.juggernaut.up&buff.juggernaut.remains<gcd
   if S.Execute:IsReady() and (Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff) < Player:GCD()) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute aoe 2"; end
+  end
+  -- whirlwind,if=buff.collateral_damage.up&cooldown.sweeping_strikes.remains<3
+  if S.Whirlwind:IsReady() and (Player:BuffUp(S.CollateralDamageBuff) and S.SweepingStrikes:CooldownRemains() < 3) then
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind aoe 3"; end
   end
   -- thunder_clap,if=talent.thunder_clap&talent.blood_and_thunder&talent.rend&dot.rend.remains<=dot.rend.duration*0.3
   if S.ThunderClap:IsReady() and (S.BloodandThunder:IsAvailable() and S.Rend:IsAvailable() and Target:DebuffRefreshable(S.RendDebuff)) then
@@ -343,6 +351,10 @@ local function AoE()
 end
 
 local function SingleTarget()
+  -- whirlwind,if=buff.collateral_damage.up&cooldown.sweeping_strikes.remains<3
+  if S.Whirlwind:IsReady() and (Player:BuffUp(S.CollateralDamageBuff) and S.SweepingStrikes:CooldownRemains() < 3) then
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 1"; end
+  end
   -- sweeping_strikes,if=active_enemies>1
   if CDsON() and S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
     if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes single_target 2"; end

@@ -156,6 +156,7 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   WarlordsTorment                       = Spell(390140),
   -- Buffs
   BattlelordBuff                        = Spell(386631),
+  CollateralDamageBuff                  = Spell(334783),
   CrushingAdvanceBuff                   = Spell(410138),
   HurricaneBuff                         = Spell(390581),
   JuggernautBuff                        = Spell(383292),
