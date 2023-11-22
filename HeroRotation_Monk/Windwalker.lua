@@ -55,11 +55,11 @@ local XuenActive
 local VarXuenOnUse = false
 local VarHoldXuen = false
 local VarHoldTPRSK = false
-local VarSyncSerenity = false
 local VarHoldSEF = false
 local VarSerenityBurst = false
 local VarBoKNeeded = false
 local VarTrinketType = (S.Serenity:IsAvailable()) and 1 or 2
+local VarSyncSerenity = I.NeltharionsCalltoDominance:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.WitherbarksBranch:IsEquipped()
 local Stuns = {
   { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end },
   { S.RingOfPeace, "Cast Ring Of Peace (Stun)", function () return true end },
@@ -96,6 +96,7 @@ HL:RegisterForEvent(function()
   equip = Player:GetEquipment()
   trinket1 = equip[13] and Item(equip[13]) or Item(0)
   trinket2 = equip[14] and Item(equip[14]) or Item(0)
+  VarSyncSerenity = I.NeltharionsCalltoDominance:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.WitherbarksBranch:IsEquipped()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function EnergyTimeToMaxRounded()
@@ -225,6 +226,8 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
+  -- variable,name=sync_serenity,op=set,value=equipped.neltharions_call_to_dominance|equipped.ashes_of_the_embersoul|equipped.mirror_of_fractured_tomorrows|equipped.witherbarks_branche
+  -- Note: Moved to variable declarations and PLAYER_EQUIPMENT_CHANGED registration.
   -- summon_white_tiger_statue
   if S.SummonWhiteTigerStatue:IsCastable() and CDsON() then
     if Cast(S.SummonWhiteTigerStatue, Settings.Commons.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue precombat 2"; end
@@ -2021,8 +2024,6 @@ local function APL()
     VarHoldXuen = not S.InvokeXuenTheWhiteTiger:IsAvailable() or 120 > FightRemains
     -- variable,name=hold_tp_rsk,op=set,value=!debuff.skyreach_exhaustion.remains<1&cooldown.rising_sun_kick.remains<1&(set_bonus.tier30_2pc|active_enemies<5)
     VarHoldTPRSK = not (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 1) and S.RisingSunKick:CooldownRemains() < 1 and (Player:HasTier(30, 2) or EnemiesCount8y < 5)
-    -- variable,name=sync_serenity,op=set,value=equipped.neltharions_call_to_dominance|equipped.ashes_of_the_embersoul|equipped.mirror_of_fractured_tomorrows|equipped.witherbarks_branche
-    VarSyncSerenity = I.NeltharionsCalltoDominance:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.WitherbarksBranch:IsEquipped()
     -- potion handling
     if Settings.Commons.Enabled.Potions then
       local PotionSelected = Everyone.PotionSelected()
