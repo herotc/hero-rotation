@@ -290,6 +290,7 @@
             CreatePanelOption("Slider", CP_Scaling, "Scaling.ScaleUI", {0.5, 5, 0.1}, "UI Scale", "Scale of the Icons.", function(value) HR.MainFrame:ResizeUI(value); end);
             CreatePanelOption("Slider", CP_Scaling, "Scaling.ScaleButtons", {0.5, 5, 0.1}, "Buttons Scale", "Scale of the Buttons.", function(value) HR.MainFrame:ResizeButtons(value); end);
             CreatePanelOption("Slider", CP_Scaling, "Scaling.ScaleHotkey", {0.5, 5, 0.1}, "Hotkey Scale", "Scale of the Hotkeys.");
+            CreatePanelOption("Slider", CP_Scaling, "Scaling.ScaleNameplateIcon", {0.5, 3, 0.1}, "Nameplate Icon Scale", "Scale of the nameplate icon.");
           end
 
           -- Modules

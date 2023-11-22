@@ -14,6 +14,7 @@
   local pairs = pairs;
   local stringlower = string.lower;
   local tostring = tostring;
+  local mathfloor = math.floor;
   -- File Locals
 
 
@@ -485,6 +486,8 @@
           NameplateIconSize = (HealthBar:GetWidth() / NameplateScaler) / 3.5;
         end
       end
+      local NameplateScaleSetting = HR.GUISettings.Scaling.ScaleNameplateIcon
+      NameplateIconSize = NameplateIconSize * NameplateScaleSetting;
       local IconFrame = HR.NameplateIconFrame;
 
       -- Init Frame if not already
@@ -503,6 +506,14 @@
         end
 
         HR.Nameplate.MainInitialized = true;
+      end
+
+      -- Handle real-time scaling
+      local CurrentSize = mathfloor(IconFrame:GetWidth() + 0.5)
+      local ScaledSize = mathfloor(NameplateIconSize + 0.5)
+      if CurrentSize ~= ScaledSize then
+        IconFrame:SetWidth(NameplateIconSize);
+        IconFrame:SetHeight(NameplateIconSize);
       end
 
       -- Set the Texture

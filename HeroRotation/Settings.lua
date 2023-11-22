@@ -41,6 +41,7 @@
       ScaleUI = 1,
       ScaleButtons = 1,
       ScaleHotkey = 1,
+      ScaleNameplateIcon = 1,
     },
     APL = {}
   };
