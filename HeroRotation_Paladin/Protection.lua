@@ -157,6 +157,10 @@ local function Cooldowns()
   end
   -- invoke_external_buff,name=power_infusion,if=buff.avenging_wrath.up
   -- Note: Not handling external buffs.
+  -- fireblood,if=buff.avenging_wrath.remains>8
+  if S.Fireblood:IsCastable() and (Player:BuffRemains(S.AvengingWrathBuff) > 8) then
+    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cooldowns 16"; end
+  end
 end
 
 local function Standard()
