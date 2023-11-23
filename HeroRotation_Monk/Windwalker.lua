@@ -349,7 +349,7 @@ end
 local function Opener()
   -- summon_white_tiger_statue
   if S.SummonWhiteTigerStatue:IsCastable() and CDsON() then
-    if Cast(S.SummonWhiteTigerStatue, nil, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue opener 2"; end
+    if Cast(S.SummonWhiteTigerStatue, Settings.Commons.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue opener 2"; end
   end
   -- expel_harm,if=talent.chi_burst.enabled&chi.max-chi>=3
   if S.ExpelHarm:IsReady() and (S.ChiBurst:IsAvailable() and Player:ChiDeficit() >= 3) then
@@ -407,7 +407,7 @@ end
 local function CDSEF()
   -- summon_white_tiger_statue,if=!cooldown.invoke_xuen_the_white_tiger.remains|active_enemies>4|cooldown.invoke_xuen_the_white_tiger.remains>50|fight_remains<=30
   if S.SummonWhiteTigerStatue:IsCastable() and (S.InvokeXuenTheWhiteTiger:CooldownUp() or EnemiesCount8y > 4 or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 50 or FightRemains <= 30) then
-    if Cast(S.SummonWhiteTigerStatue, nil, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue cd_sef 2"; end
+    if Cast(S.SummonWhiteTigerStatue, Settings.Commons.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue cd_sef 2"; end
   end
   -- invoke_external_buff,name=power_infusion,if=pet.xuen_the_white_tiger.active
   -- Note: Not handling external buffs.

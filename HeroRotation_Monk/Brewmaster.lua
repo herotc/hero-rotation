@@ -223,7 +223,7 @@ local function RotationPTA()
   end
   -- summon_white_tiger_statue
   if CDsON() and S.SummonWhiteTigerStatue:IsCastable() then
-    if Cast(S.SummonWhiteTigerStatue, Settings.Brewmaster.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue rotation_pta 18"; end
+    if Cast(S.SummonWhiteTigerStatue, Settings.Commons.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue rotation_pta 18"; end
   end
   -- bonedust_brew
   if S.BonedustBrew:IsCastable() then
@@ -340,7 +340,7 @@ local function RotationBOC()
   -- summon_white_tiger_statue,if=(!talent.weapons_of_order.enabled)
   -- Note: Combining both lines.
   if CDsON() and S.SummonWhiteTigerStatue:IsCastable() and (Target:DebuffStack(S.WeaponsofOrderDebuff) > 3 or not S.WeaponsofOrder:IsAvailable()) then
-    if Cast(S.SummonWhiteTigerStatue, Settings.Brewmaster.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue rotation_boc 34"; end
+    if Cast(S.SummonWhiteTigerStatue, Settings.Commons.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue rotation_boc 34"; end
   end
   -- bonedust_brew,if=(time<10&debuff.weapons_of_order_debuff.stack>3)|(time>10&talent.weapons_of_order.enabled)
   -- bonedust_brew,if=(!talent.weapons_of_order.enabled)
