@@ -157,7 +157,7 @@ local function Execute()
     if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes execute 2"; end
   end
   -- mortal_strike,if=dot.rend.remains<=gcd&talent.bloodletting
-  if S.MortalStrike:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and S.bloodletting:IsAvailable()) then
+  if S.MortalStrike:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and S.Bloodletting:IsAvailable()) then
     if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 4"; end
   end
   -- rend,if=remains<=gcd&!talent.bloodletting&(!talent.warbreaker&cooldown.colossus_smash.remains<4|talent.warbreaker&cooldown.warbreaker.remains<4)&target.time_to_die>12
