@@ -228,7 +228,7 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Range check
-    TargetInMeleeRange = Target:IsSpellInRange(S.Revenge)
+    TargetInMeleeRange = Target:IsInMeleeRange(5)
   end
 
   if Everyone.TargetIsValid() then
