@@ -129,6 +129,9 @@
       HR.CastLeft(LockSpell);       -- Left Icon
       HR.CastSuggested(LockSpell);  -- Suggested Icon
 	  HR.CastRightSuggested(LockSpell); -- Right Suggested Icon
+      if Target then
+        HR.Nameplate.AddIcon(Target, LockSpell)
+      end
       -- Unlock the UI
       for Key, Value in pairs(UIFrames) do
         Value:EnableMouse(true);
