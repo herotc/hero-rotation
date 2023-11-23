@@ -50,7 +50,7 @@ HL:RegisterForSelfCombatEvent(
 HL:RegisterForSelfCombatEvent(
   function (...)
     local SpellID = select(12, ...)
-    if SpellID == 228562 then
+    if SpellID == 228562 or SpellID == 262627 then
       Shaman.FeralSpiritCount = Shaman.FeralSpiritCount + 1
     end
   end
