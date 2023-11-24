@@ -554,11 +554,6 @@ local function Filler()
   if S.ShadowWordDeath:IsReady() and Player:IsMoving() then
     if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death movement filler 26"; end
   end
-  -- power_word_shield,if=set_bonus.tier31_4pc
-  -- Note: Per APL note, intent is to be used as a movement filler.
-  if S.PowerWordShield:IsReady() and Player:IsMoving() and (Player:HasTier(31, 4)) then
-    if Cast(S.PowerWordShield) then return "power_word_shield filler 28"; end
-  end
   -- shadow_word_pain,target_if=min:remains
   -- Note: Per APL note, intent is to be used as a movement filler.
   if S.ShadowWordPain:IsReady() and Player:IsMoving() then
