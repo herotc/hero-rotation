@@ -784,10 +784,10 @@ end
 --- ======= MAIN =======
 local function APL ()
   -- Enemies Update
-  -- MeleeRange = S.AcrobaticStrikes:IsAvailable() and 8 or 5
-  -- AoERange = S.AcrobaticStrikes:IsAvailable() and 10 or 13
-  TargetInMeleeRange = Target:IsInMeleeRange(5)
-  TargetInAoERange = Target:IsInMeleeRange(10)
+  MeleeRange = S.AcrobaticStrikes:IsAvailable() and 8 or 5
+  AoERange = S.AcrobaticStrikes:IsAvailable() and 10 or 13
+  TargetInMeleeRange = Target:IsInMeleeRange(MeleeRange)
+  TargetInAoERange = Target:IsInMeleeRange(AoERange)
   if AoEON() then
     Enemies30y = Player:GetEnemiesInRange(30) -- Poisoned Knife & Serrated Bone Spike
     MeleeEnemies10y = Player:GetEnemiesInMeleeRange(10) -- Fan of Knives & Crimson Tempest
