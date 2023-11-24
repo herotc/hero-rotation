@@ -37,6 +37,7 @@ Spell.Druid.Commons = {
   Regrowth                              = Spell(8936),
   Shred                                 = Spell(5221),
   -- Talents
+  AstralInfluence                       = Spell(197524),
   ConvoketheSpirits                     = Spell(391528),
   FrenziedRegeneration                  = Spell(22842),
   HeartoftheWild                        = Spell(319454),

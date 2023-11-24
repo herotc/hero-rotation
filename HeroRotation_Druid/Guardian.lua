@@ -22,7 +22,8 @@ local Cast          = HR.Cast
 -- Num/Bool Helper Functions
 local num           = HR.Commons.Everyone.num
 local bool          = HR.Commons.Everyone.bool
--- Lua
+-- lua
+local mathfloor     = math.floor
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -58,6 +59,8 @@ if Player:HasTier(31, 4) then
 end
 
 -- Rotation Variables
+local MeleeRange, AoERange
+local IsInMeleeRange, IsInAoERange
 local ActiveMitigationNeeded
 local IsTanking
 local UseMaul
@@ -163,15 +166,15 @@ local function Precombat()
     if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire precombat 8"; end
   end
   -- Manually added: wild_charge
-  if S.WildCharge:IsCastable() and (Target:IsInRange(25) and not Target:IsInRange(8)) then
+  if S.WildCharge:IsCastable() and (Target:IsInRange(S.WildCharge.MaximumRange) and not Target:IsInRange(S.WildCharge.MinimumRange)) then
     if Cast(S.WildCharge) then return "wild_charge precombat 10"; end
   end
   -- Manually added: thrash_bear
-  if S.Thrash:IsCastable() and Target:IsInRange(8) then
+  if S.Thrash:IsCastable() and IsInAoERange then
     if Cast(S.Thrash) then return "thrash precombat 12"; end
   end
   -- Manually added: mangle
-  if S.Mangle:IsCastable() and Target:IsInMeleeRange(5) then
+  if S.Mangle:IsCastable() and IsInMeleeRange then
     if Cast(S.Mangle) then return "mangle precombat 14"; end
   end
 end
@@ -203,7 +206,7 @@ local function Bear()
   end
   -- thrash_bear,target_if=refreshable|(dot.thrash_bear.stack<5&talent.flashing_claws.rank=2|dot.thrash_bear.stack<4&talent.flashing_claws.rank=1|dot.thrash_bear.stack<3&!talent.flashing_claws.enabled)
   if S.Thrash:IsCastable() then
-    if Everyone.CastCycle(S.Thrash, MeleeEnemies11y, EvaluateCycleThrash, not Target:IsInMeleeRange(8)) then return "thrash bear 8"; end
+    if Everyone.CastCycle(S.Thrash, MeleeEnemies11y, EvaluateCycleThrash, not IsInAoERange) then return "thrash bear 8"; end
   end
   -- bristling_fur,if=!cooldown.pause_action.remains&cooldown.rage_of_the_sleeper.remains>8
   -- Note: Handled in Defensives()
@@ -240,20 +243,20 @@ local function Bear()
   -- maul,if=(buff.rage_of_the_sleeper.up&buff.tooth_and_claw.stack>0&active_enemies<=6&!talent.raze.enabled&variable.If_build=0)|(buff.rage_of_the_sleeper.up&buff.tooth_and_claw.stack>0&active_enemies=1&talent.raze.enabled&variable.If_build=0)
   -- Note: Simplified the condition.
   if S.Maul:IsReady() and UseMaul and ((Player:BuffUp(S.RageoftheSleeper) and Player:BuffStack(S.ToothandClawBuff) > 0 and not VarIFBuild) and (MeleeEnemies11yCount <= 6 and not S.Raze:IsAvailable() or MeleeEnemies11yCount == 1 and S.Raze:IsAvailable())) then
-    if Cast(S.Maul, nil, nil, not Target:IsInMeleeRange(8)) then return "maul bear 24"; end
+    if Cast(S.Maul, nil, nil, not IsInMeleeRange) then return "maul bear 24"; end
   end
   -- raze,if=buff.rage_of_the_sleeper.up&buff.tooth_and_claw.stack>0&variable.If_build=0&active_enemies>1
   if S.Raze:IsReady() and not VarIFBuild and (Player:BuffUp(S.RageoftheSleeper) and Player:BuffStack(S.ToothandClawBuff) > 0 and MeleeEnemies11yCount > 1) then
-    if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 26"; end
+    if Cast(S.Raze, nil, nil, not IsInMeleeRange) then return "raze bear 26"; end
   end
   -- maul,if=(((buff.incarnation.up|buff.berserk_bear.up)&active_enemies<=5&!talent.raze.enabled&(buff.tooth_and_claw.stack>=1))&variable.If_build=0)&cooldown.rage_of_the_sleeper.remains>3|(((buff.incarnation.up|buff.berserk_bear.up)&active_enemies=1&talent.raze.enabled&(buff.tooth_and_claw.stack>=1))&variable.If_build=0)&cooldown.rage_of_the_sleeper.remains>3|(((buff.incarnation.up|buff.berserk_bear.up)&active_enemies<=5&!talent.raze.enabled&(buff.tooth_and_claw.stack>=1))&variable.If_build=0)&buff.rage_of_the_sleeper.up|(((buff.incarnation.up|buff.berserk_bear.up)&active_enemies=1&talent.raze.enabled&(buff.tooth_and_claw.stack>=1))&variable.If_build=0)&buff.rage_of_the_sleeper.up
   -- Note: Simplified the if statement to: (buff.incarnation.up|buff.berserk_bear.up)&buff.tooth_and_claw.stack>=1&variable.If_build=0&(active_enemies<=5&!talent.raze.enabled|active_enemies=1&talent.raze.enabled)&(buff.rage_of_the_sleeper.up|cooldown.rage_of_the_sleeper.remains>3)
   if S.Maul:IsReady() and not VarIFBuild and UseMaul and ((Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S.BerserkBuff)) and Player:BuffStack(S.ToothandClawBuff) >= 1 and (MeleeEnemies11yCount <= 5 and not S.Raze:IsAvailable() or MeleeEnemies11yCount == 1 and S.Raze:IsAvailable()) and (Player:BuffUp(S.RageoftheSleeper) or S.RageoftheSleeper:CooldownRemains() > 3)) then
-    if Cast(S.Maul, nil, nil, not Target:IsInMeleeRange(8)) then return "maul bear 28"; end
+    if Cast(S.Maul, nil, nil, not IsInMeleeRange) then return "maul bear 28"; end
   end
   -- raze,if=(buff.incarnation.up|buff.berserk_bear.up)&(variable.If_build=0)&active_enemies>1&cooldown.rage_of_the_sleeper.remains>3|(buff.incarnation.up|buff.berserk_bear.up)&(variable.If_build=0)&active_enemies>1&buff.rage_of_the_sleeper.up
   if S.Raze:IsReady() and not VarIFBuild and ((Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S.BerserkBuff)) and MeleeEnemies11yCount > 1 and (S.RageoftheSleeper:CooldownRemains() > 3 or Player:BuffUp(S.RageoftheSleeper))) then
-    if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 30"; end
+    if Cast(S.Raze, nil, nil, not IsInMeleeRange) then return "raze bear 30"; end
   end
   -- ironfur,target_if=!debuff.tooth_and_claw_debuff.up,if=!buff.ironfur.up&rage>50&!cooldown.pause_action.remains&variable.If_build=0&!buff.rage_of_the_sleeper.up&cooldown.rage_of_the_sleeper.remains>3&!buff.blazing_thorns.up|rage>90&variable.If_build=0&!buff.rage_of_the_sleeper.up&cooldown.rage_of_the_sleeper.remains>3&!buff.blazing_thorns.up|!debuff.tooth_and_claw_debuff.up,if=!buff.ironfur.up&rage>50&!cooldown.pause_action.remains&variable.If_build=0&buff.rage_of_the_sleeper.up&!buff.blazing_thorns.up|rage>90&variable.If_build=0&buff.rage_of_the_sleeper.up&!buff.blazing_thorns.up
   -- Note: Line has two if statements. Using the... 2nd? Simplifying to:
@@ -270,52 +273,52 @@ local function Bear()
   -- raze,if=(buff.tooth_and_claw.up)&active_enemies>1&cooldown.rage_of_the_sleeper.remains>3|(buff.tooth_and_claw.up)&active_enemies>1&buff.rage_of_the_sleeper.up
   -- Note: Simplified the if statement to: buff.tooth_and_claw.up&active_enemies>1&(cooldown.rage_of_the_sleeper.remains>3|buff.rage_of_the_sleeper.up)
   if S.Raze:IsReady() and (Player:BuffUp(S.ToothandClawBuff) and MeleeEnemies11yCount > 1 and (S.RageoftheSleeper:CooldownRemains() > 3 or Player:BuffUp(S.RageoftheSleeper))) then
-    if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 36"; end
+    if Cast(S.Raze, nil, nil, not IsInMeleeRange) then return "raze bear 36"; end
   end
   -- raze,if=(variable.If_build=0)&active_enemies>1&cooldown.rage_of_the_sleeper.remains>3|(variable.If_build=0)&active_enemies>1&buff.rage_of_the_sleeper.up
   -- Note: Simplified the if statement to: variable.If_build=0&active_enemies>1&(cooldown.rage_of_the_sleeper.remains>3|buff.rage_of_the_sleeper.up)
   if S.Raze:IsReady() and not VarIFBuild and (MeleeEnemies11yCount > 1 and (S.RageoftheSleeper:CooldownRemains() > 3 or Player:BuffUp(S.RageoftheSleeper))) then
-    if Cast(S.Raze, nil, nil, not Target:IsInMeleeRange(5)) then return "raze bear 38"; end
+    if Cast(S.Raze, nil, nil, not IsInMeleeRange) then return "raze bear 38"; end
   end
   -- mangle,if=buff.gore.up&active_enemies<11|buff.vicious_cycle_mangle.stack=3
   if S.Mangle:IsCastable() and (Player:BuffUp(S.GoreBuff) and MeleeEnemies11yCount < 11 or Player:BuffStack(S.ViciousCycleMaulBuff) == 3) then
-    if Cast(S.Mangle, nil, nil, not Target:IsInMeleeRange(8)) then return "mangle bear 40"; end
+    if Cast(S.Mangle, nil, nil, not IsInMeleeRange) then return "mangle bear 40"; end
   end
   -- maul,if=(buff.tooth_and_claw.up&active_enemies<=5&!talent.raze.enabled)&cooldown.rage_of_the_sleeper.remains>3|(buff.tooth_and_claw.up&active_enemies=1&talent.raze.enabled)&cooldown.rage_of_the_sleeper.remains>3|(buff.tooth_and_claw.up&active_enemies<=5&!talent.raze.enabled)&buff.rage_of_the_sleeper.up|(buff.tooth_and_claw.up&active_enemies=1&talent.raze.enabled)&buff.rage_of_the_sleeper.up
   -- Note: Simplified the if statement to:
   -- buff.tooth_and_claw.up&(active_enemies<=5&!talent.raze|active_enemies=1&talent.raze)&(buff.rage_of_the_sleeper.up|cooldown.rage_of_the_sleeper.remains>3)
   if S.Maul:IsReady() and (Player:BuffUp(S.ToothandClawBuff) and (MeleeEnemies11yCount <= 5 and not S.Raze:IsAvailable() or MeleeEnemies11yCount == 1 and S.Raze:IsAvailable()) and (Player:BuffUp(S.RageoftheSleeper) or S.RageoftheSleeper:CooldownRemains() > 3)) then
-    if Cast(S.Maul, nil, nil, not Target:IsInMeleeRange(5)) then return "maul bear 42"; end
+    if Cast(S.Maul, nil, nil, not IsInMeleeRange) then return "maul bear 42"; end
   end
   -- maul,if=(active_enemies<=5&!talent.raze.enabled&variable.If_build=0)&cooldown.rage_of_the_sleeper.remains>3|(active_enemies=1&talent.raze.enabled&variable.If_build=0)&cooldown.rage_of_the_sleeper.remains>3|(active_enemies<=5&!talent.raze.enabled&variable.If_build=0)&buff.rage_of_the_sleeper.up|(active_enemies=1&talent.raze.enabled&variable.If_build=0)&buff.rage_of_the_sleeper.up
   -- Simplified the if statement to:
   -- variable.If_build=0&(active_enemies<=5&!talent.raze|active_enemies=1&talent.raze)&(buff.rage_of_the_sleeper.up|cooldown.rage_of_the_sleeper.remains>3)
   if S.Maul:IsReady() and not VarIFBuild and ((MeleeEnemies11yCount <= 5 and not S.Raze:IsAvailable() or MeleeEnemies11yCount == 1 and S.Raze:IsAvailable()) and (Player:BuffUp(S.RageoftheSleeper) or S.RageoftheSleeper:CooldownRemains() > 3)) then
-    if Cast(S.Maul, nil, nil, not Target:IsInMeleeRange(5)) then return "maul bear 44"; end
+    if Cast(S.Maul, nil, nil, not IsInMeleeRange) then return "maul bear 44"; end
   end
   -- thrash_bear,target_if=active_enemies>=5
   if S.Thrash:IsCastable() and (MeleeEnemies11yCount >= 5) then
-    if Cast(S.Thrash, nil, nil, not Target:IsInMeleeRange(8)) then return "thrash bear 46"; end
+    if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash bear 46"; end
   end
   -- swipe,if=buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&active_enemies>=11
   if S.Swipe:IsCastable() and (Player:BuffDown(S.IncarnationBuff) and Player:BuffDown(S.BerserkBuff) and MeleeEnemies11yCount >= 11) then
-    if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(11)) then return "swipe bear 48"; end
+    if Cast(S.Swipe, nil, nil, not IsInAoERange) then return "swipe bear 48"; end
   end
   -- mangle,if=(buff.incarnation.up&active_enemies<=4)|(buff.incarnation.up&talent.soul_of_the_forest.enabled&active_enemies<=5)|((rage<90)&active_enemies<11)|((rage<85)&active_enemies<11&talent.soul_of_the_forest.enabled)
   if S.Mangle:IsCastable() and ((Player:BuffUp(S.IncarnationBuff) and MeleeEnemies11yCount <= 4) or (Player:BuffUp(S.IncarnationBuff) and S.SouloftheForest:IsAvailable() and MeleeEnemies11yCount <= 5) or (Player:Rage() < 90 and MeleeEnemies11yCount < 11) or (Player:Rage() < 85 and MeleeEnemies11yCount < 11 and S.SouloftheForest:IsAvailable())) then
-    if Cast(S.Mangle, nil, nil, not Target:IsInMeleeRange(8)) then return "mangle bear 50"; end
+    if Cast(S.Mangle, nil, nil, not IsInMeleeRange) then return "mangle bear 50"; end
   end
   -- thrash_bear,if=active_enemies>1
   if S.Thrash:IsCastable() and (MeleeEnemies11yCount > 1) then
-    if Cast(S.Thrash, nil, nil, not Target:IsInMeleeRange(11)) then return "thrash bear 52"; end
+    if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash bear 52"; end
   end
   -- pulverize,target_if=dot.thrash_bear.stack>2
   if S.Pulverize:IsReady() then
-    if Everyone.CastCycle(S.Pulverize, MeleeEnemies11y, EvaluateCyclePulverize, not Target:IsInMeleeRange(8)) then return "pulverize bear 54"; end
+    if Everyone.CastCycle(S.Pulverize, MeleeEnemies11y, EvaluateCyclePulverize, not IsInMeleeRange) then return "pulverize bear 54"; end
   end
   -- thrash_bear
   if S.Thrash:IsCastable() then
-    if Cast(S.Thrash, nil, nil, not Target:IsInMeleeRange(11)) then return "thrash bear 56"; end
+    if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash bear 56"; end
   end
   -- moonfire,if=buff.galactic_guardian.up
   if S.Moonfire:IsCastable() and (Player:BuffUp(S.GalacticGuardianBuff)) then
@@ -323,14 +326,17 @@ local function Bear()
   end
   -- swipe_bear
   if S.Swipe:IsCastable() then
-    if Cast(S.Swipe, nil, nil, not Target:IsInMeleeRange(11)) then return "swipe bear 60"; end
+    if Cast(S.Swipe, nil, nil, not IsInAoERange) then return "swipe bear 60"; end
   end
 end
 
 local function APL()
   -- Enemies Update
+  local AIRange = mathfloor(1.5 * S.AstralInfluence:TalentRank())
+  MeleeRange = 5 + AIRange
+  AoERange = 8 + AIRange
   if AoEON() then
-    MeleeEnemies11y = Player:GetEnemiesInMeleeRange(13)
+    MeleeEnemies11y = Player:GetEnemiesInMeleeRange(AoERange)
     MeleeEnemies11yCount = #MeleeEnemies11y
   else
     MeleeEnemies11y = {}
@@ -345,6 +351,9 @@ local function APL()
     if ((Player:Rage() >= S.Maul:Cost() + 20 and not IsTanking) or Player:RageDeficit() <= 10 or not Settings.Guardian.UseRageDefensively) then
       UseMaul = true
     end
+
+    IsInMeleeRange = Target:IsInRange(MeleeRange)
+    IsInAoERange = Target:IsInRange(AoERange)
   end
 
   if Everyone.TargetIsValid() then
@@ -360,7 +369,7 @@ local function APL()
     end
     -- Manually added: wild_charge if not in range
     if S.WildCharge:IsCastable() and not Target:IsInRange(8) then
-      if Cast(S.WildCharge, Settings.Commons.GCDasOffGCD.WildCharge, nil, not Target:IsInRange(28)) then return "wild_charge main"; end
+      if Cast(S.WildCharge, Settings.Commons.GCDasOffGCD.WildCharge, nil, not Target:IsInRange(S.WildCharge.MaximumRange)) then return "wild_charge main"; end
     end
     -- auto_attack,if=!buff.prowl.up
     -- use_item,name=jotungeirr_destinys_call,if=!buff.prowl.up&!covenant.venthyr
