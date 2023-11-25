@@ -48,9 +48,11 @@ HR.GUISettings.APL.Warrior = {
       -- Abilities
       Avatar = false,
       Bladestorm = false,
+      ColossusSmash = false,
       IgnorePain = false,
       Shockwave = true,
       ThunderousRoar = false,
+      Warbreaker = false,
     },
     OffGCDasOffGCD = {
     },

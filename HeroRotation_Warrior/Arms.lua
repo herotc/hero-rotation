@@ -133,10 +133,10 @@ local function Precombat()
       if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter precombat 8"; end
     end
     if S.ColossusSmash:IsCastable() then
-      if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash precombat 10"; end
+      if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash precombat 10"; end
     end
     if S.Warbreaker:IsCastable() then
-      if Cast(S.Warbreaker, nil, nil, not Target:IsInMeleeRange(8)) then return "warbreaker precombat 12"; end
+      if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInMeleeRange(8)) then return "warbreaker precombat 12"; end
     end
     if S.Overpower:IsCastable() then
       if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower precombat 14"; end
@@ -174,11 +174,11 @@ local function Execute()
   end
   -- warbreaker,if=raid_event.adds.in>22
   if CDsON() and S.Warbreaker:IsCastable() then
-    if Cast(S.Warbreaker, nil, nil, not TargetInMeleeRange) then return "warbreaker execute 12"; end
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not TargetInMeleeRange) then return "warbreaker execute 12"; end
   end
   -- colossus_smash
   if CDsON() and S.ColossusSmash:IsCastable() then
-    if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash execute 14"; end
+    if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash execute 14"; end
   end
   -- execute,if=buff.sudden_death.react&dot.deep_wounds.remains
   if S.Execute:IsReady() and (Player:BuffUp(S.SuddenDeathBuff) and Target:DebuffUp(S.DeepWoundsDebuff)) then
@@ -258,15 +258,15 @@ local function AoE()
   end
   -- warbreaker,if=raid_event.adds.in>22|active_enemies>1
   if S.Warbreaker:IsCastable() and (EnemiesCount8y > 1) then
-    if Cast(S.Warbreaker, nil, nil, not TargetInMeleeRange) then return "warbreaker aoe 10"; end
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not TargetInMeleeRange) then return "warbreaker aoe 10"; end
   end
   -- colossus_smash,cycle_targets=1,if=(target.health.pct<20|talent.massacre&target.health.pct<35)
   if CDsON() and S.ColossusSmash:IsCastable() then
-    if Everyone.CastCycle(S.ColossusSmash, Enemies8y, EvaluateCycleColossusSmash, not TargetInMeleeRange) then return "colossus_smash aoe 12"; end
+    if Everyone.CastCycle(S.ColossusSmash, Enemies8y, EvaluateCycleColossusSmash, not TargetInMeleeRange, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash aoe 12"; end
   end
   -- colossus_smash
   if CDsON() and S.ColossusSmash:IsCastable() then
-    if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash aoe 14"; end
+    if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash aoe 14"; end
   end
   -- execute,if=buff.sudden_death.react&set_bonus.tier31_4pc
   if S.Execute:IsReady() and (Player:BuffUp(S.SuddenDeathBuff) and Player:HasTier(31, 4)) then
@@ -377,11 +377,11 @@ local function SingleTarget()
   end
   -- colossus_smash
   if CDsON() and S.ColossusSmash:IsCastable() then
-    if Cast(S.ColossusSmash, nil, nil, not TargetInMeleeRange) then return "colossus_smash single_target 12"; end
+    if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash single_target 12"; end
   end
   -- warbreaker,if=raid_event.adds.in>22
   if CDsON() and S.Warbreaker:IsCastable() then
-    if Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker single_target 14"; end
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker single_target 14"; end
   end
   -- mortal_strike
   if S.MortalStrike:IsReady() then
