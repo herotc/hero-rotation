@@ -664,7 +664,7 @@ local function APL()
       if Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Windstrike)) then return "windstrike main 22"; end
     end
     -- primordial_wave,if=set_bonus.tier31_2pc&(raid_event.adds.in>(action.primordial_wave.cooldown%(1+set_bonus.tier31_4pc))|raid_event.adds.in<6)
-    if S.PrimordialWave:IsReady() and (Player:HasTier(31, 2)) then
+    if S.PrimordialWave:IsReady() and CDsON() and (Player:HasTier(31, 2)) then
       if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave main 24"; end
     end
     -- feral_spirit
