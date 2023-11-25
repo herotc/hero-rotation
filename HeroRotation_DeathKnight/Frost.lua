@@ -376,8 +376,8 @@ local function Cooldowns()
   if S.SacrificialPact:IsReady() and (not S.GlacialAdvance:IsAvailable() and Player:BuffDown(S.BreathofSindragosa) and Ghoul:GhoulRemains() < Player:GCD() * 2 and EnemiesMeleeCount > 3) then
     if Cast(S.SacrificialPact, Settings.Commons2.GCDasOffGCD.SacrificialPact) then return "sacrificial_pact cooldowns 36"; end
   end
-  -- any_dnd,if=!death_and_decay.ticking&variable.adds_remain&(buff.pillar_of_frost.up&buff.pillar_of_frost.remains>5&buff.pillar_of_frost.remains<11|!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains>10|fight_remains<11)&(active_enemies>5|talent.cleaving_strikes&active_enemies>=2)
-  if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and VarAddsRemain and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffRemains(S.PillarofFrostBuff) > 5 and Player:BuffRemains(S.PillarofFrostBuff) < 11 or Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() > 10 or FightRemains < 11) and (EnemiesMeleeCount > 5 or S.CleavingStrikes:IsAvailable() and EnemiesMeleeCount >= 2)) then
+  -- any_dnd,if=!death_and_decay.ticking&variable.adds_remain&(buff.pillar_of_frost.up&buff.pillar_of_frost.remains>5&buff.pillar_of_frost.remains<11|!buff.pillar_of_frost.up&cooldown.death_and_decay.charges=1&cooldown.death_and_decay.remains<10&cooldown.pillar_of_frost.remains>30|fight_remains<11)&(active_enemies>5|talent.cleaving_strikes&active_enemies>=2)
+  if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and VarAddsRemain and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffRemains(S.PillarofFrostBuff) > 5 and Player:BuffRemains(S.PillarofFrostBuff) < 11 or Player:BuffDown(S.PillarofFrostBuff) and S.DeathAndDecay:Charges() == 1 and S.DeathAndDecay:CooldownRemains() < 10 and S.PillarofFrost:CooldownRemains() > 30 or FightRemains < 11) and (EnemiesMeleeCount > 5 or S.CleavingStrikes:IsAvailable() and EnemiesMeleeCount >= 2)) then
     if Cast(S.DeathAndDecay, Settings.Commons2.GCDasOffGCD.DeathAndDecay) then return "death_and_decay cooldowns 38"; end
   end
 end
