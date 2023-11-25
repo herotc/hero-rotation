@@ -125,7 +125,7 @@ local function Precombat()
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast precombat 6"; end
   end
   if Player:IsCasting(S.ElementalBlast) and S.PrimordialWave:IsViable() then
-    if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 8"; end
+    if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 8"; end
   end
   if Player:IsCasting(S.ElementalBlast) and not S.PrimordialWave:IsViable() and S.FlameShock:IsReady() then
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flameshock precombat 10"; end
@@ -137,7 +137,7 @@ local function Precombat()
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flameshock precombat 14"; end
   end
   if Player:IsCasting(S.LavaBurst) and S.PrimordialWave:IsViable() then
-    if Cast(S.PrimordialWave, nil, nil, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 16"; end
+    if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 16"; end
   end
 end
 

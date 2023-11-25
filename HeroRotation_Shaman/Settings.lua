@@ -52,12 +52,12 @@ HR.GUISettings.APL.Shaman = {
     GCDasOffGCD = {
       -- Abilities
       CrashLightning = false,
+      DoomWinds = false,
       FeralSpirit = true,
       HealingSurge = false,
       Shield = false,
+      Sundering = false,
       WindfuryTotem = false,
-      DoomWinds = false,
-      Sundering = false
     },
     OffGCDasOffGCD = {
     },
