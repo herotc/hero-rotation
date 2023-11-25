@@ -13,6 +13,7 @@ local Spell = HL.Spell
 local Item = HL.Item
 -- Lua
 local GetTime = GetTime
+local C_Timer = C_Timer
 -- File Locals
 HR.Commons.Shaman = {}
 local Shaman = HR.Commons.Shaman
@@ -27,6 +28,18 @@ HL:RegisterForSelfCombatEvent(
     local SourceGUID, _, _, _, _, _, _, _, SpellID = select(4, ...)
     if SourceGUID == Player:GUID() and SpellID == 191634 then
       Shaman.LastSKCast = GetTime()
+    end
+    if Player:HasTier(31, 2) and SourceGUID == Player:GUID() and SpellID == 375982 then
+      Shaman.FeralSpiritCount = Shaman.FeralSpiritCount + 1
+      C_Timer.After(15, function()
+        Shaman.FeralSpiritCount = Shaman.FeralSpiritCount - 1
+      end)
+    end
+    if SourceGUID == Player:GUID() and SpellID == 51533 then
+      Shaman.FeralSpiritCount = Shaman.FeralSpiritCount + 2
+      C_Timer.After(15, function()
+        Shaman.FeralSpiritCount = Shaman.FeralSpiritCount - 2
+      end)
     end
   end
   , "SPELL_CAST_SUCCESS"
@@ -45,24 +58,4 @@ HL:RegisterForSelfCombatEvent(
     end
   end
   , "SPELL_AURA_APPLIED"
-)
-
-HL:RegisterForSelfCombatEvent(
-  function (...)
-    local SpellID = select(12, ...)
-    if SpellID == 228562 or SpellID == 262627 then
-      Shaman.FeralSpiritCount = Shaman.FeralSpiritCount + 1
-    end
-  end
-  , "SPELL_SUMMON"
-)
-
-HL:RegisterForSelfCombatEvent(
-  function (...)
-    local SpellID = select(12, ...)
-    if SpellID == 333957 then
-      Shaman.FeralSpiritCount = 0
-    end
-  end
-  , "SPELL_AURA_REMOVED"
 )
