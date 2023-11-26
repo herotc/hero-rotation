@@ -790,9 +790,9 @@ local function APL ()
   TargetInAoERange = Target:IsInMeleeRange(AoERange)
   if AoEON() then
     Enemies30y = Player:GetEnemiesInRange(30) -- Poisoned Knife & Serrated Bone Spike
-    MeleeEnemies10y = Player:GetEnemiesInMeleeRange(10) -- Fan of Knives & Crimson Tempest
+    MeleeEnemies10y = Player:GetEnemiesInMeleeRange(AoERange) -- Fan of Knives & Crimson Tempest
     MeleeEnemies10yCount = #MeleeEnemies10y
-    MeleeEnemies5y = Player:GetEnemiesInMeleeRange(5) -- Melee cycle
+    MeleeEnemies5y = Player:GetEnemiesInMeleeRange(MeleeRange) -- Melee cycle
   else
     Enemies30y = {}
     MeleeEnemies10y = {}
@@ -923,6 +923,8 @@ local function Init ()
   S.Deathmark:RegisterAuraTracking()
   S.Sepsis:RegisterAuraTracking()
   S.Garrote:RegisterAuraTracking()
+
+  HR.Print("Assassination Rogue rotation has been updated for patch 10.2.0.")
 end
 
 HR.SetAPL(259, APL, Init)
