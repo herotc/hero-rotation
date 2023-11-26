@@ -1040,7 +1040,7 @@ local function APL ()
 end
 
 local function Init ()
-  -- Nothing
+  HR.Print("Subtlety Rogue rotation has NOT been updated for patch 10.2.0. It is unlikely to work properly at this time.")
 end
 
 HR.SetAPL(261, APL, Init)
