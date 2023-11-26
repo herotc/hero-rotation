@@ -323,7 +323,7 @@ local function Tyrant()
   -- variable,name=dummyvar,value=variable.pet_expire<action.summon_demonic_tyrant.execute_time+(buff.demonic_core.down*action.shadow_bolt.execute_time+buff.demonic_core.up*gcd.max)+gcd.max
   -- Note: Not used in the profile, so not declaring it...
   -- hand_of_guldan,if=variable.pet_expire>gcd.max+action.summon_demonic_tyrant.cast_time&variable.pet_expire<gcd.max*4
-  if S.HandofGuldan:IsReady() and (VarPetExpire > GCDMax + S.SummonDemonicTyrant:CastTime() and VarPetExpire < GCDMax * 4) then
+  if S.HandofGuldan:IsReady() and SoulShards > 0 and (VarPetExpire > GCDMax + S.SummonDemonicTyrant:CastTime() and VarPetExpire < GCDMax * 4) then
     if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan tyrant 2"; end
   end
   if VarPetExpire > 0 and VarPetExpire < S.SummonDemonicTyrant:ExecuteTime() + (num(Player:BuffDown(S.DemonicCoreBuff)) * S.ShadowBolt:ExecuteTime() + num(Player:BuffUp(S.DemonicCoreBuff)) * GCDMax) + GCDMax then

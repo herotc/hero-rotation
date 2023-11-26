@@ -91,8 +91,8 @@ HL.AddCoreOverride ("Player.SoulShardsP",
     if not Player:IsCasting() then
       return Shard
     else
-      if Player:IsCasting(SpellDemo.SummonDemonicTyrant) then
-        return 5
+      if Player:IsCasting(SpellDemo.SummonDemonicTyrant) and SpellDemo.SoulboundTyrant:IsAvailable() then
+        return min(Shard + 3, 5)
       elseif Player:IsCasting(SpellDemo.Demonbolt) then
         return min(Shard + 2, 5)
       elseif Player:IsCasting(SpellDemo.ShadowBolt) or Player:IsCasting(SpellDemo.SoulStrike) then
