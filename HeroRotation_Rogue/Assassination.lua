@@ -913,7 +913,7 @@ local function APL ()
       end
     end
     -- Trick to take in consideration the Recovery Setting
-    if (S.Mutilate:IsCastable() or S.Ambush:IsCastable() or S.AmbushOverride:IsCastable()) and TargetInAoERange then
+    if S.Mutilate:IsCastable() or S.Ambush:IsCastable() or S.AmbushOverride:IsCastable() then
       if Cast(S.PoolEnergy) then return "Normal Pooling" end
     end
   end
