@@ -44,12 +44,13 @@ local OnUseExcludes = {
   I.CrimsonGladiatorsBadge:ID(),
   I.ObsidianGladiatorsBadge:ID(),
   I.VerdantGladiatorsBadge:ID(),
-  -- Other Trinkets
+  -- Other Trinkets/Items
   I.AshesoftheEmbersoul:ID(),
   I.BalefireBranch:ID(),
   I.BelorrelostheSuncaller:ID(),
   I.Dreambinder:ID(),
   I.HornofValor:ID(),
+  I.IridaltheEarthsMaster:ID(),
   I.IrideusFragment:ID(),
   I.MirrorofFracturedTomorrows:ID(),
   I.NymuesUnravelingSpindle:ID(),
@@ -80,11 +81,11 @@ local var_steroid_trinket_equipped = I.CrimsonGladiatorsBadge:IsEquipped() or I.
 local var_disable_combustion = not CDsON()
 -- variable,name=firestarter_combustion,default=-1,value=talent.sun_kings_blessing,if=variable.firestarter_combustion<0
 local var_firestarter_combustion = S.SunKingsBlessing:IsAvailable()
--- variable,name=hot_streak_flamestrike,if=variable.hot_streak_flamestrike=0,value=3*talent.flame_patch+999*!talent.flame_patch
-local var_hot_streak_flamestrike = (S.FlamePatch:IsAvailable()) and 3 or 999
+-- variable,name=hot_streak_flamestrike,if=variable.hot_streak_flamestrike=0,value=4*talent.flame_patch+999*!talent.flame_patch
+local var_hot_streak_flamestrike = (S.FlamePatch:IsAvailable()) and 4 or 999
 -- variable,name=hard_cast_flamestrike,if=variable.hard_cast_flamestrike=0,value=999
 local var_hard_cast_flamestrike = 999
--- variable,name=combustion_flamestrike,if=variable.combustion_flamestrike=0,value=3*talent.flame_patch+999*!talent.flame_patch
+-- variable,name=combustion_flamestrike,if=variable.combustion_flamestrike=0,value=4*talent.flame_patch+999*!talent.flame_patch
 local var_combustion_flamestrike = var_hot_streak_flamestrike
 -- variable,name=skb_flamestrike,if=variable.skb_flamestrike=0,value=3*talent.fuel_the_fire+999*!talent.fuel_the_fire
 local var_skb_flamestrike = 3 * num(S.FueltheFire:IsAvailable()) + 999 * num(not S.FueltheFire:IsAvailable())
@@ -231,9 +232,9 @@ local function Precombat()
   -- variable,name=disable_combustion,op=reset
   -- Note: Moved to APL(), since the users may enable or disable CDsON at any time.
   -- variable,name=firestarter_combustion,default=-1,value=talent.sun_kings_blessing,if=variable.firestarter_combustion<0
-  -- variable,name=hot_streak_flamestrike,if=variable.hot_streak_flamestrike=0,value=3*talent.flame_patch+999*!talent.flame_patch
+  -- variable,name=hot_streak_flamestrike,if=variable.hot_streak_flamestrike=0,value=4*talent.flame_patch+999*!talent.flame_patch
   -- variable,name=hard_cast_flamestrike,if=variable.hard_cast_flamestrike=0,value=999
-  -- variable,name=combustion_flamestrike,if=variable.combustion_flamestrike=0,value=3*talent.flame_patch+999*!talent.flame_patch
+  -- variable,name=combustion_flamestrike,if=variable.combustion_flamestrike=0,value=4*talent.flame_patch+999*!talent.flame_patch
   -- variable,name=skb_flamestrike,if=variable.skb_flamestrike=0,value=3*talent.fuel_the_fire+999*!talent.fuel_the_fire
   -- variable,name=arcane_explosion,if=variable.arcane_explosion=0,value=999
   -- variable,name=arcane_explosion_mana,default=40,op=reset
@@ -758,6 +759,10 @@ local function APL()
     -- use_item,name=dreambinder_loom_of_the_great_cycle
     if Settings.Commons.Enabled.Items and I.Dreambinder:IsEquippedAndReady() then
       if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder main 22"; end
+    end
+    -- use_item,name=iridal_the_earths_master,use_off_gcd=1,slot=main_hand,if=gcd.remains>=0.6*gcd.max
+    if Settings.Commons.Enabled.Items and I.IridaltheEarthsMaster:IsEquippedAndReady() then
+      if Cast(I.IridaltheEarthsMaster, nil, Settings.Commons.DisplayStyle.ITems, not Target:IsInRange(40)) then return "iridal_the_earths_master main 23"; end
     end
     -- use_item,name=belorrelos_the_suncaller,if=(!variable.steroid_trinket_equipped&buff.combustion.down)|(variable.steroid_trinket_equipped&trinket.1.has_cooldown&trinket.1.cooldown.remains>20&buff.combustion.down)|(variable.steroid_trinket_equipped&trinket.2.has_cooldown&trinket.2.cooldown.remains>20&buff.combustion.down)
     if Settings.Commons.Enabled.Trinkets and I.BelorrelostheSuncaller:IsEquippedAndReady() and ((not var_steroid_trinket_equipped and CombustionDown) or (var_steroid_trinket_equipped and trinket1:HasCooldown() and trinket1:CooldownRemains() > 20 and CombustionDown) or (var_steroid_trinket_equipped and trinket2:HasCooldown() and trinket2:CooldownRemains() > 20 and CombustionDown)) then
