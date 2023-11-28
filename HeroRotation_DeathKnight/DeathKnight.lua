@@ -54,6 +54,7 @@ Spell.DeathKnight.Commons = {
   -- Debuffs
   BloodPlagueDebuff                     = Spell(55078),
   FrostFeverDebuff                      = Spell(55095),
+  MarkofFyralathDebuff                  = Spell(414532),
   SoulReaperDebuff                      = Spell(343294),
   VirulentPlagueDebuff                  = Spell(191587),
   -- Racials
@@ -201,6 +202,8 @@ Item.DeathKnight.Commons = {
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
   VialofAnimatedBlood                   = Item(159625, {13, 14}),
+  -- Other Items
+  Fyralath                              = Item(206448, {16}),
 }
 
 Item.DeathKnight.Blood = MergeTableByKey(Item.DeathKnight.Commons, {
