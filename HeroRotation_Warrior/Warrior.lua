@@ -68,6 +68,8 @@ Spell.Warrior.Commons = {
   BattleShoutBuff                       = Spell(6673),
   ElysianMightBuff                      = Spell(386286),
   WarMachineBuff                        = Spell(262232),
+  -- Debuffs
+  MarkofFyralathDebuff                  = Spell(414532),
   -- Pool
   Pool                                  = Spell(999910),
 }
@@ -231,6 +233,8 @@ Item.Warrior.Commons = {
   IrideusFragment                       = Item(193743, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
   VialofAnimatedBlood                   = Item(159625, {13, 14}),
+  -- Other Items
+  Fyralath                              = Item(206448, {16}),
 }
 
 Item.Warrior.Fury = MergeTableByKey(Item.Warrior.Commons, {
