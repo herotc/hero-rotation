@@ -67,6 +67,7 @@ Spell.Paladin.Commons = {
   -- Debuffs
   ConsecrationDebuff                    = Spell(204242),
   JudgmentDebuff                        = Spell(197277),
+  MarkofFyralathDebuff                  = Spell(414532),
   -- Pool
   Pool                                  = Spell(999910),
 }
@@ -182,7 +183,9 @@ Item.Paladin.Protection = MergeTableByKey(Item.Paladin.Commons, {
 
 Item.Paladin.Retribution = MergeTableByKey(Item.Paladin.Commons, {
   -- Other On-Use Items
+  Fyralath                              = Item(206448, {16}),
   ShadowedRazingAnnihilator             = Item(205046, {16}),
+  
 })
 
 Item.Paladin.Holy = MergeTableByKey(Item.Paladin.Commons, {

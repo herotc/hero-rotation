@@ -179,9 +179,15 @@ local function Cooldowns()
       end
     end
   end
-  -- use_item,name=shadowed_razing_annihilator,if=(trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)
-  if I.ShadowedRazingAnnihilator:IsEquippedAndReady() and ((Trinket1:CooldownDown() or not Trinket1:HasUseBuff()) and (Trinket2:CooldownDown() or not Trinket2:HasUseBuff())) then
-    if Cast(I.ShadowedRazingAnnihilator, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(8)) then return "shadowed_razing_annihilator cooldowns 10"; end
+  if Settings.Commons.Enabled.Items then
+    -- use_item,name=shadowed_razing_annihilator,if=(trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)
+    if I.ShadowedRazingAnnihilator:IsEquippedAndReady() and ((Trinket1:CooldownDown() or not Trinket1:HasUseBuff()) and (Trinket2:CooldownDown() or not Trinket2:HasUseBuff())) then
+      if Cast(I.ShadowedRazingAnnihilator, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(8)) then return "shadowed_razing_annihilator cooldowns 10"; end
+    end
+    -- use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking&!buff.avenging_wrath.up&!buff.crusade.up
+    if I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0 and Player:BuffDown(S.AvengingWrathBuff) and Player:BuffDown(S.CrusadeBuff)) then
+      if Cast(I.Fyralath, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender cooldowns 11"; end
+    end
   end
   -- shield_of_vengeance,if=fight_remains>15&(!talent.execution_sentence|!debuff.execution_sentence.up)
   if S.ShieldofVengeance:IsCastable() and (FightRemains > 15 and (not S.ExecutionSentence:IsAvailable() or Target:DebuffDown(S.ExecutionSentence))) then
@@ -370,6 +376,8 @@ local function APL()
 end
 
 local function OnInit()
+  S.MarkofFyralathDebuff:RegisterAuraTracking()
+
   HR.Print("Retribution Paladin rotation has been updated for patch 10.2.0.")
 end
 
