@@ -17,6 +17,9 @@ local Item = HL.Item
 local HR = HeroRotation
 local AoEON = HR.AoEON
 local CDsON = HR.CDsON
+local Cast = HR.Cast
+local CastPooling = HR.CastPooling
+local CastSuggested = HR.CastSuggested
 -- Num/Bool Helper Functions
 local num = HR.Commons.Everyone.num
 local bool = HR.Commons.Everyone.bool
@@ -241,27 +244,27 @@ local function StealthCDs ()
   -- actions.stealth_cds+=/vanish,if=talent.hidden_opportunity&!talent.crackshot&!buff.audacity.up&(variable.vanish_opportunity_condition|buff.opportunity.stack<buff.opportunity.max_stack)&variable.ambush_condition
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() and S.HiddenOpportunity:IsAvailable() and not S.Crackshot:IsAvailable() and not Player:BuffUp(S.Audacity)
     and (Vanish_Opportunity_Condition() or Player:BuffStack(S.Opportunity) < 6) and Ambush_Condition() then
-    if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (HO)" end
+    if Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (HO)" end
   end
 
   -- # Crackshot builds or builds without Hidden Opportunity use Vanish at finish condition
   -- actions.stealth_cds+=/vanish,if=(!talent.hidden_opportunity|talent.crackshot)&variable.finish_condition
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() and (not S.HiddenOpportunity:IsAvailable() or S.Crackshot:IsAvailable()) and Finish_Condition() then
-    if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Finish)" end
+    if Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Finish)" end
   end
 
   -- # Crackshot builds use Dance at finish condition
   -- actions.stealth_cds+=/shadow_dance,if=talent.crackshot&variable.finish_condition
   -- synecdoche note: DPS gain in testing to hold off on shadow dance if vanish is coming up in the next 6 seconds to avoid wasting vanish CDR
   if S.ShadowDance:IsAvailable() and S.ShadowDance:IsCastable() and S.Crackshot:IsAvailable() and Finish_Condition() and S.Vanish:CooldownRemains() >= 6 then
-    if HR.Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
+    if Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
   end
 
   -- actions.stealth_cds+=/shadow_dance,if=!talent.keep_it_rolling&variable.shadow_dance_condition&buff.slice_and_dice.up
   -- &(variable.finish_condition|talent.hidden_opportunity)&(!talent.hidden_opportunity|!cooldown.vanish.ready)
   if S.ShadowDance:IsAvailable() and S.ShadowDance:IsCastable() and not S.KeepItRolling:IsAvailable() and Shadow_Dance_Condition() and Player:BuffUp(S.SliceandDice)
       and (Finish_Condition() or S.HiddenOpportunity:IsAvailable()) and (not S.HiddenOpportunity:IsAvailable() or not S.Vanish:IsReady()) then
-    if HR.Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
+    if Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
   end
 
   -- # Keep it Rolling builds without Crackshot use Dance at finish condition but hold it for an upcoming Keep it Rolling
@@ -269,13 +272,13 @@ local function StealthCDs ()
   -- &(cooldown.keep_it_rolling.remains<=30|cooldown.keep_it_rolling.remains>120&(variable.finish_condition|talent.hidden_opportunity))
   if S.ShadowDance:IsAvailable() and S.ShadowDance:IsCastable() and S.KeepItRolling:IsAvailable() and Shadow_Dance_Condition()
     and (S.KeepItRolling:CooldownRemains() <= 30 or S.KeepItRolling:CooldownRemains() >= 120 and (Finish_Condition() or S.HiddenOpportunity:IsAvailable())) then
-    if HR.Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
+    if Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
   end
 
   -- actions.stealth_cds+=/shadowmeld,if=talent.crackshot&variable.finish_condition|!talent.crackshot&(talent.count_the_odds&variable.finish_condition|talent.hidden_opportunity)
   if S.Shadowmeld:IsAvailable() and S.Shadowmeld:IsReady() then
     if S.Crackshot:IsAvailable() and Finish_Condition() or not S.Crackshot:IsAvailable() and (S.CountTheOdds:IsAvailable() and Finish_Condition() or S.HiddenOpportunity:IsAvailable()) then
-      if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
+      if Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
     end
   end
 end
@@ -287,7 +290,7 @@ local function CDs ()
   if CDsON() and S.AdrenalineRush:IsCastable()
     and (not Player:BuffUp(S.AdrenalineRush) or Player:StealthUp(true, true) and S.Crackshot:IsAvailable() and S.ImprovedAdrenalineRush:IsAvailable())
     and (ComboPoints <= 2 or not S.ImprovedAdrenalineRush:IsAvailable()) then
-    if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
+    if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
   end
 
   -- # Maintain Blade Flurry on 2+ targets, and on single target with Underhanded, or on cooldown at 5+ targets with Deft Maneuvers
@@ -299,9 +302,9 @@ local function CDs ()
     if (EnemiesBFCount >= 2 - num(S.UnderhandedUpperhand:IsAvailable()) and not Player:StealthUp(true, false))
       and Player:BuffRemains(S.BladeFlurry) < Player:GCDRemains() or S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 3 and bf_cp_gen >= ComboPointsDeficit and not Finish_Condition() then
       if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
-        HR.CastSuggested(S.BladeFlurry)
+        CastSuggested(S.BladeFlurry)
       else
-        if HR.Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
+        if Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
       end
     end
   end
@@ -312,19 +315,19 @@ local function CDs ()
   if S.RolltheBones:IsReady() then
     local outside_crackshot_window = not Player:StealthUp(true, true) or not S.Crackshot:IsAvailable()
     if outside_crackshot_window and (RtB_Reroll() or Rogue.RtBRemains() <= num(Player:HasTier(31, 4)) + num(S.ShadowDance:CooldownRemains() <=1 or S.Vanish:CooldownRemains() <= 1) * 6) then
-      if HR.Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then return "Cast Roll the Bones" end
+      if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then return "Cast Roll the Bones" end
     end
   end
 
   -- # Use Keep it Rolling with at least 3 buffs (4 with T31)
   -- actions.cds+=/keep_it_rolling,if=!variable.rtb_reroll&rtb_buffs>=3+set_bonus.tier31_4pc&(buff.shadow_dance.down|rtb_buffs>=6)
   if S.KeepItRolling:IsReady() and not RtB_Reroll() and  RtB_Buffs() >= 3 + num(Player:HasTier(31, 4)) and (Player:BuffDown(S.ShadowDance) or RtB_Buffs() >= 6) then
-    if HR.Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then return "Cast Keep it Rolling" end
+    if Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then return "Cast Keep it Rolling" end
   end
 
   --actions.cds+=/ghostly_strike
   if S.GhostlyStrike:IsAvailable() and S.GhostlyStrike:IsReady() then
-    if HR.Cast(S.GhostlyStrike, Settings.Outlaw.OffGCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike" end
+    if Cast(S.GhostlyStrike, Settings.Outlaw.OffGCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike" end
   end
 
   -- # Use Sepsis to trigger Crackshot or if the target will survive its DoT
@@ -333,14 +336,14 @@ local function CDs ()
   if CDsON() and S.Sepsis:IsAvailable() and S.Sepsis:IsReady() then
     if S.Crackshot:IsAvailable() and S.BetweentheEyes:IsReady() and Finish_Condition() and not Player:StealthUp(true, true)
       or not S.Crackshot:IsAvailable() and Target:FilteredTimeToDie(">", 11) and Player:BuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 11) then
-      if HR.Cast(S.Sepsis, Settings.Outlaw.GCDasOffGCD.Sepsis) then return "Cast Sepsis" end
+      if Cast(S.Sepsis, Settings.Outlaw.GCDasOffGCD.Sepsis) then return "Cast Sepsis" end
     end
   end
 
   -- # Use Blade Rush at minimal energy outside of stealth
   -- actions.cds+=/blade_rush,if=energy.base_time_to_max>4&!stealthed.all
   if S.BladeRush:IsReady() and EnergyTimeToMax > 4 and not Player:StealthUp(true, true) then
-    if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
+    if Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
   end
 
   -- actions.cds+=/call_action_list,name=stealth_cds,if=!stealthed.all
@@ -352,7 +355,7 @@ local function CDs ()
   -- actions.cds+=/thistle_tea,if=!buff.thistle_tea.up&(energy.base_deficit>=100|fight_remains<charges*6)
   if CDsON() and S.ThistleTea:IsCastable() and not Player:BuffUp(S.ThistleTea)
     and (EnergyDeficit >= 100 or HL.BossFilteredFightRemains("<", S.ThistleTea:Charges()*6)) then
-    if HR.Cast(S.ThistleTea, Settings.Commons.OffGCDasOffGCD.ThistleTea) then return "Cast Thistle Tea" end
+    if Cast(S.ThistleTea, Settings.Commons.OffGCDasOffGCD.ThistleTea) then return "Cast Thistle Tea" end
   end
 
   -- actions.cds+=/potion,if=buff.bloodlust.react|fight_remains<30|buff.adrenaline_rush.up
@@ -365,22 +368,22 @@ local function CDs ()
 
   -- actions.cds+=/blood_fury
   if S.BloodFury:IsCastable() then
-    if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury" end
+    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury" end
   end
 
   -- actions.cds+=/berserking
   if S.Berserking:IsCastable() then
-    if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking" end
+    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking" end
   end
 
   -- actions.cds+=/fireblood
   if S.Fireblood:IsCastable() then
-    if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood" end
+    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood" end
   end
 
   -- actions.cds+=/ancestral_call
   if S.AncestralCall:IsCastable() then
-    if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call" end
+    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call" end
   end
 
   -- # Default conditions for usable items.
@@ -389,7 +392,7 @@ local function CDs ()
     if I.ManicGrieftorch:IsEquippedAndReady() then
       if Player:GCDRemains() > Player:GCD()-0.1 and not Player:StealthUp(true, true) and Player:BuffUp(S.BetweentheEyes) or
         HL.BossFilteredFightRemains("<=", 5) then
-        if HR.Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Manic Grieftorch"; end
+        if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Manic Grieftorch"; end
       end
     end
 
@@ -398,7 +401,7 @@ local function CDs ()
     if I.DragonfireBombDispenser:IsEquippedAndReady() then
       if (not trinket1:ID() == I.DragonfireBombDispenser:ID() and trinket1:CooldownRemains() > 10 or
         trinket2:CooldownRemains() > 10) or HL.BossFilteredFightRemains("<", 20) or not trinket2:HasCooldown() or not trinket1:HasCooldown() then
-        if HR.Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Dragonfire Bomb Dispenser"; end
+        if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Dragonfire Bomb Dispenser"; end
       end
     end
 
@@ -406,7 +409,7 @@ local function CDs ()
     if I.BeaconToTheBeyond:IsEquippedAndReady() then
       if not Player:StealthUp(true, true) and Player:BuffUp(S.BetweentheEyes)
         or HL.BossFilteredFightRemains("<", 5) then
-        if HR.Cast(I.BeaconToTheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Beacon"; end
+        if Cast(I.BeaconToTheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Beacon"; end
       end
     end
 
@@ -414,7 +417,7 @@ local function CDs ()
     -- actions.cds+=/use_items,slots=trinket2,if=debuff.between_the_eyes.up|trinket.2.has_stat.any_dps|fight_remains<=20
     local TrinketToUse = Player:GetUseableItems(OnUseExcludes, 13) or Player:GetUseableItems(OnUseExcludes, 14)
     if TrinketToUse and (Player:BuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 20) or TrinketToUse:HasStatAnyDps()) then
-      if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name() end
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name() end
     end
   end
 end
@@ -424,25 +427,25 @@ local function Stealth()
 	if S.BladeFlurry:IsReady() and S.BladeFlurry:IsCastable() and AoEON() and S.Subterfuge:IsAvailable() and S.HiddenOpportunity:IsAvailable() and EnemiesBFCount >= 2
 		and Player:BuffRemains(S.BladeFlurry) <= Player:GCDRemains() then
 		if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
-		  HR.CastSuggested(S.BladeFlurry)
+		  CastSuggested(S.BladeFlurry)
 		else
-		  if HR.Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
+		  if Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
 		end
 	end
 
 	-- actions.stealth+=/cold_blood,if=variable.finish_condition
 	if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Target:IsSpellInRange(S.Dispatch) and Finish_Condition() then
-		if HR.Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
+		if Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
 	end
 
 	-- actions.stealth+=/between_the_eyes,if=variable.finish_condition&talent.crackshot
 	if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and Finish_Condition() and S.Crackshot:IsAvailable() then
-		if HR.CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
+		if CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
 	end
 
 	-- actions.stealth+=/dispatch,if=variable.finish_condition
 	if S.Dispatch:IsCastable() and Target:IsSpellInRange(S.Dispatch) and Finish_Condition() then
-		if HR.CastPooling(S.Dispatch) then return "Cast Dispatch" end
+		if CastPooling(S.Dispatch) then return "Cast Dispatch" end
 	end
 
 	-- # 2 Fan the Hammer Crackshot builds can consume Opportunity in stealth with max stacks, Broadside, and low CPs, or with Greenskins active
@@ -450,12 +453,12 @@ local function Stealth()
 	-- &(buff.broadside.up&combo_points<=1|buff.greenskins_wickers.up)
 	if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and S.Crackshot:IsAvailable() and S.FanTheHammer:TalentRank() >= 2 and Player:BuffStack(S.Opportunity) >= 6
 		and (Player:BuffUp(S.Broadside) and ComboPoints <= 1 or Player:BuffUp(S.GreenskinsWickersBuff)) then
-		if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
+		if CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
 	end
 
 	-- actions.stealth+=/ambush,if=talent.hidden_opportunity
 	if S.Ambush:IsCastable() and Target:IsSpellInRange(S.Ambush) and S.HiddenOpportunity:IsAvailable() then
-		if HR.CastPooling(S.Ambush) then return "Cast Ambush" end
+		if CastPooling(S.Ambush) then return "Cast Ambush" end
 	end
 end
 
@@ -467,66 +470,66 @@ local function Finish ()
 	if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and not S.Crackshot:IsAvailable()
 		and (Player:BuffRemains(S.BetweentheEyes) < 4 or S.ImprovedBetweenTheEyes:IsAvailable() or S.GreenskinsWickers:IsAvailable()
     or Player:HasTier(30, 4)) and Player:BuffDown(S.GreenskinsWickers) then
-		if HR.CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
+		if CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
 	end
 
 	-- #Crackshot builds use Between the Eyes outside of Stealth if Vanish or Dance will not come off cooldown within the next cast
 	-- actions.finish+=/between_the_eyes,if=talent.crackshot&(cooldown.vanish.remains>45&cooldown.shadow_dance.remains>12)
 	if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and S.Crackshot:IsAvailable()
 		and (S.Vanish:CooldownRemains() > 45 and S.ShadowDance:CooldownRemains() > 12) then
-		if HR.CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
+		if CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
 	end
 
 	-- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&refreshable
 	-- Note: Added Player:BuffRemains(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
 	if S.SliceandDice:IsCastable() and (HL.FilteredFightRemains(EnemiesBF, ">", Player:BuffRemains(S.SliceandDice), true) or Player:BuffRemains(S.SliceandDice) == 0)
 		and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints) * 1.8 then
-		if HR.CastPooling(S.SliceandDice) then return "Cast Slice and Dice" end
+		if CastPooling(S.SliceandDice) then return "Cast Slice and Dice" end
 	end
 
 	-- actions.finish+=/killing_spree,if=debuff.ghostly_strike.up|!talent.ghostly_strike
 	if S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and (Target:DebuffUp(S.GhostlyStrike) or not S.GhostlyStrike:IsAvailable()) then
-		if HR.Cast(S.KillingSpree) then return "Cast Killing Spree" end
+		if Cast(S.KillingSpree) then return "Cast Killing Spree" end
 	end
 
   if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Target:IsSpellInRange(S.Dispatch) then
-    if HR.Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
+    if Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
   end
   -- actions.finish+=/dispatch
   if S.Dispatch:IsCastable() and Target:IsSpellInRange(S.Dispatch) then
-    if HR.CastPooling(S.Dispatch) then return "Cast Dispatch" end
+    if CastPooling(S.Dispatch) then return "Cast Dispatch" end
   end
 end
 
 local function Build ()
 	-- actions.build+=/echoing_reprimand
 	if CDsON() and S.EchoingReprimand:IsReady() then
-		if HR.Cast(S.EchoingReprimand, Settings.Commons.GCDasOffGCD.EchoingReprimand) then
+		if Cast(S.EchoingReprimand, Settings.Commons.GCDasOffGCD.EchoingReprimand) then
 			return "Cast Echoing Reprimand"
 		end
 	end
 
 	-- actions.build+=/ambush,if=talent.hidden_opportunity&buff.audacity.up
   if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
-    if HR.CastPooling(S.Ambush) then return "Cast Ambush (High-Prio Buffed)" end
+    if CastPooling(S.Ambush) then return "Cast Ambush (High-Prio Buffed)" end
   end
 
 	-- # With Audacity + Hidden Opportunity + Fan the Hammer, consume Opportunity to proc Audacity any time Ambush is not available
 	-- actions.build+=/pistol_shot,if=talent.fan_the_hammer&talent.audacity&talent.hidden_opportunity&buff.opportunity.up&!buff.audacity.up
 	if S.FanTheHammer:IsAvailable() and S.Audacity:IsAvailable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.Opportunity) and Player:BuffDown(S.AudacityBuff) then
-		if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (Audacity)" end
+		if CastPooling(S.PistolShot) then return "Cast Pistol Shot (Audacity)" end
 	end
 
 	-- # Use Greenskins Wickers buff immediately with Opportunity unless running Fan the Hammer
 	-- actions.build+=/pistol_shot,if=buff.greenskins_wickers.up&(!talent.fan_the_hammer&buff.opportunity.up|buff.greenskins_wickers.remains<1.5)
 	if Player:BuffUp(S.GreenskinsWickersBuff) and (not S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity) or Player:BuffRemains(S.GreenskinsWickersBuff) < 1.5) then
-		if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (GSW Dump)" end
+		if CastPooling(S.PistolShot) then return "Cast Pistol Shot (GSW Dump)" end
 	end
 
 	-- #With Fan the Hammer, consume Opportunity at max stacks or if it will expire
 	-- actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&(buff.opportunity.stack>=buff.opportunity.max_stack|buff.opportunity.remains<2)
 	if S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity) and (Player:BuffStack(S.Opportunity) >= 6 or Player:BuffRemains(S.Opportunity) < 2) then
-		if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (FtH Dump)" end
+		if CastPooling(S.PistolShot) then return "Cast Pistol Shot (FtH Dump)" end
 	end
 
 	-- # With Fan the Hammer, consume Opportunity based on CP deficit, and 2 Fan the Hammer Crackshot builds can briefly hold stacks for an upcoming stealth cooldown
@@ -534,7 +537,7 @@ local function Build ()
 	-- &(!cooldown.vanish.ready&!cooldown.shadow_dance.ready|stealthed.all|!talent.crackshot|talent.fan_the_hammer.rank<=1)
 	if S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity) and ComboPointsDeficit > (1+num(S.QuickDraw:IsAvailable())*S.FanTheHammer:TalentRank())
 		and (not S.Vanish:IsReady() and not S.ShadowDance:IsReady() or Player:StealthUp(true, true) or not S.Crackshot:IsAvailable() or S.FanTheHammer:TalentRank() <= 1) then
-		if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
+		if CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
 	end
 
 	-- #If not using Fan the Hammer, then consume Opportunity based on energy, when it will exactly cap CPs, or when using Quick Draw
@@ -542,12 +545,12 @@ local function Build ()
 	-- &(energy.base_deficit>energy.regen*1.5|combo_points.deficit<=1+buff.broadside.up|talent.quick_draw.enabled|talent.audacity.enabled&!buff.audacity.up)
 	if not S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity)
 		and (EnergyTimeToMax > 1.5 or ComboPointsDeficit <= 1 + num(Player:BuffUp(S.Broadside)) or S.QuickDraw:IsAvailable() or S.Audacity:IsAvailable() and Player:BuffDown(S.AudacityBuff)) then
-		if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
+		if CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
 	end
 
   -- actions.build+=/sinister_strike
   if S.SinisterStrike:IsCastable() and Target:IsSpellInRange(S.SinisterStrike) then
-    if HR.CastPooling(S.SinisterStrike) then return "Cast Sinister Strike" end
+    if CastPooling(S.SinisterStrike) then return "Cast Sinister Strike" end
   end
 end
 
@@ -586,7 +589,7 @@ local function APL ()
     -- actions.precombat+=/blade_flurry,precombat_seconds=4,if=talent.underhanded_upper_hand
     -- Blade Flurry Breaks Stealth so must be done first
     if S.BladeFlurry:IsReady() and Player:BuffDown(S.BladeFlurry) and S.UnderhandedUpperhand:IsAvailable() and not Player:StealthUp(true, true) then
-      if HR.Cast(S.BladeFlurry) then return "Blade Flurry (Opener)" end
+      if Cast(S.BladeFlurry) then return "Blade Flurry (Opener)" end
     end
 
     -- Stealth
@@ -603,32 +606,32 @@ local function APL ()
       -- Precombat CDs
       -- actions.precombat+=/adrenaline_rush,precombat_seconds=3,if=talent.improved_adrenaline_rush
       if S.AdrenalineRush:IsReady() and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2 then
-        if HR.Cast(S.AdrenalineRush) then return "Cast Adrenaline Rush (Opener)" end
+        if Cast(S.AdrenalineRush) then return "Cast Adrenaline Rush (Opener)" end
       end
       -- actions.precombat+=/roll_the_bones,precombat_seconds=2
       -- Use same extended logic as a normal rotation for between pulls
       if S.RolltheBones:IsReady() and not Player:DebuffUp(S.Dreadblades) and (RtB_Buffs() == 0 or RtB_Reroll()) then
-        if HR.Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then return "Cast Roll the Bones (Opener)" end
+        if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then return "Cast Roll the Bones (Opener)" end
       end
       -- actions.precombat+=/slice_and_dice,precombat_seconds=1
       if S.SliceandDice:IsReady() and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints) * 1.8 then
-        if HR.CastPooling(S.SliceandDice) then return "Cast Slice and Dice (Opener)" end
+        if CastPooling(S.SliceandDice) then return "Cast Slice and Dice (Opener)" end
       end
       if Player:StealthUp(true, false) then
         ShouldReturn = Stealth()
         if ShouldReturn then return "Stealth (Opener): " .. ShouldReturn end
-        if S.KeepItRolling:IsAvailable() and S.GhostlyStrike:IsAvailable() and S.EchoingReprimand:IsAvailable() then
-          if HR.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike KiR (Opener)" end
+        if S.KeepItRolling:IsAvailable() and S.GhostlyStrike:IsReady() and S.EchoingReprimand:IsAvailable() then
+          if Cast(S.GhostlyStrike) then return "Cast Ghostly Strike KiR (Opener)" end
         end
         if S.Ambush:IsCastable() then
-          if HR.Cast(S.Ambush) then return "Cast Ambush (Opener)" end
+          if Cast(S.Ambush) then return "Cast Ambush (Opener)" end
         end
       elseif Finish_Condition() then
         ShouldReturn = Finish()
         if ShouldReturn then return "Finish (Opener): " .. ShouldReturn end
       end
       if S.SinisterStrike:IsCastable() then
-        if HR.Cast(S.SinisterStrike) then return "Cast Sinister Strike (Opener)" end
+        if Cast(S.SinisterStrike) then return "Cast Sinister Strike (Opener)" end
       end
     end
     return
@@ -663,7 +666,7 @@ local function APL ()
       ShouldReturn = Finish()
       if ShouldReturn then return "Finish: " .. ShouldReturn end
       -- run_action_list forces the return
-      HR.Cast(S.PoolEnergy)
+      Cast(S.PoolEnergy)
       return "Finish Pooling"
     end
     -- actions+=/call_action_list,name=build
@@ -672,25 +675,25 @@ local function APL ()
 
     -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
     if S.ArcaneTorrent:IsCastable() and Target:IsSpellInRange(S.SinisterStrike) and EnergyDeficit > 15 + EnergyRegen then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent" end
+      if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent" end
     end
     -- actions+=/arcane_pulse
     if S.ArcanePulse:IsCastable() and Target:IsSpellInRange(S.SinisterStrike) then
-      if HR.Cast(S.ArcanePulse) then return "Cast Arcane Pulse" end
+      if Cast(S.ArcanePulse) then return "Cast Arcane Pulse" end
     end
     -- actions+=/lights_judgment
     if S.LightsJudgment:IsCastable() and Target:IsInMeleeRange(5) then
-      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Lights Judgment" end
+      if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Lights Judgment" end
     end
     -- actions+=/bag_of_tricks
     if S.BagofTricks:IsCastable() and Target:IsInMeleeRange(5) then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Bag of Tricks" end
+      if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Bag of Tricks" end
     end
 
     -- OutofRange Pistol Shot
     if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and not Target:IsInRange(BladeFlurryRange) and not Player:StealthUp(true, true)
       and EnergyDeficit < 25 and (ComboPointsDeficit >= 1 or EnergyTimeToMax <= 1.2) then
-      if HR.Cast(S.PistolShot) then return "Cast Pistol Shot (OOR)" end
+      if Cast(S.PistolShot) then return "Cast Pistol Shot (OOR)" end
     end
   end
 end
