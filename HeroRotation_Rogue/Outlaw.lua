@@ -35,6 +35,7 @@ local Rogue = HR.Commons.Rogue
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Rogue.Commons,
+  Commons2 = HR.GUISettings.APL.Rogue.Commons2,
   Outlaw = HR.GUISettings.APL.Rogue.Outlaw,
 }
 
@@ -217,7 +218,7 @@ end
 -- Determine if we are allowed to use Vanish offensively in the current situation
 local function Vanish_DPS_Condition ()
   -- You can vanish if we've set the UseDPSVanish setting, and we're either not tanking or we're solo but the DPS vanish while solo flag is set).
-  return Settings.Commons.UseDPSVanish and (not Player:IsTanking(Target) or Settings.Commons.UseSoloVanish)
+  return Settings.Commons2.UseDPSVanish and (not Player:IsTanking(Target) or Settings.Commons2.UseSoloVanish)
 end
 
 local function Vanish_Opportunity_Condition ()
@@ -355,6 +356,12 @@ local function CDs ()
   end
 
   -- actions.cds+=/potion,if=buff.bloodlust.react|fight_remains<30|buff.adrenaline_rush.up
+  if Settings.Commons.Enabled.Potions then
+    local PotionSelected = Everyone.PotionSelected()
+    if PotionSelected and PotionSelected:IsReady() and (Player:BloodlustUp() or HL.BossFilteredFightRemains("<", 30) or Player:BuffUp(S.AdrenalineRush)) then
+      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "Cast Potion"; end
+    end
+  end
 
   -- actions.cds+=/blood_fury
   if S.BloodFury:IsCastable() then
@@ -377,12 +384,12 @@ local function CDs ()
   end
 
   -- # Default conditions for usable items.
-  if Settings.Commons.UseTrinkets then
+  if Settings.Commons.Enabled.Trinkets then
     -- actions.cds+=/use_item,name=manic_grieftorch,use_off_gcd=1,if=gcd.remains>gcd.max-0.1&!stealthed.all&buff.between_the_eyes.up|fight_remains<=5
     if I.ManicGrieftorch:IsEquippedAndReady() then
       if Player:GCDRemains() > Player:GCD()-0.1 and not Player:StealthUp(true, true) and Player:BuffUp(S.BetweentheEyes) or
         HL.BossFilteredFightRemains("<=", 5) then
-        if HR.Cast(I.ManicGrieftorch, nil, Settings.Commons.TrinketDisplayStyle) then return "Manic Grieftorch"; end
+        if HR.Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Manic Grieftorch"; end
       end
     end
 
@@ -391,7 +398,7 @@ local function CDs ()
     if I.DragonfireBombDispenser:IsEquippedAndReady() then
       if (not trinket1:ID() == I.DragonfireBombDispenser:ID() and trinket1:CooldownRemains() > 10 or
         trinket2:CooldownRemains() > 10) or HL.BossFilteredFightRemains("<", 20) or not trinket2:HasCooldown() or not trinket1:HasCooldown() then
-        if HR.Cast(I.DragonfireBombDispenser, nil, Settings.Commons.TrinketDisplayStyle) then return "Dragonfire Bomb Dispenser"; end
+        if HR.Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Dragonfire Bomb Dispenser"; end
       end
     end
 
@@ -399,7 +406,7 @@ local function CDs ()
     if I.BeaconToTheBeyond:IsEquippedAndReady() then
       if not Player:StealthUp(true, true) and Player:BuffUp(S.BetweentheEyes)
         or HL.BossFilteredFightRemains("<", 5) then
-        if HR.Cast(I.BeaconToTheBeyond, nil, Settings.Commons.TrinketDisplayStyle) then return "Beacon"; end
+        if HR.Cast(I.BeaconToTheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Beacon"; end
       end
     end
 
@@ -407,7 +414,7 @@ local function CDs ()
     -- actions.cds+=/use_items,slots=trinket2,if=debuff.between_the_eyes.up|trinket.2.has_stat.any_dps|fight_remains<=20
     local TrinketToUse = Player:GetUseableItems(OnUseExcludes, 13) or Player:GetUseableItems(OnUseExcludes, 14)
     if TrinketToUse and (Player:BuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 20) or TrinketToUse:HasStatAnyDps()) then
-      if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name() end
+      if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name() end
     end
   end
 end

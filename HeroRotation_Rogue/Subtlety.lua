@@ -155,7 +155,7 @@ local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD, Enemies)
   if BestUnit then
     HR.CastLeftNameplate(BestUnit, DoTSpell)
   -- Check ranged units next, if the RangedMultiDoT option is enabled
-  elseif Settings.Commons.RangedMultiDoT then
+  elseif Settings.Commons2.RangedMultiDoT then
     BestUnit, BestUnitTTD = nil, DoTMinTTD
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemains(DoTSpell))
@@ -668,7 +668,7 @@ local function CDs ()
           or S.ThistleTea:ChargesFractional() >= 2.75 and Player:BuffUp(S.ShadowDanceBuff))
         or Player:BuffRemains(S.ShadowDanceBuff) >= 4 and not Player:BuffUp(S.ThistleTea) and MeleeEnemies10yCount >= 3
         or not Player:BuffUp(S.ThistleTea) and HL.BossFilteredFightRemains("<=", 6 * S.ThistleTea:Charges()) then
-        if HR.Cast(S.ThistleTea, nil, Settings.Commons.TrinketDisplayStyle) then return "Thistle Tea"; end
+        if HR.Cast(S.ThistleTea, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Thistle Tea"; end
       end
     end
 
@@ -696,13 +696,13 @@ local function CDs ()
     end
 
     -- Trinkets
-    if Settings.Commons.UseTrinkets then
+    if Settings.Commons.Enabled.Trinkets then
       -- actions.cds+=/use_item,name=manic_grieftorch,use_off_gcd=1,if=!stealthed.all&(!raid_event.adds.up|!equipped.stormeaters_boon|trinket.stormeaters_boon.cooldown.remains>20)
       if I.ManicGrieftorch:IsEquippedAndReady() then
         if (not Player:StealthUp(true, true)
             and (not I.StormEatersBoon:IsEquipped()
                 or I.StormEatersBoon:CooldownRemains() > 20)) then
-            if HR.Cast(I.ManicGrieftorch, nil, Settings.Commons.TrinketDisplayStyle) then return "Manic Grieftorch" end
+            if HR.Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Manic Grieftorch" end
         end
       end
       -- actions.cds+=/use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=!stealthed.all&(buff.deeper_daggers.up|!talent.deeper_daggers)&(!raid_event.adds.up|!equipped.stormeaters_boon|trinket.stormeaters_boon.cooldown.remains>20)
@@ -712,7 +712,7 @@ local function CDs ()
                 or not S.DeeperDaggers:IsAvailable())
             and (not I.StormEatersBoon:IsEquipped()
                 or I.StormEatersBoon:CooldownRemains() > 20)) then
-            if HR.Cast(I.BeaconToTheBeyond, nil, Settings.Commons.TrinketDisplayStyle) then return "Beacon To The Beyond" end
+            if HR.Cast(I.BeaconToTheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Beacon To The Beyond" end
         end
       end
 
@@ -720,7 +720,7 @@ local function CDs ()
       if not Player:StealthUp(true, true) or HL.BossFilteredFightRemains("<", 10) then
         local TrinketToUse = Player:GetUseableItems(OnUseExcludes)
         if TrinketToUse then
-            if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then
+            if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then
                 return "Generic use_items for " .. TrinketToUse:Name()
             end
         end

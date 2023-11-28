@@ -32,6 +32,7 @@ HR.Commons.Rogue = Commons
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Rogue.Commons,
+  Commons2 = HR.GUISettings.APL.Rogue.Commons2,
   Assassination = HR.GUISettings.APL.Rogue.Assassination,
   Outlaw = HR.GUISettings.APL.Rogue.Outlaw,
   Subtlety = HR.GUISettings.APL.Rogue.Subtlety
@@ -300,7 +301,7 @@ end
 
 -- Stealth
 function Commons.Stealth(Stealth, Setting)
-  if Stealth:IsCastable() and Player:StealthDown() then
+  if (Settings.Commons2.ShowStealthOOC or Everyone.TargetIsValid()) and Stealth:IsCastable() and Player:StealthDown() then
     if HR.Cast(Stealth) then return "Cast Stealth (OOC)" end
   end
 
@@ -312,7 +313,7 @@ do
   local CrimsonVial = Spell(185311)
 
   function Commons.CrimsonVial()
-    if CrimsonVial:IsCastable() and Player:HealthPercentage() <= Settings.Commons.CrimsonVialHP then
+    if CrimsonVial:IsCastable() and Player:HealthPercentage() <= Settings.Commons2.CrimsonVialHP then
       if HR.Cast(CrimsonVial, Settings.Commons.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial (Defensives)" end
     end
 
@@ -341,41 +342,43 @@ do
   end
 
   function Commons.Poisons()
-    local PoisonRefreshTime = Player:AffectingCombat() and 120 or 300
-    local PoisonRemains
-    -- Lethal Poison
-    UsingWoundPoison = Player:BuffUp(WoundPoison)
+    if Settings.Commons2.ShowPoisonOOC or Everyone.TargetIsValid() or Player:AffectingCombat() then
+      local PoisonRefreshTime = Player:AffectingCombat() and 120 or 300
+      local PoisonRemains
+      -- Lethal Poison
+      UsingWoundPoison = Player:BuffUp(WoundPoison)
 
-    if Spell.Rogue.Assassination.DragonTemperedBlades:IsAvailable() then
-      CastPoison(UsingWoundPoison and WoundPoison or DeadlyPoison)
-      if AmplifyingPoison:IsAvailable() then
-        CastPoison(AmplifyingPoison)
+      if Spell.Rogue.Assassination.DragonTemperedBlades:IsAvailable() then
+        CastPoison(UsingWoundPoison and WoundPoison or DeadlyPoison)
+        if AmplifyingPoison:IsAvailable() then
+          CastPoison(AmplifyingPoison)
+        else
+          CastPoison(InstantPoison)
+        end
       else
-        CastPoison(InstantPoison)
+        if UsingWoundPoison then
+          CastPoison(WoundPoison)
+        elseif AmplifyingPoison:IsAvailable() and Player:BuffDown(DeadlyPoison) then
+          CastPoison(AmplifyingPoison)
+        elseif DeadlyPoison:IsAvailable() then
+          CastPoison(DeadlyPoison)
+        else
+          CastPoison(InstantPoison)
+        end
       end
-    else
-      if UsingWoundPoison then
-        CastPoison(WoundPoison)
-      elseif AmplifyingPoison:IsAvailable() and Player:BuffDown(DeadlyPoison) then
-        CastPoison(AmplifyingPoison)
-      elseif DeadlyPoison:IsAvailable() then
-        CastPoison(DeadlyPoison)
-      else
-        CastPoison(InstantPoison)
-      end
-    end
 
-    -- Non-Lethal Poisons
-    if Player:BuffDown(CripplingPoison) then
-      if AtrophicPoison:IsAvailable() then
-        CastPoison(AtrophicPoison)
-      elseif NumbingPoison:IsAvailable() then
-        CastPoison(NumbingPoison)
+      -- Non-Lethal Poisons
+      if Player:BuffDown(CripplingPoison) then
+        if AtrophicPoison:IsAvailable() then
+          CastPoison(AtrophicPoison)
+        elseif NumbingPoison:IsAvailable() then
+          CastPoison(NumbingPoison)
+        else
+          CastPoison(CripplingPoison)
+        end
       else
         CastPoison(CripplingPoison)
       end
-    else
-      CastPoison(CripplingPoison)
     end
   end
 end

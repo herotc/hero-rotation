@@ -18,14 +18,17 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 -- Default settings
 HR.GUISettings.APL.Rogue = {
   Commons = {
-    CrimsonVialHP = 30,
-    RangedMultiDoT = true, -- Suggest Multi-DoT at 10y Range
-    UseSoloVanish = false, -- don't vanish while solo
-    UseDPSVanish = true, -- allow the use of vanish for dps (checking for if you're solo)
-    UseTrinkets = true,
-    TrinketDisplayStyle = "Suggested",
-    ShowPooling = true,
-
+    Enabled = {
+      Potions = true,
+      Trinkets = true,
+      Items = true,
+    },
+    DisplayStyle = {
+      Potions = "Suggested",
+      Signature = "Suggested",
+      Trinkets = "Suggested",
+      Items = "Suggested",
+    },
     GCDasOffGCD = {
       EchoingReprimand = true,
       CrimsonVial = true,
@@ -38,6 +41,15 @@ HR.GUISettings.APL.Rogue = {
       ThistleTea = true,
       ColdBlood = true,
     }
+  },
+  Commons2 = {
+    ShowStealthOOC = true,
+    ShowPoisonOOC = true,
+    CrimsonVialHP = 30,
+    RangedMultiDoT = true, -- Suggest Multi-DoT at 10y Range
+    UseSoloVanish = false, -- don't vanish while solo
+    UseDPSVanish = true, -- allow the use of vanish for dps (checking for if you're solo)
+    ShowPooling = true,
   },
   Assassination = {
     EnvenomDMGOffset = 3,
@@ -106,19 +118,22 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Child Panels
 local ARPanel = HR.GUI.Panel
 local CP_Rogue = CreateChildPanel(ARPanel, "Rogue")
+local CP_Rogue2 = CreateChildPanel(ARPanel, "Rogue 2")
 local CP_Assassination = CreateChildPanel(ARPanel, "Assassination")
 local CP_Outlaw = CreateChildPanel(ARPanel, "Outlaw")
 local CP_Subtlety = CreateChildPanel(ARPanel, "Subtlety")
 -- Controls
 -- Rogue
-CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.CrimsonVialHP", {0, 100, 1}, "Crimson Vial HP", "Set the Crimson Vial HP threshold.")
-CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
-CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.")
-CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.UseDPSVanish", "Use Vanish for DPS", "Suggest Vanish for DPS.\nDisable to save Vanish for utility purposes.")
-CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.UseSoloVanish", "Use Vanish while Solo", "Suggest Vanish while Solo.\nDisable to save prevent mobs resetting.")
-CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
-CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.ShowPooling", "Show Pooling Icon", "Show pooling icon instead of pooling prediction.")
 CreateARPanelOptions(CP_Rogue, "APL.Rogue.Commons")
+-- Rogue 2
+CreatePanelOption("Slider", CP_Rogue2, "APL.Rogue.Commons2.CrimsonVialHP", {0, 100, 1}, "Crimson Vial HP", "Set the Crimson Vial HP threshold.")
+CreatePanelOption("CheckButton", CP_Rogue2, "APL.Rogue.Commons2.ShowStealthOOC", "Stealth While OOC", "Suggest Stealth while out of combat.")
+CreatePanelOption("CheckButton", CP_Rogue2, "APL.Rogue.Commons2.ShowPoisonOOC", "Poisons While OOC", "Suggest Poisons while out of combat.")
+CreatePanelOption("CheckButton", CP_Rogue2, "APL.Rogue.Commons2.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.")
+CreatePanelOption("CheckButton", CP_Rogue2, "APL.Rogue.Commons2.UseDPSVanish", "Use Vanish for DPS", "Suggest Vanish for DPS.\nDisable to save Vanish for utility purposes.")
+CreatePanelOption("CheckButton", CP_Rogue2, "APL.Rogue.Commons2.UseSoloVanish", "Use Vanish while Solo", "Suggest Vanish while Solo.\nDisable to save prevent mobs resetting.")
+CreatePanelOption("CheckButton", CP_Rogue2, "APL.Rogue.Commons2.ShowPooling", "Show Pooling Icon", "Show pooling icon instead of pooling prediction.")
+CreateARPanelOptions(CP_Rogue2, "APL.Rogue.Commons2")
 -- Assassination
 CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.EnvenomDMGOffset", {1, 5, 0.25}, "Envenom DMG Offset", "Set the Envenom DMG Offset.")
 CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateDMGOffset", {1, 5, 0.25}, "Mutilate DMG Offset", "Set the Mutilate DMG Offset.")
