@@ -18,6 +18,7 @@ local HR            = HeroRotation
 local AoEON         = HR.AoEON
 local CDsON         = HR.CDsON
 local Cast          = HR.Cast
+local CastCycle     = HR.CastCycle
 local CastPooling   = HR.CastPooling
 local CastAnnotated = HR.CastAnnotated
 local CastSuggested = HR.CastSuggested
@@ -177,34 +178,41 @@ local function Trinkets()
   if I.DragonfireBombDispenser:IsEquippedAndReady() then
     ItemCD1141Ready = true
   end
-  -- use_item,name=dreambinder_loom_of_the_great_cycle
-  if Settings.Commons.Enabled.Items and I.Dreambinder:IsEquippedAndReady() then
-    if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle trinkets 2"; end
+  if Settings.Commons.Enabled.Items then
+    -- use_item,name=dreambinder_loom_of_the_great_cycle,use_off_gcd=1,if=gcd.remains>0.5
+    if I.Dreambinder:IsEquippedAndReady() then
+      if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle trinkets 2"; end
+    end
+    -- use_item,target_if=min:target.health.pct,name=iridal_the_earths_master,use_off_gcd=1,if=gcd.remains>0.5
+    if I.Iridal:IsEquippedAndReady() then
+      if CastTargetIf(I.Iridal, Enemies25y, "min", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Items) then return "iridal_the_earths_master trinkets 4"; end
+    end
   end
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=nymues_unraveling_spindle,if=((buff.emerald_trance_stacking.stack>=2&variable.has_external_pi)|(cooldown.dragonrage.remains<=3&cooldown.fire_breath.remains<7&cooldown.eternity_surge.remains<13&target.time_to_die>=35&(!variable.has_external_pi|!set_bonus.tier31_2pc)))|fight_remains<=20
-    if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (((Player:BuffStack(S.EmeraldTranceBuff) >= 2 and VarHasExternalPI) or (S.Dragonrage:CooldownRemains() <= 3 and S.FireBreath:CooldownRemains() < 7 and S.EternitySurge:CooldownRemains() < 13 and Target:TimeToDie() >= 35 and (not VarHasExternalPI or not Player:HasTier(31, 2)))) or FightRemains <- 20) then
-      if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle trinkets 4"; end
+    -- use_item,name=nymues_unraveling_spindle,if=((buff.emerald_trance_stacking.stack>=2&(variable.has_external_pi))|(cooldown.dragonrage.remains<=3&cooldown.fire_breath.remains<7&cooldown.eternity_surge.remains<13&target.time_to_die>=35&((!variable.has_external_pi&active_enemies<=2)|!set_bonus.tier31_2pc))|(cooldown.dragonrage.remains<=3&active_enemies>=3))|fight_remains<=20
+    if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (((Player:BuffStack(S.EmeraldTranceBuff) >= 2 and VarHasExternalPI) or (S.Dragonrage:CooldownRemains() <= 3 and S.FireBreath:CooldownRemains() < 7 and S.EternitySurge:CooldownRemains() < 13 and Target:TimeToDie() >= 35 and ((not VarHasExternalPI and EnemiesCount8ySplash <= 2) or not Player:HasTier(31, 2))) or (S.Dragonrage:CooldownRemains() <= 3 and EnemiesCount8ySplash >= 3)) or FightRemains <- 20) then
+      if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle trinkets 6"; end
     end
-    -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(gcd.remains>0.5&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle))|fight_remains<=20
-    if I.BelorrelostheSuncaller:IsEquippedAndReady() and ((Player:GCDRemains() > 0.5 and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) or FightRemains <= 20) then
-      if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller trinkets 6"; end
+    -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(gcd.remains>0.5&((trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|active_enemies<=2)&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle))|fight_remains<=20
+    -- Note: Slightly modified, as we can't fully handle variable.trinket_x_buffs.
+    if I.BelorrelostheSuncaller:IsEquippedAndReady() and (((trinket2:CooldownDown() or not trinket2:HasUseBuff()) and (trinket1:CooldownDown() or not trinket1:HasUseBuff()) or EnemiesCount8ySplash <= 2) and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped()) or FightRemains <= 20) then
+      if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller trinkets 8"; end
     end
   end
-  -- living_flame,if=buff.burnout.up&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
-  if S.LivingFlame:IsReady() and (Player:BuffUp(S.BurnoutBuff) and I.BelorrelostheSuncaller:IsEquipped() and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame trinkets 8"; end
+  -- living_flame,if=buff.burnout.up&((trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|active_enemies<=2)&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
+  if S.LivingFlame:IsReady() and (Player:BuffUp(S.BurnoutBuff) and ((trinket2:CooldownDown() or not trinket2:HasUseBuff()) and (trinket1:CooldownDown() or not trinket1:HasUseBuff()) or EnemiesCount8ySplash <= 2) and I.BelorrelostheSuncaller:IsEquipped() and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) then
+    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame trinkets 10"; end
   end
-  -- call_action_list,name=green,if=talent.ancient_flame&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
-  if Settings.Devastation.UseGreen and S.AncientFlame:IsAvailable() and I.BelorrelostheSuncaller:IsEquipped() and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped()) then
+  -- call_action_list,name=green,if=talent.ancient_flame&((trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|active_enemies<=2)&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
+  if Settings.Devastation.UseGreen and (S.AncientFlame:IsAvailable() and ((trinket2:CooldownDown() or not trinket2:HasUseBuff()) and (trinket1:CooldownDown() or not trinket1:HasUseBuff()) or EnemiesCount8ySplash <= 2) and I.BelorrelostheSuncaller:IsEquipped() and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) then
     local ShouldReturn = Green(); if ShouldReturn then return ShouldReturn; end
   end
-  -- azure_strike,if=equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
-  if S.AzureStrike:IsReady() and (I.BelorrelostheSuncaller:IsEquipped() and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) then
-    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike trinkets 10"; end
+  -- azure_strike,if=equipped.belorrelos_the_suncaller&((trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|active_enemies<=2)&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
+  if S.AzureStrike:IsReady() and (I.BelorrelostheSuncaller:IsEquipped() and ((trinket2:CooldownDown() or not trinket2:HasUseBuff()) and (trinket1:CooldownDown() or not trinket1:HasUseBuff()) or EnemiesCount8ySplash <= 2) and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) then
+    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike trinkets 12"; end
   end
-  -- use_item,slot=trinket1,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=4&set_bonus.tier31_2pc)|(variable.trinket_2_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&!equipped.nymues_unraveling_spindle)|(!cooldown.fire_breath.up&!cooldown.shattering_star.up&!set_bonus.tier31_2pc)|active_enemies>=3)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1|variable.trinket_2_exclude)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)
-  -- use_item,slot=trinket2,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=4&set_bonus.tier31_2pc)|(variable.trinket_1_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&!equipped.nymues_unraveling_spindle)|(!cooldown.fire_breath.up&!cooldown.shattering_star.up&!set_bonus.tier31_2pc)|active_enemies>=3)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2|variable.trinket_1_exclude)&!variable.trinket_2_manual|trinket.2.proc.any_dps.duration>=fight_remains|trinket.2.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=2)
+  -- use_item,slot=trinket1,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=4&set_bonus.tier31_2pc)|(variable.trinket_2_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&!equipped.nymues_unraveling_spindle&trinket.2.cooldown.remains)|(!cooldown.fire_breath.up&!cooldown.shattering_star.up&!set_bonus.tier31_2pc)|active_enemies>=3)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1|variable.trinket_2_exclude)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)
+  -- use_item,slot=trinket2,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=4&set_bonus.tier31_2pc)|(variable.trinket_1_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&!equipped.nymues_unraveling_spindle&trinket.1.cooldown.remains)|(!cooldown.fire_breath.up&!cooldown.shattering_star.up&!set_bonus.tier31_2pc)|active_enemies>=3)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2|variable.trinket_1_exclude)&!variable.trinket_2_manual|trinket.2.proc.any_dps.duration>=fight_remains|trinket.2.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=2)
   -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(variable.next_dragonrage>20|!talent.dragonrage)&!variable.trinket_1_manual
   -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)&(variable.next_dragonrage>20|!talent.dragonrage)&!variable.trinket_2_manual
   -- Note: Can't handle above trinket tracking, so let's use a generic fallback. When we can do above tracking, the below can be removed.
@@ -283,10 +291,6 @@ local function Green()
 end
 
 local function Aoe()
-  -- use_item,name=iridal_the_earths_master,use_off_gcd=1,if=gcd.remains>0.5"
-  if Settings.Commons.Enabled.Items and I.Iridal:IsEquippedAndReady() then
-    if Cast(I.Iridal, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master aoe 1"; end
-  end
   -- shattering_star,target_if=max:target.health.pct,if=cooldown.dragonrage.up
   if S.ShatteringStar:IsCastable() and (S.Dragonrage:CooldownUp()) then
     if Everyone.CastTargetIf(S.ShatteringStar, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star aoe 2"; end
@@ -363,15 +367,9 @@ local function Aoe()
 end
 
 local function ST()
-  if Settings.Commons.Enabled.Items then
-    -- use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&raid_event.movement.in>6
-    if I.KharnalexTheFirstLight:IsEquippedAndReady() and (not VarDragonrageUp and Target:DebuffDown(S.ShatteringStar)) then
-      if Cast(I.KharnalexTheFirstLight, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "kharnalex_the_first_light st 2"; end
-    end
-    -- use_item,name=iridal_the_earths_master,use_off_gcd=1,if=gcd.remains>0.5
-    if I.Iridal:IsEquippedAndReady() then
-      if CasT(I.Iridal, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master st 3"; end
-    end
+  -- use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&raid_event.movement.in>6
+  if Settings.Commons.Enabled.Items and I.KharnalexTheFirstLight:IsEquippedAndReady() and (not VarDragonrageUp and Target:DebuffDown(S.ShatteringStar)) then
+    if Cast(I.KharnalexTheFirstLight, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "kharnalex_the_first_light st 2"; end
   end
   -- hover,use_off_gcd=1,if=raid_event.movement.in<2&!buff.hover.up
   -- Note: Not handling movement ability.
