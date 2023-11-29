@@ -46,11 +46,11 @@ Spell.DeathKnight.Commons = {
   -- Buffs
   AbominationLimbBuff                   = Spell(383269),
   DeathAndDecayBuff                     = Spell(188290),
-  DeathsDueBuff                         = Spell(324165), -- SL Covenant. Remove after DF launch?
+  DeathStrikeBuff                       = Spell(101568),
   EmpowerRuneWeaponBuff                 = Spell(47568),
   IcyTalonsBuff                         = Spell(194879),
+  RuneofHysteriaBuff                    = Spell(326918),
   UnholyStrengthBuff                    = Spell(53365),
-  DeathStrikeBuff                       = Spell(101568),
   -- Debuffs
   BloodPlagueDebuff                     = Spell(55078),
   FrostFeverDebuff                      = Spell(55095),
@@ -137,6 +137,7 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   ShatteringBlade                       = Spell(207057),
   UnleashedFrenzy                       = Spell(376905),
   -- Buffs
+  ChillingRageBuff                      = Spell(424165), -- Tier 31 2pc
   ColdHeartBuff                         = Spell(281209),
   GatheringStormBuff                    = Spell(211805),
   KillingMachineBuff                    = Spell(51124),
