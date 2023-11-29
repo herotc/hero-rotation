@@ -1982,7 +1982,7 @@ local function APL()
   Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   if AoEON() then
-    EnemiesCount8y = #Enemies8y -- AOE Toogle
+    EnemiesCount8y = #Enemies8y > 0 and #Enemies8y or 1
   else
     EnemiesCount8y = 1
   end

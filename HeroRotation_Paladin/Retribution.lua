@@ -334,7 +334,7 @@ local function APL()
   -- Enemies Update
   if AoEON() then
     Enemies8y = Player:GetEnemiesInRange(8) -- Divine Storm
-    EnemiesCount8y = #Enemies8y
+    EnemiesCount8y = #Enemies8y > 0 and #Enemies8y or 1
   else
     Enemies8y = {}
     EnemiesCount8y = 1

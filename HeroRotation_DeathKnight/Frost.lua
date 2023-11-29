@@ -655,7 +655,7 @@ local function APL()
   no_heal = not DeathStrikeHeal()
   if AoEON() then
     EnemiesMelee = Player:GetEnemiesInMeleeRange(5)
-    EnemiesMeleeCount = #EnemiesMelee
+    EnemiesMeleeCount = #EnemiesMelee > 0 and #EnemiesMelee or 1
   else
     EnemiesMelee = {}
     EnemiesMeleeCount = 1

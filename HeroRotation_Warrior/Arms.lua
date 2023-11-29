@@ -512,7 +512,7 @@ end
 local function APL()
   if AoEON() then
     Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
-    EnemiesCount8y = #Enemies8y
+    EnemiesCount8y = #Enemies8y > 0 and #Enemies8y or 1
   else
     EnemiesCount8y = 1
   end

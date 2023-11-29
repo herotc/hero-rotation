@@ -630,7 +630,7 @@ local function APL()
   EnemiesMelee = Player:GetEnemiesInMeleeRange(5)
   Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
   if AoEON() then
-    EnemiesMeleeCount = #EnemiesMelee
+    EnemiesMeleeCount = #EnemiesMelee > 0 and #EnemiesMelee or 1
     Enemies10ySplashCount = Target:GetEnemiesInSplashRangeCount(10)
   else
     EnemiesMeleeCount = 1

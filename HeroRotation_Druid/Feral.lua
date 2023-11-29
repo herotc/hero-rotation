@@ -692,8 +692,8 @@ local function APL()
   if AoEON() then
     EnemiesMelee = Player:GetEnemiesInMeleeRange(MeleeRange)
     Enemies11y = Player:GetEnemiesInMeleeRange(AoERange)
-    EnemiesCountMelee = #EnemiesMelee
-    EnemiesCount11y = #Enemies11y
+    EnemiesCountMelee = #EnemiesMelee > 0 and #EnemiesMelee or 1
+    EnemiesCount11y = #Enemies11y > 0 and #EnemiesMelee or 1
   else
     EnemiesMelee = {}
     Enemies11y = {}

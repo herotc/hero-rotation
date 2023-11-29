@@ -337,7 +337,7 @@ local function APL()
   AoERange = 8 + AIRange
   if AoEON() then
     MeleeEnemies11y = Player:GetEnemiesInMeleeRange(AoERange)
-    MeleeEnemies11yCount = #MeleeEnemies11y
+    MeleeEnemies11yCount = #MeleeEnemies11y > 0 and #MeleeEnemies11y or 1
   else
     MeleeEnemies11y = {}
     MeleeEnemies11yCount = 1

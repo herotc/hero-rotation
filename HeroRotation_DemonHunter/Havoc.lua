@@ -261,7 +261,7 @@ local function APL()
   if AoEON() then
     EnemiesMelee = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
     Enemies20y = Player:GetEnemiesInMeleeRange(20) -- Eye Beam
-    EnemiesMeleeCount = #EnemiesMelee
+    EnemiesMeleeCount = #EnemiesMelee > 0 and #EnemiesMelee or 1
     Enemies20yCount = #Enemies20y
   else
     EnemiesMeleeCount = 1
