@@ -260,7 +260,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   --  &!buff.shadow_dance.up&buff.slice_and_dice.remains<fight_remains&refreshable
   -- Refresh Slice and Dice outside of Shadow Dance.
   if not Player:StealthUp(true, true) and not Premed_SnD_Condition() and MeleeEnemies10yCount < 6 and not ShadowDanceBuff and
-     HL.BossFilteredFightRemains("<", Player:BuffRemains(S.SliceandDice)) and Player:BuffRemains(S.SliceandDice) < (1 + Player:ComboPoints()) * 1.8 then
+     HL.BossFilteredFightRemains(">", Player:BuffRemains(S.SliceandDice)) and Player:BuffRemains(S.SliceandDice) < (1 + Player:ComboPoints()) * 1.8 then
     if ReturnSpellOnly then
       return S.SliceandDice
     else
@@ -986,7 +986,7 @@ local function APL ()
 
     --actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|fight_remains<=1&effective_combo_points>=3
     --Finish at maximum or close to maximum combo point value
-    if ComboPointsDeficit <= 1 or HL.BossFilteredFightRemains("<=", 1) or EffectiveComboPoints >= 3 then
+    if ComboPointsDeficit <= 1 or HL.BossFilteredFightRemains("<=", 1) and EffectiveComboPoints >= 3 then
       ShouldReturn = Finish()
       if ShouldReturn then return "Finish: " .. ShouldReturn end
     end
