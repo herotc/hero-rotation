@@ -241,7 +241,28 @@ end
 local function Finish (ReturnSpellOnly, StealthSpell)
   local ShadowDanceBuff = Player:BuffUp(S.ShadowDanceBuff)
   local ShadowDanceBuffRemains = Player:BuffRemains(S.ShadowDanceBuff)
+  local SymbolsofDeathBuffRemains = Player:BuffRemains(S.SymbolsofDeath)
   local FinishComboPoints = ComboPoints
+  local ColdBloodCDRemains = S.ColdBlood:CooldownRemains()
+  local SymbolsCDRemains = S.SymbolsofDeath:CooldownRemains()
+
+  -- State changes based on predicted Stealth casts
+  local PremeditationBuff = Player:BuffUp(S.PremeditationBuff) or (StealthSpell and S.Premeditation:IsAvailable())
+  if StealthSpell and StealthSpell:ID() == S.ShadowDance:ID() then
+    ShadowDanceBuff = true
+    ShadowDanceBuffRemains = 8 + S.ImprovedShadowDance:TalentRank()
+    if S.TheFirstDance:IsAvailable() then
+      FinishComboPoints = mathmin(Player:ComboPointsMax(), ComboPoints + 4)
+    end
+    if Player:HasTier(30, 2) then
+      SymbolsofDeathBuffRemains = mathmax(SymbolsofDeathBuffRemains, 6)
+    end
+  end
+
+  if StealthSpell and StealthSpell:ID() == S.Vanish:ID() then
+    ColdBloodCDRemains = mathmin(0, S.ColdBlood:CooldownRemains() - (15*S.ColdBlood:TalentRank()))
+    SymbolsCDRemains = mathmin(0, S.SymbolsofDeath:CooldownRemains() - (15*S.SymbolsofDeath:TalentRank()))
+  end
 
   -- action.finish+=/rupture,if=!dot.rupture.ticking&target.time_to_die-remains>6
   -- Apply Rupture if its not up
@@ -303,12 +324,12 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   -- Attention: Due to the SecTec/ColdBlood interaction, this adaption has additional checks not found in the APL string
   if S.SecretTechnique:IsReady() and Secret_Condition(ShadowDanceBuff, PremeditationBuff)
     and (not S.ColdBlood:IsAvailable() or (Settings.Commons.OffGCDasOffGCD.ColdBlood and S.ColdBlood:IsReady())
-    or Player:BuffUp(S.ColdBlood) or S.ColdBlood:CooldownRemains() > ShadowDanceBuffRemains - 2 or not S.ImprovedShadowDance:IsAvailable()) then
+    or Player:BuffUp(S.ColdBlood) or ColdBloodCDRemains > ShadowDanceBuffRemains - 2 or not S.ImprovedShadowDance:IsAvailable()) then
     if ReturnSpellOnly then return S.SecretTechnique end
     if Cast(S.SecretTechnique) then return "Cast Secret Technique" end
   end
 
-  if not SkipRupture and S.Rupture:IsCastable() then
+  if not Skip_Rupture(ShadowDanceBuff) and S.Rupture:IsCastable() then
     -- actions.finish+=/rupture,cycle_targets=1,if=!variable.skip_rupture&!variable.priority_rotation&spell_targets.shuriken_storm>=2&target.time_to_die>=(2*combo_points)&refreshable
     if not ReturnSpellOnly and HR.AoEON() and not PriorityRotation and MeleeEnemies10yCount >= 2 then
       local function Evaluate_Rupture_Target(TargetUnit)
@@ -320,10 +341,10 @@ local function Finish (ReturnSpellOnly, StealthSpell)
 
     -- Refresh Rupture early if it will expire during Symbols. Do that refresh if SoD gets ready in the next 5s.
     -- actions.finish+=/rupture,if=!variable.skip_rupture&remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
-    if TargetInMeleeRange and Target:DebuffRemains(S.Rupture) < S.SymbolsofDeath:CooldownRemains() + 10
-      and S.SymbolsofDeath:CooldownRemains() <= 5
+    if TargetInMeleeRange and Target:DebuffRemains(S.Rupture) < SymbolsCDRemains + 10
+      and SymbolsCDRemains <= 5
       and Rogue.CanDoTUnit(Target, RuptureDMGThreshold)
-      and Target:FilteredTimeToDie(">", 5 + S.SymbolsofDeath:CooldownRemains(), -Target:DebuffRemains(S.Rupture)) then
+      and Target:FilteredTimeToDie(">", 5 + SymbolsCDRemains, -Target:DebuffRemains(S.Rupture)) then
       if ReturnSpellOnly then
         return S.Rupture
       else
@@ -363,14 +384,34 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   local ShadowDanceBuffRemains = Player:BuffRemains(S.ShadowDanceBuff)
   local TheRottenBuff = Player:BuffUp(S.TheRottenBuff)
   local StealthComboPoints, StealthComboPointsDeficit = ComboPoints, ComboPointsDeficit
-  local StealthBuff = Player:BuffUp(Rogue.StealthSpell()) or (StealthSpell and StealthSpell:ID() == Rogue.StealthSpell():ID())
-  local ShadowstrikeIsCastable = S.Shadowstrike:IsCastable() or StealthBuff or VanishBuffCheck or ShadowDanceBuff or Player:BuffUp(S.SepsisBuff)
+
+  -- State changes based on predicted Stealth casts
   local PremeditationBuff = Player:BuffUp(S.PremeditationBuff) or (StealthSpell and S.Premeditation:IsAvailable())
+  local StealthBuff = Player:BuffUp(Rogue.StealthSpell()) or (StealthSpell and StealthSpell:ID() == Rogue.StealthSpell():ID())
+  local VanishBuffCheck = Player:BuffUp(Rogue.VanishBuffSpell()) or (StealthSpell and StealthSpell:ID() == S.Vanish:ID())
+  if StealthSpell and StealthSpell:ID() == S.ShadowDance:ID() then
+    ShadowDanceBuff = true
+    ShadowDanceBuffRemains = 8 + S.ImprovedShadowDance:TalentRank()
+    if S.TheRotten:IsAvailable() and Player:HasTier(30, 2) then
+      TheRottenBuff = true
+    end
+    if S.TheFirstDance:IsAvailable() then
+      StealthComboPoints = mathmin(Player:ComboPointsMax(), ComboPoints + 4)
+      StealthComboPointsDeficit = Player:ComboPointsMax() - StealthComboPoints
+    end
+  end
+
   local StealthEffectiveComboPoints = Rogue.EffectiveComboPoints(StealthComboPoints)
+  local ShadowstrikeIsCastable = S.Shadowstrike:IsCastable() or StealthBuff or VanishBuffCheck or ShadowDanceBuff or Player:BuffUp(S.SepsisBuff)
+  if StealthBuff or VanishBuffCheck then
+    ShadowstrikeIsCastable = ShadowstrikeIsCastable and Target:IsInRange(25)
+  else
+    ShadowstrikeIsCastable = ShadowstrikeIsCastable and TargetInMeleeRange
+  end
 
   -- actions.stealthed=shadowstrike,if=buff.stealth.up&(spell_targets.shuriken_storm<4|variable.priority_rotation)
   -- Stealthed Rotation Always Strike from Stealth
-  if StealthBuff and (MeleeEnemies10yCount < 4 or PriorityRotation) then
+  if ShadowstrikeIsCastable and StealthBuff and (MeleeEnemies10yCount < 4 or PriorityRotation) then
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
@@ -454,6 +495,8 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
       if Cast(S.Shadowstrike) then return "Cast Shadowstrike" end
     end
   end
+
+  return false
 end
 
 -- # Stealth Macros
@@ -862,8 +905,8 @@ local function APL ()
   -- actions+=/variable,name=effective_combo_points,if=talent.echoing_reprimand.enabled&effective_combo_points>combo_points&combo_points.deficit>2&time_to_sht.4.plus<0.5&!variable.is_next_cp_animacharged,value=combo_points
   if EffectiveComboPoints > ComboPoints and ComboPointsDeficit > 2 and Player:AffectingCombat() then
     if ComboPoints == 2 and not Player:BuffUp(S.EchoingReprimand3)
-    or ComboPoints == 3 and not Player:BuffUp(S.EchoingReprimand4)
-    or ComboPoints == 4 and not Player:BuffUp(S.EchoingReprimand5) then
+      or ComboPoints == 3 and not Player:BuffUp(S.EchoingReprimand4)
+      or ComboPoints == 4 and not Player:BuffUp(S.EchoingReprimand5) then
       local TimeToSht = Rogue.TimeToSht(4)
       if TimeToSht == 0 then TimeToSht = Rogue.TimeToSht(5) end
       if TimeToSht < (mathmax(Player:EnergyTimeToX(35), Player:GCDRemains()) + 0.5) then
@@ -974,7 +1017,7 @@ local function APL ()
     -- actions+=/call_action_list,name=stealth_cds,if=variable.stealth_helper|talent.invigorating_shadowdust
     if Player:EnergyPredicted() >= StealthEnergyRequired and not S.Vigor:IsAvailable() or S.Shadowcraft:IsAvailable()
       or S.InvigoratingShadowdust:IsAvailable() then
-      ShouldReturn = Stealth_CDs()
+      ShouldReturn = Stealth_CDs(StealthEnergyRequired)
       if ShouldReturn then return "Stealth CDs: " .. ShouldReturn end
     end
 
@@ -998,10 +1041,8 @@ local function APL ()
     end
 
     -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
-    if Player:EnergyDeficitPredicted() <= Stealth_Threshold() then
-      ShouldReturn = Build(StealthEnergyRequired)
-      if ShouldReturn then return "Build: " .. ShouldReturn end
-    end
+    ShouldReturn = Build(StealthEnergyRequired)
+    if ShouldReturn then return "Build: " .. ShouldReturn end
 
     if HR.CDsON() then
       -- # Lowest priority in all of the APL because it causes a GCD
