@@ -49,6 +49,13 @@ HL:RegisterForSelfCombatEvent(
         Hunter.Pet.FeignGUID = 0
       end)
     end
+    if SpellID == 982 then
+      C_TimerAfter(1, function()
+        Hunter.Pet.Status = 1
+        Hunter.Pet.GUID = Pet:GUID()
+        Hunter.Pet.FeignGUID = 0
+      end)
+    end
   end
   , "SPELL_CAST_SUCCESS"
 )
