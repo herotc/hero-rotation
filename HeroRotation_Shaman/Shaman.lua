@@ -176,6 +176,7 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   FluxMeltingBuff                       = Spell(381777),
   IcefuryBuff                           = Spell(210714),
   LavaSurgeBuff                         = Spell(77762),
+  MagmaChamberBuff                      = Spell(381933),
   MasteroftheElementsBuff               = Spell(260734),
   PoweroftheMaelstromBuff               = Spell(191877),
   StormkeeperBuff                       = Spell(191634),
