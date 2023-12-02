@@ -153,7 +153,7 @@ local function Maintenance()
     if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand maintenance 2"; end
   end
   -- sigil_of_flame,if=talent.ascending_flame|active_dot.sigil_of_flame=0
-  if S.SigilofFlame:IsCastable() and (S.AscendingFlame:IsAvailable() and S.SigilofFlameDebuff:AuraActiveCount() == 0) then
+  if S.SigilofFlame:IsCastable() and (S.AscendingFlame:IsAvailable() or S.SigilofFlameDebuff:AuraActiveCount() == 0) then
     if Cast(S.SigilofFlame, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame maintenance 4"; end
   end
   -- immolation_aura
