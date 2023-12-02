@@ -151,8 +151,8 @@ local function Cooldowns()
     if I.BelorrelostheSuncaller:IsEquippedAndReady() and ((Player:GCDRemains() > Player:GCD() - 0.1 or FightRemains < 5) and HL.CombatTime() > 5) then
       if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller cd 10"; end
     end
-    -- use_item,name=balefire_branch,if=cooldown.ray_of_frost.up&time>1|fight_remains<20
-    if I.BalefireBranch:IsEquippedAndReady() and (S.RayofFrost:CooldownUp() and HL.CombatTime() > 1 or FightRemains < 20) then
+    -- use_item,name=balefire_branch,if=(!talent.ray_of_frost&active_enemies<=2&buff.icy_veins.up&prev_gcd.1.glacial_spike|remaining_winters_chill=1&cooldown.ray_of_frost.up&time>1&active_enemies<=2|cooldown.cone_of_cold.up&prev_gcd.1.comet_storm&active_enemies>=3)|fight_remains<20
+    if I.BalefireBranch:IsEquippedAndReady() and ((not S.RayofFrost:IsAvailable() and EnemiesCount16ySplash <= 2 and Player:BuffUp(S.IcyVeinsBuff) and Player:PrevGCDP(1, S.GlacialSpike) or RemainingWintersChill == 1 and S.RayofFrost:CooldownUp() and HL.CombatTime() > 1 and EnemiesCount16ySplash <= 2 or S.ConeofCold:CooldownUp() and Player:PrevGCDP(1, S.CometStorm) and EnemiesCount16ySplash >= 3) or FightRemains < 20) then
       if Cast(I.BalefireBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "balefire_branch cd 12"; end
     end
   end
@@ -162,8 +162,8 @@ local function Cooldowns()
   if S.IcyVeins:IsCastable() then
     if Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cd 14"; end
   end
-  -- use_items
-  if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
+  -- use_items,if=!equipped.balfire_branch|time>5
+  if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) and (not I.BalefireBranch:IsEquipped() or HL.CombatTime() > 5) then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
       local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
