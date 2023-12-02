@@ -260,8 +260,8 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   end
 
   if StealthSpell and StealthSpell:ID() == S.Vanish:ID() then
-    ColdBloodCDRemains = mathmin(0, S.ColdBlood:CooldownRemains() - (15*S.ColdBlood:TalentRank()))
-    SymbolsCDRemains = mathmin(0, S.SymbolsofDeath:CooldownRemains() - (15*S.SymbolsofDeath:TalentRank()))
+    ColdBloodCDRemains = mathmin(0, S.ColdBlood:CooldownRemains() - (15*S.InvigoratingShadowdust:TalentRank()))
+    SymbolsCDRemains = mathmin(0, S.SymbolsofDeath:CooldownRemains() - (15*S.InvigoratingShadowdust:TalentRank()))
   end
 
   -- action.finish+=/rupture,if=!dot.rupture.ticking&target.time_to_die-remains>6
@@ -895,25 +895,6 @@ local function APL ()
   ComboPointsDeficit = Player:ComboPointsDeficit()
   PriorityRotation = UsePriorityRotation()
   StealthEnergyRequired = Player:EnergyMax() - Stealth_Threshold()
-
-  -- Adjust Animacharged CP Prediction for Shadow Techniques
-  -- If we are on a non-optimal Animacharged CP, ignore it if the time to ShT is less than GCD + 500ms, unless the ER buff will expire soon
-  -- Reduces the risk of queued finishers into ShT procs for non-optimal CP amounts
-  -- This is an adaptation of the following APL lines:
-  -- actions+=/variable,name=is_next_cp_animacharged,if=talent.echoing_reprimand.enabled,value=combo_points=1&buff.echoing_reprimand_2.up|combo_points=2&buff.echoing_reprimand_3.up|combo_points=3&buff.echoing_reprimand_4.up|combo_points=4&buff.echoing_reprimand_5.up
-  -- actions+=/variable,name=effective_combo_points,value=effective_combo_points
-  -- actions+=/variable,name=effective_combo_points,if=talent.echoing_reprimand.enabled&effective_combo_points>combo_points&combo_points.deficit>2&time_to_sht.4.plus<0.5&!variable.is_next_cp_animacharged,value=combo_points
-  if EffectiveComboPoints > ComboPoints and ComboPointsDeficit > 2 and Player:AffectingCombat() then
-    if ComboPoints == 2 and not Player:BuffUp(S.EchoingReprimand3)
-      or ComboPoints == 3 and not Player:BuffUp(S.EchoingReprimand4)
-      or ComboPoints == 4 and not Player:BuffUp(S.EchoingReprimand5) then
-      local TimeToSht = Rogue.TimeToSht(4)
-      if TimeToSht == 0 then TimeToSht = Rogue.TimeToSht(5) end
-      if TimeToSht < (mathmax(Player:EnergyTimeToX(35), Player:GCDRemains()) + 0.5) then
-        EffectiveComboPoints = ComboPoints
-      end
-    end
-  end
 
   -- Shuriken Tornado Combo Point Prediction
   if Player:BuffUp(S.ShurikenTornado, nil, true) and ComboPoints < Rogue.CPMaxSpend() then
