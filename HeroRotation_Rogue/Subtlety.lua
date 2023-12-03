@@ -963,6 +963,8 @@ local function APL ()
       return "Stealthed Pooling"
     end
 
+    -- variable,name=stealth_helper,value=energy>=variable.stealth_threshold
+  	-- variable,name=stealth_helper,value=energy.deficit<=variable.stealth_threshold,if=!talent.vigor|talent.shadowcraft
     local stealth_helper
     if not S.Vigor:IsAvailable() or S.Shadowcraft:IsAvailable() then
       stealth_helper = Player:EnergyDeficitPredicted() <= Stealth_Threshold()
@@ -972,8 +974,7 @@ local function APL ()
 
     -- variable,name=stealth_helper,value=energy.deficit<=variable.stealth_threshold,if=!talent.vigor|talent.shadowcraft
     -- actions+=/call_action_list,name=stealth_cds,if=variable.stealth_helper|talent.invigorating_shadowdust
-    if stealth_helper or S.Shadowcraft:IsAvailable()
-      or S.InvigoratingShadowdust:IsAvailable() then
+    if stealth_helper or S.InvigoratingShadowdust:IsAvailable() then
       ShouldReturn = Stealth_CDs(StealthEnergyRequired)
       if ShouldReturn then return "Stealth CDs: " .. ShouldReturn end
     end
