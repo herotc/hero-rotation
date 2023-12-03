@@ -231,9 +231,9 @@ end
 -- &trinket.witherbarks_branch.cooldown.remains<=8|equipped.witherbarks_branch
 -- &trinket.witherbarks_branch.cooldown.remains<=8|equipped.bandolier_of_twisted_blades|talent.invigorating_shadowdust)
 local function Trinket_Condition()
-  return (not I.WitherbarksBranch:IsEquippedAndReady() and not I.AshesoftheEmbersoul:IsEquippedAndReady() or not I.WitherbarksBranch:IsEquippedAndReady()
-  and I.WitherbarksBranch:CooldownRemains() <= 8 or I.WitherbarksBranch:IsEquippedAndReady()
-    and I.WitherbarksBranch:CooldownRemains() <= 8 or I.BandolierOfTwistedBlades:IsEquippedAndReady() or S.InvigoratingShadowdust:IsAvailable())
+  return (not I.WitherbarksBranch:IsEquipped() and not I.AshesoftheEmbersoul:IsEquipped() or not I.WitherbarksBranch:IsEquipped()
+  and I.WitherbarksBranch:CooldownRemains() <= 8 or I.WitherbarksBranch:IsEquipped()
+    and I.WitherbarksBranch:CooldownRemains() <= 8 or I.BandolierOfTwistedBlades:IsEquipped() or S.InvigoratingShadowdust:IsAvailable())
 end
 
 -- # Finishers
@@ -311,7 +311,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   end
 
   -- actions.finish+=/cold_blood,if=variable.secret_condition&cooldown.secret_technique.ready
-  if S.ColdBlood:IsReady() and Secret_Condition(ShadowDanceBuff, PremeditationBuff) and S.SecretTechnique:CooldownUp() then
+  if S.ColdBlood:IsReady() and Secret_Condition(ShadowDanceBuff, PremeditationBuff) and S.SecretTechnique:IsReady() then
     if Settings.Commons.OffGCDasOffGCD.ColdBlood then
       Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood)
     else
@@ -322,11 +322,13 @@ local function Finish (ReturnSpellOnly, StealthSpell)
 
   -- actions.finish+=/secret_technique,if=variable.secret_condition&(!talent.cold_blood|cooldown.cold_blood.remains>buff.shadow_dance.remains-2)
   -- Attention: Due to the SecTec/ColdBlood interaction, this adaption has additional checks not found in the APL string
-  if S.SecretTechnique:IsReady() and Secret_Condition(ShadowDanceBuff, PremeditationBuff)
-    and (not S.ColdBlood:IsAvailable() or (Settings.Commons.OffGCDasOffGCD.ColdBlood and S.ColdBlood:IsReady())
-    or Player:BuffUp(S.ColdBlood) or ColdBloodCDRemains > ShadowDanceBuffRemains - 2 or not S.ImprovedShadowDance:IsAvailable()) then
-    if ReturnSpellOnly then return S.SecretTechnique end
-    if Cast(S.SecretTechnique) then return "Cast Secret Technique" end
+  if S.SecretTechnique:IsReady() then
+    if Secret_Condition(ShadowDanceBuff, PremeditationBuff)
+      and (not S.ColdBlood:IsAvailable() or (Settings.Commons.OffGCDasOffGCD.ColdBlood and S.ColdBlood:IsReady())
+      or Player:BuffUp(S.ColdBlood) or ColdBloodCDRemains > ShadowDanceBuffRemains - 2 or not S.ImprovedShadowDance:IsAvailable()) then
+      if ReturnSpellOnly then return S.SecretTechnique end
+      if Cast(S.SecretTechnique) then return "Cast Secret Technique" end
+    end
   end
 
   if not Skip_Rupture(ShadowDanceBuff) and S.Rupture:IsCastable() then
@@ -541,8 +543,8 @@ local function CDs ()
 
   -- actions.cds+=/sepsis,if=variable.snd_condition&target.time_to_die>=16&(buff.perforated_veins.up|!talent.perforated_veins)
   if HR.CDsON() and S.Sepsis:IsAvailable() and S.Sepsis:IsReady() then
-    if SnDCondition and Target:FilteredTimeToDie(">=", 16)
-      and Player:BuffUp(S.PerforatedVeins) or not S.PerforatedVeins:IsAvailable() then
+    if SnD_Condition() and Target:FilteredTimeToDie(">=", 16)
+      and (Player:BuffUp(S.PerforatedVeins) or not S.PerforatedVeins:IsAvailable()) then
         if Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
     end
   end
@@ -578,7 +580,7 @@ local function CDs ()
   -- Align Shadow Blades to Flagellation.
   if HR.CDsON() and S.ShadowBlades:IsReady() then
     if SnD_Condition() and (EffectiveComboPoints <= 1 or Player:HasTier(31, 4))
-      and (Player:BuffUp(S.Flagellation) or not S.Flagellation:IsAvailable()) then
+      and (Player:BuffUp(S.Flagellation) or Player:BuffUp(S.FlagellationPersistBuff) or not S.Flagellation:IsAvailable()) then
         if Cast(S.ShadowBlades, Settings.Subtlety.OffGCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades" end
     end
   end
@@ -606,7 +608,7 @@ local function CDs ()
   -- Shuriken Tornado only outside of cooldowns
   if HR.CDsON() and S.ShurikenTornado:IsAvailable() and S.ShurikenTornado:IsReady() then
     if SnD_Condition() and not Player:BuffUp(S.ShadowDance) and not Player:BuffUp(S.Flagellation)
-      and not Player:BuffUp(S.ShadowBlades) and MeleeEnemies10yCount <= 2 then
+      and not Player:BuffUp(S.FlagellationPersistBuff) and not Player:BuffUp(S.ShadowBlades) and MeleeEnemies10yCount <= 2 then
         if Cast(S.ShurikenTornado, Settings.Subtlety.GCDasOffGCD.ShurikenTornado) then return "Cast Shuriken Tornado" end
     end
   end
@@ -678,7 +680,7 @@ local function CDs ()
   -- Sync specific trinkets to Flagellation or Shadow Dance.
   if Settings.Commons.Enabled.Trinkets then
     if I.AshesoftheEmbersoul:IsEquippedAndReady() then
-      if Player:BuffUp(S.Flagellation) and S.InvigoratingShadowdust or Player:BuffUp(S.ShadowDance) and not I.WitherbarksBranch:IsEquippedAndReady() then
+      if Player:BuffUp(S.Flagellation) and S.InvigoratingShadowdust or Player:BuffUp(S.ShadowDance) and not I.WitherbarksBranch:IsEquipped() then
         if Cast(I.AshesoftheEmbersoul, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Ashes of the Embersoul" end
       end
     end
@@ -688,7 +690,7 @@ local function CDs ()
   -- |buff.shadow_blades.up|equipped.bandolier_of_twisted_blades&raid_event.adds.up
   if Settings.Commons.Enabled.Trinkets then
     if I.WitherbarksBranch:IsEquippedAndReady() then
-      if Player:BuffUp(S.Flagellation) and S.InvigoratingShadowdust:IsAvailable() or Player:BuffUp(S.ShadowBlades) or I.BandolierOfTwistedBlades:IsEquippedAndReady() then
+      if Player:BuffUp(S.Flagellation) and S.InvigoratingShadowdust:IsAvailable() or Player:BuffUp(S.ShadowBlades) or I.BandolierOfTwistedBlades:IsEquipped() then
         if Cast(I.WitherbarksBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Witherbark's Branch" end
       end
     end
@@ -697,7 +699,7 @@ local function CDs ()
   -- actions.cds+=/use_item,name=mirror_of_fractured_tomorrows,if=buff.shadow_dance.up&(target.time_to_die>=15|equipped.ashes_of_the_embersoul)
   if Settings.Commons.Enabled.Trinkets then
     if I.Mirror:IsEquippedAndReady() then
-      if Player:BuffUp(S.ShadowDance) and (Target:TimeToDie() >= 15 or I.AshesoftheEmbersoul:IsEquippedAndReady()) then
+      if Player:BuffUp(S.ShadowDance) and (Target:TimeToDie() >= 15 or I.AshesoftheEmbersoul:IsEquipped()) then
         if Cast(I.Mirror, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Mirror Of Fractured Tomorrows" end
       end
     end
@@ -708,7 +710,7 @@ local function CDs ()
   if Settings.Commons.Enabled.Trinkets then
     if I.BeaconToTheBeyond:IsEquippedAndReady() then
       if not Player:StealthUp(true, true) and (Player:BuffUp(S.DeeperDaggers) or not S.DeeperDaggers:IsAvailable())
-        and (not I.StormEatersBoon:IsEquippedAndReady() or I.StormEatersBoon:CooldownRemains() > 20) then
+        and (not I.StormEatersBoon:IsEquipped() or I.StormEatersBoon:CooldownRemains() > 20) then
           if Cast(I.BeaconToTheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Beacon To The Beyond" end
       end
     end
@@ -718,7 +720,7 @@ local function CDs ()
   -- |!equipped.stormeaters_boon|trinket.stormeaters_boon.cooldown.remains>20)
   if Settings.Commons.Enabled.Trinkets then
     if I.ManicGrieftorch:IsEquippedAndReady() then
-      if Player:StealthUp(true, true) and (not I.StormEatersBoon:IsEquippedAndReady() or I.StormEatersBoon:CooldownRemains() > 20) then
+      if Player:StealthUp(true, true) and (not I.StormEatersBoon:IsEquipped() or I.StormEatersBoon:CooldownRemains() > 20) then
         if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Manic Grieftorch" end
       end
     end
@@ -726,7 +728,7 @@ local function CDs ()
 
   -- actions.cds+=/use_items,if=!stealthed.all&(!trinket.mirror_of_fractured_tomorrows.cooldown.ready|!equipped.mirror_of_fractured_tomorrows)|fight_remains<10
   -- Default fallback for usable items: Use outside of Stealth/Shadow Dance.
-  if not Player:StealthUp(true, true) or (not I.Mirror:IsReady() or not I.Mirror:IsEquippedAndReady()) or HL.BossFilteredFightRemains("<", 10) then
+  if not Player:StealthUp(true, true) or (not I.Mirror:IsReady() or not I.Mirror:IsEquipped()) or HL.BossFilteredFightRemains("<", 10) then
     local TrinketToUse = Player:GetUseableItems(OnUseExcludes)
     if TrinketToUse then
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then
@@ -746,41 +748,8 @@ local function CDs ()
         if Cast(S.ThistleTea, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Thistle Tea"; end
       end
     end
-
-    -- Trinkets
-    if Settings.Commons.Enabled.Trinkets then
-      -- actions.cds+=/use_item,name=manic_grieftorch,use_off_gcd=1,if=!stealthed.all&(!raid_event.adds.up|!equipped.stormeaters_boon|trinket.stormeaters_boon.cooldown.remains>20)
-      if I.ManicGrieftorch:IsEquippedAndReady() then
-        if (not Player:StealthUp(true, true)
-            and (not I.StormEatersBoon:IsEquipped()
-                or I.StormEatersBoon:CooldownRemains() > 20)) then
-            if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Manic Grieftorch" end
-        end
-      end
-      -- actions.cds+=/use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=!stealthed.all&(buff.deeper_daggers.up|!talent.deeper_daggers)&(!raid_event.adds.up|!equipped.stormeaters_boon|trinket.stormeaters_boon.cooldown.remains>20)
-      if I.BeaconToTheBeyond:IsEquippedAndReady() then
-        if (not Player:StealthUp(true, true)
-            and (Player:BuffUp(S.DeeperDaggersBuff)
-                or not S.DeeperDaggers:IsAvailable())
-            and (not I.StormEatersBoon:IsEquipped()
-                or I.StormEatersBoon:CooldownRemains() > 20)) then
-            if Cast(I.BeaconToTheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Beacon To The Beyond" end
-        end
-      end
-
-      -- actions.cds+=/use_items,if=!stealthed.all|fight_remains<10
-      if not Player:StealthUp(true, true) or HL.BossFilteredFightRemains("<", 10) then
-        local TrinketToUse = Player:GetUseableItems(OnUseExcludes)
-        if TrinketToUse then
-            if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then
-                return "Generic use_items for " .. TrinketToUse:Name()
-            end
-        end
-      end
-
-    end
   return false
-  end
+end
 
 -- # Stealth Cooldowns
 local function Stealth_CDs (EnergyThreshold)
@@ -822,9 +791,9 @@ local function Stealth_CDs (EnergyThreshold)
   if TargetInMeleeRange and S.ShadowDance:IsCastable() then
     if (Target:DebuffUp(S.Rupture) or S.InvigoratingShadowdust:IsAvailable()) and Rotten_CB()
       and (not S.TheFirstDance:IsAvailable() or ComboPointsDeficit >= 4 or Player:BuffUp(S.ShadowBlades))
-      and (ShD_Combo_Points() and ShD_Threshold() or (Player:BuffUp(S.ShadowBlades) or Player:BuffUp(S.SymbolsofDeath))
+      and (ShD_Combo_Points() and ShD_Threshold() or (Player:BuffUp(S.ShadowBlades) or Player:BuffUp(S.SymbolsofDeath)
       and not S.Sepsis:IsAvailable() or Player:BuffRemains(S.SymbolsofDeath) >= 4 and not Player:HasTier(30, 2) or not Player:BuffUp(S.SymbolsofDeath) and Player:HasTier(30, 2))
-      and S.SecretTechnique:CooldownRemains() < 10 + 12 * num(not S.InvigoratingShadowdust:IsAvailable() or Player:HasTier(30, 2)) then
+      and S.SecretTechnique:CooldownRemains() < 10 + 12 * num(not S.InvigoratingShadowdust:IsAvailable() or Player:HasTier(30, 2))) then
       ShouldReturn = StealthMacro(S.ShadowDance, EnergyThreshold)
       if ShouldReturn then return "ShadowDance Macro 1 " .. ShouldReturn end
     end
@@ -994,9 +963,16 @@ local function APL ()
       return "Stealthed Pooling"
     end
 
+    local stealth_helper
+    if not S.Vigor:IsAvailable() or S.Shadowcraft:IsAvailable() then
+      stealth_helper = Player:EnergyDeficitPredicted() <= Stealth_Threshold()
+    else
+      stealth_helper = Player:EnergyPredicted() >= Stealth_Threshold()
+    end
+
     -- variable,name=stealth_helper,value=energy.deficit<=variable.stealth_threshold,if=!talent.vigor|talent.shadowcraft
     -- actions+=/call_action_list,name=stealth_cds,if=variable.stealth_helper|talent.invigorating_shadowdust
-    if Player:EnergyPredicted() >= StealthEnergyRequired and not S.Vigor:IsAvailable() or S.Shadowcraft:IsAvailable()
+    if stealth_helper or S.Shadowcraft:IsAvailable()
       or S.InvigoratingShadowdust:IsAvailable() then
       ShouldReturn = Stealth_CDs(StealthEnergyRequired)
       if ShouldReturn then return "Stealth CDs: " .. ShouldReturn end
@@ -1022,13 +998,13 @@ local function APL ()
     end
 
     -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
-    ShouldReturn = Build(StealthEnergyRequired)
-    if ShouldReturn then return "Build: " .. ShouldReturn end
+      ShouldReturn = Build(StealthEnergyRequired)
+      if ShouldReturn then return "Build: " .. ShouldReturn end
 
     if HR.CDsON() then
       -- # Lowest priority in all of the APL because it causes a GCD
       -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
-      if S.ArcaneTorrent:IsReady() and TargetInMeleeRange and Player:EnergyDeficitPredicted() > 15 + Player:EnergyRegen() then
+      if S.ArcaneTorrent:IsReady() and TargetInMeleeRange and Player:EnergyDeficitPredicted() >= 15 + Player:EnergyRegen() then
         if Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Torrent" end
       end
       -- actions+=/arcane_pulse
