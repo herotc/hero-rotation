@@ -98,7 +98,7 @@ OldShadowInFlight = HL.AddCoreOverride("Spell.InFlight",
   function(self)
     local BaseCheck = OldShadowInFlight(self)
     if self == SpellShadow.ShadowCrash then
-      return SpellShadow.ShadowCrash:TimeSinceLastCast() < SpellShadow.ShadowCrash:TravelTime()
+      return SpellShadow.ShadowCrash:TimeSinceLastCast() < 2
     else
       return BaseCheck
     end
