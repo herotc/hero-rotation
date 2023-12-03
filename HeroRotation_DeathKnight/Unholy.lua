@@ -254,8 +254,8 @@ local function AoE()
 end
 
 local function AoEBurst()
-  -- epidemic,if=(!talent.bursting_sores|rune<1|talent.bursting_sores&death_knight.fwounded_targets=0)&!variable.pooling_runic_power&(active_enemies>=6|runic_power.deficit<30|buff.festermight.stack=20)
-  if S.Epidemic:IsReady() and ((not S.BurstingSores:IsAvailable() or Player:Rune() < 1 or S.BurstingSores:IsAvailable() and S.FesteringWoundDebuff:AuraActiveCount() == 0) and not VarPoolingRunicPower and (EnemiesMeleeCount >= 6 or Player:RunicPowerDeficit() < 30 or Player:BuffStack(S.FestermightBuff) == 20)) then
+  -- epidemic,if=(rune<1|talent.bursting_sores&death_knight.fwounded_targets=0)&!variable.pooling_runic_power&(active_enemies>=6|runic_power.deficit<30|buff.festermight.stack=20)
+  if S.Epidemic:IsReady() and ((Player:Rune() < 1 or S.BurstingSores:IsAvailable() and S.FesteringWoundDebuff:AuraActiveCount() == 0) and not VarPoolingRunicPower and (EnemiesMeleeCount >= 6 or Player:RunicPowerDeficit() < 30 or Player:BuffStack(S.FestermightBuff) == 20)) then
     if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic aoe_burst 2"; end
   end
   -- wound_spender,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=1
