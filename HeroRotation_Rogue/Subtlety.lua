@@ -456,17 +456,19 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   -- actions.stealthed+=/gloomblade,if=!buff.premeditation.up&buff.shadow_dance.remains>=3&buff.shadow_blades.up&!used_for_danse
   --  &talent.danse_macabre&spell_targets.shuriken_storm<=4
   -- Gloomblade for Danse Macabre stack generation during Shadowblades.
-  if not PremeditationBuff and ShadowDanceBuffRemains >= 3 and Player:BuffUp(S.ShadowBlades) and not Used_For_Danse(S.Gloomblade)
-    and S.DanseMacabre:IsAvailable() and MeleeEnemies10yCount <= 4 then
-    if ReturnSpellOnly then
-      -- If calling from a Stealth macro, we don't need the PV suggestion since it's already a macro cast
-      if StealthSpell then
-        return S.Gloomblade
+  if S.Gloomblade:IsAvailable() then
+    if not PremeditationBuff and ShadowDanceBuffRemains >= 3 and Player:BuffUp(S.ShadowBlades) and not Used_For_Danse(S.Gloomblade)
+      and S.DanseMacabre:IsAvailable() and MeleeEnemies10yCount <= 4 then
+      if ReturnSpellOnly then
+        -- If calling from a Stealth macro, we don't need the PV suggestion since it's already a macro cast
+        if StealthSpell then
+          return S.Gloomblade
+        else
+          return { S.Gloomblade, S.Stealth }
+        end
       else
-        return { S.Gloomblade, S.Stealth }
+        if CastQueue(S.Gloomblade, S.Stealth) then return "Cast Gloomblade (Danse)" end
       end
-    else
-      if CastQueue(S.Gloomblade, S.Stealth) then return "Cast Gloomblade (Danse)" end
     end
   end
 
