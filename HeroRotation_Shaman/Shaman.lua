@@ -44,6 +44,7 @@ Spell.Shaman.Commons = {
   EarthElemental                        = Spell(198103),
   EarthShield                           = Spell(974),
   ElementalBlast                        = Spell(117014),
+  ElementalOrbit                        = Spell(383010),
   LavaBurst                             = Spell(51505),
   DeeplyRootedElements                  = Spell(378270),
   NaturesSwiftness                      = Spell(378081),
@@ -52,6 +53,8 @@ Spell.Shaman.Commons = {
   TotemicRecall                         = Spell(108285),
   WindShear                             = Spell(57994),
   -- Buffs
+  EarthShieldOtherBuff                  = Spell(974),
+  EarthShieldSelfBuff                   = Spell(383648),
   LightningShieldBuff                   = Spell(192106),
   PrimordialWaveBuff                    = Spell(375986),
   SpiritwalkersGraceBuff                = Spell(79206),
