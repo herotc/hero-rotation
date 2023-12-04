@@ -202,8 +202,8 @@ local function FieryDemise()
   if S.ImmolationAura:IsCastable() then
     if Cast(S.ImmolationAura) then return "immolation_aura fiery_demise 2"; end
   end
-  -- sigil_of_flame
-  if S.SigilofFlame:IsCastable() then
+  -- sigil_of_flame,if=talent.ascending_flame|active_dot.sigil_of_flame=0
+  if S.SigilofFlame:IsCastable() and (S.AscendingFlame:IsAvailable() or S.SigilofFlameDebuff:AuraActiveCount() == 0) then
     if Cast(S.SigilofFlame, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame fiery_demise 4"; end
   end
   -- felblade,if=(cooldown.fel_devastation.remains<=(execute_time+gcd.remains))&fury<50
