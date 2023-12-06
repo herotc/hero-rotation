@@ -306,7 +306,7 @@ local function AoECDs()
     end
   end
   -- dark_transformation,if=(cooldown.any_dnd.remains<10&talent.infected_claws&((cooldown.vile_contagion.remains|raid_event.adds.exists&raid_event.adds.in>10)&death_knight.fwounded_targets<active_enemies|!talent.vile_contagion)&(raid_event.adds.remains>5|!raid_event.adds.exists)|!talent.infected_claws)
-  if S.DarkTransformation:IsCastable() and (AnyDnD:CooldownRemains() < 10 and S.InfectedClaws:IsAvailable() and (S.FesteringWoundDebuff:AuraActiveCount() < Enemies10ySplashCount or not S.VileContagion:IsAvailable()) or not S.InfectedClaws:IsAvailable()) then
+  if S.DarkTransformation:IsReady() and (AnyDnD:CooldownRemains() < 10 and S.InfectedClaws:IsAvailable() and (S.FesteringWoundDebuff:AuraActiveCount() < Enemies10ySplashCount or not S.VileContagion:IsAvailable()) or not S.InfectedClaws:IsAvailable()) then
     if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation aoe_cooldowns 14"; end
   end
   -- empower_rune_weapon,if=buff.dark_transformation.up
@@ -360,7 +360,7 @@ local function Cooldowns()
     end
   end
   -- dark_transformation,if=cooldown.apocalypse.remains<5
-  if S.DarkTransformation:IsCastable() and (S.Apocalypse:CooldownRemains() < 5) then
+  if S.DarkTransformation:IsReady() and (S.Apocalypse:CooldownRemains() < 5) then
     if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cooldowns 6"; end
   end
   -- apocalypse,target_if=max:debuff.festering_wound.stack,if=variable.st_planning&debuff.festering_wound.stack>=4
@@ -426,7 +426,7 @@ local function GargSetup()
     end
   end
   -- dark_transformation,if=talent.commander_of_the_dead&runic_power>40|!talent.commander_of_the_dead
-  if S.DarkTransformation:IsCastable() and (S.CommanderoftheDead:IsAvailable() and Player:RunicPower() > 40 or not S.CommanderoftheDead:IsAvailable()) then
+  if S.DarkTransformation:IsReady() and (S.CommanderoftheDead:IsAvailable() and Player:RunicPower() > 40 or not S.CommanderoftheDead:IsAvailable()) then
     if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation garg_setup 16"; end
   end
   -- any_dnd,if=!death_and_decay.ticking&debuff.festering_wound.stack>0
