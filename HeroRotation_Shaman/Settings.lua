@@ -17,6 +17,8 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.Shaman = {
   Commons = {
+    PreferEarthShield = false,
+    ShieldsOOC = false,
     Enabled = {
       Potions = true,
       Trinkets = true,
@@ -43,7 +45,6 @@ HR.GUISettings.APL.Shaman = {
   },
   Enhancement = {
     Rotation = "Standard",
-    PreferEarthShield = false,
     HealWith5Maelstrom = 50,
     HealWithout5Maelstrom = 30,
     PotionType = {
@@ -63,7 +64,6 @@ HR.GUISettings.APL.Shaman = {
     },
   },
   Elemental = {
-    PreferEarthShield = false,
     PotionType = {
       Selected = "Power",
     },
@@ -106,17 +106,17 @@ local CP_Restoration = CreateChildPanel(CP_Shaman, "Restoration")
 
 -- Commons
 CreateARPanelOptions(CP_Shaman, "APL.Shaman.Commons")
+CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.PreferEarthShield", "Prefer Earth Shield", "Prefer using Earth Shield over Lightning Shield, when it's available.")
+CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShieldsOOC", "Show Shields OOC", "Enable to show elemental shields while out of combat.")
 
 -- Enhancement
 CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement")
 CreatePanelOption("Dropdown", CP_Enhancement, "APL.Shaman.Enhancement.Rotation", {"Standard", "Funnel"}, "Rotation Type", "Select to choose between the Standard or Funnel rotations.")
-CreatePanelOption("CheckButton", CP_Enhancement, "APL.Shaman.Enhancement.PreferEarthShield", "Prefer Earth Shield", "Prefer using Earth Shield over Lightning Shield, when it's available.")
 CreatePanelOption("Slider", CP_Enhancement, "APL.Shaman.Enhancement.HealWith5Maelstrom", {0, 100, 1}, "Heal Pct with 5 Maelstrom", "Sets the health percentage under which Healing Surge should be suggested with 5 Maelstrom. Set this to 0 to disable healing suggestions.")
 CreatePanelOption("Slider", CP_Enhancement, "APL.Shaman.Enhancement.HealWithout5Maelstrom", {0, 100, 1}, "Heal Pct without 5 Maelstrom", "Sets the health percentage under which Healing Surge should be suggested when below 5 Maelstrom. Set this to 0 to disable healing suggestions.")
 
 -- Elemental
 CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental")
-CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Elemental.PreferEarthShield", "Prefer Earth Shield", "Prefer using Earth Shield over Lightning Shield, when it's available.")
 CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Elemental.ShowMovementSpells", "Show Movement Spells", "Show Flame Shock and Frost Shock suggestions while moving. Note: This tends to make the rotation choppy when making small movements.")
 
 -- Restoration

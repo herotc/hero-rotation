@@ -599,14 +599,17 @@ local function APL()
     end
   end
 
-  if Everyone.TargetIsValid() then
-    -- Refresh shields.
+  -- Shield Handling
+  if Everyone.TargetIsValid() or Settings.Commons.ShieldsOOC then
     local EarthShieldBuff = (S.ElementalOrbit:IsAvailable()) and S.EarthShieldSelfBuff or S.EarthShieldOtherBuff
-    if (S.ElementalOrbit:IsAvailable() or Settings.Elemental.PreferEarthShield) and S.EarthShield:IsReady() and (Player:BuffDown(EarthShieldBuff) or (not Player:AffectingCombat() and Player:BuffStack(EarthShieldBuff) < 5)) then
+    if (S.ElementalOrbit:IsAvailable() or Settings.Commons.PreferEarthShield) and S.EarthShield:IsReady() and (Player:BuffDown(EarthShieldBuff) or (not Player:AffectingCombat() and Player:BuffStack(EarthShieldBuff) < 5)) then
       if Cast(S.EarthShield, Settings.Elemental.GCDasOffGCD.Shield) then return "Earth Shield Refresh"; end
-    elseif (S.ElementalOrbit:IsAvailable() or not Settings.Elemental.PreferEarthShield) and S.LightningShield:IsReady() and Player:BuffDown(S.LightningShield) then
+    elseif (S.ElementalOrbit:IsAvailable() or not Settings.Commons.PreferEarthShield) and S.LightningShield:IsReady() and Player:BuffDown(S.LightningShield) then
       if Cast(S.LightningShield, Settings.Elemental.GCDasOffGCD.Shield) then return "Lightning Shield Refresh" end
     end
+  end
+
+  if Everyone.TargetIsValid() then
     -- call Precombat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
