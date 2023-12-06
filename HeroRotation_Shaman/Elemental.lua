@@ -602,9 +602,9 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- Refresh shields.
     local EarthShieldBuff = (S.ElementalOrbit:IsAvailable()) and S.EarthShieldSelfBuff or S.EarthShieldOtherBuff
-    if (S.ElementalOrbit:IsAvailable() or Settings.Enhancement.PreferEarthShield) and S.EarthShield:IsReady() and (Player:BuffDown(EarthShieldBuff) or (not Player:AffectingCombat() and Player:BuffStack(EarthShieldBuff) < 5)) then
+    if (S.ElementalOrbit:IsAvailable() or Settings.Elemental.PreferEarthShield) and S.EarthShield:IsReady() and (Player:BuffDown(EarthShieldBuff) or (not Player:AffectingCombat() and Player:BuffStack(EarthShieldBuff) < 5)) then
       if Cast(S.EarthShield, Settings.Elemental.GCDasOffGCD.Shield) then return "Earth Shield Refresh"; end
-    elseif (S.ElementalOrbit:IsAvailable() or not Settings.Enhancement.PreferEarthShield) and S.LightningShield:IsReady() and Player:BuffDown(S.LightningShield) then
+    elseif (S.ElementalOrbit:IsAvailable() or not Settings.Elemental.PreferEarthShield) and S.LightningShield:IsReady() and Player:BuffDown(S.LightningShield) then
       if Cast(S.LightningShield, Settings.Elemental.GCDasOffGCD.Shield) then return "Lightning Shield Refresh" end
     end
     -- call Precombat
