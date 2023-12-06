@@ -648,8 +648,8 @@ local function CDs ()
   -- &(buff.shadow_blades.up|cooldown.shadow_blades.remains<=10)
   if Settings.Commons.Enabled.Potions then
     local PotionSelected = Everyone.PotionSelected()
-    if PotionSelected and PotionSelected:IsReady() and Player:BloodlustUp() or HL.BossFilteredFightRemains("<", 30) or Player:BuffUp(S.SymbolsofDeath)
-    and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:CooldownRemains() <= 10) then
+    if PotionSelected and PotionSelected:IsReady() and (Player:BloodlustUp() or HL.BossFilteredFightRemains("<", 30) or Player:BuffUp(S.SymbolsofDeath)
+    and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:CooldownRemains() <= 10)) then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "Cast Potion"; end
     end
   end
