@@ -66,9 +66,6 @@ HR.GUISettings.APL.Hunter = {
       DireBeast = false,
       WailingArrow = false,
     },
-    OffGCDasOffGCD = {
-      AspectOfTheWild = true,
-    }
   },
   Marksmanship = {
     HideAimedWhileMoving = false,
@@ -76,7 +73,6 @@ HR.GUISettings.APL.Hunter = {
       Selected = "Power",
     },
     GCDasOffGCD = {
-      DoubleTap = false,
       Volley = false,
       WailingArrow = false,
     },

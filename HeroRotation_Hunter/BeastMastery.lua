@@ -229,7 +229,7 @@ local function Cleave()
   end
   -- bloodshed
   if S.Bloodshed:IsCastable() then
-    if Cast(S.Bloodshed, nil, nil, not Target:IsSpellInRange(S.Bloodshed)) then return "bloodshed cleave 18"; end
+    if Cast(S.Bloodshed, Settings.BeastMastery.GCDasOffGCD.Bloodshed, nil, not Target:IsSpellInRange(S.Bloodshed)) then return "bloodshed cleave 18"; end
   end
   -- death_chakram
   if S.DeathChakram:IsCastable() then
@@ -285,7 +285,7 @@ local function Cleave()
   end
   -- wailing_arrow,if=pet.main.buff.frenzy.remains>execute_time|fight_remains<5
   if S.WailingArrow:IsReady() and (Pet:BuffRemains(S.FrenzyPetBuff) > S.WailingArrow:ExecuteTime() or FightRemains < 5) then
-    if Cast(S.WailingArrow, nil, nil, not Target:IsSpellInRange(S.WailingArrow)) then return "wailing_arrow cleave 46"; end
+    if Cast(S.WailingArrow, Settings.BeastMastery.GCDasOffGCD.WailingArrow, nil, not Target:IsSpellInRange(S.WailingArrow)) then return "wailing_arrow cleave 46"; end
   end
   -- bag_of_tricks,if=buff.bestial_wrath.down|target.time_to_die<5
   if S.BagofTricks:IsCastable() and CDsON() and (Player:BuffDown(S.BestialWrathBuff) or FightRemains < 5) then
@@ -372,7 +372,7 @@ local function ST()
   end
   -- wailing_arrow,if=pet.main.buff.frenzy.remains>execute_time|target.time_to_die<5
   if S.WailingArrow:IsReady() and (Pet:BuffRemains(S.FrenzyPetBuff) > S.WailingArrow:ExecuteTime() or FightRemains < 5) then
-    if Cast(S.WailingArrow, nil, nil, not Target:IsSpellInRange(S.WailingArrow)) then return "wailing_arrow st 36"; end
+    if Cast(S.WailingArrow, Settings.BeastMastery.GCDasOffGCD.WailingArrow, nil, not Target:IsSpellInRange(S.WailingArrow)) then return "wailing_arrow st 36"; end
   end
   if CDsON() then
     -- bag_of_tricks,if=buff.bestial_wrath.down|target.time_to_die<5

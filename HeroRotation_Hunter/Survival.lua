@@ -270,11 +270,11 @@ local function Cleave()
   end
   -- butchery,if=raid_event.adds.exists
   if S.Butchery:IsReady() then
-    if Cast(S.Butchery, nil, nil, not Target:IsInMeleeRange(MeleeRange)) then return "butchery cleave 20"; end
+    if Cast(S.Butchery, Settings.Survival.GCDasOffGCD.Butchery, nil, not Target:IsInMeleeRange(MeleeRange)) then return "butchery cleave 20"; end
   end
   -- butchery,if=(full_recharge_time<gcd|dot.shrapnel_bomb.ticking&(dot.internal_bleeding.stack<2|dot.shrapnel_bomb.remains<gcd|raid_event.adds.remains<10))&!raid_event.adds.exists
   if S.Butchery:IsReady() and (S.Butchery:FullRechargeTime() < Player:GCD() or Target:DebuffUp(S.ShrapnelBombDebuff) and (Target:DebuffStack(S.InternalBleedingDebuff) < 2 or Target:DebuffRemains(S.ShrapnelBombDebuff) < Player:GCD())) then
-    if Cast(S.Butchery, nil, nil, not Target:IsInMeleeRange(MeleeRange)) then return "butchery cleave 22"; end
+    if Cast(S.Butchery, Settings.Survival.GCDasOffGCD.Butchery, nil, not Target:IsInMeleeRange(MeleeRange)) then return "butchery cleave 22"; end
   end
   -- fury_of_the_eagle,if=!raid_event.adds.exists
   if S.FuryoftheEagle:IsCastable() then
@@ -286,7 +286,7 @@ local function Cleave()
   end
   -- butchery,if=(!next_wi_bomb.shrapnel|!talent.wildfire_infusion)
   if S.Butchery:IsReady() and (not S.ShrapnelBomb:IsCastable() or not S.WildfireInfusion:IsAvailable()) then
-    if Cast(S.Butchery, nil, nil, not Target:IsInMeleeRange(8)) then return "butchery cleave 26"; end
+    if Cast(S.Butchery, Settings.Survival.GCDasOffGCD.Butchery, nil, not Target:IsInMeleeRange(8)) then return "butchery cleave 26"; end
   end
   -- mongoose_bite,target_if=max:debuff.latent_poison.stack,if=debuff.latent_poison.stack>8
   if S.MongooseBite:IsReady() then

@@ -191,7 +191,7 @@ local function Precombat()
   -- wailing_arrow,if=active_enemies>2|!talent.steady_focus
   -- Note: We can't actually get target counts before combat begins.
   if S.WailingArrow:IsReady() and not Player:IsCasting(S.WailingArrow) and (EnemiesCount10ySplash > 2 or not S.SteadyFocus:IsAvailable()) then
-    if Cast(S.WailingArrow, nil, nil, not TargetInRange40y) then return "wailing_arrow precombat 8"; end
+    if Cast(S.WailingArrow, Settings.Marksmanship.GCDasOffGCD.WailingArrow, nil, not TargetInRange40y) then return "wailing_arrow precombat 8"; end
   end
   -- steady_shot,if=active_enemies>2|talent.volley&active_enemies=2
   -- Note: We can't actually get target counts before combat begins.
