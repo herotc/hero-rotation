@@ -306,86 +306,94 @@ local function ST()
   if S.BarbedShot:IsCastable() and EvaluateTargetIfBarbedShotST(Target) then
     if Cast(S.BarbedShot, nil, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot st mt_backup 3"; end
   end
-  -- call_of_the_wild
-  if S.CalloftheWild:IsCastable() and CDsON() then
-    if Cast(S.CalloftheWild, Settings.BeastMastery.GCDasOffGCD.CallOfTheWild) then return "call_of_the_wild st 4"; end
-  end
   -- kill_command,if=full_recharge_time<gcd&talent.alpha_predator
   if S.KillCommand:IsReady() and (S.KillCommand:FullRechargeTime() < GCDMax and S.AlphaPredator:IsAvailable()) then
-    if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command st 6"; end
+    if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command st 4"; end
   end
-  -- bestial_wrath
-  if S.BestialWrath:IsCastable() and CDsON() then
-    if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath st 8"; end
+  -- call_of_the_wild,if=!talent.wild_instincts
+  if S.CalloftheWild:IsCastable() and CDsON() and (not S.WildInstincts:IsAvailable()) then
+    if Cast(S.CalloftheWild, Settings.BeastMastery.GCDasOffGCD.CallOfTheWild) then return "call_of_the_wild st 6"; end
+  end
+  -- stampede
+  if S.Stampede:IsCastable() and CDsON() then
+    if Cast(S.Stampede, Settings.Commons2.GCDasOffGCD.Stampede, nil, not Target:IsSpellInRange(S.Stampede)) then return "stampede st 8"; end
   end
   -- bloodshed
   if S.Bloodshed:IsCastable() then
     if Cast(S.Bloodshed, Settings.Commons.GCDasOffGCD.Bloodshed, nil, not Target:IsSpellInRange(S.Bloodshed)) then return "bloodshed st 10"; end
   end
+  -- bestial_wrath
+  if S.BestialWrath:IsCastable() and CDsON() then
+    if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath st 12"; end
+  end
   -- death_chakram
   if S.DeathChakram:IsCastable() then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram st 12"; end
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram st 14"; end
+  end
+  -- call_of_the_wild
+  if S.CalloftheWild:IsCastable() and CDsON() then
+    if Cast(S.CalloftheWild, Settings.BeastMastery.GCDasOffGCD.CallOfTheWild) then return "call_of_the_wild st 16"; end
   end
   -- kill_command
   if S.KillCommand:IsReady() then
-    if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command st 14"; end
+    if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command st 18"; end
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsCastable() then
-    if Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderOfCrows, nil, not Target:IsSpellInRange(S.AMurderofCrows)) then return "a_murder_of_crows st 16"; end
+    if Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderOfCrows, nil, not Target:IsSpellInRange(S.AMurderofCrows)) then return "a_murder_of_crows st 20"; end
   end
   -- steel_trap
   if S.SteelTrap:IsCastable() then
-    if Cast(S.SteelTrap, Settings.Commons2.GCDasOffGCD.SteelTrap, nil, not Target:IsInRange(40)) then return "steel_trap st 18"; end
+    if Cast(S.SteelTrap, Settings.Commons2.GCDasOffGCD.SteelTrap, nil, not Target:IsInRange(40)) then return "steel_trap st 22"; end
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
-    if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot st 20"; end
+    if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot st 24"; end
   end
   -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=talent.wild_call&charges_fractional>1.4|buff.call_of_the_wild.up|full_recharge_time<gcd&cooldown.bestial_wrath.remains|talent.scent_of_blood&(cooldown.bestial_wrath.remains<12+gcd)|talent.savagery|fight_remains<9
   if S.BarbedShot:IsCastable() then
-    if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateTargetIfFilterBarbedShot, EvaluateTargetIfBarbedShotST2, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot st 22"; end
+    if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateTargetIfFilterBarbedShot, EvaluateTargetIfBarbedShotST2, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot st 26"; end
   end
   -- Main Target backup
   if S.BarbedShot:IsCastable() and EvaluateTargetIfBarbedShotST2(Target) then
-    if Cast(S.BarbedShot, nil, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot st mt_backup 24"; end
+    if Cast(S.BarbedShot, nil, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot st mt_backup 28"; end
   end
   -- dire_beast
   if S.DireBeast:IsCastable() then
-    if Cast(S.DireBeast, Settings.BeastMastery.GCDasOffGCD.DireBeast, nil, not Target:IsSpellInRange(S.DireBeast)) then return "dire_beast st 26"; end
+    if Cast(S.DireBeast, Settings.BeastMastery.GCDasOffGCD.DireBeast, nil, not Target:IsSpellInRange(S.DireBeast)) then return "dire_beast st 30"; end
   end
   -- serpent_sting,target_if=min:remains,if=refreshable&target.time_to_die>duration
   if S.SerpentSting:IsReady() then
-    if Everyone.CastTargetIf(S.SerpentSting, Enemies40y, "min", EvaluateTargetIfFilterSerpentSting, EvaluateTargetIfSerpentStingST, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting st 28"; end
+    if Everyone.CastTargetIf(S.SerpentSting, Enemies40y, "min", EvaluateTargetIfFilterSerpentSting, EvaluateTargetIfSerpentStingST, not Target:IsSpellInRange(S.SerpentSting)) then return "serpent_sting st 32"; end
   end
   -- kill_shot
   if S.KillShot:IsReady() then
-    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot st 30"; end
+    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot st 34"; end
   end
   -- lights_judgment,if=buff.bestial_wrath.down|target.time_to_die<5
   if CDsON() and S.LightsJudgment:IsCastable() and (Player:BuffDown(S.BestialWrathBuff) or Target:TimeToDie() < 5) then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(5)) then return "lights_judgment st 32"; end
+    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(5)) then return "lights_judgment st 36"; end
   end
   -- cobra_shot
   if S.CobraShot:IsReady() then
-    if Cast(S.CobraShot, nil, nil, not Target:IsSpellInRange(S.CobraShot)) then return "cobra_shot st 34"; end
+    if Cast(S.CobraShot, nil, nil, not Target:IsSpellInRange(S.CobraShot)) then return "cobra_shot st 38"; end
   end
   -- wailing_arrow,if=pet.main.buff.frenzy.remains>execute_time|target.time_to_die<5
   if S.WailingArrow:IsReady() and (Pet:BuffRemains(S.FrenzyPetBuff) > S.WailingArrow:ExecuteTime() or FightRemains < 5) then
-    if Cast(S.WailingArrow, Settings.BeastMastery.GCDasOffGCD.WailingArrow, nil, not Target:IsSpellInRange(S.WailingArrow)) then return "wailing_arrow st 36"; end
+    if Cast(S.WailingArrow, Settings.BeastMastery.GCDasOffGCD.WailingArrow, nil, not Target:IsSpellInRange(S.WailingArrow)) then return "wailing_arrow st 40"; end
   end
   if CDsON() then
     -- bag_of_tricks,if=buff.bestial_wrath.down|target.time_to_die<5
     if S.BagofTricks:IsCastable() and (Player:BuffDown(S.BestialWrathBuff) or FightRemains < 5) then
-      if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks st 38"; end
+      if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks st 42"; end
     end
     -- arcane_pulse,if=buff.bestial_wrath.down|target.time_to_die<5
     if S.ArcanePulse:IsCastable() and (Player:BuffDown(S.BestialWrathBuff) or FightRemains < 5) then
-      if Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_pulse st 40"; end
+      if Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_pulse st 44"; end
     end
     -- arcane_torrent,if=(focus+focus.regen+15)<focus.max
     if S.ArcaneTorrent:IsCastable() and ((Player:Focus() + Player:FocusRegen() + 15) < Player:FocusMax()) then
-      if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent st 42"; end
+      if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent st 46"; end
     end
   end
 end
