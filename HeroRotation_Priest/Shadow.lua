@@ -154,6 +154,11 @@ local function HighestTTD(enemies, checkVT)
 end
 
 -- CastTargetIf Filter Functions
+local function EvaluateTargetIfFilterDPRemains(TargetUnit)
+  -- target_if=max:dot.devouring_plague.remains
+  return (TargetUnit:DebuffRemains(S.DevouringPlagueDebuff))
+end
+
 local function EvaluateTargetIfFilterDPTTD(TargetUnit)
   -- target_if=max:target.time_to_die*(!dot.devouring_plague.ticking)
   return (TargetUnit:DebuffDown(S.DevouringPlagueDebuff)) and TargetUnit:TimeToDie() or 0
@@ -769,6 +774,7 @@ local function APL()
 end
 
 local function Init()
+  S.DevouringPlagueDebuff:RegisterAuraTracking()
   S.VampiricTouchDebuff:RegisterAuraTracking()
 
   HR.Print("Shadow Priest rotation has been updated for patch 10.2.0.")
