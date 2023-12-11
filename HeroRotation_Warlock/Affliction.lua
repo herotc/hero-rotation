@@ -198,7 +198,7 @@ local function Precombat()
     if Cast(S.GrimoireofSacrifice, Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "grimoire_of_sacrifice precombat 2"; end
   end
   -- snapshot_stats
-  -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>3
+  -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>2
   -- NYI precombat multi target
   -- haunt
   if S.Haunt:IsReady() then
@@ -330,6 +330,10 @@ local function AoE()
   -- seed_of_corruption,if=dot.corruption.remains<5&!(action.seed_of_corruption.in_flight|dot.seed_of_corruption.remains>0)
   if S.SeedofCorruption:IsReady() and (Target:DebuffRemains(S.CorruptionDebuff) < 5 and not (S.SeedofCorruption:InFlight() or Target:DebuffUp(S.SeedofCorruptionDebuff))) then
     if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "seed_of_corruption aoe 14"; end
+  end
+  -- corruption,target_if=min:remains,if=remains<5&!talent.seed_of_corruption
+  if S.Corruption:IsReady() and (not S.SeedofCorruption:IsAvailable()) then
+    if Everyone.CastTargetIf(S.Corruption, Enemies40y, "min", EvaluateTargetIfFilterCorruption, EvaluateTargetIfCorruption, not Target:IsSpellInRange(S.Corruption)) then return "corruption aoe 15"; end
   end
   -- agony,target_if=min:remains,if=active_dot.agony<8&remains<cooldown.vile_taint.remains+action.vile_taint.cast_time&remains<5
   if S.Agony:IsReady() and (S.AgonyDebuff:AuraActiveCount() < 8) then
