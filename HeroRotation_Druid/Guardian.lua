@@ -148,11 +148,13 @@ local function Precombat()
   -- snapshot_stats
   -- variable,name=If_build,value=1,value_else=0,if=talent.thorns_of_iron.enabled&talent.reinforced_fur.enabled
   -- Note: Moved to variable declarations and PLAYER_TALENT_UPDATE registration
-  -- cat_form,if=(druid.catweave_bear=1&(cooldown.pause_action.remains|time>30))
-  -- moonkin_form,if=(!druid.catweave_bear=1)&(cooldown.pause_action.remains|time>30)
+  -- variable,name=catweave_bear,op=reset
+  -- variable,name=owlweave_bear,op=reset
+  -- cat_form,if=(variable.catweave_bear&(cooldown.pause_action.remains|time>30))
+  -- moonkin_form,if=(!variable.catweave_bear)&(cooldown.pause_action.remains|time>30)
   -- heart_of_the_wild,if=talent.heart_of_the_wild.enabled
-  -- prowl,if=druid.catweave_bear=1&(cooldown.pause_action.remains|time>30)
-  -- NOTE: Not handling cat-weaving or owl-weaving, so skipping above 4 lines
+  -- prowl,if=variable.catweave_bear&(cooldown.pause_action.remains|time>30)
+  -- NOTE: Not handling cat-weaving or owl-weaving, so skipping above 6 lines
   -- Manually added: Group buff check
   if S.MarkoftheWild:IsCastable() and Everyone.GroupBuffMissing(S.MarkoftheWildBuff) then
     if Cast(S.MarkoftheWild, Settings.Commons.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat 2"; end
@@ -391,14 +393,14 @@ local function APL()
     if Settings.Commons.Enabled.Items and I.Djaruun:IsEquippedAndReady() and (Target:DebuffUp(S.MoonfireDebuff)) then
       if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame main 4"; end
     end
-    -- potion,if=((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)|((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!druid.catweave_bear&!druid.owlweave_bear)))
+    -- potion,if=((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)|((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!variable.catweave_bear&!variable.owlweave_bear)))
     if Settings.Commons.Enabled.Potions and ((S.HeartoftheWild:IsAvailable() and Player:BuffUp(S.HeartoftheWild)) or (Player:BuffUp(S.BerserkBuff) or Player:BuffUp(S.Incarnation))) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
         if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 6"; end
       end
     end
-    -- run_action_list,name=catweave,if=(target.cooldown.pause_action.remains|time>=30)&druid.catweave_bear=1&buff.tooth_and_claw.remains>1.5&(buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down)&(cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=2)|(buff.cat_form.up&energy>25&druid.catweave_bear=1&buff.tooth_and_claw.remains>1.5)|(buff.heart_of_the_wild.up&energy>90&druid.catweave_bear=1&buff.tooth_and_claw.remains>1.5)
+    -- run_action_list,name=catweave,if=(target.cooldown.pause_action.remains|time>=30)&variable.catweave_bear&buff.tooth_and_claw.remains>1.5&(buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down)&(cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=2)|(buff.cat_form.up&energy>25&variable.catweave_bear&buff.tooth_and_claw.remains>1.5)|(buff.heart_of_the_wild.up&energy>90&variable.catweave_bear&buff.tooth_and_claw.remains>1.5)
     -- run_action_list,name=owlweave,if=(target.cooldown.pause_action.remains|time>=30)&buff.tooth_and_claw.remains<1.5&((druid.owlweave_bear=1)&buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down&cooldown.starsurge.up)
     -- Skipping the above lists, as we're not handling catweaving or owlweaving
     -- run_action_list,name=bear
