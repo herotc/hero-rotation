@@ -277,7 +277,7 @@ local function APL()
   Enemies8y = Player:GetEnemiesInMeleeRange(8)
   Enemies30y = Player:GetEnemiesInRange(30)
   if (AoEON()) then
-    EnemiesCount8y = #Enemies8y > 0 and #Enemies8y or 1
+    EnemiesCount8y = #Enemies8y
     EnemiesCount30y = #Enemies30y
   else
     EnemiesCount8y = 1

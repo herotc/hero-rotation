@@ -258,10 +258,10 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
+  EnemiesMelee = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
+  Enemies20y = Player:GetEnemiesInMeleeRange(20) -- Eye Beam
   if AoEON() then
-    EnemiesMelee = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
-    Enemies20y = Player:GetEnemiesInMeleeRange(20) -- Eye Beam
-    EnemiesMeleeCount = #EnemiesMelee > 0 and #EnemiesMelee or 1
+    EnemiesMeleeCount = #EnemiesMelee
     Enemies20yCount = #Enemies20y
   else
     EnemiesMeleeCount = 1

@@ -486,7 +486,7 @@ local function APL()
     if EagleUp and not Target:IsInMeleeRange(8) then
       EnemyCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
     else
-      EnemyCount8ySplash = #Player:GetEnemiesInRange(8) > 0 and #Player:GetEnemiesInRange(8) or 1
+      EnemyCount8ySplash = #Player:GetEnemiesInRange(8)
     end
   else
     EnemyCount8ySplash = 1

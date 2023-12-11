@@ -237,7 +237,7 @@ end
 local function AoE()
   -- epidemic,if=!variable.pooling_runic_power|fight_remains<10
   if S.Epidemic:IsReady() and (not VarPoolingRunicPower or FightRemains < 10) then
-    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic aoe 2"; end
+    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe 2"; end
   end
   -- wound_spender,target_if=max:debuff.festering_wound.stack,if=variable.pop_wounds
   if WoundSpender:IsReady() and (VarPopWounds) then
@@ -256,7 +256,7 @@ end
 local function AoEBurst()
   -- epidemic,if=(rune<1|talent.bursting_sores&death_knight.fwounded_targets=0)&!variable.pooling_runic_power&(active_enemies>=6|runic_power.deficit<30|buff.festermight.stack=20)
   if S.Epidemic:IsReady() and ((Player:Rune() < 1 or S.BurstingSores:IsAvailable() and S.FesteringWoundDebuff:AuraActiveCount() == 0) and not VarPoolingRunicPower and (EnemiesMeleeCount >= 6 or Player:RunicPowerDeficit() < 30 or Player:BuffStack(S.FestermightBuff) == 20)) then
-    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic aoe_burst 2"; end
+    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe_burst 2"; end
   end
   -- wound_spender,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=1
   if WoundSpender:IsReady() then
@@ -264,7 +264,7 @@ local function AoEBurst()
   end
   -- epidemic,if=!variable.pooling_runic_power|fight_remains<10
   if S.Epidemic:IsReady() and (not VarPoolingRunicPower or FightRemains < 10) then
-    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic aoe_burst 6"; end
+    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe_burst 6"; end
   end
   -- death_coil,if=!variable.pooling_runic_power&!talent.epidemic
   if S.DeathCoil:IsReady() and (not VarPoolingRunicPower and not S.Epidemic:IsAvailable()) then
@@ -330,7 +330,7 @@ local function AoESetup()
   end
   -- epidemic,if=!variable.pooling_runic_power|fight_remains<10
   if S.Epidemic:IsReady() and (not VarPoolingRunicPower or FightRemains < 10) then
-    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic aoe_setup 6"; end
+    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe_setup 6"; end
   end
   -- festering_strike,target_if=min:debuff.festering_wound.stack,if=death_knight.fwounded_targets<active_enemies
   if S.FesteringStrike:IsReady() and (S.FesteringWoundDebuff:AuraActiveCount() < Enemies10ySplashCount) then
@@ -479,7 +479,7 @@ local function HighPrioActions()
   end
   -- epidemic,if=active_enemies>=4&(talent.commander_of_the_dead&buff.commander_of_the_dead.up&cooldown.apocalypse.remains<5|debuff.death_rot.up&debuff.death_rot.remains<gcd)
   if S.Epidemic:IsReady() and (Enemies10ySplashCount >= 4 and (S.CommanderoftheDead:IsAvailable() and Player:BuffUp(S.CommanderoftheDeadBuff) and S.Apocalypse:CooldownRemains() < 5 or Target:DebuffUp(S.DeathRotDebuff) and Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD())) then
-    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic high_prio_actions 8"; end
+    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic high_prio_actions 8"; end
   end
   -- wound_spender,if=(cooldown.apocalypse.remains>variable.apoc_timing+3|active_enemies>=3)&talent.plaguebringer&(talent.superstrain|talent.unholy_blight)&buff.plaguebringer.remains<gcd
   if WoundSpender:IsReady() and ((S.Apocalypse:CooldownRemains() > VarApocTiming + 3 or EnemiesMeleeCount >= 3) and S.Plaguebringer:IsAvailable() and (S.Superstrain:IsAvailable() or S.UnholyBlight:IsAvailable()) and Player:BuffRemains(S.PlaguebringerBuff) < Player:GCD()) then
@@ -537,7 +537,7 @@ local function ST()
   end
   -- epidemic,if=variable.epidemic_priority&(!variable.pooling_runic_power&variable.spend_rp|fight_remains<10)
   if S.Epidemic:IsReady() and (VarEpidemicPriority and (not VarPoolingRunicPower and VarSpendRP or FightRemains < 10)) then
-    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic st 4"; end
+    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic st 4"; end
   end
   -- any_dnd,if=!death_and_decay.ticking&(active_enemies>=2|talent.unholy_ground&(pet.apoc_ghoul.active&pet.apoc_ghoul.remains>=13|pet.gargoyle.active&pet.gargoyle.remains>8|pet.army_ghoul.active&pet.army_ghoul.remains>8|!variable.pop_wounds&debuff.festering_wound.stack>=4)|talent.defile&(pet.gargoyle.active|pet.apoc_ghoul.active|pet.army_ghoul.active|buff.dark_transformation.up))&(death_knight.fwounded_targets=active_enemies|active_enemies=1)
   if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and (EnemiesMeleeCount >= 2 or S.UnholyGround:IsAvailable() and (VarApocGhoulActive and VarApocGhoulRemains >= 13 or VarGargActive and VarGargRemains > 8 or VarArmyGhoulActive and VarArmyGhoulRemains > 8 or not VarPopWounds and FesterStacks >= 4) or S.Defile:IsAvailable() and (VarGargActive or VarApocGhoulActive or VarArmyGhoulActive or Pet:BuffUp(S.DarkTransformation))) and (S.FesteringWoundDebuff:AuraActiveCount() == EnemiesMeleeCount or EnemiesMeleeCount == 1)) then
@@ -630,7 +630,7 @@ local function APL()
   EnemiesMelee = Player:GetEnemiesInMeleeRange(5)
   Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
   if AoEON() then
-    EnemiesMeleeCount = #EnemiesMelee > 0 and #EnemiesMelee or 1
+    EnemiesMeleeCount = #EnemiesMelee
     Enemies10ySplashCount = Target:GetEnemiesInSplashRangeCount(10)
   else
     EnemiesMeleeCount = 1
@@ -681,7 +681,7 @@ local function APL()
       end
       -- Manually added: epidemic,if=!variable.pooling_runic_power&active_enemies=0
       if S.Epidemic:IsReady() and AoEON() and S.VirulentPlagueDebuff:AuraActiveCount() > 1 and not VarPoolingRunicPower then
-        if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(30)) then return "epidemic out_of_range"; end
+        if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic out_of_range"; end
       end
       -- Manually added: death_coil,if=!variable.pooling_runic_power&active_enemies=0
       if S.DeathCoil:IsReady() and S.VirulentPlagueDebuff:AuraActiveCount() < 2 and not VarPoolingRunicPower then

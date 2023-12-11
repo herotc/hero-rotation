@@ -396,9 +396,9 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
+  EnemiesMelee = Player:GetEnemiesInMeleeRange(5)
   if AoEON() then
-    EnemiesMelee = Player:GetEnemiesInMeleeRange(5)
-    EnemiesMeleeCount = #EnemiesMelee > 0 and #EnemiesMelee or 1
+    EnemiesMeleeCount = #EnemiesMelee
   else
     EnemiesMeleeCount = 1
   end

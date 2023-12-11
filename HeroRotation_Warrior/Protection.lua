@@ -219,9 +219,9 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
+  Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   if AoEON() then
-    Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
-    EnemiesCount8 = #Enemies8y > 0 and #Enemies8y or 1
+    EnemiesCount8 = #Enemies8y
   else
     EnemiesCount8 = 1
   end

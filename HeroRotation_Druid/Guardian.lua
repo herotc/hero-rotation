@@ -335,11 +335,10 @@ local function APL()
   local AIRange = mathfloor(1.5 * S.AstralInfluence:TalentRank())
   MeleeRange = 5 + AIRange
   AoERange = 8 + AIRange
+  MeleeEnemies11y = Player:GetEnemiesInMeleeRange(AoERange)
   if AoEON() then
-    MeleeEnemies11y = Player:GetEnemiesInMeleeRange(AoERange)
-    MeleeEnemies11yCount = #MeleeEnemies11y > 0 and #MeleeEnemies11y or 1
+    MeleeEnemies11yCount = #MeleeEnemies11y
   else
-    MeleeEnemies11y = {}
     MeleeEnemies11yCount = 1
   end
 

@@ -43,7 +43,6 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local Enemies5y
-local Enemies8y
 local EnemiesCount5
 local IsTanking
 
@@ -393,9 +392,8 @@ end
 local function APL()
   -- Unit Update
   Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
-  --Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   if AoEON() then
-    EnemiesCount5 = #Enemies5y > 0 and #Enemies5y or 1
+    EnemiesCount5 = #Enemies5y
   else
     EnemiesCount5 = 1
   end
