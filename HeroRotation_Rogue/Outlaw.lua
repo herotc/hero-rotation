@@ -557,7 +557,7 @@ end
 --- ======= MAIN =======
 local function APL ()
   -- Local Update
-  BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 10 or 6
+  BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 9 or 6
   ComboPoints = Player:ComboPoints()
   EffectiveComboPoints = Rogue.EffectiveComboPoints(ComboPoints)
   ComboPointsDeficit = Player:ComboPointsDeficit()
