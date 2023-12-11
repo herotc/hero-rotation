@@ -623,8 +623,12 @@ local function APL ()
         if S.KeepItRolling:IsAvailable() and S.GhostlyStrike:IsReady() and S.EchoingReprimand:IsAvailable() then
           if Cast(S.GhostlyStrike) then return "Cast Ghostly Strike KiR (Opener)" end
         end
-        if S.Ambush:IsCastable() then
+        if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() then
           if Cast(S.Ambush) then return "Cast Ambush (Opener)" end
+        else
+          if S.SinisterStrike:IsCastable() then
+            if Cast(S.SinisterStrike) then return "Cast Sinister Strike (Opener)" end
+          end
         end
       elseif Finish_Condition() then
         ShouldReturn = Finish()
