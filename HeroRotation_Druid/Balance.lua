@@ -260,13 +260,17 @@ local function Fallthru()
   if S.Starsurge:IsReady() then
     if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge fallthru 4"; end
   end
+  -- wild_mushroom,if=!variable.is_aoe
+  if S.WildMushroom:IsReady() and (not VarIsAoe) then
+    if Cast(S.WildMushroom, Settings.Balance.GCDasOffGCD.WildMushroom, nil, not Target:IsSpellInRange(S.WildMushroom)) then return "wild_mushroom fallthru 6"; end
+  end
   -- sunfire,target_if=dot.moonfire.remains>remains*22%18
   if S.Sunfire:IsCastable() then
-    if Everyone.CastCycle(S.Sunfire, Enemies10ySplash, EvaluateCycleSunfireFallthru, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire fallthru 6"; end
+    if Everyone.CastCycle(S.Sunfire, Enemies10ySplash, EvaluateCycleSunfireFallthru, not Target:IsSpellInRange(S.Sunfire)) then return "sunfire fallthru 8"; end
   end
   -- moonfire
   if S.Moonfire:IsCastable() then
-    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire fallthru 8"; end
+    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire fallthru 10"; end
   end
 end
 
