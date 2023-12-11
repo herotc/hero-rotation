@@ -37,6 +37,7 @@ local I = Item.Warlock.Demonology
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
   I.NymuesUnravelingSpindle:ID(),
+  I.TimeThiefsGambit:ID(),
 }
 
 -- Trinket Item Objects
@@ -162,8 +163,8 @@ local function EvaluateCycleDemonbolt(TargetUnit)
 end
 
 local function EvaluateCycleDemonbolt2(TargetUnit)
-  -- target_if=(!debuff.doom_brand.up|action.hand_of_guldan.in_flight&debuff.doom_brand.remains<=3)|active_enemies<4
-  return ((TargetUnit:DebuffDown(S.DoomBrandDebuff) or S.HandofGuldan:InFlight() and TargetUnit:DebuffRemains(S.DoomBrandDebuff) <= 3) or EnemiesCount8ySplash < 4)
+  -- target_if=(!debuff.doom_brand.up)|active_enemies<4
+  return ((TargetUnit:DebuffDown(S.DoomBrandDebuff)) or EnemiesCount8ySplash < 4)
 end
 
 local function EvaluateCycleDoom(TargetUnit)
@@ -291,13 +292,17 @@ local function Racials()
 end
 
 local function Items()
-  -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!pet.demonic_tyrant.active&trinket.1.cast_time>0|!trinket.1.cast_time>0)&(pet.demonic_tyrant.active)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1&!variable.trinket_2_manual)|variable.trinket_1_buff_duration>=fight_remains
-  -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!pet.demonic_tyrant.active&trinket.2.cast_time>0|!trinket.2.cast_time>0)&(pet.demonic_tyrant.active)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2&!variable.trinket_1_manual)|variable.trinket_2_buff_duration>=fight_remains
+  -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!pet.demonic_tyrant.active&trinket.1.cast_time>0|!trinket.1.cast_time>0)&(pet.demonic_tyrant.active|!talent.summon_demonic_tyrant|variable.trinket_priority=2&cooldown.summon_demonic_tyrant.remains>20&!pet.demonic_tyrant.active&trinket.2.cooldown.remains<cooldown.summon_demonic_tyrant.remains+5)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1&!variable.trinket_2_manual)|variable.trinket_1_buff_duration>=fight_remains
+  -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!pet.demonic_tyrant.active&trinket.2.cast_time>0|!trinket.2.cast_time>0)&(pet.demonic_tyrant.active|!talent.summon_demonic_tyrant|variable.trinket_priority=1&cooldown.summon_demonic_tyrant.remains>20&!pet.demonic_tyrant.active&trinket.1.cooldown.remains<cooldown.summon_demonic_tyrant.remains+5)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2&!variable.trinket_1_manual)|variable.trinket_2_buff_duration>=fight_remains
   -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&((variable.damage_trinket_priority=1|trinket.2.cooldown.remains)&(trinket.1.cast_time>0&!pet.demonic_tyrant.active|!trinket.1.cast_time>0)|(time<20&variable.trinket_2_buffs)|cooldown.summon_demonic_tyrant.remains_expected>20)
   -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&((variable.damage_trinket_priority=2|trinket.1.cooldown.remains)&(trinket.2.cast_time>0&!pet.demonic_tyrant.active|!trinket.2.cast_time>0)|(time<20&variable.trinket_1_buffs)|cooldown.summon_demonic_tyrant.remains_expected>20)
   -- use_item,use_off_gcd=1,slot=main_hand,if=(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
   -- use_item,name=nymues_unraveling_spindle,if=trinket.1.is.nymues_unraveling_spindle&((pet.demonic_tyrant.active&!cooldown.demonic_strength.ready&!variable.trinket_2_buffs)|(variable.trinket_2_buffs))|trinket.2.is.nymues_unraveling_spindle&((pet.demonic_tyrant.active&!cooldown.demonic_strength.ready&!variable.trinket_1_buffs)|(variable.trinket_1_buffs))|fight_remains<22
+  -- use_item,name=mirror_of_fractured_tomorrows,if=trinket.1.is.mirror_of_fractured_tomorrows&variable.trinket_priority=2|trinket.2.is.mirror_of_fractured_tomorrows&variable.trinket_priority=1
   -- use_item,name=timethiefs_gambit,if=pet.demonic_tyrant.active
+  if I.TimeThiefsGambit:IsEquippedAndReady() and (DemonicTyrantActive()) then
+    if Cast(I.TimeThiefsGambit, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timethiefs_gambit items 2"; end
+  end
   -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains)
   -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains)
   -- Note: Can't handle some of the above conditions, so using a generic use_items to cover trinkets and other items.
@@ -505,8 +510,8 @@ local function APL()
     if S.HandofGuldan:IsReady() and (CombatTime < 0.5 and (FightRemains % 95 > 40 or FightRemains % 95 < 15) and (S.ReignofTyranny:IsAvailable() or EnemiesCount8ySplash > 2)) then
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 2"; end
     end
-    -- call_action_list,name=tyrant,if=cooldown.summon_demonic_tyrant.remains<15&cooldown.summon_vilefiend.remains<gcd.max*5&cooldown.call_dreadstalkers.remains<gcd.max*5&(cooldown.grimoire_felguard.remains<10|!set_bonus.tier30_2pc)&(variable.tyrant_cd<15|fight_remains<40|buff.power_infusion.up)&(!raid_event.adds.in<15-raid_event.add.duration)|talent.summon_vilefiend.enabled&cooldown.summon_demonic_tyrant.remains<15&cooldown.summon_vilefiend.remains<gcd.max*5&cooldown.call_dreadstalkers.remains<gcd.max*5&(cooldown.grimoire_felguard.remains<10|!set_bonus.tier30_2pc)&(!variable.shadow_timings|variable.tyrant_cd<15|fight_remains<40|buff.power_infusion.up)
-    if (S.SummonDemonicTyrant:CooldownRemains() < 15 and S.SummonVilefiend:CooldownRemains() < GCDMax * 5 and S.CallDreadstalkers:CooldownRemains() < GCDMax * 5 and (S.GrimoireFelguard:CooldownRemains() < 10 or not Player:HasTier(30, 2)) and (VarTyrantCD < 15 or FightRemains < 40 or Player:PowerInfusionUp()) or S.SummonVilefiend:IsAvailable() and S.SummonDemonicTyrant:CooldownRemains() < 15 and S.SummonVilefiend:CooldownRemains() < GCDMax * 5 and S.CallDreadstalkers:CooldownRemains() < GCDMax * 5 and (S.GrimoireFelguard:CooldownRemains() < 10 or not Player:HasTier(30, 2)) and (not VarShadowTimings or VarTyrantCD < 15 or FightRemains < 40 or Player:PowerInfusionUp())) then
+    -- call_action_list,name=tyrant,if=cooldown.summon_demonic_tyrant.remains<15&cooldown.summon_vilefiend.remains<gcd.max*5&cooldown.call_dreadstalkers.remains<gcd.max*5&(cooldown.grimoire_felguard.remains<10|!set_bonus.tier30_2pc)&(variable.tyrant_cd<15|fight_remains<40|buff.power_infusion.up)&(!raid_event.adds.in<15-raid_event.add.duration)|talent.summon_vilefiend.enabled&cooldown.summon_demonic_tyrant.remains<15&cooldown.summon_vilefiend.remains<gcd.max*5&cooldown.call_dreadstalkers.remains<gcd.max*5&(cooldown.grimoire_felguard.remains<10|!set_bonus.tier30_2pc)&(variable.tyrant_cd<15|fight_remains<40|buff.power_infusion.up)
+    if (S.SummonDemonicTyrant:CooldownRemains() < 15 and S.SummonVilefiend:CooldownRemains() < GCDMax * 5 and S.CallDreadstalkers:CooldownRemains() < GCDMax * 5 and (S.GrimoireFelguard:CooldownRemains() < 10 or not Player:HasTier(30, 2)) and (VarTyrantCD < 15 or FightRemains < 40 or Player:PowerInfusionUp()) or S.SummonVilefiend:IsAvailable() and S.SummonDemonicTyrant:CooldownRemains() < 15 and S.SummonVilefiend:CooldownRemains() < GCDMax * 5 and S.CallDreadstalkers:CooldownRemains() < GCDMax * 5 and (S.GrimoireFelguard:CooldownRemains() < 10 or not Player:HasTier(30, 2)) and (VarTyrantCD < 15 or FightRemains < 40 or Player:PowerInfusionUp())) then
       local ShouldReturn = Tyrant(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=tyrant,if=cooldown.summon_demonic_tyrant.remains<15&(buff.vilefiend.up|!talent.summon_vilefiend&(buff.grimoire_felguard.up|cooldown.grimoire_felguard.up|!set_bonus.tier30_2pc))&(variable.tyrant_cd<15|buff.grimoire_felguard.up|fight_remains<40|buff.power_infusion.up)
@@ -529,8 +534,8 @@ local function APL()
     if S.PowerSiphon:IsReady() and (Player:BuffDown(S.DemonicCoreBuff) and (Target:DebuffDown(S.DoomBrandDebuff) or (not S.HandofGuldan:InFlight() and Target:DebuffRemains(S.DoomBrandDebuff) < GCDMax + S.Demonbolt:TravelTime()) or (S.HandofGuldan:InFlight() and Target:DebuffRemains(S.DoomBrandDebuff) < GCDMax + S.Demonbolt:TravelTime() + 3)) and Player:HasTier(31, 2)) then
       if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon main 10"; end
     end
-    -- demonic_strength,if=buff.nether_portal.remains<gcd.max&(fight_remains>63&!(fight_remains>cooldown.summon_demonic_tyrant.remains+69)|cooldown.summon_demonic_tyrant.remains>30|1|buff.rite_of_ruvaraad.up|!talent.summon_demonic_tyrant|!talent.grimoire_felguard|!set_bonus.tier30_2pc)
-    if S.DemonicStrength:IsCastable() and (Player:BuffRemains(S.NetherPortalBuff) < GCDMax and (FightRemains > 63 and not (FightRemains > S.SummonDemonicTyrant:CooldownRemains() + 69) or S.SummonDemonicTyrant:CooldownRemains() > 30 or Player:BuffUp(S.RiteofRuvaraadBuff) or not S.SummonDemonicTyrant:IsAvailable() or not S.GrimoireFelguard:IsAvailable() or not Player:HasTier(30, 2))) then
+    -- demonic_strength,if=buff.nether_portal.remains<gcd.max
+    if S.DemonicStrength:IsCastable() and (Player:BuffRemains(S.NetherPortalBuff) < GCDMax) then
       if Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength main 12"; end
     end
     -- bilescourge_bombers
@@ -553,10 +558,6 @@ local function APL()
     if S.SummonSoulkeeper:IsReady() and (S.SummonSoulkeeper:Count() == 10 and EnemiesCount8ySplash > 1) then
       if Cast(S.SummonSoulkeeper) then return "soul_strike main 22"; end
     end
-    -- demonic_strength,if=(fight_remains>63&!(fight_remains>cooldown.summon_demonic_tyrant.remains+69)|cooldown.summon_demonic_tyrant.remains>30|buff.rite_of_ruvaraad.up|1|!talent.summon_demonic_tyrant|!talent.grimoire_felguard|!set_bonus.tier30_2pc)
-    if S.DemonicStrength:IsCastable() and (FightRemains > 63 and not (FightRemains > S.SummonDemonicTyrant:CooldownRemains() + 69) or S.SummonDemonicTyrant:CooldownRemains() > 30 or Player:BuffUp(S.RiteofRuvaraadBuff) or not S.SummonDemonicTyrant:IsAvailable() or not S.GrimoireFelguard:IsAvailable() or not Player:HasTier(30, 2)) then
-      if Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength main 24"; end
-    end
     -- hand_of_guldan,if=((soul_shard>2&cooldown.call_dreadstalkers.remains>gcd.max*4&cooldown.summon_demonic_tyrant.remains>17)|soul_shard=5|soul_shard=4&talent.soul_strike&cooldown.soul_strike.remains<gcd.max*2)&(active_enemies=1&talent.grand_warlocks_design)
     if S.HandofGuldan:IsReady() and (((SoulShards > 2 and S.CallDreadstalkers:CooldownRemains() > GCDMax * 4 and S.SummonDemonicTyrant:CooldownRemains() > 17) or SoulShards == 5 or SoulShards == 4 and S.SoulStrike:IsAvailable() and S.SoulStrike:CooldownRemains() < GCDMax * 2) and (EnemiesCount8ySplash == 1 and S.GrandWarlocksDesign:IsAvailable())) then
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 26"; end
@@ -565,11 +566,11 @@ local function APL()
     if S.HandofGuldan:IsReady() and (SoulShards > 2 and not (EnemiesCount8ySplash == 1 and S.GrandWarlocksDesign:IsAvailable())) then
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 28"; end
     end
-    -- demonbolt,target_if=(!debuff.doom_brand.up|action.hand_of_guldan.in_flight&debuff.doom_brand.remains<=3)|active_enemies<4,if=buff.demonic_core.stack>1&((soul_shard<4&!talent.soul_strike|cooldown.soul_strike.remains>gcd.max*2)|soul_shard<3)&!variable.pool_cores_for_tyrant
+    -- demonbolt,target_if=(!debuff.doom_brand.up)|active_enemies<4,if=buff.demonic_core.stack>1&((soul_shard<4&!talent.soul_strike|cooldown.soul_strike.remains>gcd.max*2)|soul_shard<3)&!variable.pool_cores_for_tyrant
     if S.Demonbolt:IsReady() and (Player:BuffStack(S.DemonicCoreBuff) > 1 and ((SoulShards < 4 and not S.SoulStrike:IsAvailable() or S.SoulStrike:CooldownRemains() > GCDMax * 2) or SoulShards < 2) and not VarPoolCoresForTyrant) then
       if Everyone.CastCycle(S.Demonbolt, Enemies8ySplash, EvaluateCycleDemonbolt2, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 30"; end
     end
-    -- demonbolt,target_if=(!debuff.doom_brand.up|action.hand_of_guldan.in_flight&debuff.doom_brand.remains<=3)|active_enemies<4,if=set_bonus.tier31_2pc&(debuff.doom_brand.remains>10&buff.demonic_core.up&soul_shard<4)&!variable.pool_cores_for_tyrant
+    -- demonbolt,target_if=(!debuff.doom_brand.up)|active_enemies<4,if=set_bonus.tier31_2pc&(debuff.doom_brand.remains>10&buff.demonic_core.up&soul_shard<4)&!variable.pool_cores_for_tyrant
     if S.Demonbolt:IsReady() and (Player:HasTier(31, 2) and Player:BuffUp(S.DemonicCoreBuff) and SoulShards < 4 and not VarPoolCoresForTyrant) then
       if Everyone.CastTargetIf(S.Demonbolt, Enemies8ySplash, "==", EvaluateCycleDemonbolt2, EvaluateTargetIfDemonbolt, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 32"; end
     end
@@ -577,7 +578,7 @@ local function APL()
     if S.Demonbolt:IsReady() and (FightRemains < Player:BuffStack(S.DemonicCoreBuff) * GCDMax) then
       if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 34"; end
     end
-    -- demonbolt,target_if=(!debuff.doom_brand.up|action.hand_of_guldan.in_flight&debuff.doom_brand.remains<=3)|active_enemies<4,if=buff.demonic_core.up&(cooldown.power_siphon.remains<4)&(soul_shard<4)&!variable.pool_cores_for_tyrant
+    -- demonbolt,target_if=(!debuff.doom_brand.up)|active_enemies<4,if=buff.demonic_core.up&(cooldown.power_siphon.remains<4)&(soul_shard<4)&!variable.pool_cores_for_tyrant
     if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and S.PowerSiphon:CooldownRemains() < 4 and SoulShards < 4 and not VarPoolCoresForTyrant) then
       if Everyone.CastCycle(S.Demonbolt, Enemies8ySplash, EvaluateCycleDemonbolt2, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 36"; end
     end
