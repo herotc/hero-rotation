@@ -59,7 +59,8 @@ local VarHoldSEF = false
 local VarSerenityBurst = false
 local VarBoKNeeded = false
 local VarTrinketType = (S.Serenity:IsAvailable()) and 1 or 2
-local VarSyncSerenity = I.NeltharionsCalltoDominance:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.WitherbarksBranch:IsEquipped()
+local VarDungeonRoute = Player:IsInDungeonArea()
+local VarSyncSerenity = (I.NeltharionsCalltoDominance:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.WitherbarksBranch:IsEquipped()) and not VarDungeonRoute
 local Stuns = {
   { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end },
   { S.RingOfPeace, "Cast Ring Of Peace (Stun)", function () return true end },
@@ -69,9 +70,9 @@ local VarHoldTod = false
 local VarFoPPreChan = 0
 
 -- Trinkets
-local equip = Player:GetEquipment()
-local trinket1 = equip[13] and Item(equip[13]) or Item(0)
-local trinket2 = equip[14] and Item(equip[14]) or Item(0)
+local Equip = Player:GetEquipment()
+local Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
+local Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -93,11 +94,17 @@ HL:RegisterForEvent(function()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
-  equip = Player:GetEquipment()
-  trinket1 = equip[13] and Item(equip[13]) or Item(0)
-  trinket2 = equip[14] and Item(equip[14]) or Item(0)
-  VarSyncSerenity = I.NeltharionsCalltoDominance:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.WitherbarksBranch:IsEquipped()
+  Equip = Player:GetEquipment()
+  Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
+  Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
+  VarDungeonRoute = Player:IsInDungeonArea()
+  VarSyncSerenity = (I.NeltharionsCalltoDominance:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.WitherbarksBranch:IsEquipped()) and not VarDungeonRoute
 end, "PLAYER_EQUIPMENT_CHANGED")
+
+HL:RegisterForEvent(function()
+  VarDungeonRoute = Player:IsInDungeonArea()
+  VarSyncSerenity = (I.NeltharionsCalltoDominance:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.WitherbarksBranch:IsEquipped()) and not VarDungeonRoute
+end, "ZONE_CHANGED_NEW_AREA")
 
 local function EnergyTimeToMaxRounded()
   -- Round to the nearesth 10th to reduce prediction instability on very high regen rates
@@ -226,7 +233,7 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
-  -- variable,name=sync_serenity,op=set,value=equipped.neltharions_call_to_dominance|equipped.ashes_of_the_embersoul|equipped.mirror_of_fractured_tomorrows|equipped.witherbarks_branche
+  -- variable,name=sync_serenity,default=0,value=1,if=(equipped.neltharions_call_to_dominance|equipped.ashes_of_the_embersoul|equipped.mirror_of_fractured_tomorrows|equipped.witherbarks_branch)&!(fight_style.dungeonslice|fight_style.dungeonroute)
   -- Note: Moved to variable declarations and PLAYER_EQUIPMENT_CHANGED registration.
   -- summon_white_tiger_statue
   if S.SummonWhiteTigerStatue:IsCastable() and CDsON() then
@@ -248,7 +255,7 @@ end
 
 local function Trinkets()
   -- use_item,name=manic_grieftorch,if=(trinket.1.is.manic_grieftorch&!trinket.2.has_use_buff|trinket.2.is.manic_grieftorch&!trinket.1.has_use_buff)
-  if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() and (trinket1:ID() == I.ManicGrieftorch:ID() and not trinket2:HasUseBuff() or trinket2:ID() == I.ManicGrieftorch:ID() and not trinket1:HasUseBuff()) then
+  if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() and (Trinket1:ID() == I.ManicGrieftorch:ID() and not Trinket2:HasUseBuff() or Trinket2:ID() == I.ManicGrieftorch:ID() and not Trinket1:HasUseBuff()) then
     if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "manic_grieftorch trinkets 2"; end
   end
   if VarTrinketType == 1 then
@@ -263,11 +270,11 @@ local function Trinkets()
         if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment serenity_trinkets 6"; end
       end
       -- manic_grieftorch,use_off_gcd=1,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff&!buff.serenity.up&!pet.xuen_the_white_tiger.active|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>30&cooldown.serenity.remains|fight_remains<5
-      if I.ManicGrieftorch:IsEquippedAndReady() and (not trinket1:HasUseBuff() and not trinket2:HasUseBuff() and Player:BuffDown(S.SerenityBuff) and not XuenActive or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and S.Serenity:CooldownDown() or FightRemains < 5) then
+      if I.ManicGrieftorch:IsEquippedAndReady() and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() and Player:BuffDown(S.SerenityBuff) and not XuenActive or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and S.Serenity:CooldownDown() or FightRemains < 5) then
         if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch serenity_trinkets 8"; end
       end
       -- beacon_to_the_beyond,use_off_gcd=1,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff&!buff.serenity.up&!pet.xuen_the_white_tiger.active|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>30&cooldown.serenity.remains|fight_remains<10
-      if I.BeacontotheBeyond:IsEquippedAndReady() and (not trinket1:HasUseBuff() and not trinket2:HasUseBuff() and Player:BuffDown(S.SerenityBuff) and not XuenActive or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and S.Serenity:CooldownDown() or FightRemains < 10) then
+      if I.BeacontotheBeyond:IsEquippedAndReady() and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() and Player:BuffDown(S.SerenityBuff) and not XuenActive or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and S.Serenity:CooldownDown() or FightRemains < 10) then
         if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond trinkets 10"; end
       end
     end
@@ -277,7 +284,7 @@ local function Trinkets()
     end
     if Settings.Commons.Enabled.Trinkets then
       -- dragonfire_bomb_dispenser,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>10&cooldown.serenity.remains|fight_remains<10
-      if I.DragonfireBombDispenser:IsEquippedAndReady() and (not trinket1:HasUseBuff() and not trinket2:HasUseBuff() or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 and S.Serenity:CooldownDown() or FightRemains < 10) then
+      if I.DragonfireBombDispenser:IsEquippedAndReady() and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 and S.Serenity:CooldownDown() or FightRemains < 10) then
         if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser trinkets 14"; end
       end
       local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
@@ -294,7 +301,7 @@ local function Trinkets()
         if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name() .. " (serenity_trinkets dmg_buff trinket1)"; end
       end
       if Trinket2ToUse and (not Trinket2ToUse:HasUseBuff() or Trinket2ToUse:HasUseBuff() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 and S.Serenity:CooldownDown()) then
-        if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket1ToUse:Name() .. " (serenity_trinkets dmg_buff trinket2)"; end
+        if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name() .. " (serenity_trinkets dmg_buff trinket2)"; end
       end
     end
   else
@@ -309,11 +316,11 @@ local function Trinkets()
         if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment sef_trinkets 18"; end
       end
       -- manic_grieftorch,use_off_gcd=1,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff&!buff.storm_earth_and_fire.up&!pet.xuen_the_white_tiger.active|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>30|fight_remains<5
-      if I.ManicGrieftorch:IsEquippedAndReady() and (not trinket1:HasUseBuff() and not trinket2:HasUseBuff() and Player:BuffDown(S.StormEarthAndFireBuff) and not XuenActive or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or FightRemains < 5) then
+      if I.ManicGrieftorch:IsEquippedAndReady() and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() and Player:BuffDown(S.StormEarthAndFireBuff) and not XuenActive or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or FightRemains < 5) then
         if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch sef_trinkets 20"; end
       end
       -- beacon_to_the_beyond,use_off_gcd=1,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff&!buff.storm_earth_and_fire.up&!pet.xuen_the_white_tiger.active|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>30|fight_remains<10
-      if I.BeacontotheBeyond:IsEquippedAndReady() and (not trinket1:HasUseBuff() and not trinket2:HasUseBuff() and Player:BuffDown(S.StormEarthAndFireBuff) and not XuenActive or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or FightRemains < 10) then
+      if I.BeacontotheBeyond:IsEquippedAndReady() and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() and Player:BuffDown(S.StormEarthAndFireBuff) and not XuenActive or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or FightRemains < 10) then
         if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond sef_trinkets 22"; end
       end
     end
@@ -323,7 +330,7 @@ local function Trinkets()
     end
     if Settings.Commons.Enabled.Trinkets then
       -- dragonfire_bomb_dispenser,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>10|fight_remains<10
-      if I.DragonfireBombDispenser:IsEquippedAndReady() and (not trinket1:HasUseBuff() and not trinket2:HasUseBuff() or (trinket1:HasUseBuff() or trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 or FightRemains < 10) then
+      if I.DragonfireBombDispenser:IsEquippedAndReady() and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 or FightRemains < 10) then
         if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser sef_trinkets 26"; end
       end
       local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
@@ -415,9 +422,14 @@ local function CDSEF()
   if S.InvokeXuenTheWhiteTiger:IsCastable() and (not VarHoldXuen and Target:TimeToDie() > 25 and S.BonedustBrew:IsAvailable() and S.BonedustBrew:CooldownRemains() <= 5 and (EnemiesCount8y < 3 and Player:Chi() >= 3 or EnemiesCount8y >= 3 and Player:Chi() >= 2) or FightRemains < 25) then
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_sef 4"; end
   end
-  -- invoke_xuen_the_white_tiger,if=target.time_to_die>25&fight_remains>120|fight_remains<60&(debuff.skyreach_exhaustion.remains<2|debuff.skyreach_exhaustion.remains>55)&!cooldown.serenity.remains&active_enemies<3|buff.bloodlust.up|fight_remains<23
-  if S.InvokeXuenTheWhiteTiger:IsCastable() and (Target:TimeToDie() > 25 and FightRemains > 120 or FightRemains < 60 and (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 2 or Target:DebuffRemains(S.SkyreachExhaustionDebuff) > 55) and S.Serenity:CooldownUp() and EnemiesCount8y < 3 or Player:BloodlustUp() or FightRemains < 23) then
+  -- invoke_xuen_the_white_tiger,if=target.time_to_die>25&fight_remains>120&(!trinket.1.is.ashes_of_the_embersoul&!trinket.1.is.witherbarks_branch&!trinket.2.is.ashes_of_the_embersoul&!trinket.2.is.witherbarks_branch|(trinket.1.is.ashes_of_the_embersoul|trinket.1.is.witherbarks_branch)&!trinket.1.cooldown.remains|(trinket.2.is.ashes_of_the_embersoul|trinket.2.is.witherbarks_branch)&!trinket.2.cooldown.remains)
+  if S.InvokeXuenTheWhiteTiger:IsCastable() and (Target:TimeToDie() > 25 and FightRemains > 120 and (Trinket1:ID() ~= I.AshesoftheEmbersoul:ID() and Trinket1:ID() ~= I.WitherbarksBranch:ID() and Trinket2:ID() ~= I.AshesoftheEmbersoul:ID() and Trinket2:ID() ~= I.WitherbarksBranch:ID() or (Trinket1:ID() == I.AshesoftheEmbersoul:ID() or Trinket1:ID() == I.WitherbarksBranch:ID()) and not Trinket1:CooldownRemains() > 0 or (Trinket2:ID() == I.AshesoftheEmbersoul:ID() or Trinket2:ID() == I.WitherbarksBranch:ID()) and not Trinket2:CooldownRemains() > 0)) then
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_sef 6"; end
+  end
+  -- invoke_xuen_the_white_tiger,if=fight_remains<60&(debuff.skyreach_exhaustion.remains<2|debuff.skyreach_exhaustion.remains>55)&!cooldown.serenity.remains&active_enemies<3
+  -- Note: Ignoring Serenity check, as player can't have SEF and Serenity simultaneously.
+  if S.InvokeXuenTheWhiteTiger:IsCastable() and (FightRemains < 60 and (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 2 or Target:DebuffRemains(S.SkyreachExhaustionDebuff) > 55) and EnemiesCount8y < 3) then
+    if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_sef 7"; end
   end
   -- storm_earth_and_fire,if=talent.bonedust_brew&(fight_remains<30&cooldown.bonedust_brew.remains<4&chi>=4|buff.bonedust_brew.up|!spinning_crane_kick.max&active_enemies>=3&cooldown.bonedust_brew.remains<=2&chi>=2)&(pet.xuen_the_white_tiger.active|cooldown.invoke_xuen_the_white_tiger.remains>cooldown.storm_earth_and_fire.full_recharge_time)
   if S.StormEarthAndFire:IsCastable() and (S.BonedustBrew:IsAvailable() and (FightRemains < 30 and S.BonedustBrew:CooldownRemains() < 4 and Player:Chi() >= 4 or Player:BuffUp(S.BonedustBrewBuff) or not SCKMax() and EnemiesCount8y >= 3 and S.BonedustBrew:CooldownRemains() <= 2 and Player:Chi() >= 2) and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownRemains() > S.StormEarthAndFire:FullRechargeTime())) then
@@ -523,9 +535,13 @@ local function CDSerenity()
   if S.InvokeXuenTheWhiteTiger:IsCastable() and (not VarHoldXuen and S.BonedustBrew:IsAvailable() and S.BonedustBrew:CooldownRemains() <= 5 and Target:TimeToDie() > 25 or Player:BloodlustUp() or FightRemains < 25) then
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_serenity 4"; end
   end
-  -- invoke_xuen_the_white_tiger,if=target.time_to_die>25&fight_remains>120|fight_remains<60&(debuff.skyreach_exhaustion.remains<2|debuff.skyreach_exhaustion.remains>55)&!cooldown.serenity.remains&active_enemies<3|buff.bloodlust.up|fight_remains<23
-  if S.InvokeXuenTheWhiteTiger:IsCastable() and (Target:TimeToDie() > 25 and FightRemains > 120 or FightRemains < 60 and (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 2 or Target:DebuffRemains(S.SkyreachExhaustionDebuff) > 55) and S.Serenity:CooldownUp() and EnemiesCount8y < 3 or Player:BloodlustUp() or FightRemains < 23) then
+  -- invoke_xuen_the_white_tiger,if=(target.time_to_die>25|(fight_style.dungeonslice|fight_style.dungeonroute)&cooldown.serenity.remains<2)&fight_remains>120&(!trinket.1.is.ashes_of_the_embersoul&!trinket.1.is.witherbarks_branch&!trinket.2.is.ashes_of_the_embersoul&!trinket.2.is.witherbarks_branch|(trinket.1.is.ashes_of_the_embersoul|trinket.1.is.witherbarks_branch)&!trinket.1.cooldown.remains|(trinket.2.is.ashes_of_the_embersoul|trinket.2.is.witherbarks_branch)&!trinket.2.cooldown.remains)
+  if S.InvokeXuenTheWhiteTiger:IsCastable() and ((Target:TimeToDie() > 25 or VarDungeonRoute and S.Serenity:CooldownRemains() < 2) and FightRemains > 120 and (Trinket1:ID() ~= I.AshesoftheEmbersoul:ID() and Trinket1:ID() ~= I.WitherbarksBranch:ID() and Trinket2:ID() ~= I.AshesoftheEmbersoul:ID() and Trinket2:ID() ~= I.WitherbarksBranch:ID() or (Trinket1:ID() == I.AshesoftheEmbersoul:ID() or Trinket1:ID() == I.WitherbarksBranch:ID()) and not Trinket1:CooldownRemains() > 0 or (Trinket2:ID() == I.AshesoftheEmbersoul:ID() or Trinket2:ID() == I.WitherbarksBranch:ID()) and not Trinekt2:CooldownRemains() > 0)) then
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_serenity 6"; end
+  end
+  -- invoke_xuen_the_white_tiger,if=fight_remains<60&(debuff.skyreach_exhaustion.remains<2|debuff.skyreach_exhaustion.remains>55)&!cooldown.serenity.remains&active_enemies<3
+  if S.InvokeXuenTheWhiteTiger:IsCastable() and (FightRemains < 60 and (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 2 or Target:DebuffRemains(S.SkyreachExhaustionDebuff) > 55) and S.Serenity:CooldownUp() and EnemiesCount8y < 3) then
+    if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_serenity 7"; end
   end
   -- bonedust_brew,if=buff.invokers_delight.up|!buff.bonedust_brew.up&(cooldown.serenity.up|cooldown.serenity.remains>15|fight_remains<30&fight_remains>10)|fight_remains<10
   if S.BonedustBrew:IsCastable() and (Player:BuffUp(S.InvokersDelightBuff) or Player:BuffDown(S.BonedustBrewBuff) and (S.Serenity:CooldownUp() or S.Serenity:CooldownRemains() > 15 or FightRemains < 30 and FightRemains > 10) or FightRemains < 10) then
@@ -1134,7 +1150,7 @@ end
 
 local function Serenity2T()
   -- faeline_stomp,if=debuff.fae_exposure_damage.remains<2&!debuff.skyreach_exhaustion.remains<2&!debuff.skyreach_exhaustion.remains
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 2 and not Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 2 and Target:DebuffDown(S.SkyreachExhaustionDebuff)) then
+  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 2 and not (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 2) and Target:DebuffDown(S.SkyreachExhaustionDebuff)) then
     if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_2t 2"; end
   end
   -- tiger_palm,,target_if=min:debuff.mark_of_the_crane.remains,if=!debuff.skyreach_exhaustion.up*20&combo_strike
