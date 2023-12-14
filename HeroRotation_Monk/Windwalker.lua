@@ -423,7 +423,7 @@ local function CDSEF()
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_sef 4"; end
   end
   -- invoke_xuen_the_white_tiger,if=target.time_to_die>25&fight_remains>120&(!trinket.1.is.ashes_of_the_embersoul&!trinket.1.is.witherbarks_branch&!trinket.2.is.ashes_of_the_embersoul&!trinket.2.is.witherbarks_branch|(trinket.1.is.ashes_of_the_embersoul|trinket.1.is.witherbarks_branch)&!trinket.1.cooldown.remains|(trinket.2.is.ashes_of_the_embersoul|trinket.2.is.witherbarks_branch)&!trinket.2.cooldown.remains)
-  if S.InvokeXuenTheWhiteTiger:IsCastable() and (Target:TimeToDie() > 25 and FightRemains > 120 and (Trinket1:ID() ~= I.AshesoftheEmbersoul:ID() and Trinket1:ID() ~= I.WitherbarksBranch:ID() and Trinket2:ID() ~= I.AshesoftheEmbersoul:ID() and Trinket2:ID() ~= I.WitherbarksBranch:ID() or (Trinket1:ID() == I.AshesoftheEmbersoul:ID() or Trinket1:ID() == I.WitherbarksBranch:ID()) and not Trinket1:CooldownRemains() > 0 or (Trinket2:ID() == I.AshesoftheEmbersoul:ID() or Trinket2:ID() == I.WitherbarksBranch:ID()) and not Trinket2:CooldownRemains() > 0)) then
+  if S.InvokeXuenTheWhiteTiger:IsCastable() and (Target:TimeToDie() > 25 and FightRemains > 120 and (Trinket1:ID() ~= I.AshesoftheEmbersoul:ID() and Trinket1:ID() ~= I.WitherbarksBranch:ID() and Trinket2:ID() ~= I.AshesoftheEmbersoul:ID() and Trinket2:ID() ~= I.WitherbarksBranch:ID() or (Trinket1:ID() == I.AshesoftheEmbersoul:ID() or Trinket1:ID() == I.WitherbarksBranch:ID()) and not (Trinket1:CooldownRemains() > 0) or (Trinket2:ID() == I.AshesoftheEmbersoul:ID() or Trinket2:ID() == I.WitherbarksBranch:ID()) and not (Trinket2:CooldownRemains() > 0))) then
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_sef 6"; end
   end
   -- invoke_xuen_the_white_tiger,if=fight_remains<60&(debuff.skyreach_exhaustion.remains<2|debuff.skyreach_exhaustion.remains>55)&!cooldown.serenity.remains&active_enemies<3
@@ -453,7 +453,6 @@ local function CDSEF()
   end
   -- Touch of Death handling
   if S.TouchofDeath:CooldownUp() then
-    local DungeonRoute = Player:IsInParty() and not Player:IsInRaid()
     local ToDTar = nil
     if AoEON() then
       -- ToDTarget() checks all targets within Enemies5y to see which are valid targets for ToD and returns the one with the highest HP.
@@ -465,7 +464,7 @@ local function CDSEF()
     end
     if ToDTar then
       -- touch_of_death,target_if=max:target.health,if=fight_style.dungeonroute&!buff.serenity.up&(combo_strike&target.health<health)|(buff.hidden_masters_forbidden_touch.remains<2)|(buff.hidden_masters_forbidden_touch.remains>target.time_to_die)
-      if DungeonRoute and Player:BuffDown(S.SerenityBuff) and ComboStrike(S.TouchofDeath) and ToDTar:Health() < Player:Health() or Player:BuffRemains(S.HiddenMastersForbiddenTouchBuff) < 2 or Player:BuffRemains(S.HiddenMastersForbiddenTouchBuff) > ToDTar:TimeToDie() then
+      if VarDungeonRoute and Player:BuffDown(S.SerenityBuff) and ComboStrike(S.TouchofDeath) and ToDTar:Health() < Player:Health() or Player:BuffRemains(S.HiddenMastersForbiddenTouchBuff) < 2 or Player:BuffRemains(S.HiddenMastersForbiddenTouchBuff) > ToDTar:TimeToDie() then
         if ToDTar:GUID() == Target:GUID() then
           if Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath, nil, not Target:IsInMeleeRange(5)) then return "touch_of_death cd_sef main-target 16"; end
         else
@@ -474,7 +473,7 @@ local function CDSEF()
       end
     end
     if ToDTar and ComboStrike(S.TouchofDeath) then
-      if DungeonRoute then
+      if VarDungeonRoute then
         -- touch_of_death,cycle_targets=1,if=fight_style.dungeonroute&combo_strike&(target.time_to_die>60|debuff.bonedust_brew_debuff.up|fight_remains<10)
         if ToDTar:TimeToDie() > 60 or ToDTar:DebuffUp(S.BonedustBrewDebuff) or FightRemains < 10 then
           if ToDTar:GUID() == Target:GUID() then
@@ -536,7 +535,7 @@ local function CDSerenity()
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_serenity 4"; end
   end
   -- invoke_xuen_the_white_tiger,if=(target.time_to_die>25|(fight_style.dungeonslice|fight_style.dungeonroute)&cooldown.serenity.remains<2)&fight_remains>120&(!trinket.1.is.ashes_of_the_embersoul&!trinket.1.is.witherbarks_branch&!trinket.2.is.ashes_of_the_embersoul&!trinket.2.is.witherbarks_branch|(trinket.1.is.ashes_of_the_embersoul|trinket.1.is.witherbarks_branch)&!trinket.1.cooldown.remains|(trinket.2.is.ashes_of_the_embersoul|trinket.2.is.witherbarks_branch)&!trinket.2.cooldown.remains)
-  if S.InvokeXuenTheWhiteTiger:IsCastable() and ((Target:TimeToDie() > 25 or VarDungeonRoute and S.Serenity:CooldownRemains() < 2) and FightRemains > 120 and (Trinket1:ID() ~= I.AshesoftheEmbersoul:ID() and Trinket1:ID() ~= I.WitherbarksBranch:ID() and Trinket2:ID() ~= I.AshesoftheEmbersoul:ID() and Trinket2:ID() ~= I.WitherbarksBranch:ID() or (Trinket1:ID() == I.AshesoftheEmbersoul:ID() or Trinket1:ID() == I.WitherbarksBranch:ID()) and not Trinket1:CooldownRemains() > 0 or (Trinket2:ID() == I.AshesoftheEmbersoul:ID() or Trinket2:ID() == I.WitherbarksBranch:ID()) and not Trinekt2:CooldownRemains() > 0)) then
+  if S.InvokeXuenTheWhiteTiger:IsCastable() and ((Target:TimeToDie() > 25 or VarDungeonRoute and S.Serenity:CooldownRemains() < 2) and FightRemains > 120 and (Trinket1:ID() ~= I.AshesoftheEmbersoul:ID() and Trinket1:ID() ~= I.WitherbarksBranch:ID() and Trinket2:ID() ~= I.AshesoftheEmbersoul:ID() and Trinket2:ID() ~= I.WitherbarksBranch:ID() or (Trinket1:ID() == I.AshesoftheEmbersoul:ID() or Trinket1:ID() == I.WitherbarksBranch:ID()) and not (Trinket1:CooldownRemains() > 0) or (Trinket2:ID() == I.AshesoftheEmbersoul:ID() or Trinket2:ID() == I.WitherbarksBranch:ID()) and not (Trinket2:CooldownRemains() > 0))) then
     if Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger cd_serenity 6"; end
   end
   -- invoke_xuen_the_white_tiger,if=fight_remains<60&(debuff.skyreach_exhaustion.remains<2|debuff.skyreach_exhaustion.remains>55)&!cooldown.serenity.remains&active_enemies<3
@@ -557,7 +556,6 @@ local function CDSerenity()
   end
   -- Touch of Death handling
   if S.TouchofDeath:CooldownUp() then
-    local DungeonRoute = Player:IsInParty() and not Player:IsInRaid()
     local ToDTar = nil
     if AoEON() then
       -- ToDTarget() checks all targets within Enemies5y to see which are valid targets for ToD and returns the one with the highest HP.
@@ -569,7 +567,7 @@ local function CDSerenity()
     end
     if ToDTar then
       -- touch_of_death,target_if=max:target.health,if=fight_style.dungeonroute&!buff.serenity.up&(combo_strike&target.health<health)|(buff.hidden_masters_forbidden_touch.remains<2)|(buff.hidden_masters_forbidden_touch.remains>target.time_to_die)
-      if DungeonRoute and Player:BuffDown(S.SerenityBuff) and ComboStrike(S.TouchofDeath) and ToDTar:Health() < Player:Health() or Player:BuffRemains(S.HiddenMastersForbiddenTouchBuff) < 2 or Player:BuffRemains(S.HiddenMastersForbiddenTouchBuff) > ToDTar:TimeToDie() then
+      if VarDungeonRoute and Player:BuffDown(S.SerenityBuff) and ComboStrike(S.TouchofDeath) and ToDTar:Health() < Player:Health() or Player:BuffRemains(S.HiddenMastersForbiddenTouchBuff) < 2 or Player:BuffRemains(S.HiddenMastersForbiddenTouchBuff) > ToDTar:TimeToDie() then
         if ToDTar:GUID() == Target:GUID() then
           if Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath, nil, not Target:IsInMeleeRange(5)) then return "touch_of_death cd_sef main-target 14"; end
         else
@@ -578,7 +576,7 @@ local function CDSerenity()
       end
     end
     if ToDTar and ComboStrike(S.TouchofDeath) then
-      if DungeonRoute then
+      if VarDungeonRoute then
         -- touch_of_death,cycle_targets=1,if=fight_style.dungeonroute&combo_strike&(target.time_to_die>60|debuff.bonedust_brew_debuff.up|fight_remains<10)&!buff.serenity.up
         if (ToDTar:TimeToDie() > 60 or ToDTar:DebuffUp(S.BonedustBrewDebuff) or FightRemains < 10) and Player:BuffDown(S.SerenityBuff) then
           if ToDTar:GUID() == Target:GUID() then
