@@ -349,7 +349,7 @@ local function Precombat()
   end
   -- heart_of_the_wild
   if S.HeartoftheWild:IsCastable() then
-    if Cast(S.HeartoftheWild) then return "heart_of_the_wild precombat 4"; end
+    if Cast(S.HeartoftheWild, Settings.Feral.GCDasOffGCD.HeartOfTheWild) then return "heart_of_the_wild precombat 4"; end
   end
   -- use_item,name=algethar_puzzle_box
   if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() then

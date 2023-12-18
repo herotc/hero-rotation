@@ -76,6 +76,7 @@ HR.GUISettings.APL.Druid = {
     },
     GCDasOffGCD = {
       BsInc = true,
+      HeartOfTheWild = true,
       Regrowth = true,
       Renewal = true,
     },
