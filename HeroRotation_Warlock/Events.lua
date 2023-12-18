@@ -146,6 +146,28 @@ local PetsData = {
 }
 
 --------------------------
+----- Affliction ---------
+--------------------------
+-- Soul Rot buff tracker
+Warlock.SoulRotBuffUp = false
+Warlock.SoulRotAppliedTime = 0
+HL:RegisterForSelfCombatEvent(
+  function (_, Event, _, _, _, _, _, DestGUID, _, _, _, SpellID)
+    if DestGUID == Player:GUID() and SpellID == 386998 then
+      if Event == "SPELL_AURA_APPLIED" then
+        Warlock.SoulRotBuffUp = true
+        Warlock.SoulRotAppliedTime = GetTime()
+      end
+      if Event == "SPELL_AURA_REMOVED" then
+        Warlock.SoulRotBuffUp = false
+      end
+    end
+  end
+  , "SPELL_AURA_APPLIED"
+  , "SPELL_AURA_REMOVED"
+)
+
+--------------------------
 ----- Destruction --------
 --------------------------
 -- Immolate OnApply/OnRefresh Listener
