@@ -142,8 +142,13 @@ end
 
 -- CastTargetIf Condition Functions
 local function EvaluateTargetIfApocalypseAoECDs(TargetUnit)
-  -- if=talent.bursting_sores&debuff.festering_wound.up&(!death_and_decay.ticking&cooldown.death_and_decay.remains&rune<3|death_and_decay.ticking&rune=0)|!talent.bursting_sores&debuff.festering_wound.stack>=4|set_bonus.tier31_2pc&debuff.festering_wound.stack>=1
-  return (S.BurstingSores:IsAvailable() and TargetUnit:DebuffUp(S.FesteringWoundDebuff) and (Player:BuffDown(S.DeathAndDecayBuff) and S.DeathAndDecay:CooldownDown() and Player:Rune() < 3 or Player:BuffUp(S.DeathAndDecayBuff) and Player:Rune() == 0) or not S.BurstingSores:IsAvailable() and TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 4 or Player:HasTier(31, 2) and TargetUnit:DebuffUp(S.FesteringWoundDebuff))
+  -- if=talent.bursting_sores&debuff.festering_wound.up&(!death_and_decay.ticking&cooldown.death_and_decay.remains&rune<3|death_and_decay.ticking&rune=0)
+  return (S.BurstingSores:IsAvailable() and TargetUnit:DebuffUp(S.FesteringWoundDebuff) and (Player:BuffDown(S.DeathAndDecayBuff) and S.DeathAndDecay:CooldownDown() and Player:Rune() < 3 or Player:BuffUp(S.DeathAndDecayBuff) and Player:Rune() == 0))
+end
+
+local function EvaluateTargetIfApocalypseAoECDs2(TargetUnit)
+  -- if=!talent.bursting_sores&debuff.festering_wound.stack>=4|set_bonus.tier31_2pc&debuff.festering_wound.stack>=1
+  return (not S.BurstingSores:IsAvailable() and TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 4 or Player:HasTier(31, 2) and TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 1)
 end
 
 local function EvaluateTargetIfApocalypseCDs(TargetUnit)
@@ -290,9 +295,13 @@ local function AoECDs()
   if S.AbominationLimb:IsCastable() and (Player:Rune() < 2 or FesterStacks > 10 or not S.Festermight:IsAvailable() or Player:BuffUp(S.FestermightBuff) and Player:BuffRemains(S.FestermightBuff) < 12) then
     if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(20)) then return "abomination_limb aoe_cooldowns 6"; end
   end
-  -- apocalypse,target_if=min:debuff.festering_wound.stack,if=talent.bursting_sores&debuff.festering_wound.up&(!death_and_decay.ticking&cooldown.death_and_decay.remains&rune<3|death_and_decay.ticking&rune=0)|!talent.bursting_sores&debuff.festering_wound.stack>=4|set_bonus.tier31_2pc&debuff.festering_wound.stack>=1
+  -- apocalypse,target_if=min:debuff.festering_wound.stack,if=talent.bursting_sores&debuff.festering_wound.up&(!death_and_decay.ticking&cooldown.death_and_decay.remains&rune<3|death_and_decay.ticking&rune=0)
   if S.Apocalypse:IsReady() then
     if Everyone.CastTargetIf(S.Apocalypse, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfApocalypseAoECDs, not Target:IsInMeleeRange(5)) then return "apocalypse aoe_cooldowns 8"; end
+  end
+  -- apocalypse,target_if=max:debuff.festering_wound.stack,if=!talent.bursting_sores&debuff.festering_wound.stack>=4|set_bonus.tier31_2pc&debuff.festering_wound.stack>=1
+  if S.Apocalypse:IsReady() then
+    if Everyone.CastTargetIf(S.Apocalypse, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfApocalypseAoECDs2, not Target:IsInMeleeRange(5)) then return "apocalypse aoe_cooldowns 9"; end
   end
   -- unholy_assault,target_if=min:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=2|buff.dark_transformation.up
   if S.UnholyAssault:IsCastable() then
@@ -688,7 +697,7 @@ local function APL()
     if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=garg_setup,if=variable.garg_setup=0
+    -- run_action_list,name=garg_setup,if=variable.garg_setup_complete=0
     if CDsON() and not VarGargSetupComplete then
       local ShouldReturn = GargSetup(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for GargSetup()"; end
