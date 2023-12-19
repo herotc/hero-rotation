@@ -172,11 +172,11 @@ local function RtB_Reroll ()
         Cache.APLVar.RtB_Reroll = true
       end
 
-      -- # Crackshot builds with T31 should reroll if we won't lose over 1 buff (2 with Loaded Dice), and if Broadside is not active for builds without Hidden Opportunity
+      -- # Crackshot builds with T31 should reroll if we won't lose over 1 buff (2 with Loaded Dice)
       -- actions+=/variable,name=rtb_reroll,if=talent.crackshot&set_bonus.tier31_4pc,value=
       -- (rtb_buffs.will_lose<=1+buff.loaded_dice.up)&(talent.hidden_opportunity|!buff.broadside.up)
       if S.Crackshot:IsAvailable() and Player:HasTier(31, 4)
-        and (RtB_Buffs() <= 1 + num(Player:BuffUp(S.LoadedDiceBuff))) and (S.HiddenOpportunity:IsAvailable() or Player:BuffDown(S.Broadside)) then
+        and (RtB_Buffs() <= 1 + num(Player:BuffUp(S.LoadedDiceBuff))) then
         Cache.APLVar.RtB_Reroll = true
       end
 
@@ -190,7 +190,8 @@ local function RtB_Reroll ()
 
       -- # Additional reroll rules if all active buffs will not be rolled away and we don't already have 5+ buffs
       -- actions+/variable,name=rtb_reroll,value=variable.rtb_reroll|rtb_buffs.normal=0&rtb_buffs.longer>=1&rtb_buffs<5&rtb_buffs.max_remains<=39
-      if Cache.APLVar.RtB_Reroll or Cache.APLVar.RtB_Buffs.Normal == 0 and Cache.APLVar.RtB_Buffs.Longer >= 1 and RtB_Buffs() < 5 and Rogue.RtBRemains() <= 39 then
+      if Cache.APLVar.RtB_Reroll and (Cache.APLVar.RtB_Buffs.Longer == 0 or Cache.APLVar.RtB_Buffs.Normal == 0) and Cache.APLVar.RtB_Buffs.Longer >= 1 and RtB_Buffs() < 5 and Rogue.RtBRemains() <= 39
+      and not Player:StealthUp(true, true) then
         Cache.APLVar.RtB_Reroll = true
       end
 
