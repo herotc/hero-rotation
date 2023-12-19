@@ -28,6 +28,7 @@ HR.GUISettings.APL.Rogue = {
       Signature = "Suggested",
       Trinkets = "Suggested",
       Items = "Suggested",
+      Stealth = "Main Icon",
     },
     GCDasOffGCD = {
       EchoingReprimand = true,

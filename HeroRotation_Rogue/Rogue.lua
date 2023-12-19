@@ -309,7 +309,7 @@ end
 -- Stealth
 function Commons.Stealth(Stealth, Setting)
   if (Settings.Commons2.ShowStealthOOC or Everyone.TargetIsValid()) and Stealth:IsCastable() and Player:StealthDown() then
-    if HR.Cast(Stealth) then return "Cast Stealth (OOC)" end
+    if HR.Cast(Stealth, nil, Settings.Commons.DisplayStyle.Stealth) then return "Cast Stealth (OOC)" end
   end
 
   return false
