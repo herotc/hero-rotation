@@ -94,6 +94,7 @@ local function CalcMinAgony(Enemies)
 end
 
 local function CanSeed(Enemies)
+  if not Enemies or #Enemies == 0 then return false end
   if S.SeedofCorruption:InFlight() or Player:PrevGCDP(1, S.SeedofCorruption) then return false end
   local TotalTargets = 0
   local SeededTargets = 0
@@ -437,7 +438,7 @@ local function Cleave()
     if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction cleave 14"; end
   end
   -- seed_of_corruption,if=!talent.absolute_corruption&dot.corruption.remains<5&talent.sow_the_seeds&can_seed
-  if S.SeedofCorruption:IsReady() and (not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.CorruptionDebuff) < 5 and S.SowTheSeeds:IsAvailable() and CanSeed()) then
+  if S.SeedofCorruption:IsReady() and (not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.CorruptionDebuff) < 5 and S.SowTheSeeds:IsAvailable() and CanSeed(Enemies40y)) then
     if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "seed_of_corruption cleave 16"; end
   end
   -- corruption,target_if=min:remains,if=remains<5
