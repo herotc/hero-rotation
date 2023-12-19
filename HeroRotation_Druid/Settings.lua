@@ -44,8 +44,8 @@ HR.GUISettings.APL.Druid = {
   Balance = {
     BarkskinHP = 50,
     RenewalHP = 40,
+    ShowCancelStarlord = false,
     ShowMoonkinFormOOC = false,
-    DelayBerserking = false,
     PotionType = {
       Selected = "Power",
     },
@@ -76,6 +76,7 @@ HR.GUISettings.APL.Druid = {
     },
     GCDasOffGCD = {
       BsInc = true,
+      HeartOfTheWild = true,
       Regrowth = true,
       Renewal = true,
     },
@@ -136,7 +137,8 @@ local CP_Restoration = CreateChildPanel(CP_Druid, "Restoration")
 CreateARPanelOptions(CP_Druid, "APL.Druid.Commons")
 
 -- Balance
-CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMoonkinFormOOC", "Show Moonkin Form Out of Combat", "Enable this if you want the addon to show you the Moonkin Form reminder out of combat.")
+CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMoonkinFormOOC", "Show Moonkin Form Out of Combat", "Enable this option if you want the addon to show you the Moonkin Form reminder out of combat.")
+CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowCancelStarlord", "Show Starlord Cancel Suggestions", "Enable this option if you want to see suggestions to cancel Starlord. Note: This is a very minor dps gain if done correctly, but can be a dps loss if done incorrectly.")
 CreateARPanelOptions(CP_Balance, "APL.Druid.Balance")
 
 -- Feral

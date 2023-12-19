@@ -349,7 +349,7 @@ local function Precombat()
   end
   -- heart_of_the_wild
   if S.HeartoftheWild:IsCastable() then
-    if Cast(S.HeartoftheWild) then return "heart_of_the_wild precombat 4"; end
+    if Cast(S.HeartoftheWild, Settings.Feral.GCDasOffGCD.HeartOfTheWild) then return "heart_of_the_wild precombat 4"; end
   end
   -- use_item,name=algethar_puzzle_box
   if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() then
@@ -665,7 +665,7 @@ local function Cooldown()
       if Cast(I.MydasTalisman, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mydas_talisman cooldown 30"; end
     end
     if I.BandolierofTwistedBlades:IsEquippedAndReady() then
-      if Cast(I.BandolierofTwistedBlades, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInMeleeRange(6)) then return "bandolier_of_twisted_blades cooldown 32"; end
+      if Cast(I.BandolierofTwistedBlades, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInMeleeRange(5)) then return "bandolier_of_twisted_blades cooldown 32"; end
     end
     if I.FyrakksTaintedRageheart:IsEquippedAndReady() then
       if Cast(I.FyrakksTaintedRageheart, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInMeleeRange(10)) then return "fyrakks_tainted_rageheart cooldown 34"; end

@@ -10,6 +10,7 @@ local Spell   = HL.Spell
 local Item    = HL.Item
 -- HeroRotation
 local HR      = HeroRotation
+local Warlock = HR.Commons.Warlock
 -- Spells
 local SpellAffli   = Spell.Warlock.Affliction
 local SpellDemo    = Spell.Warlock.Demonology
@@ -18,6 +19,7 @@ local SpellDestro  = Spell.Warlock.Destruction
 local min     = math.min
 local max     = math.max
 local floor   = math.floor
+local GetTime = GetTime
 -- Settings
 local Settings = {
   Commons = HR.GUISettings.APL.Warlock.Commons
@@ -77,6 +79,35 @@ AffOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
       return BaseCheck and SpellAffli.UnstableAfflictionDebuff:AuraActiveCount() == 0 and not Player:IsCasting(self)
     elseif self == SpellAffli.SeedofCorruption or self == SpellAffli.Haunt then
       return BaseCheck and not Player:IsCasting(self) and not self:InFlight()
+    else
+      return BaseCheck
+    end
+  end
+, 265)
+
+local AffOldBuffUp
+AffOldBuffUp = HL.AddCoreOverride ("Player.BuffUp",
+  function (self, Spell, AnyCaster, BypassRecovery)
+    local BaseCheck = AffOldBuffUp(self, Spell, AnyCaster, BypassRecovery)
+    if Spell == SpellAffli.SoulRot then
+      return Warlock.SoulRotBuffUp
+    else
+      return BaseCheck
+    end
+  end
+, 265)
+
+local AffOldBuffRemains
+AffOldBuffRemains = HL.AddCoreOverride ("Player.BuffRemains",
+  function (self, Spell, AnyCaster, BypassRecovery)
+    local BaseCheck = AffOldBuffRemains(self, Spell, AnyCaster, BypassRecovery)
+    if Spell == SpellAffli.SoulRot then
+      if not Warlock.SoulRotBuffUp then return 0 end
+      --local SoulRotBuffLength = (Player:HasTier(31, 2)) and 12 or 8
+      -- Note: Appears the 2pc is currently bugged. Buff is removed after 8 seconds regardless.
+      local SoulRotBuffLength = 8
+      local Remains = SoulRotBuffLength - (GetTime() - Warlock.SoulRotAppliedTime)
+      return (Remains > 0) and Remains or 0
     else
       return BaseCheck
     end
