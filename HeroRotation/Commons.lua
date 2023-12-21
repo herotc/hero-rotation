@@ -38,7 +38,7 @@ end
 
 -- Is the current target valid?
 function Commons.TargetIsValid()
-  return Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() or HR.GUISettings.General.AlwaysShowIcon
+  return Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() or HR.GUISettings.General.ForceReadyStatus
 end
 
 -- Is the current unit valid during cycle?

@@ -472,7 +472,7 @@
   -- Is the player ready ?
   function HR.Ready ()
     local AreWeReady
-    if HR.GUISettings.General.AlwaysShowIcon then
+    if HR.GUISettings.General.ForceReadyStatus then
       AreWeReady = true
     elseif HR.GUISettings.General.ShowWhileMounted then
       AreWeReady = not Player:IsDeadOrGhost() and not Player:IsInVehicle() and not C_PetBattles.IsInBattle();
