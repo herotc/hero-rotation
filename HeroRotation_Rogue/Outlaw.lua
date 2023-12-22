@@ -73,6 +73,7 @@ local EffectiveComboPoints, ComboPoints, ComboPointsDeficit
 local Energy, EnergyRegen, EnergyDeficit, EnergyTimeToMax, EnergyMaxOffset
 local Interrupts = {
   { S.Blind, "Cast Blind (Interrupt)", function () return true end },
+  { S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return ComboPoints > 0 end }
 }
 
 -- Stable Energy Prediction
@@ -258,14 +259,15 @@ local function StealthCDs ()
   -- # Crackshot builds use Dance at finish condition
   -- actions.stealth_cds+=/shadow_dance,if=talent.crackshot&variable.finish_condition
   -- synecdoche note: DPS gain in testing to hold off on shadow dance if vanish is coming up in the next 6 seconds to avoid wasting vanish CDR
-  if S.ShadowDance:IsAvailable() and S.ShadowDance:IsCastable() and S.Crackshot:IsAvailable() and Finish_Condition() and S.Vanish:CooldownRemains() >= 6 then
+  if S.ShadowDance:IsAvailable() and S.ShadowDance:IsCastable() and S.Crackshot:IsAvailable() and Finish_Condition()
+    and (S.Vanish:CooldownRemains() >= 6 or not Settings.Commons2.UseDPSVanish) then
     if Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
   end
 
   -- actions.stealth_cds+=/shadow_dance,if=!talent.keep_it_rolling&variable.shadow_dance_condition&buff.slice_and_dice.up
   -- &(variable.finish_condition|talent.hidden_opportunity)&(!talent.hidden_opportunity|!cooldown.vanish.ready)
   if S.ShadowDance:IsAvailable() and S.ShadowDance:IsCastable() and not S.KeepItRolling:IsAvailable() and Shadow_Dance_Condition() and Player:BuffUp(S.SliceandDice)
-      and (Finish_Condition() or S.HiddenOpportunity:IsAvailable()) and (not S.HiddenOpportunity:IsAvailable() or not S.Vanish:IsReady()) then
+    and (Finish_Condition() or S.HiddenOpportunity:IsAvailable()) and (not S.HiddenOpportunity:IsAvailable() or not S.Vanish:IsReady() or not Settings.Commons2.UseDPSVanish) then
     if Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
   end
 
@@ -654,7 +656,7 @@ local function APL ()
 
   if Everyone.TargetIsValid() then
     -- Interrupts
-    ShouldReturn = Everyone.Interrupt(5, S.Kick, true, Interrupts)
+    ShouldReturn = Everyone.Interrupt(5 + (3*num(S.AcrobaticStrikes:IsAvailable())), S.Kick, true, Interrupts)
     if ShouldReturn then return ShouldReturn end
 
     -- actions+=/call_action_list,name=cds
