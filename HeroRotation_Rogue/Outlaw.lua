@@ -327,8 +327,8 @@ local function CDs ()
   end
 
   --actions.cds+=/ghostly_strike
-  if S.GhostlyStrike:IsReady() then
-    if Cast(S.GhostlyStrike, Settings.Outlaw.OffGCDasOffGCD.GhostlyStrike, nil, not Target:IsSpellInRange(S.GhostlyStrike)) then return "Cast Ghostly Strike" end
+  if S.GhostlyStrike:IsAvailable() and S.GhostlyStrike:IsReady() then
+    if Cast(S.GhostlyStrike, Settings.Outlaw.OffGCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike" end
   end
 
   -- # Use Sepsis to trigger Crackshot or if the target will survive its DoT
@@ -337,14 +337,14 @@ local function CDs ()
   if CDsON() and S.Sepsis:IsAvailable() and S.Sepsis:IsReady() then
     if S.Crackshot:IsAvailable() and S.BetweentheEyes:IsReady() and Finish_Condition() and not Player:StealthUp(true, true)
       or not S.Crackshot:IsAvailable() and Target:FilteredTimeToDie(">", 11) and Player:BuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 11) then
-      if Cast(S.Sepsis, Settings.Outlaw.GCDasOffGCD.Sepsis, nil, not Target:IsSpellInRange(S.Sepsis)) then return "Cast Sepsis" end
+      if Cast(S.Sepsis, Settings.Outlaw.GCDasOffGCD.Sepsis) then return "Cast Sepsis" end
     end
   end
 
   -- # Use Blade Rush at minimal energy outside of stealth
   -- actions.cds+=/blade_rush,if=energy.base_time_to_max>4&!stealthed.all
   if S.BladeRush:IsReady() and EnergyTimeToMax > 4 and not Player:StealthUp(true, true) then
-    if Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush, nil, not Target:IsSpellInRange(S.BladeRush)) then return "Cast Blade Rush" end
+    if Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
   end
 
   -- actions.cds+=/call_action_list,name=stealth_cds,if=!stealthed.all
@@ -393,7 +393,7 @@ local function CDs ()
     if I.ManicGrieftorch:IsEquippedAndReady() then
       if Player:GCDRemains() > Player:GCD()-0.1 and not Player:StealthUp(true, true) and Player:BuffUp(S.BetweentheEyes) or
         HL.BossFilteredFightRemains("<=", 5) then
-        if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "Manic Grieftorch"; end
+        if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Manic Grieftorch"; end
       end
     end
 
@@ -402,7 +402,7 @@ local function CDs ()
     if I.DragonfireBombDispenser:IsEquippedAndReady() then
       if (not trinket1:ID() == I.DragonfireBombDispenser:ID() and trinket1:CooldownRemains() > 10 or
         trinket2:CooldownRemains() > 10) or HL.BossFilteredFightRemains("<", 20) or not trinket2:HasCooldown() or not trinket1:HasCooldown() then
-        if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "Dragonfire Bomb Dispenser"; end
+        if Cast(I.DragonfireBombDispenser, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Dragonfire Bomb Dispenser"; end
       end
     end
 
@@ -410,20 +410,15 @@ local function CDs ()
     if I.BeaconToTheBeyond:IsEquippedAndReady() then
       if not Player:StealthUp(true, true) and Player:BuffUp(S.BetweentheEyes)
         or HL.BossFilteredFightRemains("<", 5) then
-        if Cast(I.BeaconToTheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "Beacon"; end
+        if Cast(I.BeaconToTheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Beacon"; end
       end
     end
 
     -- actions.cds+=/use_items,slots=trinket1,if=debuff.between_the_eyes.up|trinket.1.has_stat.any_dps|fight_remains<=20
     -- actions.cds+=/use_items,slots=trinket2,if=debuff.between_the_eyes.up|trinket.2.has_stat.any_dps|fight_remains<=20
     local TrinketToUse = Player:GetUseableItems(OnUseExcludes, 13) or Player:GetUseableItems(OnUseExcludes, 14)
-    local TrinketRange = 100
-    if TrinketToUse then
-      local TrinketSpell = TrinketToUse:OnUseSpell()
-      TrinketRange = (TrinketSpell and TrinketSpell.MaximumRange > 0 and TrinketSpell.MaximumRange <= 100) and TrinketSpell.MaximumRange or 100
-    end
     if TrinketToUse and (Player:BuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 20) or TrinketToUse:HasStatAnyDps()) then
-      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then return "Generic use_items for " .. TrinketToUse:Name() end
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name() end
     end
   end
 end
@@ -440,31 +435,31 @@ local function Stealth()
 	end
 
 	-- actions.stealth+=/cold_blood,if=variable.finish_condition
-	if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Finish_Condition() then
-		if Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood, nil, not Target:IsSpellInRange(S.Dispatch)) then return "Cast Cold Blood" end
+	if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Target:IsSpellInRange(S.Dispatch) and Finish_Condition() then
+		if Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
 	end
 
 	-- actions.stealth+=/between_the_eyes,if=variable.finish_condition&talent.crackshot
-	if S.BetweentheEyes:IsCastable() and Finish_Condition() and S.Crackshot:IsAvailable() then
-		if CastPooling(S.BetweentheEyes, nil, not Target:IsSpellInRange(S.BetweentheEyes)) then return "Cast Between the Eyes" end
+	if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and Finish_Condition() and S.Crackshot:IsAvailable() then
+		if CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
 	end
 
 	-- actions.stealth+=/dispatch,if=variable.finish_condition
-	if S.Dispatch:IsCastable() and Finish_Condition() then
-		if CastPooling(S.Dispatch, nil, not Target:IsSpellInRange(S.Dispatch)) then return "Cast Dispatch" end
+	if S.Dispatch:IsCastable() and Target:IsSpellInRange(S.Dispatch) and Finish_Condition() then
+		if CastPooling(S.Dispatch) then return "Cast Dispatch" end
 	end
 
 	-- # 2 Fan the Hammer Crackshot builds can consume Opportunity in stealth with max stacks, Broadside, and low CPs, or with Greenskins active
 	-- actions.stealth+=/pistol_shot,if=talent.crackshot&talent.fan_the_hammer.rank>=2&buff.opportunity.stack>=6
 	-- &(buff.broadside.up&combo_points<=1|buff.greenskins_wickers.up)
-	if S.PistolShot:IsCastable() and S.Crackshot:IsAvailable() and S.FanTheHammer:TalentRank() >= 2 and Player:BuffStack(S.Opportunity) >= 6
+	if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and S.Crackshot:IsAvailable() and S.FanTheHammer:TalentRank() >= 2 and Player:BuffStack(S.Opportunity) >= 6
 		and (Player:BuffUp(S.Broadside) and ComboPoints <= 1 or Player:BuffUp(S.GreenskinsWickersBuff)) then
-		if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then return "Cast Pistol Shot" end
+		if CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
 	end
 
 	-- actions.stealth+=/ambush,if=talent.hidden_opportunity
-	if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() then
-		if CastPooling(S.Ambush, nil, not Target:IsSpellInRange(S.Ambush)) then return "Cast Ambush" end
+	if S.Ambush:IsCastable() and Target:IsSpellInRange(S.Ambush) and S.HiddenOpportunity:IsAvailable() then
+		if CastPooling(S.Ambush) then return "Cast Ambush" end
 	end
 end
 
@@ -473,17 +468,17 @@ local function Finish ()
 	-- actions.finish=between_the_eyes,if=!talent.crackshot
 	-- &(buff.between_the_eyes.remains<4|talent.improved_between_the_eyes|talent.greenskins_wickers|set_bonus.tier30_4pc)
 	-- &!buff.greenskins_wickers.up
-	if S.BetweentheEyes:IsCastable() and not S.Crackshot:IsAvailable()
+	if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and not S.Crackshot:IsAvailable()
 		and (Player:BuffRemains(S.BetweentheEyes) < 4 or S.ImprovedBetweenTheEyes:IsAvailable() or S.GreenskinsWickers:IsAvailable()
     or Player:HasTier(30, 4)) and Player:BuffDown(S.GreenskinsWickers) then
-		if CastPooling(S.BetweentheEyes, nil, not Target:IsSpellInRange(S.BetweentheEyes)) then return "Cast Between the Eyes" end
+		if CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
 	end
 
 	-- #Crackshot builds use Between the Eyes outside of Stealth if Vanish or Dance will not come off cooldown within the next cast
 	-- actions.finish+=/between_the_eyes,if=talent.crackshot&(cooldown.vanish.remains>45&cooldown.shadow_dance.remains>12)
-	if S.BetweentheEyes:IsCastable() and S.Crackshot:IsAvailable()
+	if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and S.Crackshot:IsAvailable()
 		and (S.Vanish:CooldownRemains() > 45 and S.ShadowDance:CooldownRemains() > 12) then
-		if CastPooling(S.BetweentheEyes, nil, not Target:IsSpellInRange(S.BetweentheEyes)) then return "Cast Between the Eyes" end
+		if CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
 	end
 
 	-- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&refreshable
@@ -494,16 +489,16 @@ local function Finish ()
 	end
 
 	-- actions.finish+=/killing_spree,if=debuff.ghostly_strike.up|!talent.ghostly_strike
-	if S.KillingSpree:IsCastable() and (Target:DebuffUp(S.GhostlyStrike) or not S.GhostlyStrike:IsAvailable()) then
-		if Cast(S.KillingSpree, nil, nil, not Target:IsSpellInRange(S.KillingSpree)) then return "Cast Killing Spree" end
+	if S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and (Target:DebuffUp(S.GhostlyStrike) or not S.GhostlyStrike:IsAvailable()) then
+		if Cast(S.KillingSpree) then return "Cast Killing Spree" end
 	end
 
-  if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) then
-    if Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood, nil, not Target:IsSpellInRange(S.Dispatch)) then return "Cast Cold Blood" end
+  if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Target:IsSpellInRange(S.Dispatch) then
+    if Cast(S.ColdBlood, Settings.Commons.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
   end
   -- actions.finish+=/dispatch
-  if S.Dispatch:IsCastable() then
-    if CastPooling(S.Dispatch, nil, not Target:IsSpellInRange(S.Dispatch)) then return "Cast Dispatch" end
+  if S.Dispatch:IsCastable() and Target:IsSpellInRange(S.Dispatch) then
+    if CastPooling(S.Dispatch) then return "Cast Dispatch" end
   end
 end
 
@@ -517,25 +512,25 @@ local function Build ()
 
 	-- actions.build+=/ambush,if=talent.hidden_opportunity&buff.audacity.up
   if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
-    if CastPooling(S.Ambush, nil, not Target:IsSpellInRange(S.Ambush)) then return "Cast Ambush (High-Prio Buffed)" end
+    if CastPooling(S.Ambush) then return "Cast Ambush (High-Prio Buffed)" end
   end
 
 	-- # With Audacity + Hidden Opportunity + Fan the Hammer, consume Opportunity to proc Audacity any time Ambush is not available
 	-- actions.build+=/pistol_shot,if=talent.fan_the_hammer&talent.audacity&talent.hidden_opportunity&buff.opportunity.up&!buff.audacity.up
 	if S.FanTheHammer:IsAvailable() and S.Audacity:IsAvailable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.Opportunity) and Player:BuffDown(S.AudacityBuff) then
-		if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then return "Cast Pistol Shot (Audacity)" end
+		if CastPooling(S.PistolShot) then return "Cast Pistol Shot (Audacity)" end
 	end
 
 	-- # Use Greenskins Wickers buff immediately with Opportunity unless running Fan the Hammer
 	-- actions.build+=/pistol_shot,if=buff.greenskins_wickers.up&(!talent.fan_the_hammer&buff.opportunity.up|buff.greenskins_wickers.remains<1.5)
 	if Player:BuffUp(S.GreenskinsWickersBuff) and (not S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity) or Player:BuffRemains(S.GreenskinsWickersBuff) < 1.5) then
-		if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then return "Cast Pistol Shot (GSW Dump)" end
+		if CastPooling(S.PistolShot) then return "Cast Pistol Shot (GSW Dump)" end
 	end
 
 	-- #With Fan the Hammer, consume Opportunity at max stacks or if it will expire
 	-- actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&(buff.opportunity.stack>=buff.opportunity.max_stack|buff.opportunity.remains<2)
 	if S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity) and (Player:BuffStack(S.Opportunity) >= 6 or Player:BuffRemains(S.Opportunity) < 2) then
-		if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then return "Cast Pistol Shot (FtH Dump)" end
+		if CastPooling(S.PistolShot) then return "Cast Pistol Shot (FtH Dump)" end
 	end
 
 	-- # With Fan the Hammer, consume Opportunity based on CP deficit, and 2 Fan the Hammer Crackshot builds can briefly hold stacks for an upcoming stealth cooldown
@@ -543,7 +538,7 @@ local function Build ()
 	-- &(!cooldown.vanish.ready&!cooldown.shadow_dance.ready|stealthed.all|!talent.crackshot|talent.fan_the_hammer.rank<=1)
 	if S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity) and ComboPointsDeficit > (1+num(S.QuickDraw:IsAvailable())*S.FanTheHammer:TalentRank())
 		and (not S.Vanish:IsReady() and not S.ShadowDance:IsReady() or Player:StealthUp(true, true) or not S.Crackshot:IsAvailable() or S.FanTheHammer:TalentRank() <= 1) then
-		if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then return "Cast Pistol Shot" end
+		if CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
 	end
 
 	-- #If not using Fan the Hammer, then consume Opportunity based on energy, when it will exactly cap CPs, or when using Quick Draw
@@ -551,12 +546,12 @@ local function Build ()
 	-- &(energy.base_deficit>energy.regen*1.5|combo_points.deficit<=1+buff.broadside.up|talent.quick_draw.enabled|talent.audacity.enabled&!buff.audacity.up)
 	if not S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity)
 		and (EnergyTimeToMax > 1.5 or ComboPointsDeficit <= 1 + num(Player:BuffUp(S.Broadside)) or S.QuickDraw:IsAvailable() or S.Audacity:IsAvailable() and Player:BuffDown(S.AudacityBuff)) then
-		if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then return "Cast Pistol Shot" end
+		if CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
 	end
 
   -- actions.build+=/sinister_strike
-  if S.SinisterStrike:IsCastable() then
-    if CastPooling(S.SinisterStrike, nil, not Target:IsSpellInRange(S.SinisterStrike)) then return "Cast Sinister Strike" end
+  if S.SinisterStrike:IsCastable() and Target:IsSpellInRange(S.SinisterStrike) then
+    if CastPooling(S.SinisterStrike) then return "Cast Sinister Strike" end
   end
 end
 
@@ -591,7 +586,7 @@ local function APL ()
   Rogue.Poisons()
 
   -- Out of Combat
-  if not Player:AffectingCombat() and Everyone.TargetIsValid() and S.Vanish:TimeSinceLastCast() > 1 then
+  if not Player:AffectingCombat() and S.Vanish:TimeSinceLastCast() > 1 then
     -- actions.precombat+=/blade_flurry,precombat_seconds=4,if=talent.underhanded_upper_hand
     -- Blade Flurry Breaks Stealth so must be done first
     if S.BladeFlurry:IsReady() and Player:BuffDown(S.BladeFlurry) and S.UnderhandedUpperhand:IsAvailable() and not Player:StealthUp(true, true) then
@@ -608,39 +603,41 @@ local function APL ()
     -- Rune
     -- PrePot w/ Bossmod Countdown
     -- Opener
-    -- Precombat CDs
-    -- actions.precombat+=/adrenaline_rush,precombat_seconds=3,if=talent.improved_adrenaline_rush
-    if S.AdrenalineRush:IsReady() and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2 then
-      if Cast(S.AdrenalineRush) then return "Cast Adrenaline Rush (Opener)" end
-    end
-    -- actions.precombat+=/roll_the_bones,precombat_seconds=2
-    -- Use same extended logic as a normal rotation for between pulls
-    if S.RolltheBones:IsReady() and not Player:DebuffUp(S.Dreadblades) and (RtB_Buffs() == 0 or RtB_Reroll()) then
-      if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then return "Cast Roll the Bones (Opener)" end
-    end
-    -- actions.precombat+=/slice_and_dice,precombat_seconds=1
-    if S.SliceandDice:IsReady() and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints) * 1.8 then
-      if CastPooling(S.SliceandDice) then return "Cast Slice and Dice (Opener)" end
-    end
-    if Player:StealthUp(true, false) then
-      ShouldReturn = Stealth()
-      if ShouldReturn then return "Stealth (Opener): " .. ShouldReturn end
-      if S.KeepItRolling:IsAvailable() and S.GhostlyStrike:IsReady() and S.EchoingReprimand:IsAvailable() then
-        if Cast(S.GhostlyStrike, nil, nil, not Target:IsSpellInRange(S.GhostlyStrike)) then return "Cast Ghostly Strike KiR (Opener)" end
+    if Everyone.TargetIsValid() then
+      -- Precombat CDs
+      -- actions.precombat+=/adrenaline_rush,precombat_seconds=3,if=talent.improved_adrenaline_rush
+      if S.AdrenalineRush:IsReady() and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2 then
+        if Cast(S.AdrenalineRush) then return "Cast Adrenaline Rush (Opener)" end
       end
-      if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() then
-        if Cast(S.Ambush, nil, nil, not Target:IsSpellInRange(S.Ambush)) then return "Cast Ambush (Opener)" end
-      else
-        if S.SinisterStrike:IsCastable() then
-          if Cast(S.SinisterStrike, nil, nil, not Target:IsSpellInRange(S.SinisterStrike)) then return "Cast Sinister Strike (Opener)" end
+      -- actions.precombat+=/roll_the_bones,precombat_seconds=2
+      -- Use same extended logic as a normal rotation for between pulls
+      if S.RolltheBones:IsReady() and not Player:DebuffUp(S.Dreadblades) and (RtB_Buffs() == 0 or RtB_Reroll()) then
+        if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then return "Cast Roll the Bones (Opener)" end
+      end
+      -- actions.precombat+=/slice_and_dice,precombat_seconds=1
+      if S.SliceandDice:IsReady() and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints) * 1.8 then
+        if CastPooling(S.SliceandDice) then return "Cast Slice and Dice (Opener)" end
+      end
+      if Player:StealthUp(true, false) then
+        ShouldReturn = Stealth()
+        if ShouldReturn then return "Stealth (Opener): " .. ShouldReturn end
+        if S.KeepItRolling:IsAvailable() and S.GhostlyStrike:IsReady() and S.EchoingReprimand:IsAvailable() then
+          if Cast(S.GhostlyStrike) then return "Cast Ghostly Strike KiR (Opener)" end
         end
+        if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() then
+          if Cast(S.Ambush) then return "Cast Ambush (Opener)" end
+        else
+          if S.SinisterStrike:IsCastable() then
+            if Cast(S.SinisterStrike) then return "Cast Sinister Strike (Opener)" end
+          end
+        end
+      elseif Finish_Condition() then
+        ShouldReturn = Finish()
+        if ShouldReturn then return "Finish (Opener): " .. ShouldReturn end
       end
-    elseif Finish_Condition() then
-      ShouldReturn = Finish()
-      if ShouldReturn then return "Finish (Opener): " .. ShouldReturn end
-    end
-    if S.SinisterStrike:IsCastable() then
-      if Cast(S.SinisterStrike, nil, nil, not Target:IsSpellInRange(S.SinisterStrike)) then return "Cast Sinister Strike (Opener)" end
+      if S.SinisterStrike:IsCastable() then
+        if Cast(S.SinisterStrike) then return "Cast Sinister Strike (Opener)" end
+      end
     end
     return
   end
@@ -655,12 +652,6 @@ local function APL ()
   end
 
   if Everyone.TargetIsValid() then
-    -- OutofRange Pistol Shot
-    if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and not Target:IsInRange(BladeFlurryRange) and not Player:StealthUp(true, true)
-      and EnergyDeficit < 25 and (ComboPointsDeficit >= 1 or EnergyTimeToMax <= 1.2) then
-      if Cast(S.PistolShot) then return "Cast Pistol Shot (OOR)" end
-    end
-
     -- Interrupts
     ShouldReturn = Everyone.Interrupt(5, S.Kick, true, Interrupts)
     if ShouldReturn then return ShouldReturn end
@@ -702,6 +693,12 @@ local function APL ()
     -- actions+=/bag_of_tricks
     if S.BagofTricks:IsCastable() and Target:IsInMeleeRange(5) then
       if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Bag of Tricks" end
+    end
+
+    -- OutofRange Pistol Shot
+    if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and not Target:IsInRange(BladeFlurryRange) and not Player:StealthUp(true, true)
+      and EnergyDeficit < 25 and (ComboPointsDeficit >= 1 or EnergyTimeToMax <= 1.2) then
+      if Cast(S.PistolShot) then return "Cast Pistol Shot (OOR)" end
     end
   end
 end
