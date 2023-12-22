@@ -379,7 +379,7 @@ local function HighPrioActions()
   -- invoke_external_buff,name=power_infusion,if=(buff.pillar_of_frost.up|!talent.pillar_of_frost)&(talent.obliteration|talent.breath_of_sindragosa&buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa&!talent.obliteration)
   -- Note: Not handling external buffs.
   -- mind_freeze,if=target.debuff.casting.react
-  local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons2.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+  local ShouldReturn = Everyone.Interrupt(S.MindFreeze, Settings.Commons2.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
   if Settings.Commons.UseAMSAMZOffensively and CDsON() then
     -- antimagic_shell,if=runic_power.deficit>40
     if S.AntiMagicShell:IsCastable() and (Player:RunicPowerDeficit() > 40) then

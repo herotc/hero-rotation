@@ -746,7 +746,7 @@ local function APL()
       if Cast(S.Dispersion, Settings.Shadow.OffGCDasOffGCD.Dispersion) then return "dispersion low_hp"; end
     end
     -- Interrupts
-    local ShouldReturn = Everyone.Interrupt(30, S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false);
+    local ShouldReturn = Everyone.Interrupt(S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false);
     if ShouldReturn then return ShouldReturn; end
     -- variable,name=holding_crash,op=set,value=raid_event.adds.in<15
     -- Note: We have no way of knowing if adds are coming, so don't ever purposely hold crash

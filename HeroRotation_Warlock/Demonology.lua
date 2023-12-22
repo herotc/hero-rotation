@@ -490,7 +490,7 @@ local function APL()
     end
     -- Interrupts
     if S.SpellLock:IsAvailable() then
-      local ShouldReturn = Everyone.Interrupt(40, S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+      local ShouldReturn = Everyone.Interrupt(S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     end
     -- Manually added: unending_resolve
     if S.UnendingResolve:IsReady() and (Player:HealthPercentage() < Settings.Demonology.UnendingResolveHP) then

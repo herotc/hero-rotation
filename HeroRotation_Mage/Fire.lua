@@ -696,7 +696,7 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- counterspell
-    local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
     -- Manually added: Scorch sniping
     if Settings.Fire.UseScorchSniping and S.SearingTouch:IsAvailable() and AoEON() and Target:HealthPercentage() > 30 then
       for _, CycleUnit in pairs(Enemies16ySplash) do

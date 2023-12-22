@@ -656,7 +656,7 @@ local function APL ()
 
   if Everyone.TargetIsValid() then
     -- Interrupts
-    ShouldReturn = Everyone.Interrupt(5 + (3*num(S.AcrobaticStrikes:IsAvailable())), S.Kick, true, Interrupts)
+    ShouldReturn = Everyone.Interrupt(S.Kick, true, Interrupts)
     if ShouldReturn then return ShouldReturn end
 
     -- actions+=/call_action_list,name=cds

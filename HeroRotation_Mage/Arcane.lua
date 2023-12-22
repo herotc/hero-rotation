@@ -466,7 +466,7 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- counterspell
-    local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
     -- potion,if=cooldown.arcane_surge.ready
     if Settings.Commons.Enabled.Potions and (S.ArcaneSurge:CooldownUp()) then
       local PotionSelected = Everyone.PotionSelected()

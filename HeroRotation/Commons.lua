@@ -52,14 +52,14 @@ function Commons.CanDoTUnit(Unit, HealthThreshold)
 end
 
 -- Interrupt
-function Commons.Interrupt(Range, Spell, Setting, StunSpells)
-  if Settings.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(Range) then
-    if Spell:IsCastable(true) then
+function Commons.Interrupt(Spell, Setting, StunSpells)
+  if Settings.InterruptEnabled and Target:IsInterruptible() then
+    if Spell:IsCastable(true) and Target:IsSpellInRange(Spell) then
       if Cast(Spell, Setting) then return "Cast " .. Spell:Name() .. " (Interrupt)"; end
     elseif Settings.InterruptWithStun and Target:CanBeStunned() then
       if StunSpells then
         for i = 1, #StunSpells do
-          if StunSpells[i][1]:IsCastable() and StunSpells[i][3]() then
+          if StunSpells[i][1]:IsCastable() and Target:IsSpellInRange(StunSpells[i][1]) and StunSpells[i][3]() then
             if Cast(StunSpells[i][1]) then return StunSpells[i][2]; end
           end
         end

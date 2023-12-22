@@ -609,7 +609,7 @@ local function APL()
     end
     -- Interrupts
     if S.SpellLock:IsAvailable() then
-      local ShouldReturn = Everyone.Interrupt(40, S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock); if ShouldReturn then return ShouldReturn; end
+      local ShouldReturn = Everyone.Interrupt(S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=variables
     Variables()

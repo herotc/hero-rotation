@@ -307,7 +307,7 @@ local function APL()
       DebugMessage = Precombat();
       if DebugMessage then return DebugMessage end;
     end
-    Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false);
+    Everyone.Interrupt(S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false);
 
     DebugMessage = Cooldowns()
     if DebugMessage then return DebugMessage end;

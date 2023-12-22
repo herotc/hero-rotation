@@ -674,7 +674,7 @@ local function APL()
     end
     -- auto_attack
     -- Interrupts (here instead of HighPrioActions)
-    local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons2.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.MindFreeze, Settings.Commons2.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     if EnemiesMeleeCount == 0 then
       -- Manually added: Outbreak if targets are missing VP and out of range
       if S.Outbreak:IsReady() and (EnemiesWithoutVP > 0) then

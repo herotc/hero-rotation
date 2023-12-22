@@ -363,7 +363,7 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- Interrupt
-    local ShouldReturn = Everyone.Interrupt(13, S.SkullBash, Settings.Guardian.OffGCDasOffGCD.SkullBash, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.SkullBash, Settings.Guardian.OffGCDasOffGCD.SkullBash, false); if ShouldReturn then return ShouldReturn; end
     -- Manually added: run_action_list,name=defensives
     if (IsTanking and Player:BuffUp(S.BearForm)) then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end

@@ -314,7 +314,7 @@ local function APL()
       if Cast(S.ImmolationAura, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura main 2"; end
     end
     -- disrupt (and stun interrupts)
-    local ShouldReturn = Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- immolation_aura,if=talent.a_fire_inside&talent.inertia&buff.unbound_chaos.down&full_recharge_time<gcd.max*2&debuff.essence_break.down
     if S.ImmolationAura:IsCastable() and (S.AFireInside:IsAvailable() and S.Inertia:IsAvailable() and Player:BuffDown(S.UnboundChaosBuff) and S.ImmolationAura:FullRechargeTime() < GCDMax * 2 and Target:DebuffDown(S.EssenceBreakDebuff)) then
       if Cast(S.ImmolationAura, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura main 4"; end

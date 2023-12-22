@@ -560,7 +560,7 @@ local function APL()
       end
     end
     -- pummel,if=target.debuff.casting.react (Interrupts)
-    local ShouldReturn = Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=trinkets
     if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end

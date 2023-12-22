@@ -534,7 +534,7 @@ local function APL()
     -- invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=3&set_bonus.tier31_2pc)|(!cooldown.fire_breath.up&!cooldown.shattering_star.up&!set_bonus.tier31_2pc))
     -- Note: Not handling external buffs.
     -- quell,use_off_gcd=1,if=target.debuff.casting.react
-    local ShouldReturn = Everyone.Interrupt(25, S.Quell, Settings.Commons.OffGCDasOffGCD.Quell, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Quell, Settings.Commons.OffGCDasOffGCD.Quell, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- Manually added: Unravel if enemy has an absorb shield
     if S.Unravel:IsReady() and Target:EnemyAbsorb() then
       if Cast(S.Unravel, Settings.Commons.GCDasOffGCD.Unravel, nil, not Target:IsSpellInRange(S.Unravel)) then return "unravel main 4"; end
