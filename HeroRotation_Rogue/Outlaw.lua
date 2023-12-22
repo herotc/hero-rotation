@@ -20,6 +20,7 @@ local CDsON = HR.CDsON
 local Cast = HR.Cast
 local CastPooling = HR.CastPooling
 local CastSuggested = HR.CastSuggested
+local CastAnnotated = HR.CastAnnotated
 -- Num/Bool Helper Functions
 local num = HR.Commons.Everyone.num
 local bool = HR.Commons.Everyone.bool
@@ -699,6 +700,13 @@ local function APL ()
     if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and not Target:IsInRange(BladeFlurryRange) and not Player:StealthUp(true, true)
       and EnergyDeficit < 25 and (ComboPointsDeficit >= 1 or EnergyTimeToMax <= 1.2) then
       if Cast(S.PistolShot) then return "Cast Pistol Shot (OOR)" end
+    end
+
+    -- Generic Pooling suggestion
+    if not Target:IsSpellInRange(S.Dispatch) then
+      if CastAnnotated(S.PoolEnergy, false, "OOR") then return "Pool Energy (OOR)" end
+    else
+      if Cast(S.PoolEnergy) then return "Pool Energy" end
     end
   end
 end
