@@ -304,7 +304,7 @@ local function CDs ()
   if S.BladeFlurry:IsReady() then
     local bf_cp_gen = EnemiesBFCount + num(Player:BuffUp(S.Broadside))
     if (EnemiesBFCount >= 2 - num(S.UnderhandedUpperhand:IsAvailable()) and not Player:StealthUp(true, false))
-      and Player:BuffRemains(S.BladeFlurry) < Player:GCDRemains() or S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 3 and bf_cp_gen >= ComboPointsDeficit and not Finish_Condition() then
+      and Player:BuffRemains(S.BladeFlurry) < Player:GCD() or S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 3 and bf_cp_gen >= ComboPointsDeficit and not Finish_Condition() then
       if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
         CastSuggested(S.BladeFlurry)
       else
@@ -435,7 +435,7 @@ end
 local function Stealth()
   -- actions.stealth=blade_flurry,if=talent.subterfuge&talent.hidden_opportunity&spell_targets>=2&buff.blade_flurry.remains<gcd
   if S.BladeFlurry:IsReady() and S.BladeFlurry:IsCastable() and AoEON() and S.Subterfuge:IsAvailable() and S.HiddenOpportunity:IsAvailable() and EnemiesBFCount >= 2
-    and Player:BuffRemains(S.BladeFlurry) <= Player:GCDRemains() then
+    and Player:BuffRemains(S.BladeFlurry) <= Player:GCD() then
     if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
       CastSuggested(S.BladeFlurry)
     else
