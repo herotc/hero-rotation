@@ -56,7 +56,7 @@ local FightRemains = 11111
 local VarSyncActive = false
 local VarSyncReady = false
 local VarSyncRemains = 0
-local VarTrinket1Stronger = not Trinket2:HasCooldown() or Trinket1:HasUseBuff() and (not Trinket2:HasUseBuff() or Trinket2:Cooldown() < Trinket1:Cooldown() or Trinket2:CastTime() < Trinket1:CastTime() or Trinket2:CastTime() == Trinket1:CastTime() and Trinket2:Cooldown() == Trinket1:Cooldown()) or not Trinket1:HasUseBuff() and (not Trinket2:HasUseBuff() and (Trinket2:Cooldown() < Trinket1:Cooldown() or Trinket2:CastTime() < Trinket1:CastTime() or Trinket2:CastTime() == Trinket1:CastTime() and Trinket2:Cooldown() == Trinket1:Cooldown()))
+local VarTrinket1Stronger = not Trinket2:HasCooldown() or Trinket1:HasUseBuff() and (not Trinket2:HasUseBuff() or not Trinket1:ID() == I.MirrorofFracturedTomorrows:ID() and (Trinket2:ID() == I.MirrorofFracturedTomorrows:ID() or Trinket2:Cooldown() < Trinket1:Cooldown() or Trinket2:CastTime() < Trinket1:CastTime() or Trinket2:CastTime() == Trinket1:CastTime() and Trinket2:Cooldown() == Trinket1:Cooldown())) or not Trinket1:HasUseBuff() and (not Trinket2:HasUseBuff() and (Trinket2:Cooldown() < Trinket1:Cooldown() or Trinket2:CastTime() < Trinket1:CastTime() or Trinket2:CastTime() == Trinket1:CastTime() and Trinket2:Cooldown() == Trinket1:Cooldown()))
 local VarTrinket2Stronger = not VarTrinket1Stronger
 
 -- Enemy Range Variables
@@ -86,7 +86,7 @@ HL:RegisterForEvent(function()
   Equip = Player:GetEquipment()
   Trinket1 = (Equip[13]) and Item(Equip[13]) or Item(0)
   Trinket2 = (Equip[14]) and Item(Equip[14]) or Item(0)
-  VarTrinket1Stronger = not Trinket2:HasCooldown() or Trinket1:HasUseBuff() and (not Trinket2:HasUseBuff() or Trinket2:Cooldown() < Trinket1:Cooldown() or Trinket2:CastTime() < Trinket1:CastTime() or Trinket2:CastTime() == Trinket1:CastTime() and Trinket2:Cooldown() == Trinket1:Cooldown()) or not Trinket1:HasUseBuff() and (not Trinket2:HasUseBuff() and (Trinket2:Cooldown() < Trinket1:Cooldown() or Trinket2:CastTime() < Trinket1:CastTime() or Trinket2:CastTime() == Trinket1:CastTime() and Trinket2:Cooldown() == Trinket1:Cooldown()))
+  VarTrinket1Stronger = not Trinket2:HasCooldown() or Trinket1:HasUseBuff() and (not Trinket2:HasUseBuff() or not Trinket1:ID() == I.MirrorofFracturedTomorrows:ID() and (Trinket2:ID() == I.MirrorofFracturedTomorrows:ID() or Trinket2:Cooldown() < Trinket1:Cooldown() or Trinket2:CastTime() < Trinket1:CastTime() or Trinket2:CastTime() == Trinket1:CastTime() and Trinket2:Cooldown() == Trinket1:Cooldown())) or not Trinket1:HasUseBuff() and (not Trinket2:HasUseBuff() and (Trinket2:Cooldown() < Trinket1:Cooldown() or Trinket2:CastTime() < Trinket1:CastTime() or Trinket2:CastTime() == Trinket1:CastTime() and Trinket2:Cooldown() == Trinket1:Cooldown()))
   VarTrinket2Stronger = not VarTrinket1Stronger
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -182,7 +182,7 @@ local function Precombat()
   -- summon_pet,if=!talent.lone_wolf
   -- Note: Moved pet management to APL()
   -- snapshot_stats
-  -- variable,name=trinket_1_stronger,value=!trinket.2.has_cooldown|trinket.1.has_use_buff&(!trinket.2.has_use_buff|trinket.2.cooldown.duration<trinket.1.cooldown.duration|trinket.2.cast_time<trinket.1.cast_time|trinket.2.cast_time=trinket.1.cast_time&trinket.2.cooldown.duration=trinket.1.cooldown.duration)|!trinket.1.has_use_buff&(!trinket.2.has_use_buff&(trinket.2.cooldown.duration<trinket.1.cooldown.duration|trinket.2.cast_time<trinket.1.cast_time|trinket.2.cast_time=trinket.1.cast_time&trinket.2.cooldown.duration=trinket.1.cooldown.duration))
+  -- variable,name=trinket_1_stronger,value=!trinket.2.has_cooldown|trinket.1.has_use_buff&(!trinket.2.has_use_buff|!trinket.1.is.mirror_of_fractured_tomorrows&(trinket.2.is.mirror_of_fractured_tomorrows|trinket.2.cooldown.duration<trinket.1.cooldown.duration|trinket.2.cast_time<trinket.1.cast_time|trinket.2.cast_time=trinket.1.cast_time&trinket.2.cooldown.duration=trinket.1.cooldown.duration))|!trinket.1.has_use_buff&(!trinket.2.has_use_buff&(trinket.2.cooldown.duration<trinket.1.cooldown.duration|trinket.2.cast_time<trinket.1.cast_time|trinket.2.cast_time=trinket.1.cast_time&trinket.2.cooldown.duration=trinket.1.cooldown.duration))
   -- variable,name=trinket_2_stronger,value=!variable.trinket_1_stronger
   -- Note: Moved to variable declarations and PLAYER_EQUIPMENT_CHANGED registration.
   -- salvo,precast_time=10
