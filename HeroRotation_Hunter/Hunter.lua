@@ -231,6 +231,7 @@ Item.Hunter.Commons = {
   DecorationofFlame                     = Item(194299, {13, 14}),
   GlobeofJaggedIce                      = Item(193732, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
+  MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
   StormeatersBoon                       = Item(194302, {13, 14}),
   WindscarWhetstone                     = Item(137486, {13, 14}),
   -- Other On-Use Items
