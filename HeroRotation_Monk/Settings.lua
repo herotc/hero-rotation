@@ -24,7 +24,7 @@ HR.GUISettings.APL.Monk = {
     },
     DisplayStyle = {
       Potions = "Suggested",
-      Covenant = "Suggested",
+      Signature = "Suggested",
       Trinkets = "Suggested",
       Items = "Suggested"
     },
