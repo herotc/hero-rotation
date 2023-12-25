@@ -124,6 +124,7 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   BlackoutKickBuff                      = Spell(116768),
   ChiEnergyBuff                         = Spell(393057),
   DanceofChijiBuff                      = Spell(325202),
+  FuryofXuenBuff                        = Spell(396167),
   HiddenMastersForbiddenTouchBuff       = Spell(213114),
   HitComboBuff                          = Spell(196741),
   InvokersDelightBuff                   = Spell(388663),
@@ -132,6 +133,7 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   SerenityBuff                          = Spell(152173),
   StormEarthAndFireBuff                 = Spell(137639),
   TeachingsoftheMonasteryBuff           = Spell(202090),
+  TransferthePowerBuff                  = Spell(195321),
   WhirlingDragonPunchBuff               = Spell(196742),
   -- Debuffs
   FaeExposureDebuff                     = Spell(395414),
