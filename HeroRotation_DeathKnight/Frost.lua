@@ -119,7 +119,6 @@ end
 
 -- Target_if
 local function EvaluateTargetIfFilterFyralath(TargetUnit)
-  -- target_if=min:dot.mark_of_fyralath.remains
   return TargetUnit:DebuffRemains(S.MarkofFyralathDebuff)
 end
 
@@ -419,15 +418,15 @@ local function HighPrioActions()
   end
   -- frost_strike,if=active_enemies=1&variable.rp_buffs&talent.obliteration&talent.breath_of_sindragosa&!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains>variable.breath_pooling_time
   if S.FrostStrike:IsReady() and (EnemiesMeleeCount == 1 and VarRPBuffs and S.Obliteration:IsAvailable() and S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownRemains() > VarBreathPoolingTime) then
-    if Cast(S.FrostStrike, nil, nil, not Target:IsSpellInRange(S.FrostStrike)) then return "frost_strike high_prio_actions 14"; end
+    if Cast(S.FrostStrike, Settings.Frost.GCDasOffGCD.FrostStrike, nil, not Target:IsSpellInRange(S.FrostStrike)) then return "frost_strike high_prio_actions 14"; end
   end
   -- frost_strike,if=active_enemies=1&variable.rp_buffs&talent.breath_of_sindragosa&!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains>variable.breath_pooling_time
   if S.FrostStrike:IsReady() and (EnemiesMeleeCount == 1 and VarRPBuffs and S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownRemains() > VarBreathPoolingTime) then
-    if Cast(S.FrostStrike, nil, nil, not Target:IsSpellInRange(S.FrostStrike)) then return "frost_strike high_prio_actions 16"; end
+    if Cast(S.FrostStrike, Settings.Frost.GCDasOffGCD.FrostStrike, nil, not Target:IsSpellInRange(S.FrostStrike)) then return "frost_strike high_prio_actions 16"; end
   end
   -- frost_strike,if=active_enemies=1&variable.rp_buffs&!talent.breath_of_sindragosa&talent.obliteration&!buff.pillar_of_frost.up
   if S.FrostStrike:IsReady() and (EnemiesMeleeCount == 1 and VarRPBuffs and not S.BreathofSindragosa:IsAvailable() and S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff)) then
-    if Cast(S.FrostStrike, nil, nil, not Target:IsSpellInRange(S.FrostStrike)) then return "frost_strike high_prio_actions 18"; end
+    if Cast(S.FrostStrike, Settings.Frost.GCDasOffGCD.FrostStrike, nil, not Target:IsSpellInRange(S.FrostStrike)) then return "frost_strike high_prio_actions 18"; end
   end
   -- remorseless_winter,if=variable.rw_buffs|variable.adds_remain
   if S.RemorselessWinter:IsReady() and (VarRWBuffs or VarAddsRemain) then
@@ -453,9 +452,12 @@ local function Obliteration()
     if Cast(S.Frostscythe, nil, nil, not Target:IsInMeleeRange(8)) then return "frostscythe obliteration 12"; end
   end
   -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,target_if=min:dot.mark_of_fyralath.remains,if=buff.killing_machine.react&!variable.frostscythe_priority
-  -- TODO: Handle double target_if.
   if S.Obliterate:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and not VarFrostscythePriority) then
-    if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5)) then return "obliterate obliteration 10"; end
+    if I.Fyralath:IsEquipped() then
+      if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "min", EvaluateTargetIfFilterFyralath, nil, not Target:IsInMeleeRange(5)) then return "obliterate (fyralath) obliteration 10"; end
+    else
+      if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5)) then return "obliterate obliteration 10"; end
+    end
   end
   -- howling_blast,if=!buff.killing_machine.react&(!dot.frost_fever.ticking|buff.rime.react&set_bonus.tier30_2pc&!variable.rp_buffs)
   if S.HowlingBlast:IsReady() and (Player:BuffDown(S.KillingMachineBuff) and (Target:DebuffDown(S.FrostFeverDebuff) or Player:BuffUp(S.RimeBuff) and Player:HasTier(30, 2) and not VarRPBuffs)) then
@@ -466,18 +468,24 @@ local function Obliteration()
     if Cast(S.GlacialAdvance, nil, nil, not Target:IsInRange(100)) then return "glacial_advance obliteration 16"; end
   end
   -- frost_strike,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,target_if=min:dot.mark_of_fyralath.remains,if=!buff.killing_machine.react&(rune<2|variable.rp_buffs|debuff.razorice.stack=5&talent.shattering_blade)&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1)
-  -- TODO: Handle double target_if.
   if S.FrostStrike:IsReady() and (Player:BuffDown(S.KillingMachineBuff) and (Player:Rune() < 2 or VarRPBuffs or Target:DebuffStack(S.RazoriceDebuff) == 5 and S.ShatteringBlade:IsAvailable()) and not VarPoolingRP and (not S.GlacialAdvance:IsAvailable() or EnemiesMeleeCount == 1)) then
-    if Cast(S.FrostStrike, Settings.Frost.GCDasOffGCD.FrostStrike, nil, not Target:IsInMeleeRange(5)) then return "frost_strike obliteration 18"; end
+    if I.Fyralath:IsEquipped() then
+      if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "min", EvaluateTargetIfFilterFyralath, nil, not Target:IsInMeleeRange(5), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike (fyralath) obliteration 18"; end
+    else
+      if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike obliteration 18"; end
+    end
   end
   -- howling_blast,if=buff.rime.react&!buff.killing_machine.react
   if S.HowlingBlast:IsReady() and (Player:BuffUp(S.RimeBuff) and Player:BuffDown(S.KillingMachineBuff)) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast obliteration 20"; end
   end
   -- frost_strike,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,target_if=min:dot.mark_of_fyralath.remains,if=!buff.killing_machine.react&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1)
-  -- TODO: Handle double target_if.
   if S.FrostStrike:IsReady() and (Player:BuffDown(S.KillingMachineBuff) and not VarPoolingRP and (not S.GlacialAdvance:IsAvailable() or EnemiesMeleeCount == 1)) then
-    if Cast(S.FrostStrike, Settings.Commons2.GCDasOffGCD.FrostStrike, nil, not Target:IsInMeleeRange(5)) then return "frost_strike obliteration 24"; end
+    if I.Fyralath:IsEquipped() then
+      if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "min", EvaluateTargetIfFilterFyralath, nil, not Target:IsInMeleeRange(5), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike (fyralath) obliteration 24"; end
+    else
+      if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike obliteration 24"; end
+    end
   end
   -- howling_blast,if=!buff.killing_machine.react&runic_power<25
   if S.HowlingBlast:IsReady() and (Player:BuffDown(S.KillingMachineBuff) and Player:RunicPower() < 25) then
@@ -492,18 +500,24 @@ local function Obliteration()
     if Cast(S.GlacialAdvance, nil, nil, not Target:IsInRange(100)) then return "glacial_advance obliteration 30"; end
   end
   -- frost_strike,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,target_if=min:dot.mark_of_fyralath.remains,if=!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1)
-  -- TODO: Handle double target_if.
   if S.FrostStrike:IsReady() and (not VarPoolingRP and (not S.GlacialAdvance:IsAvailable() or EnemiesMeleeCount == 1)) then
-    if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5)) then return "frost_strike obliteration 32"; end
+    if I.Fyralath:IsEquipped() then
+      if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "min", EvaluateTargetIfFilterFyralath, nil, not Target:IsInMeleeRange(5), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike (fyralath) obliteration 32"; end
+    else
+      if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike obliteration 32"; end
+    end
   end
   -- howling_blast,if=buff.rime.react
   if S.HowlingBlast:IsReady() and (Player:BuffUp(S.RimeBuff)) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast obliteration 34"; end
   end
   -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,target_if=min:dot.mark_of_fyralath.remains
-  -- TODO: Handle double target_if.
   if S.Obliterate:IsReady() then
-    if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5)) then return "obliterate obliteration 36"; end
+    if I.Fyralath:IsEquipped() then
+      if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "min", EvaluateTargetIfFilterFyralath, nil, not Target:IsInMeleeRange(5)) then return "obliterate (fyralath) obliteration 36"; end
+    else
+      if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5)) then return "obliterate obliteration 36"; end
+    end
   end
 end
 
