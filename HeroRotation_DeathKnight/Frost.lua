@@ -447,8 +447,8 @@ local function Obliteration()
   if S.GlacialAdvance:IsReady() and (Player:BuffStack(S.KillingMachineBuff) < 2 and Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() and Player:BuffDown(S.DeathAndDecayBuff)) then
     if Cast(S.GlacialAdvance, nil, nil, not Target:IsInRange(100)) then return "glacial_advance obliteration 8"; end
   end
-  -- frostscythe,if=buff.killing_machine.react&(variable.frostscythe_priority|!death_and_decay.ticking&equipped.fyralath_the_dreamrender&(cooldown.fyralath_the_dreamrender.remains<3|!dot.mark_of_fyralath.ticking))
-  if S.Frostscythe:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and (VarFrostscythePriority or Player:BuffDown(S.DeathAndDecayBuff) and I.Fyralath:IsEquipped() and (I.Fyralath:CooldownRemains() < 3 or Target:DebuffDown(S.MarkofFyralathDebuff)))) then
+  -- frostscythe,if=buff.killing_machine.react&(variable.frostscythe_priority|active_enemies>3&!death_and_decay.ticking&equipped.fyralath_the_dreamrender&(cooldown.fyralath_the_dreamrender.remains<3|!dot.mark_of_fyralath.ticking))
+  if S.Frostscythe:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and (VarFrostscythePriority or EnemiesMeleeCount > 3 and Player:BuffDown(S.DeathAndDecayBuff) and I.Fyralath:IsEquipped() and (I.Fyralath:CooldownRemains() < 3 or Target:DebuffDown(S.MarkofFyralathDebuff)))) then
     if Cast(S.Frostscythe, nil, nil, not Target:IsInMeleeRange(8)) then return "frostscythe obliteration 12"; end
   end
   -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,target_if=min:dot.mark_of_fyralath.remains,if=buff.killing_machine.react&!variable.frostscythe_priority
