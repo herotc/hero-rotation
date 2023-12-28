@@ -658,10 +658,12 @@ local function SerenityAoELust()
     if Everyone.CastTargetIf(S.FistsofFury, Enemies8y, "max", EvaluateTargetIfFilterSkyreach, nil, not Target:IsInMeleeRange(8)) then return "fists_of_fury serenity_aoelust 10"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike&!buff.blackout_reinforcement.up&set_bonus.tier31_2pc&buff.bonedust_brew.up&active_enemies>4
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and Player:BuffDown(S.BlackoutReinforcementBuff) and Player:HasTier(31, 2) and Player:BuffUp(S.BonedustBrewBuff) and EnemiesCount8y > 4) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_aoelust 12"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&set_bonus.tier31_2pc&combo_strike&!buff.blackout_reinforcement.up
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and Player:HasTier(31, 2) and ComboStrike(S.SpinningCraneKick) and Player:BuffDown(S.BlackoutReinforcementBuff)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_aoelust 14"; end
   end
@@ -682,10 +684,12 @@ local function SerenityAoELust()
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick serenity_aoelust 22"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike&buff.dance_of_chiji.up&!buff.blackout_reinforcement.up
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.DanceofChijiBuff) and Player:BuffDown(S.BlackoutReinforcementBuff)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_aoelust 24"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&set_bonus.tier31_2pc&combo_strike&buff.blackout_reinforcement.up&prev.blackout_kick&buff.dance_of_chiji.up
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and Player:HasTier(31, 2) and ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.BlackoutReinforcementBuff) and Player:PrevGCD(1, S.BlackoutKick) and Player:BuffUp(S.DanceofChijiBuff)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_aoelust 26"; end
   end
@@ -694,6 +698,7 @@ local function SerenityAoELust()
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick serenity_aoelust 28"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&set_bonus.tier31_2pc&combo_strike&!buff.blackout_reinforcement.up
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and Player:HasTier(31, 2) and ComboStrike(S.SpinningCraneKick) and Player:BuffDown(S.BlackoutReinforcementBuff)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_aoelust 30"; end
   end
@@ -728,6 +733,7 @@ local function SerenityAoELust()
     if CastAnnotated(S.StopFoF, false, "STOP") then return "fists_of_fury_cancel serenity_aoelust 44"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike&buff.dance_of_chiji.up
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.DanceofChijiBuff)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_aoelust 46"; end
   end
@@ -736,6 +742,7 @@ local function SerenityAoELust()
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick serenity_aoelust 48"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike&spinning_crane_kick.max
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and SCKMax()) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_aoelust 50"; end
   end
@@ -757,6 +764,7 @@ local function SerenityAoELust()
     if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies5y, "max", EvaluateTargetIfFilterSkyreach, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord serenity_aoelust 58"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_aoelust 60"; end
   end
@@ -784,6 +792,7 @@ local function SerenityLust()
     if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_lust 2"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&buff.serenity.remains<1.5&combo_strike&!buff.blackout_reinforcement.remains&set_bonus.tier31_2pc
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and Player:BuffRemains(S.SerenityBuff) < 1.5 and ComboStrike(S.SpinningCraneKick) and Player:BuffDown(S.BlackoutReinforcementBuff) and Player:HasTier(31, 2)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_lust 4"; end
   end
@@ -792,6 +801,7 @@ local function SerenityLust()
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick serenity_lust 6"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike&buff.dance_of_chiji.up&!buff.blackout_reinforcement.up&set_bonus.tier31_2pc&active_enemies>2
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.DanceofChijiBuff) and Player:BuffDown(S.BlackoutReinforcementBuff) and Player:HasTier(31, 2) and EnemiesCount8y > 2) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_lust 8"; end
   end
@@ -812,6 +822,7 @@ local function SerenityLust()
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick serenity_lust 16"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike&buff.dance_of_chiji.up&!buff.blackout_reinforcement.up&prev.fists_of_fury&debuff.skyreach_exhaustion.remains>55&set_bonus.tier31_2pc
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.DanceofChijiBuff) and Player:BuffDown(S.BlackoutReinforcementBuff) and Player:PrevGCD(1, S.FistsofFury) and Target:DebuffRemains(S.SkyreachExhaustionDebuff) > 55 and Player:HasTier(31, 2)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_lust 18"; end
   end
@@ -820,14 +831,17 @@ local function SerenityLust()
     if Everyone.CastTargetIf(S.FistsofFury, Enemies8y, "max", EvaluateTargetIfFilterSkyreach, nil, not Target:IsInMeleeRange(8)) then return "fists_of_fury serenity_lust 20"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike&spinning_crane_kick.max&!buff.blackout_reinforcement.up&active_enemies>2&set_bonus.tier31_2pc
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and SCKMax() and Player:BuffDown(S.BlackoutReinforcementBuff) and EnemiesCount8y > 2 and Player:HasTier(31, 2)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_lust 22"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike&spinning_crane_kick.max&buff.blackout_reinforcement.up&active_enemies>2&prev.blackout_kick&set_bonus.tier31_2pc
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and SCKMax() and Player:BuffUp(S.BlackoutReinforcementBuff) and EnemiesCount8y > 2 and Player:PrevGCD(1, S.BlackoutKick) and Player:HasTier(31, 2)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_lust 24"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike&spinning_crane_kick.max&buff.bonedust_brew.up&active_enemies>2&set_bonus.tier31_2pc
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and SCKMax() and Player:BuffUp(S.BonedustBrewBuff) and EnemiesCount8y > 2 and Player:HasTier(31, 2)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_lust 26"; end
   end
@@ -836,10 +850,12 @@ local function SerenityLust()
     if CastAnnotated(S.StopFoF, false, "STOP") then return "fists_of_fury_cancel serenity_lust 28"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike&buff.dance_of_chiji.up&!buff.blackout_reinforcement.up
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.DanceofChijiBuff) and Player:BuffDown(S.BlackoutReinforcementBuff)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_lust 30"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike&!buff.blackout_reinforcement.up&buff.bonedust_brew.up&set_bonus.tier31_2pc
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and Player:BuffDown(S.BlackoutReinforcementBuff) and Player:BuffUp(S.BonedustBrewBuff) and Player:HasTier(31, 2)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_lust 32"; end
   end
@@ -848,6 +864,7 @@ local function SerenityLust()
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick serenity_lust 34"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&combo_strike&buff.dance_of_chiji.up
+  -- Note: Skipping target_if condition.
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.DanceofChijiBuff)) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_lust 36"; end
   end
@@ -1447,13 +1464,13 @@ local function DefaultAoE()
   if S.WhirlingDragonPunch:IsReady() and (EnemiesCount8y > 8) then
     if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch default_aoe 8"; end
   end
+  -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&buff.bonedust_brew.up&combo_strike&spinning_crane_kick.max
+  if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and Player:BuffUp(S.BonedustBrewBuff) and ComboStrike(S.SpinningCraneKick) and SCKMax()) then
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_aoe 10"; end
+  end
   -- fists_of_fury,target_if=max:debuff.keefers_skyreach.remains
   if S.FistsofFury:IsReady() then
-    if Everyone.CastTargetIf(S.FistsofFury, Enemies5y, "max", EvaluateTargetIfFilterSkyreach, nil, not Target:IsInMeleeRange(8)) then return "fists_of_fury default_aoe 10"; end
-  end
-  -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&buff.bonedust_brew.up&combo_strike&spinning_crane_kick.max&!buff.blackout_reinforcement.up
-  if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and Player:BuffUp(S.BonedustBrewBuff) and ComboStrike(S.SpinningCraneKick) and SCKMax() and Player:BuffDown(S.BlackoutReinforcementBuff)) then
-    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_aoe 12"; end
+    if Everyone.CastTargetIf(S.FistsofFury, Enemies5y, "max", EvaluateTargetIfFilterSkyreach, nil, not Target:IsInMeleeRange(8)) then return "fists_of_fury default_aoe 12"; end
   end
   -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains-spinning_crane_kick.max*(target.time_to_die+debuff.keefers_skyreach.remains*20),if=buff.bonedust_brew.up&buff.pressure_point.up&set_bonus.tier30_2pc
   if S.RisingSunKick:IsReady() and (Player:BuffUp(S.BonedustBrewBuff) and Player:BuffUp(S.PressurePointBuff) and Player:HasTier(30, 2)) then
