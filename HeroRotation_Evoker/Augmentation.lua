@@ -419,8 +419,8 @@ local function APL()
     if (Player:BuffRemains(S.EbonMightSelfBuff) - S.EbonMight:CastTime()) <= EMSelfBuffDuration() * 0.4 and (S.PrescienceBuff:AuraActiveCount() >= 2 and HL.CombatTime() <= 10 or S.PrescienceBuff:AuraActiveCount() >= 3 or Player:BuffRemains(S.EbonMightSelfBuff) >= S.EbonMight:CastTime() or AllyCount() <= 2) then
       local ShouldReturn = EbonLogic(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=opener_filler,if=variable.opener_delay>0&!equipped.nymues_unraveling_spindle
-    if VarOpenerDelay > 0 and HL.CombatTime() < VarOpenerDelay and not I.NymuesUnravelingSpindle:IsEquipped() then
+    -- run_action_list,name=opener_filler,if=variable.opener_delay>0
+    if VarOpenerDelay > 0 and HL.CombatTime() < VarOpenerDelay then
       local ShouldReturn = OpenerFiller(); if ShouldReturn then return ShouldReturn; end
       if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for OpenerFiller()"; end
     end
