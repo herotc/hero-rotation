@@ -3,28 +3,29 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroDBC
-local DBC        = HeroDBC.DBC
+local DBC           = HeroDBC.DBC
 -- HeroLib
-local HL         = HeroLib
-local Cache      = HeroCache
-local Utils      = HL.Utils
-local Unit       = HL.Unit
-local Player     = Unit.Player
-local Target     = Unit.Target
-local Pet        = Unit.Pet
-local Spell      = HL.Spell
-local MultiSpell = HL.MultiSpell
-local Item       = HL.Item
+local HL            = HeroLib
+local Cache         = HeroCache
+local Utils         = HL.Utils
+local Unit          = HL.Unit
+local Player        = Unit.Player
+local Target        = Unit.Target
+local Pet           = Unit.Pet
+local Spell         = HL.Spell
+local MultiSpell    = HL.MultiSpell
+local Item          = HL.Item
 -- HeroRotation
-local HR         = HeroRotation
-local AoEON      = HR.AoEON
-local CDsON      = HR.CDsON
-local Cast       = HR.Cast
+local HR            = HeroRotation
+local AoEON         = HR.AoEON
+local CDsON         = HR.CDsON
+local Cast          = HR.Cast
+local CastAnnotated = HR.CastAnnotated
 -- Num/Bool Helper Functions
-local num        = HR.Commons.Everyone.num
-local bool       = HR.Commons.Everyone.bool
+local num           = HR.Commons.Everyone.num
+local bool          = HR.Commons.Everyone.bool
 -- Lua
-local pairs      = pairs
+local pairs         = pairs
 
 
 --- ============================ CONTENT ============================
