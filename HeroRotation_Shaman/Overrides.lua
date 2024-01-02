@@ -140,3 +140,14 @@ HL.AddCoreOverride ("Player.IcefuryP",
 , 262)
 
 -- Enhancement, ID: 263
+local OldEnhBuffUp
+OldEnhBuffUp = HL.AddCoreOverride("Player.BuffUp",
+  function (self, Spell, AnyCaster, Offset)
+    local BaseCheck = OldEnhBuffUp(self, Spell, AnyCaster, Offset)
+    if Spell == SpellEnh.PrimordialWaveBuff then
+      return BaseCheck or Player:PrevGCDP(1, S.PrimordialWave)
+    else
+      return BaseCheck
+    end
+  end
+, 263)
