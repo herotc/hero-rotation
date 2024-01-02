@@ -145,7 +145,7 @@ OldEnhBuffUp = HL.AddCoreOverride("Player.BuffUp",
   function (self, Spell, AnyCaster, Offset)
     local BaseCheck = OldEnhBuffUp(self, Spell, AnyCaster, Offset)
     if Spell == SpellEnh.PrimordialWaveBuff then
-      return BaseCheck or Player:PrevGCDP(1, S.PrimordialWave)
+      return BaseCheck or Player:PrevGCDP(1, SpellEnh.PrimordialWave)
     else
       return BaseCheck
     end
