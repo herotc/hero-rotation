@@ -50,7 +50,7 @@ local MaxMaelstromStacks = 10
 local MaxAshenCatalystStacks = 8
 local MaxConvergingStormsStacks = 6
 local VarMinTalentedCDRemains = 1000
-local EnemiesMelee, EnemiesMeleeCount
+local EnemiesMelee, EnemiesMeleeCount, Enemies40yCount
 local MaxEBCharges = S.LavaBurst:IsAvailable() and 2 or 1
 local TIAction = S.LightningBolt
 local BossFightRemains = 11111
@@ -545,8 +545,10 @@ local function APL()
   EnemiesMelee = Player:GetEnemiesInMeleeRange(5)
   if AoEON() then
     EnemiesMeleeCount = #EnemiesMelee
+    Enemies40yCount = #Player:GetEnemiesInRange(40)
   else
     EnemiesMeleeCount = 1
+    Enemies40yCount = 1
   end
 
   -- Calculate fight_remains
@@ -682,12 +684,12 @@ local function APL()
       if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsSpellInRange(S.DoomWinds)) then return "doom_winds main 30"; end
     end
     -- call_action_list,name=single,if=active_enemies=1
-    if EnemiesMeleeCount == 1 then
+    if EnemiesMeleeCount == 1 or Enemies40yCount == 1 then
       local ShouldReturn = Single(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=aoe,if=active_enemies>1&(rotation.standard|rotation.simple)
     -- call_action_list,name=funnel,if=active_enemies>1&rotation.funnel
-    if AoEON() and EnemiesMeleeCount > 1 then
+    if AoEON() and (EnemiesMeleeCount > 1 or Enemies40yCount > 1) then
       if Settings.Enhancement.Rotation == "Standard" then
         local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
       else
