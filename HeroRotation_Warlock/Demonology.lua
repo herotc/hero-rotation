@@ -388,8 +388,8 @@ local function Tyrant()
   if S.GrimoireFelguard:IsReady() and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and (not S.NetherPortal:IsAvailable() or Player:BuffUp(S.NetherPortalBuff) or S.NetherPortal:CooldownRemains() > 30) and (Player:BuffUp(S.NetherPortalBuff) or DreadstalkerActive() or SoulShards == 5) and VarNP) then
     if Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, not Target:IsSpellInRange(S.GrimoireFelguard)) then return "grimoire_felguard tyrant 22"; end
   end
-  -- hand_of_guldan,if=soul_shard>2&(buff.vilefiend.up|!talent.summon_vilefiend&buff.dreadstalkers.up)&(soul_shard>2|buff.vilefiend.remains<gcd.max*2+2%spell_haste)
-  if S.HandofGuldan:IsReady() and (SoulShards > 2 and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and DreadstalkerActive()) and (SoulShards > 2 or VilefiendTime() < GCDMax * 2 + 2 / Player:SpellHaste())) then
+  -- hand_of_guldan,if=soul_shard>2&(buff.vilefiend.up|!talent.summon_vilefiend&buff.dreadstalkers.up)&(soul_shard>2|buff.vilefiend.remains<gcd.max*2+2%spell_haste)|(!buff.dreadstalkers.up&soul_shard=5)
+  if S.HandofGuldan:IsReady() and (SoulShards > 2 and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and DreadstalkerActive()) and (SoulShards > 2 or VilefiendTime() < GCDMax * 2 + 2 / Player:SpellHaste()) or (not DreadstalkerActive() and SoulShards == 5)) then
     if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan tyrant 24"; end
   end
   -- demonbolt,cycle_targets=1,if=soul_shard<4&(buff.demonic_core.stack>1)&(buff.vilefiend.up|!talent.summon_vilefiend&buff.dreadstalkers.up)
