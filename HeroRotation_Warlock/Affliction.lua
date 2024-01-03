@@ -176,6 +176,11 @@ local function EvaluateCycleDrainSoul(TargetUnit)
   return (TargetUnit:DebuffStack(S.ShadowEmbraceDebuff) < 3 or TargetUnit:DebuffRemains(S.ShadowEmbraceDebuff) < 3)
 end
 
+local function EvaluateCycleDrainSoul2(TargetUnit)
+  -- if=(talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3))|!talent.shadow_embrace
+  return ((S.ShadowEmbrace:IsAvailable() and (TargetUnit:DebuffStack(S.ShadowEmbraceDebuff) < 3 or TargetUnit:DebuffRemains(S.ShadowEmbraceDebuff) < 3)) or not S.ShadowEmbrace:IsAvailable())
+end
+
 local function EvaluateCycleSiphonLife(TargetUnit)
   -- target_if=remains<5
   return (TargetUnit:DebuffRemains(S.SiphonLifeDebuff) < 5)
@@ -328,8 +333,8 @@ local function AoE()
   if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
     if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction aoe 8"; end
   end
-  -- siphon_life,target_if=remains<5,if=active_dot.siphon_life<6&cooldown.summon_darkglare.up
-  if S.SiphonLife:IsReady() and (S.SiphonLifeDebuff:AuraActiveCount() < 6 and S.SummonDarkglare:CooldownUp()) then
+  -- siphon_life,target_if=remains<5,if=active_dot.siphon_life<6&cooldown.summon_darkglare.up&time<20
+  if S.SiphonLife:IsReady() and (S.SiphonLifeDebuff:AuraActiveCount() < 6 and S.SummonDarkglare:CooldownUp() and HL.CombatTime() < 20) then
     if Everyone.CastCycle(S.SiphonLife, Enemies40y, EvaluateCycleSiphonLife, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life aoe 10"; end
   end
   -- soul_rot,if=variable.vt_up&variable.ps_up
@@ -353,12 +358,12 @@ local function AoE()
   if CDsON() and S.SummonDarkglare:IsCastable() and (VarPSUp and VarVTUp and VarSRUp) then
     if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare aoe 18"; end
   end
-  -- drain_life,target_if=min:dot.soul_rot.remains,if=buff.inevitable_demise.stack>10&buff.soul_rot.up&buff.soul_rot.remains<=gcd.max&!talent.siphon_life
-  if S.DrainLife:IsReady() and (Player:BuffStack(S.InevitableDemiseBuff) > 10 and Player:BuffUp(S.SoulRot) and Player:BuffRemains(S.SoulRot) <= Player:GCD() + 0.25 and not S.SiphonLife:IsAvailable()) then
+  -- drain_life,target_if=min:dot.soul_rot.remains,if=buff.inevitable_demise.stack>30&buff.soul_rot.up&buff.soul_rot.remains<=gcd.max&active_enemies>3
+  if S.DrainLife:IsReady() and (Player:BuffStack(S.InevitableDemiseBuff) > 30 and Player:BuffUp(S.SoulRot) and Player:BuffRemains(S.SoulRot) <= Player:GCD() + 0.25 and EnemiesCount10ySplash > 3) then
     if Everyone.CastTargetIf(S.DrainLife, Enemies40y, "min", EvaluateTargetIfFilterSoulRot, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life aoe 19"; end
   end
-  -- malefic_rapture,if=buff.umbrafire_kindling.up&(pet.darkglare.active|!talent.doom_blossom)
-  if S.MaleficRapture:IsReady() and (Player:BuffUp(S.UmbrafireKindlingBuff) and (HL.GuardiansTable.DarkglareDuration > 0 or not S.DoomBlossom:IsAvailable())) then
+  -- malefic_rapture,if=buff.umbrafire_kindling.up&(((active_enemies<6|time<30)&pet.darkglare.active)|!talent.doom_blossom)
+  if S.MaleficRapture:IsReady() and (Player:BuffUp(S.UmbrafireKindlingBuff) and (((EnemiesCount10ySplash < 6 or HL.CombatTime() < 30) and HL.GuardiansTable.DarkglareDuration > 0) or not S.DoomBlossom:IsAvailable())) then
     if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture aoe 20"; end
   end
   -- seed_of_corruption,if=talent.sow_the_seeds
@@ -377,21 +382,17 @@ local function AoE()
   if S.DrainSoul:IsReady() and (Player:BuffUp(S.NightfallBuff) and S.ShadowEmbrace:IsAvailable()) then
     if Everyone.CastCycle(S.DrainSoul, Enemies40y, EvaluateCycleDrainSoul, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul aoe 28"; end
   end
-  -- drain_soul,if=buff.nightfall.react
-  if S.DrainSoul:IsReady() and (Player:BuffUp(S.NightfallBuff)) then
-    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul aoe 30"; end
-  end
   -- summon_soulkeeper,if=buff.tormented_soul.stack=10|buff.tormented_soul.stack>3&fight_remains<10
   if S.SummonSoulkeeper:IsReady() and (S.SummonSoulkeeper:Count() == 10 or S.SummonSoulkeeper:Count() > 3 and FightRemains < 10) then
     if Cast(S.SummonSoulkeeper) then return "soul_strike aoe 32"; end
   end
-  -- siphon_life,target_if=remains<5,if=active_dot.siphon_life<5
-  if S.SiphonLife:IsReady() and (S.SiphonLifeDebuff:AuraActiveCount() < 5) then
+  -- siphon_life,target_if=remains<5,if=active_dot.siphon_life<5&(active_enemies<8|!talent.doom_blossom)
+  if S.SiphonLife:IsReady() and (S.SiphonLifeDebuff:AuraActiveCount() < 5 and (EnemiesCount10ySplash < 8 or not S.DoomBlossom:IsAvailable())) then
     if Everyone.CastCycle(S.SiphonLife, Enemies40y, EvaluateCycleSiphonLife, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life aoe 34"; end
   end
-  -- drain_soul,interrupt_global=1
+  -- drain_soul,cycle_targets=1,interrupt_global=1,if=(talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3))|!talent.shadow_embrace
   if S.DrainSoul:IsReady() then
-    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul aoe 36"; end
+    if Everyone.CastCycle(S.DrainSoul, Enemies40y, EvaluateCycleDrainSoul2, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul aoe 36"; end
   end
   -- shadow_bolt
   if S.ShadowBolt:IsReady() then
