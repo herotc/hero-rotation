@@ -316,7 +316,7 @@ local function AoE()
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
   end
   -- cycling_variable,name=min_agony,op=min,value=dot.agony.remains+(99*!dot.agony.ticking)
-  VarMinAgony = CalcMinAgony(Enemies10ySplash)
+  -- Calculating in APL(), as this is now used in main function condition.
   -- haunt,if=debuff.haunt.remains<3
   if S.Haunt:IsReady() and (Target:DebuffRemains(S.HauntDebuff) < 3) then
     if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt aoe 2"; end
@@ -545,6 +545,9 @@ local function APL()
 
     -- SoulShards variable
     SoulShards = Player:SoulShardsP()
+
+    -- VarMinAgony
+    VarMinAgony = CalcMinAgony(Enemies10ySplash)
   end
 
   -- summon_pet 
