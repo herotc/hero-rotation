@@ -2233,13 +2233,13 @@ local function APL()
       local ShouldReturn = CDSerenity(); if ShouldReturn then return ShouldReturn; end
     end
     if Player:BuffUp(S.SerenityBuff) then
-      -- call_action_list,name=serenity_aoelust,if=buff.serenity.up&(buff.invokers_delight.up|buff.power_infusion.up)&active_enemies>4
+      -- call_action_list,name=serenity_aoelust,if=buff.serenity.up&((buff.bloodlust.up&(buff.invokers_delight.up|buff.power_infusion.up))|buff.invokers_delight.up&buff.power_infusion.up)&active_enemies>4
       -- Note: Changed > to >= because otherwise 4 targets is covered by neither condition.
-      if Player:BuffUp(S.SerenityBuff) and (Player:BuffUp(S.InvokersDelightBuff) or Player:PowerInfusionUp()) and EnemiesCount8y >= 4 then
+      if Player:BuffUp(S.SerenityBuff) and ((Player:BloodlustUp() and (Player:BuffUp(S.InvokersDelightBuff) or Player:PowerInfusionUp())) or Player:BuffUp(S.InvokersDelightBuff) and Player:PowerInfusionUp()) and EnemiesCount8y >= 4 then
         local ShouldReturn = SerenityAoELust(); if ShouldReturn then return ShouldReturn; end
       end
-      -- call_action_list,name=serenity_lust,if=buff.serenity.up&(buff.invokers_delight.up|buff.power_infusion.up)&active_enemies<4
-      if Player:BuffUp(S.SerenityBuff) and (Player:BuffUp(S.InvokersDelightBuff) or Player:PowerInfusionUp()) and EnemiesCount8y < 4 then
+      -- call_action_list,name=serenity_lust,if=buff.serenity.up&((buff.bloodlust.up&(buff.invokers_delight.up|buff.power_infusion.up))|buff.invokers_delight.up&buff.power_infusion.up)&active_enemies<4
+      if Player:BuffUp(S.SerenityBuff) and ((Player:BloodlustUp() and (Player:BuffUp(S.InvokersDelightBuff) or Player:PowerInfusionUp())) or Player:BuffUp(S.InvokersDelightBuff) and Player:PowerInfusionUp()) and EnemiesCount8y < 4 then
         local ShouldReturn = SerenityLust(); if ShouldReturn then return ShouldReturn; end
       end
       -- call_action_list,name=serenity_aoe,if=buff.serenity.up&active_enemies>4
