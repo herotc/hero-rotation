@@ -765,7 +765,7 @@ local function APL()
       if Cast(I.IridaltheEarthsMaster, nil, Settings.Commons.DisplayStyle.ITems, not Target:IsInRange(40)) then return "iridal_the_earths_master main 23"; end
     end
     -- use_item,name=belorrelos_the_suncaller,if=(!variable.steroid_trinket_equipped&buff.combustion.down)|(variable.steroid_trinket_equipped&trinket.1.has_cooldown&trinket.1.cooldown.remains>20&buff.combustion.down)|(variable.steroid_trinket_equipped&trinket.2.has_cooldown&trinket.2.cooldown.remains>20&buff.combustion.down)
-    if Settings.Commons.Enabled.Trinkets and I.BelorrelostheSuncaller:IsEquippedAndReady() and ((not var_steroid_trinket_equipped and CombustionDown) or (var_steroid_trinket_equipped and Trinket1:HasCooldown() and trinket1:CooldownRemains() > 20 and CombustionDown) or (var_steroid_trinket_equipped and Trinket2:HasCooldown() and Trinket2:CooldownRemains() > 20 and CombustionDown)) then
+    if Settings.Commons.Enabled.Trinkets and I.BelorrelostheSuncaller:IsEquippedAndReady() and ((not var_steroid_trinket_equipped and CombustionDown) or (var_steroid_trinket_equipped and Trinket1:HasCooldown() and Trinket1:CooldownRemains() > 20 and CombustionDown) or (var_steroid_trinket_equipped and Trinket2:HasCooldown() and Trinket2:CooldownRemains() > 20 and CombustionDown)) then
       if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller main 24"; end
     end
     -- use_items,if=!variable.item_cutoff_active
