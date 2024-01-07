@@ -120,7 +120,7 @@ HL.AddCoreOverride("Spell.IsReady",
 
 HL.AddCoreOverride("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-    if self:CastTime() > 0 and Player:IsMoving() and Settings.Arcane.MovingRotation then
+    if self:CastTime() > 0 and Player:IsMoving() and Settings.Fire.MovingRotation then
       return false
     end
 
