@@ -108,7 +108,7 @@ local function Precombat()
   HasMainHandEnchant, MHEnchantTimeRemains = GetWeaponEnchantInfo()
   -- flametongue_weapon,if=talent.improved_flametongue_weapon.enabled
   if S.ImprovedFlametongueWeapon:IsAvailable() and (not HasMainHandEnchant or MHEnchantTimeRemains < 600000) and S.FlametongueWeapon:IsViable() then
-    if Cast(S.FlamentongueWeapon) then return "flametongue_weapon enchant"; end
+    if Cast(S.FlametongueWeapon) then return "flametongue_weapon enchant"; end
   end
   -- potion
   -- Note: Skipping this, as we don't need to use potion in Precombat any longer.
