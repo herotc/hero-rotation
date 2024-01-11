@@ -563,8 +563,8 @@ local function ST()
 end
 
 local function Trinkets()
-  -- use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking
-  if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0) then
+  -- use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking&(active_enemies<3|!death_and_decay.ticking)&(raid_event.adds.remains>0&raid_event.adds.remains<4|!raid_event.adds.exists&active_enemies<7|active_enemies>21)
+  if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0 and (Enemies10ySplashCount < 3 or Player:BuffDown(S.DeathAndDecayBuff))) then
     if Cast(I.Fyralath, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender trinkets 1"; end
   end
   if Settings.Commons.Enabled.Trinkets then
