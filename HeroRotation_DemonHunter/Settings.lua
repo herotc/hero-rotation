@@ -76,6 +76,7 @@ HR.GUISettings.APL.DemonHunter = {
     },
     GCDasOffGCD = {
       -- Abilities
+      EssenceBreak = false,
       EyeBeam = false,
       GlaiveTempest = false,
       ImmolationAura = false,

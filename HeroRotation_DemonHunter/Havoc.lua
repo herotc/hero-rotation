@@ -390,7 +390,7 @@ local function APL()
     -- essence_break,if=(active_enemies>desired_targets|raid_event.adds.in>40)&(buff.metamorphosis.remains>gcd.max*3|cooldown.eye_beam.remains>10)&(!talent.tactical_retreat|buff.tactical_retreat.up|time<10)&(buff.vengeful_retreat_movement.remains<gcd.max*0.5|time>0)&cooldown.blade_dance.remains<=3.1*gcd.max|fight_remains<6
     -- TODO: Handle vengeful_retreat_movement
     if S.EssenceBreak:IsCastable() and ((Player:BuffRemains(S.MetamorphosisBuff) > GCDMax * 3 or S.EyeBeam:CooldownRemains() > 10) and (not S.TacticalRetreat:IsAvailable() or Player:BuffUp(S.TacticalRetreatBuff) or CombatTime < 10) and S.BladeDance:CooldownRemains() <= 3.1 * GCDMax or FightRemains < 6) then
-      if Cast(S.EssenceBreak, nil, nil, not IsInMeleeRange(10)) then return "essence_break main 32"; end
+      if Cast(S.EssenceBreak, Settings.Havoc.GCDasOffGCD.EssenceBreak, nil, not IsInMeleeRange(10)) then return "essence_break main 32"; end
     end
     -- death_sweep,if=variable.blade_dance&(!talent.essence_break|cooldown.essence_break.remains>gcd.max*2)&buff.fel_barrage.down
     if S.DeathSweep:IsReady() and (VarBladeDance and (not S.EssenceBreak:IsAvailable() or S.EssenceBreak:CooldownRemains() > GCDMax * 2) and Player:BuffDown(S.FelBarrage)) then
