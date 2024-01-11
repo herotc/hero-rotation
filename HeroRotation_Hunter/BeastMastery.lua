@@ -226,8 +226,8 @@ local function ST()
   if S.BarbedShot:IsCastable() and EvaluateTargetIfBarbedShotST(Target) then
     if Cast(S.BarbedShot, nil, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot st mt_backup 3"; end
   end
-  -- kill_command,if=full_recharge_time<gcd&talent.alpha_predator
-  if S.KillCommand:IsReady() and (S.KillCommand:FullRechargeTime() < GCDMax and S.AlphaPredator:IsAvailable()) then
+  -- kill_command,if=!talent.wild_instincts&full_recharge_time<gcd&talent.alpha_predator
+  if S.KillCommand:IsReady() and (not S.WildInstincts:IsAvailable() and S.KillCommand:FullRechargeTime() < GCDMax and S.AlphaPredator:IsAvailable()) then
     if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command st 4"; end
   end
   -- call_of_the_wild,if=!talent.wild_instincts&variable.cotw_ready
