@@ -22,6 +22,7 @@ local Cast          = HR.Cast
 local num           = HR.Commons.Everyone.num
 local bool          = HR.Commons.Everyone.bool
 -- Lua
+local mathmax       = math.max
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -53,17 +54,20 @@ local Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
 -- Rotation Variables
 local Enemies40y, Enemies10ySplash, EnemiesCount10ySplash
 local VarPSUp, VarVTUp, VarVTPSUp, VarSRUp, VarCDDoTsUp, VarHasCDs, VarCDsActive
-local VarMinAgony
+local VarMinAgony, VarMinVT, VarMinPS, VarMinPS1
 local SoulRotBuffLength = (Player:HasTier(31, 2)) and 12 or 8
+local DSSB = (S.DrainSoul:IsAvailable()) and S.DrainSoul or S.ShadowBolt
 local SoulShards = 0
 local BossFightRemains = 11111
 local FightRemains = 11111
+local GCDMax
 
 -- Register
 HL:RegisterForEvent(function()
   S.SeedofCorruption:RegisterInFlight()
   S.ShadowBolt:RegisterInFlight()
   S.Haunt:RegisterInFlight()
+  DSSB = (S.DrainSoul:IsAvailable()) and S.DrainSoul or S.ShadowBolt
 end, "LEARNED_SPELL_IN_TAB")
 S.SeedofCorruption:RegisterInFlight()
 S.ShadowBolt:RegisterInFlight()
@@ -81,16 +85,19 @@ HL:RegisterForEvent(function()
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
-local function CalcMinAgony(Enemies)
-  -- value=dot.agony.remains+(99*!dot.agony.ticking)
-  local LowestAgony
+local function CalcMinDoT(Enemies, Spell)
+  -- cycling_variable,name=min_agony,op=min,value=dot.agony.remains+(99*!dot.agony.ticking)
+  -- cycling_variable,name=min_vt,op=min,default=10,value=dot.vile_taint.remains+(99*!dot.vile_taint.ticking)
+  -- cycling_variable,name=min_ps,op=min,default=16,value=dot.phantom_singularity.remains+(99*!dot.phantom_singularity.ticking)
+  if not Enemies or not Spell then return 0 end
+  local LowestDoT
   for _, CycleUnit in pairs(Enemies) do
-    local UnitAgony = CycleUnit:DebuffRemains(S.AgonyDebuff) + (99 * num(CycleUnit:DebuffDown(S.AgonyDebuff)))
-    if LowestAgony == nil or UnitAgony < LowestAgony then
-      LowestAgony = UnitAgony
+    local UnitDoT = CycleUnit:DebuffRemains(Spell) + (99 * num(CycleUnit:DebuffDown(Spell)))
+    if LowestDoT == nil or UnitDoT < LowestDoT then
+      LowestDoT = UnitDoT
     end
   end
-  return LowestAgony or 0
+  return LowestDoT or 0
 end
 
 local function CanSeed(Enemies)
@@ -118,6 +125,11 @@ local function EvaluateTargetIfFilterCorruption(TargetUnit)
   return (TargetUnit:DebuffRemains(S.CorruptionDebuff))
 end
 
+local function EvaluateTargetIfFilterShadowEmbrace(TargetUnit)
+  -- target_if=min:debuff.shadow_embrace.remains
+  return (TargetUnit:DebuffRemains(S.ShadowEmbraceDebuff))
+end
+
 local function EvaluateTargetIfFilterSiphonLife(TargetUnit)
   -- target_if=min:remains
   return (TargetUnit:DebuffRemains(S.SiphonLifeDebuff))
@@ -139,9 +151,26 @@ local function EvaluateTargetIfAgony2(TargetUnit)
   return (TargetUnit:DebuffRemains(S.AgonyDebuff) < 5)
 end
 
+local function EvaluateTargetIfAgony3(TargetUnit)
+  -- if=active_dot.agony<8&(remains<cooldown.vile_taint.remains+action.vile_taint.cast_time|!talent.vile_taint)&gcd.max+action.soul_rot.cast_time+gcd.max<(variable.min_vt*talent.vile_taint<?variable.min_ps*talent.phantom_singularity)&remains<5
+  -- Note: active_dot.agony<8 and soul_rot checks done before CastTargetIf.
+  return (TargetUnit:DebuffRemains(S.AgonyDebuff) < S.VileTaint:CooldownRemains() + S.VileTaint:CastTime() or not S.VileTaint:IsAvailable()) and TargetUnit:DebuffRemains(S.AgonyDebuff) < 5
+end
+
+local function EvaluateTargetIfAgony4(TargetUnit)
+  -- if=(remains<cooldown.vile_taint.remains+action.vile_taint.cast_time|!talent.vile_taint)&remains<5&fight_remains>5
+  return ((TargetUnit:DebuffRemains(S.AgonyDebuff) < S.VileTaint:CooldownRemains() + S.VileTaint:CastTime() or not S.VileTaint:IsAvailable()) and TargetUnit:DebuffRemains(S.AgonyDebuff) < 5 and FightRemains > 5)
+end
+
 local function EvaluateTargetIfCorruption(TargetUnit)
   -- if=remains<5
   return (TargetUnit:DebuffRemains(S.CorruptionDebuff) < 5)
+end
+
+local function EvaluateTargetIfDrainSoul(TargetUnit)
+  -- if=buff.nightfall.react&(talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)|!talent.shadow_embrace)
+  -- Note: buff.nightfall.react check done before CastTargetIf.
+  return (S.ShadowEmbrace:IsAvailable() and (TargetUnit:DebuffStack(S.ShadowEmbraceDebuff) < 3 or TargetUnit:DebuffRemains(S.ShadowEmbraceDebuff) < 3) or not S.ShadowEmbrace:IsAvailable())
 end
 
 local function EvaluateTargetIfSiphonLife(TargetUnit)
@@ -186,6 +215,12 @@ local function EvaluateCycleSiphonLife(TargetUnit)
   return (TargetUnit:DebuffRemains(S.SiphonLifeDebuff) < 5)
 end
 
+local function EvaluateCycleSiphonLife2(TargetUnit)
+  -- target_if=remains<5
+  -- This version of the cycle checks if Agony is up also, as required by the "if=" portion of the condition
+  return (TargetUnit:DebuffRemains(S.SiphonLifeDebuff) < 5 and TargetUnit:DebuffUp(S.AgonyDebuff))
+end
+
 local function Precombat()
   -- flask
   -- food
@@ -212,7 +247,7 @@ local function Precombat()
     if Cast(S.GrimoireofSacrifice, Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "grimoire_of_sacrifice precombat 2"; end
   end
   -- snapshot_stats
-  -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>2
+  -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>2|talent.sow_the_seeds&spell_targets.seed_of_corruption_aoe>1
   -- NYI precombat multi target
   -- haunt
   if S.Haunt:IsReady() then
@@ -241,8 +276,11 @@ local function Variables()
   VarCDDoTsUp = (VarPSUp and VarVTUp and VarSRUp)
   -- variable,name=has_cds,op=set,value=talent.phantom_singularity|talent.vile_taint|talent.soul_rot|talent.summon_darkglare
   VarHasCDs = (S.PhantomSingularity:IsAvailable() or S.VileTaint:IsAvailable() or S.SoulRot:IsAvailable() or S.SummonDarkglare:IsAvailable())
-  -- variable,name=cds_active,op=set,value=!variable.has_cds|((variable.cd_dots_up&cooldown.summon_darkglare.remains>20)|buff.power_infusion.react)
-  VarCDsActive = (not VarHasCDs or ((VarCDDoTsUp and S.SummonDarkglare:CooldownRemains() > 20) or Player:PowerInfusionUp()))
+  -- variable,name=cds_active,op=set,value=!variable.has_cds|(variable.cd_dots_up&(cooldown.summon_darkglare.remains>20|!talent.summon_darkglare))
+  VarCDsActive = (not VarHasCDs or (VarCDDoTsUp and (S.SummonDarkglare:CooldownRemains() > 20 or not S.SummonDarkglare:IsAvailable())))
+  -- variable,name=min_vt,op=reset,if=variable.min_vt
+  -- variable,name=min_ps,op=reset,if=variable.min_ps
+  -- Note: These are being set every cycle in APL().
 end
 
 local function Items()
@@ -316,7 +354,10 @@ local function AoE()
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
   end
   -- cycling_variable,name=min_agony,op=min,value=dot.agony.remains+(99*!dot.agony.ticking)
-  -- Calculating in APL(), as this is now used in main function condition.
+  -- cycling_variable,name=min_vt,op=min,default=10,value=dot.vile_taint.remains+(99*!dot.vile_taint.ticking)
+  -- cycling_variable,name=min_ps,op=min,default=16,value=dot.phantom_singularity.remains+(99*!dot.phantom_singularity.ticking)
+  -- variable,name=min_ps1,op=set,value=(variable.min_vt*talent.vile_taint<?variable.min_ps*talent.phantom_singularity)
+  -- Calculating these in APL() so they're calculated each cycle.
   -- haunt,if=debuff.haunt.remains<3
   if S.Haunt:IsReady() and (Target:DebuffRemains(S.HauntDebuff) < 3) then
     if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt aoe 2"; end
@@ -325,20 +366,24 @@ local function AoE()
   if S.VileTaint:IsReady() and ((S.SouleatersGluttony:TalentRank() == 2 and (VarMinAgony < 1.5 or S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime())) or (S.SouleatersGluttony:TalentRank() == 1 and S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime()) or (not S.SouleatersGluttony:IsAvailable() and (S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() or S.VileTaint:CooldownRemains() > 25))) then
     if Cast(S.VileTaint, nil, nil, not Target:IsInRange(40)) then return "vile_taint aoe 4"; end
   end
-  -- phantom_singularity
-  if S.PhantomSingularity:IsCastable() then
+  -- phantom_singularity,if=(cooldown.soul_rot.remains<=execute_time|talent.souleaters_gluttony.rank<1&(!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|cooldown.soul_rot.remains>=25))&dot.agony.ticking
+  if S.PhantomSingularity:IsCastable() and ((S.SoulRot:IsAvailable() and S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or not S.SouleatersGluttony:IsAvailable() and (not S.SoulRot:IsAvailable() or S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or S.SoulRot:CooldownRemains() >= 25)) and Target:DebuffUp(S.AgonyDebuff)) then
     if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity aoe 6"; end
   end
   -- unstable_affliction,if=remains<5
   if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
     if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction aoe 8"; end
   end
-  -- siphon_life,target_if=remains<5,if=active_dot.siphon_life<6&cooldown.summon_darkglare.up&time<20
-  if S.SiphonLife:IsReady() and (S.SiphonLifeDebuff:AuraActiveCount() < 6 and S.SummonDarkglare:CooldownUp() and HL.CombatTime() < 20) then
-    if Everyone.CastCycle(S.SiphonLife, Enemies40y, EvaluateCycleSiphonLife, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life aoe 10"; end
+  -- agony,target_if=min:remains,if=active_dot.agony<8&(remains<cooldown.vile_taint.remains+action.vile_taint.cast_time|!talent.vile_taint)&gcd.max+action.soul_rot.cast_time+gcd.max<(variable.min_vt*talent.vile_taint<?variable.min_ps*talent.phantom_singularity)&remains<5
+  if S.Agony:IsReady() and (S.AgonyDebuff:AuraActiveCount() < 8 and GCDMax * 2 + S.SoulRot:CastTime() < VarMinPS1) then
+    if Everyone.CastTargetIf(S.Agony, Enemies40y, "min", EvaluateTargetIfFilterAgony, EvaluateTargetIfAgony3, not Target:IsSpellInRange(S.Agony)) then return "agony aoe 9"; end
   end
-  -- soul_rot,if=variable.vt_up&variable.ps_up
-  if S.SoulRot:IsReady() and (VarVTUp and VarPSUp) then
+  -- siphon_life,target_if=remains<5,if=active_dot.siphon_life<6&cooldown.summon_darkglare.up&time<20&gcd.max+action.soul_rot.cast_time+gcd.max<(variable.min_vt*talent.vile_taint<?variable.min_ps*talent.phantom_singularity)&dot.agony.ticking
+  if S.SiphonLife:IsReady() and (S.SiphonLifeDebuff:AuraActiveCount() < 6 and S.SummonDarkglare:CooldownUp() and HL.CombatTime() < 20 and GCDMax * 2 + S.SoulRot:CastTime() < VarMinPS1) then
+    if Everyone.CastTargetIf(S.SiphonLife, Enemies40y, EvaluateCycleSiphonLife2, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life aoe 10"; end
+  end
+  -- soul_rot,if=variable.vt_up&(variable.ps_up|talent.souleaters_gluttony.rank!=1)&dot.agony.ticking
+  if S.SoulRot:IsReady() and (VarVTUp and (VarPSUp or S.SouleatersGluttony:TalentRank() ~= 1) and Target:DebuffUp(S.AgonyDebuff)) then
     if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot aoe 12"; end
   end
   -- seed_of_corruption,if=dot.corruption.remains<5&!(action.seed_of_corruption.in_flight|dot.seed_of_corruption.remains>0)
@@ -349,17 +394,13 @@ local function AoE()
   if S.Corruption:IsReady() and (not S.SeedofCorruption:IsAvailable()) then
     if Everyone.CastTargetIf(S.Corruption, Enemies40y, "min", EvaluateTargetIfFilterCorruption, EvaluateTargetIfCorruption, not Target:IsSpellInRange(S.Corruption)) then return "corruption aoe 15"; end
   end
-  -- agony,target_if=min:remains,if=active_dot.agony<8&remains<cooldown.vile_taint.remains+action.vile_taint.cast_time&remains<5
-  if S.Agony:IsReady() and (S.AgonyDebuff:AuraActiveCount() < 8) then
-    if Everyone.CastTargetIf(S.Agony, Enemies40y, "min", EvaluateTargetIfFilterAgony, EvaluateTargetIfAgony, not Target:IsSpellInRange(S.Agony)) then return "agony aoe 16"; end
-  end
   -- summon_darkglare,if=variable.ps_up&variable.vt_up&variable.sr_up|cooldown.invoke_power_infusion_0.duration>0&cooldown.invoke_power_infusion_0.up&!talent.soul_rot
   -- Note: Not handling Power Infusion
   if CDsON() and S.SummonDarkglare:IsCastable() and (VarPSUp and VarVTUp and VarSRUp) then
     if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare aoe 18"; end
   end
   -- drain_life,target_if=min:dot.soul_rot.remains,if=buff.inevitable_demise.stack>30&buff.soul_rot.up&buff.soul_rot.remains<=gcd.max&active_enemies>3
-  if S.DrainLife:IsReady() and (Player:BuffStack(S.InevitableDemiseBuff) > 30 and Player:BuffUp(S.SoulRot) and Player:BuffRemains(S.SoulRot) <= Player:GCD() + 0.25 and EnemiesCount10ySplash > 3) then
+  if S.DrainLife:IsReady() and (Player:BuffStack(S.InevitableDemiseBuff) > 30 and Player:BuffUp(S.SoulRot) and Player:BuffRemains(S.SoulRot) <= GCDMax and EnemiesCount10ySplash > 3) then
     if Everyone.CastTargetIf(S.DrainLife, Enemies40y, "min", EvaluateTargetIfFilterSoulRot, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life aoe 19"; end
   end
   -- malefic_rapture,if=buff.umbrafire_kindling.up&(((active_enemies<6|time<30)&pet.darkglare.active)|!talent.doom_blossom)
@@ -409,118 +450,99 @@ local function Cleave()
   if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
   end
-  -- summon_darkglare,if=variable.ps_up&variable.vt_up&variable.sr_up|cooldown.invoke_power_infusion_0.duration>0&cooldown.invoke_power_infusion_0.up&!talent.soul_rot
-  -- Note: Can't handle Power Infusion.
-  if CDsON() and S.SummonDarkglare:IsCastable() and (VarPSUp and VarVTUp and VarSRUp) then
-    if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare cleave 2"; end
+  -- malefic_rapture,if=talent.dread_touch&debuff.dread_touch.remains<2&(dot.agony.remains>gcd.max&dot.corruption.ticking&(!talent.siphon_life|dot.siphon_life.ticking)&dot.unstable_affliction.ticking)&(!talent.phantom_singularity|!cooldown.phantom_singularity.ready)&(!talent.vile_taint|!cooldown.vile_taint.ready)&(!talent.soul_rot|!cooldown.soul_rot.ready)|soul_shard>4
+  if S.MaleficRapture:IsReady() and (S.DreadTouch:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < 2 and (Target:DebuffRemains(S.AgonyDebuff) > GCDMax and Target:DebuffUp(S.CorruptionDebuff) and (not S.SiphonLife:IsAvailable() or Target:DebuffUp(S.SiphonLifeDebuff)) and Target:DebuffUp(S.UnstableAfflictionDebuff)) and (not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownDown()) and (not S.VileTaint:IsAvailable() or S.VileTaint:CooldownDown()) and (not S.SoulRot:IsAvailable() or S.SoulRot:CooldownDown()) or SoulShards > 4) then
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 2"; end
   end
-  -- malefic_rapture,if=talent.dread_touch&debuff.dread_touch.remains<2&(dot.agony.ticking&dot.corruption.ticking&(!talent.siphon_life|dot.siphon_life.ticking))&(!talent.phantom_singularity|!cooldown.phantom_singularity.ready)&(!talent.vile_taint|!cooldown.vile_taint.ready)&(!talent.soul_rot|!cooldown.soul_rot.ready)|soul_shard>4|buff.umbrafire_kindling.up
-  if S.MaleficRapture:IsReady() and (S.DreadTouch:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < 2 and (Target:DebuffUp(S.AgonyDebuff) and Target:DebuffUp(S.CorruptionDebuff) and (not S.SiphonLife:IsAvailable() or Target:DebuffUp(S.SiphonLifeDebuff))) and (not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownDown()) and (not S.VileTaint:IsAvailable() or S.VileTaint:CooldownDown()) and (not S.SoulRot:IsAvailable() or S.SoulRot:CooldownDown()) or SoulShards > 4 or Player:BuffUp(S.UmbrafireKindlingBuff)) then
-    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 4"; end
+  -- vile_taint,if=!talent.soul_rot|(variable.min_agony<1.5|cooldown.soul_rot.remains<=execute_time+gcd.max)|talent.souleaters_gluttony.rank<1&cooldown.soul_rot.remains>=12
+  if S.VileTaint:IsReady() and (not S.SoulRot:IsAvailable() or (VarMinAgony < 1.5 or S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() + GCDMax) or not S.SouleatersGluttony:IsAvailable() and S.SoulRot:CooldownRemains() >= 12) then
+    if Cast(S.VileTaint, nil, nil, not Target:IsInRange(40)) then return "vile_taint cleave 4"; end
   end
-  -- agony,target_if=min:remains,if=remains<5
-  if S.Agony:IsReady() then
-    if Everyone.CastTargetIf(S.Agony, Enemies40y, "min", EvaluateTargetIfFilterAgony, EvaluateTargetIfAgony2, not Target:IsSpellInRange(S.Agony)) then return "agony cleave 6"; end
+  -- phantom_singularity,if=(cooldown.soul_rot.remains<=execute_time|talent.souleaters_gluttony.rank<1&(!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|cooldown.soul_rot.remains>=25))&active_dot.agony=2
+  if S.PhantomSingularity:IsReady() and ((S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or not S.SouleatersGluttony:IsAvailable() and (not S.SoulRot:IsAvailable() or S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or S.SoulRot:CooldownRemains() >= 25)) and S.AgonyDebuff:AuraActiveCount() >= 2) then
+    if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity cleave 6"; end
   end
-  -- soul_rot,if=(variable.vt_up&variable.ps_up)
-  if S.SoulRot:IsReady() and (VarVTUp and VarPSUp) then
+  -- soul_rot,if=(variable.vt_up&(variable.ps_up|talent.souleaters_gluttony.rank!=1))&active_dot.agony=2
+  if S.SoulRot:IsReady() and ((VarVTUp and (VarPSUp or S.SouleatersGluttony:TalentRank() ~= 1)) and S.AgonyDebuff:AuraActiveCount() >= 2) then
     if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot cleave 8"; end
   end
-  -- vile_taint,if=(active_dot.agony=2&active_dot.corruption=2&(!talent.siphon_life|active_dot.siphon_life=2))&(!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|talent.souleaters_gluttony.rank<1&cooldown.soul_rot.remains>=12)
-  if S.VileTaint:IsReady() and ((S.AgonyDebuff:AuraActiveCount() == 2 and S.CorruptionDebuff:AuraActiveCount() == 2 and (not S.SiphonLife:IsAvailable() or S.SiphonLifeDebuff:AuraActiveCount() == 2)) and (not S.SoulRot:IsAvailable() or S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() or not S.SouleatersGluttony:IsAvailable() and S.SoulRot:CooldownRemains() >= 12)) then
-    if Cast(S.VileTaint, nil, nil, not Target:IsSpellInRange(S.VileTaint)) then return "vile_taint cleave 10"; end
+  -- agony,target_if=min:remains,if=(remains<cooldown.vile_taint.remains+action.vile_taint.cast_time|!talent.vile_taint)&remains<5&fight_remains>5
+  if S.Agony:IsReady() then
+    if Everyone.CastTargetIf(S.Agony, Enemies40y, "min", EvaluateTargetIfFilterAgony, EvaluateTargetIfAgony4, not Target:IsSpellInRange(S.Agony)) then return "agony cleave 10"; end
   end
-  -- phantom_singularity,if=(active_dot.agony=2&active_dot.corruption=2&(!talent.siphon_life|active_dot.siphon_life=2))&(talent.soul_rot|cooldown.soul_rot.remains<=execute_time|cooldown.soul_rot.remains>=25)
-  if S.PhantomSingularity:IsReady() and ((S.AgonyDebuff:AuraActiveCount() == 2 and S.CorruptionDebuff:AuraActiveCount() == 2 and (not S.SiphonLife:IsAvailable() or S.SiphonLifeDebuff:AuraActiveCount() == 2)) and (S.SoulRot:IsAvailable() or S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or S.SoulRot:CooldownRemains() >= 25)) then
-    if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity cleave 12"; end
-  end
-  -- unstable_affliction,if=remains<5
-  if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5) then
-    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction cleave 14"; end
+  -- unstable_affliction,if=remains<5&fight_remains>3
+  if S.UnstableAffliction:IsReady() and (Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5 and FightRemains > 3) then
+    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction cleave 12"; end
   end
   -- seed_of_corruption,if=!talent.absolute_corruption&dot.corruption.remains<5&talent.sow_the_seeds&can_seed
   if S.SeedofCorruption:IsReady() and (not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.CorruptionDebuff) < 5 and S.SowTheSeeds:IsAvailable() and CanSeed(Enemies40y)) then
-    if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "seed_of_corruption cleave 16"; end
-  end
-  -- corruption,target_if=min:remains,if=remains<5
-  if S.Corruption:IsReady() then
-    if Everyone.CastTargetIf(S.Corruption, Enemies40y, "min", EvaluateTargetIfFilterCorruption, EvaluateTargetIfCorruption, not Target:IsSpellInRange(S.Corruption)) then return "corruption cleave 18"; end
-  end
-  -- siphon_life,target_if=min:remains,if=refreshable
-  if S.SiphonLife:IsReady() then
-    if Everyone.CastTargetIf(S.SiphonLife, Enemies40y, "min", EvaluateTargetIfFilterSiphonLife, EvaluateTargetIfSiphonLife, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life cleave 20"; end
+    if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "seed_of_corruption cleave 14"; end
   end
   -- haunt,if=debuff.haunt.remains<3
   if S.Haunt:IsReady() and (Target:DebuffRemains(S.HauntDebuff) < 3) then
-    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt cleave 22"; end
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt cleave 16"; end
   end
-  -- phantom_singularity,if=cooldown.soul_rot.remains<=execute_time|talent.souleaters_gluttony.rank<1&(!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|cooldown.soul_rot.remains>=25)
-  if S.PhantomSingularity:IsReady() and (S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or not S.SouleatersGluttony:IsAvailable() and (not S.SoulRot:IsAvailable() or S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or S.SoulRot:CooldownRemains() >= 25)) then
-    if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity cleave 24"; end
+  -- corruption,target_if=min:remains,if=remains<5&!(action.seed_of_corruption.in_flight|dot.seed_of_corruption.remains>0)&fight_remains>5
+  if S.Corruption:IsReady() and (not (S.SeedofCorruption:InFlight() or Target:DebuffRemains(S.SeedofCorruptionDebuff) > 0) and FightRemains > 5) then
+    if Everyone.CastTargetIf(S.Corruption, Enemies40y, "min", EvaluateTargetIfFilterCorruption, EvaluateTargetIfCorruption, not Target:IsSpellInRange(S.Corruption)) then return "corruption cleave 18"; end
   end
-  -- soul_rot
-  if S.SoulRot:IsReady() then
-    if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot cleave 26"; end
+  -- siphon_life,target_if=min:remains,if=refreshable&fight_remains>5
+  if S.SiphonLife:IsReady() and (FightRemains > 5) then
+    if Everyone.CastTargetIf(S.SiphonLife, Enemies40y, "min", EvaluateTargetIfFilterSiphonLife, EvaluateTargetIfSiphonLife, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life cleave 20"; end
   end
-  -- malefic_rapture,if=soul_shard>4|(talent.tormented_crescendo&buff.tormented_crescendo.stack=1&soul_shard>3)
-  if S.MaleficRapture:IsReady() and (SoulShards > 4 or (S.TormentedCrescendo:IsAvailable() and Player:BuffStack(S.TormentedCrescendoBuff) == 1 and SoulShards > 3)) then
-    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 28"; end
+  -- summon_darkglare,if=(!talent.shadow_embrace|debuff.shadow_embrace.stack=3)&variable.ps_up&variable.vt_up&variable.sr_up|cooldown.invoke_power_infusion_0.duration>0&cooldown.invoke_power_infusion_0.up&!talent.soul_rot
+  if S.SummonDarkglare:IsReady() and ((not S.ShadowEmbrace:IsAvailable() or Target:DebuffStack(S.ShadowEmbraceDebuff) == 3) and VarPSUp and VarVTUp and VarSRUp) then
+    if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare cleave 22"; end
   end
-  -- malefic_rapture,if=talent.dread_touch&debuff.dread_touch.remains<gcd
-  if S.MaleficRapture:IsReady() and S.DreadTouch:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < Player:GCD() then
-    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 30"; end
+  -- malefic_rapture,if=talent.tormented_crescendo&buff.tormented_crescendo.stack=1&soul_shard>3
+  if S.MaleficRapture:IsReady() and (S.TormentedCrescendo:IsAvailable() and Player:BuffStack(S.TormentedCrescendoBuff) == 1 and SoulShards > 3) then
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 24"; end
+  end
+  -- drain_soul,interrupt=1,if=talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)
+  if S.DrainSoul:IsReady() and (S.ShadowEmbrace:IsAvailable() and (Target:DebuffStack(S.ShadowEmbraceDebuff) < 3 or Target:DebuffRemains(S.ShadowEmbraceDebuff) < 3)) then
+    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul cleave 26"; end
+  end
+  -- drain_soul,target_if=min:debuff.shadow_embrace.remains,if=buff.nightfall.react&(talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)|!talent.shadow_embrace)
+  -- shadow_bolt,target_if=min:debuff.shadow_embrace.remains,if=buff.nightfall.react&(talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)|!talent.shadow_embrace)
+  if DSSB:IsReady() and (Player:BuffUp(S.NightfallBuff)) then
+    if Everyone.CastTargetIf(DSSB, Enemies40y, "min", EvaluateTargetIfFilterShadowEmbrace, EvaluateTargetIfDrainSoul, not Target:IsSpellInRange(DSSB)) then return "drain_soul/shadow_bolt cleave 28"; end
   end
   -- malefic_rapture,if=!talent.dread_touch&buff.tormented_crescendo.up
   if S.MaleficRapture:IsReady() and not S.DreadTouch:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) then
-    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 32"; end
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 30"; end
   end
   -- malefic_rapture,if=variable.cd_dots_up|variable.vt_ps_up
   if S.MaleficRapture:IsReady() and (VarCDDoTsUp or VarVTPSUp) then
-    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 34"; end
-  end
-  -- drain_soul,cycle_targets=1,if=buff.nightfall.react&talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)
-  if S.DrainSoul:IsReady() and (Player:BuffUp(S.NightfallBuff) and S.ShadowEmbrace:IsAvailable()) then
-    if Everyone.CastCycle(S.DrainSoul, Enemies40y, EvaluatecycleDrainSoul, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul cleave 36"; end
-  end
-  -- drain_soul,if=buff.nightfall.react
-  if S.DrainSoul:IsReady() and Player:BuffUp(S.NightfallBuff) then
-    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul cleave 38"; end
-  end
-  -- shadow_bolt,if=buff.nightfall.react
-  if S.ShadowBolt:IsReady() and Player:BuffUp(S.NightfallBuff) then
-    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt cleave 40"; end
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 32"; end
   end
   -- malefic_rapture,if=soul_shard>3
   if S.MaleficRapture:IsReady() and (SoulShards > 3) then
-    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 42"; end
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 34"; end
   end
   -- drain_life,if=buff.inevitable_demise.stack>48|buff.inevitable_demise.stack>20&fight_remains<4
   if S.DrainLife:IsReady() and (Player:BuffStack(S.InevitableDemiseBuff) > 48 or Player:BuffStack(S.InevitableDemiseBuff) > 20 and FightRemains < 4) then
-    if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life cleave 44"; end
+    if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life cleave 36"; end
   end
   -- drain_life,if=buff.soul_rot.up&buff.inevitable_demise.stack>30
   if S.DrainLife:IsReady() and (Player:BuffUp(S.SoulRot) and Player:BuffStack(S.InevitableDemiseBuff) > 30) then
-    if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life cleave 46"; end
+    if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "drain_life cleave 38"; end
   end
   -- agony,target_if=refreshable
   if S.Agony:IsReady() then
-    if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateCycleAgonyRefreshable, not Target:IsSpellInRange(S.Agony)) then return "agony cleave 48"; end
+    if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateCycleAgonyRefreshable, not Target:IsSpellInRange(S.Agony)) then return "agony cleave 40"; end
   end
   -- corruption,target_if=refreshable
   if S.Corruption:IsCastable() then
-    if Everyone.CastCycle(S.Corruption, Enemies40y, EvaluateCycleCorruptionRefreshable, not Target:IsSpellInRange(S.Corruption)) then return "corruption cleave 50"; end
+    if Everyone.CastCycle(S.Corruption, Enemies40y, EvaluateCycleCorruptionRefreshable, not Target:IsSpellInRange(S.Corruption)) then return "corruption cleave 42"; end
   end
   -- malefic_rapture,if=soul_shard>1
   if S.MaleficRapture:IsReady() and (SoulShards > 1) then
-    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 52"; end
+    if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 44"; end
   end
   -- drain_soul,interrupt_global=1
-  if S.DrainSoul:IsReady() then
-    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul cleave 54"; end
-  end
   -- shadow_bolt
-  if S.ShadowBolt:IsReady() then
-    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt cleave 56"; end
+  if DSSB:IsReady() then
+    if Cast(DSSB, nil, nil, not Target:IsSpellInRange(DSSB)) then return "drain_soul/shadow_bolt cleave 46"; end
   end
 end
 
@@ -534,6 +556,8 @@ local function APL()
   else
     EnemiesCount10ySplash = 1
   end
+  -- DEBUG: REMOVE ME
+  EnemiesCount10ySplash = 2
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
@@ -546,8 +570,14 @@ local function APL()
     -- SoulShards variable
     SoulShards = Player:SoulShardsP()
 
-    -- VarMinAgony
-    VarMinAgony = CalcMinAgony(Enemies10ySplash)
+    -- Calculate "Min" Variables
+    VarMinAgony = CalcMinDoT(Enemies10ySplash, S.AgonyDebuff)
+    VarMinVT = CalcMinDoT(Enemies10ySplash, S.VileTaintDebuff)
+    VarMinPS = CalcMinDoT(Enemies10ySplash, S.PhantomSingularityDebuff)
+    VarMinPS1 = mathmax(VarMinVT * num(S.VileTaint:IsAvailable()), VarMinPS * num(S.PhantomSingularity:IsAvailable()))
+
+    -- Calculate GCDMax
+    GCDMax = Player:GCD() + 0.25
   end
 
   -- summon_pet 
@@ -579,8 +609,8 @@ local function APL()
     if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
     end
-    -- malefic_rapture,if=talent.dread_touch&debuff.dread_touch.remains<2&(dot.agony.remains>gcd.max&dot.corruption.ticking&(!talent.siphon_life|dot.siphon_life.ticking))&(!talent.phantom_singularity|!cooldown.phantom_singularity.ready)&(!talent.vile_taint|!cooldown.vile_taint.ready)&(!talent.soul_rot|!cooldown.soul_rot.ready)
-    if S.MaleficRapture:IsReady() and (S.DreadTouch:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < 2 and (Target:DebuffRemains(S.AgonyDebuff) > Player:GCD() + 0.25 and Target:DebuffUp(S.CorruptionDebuff) and (not S.SiphonLife:IsAvailable() or Target:DebuffUp(S.SiphonLifeDebuff))) and (not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownDown()) and (not S.VileTaint:IsAvailable() or S.VileTaint:CooldownDown()) and (not S.SoulRot:IsAvailable() or S.SoulRot:CooldownDown())) then
+    -- malefic_rapture,if=talent.dread_touch&debuff.dread_touch.remains<2&(dot.agony.remains>gcd.max&dot.corruption.ticking&(!talent.siphon_life|dot.siphon_life.ticking)&dot.unstable_affliction.ticking)&(!talent.phantom_singularity|!cooldown.phantom_singularity.ready)&(!talent.vile_taint|!cooldown.vile_taint.ready)&(!talent.soul_rot|!cooldown.soul_rot.ready)
+    if S.MaleficRapture:IsReady() and (S.DreadTouch:IsAvailable() and Target:DebuffRemains(S.DreadTouchDebuff) < 2 and (Target:DebuffRemains(S.AgonyDebuff) > GCDMax and Target:DebuffUp(S.CorruptionDebuff) and (not S.SiphonLife:IsAvailable() or Target:DebuffUp(S.SiphonLifeDebuff)) and Target:DebuffUp(S.UnstableAfflictionDebuff)) and (not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownDown()) and (not S.VileTaint:IsAvailable() or S.VileTaint:CooldownDown()) and (not S.SoulRot:IsAvailable() or S.SoulRot:CooldownDown())) then
       if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 2"; end
     end
     -- malefic_rapture,if=fight_remains<4
@@ -588,7 +618,7 @@ local function APL()
       if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 4"; end
     end
     -- vile_taint,if=!talent.soul_rot|(variable.min_agony<1.5|cooldown.soul_rot.remains<=execute_time+gcd.max)|talent.souleaters_gluttony.rank<1&cooldown.soul_rot.remains>=12
-    if S.VileTaint:IsReady() and (not S.SoulRot:IsAvailable() or (VarMinAgony < 1.5 or S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() + Player:GCD() + 0.25) or not S.SouleatersGluttony:IsAvailable() and S.SoulRot:CooldownRemains() >= 12) then
+    if S.VileTaint:IsReady() and (not S.SoulRot:IsAvailable() or (VarMinAgony < 1.5 or S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() + GCDMax) or not S.SouleatersGluttony:IsAvailable() and S.SoulRot:CooldownRemains() >= 12) then
       if Cast(S.VileTaint, nil, nil, not Target:IsInRange(40)) then return "vile_taint main 6"; end
     end
     -- phantom_singularity,if=(cooldown.soul_rot.remains<=execute_time|talent.souleaters_gluttony.rank<1&(!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|cooldown.soul_rot.remains>=25))&dot.agony.ticking
