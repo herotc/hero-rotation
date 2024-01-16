@@ -172,6 +172,7 @@ Item.DemonHunter.Commons = {
   MarkofDargrul                         = Item(137357, {13, 14}),
   ScreamingBlackDragonscale             = Item(202612, {13, 14}),
   StormEatersBoon                       = Item(194302, {13, 14}),
+  WitherbarksBranch                     = Item(109999, {13, 14}),
 }
 
 Item.DemonHunter.Vengeance = MergeTableByKey(Item.DemonHunter.Commons, {
