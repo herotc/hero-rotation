@@ -198,8 +198,8 @@ local function EvaluateTargetIfFilterMarkoftheCrane103(TargetUnit)
 end
 
 local function EvaluateTargetIfFilterFaeExposure(TargetUnit)
-  -- target_if=min:debuff.fae_exposure_damage.remains
-  return TargetUnit:DebuffRemains(S.FaeExposureDebuff)
+  -- target_if=min:debuff.jadefire_brand_damage.remains
+  return TargetUnit:DebuffRemains(S.JadefireBrandDebuff)
 end
 
 local function EvaluateTargetIfFilterHP(TargetUnit)
@@ -212,10 +212,10 @@ local function EvaluateTargetIfFilterSkyreach(TargetUnit)
   return TargetUnit:DebuffRemains(S.SkyreachCritDebuff)
 end
 
-local function EvaluateTargetIfFaelineStomp(TargetUnit)
-  -- if=combo_strike&talent.faeline_harmony&debuff.fae_exposure_damage.remains<1
-  -- Note: combo_strike&talent.faeline_harmony handled prior to this function
-  return TargetUnit:DebuffRemains(S.FaeExposureDebuff)
+local function EvaluateTargetIfJadefireStomp(TargetUnit)
+  -- if=combo_strike&talent.jadefire_harmony&debuff.jadefire_brand_damage.remains<1
+  -- Note: combo_strike&talent.jadefire_harmony handled prior to this function
+  return TargetUnit:DebuffRemains(S.JadefireBrandDebuff)
 end
 
 local function EvaluateTargetIfRSK(TargetUnit)
@@ -255,8 +255,8 @@ local function Precombat()
   if S.ExpelHarm:IsReady() and (Player:Chi() < Player:ChiMax()) then
     if Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "expel_harm precombat 4"; end
   end
-  -- chi_burst,if=!talent.faeline_stomp
-  if S.ChiBurst:IsReady() and (not S.FaelineStomp:IsAvailable()) then
+  -- chi_burst,if=!talent.jadefire_stomp
+  if S.ChiBurst:IsReady() and (not S.JadefireStomp:IsAvailable()) then
     if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst precombat 6"; end
   end
   -- chi_wave
@@ -374,9 +374,9 @@ local function Opener()
   if S.ExpelHarm:IsReady() and (S.ChiBurst:IsAvailable() and Player:ChiDeficit() >= 3) then
     if Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "expel_harm opener 4"; end
   end
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<2&!debuff.skyreach_exhaustion.remains<2&!debuff.skyreach_exhaustion.remains
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 2 and Target:DebuffDown(S.SkyreachExhaustionDebuff)) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm opener 6"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<2&!debuff.skyreach_exhaustion.remains<2&!debuff.skyreach_exhaustion.remains
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 2 and Target:DebuffDown(S.SkyreachExhaustionDebuff)) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm opener 6"; end
   end
   -- expel_harm,if=talent.chi_burst.enabled&chi=3
   if S.ExpelHarm:IsReady() and (S.ChiBurst:IsAvailable() and Player:Chi() == 3) then
@@ -638,9 +638,9 @@ local function CDSerenity()
 end
 
 local function SerenityAoELust()
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<1
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 1) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_aoelust 2"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<1
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 1) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_aoelust 2"; end
   end
   -- strike_of_the_windlord,if=set_bonus.tier31_4pc&talent.thunderfist
   if S.StrikeoftheWindlord:IsReady() and (Player:HasTier(31, 4) and S.Thunderfist:IsAvailable()) then
@@ -717,9 +717,9 @@ local function SerenityAoELust()
   if S.StrikeoftheWindlord:IsReady() and (S.Thunderfist:IsAvailable() and Player:BuffUp(S.CalltoDominanceBuff) and EnemiesCount8y < 10) then
     if Everyone.CastTargetIf(S.FistsofFury, Enemies8y, "max", EvaluateTargetIfFilterSkyreach, EvaluateTargetIfSotWL, not Target:IsInMeleeRange(8)) then return "strike_of_the_windlord serenity_aoelust 36"; end
   end
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<2
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 2) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_aoelust 38"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<2
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 2) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_aoelust 38"; end
   end
   -- strike_of_the_windlord,target_if=max:debuff.keefers_skyreach.remains,if=talent.thunderfist
   if S.StrikeoftheWindlord:IsReady() and (S.Thunderfist:IsAvailable()) then
@@ -788,9 +788,9 @@ local function SerenityAoELust()
 end
 
 local function SerenityLust()
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<1
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 1) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_lust 2"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<1
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 1) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_lust 2"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&buff.serenity.remains<1.5&combo_strike&!buff.blackout_reinforcement.remains&set_bonus.tier31_2pc
   -- Note: Skipping target_if condition.
@@ -884,9 +884,9 @@ local function SerenityLust()
 end
 
 local function SerenityAoE()
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<1
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 1) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_aoe 2"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<1
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 1) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_aoe 2"; end
   end
   -- strike_of_the_windlord,if=set_bonus.tier31_4pc&talent.thunderfist
   if S.StrikeoftheWindlord:IsReady() and (Player:HasTier(31, 4) and S.Thunderfist:IsAvailable()) then
@@ -956,9 +956,9 @@ local function SerenityAoE()
   if S.StrikeoftheWindlord:IsReady() and (S.Thunderfist:IsAvailable() and Player:BuffUp(S.CalltoDominanceBuff) and EnemiesCount8y < 10) then
     if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies5y, "max", EvaluateTargetIfFilterSkyreach, EvaluateTargetIfSotWL, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord serenity_aoe 36"; end
   end
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<2
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 2) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_aoe 38"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<2
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 2) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_aoe 38"; end
   end
   -- fists_of_fury,target_if=max:debuff.keefers_skyreach.remains,if=buff.invokers_delight.up,interrupt=1
   if S.FistsofFury:IsReady() and (Player:BuffUp(S.InvokersDelightBuff)) then
@@ -1022,9 +1022,9 @@ local function SerenityAoE()
 end
 
 local function Serenity4T()
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<1
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 1) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_4t 2"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<1
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 1) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_4t 2"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&buff.serenity.remains<1.5&combo_strike&!buff.blackout_reinforcement.remains&set_bonus.tier31_2pc
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and Player:BuffRemains(S.SerenityBuff) < 1.5 and ComboStrike(S.SpinningCraneKick) and Player:BuffDown(S.BlackoutReinforcementBuff) and Player:HasTier(31, 2)) then
@@ -1082,9 +1082,9 @@ local function Serenity4T()
   if S.StrikeoftheWindlord:IsReady() and (S.Thunderfist:IsAvailable() and Player:BuffUp(S.CalltoDominanceBuff)) then
     if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies5y, "max", EvaluateTargetIfFilterSkyreach, EvaluateTargetIfSotWL, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord serenity_4t 30"; end
   end
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<2
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 2) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_4t 32"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<2
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 2) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_4t 32"; end
   end
   -- fists_of_fury,target_if=max:debuff.keefers_skyreach.remains,if=buff.invokers_delight.up,interrupt=1
   if S.FistsofFury:IsReady() and (Player:BuffUp(S.InvokersDelightBuff)) then
@@ -1145,9 +1145,9 @@ local function Serenity4T()
 end
 
 local function Serenity3T()
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<1
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 1) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_3t 2"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<1
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 1) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_3t 2"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains-spinning_crane_kick.max*(target.time_to_die+debuff.keefers_skyreach.remains*20),if=set_bonus.tier31_2pc&combo_strike&buff.blackout_reinforcement.up
   if S.BlackoutKick:IsReady() and (Player:HasTier(31, 2) and ComboStrike(S.BlackoutKick) and Player:BuffUp(S.BlackoutReinforcementBuff)) then
@@ -1206,9 +1206,9 @@ local function Serenity3T()
   if S.RisingSunKick:IsReady() and (Player:HasTier(30, 2)) then
     if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick serenity_3t 30"; end
   end
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<2
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 2) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_3t 32"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<2
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 2) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_3t 32"; end
   end
   -- strike_of_the_windlord,target_if=max:debuff.keefers_skyreach.remains,if=talent.thunderfist
   if S.StrikeoftheWindlord:IsReady() and (S.Thunderfist:IsAvailable()) then
@@ -1261,9 +1261,9 @@ local function Serenity3T()
 end
 
 local function Serenity2T()
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<2&!debuff.skyreach_exhaustion.remains<2&!debuff.skyreach_exhaustion.remains
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 2 and not (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 2) and Target:DebuffDown(S.SkyreachExhaustionDebuff)) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_2t 2"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<2&!debuff.skyreach_exhaustion.remains<2&!debuff.skyreach_exhaustion.remains
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 2 and not (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 2) and Target:DebuffDown(S.SkyreachExhaustionDebuff)) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_2t 2"; end
   end
   -- tiger_palm,,target_if=min:debuff.mark_of_the_crane.remains,if=!debuff.skyreach_exhaustion.up*20&combo_strike
   -- Note: I believe the '!debuff.skyreach_exhaustion.up*20' is supposed to be part of the target_if clause, as it makes no sense in the if clause.
@@ -1354,9 +1354,9 @@ local function Serenity2T()
 end
 
 local function SerenityST()
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<2&!debuff.skyreach_exhaustion.remains
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 2 and Target:DebuffDown(S.SkyreachExhaustionDebuff)) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_st 2"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<2&!debuff.skyreach_exhaustion.remains
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 2 and Target:DebuffDown(S.SkyreachExhaustionDebuff)) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_st 2"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=target.time_to_die>duration&buff.serenity.remains<1.5&combo_strike&!buff.blackout_reinforcement.remains&set_bonus.tier31_4pc
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and Player:BuffRemains(S.SerenityBuff) < 1.5 and ComboStrike(S.SpinningCraneKick) and Player:BuffDown(S.BlackoutReinforcementBuff) and Player:HasTier(31, 4)) then
@@ -1378,9 +1378,9 @@ local function SerenityST()
   if S.RisingSunKick:IsReady() and (ComboStrike(S.RisingSunKick)) then
     if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick serenity_st 12"; end
   end
-  -- faeline_stomp,if=debuff.fae_exposure_damage.remains<2
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.FaeExposureDebuff) < 2) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp serenity_st 14"; end
+  -- jadefire_stomp,if=debuff.jadefire_brand_damage.remains<2
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 2) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_st 14"; end
   end
   -- strike_of_the_windlord,if=talent.thunderfist&buff.call_to_dominance.up&debuff.skyreach_exhaustion.remains>buff.call_to_dominance.remains
   if S.StrikeoftheWindlord:IsReady() and (S.Thunderfist:IsAvailable() and Player:BuffUp(S.CalltoDominanceBuff) and Target:DebuffRemains(S.SkyreachExhaustionDebuff) > Player:BuffRemains(S.CalltoDominanceBuff)) then
@@ -1847,9 +1847,9 @@ local function Default2T()
   if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick)) then
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick default_2t 52"; end
   end
-  -- faeline_stomp,if=combo_strike
-  if S.FaelineStomp:IsCastable() and (ComboStrike(S.FaelineStomp)) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp default_2t 54"; end
+  -- jadefire_stomp,if=combo_strike
+  if S.JadefireStomp:IsCastable() and (ComboStrike(S.JadefireStomp)) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp default_2t 54"; end
   end
 end
 
@@ -1874,13 +1874,13 @@ local function DefaultST()
   if S.RisingSunKick:IsReady() and (S.FistsofFury:CooldownUp()) then
     if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick default_st 12"; end
   end
-  -- fists_of_fury,if=!buff.pressure_point.up&debuff.skyreach_exhaustion.remains<55&(debuff.fae_exposure_damage.remains>2|cooldown.faeline_stomp.remains)
-  if S.FistsofFury:IsReady() and (Player:BuffDown(S.PressurePointBuff) and Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 55 and (Target:DebuffRemains(S.FaeExposureDebuff) > 2 or S.FaelineStomp:CooldownDown())) then
+  -- fists_of_fury,if=!buff.pressure_point.up&debuff.skyreach_exhaustion.remains<55&(debuff.jadefire_brand_damage.remains>2|cooldown.jadefire_stomp.remains)
+  if S.FistsofFury:IsReady() and (Player:BuffDown(S.PressurePointBuff) and Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 55 and (Target:DebuffRemains(S.JadefireBrandDebuff) > 2 or S.JadefireStomp:CooldownDown())) then
     if Cast(S.FistsofFury, nil, nil, not Target:IsInMeleeRange(8)) then return "fists_of_fury default_st 14"; end
   end
-  -- faeline_stomp,if=debuff.skyreach_exhaustion.remains<1&debuff.fae_exposure_damage.remains<3
-  if S.FaelineStomp:IsCastable() and (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 1 and Target:DebuffRemains(S.FaeExposureDebuff) < 3) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp default_st 16"; end
+  -- jadefire_stomp,if=debuff.skyreach_exhaustion.remains<1&debuff.jadefire_brand_damage.remains<3
+  if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 1 and Target:DebuffRemains(S.JadefireBrandDebuff) < 3) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp default_st 16"; end
   end
   -- rising_sun_kick,if=buff.pressure_point.up|debuff.skyreach_exhaustion.remains>55
   if S.RisingSunKick:IsReady() and (Player:BuffUp(S.PressurePointBuff) or Target:DebuffRemains(S.SkyreachExhaustionDebuff) > 55) then
@@ -1961,9 +1961,9 @@ local function Fallthru()
   if S.CracklingJadeLightning:IsReady() and (Player:BuffStack(S.TheEmperorsCapacitorBuff) > 19 and EnergyTimeToMaxRounded() > S.CracklingJadeLightning:ExecuteTime() - 1 and S.RisingSunKick:CooldownRemains() > S.CracklingJadeLightning:ExecuteTime() or Player:BuffStack(S.TheEmperorsCapacitorBuff) > 14 and (S.Serenity:CooldownRemains() < 5 and S.Serenity:IsAvailable() or FightRemains < 5)) then
     if Cast(S.CracklingJadeLightning, nil, nil, not Target:IsSpellInRange(S.CracklingJadeLightning)) then return "crackling_jade_lightning fallthru 2"; end
   end
-  -- faeline_stomp,if=combo_strike
-  if S.FaelineStomp:IsCastable() and (ComboStrike(S.FaelineStomp)) then
-    if Cast(S.FaelineStomp, nil, nil, not Target:IsInRange(30)) then return "faeline_stomp fallthru 4"; end
+  -- jadefire_stomp,if=combo_strike
+  if S.JadefireStomp:IsCastable() and (ComboStrike(S.JadefireStomp)) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp fallthru 4"; end
   end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains+(debuff.skyreach_exhaustion.up*20),if=combo_strike&chi.max-chi>=(2+buff.power_strikes.up)
   if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= (2 + num(Player:BuffUp(S.PowerStrikesBuff)))) then
@@ -2204,9 +2204,9 @@ local function APL()
     if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
-    -- faeline_stomp,target_if=min:debuff.fae_exposure_damage.remains,if=combo_strike&talent.faeline_harmony&debuff.fae_exposure_damage.remains<1
-    if S.FaelineStomp:IsCastable() and (ComboStrike(S.FaelineStomp) and S.FaelineHarmony:IsAvailable()) then
-      if Everyone.CastTargetIf(S.FaelineStomp, Enemies8y, "min", EvaluateTargetIfFilterFaeExposure, EvaluateTargetIfFaelineStomp, not Target:IsInRange(30)) then return "faeline_stomp main 8"; end
+    -- jadefire_stomp,target_if=min:debuff.jadefire_brand_damage.remains,if=combo_strike&talent.jadefire_harmony&debuff.jadefire_brand_damage.remains<1
+    if S.JadefireStomp:IsCastable() and (ComboStrike(S.JadefireStomp) and S.JadefireHarmony:IsAvailable()) then
+      if Everyone.CastTargetIf(S.JadefireStomp, Enemies8y, "min", EvaluateTargetIfFilterFaeExposure, EvaluateTargetIfJadefireStomp, not Target:IsInRange(30)) then return "jadefire_stomp main 8"; end
     end
     -- bonedust_brew,if=active_enemies=1&!debuff.skyreach_exhaustion.remains&(pet.xuen_the_white_tiger.active|cooldown.xuen_the_white_tiger.remains)
     if S.BonedustBrew:IsCastable() and (EnemiesCount8y == 1 and Target:DebuffDown(S.SkyreachExhaustionDebuff) and (XuenActive or S.InvokeXuenTheWhiteTiger:CooldownDown())) then
@@ -2220,8 +2220,8 @@ local function APL()
     if S.TigerPalm:IsReady() and (Player:BuffDown(S.SerenityBuff) and Player:BuffStack(S.TeachingsoftheMonasteryBuff) < 3 and ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= (2 + num(Player:BuffUp(S.PowerStrikesBuff))) and (not S.InvokeXuenTheWhiteTiger:IsAvailable() and not S.Serenity:IsAvailable() or ((not S.Skyreach:IsAvailable() and not S.Skytouch:IsAvailable()) or HL.CombatTime() > 5 or XuenActive)) and not VarHoldTPRSK and (EnemiesCount8y > 1 or not S.BonedustBrew:IsAvailable() or S.BonedustBrew:IsAvailable() and EnemiesCount8y == 1 and S.BonedustBrew:CooldownDown())) then
       if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane101, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm main 12"; end
     end
-    -- chi_burst,if=talent.faeline_stomp&cooldown.faeline_stomp.remains&(chi.max-chi>=1&active_enemies=1|chi.max-chi>=2&active_enemies>=2)&!talent.faeline_harmony
-    if S.ChiBurst:IsCastable() and (S.FaelineStomp:IsAvailable() and S.FaelineStomp:CooldownDown() and (Player:ChiDeficit() >= 1 and EnemiesCount8y == 1 or Player:ChiDeficit() >= 2 and EnemiesCount8y >= 2) and not S.FaelineHarmony:IsAvailable()) then
+    -- chi_burst,if=talent.jadefire_stomp&cooldown.jadefire_stomp.remains&(chi.max-chi>=1&active_enemies=1|chi.max-chi>=2&active_enemies>=2)&!talent.jadefire_harmony
+    if S.ChiBurst:IsCastable() and (S.JadefireStomp:IsAvailable() and S.JadefireStomp:CooldownDown() and (Player:ChiDeficit() >= 1 and EnemiesCount8y == 1 or Player:ChiDeficit() >= 2 and EnemiesCount8y >= 2) and not S.JadefireHarmony:IsAvailable()) then
       if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst main 14"; end
     end
     -- call_action_list,name=cd_sef,if=!talent.serenity
