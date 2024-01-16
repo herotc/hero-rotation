@@ -92,6 +92,7 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   ArcaneOrb                             = Spell(153626), --Splash, 16
   ArcanePower                           = Spell(321739),
   ArcaneSurge                           = Spell(365350),
+  ArcingCleave                          = Spell(231564),
   CascadingPower                        = Spell(384276),
   ChargedOrb                            = Spell(384651),
   ConjureManaGem                        = Spell(759),

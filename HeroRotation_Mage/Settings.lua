@@ -89,12 +89,13 @@ HR.GUISettings.APL.Mage = {
     }
   },
   Arcane = {
-    MirrorImagesBeforePull = true,
     AEMainIcon = false,
+    MirrorImagesBeforePull = true,
     PotionType = {
       Selected = "Power",
     },
-    Enabled={
+    Enabled = {
+      ArcaneMissilesInterrupts = true,
       ManaGem = true,
     },
     StayDistance = false,
