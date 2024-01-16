@@ -169,9 +169,9 @@ local function Execute()
   if CDsON() and S.Avatar:IsCastable() and (S.ColossusSmash:CooldownUp() or Target:DebuffUp(S.ColossusSmashDebuff) or FightRemains < 20) then
     if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar execute 8"; end
   end
-  -- spear_of_bastion,if=cooldown.colossus_smash.remains<=gcd"
-  if CDsON() and S.SpearofBastion:IsCastable() and (S.ColossusSmash:CooldownRemains() <= Player:GCD()) then
-    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion execute 10"; end
+  -- champions_spear,if=cooldown.colossus_smash.remains<=gcd"
+  if CDsON() and S.ChampionsSpear:IsCastable() and (S.ColossusSmash:CooldownRemains() <= Player:GCD()) then
+    if Cast(S.ChampionsSpear, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.ChampionsSpear)) then return "champions_spear execute 10"; end
   end
   -- warbreaker,if=raid_event.adds.in>22
   if CDsON() and S.Warbreaker:IsCastable() then
@@ -285,9 +285,9 @@ local function AoE()
   if CDsON() and S.ThunderousRoar:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or Target:DebuffUp(S.ColossusSmashDebuff) or Target:DebuffUp(S.DeepWoundsDebuff)) then
     if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar aoe 22"; end
   end
-  -- spear_of_bastion,if=buff.test_of_might.up|debuff.colossus_smash.up|dot.deep_wounds.remains
-  if CDsON() and S.SpearofBastion:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or Target:DebuffUp(S.ColossusSmashDebuff) or Target:DebuffUp(S.DeepWoundsDebuff)) then
-    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion aoe 24"; end
+  -- champions_spear,if=buff.test_of_might.up|debuff.colossus_smash.up|dot.deep_wounds.remains
+  if CDsON() and S.ChampionsSpear:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or Target:DebuffUp(S.ColossusSmashDebuff) or Target:DebuffUp(S.DeepWoundsDebuff)) then
+    if Cast(S.ChampionsSpear, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.ChampionsSpear)) then return "champions_spear aoe 24"; end
   end
   -- bladestorm,if=buff.hurricane.remains<3|!talent.hurricane
   if CDsON() and S.Bladestorm:IsCastable() and (Player:BuffRemains(S.HurricaneBuff) < 3 or not S.Hurricane:IsAvailable()) then
@@ -400,9 +400,9 @@ local function SingleTarget()
   if CDsON() and S.Bladestorm:IsCastable() and (S.Hurricane:IsAvailable() and (Player:BuffUp(S.TestofMightBuff) or not S.TestofMight:IsAvailable() and Target:DebuffUp(S.ColossusSmashDebuff)) and Player:BuffRemains(S.HurricaneBuff) < 2 or S.Unhinged:IsAvailable() and (Player:BuffUp(S.TestofMightBuff) or not S.TestofMight:IsAvailable() and Target:DebuffUp(S.ColossusSmashDebuff))) then
     if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm single_target 22"; end
   end
-  -- spear_of_bastion,if=buff.test_of_might.up|debuff.colossus_smash.up
-  if CDsON() and S.SpearofBastion:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or Target:DebuffUp(S.ColossusSmashDebuff)) then
-    if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.SpearofBastion)) then return "spear_of_bastion aoe 24"; end
+  -- champions_spear,if=buff.test_of_might.up|debuff.colossus_smash.up
+  if CDsON() and S.ChampionsSpear:IsCastable() and (Player:BuffUp(S.TestofMightBuff) or Target:DebuffUp(S.ColossusSmashDebuff)) then
+    if Cast(S.ChampionsSpear, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.ChampionsSpear)) then return "champions_spear aoe 24"; end
   end
   -- skullsplitter
   if S.Skullsplitter:IsCastable() then

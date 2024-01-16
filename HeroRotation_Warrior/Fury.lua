@@ -490,17 +490,17 @@ local function APL()
       if S.Avatar:IsCastable() and (S.TitansTorment:IsAvailable() and EnrageUp and Player:BuffDown(S.AvatarBuff) and S.OdynsFury:CooldownDown() or S.BerserkersTorment:IsAvailable() and EnrageUp and Player:BuffDown(S.AvatarBuff) or not S.TitansTorment:IsAvailable() and not S.BerserkersTorment:IsAvailable() and (Player:BuffUp(S.RecklessnessBuff) or FightRemains < 20)) then
         if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar main 20"; end
       end
-      -- recklessness,if=!raid_event.adds.exists&(talent.annihilator&cooldown.spear_of_bastion.remains<1|cooldown.avatar.remains>40|!talent.avatar|target.time_to_die<12)
-      if S.Recklessness:IsCastable() and (S.Annihilator:IsAvailable() and S.SpearofBastion:CooldownRemains() < 1 or S.Avatar:CooldownRemains() > 40 or not S.Avatar:IsAvailable() or FightRemains < 12) then
+      -- recklessness,if=!raid_event.adds.exists&(talent.annihilator&cooldown.champions_spear.remains<1|cooldown.avatar.remains>40|!talent.avatar|target.time_to_die<12)
+      if S.Recklessness:IsCastable() and (S.Annihilator:IsAvailable() and S.ChampionsSpear:CooldownRemains() < 1 or S.Avatar:CooldownRemains() > 40 or not S.Avatar:IsAvailable() or FightRemains < 12) then
         if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 22"; end
       end
       -- recklessness,if=!raid_event.adds.exists&!talent.annihilator|target.time_to_die<12
       if S.Recklessness:IsCastable() and (not S.Annihilator:IsAvailable() or FightRemains < 12) then
         if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 24"; end
       end
-      -- spear_of_bastion,if=buff.enrage.up&((buff.furious_bloodthirst.up&talent.titans_torment)|!talent.titans_torment|target.time_to_die<20|active_enemies>1|!set_bonus.tier31_2pc)&raid_event.adds.in>15
-      if S.SpearofBastion:IsCastable() and (EnrageUp and ((Player:BuffUp(S.FuriousBloodthirstBuff) and S.TitansTorment:IsAvailable()) or not S.TitansTorment:IsAvailable() or FightRemains < 20 or EnemiesMeleeCount > 1 or not Player:HasTier(31, 2))) then
-        if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "spear_of_bastion main 26"; end
+      -- champions_spear,if=buff.enrage.up&((buff.furious_bloodthirst.up&talent.titans_torment)|!talent.titans_torment|target.time_to_die<20|active_enemies>1|!set_bonus.tier31_2pc)&raid_event.adds.in>15
+      if S.ChampionsSpear:IsCastable() and (EnrageUp and ((Player:BuffUp(S.FuriousBloodthirstBuff) and S.TitansTorment:IsAvailable()) or not S.TitansTorment:IsAvailable() or FightRemains < 20 or EnemiesMeleeCount > 1 or not Player:HasTier(31, 2))) then
+        if Cast(S.ChampionsSpear, nil, Settings.Commons.DisplayStyle.Signature, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear main 26"; end
       end
     end
     -- run_action_list,name=multi_target,if=active_enemies>=2

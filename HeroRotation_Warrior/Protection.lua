@@ -357,10 +357,10 @@ local function APL()
       SuggestRageDump(30)
       if Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout main 28"; end
     end
-    -- spear_of_bastion
-    if CDsON() and S.SpearofBastion:IsCastable() then
+    -- champions_spear
+    if CDsON() and S.ChampionsSpear:IsCastable() then
       SuggestRageDump(20)
-      if Cast(S.SpearofBastion, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "spear_of_bastion main 30"; end
+      if Cast(S.ChampionsSpear, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "champions_spear main 30"; end
     end
     -- thunderous_roar
     if CDsON() and S.ThunderousRoar:IsCastable() then
