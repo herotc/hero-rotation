@@ -565,7 +565,7 @@ local function APL()
 end
 
 local function OnInit ()
-  HR.Print("Survival Hunter rotation has been updated for patch 10.2.0.")
+  HR.Print("Survival Hunter rotation has been updated for patch 10.2.5.")
 end
 
 HR.SetAPL(255, APL, OnInit)

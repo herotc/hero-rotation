@@ -521,7 +521,7 @@ end
 local function Init()
   S.MarkofFyralathDebuff:RegisterAuraTracking()
 
-  HR.Print("Fury Warrior rotation has been updated for patch 10.2.0.")
+  HR.Print("Fury Warrior rotation has been updated for patch 10.2.5.")
 end
 
 HR.SetAPL(72, APL, Init)

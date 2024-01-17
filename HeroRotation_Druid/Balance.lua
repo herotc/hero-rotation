@@ -664,7 +664,7 @@ local function APL()
 end
 
 local function OnInit()
-  HR.Print("Balance Druid rotation has been updated for patch 10.2.0.")
+  HR.Print("Balance Druid rotation has been updated for patch 10.2.5.")
 end
 
 HR.SetAPL(102, APL, OnInit)

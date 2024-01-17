@@ -756,7 +756,7 @@ end
 local function Init()
   S.MarkofFyralathDebuff:RegisterAuraTracking()
 
-  HR.Print("Frost Death Knight rotation has been updated for patch 10.2.0.")
+  HR.Print("Frost Death Knight rotation has been updated for patch 10.2.5.")
 end
 
 HR.SetAPL(251, APL, Init)

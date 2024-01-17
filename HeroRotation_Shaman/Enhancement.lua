@@ -728,7 +728,7 @@ end
 local function Init()
   S.FlameShockDebuff:RegisterAuraTracking()
 
-  HR.Print("Enhancement Shaman rotation has been updated for patch 10.2.0.")
+  HR.Print("Enhancement Shaman rotation has been updated for patch 10.2.5.")
 end
 
 HR.SetAPL(263, APL, Init)

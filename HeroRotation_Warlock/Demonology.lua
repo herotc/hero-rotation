@@ -608,7 +608,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Demonology Warlock rotation has been updated for patch 10.2.0.")
+  HR.Print("Demonology Warlock rotation has been updated for patch 10.2.5.")
 end
 
 HR.SetAPL(266, APL, Init)

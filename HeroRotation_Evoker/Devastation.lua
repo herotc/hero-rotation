@@ -559,7 +559,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Devastation Evoker rotation has been updated for patch 10.2.0.")
+  HR.Print("Devastation Evoker rotation has been updated for patch 10.2.5.")
 end
 
 HR.SetAPL(1467, APL, Init);

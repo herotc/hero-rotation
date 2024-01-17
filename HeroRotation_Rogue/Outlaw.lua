@@ -718,7 +718,7 @@ local function APL ()
 end
 
 local function Init ()
-  HR.Print("Outlaw Rogue rotation has been updated for patch 10.2.0.")
+  HR.Print("Outlaw Rogue rotation has been updated for patch 10.2.5.")
 end
 
 HR.SetAPL(260, APL, Init)
