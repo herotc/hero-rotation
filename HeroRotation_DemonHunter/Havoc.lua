@@ -241,11 +241,11 @@ end
 
 local function Cooldown()
   -- metamorphosis,if=(!talent.initiative|cooldown.vengeful_retreat.remains)&((!talent.demonic|prev_gcd.1.death_sweep|prev_gcd.2.death_sweep|prev_gcd.3.death_sweep)&cooldown.eye_beam.remains&(!talent.essence_break|debuff.essence_break.up)&buff.fel_barrage.down&(raid_event.adds.in>40|(raid_event.adds.remains>8|!talent.fel_barrage)&active_enemies>2)|!talent.chaotic_transformation|fight_remains<30)
-  if CDsON() and S.Metamorphosis:IsCastable() and ((not S.Initiative:IsAvailable() or S.VengefulRetreat:CooldownDown()) and ((not S.Demonic:IsAvailable() or Player:PrevGCDP(1, S.DeathSweep) or Player:PrevGCDP(2, S.DeathSweep) or Player:PrevGCDP(3, S.DeathSweep)) and S.EyeBeam:CooldownDown() and (not S.EssenceBreak:IsAvailable() or Target:DebuffUp(S.EssenceBreakDebuff)) and Player:BuffDown(S.FelBarrage) or not S.ChaoticTransformation:IsAvailable() or FightRemains < 30)) then
+  if CDsON() and S.Metamorphosis:IsCastable() and ((not S.Initiative:IsAvailable() or S.VengefulRetreat:CooldownDown()) and ((not S.Demonic:IsAvailable() or Player:PrevGCDP(1, S.DeathSweep) or Player:PrevGCDP(2, S.DeathSweep) or Player:PrevGCDP(3, S.DeathSweep)) and S.EyeBeam:CooldownDown() and (not S.EssenceBreak:IsAvailable() or Target:DebuffUp(S.EssenceBreakDebuff)) and Player:BuffDown(S.FelBarrage) or not S.ChaoticTransformation:IsAvailable() or BossFightRemains < 30)) then
     if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis, not Target:IsInRange(40)) then return "metamorphosis cooldown 2"; end
   end
   -- potion,if=fight_remains<35|buff.metamorphosis.up
-  if Settings.Commons.Enabled.Potions and (FightRemains < 35 or Player:BuffUp(S.MetamorphosisBuff)) then
+  if Settings.Commons.Enabled.Potions and (BossFightRemains < 35 or Player:BuffUp(S.MetamorphosisBuff)) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
       if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldown 4"; end
@@ -254,16 +254,16 @@ local function Cooldown()
   if Settings.Commons.Enabled.Trinkets then
     local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
     -- use_item,slot=trinket1,use_off_gcd=1,if=((cooldown.eye_beam.remains<gcd.max&active_enemies>1|buff.metamorphosis.up)&(raid_event.adds.in>trinket.1.cooldown.duration-15|raid_event.adds.remains>8)|!trinket.1.has_buff.any|fight_remains<25)&(!equipped.witherbarks_branch|trinket.2.cooldown.remains>20)&time>0
-    if Trinket1ToUse and (((S.EyeBeam:CooldownRemains() < GCDMax and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket1:HasUseBuff() or FightRemains < 25) and (not I.WitherbarksBranch:IsEquipped() or Trinket2:CooldownRemains() > 20)) then
+    if Trinket1ToUse and (((S.EyeBeam:CooldownRemains() < GCDMax and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket1:HasUseBuff() or BossFightRemains < 25) and (not I.WitherbarksBranch:IsEquipped() or Trinket2:CooldownRemains() > 20)) then
       if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 cooldown 6"; end
     end
     local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
     -- use_item,slot=trinket2,use_off_gcd=1,if=((cooldown.eye_beam.remains<gcd.max&active_enemies>1|buff.metamorphosis.up)&(raid_event.adds.in>trinket.2.cooldown.duration-15|raid_event.adds.remains>8)|!trinket.2.has_buff.any|fight_remains<25)&(!equipped.witherbarks_branch|trinket.1.cooldown.remains>20)&time>0
-    if Trinket2ToUse and (((S.EyeBeam:CooldownRemains() < GCDMax and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket2:HasUseBuff() or FightRemains < 25) and (not I.WitherbarksBranch:IsEquipped() or Trinket1:CooldownRemains() > 20)) then
+    if Trinket2ToUse and (((S.EyeBeam:CooldownRemains() < GCDMax and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket2:HasUseBuff() or BossFightRemains < 25) and (not I.WitherbarksBranch:IsEquipped() or Trinket1:CooldownRemains() > 20)) then
       if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 cooldown 8"; end
     end
     -- use_item,name=witherbarks_branch,if=(talent.essence_break&cooldown.essence_break.remains<gcd.max|!talent.essence_break)&(active_enemies+3>=desired_targets+raid_event.adds.count|raid_event.adds.in>105)|fight_remains<25
-    if I.WitherbarksBranch:IsEquippedAndReady() and ((S.EssenceBreak:IsAvailable() and S.EssenceBreak:CooldownRemains() < GCDMax or not S.EssenceBreak:IsAvailable()) or FightRemains < 25) then
+    if I.WitherbarksBranch:IsEquippedAndReady() and ((S.EssenceBreak:IsAvailable() and S.EssenceBreak:CooldownRemains() < GCDMax or not S.EssenceBreak:IsAvailable()) or BossFightRemains < 25) then
       if Cast(I.WitherbarksBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "witherbarks_branch cooldown 10"; end
     end
   end
