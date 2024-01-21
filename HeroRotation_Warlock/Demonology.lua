@@ -48,7 +48,7 @@ local Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
 -- Rotation Var
 local BossFightRemains = 11111
 local FightRemains = 11111
-local VarNextTyrant = 0
+local VarNextTyrant = 14 + num(S.GrimoireFelguard:IsAvailable()) + num(S.SummonVilefiend:IsAvailable())
 local VarPetExpire = 0
 local VarNP = false
 local VarImpl = false
@@ -57,7 +57,7 @@ local VarShadowTimings = 0
 local VarTyrantTimings = 0
 local VarTyrantSync = 0
 local VarTyrantCD = 120
-local VarTyrantPrepStart = 0
+local VarTyrantPrepStart = 12
 local SoulShards = 0
 local CombatTime = 0
 local GCDMax = 0
@@ -92,6 +92,7 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
   S.HandofGuldan:RegisterInFlight()
+  VarNextTyrant = 14 + num(S.GrimoireFelguard:IsAvailable()) + num(S.SummonVilefiend:IsAvailable())
 end, "LEARNED_SPELL_IN_TAB")
 S.HandofGuldan:RegisterInFlight()
 
@@ -197,8 +198,8 @@ local function Precombat()
   if Settings.Demonology.PISource == "Shadow" then
     VarShadowTimings = 1
   end
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_buff.intellect|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit|trinket.1.is.mirror_of_fractured_tomorrows|trinket.1.is.spoils_of_neltharus
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_buff.intellect|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit|trinket.2.is.mirror_of_fractured_tomorrows|trinket.2.is.spoils_of_neltharus
+  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff
+  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff
   -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon|trinket.1.is.timethiefs_gambit
   -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon|trinket.2.is.timethiefs_gambit
   -- variable,name=trinket_1_manual,value=trinket.1.is.nymues_unraveling_spindle
