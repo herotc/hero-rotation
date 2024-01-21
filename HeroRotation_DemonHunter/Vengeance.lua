@@ -171,8 +171,8 @@ local function Maintenance()
   if S.SpiritBomb:IsReady() and (VarCanSpB) then
     if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb maintenance 10"; end
   end
-  -- felblade,if=(fury.deficit>=40&active_enemies=1)|((cooldown.fel_devastation.remains<=(execute_time+gcd.remains))&fury<50)
-  if S.Felblade:IsReady() and ((Player:FuryDeficit() >= 40 and EnemiesCount8yMelee == 1) or ((S.FelDevastation:CooldownRemains() <= (S.Felblade:ExecuteTime() + Player:GCDRemains())) and Player:Fury() < 50)) then
+  -- felblade,if=((!talent.spirit_bomb|active_enemies=1)&fury.deficit>=40)|((cooldown.fel_devastation.remains<=(execute_time+gcd.remains))&fury<50)
+  if S.Felblade:IsReady() and (((not S.SpiritBomb:IsAvailable() or EnemiesCount8yMelee ==1) and Player:FuryDeficit() >= 40) or ((S.FelDevastation:CooldownRemains() <= (S.Felblade:ExecuteTime() + Player:GCDRemains())) and Player:Fury() < 50)) then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade maintenance 12"; end
   end
   -- fracture,if=(cooldown.fel_devastation.remains<=(execute_time+gcd.remains))&fury<50
@@ -206,8 +206,8 @@ local function FieryDemise()
   if S.SigilofFlame:IsCastable() and (S.AscendingFlame:IsAvailable() or S.SigilofFlameDebuff:AuraActiveCount() == 0) then
     if Cast(S.SigilofFlame, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame fiery_demise 4"; end
   end
-  -- felblade,if=(cooldown.fel_devastation.remains<=(execute_time+gcd.remains))&fury<50
-  if S.Felblade:IsReady() and ((S.FelDevastation:CooldownRemains() <= (S.Felblade:ExecuteTime() + Player:GCDRemains())) and Player:Fury() < 50) then
+  -- felblade,if=(!talent.spirit_bomb|(cooldown.fel_devastation.remains<=(execute_time+gcd.remains)))&fury<50
+  if S.Felblade:IsReady() and ((not S.SpiritBomb:IsAvailable() or (S.FelDevastation:CooldownRemains() <= (S.Felblade:ExecuteTime() + Player:GCDRemains()))) and Player:Fury() < 50) then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade fiery_demise 6"; end
   end
   -- fel_devastation
@@ -252,9 +252,13 @@ local function Filler()
   if S.Felblade:IsReady() then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade filler 8"; end
   end
+  -- shear
+  if S.Shear:IsCastable() then
+    if Cast(S.Shear, nil, nil, not IsInMeleeRange) then return "shear filler 10"; end
+  end
   -- throw_glaive
   if S.ThrowGlaive:IsCastable() then
-    if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive filler 10"; end
+    if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive filler 12"; end
   end
 end
 
@@ -287,10 +291,6 @@ local function SingleTarget()
   if S.Fracture:IsCastable() then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture single_target 14"; end
   end
-  -- shear
-  if S.Shear:IsCastable() then
-    if Cast(S.Shear, nil, nil, not IsInMeleeRange) then return "shear single_target 16"; end
-  end
   -- call_action_list,name=filler
   local ShouldReturn = Filler(); if ShouldReturn then return ShouldReturn; end
 end
@@ -316,17 +316,13 @@ local function SmallAoE()
   if S.SoulCarver:IsCastable() and (TotalSoulFragments < 3) then
     if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver small_aoe 10"; end
   end
-  -- soul_cleave,if=soul_fragments<=1&!variable.dont_cleave
-  if S.SoulCleave:IsReady() and (SoulFragments <= 1 and not VarDontCleave) then
+  -- soul_cleave,if=(soul_fragments<=1|!talent.spirit_bomb)&!variable.dont_cleave
+  if S.SoulCleave:IsReady() and ((SoulFragments <= 1 or not S.SpiritBomb:IsAvailable()) and not VarDontCleave) then
     if Cast(S.SoulCleave, nil, nil, not IsInMeleeRange) then return "soul_cleave small_aoe 14"; end
   end
   -- fracture
   if S.Fracture:IsCastable() then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture small_aoe 16"; end
-  end
-  -- shear
-  if S.Shear:IsCastable() then
-    if Cast(S.Shear, nil, nil, not IsInMeleeRange) then return "shear small_aoe 18"; end
   end
   -- call_action_list,name=filler
   local ShouldReturn = Filler(); if ShouldReturn then return ShouldReturn; end
@@ -361,13 +357,13 @@ local function BigAoE()
   if S.SpiritBomb:IsReady() and (SoulFragments >= 4) then
     if Cast(S.SpiritBomb, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_bomb big_aoe 12"; end
   end
+  -- soul_cleave,if=!talent.spirit_bomb&!variable.dont_cleave
+  if S.SoulCleave:IsReady() and (not S.SpiritBomb:IsAvailable() or not VarDontCleave) then
+    if Cast(S.SoulCleave, nil, nil, not IsInMeleeRange) then return "soul_cleave big_aoe 14"; end
+  end
   -- fracture
   if S.Fracture:IsCastable() then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture big_aoe 14"; end
-  end
-  -- shear
-  if S.Shear:IsCastable() then
-    if Cast(S.Shear, nil, nil, not IsInMeleeRange) then return "shear big_aoe 16"; end
+    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture big_aoe 16"; end
   end
   -- soul_cleave,if=!variable.dont_cleave
   if S.SoulCleave:IsReady() and (not VarDontCleave) then
@@ -455,8 +451,8 @@ local function APL()
     end
     -- demon_spikes,use_off_gcd=1,if=!buff.demon_spikes.up&!cooldown.pause_action.remains
     -- Note: Handled via Defensives()
-    -- metamorphosis,use_off_gcd=1,if=!buff.metamorphosis.up
-    if S.Metamorphosis:IsCastable() and (Player:BuffDown(S.MetamorphosisBuff)) then
+    -- metamorphosis,use_off_gcd=1,if=!buff.metamorphosis.up&cooldown.fel_devastation.remains>12
+    if S.Metamorphosis:IsCastable() and (Player:BuffDown(S.MetamorphosisBuff) and S.FelDevastation:CooldownRemains() > 12) then
       if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis) then return "metamorphosis main 4"; end
     end
     -- potion,use_off_gcd=1
