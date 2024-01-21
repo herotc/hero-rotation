@@ -76,7 +76,7 @@ local VarTrinket1Exclude = Trinket1ID == I.RubyWhelpShell:ID() or Trinket1ID == 
 local VarTrinket2Exclude = Trinket2ID == I.RubyWhelpShell:ID() or Trinket2ID == I.WhisperingIncarnateIcon:ID()
 local VarTrinket1BuffDuration = Trinket1:BuffDuration() + (num(Trinket1ID == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket1ID == I.NymuesUnravelingSpindle:ID()) * 2)
 local VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(Trinket2ID == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket2ID == I.NymuesUnravelingSpindle:ID()) * 2)
-local VarTrinketPriority = (not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (num(VarTrinket2Sync)) * (1 - 0.5 * num(Trinket2ID == I.MirrorofFracturedTomorrows:ID() or Trinket2ID == I.AshesoftheEmbersoul:ID()))) > ((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (num(VarTrinket1Sync)) * (1 - 0.5 * num(Trinket1ID == I.MirrorofFracturedTomorrows:ID() or Trinket1ID == I.AshesoftheEmbersoul:ID())))) and 2 or 1
+local VarTrinketPriority = (not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2ID == I.MirrorofFracturedTomorrows:ID() or Trinket2ID == I.AshesoftheEmbersoul:ID()))) > ((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1ID == I.MirrorofFracturedTomorrows:ID() or Trinket1ID == I.AshesoftheEmbersoul:ID())))) and 2 or 1
 
 -- Register
 HL:RegisterForEvent(function()
@@ -107,7 +107,7 @@ HL:RegisterForEvent(function()
   VarTrinket2Exclude = Trinket2ID == I.RubyWhelpShell:ID() or Trinket2ID == I.WhisperingIncarnateIcon:ID()
   VarTrinket1BuffDuration = Trinket1:BuffDuration() + (num(Trinket1ID == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket1ID == I.NymuesUnravelingSpindle:ID()) * 2)
   VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(Trinket2ID == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket2ID == I.NymuesUnravelingSpindle:ID()) * 2)
-  VarTrinketPriority = (not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (num(VarTrinket2Sync)) * (1 - 0.5 * num(Trinket2ID == I.MirrorofFracturedTomorrows:ID() or Trinket2ID == I.AshesoftheEmbersoul:ID()))) > ((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (num(VarTrinket1Sync)) * (1 - 0.5 * num(Trinket1ID == I.MirrorofFracturedTomorrows:ID() or Trinket1ID == I.AshesoftheEmbersoul:ID())))) and 2 or 1
+  VarTrinketPriority = (not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2ID == I.MirrorofFracturedTomorrows:ID() or Trinket2ID == I.AshesoftheEmbersoul:ID()))) > ((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1ID == I.MirrorofFracturedTomorrows:ID() or Trinket1ID == I.AshesoftheEmbersoul:ID())))) and 2 or 1
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
