@@ -193,6 +193,7 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Commons = {
   -- Trinkets
+  AshesoftheEmbersoul                   = Item(207167, {13, 14}),
   BeacontotheBeyond                     = Item(203963, {13, 14}),
   BelorrelostheSuncaller                = Item(207172, {13, 14}),
   ConjuredChillglobe                    = Item(194300, {13, 14}),
@@ -200,13 +201,16 @@ Item.Warlock.Commons = {
   EruptingSpearFragment                 = Item(193769, {13, 14}),
   IcebloodDeathsnare                    = Item(194304, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
+  MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
   NeltharionsCallToDominance            = Item(204202, {13, 14}),
   NymuesUnravelingSpindle               = Item(208615, {13, 14}),
   RotcrustedVoodooDoll                  = Item(159624, {13, 14}),
+  RubyWhelpShell                        = Item(193757, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   TimeThiefsGambit                      = Item(207579, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
   VoidmendersShadowgem                  = Item(110007, {13, 14}),
+  WhisperingIncarnateIcon               = Item(194301, {13, 14}),
   -- Other Items
   Iridal                                = Item(208321, {16}),
 }
