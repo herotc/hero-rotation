@@ -71,11 +71,40 @@ local SoulShards = 0
 local BossFightRemains = 11111
 local FightRemains = 11111
 
+-- Trinket Variables
+local Trinket1ID = Trinket1:ID()
+local Trinket2ID = Trinket2:ID()
+local VarTrinket1Buffs = Trinket1:HasUseBuff()
+local VarTrinket2Buffs = Trinket2:HasUseBuff()
+local VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 120 == 0 or 120 % Trinket1:Cooldown() == 0)) and 1 or 0.5
+local VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 120 == 0 or 120 % Trinket2:Cooldown() == 0)) and 1 or 0.5
+local VarTrinket1Manual = Trinket1ID == I.BelorrelostheSuncaller:ID() or Trinket1ID == I.NymuesUnravelingSpindle:ID() or Trinket1ID == I.TimeThiefsGambit:ID()
+local VarTrinket2Manual = Trinket2ID == I.BelorrelostheSuncaller:ID() or Trinket2ID == I.NymuesUnravelingSpindle:ID() or Trinket2ID == I.TimeThiefsGambit:ID()
+local VarTrinket1Exclude = Trinket1ID == I.RubyWhelpShell:ID() or Trinket1ID == I.WhisperingIncarnateIcon:ID()
+local VarTrinket2Exclude = Trinket2ID == I.RubyWhelpShell:ID() or Trinket2ID == I.WhisperingIncarnateIcon:ID()
+local VarTrinket1BuffDuration = Trinket1:BuffDuration() + (num(Trinket1ID == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket1ID == I.NymuesUnravelingSpindle:ID()) * 2)
+local VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(Trinket2ID == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket2ID == I.NymuesUnravelingSpindle:ID()) * 2)
+local VarTrinketPriority = (not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2ID == I.MirrorofFracturedTomorrows:ID()))) > ((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket2ID == I.MirrorofFracturedTomorrows:ID())))) and 2 or 1
+
 -- Event Registrations
 HL:RegisterForEvent(function()
   Equip = Player:GetEquipment()
   Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
   Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
+  -- Trinket stuffs on item change
+  Trinket1ID = Trinket1:ID()
+  Trinket2ID = Trinket2:ID()
+  VarTrinket1Buffs = Trinket1:HasUseBuff()
+  VarTrinket2Buffs = Trinket2:HasUseBuff()
+  VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 120 == 0 or 120 % Trinket1:Cooldown() == 0)) and 1 or 0.5
+  VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 120 == 0 or 120 % Trinket2:Cooldown() == 0)) and 1 or 0.5
+  VarTrinket1Manual = Trinket1ID == I.BelorrelostheSuncaller:ID() or Trinket1ID == I.NymuesUnravelingSpindle:ID() or Trinket1ID == I.TimeThiefsGambit:ID()
+  VarTrinket2Manual = Trinket2ID == I.BelorrelostheSuncaller:ID() or Trinket2ID == I.NymuesUnravelingSpindle:ID() or Trinket2ID == I.TimeThiefsGambit:ID()
+  VarTrinket1Exclude = Trinket1ID == I.RubyWhelpShell:ID() or Trinket1ID == I.WhisperingIncarnateIcon:ID()
+  VarTrinket2Exclude = Trinket2ID == I.RubyWhelpShell:ID() or Trinket2ID == I.WhisperingIncarnateIcon:ID()
+  VarTrinket1BuffDuration = Trinket1:BuffDuration() + (num(Trinket1ID == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket1ID == I.NymuesUnravelingSpindle:ID()) * 2)
+  VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(Trinket2ID == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket2ID == I.NymuesUnravelingSpindle:ID()) * 2)
+  VarTrinketPriority = (not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2ID == I.MirrorofFracturedTomorrows:ID()))) > ((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket2ID == I.MirrorofFracturedTomorrows:ID())))) and 2 or 1
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -169,8 +198,8 @@ local function Precombat()
   -- Moved to APL()
   -- variable,name=cleave_apl,default=0,op=reset
   VarCleaveAPL = false
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_buff.intellect|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit|trinket.1.is.mirror_of_fractured_tomorrows|trinket.1.is.spoils_of_neltharus|trinket.1.is.nymues_unraveling_spindle
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_buff.intellect|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit|trinket.2.is.mirror_of_fractured_tomorrows|trinket.2.is.spoils_of_neltharus|trinket.2.is.nymues_unraveling_spindle
+  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff
+  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff
   -- variable,name=trinket_1_buffs_print,op=print,value=variable.trinket_1_buffs
   -- variable,name=trinket_2_buffs_print,op=print,value=variable.trinket_2_buffs
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_1_buffs&(trinket.1.cooldown.duration%%cooldown.summon_infernal.duration=0|cooldown.summon_infernal.duration%%trinket.1.cooldown.duration=0)
@@ -182,7 +211,7 @@ local function Precombat()
   -- variable,name=trinket_1_buff_duration,value=trinket.1.proc.any_dps.duration+(trinket.1.is.mirror_of_fractured_tomorrows*20)+(trinket.1.is.nymues_unraveling_spindle*2)
   -- variable,name=trinket_2_buff_duration,value=trinket.2.proc.any_dps.duration+(trinket.2.is.mirror_of_fractured_tomorrows*20)+(trinket.2.is.nymues_unraveling_spindle*2)
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%variable.trinket_2_buff_duration)*(1+0.5*trinket.2.has_buff.intellect)*(variable.trinket_2_sync)*(1-0.5*trinket.2.is.mirror_of_fractured_tomorrows))>((trinket.1.cooldown.duration%variable.trinket_1_buff_duration)*(1+0.5*trinket.1.has_buff.intellect)*(variable.trinket_1_sync)*(1-0.5*trinket.1.is.mirror_of_fractured_tomorrows))
-  -- Note: Can't handle some of the above trinket conditions.
+  -- Note: Trinket variables moved to variable declarations and PLAYER_EQUIPMENT_CHANGED registration.
   -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
   if S.GrimoireofSacrifice:IsReady() then
     if Cast(S.GrimoireofSacrifice, Settings.Destruction.GCDasOffGCD.GrimoireOfSacrifice) then return "grimoire_of_sacrifice precombat 2"; end
@@ -206,39 +235,41 @@ local function Items()
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,use_off_gcd=1,name=belorrelos_the_suncaller,if=((time>20&cooldown.summon_infernal.remains>20)|(trinket.1.is.belorrelos_the_suncaller&(trinket.2.cooldown.remains|!variable.trinket_2_buffs|trinket.1.is.time_thiefs_gambit))|(trinket.2.is.belorrelos_the_suncaller&(trinket.1.cooldown.remains|!variable.trinket_1_buffs|trinket.2.is.time_thiefs_gambit)))&(!raid_event.adds.exists|raid_event.adds.up|spell_targets.belorrelos_the_suncaller>=5)|fight_remains<20
     -- Note: (trinket.1.is.belorrelos_the_suncaller&(trinket.2.cooldown.remains|!variable.trinket_2_buffs|trinket.1.is.time_thiefs_gambit)) checks to see if trinket.1 is both belorrelos_the_suncaller and time_thiefs_gambit. Making a simplified version.
-    if I.BelorrelostheSuncaller:IsEquippedAndReady() and (((HL.CombatTime() > 20 and S.SummonInfernal:CooldownRemains() > 20) or (Trinket1:ID() == I.BelorrelostheSuncaller:ID() and (Trinket2:CooldownDown() or Trinket2:Cooldown() == 0)) or (Trinket2:ID() == I.BelorrelostheSuncaller:ID() and (Trinket1:CooldownDown() or Trinket1:Cooldown() == 0))) or FightRemains < 20) then
+    if I.BelorrelostheSuncaller:IsEquippedAndReady() and (((HL.CombatTime() > 20 and S.SummonInfernal:CooldownRemains() > 20) or (Trinket1ID == I.BelorrelostheSuncaller:ID() and (Trinket2:CooldownDown() or Trinket2:Cooldown() == 0)) or (Trinket2ID == I.BelorrelostheSuncaller:ID() and (Trinket1:CooldownDown() or Trinket1:Cooldown() == 0))) or FightRemains < 20) then
       if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller items 2"; end
     end
     -- use_item,use_off_gcd=1,name=nymues_unraveling_spindle,if=(variable.infernal_active|!talent.summon_infernal|(variable.trinket_1_will_lose_cast&trinket.1.is.nymues_unraveling_spindle)|(variable.trinket_2_will_lose_cast&trinket.2.is.nymues_unraveling_spindle))|fight_remains<20
-    if I.NymuesUnravelingSpindle:IsEquippedAndReady() and ((VarInfernalActive or not S.SummonInfernal:IsAvailable() or (VarT1WillLoseCast and Trinket1:ID() == I.NymuesUnravelingSpindle:ID()) or (VarT2WillLoseCast and Trinket2:ID() == I.NymuesUnravelingSpindle:ID())) or FightRemains < 20) then
+    if I.NymuesUnravelingSpindle:IsEquippedAndReady() and ((VarInfernalActive or not S.SummonInfernal:IsAvailable() or (VarT1WillLoseCast and Trinket1ID == I.NymuesUnravelingSpindle:ID()) or (VarT2WillLoseCast and Trinket2ID == I.NymuesUnravelingSpindle:ID())) or FightRemains < 20) then
       if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle items 4"; end
     end
-    -- use_item,slot=trinket1,if=(variable.infernal_active|!talent.summon_infernal|variable.trinket_1_will_lose_cast)&(variable.trinket_priority=1|variable.trinket_2_exclude|!trinket.2.has_cooldown|(trinket.2.cooldown.remains|variable.trinket_priority=2&cooldown.summon_infernal.remains>20&!variable.infernal_active&trinket.2.cooldown.remains<cooldown.summon_infernal.remains))&variable.trinket_1_buffs&!variable.trinket_1_manual|(variable.trinket_1_buff_duration+1>=fight_remains)", "We want to use trinkets with Infernal unless we will miss a trinket use. The trinket with highest estimated value, will be used first.
+    local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
+    local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
+    -- use_item,slot=trinket1,if=(variable.infernal_active|!talent.summon_infernal|variable.trinket_1_will_lose_cast)&(variable.trinket_priority=1|variable.trinket_2_exclude|!trinket.2.has_cooldown|(trinket.2.cooldown.remains|variable.trinket_priority=2&cooldown.summon_infernal.remains>20&!variable.infernal_active&trinket.2.cooldown.remains<cooldown.summon_infernal.remains))&variable.trinket_1_buffs&!variable.trinket_1_manual|(variable.trinket_1_buff_duration+1>=fight_remains)
+    if Trinket1ToUse and ((VarInfernalActive or not S.SummonInfernal:IsAvailable() or VarT1WillLoseCast) and (VarTrinketPriority == 1 or VarTrinket2Exclude or not Trinket2:HasCooldown() or (Trinket2:CooldownDown() or VarTrinketPriority == 2 and S.SummonInfernal:CooldownRemains() > 20 and not VarInfernalActive and Trinket2:CooldownRemains() < S.SummonInfernal:CooldownRemains())) and VarTrinket1Buffs and not VarTrinket1Manual or (VarTrinket1BuffDuration + 1 >= BossFightRemains)) then
+      if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 6"; end
+    end
     -- use_item,slot=trinket2,if=(variable.infernal_active|!talent.summon_infernal|variable.trinket_2_will_lose_cast)&(variable.trinket_priority=2|variable.trinket_1_exclude|!trinket.1.has_cooldown|(trinket.1.cooldown.remains|variable.trinket_priority=1&cooldown.summon_infernal.remains>20&!variable.infernal_active&trinket.1.cooldown.remains<cooldown.summon_infernal.remains))&variable.trinket_2_buffs&!variable.trinket_2_manual|(variable.trinket_2_buff_duration+1>=fight_remains)
+    if Trinket2ToUse and ((VarInfernalActive or not S.SummonInfernal:IsAvailable() or VarT2WillLoseCast) and (VarTrinketPriority == 2 or VarTrinket1Exclude or not Trinket1:HasCooldown() or (Trinket1:CooldownDown() or VarTrinketPriority == 1 and S.SummonInfernal:CooldownRemains() > 20 and not VarInfernalActive and Trinket1:CooldownRemains() < S.SummonInfernal:CooldownRemains())) and VarTrinket2Buffs and not VarTrinket2Manual or (VarTrinket2BuffDuration + 1 >= BossFightRemains)) then
+      if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 8"; end
+    end
     -- use_item,name=time_thiefs_gambit,if=variable.infernal_active|!talent.summon_infernal|fight_remains<15|((trinket.1.cooldown.duration<cooldown.summon_infernal.remains_expected+5)&active_enemies=1)|(active_enemies>1&havoc_active)
     if I.TimeThiefsGambit:IsEquippedAndReady() and (VarInfernalActive or not S.SummonInfernal:IsAvailable() or FightRemains < 15 or ((Trinket1:Cooldown() < S.SummonInfernal:CooldownRemains() + 5) and EnemiesCount8ySplash == 1) or (EnemiesCount8ySplash > 1 and VarHavocActive)) then
-      if Cast(I.TimeThiefsGambit, nil, Settings.Commons.DisplayStyle.Trinkets) then return "time_thiefs_gambit items 6"; end
+      if Cast(I.TimeThiefsGambit, nil, Settings.Commons.DisplayStyle.Trinkets) then return "time_thiefs_gambit items 10"; end
     end
-    -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|talent.summon_infernal&cooldown.summon_infernal.remains_expected>20|!talent.summon_infernal)", "If only one on use trinket provied a buff, use the other on cooldown, Or if neither trinket provied a buff, use both on cooldown.
+    -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|talent.summon_infernal&cooldown.summon_infernal.remains_expected>20|!talent.summon_infernal)
+    if Trinket1ToUse and (not VarTrinket1Buffs and not VarTrinket1Manual and (not VarTrinket1Buffs and (Trinket2:CooldownDown() or not VarTrinket2Buffs) or S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemains() > 20 or not S.SummonInfernal:IsAvailable())) then
+      if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 12"; end
+    end
     -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|talent.summon_infernal&cooldown.summon_infernal.remains_expected>20|!talent.summon_infernal)
+    if Trinket2ToUse and (not VarTrinket2Buffs and not VarTrinket2Manual and (not VarTrinket2Buffs and (Trinket1:CooldownDown() or not VarTrinket1Buffs) or S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemains() > 20 or not S.SummonInfernal:IsAvailable())) then
+      if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 14"; end
+    end
   end
   -- use_item,use_off_gcd=1,slot=main_hand
   if Settings.Commons.Enabled.Items then
     local MainHandOnUse, _, MainHandRange = Player:GetUseableItems(OnUseExcludes, 16)
     if MainHandOnUse and MainHandOnUse:IsReady() then
-      if Cast(MainHandOnUse, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(MainHandRange)) then return "main_hand (" .. MainHandOnUse:Name() .. ") items 8"; end
-    end
-  end
-  -- Note: As we can't handle a lot of the trinket conditions, here's a generic use_items
-  -- use_items,if=pet.infernal.active|!talent.summon_infernal|time_to_die<21
-  if (InfernalTime() > 0 or not S.SummonInfernal:IsAvailable() or FightRemains < 21) then
-    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-    if ItemToUse then
-      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
-      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
-        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
-      end
+      if Cast(MainHandOnUse, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(MainHandRange)) then return "main_hand (" .. MainHandOnUse:Name() .. ") items 16"; end
     end
   end
 end
