@@ -253,7 +253,8 @@ local function Bear()
   end
   -- maul,if=(((buff.incarnation.up|buff.berserk_bear.up)&active_enemies<=5&!talent.raze.enabled&(buff.tooth_and_claw.stack>=1))&variable.If_build=0)&cooldown.rage_of_the_sleeper.remains>3|(((buff.incarnation.up|buff.berserk_bear.up)&active_enemies=1&talent.raze.enabled&(buff.tooth_and_claw.stack>=1))&variable.If_build=0)&cooldown.rage_of_the_sleeper.remains>3|(((buff.incarnation.up|buff.berserk_bear.up)&active_enemies<=5&!talent.raze.enabled&(buff.tooth_and_claw.stack>=1))&variable.If_build=0)&buff.rage_of_the_sleeper.up|(((buff.incarnation.up|buff.berserk_bear.up)&active_enemies=1&talent.raze.enabled&(buff.tooth_and_claw.stack>=1))&variable.If_build=0)&buff.rage_of_the_sleeper.up
   -- Note: Simplified the if statement to: (buff.incarnation.up|buff.berserk_bear.up)&buff.tooth_and_claw.stack>=1&variable.If_build=0&(active_enemies<=5&!talent.raze.enabled|active_enemies=1&talent.raze.enabled)&(buff.rage_of_the_sleeper.up|cooldown.rage_of_the_sleeper.remains>3)
-  if S.Maul:IsReady() and not VarIFBuild and UseMaul and ((Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S.BerserkBuff)) and Player:BuffStack(S.ToothandClawBuff) >= 1 and (MeleeEnemies11yCount <= 5 and not S.Raze:IsAvailable() or MeleeEnemies11yCount == 1 and S.Raze:IsAvailable()) and (Player:BuffUp(S.RageoftheSleeper) or S.RageoftheSleeper:CooldownRemains() > 3)) then
+  -- Note: Added 'not IsTanking' to RotS conditions, as RotS doesn't get used while not actively tanking.
+  if S.Maul:IsReady() and not VarIFBuild and UseMaul and ((Player:BuffUp(S.IncarnationBuff) or Player:BuffUp(S.BerserkBuff)) and Player:BuffStack(S.ToothandClawBuff) >= 1 and (MeleeEnemies11yCount <= 5 and not S.Raze:IsAvailable() or MeleeEnemies11yCount == 1 and S.Raze:IsAvailable()) and (Player:BuffUp(S.RageoftheSleeper) or S.RageoftheSleeper:CooldownRemains() > 3 or not IsTanking)) then
     if Cast(S.Maul, nil, nil, not IsInMeleeRange) then return "maul bear 28"; end
   end
   -- raze,if=(buff.incarnation.up|buff.berserk_bear.up)&(variable.If_build=0)&active_enemies>1&cooldown.rage_of_the_sleeper.remains>3|(buff.incarnation.up|buff.berserk_bear.up)&(variable.If_build=0)&active_enemies>1&buff.rage_of_the_sleeper.up
@@ -289,13 +290,15 @@ local function Bear()
   -- maul,if=(buff.tooth_and_claw.up&active_enemies<=5&!talent.raze.enabled)&cooldown.rage_of_the_sleeper.remains>3|(buff.tooth_and_claw.up&active_enemies=1&talent.raze.enabled)&cooldown.rage_of_the_sleeper.remains>3|(buff.tooth_and_claw.up&active_enemies<=5&!talent.raze.enabled)&buff.rage_of_the_sleeper.up|(buff.tooth_and_claw.up&active_enemies=1&talent.raze.enabled)&buff.rage_of_the_sleeper.up
   -- Note: Simplified the if statement to:
   -- buff.tooth_and_claw.up&(active_enemies<=5&!talent.raze|active_enemies=1&talent.raze)&(buff.rage_of_the_sleeper.up|cooldown.rage_of_the_sleeper.remains>3)
-  if S.Maul:IsReady() and (Player:BuffUp(S.ToothandClawBuff) and (MeleeEnemies11yCount <= 5 and not S.Raze:IsAvailable() or MeleeEnemies11yCount == 1 and S.Raze:IsAvailable()) and (Player:BuffUp(S.RageoftheSleeper) or S.RageoftheSleeper:CooldownRemains() > 3)) then
+  -- Note: Added 'not IsTanking' to RotS conditions, as RotS doesn't get used while not actively tanking.
+  if S.Maul:IsReady() and (Player:BuffUp(S.ToothandClawBuff) and (MeleeEnemies11yCount <= 5 and not S.Raze:IsAvailable() or MeleeEnemies11yCount == 1 and S.Raze:IsAvailable()) and (Player:BuffUp(S.RageoftheSleeper) or S.RageoftheSleeper:CooldownRemains() > 3 or not IsTanking)) then
     if Cast(S.Maul, nil, nil, not IsInMeleeRange) then return "maul bear 42"; end
   end
   -- maul,if=(active_enemies<=5&!talent.raze.enabled&variable.If_build=0)&cooldown.rage_of_the_sleeper.remains>3|(active_enemies=1&talent.raze.enabled&variable.If_build=0)&cooldown.rage_of_the_sleeper.remains>3|(active_enemies<=5&!talent.raze.enabled&variable.If_build=0)&buff.rage_of_the_sleeper.up|(active_enemies=1&talent.raze.enabled&variable.If_build=0)&buff.rage_of_the_sleeper.up
   -- Simplified the if statement to:
   -- variable.If_build=0&(active_enemies<=5&!talent.raze|active_enemies=1&talent.raze)&(buff.rage_of_the_sleeper.up|cooldown.rage_of_the_sleeper.remains>3)
-  if S.Maul:IsReady() and not VarIFBuild and ((MeleeEnemies11yCount <= 5 and not S.Raze:IsAvailable() or MeleeEnemies11yCount == 1 and S.Raze:IsAvailable()) and (Player:BuffUp(S.RageoftheSleeper) or S.RageoftheSleeper:CooldownRemains() > 3)) then
+  -- Note: Added 'not IsTanking' to RotS conditions, as RotS doesn't get used while not actively tanking.
+  if S.Maul:IsReady() and not VarIFBuild and ((MeleeEnemies11yCount <= 5 and not S.Raze:IsAvailable() or MeleeEnemies11yCount == 1 and S.Raze:IsAvailable()) and (Player:BuffUp(S.RageoftheSleeper) or S.RageoftheSleeper:CooldownRemains() > 3 or not IsTanking)) then
     if Cast(S.Maul, nil, nil, not IsInMeleeRange) then return "maul bear 44"; end
   end
   -- thrash_bear,target_if=active_enemies>=5
