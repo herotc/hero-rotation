@@ -744,6 +744,7 @@ end
 local function Init()
   S.VirulentPlagueDebuff:RegisterAuraTracking()
   S.FesteringWoundDebuff:RegisterAuraTracking()
+  S.MarkofFyralathDebuff:RegisterAuraTracking()
 
   HR.Print("Unholy DK rotation has been updated for patch 10.2.5.")
 end
