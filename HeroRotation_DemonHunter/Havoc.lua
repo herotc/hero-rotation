@@ -385,7 +385,7 @@ local function FelBarrageFunc()
   end
   -- fel_barrage,if=fury>100&(raid_event.adds.in>90|raid_event.adds.in<gcd.max|raid_event.adds.remains>4&active_enemies>2)
   if S.FelBarrage:IsReady() and (Player:Fury() > 100) then
-    if Cast(S.FelBarrage, nil, nil, not IsInMeleeRange(8)) then return "fel_barrage fel_barrage 16"; end
+    if Cast(S.FelBarrage, Settings.Havoc.GCDasOffGCD.FelBarrage, nil, not IsInMeleeRange(8)) then return "fel_barrage fel_barrage 16"; end
   end
   -- fel_rush,if=buff.unbound_chaos.up&fury>20&buff.fel_barrage.up
   if S.FelRush:IsCastable() and UseFelRush() and (Player:BuffUp(S.UnboundChaosBuff) and Player:Fury() > 20 and Player:BuffUp(S.FelBarrage)) then
