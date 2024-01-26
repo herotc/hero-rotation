@@ -551,7 +551,7 @@ local function Filler()
   end
   -- shadow_word_pain,target_if=min:remains,if=!set_bonus.tier31_4pc
   -- Note: Per APL note, intent is to be used as a movement filler.
-  if S.ShadowWordPain:IsReady() and Player:IsMoving() and (Player:HasTier(31, 4)) then
+  if S.ShadowWordPain:IsReady() and Player:IsMoving() and (not Player:HasTier(31, 4)) then
     if Everyone.CastTargetIf(S.ShadowWordPain, Enemies40y, "min", EvaluateTargetIfFilterSWP, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain filler 32"; end
   end
 end
@@ -636,6 +636,8 @@ local function AoE()
 end
 
 local function Main()
+  -- Reset variable.holding_crash to false for ST, in case it was set to true during AoE.
+  VarHoldingCrash = false
   -- variable,name=dots_up,op=set,value=active_dot.vampiric_touch=active_enemies|action.shadow_crash.in_flight&talent.whispering_shadows
   VarDotsUp = S.VampiricTouchDebuff:AuraActiveCount() == EnemiesCount10ySplash or S.ShadowCrash:InFlight() and S.WhisperingShadows:IsAvailable()
   -- call_action_list,name=cds,if=fight_remains<30|target.time_to_die>15&(!variable.holding_crash|active_enemies>2)
@@ -684,7 +686,7 @@ local function Main()
   end
   -- shadow_word_pain,if=buff.deaths_torment.stack>9&set_bonus.tier31_4pc&(!variable.holding_crash|!talent.shadow_crash)
   if S.ShadowWordPain:IsReady() and (Player:BuffStack(S.DeathsTormentBuff) > 9 and Player:HasTier(31, 4) and (not VarHoldingCrash or not S.ShadowCrash:IsAvailable())) then
-    if Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 22"; end
+    if Cast(S.ShadowWordPain, Settings.Shadow.GCDasOffGCD.ShadowWordPain, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_pain main 22"; end
   end
   -- shadow_word_death,if=variable.dots_up&talent.inescapable_torment&pet.fiend.active&((!talent.insidious_ire&!talent.idol_of_yoggsaron)|buff.deathspeaker.up)&!set_bonus.tier31_2pc
   if S.ShadowWordDeath:IsReady() and (VarDotsUp and S.InescapableTorment:IsAvailable() and VarFiendUp and ((not S.InsidiousIre:IsAvailable() and not S.IdolOfYoggSaron:IsAvailable()) or Player:BuffUp(S.DeathspeakerBuff)) and not Player:HasTier(31, 2)) then

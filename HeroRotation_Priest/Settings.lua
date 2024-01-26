@@ -54,6 +54,7 @@ HR.GUISettings.APL.Priest = {
       ShadowCrash = false,
       Shadowform = true,
       ShadowWordDeath = false,
+      ShadowWordPain = false,
       VoidEruption = true,
       VoidTorrent = false,
     },
