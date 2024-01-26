@@ -370,7 +370,7 @@ local function Opener()
     if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash opener 2"; end
   end
   -- vampiric_touch,if=!debuff.vampiric_touch.up&(!cooldown.shadow_crash.ready|!talent.shadow_crash)
-  if S.VampiricTouch:IsCastable() and (Target:DebuffDown(S.VampiricTouchDebuff) and (S.ShadowCrash:CooldownDown() or not S.ShadowCrash:IsAvailable())) then
+  if S.VampiricTouch:IsCastable() and (Target:DebuffDown(S.VampiricTouchDebuff) and (S.ShadowCrash:CooldownDown() or not S.ShadowCrash:IsAvailable() or S.ShadowCrash:InFlight())) then
     if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch opener 3"; end
   end
   -- mindbender
