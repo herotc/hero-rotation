@@ -245,28 +245,28 @@ end
 local function StealthCDs ()
   -- # Hidden Opportunity builds without Crackshot use Vanish if Audacity is not active and when under max Opportunity stacks
   -- actions.stealth_cds+=/vanish,if=talent.hidden_opportunity&!talent.crackshot&!buff.audacity.up&(variable.vanish_opportunity_condition|buff.opportunity.stack<buff.opportunity.max_stack)&variable.ambush_condition
-  if S.Vanish:CooldownRemains() < Player:GCD() and Vanish_DPS_Condition() and S.HiddenOpportunity:IsAvailable() and not S.Crackshot:IsAvailable() and not Player:BuffUp(S.Audacity)
+  if S.Vanish:IsReady() and Vanish_DPS_Condition() and S.HiddenOpportunity:IsAvailable() and not S.Crackshot:IsAvailable() and not Player:BuffUp(S.Audacity)
     and (Vanish_Opportunity_Condition() or Player:BuffStack(S.Opportunity) < 6) and Ambush_Condition() then
     if Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (HO)" end
   end
 
   -- # Crackshot builds or builds without Hidden Opportunity use Vanish at finish condition
   -- actions.stealth_cds+=/vanish,if=(!talent.hidden_opportunity|talent.crackshot)&variable.finish_condition
-  if S.Vanish:CooldownRemains() < Player:GCD() and Vanish_DPS_Condition() and (not S.HiddenOpportunity:IsAvailable() or S.Crackshot:IsAvailable()) and Finish_Condition() then
+  if S.Vanish:IsReady() and Vanish_DPS_Condition() and (not S.HiddenOpportunity:IsAvailable() or S.Crackshot:IsAvailable()) and Finish_Condition() then
     if Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Finish)" end
   end
 
   -- # Crackshot builds use Dance at finish condition
   -- actions.stealth_cds+=/shadow_dance,if=talent.crackshot&variable.finish_condition
   -- synecdoche note: DPS gain in testing to hold off on shadow dance if vanish is coming up in the next 6 seconds to avoid wasting vanish CDR
-  if S.ShadowDance:CooldownRemains() < Player:GCD() and S.Crackshot:IsAvailable() and Finish_Condition()
+  if S.ShadowDance:IsReady() and S.Crackshot:IsAvailable() and Finish_Condition()
     and (S.Vanish:CooldownRemains() >= 6 or not Settings.Commons2.UseDPSVanish) and not Player:StealthUp(true, false) then
     if Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance Crackshot" end
   end
 
   -- actions.stealth_cds+=/shadow_dance,if=!talent.keep_it_rolling&variable.shadow_dance_condition&buff.slice_and_dice.up
   -- &(variable.finish_condition|talent.hidden_opportunity)&(!talent.hidden_opportunity|!cooldown.vanish.ready)
-  if S.ShadowDance:CooldownRemains() < Player:GCD() and not S.KeepItRolling:IsAvailable() and Shadow_Dance_Condition() and Player:BuffUp(S.SliceandDice)
+  if S.ShadowDance:IsReady() and not S.KeepItRolling:IsAvailable() and Shadow_Dance_Condition() and Player:BuffUp(S.SliceandDice)
     and (Finish_Condition() or S.HiddenOpportunity:IsAvailable()) and (not S.HiddenOpportunity:IsAvailable() or not S.Vanish:IsReady() or not Settings.Commons2.UseDPSVanish) then
     if Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
   end
@@ -274,7 +274,7 @@ local function StealthCDs ()
   -- # Keep it Rolling builds without Crackshot use Dance at finish condition but hold it for an upcoming Keep it Rolling
   -- actions.stealth_cds+=/shadow_dance,if=talent.keep_it_rolling&variable.shadow_dance_condition
   -- &(cooldown.keep_it_rolling.remains<=30|cooldown.keep_it_rolling.remains>120&(variable.finish_condition|talent.hidden_opportunity))
-  if S.ShadowDance:CooldownRemains() < Player:GCD() and S.KeepItRolling:IsAvailable() and Shadow_Dance_Condition()
+  if S.ShadowDance:IsReady() and S.KeepItRolling:IsAvailable() and Shadow_Dance_Condition()
     and (S.KeepItRolling:CooldownRemains() <= 30 or S.KeepItRolling:CooldownRemains() >= 120 and (Finish_Condition() or S.HiddenOpportunity:IsAvailable())) then
     if Cast(S.ShadowDance, Settings.Commons.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance KiR without Crackshot" end
   end
@@ -300,7 +300,7 @@ local function CDs ()
   -- # Maintain Blade Flurry on 2+ targets, and on single target with Underhanded during Adrenaline Rush
   -- action.cds+=/blade_flurry,if=(spell_targets>=2-talent.underhanded_upper_hand&!stealthed.all&buff.adrenaline_rush.up)&buff.blade_flurry.remains<gcd
   if S.BladeFlurry:IsReady() then
-    if (EnemiesBFCount >= 2-num(S.UnderhandedUpperhand:IsAvailable()) and not Player:StealthUp(true, true) and Player:BuffUp(S.AdrenalineRush))
+    if (EnemiesBFCount >= 2-num(S.UnderhandedUpperhand:IsAvailable() and not Player:StealthUp(true, true) and Player:BuffUp(S.AdrenalineRush)))
       and Player:BuffRemains(S.BladeFlurry) < Player:GCD() then
         if Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
     end
@@ -319,7 +319,8 @@ local function CDs ()
   -- roll_the_bones,if=variable.rtb_reroll|rtb_buffs=0|rtb_buffs.max_remains<=2&set_bonus.tier31_4pc|rtb_buffs.max_remains<=7&(cooldown.shadow_dance.ready|cooldown.vanish.ready)
   -- Use Roll the Bones if reroll conditions are met, or with no buffs, or 2s before buffs expire with T31, or 7s before buffs expire with Vanish/Dance ready
   if S.RolltheBones:IsReady() then
-    if RtB_Reroll() or RtB_Buffs() == 0 or (Rogue.RtBRemains() <= 3 and Player:HasTier(31, 4)) or Rogue.RtBRemains() <= 7 and (S.ShadowDance:CooldownRemains() <= 3 or S.Vanish:CooldownRemains() <= 3) then
+    if (RtB_Reroll() and not Player:StealthUp(true, true)) or RtB_Buffs() == 0 or (Rogue.RtBRemains() <= 3 and Player:HasTier(31, 4)) or (Rogue.RtBRemains() <= 7 and (S.ShadowDance:CooldownRemains() <= 3 or S.Vanish:CooldownRemains() <= 3)
+    and not Player:StealthUp(true, true)) then
       if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then return "Cast Roll the Bones" end
     end
   end
