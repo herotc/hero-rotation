@@ -707,13 +707,12 @@ local function CDs ()
     end
   end
 
-  -- actions.cds+=/use_items,if=!stealthed.all&(!trinket.mirror_of_fractured_tomorrows.cooldown.ready|!equipped.mirror_of_fractured_tomorrows)|fight_remains<10
+  -- actions.cds+=/use_items,if=!stealthed.all&(!trinket.mirror_of_fractured_tomorrows.cooldown.ready|!equipped.mirror_of_fractured_tomorrows)&(!trinket.ashes_of_the_embersoul.cooldown.ready|!equipped.ashes_of_the_embersoul)|fight_remains<10
   -- Default fallback for usable items: Use outside of Stealth/Shadow Dance.
   if not Player:StealthUp(true, true) and (
     (not I.Mirror:IsReady() or not I.Mirror:IsEquipped()) and
-      ((I.WitherbarksBranch:IsEquipped() and not I.WitherbarksBranch:IsReady() and not I.AshesoftheEmbersoul:IsEquipped()) or
-        (I.AshesoftheEmbersoul:IsEquipped() and not I.AshesoftheEmbersoul:IsReady() and not I.WitherbarksBranch:IsEquipped()))
-      or HL.BossFilteredFightRemains("<", 10)) then
+      (not I.AshesoftheEmbersoul:IsReady() or not I.AshesoftheEmbersoul:IsEquipped()) or
+        HL.BossFilteredFightRemains("<", 10)) then
     local TrinketToUse = Player:GetUseableItems(OnUseExcludes)
     if TrinketToUse then
       if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then
