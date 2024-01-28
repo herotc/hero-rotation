@@ -144,7 +144,7 @@ function Commons.GroupBuffMissing(spell)
       end
     end
   end
-  if BuffedChars < TotalChars then return true end
+  if spell:ID() == 381748 and BuffedChars < TotalChars then return true end
   return false
 end
 
