@@ -115,9 +115,10 @@ end
 
 function Commons.GroupBuffMissing(spell)
   local range = 40
-  local BotBBuffIDs = { 381732, 381741, 381746, 381748, 381749, 381750, 381751, 381752, 381753, 381754, 381756, 381757, 381758 }
-  if spell:Name() == "Battle Shout" then range = 100 end
-  if Player:BuffDown(spell) then return true end
+  local BotBBuffIDs = { 381732, 381741, 381746, 381748, 381749, 381750, 381751, 381752, 381753, 381754, 381756, 381757, 381758, 432652, 432655, 432658, 432674 }
+  if spell:ID() == 6673 then range = 100 end
+  if Player:BuffDown(spell, true) then return true end
+  -- Are we in a party or raid?
   local Group
   if UnitInRaid("player") then
     Group = Unit.Raid
@@ -126,18 +127,24 @@ function Commons.GroupBuffMissing(spell)
   else
     return false
   end
+  -- Check for the buff amongst group members.
+  local TotalChars = 0
+  local BuffedChars = 0
   for _, Char in pairs(Group) do
     if Char:Exists() and not Char:IsDeadOrGhost() and Char:IsInRange(range) then
-      if spell:Name() == "Blessing of the Bronze" then
+      TotalChars = TotalChars + 1
+      if spell:ID() == 381748 then -- Blessing of the Bronze
         for _, v in pairs(BotBBuffIDs) do
-          if Char:BuffUp(Spell(v), true) then return false end
+          if Char:BuffUp(Spell(v), true) then
+            BuffedChars = BuffedChars + 1
+          end
         end
-        return true
       elseif Char:BuffDown(spell, true) then
         return true
       end
     end
   end
+  if BuffedChars < TotalChars then return true end
   return false
 end
 
