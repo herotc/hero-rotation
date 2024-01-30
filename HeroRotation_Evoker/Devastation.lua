@@ -247,7 +247,7 @@ local function ES()
   end
   -- We should (usually, if not always) be hitting all targets anyway, so keeping CastAnnotated over CastTargetIf.
   if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and (not (Player:PowerInfusionUp() and Player:BloodlustUp()) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
-    if CastAnnotated(S.EternitySurge, nil, ESEmpower.." CLIP", not Target:IsInRange(25), Settings.Commons.DisintegrateFontSize) then return "eternity_surge empower " .. ESEmpower .. " clip ES 2"; end
+    if CastAnnotated(S.EternitySurge, nil, ESEmpower.." CLIP", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "eternity_surge empower " .. ESEmpower .. " clip ES 2"; end
   else
     if CastAnnotated(S.EternitySurge, false, ESEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "eternity_surge empower " .. ESEmpower .. " ES 2"; end
   end
@@ -272,7 +272,7 @@ local function FB()
   end
   -- We should (usually, if not always) be hitting all targets anyway, so keeping CastAnnotated over CastTargetIf.
   if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and (not (Player:PowerInfusionUp() and Player:BloodlustUp()) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
-    if CastAnnotated(S.FireBreath, nil, FBEmpower.." CLIP", not Target:IsInRange(25), Settings.Commons.DisintegrateFontSize) then return "fire_breath empower " .. FBEmpower .. " clip FB 2"; end
+    if CastAnnotated(S.FireBreath, nil, FBEmpower.." CLIP", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower " .. FBEmpower .. " clip FB 2"; end
   else
     if CastAnnotated(S.FireBreath, false, FBEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower " .. FBEmpower .. " FB 2"; end
   end
@@ -396,7 +396,7 @@ local function ST()
   -- shattering_star,if=(buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor)&(!cooldown.fire_breath.up|!talent.event_horizon)
   if S.ShatteringStar:IsCastable() and ((Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack or not S.ArcaneVigor:IsAvailable()) and (S.FireBreath:CooldownDown() or not S.EventHorizon:IsAvailable())) then
     if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and (not (Player:PowerInfusionUp() and Player:BloodlustUp()) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
-      if CastAnnotated(S.ShatteringStar, nil, "CLIP", not Target:IsSpellInRange(S.ShatteringStar), Settings.Commons.DisintegrateFontSize) then return "shattering_star clip st 10"; end
+      if CastAnnotated(S.ShatteringStar, nil, "CLIP", not Target:IsSpellInRange(S.ShatteringStar), Settings.Commons.EmpoweredFontSize) then return "shattering_star clip st 10"; end
     else
       if Cast(S.ShatteringStar, nil, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star st 10"; end
     end
@@ -416,7 +416,7 @@ local function ST()
   -- living_flame,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max&buff.burnout.up
   if S.LivingFlame:IsCastable() and (VarDragonrageUp and VarDragonrageRemains < (MaxEssenceBurstStack - Player:BuffStack(S.EssenceBurstBuff)) * GCDMax and Player:BuffUp(S.BurnoutBuff)) then
     if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and (not (Player:PowerInfusionUp() and Player:BloodlustUp()) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
-      if CastAnnotated(S.LivingFlame, nil, "CLIP", not Target:IsSpellInRange(S.LivingFlame), Settings.Commons.DisintegrateFontSize) then return "living_flame clip st 16"; end
+      if CastAnnotated(S.LivingFlame, nil, "CLIP", not Target:IsSpellInRange(S.LivingFlame), Settings.Commons.EmpoweredFontSize) then return "living_flame clip st 16"; end
     else
       if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 16"; end
     end
@@ -428,7 +428,7 @@ local function ST()
   -- living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)&essence.deficit>=2
   if S.LivingFlame:IsCastable() and (Player:BuffUp(S.BurnoutBuff) and (Player:BuffUp(S.LeapingFlamesBuff) and Player:BuffDown(S.EssenceBurstBuff) or Player:BuffDown(S.LeapingFlamesBuff) and Player:BuffStack(S.EssenceBurstBuff) < MaxEssenceBurstStack) and Player:EssenceDeficit() >= 2) then
     if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and (not (Player:PowerInfusionUp() and Player:BloodlustUp()) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
-      if CastAnnotated(S.LivingFlame, nil, "CLIP", not Target:IsSpellInRange(S.LivingFlame), Settings.Commons.DisintegrateFontSize) then return "living_flame clip st 20"; end
+      if CastAnnotated(S.LivingFlame, nil, "CLIP", not Target:IsSpellInRange(S.LivingFlame), Settings.Commons.EmpoweredFontSize) then return "living_flame clip st 20"; end
     else
       if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame st 20"; end
     end
