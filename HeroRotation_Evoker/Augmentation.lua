@@ -359,7 +359,7 @@ local function FB()
       FBEmpower = 3
     end
     if FBEmpower > 0 then
-      if CastAnnotated(S.FireBreath, false, FBEmpower, not Target:IsInRange(25)) then return "fire_breath empower_to=" .. FBEmpower .. " fb 4"; end
+      if CastAnnotated(S.FireBreath, false, FBEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower_to=" .. FBEmpower .. " fb 4"; end
     end
   end
 end
