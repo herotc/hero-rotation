@@ -185,7 +185,7 @@ local function Trinkets()
     end
     -- use_item,target_if=min:target.health.pct,name=iridal_the_earths_master,use_off_gcd=1,if=gcd.remains>0.5
     if I.Iridal:IsEquippedAndReady() then
-      if CastTargetIf(I.Iridal, Enemies25y, "min", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Items) then return "iridal_the_earths_master trinkets 4"; end
+      if Everyone.CastTargetIf(I.Iridal, Enemies25y, "min", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Items) then return "iridal_the_earths_master trinkets 4"; end
     end
   end
   if Settings.Commons.Enabled.Trinkets then
