@@ -332,31 +332,38 @@ local function FB()
     if Cast(S.TipTheScales, Settings.Commons.GCDasOffGCD.TipTheScales) then return "tip_the_scales fb 2"; end
   end
   local FBEmpower = 0
+  -- Note: Using Player:EmpowerCastTime() in place of duration in the below lines. Intention seems to be whether we can get the spell off before Ebom Might ends.
   if S.FireBreath:IsCastable() then
-    -- fire_breath,empower_to=1,target_if=target.time_to_die>16,if=buff.ebon_might_self.remains>duration&equipped.neltharions_call_to_chaos
-    if Player:BuffRemains(S.EbonMightSelfBuff) > S.FireBreath:ExecuteTime() and I.NeltharionsCalltoChaos:IsEquipped() and Target:TimeToDie() > 16 then
-      FBEmpower = 1
-    -- fire_breath,empower_to=2,target_if=target.time_to_die>12,if=buff.ebon_might_self.remains>duration&equipped.neltharions_call_to_chaos
-    elseif Player:BuffRemains(S.EbonMightSelfBuff) > S.FireBreath:ExecuteTime() and I.NeltharionsCalltoChaos:IsEquipped() and Target:TimeToDie() > 12 then
-      FBEmpower = 2
-    -- fire_breath,empower_to=3,target_if=target.time_to_die>8,if=buff.ebon_might_self.remains>duration&equipped.neltharions_call_to_chaos
-    elseif Player:BuffRemains(S.EbonMightSelfBuff) > S.FireBreath:ExecuteTime() and I.NeltharionsCalltoChaos:IsEquipped() and Target:TimeToDie() > 8 then
-      FBEmpower = 3
+    if I.NeltharionsCalltoChaos:IsEquipped() then
+      -- fire_breath,empower_to=1,target_if=target.time_to_die>16,if=buff.ebon_might_self.remains>duration&equipped.neltharions_call_to_chaos
+      if Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) and Target:TimeToDie() > 16 then
+        FBEmpower = 1
+      -- fire_breath,empower_to=2,target_if=target.time_to_die>12,if=buff.ebon_might_self.remains>duration&equipped.neltharions_call_to_chaos
+      elseif Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(2) and Target:TimeToDie() > 12 then
+        FBEmpower = 2
+      -- fire_breath,empower_to=3,target_if=target.time_to_die>8,if=buff.ebon_might_self.remains>duration&equipped.neltharions_call_to_chaos
+      elseif (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(3) or Player:BuffUp(S.TipTheScales) and not S.FontofMagic:IsAvailable()) and Target:TimeToDie() > 8 then
+        FBEmpower = 3
+      end
+    end
     -- fire_breath,empower_to=4,target_if=target.time_to_die>4,if=talent.font_of_magic&(buff.ebon_might_self.remains>duration|buff.tip_the_scales.up)
-    elseif Player:BuffRemains(S.EbonMightSelfBuff) > S.FireBreath:ExecuteTime() and I.NeltharionsCalltoChaos:IsEquipped() and Target:TimeToDie() > 4 then
+    -- Note: Moved max empower to the bottom so it doesn't get overwritten.
+    if not I.NeltharionsCalltoChaos:IsEquipped() then
+      -- fire_breath,empower_to=3,target_if=target.time_to_die>8,if=(buff.ebon_might_self.remains>duration|buff.tip_the_scales.up)&!equipped.neltharions_call_to_chaos
+      -- fire_breath,empower_to=2,target_if=target.time_to_die>12,if=buff.ebon_might_self.remains>duration&!equipped.neltharions_call_to_chaos
+      -- fire_breath,empower_to=1,target_if=target.time_to_die>16,if=buff.ebon_might_self.remains>duration&!equipped.neltharions_call_to_chaos
+      -- Note: Re-ordered below so a lower empower can't overwrite a higher empower.
+      if Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) and Target:TimeToDie() > 16 then
+        FBEmpower = 1
+      elseif Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(2) and Target:TimeToDie() > 12 then
+        FBEmpower = 2
+      elseif (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(3) or Player:BuffUp(S.TipTheScales) and not S.FontofMagic:IsAvailable()) and Target:TimeToDie() > 8 then
+        FBEmpower = 3
+      end
+    end
+    -- Max empower moved from above.
+    if S.FontofMagic:IsAvailable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(4) or Player:BuffUp(S.TipTheScales)) and Target:TimeToDie() > 4 then
       FBEmpower = 4
-    -- fire_breath,empower_to=3,target_if=target.time_to_die>8,if=(buff.ebon_might_self.remains>duration|buff.tip_the_scales.up)&!equipped.neltharions_call_to_chaos
-    elseif Player:BuffUp(S.TipTheScales) and not I.NeltharionsCalltoChaos:IsEquipped() and Target:TimeToDie() > 8 then
-      FBEmpower = 3
-    -- fire_breath,empower_to=2,target_if=target.time_to_die>12,if=buff.ebon_might_self.remains>duration&!equipped.neltharions_call_to_chaos
-    -- Note: Moved below the following APL line to allow our if statement to flow properly.
-    -- fire_breath,empower_to=1,target_if=target.time_to_die>16,if=buff.ebon_might_self.remains>duration&!equipped.neltharions_call_to_chaos
-    elseif Player:BuffRemains(S.EbonMightSelfBuff) > S.FireBreath:ExecuteTime() and not I.NeltharionsCalltoChaos:IsEquipped() and Target:TimeToDie() > 16 then
-      FBEmpower = 1
-    elseif Player:BuffRemains(S.EbonMightSelfBuff) > S.FireBreath:ExecuteTime() and not I.NeltharionsCalltoChaos:IsEquipped() and Target:TimeToDie() > 12 then
-      FBEmpower = 2
-    elseif Player:BuffRemains(S.EbonMightSelfBuff) > S.FireBreath:ExecuteTime() and not I.NeltharionsCalltoChaos:IsEquipped() and Target:TimeToDie() > 8 then
-      FBEmpower = 3
     end
     if FBEmpower > 0 then
       if CastAnnotated(S.FireBreath, false, FBEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower_to=" .. FBEmpower .. " fb 4"; end
