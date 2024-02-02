@@ -467,12 +467,12 @@ local function HighPrioActions()
       end
     end
   end
-  -- army_of_the_dead,if=!equipped.fyralath_the_dreamrender&(talent.summon_gargoyle&cooldown.summon_gargoyle.remains<2|!talent.summon_gargoyle|fight_remains<35)
-  if S.ArmyoftheDead:IsReady() and (not I.Fyralath:IsEquipped() and (S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:CooldownRemains() < 2 or not S.SummonGargoyle:IsAvailable() or FightRemains < 35)) then
+  -- army_of_the_dead,if=talent.summon_gargoyle&cooldown.summon_gargoyle.remains<2|!talent.summon_gargoyle|fight_remains<35
+  if S.ArmyoftheDead:IsReady() and (S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:CooldownRemains() < 2 or not S.SummonGargoyle:IsAvailable() or FightRemains < 35) then
     if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyOfTheDead) then return "army_of_the_dead high_prio_actions 4"; end
   end
-  -- death_coil,if=(active_enemies<=3|!talent.epidemic)&(pet.gargoyle.active&talent.commander_of_the_dead&buff.commander_of_the_dead.up&cooldown.apocalypse.remains<5&buff.commander_of_the_dead.remains>27|debuff.death_rot.up&debuff.death_rot.remains<gcd)
-  if S.DeathCoil:IsReady() and ((ActiveEnemies <= 3 or not S.Epidemic:IsAvailable()) and (VarGargActive and S.CommanderoftheDead:IsAvailable() and Player:BuffUp(S.CommanderoftheDeadBuff) and S.Apocalypse:CooldownRemains() < 5 and Player:BuffRemains(S.CommanderoftheDeadBuff) > 27 or Target:DebuffUp(S.DeathRotDebuff) and Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD())) then
+  -- death_coil,if=(active_enemies<=3|!talent.epidemic)&(pet.gargoyle.active&talent.commander_of_the_dead&buff.commander_of_the_dead.up&cooldown.apocalypse.remains<5&buff.commander_of_the_dead.remains>26|debuff.death_rot.up&debuff.death_rot.remains<gcd)
+  if S.DeathCoil:IsReady() and ((ActiveEnemies <= 3 or not S.Epidemic:IsAvailable()) and (VarGargActive and S.CommanderoftheDead:IsAvailable() and Player:BuffUp(S.CommanderoftheDeadBuff) and S.Apocalypse:CooldownRemains() < 5 and Player:BuffRemains(S.CommanderoftheDeadBuff) > 26 or Target:DebuffUp(S.DeathRotDebuff) and Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD())) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil high_prio_actions 6"; end
   end
   -- epidemic,if=active_enemies>=4&(talent.commander_of_the_dead&buff.commander_of_the_dead.up&cooldown.apocalypse.remains<5|debuff.death_rot.up&debuff.death_rot.remains<gcd)
@@ -490,10 +490,6 @@ local function HighPrioActions()
   -- outbreak,target_if=target.time_to_die>dot.virulent_plague.remains&(dot.virulent_plague.refreshable|talent.superstrain&(dot.frost_fever_superstrain.refreshable|dot.blood_plague_superstrain.refreshable))&(!talent.unholy_blight|talent.unholy_blight&cooldown.unholy_blight.remains>15%((talent.superstrain*3)+(talent.plaguebringer*2)+(talent.ebon_fever*2)))
   if S.Outbreak:IsReady() then
     if Everyone.CastCycle(S.Outbreak, EnemiesMelee, EvaluateCycleOutbreak, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak high_prio_actions 14"; end
-  end
-  -- army_of_the_dead,if=equipped.fyralath_the_dreamrender&(talent.summon_gargoyle&cooldown.summon_gargoyle.remains<2|!talent.summon_gargoyle|fight_remains<35)
-  if S.ArmyoftheDead:IsReady() and (I.Fyralath:IsEquipped() and (S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:CooldownRemains() < 2 or not S.SummonGargoyle:IsAvailable() or FightRemains < 35)) then
-    if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyOfTheDead) then return "army_of_the_dead high_prio_actions 16"; end
   end
 end
 
@@ -564,9 +560,9 @@ local function ST()
 end
 
 local function Trinkets()
-  -- use_item,name=fyralath_the_dreamrender,if=active_dot.mark_of_fyralath=active_enemies&(active_enemies<5|active_enemies>21|fight_remains<4)
+  -- use_item,name=fyralath_the_dreamrender,if=active_dot.mark_of_fyralath=active_enemies&(active_enemies<5|active_enemies>21|fight_remains<4)&(debuff.festering_wound.stack>2|time>15)
   -- Note: Using >= for mark_of_fyralath debuff count, just to be safe.
-  if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() >= ActiveEnemies and (ActiveEnemies < 5 or ActiveEnemies > 21 or FightRemains < 4)) then
+  if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() >= ActiveEnemies and (ActiveEnemies < 5 or ActiveEnemies > 21 or FightRemains < 4) and (FesterStacks > 2 or HL.CombatTime() > 15)) then
     if Cast(I.Fyralath, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender trinkets 1"; end
   end
   if Settings.Commons.Enabled.Trinkets then
