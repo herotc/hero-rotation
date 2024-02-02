@@ -324,16 +324,10 @@ local function Aoe()
     if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 12"; end
   end
   if S.Pyre:IsReady() and (
-    -- pyre,target_if=max:target.health.pct,if=active_enemies>=5
-    (EnemiesCount8ySplash >= 5) or
-    -- pyre,target_if=max:target.health.pct,if=active_enemies>=4&(!buff.essence_burst.up&!buff.iridescence_blue.up|!talent.eternitys_span)
-    (EnemiesCount8ySplash >= 4 and (Player:BuffDown(S.EssenceBurstBuff) and Player:BuffDown(S.IridescenceBlueBuff) or not S.EternitysSpan:IsAvailable())) or
-    -- pyre,target_if=max:target.health.pct,if=active_enemies>=4&talent.volatility
-    (EnemiesCount8ySplash >= 4 and S.Volatility:IsAvailable()) or
-    -- pyre,target_if=max:target.health.pct,if=active_enemies>=3&talent.volatility&talent.charged_blast&!buff.essence_burst.up&!buff.iridescence_blue.up
-    (EnemiesCount8ySplash >= 3 and S.Volatility:IsAvailable() and S.ChargedBlast:IsAvailable() and Player:BuffDown(S.EssenceBurstBuff) and Player:BuffDown(S.IridescenceBlueBuff)) or
-    -- pyre,target_if=max:target.health.pct,if=active_enemies>=3&talent.volatility&!talent.charged_blast&(buff.iridescence_red.up|!buff.essence_burst.up)
-    (EnemiesCount8ySplash >= 3 and S.Volatility:IsAvailable() and not S.ChargedBlast:IsAvailable() and (Player:BuffUp(S.IridescenceRedBuff) or Player:BuffDown(S.EssenceBurstBuff))) or
+    -- pyre,target_if=max:target.health.pct,if=active_enemies>=4
+    (EnemiesCount8ySplash >= 4) or
+    -- pyre,target_if=max:target.health.pct,if=active_enemies>=3&talent.volatility
+    (EnemiesCount8ySplash >= 3 and S.Volatility:IsAvailable()) or
     -- pyre,target_if=max:target.health.pct,if=buff.charged_blast.stack>=15
     (Player:BuffStack(S.ChargedBlastBuff) >= 15)
   ) then
