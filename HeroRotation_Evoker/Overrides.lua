@@ -99,6 +99,10 @@ AugOldIsReady = HL.AddCoreOverride ("Spell.IsReady",
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
     local BaseCheck = AugOldIsReady(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    if Player:BuffUp(SpellAug.HoverBuff) then
+      local _, SpellMissingResource = self:IsUsable()
+      BaseCheck = self:IsCastable() and not SpellMissingResource
+    end
     if self == SpellAug.Eruption then
       return BaseCheck and Player:EssenceP() >= 2
     elseif self == SpellAug.EbonMight then

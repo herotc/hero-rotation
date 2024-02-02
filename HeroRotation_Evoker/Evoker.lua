@@ -33,6 +33,7 @@ Spell.Evoker.Commons = {
   Disintegrate                          = Spell(356995),
   EmeraldBlossom                        = Spell(355913),
   FireBreath                            = MultiSpell(357208,382266), -- with and without Font of Magic
+  Hover                                 = Spell(358267),
   LivingFlame                           = Spell(361469),
   -- Talents
   AncientFlame                          = Spell(369990),
