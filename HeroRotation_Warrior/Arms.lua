@@ -205,8 +205,8 @@ local function Execute()
   if S.Overpower:IsCastable() and (Player:Rage() < 40 and Player:BuffStack(S.MartialProwessBuff) < 2) then
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 26"; end
   end
-  -- mortal_strike,if=debuff.executioners_precision.stack=2|!talent.executioners_precision&buff.martial_prowess.stack=2
-  if S.MortalStrike:IsReady() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 or not S.ExecutionersPrecision:IsAvailable() and Player:BuffStack(S.MartialProwessBuff) == 2) then
+  -- mortal_strike,if=debuff.executioners_precision.stack=2&buff.martial_prowess.stack=2|!talent.executioners_precision&buff.martial_prowess.stack=2
+  if S.MortalStrike:IsReady() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Player:BuffStack(S.MartialProwessBuff) == 2 or not S.ExecutionersPrecision:IsAvailable() and Player:BuffStack(S.MartialProwessBuff) == 2) then
     if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 28"; end
   end
   -- skullsplitter,if=rage<40
@@ -459,8 +459,8 @@ local function SingleTarget()
 end
 
 local function Trinkets()
-  -- use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking
-  if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0) then
+  -- use_item,name=fyralath_the_dreamrender,,if=dot.mark_of_fyralath.ticking&!talent.blademasters_torment|dot.mark_of_fyralath.ticking&cooldown.avatar.remains>3&cooldown.bladestorm.remains>3&!debuff.colossus_smash.up
+  if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0 and not S.BlademastersTorment:IsAvailable() or S.MarkofFyralathDebuff:AuraActiveCount() > 0 and S.Avatar:CooldownRemains() > 3 and S.Bladestorm:CooldownRemains() > 3 and Target:DebuffDown(S.ColossusSmashDebuff)) then
     if Cast(I.Fyralath, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender trinkets 1"; end
   end
   -- use_item,use_off_gcd=1,name=algethar_puzzle_box,if=cooldown.avatar.remains<=3
@@ -487,9 +487,9 @@ local function Trinkets()
   if Trinket2Item and Trinket2Item:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and (not VarTrinket2Buffs and (trinket1:CooldownDown() or not VarTrinket1Buffs) or (Trinket2Spell:CastTime() > 0 and Player:BuffDown(S.AvatarBuff) or Trinket2Spell:CastTime() == 0) or S.Avatar:CooldownRemains() > 20)) then
     if Cast(Trinket2Item, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "use_item for "..Trinket2Item:Name().." trinkets 10"; end
   end
-  -- use_item,use_off_gcd=1,slot=main_hand,if=(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
+  -- use_item,use_off_gcd=1,slot=main_hand,if=!equipped.fyralath_the_dreamrender&(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
   local MainHandOnUse, _, MainHandRange = Player:GetUseableItems(OnUseExcludes, 16)
-  if MainHandOnUse and MainHandOnUse:IsReady() and ((not VarTrinket1Buffs or trinket1:CooldownDown()) and (not VarTrinket2Buffs or trinket2:CooldownDown())) then
+  if MainHandOnUse and MainHandOnUse:IsReady() and (not I.Fyralath:IsEquipped() and (not VarTrinket1Buffs or trinket1:CooldownDown()) and (not VarTrinket2Buffs or trinket2:CooldownDown())) then
     if Cast(MainHandOnUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(MainHandRange)) then return "use_item for "..MainHandOnUse:Name().." trinkets 12"; end
   end
   -- Note: Adding a generic use_items for non-trinkets/non-weapons
