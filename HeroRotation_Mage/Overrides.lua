@@ -272,7 +272,7 @@ FrostOldTargetDebuffStack = HL.AddCoreOverride("Target.DebuffStack",
     if Spell == SpellFrost.WintersChillDebuff then
       if SpellFrost.Flurry:InFlight() then
         return 2
-      elseif SpellFrost.IceLance:InFlight() then
+      elseif SpellFrost.IceLance:InFlight() or Player:IsCasting(SpellFrost.GlacialSpike) or SpellFrost.GlacialSpike:InFlight() then
         if BaseCheck == 0 then
           return 0
         else

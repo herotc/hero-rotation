@@ -62,15 +62,25 @@ local Settings = {
   Frost = HR.GUISettings.APL.Mage.Frost
 }
 
-S.FrozenOrb:RegisterInFlightEffect(84721)
-S.FrozenOrb:RegisterInFlight()
-HL:RegisterForEvent(function() S.FrozenOrb:RegisterInFlight() end, "LEARNED_SPELL_IN_TAB")
 S.Frostbolt:RegisterInFlightEffect(228597)
 S.Frostbolt:RegisterInFlight()
+S.FrozenOrb:RegisterInFlightEffect(84721)
+S.FrozenOrb:RegisterInFlight()
 S.Flurry:RegisterInFlightEffect(228354)
 S.Flurry:RegisterInFlight()
+S.GlacialSpike:RegisterInFlightEffect(228600)
+S.GlacialSpike:RegisterInFlight()
 S.IceLance:RegisterInFlightEffect(228598)
 S.IceLance:RegisterInFlight()
+
+HL:RegisterForEvent(function()
+  S.FrozenOrb:RegisterInFlightEffect(84721)
+  S.FrozenOrb:RegisterInFlight()
+  S.Flurry:RegisterInFlightEffect(228354)
+  S.Flurry:RegisterInFlight()
+  S.GlacialSpike:RegisterInFlightEffect(228600)
+  S.GlacialSpike:RegisterInFlight()
+end, "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
   BossFightRemains = 11111
@@ -448,7 +458,11 @@ local function APL()
     end
 
     -- Calculate remaining_winters_chill and icicles, as it's used in many lines
-    RemainingWintersChill = CalculateWintersChill(Enemies16ySplash)
+    if AoEON() and EnemiesCount16ySplash > 1 then
+      RemainingWintersChill = CalculateWintersChill(Enemies16ySplash)
+    else
+      RemainingWintersChill = Target:DebuffStack(S.WintersChillDebuff)
+    end
     Icicles = Player:BuffStackP(S.IciclesBuff)
 
     -- Calculate GCDMax
