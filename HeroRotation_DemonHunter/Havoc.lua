@@ -491,7 +491,7 @@ local function APL()
     -- pick_up_fragment,mode=nearest,type=lesser,if=fury.deficit>=45&(!cooldown.eye_beam.ready|fury<30)
     -- TODO: Can't detect when orbs actually spawn, we could possibly show a suggested icon when we DON'T want to pick up souls so people can avoid moving?
     -- run_action_list,name=opener,if=(cooldown.eye_beam.up|cooldown.metamorphosis.up)&time<15&(raid_event.adds.in>40)
-    if (S.EyeBeam:CooldownUp() and S.Metamorphosis:CooldownUp()) and CombatTime < 15 then
+    if (S.EyeBeam:CooldownUp() or S.Metamorphosis:CooldownUp()) and CombatTime < 15 then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Opener()"; end
     end
