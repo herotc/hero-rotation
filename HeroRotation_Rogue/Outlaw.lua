@@ -109,6 +109,8 @@ local RtB_BuffsList = {
 local function RtB_Buffs ()
   if not Cache.APLVar.RtB_Buffs then
     Cache.APLVar.RtB_Buffs = {}
+    Cache.APLVar.RtB_Buffs.Will_Lose = {}
+    Cache.APLVar.RtB_Buffs.Will_Lose.Total = 0
     Cache.APLVar.RtB_Buffs.Total = 0
     Cache.APLVar.RtB_Buffs.Normal = 0
     Cache.APLVar.RtB_Buffs.Shorter = 0
@@ -120,15 +122,23 @@ local function RtB_Buffs ()
         Cache.APLVar.RtB_Buffs.Total = Cache.APLVar.RtB_Buffs.Total + 1
         if Remains == RtBRemains then
           Cache.APLVar.RtB_Buffs.Normal = Cache.APLVar.RtB_Buffs.Normal + 1
+          Cache.APLVar.RtB_Buffs.Will_Lose[RtB_BuffsList[i]:Name()] = true
+          Cache.APLVar.RtB_Buffs.Will_Lose.Total = Cache.APLVar.RtB_Buffs.Will_Lose.Total + 1
         elseif Remains > RtBRemains then
           Cache.APLVar.RtB_Buffs.Longer = Cache.APLVar.RtB_Buffs.Longer + 1
         else
           Cache.APLVar.RtB_Buffs.Shorter = Cache.APLVar.RtB_Buffs.Shorter + 1
+          Cache.APLVar.RtB_Buffs.Will_Lose[RtB_BuffsList[i]:Name()] = true
+          Cache.APLVar.RtB_Buffs.Will_Lose.Total = Cache.APLVar.RtB_Buffs.Will_Lose.Total + 1
         end
       end
     end
   end
   return Cache.APLVar.RtB_Buffs.Total
+end
+
+local function checkBuffWillLose(buff)
+  return (Cache.APLVar.RtB_Buffs.Will_Lose and Cache.APLVar.RtB_Buffs.Will_Lose[buff]) and true or false
 end
 
 -- RtB rerolling strategy, return true if we should reroll
@@ -162,38 +172,40 @@ local function RtB_Reroll ()
       -- # Default Roll the Bones reroll rule: reroll for any buffs that aren't Buried Treasure, excluding Grand Melee in single target
       -- actions+=/variable,name=rtb_reroll,value=rtb_buffs.will_lose=
       -- (rtb_buffs.will_lose.buried_treasure+rtb_buffs.will_lose.grand_melee&spell_targets.blade_flurry<2&raid_event.adds.in>10)
-      if RtB_Buffs() <= 2 and Player:BuffUp(S.BuriedTreasure) and Player:BuffDown(S.GrandMelee) and EnemiesBFCount < 2 then
+      if RtB_Buffs() <= num(checkBuffWillLose(S.BuriedTreasure)) + num(checkBuffWillLose(S.GrandMelee)) and EnemiesBFCount < 2 then
         Cache.APLVar.RtB_Reroll = true
       end
 
       -- # Crackshot builds without T31 should reroll for True Bearing (or Broadside without Hidden Opportunity) if we won't lose over 1 buff
-      -- actions+=/variable,name=rtb_reroll,if=talent.crackshot&talent.hidden_opportunity&!set_bonus.tier31_4pc,value=
-      -- (!rtb_buffs.will_lose.true_bearing&talent.hidden_opportunity|!rtb_buffs.will_lose.broadside&!talent.hidden_opportunity)&rtb_buffs.will_lose<=1
-      if S.Crackshot:IsAvailable() and S.HiddenOpportunity:IsAvailable() and not Player:HasTier(31, 4)
-        and (not Player:BuffUp(S.TrueBearing) and S.HiddenOpportunity:IsAvailable() or not Player:BuffUp(S.Broadside) and not S.HiddenOpportunity:IsAvailable()) and RtB_Buffs() <= 1 then
-        Cache.APLVar.RtB_Reroll = true
+      -- actions+=/	variable,name=rtb_reroll,if=talent.crackshot&!set_bonus.tier31_4pc,value=(!rtb_buffs.will_lose.true_bearing
+      -- &talent.hidden_opportunity|!rtb_buffs.will_lose.broadside&!talent.hidden_opportunity)&rtb_buffs.will_lose<=1
+      if S.Crackshot:IsAvailable() and not Player:HasTier(31, 4)
+        and (not checkBuffWillLose(S.TrueBearing) and S.HiddenOpportunity:IsAvailable() or not checkBuffWillLose(S.Broadside) and not S.HiddenOpportunity:IsAvailable())
+        and Cache.APLVar.RtB_Buffs.Will_Lose.Total <= 1 then
+          Cache.APLVar.RtB_Reroll = true
       end
 
       -- # Crackshot builds with T31 should reroll if we won't lose over 1 buff (2 with Loaded Dice)
       -- actions+=/variable,name=rtb_reroll,if=talent.crackshot&set_bonus.tier31_4pc,value=
-      -- (rtb_buffs.will_lose<=1+buff.loaded_dice.up)&(talent.hidden_opportunity|!buff.broadside.up)
+      -- (rtb_buffs.will_lose<=1+buff.loaded_dice.up)
       if S.Crackshot:IsAvailable() and Player:HasTier(31, 4)
-        and (RtB_Buffs() <= 1 + num(Player:BuffUp(S.LoadedDiceBuff))) then
+        and (Cache.APLVar.RtB_Buffs.Will_Lose.Total <= 1 + num(Player:BuffUp(S.LoadedDiceBuff))) then
         Cache.APLVar.RtB_Reroll = true
       end
 
       -- # Hidden Opportunity builds without Crackshot should reroll for Skull and Crossbones or any 2 buffs excluding Grand Melee in single target
       -- actions+=/variable,name=rtb_reroll,if=!talent.crackshot&talent.hidden_opportunity,value=!rtb_buffs.will_lose.skull_and_crossbones
       -- &(rtb_buffs.will_lose<2+rtb_buffs.will_lose.grand_melee&spell_targets.blade_flurry<2&raid_event.adds.in>10)
-      if not S.Crackshot:IsAvailable() and S.HiddenOpportunity:IsAvailable() and not Player:BuffUp(S.SkullandCrossbones)
-        and (RtB_Buffs() < 2 + num(Player:BuffUp(S.GrandMelee)) and EnemiesBFCount < 2) then
+      if not S.Crackshot:IsAvailable() and S.HiddenOpportunity:IsAvailable() and not checkBuffWillLose(S.SkullandCrossbones)
+        and (Cache.APLVar.RtB_Buffs.Will_Lose.Total < 2 + checkBuffWillLose(S.GrandMelee) and EnemiesBFCount < 2) then
         Cache.APLVar.RtB_Reroll = true
       end
 
       -- # Additional reroll rules if all active buffs will not be rolled away and we don't already have 5+ buffs
-      -- actions+/variable,name=rtb_reroll,value=variable.rtb_reroll|rtb_buffs.normal=0&rtb_buffs.longer>=1&rtb_buffs<5&rtb_buffs.max_remains<=39
-      if Cache.APLVar.RtB_Reroll and (Cache.APLVar.RtB_Buffs.Longer == 0 or Cache.APLVar.RtB_Buffs.Normal == 0) and Cache.APLVar.RtB_Buffs.Longer >= 1 and RtB_Buffs() < 5 and Rogue.RtBRemains() <= 39
-      and not Player:StealthUp(true, true) then
+      -- actions+/variable,name=rtb_reroll,value=variable.rtb_reroll&rtb_buffs.longer=0|rtb_buffs.normal=0
+      -- &rtb_buffs.longer>=1&rtb_buffs<6&rtb_buffs.max_remains<=39&!stealthed.all&buff.loaded_dice.up
+      if Cache.APLVar.RtB_Reroll and Cache.APLVar.RtB_Buffs.Longer == 0 or Cache.APLVar.RtB_Buffs.Normal == 0 and Cache.APLVar.RtB_Buffs.Longer >= 1 and RtB_Buffs() < 6 and Rogue.RtBRemains() <= 39
+      and not Player:StealthUp(true, true) and Player:BuffUp(S.LoadedDiceBuff) then
         Cache.APLVar.RtB_Reroll = true
       end
 
@@ -489,7 +501,7 @@ local function Finish ()
   -- #Crackshot builds use Between the Eyes outside of Stealth if Vanish or Dance will not come off cooldown within the next cast
   -- actions.finish+=/between_the_eyes,if=talent.crackshot&(cooldown.vanish.remains>45&cooldown.shadow_dance.remains>12)
   if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and S.Crackshot:IsAvailable()
-    and (S.Vanish:CooldownRemains() > 45 and S.ShadowDance:CooldownRemains() > 15) then
+    and (S.Vanish:CooldownRemains() > 45 and S.ShadowDance:CooldownRemains() > 12) then
     if CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
   end
 
