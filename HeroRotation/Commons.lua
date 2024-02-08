@@ -137,6 +137,7 @@ function Commons.GroupBuffMissing(spell)
         for _, v in pairs(BotBBuffIDs) do
           if Char:BuffUp(Spell(v), true) then
             BuffedChars = BuffedChars + 1
+            break
           end
         end
       elseif Char:BuffDown(spell, true) then
