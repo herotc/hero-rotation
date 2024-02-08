@@ -228,7 +228,8 @@ local function Aoe()
   if S.LavaBurst:IsViable() and (Player:BuffUp(S.LavaSurgeBuff) and (not S.LightningRod:IsAvailable() and Player:HasTier(31, 4))) then
     if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 42"; end
   end
-  -- lava_burst,target_if=dot.flame_shock.remains,if=cooldown_react&buff.lava_surge.up&talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&(maelstrom>=60-5*talent.eye_of_the_storm.rank-2*talent.flow_of_power.enabled)&(!talent.echoes_of_great_sundering.enabled&!talent.lightning_rod.enabled|buff.echoes_of_great_sundering.up)&(!buff.ascendance.up&active_enemies>3&talent.unrelenting_calamity.enabled|active_enemies>3&!talent.unrelenting_calamity.enabled|active_enemies=3)
+  -- lava_burst,target_if=dot.flame_shock.remains,if=cooldown_react&buff.lava_surge.up&talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&(maelstrom>=60-5*talent.eye_of_the_storm.rank-2*talent.flow_of_power.enabled)&(!talent.echoes_of_great_sundering.enabled&!talent.lightning_rod.enabled|buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up)&(!buff.ascendance.up&active_enemies>3&talent.unrelenting_calamity.enabled|active_enemies>3&!talent.unrelenting_calamity.enabled|active_enemies=3)
+  -- Note: Buff ID for echoes_of_great_sundering_eb and echoes_of_great_sundering_es is the same.
   if S.LavaBurst:IsViable() and (Player:BuffUp(S.LavaSurgeBuff) and S.MasteroftheElements:IsAvailable() and not Player:MOTEP() and (Player:MaelstromP() >= 60 - 5 * S.EyeoftheStorm:TalentRank() - 2 * num(S.FlowofPower:IsAvailable())) and (not S.EchoesofGreatSundering:IsAvailable() and not S.LightningRod:IsAvailable() or Player:BuffUp(S.EchoesofGreatSunderingBuff)) and (Player:BuffDown(S.AscendanceBuff) and Shaman.Targets > 3 and not S.UnrelentingCalamity:IsAvailable() or Shaman.ClusterTargets == 3)) then
     if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 44"; end
   end
@@ -240,7 +241,8 @@ local function Aoe()
   if S.Earthquake:IsReady() and (not S.EchoesofGreatSundering:IsAvailable() and not S.ElementalBlast:IsAvailable() and Shaman.Targets == 3 and Shaman.ClusterTargets == 3) then
     if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 48"; end
   end
-  -- earthquake,if=buff.echoes_of_great_sundering.up
+  -- earthquake,if=buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up
+  -- Note: Buff ID for echoes_of_great_sundering_eb and echoes_of_great_sundering_es is the same.
   if S.Earthquake:IsReady() and (Player:BuffUp(S.EchoesofGreatSunderingBuff)) then
     if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 50"; end
   end
@@ -443,7 +445,8 @@ local function SingleTarget()
   if S.FrostShock:IsCastable() and (Player:IcefuryP() and not S.LavaSurge:IsAvailable() and not S.EchooftheElements:IsAvailable() and not S.ElementalBlast:IsAvailable() and (Player:MaelstromP() >= 36 and Player:MaelstromP() < 50 and S.LavaBurst:CooldownRemains() > Player:GCD() or Player:MaelstromP() >= 24 and Player:MaelstromP() < 38 and S.LavaBurst:CooldownUp())) then
     if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 50"; end
   end
-  -- lava_burst,if=buff.windspeakers_lava_resurgence.up&(talent.echo_of_the_elements.enabled|talent.lava_surge.enabled|talent.primordial_surge.enabled|maelstrom>=63&talent.master_of_the_elements.enabled|maelstrom>=38&buff.echoes_of_great_sundering.up&active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)|!talent.elemental_blast.enabled)
+  -- lava_burst,if=buff.windspeakers_lava_resurgence.up&(talent.echo_of_the_elements.enabled|talent.lava_surge.enabled|talent.primordial_surge.enabled|maelstrom>=63&talent.master_of_the_elements.enabled|maelstrom>=38&(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up)&active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)|!talent.elemental_blast.enabled)
+  -- Note: Buff ID for echoes_of_great_sundering_eb and echoes_of_great_sundering_es is the same.
   if S.LavaBurst:IsViable() and (Player:BuffUp(S.WindspeakersLavaResurgenceBuff) and (S.EchooftheElements:IsAvailable() or S.LavaSurge:IsAvailable() or S.PrimordialSurge:IsAvailable() or Player:MaelstromP() >= 63 and S.MasteroftheElements:IsAvailable() or Player:MaelstromP() >= 38 and Player:BuffUp(S.EchoesofGreatSunderingBuff) and Shaman.Targets > 1 and Shaman.ClusterTargets > 1 or not S.ElementalBlast:IsAvailable())) then
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 52"; end
   end
@@ -468,7 +471,8 @@ local function SingleTarget()
   if S.LavaBurst:IsViable() and (S.MasteroftheElements:IsAvailable() and not Player:MOTEP() and (Player:MaelstromP() >= 75 or Player:MaelstromP() >= 50 and not S.ElementalBlast:IsAvailable()) and S.SwellingMaelstrom:IsAvailable() and Player:MaelstromP() <= 130) then
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 62"; end
   end
-  -- earthquake,if=buff.echoes_of_great_sundering.up&(!talent.elemental_blast.enabled&active_enemies<2|active_enemies>1)
+  -- earthquake,if=(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up)&(!talent.elemental_blast.enabled&active_enemies<2|active_enemies>1)
+  -- Note: Buff ID for echoes_of_great_sundering_eb and echoes_of_great_sundering_es is the same.
   if S.Earthquake:IsReady() and (Player:BuffUp(S.EchoesofGreatSunderingBuff) and (not S.ElementalBlast:IsAvailable() and Shaman.Targets < 2 or Shaman.Targets > 1)) then
     if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 64"; end
   end
