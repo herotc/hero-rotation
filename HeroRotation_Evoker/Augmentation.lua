@@ -136,8 +136,16 @@ local function BlisteringScalesCheck()
 
   if Group == Player then
     return Player:BuffStack(S.BlisteringScalesBuff)
-  else
+  elseif Group == Unit.Party then
     for unitID, Char in pairs(Group) do
+      -- Check for the buff on the group tank only
+      if Char:Exists() and UnitGroupRolesAssigned(unitID) == "TANK" then
+        return Char:BuffStack(S.BlisteringScalesBuff)
+      end
+    end
+  elseif Group == Unit.Raid then
+    for unitID, Char in pairs(Group) do
+      -- Check for the buff on the raid's ACTIVE tank only
       if Char:Exists() and (Char:IsTankingAoE(8) or Char:IsTanking(Target)) and UnitGroupRolesAssigned(unitID) == "TANK" then
         return Char:BuffStack(S.BlisteringScalesBuff)
       end
