@@ -125,18 +125,19 @@ local function SoMCheck()
 end
 
 local function BlisteringScalesCheck()
+  -- if Blistering Scales option is disabled, return 99 (always higher than required stacks, which should result in no suggestion)
+  if not Settings.Augmentation.ShowBlisteringScales then return 99 end
   local Group
   if UnitInRaid("player") then
     Group = Unit.Raid
   elseif UnitInParty("player") then
     Group = Unit.Party
   else
-    Group = Player
+    -- If solo, just return our own stacks
+    return Player:BuffStack(S.BlisteringScalesBuff)
   end
 
-  if Group == Player then
-    return Player:BuffStack(S.BlisteringScalesBuff)
-  elseif Group == Unit.Party then
+  if Group == Unit.Party then
     for unitID, Char in pairs(Group) do
       -- Check for the buff on the group tank only
       if Char:Exists() and UnitGroupRolesAssigned(unitID) == "TANK" then
@@ -152,7 +153,7 @@ local function BlisteringScalesCheck()
     end
   end
 
-  return 0
+  return 99
 end
 
 local function TemporalWoundCalc(Enemies)
