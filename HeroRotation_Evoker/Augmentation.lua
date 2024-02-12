@@ -100,9 +100,6 @@ HL:RegisterForEvent(function()
   FoMEmpowerMod = (S.FontofMagic:IsAvailable()) and 0.8 or 1
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
-local function PrescienceCheck()
-end
-
 local function SoMCheck()
   local Group
   if UnitInRaid("player") then
@@ -154,6 +151,29 @@ local function BlisteringScalesCheck()
   end
 
   return 99
+end
+
+local function PrescienceCheck()
+  -- If Prescience suggestions are disabled in settings, always return false.
+  if not Settings.Augmentation.ShowPrescience then return false end
+  local Group
+  -- Always return true in a raid, as the odds of running out of dps to buff is low.
+  if UnitInRaid("player") then
+    return true
+  -- In a 5-man, only suggest Prescience on a dps without the Prescience buff.
+  elseif UnitInParty("player") then
+    for unitID, Char in pairs(Unit.Party) do
+      if Char:Exists() and UnitGroupRolesAssigned(unitID) == "DAMAGER" then
+        if Char:BuffRemains(S.PrescienceBuff) <= Player:GCDRemains() then
+          return true
+        end
+      end
+    end
+    return false
+  -- Always return false when playing solo.
+  else
+    return false
+  end
 end
 
 local function TemporalWoundCalc(Enemies)
@@ -427,7 +447,7 @@ local function APL()
     VarTempWound = TemporalWoundCalc(Enemies25y)
     -- prescience,target_if=min:debuff.prescience.remains+1000*(target=self&active_allies>2)+1000*target.spec.augmentation,if=(full_recharge_time<=gcd.max*3|cooldown.ebon_might.remains<=gcd.max*3&(buff.ebon_might_self.remains-gcd.max*3)<=buff.ebon_might_self.duration*0.4|variable.temp_wound>=(gcd.max+action.eruption.cast_time)|fight_remains<=30)&(buff.trembling_earth.stack+evoker.prescience_buffs)<=(5+(full_recharge_time<=gcd.max*3))
     -- Note: Not handling target_if, as user will have to decide on a target.
-    if Settings.Augmentation.ShowPrescience and S.Prescience:IsCastable() and ((S.Prescience:FullRechargeTime() <= GCDMax * 3 or S.EbonMight:CooldownRemains() <= GCDMax * 3 and (Player:BuffRemains(S.EbonMightSelfBuff) - GCDMax * 3) <= EMSelfBuffDuration() * 0.4 or VarTempWound >= (GCDMax + S.Eruption:CastTime()) or FightRemains <= 30) and (Player:BuffStack(S.TremblingEarthBuff) + S.PrescienceBuff:AuraActiveCount()) <= (5 + num(S.Prescience:FullRechargeTime() <= GCDMax * 3))) then
+    if S.Prescience:IsCastable() and PrescienceCheck() and ((S.Prescience:FullRechargeTime() <= GCDMax * 3 or S.EbonMight:CooldownRemains() <= GCDMax * 3 and (Player:BuffRemains(S.EbonMightSelfBuff) - GCDMax * 3) <= EMSelfBuffDuration() * 0.4 or VarTempWound >= (GCDMax + S.Eruption:CastTime()) or FightRemains <= 30) and (Player:BuffStack(S.TremblingEarthBuff) + S.PrescienceBuff:AuraActiveCount()) <= (5 + num(S.Prescience:FullRechargeTime() <= GCDMax * 3))) then
       if Cast(S.Prescience, nil, Settings.Augmentation.DisplayStyle.AugBuffs) then return "prescience main 4"; end
     end
     -- call_action_list,name=ebon_logic,if=(buff.ebon_might_self.remains-cast_time)<=buff.ebon_might_self.duration*0.4&(active_enemies>0|raid_event.adds.in<=3)&(evoker.prescience_buffs>=2&time<=10|evoker.prescience_buffs>=3|fight_style.dungeonroute|fight_style.dungeonslice|buff.ebon_might_self.remains>=action.ebon_might.cast_time|active_allies<=2)
