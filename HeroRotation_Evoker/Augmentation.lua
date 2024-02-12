@@ -264,7 +264,7 @@ local function OpenerFiller()
     VarOpenerCDs = true
   end
   -- variable,name=opener_delay,value=variable.opener_delay-2,if=equipped.nymues_unraveling_spindle&trinket.nymues_unraveling_spindle.cooldown.up
-  if I.NymuesUnravelingSpindle:IsEquipped() and I.NymuesUnravelingSpindle:CooldownUp() then
+  if I.NymuesUnravelingSpindle:IsEquipped() and I.NymuesUnravelingSpindle:CooldownRemains() <= Player:GCD() then
     VarOpenerDelay = VarOpenerDelay - 2
   end
   -- living_flame,if=active_enemies=1|talent.pupil_of_alexstrasza
@@ -280,7 +280,7 @@ end
 local function Items()
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=nymues_unraveling_spindle,if=cooldown.breath_of_eons.remains<=3
-    if I.NymuesUnravelingSpindle:IsEquipped() and I.NymuesUnravelingSpindle:CooldownUp() and (S.BreathofEons:CooldownRemains() <= 3) then
+    if I.NymuesUnravelingSpindle:IsEquipped() and I.NymuesUnravelingSpindle:CooldownRemains() <= Player:GCD() and (S.BreathofEons:CooldownRemains() <= 3) then
       if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle items 2"; end
     end
     if Target:DebuffUp(S.TemporalWoundDebuff) or FightRemains <= 30 and Player:BuffUp(S.EbonMightSelfBuff) then
