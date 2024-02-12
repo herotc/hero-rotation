@@ -55,9 +55,11 @@ HR.GUISettings.APL.Mage = {
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
+      CometStorm = false,
       Freeze = false,
       FrozenOrb = true,
       IcyVeins = true,
+      RayOfFrost = false,
       WaterJet = false,
     },
     -- {Display OffGCD as OffGCD}

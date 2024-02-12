@@ -249,7 +249,7 @@ local function Aoe()
   end
   -- comet_storm,if=!prev_gcd.1.glacial_spike&(!talent.coldest_snap|cooldown.cone_of_cold.ready&cooldown.frozen_orb.remains>25|cooldown.cone_of_cold.remains>20)
   if S.CometStorm:IsCastable() and (not Player:PrevGCDP(1, S.GlacialSpike) and (not S.ColdestSnap:IsAvailable() or S.ConeofCold:CooldownUp() and S.FrozenOrb:CooldownRemains() > 25 or S.ConeofCold:CooldownRemains() > 20)) then
-    if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm aoe 8"; end
+    if Cast(S.CometStorm, Settings.Frost.GCDasOffGCD.CometStorm, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm aoe 8"; end
   end
   -- freeze,if=freez&debuff.frozen.down&(!talent.glacial_spike&!talent.snowstorm|prev_gcd.1.glacial_spike|cooldown.cone_of_cold.ready&buff.snowstorm.stack=buff.snowstorm.max_stack)
   if Pet:IsActive() and S.Freeze:IsReady() and (Freezable() and FrozenRemains() == 0 and (not S.GlacialSpike:IsAvailable() and not S.Snowstorm:IsAvailable() or Player:PrevGCDP(1, S.GlacialSpike) or S.ConeofCold:CooldownUp() and Player:BuffStack(S.SnowstormBuff) == var_snowstorm_max_stack)) then
@@ -316,7 +316,7 @@ end
 local function Cleave()
   -- comet_storm,if=prev_gcd.1.flurry|prev_gcd.1.cone_of_cold
   if S.CometStorm:IsCastable() and (Player:PrevGCDP(1, S.Flurry) or Player:PrevGCDP(1, S.ConeofCold)) then
-    if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm cleave 2"; end
+    if Cast(S.CometStorm, Settings.Frost.GCDasOffGCD.CometStorm, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm cleave 2"; end
   end
   -- flurry,target_if=min:debuff.winters_chill.stack,if=cooldown_react&((prev_gcd.1.frostbolt&buff.icicles.react>=3)|prev_gcd.1.glacial_spike|(buff.icicles.react>=3&buff.icicles.react<5&charges_fractional=2))
   if S.Flurry:IsCastable() and ((Player:PrevGCDP(1, S.Frostbolt) and Icicles >= 3) or Player:PrevGCDP(1, S.GlacialSpike) or (Icicles >= 3 and Icicles < 5 and S.Flurry:ChargesFractional() == 2)) then
@@ -329,7 +329,7 @@ local function Cleave()
   end
   -- ray_of_frost,target_if=max:debuff.winters_chill.stack,if=remaining_winters_chill=1
   if S.RayofFrost:IsCastable() and (RemainingWintersChill == 1) then
-    if Everyone.CastTargetIf(S.RayofFrost, Enemies16ySplash, "max", EvaluateTargetIfFilterWCStacks, nil, not Target:IsSpellInRange(S.RayofFrost)) then return "ray_of_frost cleave 8"; end
+    if Everyone.CastTargetIf(S.RayofFrost, Enemies16ySplash, "max", EvaluateTargetIfFilterWCStacks, nil, not Target:IsSpellInRange(S.RayofFrost), Settings.Frost.GCDasOffGCD.RayOfFrost) then return "ray_of_frost cleave 8"; end
   end
   -- glacial_spike,if=buff.icicles.react=5&(action.flurry.cooldown_react|remaining_winters_chill)
   if S.GlacialSpike:IsReady() and (Icicles == 5 and (S.Flurry:CooldownUp() or RemainingWintersChill > 0)) then
@@ -376,7 +376,7 @@ end
 local function ST()
   -- comet_storm,if=prev_gcd.1.flurry|prev_gcd.1.cone_of_cold
   if S.CometStorm:IsCastable() and (Player:PrevGCDP(1, S.Flurry) or Player:PrevGCDP(1, S.ConeofCold)) then
-    if Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm single 2"; end
+    if Cast(S.CometStorm, Settings.Frost.GCDasOffGCD.CometStorm, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm single 2"; end
   end
   -- flurry,if=cooldown_react&remaining_winters_chill=0&debuff.winters_chill.down&((prev_gcd.1.frostbolt&buff.icicles.react>=3|prev_gcd.1.frostbolt&buff.brain_freeze.react)|prev_gcd.1.glacial_spike|talent.glacial_spike&buff.icicles.react=4&!buff.fingers_of_frost.react)
   if S.Flurry:IsCastable() and (RemainingWintersChill == 0 and Target:DebuffDown(S.WintersChillDebuff) and ((Player:PrevGCDP(1, S.Frostbolt) and Icicles >= 3 or Player:PrevGCDP(1, S.Frostbolt) and Player:BuffUp(S.BrainFreezeBuff)) or Player:PrevGCDP(1, S.GlacialSpike) or S.GlacialSpike:IsAvailable() and Icicles == 4 and Player:BuffDown(S.FingersofFrostBuff))) then
@@ -388,7 +388,7 @@ local function ST()
   end
   -- ray_of_frost,if=remaining_winters_chill=1
   if S.RayofFrost:IsCastable() and (RemainingWintersChill == 1) then
-    if Cast(S.RayofFrost, nil, nil, not Target:IsSpellInRange(S.RayofFrost)) then return "ray_of_frost single 8"; end
+    if Cast(S.RayofFrost, Settings.Frost.GCDasOffGCD.RayOfFrost, nil, not Target:IsSpellInRange(S.RayofFrost)) then return "ray_of_frost single 8"; end
   end
   -- glacial_spike,if=buff.icicles.react=5&(action.flurry.cooldown_react|remaining_winters_chill)
   if S.GlacialSpike:IsReady() and (Icicles == 5 and (S.Flurry:Charges() >= 1 or RemainingWintersChill > 0)) then
