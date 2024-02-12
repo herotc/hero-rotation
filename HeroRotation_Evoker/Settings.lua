@@ -47,6 +47,7 @@ HR.GUISettings.APL.Evoker = {
   Augmentation = {
     MinOpenerDelay = 0,
     ShowBlisteringScales = true,
+    ShowPrescience = true,
     UpheavalRank1Only = true,
     DisplayStyle = {
       AugBuffs = "SuggestedRight",
@@ -94,6 +95,7 @@ CreatePanelOption("Slider", CP_Evoker, "APL.Evoker.Commons.DisintegrateFontSize"
 CreateARPanelOptions(CP_Augmentation, "APL.Evoker.Augmentation")
 CreatePanelOption("Slider", CP_Augmentation, "APL.Evoker.Augmentation.MinOpenerDelay", {0, 5, 1}, "Minimum Opener Delay", "Set this to the minimum number of seconds to delay during the opener. (Note: This will result in filler Living Flame or Azure Strike casts before continuing the rotation. Default: 0.)")
 CreatePanelOption("CheckButton", CP_Augmentation, "APL.Evoker.Augmentation.ShowBlisteringScales", "Show Blistering Scales", "Enable this option to allow Blistering Scales suggestions. NOTE: This will only suggest Blistering Scales for the party/raid tank.")
+CreatePanelOption("CheckButton", CP_Augmentation, "APL.Evoker.Augmentation.ShowPrescience", "Show Prescience", "Enable this option to show Prescience suggestions.")
 CreatePanelOption("CheckButton", CP_Augmentation, "APL.Evoker.Augmentation.UpheavalRank1Only", "Only Use Rank 1 Upheaval", "Enable this option to only suggest Rank 1 Upheaval. When disabled, Upheaval will be recommended at higher ranks depending on target count.")
 
 -- Devastation
