@@ -127,11 +127,11 @@ end
 local function UsePriorityRotation()
   if MeleeEnemies10yCount < 2 then
     return false
-  elseif Settings.Commons.UsePriorityRotation == "Always" then
+  elseif Settings.Subtlety.UsePriorityRotation == "Always" then
     return true
-  elseif Settings.Commons.UsePriorityRotation == "On Bosses" and Target:IsInBossList() then
+  elseif Settings.Subtlety.UsePriorityRotation == "On Bosses" and Target:IsInBossList() then
     return true
-  elseif Settings.Commons.UsePriorityRotation == "Auto" then
+  elseif Settings.Subtlety.UsePriorityRotation == "Auto" then
     -- Zul Mythic
     if Player:InstanceDifficulty() == 16 and Target:NPCID() == 138967 then
       return true
