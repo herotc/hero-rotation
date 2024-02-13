@@ -494,8 +494,8 @@ local function HighPrioActions()
 end
 
 local function Racials()
-  -- arcane_torrent,if=runic_power.deficit>20&(cooldown.summon_gargoyle.remains<gcd|!talent.summon_gargoyle.enabled|pet.gargoyle.active&rune<2&debuff.festering_wound.stack<1)
-  if S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 20 and (S.SummonGargoyle:CooldownRemains() < Player:GCD() or not S.SummonGargoyle:IsAvailable() or VarGargActive and Player:Rune() < 2 and FesterStacks < 1)) then
+  -- arcane_torrent,if=runic_power.deficit>20&(cooldown.summon_gargoyle.remains<gcd&time>15|!talent.summon_gargoyle.enabled|pet.gargoyle.active&rune<2&debuff.festering_wound.stack<1)
+  if S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 20 and (S.SummonGargoyle:CooldownRemains() < Player:GCD() and HL.CombatTime() > 15 or not S.SummonGargoyle:IsAvailable() or VarGargActive and Player:Rune() < 2 and FesterStacks < 1)) then
     if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent racials 2"; end
   end
   -- blood_fury,if=(buff.blood_fury.duration+3>=pet.gargoyle.remains&pet.gargoyle.active)|(!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>60)&(pet.army_ghoul.active&pet.army_ghoul.remains<=buff.blood_fury.duration+3|pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=buff.blood_fury.duration+3|active_enemies>=2&death_and_decay.ticking)|fight_remains<=buff.blood_fury.duration+3
@@ -560,9 +560,8 @@ local function ST()
 end
 
 local function Trinkets()
-  -- use_item,name=fyralath_the_dreamrender,if=active_dot.mark_of_fyralath=active_enemies&(active_enemies<5|active_enemies>21|fight_remains<4)&(debuff.festering_wound.stack>2|time>15)
-  -- Note: Using >= for mark_of_fyralath debuff count, just to be safe.
-  if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() >= ActiveEnemies and (ActiveEnemies < 5 or ActiveEnemies > 21 or FightRemains < 4) and (FesterStacks > 2 or HL.CombatTime() > 15)) then
+  -- use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking&(active_enemies<5|active_enemies>21|fight_remains<4)&(debuff.festering_wound.stack>=2|time>15)
+  if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0 and (ActiveEnemies < 5 or ActiveEnemies > 21 or FightRemains < 4) and (FesterStacks >= 2 or HL.CombatTime() > 15)) then
     if Cast(I.Fyralath, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender trinkets 1"; end
   end
   if Settings.Commons.Enabled.Trinkets then
