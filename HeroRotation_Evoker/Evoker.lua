@@ -149,7 +149,9 @@ Item.Evoker.Commons = {
   MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
   NeltharionsCalltoChaos                = Item(204201, {13, 14}),
   NymuesUnravelingSpindle               = Item(208615, {13, 14}),
+  RubyWhelpShell                        = Item(193757, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
+  WhisperingIncarnateIcon               = Item(194301, {13, 14}),
   -- Items
   Dreambinder                           = Item(208616, {16}),
   Iridal                                = Item(208321, {16}),
