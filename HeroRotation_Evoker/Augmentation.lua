@@ -93,6 +93,7 @@ local VarSpamHeal = true
 local VarMinOpenerDelay = Settings.Augmentation.MinOpenerDelay
 local VarOpenerDelay = 0
 local VarOpenerCDs = false
+local InDungeon
 
 -- Stun Interrupts
 local StunInterrupts = {
@@ -449,7 +450,7 @@ local function APL()
     GCDMax = Player:GCD() + 0.25
 
     -- Are we running a dungeon (non-raid)
-    local InDungeon = Player:IsInParty() and not Player:IsInRaid()
+    InDungeon = Player:IsInParty() and not Player:IsInRaid()
   end
 
   if Everyone.TargetIsValid() then
