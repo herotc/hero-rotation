@@ -227,13 +227,13 @@ local function Breath()
   if S.Obliterate:IsReady() and (Player:RunicPowerDeficit() > 40 or Player:BuffUp(S.PillarofFrostBuff)) then
     if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfRazoriceStacks, nil, not Target:IsInMeleeRange(5)) then return "obliterate breath 10"; end
   end
-  -- death_and_decay,if=runic_power<36&rune.time_to_2>runic_power%18
-  if S.DeathAndDecay:IsReady() and (Player:RunicPower() < 36 and Player:RuneTimeToX(2) > Player:RunicPower() / 18) then
-    if Cast(S.DeathAndDecay, Settings.Commons2.GCDasOffGCD.DeathAndDecay, nil, not Target:IsSpellInRange(S.DeathAndDecay)) then return "death_and_decay breath 12"; end
-  end
   -- remorseless_winter,if=runic_power<36&rune.time_to_2>runic_power%18
   if S.RemorselessWinter:IsReady() and (Player:RunicPower() < 36 and Player:RuneTimeToX(2) > Player:RunicPower() / 18) then
-    if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter breath 14"; end
+    if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter breath 12"; end
+  end
+  -- death_and_decay,if=talent.unholy_ground&!death_and_decay.ticking&runic_power.deficit>=10|runic_power<36&rune.time_to_2>runic_power%18
+  if S.DeathAndDecay:IsReady() and (S.UnholyGround:IsAvailable() and Player:BuffDown(S.DeathAndDecayBuff) and Player:RunicPowerDeficit() >= 10 or Player:RunicPower() < 36 and Player:RuneTimeToX(2) > Player:RunicPower() / 18) then
+    if Cast(S.DeathAndDecay, Settings.Commons2.GCDasOffGCD.DeathAndDecay, nil, not Target:IsSpellInRange(S.DeathAndDecay)) then return "death_and_decay breath 14"; end
   end
   -- howling_blast,if=runic_power<36&rune.time_to_2>runic_power%18
   if S.HowlingBlast:IsReady() and (Player:RunicPower() < 36 and Player:RuneTimeToX(2) > Player:RunicPower() / 18) then
