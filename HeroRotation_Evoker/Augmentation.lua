@@ -200,7 +200,7 @@ local function PrescienceCheck()
   elseif UnitInParty("player") then
     for unitID, Char in pairs(Unit.Party) do
       if Char:Exists() and UnitGroupRolesAssigned(unitID) == "DAMAGER" then
-        if Char:BuffRemains(S.PrescienceBuff) <= Player:GCDRemains() then
+        if Char:BuffDown(S.PrescienceBuff) then
           return true
         end
       end
