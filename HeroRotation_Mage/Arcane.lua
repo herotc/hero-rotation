@@ -220,7 +220,7 @@ end
 local function CooldownPhase()
   -- touch_of_the_magi,use_off_gcd=1,if=prev_gcd.1.arcane_barrage
   if S.TouchoftheMagi:IsReady() and (Player:PrevGCDP(1, S.ArcaneBarrage)) then
-    if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi cooldown_phase 2"; end
+    if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi, nil, not Target:IsInRange(40)) then return "touch_of_the_magi cooldown_phase 2"; end
   end
   -- shifting_power,if=buff.arcane_surge.down&!talent.radiant_spark
   if S.ShiftingPower:IsReady() and (Player:BuffDown(S.ArcaneSurgeBuff) and not S.RadiantSpark:IsAvailable()) then
@@ -503,7 +503,7 @@ local function APL()
     local ShouldReturn = Calculations(); if ShouldReturn then return ShouldReturn; end
     -- Manually added: touch_of_the_magi,if=prev_gcd.1.arcane_barrage
     if S.TouchoftheMagi:IsReady() and (Player:PrevGCDP(1, S.ArcaneBarrage)) then
-      if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi) then return "touch_of_the_magi main 54"; end
+      if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi, nil, not Target:IsInRange(40)) then return "touch_of_the_magi main 54"; end
     end
     -- cancel_action,if=action.evocation.channeling&mana.pct>=95&!talent.siphon_storm
     -- cancel_action,if=action.evocation.channeling&(mana.pct>fight_remains*4)&!(fight_remains>10&cooldown.arcane_surge.remains<1)
