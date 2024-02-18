@@ -196,14 +196,29 @@ local function PrescienceCheck()
   -- Always return true in a raid, as the odds of running out of dps to buff is low.
   if UnitInRaid("player") then
     return true
-  -- In a 5-man, only suggest Prescience on a dps without the Prescience buff.
+  -- In a 5-man, suggest Prescience on a dps without the Prescience buff or on the tank if neither dps will lose uptime.
   elseif UnitInParty("player") then
+    local DPSBuffOne = nil
+    local DPSBuffTwo = nil
+    local TankBuff = nil
+    local PrescienceCD = S.Prescience:Cooldown()
     for unitID, Char in pairs(Unit.Party) do
-      if Char:Exists() and UnitGroupRolesAssigned(unitID) == "DAMAGER" then
-        if Char:BuffDown(S.PrescienceBuff) then
-          return true
+      if Char:Exists() then
+        local CharRole = UnitGroupRolesAssigned(unitID)
+        if CharRole == "DAMAGER" then
+          if DPSBuffOne == nil then
+            DPSBuffOne = Char:BuffRemains(S.PrescienceBuff)
+          else
+            DPSBuffTwo = Char:BuffRemains(S.PrescienceBuff)
+          end
+        end
+        if CharRole == "TANK" then
+          TankBuff = Char:BuffRemains(S.PrescienceBuff)
         end
       end
+    end
+    if DPSBuffOne == 0 or DPSBuffTwo == 0 or Player:HasTier(31, 2) and DPSBuffOne > PrescienceCD and DPSBuffTwo > PrescienceCD and TankBuff == 0 then
+      return true
     end
     return false
   -- Always return false when playing solo.
