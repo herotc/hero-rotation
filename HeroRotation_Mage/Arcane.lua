@@ -375,7 +375,7 @@ local function APL()
     end
     if CDsON() then
       -- time_warp,if=talent.temporal_warp&buff.exhaustion.up&(cooldown.arcane_surge.ready|fight_remains<=40|(buff.arcane_surge.up&fight_remains<=(cooldown.arcane_surge.remains+14)))
-      if S.TimeWarp:IsReady() and Settings.Commons.UseTemporalWarp and (S.TemporalWarp:IsAvailable() and Player:BloodlustExhaustUp() and (S.ArcaneSurge:CooldownUp() or FightRemains <= 40 or (Player:BuffUp(S.ArcaneSurgeBuff) and FightRemains <= (S.ArcaneSurge:CooldownRemains() + 14)))) then
+      if S.TimeWarp:IsReady() and Settings.Commons.UseTemporalWarp and Player:BloodlustDown() and (S.TemporalWarp:IsAvailable() and Player:BloodlustExhaustUp() and (S.ArcaneSurge:CooldownUp() or FightRemains <= 40 or (Player:BuffUp(S.ArcaneSurgeBuff) and FightRemains <= (S.ArcaneSurge:CooldownRemains() + 14)))) then
         if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp main 4"; end
       end
       -- lights_judgment,if=buff.arcane_surge.down&debuff.touch_of_the_magi.down&active_enemies>=2
