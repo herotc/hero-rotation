@@ -106,7 +106,7 @@ local function RetargetAutoAttack(Spell, Enemies, Condition, OutofRange)
   if Target:IsInBossList() or not AoEON() then return false end
   local TargetGUID = Target:GUID()
   for _, CycleUnit in pairs(Enemies) do
-    if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and Condition(CycleUnit) then
+    if CycleUnit:GUID() ~= TargetGUID and CycleUnit:DebuffDown(S.BurningWoundDebuff) then
       HR.CastLeftNameplate(CycleUnit, Spell)
       break
     end
