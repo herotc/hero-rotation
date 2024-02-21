@@ -231,8 +231,8 @@ local function Breath()
   if S.RemorselessWinter:IsReady() and (Player:RunicPower() < 36 and Player:RuneTimeToX(2) > Player:RunicPower() / 18) then
     if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter breath 12"; end
   end
-  -- death_and_decay,if=talent.unholy_ground&!death_and_decay.ticking&runic_power.deficit>=10|runic_power<36&rune.time_to_2>runic_power%18
-  if S.DeathAndDecay:IsReady() and (S.UnholyGround:IsAvailable() and Player:BuffDown(S.DeathAndDecayBuff) and Player:RunicPowerDeficit() >= 10 or Player:RunicPower() < 36 and Player:RuneTimeToX(2) > Player:RunicPower() / 18) then
+  -- death_and_decay,if=variable.st_planning&talent.unholy_ground&!death_and_decay.ticking&runic_power.deficit>=10|runic_power<36&rune.time_to_2>runic_power%18
+  if S.DeathAndDecay:IsReady() and (VarSTPlanning and S.UnholyGround:IsAvailable() and Player:BuffDown(S.DeathAndDecayBuff) and Player:RunicPowerDeficit() >= 10 or Player:RunicPower() < 36 and Player:RuneTimeToX(2) > Player:RunicPower() / 18) then
     if Cast(S.DeathAndDecay, Settings.Commons2.GCDasOffGCD.DeathAndDecay, nil, not Target:IsSpellInRange(S.DeathAndDecay)) then return "death_and_decay breath 14"; end
   end
   -- howling_blast,if=runic_power<36&rune.time_to_2>runic_power%18
