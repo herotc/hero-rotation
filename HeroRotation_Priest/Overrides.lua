@@ -83,10 +83,24 @@ OldShadowIsCastable = HL.AddCoreOverride("Spell.IsCastable",
       return BaseCheck and (not SpellShadow.ShadowCrash:InFlight() or SpellShadow.ShadowCrash:TimeSinceLastCast() > Player:GCD()) and (SpellShadow.UnfurlingDarkness:IsAvailable() or not Player:IsCasting(self))
     elseif self == SpellShadow.MindBlast then
       return BaseCheck and (self:Charges() >= 2 or not Player:IsCasting(self))
-    elseif self == SpellShadow.VoidEruption then
+    elseif self == SpellShadow.VoidEruption or self == SpellShadow.DarkAscension then
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellShadow.VoidBolt then
       return BaseCheck or Player:IsCasting(SpellShadow.VoidEruption)
+    else
+      return BaseCheck
+    end
+  end
+, 258)
+
+local OldShadowBuffUp
+OldShadowBuffUp = HL.AddCoreOverride("Player.BuffUp",
+  function (self, Spell, AnyCaster, Offset)
+    local BaseCheck = OldShadowBuffUp(self, Spell, AnyCaster, Offset)
+    if Spell == SpellShadow.VoidformBuff then
+      return BaseCheck or Player:IsCasting(SpellShadow.VoidEruption)
+    elseif Spell == SpellShadow.DarkAscensionBuff then
+      return BaseCheck or Player:IsCasting(SpellShadow.DarkAscension)
     else
       return BaseCheck
     end

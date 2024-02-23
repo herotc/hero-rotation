@@ -365,65 +365,85 @@ local function Trinkets()
 end
 
 local function Opener()
+  -- potion,if=buff.voidform.up|buff.dark_ascension.up
+  -- Note: Top priority so it's suggested as soon as Voidform/DA is active.
+  if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscensionBuff)) then
+    local PotionSelected = Everyone.PotionSelected()
+    if PotionSelected and PotionSelected:IsReady() then
+      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion opener 2"; end
+    end
+  end
+  -- power_infusion,if=buff.voidform.up|buff.dark_ascension.up
+  -- Note: Top priority so it's suggested as soon as Voidform/DA is active.
+  if CDsON() and S.PowerInfusion:IsCastable() and Settings.Shadow.SelfPI and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscensionBuff)) then
+    if Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "power_infusion opener 4"; end
+  end
   -- shadow_crash,if=!debuff.vampiric_touch.up
   if S.ShadowCrash:IsCastable() and not VarPreferVT and (Target:DebuffDown(S.VampiricTouchDebuff)) then
-    if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash opener 2"; end
+    if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash opener 6"; end
   end
   -- vampiric_touch,if=!debuff.vampiric_touch.up&(!cooldown.shadow_crash.ready|!talent.shadow_crash)
   if S.VampiricTouch:IsCastable() and (Target:DebuffDown(S.VampiricTouchDebuff) and (S.ShadowCrash:CooldownDown() or not S.ShadowCrash:IsAvailable() or S.ShadowCrash:InFlight())) then
-    if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch opener 3"; end
+    if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch opener 8"; end
+  end
+  -- use_item,name=nymues_unraveling_spindle
+  if Settings.Commons.Enabled.Trinkets and I.NymuesUnravelingSpindle:IsEquippedAndReady() then
+    if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle opener 10"; end
   end
   -- mindbender
   if Fiend:IsCastable() then
-    if Cast(Fiend, Settings.Shadow.GCDasOffGCD.Mindbender) then return "mindbender opener 4"; end
+    if Cast(Fiend, Settings.Shadow.GCDasOffGCD.Mindbender) then return "mindbender opener 12"; end
+  end
+  -- use_item,use_off_gcd=1,name=belorrelos_the_suncaller
+  if Settings.Commons.Enabled.Trinkets and I.BelorrelostheSuncaller:IsEquippedAndReady() then
+    if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller opener 14"; end
   end
   -- dark_ascension,if=talent.dark_ascension
   if S.DarkAscension:IsCastable() then
-    if Cast(S.DarkAscension, Settings.Shadow.GCDasOffGCD.DarkAscension) then return "dark_ascension opener 6"; end
+    if Cast(S.DarkAscension, Settings.Shadow.GCDasOffGCD.DarkAscension) then return "dark_ascension opener 16"; end
   end
   if S.VoidEruption:IsAvailable() then
     -- shadow_word_death,if=talent.inescapable_torment&talent.void_eruption&prev_gcd.mind_blast
     -- Note: 20+ seconds since last cast, since we only want one cast during the opener.
-    if S.ShadowWordDeath:IsCastable() and S.InescapableTorment:IsAvailable() and Player:PrevGCDP(1, S.MindBlast) and S.ShadowWordDeath:TimeSinceLastCast() > 20 then
-      if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death opener 8"; end
+    if S.ShadowWordDeath:IsReady() and S.InescapableTorment:IsAvailable() and Player:PrevGCDP(1, S.MindBlast) and S.ShadowWordDeath:TimeSinceLastCast() > 20 then
+      if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death opener 18"; end
     end
     -- mind_blast,if=talent.void_eruption
     if S.MindBlast:IsCastable() then
-      if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast opener 10"; end
+      if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast opener 20"; end
     end
     -- void_eruption,if=talent.void_eruption
     if S.VoidEruption:IsCastable() then
-      if Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption) then return "void_eruption opener 12"; end
+      if Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption) then return "void_eruption opener 22"; end
     end
   end
-  -- power_infusion,if=buff.voidform.up|buff.dark_ascension.up
-  if CDsON() and S.PowerInfusion:IsCastable() and Settings.Shadow.SelfPI and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscension)) then
-    if Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "power_infusion opener 14"; end
+  -- shadow_word_death,if=buff.dark_ascension.up&buff.power_infusion.up
+  if S.ShadowWordDeath:IsReady() and (Player:BuffUp(S.DarkAscensionBuff) and Player:PowerInfusionUp()) then
+    if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death opener 24"; end
   end
-  -- use_items
-  if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
-    local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
+  -- void_bolt,if=buff.voidform.up&(prev_gcd.1.power_infusion|debuff.devouring_plague.up&cooldown.mind_blast.down|prev_gcd.1.shadow_word_death)
+  if S.VoidBolt:IsCastable() and (Player:BuffUp(S.VoidformBuff) and (Player:PrevGCDP(1, S.PowerInfusion) or Target:DebuffUp(S.DevouringPlagueDebuff) and S.MindBlast:CooldownDown() or Player:PrevGCDP(1, S.ShadowWordDeath))) then
+    if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt opener 26"; end
   end
-  -- void_bolt,if=talent.void_eruption
-  if S.VoidBolt:IsCastable() then
-    if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt opener 16"; end
+  -- devouring_plague,if=debuff.devouring_plague.down
+  if S.DevouringPlague:IsReady() and (Target:DebuffDown(S.DevouringPlagueDebuff)) then
+    if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague opener 28"; end
   end
-  -- devouring_plague
-  if S.DevouringPlague:IsReady() then
-    if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague opener 18"; end
+  -- mind_blast,if=debuff.devouring_plague.down&insanity<action.devouring_plague.cost|prev_gcd.1.devouring_plague|prev_gcd.2.devouring_plague&prev_gcd.1.mind_blast|buff.dark_ascension.up&prev_gcd.1.void_torrent|buff.voidform.up&prev_gcd.1.void_bolt
+  if S.MindBlast:IsCastable() and (Target:DebuffDown(S.DevouringPlagueDebuff) and Player:Insanity() < S.DevouringPlague:Cost() or Player:PrevGCDP(1, S.DevouringPlague) or Player:PrevGCDP(2, S.DevouringPlague) and Player:PrevGCDP(1, S.MindBlast) or Player:BuffUp(S.DarkAscensionBuff) and Player:PrevGCDP(1, S.VoidTorrent) or Player:BuffUp(S.VoidformBuff) and Player:PrevGCDP(1, S.VoidBolt)) then
+    if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast opener 30"; end
   end
-  -- Note: Just in case there is not enough Insanity for devouring_plague...
-  -- mind_blast
-  if S.MindBlast:IsCastable() then
-    if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast opener 20"; end
+  -- void_torrent,if=cooldown.mind_blast.down
+  if S.VoidTorrent:IsCastable() and (S.MindBlast:CooldownDown()) then
+    if Cast(S.VoidTorrent, Settings.Shadow.GCDasOffGCD.VoidTorrent, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent opener 32"; end
   end
-  -- mind_spike
-  if S.MindSpike:IsCastable() then
-    if Cast(S.MindSpike, nil, nil, not Target:IsSpellInRange(S.MindSpike)) then return "mind_spike opener 22"; end
+  -- shadow_word_death,if=buff.voidform.up&prev_gcd.1.void_torrent
+  if S.ShadowWordDeath:IsReady() and (Player:BuffUp(S.VoidformBuff) and Player:PrevGCDP(1, S.VoidTorrent)) then
+    if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death opener 34"; end
   end
-  -- mind_flay
-  if S.MindFlay:IsCastable() then
-    if Cast(S.MindFlay, nil, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay opener 24"; end
+  -- mindgames,if=cooldown.void_torrent.down&cooldown.mind_blast.down
+  if S.Mindgames:IsCastable() and (S.VoidTorrent:CooldownDown() and (S.MindBlast:CooldownDown() or S.MindBlast:Charges() == 1 and Player:IsCasting(S.MindBlast))) then
+    if Cast(S.Mindgames, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "mindgames opener 36"; end
   end
 end
 
@@ -758,7 +778,9 @@ local function APL()
     VarPoolForCDs = ((S.VoidEruption:CooldownRemains() <= Player:GCD() * 3 and S.VoidEruption:IsAvailable() or S.DarkAscension:CooldownUp() and S.DarkAscension:IsAvailable()) or S.VoidTorrent:IsAvailable() and S.PsychicLink:IsAvailable() and S.VoidTorrent:CooldownRemains() <= 4 and Player:BuffDown(S.VoidformBuff))
     -- Manually added: Attempt at an opener
     if VarFirstTar == nil then VarFirstTar = Target:GUID() end
-    if VarOpened == false and Settings.Shadow.UseOpener and Target:GUID() == VarFirstTar and not DotsUp(Target, true) then
+    local MGTimer = (S.VoidEruption:IsAvailable()) and 22 or 12
+    if I.NymuesUnravelingSpindle:IsEquippedAndReady() then MGTimer = MGTimer + 3 end
+    if VarOpened == false and Settings.Shadow.UseOpener and Target:GUID() == VarFirstTar and S.Mindgames:CooldownRemains() < MGTimer and (S.PowerInfusion:CooldownRemains() < 3 or Player:PowerInfusionUp()) then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for Opener()"; end
     else
