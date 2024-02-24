@@ -355,7 +355,7 @@ local function CDs ()
   -- Use Roll the Bones if reroll conditions are met, or with no buffs, or 2s before buffs expire with T31, or 7s before buffs expire with Vanish/Dance ready
   if S.RolltheBones:IsReady() then
     if (RtB_Reroll() and not Player:StealthUp(true, true)) or RtB_Buffs() == 0 or (Cache.APLVar.RtB_Buffs.MaxRemains <= 3 and Player:HasTier(31, 4))
-      or (Rogue.RtBRemains() <= 7 and (S.ShadowDance:CooldownRemains() <= 3 or S.Vanish:CooldownRemains() <= 3)
+      or (Cache.APLVar.RtB_Buffs.MaxRemains <= 7 and (S.ShadowDance:CooldownRemains() <= 3 or S.Vanish:CooldownRemains() <= 3)
     and not Player:StealthUp(true, true)) then
       if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then return "Cast Roll the Bones" end
     end
