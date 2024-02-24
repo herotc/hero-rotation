@@ -50,7 +50,7 @@ do
   HL:RegisterForSelfCombatEvent(
     function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
       if SpellID == 315508 then
-        RtBExpiryTime = GetTime() + mathmin(40, 30 + Rogue.RtBRemains(true))
+        RtBExpiryTime = GetTime() + mathmin(39, 30 + Rogue.RtBRemains(true))
       end
     end,
     "SPELL_AURA_REFRESH"
