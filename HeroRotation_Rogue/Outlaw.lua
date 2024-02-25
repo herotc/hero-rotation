@@ -105,6 +105,7 @@ local RtB_BuffsList = {
   S.TrueBearing
 }
 
+local enableRtBDebugging = false
 -- Get the number of Roll the Bones buffs currently on
 local function RtB_Buffs ()
   if not Cache.APLVar.RtB_Buffs then
@@ -115,23 +116,45 @@ local function RtB_Buffs ()
     Cache.APLVar.RtB_Buffs.Normal = 0
     Cache.APLVar.RtB_Buffs.Shorter = 0
     Cache.APLVar.RtB_Buffs.Longer = 0
+    Cache.APLVar.RtB_Buffs.MaxRemains = 0
     local RtBRemains = Rogue.RtBRemains()
     for i = 1, #RtB_BuffsList do
       local Remains = Player:BuffRemains(RtB_BuffsList[i])
       if Remains > 0 then
         Cache.APLVar.RtB_Buffs.Total = Cache.APLVar.RtB_Buffs.Total + 1
-        if Remains == RtBRemains then
+        if Remains > Cache.APLVar.RtB_Buffs.MaxRemains then
+          Cache.APLVar.RtB_Buffs.MaxRemains = Remains
+        end
+
+        local difference = math.abs(Remains - RtBRemains)
+        if difference <= 0.5 then
           Cache.APLVar.RtB_Buffs.Normal = Cache.APLVar.RtB_Buffs.Normal + 1
           Cache.APLVar.RtB_Buffs.Will_Lose[RtB_BuffsList[i]:Name()] = true
           Cache.APLVar.RtB_Buffs.Will_Lose.Total = Cache.APLVar.RtB_Buffs.Will_Lose.Total + 1
+
         elseif Remains > RtBRemains then
           Cache.APLVar.RtB_Buffs.Longer = Cache.APLVar.RtB_Buffs.Longer + 1
+
         else
           Cache.APLVar.RtB_Buffs.Shorter = Cache.APLVar.RtB_Buffs.Shorter + 1
           Cache.APLVar.RtB_Buffs.Will_Lose[RtB_BuffsList[i]:Name()] = true
           Cache.APLVar.RtB_Buffs.Will_Lose.Total = Cache.APLVar.RtB_Buffs.Will_Lose.Total + 1
         end
       end
+
+      if enableRtBDebugging then
+        print("RtbRemains", RtBRemains)
+        print(RtB_BuffsList[i]:Name(), Remains)
+      end
+    end
+
+    if enableRtBDebugging then
+      print("have: ", Cache.APLVar.RtB_Buffs.Total)
+      print("will lose: ", Cache.APLVar.RtB_Buffs.Will_Lose.Total)
+      print("shorter: ", Cache.APLVar.RtB_Buffs.Shorter)
+      print("normal: ", Cache.APLVar.RtB_Buffs.Normal)
+      print("longer: ", Cache.APLVar.RtB_Buffs.Longer)
+      print("max remains: ", Cache.APLVar.RtB_Buffs.MaxRemains)
     end
   end
   return Cache.APLVar.RtB_Buffs.Total
@@ -142,7 +165,7 @@ local function checkBuffWillLose(buff)
 end
 
 -- RtB rerolling strategy, return true if we should reroll
-local function RtB_Reroll ()
+local function RtB_Reroll()
   if not Cache.APLVar.RtB_Reroll then
     -- 1+ Buff
     if Settings.Outlaw.RolltheBonesLogic == "1+ Buff" then
@@ -204,7 +227,7 @@ local function RtB_Reroll ()
       -- # Additional reroll rules if all active buffs will not be rolled away and we don't already have 5+ buffs
       -- actions+/variable,name=rtb_reroll,value=variable.rtb_reroll&rtb_buffs.longer=0|rtb_buffs.normal=0
       -- &rtb_buffs.longer>=1&rtb_buffs<6&rtb_buffs.max_remains<=39&!stealthed.all&buff.loaded_dice.up
-      if Cache.APLVar.RtB_Reroll and Cache.APLVar.RtB_Buffs.Longer == 0 or Cache.APLVar.RtB_Buffs.Normal == 0 and Cache.APLVar.RtB_Buffs.Longer >= 1 and RtB_Buffs() < 6 and Rogue.RtBRemains() <= 39
+      if Cache.APLVar.RtB_Reroll and Cache.APLVar.RtB_Buffs.Longer == 0 or Cache.APLVar.RtB_Buffs.Normal == 0 and Cache.APLVar.RtB_Buffs.Longer >= 1 and RtB_Buffs() < 6 and Cache.APLVar.RtB_Buffs.MaxRemains <= 39
       and not Player:StealthUp(true, true) and Player:BuffUp(S.LoadedDiceBuff) then
         Cache.APLVar.RtB_Reroll = true
       end
@@ -331,7 +354,8 @@ local function CDs ()
   -- roll_the_bones,if=variable.rtb_reroll|rtb_buffs=0|rtb_buffs.max_remains<=2&set_bonus.tier31_4pc|rtb_buffs.max_remains<=7&(cooldown.shadow_dance.ready|cooldown.vanish.ready)
   -- Use Roll the Bones if reroll conditions are met, or with no buffs, or 2s before buffs expire with T31, or 7s before buffs expire with Vanish/Dance ready
   if S.RolltheBones:IsReady() then
-    if (RtB_Reroll() and not Player:StealthUp(true, true)) or RtB_Buffs() == 0 or (Rogue.RtBRemains() <= 3 and Player:HasTier(31, 4)) or (Rogue.RtBRemains() <= 7 and (S.ShadowDance:CooldownRemains() <= 3 or S.Vanish:CooldownRemains() <= 3)
+    if (RtB_Reroll() and not Player:StealthUp(true, true)) or RtB_Buffs() == 0 or (Cache.APLVar.RtB_Buffs.MaxRemains <= 3 and Player:HasTier(31, 4))
+      or (Cache.APLVar.RtB_Buffs.MaxRemains <= 7 and (S.ShadowDance:CooldownRemains() <= 3 or S.Vanish:CooldownRemains() <= 3)
     and not Player:StealthUp(true, true)) then
       if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then return "Cast Roll the Bones" end
     end
