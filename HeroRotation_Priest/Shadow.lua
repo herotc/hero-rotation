@@ -386,7 +386,7 @@ local function CDs()
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=nymues_unraveling_spindle,if=variable.dots_up&(fight_remains<30|target.time_to_die>15)&(!talent.dark_ascension|cooldown.dark_ascension.remains<3+gcd.max|fight_remains<15)
-    if I.NymuesUnravelingSpindle:IsEquipped() and I.NymuesUnravelingSpindle:CooldownRemains() <= Player:GCD() and (VarDotsUp and (FightRemains < 30 or Target:TimeToDie() > 15) and (not S.DarkAscension:IsAvailable() or S.DarkAscension:CooldownRemains() < 3 + GCDMax or FightRemains < 15)) then
+    if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (VarDotsUp and (FightRemains < 30 or Target:TimeToDie() > 15) and (not S.DarkAscension:IsAvailable() or S.DarkAscension:CooldownRemains() < 3 + GCDMax or FightRemains < 15)) then
       if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle cds 12"; end
     end
     -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=gcd.remains>0&(!raid_event.adds.exists&!prev_gcd.1.mindbender|raid_event.adds.up|spell_targets.belorrelos_the_suncaller>=5)|fight_remains<20

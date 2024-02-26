@@ -752,7 +752,7 @@ local function APL()
         if Cast(I.AshesoftheEmbersoul, nil, Settings.Commons.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul main 18"; end
       end
       -- use_item,name=nymues_unraveling_spindle,if=variable.time_to_combustion<=9
-      if I.NymuesUnravelingSpindle:IsEquipped() and I.NymuesUnravelingSpindle:CooldownRemains() <= Player:GCD() and (var_time_to_combustion <= 9) then
+      if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (var_time_to_combustion <= 9) then
         if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle main 20"; end
       end
     end
