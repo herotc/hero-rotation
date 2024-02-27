@@ -235,7 +235,7 @@ local function Generators()
   end
   -- wake_of_ashes,if=holy_power<=2&(cooldown.avenging_wrath.remains|cooldown.crusade.remains)&(!talent.execution_sentence|cooldown.execution_sentence.remains>4|target.time_to_die<8)&(!raid_event.adds.exists|raid_event.adds.in>20|raid_event.adds.up)
   if S.WakeofAshes:IsCastable() and (HolyPower <= 2 and (S.AvengingWrath:CooldownDown() or S.Crusade:CooldownDown()) and (not S.ExecutionSentence:IsAvailable() or S.ExecutionSentence:CooldownRemains() > 4 or FightRemains < 8)) then
-    if Cast(S.WakeofAshes, nil, nil, not Target:IsInRange(14)) then return "wake_of_ashes generators 2"; end
+    if Cast(S.WakeofAshes, Settings.Retribution.GCDasOffGCD.WakeOfAshes, nil, not Target:IsInRange(14)) then return "wake_of_ashes generators 2"; end
   end
   -- blade_of_justice,if=!dot.expurgation.ticking&holy_power<=3&set_bonus.tier31_2pc
   if S.BladeofJustice:IsCastable() and (Target:DebuffDown(S.ExpurgationDebuff) and HolyPower <= 3 and Player:HasTier(31, 2)) then

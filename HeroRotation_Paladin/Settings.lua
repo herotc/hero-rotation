@@ -75,6 +75,7 @@ HR.GUISettings.APL.Paladin = {
       FinalReckoning = false,
       Seraphim = false,
       ShieldOfVengeance = true,
+      WakeOfAshes = false,
     },
     OffGCDasOffGCD = {
       AvengingWrath = true,
