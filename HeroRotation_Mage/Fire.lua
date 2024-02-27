@@ -476,7 +476,8 @@ local function CombustionPhase()
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 42"; end
   end
   -- scorch,if=buff.combustion.remains>cast_time&cast_time>=gcd.max
-  if S.Scorch:IsReady() and (CombustionRemains > S.Scorch:CastTime() and S.Scorch:CastTime() >= GCDMax) then
+  -- Note: Using Player:GCD() here to avoid this line being skipped from the extra 0.25s added to GCDMax.
+  if S.Scorch:IsReady() and (CombustionRemains > S.Scorch:CastTime() and S.Scorch:CastTime() >= Player:GCD()) then
     if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch combustion_phase 44"; end
   end
   -- fireball,if=buff.combustion.remains>cast_time
