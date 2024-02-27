@@ -269,7 +269,7 @@ end
 local function ActiveTalents()
   -- living_bomb,if=active_enemies>1&buff.combustion.down&(variable.time_to_combustion>cooldown.living_bomb.duration|variable.time_to_combustion<=0)
   if S.LivingBomb:IsReady() and (EnemiesCount10ySplash > 1 and CombustionDown and (var_time_to_combustion > S.LivingBomb:CooldownRemains() or var_time_to_combustion <= 0)) then
-    if Cast(S.LivingBomb, nil, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb active_talents 2"; end
+    if Cast(S.LivingBomb, Settings.Fire.GCDasOffGCD.LivingBomb, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb active_talents 2"; end
   end
   -- meteor,if=variable.time_to_combustion<=0|buff.combustion.remains>travel_time|!talent.sun_kings_blessing&(cooldown.meteor.duration<variable.time_to_combustion|fight_remains<variable.time_to_combustion)
   if S.Meteor:IsReady() and (var_time_to_combustion <= 0 or CombustionRemains > S.Meteor:TravelTime() or not S.SunKingsBlessing:IsAvailable() and (45 < var_time_to_combustion or FightRemains < var_time_to_combustion)) then
@@ -389,7 +389,7 @@ local function CombustionPhase()
   end
   -- living_bomb,if=active_enemies>1&buff.combustion.down
   if S.LivingBomb:IsReady() and AoEON() and (EnemiesCount10ySplash > 1 and CombustionDown) then
-    if Cast(S.LivingBomb, nil, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb combustion_phase 6"; end
+    if Cast(S.LivingBomb, Settings.Fire.GCDasOffGCD.LivingBomb, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb combustion_phase 6"; end
   end
   -- call_action_list,name=combustion_cooldowns,if=buff.combustion.remains>variable.skb_duration|fight_remains<20
   if CombustionRemains > var_skb_duration or FightRemains < 20 then
@@ -486,7 +486,7 @@ local function CombustionPhase()
   end
   -- living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1
   if S.LivingBomb:IsReady() and (CombustionRemains < GCDMax and EnemiesCount10ySplash > 1) then
-    if Cast(S.LivingBomb, nil, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb combustion_phase 48"; end
+    if Cast(S.LivingBomb, Settings.Fire.GCDasOffGCD.LivingBomb, nil, not Target:IsSpellInRange(S.LivingBomb)) then return "living_bomb combustion_phase 48"; end
   end
 end
 
