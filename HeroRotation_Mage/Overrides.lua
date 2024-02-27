@@ -115,6 +115,18 @@ FirePlayerBuffUp = HL.AddCoreOverride("Player.BuffUp",
   end
 , 63)
 
+local FirePlayerBuffDown
+FirePlayerBuffDown = HL.AddCoreOverride("Player.BuffDown",
+  function (self, Spell, AnyCaster, Offset)
+    local BaseCheck = FirePlayerBuffDown(self, Spell, AnyCaster, Offset)
+    if Spell == SpellFire.FuryoftheSunKingBuff then
+      return BaseCheck or Player:IsCasting(SpellFire.Pyroblast)
+    else
+      return BaseCheck
+    end
+  end
+, 63)
+
 HL.AddCoreOverride("Spell.IsReady",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local BaseCheck = self:IsCastable() and self:IsUsableP()
