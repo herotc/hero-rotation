@@ -109,9 +109,6 @@ FirePlayerBuffUp = HL.AddCoreOverride("Player.BuffUp",
     if Spell == SpellFire.HeatingUpBuff then
       -- "Predictive" Heating Up buff for SKB Pyroblast casts...
       return BaseCheck or Player:IsCasting(SpellFire.Pyroblast) and Player:BuffRemains(SpellFire.FuryoftheSunKingBuff) > 0
-    elseif Spell == SpellFire.HotStreakBuff then
-      -- "Predictive" Hot Streak buff for SKB Pyroblast casts...
-      return BaseCheck or Player:IsCasting(SpellFire.Pyroblast) and Player:BuffRemains(SpellFire.FuryoftheSunKingBuff) > 0 and Player:BuffRemains(SpellFire.HeatingUpBuff) > 0
     else
       return BaseCheck
     end
