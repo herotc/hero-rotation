@@ -144,6 +144,7 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   BlazingBarrier                        = Spell(235313),
   Combustion                            = Spell(190319),
   FeeltheBurn                           = Spell(383391),
+  FlameAccelerant                       = Spell(203275),
   FireBlast                             = Spell(108853),
   Firestarter                           = Spell(205026),
   FlameOn                               = Spell(205029),

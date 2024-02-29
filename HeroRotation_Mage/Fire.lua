@@ -473,8 +473,8 @@ local function CombustionPhase()
   if S.Fireball:IsReady() and (CombustionRemains > S.Fireball:CastTime() and Player:BuffUp(S.FlameAccelerantBuff)) then
     if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball combustion_phase 40"; end
   end
-  -- phoenix_flames,if=!set_bonus.tier30_2pc&!talent.alexstraszas_fury&travel_time<buff.combustion.remains&buff.heating_up.react+hot_streak_spells_in_flight<2
-  if S.PhoenixFlames:IsCastable() and (not Player:HasTier(30, 2) and not S.AlexstraszasFury:IsAvailable() and S.PhoenixFlames:TravelTime() < CombustionRemains and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() < 2) then
+  -- phoenix_flames,if=(!searing_touch.active&talent.flame_accelerant|!talent.flame_accelerant)&!set_bonus.tier30_2pc&!talent.alexstraszas_fury&travel_time<buff.combustion.remains&buff.heating_up.react+hot_streak_spells_in_flight<2
+  if S.PhoenixFlames:IsCastable() and ((not SearingTouchActive() and S.FlameAccelerant:IsAvailable() or not S.FlameAccelerant:IsAvailable()) and not Player:HasTier(30, 2) and not S.AlexstraszasFury:IsAvailable() and S.PhoenixFlames:TravelTime() < CombustionRemains and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() < 2) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 42"; end
   end
   -- scorch,if=buff.combustion.remains>cast_time&cast_time>=gcd.max
