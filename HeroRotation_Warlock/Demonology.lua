@@ -478,7 +478,7 @@ local function APL()
 
   -- summon_pet
   if S.SummonPet:IsCastable() and not (Player:IsMounted() or Player:IsInVehicle()) then
-    if Cast(S.SummonPet, Settings.Demonology.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
+    if HR.CastAnnotated(S.SummonPet, Settings.Demonology.GCDasOffGCD.SummonPet, "NO PET", nil, 26 * HeroRotationDB.GUISettings["Scaling.ScaleUI"]) then return "summon_pet ooc"; end
   end
 
   if Everyone.TargetIsValid() then
