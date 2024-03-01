@@ -24,7 +24,7 @@ local num        = HR.Commons.Everyone.num
 local bool       = HR.Commons.Everyone.bool
 -- lua
 local mathmax    = math.max
-
+local mathmin    = math.min
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -240,11 +240,11 @@ local function Variables()
   end
   -- variable,name=pet_expire,op=set,value=(buff.dreadstalkers.remains>?buff.vilefiend.remains)-gcd*0.5,if=buff.vilefiend.up&buff.dreadstalkers.up
   if VilefiendActive() and DreadstalkerActive() then
-    VarPetExpire = mathmax(VilefiendTime(), DreadstalkerTime()) - Player:GCD() * 0.5
+    VarPetExpire = mathmin(VilefiendTime(), DreadstalkerTime()) - Player:GCD() * 0.5
   end
   -- variable,name=pet_expire,op=set,value=(buff.dreadstalkers.remains>?buff.grimoire_felguard.remains)-gcd*0.5,if=!talent.summon_vilefiend&talent.grimoire_felguard&buff.dreadstalkers.up
   if not S.SummonVilefiend:IsAvailable() and S.GrimoireFelguard:IsAvailable() and DreadstalkerActive() then
-    VarPetExpire = mathmax(DreadstalkerTime(), GrimoireFelguardTime()) - Player:GCD() * 0.5
+    VarPetExpire = mathmin(DreadstalkerTime(), GrimoireFelguardTime()) - Player:GCD() * 0.5
   end
   -- variable,name=pet_expire,op=set,value=(buff.dreadstalkers.remains)-gcd*0.5,if=!talent.summon_vilefiend&(!talent.grimoire_felguard|!set_bonus.tier30_2pc)&buff.dreadstalkers.up
   if not S.SummonVilefiend:IsAvailable() and (not S.GrimoireFelguard:IsAvailable() or not Player:HasTier(30, 2)) and DreadstalkerActive() then
