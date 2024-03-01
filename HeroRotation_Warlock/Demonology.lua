@@ -53,7 +53,6 @@ local VarPetExpire = 0
 local VarNP = false
 local VarImpl = false
 local VarPoolCoresForTyrant = false
-local VarShadowTimings = 0
 local VarTyrantTimings = 0
 local VarTyrantSync = 0
 local VarTyrantCD = 120
@@ -191,13 +190,11 @@ local function Precombat()
   -- variable,name=next_tyrant,op=set,value=14+talent.grimoire_felguard+talent.summon_vilefiend
   VarNextTyrant = 14 + num(S.GrimoireFelguard:IsAvailable()) + num(S.SummonVilefiend:IsAvailable())
   -- variable,name=shadow_timings,default=0,op=reset
-  VarShadowTimings = 0
+  -- Note: variable.shadow_timings is never used in the APL.
   -- variable,name=tyrant_timings,value=0
   VarTyrantTimings = 0
   -- variable,name=shadow_timings,op=set,value=0,if=cooldown.invoke_power_infusion_0.duration!=120
-  if Settings.Demonology.PISource == "Shadow" then
-    VarShadowTimings = 1
-  end
+  -- Note: variable.shadow_timings is never used in the APL.
   -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff
   -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff
   -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon|trinket.1.is.timethiefs_gambit
