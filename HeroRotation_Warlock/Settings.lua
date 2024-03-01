@@ -61,6 +61,7 @@ HR.GUISettings.APL.Warlock = {
     }
   },
   Demonology = {
+    SummonPetFontSize = 26,
     PotionType = {
       Selected = "Power",
     },
@@ -122,6 +123,7 @@ CreateARPanelOptions(CP_Destruction, "APL.Warlock.Destruction")
 
 -- Demonology
 CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.")
+CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.SummonPetFontSize", {1, 100, 1}, "Summon Pet Font Size", "Select the font size to use for the overlay on your Summon Felguard pet suggestion.")
 CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology")
 
 -- Affliction
