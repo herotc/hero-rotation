@@ -88,8 +88,8 @@ local CP_Devastation = CreateChildPanel(CP_Evoker, "Devastation")
 
 -- Evoker
 CreateARPanelOptions(CP_Evoker, "APL.Evoker.Commons")
-CreatePanelOption("Slider", CP_Evoker, "APL.Evoker.Commons.EmpoweredFontSize", {1, 100, 1}, "Empowered Spell Font Size", "Select the font size you would like shown for the overlay on your empowered spell casts (Fire Breath/Eternity Surge).")
-CreatePanelOption("Slider", CP_Evoker, "APL.Evoker.Commons.DisintegrateFontSize", {1, 100, 1}, "Other Annotated Spell Font Size", "Select the font size you would like shown for the overlay on your spell casts that show 'CLIP', 'CHAIN', or 'NO CHAIN'.")
+CreatePanelOption("Slider", CP_Evoker, "APL.Evoker.Commons.EmpoweredFontSize", {1, 100, 1}, "Empowered Spell Font Size", "Select the font size to use for the overlay on your empowered spell casts (Fire Breath/Eternity Surge). This value scales with the addon's 'UI' scale.")
+CreatePanelOption("Slider", CP_Evoker, "APL.Evoker.Commons.DisintegrateFontSize", {1, 100, 1}, "Other Annotated Spell Font Size", "Select the font size to use for the overlay on your spell casts that show 'CLIP', 'CHAIN', or 'NO CHAIN'. This value scales with the addon's 'UI' scale.")
 
 -- Augmentation
 CreateARPanelOptions(CP_Augmentation, "APL.Evoker.Augmentation")
