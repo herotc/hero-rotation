@@ -71,6 +71,7 @@ HR.GUISettings.APL.Warlock = {
       -- Abilities
       DemonicStrength = false,
       GrimoireFelguard = false,
+      Guillotine = false,
       Implosion = false,
       NetherPortal = true,
       PowerSiphon = true,
