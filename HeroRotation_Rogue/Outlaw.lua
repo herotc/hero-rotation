@@ -333,9 +333,9 @@ local function CDs ()
   end
 
   -- # Maintain Blade Flurry on 2+ targets, and on single target with Underhanded during Adrenaline Rush
-  -- action.cds+=/blade_flurry,if=(spell_targets>=2-talent.underhanded_upper_hand&!stealthed.all&buff.adrenaline_rush.up)&buff.blade_flurry.remains<gcd
+  -- action.cds+=/blade_flurry,if=spell_targets>=2-(talent.underhanded_upper_hand&!stealthed.all&buff.adrenaline_rush.up)&buff.blade_flurry.remains<gcd
   if S.BladeFlurry:IsReady() then
-    if (EnemiesBFCount >= 2-num(S.UnderhandedUpperhand:IsAvailable() and not Player:StealthUp(true, true) and Player:BuffUp(S.AdrenalineRush)))
+    if EnemiesBFCount >= 2 - num(S.UnderhandedUpperhand:IsAvailable() and not Player:StealthUp(true, true) and Player:BuffUp(S.AdrenalineRush))
       and Player:BuffRemains(S.BladeFlurry) < Player:GCD() then
         if Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
     end
@@ -345,7 +345,7 @@ local function CDs ()
   -- action.cds/blade_flurry,if=talent.deft_maneuvers&!variable.finish_condition&(spell_targets>=3
   -- &combo_points.deficit=spell_targets+buff.broadside.up|spell_targets>=5)
   if S.BladeFlurry:IsReady() then
-    if S.DeftManeuvers:IsAvailable() and not Finish_Condition() and (EnemiesBFCount >=3
+    if S.DeftManeuvers:IsAvailable() and not Finish_Condition() and (EnemiesBFCount >= 3
       and ComboPointsDeficit == EnemiesBFCount + num(Player:BuffUp(S.Broadside)) or EnemiesBFCount >= 5) then
         if Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
     end
@@ -523,9 +523,9 @@ local function Finish ()
   end
 
   -- #Crackshot builds use Between the Eyes outside of Stealth if Vanish or Dance will not come off cooldown within the next cast
-  -- actions.finish+=/between_the_eyes,if=talent.crackshot&(cooldown.vanish.remains>45&cooldown.shadow_dance.remains>12)
+  -- actions.finish+=/between_the_eyes,if=talent.crackshot&cooldown.vanish.remains>45&cooldown.shadow_dance.remains>12
   if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and S.Crackshot:IsAvailable()
-    and (S.Vanish:CooldownRemains() > 45 and S.ShadowDance:CooldownRemains() > 12) then
+    and S.Vanish:CooldownRemains() > 45 and S.ShadowDance:CooldownRemains() > 12 then
     if CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
   end
 
