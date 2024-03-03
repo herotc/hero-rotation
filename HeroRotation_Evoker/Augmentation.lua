@@ -70,8 +70,8 @@ local VarTrinket1Buffs = Trinket1:HasUseBuff() and not VarTrinket1Exclude
 local VarTrinket2Buffs = Trinket2:HasUseBuff() and not VarTrinket2Exclude
 local VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 120 == 0)) and 1 or 0.5
 local VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 120 == 0)) and 1 or 0.5
-local VarTrinketPriority = 2
-local VarDamageTrinketPriority = 2
+local VarTrinketPriority = 1
+local VarDamageTrinketPriority = 1
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -127,8 +127,8 @@ HL:RegisterForEvent(function()
   VarTrinket2Buffs = Trinket2:HasUseBuff() and not VarTrinket2Exclude
   VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 120 == 0)) and 1 or 0.5
   VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 120 == 0)) and 1 or 0.5
-  VarTrinketPriority = 2
-  VarDamageTrinketPriority = 2
+  VarTrinketPriority = 1
+  VarDamageTrinketPriority = 1
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
