@@ -45,6 +45,7 @@ local OnUseExcludes = {
 -- Rotation Var
 local HasMainHandEnchant, HasOffHandEnchant
 local MHEnchantTimeRemains, OHEnchantTimeRemains
+local MHEnchantID, OHEnchantID
 local MaelstromStacks
 local MaxMaelstromStacks = 10
 local MaxAshenCatalystStacks = 8
@@ -121,18 +122,10 @@ local function Precombat()
   -- flask
   -- food
   -- augmentation
-  -- Check weapon enchants
-  HasMainHandEnchant, MHEnchantTimeRemains, _, _, HasOffHandEnchant, OHEnchantTimeRemains = GetWeaponEnchantInfo()
   -- windfury_weapon
-  if (not HasMainHandEnchant or MHEnchantTimeRemains < 600000) and S.WindfuryWeapon:IsCastable() then
-    if Cast(S.WindfuryWeapon) then return "windfury_weapon enchant"; end
-  end
   -- flametongue_weapon
-  if (not HasOffHandEnchant or OHEnchantTimeRemains < 600000) and S.FlametongueWeapon:IsCastable() then
-    if Cast(S.FlametongueWeapon) then return "flametongue_weapon enchant"; end
-  end
   -- lightning_shield
-  -- Note: Moved to APL() for in-combat suggestions.
+  -- Note: Moved shields and weapon buffs to APL().
   -- windfury_totem
   if S.WindfuryTotem:IsReady() and (Player:BuffDown(S.WindfuryTotemBuff, true) or S.WindfuryTotem:TimeSinceLastCast() > 90) then
     if Cast(S.WindfuryTotem, Settings.Enhancement.GCDasOffGCD.WindfuryTotem) then return "windfury_totem precombat 4"; end
@@ -601,12 +594,26 @@ local function APL()
   end
 
  -- Shield Handling
-  if Everyone.TargetIsValid() or Settings.Commons.ShieldsOOC then
+  if Everyone.TargetIsValid() or Player:AffectingCombat() or Settings.Commons.ShieldsOOC then
     local EarthShieldBuff = (S.ElementalOrbit:IsAvailable()) and S.EarthShieldSelfBuff or S.EarthShieldOtherBuff
     if (S.ElementalOrbit:IsAvailable() or Settings.Commons.PreferEarthShield) and S.EarthShield:IsReady() and (Player:BuffDown(EarthShieldBuff) or (not Player:AffectingCombat() and Player:BuffStack(EarthShieldBuff) < 5)) then
       if Cast(S.EarthShield, Settings.Enhancement.GCDasOffGCD.Shield) then return "earth_shield main 2"; end
     elseif (S.ElementalOrbit:IsAvailable() or not Settings.Commons.PreferEarthShield) and S.LightningShield:IsReady() and Player:BuffDown(S.LightningShield) then
       if Cast(S.LightningShield, Settings.Enhancement.GCDasOffGCD.Shield) then return "lightning_shield main 3"; end
+    end
+  end
+
+  -- Weapon Buff Handling
+  if Everyone.TargetIsValid() or Player:AffectingCombat() or Settings.Commons.WeaponBuffsOOC then
+    -- Check weapon enchants
+    HasMainHandEnchant, MHEnchantTimeRemains, _, MHEnchantID, HasOffHandEnchant, OHEnchantTimeRemains, _, OHEnchantID = GetWeaponEnchantInfo()
+    -- windfury_weapon
+    if (not HasMainHandEnchant or MHEnchantTimeRemains < 600000) and S.WindfuryWeapon:IsCastable() then
+      if Cast(S.WindfuryWeapon) then return "windfury_weapon enchant"; end
+    end
+    -- flametongue_weapon
+    if (not HasOffHandEnchant or OHEnchantTimeRemains < 600000) and S.FlametongueWeapon:IsCastable() then
+      if Cast(S.FlametongueWeapon) then return "flametongue_weapon enchant"; end
     end
   end
 
