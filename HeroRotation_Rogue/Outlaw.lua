@@ -471,6 +471,13 @@ local function CDs ()
 end
 
 local function Stealth()
+  if S.BladeFlurry:IsReady() then
+    if S.DeftManeuvers:IsAvailable() and not Finish_Condition() and (EnemiesBFCount >= 3
+      and ComboPointsDeficit == EnemiesBFCount + num(Player:BuffUp(S.Broadside)) or EnemiesBFCount >= 5) then
+      if Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
+    end
+  end
+
   -- actions.stealth=blade_flurry,if=talent.subterfuge&talent.hidden_opportunity&spell_targets>=2&buff.blade_flurry.remains<gcd
   if S.BladeFlurry:IsReady() and S.BladeFlurry:IsCastable() and AoEON() and S.Subterfuge:IsAvailable() and S.HiddenOpportunity:IsAvailable() and EnemiesBFCount >= 2
     and Player:BuffRemains(S.BladeFlurry) <= Player:GCD() and (S.AdrenalineRush:IsReady() or Player:BuffUp(S.AdrenalineRush)) then
