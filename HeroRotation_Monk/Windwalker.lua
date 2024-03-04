@@ -67,7 +67,7 @@ local VarSyncSerenity = (I.NeltharionsCalltoDominance:IsEquipped() or I.Ashesoft
 local Stuns = {}
 if S.LegSweep:IsAvailable() then tinsert(Stuns, { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end }) end
 if S.RingofPeace:IsAvailable() then tinsert(Stuns, { S.RingofPeace, "Cast Ring Of Peace (Stun)", function () return true end }) end
-if S.Paralysis:IsAvailable() then tinsert(Stuns, { S.Paralysis, "Cast Paralysis (Stun)", function () return true end })
+if S.Paralysis:IsAvailable() then tinsert(Stuns, { S.Paralysis, "Cast Paralysis (Stun)", function () return true end }) end
 
 local VarHoldTod = false
 local VarFoPPreChan = 0
@@ -97,7 +97,7 @@ HL:RegisterForEvent(function()
   for i = 0, #Stuns do Stuns[i] = nil end
   if S.LegSweep:IsAvailable() then tinsert(Stuns, { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end }) end
   if S.RingofPeace:IsAvailable() then tinsert(Stuns, { S.RingofPeace, "Cast Ring Of Peace (Stun)", function () return true end }) end
-  if S.Paralysis:IsAvailable() then tinsert(Stuns, { S.Paralysis, "Cast Paralysis (Stun)", function () return true end })
+  if S.Paralysis:IsAvailable() then tinsert(Stuns, { S.Paralysis, "Cast Paralysis (Stun)", function () return true end }) end
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
