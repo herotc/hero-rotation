@@ -26,6 +26,7 @@ local num           = HR.Commons.Everyone.num
 local bool          = HR.Commons.Everyone.bool
 -- Lua
 local pairs         = pairs
+local tinsert       = table.insert
 
 
 --- ============================ CONTENT ============================
@@ -63,11 +64,11 @@ local VarBoKNeeded = false
 local VarTrinketType = (S.Serenity:IsAvailable()) and 1 or 2
 local VarDungeonRoute = Player:IsInDungeonArea()
 local VarSyncSerenity = (I.NeltharionsCalltoDominance:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.WitherbarksBranch:IsEquipped()) and not VarDungeonRoute
-local Stuns = {
-  { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end },
-  { S.RingOfPeace, "Cast Ring Of Peace (Stun)", function () return true end },
-  { S.Paralysis, "Cast Paralysis (Stun)", function () return true end },
-}
+local Stuns = {}
+if S.LegSweep:IsAvailable() then tinsert(Stuns, { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end }) end
+if S.RingofPeace:IsAvailable() then tinsert(Stuns, { S.RingofPeace, "Cast Ring Of Peace (Stun)", function () return true end }) end
+if S.Paralysis:IsAvailable() then tinsert(Stuns, { S.Paralysis, "Cast Paralysis (Stun)", function () return true end })
+
 local VarHoldTod = false
 local VarFoPPreChan = 0
 
@@ -93,6 +94,10 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   VarTrinketType = (S.Serenity:IsAvailable()) and 1 or 2
+  for i = 0, #Stuns do Stuns[i] = nil end
+  if S.LegSweep:IsAvailable() then tinsert(Stuns, { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end }) end
+  if S.RingofPeace:IsAvailable() then tinsert(Stuns, { S.RingofPeace, "Cast Ring Of Peace (Stun)", function () return true end }) end
+  if S.Paralysis:IsAvailable() then tinsert(Stuns, { S.Paralysis, "Cast Paralysis (Stun)", function () return true end })
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
@@ -256,7 +261,7 @@ local function Precombat()
     if Cast(S.ExpelHarm) then return "expel_harm precombat 4"; end
   end
   -- chi_burst,if=!talent.jadefire_stomp
-  if S.ChiBurst:IsReady() and (not S.JadefireStomp:IsAvailable()) then
+  if S.ChiBurst:IsCastable() and (not S.JadefireStomp:IsAvailable()) then
     if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst precombat 6"; end
   end
   -- chi_wave
@@ -391,7 +396,7 @@ local function Opener()
     if Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "expel_harm opener 12"; end
   end
   -- chi_burst,if=chi>1&chi.max-chi>=2
-  if S.ChiBurst:IsReady() and (Player:Chi() > 1 and Player:ChiDeficit() >= 2) then
+  if S.ChiBurst:IsCastable() and (Player:Chi() > 1 and Player:ChiDeficit() >= 2) then
     if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst opener 14"; end
   end
 end
@@ -1539,7 +1544,7 @@ local function DefaultAoE()
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane103, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick default_aoe 42"; end
   end
   -- chi_burst,if=chi.max-chi>=1&active_enemies=1&raid_event.adds.in>20|chi.max-chi>=2
-  if S.ChiBurst:IsReady() and (Player:ChiDeficit() >= 1 and EnemiesCount8y == 1 or Player:ChiDeficit() >= 2) then
+  if S.ChiBurst:IsCastable() and (Player:ChiDeficit() >= 1 and EnemiesCount8y == 1 or Player:ChiDeficit() >= 2) then
     if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst default_aoe 44"; end
   end
 end
