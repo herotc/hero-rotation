@@ -253,7 +253,7 @@ local function Precombat()
   end
   -- expel_harm,if=chi<chi.max
   if S.ExpelHarm:IsReady() and (Player:Chi() < Player:ChiMax()) then
-    if Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "expel_harm precombat 4"; end
+    if Cast(S.ExpelHarm) then return "expel_harm precombat 4"; end
   end
   -- chi_burst,if=!talent.jadefire_stomp
   if S.ChiBurst:IsReady() and (not S.JadefireStomp:IsAvailable()) then
