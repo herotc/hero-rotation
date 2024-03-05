@@ -30,5 +30,16 @@ BMOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 , 268)
 
 -- Windwalker, ID: 269
+local WWOldSpellIsCastable
+WWOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = WWOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    if self == SpellWW.ChiBurst then
+      return BaseCheck and not Player:IsCasting(self)
+    else
+      return BaseCheck
+    end
+  end
+, 269)
 
 -- Mistweaver, ID: 270
