@@ -260,6 +260,7 @@ Item.Druid.Commons = {
   MydasTalisman                         = Item(158319, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   WitherbarksBranch                     = Item(109999, {13, 14}),
+  VerdantBadge                          = Item(209343, {13, 14}),
   -- Other On-Use Items
   Djaruun                               = Item(202569, {16}),
   Jotungeirr                            = Item(186404, {16}),

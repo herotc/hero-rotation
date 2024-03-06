@@ -51,6 +51,7 @@ local OnUseExcludes = {--  I.TrinketName:ID(),
   I.MirrorofFracturedTomorrows:ID(),
   I.MydasTalisman:ID(),
   I.WitherbarksBranch:ID(),
+  I.VerdantBadge:ID(),
 }
 
 -- Trinket Item Objects
@@ -232,9 +233,24 @@ local function EvaluateTargetIfFilterLIMoonfire(TargetUnit)
   return ((3 * num(TargetUnit:DebuffRefreshable(S.LIMoonfireDebuff))) + num(TargetUnit:DebuffUp(S.LIMoonfireDebuff)))
 end
 
-local function EvaluateTargetIfFilterRake(TargetUnit)
-  -- target_if=min:(25*(persistent_multiplier<dot.rake.pmultiplier)+dot.rake.remains)
-  return (25 * num(Player:PMultiplier(S.Rake) < TargetUnit:PMultiplier(S.Rake)) + TargetUnit:DebuffRemains(S.RakeDebuff))
+local function EvaluateTargetIfFilterLIMoonfire2(TargetUnit)
+  -- target_if=max:dot.moonfire.ticks_gained_on_refresh
+  return (TicksGainedOnRefresh(S.LIMoonfireDebuff, TargetUnit))
+end
+
+local function EvaluateTargetIfFilterRakeAoEBuilder(TargetUnit)
+  -- target_if=max:(dot.rake.pmultiplier<1.6|dot.rake.refreshable)*druid.rake.ticks_gained_on_refresh
+  return (num(TargetUnit:PMultiplier(S.Rake) < 1.6 or TargetUnit.DebuffRefreshable(S.RakeDebuff)) * TicksGainedOnRefresh(S.RakeDebuff, TargetUnit))
+end
+
+local function EvaluateTargetIfFilterRakeAoEBuilder2(TargetUnit)
+  -- target_if=max:((dot.rake.pmultiplier<=persistent_multiplier)*25)+druid.rake.ticks_gained_on_refresh
+  return ((num(TargetUnit:PMultiplier(S.Rake) <= Player:PMultiplier(S.Rake)) * 25) + TicksGainedOnRefresh(S.RakeDebuff, TargetUnit))
+end
+
+local function EvaluateTargetIfFilterRakeMain(TargetUnit)
+  -- target_if=max:persistent_multiplier>dot.rake.pmultiplier+refreshable
+  return (Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake) + num(TargetUnit:DebuffRefreshable(S.RakeDebuff)))
 end
 
 local function EvaluateTargetIfFilterRakeTicks(TargetUnit)
@@ -255,8 +271,8 @@ local function EvaluateTargetIfAdaptiveSwarm(TargetUnit)
 end
 
 local function EvaluateTargetIfBrutalSlashAoeBuilder(TargetUnit)
-  -- if=cooldown.brutal_slash.full_recharge_time<4|target.time_to_die<5
-  return (S.BrutalSlash:FullRechargeTime() < 4 or TargetUnit:TimeToDie() < 5)
+  -- if=(cooldown.brutal_slash.full_recharge_time<4|target.time_to_die<5)&!((variable.need_bt|buff.bs_inc.up)&buff.bt_brutal_slash.up)
+  return ((S.BrutalSlash:FullRechargeTime() < 4 or TargetUnit:TimeToDie() < 5) and not (VarNeedBT or Player:BuffUp(BsInc)) and BTBuffUp(S.BrutalSlash))
 end
 
 local function EvaluateTargetIfBrutalSlashBT(TargetUnit)
@@ -265,13 +281,13 @@ local function EvaluateTargetIfBrutalSlashBT(TargetUnit)
 end
 
 local function EvaluateTargetIfConvokeCD(TargetUnit)
-  -- if=fight_remains<5|(buff.smoldering_frenzy.up|!set_bonus.tier31_4pc)&(dot.rip.remains>4-talent.ashamanes_guidance&buff.tigers_fury.up&combo_points<2)&(debuff.dire_fixation.up|!talent.dire_fixation.enabled|spell_targets.swipe_cat>1)&((target.time_to_die<fight_remains&target.time_to_die>5-talent.ashamanes_guidance.enabled)|target.time_to_die=fight_remains)
-  return (FightRemains < 5 or (Player:BuffUp(S.SmolderingFrenzyBuff) or not Player:HasTier(31, 4)) and (TargetUnit:DebuffRemains(S.RipDebuff) > 4 - num(S.AshamanesGuidance:IsAvailable()) and Player:BuffUp(S.TigersFury) and ComboPoints < 2) and (TargetUnit:DebuffUp(S.DireFixationDebuff) or not S.DireFixation:IsAvailable() or EnemiesCount11y > 1) and ((TargetUnit:TimeToDie() < FightRemains and TargetUnit:TimeToDie() > 5 - num(S.AshamanesGuidance:IsAvailable())) or TargetUnit:TimeToDie() == FightRemains))
+  -- if=fight_remains<5|(buff.smoldering_frenzy.up|!set_bonus.tier31_4pc)&(dot.rip.remains>4-talent.ashamanes_guidance&buff.tigers_fury.up&(combo_points<=2)|buff.bs_inc.up&combo_points<=3)&(debuff.dire_fixation.up|!talent.dire_fixation.enabled|spell_targets.swipe_cat>1)&(target.time_to_die>5-talent.ashamanes_guidance.enabled|target.time_to_die=fight_remains)
+  return (FightRemains < 5 or (Player:BuffUp(S.SmolderingFrenzyBuff) or not Player:HasTier(31, 4)) and (TargetUnit:DebuffRemains(S.RipDebuff) > 4 - num(S.AshamanesGuidance:IsAvailable()) and Player:BuffUp(S.TigersFury) and ComboPoints < 2 or Player:BuffUp(BsInc) and ComboPoints <= 3) and (TargetUnit:DebuffUp(S.DireFixationDebuff) or not S.DireFixation:IsAvailable() or EnemiesCount11y > 1) and (TargetUnit:TimeToDie() > 5 - num(S.AshamanesGuidance:IsAvailable()) or TargetUnit:TimeToDie() == FightRemains))
 end
 
 local function EvaluateTargetIfLIMoonfireAoEBuilder(TargetUnit)
-  -- if=spell_targets.swipe_cat<5&dot.moonfire.refreshable
-  -- Note: Target count checked before CastTargetIf call.
+  -- if=refreshable&!(variable.need_bt&buff.bt_moonfire.up)
+  -- Note: BT buffs checked before CastTargetIf.
   return (TargetUnit:DebuffRefreshable(S.LIMoonfireDebuff))
 end
 
@@ -281,8 +297,8 @@ local function EvaluateTargetIfLIMoonfireBT(TargetUnit)
 end
 
 local function EvaluateTargetIfRakeAoeBuilder(TargetUnit)
-  -- if=buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier
-  return (Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake))
+  -- if=(buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier|dot.rake.refreshable)&!(variable.need_bt&buff.bt_rake.up)
+  return (Player:BuffUp(S.SuddenAmbushBuff) and Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake) or TargetUnit:DebuffRefreshable(S.RakeDebuff))
 end
 
 local function EvaluateTargetIfRakeBloodtalons(TargetUnit)
@@ -291,8 +307,8 @@ local function EvaluateTargetIfRakeBloodtalons(TargetUnit)
 end
 
 local function EvaluateTargetIfFeralFrenzy(TargetUnit)
-  -- if=((combo_points<3|time<10&combo_points<4)&(!talent.dire_fixation.enabled|debuff.dire_fixation.up|spell_targets.swipe_cat>1)&(target.time_to_die<fight_remains&target.time_to_die>6|target.time_to_die=fight_remains))&!(spell_targets=1&talent.convoke_the_spirits.enabled)
-  return (((ComboPoints < 3 or HL.CombatTime() < 10 and ComboPoints < 4) and (not S.DireFixation:IsAvailable() or TargetUnit:DebuffUp(S.DireFixationDebuff) or EnemiesCount11y > 1) and (TargetUnit:TimeToDie() < FightRemains and Target:TimeToDie() > 6 or TargetUnit:TimeToDie() == FightRemains)) and not (EnemiesCount11y == 1 and S.ConvoketheSpirits:IsAvailable()))
+  -- if=(combo_points<=2|combo_points<=3&buff.bs_inc.up)&(dot.rip.ticking|spell_targets.swipe_cat>1)&(!talent.dire_fixation.enabled|debuff.dire_fixation.up|spell_targets.swipe_cat>1)&(target.time_to_die>6|target.time_to_die=fight_remains)
+  return ((ComboPoints <= 2 or ComboPoints <= 3 and Player:BuffUp(BsInc)) and (TargetUnit:DebuffUp(S.RipDebuff) or EnemiesCount11y > 1) and (not S.DireFixation:IsAvailable() or TargetUnit:DebuffUp(S.DireFixationDebuff) or EnemiesCount11y > 1) and (TargetUnit:TimeToDie() > 6 or TargetUnit:TimeToDie() == FightRemains))
 end
 
 local function EvaluateTargetIfFerociousBiteBerserk(TargetUnit)
@@ -320,11 +336,6 @@ local function EvaluateCycleRake(TargetUnit)
   -- target_if=buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier&buff.bt_rake.down
   -- bt_rake check handled before CastCycle
   return (Player:BuffUp(S.SuddenAmbushBuff) and Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake))
-end
-
-local function EvaluateCycleRakeMain(TargetUnit)
-  -- target_if=persistent_multiplier>dot.rake.pmultiplier
-  return (Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake))
 end
 
 local function EvaluateCycleRip(TargetUnit)
@@ -387,14 +398,14 @@ local function Variables()
   VarEasySwipe = Settings.Feral.UseEasySwipe
   -- variable,name=force_align_2min,op=reset
   VarForceAlign2Min = Settings.Feral.Align2Min
-  -- variable,name=align_cds,value=(variable.force_align_2min|equipped.witherbarks_branch|equipped.ashes_of_the_embersoul|(time+fight_remains>150&time+fight_remains<200|time+fight_remains>270&time+fight_remains<295|time+fight_remains>395&time+fight_remains<400|time+fight_remains>490&time+fight_remains<495))&talent.convoke_the_spirits.enabled&fight_style.patchwerk&spell_targets.swipe_cat=1&set_bonus.tier31_2pc
+  -- variable,name=align_cds,value=(variable.force_align_2min|equipped.witherbarks_branch|equipped.ashes_of_the_embersoul|(time+fight_remains>150&time+fight_remains<200|time+fight_remains>270&time+fight_remains<295|time+fight_remains>395&time+fight_remains<400|time+fight_remains>490&time+fight_remains<495))&talent.convoke_the_spirits.enabled&fight_style.patchwerk&spell_targets.swipe_cat=1&set_bonus.tier31_4pc
   local CombatTime = HL.CombatTime()
   local TimeCheck = CombatTime + FightRemains
-  VarAlignCDs = (VarForceAlign2Min or I.WitherbarksBranch:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or (TimeCheck > 150 and TimeCheck < 200 or TimeCheck > 270 and TimeCheck < 295 or TimeCheck > 395 and TimeCheck < 400 or TimeCheck > 490 and TimeCheck < 495)) and S.ConvoketheSpirits:IsAvailable() and not DungeonSlice and EnemiesCount11y == 1 and Player:HasTier(31, 2)
+  VarAlignCDs = (VarForceAlign2Min or I.WitherbarksBranch:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or (TimeCheck > 150 and TimeCheck < 200 or TimeCheck > 270 and TimeCheck < 295 or TimeCheck > 395 and TimeCheck < 400 or TimeCheck > 490 and TimeCheck < 495)) and S.ConvoketheSpirits:IsAvailable() and not DungeonSlice and EnemiesCount11y == 1 and Player:HasTier(31, 4)
 end
 
 local function Builder()
-  -- thrash_cat,target_if=refreshable&(!talent.dire_fixation.enabled|talent.dire_fixation.enabled&debuff.dire_fixation.up)&buff.clearcasting.react&!talent.thrashing_claws.enabled
+  -- thrash_cat,if=refreshable&(!talent.dire_fixation.enabled|talent.dire_fixation.enabled&debuff.dire_fixation.up)&buff.clearcasting.react&!talent.thrashing_claws.enabled
   if S.Thrash:IsCastable() and (Target:DebuffRefreshable(S.ThrashDebuff) and (not S.DireFixation:IsAvailable() or S.DireFixation:IsAvailable() and Target:DebuffUp(S.DireFixationDebuff)) and Player:BuffUp(S.Clearcasting) and not S.ThrashingClaws:IsAvailable()) then
     if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash builder 2"; end
   end
@@ -457,57 +468,67 @@ local function Builder()
 end
 
 local function AoeBuilder()
-  -- brutal_slash,target_if=min:target.time_to_die,if=cooldown.brutal_slash.full_recharge_time<4|target.time_to_die<5
+  -- brutal_slash,target_if=min:target.time_to_die,if=(cooldown.brutal_slash.full_recharge_time<4|target.time_to_die<5)&!((variable.need_bt|buff.bs_inc.up)&buff.bt_brutal_slash.up)
   if S.BrutalSlash:IsReady() then
     if Everyone.CastTargetIf(S.BrutalSlash, Enemies11y, "min", EvaluateTargetIfFilterTTD, EvaluateTargetIfBrutalSlashAoeBuilder, not IsInAoERange) then return "brutal_slash aoe_builder 2"; end
   end
-  -- thrash_cat,target_if=refreshable,if=buff.clearcasting.react|(spell_targets.thrash_cat>10|(spell_targets.thrash_cat>5&!talent.doubleclawed_rake.enabled))&!talent.thrashing_claws
-  if S.Thrash:IsReady() and (Player:BuffUp(S.Clearcasting) or (EnemiesCount11y > 10 or (EnemiesCount11y > 5 and not S.DoubleClawedRake:IsAvailable())) and not S.ThrashingClaws:IsAvailable()) then
-    if Everyone.CastCycle(S.Thrash, Enemies11y, EvaluateCycleThrash, not IsInAoERange) then return "thrash aoe_builder 4"; end
+  -- thrash_cat,if=dot.thrash_cat.remains<3&(!buff.sudden_ambush.up|!talent.doubleclawed_rake.enabled)&!talent.thrashing_claws
+  if S.Thrash:IsReady() and (Target:DebuffRemains(S.ThrashDebuff) < 3 and (Player:BuffDown(S.SuddenAmbushBuff) or not S.DoubleClawedRake:IsAvailable()) and not S.ThrashingClaws:IsAvailable()) then
+    if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash aoe_builder 4"; end
   end
-  -- shadowmeld,target_if=max:druid.rake.ticks_gained_on_refresh,if=action.rake.ready&!buff.sudden_ambush.up&(dot.rake.refreshable|dot.rake.pmultiplier<1.4)&!buff.prowl.up&!buff.apex_predators_craving.up
-  if S.Shadowmeld:IsReady() and (S.Rake:IsReady() and Player:BuffDown(S.SuddenAmbushBuff) and (DebuffRefreshAny(Enemies11y, S.RakeDebuff) or LowRakePMult(Enemies11y) < 1.4) and Player:BuffDown(S.Prowl) and Player:BuffDown(S.ApexPredatorsCravingBuff)) then
-    if Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "shadowmeld aoe_builder 6"; end
+  -- prowl,target_if=max:dot.rake.pmultiplier<1.6+dot.rake.refreshable,if=(dot.rake.pmultiplier<1.6|dot.rake.refreshable)&!(variable.need_bt&buff.bt_rake.up)
+  -- Note: Skipping target_if condition.
+  if S.Prowl:IsReady() and not Player:StealthUp(false, true) and ((Target:PMultiplier(S.Rake) < 1.6 or Target:DebuffRefreshable(S.RakeDebuff)) and not (VarNeedBT and BTBuffUp(S.Rake))) then
+    if Cast(S.Prowl) then return "prowl aoe_builder 6"; end
   end
-  -- shadowmeld,target_if=druid.rake.ticks_gained_on_refresh,if=action.rake.ready&!buff.sudden_ambush.up&dot.rake.pmultiplier<1.4&!buff.prowl.up&!buff.apex_predators_craving.up
-  if S.Shadowmeld:IsReady() and (S.Rake:IsReady() and Player:BuffDown(S.SuddenAmbushBuff) and LowRakePMult(Enemies11y) < 1.4 and Player:BuffDown(S.Prowl) and Player:BuffDown(S.ApexPredatorsCravingBuff)) then
+  -- shadowmeld,target_if=max:dot.rake.pmultiplier<1.6+dot.rake.refreshable,if=(dot.rake.pmultiplier<1.6|dot.rake.refreshable)&!(variable.need_bt&buff.bt_rake.up)
+  -- Note: Skipping target_if condition.
+  if S.Shadowmeld:IsReady() and not Player:StealthUp(false, true) and ((Target:PMultiplier(S.Rake) < 1.6 or Target:DebuffRefreshable(S.RakeDebuff)) and not (VarNeedBT and BTBuffUp(S.Rake))) then
     if Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "shadowmeld aoe_builder 8"; end
   end
-  -- rake,target_if=max:druid.rake.ticks_gained_on_refresh,if=buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier
-  if S.Rake:IsReady() and (Player:BuffUp(S.SuddenAmbushBuff)) then
-    if Everyone.CastTargetIf(S.Rake, EnemiesMelee, "max", EvaluateTargetIfFilterRakeTicks, EvaluateTargetIfRakeAoeBuilder, not IsInMeleeRange) then return "rake aoe_builder 10"; end
+  -- rake,target_if=max:(dot.rake.pmultiplier<1.6|dot.rake.refreshable)*druid.rake.ticks_gained_on_refresh,if=(buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier|dot.rake.refreshable)&!(variable.need_bt&buff.bt_rake.up)
+  if S.Rake:IsReady() and (not (VarNeedBT and BTBuffUp(S.Rake))) then
+    if Everyone.CastTargetIf(S.Rake, EnemiesMelee, "max", EvaluateTargetIfFilterRakeAoEBuilder, EvaluateTargetIfRakeAoeBuilder, not IsInMeleeRange) then return "rake aoe_builder 10"; end
   end
-  -- rake,target_if=buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier|refreshable
-  if S.Rake:IsReady() then
-    if Everyone.CastCycle(S.Rake, EnemiesMelee, EvaluateCycleRakeAoeBuilder, not IsInMeleeRange) then return "rake aoe_builder 12"; end
+  -- thrash_cat,if=refreshable&!talent.thrashing_claws
+  if S.Thrash:IsReady() and (Target:DebuffRefreshable(S.ThrashDebuff) and not S.ThrashingClaws:IsAvailable()) then
+    if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash aoe_builder 12"; end
   end
-  -- thrash_cat,target_if=refreshable
-  if S.Thrash:IsReady() and (Target:DebuffRefreshable(S.ThrashDebuff)) then
-    if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash aoe_builder 14"; end
+  -- brutal_slash,if=!(variable.need_bt&buff.bt_brutal_slash.up)
+  if S.BrutalSlash:IsReady() and (not (VarNeedBT and BTBuffUp(S.BrutalSlash))) then
+    if Cast(S.BrutalSlash, nil, nil, not IsInAoERange) then return "brutal_slash aoe_builder 14"; end
   end
-  -- brutal_slash
-  if S.BrutalSlash:IsReady() then
-    if Cast(S.BrutalSlash, nil, nil, not IsInAoERange) then return "brutal_slash aoe_builder 16"; end
+  -- swipe_cat,if=spell_targets.swipe_cat>4&!(variable.need_bt&buff.bt_swipe.up)
+  if S.Swipe:IsReady() and (EnemiesCount11y > 4 and not (VarNeedBT and BTBuffUp(S.Swipe))) then
+    if Cast(S.Swipe, nil, nil, not IsInAoERange) then return "swipe aoe_builder 16"; end
   end
-  -- moonfire_cat,target_if=max:(3*refreshable)+dot.adaptive_swarm_damage.ticking,if=spell_targets.swipe_cat<5&dot.moonfire.refreshable
+  -- moonfire_cat,target_if=max:(3*refreshable)+dot.adaptive_swarm_damage.ticking,if=refreshable&!(variable.need_bt&buff.bt_moonfire.up)
   if S.LIMoonfire:IsReady() and (EnemiesCount11y < 5) then
-    if Everyone.CastTargetIf(S.LIMoonfire, Enemies11y, "max", EvaluateTargetIfFilterLIMoonfire, EvaluateTargetIfLIMoonfireAoEBuilder, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat aoe_builders 18"; end
+    if Everyone.CastTargetIf(S.LIMoonfire, Enemies11y, "max", EvaluateTargetIfFilterLIMoonfire, EvaluateTargetIfLIMoonfireAoEBuilder, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat aoe_builder 18"; end
   end
-  -- swipe_cat
-  if S.Swipe:IsReady() then
+  -- swipe_cat,if=!(variable.need_bt&buff.bt_swipe.up)
+  if S.Swipe:IsReady() and (not (VarNeedBT and BTBuffUp(S.Swipe))) then
     if Cast(S.Swipe, nil, nil, not IsInAoERange) then return "swipe aoe_builder 20"; end
   end
-  -- moonfire_cat,target_if=max:(3*refreshable)+dot.adaptive_swarm_damage.ticking,if=dot.moonfire.refreshable
-  if S.LIMoonfire:IsReady() then
-    if Everyone.CastTargetIf(S.LIMoonfire, Enemies11y, "max", EvaluateTargetIfFilterLIMoonfire, EvaluateTargetIfLIMoonfireAoEBuilder, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat aoe_builders 22"; end
+  -- shred,target_if=max:target.time_to_die,if=(spell_targets.swipe_cat<4|talent.dire_fixation.enabled)&!buff.sudden_ambush.up&!(variable.easy_swipe&talent.wild_slashes)&!(variable.need_bt&buff.bt_shred.up)
+  if S.Shred:IsReady() and ((EnemiesCount11y < 4 or S.DireFixation:IsAvailable()) and Player:BuffDown(S.SuddenAmbushBuff) and not (VarEasySwipe and S.WildSlashes:IsAvailable()) and not (VarNeedBT and BTBuffUp(S.Shred))) then
+    if Everyone.CastTargetIf(S.Shred, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange) then return "shred aoe_builder 22"; end
   end
-  -- shred,target_if=max:target.time_to_die,if=(spell_targets.swipe_cat<4|talent.dire_fixation.enabled)&!buff.sudden_ambush.up&!(variable.lazy_swipe&talent.wild_slashes)
-  if S.Shred:IsReady() and ((EnemiesCount11y < 4 or S.DireFixation:IsAvailable()) and Player:BuffDown(S.SuddenAmbushBuff) and not (VarEasySwipe and S.WildSlashes:IsAvailable())) then
-    if Everyone.CastTargetIf(S.Shred, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange) then return "shred aoe_builder 24"; end
+  -- thrash_cat,if=!(variable.need_bt&buff.bt_thrash.up)
+  if S.Thrash:IsReady() and (not (VarNeedBT and BTBuffUp(S.Thrash))) then
+    if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash aoe_builder 24"; end
   end
-  -- thrash_cat
-  if S.Thrash:IsReady() then
-    if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash aoe_builder 26"; end
+  -- shred,target_if=max:target.time_to_die,if=!variable.easy_swipe&variable.need_bt&buff.bt_shred.down
+  if S.Shred:IsReady() and (not VarEasySwipe and VarNeedBT and BTBuffDown(S.Shred)) then
+    if Everyone.CastTargetIf(S.Shred, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange) then return "shred aoe_builder 26"; end
+  end
+  -- moonfire_cat,target_if=max:dot.moonfire.ticks_gained_on_refresh,if=variable.need_bt&buff.bt_moonfire.down
+  if S.LIMoonfire:IsReady() and (VarNeedBT and BTBuffDown(S.LIMoonfire)) then
+    if Everyone.CastTargetIf(S.LIMoonfire, Enemies11y, "max", EvaluateTargetIfFilterLIMoonfire2, nil, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat aoe_builder 28"; end
+  end
+  -- rake,target_if=max:((dot.rake.pmultiplier<=persistent_multiplier)*25)+druid.rake.ticks_gained_on_refresh,if=variable.need_bt&buff.bt_rake.down
+  if S.Rake:IsReady() and (VarNeedBT and BTBuffDown(S.Rake)) then
+    if Everyone.CastTargetIf(S.Rake, EnemiesMelee, "max", EvaluateTargetIfFilterRakeAoEBuilder2, nil, not IsInMeleeRange) then return "rake aoe_builder 30"; end
   end
 end
 
@@ -550,8 +571,8 @@ local function Berserk()
     local ShouldReturn = AoeBuilder(); if ShouldReturn then return ShouldReturn; end
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for AoeBuilder()"; end
   end
-  -- prowl,if=!(buff.bt_rake.up&active_bt_triggers=2)&(action.rake.ready&gcd.remains=0&!buff.sudden_ambush.up&(dot.rake.refreshable|dot.rake.pmultiplier<1.4)&!buff.shadowmeld.up)
-  if S.Prowl:IsReady() and (not (BTBuffUp(S.Rake) and CountActiveBtTriggers() == 2) and (S.Rake:IsReady() and Player:BuffDown(S.SuddenAmbushBuff) and (Target:DebuffRefreshable(S.RakeDebuff) or Target:PMultiplier(S.Rake) < 1.4) and Player:BuffDown(S.Shadowmeld))) then
+  -- prowl,if=!(buff.bt_rake.up&active_bt_triggers=2)&action.rake.ready&gcd.remains=0&!buff.sudden_ambush.up&(dot.rake.refreshable|dot.rake.pmultiplier<1.4)&!buff.shadowmeld.up
+  if S.Prowl:IsReady() and (not (BTBuffUp(S.Rake) and CountActiveBtTriggers() == 2) and S.Rake:IsReady() and Player:BuffDown(S.SuddenAmbushBuff) and (Target:DebuffRefreshable(S.RakeDebuff) or Target:PMultiplier(S.Rake) < 1.4) and Player:BuffDown(S.Shadowmeld)) then
     if Cast(S.Prowl) then return "prowl berserk 4"; end
   end
   -- shadowmeld,if=!(buff.bt_rake.up&active_bt_triggers=2)&action.rake.ready&!buff.sudden_ambush.up&(dot.rake.refreshable|dot.rake.pmultiplier<1.4)&!buff.prowl.up
@@ -578,9 +599,9 @@ local function Berserk()
   if S.Thrash:IsReady() and (CountActiveBtTriggers() == 2 and BTBuffDown(S.Thrash) and not S.ThrashingClaws:IsAvailable() and VarNeedBT) then
     if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash berserk 16"; end
   end
-  -- moonfire_cat,target_if=refreshable
-  if S.LIMoonfire:IsReady() then
-    if Everyone.CastCycle(S.LIMoonfire, Enemies11y, EvaluateCycleLIMoonfire, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat berserk 18"; end
+  -- moonfire_cat,if=refreshable
+  if S.LIMoonfire:IsReady() and (Target:DebuffRefreshable(S.LIMoonfireDebuff)) then
+    if Cast(S.LIMoonfire, nil, nil, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat berserk 18"; end
   end
   -- brutal_slash,if=cooldown.brutal_slash.charges>1&(!talent.dire_fixation.enabled|debuff.dire_fixation.up)
   if S.BrutalSlash:IsReady() and (S.BrutalSlash:Charges() > 1 and (not S.DireFixation:IsAvailable() or Target:DebuffUp(S.DireFixationDebuff))) then
@@ -603,9 +624,9 @@ local function Cooldown()
       if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldown 4"; end
     end
   end
-  -- incarnation,target_if=max:target.time_to_die,if=(target.time_to_die<fight_remains&target.time_to_die>25)|target.time_to_die=fight_remains
+  -- incarnation,target_if=max:target.time_to_die,if=target.time_to_die>25|target.time_to_die=fight_remains
   local HighTTD, _ = HighestTTD(Enemies11y)
-  if S.Incarnation:IsReady() and ((HighTTD < FightRemains and HighTTD > 25) or HighTTD == FightRemains) then
+  if S.Incarnation:IsReady() and (HighTTD > 25 or HighTTD == FightRemains) then
     if Cast(S.Incarnation, Settings.Feral.GCDasOffGCD.BsInc) then return "incarnation cooldown 6"; end
   end
   -- berserk,if=fight_remains<25|talent.convoke_the_spirits.enabled&(fight_remains<cooldown.convoke_the_spirits.remains|(variable.align_cds&(action.feral_frenzy.ready&(combo_points<3|(time<10&combo_points<4))|time<10&combo_points<4)&cooldown.convoke_the_spirits.remains<10))
@@ -640,11 +661,16 @@ local function Cooldown()
     if I.WitherbarksBranch:IsEquippedAndReady() and ((not S.ConvoketheSpirits:IsAvailable() or S.FeralFrenzy:IsReady() or not Player:HasTier(31, 4)) and not (trinket1:ID() == I.AshesoftheEmbersoul:ID() and trinket1:CooldownRemains() < 20 or trinket2:ID() == I.AshesoftheEmbersoul:ID() and trinket2:CooldownRemains() < 20)) then
       if Cast(I.WitherbarksBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "witherbarks_branch cooldown 20"; end
     end
-    -- use_item,name=mirror_of_fractured_tomorrows,if=(!variable.align_3minutes|buff.bs_inc.up&buff.bs_inc.remains>15|variable.lastConvoke&!variable.lastZerk&cooldown.convoke_the_spirits.remains<1)&(target.time_to_die<fight_remains&target.time_to_die>16|target.time_to_die=fight_remains)
-    if I.MirrorofFracturedTomorrows:IsEquippedAndReady() and ((not VarAlign3Mins or Player:BuffUp(BsInc) and Player:BuffRemains(BsInc) > 15 or VarLastConvoke and not VarLastZerk and S.ConvoketheSpirits:CooldownRemains() < 1) and (Target:TimeToDie() < FightRemains and Target:TimeToDie() > 16 or Target:TimeToDie() == FightRemains)) then
+    -- use_item,name=mirror_of_fractured_tomorrows,if=(!variable.align_3minutes|buff.bs_inc.up&buff.bs_inc.remains>15|variable.lastConvoke&!variable.lastZerk&cooldown.convoke_the_spirits.remains<1)&(target.time_to_die>16|target.time_to_die=fight_remains)
+    if I.MirrorofFracturedTomorrows:IsEquippedAndReady() and ((not VarAlign3Mins or Player:BuffUp(BsInc) and Player:BuffRemains(BsInc) > 15 or VarLastConvoke and not VarLastZerk and S.ConvoketheSpirits:CooldownRemains() < 1) and (Target:TimeToDie() > 16 or Target:TimeToDie() == FightRemains)) then
       if Cast(I.MirrorofFracturedTomorrows, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows cooldown 22"; end
     end
+    -- use_item,name=verdant_gladiators_badge_of_ferocity,use_off_gcd=1,if=buff.smoldering_frenzy.up
+    if I.VerdantBadge:IsEquippedAndReady() and (Player:BuffUp(S.SmolderingFrenzyBuff)) then
+      if Cast(I.VerdantBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "verdant_gladiators_badge_of_ferocity cooldown 23"; end
+    end
   end
+  -- convoke_the_spirits,target_if=max:target.time_to_die,if=fight_remains<5|(buff.smoldering_frenzy.up|!set_bonus.tier31_4pc)&(dot.rip.remains>4-talent.ashamanes_guidance&buff.tigers_fury.up&(combo_points<=2)|buff.bs_inc.up&combo_points<=3)&(debuff.dire_fixation.up|!talent.dire_fixation.enabled|spell_targets.swipe_cat>1)&(target.time_to_die>5-talent.ashamanes_guidance.enabled|target.time_to_die=fight_remains)
   -- convoke_the_spirits,target_if=max:target.time_to_die,if=fight_remains<5|(buff.smoldering_frenzy.up|!set_bonus.tier31_4pc)&(dot.rip.remains>4-talent.ashamanes_guidance&buff.tigers_fury.up&combo_points<2)&(debuff.dire_fixation.up|!talent.dire_fixation.enabled|spell_targets.swipe_cat>1)&((target.time_to_die<fight_remains&target.time_to_die>5-talent.ashamanes_guidance.enabled)|target.time_to_die=fight_remains)
   if S.ConvoketheSpirits:IsReady() then
     if Everyone.CastTargetIf(S.ConvoketheSpirits, Enemies11y, "max", EvaluateTargetIfFilterTTD, EvaluateTargetIfConvokeCD, not IsInMeleeRange) then return "convoke_the_spirits cooldown 24"; end
@@ -744,13 +770,13 @@ local function APL()
     if S.TigersFury:IsCastable() and (not Player:HasTier(31, 4) and S.ConvoketheSpirits:IsAvailable() or Player:BuffDown(S.TigersFury) or Player:EnergyDeficit() > 65 or Player:HasTier(31, 2) and S.FeralFrenzy:CooldownUp() or FightRemains < 15 and S.Predator:IsAvailable()) then
       if Cast(S.TigersFury, Settings.Feral.OffGCDasOffGCD.TigersFury) then return "tigers_fury main 6"; end
     end
-    -- rake,target_if=persistent_multiplier>dot.rake.pmultiplier,if=buff.prowl.up|buff.shadowmeld.up
+    -- rake,target_if=max:persistent_multiplier>dot.rake.pmultiplier+refreshable,if=buff.prowl.up|buff.shadowmeld.up
     if S.Rake:IsReady() and (Player:StealthUp(false, true)) then
-      if Everyone.CastCycle(S.Rake, EnemiesMelee, EvaluateCycleRakeMain, not IsInAoERange) then return "rake main 8"; end
+      if Everyone.CastTargetIf(S.Rake, EnemiesMelee, "max", EvaluateTargetIfFilterRakeMain, nil, not IsInAoERange) then return "rake main 8"; end
     end
     -- auto_attack,if=!buff.prowl.up&!buff.shadowmeld.up
     -- natures_vigil,if=spell_targets.swipe_cat>0
-    if S.NaturesVigil:IsCastable() then
+    if S.NaturesVigil:IsCastable() and (EnemiesCount11y > 0) then
       if Cast(S.NaturesVigil, Settings.Feral.OffGCDasOffGCD.NaturesVigil) then return "natures_vigil main 10"; end
     end
     -- renewal,if=variable.regrowth
@@ -769,21 +795,13 @@ local function APL()
     if S.AdaptiveSwarm:IsReady() and (S.UnbridledSwarm:IsAvailable() and EnemiesCount11y > 1) then
       if Everyone.CastTargetIf(S.AdaptiveSwarm, Enemies11y, "max", EvaluateTargetIfFilterAdaptiveSwarm, EvaluateTargetIfAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm)) then return "adaptive_swarm main 18"; end
     end
-    -- call_action_list,name=cooldown,if=(time>3|!talent.dire_fixation.enabled|debuff.dire_fixation.up&combo_points<4|spell_targets.swipe_cat>1)&!(spell_targets=1&talent.convoke_the_spirits.enabled)
-    if CDsON() and ((HL.CombatTime() > 3 or not S.DireFixation:IsAvailable() or Target:DebuffUp(S.DireFixationDebuff) and ComboPoints < 4 or EnemiesCount11y > 1) and not (EnemiesCount11y == 1 and S.ConvoketheSpirits:IsAvailable())) then
+    -- call_action_list,name=cooldown,if=dot.rip.ticking|spell_targets.swipe_cat>1
+    if CDsON() and (Target:DebuffUp(S.RipDebuff) or EnemiesCount11y > 1) then
       local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=cooldown,if=dot.rip.ticking
-    if CDsON() and Target:DebuffUp(S.RipDebuff) then
-      local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- feral_frenzy,target_if=max:target.time_to_die,if=((combo_points<3|time<10&combo_points<4)&(!talent.dire_fixation.enabled|debuff.dire_fixation.up|spell_targets.swipe_cat>1)&(target.time_to_die<fight_remains&target.time_to_die>6|target.time_to_die=fight_remains))&!(spell_targets=1&talent.convoke_the_spirits.enabled)
+    -- feral_frenzy,target_if=max:target.time_to_die,if=(combo_points<=2|combo_points<=3&buff.bs_inc.up)&(dot.rip.ticking|spell_targets.swipe_cat>1)&(!talent.dire_fixation.enabled|debuff.dire_fixation.up|spell_targets.swipe_cat>1)&(target.time_to_die>6|target.time_to_die=fight_remains)
     if S.FeralFrenzy:IsReady() then
       if Everyone.CastTargetIf(S.FeralFrenzy, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, EvaluateTargetIfFeralFrenzy, not IsInMeleeRange) then return "feral_frenzy main 20"; end
-    end
-    -- feral_frenzy,if=combo_points<3&debuff.dire_fixation.up&dot.rip.ticking&(spell_targets=1&talent.convoke_the_spirits.enabled)
-    if S.FeralFrenzy:IsReady() and (ComboPoints < 3 and Target:DebuffUp(S.DireFixationDebuff) and Target:DebuffUp(S.RipDebuff) and (EnemiesCount11y == 1 and S.ConvoketheSpirits:IsAvailable())) then
-      if Cast(S.FeralFrenzy, nil, nil, not IsInAoERange) then return "feral_frenzy main 21"; end
     end
     -- ferocious_bite,target_if=max:target.time_to_die,if=buff.apex_predators_craving.up&(spell_targets.swipe_cat=1|!talent.primal_wrath.enabled|!buff.sabertooth.up)&!(variable.need_bt&active_bt_triggers=2)
     if S.FerociousBite:IsReady() and (Player:BuffUp(S.ApexPredatorsCravingBuff) and (EnemiesCount11y == 1 or not S.PrimalWrath:IsAvailable() or Player:BuffDown(S.SabertoothBuff)) and not (VarNeedBT and CountActiveBtTriggers() == 2)) then
