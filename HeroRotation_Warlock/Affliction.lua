@@ -145,11 +145,11 @@ local function CanSeed(Enemies)
 end
 
 local function DarkglareActive()
-  return HL.GuardiansTable.DarkglareDuration > 0
+  return Warlock.GuardiansTable.DarkglareDuration > 0
 end
 
 local function DarkglareTime()
-  return HL.GuardiansTable.DarkglareDuration
+  return Warlock.GuardiansTable.DarkglareDuration
 end
 
 -- CastTargetIf Functions

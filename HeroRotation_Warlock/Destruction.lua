@@ -19,6 +19,7 @@ local HR            = HeroRotation
 local AoEON         = HR.AoEON
 local CDsON         = HR.CDsON
 local Cast          = HR.Cast
+local Warlock    = HR.Commons.Warlock
 -- Num/Bool Helper Functions
 local num           = HR.Commons.Everyone.num
 local bool          = HR.Commons.Everyone.bool
@@ -134,11 +135,11 @@ local function UnitWithHavoc(enemies)
 end
 
 local function InfernalTime()
-  return HL.GuardiansTable.InfernalDuration or (S.SummonInfernal:InFlight() and 30) or 0
+  return Warlock.GuardiansTable.InfernalDuration or (S.SummonInfernal:InFlight() and 30) or 0
 end
 
 local function BlasphemyTime()
-  return HL.GuardiansTable.BlasphemyDuration or 0
+  return Warlock.GuardiansTable.BlasphemyDuration or 0
 end
 
 local function ChannelDemonfireExecuteTime()

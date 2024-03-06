@@ -97,13 +97,13 @@ S.HandofGuldan:RegisterInFlight()
 
 -- Function to check for imp count
 local function WildImpsCount()
-  return HL.GuardiansTable.ImpCount or 0
+  return Warlock.GuardiansTable.ImpCount or 0
 end
 
 -- Function to check two_cast_imps or last_cast_imps
 local function CheckImpCasts(count)
   local ImpCount = 0
-  for _, Pet in pairs(HL.GuardiansTable.Pets) do
+  for _, Pet in pairs(Warlock.GuardiansTable.Pets) do
     if Pet.ImpCasts <= count then
       ImpCount = ImpCount + 1
     end
@@ -113,7 +113,7 @@ end
 
 -- Function to check for Grimoire Felguard
 local function GrimoireFelguardTime()
-  return HL.GuardiansTable.FelGuardDuration or 0
+  return Warlock.GuardiansTable.FelGuardDuration or 0
 end
 
 local function GrimoireFelguardActive()
@@ -122,7 +122,7 @@ end
 
 -- Function to check for Demonic Tyrant
 local function DemonicTyrantTime()
-  return HL.GuardiansTable.DemonicTyrantDuration or 0
+  return Warlock.GuardiansTable.DemonicTyrantDuration or 0
 end
 
 local function DemonicTyrantActive()
@@ -131,7 +131,7 @@ end
 
 -- Function to check for Dreadstalkers
 local function DreadstalkerTime()
-  return HL.GuardiansTable.DreadstalkerDuration or 0
+  return Warlock.GuardiansTable.DreadstalkerDuration or 0
 end
 
 local function DreadstalkerActive()
@@ -140,7 +140,7 @@ end
 
 -- Function to check for Vilefiend
 local function VilefiendTime()
-  return HL.GuardiansTable.VilefiendDuration or 0
+  return Warlock.GuardiansTable.VilefiendDuration or 0
 end
 
 local function VilefiendActive()
@@ -149,7 +149,7 @@ end
 
 -- Function to check for Pit Lord
 local function PitLordTime()
-  return HL.GuardiansTable.PitLordDuration or 0
+  return Warlock.GuardiansTable.PitLordDuration or 0
 end
 
 local function PitLordActive()
@@ -464,7 +464,6 @@ local function APL()
 
     -- Update Demonology-specific Tables
     Warlock.UpdatePetTable()
-    Warlock.UpdateSoulShards()
 
     -- Update CombatTime, which is used in many spell suggestions
     CombatTime = HL.CombatTime()
@@ -483,7 +482,7 @@ local function APL()
 
   if Everyone.TargetIsValid() then
     -- call precombat
-    if not Player:AffectingCombat() and not Player:IsCasting(S.Demonbolt) then
+    if not Player:AffectingCombat() and not (Player:IsCasting(S.Demonbolt) or Player:IsCasting(S.ShadowBolt)) then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- Interrupts
