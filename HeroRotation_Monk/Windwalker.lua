@@ -220,7 +220,7 @@ end
 local function EvaluateTargetIfJadefireStomp(TargetUnit)
   -- if=combo_strike&talent.jadefire_harmony&debuff.jadefire_brand_damage.remains<1
   -- Note: combo_strike&talent.jadefire_harmony handled prior to this function
-  return TargetUnit:DebuffRemains(S.JadefireBrandDebuff)
+  return TargetUnit:DebuffRemains(S.JadefireBrandDebuff) < 1
 end
 
 local function EvaluateTargetIfRSK(TargetUnit)
