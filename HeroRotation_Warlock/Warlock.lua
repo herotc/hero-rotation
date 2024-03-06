@@ -97,6 +97,7 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   SummonPet                             = Spell(688),
   -- Talents
   AbsoluteCorruption                    = Spell(196103),
+  CreepingDeath                         = Spell(264000),
   DoomBlossom                           = Spell(389764),
   DrainSoul                             = Spell(198590),
   DreadTouch                            = Spell(389775),
