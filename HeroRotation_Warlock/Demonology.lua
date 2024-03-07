@@ -113,7 +113,7 @@ end
 
 -- Function to check for Grimoire Felguard
 local function GrimoireFelguardTime()
-  return Warlock.GuardiansTable.FelGuardDuration or 0
+  return Warlock.GuardiansTable.FelguardDuration or 0
 end
 
 local function GrimoireFelguardActive()
