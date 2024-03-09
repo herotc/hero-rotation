@@ -47,17 +47,17 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Blood = {
-    RuneTapThreshold = 40,
-    IceboundFortitudeThreshold = 50,
-    VampiricBloodThreshold = 65,
     DeathStrikeDumpAmount = 65,
+    IceboundFortitudeThreshold = 50,
+    PoolDuringBlooddrinker = false,
+    RuneTapThreshold = 40,
+    VampiricBloodThreshold = 65,
     PotionType = {
       Selected = "Power",
     },
     DisplayStyle = {
       Consumption = "Suggested",
     },
-    PoolDuringBlooddrinker = false,
     GCDasOffGCD = {
       Bonestorm = false,
       ChainsOfIce = false,
@@ -73,7 +73,6 @@ HR.GUISettings.APL.DeathKnight = {
     },
   },
   Frost = {
-    DisableBoSPooling = false,
     AMSAbsorbPercent = 0,
     PotionType = {
       Selected = "Power",
@@ -92,7 +91,6 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Unholy = {
-    DisableAotD = false,
     RaiseDeadCastLeft = false,
     PotionType = {
       Selected = "Power",
@@ -140,11 +138,9 @@ CreatePanelOption("Slider", CP_Blood, "APL.DeathKnight.Blood.DeathStrikeDumpAmou
 CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood")
 
 --Frost Panels
-CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.DisableBoSPooling", "Disable BoS Pooling", "Enable this option to bypass the BoS Pooling function.")
 CreatePanelOption("Slider", CP_Frost, "APL.DeathKnight.Frost.AMSAbsorbPercent", {0, 100, 1}, "AMS Absorb Percentage", "Set this to the average percentage of AMS's absorb shield that is actively used on any given cast of AMS. Leave at 0 if unsure.")
 CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost")
 
 --Unholy Panels
-CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.DisableAotD", "Disable AotD", "Disable Army of the Dead suggestions.")
 CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.RaiseDeadCastLeft", "Raise Dead in CastLeft", "Enable this to ignore the Raise Dead DisplayStyle option and instead use CastLeft.")
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy")
