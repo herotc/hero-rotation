@@ -31,8 +31,8 @@ HR.GUISettings.APL.Monk = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       LegSweep = true,
-      RingOfPeace = true,
       Paralysis = true,
+      RingOfPeace = true,
       SummonWhiteTigerStatue = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
@@ -56,44 +56,44 @@ HR.GUISettings.APL.Monk = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-      BreathOfFire           = false,
-      ExpelHarm              = false,
-      ExplodingKeg           = false,
+      BreathOfFire = false,
+      ExpelHarm = false,
+      ExplodingKeg = false,
       InvokeNiuzaoTheBlackOx = true,
-      TouchOfDeath           = true,
+      TouchOfDeath = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Racials
       -- Abilities
-      BlackOxBrew            = true,
-      PurifyingBrew          = true,
+      BlackOxBrew = true,
+      PurifyingBrew = true,
     }
   },
   Windwalker = {
-    ShowFortifyingBrewCD = false,
-    IgnoreToK = false,
-    IgnoreFSK = true,
     FortifyingBrewHP = 40,
+    IgnoreFSK = true,
+    IgnoreToK = false,
+    ShowFortifyingBrewCD = false,
     PotionType = {
       Selected = "Power",
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-      FortifyingBrew          = true,
+      FortifyingBrew = true,
       InvokeXuenTheWhiteTiger = true,
       StormEarthAndFireFixate = false,
-      TouchOfDeath            = true,
-      TouchOfKarma            = true,
+      TouchOfDeath = true,
+      TouchOfKarma = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Racials
       -- Abilities
-      EnergizingElixir        = true,
-      Serenity                = true,
-      StormEarthAndFire       = true,
+      EnergizingElixir = true,
+      Serenity = true,
+      StormEarthAndFire = true,
     }
   },
   Mistweaver = {
@@ -112,17 +112,17 @@ HR.GUISettings.APL.Monk = {
     GCDasOffGCD = {
       -- Abilities
       InvokeYulonTheJadeSerpent = true,
-      InvokeChiJiTheRedCrane    = true,
-      SummonJadeSerpentStatue   = true,
-      RenewingMist              = true,
-      TouchOfDeath              = true,
-      FortifyingBrew            = true,
+      InvokeChiJiTheRedCrane = true,
+      SummonJadeSerpentStatue = true,
+      RenewingMist = true,
+      TouchOfDeath = true,
+      FortifyingBrew = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Racials
       -- Abilities
-      ThunderFocusTea         = true,
+      ThunderFocusTea = true,
     }
   }
 };
