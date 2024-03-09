@@ -17,6 +17,8 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.Warrior = {
   Commons = {
+    ShoutDuringCombat = true,
+    VictoryRushHP = 80,
     Enabled = {
       Potions = true,
       Trinkets = true,
@@ -28,8 +30,6 @@ HR.GUISettings.APL.Warrior = {
       Charge = "Suggested",
       HeroicLeap = "Suggested",
     },
-    ShoutDuringCombat = true,
-    VictoryRushHP = 80,
     -- {Display OffGCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       BattleShout = true,
