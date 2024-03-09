@@ -17,6 +17,7 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.Mage = {
   Commons = {
+    MovingRotation = false,
     UseTemporalWarp = true,
     Enabled = {
       Potions = true,
@@ -43,8 +44,54 @@ HR.GUISettings.APL.Mage = {
       Counterspell = true,
     }
   },
+  Arcane = {
+    AEMainIcon = false,
+    MirrorImagesBeforePull = true,
+    PotionType = {
+      Selected = "Power",
+    },
+    Enabled = {
+      ArcaneMissilesInterrupts = true,
+      ManaGem = true,
+    },
+    -- {Display GCD as OffGCD}
+    GCDasOffGCD = {
+      -- Abilities
+      ArcaneSurge = true,
+      MirrorImage = true,
+      TouchOfTheMagi = true,
+      Evocation = true,
+    },
+    -- {Display OffGCD as OffGCD}
+    OffGCDasOffGCD = {
+      -- Abilities
+      ManaGem = true,
+      PresenceOfMind = true,
+    }
+  },
+  Fire = {
+    MirrorImagesBeforePull = false,
+    ShowFireBlastLeft = false,
+    ShowPyroblastLeft = false,
+    StayDistance = true,
+    UseScorchSniping = false,
+    PotionType = {
+      Selected = "Power",
+    },
+    -- {Display GCD as OffGCD}
+    GCDasOffGCD = {
+      -- Abilities
+      DragonsBreath = true,
+      LivingBomb = false,
+      Meteor = false,
+    },
+    -- {Display OffGCD as OffGCD}
+    OffGCDasOffGCD = {
+      -- Abilities
+      Combustion = true,
+    }
+  },
   Frost = {
-    MovingRotation = false,
     StayDistance = true,
     PotionType = {
       Selected = "Power",
@@ -66,56 +113,6 @@ HR.GUISettings.APL.Mage = {
     OffGCDasOffGCD = {
       -- Abilities
     }
-  },
-  Fire = {
-    DisableCombustion = false,
-    MirrorImagesBeforePull = false,
-    StayDistance = true,
-    ShowFireBlastLeft = false,
-    ShowPyroblastLeft = false,
-    UseScorchSniping = false,
-    PotionType = {
-      Selected = "Power",
-    },
-    -- {Display GCD as OffGCD}
-    GCDasOffGCD = {
-      -- Abilities
-      DragonsBreath = true,
-      LivingBomb = false,
-      Meteor = false,
-    },
-    -- {Display OffGCD as OffGCD}
-    OffGCDasOffGCD = {
-      -- Abilities
-      Combustion = true,
-    }
-  },
-  Arcane = {
-    AEMainIcon = false,
-    MirrorImagesBeforePull = true,
-    PotionType = {
-      Selected = "Power",
-    },
-    Enabled = {
-      ArcaneMissilesInterrupts = true,
-      ManaGem = true,
-    },
-    StayDistance = false,
-    MovingRotation = false,
-    -- {Display GCD as OffGCD}
-    GCDasOffGCD = {
-      -- Abilities
-      ArcaneSurge = true,
-      MirrorImage = true,
-      TouchOfTheMagi = true,
-      Evocation = true,
-    },
-    -- {Display OffGCD as OffGCD}
-    OffGCDasOffGCD = {
-      -- Abilities
-      ManaGem = true,
-      PresenceOfMind = true,
-    }
   }
 }
 
@@ -132,10 +129,10 @@ local CP_Frost = CreateChildPanel(CP_Mage, "Frost")
 -- Mage
 CreateARPanelOptions(CP_Mage, "APL.Mage.Commons")
 CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTemporalWarp", "Suggest Time Warp with Temporal Warp", "Show Time Warp when the Temporal Warp talent is selected.")
+CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.MovingRotation", "Disable non-instant casts while moving", "Don't show abilities where a cast is needed (makes the rotation a bit clunky with small steps).")
 
 -- Arcane
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AEMainIcon", "Show Arcane Explosion in Main Icon", "Enable this to show Arcane Explosion in the main icon. When not enabled, Arcane Explosion will be shown in the left icon.")
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MovingRotation", "Disable cast abilities when moving", "While moving, don't show abilities where a cast time is needed (makes the rotation a bit clunky with small steps).")
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MirrorImagesBeforePull", "Use Mirror Images Precombat", "Enable this option to show Mirror Images during Precombat.")
 CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane")
 
@@ -149,5 +146,4 @@ CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.UseScorchSniping", "Ena
 
 -- Frost
 CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.StayDistance", "Stay at distance", "Only use Arcane Explosion if in range. If out of range, display it on the left icon.")
-CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.MovingRotation", "Disable non-instant casts while moving", "Don't show abilities where a cast is needed (makes the rotation a bit clunky with small steps).")
 CreateARPanelOptions(CP_Frost, "APL.Mage.Frost")
