@@ -39,28 +39,6 @@ HR.GUISettings.APL.DemonHunter = {
       Racials = true,
     },
   },
-  Vengeance = {
-    ConserveInfernalStrike = true,
-    DemonSpikesHealthThreshold = 65,
-    FieryBrandHealthThreshold = 40,
-    MetamorphosisHealthThreshold = 50,
-    PotionType = {
-      Selected = "Power",
-    },
-    DisplayStyle = {
-      Defensives = "SuggestedRight",
-    },
-    -- {Display OffGCD as OffGCD, ForceReturn}
-    OffGCDasOffGCD = {
-      -- Abilities
-      InfernalStrike = false,
-    },
-    GCDasOffGCD = {
-      BulkExtraction = false,
-      FelDevastation = false,
-      FieryBrand = false,
-    }
-  },
   Havoc = {
     BlurHealthThreshold = 65,
     ConserveFelRush = false,
@@ -82,6 +60,28 @@ HR.GUISettings.APL.DemonHunter = {
       ImmolationAura = false,
       ThrowGlaive = false,
     },
+  },
+  Vengeance = {
+    ConserveInfernalStrike = true,
+    DemonSpikesHealthThreshold = 65,
+    FieryBrandHealthThreshold = 40,
+    MetamorphosisHealthThreshold = 50,
+    PotionType = {
+      Selected = "Power",
+    },
+    DisplayStyle = {
+      Defensives = "SuggestedRight",
+    },
+    -- {Display OffGCD as OffGCD, ForceReturn}
+    OffGCDasOffGCD = {
+      -- Abilities
+      InfernalStrike = false,
+    },
+    GCDasOffGCD = {
+      BulkExtraction = false,
+      FelDevastation = false,
+      FieryBrand = false,
+    }
   }
 }
 
