@@ -48,7 +48,6 @@ HR.GUISettings.APL.Evoker = {
     MinOpenerDelay = 0,
     ShowBlisteringScales = true,
     ShowPrescience = true,
-    UpheavalRank1Only = true,
     DisplayStyle = {
       AugBuffs = "SuggestedRight",
     },
@@ -64,10 +63,10 @@ HR.GUISettings.APL.Evoker = {
     },
   },
   Devastation = {
+    ObsidianScalesThreshold = 60,
+    ShowChainClip = true,
     UseDefensives = true,
     UseGreen = true,
-    ShowChainClip = true,
-    ObsidianScalesThreshold = 60,
     PotionType = {
       Selected = "Power",
     },
@@ -96,7 +95,6 @@ CreateARPanelOptions(CP_Augmentation, "APL.Evoker.Augmentation")
 CreatePanelOption("Slider", CP_Augmentation, "APL.Evoker.Augmentation.MinOpenerDelay", {0, 5, 1}, "Minimum Opener Delay", "Set this to the minimum number of seconds to delay during the opener. (Note: This will result in filler Living Flame or Azure Strike casts before continuing the rotation. Default: 0.)")
 CreatePanelOption("CheckButton", CP_Augmentation, "APL.Evoker.Augmentation.ShowBlisteringScales", "Show Blistering Scales", "Enable this option to allow Blistering Scales suggestions. NOTE: This will only suggest Blistering Scales for the party/raid tank.")
 CreatePanelOption("CheckButton", CP_Augmentation, "APL.Evoker.Augmentation.ShowPrescience", "Show Prescience", "Enable this option to show Prescience suggestions.")
-CreatePanelOption("CheckButton", CP_Augmentation, "APL.Evoker.Augmentation.UpheavalRank1Only", "Only Use Rank 1 Upheaval", "Enable this option to only suggest Rank 1 Upheaval. When disabled, Upheaval will be recommended at higher ranks depending on target count.")
 
 -- Devastation
 CreatePanelOption("CheckButton", CP_Devastation, "APL.Evoker.Devastation.UseDefensives", "Suggest Defensives", "Enable this option to have the addon suggest defensive spells.")
