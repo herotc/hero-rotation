@@ -545,7 +545,7 @@ local function Finish ()
 
   -- actions.finish+=/killing_spree,if=debuff.ghostly_strike.up|!talent.ghostly_strike
   if S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and (Target:DebuffUp(S.GhostlyStrike) or not S.GhostlyStrike:IsAvailable()) then
-    if Cast(S.KillingSpree) then return "Cast Killing Spree" end
+    if Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree" end
   end
 
   if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Target:IsSpellInRange(S.Dispatch) then
