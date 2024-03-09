@@ -39,8 +39,8 @@ HR.GUISettings.APL.Priest = {
   Shadow = {
     DesperatePrayerHP = 75,
     DispersionHP = 30,
-    SelfPI = true,
     PreferVTWhenSTinDungeon = false,
+    SelfPI = true,
     PotionType = {
       Selected = "Power",
     },
