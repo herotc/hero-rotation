@@ -17,6 +17,7 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.Warlock = {
   Commons = {
+    HidePetSummon = false,
     Enabled = {
       Potions = true,
       Trinkets = true,
@@ -28,7 +29,6 @@ HR.GUISettings.APL.Warlock = {
       Items = "Suggested",
       Signature = "Suggested",
     },
-    HidePetSummon = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
     },
@@ -36,53 +36,6 @@ HR.GUISettings.APL.Warlock = {
     OffGCDasOffGCD = {
       Racials = true,
       SpellLock = true,
-    }
-  },
-  Destruction = {
-    IgnoreSTHavoc = false,
-    PotionType = {
-      Selected = "Power",
-    },
-    --UnendingResolveHP = 20,
-    -- {Display GCD as OffGCD, ForceReturn}
-    GCDasOffGCD = {
-      -- Abilities
-      Cataclysm = false,
-      DimensionalRift = false,
-      GrimoireOfSacrifice = true,
-      InquisitorsGaze = false,
-      SummonInfernal = true,
-      SummonPet = false,
-      SummonSoulkeeper = false,
-    },
-    -- {Display OffGCD as OffGCD, ForceReturn}
-    OffGCDasOffGCD = {
-      -- Abilities
-    }
-  },
-  Demonology = {
-    SummonPetFontSize = 26,
-    PotionType = {
-      Selected = "Power",
-    },
-    UnendingResolveHP = 20,
-    -- {Display GCD as OffGCD, ForceReturn}
-    GCDasOffGCD = {
-      -- Abilities
-      DemonicStrength = false,
-      GrimoireFelguard = false,
-      Guillotine = false,
-      Implosion = false,
-      NetherPortal = true,
-      PowerSiphon = true,
-      SummonDemonicTyrant = false,
-      SummonPet = false,
-    },
-    -- {Display OffGCD as OffGCD, ForceReturn}
-    OffGCDasOffGCD = {
-      -- Abilities
-      UnendingResolve = true,
-      AxeToss = true,
     }
   },
   Affliction = {
@@ -103,6 +56,52 @@ HR.GUISettings.APL.Warlock = {
     OffGCDasOffGCD = {
       -- Abilities
     }
+  },
+  Demonology = {
+    SummonPetFontSize = 26,
+    UnendingResolveHP = 20,
+    PotionType = {
+      Selected = "Power",
+    },
+    -- {Display GCD as OffGCD, ForceReturn}
+    GCDasOffGCD = {
+      -- Abilities
+      DemonicStrength = false,
+      GrimoireFelguard = false,
+      Guillotine = false,
+      Implosion = false,
+      NetherPortal = true,
+      PowerSiphon = true,
+      SummonDemonicTyrant = false,
+      SummonPet = false,
+    },
+    -- {Display OffGCD as OffGCD, ForceReturn}
+    OffGCDasOffGCD = {
+      -- Abilities
+      UnendingResolve = true,
+      AxeToss = true,
+    }
+  },
+  Destruction = {
+    PotionType = {
+      Selected = "Power",
+    },
+    --UnendingResolveHP = 20,
+    -- {Display GCD as OffGCD, ForceReturn}
+    GCDasOffGCD = {
+      -- Abilities
+      Cataclysm = false,
+      DimensionalRift = false,
+      GrimoireOfSacrifice = true,
+      InquisitorsGaze = false,
+      SummonInfernal = true,
+      SummonPet = false,
+      SummonSoulkeeper = false,
+    },
+    -- {Display OffGCD as OffGCD, ForceReturn}
+    OffGCDasOffGCD = {
+      -- Abilities
+    }
   }
 }
 
@@ -118,14 +117,13 @@ local CP_Destruction = CreateChildPanel(CP_Warlock, "Destruction")
 -- Warlock
 CreateARPanelOptions(CP_Warlock, "APL.Warlock.Commons")
 
--- Destruction
-CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.IgnoreSTHavoc", "Ignore Havoc in Single Target", "Enable this option to not receive suggestions to use Havoc while in single target combat.")
-CreateARPanelOptions(CP_Destruction, "APL.Warlock.Destruction")
+-- Affliction
+CreateARPanelOptions(CP_Affliction, "APL.Warlock.Affliction")
 
 -- Demonology
 CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.")
 CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.SummonPetFontSize", {1, 100, 1}, "Summon Pet Font Size", "Select the font size to use for the overlay on your Summon Felguard pet suggestion. This value scales with the addon's 'UI' scale.")
 CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology")
 
--- Affliction
-CreateARPanelOptions(CP_Affliction, "APL.Warlock.Affliction")
+-- Destruction
+CreateARPanelOptions(CP_Destruction, "APL.Warlock.Destruction")
