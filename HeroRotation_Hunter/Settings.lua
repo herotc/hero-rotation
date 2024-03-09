@@ -35,9 +35,9 @@ HR.GUISettings.APL.Hunter = {
     }
   },
   Commons2 = {
-    SummonPetSlot = 1,
     ExhilarationHP = 20,
     MendPetHP = 40,
+    SummonPetSlot = 1,
     GCDasOffGCD = {
       Exhilaration = true,
       ExplosiveShot = false,
@@ -68,7 +68,6 @@ HR.GUISettings.APL.Hunter = {
     },
   },
   Marksmanship = {
-    HideAimedWhileMoving = false,
     PotionType = {
       Selected = "Power",
     },
@@ -126,7 +125,6 @@ CreateARPanelOptions(CP_Hunter2, "APL.Hunter.Commons2")
 CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery")
 
 -- Marksmanship
-CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.HideAimedWhileMoving", "Hide Moving Aimed Shot", "Enable this option to hide Aimed Shot while your character is moving.")
 CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship")
 
 -- Survival
