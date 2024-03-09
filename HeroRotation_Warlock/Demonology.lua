@@ -186,9 +186,11 @@ local function Precombat()
   -- Moved to APL()
   -- snapshot_stats
   -- variable,name=tyrant_prep_start,op=set,value=12
-  VarTyrantPrepStart = 12
+  -- Note: variable.tyrant_prep_start is never used in the APL.
+  --VarTyrantPrepStart = 12
   -- variable,name=next_tyrant,op=set,value=14+talent.grimoire_felguard+talent.summon_vilefiend
-  VarNextTyrant = 14 + num(S.GrimoireFelguard:IsAvailable()) + num(S.SummonVilefiend:IsAvailable())
+  -- Note: variable.next_tyrant is never used in the APL
+  --VarNextTyrant = 14 + num(S.GrimoireFelguard:IsAvailable()) + num(S.SummonVilefiend:IsAvailable())
   -- variable,name=shadow_timings,default=0,op=reset
   -- Note: variable.shadow_timings is never used in the APL.
   -- variable,name=tyrant_timings,value=0
@@ -213,7 +215,8 @@ local function Precombat()
     if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon precombat 2"; end
   end
   -- demonbolt,if=!buff.power_siphon.up
-  if S.Demonbolt:IsReady() and Player:BuffDown(S.DemonicCoreBuff) then
+  -- Note: Manually added power_siphon check so this line is skipped when power_siphon is used in Precombat.
+  if S.Demonbolt:IsReady() and Player:BuffDown(S.DemonicCoreBuff) and not Player:PrevGCDP(1, S.PowerSiphon) then
     if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt precombat 4"; end
   end
   -- shadow_bolt
