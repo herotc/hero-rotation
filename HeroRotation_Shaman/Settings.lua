@@ -32,7 +32,6 @@ HR.GUISettings.APL.Shaman = {
       Signature = "Suggested",
       SpiritwalkersGrace = "SuggestedRight",
     },
-    UseBloodlust = false,
     GCDasOffGCD = {
       Ascendance = true,
       EarthElemental = true,
@@ -42,6 +41,25 @@ HR.GUISettings.APL.Shaman = {
     OffGCDasOffGCD = {
       Racials = true,
       WindShear = true
+    }
+  },
+  Elemental = {
+    PotionType = {
+      Selected = "Power",
+    },
+    DisplayStyle = {
+    },
+    GCDasOffGCD = {
+      -- Abilities
+      EchoingShock = true,
+      FireElemental = true,
+      LiquidMagmaTotem = true,
+      Shield = false,
+      StormElemental = true,
+      Stormkeeper = true
+    },
+    -- {Display OffGCD as OffGCD, ForceReturn}
+    OffGCDasOffGCD = {
     }
   },
   Enhancement = {
@@ -63,27 +81,6 @@ HR.GUISettings.APL.Shaman = {
     },
     OffGCDasOffGCD = {
     },
-  },
-  Elemental = {
-    PotionType = {
-      Selected = "Power",
-    },
-    DisplayStyle = {
-      Meteor = "Suggested",
-      EyeOfTheStorm = "Suggested",
-    },
-    GCDasOffGCD = {
-      -- Abilities
-      EchoingShock = true,
-      FireElemental = true,
-      LiquidMagmaTotem = true,
-      Shield = false,
-      StormElemental = true,
-      Stormkeeper = true
-    },
-    -- {Display OffGCD as OffGCD, ForceReturn}
-    OffGCDasOffGCD = {
-    }
   },
   Restoration = {
     PotionType = {
@@ -111,15 +108,14 @@ CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.PreferEarthShiel
 CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShieldsOOC", "Show Shields OOC", "Enable to show elemental shields while out of combat.")
 CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.WeaponBuffsOOC", "Show Weapon Buffs OOC", "Enable to show weapon buffs while out of combat.")
 
+-- Elemental
+CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental")
+
 -- Enhancement
 CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement")
 CreatePanelOption("Dropdown", CP_Enhancement, "APL.Shaman.Enhancement.Rotation", {"Standard", "Funnel"}, "Rotation Type", "Select to choose between the Standard or Funnel rotations.")
 CreatePanelOption("Slider", CP_Enhancement, "APL.Shaman.Enhancement.HealWith5Maelstrom", {0, 100, 1}, "Heal Pct with 5 Maelstrom", "Sets the health percentage under which Healing Surge should be suggested with 5 Maelstrom. Set this to 0 to disable healing suggestions.")
 CreatePanelOption("Slider", CP_Enhancement, "APL.Shaman.Enhancement.HealWithout5Maelstrom", {0, 100, 1}, "Heal Pct without 5 Maelstrom", "Sets the health percentage under which Healing Surge should be suggested when below 5 Maelstrom. Set this to 0 to disable healing suggestions.")
-
--- Elemental
-CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental")
-CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Elemental.ShowMovementSpells", "Show Movement Spells", "Show Flame Shock and Frost Shock suggestions while moving. Note: This tends to make the rotation choppy when making small movements.")
 
 -- Restoration
 CreateARPanelOptions(CP_Restoration, "APL.Shaman.Restoration")
