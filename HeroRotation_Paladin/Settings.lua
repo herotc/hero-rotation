@@ -66,7 +66,6 @@ HR.GUISettings.APL.Paladin = {
     }
   },
   Retribution = {
-    DisableFinisherCDCheck = false,
     PotionType = {
       Selected = "Power",
     },
@@ -124,7 +123,6 @@ CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.FriendlyWordo
 CreateARPanelOptions(CP_Protection2, "APL.Paladin.Protection")
 
 -- Retribution
-CreatePanelOption("CheckButton", CP_Retribution, "APL.Paladin.Retribution.DisableFinisherCDCheck", "Disable CDs for Finishers", "Enable this option to ignore the status of cooldowns, such as Crusade, Execution Sentence, and Final Reckoning, when deciding whether to suggest finishers.")
 CreateARPanelOptions(CP_Retribution, "APL.Paladin.Retribution")
 
 -- Holy
