@@ -525,7 +525,7 @@ local function AoE()
   end
   -- void_bolt,target_if=max:target.time_to_die
   -- Note: If Target won't die soon, just cast on Target instead of using CastTargetIf. If Target TTD <= 4, then use CastTargetIf.
-  if S.VoidBolt:IsCastable() 
+  if S.VoidBolt:IsCastable() then
     if Target:TimeToDie() > 4 then
       if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt aoe 15"; end
     else
