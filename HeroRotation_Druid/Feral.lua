@@ -240,7 +240,7 @@ end
 
 local function EvaluateTargetIfFilterRakeAoEBuilder(TargetUnit)
   -- target_if=max:(dot.rake.pmultiplier<1.6|dot.rake.refreshable)*druid.rake.ticks_gained_on_refresh
-  return (num(TargetUnit:PMultiplier(S.Rake) < 1.6 or TargetUnit.DebuffRefreshable(S.RakeDebuff)) * TicksGainedOnRefresh(S.RakeDebuff, TargetUnit))
+  return (num(TargetUnit:PMultiplier(S.Rake) < 1.6 or TargetUnit:DebuffRefreshable(S.RakeDebuff)) * TicksGainedOnRefresh(S.RakeDebuff, TargetUnit))
 end
 
 local function EvaluateTargetIfFilterRakeAoEBuilder2(TargetUnit)
