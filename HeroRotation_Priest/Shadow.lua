@@ -524,8 +524,13 @@ local function AoE()
     if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death aoe 14"; end
   end
   -- void_bolt,target_if=max:target.time_to_die
-  if S.VoidBolt:IsCastable() then
-    if Everyone.CastTargetIf(S.VoidBolt, Enemies40y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(40)) then return "void_bolt aoe 16"; end
+  -- Note: If Target won't die soon, just cast on Target instead of using CastTargetIf. If Target TTD <= 4, then use CastTargetIf.
+  if S.VoidBolt:IsCastable() 
+    if Target:TimeToDie() > 4 then
+      if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt aoe 15"; end
+    else
+      if Everyone.CastTargetIf(S.VoidBolt, Enemies40y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(40)) then return "void_bolt aoe 16"; end
+    end
   end
   -- devouring_plague,target_if=max:target.time_to_die*(!dot.devouring_plague.ticking),if=talent.distorted_reality
   if S.DevouringPlague:IsReady() and (S.DistortedReality:IsAvailable()) then
