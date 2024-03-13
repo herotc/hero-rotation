@@ -63,6 +63,7 @@ HR.GUISettings.APL.Paladin = {
     }
   },
   Retribution = {
+    DisableFinisherCDCheck = false,
     PotionType = {
       Selected = "Power",
     },
@@ -118,6 +119,7 @@ CreateARPanelOptions(CP_Protection2, "APL.Paladin.Protection")
 
 -- Retribution
 CreateARPanelOptions(CP_Retribution, "APL.Paladin.Retribution")
+CreatePanelOption("CheckButton", CP_Retribution, "APL.Paladin.Retribution.DisableFinisherCDCheck", "Disable CD Checks for Finishers", "Enable this option to ignore the status of CDs (such as Crusade) when deciding whether to suggest finishers.")
 
 -- Holy
 CreateARPanelOptions(CP_Holy, "APL.Paladin.Holy")

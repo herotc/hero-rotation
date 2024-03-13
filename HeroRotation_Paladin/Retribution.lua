@@ -215,15 +215,15 @@ local function Finishers()
   -- variable,name=ds_castable,value=(spell_targets.divine_storm>=3|spell_targets.divine_storm>=2&!talent.divine_arbiter|buff.empyrean_power.up)&!buff.empyrean_legacy.up&!(buff.divine_arbiter.up&buff.divine_arbiter.stack>24)
   VarDSCastable = ((EnemiesCount8y >= 3 or EnemiesCount8y >= 2 and not S.DivineArbiter:IsAvailable() or Player:BuffUp(S.EmpyreanPowerBuff)) and Player:BuffDown(S.EmpyreanLegacyBuff) and not (Player:BuffUp(S.DivineArbiterBuff) and Player:BuffStack(S.DivineArbiterBuff) > 24))
   -- divine_storm,if=variable.ds_castable&(!talent.crusade|cooldown.crusade.remains>gcd*3|buff.crusade.up&buff.crusade.stack<10)
-  if S.DivineStorm:IsReady() and (VarDSCastable and (not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10)) then
+  if S.DivineStorm:IsReady() and (VarDSCastable and (Settings.Retribution.DisableFinisherCDCheck or not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10)) then
     if Cast(S.DivineStorm, nil, nil, not Target:IsInRange(8)) then return "divine_storm finishers 2" end
   end
   -- justicars_vengeance,if=!talent.crusade|cooldown.crusade.remains>gcd*3|buff.crusade.up&buff.crusade.stack<10
-  if S.JusticarsVengeance:IsReady() and (not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
+  if S.JusticarsVengeance:IsReady() and (Settings.Retribution.DisableFinisherCDCheck or not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
     if Cast(S.JusticarsVengeance, nil, nil, not Target:IsSpellInRange(S.JusticarsVengeance)) then return "justicars_vengeance finishers 4"; end
   end
   -- templars_verdict,if=!talent.crusade|cooldown.crusade.remains>gcd*3|buff.crusade.up&buff.crusade.stack<10
-  if VerdictSpell:IsReady() and (not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
+  if VerdictSpell:IsReady() and (Settings.Retribution.DisableFinisherCDCheck or not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10) then
     if Cast(VerdictSpell, nil, nil, not Target:IsSpellInRange(VerdictSpell)) then return "either verdict finishers 6" end
   end
 end
