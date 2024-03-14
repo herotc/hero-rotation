@@ -467,8 +467,8 @@ local function HighPrioActions()
       end
     end
   end
-  -- army_of_the_dead,if=talent.summon_gargoyle&cooldown.summon_gargoyle.remains<2|!talent.summon_gargoyle|fight_remains<35
-  if S.ArmyoftheDead:IsReady() and (S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:CooldownRemains() < 2 or not S.SummonGargoyle:IsAvailable() or FightRemains < 35) then
+  -- army_of_the_dead,if=talent.summon_gargoyle&cooldown.summon_gargoyle.remains<3*gcd|!talent.summon_gargoyle|fight_remains<35
+  if S.ArmyoftheDead:IsReady() and (S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:CooldownRemains() < 3 * Player:GCD() or not S.SummonGargoyle:IsAvailable() or FightRemains < 35) then
     if Cast(S.ArmyoftheDead, nil, Settings.Unholy.DisplayStyle.ArmyOfTheDead) then return "army_of_the_dead high_prio_actions 4"; end
   end
   -- death_coil,if=(active_enemies<=3|!talent.epidemic)&(pet.gargoyle.active&talent.commander_of_the_dead&buff.commander_of_the_dead.up&cooldown.apocalypse.remains<5&buff.commander_of_the_dead.remains>26|debuff.death_rot.up&debuff.death_rot.remains<gcd)
