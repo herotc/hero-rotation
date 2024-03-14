@@ -92,6 +92,7 @@ HR.GUISettings.APL.DeathKnight = {
   },
   Unholy = {
     RaiseDeadCastLeft = false,
+    SkipGargSetup = false,
     PotionType = {
       Selected = "Power",
     },
@@ -143,4 +144,5 @@ CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost")
 
 --Unholy Panels
 CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.RaiseDeadCastLeft", "Raise Dead in CastLeft", "Enable this to ignore the Raise Dead DisplayStyle option and instead use CastLeft.")
+CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.SkipGargSetup", "Skip Gargoyle Setup Action List", "Enable this option to allow the ability to hold Summon Gargoyle without pausing the entire rotation. NOTE: This WILL result in a DPS LOSS, but stops the rotation from hanging when not using Summon Gargoyle when suggested.")
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy")

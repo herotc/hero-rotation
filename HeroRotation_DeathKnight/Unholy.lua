@@ -701,7 +701,7 @@ local function APL()
       local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=garg_setup,if=variable.garg_setup_complete=0
-    if CDsON() and not VarGargSetupComplete then
+    if CDsON() and not VarGargSetupComplete and not Settings.Unholy.SkipGargSetup then
       local ShouldReturn = GargSetup(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for GargSetup()"; end
     end
