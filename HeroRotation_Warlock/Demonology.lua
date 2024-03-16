@@ -172,6 +172,11 @@ local function EvaluateCycleDoom(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.Doom))
 end
 
+local function EvaluateCycleDoomBrand(TargetUnit)
+  -- target_if=!debuff.doom_brand.up
+  return (TargetUnit:DebuffDown(S.DoomBrandDebuff))
+end
+
 local function EvaluateTargetIfDemonbolt(TargetUnit)
   -- if=set_bonus.tier31_2pc&(debuff.doom_brand.remains>10&buff.demonic_core.up&soul_shard<4)&!variable.pool_cores_for_tyrant
   -- Note: All but debuff.doom_brand.remains handled prior to CastTargetIf.
@@ -395,7 +400,11 @@ local function Tyrant()
   end
   -- demonbolt,cycle_targets=1,if=soul_shard<4&(buff.demonic_core.stack>1)&(buff.vilefiend.up|!talent.summon_vilefiend&buff.dreadstalkers.up)
   if S.Demonbolt:IsReady() and (SoulShards < 4 and (Player:BuffStack(S.DemonicCoreBuff) > 1) and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and DreadstalkerActive())) then
-    if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyrant 26"; end
+    if S.DoomBrandDebuff:AuraActiveCount() == EnemiesCount8ySplash then
+      if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyrant 26"; end
+    else
+      if Everyone.CastCycle(S.Demonbolt, Enemies8ySplash, EvaluateCycleDoomBrand, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyran 27"; end
+    end
   end
   -- power_siphon,if=buff.demonic_core.stack<3&variable.pet_expire>action.summon_demonic_tyrant.execute_time+gcd.max*3|variable.pet_expire=0
   if S.PowerSiphon:IsReady() and (Player:BuffStack(S.DemonicCoreBuff) < 3 and VarPetExpire > S.SummonDemonicTyrant:ExecuteTime() + GCDMax * 3 or VarPetExpire == 0) then
@@ -606,6 +615,8 @@ local function APL()
 end
 
 local function Init()
+  S.DoomBrandDebuff:RegisterAuraTracking()
+
   HR.Print("Demonology Warlock rotation has been updated for patch 10.2.5.")
 end
 
