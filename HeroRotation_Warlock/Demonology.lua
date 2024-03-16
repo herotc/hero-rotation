@@ -400,7 +400,7 @@ local function Tyrant()
   end
   -- demonbolt,cycle_targets=1,if=soul_shard<4&(buff.demonic_core.stack>1)&(buff.vilefiend.up|!talent.summon_vilefiend&buff.dreadstalkers.up)
   if S.Demonbolt:IsReady() and (SoulShards < 4 and (Player:BuffStack(S.DemonicCoreBuff) > 1) and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and DreadstalkerActive())) then
-    if S.DoomBrandDebuff:AuraActiveCount() == EnemiesCount8ySplash then
+    if S.DoomBrandDebuff:AuraActiveCount() == EnemiesCount8ySplash or not Player:HasTier(31, 2) then
       if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyrant 26"; end
     else
       if Everyone.CastCycle(S.Demonbolt, Enemies8ySplash, EvaluateCycleDoomBrand, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyran 27"; end
