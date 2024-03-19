@@ -18,6 +18,8 @@ local stringlower  = string.lower
 local strsplit     = strsplit
 local tostring     = tostring
 local GetTime      = GetTime
+-- API locals
+local GetItemInfo  = C_Item.GetItemInfo
 -- File Locals
 
 --- ======= GLOBALIZE =======
