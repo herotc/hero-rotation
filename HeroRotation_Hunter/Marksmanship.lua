@@ -253,7 +253,7 @@ local function St()
   end
   -- rapid_fire,if=buff.trick_shots.remains<execute_time
   if S.RapidFire:IsCastable() and (Target:DebuffRemains(S.TrickShotsBuff) < S.RapidFire:ExecuteTime()) then
-    if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 4"; end
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire st 4"; end
   end
   -- kill_shot,if=focus+cast_regen<focus.max
   if S.KillShot:IsReady() and (Player:FocusP() + Player:FocusCastRegen(S.KillShot:ExecuteTime()) < Player:FocusMax()) then
@@ -285,7 +285,7 @@ local function St()
   end
   -- rapid_fire,if=(talent.surging_shots|action.aimed_shot.full_recharge_time>action.aimed_shot.cast_time+cast_time)&(focus+cast_regen<focus.max)
   if S.RapidFire:IsCastable() and ((S.SurgingShots:IsAvailable() or S.AimedShot:FullRechargeTime() > S.AimedShot:CastTime() + S.RapidFire:CastTime()) and (Player:FocusP() + Player:FocusCastRegen(S.RapidFire:ExecuteTime()) < Player:FocusMax())) then
-    if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire st 20"; end
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire st 20"; end
   end
   -- trueshot,if=variable.trueshot_ready
   if S.Trueshot:IsReady() and CDsON() and (VarTrueshotReady) then
@@ -372,7 +372,7 @@ local function Trickshots()
   end
   -- rapid_fire,if=buff.trick_shots.remains>=execute_time&talent.surging_shots
   if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime() and S.SurgingShots:IsAvailable()) then
-    if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire trickshots 22"; end
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire trickshots 22"; end
   end
   -- trueshot,if=variable.trueshot_ready
   -- Note: Can't handle raid_event conditions.
@@ -389,7 +389,7 @@ local function Trickshots()
   end
   -- rapid_fire,if=buff.trick_shots.remains>=execute_time
   if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) >= S.RapidFire:ExecuteTime()) then
-    if Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire trickshots 30"; end
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire trickshots 30"; end
   end
   -- chimaera_shot,if=buff.trick_shots.up&buff.precise_shots.up&focus>cost+action.aimed_shot.cost&active_enemies<4
   if S.ChimaeraShot:IsReady() and (Player:BuffUp(S.TrickShotsBuff) and Player:BuffUp(S.PreciseShotsBuff) and Player:FocusP() > S.ChimaeraShot:Cost() + S.AimedShot:Cost() and EnemiesCount10ySplash < 4) then

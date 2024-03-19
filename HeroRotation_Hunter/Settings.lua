@@ -72,6 +72,7 @@ HR.GUISettings.APL.Hunter = {
       Selected = "Power",
     },
     GCDasOffGCD = {
+      RapidFire = false,
       Volley = false,
       WailingArrow = false,
     },
