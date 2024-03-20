@@ -262,6 +262,8 @@ local function Variables()
   -- variable,name=np,op=set,value=(!talent.nether_portal|cooldown.nether_portal.remains>30|buff.nether_portal.up)
   VarNP = (not S.NetherPortal:IsAvailable() or S.NetherPortal:CooldownRemains() > 30 or Player:BuffUp(S.NetherPortalBuff))
   local SacSoulsValue = num(S.SacrificedSouls:IsAvailable())
+  -- Note: Set VarImpl to false and only set it to true if the below conditions allow it.
+  VarImpl = false
   -- variable,name=impl,op=set,value=buff.tyrant.down,if=active_enemies>1+(talent.sacrificed_souls.enabled)
   if EnemiesCount8ySplash > 1 + SacSoulsValue then
     VarImpl = not DemonicTyrantActive()
