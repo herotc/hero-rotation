@@ -752,7 +752,7 @@ local function SerenityAoELust()
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and SCKMax()) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_aoelust 50"; end
   end
-  -- tiger_palm,,target_if=min:debuff.mark_of_the_crane.remains,if=!debuff.skyreach_exhaustion.up*20&combo_strike&active_enemies=5
+  -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!debuff.skyreach_exhaustion.up*20&combo_strike&active_enemies=5
   -- Note: I believe the '!debuff.skyreach_exhaustion.up*20' is supposed to be part of the target_if clause, as it makes no sense in the if clause.
   if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and EnemiesCount8y == 5) then
     if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane102, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm serenity_aoelust 52"; end
@@ -989,7 +989,7 @@ local function SerenityAoE()
   if S.SpinningCraneKick:IsReady() and (FightRemains > (Player:SpellHaste() * 1.5) and ComboStrike(S.SpinningCraneKick) and SCKMax()) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick serenity_aoe 50"; end
   end
-  -- tiger_palm,,target_if=min:debuff.mark_of_the_crane.remains,if=!debuff.skyreach_exhaustion.up*20&combo_strike&active_enemies=5
+  -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!debuff.skyreach_exhaustion.up*20&combo_strike&active_enemies=5
   -- Note: I believe the '!debuff.skyreach_exhaustion.up*20' is supposed to be part of the target_if clause, as it makes no sense in the if clause.
   if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and EnemiesCount8y == 5) then
     if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane102, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm serenity_aoe 52"; end
@@ -1270,7 +1270,7 @@ local function Serenity2T()
   if S.JadefireStomp:IsCastable() and (Target:DebuffRemains(S.JadefireBrandDebuff) < 2 and not (Target:DebuffRemains(S.SkyreachExhaustionDebuff) < 2) and Target:DebuffDown(S.SkyreachExhaustionDebuff)) then
     if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp serenity_2t 2"; end
   end
-  -- tiger_palm,,target_if=min:debuff.mark_of_the_crane.remains,if=!debuff.skyreach_exhaustion.up*20&combo_strike
+  -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!debuff.skyreach_exhaustion.up*20&combo_strike
   -- Note: I believe the '!debuff.skyreach_exhaustion.up*20' is supposed to be part of the target_if clause, as it makes no sense in the if clause.
   if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm)) then
     if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane102, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm serenity_2t 4"; end
