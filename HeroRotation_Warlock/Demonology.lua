@@ -36,6 +36,7 @@ local I = Item.Warlock.Demonology
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.MirrorofFracturedTomorrows:ID(),
   I.NymuesUnravelingSpindle:ID(),
   I.TimeThiefsGambit:ID(),
 }
@@ -44,6 +45,32 @@ local OnUseExcludes = {
 local Equip = Player:GetEquipment()
 local Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
 local Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
+local Trinket1Spell = Trinket1:OnUseSpell()
+local Trinket2Spell = Trinket2:OnUseSpell()
+local Trinket1Range = (Trinket1Spell and Trinket1Spell.MaximumRange > 0 and Trinket1Spell.MaximumRange <= 100) and Trinket1Spell.MaximumRange or 100
+local Trinket2Range = (Trinket2Spell and Trinket2Spell.MaximumRange > 0 and Trinket2Spell.MaximumRange <= 100) and Trinket2Spell.MaximumRange or 100
+-- Special exceptions for trinket ranges.
+Trinket1Range = (Trinket1:ID() == I.BelorrelostheSuncaller:ID()) and 10 or Trinket1Range
+Trinket2Range = (Trinket2:ID() == I.BelorrelostheSuncaller:ID()) and 10 or Trinket2Range
+
+-- Trinket Variables (from Precombat)
+local VarTrinket1Buffs = Trinket1:HasUseBuff()
+local VarTrinket2Buffs = Trinket2:HasUseBuff()
+local VarTrinket1Exclude = Trinket1:ID() == I.RubyWhelpShell:ID() or Trinket1:ID() == I.WhisperingIncarnateIcon:ID() or Trinket1:ID() == I.TimeThiefsGambit:ID()
+local VarTrinket2Exclude = Trinket2:ID() == I.RubyWhelpShell:ID() or Trinket2:ID() == I.WhisperingIncarnateIcon:ID() or Trinket2:ID() == I.TimeThiefsGambit:ID()
+local VarTrinket1Manual = Trinket1:ID() == I.NymuesUnravelingSpindle:ID()
+local VarTrinket2Manual = Trinket2:ID() == I.NymuesUnravelingSpindle:ID()
+local VarTrinket1BuffDuration = Trinket1:BuffDuration() + (num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket1:ID() == I.NymuesUnravelingSpindle:ID()) * 2)
+local VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket2:ID() == I.NymuesUnravelingSpindle:ID()) * 2)
+local VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 90 == 0 or 90 % Trinket1:Cooldown() == 0)) and 1 or 0.5
+local VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 90 == 0 or 90 % Trinket2:Cooldown() == 0)) and 1 or 0.5
+local VarDmgTrinketPriority = (not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2:Level() > Trinket1:Level()) and 2 or 1
+local VarTrinketPriority
+if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()))) > (((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()))) * (1 + ((Trinket1:Level() - Trinket2:Level()) / 100))) then
+  VarTrinketPriority = 2
+else
+  VarTrinketPriority = 1
+end
 
 -- Rotation Var
 local BossFightRemains = 11111
@@ -87,6 +114,30 @@ HL:RegisterForEvent(function()
   Equip = Player:GetEquipment()
   Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
   Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
+  Trinket1Spell = Trinket1:OnUseSpell()
+  Trinket2Spell = Trinket2:OnUseSpell()
+  Trinket1Range = (Trinket1Spell and Trinket1Spell.MaximumRange > 0 and Trinket1Spell.MaximumRange <= 100) and Trinket1Spell.MaximumRange or 100
+  Trinket2Range = (Trinket2Spell and Trinket2Spell.MaximumRange > 0 and Trinket2Spell.MaximumRange <= 100) and Trinket2Spell.MaximumRange or 100
+  -- Special exceptions for trinket ranges.
+  Trinket1Range = (Trinket1:ID() == I.BelorrelostheSuncaller:ID()) and 10 or Trinket1Range
+  Trinket2Range = (Trinket2:ID() == I.BelorrelostheSuncaller:ID()) and 10 or Trinket2Range
+
+  VarTrinket1Buffs = Trinket1:HasUseBuff()
+  VarTrinket2Buffs = Trinket2:HasUseBuff()
+  VarTrinket1Exclude = Trinket1:ID() == I.RubyWhelpShell:ID() or Trinket1:ID() == I.WhisperingIncarnateIcon:ID() or Trinket1:ID() == I.TimeThiefsGambit:ID()
+  VarTrinket2Exclude = Trinket2:ID() == I.RubyWhelpShell:ID() or Trinket2:ID() == I.WhisperingIncarnateIcon:ID() or Trinket2:ID() == I.TimeThiefsGambit:ID()
+  VarTrinket1Manual = Trinket1:ID() == I.NymuesUnravelingSpindle:ID()
+  VarTrinket2Manual = Trinket2:ID() == I.NymuesUnravelingSpindle:ID()
+  VarTrinket1BuffDuration = Trinket1:BuffDuration() + (num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket1:ID() == I.NymuesUnravelingSpindle:ID()) * 2)
+  VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket2:ID() == I.NymuesUnravelingSpindle:ID()) * 2)
+  VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 90 == 0 or 90 % Trinket1:Cooldown() == 0)) and 1 or 0.5
+  VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 90 == 0 or 90 % Trinket2:Cooldown() == 0)) and 1 or 0.5
+  VarDmgTrinketPriority = (not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2:Level() > Trinket1:Level()) and 2 or 1
+  if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()))) > (((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()))) * (1 + ((Trinket1:Level() - Trinket2:Level()) / 100))) then
+    VarTrinketPriority = 2
+  else
+    VarTrinketPriority = 1
+  end
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -214,7 +265,7 @@ local function Precombat()
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_2_buffs&(trinket.2.cooldown.duration%%cooldown.summon_demonic_tyrant.duration=0|cooldown.summon_demonic_tyrant.duration%%trinket.2.cooldown.duration=0)
   -- variable,name=damage_trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&!variable.trinket_2_buffs&trinket.2.ilvl>trinket.1.ilvl
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%variable.trinket_2_buff_duration)*(1.5+trinket.2.has_buff.intellect)*(variable.trinket_2_sync)*(1-0.5*trinket.2.is.mirror_of_fractured_tomorrows))>(((trinket.1.cooldown.duration%variable.trinket_1_buff_duration)*(1.5+trinket.1.has_buff.intellect)*(variable.trinket_1_sync)*(1-0.5*trinket.1.is.mirror_of_fractured_tomorrows))*(1+((trinket.1.ilvl-trinket.2.ilvl)%100)))
-  -- Note: Currently can't handle the variables above.
+  -- Note: Moved to variable declarations and PLAYER_EQUIPMENT_CHANGED event handling.
   -- power_siphon
   if S.PowerSiphon:IsReady() then
     if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon precombat 2"; end
@@ -305,34 +356,52 @@ local function Racials()
 end
 
 local function Items()
-  -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!pet.demonic_tyrant.active&trinket.1.cast_time>0|!trinket.1.cast_time>0)&(pet.demonic_tyrant.active|!talent.summon_demonic_tyrant|variable.trinket_priority=2&cooldown.summon_demonic_tyrant.remains>20&!pet.demonic_tyrant.active&trinket.2.cooldown.remains<cooldown.summon_demonic_tyrant.remains+5)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1&!variable.trinket_2_manual)|variable.trinket_1_buff_duration>=fight_remains
-  -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!pet.demonic_tyrant.active&trinket.2.cast_time>0|!trinket.2.cast_time>0)&(pet.demonic_tyrant.active|!talent.summon_demonic_tyrant|variable.trinket_priority=1&cooldown.summon_demonic_tyrant.remains>20&!pet.demonic_tyrant.active&trinket.1.cooldown.remains<cooldown.summon_demonic_tyrant.remains+5)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2&!variable.trinket_1_manual)|variable.trinket_2_buff_duration>=fight_remains
-  -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&((variable.damage_trinket_priority=1|trinket.2.cooldown.remains)&(trinket.1.cast_time>0&!pet.demonic_tyrant.active|!trinket.1.cast_time>0)|(time<20&variable.trinket_2_buffs)|cooldown.summon_demonic_tyrant.remains_expected>20)
-  -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&((variable.damage_trinket_priority=2|trinket.1.cooldown.remains)&(trinket.2.cast_time>0&!pet.demonic_tyrant.active|!trinket.2.cast_time>0)|(time<20&variable.trinket_1_buffs)|cooldown.summon_demonic_tyrant.remains_expected>20)
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!pet.demonic_tyrant.active&trinket.1.cast_time>0|!trinket.1.cast_time>0)&(pet.demonic_tyrant.active|!talent.summon_demonic_tyrant|variable.trinket_priority=2&cooldown.summon_demonic_tyrant.remains>20&!pet.demonic_tyrant.active&trinket.2.cooldown.remains<cooldown.summon_demonic_tyrant.remains+5)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1&!variable.trinket_2_manual)|variable.trinket_1_buff_duration>=fight_remains
+    if Trinket1:IsReady() and (VarTrinket1Buffs and not VarTrinket1Manual and (not DemonicTyrantActive() and Trinket1:CastTime() > 0 or not (Trinket1:CastTime() > 0)) and (DemonicTyrantActive() or not S.SummonDemonicTyrant:IsAvailable() or VarTrinketPriority == 2 and S.SummonDemonicTyrant:CooldownRemains() > 20 and not DemonicTyrantActive() and Trinket2:CooldownRemains() < S.SummonDemonicTyrant:CooldownRemains() + 5) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1 and not VarTrinket2Manual) or VarTrinket1BuffDuration >= BossFightRemains) then
+      if Cast(Trinket1, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 2"; end
+    end
+    -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!pet.demonic_tyrant.active&trinket.2.cast_time>0|!trinket.2.cast_time>0)&(pet.demonic_tyrant.active|!talent.summon_demonic_tyrant|variable.trinket_priority=1&cooldown.summon_demonic_tyrant.remains>20&!pet.demonic_tyrant.active&trinket.1.cooldown.remains<cooldown.summon_demonic_tyrant.remains+5)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2&!variable.trinket_1_manual)|variable.trinket_2_buff_duration>=fight_remains\
+    if Trinket2:IsReady() and (VarTrinket2Buffs and not VarTrinket2Manual and (not DemonicTyrantActive() and Trinket2:CastTime() > 0 or not (Trinket2:CastTime() > 0)) and (DemonicTyrantActive() or not S.SummonDemonicTyrant:IsAvailable() or VarTrinketPriority == 1 and S.SummonDemonicTyrant:CooldownRemains() > 20 and not DemonicTyrantActive() and Trinket1:CooldownRemains() < S.SummonDemonicTyrant:CooldownRemains() + 5) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2 and not VarTrinket1Manual) or VarTrinket2BuffDuration >= BossFightRemains) then
+      if Cast(Trinket2, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 4"; end
+    end
+    -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&((variable.damage_trinket_priority=1|trinket.2.cooldown.remains)&(trinket.1.cast_time>0&!pet.demonic_tyrant.active|!trinket.1.cast_time>0)|(time<20&variable.trinket_2_buffs)|cooldown.summon_demonic_tyrant.remains_expected>20)
+    HR.Print("VarDmgTrinketPriority: "..tostring(VarDmgTrinketPriority))
+    if Trinket1:IsReady() and (not VarTrinket1Buffs and not VarTrinket1Manual and ((VarDmgTrinketPriority == 1 or Trinket2:CooldownDown()) and (Trinket1:CastTime() > 0 and not DemonicTyrantActive() or not (Trinket1:CastTime() > 0)) or (CombatTime < 20 and VarTrinket2Buffs) or S.SummonDemonicTyrant:CooldownRemains() > 20)) then
+      if Cast(Trinket1, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 6"; end
+    end
+    -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&((variable.damage_trinket_priority=2|trinket.1.cooldown.remains)&(trinket.2.cast_time>0&!pet.demonic_tyrant.active|!trinket.2.cast_time>0)|(time<20&variable.trinket_1_buffs)|cooldown.summon_demonic_tyrant.remains_expected>20)
+    if Trinket2:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and ((VarDmgTrinketPriority == 2 or Trinket1:CooldownDown()) and (Trinket2:CastTime() > 0 and not DemonicTyrantActive() or not (Trinket2:CastTime() > 0)) or (CombatTime < 20 and VarTrinket1Buffs) or S.SummonDemonicTyrant:CooldownRemains() > 20)) then
+      if Cast(Trinket2, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 8"; end
+    end
+  end
   -- use_item,use_off_gcd=1,slot=main_hand
   if Settings.Commons.Enabled.Items then
     local MainHandToUse, _, MainHandRange = Player:GetUseableItems(OnUseExcludes, 16)
     if MainHandToUse then
-      if Cast(MainHandToUse, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(MainHandRange)) then return "use_item main_hand items 2"; end
+      if Cast(MainHandToUse, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(MainHandRange)) then return "use_item main_hand items 10"; end
     end
   end
-  -- use_item,name=nymues_unraveling_spindle,if=trinket.1.is.nymues_unraveling_spindle&((pet.demonic_tyrant.active&(!cooldown.demonic_strength.ready|!talent.demonic_strength)&!variable.trinket_2_buffs)|(variable.trinket_2_buffs))|trinket.2.is.nymues_unraveling_spindle&((pet.demonic_tyrant.active&(!cooldown.demonic_strength.ready|!talent.demonic_strength)&!variable.trinket_1_buffs)|(variable.trinket_1_buffs))|fight_remains<22
-  -- use_item,name=mirror_of_fractured_tomorrows,if=trinket.1.is.mirror_of_fractured_tomorrows&variable.trinket_priority=2|trinket.2.is.mirror_of_fractured_tomorrows&variable.trinket_priority=1
-  -- use_item,name=timethiefs_gambit,if=pet.demonic_tyrant.active
-  if I.TimeThiefsGambit:IsEquippedAndReady() and (DemonicTyrantActive()) then
-    if Cast(I.TimeThiefsGambit, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timethiefs_gambit items 2"; end
-  end
-  -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains)
-  -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains)
-  -- Note: Can't handle some of the above conditions, so using a generic use_items to cover trinkets and other items.
-  if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
-    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-    if ItemToUse then
-      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
-      if (ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets or (ItemSlot ~= 13 and ItemSlot ~= 14) and Settings.Commons.Enabled.Items then
-        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for "..ItemToUse:Name(); end
-      end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,name=nymues_unraveling_spindle,if=trinket.1.is.nymues_unraveling_spindle&((pet.demonic_tyrant.active&(!cooldown.demonic_strength.ready|!talent.demonic_strength)&!variable.trinket_2_buffs)|(variable.trinket_2_buffs))|trinket.2.is.nymues_unraveling_spindle&((pet.demonic_tyrant.active&(!cooldown.demonic_strength.ready|!talent.demonic_strength)&!variable.trinket_1_buffs)|(variable.trinket_1_buffs))|fight_remains<22
+    if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (Trinket1:ID() == I.NymuesUnravelingSpindle:ID() and ((DemonicTyrantActive() and (not S.DemonicStrength:IsReady() or not S.DemonicStrength:IsAvailable()) and not VarTrinket2Buffs) or (VarTrinket2Buffs)) or Trinket2:ID() == I.NymuesUnravelingSpindle:ID() and ((DemonicTyrantActive() and (not S.DemonicStrength:IsReady() or not S.DemonicStrength:IsAvailable()) and not VarTrinket1Buffs) or (VarTrinket1Buffs)) or BossFightRemains < 22) then
+      if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle items 12"; end
+    end
+    -- use_item,name=mirror_of_fractured_tomorrows,if=trinket.1.is.mirror_of_fractured_tomorrows&variable.trinket_priority=2|trinket.2.is.mirror_of_fractured_tomorrows&variable.trinket_priority=1
+    if I.MirrorofFracturedTomorrows:IsEquippedAndReady() and (Trinket1:ID() == I.MirrorofFracturedTomorrows:ID() and VarTrinketPriority == 2 or Trinket2:ID() == I.MirrorofFracturedTomorrows:ID() and VarTrinketPriority == 1) then
+      if Cast(I.MirrorofFracturedTomorrows, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows items 14"; end
+    end
+    -- use_item,name=timethiefs_gambit,if=pet.demonic_tyrant.active
+    if I.TimeThiefsGambit:IsEquippedAndReady() and (DemonicTyrantActive()) then
+      if Cast(I.TimeThiefsGambit, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timethiefs_gambit items 16"; end
+    end
+    -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains)
+    if Trinket1:IsReady() and (not VarTrinket1Buffs and (VarDmgTrinketPriority == 1 or Trinket2:CooldownDown())) then
+      if Cast(Trinket1, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 18"; end
+    end
+    -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains)
+    if Trinket2:IsReady() and (not VarTrinekt2Buffs and (VarDmgTrinketPriority == 2 or Trinket1:CooldownDown())) then
+      if Cast(Trinket2, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 20"; end
     end
   end
 end
