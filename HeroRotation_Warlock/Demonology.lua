@@ -267,7 +267,8 @@ local function Precombat()
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%variable.trinket_2_buff_duration)*(1.5+trinket.2.has_buff.intellect)*(variable.trinket_2_sync)*(1-0.5*trinket.2.is.mirror_of_fractured_tomorrows))>(((trinket.1.cooldown.duration%variable.trinket_1_buff_duration)*(1.5+trinket.1.has_buff.intellect)*(variable.trinket_1_sync)*(1-0.5*trinket.1.is.mirror_of_fractured_tomorrows))*(1+((trinket.1.ilvl-trinket.2.ilvl)%100)))
   -- Note: Moved to variable declarations and PLAYER_EQUIPMENT_CHANGED event handling.
   -- power_siphon
-  if S.PowerSiphon:IsReady() then
+  -- Note: Suggest on bosses or in raids. Avoids forcing this during dungeons.
+  if S.PowerSiphon:IsReady() and (Target:IsInBossList() or not Player:IsInDungeonArea()) then
     if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon precombat 2"; end
   end
   -- Manually added: demonbolt,if=fight_style.dungeonroute&!target.is_boss&buff.demonic_core.up
