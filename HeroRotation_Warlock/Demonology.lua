@@ -219,6 +219,11 @@ local function Precombat()
   if S.PowerSiphon:IsReady() then
     if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon precombat 2"; end
   end
+  -- Manually added: demonbolt,if=fight_style.dungeonroute&!target.is_boss&buff.demonic_core.up
+  -- Note: This is to avoid suggesting ShadowBolt on a new dungeon pack when we have Demonic Core buff stacks.
+  if S.Demonbolt:IsReady() and Player:IsInDungeonArea() and not Target:IsInBossList() and Player:BuffUp(S.DemonicCoreBuff) then
+    if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt precombat 3"; end
+  end
   -- demonbolt,if=!buff.power_siphon.up
   -- Note: Manually added power_siphon check so this line is skipped when power_siphon is used in Precombat.
   if S.Demonbolt:IsReady() and Player:BuffDown(S.DemonicCoreBuff) and not Player:PrevGCDP(1, S.PowerSiphon) then
