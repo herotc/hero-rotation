@@ -250,7 +250,7 @@ end
 
 local function EvaluateTargetIfFilterRakeMain(TargetUnit)
   -- target_if=max:persistent_multiplier>dot.rake.pmultiplier+refreshable
-  return (Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake) + num(TargetUnit:DebuffRefreshable(S.RakeDebuff)))
+  return (num(Player:PMultiplier(S.Rake) > TargetUnit:PMultiplier(S.Rake)) + num(TargetUnit:DebuffRefreshable(S.RakeDebuff)))
 end
 
 local function EvaluateTargetIfFilterRakeTicks(TargetUnit)
