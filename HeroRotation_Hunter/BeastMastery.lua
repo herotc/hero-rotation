@@ -240,7 +240,7 @@ local function ST()
   end
   -- bloodshed
   if S.Bloodshed:IsCastable() then
-    if Cast(S.Bloodshed, Settings.Commons.GCDasOffGCD.Bloodshed, nil, not Target:IsSpellInRange(S.Bloodshed)) then return "bloodshed st 10"; end
+    if Cast(S.Bloodshed, Settings.BeastMastery.GCDasOffGCD.Bloodshed, nil, not Target:IsSpellInRange(S.Bloodshed)) then return "bloodshed st 10"; end
   end
   -- bestial_wrath
   if S.BestialWrath:IsCastable() and CDsON() then
