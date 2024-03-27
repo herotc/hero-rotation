@@ -479,7 +479,7 @@ local function Tyrant()
     if S.DoomBrandDebuff:AuraActiveCount() == EnemiesCount8ySplash or not Player:HasTier(31, 2) then
       if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyrant 26"; end
     else
-      if Everyone.CastCycle(S.Demonbolt, Enemies8ySplash, EvaluateCycleDoomBrand, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyran 27"; end
+      if Everyone.CastCycle(S.Demonbolt, Enemies8ySplash, EvaluateCycleDoomBrand, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyrant 27"; end
     end
   end
   -- power_siphon,if=buff.demonic_core.stack<3&variable.pet_expire>action.summon_demonic_tyrant.execute_time+gcd.max*3|variable.pet_expire=0
