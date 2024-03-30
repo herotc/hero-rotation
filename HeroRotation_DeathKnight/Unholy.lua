@@ -607,8 +607,8 @@ local function Variables()
   VarEpidemicPriority = (S.ImprovedDeathCoil:IsAvailable() and not S.CoilofDevastation:IsAvailable() and ActiveEnemies >= 3 or S.CoilofDevastation:IsAvailable() and ActiveEnemies >= 4 or not S.ImprovedDeathCoil:IsAvailable() and ActiveEnemies >= 2)
   -- variable,name=garg_setup_complete,op=setif,value=1,value_else=0,condition=active_enemies>=3|cooldown.summon_gargoyle.remains>1&(cooldown.apocalypse.remains>1|!talent.apocalypse)|!talent.summon_gargoyle|time>20
   VarGargSetupComplete = (ActiveEnemies >= 3 or S.SummonGargoyle:CooldownRemains() > 1 and (S.Apocalypse:CooldownRemains() > 1 or not S.Apocalypse:IsAvailable()) or not S.SummonGargoyle:IsAvailable() or HL.CombatTime() > 20)
-  -- variable,name=apoc_timing,op=setif,value=7,value_else=2,condition=cooldown.apocalypse.remains<10&debuff.festering_wound.stack<=4&cooldown.unholy_assault.remains>10
-  VarApocTiming = (S.Apocalypse:CooldownRemains() < 10 and FesterStacks <= 4 and S.UnholyAssault:CooldownRemains() > 10) and 7 or 2
+  -- variable,name=apoc_timing,op=setif,value=7,value_else=3,condition=cooldown.apocalypse.remains<10&debuff.festering_wound.stack<=4&cooldown.unholy_assault.remains>10
+  VarApocTiming = (S.Apocalypse:CooldownRemains() < 10 and FesterStacks <= 4 and S.UnholyAssault:CooldownRemains() > 10) and 7 or 3
   -- variable,name=festermight_tracker,op=setif,value=debuff.festering_wound.stack>=1,value_else=debuff.festering_wound.stack>=(3-talent.infected_claws),condition=!pet.gargoyle.active&talent.festermight&buff.festermight.up&(buff.festermight.remains%(5*gcd.max))>=1
   if (not VarGargActive and S.Festermight:IsAvailable() and Player:BuffUp(S.FestermightBuff) and (Player:BuffRemains(S.FestermightBuff) / (5 * Player:GCD())) >= 1) then
     VarFesterTracker = FesterStacks >= 1
