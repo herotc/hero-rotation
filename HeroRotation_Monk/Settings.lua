@@ -30,7 +30,6 @@ HR.GUISettings.APL.Monk = {
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      LegSweep = true,
       Paralysis = true,
       RingOfPeace = true,
       SummonWhiteTigerStatue = true,
