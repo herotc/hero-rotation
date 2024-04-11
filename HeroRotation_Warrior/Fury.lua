@@ -509,7 +509,7 @@ local function APL()
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for MultiTarget()"; end
     end
     -- run_action_list,name=single_target,if=active_enemies=1
-    if EnemiesMeleeCount == 1 then
+    if EnemiesMeleeCount < 2 then
       local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for SingleTarget()"; end
     end
