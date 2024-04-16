@@ -707,6 +707,27 @@ local function CDs ()
     end
   end
 
+  -- actions.cds+=/use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=!stealthed.all&(buff.deeper_daggers.up|!talent.deeper_daggers)&
+  -- (!raid_event.adds.up|!equipped.stormeaters_boon|trinket.stormeaters_boon.cooldown.remains>20)
+  if Settings.Commons.Enabled.Trinkets then
+    if I.BeaconToTheBeyond:IsEquippedAndReady() then
+      if not Player:StealthUp(true, true) and (Player:BuffUp(S.DeeperDaggersBuff) or not S.DeeperDaggers:IsAvailable()) and
+        (not I.StormEatersBoon:IsEquipped() or I.StormEatersBoon:CooldownRemains() > 20) then
+        if Cast(I.BeaconToTheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Beacon To The Beyond" end
+      end
+    end
+  end
+
+  -- actions.cds+=/use_item,name=manic_grieftorch,use_off_gcd=1,if=!stealthed.all&(!raid_event.adds.up
+  -- |!equipped.stormeaters_boon|trinket.stormeaters_boon.cooldown.remains>20)
+  if Settings.Commons.Enabled.Trinkets then
+    if I.ManicGrieftorch:IsEquippedAndReady() then
+      if not Player:StealthUp(true, true) and (not I.StormEatersBoon:IsEquippedAndReady() or I.StormEatersBoon:CooldownRemains()>20) then
+        if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Manic Grieftorch" end
+      end
+    end
+  end
+
   -- actions.cds+=/use_items,if=!stealthed.all&(!trinket.mirror_of_fractured_tomorrows.cooldown.ready|!equipped.mirror_of_fractured_tomorrows)&(!trinket.ashes_of_the_embersoul.cooldown.ready|!equipped.ashes_of_the_embersoul)|fight_remains<10
   -- Default fallback for usable items: Use outside of Stealth/Shadow Dance.
   if not Player:StealthUp(true, true) and (
