@@ -255,6 +255,7 @@ Item.Mage.Commons = {
   VoidmendersShadowgem                  = Item(110007, {13, 14}),
   -- Gladiator's Badges
   CrimsonGladiatorsBadge                = Item(201807, {13, 14}),
+  DraconicGladiatorsBadge               = Item(216279, {13, 14}),
   ObsidianGladiatorsBadge               = Item(205708, {13, 14}),
   VerdantGladiatorsBadge                = Item(209343, {13, 14}),
   -- Other On-Use Items
