@@ -290,10 +290,6 @@ local function Rotation()
   if S.ArcaneOrb:IsReady() and (Player:ArcaneCharges() < 3 and (Player:BloodlustDown() or Player:ManaPercentage() > 70)) then
     if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb rotation 2"; end
   end
-  -- nether_tempest,if=equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.ready_cooldown&buff.siphon_storm.down&buff.arcane_surge.down&buff.arcane_charge.stack=buff.arcane_charge.max_stack,line_cd=120
-  if S.NetherTempest:IsReady() and S.NetherTempest:TimeSinceLastCast() >= 120 and (I.BelorrelostheSuncaller:IsEquippedAndReady() and Player:BuffDown(S.SiphonStormBuff) and Player:BuffDown(S.ArcaneSurgeBuff) and Player:ArcaneCharges() == Player:ArcaneChargesMax()) then
-    if Cast(S.NetherTempest, nil, nil, not Target:IsSpellInRange(S.NetherTempest)) then return "nether_tempest rotation 4"; end
-  end
   -- shifting_power,if=buff.arcane_surge.down&cooldown.arcane_surge.remains>45&fight_remains>15
   if S.ShiftingPower:IsReady() and (Player:BuffDown(S.ArcaneSurgeBuff) and S.ArcaneSurge:CooldownRemains() > 45 and FightRemains > 15) then
     if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power rotation 6"; end
@@ -482,8 +478,8 @@ local function APL()
               if Cast(I.IcebloodDeathsnare, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "iceblood_deathsnare main 46"; end
             end
           end
-          -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=gcd.remains&!dot.radiant_spark.remains&(!variable.steroid_trinket_equipped|(buff.siphon_storm.down|equipped.nymues_unraveling_spindle))
-          if I.BelorrelostheSuncaller:IsEquippedAndReady() and (Target:DebuffDown(S.RadiantSparkDebuff) and (not var_steroid_trinket_equipped or (Player:BuffDown(S.SiphonStormBuff) or I.NymuesUnravelingSpindle:IsEquipped()))) then
+          -- use_item,name=belorrelos_the_suncaller,if=!variable.steroid_trinket_equipped|buff.siphon_storm.down|equipped.nymues_unraveling_spindle
+          if I.BelorrelostheSuncaller:IsEquippedAndReady() and (not var_steroid_trinket_equipped or Player:BuffDown(S.SiphonStormBuff) or I.NymuesUnravelingSpindle:IsEquipped()) then
             if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller main 48"; end
           end
         end
