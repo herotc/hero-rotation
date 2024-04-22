@@ -157,8 +157,8 @@ local function Cooldowns()
     if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle cd 8"; end
   end
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(gcd.remains>gcd.max-0.1|fight_remains<5)&time>5
-    if I.BelorrelostheSuncaller:IsEquippedAndReady() and (HL.CombatTime() > 5) then
+    -- use_item,name=belorrelos_the_suncaller,if=time>5&!prev_gcd.1.flurry
+    if I.BelorrelostheSuncaller:IsEquippedAndReady() and (HL.CombatTime() > 5 and not Player:PrevGCDP(1, S.Flurry)) then
       if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller cd 10"; end
     end
     -- use_item,name=balefire_branch,if=(!talent.ray_of_frost&active_enemies<=2&buff.icy_veins.up&prev_gcd.1.glacial_spike|remaining_winters_chill=1&cooldown.ray_of_frost.up&time>1&active_enemies<=2|cooldown.cone_of_cold.up&prev_gcd.1.comet_storm&active_enemies>=3)|fight_remains<20
