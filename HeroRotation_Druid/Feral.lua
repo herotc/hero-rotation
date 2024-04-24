@@ -47,6 +47,7 @@ local OnUseExcludes = {--  I.TrinketName:ID(),
   I.AlgetharPuzzleBox:ID(),
   I.AshesoftheEmbersoul:ID(),
   I.BandolierofTwistedBlades:ID(),
+  I.IrideusFragment:ID(),
   I.ManicGrieftorch:ID(),
   I.MirrorofFracturedTomorrows:ID(),
   I.MydasTalisman:ID(),
@@ -55,9 +56,9 @@ local OnUseExcludes = {--  I.TrinketName:ID(),
 }
 
 -- Trinket Item Objects
-local equip = Player:GetEquipment()
-local trinket1 = equip[13] and Item(equip[13]) or Item(0)
-local trinket2 = equip[14] and Item(equip[14]) or Item(0)
+local Equip = Player:GetEquipment()
+local Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
+local Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
 
 -- Rotation Variables
 local VarNeedBT, VarAlign3Mins, VarLastConvoke, VarLastZerk, VarZerkBiteweave, VarRegrowth, VarEasySwipe
@@ -81,9 +82,9 @@ HL:RegisterForEvent(function()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
-  equip = Player:GetEquipment()
-  trinket1 = equip[13] and Item(equip[13]) or Item(0)
-  trinket2 = equip[14] and Item(equip[14]) or Item(0)
+  Equip = Player:GetEquipment()
+  Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
+  Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -398,10 +399,10 @@ local function Variables()
   VarEasySwipe = Settings.Feral.UseEasySwipe
   -- variable,name=force_align_2min,op=reset
   VarForceAlign2Min = Settings.Feral.Align2Min
-  -- variable,name=align_cds,value=(variable.force_align_2min|equipped.witherbarks_branch|equipped.ashes_of_the_embersoul|(time+fight_remains>150&time+fight_remains<200|time+fight_remains>270&time+fight_remains<295|time+fight_remains>395&time+fight_remains<400|time+fight_remains>490&time+fight_remains<495))&talent.convoke_the_spirits.enabled&fight_style.patchwerk&spell_targets.swipe_cat=1&set_bonus.tier31_4pc
+  -- variable,name=align_cds,value=(variable.force_align_2min|equipped.witherbarks_branch|equipped.ashes_of_the_embersoul|equipped.mirror_of_fractured_tomorrows|equipped.algethar_puzzle_box|equipped.irideus_fragment|(time+fight_remains>150&time+fight_remains<200|time+fight_remains>270&time+fight_remains<295|time+fight_remains>395&time+fight_remains<400|time+fight_remains>490&time+fight_remains<495))&talent.convoke_the_spirits.enabled&fight_style.patchwerk&spell_targets.swipe_cat=1&set_bonus.tier31_4pc
   local CombatTime = HL.CombatTime()
   local TimeCheck = CombatTime + FightRemains
-  VarAlignCDs = (VarForceAlign2Min or I.WitherbarksBranch:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or (TimeCheck > 150 and TimeCheck < 200 or TimeCheck > 270 and TimeCheck < 295 or TimeCheck > 395 and TimeCheck < 400 or TimeCheck > 490 and TimeCheck < 495)) and S.ConvoketheSpirits:IsAvailable() and not DungeonSlice and EnemiesCount11y == 1 and Player:HasTier(31, 4)
+  VarAlignCDs = (VarForceAlign2Min or I.WitherbarksBranch:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.AlgetharPuzzleBox:IsEquipped() or I.IrideusFragment:IsEquipped() or (TimeCheck > 150 and TimeCheck < 200 or TimeCheck > 270 and TimeCheck < 295 or TimeCheck > 395 and TimeCheck < 400 or TimeCheck > 490 and TimeCheck < 495)) and S.ConvoketheSpirits:IsAvailable() and not DungeonSlice and EnemiesCount11y == 1 and Player:HasTier(31, 4)
 end
 
 local function Builder()
@@ -619,8 +620,12 @@ local function Cooldown()
     if I.AlgetharPuzzleBox:IsEquippedAndReady() and (FightRemains < 35 or not VarAlign3Mins) then
       if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldown 2"; end
     end
-    -- use_item,name=algethar_puzzle_box,if=variable.align_3minutes&(cooldown.bs_inc.remains<3&(!variable.lastZerk|!variable.lastConvoke|(variable.lastConvoke&cooldown.convoke_the_spirits.remains<13)))
-    if I.AlgetharPuzzleBox:IsEquippedAndReady() and (VarAlign3Mins and (BsInc:CooldownRemains() < 3 and (not VarLastZerk or not VarLastConvoke or (VarLastConvoke and S.ConvoketheSpirits:CooldownRemains() < 13)))) then
+    -- use_item,name=algethar_puzzle_box,if=variable.align_3minutes&!variable.align_cds&cooldown.bs_inc.remains<5&!buff.smoldering_frenzy.up
+    -- use_item,name=algethar_puzzle_box,if=variable.align_3minutes&variable.align_cds&cooldown.convoke_the_spirits.remains<20&!buff.smoldering_frenzy.up
+    if I.AlgetharPuzzleBox:IsEquippedAndReady() and (
+      (VarAlign3Mins and not VarAlignCDs and BsInc:CooldownRemains() < 5 and Player:BuffDown(S.SmolderingFrenzyBuff)) or
+      (VarAlign3Mins and VarAlignCDs and S.ConvoketheSpirits:CooldownRemains() < 20 and Player:BuffDown(S.SmolderingFrenzyBuff))
+    ) then
       if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldown 4"; end
     end
   end
@@ -658,35 +663,38 @@ local function Cooldown()
       if Cast(I.AshesoftheEmbersoul, nil, Settings.Commons.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul cooldown 18"; end
     end
     -- use_item,name=witherbarks_branch,if=(!talent.convoke_the_spirits.enabled|action.feral_frenzy.ready|!set_bonus.tier31_4pc)&!(trinket.1.is.ashes_of_the_embersoul&trinket.1.cooldown.remains<20|trinket.2.is.ashes_of_the_embersoul&trinket.2.cooldown.remains<20)
-    if I.WitherbarksBranch:IsEquippedAndReady() and ((not S.ConvoketheSpirits:IsAvailable() or S.FeralFrenzy:IsReady() or not Player:HasTier(31, 4)) and not (trinket1:ID() == I.AshesoftheEmbersoul:ID() and trinket1:CooldownRemains() < 20 or trinket2:ID() == I.AshesoftheEmbersoul:ID() and trinket2:CooldownRemains() < 20)) then
+    if I.WitherbarksBranch:IsEquippedAndReady() and ((not S.ConvoketheSpirits:IsAvailable() or S.FeralFrenzy:IsReady() or not Player:HasTier(31, 4)) and not (Trinket1:ID() == I.AshesoftheEmbersoul:ID() and Trinket1:CooldownRemains() < 20 or Trinket2:ID() == I.AshesoftheEmbersoul:ID() and Trinket2:CooldownRemains() < 20)) then
       if Cast(I.WitherbarksBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "witherbarks_branch cooldown 20"; end
     end
-    -- use_item,name=mirror_of_fractured_tomorrows,if=(!variable.align_3minutes|buff.bs_inc.up&buff.bs_inc.remains>15|variable.lastConvoke&!variable.lastZerk&cooldown.convoke_the_spirits.remains<1)&(target.time_to_die>16|target.time_to_die=fight_remains)
-    if I.MirrorofFracturedTomorrows:IsEquippedAndReady() and ((not VarAlign3Mins or Player:BuffUp(BsInc) and Player:BuffRemains(BsInc) > 15 or VarLastConvoke and not VarLastZerk and S.ConvoketheSpirits:CooldownRemains() < 1) and (Target:TimeToDie() > 16 or Target:TimeToDie() == FightRemains)) then
+    -- use_item,name=mirror_of_fractured_tomorrows,if=fight_remains<22|(!variable.align_3minutes|buff.bs_inc.up&buff.bs_inc.remains>15|variable.lastConvoke&!variable.lastZerk&cooldown.convoke_the_spirits.remains<1)&(target.time_to_die>16|target.time_to_die=fight_remains)
+    if I.MirrorofFracturedTomorrows:IsEquippedAndReady() and (BossFightRemains < 22 or (not VarAlign3Mins or Player:BuffUp(BsInc) and Player:BuffRemains(BsInc) > 15 or VarLastConvoke and not VarLastZerk and S.ConvoketheSpirits:CooldownRemains() < 1) and (Target:TimeToDie() > 16 or Target:TimeToDie() == FightRemains)) then
       if Cast(I.MirrorofFracturedTomorrows, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows cooldown 22"; end
+    end
+    -- use_item,name=irideus_fragment,if=buff.smoldering_frenzy.up&(fight_remains<35|!variable.align_3minutes|buff.bs_inc.up|variable.lastConvoke&!variable.lastZerk&cooldown.convoke_the_spirits.remains<5)
+    if I.IrideusFragment:IsEquippedAndReady() and (Player:BuffUp(S.SmolderingFrenzyBuff) and (BossFightRemains < 35 or not VarAlign3Mins or Player:BuffUp(BsInc) or VarLastConvoke and not VarLastZerk and S.ConvoketheSpirits:CooldownRemains() < 5)) then
+      if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment cooldown 23"; end
     end
     -- use_item,name=verdant_gladiators_badge_of_ferocity,use_off_gcd=1,if=buff.smoldering_frenzy.up
     if I.VerdantBadge:IsEquippedAndReady() and (Player:BuffUp(S.SmolderingFrenzyBuff)) then
-      if Cast(I.VerdantBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "verdant_gladiators_badge_of_ferocity cooldown 23"; end
+      if Cast(I.VerdantBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "verdant_gladiators_badge_of_ferocity cooldown 24"; end
     end
   end
   -- convoke_the_spirits,target_if=max:target.time_to_die,if=fight_remains<5|(buff.smoldering_frenzy.up|!set_bonus.tier31_4pc)&(dot.rip.remains>4-talent.ashamanes_guidance&buff.tigers_fury.up&(combo_points<=2)|buff.bs_inc.up&combo_points<=3)&(debuff.dire_fixation.up|!talent.dire_fixation.enabled|spell_targets.swipe_cat>1)&(target.time_to_die>5-talent.ashamanes_guidance.enabled|target.time_to_die=fight_remains)
-  -- convoke_the_spirits,target_if=max:target.time_to_die,if=fight_remains<5|(buff.smoldering_frenzy.up|!set_bonus.tier31_4pc)&(dot.rip.remains>4-talent.ashamanes_guidance&buff.tigers_fury.up&combo_points<2)&(debuff.dire_fixation.up|!talent.dire_fixation.enabled|spell_targets.swipe_cat>1)&((target.time_to_die<fight_remains&target.time_to_die>5-talent.ashamanes_guidance.enabled)|target.time_to_die=fight_remains)
   if S.ConvoketheSpirits:IsReady() then
-    if Everyone.CastTargetIf(S.ConvoketheSpirits, Enemies11y, "max", EvaluateTargetIfFilterTTD, EvaluateTargetIfConvokeCD, not IsInMeleeRange, nil, Settings.Commons.DisplayStyle.Signature) then return "convoke_the_spirits cooldown 24"; end
+    if Everyone.CastTargetIf(S.ConvoketheSpirits, Enemies11y, "max", EvaluateTargetIfFilterTTD, EvaluateTargetIfConvokeCD, not IsInMeleeRange, nil, Settings.Commons.DisplayStyle.Signature) then return "convoke_the_spirits cooldown 25"; end
   end
   -- convoke_the_spirits,if=buff.smoldering_frenzy.up&buff.smoldering_frenzy.remains<5.1-talent.ashamanes_guidance
   if S.ConvoketheSpirits:IsReady() and (Player:BuffUp(S.SmolderingFrenzyBuff) and Player:BuffRemains(S.SmolderingFrenzyBuff) < 5.1 - num(S.AshamanesGuidance:IsAvailable())) then
     if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not IsInMeleeRange) then return "convoke_the_spirits cooldown 26"; end
   end
-  -- use_item,name=manic_grieftorch,target_if=max:target.time_to_die,if=energy.deficit>40
-  if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() and (Player:EnergyDeficit() > 40) then
+  -- use_item,name=manic_grieftorch,target_if=max:target.time_to_die,if=!equipped.ashes_of_the_embersoul&!equipped.mirror_of_fractured_tomorrows&!equipped.algethar_puzzle_box|trinket.1.is.manic_grieftorch&trinket.2.cooldown.remains>20|trinket.2.is.manic_grieftorch&trinket.1.cooldown.remains>20
+  if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() and (not I.AshesoftheEmbersoul:IsEquipped() and not I.MirrorofFracturedTomorrows:IsEquipped() and not I.AlgetharPuzzleBox:IsEquipped() or Trinket1:ID() == I.ManicGrieftorch:ID() and Trinket2:CooldownRemains() > 20 or Trinket2:ID() == I.ManicGrieftorch:ID() and Trinket1:CooldownRemains() > 20) then
     if Everyone.CastTargetIf(I.ManicGrieftorch, Enemies11y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch cooldown 28"; end
   end
   -- use_item,name=mydas_talisman,if=!equipped.ashes_of_the_embersoul&!equipped.witherbarks_branch|((trinket.2.is.witherbarks_branch|trinket.2.is.ashes_of_the_embersoul)&trinket.2.cooldown.remains>20)|((trinket.1.is.witherbarks_branch|trinket.1.is.ashes_of_the_embersoul)&trinket.1.cooldown.remains>20)
   -- use_item,name=bandolier_of_twisted_blades,if=!equipped.ashes_of_the_embersoul&!equipped.witherbarks_branch|((trinket.2.is.witherbarks_branch|trinket.2.is.ashes_of_the_embersoul)&trinket.2.cooldown.remains>20)|((trinket.1.is.witherbarks_branch|trinket.1.is.ashes_of_the_embersoul)&trinket.1.cooldown.remains>20)
   -- use_item,name=fyrakks_tainted_rageheart,if=!equipped.ashes_of_the_embersoul&!equipped.witherbarks_branch|((trinket.2.is.witherbarks_branch|trinket.2.is.ashes_of_the_embersoul)&trinket.2.cooldown.remains>20)|((trinket.1.is.witherbarks_branch|trinket.1.is.ashes_of_the_embersoul)&trinket.1.cooldown.remains>20)
-  if (not I.AshesoftheEmbersoul:IsEquipped() and not I.WitherbarksBranch:IsEquipped() or ((trinket2:ID() == I.WitherbarksBranch:ID() or trinket2:ID() == I.AshesoftheEmbersoul:ID()) and trinket2:CooldownRemains() > 20) or ((trinket1:ID() == I.WitherbarksBranch:ID() or trinket1:ID() == I.AshesoftheEmbersoul:ID()) and trinket1:CooldownRemains() > 20)) then
+  if (not I.AshesoftheEmbersoul:IsEquipped() and not I.WitherbarksBranch:IsEquipped() or ((Trinket2:ID() == I.WitherbarksBranch:ID() or Trinket2:ID() == I.AshesoftheEmbersoul:ID()) and Trinket2:CooldownRemains() > 20) or ((Trinket1:ID() == I.WitherbarksBranch:ID() or Trinket1:ID() == I.AshesoftheEmbersoul:ID()) and Trinket1:CooldownRemains() > 20)) then
     if I.MydasTalisman:IsEquippedAndReady() then
       if Cast(I.MydasTalisman, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mydas_talisman cooldown 30"; end
     end
