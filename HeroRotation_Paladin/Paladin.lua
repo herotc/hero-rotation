@@ -139,6 +139,7 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   ShieldofVengeance                     = Spell(184662),
   TemplarSlash                          = Spell(406647),
   TemplarStrike                         = Spell(407480),
+  VanguardofJustice                     = Spell(406545),
   VanguardsMomentum                     = Spell(383314),
   WakeofAshes                           = Spell(255937),
   Zeal                                  = Spell(269569),
