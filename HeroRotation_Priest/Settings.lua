@@ -49,6 +49,7 @@ HR.GUISettings.APL.Priest = {
       DarkAscension = true,
       DivineStar = true,
       Halo = false,
+      HolyNova = true,
       Mindbender = true,
       ShadowCrash = false,
       Shadowform = true,
