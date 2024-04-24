@@ -192,23 +192,11 @@ local function Trinkets()
     if I.NymuesUnravelingSpindle:IsEquippedAndReady() and ((Player:BuffStack(S.EmeraldTranceBuff) >= 2 and VarHasExternalPI and S.EventHorizon:IsAvailable() or S.Dragonrage:CooldownRemains() <= 3 and S.FireBreath:CooldownRemains() < 7 and S.EternitySurge:CooldownRemains() < 13 and Target:TimeToDie() >= 35 and (not VarHasExternalPI and EnemiesCount8ySplash <= 2 or not S.EventHorizon:IsAvailable() or not Player:HasTier(31, 2))) or S.Dragonrage:CooldownRemains() <= 3 and EnemiesCount8ySplash >= 3 or FightRemains <= 20) then
       if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle trinkets 6"; end
     end
-    -- use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(gcd.remains>0.5&((trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|active_enemies<=2)&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle))|fight_remains<=20
+    -- use_item,name=belorrelos_the_suncaller,if=(((trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|active_enemies<=2)&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle))|fight_remains<=20
     -- Note: Slightly modified, as we can't fully handle variable.trinket_x_buffs.
     if I.BelorrelostheSuncaller:IsEquippedAndReady() and (((trinket2:CooldownDown() or not trinket2:HasUseBuff()) and (trinket1:CooldownDown() or not trinket1:HasUseBuff()) or EnemiesCount8ySplash <= 2) and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped()) or FightRemains <= 20) then
       if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller trinkets 8"; end
     end
-  end
-  -- living_flame,if=buff.burnout.up&((trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|active_enemies<=2)&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)&buff.essence_burst.stack<buff.essence_burst.max_stack
-  if S.LivingFlame:IsReady() and (Player:BuffUp(S.BurnoutBuff) and ((trinket2:CooldownDown() or not trinket2:HasUseBuff()) and (trinket1:CooldownDown() or not trinket1:HasUseBuff()) or EnemiesCount8ySplash <= 2) and I.BelorrelostheSuncaller:IsEquipped() and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped()) and LessThanMaxEssenceBurst()) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame trinkets 10"; end
-  end
-  -- azure_strike,if=equipped.belorrelos_the_suncaller&((trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|active_enemies<=2)&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)&buff.dragonrage.up&buff.essence_burst.stack<buff.essence_burst.max_stack
-  if S.AzureStrike:IsReady() and (I.BelorrelostheSuncaller:IsEquipped() and ((trinket2:CooldownDown() or not trinket2:HasUseBuff()) and (trinket1:CooldownDown() or not trinket1:HasUseBuff()) or EnemiesCount8ySplash <= 2) and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped()) and VarDragonrageUp and LessThanMaxEssenceBurst()) then
-    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike trinkets 12"; end
-  end
-  -- call_action_list,name=green,if=talent.ancient_flame&((trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|active_enemies<=2)&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
-  if Settings.Devastation.UseGreen and (S.AncientFlame:IsAvailable() and ((trinket2:CooldownDown() or not trinket2:HasUseBuff()) and (trinket1:CooldownDown() or not trinket1:HasUseBuff()) or EnemiesCount8ySplash <= 2) and I.BelorrelostheSuncaller:IsEquipped() and I.BelorrelostheSuncaller:CooldownRemains() <= GCDMax and ItemCD1141Ready and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped())) then
-    local ShouldReturn = Green(); if ShouldReturn then return ShouldReturn; end
   end
   -- use_item,slot=trinket1,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=4&set_bonus.tier31_2pc)|(variable.trinket_2_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&!equipped.nymues_unraveling_spindle&trinket.2.cooldown.remains)|(!cooldown.fire_breath.up&!cooldown.shattering_star.up&!set_bonus.tier31_2pc)|active_enemies>=3)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1|variable.trinket_2_exclude)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)
   -- use_item,slot=trinket2,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=4&set_bonus.tier31_2pc)|(variable.trinket_1_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&!equipped.nymues_unraveling_spindle&trinket.1.cooldown.remains)|(!cooldown.fire_breath.up&!cooldown.shattering_star.up&!set_bonus.tier31_2pc)|active_enemies>=3)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2|variable.trinket_1_exclude)&!variable.trinket_2_manual|trinket.2.proc.any_dps.duration>=fight_remains|trinket.2.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=2)
@@ -294,6 +282,10 @@ local function Aoe()
   if S.ShatteringStar:IsCastable() and (S.Dragonrage:CooldownUp()) then
     if Everyone.CastTargetIf(S.ShatteringStar, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star aoe 2"; end
   end
+  -- firestorm,if=talent.raging_inferno&cooldown.dragonrage.remains<=gcd&(target.time_to_die>=32|fight_remains<30)
+  if S.Firestorm:IsCastable() and (S.RagingInferno:IsAvailable() and S.Dragonrage:CooldownRemains() <= Player:GCD() and (Target:TimeToDie() >= 32 or FightRemains < 30)) then
+    if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 3"; end
+  end
   -- dragonrage,if=target.time_to_die>=32|fight_remains<30
   if S.Dragonrage:IsCastable() and CDsON() and (Target:TimeToDie() >= 32 or FightRemains < 30) then
     if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage aoe 4"; end
@@ -318,8 +310,8 @@ local function Aoe()
   if S.ShatteringStar:IsCastable() and (LessThanMaxEssenceBurst() or not S.ArcaneVigor:IsAvailable()) then
     if Everyone.CastTargetIf(S.ShatteringStar, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star aoe 10"; end
   end
-  -- firestorm
-  if S.Firestorm:IsCastable() then
+  -- firestorm,if=talent.raging_inferno&(cooldown.dragonrage.remains>=20|cooldown.dragonrage.remains<=10)&(buff.essence_burst.up|essence>=2|cooldown.dragonrage.remains<=10)|buff.snapfire.up
+  if S.Firestorm:IsCastable() and (S.RagingInferno:IsAvailable() and (S.Dragonrage:CooldownRemains() >= 20 or S.Dragonrage:CooldownRemains() <= 10) and (Player:BuffUp(S.EssenceBurstBuff) or Player:Essence() >= 2 or S.Dragonrage:CooldownRemains() <= 10) or Player:BuffUp(S.SnapfireBuff)) then
     if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 12"; end
   end
   if S.Pyre:IsReady() and (
@@ -333,17 +325,21 @@ local function Aoe()
     -- Note: Using Cast instead of CastTargetIf, since we hit all targets anyway.
     if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre aoe 14"; end
   end
-  -- living_flame,target_if=max:target.health.pct,if=(!talent.burnout|buff.burnout.up|active_enemies>=4|buff.scarlet_adaptation.up)&buff.leaping_flames.up&!buff.essence_burst.up&essence<essence.max-1
-  if S.LivingFlame:IsCastable() and ((not S.Burnout:IsAvailable() or Player:BuffUp(S.BurnoutBuff) or EnemiesCount8ySplash >= 4 or Player:BuffUp(S.ScarletAdaptationBuff)) and Player:BuffUp(S.LeapingFlamesBuff) and Player:BuffDown(S.EssenceBurstBuff) and Player:Essence() < Player:EssenceMax() - 1) then
+  -- living_flame,target_if=max:target.health.pct,if=(!talent.burnout|buff.burnout.up|active_enemies>=4&cooldown.fire_breath.remains<=gcd.max*3|buff.scarlet_adaptation.up)&buff.leaping_flames.up&!buff.essence_burst.up&essence<essence.max-1
+  if S.LivingFlame:IsCastable() and ((not S.Burnout:IsAvailable() or Player:BuffUp(S.BurnoutBuff) or EnemiesCount8ySplash >= 4 and S.FireBreath:CooldownRemains() <= GCDMax * 3 or Player:BuffUp(S.ScarletAdaptationBuff)) and Player:BuffUp(S.LeapingFlamesBuff) and Player:BuffDown(S.EssenceBurstBuff) and Player:Essence() < Player:EssenceMax() - 1) then
     if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 18"; end
   end
-  -- disintegrate,target_if=max:target.health.pct,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&essence.deficit<2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(!(buff.power_infusion.up&buff.bloodlust.up)|cooldown.fire_breath.up|cooldown.eternity_surge.up)&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
+  -- disintegrate,target_if=max:target.health.pct,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&buff.dragonrage.up&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
   if S.Disintegrate:IsReady() then
     if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.Disintegrate)) then return "disintegrate aoe 22"; end
   end
   -- living_flame,target_if=max:target.health.pct,if=talent.snapfire&buff.burnout.up
   if S.LivingFlame:IsCastable() and (S.Snapfire:IsAvailable() and Player:BuffUp(S.BurnoutBuff)) then
     if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame aoe 24"; end
+  end
+  -- firestorm
+  if S.Firestorm:IsCastable() then
+    if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 25"; end
   end
   -- call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up&!buff.dragonrage.up
   if Settings.Devastation.UseGreen and S.AncientFlame:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and not VarDragonrageUp then
@@ -382,8 +378,8 @@ local function ST()
   if (not S.Dragonrage:IsAvailable() or VarNextDragonrage > VarDRPrepTimeST or not S.Animosity:IsAvailable()) and (Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime or VarDragonrageUp) and (S.EternitySurge:CooldownDown() or not S.EventHorizon:IsAvailable() or not VarDragonrageUp) and (Target:TimeToDie() >= 8 or FightRemains < 30) then
     local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
   end
-  -- shattering_star,if=(buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor)&(!cooldown.fire_breath.up|!talent.event_horizon)&(!buff.iridescence_blue.up|talent.event_horizon)
-  if S.ShatteringStar:IsCastable() and ((LessThanMaxEssenceBurst() or not S.ArcaneVigor:IsAvailable()) and (S.FireBreath:CooldownDown() or not S.EventHorizon:IsAvailable()) and (Player:BuffDown(S.IridescenceBlueBuff) or S.EventHorizon:IsAvailable())) then
+  -- shattering_star,if=(buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor)&(!cooldown.eternity_surge.up|!buff.dragonrage.up|!talent.event_horizon)
+  if S.ShatteringStar:IsCastable() and ((LessThanMaxEssenceBurst() or not S.ArcaneVigor:IsAvailable()) and (S.EternitySurge:CooldownDown() or Player:BuffDown(S.Dragonrage) or not S.EventHorizon:IsAvailable())) then
     if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and (not (Player:PowerInfusionUp() and Player:BloodlustUp()) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
       if CastAnnotated(S.ShatteringStar, nil, "CLIP", not Target:IsSpellInRange(S.ShatteringStar), Settings.Commons.DisintegrateFontSize) then return "shattering_star clip st 10"; end
     else
@@ -426,9 +422,9 @@ local function ST()
   if S.Pyre:IsReady() and (InFirestorm() and S.RagingInferno:IsAvailable() and Player:BuffStack(S.ChargedBlastBuff) == 20 and EnemiesCount8ySplash >= 2) then
     if Cast(S.Pyre, nil, nil, not Target:IsSpellInRange(S.Pyre)) then return "pyre st 22"; end
   end
-  -- disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
+  -- disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&buff.dragonrage.up&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
   if S.Disintegrate:IsReady() then
-    if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) then
+    if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and Player:BuffUp(S.Dragonrage) then
       local DisNote = "CHAIN"
       if CastAnnotated(S.Disintegrate, nil, DisNote, not Target:IsSpellInRange(S.Disintegrate), Settings.Commons.DisintegrateFontSize) then return "disintegrate st 24"; end
     else
