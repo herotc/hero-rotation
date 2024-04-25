@@ -150,14 +150,15 @@ Item.Evoker.Commons = {
   NeltharionsCalltoChaos                = Item(204201, {13, 14}),
   NymuesUnravelingSpindle               = Item(208615, {13, 14}),
   RubyWhelpShell                        = Item(193757, {13, 14}),
+  ScreamingBlackDragonscale             = Item(202612, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
+  UmbrelskulsFracturedHeart             = Item(193639, {13, 14}),
+  VesselofSearingShadow                 = Item(202615, {13, 14}),
   WhisperingIncarnateIcon               = Item(194301, {13, 14}),
   -- Items
   Dreambinder                           = Item(208616, {16}),
   Iridal                                = Item(208321, {16}),
   KharnalexTheFirstLight                = Item(195519, {16}),
-  -- Trinkets (SL)
-  ShadowedOrbofTorment                  = Item(186428, {13, 14}),
 }
 
 Item.Evoker.Augmentation = MergeTableByKey(Item.Evoker.Commons, {

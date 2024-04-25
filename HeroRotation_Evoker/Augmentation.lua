@@ -60,18 +60,28 @@ local T1Range = (T1Spell and T1Spell.MaximumRange > 0 and T1Spell.MaximumRange <
 local T2ID = Trinket2:ID()
 local T2Spell = Trinket2:OnUseSpell()
 local T2Range = (T2Spell and T2Spell.MaximumRange > 0 and T2Spell.MaximumRange <= 100) and T2Spell.MaximumRange or 100
-local VarTrinket1Exclude = T1ID == I.RubyWhelpShell:ID() or T1ID == I.WhisperingIncarnateIcon:ID()
-local VarTrinket2Exclude = T2ID == I.RubyWhelpShell:ID() or T2ID == I.WhisperingIncarnateIcon:ID()
+local ExcludedTrinkets = { I.RubyWhelpShell:ID(), I.WhisperingIncarnateIcon:ID(), I.UmbrelskulsFracturedHeart:ID(), I.NeltharionsCalltoChaos:ID(), I.VesselofSearingShadow:ID(), I.ScreamingBlackDragonscale:ID() }
+local VarTrinket1Exclude = false
+local VarTrinket2Exclude = false
+for _, TrinketID in pairs(ExcludedTrinkets) do
+  if T1ID == TrinketID then
+    VarTrinket1Exclude = true
+  elseif T2ID == TrinketID then
+    VarTrinket2Exclude = true
+  end
+end
 local VarTrinket1Manual = T1ID == I.NymuesUnravelingSpindle:ID()
 local VarTrinket2Manual = T2ID == I.NymuesUnravelingSpindle:ID()
-local VarTrinket1OGCDCast = T1ID == I.BeacontotheBeyond:ID() or T1ID == I.BelorrelostheSuncaller:ID()
-local VarTrinket2OGCDCast = T2ID == I.BeacontotheBeyond:ID() or T2ID == I.BelorrelostheSuncaller:ID()
-local VarTrinket1Buffs = Trinket1:HasUseBuff() and not VarTrinket1Exclude
-local VarTrinket2Buffs = Trinket2:HasUseBuff() and not VarTrinket2Exclude
+local VarTrinket1OGCDCast = false
+local VarTrinket2OGCDCast = false
+local VarTrinket1Buffs = Trinket1:HasUseBuff() and not VarTrinket1Exclude or T1ID == I.NymuesUnravelingSpindle:ID()
+local VarTrinket2Buffs = Trinket2:HasUseBuff() and not VarTrinket2Exclude or T2ID == I.NymuesUnravelingSpindle:ID()
 local VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 120 == 0)) and 1 or 0.5
 local VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 120 == 0)) and 1 or 0.5
+local VarDamageTrinketPriority = (not VarTrinket1Buffs or VarTrinket1Exclude or Trinket2:Level() >= Trinket1:Level()) and not VarTrinket2Buffs
+-- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=trinket.1.is.nymues_unraveling_spindle&trinket.2.has_buff.intellect&!variable.trinket_2_exclude|trinket.2.is.nymues_unraveling_spindle&!trinket.1.has_buff.intellect&!variable.trinket_1_exclude,if=(trinket.1.is.nymues_unraveling_spindle|trinket.2.is.nymues_unraveling_spindle)&(!variable.trinket_1_buffs&!variable.trinket_2_buffs)
+-- TODO: Handle this.
 local VarTrinketPriority = 1
-local VarDamageTrinketPriority = 1
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -117,18 +127,25 @@ HL:RegisterForEvent(function()
   T2ID = Trinket2:ID()
   T2Spell = Trinket2:OnUseSpell()
   T2Range = (T2Spell and T2Spell.MaximumRange > 0 and T2Spell.MaximumRange <= 100) and T2Spell.MaximumRange or 100
-  VarTrinket1Exclude = T1ID == I.RubyWhelpShell:ID() or T1ID == I.WhisperingIncarnateIcon:ID()
-  VarTrinket2Exclude = T2ID == I.RubyWhelpShell:ID() or T2ID == I.WhisperingIncarnateIcon:ID()
+  VarTrinket1Exclude = false
+  VarTrinket2Exclude = false
+  for _, TrinketID in pairs(ExcludedTrinkets) do
+    if T1ID == TrinketID then
+      VarTrinket1Exclude = true
+    elseif T2ID == TrinketID then
+      VarTrinket2Exclude = true
+    end
+  end
   VarTrinket1Manual = T1ID == I.NymuesUnravelingSpindle:ID()
   VarTrinket2Manual = T2ID == I.NymuesUnravelingSpindle:ID()
-  VarTrinket1OGCDCast = T1ID == I.BeacontotheBeyond:ID() or T1ID == I.BelorrelostheSuncaller:ID()
-  VarTrinket2OGCDCast = T2ID == I.BeacontotheBeyond:ID() or T2ID == I.BelorrelostheSuncaller:ID()
-  VarTrinket1Buffs = Trinket1:HasUseBuff() and not VarTrinket1Exclude
-  VarTrinket2Buffs = Trinket2:HasUseBuff() and not VarTrinket2Exclude
+  VarTrinket1OGCDCast = false
+  VarTrinket2OGCDCast = false
+  VarTrinket1Buffs = Trinket1:HasUseBuff() and not VarTrinket1Exclude or T1ID == I.NymuesUnravelingSpindle:ID()
+  VarTrinket2Buffs = Trinket2:HasUseBuff() and not VarTrinket2Exclude or T2ID == I.NymuesUnravelingSpindle:ID()
   VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 120 == 0)) and 1 or 0.5
   VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 120 == 0)) and 1 or 0.5
+  VarDamageTrinketPriority = (not VarTrinket1Buffs or VarTrinket1Exclude or Trinket2:Level() >= Trinket1:Level()) and not VarTrinket2Buffs
   VarTrinketPriority = 1
-  VarDamageTrinketPriority = 1
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -192,7 +209,6 @@ end
 local function PrescienceCheck()
   -- If Prescience suggestions are disabled in settings, always return false.
   if not Settings.Augmentation.ShowPrescience then return false end
-  local Group
   -- Always return true in a raid, as the odds of running out of dps to buff is low.
   if UnitInRaid("player") then
     return true
@@ -225,6 +241,26 @@ local function PrescienceCheck()
   else
     return false
   end
+end
+
+local function PrescienceCount()
+  -- Determine group type. Return 0 if solo.
+  local Group
+  if UnitInRaid("player") then
+    Group = Unit.Raid
+  elseif UnitInParty("player") then
+    Group = Unit.Party
+  else
+    return 0
+  end
+  -- Count active Prescience buffs if in party or raid.
+  local Count = 0
+  for _, Char in pairs(Group) do
+    if Char:Exists() and Char:BuffUp(S.PrescienceBuff) then
+      Count = Count + 1
+    end
+  end
+  return Count
 end
 
 local function TemporalWoundCalc(Enemies)
@@ -279,21 +315,21 @@ local function Precombat()
   end
   -- variable,name=opener_cds_detected,op=reset,default=0
   VarOpenerCDs = false
-  -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon
-  -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
+  -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon|trinket.1.is.umbrelskuls_fractured_heart|trinket.1.is.neltharions_call_to_chaos|trinket.1.is.vessel_of_searing_shadow|trinket.1.is.screaming_black_dragonscale
+  -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon|trinket.2.is.umbrelskuls_fractured_heart|trinket.2.is.neltharions_call_to_chaos|trinket.2.is.vessel_of_searing_shadow|trinket.2.is.screaming_black_dragonscale
   -- variable,name=trinket_1_manual,value=trinket.1.is.nymues_unraveling_spindle
   -- variable,name=trinket_2_manual,value=trinket.2.is.nymues_unraveling_spindle
-  -- variable,name=trinket_1_ogcd_cast,value=trinket.1.is.beacon_to_the_beyond|trinket.1.is.belorrelos_the_suncaller
-  -- variable,name=trinket_2_ogcd_cast,value=trinket.2.is.beacon_to_the_beyond|trinket.2.is.belorrelos_the_suncaller
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff|(trinket.1.has_buff.intellect|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit)&!variable.trinket_1_exclude
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|(trinket.2.has_buff.intellect|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit)&!variable.trinket_2_exclude
+  -- variable,name=trinket_1_ogcd_cast,value=0
+  -- variable,name=trinket_2_ogcd_cast,value=0
+  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff&(trinket.1.has_buff.intellect|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit)&!variable.trinket_1_exclude|trinket.1.is.nymues_unraveling_spindle
+  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff&(trinket.2.has_buff.intellect|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit)&!variable.trinket_2_exclude|trinket.2.is.nymues_unraveling_spindle
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_1_buffs&(trinket.1.cooldown.duration%%120=0)
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_2_buffs&(trinket.2.cooldown.duration%%120=0)
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs&(trinket.2.has_cooldown&!variable.trinket_2_exclude|!trinket.1.has_cooldown)|variable.trinket_2_buffs&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(0.5+trinket.2.has_buff.intellect*3+trinket.2.has_buff.mastery)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(0.5+trinket.1.has_buff.intellect*3+trinket.1.has_buff.mastery)*(variable.trinket_1_sync)*(1+((trinket.1.ilvl-trinket.2.ilvl)%100)))
-  -- variable,name=damage_trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&!variable.trinket_2_buffs&trinket.2.ilvl>=trinket.1.ilvl
-  -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=trinket.1.is.nymues_unraveling_spindle&trinket.2.has_buff.intellect|trinket.2.is.nymues_unraveling_spindle&!trinket.1.has_buff.intellect,if=(trinket.1.is.nymues_unraveling_spindle|trinket.2.is.nymues_unraveling_spindle)&(variable.trinket_1_buffs&variable.trinket_2_buffs)
+  -- variable,name=damage_trinket_priority,op=setif,value=2,value_else=1,condition=(!variable.trinket_1_buffs|variable.trinket_1_exclude|trinket.2.ilvl>=trinket.1.ilvl)&!variable.trinket_2_buffs
+  -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=trinket.1.is.nymues_unraveling_spindle&trinket.2.has_buff.intellect&!variable.trinket_2_exclude|trinket.2.is.nymues_unraveling_spindle&!trinket.1.has_buff.intellect&!variable.trinket_1_exclude,if=(trinket.1.is.nymues_unraveling_spindle|trinket.2.is.nymues_unraveling_spindle)&(!variable.trinket_1_buffs&!variable.trinket_2_buffs)
   -- Note1: Moved all trinket variable handling to variable declaration and PLAYER_EQUIPMENT_CHANGED.
-  -- Note2: Can't handle some of these conditions, such as has_buff.intellect, has_buff.mastery, and ilvl. As such, defaulting priority to Trinket2. The dps difference should be negligible.
+  -- Note2: Can't handle some of these conditions, such as has_buff.intellect, has_buff.mastery, etc.
   -- Manually added: Group buff check
   if S.BlessingoftheBronze:IsCastable() and Everyone.GroupBuffMissing(S.BlessingoftheBronzeBuff) then
     if Cast(S.BlessingoftheBronze, Settings.Commons.GCDasOffGCD.BlessingOfTheBronze) then return "blessing_of_the_bronze precombat"; end
@@ -367,14 +403,17 @@ local function Items()
     if Trinket2:IsReady() and (VarTrinket2Buffs and not VarTrinket2Manual and (Target:DebuffUp(S.TemporalWoundDebuff) or VarTrinket1Buffs and Trinket1:CooldownDown() and (Player:PrevGCDP(1, S.FireBreath) or Player:PrevGCDP(1, S.Upheaval)) and Player:BuffUp(S.EbonMightSelfBuff)) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= FightRemains) then
       if Cast(Trinket2, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(T2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 6"; end
     end
-    -- azure_strike,if=cooldown.item_cd_1141.up&(variable.trinket_1_ogcd_cast&trinket.1.cooldown.up&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains)|variable.trinket_2_ogcd_cast&trinket.2.cooldown.up&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains))
+    -- azure_strike,if=cooldown.item_cd_1141.up&(variable.trinket_1_ogcd_cast&trinket.1.cooldown.up&(variable.damage_trinket_priority=1&(!variable.trinket_2_buffs|variable.trinket_2_exclude)|trinket.2.cooldown.remains)|variable.trinket_2_ogcd_cast&trinket.2.cooldown.up&(variable.damage_trinket_priority=2&(!variable.trinket_1_buffs|variable.trinket_1_exclude)|trinket.1.cooldown.remains))
     -- Note: Skipping this line
-    -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains)&(gcd.remains>0.1|!variable.trinket_1_ogcd_cast)
-    if Trinket1:IsReady() and (not VarTrinket1Buffs and not VarTrinket1Manual and (VarDamageTrinketPriority == 1 or Trinket2:CooldownDown())) then
+    -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(variable.damage_trinket_priority=1&(!variable.trinket_2_buffs|variable.trinket_2_exclude)|trinket.2.cooldown.remains|trinket.2.cooldown.duration=0)&gcd.remains>0.1&variable.trinket_1_ogcd_cast
+    -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(variable.damage_trinket_priority=2&(!variable.trinket_1_buffs|variable.trinket_1_exclude)|trinket.1.cooldown.remains|trinket.1.cooldown.duration=0)&gcd.remains>0.1&variable.trinket_2_ogcd_cast
+    -- Note: APL sets VarTrinket1OGCDCast and VarTrinket2OGCDCast to false, so these lines would never be called.
+    -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(variable.damage_trinket_priority=1&(!variable.trinket_2_buffs|variable.trinket_2_exclude)|trinket.2.cooldown.remains|trinket.2.cooldown.duration=0)&!variable.trinket_1_ogcd_cast
+    if Trinket1:IsReady() and (not VarTrinket1Buffs and not VarTrinket1Manual and (VarDamageTrinketPriority == 1 and (not VarTrinket2Buffs or VarTrinket2Exclude) or Trinket2:CooldownDown() or Trinket2:Cooldown() == 0) and not VarTrinket1OGCDCast) then
       if Cast(Trinket1, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(T1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 10"; end
     end
-    -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains)&(gcd.remains>0.1|!variable.trinket_2_ogcd_cast)
-    if Trinket2:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and (VarDamageTrinketPriority == 2 or Trinket1:CooldownDown())) then
+    -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(variable.damage_trinket_priority=2&(!variable.trinket_1_buffs|variable.trinket_1_exclude)|trinket.1.cooldown.remains|trinket.1.cooldown.duration=0)&!variable.trinket_2_ogcd_cast
+    if Trinket2:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and (VarDamageTrinketPriority == 2 and (not VarTrinket1Buffs or VarTrinket1Exclude) or Trinket1:CooldownDown() or Trinket1:Cooldown() == 0) and not VarTrinket2OGCDCast) then
       if Cast(Trinket2, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(T2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 12"; end
     end
   end
@@ -396,11 +435,8 @@ local function FB()
   -- Note: Using Player:EmpowerCastTime() in place of duration in the below lines. Intention seems to be whether we can get the spell off before Ebom Might ends.
   if S.FireBreath:IsCastable() then
     if I.NeltharionsCalltoChaos:IsEquipped() then
-      -- fire_breath,empower_to=1,target_if=target.time_to_die>16,if=buff.ebon_might_self.remains>duration&equipped.neltharions_call_to_chaos
-      if Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) and Target:TimeToDie() > 16 then
-        FBEmpower = 1
       -- fire_breath,empower_to=2,target_if=target.time_to_die>12,if=buff.ebon_might_self.remains>duration&equipped.neltharions_call_to_chaos
-      elseif Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(2) and Target:TimeToDie() > 12 then
+      if Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(2) and Target:TimeToDie() > 12 then
         FBEmpower = 2
       -- fire_breath,empower_to=3,target_if=target.time_to_die>8,if=buff.ebon_might_self.remains>duration&equipped.neltharions_call_to_chaos
       elseif (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(3) or Player:BuffUp(S.TipTheScales) and not S.FontofMagic:IsAvailable()) and Target:TimeToDie() > 8 then
@@ -433,8 +469,8 @@ local function FB()
 end
 
 local function Filler()
-  -- living_flame,if=(buff.ancient_flame.up|mana>=200000|!talent.dream_of_spring|variable.spam_heal=0)&(active_enemies=1|talent.pupil_of_alexstrasza)
-  if S.LivingFlame:IsReady() and ((Player:BuffUp(S.AncientFlameBuff) or Player:Mana() >= 200000 or not S.DreamofSpring:IsAvailable() or VarSpamHeal == 0) and (EnemiesCount8ySplash == 1 or S.PupilofAlexstrasza:IsAvailable())) then
+  -- living_flame,if=(buff.ancient_flame.up|mana>=100000|!talent.dream_of_spring|variable.spam_heal=0)&(active_enemies=1|talent.pupil_of_alexstrasza)
+  if S.LivingFlame:IsReady() and ((Player:BuffUp(S.AncientFlameBuff) or Player:Mana() >= 100000 or not S.DreamofSpring:IsAvailable() or VarSpamHeal == 0) and (EnemiesCount8ySplash == 1 or S.PupilofAlexstrasza:IsAvailable())) then
     if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame filler 2"; end
   end
   -- azure_strike
@@ -518,10 +554,10 @@ local function APL()
     if S.Upheaval:IsCastable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) and S.TimeSkip:IsAvailable() and S.TimeSkip:CooldownUp() and not S.InterwovenThreads:IsAvailable()) then
       if CastAnnotated(S.Upheaval, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "upheaval empower_to=1 main 10"; end
     end
-    -- breath_of_eons,if=((cooldown.ebon_might.remains<=4|buff.ebon_might_self.up)&target.time_to_die>15&raid_event.adds.in>15&(!equipped.nymues_unraveling_spindle|trinket.nymues_unraveling_spindle.cooldown.remains>=10|fight_remains<30|trinket.1.is.nymues_unraveling_spindle&variable.trinket_priority=2|trinket.2.is.nymues_unraveling_spindle&variable.trinket_priority=1)|fight_remains<30)&!fight_style.dungeonroute,line_cd=117
-    -- breath_of_eons,if=evoker.allied_cds_up>0&((cooldown.ebon_might.remains<=4|buff.ebon_might_self.up)&target.time_to_die>15&(!equipped.nymues_unraveling_spindle|trinket.nymues_unraveling_spindle.cooldown.remains>=10|fight_remains<30|trinket.1.is.nymues_unraveling_spindle&variable.trinket_priority=2|trinket.2.is.nymues_unraveling_spindle&variable.trinket_priority=1)|fight_remains<30)&fight_style.dungeonroute
+    -- breath_of_eons,if=((cooldown.ebon_might.remains<=4|buff.ebon_might_self.up)&target.time_to_die>15&raid_event.adds.in>15&(!equipped.nymues_unraveling_spindle|trinket.nymues_unraveling_spindle.cooldown.remains>=20|fight_remains<30|trinket.1.is.nymues_unraveling_spindle&variable.trinket_priority=2|trinket.2.is.nymues_unraveling_spindle&variable.trinket_priority=1)|fight_remains<30)&!fight_style.dungeonroute,line_cd=119
+    -- breath_of_eons,if=evoker.allied_cds_up>0&((cooldown.ebon_might.remains<=4|buff.ebon_might_self.up)&target.time_to_die>15&(!equipped.nymues_unraveling_spindle|trinket.nymues_unraveling_spindle.cooldown.remains>=20|fight_remains<30|trinket.1.is.nymues_unraveling_spindle&variable.trinket_priority=2|trinket.2.is.nymues_unraveling_spindle&variable.trinket_priority=1)|fight_remains<30)&fight_style.dungeonroute
     -- Note: Combined both lines. Only difference seems to be a line_cd if not in a dungeon.
-    if CDsON() and S.BreathofEons:IsCastable() and (S.BreathofEons:TimeSinceLastCast() >= 117 or InDungeon) and ((S.EbonMight:CooldownRemains() <= 4 or Player:BuffUp(S.EbonMightSelfBuff)) and Target:TimeToDie() > 15 and (not I.NymuesUnravelingSpindle:IsEquipped() or I.NymuesUnravelingSpindle:CooldownRemains() >= 10 or FightRemains < 30 or T1ID == I.NymuesUnravelingSpindle:ID() and VarTrinketPriority == 2 or T2ID == I.NymuesUnravelingSpindle:ID() and VarTrinketPriority == 1) or FightRemains < 30) then
+    if CDsON() and S.BreathofEons:IsCastable() and (S.BreathofEons:TimeSinceLastCast() >= 119 or InDungeon) and ((S.EbonMight:CooldownRemains() <= 4 or Player:BuffUp(S.EbonMightSelfBuff)) and Target:TimeToDie() > 15 and (not I.NymuesUnravelingSpindle:IsEquipped() or I.NymuesUnravelingSpindle:CooldownRemains() >= 20 or FightRemains < 30 or T1ID == I.NymuesUnravelingSpindle:ID() and VarTrinketPriority == 2 or T2ID == I.NymuesUnravelingSpindle:ID() and VarTrinketPriority == 1) or FightRemains < 30) then
       if Cast(S.BreathofEons, Settings.Augmentation.GCDasOffGCD.BreathOfEons, nil, not Target:IsInRange(50)) then return "breath_of_eons main 12"; end
     end
     -- living_flame,if=buff.leaping_flames.up&cooldown.fire_breath.up&fight_style.dungeonroute
@@ -542,8 +578,8 @@ local function APL()
     if CDsON() and S.TimeSkip:IsCastable() and (S.FireBreath:CooldownRemains() + S.Upheaval:CooldownRemains() + S.Prescience:FullRechargeTime() > 35) then
       if Cast(S.TimeSkip, Settings.Augmentation.GCDasOffGCD.TimeSkip) then return "time_skip main 18"; end
     end
-    -- emerald_blossom,if=talent.dream_of_spring&buff.essence_burst.up&(variable.spam_heal=2|variable.spam_heal=1&!buff.ancient_flame.up)&(buff.ebon_might_self.up|essence.deficit=0|buff.essence_burst.stack=buff.essence_burst.max_stack&cooldown.ebon_might.remains>4)
-    if S.EmeraldBlossom:IsReady() and (S.DreamofSpring:IsAvailable() and Player:BuffUp(S.EssenceBurstBuff) and (VarSpamHeal == 2 or VarSpamHeal == 1 and Player:BuffDown(S.AncientFlameBuff)) and (Player:BuffUp(S.EbonMightSelfBuff) or Player:EssenceDeficit() == 0 or Player:BuffStack(S.EssenceBurstBuff) == VarEssenceBurstMaxStacks and S.EbonMight:CooldownRemains() > 4)) then
+    -- emerald_blossom,if=talent.dream_of_spring&buff.essence_burst.up&(variable.spam_heal=2|variable.spam_heal=1&!buff.ancient_flame.up)&(buff.ebon_might_self.up|essence.deficit=0|buff.essence_burst.stack=buff.essence_burst.max_stack&cooldown.ebon_might.remains>4)&((buff.trembling_earth.stack+evoker.prescience_buffs)<=5|essence>=2)
+    if S.EmeraldBlossom:IsReady() and (S.DreamofSpring:IsAvailable() and Player:BuffUp(S.EssenceBurstBuff) and (VarSpamHeal == 2 or VarSpamHeal == 1 and Player:BuffDown(S.AncientFlameBuff)) and (Player:BuffUp(S.EbonMightSelfBuff) or Player:EssenceDeficit() == 0 or Player:BuffStack(S.EssenceBurstBuff) == VarEssenceBurstMaxStacks and S.EbonMight:CooldownRemains() > 4) and ((num(Player:BuffUp(S.TremblingEarthBuff)) + PrescienceCount()) <= 5 or Player:Essence() >= 2)) then
       if Cast(S.EmeraldBlossom, Settings.Augmentation.GCDasOffGCD.EmeraldBlossom) then return "emerald_blossom main 20"; end
     end
     -- eruption,if=buff.ebon_might_self.remains>execute_time|essence.deficit=0|buff.essence_burst.stack=buff.essence_burst.max_stack&cooldown.ebon_might.remains>4
@@ -558,8 +594,8 @@ local function APL()
     if S.EmeraldBlossom:IsReady() and (Player:BuffDown(S.EbonMightSelfBuff) and S.AncientFlame:IsAvailable() and S.ScarletAdaptation:IsAvailable() and not S.DreamofSpring:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and EnemiesCount8ySplash == 1) then
       if Cast(S.EmeraldBlossom, Settings.Augmentation.GCDasOffGCD.EmeraldBlossom) then return "emerald_blossom main 26"; end
     end
-    -- verdant_embrace,if=!buff.ebon_might_self.up&talent.ancient_flame&talent.scarlet_adaptation&!buff.ancient_flame.up&(!talent.dream_of_spring|mana>=200000)&active_enemies=1
-    if S.VerdantEmbrace:IsReady() and (Player:BuffDown(S.EbonMightSelfBuff) and S.AncientFlame:IsAvailable() and S.ScarletAdaptation:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and (not S.DreamofSpring:IsAvailable() or Player:Mana() >= 200000) and EnemiesCount8ySplash == 1) then
+    -- verdant_embrace,if=!buff.ebon_might_self.up&talent.ancient_flame&talent.scarlet_adaptation&!buff.ancient_flame.up&(!talent.dream_of_spring|mana>=100000)&active_enemies=1
+    if S.VerdantEmbrace:IsReady() and (Player:BuffDown(S.EbonMightSelfBuff) and S.AncientFlame:IsAvailable() and S.ScarletAdaptation:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and (not S.DreamofSpring:IsAvailable() or Player:Mana() >= 100000) and EnemiesCount8ySplash == 1) then
       if Cast(S.VerdantEmbrace, Settings.Augmentation.GCDasOffGCD.VerdantEmbrace) then return "verdant_embrace main 28"; end
     end
     -- run_action_list,name=filler
