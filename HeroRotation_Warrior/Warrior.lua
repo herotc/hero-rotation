@@ -72,6 +72,7 @@ Spell.Warrior.Commons = {
   WarMachineBuff                        = Spell(262232),
   -- Debuffs
   MarkofFyralathDebuff                  = Spell(414532),
+  ThunderousRoarDebuff                  = Spell(397364),
   -- Pool
   Pool                                  = Spell(999910),
 }
@@ -164,6 +165,7 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   JuggernautBuff                        = Spell(383292),
   MartialProwessBuff                    = Spell(7384),
   MercilessBonegrinderBuff              = Spell(383316),
+  StrikeVulnerabilitiesBuff             = Spell(394173),
   SuddenDeathBuff                       = Spell(52437),
   SweepingStrikesBuff                   = Spell(260708),
   TestofMightBuff                       = Spell(385013),

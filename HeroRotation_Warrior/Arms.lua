@@ -181,10 +181,6 @@ local function Execute()
   if CDsON() and S.ColossusSmash:IsCastable() then
     if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash execute 14"; end
   end
-  -- execute,if=buff.sudden_death.react&dot.deep_wounds.remains
-  if S.Execute:IsReady() and (Player:BuffUp(S.SuddenDeathBuff) and Target:DebuffUp(S.DeepWoundsDebuff)) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 16"; end
-  end
   -- thunderous_roar,if=(talent.test_of_might&rage<40)|(!talent.test_of_might&(buff.avatar.up|debuff.colossus_smash.up)&rage<70)
   if CDsON() and S.ThunderousRoar:IsCastable() and ((S.TestofMight:IsAvailable() and Player:Rage() < 40) or (not S.TestofMight:IsAvailable() and (Player:BuffUp(S.AvatarBuff) or Target:DebuffUp(S.ColossusSmashDebuff)) and Player:Rage() < 70)) then
     if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar execute 18"; end
@@ -197,17 +193,17 @@ local function Execute()
   if CDsON() and S.Bladestorm:IsCastable() and (S.Hurricane:IsAvailable() and Player:Rage() < 40) then
     if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm execute 22"; end
   end
-  -- mortal_strike,if=debuff.executioners_precision.stack=2&debuff.colossus_smash.remains<=gcd
-  if S.MortalStrike:IsReady() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Target:DebuffRemains(S.ColossusSmashDebuff) <= Player:GCD()) then
+  -- mortal_strike,if=debuff.executioners_precision.stack=2
+  if S.MortalStrike:IsReady() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2) then
     if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 24"; end
+  end
+  -- execute,if=buff.sudden_death.react&dot.deep_wounds.remains
+  if S.Execute:IsReady() and (Player:BuffUp(S.SuddenDeathBuff) and Target:DebuffUp(S.DeepWoundsDebuff)) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 26"; end
   end
   -- overpower,if=rage<40&buff.martial_prowess.stack<2
   if S.Overpower:IsCastable() and (Player:Rage() < 40 and Player:BuffStack(S.MartialProwessBuff) < 2) then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 26"; end
-  end
-  -- mortal_strike,if=debuff.executioners_precision.stack=2&buff.martial_prowess.stack=2|!talent.executioners_precision&buff.martial_prowess.stack=2
-  if S.MortalStrike:IsReady() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Player:BuffStack(S.MartialProwessBuff) == 2 or not S.ExecutionersPrecision:IsAvailable() and Player:BuffStack(S.MartialProwessBuff) == 2) then
-    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike execute 28"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower execute 28"; end
   end
   -- skullsplitter,if=rage<40
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 40) then
@@ -236,21 +232,21 @@ local function Execute()
 end
 
 local function AoE()
-  -- execute,if=buff.juggernaut.up&buff.juggernaut.remains<gcd
-  if S.Execute:IsReady() and (Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff) < Player:GCD()) then
+  -- execute,if=buff.juggernaut.up&buff.juggernaut.remains<gcd&set_bonus.tier31_4pc
+  if S.Execute:IsReady() and (Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff) < Player:GCD() and Player:HasTier(31, 4)) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute aoe 2"; end
   end
-  -- whirlwind,if=buff.collateral_damage.up&cooldown.sweeping_strikes.remains<3
-  if S.Whirlwind:IsReady() and (Player:BuffUp(S.CollateralDamageBuff) and S.SweepingStrikes:CooldownRemains() < 3) then
+  -- whirlwind,if=buff.collateral_damage.up&cooldown.sweeping_strikes.remains<3|dot.deep_wounds.remains&debuff.colossus_smash.remains&!buff.sweeping_strikes.up
+  if S.Whirlwind:IsReady() and (Player:BuffUp(S.CollateralDamageBuff) and S.SweepingStrikes:CooldownRemains() < 3 or Target:DebuffUp(S.DeepWoundsDebuff) and Target:DebuffUp(S.ColossusSmashDebuff) and Player:BuffDown(S.SweepingStrikesBuff)) then
     if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind aoe 3"; end
   end
   -- thunder_clap,if=talent.thunder_clap&talent.blood_and_thunder&talent.rend&dot.rend.remains<=dot.rend.duration*0.3
   if S.ThunderClap:IsReady() and (S.BloodandThunder:IsAvailable() and S.Rend:IsAvailable() and Target:DebuffRefreshable(S.RendDebuff)) then
     if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap aoe 4"; end
   end
-  -- sweeping_strikes,if=cooldown.bladestorm.remains>15|talent.improved_sweeping_strikes&cooldown.bladestorm.remains>21|!talent.bladestorm|!talent.bladestorm&talent.blademasters_torment&cooldown.avatar.remains>15|!talent.bladestorm&talent.blademasters_torment&talent.improved_sweeping_strikes&cooldown.avatar.remains>21
-  -- Note: !talent.bladestorm covers the remainder of the line.
-  if S.SweepingStrikes:IsCastable() and (S.Bladestorm:CooldownRemains() > 15 or S.ImprovedSweepingStrikes:IsAvailable() and S.Bladestorm:CooldownRemains() > 21 or not S.Bladestorm:IsAvailable()) then
+  -- sweeping_strikes,if=(cooldown.bladestorm.remains>15|talent.improved_sweeping_strikes&cooldown.bladestorm.remains>21|!talent.bladestorm|!talent.bladestorm&talent.blademasters_torment&cooldown.avatar.remains>15|!talent.bladestorm&talent.blademasters_torment&talent.improved_sweeping_strikes&cooldown.avatar.remains>21)&dot.rend.remains&(dot.thunderous_roar.remains|cooldown.thunderous_roar.remains)&(prev.cleave|buff.strike_vulnerabilities.up)
+  -- Note: In '!talent.bladestorm|!talent.bladestorm&talent.blademasters_torment&cooldown.avatar.remains>15|!talent.bladestorm&talent.blademasters_torment&talent.improved_sweeping_strikes&cooldown.avatar.remains>21', the first !talent.bladestorm covers the rest.
+  if S.SweepingStrikes:IsCastable() and ((S.Bladestorm:CooldownRemains() > 15 or S.ImprovedSweepingStrikes:IsAvailable() and S.Bladestorm:CooldownRemains() > 21 or not S.Bladestorm:IsAvailable()) and Target:DebuffUp(S.RendDebuff) and (Target:DebuffUp(S.ThunderousRoarDebuff) or S.ThunderousRoar:CooldownDown()) and (Player:PrevGCD(1, S.Cleave) or Player:BuffUp(S.StrikeVulnerabilitiesBuff))) then
     if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes aoe 6"; end
   end
   -- avatar,if=raid_event.adds.in>15|talent.blademasters_torment|target.time_to_die<20|buff.hurricane.remains<3
@@ -273,12 +269,12 @@ local function AoE()
   if S.Execute:IsReady() and (Player:BuffUp(S.SuddenDeathBuff) and Player:HasTier(31, 4)) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute aoe 16"; end
   end
-  -- cleave,if=buff.martial_prowess.stack=2
-  if S.Cleave:IsReady() and (Player:BuffStack(S.MartialProwessBuff) == 2) then
+  -- cleave,if=buff.martial_prowess.stack>0
+  if S.Cleave:IsReady() and (Player:BuffUp(S.MartialProwessBuff)) then
     if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave aoe 18"; end
   end
-  -- mortal_strike,if=talent.sharpened_blades&buff.sweeping_strikes.up&buff.martial_prowess.stack=2&active_enemies<=8
-  if S.MortalStrike:IsReady() and (S.SharpenedBlades:IsAvailable() and Player:BuffUp(S.SweepingStrikesBuff) and Player:BuffStack(S.MartialProwessBuff) == 2 and EnemiesCount8y <= 8) then
+  -- mortal_strike,if=talent.sharpened_blades&buff.sweeping_strikes.up&buff.martial_prowess.stack=2&active_enemies<=4
+  if S.MortalStrike:IsReady() and (S.SharpenedBlades:IsAvailable() and Player:BuffUp(S.SweepingStrikesBuff) and Player:BuffStack(S.MartialProwessBuff) == 2 and EnemiesCount8y <= 4) then
     if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike aoe 20"; end
   end
   -- thunderous_roar,if=buff.test_of_might.up|debuff.colossus_smash.up|dot.deep_wounds.remains
@@ -293,25 +289,21 @@ local function AoE()
   if CDsON() and S.Bladestorm:IsCastable() and (Player:BuffRemains(S.HurricaneBuff) < 3 or not S.Hurricane:IsAvailable()) then
     if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm aoe 26"; end
   end
-  -- whirlwind,if=talent.storm_of_swords
-  if S.Whirlwind:IsReady() and (S.StormofSwords:IsAvailable()) then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind aoe 28"; end
-  end
   -- cleave,if=!talent.fervor_of_battle|talent.fervor_of_battle&dot.deep_wounds.remains<=dot.deep_wounds.duration*0.3
   if S.Cleave:IsReady() and (not S.FervorofBattle:IsAvailable() or S.FervorofBattle:IsAvailable() and Target:DebuffRemains(S.DeepWoundsDebuff) <= S.DeepWoundsDebuff:PandemicThreshold()) then
     if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave aoe 30"; end
   end
-  -- overpower,if=buff.sweeping_strikes.up&talent.dreadnaught&!talent.test_of_might&active_enemies<3
-  if S.Overpower:IsCastable() and (Player:BuffUp(S.SweepingStrikes) and S.Dreadnaught:IsAvailable() and not S.TestofMight:IsAvailable() and EnemiesCount8y < 3) then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower aoe 32"; end
-  end
-  -- whirlwind,if=talent.fervor_of_battle
-  if S.Whirlwind:IsReady() and (S.FervorofBattle:IsAvailable()) then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind aoe 34"; end
-  end
   -- overpower,if=buff.sweeping_strikes.up&(talent.dreadnaught|charges=2)
   if S.Overpower:IsCastable() and (Player:BuffUp(S.SweepingStrikes) and (S.Dreadnaught:IsAvailable() or S.Overpower:Charges() == 2)) then
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower aoe 36"; end
+  end
+  -- whirlwind,if=talent.fervor_of_battle|talent.storm_of_swords
+  if S.Whirlwind:IsReady() and (S.FervorofBattle:IsAvailable() or S.StormofSwords:IsAvailable()) then
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind aoe 34"; end
+  end
+  -- overpower
+  if S.Overpower:IsCastable() then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower aoe 32"; end
   end
   -- mortal_strike,cycle_targets=1,if=debuff.executioners_precision.stack=2|dot.deep_wounds.remains<=gcd|active_enemies<3
   if S.MortalStrike:IsReady() then
@@ -320,10 +312,6 @@ local function AoE()
   -- execute,cycle_targets=1,if=buff.sudden_death.react|(target.health.pct<20|talent.massacre&target.health.pct<35)|buff.sweeping_strikes.up|active_enemies<=2
   if S.Execute:IsReady() then
     if Everyone.CastCycle(S.Execute, Enemies8y, EvaluateCycleExecute, not TargetInMeleeRange) then return "execute aoe 40"; end
-  end
-  -- overpower
-  if S.Overpower:IsCastable() then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower aoe 42"; end
   end
   -- thunder_clap,if=active_enemies>3
   if S.ThunderClap:IsReady() and (EnemiesCount8y > 3) then
@@ -360,10 +348,6 @@ local function SingleTarget()
   if CDsON() and S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
     if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes single_target 2"; end
   end
-  -- execute,if=(buff.juggernaut.up&buff.juggernaut.remains<gcd)|(buff.sudden_death.react&dot.deep_wounds.remains&set_bonus.tier31_2pc|buff.sudden_death.react&!dot.rend.remains&set_bonus.tier31_4pc)
-  if S.Execute:IsReady() and ((Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff) < Player:GCD()) or (Player:BuffUp(S.SuddenDeathBuff) and Target:DebuffRemains(S.DeepWoundsDebuff) and Player:HasTier(31, 2) or Player:BuffUp(S.SuddenDeathBuff) and Target:DebuffDown(S.RendDebuff) and Player:HasTier(31, 4))) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 4"; end
-  end
   -- thunder_clap,if=dot.rend.remains<=gcd&talent.blood_and_thunder&talent.blademasters_torment
   if S.ThunderClap:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and S.BloodandThunder:IsAvailable() and S.BlademastersTorment:IsAvailable()) then
     if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap single_target 6"; end
@@ -371,6 +355,10 @@ local function SingleTarget()
   -- thunderous_roar,if=raid_event.adds.in>15
   if CDsON() and S.ThunderousRoar:IsCastable() then
     if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 8"; end
+  end
+  -- bladestorm,if=talent.hurricane&raid_event.add.in>22&talent.warlords_torment
+  if S.Bladestorm:IsReady() and (S.Hurricane:IsAvailable() and S.WarlordsTorment:IsAvailable()) then
+    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm single_target 9"; end
   end
   -- avatar,if=raid_event.adds.in>15|target.time_to_die<20
   if CDsON() and S.Avatar:IsCastable() then
@@ -388,9 +376,17 @@ local function SingleTarget()
   if S.MortalStrike:IsReady() then
     if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike single_target 16"; end
   end
+  -- execute,if=(buff.juggernaut.up&buff.juggernaut.remains<gcd)|(buff.sudden_death.react&dot.deep_wounds.remains&set_bonus.tier31_2pc|buff.sudden_death.react&!dot.rend.remains&set_bonus.tier31_4pc)
+  if S.Execute:IsReady() and ((Player:BuffUp(S.JuggernautBuff) and Player:BuffRemains(S.JuggernautBuff) < Player:GCD()) or (Player:BuffUp(S.SuddenDeathBuff) and Target:DebuffRemains(S.DeepWoundsDebuff) and Player:HasTier(31, 2) or Player:BuffUp(S.SuddenDeathBuff) and Target:DebuffDown(S.RendDebuff) and Player:HasTier(31, 4))) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute single_target 4"; end
+  end
   -- thunder_clap,if=dot.rend.remains<=gcd&talent.blood_and_thunder
   if S.ThunderClap:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and S.BloodandThunder:IsAvailable()) then
     if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap single_target 18"; end
+  end
+  -- rend,if=dot.rend.remains<=gcd&!talent.blood_and_thunder
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and not S.BloodandThunder:IsAvailable()) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend single_target 19"; end
   end
   -- whirlwind,if=talent.storm_of_swords&debuff.colossus_smash.up
   if S.Whirlwind:IsReady() and (S.StormofSwords:IsAvailable() and Target:DebuffUp(S.ColossusSmashDebuff)) then
@@ -428,6 +424,10 @@ local function SingleTarget()
   if S.Whirlwind:IsReady() and (S.StormofSwords:IsAvailable()) then
     if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 36"; end
   end
+  -- thunder_clap
+  if S.ThunderClap:IsReady() then
+    if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap single_target 42"; end
+  end
   -- slam,if=talent.crushing_force
   if S.Slam:IsReady() and (S.CrushingForce:IsAvailable()) then
     if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam single_target 38"; end
@@ -435,10 +435,6 @@ local function SingleTarget()
   -- whirlwind,if=buff.merciless_bonegrinder.up
   if S.Whirlwind:IsReady() and (Player:BuffUp(S.MercilessBonegrinderBuff)) then
     if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 40"; end
-  end
-  -- thunder_clap
-  if S.ThunderClap:IsReady() then
-    if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap single_target 42"; end
   end
   -- slam
   if S.Slam:IsReady() then
@@ -459,7 +455,7 @@ local function SingleTarget()
 end
 
 local function Trinkets()
-  -- use_item,name=fyralath_the_dreamrender,,if=dot.mark_of_fyralath.ticking&!talent.blademasters_torment|dot.mark_of_fyralath.ticking&cooldown.avatar.remains>3&cooldown.bladestorm.remains>3&!debuff.colossus_smash.up
+  -- use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking&!talent.blademasters_torment|dot.mark_of_fyralath.ticking&cooldown.avatar.remains>3&cooldown.bladestorm.remains>3&!debuff.colossus_smash.up
   if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0 and not S.BlademastersTorment:IsAvailable() or S.MarkofFyralathDebuff:AuraActiveCount() > 0 and S.Avatar:CooldownRemains() > 3 and S.Bladestorm:CooldownRemains() > 3 and Target:DebuffDown(S.ColossusSmashDebuff)) then
     if Cast(I.Fyralath, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender trinkets 1"; end
   end
@@ -595,6 +591,8 @@ local function APL()
         if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 20"; end
       end
     end
+    -- invoke_external_buff,name=power_infusion,if=debuff.colossus_smash.up&fight_remains>=135|(target.health.pct<35&talent.massacre|target.health.pct<20)&buff.avatar.up|fight_remains<=25
+    -- Note: Not handling external buffs.
     -- run_action_list,name=aoe,if=raid_event.adds.up&active_enemies>2|!raid_event.adds.up&active_enemies>2|talent.fervor_of_battle.enabled&(talent.massacre.enabled&target.health.pct>35|target.health.pct>20)&!raid_event.adds.up&active_enemies>1
     if AoEON() and (EnemiesCount8y > 2 or S.FervorofBattle:IsAvailable() and (S.Massacre:IsAvailable() and Target:HealthPercentage() > 35 or Target:HealthPercentage() > 20) and EnemiesCount8y > 1) then
       local ShouldReturn = AoE(); if ShouldReturn then return ShouldReturn; end
