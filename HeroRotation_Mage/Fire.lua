@@ -75,8 +75,8 @@ local Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
 local Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
 
 -- Variables from Precombat
--- variable,name=steroid_trinket_equipped,op=set,value=equipped.gladiators_badge|equipped.irideus_fragment|equipped.erupting_spear_fragment|equipped.spoils_of_neltharus|equipped.tome_of_unstable_power|equipped.timebreaching_talon|equipped.horn_of_valor|equipped.mirror_of_fractured_tomorrows|equipped.ashes_of_the_embersoul|equipped.balefire_branch|equipped.time_theifs_gambit|equipped.nymues_unraveling_spindle
-local var_steroid_trinket_equipped = I.CrimsonGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.IrideusFragment:IsEquipped() or I.EruptingSpearFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.BalefireBranch:IsEquipped() or I.TimeThiefsGambit:IsEquipped() or I.NymuesUnravelingSpindle:IsEquipped()
+-- variable,name=steroid_trinket_equipped,op=set,value=equipped.gladiators_badge|equipped.irideus_fragment|equipped.erupting_spear_fragment|equipped.spoils_of_neltharus|equipped.timebreaching_talon|equipped.horn_of_valor|equipped.mirror_of_fractured_tomorrows|equipped.ashes_of_the_embersoul|equipped.balefire_branch|equipped.time_theifs_gambit|equipped.nymues_unraveling_spindle
+local var_steroid_trinket_equipped = I.CrimsonGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.IrideusFragment:IsEquipped() or I.EruptingSpearFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped() or I.MirrorofFracturedTomorrows:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.BalefireBranch:IsEquipped() or I.TimeThiefsGambit:IsEquipped() or I.NymuesUnravelingSpindle:IsEquipped()
 -- variable,name=disable_combustion,op=reset
 local var_disable_combustion = not CDsON()
 -- variable,name=firestarter_combustion,default=-1,value=talent.sun_kings_blessing,if=variable.firestarter_combustion<0
@@ -103,8 +103,8 @@ local var_overpool_fire_blasts = 0
 -- variable,name=skb_duration,value=dbc.effect.1016075.base_value
 -- Note: This is the duration of Sun King's Blessing's free Combustion
 local var_skb_duration = 6
--- variable,name=combustion_on_use,value=equipped.gladiators_badge|equipped.moonlit_prism|equipped.irideus_fragment|equipped.spoils_of_neltharus|equipped.tome_of_unstable_power|equipped.timebreaching_talon|equipped.horn_of_valor
-local var_combustion_on_use = I.CrimsonGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.MoonlitPrism:IsEquipped() or I.IrideusFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TomeofUnstablePower:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped()
+-- variable,name=combustion_on_use,value=equipped.gladiators_badge|equipped.moonlit_prism|equipped.irideus_fragment|equipped.spoils_of_neltharus|equipped.timebreaching_talon|equipped.horn_of_valor
+local var_combustion_on_use = I.CrimsonGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.MoonlitPrism:IsEquipped() or I.IrideusFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped()
 -- variable,name=on_use_cutoff,value=20,if=variable.combustion_on_use
 local var_on_use_cutoff = (var_combustion_on_use) and 20 or 0
 
@@ -473,8 +473,8 @@ local function CombustionPhase()
   if S.Fireball:IsReady() and (CombustionRemains > S.Fireball:CastTime() and Player:BuffUp(S.FlameAccelerantBuff)) then
     if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball combustion_phase 40"; end
   end
-  -- phoenix_flames,if=(!searing_touch.active&talent.flame_accelerant|!talent.flame_accelerant)&!set_bonus.tier30_2pc&!talent.alexstraszas_fury&travel_time<buff.combustion.remains&buff.heating_up.react+hot_streak_spells_in_flight<2
-  if S.PhoenixFlames:IsCastable() and ((not SearingTouchActive() and S.FlameAccelerant:IsAvailable() or not S.FlameAccelerant:IsAvailable()) and not Player:HasTier(30, 2) and not S.AlexstraszasFury:IsAvailable() and S.PhoenixFlames:TravelTime() < CombustionRemains and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() < 2) then
+  -- phoenix_flames,if=(!talent.alexstraszas_fury&travel_time<buff.combustion.remains|talent.alexstraszas_fury)&buff.heating_up.react+hot_streak_spells_in_flight<2
+  if S.PhoenixFlames:IsCastable() and ((not S.AlexstraszasFury:IsAvailable() and S.PhoenixFlames:TravelTime() < CombustionRemains or S.AlexstraszasFury:IsAvailable()) and num(Player:BuffUp(S.HeatingUpBuff)) + HotStreakInFlight() < 2) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 42"; end
   end
   -- scorch,if=buff.combustion.remains>cast_time&cast_time>=gcd.max
