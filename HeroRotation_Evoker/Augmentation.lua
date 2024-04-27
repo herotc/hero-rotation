@@ -79,9 +79,21 @@ local VarTrinket2Buffs = Trinket2:HasUseBuff() and not VarTrinket2Exclude or T2I
 local VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 120 == 0)) and 1 or 0.5
 local VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 120 == 0)) and 1 or 0.5
 local VarDamageTrinketPriority = (not VarTrinket1Buffs or VarTrinket1Exclude or Trinket2:Level() >= Trinket1:Level()) and not VarTrinket2Buffs
--- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=trinket.1.is.nymues_unraveling_spindle&trinket.2.has_buff.intellect&!variable.trinket_2_exclude|trinket.2.is.nymues_unraveling_spindle&!trinket.1.has_buff.intellect&!variable.trinket_1_exclude,if=(trinket.1.is.nymues_unraveling_spindle|trinket.2.is.nymues_unraveling_spindle)&(!variable.trinket_1_buffs&!variable.trinket_2_buffs)
--- TODO: Handle this.
-local VarTrinketPriority = 1
+local T1Duration = Trinket1:BuffDuration() or 1
+local T2Duration = Trinket2:BuffDuration() or 2
+local VarTrinketPriority
+if not VarTrinket1Buffs and VarTrinket2Buffs and (Trinket2:HasCooldown() and not VarTrinket2Exclude or not Trinket1:HasCooldown()) or VarTrinket2Buffs and ((Trinket2:Cooldown() / T2Duration) * VarTrinket2Sync) > ((Trinket1:Cooldown() / T1Duration) * VarTrinket1Sync * (1 + ((Trinket1:Level() - Trinket2:Level())/100))) then
+  VarTrinketPriority = 2
+else
+  VarTrinketPriority = 1
+end
+if I.NymuesUnravelingSpindle:IsEquipped() and (not VarTrinket1Buffs and not VarTrinket2Buffs) then
+  if T1ID == I.NymuesUnravelingSpindle:ID() and not VarTrinket2Exclude or T2ID == I.NymuesUnravelingSpindle:ID() and not VarTrinket1Exclude then
+    VarTrinketPriority = 2
+  else
+    VarTrinketPriority = 1
+  end
+end
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -145,7 +157,18 @@ HL:RegisterForEvent(function()
   VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 120 == 0)) and 1 or 0.5
   VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 120 == 0)) and 1 or 0.5
   VarDamageTrinketPriority = (not VarTrinket1Buffs or VarTrinket1Exclude or Trinket2:Level() >= Trinket1:Level()) and not VarTrinket2Buffs
-  VarTrinketPriority = 1
+  if not VarTrinket1Buffs and VarTrinket2Buffs and (Trinket2:HasCooldown() and not VarTrinket2Exclude or not Trinket1:HasCooldown()) or VarTrinket2Buffs and ((Trinket2:Cooldown() / T2Duration) * VarTrinket2Sync) > ((Trinket1:Cooldown() / T1Duration) * VarTrinket1Sync * (1 + ((Trinket1:Level() - Trinket2:Level())/100))) then
+    VarTrinketPriority = 2
+  else
+    VarTrinketPriority = 1
+  end
+  if I.NymuesUnravelingSpindle:IsEquipped() and (not VarTrinket1Buffs and not VarTrinket2Buffs) then
+    if T1ID == I.NymuesUnravelingSpindle:ID() and not VarTrinket2Exclude or T2ID == I.NymuesUnravelingSpindle:ID() and not VarTrinket1Exclude then
+      VarTrinketPriority = 2
+    else
+      VarTrinketPriority = 1
+    end
+  end
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
