@@ -66,7 +66,9 @@ local VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 90 == 0 or 
 local VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 90 == 0 or 90 % Trinket2:Cooldown() == 0)) and 1 or 0.5
 local VarDmgTrinketPriority = (not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2:Level() > Trinket1:Level()) and 2 or 1
 local VarTrinketPriority
-if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()))) > (((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()))) * (1 + ((Trinket1:Level() - Trinket2:Level()) / 100))) then
+local TrinketCompare1 = ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()))) or 0
+local TrinketCompare2 = (((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()))) * (1 + ((Trinket1:Level() - Trinket2:Level()) / 100))) or 0
+if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and TrinketCompare1 > TrinketCompare2 then
   VarTrinketPriority = 2
 else
   VarTrinketPriority = 1
