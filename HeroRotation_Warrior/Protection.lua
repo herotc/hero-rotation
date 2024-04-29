@@ -46,6 +46,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Warrior.Commons,
+  CommonsDS = HR.GUISettings.APL.Warrior.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Warrior.CommonsOGCD,
   Protection = HR.GUISettings.APL.Warrior.Protection
 }
 
