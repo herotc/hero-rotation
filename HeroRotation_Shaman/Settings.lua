@@ -25,13 +25,20 @@ HR.GUISettings.APL.Shaman = {
       Trinkets = true,
       Items = true,
     },
+  },
+  CommonsDS = {
     DisplayStyle = {
-      Potions = "Suggested",
-      Trinkets = "Suggested",
+      -- Common
+      Interrupts = "Cooldown",
       Items = "Suggested",
+      Potions = "Suggested",
       Signature = "Suggested",
+      Trinkets = "Suggested",
+      -- Class Specific
       SpiritwalkersGrace = "SuggestedRight",
     },
+  },
+  CommonsOGCD = {
     GCDasOffGCD = {
       Ascendance = true,
       EarthElemental = true,
@@ -40,7 +47,6 @@ HR.GUISettings.APL.Shaman = {
     },
     OffGCDasOffGCD = {
       Racials = true,
-      WindShear = true
     }
   },
   Elemental = {
@@ -98,6 +104,8 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Child Panels
 local ARPanel = HR.GUI.Panel
 local CP_Shaman = CreateChildPanel(ARPanel, "Shaman")
+local CP_ShamanDS = CreateChildPanel(CP_Shaman, "Class DisplayStyles")
+local CP_ShamanOGCD = CreateChildPanel(CP_Shaman, "Class OffGCDs")
 local CP_Enhancement = CreateChildPanel(CP_Shaman, "Enhancement")
 local CP_Elemental = CreateChildPanel(CP_Shaman, "Elemental")
 local CP_Restoration = CreateChildPanel(CP_Shaman, "Restoration")
@@ -107,6 +115,8 @@ CreateARPanelOptions(CP_Shaman, "APL.Shaman.Commons")
 CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.PreferEarthShield", "Prefer Earth Shield", "Prefer using Earth Shield over Lightning Shield, when it's available.")
 CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShieldsOOC", "Show Shields OOC", "Enable to show elemental shields while out of combat.")
 CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.WeaponBuffsOOC", "Show Weapon Buffs OOC", "Enable to show weapon buffs while out of combat.")
+CreateARPanelOptions(CP_ShamanDS, "APL.Shaman.CommonsDS")
+CreateARPanelOptions(CP_ShamanOGCD, "APL.Shaman.CommonsOGCD")
 
 -- Elemental
 CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental")
@@ -118,4 +128,4 @@ CreatePanelOption("Slider", CP_Enhancement, "APL.Shaman.Enhancement.HealWith5Mae
 CreatePanelOption("Slider", CP_Enhancement, "APL.Shaman.Enhancement.HealWithout5Maelstrom", {0, 100, 1}, "Heal Pct without 5 Maelstrom", "Sets the health percentage under which Healing Surge should be suggested when below 5 Maelstrom. Set this to 0 to disable healing suggestions.")
 
 -- Restoration
-CreateARPanelOptions(CP_Restoration, "APL.Shaman.Restoration")
+--CreateARPanelOptions(CP_Restoration, "APL.Shaman.Restoration")

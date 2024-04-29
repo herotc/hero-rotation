@@ -60,6 +60,8 @@ local Everyone = HR.Commons.Everyone;
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Mage.Commons,
+  CommonsDS = HR.GUISettings.APL.Mage.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Mage.CommonsOGCD,
   Arcane = HR.GUISettings.APL.Mage.Arcane
 };
 
@@ -191,7 +193,7 @@ local function AoeCooldownPhase()
   end
   -- radiant_spark
   if S.RadiantSpark:IsReady() then
-    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe_cooldown_phase 4"; end
+    if Cast(S.RadiantSpark, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe_cooldown_phase 4"; end
   end
   -- arcane_orb,if=buff.arcane_charge.stack<3,line_cd=1
   if S.ArcaneOrb:IsReady() and (Player:ArcaneCharges() < 3) then
@@ -237,7 +239,7 @@ end
 local function AoeRotation()
   -- shifting_power,if=(!talent.evocation|cooldown.evocation.remains>12)&(!talent.arcane_surge|cooldown.arcane_surge.remains>12)&(!talent.touch_of_the_magi|cooldown.touch_of_the_magi.remains>12)&buff.arcane_surge.down&((!talent.charged_orb&cooldown.arcane_orb.remains>12)|(action.arcane_orb.charges=0|cooldown.arcane_orb.remains>12))&!debuff.touch_of_the_magi.up
   if S.ShiftingPower:IsReady() and ((not S.Evocation:IsAvailable() or S.Evocation:CooldownRemains() > 12) and (not S.ArcaneSurge:IsAvailable() or S.ArcaneSurge:CooldownRemains() > 12) and (not S.TouchoftheMagi:IsAvailable() or S.TouchoftheMagi:CooldownRemains() > 12) and Player:BuffDown(S.ArcaneSurgeBuff) and ((not S.ChargedOrb:IsAvailable() and S.ArcaneOrb:CooldownRemains() > 12) or (S.ArcaneOrb:Charges() == 0 or S.ArcaneOrb:CooldownRemains() > 12)) and Target:DebuffDown(S.TouchoftheMagiDebuff)) then
-    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power aoe_rotation 2"; end
+    if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power aoe_rotation 2"; end
   end
   -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.arcane_surge.down&(active_enemies>6|!talent.orb_barrage)&!debuff.touch_of_the_magi.up
   if S.NetherTempest:IsReady() and (Target:DebuffRefreshable(S.NetherTempestDebuff) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffDown(S.ArcaneSurgeBuff) and (EnemiesCount8ySplash > 6 or not S.OrbBarrage:IsAvailable()) and Target:DebuffDown(S.TouchoftheMagiDebuff)) then
@@ -268,7 +270,7 @@ local function CooldownPhase()
   end
   -- shifting_power,if=buff.arcane_surge.down&!talent.radiant_spark
   if S.ShiftingPower:IsReady() and (Player:BuffDown(S.ArcaneSurgeBuff) and not S.RadiantSpark:IsAvailable()) then
-    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power cooldown_phase 4"; end
+    if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power cooldown_phase 4"; end
   end
   -- arcane_orb,if=(cooldown.radiant_spark.ready|(active_enemies>=2&debuff.radiant_spark_vulnerability.down))&buff.arcane_charge.stack<buff.arcane_charge.max_stack
   if S.ArcaneOrb:IsReady() and ((S.RadiantSpark:CooldownUp() or (EnemiesCount8ySplash >= 2 and Target:DebuffDown(S.RadiantSparkVulnerability))) and Player:ArcaneCharges() < Player:ArcaneChargesMax()) then
@@ -291,7 +293,7 @@ local function CooldownPhase()
   end
   -- radiant_spark
   if S.RadiantSpark:IsReady() then
-    if Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark cooldown_phase 16"; end
+    if Cast(S.RadiantSpark, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark cooldown_phase 16"; end
   end
   -- nether_tempest,if=talent.arcane_echo,line_cd=30
   if S.NetherTempest:IsReady() and S.NetherTempest:TimeSinceLastCast() >= 30 and (S.ArcaneEcho:IsAvailable()) then
@@ -336,7 +338,7 @@ local function Rotation()
   end
   -- shifting_power,if=buff.arcane_surge.down&cooldown.arcane_surge.remains>45&fight_remains>15
   if S.ShiftingPower:IsReady() and (Player:BuffDown(S.ArcaneSurgeBuff) and S.ArcaneSurge:CooldownRemains() > 45 and FightRemains > 15) then
-    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power rotation 6"; end
+    if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power rotation 6"; end
   end
   -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&(((buff.temporal_warp.up|mana.pct<10|!talent.shifting_power)&buff.arcane_surge.down)|equipped.neltharions_call_to_chaos)&!variable.opener&fight_remains>=12
   if S.NetherTempest:IsReady() and (Target:DebuffRefreshable(S.NetherTempestDebuff) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and (((Player:BuffUp(S.TemporalWarpBuff) or Player:ManaPercentage() < 10 or not S.ShiftingPower:IsAvailable()) and Player:BuffDown(S.ArcaneSurgeBuff)) or I.NeltharionsCalltoChaos:IsEquipped()) and not var_opener and FightRemains >= 12) then
@@ -398,46 +400,46 @@ local function APL()
     -- arcane_intellect
     -- Note: Moved from of precombat
     if S.ArcaneIntellect:IsCastable() and Everyone.GroupBuffMissing(S.ArcaneIntellect) then
-      if Cast(S.ArcaneIntellect, Settings.Commons.GCDasOffGCD.ArcaneIntellect) then return "arcane_intellect group_buff"; end
+      if Cast(S.ArcaneIntellect, Settings.CommonsOGCD.GCDasOffGCD.ArcaneIntellect) then return "arcane_intellect group_buff"; end
     end
     -- call precombat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- counterspell
-    local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.CommonsDS.DisplayStyle.Interrupts, false); if ShouldReturn then return ShouldReturn; end
     -- potion,if=buff.siphon_storm.up|(!talent.siphon_storm&cooldown.arcane_surge.ready)
     if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.SiphonStormBuff) or (not S.SiphonStorm:IsAvailable() and S.ArcaneSurge:CooldownUp())) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 2"; end
       end
     end
     if CDsON() then
       -- time_warp,if=talent.temporal_warp&buff.exhaustion.up&(cooldown.arcane_surge.ready|fight_remains<=40|(buff.arcane_surge.up&fight_remains<=(cooldown.arcane_surge.remains+14)))
       if S.TimeWarp:IsReady() and Settings.Commons.UseTemporalWarp and Player:BloodlustDown() and (S.TemporalWarp:IsAvailable() and Player:BloodlustExhaustUp() and (S.ArcaneSurge:CooldownUp() or FightRemains <= 40 or (Player:BuffUp(S.ArcaneSurgeBuff) and FightRemains <= (S.ArcaneSurge:CooldownRemains() + 14)))) then
-        if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp main 4"; end
+        if Cast(S.TimeWarp, Settings.CommonsOGCD.OffGCDasOffGCD.TimeWarp) then return "time_warp main 4"; end
       end
       -- lights_judgment,if=buff.arcane_surge.down&debuff.touch_of_the_magi.down&active_enemies>=2
       if S.LightsJudgment:IsCastable() and (Player:BuffDown(S.ArcaneSurgeBuff) and Target:DebuffDown(S.TouchoftheMagiDebuff) and EnemiesCount8ySplash >= 2) then
-        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 6"; end
+        if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 6"; end
       end
       -- berserking,if=(prev_gcd.1.arcane_surge&!(buff.temporal_warp.up&buff.bloodlust.up))|(buff.arcane_surge.up&debuff.touch_of_the_magi.up)
       if S.Berserking:IsCastable() and ((Player:PrevGCDP(1, S.ArcaneSurge) and not (Player:BuffUp(S.TemporalWarpBuff) and Player:BloodlustUp())) or Player:BuffUp(S.ArcaneSurgeBuff) and Target:DebuffUp(S.TouchoftheMagiDebuff)) then
-        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 8"; end
+        if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking main 8"; end
       end
       if Player:PrevGCDP(1, S.ArcaneSurge) then
         -- blood_fury,if=prev_gcd.1.arcane_surge
         if S.BloodFury:IsCastable() then
-          if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 10"; end
+          if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury main 10"; end
         end
         -- fireblood,if=prev_gcd.1.arcane_surge
         if S.Fireblood:IsCastable() then
-          if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 12"; end
+          if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood main 12"; end
         end
         -- ancestral_call,if=prev_gcd.1.arcane_surge
         if S.AncestralCall:IsCastable() then
-          if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 14"; end
+          if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call main 14"; end
         end
       end
       -- invoke_external_buff,name=power_infusion,if=((!talent.radiant_spark&prev_gcd.1.arcane_surge)|(talent.radiant_spark&prev_gcd.1.radiant_spark&cooldown.arcane_surge.remains<=(gcd.max*3)))
@@ -447,26 +449,26 @@ local function APL()
       if Settings.Commons.Enabled.Trinkets then
         -- use_item,name=irideus_fragment,if=cooldown.arcane_surge.ready&prev_gcd.1.nether_tempest|fight_remains<=20
         if I.IrideusFragment:IsEquippedAndReady() and (S.ArcaneSurge:CooldownUp() and Player:PrevGCDP(1, S.NetherTempest) or BossFightRemains <= 20) then
-          if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment main 16"; end
+          if Cast(I.IrideusFragment, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "irideus_fragment main 16"; end
         end
         -- use_item,name=ashes_of_the_embersoul,if=(prev_gcd.1.arcane_surge&!equipped.belorrelos_the_suncaller&(!variable.ashes_double_on_use|!variable.opener))|fight_remains<=20|((active_enemies>=variable.aoe_target_count)&cooldown.arcane_surge.ready&prev_gcd.1.nether_tempest)|(equipped.belorrelos_the_suncaller&(buff.arcane_surge.remains>12|(prev_gcd.1.arcane_surge&variable.opener))&cooldown.evocation.remains>60)
         if I.AshesoftheEmbersoul:IsEquippedAndReady() and ((Player:PrevGCDP(1, S.ArcaneSurge) and not I.BelorrelostheSuncaller:IsEquipped() and (not var_ashes_double_on_use or not var_opener)) or BossFightRemains <= 20 or ((EnemiesCount8ySplash >= var_aoe_target_count) and S.ArcaneSurge:CooldownUp() and Player:PrevGCDP(1, S.NetherTempest)) or (I.BelorrelostheSuncaller:IsEquipped() and (Player:BuffRemains(S.ArcaneSurgeBuff) > 12 or (Player:PrevGCDP(1, S.ArcaneSurge) and var_opener)) and S.Evocation:CooldownRemains() > 60)) then
-          if Cast(I.AshesoftheEmbersoul, nil, Settings.Commons.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul main 18"; end
+          if Cast(I.AshesoftheEmbersoul, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul main 18"; end
         end
         -- use_item,name=nymues_unraveling_spindle,if=((!variable.opener&cooldown.arcane_surge.remains<=(gcd.max*4)&cooldown.radiant_spark.ready)|(variable.opener&(mana.pct<=10|buff.siphon_storm.remains<19))&(!variable.nymues_double_on_use|!variable.opener))|fight_remains<=24|((active_enemies>=variable.aoe_target_count)&cooldown.arcane_surge.ready&prev_gcd.1.nether_tempest)|((equipped.belorrelos_the_suncaller)&cooldown.touch_of_the_magi.remains<(gcd.max*6))
         if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (((not var_opener and S.ArcaneSurge:CooldownRemains() <= (GCDMax * 4) and S.RadiantSpark:CooldownUp()) or (var_opener and (Player:ManaPercentage() <= 10 or Player:BuffRemains(S.SiphonStormBuff) < 19)) and (not var_nymues_double_on_use or not var_opener)) or BossFightRemains <= 24 or ((EnemiesCount8ySplash >= var_aoe_target_count) and S.ArcaneSurge:CooldownUp() and Player:PrevGCDP(1, S.NetherTempest)) or ((I.BelorrelostheSuncaller:IsEquipped()) and S.TouchoftheMagi:CooldownRemains() < (GCDMax * 6))) then
-          if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle main 20"; end
+          if Cast(I.NymuesUnravelingSpindle, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle main 20"; end
         end
         -- use_item,name=timebreaching_talon,if=((cooldown.arcane_surge.remains<=(gcd.max*4)&cooldown.radiant_spark.remains)&(!variable.talon_double_on_use|!variable.opener))|fight_remains<=20|((active_enemies>=variable.aoe_target_count)&cooldown.arcane_surge.ready&prev_gcd.1.nether_tempest)
         if I.TimebreachingTalon:IsEquippedAndReady() and (((S.ArcaneSurge:CooldownRemains() <= (GCDMax * 4) and S.RadiantSpark:CooldownDown()) and (not var_talon_double_on_use or not var_opener)) or BossFightRemains <= 20 or ((EnemiesCount8ySplash >= var_aoe_target_count) and S.ArcaneSurge:CooldownUp() and Player:PrevGCDP(1, S.NetherTempest))) then
-          if Cast(I.TimebreachingTalon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timebreaching_talon main 22"; end
+          if Cast(I.TimebreachingTalon, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "timebreaching_talon main 22"; end
         end
         -- use_items,if=prev_gcd.1.arcane_surge|((active_enemies>=variable.aoe_target_count)&cooldown.arcane_surge.ready&prev_gcd.1.nether_tempest)|fight_remains<=15
         if Player:PrevGCDP(1, S.ArcaneSurge) or ((EnemiesCount8ySplash >= var_aoe_target_count) and S.ArcaneSurge:CooldownUp() and Player:PrevGCDP(1, S.NetherTempest)) or FightRemains <= 15 then
           local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
           if ItemToUse then
-            local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-            if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+            local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+            if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
             if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
               if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " main 24"; end
             end
@@ -476,56 +478,56 @@ local function APL()
         -- TODO: Handle tinkers
         -- use_item,name=belorrelos_the_suncaller,if=!variable.steroid_trinket_equipped|buff.siphon_storm.down|equipped.nymues_unraveling_spindle
         if I.BelorrelostheSuncaller:IsEquippedAndReady() and (not var_steroid_trinket_equipped or Player:BuffDown(S.SiphonStormBuff) or I.NymuesUnravelingSpindle:IsEquipped()) then
-          if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller main 26"; end
+          if Cast(I.BelorrelostheSuncaller, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller main 26"; end
         end
         -- use_item,name=beacon_to_the_beyond,if=!variable.steroid_trinket_equipped|(buff.siphon_storm.down&buff.arcane_surge.remains<10)
         if I.BeacontotheBeyond:IsEquippedAndReady() and (not var_steroid_trinket_equipped or (Player:BuffDown(S.SiphonStormBuff) and Player:BuffRemains(S.ArcaneSurgeBuff) < 10)) then
-          if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond main 28"; end
+          if Cast(I.BeacontotheBeyond, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond main 28"; end
         end
         -- use_item,name=iceblood_deathsnare,if=!variable.steroid_trinket_equipped|buff.siphon_storm.down
         if I.IcebloodDeathsnare:IsEquippedAndReady() and (not var_steroid_trinket_equipped or Player:BuffDown(S.SiphonStormBuff)) then
-          if Cast(I.IcebloodDeathsnare, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "iceblood_deathsnare main 30"; end
+          if Cast(I.IcebloodDeathsnare, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "iceblood_deathsnare main 30"; end
         end
         -- use_item,name=desperate_invokers_codex,if=!variable.steroid_trinket_equipped|buff.siphon_storm.down
         if I.DesperateInvokersCodex:IsEquippedAndReady() and (not var_steroid_trinket_equipped or Player:BuffDown(S.SiphonStormBuff)) then
-          if Cast(I.DesperateInvokersCodex, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "desperate_invokers_codex main 32"; end
+          if Cast(I.DesperateInvokersCodex, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "desperate_invokers_codex main 32"; end
         end
         -- use_item,name=conjured_chillglobe,if=mana.pct>65&(!variable.steroid_trinket_equipped|buff.siphon_storm.down)
         if I.ConjuredChillglobe:IsEquippedAndReady() and (Player:ManaPercentage() > 65 and (not var_steroid_trinket_equipped or Player:BuffDown(S.SiphonStormBuff))) then
-          if Cast(I.ConjuredChillglobe, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "conjured_chillglobe main 34"; end
+          if Cast(I.ConjuredChillglobe, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "conjured_chillglobe main 34"; end
         end
         if (not var_steroid_trinket_equipped or Player:BuffDown(S.SiphonStormBuff)) then
           -- use_item,name=darkmoon_deck_rime,if=!variable.steroid_trinket_equipped|buff.siphon_storm.down
           if I.DMDRime:IsEquippedAndReady() then
-            if Cast(I.DMDRime, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "darkmoon_deck_rime main 36"; end
+            if Cast(I.DMDRime, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "darkmoon_deck_rime main 36"; end
           end
           if I.DMDRimeBox:IsEquippedAndReady() then
-            if Cast(I.DMDRimeBox, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "darkmoon_deck_box_rime main 38"; end
+            if Cast(I.DMDRimeBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(30)) then return "darkmoon_deck_box_rime main 38"; end
           end
           -- use_item,name=darkmoon_deck_dance,if=!variable.steroid_trinket_equipped|buff.siphon_storm.down
           if I.DMDDance:IsEquippedAndReady() then
-            if Cast(I.DMDDance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(25)) then return "darkmoon_deck_dance main 40"; end
+            if Cast(I.DMDDance, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(25)) then return "darkmoon_deck_dance main 40"; end
           end
           if I.DMDDanceBox:IsEquippedAndReady() then
-            if Cast(I.DMDDanceBox, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(25)) then return "darkmoon_deck_box_dance main 42"; end
+            if Cast(I.DMDDanceBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(25)) then return "darkmoon_deck_box_dance main 42"; end
           end
           -- use_item,name=darkmoon_deck_inferno,if=!variable.steroid_trinket_equipped|buff.siphon_storm.down
           if I.DMDInferno:IsEquippedAndReady() then
-            if Cast(I.DMDInferno, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "darkmoon_deck_inferno main 44"; end
+            if Cast(I.DMDInferno, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "darkmoon_deck_inferno main 44"; end
           end
           if I.DMDInfernoBox:IsEquippedAndReady() then
-            if Cast(I.DMDInfernoBox, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "darkmoon_deck_box_inferno main 46"; end
+            if Cast(I.DMDInfernoBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "darkmoon_deck_box_inferno main 46"; end
           end
         end
       end
       if Settings.Commons.Enabled.Items then
         -- use_item,name=dreambinder_loom_of_the_great_cycle
         if I.Dreambinder:IsEquippedAndReady() then
-          if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle main 48"; end
+          if Cast(I.Dreambinder, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle main 48"; end
         end
         -- use_item,name=iridal_the_earths_master,use_off_gcd=1,if=gcd.remains
         if I.IridaltheEarthsMaster:IsEquippedAndReady() then
-          if Cast(I.IridaltheEarthsMaster, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master main 50"; end
+          if Cast(I.IridaltheEarthsMaster, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master main 50"; end
         end
       end
     end

@@ -32,7 +32,8 @@ HR.Commons.Rogue = Commons
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Rogue.Commons,
-  Commons2 = HR.GUISettings.APL.Rogue.Commons2,
+  CommonsDS = HR.GUISettings.APL.Rogue.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Rogue.CommonsOGCD,
   Assassination = HR.GUISettings.APL.Rogue.Assassination,
   Outlaw = HR.GUISettings.APL.Rogue.Outlaw,
   Subtlety = HR.GUISettings.APL.Rogue.Subtlety
@@ -310,8 +311,8 @@ end
 
 -- Stealth
 function Commons.Stealth(Stealth, Setting)
-  if (Settings.Commons2.ShowStealthOOC or Everyone.TargetIsValid()) and Stealth:IsCastable() and Player:StealthDown() then
-    if HR.Cast(Stealth, nil, Settings.Commons.DisplayStyle.Stealth) then return "Cast Stealth (OOC)" end
+  if (Settings.Commons.ShowStealthOOC or Everyone.TargetIsValid()) and Stealth:IsCastable() and Player:StealthDown() then
+    if HR.Cast(Stealth, nil, Settings.CommonsDS.DisplayStyle.Stealth) then return "Cast Stealth (OOC)" end
   end
 
   return false
@@ -322,8 +323,8 @@ do
   local CrimsonVial = Spell(185311)
 
   function Commons.CrimsonVial()
-    if CrimsonVial:IsCastable() and Player:HealthPercentage() <= Settings.Commons2.CrimsonVialHP then
-      if HR.Cast(CrimsonVial, Settings.Commons.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial (Defensives)" end
+    if CrimsonVial:IsCastable() and Player:HealthPercentage() <= Settings.Commons.CrimsonVialHP then
+      if HR.Cast(CrimsonVial, Settings.CommonsOGCD.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial (Defensives)" end
     end
 
     return false
@@ -351,7 +352,7 @@ do
   end
 
   function Commons.Poisons()
-    if Settings.Commons2.ShowPoisonOOC or Everyone.TargetIsValid() or Player:AffectingCombat() then
+    if Settings.Commons.ShowPoisonOOC or Everyone.TargetIsValid() or Player:AffectingCombat() then
       local PoisonRefreshTime = Player:AffectingCombat() and 120 or 300
       local PoisonRemains
       -- Lethal Poison

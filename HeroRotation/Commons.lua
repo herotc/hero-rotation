@@ -55,12 +55,12 @@ end
 function Commons.Interrupt(Spell, Setting, StunSpells)
   if Settings.InterruptEnabled and Target:IsInterruptible() then
     if Spell:IsCastable(true) and Target:IsSpellInRange(Spell) then
-      if Cast(Spell, Setting) then return "Cast " .. Spell:Name() .. " (Interrupt)"; end
+      if Cast(Spell, nil, Setting) then return "Cast " .. Spell:Name() .. " (Interrupt)"; end
     elseif Settings.InterruptWithStun and Target:CanBeStunned() then
       if StunSpells then
         for i = 1, #StunSpells do
           if StunSpells[i][1]:IsCastable() and Target:IsSpellInRange(StunSpells[i][1]) and StunSpells[i][3]() then
-            if Cast(StunSpells[i][1]) then return StunSpells[i][2]; end
+            if Cast(StunSpells[i][1], nil, Setting) then return StunSpells[i][2]; end
           end
         end
       end

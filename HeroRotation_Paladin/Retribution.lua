@@ -34,6 +34,8 @@ local Paladin = HR.Commons.Paladin
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Paladin.Commons,
+  CommonsDS = HR.GUISettings.APL.Paladin.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Paladin.CommonsOGCD,
   Retribution = HR.GUISettings.APL.Paladin.Retribution
 }
 
@@ -135,7 +137,7 @@ local function Precombat()
     if Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment precombat 6" end
   end
   if S.HammerofWrath:IsReady() then
-    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath precombat 8" end
+    if Cast(S.HammerofWrath, Settings.CommonsOGCD.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath precombat 8" end
   end
   if S.CrusaderStrike:IsCastable() then
     if Cast(S.CrusaderStrike, nil, nil, not Target:IsSpellInRange(S.CrusaderStrike)) then return "crusader_strike 10" end
@@ -147,22 +149,22 @@ local function Cooldowns()
   if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.AvengingWrathBuff) or Player:BuffUp(S.CrusadeBuff) or BossFightRemains < 30) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldowns 2"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion cooldowns 2"; end
     end
   end
   -- invoke_external_buff,name=power_infusion,if=buff.avenging_wrath.up|buff.crusade.up
   -- Note: Not handling external buffs
   -- lights_judgment,if=spell_targets.lights_judgment>=2|!raid_event.adds.exists|raid_event.adds.in>75|raid_event.adds.up
   if S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "lights_judgment cooldowns 4" end
+    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "lights_judgment cooldowns 4" end
   end
   -- fireblood,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
   if S.Fireblood:IsCastable() and (Player:BuffUp(S.AvengingWrathBuff) or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) == 10) then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cooldowns 6" end
+    if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood cooldowns 6" end
   end
   -- use_item,name=algethar_puzzle_box,if=(cooldown.avenging_wrath.remains<5&!talent.crusade|cooldown.crusade.remains<5&talent.crusade)&(holy_power>=4&time<5|holy_power>=3&time>5)
   if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() and ((S.AvengingWrath:CooldownRemains() < 5 and not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() < 5 and S.Crusade:IsAvailable()) and (HolyPower >= 4 and HL.CombatTime() < 5 or HolyPower >= 3 and HL.CombatTime() > 5)) then
-    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldowns 8"; end
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldowns 8"; end
   end
   -- use_item,slot=trinket1,if=(buff.avenging_wrath.up&cooldown.avenging_wrath.remains>40|buff.crusade.up&buff.crusade.stack=10)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
   -- use_item,slot=trinket2,if=(buff.avenging_wrath.up&cooldown.avenging_wrath.remains>40|buff.crusade.up&buff.crusade.stack=10)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
@@ -172,8 +174,8 @@ local function Cooldowns()
   -- Note: Can't handle all of the above trinket conditions, so using above simplified use_items instead.
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
-      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
       if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
         if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "simplified use_items for " .. ItemToUse:Name(); end
       end
@@ -182,11 +184,11 @@ local function Cooldowns()
   if Settings.Commons.Enabled.Items then
     -- use_item,name=shadowed_razing_annihilator,if=(trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)
     if I.ShadowedRazingAnnihilator:IsEquippedAndReady() and ((Trinket1:CooldownDown() or not Trinket1:HasUseBuff()) and (Trinket2:CooldownDown() or not Trinket2:HasUseBuff())) then
-      if Cast(I.ShadowedRazingAnnihilator, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(8)) then return "shadowed_razing_annihilator cooldowns 10"; end
+      if Cast(I.ShadowedRazingAnnihilator, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(8)) then return "shadowed_razing_annihilator cooldowns 10"; end
     end
     -- use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking&!buff.avenging_wrath.up&!buff.crusade.up
     if I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0 and Player:BuffDown(S.AvengingWrathBuff) and Player:BuffDown(S.CrusadeBuff)) then
-      if Cast(I.Fyralath, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender cooldowns 11"; end
+      if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender cooldowns 11"; end
     end
   end
   -- shield_of_vengeance,if=fight_remains>15&(!talent.execution_sentence|!debuff.execution_sentence.up)
@@ -243,7 +245,7 @@ local function Generators()
   end
   -- divine_toll,if=holy_power<=2&(!raid_event.adds.exists|raid_event.adds.in>30|raid_event.adds.up)&(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15|fight_remains<8)
   if S.DivineToll:IsCastable() and (HolyPower <= 2 and (Settings.Retribution.DisableCrusadeAWCDCheck or S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15 or FightRemains < 8)) then
-    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll generators 6"; end
+    if Cast(S.DivineToll, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll generators 6"; end
   end
   -- judgment,if=dot.expurgation.ticking&!buff.echoes_of_wrath.up&set_bonus.tier31_2pc
   if S.Judgment:IsReady() and (Target:DebuffUp(S.ExpurgationDebuff) and Player:BuffDown(S.EchoesofWrathBuff) and Player:HasTier(31, 2)) then
@@ -263,7 +265,7 @@ local function Generators()
   end
   -- hammer_of_wrath,if=(spell_targets.divine_storm<2|!talent.blessed_champion|set_bonus.tier30_4pc)&(holy_power<=3|target.health.pct>20|!talent.vanguards_momentum)
   if S.HammerofWrath:IsReady() and ((EnemiesCount8y < 2 or not S.BlessedChampion:IsAvailable() or Player:HasTier(30, 4)) and (HolyPower <= 3 or Target:HealthPercentage() > 20 or not S.VanguardsMomentum:IsAvailable())) then
-    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 14"; end
+    if Cast(S.HammerofWrath, Settings.CommonsOGCD.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 14"; end
   end
   -- templar_slash,if=buff.templar_strikes.remains<gcd
   if S.TemplarSlash:IsReady() and (S.TemplarStrike:TimeSinceLastCast() + PlayerGCD < 4) then
@@ -309,7 +311,7 @@ local function Generators()
   end
   -- hammer_of_wrath,if=holy_power<=3|target.health.pct>20|!talent.vanguards_momentum
   if S.HammerofWrath:IsReady() and (HolyPower <= 3 or Target:HealthPercentage() > 20 or not S.VanguardsMomentum:IsAvailable()) then
-    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 34"; end
+    if Cast(S.HammerofWrath, Settings.CommonsOGCD.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 34"; end
   end
   -- crusader_strike
   if S.CrusaderStrike:IsCastable() then
@@ -317,7 +319,7 @@ local function Generators()
   end
   -- arcane_torrent
   if S.ArcaneTorrent:IsCastable() then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent generators 38"; end
+    if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent generators 38"; end
   end
   -- consecration
   if S.Consecration:IsCastable() then
@@ -362,7 +364,7 @@ local function APL()
     end
     -- auto_attack
     -- rebuke
-    local ShouldReturn = Everyone.Interrupt(S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, Interrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Rebuke, Settings.CommonsDS.DisplayStyle.Interrupts, Interrupts); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=cooldowns
     if (CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end

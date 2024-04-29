@@ -49,6 +49,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.DemonHunter.Commons,
+  CommonsDS = HR.GUISettings.APL.DemonHunter.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.DemonHunter.CommonsOGCD,
   Vengeance = HR.GUISettings.APL.DemonHunter.Vengeance
 }
 
@@ -106,7 +108,7 @@ local function Precombat()
   -- snapshot_stats
   -- sigil_of_flame
   if S.SigilofFlame:IsCastable() then
-    if Cast(S.SigilofFlame, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame precombat 2"; end
+    if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame precombat 2"; end
   end
   -- Manually added: Gap closers
   if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
@@ -139,7 +141,7 @@ local function Defensives()
   end
   -- Metamorphosis,if=!buff.metamorphosis.up|target.time_to_die<15
   if S.Metamorphosis:IsCastable() and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold and (Player:BuffDown(S.MetamorphosisBuff) or Target:TimeToDie() < 15) then
-    if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis) then return "metamorphosis defensives"; end
+    if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis defensives"; end
   end
   -- Fiery Brand
   if S.FieryBrand:IsCastable() and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
@@ -154,7 +156,7 @@ local function Maintenance()
   end
   -- sigil_of_flame,if=talent.ascending_flame|active_dot.sigil_of_flame=0
   if S.SigilofFlame:IsCastable() and (S.AscendingFlame:IsAvailable() or S.SigilofFlameDebuff:AuraActiveCount() == 0) then
-    if Cast(S.SigilofFlame, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame maintenance 4"; end
+    if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame maintenance 4"; end
   end
   -- immolation_aura
   if S.ImmolationAura:IsCastable() then
@@ -204,7 +206,7 @@ local function FieryDemise()
   end
   -- sigil_of_flame,if=talent.ascending_flame|active_dot.sigil_of_flame=0
   if S.SigilofFlame:IsCastable() and (S.AscendingFlame:IsAvailable() or S.SigilofFlameDebuff:AuraActiveCount() == 0) then
-    if Cast(S.SigilofFlame, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame fiery_demise 4"; end
+    if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame fiery_demise 4"; end
   end
   -- felblade,if=(!talent.spirit_bomb|(cooldown.fel_devastation.remains<=(execute_time+gcd.remains)))&fury<50
   if S.Felblade:IsReady() and ((not S.SpiritBomb:IsAvailable() or (S.FelDevastation:CooldownRemains() <= (S.Felblade:ExecuteTime() + Player:GCDRemains()))) and Player:Fury() < 50) then
@@ -220,11 +222,11 @@ local function FieryDemise()
   end
   -- the_hunt
   if S.TheHunt:IsCastable() then
-    if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt fiery_demise 12"; end
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt fiery_demise 12"; end
   end
   -- elysian_decree,line_cd=1.85,if=fury>=40
   if S.ElysianDecree:IsCastable() and S.ElysianDecree:TimeSinceLastCast() >= 1.85 and (Player:Fury() >= 40) then
-    if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree fiery_demise 14"; end
+    if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree fiery_demise 14"; end
   end
   -- spirit_bomb,if=variable.can_spb
   if VarNoMaintCleave and not VarCanSpB then
@@ -238,15 +240,15 @@ end
 local function Filler()
   -- sigil_of_chains,if=talent.cycle_of_binding&talent.sigil_of_chains
   if S.SigilofChains:IsCastable() and (S.CycleofBinding:IsAvailable()) then
-    if Cast(S.SigilofChains, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_chains filler 2"; end
+    if Cast(S.SigilofChains, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_chains filler 2"; end
   end
   -- sigil_of_misery,if=talent.cycle_of_binding&talent.sigil_of_misery.enabled
   if S.SigilofMisery:IsCastable() and (S.CycleofBinding:IsAvailable()) then
-    if Cast(S.SigilofMisery, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_misery filler 4"; end
+    if Cast(S.SigilofMisery, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_misery filler 4"; end
   end
   -- sigil_of_silence,if=talent.cycle_of_binding&talent.sigil_of_silence.enabled
   if S.SigilofSilence:IsCastable() and (S.CycleofBinding:IsAvailable()) then
-    if Cast(S.SigilofSilence, nil, Settings.Commons.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_silence filler 6"; end
+    if Cast(S.SigilofSilence, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_silence filler 6"; end
   end
   -- felblade
   if S.Felblade:IsReady() then
@@ -265,7 +267,7 @@ end
 local function SingleTarget()
   -- the_hunt
   if S.TheHunt:IsCastable() then
-    if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt single_target 2"; end
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt single_target 2"; end
   end
   -- soul_carver
   if S.SoulCarver:IsCastable() then
@@ -277,7 +279,7 @@ local function SingleTarget()
   end
   -- elysian_decree
   if S.ElysianDecree:IsCastable() then
-    if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree single_target 8"; end
+    if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree single_target 8"; end
   end
   -- fel_devastation
   if S.FelDevastation:IsReady() then
@@ -298,7 +300,7 @@ end
 local function SmallAoE()
   -- the_hunt
   if S.TheHunt:IsCastable() then
-    if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt small_aoe 2"; end
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt small_aoe 2"; end
   end
   -- fel_devastation,if=talent.collective_anguish.enabled|(talent.stoke_the_flames.enabled&talent.burning_blood.enabled)
   if S.FelDevastation:IsReady() and (S.CollectiveAnguish:IsAvailable() or (S.StoketheFlames:IsAvailable() and S.BurningBlood:IsAvailable())) then
@@ -306,7 +308,7 @@ local function SmallAoE()
   end
   -- elysian_decree,line_cd=1.85,if=fury>=40&(soul_fragments.total<=1|soul_fragments.total>=4)
   if S.ElysianDecree:IsCastable() and S.ElysianDecree:TimeSinceLastCast() >= 1.85 and (Player:Fury() >= 40 and (TotalSoulFragments <= 1 or TotalSoulFragments >= 4)) then
-    if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree small_aoe 6"; end
+    if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree small_aoe 6"; end
   end
   -- fel_devastation
   if S.FelDevastation:IsReady() then
@@ -335,11 +337,11 @@ local function BigAoE()
   end
   -- the_hunt
   if S.TheHunt:IsCastable() then
-    if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt big_aoe 4"; end
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt big_aoe 4"; end
   end
   -- elysian_decree,line_cd=1.85,if=fury>=40&(soul_fragments.total<=1|soul_fragments.total>=4)
   if S.ElysianDecree:IsCastable() and S.ElysianDecree:TimeSinceLastCast() >= 1.85 and (Player:Fury() >= 40 and (TotalSoulFragments <= 1 or TotalSoulFragments >= 4)) then
-    if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree big_aoe 6"; end
+    if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree big_aoe 6"; end
   end
   -- fel_devastation
   if S.FelDevastation:IsReady() then
@@ -440,7 +442,7 @@ local function APL()
     end
     -- auto_attack
     -- disrupt,if=target.debuff.casting.react (Interrupts)
-    local ShouldReturn = Everyone.Interrupt(S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Disrupt, Settings.CommonsDS.DisplayStyle.Interrupts, false); if ShouldReturn then return ShouldReturn; end
     -- Manually added: Defensives
     if (IsTanking) then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
@@ -453,13 +455,13 @@ local function APL()
     -- Note: Handled via Defensives()
     -- metamorphosis,use_off_gcd=1,if=!buff.metamorphosis.up&cooldown.fel_devastation.remains>12
     if S.Metamorphosis:IsCastable() and (Player:BuffDown(S.MetamorphosisBuff) and S.FelDevastation:CooldownRemains() > 12) then
-      if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis) then return "metamorphosis main 4"; end
+      if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis main 4"; end
     end
     -- potion,use_off_gcd=1
     if Settings.Commons.Enabled.Potions then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 6"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 6"; end
       end
     end
     -- call_action_list,name=externals
@@ -469,8 +471,8 @@ local function APL()
     if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
       if ItemToUse then
-        local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+        local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
         if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
           if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
         end

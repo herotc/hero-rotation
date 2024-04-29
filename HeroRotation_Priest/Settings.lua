@@ -22,18 +22,24 @@ HR.GUISettings.APL.Priest = {
       Trinkets = true,
       Items = true,
     },
+  },
+  CommonsDS = {
     DisplayStyle = {
-      Potions = "Suggested",
-      Trinkets = "Suggested",
+      -- Common
+      Interrupts = "Cooldown",
       Items = "Suggested",
+      Potions = "Suggested",
       Signature = "Suggested",
+      Trinkets = "Suggested",
+      -- Class Specific
     },
+  },
+  CommonsOGCD = {
     GCDasOffGCD = {
       PowerWordFortitude = true,
     },
     OffGCDasOffGCD = {
       Racials = true,
-      Silence = true,
     }
   },
   Shadow = {
@@ -97,11 +103,16 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Child Panels
 local ARPanel = HR.GUI.Panel
 local CP_Priest = CreateChildPanel(ARPanel, "Priest")
+local CP_PriestDS = CreateChildPanel(CP_Priest, "Class DisplayStyles")
+local CP_PriestOGCD = CreateChildPanel(CP_Priest, "Class OffGCDs")
 local CP_Shadow = CreateChildPanel(CP_Priest, "Shadow")
-local CP_Discipline = CreateChildPanel(CP_Priest, "Discipline")
-local CP_Holy = CreateChildPanel(CP_Priest, "Holy")
+--local CP_Discipline = CreateChildPanel(CP_Priest, "Discipline")
+--local CP_Holy = CreateChildPanel(CP_Priest, "Holy")
 
+-- Commons
 CreateARPanelOptions(CP_Priest, "APL.Priest.Commons")
+CreateARPanelOptions(CP_PriestDS, "APL.Priest.CommonsDS")
+CreateARPanelOptions(CP_PriestOGCD, "APL.Priest.CommonsOGCD")
 
 --Shadow
 CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DesperatePrayerHP", { 0, 100, 1 }, "Desperate Prayer HP",
@@ -115,7 +126,7 @@ CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.PreferVTWhenSTinD
   "Prefer to use Vampiric Touch while in single target combat in dungeon content. (Note: This does not apply to raid content.)")
 
 --Discipline
-CreateARPanelOptions(CP_Discipline, "APL.Priest.Discipline")
+--CreateARPanelOptions(CP_Discipline, "APL.Priest.Discipline")
 
 --Holy
-CreateARPanelOptions(CP_Holy, "APL.Priest.Holy")
+--CreateARPanelOptions(CP_Holy, "APL.Priest.Holy")

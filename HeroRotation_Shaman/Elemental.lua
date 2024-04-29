@@ -43,6 +43,8 @@ local Shaman = HR.Commons.Shaman
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Shaman.Commons,
+  CommonsDS = HR.GUISettings.APL.Shaman.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Shaman.CommonsOGCD,
   Elemental = HR.GUISettings.APL.Shaman.Elemental
 }
 
@@ -121,7 +123,7 @@ local function Precombat()
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast precombat 6"; end
   end
   if Player:IsCasting(S.ElementalBlast) and S.PrimordialWave:IsViable() then
-    if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 8"; end
+    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 8"; end
   end
   if Player:IsCasting(S.ElementalBlast) and not S.PrimordialWave:IsViable() and S.FlameShock:IsReady() then
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flameshock precombat 10"; end
@@ -133,7 +135,7 @@ local function Precombat()
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flameshock precombat 14"; end
   end
   if Player:IsCasting(S.LavaBurst) and S.PrimordialWave:IsViable() then
-    if Cast(S.PrimordialWave, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 16"; end
+    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 16"; end
   end
 end
 
@@ -152,7 +154,7 @@ local function Aoe()
   end
   -- totemic_recall,if=cooldown.liquid_magma_totem.remains>45
   if S.TotemicRecall:IsCastable() and (S.LiquidMagmaTotem:CooldownRemains() > 45) then
-    if Cast(S.TotemicRecall, Settings.Commons.GCDasOffGCD.TotemicRecall) then return "totemic_recall aoe 8"; end
+    if Cast(S.TotemicRecall, Settings.CommonsOGCD.GCDasOffGCD.TotemicRecall) then return "totemic_recall aoe 8"; end
   end
   -- liquid_magma_totem
   if S.LiquidMagmaTotem:IsReady() then
@@ -160,15 +162,15 @@ local function Aoe()
   end
   -- primordial_wave,target_if=min:dot.flame_shock.remains,if=!buff.primordial_wave.up&buff.surge_of_power.up&!buff.splintered_elements.up
   if S.PrimordialWave:IsViable() and (Player:BuffDown(S.PrimordialWaveBuff) and Player:BuffUp(S.SurgeofPowerBuff) and Player:BuffDown(S.SplinteredElementsBuff)) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 12"; end
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.Signature) then return "primordial_wave aoe 12"; end
   end
   -- primordial_wave,target_if=min:dot.flame_shock.remains,if=!buff.primordial_wave.up&talent.deeply_rooted_elements.enabled&!talent.surge_of_power.enabled&!buff.splintered_elements.up
   if S.PrimordialWave:IsViable() and (Player:BuffDown(S.PrimordialWaveBuff) and S.DeeplyRootedElements:IsAvailable() and not S.SurgeofPower:IsAvailable() and Player:BuffDown(S.SplinteredElementsBuff)) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 14"; end
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.Signature) then return "primordial_wave aoe 14"; end
   end
   -- primordial_wave,target_if=min:dot.flame_shock.remains,if=!buff.primordial_wave.up&talent.master_of_the_elements.enabled&!talent.lightning_rod.enabled
   if S.PrimordialWave:IsViable() and (Player:BuffDown(S.PrimordialWaveBuff) and S.MasteroftheElements:IsAvailable() and not S.LightningRod:IsAvailable()) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave aoe 16"; end
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.Signature) then return "primordial_wave aoe 16"; end
   end
   if S.FlameShock:IsCastable() then
     -- flame_shock,target_if=refreshable,if=buff.surge_of_power.up&talent.lightning_rod.enabled&talent.windspeakers_lava_resurgence.enabled&dot.flame_shock.remains<target.time_to_die-16&active_enemies<5
@@ -202,7 +204,7 @@ local function Aoe()
   end
   -- ascendance
   if S.Ascendance:IsCastable() then
-    if Cast(S.Ascendance, Settings.Commons.GCDasOffGCD.Ascendance) then return "ascendance aoe 32"; end
+    if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance aoe 32"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains,if=active_enemies=3&(!talent.lightning_rod.enabled&set_bonus.tier31_4pc)
   if S.LavaBurst:IsViable() and (Shaman.Targets == 3 and (not S.LightningRod:IsAvailable() and Player:HasTier(31, 4))) then
@@ -351,7 +353,7 @@ local function SingleTarget()
   end
   -- totemic_recall,if=cooldown.liquid_magma_totem.remains>45&(talent.lava_surge.enabled&talent.splintered_elements.enabled|active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1))
   if S.TotemicRecall:IsCastable() and (S.LiquidMagmaTotem:CooldownRemains() > 45 and (S.LavaSurge:IsAvailable() and S.SplinteredElements:IsAvailable() or Shaman.Targets > 1 and Shaman.ClusterTargets > 1)) then
-    if Cast(S.TotemicRecall, Settings.Commons.GCDasOffGCD.TotemicRecall) then return "totemic_recall single_target 6"; end
+    if Cast(S.TotemicRecall, Settings.CommonsOGCD.GCDasOffGCD.TotemicRecall) then return "totemic_recall single_target 6"; end
   end
   -- liquid_magma_totem,if=talent.lava_surge.enabled&talent.splintered_elements.enabled|active_dot.flame_shock=0|dot.flame_shock.remains<6|active_enemies>1&(spell_targets.chain_lightning>1|spell_targets.lava_beam>1)
   if S.LiquidMagmaTotem:IsCastable() and (S.LavaSurge:IsAvailable() and S.SplinteredElements:IsAvailable() or S.FlameShockDebuff:AuraActiveCount() == 0 or Target:DebuffRemains(S.FlameShockDebuff) < 6 or Shaman.Targets > 1 and Shaman.ClusterTargets > 1) then
@@ -359,7 +361,7 @@ local function SingleTarget()
   end
   -- primordial_wave,target_if=min:dot.flame_shock.remains,if=!buff.primordial_wave.up&!buff.splintered_elements.up
   if S.PrimordialWave:IsViable() and (Player:BuffDown(S.PrimordialWaveBuff) and Player:BuffDown(S.SplinteredElementsBuff)) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.Commons.DisplayStyle.Signature) then return "primordial_wave single_target 10"; end
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.Signature) then return "primordial_wave single_target 10"; end
   end
   -- flame_shock,target_if=min:dot.flame_shock.remains,if=active_enemies=1&refreshable&(dot.flame_shock.remains<cooldown.primordial_wave.remains|!talent.primordial_wave.enabled)&!buff.surge_of_power.up&(!buff.master_of_the_elements.up|(!buff.stormkeeper.up&(talent.elemental_blast.enabled&maelstrom<90-8*talent.eye_of_the_storm.rank|maelstrom<60-5*talent.eye_of_the_storm.rank)))
   if S.FlameShock:IsCastable() and (Shaman.Targets == 1 and Target:DebuffRefreshable(S.FlameShockDebuff) and (Target:DebuffRemains(S.FlameShockDebuff) < S.PrimordialWave:CooldownRemains() or not S.PrimordialWave:IsAvailable()) and Player:BuffDown(S.SurgeofPowerBuff) and (not Player:MOTEP() or (not Player:StormkeeperP() and (S.ElementalBlast:IsAvailable() and Player:MaelstromP() < 90 - 8 * S.EyeoftheStorm:TalentRank() or Player:MaelstromP() < 60 - 5 * S.EyeoftheStorm:TalentRank())))) then
@@ -387,7 +389,7 @@ local function SingleTarget()
   end
   -- ascendance,if=!buff.stormkeeper.up
   if S.Ascendance:IsCastable() and (not Player:StormkeeperP()) then
-    if Cast(S.Ascendance, Settings.Commons.GCDasOffGCD.Ascendance) then return "ascendance single_target 24"; end
+    if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance single_target 24"; end
   end
   -- lightning_bolt,if=buff.stormkeeper.up&buff.surge_of_power.up
   if S.LightningBolt:IsViable() and (Player:StormkeeperP() and Player:BuffUp(S.SurgeofPowerBuff)) then
@@ -627,35 +629,35 @@ local function APL()
     -- spiritwalkers_grace,moving=1,if=movement.distance>6
     -- Note: Too situational to include
     -- wind_shear
-    local ShouldReturn = Everyone.Interrupt(S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.WindShear, Settings.CommonsDS.DisplayStyle.Interrupts); if ShouldReturn then return ShouldReturn; end
     if CDsON() then
       -- blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
       if S.BloodFury:IsCastable() and (not S.Ascendance:IsAvailable() or Player:BuffUp(S.AscendanceBuff) or S.Ascendance:CooldownRemains() > 50) then
-        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 2"; end
+        if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury main 2"; end
       end
       -- berserking,if=!talent.ascendance.enabled|buff.ascendance.up
       if S.Berserking:IsCastable() and (not S.Ascendance:IsAvailable() or Player:BuffUp(S.AscendanceBuff)) then
-        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 4"; end
+        if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking main 4"; end
       end
       -- fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
       if S.Fireblood:IsCastable() and (not S.Ascendance:IsAvailable() or Player:BuffUp(S.AscendanceBuff) or S.Ascendance:CooldownRemains() > 50) then
-        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 6"; end
+        if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood main 6"; end
       end
       -- ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
       if S.AncestralCall:IsCastable() and (not S.Ascendance:IsAvailable() or Player:BuffUp(S.AscendanceBuff) or S.Ascendance:CooldownRemains() > 50) then
-        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 8"; end
+        if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call main 8"; end
       end
       -- bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
       if S.BagofTricks:IsCastable() and (not S.Ascendance:IsAvailable() or Player:BuffUp(S.AscendanceBuff)) then
-        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks main 10"; end
+        if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "bag_of_tricks main 10"; end
       end
     end
     -- use_items
     if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
       if ItemToUse then
-        local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+        local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
         if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
           if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
         end
@@ -663,7 +665,7 @@ local function APL()
     end
     -- natures_swiftness
     if S.NaturesSwiftness:IsCastable() then
-      if Cast(S.NaturesSwiftness, Settings.Commons.GCDasOffGCD.NaturesSwiftness) then return "natures_swiftness main 12"; end
+      if Cast(S.NaturesSwiftness, Settings.CommonsOGCD.GCDasOffGCD.NaturesSwiftness) then return "natures_swiftness main 12"; end
     end
     -- invoke_external_buff,name=power_infusion,if=talent.ascendance.enabled&buff.ascendance.up|!talent.ascendance.enabled
     -- Note: Not handling external buffs.
@@ -671,7 +673,7 @@ local function APL()
     if Settings.Commons.Enabled.Potions then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 14"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 14"; end
       end
     end
     -- run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)

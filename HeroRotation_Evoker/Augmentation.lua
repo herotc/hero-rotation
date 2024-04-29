@@ -100,6 +100,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Evoker.Commons,
+  CommonsDS = HR.GUISettings.APL.Evoker.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Evoker.CommonsOGCD,
   Augmentation = HR.GUISettings.APL.Evoker.Augmentation
 }
 
@@ -355,7 +357,7 @@ local function Precombat()
   -- Note2: Can't handle some of these conditions, such as has_buff.intellect, has_buff.mastery, etc.
   -- Manually added: Group buff check
   if S.BlessingoftheBronze:IsCastable() and Everyone.GroupBuffMissing(S.BlessingoftheBronzeBuff) then
-    if Cast(S.BlessingoftheBronze, Settings.Commons.GCDasOffGCD.BlessingOfTheBronze) then return "blessing_of_the_bronze precombat"; end
+    if Cast(S.BlessingoftheBronze, Settings.CommonsOGCD.GCDasOffGCD.BlessingOfTheBronze) then return "blessing_of_the_bronze precombat"; end
   end
   -- Manually added: source_of_magic,if=group&active_dot.source_of_magic=0
   if S.SourceofMagic:IsCastable() and SoMCheck() then
@@ -416,15 +418,15 @@ local function Items()
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=nymues_unraveling_spindle,if=cooldown.breath_of_eons.remains<=3&(trinket.1.is.nymues_unraveling_spindle&variable.trinket_priority=1|trinket.2.is.nymues_unraveling_spindle&variable.trinket_priority=2)|(cooldown.fire_breath.remains<=4|cooldown.upheaval.remains<=4)&cooldown.breath_of_eons.remains>10&!debuff.temporal_wound.up&(trinket.1.is.nymues_unraveling_spindle&variable.trinket_priority=2|trinket.2.is.nymues_unraveling_spindle&variable.trinket_priority=1)
     if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (S.BreathofEons:CooldownRemains() <= 3 and (T1ID == I.NymuesUnravelingSpindle:ID() and VarTrinketPriority == 1 or T2ID == I.NymuesUnravelingSpindle:ID() and VarTrinketPriority == 2) or (S.FireBreath:CooldownRemains() <= 4 or S.Upheaval:CooldownRemains() <= 4) and S.BreathofEons:CooldownRemains() > 10 and Target:DebuffDown(S.TemporalWoundDebuff) and (T1ID == I.NymuesUnravelingSpindle:ID() and VarTrinketPriority == 2 or T2ID == I.NymuesUnravelingSpindle:ID() and VarTrinketPriority == 1)) then
-      if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle items 2"; end
+      if Cast(I.NymuesUnravelingSpindle, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle items 2"; end
     end
     -- use_item,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(debuff.temporal_wound.up|variable.trinket_2_buffs&!trinket.2.cooldown.up&(prev_gcd.1.fire_breath|prev_gcd.1.upheaval)&buff.ebon_might_self.up)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
     if Trinket1:IsReady() and (VarTrinket1Buffs and not VarTrinket1Manual and (Target:DebuffUp(S.TemporalWoundDebuff) or VarTrinket2Buffs and Trinket2:CooldownDown() and (Player:PrevGCDP(1, S.FireBreath) or Player:PrevGCDP(1, S.Upheaval)) and Player:BuffUp(S.EbonMightSelfBuff)) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= FightRemains) then
-      if Cast(Trinket1, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(T1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 4"; end
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(T1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 4"; end
     end
     -- use_item,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(debuff.temporal_wound.up|variable.trinket_1_buffs&!trinket.1.cooldown.up&(prev_gcd.1.fire_breath|prev_gcd.1.upheaval)&buff.ebon_might_self.up)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
     if Trinket2:IsReady() and (VarTrinket2Buffs and not VarTrinket2Manual and (Target:DebuffUp(S.TemporalWoundDebuff) or VarTrinket1Buffs and Trinket1:CooldownDown() and (Player:PrevGCDP(1, S.FireBreath) or Player:PrevGCDP(1, S.Upheaval)) and Player:BuffUp(S.EbonMightSelfBuff)) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= FightRemains) then
-      if Cast(Trinket2, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(T2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 6"; end
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(T2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 6"; end
     end
     -- azure_strike,if=cooldown.item_cd_1141.up&(variable.trinket_1_ogcd_cast&trinket.1.cooldown.up&(variable.damage_trinket_priority=1&(!variable.trinket_2_buffs|variable.trinket_2_exclude)|trinket.2.cooldown.remains)|variable.trinket_2_ogcd_cast&trinket.2.cooldown.up&(variable.damage_trinket_priority=2&(!variable.trinket_1_buffs|variable.trinket_1_exclude)|trinket.1.cooldown.remains))
     -- Note: Skipping this line
@@ -433,18 +435,18 @@ local function Items()
     -- Note: APL sets VarTrinket1OGCDCast and VarTrinket2OGCDCast to false, so these lines would never be called.
     -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(variable.damage_trinket_priority=1&(!variable.trinket_2_buffs|variable.trinket_2_exclude)|trinket.2.cooldown.remains|trinket.2.cooldown.duration=0)&!variable.trinket_1_ogcd_cast
     if Trinket1:IsReady() and (not VarTrinket1Buffs and not VarTrinket1Manual and (VarDamageTrinketPriority == 1 and (not VarTrinket2Buffs or VarTrinket2Exclude) or Trinket2:CooldownDown() or Trinket2:Cooldown() == 0) and not VarTrinket1OGCDCast) then
-      if Cast(Trinket1, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(T1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 10"; end
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(T1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 10"; end
     end
     -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(variable.damage_trinket_priority=2&(!variable.trinket_1_buffs|variable.trinket_1_exclude)|trinket.1.cooldown.remains|trinket.1.cooldown.duration=0)&!variable.trinket_2_ogcd_cast
     if Trinket2:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and (VarDamageTrinketPriority == 2 and (not VarTrinket1Buffs or VarTrinket1Exclude) or Trinket1:CooldownDown() or Trinket1:Cooldown() == 0) and not VarTrinket2OGCDCast) then
-      if Cast(Trinket2, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(T2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 12"; end
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(T2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 12"; end
     end
   end
   -- use_item,slot=main_hand,use_off_gcd=1,if=gcd.remains>=gcd.max*0.6
   if Settings.Commons.Enabled.Items then
     local MainHandOnUse, _, MainHandRange = Player:GetUseableItems(OnUseExcludes, 16)
     if MainHandOnUse and MainHandOnUse:IsReady() then
-      if Cast(MainHandOnUse, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(MainHandRange)) then return "use_item for main_hand (" .. MainHandOnUse:Name() .. ") items 22"; end
+      if Cast(MainHandOnUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(MainHandRange)) then return "use_item for main_hand (" .. MainHandOnUse:Name() .. ") items 22"; end
     end
   end
 end
@@ -452,7 +454,7 @@ end
 local function FB()
   -- tip_the_scales,if=cooldown.fire_breath.ready&buff.ebon_might_self.up
   if CDsON() and S.TipTheScales:IsCastable() and (S.FireBreath:CooldownUp() and Player:BuffUp(S.EbonMightSelfBuff)) then
-    if Cast(S.TipTheScales, Settings.Commons.GCDasOffGCD.TipTheScales) then return "tip_the_scales fb 2"; end
+    if Cast(S.TipTheScales, Settings.CommonsOGCD.GCDasOffGCD.TipTheScales) then return "tip_the_scales fb 2"; end
   end
   local FBEmpower = 0
   -- Note: Using Player:EmpowerCastTime() in place of duration in the below lines. Intention seems to be whether we can get the spell off before Ebom Might ends.
@@ -533,10 +535,10 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- Interrupts
-    local ShouldReturn = Everyone.Interrupt(S.Quell, Settings.Commons.OffGCDasOffGCD.Quell, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Quell, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- Manually added: unravel
     if S.Unravel:IsReady() then
-      if Cast(S.Unravel, Settings.Commons.GCDasOffGCD.Unravel, nil, not Target:IsSpellInRange(S.Unravel)) then return "unravel main 2"; end
+      if Cast(S.Unravel, Settings.CommonsOGCD.GCDasOffGCD.Unravel, nil, not Target:IsSpellInRange(S.Unravel)) then return "unravel main 2"; end
     end
     -- variable,name=temp_wound,value=debuff.temporal_wound.remains,target_if=max:debuff.temporal_wound.remains
     VarTempWound = TemporalWoundCalc(Enemies25y)
@@ -558,7 +560,7 @@ local function APL()
     if Settings.Commons.Enabled.Potions and (Target:DebuffUp(S.TemporalWoundDebuff) and Player:BuffUp(S.EbonMightSelfBuff)) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 6"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 6"; end
       end
     end
     -- call_action_list,name=items

@@ -50,6 +50,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Evoker.Commons,
+  CommonsDS = HR.GUISettings.APL.Evoker.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Evoker.CommonsOGCD,
   Devastation = HR.GUISettings.APL.Evoker.Devastation
 }
 
@@ -132,7 +134,7 @@ local function Precombat()
   -- snapshot_stats
   -- Manually added: Group buff check
   if S.BlessingoftheBronze:IsCastable() and Everyone.GroupBuffMissing(S.BlessingoftheBronzeBuff) then
-    if Cast(S.BlessingoftheBronze, Settings.Commons.GCDasOffGCD.BlessingOfTheBronze) then return "blessing_of_the_bronze precombat"; end
+    if Cast(S.BlessingoftheBronze, Settings.CommonsOGCD.GCDasOffGCD.BlessingOfTheBronze) then return "blessing_of_the_bronze precombat"; end
   end
   -- variable,name=trinket_1_buffs,value=trinket.1.has_buff.intellect|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit|trinket.1.is.mirror_of_fractured_tomorrows
   -- variable,name=trinket_2_buffs,value=trinket.2.has_buff.intellect|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit|trinket.2.is.mirror_of_fractured_tomorrows
@@ -167,7 +169,7 @@ end
 
 local function Defensives()
   if S.ObsidianScales:IsCastable() and Player:BuffDown(S.ObsidianScales) and (Player:HealthPercentage() < Settings.Devastation.ObsidianScalesThreshold) then
-    if Cast(S.ObsidianScales, nil, Settings.Commons.DisplayStyle.Defensives) then return "obsidian_scales defensives"; end
+    if Cast(S.ObsidianScales, nil, Settings.CommonsDS.DisplayStyle.Defensives) then return "obsidian_scales defensives"; end
   end
 end
 
@@ -180,22 +182,22 @@ local function Trinkets()
   if Settings.Commons.Enabled.Items then
     -- use_item,name=dreambinder_loom_of_the_great_cycle,use_off_gcd=1,if=gcd.remains>0.5
     if I.Dreambinder:IsEquippedAndReady() then
-      if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle trinkets 2"; end
+      if Cast(I.Dreambinder, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle trinkets 2"; end
     end
     -- use_item,target_if=min:target.health.pct,name=iridal_the_earths_master,use_off_gcd=1,if=gcd.remains>0.5
     if I.Iridal:IsEquippedAndReady() then
-      if Everyone.CastTargetIf(I.Iridal, Enemies25y, "min", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Items) then return "iridal_the_earths_master trinkets 4"; end
+      if Everyone.CastTargetIf(I.Iridal, Enemies25y, "min", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(40), nil, Settings.CommonsDS.DisplayStyle.Items) then return "iridal_the_earths_master trinkets 4"; end
     end
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=nymues_unraveling_spindle,if=(buff.emerald_trance_stacking.stack>=2&variable.has_external_pi&talent.event_horizon|cooldown.dragonrage.remains<=3&cooldown.fire_breath.remains<7&cooldown.eternity_surge.remains<13&target.time_to_die>=35&(!variable.has_external_pi&active_enemies<=2|!talent.event_horizon|!set_bonus.tier31_2pc))|cooldown.dragonrage.remains<=3&active_enemies>=3|fight_remains<=20
     if I.NymuesUnravelingSpindle:IsEquippedAndReady() and ((Player:BuffStack(S.EmeraldTranceBuff) >= 2 and VarHasExternalPI and S.EventHorizon:IsAvailable() or S.Dragonrage:CooldownRemains() <= 3 and S.FireBreath:CooldownRemains() < 7 and S.EternitySurge:CooldownRemains() < 13 and Target:TimeToDie() >= 35 and (not VarHasExternalPI and EnemiesCount8ySplash <= 2 or not S.EventHorizon:IsAvailable() or not Player:HasTier(31, 2))) or S.Dragonrage:CooldownRemains() <= 3 and EnemiesCount8ySplash >= 3 or FightRemains <= 20) then
-      if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle trinkets 6"; end
+      if Cast(I.NymuesUnravelingSpindle, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle trinkets 6"; end
     end
     -- use_item,name=belorrelos_the_suncaller,if=(((trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|active_enemies<=2)&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle))|fight_remains<=20
     -- Note: Slightly modified, as we can't fully handle variable.trinket_x_buffs.
     if I.BelorrelostheSuncaller:IsEquippedAndReady() and (((trinket2:CooldownDown() or not trinket2:HasUseBuff()) and (trinket1:CooldownDown() or not trinket1:HasUseBuff()) or EnemiesCount8ySplash <= 2) and (I.NymuesUnravelingSpindle:CooldownDown() or not I.NymuesUnravelingSpindle:IsEquipped()) or FightRemains <= 20) then
-      if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller trinkets 8"; end
+      if Cast(I.BelorrelostheSuncaller, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller trinkets 8"; end
     end
   end
   -- use_item,slot=trinket1,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=4&set_bonus.tier31_2pc)|(variable.trinket_2_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&!equipped.nymues_unraveling_spindle&trinket.2.cooldown.remains)|(!cooldown.fire_breath.up&!cooldown.shattering_star.up&!set_bonus.tier31_2pc)|active_enemies>=3)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1|variable.trinket_2_exclude)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)
@@ -207,8 +209,8 @@ local function Trinkets()
   if (VarDragonrageUp or VarNextDragonrage > 20 or not S.Dragonrage:IsAvailable()) then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
-      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
       if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
         if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
       end
@@ -292,7 +294,7 @@ local function Aoe()
   end
   -- tip_the_scales,if=buff.dragonrage.up&(active_enemies<=3+3*talent.eternitys_span|!cooldown.fire_breath.up)
   if S.TipTheScales:IsCastable() and CDsON() and (VarDragonrageUp and (EnemiesCount8ySplash <= 3 + 3 * num(S.EternitysSpan:IsAvailable()) or S.FireBreath:CooldownDown())) then
-    if Cast(S.TipTheScales, Settings.Commons.GCDasOffGCD.TipTheScales) then return "tip_the_scales aoe 6"; end
+    if Cast(S.TipTheScales, Settings.CommonsOGCD.GCDasOffGCD.TipTheScales) then return "tip_the_scales aoe 6"; end
   end
   -- call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_aoe|!talent.animosity)&((buff.power_swell.remains<variable.r1_cast_time|(!talent.volatility&active_enemies=3))&buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)&(target.time_to_die>=8|fight_remains<30)
   if ((not S.Dragonrage:IsAvailable() or VarNextDragonrage > VarDRPrepTimeAoe or not S.Animosity:IsAvailable()) and ((Player:BuffRemains(S.PowerSwellBuff) < VarR1CastTime or (not S.Volatility:IsAvailable() and EnemiesCount8ySplash == 3)) and Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime or VarDragonrageUp) and (Target:TimeToDie() >= 8 or FightRemains < 30)) then
@@ -358,7 +360,7 @@ end
 local function ST()
   -- use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&raid_event.movement.in>6
   if Settings.Commons.Enabled.Items and I.KharnalexTheFirstLight:IsEquippedAndReady() and (not VarDragonrageUp and Target:DebuffDown(S.ShatteringStar)) then
-    if Cast(I.KharnalexTheFirstLight, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "kharnalex_the_first_light st 2"; end
+    if Cast(I.KharnalexTheFirstLight, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(25)) then return "kharnalex_the_first_light st 2"; end
   end
   -- hover,use_off_gcd=1,if=raid_event.movement.in<2&!buff.hover.up
   -- Note: Not handling movement ability.
@@ -372,7 +374,7 @@ local function ST()
   end
   -- tip_the_scales,if=buff.dragonrage.up&(((!talent.font_of_magic|talent.everburning_flame)&cooldown.fire_breath.up&!cooldown.eternity_surge.up&buff.dragonrage.remains<14)|(cooldown.eternity_surge.up&!cooldown.fire_breath.up&!talent.everburning_flame&talent.font_of_magic))
   if S.TipTheScales:IsCastable() and CDsON() and (VarDragonrageUp and (((not S.FontofMagic:IsAvailable() or S.EverburningFlame:IsAvailable()) and S.FireBreath:CooldownUp() and S.EternitySurge:CooldownDown() and VarDragonrageRemains < 14) or (S.EternitySurge:CooldownUp() and S.FireBreath:CooldownDown() and not S.EverburningFlame and S.FontofMagic:IsAvailable()))) then
-    if Cast(S.TipTheScales, Settings.Commons.GCDasOffGCD.TipTheScales) then return "tip_the_scales st 8"; end
+    if Cast(S.TipTheScales, Settings.CommonsOGCD.GCDasOffGCD.TipTheScales) then return "tip_the_scales st 8"; end
   end
   -- call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)&(!cooldown.eternity_surge.up|!talent.event_horizon|!buff.dragonrage.up)&(target.time_to_die>=8|fight_remains<30)
   if (not S.Dragonrage:IsAvailable() or VarNextDragonrage > VarDRPrepTimeST or not S.Animosity:IsAvailable()) and (Player:BuffRemains(S.BlazingShardsBuff) < VarR1CastTime or VarDragonrageUp) and (S.EternitySurge:CooldownDown() or not S.EventHorizon:IsAvailable() or not VarDragonrageUp) and (Target:TimeToDie() >= 8 or FightRemains < 30) then
@@ -508,7 +510,7 @@ local function APL()
     if Settings.Commons.Enabled.Potions and (VarDragonrageUp and (S.ShatteringStar:CooldownDown() or EnemiesCount8ySplash >= 2) or FightRemains < 35) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 2"; end
       end
     end
     -- variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?(cooldown.eternity_surge.remains-2*gcd.max)<?(cooldown.fire_breath.remains-gcd.max)
@@ -516,10 +518,10 @@ local function APL()
     -- invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&(buff.emerald_trance_stacking.stack>=3&set_bonus.tier31_2pc|!cooldown.fire_breath.up&!cooldown.shattering_star.up&(!set_bonus.tier31_2pc|!talent.event_horizon))
     -- Note: Not handling external buffs.
     -- quell,use_off_gcd=1,if=target.debuff.casting.react
-    local ShouldReturn = Everyone.Interrupt(S.Quell, Settings.Commons.OffGCDasOffGCD.Quell, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Quell, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- Manually added: Unravel if enemy has an absorb shield
     if S.Unravel:IsReady() and Target:EnemyAbsorb() then
-      if Cast(S.Unravel, Settings.Commons.GCDasOffGCD.Unravel, nil, not Target:IsSpellInRange(S.Unravel)) then return "unravel main 4"; end
+      if Cast(S.Unravel, Settings.CommonsOGCD.GCDasOffGCD.Unravel, nil, not Target:IsSpellInRange(S.Unravel)) then return "unravel main 4"; end
     end
     -- call_action_list,name=trinkets
     if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then

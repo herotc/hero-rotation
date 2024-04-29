@@ -34,6 +34,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Druid.Commons,
+  CommonsDS = HR.GUISettings.APL.Druid.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Druid.CommonsOGCD,
   Guardian = HR.GUISettings.APL.Druid.Guardian
 }
 
@@ -157,7 +159,7 @@ local function Precombat()
   -- NOTE: Not handling cat-weaving or owl-weaving, so skipping above 6 lines
   -- Manually added: Group buff check
   if S.MarkoftheWild:IsCastable() and Everyone.GroupBuffMissing(S.MarkoftheWildBuff) then
-    if Cast(S.MarkoftheWild, Settings.Commons.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat 2"; end
+    if Cast(S.MarkoftheWild, Settings.CommonsOGCD.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat 2"; end
   end
   -- bear_form,if=(!buff.prowl.up)
   if S.BearForm:IsCastable() then
@@ -219,7 +221,7 @@ local function Bear()
   if CDsON() then
     -- convoke_the_spirits
     if S.ConvoketheSpirits:IsCastable() then
-      if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature) then return "convoke_the_spirits bear 12"; end
+      if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.Signature) then return "convoke_the_spirits bear 12"; end
     end
     -- berserk_bear
     if S.Berserk:IsCastable() then
@@ -240,7 +242,7 @@ local function Bear()
   end
   -- berserking,if=(buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)
   if S.Berserking:IsCastable() and (Player:BuffUp(S.BerserkBuff) or Player:BuffUp(S.IncarnationBuff)) then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking bear 22"; end
+    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking bear 22"; end
   end
   -- maul,if=(buff.rage_of_the_sleeper.up&buff.tooth_and_claw.stack>0&active_enemies<=6&!talent.raze.enabled&variable.If_build=0)|(buff.rage_of_the_sleeper.up&buff.tooth_and_claw.stack>0&active_enemies=1&talent.raze.enabled&variable.If_build=0)
   -- Note: Simplified the condition.
@@ -366,41 +368,41 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- Interrupt
-    local ShouldReturn = Everyone.Interrupt(S.SkullBash, Settings.Guardian.OffGCDasOffGCD.SkullBash, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.SkullBash, Settings.CommonsDS.DisplayStyle.Interrupts, false); if ShouldReturn then return ShouldReturn; end
     -- Manually added: run_action_list,name=defensives
     if (IsTanking and Player:BuffUp(S.BearForm)) then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     end
     -- Manually added: wild_charge if not in range
     if S.WildCharge:IsCastable() and not Target:IsInRange(8) then
-      if Cast(S.WildCharge, Settings.Commons.GCDasOffGCD.WildCharge, nil, not Target:IsInRange(S.WildCharge.MaximumRange)) then return "wild_charge main"; end
+      if Cast(S.WildCharge, Settings.CommonsOGCD.GCDasOffGCD.WildCharge, nil, not Target:IsInRange(S.WildCharge.MaximumRange)) then return "wild_charge main"; end
     end
     -- auto_attack,if=!buff.prowl.up
     -- use_item,name=jotungeirr_destinys_call,if=!buff.prowl.up&!covenant.venthyr
     if Settings.Commons.Enabled.Items and I.Jotungeirr:IsEquippedAndReady() then
-      if Cast(I.Jotungeirr, nil, Settings.Commons.DisplayStyle.Items) then return "jotungeirr_destinys_call main 2"; end
+      if Cast(I.Jotungeirr, nil, Settings.CommonsDS.DisplayStyle.Items) then return "jotungeirr_destinys_call main 2"; end
     end
     -- use_item,slot=trinket1
     -- use_item,slot=trinket2
     if Settings.Commons.Enabled.Trinkets then
       local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
       if Trinket1ToUse then
-        if Cast(Trinket1ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name(); end
+        if Cast(Trinket1ToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name(); end
       end
       local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
       if Trinket2ToUse then
-        if Cast(Trinket2ToUse, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name(); end
+        if Cast(Trinket2ToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name(); end
       end
     end
     -- use_item,name=djaruun_pillar_of_the_elder_flame,if=dot.moonfire.ticking
     if Settings.Commons.Enabled.Items and I.Djaruun:IsEquippedAndReady() and (Target:DebuffUp(S.MoonfireDebuff)) then
-      if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame main 4"; end
+      if Cast(I.Djaruun, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame main 4"; end
     end
     -- potion,if=((talent.heart_of_the_wild.enabled&buff.heart_of_the_wild.up)|((buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)&(!variable.catweave_bear&!variable.owlweave_bear)))
     if Settings.Commons.Enabled.Potions and ((S.HeartoftheWild:IsAvailable() and Player:BuffUp(S.HeartoftheWild)) or (Player:BuffUp(S.BerserkBuff) or Player:BuffUp(S.Incarnation))) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 6"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 6"; end
       end
     end
     -- run_action_list,name=catweave,if=(target.cooldown.pause_action.remains|time>=30)&variable.catweave_bear&buff.tooth_and_claw.remains>1.5&(buff.incarnation_guardian_of_ursoc.down&buff.berserk_bear.down)&(cooldown.thrash_bear.remains>0&cooldown.mangle.remains>0&dot.moonfire.remains>=2)|(buff.cat_form.up&energy>25&variable.catweave_bear&buff.tooth_and_claw.remains>1.5)|(buff.heart_of_the_wild.up&energy>90&variable.catweave_bear&buff.tooth_and_claw.remains>1.5)

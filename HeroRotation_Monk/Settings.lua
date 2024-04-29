@@ -22,12 +22,19 @@ HR.GUISettings.APL.Monk = {
       Potions = true,
       Items = true,
     },
+  },
+  CommonsDS = {
     DisplayStyle = {
+      -- Common
+      Interrupts = "Cooldown",
+      Items = "Suggested",
       Potions = "Suggested",
       Signature = "Suggested",
       Trinkets = "Suggested",
-      Items = "Suggested"
+      -- Class Specific
     },
+  },
+  CommonsOGCD = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       Paralysis = true,
@@ -36,7 +43,6 @@ HR.GUISettings.APL.Monk = {
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      Interrupts = true,
       Racials = true,
     }
   },
@@ -130,11 +136,16 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Child Panels
 local ARPanel = HR.GUI.Panel
 local CP_Monk = CreateChildPanel(ARPanel, "Monk")
+local CP_MonkDS = CreateChildPanel(CP_Monk, "Class DisplayStyles")
+local CP_MonkOGCD = CreateChildPanel(CP_Monk, "Class OffGCDs")
 local CP_Windwalker = CreateChildPanel(CP_Monk, "Windwalker")
 local CP_Brewmaster = CreateChildPanel(CP_Monk, "Brewmaster")
-local CP_Mistweaver = CreateChildPanel(CP_Monk, "Mistweaver")
+--local CP_Mistweaver = CreateChildPanel(CP_Monk, "Mistweaver")
+
 -- Monk
 CreateARPanelOptions(CP_Monk, "APL.Monk.Commons")
+CreateARPanelOptions(CP_MonkDS, "APL.Monk.CommonsDS")
+CreateARPanelOptions(CP_MonkOGCD, "APL.Monk.CommonsOGCD")
 
 -- Windwalker
 CreateARPanelOptions(CP_Windwalker, "APL.Monk.Windwalker")
@@ -148,6 +159,6 @@ CreatePanelOption("Slider", CP_Brewmaster, "APL.Monk.Brewmaster.ExpelHarmHP", {1
 CreateARPanelOptions(CP_Brewmaster, "APL.Monk.Brewmaster")
 
 -- Mistweaver
-CreatePanelOption("Slider", CP_Mistweaver, "APL.Monk.Mistweaver.DampenHarmHP", {1, 100, 1}, "Dampen Harm HP Threshold", "Set the HP threshold for when to suggest Dampen Harm.")
-CreatePanelOption("Slider", CP_Mistweaver, "APL.Monk.Mistweaver.FortifyingBrewHP", {1, 100, 1}, "Fortifying Brew HP Threshold", "Set the HP threshold for when to suggest Fortifying Brew.)")
-CreateARPanelOptions(CP_Mistweaver, "APL.Monk.Mistweaver")
+--CreatePanelOption("Slider", CP_Mistweaver, "APL.Monk.Mistweaver.DampenHarmHP", {1, 100, 1}, "Dampen Harm HP Threshold", "Set the HP threshold for when to suggest Dampen Harm.")
+--CreatePanelOption("Slider", CP_Mistweaver, "APL.Monk.Mistweaver.FortifyingBrewHP", {1, 100, 1}, "Fortifying Brew HP Threshold", "Set the HP threshold for when to suggest Fortifying Brew.)")
+--CreateARPanelOptions(CP_Mistweaver, "APL.Monk.Mistweaver")

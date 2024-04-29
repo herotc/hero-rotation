@@ -51,6 +51,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Paladin.Commons,
+  CommonsDS = HR.GUISettings.APL.Paladin.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Paladin.CommonsOGCD,
   Protection = HR.GUISettings.APL.Paladin.Protection
 }
 
@@ -73,11 +75,11 @@ local function Precombat()
   end
   -- lights_judgment
   if CDsON() and S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment precombat 4"; end
+    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment precombat 4"; end
   end
   -- arcane_torrent
   if CDsON() and S.ArcaneTorrent:IsCastable() then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 6"; end
+    if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 6"; end
   end
   -- consecration
   if S.Consecration:IsCastable() and Target:IsInMeleeRange(8) then
@@ -125,7 +127,7 @@ local function Cooldowns()
   -- Note: Not handling anything at time=0
   -- lights_judgment,if=spell_targets.lights_judgment>=2|!raid_event.adds.exists|raid_event.adds.in>75|raid_event.adds.up
   if S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cooldowns 2"; end
+    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cooldowns 2"; end
   end
   -- avenging_wrath
   if S.AvengingWrath:IsCastable() then
@@ -140,7 +142,7 @@ local function Cooldowns()
   if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.AvengingWrathBuff)) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldowns 8"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion cooldowns 8"; end
     end
   end
   -- moment_of_glory,if=(buff.avenging_wrath.remains<15|(time>10|(cooldown.avenging_wrath.remains>15))&(cooldown.avengers_shield.remains&cooldown.judgment.remains&cooldown.hammer_of_wrath.remains))
@@ -149,7 +151,7 @@ local function Cooldowns()
   end
   -- divine_toll,if=spell_targets.shield_of_the_righteous>=3
   if CDsON() and S.DivineToll:IsCastable() and (EnemiesCount8y >= 3) then
-    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature) then return "divine_toll cooldowns 12"; end
+    if Cast(S.DivineToll, nil, Settings.CommonsDS.DisplayStyle.Signature) then return "divine_toll cooldowns 12"; end
   end
   -- bastion_of_light,if=buff.avenging_wrath.up|cooldown.avenging_wrath.remains<=30
   if S.BastionofLight:IsCastable() and (Player:BuffUp(S.AvengingWrathBuff) or S.AvengingWrath:CooldownRemains() <= 30) then
@@ -159,7 +161,7 @@ local function Cooldowns()
   -- Note: Not handling external buffs.
   -- fireblood,if=buff.avenging_wrath.remains>8
   if S.Fireblood:IsCastable() and (Player:BuffRemains(S.AvengingWrathBuff) > 8) then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cooldowns 16"; end
+    if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood cooldowns 16"; end
   end
 end
 
@@ -183,7 +185,7 @@ local function Standard()
   end
   -- hammer_of_wrath
   if S.HammerofWrath:IsReady() then
-    if Cast(S.HammerofWrath, Settings.Commons.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath standard 10"; end
+    if Cast(S.HammerofWrath, Settings.CommonsOGCD.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath standard 10"; end
   end
   -- judgment,target_if=min:debuff.judgment.remains,if=charges>=2|full_recharge_time<=gcd.max
   if S.Judgment:IsReady() and (S.Judgment:Charges() >= 2 or S.Judgment:FullRechargeTime() <= Player:GCD() + 0.25) then
@@ -195,7 +197,7 @@ local function Standard()
   end
   -- divine_toll,if=(!raid_event.adds.exists|raid_event.adds.in>10)
   if CDsON() and S.DivineToll:IsReady() then
-    if Cast(S.DivineToll, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll standard 16"; end
+    if Cast(S.DivineToll, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "divine_toll standard 16"; end
   end
   -- avengers_shield
   if S.AvengersShield:IsCastable() then
@@ -247,7 +249,7 @@ local function Standard()
   end
   -- arcane_torrent,if=holy_power<5
   if CDsON() and S.ArcaneTorrent:IsCastable() and (Player:HolyPower() < 5) then
-    if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent standard 40"; end
+    if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent standard 40"; end
   end
   -- consecration,if=!buff.sanctification_empower.up
   if S.Consecration:IsCastable() and (Player:BuffDown(S.SanctificationEmpowerBuff)) then
@@ -263,8 +265,8 @@ local function Trinkets()
   if Player:BuffUp(S.AvengingWrathBuff) or FightRemains <= 40 then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
-      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
       if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
         if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
       end
@@ -303,7 +305,7 @@ local function APL()
     end
     -- auto_attack
     -- Interrupts
-    local ShouldReturn = Everyone.Interrupt(S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Rebuke, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- Manually added: Defensives!
     if IsTanking then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end

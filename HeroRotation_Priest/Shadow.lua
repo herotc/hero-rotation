@@ -64,6 +64,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Priest.Commons,
+  CommonsDS = HR.GUISettings.APL.Priest.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Priest.CommonsOGCD,
   Shadow = HR.GUISettings.APL.Priest.Shadow
 }
 
@@ -282,7 +284,7 @@ local function Precombat()
   -- snapshot_stats
   -- Manually added: Group buff check
   if S.PowerWordFortitude:IsCastable() and Everyone.GroupBuffMissing(S.PowerWordFortitudeBuff) then
-    if Cast(S.PowerWordFortitude, Settings.Commons.GCDasOffGCD.PowerWordFortitude) then return "power_word_fortitude precombat 2"; end
+    if Cast(S.PowerWordFortitude, Settings.CommonsOGCD.GCDasOffGCD.PowerWordFortitude) then return "power_word_fortitude precombat 2"; end
   end
   -- shadowform,if=!buff.shadowform.up
   if S.Shadowform:IsCastable() and (Player:BuffDown(S.ShadowformBuff)) then
@@ -332,67 +334,67 @@ end
 local function Trinkets()
   -- use_item,name=voidmenders_shadowgem,if=(buff.power_infusion.up|fight_remains<20)&equipped.voidmenders_shadowgem
   if Settings.Commons.Enabled.Trinkets and I.VoidmendersShadowgem:IsEquippedAndReady() and (Player:PowerInfusionUp() or FightRemains < 20) then
-    if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem trinkets 2"; end
+    if Cast(I.VoidmendersShadowgem, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "voidmenders_shadowgem trinkets 2"; end
   end
   if Settings.Commons.Enabled.Items then
     -- use_item,name=iridal_the_earths_master,use_off_gcd=1,if=gcd.remains>0|fight_remains<20
     if I.Iridal:IsEquippedAndReady() then
-      if Cast(I.Iridal, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master trinkets 4"; end
+      if Cast(I.Iridal, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master trinkets 4"; end
     end
     -- use_item,name=dreambinder_loom_of_the_great_cycle,use_off_gcd=1,if=gcd.remains>0|fight_remains<20
     if I.Dreambinder:IsEquippedAndReady() then
-      if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder trinkets 6"; end
+      if Cast(I.Dreambinder, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder trinkets 6"; end
     end
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=darkmoon_deck_box_inferno,if=equipped.darkmoon_deck_box_inferno
     if I.DMDInferno:IsEquippedAndReady() then
-      if Cast(I.DMDInferno, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_inferno trinkets 8"; end
+      if Cast(I.DMDInferno, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "dmd_inferno trinkets 8"; end
     end
     if I.DMDInfernoBox:IsEquippedAndReady() then
-      if Cast(I.DMDInfernoBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_inferno_box trinkets 10"; end
+      if Cast(I.DMDInfernoBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "dmd_inferno_box trinkets 10"; end
     end
     -- use_item,name=darkmoon_deck_box_rime,if=equipped.darkmoon_deck_box_rime
     if I.DMDRime:IsEquippedAndReady() then
-      if Cast(I.DMDRime, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_rime trinkets 12"; end
+      if Cast(I.DMDRime, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "dmd_rime trinkets 12"; end
     end
     if I.DMDRimeBox:IsEquippedAndReady() then
-      if Cast(I.DMDRimeBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_rime_box trinkets 14"; end
+      if Cast(I.DMDRimeBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "dmd_rime_box trinkets 14"; end
     end
     -- use_item,name=darkmoon_deck_box_dance,if=equipped.darkmoon_deck_box_dance
     if I.DMDDance:IsEquippedAndReady() then
-      if Cast(I.DMDDance, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_dance trinkets 16"; end
+      if Cast(I.DMDDance, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "dmd_dance trinkets 16"; end
     end
     if I.DMDDanceBox:IsEquippedAndReady() then
-      if Cast(I.DMDDanceBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "dmd_dance_box trinkets 18"; end
+      if Cast(I.DMDDanceBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "dmd_dance_box trinkets 18"; end
     end
     -- use_item,name=conjured_chillglobe
     if I.ConjuredChillglobe:IsEquippedAndReady() then
-      if Cast(I.ConjuredChillglobe, nil, Settings.Commons.DisplayStyle.Trinkets) then return "conjured_chillglobe trinkets 20"; end
+      if Cast(I.ConjuredChillglobe, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "conjured_chillglobe trinkets 20"; end
     end
     -- use_item,name=iceblood_deathsnare,if=(!raid_event.adds.exists|raid_event.adds.up|spell_targets.iceblood_deathsnare>=5)|fight_remains<20
     if I.IcebloodDeathsnare:IsEquippedAndReady() then
-      if Cast(I.IcebloodDeathsnare, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "iceblood_deathsnare trinkets 22"; end
+      if Cast(I.IcebloodDeathsnare, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "iceblood_deathsnare trinkets 22"; end
     end
     -- use_item,name=erupting_spear_fragment,if=(buff.power_infusion.up|raid_event.adds.up|fight_remains<20)&equipped.erupting_spear_fragment
     if I.EruptingSpearFragment:IsEquippedAndReady() and (Player:PowerInfusionUp() or FightRemains < 20) then
-      if Cast(I.EruptingSpearFragment, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment trinkets 24"; end
+      if Cast(I.EruptingSpearFragment, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment trinkets 24"; end
     end
     -- use_item,name=belorrelos_the_suncaller,if=(!raid_event.adds.exists|raid_event.adds.up|spell_targets.belorrelos_the_suncaller>=5|fight_remains<20)&equipped.belorrelos_the_suncaller
     if I.BelorrelostheSuncaller:IsEquippedAndReady() then
-      if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller trinkets 26"; end
+      if Cast(I.BelorrelostheSuncaller, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller trinkets 26"; end
     end
     -- use_item,name=beacon_to_the_beyond,if=(!raid_event.adds.exists|raid_event.adds.up|spell_targets.beacon_to_the_beyond>=5|fight_remains<20)&equipped.beacon_to_the_beyond
     if I.BeacontotheBeyond:IsEquippedAndReady() then
-      if Cast(I.BeacontotheBeyond, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond trinkets 28"; end
+      if Cast(I.BeacontotheBeyond, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond trinkets 28"; end
     end
   end
   -- use_items,if=buff.voidform.up|buff.power_infusion.up|buff.dark_ascension.up|(cooldown.void_eruption.remains>10&trinket.cooldown.duration<=60)|fight_remains<20
   if (Player:BuffUp(S.VoidformBuff) or Player:PowerInfusionUp() or Player:BuffUp(S.DarkAscensionBuff) or FightRemains < 20) then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
-      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
       if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
         if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 30"; end
       end
@@ -400,7 +402,7 @@ local function Trinkets()
   end
   -- use_item,name=desperate_invokers_codex,if=equipped.desperate_invokers_codex
   if Settings.Commons.Enabled.Trinkets and I.DesperateInvokersCodex:IsEquippedAndReady() then
-    if Cast(I.DesperateInvokersCodex, nil, Settings.Commons.DisplayStyle.Trinkets) then return "desperate_invokers_codex trinkets 32"; end
+    if Cast(I.DesperateInvokersCodex, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "desperate_invokers_codex trinkets 32"; end
   end
 end
 
@@ -410,28 +412,28 @@ local function CDs()
   if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.VoidformBuff) or Player:PowerInfusionUp() or Player:BuffUp(S.DarkAscensionBuff) and (FightRemains <= S.PowerInfusion:CooldownRemains() + 15) or BossFightRemains <= 30) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 2"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion cds 2"; end
     end
   end
   -- fireblood,if=buff.power_infusion.up|fight_remains<=8
   if S.Fireblood:IsCastable() and (Player:PowerInfusionUp() or FightRemains <= 8) then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 4"; end
+    if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood cds 4"; end
   end
   -- berserking,if=buff.power_infusion.up|fight_remains<=12
   if S.Berserking:IsCastable() and (Player:PowerInfusionUp() or FightRemains <= 12) then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 6"; end
+    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking cds 6"; end
   end
   -- blood_fury,if=buff.power_infusion.up|fight_remains<=15
   if S.BloodFury:IsCastable() and (Player:PowerInfusionUp() or FightRemains <= 15) then
-    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 8"; end
+    if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury cds 8"; end
   end
   -- ancestral_call,if=buff.power_infusion.up|fight_remains<=15
   if S.AncestralCall:IsCastable() and (Player:PowerInfusionUp() or FightRemains <= 15) then
-    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cds 10"; end
+    if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call cds 10"; end
   end
   -- use_item,name=nymues_unraveling_spindle,if=variable.dots_up&(fight_remains<30|target.time_to_die>15)&(!talent.dark_ascension|cooldown.dark_ascension.remains<3+gcd.max|fight_remains<15)
   if Settings.Commons.Enabled.Trinkets and I.NymuesUnravelingSpindle:IsEquippedAndReady() and (VarDotsUp and (FightRemains < 30 or Target:TimeToDie() > 15) and (not S.DarkAscension:IsAvailable() or S.DarkAscension:CooldownRemains() < 3 + GCDMax or FightRemains < 15)) then
-    if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle cds 12"; end
+    if Cast(I.NymuesUnravelingSpindle, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle cds 12"; end
   end
   -- power_infusion,if=(buff.voidform.up|buff.dark_ascension.up)
   if S.PowerInfusion:IsCastable() and Settings.Shadow.SelfPI and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscension)) then
@@ -508,7 +510,7 @@ local function Filler()
   end
   -- mindgames,target_if=max:dot.devouring_plague.remains
   if S.Mindgames:IsReady() then
-    if Everyone.CastTargetIf(S.Mindgames, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Signature) then return "mindgames filler 10"; end
+    if Everyone.CastTargetIf(S.Mindgames, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsInRange(40), nil, Settings.CommonsDS.DisplayStyle.Signature) then return "mindgames filler 10"; end
   end
   -- devouring_plague,if=buff.voidform.up|cooldown.dark_ascension.up|buff.mind_devourer.up
   if S.DevouringPlague:IsReady() and (Player:BuffUp(S.VoidformBuff) or S.DarkAscension:CooldownUp() or Player:BuffUp(S.MindDevourerBuff)) then
@@ -766,7 +768,7 @@ local function APL()
       if Cast(S.Dispersion, Settings.Shadow.OffGCDasOffGCD.Dispersion) then return "dispersion low_hp"; end
     end
     -- Interrupts
-    local ShouldReturn = Everyone.Interrupt(S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false);
+    local ShouldReturn = Everyone.Interrupt(S.Silence, Settings.CommonsDS.DisplayStyle.Interrupts);
     if ShouldReturn then return ShouldReturn; end
     -- variable,name=holding_crash,op=set,value=raid_event.adds.in<15
     -- Note: We have no way of knowing if adds are coming, so don't ever purposely hold crash

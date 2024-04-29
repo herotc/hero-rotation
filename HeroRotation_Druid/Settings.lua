@@ -22,12 +22,19 @@ HR.GUISettings.APL.Druid = {
       Trinkets = true,
       Items = true,
     },
+  },
+  CommonsDS = {
     DisplayStyle = {
-      Potions = "Suggested",
-      Trinkets = "Suggested",
-      Signature = "Suggested",
+      -- Common
+      Interrupts = "Cooldown",
       Items = "Suggested",
+      Potions = "Suggested",
+      Signature = "Suggested",
+      Trinkets = "Suggested",
+      -- Class Specific
     },
+  },
+  CommonsOGCD = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -81,7 +88,6 @@ HR.GUISettings.APL.Druid = {
     },
     OffGCDasOffGCD = {
       NaturesVigil = true,
-      SkullBash = true,
       TigersFury = true,
     }
   },
@@ -107,7 +113,6 @@ HR.GUISettings.APL.Druid = {
     OffGCDasOffGCD = {
       Berserk = true,
       Incarnation = true,
-      SkullBash = true,
     }
   },
   Restoration = {
@@ -127,13 +132,17 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Child Panels
 local ARPanel = HR.GUI.Panel
 local CP_Druid = CreateChildPanel(ARPanel, "Druid")
+local CP_DruidDS = CreateChildPanel(CP_Druid, "Class DisplayStyles")
+local CP_DruidOGCD = CreateChildPanel(CP_Druid, "Class OffGCDs")
 local CP_Balance = CreateChildPanel(CP_Druid, "Balance")
 local CP_Feral = CreateChildPanel(CP_Druid, "Feral")
 local CP_Guardian = CreateChildPanel(CP_Druid, "Guardian")
-local CP_Restoration = CreateChildPanel(CP_Druid, "Restoration")
+--local CP_Restoration = CreateChildPanel(CP_Druid, "Restoration")
 
 -- Druid
 CreateARPanelOptions(CP_Druid, "APL.Druid.Commons")
+CreateARPanelOptions(CP_DruidDS, "APL.Druid.CommonsDS")
+CreateARPanelOptions(CP_DruidOGCD, "APL.Druid.CommonsOGCD")
 
 -- Balance
 CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMoonkinFormOOC", "Show Moonkin Form Out of Combat", "Enable this option if you want the addon to show you the Moonkin Form reminder out of combat.")
@@ -161,4 +170,4 @@ CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.SurvivalInstinctsHP
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.BristlingFurRage", {0, 100, 1}, "Bristling Fur Threshold", "Set the Rage threshold of when to use Bristling Fur.")
 
 -- Restoration
-CreateARPanelOptions(CP_Restoration, "APL.Druid.Restoration")
+--CreateARPanelOptions(CP_Restoration, "APL.Druid.Restoration")

@@ -23,19 +23,25 @@ HR.GUISettings.APL.Warlock = {
       Trinkets = true,
       Items = true,
     },
+  },
+  CommonsDS = {
     DisplayStyle = {
-      Potions = "Suggested",
-      Trinkets = "Suggested",
+      -- Common
+      Interrupts = "Cooldown",
       Items = "Suggested",
+      Potions = "Suggested",
       Signature = "Suggested",
+      Trinkets = "Suggested",
+      -- Class Specific
     },
+  },
+  CommonsOGCD = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       Racials = true,
-      SpellLock = true,
     }
   },
   Affliction = {
@@ -110,12 +116,16 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Child Panels
 local ARPanel = HR.GUI.Panel
 local CP_Warlock = CreateChildPanel(ARPanel, "Warlock")
+local CP_WarlockDS = CreateChildPanel(CP_Warlock, "Class DisplayStyles")
+local CP_WarlockOGCD = CreateChildPanel(CP_Warlock, "Class OffGCDs")
 local CP_Demonology = CreateChildPanel(CP_Warlock, "Demonology")
 local CP_Affliction = CreateChildPanel(CP_Warlock, "Affliction")
 local CP_Destruction = CreateChildPanel(CP_Warlock, "Destruction")
 
 -- Warlock
 CreateARPanelOptions(CP_Warlock, "APL.Warlock.Commons")
+CreateARPanelOptions(CP_WarlockDS, "APL.Warlock.CommonsDS")
+CreateARPanelOptions(CP_WarlockOGCD, "APL.Warlock.CommonsOGCD")
 
 -- Affliction
 CreateARPanelOptions(CP_Affliction, "APL.Warlock.Affliction")

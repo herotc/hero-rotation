@@ -24,12 +24,19 @@ HR.GUISettings.APL.Mage = {
       Trinkets = true,
       Items = true,
     },
+  },
+  CommonsDS = {
     DisplayStyle = {
-      Potions = "Suggested",
-      Trinkets = "Suggested",
+      -- Common
+      Interrupts = "Cooldown",
       Items = "Suggested",
+      Potions = "Suggested",
       Signature = "Suggested",
+      Trinkets = "Suggested",
+      -- Class Specific
     },
+  },
+  CommonsOGCD = {
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
@@ -41,7 +48,6 @@ HR.GUISettings.APL.Mage = {
       Racials = true,
       -- Abilities
       TimeWarp = true,
-      Counterspell = true,
     }
   },
   Arcane = {
@@ -123,6 +129,8 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Child Panels
 local ARPanel = HR.GUI.Panel
 local CP_Mage = CreateChildPanel(ARPanel, "Mage")
+local CP_MageDS = CreateChildPanel(CP_Mage, "Class DisplayStyles")
+local CP_MageOGCD = CreateChildPanel(CP_Mage, "Class OffGCDs")
 local CP_Arcane = CreateChildPanel(CP_Mage, "Arcane")
 local CP_Fire = CreateChildPanel(CP_Mage, "Fire")
 local CP_Frost = CreateChildPanel(CP_Mage, "Frost")
@@ -132,6 +140,8 @@ local CP_Frost = CreateChildPanel(CP_Mage, "Frost")
 CreateARPanelOptions(CP_Mage, "APL.Mage.Commons")
 CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTemporalWarp", "Suggest Time Warp with Temporal Warp", "Show Time Warp when the Temporal Warp talent is selected.")
 CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.MovingRotation", "Disable non-instant casts while moving", "Don't show abilities where a cast is needed (makes the rotation a bit clunky with small steps).")
+CreateARPanelOptions(CP_MageDS, "APL.Mage.CommonsDS")
+CreateARPanelOptions(CP_MageOGCD, "APL.Mage.CommonsOGCD")
 
 -- Arcane
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AEMainIcon", "Show Arcane Explosion in Main Icon", "Enable this to show Arcane Explosion in the main icon. When not enabled, Arcane Explosion will be shown in the left icon.")

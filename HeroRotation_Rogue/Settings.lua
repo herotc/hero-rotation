@@ -23,13 +23,27 @@ HR.GUISettings.APL.Rogue = {
       Trinkets = true,
       Items = true,
     },
+    ShowStealthOOC = true,
+    ShowPoisonOOC = true,
+    CrimsonVialHP = 30,
+    RangedMultiDoT = true, -- Suggest Multi-DoT at 10y Range
+    UseSoloVanish = false, -- don't vanish while solo
+    UseDPSVanish = true, -- allow the use of vanish for dps (checking for if you're solo)
+    ShowPooling = true,
+  },
+  CommonsDS = {
     DisplayStyle = {
+      -- Common
+      Interrupts = "Cooldown",
+      Items = "Suggested",
       Potions = "Suggested",
       Signature = "Suggested",
       Trinkets = "Suggested",
-      Items = "Suggested",
+      -- Class Specific
       Stealth = "Main Icon",
     },
+  },
+  CommonsOGCD = {
     GCDasOffGCD = {
       EchoingReprimand = true,
       CrimsonVial = true,
@@ -42,15 +56,6 @@ HR.GUISettings.APL.Rogue = {
       ThistleTea = true,
       ColdBlood = true,
     }
-  },
-  Commons2 = {
-    ShowStealthOOC = true,
-    ShowPoisonOOC = true,
-    CrimsonVialHP = 30,
-    RangedMultiDoT = true, -- Suggest Multi-DoT at 10y Range
-    UseSoloVanish = false, -- don't vanish while solo
-    UseDPSVanish = true, -- allow the use of vanish for dps (checking for if you're solo)
-    ShowPooling = true,
   },
   Assassination = {
     EnvenomDMGOffset = 3,
@@ -117,31 +122,36 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Child Panels
 local ARPanel = HR.GUI.Panel
 local CP_Rogue = CreateChildPanel(ARPanel, "Rogue")
-local CP_Rogue2 = CreateChildPanel(ARPanel, "Rogue 2")
-local CP_Assassination = CreateChildPanel(ARPanel, "Assassination")
-local CP_Outlaw = CreateChildPanel(ARPanel, "Outlaw")
-local CP_Subtlety = CreateChildPanel(ARPanel, "Subtlety")
+local CP_RogueDS = CreateChildPanel(CP_Rogue, "Class DisplayStyles")
+local CP_RogueOGCD = CreateChildPanel(CP_Rogue, "Class OffGCDs")
+local CP_Assassination = CreateChildPanel(CP_Rogue, "Assassination")
+local CP_Outlaw = CreateChildPanel(CP_Rogue, "Outlaw")
+local CP_Subtlety = CreateChildPanel(CP_Rogue, "Subtlety")
+
 -- Controls
 -- Rogue
 CreateARPanelOptions(CP_Rogue, "APL.Rogue.Commons")
--- Rogue 2
-CreatePanelOption("Slider", CP_Rogue2, "APL.Rogue.Commons2.CrimsonVialHP", {0, 100, 1}, "Crimson Vial HP", "Set the Crimson Vial HP threshold.")
-CreatePanelOption("CheckButton", CP_Rogue2, "APL.Rogue.Commons2.ShowStealthOOC", "Stealth While OOC", "Suggest Stealth while out of combat.")
-CreatePanelOption("CheckButton", CP_Rogue2, "APL.Rogue.Commons2.ShowPoisonOOC", "Poisons While OOC", "Suggest Poisons while out of combat.")
-CreatePanelOption("CheckButton", CP_Rogue2, "APL.Rogue.Commons2.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.")
-CreatePanelOption("CheckButton", CP_Rogue2, "APL.Rogue.Commons2.UseDPSVanish", "Use Vanish for DPS", "Suggest Vanish for DPS.\nDisable to save Vanish for utility purposes.")
-CreatePanelOption("CheckButton", CP_Rogue2, "APL.Rogue.Commons2.UseSoloVanish", "Use Vanish while Solo", "Suggest Vanish while Solo.\nDisable to save prevent mobs resetting.")
-CreatePanelOption("CheckButton", CP_Rogue2, "APL.Rogue.Commons2.ShowPooling", "Show Pooling Icon", "Show pooling icon instead of pooling prediction.")
-CreateARPanelOptions(CP_Rogue2, "APL.Rogue.Commons2")
+CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.CrimsonVialHP", {0, 100, 1}, "Crimson Vial HP", "Set the Crimson Vial HP threshold.")
+CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.ShowStealthOOC", "Stealth While OOC", "Suggest Stealth while out of combat.")
+CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.ShowPoisonOOC", "Poisons While OOC", "Suggest Poisons while out of combat.")
+CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.")
+CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.UseDPSVanish", "Use Vanish for DPS", "Suggest Vanish for DPS.\nDisable to save Vanish for utility purposes.")
+CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.UseSoloVanish", "Use Vanish while Solo", "Suggest Vanish while Solo.\nDisable to save prevent mobs resetting.")
+CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.ShowPooling", "Show Pooling Icon", "Show pooling icon instead of pooling prediction.")
+CreateARPanelOptions(CP_RogueDS, "APL.Rogue.CommonsDS")
+CreateARPanelOptions(CP_RogueOGCD, "APL.Rogue.CommonsOGCD")
+
 -- Assassination
 CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.EnvenomDMGOffset", {1, 5, 0.25}, "Envenom DMG Offset", "Set the Envenom DMG Offset.")
 CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateDMGOffset", {1, 5, 0.25}, "Mutilate DMG Offset", "Set the Mutilate DMG Offset.")
 CreatePanelOption("Dropdown", CP_Assassination, "APL.Rogue.Assassination.UsePriorityRotation", {"Never", "On Bosses", "Always", "Auto"}, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall AoE damage.)\nAuto will function as Never except on specific encounters where AoE is not recommended.")
 CreateARPanelOptions(CP_Assassination, "APL.Rogue.Assassination")
+
 -- Outlaw
 CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLogic", {"SimC", "1+ Buff", "Broadside", "Buried Treasure", "Grand Melee", "Skull and Crossbones", "Ruthless Precision", "True Bearing"}, "Roll the Bones Logic", "Define the Roll the Bones logic to follow.\n(SimC highly recommended!)")
 CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.KillingSpreeDisplayStyle", {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Killing Spree Display Style", "Define which icon display style to use for Killing Spree.")
 CreateARPanelOptions(CP_Outlaw, "APL.Rogue.Outlaw")
+
 -- Subtlety
 CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.EviscerateDMGOffset", {1, 5, 0.25}, "Eviscerate Damage Offset", "Set the Eviscerate Damage Offset, used to compute the rupture threshold.")
 CreatePanelOption("Dropdown", CP_Subtlety, "APL.Rogue.Subtlety.UsePriorityRotation", {"Never", "On Bosses", "Always", "Auto"}, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall AoE damage.)\nAuto will function as Never except on specific encounters where AoE is not recommended.")

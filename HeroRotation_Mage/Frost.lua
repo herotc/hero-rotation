@@ -59,6 +59,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Mage.Commons,
+  CommonsDS = HR.GUISettings.APL.Mage.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Mage.CommonsOGCD,
   Frost = HR.GUISettings.APL.Mage.Frost
 }
 
@@ -124,7 +126,7 @@ local function Precombat()
   -- augmentation
   -- arcane_intellect
   if S.ArcaneIntellect:IsCastable() and Everyone.GroupBuffMissing(S.ArcaneIntellect) then
-    if Cast(S.ArcaneIntellect, Settings.Commons.GCDasOffGCD.ArcaneIntellect) then return "arcane_intellect precombat 2"; end
+    if Cast(S.ArcaneIntellect, Settings.CommonsOGCD.GCDasOffGCD.ArcaneIntellect) then return "arcane_intellect precombat 2"; end
   end
   -- snapshot_stats
   -- blizzard,if=active_enemies>=2&talent.ice_caller|active_enemies>=3
@@ -139,31 +141,31 @@ local function Cooldowns()
   -- time_warp,if=buff.exhaustion.up&talent.temporal_warp&buff.bloodlust.down&(prev_off_gcd.icy_veins|(buff.icy_veins.up&fight_remains<=110|buff.icy_veins.up&fight_remains>=280)|fight_remains<40)
   -- Note: Keeping this as TemporalWarp time_warp, as we won't suggest time_warp otherwise.
   if Settings.Commons.UseTemporalWarp and S.TimeWarp:IsCastable() and (Player:BloodlustExhaustUp() and S.TemporalWarp:IsAvailable() and Player:BloodlustDown() and (Player:PrevOffGCDP(1, S.IcyVeins) or (Player:BuffUp(S.IcyVeinsBuff) and FightRemains <= 110 or Player:BuffUp(S.IcyVeinsBuff) and FightRemains >= 280) or FightRemains < 40)) then
-    if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 2"; end
+    if Cast(S.TimeWarp, Settings.CommonsOGCD.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 2"; end
   end
   -- use_item,name=spoils_of_neltharus,if=buff.spoils_of_neltharus_mastery.up|buff.spoils_of_neltharus_haste.up&buff.bloodlust.down&buff.temporal_warp.down&time>0|buff.spoils_of_neltharus_vers.up&(buff.bloodlust.up|buff.temporal_warp.up)
   if I.SpoilsofNeltharus:IsEquippedAndReady() and (Player:BuffUp(S.SpoilsofNeltharusMastery) or Player:BuffUp(S.SpoilsofNeltharusHaste) and Player:BloodlustDown() and Player:BuffDown(S.TemporalWarpBuff) or Player:BuffUp(S.SpoilsofNeltharusVers) and (Player:BloodlustUp() or Player:BuffUp(S.TemporalWarpBuff))) then
-    if Cast(I.SpoilsofNeltharus, nil, Settings.Commons.DisplayStyle.Trinkets) then return "spoils_of_neltharus cd 4"; end
+    if Cast(I.SpoilsofNeltharus, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spoils_of_neltharus cd 4"; end
   end
   -- potion,if=prev_off_gcd.icy_veins|fight_remains<60
   if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.IcyVeinsBuff) or FightRemains < 60) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cd 6"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion cd 6"; end
     end
   end
   -- use_item,name=dreambinder_loom_of_the_great_cycle,if=(equipped.nymues_unraveling_spindle&prev_gcd.1.nymues_unraveling_spindle)|fight_remains>2
   if Settings.Commons.Enabled.Items and I.Dreambinder:IsEquippedAndReady() and ((I.NymuesUnravelingSpindle:IsEquipped() and Player:PrevGCDP(1, I.NymuesUnravelingSpindle)) or FightRemains > 2) then
-    if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle cd 8"; end
+    if Cast(I.Dreambinder, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle cd 8"; end
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=belorrelos_the_suncaller,if=time>5&!prev_gcd.1.flurry
     if I.BelorrelostheSuncaller:IsEquippedAndReady() and (HL.CombatTime() > 5 and not Player:PrevGCDP(1, S.Flurry)) then
-      if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller cd 10"; end
+      if Cast(I.BelorrelostheSuncaller, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller cd 10"; end
     end
     -- use_item,name=balefire_branch,if=(!talent.ray_of_frost&active_enemies<=2&buff.icy_veins.up&prev_gcd.1.glacial_spike|remaining_winters_chill=1&cooldown.ray_of_frost.up&time>1&active_enemies<=2|cooldown.cone_of_cold.up&prev_gcd.1.comet_storm&active_enemies>=3)|fight_remains<20
     if I.BalefireBranch:IsEquippedAndReady() and ((not S.RayofFrost:IsAvailable() and EnemiesCount16ySplash <= 2 and Player:BuffUp(S.IcyVeinsBuff) and Player:PrevGCDP(1, S.GlacialSpike) or RemainingWintersChill == 1 and S.RayofFrost:CooldownUp() and HL.CombatTime() > 1 and EnemiesCount16ySplash <= 2 or S.ConeofCold:CooldownUp() and Player:PrevGCDP(1, S.CometStorm) and EnemiesCount16ySplash >= 3) or FightRemains < 20) then
-      if Cast(I.BalefireBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "balefire_branch cd 12"; end
+      if Cast(I.BalefireBranch, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "balefire_branch cd 12"; end
     end
   end
   -- flurry,if=time=0&active_enemies<=2
@@ -176,8 +178,8 @@ local function Cooldowns()
   if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) and (not I.BalefireBranch:IsEquipped() or HL.CombatTime() > 5) then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
-      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
       if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
         if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
       end
@@ -188,23 +190,23 @@ local function Cooldowns()
   -- Note: Not handling external buffs.
   -- blood_fury
   if S.BloodFury:IsCastable() then
-    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cd 16"; end
+    if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury cd 16"; end
   end
   -- berserking
   if S.Berserking:IsCastable() then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cd 18"; end
+    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking cd 18"; end
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cd 20"; end
+    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cd 20"; end
   end
   -- fireblood
   if S.Fireblood:IsCastable() then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cd 22"; end
+    if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood cd 22"; end
   end
   -- ancestral_call
   if S.AncestralCall:IsCastable() then
-    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cd 24"; end
+    if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call cd 24"; end
   end
 end
 
@@ -269,7 +271,7 @@ local function Aoe()
   end
   -- shifting_power
   if S.ShiftingPower:IsCastable() and CDsON() then
-    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power aoe 18"; end
+    if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power aoe 18"; end
   end
   -- glacial_spike,if=buff.icicles.react=5&cooldown.blizzard.remains>gcd.max
   if S.GlacialSpike:IsReady() and (Icicles == 5 and S.Blizzard:CooldownRemains() > GCDMax) then
@@ -349,7 +351,7 @@ local function Cleave()
   end
   -- shifting_power,if=cooldown.frozen_orb.remains>10&(!talent.comet_storm|cooldown.comet_storm.remains>10)&(!talent.ray_of_frost|cooldown.ray_of_frost.remains>10)|cooldown.icy_veins.remains<20
   if S.ShiftingPower:IsCastable() and (S.FrozenOrb:CooldownRemains() > 10 and (not S.CometStorm:IsAvailable() or S.CometStorm:CooldownRemains() > 10) and (not S.RayofFrost:IsAvailable() or S.RayofFrost:CooldownRemains() > 10) or S.IcyVeins:CooldownRemains() < 20) then
-    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power cleave 18"; end
+    if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power cleave 18"; end
   end
   -- glacial_spike,if=buff.icicles.react=5
   if S.GlacialSpike:IsReady() and (Icicles == 5) then
@@ -409,7 +411,7 @@ local function ST()
   end
   -- shifting_power,if=cooldown.frozen_orb.remains>10&(!talent.comet_storm|cooldown.comet_storm.remains>10)&(!talent.ray_of_frost|cooldown.ray_of_frost.remains>10)|cooldown.icy_veins.remains<20
   if S.ShiftingPower:IsCastable() and (S.FrozenOrb:CooldownRemains() > 10 and (not S.CometStorm:IsAvailable() or S.CometStorm:CooldownRemains() > 10) and (not S.RayofFrost:IsAvailable() or S.RayofFrost:CooldownRemains() > 10) or S.IcyVeins:CooldownRemains() < 20) then
-    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power single 18"; end
+    if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power single 18"; end
   end
   -- glacial_spike,if=buff.icicles.react=5
   if S.GlacialSpike:IsCastable() and (Icicles == 5) then
@@ -476,7 +478,7 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- counterspell
-    local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.CommonsDS.DisplayStyle.Interrupts, false); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=cds
     if CDsON() then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end

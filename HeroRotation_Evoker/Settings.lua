@@ -24,13 +24,20 @@ HR.GUISettings.APL.Evoker = {
       Trinkets = true,
       Items = true,
     },
+  },
+  CommonsDS = {
     DisplayStyle = {
-      Defensives = "Suggested",
+      -- Common
+      Interrupts = "Cooldown",
+      Items = "Suggested",
       Potions = "Suggested",
       Signature = "Suggested",
       Trinkets = "Suggested",
-      Items = "Suggested",
+      -- Class Specific
+      Defensives = "Suggested",
     },
+  },
+  CommonsOGCD = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -82,6 +89,8 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Child Panels
 local ARPanel = HR.GUI.Panel
 local CP_Evoker = CreateChildPanel(ARPanel, "Evoker")
+local CP_EvokerDS = CreateChildPanel(CP_Evoker, "Class DisplayStyles")
+local CP_EvokerOGCD = CreateChildPanel(CP_Evoker, "Class OffGCDs")
 local CP_Augmentation = CreateChildPanel(CP_Evoker, "Augmentation")
 local CP_Devastation = CreateChildPanel(CP_Evoker, "Devastation")
 
@@ -89,6 +98,8 @@ local CP_Devastation = CreateChildPanel(CP_Evoker, "Devastation")
 CreateARPanelOptions(CP_Evoker, "APL.Evoker.Commons")
 CreatePanelOption("Slider", CP_Evoker, "APL.Evoker.Commons.EmpoweredFontSize", {1, 100, 1}, "Empowered Spell Font Size", "Select the font size to use for the overlay on your empowered spell casts (Fire Breath/Eternity Surge). This value scales with the addon's 'UI' scale.")
 CreatePanelOption("Slider", CP_Evoker, "APL.Evoker.Commons.DisintegrateFontSize", {1, 100, 1}, "Other Annotated Spell Font Size", "Select the font size to use for the overlay on your spell casts that show 'CLIP', 'CHAIN', or 'NO CHAIN'. This value scales with the addon's 'UI' scale.")
+CreateARPanelOptions(CP_EvokerDS, "APL.Evoker.CommonsDS")
+CreateARPanelOptions(CP_EvokerOGCD, "APL.Evoker.CommonsOGCD")
 
 -- Augmentation
 CreateARPanelOptions(CP_Augmentation, "APL.Evoker.Augmentation")

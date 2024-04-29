@@ -65,9 +65,11 @@ local Stuns = {
 local Everyone = HR.Commons.Everyone
 local Monk = HR.Commons.Monk
 local Settings = {
-  General    = HR.GUISettings.General,
-  Commons    = HR.GUISettings.APL.Monk.Commons,
-  Brewmaster = HR.GUISettings.APL.Monk.Brewmaster
+  General     = HR.GUISettings.General,
+  Commons     = HR.GUISettings.APL.Monk.Commons,
+  CommonsDS   = HR.GUISettings.APL.Monk.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Monk.CommonsOGCD,
+  Brewmaster  = HR.GUISettings.APL.Monk.Brewmaster
 }
 
 local function ShouldPurify()
@@ -147,9 +149,9 @@ local function ItemActions()
   -- use_items
   local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
   if ItemToUse then
-    local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
+    local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
     local IsTrinket = ItemSlot == 13 or ItemSlot == 14
-    if not IsTrinket then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+    if not IsTrinket then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
     if (IsTrinket and Settings.Commons.Enabled.Trinkets) or (not IsTrinket and Settings.Commons.Enabled.Items) then
       if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
     end
@@ -159,27 +161,27 @@ end
 local function RaceActions()
   -- blood_fury
   if S.BloodFury:IsCastable() then
-    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury race_actions 2"; end
+    if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury race_actions 2"; end
   end
   -- berserking
   if S.Berserking:IsCastable() then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking race_actions 4"; end
+    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking race_actions 4"; end
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "lights_judgment race_actions 6"; end
+    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "lights_judgment race_actions 6"; end
   end
   -- fireblood
   if S.Fireblood:IsCastable() then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood race_actions 8"; end
+    if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood race_actions 8"; end
   end
   -- ancestral_call
   if S.AncestralCall:IsCastable() then
-    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call race_actions 10"; end
+    if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call race_actions 10"; end
   end
   -- bag_of_tricks
   if S.BagofTricks:IsCastable() then
-    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks race_actions 12"; end
+    if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks race_actions 12"; end
   end
 end
 
@@ -222,11 +224,11 @@ local function RotationPTA()
   end
   -- summon_white_tiger_statue
   if CDsON() and S.SummonWhiteTigerStatue:IsCastable() then
-    if Cast(S.SummonWhiteTigerStatue, Settings.Commons.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue rotation_pta 18"; end
+    if Cast(S.SummonWhiteTigerStatue, Settings.CommonsOGCD.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue rotation_pta 18"; end
   end
   -- bonedust_brew
   if S.BonedustBrew:IsCastable() then
-    if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "bonedust_brew rotation_pta 20"; end
+    if Cast(S.BonedustBrew, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(40)) then return "bonedust_brew rotation_pta 20"; end
   end
   -- exploding_keg,if=((buff.bonedust_brew.up)|(cooldown.bonedust_brew.remains>=20))
   -- exploding_keg,if=(!talent.bonedust_brew.enabled)
@@ -281,7 +283,7 @@ local function RotationBOC()
   end
   -- weapons_of_order,if=(buff.recent_purifies.up)&talent.improved_invoke_niuzao_the_black_ox.enabled
   if CDsON() and S.WeaponsofOrder:IsCastable() and (RecentPurifiesBuff and S.ImprovedInvokeNiuzao:IsAvailable()) then
-    if Cast(S.WeaponsofOrder, Settings.Commons.DisplayStyle.Signature) then return "weapons_of_order rotation_boc 6"; end
+    if Cast(S.WeaponsofOrder, Settings.CommonsDS.DisplayStyle.Signature) then return "weapons_of_order rotation_boc 6"; end
   end
   -- invoke_niuzao_the_black_ox,if=(buff.invoke_niuzao_the_black_ox.down&buff.recent_purifies.up&buff.weapons_of_order.remains<14)&talent.improved_invoke_niuzao_the_black_ox.enabled
   if CDsON() and S.InvokeNiuzaoTheBlackOx:IsCastable() and ((Player:BuffDown(S.InvokeNiuzaoTheBlackOx) and RecentPurifiesBuff and Player:BuffRemains(S.WeaponsofOrderBuff) < 14) and S.ImprovedInvokeNiuzao:IsAvailable()) then
@@ -297,7 +299,7 @@ local function RotationBOC()
   end
   -- weapons_of_order,if=(talent.weapons_of_order.enabled)&!talent.improved_invoke_niuzao_the_black_ox.enabled
   if CDsON() and S.WeaponsofOrder:IsCastable() and (not S.ImprovedInvokeNiuzao:IsAvailable()) then
-    if Cast(S.WeaponsofOrder, Settings.Commons.DisplayStyle.Signature) then return "weapons_of_order rotation_boc 14"; end
+    if Cast(S.WeaponsofOrder, Settings.CommonsDS.DisplayStyle.Signature) then return "weapons_of_order rotation_boc 14"; end
   end
   -- keg_smash,if=(time-action.weapons_of_order.last_used<2)
   if S.KegSmash:IsReady() and (S.WeaponsofOrder:TimeSinceLastCast() < 2) then
@@ -339,13 +341,13 @@ local function RotationBOC()
   -- summon_white_tiger_statue,if=(!talent.weapons_of_order.enabled)
   -- Note: Combining both lines.
   if CDsON() and S.SummonWhiteTigerStatue:IsCastable() and (Target:DebuffStack(S.WeaponsofOrderDebuff) > 3 or not S.WeaponsofOrder:IsAvailable()) then
-    if Cast(S.SummonWhiteTigerStatue, Settings.Commons.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue rotation_boc 34"; end
+    if Cast(S.SummonWhiteTigerStatue, Settings.CommonsOGCD.GCDasOffGCD.SummonWhiteTigerStatue, nil, not Target:IsInRange(40)) then return "summon_white_tiger_statue rotation_boc 34"; end
   end
   -- bonedust_brew,if=(time<10&debuff.weapons_of_order_debuff.stack>3)|(time>10&talent.weapons_of_order.enabled)
   -- bonedust_brew,if=(!talent.weapons_of_order.enabled)
   -- Note: Combining both lines.
   if S.BonedustBrew:IsCastable() and ((CombatTime < 10 and Target:DebuffStack(S.WeaponsofOrderDebuff) > 3) or (CombatTime > 10 and S.WeaponsofOrder:IsAvailable()) or not S.WeaponsofOrder:IsAvailable()) then
-    if Cast(S.BonedustBrew, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(40)) then return "bonedust_brew rotation_boc 36"; end
+    if Cast(S.BonedustBrew, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(40)) then return "bonedust_brew rotation_boc 36"; end
   end
   -- exploding_keg,if=(buff.bonedust_brew.up)
   -- exploding_keg,if=(cooldown.bonedust_brew.remains>=20)
@@ -424,7 +426,7 @@ local function APL()
     -- chi_torpedo,if=movement.distance>5
     -- Note: Not suggesting movement abilities
     -- spear_hand_strike,if=target.debuff.casting.react
-    local ShouldReturn = Everyone.Interrupt(S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.Interrupts, Stuns); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.SpearHandStrike, Settings.CommonsDS.DisplayStyle.Interrupts, Stuns); if ShouldReturn then return ShouldReturn; end
     -- Manually added: Defensives
     if IsTanking then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
@@ -433,7 +435,7 @@ local function APL()
     if Settings.Commons.Enabled.Potions then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 2"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 2"; end
       end
     end
     -- invoke_external_buff,name=power_infusion,if=buff.weapons_of_order.remains<=20&talent.weapons_of_order.enabled

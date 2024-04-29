@@ -22,15 +22,22 @@ HR.GUISettings.APL.DemonHunter = {
       Trinkets = true,
       Items = true,
     },
+  },
+  CommonsDS = {
     DisplayStyle = {
+      -- Common
+      Interrupts = "Cooldown",
+      Items = "Suggested",
       Potions = "Suggested",
       Signature = "Suggested",
       Trinkets = "Suggested",
-      Items = "Suggested",
+      -- Class Specific
       FelRush = "Suggested",
       Metamorphosis = "Suggested",
       Sigils = "Suggested",
     },
+  },
+  CommonsOGCD = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
     },
@@ -88,11 +95,15 @@ HR.GUISettings.APL.DemonHunter = {
 HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 local ARPanel = HR.GUI.Panel
 local CP_DemonHunter = CreateChildPanel(ARPanel, "DemonHunter")
+local CP_DemonHunterDS = CreateChildPanel(CP_DemonHunter, "Class DisplayStyles")
+local CP_DemonHunterOGCD = CreateChildPanel(CP_DemonHunter, "Class OffGCDs")
 local CP_Havoc = CreateChildPanel(CP_DemonHunter, "Havoc")
 local CP_Vengeance = CreateChildPanel(CP_DemonHunter, "Vengeance")
 
 -- Commons
 CreateARPanelOptions(CP_DemonHunter, "APL.DemonHunter.Commons")
+CreateARPanelOptions(CP_DemonHunterDS, "APL.DemonHunter.CommonsDS")
+CreateARPanelOptions(CP_DemonHunterOGCD, "APL.DemonHunter.CommonsOGCD")
 
 -- Vengeance
 CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.ConserveInfernalStrike", "Conserve Infernal Strike", "Save at least 1 Infernal Strike charge for mobility.")

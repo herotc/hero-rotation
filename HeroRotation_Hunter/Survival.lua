@@ -28,7 +28,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Hunter.Commons,
-  Commons2 = HR.GUISettings.APL.Hunter.Commons2,
+  CommonsDS = HR.GUISettings.APL.Hunter.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Hunter.CommonsOGCD,
   Survival = HR.GUISettings.APL.Hunter.Survival
 }
 
@@ -138,7 +139,7 @@ local function Precombat()
   -- snapshot_stats
   -- use_item,name=algethar_puzzle_box
   if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() then
-    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 2"; end
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 2"; end
   end
   -- steel_trap,precast_time=2
   if S.SteelTrap:IsCastable() and Target:DebuffDown(S.SteelTrapDebuff) then
@@ -161,7 +162,7 @@ end
 local function CDs()
   -- blood_fury,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault
   if S.BloodFury:IsCastable() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or not S.Spearhead:IsAvailable() and not S.CoordinatedAssault:IsAvailable()) then
-    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury cds 2"; end
+    if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury cds 2"; end
   end
   -- harpoon,if=talent.terms_of_engagement.enabled&focus<focus.max
   if S.Harpoon:IsCastable() and (S.TermsofEngagement:IsAvailable() and Player:Focus() < Player:FocusMax()) then
@@ -170,24 +171,24 @@ local function CDs()
   if (Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or not S.Spearhead:IsAvailable() and not S.CoordinatedAssault:IsAvailable()) then
     -- ancestral_call,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault
     if S.AncestralCall:IsCastable() then
-      if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call cds 6"; end
+      if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call cds 6"; end
     end
     -- fireblood,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault
     if S.Fireblood:IsCastable() then
-      if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood cds 8"; end
+      if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood cds 8"; end
     end
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cds 10"; end
+    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cds 10"; end
   end
   -- bag_of_tricks,if=cooldown.kill_command.full_recharge_time>gcd
   if S.BagofTricks:IsCastable() and (S.KillCommand:FullRechargeTime() > Player:GCD()) then
-    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks cds 12"; end
+    if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks cds 12"; end
   end
   -- berserking,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.spearhead&!talent.coordinated_assault|time_to_die<13
   if S.Berserking:IsCastable() and (Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or not S.Spearhead:IsAvailable() and not S.CoordinatedAssault:IsAvailable() or FightRemains < 13) then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cds 14"; end
+    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking cds 14"; end
   end
   -- muzzle
   -- Handled via Interrupt in APL()
@@ -195,18 +196,18 @@ local function CDs()
   if Settings.Commons.Enabled.Potions and (FightRemains < 25 or Player:BuffUp(S.CoordinatedAssaultBuff) or Player:BuffUp(S.SpearheadBuff) or not S.Spearhead:IsAvailable() and not S.CoordinatedAssault:IsAvailable()) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cds 16"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion cds 16"; end
     end
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=algethar_puzzle_box,use_off_gcd=1,if=gcd.remains>gcd.max-0.1
     -- Note: Widened the available window by half a second to account for player reaction.
     if I.AlgetharPuzzleBox:IsEquippedAndReady() and (Player:GCDRemains() > Player:GCD() - 0.6) then
-      if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cds 18"; end
+      if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box cds 18"; end
     end
     -- use_item,name=manic_grieftorch,use_off_gcd=1,if=gcd.remains>gcd.max-0.1&!buff.spearhead.up
     if I.ManicGrieftorch:IsEquippedAndReady() and (Player:GCDRemains() > Player:GCD() - 0.6 and Player:BuffDown(S.SpearheadBuff)) then
-      if Cast(I.ManicGrieftorch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch cds 20"; end
+      if Cast(I.ManicGrieftorch, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "manic_grieftorch cds 20"; end
     end
   end
   if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
@@ -214,8 +215,8 @@ local function CDs()
     if Player:BuffDown(S.SpearheadBuff) then
       local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
       if ItemToUse then
-        local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+        local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
         if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
           if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
         end
@@ -236,7 +237,7 @@ local function Cleave()
   -- death_chakram,if=cooldown.death_chakram.duration=45
   -- Note: Can't get CD duration from death_chakram.
   if S.DeathChakram:IsCastable() then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram cleave 4"; end
+    if Cast(S.DeathChakram, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram cleave 4"; end
   end
   -- wildfire_bomb
   for _, Bomb in pairs(Bombs) do
@@ -254,7 +255,7 @@ local function Cleave()
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
-    if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot cleave 12"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot cleave 12"; end
   end
   -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
   if S.Carve:IsReady() and (S.WildfireBomb:FullRechargeTime() > EnemyCount8ySplash / 2) then
@@ -262,11 +263,11 @@ local function Cleave()
   end
   -- use_item,name=djaruun_pillar_of_the_elder_flame
   if I.Djaruun:IsEquippedAndReady() then
-    if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame cleave 16"; end
+    if Cast(I.Djaruun, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame cleave 16"; end
   end
   -- fury_of_the_eagle,if=raid_event.adds.exists
   if S.FuryoftheEagle:IsCastable() then
-    if Cast(S.FuryoftheEagle, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle cleave 18"; end
+    if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle cleave 18"; end
   end
   -- butchery,if=raid_event.adds.exists
   if S.Butchery:IsReady() then
@@ -278,7 +279,7 @@ local function Cleave()
   end
   -- fury_of_the_eagle,if=!raid_event.adds.exists
   if S.FuryoftheEagle:IsCastable() then
-    if Cast(S.FuryoftheEagle, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle cleave 22"; end
+    if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle cleave 22"; end
   end
   -- carve,if=dot.shrapnel_bomb.ticking
   if S.Carve:IsReady() and (Target:DebuffUp(S.ShrapnelBombDebuff)) then
@@ -314,7 +315,7 @@ local function Cleave()
   end
   -- steel_trap,if=focus+cast_regen<focus.max
   if S.SteelTrap:IsCastable() and (CheckFocusCap(S.SteelTrap:ExecuteTime())) then
-    if Cast(S.SteelTrap, Settings.Commons2.GCDasOffGCD.SteelTrap, nil, not Target:IsInRange(40)) then return "steel_trap cleave 40"; end
+    if Cast(S.SteelTrap, Settings.CommonsOGCD.GCDasOffGCD.SteelTrap, nil, not Target:IsInRange(40)) then return "steel_trap cleave 40"; end
   end
   -- spearhead
   if S.Spearhead:IsCastable() and CDsON() then
@@ -353,7 +354,7 @@ local function ST()
   end
   -- death_chakram,if=focus+cast_regen<focus.max|talent.spearhead&!cooldown.spearhead.remains&cooldown.fury_of_the_eagle.remains|talent.bombardier&!cooldown.fury_of_the_eagle.remains
   if S.DeathChakram:IsCastable() and (CheckFocusCap(S.DeathChakram:ExecuteTime()) or S.Spearhead:IsAvailable() and S.Spearhead:CooldownUp() and S.FuryoftheEagle:CooldownDown() or S.Bombardier:IsAvailable() and S.FuryoftheEagle:CooldownUp()) then
-    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram st 6"; end
+    if Cast(S.DeathChakram, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.DeathChakram)) then return "death_chakram st 6"; end
   end
   -- mongoose_bite,if=prev.fury_of_the_eagle
   if S.MongooseBite:IsReady() and (Player:PrevGCD(1, S.FuryoftheEagle)) then
@@ -361,12 +362,12 @@ local function ST()
   end
   -- use_item,name=djaruun_pillar_of_the_elder_flame,if=!talent.fury_of_the_eagle|talent.spearhead
   if I.Djaruun:IsEquippedAndReady() and (not S.FuryoftheEagle:IsAvailable() or S.Spearhead:IsAvailable()) then
-    if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame st 10"; end
+    if Cast(I.Djaruun, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame st 10"; end
   end
   -- fury_of_the_eagle,interrupt_if=(cooldown.wildfire_bomb.full_recharge_time<gcd&talent.ruthless_marauder|!talent.ruthless_marauder),if=(!raid_event.adds.exists&set_bonus.tier31_2pc|raid_event.adds.exists&raid_event.adds.in>40&set_bonus.tier31_2pc)
   -- Note: Unable to handle raid_event conditions, but both include set_bonus.tier31_2pc.
   if S.FuryoftheEagle:IsCastable() and (Player:HasTier(31, 2)) then
-    if Cast(S.FuryoftheEagle, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle st 12"; end
+    if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle st 12"; end
   end
   -- spearhead,if=focus+action.kill_command.cast_regen>focus.max-10&(cooldown.death_chakram.remains|!talent.death_chakram)
   if S.Spearhead:IsCastable() and CDsON() and (Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) + 21 > Player:FocusMax() - 10 and (S.DeathChakram:CooldownDown() or not S.DeathChakram:IsAvailable())) then
@@ -398,11 +399,11 @@ local function ST()
   end
   -- fury_of_the_eagle,if=equipped.djaruun_pillar_of_the_elder_flame&buff.seething_rage.up&buff.seething_rage.remains<3*gcd&(!raid_event.adds.exists|active_enemies>1)|raid_event.adds.exists&raid_event.adds.in>40&buff.seething_rage.up&buff.seething_rage.remains<3*gcd
   if S.FuryoftheEagle:IsCastable() and (I.Djaruun:IsEquipped() and Player:BuffUp(S.SeethingRageBuff) and Player:BuffRemains(S.SeethingRageBuff) < 3 * Player:GCD()) then
-    if Cast(S.FuryoftheEagle, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle st 28"; end
+    if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle st 28"; end
   end
   -- use_item,name=djaruun_pillar_of_the_elder_flame,if=talent.coordinated_assault|talent.fury_of_the_eagle&cooldown.fury_of_the_eagle.remains<5
   if I.Djaruun:IsEquippedAndReady() and (S.CoordinatedAssault:IsAvailable() or S.FuryoftheEagle:IsAvailable() and S.FuryoftheEagle:CooldownRemains() < 5) then
-    if Cast(I.Djaruun, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame st 30"; end
+    if Cast(I.Djaruun, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(100)) then return "djaruun_pillar_of_the_elder_flame st 30"; end
   end
   -- mongoose_bite,if=talent.alpha_predator&buff.mongoose_fury.up&buff.mongoose_fury.remains<focus%(variable.mb_rs_cost-cast_regen)*gcd|equipped.djaruun_pillar_of_the_elder_flame&buff.seething_rage.remains&active_enemies=1|next_wi_bomb.pheromone&cooldown.wildfire_bomb.remains<focus%(variable.mb_rs_cost-cast_regen)*gcd&set_bonus.tier31_2pc
   if S.MongooseBite:IsReady() and (S.AlphaPredator:IsAvailable() and Player:BuffUp(S.MongooseFuryBuff) and Player:BuffRemains(S.MongooseFuryBuff) < Player:Focus() / (MBRSCost - Player:FocusCastRegen(S.MongooseBite:ExecuteTime())) * Player:GCD() or I.Djaruun:IsEquipped() and Player:BuffUp(S.SeethingRageBuff) and EnemyCount8ySplash == 1 or S.PheromoneBomb:IsCastable() and S.WildfireBomb:CooldownRemains() < Player:Focus() / (MBRSCost - Player:FocusCastRegen(S.MongooseBite:ExecuteTime())) * Player:GCD() and Player:HasTier(31, 2)) then
@@ -414,7 +415,7 @@ local function ST()
   end
   -- stampede
   if S.Stampede:IsCastable() and CDsON() then
-    if Cast(S.Stampede, Settings.Commons2.GCDasOffGCD.Stampede, nil, not Target:IsSpellInRange(S.Stampede)) then return "stampede st 36"; end
+    if Cast(S.Stampede, Settings.CommonsOGCD.GCDasOffGCD.Stampede, nil, not Target:IsSpellInRange(S.Stampede)) then return "stampede st 36"; end
   end
   -- coordinated_assault,if=(!talent.coordinated_kill&target.health.pct<20&(!buff.spearhead.remains&cooldown.spearhead.remains|!talent.spearhead)|talent.coordinated_kill&(!buff.spearhead.remains&cooldown.spearhead.remains|!talent.spearhead))&(!raid_event.adds.exists|raid_event.adds.in>90)
   if S.CoordinatedAssault:IsCastable() and CDsON() and (not S.CoordinatedKill:IsAvailable() and Target:HealthPercentage() < 20 and (Player:BuffDown(S.SpearheadBuff) and S.Spearhead:CooldownDown() or not S.Spearhead:IsAvailable()) or S.CoordinatedKill:IsAvailable() and (Player:BuffDown(S.SpearheadBuff) and S.Spearhead:CooldownDown() or not S.Spearhead:IsAvailable())) then
@@ -450,15 +451,15 @@ local function ST()
   end
   -- steel_trap
   if S.SteelTrap:IsCastable() then
-    if Cast(S.SteelTrap, Settings.Commons2.GCDasOffGCD.SteelTrap, nil, not Target:IsInRange(40)) then return "steel_trap st 52"; end
+    if Cast(S.SteelTrap, Settings.CommonsOGCD.GCDasOffGCD.SteelTrap, nil, not Target:IsInRange(40)) then return "steel_trap st 52"; end
   end
   -- explosive_shot,if=talent.ranger&(!raid_event.adds.exists|raid_event.adds.in>28)
   if S.ExplosiveShot:IsReady() and (S.Ranger:IsAvailable()) then
-    if Cast(S.ExplosiveShot, Settings.Commons2.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot st 54"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot st 54"; end
   end
   -- fury_of_the_eagle,if=(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.in>40)
   if S.FuryoftheEagle:IsCastable() then
-    if Cast(S.FuryoftheEagle, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle st 56"; end
+    if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInMeleeRange(MeleeRange)) then return "fury_of_the_eagle st 56"; end
   end
   -- mongoose_bite
   if S.MongooseBite:IsReady() then
@@ -510,13 +511,13 @@ local function APL()
   -- Pet Management; Conditions handled via override
   if not (Player:IsMounted() or Player:IsInVehicle()) then
     if S.SummonPet:IsCastable() then
-      if Cast(SummonPetSpells[Settings.Commons2.SummonPetSlot]) then return "Summon Pet"; end
+      if Cast(SummonPetSpells[Settings.Commons.SummonPetSlot]) then return "Summon Pet"; end
     end
     if S.RevivePet:IsCastable() then
-      if Cast(S.RevivePet, Settings.Commons2.GCDasOffGCD.RevivePet) then return "Revive Pet"; end
+      if Cast(S.RevivePet, Settings.CommonsOGCD.GCDasOffGCD.RevivePet) then return "Revive Pet"; end
     end
     if S.MendPet:IsCastable() then
-      if Cast(S.MendPet, Settings.Commons2.GCDasOffGCD.MendPet) then return "Mend Pet"; end
+      if Cast(S.MendPet, Settings.CommonsOGCD.GCDasOffGCD.MendPet) then return "Mend Pet"; end
     end
   end
 
@@ -526,11 +527,11 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- Exhilaration
-    if S.Exhilaration:IsCastable() and Player:HealthPercentage() <= Settings.Commons2.ExhilarationHP then
-      if Cast(S.Exhilaration, Settings.Commons2.GCDasOffGCD.Exhilaration) then return "Exhilaration"; end
+    if S.Exhilaration:IsCastable() and Player:HealthPercentage() <= Settings.Commons.ExhilarationHP then
+      if Cast(S.Exhilaration, Settings.CommonsOGCD.GCDasOffGCD.Exhilaration) then return "Exhilaration"; end
     end
     -- muzzle
-    local ShouldReturn = Everyone.Interrupt(S.Muzzle, Settings.Survival.OffGCDasOffGCD.Muzzle, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Muzzle, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- invoke_external_buff,name=power_infusion,if=buff.coordinated_assault.up|buff.spearhead.up|!talent.coordinated_assault&!talent.spearhead
     -- Note: Not handling external buffs.
@@ -557,7 +558,7 @@ local function APL()
     end
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastable() and CDsON() then
-      if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent main"; end
+      if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent main"; end
     end
     -- PoolFocus if nothing else to do
     if HR.CastAnnotated(S.PoolFocus, false, "WAIT") then return "Pooling Focus"; end

@@ -114,7 +114,7 @@ local function Precombat()
   -- snapshot_stats
   -- Manually added: Group buff check
   if S.BattleShout:IsCastable() and Everyone.GroupBuffMissing(S.BattleShoutBuff) then
-    if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat"; end
+    if Cast(S.BattleShout, Settings.CommonsOGCD.GCDasOffGCD.BattleShout) then return "battle_shout precombat"; end
   end
   -- Manually added opener
   if Target:IsInMeleeRange(12) then
@@ -238,7 +238,7 @@ local function APL()
     end
     -- Manually added: battle_shout during combat
     if S.BattleShout:IsCastable() and Settings.Commons.ShoutDuringCombat and Everyone.GroupBuffMissing(S.BattleShoutBuff) then
-      if Cast(S.BattleShout, Settings.Commons.GCDasOffGCD.BattleShout) then return "battle_shout precombat"; end
+      if Cast(S.BattleShout, Settings.CommonsOGCD.GCDasOffGCD.BattleShout) then return "battle_shout precombat"; end
     end
     -- Manually added: VR/IV
     if Player:HealthPercentage() < Settings.Commons.VictoryRushHP then
@@ -250,7 +250,7 @@ local function APL()
       end
     end
     -- Interrupt
-    local ShouldReturn = Everyone.Interrupt(S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Pummel, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- charge,if=time=0
     -- Note: Handled in Precombat
@@ -258,8 +258,8 @@ local function APL()
     if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
       local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
       if ItemToUse then
-        local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+        local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
         if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
           if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
         end
@@ -276,38 +276,38 @@ local function APL()
     if CDsON() then
       -- blood_fury
       if S.BloodFury:IsCastable() then
-        if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury main 6"; end
+        if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury main 6"; end
       end
       -- berserking
       if S.Berserking:IsCastable() then
-        if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 8"; end
+        if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking main 8"; end
       end
       -- arcane_torrent
       if S.ArcaneTorrent:IsCastable() then
-        if Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent main 10"; end
+        if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "arcane_torrent main 10"; end
       end
       -- lights_judgment
       if S.LightsJudgment:IsCastable() then
-        if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment main 12"; end
+        if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "lights_judgment main 12"; end
       end
       -- fireblood
       if S.Fireblood:IsCastable() then
-        if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood main 14"; end
+        if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood main 14"; end
       end
       -- ancestral_call
       if S.AncestralCall:IsCastable() then
-        if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 16"; end
+        if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call main 16"; end
       end
       -- bag_of_tricks
       if S.BagofTricks:IsCastable() then
-        if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call main 18"; end
+        if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call main 18"; end
       end
     end
     -- potion,if=buff.avatar.up|buff.avatar.up&target.health.pct<=20
     if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.AvatarBuff) or Player:BuffDown(S.AvatarBuff) and Target:HealthPercentage() <= 20) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 20"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 20"; end
       end
     end
     -- ignore_pain,if=target.health.pct>=20&
@@ -360,7 +360,7 @@ local function APL()
     -- champions_spear
     if CDsON() and S.ChampionsSpear:IsCastable() then
       SuggestRageDump(20)
-      if Cast(S.ChampionsSpear, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(25)) then return "champions_spear main 30"; end
+      if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(25)) then return "champions_spear main 30"; end
     end
     -- thunderous_roar
     if CDsON() and S.ThunderousRoar:IsCastable() then

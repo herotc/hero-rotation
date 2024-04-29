@@ -35,6 +35,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Druid.Commons,
+  CommonsDS = HR.GUISettings.APL.Druid.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Druid.CommonsOGCD,
   Feral = HR.GUISettings.APL.Druid.Feral
 }
 
@@ -353,7 +355,7 @@ end
 local function Precombat()
   -- Manually added: Group buff check
   if S.MarkoftheWild:IsCastable() and Everyone.GroupBuffMissing(S.MarkoftheWildBuff) then
-    if Cast(S.MarkoftheWild, Settings.Commons.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat"; end
+    if Cast(S.MarkoftheWild, Settings.CommonsOGCD.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat"; end
   end
   -- cat_form,if=!buff.cat_form.up
   if S.CatForm:IsCastable() then
@@ -365,7 +367,7 @@ local function Precombat()
   end
   -- use_item,name=algethar_puzzle_box
   if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() then
-    if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 6"; end
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 6"; end
   end
   -- prowl,if=!buff.prowl.up
   if S.Prowl:IsCastable() then
@@ -424,7 +426,7 @@ local function Builder()
   end
   -- shadowmeld,if=action.rake.ready&!buff.sudden_ambush.up&(dot.rake.refreshable|dot.rake.pmultiplier<1.4)&!(variable.need_bt&buff.bt_rake.up)&!buff.prowl.up
   if S.Shadowmeld:IsCastable() and (S.Rake:IsReady() and Player:BuffDown(S.SuddenAmbushBuff) and (Target:DebuffRefreshable(S.RakeDebuff) or Target:PMultiplier(S.Rake) < 1.4) and not (VarNeedBT and BTBuffUp(S.Rake)) and Player:BuffDown(S.Prowl)) then
-    if Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "shadowmeld builder 8"; end
+    if Cast(S.Shadowmeld, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "shadowmeld builder 8"; end
   end
   -- rake,if=(refreshable|buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier)&!(variable.need_bt&buff.bt_rake.up)
   if S.Rake:IsReady() and ((Target:DebuffRefreshable(S.RakeDebuff) or Player:BuffUp(S.SuddenAmbushBuff) and Player:PMultiplier(S.Rake) > Target:PMultiplier(S.Rake)) and not (VarNeedBT and BTBuffUp(S.Rake))) then
@@ -485,7 +487,7 @@ local function AoeBuilder()
   -- shadowmeld,target_if=max:dot.rake.pmultiplier<1.6+dot.rake.refreshable,if=(dot.rake.pmultiplier<1.6|dot.rake.refreshable)&!(variable.need_bt&buff.bt_rake.up)
   -- Note: Skipping target_if condition.
   if S.Shadowmeld:IsReady() and not Player:StealthUp(false, true) and ((Target:PMultiplier(S.Rake) < 1.6 or Target:DebuffRefreshable(S.RakeDebuff)) and not (VarNeedBT and BTBuffUp(S.Rake))) then
-    if Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "shadowmeld aoe_builder 8"; end
+    if Cast(S.Shadowmeld, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "shadowmeld aoe_builder 8"; end
   end
   -- rake,target_if=max:(dot.rake.pmultiplier<1.6|dot.rake.refreshable)*druid.rake.ticks_gained_on_refresh,if=(buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier|dot.rake.refreshable)&!(variable.need_bt&buff.bt_rake.up)
   if S.Rake:IsReady() and (not (VarNeedBT and BTBuffUp(S.Rake))) then
@@ -578,7 +580,7 @@ local function Berserk()
   end
   -- shadowmeld,if=!(buff.bt_rake.up&active_bt_triggers=2)&action.rake.ready&!buff.sudden_ambush.up&(dot.rake.refreshable|dot.rake.pmultiplier<1.4)&!buff.prowl.up
   if S.Shadowmeld:IsCastable() and (not (BTBuffUp(S.Rake) and CountActiveBtTriggers() == 2) and S.Rake:IsReady() and Player:BuffDown(S.SuddenAmbushBuff) and (Target:DebuffRefreshable(S.RakeDebuff) or Target:PMultiplier(S.Rake) < 1.4) and Player:BuffDown(S.Prowl)) then
-    if Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "shadowmeld berserk 6"; end
+    if Cast(S.Shadowmeld, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "shadowmeld berserk 6"; end
   end
   -- rake,if=!(buff.bt_rake.up&active_bt_triggers=2)&(dot.rake.remains<3|buff.sudden_ambush.up&persistent_multiplier>dot.rake.pmultiplier)
   if S.Rake:IsReady() and (not (BTBuffUp(S.Rake) and CountActiveBtTriggers() == 2) and (Target:DebuffRemains(S.RakeDebuff) < 3 or (Player:BuffUp(S.SuddenAmbushBuff) and Player:PMultiplier(S.Rake) > Target:PMultiplier(S.Rake)))) then
@@ -618,7 +620,7 @@ local function Cooldown()
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=algethar_puzzle_box,if=fight_remains<35|(!variable.align_3minutes)
     if I.AlgetharPuzzleBox:IsEquippedAndReady() and (FightRemains < 35 or not VarAlign3Mins) then
-      if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldown 2"; end
+      if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldown 2"; end
     end
     -- use_item,name=algethar_puzzle_box,if=variable.align_3minutes&!variable.align_cds&cooldown.bs_inc.remains<5&!buff.smoldering_frenzy.up
     -- use_item,name=algethar_puzzle_box,if=variable.align_3minutes&variable.align_cds&cooldown.convoke_the_spirits.remains<20&!buff.smoldering_frenzy.up
@@ -626,7 +628,7 @@ local function Cooldown()
       (VarAlign3Mins and not VarAlignCDs and BsInc:CooldownRemains() < 5 and Player:BuffDown(S.SmolderingFrenzyBuff)) or
       (VarAlign3Mins and VarAlignCDs and S.ConvoketheSpirits:CooldownRemains() < 20 and Player:BuffDown(S.SmolderingFrenzyBuff))
     ) then
-      if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldown 4"; end
+      if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box cooldown 4"; end
     end
   end
   -- incarnation,target_if=max:target.time_to_die,if=target.time_to_die>25|target.time_to_die=fight_remains
@@ -648,69 +650,69 @@ local function Cooldown()
   end
   -- berserking,if=!variable.align_3minutes|buff.bs_inc.up
   if S.Berserking:IsCastable() and (not VarAlign3Mins or Player:BuffUp(BsInc)) then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking cooldown 14"; end
+    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking cooldown 14"; end
   end
   -- potion,if=buff.bs_inc.up|fight_remains<32|(!variable.lastZerk&variable.lastConvoke&cooldown.convoke_the_spirits.remains<10)
   if Settings.Commons.Enabled.Potions and (Player:BuffUp(BsInc) or FightRemains < 32 or (not VarLastZerk and VarLastConvoke and S.ConvoketheSpirits:CooldownRemains() < 10)) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cooldown 16"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion cooldown 16"; end
     end
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=ashes_of_the_embersoul,if=((buff.smoldering_frenzy.up&(!talent.convoke_the_spirits.enabled|cooldown.convoke_the_spirits.remains<10))|!set_bonus.tier31_4pc&(cooldown.convoke_the_spirits.remains=0|!talent.convoke_the_spirits.enabled&buff.bs_inc.up))
     if I.AshesoftheEmbersoul:IsEquippedAndReady() and ((Player:BuffUp(S.SmolderingFrenzyBuff) and (not S.ConvoketheSpirits:IsAvailable() or S.ConvoketheSpirits:CooldownRemains() < 10)) or not Player:HasTier(31, 4) and (S.ConvoketheSpirits:CooldownUp() or not S.ConvoketheSpirits:IsAvailable() and Player:BuffUp(BsInc))) then
-      if Cast(I.AshesoftheEmbersoul, nil, Settings.Commons.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul cooldown 18"; end
+      if Cast(I.AshesoftheEmbersoul, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul cooldown 18"; end
     end
     -- use_item,name=witherbarks_branch,if=(!talent.convoke_the_spirits.enabled|action.feral_frenzy.ready|!set_bonus.tier31_4pc)&!(trinket.1.is.ashes_of_the_embersoul&trinket.1.cooldown.remains<20|trinket.2.is.ashes_of_the_embersoul&trinket.2.cooldown.remains<20)
     if I.WitherbarksBranch:IsEquippedAndReady() and ((not S.ConvoketheSpirits:IsAvailable() or S.FeralFrenzy:IsReady() or not Player:HasTier(31, 4)) and not (Trinket1:ID() == I.AshesoftheEmbersoul:ID() and Trinket1:CooldownRemains() < 20 or Trinket2:ID() == I.AshesoftheEmbersoul:ID() and Trinket2:CooldownRemains() < 20)) then
-      if Cast(I.WitherbarksBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "witherbarks_branch cooldown 20"; end
+      if Cast(I.WitherbarksBranch, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "witherbarks_branch cooldown 20"; end
     end
     -- use_item,name=mirror_of_fractured_tomorrows,if=fight_remains<22|(!variable.align_3minutes|buff.bs_inc.up&buff.bs_inc.remains>15|variable.lastConvoke&!variable.lastZerk&cooldown.convoke_the_spirits.remains<1)&(target.time_to_die>16|target.time_to_die=fight_remains)
     if I.MirrorofFracturedTomorrows:IsEquippedAndReady() and (BossFightRemains < 22 or (not VarAlign3Mins or Player:BuffUp(BsInc) and Player:BuffRemains(BsInc) > 15 or VarLastConvoke and not VarLastZerk and S.ConvoketheSpirits:CooldownRemains() < 1) and (Target:TimeToDie() > 16 or Target:TimeToDie() == FightRemains)) then
-      if Cast(I.MirrorofFracturedTomorrows, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows cooldown 22"; end
+      if Cast(I.MirrorofFracturedTomorrows, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows cooldown 22"; end
     end
     -- use_item,name=irideus_fragment,if=buff.smoldering_frenzy.up&(fight_remains<35|!variable.align_3minutes|buff.bs_inc.up|variable.lastConvoke&!variable.lastZerk&cooldown.convoke_the_spirits.remains<5)
     if I.IrideusFragment:IsEquippedAndReady() and (Player:BuffUp(S.SmolderingFrenzyBuff) and (BossFightRemains < 35 or not VarAlign3Mins or Player:BuffUp(BsInc) or VarLastConvoke and not VarLastZerk and S.ConvoketheSpirits:CooldownRemains() < 5)) then
-      if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment cooldown 23"; end
+      if Cast(I.IrideusFragment, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "irideus_fragment cooldown 23"; end
     end
     -- use_item,name=verdant_gladiators_badge_of_ferocity,use_off_gcd=1,if=buff.smoldering_frenzy.up
     if I.VerdantBadge:IsEquippedAndReady() and (Player:BuffUp(S.SmolderingFrenzyBuff)) then
-      if Cast(I.VerdantBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "verdant_gladiators_badge_of_ferocity cooldown 24"; end
+      if Cast(I.VerdantBadge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "verdant_gladiators_badge_of_ferocity cooldown 24"; end
     end
   end
   -- convoke_the_spirits,target_if=max:target.time_to_die,if=fight_remains<5|(buff.smoldering_frenzy.up|!set_bonus.tier31_4pc)&(dot.rip.remains>4-talent.ashamanes_guidance&buff.tigers_fury.up&(combo_points<=2)|buff.bs_inc.up&combo_points<=3)&(debuff.dire_fixation.up|!talent.dire_fixation.enabled|spell_targets.swipe_cat>1)&(target.time_to_die>5-talent.ashamanes_guidance.enabled|target.time_to_die=fight_remains)
   if S.ConvoketheSpirits:IsReady() then
-    if Everyone.CastTargetIf(S.ConvoketheSpirits, Enemies11y, "max", EvaluateTargetIfFilterTTD, EvaluateTargetIfConvokeCD, not IsInMeleeRange, nil, Settings.Commons.DisplayStyle.Signature) then return "convoke_the_spirits cooldown 25"; end
+    if Everyone.CastTargetIf(S.ConvoketheSpirits, Enemies11y, "max", EvaluateTargetIfFilterTTD, EvaluateTargetIfConvokeCD, not IsInMeleeRange, nil, Settings.CommonsDS.DisplayStyle.Signature) then return "convoke_the_spirits cooldown 25"; end
   end
   -- convoke_the_spirits,if=buff.smoldering_frenzy.up&buff.smoldering_frenzy.remains<5.1-talent.ashamanes_guidance
   if S.ConvoketheSpirits:IsReady() and (Player:BuffUp(S.SmolderingFrenzyBuff) and Player:BuffRemains(S.SmolderingFrenzyBuff) < 5.1 - num(S.AshamanesGuidance:IsAvailable())) then
-    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not IsInMeleeRange) then return "convoke_the_spirits cooldown 26"; end
+    if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.Signature, not IsInMeleeRange) then return "convoke_the_spirits cooldown 26"; end
   end
   -- use_item,name=manic_grieftorch,target_if=max:target.time_to_die,if=!equipped.ashes_of_the_embersoul&!equipped.mirror_of_fractured_tomorrows&!equipped.algethar_puzzle_box|trinket.1.is.manic_grieftorch&trinket.2.cooldown.remains>20|trinket.2.is.manic_grieftorch&trinket.1.cooldown.remains>20
   if Settings.Commons.Enabled.Trinkets and I.ManicGrieftorch:IsEquippedAndReady() and (not I.AshesoftheEmbersoul:IsEquipped() and not I.MirrorofFracturedTomorrows:IsEquipped() and not I.AlgetharPuzzleBox:IsEquipped() or Trinket1:ID() == I.ManicGrieftorch:ID() and Trinket2:CooldownRemains() > 20 or Trinket2:ID() == I.ManicGrieftorch:ID() and Trinket1:CooldownRemains() > 20) then
-    if Everyone.CastTargetIf(I.ManicGrieftorch, Enemies11y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(40), nil, Settings.Commons.DisplayStyle.Trinkets) then return "manic_grieftorch cooldown 28"; end
+    if Everyone.CastTargetIf(I.ManicGrieftorch, Enemies11y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(40), nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "manic_grieftorch cooldown 28"; end
   end
   -- use_item,name=mydas_talisman,if=!equipped.ashes_of_the_embersoul&!equipped.witherbarks_branch|((trinket.2.is.witherbarks_branch|trinket.2.is.ashes_of_the_embersoul)&trinket.2.cooldown.remains>20)|((trinket.1.is.witherbarks_branch|trinket.1.is.ashes_of_the_embersoul)&trinket.1.cooldown.remains>20)
   -- use_item,name=bandolier_of_twisted_blades,if=!equipped.ashes_of_the_embersoul&!equipped.witherbarks_branch|((trinket.2.is.witherbarks_branch|trinket.2.is.ashes_of_the_embersoul)&trinket.2.cooldown.remains>20)|((trinket.1.is.witherbarks_branch|trinket.1.is.ashes_of_the_embersoul)&trinket.1.cooldown.remains>20)
   -- use_item,name=fyrakks_tainted_rageheart,if=!equipped.ashes_of_the_embersoul&!equipped.witherbarks_branch|((trinket.2.is.witherbarks_branch|trinket.2.is.ashes_of_the_embersoul)&trinket.2.cooldown.remains>20)|((trinket.1.is.witherbarks_branch|trinket.1.is.ashes_of_the_embersoul)&trinket.1.cooldown.remains>20)
   if (not I.AshesoftheEmbersoul:IsEquipped() and not I.WitherbarksBranch:IsEquipped() or ((Trinket2:ID() == I.WitherbarksBranch:ID() or Trinket2:ID() == I.AshesoftheEmbersoul:ID()) and Trinket2:CooldownRemains() > 20) or ((Trinket1:ID() == I.WitherbarksBranch:ID() or Trinket1:ID() == I.AshesoftheEmbersoul:ID()) and Trinket1:CooldownRemains() > 20)) then
     if I.MydasTalisman:IsEquippedAndReady() then
-      if Cast(I.MydasTalisman, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mydas_talisman cooldown 30"; end
+      if Cast(I.MydasTalisman, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "mydas_talisman cooldown 30"; end
     end
     if I.BandolierofTwistedBlades:IsEquippedAndReady() then
-      if Cast(I.BandolierofTwistedBlades, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInMeleeRange(5)) then return "bandolier_of_twisted_blades cooldown 32"; end
+      if Cast(I.BandolierofTwistedBlades, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInMeleeRange(5)) then return "bandolier_of_twisted_blades cooldown 32"; end
     end
     if I.FyrakksTaintedRageheart:IsEquippedAndReady() then
-      if Cast(I.FyrakksTaintedRageheart, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInMeleeRange(10)) then return "fyrakks_tainted_rageheart cooldown 34"; end
+      if Cast(I.FyrakksTaintedRageheart, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInMeleeRange(10)) then return "fyrakks_tainted_rageheart cooldown 34"; end
     end
   end
   -- use_items
   if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
-      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
       if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
         if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
       end
@@ -761,7 +763,7 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- Interrupts
-    local ShouldReturn = Everyone.Interrupt(S.SkullBash, Settings.Feral.OffGCDasOffGCD.SkullBash, InterruptStuns); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.SkullBash, Settings.CommonsDS.DisplayStyle.Interrupts, InterruptStuns); if ShouldReturn then return ShouldReturn; end
     -- prowl,if=(buff.bs_inc.down|!in_combat)&!buff.prowl.up
     if S.Prowl:IsCastable() and (Player:BuffDown(BsInc) or not Player:AffectingCombat()) then
       if Cast(S.Prowl) then return "prowl main 2"; end
@@ -797,11 +799,11 @@ local function APL()
     end
     -- adaptive_swarm,target_if=(!dot.adaptive_swarm_damage.ticking|dot.adaptive_swarm_damage.remains<2)&dot.adaptive_swarm_damage.stack<3&!action.adaptive_swarm_damage.in_flight&!action.adaptive_swarm.in_flight&target.time_to_die>5,if=!talent.unbridled_swarm.enabled|spell_targets.swipe_cat=1
     if S.AdaptiveSwarm:IsReady() and (not S.UnbridledSwarm:IsAvailable() or EnemiesCount11y == 1) then
-      if Everyone.CastCycle(S.AdaptiveSwarm, Enemies11y, EvaluateCycleAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm main 16"; end
+      if Everyone.CastCycle(S.AdaptiveSwarm, Enemies11y, EvaluateCycleAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.CommonsDS.DisplayStyle.Signature) then return "adaptive_swarm main 16"; end
     end
     -- adaptive_swarm,target_if=max:(1+dot.adaptive_swarm_damage.stack)*dot.adaptive_swarm_damage.stack<3*time_to_die,if=dot.adaptive_swarm_damage.stack<3&talent.unbridled_swarm.enabled&spell_targets.swipe_cat>1
     if S.AdaptiveSwarm:IsReady() and (S.UnbridledSwarm:IsAvailable() and EnemiesCount11y > 1) then
-      if Everyone.CastTargetIf(S.AdaptiveSwarm, Enemies11y, "max", EvaluateTargetIfFilterAdaptiveSwarm, EvaluateTargetIfAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.Commons.DisplayStyle.Signature) then return "adaptive_swarm main 18"; end
+      if Everyone.CastTargetIf(S.AdaptiveSwarm, Enemies11y, "max", EvaluateTargetIfFilterAdaptiveSwarm, EvaluateTargetIfAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.CommonsDS.DisplayStyle.Signature) then return "adaptive_swarm main 18"; end
     end
     -- call_action_list,name=cooldown,if=dot.rip.ticking|spell_targets.swipe_cat>1
     if CDsON() and (Target:DebuffUp(S.RipDebuff) or EnemiesCount11y > 1) then

@@ -25,15 +25,20 @@ HR.GUISettings.APL.DeathKnight = {
       Trinkets = true,
       Items = true,
     },
+  },
+  CommonsDS = {
     DisplayStyle = {
+      -- Common
+      Interrupts = "Cooldown",
+      Items = "Suggested",
       Potions = "Suggested",
       Signature = "Suggested",
       Trinkets = "Suggested",
-      Items = "Suggested",
+      -- Class Specific
       RaiseDead = "Suggested",
     },
   },
-  Commons2 = {
+  CommonsOGCD = {
     GCDasOffGCD = {
       AntiMagicShell = true,
       AntiMagicZone = true,
@@ -42,7 +47,6 @@ HR.GUISettings.APL.DeathKnight = {
       SacrificialPact = true
     },
     OffGCDasOffGCD = {
-      MindFreeze = true,
       Racials = true,
     }
   },
@@ -117,7 +121,8 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Panels
 local ARPanel = HR.GUI.Panel
 local CP_Deathknight = CreateChildPanel(ARPanel, "DeathKnight")
-local CP_Deathknight2 = CreateChildPanel(CP_Deathknight, "DeathKnight 2")
+local CP_DeathknightDS = CreateChildPanel(CP_Deathknight, "DK DisplayStyles")
+local CP_DeathknightOGCD = CreateChildPanel(CP_Deathknight, "DK OffGCDs")
 local CP_Blood = CreateChildPanel(CP_Deathknight, "Blood")
 local CP_Frost = CreateChildPanel(CP_Deathknight, "Frost")
 local CP_Unholy = CreateChildPanel(CP_Deathknight, "Unholy")
@@ -127,9 +132,8 @@ CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDeathStr
 CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDarkSuccorHP", { 1, 100, 1 }, "Use Death Strike to Consume Dark Succor", "Set the HP threshold to use Death Strike to Consume Dark Succor (working only if Solo Mode is enabled).")
 CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseAMSAMZOffensively", "Use AMS/AMZ Offensively", "Enable this option to allow AMS/AMZ to be suggested for Runic Power generation purposes.")
 CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons")
-
---DeathKnight2 Panel
-CreateARPanelOptions(CP_Deathknight2, "APL.DeathKnight.Commons2")
+CreateARPanelOptions(CP_DeathknightDS, "APL.DeathKnight.CommonsDS")
+CreateARPanelOptions(CP_DeathknightOGCD, "APL.DeathKnight.CommonsOGCD")
 
 --Blood Panels
 CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBlooddrinker", "Show Pool During Blooddrinker", "Display the 'Pool' icon whenever you're channeling Blooddrinker as long as you shouldn't interrupt it.")

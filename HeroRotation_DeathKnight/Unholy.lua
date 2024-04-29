@@ -57,7 +57,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.DeathKnight.Commons,
-  Commons2 = HR.GUISettings.APL.DeathKnight.Commons2,
+  CommonsDS = HR.GUISettings.APL.DeathKnight.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.DeathKnight.CommonsOGCD,
   Unholy = HR.GUISettings.APL.DeathKnight.Unholy
 }
 
@@ -213,7 +214,7 @@ local function Precombat()
     if Settings.Unholy.RaiseDeadCastLeft then
       if HR.CastLeft(S.RaiseDead) then return "raise_dead precombat 2 left"; end
     else
-      if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead precombat 2 displaystyle"; end
+      if Cast(S.RaiseDead, nil, Settings.CommonsDS.DisplayStyle.RaiseDead) then return "raise_dead precombat 2 displaystyle"; end
     end
   end
   -- army_of_the_dead,precombat_time=2,if=!equipped.fyralath_the_dreamrender|raid_event.adds.exists
@@ -294,7 +295,7 @@ local function AoECDs()
   end
   -- abomination_limb,if=rune<2|buff.festermight.stack>10|!talent.festermight|buff.festermight.up&buff.festermight.remains<12
   if S.AbominationLimb:IsCastable() and (Player:Rune() < 2 or FesterStacks > 10 or not S.Festermight:IsAvailable() or Player:BuffUp(S.FestermightBuff) and Player:BuffRemains(S.FestermightBuff) < 12) then
-    if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(20)) then return "abomination_limb aoe_cooldowns 6"; end
+    if Cast(S.AbominationLimb, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(20)) then return "abomination_limb aoe_cooldowns 6"; end
   end
   -- apocalypse,target_if=min:debuff.festering_wound.stack,if=talent.bursting_sores&debuff.festering_wound.up&(!death_and_decay.ticking&cooldown.death_and_decay.remains&rune<3|death_and_decay.ticking&rune=0)
   if S.Apocalypse:IsReady() then
@@ -313,7 +314,7 @@ local function AoECDs()
     if Settings.Unholy.RaiseDeadCastLeft then
       if HR.CastLeft(S.RaiseDead) then return "raise_dead aoe_cooldowns 12 left"; end
     else
-      if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead aoe_cooldowns 12 displaystyle"; end
+      if Cast(S.RaiseDead, nil, Settings.CommonsDS.DisplayStyle.RaiseDead) then return "raise_dead aoe_cooldowns 12 displaystyle"; end
     end
   end
   -- dark_transformation,if=(cooldown.any_dnd.remains<10&talent.infected_claws&((cooldown.vile_contagion.remains|raid_event.adds.exists&raid_event.adds.in>10)&death_knight.fwounded_targets<active_enemies|!talent.vile_contagion)&(raid_event.adds.remains>5|!raid_event.adds.exists)|!talent.infected_claws)
@@ -322,11 +323,11 @@ local function AoECDs()
   end
   -- empower_rune_weapon,if=buff.dark_transformation.up
   if S.EmpowerRuneWeapon:IsCastable() and (Pet:BuffUp(S.DarkTransformation)) then
-    if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon aoe_cooldowns 16"; end
+    if Cast(S.EmpowerRuneWeapon, Settings.CommonsOGCD.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon aoe_cooldowns 16"; end
   end
   -- sacrificial_pact,if=!buff.dark_transformation.up&cooldown.dark_transformation.remains>6|fight_remains<gcd
   if S.SacrificialPact:IsReady() and (Pet:BuffDown(S.DarkTransformation) and S.DarkTransformation:CooldownRemains() > 6 or FightRemains < Player:GCD()) then
-    if Cast(S.SacrificialPact, Settings.Commons2.GCDasOffGCD.SacrificialPact) then return "sacrificial_pact aoe_cooldowns 18"; end
+    if Cast(S.SacrificialPact, Settings.CommonsOGCD.GCDasOffGCD.SacrificialPact) then return "sacrificial_pact aoe_cooldowns 18"; end
   end
 end
 
@@ -334,7 +335,7 @@ local function AoESetup()
   -- any_dnd,if=(!talent.bursting_sores|death_knight.fwounded_targets=active_enemies|death_knight.fwounded_targets>=8|raid_event.adds.exists&raid_event.adds.remains<=11&raid_event.adds.remains>5)&(!talent.defile|talent.defile&buff.defile.remains<gcd)
   -- Note: Added 250ms buffer to the buff check to account for game/player latency.
   if AnyDnD:IsReady() and ((not S.BurstingSores:IsAvailable() or S.FesteringWoundDebuff:AuraActiveCount() == ActiveEnemies or S.FesteringWoundDebuff:AuraActiveCount() >= 8) and (not S.Defile:IsAvailable() or S.Defile:IsAvailable() and Player:BuffRemains(S.DefileBuff) < Player:GCD() + 0.25)) then
-    if Cast(AnyDnD, Settings.Commons2.GCDasOffGCD.DeathAndDecay) then return "any_dnd aoe_setup 2"; end
+    if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd aoe_setup 2"; end
   end
   -- festering_strike,target_if=min:debuff.festering_wound.stack,if=death_knight.fwounded_targets<active_enemies&talent.bursting_sores
   if S.FesteringStrike:IsReady() and (S.FesteringWoundDebuff:AuraActiveCount() < ActiveEnemies and S.BurstingSores:IsAvailable()) then
@@ -368,7 +369,7 @@ local function Cooldowns()
     if Settings.Unholy.RaiseDeadCastLeft then
       if HR.CastLeft(S.RaiseDead) then return "raise_dead cooldowns 4 left"; end
     else
-      if Cast(S.RaiseDead, nil, Settings.Commons.DisplayStyle.RaiseDead) then return "raise_dead cooldowns 4 displaystyle"; end
+      if Cast(S.RaiseDead, nil, Settings.CommonsDS.DisplayStyle.RaiseDead) then return "raise_dead cooldowns 4 displaystyle"; end
     end
   end
   -- dark_transformation,if=cooldown.apocalypse.remains<5
@@ -381,11 +382,11 @@ local function Cooldowns()
   end
   -- empower_rune_weapon,if=variable.st_planning&(pet.gargoyle.active&pet.gargoyle.remains<=23|!talent.summon_gargoyle&talent.army_of_the_damned&pet.army_ghoul.active&pet.apoc_ghoul.active|!talent.summon_gargoyle&!talent.army_of_the_damned&buff.dark_transformation.up|!talent.summon_gargoyle&!talent.summon_gargoyle&buff.dark_transformation.up)|fight_remains<=21
   if S.EmpowerRuneWeapon:IsCastable() and (VarSTPlanning and (VarGargActive and VarGargRemains <= 23 or not S.SummonGargoyle:IsAvailable() and S.ArmyoftheDamned:IsAvailable() and VarArmyGhoulActive and VarApocGhoulActive or not S.SummonGargoyle:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and Pet:BuffUp(S.DarkTransformation) or not S.SummonGargoyle:IsAvailable() and Pet:BuffUp(S.DarkTransformation)) or FightRemains <= 21) then
-    if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 10"; end
+    if Cast(S.EmpowerRuneWeapon, Settings.CommonsOGCD.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 10"; end
   end
   -- abomination_limb,if=rune<3&variable.st_planning
   if S.AbominationLimb:IsCastable() and (Player:Rune() < 3 and VarSTPlanning) then
-    if Cast(S.AbominationLimb, nil, Settings.Commons.DisplayStyle.Signature) then return "abomination_limb cooldowns 12"; end
+    if Cast(S.AbominationLimb, nil, Settings.CommonsDS.DisplayStyle.Signature) then return "abomination_limb cooldowns 12"; end
   end
   -- unholy_assault,target_if=min:debuff.festering_wound.stack,if=variable.st_planning
   if S.UnholyAssault:IsReady() and (VarSTPlanning) then
@@ -412,7 +413,7 @@ local function GargSetup()
   end
   -- any_dnd,if=!death_and_decay.ticking&debuff.festering_wound.stack>1
   if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and FesterStacks > 1) then
-    if Cast(AnyDnD, Settings.Commons2.GCDasOffGCD.DeathAndDecay) then return "any_dnd garg_setup 6"; end
+    if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd garg_setup 6"; end
   end
   -- summon_gargoyle,use_off_gcd=1,if=buff.commander_of_the_dead.up|!talent.commander_of_the_dead&runic_power>=40
   if S.SummonGargoyle:IsCastable() and CDsON() and (Player:BuffUp(S.CommanderoftheDeadBuff) or not S.CommanderoftheDead:IsAvailable() and Player:RunicPower() >= 40) then
@@ -421,7 +422,7 @@ local function GargSetup()
   if CDsON() and (VarGargActive and VarGargRemains <= 23) then
     -- empower_rune_weapon,if=pet.gargoyle.active&pet.gargoyle.remains<=23
     if S.EmpowerRuneWeapon:IsCastable() then
-      if Cast(S.EmpowerRuneWeapon, Settings.Commons2.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon garg_setup 10"; end
+      if Cast(S.EmpowerRuneWeapon, Settings.CommonsOGCD.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon garg_setup 10"; end
     end
     -- unholy_assault,if=pet.gargoyle.active&pet.gargoyle.remains<=23
     if S.UnholyAssault:IsCastable() then
@@ -448,11 +449,11 @@ local function HighPrioActions()
   if Settings.Commons.UseAMSAMZOffensively then
     -- antimagic_shell,if=runic_power.deficit>40&(pet.gargoyle.active|!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>cooldown.antimagic_shell.duration)
     if S.AntiMagicShell:IsCastable() and (Player:RunicPowerDeficit() > 40 and (VarGargActive or not S.SummonGargoyle:IsAvailable() or S.SummonGargoyle:CooldownRemains() > 40)) then
-      if Cast(S.AntiMagicShell, Settings.Commons2.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell ams_amz 2"; end
+      if Cast(S.AntiMagicShell, Settings.CommonsOGCD.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell ams_amz 2"; end
     end
     -- antimagic_zone,if=!death_knight.amz_specified&(death_knight.amz_absorb_percent>0&runic_power.deficit>70&talent.assimilation&(pet.gargoyle.active|!talent.summon_gargoyle))
     if S.AntiMagicZone:IsCastable() and (Player:RunicPowerDeficit() > 70 and S.Assimilation:IsAvailable() and (VarGargActive or not S.SummonGargoyle:IsAvailable())) then
-      if Cast(S.AntiMagicZone, Settings.Commons2.GCDasOffGCD.AntiMagicZone) then return "antimagic_zone ams_amz 4"; end
+      if Cast(S.AntiMagicZone, Settings.CommonsOGCD.GCDasOffGCD.AntiMagicZone) then return "antimagic_zone ams_amz 4"; end
     end
     -- antimagic_zone,if=death_knight.amz_specified&buff.amz_timing.up
     -- This is for Simc manually specified AMZ timing, so we're ignoring it.
@@ -464,13 +465,13 @@ local function HighPrioActions()
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected then
       if PotionSelected:IsReady() and ((not S.SummonGargoyle:IsAvailable() or S.SummonGargoyle:CooldownRemains() > 60) and (Pet:BuffUp(S.DarkTransformation) and 30 >= Pet:BuffRemains(S.DarkTransformation) or VarArmyGhoulActive and VarArmyGhoulRemains <= 30 or VarApocGhoulActive and VarApocGhoulRemains <= 30) or FightRemains <= 30) then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion high_prio_actions 2"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion high_prio_actions 2"; end
       end
     end
   end
   -- any_dnd,if=variable.adds_remain&!death_and_decay.ticking&!talent.bursting_sores&talent.defile&buff.defile.remains<gcd
   if AnyDnD:IsReady() and (VarAddsRemain and Player:BuffDown(S.DeathAndDecayBuff) and not S.BurstingSores:IsAvailable() and S.Defile:IsAvailable() and Player:BuffRemains(S.DefileBuff) < Player:GCD() + 0.25) then
-    if Cast(AnyDnD, Settings.Commons2.GCDasOffGCD.DeathAndDecay) then return "any_dnd high_prio_actions 3"; end
+    if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd high_prio_actions 3"; end
   end
   -- army_of_the_dead,if=talent.summon_gargoyle&cooldown.summon_gargoyle.remains<3*gcd|!talent.summon_gargoyle|fight_remains<35
   if S.ArmyoftheDead:IsReady() and (S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:CooldownRemains() < 3 * Player:GCD() or not S.SummonGargoyle:IsAvailable() or FightRemains < 35) then
@@ -501,35 +502,35 @@ end
 local function Racials()
   -- arcane_torrent,if=runic_power.deficit>20&(cooldown.summon_gargoyle.remains<gcd&time>15|!talent.summon_gargoyle.enabled|pet.gargoyle.active&rune<2&debuff.festering_wound.stack<1)
   if S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 20 and (S.SummonGargoyle:CooldownRemains() < Player:GCD() and HL.CombatTime() > 15 or not S.SummonGargoyle:IsAvailable() or VarGargActive and Player:Rune() < 2 and FesterStacks < 1)) then
-    if Cast(S.ArcaneTorrent, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent racials 2"; end
+    if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent racials 2"; end
   end
   -- blood_fury,if=(buff.blood_fury.duration+3>=pet.gargoyle.remains&pet.gargoyle.active)|(!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>60)&(pet.army_ghoul.active&pet.army_ghoul.remains<=buff.blood_fury.duration+3|pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=buff.blood_fury.duration+3|active_enemies>=2&death_and_decay.ticking)|fight_remains<=buff.blood_fury.duration+3
   if S.BloodFury:IsCastable() and ((S.BloodFury:BaseDuration() + 3 >= VarGargRemains and VarGargActive) or (not S.SummonGargoyle:IsAvailable() or S.SummonGargoyle:CooldownRemains() > 60) and (VarArmyGhoulActive and VarArmyGhoulRemains <= S.BloodFury:BaseDuration() + 3 or VarApocGhoulActive and VarApocGhoulRemains <= S.BloodFury:BaseDuration() + 3 or ActiveEnemies >= 2 and Player:BuffUp(S.DeathAndDecayBuff)) or FightRemains <= S.BloodFury:BaseDuration() + 3) then
-    if Cast(S.BloodFury, Settings.Commons2.OffGCDasOffGCD.Racials) then return "blood_fury racials 4"; end
+    if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury racials 4"; end
   end
   -- berserking,if=(buff.berserking.duration+3>=pet.gargoyle.remains&pet.gargoyle.active)|(!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>60)&(pet.army_ghoul.active&pet.army_ghoul.remains<=buff.berserking.duration+3|pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=buff.berserking.duration+3|active_enemies>=2&death_and_decay.ticking)|fight_remains<=buff.berserking.duration+3
   if S.Berserking:IsCastable() and ((S.Berserking:BaseDuration() + 3 >= VarGargRemains and VarGargActive) or (not S.SummonGargoyle:IsAvailable() or S.SummonGargoyle:CooldownRemains() > 60) and (VarArmyGhoulActive and VarArmyGhoulRemains <= S.Berserking:BaseDuration() + 3 or VarApocGhoulActive and VarApocGhoulRemains <= S.Berserking:BaseDuration() + 3 or ActiveEnemies >= 2 and Player:BuffUp(S.DeathAndDecayBuff)) or FightRemains <= S.Berserking:BaseDuration() + 3) then
-    if Cast(S.Berserking, Settings.Commons2.OffGCDasOffGCD.Racials) then return "berserking racials 6"; end
+    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking racials 6"; end
   end
   -- lights_judgment,if=buff.unholy_strength.up&(!talent.festermight|buff.festermight.remains<target.time_to_die|buff.unholy_strength.remains<target.time_to_die)
   if S.LightsJudgment:IsCastable() and (Player:BuffUp(S.UnholyStrengthBuff) and (not S.Festermight:IsAvailable() or Player:BuffRemains(S.FestermightBuff) < Target:TimeToDie() or Player:BuffRemains(S.UnholyStrengthBuff) < Target:TimeToDie())) then
-    if Cast(S.LightsJudgment, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
+    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment racials 8"; end
   end
   -- ancestral_call,if=(18>=pet.gargoyle.remains&pet.gargoyle.active)|(!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>60)&(pet.army_ghoul.active&pet.army_ghoul.remains<=18|pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=18|active_enemies>=2&death_and_decay.ticking)|fight_remains<=18
   if S.AncestralCall:IsCastable() and ((18 >= VarGargRemains and VarGargActive) or (not S.SummonGargoyle:IsAvailable() or S.SummonGargoyle:CooldownRemains() > 60) and (VarArmyGhoulActive and VarArmyGhoulRemains <= 18 or VarApocGhoulActive and VarApocGhoulRemains <= 18 or ActiveEnemies >= 2 and Player:BuffUp(S.DeathAndDecayBuff)) or FightRemains <= 18) then
-    if Cast(S.AncestralCall, Settings.Commons2.OffGCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
+    if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call racials 10"; end
   end
   -- arcane_pulse,if=active_enemies>=2|(rune.deficit>=5&runic_power.deficit>=60)
   if S.ArcanePulse:IsCastable() and (ActiveEnemies >= 2 or (Player:Rune() <= 1 and Player:RunicPowerDeficit() >= 60)) then
-    if Cast(S.ArcanePulse, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 12"; end
+    if Cast(S.ArcanePulse, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_pulse racials 12"; end
   end
   -- fireblood,if=(buff.fireblood.duration+3>=pet.gargoyle.remains&pet.gargoyle.active)|(!talent.summon_gargoyle|cooldown.summon_gargoyle.remains>60)&(pet.army_ghoul.active&pet.army_ghoul.remains<=buff.fireblood.duration+3|pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=buff.fireblood.duration+3|active_enemies>=2&death_and_decay.ticking)|fight_remains<=buff.fireblood.duration+3
   if S.Fireblood:IsCastable() and ((S.Fireblood:BaseDuration() + 3 >= VarGargRemains and VarGargActive) or (not S.SummonGargoyle:IsAvailable() or S.SummonGargoyle:CooldownRemains() > 60) and (VarArmyGhoulActive and VarArmyGhoulRemains <= S.Fireblood:BaseDuration() + 3 or VarApocGhoulActive and VarApocGhoulRemains <= S.Fireblood:BaseDuration() + 3 or ActiveEnemies >= 2 and Player:BuffUp(S.DeathAndDecayBuff)) or FightRemains <= S.Fireblood:BaseDuration() + 3) then
-    if Cast(S.Fireblood, Settings.Commons2.OffGCDasOffGCD.Racials) then return "fireblood racials 14"; end
+    if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood racials 14"; end
   end
   -- bag_of_tricks,if=active_enemies=1&(buff.unholy_strength.up|fight_remains<5)
   if S.BagofTricks:IsCastable() and (ActiveEnemies == 1 and (Player:BuffUp(S.UnholyStrengthBuff) or HL.FilteredFightRemains(EnemiesMelee, "<", 5))) then
-    if Cast(S.BagofTricks, Settings.Commons2.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks racials 16"; end
+    if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks racials 16"; end
   end
 end
 
@@ -544,7 +545,7 @@ local function ST()
   end
   -- any_dnd,if=!death_and_decay.ticking&(active_enemies>=2|talent.unholy_ground&(pet.apoc_ghoul.active&pet.apoc_ghoul.remains>=13|pet.gargoyle.active&pet.gargoyle.remains>8|pet.army_ghoul.active&pet.army_ghoul.remains>8|!variable.pop_wounds&debuff.festering_wound.stack>=4)|talent.defile&(pet.gargoyle.active|pet.apoc_ghoul.active|pet.army_ghoul.active|buff.dark_transformation.up))&(death_knight.fwounded_targets=active_enemies|active_enemies=1)
   if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and (ActiveEnemies >= 2 or S.UnholyGround:IsAvailable() and (VarApocGhoulActive and VarApocGhoulRemains >= 13 or VarGargActive and VarGargRemains > 8 or VarArmyGhoulActive and VarArmyGhoulRemains > 8 or not VarPopWounds and FesterStacks >= 4) or S.Defile:IsAvailable() and (VarGargActive or VarApocGhoulActive or VarArmyGhoulActive or Pet:BuffUp(S.DarkTransformation))) and (S.FesteringWoundDebuff:AuraActiveCount() == ActiveEnemies or ActiveEnemies == 1)) then
-    if Cast(AnyDnD, Settings.Commons2.GCDasOffGCD.DeathAndDecay) then return "any_dnd st 6"; end
+    if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd st 6"; end
   end
   -- wound_spender,target_if=max:debuff.festering_wound.stack,if=variable.pop_wounds|active_enemies>=2&death_and_decay.ticking
   if WoundSpender:IsReady() and (VarPopWounds or ActiveEnemies >= 2 and Player:BuffUp(S.DeathAndDecayBuff)) then
@@ -567,20 +568,20 @@ end
 local function Trinkets()
   -- use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking&(active_enemies<5|active_enemies>21|fight_remains<4)&(debuff.festering_wound.stack>=2|time>15)
   if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0 and (ActiveEnemies < 5 or ActiveEnemies > 21 or FightRemains < 4) and (FesterStacks >= 2 or HL.CombatTime() > 15)) then
-    if Cast(I.Fyralath, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender trinkets 1"; end
+    if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender trinkets 1"; end
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,use_off_gcd=1,name=algethar_puzzle_box,if=cooldown.summon_gargoyle.remains<5&rune<=4|!talent.summon_gargoyle&pet.army_ghoul.active|active_enemies>3&variable.adds_remain&(buff.dark_transformation.up|talent.bursting_sores&cooldown.any_dnd.remains<10&!death_and_decay.ticking)
     if I.AlgetharPuzzleBox:IsEquippedAndReady() and (S.SummonGargoyle:CooldownRemains() < 5 and Player:Rune() <= 4 or not S.SummonGargoyle:IsAvailable() and VarArmyGhoulActive or ActiveEnemies > 3 and VarAddsRemain and (Pet:BuffUp(S.DarkTransformation) or S.BurstingSores:IsAvailable() and AnyDnD:CooldownRemains() < 10 and Player:BuffDown(S.DeathAndDecayBuff))) then
-      if Cast(I.AlgetharPuzzleBox, nil, Settings.Commons.DisplayStyle.Trinkets) then return "algethar_puzzle_box trinkets 2"; end
+      if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box trinkets 2"; end
     end
     -- use_item,use_off_gcd=1,name=irideus_fragment,if=(pet.gargoyle.active&pet.gargoyle.remains<16|!talent.summon_gargoyle&pet.army_ghoul.active&pet.army_ghoul.remains<16)|active_enemies>3&variable.adds_remain&(buff.dark_transformation.up|talent.bursting_sores&death_and_decay.ticking)
     if I.IrideusFragment:IsEquippedAndReady() and ((VarGargActive and VarGargRemains < 16 or not S.SummonGargoyle:IsAvailable() and VarArmyGhoulActive and VarArmyGhoulRemains < 16) or ActiveEnemies > 3 and VarAddsRemain and (Pet:BuffUp(S.DarkTransformation) or S.BurstingSores:IsAvailable() and Player:BuffUp(S.DeathAndDecayBuff))) then
-      if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment trinkets 4"; end
+      if Cast(I.IrideusFragment, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "irideus_fragment trinkets 4"; end
     end
     -- use_item,use_off_gcd=1,name=vial_of_animated_blood,if=pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=18|!talent.apocalypse&buff.dark_transformation.up|active_enemies>3&variable.adds_remain&(buff.dark_transformation.up|talent.bursting_sores&death_and_decay.ticking)
     if I. VialofAnimatedBlood:IsEquippedAndReady() and (VarApocGhoulActive and VarApocGhoulRemains <= 18 or not S.Apocalypse:IsAvailable() and Pet:BuffUp(S.DarkTransformation) or ActiveEnemies > 3 and VarAddsRemain and (Pet:BuffUp(S.DarkTransformation) or S.BurstingSores:IsAvailable() and Player:BuffUp(S.DeathAndDecayBuff))) then
-      if Cast(I.VialofAnimatedBlood, nil, Settings.Commons.DisplayStyle.Trinkets) then return "vial_of_animated_blood trinkets 6"; end
+      if Cast(I.VialofAnimatedBlood, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "vial_of_animated_blood trinkets 6"; end
     end
   end
   -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_manual&variable.trinket_1_buffs&((!talent.summon_gargoyle&((!talent.army_of_the_dead|cooldown.army_of_the_dead.remains_expected>60|death_knight.disable_aotd)&(pet.apoc_ghoul.active|(!talent.apocalypse|active_enemies>=2)&buff.dark_transformation.up)|pet.army_ghoul.active)|talent.summon_gargoyle&pet.gargoyle.active|cooldown.summon_gargoyle.remains>80)&(pet.apoc_ghoul.active|(!talent.apocalypse|active_enemies>=2)&buff.dark_transformation.up)&(variable.trinket_2_exclude|variable.trinket_priority=1|trinket.2.cooldown.remains|!trinket.2.has_cooldown))|trinket.1.proc.any_dps.duration>=fight_remains
@@ -593,8 +594,8 @@ local function Trinkets()
   if (S.Apocalypse:CooldownDown() or Pet:BuffUp(S.DarkTransformation)) then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
-      local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+      local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
       if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
         if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
       end
@@ -677,7 +678,7 @@ local function APL()
     end
     -- auto_attack
     -- Interrupts (here instead of HighPrioActions)
-    local ShouldReturn = Everyone.Interrupt(S.MindFreeze, Settings.Commons2.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.MindFreeze, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- Manually added: Things to do if more than 10y away from our target (10y instead of melee range to avoid the rotation getting twitchy when near max melee range).
     if not Target:IsInRange(10) then
       -- Manually added: Outbreak if targets are missing VP and out of range

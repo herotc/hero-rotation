@@ -34,7 +34,7 @@ function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   elseif self == SpellBM.RevivePet then
     return (Pet:IsDeadOrGhost() or Hunter.Pet.Status == 2 and Hunter.Pet.FeignGUID == 0) and BaseCheck
   elseif self == SpellBM.MendPet then
-    return Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= Settings.Commons2.MendPetHP and BaseCheck
+    return Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= Settings.Commons.MendPetHP and BaseCheck
   else
     return BaseCheck
   end
@@ -145,7 +145,7 @@ function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   elseif self == SpellSV.RevivePet then
     return (Pet:IsDeadOrGhost() or Hunter.Pet.Status == 2) and BaseCheck
   elseif self == SpellSV.MendPet then
-    return Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= Settings.Commons2.MendPetHP and BaseCheck
+    return Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= Settings.Commons.MendPetHP and BaseCheck
   elseif self == SpellSV.AspectoftheEagle then
     return Settings.Survival.AspectOfTheEagle and BaseCheck
   elseif self == SpellSV.Harpoon then

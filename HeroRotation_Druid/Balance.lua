@@ -33,6 +33,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Druid.Commons,
+  CommonsDS = HR.GUISettings.APL.Druid.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Druid.CommonsOGCD,
   Balance = HR.GUISettings.APL.Druid.Balance
 }
 
@@ -227,7 +229,7 @@ local function Precombat()
   -- snapshot_stats
   -- Manually added: Group buff check
   if S.MarkoftheWild:IsCastable() and Everyone.GroupBuffMissing(S.MarkoftheWildBuff) then
-    if Cast(S.MarkoftheWild, Settings.Commons.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat"; end
+    if Cast(S.MarkoftheWild, Settings.CommonsOGCD.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat"; end
   end
   -- moonkin_form
   if S.MoonkinForm:IsCastable() then
@@ -343,7 +345,7 @@ local function St()
   end
   -- convoke_the_spirits,if=variable.convoke_condition
   if S.ConvoketheSpirits:IsCastable() and CDsON() and (VarConvokeCondition) then
-    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.Wrath)) then return "convoke_the_spirits st 30"; end
+    if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.Wrath)) then return "convoke_the_spirits st 30"; end
   end
   -- astral_communion,if=astral_power.deficit>variable.passive_asp+energize_amount
   if S.AstralCommunion:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + S.AstralCommunion:EnergizeAmount()) then
@@ -508,7 +510,7 @@ local function AoE()
   end
   -- convoke_the_spirits,if=astral_power<50&spell_targets.starfall<3+talent.elunes_guidance&(buff.eclipse_lunar.remains>4|buff.eclipse_solar.remains>4)
   if S.ConvoketheSpirits:IsCastable() and CDsON() and (Player:AstralPowerP() < 50 and EnemiesCount10ySplash < 3 + num(S.ElunesGuidance:IsAvailable()) and (Player:BuffRemains(S.EclipseLunar) > 4 or Player:BuffRemains(S.EclipseSolar) > 4)) then
-    if Cast(S.ConvoketheSpirits, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsSpellInRange(S.Wrath)) then return "convoke_the_spirits aoe 36"; end
+    if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.Wrath)) then return "convoke_the_spirits aoe 36"; end
   end
   -- new_moon,if=astral_power.deficit>variable.passive_asp+energize_amount
   if S.NewMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + S.NewMoon:EnergizeAmount()) then
@@ -611,34 +613,34 @@ local function APL()
     VarPassiveAsp = 6 / Player:SpellHaste() + num(S.NaturesBalance:IsAvailable()) + num(S.OrbitBreaker:IsAvailable()) * num(Target:DebuffUp(S.MoonfireDebuff)) * num(Druid.OrbitBreakerStacks > (27 - 2 * num(Player:BuffUp(S.SolsticeBuff)))) * 40
     -- berserking,if=buff.ca_inc.remains>=20|variable.no_cd_talent|fight_remains<15
     if S.Berserking:IsCastable() and CDsON() and (CAIncBuffRemains >= 20 or VarNoCDTalent or FightRemains < 15) then
-      if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking main 2"; end
+      if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking main 2"; end
     end
     -- potion,if=!druid.no_cds&(buff.ca_inc.remains>=20|variable.no_cd_talent|fight_remains<30)
     -- Note: Using Enabled.Potions instead of !druid.no_cds
     if Settings.Commons.Enabled.Potions and (CAIncBuffRemains >= 20 or VarNoCDTalent or FightRemains < 30) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion 4"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion 4"; end
       end
     end
     if Settings.Commons.Enabled.Trinkets then
       -- use_items,slots=trinket1,if=variable.on_use_trinket!=1&!trinket.2.ready_cooldown|(variable.on_use_trinket=1|variable.on_use_trinket=3)&buff.ca_inc.up|variable.no_cd_talent|fight_remains<20|variable.on_use_trinket=0
       local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
       if Trinket1ToUse and (VarOnUseTrinket ~= 1 and not trinket2:IsReady() or (VarOnUseTrinket == 1 or VarOnUseTrinket == 3) and CAIncBuffUp or VarNoCDTalent or FightRemains < 20 or VarOnUseTrinket == 0) then
-        if Cast(trinket1, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 main 6"; end
+        if Cast(trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "trinket1 main 6"; end
       end
       -- use_items,slots=trinket2,if=variable.on_use_trinket!=2&!trinket.1.ready_cooldown|variable.on_use_trinket=2&buff.ca_inc.up|variable.no_cd_talent|fight_remains<20|variable.on_use_trinket=0
       local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
       if Trinket2ToUse and (VarOnUseTrinket ~= 2 and not trinket1:IsReady() or VarOnUseTrinket == 2 and CAIncBuffUp or VarNoCDTalent or FightRemains < 20 or VarOnUseTrinket == 0) then
-        if Cast(trinket2, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 main 8"; end
+        if Cast(trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "trinket2 main 8"; end
       end
     end
     -- use_items
     if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
       if ItemToUse then
-        local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+        local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
         if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
           if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
         end

@@ -22,22 +22,22 @@ HR.GUISettings.APL.Hunter = {
       Trinkets = true,
       Items = true,
     },
-    DisplayStyle = {
-      Signature = "Suggested",
-      Potions = "Suggested",
-      Trinkets = "Suggested",
-      Items = "Suggested",
-    },
-    GCDasOffGCD = {
-    },
-    OffGCDasOffGCD = {
-      Racials = false,
-    }
-  },
-  Commons2 = {
     ExhilarationHP = 20,
     MendPetHP = 40,
     SummonPetSlot = 1,
+  },
+  CommonsDS = {
+    DisplayStyle = {
+      -- Common
+      Interrupts = "Cooldown",
+      Items = "Suggested",
+      Potions = "Suggested",
+      Signature = "Suggested",
+      Trinkets = "Suggested",
+      -- Class Specific
+    },
+  },
+  CommonsOGCD = {
     GCDasOffGCD = {
       Exhilaration = true,
       ExplosiveShot = false,
@@ -52,6 +52,7 @@ HR.GUISettings.APL.Hunter = {
     },
     OffGCDasOffGCD = {
       CounterShot = true,
+      Racials = true,
     }
   },
   BeastMastery = {
@@ -98,7 +99,6 @@ HR.GUISettings.APL.Hunter = {
     OffGCDasOffGCD = {
       -- Abilities
       AspectOfTheEagle = true,
-      Muzzle = true,
     }
   }
 }
@@ -108,19 +108,19 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 -- Child Panels
 local ARPanel = HR.GUI.Panel
 local CP_Hunter = CreateChildPanel(ARPanel, "Hunter")
-local CP_Hunter2 = CreateChildPanel(ARPanel, "Hunter 2")
-local CP_BeastMastery = CreateChildPanel(ARPanel, "BeastMastery")
-local CP_Marksmanship = CreateChildPanel(ARPanel, "Marksmanship")
-local CP_Survival = CreateChildPanel(ARPanel, "Survival")
+local CP_HunterDS = CreateChildPanel(CP_Hunter, "Class DisplayStyles")
+local CP_HunterOGCD = CreateChildPanel(CP_Hunter, "Class OffGCDs")
+local CP_BeastMastery = CreateChildPanel(CP_Hunter, "BeastMastery")
+local CP_Marksmanship = CreateChildPanel(CP_Hunter, "Marksmanship")
+local CP_Survival = CreateChildPanel(CP_Hunter, "Survival")
 
 -- Hunter
 CreateARPanelOptions(CP_Hunter, "APL.Hunter.Commons")
-
--- Hunter 2
-CreatePanelOption("Slider", CP_Hunter2, "APL.Hunter.Commons2.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold. Set to 0 to disable.")
-CreatePanelOption("Slider", CP_Hunter2, "APL.Hunter.Commons2.MendPetHP", {0, 100, 1}, "Mend Pet High HP", "Set the Mend Pet HP threshold. Set to 0 to disable.")
-CreatePanelOption("Slider", CP_Hunter2, "APL.Hunter.Commons2.SummonPetSlot", {1, 5, 1}, "Summon Pet Slot", "Which pet stable slot to suggest when summoning a pet.")
-CreateARPanelOptions(CP_Hunter2, "APL.Hunter.Commons2")
+CreatePanelOption("Slider", CP_Hunter, "APL.Hunter.Commons.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold. Set to 0 to disable.")
+CreatePanelOption("Slider", CP_Hunter, "APL.Hunter.Commons.MendPetHP", {0, 100, 1}, "Mend Pet High HP", "Set the Mend Pet HP threshold. Set to 0 to disable.")
+CreatePanelOption("Slider", CP_Hunter, "APL.Hunter.Commons.SummonPetSlot", {1, 5, 1}, "Summon Pet Slot", "Which pet stable slot to suggest when summoning a pet.")
+CreateARPanelOptions(CP_HunterDS, "APL.Hunter.CommonsDS")
+CreateARPanelOptions(CP_HunterOGCD, "APL.Hunter.CommonsOGCD")
 
 -- Beast Mastery
 CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery")

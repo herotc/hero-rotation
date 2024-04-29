@@ -22,20 +22,28 @@ HR.GUISettings.APL.Warrior = {
     Enabled = {
       Potions = true,
       Trinkets = true,
+      Items = true,
     },
+  },
+  CommonsDS = {
     DisplayStyle = {
+      -- Common
+      Interrupts = "Cooldown",
+      Items = "Suggested",
       Potions = "Suggested",
       Signature = "Suggested",
       Trinkets = "Suggested",
+      -- Class Specific
       Charge = "Suggested",
       HeroicLeap = "Suggested",
     },
+  },
+  CommonsOGCD = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       BattleShout = true,
     },
     OffGCDasOffGCD = {
-      Pummel = true,
       Racials = true,
     },
   },
@@ -99,13 +107,18 @@ HR.GUISettings.APL.Warrior = {
 HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 local ARPanel = HR.GUI.Panel
 local CP_Warrior = CreateChildPanel(ARPanel, "Warrior")
+local CP_WarriorDS = CreateChildPanel(CP_Warrior, "Class DisplayStyles")
+local CP_WarriorOGCD = CreateChildPanel(CP_Warrior, "Class OffGCDs")
 local CP_Arms = CreateChildPanel(CP_Warrior, "Arms")
 local CP_Fury = CreateChildPanel(CP_Warrior, "Fury")
 local CP_Protection = CreateChildPanel(CP_Warrior, "Protection")
 
+-- Commons
 CreateARPanelOptions(CP_Warrior, "APL.Warrior.Commons")
 CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.ShoutDuringCombat", "Battle Shout during combat", "Enable this option to allow Battle Shout to be suggested during combat (for re-buffing fallen allies or when the buff expires during combat).")
 CreatePanelOption("Slider", CP_Warrior, "APL.Warrior.Commons.VictoryRushHP", {0, 100, 1}, "Victory Rush HP", "Set the Victory Rush/Impending Victory HP threshold. Set to 0 to disable.")
+CreateARPanelOptions(CP_WarriorDS, "APL.Warrior.CommonsDS")
+CreateARPanelOptions(CP_WarriorOGCD, "APL.Warrior.CommonsOGCD")
 
 -- Arms Settings
 CreateARPanelOptions(CP_Arms, "APL.Warrior.Arms")

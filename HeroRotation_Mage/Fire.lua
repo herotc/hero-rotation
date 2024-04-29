@@ -66,6 +66,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Mage.Commons,
+  CommonsDS = HR.GUISettings.APL.Mage.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Mage.CommonsOGCD,
   Fire = HR.GUISettings.APL.Mage.Fire
 }
 
@@ -226,7 +228,7 @@ local function Precombat()
   -- augmentation
   -- arcane_intellect
   if S.ArcaneIntellect:IsCastable() and Everyone.GroupBuffMissing(S.ArcaneIntellect) then
-    if Cast(S.ArcaneIntellect, Settings.Commons.GCDasOffGCD.ArcaneIntellect) then return "arcane_intellect precombat 2"; end
+    if Cast(S.ArcaneIntellect, Settings.CommonsOGCD.GCDasOffGCD.ArcaneIntellect) then return "arcane_intellect precombat 2"; end
   end
   -- variable,name=steroid_trinket_equipped,op=set,value=equipped.gladiators_badge|equipped.irideus_fragment|equipped.erupting_spear_fragment|equipped.spoils_of_neltharus|equipped.tome_of_unstable_power|equipped.timebreaching_talon|equipped.horn_of_valor|equipped.mirror_of_fractured_tomorrows|equipped.ashes_of_the_embersoul|equipped.balefire_branch|equipped.time_theifs_gambit|equipped.nymues_unraveling_spindle
   -- variable,name=disable_combustion,op=reset
@@ -298,82 +300,82 @@ local function CombustionCooldowns()
   if Settings.Commons.Enabled.Potions then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion combustion_cooldowns 2"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion combustion_cooldowns 2"; end
     end
   end
   -- blood_fury
   if S.BloodFury:IsCastable() then
-    if Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury combustion_cooldowns 4"; end
+    if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury combustion_cooldowns 4"; end
   end
   -- berserking,if=buff.combustion.up
   if S.Berserking:IsCastable() and (CombustionUp) then
-    if Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking combustion_cooldowns 6"; end
+    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking combustion_cooldowns 6"; end
   end
   -- fireblood
   if S.Fireblood:IsCastable() then
-    if Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood combustion_cooldowns 8"; end
+    if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood combustion_cooldowns 8"; end
   end
   -- ancestral_call
   if S.AncestralCall:IsCastable() then
-    if Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call combustion_cooldowns 10"; end
+    if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call combustion_cooldowns 10"; end
   end
   -- invoke_external_buff,name=power_infusion,if=buff.power_infusion.down
   -- invoke_external_buff,name=blessing_of_summer,if=buff.blessing_of_summer.down
   -- Note: Not handling external buffs
   -- time_warp,if=talent.temporal_warp&buff.exhaustion.up
   if S.TimeWarp:IsReady() and Settings.Commons.UseTemporalWarp and (S.TemporalWarp:IsAvailable() and Player:BloodlustExhaustUp()) then
-    if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp combustion_cooldowns 12"; end
+    if Cast(S.TimeWarp, Settings.CommonsOGCD.OffGCDasOffGCD.TimeWarp) then return "time_warp combustion_cooldowns 12"; end
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,effect_name=gladiators_badge
     if I.CrimsonGladiatorsBadge:IsEquippedAndReady() then
-      if Cast(I.CrimsonGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge (crimson) combustion_cooldowns 14"; end
+      if Cast(I.CrimsonGladiatorsBadge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "gladiators_badge (crimson) combustion_cooldowns 14"; end
     end
     if I.ObsidianGladiatorsBadge:IsEquippedAndReady() then
-      if Cast(I.ObsidianGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge (obsidian) combustion_cooldowns 16"; end
+      if Cast(I.ObsidianGladiatorsBadge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "gladiators_badge (obsidian) combustion_cooldowns 16"; end
     end
     if I.VerdantGladiatorsBadge:IsEquippedAndReady() then
-      if Cast(I.VerdantGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge (verdant) combustion_cooldowns 18"; end
+      if Cast(I.VerdantGladiatorsBadge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "gladiators_badge (verdant) combustion_cooldowns 18"; end
     end
     -- use_item,name=irideus_fragment
     if I.IrideusFragment:IsEquippedAndReady() then
-      if Cast(I.IrideusFragment, nil, Settings.Commons.DisplayStyle.Trinkets) then return "irideus_fragment combustion_cooldowns 20"; end
+      if Cast(I.IrideusFragment, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "irideus_fragment combustion_cooldowns 20"; end
     end
     -- use_item,name=spoils_of_neltharus
     if I.SpoilsofNeltharus:IsEquippedAndReady() then
-      if Cast(I.SpoilsofNeltharus, nil, Settings.Commons.DisplayStyle.Trinkets) then return "spoils_of_neltharus combustion_cooldowns 22"; end
+      if Cast(I.SpoilsofNeltharus, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spoils_of_neltharus combustion_cooldowns 22"; end
     end
     -- use_item,name=tome_of_unstable_power
     if I.TomeofUnstablePower:IsEquippedAndReady() then
-      if Cast(I.TomeofUnstablePower, nil, Settings.Commons.DisplayStyle.Trinkets) then return "tome_of_unstable_power combustion_cooldowns 24"; end
+      if Cast(I.TomeofUnstablePower, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "tome_of_unstable_power combustion_cooldowns 24"; end
     end
     -- use_item,name=timebreaching_talon
     if I.TimebreachingTalon:IsEquippedAndReady() then
-      if Cast(I.TimebreachingTalon, nil, Settings.Commons.DisplayStyle.Trinkets) then return "timebreaching_talon combustion_cooldowns 26"; end
+      if Cast(I.TimebreachingTalon, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "timebreaching_talon combustion_cooldowns 26"; end
     end
     -- use_item,name=voidmenders_shadowgem
     if I.VoidmendersShadowgem:IsEquippedAndReady() then
-      if Cast(I.VoidmendersShadowgem, nil, Settings.Commons.DisplayStyle.Trinkets) then return "voidmenders_shadowgem combustion_cooldowns 28"; end
+      if Cast(I.VoidmendersShadowgem, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "voidmenders_shadowgem combustion_cooldowns 28"; end
     end
     -- use_item,name=horn_of_valor
     if I.HornofValor:IsEquippedAndReady() then
-      if Cast(I.HornofValor, nil, Settings.Commons.DisplayStyle.Trinkets) then return "horn_of_valor combustion_cooldowns 30"; end
+      if Cast(I.HornofValor, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "horn_of_valor combustion_cooldowns 30"; end
     end
     -- use_item,name=timethiefs_gambit
     if I.TimeThiefsGambit:IsEquippedAndReady() then
-      if Cast(I.TimeThiefsGambit, nil, Settings.Commons.DisplayStyle.Trinkets) then return "time_theifs_gambit combustion_cooldowns 32"; end
+      if Cast(I.TimeThiefsGambit, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "time_theifs_gambit combustion_cooldowns 32"; end
     end
     -- use_item,name=balefire_branch
     if I.BalefireBranch:IsEquippedAndReady() then
-      if Cast(I.BalefireBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "balefire_branch combustion_cooldowns 34"; end
+      if Cast(I.BalefireBranch, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "balefire_branch combustion_cooldowns 34"; end
     end
     -- use_item,name=ashes_of_the_embersoul
     if I.AshesoftheEmbersoul:IsEquippedAndReady() then
-      if Cast(I.AshesoftheEmbersoul, nil, Settings.Commons.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul combustion_cooldowns 36"; end
+      if Cast(I.AshesoftheEmbersoul, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul combustion_cooldowns 36"; end
     end
     -- use_item,name=mirror_of_fractured_tomorrows
     if I.MirrorofFracturedTomorrows:IsEquippedAndReady() then
-      if Cast(I.MirrorofFracturedTomorrows, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows combustion_cooldowns 38"; end
+      if Cast(I.MirrorofFracturedTomorrows, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows combustion_cooldowns 38"; end
     end
   end
 end
@@ -381,11 +383,11 @@ end
 local function CombustionPhase()
   -- lights_judgment,if=buff.combustion.down
   if CDsON() and S.LightsJudgment:IsCastable() and (CombustionDown) then
-    if Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment combustion_phase 2"; end
+    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "lights_judgment combustion_phase 2"; end
   end
   -- bag_of_tricks,if=buff.combustion.down
   if CDsON() and S.BagofTricks:IsCastable() and (CombustionDown) then
-    if Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks combustion_phase 4"; end
+    if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "bag_of_tricks combustion_phase 4"; end
   end
   -- living_bomb,if=active_enemies>1&buff.combustion.down
   if S.LivingBomb:IsReady() and AoEON() and (EnemiesCount10ySplash > 1 and CombustionDown) then
@@ -451,7 +453,7 @@ local function CombustionPhase()
   end
   -- shifting_power,if=buff.combustion.up&!action.fire_blast.charges&(action.phoenix_flames.charges<action.phoenix_flames.max_charges|talent.alexstraszas_fury)&variable.combustion_shifting_power<=active_enemies
   if S.ShiftingPower:IsReady() and (CombustionUp and S.FireBlast:Charges() == 0 and (S.PhoenixFlames:Charges() < S.PhoenixFlames:MaxCharges() or S.AlexstraszasFury:IsAvailable()) and var_combustion_shifting_power <= EnemiesCount8ySplash) then
-    if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power combustion_phase 30"; end
+    if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power combustion_phase 30"; end
   end
   -- flamestrike,if=buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.remains>cast_time&active_enemies>=variable.skb_flamestrike&buff.fury_of_the_sun_king.expiration_delay_remains=0
   if AoEON() and S.Flamestrike:IsReady() and not Player:IsCasting(S.Flamestrike) and (Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Flamestrike:CastTime() and EnemiesCount8ySplash >= var_skb_flamestrike) then
@@ -702,7 +704,7 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- counterspell
-    local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.CommonsDS.DisplayStyle.Interrupts, false); if ShouldReturn then return ShouldReturn; end
     -- Manually added: Scorch sniping
     if Settings.Fire.UseScorchSniping and S.SearingTouch:IsAvailable() and AoEON() and Target:HealthPercentage() > 30 then
       for _, CycleUnit in pairs(Enemies16ySplash) do
@@ -717,13 +719,13 @@ local function APL()
     end
     -- time_warp,if=buff.exhaustion.up&talent.temporal_warp&(firestarter.active|interpolated_fight_remains<buff.bloodlust.duration)
     if CDsON() and S.TimeWarp:IsReady() and Settings.Commons.UseTemporalWarp and (Player:BloodlustExhaustUp() and S.TemporalWarp:IsAvailable() and (FirestarterActive() or FightRemains < 40)) then
-      if Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp main 2"; end
+      if Cast(S.TimeWarp, Settings.CommonsOGCD.OffGCDasOffGCD.TimeWarp) then return "time_warp main 2"; end
     end
     -- potion,if=buff.potion.duration>variable.time_to_combustion+buff.combustion.duration
     if Settings.Commons.Enabled.Potions then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() and (PotionSelected:BuffDuration() > var_time_to_combustion + 12) then
-        if Cast(PotionSelected, nil, Settings.Commons.DisplayStyle.Potions) then return "potion main 4"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 4"; end
       end
     end
     -- variable,name=shifting_power_before_combustion,value=variable.time_to_combustion>cooldown.shifting_power.remains
@@ -733,53 +735,53 @@ local function APL()
       var_item_cutoff_active = (var_time_to_combustion < var_on_use_cutoff or CombustionRemains > var_skb_duration and (I.DragonfireBombDispenser:CooldownUp() or not I.DragonfireBombDispenser:IsEquipped())) and (num(Trinket1:Cooldown() > 0 and Trinket1:CooldownRemains() < var_on_use_cutoff) + num(Trinket2:Cooldown() and Trinket2:CooldownRemains() < var_on_use_cutoff) > 1)
       -- use_item,effect_name=gladiators_badge,if=variable.time_to_combustion>cooldown-5
       if I.CrimsonGladiatorsBadge:IsEquippedAndReady() and (var_time_to_combustion > I.CrimsonGladiatorsBadge:Cooldown() - 5) then
-        if Cast(I.CrimsonGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge (crimson) main 6"; end
+        if Cast(I.CrimsonGladiatorsBadge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "gladiators_badge (crimson) main 6"; end
       end
       if I.ObsidianGladiatorsBadge:IsEquippedAndReady() and (var_time_to_combustion > I.ObsidianGladiatorsBadge:Cooldown() - 5) then
-        if Cast(I.ObsidianGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge (obsidian) main 8"; end
+        if Cast(I.ObsidianGladiatorsBadge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "gladiators_badge (obsidian) main 8"; end
       end
       if I.VerdantGladiatorsBadge:IsEquippedAndReady() and (var_time_to_combustion > I.VerdantGladiatorsBadge:Cooldown() - 5) then
-        if Cast(I.VerdantGladiatorsBadge, nil, Settings.Commons.DisplayStyle.Trinkets) then return "gladiators_badge (verdant) main 10"; end
+        if Cast(I.VerdantGladiatorsBadge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "gladiators_badge (verdant) main 10"; end
       end
       -- use_item,name=mirror_of_fractured_tomorrows,if=buff.combustion.up&buff.combustion.remains>11
       if I.MirrorofFracturedTomorrows:IsEquippedAndReady() and (CombustionUp and CombustionRemains > 11) then
-        if Cast(I.MirrorofFracturedTomorrows, nil, Settings.Commons.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows main 12"; end
+        if Cast(I.MirrorofFracturedTomorrows, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows main 12"; end
       end
       -- use_item,name=timethiefs_gambit,if=buff.combustion.up
       if I.TimeThiefsGambit:IsEquippedAndReady() and (CombustionUp) then
-        if Cast(I.TimeThiefsGambit, nil, Settings.Commons.DisplayStyle.Trinkets) then return "time_theifs_gambit main 14"; end
+        if Cast(I.TimeThiefsGambit, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "time_theifs_gambit main 14"; end
       end
       -- use_item,name=balefire_branch,if=(variable.time_to_combustion<=3&buff.fury_of_the_sun_king.up)|(buff.combustion.up&buff.combustion.remains>11)
       if I.BalefireBranch:IsEquippedAndReady() and ((var_time_to_combustion <= 3 and Player:BuffUp(S.FuryoftheSunKingBuff)) or (CombustionUp and CombustionRemains > 11)) then
-        if Cast(I.BalefireBranch, nil, Settings.Commons.DisplayStyle.Trinkets) then return "balefire_branch main 16"; end
+        if Cast(I.BalefireBranch, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "balefire_branch main 16"; end
       end
       -- use_item,name=ashes_of_the_embersoul,if=(variable.time_to_combustion<=3&buff.fury_of_the_sun_king.up)|(buff.combustion.up&buff.combustion.remains>11)
       if I.AshesoftheEmbersoul:IsEquippedAndReady() and ((var_time_to_combustion <= 3 and Player:BuffUp(S.FuryoftheSunKingBuff)) or (CombustionUp and CombustionRemains > 11)) then
-        if Cast(I.AshesoftheEmbersoul, nil, Settings.Commons.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul main 18"; end
+        if Cast(I.AshesoftheEmbersoul, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "ashes_of_the_embersoul main 18"; end
       end
       -- use_item,name=nymues_unraveling_spindle,if=variable.time_to_combustion<=9
       if I.NymuesUnravelingSpindle:IsEquippedAndReady() and (var_time_to_combustion <= 9) then
-        if Cast(I.NymuesUnravelingSpindle, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle main 20"; end
+        if Cast(I.NymuesUnravelingSpindle, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle main 20"; end
       end
     end
     -- use_item,name=dreambinder_loom_of_the_great_cycle
     if Settings.Commons.Enabled.Items and I.Dreambinder:IsEquippedAndReady() then
-      if Cast(I.Dreambinder, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder main 22"; end
+      if Cast(I.Dreambinder, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder main 22"; end
     end
     -- use_item,name=iridal_the_earths_master,use_off_gcd=1,slot=main_hand,if=gcd.remains>=0.6*gcd.max
     if Settings.Commons.Enabled.Items and I.IridaltheEarthsMaster:IsEquippedAndReady() then
-      if Cast(I.IridaltheEarthsMaster, nil, Settings.Commons.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master main 23"; end
+      if Cast(I.IridaltheEarthsMaster, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(40)) then return "iridal_the_earths_master main 23"; end
     end
     -- use_item,name=belorrelos_the_suncaller,if=(!variable.steroid_trinket_equipped&buff.combustion.down)|(variable.steroid_trinket_equipped&trinket.1.has_cooldown&trinket.1.cooldown.remains>20&buff.combustion.down)|(variable.steroid_trinket_equipped&trinket.2.has_cooldown&trinket.2.cooldown.remains>20&buff.combustion.down)
     if Settings.Commons.Enabled.Trinkets and I.BelorrelostheSuncaller:IsEquippedAndReady() and ((not var_steroid_trinket_equipped and CombustionDown) or (var_steroid_trinket_equipped and Trinket1:HasCooldown() and Trinket1:CooldownRemains() > 20 and CombustionDown) or (var_steroid_trinket_equipped and Trinket2:HasCooldown() and Trinket2:CooldownRemains() > 20 and CombustionDown)) then
-      if Cast(I.BelorrelostheSuncaller, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller main 24"; end
+      if Cast(I.BelorrelostheSuncaller, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller main 24"; end
     end
     -- use_items,if=!variable.item_cutoff_active
     if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) and not var_item_cutoff_active then
       local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
       if ItemToUse then
-        local DisplayStyle = Settings.Commons.DisplayStyle.Trinkets
-        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.Commons.DisplayStyle.Items end
+        local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+        if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
         if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~=13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
           if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
         end
@@ -797,7 +799,7 @@ local function APL()
     end
     -- shifting_power,if=buff.combustion.down&(action.fire_blast.charges=0|variable.fire_blast_pooling)&(!improved_scorch.active|debuff.improved_scorch.remains>cast_time+action.scorch.cast_time&!buff.fury_of_the_sun_king.up)&!buff.hot_streak.react&variable.shifting_power_before_combustion
     if S.ShiftingPower:IsReady() and (CombustionDown and (S.FireBlast:Charges() == 0 or var_fire_blast_pooling) and (not ImprovedScorchActive() or Target:DebuffRemains(S.ImprovedScorchDebuff) > S.ShiftingPower:CastTime() + S.Scorch:CastTime() and Player:BuffDown(S.FuryoftheSunKingBuff)) and Player:BuffDown(S.HotStreakBuff) and var_shifting_power_before_combustion) then
-      if Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power main 26"; end
+      if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power main 26"; end
     end
     -- variable,name=phoenix_pooling,if=active_enemies<variable.combustion_flamestrike,value=(variable.time_to_combustion+buff.combustion.duration-5<action.phoenix_flames.full_recharge_time+cooldown.phoenix_flames.duration-action.shifting_power.full_reduction*variable.shifting_power_before_combustion&variable.time_to_combustion<fight_remains|talent.sun_kings_blessing)&!talent.alexstraszas_fury
     -- Note: Swapped SunKingsBlessing check to the front so we can avoid lots of math if it's talented.
