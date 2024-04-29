@@ -36,6 +36,8 @@ local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Warlock.Commons,
+  CommonsDS = HR.GUISettings.APL.Warlock.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Warlock.CommonsOGCD,
   Destruction = HR.GUISettings.APL.Warlock.Destruction
 }
 

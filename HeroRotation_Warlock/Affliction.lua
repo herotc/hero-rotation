@@ -34,6 +34,8 @@ local Warlock  = HR.Commons.Warlock
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Warlock.Commons,
+  CommonsDS = HR.GUISettings.APL.Warlock.CommonsDS,
+  CommonsOGCD = HR.GUISettings.APL.Warlock.CommonsOGCD,
   Affliction = HR.GUISettings.APL.Warlock.Affliction
 }
 
