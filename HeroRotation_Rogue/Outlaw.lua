@@ -218,7 +218,7 @@ local function RtB_Reroll()
       -- actions+=/variable,name=rtb_reroll,if=!talent.crackshot&talent.hidden_opportunity,value=!rtb_buffs.will_lose.skull_and_crossbones
       -- &(rtb_buffs.will_lose<2+rtb_buffs.will_lose.grand_melee&spell_targets.blade_flurry<2&raid_event.adds.in>10)
       if not S.Crackshot:IsAvailable() and S.HiddenOpportunity:IsAvailable() and not checkBuffWillLose(S.SkullandCrossbones)
-        and (Cache.APLVar.RtB_Buffs.Will_Lose.Total < 2 + checkBuffWillLose(S.GrandMelee) and EnemiesBFCount < 2) then
+        and (Cache.APLVar.RtB_Buffs.Will_Lose.Total < 2 + num(checkBuffWillLose(S.GrandMelee)) and EnemiesBFCount < 2) then
         Cache.APLVar.RtB_Reroll = true
       end
 
@@ -278,7 +278,7 @@ local function StealthCDs ()
   -- # Hidden Opportunity builds without Crackshot use Vanish if Audacity is not active and when under max Opportunity stacks
   -- actions.stealth_cds+=/vanish,if=talent.hidden_opportunity&!talent.crackshot&!buff.audacity.up&(variable.vanish_opportunity_condition|buff.opportunity.stack<buff.opportunity.max_stack)&variable.ambush_condition
   if S.Vanish:IsReady() and Vanish_DPS_Condition() and S.HiddenOpportunity:IsAvailable() and not S.Crackshot:IsAvailable() and not Player:BuffUp(S.Audacity)
-    and (Vanish_Opportunity_Condition() or Player:BuffStack(S.Opportunity) < 6) and Ambush_Condition() and not Player.StealthUp(true, false) then
+    and (Vanish_Opportunity_Condition() or Player:BuffStack(S.Opportunity) < 6) and Ambush_Condition() and not Player:StealthUp(true, false) then
     if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (HO)" end
   end
 
