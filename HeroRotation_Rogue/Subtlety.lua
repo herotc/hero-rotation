@@ -162,7 +162,7 @@ local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD, Enemies)
   if BestUnit then
     CastLeftNameplate(BestUnit, DoTSpell)
   -- Check ranged units next, if the RangedMultiDoT option is enabled
-  elseif Settings.Commons2.RangedMultiDoT then
+  elseif Settings.Commons.RangedMultiDoT then
     BestUnit, BestUnitTTD = nil, DoTMinTTD
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemains(DoTSpell))

@@ -256,7 +256,7 @@ end
 -- Determine if we are allowed to use Vanish offensively in the current situation
 local function Vanish_DPS_Condition ()
   -- You can vanish if we've set the UseDPSVanish setting, and we're either not tanking or we're solo but the DPS vanish while solo flag is set).
-  return Settings.Commons2.UseDPSVanish and (not Player:IsTanking(Target) or Settings.Commons2.UseSoloVanish)
+  return Settings.Commons.UseDPSVanish and (not Player:IsTanking(Target) or Settings.Commons.UseSoloVanish)
 end
 
 local function Vanish_Opportunity_Condition ()
@@ -293,14 +293,14 @@ local function StealthCDs ()
   -- actions.stealth_cds+=/shadow_dance,if=talent.crackshot&variable.finish_condition
   -- synecdoche note: DPS gain in testing to hold off on shadow dance if vanish is coming up in the next 6 seconds to avoid wasting vanish CDR
   if S.ShadowDance:IsReady() and S.Crackshot:IsAvailable() and Finish_Condition()
-    and (S.Vanish:CooldownRemains() >= 6 or not Settings.Commons2.UseDPSVanish) and not Player:StealthUp(true, false) then
+    and (S.Vanish:CooldownRemains() >= 6 or not Settings.Commons.UseDPSVanish) and not Player:StealthUp(true, false) then
     if Cast(S.ShadowDance, Settings.CommonsOGCD.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance Crackshot" end
   end
 
   -- actions.stealth_cds+=/shadow_dance,if=!talent.keep_it_rolling&variable.shadow_dance_condition&buff.slice_and_dice.up
   -- &(variable.finish_condition|talent.hidden_opportunity)&(!talent.hidden_opportunity|!cooldown.vanish.ready)
   if S.ShadowDance:IsReady() and not S.KeepItRolling:IsAvailable() and Shadow_Dance_Condition() and Player:BuffUp(S.SliceandDice)
-    and (Finish_Condition() or S.HiddenOpportunity:IsAvailable()) and (not S.HiddenOpportunity:IsAvailable() or not S.Vanish:IsReady() or not Settings.Commons2.UseDPSVanish)
+    and (Finish_Condition() or S.HiddenOpportunity:IsAvailable()) and (not S.HiddenOpportunity:IsAvailable() or not S.Vanish:IsReady() or not Settings.Commons.UseDPSVanish)
     and not Player.StealthUp(true, false) then
     if Cast(S.ShadowDance, Settings.CommonsOGCD.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
   end

@@ -243,7 +243,7 @@ local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD, Enemies)
   if BestUnit then
     CastLeftNameplate(BestUnit, DoTSpell)
   -- Check ranged units next, if the RangedMultiDoT option is enabled
-  elseif Settings.Commons2.RangedMultiDoT then
+  elseif Settings.Commons.RangedMultiDoT then
     BestUnit, BestUnitTTD = nil, DoTMinTTD
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemains(DoTSpell))
@@ -294,7 +294,7 @@ local function CheckTargetIfTarget(Mode, ModeEvaluation, IfEvaluation)
 
   -- Prefer melee cycle units over ranged
   RunTargetIfCycler(MeleeEnemies5y)
-  if Settings.Commons2.RangedMultiDoT then
+  if Settings.Commons.RangedMultiDoT then
     RunTargetIfCycler(MeleeEnemies10y)
   end
   -- Prefer current target if equal mode value results to prevent "flickering"
@@ -367,7 +367,7 @@ local function Vanish ()
   if S.ShadowDance:IsCastable() and not S.Kingsbane:IsAvailable() then
     if S.ImprovedGarrote:IsAvailable() and S.Garrote:CooldownUp() and (Target:PMultiplier(S.Garrote) <= 1 or IsDebuffRefreshable(Target, S.Garrote))
       and (S.Deathmark:AnyDebuffUp() or S.Deathmark:CooldownRemains() < 12 or S.Deathmark:CooldownRemains() > 60) and ComboPointsDeficit >= mathmin(MeleeEnemies10yCount, 4) then
-      if Settings.Commons2.ShowPooling and Player:EnergyPredicted() < 45 then
+      if Settings.Commons.ShowPooling and Player:EnergyPredicted() < 45 then
         if Cast(S.PoolEnergy) then return "Pool for Shadow Dance (Garrote)" end
       end
       if Cast(S.ShadowDance, Settings.CommonsOGCD.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance (Garrote)" end
@@ -386,14 +386,14 @@ local function Vanish ()
       if not S.IndiscriminateCarnage:IsAvailable() and (S.Deathmark:AnyDebuffUp() or S.Deathmark:CooldownRemains() < 4)
         and ComboPointsDeficit >= mathmin(MeleeEnemies10yCount, 4) then
         -- actions.cds+=/pool_resource,for_next=1,extra_amount=45
-        if Settings.Commons2.ShowPooling and Player:EnergyPredicted() < 45 then
+        if Settings.Commons.ShowPooling and Player:EnergyPredicted() < 45 then
           if Cast(S.PoolEnergy) then return "Pool for Vanish (Garrote Deathmark)" end
         end
         if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Garrote No Carnage)" end
       end
       if S.IndiscriminateCarnage:IsAvailable() and MeleeEnemies10yCount > 2 then
         -- actions.cds+=/pool_resource,for_next=1,extra_amount=45
-        if Settings.Commons2.ShowPooling and Player:EnergyPredicted() < 45 then
+        if Settings.Commons.ShowPooling and Player:EnergyPredicted() < 45 then
           if Cast(S.PoolEnergy) then return "Pool for Vanish (Garrote Deathmark)" end
         end
         if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Garrote Carnage)" end
