@@ -66,14 +66,18 @@ local VarTrinket1BuffDuration = Trinket1:BuffDuration() + (num(Trinket1:ID() == 
 local VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket2:ID() == I.NymuesUnravelingSpindle:ID()) * 2)
 local VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 90 == 0 or 90 % Trinket1:Cooldown() == 0)) and 1 or 0.5
 local VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 90 == 0 or 90 % Trinket2:Cooldown() == 0)) and 1 or 0.5
-local VarDmgTrinketPriority = (not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2Level > Trinket1Level) and 2 or 1
-local VarTrinketPriority
-local TrinketCompare1 = ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()))) or 0
-local TrinketCompare2 = (((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()))) * (1 + ((Trinket1Level - Trinket2Level) / 100))) or 0
-if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and TrinketCompare1 > TrinketCompare2 then
-  VarTrinketPriority = 2
-else
-  VarTrinketPriority = 1
+-- Some logic to avoid processing a bunch of math when we're not using two on-use trinkets...
+local VarDmgTrinketPriority = (Trinket2Spell and not Trinket1Spell) and 2 or 1
+local VarTrinketPriority = (Trinket2Spell and not Trinket1Spell) and 2 or 1
+if Trinket1Spell and Trinket2Spell then
+  VarDmgTrinketPriority = (not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2Level > Trinket1Level) and 2 or 1
+  local TrinketCompare1 = ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()))) or 0
+  local TrinketCompare2 = (((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()))) * (1 + ((Trinket1Level - Trinket2Level) / 100))) or 0
+  if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and TrinketCompare1 > TrinketCompare2 then
+    VarTrinketPriority = 2
+  else
+    VarTrinketPriority = 1
+  end
 end
 
 -- Rotation Var
@@ -140,14 +144,18 @@ HL:RegisterForEvent(function()
   VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket2:ID() == I.NymuesUnravelingSpindle:ID()) * 2)
   VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 90 == 0 or 90 % Trinket1:Cooldown() == 0)) and 1 or 0.5
   VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 90 == 0 or 90 % Trinket2:Cooldown() == 0)) and 1 or 0.5
-  VarDmgTrinketPriority = (not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2Level > Trinket1Level) and 2 or 1
-  VarTrinketPriority
-  TrinketCompare1 = ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()))) or 0
-  TrinketCompare2 = (((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()))) * (1 + ((Trinket1Level - Trinket2Level) / 100))) or 0
-  if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and TrinketCompare1 > TrinketCompare2 then
-    VarTrinketPriority = 2
-  else
-    VarTrinketPriority = 1
+  -- Some logic to avoid processing a bunch of math when we're not using two on-use trinkets...
+  VarDmgTrinketPriority = (Trinket2Spell and not Trinket1Spell) and 2 or 1
+  VarTrinketPriority = (Trinket2Spell and not Trinket1Spell) and 2 or 1
+  if Trinket1Spell and Trinket2Spell then
+    VarDmgTrinketPriority = (not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2Level > Trinket1Level) and 2 or 1
+    local TrinketCompare1 = ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()))) or 0
+    local TrinketCompare2 = (((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()))) * (1 + ((Trinket1Level - Trinket2Level) / 100))) or 0
+    if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and TrinketCompare1 > TrinketCompare2 then
+      VarTrinketPriority = 2
+    else
+      VarTrinketPriority = 1
+    end
   end
 end, "PLAYER_EQUIPMENT_CHANGED")
 
