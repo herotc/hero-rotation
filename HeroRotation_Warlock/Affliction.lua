@@ -602,8 +602,6 @@ local function APL()
   else
     EnemiesCount10ySplash = 1
   end
-  -- DEBUG: REMOVE ME
-  EnemiesCount10ySplash = 2
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
