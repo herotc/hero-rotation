@@ -282,9 +282,9 @@ local function Precombat()
   if S.PowerSiphon:IsReady() and (Player:BuffStack(S.DemonicCoreBuff) + mathmax(WildImpsCount(), 2) <= 4 or Player:BuffRemains(S.DemonicCoreBuff) < 3) then
     if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon precombat 2"; end
   end
-  -- Manually added: demonbolt,if=fight_style.dungeonroute&!target.is_boss&buff.demonic_core.up
-  -- Note: This is to avoid suggesting ShadowBolt on a new dungeon pack when we have Demonic Core buff stacks.
-  if S.Demonbolt:IsReady() and Player:IsInDungeonArea() and not Target:IsInBossList() and Player:BuffUp(S.DemonicCoreBuff) then
+  -- Manually added: demonbolt,if=!target.is_boss&buff.demonic_core.up
+  -- Note: This is to avoid suggesting ShadowBolt on a new pack of mobs when we have Demonic Core buff stacks.
+  if S.Demonbolt:IsReady() and not Target:IsInBossList() and Player:BuffUp(S.DemonicCoreBuff) then
     if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt precombat 3"; end
   end
   -- demonbolt,if=!buff.power_siphon.up
@@ -486,7 +486,8 @@ local function Tyrant()
     if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan tyrant 24"; end
   end
   -- demonbolt,cycle_targets=1,if=soul_shard<4&(buff.demonic_core.stack>1)&(buff.vilefiend.up|!talent.summon_vilefiend&buff.dreadstalkers.up)
-  if S.Demonbolt:IsReady() and (SoulShards < 4 and (Player:BuffStack(S.DemonicCoreBuff) > 1) and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and DreadstalkerActive())) then
+  -- Note: Added 'not CDsON()' check to avoid having the profile ignore Demonbolt when Vilefiend is being held.
+  if S.Demonbolt:IsReady() and (SoulShards < 4 and (Player:BuffStack(S.DemonicCoreBuff) > 1) and (VilefiendActive() or not S.SummonVilefiend:IsAvailable() and DreadstalkerActive() or not CDsON())) then
     if S.DoomBrandDebuff:AuraActiveCount() == EnemiesCount8ySplash or not Player:HasTier(31, 2) then
       if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyrant 26"; end
     else
@@ -527,7 +528,7 @@ local function FightEnd()
     if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant fight_end 10"; end
   end
   -- demonic_strength,if=fight_remains<10
-  if CDsON() and S.DemonicStrength:IsCastable() and (BossFightRemains < 10) then
+  if S.DemonicStrength:IsCastable() and (BossFightRemains < 10) then
     if Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength fight_end 12"; end
   end
   -- power_siphon,if=buff.demonic_core.stack<3&fight_remains<20
@@ -635,7 +636,7 @@ local function APL()
       if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon main 10"; end
     end
     -- demonic_strength,if=buff.nether_portal.remains<gcd.max&!(raid_event.adds.in<45-raid_event.add.duration)
-    if CDsON() and S.DemonicStrength:IsCastable() and (Player:BuffRemains(S.NetherPortalBuff) < GCDMax) then
+    if S.DemonicStrength:IsCastable() and (Player:BuffRemains(S.NetherPortalBuff) < GCDMax) then
       if Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength main 12"; end
     end
     -- bilescourge_bombers
