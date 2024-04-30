@@ -45,6 +45,8 @@ local OnUseExcludes = {
 local Equip = Player:GetEquipment()
 local Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
 local Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
+local Trinket1Level = Trinket1:Level() or 0
+local Trinket2Level = Trinket2:Level() or 0
 local Trinket1Spell = Trinket1:OnUseSpell()
 local Trinket2Spell = Trinket2:OnUseSpell()
 local Trinket1Range = (Trinket1Spell and Trinket1Spell.MaximumRange > 0 and Trinket1Spell.MaximumRange <= 100) and Trinket1Spell.MaximumRange or 100
@@ -64,10 +66,10 @@ local VarTrinket1BuffDuration = Trinket1:BuffDuration() + (num(Trinket1:ID() == 
 local VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket2:ID() == I.NymuesUnravelingSpindle:ID()) * 2)
 local VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 90 == 0 or 90 % Trinket1:Cooldown() == 0)) and 1 or 0.5
 local VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 90 == 0 or 90 % Trinket2:Cooldown() == 0)) and 1 or 0.5
-local VarDmgTrinketPriority = (not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2:Level() > Trinket1:Level()) and 2 or 1
+local VarDmgTrinketPriority = (not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2Level > Trinket1Level) and 2 or 1
 local VarTrinketPriority
 local TrinketCompare1 = ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()))) or 0
-local TrinketCompare2 = (((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()))) * (1 + ((Trinket1:Level() - Trinket2:Level()) / 100))) or 0
+local TrinketCompare2 = (((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()))) * (1 + ((Trinket1Level - Trinket2Level) / 100))) or 0
 if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and TrinketCompare1 > TrinketCompare2 then
   VarTrinketPriority = 2
 else
@@ -118,6 +120,8 @@ HL:RegisterForEvent(function()
   Equip = Player:GetEquipment()
   Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
   Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
+  Trinket1Level = Trinket1:Level() or 0
+  Trinket2Level = Trinket2:Level() or 0
   Trinket1Spell = Trinket1:OnUseSpell()
   Trinket2Spell = Trinket2:OnUseSpell()
   Trinket1Range = (Trinket1Spell and Trinket1Spell.MaximumRange > 0 and Trinket1Spell.MaximumRange <= 100) and Trinket1Spell.MaximumRange or 100
@@ -136,8 +140,11 @@ HL:RegisterForEvent(function()
   VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()) * 20) + (num(Trinket2:ID() == I.NymuesUnravelingSpindle:ID()) * 2)
   VarTrinket1Sync = (VarTrinket1Buffs and (Trinket1:Cooldown() % 90 == 0 or 90 % Trinket1:Cooldown() == 0)) and 1 or 0.5
   VarTrinket2Sync = (VarTrinket2Buffs and (Trinket2:Cooldown() % 90 == 0 or 90 % Trinket2:Cooldown() == 0)) and 1 or 0.5
-  VarDmgTrinketPriority = (not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2:Level() > Trinket1:Level()) and 2 or 1
-  if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()))) > (((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()))) * (1 + ((Trinket1:Level() - Trinket2:Level()) / 100))) then
+  VarDmgTrinketPriority = (not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2Level > Trinket1Level) and 2 or 1
+  VarTrinketPriority
+  TrinketCompare1 = ((Trinket2:Cooldown() / VarTrinket2BuffDuration) * (VarTrinket2Sync) * (1 - 0.5 * num(Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()))) or 0
+  TrinketCompare2 = (((Trinket1:Cooldown() / VarTrinket1BuffDuration) * (VarTrinket1Sync) * (1 - 0.5 * num(Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()))) * (1 + ((Trinket1Level - Trinket2Level) / 100))) or 0
+  if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and TrinketCompare1 > TrinketCompare2 then
     VarTrinketPriority = 2
   else
     VarTrinketPriority = 1
