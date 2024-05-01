@@ -696,6 +696,14 @@ local function Main()
   if S.DevouringPlague:IsReady() and (Player:InsanityDeficit() <= 35 and S.DistortedReality:IsAvailable() or Player:BuffUp(S.DarkAscensionBuff) or Player:BuffUp(S.MindDevourerBuff) and S.MindBlast:CooldownUp()) then
     if Everyone.CastCycle(S.DevouringPlague, Enemies40y, EvaluateCycleDP2, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 16"; end
   end
+  -- void_torrent,if=!variable.holding_crash&talent.idol_of_cthun&cooldown.mind_blast.full_recharge_time>=3&talent.void_eruption,target_if=dot.devouring_plague.remains>=2.5
+  if S.VoidTorrent:IsReady() and (not VarHoldingCrash and S.IdolOfCthun:IsAvailable() and S.MindBlast:FullRechargeTime() >= 3 and S.VoidEruption:IsAvailable()) then
+    if Target:DebuffRemains(S.DevouringPlagueDebuff) >= 2.5 then
+      if Cast(S.VoidTorrent, Settings.Shadow.GCDasOffGCD.VoidTorrent, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 17 (primary target)"; end
+    else
+      if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent main 17 (off-target)"; end
+    end
+  end
   -- shadow_word_death,if=set_bonus.tier31_2pc
   if S.ShadowWordDeath:IsReady() and (Player:HasTier(31, 2)) then
     if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 18"; end
@@ -722,7 +730,11 @@ local function Main()
   end
   -- void_torrent,if=!variable.holding_crash&(!talent.idol_of_cthun|!talent.void_eruption),target_if=dot.devouring_plague.remains>=2.5,interrupt_if=cooldown.shadow_word_death.ready&pet.fiend.active&set_bonus.tier31_2pc
   if S.VoidTorrent:IsCastable() and (not VarHoldingCrash and (not S.IdolOfCthun:IsAvailable() or not S.VoidEruption:IsAvailable())) then
-    if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent main 30"; end
+    if Target:DebuffRemains(S.DevouringPlagueDebuff) >= 2.5 then
+      if Cast(S.VoidTorrent, Settings.Shadow.GCDasOffGCD.VoidTorrent, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 30 (primary target)"; end
+    else
+      if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent main 30 (off-target)"; end
+    end
   end
   -- call_action_list,name=filler
   local ShouldReturn = Filler(); if ShouldReturn then return ShouldReturn; end
