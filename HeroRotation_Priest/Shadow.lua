@@ -582,30 +582,30 @@ local function AoE()
   if Fiend:IsCastable() and ((Target:DebuffUp(S.ShadowWordPainDebuff) and VarDotsUp or S.ShadowCrash:InFlight() and S.WhisperingShadows:IsAvailable()) and (FightRemains < 30 or Target:TimeToDie() > 15) and (not S.DarkAscension:IsAvailable() or S.DarkAscension:CooldownRemains() < GCDMax or FightRemains < 15)) then
     if Cast(Fiend, Settings.Shadow.GCDasOffGCD.Mindbender) then return "mindbender aoe 6"; end
   end
-  -- devouring_plague,target_if=max:target.time_to_die*(!dot.devouring_plague.ticking),if=talent.distorted_reality&(active_dot.devouring_plague=0|insanity.deficit<=20)
-  if S.DevouringPlague:IsReady() and (S.DistortedReality:IsAvailable() and (S.DevouringPlagueDebuff:AuraActiveCount() == 0 or Player:InsanityDeficit() <= 20)) then
-    if Everyone.CastTargetIf(S.DevouringPlague, Enemies40y, "max", EvaluateTargetIfFilterDPTTD, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague aoe 8"; end
-  end
-  -- shadow_word_death,target_if=max:dot.devouring_plague.remains,if=(set_bonus.tier31_4pc|pet.fiend.active&talent.inescapable_torment&set_bonus.tier31_2pc)
-  if S.ShadowWordDeath:IsReady() and (Player:HasTier(31, 4) or VarFiendUp and S.InescapableTorment:IsAvailable() and Player:HasTier(31, 2)) then
-    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death aoe 10"; end
-  end
-  -- mind_blast,target_if=max:dot.devouring_plague.remains,if=(cooldown.mind_blast.full_recharge_time<=gcd.max+cast_time|pet.fiend.remains<=cast_time+gcd.max)&pet.fiend.active&talent.inescapable_torment&pet.fiend.remains>cast_time&active_enemies<=7&!buff.mind_devourer.up&dot.devouring_plague.remains>execute_time
-  if S.MindBlast:IsCastable() and ((S.MindBlast:FullRechargeTime() <= GCDMax + S.MindBlast:CastTime() or VarFiendRemains <= S.MindBlast:CastTime() + GCDMax) and VarFiendUp and S.InescapableTorment:IsAvailable() and VarFiendRemains > S.MindBlast:CastTime() and EnemiesCount10ySplash <= 7 and Player:BuffDown(S.MindDevourerBuff)) then
-    if Everyone.CastTargetIf(S.MindBlast, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, EvaluateTargetIfMindBlastAoE, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast aoe 12"; end
-  end
-  -- shadow_word_death,target_if=max:dot.devouring_plague.remains,if=pet.fiend.remains<=2&pet.fiend.active&talent.inescapable_torment&active_enemies<=7
-  if S.ShadowWordDeath:IsReady() and (VarFiendRemains <= 2 and VarFiendUp and S.InescapableTorment:IsAvailable() and EnemiesCount10ySplash <= 7) then
-    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death aoe 14"; end
-  end
   -- void_bolt,target_if=max:target.time_to_die
   -- Note: If Target won't die soon, just cast on Target instead of using CastTargetIf. If Target TTD <= 4, then use CastTargetIf.
   if S.VoidBolt:IsCastable() then
     if Target:TimeToDie() > 4 then
-      if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt aoe 15"; end
+      if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt aoe 8"; end
     else
-      if Everyone.CastTargetIf(S.VoidBolt, Enemies40y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(40)) then return "void_bolt aoe 16"; end
+      if Everyone.CastTargetIf(S.VoidBolt, Enemies40y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(40)) then return "void_bolt aoe 10"; end
     end
+  end
+  -- devouring_plague,target_if=max:target.time_to_die*(!dot.devouring_plague.ticking),if=talent.distorted_reality&(active_dot.devouring_plague=0|insanity.deficit<=20)
+  if S.DevouringPlague:IsReady() and (S.DistortedReality:IsAvailable() and (S.DevouringPlagueDebuff:AuraActiveCount() == 0 or Player:InsanityDeficit() <= 20)) then
+    if Everyone.CastTargetIf(S.DevouringPlague, Enemies40y, "max", EvaluateTargetIfFilterDPTTD, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague aoe 12"; end
+  end
+  -- shadow_word_death,target_if=max:dot.devouring_plague.remains,if=(set_bonus.tier31_4pc|pet.fiend.active&talent.inescapable_torment&set_bonus.tier31_2pc)
+  if S.ShadowWordDeath:IsReady() and (Player:HasTier(31, 4) or VarFiendUp and S.InescapableTorment:IsAvailable() and Player:HasTier(31, 2)) then
+    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death aoe 14"; end
+  end
+  -- mind_blast,target_if=max:dot.devouring_plague.remains,if=(cooldown.mind_blast.full_recharge_time<=gcd.max+cast_time|pet.fiend.remains<=cast_time+gcd.max)&pet.fiend.active&talent.inescapable_torment&pet.fiend.remains>cast_time&active_enemies<=7&!buff.mind_devourer.up&dot.devouring_plague.remains>execute_time
+  if S.MindBlast:IsCastable() and ((S.MindBlast:FullRechargeTime() <= GCDMax + S.MindBlast:CastTime() or VarFiendRemains <= S.MindBlast:CastTime() + GCDMax) and VarFiendUp and S.InescapableTorment:IsAvailable() and VarFiendRemains > S.MindBlast:CastTime() and EnemiesCount10ySplash <= 7 and Player:BuffDown(S.MindDevourerBuff)) then
+    if Everyone.CastTargetIf(S.MindBlast, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, EvaluateTargetIfMindBlastAoE, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast aoe 16"; end
+  end
+  -- shadow_word_death,target_if=max:dot.devouring_plague.remains,if=pet.fiend.remains<=2&pet.fiend.active&talent.inescapable_torment&active_enemies<=7
+  if S.ShadowWordDeath:IsReady() and (VarFiendRemains <= 2 and VarFiendUp and S.InescapableTorment:IsAvailable() and EnemiesCount10ySplash <= 7) then
+    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death aoe 18"; end
   end
   -- call_action_list,name=heal_for_tof,if=!buff.twist_of_fate.up&buff.twist_of_fate_can_trigger_on_ally_heal.up&(talent.rhapsody|talent.divine_star|talent.halo)
   if S.TwistofFate:IsAvailable() and Player:BuffDown(S.TwistofFateBuff) and CanToF() then
@@ -613,39 +613,39 @@ local function AoE()
   end
   -- devouring_plague,target_if=max:target.time_to_die*(!dot.devouring_plague.ticking),if=talent.distorted_reality
   if S.DevouringPlague:IsReady() and (S.DistortedReality:IsAvailable()) then
-    if Everyone.CastTargetIf(S.DevouringPlague, Enemies40y, "max", EvaluateTargetIfFilterDPTTD, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague aoe 18"; end
+    if Everyone.CastTargetIf(S.DevouringPlague, Enemies40y, "max", EvaluateTargetIfFilterDPTTD, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague aoe 20"; end
   end
   -- devouring_plague,if=(remains<=gcd.max&!variable.pool_for_cds|insanity.deficit<=20|buff.voidform.up&cooldown.void_bolt.remains>buff.voidform.remains&cooldown.void_bolt.remains<=buff.voidform.remains+2)&!talent.distorted_reality
   if S.DevouringPlague:IsReady() and ((Target:DebuffRemains(S.DevouringPlagueDebuff) <= GCDMax and not VarPoolForCDs or Player:InsanityDeficit() <= 20 or Player:BuffUp(S.VoidformBuff) and S.VoidBolt:CooldownRemains() > Player:BuffRemains(S.VoidformBuff) and S.VoidBolt:CooldownRemains() <= Player:BuffRemains(S.VoidformBuff) + 2) and not S.DistortedReality:IsAvailable()) then
-    if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague aoe 20"; end
+    if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague aoe 22"; end
   end
   -- vampiric_touch,target_if=refreshable&target.time_to_die>=18&(dot.vampiric_touch.ticking|!variable.dots_up),if=variable.max_vts>0&(cooldown.shadow_crash.remains>=dot.vampiric_touch.remains|variable.holding_crash)&!action.shadow_crash.in_flight|!talent.whispering_shadows
   if S.VampiricTouch:IsCastable() then
-    if Everyone.CastCycle(S.VampiricTouch, Enemies40y, EvaluateCycleVTAoE2, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch aoe 22"; end
+    if Everyone.CastCycle(S.VampiricTouch, Enemies40y, EvaluateCycleVTAoE2, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch aoe 24"; end
   end
   -- shadow_word_death,target_if=max:dot.devouring_plague.remains,if=variable.dots_up&talent.inescapable_torment&pet.fiend.active&((!talent.insidious_ire&!talent.idol_of_yoggsaron)|buff.deathspeaker.up)&!set_bonus.tier31_2pc
   if S.ShadowWordDeath:IsReady() and (VarDotsUp and S.InescapableTorment:IsAvailable() and VarFiendUp and ((not S.InsidiousIre:IsAvailable() and not S.IdolOfYoggSaron) or Player:BuffUp(S.DeathspeakerBuff)) and not Player:HasTier(31, 2)) then
-    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death aoe 24"; end
+    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death aoe 26"; end
   end
   -- mind_spike_insanity,target_if=max:dot.devouring_plague.remains,if=variable.dots_up&cooldown.mind_blast.full_recharge_time>=gcd*3&talent.idol_of_cthun&(!cooldown.void_torrent.up|!talent.void_torrent)
   if S.MindSpikeInsanity:IsReady() and (VarDotsUp and S.MindBlast:FullRechargeTime() >= Player:GCD() * 3 and S.IdolOfCthun:IsAvailable() and (S.VoidTorrent:CooldownDown() or not S.VoidTorrent:IsAvailable())) then
-    if Everyone.CastTargetIf(S.MindSpikeInsanity, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsInRange(40)) then return "mind_spike_insanity aoe 26"; end
+    if Everyone.CastTargetIf(S.MindSpikeInsanity, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsInRange(40)) then return "mind_spike_insanity aoe 28"; end
   end
   -- mind_flay,target_if=max:dot.devouring_plague.remains,if=buff.mind_flay_insanity.up&variable.dots_up&cooldown.mind_blast.full_recharge_time>=gcd*3&talent.idol_of_cthun&(!cooldown.void_torrent.up|!talent.void_torrent)
   if Flay:IsCastable() and (Player:BuffUp(S.MindFlayInsanityBuff) and VarDotsUp and S.MindBlast:FullRechargeTime() >= Player:GCD() * 3 and S.IdolOfCthun:IsAvailable() and (S.VoidTorrent:CooldownDown() or not S.VoidTorrent:IsAvailable())) then
-    if Everyone.CastTargetIf(Flay, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(Flay)) then return "mind_flay aoe 28"; end
+    if Everyone.CastTargetIf(Flay, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(Flay)) then return "mind_flay aoe 30"; end
   end
   -- mind_blast,target_if=max:dot.devouring_plague.remains,if=variable.dots_up&(!buff.mind_devourer.up|cooldown.void_eruption.up&talent.void_eruption)
   if S.MindBlast:IsCastable() and (VarDotsUp and (Player:BuffDown(S.MindDevourerBuff) or S.VoidEruption:CooldownUp() and S.VoidEruption:IsAvailable())) then
-    if Everyone.CastTargetIf(S.MindBlast, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast aoe 30"; end
+    if Everyone.CastTargetIf(S.MindBlast, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast aoe 32"; end
   end
   -- void_torrent,target_if=max:dot.devouring_plague.remains,if=(!variable.holding_crash|raid_event.adds.count%(active_dot.vampiric_touch+raid_event.adds.count)<1.5)&(dot.devouring_plague.remains>=2.5|buff.voidform.up)
   if S.VoidTorrent:IsCastable() then
-    if Everyone.CastTargetIf(S.VoidTorrent, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, EvaluateTargetIfVoidTorrentAoE, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent aoe 32"; end
+    if Everyone.CastTargetIf(S.VoidTorrent, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, EvaluateTargetIfVoidTorrentAoE, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent aoe 34"; end
   end
   -- mind_flay,target_if=max:dot.devouring_plague.remains,if=buff.mind_flay_insanity.up&talent.idol_of_cthun,interrupt_if=ticks>=2,interrupt_immediate=1
   if Flay:IsCastable() and (Player:BuffUp(S.MindFlayInsanityBuff) and S.IdolOfCthun:IsAvailable()) then
-    if Everyone.CastTargetIf(Flay, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(Flay)) then return "mind_flay aoe 34"; end
+    if Everyone.CastTargetIf(Flay, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(Flay)) then return "mind_flay aoe 36"; end
   end
   -- call_action_list,name=filler
   local ShouldReturn = Filler(); if ShouldReturn then return ShouldReturn; end
@@ -664,25 +664,25 @@ local function Main()
   if Fiend:IsCastable() and (VarDotsUp and (FightRemains < 30 or Target:TimeToDie() > 15) and (not S.DarkAscension:IsAvailable() or S.DarkAscension:CooldownRemains() < GCDMax or FightRemains < 15)) then
     if Cast(Fiend, Settings.Shadow.GCDasOffGCD.Mindbender) then return "mindbender main 2"; end
   end
+  -- void_bolt,if=variable.dots_up
+  if S.VoidBolt:IsCastable() and (VarDotsUp) then
+    if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt main 4"; end
+  end
   -- devouring_plague,target_if=!talent.distorted_reality|active_enemies=1|remains<=gcd.max,if=remains<=gcd.max|insanity.deficit<=16
   if S.DevouringPlague:IsReady() then
-    if Everyone.CastCycle(S.DevouringPlague, Enemies40y, EvaluateCycleDP, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 4"; end
+    if Everyone.CastCycle(S.DevouringPlague, Enemies40y, EvaluateCycleDP, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 6"; end
   end
   -- shadow_word_death,if=(set_bonus.tier31_4pc|pet.fiend.active&talent.inescapable_torment&set_bonus.tier31_2pc)&dot.devouring_plague.ticking
   if S.ShadowWordDeath:IsReady() and ((Player:HasTier(31, 4) or VarFiendUp and S.InescapableTorment:IsAvailable() and Player:HasTier(31, 2)) and Target:DebuffUp(S.DevouringPlagueDebuff)) then
-    if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 6"; end
+    if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 8"; end
   end
   -- mind_blast,target_if=dot.devouring_plague.remains>execute_time&(cooldown.mind_blast.full_recharge_time<=gcd.max+execute_time)|pet.fiend.remains<=execute_time+gcd.max,if=pet.fiend.active&talent.inescapable_torment&pet.fiend.remains>execute_time&active_enemies<=7
   if S.MindBlast:IsCastable() and (VarFiendUp and S.InescapableTorment:IsAvailable() and VarFiendRemains > S.MindBlast:ExecuteTime() and EnemiesCount10ySplash <= 7) then
-    if Everyone.CastCycle(S.MindBlast, Enemies40y, EvaluateCycleMindBlastMain, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 8"; end
+    if Everyone.CastCycle(S.MindBlast, Enemies40y, EvaluateCycleMindBlastMain, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 10"; end
   end
   -- shadow_word_death,target_if=dot.devouring_plague.ticking&pet.fiend.remains<=2&pet.fiend.active&talent.inescapable_torment&active_enemies<=7
   if S.ShadowWordDeath:IsReady() then
-    if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateCycleSWDMain, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 10"; end
-  end
-  -- void_bolt,if=variable.dots_up
-  if S.VoidBolt:IsCastable() and (VarDotsUp) then
-    if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt main 12"; end
+    if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateCycleSWDMain, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 12"; end
   end
   -- call_action_list,name=heal_for_tof,if=!buff.twist_of_fate.up&buff.twist_of_fate_can_trigger_on_ally_heal.up&(talent.rhapsody|talent.divine_star|talent.halo)
   if S.TwistofFate:IsAvailable() and Player:BuffDown(S.TwistofFateBuff) and CanToF() then
@@ -699,41 +699,41 @@ local function Main()
   -- void_torrent,if=!variable.holding_crash&talent.idol_of_cthun&cooldown.mind_blast.full_recharge_time>=3&talent.void_eruption,target_if=dot.devouring_plague.remains>=2.5
   if S.VoidTorrent:IsReady() and (not VarHoldingCrash and S.IdolOfCthun:IsAvailable() and S.MindBlast:FullRechargeTime() >= 3 and S.VoidEruption:IsAvailable()) then
     if Target:DebuffRemains(S.DevouringPlagueDebuff) >= 2.5 then
-      if Cast(S.VoidTorrent, Settings.Shadow.GCDasOffGCD.VoidTorrent, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 17 (primary target)"; end
+      if Cast(S.VoidTorrent, Settings.Shadow.GCDasOffGCD.VoidTorrent, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 18 (primary target)"; end
     else
-      if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent main 17 (off-target)"; end
+      if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent main 18 (off-target)"; end
     end
   end
   -- shadow_word_death,if=set_bonus.tier31_2pc
   if S.ShadowWordDeath:IsReady() and (Player:HasTier(31, 2)) then
-    if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 18"; end
+    if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 20"; end
   end
   -- shadow_crash,if=!variable.holding_crash&(dot.vampiric_touch.refreshable|buff.deaths_torment.stack>9&set_bonus.tier31_4pc&active_enemies>1)
   if S.ShadowCrash:IsCastable() and not VarPreferVT and (not VarHoldingCrash and (Target:DebuffRefreshable(S.VampiricTouchDebuff) or Player:BuffStack(S.DeathsTormentBuff) > 9 and Player:HasTier(31, 4) and EnemiesCount10ySplash > 1)) then
-    if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash main 20"; end
+    if Cast(S.ShadowCrash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash main 22"; end
   end
   -- shadow_word_pain,if=buff.deaths_torment.stack>9&set_bonus.tier31_4pc&active_enemies=1
   if S.ShadowWordPain:IsReady() and (Player:BuffStack(S.DeathsTormentBuff) > 9 and Player:HasTier(31, 4) and EnemiesCount10ySplash == 1) then
-    if Cast(S.ShadowWordPain, Settings.Shadow.GCDasOffGCD.ShadowWordPain, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_pain main 22"; end
+    if Cast(S.ShadowWordPain, Settings.Shadow.GCDasOffGCD.ShadowWordPain, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_pain main 24"; end
   end
   -- shadow_word_death,if=variable.dots_up&talent.inescapable_torment&pet.fiend.active&((!talent.insidious_ire&!talent.idol_of_yoggsaron)|buff.deathspeaker.up)&!set_bonus.tier31_2pc
   if S.ShadowWordDeath:IsReady() and (VarDotsUp and S.InescapableTorment:IsAvailable() and VarFiendUp and ((not S.InsidiousIre:IsAvailable() and not S.IdolOfYoggSaron:IsAvailable()) or Player:BuffUp(S.DeathspeakerBuff)) and not Player:HasTier(31, 2)) then
-    if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 24"; end
+    if Cast(S.ShadowWordDeath, Settings.Shadow.GCDasOffGCD.ShadowWordDeath, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 26"; end
   end
   -- vampiric_touch,target_if=min:remains,if=refreshable&target.time_to_die>=12&(cooldown.shadow_crash.remains>=dot.vampiric_touch.remains|variable.holding_crash|!talent.whispering_shadows)&(!action.shadow_crash.in_flight|!talent.whispering_shadows)
   if S.VampiricTouch:IsCastable() then
-    if Everyone.CastTargetIf(S.VampiricTouch, Enemies40y, "min", EvaluateTargetIfFilterVTRemains, EvaluateTargetIfVTMain, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch main 26"; end
+    if Everyone.CastTargetIf(S.VampiricTouch, Enemies40y, "min", EvaluateTargetIfFilterVTRemains, EvaluateTargetIfVTMain, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch main 28"; end
   end
   -- mind_blast,if=(!buff.mind_devourer.up|cooldown.void_eruption.up&talent.void_eruption)
   if S.MindBlast:IsCastable() and (Player:BuffDown(S.MindDevourerBuff) or S.VoidEruption:CooldownUp() and S.VoidEruption:IsAvailable()) then
-    if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 28"; end
+    if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 30"; end
   end
   -- void_torrent,if=!variable.holding_crash&(!talent.idol_of_cthun|!talent.void_eruption),target_if=dot.devouring_plague.remains>=2.5,interrupt_if=cooldown.shadow_word_death.ready&pet.fiend.active&set_bonus.tier31_2pc
   if S.VoidTorrent:IsCastable() and (not VarHoldingCrash and (not S.IdolOfCthun:IsAvailable() or not S.VoidEruption:IsAvailable())) then
     if Target:DebuffRemains(S.DevouringPlagueDebuff) >= 2.5 then
-      if Cast(S.VoidTorrent, Settings.Shadow.GCDasOffGCD.VoidTorrent, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 30 (primary target)"; end
+      if Cast(S.VoidTorrent, Settings.Shadow.GCDasOffGCD.VoidTorrent, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 32 (primary target)"; end
     else
-      if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent main 30 (off-target)"; end
+      if Everyone.CastCycle(S.VoidTorrent, Enemies40y, EvaluateCycleVoidTorrentMain, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent main 32 (off-target)"; end
     end
   end
   -- call_action_list,name=filler
