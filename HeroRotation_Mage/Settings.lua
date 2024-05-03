@@ -17,7 +17,6 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.Mage = {
   Commons = {
-    MovingRotation = false,
     UseTemporalWarp = true,
     Enabled = {
       Potions = true,
@@ -139,7 +138,6 @@ local CP_Frost = CreateChildPanel(CP_Mage, "Frost")
 -- Mage
 CreateARPanelOptions(CP_Mage, "APL.Mage.Commons")
 CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTemporalWarp", "Suggest Time Warp with Temporal Warp", "Show Time Warp when the Temporal Warp talent is selected.")
-CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.MovingRotation", "Disable non-instant casts while moving", "Don't show abilities where a cast is needed (makes the rotation a bit clunky with small steps).")
 CreateARPanelOptions(CP_MageDS, "APL.Mage.CommonsDS")
 CreateARPanelOptions(CP_MageOGCD, "APL.Mage.CommonsOGCD")
 
