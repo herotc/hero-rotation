@@ -679,10 +679,18 @@ local function CDs ()
   end
 
   if Settings.Commons.Enabled.Trinkets then
-    -- actions.cds+=/use_item,name=ashes_of_the_embersoul,if=(buff.cold_blood.up|(!talent.danse_macabre&buff.shadow_dance.up
+    -- use_item,name=irideus_fragment,if=(buff.cold_blood.up|(!talent.danse_macabre&buff.shadow_dance.up
+    -- |buff.danse_macabre.stack>=3)&!talent.cold_blood)|fight_remains<10
+    if I.IrideusFragment:IsEquippedAndReady() then
+      if (Player:BuffUp(S.ColdBlood) or (not S.DanseMacabre:IsAvailable() and Player:BuffUp(S.ShadowDance)
+        or Player:BuffStack(S.DanseMacabre) >= 3) and not S.ColdBlood:IsAvailable()) or HL.BossFilteredFightRemains("<", 10) then
+        if Cast(I.IrideusFragment, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Irideus Fragment" end
+      end
+    end
+    -- use_item,name=ashes_of_the_embersoul,if=(buff.cold_blood.up|(!talent.danse_macabre&buff.shadow_dance.up
     -- |buff.danse_macabre.stack>=3)&!talent.cold_blood)|fight_remains<10
     if I.AshesoftheEmbersoul:IsEquippedAndReady() then
-      if ((Player:BuffUp(S.ColdBlood) or S.ColdBlood:IsReady()) or (not S.DanseMacabre:IsAvailable() and Player:BuffUp(S.ShadowDance)
+      if (Player:BuffUp(S.ColdBlood) or (not S.DanseMacabre:IsAvailable() and Player:BuffUp(S.ShadowDance)
         or Player:BuffStack(S.DanseMacabre) >= 3) and not S.ColdBlood:IsAvailable()) or HL.BossFilteredFightRemains("<", 10) then
         if Cast(I.AshesoftheEmbersoul, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Ashes of the Embersoul" end
       end
@@ -703,7 +711,7 @@ local function CDs ()
       end
     end
 
-    -- actions.cds+=/use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=!stealthed.all&(buff.deeper_daggers.up|!talent.deeper_daggers)&
+    -- actions.cds+=/use_item,name=beacon_to_the_beyond,if=!stealthed.all&(buff.deeper_daggers.up|!talent.deeper_daggers)&
     -- (!raid_event.adds.up|!equipped.stormeaters_boon|trinket.stormeaters_boon.cooldown.remains>20)
     if I.BeaconToTheBeyond:IsEquippedAndReady() then
       if not Player:StealthUp(true, true) and (Player:BuffUp(S.DeeperDaggersBuff) or not S.DeeperDaggers:IsAvailable()) and
@@ -712,10 +720,13 @@ local function CDs ()
       end
     end
 
-    -- actions.cds+=/use_item,name=manic_grieftorch,use_off_gcd=1,if=!stealthed.all&(!raid_event.adds.up
-    -- |!equipped.stormeaters_boon|trinket.stormeaters_boon.cooldown.remains>20)
+    -- use_item,name=manic_grieftorch,if=!buff.shadow_blades.up&!buff.shadow_dance.up&(!trinket.mirror_of_fractured_tomorrows.cooldown.ready|!equipped.mirror_of_fractured_tomorrows)
+    -- &(!trinket.ashes_of_the_embersoul.cooldown.ready|!equipped.ashes_of_the_embersoul)&(!trinket.irideus_fragment.cooldown.ready|!equipped.irideus_fragment)
+    -- |fight_remains<10
     if I.ManicGrieftorch:IsEquippedAndReady() then
-      if not Player:StealthUp(true, true) and (not I.StormEatersBoon:IsEquippedAndReady() or I.StormEatersBoon:CooldownRemains()>20) then
+      if Player:BuffDown(S.ShadowBlades) and Player:BuffDown(S.ShadowDanceBuff) and (I.Mirror:CooldownDown() or not I.Mirror:IsEquipped())
+        and (I.AshesoftheEmbersoul:CooldownDown() or not I.AshesoftheEmbersoul:IsEquipped()) and (I.IrideusFragment:CooldownDown() or not I.IrideusFragment:IsEquipped())
+        or HL.BossFilteredFightRemains("<", 10) then
         if Cast(I.ManicGrieftorch, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Manic Grieftorch" end
       end
     end

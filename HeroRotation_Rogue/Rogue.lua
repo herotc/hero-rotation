@@ -298,7 +298,8 @@ Item.Rogue.Subtlety = {
   AshesoftheEmbersoul     = Item(207167, {13, 14}),
   WitherbarksBranch       = Item(109999, {13, 14}),
   BandolierOfTwistedBlades = Item(207165, {13, 14}),
-  Mirror                  = Item(207581, {13, 14})
+  Mirror                  = Item(207581, {13, 14}),
+  IrideusFragment         = Item(193743, {13, 14}),
 }
 
 function Commons.StealthSpell()
