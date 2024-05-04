@@ -284,10 +284,11 @@ Item.Rogue.Assassination = {
 
 Item.Rogue.Outlaw = {
   -- Trinkets
-  ManicGrieftorch         = Item(194308, {13, 14}),
-  WindscarWhetstone       = Item(137486, {13, 14}),
   BeaconToTheBeyond       = Item(203963, {13, 14}),
   DragonfireBombDispenser = Item(202610, {13, 14}),
+  ManicGrieftorch         = Item(194308, {13, 14}),
+  StormEatersBoon         = Item(194302, {13, 14}),
+  WindscarWhetstone       = Item(137486, {13, 14}),
 }
 
 Item.Rogue.Subtlety = {
