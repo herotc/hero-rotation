@@ -301,7 +301,7 @@ local function StealthCDs ()
   -- &(variable.finish_condition|talent.hidden_opportunity)&(!talent.hidden_opportunity|!cooldown.vanish.ready)
   if S.ShadowDance:IsReady() and not S.KeepItRolling:IsAvailable() and Shadow_Dance_Condition() and Player:BuffUp(S.SliceandDice)
     and (Finish_Condition() or S.HiddenOpportunity:IsAvailable()) and (not S.HiddenOpportunity:IsAvailable() or not S.Vanish:IsReady() or not Settings.Commons.UseDPSVanish)
-    and not Player.StealthUp(true, false) then
+    and not Player:StealthUp(true, false) then
     if Cast(S.ShadowDance, Settings.CommonsOGCD.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
   end
 
@@ -310,7 +310,7 @@ local function StealthCDs ()
   -- &(cooldown.keep_it_rolling.remains<=30|cooldown.keep_it_rolling.remains>120&(variable.finish_condition|talent.hidden_opportunity))
   if S.ShadowDance:IsReady() and S.KeepItRolling:IsAvailable() and Shadow_Dance_Condition()
     and (S.KeepItRolling:CooldownRemains() <= 30 or S.KeepItRolling:CooldownRemains() >= 120 and (Finish_Condition() or S.HiddenOpportunity:IsAvailable()))
-    and not Player.StealthUp(true, false) then
+    and not Player:StealthUp(true, false) then
     if Cast(S.ShadowDance, Settings.CommonsOGCD.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance KiR without Crackshot" end
   end
 
