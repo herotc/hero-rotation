@@ -682,7 +682,7 @@ local function CDs ()
     -- use_item,name=irideus_fragment,if=(buff.cold_blood.up|(!talent.danse_macabre&buff.shadow_dance.up
     -- |buff.danse_macabre.stack>=3)&!talent.cold_blood)|fight_remains<10
     if I.IrideusFragment:IsEquippedAndReady() then
-      if (Player:BuffUp(S.ColdBlood) or (not S.DanseMacabre:IsAvailable() and Player:BuffUp(S.ShadowDance)
+      if ((Player:BuffUp(S.ColdBlood) or S.ColdBlood:CooldownUp()) or (not S.DanseMacabre:IsAvailable() and Player:BuffUp(S.ShadowDance)
         or Player:BuffStack(S.DanseMacabre) >= 3) and not S.ColdBlood:IsAvailable()) or HL.BossFilteredFightRemains("<", 10) then
         if Cast(I.IrideusFragment, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Irideus Fragment" end
       end
@@ -690,7 +690,7 @@ local function CDs ()
     -- use_item,name=ashes_of_the_embersoul,if=(buff.cold_blood.up|(!talent.danse_macabre&buff.shadow_dance.up
     -- |buff.danse_macabre.stack>=3)&!talent.cold_blood)|fight_remains<10
     if I.AshesoftheEmbersoul:IsEquippedAndReady() then
-      if (Player:BuffUp(S.ColdBlood) or (not S.DanseMacabre:IsAvailable() and Player:BuffUp(S.ShadowDance)
+      if ((Player:BuffUp(S.ColdBlood) or S.ColdBlood:CooldownUp()) or (not S.DanseMacabre:IsAvailable() and Player:BuffUp(S.ShadowDance)
         or Player:BuffStack(S.DanseMacabre) >= 3) and not S.ColdBlood:IsAvailable()) or HL.BossFilteredFightRemains("<", 10) then
         if Cast(I.AshesoftheEmbersoul, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Ashes of the Embersoul" end
       end
