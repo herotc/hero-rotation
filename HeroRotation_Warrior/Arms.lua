@@ -435,7 +435,7 @@ local function SingleTarget()
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower single_target 40"; end
   end
   -- whirlwind,if=talent.storm_of_swords&!talent.test_of_might
-  if S.Whirlwind:IsReady() and (S.StormofSwords:IsAvailable() and not S.TestofMight:IsAvailable().) then
+  if S.Whirlwind:IsReady() and (S.StormofSwords:IsAvailable() and not S.TestofMight:IsAvailable()) then
     if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind single_target 42"; end
   end
   -- slam,if=talent.crushing_force&dot.rend.remains>12
