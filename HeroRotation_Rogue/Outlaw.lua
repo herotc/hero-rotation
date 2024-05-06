@@ -386,7 +386,7 @@ local function CDs ()
     if I.ManicGrieftorch:IsEquippedAndReady() then
       if (not Player:StealthUp(true, true) and Player:BuffUp(S.BetweentheEyes) or
         HL.BossFilteredFightRemains("<=", 5)) then
-        if Cast(I.ManicGrieftorch, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(40) then return "Manic Grieftorch"; end
+        if Cast(I.ManicGrieftorch, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "Manic Grieftorch"; end
       end
     end
 
@@ -394,7 +394,7 @@ local function CDs ()
     if I.BeaconToTheBeyond:IsEquippedAndReady() then
       if not Player:StealthUp(true, true) and Player:BuffUp(S.BetweentheEyes)
         or HL.BossFilteredFightRemains("<", 5) then
-        if Cast(I.BeaconToTheBeyond, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45) then return "Beacon"; end
+        if Cast(I.BeaconToTheBeyond, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "Beacon"; end
       end
     end
   end
@@ -452,7 +452,7 @@ local function CDs ()
     if I.DragonfireBombDispenser:IsEquippedAndReady() then
       if (not trinket1:ID() == I.DragonfireBombDispenser:ID() and trinket1:CooldownRemains() > 10 or
         trinket2:CooldownRemains() > 10) or (I.DragonfireBombDispenser:OnUseSpell()):Charges() > 2 or HL.BossFilteredFightRemains("<", 20) or not trinket2:HasCooldown() or not trinket1:HasCooldown() then
-        if Cast(I.DragonfireBombDispenser, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(46) then return "Dragonfire Bomb Dispenser"; end
+        if Cast(I.DragonfireBombDispenser, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "Dragonfire Bomb Dispenser"; end
       end
     end
 
