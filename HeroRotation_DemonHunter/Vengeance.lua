@@ -57,6 +57,7 @@ local Settings = {
 -- Rotation Var
 local SoulFragments, TotalSoulFragments, IncSoulFragments
 local VarEDFragments = (S.SoulSigils:IsAvailable()) and 4 or 3
+local SigilPopTime = (S.QuickenedSigils:IsAvailable()) and 1 or 2
 local IsInMeleeRange, IsInAoERange
 local ActiveMitigationNeeded
 local IsTanking
@@ -154,8 +155,8 @@ local function Maintenance()
   if S.FieryBrand:IsCastable() and ((S.FieryBrandDebuff:AuraActiveCount() == 0 and (S.SigilofFlame:CooldownRemains() <= (S.FieryBrand:ExecuteTime() + Player:GCDRemains()) or S.SoulCarver:CooldownRemains() < (S.FieryBrand:ExecuteTime() + Player:GCDRemains()) or S.FelDevastation:CooldownRemains() < (S.FieryBrand:ExecuteTime() + Player:GCDRemains()))) or (S.DowninFlames:IsAvailable() and S.FieryBrand:FullRechargeTime() < (S.FieryBrand:ExecuteTime() + Player:GCDRemains()))) then
     if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand maintenance 2"; end
   end
-  -- sigil_of_flame,if=talent.ascending_flame|active_dot.sigil_of_flame=0
-  if S.SigilofFlame:IsCastable() and (S.AscendingFlame:IsAvailable() or S.SigilofFlameDebuff:AuraActiveCount() == 0) then
+  -- sigil_of_flame,if=talent.ascending_flame|(active_dot.sigil_of_flame=0&!in_flight)
+  if S.SigilofFlame:IsCastable() and (S.AscendingFlame:IsAvailable() or (S.SigilofFlameDebuff:AuraActiveCount() == 0 and S.SigilofFlame:TimeSinceLastCast() > SigilPopTime)) then
     if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame maintenance 4"; end
   end
   -- immolation_aura
@@ -224,8 +225,8 @@ local function FieryDemise()
   if S.TheHunt:IsCastable() then
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt fiery_demise 12"; end
   end
-  -- elysian_decree,line_cd=1.85,if=fury>=40
-  if S.ElysianDecree:IsCastable() and S.ElysianDecree:TimeSinceLastCast() >= 1.85 and (Player:Fury() >= 40) then
+  -- elysian_decree,if=fury>=40&!prev_gcd.1.elysian_decree
+  if S.ElysianDecree:IsCastable() and (Player:Fury() >= 40 and not Player:PrevGCD(1, S.ElysianDecree)) then
     if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree fiery_demise 14"; end
   end
   -- spirit_bomb,if=variable.can_spb
@@ -277,8 +278,8 @@ local function SingleTarget()
   if S.FelDevastation:IsReady() and (S.CollectiveAnguish:IsAvailable() or (S.StoketheFlames:IsAvailable() and S.BurningBlood:IsAvailable())) then
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation single_target 6"; end
   end
-  -- elysian_decree
-  if S.ElysianDecree:IsCastable() then
+  -- elysian_decree,if=!prev_gcd.1.elysian_decree
+  if S.ElysianDecree:IsCastable() and (not Player:PrevGCD(1, S.ElysianDecree)) then
     if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree single_target 8"; end
   end
   -- fel_devastation
@@ -306,8 +307,8 @@ local function SmallAoE()
   if S.FelDevastation:IsReady() and (S.CollectiveAnguish:IsAvailable() or (S.StoketheFlames:IsAvailable() and S.BurningBlood:IsAvailable())) then
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation small_aoe 4"; end
   end
-  -- elysian_decree,line_cd=1.85,if=fury>=40&(soul_fragments.total<=1|soul_fragments.total>=4)
-  if S.ElysianDecree:IsCastable() and S.ElysianDecree:TimeSinceLastCast() >= 1.85 and (Player:Fury() >= 40 and (TotalSoulFragments <= 1 or TotalSoulFragments >= 4)) then
+  -- elysian_decree,if=fury>=40&(soul_fragments.total<=1|soul_fragments.total>=4)&!prev_gcd.1.elysian_decree
+  if S.ElysianDecree:IsCastable() and (Player:Fury() >= 40 and (TotalSoulFragments <= 1 or TotalSoulFragments >= 4) and not Player:PrevGCD(1, S.ElysianDecree)) then
     if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree small_aoe 6"; end
   end
   -- fel_devastation
@@ -339,8 +340,8 @@ local function BigAoE()
   if S.TheHunt:IsCastable() then
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt big_aoe 4"; end
   end
-  -- elysian_decree,line_cd=1.85,if=fury>=40&(soul_fragments.total<=1|soul_fragments.total>=4)
-  if S.ElysianDecree:IsCastable() and S.ElysianDecree:TimeSinceLastCast() >= 1.85 and (Player:Fury() >= 40 and (TotalSoulFragments <= 1 or TotalSoulFragments >= 4)) then
+  -- elysian_decree,if=fury>=40&(soul_fragments.total<=1|soul_fragments.total>=4)&!prev_gcd.1.elysian_decree
+  if S.ElysianDecree:IsCastable() and (Player:Fury() >= 40 and (TotalSoulFragments <= 1 or TotalSoulFragments >= 4) and not Player:PrevGCD(1, S.ElysianDecree)) then
     if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree big_aoe 6"; end
   end
   -- fel_devastation
@@ -428,11 +429,11 @@ local function APL()
     VarBigAoE = EnemiesCount8yMelee >= 6
     -- Note: Below line moved from above.
     VarDontCleave = ((S.FelDevastation:CooldownRemains() <= (S.SoulCleave:ExecuteTime() + Player:GCDRemains())) and Player:Fury() < 80 or (IncSoulFragments > 1 or TotalSoulFragments >= 5) and not VarST)
-    -- variable,name=can_spb,op=setif,condition=variable.fd_ready,value=(variable.single_target&soul_fragments>=5)|(variable.small_aoe&soul_fragments>=4)|(variable.big_aoe&soul_fragments>=3),value_else=(variable.small_aoe&soul_fragments>=5)|(variable.big_aoe&soul_fragments>=4)
+    -- variable,name=can_spb,op=setif,condition=variable.fd_ready,value=(variable.single_target&soul_fragments>=5)|(variable.small_aoe&soul_fragments>=4)|(variable.big_aoe&soul_fragments>=3),value_else=(variable.small_aoe&soul_fragments>=4)|(variable.big_aoe&soul_fragments>=3)
     if VarFDReady then
       VarCanSpB = (VarST and SoulFragments >= 5) or (VarSmallAoE and SoulFragments >= 4) or (VarBigAoE and SoulFragments >= 3)
     else
-      VarCanSpB = (VarSmallAoE and SoulFragments >= 5) or (VarBigAoE and SoulFragments >= 4)
+      VarCanSpB = (VarSmallAoE and SoulFragments >= 4) or (VarBigAoE and SoulFragments >= 3)
     end
     -- Note: Manually added variable for holding maintenance SoulCleave if incoming souls would make VarCanSpB true
     if VarFDReady then

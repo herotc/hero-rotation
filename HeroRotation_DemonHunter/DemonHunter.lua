@@ -37,6 +37,7 @@ Spell.DemonHunter.Commons = {
   Felblade                              = Spell(232893),
   FirstoftheIllidari                    = Spell(235893),
   FoddertotheFlame                      = Spell(391429),
+  QuickenedSigils                       = Spell(209281),
   SigilofFlame                          = MultiSpell(204596, 389810), -- 204596: Base ID, 389810: Precise
   SigilofMisery                         = MultiSpell(207684, 389813), -- 207684: Base ID, 389813: Precise
   SoulSigils                            = Spell(395446),
