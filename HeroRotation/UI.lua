@@ -125,7 +125,7 @@
     KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE");
     KeybindFrame:SetAllPoints(true);
     KeybindFrame:SetJustifyH("RIGHT");
-    --KeybindFrame:SetJustifyV("TOP");
+    KeybindFrame:SetJustifyV("TOP");
     KeybindFrame:SetPoint("TOPRIGHT");
     KeybindFrame:SetTextColor(0.8,0.8,0.8,1);
     KeybindFrame:SetText("");
@@ -134,7 +134,7 @@
     self.Text = TextFrame;
     TextFrame:SetAllPoints(true);
     TextFrame:SetJustifyH("CENTER");
-    --TextFrame:SetJustifyV("CENTER");
+    TextFrame:SetJustifyV("MIDDLE");
     TextFrame:SetPoint("CENTER");
     TextFrame:SetTextColor(1,1,1,1);
     TextFrame:SetText("");
@@ -220,7 +220,7 @@
       PartFrame.Keybind:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE");
       PartFrame.Keybind:SetAllPoints(true);
       PartFrame.Keybind:SetJustifyH("RIGHT");
-      --PartFrame.Keybind:SetJustifyV("TOP");
+      PartFrame.Keybind:SetJustifyV("TOP");
       PartFrame.Keybind:SetPoint("TOPRIGHT");
       PartFrame.Keybind:SetTextColor(0.8,0.8,0.8,1);
       PartFrame.Keybind:SetText("");
@@ -344,7 +344,7 @@
     Keybind:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE");
     Keybind:SetAllPoints(true);
     Keybind:SetJustifyH("RIGHT");
-    --Keybind:SetJustifyV("TOP");
+    Keybind:SetJustifyV("TOP");
     Keybind:SetPoint("TOPRIGHT");
     Keybind:SetTextColor(0.8,0.8,0.8,1);
     Keybind:SetText("");
@@ -427,7 +427,7 @@
     KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE");
     KeybindFrame:SetAllPoints(true);
     KeybindFrame:SetJustifyH("RIGHT");
-    --KeybindFrame:SetJustifyV("TOP");
+    KeybindFrame:SetJustifyV("TOP");
     KeybindFrame:SetPoint("TOPRIGHT");
     KeybindFrame:SetTextColor(0.8,0.8,0.8,1);
     KeybindFrame:SetText("");
@@ -641,7 +641,7 @@
     KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE");
     KeybindFrame:SetAllPoints(true);
     KeybindFrame:SetJustifyH("RIGHT");
-    --KeybindFrame:SetJustifyV("TOP");
+    KeybindFrame:SetJustifyV("TOP");
     KeybindFrame:SetPoint("TOPRIGHT");
     KeybindFrame:SetTextColor(0.8,0.8,0.8,1);
     KeybindFrame:SetText("");
@@ -713,7 +713,7 @@
     KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE");
     KeybindFrame:SetAllPoints(true);
     KeybindFrame:SetJustifyH("RIGHT");
-    --KeybindFrame:SetJustifyV("TOP");
+    KeybindFrame:SetJustifyV("TOP");
     KeybindFrame:SetPoint("TOPRIGHT");
     KeybindFrame:SetTextColor(0.8,0.8,0.8,1);
     KeybindFrame:SetText("");
