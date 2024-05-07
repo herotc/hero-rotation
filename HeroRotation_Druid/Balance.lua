@@ -311,10 +311,14 @@ local function St()
   if S.Wrath:IsReady() and (Player:BuffUp(S.DreamstateBuff) and VarCDConditionST and Player:BuffUp(S.EclipseSolar)) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath st 15"; end
   end
+  -- starsurge,if=buff.touch_the_cosmos.up&variable.cd_condition_st
+  if S.Starsurge:IsReady() and (Player:BuffUp(S.TouchtheCosmos) and VarCDConditionST) then
+    if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 16"; end
+  end
   if CDsON() then
     -- celestial_alignment,if=variable.cd_condition_st
     if S.CelestialAlignment:IsCastable() and (VarCDConditionST) then
-      if Cast(S.CelestialAlignment, Settings.Balance.GCDasOffGCD.CaInc) then return "celestial_alignment st 16"; end
+      if Cast(S.CelestialAlignment, Settings.Balance.GCDasOffGCD.CaInc) then return "celestial_alignment st 17"; end
     end
     -- incarnation,if=variable.cd_condition_st
     if S.Incarnation:IsCastable() and (VarCDConditionST) then
@@ -365,13 +369,17 @@ local function St()
   end
   -- variable,name=starsurge_condition1,value=talent.starlord&buff.starlord.stack<3|(buff.balance_of_all_things_arcane.stack+buff.balance_of_all_things_nature.stack)>2&buff.starlord.remains>4
   local VarStarsurgeCondition1 = (S.Starlord:IsAvailable() and Player:BuffStack(S.StarlordBuff) < 3 or (Player:BuffStack(S.BOATArcaneBuff) + Player:BuffStack(S.BOATNatureBuff)) > 2 and Player:BuffRemains(S.StarlordBuff) > 4)
+  -- wrath,if=buff.gathering_starstuff.stack=3&astral_power.deficit>variable.passive_asp+energize_amount
+  if S.Wrath:IsReady() and (Player:BuffStack(S.GatheringStarstuff) == 3 and Player:AstralPowerDeficit() > VarPassiveAsp + S.Wrath:EnergizeAmount()) then
+    if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath st 39"; end
+  end
   -- cancel_buff,name=starlord,if=buff.starlord.remains<2&variable.starsurge_condition1
   if Settings.Balance.ShowCancelStarlord and Player:BuffUp(S.StarlordBuff) and Player:BuffRemains(S.StarlordBuff) < 2 and VarStarsurgeCondition1 then
-    if HR.CastAnnotated(S.Starlord, false, "CANCEL") then return "cancel_buff starlord st 39"; end
+    if HR.CastAnnotated(S.Starlord, false, "CANCEL") then return "cancel_buff starlord st 40"; end
   end
   -- starsurge,if=variable.starsurge_condition1
   if S.Starsurge:IsReady() and (VarStarsurgeCondition1) then
-    if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 40"; end
+    if Cast(S.Starsurge, nil, nil, not Target:IsSpellInRange(S.Starsurge)) then return "starsurge st 41"; end
   end
   -- sunfire,target_if=refreshable&astral_power.deficit>variable.passive_asp+energize_amount
   if S.Sunfire:IsCastable() then
