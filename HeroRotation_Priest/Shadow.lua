@@ -244,8 +244,8 @@ local function EvaluateCycleShadowCrashAoE(TargetUnit)
 end
 
 local function EvaluateCycleSWDFiller(TargetUnit)
-  -- target_if=target.health.pct<20|(buff.deathspeaker.up|set_bonus.tier31_2pc)&dot.devouring_plague.ticking
-  return (TargetUnit:HealthPercentage() < 20 or (Player:BuffUp(S.DeathspeakerBuff) or Player:HasTier(31, 2)) and TargetUnit:DebuffUp(S.DevouringPlagueDebuff))
+  -- target_if=(target.health.pct<20|buff.deathspeaker.up|set_bonus.tier31_2pc)&dot.devouring_plague.ticking
+  return ((TargetUnit:HealthPercentage() < 20 or Player:BuffUp(S.DeathspeakerBuff) or Player:HasTier(31, 2)) and TargetUnit:DebuffUp(S.DevouringPlagueDebuff))
 end
 
 local function EvaluateCycleSWDFiller2(TargetUnit)
@@ -500,7 +500,7 @@ local function Filler()
   if Target:DebuffRemains(S.DevouringPlagueDebuff) > S.MindSpike:CastTime() or not S.MindSpike:IsAvailable() then
     local ShouldReturn = EmpoweredFiller(); if ShouldReturn then return ShouldReturn; end
   end
-  -- shadow_word_death,target_if=target.health.pct<20|(buff.deathspeaker.up|set_bonus.tier31_2pc)&dot.devouring_plague.ticking
+  -- shadow_word_death,target_if=(target.health.pct<20|buff.deathspeaker.up|set_bonus.tier31_2pc)&dot.devouring_plague.ticking
   if S.ShadowWordDeath:IsReady() then
     if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateCycleSWDFiller, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 4"; end
   end
