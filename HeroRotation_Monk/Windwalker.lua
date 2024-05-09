@@ -38,13 +38,21 @@ local S = Spell.Monk.Windwalker
 local I = Item.Monk.Windwalker
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = {
+local OnUseExcludesSerenity = {
   I.AlgetharPuzzleBox:ID(),
   I.BeacontotheBeyond:ID(),
   I.Djaruun:ID(),
   I.DragonfireBombDispenser:ID(),
   I.EruptingSpearFragment:ID(),
   I.IrideusFragment:ID(),
+  I.ManicGrieftorch:ID(),
+}
+local OnUseExcludesSEF = {
+  I.AlgetharPuzzleBox:ID(),
+  I.BeacontotheBeyond:ID(),
+  I.Djaruun:ID(),
+  I.DragonfireBombDispenser:ID(),
+  I.EruptingSpearFragment:ID(),
   I.ManicGrieftorch:ID(),
 }
 
@@ -311,8 +319,8 @@ local function Trinkets()
       if I.IrideusFragment:IsEquippedAndReady() and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and (Player:BuffUp(S.InvokersDelightBuff) or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 45 and FightRemains > 180) and Player:BuffUp(S.SerenityBuff) or BossFightRemains < 20) then
         if Cast(I.IrideusFragment, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "irideus_fragment trinkets 15"; end
       end
-      local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
-      local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
+      local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludesSerenity, 13)
+      local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludesSerenity, 14)
       -- ITEM_STAT_BUFF,if=(pet.xuen_the_white_tiger.active|!talent.invoke_xuen_the_white_tiger)&buff.serenity.up|fight_remains<25
       if Trinket1ToUse and Trinket1ToUse:HasUseBuff() and ((XuenActive or not S.InvokeXuenTheWhiteTiger:IsAvailable()) and Player:BuffUp(S.SerenityBuff) or BossFightRemains < 25) then
         if Cast(Trinket1ToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name() .. " (serenity_trinkets stat_buff trinket1)"; end
@@ -357,8 +365,8 @@ local function Trinkets()
       if I.DragonfireBombDispenser:IsEquippedAndReady() and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 or BossFightRemains < 10) then
         if Cast(I.DragonfireBombDispenser, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser sef_trinkets 26"; end
       end
-      local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
-      local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
+      local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludesSEF, 13)
+      local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludesSEF, 14)
       -- ITEM_STAT_BUFF,if=(pet.xuen_the_white_tiger.active|!talent.invoke_xuen_the_white_tiger)&buff.storm_earth_and_fire.up|fight_remains<25
       if Trinket1ToUse and Trinket1ToUse:HasUseBuff() and ((XuenActive or not S.InvokeXuenTheWhiteTiger:IsAvailable()) and Player:BuffUp(S.StormEarthAndFireBuff) or BossFightRemains < 25) then
         if Cast(Trinket1ToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name() .. " (sef_trinkets stat_buff trinket1)"; end
