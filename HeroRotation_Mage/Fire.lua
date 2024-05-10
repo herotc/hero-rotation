@@ -574,7 +574,7 @@ local function StandardRotation()
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!firestarter.active&!variable.fire_blast_pooling&buff.fury_of_the_sun_king.down&(((action.fireball.executing&(action.fireball.execute_remains<0.5|!talent.hyperthermia)|action.pyroblast.executing&(action.pyroblast.execute_remains<0.5|!talent.hyperthermia))&buff.heating_up.react)|(searing_touch.active&(!improved_scorch.active|debuff.improved_scorch.stack=debuff.improved_scorch.max_stack|full_recharge_time<3)&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!hot_streak_spells_in_flight)))
   -- Note: Moved above previous 3 lines, due to use_while_casting.
   -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react&searing_touch.active&active_enemies<variable.hot_streak_flamestrike
-  if S.Pyroblast:IsReady() and ((Player:IsCasting(S.Scorch) or Player:PrevGCDP(1, S.Scorch)) and Player:BuffUp(S.HeatingUpBuff) and SearingTouchActive() and EnemiesCount8ySplash < var_hot_streak_flamestrike) then
+  if S.Pyroblast:IsReady() and (((Player:IsCasting(S.Scorch) and Player:BuffUp(S.HeatingUpBuff)) or (Player:PrevGCDP(1, S.Scorch) and Player:BuffUp(S.HotStreakBuff))) and SearingTouchActive() and EnemiesCount8ySplash < var_hot_streak_flamestrike) then
     if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 18"; end
   end
   -- scorch,if=improved_scorch.active&debuff.improved_scorch.remains<4*gcd.max
