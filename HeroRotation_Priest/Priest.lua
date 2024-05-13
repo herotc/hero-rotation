@@ -47,12 +47,21 @@ Spell.Priest.Commons = {
   ShadowWordDeath             = Spell(32379),
   ShadowWordPain              = Spell(589),
   ShadowWordPainDebuff        = Spell(589),
+  FlashHeal                   = Spell(2061),
   Smite                       = Spell(585),
+  Renew                       = Spell(139),
   -- Talents
   Mindgames                   = Spell(375901),
+  Manipulation                = Spell(390996),
   Shadowfiend                 = Spell(34433),
+  CrystallineReflection       = Spell(373457),
+  Rhapsody                    = Spell(390622),
+  PowerWordLife               = Spell(373481),
+  TwistofFate                 = Spell(390972),
   -- Buffs
   PowerWordFortitudeBuff      = Spell(21562),
+  RhapsodyBuff                = Spell(390636),
+  TwistofFateBuff             = Spell(390978),
   -- Debuffs
   -- Other
   Pool                        = Spell(999910)
@@ -66,7 +75,6 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   VoidEruption                = Spell(228260), -- Splash, 10
   -- Talents
   AncientMadness              = Spell(341240),
-  CrystallineReflection       = Spell(373457),
   Damnation                   = Spell(341374),
   DarkAscension               = Spell(391109),
   DarkVoid                    = Spell(263346),
@@ -92,7 +100,6 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   MindSpikeInsanity           = Spell(407466),
   Misery                      = Spell(238558),
   PsychicLink                 = Spell(199484),
-  Rhapsody                    = Spell(390622),
   ScreamsOfTheVoid            = Spell(375767),
   SearingNightmare            = Spell(341385), -- Splash, 10
   ShadowCrash                 = Spell(205385), -- Splash, 8
@@ -100,7 +107,6 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   Silence                     = Spell(15487),
   SurgeOfDarkness             = Spell(162448),
   SurrenderToMadness          = Spell(319952),
-  TwistofFate                 = Spell(390972),
   UnfurlingDarkness           = Spell(341273),
   VoidTorrent                 = Spell(263165),
   Voidtouched                 = Spell(407430),
@@ -119,7 +125,6 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   ShadowformBuff              = Spell(232698),
   ShadowyInsightBuff          = Spell(375981),
   SurgeOfDarknessBuff         = Spell(87160),
-  TwistofFateBuff             = Spell(390978),
   UnfurlingDarknessBuff       = Spell(341282),
   VoidformBuff                = Spell(194249),
   -- Debuffs
@@ -129,6 +134,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   -- Tier Set Effects
   DarkReveriesBuff            = Spell(394963),
   GatheringShadowsBuff        = Spell(394961),
+  DarkflameShroudBuff         = Spell(410871),
 })
 
 Spell.Priest.Discipline = MergeTableByKey(Spell.Priest.Commons, {
