@@ -450,8 +450,8 @@ local function CDs ()
     -- &((!trinket.1.is.dragonfire_bomb_dispenser&trinket.1.cooldown.remains>10|trinket.2.cooldown.remains>10)
     -- |cooldown.dragonfire_bomb_dispenser.charges>2|fight_remains<20|!trinket.2.has_cooldown|!trinket.1.has_cooldown)
     if I.DragonfireBombDispenser:IsEquippedAndReady() then
-      if (not trinket1:ID() == I.DragonfireBombDispenser:ID() and trinket1:CooldownRemains() > 10 or
-        trinket2:CooldownRemains() > 10) or (I.DragonfireBombDispenser:OnUseSpell()):Charges() > 2 or HL.BossFilteredFightRemains("<", 20) or not trinket2:HasCooldown() or not trinket1:HasCooldown() then
+      if ((trinket1:ID() ~= I.DragonfireBombDispenser:ID() and trinket1:CooldownRemains() > 10 or
+        trinket2:CooldownRemains() > 10) or I.DragonfireBombDispenser:OnUseSpell():Charges() > 2 or HL.BossFilteredFightRemains("<", 20) or not trinket2:HasCooldown() or not trinket1:HasCooldown()) then
         if Cast(I.DragonfireBombDispenser, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "Dragonfire Bomb Dispenser"; end
       end
     end
