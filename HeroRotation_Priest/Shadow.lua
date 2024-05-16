@@ -202,7 +202,11 @@ end
 
 local function EvaluateTargetIfFilterVTRemains(TargetUnit)
   -- target_if=min:remains
-  return (TargetUnit:DebuffRemains(S.VampiricTouchDebuff))
+  if TargetUnit:MaxHealth() > Settings.Shadow.MinVTHP * 1000 then
+    return (TargetUnit:DebuffRemains(S.VampiricTouchDebuff))
+  else
+    return false
+  end
 end
 
 -- CastTargetIf Condition Functions
@@ -265,12 +269,13 @@ end
 
 local function EvaluateCycleVTAoE(TargetUnit)
   -- target_if=refreshable&target.time_to_die>=18&(dot.vampiric_touch.ticking|!variable.dots_up)
-  return (TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) and TargetUnit:TimeToDie() >= 18 and (TargetUnit:DebuffUp(S.VampiricTouchDebuff) or not VarDotsUp))
+  -- Note: Manually added variable check to avoid cycling on low hp adds.
+  return (TargetUnit:MaxHealth() > Settings.Shadow.MinVTHP * 1000 and (TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) and TargetUnit:TimeToDie() >= 18 and (TargetUnit:DebuffUp(S.VampiricTouchDebuff) or not VarDotsUp)))
 end
 
 local function EvaluateCycleVTAoE2(TargetUnit)
   -- target_if=refreshable&target.time_to_die>=18&(dot.vampiric_touch.ticking|!variable.dots_up),if=variable.max_vts>0&(cooldown.shadow_crash.remains>=dot.vampiric_touch.remains|variable.holding_crash)&!action.shadow_crash.in_flight|!talent.whispering_shadows
-  if VarMaxVTs > 0 and (S.ShadowCrash:CooldownRemains() >= TargetUnit:DebuffRemains(S.VampiricTouchDebuff) or VarHoldingCrash) and not S.ShadowCrash:InFlight() or not S.WhisperingShadows:IsAvailable() then
+  if TargetUnit:MaxHealth() > Settings.Shadow.MinVTHP * 1000 and (VarMaxVTs > 0 and (S.ShadowCrash:CooldownRemains() >= TargetUnit:DebuffRemains(S.VampiricTouchDebuff) or VarHoldingCrash) and not S.ShadowCrash:InFlight() or not S.WhisperingShadows:IsAvailable()) then
     return (TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) and TargetUnit:TimeToDie() >= 18 and (TargetUnit:DebuffUp(S.VampiricTouchDebuff) or not VarDotsUp))
   else
     return false

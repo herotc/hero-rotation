@@ -45,6 +45,7 @@ HR.GUISettings.APL.Priest = {
   Shadow = {
     DesperatePrayerHP = 75,
     DispersionHP = 30,
+    MinVTHP = 100,
     PreferVTWhenSTinDungeon = false,
     SelfPI = true,
     PotionType = {
@@ -106,6 +107,7 @@ local CP_Priest = CreateChildPanel(ARPanel, "Priest")
 local CP_PriestDS = CreateChildPanel(CP_Priest, "Class DisplayStyles")
 local CP_PriestOGCD = CreateChildPanel(CP_Priest, "Class OffGCDs")
 local CP_Shadow = CreateChildPanel(CP_Priest, "Shadow")
+local CP_ShadowOGCD = CreateChildPanel(CP_Priest, "Shadow OffGCDs")
 --local CP_Discipline = CreateChildPanel(CP_Priest, "Discipline")
 --local CP_Holy = CreateChildPanel(CP_Priest, "Holy")
 
@@ -114,16 +116,15 @@ CreateARPanelOptions(CP_Priest, "APL.Priest.Commons")
 CreateARPanelOptions(CP_PriestDS, "APL.Priest.CommonsDS")
 CreateARPanelOptions(CP_PriestOGCD, "APL.Priest.CommonsOGCD")
 
---Shadow
-CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DesperatePrayerHP", { 0, 100, 1 }, "Desperate Prayer HP",
-  "Set the Desperate Prayer HP threshold.")
-CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", { 0, 100, 1 }, "Dispersion HP",
-  "Set the Dispersion HP threshold.")
-CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume Self-Power Infusion",
-  "Assume the player will be using Power Infusion on themselves.")
-CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow")
-CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.PreferVTWhenSTinDungeon", "Prefer VT for dungeon ST",
-  "Prefer to use Vampiric Touch while in single target combat in dungeon content. (Note: This does not apply to raid content.)")
+-- Shadow
+CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DesperatePrayerHP", { 0, 100, 1 }, "Desperate Prayer HP", "Set the Desperate Prayer HP threshold.")
+CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", { 0, 100, 1 }, "Dispersion HP", "Set the Dispersion HP threshold.")
+CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.MinVTHP", { 0, 1000, 10 }, "Minimum VT HP (in thousands)", "Set the minimum HP of a target for Vampiric Touch to be suggested. This value is multiplied by 1,000. For example, a value of 100 checks for a target's minimum HP of 100,000.")
+CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume Self-Power Infusion", "Assume the player will be using Power Infusion on themselves.")
+CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.PreferVTWhenSTinDungeon", "Prefer VT for dungeon ST", "Prefer to use Vampiric Touch while in single target combat in dungeon content. (Note: This does not apply to raid content.)")
+
+-- Shadow OffGCDs
+CreateARPanelOptions(CP_ShadowOGCD, "APL.Priest.Shadow")
 
 --Discipline
 --CreateARPanelOptions(CP_Discipline, "APL.Priest.Discipline")
