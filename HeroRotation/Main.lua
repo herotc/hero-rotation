@@ -399,8 +399,7 @@
         -- Check for MoP Remix
         local ReadyToGo = true
         if not HR.GUISettings.General.EnableMoPRemix then
-          local Equip = Player:GetEquipment()
-          if Equip[15] == 210333 then
+          if Player:BuffUp(Spell(424143)) then
             HR.Print("HeroRotation is currently disabled in Mists of Pandaria Remix. If you wish to enable it, please check the settings box labeled 'Enable for MoP Remix' under HeroRotation's General settings. Please note that we cannot guarantee that the APLs will be optimized for this game mode. After enabling this option, a reload is required.")
             for Key, Value in pairs(UIFrames) do
               Value:Hide()
@@ -494,8 +493,7 @@
       AreWeReady = not Player:IsDeadOrGhost() and not Player:IsMounted() and not Player:IsInVehicle() and not C_PetBattles.IsInBattle();
     end
     if not HR.GUISettings.General.EnableMoPRemix then
-      local Equip = Player:GetEquipment()
-      if Equip[15] == 210333 then
+      if Player:BuffUp(Spell(424143)) then
         HR.Print("HeroRotation is currently disabled in Mists of Pandaria Remix. If you wish to enable it, please check the settings box labeled 'Enable for MoP Remix' under HeroRotation's General settings. Please note that we cannot guarantee that the APLs will be optimized for this game mode. After enabling this option, a reload is required.")
         for Key, Value in pairs(UIFrames) do
           Value:Hide()
