@@ -45,7 +45,7 @@ HR.GUISettings.APL.Priest = {
   Shadow = {
     DesperatePrayerHP = 75,
     DispersionHP = 30,
-    MinVTHP = 100,
+    VTMinHP = 1,
     PreferVTWhenSTinDungeon = false,
     SelfPI = true,
     PotionType = {
@@ -119,7 +119,7 @@ CreateARPanelOptions(CP_PriestOGCD, "APL.Priest.CommonsOGCD")
 -- Shadow
 CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DesperatePrayerHP", { 0, 100, 1 }, "Desperate Prayer HP", "Set the Desperate Prayer HP threshold.")
 CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", { 0, 100, 1 }, "Dispersion HP", "Set the Dispersion HP threshold.")
-CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.MinVTHP", { 0, 1000, 10 }, "Minimum VT HP (in thousands)", "Set the minimum HP of a target for Vampiric Touch to be suggested. This value is multiplied by 1,000. For example, a value of 100 checks for a target's minimum HP of 100,000.")
+CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.VTMinHP", { 0, 20, 1 }, "Minimum VT HP (in millions)", "Set the minimum HP of a target for Vampiric Touch to be suggested. This value is multiplied by 1,000,000. For example, a value of 10 checks for a target's minimum HP of 10,000,000.")
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume Self-Power Infusion", "Assume the player will be using Power Infusion on themselves.")
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.PreferVTWhenSTinDungeon", "Prefer VT for dungeon ST", "Prefer to use Vampiric Touch while in single target combat in dungeon content. (Note: This does not apply to raid content.)")
 
