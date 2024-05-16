@@ -36,6 +36,8 @@
       --
       NotEnoughManaEnabled = false,
       SetAlpha = 1,
+      -- MoP Remix
+      EnableMoPRemix = false,
     },
     Scaling = {
       ScaleUI = 1,
@@ -64,4 +66,5 @@
     CreatePanelOption("CheckButton", CP_General, "General.SoloMode", "Solo Mode", "Enable if you want to try to maximize survivability at the cost of dps.");
     CreatePanelOption("CheckButton", CP_General, "General.HideToggleIcons", "Hide toggle icons", "Enable if you want to hide the toggle buttons on the icon frame.", {ReloadRequired = true});
     CreatePanelOption("CheckButton", CP_General, "General.NotEnoughManaEnabled", "Not enough mana/energy", "Enable if you want a faded icon when you have not enough mana or energy.");
+    CreatePanelOption("CheckButton", CP_General, "General.EnableMoPRemix", "Enable for MoP Remix", "Enable if you want the addon to work for MoP Remix. NOTE: We cannot guarantee the APL will be optimized for this game mode.", {ReloadRequired = true})
   end
