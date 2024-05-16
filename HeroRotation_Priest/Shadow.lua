@@ -205,7 +205,7 @@ local function EvaluateTargetIfFilterVTRemains(TargetUnit)
   if TargetUnit:MaxHealth() > Settings.Shadow.VTMinHP * 1000000 then
     return (TargetUnit:DebuffRemains(S.VampiricTouchDebuff))
   else
-    return false
+    return 999999999
   end
 end
 
