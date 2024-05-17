@@ -202,11 +202,7 @@ end
 
 local function EvaluateTargetIfFilterVTRemains(TargetUnit)
   -- target_if=min:remains
-  if TargetUnit:MaxHealth() > Settings.Shadow.VTMinHP * 1000000 then
-    return (TargetUnit:DebuffRemains(S.VampiricTouchDebuff))
-  else
-    return 999999999
-  end
+  return (TargetUnit:DebuffRemains(S.VampiricTouchDebuff))
 end
 
 -- CastTargetIf Condition Functions
@@ -223,7 +219,8 @@ end
 
 local function EvaluateTargetIfVTMain(TargetUnit)
   -- if=refreshable&target.time_to_die>=12&(cooldown.shadow_crash.remains>=dot.vampiric_touch.remains|variable.holding_crash|!talent.whispering_shadows)&(!action.shadow_crash.in_flight|!talent.whispering_shadows)
-  return (TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) and TargetUnit:TimeToDie() >= 12 and (S.ShadowCrash:CooldownRemains() >= TargetUnit:DebuffRemains(S.VampiricTouchDebuff) or not S.WhisperingShadows:IsAvailable()) and (not S.ShadowCrash:InFlight() or not S.WhisperingShadows:IsAvailable()))
+  -- Note: Added setting check for lowest max hp for us to cycle.
+  return TargetUnit:MaxHealth() > Settings.Shadow.VTMinHP * 1000000 and (TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) and TargetUnit:TimeToDie() >= 12 and (S.ShadowCrash:CooldownRemains() >= TargetUnit:DebuffRemains(S.VampiricTouchDebuff) or not S.WhisperingShadows:IsAvailable()) and (not S.ShadowCrash:InFlight() or not S.WhisperingShadows:IsAvailable()))
 end
 
 -- CastCycle Functions
@@ -270,7 +267,7 @@ end
 local function EvaluateCycleVTAoE(TargetUnit)
   -- target_if=refreshable&target.time_to_die>=18&(dot.vampiric_touch.ticking|!variable.dots_up)
   -- Note: Manually added variable check to avoid cycling on low hp adds.
-  return (TargetUnit:MaxHealth() > Settings.Shadow.VTMinHP * 1000000 and (TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) and TargetUnit:TimeToDie() >= 18 and (TargetUnit:DebuffUp(S.VampiricTouchDebuff) or not VarDotsUp)))
+  return TargetUnit:MaxHealth() > Settings.Shadow.VTMinHP * 1000000 and (TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) and TargetUnit:TimeToDie() >= 18 and (TargetUnit:DebuffUp(S.VampiricTouchDebuff) or not VarDotsUp))
 end
 
 local function EvaluateCycleVTAoE2(TargetUnit)
