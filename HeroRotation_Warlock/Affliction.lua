@@ -410,7 +410,7 @@ local function AoE()
   end
   -- vile_taint,if=(talent.souleaters_gluttony.rank=2&(variable.min_agony<1.5|cooldown.soul_rot.remains<=execute_time))|((talent.souleaters_gluttony.rank=1&cooldown.soul_rot.remains<=execute_time))|(talent.souleaters_gluttony.rank=0&(cooldown.soul_rot.remains<=execute_time|cooldown.vile_taint.remains>25))
   if S.VileTaint:IsReady() and ((S.SouleatersGluttony:TalentRank() == 2 and (VarMinAgony < 1.5 or S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime())) or (S.SouleatersGluttony:TalentRank() == 1 and S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime()) or (not S.SouleatersGluttony:IsAvailable() and (S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() or S.VileTaint:CooldownRemains() > 25))) then
-    if Cast(S.VileTaint, nil, nil, not Target:IsInRange(40)) then return "vile_taint aoe 4"; end
+    if Cast(S.VileTaint, Settings.Affliction.GCDasOffGCD.VileTaint, nil, not Target:IsInRange(40)) then return "vile_taint aoe 4"; end
   end
   -- phantom_singularity,if=(cooldown.soul_rot.remains<=execute_time|talent.souleaters_gluttony.rank<1&(!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|cooldown.soul_rot.remains>=25))&dot.agony.ticking
   if S.PhantomSingularity:IsCastable() and ((S.SoulRot:IsAvailable() and S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or not S.SouleatersGluttony:IsAvailable() and (not S.SoulRot:IsAvailable() or S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or S.SoulRot:CooldownRemains() >= 25)) and Target:DebuffUp(S.AgonyDebuff)) then
@@ -430,7 +430,7 @@ local function AoE()
   end
   -- soul_rot,if=variable.vt_up&(variable.ps_up|talent.souleaters_gluttony.rank!=1)&dot.agony.ticking
   if S.SoulRot:IsReady() and (VarVTUp and (VarPSUp or S.SouleatersGluttony:TalentRank() ~= 1) and Target:DebuffUp(S.AgonyDebuff)) then
-    if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot aoe 12"; end
+    if Cast(S.SoulRot, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot aoe 12"; end
   end
   -- seed_of_corruption,if=dot.corruption.remains<5&!(action.seed_of_corruption.in_flight|dot.seed_of_corruption.remains>0)
   if S.SeedofCorruption:IsReady() and (Target:DebuffRemains(S.CorruptionDebuff) < 5 and not (S.SeedofCorruption:InFlight() or Target:DebuffUp(S.SeedofCorruptionDebuff))) then
@@ -502,7 +502,7 @@ local function Cleave()
   end
   -- vile_taint,if=!talent.soul_rot|(variable.min_agony<1.5|cooldown.soul_rot.remains<=execute_time+gcd.max)|talent.souleaters_gluttony.rank<1&cooldown.soul_rot.remains>=12
   if S.VileTaint:IsReady() and (not S.SoulRot:IsAvailable() or (VarMinAgony < 1.5 or S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() + GCDMax) or not S.SouleatersGluttony:IsAvailable() and S.SoulRot:CooldownRemains() >= 12) then
-    if Cast(S.VileTaint, nil, nil, not Target:IsInRange(40)) then return "vile_taint cleave 4"; end
+    if Cast(S.VileTaint, Settings.Affliction.GCDasOffGCD.VileTaint, nil, not Target:IsInRange(40)) then return "vile_taint cleave 4"; end
   end
   -- phantom_singularity,if=(cooldown.soul_rot.remains<=execute_time|talent.souleaters_gluttony.rank<1&(!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|cooldown.soul_rot.remains>=25))&active_dot.agony=2
   if S.PhantomSingularity:IsReady() and ((S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or not S.SouleatersGluttony:IsAvailable() and (not S.SoulRot:IsAvailable() or S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or S.SoulRot:CooldownRemains() >= 25)) and S.AgonyDebuff:AuraActiveCount() >= 2) then
@@ -510,7 +510,7 @@ local function Cleave()
   end
   -- soul_rot,if=(variable.vt_up&(variable.ps_up|talent.souleaters_gluttony.rank!=1))&active_dot.agony=2
   if S.SoulRot:IsReady() and ((VarVTUp and (VarPSUp or S.SouleatersGluttony:TalentRank() ~= 1)) and S.AgonyDebuff:AuraActiveCount() >= 2) then
-    if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot cleave 8"; end
+    if Cast(S.SoulRot, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot cleave 8"; end
   end
   -- agony,target_if=min:remains,if=(remains<cooldown.vile_taint.remains+action.vile_taint.cast_time|!talent.vile_taint)&remains<5&fight_remains>5
   if S.Agony:IsReady() then
@@ -663,7 +663,7 @@ local function APL()
     end
     -- vile_taint,if=!talent.soul_rot|(variable.min_agony<1.5|cooldown.soul_rot.remains<=execute_time+gcd.max)|talent.souleaters_gluttony.rank<1&cooldown.soul_rot.remains>=12
     if S.VileTaint:IsReady() and (not S.SoulRot:IsAvailable() or (VarMinAgony < 1.5 or S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() + GCDMax) or not S.SouleatersGluttony:IsAvailable() and S.SoulRot:CooldownRemains() >= 12) then
-      if Cast(S.VileTaint, nil, nil, not Target:IsInRange(40)) then return "vile_taint main 6"; end
+      if Cast(S.VileTaint, Settings.Affliction.GCDasOffGCD.VileTaint, nil, not Target:IsInRange(40)) then return "vile_taint main 6"; end
     end
     -- phantom_singularity,if=(cooldown.soul_rot.remains<=execute_time|talent.souleaters_gluttony.rank<1&(!talent.soul_rot|cooldown.soul_rot.remains<=execute_time|cooldown.soul_rot.remains>=25))&dot.agony.ticking
     if S.PhantomSingularity:IsCastable() and ((S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or not S.SouleatersGluttony:IsAvailable() and (not S.SoulRot:IsAvailable() or S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() or S.SoulRot:CooldownRemains() >= 25)) and Target:DebuffUp(S.AgonyDebuff)) then
@@ -671,7 +671,7 @@ local function APL()
     end
     -- soul_rot,if=(variable.vt_up&(variable.ps_up|talent.souleaters_gluttony.rank!=1))&dot.agony.ticking
     if S.SoulRot:IsReady() and (VarVTUp and (VarPSUp or S.SouleatersGluttony:TalentRank() ~= 1) and Target:DebuffUp(S.AgonyDebuff)) then
-      if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot main 10"; end
+      if Cast(S.SoulRot, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot main 10"; end
     end
     -- agony,if=(remains<cooldown.vile_taint.remains+action.vile_taint.cast_time|!talent.vile_taint)&remains<5&fight_remains>5
     -- Note: Swapped vile_taint conditions to avoid potential nil errors.

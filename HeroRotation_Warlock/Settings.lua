@@ -52,11 +52,12 @@ HR.GUISettings.APL.Warlock = {
     GCDasOffGCD = {
       -- Abilities
       GrimoireOfSacrifice = true,
+      InquisitorsGaze = false,
       PhantomSingularity = true,
       SoulTap = true,
       SummonDarkglare = true,
       SummonPet = false,
-      InquisitorsGaze = false,
+      VileTaint = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
