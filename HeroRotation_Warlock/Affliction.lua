@@ -426,7 +426,7 @@ local function AoE()
   end
   -- siphon_life,target_if=remains<5,if=active_dot.siphon_life<6&cooldown.summon_darkglare.up&time<20&gcd.max+action.soul_rot.cast_time+gcd.max<(variable.min_vt*talent.vile_taint<?variable.min_ps*talent.phantom_singularity)&dot.agony.ticking
   if S.SiphonLife:IsReady() and (S.SiphonLifeDebuff:AuraActiveCount() < 6 and S.SummonDarkglare:CooldownUp() and HL.CombatTime() < 20 and GCDMax * 2 + S.SoulRot:CastTime() < VarMinPS1) then
-    if Everyone.CastTargetIf(S.SiphonLife, Enemies40y, EvaluateCycleSiphonLife2, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life aoe 10"; end
+    if Everyone.CastCycle(S.SiphonLife, Enemies40y, EvaluateCycleSiphonLife2, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life aoe 10"; end
   end
   -- soul_rot,if=variable.vt_up&(variable.ps_up|talent.souleaters_gluttony.rank!=1)&dot.agony.ticking
   if S.SoulRot:IsReady() and (VarVTUp and (VarPSUp or S.SouleatersGluttony:TalentRank() ~= 1) and Target:DebuffUp(S.AgonyDebuff)) then
