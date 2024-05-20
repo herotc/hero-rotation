@@ -55,7 +55,6 @@ local I = Item.Rogue.Assassination
 local OnUseExcludeTrinkets = {
   I.AlgetharPuzzleBox,
   I.AshesoftheEmbersoul,
-  I.WitherbarksBranch,
 }
 
 -- Enemies
@@ -76,11 +75,11 @@ local Equipment = Player:GetEquipment()
 local TrinketItem1 = Equipment[13] and Item(Equipment[13]) or Item(0)
 local TrinketItem2 = Equipment[14] and Item(Equipment[14]) or Item(0)
 local function SetTrinketVariables ()
-  -- actions.precombat+=/variable,name=trinket_sync_slot,value=1,if=trinket.1.has_stat.any_dps&(!trinket.2.has_stat.any_dps|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)
-  -- actions.precombat+=/variable,name=trinket_sync_slot,value=2,if=trinket.2.has_stat.any_dps&(!trinket.1.has_stat.any_dps|trinket.2.cooldown.duration>trinket.1.cooldown.duration)
-  if TrinketItem1:HasStatAnyDps() and (not TrinketItem2:HasStatAnyDps() or TrinketItem1:Cooldown() >= TrinketItem2:Cooldown()) then
+  -- actions.precombat+=/variable,name=trinket_sync_slot,value=1,if=trinket.1.has_stat.any_dps&(!trinket.2.has_stat.any_dps|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)&!trinket.2.is.witherbarks_branch|trinket.1.is.witherbarks_branch
+  -- actions.precombat+=/variable,name=trinket_sync_slot,value=2,if=trinket.2.has_stat.any_dps&(!trinket.1.has_stat.any_dps|trinket.2.cooldown.duration>trinket.1.cooldown.duration)&!trinket.1.is.witherbarks_branch|trinket.2.is.witherbarks_branch
+  if TrinketItem1:HasStatAnyDps() and (not TrinketItem2:HasStatAnyDps() or TrinketItem1:Cooldown() >= TrinketItem2:Cooldown()) and TrinketItem2:ID() ~= I.WitherbarksBranch:ID() or TrinketItem1:ID() == I.WitherbarksBranch:ID() then
     TrinketSyncSlot = 1
-  elseif TrinketItem2:HasStatAnyDps() and (not TrinketItem1:HasStatAnyDps() or TrinketItem2:Cooldown() > TrinketItem1:Cooldown()) then
+  elseif TrinketItem2:HasStatAnyDps() and (not TrinketItem1:HasStatAnyDps() or TrinketItem2:Cooldown() > TrinketItem1:Cooldown()) and TrinketItem1:ID() ~= I.WitherbarksBranch:ID() or TrinketItem2:ID() == I.WitherbarksBranch:ID() then
     TrinketSyncSlot = 2
   else
     TrinketSyncSlot = 0
@@ -417,21 +416,13 @@ local function UsableItems ()
     return
   end
 
-  if not Player:StealthUp(true, false) then
-    return
-  end
-
   -- actions.items+=/use_item,name=ashes_of_the_embersoul,use_off_gcd=1,if=(dot.kingsbane.ticking&dot.kingsbane.remains<=11)|fight_remains<=22
-  -- actions.items+=/use_item,name=witherbarks_branch,use_off_gcd=1,if=(dot.deathmark.ticking)|fight_remains<=22
   -- actions.items+=/use_item,name=algethar_puzzle_box,use_off_gcd=1,if=dot.rupture.ticking&cooldown.deathmark.remains<2|fight_remains<=22
   if I.AshesoftheEmbersoul:IsEquippedAndReady() and (Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) <= 11 or HL.BossFilteredFightRemains("<", 22)) then
-    if HR.Cast(I.AshesoftheEmbersoul, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Ashes of the 1Embersoul"; end
-  end
-  if I.WitherbarksBranch:IsEquippedAndReady() and (Target:DebuffUp(S.Deathmark) or HL.BossFilteredFightRemains("<", 22)) then
-    if HR.Cast(I.WitherbarksBranch, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Witherbark Branch"; end
+    if Cast(I.AshesoftheEmbersoul, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Ashes of the 1Embersoul"; end
   end
   if I.AlgetharPuzzleBox:IsEquippedAndReady() and (Target:DebuffUp(S.Rupture) and S.Deathmark:CooldownRemains() <= 2 or HL.BossFilteredFightRemains("<", 22)) then
-    if HR.Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Algethar Puzzle Box"; end
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Algethar Puzzle Box"; end
   end
 
   -- actions.items+=/use_items,slots=trinket1,if=(variable.trinket_sync_slot=1&(debuff.deathmark.up|fight_remains<=20)|(variable.trinket_sync_slot=2&(!trinket.2.cooldown.ready|!debuff.deathmark.up&cooldown.deathmark.remains>20))|!variable.trinket_sync_slot)
@@ -440,49 +431,15 @@ local function UsableItems ()
     and (TrinketSyncSlot == 1 and (S.Deathmark:AnyDebuffUp() or HL.BossFilteredFightRemains("<", 20))
       or (TrinketSyncSlot == 2 and (not TrinketItem2:IsReady() or not S.Deathmark:AnyDebuffUp() and S.Deathmark:CooldownRemains() > 20)) or TrinketSyncSlot == 0) then
     if Cast(TrinketItem1, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Trinket 1"; end
-  elseif TrinketItem2:IsReady() and not Player:IsItemBlacklisted(TrinketItem2) and not ValueIsInArray(OnUseExcludeTrinkets, TrinketItem2:ID())
+  end
+  if TrinketItem2:IsReady() and not Player:IsItemBlacklisted(TrinketItem2) and not ValueIsInArray(OnUseExcludeTrinkets, TrinketItem2:ID())
     and (TrinketSyncSlot == 2 and (S.Deathmark:AnyDebuffUp() or HL.BossFilteredFightRemains("<", 20))
       or (TrinketSyncSlot == 1 and (not TrinketItem1:IsReady() or not S.Deathmark:AnyDebuffUp() and S.Deathmark:CooldownRemains() > 20)) or TrinketSyncSlot == 0) then
     if Cast(TrinketItem2, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Trinket 2"; end
   end
 end
 
--- # Cooldowns
-local function CDs ()
-  if not TargetInAoERange then
-    return
-  end
-
-  if not HR.CDsON() then
-    return
-  end
-
-  -- actions.cds+=/sepsis,if=dot.rupture.remains>20&(!talent.improved_garrote&dot.garrote.ticking|talent.improved_garrote&cooldown.garrote.up&dot.garrote.pmultiplier<=1)&(target.time_to_die>10|fight_remains<10)
-  if S.Sepsis:IsReady() and Target:DebuffRemains(S.Rupture) > 20 and (not S.ImprovedGarrote:IsAvailable() and Target:DebuffUp(S.Garrote)
-    or S.ImprovedGarrote:IsAvailable() and S.Garrote:CooldownUp() and Target:PMultiplier(S.Garrote) <= 1)
-    and (Target:FilteredTimeToDie(">", 10) or HL.BossFilteredFightRemains("<=", 10)) then
-    if Cast(S.Sepsis, nil, true) then return "Cast Sepsis" end
-  end
-
-  if Settings.Commons.Enabled.Trinkets then
-    if ShouldReturn then
-      UsableItems()
-    else
-      ShouldReturn = UsableItems()
-    end
-  end
-
-  -- actions.cds=variable,name=deathmark_ma_condition,value=!talent.master_assassin.enabled|dot.garrote.ticking
-  -- actions.cds+=/variable,name=deathmark_kingsbane_condition,value=!talent.kingsbane|cooldown.kingsbane.remains<=2
-  -- actions.cds+=/variable,name=deathmark_condition,value=!stealthed.rogue&dot.rupture.ticking&buff.envenom.up&!debuff.deathmark.up&variable.deathmark_ma_condition&variable.deathmark_kingsbane_condition
-  -- actions.cds+=/deathmark,if=variable.deathmark_condition|fight_remains<=20
-  local DeathmarkCondition = not Player:StealthUp(true, false) and Target:DebuffUp(S.Rupture) and Player:BuffUp(S.Envenom) and not S.Deathmark:AnyDebuffUp()
-    and (not S.MasterAssassin:IsAvailable() or Target:DebuffUp(S.Garrote))
-    and (not S.Kingsbane:IsAvailable() or S.Kingsbane:CooldownRemains() <= 2)
-  if S.Deathmark:IsCastable() and (DeathmarkCondition or HL.BossFilteredFightRemains("<=", 20)) then
-    if Cast(S.Deathmark, Settings.Assassination.OffGCDasOffGCD.Deathmark) then return "Cast Deathmark" end
-  end
-
+local function ShivUsage ()
   -- actions.shiv=/shiv,if=talent.kingsbane&!talent.lightweight_shiv.enabled&buff.envenom.up&!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking&(dot.kingsbane.ticking&dot.kingsbane.remains<8|cooldown.kingsbane.remains>=24)&(!talent.crimson_tempest.enabled|variable.single_target|dot.crimson_tempest.ticking)|fight_remains<=charges*8
   -- actions.shiv+=/shiv,if=talent.kingsbane&talent.lightweight_shiv.enabled&buff.envenom.up&!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking&(dot.kingsbane.ticking|cooldown.kingsbane.remains<=1)|fight_remains<=charges*8
   -- actions.shiv+=/shiv,if=talent.arterial_precision&!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking&debuff.deathmark.up|fight_remains<=charges*8
@@ -517,6 +474,74 @@ local function CDs ()
       end
     end
   end
+end
+
+local function MiscCDs ()
+  -- actions.misc_cds=potion,if=buff.bloodlust.react|fight_remains<30|debuff.deathmark.up
+  if Settings.Commons.Enabled.Potions then
+    local PotionSelected = Everyone.PotionSelected()
+    if PotionSelected and PotionSelected:IsReady() and (Player:BloodlustUp() or HL.BossFilteredFightRemains("<", 30) or S.Deathmark:AnyDebuffUp()) then
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "Cast Potion"; end
+    end
+  end
+
+  -- Racials
+  if S.Deathmark:AnyDebuffUp() and (not ShouldReturn or Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then
+    if ShouldReturn then
+      Racials()
+    else
+      ShouldReturn = Racials()
+    end
+  end
+end
+
+-- # Cooldowns
+local function CDs ()
+  if not TargetInAoERange then
+    return
+  end
+
+  if not HR.CDsON() then
+    return
+  end
+
+  -- actions.cds=variable,name=deathmark_ma_condition,value=!talent.master_assassin.enabled|dot.garrote.ticking
+  -- actions.cds+=/variable,name=deathmark_kingsbane_condition,value=!talent.kingsbane|cooldown.kingsbane.remains<=2
+  -- actions.cds+=/variable,name=deathmark_condition,value=!stealthed.rogue&dot.rupture.ticking&buff.envenom.up&!debuff.deathmark.up&variable.deathmark_ma_condition&variable.deathmark_kingsbane_condition
+  local DeathmarkCondition = not Player:StealthUp(true, false) and Target:DebuffUp(S.Rupture) and Player:BuffUp(S.Envenom) and not S.Deathmark:AnyDebuffUp()
+    and (not S.MasterAssassin:IsAvailable() or Target:DebuffUp(S.Garrote))
+    and (not S.Kingsbane:IsAvailable() or S.Kingsbane:CooldownRemains() <= 2)
+
+  -- actions.cds+=/sepsis,if=dot.rupture.remains>20&(!talent.improved_garrote&dot.garrote.ticking|talent.improved_garrote&cooldown.garrote.up&dot.garrote.pmultiplier<=1)&(target.time_to_die>10|fight_remains<10)
+  if S.Sepsis:IsReady() and Target:DebuffRemains(S.Rupture) > 20 and (not S.ImprovedGarrote:IsAvailable() and Target:DebuffUp(S.Garrote)
+    or S.ImprovedGarrote:IsAvailable() and S.Garrote:CooldownUp() and Target:PMultiplier(S.Garrote) <= 1)
+    and (Target:FilteredTimeToDie(">", 10) or HL.BossFilteredFightRemains("<=", 10)) then
+    if Cast(S.Sepsis, nil, true) then return "Cast Sepsis" end
+  end
+
+  -- actions.cds+=/call_action_list,name=items
+  if Settings.Commons.Enabled.Trinkets then
+    if ShouldReturn then
+      UsableItems()
+    else
+      ShouldReturn = UsableItems()
+    end
+  end
+
+  -- actions.cds+=/invoke_external_buff,name=power_infusion,if=dot.deathmark.ticking
+  -- Note: We don't handle external buffs.
+
+  -- actions.cds+=/deathmark,if=variable.deathmark_condition|fight_remains<=20
+  if S.Deathmark:IsCastable() and (DeathmarkCondition or HL.BossFilteredFightRemains("<=", 20)) then
+    if Cast(S.Deathmark, Settings.Assassination.OffGCDasOffGCD.Deathmark) then return "Cast Deathmark" end
+  end
+
+  -- -- actions.cds+=/call_action_list,name=shiv
+  if ShouldReturn then
+    ShivUsage()
+  else
+    ShouldReturn = ShivUsage()
+  end
 
   -- actions.cds+=/shadow_dance,if=talent.kingsbane&buff.envenom.up&(cooldown.deathmark.remains>=50|variable.deathmark_condition)
   if S.ShadowDance:IsCastable() and S.Kingsbane:IsAvailable() and Player:BuffUp(S.Envenom)
@@ -536,21 +561,11 @@ local function CDs ()
     if HR.Cast(S.ThistleTea, Settings.CommonsOGCD.OffGCDasOffGCD.ThistleTea) then return "Cast Thistle Tea" end
   end
 
-  -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|debuff.vendetta.up&cooldown.vanish.remains<5
-  if Settings.Commons.Enabled.Potions then
-    local PotionSelected = Everyone.PotionSelected()
-    if PotionSelected and PotionSelected:IsReady() and (Player:BloodlustUp() or HL.BossFilteredFightRemains("<", 60) or S.Vanish:CooldownRemains() < 5) then
-      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "Cast Potion"; end
-    end
-  end
-
-  -- Racials
-  if S.Deathmark:AnyDebuffUp() and (not ShouldReturn or Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then
-    if ShouldReturn then
-      Racials()
-    else
-      ShouldReturn = Racials()
-    end
+  -- actions.cds+=/call_action_list,name=misc_cds
+  if ShouldReturn then
+    MiscCDs()
+  else
+    ShouldReturn = MiscCDs()
   end
 
   -- actions.cds+=/call_action_list,name=vanish,if=!stealthed.all&master_assassin_remains=0
@@ -584,19 +599,19 @@ local function Stealthed ()
       if Cast(S.Kingsbane, Settings.Assassination.GCDasOffGCD.Kingsbane) then return "Cast Kingsbane (Dance)" end
     end
   end
-  -- actions.stealthed+=/envenom,if=effective_combo_points>=4&dot.kingsbane.ticking&buff.envenom.remains<=2
+  -- actions.stealthed+=/envenom,if=effective_combo_points>=4&dot.kingsbane.ticking&buff.envenom.remains<=3
   -- actions.stealthed+=/envenom,if=effective_combo_points>=4&buff.master_assassin_aura.up&!buff.shadow_dance.up&variable.single_target
   if ComboPoints >= 4 then
-    if Target:DebuffUp(S.Kingsbane) and Player:BuffRemains(S.Envenom) <= 2 then
+    if Target:DebuffUp(S.Kingsbane) and Player:BuffRemains(S.Envenom) <= 3 then
       if Cast(S.Envenom, nil, nil, not TargetInMeleeRange) then return "Cast Envenom (Stealth Kingsbane)" end
     end
     if SingleTarget and MasterAssassinAuraUp() and Player:BuffDown(S.ShadowDanceBuff) then
       if Cast(S.Envenom, nil, nil, not TargetInMeleeRange) then return "Cast Envenom (Master Assassin)" end
     end
   end
-  -- actions.stealthed+=/crimson_tempest,target_if=min:remains,if=spell_targets>=3&refreshable&effective_combo_points>=4&!cooldown.deathmark.ready&target.time_to_die-remains>6
+  -- actions.stealthed+=/crimson_tempest,target_if=min:remains,if=spell_targets>=3+set_bonus.tier31_4pc&refreshable&effective_combo_points>=4&!cooldown.deathmark.ready&target.time_to_die-remains>6
   if HR.AoEON() and S.CrimsonTempest:IsReady() and S.Nightstalker:IsAvailable()
-    and MeleeEnemies10yCount >= 3 and ComboPoints >= 4 and not S.Deathmark:IsReady() then
+    and MeleeEnemies10yCount >= 3 + num(Player:HasTier(31, 4)) and ComboPoints >= 4 and not S.Deathmark:IsReady() then
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       if IsDebuffRefreshable(CycleUnit, S.CrimsonTempest, CrimsonTempestThreshold)
         and CycleUnit:FilteredTimeToDie(">", 6, -CycleUnit:DebuffRemains(S.CrimsonTempest)) then
@@ -605,8 +620,7 @@ local function Stealthed ()
     end
   end
   -- actions.stealthed+=/garrote,target_if=min:remains,if=stealthed.improved_garrote&(remains<(12-buff.sepsis_buff.remains)|pmultiplier<=1|(buff.indiscriminate_carnage.up&active_dot.garrote<spell_targets.fan_of_knives))&!variable.single_target&target.time_to_die-remains>2
-  -- actions.stealthed+=/garrote,if=stealthed.improved_garrote&!buff.shadow_dance.up&(pmultiplier<=1|dot.deathmark.ticking&buff.master_assassin_aura.remains<3)&combo_points.deficit>=1+2*talent.shrouded_suffocation
-  -- actions.stealthed+=/garrote,if=stealthed.improved_garrote&(pmultiplier<=1|remains<12)&combo_points.deficit>=1+2*talent.shrouded_suffocation
+  -- actions.stealthed+=/garrote,if=stealthed.improved_garrote&(pmultiplier<=1|remains<14|!variable.single_target&buff.master_assassin_aura.remains<3)&combo_points.deficit>=1+2*talent.shrouded_suffocation
   if S.Garrote:IsCastable() and ImprovedGarroteRemains() > 0 then
     local function GarroteTargetIfFunc(TargetUnit)
       return TargetUnit:DebuffRemains(S.Garrote)
@@ -626,13 +640,8 @@ local function Stealthed ()
     if GarroteIfFunc(Target) then
       if Cast(S.Garrote, nil, nil, not TargetInMeleeRange) then return "Cast Garrote (Improved Garrote)" end
     end
-    if ComboPointsDeficit >= (1 + 2 * num(S.ShroudedSuffocation:IsAvailable())) then 
-      if Player:BuffDown(S.ShadowDanceBuff) and (Target:PMultiplier(S.Garrote) <= 1 or Target:DebuffUp(S.Deathmark) and MasterAssassinRemains() < 3) then
-        if Cast(S.Garrote, nil, nil, not TargetInMeleeRange) then return "Cast Garrote (Improved Garrote Low CP)" end
-      end
-      if (Target:PMultiplier(S.Garrote) <= 1 or Target:DebuffRemains(S.Garrote) < 12) then
-        if Cast(S.Garrote, nil, nil, not TargetInMeleeRange) then return "Cast Garrote (Improved Garrote Low CP 2)" end
-      end
+    if ComboPointsDeficit >= (1 + 2 * num(S.ShroudedSuffocation:IsAvailable())) and (Target:PMultiplier(S.Garrote) <= 1 or Target:DebuffRemains(S.Garrote) < 14 or not SingleTarget and MasterAssassinRemains() < 3) then
+      if Cast(S.Garrote, nil, nil, not TargetInMeleeRange) then return "Cast Garrote (Improved Garrote Low CP)" end
     end
   end
   -- actions.stealthed+=/rupture,if=effective_combo_points>=4&(pmultiplier<=1)&(buff.shadow_dance.up|debuff.deathmark.up)
@@ -643,8 +652,8 @@ end
 
 -- # Damage over time abilities
 local function Dot ()
-  -- actions.dot+=/crimson_tempest,target_if=min:remains,if=spell_targets>=2&refreshable&effective_combo_points>=4&energy.regen_combined>25&!cooldown.deathmark.ready&target.time_to_die-remains>6
-  if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 2 and ComboPoints >= 4
+  -- actions.dot+=/crimson_tempest,target_if=min:remains,if=spell_targets>=3+set_bonus.tier31_4pc&refreshable&pmultiplier<=1&effective_combo_points>=4&energy.regen_combined>25&!cooldown.deathmark.ready&target.time_to_die-remains>6
+  if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 3 + num(Player:HasTier(31, 4)) and ComboPoints >= 4
     and EnergyRegenCombined > 25 and not S.Deathmark:IsReady() then
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       if IsDebuffRefreshable(CycleUnit, S.CrimsonTempest, CrimsonTempestThreshold)
@@ -698,8 +707,8 @@ end
 
 -- # Direct damage abilities
 local function Direct ()
-  -- actions.direct=envenom,if=effective_combo_points>=4&(variable.not_pooling|debuff.amplifying_poison.stack>=20|effective_combo_points>cp_max_spend|!variable.single_target)
-  if S.Envenom:IsReady() and ComboPoints >= 4 and ((NotPooling or Target:DebuffStack(S.AmplifyingPoisonDebuff) >= 20)
+  -- actions.direct=envenom,if=effective_combo_points>=4+cooldown.deathmark.ready&(variable.not_pooling|debuff.amplifying_poison.stack>=20|effective_combo_points>cp_max_spend|!variable.single_target)
+  if S.Envenom:IsReady() and ComboPoints >= 4 + num(S.Deathmark:CooldownUp()) and ((NotPooling or Target:DebuffStack(S.AmplifyingPoisonDebuff) >= 20)
     or ComboPoints > Rogue.CPMaxSpend() or not SingleTarget) then
     if Cast(S.Envenom, nil, nil, not TargetInMeleeRange) then return "Cast Envenom" end
   end
@@ -829,15 +838,17 @@ local function APL ()
 
   -- Out of Combat
   if not Player:AffectingCombat() then
-    -- actions=stealth
+    -- actions.precombat=apply_poison
+    -- Note: Handled just above.
+    -- actions.precombat+=/flask
+    -- actions.precombat+=/augmentation
+    -- actions.precombat+=/food
+    -- actions.precombat+=/snapshot_stats
+    -- actions.precombat+=/stealth
     if not Player:BuffUp(Rogue.VanishBuffSpell()) then
       ShouldReturn = Rogue.Stealth(Rogue.StealthSpell())
       if ShouldReturn then return ShouldReturn end
     end
-    -- Flask
-    -- Food
-    -- Rune
-    -- PrePot w/ Bossmod Countdown
     -- Opener
     if Everyone.TargetIsValid() then
       -- actions.precombat+=/slice_and_dice,precombat_seconds=1
@@ -853,7 +864,7 @@ local function APL ()
     -- Interrupts
     ShouldReturn = Everyone.Interrupt(S.Kick, Settings.CommonsDS.DisplayStyle.Interrupts, Interrupts)
     if ShouldReturn then return ShouldReturn end
-  
+
     PoisonedBleeds = Rogue.PoisonedBleeds()
     -- TODO: Make this match the updated code version
     EnergyRegenCombined = Player:EnergyRegen() + PoisonedBleeds * 6 / (2 * Player:SpellHaste())
@@ -863,6 +874,8 @@ local function APL ()
     NotPooling = NotPoolingVar()
     SepsisSyncRemains = SepsisSyncRemainsVar()
     ScentSaturated = ScentSaturatedVar()
+
+    -- actions=/stealth
     -- actions+=/variable,name=single_target,value=spell_targets.fan_of_knives<2
     SingleTarget = MeleeEnemies10yCount < 2
 
@@ -904,8 +917,8 @@ local function APL ()
     if ShouldReturn then return ShouldReturn end
     -- Racials
     if HR.CDsON() then
-      -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
-      if S.ArcaneTorrent:IsCastable() and TargetInMeleeRange and Player:EnergyDeficit() > 15 then
+      -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen_combined
+      if S.ArcaneTorrent:IsCastable() and TargetInMeleeRange and Player:EnergyDeficit() >= 15 + EnergyRegenCombined then
         if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent" end
       end
       -- actions+=/arcane_pulse
