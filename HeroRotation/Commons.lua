@@ -59,7 +59,7 @@ function Commons.Interrupt(Spell, Setting, StunSpells)
     elseif Settings.InterruptWithStun and Target:CanBeStunned() then
       if StunSpells then
         for i = 1, #StunSpells do
-          if StunSpells[i][1]:IsCastable() and Target:IsSpellInRange(StunSpells[i][1]) and StunSpells[i][3]() then
+          if (StunSpells[i][1]:IsKnown() or StunSpells[i][1]:IsKnown(true)) and StunSpells[i][1]:IsCastable() and Target:IsSpellInRange(StunSpells[i][1]) and StunSpells[i][3]() then
             if Cast(StunSpells[i][1], nil, Setting) then return StunSpells[i][2]; end
           end
         end
