@@ -217,6 +217,11 @@ local function EvaluateTargetIfMSIFiller(TargetUnit)
   return (TargetUnit:DebuffRemains(S.DevouringPlagueDebuff) > S.MindSpikeInsanity:CastTime())
 end
 
+local function EvaluateTargetIfVTAoE(TargetUnit)
+  -- if=(!variable.holding_crash|raid_event.adds.count%(active_dot.vampiric_touch+raid_event.adds.count)<1.5)&(dot.devouring_plague.remains>=2.5|buff.voidform.up)
+  return (TargetUnit:DebuffRemains(S.DevouringPlagueDebuff) >= 2.5 or Player:BuffUp(S.VoidformBuff))
+end
+
 local function EvaluateTargetIfVTMain(TargetUnit)
   -- if=refreshable&target.time_to_die>=12&(cooldown.shadow_crash.remains>=dot.vampiric_touch.remains|variable.holding_crash|!talent.whispering_shadows)&(!action.shadow_crash.in_flight|!talent.whispering_shadows)
   -- Note: Added setting check for lowest max hp for us to cycle.
@@ -643,7 +648,7 @@ local function AoE()
   end
   -- void_torrent,target_if=max:dot.devouring_plague.remains,if=(!variable.holding_crash|raid_event.adds.count%(active_dot.vampiric_touch+raid_event.adds.count)<1.5)&(dot.devouring_plague.remains>=2.5|buff.voidform.up)
   if S.VoidTorrent:IsCastable() then
-    if Everyone.CastTargetIf(S.VoidTorrent, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, EvaluateTargetIfVoidTorrentAoE, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent aoe 34"; end
+    if Everyone.CastTargetIf(S.VoidTorrent, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, EvaluateTargetIfVTAoE, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent aoe 34"; end
   end
   -- mind_flay,target_if=max:dot.devouring_plague.remains,if=buff.mind_flay_insanity.up&talent.idol_of_cthun,interrupt_if=ticks>=2,interrupt_immediate=1
   if Flay:IsCastable() and (Player:BuffUp(S.MindFlayInsanityBuff) and S.IdolOfCthun:IsAvailable()) then
