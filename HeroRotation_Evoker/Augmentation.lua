@@ -633,7 +633,7 @@ end
 local function Init()
   S.PrescienceBuff:RegisterAuraTracking()
 
-  HR.Print("Augmentation Evoker rotation has been updated for patch 10.2.5.")
+  HR.Print("Augmentation Evoker rotation has been updated for patch 10.2.7.")
 end
 
 HR.SetAPL(1473, APL, Init);

@@ -713,7 +713,7 @@ end
 local function Init()
   S.DoomBrandDebuff:RegisterAuraTracking()
 
-  HR.Print("Demonology Warlock rotation has been updated for patch 10.2.5.")
+  HR.Print("Demonology Warlock rotation has been updated for patch 10.2.7.")
 end
 
 HR.SetAPL(266, APL, Init)

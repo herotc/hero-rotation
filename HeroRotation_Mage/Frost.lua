@@ -505,7 +505,7 @@ end
 local function Init()
   S.WintersChillDebuff:RegisterAuraTracking()
 
-  HR.Print("Frost Mage rotation has been updated for patch 10.2.5.")
+  HR.Print("Frost Mage rotation has been updated for patch 10.2.7.")
 end
 
 HR.SetAPL(64, APL, Init)

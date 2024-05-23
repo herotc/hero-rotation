@@ -379,7 +379,7 @@ end
 local function OnInit()
   S.MarkofFyralathDebuff:RegisterAuraTracking()
 
-  HR.Print("Retribution Paladin rotation has been updated for patch 10.2.5.")
+  HR.Print("Retribution Paladin rotation has been updated for patch 10.2.7.")
 end
 
 HR.SetAPL(70, APL, OnInit)

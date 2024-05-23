@@ -747,7 +747,7 @@ local function Init()
   S.FesteringWoundDebuff:RegisterAuraTracking()
   S.MarkofFyralathDebuff:RegisterAuraTracking()
 
-  HR.Print("Unholy DK rotation has been updated for patch 10.2.5.")
+  HR.Print("Unholy DK rotation has been updated for patch 10.2.7.")
 end
 
 HR.SetAPL(252, APL, Init)

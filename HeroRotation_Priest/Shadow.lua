@@ -810,7 +810,7 @@ local function Init()
   S.DevouringPlagueDebuff:RegisterAuraTracking()
   S.VampiricTouchDebuff:RegisterAuraTracking()
 
-  HR.Print("Shadow Priest rotation has been updated for patch 10.2.5.")
+  HR.Print("Shadow Priest rotation has been updated for patch 10.2.7.")
 end
 
 HR.SetAPL(258, APL, Init)

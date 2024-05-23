@@ -587,7 +587,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Arcane Mage rotation has been updated for patch 10.2.5.")
+  HR.Print("Arcane Mage rotation has been updated for patch 10.2.7.")
 end
 
 HR.SetAPL(62, APL, Init)

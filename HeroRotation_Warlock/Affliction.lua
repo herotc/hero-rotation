@@ -749,7 +749,7 @@ local function OnInit()
   S.SiphonLifeDebuff:RegisterAuraTracking()
   S.UnstableAfflictionDebuff:RegisterAuraTracking()
 
-  HR.Print("Affliction Warlock rotation has been updated for patch 10.2.5.")
+  HR.Print("Affliction Warlock rotation has been updated for patch 10.2.7.")
 end
 
 HR.SetAPL(265, APL, OnInit)
