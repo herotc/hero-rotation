@@ -554,7 +554,7 @@ local function Cleave()
     if Everyone.CastTargetIf(DSSB, Enemies40y, "min", EvaluateTargetIfFilterShadowEmbrace, EvaluateTargetIfDrainSoul, not Target:IsSpellInRange(DSSB)) then return "drain_soul/shadow_bolt cleave 28"; end
   end
   -- malefic_rapture,if=!talent.dread_touch&buff.tormented_crescendo.up
-  if S.MaleficRapture:IsReady() and not S.DreadTouch:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) then
+  if S.MaleficRapture:IsReady() and (not S.DreadTouch:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff)) then
     if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 30"; end
   end
   -- malefic_rapture,if=variable.cd_dots_up|variable.vt_ps_up
