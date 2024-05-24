@@ -400,7 +400,22 @@ local function Aoe()
   end
   -- havoc,target_if=min:((-target.time_to_die)<?-15)+dot.immolate.remains+99*(self.target=target),if=(!cooldown.summon_infernal.up|!talent.summon_infernal|(talent.inferno&active_enemies>4))&target.time_to_die>8
   if S.Havoc:IsReady() and (S.SummonInfernal:CooldownDown() or not S.SummonInfernal:IsAvailable() or (S.Inferno:IsAvailable() and EnemiesCount8ySplash > 4)) then
-    if Everyone.CastTargetIf(S.Havoc, Enemies40y, "min", EvaluateTargetIfFilterHavoc, EvaluateTargetIfHavoc, not Target:IsSpellInRange(S.Havoc)) then return "havoc aoe 14"; end
+    --if Everyone.CastTargetIf(S.Havoc, Enemies40y, "min", EvaluateTargetIfFilterHavoc, EvaluateTargetIfHavoc, not Target:IsSpellInRange(S.Havoc)) then return "havoc aoe 14"; end
+    local BestUnit, BestConditionValue, CUCV = nil, nil, nil
+    for _, CycleUnit in pairs(Enemies40y) do
+      if CycleUnit:GUID() ~= Target:GUID() then
+        if BestConditionValue then
+          CUCV = EvaluateTargetIfFilterHavoc(CycleUnit)
+        end
+        if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy())
+          and (not BestConditionValue or Utils.CompareThis("min", CUCV, BestConditionValue)) then
+          BestUnit, BestConditionValue = CycleUnit, CUCV
+        end
+      end
+    end
+    if BestUnit and EvaluateTargetIfHavoc(BestUnit) then
+      HR.CastLeftNameplate(BestUnit, S.Havoc)
+    end
   end
   -- immolate,target_if=min:dot.immolate.remains+99*debuff.havoc.remains,if=dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&(!talent.raging_demonfire|cooldown.channel_demonfire.remains>remains|time<5)&active_dot.immolate<=4&target.time_to_die>18
   if S.Immolate:IsCastable() and (S.ImmolateDebuff:AuraActiveCount() <= 4) then
