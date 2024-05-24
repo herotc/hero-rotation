@@ -87,7 +87,7 @@ AffOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
     elseif self == SpellAffli.SeedofCorruption or self == SpellAffli.Haunt then
       return BaseCheck and not Player:IsCasting(self) and not self:InFlight()
     elseif self == SpellAffli.MaleficRapture then
-      return BaseCheck and Target:DebuffUp(SpellAffli.CorruptionDebuff) or Target:DebuffUp(SpellAffli.AgonyDebuff) or Target:DebuffUp(SpellAffli.UnstableAfflictionDebuff) or Target:DebuffUp(SpellAffli.SiphonLifeDebuff) or Target:DebuffUp(SpellAffli.HauntDebuff) or Target:DebuffUp(SpellAffli.SoulRotDebuff) or Target:DebuffUp(SpellAffli.VileTaintDebuff)
+      return BaseCheck and (Target:DebuffUp(SpellAffli.CorruptionDebuff) or Target:DebuffUp(SpellAffli.AgonyDebuff) or Target:DebuffUp(SpellAffli.UnstableAfflictionDebuff) or Target:DebuffUp(SpellAffli.SiphonLifeDebuff) or Target:DebuffUp(SpellAffli.HauntDebuff) or Target:DebuffUp(SpellAffli.SoulRotDebuff) or Target:DebuffUp(SpellAffli.VileTaintDebuff))
     else
       return BaseCheck
     end
