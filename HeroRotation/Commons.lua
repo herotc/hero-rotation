@@ -67,7 +67,7 @@ function Commons.Interrupt(Spell, Setting, StunSpells)
         end
       end
     elseif Settings.InterruptCycle and AoEON() then
-      local SpellRange = (Spell.MaximumRange > 0) and Spell.MaximumRange or 40
+      local SpellRange = (Spell.MaximumRange and Spell.MaximumRange > 0) and Spell.MaximumRange or 40
       local Enemies = Player:GetEnemiesInRange(SpellRange)
       local TargetGUID = Target:GUID()
       for _, CycleUnit in pairs(Enemies) do
