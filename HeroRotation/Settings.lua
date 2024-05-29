@@ -29,6 +29,7 @@
       -- Interrupt
       InterruptEnabled = false,
       InterruptWithStun = false, -- EXPERIMENTAL
+      InterruptCycle = false,
       -- SoloMode try to maximize survivability at the cost of dps
       SoloMode = false,
       -- Remove the toggle icon buttons.
@@ -63,6 +64,7 @@
     CreatePanelOption("CheckButton", CP_General, "General.HideKeyBinds", "Hide Keybinds", "Enable if you want to hide the keybind on the icons.");
     CreatePanelOption("CheckButton", CP_General, "General.InterruptEnabled", "Interrupt", "Enable if you want to interrupt.");
     CreatePanelOption("CheckButton", CP_General, "General.InterruptWithStun", "Interrupt With Stun", "EXPERIMENTAL: Enable if you want to interrupt with stuns.");
+    CreatePanelOption("CheckButton", CP_General, "General.InterruptCycle", "Cycle Interrupts", "Enable if you want to suggest an interrupt on any target within range.");
     CreatePanelOption("CheckButton", CP_General, "General.SoloMode", "Solo Mode", "Enable if you want to try to maximize survivability at the cost of dps.");
     CreatePanelOption("CheckButton", CP_General, "General.HideToggleIcons", "Hide toggle icons", "Enable if you want to hide the toggle buttons on the icon frame.", {ReloadRequired = true});
     CreatePanelOption("CheckButton", CP_General, "General.NotEnoughManaEnabled", "Not enough mana/energy", "Enable if you want a faded icon when you have not enough mana or energy.");

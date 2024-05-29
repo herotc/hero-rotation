@@ -53,14 +53,36 @@ end
 
 -- Interrupt
 function Commons.Interrupt(Spell, Setting, StunSpells)
-  if Settings.InterruptEnabled and Target:IsInterruptible() then
-    if Spell:IsCastable(true) and Target:IsSpellInRange(Spell) then
-      if Cast(Spell, nil, Setting) then return "Cast " .. Spell:Name() .. " (Interrupt)"; end
-    elseif Settings.InterruptWithStun and Target:CanBeStunned() then
-      if StunSpells then
-        for i = 1, #StunSpells do
-          if (StunSpells[i][1]:IsKnown() or StunSpells[i][1]:IsKnown(true)) and StunSpells[i][1]:IsCastable() and Target:IsSpellInRange(StunSpells[i][1]) and StunSpells[i][3]() then
-            if Cast(StunSpells[i][1], nil, Setting) then return StunSpells[i][2]; end
+  if Settings.InterruptEnabled then
+    if (not Settings.InterruptCycle or not AoEON() or Target:IsInterruptible()) and Target:IsInterruptible() then
+      if Spell:IsCastable(true) and Target:IsSpellInRange(Spell) then
+        if Cast(Spell, nil, Setting) then return "Cast " .. Spell:Name() .. " (Interrupt)"; end
+      elseif Settings.InterruptWithStun and Target:CanBeStunned() then
+        if StunSpells then
+          for i = 1, #StunSpells do
+            if (StunSpells[i][1]:IsKnown() or StunSpells[i][1]:IsKnown(true)) and StunSpells[i][1]:IsCastable() and Target:IsSpellInRange(StunSpells[i][1]) and StunSpells[i][3]() then
+              if Cast(StunSpells[i][1], nil, Setting) then return StunSpells[i][2]; end
+            end
+          end
+        end
+      end
+    elseif Settings.InterruptCycle and AoEON() then
+      local SpellRange = (Spell.MaximumRange > 0) and Spell.MaximumRange or 40
+      local Enemies = Player:GetEnemiesInRange(SpellRange)
+      local TargetGUID = Target:GUID()
+      for _, CycleUnit in pairs(Enemies) do
+        if CycleUnit:GUID() ~= TargetGUID and CycleUnit:IsInterruptible() then
+          if Spell:IsCastable(true) and CycleUnit:IsSpellInRange(Spell) then
+            CastLeftNameplate(CycleUnit, Spell)
+            break
+          elseif Settings.InterruptWithStun and CycleUnit:CanBeStunned() then
+            if StunSpells then
+              for i = 1, #StunSpells do
+                if (StunSpells[i][1]:IsKnown() or StunSpells[i][1]:IsKnown(true)) and StunSpells[i][1]:IsCastable() and CycleUnit:IsSpellInRange(StunSpells[i][1]) and StunSpells[i][3]() then
+                  CastLeftNameplate(CycleUnit, StunSpells[i][1])
+                end
+              end
+            end
           end
         end
       end
