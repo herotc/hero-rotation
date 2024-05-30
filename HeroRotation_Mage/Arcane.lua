@@ -137,7 +137,7 @@ local function Precombat()
   -- conjure_mana_gem
   -- TODO: Fix hotkey issue (spell and item use the same icon)
   if S.ConjureManaGem:IsCastable() then
-    if Cast(S.ConjureManaGem) then return "conjure_mana_gem precombat 4"; end
+    if HR.CastAnnotated(S.ConjureManaGem, false, "CREATE GEM") then return "conjure_mana_gem precombat 4"; end
   end
   -- variable,name=aoe_target_count,op=reset,default=3
   -- variable,name=aoe_target_count,op=set,value=9,if=!talent.arcing_cleave
@@ -200,7 +200,7 @@ local function AoeCooldownPhase()
     if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb aoe_cooldown_phase 6"; end
   end
   -- nether_tempest,if=talent.arcane_echo,line_cd=30
-  if S.NetherTempest:IsReady() and (S.ArcaneEcho:IsAvailable()) then
+  if S.NetherTempest:IsReady() and S.NetherTempest:TimeSinceLastCast() >= 30 and (S.ArcaneEcho:IsAvailable()) then
     if Cast(S.NetherTempest, nil, nil, not Target:IsSpellInRange(S.NetherTempest)) then return "nether_tempest aoe_cooldown_phase 8"; end
   end
   -- arcane_surge
