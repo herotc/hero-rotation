@@ -372,8 +372,10 @@ function HR.CmdHandler(Message)
     HeroRotationCharDB.Toggles[5] = not HeroRotationCharDB.Toggles[5]
     HR.Print("Icon Flashing is now " .. (HeroRotationCharDB.Toggles[5] == true and "|cff00ff00enabled|r." or "|cffff0000disabled|r."))
   elseif Argument1 == "version" then
-    local HRVer = HR.Version() or "not defined"
+    local HRVer, HLVer, DBCVer = HR.Version()
     HR.Print("HeroRotation Version: |cff8888ff" .. tostring(HRVer) .. "|r")
+    HR.Print("HeroLib Version: |cff8888ff" .. tostring(HLVer) .. "|r")
+    HR.Print("HeroDBC Version: |cff8888ff" .. tostring(DBCVer) .. "|r")
   elseif Argument1 == "help" then
     HR.Print("|cffffff00--[Toggles]--|r")
     HR.Print("  On/Off: |cff8888ff/hr toggle|r")
@@ -440,5 +442,8 @@ end
 
 -- Get the version of HR.
 function HR.Version()
-  return GetAddOnMetadata("HeroRotation", "Version")
+  local HRVer = GetAddOnMetadata("HeroRotation", "Version") or "not defined"
+  local HLVer = GetAddOnMetadata("HeroLib", "Version") or "not defined"
+  local DBCVer = GetAddOnMetadata("HeroDBC", "Version") or "not defined"
+  return HRVer, HLVer, DBCVer
 end
