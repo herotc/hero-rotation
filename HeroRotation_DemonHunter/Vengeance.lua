@@ -56,14 +56,15 @@ local Settings = {
 
 -- Rotation Var
 local SoulFragments, TotalSoulFragments, IncSoulFragments
-local VarEDFragments = (S.SoulSigils:IsAvailable()) and 4 or 3
+local VarSoSFragments = (S.SoulSigils:IsAvailable()) and 4 or 3
 local SigilPopTime = (S.QuickenedSigils:IsAvailable()) and 1 or 2
 local IsInMeleeRange, IsInAoERange
 local ActiveMitigationNeeded
 local IsTanking
 local Enemies8yMelee
 local EnemiesCount8yMelee
-local VarDontCleave, VarFDReady, VarST, VarSmallAoE, VarBigAoE, VarCanSpB
+local VarDontCleave, VarFDReady, VarCanSpB, VarNoMaintCleave
+local VarST, VarSmallAoE, VarBigAoE
 local BossFightRemains = 11111
 local FightRemains = 11111
 
@@ -73,7 +74,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  VarEDFragments = (S.SoulSigils:IsAvailable()) and 4 or 3
+  VarSoSFragments = (S.SoulSigils:IsAvailable()) and 4 or 3
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 -- Melee Is In Range w/ Movement Handlers
@@ -113,21 +114,21 @@ local function Precombat()
   end
   -- Manually added: Gap closers
   if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
-    if Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike precombat 6"; end
+    if Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike precombat 4"; end
   end
   if S.Felblade:IsCastable() and not IsInMeleeRange then
-    if Cast(S.Felblade, nil, nil, not Target:IsInRange(15)) then return "felblade precombat 5"; end
+    if Cast(S.Felblade, nil, nil, not Target:IsInRange(15)) then return "felblade precombat 6"; end
   end
   -- immolation_aura
   if S.ImmolationAura:IsCastable() then
-    if Cast(S.ImmolationAura) then return "immolation_aura precombat 4"; end
+    if Cast(S.ImmolationAura) then return "immolation_aura precombat 8"; end
   end
   -- Manually added: First attacks
   if S.Fracture:IsCastable() and IsInMeleeRange then
-    if Cast(S.Fracture) then return "fracture precombat 8"; end
+    if Cast(S.Fracture) then return "fracture precombat 10"; end
   end
   if S.Shear:IsCastable() and IsInMeleeRange then
-    if Cast(S.Shear) then return "shear precombat 10"; end
+    if Cast(S.Shear) then return "shear precombat 12"; end
   end
 end
 
@@ -150,13 +151,63 @@ local function Defensives()
   end
 end
 
+local function AldrachiReaver()
+  -- metamorphosis,use_off_gcd=1,if=!buff.metamorphosis.up&cooldown.fel_devastation.remains>12
+  if S.Metamorphosis:IsCastable() and (Player:BuffDown(S.MetamorphosisBuff) and S.FelDevastation:CooldownRemains() > 12) then
+    if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis aldrachi_reaver 2"; end
+  end
+  -- call_action_list,name=fiery_demise,if=talent.fiery_brand&talent.fiery_demise&active_dot.fiery_brand>0
+  if S.FieryBrand:IsAvailable() and S.FieryDemise:IsAvailable() and Target:DebuffUp(S.FieryBrandDebuff) then
+    local ShouldReturn = FieryDemise(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- call_action_list,name=maintenance
+  local ShouldReturn = Maintenance(); if ShouldReturn then return ShouldReturn; end
+  -- run_action_list,name=single_target,if=variable.single_target
+  if VarST then
+    local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- run_action_list,name=small_aoe,if=variable.small_aoe
+  if VarSmallAoE then
+    local ShouldReturn = SmallAoE(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- run_action_list,name=big_aoe,if=variable.big_aoe
+  if VarBigAoE then
+    local ShouldReturn = BigAoE(); if ShouldReturn then return ShouldReturn; end
+  end
+end
+
+local function Felscarred()
+  -- metamorphosis,use_off_gcd=1,if=!buff.metamorphosis.up&cooldown.fel_devastation.remains>12
+  if S.Metamorphosis:IsCastable() and (Player:BuffDown(S.MetamorphosisBuff) and S.FelDevastation:CooldownRemains() > 12) then
+    if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis felscarred 2"; end
+  end
+  -- call_action_list,name=fiery_demise,if=talent.fiery_brand&talent.fiery_demise&active_dot.fiery_brand>0
+  if S.FieryBrand:IsAvailable() and S.FieryDemise:IsAvailable() and Target:DebuffUp(S.FieryBrandDebuff) then
+    local ShouldReturn = FieryDemise(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- call_action_list,name=maintenance
+  local ShouldReturn = Maintenance(); if ShouldReturn then return ShouldReturn; end
+  -- run_action_list,name=single_target,if=variable.single_target
+  if VarST then
+    local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- run_action_list,name=small_aoe,if=variable.small_aoe
+  if VarSmallAoE then
+    local ShouldReturn = SmallAoE(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- run_action_list,name=big_aoe,if=variable.big_aoe
+  if VarBigAoE then
+    local ShouldReturn = BigAoE(); if ShouldReturn then return ShouldReturn; end
+  end
+end
+
 local function Maintenance()
   -- fiery_brand,if=talent.fiery_brand&((active_dot.fiery_brand=0&(cooldown.sigil_of_flame.remains<=(execute_time+gcd.remains)|cooldown.soul_carver.remains<=(execute_time+gcd.remains)|cooldown.fel_devastation.remains<=(execute_time+gcd.remains)))|(talent.down_in_flames&full_recharge_time<=(execute_time+gcd.remains)))
   if S.FieryBrand:IsCastable() and ((S.FieryBrandDebuff:AuraActiveCount() == 0 and (S.SigilofFlame:CooldownRemains() <= (S.FieryBrand:ExecuteTime() + Player:GCDRemains()) or S.SoulCarver:CooldownRemains() < (S.FieryBrand:ExecuteTime() + Player:GCDRemains()) or S.FelDevastation:CooldownRemains() < (S.FieryBrand:ExecuteTime() + Player:GCDRemains()))) or (S.DowninFlames:IsAvailable() and S.FieryBrand:FullRechargeTime() < (S.FieryBrand:ExecuteTime() + Player:GCDRemains()))) then
     if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand maintenance 2"; end
   end
-  -- sigil_of_flame,if=talent.ascending_flame|(active_dot.sigil_of_flame=0&!in_flight)
-  if S.SigilofFlame:IsCastable() and (S.AscendingFlame:IsAvailable() or (S.SigilofFlameDebuff:AuraActiveCount() == 0 and S.SigilofFlame:TimeSinceLastCast() > SigilPopTime)) then
+  -- sigil_of_flame,if=talent.ascending_flame|active_dot.sigil_of_flame=0
+  if S.SigilofFlame:IsCastable() and (S.AscendingFlame:IsAvailable() or S.SigilofFlameDebuff:AuraActiveCount() == 0) then
     if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame maintenance 4"; end
   end
   -- immolation_aura
@@ -225,9 +276,9 @@ local function FieryDemise()
   if S.TheHunt:IsCastable() then
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt fiery_demise 12"; end
   end
-  -- elysian_decree,if=fury>=40&!prev_gcd.1.elysian_decree
-  if S.ElysianDecree:IsCastable() and (Player:Fury() >= 40 and not Player:PrevGCD(1, S.ElysianDecree)) then
-    if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree fiery_demise 14"; end
+  -- sigil_of_spite,line_cd=1.85,if=fury>=40
+  if S.SigilofSpite:IsCastable() and S.SigilofSpite:TimeSinceLastCast() > 1.85 and (Player:Fury() >= 40) then
+    if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "sigil_of_spite fiery_demise 14"; end
   end
   -- spirit_bomb,if=variable.can_spb
   if VarNoMaintCleave and not VarCanSpB then
@@ -243,11 +294,11 @@ local function Filler()
   if S.SigilofChains:IsCastable() and (S.CycleofBinding:IsAvailable()) then
     if Cast(S.SigilofChains, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_chains filler 2"; end
   end
-  -- sigil_of_misery,if=talent.cycle_of_binding&talent.sigil_of_misery.enabled
+  -- sigil_of_misery,if=talent.cycle_of_binding&talent.sigil_of_misery
   if S.SigilofMisery:IsCastable() and (S.CycleofBinding:IsAvailable()) then
     if Cast(S.SigilofMisery, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_misery filler 4"; end
   end
-  -- sigil_of_silence,if=talent.cycle_of_binding&talent.sigil_of_silence.enabled
+  -- sigil_of_silence,if=talent.cycle_of_binding&talent.sigil_of_silence
   if S.SigilofSilence:IsCastable() and (S.CycleofBinding:IsAvailable()) then
     if Cast(S.SigilofSilence, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_silence filler 6"; end
   end
@@ -278,9 +329,9 @@ local function SingleTarget()
   if S.FelDevastation:IsReady() and (S.CollectiveAnguish:IsAvailable() or (S.StoketheFlames:IsAvailable() and S.BurningBlood:IsAvailable())) then
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation single_target 6"; end
   end
-  -- elysian_decree,if=!prev_gcd.1.elysian_decree
-  if S.ElysianDecree:IsCastable() and (not Player:PrevGCD(1, S.ElysianDecree)) then
-    if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree single_target 8"; end
+  -- sigil_of_spite
+  if S.SigilofSpite:IsCastable() and (not Player:PrevGCD(1, S.SigilofSpite)) then
+    if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "sigil_of_spite single_target 8"; end
   end
   -- fel_devastation
   if S.FelDevastation:IsReady() then
@@ -307,9 +358,9 @@ local function SmallAoE()
   if S.FelDevastation:IsReady() and (S.CollectiveAnguish:IsAvailable() or (S.StoketheFlames:IsAvailable() and S.BurningBlood:IsAvailable())) then
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation small_aoe 4"; end
   end
-  -- elysian_decree,if=fury>=40&(soul_fragments.total<=1|soul_fragments.total>=4)&!prev_gcd.1.elysian_decree
-  if S.ElysianDecree:IsCastable() and (Player:Fury() >= 40 and (TotalSoulFragments <= 1 or TotalSoulFragments >= 4) and not Player:PrevGCD(1, S.ElysianDecree)) then
-    if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree small_aoe 6"; end
+  -- sigil_of_spite,line_cd=1.85,if=fury>=40&(soul_fragments.total<=1|soul_fragments.total>=4)
+  if S.SigilofSpite:IsCastable() and S.SigilofSpite:TimeSinceLastCast() > 1.85 and (Player:Fury() >= 40 and (TotalSoulFragments <= 1 or TotalSoulFragments >= 4)) then
+    if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "sigil_of_spite small_aoe 6"; end
   end
   -- fel_devastation
   if S.FelDevastation:IsReady() then
@@ -340,9 +391,9 @@ local function BigAoE()
   if S.TheHunt:IsCastable() then
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(50)) then return "the_hunt big_aoe 4"; end
   end
-  -- elysian_decree,if=fury>=40&(soul_fragments.total<=1|soul_fragments.total>=4)&!prev_gcd.1.elysian_decree
-  if S.ElysianDecree:IsCastable() and (Player:Fury() >= 40 and (TotalSoulFragments <= 1 or TotalSoulFragments >= 4) and not Player:PrevGCD(1, S.ElysianDecree)) then
-    if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree big_aoe 6"; end
+  -- sigil_of_spite,line_cd=1.85,if=fury>=40&(soul_fragments.total<=1|soul_fragments.total>=4)
+  if S.SigilofSpite:IsCastable() and S.SigilofSpite:TimeSinceLastCast() > 1.85 and (Player:Fury() >= 40 and (TotalSoulFragments <= 1 or TotalSoulFragments >= 4)) then
+    if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "sigil_of_spite big_aoe 6"; end
   end
   -- fel_devastation
   if S.FelDevastation:IsReady() then
@@ -429,11 +480,11 @@ local function APL()
     VarBigAoE = EnemiesCount8yMelee >= 6
     -- Note: Below line moved from above.
     VarDontCleave = ((S.FelDevastation:CooldownRemains() <= (S.SoulCleave:ExecuteTime() + Player:GCDRemains())) and Player:Fury() < 80 or (IncSoulFragments > 1 or TotalSoulFragments >= 5) and not VarST)
-    -- variable,name=can_spb,op=setif,condition=variable.fd_ready,value=(variable.single_target&soul_fragments>=5)|(variable.small_aoe&soul_fragments>=4)|(variable.big_aoe&soul_fragments>=3),value_else=(variable.small_aoe&soul_fragments>=4)|(variable.big_aoe&soul_fragments>=3)
+    -- variable,name=can_spb,op=setif,condition=variable.fd_ready,value=(variable.single_target&soul_fragments>=5)|(variable.small_aoe&soul_fragments>=4)|(variable.big_aoe&soul_fragments>=3),value_else=(variable.small_aoe&soul_fragments>=5)|(variable.big_aoe&soul_fragments>=4)
     if VarFDReady then
       VarCanSpB = (VarST and SoulFragments >= 5) or (VarSmallAoE and SoulFragments >= 4) or (VarBigAoE and SoulFragments >= 3)
     else
-      VarCanSpB = (VarSmallAoE and SoulFragments >= 4) or (VarBigAoE and SoulFragments >= 3)
+      VarCanSpB = (VarSmallAoE and SoulFragments >= 5) or (VarBigAoE and SoulFragments >= 4)
     end
     -- Note: Manually added variable for holding maintenance SoulCleave if incoming souls would make VarCanSpB true
     if VarFDReady then
@@ -443,7 +494,7 @@ local function APL()
     end
     -- auto_attack
     -- disrupt,if=target.debuff.casting.react (Interrupts)
-    local ShouldReturn = Everyone.Interrupt(S.Disrupt, Settings.CommonsDS.DisplayStyle.Interrupts, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(S.Disrupt, Settings.CommonsDS.DisplayStyle.Interrupts); if ShouldReturn then return ShouldReturn; end
     -- Manually added: Defensives
     if (IsTanking) then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
@@ -454,10 +505,6 @@ local function APL()
     end
     -- demon_spikes,use_off_gcd=1,if=!buff.demon_spikes.up&!cooldown.pause_action.remains
     -- Note: Handled via Defensives()
-    -- metamorphosis,use_off_gcd=1,if=!buff.metamorphosis.up&cooldown.fel_devastation.remains>12
-    if S.Metamorphosis:IsCastable() and (Player:BuffDown(S.MetamorphosisBuff) and S.FelDevastation:CooldownRemains() > 12) then
-      if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis main 4"; end
-    end
     -- potion,use_off_gcd=1
     if Settings.Commons.Enabled.Potions then
       local PotionSelected = Everyone.PotionSelected()
@@ -479,26 +526,15 @@ local function APL()
         end
       end
     end
-    -- call_action_list,name=fiery_demise,if=talent.fiery_brand&talent.fiery_demise&active_dot.fiery_brand>0
-    if S.FieryBrand:IsAvailable() and S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() > 0 then
-      local ShouldReturn = FieryDemise(); if ShouldReturn then return ShouldReturn; end
+    -- run_action_list,name=aldrachi_reaver,if=talent.art_of_the_glaive
+    if S.ArtoftheGlaive:IsAvailable() then
+      local ShouldReturn = AldrachiReaver(); if ShouldReturn then return ShouldReturn; end
+      if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for AldrachiReaver()"; end
     end
-    -- call_action_list,name=maintenance
-    local ShouldReturn = Maintenance(); if ShouldReturn then return ShouldReturn; end
-    -- run_action_list,name=single_target,if=variable.single_target
-    if VarST then
-      local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
-      if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for SingleTarget()"; end
-    end
-    -- run_action_list,name=small_aoe,if=variable.small_aoe
-    if VarSmallAoE then
-      local ShouldReturn = SmallAoE(); if ShouldReturn then return ShouldReturn; end
-      if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for SmallAoE()"; end
-    end
-    -- run_action_list,name=big_aoe,if=variable.big_aoe
-    if VarBigAoE then
-      local ShouldReturn = BigAoE(); if ShouldReturn then return ShouldReturn; end
-      if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for BigAoE()"; end
+    -- run_action_list,name=felscarred,if=talent.demonsurge
+    if S.Demonsurge:IsAvailable() then
+      local ShouldReturn = Felscarred(); if ShouldReturn then return ShouldReturn; end
+      if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Felscarred()"; end
     end
     -- If nothing else to do, show the Pool icon
     if CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
@@ -509,7 +545,7 @@ local function Init()
   S.FieryBrandDebuff:RegisterAuraTracking()
   S.SigilofFlameDebuff:RegisterAuraTracking()
 
-  HR.Print("Vengeance Demon Hunter rotation has been updated for patch 10.2.7.")
+  HR.Print("Vengeance Demon Hunter rotation has been updated for patch 11.0.0.")
 end
 
 HR.SetAPL(581, APL, Init);
