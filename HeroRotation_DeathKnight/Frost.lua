@@ -25,6 +25,7 @@ local bool       = HR.Commons.Everyone.bool
 local strsplit   = strsplit
 -- WoW API
 local GetInventoryItemLink = GetInventoryItemLink
+local IsEquippedItemType   = C_Item.IsEquippedItemType
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
