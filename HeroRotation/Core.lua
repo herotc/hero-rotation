@@ -21,6 +21,7 @@ local GetTime          = GetTime
 -- API locals
 local GetItemInfo      = C_Item.GetItemInfo
 local GetAddOnMetadata = C_AddOns.GetAddOnMetadata
+local IsAddOnLoaded    = C_AddOns.IsAddOnLoaded
 -- File Locals
 
 --- ======= GLOBALIZE =======
@@ -87,7 +88,7 @@ local function DisplayCooldown(Object, DisplayPoolingSwirl, CustomTime)
     StartTime = Player:CastStart()
     CastDuration = Player:CastDuration()
   else
-    StartTime, CastDuration = GCDSpell:CooldownInfo()
+    _, StartTime, _, CastDuration = GCDSpell:CooldownInfo()
   end
 
   -- Tracking Values for Current Spell
