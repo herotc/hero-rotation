@@ -408,21 +408,8 @@ function HR.PulseInit ()
         HL.LoadOverrides(SpecID)
       end
 
-      -- Check for MoP Remix
-      local ReadyToGo = true
-      if not HR.GUISettings.General.EnableMoPRemix then
-        if Player:BuffUp(Spell(424143)) then
-          HR.Print("HeroRotation is currently disabled in Mists of Pandaria Remix. If you wish to enable it, please check the settings box labeled 'Enable for MoP Remix' under HeroRotation's General settings. Please note that we cannot guarantee that the APLs will be optimized for this game mode. After enabling this option, a reload is required.")
-          for Key, Value in pairs(UIFrames) do
-            Value:Hide()
-          end
-          HR.MainFrame:SetScript("OnUpdate", nil)
-          ReadyToGo = false
-        end
-      end
-
       -- Check if there is a Rotation for this Spec
-      if ReadyToGo and LatestSpecIDChecked ~= SpecID then
+      if LatestSpecIDChecked ~= SpecID then
         if EnabledRotation[SpecID] and HR.APLs[SpecID] then
           for Key, Value in pairs(UIFrames) do
             Value:Show()
