@@ -277,6 +277,20 @@ end
 local function StealthCDs ()
   -- # Hidden Opportunity builds without Crackshot use Vanish if Audacity is not active and when under max Opportunity stacks
   -- actions.stealth_cds+=/vanish,if=talent.hidden_opportunity&!talent.crackshot&!buff.audacity.up&(variable.vanish_opportunity_condition|buff.opportunity.stack<buff.opportunity.max_stack)&variable.ambush_condition
+  if S.TricksterDistract:IsReady() and S.Vanish:IsReady() and Vanish_DPS_Condition() and S.HiddenOpportunity:IsAvailable() and not S.Crackshot:IsAvailable() and not Player:BuffUp(S.Audacity)
+    and (Vanish_Opportunity_Condition() or Player:BuffStack(S.Opportunity) < 6) and Ambush_Condition() and not Player:StealthUp(true, false) then
+    if CastPooling(S.TricksterDistract, nil, not Target:IsSpellInRange(S.TricksterDistract)) then return "Cast Trickster Distract" end
+  end
+
+  -- # Crackshot builds or builds without Hidden Opportunity use Vanish at finish condition
+  -- actions.stealth_cds+=/vanish,if=(!talent.hidden_opportunity|talent.crackshot)&variable.finish_condition
+  if S.TricksterDistract:IsReady() and S.Vanish:IsReady() and Vanish_DPS_Condition() and (not S.HiddenOpportunity:IsAvailable() or S.Crackshot:IsAvailable()) and Finish_Condition() and Player:BuffUp(S.AdrenalineRush)
+    and not Player:StealthUp(true, false) then
+    if CastPooling(S.TricksterDistract, nil, not Target:IsSpellInRange(S.TricksterDistract)) then return "Cast Trickster Distract" end
+  end
+
+  -- # Hidden Opportunity builds without Crackshot use Vanish if Audacity is not active and when under max Opportunity stacks
+  -- actions.stealth_cds+=/vanish,if=talent.hidden_opportunity&!talent.crackshot&!buff.audacity.up&(variable.vanish_opportunity_condition|buff.opportunity.stack<buff.opportunity.max_stack)&variable.ambush_condition
   if S.Vanish:IsReady() and Vanish_DPS_Condition() and S.HiddenOpportunity:IsAvailable() and not S.Crackshot:IsAvailable() and not Player:BuffUp(S.Audacity)
     and (Vanish_Opportunity_Condition() or Player:BuffStack(S.Opportunity) < 6) and Ambush_Condition() and not Player:StealthUp(true, false) then
     if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (HO)" end
@@ -284,34 +298,9 @@ local function StealthCDs ()
 
   -- # Crackshot builds or builds without Hidden Opportunity use Vanish at finish condition
   -- actions.stealth_cds+=/vanish,if=(!talent.hidden_opportunity|talent.crackshot)&variable.finish_condition
-  if S.Vanish:IsReady() and Vanish_DPS_Condition() and (not S.HiddenOpportunity:IsAvailable() or S.Crackshot:IsAvailable()) and Finish_Condition()
+  if S.Vanish:IsReady() and Vanish_DPS_Condition() and (not S.HiddenOpportunity:IsAvailable() or S.Crackshot:IsAvailable()) and Finish_Condition() and Player:BuffUp(S.AdrenalineRush)
     and not Player:StealthUp(true, false) then
     if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Finish)" end
-  end
-
-  -- # Crackshot builds use Dance at finish condition
-  -- actions.stealth_cds+=/shadow_dance,if=talent.crackshot&variable.finish_condition
-  -- synecdoche note: DPS gain in testing to hold off on shadow dance if vanish is coming up in the next 6 seconds to avoid wasting vanish CDR
-  if S.ShadowDance:IsReady() and S.Crackshot:IsAvailable() and Finish_Condition()
-    and (S.Vanish:CooldownRemains() >= 6 or not Settings.Commons.UseDPSVanish) and not Player:StealthUp(true, false) then
-    if Cast(S.ShadowDance, Settings.CommonsOGCD.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance Crackshot" end
-  end
-
-  -- actions.stealth_cds+=/shadow_dance,if=!talent.keep_it_rolling&variable.shadow_dance_condition&buff.slice_and_dice.up
-  -- &(variable.finish_condition|talent.hidden_opportunity)&(!talent.hidden_opportunity|!cooldown.vanish.ready)
-  if S.ShadowDance:IsReady() and not S.KeepItRolling:IsAvailable() and Shadow_Dance_Condition() and Player:BuffUp(S.SliceandDice)
-    and (Finish_Condition() or S.HiddenOpportunity:IsAvailable()) and (not S.HiddenOpportunity:IsAvailable() or not S.Vanish:IsReady() or not Settings.Commons.UseDPSVanish)
-    and not Player:StealthUp(true, false) then
-    if Cast(S.ShadowDance, Settings.CommonsOGCD.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
-  end
-
-  -- # Keep it Rolling builds without Crackshot use Dance at finish condition but hold it for an upcoming Keep it Rolling
-  -- actions.stealth_cds+=/shadow_dance,if=talent.keep_it_rolling&variable.shadow_dance_condition
-  -- &(cooldown.keep_it_rolling.remains<=30|cooldown.keep_it_rolling.remains>120&(variable.finish_condition|talent.hidden_opportunity))
-  if S.ShadowDance:IsReady() and S.KeepItRolling:IsAvailable() and Shadow_Dance_Condition()
-    and (S.KeepItRolling:CooldownRemains() <= 30 or S.KeepItRolling:CooldownRemains() >= 120 and (Finish_Condition() or S.HiddenOpportunity:IsAvailable()))
-    and not Player:StealthUp(true, false) then
-    if Cast(S.ShadowDance, Settings.CommonsOGCD.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance KiR without Crackshot" end
   end
 
   -- actions.stealth_cds+=/shadowmeld,if=talent.crackshot&variable.finish_condition|!talent.crackshot&(talent.count_the_odds&variable.finish_condition|talent.hidden_opportunity)
@@ -561,8 +550,9 @@ local function Finish ()
   end
 
   -- actions.finish+=/killing_spree,if=debuff.ghostly_strike.up|!talent.ghostly_strike
-  if S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and (Target:DebuffUp(S.GhostlyStrike) or not S.GhostlyStrike:IsAvailable()) then
-    if Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree" end
+  if S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and (Target:DebuffUp(S.GhostlyStrike) or not S.GhostlyStrike:IsAvailable())
+    and not Player:StealthUp(true, true) and not S.Vanish:IsReady() then
+    if Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle, not Target:IsSpellInRange(S.KillingSpree), nil) then return "Cast Killing Spree" end
   end
 
   if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Target:IsSpellInRange(S.Dispatch) then
@@ -623,7 +613,7 @@ end
 --- ======= MAIN =======
 local function APL ()
   -- Local Update
-  BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 9 or 6
+  BladeFlurryRange = 6
   ComboPoints = Player:ComboPoints()
   EffectiveComboPoints = Rogue.EffectiveComboPoints(ComboPoints)
   ComboPointsDeficit = Player:ComboPointsDeficit()
