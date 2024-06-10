@@ -9,7 +9,6 @@ local GUI = HL.GUI
 local CreatePanel = GUI.CreatePanel
 local CreateChildPanel = GUI.CreateChildPanel
 local CreatePanelOption = GUI.CreatePanelOption
-=======
 local addonName, HR = ...
 -- HeroLib
 local HL = HeroLib
