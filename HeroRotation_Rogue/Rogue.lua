@@ -95,6 +95,7 @@ Spell.Rogue.Commons = {
   Subterfuge              = Spell(108208),
   SubterfugeBuff          = Spell(115192),
   ThistleTea              = Spell(381623),
+  TricksterDistract       = Spell(441587),
   Vigor                   = Spell(14983),
   -- Stealth
   Stealth                 = Spell(1784),
