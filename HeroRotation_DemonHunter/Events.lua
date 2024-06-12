@@ -42,7 +42,7 @@ HL:RegisterForSelfCombatEvent(
       C_Timer.After(1, function() Soul.IncomingSouls = Soul.IncomingSouls + 1; end)
       C_Timer.After(2, function() Soul.IncomingSouls = Soul.IncomingSouls + 1; end)
       C_Timer.After(3, function() Soul.IncomingSouls = Soul.IncomingSouls + 1; end)
-    elseif SpellID == SpellVDH.ElysianDecree:ID() then
+    elseif SpellID == SpellVDH.SigilofSpite:ID() then
       IncAmt = (SpellVDH.SoulSigils:IsAvailable()) and 4 or 3
     elseif SpellVDH.SoulSigils:IsAvailable() and
       (SpellID == SpellVDH.SigilofFlame:ID() or SpellID == SpellVDH.SigilofMisery:ID() or SpellID == SpellVDH.SigilofChains:ID() or SpellID == SpellVDH.SigilofSilence:ID()) then

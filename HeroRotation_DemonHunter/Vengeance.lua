@@ -227,7 +227,7 @@ local function Maintenance()
   end
   -- felblade,if=((!talent.spirit_bomb|active_enemies=1)&fury.deficit>=40)|((cooldown.fel_devastation.remains<=(execute_time+gcd.remains))&fury<50)
   if S.Felblade:IsReady() and (((not S.SpiritBomb:IsAvailable() or EnemiesCount8yMelee ==1) and Player:FuryDeficit() >= 40) or ((S.FelDevastation:CooldownRemains() <= (S.Felblade:ExecuteTime() + Player:GCDRemains())) and Player:Fury() < 50)) then
-    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade maintenance 12"; end
+    if Cast(S.Felblade, nil, nil, not Target:IsInRange(15)) then return "felblade maintenance 12"; end
   end
   -- fracture,if=(cooldown.fel_devastation.remains<=(execute_time+gcd.remains))&fury<50
   if S.Fracture:IsCastable() and ((S.FelDevastation:CooldownRemains() <= (S.Fracture:ExecuteTime() + Player:GCDRemains())) and Player:Fury() < 50) then
@@ -262,7 +262,7 @@ local function FieryDemise()
   end
   -- felblade,if=(!talent.spirit_bomb|(cooldown.fel_devastation.remains<=(execute_time+gcd.remains)))&fury<50
   if S.Felblade:IsReady() and ((not S.SpiritBomb:IsAvailable() or (S.FelDevastation:CooldownRemains() <= (S.Felblade:ExecuteTime() + Player:GCDRemains()))) and Player:Fury() < 50) then
-    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade fiery_demise 6"; end
+    if Cast(S.Felblade, nil, nil, not Target:IsInRange(15)) then return "felblade fiery_demise 6"; end
   end
   -- fel_devastation
   if S.FelDevastation:IsReady() then
@@ -304,7 +304,7 @@ local function Filler()
   end
   -- felblade
   if S.Felblade:IsReady() then
-    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade filler 8"; end
+    if Cast(S.Felblade, nil, nil, not Target:IsInRange(15)) then return "felblade filler 8"; end
   end
   -- shear
   if S.Shear:IsCastable() then
@@ -535,6 +535,18 @@ local function APL()
     if S.Demonsurge:IsAvailable() then
       local ShouldReturn = Felscarred(); if ShouldReturn then return ShouldReturn; end
       if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Felscarred()"; end
+    end
+    -- Safety for level 70
+    if not S.ArtoftheGlaive:IsAvailable() and not S.Demonsurge:IsAvailable() then
+      if VarST then
+        local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
+      end
+      if VarSmallAoE then
+        local ShouldReturn = SmallAoE(); if ShouldReturn then return ShouldReturn; end
+      end
+      if VarBigAoE then
+        local ShouldReturn = BigAoE(); if ShouldReturn then return ShouldReturn; end
+      end
     end
     -- If nothing else to do, show the Pool icon
     if CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
