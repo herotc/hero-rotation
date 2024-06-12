@@ -1,21 +1,19 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, HR = ...
+local addonName, HR     = ...
 -- HeroLib
-local HL = HeroLib
+local HL                = HeroLib
 -- File Locals
-local GUI = HL.GUI
-local CreatePanel = GUI.CreatePanel
-local CreateChildPanel = GUI.CreateChildPanel
+local GUI               = HL.GUI
+local CreatePanel       = GUI.CreatePanel
+local CreateChildPanel  = GUI.CreateChildPanel
 local CreatePanelOption = GUI.CreatePanelOption
-local addonName, HR = ...
--- HeroLib
-local HL = HeroLib
+local addonName, HR     = ...
 -- File Locals
-local GUI = HL.GUI
-local CreatePanel = GUI.CreatePanel
-local CreateChildPanel = GUI.CreateChildPanel
+local GUI               = HL.GUI
+local CreatePanel       = GUI.CreatePanel
+local CreateChildPanel  = GUI.CreateChildPanel
 local CreatePanelOption = GUI.CreatePanelOption
 
 --- ============================ CONTENT ============================
