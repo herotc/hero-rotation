@@ -17,9 +17,13 @@ local mathmax           = math.max
 local mathmin           = math.min
 local pairs             = pairs
 local select            = select
--- API
+
+-- C_AddOns locals
 local IsAddOnLoaded     = C_AddOns.IsAddOnLoaded
+-- Accepts: name; Returns: loadedOrLoading (bool), loaded(bool)
 local LoadAddOn         = C_AddOns.LoadAddOn
+-- Accepts: name; Returns: loaded (bool), value (string)
+
 -- File Locals
 local Masque -- , MasqueGroupLeft
 local MasqueGroups = {}

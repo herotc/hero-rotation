@@ -18,11 +18,23 @@ local stringlower      = string.lower
 local strsplit         = strsplit
 local tostring         = tostring
 local GetTime          = GetTime
--- API locals
-local GetItemInfo      = C_Item.GetItemInfo
+
+-- C_AddOns locals
 local GetAddOnMetadata = C_AddOns.GetAddOnMetadata
-local GetSpellTexture  = C_Spell.GetSpellTexture
+-- Accepts: name, variable; Returns: value (cstring)
 local IsAddOnLoaded    = C_AddOns.IsAddOnLoaded
+-- Accepts: name; Returns: loadedOrLoading (bool), loaded(bool)
+
+-- C_Item locals
+local GetItemInfo      = C_Item.GetItemInfo
+-- Accepts: itemInfo; 
+-- Returns: itemName (cstring), itemLink (cstring), itemQuality (ItemQuality), itemLevel (number), itemMinLevel (number), itemType (cstring), itemsubType (cstring), itemStackCount (number),
+-- itemEquipLoc (cstring), itemTexture (fileID), sellPrice (number), classID (number), subclassID (number), bindType (number), expansionID (number), setID (number), isCraftingReagent (bool)
+
+-- C_Spell locals
+local GetSpellTexture  = C_Spell.GetSpellTexture
+-- Accepts: spellIdentifier; Returns: iconID (fileID), originalIconID (fileID)
+
 -- File Locals
 
 --- ======= GLOBALIZE =======
