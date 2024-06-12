@@ -21,6 +21,7 @@ local GetTime          = GetTime
 -- API locals
 local GetItemInfo      = C_Item.GetItemInfo
 local GetAddOnMetadata = C_AddOns.GetAddOnMetadata
+local GetSpellTexture  = C_Spell.GetSpellTexture
 local IsAddOnLoaded    = C_AddOns.IsAddOnLoaded
 -- File Locals
 
