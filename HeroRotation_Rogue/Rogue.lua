@@ -71,7 +71,7 @@ Spell.Rogue.Commons = {
   Sprint                  = Spell(2983),
   TricksoftheTrade        = Spell(57934),
   -- Talents
-  AcrobaticStrikes        = Spell(196924),
+  AcrobaticStrikes        = Spell(455143),
   Alacrity                = Spell(193539),
   ColdBlood               = Spell(382245),
   DeeperStratagem         = Spell(193531),
