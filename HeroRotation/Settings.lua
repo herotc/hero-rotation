@@ -44,6 +44,8 @@ HR.GUISettings = {
     SetAlpha = 1,
     -- Silence print messages
     SilentMode = false,
+    -- Force primary target spell suggestions to Main Icon
+    ForceMainIcon = false,
   },
   Scaling = {
     ScaleUI = 1,
@@ -74,4 +76,5 @@ function HR.GUI.CorePanelSettingsInit ()
   CreatePanelOption("CheckButton", CP_General, "General.HideToggleIcons", "Hide toggle icons", "Enable if you want to hide the toggle buttons on the icon frame.", {ReloadRequired = true})
   CreatePanelOption("CheckButton", CP_General, "General.NotEnoughManaEnabled", "Not enough mana/energy", "Enable if you want a faded icon when you have not enough mana or energy.")
   CreatePanelOption("CheckButton", CP_General, "General.SilentMode", "Enable Silent Mode", "Enable this option to no longer receive output messages from settings toggles. Debug output will still be printed, if enabled.")
+  CreatePanelOption("CheckButton", CP_General, "General.ForceMainIcon", "Force Main Icon", "Force all spell suggestions for your primary target to be shown in the Main Icon area, regardless of DisplayStyle or OffGCD settings.\n\nNOTE: Suggestions for spells that cycle through targets will still show in the Left Icon area when they are suggested for targets other than your primary target.\n\nNOTE: This should mostly be used for debugging purposes, as /hr debug output only captures output for Main Icon suggestions.")
 end
