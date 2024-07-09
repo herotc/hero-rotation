@@ -462,7 +462,7 @@ local function CDs()
   end
   -- desperate_prayer,if=health.pct<=75
   if S.DesperatePrayer:IsCastable() and (Player:HealthPercentage() <= Settings.Shadow.DesperatePrayerHP) then
-    if Cast(S.DesperatePrayer) then return "desperate_prayer cds 24"; end
+    if Cast(S.DesperatePrayer, Settings.Shadow.GCDasOffGCD.DesperatePrayer) then return "desperate_prayer cds 24"; end
   end
 end
 

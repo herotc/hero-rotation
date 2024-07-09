@@ -54,6 +54,7 @@ HR.GUISettings.APL.Priest = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       DarkAscension = true,
+      DesperatePrayer = false,
       DivineStar = true,
       Halo = false,
       HolyNova = true,
