@@ -44,6 +44,7 @@ HR.GUISettings.APL.DemonHunter = {
     OffGCDasOffGCD = {
       Disrupt = true,
       Racials = true,
+      ReaversGlaive = false,
     },
   },
   Havoc = {

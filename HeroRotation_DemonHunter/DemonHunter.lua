@@ -41,13 +41,18 @@ Spell.DemonHunter.Commons = {
   SigilofFlame                          = MultiSpell(204596, 389810), -- 204596: Base ID, 389810: Precise
   SigilofMisery                         = MultiSpell(207684, 389813), -- 207684: Base ID, 389813: Precise
   SoulSigils                            = Spell(395446),
+  StudentofSuffering                    = Spell(452412),
   TheHunt                               = Spell(370965),
   -- Hero Talents
   ArtoftheGlaive                        = Spell(442290),
   Demonsurge                            = Spell(454402),
+  ReaversGlaive                         = Spell(442294),
   -- Utility
   Disrupt                               = Spell(183752),
   -- Buffs
+  ArtoftheGlaiveBuff                    = Spell(444661),
+  ThrilloftheFightAtkBuff               = Spell(442695),
+  ThrilloftheFightDmgBuff               = Spell(442688),
   -- Debuffs
   SigilofFlameDebuff                    = Spell(204598),
   SigilofMiseryDebuff                   = Spell(207685),
@@ -96,11 +101,14 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   Metamorphosis                         = Spell(187827),
   -- Buffs
   DemonSpikesBuff                       = Spell(203819),
+  GlaiveFlurryBuff                      = Spell(442435),
   MetamorphosisBuff                     = Spell(187827),
-  RecriminationBuff                     = Spell(409877), -- Tier 30 4pc
+  ReaversGlaiveBuff                     = Spell(444764),
+  RendingStrikeBuff                     = Spell(442442),
   -- Debuffs
   FieryBrandDebuff                      = Spell(207771),
   FrailtyDebuff                         = Spell(247456),
+  ReaversMarkDebuff                     = Spell(442624),
   SigilofChainsDebuff                   = Spell(204843),
   SigilofSilenceDebuff                  = Spell(204490),
 })
