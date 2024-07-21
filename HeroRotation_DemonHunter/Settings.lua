@@ -29,7 +29,6 @@ HR.GUISettings.APL.DemonHunter = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
-      Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
       FelRush = "Suggested",
@@ -40,6 +39,7 @@ HR.GUISettings.APL.DemonHunter = {
   CommonsOGCD = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
+      TheHunt = false,
     },
     OffGCDasOffGCD = {
       Disrupt = true,

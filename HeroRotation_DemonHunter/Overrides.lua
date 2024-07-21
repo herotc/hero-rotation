@@ -10,6 +10,7 @@ local Spell          = HL.Spell
 local Item           = HL.Item
 -- HeroRotation
 local HR             = HeroRotation
+local DH             = HR.Commons.DemonHunter
 -- Spells
 local SpellHavoc     = Spell.DemonHunter.Havoc
 local SpellVengeance = Spell.DemonHunter.Vengeance
@@ -47,6 +48,24 @@ VengOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     else
       return BaseCheck
     end
+  end
+, 581)
+
+HL.AddCoreOverride ("Player.DSurgeHardcast",
+  function()
+    return SpellVengeance.FelDesolation:IsLearned()
+  end
+, 581)
+
+HL.AddCoreOverride ("Player.DSurgeSpiritBurst",
+  function()
+    return DH.Demonsurge.SpiritBurst
+  end
+, 581)
+
+HL.AddCoreOverride ("Player.DSurgeSoulSunder",
+  function()
+    return DH.Demonsurge.SoulSunder
   end
 , 581)
 

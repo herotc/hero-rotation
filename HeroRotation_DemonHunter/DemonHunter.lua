@@ -46,14 +46,21 @@ Spell.DemonHunter.Commons = {
   -- Hero Talents
   ArtoftheGlaive                        = Spell(442290),
   Demonsurge                            = Spell(454402),
+  FelDesolation                         = Spell(452486),
   ReaversGlaive                         = Spell(442294),
+  SigilofDoom                           = Spell(452490),
+  SoulSunder                            = Spell(452436),
+  SpiritBurst                           = Spell(452437),
   -- Utility
   Disrupt                               = Spell(183752),
   -- Buffs
   ArtoftheGlaiveBuff                    = Spell(444661),
+  DemonsurgeSpiritBurstBuff             = Spell(452416),
+  StudentofSufferingBuff                = Spell(453239),
   ThrilloftheFightAtkBuff               = Spell(442695),
   ThrilloftheFightDmgBuff               = Spell(442688),
   -- Debuffs
+  SigilofDoomDebuff                     = Spell(462030),
   SigilofFlameDebuff                    = Spell(204598),
   SigilofMiseryDebuff                   = Spell(207685),
   -- Other
@@ -105,6 +112,8 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   MetamorphosisBuff                     = Spell(187827),
   ReaversGlaiveBuff                     = Spell(444764),
   RendingStrikeBuff                     = Spell(442442),
+  SoulFurnaceBuff                       = Spell(391166),
+  SoulFurnaceDmgBuff                    = Spell(391172),
   -- Debuffs
   FieryBrandDebuff                      = Spell(207771),
   FrailtyDebuff                         = Spell(247456),

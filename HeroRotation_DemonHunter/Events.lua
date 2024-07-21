@@ -24,7 +24,50 @@ local SpellVDH         = Spell.DemonHunter.Vengeance
 --- ======= NON-COMBATLOG =======
 
 --- ======= COMBATLOG =======
--- Soul Fragment Tracker
+
+--- ======= Demonsurge Tracker =====
+DemonHunter.Demonsurge = {}
+local Surge = DemonHunter.Demonsurge
+Surge.SpiritBurst = false
+Surge.SoulSunder = false
+
+-- When we cast Meta, set Demonsurge buffs to active.
+-- Then remove the buffs when we use them.
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local SpellID = select(12, ...)
+    if SpellID == SpellVDH.SpiritBurst:ID() then
+      Surge.SpiritBurst = false
+    end
+    if SpellID == SpellVDH.SoulSunder:ID() then
+      Surge.SoulSunder = false
+    end
+  end
+, "SPELL_CAST_SUCCESS")
+
+-- Watch for the Meta aura instead of cast to account for Demonic
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local SpellID = select(12, ...)
+    if SpellID == SpellVDH.MetamorphosisBuff:ID() then
+      Surge.SpiritBurst = true
+      Surge.SoulSunder = true
+    end
+  end
+, "SPELL_AURA_APPLIED")
+
+-- Remove Demonsurge buffs when Meta ends
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local SpellID = select(12, ...)
+    if SpellID == SpellVDH.MetamorphosisBuff:ID() then
+      Surge.SpiritBurst = false
+      Surge.SoulSunder = false
+    end
+  end
+, "SPELL_AURA_REMOVED")
+
+--- ===== Soul Fragment Tracker =====
 DemonHunter.Souls = {}
 local Soul = DemonHunter.Souls
 Soul.AuraSouls = 0
