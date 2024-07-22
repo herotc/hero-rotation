@@ -51,21 +51,17 @@ VengOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   end
 , 581)
 
-HL.AddCoreOverride ("Player.DSurgeHardcast",
-  function()
-    return SpellVengeance.FelDesolation:IsLearned()
-  end
-, 581)
-
-HL.AddCoreOverride ("Player.DSurgeSpiritBurst",
-  function()
-    return DH.Demonsurge.SpiritBurst
-  end
-, 581)
-
-HL.AddCoreOverride ("Player.DSurgeSoulSunder",
-  function()
-    return DH.Demonsurge.SoulSunder
+HL.AddCoreOverride ("Player.Demonsurge",
+  function(self, Buff)
+    if Buff == "Hardcast" then
+      return SpellVengeance.FelDesolation:IsLearned()
+    else
+      if DH.Demonsurge[Buff] ~= nil then
+        return DH.Demonsurge[Buff]
+      else
+        return false
+      end
+    end
   end
 , 581)
 

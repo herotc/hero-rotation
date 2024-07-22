@@ -83,7 +83,8 @@ HR.GUISettings.APL.DemonHunter = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
-      InfernalStrike = false,
+      InfernalStrike = true,
+      VengefulRetreat = true,
     },
     GCDasOffGCD = {
       BulkExtraction = false,

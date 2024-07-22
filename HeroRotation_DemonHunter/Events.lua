@@ -28,41 +28,59 @@ local SpellVDH         = Spell.DemonHunter.Vengeance
 --- ======= Demonsurge Tracker =====
 DemonHunter.Demonsurge = {}
 local Surge = DemonHunter.Demonsurge
-Surge.SpiritBurst = false
+Surge.ConsumingFire = false
+Surge.FelDesolation = false
+Surge.SigilofDoom = false
 Surge.SoulSunder = false
+Surge.SpiritBurst = false
 
 -- When we cast Meta, set Demonsurge buffs to active.
 -- Then remove the buffs when we use them.
 HL:RegisterForSelfCombatEvent(
   function(...)
     local SpellID = select(12, ...)
-    if SpellID == SpellVDH.SpiritBurst:ID() then
-      Surge.SpiritBurst = false
-    end
-    if SpellID == SpellVDH.SoulSunder:ID() then
-      Surge.SoulSunder = false
+    if Player:HeroTreeID() == 34 then
+      if SpellID == SpellVDH.Metamorphosis:ID() then
+        Surge.ConsumingFire = true
+        Surge.FelDesolation = true
+        Surge.SigilofDoom = true
+      elseif SpellID == SpellVDH.ConsumingFire:ID() then
+        Surge.ConsumingFire = false
+      elseif SpellID == SpellVDH.FelDesolation:ID() then
+        Surge.FelDesolation = false
+      elseif SpellID == SpellVDH.SigilofDoom:ID() then
+        Surge.SigilofDoom = false
+      elseif SpellID == SpellVDH.SoulSunder:ID() then
+        Surge.SoulSunder = false
+      elseif SpellID == SpellVDH.SpiritBurst:ID() then
+        Surge.SpiritBurst = false
+      end
     end
   end
 , "SPELL_CAST_SUCCESS")
 
--- Watch for the Meta aura instead of cast to account for Demonic
+-- Watch for the Meta aura.
+-- SpiritBurst and SoulSunder are both buffed on hardcast Meta and Demonic Meta.
 HL:RegisterForSelfCombatEvent(
   function(...)
     local SpellID = select(12, ...)
-    if SpellID == SpellVDH.MetamorphosisBuff:ID() then
+    if Player:HeroTreeID() == 34 and SpellID == SpellVDH.MetamorphosisBuff:ID() then
       Surge.SpiritBurst = true
       Surge.SoulSunder = true
     end
   end
 , "SPELL_AURA_APPLIED")
 
--- Remove Demonsurge buffs when Meta ends
+-- Remove Demonsurge buffs when Meta ends.
 HL:RegisterForSelfCombatEvent(
   function(...)
     local SpellID = select(12, ...)
-    if SpellID == SpellVDH.MetamorphosisBuff:ID() then
-      Surge.SpiritBurst = false
+    if Player:HeroTreeID() == 34 and SpellID == SpellVDH.MetamorphosisBuff:ID() then
+      Surge.ConsumingFire = false
+      Surge.FelDesolation = false
+      Surge.SigilofDoom = false
       Surge.SoulSunder = false
+      Surge.SpiritBurst = false
     end
   end
 , "SPELL_AURA_REMOVED")

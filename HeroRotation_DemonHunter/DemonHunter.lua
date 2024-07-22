@@ -43,8 +43,11 @@ Spell.DemonHunter.Commons = {
   SoulSigils                            = Spell(395446),
   StudentofSuffering                    = Spell(452412),
   TheHunt                               = Spell(370965),
+  UnhinderedAssault                     = Spell(444931),
+  VengefulRetreat                       = Spell(198793),
   -- Hero Talents
   ArtoftheGlaive                        = Spell(442290),
+  ConsumingFire                         = Spell(452487),
   Demonsurge                            = Spell(454402),
   FelDesolation                         = Spell(452486),
   ReaversGlaive                         = Spell(442294),
@@ -95,6 +98,7 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   FocusedCleave                         = Spell(343207),
   Frailty                               = Spell(389958),
   Fracture                              = Spell(263642),
+  IlluminatedSigils                     = Spell(428557),
   ShearFury                             = Spell(389997),
   SigilofChains                         = MultiSpell(202138, 389807), -- 202138: Base ID, 389807: Precise
   SigilofSilence                        = MultiSpell(202137, 389809), -- 202137: Base ID, 389809: Precise
@@ -164,7 +168,6 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   TacticalRetreat                       = Spell(389688),
   TrailofRuin                           = Spell(258881),
   UnboundChaos                          = Spell(347461),
-  VengefulRetreat                       = Spell(198793),
   -- Buffs
   ChaosTheoryBuff                       = Spell(390195),
   FuriousGazeBuff                       = Spell(343312),
