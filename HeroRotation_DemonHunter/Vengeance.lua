@@ -45,7 +45,7 @@ local OnUseExcludes = {
   -- I.Item:ID(),
 }
 
--- GUI Settings
+--- ===== GUI Settings =====
 local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
@@ -55,7 +55,7 @@ local Settings = {
   Vengeance = HR.GUISettings.APL.DemonHunter.Vengeance
 }
 
--- Rotation Var
+--- ===== Rotation Var =====
 local SoulFragments, TotalSoulFragments, IncSoulFragments
 local VarFieryBrandCD = (S.DowninFlames:IsAvailable()) and 48 or 60
 local VarSigilPopTime = (S.QuickenedSigils:IsAvailable()) and 1 or 2
@@ -77,6 +77,7 @@ local VarST, VarSmallAoE, VarBigAoE
 local BossFightRemains = 11111
 local FightRemains = 11111
 
+--- ===== Event Registrations =====
 HL:RegisterForEvent(function()
   BossFightRemains = 11111
   FightRemains = 11111
@@ -89,6 +90,7 @@ HL:RegisterForEvent(function()
   VarSoSFragments = (S.SoulSigils:IsAvailable()) and 4 or 3
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
+--- ===== Helper Functions =====
 -- Melee Is In Range w/ Movement Handlers
 local function UpdateIsInMeleeRange()
   if S.Felblade:TimeSinceLastCast() < Player:GCD()
@@ -107,9 +109,7 @@ local function DGBFury(FuryWithDGB, FuryWithoutDGB)
   return ((S.DarkglareBoon:IsAvailable() and Player:Fury() >= FuryWithDGB) or (not S.DarkglareBoon:IsAvailable() and Player:Fury() >= FuryWithoutDGB))
 end
 
--- CastTargetIf/CastCycle functions
-
--- Base rotation functions
+--- ===== Base Rotation Functions =====
 local function Precombat()
   -- flask
   -- augmentation
@@ -730,7 +730,7 @@ local function FS()
   end
 end
 
--- APL Main
+--- ===== APL Main =====
 local function APL()
   Enemies8yMelee = Player:GetEnemiesInMeleeRange(8)
   if (AoEON()) then
