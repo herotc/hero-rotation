@@ -55,7 +55,7 @@ local Settings = {
   Vengeance = HR.GUISettings.APL.DemonHunter.Vengeance
 }
 
---- ===== Rotation Var =====
+--- ===== Rotation Variables =====
 local SoulFragments, TotalSoulFragments, IncSoulFragments
 local VarFieryBrandCD = (S.DowninFlames:IsAvailable()) and 48 or 60
 local VarSigilPopTime = (S.QuickenedSigils:IsAvailable()) and 1 or 2
