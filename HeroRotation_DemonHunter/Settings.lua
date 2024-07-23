@@ -29,6 +29,7 @@ HR.GUISettings.APL.DemonHunter = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
+      Signature = "Suggested", -- Remove me after Havoc update
       Trinkets = "Suggested",
       -- Class Specific
       FelRush = "Suggested",
