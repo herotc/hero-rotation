@@ -43,6 +43,14 @@ Spell.DeathKnight.Commons = {
   SacrificialPact                       = Spell(327574),
   SoulReaper                            = Spell(343294),
   UnholyGround                          = Spell(374265),
+  -- Hero Talents
+  GiftoftheSanlayn                      = Spell(434152),
+  VampiricStrike                        = Spell(433901),
+  -- Hero Talent Buffs
+  EssenceoftheBloodQueenBuff            = Spell(433925),
+  GiftoftheSanlaynBuff                  = Spell(434153),
+  InflictionofSorrowBuff                = Spell(460049),
+  VampricStrikeBuff                     = Spell(433899),
   -- Buffs
   AbominationLimbBuff                   = Spell(383269),
   DeathAndDecayBuff                     = Spell(188290),
@@ -150,6 +158,7 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
 
 Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   -- Abilities
+  FesteringScytheAction                 = Spell(458128),
   -- Talents
   Apocalypse                            = Spell(275699),
   ArmyoftheDamned                       = Spell(276837),
@@ -160,9 +169,11 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   CommanderoftheDead                    = Spell(390259),
   DarkTransformation                    = Spell(63560),
   Defile                                = Spell(152280),
+  DoomedBidding                         = Spell(455386),
   EbonFever                             = Spell(207269),
   Epidemic                              = Spell(207317),
   EternalAgony                          = Spell(390268),
+  FesteringScythe                       = Spell(455397),
   FesteringStrike                       = Spell(85948),
   Festermight                           = Spell(377590),
   GhoulishFrenzy                        = Spell(377587),
@@ -172,6 +183,7 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   Outbreak                              = Spell(77575),
   Pestilence                            = Spell(277234),
   Plaguebringer                         = Spell(390175),
+  RaiseAbomination                      = Spell(455395),
   RaiseDead                             = Spell(46584),
   RottenTouch                           = Spell(390275),
   ScourgeStrike                         = Spell(55090),
@@ -185,6 +197,7 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   -- Buffs
   CommanderoftheDeadBuff                = Spell(390260),
   DefileBuff                            = Spell(218100),
+  FesteringScytheBuff                   = Spell(458123),
   FestermightBuff                       = Spell(377591),
   PlaguebringerBuff                     = Spell(390178),
   RunicCorruptionBuff                   = Spell(51460),
@@ -204,6 +217,9 @@ Item.DeathKnight.Commons = {
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
   VialofAnimatedBlood                   = Item(159625, {13, 14}),
+  -- Trinkets
+  MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
+  TreacherousTransmitter                = Item(221023, {13, 14}),
   -- Other Items
   Fyralath                              = Item(206448, {16}),
 }

@@ -17,16 +17,18 @@ local GetTime = GetTime
 local OneRuneSpenders = { 42650, 55090, 207311, 43265, 152280, 77575, 115989, 45524, 3714, 343294, 111673 }
 -- GhoulTable
 HL.GhoulTable = {
-  SummonedGhoul = nil,
-  SummonExpiration = nil,
-  SummonedGargoyle = nil,
-  GargoyleExpiration = nil,
+  AbominationExpiration = 0,
   ApocMagusExpiration = 0,
   ArmyMagusExpiration = 0,
+  GargoyleExpiration = 0,
+  SummonExpiration = 0,
+  SummonedAbomination = nil,
+  SummonedGargoyle = nil,
+  SummonedGhoul = nil,
 }
 
 --- ============================ CONTENT ============================
---- Ghoul Tracking
+--- ===== Ghoul Tracking =====
 HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, destGUID, _, _, _, spellId)
   if spellId == 46585 then
     HL.GhoulTable.SummonedGhoul = destGUID
@@ -37,12 +39,16 @@ HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, destGUID, _, _, _, s
     HL.GhoulTable.SummonedGargoyle = destGUID
     HL.GhoulTable.GargoyleExpiration = GetTime() + 25
   end
+  if spellId == 455395 then
+    HL.GhoulTable.SummonedAbomination = destGUID
+    HL.GhoulTable.AbominationExpiration = GetTime() + 30
+  end
 end, "SPELL_SUMMON")
 
 HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, _, _, _, _, spellId)
   if spellId == 327574 then
     HL.GhoulTable.SummonedGhoul = nil
-    HL.GhoulTable.SummonExpiration = nil
+    HL.GhoulTable.SummonExpiration = 0
   end
   if Player:HasTier(31, 4) and (HL.GhoulTable.ApocMagusExpiration > 0 or HL.GhoulTable.ArmyMagusExpiration > 0) then
     if spellId == 85948 then
@@ -67,31 +73,33 @@ end, "SPELL_CAST_SUCCESS")
 HL:RegisterForCombatEvent(function(_, _, _, _, _, _, _, destGUID)
   if destGUID == HL.GhoulTable.SummonedGhoul then
     HL.GhoulTable.SummonedGhoul = nil
-    HL.GhoulTable.SummonExpiration = nil
+    HL.GhoulTable.SummonExpiration = 0
   end
   if destGUID == HL.GhoulTable.SummonedGargoyle then
     HL.GhoulTable.SummonedGargoyle = nil
-    HL.GhoulTable.GargoyleExpiration = nil
+    HL.GhoulTable.GargoyleExpiration = 0
   end
+  if destGUID == HL.GhoulTable.SummonedAbomination then
+    HL.GhoulTable.SummonedAbomination = nil
+    HL.GhoulTable.AbominationExpiration = 0
 end, "UNIT_DESTROYED")
 
--- Tracker Functions
-function HL.GhoulTable:GhoulRemains()
-  if HL.GhoulTable.SummonExpiration == nil then return 0 end
-  return HL.GhoulTable.SummonExpiration - GetTime()
+--- ===== Tracker Functions =====
+function HL.GhoulTable:AbomRemains()
+  if HL.GhoulTable.AbominationExpiration == 0 then return 0 end
+  return HL.GhoulTable.AbominationExpiration - GetTime()
 end
 
-function HL.GhoulTable:GhoulActive()
-  return HL.GhoulTable.SummonedGhoul ~= nil and HL.GhoulTable:GhoulRemains() > 0
+function HL.GhoulTable:AbomActive()
+  return HL.GhoulTable.SummonedAbomination ~= nil and HL.GhoulTable:AbomRemains() > 0
 end
 
-function HL.GhoulTable:GargRemains()
-  if HL.GhoulTable.GargoyleExpiration == nil then return 0 end
-  return HL.GhoulTable.GargoyleExpiration - GetTime()
+function HL.GhoulTable:ApocMagusRemains()
+  return HL.GhoulTable.ApocMagusExpiration - GetTime()
 end
 
-function HL.GhoulTable:GargActive()
-  return HL.GhoulTable.SummonedGargoyle ~= nil and HL.GhoulTable:GargRemains() > 0
+function HL.GhoulTable:ApocMagusActive()
+  return HL.GhoulTable.ApocMagusRemains() > 0
 end
 
 function HL.GhoulTable:ArmyMagusRemains()
@@ -102,12 +110,22 @@ function HL.GhoulTable:ArmyMagusActive()
   return HL.GhoulTable:ArmyMagusRemains() > 0
 end
 
-function HL.GhoulTable:ApocMagusRemains()
-  return HL.GhoulTable.ApocMagusExpiration - GetTime()
+function HL.GhoulTable:GargRemains()
+  if HL.GhoulTable.GargoyleExpiration == 0 then return 0 end
+  return HL.GhoulTable.GargoyleExpiration - GetTime()
 end
 
-function HL.GhoulTable:ApocMagusActive()
-  return HL.GhoulTable.ApocMagusRemains() > 0
+function HL.GhoulTable:GargActive()
+  return HL.GhoulTable.SummonedGargoyle ~= nil and HL.GhoulTable:GargRemains() > 0
+end
+
+function HL.GhoulTable:GhoulRemains()
+  if HL.GhoulTable.SummonExpiration == 0 then return 0 end
+  return HL.GhoulTable.SummonExpiration - GetTime()
+end
+
+function HL.GhoulTable:GhoulActive()
+  return HL.GhoulTable.SummonedGhoul ~= nil and HL.GhoulTable:GhoulRemains() > 0
 end
 
 --- ======= NON-COMBATLOG =======

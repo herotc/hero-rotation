@@ -17,6 +17,7 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.DeathKnight = {
   Commons = {
+    DisableAotD = false,
     UseDeathStrikeHP = 60, -- % HP threshold to try to heal with Death Strike
     UseDarkSuccorHP = 80, -- % HP threshold to use Dark Succor's free Death Strike
     UseAMSAMZOffensively = false,
@@ -96,8 +97,8 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Unholy = {
+    AMSAbsorbPercent = 0,
     RaiseDeadCastLeft = false,
-    SkipGargSetup = false,
     PotionType = {
       Selected = "Power",
     },
@@ -106,9 +107,11 @@ HR.GUISettings.APL.DeathKnight = {
     },
     GCDasOffGCD = {
       -- Abilities
+      AbominationLimb = false,
       Apocalypse = false,
       DarkTransformation = true,
       Epidemic = false,
+      RaiseAbomination = false,
       SummonGargoyle = false,
       UnholyAssault = true,
       UnholyBlight = false,
@@ -131,6 +134,7 @@ local CP_Unholy = CreateChildPanel(CP_Deathknight, "Unholy")
 CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDeathStrikeHP", { 1, 100, 1 }, "Use Death Strike on Low HP", "Set the HP threshold to use Death Strike (working only if Solo Mode is enabled).")
 CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDarkSuccorHP", { 1, 100, 1 }, "Use Death Strike to Consume Dark Succor", "Set the HP threshold to use Death Strike to Consume Dark Succor (working only if Solo Mode is enabled).")
 CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseAMSAMZOffensively", "Use AMS/AMZ Offensively", "Enable this option to allow AMS/AMZ to be suggested for Runic Power generation purposes.")
+CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.DisableAotD", "Disabled AotD", "Disable suggestions related to Army of the Dead.")
 CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons")
 CreateARPanelOptions(CP_DeathknightDS, "APL.DeathKnight.CommonsDS")
 CreateARPanelOptions(CP_DeathknightOGCD, "APL.DeathKnight.CommonsOGCD")
@@ -149,5 +153,5 @@ CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost")
 
 --Unholy Panels
 CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.RaiseDeadCastLeft", "Raise Dead in CastLeft", "Enable this to ignore the Raise Dead DisplayStyle option and instead use CastLeft.")
-CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.SkipGargSetup", "Skip Gargoyle Setup Action List", "Enable this option to allow the ability to hold Summon Gargoyle without pausing the entire rotation. NOTE: This WILL result in a DPS LOSS, but stops the rotation from hanging when not using Summon Gargoyle when suggested.")
+CreatePanelOption("Slider", CP_Frost, "APL.DeathKnight.Unholy.AMSAbsorbPercent", {0, 100, 1}, "AMS Absorb Percentage", "Set this to the average percentage of AMS's absorb shield that is actively used on any given cast of AMS. Leave at 0 if unsure.")
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy")
