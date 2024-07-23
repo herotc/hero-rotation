@@ -109,7 +109,7 @@ local function DGBFury(FuryWithDGB, FuryWithoutDGB)
   return ((S.DarkglareBoon:IsAvailable() and Player:Fury() >= FuryWithDGB) or (not S.DarkglareBoon:IsAvailable() and Player:Fury() >= FuryWithoutDGB))
 end
 
---- ===== Base Rotation Functions =====
+--- ===== Rotation Functions =====
 local function Precombat()
   -- flask
   -- augmentation
