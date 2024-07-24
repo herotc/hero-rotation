@@ -33,9 +33,9 @@ HR.GUISettings.APL.DeathKnight = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
-      Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
+      AbominationLimb = "Suggested",
       RaiseDead = "Suggested",
     },
   },

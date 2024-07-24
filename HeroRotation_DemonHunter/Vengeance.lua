@@ -184,7 +184,7 @@ local function RGActive()
   -- the_hunt,if=!buff.reavers_glaive.up&(debuff.reavers_mark.remains>(gcd.remains+execute_time+action.soul_cleave.execute_time+(talent.fracture&action.fracture.execute_time|!talent.fracture&action.shear.execute_time)+gcd.max))
   local FillerET = (S.Fracture:IsAvailable()) and S.Fracture:ExecuteTime() or S.Shear:ExecuteTime()
   if S.TheHunt:IsCastable() and (Player:BuffDown(S.ReaversGlaiveBuff) and (Target:DebuffRemains(S.ReaversMarkDebuff) > (Player:GCDRemains() + S.TheHunt:ExecuteTime() + S.SoulCleave:ExecuteTime() + FillerET + Player:GCD()))) then
-    if Cast(S.TheHunt, nil, Settings.CommonsOGCD.GCDasOffGCD.TheHunt, not Target:IsInRange(50)) then return "the_hunt rg_active 6"; end
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt rg_active 6"; end
   end
   -- fracture,if=variable.rg_enhance_cleave&buff.rending_strike.up&buff.glaive_flurry.up|!variable.rg_enhance_cleave&!buff.glaive_flurry.up
   -- shear,if=variable.rg_enhance_cleave&buff.rending_strike.up&buff.glaive_flurry.up|!variable.rg_enhance_cleave&!buff.glaive_flurry.up
@@ -225,7 +225,7 @@ local function ARExecute()
   end
   -- the_hunt,if=!buff.reavers_glaive.up
   if S.TheHunt:IsCastable() and (Player:BuffDown(S.ReaversGlaiveBuff)) then
-    if Cast(S.TheHunt, nil, Settings.CommonsOGCD.GCDasOffGCD.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar_execute 6"; end
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar_execute 6"; end
   end
   -- bulk_extraction,if=spell_targets>=3&buff.art_of_the_glaive.stack>=20
   if S.BulkExtraction:IsCastable() and (EnemiesCount8yMelee >= 3 and Player:BuffStack(S.ArtoftheGlaiveBuff) >= 20) then
@@ -337,7 +337,7 @@ local function AR()
   end
   -- the_hunt,if=!buff.reavers_glaive.up
   if S.TheHunt:IsCastable() and (Player:BuffDown(S.ReaversGlaiveBuff)) then
-    if Cast(S.TheHunt, nil, Settings.CommonsOGCD.GCDasOffGCD.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar 20"; end
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar 20"; end
   end
   -- fiery_brand,if=!talent.fiery_demise|(talent.fiery_demise&((talent.down_in_flames&charges>=max_charges)|(active_dot.fiery_brand=0)))
   if S.FieryBrand:IsCastable() and (not S.FieryDemise:IsAvailable() or (S.FieryDemise:IsAvailable() and ((S.DowninFlames:IsAvailable() and S.FieryBrand:Charges() >= S.FieryBrand:MaxCharges()) or (S.FieryBrandDebuff:AuraActiveCount() == 0)))) then
@@ -474,7 +474,7 @@ local function FSExecute()
   end
   -- the_hunt
   if S.TheHunt:IsCastable() then
-    if Cast(S.TheHunt, nil, Settings.CommonsOGCD.GCDasOffGCD.TheHunt, not Target:IsInRange(50)) then return "the_hunt fs_execute 4"; end
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt fs_execute 4"; end
   end
   -- sigil_of_flame
   if S.SigilofFlame:IsCastable() then
@@ -676,7 +676,7 @@ local function FS()
   end
   -- the_hunt
   if S.TheHunt:IsCastable() then
-    if Cast(S.TheHunt, nil, Settings.CommonsOGCD.GCDasOffGCD.TheHunt, not Target:IsInRange(50)) then return "the_hunt fs 8"; end
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt fs 8"; end
   end
   -- soul_carver,if=(!talent.fiery_demise|talent.fiery_demise&dot.fiery_brand.ticking)&(((soul_fragments.total+3)<=6)&fury>=15&!prev_gcd.1.sigil_of_spite)
   if S.SoulCarver:IsCastable() and ((not S.FieryDemise:IsAvailable() or S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() > 0) and (((TotalSoulFragments + 3) <= 6) and Player:Fury() >= 15 and not Player:PrevGCD(1, S.SigilofSpite))) then

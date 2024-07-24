@@ -29,18 +29,17 @@ HR.GUISettings.APL.DemonHunter = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
-      Signature = "Suggested", -- Remove me after Havoc update
       Trinkets = "Suggested",
       -- Class Specific
       FelRush = "Suggested",
       Metamorphosis = "Suggested",
       Sigils = "Suggested",
+      TheHunt = "Suggested",
     },
   },
   CommonsOGCD = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      TheHunt = false,
     },
     OffGCDasOffGCD = {
       Disrupt = true,
