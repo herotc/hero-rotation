@@ -43,15 +43,6 @@ Spell.DeathKnight.Commons = {
   SacrificialPact                       = Spell(327574),
   SoulReaper                            = Spell(343294),
   UnholyGround                          = Spell(374265),
-  -- Hero Talents
-  GiftoftheSanlayn                      = Spell(434152),
-  VampiricStrike                        = Spell(433901),
-  VampiricStrikeAction                  = Spell(433895),
-  -- Hero Talent Buffs
-  EssenceoftheBloodQueenBuff            = Spell(433925),
-  GiftoftheSanlaynBuff                  = Spell(434153),
-  InflictionofSorrowBuff                = Spell(460049),
-  VampricStrikeBuff                     = Spell(433899),
   -- Buffs
   AbominationLimbBuff                   = Spell(383269),
   DeathAndDecayBuff                     = Spell(188290),
@@ -79,6 +70,32 @@ Spell.DeathKnight.Commons = {
   MindFreeze                            = Spell(47528),
   -- Custom
   Pool                                  = Spell(999910)
+}
+
+Spell.DeathKnight.Deathbringer = {
+  -- Talents
+  DarkTalons                            = Spell(436687),
+  ReapersMark                           = Spell(439843),
+  -- Debuffs
+  ReapersMarkDebuff                     = Spell(434765),
+}
+
+Spell.DeathKnight.RideroftheApocalypse = {
+  -- Buffs
+  MograinesMightBuff                    = Spell(444505),
+}
+
+Spell.DeathKnight.Sanlayn = {
+  -- Abilities
+  VampiricStrikeAction                  = Spell(433895),
+  -- Talents
+  GiftoftheSanlayn                      = Spell(434152),
+  VampiricStrike                        = Spell(433901),
+  -- Buffs
+  EssenceoftheBloodQueenBuff            = Spell(433925),
+  GiftoftheSanlaynBuff                  = Spell(434153),
+  InflictionofSorrowBuff                = Spell(460049),
+  VampricStrikeBuff                     = Spell(433899),
 }
 
 Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
@@ -116,12 +133,15 @@ Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
   VampiricBloodBuff                     = Spell(55233),
   VampiricStrengthBuff                  = Spell(408356), -- Tier 30 4pc
 })
+Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Blood, Spell.DeathKnight.Deathbringer)
+Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Blood, Spell.DeathKnight.Sanlayn)
 
 Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   -- Abilities
   FrostStrike                           = Spell(49143),
   HowlingBlast                          = Spell(49184),
   -- Talents
+  ArcticAssault                         = Spell(456230),
   Avalanche                             = Spell(207142),
   BitingCold                            = Spell(377056),
   BreathofSindragosa                    = Spell(152279),
@@ -143,7 +163,9 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   PillarofFrost                         = Spell(51271),
   RageoftheFrozenChampion               = Spell(377076),
   RemorselessWinter                     = Spell(196770),
+  ShatteredFrost                        = Spell(455993),
   ShatteringBlade                       = Spell(207057),
+  SmotheringOffense                     = Spell(435005),
   UnleashedFrenzy                       = Spell(376905),
   -- Buffs
   ChillingRageBuff                      = Spell(424165), -- Tier 31 2pc
@@ -156,6 +178,8 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   -- Debuffs
   RazoriceDebuff                        = Spell(51714)
 })
+Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Frost, Spell.DeathKnight.Deathbringer)
+Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Frost, Spell.DeathKnight.RideroftheApocalypse)
 
 Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   -- Abilities
@@ -201,6 +225,8 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   FesteringWoundDebuff                  = Spell(194310),
   RottenTouchDebuff                     = Spell(390276),
 })
+Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Unholy, Spell.DeathKnight.RideroftheApocalypse)
+Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Unholy, Spell.DeathKnight.Sanlayn)
 
 -- Items
 if not Item.DeathKnight then Item.DeathKnight = {} end
