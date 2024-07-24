@@ -58,6 +58,7 @@ local VarPopWounds
 local VarPoolingRunicPower
 local VarSpendRP
 local Equip, Trinket1, Trinket2
+local VarTrinket1ID, VarTrinket2ID
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1Range, VarTrinket2Range
 local VarTrinket1Buffs, VarTrinket2Buffs
@@ -88,6 +89,9 @@ GetTrinketItems()
 
 --- ===== Trinket Variables (from Precombat) =====
 local function SetTrinketVariables()
+  VarTrinket1ID = Trinket1:ID()
+  VarTrinket2ID = Trinket2:ID()
+
   local Trinket1Spell = Trinket1:OnUseSpell()
   VarTrinket1Range = (Trinket1Spell and Trinket1Spell.MaximumRange > 0 and Trinket1Spell.MaximumRange <= 100) and Trinket1Spell.MaximumRange or 100
   local Trinket2Spell = Trinket2:OnUseSpell()
@@ -96,19 +100,19 @@ local function SetTrinketVariables()
   VarTrinket1CD = Trinket1:Cooldown()
   VarTrinket2CD = Trinket2:Cooldown()
 
-  VarTrinket1Buffs = Trinket1:HasUseBuff() or Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()
-  VarTrinket2Buffs = Trinket2:HasUseBuff() or Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()
+  VarTrinket1Buffs = Trinket1:HasUseBuff() or VarTrinket1ID == I.MirrorofFracturedTomorrows:ID()
+  VarTrinket2Buffs = Trinket2:HasUseBuff() or VarTrinket2ID == I.MirrorofFracturedTomorrows:ID()
 
-  VarTrinket1Duration = (Trinket1:ID() == I.MirrorofFracturedTomorrows:ID()) and 20 or Trinket1:BuffDuration()
-  VarTrinket2Duration = (Trinket2:ID() == I.MirrorofFracturedTomorrows:ID()) and 20 or Trinket2:BuffDuration()
+  VarTrinket1Duration = (VarTrinket1ID == I.MirrorofFracturedTomorrows:ID()) and 20 or Trinket1:BuffDuration()
+  VarTrinket2Duration = (VarTrinket2ID == I.MirrorofFracturedTomorrows:ID()) and 20 or Trinket2:BuffDuration()
 
   VarTrinket1Sync = 0.5
-  if VarTrinket1Buffs and (S.Apocalypse:IsAvailable() and VarTrinket1CD % 30 == 0 or S.DarkTransformation:IsAvailable() and VarTrinket1CD % 45 == 0) or Trinket1:ID() == I.TreacherousTransmitter:ID() then
+  if VarTrinket1Buffs and (S.Apocalypse:IsAvailable() and VarTrinket1CD % 30 == 0 or S.DarkTransformation:IsAvailable() and VarTrinket1CD % 45 == 0) or VarTrinket1ID == I.TreacherousTransmitter:ID() then
     VarTrinket1Sync = 1
   end
 
   VarTrinket2Sync = 0.5
-  if VarTrinket2Buffs and (S.Apocalypse:IsAvailable() and VarTrinket2CD % 30 == 0 or S.DarkTransformation:IsAvailable() and VarTrinket2CD % 45 == 0) or Trinket2:ID() == I.TreacherousTransmitter:ID() then
+  if VarTrinket2Buffs and (S.Apocalypse:IsAvailable() and VarTrinket2CD % 30 == 0 or S.DarkTransformation:IsAvailable() and VarTrinket2CD % 45 == 0) or VarTrinket2ID == I.TreacherousTransmitter:ID() then
     VarTrinket2Sync = 1
   end
 
@@ -508,11 +512,11 @@ local function SanTrinkets()
     -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.errant_manaforge_emission.up&buff.dark_transformation.up|buff.cryptic_instructions.up&buff.dark_transformation.up|buff.realigning_nexus_convergence_divergence.up&buff.dark_transformation.up
     -- TODO: Handle the above.
     -- use_item,use_off_gcd=1,slot=trinket1,if=(variable.trinket_1_buffs|trinket.1.is.treacherous_transmitter)&(buff.dark_transformation.up&buff.dark_transformation.remains<variable.trinket_1_duration*0.73&(variable.trinket_priority=1|trinket.2.cooldown.remains|!trinket.2.has_cooldown))|variable.trinket_1_duration>=fight_remains
-    if Trinket1:IsReady() and ((VarTrinket1Buffs or Trinket1:ID() == I.TreacherousTransmitter:ID()) and (Pet:BuffUp(S.DarkTransformation) and Pet:BuffRemains(S.DarkTransformation) < VarTrinket1Duration * 0.73 and (VarTrinketPriority == 1 or Trinket2:CooldownDown() or not Trinket2:HasCooldown())) or VarTrinket1Duration >= BossFightRemains) then
+    if Trinket1:IsReady() and ((VarTrinket1Buffs or VarTrinket1ID == I.TreacherousTransmitter:ID()) and (Pet:BuffUp(S.DarkTransformation) and Pet:BuffRemains(S.DarkTransformation) < VarTrinket1Duration * 0.73 and (VarTrinketPriority == 1 or Trinket2:CooldownDown() or not Trinket2:HasCooldown())) or VarTrinket1Duration >= BossFightRemains) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " san_trinkets 4"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket2,if=(variable.trinket_2_buffs|trinket.2.is.treacherous_transmitter)&(buff.dark_transformation.up&buff.dark_transformation.remains<variable.trinket_2_duration*0.73&(variable.trinket_priority=2|trinket.1.cooldown.remains|!trinket.1.has_cooldown))|variable.trinket_2_duration>=fight_remains
-    if Trinket2:IsReady() and ((VarTrinket2Buffs or Trinket2:ID() == I.TreacherousTransmitter:ID()) and (Pet:BuffUp(S.DarkTransformation) and Pet:BuffRemains(S.DarkTransformation) < VarTrinket2Duration * 0.73 and (VarTrinketPriority == 2 or Trinket1:CooldownDown() or not Trinket1:HasCooldown())) or VarTrinket2Duration >= BossFightRemains) then
+    if Trinket2:IsReady() and ((VarTrinket2Buffs or VarTrinket2ID == I.TreacherousTransmitter:ID()) and (Pet:BuffUp(S.DarkTransformation) and Pet:BuffRemains(S.DarkTransformation) < VarTrinket2Duration * 0.73 and (VarTrinketPriority == 2 or Trinket1:CooldownDown() or not Trinket1:HasCooldown())) or VarTrinket2Duration >= BossFightRemains) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " san_trinkets 6"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|!trinket.2.has_cooldown|!talent.summon_gargoyle&!talent.army_of_the_dead&!talent.raise_abomination|!talent.summon_gargoyle&talent.army_of_the_dead&(!talent.raise_abomination&cooldown.army_of_the_dead.remains>20|talent.raise_abomination&cooldown.raise_abomination.remains>20)|!talent.summon_gargoyle&!talent.army_of_the_dead&!talent.raise_abomination&cooldown.dark_transformation.remains>20|talent.summon_gargoyle&cooldown.summon_gargoyle.remains>20&!pet.gargoyle.active)|fight_remains<15
@@ -562,11 +566,11 @@ local function Trinkets()
     -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.errant_manaforge_emission.up&buff.dark_transformation.up|buff.cryptic_instructions.up&buff.dark_transformation.up|buff.realigning_nexus_convergence_divergence.up&buff.dark_transformation.up
     -- TODO: Handle the above.
     -- use_item,use_off_gcd=1,slot=trinket1,if=(variable.trinket_1_buffs|trinket.1.is.treacherous_transmitter)&((!talent.summon_gargoyle&((!talent.army_of_the_dead|talent.army_of_the_dead&cooldown.army_of_the_dead.remains>trinket.1.cooldown.duration*0.51|death_knight.disable_aotd|talent.raise_abomination&cooldown.raise_abomination.remains>trinket.1.cooldown.duration*0.51)&((20>variable.trinket_1_duration&pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=variable.trinket_1_duration*1.2|20<=variable.trinket_1_duration&cooldown.apocalypse.remains<gcd&buff.dark_transformation.up)|(!talent.apocalypse|active_enemies>=2)&buff.dark_transformation.up)|pet.army_ghoul.active&pet.army_ghoul.remains<variable.trinket_1_duration*1.2|pet.abomination.active&pet.abomination.remains<variable.trinket_1_duration*1.2)|talent.summon_gargoyle&pet.gargoyle.active&pet.gargoyle.remains<variable.trinket_1_duration*1.2|cooldown.summon_gargoyle.remains>80)&(variable.trinket_priority=1|trinket.2.cooldown.remains|!trinket.2.has_cooldown))|variable.trinket_1_duration>=fight_remains
-    if Trinket1:IsReady() and ((VarTrinket1Buffs or Trinket1:ID() == I.TreacherousTransmitter:ID()) and ((not S.SummonGargoyle:IsAvailable() and ((not S.ArmyoftheDead:IsAvailable() or S.ArmyoftheDead:IsAvailable() and S.ArmyoftheDead:CooldownRemains() > VarTrinket1CD * 0.51 or Settings.Commons.DisableAotD or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > VarTrinket1CD * 0.51) and ((20 > VarTrinket1Duration and VarApocGhoulActive and VarApocGhoulRemains <= VarTrinket1Duration * 1.2 or 20 <= VarTrinket1Duration and S.Apocalypse:CooldownRemains() < Player:GCD() and Pet:BuffUp(S.DarkTransformation)) or (not S.Apocalypse:IsAvailable() or ActiveEnemies >= 2) and Pet:BuffUp(S.DarkTransformation)) or VarArmyGhoulActive and VarArmyGhoulRemains < VarTrinket1Duration * 1.2 or VarAbomActive and VarAbomRemains < VarTrinket1Duration * 1.2) or S.SummonGargoyle:IsAvailable() and VarGargActive and VarGargRemains < VarTrinket1Duration * 1.2 or S.SummonGargoyle:CooldownRemains() > 80) and (VarTrinketPriority == 1 or Trinekt2:CooldownDown() or not Trinket2:HasCooldown())) or VarTrinket1Duration >= FightRemains) then
+    if Trinket1:IsReady() and ((VarTrinket1Buffs or VarTrinket1ID == I.TreacherousTransmitter:ID()) and ((not S.SummonGargoyle:IsAvailable() and ((not S.ArmyoftheDead:IsAvailable() or S.ArmyoftheDead:IsAvailable() and S.ArmyoftheDead:CooldownRemains() > VarTrinket1CD * 0.51 or Settings.Commons.DisableAotD or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > VarTrinket1CD * 0.51) and ((20 > VarTrinket1Duration and VarApocGhoulActive and VarApocGhoulRemains <= VarTrinket1Duration * 1.2 or 20 <= VarTrinket1Duration and S.Apocalypse:CooldownRemains() < Player:GCD() and Pet:BuffUp(S.DarkTransformation)) or (not S.Apocalypse:IsAvailable() or ActiveEnemies >= 2) and Pet:BuffUp(S.DarkTransformation)) or VarArmyGhoulActive and VarArmyGhoulRemains < VarTrinket1Duration * 1.2 or VarAbomActive and VarAbomRemains < VarTrinket1Duration * 1.2) or S.SummonGargoyle:IsAvailable() and VarGargActive and VarGargRemains < VarTrinket1Duration * 1.2 or S.SummonGargoyle:CooldownRemains() > 80) and (VarTrinketPriority == 1 or Trinekt2:CooldownDown() or not Trinket2:HasCooldown())) or VarTrinket1Duration >= FightRemains) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " trinkets 4"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket2,if=(variable.trinket_2_buffs|trinket.2.is.treacherous_transmitter)&((!talent.summon_gargoyle&((!talent.army_of_the_dead|talent.army_of_the_dead&cooldown.army_of_the_dead.remains>trinket.2.cooldown.duration*0.51|death_knight.disable_aotd|talent.raise_abomination&cooldown.raise_abomination.remains>trinket.2.cooldown.duration*0.51)&((20>variable.trinket_2_duration&pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=variable.trinket_2_duration*1.2|20<=variable.trinket_2_duration&cooldown.apocalypse.remains<gcd&buff.dark_transformation.up)|(!talent.apocalypse|active_enemies>=2)&buff.dark_transformation.up)|pet.army_ghoul.active&pet.army_ghoul.remains<variable.trinket_2_duration*1.2|pet.abomination.active&pet.abomination.remains<variable.trinket_2_duration*1.2)|talent.summon_gargoyle&pet.gargoyle.active&pet.gargoyle.remains<variable.trinket_2_duration*1.2|cooldown.summon_gargoyle.remains>80)&(variable.trinket_priority=2|trinket.1.cooldown.remains|!trinket.1.has_cooldown))|variable.trinket_2_duration>=fight_remains
-    if Trinket2:IsReady() and ((VarTrinket2Buffs or Trinket2:ID() == I.TreacherousTransmitter:ID()) and ((not S.SummonGargoyle:IsAvailable() and ((not S.ArmyoftheDead:IsAvailable() or S.ArmyoftheDead:IsAvailable() and S.ArmyoftheDead:CooldownRemains() > VarTrinket2CD * 0.51 or Settings.Commons.DisableAotD or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > VarTrinket2CD * 0.51) and ((20 > VarTrinket2Duration and VarApocGhoulActive and VarApocGhoulRemains <= VarTrinket2Duration * 1.2 or 20 <= VarTrinket2Duration and S.Apocalypse:CooldownRemains() < Player:GCD() and Pet:BuffUp(S.DarkTransformation)) or (not S.Apocalypse:IsAvailable() or ActiveEnemies >= 2) and Pet:BuffUp(S.DarkTransformation)) or VarArmyGhoulActive and VarArmyGhoulRemains < VarTrinket2Duration * 1.2 or VarAbomActive and VarAbomRemains < VarTrinket2Duration * 1.2) or S.SummonGargoyle:IsAvailable() and VarGargActive and VarGargRemains < VarTrinket2Duration * 1.2 or S.SummonGargoyle:CooldownRemains() > 80) and (VarTrinketPriority == 2 or Trinket1:CooldownDown() or not Trinket1:HasCooldown())) or VarTrinket2Duration >= FightRemains) then
+    if Trinket2:IsReady() and ((VarTrinket2Buffs or VarTrinket2ID == I.TreacherousTransmitter:ID()) and ((not S.SummonGargoyle:IsAvailable() and ((not S.ArmyoftheDead:IsAvailable() or S.ArmyoftheDead:IsAvailable() and S.ArmyoftheDead:CooldownRemains() > VarTrinket2CD * 0.51 or Settings.Commons.DisableAotD or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > VarTrinket2CD * 0.51) and ((20 > VarTrinket2Duration and VarApocGhoulActive and VarApocGhoulRemains <= VarTrinket2Duration * 1.2 or 20 <= VarTrinket2Duration and S.Apocalypse:CooldownRemains() < Player:GCD() and Pet:BuffUp(S.DarkTransformation)) or (not S.Apocalypse:IsAvailable() or ActiveEnemies >= 2) and Pet:BuffUp(S.DarkTransformation)) or VarArmyGhoulActive and VarArmyGhoulRemains < VarTrinket2Duration * 1.2 or VarAbomActive and VarAbomRemains < VarTrinket2Duration * 1.2) or S.SummonGargoyle:IsAvailable() and VarGargActive and VarGargRemains < VarTrinket2Duration * 1.2 or S.SummonGargoyle:CooldownRemains() > 80) and (VarTrinketPriority == 2 or Trinket1:CooldownDown() or not Trinket1:HasCooldown())) or VarTrinket2Duration >= FightRemains) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " san_trinkets 6"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|!trinket.2.has_cooldown|!talent.summon_gargoyle&!talent.army_of_the_dead&!talent.raise_abomination|!talent.summon_gargoyle&talent.army_of_the_dead&(!talent.raise_abomination&cooldown.army_of_the_dead.remains>20|talent.raise_abomination&cooldown.raise_abomination.remains>20)|!talent.summon_gargoyle&!talent.army_of_the_dead&!talent.raise_abomination&cooldown.dark_transformation.remains>20|talent.summon_gargoyle&cooldown.summon_gargoyle.remains>20&!pet.gargoyle.active)|fight_remains<15
