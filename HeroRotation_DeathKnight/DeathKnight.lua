@@ -81,7 +81,11 @@ Spell.DeathKnight.Deathbringer = {
 }
 
 Spell.DeathKnight.RideroftheApocalypse = {
+  -- Talents
+  AFeastofSouls                         = Spell(444072),
+  ApocalypseNow                         = Spell(444040),
   -- Buffs
+  AFeastofSoulsBuff                     = Spell(440861),
   MograinesMightBuff                    = Spell(444505),
 }
 
@@ -147,6 +151,7 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   BreathofSindragosa                    = Spell(152279),
   ChillStreak                           = Spell(305392),
   ColdHeart                             = Spell(281208),
+  EnduringStrength                      = Spell(377190),
   Everfrost                             = Spell(376938),
   FatalFixation                         = Spell(405166),
   Frostscythe                           = Spell(207230),
@@ -166,6 +171,7 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   ShatteredFrost                        = Spell(455993),
   ShatteringBlade                       = Spell(207057),
   SmotheringOffense                     = Spell(435005),
+  TheLongWinter                         = Spell(456240),
   UnleashedFrenzy                       = Spell(376905),
   -- Buffs
   ChillingRageBuff                      = Spell(424165), -- Tier 31 2pc
