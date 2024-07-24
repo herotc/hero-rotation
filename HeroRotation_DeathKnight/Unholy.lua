@@ -699,15 +699,15 @@ local function APL()
       local ShouldReturn = CDsSan(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cleave,if=active_enemies<4&active_enemies>=2
-    if ActiveEnemies < 4 and ActiveEnemies >= 2 then
+    if AoEON() and ActiveEnemies < 4 and ActiveEnemies >= 2 then
       local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=aoe_burst,if=active_enemies>=4&buff.death_and_decay.up
-    if ActiveEnemies >= 4 and Player:BuffUp(S.DeathAndDecayBuff) then
+    if AoEON() and ActiveEnemies >= 4 and Player:BuffUp(S.DeathAndDecayBuff) then
       local ShouldReturn = AoEBurst(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=aoe,if=active_enemies>=4&!buff.death_and_decay.up
-    if ActiveEnemies >= 4 and Player:BuffDown(S.DeathAndDecayBuff) then
+    if AoEON() and ActiveEnemies >= 4 and Player:BuffDown(S.DeathAndDecayBuff) then
       local ShouldReturn = AoE(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=san_fishing,if=talent.gift_of_the_sanlayn&!buff.gift_of_the_sanlayn.up&buff.essence_of_the_blood_queen.remains<cooldown.dark_transformation.remains+2
@@ -715,11 +715,11 @@ local function APL()
       local ShouldReturn = SanFishing(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=san_st,if=active_enemies=1&talent.vampiric_strike
-    if ActiveEnemies == 1 and S.VampiricStrike:IsAvailable() then
+    if (ActiveEnemies == 1 or not AoEON()) and S.VampiricStrike:IsAvailable() then
       local ShouldReturn = SanST(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=st,if=active_enemies=1&!talent.vampiric_strike
-    if ActiveEnemies == 1 and not S.VampiricStrike:IsAvailable() then
+    if (ActiveEnemies == 1 or not AoEON()) and not S.VampiricStrike:IsAvailable() then
       local ShouldReturn = ST(); if ShouldReturn then return ShouldReturn; end
     end
     -- Add pool resources icon if nothing else to do
