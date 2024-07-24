@@ -181,8 +181,8 @@ end
 
 --- ===== CastTargetIf Condition Functions =====
 local function EvaluateTargetIfFesteringStrikeAoE(TargetUnit)
-  -- if=debuff.festering_wound.stack<4&(buff.festering_scythe.react|cooldown.apocalypse.remains<gcd&debuff.festering_wound.stack=0)
-  return TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 4 and (Player:BuffUp(S.FesteringScytheBuff) or S.Apocalypse:CooldownRemains() < Player:GCD() and TargetUnit:DebuffDown(S.FesteringWoundDebuff))
+  -- if=cooldown.apocalypse.remains<gcd&debuff.festering_wound.stack=0|buff.festering_scythe.react
+  return S.Apocalypse:CooldownRemains() < Player:GCD() and TargetUnit:DebuffDown(S.FesteringWoundDebuff) or Player:BuffUp(S.FesteringScytheBuff)
 end
 
 local function EvaluateTargetIfFesteringStrikeAoE2(TargetUnit)
@@ -258,7 +258,7 @@ local function AoE()
   if S.Epidemic:IsReady() and (not VarPoolingRunicPower) then
     if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe 4"; end
   end
-  -- festering_strike,target_if=min:debuff.festering_wound.stack,if=debuff.festering_wound.stack<4&(buff.festering_scythe.react|cooldown.apocalypse.remains<gcd&debuff.festering_wound.stack=0)
+  -- festering_strike,target_if=min:debuff.festering_wound.stack,if=cooldown.apocalypse.remains<gcd&debuff.festering_wound.stack=0|buff.festering_scythe.react
   if FesteringAction:IsReady() then
     if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeAoE, not Target:IsInMeleeRange(5)) then return "festering_strike aoe 6"; end
   end
@@ -285,13 +285,13 @@ local function AoEBurst()
   if WoundSpender:IsReady() then
     if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfWoundSpenderAoEBurst, not Target:IsInMeleeRange(5)) then return "wound_spender aoe_burst 6"; end
   end
-  -- epidemic,if=!variable.pooling_runic_power
-  if S.Epidemic:IsReady() and (not VarPoolingRunicPower) then
-    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe_burst 8"; end
-  end
   -- festering_strike,if=buff.festering_scythe.react
   if FesteringAction:IsReady() then
-    if Cast(FesteringAction, nil, nil, not Target:IsInMeleeRange(14)) then return "festering_scythe aoe_burst 10"; end
+    if Cast(FesteringAction, nil, nil, not Target:IsInMeleeRange(14)) then return "festering_scythe aoe_burst 8"; end
+  end
+  -- epidemic,if=!variable.pooling_runic_power
+  if S.Epidemic:IsReady() and (not VarPoolingRunicPower) then
+    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe_burst 10"; end
   end
   -- wound_spender
   if WoundSpender:IsReady() then
