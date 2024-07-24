@@ -35,12 +35,12 @@ HR.GUISettings.APL.DemonHunter = {
       FelRush = "Suggested",
       Metamorphosis = "Suggested",
       Sigils = "Suggested",
+      TheHunt = "Suggested",
     },
   },
   CommonsOGCD = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      TheHunt = false,
     },
     OffGCDasOffGCD = {
       Disrupt = true,
