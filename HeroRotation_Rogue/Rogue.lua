@@ -75,6 +75,7 @@ Spell.Rogue.Commons = {
   Alacrity                = Spell(193539),
   ColdBlood               = Spell(382245),
   DeeperStratagem         = Spell(193531),
+  DoubleJeopardy          = Spell(454430),
   EchoingReprimand        = Spell(385616),
   EchoingReprimand2       = Spell(323558),
   EchoingReprimand3       = Spell(323559),
@@ -103,6 +104,7 @@ Spell.Rogue.Commons = {
   Vanish                  = Spell(1856),
   VanishBuff              = Spell(11327),
   VanishBuff2             = Spell(115193),
+  WithoutATrace           = Spell(382513),
   -- Trinkets
   -- Misc
   PoolEnergy              = Spell(999910),
@@ -203,6 +205,7 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   Ruthlessness            = Spell(14161),
   SummarilyDispatched     = Spell(381990),
   SwiftSlasher            = Spell(381988),
+  TakeEmBySurprise        = Spell(382742),
   TakeEmBySurpriseBuff    = Spell(385907),
   UnderhandedUpperhand    = Spell(424044),
   Weaponmaster            = Spell(200733),
