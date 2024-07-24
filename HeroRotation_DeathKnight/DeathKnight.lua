@@ -46,6 +46,7 @@ Spell.DeathKnight.Commons = {
   -- Hero Talents
   GiftoftheSanlayn                      = Spell(434152),
   VampiricStrike                        = Spell(433901),
+  VampiricStrikeAction                  = Spell(433895),
   -- Hero Talent Buffs
   EssenceoftheBloodQueenBuff            = Spell(433925),
   GiftoftheSanlaynBuff                  = Spell(434153),

@@ -144,7 +144,6 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  WoundSpender = (S.ClawingShadows:IsAvailable()) and S.ClawingShadows or S.ScourgeStrike
   AnyDnD = (S.Defile:IsAvailable()) and S.Defile or S.DeathAndDecay
   SetTrinketVariables()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
@@ -245,8 +244,8 @@ local function Precombat()
     if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak precombat 6"; end
   end
   -- Manually added: festering_strike if in melee range
-  if S.FesteringStrike:IsReady() then
-    if Cast(S.FesteringStrike, nil, nil, not Target:IsInMeleeRange(5)) then return "festering_strike precombat 8"; end
+  if FesteringAction:IsReady() then
+    if Cast(FesteringAction, nil, nil, not Target:IsInMeleeRange(5)) then return "festering_strike precombat 8"; end
   end
 end
 
@@ -260,16 +259,16 @@ local function AoE()
     if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe 4"; end
   end
   -- festering_strike,target_if=min:debuff.festering_wound.stack,if=debuff.festering_wound.stack<4&(buff.festering_scythe.react|cooldown.apocalypse.remains<gcd&debuff.festering_wound.stack=0)
-  if S.FesteringStrike:IsReady() then
-    if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeAoE, not Target:IsInMeleeRange(5)) then return "festering_strike aoe 6"; end
+  if FesteringAction:IsReady() then
+    if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeAoE, not Target:IsInMeleeRange(5)) then return "festering_strike aoe 6"; end
   end
   -- wound_spender,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=1&cooldown.apocalypse.remains>gcd
   if WoundSpender:IsReady() then
     if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfWoundSpenderAoE, not Target:IsInMeleeRange(5)) then return "wound_spender aoe 8"; end
   end
   -- festering_strike,target_if=min:debuff.festering_wound.stack,if=debuff.festering_wound.stack<4
-  if S.FesteringStrike:IsReady() then
-    if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeAoE2, not Target:IsInMeleeRange(5)) then return "festering_strike aoe 10"; end
+  if FesteringAction:IsReady() then
+    if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeAoE2, not Target:IsInMeleeRange(5)) then return "festering_strike aoe 10"; end
   end
 end
 
@@ -291,8 +290,8 @@ local function AoEBurst()
     if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe_burst 8"; end
   end
   -- festering_strike,if=buff.festering_scythe.react
-  if S.FesteringScythe:IsReady() then
-    if Cast(S.FesteringScythe, nil, nil, not Target:IsInMeleeRange(14)) then return "festering_scythe aoe_burst 10"; end
+  if FesteringAction:IsReady() then
+    if Cast(FesteringAction, nil, nil, not Target:IsInMeleeRange(14)) then return "festering_scythe aoe_burst 10"; end
   end
   -- wound_spender
   if WoundSpender:IsReady() then
@@ -386,8 +385,8 @@ local function Cleave()
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil cleave 4"; end
   end
   -- festering_strike,if=!variable.pop_wounds&debuff.festering_wound.stack<4|buff.festering_scythe.react
-  if S.FesteringStrike:IsReady() and (not VarPopWounds and FesterStacks < 4 or Player:BuffUp(S.FesteringScytheBuff)) then
-    if Cast(S.FesteringStrike, nil, nil, not Target:IsInMeleeRange(5)) then return "festering_strike cleave 6"; end
+  if FesteringAction:IsReady() and (not VarPopWounds and FesterStacks < 4 or Player:BuffUp(S.FesteringScytheBuff)) then
+    if Cast(FesteringAction, nil, nil, not Target:IsInMeleeRange(5)) then return "festering_strike cleave 6"; end
   end
   -- wound_spender,if=variable.pop_wounds
   if WoundSpender:IsReady() and (VarPopWounds) then
@@ -460,8 +459,8 @@ local function SanFishing()
     if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender san_fishing 12"; end
   end
   -- festering_strike,if=debuff.festering_wound.stack<3-pet.abomination.active
-  if S.FesteringStrike:IsReady() and (FesterStacks < 3 - num(VarAbomActive)) then
-    if Cast(S.FesteringStrike, nil, nil, not Target:IsInMeleeRange(5)) then return "festering_strike san_fishing 14"; end
+  if FesteringAction:IsReady() and (FesterStacks < 3 - num(VarAbomActive)) then
+    if Cast(FesteringAction, nil, nil, not Target:IsInMeleeRange(5)) then return "festering_strike san_fishing 14"; end
   end
 end
 
@@ -479,8 +478,8 @@ local function SanST()
     if Cast(S.SoulReaper, nil, nil, not Target:IsInMeleeRange(5)) then return "soul_reaper san_st 6"; end
   end
   -- festering_strike,if=(debuff.festering_wound.stack<4&cooldown.apocalypse.remains<variable.apoc_timing)|(talent.gift_of_the_sanlayn&!buff.gift_of_the_sanlayn.up|!talent.gift_of_the_sanlayn)&(buff.festering_scythe.react|debuff.festering_wound.stack<=1-pet.abomination.active)
-  if S.FesteringStrike:IsReady() and ((FesterStacks < 4 and S.Apocalypse:CooldownRemains() < VarApocTiming) or (S.GiftoftheSanlayn:IsAvailable() and Player:BuffDown(S.GiftoftheSanlaynBuff) or not S.GiftoftheSanlayn:IsAvailable()) and (Player:BuffUp(S.FesteringScytheBuff) or FesterStacks <= 1 - num(VarAbomActive))) then
-    if Cast(S.FesteringStrike, nil, nil, not Target:IsInMeleeRange(5)) then return "festering_strike san_st 8"; end
+  if FesteringAction:IsReady() and ((FesterStacks < 4 and S.Apocalypse:CooldownRemains() < VarApocTiming) or (S.GiftoftheSanlayn:IsAvailable() and Player:BuffDown(S.GiftoftheSanlaynBuff) or not S.GiftoftheSanlayn:IsAvailable()) and (Player:BuffUp(S.FesteringScytheBuff) or FesterStacks <= 1 - num(VarAbomActive))) then
+    if Cast(FesteringAction, nil, nil, not Target:IsInMeleeRange(5)) then return "festering_strike san_st 8"; end
   end
   -- wound_spender,if=(debuff.festering_wound.stack>=3-pet.abomination.active&cooldown.apocalypse.remains>variable.apoc_timing)|buff.vampiric_strike.react&cooldown.apocalypse.remains>variable.apoc_timing
   if WoundSpender:IsReady() and ((FesterStacks >= 3 - num(VarAbomActive) and S.Apocalypse:CooldownRemains() > VarApocTiming) or Player:BuffUp(S.VampiricStrikeBuff) and S.Apocalypse:CooldownRemains() > VarApocTiming) then
@@ -537,8 +536,8 @@ local function ST()
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil st 4"; end
   end
   -- festering_strike,if=!variable.pop_wounds&debuff.festering_wound.stack<4
-  if S.FesteringStrike:IsReady() and (not VarPopWounds and FesterStacks < 4) then
-    if Cast(S.FesteringStrike, nil, nil, not Target:IsInMeleeRange(5)) then return "festering_strike st 6"; end
+  if FesteringAction:IsReady() and (not VarPopWounds and FesterStacks < 4) then
+    if Cast(FesteringAction, nil, nil, not Target:IsInMeleeRange(5)) then return "festering_strike st 6"; end
   end
   -- wound_spender,if=variable.pop_wounds
   if WoundSpender:IsReady() and (VarPopWounds) then
@@ -635,6 +634,11 @@ local function APL()
 
     -- Check our stacks of Festering Wounds
     FesterStacks = Target:DebuffStack(S.FesteringWoundDebuff)
+
+    -- Use the right version of Festering Strike/Scythe
+    FesteringAction = (S.FesteringScytheAction:IsLearned()) and S.FesteringScytheAction or S.FesteringStrike
+    -- Use the right WoundSpender
+    WoundSpender = (S.VampiricStrikeAction:IsLearned()) and S.VampiricStrikeAction or ((S.ClawingShadows:IsAvailable()) and S.ClawingShadows or S.ScourgeStrike)
   end
 
   if Everyone.TargetIsValid() then
