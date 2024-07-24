@@ -162,7 +162,6 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   FesteringScytheAction                 = Spell(458128),
   -- Talents
   Apocalypse                            = Spell(275699),
-  ArmyoftheDamned                       = Spell(276837),
   ArmyoftheDead                         = Spell(42650),
   BurstingSores                         = Spell(207264),
   ClawingShadows                        = Spell(207311),
@@ -173,13 +172,10 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   DoomedBidding                         = Spell(455386),
   EbonFever                             = Spell(207269),
   Epidemic                              = Spell(207317),
-  EternalAgony                          = Spell(390268),
   FesteringScythe                       = Spell(455397),
   FesteringStrike                       = Spell(85948),
   Festermight                           = Spell(377590),
-  GhoulishFrenzy                        = Spell(377587),
   ImprovedDeathCoil                     = Spell(377580),
-  InfectedClaws                         = Spell(207272),
   Morbidity                             = Spell(377592),
   Outbreak                              = Spell(77575),
   Pestilence                            = Spell(277234),
@@ -192,23 +188,18 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   Superstrain                           = Spell(390283),
   UnholyAssault                         = Spell(207289),
   UnholyBlight                          = Spell(115989),
-  UnholyCommand                         = Spell(316941),
-  UnholyPact                            = Spell(319230),
   VileContagion                         = Spell(390279),
   -- Buffs
   CommanderoftheDeadBuff                = Spell(390260),
   DefileBuff                            = Spell(218100),
   FesteringScytheBuff                   = Spell(458123),
   FestermightBuff                       = Spell(377591),
-  PlaguebringerBuff                     = Spell(390178),
   RunicCorruptionBuff                   = Spell(51460),
   SuddenDoomBuff                        = Spell(81340),
-  UnholyAssaultBuff                     = Spell(207289),
   -- Debuffs
   DeathRotDebuff                        = Spell(377540),
   FesteringWoundDebuff                  = Spell(194310),
   RottenTouchDebuff                     = Spell(390276),
-  UnholyBlightDebuff                    = Spell(115994),
 })
 
 -- Items
