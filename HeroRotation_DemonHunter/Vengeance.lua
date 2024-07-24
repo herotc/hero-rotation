@@ -399,7 +399,7 @@ end
 
 local function FelDev()
   -- spirit_burst,if=talent.spirit_bomb&(variable.can_spburst|(buff.metamorphosis.remains<(gcd.remains+execute_time+1)&buff.demonsurge_spirit_burst.up))
-  if S.SpiritBurst:IsReady() and (S.SpiritBomb:IsAvailable() and (VarCanSpBurst or (Player:BuffRemains(S.MetamorphosisBuff) < (Player:GCDRemains() + S.SpiritBurst:ExecuteTime() + 1) and Player:BuffUp(S.DemonsurgeSpiritBurstBuff)))) then
+  if S.SpiritBurst:IsReady() and (S.SpiritBomb:IsAvailable() and (VarCanSpBurst or (Player:BuffRemains(S.MetamorphosisBuff) < (Player:GCDRemains() + S.SpiritBurst:ExecuteTime() + 1) and Player:Demonsurge("SpiritBurst")))) then
     if Cast(S.SpiritBurst, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_burst fel_dev 2"; end
   end
   -- soul_sunder,if=buff.demonsurge_soul_sunder.up|!variable.dont_soul_cleave|(buff.metamorphosis.remains<(gcd.remains+execute_time+1)&buff.demonsurge_soul_sunder.up)
