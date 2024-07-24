@@ -276,11 +276,11 @@ local function Cooldown()
   if CDsON() then
     -- the_hunt,if=debuff.essence_break.down&(active_enemies>=desired_targets+raid_event.adds.count|raid_event.adds.in>(1+!set_bonus.tier31_2pc)*45)&time>5
     if S.TheHunt:IsCastable() and (Target:DebuffDown(S.EssenceBreakDebuff) and CombatTime > 5) then
-      if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt cooldown 12"; end
+      if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt cooldown 12"; end
     end
     -- elysian_decree,if=debuff.essence_break.down
-    if S.ElysianDecree:IsCastable() and (Target:DebuffDown(S.EssenceBreakDebuff)) then
-      if Cast(S.ElysianDecree, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(30)) then return "elysian_decree cooldown 14"; end
+    if S.SigilofSpite:IsCastable() and (Target:DebuffDown(S.EssenceBreakDebuff)) then
+      if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "elysian_decree cooldown 14"; end
     end
   end
 end
@@ -334,7 +334,7 @@ local function Opener()
   end
   -- the_hunt,if=active_enemies>desired_targets|raid_event.adds.in>40+50*!set_bonus.tier31_2pc
   if CDsON() and S.TheHunt:IsCastable() then
-    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt opener 20"; end
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt opener 20"; end
   end
   -- essence_break
   if S.EssenceBreak:IsCastable() then
@@ -427,7 +427,7 @@ local function FelBarrageFunc()
   end
   -- the_hunt,if=fury>40&(active_enemies>=desired_targets+raid_event.adds.count|raid_event.adds.in>(1+set_bonus.tier31_2pc)*40)
   if CDsON() and S.TheHunt:IsCastable() and (Player:Fury() > 40) then
-    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt fel_barrage 34"; end
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt fel_barrage 34"; end
   end
   -- demons_bite
   if S.DemonsBite:IsCastable() then
