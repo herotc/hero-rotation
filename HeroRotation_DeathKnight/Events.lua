@@ -82,6 +82,7 @@ HL:RegisterForCombatEvent(function(_, _, _, _, _, _, _, destGUID)
   if destGUID == HL.GhoulTable.SummonedAbomination then
     HL.GhoulTable.SummonedAbomination = nil
     HL.GhoulTable.AbominationExpiration = 0
+  end
 end, "UNIT_DESTROYED")
 
 --- ===== Tracker Functions =====

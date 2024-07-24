@@ -274,7 +274,7 @@ end
 
 local function AoEBurst()
   -- defile,if=!defile.ticking
-  if S.Defile:IsReady() and (Player:BuffDown(S.DefileBuff)) then
+  if S.Defile:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff)) then
     if Cast(S.Defile, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "defile aoe_burst 2"; end
   end
   -- epidemic,if=!variable.pooling_runic_power&(active_enemies>=6&!talent.bursting_sores|talent.bursting_sores&death_knight.fwounded_targets!=active_enemies&death_knight.fwounded_targets<6|!talent.bursting_sores&runic_power.deficit<30|buff.sudden_doom.react)
@@ -548,7 +548,7 @@ local function ST()
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil st 10"; end
   end
   -- wound_spender,if=!variable.pop_wounds&debuff.festering_wound.stack>=4
-  if WoundSpender:IsReady() and (!VarPopWounds and FesterStacks >= 4) then
+  if WoundSpender:IsReady() and (not VarPopWounds and FesterStacks >= 4) then
     if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 12"; end
   end
 end
