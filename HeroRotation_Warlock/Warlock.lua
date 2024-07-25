@@ -50,6 +50,15 @@ Spell.Warlock.Commons = {
   SpellLock                             = Spell(119910),
 }
 
+Spell.Warlock.Diabolist = {
+}
+
+Spell.Warlock.Hellcaller = {
+}
+
+Spell.Warlock.SoulHarvester = {
+}
+
 Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
   -- Base Abilities
   Felstorm                              = Spell(89751),
@@ -88,6 +97,8 @@ Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
   DoomBrandDebuff                       = Spell(423583), -- T31 2pc
   FromtheShadowsDebuff                  = Spell(270569),
 })
+Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Demonology, Spell.Warlock.Diabolist)
+Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Demonology, Spell.Warlock.SoulHarvester)
 
 Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   -- Base Abilities
@@ -137,6 +148,8 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   DreadTouchDebuff                      = Spell(389868),
   ShadowEmbraceDebuff                   = Spell(32390),
 })
+Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Affliction, Spell.Warlock.Hellcaller)
+Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Affliction, Spell.Warlock.SoulHarvester)
 
 Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   -- Base Abilities
@@ -188,6 +201,8 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   PyrogenicsDebuff                      = Spell(387096),
   RoaringBlazeDebuff                    = Spell(265931),
 })
+Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Destruction, Spell.Warlock.Diabolist)
+Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Destruction, Spell.Warlock.Hellcaller)
 
 -- Items
 if not Item.Warlock then Item.Warlock = {} end
