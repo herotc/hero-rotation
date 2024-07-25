@@ -29,7 +29,6 @@ HR.GUISettings.APL.Priest = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
-      Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
     },

@@ -61,11 +61,27 @@ Spell.Priest.Commons = {
   -- Buffs
   PowerWordFortitudeBuff      = Spell(21562),
   RhapsodyBuff                = Spell(390636),
+  SpymastersReportBuff        = Spell(451199), -- Stacking buff from before using Spymaster's Web trinket
+  SpymastersWebBuff           = Spell(444959), -- Buff from using Spymaster's Web trinket
   TwistofFateBuff             = Spell(390978),
   -- Debuffs
   -- Other
   Pool                        = Spell(999910)
 }
+
+Spell.Priest.Archon = {
+  -- Talents
+  EmpoweredSurges             = Spell(453799),
+}
+
+Spell.Priest.Voidweaver = {
+  -- Talents
+  DepthofShadows              = Spell(451308),
+  EntropicRift                = Spell(447444),
+  VoidBlast                   = Spell(450405),
+  VoidEmpowerment             = Spell(450138),
+}
+
 Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   -- Base Spells
   MindFlay                    = Spell(15407),
@@ -136,6 +152,8 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   GatheringShadowsBuff        = Spell(394961),
   DarkflameShroudBuff         = Spell(410871),
 })
+Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Shadow, Spell.Priest.Archon)
+Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Shadow, Spell.Priest.Voidweaver)
 
 Spell.Priest.Discipline = MergeTableByKey(Spell.Priest.Commons, {
   -- Base Spells
@@ -171,6 +189,7 @@ Spell.Priest.Holy = MergeTableByKey(Spell.Priest.Commons, {
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Commons = {
   -- Trinkets
+  AberrantSpellforge          = Item(212451, {13, 14}),
   BeacontotheBeyond           = Item(203963, {13, 14}),
   BelorrelostheSuncaller      = Item(207172, {13, 14}),
   ConjuredChillglobe          = Item(194300, {13, 14}),
@@ -185,10 +204,10 @@ Item.Priest.Commons = {
   IcebloodDeathsnare          = Item(194304, {13, 14}),
   NymuesUnravelingSpindle     = Item(208615, {13, 14}),
   RashoksMoltenHeart          = Item(202614, {13, 14}),
+  SpymastersWeb               = Item(220202, {13, 14}),
   VoidmendersShadowgem        = Item(110007, {13, 14}),
   -- Other Items
   Dreambinder                 = Item(208616, {16}),
-  Iridal                      = Item(208321, {16}),
 }
 
 Item.Priest.Shadow = MergeTableByKey(Item.Priest.Commons, {
