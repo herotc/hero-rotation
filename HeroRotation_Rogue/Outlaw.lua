@@ -774,7 +774,7 @@ local function APL ()
 end
 
 local function Init ()
-  HR.Print("Outlaw Rogue rotation has been updated for patch 10.2.7. \n ",
+  HR.Print("Outlaw Rogue rotation has been updated for patch 11.0.0. \n ",
             "Note: It is known & Intended that Audacity procs will suggest Sinister Strike without a keybind shown")
 end
 
