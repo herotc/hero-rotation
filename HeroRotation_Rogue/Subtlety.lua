@@ -1056,7 +1056,7 @@ local function APL ()
 end
 
 local function Init ()
-  HR.Print("Subtlety Rogue rotation has been updated for patch 10.2.7.")
+  HR.Print("Subtlety Rogue rotation has been updated for patch 11.0.0.")
 end
 
 HR.SetAPL(261, APL, Init)
