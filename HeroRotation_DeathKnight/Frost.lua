@@ -53,7 +53,6 @@ local Settings = {
 
 --- ===== Rotation Variables =====
 local VarPillarCD = (S.Icecap:IsAvailable()) and 45 or 60
-local Equip, Trinket1, Trinket2
 local VarTrinket1ID, VarTrinket2ID
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1Exclude, VarTrinket2Exclude
@@ -78,12 +77,7 @@ local GCDMax
 local Ghoul = HL.GhoulTable
 
 --- ===== Trinket Item Objects =====
-local function GetTrinketItems()
-  Equip = Player:GetEquipment()
-  Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
-  Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
-end
-GetTrinketItems()
+local Trinket1, Trinket2 = Player:GetTrinketItems()
 
 --- ===== Trinket Variables (from Precombat) =====
 local function SetTrinketVariables()
@@ -173,7 +167,7 @@ HL:RegisterForEvent(function()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
-  GetTrinketItems()
+  Trinket1, Trinket2 = Player:GetTrinketItems()
   SetTrinketVariables()
   SetWeaponVariables()
   SetSpellVariables()

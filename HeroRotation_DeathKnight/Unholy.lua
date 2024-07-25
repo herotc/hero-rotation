@@ -57,7 +57,6 @@ local VarApocTiming
 local VarPopWounds
 local VarPoolingRunicPower
 local VarSpendRP
-local Equip, Trinket1, Trinket2
 local VarTrinket1ID, VarTrinket2ID
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1Range, VarTrinket2Range
@@ -80,12 +79,7 @@ local FightRemains = 11111
 local Ghoul = HL.GhoulTable
 
 --- ===== Trinket Item Objects =====
-local function GetTrinketItems()
-  Equip = Player:GetEquipment()
-  Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
-  Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
-end
-GetTrinketItems()
+local Trinket1, Trinket2 = Player:GetTrinketItems()
 
 --- ===== Trinket Variables (from Precombat) =====
 local function SetTrinketVariables()
@@ -138,7 +132,7 @@ local StunInterrupts = {
 
 --- ===== Event Registrations =====
 HL:RegisterForEvent(function()
-  GetTrinketItems()
+  Trinket1, Trinket2 = Player:GetTrinketItems()
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
