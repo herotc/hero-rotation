@@ -653,7 +653,7 @@ local function Main()
   end
   -- devouring_plague,target_if=max:target.time_to_die*(dot.devouring_plague.remains<=gcd.max|variable.dr_force_prio|!talent.distorted_reality&variable.me_force_prio),if=insanity.deficit<=35&talent.distorted_reality|buff.dark_ascension.up|buff.mind_devourer.up&cooldown.mind_blast.up&(cooldown.void_eruption.remains>=3*gcd.max|!talent.void_eruption)|buff.entropic_rift.up
   if S.DevouringPlague:IsReady() and (Player:InsanityDeficit() <= 35 and S.DistortedReality:IsAvailable() or Player:BuffUp(S.DarkAscensionBuff) or Player:BuffUp(S.MindDevourerBuff) and S.MindBlast:CooldownUp() and (S.VoidEruption:CooldownRemains() >= 3 * GCDMax or not S.VoidEruption:IsAvailable()) or EntropicRiftUp) then
-    if CastTargetIf(S.DevouringPlague, Enemies10ySplash, "max", EvaluateTargetIfFilterTTDTimesDP, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 24"; end
+    if Everyone.CastTargetIf(S.DevouringPlague, Enemies10ySplash, "max", EvaluateTargetIfFilterTTDTimesDP, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 24"; end
   end
   -- void_torrent,target_if=max:(dot.devouring_plague.remains*1000+target.time_to_die),if=!variable.holding_crash&!talent.entropic_rift,target_if=dot.devouring_plague.remains>=2.5
   if S.VoidTorrent:IsCastable() then
