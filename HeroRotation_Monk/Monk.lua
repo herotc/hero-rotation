@@ -106,7 +106,6 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   InvokeXuenTheWhiteTiger               = Spell(123904),
   JadeIgnition                          = Spell(392979),
   MarkoftheCrane                        = Spell(220357),
-  Serenity                              = Spell(152173),
   ShadowboxingTreads                    = Spell(392982),
   Skyreach                              = Spell(392991),
   Skytouch                              = Spell(405044),
