@@ -352,7 +352,7 @@ local function APL()
     -- ravager
     if CDsON() and S.Ravager:IsCastable() then
       SuggestRageDump(10)
-      if Cast(S.Ravager, Settings.Protection.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager main 26"; end
+      if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager main 26"; end
     end
     --demoralizing_shout,if=talent.booming_voice.enabled
     if S.DemoralizingShout:IsCastable() and (S.BoomingVoice:IsAvailable()) then
