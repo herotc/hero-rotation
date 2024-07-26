@@ -56,14 +56,10 @@ local OnUseExcludes = {
 }
 
 -- Trinkets
-local Equipment = Player:GetEquipment()
-local trinket1 = Equipment[13] and Item(Equipment[13]) or Item(0)
-local trinket2 = Equipment[14] and Item(Equipment[14]) or Item(0)
+local trinket1, trinket2 = Player:GetTrinketItems()
 
 HL:RegisterForEvent(function()
-  Equipment = Player:GetEquipment()
-  trinket1 = Equipment[13] and Item(Equipment[13]) or Item(0)
-  trinket2 = Equipment[14] and Item(Equipment[14]) or Item(0)
+  trinket1, trinket2 = Player:GetTrinketItems()
 end, "PLAYER_EQUIPMENT_CHANGED" )
 
 -- Rotation Var

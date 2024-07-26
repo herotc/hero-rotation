@@ -53,8 +53,9 @@ local Settings = {
 
 --- ===== Rotation Variables =====
 local VarPillarCD = (S.Icecap:IsAvailable()) and 45 or 60
-local Equip, Trinket1, Trinket2
 local VarTrinket1ID, VarTrinket2ID
+local VarTrinket1Spell, VarTrinket2Spell
+local VarTrinket1Range, VarTrinket2Range
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1Exclude, VarTrinket2Exclude
 local VarTrinket1Sync, VarTrinket2Sync
@@ -78,22 +79,17 @@ local GCDMax
 local Ghoul = HL.GhoulTable
 
 --- ===== Trinket Item Objects =====
-local function GetTrinketItems()
-  Equip = Player:GetEquipment()
-  Trinket1 = Equip[13] and Item(Equip[13]) or Item(0)
-  Trinket2 = Equip[14] and Item(Equip[14]) or Item(0)
-end
-GetTrinketItems()
+local Trinket1, Trinket2 = Player:GetTrinketItems()
 
 --- ===== Trinket Variables (from Precombat) =====
 local function SetTrinketVariables()
   VarTrinket1ID = Trinket1:ID()
   VarTrinket2ID = Trinket2:ID()
 
-  local Trinket1Spell = Trinket1:OnUseSpell()
-  VarTrinket1Range = (Trinket1Spell and Trinket1Spell.MaximumRange > 0 and Trinket1Spell.MaximumRange <= 100) and Trinket1Spell.MaximumRange or 100
-  local Trinket2Spell = Trinket2:OnUseSpell()
-  VarTrinket2Range = (Trinket2Spell and Trinket2Spell.MaximumRange > 0 and Trinket2Spell.MaximumRange <= 100) and Trinket2Spell.MaximumRange or 100
+  VarTrinket1Spell = Trinket1:OnUseSpell()
+  VarTrinket1Range = (VarTrinket1Spell and VarTrinket1Spell.MaximumRange > 0 and VarTrinket1Spell.MaximumRange <= 100) and VarTrinket1Spell.MaximumRange or 100
+  VarTrinket2Spell = Trinket2:OnUseSpell()
+  VarTrinket2Range = (VarTrinket2Spell and VarTrinket2Spell.MaximumRange > 0 and VarTrinket2Spell.MaximumRange <= 100) and VarTrinket2Spell.MaximumRange or 100
 
   VarTrinket1CD = Trinket1:Cooldown()
   VarTrinket2CD = Trinket2:Cooldown()
@@ -173,7 +169,7 @@ HL:RegisterForEvent(function()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
-  GetTrinketItems()
+  Trinket1, Trinket2 = Player:GetTrinketItems()
   SetTrinketVariables()
   SetWeaponVariables()
   SetSpellVariables()
@@ -677,19 +673,19 @@ local function Trinkets()
       if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box trinkets 4"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(talent.obliteration&buff.pillar_of_frost.remains>10&(!variable.rp_buffs|cooldown.empower_rune_weapon.max_charges<2&buff.empower_rune_weapon.up)|!talent.obliteration)&(!buff.pillar_of_frost.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&(buff.breath_of_sindragosa.up|buff.pillar_of_frost.up)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
-    if Trinket1:IsReady() and (VarTrinket1Buffs and not VarTrinket1Manual and (S.Obliteration:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 and (not VarRPBuffs or S.EmpowerRuneWeapon:MaxCharges() < 2 and Player:BuffUp(S.EmpowerRuneWeaponBuff)) or not S.Obliteration:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and Trinket1:CastTime() > 0) and (Player:BuffUp(S.BreathofSindragosa) or Player:BuffUp(S.PillarofFrostBuff)) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= FightRemains) then
+    if Trinket1:IsReady() and (VarTrinket1Buffs and not VarTrinket1Manual and (S.Obliteration:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 and (not VarRPBuffs or S.EmpowerRuneWeapon:MaxCharges() < 2 and Player:BuffUp(S.EmpowerRuneWeaponBuff)) or not S.Obliteration:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and VarTrinket1Spell:CastTime() > 0) and (Player:BuffUp(S.BreathofSindragosa) or Player:BuffUp(S.PillarofFrostBuff)) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= FightRemains) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " trinkets 6"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(talent.obliteration&buff.pillar_of_frost.remains>10&(!variable.rp_buffs|cooldown.empower_rune_weapon.max_charges<2&buff.empower_rune_weapon.up)|!talent.obliteration)&(!buff.pillar_of_frost.up&trinket.2.cast_time>0|!trinket.2.cast_time>0)&(buff.breath_of_sindragosa.up|buff.pillar_of_frost.up)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
-    if Trinket2:IsReady() and (VarTrinket2Buffs and not VarTrinket2Manual and (S.Obliteration:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 and (not VarRPBuffs or S.EmpowerRuneWeapon:MaxCharges() < 2 and Player:BuffUp(S.EmpowerRuneWeaponBuff)) or not S.Obliteration:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and Trinket2:CastTime() > 0) and (Player:BuffUp(S.BreathofSindragosa) or Player:BuffUp(S.PillarofFrostBuff)) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= FightRemains) then
+    if Trinket2:IsReady() and (VarTrinket2Buffs and not VarTrinket2Manual and (S.Obliteration:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 and (not VarRPBuffs or S.EmpowerRuneWeapon:MaxCharges() < 2 and Player:BuffUp(S.EmpowerRuneWeaponBuff)) or not S.Obliteration:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and VarTrinket2Spell:CastTime() > 0) and (Player:BuffUp(S.BreathofSindragosa) or Player:BuffUp(S.PillarofFrostBuff)) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= FightRemains) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " trinkets 8"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&((variable.damage_trinket_priority=1|trinket.2.cooldown.remains)|(trinket.1.cast_time>0&!buff.pillar_of_frost.up|!trinket.1.cast_time>0&cooldown.pillar_of_frost.remains>20)|talent.pillar_of_frost&cooldown.pillar_of_frost.remains_expected>20|!talent.pillar_of_frost)
-    if Trinket1:IsReady() and (not VarTrinket1Buffs and not VarTrinket1Manual and ((VarDamageTrinketPriority == 1 or Trinket2:CooldownDown()) or (Trinket1:CastTime() > 0 and Player:BuffDown(S.PillarofFrostBuff) or not Trinket1:CastTime() > 0 and S.PillarofFrost:CooldownRemains() > 20) or S.PillarofFrost:IsAvailable() and S.PillarofFrost:CooldownRemains() > 20 or not S.PillarofFrost:IsAvailable())) then
+    if Trinket1:IsReady() and (not VarTrinket1Buffs and not VarTrinket1Manual and ((VarDamageTrinketPriority == 1 or Trinket2:CooldownDown()) or (VarTrinket1Spell:CastTime() > 0 and Player:BuffDown(S.PillarofFrostBuff) or not VarTrinket1Spell:CastTime() > 0 and S.PillarofFrost:CooldownRemains() > 20) or S.PillarofFrost:IsAvailable() and S.PillarofFrost:CooldownRemains() > 20 or not S.PillarofFrost:IsAvailable())) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " trinkets 10"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&((variable.damage_trinket_priority=2|trinket.1.cooldown.remains)|(trinket.2.cast_time>0&!buff.pillar_of_frost.up|!trinket.2.cast_time>0&cooldown.pillar_of_frost.remains>20)|talent.pillar_of_frost&cooldown.pillar_of_frost.remains_expected>20|!talent.pillar_of_frost)
-    if Trinket2:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and ((VarDamageTrinketPriority == 2 or Trinket1:CooldownDown()) or (Trinket2:CastTime() > 0 and Player:BuffDown(S.PillarofFrostBuff) or not Trinket2:CastTime() > 0 and S.PillarofFrost:CooldownRemains() > 20) or S.PillarofFrost:IsAvailable() and S.PillarofFrost:CooldownRemains() > 20 or not S.PillarofFrost:IsAvailable())) then
+    if Trinket2:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and ((VarDamageTrinketPriority == 2 or Trinket1:CooldownDown()) or (VarTrinket2Spell:CastTime() > 0 and Player:BuffDown(S.PillarofFrostBuff) or not VarTrinket2Spell:CastTime() > 0 and S.PillarofFrost:CooldownRemains() > 20) or S.PillarofFrost:IsAvailable() and S.PillarofFrost:CooldownRemains() > 20 or not S.PillarofFrost:IsAvailable())) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " trinkets 12"; end
     end
   end
