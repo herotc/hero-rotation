@@ -371,6 +371,16 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       end
   end
 
+  -- actions.finish+=/coup_de_grace
+  if S.CoupDeGrace:IsCastable() and TargetInMeleeRange then
+    if ReturnSpellOnly then
+      return S.CoupDeGrace
+    else
+      if S.Eviscerate:IsReady() and Cast(S.CoupDeGrace) then return "Cast Eviscerate Coup De Grace" end
+      SetPoolingFinisher(S.CoupDeGrace)
+    end
+  end
+
   -- actions.finish+=/eviscerate
   if S.Eviscerate:IsCastable() and TargetInMeleeRange then
     if ReturnSpellOnly then
@@ -381,6 +391,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     end
   end
 
+  print('No Finisher Found')
   return false
 end
 
