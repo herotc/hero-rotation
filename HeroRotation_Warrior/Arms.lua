@@ -72,10 +72,10 @@ local function SetTrinketVariables()
 
   VarTrinket1Spell = Trinket1:OnUseSpell()
   VarTrinket1Range = (VarTrinket1Spell and VarTrinket1Spell.MaximumRange > 0 and VarTrinket1Spell.MaximumRange <= 100) and VarTrinket1Spell.MaximumRange or 100
-  VarTrinket1CastTime = VarTrinket1Spell:CastTime()
+  VarTrinket1CastTime = VarTrinket1Spell and VarTrinket1Spell:CastTime() or 0
   VarTrinket2Spell = Trinket2:OnUseSpell()
   VarTrinket2Range = (VarTrinket2Spell and VarTrinket2Spell.MaximumRange > 0 and VarTrinket2Spell.MaximumRange <= 100) and VarTrinket2Spell.MaximumRange or 100
-  VarTrinket2CastTime = VarTrinket2Spell:CastTime()
+  VarTrinket2CastTime = VarTrinket2Spell and VarTrinket2Spell:CastTime() or 0
 
   VarTrinket1CD = Trinket1:Cooldown()
   VarTrinket2CD = Trinket2:Cooldown()
