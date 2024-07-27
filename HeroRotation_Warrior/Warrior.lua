@@ -43,6 +43,7 @@ Spell.Warrior.Commons = {
   Avatar                                = Spell(107574),
   BerserkerRage                         = Spell(18499),
   BerserkersTorment                     = Spell(390123),
+  Bladestorm                            = MultiSpell(227847, 389774),
   BloodandThunder                       = Spell(384277),
   ChampionsSpear                        = Spell(376079),
   DoubleTime                            = Spell(103827),
@@ -68,10 +69,11 @@ Spell.Warrior.Commons = {
   -- Buffs
   AvatarBuff                            = Spell(107574),
   BattleShoutBuff                       = Spell(6673),
-  ElysianMightBuff                      = Spell(386286),
+  ChampionsMightBuff                    = Spell(386286),
   HurricaneBuff                         = Spell(390581),
   WarMachineBuff                        = Spell(262232),
   -- Debuffs
+  ChampionsMightDebuff                  = Spell(376080),
   MarkofFyralathDebuff                  = Spell(414532),
   ThunderousRoarDebuff                  = Spell(397364),
   -- Pool
@@ -96,7 +98,6 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   AngerManagement                       = Spell(152278),
   Battlelord                            = Spell(386630),
   BlademastersTorment                   = Spell(390138),
-  Bladestorm                            = MultiSpell(227847, 389774),
   Bloodletting                          = Spell(383154),
   Cleave                                = Spell(845),
   ColossusSmash                         = MultiSpell(167105, 262161),
@@ -185,6 +186,7 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   SuddenDeathBuff                       = Spell(280776),
   -- Debuffs
   GushingWoundDebuff                    = Spell(385042),
+  OdynsFuryDebuff                       = Spell(385060),
 })
 Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Fury, Spell.Warrior.MountainThane)
 Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Fury, Spell.Warrior.Slayer)

@@ -23,7 +23,7 @@ ArmsOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local BaseCheck = ArmsOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellArms.Charge then
-      return BaseCheck and (self:Charges() >= 1 and (Player:AffectingCombat() and (not Target:IsInRange(8)) and Target:IsInRange(25) or not Player:AffectingCombat()))
+      return BaseCheck and (self:Charges() >= 1 and not Target:IsInRange(8) and Target:IsInRange(25))
     else
       return BaseCheck
     end
@@ -36,7 +36,7 @@ FuryOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local BaseCheck = FuryOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellFury.Charge then
-      return BaseCheck and (self:Charges() >= 1 and (Player:AffectingCombat() and (not Target:IsInRange(8)) and Target:IsInRange(25) or not Player:AffectingCombat()))
+      return BaseCheck and (self:Charges() >= 1 and not Target:IsInRange(8) and Target:IsInRange(25))
     else
       return BaseCheck
     end
