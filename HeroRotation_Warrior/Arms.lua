@@ -221,7 +221,7 @@ local function Execute()
   end
   -- bladestorm
   if CDsON() and S.Bladestorm:IsCastable() then
-    if Everyone.CastTargetIf(S.Bladestorm, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.Arms.GCDasOffGCD.Bladestorm) then return "bladestorm execute 24"; end
+    if Everyone.CastTargetIf(S.Bladestorm, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm) then return "bladestorm execute 24"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
@@ -264,7 +264,7 @@ local function AoE()
   end
   -- bladestorm,if=talent.unhinged|talent.merciless_bonegrinder
   if S.Bladestorm:IsReady() and (S.Unhinged:IsAvailable() or S.MercilessBonegrinder:IsAvailable()) then
-    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm aoe 18"; end
+    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm aoe 18"; end
   end
   -- champions_spear
   if CDsON() and S.ChampionsSpear:IsCastable() then
@@ -296,7 +296,7 @@ local function AoE()
   end
   -- bladestorm
   if CDsON() and S.Bladestorm:IsCastable() then
-    if Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm aoe 34"; end
+    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm aoe 34"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then

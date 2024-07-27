@@ -43,6 +43,7 @@ HR.GUISettings.APL.Warrior = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       BattleShout = true,
+      Bladestorm = false,
       Ravager = false,
     },
     OffGCDasOffGCD = {
@@ -57,7 +58,6 @@ HR.GUISettings.APL.Warrior = {
     GCDasOffGCD = {
       -- Abilities
       Avatar = false,
-      Bladestorm = false,
       ColossusSmash = false,
       IgnorePain = false,
       Shockwave = true,
