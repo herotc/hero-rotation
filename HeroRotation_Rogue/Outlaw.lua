@@ -562,6 +562,11 @@ local function Finish ()
     if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
   end
 
+  -- actions.finish+=/coup_de_grace
+  if S.CoupDeGrace:IsCastable() and Target:IsSpellInRange(S.CoupDeGrace) then
+    if CastPooling(S.CoupDeGrace) then return "Cast Coup de Grace" end
+  end
+
   -- actions.finish+=/dispatch
   if S.Dispatch:IsCastable() and Target:IsSpellInRange(S.Dispatch) then
     if CastPooling(S.Dispatch) then return "Cast Dispatch" end

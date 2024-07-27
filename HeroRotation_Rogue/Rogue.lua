@@ -74,6 +74,7 @@ Spell.Rogue.Commons = {
   AcrobaticStrikes        = Spell(455143),
   Alacrity                = Spell(193539),
   ColdBlood               = Spell(382245),
+  CoupDeGrace             = Spell(441776),
   DarkestNight            = Spell(457058),
   DarkestNightBuff        = Spell(457280),
   DeeperStratagem         = Spell(193531),
