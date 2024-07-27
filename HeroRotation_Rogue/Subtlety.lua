@@ -391,7 +391,6 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     end
   end
 
-  print('No Finisher Found')
   return false
 end
 
