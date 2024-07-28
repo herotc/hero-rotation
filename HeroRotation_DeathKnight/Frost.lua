@@ -24,6 +24,7 @@ local bool       = HR.Commons.Everyone.bool
 -- lua
 local strsplit   = strsplit
 -- WoW API
+local Delay                = C_Timer.After
 local GetInventoryItemLink = GetInventoryItemLink
 local IsEquippedItemType   = C_Item.IsEquippedItemType
 
@@ -118,7 +119,9 @@ local function SetTrinketVariables()
   end
 
   VarDamageTrinketPriority = 1
-  if not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2:Level() >= Trinket1:Level() then
+  local T1Level = (Trinket1) and Trinket1:Level() or 0
+  local T2Level = (Trinket2) and Trinket2:Level() or 0
+  if not VarTrinket1Buffs and not VarTrinket2Buffs and T2Level >= T1Level then
     VarDamageTrinketPriority = 2
   end
 
@@ -126,6 +129,15 @@ local function SetTrinketVariables()
   VarTrinket2Manual = VarTrinket2ID == I.AlgetharPuzzleBox:ID()
 end
 SetTrinketVariables()
+
+-- nil safety
+if not Trinket1 or not Trinket2 then
+  Delay(2, function()
+      Trinket1, Trinket2 = Player:GetTrinketItems()
+      SetTrinketVariables()
+    end
+  )
+end
 
 local function SetSpellVariables()
   VarStaticObliterateBuffs = S.ArcticAssault:IsAvailable() or S.FrigidExecutioner:IsAvailable() or Var2HCheck
