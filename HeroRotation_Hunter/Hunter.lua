@@ -79,6 +79,15 @@ Spell.Hunter.Commons = {
   PoolFocus                             = Spell(999910),
 }
 
+Spell.Hunter.DarkRanger = {
+}
+
+Spell.Hunter.PackLeader = {
+}
+
+Spell.Hunter.Sentinel = {
+}
+
 Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   -- Abilities
   -- Pet Abilities
@@ -118,6 +127,8 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   -- Debuffs
   BarbedShotDebuff                      = Spell(217200),
 })
+Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.BeastMastery, Spell.Hunter.DarkRanger)
+Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.BeastMastery, Spell.Hunter.PackLeader)
 
 Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   -- Abilities
@@ -159,6 +170,8 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   -- Legendaries
   EagletalonsTrueFocusBuff              = Spell(336851),
 })
+Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Marksmanship, Spell.Hunter.DarkRanger)
+Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Marksmanship, Spell.Hunter.Sentinel)
 
 Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   -- Abilities
@@ -201,6 +214,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   CoordinatedAssaultBuff                = Spell(360952),
   CoordinatedAssaultEmpowerBuff         = Spell(361738),
   DeadlyDuoBuff                         = Spell(397568),
+  MercilessBlowsBuff                    = Spell(459870), -- Exposed Flank buff from Merciless Blows talent. Called buff.merciless_blows in APL.
   MongooseFuryBuff                      = Spell(259388),
   SpearheadBuff                         = Spell(360966),
   SteelTrapDebuff                       = Spell(162487),
@@ -214,12 +228,15 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   VolatileBombDebuff                    = Spell(271049),
   WildfireBombDebuff                    = Spell(269747),
 })
+Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Survival, Spell.Hunter.PackLeader)
+Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Survival, Spell.Hunter.Sentinel)
 
 -- Items
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Commons = {
   -- Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
+  BeacontotheBeyond                     = Item(203963, {13, 14}),
   DMDDance                              = Item(198088, {13, 14}),
   DMDDanceBox                           = Item(198478, {13, 14}),
   DMDInferno                            = Item(198086, {13, 14}),
@@ -234,8 +251,6 @@ Item.Hunter.Commons = {
   MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
   StormeatersBoon                       = Item(194302, {13, 14}),
   WindscarWhetstone                     = Item(137486, {13, 14}),
-  -- Other On-Use Items
-  Djaruun                               = Item(202569, {16}),
 }
 
 Item.Hunter.BeastMastery = MergeTableByKey(Item.Hunter.Commons, {
