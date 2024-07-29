@@ -59,8 +59,12 @@ Spell.DemonHunter.AldrachiReaver = {
   ReaversGlaive                         = Spell(442294),
   -- Buffs
   ArtoftheGlaiveBuff                    = Spell(444661),
+  GlaiveFlurryBuff                      = Spell(442435),
+  ReaversGlaiveBuff                     = Spell(444764),
   ThrilloftheFightAtkBuff               = Spell(442695),
   ThrilloftheFightDmgBuff               = Spell(442688),
+  -- Debuffs
+  ReaversMarkDebuff                     = Spell(442624),
 }
 
 Spell.DemonHunter.FelScarred = {
@@ -143,55 +147,31 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   InfernalStrike                        = Spell(189110),
   Shear                                 = Spell(203782),
   SoulCleave                            = Spell(228477),
-  SoulFragments                         = Spell(203981),
   ThrowGlaive                           = Spell(204157),
   -- Defensive
   DemonSpikes                           = Spell(203720),
-  Torment                               = Spell(185245),
   -- Talents
-  AgonizingFlames                       = Spell(207548),
   AscendingFlame                        = Spell(428603),
   BulkExtraction                        = Spell(320341),
-  BurningAlive                          = Spell(207739),
-  BurningBlood                          = Spell(390213),
-  CharredFlesh                          = Spell(336639),
-  ConcentratedSigils                    = Spell(207666),
-  CycleofBinding                        = Spell(389718),
   DarkglareBoon                         = Spell(389708),
   DowninFlames                          = Spell(389732),
-  Fallout                               = Spell(227174),
   FelDevastation                        = Spell(212084),
   FieryBrand                            = Spell(204021),
   FieryDemise                           = Spell(389220),
-  FocusedCleave                         = Spell(343207),
-  Frailty                               = Spell(389958),
   Fracture                              = Spell(263642),
   IlluminatedSigils                     = Spell(428557),
-  ShearFury                             = Spell(389997),
-  SigilofChains                         = MultiSpell(202138, 389807), -- 202138: Base ID, 389807: Precise
-  SigilofSilence                        = MultiSpell(202137, 389809), -- 202137: Base ID, 389809: Precise
-  SoulBarrier                           = Spell(263648),
   SoulCarver                            = Spell(207407),
-  Soulcrush                             = Spell(389985),
   SpiritBomb                            = Spell(247454),
-  StoketheFlames                        = Spell(393827),
-  Vulnerability                         = Spell(389976),
   -- Utility
   Metamorphosis                         = Spell(187827),
   -- Buffs
   DemonSpikesBuff                       = Spell(203819),
-  GlaiveFlurryBuff                      = Spell(442435),
   MetamorphosisBuff                     = Spell(187827),
-  ReaversGlaiveBuff                     = Spell(444764),
   RendingStrikeBuff                     = Spell(442442),
   SoulFurnaceBuff                       = Spell(391166),
   SoulFurnaceDmgBuff                    = Spell(391172),
   -- Debuffs
   FieryBrandDebuff                      = Spell(207771),
-  FrailtyDebuff                         = Spell(247456),
-  ReaversMarkDebuff                     = Spell(442624),
-  SigilofChainsDebuff                   = Spell(204843),
-  SigilofSilenceDebuff                  = Spell(204490),
 })
 Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Vengeance, Spell.DemonHunter.AldrachiReaver)
 Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Vengeance, Spell.DemonHunter.FelScarred)
