@@ -41,16 +41,12 @@ end
 local ArcaneOldPlayerAffectingCombat
 ArcaneOldPlayerAffectingCombat = HL.AddCoreOverride("Player.AffectingCombat",
   function (self)
-    return SpellArcane.ArcaneBlast:InFlight() or ArcaneOldPlayerAffectingCombat(self)
+    return Player:IsCasting(SpellArcane.ArcaneBlast) or ArcaneOldPlayerAffectingCombat(self)
   end
 , 62)
 
 HL.AddCoreOverride("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-    if self:CastTime() > 0 and Player:IsMoving() and Settings.Commons.MovingRotation then
-      return false
-    end
-
     local RangeOK = true
     if Range then
       local RangeUnit = ThisUnit or Target
@@ -60,16 +56,10 @@ HL.AddCoreOverride("Spell.IsCastable",
     local BaseCheck = self:IsLearned() and self:CooldownRemains( BypassRecovery, Offset or "Auto") == 0 and RangeOK and Player:Mana() >= self:Cost()
     if self == SpellArcane.PresenceofMind then
       return BaseCheck and Player:BuffDown(SpellArcane.PresenceofMind)
-    elseif self == SpellArcane.RadiantSpark then
-      return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellArcane.ShiftingPower then
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellArcane.TouchoftheMagi then
       return BaseCheck and not Player:IsCasting(self)
-    elseif self == SpellArcane.ConjureManaGem then
-      local ManaGem = Item.Mage.Arcane.ManaGem
-      local GemCD = ManaGem:CooldownRemains()
-      return BaseCheck and (not Player:IsCasting(self)) and not (ManaGem:IsReady() or GemCD > 0)
     elseif self == SpellArcane.ArcaneSurge then
       return self:IsLearned() and self:CooldownUp() and RangeOK
     else

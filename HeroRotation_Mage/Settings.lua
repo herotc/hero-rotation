@@ -33,6 +33,7 @@ HR.GUISettings.APL.Mage = {
       Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
+      ShiftingPower = "Suggested",
     },
   },
   CommonsOGCD = {
@@ -57,7 +58,7 @@ HR.GUISettings.APL.Mage = {
     },
     Enabled = {
       ArcaneMissilesInterrupts = true,
-      ManaGem = true,
+      ShiftingPowerInterrupts = true,
     },
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
@@ -70,7 +71,6 @@ HR.GUISettings.APL.Mage = {
     -- {Display OffGCD as OffGCD}
     OffGCDasOffGCD = {
       -- Abilities
-      ManaGem = true,
       PresenceOfMind = true,
     }
   },

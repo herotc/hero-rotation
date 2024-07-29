@@ -77,63 +77,60 @@ Spell.Mage.Commons = {
   Pool                                  = Spell(999910)
 }
 
+Spell.Mage.Frostfire = {
+}
+
+Spell.Mage.Spellslinger = {
+  -- Talents
+  ShiftingShards                        = Spell(444675),
+  SplinteringSorcery                    = Spell(443739),
+  UnerringProficiency                   = Spell(444974),
+  -- Buffs
+  UnerringProficiencyBuff               = Spell(444981),
+}
+
+Spell.Mage.Sunfury = {
+}
+
 Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   -- Abilities
   ArcaneBlast                           = Spell(30451),
-  FireBlast                             = Spell(319836),
   -- Talents
-  Amplification                         = Spell(236628),
   ArcaneBarrage                         = Spell(44425), --Splash, 10
   ArcaneBombardment                     = Spell(384581),
-  ArcaneEcho                            = Spell(342231), --Splash, 8
   ArcaneFamiliar                        = Spell(205022),
   ArcaneHarmony                         = Spell(384452),
   ArcaneMissiles                        = Spell(5143),
   ArcaneOrb                             = Spell(153626), --Splash, 16
-  ArcanePower                           = Spell(321739),
   ArcaneSurge                           = Spell(365350),
+  ArcaneTempo                           = Spell(383980),
   ArcingCleave                          = Spell(231564),
-  CascadingPower                        = Spell(384276),
-  ChargedOrb                            = Spell(384651),
-  ConjureManaGem                        = Spell(759),
-  Concentration                         = Spell(384374),
-  Enlightened                           = Spell(321387),
   Evocation                             = Spell(12051),
-  GreaterInvisibility                   = Spell(110959),
-  NetherTempest                         = Spell(114923), --Splash, 10
-  NetherPrecision                       = Spell(383782),
-  OrbBarrage                            = Spell(384858),
-  Overpowered                           = Spell(155147),
+  HighVoltage                           = Spell(461248),
+  Impetus                               = Spell(383676),
+  ImprovedClearcasting                  = Spell(321420),
+  MagisSpark                            = Spell(454016),
   PresenceofMind                        = Spell(205025),
-  PrismaticBarrier                      = Spell(235450),
-  RadiantSpark                          = Spell(376103),
-  Resonance                             = Spell(205028),
-  RuleofThrees                          = Spell(264354),
-  SiphonStorm                           = Spell(384187),
-  Slipstream                            = Spell(236457),
   Supernova                             = Spell(157980), --Splash, 8
-  TimeAnomaly                           = Spell(383243),
   TouchoftheMagi                        = Spell(321507), --Splash, 8
   -- Buffs
-  ArcaneArtilleryBuff                   = Spell(424331), -- Tier 31 4pc
+  AetherAttunementBuff                  = Spell(453601),
   ArcaneFamiliarBuff                    = Spell(210126),
   ArcaneHarmonyBuff                     = Spell(384455),
-  ArcaneOverloadBuff                    = Spell(409022), -- Tier 30 4pc
   ArcaneSurgeBuff                       = Spell(365362),
+  ArcaneTempoBuff                       = Spell(383997),
   ClearcastingBuff                      = Spell(263725),
-  ConcentrationBuff                     = Spell(384379),
+  IntuitionBuff                         = Spell(455681), -- TWW S1 Tier 4pc
   NetherPrecisionBuff                   = Spell(383783),
   PresenceofMindBuff                    = Spell(205025),
-  RuleofThreesBuff                      = Spell(264774),
   SiphonStormBuff                       = Spell(384267),
   -- Debuffs
-  NetherTempestDebuff                   = Spell(114923), --Splash, 10
-  RadiantSparkDebuff                    = Spell(376103),
-  RadiantSparkVulnerability             = Spell(376104),
   TouchoftheMagiDebuff                  = Spell(210824),
   -- Misc
   StopAM                                = Spell(363653),
 })
+Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Arcane, Spell.Mage.Spellslinger)
+Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Arcane, Spell.Mage.Sunfury)
 
 Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   -- Abilities
@@ -176,6 +173,8 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   IgniteDebuff                          = Spell(12654),
   ImprovedScorchDebuff                  = Spell(383608),
 })
+Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Fire, Spell.Mage.Frostfire)
+Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Fire, Spell.Mage.Sunfury)
 
 Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   -- Abilities
@@ -221,11 +220,13 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   FrostbiteDebuff                       = Spell(378760),
   WintersChillDebuff                    = Spell(228358),
 })
+Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Frost, Spell.Mage.Frostfire)
+Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Frost, Spell.Mage.Spellslinger)
 
 -- Items
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Commons = {
-  -- Trinkets
+  -- DF Trinkets
   AshesoftheEmbersoul                   = Item(207167, {13, 14}),
   BalefireBranch                        = Item(159630, {13, 14}),
   BeacontotheBeyond                     = Item(203963, {13, 14}),
@@ -253,7 +254,16 @@ Item.Mage.Commons = {
   TimeThiefsGambit                      = Item(207579, {13, 14}),
   TomeofUnstablePower                   = Item(193628, {13, 14}),
   VoidmendersShadowgem                  = Item(110007, {13, 14}),
-  -- Gladiator's Badges
+  -- TWW Trinkets
+  AberrantSpellforge                    = Item(212451, {13, 14}),
+  HighSpeakersAccretion                 = Item(219303, {13, 14}),
+  MadQueensMandate                      = Item(212454, {13, 14}),
+  MereldarsToll                         = Item(219313, {13, 14}),
+  SpymastersWeb                         = Item(220202, {13, 14}),
+  TreacherousTransmitter                = Item(221023, {13, 14}),
+  -- TWW Gladiator's Badges
+  ForgedGladiatorsBadge                 = Item(218713, {13, 14}),
+  -- DF Gladiator's Badges
   CrimsonGladiatorsBadge                = Item(201807, {13, 14}),
   DraconicGladiatorsBadge               = Item(216279, {13, 14}),
   ObsidianGladiatorsBadge               = Item(205708, {13, 14}),
