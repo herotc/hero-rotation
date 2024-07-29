@@ -557,20 +557,3 @@ local function Init()
 end
 
 HR.SetAPL(72, APL, Init)
-
-
-
-
-
-      -- avatar,if=talent.titans_torment&buff.enrage.up&raid_event.adds.in>15&!buff.avatar.up&cooldown.odyns_fury.remains|talent.berserkers_torment&buff.enrage.up&!buff.avatar.up&raid_event.adds.in>15|!talent.titans_torment&!talent.berserkers_torment&(buff.recklessness.up|target.time_to_die<20)
-      if S.Avatar:IsCastable() and (S.TitansTorment:IsAvailable() and EnrageUp and Player:BuffDown(S.AvatarBuff) and S.OdynsFury:CooldownDown() or S.BerserkersTorment:IsAvailable() and EnrageUp and Player:BuffDown(S.AvatarBuff) or not S.TitansTorment:IsAvailable() and not S.BerserkersTorment:IsAvailable() and (Player:BuffUp(S.RecklessnessBuff) or FightRemains < 20)) then
-        if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar main 20"; end
-      end
-      -- recklessness,if=!raid_event.adds.exists&(talent.annihilator&cooldown.champions_spear.remains<1|cooldown.avatar.remains>40|!talent.avatar|target.time_to_die<12)
-      if S.Recklessness:IsCastable() and (S.Annihilator:IsAvailable() and S.ChampionsSpear:CooldownRemains() < 1 or S.Avatar:CooldownRemains() > 40 or not S.Avatar:IsAvailable() or FightRemains < 12) then
-        if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 22"; end
-      end
-      -- recklessness,if=!raid_event.adds.exists&!talent.annihilator|target.time_to_die<12
-      if S.Recklessness:IsCastable() and (not S.Annihilator:IsAvailable() or FightRemains < 12) then
-        if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness main 24"; end
-      end
