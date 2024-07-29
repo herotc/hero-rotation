@@ -665,7 +665,7 @@ end
 local function Trinkets()
   -- use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking&!buff.pillar_of_frost.up&!buff.empower_rune_weapon.up&!buff.death_and_decay.up&(active_enemies<2|dot.frost_fever.ticking)
   if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0 and Player:BuffDown(S.PillarofFrostBuff) and Player:BuffDown(S.EmpowerRuneWeaponBuff) and Player:BuffDown(S.DeathAndDecayBuff) and (EnemiesMeleeCount < 2 or Target:DebuffUp(S.FrostFeverDebuff))) then
-    if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender trinkets 2"; end
+    if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsItemInRange(I.Fyralath)) then return "fyralath_the_dreamrender trinkets 2"; end
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,use_off_gcd=1,name=algethar_puzzle_box,if=!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains<2&(!talent.breath_of_sindragosa|runic_power>60&(buff.breath_of_sindragosa.up|cooldown.breath_of_sindragosa.remains<2))

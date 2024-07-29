@@ -500,7 +500,7 @@ end
 local function SanTrinkets()
   -- use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking&(active_enemies<5|active_enemies>21|fight_remains<4)&(pet.abomination.active|pet.army_ghoul.active|!talent.raise_abomination&!talent.army_of_the_dead|time>15)
   if Settings.Commons.Enabled.Items and I.Fyralath:IsReady() and (Target:DebuffUp(S.MarkofFyralathDebuff) and (ActiveEnemies < 5 or ActiveEnemies > 21 or BossFightRemains < 4) and (VarAbomActive or VarArmyGhoulActive or not S.RaiseAbomination:IsAvailable() and not S.ArmyoftheDead:IsAvailable() or HL.CombatTime() > 15)) then
-    if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender san_trinkets 2"; end
+    if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsItemInRange(I.Fyralath)) then return "fyralath_the_dreamrender san_trinkets 2"; end
   end
   if Settings.Commons.Enabled.Trinkets then
     -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.errant_manaforge_emission.up&buff.dark_transformation.up|buff.cryptic_instructions.up&buff.dark_transformation.up|buff.realigning_nexus_convergence_divergence.up&buff.dark_transformation.up

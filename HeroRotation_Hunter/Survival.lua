@@ -151,7 +151,7 @@ local function CDs()
     end
     -- use_item,name=beacon_to_the_beyond
     if I.BeacontotheBeyond:IsEquippedAndReady() then
-      if Cast(I.BeacontotheBeyond, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond cds 20"; end
+      if Cast(I.BeacontotheBeyond, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.BeacontotheBeyond)) then return "beacon_to_the_beyond cds 20"; end
     end
   end
   if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then

@@ -375,7 +375,7 @@ local function Trinkets()
   end
   -- use_item,name=dreambinder_loom_of_the_great_cycle,use_off_gcd=1,if=gcd.remains>0|fight_remains<20
   if Settings.Commons.Enabled.Items and I.Dreambinder:IsEquippedAndReady() then
-    if Cast(I.Dreambinder, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder trinkets 14"; end
+    if Cast(I.Dreambinder, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsItemInRange(I.Dreambinder)) then return "dreambinder trinkets 14"; end
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=conjured_chillglobe
@@ -384,11 +384,11 @@ local function Trinkets()
     end
     -- use_item,name=iceblood_deathsnare,if=(!raid_event.adds.exists|raid_event.adds.up|spell_targets.iceblood_deathsnare>=5)|fight_remains<20
     if I.IcebloodDeathsnare:IsEquippedAndReady() then
-      if Cast(I.IcebloodDeathsnare, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "iceblood_deathsnare trinkets 18"; end
+      if Cast(I.IcebloodDeathsnare, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.IcebloodDeathsnare)) then return "iceblood_deathsnare trinkets 18"; end
     end
     -- use_item,name=erupting_spear_fragment,if=(buff.power_infusion.up|raid_event.adds.up|fight_remains<20)&equipped.erupting_spear_fragment
     if I.EruptingSpearFragment:IsEquippedAndReady() and (Player:PowerInfusionUp() or FightRemains < 20) then
-      if Cast(I.EruptingSpearFragment, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "erupting_spear_fragment trinkets 20"; end
+      if Cast(I.EruptingSpearFragment, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.EruptingSpearFragment)) then return "erupting_spear_fragment trinkets 20"; end
     end
     -- use_item,name=belorrelos_the_suncaller,if=(!raid_event.adds.exists|raid_event.adds.up|spell_targets.belorrelos_the_suncaller>=5|fight_remains<20)&equipped.belorrelos_the_suncaller
     if I.BelorrelostheSuncaller:IsEquippedAndReady() then
@@ -396,7 +396,7 @@ local function Trinkets()
     end
     -- use_item,name=beacon_to_the_beyond,if=(!raid_event.adds.exists|raid_event.adds.up|spell_targets.beacon_to_the_beyond>=5|fight_remains<20)&equipped.beacon_to_the_beyond
     if I.BeacontotheBeyond:IsEquippedAndReady() then
-      if Cast(I.BeacontotheBeyond, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "beacon_to_the_beyond trinkets 24"; end
+      if Cast(I.BeacontotheBeyond, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.BeacontotheBeyond)) then return "beacon_to_the_beyond trinkets 24"; end
     end
     -- use_item,name=aberrant_spellforge
     if I.AberrantSpellforge:IsEquippedAndReady() then
@@ -448,7 +448,7 @@ local function CDs()
   end
   -- use_item,name=nymues_unraveling_spindle,if=variable.dots_up&(fight_remains<30|target.time_to_die>15)&(!talent.dark_ascension|cooldown.dark_ascension.remains<3+gcd.max|fight_remains<15)
   if Settings.Commons.Enabled.Trinkets and I.NymuesUnravelingSpindle:IsEquippedAndReady() and (VarDotsUp and (BossFightRemains < 30 or Target:TimeToDie() > 15) and (not S.DarkAscension:IsAvailable() or S.DarkAscension:CooldownRemains() < 3 + GCDMax or BossFightRemains < 15)) then
-    if Cast(I.NymuesUnravelingSpindle, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "nymues_unraveling_spindle cds 12"; end
+    if Cast(I.NymuesUnravelingSpindle, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.NymuesUnravelingSpindle)) then return "nymues_unraveling_spindle cds 12"; end
   end
   -- power_infusion,if=(buff.voidform.up|buff.dark_ascension.up&(fight_remains<=80|fight_remains>=140)|active_allied_augmentations)
   if S.PowerInfusion:IsCastable() and Settings.Shadow.SelfPI and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscension) and (BossFightRemains <= 80 or BossFightRemains >= 140)) then

@@ -401,7 +401,7 @@ end
 local function Trinkets()
   -- use_item,name=fyralath_the_dreamrender,,if=dot.mark_of_fyralath.ticking&!talent.blademasters_torment|dot.mark_of_fyralath.ticking&cooldown.avatar.remains>3&cooldown.bladestorm.remains>3&!debuff.colossus_smash.up
   if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0 and not S.BlademastersTorment:IsAvailable() or S.MarkofFyralathDebuff:AuraActiveCount() > 0 and S.Avatar:CooldownRemains() > 3 and S.Bladestorm:CooldownRemains() > 3 and Target:DebuffDown(S.ColossusSmashDebuff)) then
-    if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender trinkets 2"; end
+    if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsItemInRange(I.Fyralath)) then return "fyralath_the_dreamrender trinkets 2"; end
   end
   -- use_item,use_off_gcd=1,name=algethar_puzzle_box,if=cooldown.avatar.remains<=3
   if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() and (S.Avatar:CooldownRemains() <= 3) then
