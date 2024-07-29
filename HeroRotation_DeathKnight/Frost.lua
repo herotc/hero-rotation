@@ -384,17 +384,17 @@ local function Cooldowns()
   if S.AbominationLimb:IsCastable() and ((S.Obliteration:IsAvailable() and Player:BuffDown(S.PillarofFrostBuff) and VarSendingCDs or BossFightRemains < 15) or (not S.Obliteration:IsAvailable() and VarSendingCDs)) then
     if Cast(S.AbominationLimb, nil, Settings.CommonsDS.DisplayStyle.AbominationLimb, not Target:IsInRange(20)) then return "abomination_limb_talent cooldowns 4"; end
   end
+  -- remorseless_winter,if=variable.rw_buffs&variable.sending_cds&(!talent.arctic_assault|!buff.pillar_of_frost.up)
+  if S.RemorselessWinter:IsReady() and (VarRWBuffs and VarSendingCDs and (not S.ArcticAssault:IsAvailable() or Player:BuffDown(S.PillarofFrostBuff))) then
+    if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter cooldowns 6"; end
+  end
   -- chill_streak,if=variable.sending_cds&(!talent.arctic_assault|!buff.pillar_of_frost.up)
   if S.ChillStreak:IsReady() and (VarSendingCDs and (not S.ArcticAssault:IsAvailable() or Player:BuffDown(S.PillarofFrostBuff))) then
-    if Cast(S.ChillStreak, Settings.Frost.GCDasOffGCD.ChillStreak, nil, not Target:IsSpellInRange(S.ChillStreak)) then return "chill_streak cooldowns 6"; end
+    if Cast(S.ChillStreak, Settings.Frost.GCDasOffGCD.ChillStreak, nil, not Target:IsSpellInRange(S.ChillStreak)) then return "chill_streak cooldowns 8"; end
   end
   -- reapers_mark,target_if=first:!debuff.reapers_mark_debuff.up
   if S.ReapersMark:IsReady() then
-    if Everyone.CastCycle(S.ReapersMark, EnemiesMelee, EvaluateCycleReapersMarkCDs, not Target:IsInMeleeRange(5)) then return "reapers_mark cooldowns 8"; end
-  end
-  -- remorseless_winter,if=variable.rw_buffs&variable.sending_cds&(!talent.arctic_assault|!buff.pillar_of_frost.up)
-  if S.RemorselessWinter:IsReady() and (VarRWBuffs and VarSendingCDs and (not S.ArcticAssault:IsAvailable() or Player:BuffDown(S.PillarofFrostBuff))) then
-    if Cast(S.RemorselessWinter, nil, nil, not Target:IsInMeleeRange(8)) then return "remorseless_winter cooldowns 10"; end
+    if Everyone.CastCycle(S.ReapersMark, EnemiesMelee, EvaluateCycleReapersMarkCDs, not Target:IsInMeleeRange(5)) then return "reapers_mark cooldowns 10"; end
   end
   -- empower_rune_weapon,if=talent.obliteration&!talent.breath_of_sindragosa&buff.pillar_of_frost.up|fight_remains<20
   if S.EmpowerRuneWeapon:IsCastable() and (S.Obliteration:IsAvailable() and not S.BreathofSindragosa:IsAvailable() and Player:BuffUp(S.PillarofFrostBuff) or BossFightRemains < 20) then
@@ -420,8 +420,8 @@ local function Cooldowns()
   if S.PillarofFrost:IsCastable() and (not S.Obliteration:IsAvailable() and not S.BreathofSindragosa:IsAvailable() and VarSendingCDs) then
     if Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cooldowns 22"; end
   end
-  -- breath_of_sindragosa,if=!buff.breath_of_sindragosa.up&cooldown.empower_rune_weapon.remains_expected<15&runic_power>variable.breath_rp_threshold&(variable.adds_remain|variable.st_planning|fight_remains<30)
-  if S.BreathofSindragosa:IsReady() and (Player:BuffDown(S.BreathofSindragosa) and S.EmpowerRuneWeapon:CooldownRemains() < 15 and Player:RunicPower() > VarBreathRPThreshold and (VarAddsRemain or VarSTPlanning or BossFightRemains < 30)) then
+  -- breath_of_sindragosa,if=!buff.breath_of_sindragosa.up&cooldown.empower_rune_weapon.remains_expected<15&runic_power>variable.breath_rp_threshold&(variable.adds_remain|variable.st_planning|fight_remains<30)|(time<10&rune<1)
+  if S.BreathofSindragosa:IsReady() and (Player:BuffDown(S.BreathofSindragosa) and S.EmpowerRuneWeapon:CooldownRemains() < 15 and Player:RunicPower() > VarBreathRPThreshold and (VarAddsRemain or VarSTPlanning or BossFightRemains < 30) or (HL.CombatTime() < 10 and Player:Rune() < 1)) then
     if Cast(S.BreathofSindragosa, Settings.Frost.GCDasOffGCD.BreathOfSindragosa, nil, not Target:IsInRange(12)) then return "breath_of_sindragosa cooldowns 24"; end
   end
   -- frostwyrms_fury,if=hero_tree.rider_of_the_apocalypse&talent.apocalypse_now&(!talent.breath_of_sindragosa&variable.sending_cds|buff.breath_of_sindragosa.up&buff.pillar_of_frost.up)|fight_remains<20
@@ -463,10 +463,12 @@ local function HighPrioActions()
   -- Note: Not handling external buffs.
   -- mind_freeze,if=target.debuff.casting.react
   local ShouldReturn = Everyone.Interrupt(S.MindFreeze, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
-  -- antimagic_shell,if=runic_power.deficit>40&death_knight.first_ams_cast<time
+  -- antimagic_shell,if=runic_power.deficit>40&death_knight.first_ams_cast<time&(!talent.breath_of_sindragosa|talent.breath_of_sindragosa&cooldown.breath_of_sindragosa.remains>cooldown.antimagic_shell.duration)
   -- In simc, the default of this setting is 20s.
   -- TODO: Maybe make this a setting?
-  if Settings.Commons.UseAMSAMZOffensively and CDsON() and S.AntiMagicShell:IsCastable() and (Player:RunicPowerDeficit() > 40 and 20 < HL.CombatTime()) then
+  local VarAMSCD = S.AntiMagicBarrier:IsAvailable() and 40 or 60
+  VarAMSCD = S.UnyieldingWill:IsAvailable() and VarAMSCD + 20 or VarAMSCD
+  if Settings.Commons.UseAMSAMZOffensively and CDsON() and S.AntiMagicShell:IsCastable() and (Player:RunicPowerDeficit() > 40 and 20 < HL.CombatTime() and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemains() > VarAMSCD)) then
     if Cast(S.AntiMagicShell, Settings.CommonsOGCD.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell high_prio_actions 2"; end
   end
   -- howling_blast,if=!dot.frost_fever.ticking&active_enemies>=2&((!talent.obliteration|talent.obliteration&(!cooldown.pillar_of_frost.ready|buff.pillar_of_frost.up&!buff.killing_machine.react))|(equipped.fyralath_the_dreamrender&!dot.mark_of_fyralath.ticking))
@@ -672,12 +674,12 @@ local function Trinkets()
     if I.AlgetharPuzzleBox:IsEquippedAndReady() and (Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() < 2 and (not S.BreathofSindragosa:IsAvailable() or Player:RunicPower() > 60 and (Player:BuffUp(S.BreathofSindragosa) or S.BreathofSindragosa:CooldownRemains() < 2))) then
       if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box trinkets 4"; end
     end
-    -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(talent.obliteration&buff.pillar_of_frost.remains>10&(!variable.rp_buffs|cooldown.empower_rune_weapon.max_charges<2&buff.empower_rune_weapon.up)|!talent.obliteration)&(!buff.pillar_of_frost.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&(buff.breath_of_sindragosa.up|buff.pillar_of_frost.up)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
-    if Trinket1:IsReady() and (VarTrinket1Buffs and not VarTrinket1Manual and (S.Obliteration:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 and (not VarRPBuffs or S.EmpowerRuneWeapon:MaxCharges() < 2 and Player:BuffUp(S.EmpowerRuneWeaponBuff)) or not S.Obliteration:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and VarTrinket1Spell:CastTime() > 0) and (Player:BuffUp(S.BreathofSindragosa) or Player:BuffUp(S.PillarofFrostBuff)) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= FightRemains) then
+    -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!talent.breath_of_sindragosa&buff.pillar_of_frost.remains>10|talent.breath_of_sindragosa)&(!buff.pillar_of_frost.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&(buff.breath_of_sindragosa.up&buff.pillar_of_frost.up)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
+    if Trinket1:IsReady() and (VarTrinket1Buffs and not VarTrinket1Manual and (not S.BreathofSindragosa:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 or S.BreathofSindragosa:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and VarTrinket1Spell:CastTime() > 0 or VarTrinket1Spell:CastTime() == 0) and (Player:BuffUp(S.BreathofSindragosa) or Player:BuffUp(S.PillarofFrostBuff)) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= FightRemains) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " trinkets 6"; end
     end
-    -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(talent.obliteration&buff.pillar_of_frost.remains>10&(!variable.rp_buffs|cooldown.empower_rune_weapon.max_charges<2&buff.empower_rune_weapon.up)|!talent.obliteration)&(!buff.pillar_of_frost.up&trinket.2.cast_time>0|!trinket.2.cast_time>0)&(buff.breath_of_sindragosa.up|buff.pillar_of_frost.up)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
-    if Trinket2:IsReady() and (VarTrinket2Buffs and not VarTrinket2Manual and (S.Obliteration:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 and (not VarRPBuffs or S.EmpowerRuneWeapon:MaxCharges() < 2 and Player:BuffUp(S.EmpowerRuneWeaponBuff)) or not S.Obliteration:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and VarTrinket2Spell:CastTime() > 0) and (Player:BuffUp(S.BreathofSindragosa) or Player:BuffUp(S.PillarofFrostBuff)) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= FightRemains) then
+    -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!talent.breath_of_sindragosa&buff.pillar_of_frost.remains>10|talent.breath_of_sindragosa)&(!buff.pillar_of_frost.up&trinket.2.cast_time>0|!trinket.2.cast_time>0)&(buff.breath_of_sindragosa.up&buff.pillar_of_frost.up)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
+    if Trinket2:IsReady() and (VarTrinket2Buffs and not VarTrinket2Manual and (not S.BreathofSindragosa:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 or S.BreathofSindragosa:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and VarTrinket2Spell:CastTime() > 0 or VarTrinket2Spell:CastTime() == 0) and (Player:BuffUp(S.BreathofSindragosa) or Player:BuffUp(S.PillarofFrostBuff)) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= FightRemains) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " trinkets 8"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&((variable.damage_trinket_priority=1|trinket.2.cooldown.remains)|(trinket.1.cast_time>0&!buff.pillar_of_frost.up|!trinket.1.cast_time>0&cooldown.pillar_of_frost.remains>20)|talent.pillar_of_frost&cooldown.pillar_of_frost.remains_expected>20|!talent.pillar_of_frost)

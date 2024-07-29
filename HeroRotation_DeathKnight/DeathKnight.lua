@@ -28,6 +28,7 @@ Spell.DeathKnight.Commons = {
   DeathCoil                             = Spell(47541),
   -- Talents
   AbominationLimb                       = Spell(383269),
+  AntiMagicBarrier                      = Spell(205727),
   AntiMagicShell                        = Spell(48707),
   AntiMagicZone                         = Spell(51052),
   Asphyxiate                            = Spell(221562),
@@ -43,6 +44,7 @@ Spell.DeathKnight.Commons = {
   SacrificialPact                       = Spell(327574),
   SoulReaper                            = Spell(343294),
   UnholyGround                          = Spell(374265),
+  UnyieldingWill                        = Spell(457574),
   -- Buffs
   AbominationLimbBuff                   = Spell(383269),
   DeathAndDecayBuff                     = Spell(188290),
