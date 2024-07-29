@@ -217,7 +217,7 @@ local function MultiTarget()
   end
   -- bloodbath,if=buff.furious_bloodthirst.up
   if S.Bloodbath:IsCastable() and (Player:BuffUp(S.FuriousBloodthirstBuff)) then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst multi_target 24"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath multi_target 24"; end
   end
   -- crushing_blow
   if S.CrushingBlow:IsCastable() then
@@ -229,7 +229,7 @@ local function MultiTarget()
   end
   -- bloodbath,if=!dot.gushing_wound.remains
   if S.Bloodbath:IsCastable() and (Player:BuffUp(S.FuriousBloodthirstBuff)) then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst multi_target 30"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath multi_target 30"; end
   end
   -- rampage,if=talent.reckless_abandon
   if S.Rampage:IsReady() and (S.RecklessAbandon:IsAvailable()) then
@@ -241,7 +241,7 @@ local function MultiTarget()
   end
   -- bloodbath
   if S.Bloodbath:IsCastable() then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst multi_target 36"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath multi_target 36"; end
   end
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
