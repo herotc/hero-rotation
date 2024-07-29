@@ -501,7 +501,7 @@ local function EmpoweredFiller()
   end
   -- mind_flay,target_if=max:dot.devouring_plague.remains,if=buff.mind_flay_insanity.up
   if S.MindFlay:IsCastable() and (Player:BuffUp(S.MindFlayInsanityBuff)) then
-    if Everyone.CastTargetIf(S.MindSpike, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.MindSpike)) then return "mind_flay empowered_filler 4"; end
+    if Everyone.CastTargetIf(S.MindFlay, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay empowered_filler 4"; end
   end
 end
 
