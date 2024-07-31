@@ -10,8 +10,8 @@
 
 Settings.lua
 Monk.lua
+Events.lua
 Brewmaster.lua
 Windwalker.lua
 Mistweaver.lua
-Events.lua
 Overrides.lua

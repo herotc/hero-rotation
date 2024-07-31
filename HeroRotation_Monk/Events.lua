@@ -14,6 +14,7 @@ local Spell = HL.Spell
 local Item = HL.Item
 -- HeroRotation
 local HR = HeroRotation
+HR.Commons.Monk = {}
 local Monk = HR.Commons.Monk
 -- Lua
 local C_Timer = C_Timer
@@ -238,6 +239,35 @@ HL:RegisterForCombatEvent(
     local DestGUID = select(8, ...)
     if DestGUID == Monk.NiuzaoGUID then
       Monk.NiuzaoGUID = 0
+    end
+  end
+  , "UNIT_DIED"
+)
+
+-- Track Xuen, the White Tiger
+Monk.Xuen = {}
+Monk.Xuen.Active = false
+Monk.Xuen.GUID = 0
+Monk.Xuen.SummonTime = 0
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local destGUID, _, _, _, spellID = select(8, ...)
+    if spellID == 123904 then
+      Monk.Xuen.Active = true
+      Monk.Xuen.GUID = destGUID
+      Monk.Xuen.SummonTime = GetTime()
+    end
+  end
+  , "SPELL_SUMMON"
+)
+
+HL:RegisterForCombatEvent(
+  function(...)
+    local destGUID = select(8, ...)
+    if destGUID == Monk.Xuen.GUID then
+      Monk.Xuen.Active = false
+      Monk.Xuen.GUID = 0
+      Monk.Xuen.SummonTime = 0
     end
   end
   , "UNIT_DIED"
