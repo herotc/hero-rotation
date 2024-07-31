@@ -273,7 +273,7 @@ local function AR()
   -- variable,name=rg_enhance_cleave,op=setif,condition=variable.big_aoe|fight_remains<10,value=1,value_else=0
   VarRGEnhCleave = (VarBigAoE or BossFightRemains < 10) and 1 or 0
   -- variable,name=cooldown_sync,value=(debuff.reavers_mark.up&buff.thrill_of_the_fight_damage.up)|fight_remains<20
-  VarCDSync = (Target:DebuffUp(S.ReaversMarkDebuff) and Player:BuffUp(S.ThrilloftheFightDmgBuff)) or BossFightRemains < 20
+  VarCDSync = (Target:DebuffUp(S.ReaversMarkDebuff) and Player:BuffUp(S.ThrilloftheFightDmgBuff)) or Player:Level() <= 70 or BossFightRemains < 20
   -- potion,use_off_gcd=1,if=variable.cooldown_sync
   if Settings.Commons.Enabled.Potions and VarCDSync then
     local PotionSelected = Everyone.PotionSelected()
