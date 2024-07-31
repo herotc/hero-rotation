@@ -341,7 +341,7 @@ local function AR()
   end
   -- fiery_brand,if=!talent.fiery_demise|(talent.fiery_demise&((talent.down_in_flames&charges>=max_charges)|(active_dot.fiery_brand=0)))
   if S.FieryBrand:IsCastable() and (not S.FieryDemise:IsAvailable() or (S.FieryDemise:IsAvailable() and ((S.DowninFlames:IsAvailable() and S.FieryBrand:Charges() >= S.FieryBrand:MaxCharges()) or (S.FieryBrandDebuff:AuraActiveCount() == 0)))) then
-    if Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand ar 22"; end
+    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand ar 22"; end
   end
   -- fel_devastation,if=talent.spirit_bomb&!variable.can_spb&(variable.can_spb_soon|soul_fragments.inactive>=2)
   if S.FelDevastation:IsReady() and (S.SpiritBomb:IsAvailable() and not VarCanSpB and (VarCanSpBSoon or IncSoulFragments >= 2)) then
@@ -439,7 +439,7 @@ end
 local function FelDevPrep()
   -- fiery_brand,if=talent.fiery_demise&((talent.darkglare_boon&fury>=70)|(!talent.darkglare_boon&fury>=100))&(variable.can_spburst|variable.can_spburst_soon)&active_dot.fiery_brand=0&(cooldown.metamorphosis.up|cooldown.metamorphosis.remains<(gcd.remains+execute_time+action.fel_devastation.execute_time+(gcd.max*2)))
   if S.FieryBrand:IsCastable() and (S.FieryDemise:IsAvailable() and DGBFury(70, 100) and (VarCanSpBurst or VarCanSpBurstSoon) and S.FieryBrandDebuff:AuraActiveCount() == 0 and (S.Metamorphosis:CooldownUp() or S.Metamorphosis:CooldownRemains() < (Player:GCDRemains() + S.FieryBrand:ExecuteTime() + S.FelDevastation:ExecuteTime() + (Player:GCD() * 2)))) then
-    if Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fel_dev_prep 2"; end
+    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fel_dev_prep 2"; end
   end
   -- fel_devastation,if=((talent.darkglare_boon&fury>=70)|(!talent.darkglare_boon&fury>=100))&(variable.can_spburst|variable.can_spburst_soon)
   if S.FelDevastation:IsReady() and (DGBFury(70, 100) and (VarCanSpBurst or VarCanSpBurstSoon)) then
@@ -486,7 +486,7 @@ local function FSExecute()
   end
   -- fiery_brand
   if S.FieryBrand:IsCastable() then
-    if Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fs_execute 8"; end
+    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fs_execute 8"; end
   end
   -- sigil_of_spite
   if S.SigilofSpite:IsCastable() then
@@ -509,7 +509,7 @@ local function MetaPrep()
   end
   -- fiery_brand,if=talent.fiery_demise&active_dot.fiery_brand=0
   if S.FieryBrand:IsCastable() and (S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() == 0) then
-    if Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand meta_prep 4"; end
+    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand meta_prep 4"; end
   end
   -- potion,use_off_gcd=1
   if Settings.Commons.Enabled.Potions then
@@ -644,7 +644,7 @@ local function FS()
   end
   -- fiery_brand,if=!talent.fiery_demise|talent.fiery_demise&((talent.down_in_flames&charges>=max_charges)|(active_dot.fiery_brand=0&variable.fiery_brand_back_before_meta))
   if S.FieryBrand:IsCastable() and (not S.FieryDemise:IsAvailable() or S.FieryDemise:IsAvailable() and ((S.DowninFlames:IsAvailable() and S.FieryBrand:Charges() >= S.FieryBrand:MaxCharges()) or (S.FieryBrandDebuff:AuraActiveCount() == 0 and VarFBBeforeMeta))) then
-    if Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fs 6"; end
+    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fs 6"; end
   end
   -- use_items,use_off_gcd=1,if=!buff.metamorphosis.up
   if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) and Player:BuffDown(S.MetamorphosisBuff) then
