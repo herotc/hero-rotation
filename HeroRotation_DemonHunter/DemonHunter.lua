@@ -38,13 +38,16 @@ Spell.DemonHunter.Commons = {
   FirstoftheIllidari                    = Spell(235893),
   FoddertotheFlame                      = Spell(391429),
   QuickenedSigils                       = Spell(209281),
-  SigilofFlame                          = MultiSpell(204596, 389810), -- 204596: Base ID, 389810: Precise
-  SigilofMisery                         = MultiSpell(207684, 389813), -- 207684: Base ID, 389813: Precise
   SoulSigils                            = Spell(395446),
   StudentofSuffering                    = Spell(452412),
   TheHunt                               = Spell(370965),
   UnhinderedAssault                     = Spell(444931),
   VengefulRetreat                       = Spell(198793),
+  -- Sigils
+  SigilofChains                         = MultiSpell(202138, 389807),
+  SigilofFlame                          = MultiSpell(204596, 389810), -- 204596: Base ID, 389810: Precise
+  SigilofMisery                         = MultiSpell(207684, 389813), -- 207684: Base ID, 389813: Precise
+  SigilofSilence                        = MultiSpell(202137, 389809),
   -- Utility
   Disrupt                               = Spell(183752),
   -- Debuffs
@@ -162,6 +165,8 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   IlluminatedSigils                     = Spell(428557),
   SoulCarver                            = Spell(207407),
   SpiritBomb                            = Spell(247454),
+  -- Sigils
+  
   -- Utility
   Metamorphosis                         = Spell(187827),
   -- Buffs

@@ -163,7 +163,7 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     return OldSVIsReady(self, "Melee", AoESpell, ThisUnit, BypassRecovery, Offset)
   else
     local BaseCheck = OldSVIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    if self == SpellSV.Carve or self == SpellSV.Butchery then
+    if self == SpellSV.Butchery then
       return BaseCheck and (Player:BuffDown(SpellSV.AspectoftheEagle) or Player:BuffUp(SpellSV.AspectoftheEagle) and Target:IsInMeleeRange(8))
     else
       return BaseCheck

@@ -50,8 +50,6 @@ HL.AddCoreOverride ("Player.Insanity",
         return Insanity + 4
       elseif Player:IsCasting(SpellShadow.MindFlay) then
         return Insanity + (12 / SpellShadow.MindFlay:BaseDuration())
-      elseif Player:IsCasting(SpellShadow.DarkVoid) then
-        return Insanity + 15
       elseif Player:IsCasting(SpellShadow.DarkAscension) then
         return Insanity + 30
       elseif Player:IsCasting(SpellShadow.VoidTorrent) then
@@ -80,7 +78,7 @@ OldShadowIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local BaseCheck = OldShadowIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellShadow.VampiricTouch then
-      return BaseCheck and (not SpellShadow.ShadowCrash:InFlight() or SpellShadow.ShadowCrash:TimeSinceLastCast() > Player:GCD()) and (SpellShadow.UnfurlingDarkness:IsAvailable() or not Player:IsCasting(self))
+      return BaseCheck and (not SpellShadow.ShadowCrash:InFlight() or SpellShadow.ShadowCrash:TimeSinceLastCast() > Player:GCD()) and (not SpellShadow.ShadowCrashTarget:InFlight() or SpellShadow.ShadowCrashTarget:TimeSinceLastCast() > Player:GCD()) and (SpellShadow.UnfurlingDarkness:IsAvailable() or not Player:IsCasting(self))
     elseif self == SpellShadow.MindBlast then
       return BaseCheck and not (self:Charges() == 1 and Player:IsCasting(self))
     elseif self == SpellShadow.VoidEruption or self == SpellShadow.DarkAscension then
