@@ -23,6 +23,8 @@ BMOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     local BaseCheck = BMOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellBM.TouchofDeath then
       return BaseCheck and self:IsUsable()
+    elseif self == SpellBM.ChiBurst then
+      return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
     end
