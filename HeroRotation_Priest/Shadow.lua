@@ -589,10 +589,10 @@ local function Main()
   if EnemiesCount10ySplash < 3 then
     VarDotsUp = S.VampiricTouchDebuff:AuraActiveCount() == EnemiesCount10ySplash or Crash:InFlight() and S.WhisperingShadows:IsAvailable() or Player:IsCasting(S.VampiricTouch) and S.Misery:IsAvailable()
   end
-  -- variable,name=pooling_mindblasts,op=setif,value=1,value_else=0,condition=(cooldown.void_torrent.remains<?(variable.holding_crash*raid_event.adds.in))<=gcd.max*4,if=talent.void_blast
+  -- variable,name=pooling_mindblasts,op=setif,value=1,value_else=0,condition=(cooldown.void_torrent.remains<?(variable.holding_crash*raid_event.adds.in))<=gcd.max*(1+talent.mind_melt*3),if=talent.void_blast
   VarPoolingMindblasts = false
   if S.VoidBlast:IsAvailable() then
-    VarPoolingMindblasts = S.VoidTorrent:CooldownRemains() <= GCDMax * 4
+    VarPoolingMindblasts = S.VoidTorrent:CooldownRemains() <= GCDMax * (1 + num(S.MindMelt:IsAvailable()) * 3)
   end
   -- call_action_list,name=cds,if=fight_remains<30|target.time_to_die>15&(!variable.holding_crash|active_enemies>2)
   if CDsON() and (FightRemains < 30 or Target:TimeToDie() > 15 and (not VarHoldingCrash or EnemiesCount10ySplash > 2)) then
