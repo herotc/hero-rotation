@@ -37,24 +37,12 @@ local I = Item.Mage.Frost
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.BalefireBranch:ID(),
   I.BelorrelostheSuncaller:ID(),
   I.Dreambinder:ID(),
   I.SpoilsofNeltharus:ID(),
 }
 
--- Rotation Var
-local EnemiesCount8ySplash, EnemiesCount16ySplash --Enemies arround target
-local EnemiesCount15yMelee  --Enemies arround player
-local Enemies16ySplash
-local RemainingWintersChill = 0
-local Icicles = 0
-local var_snowstorm_max_stack = 15
-local BossFightRemains = 11111
-local FightRemains = 11111
-local GCDMax
-
--- GUI Settings
+--- ===== GUI Settings =====
 local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
@@ -64,6 +52,29 @@ local Settings = {
   Frost = HR.GUISettings.APL.Mage.Frost
 }
 
+--- ===== Rotation Variables =====
+local EnemiesCount8ySplash, EnemiesCount16ySplash --Enemies arround target
+local Enemies16ySplash
+local RemainingWintersChill = 0
+local Icicles = 0
+local PlayerMaxLevel = 70 -- Check Enum for a max player level value
+local BossFightRemains = 11111
+local FightRemains = 11111
+local GCDMax
+
+--- ===== Event Registrations =====
+HL:RegisterForEvent(function()
+  S.Frostbolt:RegisterInFlightEffect(228597)
+  S.Frostbolt:RegisterInFlight()
+  S.FrozenOrb:RegisterInFlightEffect(84721)
+  S.FrozenOrb:RegisterInFlight()
+  S.Flurry:RegisterInFlightEffect(228354)
+  S.Flurry:RegisterInFlight()
+  S.GlacialSpike:RegisterInFlightEffect(228600)
+  S.GlacialSpike:RegisterInFlight()
+  S.IceLance:RegisterInFlightEffect(228598)
+  S.IceLance:RegisterInFlight()
+end, "LEARNED_SPELL_IN_TAB")
 S.Frostbolt:RegisterInFlightEffect(228597)
 S.Frostbolt:RegisterInFlight()
 S.FrozenOrb:RegisterInFlightEffect(84721)
@@ -76,23 +87,15 @@ S.IceLance:RegisterInFlightEffect(228598)
 S.IceLance:RegisterInFlight()
 
 HL:RegisterForEvent(function()
-  S.FrozenOrb:RegisterInFlightEffect(84721)
-  S.FrozenOrb:RegisterInFlight()
-  S.Flurry:RegisterInFlightEffect(228354)
-  S.Flurry:RegisterInFlight()
-  S.GlacialSpike:RegisterInFlightEffect(228600)
-  S.GlacialSpike:RegisterInFlight()
-end, "LEARNED_SPELL_IN_TAB")
-
-HL:RegisterForEvent(function()
   BossFightRemains = 11111
   FightRemains = 11111
   RemainingWintersChill = 0
 end, "PLAYER_REGEN_ENABLED")
 
+--- ===== Helper Functions =====
 local function Freezable(Tar)
   if Tar == nil then Tar = Target end
-  return (not Tar:IsInBossList() or Tar:Level() < 73)
+  return (not Tar:IsInBossList() or Tar:Level() < PlayerMaxLevel + 3)
 end
 
 local function FrozenRemains()
@@ -108,18 +111,13 @@ local function CalculateWintersChill(enemies)
   return WCStacks
 end
 
--- CastTargetIf/CastCycle Functions
+--- ===== CastTargetIf Filter Functions
 local function EvaluateTargetIfFilterWCStacks(TargetUnit)
   -- target_if=min:debuff.winters_chill.stack
   return (TargetUnit:DebuffStack(S.WintersChillDebuff))
 end
 
-local function EvaluateTargetIfILCleave(TargetUnit)
-  -- if=talent.glacial_spike&debuff.winters_chill.down&buff.icicles.react=4&buff.fingers_of_frost.react
-  -- Note: All but debuff handled before the CastCycle
-  return (TargetUnit:DebuffDown(S.WintersChillDebuff))
-end
-
+--- ===== Rotation Functions =====
 local function Precombat()
   -- flask
   -- food
@@ -129,7 +127,7 @@ local function Precombat()
     if Cast(S.ArcaneIntellect, Settings.CommonsOGCD.GCDasOffGCD.ArcaneIntellect) then return "arcane_intellect precombat 2"; end
   end
   -- snapshot_stats
-  -- blizzard,if=active_enemies>=2&talent.ice_caller|active_enemies>=3
+  -- blizzard,if=active_enemies>=2&talent.ice_caller&!talent.fractured_frost|active_enemies>=3
   -- Note: Can't check active_enemies in Precombat
   -- frostbolt,if=active_enemies<=2
   if S.Frostbolt:IsCastable() and not Player:IsCasting(S.Frostbolt) then
@@ -138,50 +136,39 @@ local function Precombat()
 end
 
 local function Cooldowns()
-  -- time_warp,if=buff.exhaustion.up&talent.temporal_warp&buff.bloodlust.down&(prev_off_gcd.icy_veins|(buff.icy_veins.up&fight_remains<=110|buff.icy_veins.up&fight_remains>=280)|fight_remains<40)
-  -- Note: Keeping this as TemporalWarp time_warp, as we won't suggest time_warp otherwise.
-  if Settings.Commons.UseTemporalWarp and S.TimeWarp:IsCastable() and (Player:BloodlustExhaustUp() and S.TemporalWarp:IsAvailable() and Player:BloodlustDown() and (Player:PrevOffGCDP(1, S.IcyVeins) or (Player:BuffUp(S.IcyVeinsBuff) and FightRemains <= 110 or Player:BuffUp(S.IcyVeinsBuff) and FightRemains >= 280) or FightRemains < 40)) then
-    if Cast(S.TimeWarp, Settings.CommonsOGCD.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 2"; end
-  end
-  -- use_item,name=spoils_of_neltharus,if=buff.spoils_of_neltharus_mastery.up|buff.spoils_of_neltharus_haste.up&buff.bloodlust.down&buff.temporal_warp.down&time>0|buff.spoils_of_neltharus_vers.up&(buff.bloodlust.up|buff.temporal_warp.up)
-  if I.SpoilsofNeltharus:IsEquippedAndReady() and (Player:BuffUp(S.SpoilsofNeltharusMastery) or Player:BuffUp(S.SpoilsofNeltharusHaste) and Player:BloodlustDown() and Player:BuffDown(S.TemporalWarpBuff) or Player:BuffUp(S.SpoilsofNeltharusVers) and (Player:BloodlustUp() or Player:BuffUp(S.TemporalWarpBuff))) then
-    if Cast(I.SpoilsofNeltharus, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spoils_of_neltharus cd 4"; end
+  -- use_item,name=spoils_of_neltharus,if=buff.spoils_of_neltharus_mastery.up|buff.spoils_of_neltharus_haste.up&buff.bloodlust.down|buff.spoils_of_neltharus_vers.up&(buff.bloodlust.up)
+  if I.SpoilsofNeltharus:IsEquippedAndReady() and (Player:BuffUp(S.SpoilsofNeltharusMastery) or Player:BuffUp(S.SpoilsofNeltharusHaste) and Player:BloodlustDown() or Player:BuffUp(S.SpoilsofNeltharusVers) and Player:BloodlustUp()) then
+    if Cast(I.SpoilsofNeltharus, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spoils_of_neltharus cd 2"; end
   end
   -- potion,if=prev_off_gcd.icy_veins|fight_remains<60
   if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.IcyVeinsBuff) or FightRemains < 60) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion cd 6"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion cd 4"; end
     end
   end
   -- use_item,name=dreambinder_loom_of_the_great_cycle,if=(equipped.nymues_unraveling_spindle&prev_gcd.1.nymues_unraveling_spindle)|fight_remains>2
   if Settings.Commons.Enabled.Items and I.Dreambinder:IsEquippedAndReady() and ((I.NymuesUnravelingSpindle:IsEquipped() and Player:PrevGCDP(1, I.NymuesUnravelingSpindle)) or FightRemains > 2) then
-    if Cast(I.Dreambinder, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle cd 8"; end
+    if Cast(I.Dreambinder, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(45)) then return "dreambinder_loom_of_the_great_cycle cd 6"; end
   end
-  if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=belorrelos_the_suncaller,if=time>5&!prev_gcd.1.flurry
-    if I.BelorrelostheSuncaller:IsEquippedAndReady() and (HL.CombatTime() > 5 and not Player:PrevGCDP(1, S.Flurry)) then
-      if Cast(I.BelorrelostheSuncaller, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller cd 10"; end
-    end
-    -- use_item,name=balefire_branch,if=(!talent.ray_of_frost&active_enemies<=2&buff.icy_veins.up&prev_gcd.1.glacial_spike|remaining_winters_chill=1&cooldown.ray_of_frost.up&time>1&active_enemies<=2|cooldown.cone_of_cold.up&prev_gcd.1.comet_storm&active_enemies>=3)|fight_remains<20
-    if I.BalefireBranch:IsEquippedAndReady() and ((not S.RayofFrost:IsAvailable() and EnemiesCount16ySplash <= 2 and Player:BuffUp(S.IcyVeinsBuff) and Player:PrevGCDP(1, S.GlacialSpike) or RemainingWintersChill == 1 and S.RayofFrost:CooldownUp() and HL.CombatTime() > 1 and EnemiesCount16ySplash <= 2 or S.ConeofCold:CooldownUp() and Player:PrevGCDP(1, S.CometStorm) and EnemiesCount16ySplash >= 3) or FightRemains < 20) then
-      if Cast(I.BalefireBranch, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "balefire_branch cd 12"; end
-    end
+  -- use_item,name=belorrelos_the_suncaller,if=time>5&!prev_gcd.1.flurry
+  if Settings.Commons.Enabled.Trinkets and I.BelorrelostheSuncaller:IsEquippedAndReady() and (HL.CombatTime() > 5 and not Player:PrevGCDP(1, S.Flurry)) then
+    if Cast(I.BelorrelostheSuncaller, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller cd 8"; end
   end
   -- flurry,if=time=0&active_enemies<=2
   -- Note: Can't get target count at time=0
   -- icy_veins
   if S.IcyVeins:IsCastable() then
-    if Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cd 14"; end
+    if Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cd 10"; end
   end
-  -- use_items,if=!equipped.balfire_branch|time>5
-  if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) and (not I.BalefireBranch:IsEquipped() or HL.CombatTime() > 5) then
+  -- Manually added: use_items
+  if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
       local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
       if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
       if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
-        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " cd 12"; end
       end
     end
   end
@@ -190,23 +177,23 @@ local function Cooldowns()
   -- Note: Not handling external buffs.
   -- blood_fury
   if S.BloodFury:IsCastable() then
-    if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury cd 16"; end
+    if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury cd 14"; end
   end
   -- berserking
   if S.Berserking:IsCastable() then
-    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking cd 18"; end
+    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking cd 16"; end
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
-    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cd 20"; end
+    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cd 18"; end
   end
   -- fireblood
   if S.Fireblood:IsCastable() then
-    if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood cd 22"; end
+    if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood cd 20"; end
   end
   -- ancestral_call
   if S.AncestralCall:IsCastable() then
-    if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call cd 24"; end
+    if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call cd 22"; end
   end
 end
 
@@ -249,48 +236,48 @@ local function Aoe()
   if S.Blizzard:IsCastable() and (not Player:PrevGCDP(1, S.GlacialSpike) or not Freezable()) then
     if Cast(S.Blizzard, Settings.Frost.GCDasOffGCD.Blizzard, nil, not Target:IsInRange(40)) then return "blizzard aoe 6"; end
   end
+  -- frostbolt,if=buff.icy_veins.up&(buff.deaths_chill.stack<9|buff.deaths_chill.stack=9&!action.frostbolt.in_flight)&buff.icy_veins.remains>8&talent.deaths_chill
+  if S.Frostbolt:IsReady() and (Player:BuffUp(S.IcyVeinsBuff) and (Player:BuffStack(S.DeathsChillBuff) < 9 or Player:BuffStack(S.DeathsChillBuff) == 0 and not S.Frostbolt:InFlight()) and Player:BuffRemains(S.IcyVeinsBuff) > 8 and S.DeathsChill:IsAvailable()) then
+    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 8"; end
+  end
   -- comet_storm,if=!prev_gcd.1.glacial_spike&(!talent.coldest_snap|cooldown.cone_of_cold.ready&cooldown.frozen_orb.remains>25|cooldown.cone_of_cold.remains>20)
   if S.CometStorm:IsCastable() and (not Player:PrevGCDP(1, S.GlacialSpike) and (not S.ColdestSnap:IsAvailable() or S.ConeofCold:CooldownUp() and S.FrozenOrb:CooldownRemains() > 25 or S.ConeofCold:CooldownRemains() > 20)) then
-    if Cast(S.CometStorm, Settings.Frost.GCDasOffGCD.CometStorm, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm aoe 8"; end
+    if Cast(S.CometStorm, Settings.Frost.GCDasOffGCD.CometStorm, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm aoe 10"; end
   end
-  -- freeze,if=freez&debuff.frozen.down&(!talent.glacial_spike&!talent.snowstorm|prev_gcd.1.glacial_spike|cooldown.cone_of_cold.ready&buff.snowstorm.stack=buff.snowstorm.max_stack)
-  if Pet:IsActive() and S.Freeze:IsReady() and (Freezable() and FrozenRemains() == 0 and (not S.GlacialSpike:IsAvailable() and not S.Snowstorm:IsAvailable() or Player:PrevGCDP(1, S.GlacialSpike) or S.ConeofCold:CooldownUp() and Player:BuffStack(S.SnowstormBuff) == var_snowstorm_max_stack)) then
-    if Cast(S.Freeze, nil, nil, not Target:IsSpellInRange(S.Freeze)) then return "freeze aoe 10"; end
+  -- freeze,if=freezable&debuff.frozen.down&(!talent.glacial_spike|prev_gcd.1.glacial_spike)
+  if Pet:IsActive() and S.Freeze:IsReady() and (Freezable() and FrozenRemains() == 0 and (not S.GlacialSpike:IsAvailable() or Player:PrevGCDP(1, S.GlacialSpike))) then
+    if Cast(S.Freeze, nil, nil, not Target:IsSpellInRange(S.Freeze)) then return "freeze aoe 12"; end
   end
-  -- ice_nova,if=freezable&!prev_off_gcd.freeze&(prev_gcd.1.glacial_spike|cooldown.cone_of_cold.ready&buff.snowstorm.stack=buff.snowstorm.max_stack&gcd.max<1)
-  if S.IceNova:IsCastable() and (Freezable() and not Player:PrevOffGCDP(1, S.Freeze) and (Player:PrevGCDP(1, S.GlacialSpike) or S.ConeofCold:CooldownUp() and Player:BuffStack(S.SnowstormBuff) == var_snowstorm_max_stack and GCDMax < 1)) then
-    if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova aoe 12"; end
+  -- ice_nova,if=freezable&!prev_off_gcd.freeze&(prev_gcd.1.glacial_spike)
+  if S.IceNova:IsCastable() and (Freezable() and not Player:PrevOffGCDP(1, S.Freeze) and Player:PrevGCDP(1, S.GlacialSpike)) then
+    if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova aoe 14"; end
   end
-  -- frost_nova,if=freezable&!prev_off_gcd.freeze&(prev_gcd.1.glacial_spike&!remaining_winters_chill|cooldown.cone_of_cold.ready&buff.snowstorm.stack=buff.snowstorm.max_stack&gcd.max<1)
-  if S.FrostNova:IsCastable() and (Freezable() and not Player:PrevOffGCDP(1, S.Freeze) and (Player:PrevGCDP(1, S.GlacialSpike) and RemainingWintersChill == 0 or S.ConeofCold:CooldownUp() and Player:BuffStack(S.SnowstormBuff) == var_snowstorm_max_stack and GCDMax < 1)) then
-    if Cast(S.FrostNova, nil, nil, not Target:IsInRange(12)) then return "frost_nova aoe 14"; end
+  -- frost_nova,if=freezable&!prev_off_gcd.freeze&(prev_gcd.1.glacial_spike&!remaining_winters_chill)
+  if S.FrostNova:IsCastable() and (Freezable() and not Player:PrevOffGCDP(1, S.Freeze) and (Player:PrevGCDP(1, S.GlacialSpike) and RemainingWintersChill == 0)) then
+    if Cast(S.FrostNova, nil, nil, not Target:IsInRange(12)) then return "frost_nova aoe 16"; end
   end
-  -- cone_of_cold,if=buff.snowstorm.stack=buff.snowstorm.max_stack
-  if S.ConeofCold:IsCastable() and (Player:BuffStackP(S.SnowstormBuff) == var_snowstorm_max_stack) then
-    if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold aoe 16"; end
-  end
-  -- shifting_power
-  if S.ShiftingPower:IsCastable() and CDsON() then
+  -- shifting_power,if=cooldown.comet_storm.remains>10
+  if CDsON() and S.ShiftingPower:IsCastable() and (S.CometStorm:CooldownRemains() > 10) then
     if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power aoe 18"; end
+  end
+  -- flurry,if=cooldown_react&!debuff.winters_chill.remains&buff.icicles.react=4&talent.glacial_spike&!freezable
+  if S.Flurry:IsCastable() and (RemainingWintersChill == 0 and Icicles == 4 and S.GlacialSpike:IsAvailable() and not Freezable()) then
+    if Cast(S.Flurry, Settings.Frost.GCDasOffGCD.Flurry, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 20"; end
   end
   -- glacial_spike,if=buff.icicles.react=5&cooldown.blizzard.remains>gcd.max
   if S.GlacialSpike:IsReady() and (Icicles == 5 and S.Blizzard:CooldownRemains() > GCDMax) then
-    if Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike aoe 20"; end
+    if Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike aoe 22"; end
   end
-  -- flurry,if=!freezable&cooldown_react&!debuff.winters_chill.remains&(prev_gcd.1.glacial_spike|charges_fractional>1.8)
-  if S.Flurry:IsCastable() and (not Freezable() and RemainingWintersChill == 0 and (Player:PrevGCDP(1, S.GlacialSpike) or S.Flurry:ChargesFractional() > 1.8)) then
-    if Cast(S.Flurry, Settings.Frost.GCDasOffGCD.Flurry, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 22"; end
-  end
-  -- flurry,if=cooldown_react&!debuff.winters_chill.remains&(buff.brain_freeze.react|!buff.fingers_of_frost.react)
-  if S.Flurry:IsCastable() and (RemainingWintersChill == 0 and (Player:BuffUp(S.BrainFreezeBuff) or Player:BuffUp(S.FingersofFrostBuff))) then
+  -- flurry,if=(freezable|!talent.glacial_spike)&cooldown_react&!debuff.winters_chill.remains&(buff.brain_freeze.react|!buff.fingers_of_frost.react)
+  if S.Flurry:IsCastable() and ((not Freezable() or not S.GlacialSpike:IsAvailable()) and RemainingWintersChill == 0 and (Player:BuffUp(S.BrainFreezeBuff) or Player:BuffUp(S.FingersofFrostBuff))) then
     if Cast(S.Flurry, Settings.Frost.GCDasOffGCD.Flurry, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 24"; end
   end
   -- ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time|remaining_winters_chill
   if S.IceLance:IsReady() and (Player:BuffUp(S.FingersofFrostBuff) or FrozenRemains() > S.IceLance:TravelTime() or bool(RemainingWintersChill)) then
     if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 26"; end
   end
-  -- ice_nova,if=active_enemies>=4&(!talent.snowstorm&!talent.glacial_spike|!freezable)
-  if S.IceNova:IsCastable() and (EnemiesCount8ySplash >= 4 and (not S.Snowstorm:IsAvailable() and not S.GlacialSpike:IsAvailable() or not Freezable())) then
+  -- ice_nova,if=active_enemies>=4&(!talent.glacial_spike|!freezable)
+  if S.IceNova:IsCastable() and (EnemiesCount8ySplash >= 4 and (not S.GlacialSpike:IsAvailable() or not Freezable())) then
     if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova aoe 28"; end
   end
   -- dragons_breath,if=active_enemies>=7
@@ -345,29 +332,25 @@ local function Cleave()
   if S.ConeofCold:IsCastable() and (S.ColdestSnap:IsAvailable() and S.CometStorm:CooldownRemains() > 10 and S.FrozenOrb:CooldownRemains() > 10 and RemainingWintersChill == 0 and EnemiesCount16ySplash >= 3) then
     if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold cleave 14"; end
   end
-  -- blizzard,if=active_enemies>=2&talent.ice_caller&talent.freezing_rain&(!talent.splintering_cold&!talent.ray_of_frost|buff.freezing_rain.up|active_enemies>=3)
-  if S.Blizzard:IsCastable() and (EnemiesCount16ySplash >= 2 and S.IceCaller:IsAvailable() and S.FreezingRain:IsAvailable() and (not S.SplinteringCold:IsAvailable() and not S.RayofFrost:IsAvailable() or Player:BuffUp(S.FreezingRainBuff) or EnemiesCount16ySplash >= 3)) then
-    if Cast(S.Blizzard, Settings.Frost.GCDasOffGCD.Blizzard, nil, not Target:IsInRange(40)) then return "blizzard cleave 16"; end
-  end
   -- shifting_power,if=cooldown.frozen_orb.remains>10&(!talent.comet_storm|cooldown.comet_storm.remains>10)&(!talent.ray_of_frost|cooldown.ray_of_frost.remains>10)|cooldown.icy_veins.remains<20
   if S.ShiftingPower:IsCastable() and (S.FrozenOrb:CooldownRemains() > 10 and (not S.CometStorm:IsAvailable() or S.CometStorm:CooldownRemains() > 10) and (not S.RayofFrost:IsAvailable() or S.RayofFrost:CooldownRemains() > 10) or S.IcyVeins:CooldownRemains() < 20) then
-    if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power cleave 18"; end
+    if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power cleave 16"; end
   end
   -- glacial_spike,if=buff.icicles.react=5
   if S.GlacialSpike:IsReady() and (Icicles == 5) then
-    if Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike cleave 20"; end
+    if Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike cleave 18"; end
   end
   -- ice_lance,target_if=max:debuff.winters_chill.stack,if=buff.fingers_of_frost.react&!prev_gcd.1.glacial_spike|remaining_winters_chill
   if S.IceLance:IsReady() and (Player:BuffUpP(S.FingersofFrostBuff) and not Player:PrevGCDP(1, S.GlacialSpike) or RemainingWintersChill > 0) then
-    if Everyone.CastTargetIf(S.IceLance, Enemies16ySplash, "max", EvaluateTargetIfFilterWCStacks, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance cleave 22"; end
+    if Everyone.CastTargetIf(S.IceLance, Enemies16ySplash, "max", EvaluateTargetIfFilterWCStacks, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance cleave 20"; end
   end
   -- ice_nova,if=active_enemies>=4
   if S.IceNova:IsCastable() and (EnemiesCount16ySplash >= 4) then
-    if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova cleave 24"; end
+    if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova cleave 22"; end
   end
   -- frostbolt
   if S.Frostbolt:IsCastable() then
-    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt cleave 26"; end
+    if Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt cleave 24"; end
   end
   -- call_action_list,name=movement
   if Player:IsMoving() then
@@ -408,8 +391,8 @@ local function ST()
   if AoEON() and S.Blizzard:IsCastable() and (EnemiesCount8ySplash >= 2 and S.IceCaller:IsAvailable() and S.FreezingRain:IsAvailable() and (not S.SplinteringCold:IsAvailable() and not S.RayofFrost:IsAvailable() or Player:BuffUp(S.FreezingRainBuff) or EnemiesCount8ySplash >= 3)) then
     if Cast(S.Blizzard, Settings.Frost.GCDasOffGCD.Blizzard, nil, not Target:IsInRange(40)) then return "blizzard single 16"; end
   end
-  -- shifting_power,if=cooldown.frozen_orb.remains>10&(!talent.comet_storm|cooldown.comet_storm.remains>10)&(!talent.ray_of_frost|cooldown.ray_of_frost.remains>10)|cooldown.icy_veins.remains<20
-  if S.ShiftingPower:IsCastable() and (S.FrozenOrb:CooldownRemains() > 10 and (not S.CometStorm:IsAvailable() or S.CometStorm:CooldownRemains() > 10) and (not S.RayofFrost:IsAvailable() or S.RayofFrost:CooldownRemains() > 10) or S.IcyVeins:CooldownRemains() < 20) then
+  -- shifting_power,if=(buff.icy_veins.down|!talent.deaths_chill)&cooldown.frozen_orb.remains>10&(!talent.comet_storm|cooldown.comet_storm.remains>10)&(!talent.ray_of_frost|cooldown.ray_of_frost.remains>10)|cooldown.icy_veins.remains<20
+  if S.ShiftingPower:IsCastable() and ((Player:BuffDown(S.IcyVeinsBuff) or not S.DeathsChill:IsAvailable()) and S.FrozenOrb:CooldownRemains() > 10 and (not S.CometStorm:IsAvailable() or S.CometStorm:CooldownRemains() > 10) and (not S.RayofFrost:IsAvailable() or S.RayofFrost:CooldownRemains() > 10) or S.IcyVeins:CooldownRemains() < 20) then
     if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(18)) then return "shifting_power single 18"; end
   end
   -- glacial_spike,if=buff.icicles.react=5
@@ -434,7 +417,7 @@ local function ST()
   end
 end
 
---- ======= ACTION LISTS =======
+--- ===== APL Main =====
 local function APL()
   -- Enemies Update
   Enemies16ySplash = Target:GetEnemiesInSplashRange(16)
@@ -442,10 +425,11 @@ local function APL()
     EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
     EnemiesCount16ySplash = Target:GetEnemiesInSplashRangeCount(16)
   else
-    EnemiesCount15yMelee = 1
     EnemiesCount8ySplash = 1
     EnemiesCount16ySplash = 1
   end
+  -- DEBUG REMOVE ME
+  EnemiesCount16ySplash = 999
 
   -- Check our IF status
   -- Note: Not referenced in the current APL, but saving for potential use later
@@ -486,13 +470,13 @@ local function APL()
     if CDsON() then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=aoe,if=active_enemies>=7&!set_bonus.tier30_2pc|active_enemies>=3&talent.ice_caller
-    if AoEON() and (EnemiesCount16ySplash >= 7 and not Player:HasTier(30, 2) or EnemiesCount16ySplash >= 3 and S.IceCaller:IsAvailable()) then
+    -- run_action_list,name=aoe,if=active_enemies>=7&!set_bonus.tier30_2pc|active_enemies>=4&talent.ice_caller
+    if AoEON() and (EnemiesCount16ySplash >= 7 and not Player:HasTier(30, 2) or EnemiesCount16ySplash >= 4 and S.IceCaller:IsAvailable()) then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "pool for Aoe()"; end
     end
-    -- run_action_list,name=cleave,if=active_enemies=2
-    if AoEON() and EnemiesCount16ySplash == 2 then
+    -- run_action_list,name=cleave,if=active_enemies>=2&active_enemies<=3
+    if AoEON() and EnemiesCount16ySplash >= 2 and EnemiesCount16ySplash <= 3 then
       local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "pool for Cleave()"; end
     end
@@ -505,7 +489,7 @@ end
 local function Init()
   S.WintersChillDebuff:RegisterAuraTracking()
 
-  HR.Print("Frost Mage rotation has been updated for patch 10.2.7.")
+  HR.Print("Frost Mage rotation has been updated for patch 11.0.0.")
 end
 
 HR.SetAPL(64, APL, Init)

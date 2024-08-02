@@ -175,31 +175,17 @@ HL.AddCoreOverride("Spell.InFlightRemains",
 local FrostOldSpellIsCastable
 FrostOldSpellIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-    local MovingOK = true
-    if self:CastTime() > 0 and Player:IsMoving() and Settings.Commons.MovingRotation then
-      if self == SpellFrost.Blizzard and Player:BuffUp(SpellFrost.FreezingRain) then
-        MovingOK = true
-      else
-        return false
-      end
-    end
-
     local RangeOK = true
     if Range then
       local RangeUnit = ThisUnit or Target
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
+
     if self == SpellFrost.GlacialSpike then
       return self:IsLearned() and RangeOK and MovingOK and not Player:IsCasting(self) and (Player:BuffUp(SpellFrost.GlacialSpikeBuff) or (Player:BuffStack(SpellFrost.IciclesBuff) == 5))
     else
       local BaseCheck = FrostOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-      if self == SpellFrost.MirrorsofTorment then
-        return BaseCheck and not Player:IsCasting(self)
-      elseif self == SpellFrost.RadiantSpark then
-        return BaseCheck and not Player:IsCasting(self)    
-      elseif self == SpellFrost.ShiftingPower then
-        return BaseCheck and not Player:IsCasting(self)    
-      elseif self == SpellFrost.Deathborne then
+      if self == SpellFrost.ShiftingPower then
         return BaseCheck and not Player:IsCasting(self)
       else
         return BaseCheck
@@ -219,8 +205,7 @@ FrostOldSpellCooldownRemains = HL.AddCoreOverride("Spell.CooldownRemains",
   end
 , 64)
 
-local FrostOldPlayerBuffStack
-FrostOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffStackP",
+HL.AddCoreOverride("Player.BuffStackP",
   function (self, Spell, AnyCaster, Offset)
     local BaseCheck = Player:BuffStack(Spell)
     if Spell == SpellFrost.IciclesBuff then
@@ -248,8 +233,7 @@ FrostOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffStackP",
   end
 , 64)
 
-local FrostOldPlayerBuffUp
-FrostOldPlayerBuffUp = HL.AddCoreOverride("Player.BuffUpP",
+HL.AddCoreOverride("Player.BuffUpP",
   function (self, Spell, AnyCaster, Offset)
     local BaseCheck = Player:BuffUp(Spell)
     if Spell == SpellFrost.FingersofFrostBuff then
@@ -264,8 +248,7 @@ FrostOldPlayerBuffUp = HL.AddCoreOverride("Player.BuffUpP",
   end
 , 64)
 
-local FrostOldPlayerBuffDown
-FrostOldPlayerBuffDown = HL.AddCoreOverride("Player.BuffDownP",
+HL.AddCoreOverride("Player.BuffDownP",
   function (self, Spell, AnyCaster, Offset)
     local BaseCheck = Player:BuffDown(Spell)
     if Spell == SpellFrost.FingersofFrostBuff then

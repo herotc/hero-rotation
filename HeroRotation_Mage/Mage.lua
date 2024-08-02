@@ -182,42 +182,30 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   ConeofCold                            = Spell(120),--Melee, 12
   FireBlast                             = Spell(319836),
   -- Talents
-  BoneChilling                          = Spell(205027),
-  ChainReaction                         = Spell(278309),
   ColdestSnap                           = Spell(417493),
   CometStorm                            = Spell(153595), --splash, 6
-  DeepShatter                           = Spell(378749),
+  DeathsChill                           = Spell(450331),
   Flurry                                = Spell(44614),
   FreezingRain                          = Spell(270233),
-  FreezingWinds                         = Spell(382103),
   Frostbite                             = Spell(378756),
   FrozenOrb                             = Spell(84714), --splash, 16
-  FrozenTouch                           = Spell(205030),
   GlacialSpike                          = Spell(199786), --splash, 8 (with splitting ice)
-  IceBarrier                            = Spell(11426),
   IceCaller                             = Spell(236662),
   IceLance                              = Spell(30455), --splash, 8 (with splitting ice)
   IcyVeins                              = Spell(12472),
   RayofFrost                            = Spell(205021),
-  SlickIce                              = Spell(382144),
-  Snowstorm                             = Spell(381706),
   SplinteringCold                       = Spell(379049),
-  SplittingIce                          = Spell(56377), --splash, 8
   -- Pet Abilities
   Freeze                                = Spell(33395), --splash, 8
-  WaterJet                              = Spell(135029),
   -- Buffs
-  BoneChillingBuff                      = Spell(205766),
   BrainFreezeBuff                       = Spell(190446),
+  DeathsChillBuff                       = Spell(454371),
   FingersofFrostBuff                    = Spell(44544),
   FreezingRainBuff                      = Spell(270232),
-  FreezingWindsBuff                     = Spell(382106),
   GlacialSpikeBuff                      = Spell(199844),
   IciclesBuff                           = Spell(205473),
   IcyVeinsBuff                          = Spell(12472),
-  SnowstormBuff                         = Spell(381522),
   -- Debuffs
-  FrostbiteDebuff                       = Spell(378760),
   WintersChillDebuff                    = Spell(228358),
 })
 Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Frost, Spell.Mage.Frostfire)
@@ -274,7 +262,6 @@ Item.Mage.Commons = {
 }
 
 Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
-  ManaGem                          = Item(36799),
 })
 
 Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
@@ -283,7 +270,7 @@ Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
 Item.Mage.Frost = MergeTableByKey(Item.Mage.Commons, {
 })
 
--- Variables
+--[[ Variables
 Mage.IFST = {
   CurrStacks = 0,
   CurrStacksTime = 0,
@@ -368,4 +355,4 @@ function Mage.IFTimeToX(count, direction)
     local ticks_low = (10 + low - buff_position) % 10
     local ticks_high = (10 + high - buff_position) % 10
     return (Mage.IFST.CurrStacksTime - Mage.IFST.OldStacksTime) + math.min(ticks_low, ticks_high) - 1
-end
+end]]
