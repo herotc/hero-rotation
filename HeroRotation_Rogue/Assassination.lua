@@ -22,6 +22,7 @@ local AoEON = HR.AoEON
 local CDsON = HR.CDsON
 local Cast = HR.Cast
 local CastPooling = HR.CastPooling
+local CastQueue = HR.CastQueue
 local CastLeftNameplate = HR.CastLeftNameplate
 -- Num/Bool Helper Functions
 local num = HR.Commons.Everyone.num
@@ -350,6 +351,110 @@ local function Racials ()
   return false
 end
 
+-- # Stealthed
+local function Stealthed (ReturnSpellOnly, ForceStealth)
+  -- actions.stealthed=pool_resource,for_next=1
+
+  -- actions.stealthed+=/ambush,if=!debuff.deathstalkers_mark.up&talent.deathstalkers_mark&!buff.darkest_night.up
+  if (S.Ambush:IsCastable() or ForceStealth)  and Target:DebuffDown(S.DeathStalkersMarkBuff) and S.DeathStalkersMark:IsAvailable()
+    and Player:BuffDown(S.DarkestNightBuff) then
+    if ReturnSpellOnly then
+      return S.Ambush
+    else
+      if Cast(S.Ambush, nil, nil, not TargetInMeleeRange) then return "Cast Ambush Stealthed" end
+    end
+  end
+
+  -- actions.stealthed+=/shiv,if=talent.kingsbane&(dot.kingsbane.ticking|cooldown.kingsbane.up)&(!debuff.shiv.up&debuff.shiv.remains<1)&buff.envenom.up
+  if S.Kingsbane:IsAvailable() and Player:BuffUp(S.Envenom) then
+    if S.Shiv:IsReady() and (Target:DebuffUp(S.Kingsbane) or S.Kingsbane:CooldownUp()) and Target:DebuffDown(S.ShivDebuff) then
+      if ReturnSpellOnly then
+        return S.Shiv
+      else
+        if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then return "Cast Shiv (Stealth Kingsbane)" end
+      end
+    end
+  end
+
+  -- actions.stealthed+=/envenom,if=effective_combo_points>=variable.effective_spend_cp&dot.kingsbane.ticking&buff.envenom.remains<=3
+  -- actions.stealthed+=/envenom,if=effective_combo_points>=variable.effective_spend_cp&buff.master_assassin_aura.up&variable.single_target
+  if ComboPoints >= EffectiveCPSpend then
+    if Target:DebuffUp(S.Kingsbane) and Player:BuffRemains(S.Envenom) <= 3 then
+      if ReturnSpellOnly then
+        return S.Envenom
+      else
+        if Cast(S.Envenom, nil, nil, not TargetInMeleeRange) then return "Cast Envenom (Stealth Kingsbane)" end
+      end
+    end
+    if SingleTarget and MasterAssassinAuraUp() then
+      if ReturnSpellOnly then
+        return S.Envenom
+      else
+        if Cast(S.Envenom, nil, nil, not TargetInMeleeRange) then return "Cast Envenom (Master Assassin)" end
+      end
+    end
+  end
+
+  -- actions.stealthed+=/garrote,target_if=min:remains,if=stealthed.improved_garrote&(remains<12|pmultiplier<=1|(buff.indiscriminate_carnage.up&active_dot.garrote<spell_targets.fan_of_knives))&!variable.single_target&target.time_to_die-remains>2
+  -- actions.stealthed+=/garrote,if=stealthed.improved_garrote&(pmultiplier<=1|remains<14|!variable.single_target&buff.master_assassin_aura.remains<3)&combo_points.deficit>=1+2*talent.shrouded_suffocation
+  if (S.Garrote:IsCastable() and ImprovedGarroteRemains() > 0) or ForceStealth then
+    local function GarroteTargetIfFunc(TargetUnit)
+      return TargetUnit:DebuffRemains(S.Garrote)
+    end
+    local function GarroteIfFunc(TargetUnit)
+      return (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemains(S.Garrote) < 12
+        or (IndiscriminateCarnageRemains() > 0 and S.Garrote:AuraActiveCount() < MeleeEnemies10yCount)) and not SingleTarget
+        and (TargetUnit:FilteredTimeToDie(">", 2, -TargetUnit:DebuffRemains(S.Garrote)) or TargetUnit:TimeToDieIsNotValid())
+        and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold)
+    end
+    if HR.AoEON() then
+      local TargetIfUnit = CheckTargetIfTarget("min", GarroteTargetIfFunc, GarroteIfFunc)
+      if TargetIfUnit and TargetIfUnit:GUID() ~= Target:GUID() then
+        CastLeftNameplate(TargetIfUnit, S.Garrote)
+      end
+    end
+    if GarroteIfFunc(Target) then
+      if ReturnSpellOnly then
+        return S.Garrote
+      else
+        if Cast(S.Garrote, nil, nil, not TargetInMeleeRange) then return "Cast Garrote (Improved Garrote)" end
+      end
+    end
+    if ComboPointsDeficit >= (1 + 2 * num(S.ShroudedSuffocation:IsAvailable())) and (Target:PMultiplier(S.Garrote) <= 1 or Target:DebuffRemains(S.Garrote) < 14 or not SingleTarget and MasterAssassinRemains() < 3) then
+      if ReturnSpellOnly then
+        return S.Garrote
+      else
+        if Cast(S.Garrote, nil, nil, not TargetInMeleeRange) then return "Cast Garrote (Improved Garrote Low CP)" end
+      end
+    end
+  end
+end
+
+-- # Stealth Macros
+-- This returns a table with the original Stealth spell and the result of the Stealthed action list as if the applicable buff was present
+local function StealthMacro (StealthSpell)
+  -- Fetch the predicted ability to use after the stealth spell, a number of abilities require stealth to be castable
+  -- so fake stealth to allow them to be evaluated
+  local MacroAbility = Stealthed(true, true)
+
+  -- Handle StealthMacro GUI options
+  -- If false, just suggest them as off-GCD and bail out of the macro functionality
+  if StealthSpell:ID() == S.Vanish:ID() and (not Settings.Assassination.StealthMacro.Vanish or not MacroAbility) then
+    if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish" end
+    return false
+  elseif StealthSpell:ID() == S.Shadowmeld:ID() and (not Settings.Assassination.StealthMacro.Shadowmeld or not MacroAbility) then
+    if Cast(S.Shadowmeld, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
+    return false
+  end
+
+  local MacroTable = {StealthSpell, MacroAbility}
+
+  ShouldReturn = CastQueue(unpack(MacroTable))
+  if ShouldReturn then return "| " .. MacroTable[2]:Name() end
+
+  return false
+end
+
 -- # Vanish Handling
 local function Vanish ()
   -- actions.vanish=pool_resource,for_next=1,extra_amount=45
@@ -360,7 +465,9 @@ local function Vanish ()
       if Settings.Commons.ShowPooling and Player:EnergyPredicted() < 45 then
         if Cast(S.PoolEnergy) then return "Pool for Vanish Fateful Ending Fish" end
       end
-      if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish Fateful Ending Fish" end
+    ShouldReturn = StealthMacro(S.Vanish)
+    if ShouldReturn then return "Cast Vanish Fateful Ending Fish" .. ShouldReturn end
+    -- if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish Fateful Ending Fish" end
   end
 
   if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
@@ -374,26 +481,34 @@ local function Vanish ()
         if Settings.Commons.ShowPooling and Player:EnergyPredicted() < 45 then
           if Cast(S.PoolEnergy) then return "Pool for Vanish (Garrote Deathmark)" end
         end
-        if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Garrote No Carnage)" end
+        ShouldReturn = StealthMacro(S.Vanish)
+        if ShouldReturn then return "Cast Vanish (Garrote No Carnage) " .. ShouldReturn end
+        --if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Garrote No Carnage)" end
       end
       if S.IndiscriminateCarnage:IsAvailable() and MeleeEnemies10yCount > 2 then
         -- actions.cds+=/pool_resource,for_next=1,extra_amount=45
         if Settings.Commons.ShowPooling and Player:EnergyPredicted() < 45 then
           if Cast(S.PoolEnergy) then return "Pool for Vanish (Garrote Deathmark)" end
         end
-        if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Garrote Carnage)" end
+        ShouldReturn = StealthMacro(S.Vanish)
+        if ShouldReturn then return "Cast Vanish (Garrote Carnage)" .. ShouldReturn end
+        --if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Garrote Carnage)" end
       end
     end
 
     -- actions.vanish+=/vanish,if=talent.master_assassin&talent.kingsbane&dot.kingsbane.remains<=3&dot.kingsbane.ticking&debuff.deathmark.remains<=3&dot.deathmark.ticking
     if S.MasterAssassin:IsAvailable() and S.Kingsbane:IsAvailable() and Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) <= 3
       and Target:DebuffUp(S.Deathmark) and Target:DebuffRemains(S.Deathmark) <= 3 then
-      if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Kingsbane)" end
+      ShouldReturn = StealthMacro(S.Vanish)
+      if ShouldReturn then return "Cast Vanish (Kingsbane)" .. ShouldReturn end
+      --if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Kingsbane)" end
     end
     -- actions.vanish+=/vanish,if=!talent.improved_garrote&talent.master_assassin&!dot.rupture.refreshable&dot.garrote.remains>3&debuff.deathmark.up&(debuff.shiv.up|debuff.deathmark.remains<4|dot.sepsis.ticking)&dot.sepsis.remains<3
     if not S.ImprovedGarrote:IsAvailable() and S.MasterAssassin:IsAvailable() and not IsDebuffRefreshable(Target, S.Rupture) and Target:DebuffRemains(S.Garrote) > 3
       and Target:DebuffUp(S.Deathmark) and (Target:DebuffUp(S.ShivDebuff) or Target:DebuffRemains(S.Deathmark) < 4) then
-      if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)" end
+      ShouldReturn = StealthMacro(S.Vanish)
+      if ShouldReturn then return "Cast Vanish (Master Assassin)" .. ShouldReturn end
+      --if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)" end
     end
   end
 end
@@ -553,62 +668,6 @@ local function CDs ()
   end
 
   return ShouldReturn
-end
-
--- # Stealthed
-local function Stealthed ()
-  -- actions.stealthed=pool_resource,for_next=1
-
-  -- actions.stealthed+=/ambush,if=!debuff.deathstalkers_mark.up&talent.deathstalkers_mark&!buff.darkest_night.up
-  if S.Ambush:IsCastable() and Target:DebuffDown(S.DeathStalkersMarkBuff) and S.DeathStalkersMark:IsAvailable()
-    and Player:BuffDown(S.DarkestNightBuff) then
-      if Cast(S.Ambush, nil, nil, not TargetInMeleeRange) then return "Cast Ambush Stealthed" end
-  end
-
-  -- actions.stealthed+=/shiv,if=talent.kingsbane&(dot.kingsbane.ticking|cooldown.kingsbane.up)&(!debuff.shiv.up&debuff.shiv.remains<1)&buff.envenom.up
-  if S.Kingsbane:IsAvailable() and Player:BuffUp(S.Envenom) then
-    if S.Shiv:IsReady() and (Target:DebuffUp(S.Kingsbane) or S.Kingsbane:CooldownUp()) and Target:DebuffDown(S.ShivDebuff) then
-      if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then return "Cast Shiv (Stealth Kingsbane)" end
-    end
-  end
-
-  -- actions.stealthed+=/envenom,if=effective_combo_points>=variable.effective_spend_cp&dot.kingsbane.ticking&buff.envenom.remains<=3
-  -- actions.stealthed+=/envenom,if=effective_combo_points>=variable.effective_spend_cp&buff.master_assassin_aura.up&variable.single_target
-  if ComboPoints >= EffectiveCPSpend then
-    if Target:DebuffUp(S.Kingsbane) and Player:BuffRemains(S.Envenom) <= 3 then
-      if Cast(S.Envenom, nil, nil, not TargetInMeleeRange) then return "Cast Envenom (Stealth Kingsbane)" end
-    end
-    if SingleTarget and MasterAssassinAuraUp() then
-      if Cast(S.Envenom, nil, nil, not TargetInMeleeRange) then return "Cast Envenom (Master Assassin)" end
-    end
-  end
-
-  -- actions.stealthed+=/garrote,target_if=min:remains,if=stealthed.improved_garrote&(remains<12|pmultiplier<=1|(buff.indiscriminate_carnage.up&active_dot.garrote<spell_targets.fan_of_knives))&!variable.single_target&target.time_to_die-remains>2
-  -- actions.stealthed+=/garrote,if=stealthed.improved_garrote&(pmultiplier<=1|remains<14|!variable.single_target&buff.master_assassin_aura.remains<3)&combo_points.deficit>=1+2*talent.shrouded_suffocation
-  if S.Garrote:IsCastable() and ImprovedGarroteRemains() > 0 then
-    local function GarroteTargetIfFunc(TargetUnit)
-      return TargetUnit:DebuffRemains(S.Garrote)
-    end
-    local function GarroteIfFunc(TargetUnit)
-      return (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemains(S.Garrote) < 12
-        or (IndiscriminateCarnageRemains() > 0 and S.Garrote:AuraActiveCount() < MeleeEnemies10yCount)) and not SingleTarget
-        and (TargetUnit:FilteredTimeToDie(">", 2, -TargetUnit:DebuffRemains(S.Garrote)) or TargetUnit:TimeToDieIsNotValid())
-        and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold)
-    end
-    if HR.AoEON() then
-      local TargetIfUnit = CheckTargetIfTarget("min", GarroteTargetIfFunc, GarroteIfFunc)
-      if TargetIfUnit and TargetIfUnit:GUID() ~= Target:GUID() then
-        CastLeftNameplate(TargetIfUnit, S.Garrote)
-      end
-    end
-    if GarroteIfFunc(Target) then
-      if Cast(S.Garrote, nil, nil, not TargetInMeleeRange) then return "Cast Garrote (Improved Garrote)" end
-    end
-    if ComboPointsDeficit >= (1 + 2 * num(S.ShroudedSuffocation:IsAvailable())) and (Target:PMultiplier(S.Garrote) <= 1 or Target:DebuffRemains(S.Garrote) < 14 or not SingleTarget and MasterAssassinRemains() < 3) then
-      if Cast(S.Garrote, nil, nil, not TargetInMeleeRange) then return "Cast Garrote (Improved Garrote Low CP)" end
-    end
-  end
-
 end
 
 -- # Damage over time abilities
