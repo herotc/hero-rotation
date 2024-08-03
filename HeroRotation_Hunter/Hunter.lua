@@ -144,6 +144,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   LoneWolf                              = Spell(155228),
   MultiShot                             = Spell(257620),
   RapidFire                             = Spell(257044),
+  RapidFireBarrage                      = Spell(459800),
   Salvo                                 = Spell(400456),
   SerpentstalkersTrickery               = Spell(378888),
   SteadyFocus                           = Spell(193533),
