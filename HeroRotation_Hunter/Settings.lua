@@ -43,6 +43,7 @@ HR.GUISettings.APL.Hunter = {
       ExplosiveShot = false,
       Flare = false,
       FreezingTrap = false,
+      HuntersMark = false,
       MendPet = false,
       RevivePet = false,
       Stampede = false,

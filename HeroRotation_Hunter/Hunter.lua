@@ -108,7 +108,9 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   CalloftheWild                         = Spell(359844),
   CobraShot                             = Spell(193455),
   DireBeast                             = Spell(120679),
+  HuntmastersCall                       = Spell(459730),
   KillCleave                            = Spell(378207),
+  KillerCobra                           = Spell(199532),
   MultiShot                             = Spell(2643),
   OneWithThePack                        = Spell(199528),
   Savagery                              = Spell(424557),
@@ -124,6 +126,7 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   BestialWrathPetBuff                   = Spell(186254, "Pet"),
   CalloftheWildBuff                     = Spell(359844),
   FrenzyPetBuff                         = Spell(272790, "Pet"),
+  HuntersPreyBuff                       = Spell(378215),
   -- Debuffs
   BarbedShotDebuff                      = Spell(217200),
 })
