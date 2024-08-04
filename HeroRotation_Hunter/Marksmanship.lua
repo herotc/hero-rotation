@@ -12,7 +12,6 @@ local Player     = Unit.Player
 local Target     = Unit.Target
 local Pet        = Unit.Pet
 local Spell      = HL.Spell
-local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
@@ -22,14 +21,9 @@ local AoEON      = HR.AoEON
 -- Num/Bool Helper Functions
 local num        = HR.Commons.Everyone.num
 local bool       = HR.Commons.Everyone.bool
--- lua
-local GetTime    = GetTime
--- File Locals
-local Hunter     = HR.Commons.Hunter
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
--- luacheck: max_line_length 9999
 
 -- Define S/I for spell and item arrays
 local S = Spell.Hunter.Marksmanship
@@ -45,6 +39,7 @@ local OnUseExcludes = {
 
 --- ===== GUI Settings =====
 local Everyone = HR.Commons.Everyone
+local Hunter = HR.Commons.Hunter
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Hunter.Commons,
