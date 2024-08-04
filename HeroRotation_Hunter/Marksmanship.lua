@@ -44,7 +44,7 @@ local OnUseExcludes = {
 }
 
 --- ===== GUI Settings =====
-local Everyone = HR.Commons.Everyone;
+local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Hunter.Commons,
