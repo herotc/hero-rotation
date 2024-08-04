@@ -48,11 +48,6 @@ local Settings = {
   Marksmanship = HR.GUISettings.APL.Hunter.Marksmanship
 }
 
--- Trinket Item Objects
-local Equip = Player:GetEquipment()
-local Trinket1 = (Equip[13]) and Item(Equip[13]) or Item(0)
-local Trinket2 = (Equip[14]) and Item(Equip[14]) or Item(0)
-
 --- ===== Rotation Variables =====
 local VarCAExecute = Target:HealthPercentage() > 70 and S.CarefulAim:IsAvailable()
 local VarTrueshotReady = false
