@@ -23,6 +23,7 @@ local AoEON         = HR.AoEON
 local num           = HR.Commons.Everyone.num
 local bool          = HR.Commons.Everyone.bool
 -- WoW API
+local Delay         = C_Timer.After
 local GetItemCount  = GetItemCount
 
 --- ============================ CONTENT ===========================
@@ -72,6 +73,10 @@ S.ArcaneBarrage:RegisterInFlight()
 local VarAoETargetCount = (not S.ArcingCleave:IsAvailable()) and 9 or 2
 local VarOpener = true
 local VarAltRotation = S.HighVoltage:IsAvailable()
+local Trinket1, Trinket2
+local VarTrinket1CD, VarTrinket2CD
+local VarTrinket1ID, VarTrinket2ID
+local VarTrinket1Range, VarTrinket2Range
 local VarSteroidTrinketEquipped
 local Enemies8ySplash, EnemiesCount8ySplash
 local ClearCastingMaxStack = S.ImprovedClearcasting:IsAvailable() and 3 or 1
@@ -81,12 +86,23 @@ local CastAE
 local GCDMax
 
 --- ===== Trinket Item Objects =====
-local Trinket1, Trinket2 = Player:GetTrinketItems()
+ = Player:GetTrinketItems()
 
 --- ===== Trinket Variables =====
 local function SetTrinketVariables()
+  Trinket1, Trinket2 = Player:GetTrinketItems()
   VarTrinket1ID = Trinket1:ID()
   VarTrinket2ID = Trinket2:ID()
+
+  -- If we don't have trinket items, try again in 2 seconds.
+  if VarTrinket1ID == 0 or VarTrinket2ID == 0 then
+    Delay(2, function()
+        Trinket1, Trinket2 = Player:GetTrinketItems()
+        VarTrinket1ID = Trinket1:ID()
+        VarTrinket2ID = Trinket2:ID()
+      end
+    )
+  end
 
   local Trinket1Spell = Trinket1:OnUseSpell()
   VarTrinket1Range = (Trinket1Spell and Trinket1Spell.MaximumRange > 0 and Trinket1Spell.MaximumRange <= 100) and Trinket1Spell.MaximumRange or 100
@@ -115,7 +131,6 @@ HL:RegisterForEvent(function()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
-  Trinket1, Trinket2 = Player:GetTrinketItems()
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
 

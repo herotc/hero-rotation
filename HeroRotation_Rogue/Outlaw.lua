@@ -29,6 +29,8 @@ local bool = HR.Commons.Everyone.bool
 local mathmin = math.min
 local mathmax = math.max
 local mathabs = math.abs
+-- WoW API
+local Delay = C_Timer.After
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -58,6 +60,13 @@ local OnUseExcludes = {
 
 -- Trinkets
 local trinket1, trinket2 = Player:GetTrinketItems()
+-- If we don't have trinket items, try again in 2 seconds.
+if trinket1:ID() == 0 or trinket2:ID() == 0 then
+  Delay(2, function()
+      trinket1, trinket2 = Player:GetTrinketItems()
+    end
+  )
+end
 
 HL:RegisterForEvent(function()
   trinket1, trinket2 = Player:GetTrinketItems()

@@ -27,6 +27,8 @@ local bool          = HR.Commons.Everyone.bool
 -- Lua
 local pairs         = pairs
 local tinsert       = table.insert
+-- WoW API
+local Delay         = C_Timer.After
 -- File locals
 local Monk = HR.Commons.Monk
 
@@ -66,6 +68,12 @@ local FightRemains = 11111
 
 --- ===== Trinket Item Objects =====
 local Trinket1, Trinket2 = Player:GetTrinketItems()
+if Trinket1:ID() == 0 or Trinket2:ID() == 0 then
+  Delay(2, function()
+      Trinket1, Trinket2 = Player:GetTrinketItems()
+    end
+  )
+end
 
 --- ===== Stun Interrupts List =====
 local Stuns = {}

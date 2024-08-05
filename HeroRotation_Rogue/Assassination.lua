@@ -32,6 +32,8 @@ local pairs = pairs
 local mathfloor = math.floor
 local mathmax = math.max
 local mathmin = math.min
+-- WoW API
+local Delay = C_Timer.After
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -73,10 +75,15 @@ local TrinketSyncSlot = 0
 local EffectiveCPSpend
 
 -- Equipment
-local Equipment = Player:GetEquipment()
-local TrinketItem1 = Equipment[13] and Item(Equipment[13]) or Item(0)
-local TrinketItem2 = Equipment[14] and Item(Equipment[14]) or Item(0)
 local function SetTrinketVariables ()
+  TrinketItem1, TrinketItem2 = Player:GetTrinketItems()
+  -- If we don't have trinket items, try again in 2 seconds.
+  if TrinketItem1:ID() == 0 or TrinketItem2:ID() == 0 then
+    Delay(2, function()
+        TrinketItem1, TrinketItem2 = Player:GetTrinketItems()
+      end
+    )
+  end
   -- actions.precombat+=/variable,name=trinket_sync_slot,value=1,if=trinket.1.has_stat.any_dps&(!trinket.2.has_stat.any_dps|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)&!trinket.2.is.witherbarks_branch|trinket.1.is.witherbarks_branch
   -- actions.precombat+=/variable,name=trinket_sync_slot,value=2,if=trinket.2.has_stat.any_dps&(!trinket.1.has_stat.any_dps|trinket.2.cooldown.duration>trinket.1.cooldown.duration)&!trinket.1.is.witherbarks_branch|trinket.2.is.witherbarks_branch
   if TrinketItem1:HasStatAnyDps() and (not TrinketItem2:HasStatAnyDps() or TrinketItem1:Cooldown() >= TrinketItem2:Cooldown()) and TrinketItem2:ID() ~= I.WitherbarksBranch:ID() or TrinketItem1:ID() == I.WitherbarksBranch:ID() then
@@ -89,10 +96,8 @@ local function SetTrinketVariables ()
 end
 SetTrinketVariables()
 
+
 HL:RegisterForEvent(function()
-  Equipment = Player:GetEquipment()
-  TrinketItem1 = Equipment[13] and Item(Equipment[13]) or Item(0)
-  TrinketItem2 = Equipment[14] and Item(Equipment[14]) or Item(0)
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED" )
 

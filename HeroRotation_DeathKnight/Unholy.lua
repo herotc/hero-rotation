@@ -26,6 +26,8 @@ local bool        = HR.Commons.Everyone.bool
 local mathmax     = math.max
 local tableinsert = table.insert
 local GetTime     = GetTime
+-- WoW API
+local Delay       = C_Timer.After
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -57,6 +59,7 @@ local VarApocTiming
 local VarPopWounds
 local VarPoolingRunicPower
 local VarSpendRP
+local Trinket1, Trinket2
 local VarTrinket1ID, VarTrinket2ID
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1BL, VarTrinket2BL
@@ -79,13 +82,21 @@ local BossFightRemains = 11111
 local FightRemains = 11111
 local Ghoul = HL.GhoulTable
 
---- ===== Trinket Item Objects =====
-local Trinket1, Trinket2 = Player:GetTrinketItems()
-
 --- ===== Trinket Variables (from Precombat) =====
 local function SetTrinketVariables()
+  Trinket1, Trinket2 = Player:GetTrinketItems()
   VarTrinket1ID = Trinket1:ID()
   VarTrinket2ID = Trinket2:ID()
+
+  -- If we don't have trinket items, try again in 2 seconds.
+  if VarTrinket1ID == 0 or VarTrinket2ID == 0 then
+    Delay(2, function()
+        Trinket1, Trinket2 = Player:GetTrinketItems()
+        VarTrinket1ID = Trinket1:ID()
+        VarTrinket2ID = Trinket2:ID()
+      end
+    )
+  end
 
   local Trinket1Spell = Trinket1:OnUseSpell()
   VarTrinket1Range = (Trinket1Spell and Trinket1Spell.MaximumRange > 0 and Trinket1Spell.MaximumRange <= 100) and Trinket1Spell.MaximumRange or 100
@@ -118,12 +129,14 @@ local function SetTrinketVariables()
   -- Note: Using the below buff durations to avoid potential divide by zero errors.
   local T1BuffDuration = (VarTrinket1Duration > 0) and VarTrinket1Duration or 1
   local T2BuffDuration = (VarTrinket2Duration > 0) and VarTrinket2Duration or 1
-  if not VarTrinket1Buffs and VarTrinket2Buffs and (Trinket2:HasCooldown() or not Trinket1:HasCooldown()) or VarTrinket2Buffs and ((VarTrinket2CD / T2BuffDuration) * (VarTrinket2Sync)) > ((VarTrinket1CD / T1BuffDuration) * (VarTrinket1Sync) * (1 + ((Trinket1:Level() - Trinket2:Level()) / 100))) then
+  local T1Level = (VarTrinket1ID ~= 0) and Trinket1:Level() or 0
+  local T2Level = (VarTrinket2ID ~= 0) and Trinket2:Level() or 0
+  if not VarTrinket1Buffs and VarTrinket2Buffs and (Trinket2:HasCooldown() or not Trinket1:HasCooldown()) or VarTrinket2Buffs and ((VarTrinket2CD / T2BuffDuration) * (VarTrinket2Sync)) > ((VarTrinket1CD / T1BuffDuration) * (VarTrinket1Sync) * (1 + ((T1Level - T2Level) / 100))) then
     VarTrinketPriority = 2
   end
 
   VarDamageTrinketPriority = 1
-  if not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2:Level() >= Trinket1:Level() then
+  if not VarTrinket1Buffs and not VarTrinket2Buffs and T2Level >= T1Level then
     VarDamageTrinketPriority = 2
   end
 end
@@ -136,7 +149,6 @@ local StunInterrupts = {
 
 --- ===== Event Registrations =====
 HL:RegisterForEvent(function()
-  Trinket1, Trinket2 = Player:GetTrinketItems()
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
 

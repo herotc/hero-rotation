@@ -46,6 +46,7 @@ local Settings = {
 }
 
 --- ===== Rotation Variables =====
+local Trinket1, Trinket2
 local VarTrinket1ID, VarTrinket2ID
 local VarTrinket1Spell, VarTrinket2Spell
 local VarTrinket1Range, VarTrinket2Range
@@ -64,13 +65,21 @@ local EnrageUp
 local BossFightRemains = 11111
 local FightRemains = 11111
 
---- ===== Trinket Item Objects =====
-local Trinket1, Trinket2 = Player:GetTrinketItems()
-
 --- ===== Trinket Variables (from Precombat) =====
 local function SetTrinketVariables()
+  Trinket1, Trinket2 = Player:GetTrinketItems()
   VarTrinket1ID = Trinket1:ID()
   VarTrinket2ID = Trinket2:ID()
+
+  -- If we don't have trinket items, try again in 2 seconds.
+  if VarTrinket1ID == 0 or VarTrinket2ID == 0 then
+    Delay(2, function()
+        Trinket1, Trinket2 = Player:GetTrinketItems()
+        VarTrinket1ID = Trinket1:ID()
+        VarTrinket2ID = Trinket2:ID()
+      end
+    )
+  end
 
   VarTrinket1Spell = Trinket1:OnUseSpell()
   VarTrinket1Range = (VarTrinket1Spell and VarTrinket1Spell.MaximumRange > 0 and VarTrinket1Spell.MaximumRange <= 100) and VarTrinket1Spell.MaximumRange or 100
@@ -125,7 +134,6 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  Trinket1, Trinket2 = Player:GetTrinketItems()
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
