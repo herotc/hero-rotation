@@ -32,9 +32,9 @@ HR.GUISettings.APL.Hunter = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
-      Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
+      FuryOfTheEagle = "Suggested",
     },
   },
   CommonsOGCD = {
