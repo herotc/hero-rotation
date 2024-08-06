@@ -197,11 +197,11 @@ local function MultiTarget()
   end
   -- champions_spear,if=buff.enrage.up
   if S.ChampionsSpear:IsCastable() and (EnrageUp) then
-    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.Signature, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear multi_target 8"; end
+    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear multi_target 8"; end
   end
   -- odyns_fury,if=dot.odyns_fury_torment_mh.remains<1&(buff.enrage.up|talent.titanic_rage)&cooldown.avatar.remains
   if CDsON() and S.OdynsFury:IsCastable() and (Target:DebuffRemains(S.OdynsFuryDebuff) < 1 and (EnrageUp or S.TitanicRage:IsAvailable()) and S.Avatar:CooldownDown()) then
-    if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 10"; end
+    if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury multi_target 10"; end
   end
   -- whirlwind,if=buff.meat_cleaver.stack=0&talent.improved_whirlwind
   if S.Whirlwind:IsCastable() and (Player:BuffDown(S.MeatCleaverBuff) and S.ImprovedWhilwind:IsAvailable()) then
@@ -284,7 +284,7 @@ local function SingleTarget()
   end
   -- champions_spear,if=buff.enrage.up&((buff.furious_bloodthirst.up&talent.titans_torment)|!talent.titans_torment|target.time_to_die<20|active_enemies>1|!set_bonus.tier31_2pc)&raid_event.adds.in>15
   if S.ChampionsSpear:IsCastable() and (EnrageUp and ((Player:BuffUp(S.FuriousBloodthirstBuff) and S.TitansTorment:IsAvailable()) or not S.TitansTorment:IsAvailable() or FightRemains < 20 or EnemiesMeleeCount > 1 or not Player:HasTier(31, 2))) then
-    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.Signature, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear single_target 6"; end
+    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear single_target 6"; end
   end
   -- whirlwind,if=spell_targets.whirlwind>1&talent.improved_whirlwind&!buff.meat_cleaver.up|raid_event.adds.in<2&talent.improved_whirlwind&!buff.meat_cleaver.up
   if S.Whirlwind:IsCastable() and (EnemiesMeleeCount > 1 and S.ImprovedWhilwind:IsAvailable() and Player:BuffDown(S.MeatCleaverBuff)) then
@@ -296,7 +296,7 @@ local function SingleTarget()
   end
   -- odyns_fury,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)&(talent.dancing_blades&buff.dancing_blades.remains<5|!talent.dancing_blades)
   if CDsON() and S.OdynsFury:IsCastable() and (EnrageUp and (S.DancingBlades:IsAvailable() and Player:BuffRemains(S.DancingBladesBuff) < 5 or not S.DancingBlades:IsAvailable())) then
-    if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInMeleeRange(12)) then return "odyns_fury single_target 12"; end
+    if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury single_target 12"; end
   end
   -- rampage,if=talent.anger_management&(buff.recklessness.up|buff.enrage.remains<gcd|rage.pct>85)
   if S.Rampage:IsReady() and (S.AngerManagement:IsAvailable() and (Player:BuffUp(S.RecklessnessBuff) or Player:BuffRemains(S.EnrageBuff) < Player:GCD() or Player:RagePercentage() > 85)) then

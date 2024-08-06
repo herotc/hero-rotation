@@ -31,12 +31,12 @@ HR.GUISettings.APL.Warrior = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
-      Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
       ChampionsSpear = "Suggested",
       Charge = "Suggested",
       HeroicLeap = "Suggested",
+      OdynsFury = "Suggested",
     },
   },
   CommonsOGCD = {

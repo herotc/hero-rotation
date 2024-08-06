@@ -362,7 +362,7 @@ local function APL()
     -- champions_spear
     if CDsON() and S.ChampionsSpear:IsCastable() then
       SuggestRageDump(20)
-      if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsInRange(25)) then return "champions_spear main 30"; end
+      if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not Target:IsInRange(25)) then return "champions_spear main 30"; end
     end
     -- thunderous_roar
     if CDsON() and S.ThunderousRoar:IsCastable() then
