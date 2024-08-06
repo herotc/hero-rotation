@@ -116,6 +116,7 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   Savagery                              = Spell(424557),
   ScentofBlood                          = Spell(193532),
   Stomp                                 = Spell(199530),
+  VenomsBite                            = Spell(459565),
   WildCall                              = Spell(185789),
   WildInstincts                         = Spell(378442),
   -- Buffs
