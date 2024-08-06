@@ -30,7 +30,6 @@ HR.GUISettings.APL.Mage = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
-      Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
       ShiftingPower = "Suggested",
