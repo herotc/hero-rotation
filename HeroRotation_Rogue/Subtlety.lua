@@ -573,7 +573,7 @@ local function CDs ()
   if HR.CDsON() and S.Sepsis:IsAvailable() and S.Sepsis:IsReady() then
     if SnD_Condition() and (S.ShadowBlades:CooldownRemains() <= 3 or HL.BossFilteredFightRemains("<=", 12)
       or S.ShadowBlades:CooldownRemains() >= 14 and S.InvigoratingShadowdust:IsAvailable()) then
-        if Cast(S.Sepsis, nil, Settings.CommonsDS.DisplayStyle.Signature) then return "Cast Sepsis" end
+        if Cast(S.Sepsis, nil, Settings.CommonsDS.DisplayStyle.Sepsis) then return "Cast Sepsis" end
     end
   end
 
@@ -588,7 +588,7 @@ local function CDs ()
       or S.ShadowBlades:CooldownRemains() >= 14 and S.InvigoratingShadowdust:IsAvailable() and S.DoubleDance:IsAvailable())
       and (not S.InvigoratingShadowdust:IsAvailable() or not S.DoubleDance:IsAvailable() or S.InvigoratingShadowdust:TalentRank() == 2
       and MeleeEnemies10yCount >= 2 or S.SymbolsofDeath:CooldownRemains() <= 3 or Player:BuffRemains(S.SymbolsofDeath) > 3) then
-        if Cast(S.Flagellation, nil, Settings.CommonsDS.DisplayStyle.Signature) then return "Cast Flagellation" end
+        if Cast(S.Flagellation, nil, Settings.CommonsDS.DisplayStyle.Flagellation) then return "Cast Flagellation" end
     end
   end
 
@@ -625,7 +625,7 @@ local function CDs ()
   if HR.CDsON() and S.EchoingReprimand:IsCastable() and S.EchoingReprimand:IsAvailable() then
     if SnD_Condition() and ComboPointsDeficit >= 3
       and (not S.TheRotten:IsAvailable() or not S.Reverberation:IsAvailable() or Player:BuffUp(S.ShadowDanceBuff)) then
-      if Cast(S.EchoingReprimand, nil, Settings.CommonsDS.DisplayStyle.Signature) then return "Cast Echoing Reprimand" end
+      if Cast(S.EchoingReprimand, nil, Settings.CommonsDS.DisplayStyle.EchoingReprimand) then return "Cast Echoing Reprimand" end
     end
   end
 

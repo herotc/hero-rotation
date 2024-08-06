@@ -37,10 +37,12 @@ HR.GUISettings.APL.Rogue = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
-      Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
+      EchoingReprimand = "Suggested",
+      Flagellation = "Suggested",
       Stealth = "Main Icon",
+      Sepsis = "Suggested",
     },
   },
   CommonsOGCD = {
