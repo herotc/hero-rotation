@@ -74,6 +74,18 @@ Spell.Druid.Commons = {
   Pool                                  = Spell(999910)
 }
 
+Spell.Druid.DruidoftheClaw = {
+}
+
+Spell.Druid.ElunesChosen = {
+}
+
+Spell.Druid.KeeperoftheGrove = {
+}
+
+Spell.Druid.Wildstalker = {
+}
+
 Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   -- Abilities
   EclipseLunar                          = Spell(48518),
@@ -143,6 +155,8 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   OnethsPerceptionBuff                  = Spell(339800),
   TimewornDreambinderBuff               = Spell(340049)
 })
+Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Balance, Spell.Druid.ElunesChosen)
+Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Balance, Spell.Druid.KeeperoftheGrove)
 
 Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   -- Abilties
@@ -193,6 +207,8 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   LIMoonfireDebuff                      = Spell(155625),
   ThrashDebuff                          = Spell(405233),
 })
+Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Feral, Spell.Druid.DruidoftheClaw)
+Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Feral, Spell.Druid.Wildstalker)
 
 Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   -- Abilities
@@ -200,35 +216,17 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   -- Talents
   Berserk                               = Spell(50334),
   BristlingFur                          = Spell(155835),
-  DreamofCenarius                       = Spell(372119),
-  FlashingClaws                         = Spell(393427),
-  FuryofNature                          = Spell(370695),
   Incarnation                           = Spell(102558),
-  LayeredMane                           = Spell(384721),
   LunarBeam                             = Spell(204066),
   Maul                                  = Spell(6807),
   Pulverize                             = Spell(80313),
   RageoftheSleeper                      = Spell(200851),
-  Raze                                  = Spell(400254),
-  ReinforcedFur                         = Spell(393618),
-  SouloftheForest                       = Spell(158477),
   Swipe                                 = Spell(213771),
-  ThornsofIron                          = Spell(400222),
-  ToothandClaw                          = Spell(135288),
-  ViciousCycle                          = Spell(371999),
-  VulnerableFlesh                       = Spell(372618),
   -- Buffs
-  BerserkBuff                           = Spell(50334),
   DreamofCenariusBuff                   = Spell(372152),
-  GalacticGuardianBuff                  = Spell(213708),
-  GoreBuff                              = Spell(93662),
-  IncarnationBuff                       = Spell(102558),
-  ToothandClawBuff                      = Spell(135286),
-  ViciousCycleMaulBuff                  = Spell(372015),
-  ViciousCycleMangleBuff                = Spell(372019),
-  -- Debuffs
-  ToothandClawDebuff                    = Spell(135601),
 })
+Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Guardian, Spell.Druid.DruidoftheClaw)
+Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Guardian, Spell.Druid.ElunesChosen)
 
 Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Commons, {
   -- Abilities
@@ -244,6 +242,8 @@ Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Commons, {
   BalanceAffinity                       = Spell(197632),
   FeralAffinity                         = Spell(197490),
 })
+Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Restoration, Spell.Druid.KeeperoftheGrove)
+Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Restoration, Spell.Druid.Wildstalker)
 
 -- Items
 if not Item.Druid then Item.Druid = {} end

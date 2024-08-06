@@ -32,6 +32,7 @@ HR.GUISettings.APL.Druid = {
       Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
+      ConvokeTheSpirits = "Suggested",
     },
   },
   CommonsOGCD = {
@@ -113,6 +114,7 @@ HR.GUISettings.APL.Druid = {
     OffGCDasOffGCD = {
       Berserk = true,
       Incarnation = true,
+      NaturesVigil = true,
     }
   },
   Restoration = {
