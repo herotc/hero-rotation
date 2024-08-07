@@ -83,6 +83,10 @@ Spell.Hunter.DarkRanger = {
 }
 
 Spell.Hunter.PackLeader = {
+  -- Talents
+  ViciousHunt                           = Spell(445404),
+  -- Buffs
+  FuriousAssaultBuff                    = Spell(448814),
 }
 
 Spell.Hunter.Sentinel = {
@@ -190,17 +194,24 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   AspectoftheEagle                      = Spell(186289),
   Bombardier                            = Spell(389880),
   Butchery                              = Spell(212436),
+  ContagiousReagents                    = Spell(459741),
   CoordinatedAssault                    = Spell(360952),
   FlankingStrike                        = Spell(269751),
   FuryoftheEagle                        = Spell(203415),
   Harpoon                               = Spell(190925),
+  MercilessBlows                        = Spell(459868),
   MongooseBite                          = Spell(259387),
   RaptorStrike                          = Spell(186270),
+  SicEm                                 = Spell(459920),
   Spearhead                             = Spell(360966),
+  SymbioticAdrenaline                   = Spell(459875),
   WildfireBomb                          = Spell(259495),
   -- Buffs
+  BombardierBuff                        = Spell(459859),
   CoordinatedAssaultBuff                = Spell(360952),
   MercilessBlowsBuff                    = Spell(459870), -- Exposed Flank buff from Merciless Blows talent. Called buff.merciless_blows in APL.
+  MongooseFuryBuff                      = Spell(259388),
+  RelentlessPrimalFerocityBuff          = Spell(459962),
   TipoftheSpearBuff                     = Spell(260286),
   -- Debuffs
   BloodseekerDebuff                     = Spell(259277),
