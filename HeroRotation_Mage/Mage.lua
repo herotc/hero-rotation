@@ -90,6 +90,13 @@ Spell.Mage.Spellslinger = {
 }
 
 Spell.Mage.Sunfury = {
+  -- Talents
+  SpellfireSpheres                      = Spell(448601),
+  -- Buffs
+  ArcaneSoulBuff                        = Spell(451038),
+  BurdenofPowerBuff                     = Spell(451049),
+  GloriousIncandescenceBuff             = Spell(451073),
+  SpellfireSpheresBuff                  = Spell(449400),
 }
 
 Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
@@ -111,6 +118,7 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   ImprovedClearcasting                  = Spell(321420),
   MagisSpark                            = Spell(454016),
   PresenceofMind                        = Spell(205025),
+  Reverberate                           = Spell(281482),
   Supernova                             = Spell(157980), --Splash, 8
   TouchoftheMagi                        = Spell(321507), --Splash, 8
   -- Buffs
@@ -125,6 +133,9 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   PresenceofMindBuff                    = Spell(205025),
   SiphonStormBuff                       = Spell(384267),
   -- Debuffs
+  MagisSparkABDebuff                    = Spell(453912),
+  MagisSparkABarDebuff                  = Spell(451911),
+  MagisSparkAMDebuff                    = Spell(453898),
   TouchoftheMagiDebuff                  = Spell(210824),
   -- Misc
   StopAM                                = Spell(363653),

@@ -61,7 +61,7 @@ HL.AddCoreOverride("Spell.IsCastable",
     elseif self == SpellArcane.TouchoftheMagi then
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellArcane.ArcaneSurge then
-      return self:IsLearned() and self:CooldownUp() and RangeOK
+      return self:IsLearned() and self:CooldownUp() and RangeOK and not Player:IsCasting(self)
     else
       return BaseCheck
     end
