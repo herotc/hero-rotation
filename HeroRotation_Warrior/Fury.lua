@@ -166,7 +166,7 @@ local function Precombat()
     if Cast(S.BerserkerStance) then return "berserker_stance precombat 6"; end
   end
   -- recklessness,if=!equipped.fyralath_the_dreamrender
-  if S.Recklessness:IsCastable() and (not I.Fyralath:IsEquipped()) then
+  if CDsON() and S.Recklessness:IsCastable() and (not I.Fyralath:IsEquipped()) then
     if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat 8"; end
   end
   -- avatar,if=!talent.titans_torment
