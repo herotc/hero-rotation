@@ -20,6 +20,8 @@ local CDsON      = HR.CDsON
 -- Num/Bool Helper Functions
 local num        = HR.Commons.Everyone.num
 local bool       = HR.Commons.Everyone.bool
+-- WoW API
+local Delay      = C_Timer.After
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
