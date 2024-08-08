@@ -89,6 +89,8 @@ Spell.DeathKnight.RideroftheApocalypse = {
   -- Buffs
   AFeastofSoulsBuff                     = Spell(440861),
   MograinesMightBuff                    = Spell(444505),
+  -- Debuffs
+  TrollbaneSlowDebuff                   = Spell(444834),
 }
 
 Spell.DeathKnight.Sanlayn = {
@@ -101,7 +103,7 @@ Spell.DeathKnight.Sanlayn = {
   EssenceoftheBloodQueenBuff            = Spell(433925),
   GiftoftheSanlaynBuff                  = Spell(434153),
   InflictionofSorrowBuff                = Spell(460049),
-  VampricStrikeBuff                     = Spell(433899),
+  VampiricStrikeBuff                    = Spell(433899), -- Not available in 11.0.0, but will be in 11.0.2
 }
 
 Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {

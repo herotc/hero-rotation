@@ -15,6 +15,8 @@ local SpellBlood   = Spell.DeathKnight.Blood
 local SpellFrost   = Spell.DeathKnight.Frost
 local SpellUnholy  = Spell.DeathKnight.Unholy
 -- Lua
+local GetTime = GetTime
+local next    = next
 
 --- ============================ CONTENT ============================
 -- Generic
@@ -81,6 +83,22 @@ OldUHIsAvailable = HL.AddCoreOverride("Spell.IsAvailable",
     else
       return BaseCheck
     end
+  end
+, 252)
+
+HL.AddCoreOverride("Player.DnDTicking",
+  function (self)
+    if next(HL.DnDTable) == nil then return false end
+    local Ticking = false
+    for k,v in pairs(HL.DnDTable) do
+      if GetTime() - v < 1.25 then
+        Ticking = true
+      end
+    end
+    if Ticking and Player:BuffUp(SpellUnholy.DeathAndDecayBuff) then
+      return true
+    end
+    return false
   end
 , 252)
 

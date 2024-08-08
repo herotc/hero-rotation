@@ -85,7 +85,7 @@ HL:RegisterForCombatEvent(function(_, _, _, _, _, _, _, destGUID)
   end
 end, "UNIT_DESTROYED")
 
---- ===== Tracker Functions =====
+--- ===== Ghoul Tracker Functions =====
 function HL.GhoulTable:AbomRemains()
   if HL.GhoulTable.AbominationExpiration == 0 then return 0 end
   return HL.GhoulTable.AbominationExpiration - GetTime()
@@ -128,6 +128,27 @@ end
 function HL.GhoulTable:GhoulActive()
   return HL.GhoulTable.SummonedGhoul ~= nil and HL.GhoulTable:GhoulRemains() > 0
 end
+
+--- ===== Death and Decay Tracking =====
+HL.DnDTable = {}
+
+HL:RegisterForCombatEvent(function(_, _, _, srcGUID, _, _, _, destGUID, _, _, _, spellId)
+  if srcGUID == Player:GUID() then
+    -- Death and Decay
+    if spellId == 52212 then
+      HL.DnDTable[destGUID] = GetTime()
+    -- Defile
+    elseif spellId == 156000 then
+      HL.DnDTable[destGUID] = GetTime()
+    end
+  end
+end, "SPELL_DAMAGE")
+
+HL:RegisterForCombatEvent(function(_, _, _, _, _, _, _, destGUID)
+  if HL.DnDTable[destGUID] then
+    HL.DnDTable[destGUID] = nil
+  end
+end, "UNIT_DIED", "UNIT_DESTROYED")  
 
 --- ======= NON-COMBATLOG =======
 
