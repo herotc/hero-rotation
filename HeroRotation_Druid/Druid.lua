@@ -39,6 +39,7 @@ Spell.Druid.Commons = {
   -- Talents
   AstralInfluence                       = Spell(197524),
   ConvoketheSpirits                     = Spell(391528),
+  FluidForm                             = Spell(449193),
   FrenziedRegeneration                  = Spell(22842),
   HeartoftheWild                        = Spell(319454),
   Innervate                             = Spell(29166),
