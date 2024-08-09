@@ -275,6 +275,11 @@ local function EvaluateCycleVTAoE(TargetUnit)
   return TargetUnit:MaxHealth() > Settings.Shadow.VTMinHP * 1000000 and (TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) and TargetUnit:TimeToDie() >= 18 and (TargetUnit:DebuffUp(S.VampiricTouchDebuff) or not VarDotsUp))
 end
 
+local function EvaluateCycleVTRefreshable(TargetUnit)
+  -- target_if=dot.vampiric_touch.refreshable
+  return TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff)
+end
+
 local function Precombat()
   -- flask
   -- food
@@ -331,7 +336,7 @@ local function AoEVariables()
   end
   -- variable,name=dots_up,op=set,value=(active_dot.vampiric_touch+8*(action.shadow_crash.in_flight&talent.whispering_shadows))>=variable.max_vts|!variable.is_vt_possible
   VarDotsUp = ((S.VampiricTouchDebuff:AuraActiveCount() + 8 * num(Crash:InFlight() and S.WhisperingShadows:IsAvailable())) >= VarMaxVTs or not VarIsVTPossible)
-  -- variable,name=holding_crash,op=set,value=(variable.max_vts-active_dot.vampiric_touch)<4|raid_event.adds.in<10&raid_event.adds.count>(variable.max_vts-active_dot.vampiric_touch),if=variable.holding_crash&talent.whispering_shadows
+  -- variable,name=holding_crash,op=set,value=(variable.max_vts-active_dot.vampiric_touch)<4&raid_event.adds.in>15|raid_event.adds.in<10&raid_event.adds.count>(variable.max_vts-active_dot.vampiric_touch),if=variable.holding_crash&talent.whispering_shadows&raid_event.adds.exists
   if VarHoldingCrash and S.WhisperingShadows:IsAvailable() then
     VarHoldingCrash = (VarMaxVTs - S.VampiricTouchDebuff:AuraActiveCount()) < 4
   end
@@ -642,8 +647,8 @@ local function Main()
   if S.VoidBolt:IsCastable() and (S.VoidBolt:CooldownRemains() <= 0.1) then
     if Everyone.CastTargetIf(S.VoidBolt, Enemies10ySplash, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt main 20"; end
   end
-  -- call_action_list,name=empowered_filler,if=(buff.mind_spike_insanity.stack=1&talent.mind_spike|buff.mind_flay_insanity.stack=1&!talent.mind_spike|buff.power_surge.up)&talent.empowered_surges&!cooldown.void_eruption.up
-  if (Player:BuffStack(S.MindSpikeInsanityBuff) == 1 and S.MindSpike:IsAvailable() or Player:BuffStack(S.MindFlayInsanityBuff) == 1 and not S.MindSpike:IsAvailable() or PowerSurgeUp) and S.EmpoweredSurges:IsAvailable() and S.VoidEruption:CooldownDown() then
+  -- call_action_list,name=empowered_filler,if=(buff.mind_spike_insanity.stack>2&talent.mind_spike|buff.mind_flay_insanity.stack>2&!talent.mind_spike)&talent.empowered_surges&!cooldown.void_eruption.up
+  if (Player:BuffStack(S.MindSpikeInsanityBuff) > 2 and S.MindSpike:IsAvailable() or Player:BuffStack(S.MindFlayInsanityBuff) > 2 and not S.MindSpike:IsAvailable()) and S.EmpoweredSurges:IsAvailable() and S.VoidEruption:CooldownDown() then
     local ShouldReturn = EmpoweredFiller(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=heal_for_tof,if=!buff.twist_of_fate.up&buff.twist_of_fate_can_trigger_on_ally_heal.up&(talent.rhapsody|talent.divine_star|talent.halo)
@@ -666,9 +671,9 @@ local function Main()
       if Everyone.CastTargetIf(S.VoidTorrent, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusTTD, EvaluateTargetIfDPMain2, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 26 (off-target)"; end
     end
   end
-  -- shadow_crash,if=!variable.holding_crash&dot.vampiric_touch.refreshable
-  if Crash:IsCastable() and (not VarHoldingCrash and Target:DebuffRefreshable(S.VampiricTouchDebuff)) then
-    if Cast(Crash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash main 28"; end
+  -- shadow_crash,target_if=dot.vampiric_touch.refreshable,if=!variable.holding_crash
+  if Crash:IsCastable() and (not VarHoldingCrash) then
+    if Everyone.CastCycle(Crash, Enemies10ySplash, EvaluateCycleVTRefreshable, not Target:IsInRange(40), Settings.Shadow.GCDasOffGCD.ShadowCrash) then return "shadow_crash main 28"; end
   end
   -- vampiric_touch,target_if=max:(refreshable*10000+target.time_to_die)*(dot.vampiric_touch.ticking|!variable.dots_up),if=refreshable&target.time_to_die>12&(dot.vampiric_touch.ticking|!variable.dots_up)&(variable.max_vts>0|active_enemies=1)&(cooldown.shadow_crash.remains>=dot.vampiric_touch.remains|variable.holding_crash|!talent.whispering_shadows)&(!action.shadow_crash.in_flight|!talent.whispering_shadows)
   if S.VampiricTouch:IsCastable() and ((VarMaxVTs > 0 or EnemiesCount10ySplash == 1) and (not Crash:InFlight() or not S.WhisperingShadows:IsAvailable())) then
