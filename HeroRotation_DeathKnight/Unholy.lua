@@ -225,12 +225,12 @@ local function EvaluateTargetIfFesteringStrikeCleave(TargetUnit)
 end
 
 local function EvaluateTargetIfUnholyAssaultCDsAoE(TargetUnit)
-  -- if=variable.adds_remain&(debuff.festering_wound.stack>=2&cooldown.vile_contagions.remains<3|!talent.vile_contagion)
+  -- if=variable.adds_remain&(debuff.festering_wound.stack>=2&cooldown.vile_contagion.remains<3|!talent.vile_contagion)
   return VarAddsRemain and (TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 2 and S.VileContagion:CooldownRemains() < 3 or not S.VileContagion:IsAvailable())
 end
 
 local function EvaluateTargetIfUnholyAssaultCDsAoESan(TargetUnit)
-  -- if=variable.adds_remain&(debuff.festering_wound.stack>=2&cooldown.vile_contagions.remains<6|!talent.vile_contagion)
+  -- if=variable.adds_remain&(debuff.festering_wound.stack>=2&cooldown.vile_contagion.remains<6|!talent.vile_contagion)
   return VarAddsRemain and (TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 2 and S.VileContagion:CooldownRemains() < 6 or not S.VileContagion:IsAvailable())
 end
 
@@ -436,7 +436,7 @@ local function CDsAoE()
   if S.VileContagion:IsReady() then
     if Everyone.CastTargetIf(S.VileContagion, Enemies10ySplash, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfVileContagionCDsAoE, not Target:IsSpellInRange(S.VileContagion), Settings.Unholy.GCDasOffGCD.VileContagion) then return "vile_contagion cds_aoe 2"; end
   end
-  -- unholy_assault,target_if=max:debuff.festering_wound.stack,if=variable.adds_remain&(debuff.festering_wound.stack>=2&cooldown.vile_contagions.remains<3|!talent.vile_contagion)
+  -- unholy_assault,target_if=max:debuff.festering_wound.stack,if=variable.adds_remain&(debuff.festering_wound.stack>=2&cooldown.vile_contagion.remains<3|!talent.vile_contagion)
   if S.UnholyAssault:IsCastable() then
     if Everyone.CastTargetIf(S.UnholyAssault, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfUnholyAssaultCDsAoE, not Target:IsInMeleeRange(5), Settings.Unholy.GCDasOffGCD.UnholyAssault) then return "unholy_assault cds_aoe 4"; end
   end
@@ -467,7 +467,7 @@ local function CDsAoESan()
   if S.VileContagion:IsReady() then
     if Everyone.CastTargetIf(S.VileContagion, Enemies10ySplash, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfVileContagionCDsAoE, not Target:IsSpellInRange(S.VileContagion), Settings.Unholy.GCDasOffGCD.VileContagion) then return "vile_contagion cds_aoe_san 4"; end
   end
-  -- unholy_assault,target_if=max:debuff.festering_wound.stack,if=variable.adds_remain&(debuff.festering_wound.stack>=2&cooldown.vile_contagions.remains<6|!talent.vile_contagion)
+  -- unholy_assault,target_if=max:debuff.festering_wound.stack,if=variable.adds_remain&(debuff.festering_wound.stack>=2&cooldown.vile_contagion.remains<6|!talent.vile_contagion)
   if S.UnholyAssault:IsCastable() and (VarAddsRemain) then
     if Everyone.CastTargetIf(S.UnholyAssault, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfUnholyAssaultCDsAoESan, not Target:IsInMeleeRange(5), Settings.Unholy.GCDasOffGCD.UnholyAssault) then return "unholy_assault cds_aoe_san 6"; end
   end
