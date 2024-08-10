@@ -595,7 +595,7 @@ local function Cooldown()
   -- Manually added: Generic use_items for main hand items
   if Settings.Commons.Enabled.Items then
     local MHToUse, _, MHRange = Player:GetUseableItems(OnUseExcludes, 16)
-    if MHToUse and MHToUse:IsReady() and (not I.Fyralath:IsEquipped() and (not VarTrinket1Buffs or Trinket1:CooldownDown()) and (not VarTrinket2Buffs or Trinket2:CooldownDown())) then
+    if MHToUse and MHToUse:IsReady() then
       if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(MHRange)) then return "Generic use_item for " .. MHToUse:Name() .. " cooldown 22"; end
     end
   end
