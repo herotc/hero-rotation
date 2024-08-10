@@ -592,6 +592,13 @@ local function Cooldown()
   if S.ConvoketheSpirits:IsCastable() and (BossFightRemains < 5 or (Player:BuffUp(S.TigersFury) and (ComboPoints <= 2 or Player:BuffUp(BsInc) and ComboPoints <= 3) and (Target:TimeToDie() > 5 - num(S.AshamanesGuidance:IsAvailable()) or Target:TimeToDie() == FightRemains))) then
     if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.ConvokeTheSpirits, not IsInMeleeRange) then return "convoke_the_spirits cooldown 20"; end
   end
+  -- Manually added: Generic use_items for main hand items
+  if Settings.Commons.Enabled.Items then
+    local MHToUse, _, MHRange = Player:GetUseableItems(OnUseExcludes, 16)
+    if MHToUse and MHToUse:IsReady() and (not I.Fyralath:IsEquipped() and (not VarTrinket1Buffs or Trinket1:CooldownDown()) and (not VarTrinket2Buffs or Trinket2:CooldownDown())) then
+      if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(MHRange)) then return "Generic use_item for " .. MHToUse:Name() .. " cooldown 22"; end
+    end
+  end
 end
 
 local function Variables()
