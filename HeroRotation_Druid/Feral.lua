@@ -596,7 +596,7 @@ local function Cooldown()
   if Settings.Commons.Enabled.Items then
     local MHToUse, _, MHRange = Player:GetUseableItems(OnUseExcludes, 16)
     if MHToUse and MHToUse:IsReady() then
-      if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(MHRange)) then return "Generic use_item for " .. MHToUse:Name() .. " cooldown 22"; end
+      if Cast(MHToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(MHRange)) then return "Generic use_item for " .. MHToUse:Name() .. " cooldown 22"; end
     end
   end
 end
