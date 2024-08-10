@@ -18,6 +18,7 @@ local SpellProt = Spell.Paladin.Protection
 -- Holy, ID: 65
 
 -- Protection, ID: 66
+local ProtPalBuffUp
 ProtPalBuffUp = HL.AddCoreOverride("Player.BuffUp",
   function(self, Spell, AnyCaster, BypassRecovery)
     local BaseCheck = ProtPalBuffUp(self, Spell, AnyCaster, BypassRecovery)
@@ -29,6 +30,7 @@ ProtPalBuffUp = HL.AddCoreOverride("Player.BuffUp",
   end
 , 66)
 
+local ProtPalBuffRemains
 ProtPalBuffRemains = HL.AddCoreOverride("Player.BuffRemains",
   function(self, Spell, AnyCaster, BypassRecovery)
     local BaseCheck = ProtPalBuffRemains(self, Spell, AnyCaster, BypassRecovery)
@@ -40,6 +42,7 @@ ProtPalBuffRemains = HL.AddCoreOverride("Player.BuffRemains",
   end
 , 66)
 
+local ProtPalCDRemains
 ProtPalCDRemains = HL.AddCoreOverride("Spell.CooldownRemains",
   function(self, BypassRecovery)
     local BaseCheck = ProtPalCDRemains(self, BypassRecovery)
@@ -51,11 +54,26 @@ ProtPalCDRemains = HL.AddCoreOverride("Spell.CooldownRemains",
   end
 , 66)
 
+local ProtPalIsAvail
 ProtPalIsAvail = HL.AddCoreOverride("Spell.IsAvailable",
   function(self, CheckPet)
     local BaseCheck = ProtPalIsAvail(self, CheckPet)
     if self == SpellProt.AvengingWrath and SpellProt.Sentinel:IsAvailable() then
       return SpellProt.Sentinel:IsAvailable()
+    else
+      return BaseCheck
+    end
+  end
+, 66)
+
+local ProtPalIsCastable
+ProtPalIsCastable = HL.AddCoreOverride("Spell.IsCastable",
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = ProtPalIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, OffSet)
+    if self == SpellProt.RiteofAdjuration then
+      return BaseCheck and Player:BuffDown(SpellProt.RiteofAdjurationBuff)
+    elseif self == SpellProt.RiteofSanctification then
+      return BaseCheck and Player:BuffDown(SpellProt.RiteofSanctificationBuff)
     else
       return BaseCheck
     end

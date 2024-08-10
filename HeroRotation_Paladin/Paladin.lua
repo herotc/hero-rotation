@@ -49,6 +49,7 @@ Spell.Paladin.Commons = {
   HammerofWrath                         = Spell(24275),
   HolyAvenger                           = Spell(105809),
   LayonHands                            = Spell(633),
+  OfDuskandDawn                         = Spell(409441),
   Seraphim                              = Spell(152262),
   ZealotsParagon                        = Spell(391142),
   -- Auras
@@ -58,6 +59,7 @@ Spell.Paladin.Commons = {
   RetributionAura                       = Spell(183435),
   -- Buffs
   AvengingWrathBuff                     = Spell(31884),
+  BlessingofDawnBuff                    = Spell(385127),
   BlessingofDuskBuff                    = Spell(385126),
   ConsecrationBuff                      = Spell(188370),
   DivinePurposeBuff                     = Spell(223819),
@@ -70,6 +72,30 @@ Spell.Paladin.Commons = {
   MarkofFyralathDebuff                  = Spell(414532),
   -- Pool
   Pool                                  = Spell(999910),
+}
+
+Spell.Paladin.HeraldoftheSun = {
+}
+
+Spell.Paladin.Lightsmith = {
+  -- Abilities
+  HolyBulwark                          = Spell(432459),
+  SacredWeapon                         = Spell(432472),
+  -- Talents
+  HolyArmaments                        = Spell(432459),
+  RiteofAdjuration                     = Spell(433583),
+  RiteofSanctification                 = Spell(433568),
+  -- Buffs
+  RiteofAdjurationBuff                 = Spell(433584),
+  RiteofSanctificationBuff             = Spell(433550),
+  SacredWeaponBuff                     = Spell(432502),
+}
+
+Spell.Paladin.Templar = {
+  -- Talents
+  HammerofLight                        = Spell(427453),
+  LightsDeliverance                    = Spell(425518),
+  LightsGuidance                       = Spell(427445),
 }
 
 Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
@@ -96,12 +122,15 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   BulwarkofRighteousFuryBuff            = Spell(386652),
   GuardianofAncientKingsBuff            = MultiSpell(86659,212641),
   MomentofGloryBuff                     = Spell(327193),
+  RedoubtBuff                           = Spell(280375),
   SanctificationBuff                    = Spell(424616), -- T31, 2pc
   SanctificationEmpowerBuff             = Spell(424622), -- T31, 2pc
   SentinelBuff                          = Spell(389539),
   ShiningLightFreeBuff                  = Spell(327510),
   -- Debuffs
 })
+Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Protection, Spell.Paladin.Lightsmith)
+Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Protection, Spell.Paladin.Templar)
 
 Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   -- Abilities
@@ -153,6 +182,8 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   -- Debuffs
   ExpurgationDebuff                     = Spell(383346),
 })
+Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Retribution, Spell.Paladin.HeraldoftheSun)
+Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Retribution, Spell.Paladin.Templar)
 
 Spell.Paladin.Holy = MergeTableByKey(Spell.Paladin.Commons, {
   -- Abilities
@@ -171,6 +202,8 @@ Spell.Paladin.Holy = MergeTableByKey(Spell.Paladin.Commons, {
   HolyPrism                             = Spell(114165),
   LightsHammer                          = Spell(114158),
 })
+Spell.Paladin.Holy = MergeTableByKey(Spell.Paladin.Holy, Spell.Paladin.HeraldoftheSun)
+Spell.Paladin.Holy = MergeTableByKey(Spell.Paladin.Holy, Spell.Paladin.Lightsmith)
 
 -- Items
 if not Item.Paladin then Item.Paladin = {} end

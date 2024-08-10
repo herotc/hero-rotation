@@ -31,6 +31,8 @@ HR.GUISettings.APL.Paladin = {
       Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
+      DivineToll = "Suggested",
+      HolyArmaments = "Suggested",
     },
   },
   CommonsOGCD = {
