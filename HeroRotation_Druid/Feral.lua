@@ -679,11 +679,11 @@ local function APL()
       if Everyone.CastTargetIf(S.Rake, EnemiesMelee, "max", EvaluateTargetIfFilterRakeMain, nil, not IsInAoERange) then return "rake main 8"; end
     end
     -- natures_vigil,if=spell_targets.swipe_cat>0
-    if S.NaturesVigil:IsCastable() and (EnemiesCount8y > 0) then
+    if Settings.Feral.ShowHealSpells and S.NaturesVigil:IsCastable() and (EnemiesCount8y > 0) then
       if Cast(S.NaturesVigil, Settings.Feral.OffGCDasOffGCD.NaturesVigil) then return "natures_vigil main 10"; end
     end
     -- renewal,if=spell_targets.swipe_cat>0
-    if S.Renewal:IsCastable() and (EnemiesCount8y > 0) then
+    if Settings.Feral.ShowHealSpells and S.Renewal:IsCastable() and (EnemiesCount8y > 0) then
       if Cast(S.Renewal, Settings.Feral.GCDasOffGCD.Renewal) then return "renewal main 12"; end
     end
     -- ferocious_bite,if=buff.apex_predators_craving.up&!(variable.need_bt&active_bt_triggers=2)
