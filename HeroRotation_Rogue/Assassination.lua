@@ -198,10 +198,13 @@ local function UsePriorityRotation()
 end
 
 -- actions+=/variable,name=not_pooling,value=(dot.deathmark.ticking|dot.kingsbane.ticking|debuff.shiv.up)
--- |(buff.envenom.up&buff.envenom.remains<=1&energy.pct>=40)|energy.pct>=50|fight_remains<=20
+-- |(buff.envenom.up&buff.envenom.remains<=1)
+-- |energy.pct>=(40+30*talent.hand_of_fate-15*talent.vicious_venoms)
+-- |fight_remains<=20
 local function NotPoolingVar()
-  if (Target:DebuffUp(S.Deathmark) or Target:DebuffUp(S.Kingsbane) or Target:DebuffUp(S.ShivDebuff)
-    or Player:BuffUp(S.Envenom) and Player:BuffRemains(S.Envenom) <= 1 and Player:EnergyPercentage() >= 40
+  if ((Target:DebuffUp(S.Deathmark) or Target:DebuffUp(S.Kingsbane) or Target:DebuffUp(S.ShivDebuff))
+    or (Player:BuffUp(S.Envenom) and Player:BuffRemains(S.Envenom) <= 1)
+    or Player:EnergyPercentage() >= (40 + 30 * num(S.HandOfFate:IsAvailable()) - 15 * num(S.ViciousVenoms:IsAvailable()))
     or HL.BossFilteredFightRemains("<=", 20)) then
       return true
   end
@@ -678,9 +681,9 @@ end
 -- # Damage over time abilities
 local function Dot ()
   -- actions.dot+=/	crimson_tempest,target_if=min:remains,if=spell_targets>=3&refreshable&pmultiplier<=1
-  --&effective_combo_points>=variable.effective_spend_cp&energy.regen_combined>25&!cooldown.deathmark.ready&target.time_to_die-remains>6
+  --&effective_combo_points>=variable.effective_spend_cp&energy.regen_combined>25&target.time_to_die-remains>6
   if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 3 and ComboPoints >= EffectiveCPSpend
-    and EnergyRegenCombined > 25 and not S.Deathmark:IsReady() then
+    and EnergyRegenCombined > 25 then
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       if IsDebuffRefreshable(CycleUnit, S.CrimsonTempest, CrimsonTempestThreshold)
         and CycleUnit:PMultiplier(S.CrimsonTempest) <= 1
@@ -910,9 +913,11 @@ local function APL ()
     if ShouldReturn then return ShouldReturn end
     -- # Put SnD up initially for Cut to the Chase, refresh with Envenom if at low duration
     -- actions+=/slice_and_dice,if=!buff.slice_and_dice.up&dot.rupture.ticking&combo_points>=1
+    -- &(!buff.indiscriminate_carnage.up|variable.single_target)
     if not Player:BuffUp(S.SliceandDice) then
-      if S.SliceandDice:IsReady() and Player:ComboPoints() >= 1 and Target:DebuffUp(S.Rupture) then
-        if Cast(S.SliceandDice) then return "Cast Slice and Dice" end
+      if S.SliceandDice:IsReady() and Target:DebuffUp(S.Rupture) and Player:ComboPoints() >= 1
+        and (Player:BuffDown(S.IndiscriminateCarnageBuff) or SingleTarget) then
+          if Cast(S.SliceandDice) then return "Cast Slice and Dice" end
       end
     elseif TargetInAoERange then
       -- actions+=/envenom,if=buff.slice_and_dice.up&buff.slice_and_dice.remains<5&combo_points>=5
