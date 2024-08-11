@@ -160,6 +160,18 @@ local function ComputeRakePMultiplier()
 end
 S.Rake:RegisterPMultiplier(S.RakeDebuff, ComputeRakePMultiplier)
 
+
+local function ComputeRipPMultiplier()
+  local Mult = 1
+  Mult = Player:BuffUp(S.BloodtalonsBuff) and Mult * 1.25 or Mult
+  Mult = S.DreadfulBleeding:IsAvailable() and Mult * 1.2 or Mult
+  Mult = Player:HasTier("TWWS1", 4) and Mult * 1.08 or Mult
+  Mult = S.LionsStrength:IsAvailable() and Mult * 1.15 or Mult
+  Mult = Player:BuffUp(S.TigersFury) and Mult * 1.15 or Mult
+  return Mult
+end
+S.Rip:RegisterPMultiplier(S.RipDebuff, ComputeRipPMultiplier)
+
 --- ===== Helper Functions =====
 local BtTriggers = {
   S.Rake,
@@ -243,6 +255,11 @@ local function EvaluateTargetIfFilterAdaptiveSwarm(TargetUnit)
   return (1 + TargetUnit:DebuffStack(S.AdaptiveSwarmDebuff)) * num(TargetUnit:DebuffStack(S.AdaptiveSwarmDebuff) < 3) * TargetUnit:TimeToDie()
 end
 
+local function EvaluateTargetIfFilterBloodseeker(TargetUnit)
+  -- target_if=max:dot.bloodseeker_vines.ticking
+  return TargetUnit:DebuffRemains(S.BloodseekerVinesDebuff)
+end
+
 local function EvaluateTargetIfFilterLIMoonfire(TargetUnit)
   -- target_if=max:(3*refreshable)+dot.adaptive_swarm_damage.ticking
   return (3 * num(TargetUnit:DebuffRefreshable(S.LIMoonfireDebuff))) + num(TargetUnit:DebuffUp(S.LIMoonfireDebuff))
@@ -283,6 +300,11 @@ end
 local function EvaluateTargetIfLIMoonfireRefreshable(TargetUnit)
   -- if=refreshable
   return TargetUnit:DebuffRefreshable(S.LIMoonfireDebuff)
+end
+
+local function EvaluateTargetIfPrimalWrath(TargetUnit)
+  -- if=spell_targets.primal_wrath>1&((dot.primal_wrath.remains<6.5&!buff.bs_inc.up|dot.primal_wrath.refreshable)|(!talent.rampant_ferocity.enabled&(spell_targets.primal_wrath>1&!dot.bloodseeker_vines.ticking&!buff.ravage.up|spell_targets.primal_wrath>6+talent.ravage))|dot.primal_wrath.pmultiplier<persistent_multiplier)
+  return (TargetUnit:DebuffRemains(S.RipDebuff) < 6.5 and Player:BuffDown(BsInc) or TargetUnit:DebuffRefreshable(S.RipDebuff)) or (not S.RampantFerocity:IsAvailable() and (EnemiesCount8y > 1 and TargetUnit:DebuffDown(S.BloodseekerVinesDebuff) and Player:BuffDown(S.RavageBuffFeral) or EnemiesCount8y > 6 + num(S.Ravage:IsAvailable()))) or TargetUnit:PMultiplier(S.Rip) < Player:PMultiplier(S.Rip)
 end
 
 local function EvaluateTargetIfRakeRefreshable(TargetUnit)
@@ -362,13 +384,13 @@ local function Builder()
   if S.Thrash:IsCastable() and (Target:DebuffRefreshable(S.ThrashDebuff)) then
     if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash builder 8"; end
   end
-  -- moonfire_cat,if=refreshable&cooldown.convoke_the_spirits.remains>5
-  if S.LIMoonfire:IsReady() and (Target:DebuffRefreshable(S.LIMoonfireDebuff) and S.ConvoketheSpirits:CooldownRemains() > 5) then
-    if Cast(S.LIMoonfire, nil, nil, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat builder 10"; end
-  end
   -- shred,if=buff.clearcasting.react
   if S.Shred:IsReady() and (Player:BuffUp(S.Clearcasting)) then
-    if Cast(S.Shred, nil, nil, not IsInMeleeRange) then return "shred builder 12"; end
+    if Cast(S.Shred, nil, nil, not IsInMeleeRange) then return "shred builder 10"; end
+  end
+  -- moonfire_cat,if=refreshable
+  if S.LIMoonfire:IsReady() and (Target:DebuffRefreshable(S.LIMoonfireDebuff)) then
+    if Cast(S.LIMoonfire, nil, nil, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat builder 12"; end
   end
   -- brutal_slash,if=!(variable.need_bt&buff.bt_swipe.up)
   if S.BrutalSlash:IsReady() and (not (VarNeedBT and BTBuffUp(S.Swipe))) then
@@ -401,23 +423,23 @@ local function Builder()
 end
 
 local function Finisher()
-  -- primal_wrath,if=spell_targets.primal_wrath>1&((dot.primal_wrath.remains<6.5&!buff.bs_inc.up|dot.primal_wrath.refreshable)|spell_targets.primal_wrath>3&!talent.rampant_ferocity.enabled|dot.primal_wrath.pmultiplier<persistent_multiplier)
-  if S.PrimalWrath:IsReady() and (EnemiesCount8y > 1 and ((Target:DebuffRemains(S.PrimalWrath) < 6.5 and Player:BuffDown(BsInc) or Target:DebuffRefreshable(S.PrimalWrath)) or EnemiesCount8y > 3 and not S.RampantFerocity:IsAvailable() or Target:PMultiplier(S.Rake) < Player:PMultiplier(S.Rake))) then
-    if Cast(S.PrimalWrath, nil, nil, not IsInAoERange) then return "primal_wrath finisher 2"; end
+  -- primal_wrath,target_if=max:dot.bloodseeker_vines.ticking,if=spell_targets.primal_wrath>1&((dot.primal_wrath.remains<6.5&!buff.bs_inc.up|dot.primal_wrath.refreshable)|(!talent.rampant_ferocity.enabled&(spell_targets.primal_wrath>1&!dot.bloodseeker_vines.ticking&!buff.ravage.up|spell_targets.primal_wrath>6+talent.ravage))|dot.primal_wrath.pmultiplier<persistent_multiplier)
+  if S.PrimalWrath:IsReady() and (EnemiesCount8y > 1) then
+    if Everyone.CastTargetIf(S.PrimalWrath, Enemies8y, "max", EvaluateTargetIfFilterBloodseeker, EvaluateTargetIfPrimalWrath, not IsInAoERange) then return "primal_wrath finisher 2"; end
   end
   -- rip,target_if=refreshable,if=(!talent.primal_wrath|spell_targets=1)&(buff.bloodtalons.up|!talent.bloodtalons)&(buff.tigers_fury.up|dot.rip.remains<cooldown.tigers_fury.remains)
   if S.Rip:IsReady() and ((not S.PrimalWrath:IsAvailable() or EnemiesCountMelee == 1) and (Player:BuffUp(S.BloodtalonsBuff) or not S.Bloodtalons:IsAvailable()) and (Player:BuffUp(S.TigersFury) or Target:DebuffRemains(S.RipDebuff) < S.TigersFury:CooldownRemains())) then
     if Everyone.CastCycle(S.Rip, EnemiesMelee, EvaluateCycleRip, not IsInMeleeRange) then return "rip finisher 4"; end
   end
   -- pool_resource,for_next=1
-  -- ferocious_bite,max_energy=1,target_if=max:target.time_to_die,if=!buff.bs_inc.up|!talent.soul_of_the_forest.enabled
+  -- ferocious_bite,max_energy=1,target_if=max:dot.bloodseeker_vines.ticking,if=!buff.bs_inc.up|!talent.soul_of_the_forest.enabled
   -- TODO: Determine a way to do both pool_resource and target_if together.
   if S.FerociousBite:IsReady() and (Player:BuffDown(BsInc) or not S.SouloftheForest:IsAvailable()) then
     if CastPooling(S.FerociousBite, Player:EnergyTimeToX(50)) then return "ferocious_bite finisher 6"; end
   end
-  -- ferocious_bite,target_if=max:target.time_to_die
+  -- ferocious_bite,target_if=max:dot.bloodseeker_vines.ticking
   if S.FerociousBite:IsReady() then
-    if Everyone.CastTargetIf(S.FerociousBite, EnemiesMelee, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange) then return "ferocious_bite finisher 8"; end
+    if Everyone.CastTargetIf(S.FerociousBite, EnemiesMelee, "max", EvaluateTargetIfFilterBloodseeker, nil, not IsInMeleeRange) then return "ferocious_bite finisher 8"; end
   end
 end
 
@@ -466,9 +488,9 @@ local function AoeBuilder()
   if S.LIMoonfire:IsReady() and (not (BTBuffUp(S.LIMoonfire) and CountActiveBtTriggers() == 2)) then
     if Everyone.CastTargetIf(S.LIMoonfire, Enemies8y, "max", EvaluateTargetIfFilterLIMoonfire, EvaluateTargetIfLIMoonfireRefreshable, not Target:IsSpellInRange(S.LIMoonfire)) then return "moonfire_cat aoe_builder 20"; end
   end
-  -- rake,target_if=min:dot.rake.remains-20*(dot.rake.pmultiplier<persistent_multiplier),if=refreshable&!(buff.bt_rake.up&active_bt_triggers=2)
+  -- rake,target_if=min:dot.rake.remains-20*(dot.rake.pmultiplier<persistent_multiplier),if=!(buff.bt_rake.up&active_bt_triggers=2)
   if S.Rake:IsReady() and (not (BTBuffUp(S.Rake) and CountActiveBtTriggers() == 2)) then
-    if Everyone.CastTargetIf(S.Rake, EnemiesMelee, "min", EvaluateTargetIfFilterRakeAoEBuilder, EvaluateTargetIfRakeRefreshable, not IsInMeleeRange) then return "rake aoe_builder 22"; end
+    if Everyone.CastTargetIf(S.Rake, EnemiesMelee, "min", EvaluateTargetIfFilterRakeAoEBuilder, nil, not IsInMeleeRange) then return "rake aoe_builder 22"; end
   end
   -- shred,if=!(buff.bt_shred.up&active_bt_triggers=2)&!variable.easy_swipe&!buff.sudden_ambush.up
   if S.Shred:IsReady() and (not (BTBuffUp(S.Shred) and CountActiveBtTriggers() == 2) and not VarEasySwipe and not Player:BuffUp(S.SuddenAmbushBuff)) then
@@ -530,21 +552,29 @@ local function Berserk()
   if S.BrutalSlash:IsReady() and (CountActiveBtTriggers() == 2 and BTBuffDown(S.Swipe)) then
     if Cast(S.BrutalSlash, nil, nil, not IsInAoERange) then return "brutal_slash berserk 14"; end
   end
+  -- swipe_cat,if=active_bt_triggers=2&buff.bt_swipe.down&talent.wild_slashes
+  if S.Swipe:IsReady() and (CountActiveBtTriggers() == 2 and BTBuffDown(S.Swipe) and S.WildSlashes:IsAvailable()) then
+    if Cast(S.Swipe, nil, nil, not IsInAoERange) then return "swipe_cat berserk 16"; end
+  end
   -- brutal_slash,if=cooldown.brutal_slash.charges>1&buff.bt_swipe.down
   if S.BrutalSlash:IsReady() and (S.BrutalSlash:Charges() > 1 and BTBuffDown(S.Swipe)) then
-    if Cast(S.BrutalSlash, nil, nil, not IsInAoERange) then return "brutal_slash berserk 16"; end
+    if Cast(S.BrutalSlash, nil, nil, not IsInAoERange) then return "brutal_slash berserk 18"; end
   end
   -- shred,if=buff.bt_shred.down
   if S.Shred:IsReady() and (BTBuffDown(S.Shred)) then
-    if Cast(S.Shred, nil, nil, not IsInMeleeRange) then return "shred berserk 18"; end
+    if Cast(S.Shred, nil, nil, not IsInMeleeRange) then return "shred berserk 20"; end
   end
   -- brutal_slash,if=cooldown.brutal_slash.charges>1
   if S.BrutalSlash:IsReady() and (S.BrutalSlash:Charges() > 1) then
-    if Cast(S.BrutalSlash, nil, nil, not IsInAoERange) then return "brutal_slash berserk 20"; end
+    if Cast(S.BrutalSlash, nil, nil, not IsInAoERange) then return "brutal_slash berserk 22"; end
+  end
+  -- swipe_cat,if=buff.bt_swipe.down&talent.wild_slashes
+  if S.Swipe:IsReady() and (BTBuffDown(S.Swipe) and S.WildSlashes:IsAvailable()) then
+    if Cast(S.Swipe, nil, nil, not IsInAoERange) then return "swipe_cat berserk 24"; end
   end
   -- shred
   if S.Shred:IsReady() then
-    if Cast(S.Shred, nil, nil, not IsInMeleeRange) then return "shred berserk 22"; end
+    if Cast(S.Shred, nil, nil, not IsInMeleeRange) then return "shred berserk 26"; end
   end
 end
 
@@ -568,36 +598,36 @@ local function Cooldown()
       if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion cooldown 8"; end
     end
   end
+  -- use_items
+  if Settings.Commons.Enabled.Items then
+    local ItemToUse, _, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
+    if ItemToUse and ItemToUse:IsReady() then
+      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_item for " .. ItemToUse:Name() .. " cooldown 10"; end
+    end
+  end
   -- feral_frenzy,if=combo_points<=1|buff.bs_inc.up&combo_points<=2
   if S.FeralFrenzy:IsReady() and (ComboPoints <= 1 or Player:BuffUp(BsInc) and ComboPoints <= 2) then
-    if Cast(S.FeralFrenzy, Settings.Feral.GCDasOffGCD.FeralFrenzy, nil, not IsInMeleeRange) then return "feral_frenzy cooldown 10"; end
+    if Cast(S.FeralFrenzy, Settings.Feral.GCDasOffGCD.FeralFrenzy, nil, not IsInMeleeRange) then return "feral_frenzy cooldown 12"; end
   end
   -- use_item,slot=trinket1,if=(buff.bs_inc.up|((buff.tigers_fury.up&cooldown.tigers_fury.remains>20)&(cooldown.convoke_the_spirits.remains<4|cooldown.convoke_the_spirits.remains>45|cooldown.convoke_the_spirits.remains-trinket.2.cooldown.remains>0|!talent.convoke_the_spirits&(cooldown.bs_inc.remains>40|cooldown.bs_inc.remains-trinket.2.cooldown.remains>0))))&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
   if Trinket1:IsReady() and not VarTrinket1BL and ((Player:BuffUp(BsInc) or ((Player:BuffUp(S.TigersFury) and S.TigersFury:CooldownRemains() > 20) and (S.ConvoketheSpirits:CooldownRemains() < 4 or S.ConvoketheSpirits:CooldownRemains() > 45 or S.ConvoketheSpirits:CooldownRemains() - Trinket2:CooldownRemains() > 0 or not S.ConvoketheSpirits:IsAvailable() and (BsInc:CooldownRemains() > 40 or BsInc:CooldownRemains() - Trinket2:CooldownRemains() > 0)))) and (not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or VarTrinket1Duration >= FightRemains) then
-    if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for "..Trinket1:Name().." cooldown 12"; end
+    if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for "..Trinket1:Name().." cooldown 14"; end
   end
   -- use_item,slot=trinket2,if=(buff.bs_inc.up|((buff.tigers_fury.up&cooldown.tigers_fury.remains>20)&(cooldown.convoke_the_spirits.remains<4|cooldown.convoke_the_spirits.remains>45|cooldown.convoke_the_spirits.remains-trinket.1.cooldown.remains>0|!talent.convoke_the_spirits&(cooldown.bs_inc.remains>40|cooldown.bs_inc.remains-trinket.1.cooldown.remains>0))))&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
   if Trinket2:IsReady() and not VarTrinket2BL and ((Player:BuffUp(BsInc) or ((Player:BuffUp(S.TigersFury) and S.TigersFury:CooldownRemains() > 20) and (S.ConvoketheSpirits:CooldownRemains() < 4 or S.ConvoketheSpirits:CooldownRemains() > 45 or S.ConvoketheSpirits:CooldownRemains() - Trinket1:CooldownRemains() > 0 or not S.ConvoketheSpirits:IsAvailable() and (BsInc:CooldownRemains() > 40 or BsInc:CooldownRemains() - Trinket1:CooldownRemains() > 0)))) and (not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 1) or VarTrinket1Duration >= FightRemains) then
-    if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for "..Trinket2:Name().." cooldown 14"; end
+    if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for "..Trinket2:Name().." cooldown 16"; end
   end
   -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.2.cooldown.remains>20|!variable.trinket_2_buffs|trinket.2.cooldown.remains&cooldown.tigers_fury.remains>20)
   if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs and (Trinket2:CooldownRemains() > 20 or not VarTrinket2Buffs or Trinket2:CooldownDown() and S.TigersFury:CooldownRemains() > 20)) then
-    if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for "..Trinket1:Name().." cooldown 16"; end
+    if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for "..Trinket1:Name().." cooldown 18"; end
   end
   -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains>20|!variable.trinket_1_buffs|trinket.1.cooldown.remains&cooldown.tigers_fury.remains>20)
   if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs and (Trinket1:CooldownRemains() > 20 or not VarTrinket1Buffs or Trinket1:CooldownDown() and S.TigersFury:CooldownRemains() > 20)) then
-    if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for "..Trinket2:Name().." cooldown 18"; end
+    if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for "..Trinket2:Name().." cooldown 20"; end
   end
   -- convoke_the_spirits,if=fight_remains<5|(buff.tigers_fury.up&(combo_points<=2|buff.bs_inc.up&combo_points<=3)&(target.time_to_die>5-talent.ashamanes_guidance.enabled|target.time_to_die=fight_remains))
   if S.ConvoketheSpirits:IsCastable() and (BossFightRemains < 5 or (Player:BuffUp(S.TigersFury) and (ComboPoints <= 2 or Player:BuffUp(BsInc) and ComboPoints <= 3) and (Target:TimeToDie() > 5 - num(S.AshamanesGuidance:IsAvailable()) or Target:TimeToDie() == FightRemains))) then
-    if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.ConvokeTheSpirits, not IsInMeleeRange) then return "convoke_the_spirits cooldown 20"; end
-  end
-  -- Manually added: Generic use_items for main hand items
-  if Settings.Commons.Enabled.Items then
-    local MHToUse, _, MHRange = Player:GetUseableItems(OnUseExcludes, 16)
-    if MHToUse and MHToUse:IsReady() then
-      if Cast(MHToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(MHRange)) then return "Generic use_item for " .. MHToUse:Name() .. " cooldown 22"; end
-    end
+    if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.ConvokeTheSpirits, not IsInMeleeRange) then return "convoke_the_spirits cooldown 22"; end
   end
 end
 
