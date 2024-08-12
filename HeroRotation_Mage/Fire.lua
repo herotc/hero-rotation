@@ -100,6 +100,7 @@ local UnitsWithIgniteCount
 local BossFightRemains = 11111
 local FightRemains = 11111
 local GCDMax
+local Bolt = S.FrostfireBolt:IsAvailable() and S.FrostfireBolt or S.Fireball
 
 --- ===== Trinket Variables =====
 local function SetTrinketVariables()
@@ -157,22 +158,27 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 HL:RegisterForEvent(function()
   S.Pyroblast:RegisterInFlight()
   S.Fireball:RegisterInFlight()
+  S.FrostfireBolt:RegisterInFlight()
   S.Meteor:RegisterInFlightEffect(351140)
   S.Meteor:RegisterInFlight()
   S.PhoenixFlames:RegisterInFlightEffect(257542)
   S.PhoenixFlames:RegisterInFlight()
   S.Pyroblast:RegisterInFlight(S.CombustionBuff)
   S.Fireball:RegisterInFlight(S.CombustionBuff)
+  S.FrostfireBolt:RegisterInFlight(S.CombustionBuff)
+  Bolt = S.FrostfireBolt:IsAvailable() and S.FrostfireBolt or S.Fireball
   SetPrecombatVariables()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 S.Pyroblast:RegisterInFlight()
 S.Fireball:RegisterInFlight()
+S.FrostfireBolt:RegisterInFlight()
 S.Meteor:RegisterInFlightEffect(351140)
 S.Meteor:RegisterInFlight()
 S.PhoenixFlames:RegisterInFlightEffect(257542)
 S.PhoenixFlames:RegisterInFlight()
 S.Pyroblast:RegisterInFlight(S.CombustionBuff)
 S.Fireball:RegisterInFlight(S.CombustionBuff)
+S.FrostfireBolt:RegisterInFlight(S.CombustionBuff)
 
 HL:RegisterForEvent(function()
   BossFightRemains = 11111
@@ -203,9 +209,9 @@ local function ShiftingPowerFullReduction()
 end
 
 local function FreeCastAvailable()
-  local FSInFlight = FirestarterActive() and (num(S.Pyroblast:InFlight()) + num(S.Fireball:InFlight())) or 0
+  local FSInFlight = FirestarterActive() and (num(S.Pyroblast:InFlight()) + num(Bolt:InFlight())) or 0
   FSInFlight = FSInFlight + num(S.PhoenixFlames:InFlight() or Player:PrevGCDP(1, S.PhoenixFlames))
-  return Player:BuffUp(S.HotStreakBuff) or Player:BuffUp(S.HyperthermiaBuff) or (Player:BuffUp(S.HeatingUpBuff) and (ImprovedScorchActive() and Player:IsCasting(S.Scorch) or FirestarterActive() and (Player:IsCasting(S.Fireball) or FSInFlight > 0)))
+  return Player:BuffUp(S.HotStreakBuff) or Player:BuffUp(S.HyperthermiaBuff) or (Player:BuffUp(S.HeatingUpBuff) and (ImprovedScorchActive() and Player:IsCasting(S.Scorch) or FirestarterActive() and (Player:IsCasting(Bolt) or FSInFlight > 0)))
 end
 
 local function UnitsWithIgnite(enemies)
@@ -220,7 +226,7 @@ end
 
 local function HotStreakInFlight()
   local total = 0
-  if S.Fireball:InFlight() or S.PhoenixFlames:InFlight() then
+  if Bolt:InFlight() or S.PhoenixFlames:InFlight() then
     total = total + 1
   end
   return total
@@ -261,8 +267,8 @@ local function Precombat()
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast precombat 4"; end
   end
   -- Manually added: fireball
-  if S.Fireball:IsReady() then
-    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball precombat 6"; end
+  if Bolt:IsReady() then
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball precombat 6"; end
   end
 end
 
@@ -336,7 +342,7 @@ local function CombustionPhase()
   -- call_action_list,name=active_talents
   local ShouldReturn = ActiveTalents(); if ShouldReturn then return ShouldReturn; end
   -- combustion from below
-  if S.Combustion:IsReady() and (HotStreakInFlight() == 0 and CombustionDown and VarTimeToCombustion <= 0 and (Player:IsCasting(S.Scorch) and S.Scorch:ExecuteRemains() < VarCombustionCastRemains or Player:IsCasting(S.Fireball) and S.Fireball:ExecuteRemains() < VarCombustionCastRemains or Player:IsCasting(S.Pyroblast) and S.Pyroblast:ExecuteRemains() < VarCombustionCastRemains or Player:IsCasting(S.Flamestrike) and S.Flamestrike:ExecuteRemains() < VarCombustionCastRemains or S.Meteor:InFlight() and S.Meteor:InFlightRemains() < VarCombustionCastRemains)) then
+  if S.Combustion:IsReady() and (HotStreakInFlight() == 0 and CombustionDown and VarTimeToCombustion <= 0 and (Player:IsCasting(S.Scorch) and S.Scorch:ExecuteRemains() < VarCombustionCastRemains or Player:IsCasting(Bolt) and Bolt:ExecuteRemains() < VarCombustionCastRemains or Player:IsCasting(S.Pyroblast) and S.Pyroblast:ExecuteRemains() < VarCombustionCastRemains or Player:IsCasting(S.Flamestrike) and S.Flamestrike:ExecuteRemains() < VarCombustionCastRemains or S.Meteor:InFlight() and S.Meteor:InFlightRemains() < VarCombustionCastRemains)) then
     if Cast(S.Combustion, Settings.Fire.OffGCDasOffGCD.Combustion) then return "combustion combustion_phase 2"; end
   end
   -- fire_blast from below
@@ -359,8 +365,8 @@ local function CombustionPhase()
     if Cast(S.Meteor, Settings.Fire.GCDasOffGCD.Meteor, nil, not Target:IsInRange(40)) then return "meteor combustion_phase 10"; end
   end
   -- fireball,if=buff.combustion.down&cooldown.combustion.remains<cast_time&active_enemies<2&!improved_scorch.active&!(talent.sun_kings_blessing&talent.flame_accelerant)
-  if S.Fireball:IsReady() and (CombustionDown and CombustionRemains < S.Fireball:CastTime() and EnemiesCount16ySplash < 2 and not ImprovedScorchActive() and not (S.SunKingsBlessing:IsAvailable() and S.FlameAccelerant:IsAvailable())) then
-    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball combustion_phase 12"; end
+  if Bolt:IsReady() and (CombustionDown and CombustionRemains < Bolt:CastTime() and EnemiesCount16ySplash < 2 and not ImprovedScorchActive() and not (S.SunKingsBlessing:IsAvailable() and S.FlameAccelerant:IsAvailable())) then
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball combustion_phase 12"; end
   end
   -- scorch,if=buff.combustion.down&cooldown.combustion.remains<cast_time
   if S.Scorch:IsReady() and (CombustionDown and S.Combustion:CooldownRemains() < S.Scorch:CastTime()) then
@@ -400,8 +406,8 @@ local function CombustionPhase()
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 28"; end
   end
   -- fireball,if=buff.frostfire_empowerment.up&!buff.hot_streak.react&!buff.excess_frost.up
-  if S.Fireball:IsReady() and (Player:BuffUp(S.FrostfireEmpowermentBuff) and Player:BuffDown(S.HotStreakBuff) and Player:BuffDown(S.ExcessFrostBuff)) then
-    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball combustion_phase 30"; end
+  if Bolt:IsReady() and (Player:BuffUp(S.FrostfireEmpowermentBuff) and Player:BuffDown(S.HotStreakBuff) and Player:BuffDown(S.ExcessFrostBuff)) then
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball combustion_phase 30"; end
   end
   -- scorch,if=improved_scorch.active&(debuff.improved_scorch.remains<4*gcd.max)&active_enemies<variable.combustion_flamestrike
   if S.Scorch:IsReady() and (ImprovedScorchActive() and (Target:DebuffRemains(S.ImprovedScorchDebuff) < 4 * GCDMax) and EnemiesCount16ySplash < VarCombustionFlamestrike) then
@@ -416,8 +422,8 @@ local function CombustionPhase()
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 36"; end
   end
   -- fireball,if=buff.frostfire_empowerment.up&!buff.hot_streak.react
-  if S.Fireball:IsReady() and (Player:BuffUp(S.FrostfireEmpowermentBuff) and Player:BuffDown(S.HotStreakBuff)) then
-    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball combustion_phase 38"; end
+  if Bolt:IsReady() and (Player:BuffUp(S.FrostfireEmpowermentBuff) and Player:BuffDown(S.HotStreakBuff)) then
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball combustion_phase 38"; end
   end
   -- scorch,if=buff.combustion.remains>cast_time&cast_time>=gcd.max
   -- Note: Using Player:GCD() here to avoid this line being skipped from the extra 0.25s added to GCDMax.
@@ -425,8 +431,8 @@ local function CombustionPhase()
     if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch combustion_phase 44"; end
   end
   -- fireball,if=buff.combustion.remains>cast_time
-  if S.Fireball:IsReady() and (CombustionRemains > S.Fireball:CastTime()) then
-    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball combustion_phase 46"; end
+  if Bolt:IsReady() and (CombustionRemains > Bolt:CastTime()) then
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball combustion_phase 46"; end
   end
 end
 
@@ -434,7 +440,7 @@ local function CombustionTiming()
   -- variable,use_off_gcd=1,use_while_casting=1,name=combustion_ready_time,value=cooldown.combustion.remains*expected_kindling_reduction
   VarCombustionReadyTime = S.Combustion:CooldownRemains() * VarKindlingReduction
   -- variable,use_off_gcd=1,use_while_casting=1,name=combustion_precast_time,value=action.fireball.cast_time*(active_enemies<variable.combustion_flamestrike)+action.flamestrike.cast_time*(active_enemies>=variable.combustion_flamestrike)-variable.combustion_cast_remains
-  VarCombustionPrecastTime = S.Fireball:CastTime() * num(EnemiesCount8ySplash < VarCombustionFlamestrike) + S.Flamestrike:CastTime() * num(EnemiesCount8ySplash >= VarCombustionFlamestrike) - VarCombustionCastRemains
+  VarCombustionPrecastTime = Bolt:CastTime() * num(EnemiesCount8ySplash < VarCombustionFlamestrike) + S.Flamestrike:CastTime() * num(EnemiesCount8ySplash >= VarCombustionFlamestrike) - VarCombustionCastRemains
   -- variable,use_off_gcd=1,use_while_casting=1,name=time_to_combustion,value=variable.combustion_ready_time
   VarTimeToCombustion = VarCombustionReadyTime
   -- variable,use_off_gcd=1,use_while_casting=1,name=time_to_combustion,op=max,value=firestarter.remains,if=talent.firestarter&!variable.firestarter_combustion
@@ -495,12 +501,12 @@ local function StandardRotation()
   if S.Pyroblast:IsReady() and FreeCastAvailable() then
     if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 4"; end
   end
-  --if S.Pyroblast:IsReady() and (Player:BuffUp(S.HyperthermiaBuff) or Player:BuffUp(S.HotStreakBuff) and (Player:BuffRemains(S.HotStreakBuff) < S.Fireball:ExecuteRemains()) or Player:BuffUp(S.HotStreakBuff) and (HotStreakInFlight() > 0 or FirestarterActive() or S.CalloftheSunKing:IsAvailable() and S.PhoenixFlames:Charges() > 0) or Player:BuffUp(S.HotStreakBuff) and ScorchExecuteActive()) then
+  --if S.Pyroblast:IsReady() and (Player:BuffUp(S.HyperthermiaBuff) or Player:BuffUp(S.HotStreakBuff) and (Player:BuffRemains(S.HotStreakBuff) < Bolt:ExecuteRemains()) or Player:BuffUp(S.HotStreakBuff) and (HotStreakInFlight() > 0 or FirestarterActive() or S.CalloftheSunKing:IsAvailable() and S.PhoenixFlames:Charges() > 0) or Player:BuffUp(S.HotStreakBuff) and ScorchExecuteActive()) then
     --if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 4"; end
   --end
   -- Note: fire_blast moved from below.
   -- Note: Removed Hyperthermia timings, as it caused Fire Blast to only quickly appear in the last 0.5s of a Fireball/Pyroblast cast.
-  if S.FireBlast:IsReady() and not FreeCastAvailable() and (not FirestarterActive() and (not VarFireBlastPooling or S.SpontaneousCombustion:IsAvailable()) and Player:BuffDown(S.FuryoftheSunKingBuff) and (((Player:IsCasting(S.Fireball) or Player:IsCasting(S.Pyroblast)) and Player:BuffUp(S.HeatingUpBuff)) or (ScorchExecuteActive() and (not ImprovedScorchActive() or Target:DebuffStack(S.ImprovedScorchDebuff) == VarImprovedScorchMaxStack or S.FireBlast:FullRechargeTime() < 3) and (Player:BuffUp(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDown(S.HotStreakBuff) and Player:BuffDown(S.HeatingUpBuff) and Player:IsCasting(S.Scorch) and HotStreakInFlight() == 0)))) then
+  if S.FireBlast:IsReady() and not FreeCastAvailable() and (not FirestarterActive() and (not VarFireBlastPooling or S.SpontaneousCombustion:IsAvailable()) and Player:BuffDown(S.FuryoftheSunKingBuff) and (((Player:IsCasting(Bolt) or Player:IsCasting(S.Pyroblast)) and Player:BuffUp(S.HeatingUpBuff)) or (ScorchExecuteActive() and (not ImprovedScorchActive() or Target:DebuffStack(S.ImprovedScorchDebuff) == VarImprovedScorchMaxStack or S.FireBlast:FullRechargeTime() < 3) and (Player:BuffUp(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDown(S.HotStreakBuff) and Player:BuffDown(S.HeatingUpBuff) and Player:IsCasting(S.Scorch) and HotStreakInFlight() == 0)))) then
     if CastLeft(S.FireBlast) then return "fire_blast standard_rotation 6"; end
   end
   -- Note: Other fire_blast moved from below.
@@ -532,8 +538,8 @@ local function StandardRotation()
     if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch standard_rotation 18"; end
   end
   -- fireball,if=buff.frostfire_empowerment.up&!buff.hot_streak.react&!buff.excess_frost.up
-  if S.Fireball:IsReady() and (Player:BuffUp(S.FrostfireEmpowermentBuff) and Player:BuffDown(S.HotStreakBuff) and Player:BuffDown(S.ExcessFrostBuff)) then
-    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball standard_rotation 20"; end
+  if Bolt:IsReady() and (Player:BuffUp(S.FrostfireEmpowermentBuff) and Player:BuffDown(S.HotStreakBuff) and Player:BuffDown(S.ExcessFrostBuff)) then
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball standard_rotation 20"; end
   end
   -- scorch,if=improved_scorch.active&debuff.improved_scorch.stack<debuff.improved_scorch.max_stack
   if S.Scorch:IsReady() and (ImprovedScorchActive() and Target:DebuffStack(S.ImprovedScorchDebuff) < VarImprovedScorchMaxStack) then
@@ -579,8 +585,8 @@ local function StandardRotation()
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike standard_rotation 36"; end
   end
   -- fireball
-  if S.Fireball:IsReady() and (not FreeCastAvailable()) then
-    if Cast(S.Fireball, nil, nil, not Target:IsSpellInRange(S.Fireball)) then return "fireball standard_rotation 38"; end
+  if Bolt:IsReady() and (not FreeCastAvailable()) then
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball standard_rotation 38"; end
   end
 end
 

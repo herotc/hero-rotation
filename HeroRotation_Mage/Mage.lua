@@ -61,6 +61,8 @@ Spell.Mage.Commons = {
 }
 
 Spell.Mage.Frostfire = {
+  -- Abilities
+  FrostfireBolt                         = Spell(431044),
   -- Talents
   IsothermicCore                        = Spell(431095),
   -- Buffs
