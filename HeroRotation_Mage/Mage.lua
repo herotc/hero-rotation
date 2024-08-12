@@ -32,7 +32,6 @@ if not Spell.Mage then Spell.Mage = {} end
 Spell.Mage.Commons = {
   -- Racials
   AncestralCall                         = Spell(274738),
-  BagofTricks                           = Spell(312411),
   Berserking                            = Spell(26297),
   BloodFury                             = Spell(20572),
   Fireblood                             = Spell(265221),
@@ -40,33 +39,17 @@ Spell.Mage.Commons = {
   -- Abilities
   ArcaneExplosion                       = Spell(1449), --Melee, 10
   ArcaneIntellect                       = Spell(1459),
-  Blink                                 = MultiSpell(1953, 212653),
   Frostbolt                             = Spell(116),
   FrostNova                             = Spell(122),
-  SlowFall                              = Spell(130),
-  TimeWarp                              = Spell(80353),
   -- Talents
-  AlterTime                             = Spell(342245),
-  BlastWave                             = Spell(157981),
   Counterspell                          = Spell(2139),
   DragonsBreath                         = Spell(31661),
-  FocusMagic                            = Spell(321358),
-  IceBlock                              = Spell(45438),
   IceFloes                              = Spell(108839),
   IceNova                               = Spell(157997), --splash, 8
-  Invisibility                          = Spell(66),
-  Meteor                                = Spell(153561),
   MirrorImage                           = Spell(55342),
-  RemoveCurse                           = Spell(475),
-  RingOfFrost                           = Spell(113724),
   ShiftingPower                         = Spell(382440), --Melee 15
-  SpellSteal                            = Spell(30449),
-  TemporalWarp                          = Spell(386539),
   -- Buffs
   ArcaneIntellectBuff                   = Spell(1459),
-  BerserkingBuff                        = Spell(26297),
-  BloodFuryBuff                         = Spell(20572),
-  TemporalWarpBuff                      = Spell(386540),
   -- Debuffs
   -- Trinket Effects
   SpoilsofNeltharusCrit                 = Spell(381954),
@@ -165,6 +148,7 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   Hyperthermia                          = Spell(383860),
   ImprovedScorch                        = Spell(383604),
   Kindling                              = Spell(155148),
+  Meteor                                = Spell(153561),
   PhoenixFlames                         = Spell(257541),
   PhoenixReborn                         = Spell(453123),
   Pyroblast                             = Spell(11366),
