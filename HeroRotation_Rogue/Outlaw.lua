@@ -335,11 +335,11 @@ local function Stealth(ReturnSpellOnly)
   end
 
   -- ***NOT PART of SimC*** Condition duplicated from build to Show SS Icon in stealth with audacity buff
-  if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
+  if S.AmbushOverride:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
     if ReturnSpellOnly then
-      return S.SSAudacity
+      return S.AmbushOverride
     else
-      if CastPooling(S.SSAudacity, nil, not Target:IsSpellInRange(S.Ambush)) then return "Cast Ambush (SS High-Prio Buffed)" end
+      if CastPooling(S.AmbushOverride, nil, not Target:IsSpellInRange(S.Ambush)) then return "Cast Ambush (SS High-Prio Buffed)" end
     end
   end
 
@@ -682,8 +682,8 @@ local function Build ()
   end
 
   -- actions.build+=/ambush,if=talent.hidden_opportunity&buff.audacity.up
-  if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
-    if CastPooling(S.SSAudacity, nil, not Target:IsSpellInRange(S.Ambush)) then return "Cast Ambush (SS High-Prio Buffed)" end
+  if S.AmbushOverride:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
+    if CastPooling(S.AmbushOverride, nil, not Target:IsSpellInRange(S.Ambush)) then return "Cast Ambush (SS High-Prio Buffed)" end
   end
 
   -- # With Audacity + Hidden Opportunity + Fan the Hammer, consume Opportunity to proc Audacity any time Ambush is not available
