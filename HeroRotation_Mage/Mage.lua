@@ -216,38 +216,21 @@ if not Item.Mage then Item.Mage = {} end
 Item.Mage.Commons = {
   -- DF Trinkets
   AshesoftheEmbersoul                   = Item(207167, {13, 14}),
-  BalefireBranch                        = Item(159630, {13, 14}),
-  BeacontotheBeyond                     = Item(203963, {13, 14}),
   BelorrelostheSuncaller                = Item(207172, {13, 14}),
-  ConjuredChillglobe                    = Item(194300, {13, 14}),
-  DesperateInvokersCodex                = Item(194310, {13, 14}),
-  DMDDance                              = Item(198088, {13, 14}),
-  DMDDanceBox                           = Item(198478, {13, 14}),
-  DMDInferno                            = Item(198086, {13, 14}),
-  DMDInfernoBox                         = Item(194872, {13, 14}),
-  DMDRime                               = Item(198087, {13, 14}),
-  DMDRimeBox                            = Item(198477, {13, 14}),
   DragonfireBombDispenser               = Item(202610, {13, 14}),
-  EruptingSpearFragment                 = Item(193769, {13, 14}),
   HornofValor                           = Item(133642, {13, 14}),
-  IcebloodDeathsnare                    = Item(194304, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
-  MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
   MoonlitPrism                          = Item(137541, {13, 14}),
-  NeltharionsCalltoChaos                = Item(204201, {13, 14}),
   NymuesUnravelingSpindle               = Item(208615, {13, 14}),
-  SeaStar                               = Item(56290, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
-  TimeThiefsGambit                      = Item(207579, {13, 14}),
-  TomeofUnstablePower                   = Item(193628, {13, 14}),
-  VoidmendersShadowgem                  = Item(110007, {13, 14}),
   -- TWW Trinkets
   AberrantSpellforge                    = Item(212451, {13, 14}),
   HighSpeakersAccretion                 = Item(219303, {13, 14}),
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
   MereldarsToll                         = Item(219313, {13, 14}),
+  SignetofthePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
   -- TWW Gladiator's Badges
@@ -259,7 +242,6 @@ Item.Mage.Commons = {
   VerdantGladiatorsBadge                = Item(209343, {13, 14}),
   -- Other On-Use Items
   Dreambinder                           = Item(208616, {16}),
-  IridaltheEarthsMaster                 = Item(208321, {16}),
 }
 
 Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
