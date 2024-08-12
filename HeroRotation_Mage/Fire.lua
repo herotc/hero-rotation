@@ -40,25 +40,17 @@ local I = Item.Mage.Fire
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- GladiatorsBadge
+  -- TWW GladiatorsBadge
+  I.ForgedGladiatorsBadge:ID(),
+  -- DF GladiatorsBadge
   I.CrimsonGladiatorsBadge:ID(),
+  I.DraconicGladiatorsBadge:ID(),
   I.ObsidianGladiatorsBadge:ID(),
   I.VerdantGladiatorsBadge:ID(),
-  -- Other Trinkets/Items
-  I.AshesoftheEmbersoul:ID(),
-  I.BalefireBranch:ID(),
-  I.BelorrelostheSuncaller:ID(),
-  I.Dreambinder:ID(),
-  I.HornofValor:ID(),
-  I.IridaltheEarthsMaster:ID(),
-  I.IrideusFragment:ID(),
-  I.MirrorofFracturedTomorrows:ID(),
-  I.NymuesUnravelingSpindle:ID(),
-  I.SpoilsofNeltharus:ID(),
-  I.TimeThiefsGambit:ID(),
-  I.TimebreachingTalon:ID(),
-  I.TomeofUnstablePower:ID(),
-  I.VoidmendersShadowgem:ID(),
+  -- Other TWW Trinkets
+  I.ImperfectAscendancySerum:ID(),
+  I.SpymastersWeb:ID(),
+  I.TreacherousTransmitter:ID(),
 }
 
 --- ===== GUI Settings =====
