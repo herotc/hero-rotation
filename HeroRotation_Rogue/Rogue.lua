@@ -187,7 +187,8 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   -- Abilities
   AdrenalineRush          = Spell(13750),
   Ambush                  = Spell(8676),
-  AudacityAmbush          = Spell(430023),
+  SSAudacity              = Spell(197834),
+  AmbushOverride          = Spell(430023),
   BetweentheEyes          = Spell(315341),
   BladeFlurry             = Spell(13877),
   Dispatch                = Spell(2098),
