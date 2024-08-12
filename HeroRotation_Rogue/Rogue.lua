@@ -310,6 +310,8 @@ Item.Rogue.Outlaw = {
   ManicGrieftorch         = Item(194308, {13, 14}),
   StormEatersBoon         = Item(194302, {13, 14}),
   WindscarWhetstone       = Item(137486, {13, 14}),
+  ImperfectAscendancySerum = Item(225654, {13, 14}),
+  EnduringDreadplate      = Item(202616, {13, 14}),
 }
 
 Item.Rogue.Subtlety = {
