@@ -69,29 +69,6 @@ HL.AddCoreOverride("Spell.IsCastable",
 , 62)
 
 -- Fire, ID: 63
-local FireOldPlayerBuffStack
-FireOldPlayerBuffStack = HL.AddCoreOverride("Player.BuffStack",
-  function (self, Spell, AnyCaster, Offset)
-    local BaseCheck = FireOldPlayerBuffStack(self, Spell, AnyCaster, Offset)
-    if Spell == SpellFire.PyroclasmBuff and self:IsCasting(SpellFire.Pyroblast) then
-      return 0
-    else
-      return BaseCheck
-    end
-  end
-, 63)
-
-local FirePlayerBuffRemains
-FirePlayerBuffRemains = HL.AddCoreOverride("Player.BuffRemains",
-  function (self, Spell, AnyCaster, Offset)
-    local BaseCheck = FirePlayerBuffRemains(self, Spell, AnyCaster, Offset)
-    if Spell == SpellFire.PyroclasmBuff and self:IsCasting(SpellFire.Pyroblast) then
-      return 0
-    end
-    return BaseCheck
-  end
-, 63)
-
 local FirePlayerBuffUp
 FirePlayerBuffUp = HL.AddCoreOverride("Player.BuffUp",
   function (self, Spell, AnyCaster, Offset)
@@ -145,10 +122,8 @@ HL.AddCoreOverride("Spell.IsCastable",
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
 
-    local BaseCheck = self:IsLearned() and self:CooldownRemains( BypassRecovery, Offset or "Auto") == 0 and RangeOK
-    if self == SpellFire.RadiantSpark then
-      return BaseCheck and not Player:IsCasting(self)
-    elseif self == SpellFire.ShiftingPower then
+    local BaseCheck = self:IsLearned() and self:CooldownRemains(BypassRecovery, Offset or "Auto") == 0 and RangeOK
+    if self == SpellFire.ShiftingPower then
       return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck

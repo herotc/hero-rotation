@@ -78,6 +78,11 @@ Spell.Mage.Commons = {
 }
 
 Spell.Mage.Frostfire = {
+  -- Talents
+  IsothermicCore                        = Spell(431095),
+  -- Buffs
+  ExcessFrost                           = Spell(438611),
+  FrostfireEmpowermentBuff              = Spell(431177),
 }
 
 Spell.Mage.Spellslinger = {
@@ -92,6 +97,7 @@ Spell.Mage.Spellslinger = {
 Spell.Mage.Sunfury = {
   -- Talents
   SpellfireSpheres                      = Spell(448601),
+  SunfuryExecution                      = Spell(449349),
   -- Buffs
   ArcaneSoulBuff                        = Spell(451038),
   BurdenofPowerBuff                     = Spell(451049),
@@ -149,38 +155,37 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   Flamestrike                           = Spell(2120),
   -- Talents
   AlexstraszasFury                      = Spell(235870),
-  BlazingBarrier                        = Spell(235313),
+  CalloftheSunKing                      = Spell(343222),
   Combustion                            = Spell(190319),
   FeeltheBurn                           = Spell(383391),
   FlameAccelerant                       = Spell(203275),
   FireBlast                             = Spell(108853),
   Firestarter                           = Spell(205026),
-  FlameOn                               = Spell(205029),
   FlamePatch                            = Spell(205037),
-  FromTheAshes                          = Spell(342344),
-  FueltheFire                           = Spell(416094),
   Hyperthermia                          = Spell(383860),
   ImprovedScorch                        = Spell(383604),
   Kindling                              = Spell(155148),
-  LivingBomb                            = Spell(44457),
   PhoenixFlames                         = Spell(257541),
+  PhoenixReborn                         = Spell(453123),
   Pyroblast                             = Spell(11366),
+  Quickflame                            = Spell(450807),
+  Scald                                 = Spell(450746),
   Scorch                                = Spell(2948),
   SearingTouch                          = Spell(269644),
+  SpontaneousCombustion                 = Spell(451875),
   SunKingsBlessing                      = Spell(383886),
-  TemperedFlames                        = Spell(383659),
   -- Buffs
   CombustionBuff                        = Spell(190319),
   FeeltheBurnBuff                       = Spell(383395),
   FlameAccelerantBuff                   = Spell(203277),
   FlamesFuryBuff                        = Spell(409964), -- T30 4pc bonus
+  HeatShimmerBuff                       = Spell(458964),
   HeatingUpBuff                         = Spell(48107),
   HotStreakBuff                         = Spell(48108),
   HyperthermiaBuff                      = Spell(383874),
   SunKingsBlessingBuff                  = Spell(383882),
   FuryoftheSunKingBuff                  = Spell(383883),
   -- Debuffs
-  CharringEmbersDebuff                  = Spell(408665), -- T30 2pc bonus
   IgniteDebuff                          = Spell(12654),
   ImprovedScorchDebuff                  = Spell(383608),
 })
@@ -256,6 +261,7 @@ Item.Mage.Commons = {
   -- TWW Trinkets
   AberrantSpellforge                    = Item(212451, {13, 14}),
   HighSpeakersAccretion                 = Item(219303, {13, 14}),
+  ImperfectAscendancySerum              = Item(225654, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
   MereldarsToll                         = Item(219313, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
