@@ -101,7 +101,7 @@ local function SetTrinketVariables()
   VarTrinket1CD = Trinket1:Cooldown()
   VarTrinket2CD = Trinket2:Cooldown()
 
-  VarSteroidTrinketEquipped = I.ForgedGladiatorsBadge:IsEquipped() or I.CrimsonGladiatorsBadge:IsEquipped() or I.DraconicGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped()
+  VarSteroidTrinketEquipped = I.ForgedGladiatorsBadge:IsEquipped() or I.CrimsonGladiatorsBadge:IsEquipped() or I.DraconicGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.IrideusFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.AshesoftheEmbersoul:IsEquipped() or I.NymuesUnravelingSpindle:IsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped()
 end
 SetTrinketVariables()
 
