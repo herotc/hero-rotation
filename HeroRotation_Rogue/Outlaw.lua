@@ -254,8 +254,11 @@ end
 
 -- # Use finishers if at -1 from max combo points, or -2 in Stealth with Crackshot
 local function Finish_Condition ()
-  -- actions+=/variable,name=finish_condition,value=effective_combo_points>=cp_max_spend-1-(stealthed.all&talent.crackshot)
-  return EffectiveComboPoints >= Rogue.CPMaxSpend()-1-num((Player:StealthUp(true, true)) and S.Crackshot:IsAvailable())
+  -- actions+=/variable,name=finish_condition,value=effective_combo_points>=cp_max_spend-1-(stealthed.all
+  -- &talent.crackshot|(talent.hand_of_fate|talent.flawless_form)&talent.hidden_opportunity&(buff.audacity.up|buff.opportunity.up))
+  return EffectiveComboPoints >= Rogue.CPMaxSpend()-1-num((Player:StealthUp(true, true) and S.Crackshot:IsAvailable()
+    or (S.HandOfFate:IsAvailable() or S.FlawlessForm:IsAvailable()) and S.HiddenOpportunity:IsAvailable()
+    and (Player:BuffUp(S.AudacityBuff) or Player:BuffUp(S.Opportunity))))
 end
 
 -- # Ensure we want to cast Ambush prior to triggering a Stealth cooldown
@@ -303,7 +306,7 @@ local function Stealth(ReturnSpellOnly)
     if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
   end
 
-  -- actions.stealth+=/between_the_eyes,if=variable.finish_condition&talent.crackshot
+  -- actions.stealth+=/between_the_eyes,if=variable.finish_condition&talent.crackshot&(!buff.shadowmeld.up|stealthed.rogue)
   if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and Finish_Condition() and S.Crackshot:IsAvailable()
     and (not Player:BuffUp(S.Shadowmeld) or Player:StealthUp(true, false)) then
     if ReturnSpellOnly then
@@ -335,11 +338,11 @@ local function Stealth(ReturnSpellOnly)
   end
 
   -- ***NOT PART of SimC*** Condition duplicated from build to Show SS Icon in stealth with audacity buff
-  if S.AudacityAmbush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
+  if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
     if ReturnSpellOnly then
-      return S.AudacityAmbush
+      return S.SSAudacity
     else
-      if CastPooling(S.AudacityAmbush, nil, not Target:IsSpellInRange(S.Ambush)) then return "Cast Ambush (SS High-Prio Buffed)" end
+      if CastPooling(S.SSAudacity, nil, not Target:IsSpellInRange(S.Ambush)) then return "Cast Ambush (SS High-Prio Buffed)" end
     end
   end
 
@@ -581,6 +584,13 @@ local function CDs ()
         if Cast(I.BeaconToTheBeyond, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.BeaconToTheBeyond)) then return "Beacon"; end
       end
     end
+
+    -- actions.cds+=/use_item,name=imperfect_ascendancy_serum,if=!stealthed.all|fight_remains<=22
+    if I.ImperfectAscendancySerum:IsEquippedAndReady() then
+      if not Player:StealthUp(true, true) or HL.BossFilteredFightRemains("<=", 22) then
+        if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.ImperfectAscendancySerum)) then return "Imperfect Ascendancy Serum"; end
+      end
+    end
   end
 
   -- actions.finish+=/killing_spree,if=variable.finish_condition&!stealthed.all
@@ -652,6 +662,13 @@ local function CDs ()
       end
     end
 
+    -- actions.cds+=/use_item,name=enduring_dreadplate,if=spell_targets.blade_flurry>desired_targets|raid_event.adds.in>60|raid_event.adds.count<2|fight_remains<16
+    if I.EnduringDreadplate:IsEquippedAndReady() then
+      if EnemiesBFCount > 2 or HL.BossFilteredFightRemains("<", 16) then
+        if Cast(I.EnduringDreadplate, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Enduring Dreadplate"; end
+      end
+    end
+
     -- actions.cds+=/use_item,name=windscar_whetstone,if=spell_targets.blade_flurry>desired_targets|raid_event.adds.in>60|fight_remains<7
     if I.WindscarWhetstone:IsEquippedAndReady() then
       if EnemiesBFCount > 2 or HL.BossFilteredFightRemains("<", 7) then
@@ -682,8 +699,8 @@ local function Build ()
   end
 
   -- actions.build+=/ambush,if=talent.hidden_opportunity&buff.audacity.up
-  if S.AudacityAmbush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
-    if CastPooling(S.AudacityAmbush, nil, not Target:IsSpellInRange(S.Ambush)) then return "Cast Ambush (SS High-Prio Buffed)" end
+  if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
+    if CastPooling(S.SSAudacity, nil, not Target:IsSpellInRange(S.Ambush)) then return "Cast Ambush (SS High-Prio Buffed)" end
   end
 
   -- # With Audacity + Hidden Opportunity + Fan the Hammer, consume Opportunity to proc Audacity any time Ambush is not available
@@ -877,7 +894,8 @@ local function APL ()
 end
 
 local function Init ()
-  HR.Print("Outlaw Rogue rotation has been updated for patch 11.0.0.")
+  HR.Print("Outlaw Rogue rotation has been updated for patch 11.0.0. \n ",
+            "Note: It is known & Intended that Audacity procs will suggest Sinister Strike without a keybind shown")
 end
 
 HR.SetAPL(260, APL, Init)

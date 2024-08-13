@@ -187,7 +187,8 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   -- Abilities
   AdrenalineRush          = Spell(13750),
   Ambush                  = Spell(8676),
-  AudacityAmbush          = Spell(430023),
+  SSAudacity              = Spell(197834),
+  AmbushOverride          = Spell(430023),
   BetweentheEyes          = Spell(315341),
   BladeFlurry             = Spell(13877),
   Dispatch                = Spell(2098),
@@ -309,6 +310,8 @@ Item.Rogue.Outlaw = {
   ManicGrieftorch         = Item(194308, {13, 14}),
   StormEatersBoon         = Item(194302, {13, 14}),
   WindscarWhetstone       = Item(137486, {13, 14}),
+  ImperfectAscendancySerum = Item(225654, {13, 14}),
+  EnduringDreadplate      = Item(202616, {13, 14}),
 }
 
 Item.Rogue.Subtlety = {
