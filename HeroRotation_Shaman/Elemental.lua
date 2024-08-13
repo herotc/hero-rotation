@@ -558,8 +558,6 @@ local function APL()
   else
     Shaman.ClusterTargets = 1
   end
-  -- DEBUG, REMOVE ME
-  Shaman.ClusterTargets = 999
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
