@@ -1,4 +1,4 @@
-## Interface: 110000
+## Interface: 110002
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFF40C7EBMage|r]
 ## Author: KutiKuti
