@@ -40,6 +40,7 @@ HR.GUISettings.APL.Shaman = {
   },
   CommonsOGCD = {
     GCDasOffGCD = {
+      AncestralSwiftness = true,
       Ascendance = true,
       EarthElemental = true,
       NaturesSwiftness = true,
