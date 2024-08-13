@@ -135,8 +135,9 @@ local function Precombat()
   -- lightning_shield
   -- Note: Moved to APL()
   -- thunderstrike_ward
-  if S.ThunderstrikeWard:IsReady() then
-    if Cast(S.ThunderstrikeWard, nil, nil, not Target:IsSpellInRange(S.ThunderstrikeWard)) then return "thunderstrike_ward precombat 4"; end
+  local ShieldEnchantID = select(8, GetWeaponEnchantInfo())
+  if S.ThunderstrikeWard:IsReady() and (not ShieldEnchantID or ShieldEnchantID ~= 7587) then
+    if Cast(S.ThunderstrikeWard) then return "thunderstrike_ward precombat 4"; end
   end
   -- Manually added: Opener abilities, in case thunderstrike_ward is on CD
   if S.ElementalBlast:IsViable() then
