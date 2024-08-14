@@ -68,9 +68,15 @@ Spell.Shaman.Commons = {
 Spell.Shaman.Farseer = {
   -- Talents
   AncestralSwiftness                    = Spell(443454),
+  PrimordialCapacity                    = Spell(443448),
 }
 
 Spell.Shaman.Stormbringer = {
+  -- Abilities
+  TempestAbility                        = Spell(452201),
+  TempestOverload                       = Spell(463351),
+  -- Talents
+  Tempest                               = Spell(454009),
 }
 
 Spell.Shaman.Totemic = {
@@ -83,6 +89,7 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   FireElemental                         = Spell(198067),
   -- Talents
   Ascendance                            = Spell(114050),
+  EchoChamber                           = Spell(382032),
   EchooftheElements                     = Spell(333919),
   EchoesofGreatSundering                = Spell(384087),
   ElectrifiedShocks                     = Spell(382086),
