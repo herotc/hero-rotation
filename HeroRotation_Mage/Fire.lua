@@ -27,6 +27,8 @@ local bool       = HR.Commons.Everyone.bool
 -- lua
 local max        = math.max
 local ceil       = math.ceil
+-- WoW API
+local Delay      = C_Timer.After
 -- Commons
 local Mage       = HR.Commons.Mage
 
