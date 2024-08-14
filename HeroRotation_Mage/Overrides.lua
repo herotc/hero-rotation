@@ -157,7 +157,7 @@ FrostOldSpellIsCastable = HL.AddCoreOverride("Spell.IsCastable",
     end
 
     if self == SpellFrost.GlacialSpike then
-      return self:IsLearned() and RangeOK and MovingOK and not Player:IsCasting(self) and (Player:BuffUp(SpellFrost.GlacialSpikeBuff) or (Player:BuffStack(SpellFrost.IciclesBuff) == 5))
+      return self:IsLearned() and RangeOK and not Player:IsCasting(self) and (Player:BuffUp(SpellFrost.GlacialSpikeBuff) or (Player:BuffStack(SpellFrost.IciclesBuff) == 5))
     else
       local BaseCheck = FrostOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
       if self == SpellFrost.ShiftingPower then
