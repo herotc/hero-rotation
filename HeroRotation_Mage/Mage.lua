@@ -66,7 +66,7 @@ Spell.Mage.Frostfire = {
   -- Talents
   IsothermicCore                        = Spell(431095),
   -- Buffs
-  ExcessFrost                           = Spell(438611),
+  ExcessFrostBuff                       = Spell(438611),
   FrostfireEmpowermentBuff              = Spell(431177),
 }
 
