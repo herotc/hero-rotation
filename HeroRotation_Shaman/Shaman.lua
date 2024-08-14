@@ -65,6 +65,67 @@ Spell.Shaman.Commons = {
   Pool                                  = Spell(999910),
 }
 
+Spell.Shaman.Farseer = {
+  -- Talents
+  AncestralSwiftness                    = Spell(443454),
+}
+
+Spell.Shaman.Stormbringer = {
+}
+
+Spell.Shaman.Totemic = {
+}
+
+Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
+  -- Abilities
+  EarthShock                            = Spell(8042),
+  Earthquake                            = MultiSpell(61882, 462620),
+  FireElemental                         = Spell(198067),
+  -- Talents
+  Ascendance                            = Spell(114050),
+  EchooftheElements                     = Spell(333919),
+  EchoesofGreatSundering                = Spell(384087),
+  ElectrifiedShocks                     = Spell(382086),
+  EyeoftheStorm                         = Spell(381708),
+  FlowofPower                           = Spell(385923),
+  FluxMelting                           = Spell(381776),
+  FusionofElements                      = Spell(462840),
+  Icefury                               = Spell(210714),
+  ImprovedFlametongueWeapon             = Spell(382027),
+  LavaBeam                              = Spell(114074),
+  LightningRod                          = Spell(210689),
+  LiquidMagmaTotem                      = Spell(192222),
+  MagmaChamber                          = Spell(381932),
+  MasteroftheElements                   = Spell(16166),
+  MountainsWillFall                     = Spell(381726),
+  PoweroftheMaelstrom                   = Spell(191861),
+  PrimalElementalist                    = Spell(117013),
+  SearingFlames                         = Spell(381782),
+  SkybreakersFieryDemise                = Spell(378310),
+  SplinteredElements                    = Spell(382042),
+  StormElemental                        = Spell(192249),
+  Stormkeeper                           = Spell(191634),
+  SurgeofPower                          = Spell(262303),
+  SwellingMaelstrom                     = Spell(384359),
+  ThunderstrikeWard                     = Spell(462757),
+  -- Buffs
+  AscendanceBuff                        = Spell(114050),
+  EchoesofGreatSunderingBuff            = Spell(384088),
+  FluxMeltingBuff                       = Spell(381777),
+  IcefuryBuff                           = Spell(210714),
+  LavaSurgeBuff                         = Spell(77762),
+  MagmaChamberBuff                      = Spell(381933),
+  MasteroftheElementsBuff               = Spell(260734),
+  PoweroftheMaelstromBuff               = Spell(191877),
+  StormkeeperBuff                       = Spell(191634),
+  SurgeofPowerBuff                      = Spell(285514),
+  -- Debuffs
+  ElectrifiedShocksDebuff               = Spell(382089),
+  LightningRodDebuff                    = Spell(197209),
+})
+Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Elemental, Spell.Shaman.Farseer)
+Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Elemental, Spell.Shaman.Stormbringer)
+
 Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   -- Abilities
   Windstrike                            = Spell(115356),
@@ -127,72 +188,13 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   -- Tier 30 Buffs
   VolcanicStrengthBuff                  = Spell(409833),
 })
-
-Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
-  -- Abilities
-  EarthShock                            = Spell(8042),
-  Earthquake                            = Spell(61882),
-  FireElemental                         = Spell(198067),
-  -- Talents
-  Aftershock                            = Spell(273221),
-  Ascendance                            = Spell(114050),
-  EarthenRage                           = Spell(170374),
-  EchooftheElements                     = Spell(333919),
-  EchoesofGreatSundering                = Spell(384087),
-  EchoingShock                          = Spell(320125),
-  ElectrifiedShocks                     = Spell(382086),
-  EyeoftheStorm                         = Spell(381708),
-  FlowofPower                           = Spell(385923),
-  FluxMelting                           = Spell(381776),
-  FurtherBeyond                         = Spell(381787),
-  Icefury                               = Spell(210714),
-  ImprovedFlametongueWeapon             = Spell(382027),
-  LavaBeam                              = Spell(114074),
-  LavaSurge                             = Spell(77756),
-  LightningRod                          = Spell(210689),
-  LiquidMagmaTotem                      = Spell(192222),
-  MagmaChamber                          = Spell(381932),
-  MasteroftheElements                   = Spell(16166),
-  MountainsWillFall                     = Spell(381726),
-  PoweroftheMaelstrom                   = Spell(191861),
-  PrimalElementalist                    = Spell(117013),
-  PrimordialSurge                       = Spell(386474),
-  SearingFlames                         = Spell(381782),
-  SkybreakersFieryDemise                = Spell(378310),
-  SplinteredElements                    = Spell(382042),
-  StaticDischarge                       = Spell(342243),
-  StormElemental                        = Spell(192249),
-  Stormkeeper                           = Spell(191634),
-  SurgeofPower                          = Spell(262303),
-  SwellingMaelstrom                     = Spell(384359),
-  UnlimitedPower                        = Spell(260895),
-  UnrelentingCalamity                   = Spell(382685),
-  WindspeakersLavaResurgence            = Spell(378268),
-  -- Pets
-  Meteor                                = Spell(117588, "pet"),
-  CallLightning                         = Spell(157348, "pet"),
-  -- Buffs
-  AscendanceBuff                        = Spell(114050),
-  CallLightningBuff                     = Spell(157348),
-  EchoesofGreatSunderingBuff            = Spell(384088),
-  EchoingShockBuff                      = Spell(320125),
-  FluxMeltingBuff                       = Spell(381777),
-  IcefuryBuff                           = Spell(210714),
-  LavaSurgeBuff                         = Spell(77762),
-  MagmaChamberBuff                      = Spell(381933),
-  MasteroftheElementsBuff               = Spell(260734),
-  PoweroftheMaelstromBuff               = Spell(191877),
-  StormkeeperBuff                       = Spell(191634),
-  SurgeofPowerBuff                      = Spell(285514),
-  WindGustBuff                          = Spell(263806),
-  WindspeakersLavaResurgenceBuff        = Spell(378269),
-  -- Debuffs
-  ElectrifiedShocksDebuff               = Spell(382089),
-  LightningRodDebuff                    = Spell(197209),
-})
+Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Enhancement, Spell.Shaman.Stormbringer)
+Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Enhancement, Spell.Shaman.Totemic)
 
 Spell.Shaman.Restoration = MergeTableByKey(Spell.Shaman.Commons, {
 })
+Spell.Shaman.Restoration = MergeTableByKey(Spell.Shaman.Restoration, Spell.Shaman.Farseer)
+Spell.Shaman.Restoration = MergeTableByKey(Spell.Shaman.Restoration, Spell.Shaman.Totemic)
 
 if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Commons = {

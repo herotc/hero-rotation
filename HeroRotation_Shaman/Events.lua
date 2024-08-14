@@ -59,3 +59,43 @@ HL:RegisterForSelfCombatEvent(
   end
   , "SPELL_AURA_APPLIED"
 )
+
+--- ===== Fire Elemental Tracker =====
+Shaman.FireElemental = {
+  GreaterActive = false,
+  LesserActive = false
+}
+Shaman.StormElemental = {
+  GreaterActive = false,
+  LesserActive = false
+}
+
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local DestGUID, _, _, _, SpellID = select(8, ...)
+    -- Fire Elemental. SpellIDs are without and with Primal Elementalist
+    if SpellID == 188592 or SpellID == 118291 then
+      Shaman.FireElemental.GreaterActive = true
+      C_Timer.After(30, function()
+        Shaman.FireElemental.GreaterActive = false
+      end)
+    elseif SpellID == 462992 or SpellID == 462991 then
+      Shaman.FireElemental.LesserActive = true
+      C_Timer.After(15, function()
+        Shaman.FireElemental.LesserActive = false
+      end)
+    -- Storm Elemental. SpellIDs are without and with Primal Elementalist
+    elseif SpellID == 157299 or SpellID == 157319 then
+      Shaman.StormElemental.GreaterActive = true
+      C_Timer.After(30, function()
+        Shaman.StormElemental.GreaterActive = false
+      end)
+    elseif SpellID == 462993 or SpellID == 462990 then
+      Shaman.StormElemental.LesserActive = true
+      C_Timer.After(15, function()
+        Shaman.StormElemental.LesserActive = false
+      end)
+    end
+  end
+  , "SPELL_SUMMON"
+)

@@ -138,8 +138,8 @@ local function SetTrinketVariables()
     VarDamageTrinketPriority = 2
   end
 
-  VarTrinket1Manual = VarTrinket1ID == I.AlgetharPuzzleBox:ID()
-  VarTrinket2Manual = VarTrinket2ID == I.AlgetharPuzzleBox:ID()
+  VarTrinket1Manual = VarTrinket1ID == I.TreacherousTransmitter:ID()
+  VarTrinket2Manual = VarTrinket2ID == I.TreacherousTransmitter:ID()
 end
 SetTrinketVariables()
 
@@ -147,7 +147,7 @@ local function SetSpellVariables()
   VarStaticObliterateBuffs = S.ArcticAssault:IsAvailable() or S.FrigidExecutioner:IsAvailable() or Var2HCheck
   VarBreathRPCost = 1.7
   VarStaticRimeBuffs = S.RageoftheFrozenChampion:IsAvailable() or S.Icebreaker:IsAvailable()
-  VarBreathRPThreshold = 70
+  VarBreathRPThreshold = 60
   VarERWBreathRPTrigger = 70
   VarERWBreathRuneTrigger = 3
   VarOblitRunePooling = 4
@@ -225,9 +225,9 @@ local function EvaluateTargetIfFrostStrikeObliteration(TargetUnit)
 end
 
 local function EvaluateTargetIfFrostStrikeObliteration2(TargetUnit)
-  -- if=(rune<2|variable.rp_buffs|debuff.razorice.stack=5&talent.shattering_blade)&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1|talent.shattered_frost)
-  -- Note: VarPoolingRP and talent checks performed before CastTargetIf.
-  return Player:Rune() < 2 or VarRPBuffs or TargetUnit:DebuffStack(S.RazoriceDebuff) == 5 and S.ShatteringBlade:IsAvailable()
+  -- if=(rune<2|variable.rp_buffs|debuff.razorice.stack=5&talent.shattering_blade|hero_tree.rider_of_the_apocalypse)&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1|talent.shattered_frost)
+  -- Note: '&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1|talent.shattered_frost)' performed before CastTargetIf.
+  return Player:Rune() < 2 or VarRPBuffs or TargetUnit:DebuffStack(S.RazoriceDebuff) == 5 and S.ShatteringBlade:IsAvailable() or Player:HeroTreeID() == 32
 end
 
 local function EvaluateTargetIfGlacialAdvanceAoE(TargetUnit)
@@ -261,8 +261,8 @@ local function Precombat()
   -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|(trinket.2.has_buff.strength|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit&!variable.trinket_2_exclude)
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs&(trinket.2.has_cooldown&!variable.trinket_2_exclude|!trinket.1.has_cooldown)|variable.trinket_2_buffs&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync)*(1+((trinket.1.ilvl-trinket.2.ilvl)%100)))
   -- variable,name=damage_trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&!variable.trinket_2_buffs&trinket.2.ilvl>=trinket.1.ilvl
-  -- variable,name=trinket_1_manual,value=trinket.1.is.algethar_puzzle_box
-  -- variable,name=trinket_2_manual,value=trinket.2.is.algethar_puzzle_box
+  -- variable,name=trinket_1_manual,value=trinket.1.is.treacherous_transmitter
+  -- variable,name=trinket_2_manual,value=trinket.2.is.treacherous_transmitter
   -- Note: Manual trinkets handled via OnUseExcludes.
   -- Note: Moved the above variable definitions to initial profile load, SPELLS_CHANGED, and PLAYER_EQUIPMENT_CHANGED.
   -- variable,name=rw_buffs,value=talent.gathering_storm|talent.biting_cold
@@ -415,32 +415,32 @@ local function Cooldowns()
   if S.EmpowerRuneWeapon:IsCastable() and (S.Obliteration:IsAvailable() and not S.BreathofSindragosa:IsAvailable() and Player:BuffUp(S.PillarofFrostBuff) or BossFightRemains < 20) then
     if Cast(S.EmpowerRuneWeapon, Settings.CommonsOGCD.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 12"; end
   end
-  -- empower_rune_weapon,if=buff.breath_of_sindragosa.up&runic_power<variable.erw_breath_rp_trigger&rune<variable.erw_breath_rune_trigger|fight_remains<20
-  if S.EmpowerRuneWeapon:IsCastable() and (Player:BuffUp(S.BreathofSindragosa) and Player:RunicPower() < VarERWBreathRPTrigger and Player:Rune() < VarERWBreathRuneTrigger or BossFightRemains < 20) then
+  -- empower_rune_weapon,if=buff.breath_of_sindragosa.up&runic_power<variable.erw_breath_rp_trigger&rune<variable.erw_breath_rune_trigger
+  if S.EmpowerRuneWeapon:IsCastable() and (Player:BuffUp(S.BreathofSindragosa) and Player:RunicPower() < VarERWBreathRPTrigger and Player:Rune() < VarERWBreathRuneTrigger) then
     if Cast(S.EmpowerRuneWeapon, Settings.CommonsOGCD.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 14"; end
   end
   -- empower_rune_weapon,if=!talent.breath_of_sindragosa&!talent.obliteration&!buff.empower_rune_weapon.up&rune<5&(cooldown.pillar_of_frost.remains_expected<7|buff.pillar_of_frost.up|!talent.pillar_of_frost)
   if S.EmpowerRuneWeapon:IsCastable() and (not S.BreathofSindragosa:IsAvailable() and not S.Obliteration:IsAvailable() and Player:BuffDown(S.EmpowerRuneWeaponBuff) and Player:Rune() < 5 and (S.PillarofFrost:CooldownRemains() < 7 or Player:BuffUp(S.PillarofFrostBuff) or not S.PillarofFrost:IsAvailable())) then
     if Cast(S.EmpowerRuneWeapon, Settings.CommonsOGCD.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon cooldowns 16"; end
   end
-  -- pillar_of_frost,if=talent.obliteration&!talent.breath_of_sindragosa&variable.sending_cds|fight_remains<12
-  if S.PillarofFrost:IsCastable() and (S.Obliteration:IsAvailable() and not S.BreathofSindragosa:IsAvailable() and VarSendingCDs or BossFightRemains < 12) then
+  -- pillar_of_frost,if=talent.obliteration&!talent.breath_of_sindragosa&variable.sending_cds|fight_remains<20
+  if S.PillarofFrost:IsCastable() and (S.Obliteration:IsAvailable() and not S.BreathofSindragosa:IsAvailable() and VarSendingCDs or BossFightRemains < 20) then
     if Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cooldowns 18"; end
   end
-  -- pillar_of_frost,if=talent.breath_of_sindragosa&variable.sending_cds&(buff.breath_of_sindragosa.up|cooldown.breath_of_sindragosa.remains>cooldown.pillar_of_frost.duration-20)|fight_remains<12
-  if S.PillarofFrost:IsCastable() and (S.BreathofSindragosa:IsAvailable() and VarSendingCDs and (Player:BuffUp(S.BreathofSindragosa) or S.BreathofSindragosa:CooldownRemains() > VarPillarCD - 20) or BossFightRemains < 12) then
+  -- pillar_of_frost,if=talent.breath_of_sindragosa&variable.sending_cds&cooldown.breath_of_sindragosa.remains
+  if S.PillarofFrost:IsCastable() and (S.BreathofSindragosa:IsAvailable() and VarSendingCDs and BreathofSindragosa:CooldownDown()) then
     if Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cooldowns 20"; end
   end
   -- pillar_of_frost,if=!talent.obliteration&!talent.breath_of_sindragosa&variable.sending_cds
   if S.PillarofFrost:IsCastable() and (not S.Obliteration:IsAvailable() and not S.BreathofSindragosa:IsAvailable() and VarSendingCDs) then
     if Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarOfFrost) then return "pillar_of_frost cooldowns 22"; end
   end
-  -- breath_of_sindragosa,if=!buff.breath_of_sindragosa.up&cooldown.empower_rune_weapon.remains_expected<15&runic_power>variable.breath_rp_threshold&(variable.adds_remain|variable.st_planning|fight_remains<30)|(time<10&rune<1)
-  if S.BreathofSindragosa:IsReady() and (Player:BuffDown(S.BreathofSindragosa) and S.EmpowerRuneWeapon:CooldownRemains() < 15 and Player:RunicPower() > VarBreathRPThreshold and (VarAddsRemain or VarSTPlanning or BossFightRemains < 30) or (HL.CombatTime() < 10 and Player:Rune() < 1)) then
+  -- breath_of_sindragosa,use_off_gcd=1,if=!buff.breath_of_sindragosa.up&runic_power>variable.breath_rp_threshold&(cooldown.pillar_of_frost.ready&variable.sending_cds|fight_remains<30)|(time<10&rune<1)
+  if S.BreathofSindragosa:IsReady() and (Player:BuffDown(S.BreathofSindragosa) and Player:RunicPower() > VarBreathRPThreshold and (S.PillarofFrost:CooldownUp() and VarSendingCDs or BossFightRemains < 30) or (HL.CombatTime() < 10 and Player:Rune() < 1)) then
     if Cast(S.BreathofSindragosa, Settings.Frost.GCDasOffGCD.BreathOfSindragosa, nil, not Target:IsInRange(12)) then return "breath_of_sindragosa cooldowns 24"; end
   end
-  -- frostwyrms_fury,if=hero_tree.rider_of_the_apocalypse&talent.apocalypse_now&(!talent.breath_of_sindragosa&variable.sending_cds|buff.breath_of_sindragosa.up&buff.pillar_of_frost.up)|fight_remains<20
-  if S.FrostwyrmsFury:IsCastable() and (Player:HeroTreeID() == 32 and S.ApocalypseNow:IsAvailable() and (not S.BreathofSindragosa:IsAvailable() and VarSendingCDs or Player:BuffUp(S.BreathofSindragosa) and Player:BuffUp(S.PillarofFrostBuff)) or BossFightRemains < 20) then
+  -- frostwyrms_fury,if=hero_tree.rider_of_the_apocalypse&talent.apocalypse_now&variable.sending_cds&(!talent.breath_of_sindragosa&buff.pillar_of_frost.up|buff.breath_of_sindragosa.up)|fight_remains<30
+  if S.FrostwyrmsFury:IsCastable() and (Player:HeroTreeID() == 32 and S.ApocalypseNow:IsAvailable() and VarSendingCDs and (not S.BreathofSindragosa:IsAvailable() and Player:BuffUp(S.PillarofFrostBuff) or Player:BuffUp(S.BreathofSindragosa)) or BossFightRemains < 30) then
     if Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury, nil, not Target:IsInRange(40)) then return "frostwyrms_fury cooldowns 26"; end
   end
   -- frostwyrms_fury,if=!talent.apocalypse_now&active_enemies=1&(talent.pillar_of_frost&buff.pillar_of_frost.up&!talent.obliteration|!talent.pillar_of_frost)&(!raid_event.adds.exists|(raid_event.adds.in>15+raid_event.adds.duration|talent.absolute_zero&raid_event.adds.in>15+raid_event.adds.duration))|fight_remains<3
@@ -478,12 +478,12 @@ local function HighPrioActions()
   -- Note: Not handling external buffs.
   -- mind_freeze,if=target.debuff.casting.react
   local ShouldReturn = Everyone.Interrupt(S.MindFreeze, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
-  -- antimagic_shell,if=runic_power.deficit>40&death_knight.first_ams_cast<time&(!talent.breath_of_sindragosa|talent.breath_of_sindragosa&cooldown.breath_of_sindragosa.remains>cooldown.antimagic_shell.duration)
+  -- antimagic_shell,if=runic_power.deficit>40&death_knight.first_ams_cast<time&(!talent.breath_of_sindragosa|talent.breath_of_sindragosa&variable.true_breath_cooldown>cooldown.antimagic_shell.duration)
   -- In simc, the default of this setting is 20s.
   -- TODO: Maybe make this a setting?
   local VarAMSCD = S.AntiMagicBarrier:IsAvailable() and 40 or 60
   VarAMSCD = S.UnyieldingWill:IsAvailable() and VarAMSCD + 20 or VarAMSCD
-  if Settings.Commons.UseAMSAMZOffensively and CDsON() and S.AntiMagicShell:IsCastable() and (Player:RunicPowerDeficit() > 40 and 20 < HL.CombatTime() and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemains() > VarAMSCD)) then
+  if Settings.Commons.UseAMSAMZOffensively and CDsON() and S.AntiMagicShell:IsCastable() and (Player:RunicPowerDeficit() > 40 and 20 < HL.CombatTime() and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:IsAvailable() and VarTrueBreathCD > VarAMSCD)) then
     if Cast(S.AntiMagicShell, Settings.CommonsOGCD.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell high_prio_actions 2"; end
   end
   -- howling_blast,if=!dot.frost_fever.ticking&active_enemies>=2&((!talent.obliteration|talent.obliteration&(!cooldown.pillar_of_frost.ready|buff.pillar_of_frost.up&!buff.killing_machine.react))|(equipped.fyralath_the_dreamrender&!dot.mark_of_fyralath.ticking))
@@ -545,7 +545,7 @@ local function Obliteration()
   if S.GlacialAdvance:IsReady() then
     if Everyone.CastTargetIf(S.GlacialAdvance, EnemiesMelee, "max", EvaluateTargetIfFilterRazoriceStacks, EvaluateTargetIfGlacialAdvanceObliteration, not Target:IsInRange(100)) then return "glacial_advance obliteration 14"; end
   end
-  -- frost_strike,target_if=max:((talent.shattering_blade&debuff.razorice.stack=5)*5)+(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=(rune<2|variable.rp_buffs|debuff.razorice.stack=5&talent.shattering_blade)&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1|talent.shattered_frost)
+  -- frost_strike,target_if=max:((talent.shattering_blade&debuff.razorice.stack=5)*5)+(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=(rune<2|variable.rp_buffs|debuff.razorice.stack=5&talent.shattering_blade|hero_tree.rider_of_the_apocalypse)&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1|talent.shattered_frost)
   if S.FrostStrike:IsReady() and (not VarPoolingRP and (not S.GlacialAdvance:IsAvailable() or EnemiesMeleeCount == 1 or S.ShatteredFrost:IsAvailable())) then
     if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "max", EvaluateTargetIfFilterFrostStrike, EvaluateTargetIfFrostStrikeObliteration2, not Target:IsSpellInRange(S.FrostStrike), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike obliteration 16"; end
   end
@@ -617,12 +617,12 @@ local function Racials()
 end
 
 local function SingleTarget()
-  -- frost_strike,if=debuff.razorice.stack=5&talent.shattering_blade&talent.a_feast_of_souls&buff.a_feast_of_souls.up
-  if S.FrostStrike:IsReady() and (Target:DebuffStack(S.RazoriceDebuff) == 5 and S.ShatteringBlade:IsAvailable() and S.AFeastofSouls:IsAvailable() and Player:BuffUp(S.AFeastofSoulsBuff)) then
+  -- frost_strike,if=talent.a_feast_of_souls&debuff.razorice.stack=5&talent.shattering_blade&buff.a_feast_of_souls.up
+  if S.FrostStrike:IsReady() and (S.AFeastofSouls:IsAvailable() and Target:DebuffStack(S.RazoriceDebuff) == 5 and S.ShatteringBlade:IsAvailable() and Player:BuffUp(S.AFeastofSoulsBuff)) then
     if Cast(S.FrostStrike, Settings.Frost.GCDasOffGCD.FrostStrike, nil, not Target:IsInMeleeRange(5)) then return "frost_strike single_target 2"; end
   end
-  -- obliterate,if=buff.killing_machine.react&variable.static_obliterate_buffs
-  if S.Obliterate:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and VarStaticObliterateBuffs) then
+  -- obliterate,if=buff.killing_machine.react=2
+  if S.Obliterate:IsReady() and (Player:BuffStack(S.KillingMachineBuff) == 2) then
     if Cast(S.Obliterate, nil, nil, not Target:IsInMeleeRange(5)) then return "obliterate single_target 4"; end
   end
   -- frost_strike,if=(debuff.razorice.stack=5&talent.shattering_blade)|(buff.killing_machine.up&rune<2&!talent.icebreaker)
@@ -633,8 +633,8 @@ local function SingleTarget()
   if S.HowlingBlast:IsReady() and (VarRimeBuffs) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast single_target 8"; end
   end
-  -- obliterate,if=buff.killing_machine.react&(!variable.pooling_runes|buff.killing_machine.react=2)
-  if S.Obliterate:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and (not VarPoolingRP or Player:BuffStack(S.KillingMachineBuff) == 2)) then
+  -- obliterate,if=buff.killing_machine.react
+  if S.Obliterate:IsReady() and (Player:BuffUp(S.KillingMachineBuff)) then
     if Cast(S.Obliterate, nil, nil, not Target:IsInMeleeRange(5)) then return "obliterate single_target 10"; end
   end
   -- glacial_advance,if=!variable.pooling_runic_power&!death_knight.runeforge.razorice&(debuff.razorice.stack<5|debuff.razorice.remains<gcd*3)
@@ -665,12 +665,12 @@ local function SingleTarget()
   if S.HowlingBlast:IsReady() and (Target:DebuffDown(S.FrostFeverDebuff)) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast single_target 24"; end
   end
-  -- any_dnd,if=talent.breath_of_sindragosa&!buff.breath_of_sindragosa.up&!cooldown.breath_of_sindragosa.remains&rune<2&!buff.death_and_decay.up
-  if S.DeathAndDecay:IsReady() and (S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.BreathofSindragosa) and S.BreathofSindragosa:CooldownUp() and Player:Rune() < 2 and Player:BuffDown(S.DeathAndDecayBuff)) then
+  -- any_dnd,if=talent.breath_of_sindragosa&!buff.breath_of_sindragosa.up&!variable.true_breath_cooldown&rune<2&!buff.death_and_decay.up
+  if S.DeathAndDecay:IsReady() and (S.BreathofSindragosa:IsAvailable() and Player:BuffDown(S.BreathofSindragosa) and not bool(VarTrueBreathCD) and Player:Rune() < 2 and Player:BuffDown(S.DeathAndDecayBuff)) then
     if Cast(S.DeathAndDecay, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "death_and_decay single_target 26"; end
   end
-  -- horn_of_winter,if=rune<2&runic_power.deficit>25&(!talent.breath_of_sindragosa|cooldown.breath_of_sindragosa.remains>cooldown.horn_of_winter.duration-15)
-  if S.HornofWinter:IsReady() and (Player:Rune() < 2 and Player:RunicPowerDeficit() > 25 and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownRemains() > 30)) then
+  -- horn_of_winter,if=rune<2&runic_power.deficit>25&(!talent.breath_of_sindragosa|variable.true_breath_cooldown>cooldown.horn_of_winter.duration-15)
+  if S.HornofWinter:IsReady() and (Player:Rune() < 2 and Player:RunicPowerDeficit() > 25 and (not S.BreathofSindragosa:IsAvailable() or VarTrueBreathCD > 30)) then
     if Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornOfWinter) then return "horn_of_winter single_target 28"; end
   end
   -- arcane_torrent,if=!talent.breath_of_sindragosa&runic_power.deficit>20
@@ -680,37 +680,33 @@ local function SingleTarget()
 end
 
 local function Trinkets()
-  -- use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking&!buff.pillar_of_frost.up&!buff.empower_rune_weapon.up&!buff.death_and_decay.up&(active_enemies<2|dot.frost_fever.ticking)
-  if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0 and Player:BuffDown(S.PillarofFrostBuff) and Player:BuffDown(S.EmpowerRuneWeaponBuff) and Player:BuffDown(S.DeathAndDecayBuff) and (EnemiesMeleeCount < 2 or Target:DebuffUp(S.FrostFeverDebuff))) then
-    if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsItemInRange(I.Fyralath)) then return "fyralath_the_dreamrender trinkets 2"; end
-  end
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,use_off_gcd=1,name=algethar_puzzle_box,if=!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains<2&(!talent.breath_of_sindragosa|runic_power>60&(buff.breath_of_sindragosa.up|cooldown.breath_of_sindragosa.remains<2))
-    if I.AlgetharPuzzleBox:IsEquippedAndReady() and (Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() < 2 and (not S.BreathofSindragosa:IsAvailable() or Player:RunicPower() > 60 and (Player:BuffUp(S.BreathofSindragosa) or S.BreathofSindragosa:CooldownRemains() < 2))) then
-      if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box trinkets 4"; end
+    -- use_item,use_off_gcd=1,name=treacherous_transmitter,if=!buff.pillar_of_frost.up&cooldown.pillar_of_frost.remains<5&(!talent.breath_of_sindragosa|(buff.breath_of_sindragosa.up|variable.true_breath_cooldown<5))|fight_remains<25
+    if I.TreacherousTransmitter:IsEquippedAndReady() and (Player:BuffDown(S.PillarofFrostBuff) and S.PillarofFrost:CooldownRemains() < 5 and (not S.BreathofSindragosa:IsAvailable() or (Player:BuffUp(S.BreathofSindragosa) or VarTrueBreathCD < 5)) or BossFightRemains < 25) then
+      if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter trinkets 2"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!talent.breath_of_sindragosa&buff.pillar_of_frost.remains>10|talent.breath_of_sindragosa)&(!buff.pillar_of_frost.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&(buff.breath_of_sindragosa.up&buff.pillar_of_frost.up|!talent.breath_of_sindragosa)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
     if Trinket1:IsReady() and not VarTrinket1BL and (VarTrinket1Buffs and not VarTrinket1Manual and (not S.BreathofSindragosa:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 or S.BreathofSindragosa:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and VarTrinket1Spell:CastTime() > 0 or VarTrinket1Spell:CastTime() == 0) and (Player:BuffUp(S.BreathofSindragosa) and Player:BuffUp(S.PillarofFrostBuff) or not S.BreathofSindragosa:IsAvailable()) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= FightRemains) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " trinkets 6"; end
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " trinkets 4"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!talent.breath_of_sindragosa&buff.pillar_of_frost.remains>10|talent.breath_of_sindragosa)&(!buff.pillar_of_frost.up&trinket.2.cast_time>0|!trinket.2.cast_time>0)&(buff.breath_of_sindragosa.up&buff.pillar_of_frost.up|!talent.breath_of_sindragosa)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
     if Trinket2:IsReady() and not VarTrinket2BL and (VarTrinket2Buffs and not VarTrinket2Manual and (not S.BreathofSindragosa:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 or S.BreathofSindragosa:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and VarTrinket2Spell:CastTime() > 0 or VarTrinket2Spell:CastTime() == 0) and (Player:BuffUp(S.BreathofSindragosa) and Player:BuffUp(S.PillarofFrostBuff) or not S.BreathofSindragosa:IsAvailable()) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= FightRemains) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " trinkets 8"; end
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " trinkets 6"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&((variable.damage_trinket_priority=1|trinket.2.cooldown.remains)|(trinket.1.cast_time>0&!buff.pillar_of_frost.up|!trinket.1.cast_time>0&cooldown.pillar_of_frost.remains>20)|talent.pillar_of_frost&cooldown.pillar_of_frost.remains_expected>20|!talent.pillar_of_frost)
     if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs and not VarTrinket1Manual and ((VarDamageTrinketPriority == 1 or Trinket2:CooldownDown()) or (VarTrinket1Spell:CastTime() > 0 and Player:BuffDown(S.PillarofFrostBuff) or VarTrinket1Spell:CastTime() == 0 and S.PillarofFrost:CooldownRemains() > 20) or S.PillarofFrost:IsAvailable() and S.PillarofFrost:CooldownRemains() > 20 or not S.PillarofFrost:IsAvailable())) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " trinkets 10"; end
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " trinkets 8"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&((variable.damage_trinket_priority=2|trinket.1.cooldown.remains)|(trinket.2.cast_time>0&!buff.pillar_of_frost.up|!trinket.2.cast_time>0&cooldown.pillar_of_frost.remains>20)|talent.pillar_of_frost&cooldown.pillar_of_frost.remains_expected>20|!talent.pillar_of_frost)
     if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs and not VarTrinket2Manual and ((VarDamageTrinketPriority == 2 or Trinket1:CooldownDown()) or (VarTrinket2Spell:CastTime() > 0 and Player:BuffDown(S.PillarofFrostBuff) or VarTrinket2Spell:CastTime() == 0 and S.PillarofFrost:CooldownRemains() > 20) or S.PillarofFrost:IsAvailable() and S.PillarofFrost:CooldownRemains() > 20 or not S.PillarofFrost:IsAvailable())) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " trinkets 12"; end
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " trinkets 10"; end
     end
   end
   -- use_item,use_off_gcd=1,slot=main_hand,if=!equipped.fyralath_the_dreamrender&(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
   if Settings.Commons.Enabled.Items then
     local MHToUse, _, MHRange = Player:GetUseableItems(OnUseExcludes, 16)
     if MHToUse and MHToUse:IsReady() and (not I.Fyralath:IsEquipped() and (not VarTrinket1Buffs or Trinket1:CooldownDown()) and (not VarTrinket2Buffs or Trinket2:CooldownDown())) then
-      if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(MHRange)) then return "Generic use_item for " .. MHToUse:Name() .. " trinkets 14"; end
+      if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(MHRange)) then return "Generic use_item for " .. MHToUse:Name() .. " trinkets 12"; end
     end
   end
 end
@@ -722,26 +718,28 @@ local function Variables()
   VarAddsRemain = EnemiesMeleeCount >= 2 and AoEON()
   -- variable,name=sending_cds,value=(variable.st_planning|variable.adds_remain)
   VarSendingCDs = VarSTPlanning or VarAddsRemain
-  -- variable,name=rime_buffs,value=buff.rime.react&(variable.static_rime_buffs|talent.avalanche&!talent.arctic_assault&debuff.razorice.stack<5)
-  VarRimeBuffs = Player:BuffUp(S.RimeBuff) and (VarStaticRimeBuffs or S.Avalanche:IsAvailable() and not S.ArcticAssault:IsAvailable() and Target:DebuffStack(S.RazoriceDebuff) < 5)
+  -- variable,name=rime_buffs,value=buff.rime.react&(!dot.frost_fever.ticking|variable.static_rime_buffs|talent.avalanche&!talent.arctic_assault&debuff.razorice.stack<5)
+  VarRimeBuffs = Player:BuffUp(S.RimeBuff) and (Target:DebuffDown(S.FrostFeverDebuff) or VarStaticRimeBuffs or S.Avalanche:IsAvailable() and not S.ArcticAssault:IsAvailable() and Target:DebuffStack(S.RazoriceDebuff) < 5)
   -- variable,name=rp_buffs,value=talent.unleashed_frenzy&(buff.unleashed_frenzy.remains<gcd.max*3|buff.unleashed_frenzy.stack<3)|talent.icy_talons&(buff.icy_talons.remains<gcd.max*3|buff.icy_talons.stack<(3+(2*talent.smothering_offense)+(2*talent.dark_talons)))
   VarRPBuffs = S.UnleashedFrenzy:IsAvailable() and (Player:BuffRemains(S.UnleashedFrenzyBuff) < Player:GCD() * 3 or Player:BuffStack(S.UnleashedFrenzyBuff) < 3) or S.IcyTalons:IsAvailable() and (Player:BuffRemains(S.IcyTalonsBuff) < Player:GCD() * 3 or Player:BuffStack(S.IcyTalonsBuff) < (3 + (2 * num(S.SmotheringOffense:IsAvailable())) + (2 * num(S.DarkTalons:IsAvailable()))))
   -- variable,name=cooldown_check,value=talent.pillar_of_frost&buff.pillar_of_frost.up&(talent.obliteration&buff.pillar_of_frost.remains>10|!talent.obliteration)|!talent.pillar_of_frost&buff.empower_rune_weapon.up|!talent.pillar_of_frost&!talent.empower_rune_weapon|active_enemies>=2&buff.pillar_of_frost.up
   VarCDCheck = S.PillarofFrost:IsAvailable() and Player:BuffUp(S.PillarofFrostBuff) and (S.Obliteration:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 or not S.Obliteration:IsAvailable()) or not S.PillarofFrost:IsAvailable() and Player:BuffUp(S.EmpowerRuneWeaponBuff) or not S.PillarofFrost:IsAvailable() and not S.EmpowerRuneWeapon:IsAvailable() or EnemiesMeleeCount >= 2 and Player:BuffUp(S.PillarofFrostBuff)
+  -- variable,name=true_breath_cooldown,op=setif,value=cooldown.breath_of_sindragosa.remains,value_else=cooldown.pillar_of_frost.remains,condition=cooldown.breath_of_sindragosa.remains>cooldown.pillar_of_frost.remains
+  VarTrueBreathCD = (S.BreathofSindragosa:CooldownRemains() > S.PillarofFrost:CooldownRemains()) and S.BreathofSindragosa:CooldownRemains() or S.PillarofFrost:CooldownRemains()
   -- variable,name=oblit_pooling_time,op=setif,value=((cooldown.pillar_of_frost.remains_expected+1)%gcd.max)%((rune+3)*(runic_power+5))*100,value_else=3,condition=runic_power<35&rune<2&cooldown.pillar_of_frost.remains_expected<10
   VarOblitPoolingTime = 3
   if Player:RunicPower() < 35 and Player:Rune() < 2 and S.PillarofFrost:CooldownRemains() < 10 then
     VarOblitPoolingTime = ((S.PillarofFrost:CooldownRemains() + 1) / GCDMax) / ((Player:Rune() + 3) * (Player:RunicPower() + 5)) * 100
   end
-  -- variable,name=breath_pooling_time,op=setif,value=((cooldown.breath_of_sindragosa.remains+1)%gcd.max)%((rune+1)*(runic_power+20))*100,value_else=2,condition=runic_power.deficit>10&cooldown.breath_of_sindragosa.remains<10
+  -- variable,name=breath_pooling_time,op=setif,value=((variable.true_breath_cooldown+1)%gcd.max)%((rune+1)*(runic_power+20))*100,value_else=2,condition=runic_power.deficit>10&variable.true_breath_cooldown<10
   VarBreathPoolingTime = 2
-  if Player:RunicPowerDeficit() > 10 and S.BreathofSindragosa:CooldownRemains() < 10 then
-    VarBreathPoolingTime = ((S.BreathofSindragosa:CooldownRemains() + 1) / GCDMax) / ((Player:Rune() + 1) * (Player:RunicPower() + 20)) * 100
+  if Player:RunicPowerDeficit() > 10 and VarTrueBreathCD < 10 then
+    VarBreathPoolingTime = ((VarTrueBreathCD + 1) / GCDMax) / ((Player:Rune() + 1) * (Player:RunicPower() + 20)) * 100
   end
-  -- variable,name=pooling_runes,value=rune<variable.oblit_rune_pooling&talent.obliteration&(!talent.breath_of_sindragosa|cooldown.breath_of_sindragosa.remains)&cooldown.pillar_of_frost.remains_expected<variable.oblit_pooling_time
-  VarPoolingRunes = Player:Rune() < VarOblitRunePooling and S.Obliteration:IsAvailable() and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownDown()) and S.PillarofFrost:CooldownRemains() < VarOblitPoolingTime
-  -- variable,name=pooling_runic_power,value=talent.breath_of_sindragosa&cooldown.breath_of_sindragosa.remains<variable.breath_pooling_time|talent.obliteration&runic_power<35&cooldown.pillar_of_frost.remains_expected<variable.oblit_pooling_time
-  VarPoolingRP = S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemains() < VarBreathPoolingTime or S.Obliteration:IsAvailable() and Player:RunicPower() < 35 and S.PillarofFrost:CooldownRemains() < VarOblitPoolingTime
+  -- variable,name=pooling_runes,value=rune<variable.oblit_rune_pooling&talent.obliteration&(!talent.breath_of_sindragosa|variable.true_breath_cooldown)&cooldown.pillar_of_frost.remains_expected<variable.oblit_pooling_time
+  VarPoolingRunes = Player:Rune() < VarOblitRunePooling and S.Obliteration:IsAvailable() and (not S.BreathofSindragosa:IsAvailable() or bool(VarTrueBreathCD)) and S.PillarofFrost:CooldownRemains() < VarOblitPoolingTime
+  -- variable,name=pooling_runic_power,value=talent.breath_of_sindragosa&variable.true_breath_cooldown<variable.breath_pooling_time|talent.obliteration&runic_power<35&cooldown.pillar_of_frost.remains_expected<variable.oblit_pooling_time
+  VarPoolingRP = S.BreathofSindragosa:IsAvailable() and VarTrueBreathCD < VarBreathPoolingTime or S.Obliteration:IsAvailable() and Player:RunicPower() < 35 and S.PillarofFrost:CooldownRemains() < VarOblitPoolingTime
   -- variable,name=ga_priority,value=(talent.shattered_frost&active_enemies>=2)|(!talent.shattered_frost&talent.shattering_blade&active_enemies>=4)|(!talent.shattered_frost&!talent.shattering_blade&active_enemies>=2)
   VarGAPriority = (S.ShatteredFrost:IsAvailable() and EnemiesMeleeCount >= 2) or (not S.ShatteredFrost:IsAvailable() and S.ShatteringBlade:IsAvailable() and EnemiesMeleeCount >= 4) or (not S.ShatteredFrost:IsAvailable() and not S.ShatteringBlade:IsAvailable() and EnemiesMeleeCount >= 2)
   -- variable,name=breath_dying,value=runic_power<variable.breath_rp_cost*2&rune.time_to_2>runic_power%variable.breath_rp_cost

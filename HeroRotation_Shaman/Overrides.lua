@@ -27,18 +27,18 @@ HL.AddCoreOverride ("Player.MaelstromP",
       return Maelstrom
     else
       if Player:IsCasting(SpellEle.ElementalBlast) then
-        return Maelstrom - 75
+        return Maelstrom - 90
       elseif Player:IsCasting(SpellEle.Icefury) then
-        return Maelstrom + 25
-      elseif Player:IsCasting(SpellEle.LightningBolt) then
         return Maelstrom + 10
+      elseif Player:IsCasting(SpellEle.LightningBolt) then
+        return Maelstrom + 6
       elseif Player:IsCasting(SpellEle.LavaBurst) then
-        return Maelstrom + 12
+        return Maelstrom + 8
       elseif Player:IsCasting(SpellEle.ChainLightning) then
         --TODO: figure out the *actual* maelstrom you'll get from hitting your current target...
         --return Maelstrom + (4 * #SplashedEnemiesTable[Target])
         -- If you're hitting the best target with CL , this is 4*Shaman.ClusterTargets
-        return Maelstrom + (4 * Shaman.ClusterTargets)
+        return Maelstrom + (2 * Shaman.ClusterTargets)
       else
         return Maelstrom
       end
@@ -73,25 +73,25 @@ HL.AddCoreOverride ("Spell.IsViable",
   end
 , 262)
 
-HL.AddCoreOverride ("Player.MOTEP",
+HL.AddCoreOverride ("Player.MotEUp",
   function()
     if not SpellEle.MasteroftheElements:IsAvailable() then return false end
-    local MOTEUp = Player:BuffUp(SpellEle.MasteroftheElementsBuff)
+    local MotEBuffUp = Player:BuffUp(SpellEle.MasteroftheElementsBuff)
     if not Player:IsCasting() then
-      return MOTEUp
+      return MotEBuffUp
     else
       if Player:IsCasting(SpellEle.LavaBurst) then
         return true
       elseif Player:IsCasting(SpellEle.ElementalBlast) or Player:IsCasting(SpellEle.Icefury) or Player:IsCasting(SpellEle.LightningBolt) or Player:IsCasting(SpellEle.ChainLightning) then 
         return false
       else
-        return MOTEUp
+        return MotEBuffUp
       end
     end
   end
 , 262)
 
-HL.AddCoreOverride ("Player.PotMP",
+HL.AddCoreOverride ("Player.PotMUp",
   function()
     if not SpellEle.PoweroftheMaelstrom:IsAvailable() then return false end
     local PotMStacks = Player:BuffStack(SpellEle.PoweroftheMaelstromBuff)
@@ -107,33 +107,33 @@ HL.AddCoreOverride ("Player.PotMP",
   end
 , 262)
 
-HL.AddCoreOverride ("Player.StormkeeperP",
+HL.AddCoreOverride ("Player.StormkeeperUp",
   function()
     if not SpellEle.Stormkeeper:IsAvailable() then return false end
-    local StormkeeperUp = Player:BuffUp(SpellEle.StormkeeperBuff)
+    local StormkeeperBuffUp = Player:BuffUp(SpellEle.StormkeeperBuff)
     if not Player:IsCasting() then
-      return StormkeeperUp
+      return StormkeeperBuffUp
     else
       if Player:IsCasting(SpellEle.Stormkeeper) then
         return true
       else
-        return StormkeeperUp
+        return StormkeeperBuffUp
       end
     end
   end
 , 262)
 
-HL.AddCoreOverride ("Player.IcefuryP",
+HL.AddCoreOverride ("Player.IcefuryUp",
   function()
     if not SpellEle.Icefury:IsAvailable() then return false end
-    local IcefuryUp = Player:BuffUp(SpellEle.IcefuryBuff)
+    local IcefuryBuffUp = Player:BuffUp(SpellEle.IcefuryBuff)
     if not Player:IsCasting() then
-      return IcefuryUp
+      return IcefuryBuffUp
     else
       if Player:IsCasting(SpellEle.Icefury) then
         return true
       else
-        return IcefuryUp
+        return IcefuryBuffUp
       end
     end
   end

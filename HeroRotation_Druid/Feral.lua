@@ -25,6 +25,8 @@ local num         = HR.Commons.Everyone.num
 local bool        = HR.Commons.Everyone.bool
 -- lua
 local mathfloor   = math.floor
+-- WoW API
+local Delay       = C_Timer.After
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
