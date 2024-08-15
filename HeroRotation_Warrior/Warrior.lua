@@ -33,6 +33,7 @@ Spell.Warrior.Commons = {
   LightsJudgment                        = Spell(255647),
   -- Abilities
   BattleShout                           = Spell(6673),
+  BattleStance                          = Spell(386164),
   Charge                                = Spell(100),
   HeroicThrow                           = Spell(57755),
   Pummel                                = Spell(6552),
@@ -81,9 +82,19 @@ Spell.Warrior.Commons = {
 }
 
 Spell.Warrior.Colossus = {
+  -- Talents
+  Demolish                              = Spell(436358),
 }
 
 Spell.Warrior.MountainThane = {
+  -- Abilities
+  ThunderBlastAbility                   = Spell(435222),
+  -- Talents
+  CrashingThunder                       = Spell(436707),
+  ThunderBlast                          = Spell(435607),
+  -- Buffs
+  BurstofPowerBuff                      = Spell(437121),
+  ThunderBlastBuff                      = Spell(435615),
 }
 
 Spell.Warrior.Slayer = {
@@ -91,7 +102,6 @@ Spell.Warrior.Slayer = {
 
 Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   -- Abilities
-  BattleStance                          = Spell(386164),
   Execute                               = MultiSpell(163201, 281000),
   Whirlwind                             = Spell(1680),
   -- Talents
@@ -165,7 +175,6 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Fury, Spell.Warrior.Slayer)
 
 Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   -- Abilities
-  BattleStance                          = Spell(386164),
   Devastate                             = Spell(20243),
   Execute                               = Spell(163201),
   ShieldBlock                           = Spell(2565),

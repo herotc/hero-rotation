@@ -65,7 +65,7 @@ ProtOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local BaseCheck = ProtOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellProt.Charge then
-      return BaseCheck and (self:Charges() >= 1 and (not Target:IsInRange(8)))
+      return BaseCheck and (self:Charges() >= 1 and not Target:IsInRange(8))
     elseif self == SpellProt.HeroicThrow or self == SpellProt.TitanicThrow then
       return BaseCheck and (not Target:IsInRange(8))
     elseif self == SpellProt.Avatar then
