@@ -14,6 +14,7 @@ local Item             = HL.Item
 -- Lua
 local GetTime          = GetTime
 local mathmax          = math.max
+local select           = select
 -- File Locals
 HR.Commons.DemonHunter = {}
 local DemonHunter      = HR.Commons.DemonHunter

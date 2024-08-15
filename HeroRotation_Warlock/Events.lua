@@ -14,6 +14,7 @@ local Item = HL.Item
 -- Lua
 local find = string.find
 local GetTime = GetTime
+local select = select
 -- WoW API
 local UnitGUID = UnitGUID
 -- File Locals

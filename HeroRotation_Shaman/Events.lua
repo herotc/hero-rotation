@@ -14,6 +14,7 @@ local Item = HL.Item
 -- Lua
 local GetTime = GetTime
 local C_Timer = C_Timer
+local select = select
 -- File Locals
 HR.Commons.Shaman = {}
 local Shaman = HR.Commons.Shaman

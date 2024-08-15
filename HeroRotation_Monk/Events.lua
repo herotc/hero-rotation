@@ -20,6 +20,7 @@ local Monk = HR.Commons.Monk
 local C_Timer = C_Timer
 local tableremove = table.remove
 local tableinsert = table.insert
+local select = select
 -- WoW API
 local GetTime = GetTime
 -- File Locals
