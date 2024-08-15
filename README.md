@@ -6,9 +6,9 @@
 
 **If you see an icon with "POOL" written inside, it means you have to pool your resources. It's a normal behavior. Please see this [link explaining resource pooling](https://wow.gamepedia.com/Resource_pooling).**
 
-**If you update the addon via the Curse Client and wish to get every change as they are released, please set the addon type to Alpha by right clicking the addon name and selecting Alpha under Release Type. The is dependent upon Curse grabbing updates from the github, which it doesn't always do properly, so some updates may be missed. Note that this can potentially include updates that break functionality!**
+**If you update the addon via the Curse Client and wish to get every change as they are released, please set the addon type to Alpha by right clicking the addon name and selecting Alpha under Release Type. This is dependent upon Curse grabbing updates from GitHub, which it doesn't always do properly, so some updates may be missed. Note that this can potentially include updates that break functionality!**
 
-**If you would like to update the addon directly from our github via [WowUp](https://wowup.io), go to the Get Addons tab, click Install from URL, enter the github repo address (https://github.com/herotc/hero-rotation), and click Import. Remember to do the same with HeroLib (https://github.com/herotc/hero-lib) and HeroDBC (https://github.com/herotc/hero-dbc).**
+**If you would like to update the addon directly from GitHub via [WowUp](https://wowup.io), go to the Get Addons tab, click Install from URL, enter the GitHub repo address (https://github.com/herotc/hero-rotation), and click Import. Remember to do the same with HeroLib (https://github.com/herotc/hero-lib) and HeroDBC (https://github.com/herotc/hero-dbc).**
 
 # HeroRotation
 
