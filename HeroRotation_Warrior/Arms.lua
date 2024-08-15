@@ -168,7 +168,7 @@ local function Precombat()
     if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 4"; end
   end
   -- battle_stance,toggle=on
-  if S.BattleStance:IsCastable() and Player:BuffDown(S.BattleStance, true) then
+  if S.BattleStance:IsCastable() and Player:BuffDown(S.BattleStance) then
     if Cast(S.BattleStance) then return "battle_stance precombat 6"; end
   end
   -- Manually added: pre-pull
