@@ -1,4 +1,4 @@
-**Not everything is updated for Dragonflight, so please check the table below (Supported Rotations). If a spec is in WIP or KO status, please do not report an issue about it.**
+**Not everything is updated for The War Within, so please check the table below (Supported Rotations). If a spec is in WIP or KO status, please do not report an issue about it.**
 
 **If you are missing dependencies, ([HeroDBC](https://www.curseforge.com/wow/addons/herodbc) and [HeroLib](https://www.curseforge.com/wow/addons/herolib)), you have to install them.**
 
