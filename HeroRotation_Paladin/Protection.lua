@@ -40,6 +40,7 @@ local OnUseExcludes = {
 
 --- ===== GUI Settings ======
 local Everyone = HR.Commons.Everyone
+local Paladin = HR.Commons.Paladin
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Paladin.Commons,
@@ -63,7 +64,7 @@ local StunInterrupts = {
 --- ===== Helper Functions =====
 local function HPGTo2Dawn()
   if not S.OfDuskandDawn:IsAvailable() then return -1 end
-  return 6 - Player:HolyPower() - (Player:BuffStack(S.BlessingofDawnBuff) * 3)
+  return 6 - Paladin.HPGCount - (Player:BuffStack(S.BlessingofDawnBuff) * 3)
 end
 
 local function MissingAura()
@@ -186,10 +187,10 @@ end
 local function HammerofLight()
   -- hammer_of_light,if=buff.blessing_of_dawn.stack>0|spell_targets.shield_of_the_righteous>=5
   if S.HammerofLight:IsReady() and (Player:BuffUp(S.BlessingofDawnBuff) or EnemiesCount8y >= 5) then
-    if Cast(S.HammerofJustice, Settings.Protection.GCDasOffGCD.EyeOfTyr, nil, not Target:IsInRange(12)) then return "hammer_of_light hammer_of_light 2"; end
+    if Cast(S.HammerofLight, Settings.Protection.GCDasOffGCD.EyeOfTyr, nil, not Target:IsInRange(12)) then return "hammer_of_light hammer_of_light 2"; end
   end
   -- eye_of_tyr,if=hpg_to_2dawn=5
-  if CDsON() and S.EyeofTyr:IsCastable() and (HPGTo2Dawn() == 5) then
+  if S.EyeofTyr:IsCastable() and (HPGTo2Dawn() == 5) then
     if Cast(S.EyeofTyr, Settings.Protection.GCDasOffGCD.EyeOfTyr, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr hammer_of_light 4"; end
   end
   -- shield_of_the_righteous,if=hpg_to_2dawn=4
@@ -197,7 +198,7 @@ local function HammerofLight()
     if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous standard 6"; end
   end
   -- eye_of_tyr,if=hpg_to_2dawn=1|buff.blessing_of_dawn.stack>0
-  if CDsON() and S.EyeofTyr:IsCastable() and (HPGTo2Dawn() == 1 or Player:BuffUp(S.BlessingofDawnBuff)) then
+  if S.EyeofTyr:IsCastable() and (HPGTo2Dawn() == 1 or Player:BuffUp(S.BlessingofDawnBuff)) then
     if Cast(S.EyeofTyr, Settings.Protection.GCDasOffGCD.EyeOfTyr, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr hammer_of_light 8"; end
   end
   -- hammer_of_wrath
@@ -285,7 +286,8 @@ local function Standard()
     if Cast(S.Consecration) then return "consecration standard 22"; end
   end
   -- eye_of_tyr,if=(talent.inmost_light.enabled&raid_event.adds.in>=45|spell_targets.shield_of_the_righteous>=3)&!talent.lights_deliverance.enabled
-  if CDsON() and S.EyeofTyr:IsCastable() and ((S.InmostLight:IsAvailable() and EnemiesCount8y == 1 or EnemiesCount8y >= 3) and not S.LightsDeliverance:IsAvailable()) then
+  -- Note: Ignoring CDsON if spec'd Templar Hero Tree.
+  if (CDsON() or S.LightsGuidance:IsAvailable()) and S.EyeofTyr:IsCastable() and ((S.InmostLight:IsAvailable() and EnemiesCount8y == 1 or EnemiesCount8y >= 3) and not S.LightsDeliverance:IsAvailable()) then
     if Cast(S.EyeofTyr, Settings.Protection.GCDasOffGCD.EyeOfTyr, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr standard 24"; end
   end
   -- holy_armaments,if=next_armament=holy_bulwark
@@ -325,7 +327,8 @@ local function Standard()
     if Cast(S.AvengersShield, nil, nil, not Target:IsSpellInRange(S.AvengersShield)) then return "avengers_shield standard 40"; end
   end
   -- eye_of_tyr,if=!talent.lights_deliverance.enabled
-  if CDsON() and S.EyeofTyr:IsCastable() and (not S.LightsDeliverance:IsAvailable()) then
+  -- Note: Ignoring CDsON if spec'd Templar Hero Tree.
+  if (CDsON() or S.LightsGuidance:IsAvailable()) and S.EyeofTyr:IsCastable() and (not S.LightsDeliverance:IsAvailable()) then
     if Cast(S.EyeofTyr, Settings.Protection.GCDasOffGCD.EyeOfTyr, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr standard 42"; end
   end
   -- word_of_glory,if=buff.shining_light_free.up

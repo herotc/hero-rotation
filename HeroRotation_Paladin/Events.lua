@@ -4,6 +4,7 @@
 local addonName, addonTable = ...
 -- HeroLib
 local HL = HeroLib
+local HR = HeroRotation
 local Cache = HeroCache
 local Unit = HL.Unit
 local Player = Unit.Player
@@ -11,12 +12,32 @@ local Target = Unit.Target
 local Spell = HL.Spell
 local Item = HL.Item
 -- Lua
-local pairs = pairs
 local select = select
 -- File Locals
-
+HR.Commons.Paladin = {}
+local Paladin = HR.Commons.Paladin
 
 --- ============================ CONTENT ============================
+--- ===== HPGTo2Dawn Tracker =====
+local Spec = Cache.Persistent.Player.Spec[1]
+Paladin.HPGCount = 0
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    if Spec == 66 then
+      Paladin.HPGCount = Paladin.HPGCount + 1
+    end
+  end
+, "SPELL_ENERGIZE")
+
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local SpellID = select(12, ...)
+    if SpellID == 385127 then
+      Paladin.HPGCount = 0
+    end
+  end
+, "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE")
+
 --- ======= NON-COMBATLOG =======
 
 --- ======= COMBATLOG =======
