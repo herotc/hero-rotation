@@ -92,6 +92,8 @@ Spell.Hunter.PackLeader = {
 }
 
 Spell.Hunter.Sentinel = {
+  -- Talents
+  LunarStorm                            = Spell(450385),
 }
 
 Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
