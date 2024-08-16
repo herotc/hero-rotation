@@ -346,7 +346,6 @@ local function APL()
   end
 
   if Everyone.TargetIsValid() then
-    HR.Print("Arcane Charges: "..tostring(Player:ArcaneCharges()))
     -- arcane_intellect
     -- Note: Moved from of precombat
     if S.ArcaneIntellect:IsCastable() and (S.ArcaneFamiliar:IsAvailable() and Player:BuffDown(S.ArcaneFamiliarBuff) or Everyone.GroupBuffMissing(S.ArcaneIntellect)) then
