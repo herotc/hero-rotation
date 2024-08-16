@@ -108,6 +108,7 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   Impetus                               = Spell(383676),
   ImprovedClearcasting                  = Spell(321420),
   MagisSpark                            = Spell(454016),
+  OrbBarrage                            = Spell(384858),
   PresenceofMind                        = Spell(205025),
   Reverberate                           = Spell(281482),
   Supernova                             = Spell(157980), --Splash, 8
