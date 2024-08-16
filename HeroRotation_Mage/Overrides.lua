@@ -68,6 +68,19 @@ HL.AddCoreOverride("Spell.IsCastable",
   end
 , 62)
 
+local ArcaneChargesPowerType = Enum.PowerType.ArcaneCharges
+local ArcaneOldPlayerArcaneCharges
+ArcaneOldPlayerArcaneCharges = HL.AddCoreOverride("Player.ArcaneCharges",
+  function (self)
+    local BaseCharges = UnitPower("player", ArcaneChargesPowerType)
+    if Player:IsCasting(SpellArcane.ArcaneBlast) then
+      return mathmin(BaseCharges + 1, 4)
+    else
+      return BaseCharges
+    end
+  end
+, 62)
+
 -- Fire, ID: 63
 local FirePlayerBuffUp
 FirePlayerBuffUp = HL.AddCoreOverride("Player.BuffUp",
