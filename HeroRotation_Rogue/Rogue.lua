@@ -73,6 +73,7 @@ Spell.Rogue.Commons = {
   -- Talents
   AcrobaticStrikes        = Spell(455143),
   Alacrity                = Spell(193539),
+  ClearTheWitnessesBuff   = Spell(457179),
   ColdBlood               = Spell(382245),
   CoupDeGrace             = Spell(441776),
   DarkestNight            = Spell(457058),
@@ -86,15 +87,18 @@ Spell.Rogue.Commons = {
   EchoingReprimand3       = Spell(323559),
   EchoingReprimand4       = Spell(323560),
   EchoingReprimand5       = Spell(354838),
+  EscalatingBlade         = Spell(441786),
   FateboundCoin           = Spell(453012),
   FateboundCoinHeads      = Spell(456479),
   FateboundCoinTails      = Spell(452538),
   FateboundLuckyCoin      = Spell(461818),
   FatefulEnding           = Spell(454428),
+  Fazed                   = Spell(460927),
   FindWeakness            = Spell(91023),
   FindWeaknessDebuff      = Spell(316220),
   FlawlessForm            = Spell(441321),
   FlawlessFormBuff        = Spell(441326),
+  FollowTheBlood          = Spell(457068),
   HandOfFate              = Spell(452536),
   ImprovedAmbush          = Spell(381620),
   MarkedforDeath          = Spell(137619),
@@ -282,6 +286,7 @@ Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
   PreyontheWeakDebuff     = Spell(255909),
   Premeditation           = Spell(343160),
   PremeditationBuff       = Spell(343173),
+  ReplicatingShadows      = Spell(382506),
   SecretStratagem         = Spell(394320),
   SecretTechnique         = Spell(280719),
   Shadowcraft             = Spell(426594),
@@ -327,6 +332,7 @@ Item.Rogue.Subtlety = {
   Mirror                  = Item(207581, {13, 14}),
   IrideusFragment         = Item(193743, {13, 14}),
   ImperfectAscendancySerum = Item(225654, {13, 14}),
+  TreacherousTransmitter  = Item(221023, {13, 14})
 }
 
 function Commons.StealthSpell()
