@@ -88,6 +88,7 @@ Spell.Rogue.Commons = {
   EchoingReprimand4       = Spell(323560),
   EchoingReprimand5       = Spell(354838),
   EscalatingBlade         = Spell(441786),
+  EdgeCase                = Spell(453457),
   FateboundCoin           = Spell(453012),
   FateboundCoinHeads      = Spell(456479),
   FateboundCoinTails      = Spell(452538),
@@ -308,6 +309,8 @@ Item.Rogue.Assassination = {
   AlgetharPuzzleBox       = Item(193701, {13, 14}),
   AshesoftheEmbersoul     = Item(207167, {13, 14}),
   WitherbarksBranch       = Item(109999, {13, 14}),
+  ImperfectAscendancySerum = Item(225654, {13, 14}),
+  TreacherousTransmitter  = Item(221023, {13, 14})
 }
 
 Item.Rogue.Outlaw = {
