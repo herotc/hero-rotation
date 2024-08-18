@@ -254,12 +254,6 @@ local function Vanish_DPS_Condition ()
   return Settings.Commons.UseDPSVanish and (not Player:IsTanking(Target) or Settings.Commons.UseSoloVanish)
 end
 
-local function Vanish_Opportunity_Condition ()
-  -- actions.stealth_cds=variable,name=vanish_opportunity_condition,value=!talent.shadow_dance&talent.fan_the_hammer.rank+talent.quick_draw+talent.audacity<talent.count_the_odds+talent.keep_it_rolling
-  return not S.ShadowDanceTalent:IsAvailable()
-    and S.FanTheHammer:TalentRank() + num(S.QuickDraw:IsAvailable()) + num(S.Audacity:IsAvailable()) < num(S.CountTheOdds:IsAvailable()) + num(S.KeepItRolling:IsAvailable())
-end
-
 local function Stealth(ReturnSpellOnly)
   if S.BladeFlurry:IsReady() then
     if S.DeftManeuvers:IsAvailable() and not Finish_Condition() and (EnemiesBFCount >= 3

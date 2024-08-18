@@ -13,6 +13,7 @@ local Spell = HL.Spell
 local MultiSpell = HL.MultiSpell
 local Item = HL.Item
 local BoolToInt = HL.Utils.BoolToInt
+local ValueIsInArray = HL.Utils.ValueIsInArray
 -- HeroRotation
 local HR = HeroRotation
 local AoEON = HR.AoEON
@@ -46,16 +47,6 @@ local OnUseExcludes = {
   I.ImperfectAscendancySerum:ID(),
   I.TreacherousTransmitter:ID()
 }
-
--- Determines if a trinket is in the excludes list
-local function TrinketInExcludes(trinket)
-  for i=1, #OnUseExcludes do
-    if OnUseExcludes[i] == trinket then
-      return true
-    end
-    return false
-  end
-end
 
 -- Rotation Var
 local MeleeRange, AoERange, TargetInMeleeRange, TargetInAoERange
@@ -206,24 +197,9 @@ local function Stealth_Threshold ()
   return 20 + S.Vigor:TalentRank() * 25 + num(S.ThistleTea:IsAvailable()) * 20 + num(S.Shadowcraft:IsAvailable()) * 20
 end
 
-local function ShD_Threshold ()
-  -- actions.stealth_cds=variable,name=shd_threshold,value=cooldown.shadow_dance.charges_fractional>=0.75+talent.shadow_dance
-  return S.ShadowDance:ChargesFractional() >= 0.75 + BoolToInt(S.DoubleDance:IsAvailable())
-end
-
-local function ShD_Combo_Points ()
-  -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=3
-  return ComboPointsDeficit >= 3
-end
-
 local function SnD_Condition ()
   -- actions+=/variable,name=snd_condition,value=buff.slice_and_dice.up
   return Player:BuffUp(S.SliceandDice)
-end
-
--- variable,name=premed_snd_condition,value=talent.premeditation.enabled&spell_targets.shuriken_storm<5
-local function Premed_SnD_Condition ()
-  return S.Premeditation:IsAvailable() and MeleeEnemies10yCount < 5
 end
 
 local function Skip_Rupture (ShadowDanceBuff)
@@ -243,13 +219,6 @@ local function Rupture_Before_Flag()
     or not S.ReplicatingShadows:IsAvailable()
 end
 
--- Helper variable to check for Cold Blood and The Rotten buff.
-local function Rotten_CB ()
-  -- actions.stealth_cds+=/variable,name=rotten_cb,value=(!buff.the_rotten.up|!set_bonus.tier30_2pc)&(!talent.cold_blood|cooldown.cold_blood.remains<4|cooldown.cold_blood.remains>10)
-  return (not Player:BuffUp(S.TheRotten) or not Player:HasTier(30, 2)) and (not S.ColdBlood:IsAvailable() or S.ColdBlood:CooldownRemains() < 4
-      or S.ColdBlood:CooldownRemains() > 10)
-end
-
 local function Used_For_Danse(Spell)
   return Player:BuffUp(S.ShadowDanceBuff) and Spell:TimeSinceLastCast() < S.ShadowDance:TimeSinceLastCast()
 end
@@ -259,13 +228,6 @@ local function Secret_Condition()
   -- &(buff.danse_macabre.stack>=2|!talent.danse_macabre|(talent.unseen_blade&buff.shadow_dance.up&buff.escalating_blade.stack>=2))
   return Player:BuffDown(S.DarkestNightBuff) and (Player:BuffStack(S.DanseMacabreBuff) >= 2 or not S.DanseMacabre:IsAvailable()
   or (S.UnseenBlade:IsAvailable() and Player:BuffUp(S.ShadowDanceBuff) and Player:BuffStack(S.EscalatingBlade) >= 2))
-end
-
--- variable,name=trinket_conditions,value=(!equipped.witherbarks_branch|equipped.witherbarks_branch
--- &trinket.witherbarks_branch.cooldown.remains<=8|equipped.bandolier_of_twisted_blades|talent.invigorating_shadowdust)
-local function Trinket_Condition()
-  return (not I.WitherbarksBranch:IsEquipped() or I.WitherbarksBranch:IsEquipped() and I.WitherbarksBranch:CooldownRemains() <= 8
-  or I.BandolierOfTwistedBlades:IsEquipped() or S.InvigoratingShadowdust:IsAvailable())
 end
 
 local function Trinket_Sync_Slot()
@@ -805,7 +767,7 @@ local function Items()
       TrinketSpell = trinket1:OnUseSpell()
       TrinketRange = (TrinketSpell and TrinketSpell.MaximumRange > 0 and TrinketSpell.MaximumRange <= 100) and TrinketSpell.MaximumRange or 100
     end
-    if trinket1:IsEquippedAndReady() and not TrinketInExcludes(trinket1) and (Trinket_Sync_Slot() == 1 and (Player:BuffUp(S.ShadowBlades) or (1+S.ShadowBlades:CooldownRemains()) >= trinket1:CooldownRemains()
+    if trinket1:IsEquippedAndReady() and not ValueIsInArray(OnUseExcludes, trinket1:ID()) and (Trinket_Sync_Slot() == 1 and (Player:BuffUp(S.ShadowBlades) or (1+S.ShadowBlades:CooldownRemains()) >= trinket1:CooldownRemains()
       or HL.BossFilteredFightRemains("<=", 20)) or (Trinket_Sync_Slot() == 2 and (not trinket2:IsReady() and not Player:BuffUp(S.ShadowBlades)
       and S.ShadowBlades:CooldownRemains() > 20)) or Trinket_Sync_Slot() == 0) then
         if Cast(trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then return "Generic use_items for " .. trinket1:Name() end
@@ -818,7 +780,7 @@ local function Items()
       TrinketSpell = trinket2:OnUseSpell()
       TrinketRange = (TrinketSpell and TrinketSpell.MaximumRange > 0 and TrinketSpell.MaximumRange <= 100) and TrinketSpell.MaximumRange or 100
     end
-    if trinket2:IsEquippedAndReady() and not TrinketInExcludes(trinket2) and (Trinket_Sync_Slot() == 2 and (Player:BuffUp(S.ShadowBlades) or (1+S.ShadowBlades:CooldownRemains()) >= trinket2:CooldownRemains()
+    if trinket2:IsEquippedAndReady() and not ValueIsInArray(OnUseExcludes, trinket2:ID()) and (Trinket_Sync_Slot() == 2 and (Player:BuffUp(S.ShadowBlades) or (1+S.ShadowBlades:CooldownRemains()) >= trinket2:CooldownRemains()
       or HL.BossFilteredFightRemains("<=", 20)) or (Trinket_Sync_Slot() == 1 and (not trinket1:IsReady() and not Player:BuffUp(S.ShadowBlades)
       and S.ShadowBlades:CooldownRemains() > 20)) or Trinket_Sync_Slot() == 0) then
       if Cast(trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then return "Generic use_items for " .. trinket2:Name() end
