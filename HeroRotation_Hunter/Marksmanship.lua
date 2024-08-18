@@ -220,7 +220,7 @@ local function ST()
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley st 10"; end
   end
   -- rapid_fire,if=!talent.lunar_storm|(!cooldown.lunar_storm.remains|cooldown.lunar_storm.remains>5)
-  if S.RapidFire:IsCastable() and (not S.LunarStorm:IsAvailable() and (S.LunarStorm:CooldownDown() or S.LunarStorm:CooldownRemains() > 5)) then
+  if S.RapidFire:IsCastable() and (not S.LunarStorm:IsAvailable() or (S.LunarStorm:CooldownDown() or S.LunarStorm:CooldownRemains() > 5)) then
     if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire st 12"; end
   end
   -- trueshot,if=variable.trueshot_ready
