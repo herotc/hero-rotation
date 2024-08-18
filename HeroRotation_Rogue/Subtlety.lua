@@ -644,7 +644,8 @@ local function CDs ()
     if Player:BuffUp(S.ShadowDanceBuff) and S.InvigoratingShadowdust:IsAvailable() and S.UnseenBlade:IsAvailable()
       and ComboPointsDeficit > 1 and (S.Flagellation:CooldownRemains() >= 60 or not S.Flagellation:IsAvailable() or HL.BossFilteredFightRemains("<=", 30*S.Vanish:Charges()))
       and S.SecretTechnique:CooldownRemains() >= 10 then
-      if Cast(S.Vanish) then return "Cast Vanish" end
+        ShouldReturn = StealthMacro(S.Vanish, StealthEnergyRequired)
+        if ShouldReturn then return "Vanish Macro" .. ShouldReturn end
     end
   end
 
@@ -653,7 +654,8 @@ local function CDs ()
   -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
   if HR.CDsON() and S.ShadowDance:IsAvailable() and MayBurnShadowDance() and S.ShadowDance:IsReady() then
     if not Player:BuffUp(S.ShadowDanceBuff) and HL.BossFilteredFightRemains("<=", 8 + num(S.Subterfuge:IsAvailable())) then
-      if Cast(S.ShadowDance) then return "Cast Shadow Dance CDs 1" end
+        ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
+        if ShouldReturn then return "Shadow Dance Macro CDs 1" .. ShouldReturn end
     end
   end
 
@@ -663,7 +665,8 @@ local function CDs ()
     if Player:BuffDown(S.ShadowDanceBuff) and S.InvigoratingShadowdust:IsAvailable() and S.DeathStalkersMark:IsAvailable()
       and Player:BuffUp(S.ShadowBlades) and (Player:BuffUp(S.Subterfuge) and MeleeEnemies10yCount >= 4
       or Player:BuffRemains(S.Subterfuge) >= 3) then
-        if Cast(S.ShadowDance) then return "Cast Shadow Dance CDs 2" end
+        ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
+        if ShouldReturn then return "Shadow Dance Macro CDs 2" .. ShouldReturn end
     end
   end
 
@@ -678,7 +681,8 @@ local function CDs ()
     or Player:BuffUp(S.SymbolsofDeath) and Player:BuffUp(S.ShadowBlades) or Player:BuffUp(S.ShadowBlades) and not S.InvigoratingShadowdust:IsAvailable())
     and (S.SecretTechnique:CooldownRemains() <= 10 + 12 * num(not S.InvigoratingShadowdust:IsAvailable() or Player:BuffUp(S.ShadowBlades))
       and (not S.TheFirstDance:IsAvailable() or (ComboPointsDeficit >= 7 and Player:BuffDown(S.ShadowBlades) or Player:BuffUp(S.ShadowBlades)))) then
-        if Cast(S.ShadowDance) then return "Cast Shadow Dance CDs 3" end
+        ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
+        if ShouldReturn then return "Shadow Dance Macro CDs 3" .. ShouldReturn end
     end
   end
 
@@ -767,10 +771,12 @@ local function Items()
       TrinketSpell = trinket1:OnUseSpell()
       TrinketRange = (TrinketSpell and TrinketSpell.MaximumRange > 0 and TrinketSpell.MaximumRange <= 100) and TrinketSpell.MaximumRange or 100
     end
-    if trinket1:IsEquippedAndReady() and not ValueIsInArray(OnUseExcludes, trinket1:ID()) and (Trinket_Sync_Slot() == 1 and (Player:BuffUp(S.ShadowBlades) or (1+S.ShadowBlades:CooldownRemains()) >= trinket1:CooldownRemains()
-      or HL.BossFilteredFightRemains("<=", 20)) or (Trinket_Sync_Slot() == 2 and (not trinket2:IsReady() and not Player:BuffUp(S.ShadowBlades)
-      and S.ShadowBlades:CooldownRemains() > 20)) or Trinket_Sync_Slot() == 0) then
-        if Cast(trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then return "Generic use_items for " .. trinket1:Name() end
+    if trinket1:IsEquippedAndReady() then
+      if not ValueIsInArray(OnUseExcludes, trinket1:ID()) and (Trinket_Sync_Slot() == 1 and (Player:BuffUp(S.ShadowBlades) or (1+S.ShadowBlades:CooldownRemains()) >= trinket1:CooldownRemains()
+        or HL.BossFilteredFightRemains("<=", 20)) or (Trinket_Sync_Slot() == 2 and (not trinket2:IsReady() and not Player:BuffUp(S.ShadowBlades)
+        and S.ShadowBlades:CooldownRemains() > 20)) or Trinket_Sync_Slot() == 0) then
+          if Cast(trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then return "Generic use_items for " .. trinket1:Name() end
+      end
     end
 
     --actions.items+=/use_items,slots=trinket2,if=(variable.trinket_sync_slot=2&(buff.shadow_blades.up
@@ -780,10 +786,12 @@ local function Items()
       TrinketSpell = trinket2:OnUseSpell()
       TrinketRange = (TrinketSpell and TrinketSpell.MaximumRange > 0 and TrinketSpell.MaximumRange <= 100) and TrinketSpell.MaximumRange or 100
     end
-    if trinket2:IsEquippedAndReady() and not ValueIsInArray(OnUseExcludes, trinket2:ID()) and (Trinket_Sync_Slot() == 2 and (Player:BuffUp(S.ShadowBlades) or (1+S.ShadowBlades:CooldownRemains()) >= trinket2:CooldownRemains()
-      or HL.BossFilteredFightRemains("<=", 20)) or (Trinket_Sync_Slot() == 1 and (not trinket1:IsReady() and not Player:BuffUp(S.ShadowBlades)
-      and S.ShadowBlades:CooldownRemains() > 20)) or Trinket_Sync_Slot() == 0) then
-      if Cast(trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then return "Generic use_items for " .. trinket2:Name() end
+    if trinket2:IsEquippedAndReady() then
+      if not ValueIsInArray(OnUseExcludes, trinket2:ID()) and (Trinket_Sync_Slot() == 2 and (Player:BuffUp(S.ShadowBlades) or (1+S.ShadowBlades:CooldownRemains()) >= trinket2:CooldownRemains()
+        or HL.BossFilteredFightRemains("<=", 20)) or (Trinket_Sync_Slot() == 1 and (not trinket1:IsReady() and not Player:BuffUp(S.ShadowBlades)
+        and S.ShadowBlades:CooldownRemains() > 20)) or Trinket_Sync_Slot() == 0) then
+          if Cast(trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then return "Generic use_items for " .. trinket2:Name() end
+      end
     end
   end
 
