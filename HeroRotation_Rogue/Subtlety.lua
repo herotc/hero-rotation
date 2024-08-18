@@ -337,7 +337,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
 
   -- actions.finish+=/coup_de_grace,if=debuff.fazed.up&(buff.shadow_dance.up|(buff.symbols_of_death.up&cooldown.shadow_dance.charges_fractional<=0.85))
   if S.CoupDeGrace:IsReady() and S.CoupDeGrace:IsCastable() then
-    if Target:DebuffUp(S.Fazed) and (Player:BuffUp(S.ShadowDanceBuff) or Player:BuffUp(S.SymbolsofDeath)
+    if Target:DebuffUp(S.FazedDebuff) and (Player:BuffUp(S.ShadowDanceBuff) or Player:BuffUp(S.SymbolsofDeath)
       and S.ShadowDance:ChargesFractional() <= 0.85) then
         if ReturnSpellOnly then
           return S.CoupDeGrace
@@ -416,13 +416,13 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       if ReturnSpellOnly then
         return S.BlackPowder
       else
-        if S.BlackPowder:IsReady() and Cast(S.BlackPowder) then return "Cast BlackPowder" end
+        if S.BlackPowder:IsReady() and Cast(S.BlackPowder) then return "Cast BlackPowder 2" end
         SetPoolingFinisher(S.BlackPowder)
       end
   end
 
   -- actions.finish+=/coup_de_grace,if=debuff.fazed.up
-  if S.CoupDeGrace:IsCastable() and TargetInMeleeRange and Target:DebuffUp(S.Fazed) then
+  if S.CoupDeGrace:IsCastable() and TargetInMeleeRange and Target:DebuffUp(S.FazedDebuff) then
     if ReturnSpellOnly then
       return S.CoupDeGrace
     else
@@ -477,7 +477,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   end
 
   -- actions.stealthed=shadowstrike,if=talent.deathstalkers_mark&!debuff.deathstalkers_mark.up&!buff.darkest_night.up
-  if ShadowstrikeIsCastable and S.DeathStalkersMark:IsAvailable() and Target:DebuffDown(S.DeathStalkersMarkBuff)
+  if ShadowstrikeIsCastable and S.DeathStalkersMark:IsAvailable() and Target:DebuffDown(S.DeathStalkersMarkDebuff)
     and Player:BuffDown(S.DarkestNightBuff) then
       if ReturnSpellOnly then
         return S.Shadowstrike
@@ -487,7 +487,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   end
 
   -- actions.stealthed+=/call_action_list,name=finish,if=buff.darkest_night.up&combo_points==cp_max_spend
-  if Player:BuffUp(S.DarkestNightBuff) and StealthEffectiveComboPoints == Rogue.CPMaxSpend() then
+  if Player:BuffUp(S.DarkestNightBuff) and ComboPoints == Rogue.CPMaxSpend() then
     return Finish(ReturnSpellOnly, StealthSpell)
   end
 
