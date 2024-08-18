@@ -228,12 +228,12 @@ local function HammerofLight()
 end
 
 local function Standard()
-  -- call_action_list,name=hammer_of_light,if=talent.lights_guidance.enabled&(cooldown.eye_of_tyr.remains<2|buff.hammer_of_light_ready.up)&(buff.redoubt.stack>=2|!talent.bastion_of_light.enabled)&talent.of_dusk_and_dawn.enabled
-  if S.LightsGuidance:IsAvailable() and (S.EyeofTyr:CooldownRemains() < 2 or S.HammerofLight:IsLearned()) and (Player:BuffStack(S.RedoubtBuff) >= 2 or not S.BastionofLight:IsAvailable()) and S.OfDuskandDawn:IsAvailable() then
+  -- call_action_list,name=hammer_of_light,if=talent.lights_guidance.enabled&(cooldown.eye_of_tyr.remains<2|buff.hammer_of_light_ready.up)&(!talent.redoubt.enabled|buff.redoubt.stack>=2|!talent.bastion_of_light.enabled)&talent.of_dusk_and_dawn.enabled
+  if S.LightsGuidance:IsAvailable() and (S.EyeofTyr:CooldownRemains() < 2 or S.HammerofLight:IsLearned()) and (not S.Redoubt:IsAvailable() or Player:BuffStack(S.RedoubtBuff) >= 2 or not S.BastionofLight:IsAvailable()) and S.OfDuskandDawn:IsAvailable() then
     local ShouldReturn = HammerofLight(); if ShouldReturn then return ShouldReturn; end
   end
-  -- hammer_of_light,if=buff.redoubt.stack=3&(buff.blessing_of_dawn.stack>=1|!talent.of_dusk_and_dawn.enabled)
-  if S.HammerofLight:IsReady() and (Player:BuffStack(S.RedoubtBuff) == 3 and (Player:BuffUp(S.BlessingofDawnBuff) or not S.OfDuskandDawn:IsAvailable())) then
+  -- hammer_of_light,if=(!talent.redoubt.enabled|buff.redoubt.stack=3)&(buff.blessing_of_dawn.stack>=1|!talent.of_dusk_and_dawn.enabled)
+  if S.HammerofLight:IsReady() and ((not S.Redoubt:IsAvailable() or Player:BuffStack(S.RedoubtBuff) == 3) and (Player:BuffUp(S.BlessingofDawnBuff) or not S.OfDuskandDawn:IsAvailable())) then
     if Cast(S.HammerofLight, Settings.Protection.GCDasOffGCD.EyeOfTyr, nil, not Target:IsInRange(12)) then return "hammer_of_light standard 2"; end
   end
   -- shield_of_the_righteous,if=(((!talent.righteous_protector.enabled|cooldown.righteous_protector_icd.remains=0)&holy_power>2)|buff.bastion_of_light.up|buff.divine_purpose.up)&!((buff.hammer_of_light_ready.up|buff.hammer_of_light_free.up))
