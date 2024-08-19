@@ -74,6 +74,7 @@ Spell.Mage.Spellslinger = {
   -- Talents
   ShiftingShards                        = Spell(444675),
   SplinteringSorcery                    = Spell(443739),
+  Splinterstorm                         = Spell(443742),
   UnerringProficiency                   = Spell(444974),
   -- Buffs
   UnerringProficiencyBuff               = Spell(444981),
@@ -205,6 +206,7 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   DeathsChillBuff                       = Spell(454371),
   FingersofFrostBuff                    = Spell(44544),
   FreezingRainBuff                      = Spell(270232),
+  FreezingWindsBuff                     = Spell(382106),
   GlacialSpikeBuff                      = Spell(199844),
   IciclesBuff                           = Spell(205473),
   IcyVeinsBuff                          = Spell(12472),
