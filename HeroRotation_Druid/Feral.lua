@@ -167,7 +167,7 @@ local function ComputeRipPMultiplier()
   local Mult = 1
   Mult = Player:BuffUp(S.BloodtalonsBuff) and Mult * 1.25 or Mult
   Mult = S.DreadfulBleeding:IsAvailable() and Mult * 1.2 or Mult
-  Mult = Player:HasTier("TWWS1", 4) and Mult * 1.08 or Mult
+  Mult = Player:HasTier("TWW1", 4) and Mult * 1.08 or Mult
   Mult = S.LionsStrength:IsAvailable() and Mult * 1.15 or Mult
   Mult = Player:BuffUp(S.TigersFury) and Mult * 1.15 or Mult
   return Mult
