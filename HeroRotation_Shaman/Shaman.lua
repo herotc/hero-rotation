@@ -142,6 +142,8 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   -- Debuffs
   ElectrifiedShocksDebuff               = Spell(382089),
   LightningRodDebuff                    = Spell(197209),
+  -- Tier Bonuses
+  MaelstromSurgeBuff                    = Spell(457727), -- TWWS1 4pc
 })
 Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Elemental, Spell.Shaman.Farseer)
 Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Elemental, Spell.Shaman.Stormbringer)
@@ -219,7 +221,9 @@ Spell.Shaman.Restoration = MergeTableByKey(Spell.Shaman.Restoration, Spell.Shama
 
 if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Commons = {
-  -- Trinkets
+  -- TWW Trinkets
+  SpymastersWeb                         = Item(220202, {13, 14}),
+  -- DF Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   BeacontotheBeyond                     = Item(203963, {13, 14}),
   ElementiumPocketAnvil                 = Item(202617, {13, 14}),

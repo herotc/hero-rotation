@@ -37,7 +37,7 @@ HL.AddCoreOverride ("Player.MaelstromP",
       elseif Player:IsCasting(SpellEle.ChainLightning) then
         --TODO: figure out the *actual* maelstrom you'll get from hitting your current target...
         --return Maelstrom + (4 * #SplashedEnemiesTable[Target])
-        -- If you're hitting the best target with CL , this is 4*Shaman.ClusterTargets
+        -- If you're hitting the best target with CL , this is 2*Shaman.ClusterTargets
         return Maelstrom + (2 * Shaman.ClusterTargets)
       else
         return Maelstrom
