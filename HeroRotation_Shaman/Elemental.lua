@@ -152,7 +152,7 @@ local function Precombat()
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast precombat 6"; end
   end
   if Player:IsCasting(S.ElementalBlast) and S.PrimordialWave:IsViable() then
-    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 8"; end
+    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 8"; end
   end
   if Player:IsCasting(S.ElementalBlast) and not S.PrimordialWave:IsViable() and S.FlameShock:IsReady() then
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flameshock precombat 10"; end
@@ -164,7 +164,7 @@ local function Precombat()
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flameshock precombat 14"; end
   end
   if Player:IsCasting(S.LavaBurst) and S.PrimordialWave:IsViable() then
-    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 16"; end
+    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 16"; end
   end
 end
 
@@ -191,15 +191,15 @@ local function Aoe()
   end
   -- primordial_wave,target_if=min:dot.flame_shock.remains,if=buff.surge_of_power.up
   if S.PrimordialWave:IsViable() and (Player:BuffUp(S.SurgeofPowerBuff)) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateTargetIfFilterFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.Signature) then return "primordial_wave aoe 12"; end
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateTargetIfFilterFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.PrimordialWave) then return "primordial_wave aoe 12"; end
   end
   -- primordial_wave,target_if=min:dot.flame_shock.remains,if=talent.deeply_rooted_elements.enabled&!talent.surge_of_power.enabled
   if S.PrimordialWave:IsViable() and (S.DeeplyRootedElements:IsAvailable() and not S.SurgeofPower:IsAvailable()) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateTargetIfFilterFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.Signature) then return "primordial_wave aoe 14"; end
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateTargetIfFilterFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.PrimordialWave) then return "primordial_wave aoe 14"; end
   end
   -- primordial_wave,target_if=min:dot.flame_shock.remains,if=talent.master_of_the_elements.enabled&!talent.lightning_rod.enabled
   if S.PrimordialWave:IsViable() and (S.MasteroftheElements:IsAvailable() and not S.LightningRod:IsAvailable()) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateTargetIfFilterFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.Signature) then return "primordial_wave aoe 16"; end
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateTargetIfFilterFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.PrimordialWave) then return "primordial_wave aoe 16"; end
   end
   if S.FlameShock:IsCastable() then
     local Lowest, BestTarget = LowestFlameShock(Enemies10ySplash)
@@ -405,7 +405,7 @@ local function SingleTarget()
   end
   -- primordial_wave,target_if=min:dot.flame_shock.remains,if=(!buff.surge_of_power.up&spell_targets.chain_lightning=1)|active_dot.flame_shock=0|talent.fire_elemental.enabled&(talent.skybreakers_fiery_demise.enabled|talent.deeply_rooted_elements.enabled)|(buff.surge_of_power.up|!talent.surge_of_power.enabled)&spell_targets.chain_lightning>1
   if S.PrimordialWave:IsViable() and ((Player:BuffDown(S.SurgeofPowerBuff) and Shaman.ClusterTargets == 1) or S.FlameShockDebuff:AuraActiveCount() == 0 or S.FireElemental:IsAvailable() and (S.SkybreakersFieryDemise:IsAvailable() or S.DeeplyRootedElements:IsAvailable()) or (Player:BuffUp(S.SurgeofPowerBuff) or not S.SurgeofPower:IsAvailable()) and Shaman.ClusterTargets > 1) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateTargetIfFilterFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.Signature) then return "primordial_wave single_target 10"; end
+    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateTargetIfFilterFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.PrimordialWave) then return "primordial_wave single_target 10"; end
   end
   -- flame_shock,target_if=min:dot.flame_shock.remains,if=active_enemies=1&(dot.flame_shock.remains<2|active_dot.flame_shock=0)&(dot.flame_shock.remains<cooldown.primordial_wave.remains|!talent.primordial_wave.enabled)&(dot.flame_shock.remains<cooldown.liquid_magma_totem.remains|!talent.liquid_magma_totem.enabled)&!buff.surge_of_power.up&talent.fire_elemental.enabled
   if S.FlameShock:IsCastable() and (Shaman.ClusterTargets == 1 and Player:BuffDown(S.SurgeofPowerBuff) and S.FireElemental:IsAvailable()) then
