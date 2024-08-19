@@ -22,6 +22,7 @@ Shaman.LastSKCast = 0
 Shaman.LastSKBuff = 0
 Shaman.LastT302pcBuff = 0
 Shaman.FeralSpiritCount = 0
+Shaman.TempestMaelstrom = 0
 
 --- ============================ CONTENT ============================
 HL:RegisterForSelfCombatEvent(
@@ -99,4 +100,18 @@ HL:RegisterForSelfCombatEvent(
     end
   end
   , "SPELL_SUMMON"
+)
+
+--- ===== Tempest Maelstrom Counter =====
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local SpellID = select(12, ...)
+    if SpellID == 344179 then
+      Shaman.TempestMaelstrom = Shaman.TempestMaelstrom + 1
+      if Shaman.TempestMaelstrom >= 40 then
+        Shaman.TempestMaelstrom = Shaman.TempestMaelstrom - 40
+      end
+    end
+  end
+  , "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE"
 )

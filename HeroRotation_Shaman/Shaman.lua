@@ -76,10 +76,21 @@ Spell.Shaman.Stormbringer = {
   TempestAbility                        = Spell(452201),
   TempestOverload                       = Spell(463351),
   -- Talents
+  ArcDischarge                          = Spell(455096),
+  AwakeningStorms                       = Spell(455129),
+  Supercharge                           = Spell(455110),
   Tempest                               = Spell(454009),
+  -- Buffs
+  ArcDischargeBuff                      = Spell(455097),
+  AwakeningStormsBuff                   = Spell(462131),
 }
 
 Spell.Shaman.Totemic = {
+  -- Talents
+  Earthsurge                            = Spell(455590),
+  LivelyTotems                          = Spell(445034),
+  SurgingTotem                          = Spell(444995),
+  TotemicRebound                        = Spell(445025),
 }
 
 Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
@@ -157,6 +168,7 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   LavaLash                              = Spell(60103),
   MoltenAssault                         = Spell(334033),
   OverflowingMaelstrom                  = Spell(384149),
+  RagingMaelstrom                       = Spell(384143),
   StaticAccumulation                    = Spell(384411),
   Stormblast                            = Spell(319930),
   Stormflurry                           = Spell(344357),
