@@ -59,6 +59,7 @@ Spell.Priest.Commons = {
   PowerWordLife               = Spell(373481),
   TwistofFate                 = Spell(390972),
   -- Buffs
+  AberrantSpellforgeBuff      = Spell(451895),
   PowerWordFortitudeBuff      = Spell(21562),
   RhapsodyBuff                = Spell(390636),
   SpymastersReportBuff        = Spell(451199), -- Stacking buff from before using Spymaster's Web trinket
