@@ -54,7 +54,6 @@ HR.GUISettings.APL.Rogue = {
     OffGCDasOffGCD = {
       Racials = true,
       Vanish = true,
-      ShadowDance = true,
       ThistleTea = true,
       ColdBlood = true,
     }

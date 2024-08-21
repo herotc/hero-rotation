@@ -56,10 +56,10 @@ local S = Spell.Rogue.Assassination
 -- Items
 local I = Item.Rogue.Assassination
 local OnUseExcludeTrinkets = {
-  I.AlgetharPuzzleBox,
-  I.AshesoftheEmbersoul,
-  I.ImperfectAscendancySerum,
-  I.TreacherousTransmitter,
+  I.AlgetharPuzzleBox:ID(),
+  I.AshesoftheEmbersoul:ID(),
+  I.ImperfectAscendancySerum:ID(),
+  I.TreacherousTransmitter:ID(),
 }
 
 -- Enemies
@@ -381,7 +381,7 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
   -- # Rupture during Indiscriminate Carnage
   -- actions.stealthed+=/rupture,target_if=effective_combo_points>=variable.effective_spend_cp
   -- &buff.indiscriminate_carnage.up&refreshable&(!variable.regen_saturated|!variable.scent_saturation|!dot.rupture.ticking)
-  if S.Rupture:IsCastable() then
+  if S.Rupture:IsCastable() or ForceStealth then
     local function RuptureTargetIfFunc(TargetUnit)
       return TargetUnit:DebuffRemains(S.Rupture)
     end
@@ -405,7 +405,7 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
   end
 
   -- actions.stealthed+=/garrote,target_if=min:remains,if=stealthed.improved_garrote&(remains<12|pmultiplier<=1|(buff.indiscriminate_carnage.up&active_dot.garrote<spell_targets.fan_of_knives))&!variable.single_target&target.time_to_die-remains>2
-  -- actions.stealthed+=/garrote,if=stealthed.improved_garrote&(pmultiplier<=1|remains<14|!variable.single_target&buff.master_assassin_aura.remains<3)&combo_points.deficit>=1+2*talent.shrouded_suffocation
+  -- actions.stealthed+=/garrote,if=stealthed.improved_garrote&(pmultiplier<=1|remains<12|!variable.single_target&buff.master_assassin_aura.remains<3)&combo_points.deficit>=1+2*talent.shrouded_suffocation
   if (S.Garrote:IsCastable() and ImprovedGarroteRemains() > 0) or ForceStealth then
     local function GarroteTargetIfFunc(TargetUnit)
       return TargetUnit:DebuffRemains(S.Garrote)
@@ -429,7 +429,7 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
         if Cast(S.Garrote, nil, nil, not TargetInMeleeRange) then return "Cast Garrote (Improved Garrote)" end
       end
     end
-    if ComboPointsDeficit >= (1 + 2 * num(S.ShroudedSuffocation:IsAvailable())) and (Target:PMultiplier(S.Garrote) <= 1 or Target:DebuffRemains(S.Garrote) < 14 or not SingleTarget and MasterAssassinRemains() < 3) then
+    if ComboPointsDeficit >= (1 + 2 * num(S.ShroudedSuffocation:IsAvailable())) and (Target:PMultiplier(S.Garrote) <= 1 or Target:DebuffRemains(S.Garrote) < 12 or not SingleTarget and MasterAssassinRemains() < 3) then
       if ReturnSpellOnly then
         return S.Garrote
       else
@@ -450,77 +450,79 @@ local function StealthMacro (StealthSpell)
   -- If false, just suggest them as off-GCD and bail out of the macro functionality
   if StealthSpell:ID() == S.Vanish:ID() and (not Settings.Assassination.StealthMacro.Vanish or not MacroAbility) then
     if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish" end
-    return false
   elseif StealthSpell:ID() == S.Shadowmeld:ID() and (not Settings.Assassination.StealthMacro.Shadowmeld or not MacroAbility) then
     if Cast(S.Shadowmeld, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
-    return false
   end
 
   local MacroTable = {StealthSpell, MacroAbility}
 
   ShouldReturn = CastQueue(unpack(MacroTable))
   if ShouldReturn then return "| " .. MacroTable[2]:Name() end
-
   return false
 end
 
 -- # Vanish Handling
 local function Vanish ()
   -- actions.vanish=pool_resource,for_next=1,extra_amount=45
+  if Settings.Commons.ShowPooling and Player:EnergyPredicted() < 45 then
+    if Cast(S.PoolEnergy) then return "Pool for Vanish" end
+  end
 
   -- # Vanish to fish for Fateful Ending if possible
   -- actions.vanish+=/vanish,if=!buff.fatebound_lucky_coin.up&(buff.fatebound_coin_tails.stack>=5|buff.fatebound_coin_heads.stack>=5)
   if S.Vanish:IsCastable() and Player:BuffDown(S.FateboundLuckyCoin) and
     (Player:BuffStack(S.FateboundCoinTails) >= 5 or Player:BuffStack(S.FateboundCoinHeads) >= 5) then
-      if Settings.Commons.ShowPooling and Player:EnergyPredicted() < 45 then
-        if Cast(S.PoolEnergy) then return "Pool for Vanish Fateful Ending Fish" end
-      end
-    ShouldReturn = StealthMacro(S.Vanish)
-    if ShouldReturn then return "Cast Vanish Fateful Ending Fish" .. ShouldReturn end
+      ShouldReturn = StealthMacro(S.Vanish)
+      if ShouldReturn then return "Cast Vanish (Fateful Ending Fish)" .. ShouldReturn end
   end
 
-  if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
-    -- # Vanish to spread Garrote during Deathmark without Indiscriminate Carnage
-    -- actions.vanish+=/vanish,if=!talent.master_assassin&!talent.indiscriminate_carnage&talent.improved_garrote&cooldown.garrote.up&(dot.garrote.pmultiplier<=1|dot.garrote.refreshable)&(debuff.deathmark.up|cooldown.deathmark.remains<4)&combo_points.deficit>=(spell_targets.fan_of_knives>?4)
+  -- # Vanish to spread Garrote during Deathmark without Indiscriminate Carnage
+  -- actions.vanish+=/vanish,if=!talent.master_assassin&!talent.indiscriminate_carnage&talent.improved_garrote
+  -- &cooldown.garrote.up&(dot.garrote.pmultiplier<=1|dot.garrote.refreshable)
+  -- &(debuff.deathmark.up|cooldown.deathmark.remains<4)&combo_points.deficit>=(spell_targets.fan_of_knives>?4)
+  if S.Vanish:IsCastable() and not S.MasterAssassin:IsAvailable() and not S.IndiscriminateCarnage:IsAvailable()
+    and S.ImprovedGarrote:IsAvailable() and S.Garrote:CooldownUp() and (Target:PMultiplier(S.Garrote) <= 1
+    or IsDebuffRefreshable(Target, S.Garrote)) and (Target:DebuffUp(S.Deathmark) or S.Deathmark:CooldownRemains() < 4)
+    and ComboPointsDeficit >= mathmin(MeleeEnemies10yCount, 4) then
+      ShouldReturn = StealthMacro(S.Vanish)
+      if ShouldReturn then return "Cast Vanish Garrote Deathmark (No Carnage)" .. ShouldReturn end
+  end
 
-    -- # Vanish for cleaving Garrotes with Indiscriminate Carnage
-    -- actions.vanish+=/vanish,if=!talent.master_assassin&talent.indiscriminate_carnage&talent.improved_garrote&cooldown.garrote.up&(dot.garrote.pmultiplier<=1|dot.garrote.refreshable)&spell_targets.fan_of_knives>2&(target.time_to_die-remains>15|raid_event.adds.in>20)
-    if S.ImprovedGarrote:IsAvailable() and not S.MasterAssassin:IsAvailable() and S.Garrote:CooldownUp()
-      and (Target:PMultiplier(S.Garrote) <= 1 or IsDebuffRefreshable(Target, S.Garrote)) then
-      if not S.IndiscriminateCarnage:IsAvailable() and (S.Deathmark:AnyDebuffUp() or S.Deathmark:CooldownRemains() < 4)
-        and ComboPointsDeficit >= mathmin(MeleeEnemies10yCount, 4) then
-        -- actions.cds+=/pool_resource,for_next=1,extra_amount=45
-        if Settings.Commons.ShowPooling and Player:EnergyPredicted() < 45 then
-          if Cast(S.PoolEnergy) then return "Pool for Vanish (Garrote Deathmark)" end
-        end
-        ShouldReturn = StealthMacro(S.Vanish)
-        if ShouldReturn then return "Cast Vanish (Garrote No Carnage) " .. ShouldReturn end
-      end
-      if S.IndiscriminateCarnage:IsAvailable() and MeleeEnemies10yCount > 2 and Target:TimeToDie() >= 15 then
-        -- actions.cds+=/pool_resource,for_next=1,extra_amount=45
-        if Settings.Commons.ShowPooling and Player:EnergyPredicted() < 45 then
-          if Cast(S.PoolEnergy) then return "Pool for Vanish (Garrote Deathmark)" end
-        end
-        ShouldReturn = StealthMacro(S.Vanish)
-        if ShouldReturn then return "Cast Vanish (Garrote Carnage)" .. ShouldReturn end
-      end
-    end
+  -- actions.vanish=pool_resource,for_next=1,extra_amount=45
+  if Settings.Commons.ShowPooling and Player:EnergyPredicted() < 45 then
+    if Cast(S.PoolEnergy) then return "Pool for Vanish" end
+  end
 
-    -- # Vanish fallback for Master Assassin
-    -- actions.vanish+=/vanish,if=!talent.improved_garrote&talent.master_assassin&!dot.rupture.refreshable&dot.garrote.remains>3&debuff.deathmark.up&(debuff.shiv.up|debuff.deathmark.remains<4)
-    if not S.ImprovedGarrote:IsAvailable() and S.MasterAssassin:IsAvailable() and not IsDebuffRefreshable(Target, S.Rupture) and Target:DebuffRemains(S.Garrote) > 3
-      and Target:DebuffUp(S.Deathmark) and (Target:DebuffUp(S.ShivDebuff) or Target:DebuffRemains(S.Deathmark) < 4) then
+  -- # Vanish for cleaving Garrotes with Indiscriminate Carnage
+  --actions.vanish+=/vanish,if=!talent.master_assassin&talent.indiscriminate_carnage&talent.improved_garrote
+  -- &cooldown.garrote.up&(dot.garrote.pmultiplier<=1|dot.garrote.refreshable)&spell_targets.fan_of_knives>2
+  -- &(target.time_to_die-remains>15|raid_event.adds.in>20)
+  if S.Vanish:IsCastable() and not S.MasterAssassin:IsAvailable() and S.IndiscriminateCarnage:IsAvailable()
+    and S.ImprovedGarrote:IsAvailable() and S.Garrote:CooldownUp() and (Target:PMultiplier(S.Garrote) <= 1 or
+    IsDebuffRefreshable(Target, S.Garrote)) and MeleeEnemies10yCount > 2 then
+      ShouldReturn = StealthMacro(S.Vanish)
+      if ShouldReturn then return "Cast Vanish (Garrote Carnage)" .. ShouldReturn end
+  end
+
+  -- # Vanish fallback for Master Assassin
+  --actions.vanish+=/vanish,if=!talent.improved_garrote&talent.master_assassin&!dot.rupture.refreshable
+  -- &dot.garrote.remains>3&debuff.deathmark.up&(debuff.shiv.up|debuff.deathmark.remains<4)
+  if S.Vanish:IsCastable() and not S.ImprovedGarrote:IsAvailable() and S.MasterAssassin:IsAvailable()
+    and not IsDebuffRefreshable(Target, S.Rupture) and Target:DebuffRemains(S.Garrote) > 3 and Target.DebuffUp(S.Deathmark)
+    and (Target.DebuffUp(S.ShivDebuff) or Target.DebuffRemains(S.Deathmark) < 4) then
       ShouldReturn = StealthMacro(S.Vanish)
       if ShouldReturn then return "Cast Vanish (Master Assassin)" .. ShouldReturn end
-    end
+  end
 
-    -- # Vanish fallback for Improved Garrote during Deathmark if no add waves are expected
-    -- actions.vanish+=/vanish,if=talent.improved_garrote&cooldown.garrote.up&(dot.garrote.pmultiplier<=1
-    -- |dot.garrote.refreshable)&(debuff.deathmark.up|cooldown.deathmark.remains<4)&raid_event.adds.in>30
-    if ImprovedGarroteRemains() > 0 and (Target:PMultiplier(S.Garrote) <= 1 or Target:DebuffRefreshable(S.Garrote))
-      and (Target:DebuffUp(S.Deathmark) or S.Deathmark:CooldownRemains() < 5) then
-        if ShouldReturn then return "Cast Vanish (Improved Garrote during Deathmark)" .. ShouldReturn end
-    end
+  -- # Vanish fallback for Improved Garrote during Deathmark if no add waves are expected
+  --actions.vanish+=/vanish,if=talent.improved_garrote&cooldown.garrote.up
+  -- &(dot.garrote.pmultiplier<=1|dot.garrote.refreshable)
+  -- &(debuff.deathmark.up|cooldown.deathmark.remains<4)&raid_event.adds.in>30
+  if S.Vanish:IsCastable() and S.ImprovedGarrote:IsAvailable() and S.Garrote:CooldownUp()
+    and (Target:PMultiplier(S.Garrote) <= 1 or IsDebuffRefreshable(Target, S.Garrote))
+    and (Target:DebuffUp(S.Deathmark) or S.Deathmark:CooldownRemains() < 4) then
+      ShouldReturn = StealthMacro(S.Vanish)
+      if ShouldReturn then return "Cast Vanish (Improved Garrote during Deathmark)" .. ShouldReturn end
   end
 end
 
@@ -690,6 +692,7 @@ local function CDs ()
     MiscCDs()
   else
     ShouldReturn = MiscCDs()
+    if ShouldReturn then return ShouldReturn end
   end
 
   -- actions.cds+=/call_action_list,name=vanish,if=!stealthed.all&master_assassin_remains=0
@@ -698,6 +701,7 @@ local function CDs ()
       Vanish()
     else
       ShouldReturn = Vanish()
+      if ShouldReturn then return ShouldReturn end
     end
   end
 
