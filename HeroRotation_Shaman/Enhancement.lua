@@ -782,7 +782,7 @@ local function APL()
   end
 
   -- Update Thorim's Invocation
-  if Player:AffectingCombat() and Player:BuffUp(S.AscendanceBuff) then
+  if Player:AffectingCombat() then
     if Player:PrevGCD(1, S.ChainLightning) then
       TIAction = S.ChainLightning
     elseif Player:PrevGCD(1, S.LightningBolt) then
