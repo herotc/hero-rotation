@@ -419,7 +419,7 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
     if HR.AoEON() then
       local TargetIfUnit = CheckTargetIfTarget("min", GarroteTargetIfFunc, GarroteIfFunc)
       if TargetIfUnit and TargetIfUnit:GUID() ~= Target:GUID() then
-        CastLeftNameplate(TargetIfUnit, S.Garrote)
+        return CastLeftNameplate(TargetIfUnit, S.Garrote)
       end
     end
     if GarroteIfFunc(Target) then
