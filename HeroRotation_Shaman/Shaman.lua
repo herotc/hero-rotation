@@ -61,6 +61,10 @@ Spell.Shaman.Commons = {
   SplinteredElementsBuff                = Spell(382043),
   -- Debuffs
   FlameShockDebuff                      = Spell(188389),
+  LightningRodDebuff                    = Spell(197209),
+  -- Other Class Debuffs
+  ChaosBrandDebuff                      = Spell(1490),
+  HuntersMarkDebuff                     = Spell(257284),
   -- Misc
   Pool                                  = Spell(999910),
 }
@@ -87,6 +91,7 @@ Spell.Shaman.Stormbringer = {
 
 Spell.Shaman.Totemic = {
   -- Talents
+  AmplificationCore                     = Spell(445029),
   Earthsurge                            = Spell(455590),
   LivelyTotems                          = Spell(445034),
   SurgingTotem                          = Spell(444995),
@@ -141,7 +146,6 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   SurgeofPowerBuff                      = Spell(285514),
   -- Debuffs
   ElectrifiedShocksDebuff               = Spell(382089),
-  LightningRodDebuff                    = Spell(197209),
   -- Tier Bonuses
   MaelstromSurgeBuff                    = Spell(457727), -- TWWS1 4pc
 })
