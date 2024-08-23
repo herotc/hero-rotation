@@ -223,7 +223,7 @@ local function Movement()
     if Cast(S.IceNova, nil, Settings.Frost.DisplayStyle.Movement, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova movement 4"; end
   end
   -- cone_of_cold,if=!talent.coldest_snap&active_enemies>=2
-  if S.ConeofCold:IsReady() and (not S.ColdestSnap:IsActive() and EnemiesCount16ySplash >= 2) then
+  if S.ConeofCold:IsReady() and (not S.ColdestSnap:IsAvailable() and EnemiesCount16ySplash >= 2) then
     if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold movement 6"; end
   end
   -- arcane_explosion,if=mana.pct>30&active_enemies>=2
@@ -299,7 +299,7 @@ local function Aoe()
     if Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova aoe 28"; end
   end
   -- cone_of_cold,if=!talent.coldest_snap&active_enemies>=7
-  if S.ConeofCold:IsReady() and (not S.ColdestSnap:IsActive() and EnemiesCount16ySplash >= 7) then
+  if S.ConeofCold:IsReady() and (not S.ColdestSnap:IsAvailable() and EnemiesCount16ySplash >= 7) then
     if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold aoe 30"; end
   end
   -- dragons_breath,if=active_enemies>=7
