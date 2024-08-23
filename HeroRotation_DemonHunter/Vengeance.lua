@@ -300,7 +300,8 @@ local function AR()
   -- call_action_list,name=externals,if=variable.cooldown_sync
   -- Note: Not handling externals.
   -- run_action_list,name=rg_sequence,if=buff.glaive_flurry.up|buff.rending_strike.up
-  if Player:BuffUp(S.GlaiveFlurryBuff) or Player:BuffUp(S.RendingStrikeBuff) then
+  -- Note: Added FuryoftheAldrachi check to avoid stalling the profile if it's not yet learned.
+  if S.FuryoftheAldrachi:IsAvailable() and (Player:BuffUp(S.GlaiveFlurryBuff) or Player:BuffUp(S.RendingStrikeBuff)) then
     local ShouldReturn = RGSequence(); if ShouldReturn then return ShouldReturn; end
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for RGSequence()"; end
   end

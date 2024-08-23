@@ -59,6 +59,7 @@ Spell.DemonHunter.Commons = {
 
 Spell.DemonHunter.AldrachiReaver = {
   -- Talents
+  FuryoftheAldrachi                     = Spell(442718),
   KeenEngagement                        = Spell(442497),
   ReaversGlaive                         = Spell(442294),
   -- Buffs
