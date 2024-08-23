@@ -621,7 +621,7 @@ local function Main()
   end
   -- void_bolt,target_if=max:target.time_to_die,if=insanity.deficit>16&cooldown.void_bolt.remains<=0.1
   if S.VoidBolt:IsCastable() and (Player:InsanityDeficit() > 16 and S.VoidBolt:CooldownRemains() <= 0.1) then
-    if Everyone.CastTargetIf(S.VoidBolt, Enemies10ySplash, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt main 8"; end
+    if Everyone.CastTargetIf(S.VoidBolt, Enemies10ySplash, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(46)) then return "void_bolt main 8"; end
   end
   -- devouring_plague,target_if=max:target.time_to_die*(dot.devouring_plague.remains<=gcd.max|variable.dr_force_prio|!talent.distorted_reality&variable.me_force_prio),if=active_dot.devouring_plague<=1&dot.devouring_plague.remains<=gcd.max&(!talent.void_eruption|cooldown.void_eruption.remains>=gcd.max*3)|insanity.deficit<=16
   if S.DevouringPlague:IsReady() then
@@ -645,7 +645,7 @@ local function Main()
   end
   -- void_bolt,target_if=max:target.time_to_die,if=cooldown.void_bolt.remains<=0.1
   if S.VoidBolt:IsCastable() and (S.VoidBolt:CooldownRemains() <= 0.1) then
-    if Everyone.CastTargetIf(S.VoidBolt, Enemies10ySplash, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt main 20"; end
+    if Everyone.CastTargetIf(S.VoidBolt, Enemies10ySplash, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(46)) then return "void_bolt main 20"; end
   end
   -- call_action_list,name=empowered_filler,if=(buff.mind_spike_insanity.stack>2&talent.mind_spike|buff.mind_flay_insanity.stack>2&!talent.mind_spike)&talent.empowered_surges&!cooldown.void_eruption.up
   if (Player:BuffStack(S.MindSpikeInsanityBuff) > 2 and S.MindSpike:IsAvailable() or Player:BuffStack(S.MindFlayInsanityBuff) > 2 and not S.MindSpike:IsAvailable()) and S.EmpoweredSurges:IsAvailable() and S.VoidEruption:CooldownDown() then
