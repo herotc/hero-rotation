@@ -175,7 +175,7 @@ end]]
 local function RGOverflow()
   -- reavers_glaive,if=!buff.rending_strike.up&!buff.glaive_flurry.up
   if S.ReaversGlaive:IsCastable() and (Player:BuffUp(S.RendingStrikeBuff) and Player:BuffDown(S.GlaiveFlurryBuff)) then
-    if Cast(S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsSpellInRange(S.ReaversGlaive)) then return "reavers_glaive rg_overflow 2"; end
+    if Cast(S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsInRange(50)) then return "reavers_glaive rg_overflow 2"; end
   end
 end
 
@@ -221,7 +221,7 @@ local function ARExecute()
   end
   -- reavers_glaive
   if S.ReaversGlaive:IsCastable() then
-    if Cast(S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsSpellInRange(S.ReaversGlaive)) then return "reavers_glaive ar_execute 4"; end
+    if Cast(S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsInRange(50)) then return "reavers_glaive ar_execute 4"; end
   end
   -- the_hunt,if=!buff.reavers_glaive.up
   if S.TheHunt:IsCastable() and (Player:BuffDown(S.ReaversGlaiveBuff)) then
@@ -346,7 +346,7 @@ local function AR()
   end
   -- reavers_glaive,if=buff.thrill_of_the_fight_damage.remains<variable.rg_sequence_duration&(!buff.thrill_of_the_fight_attack_speed.up|(debuff.reavers_mark.remains<=variable.rg_sequence_duration)|variable.rg_enhance_cleave)
   if S.ReaversGlaive:IsCastable() and (Player:BuffRemains(S.ThrilloftheFightDmgBuff) < VarRGSequenceDuration and (Player:BuffDown(S.ThrilloftheFightAtkBuff) or (Target:DebuffRemains(S.ReaversMarkDebuff) <= VarRGSequenceDuration) or VarRGEnhCleave)) then
-    if Cast(S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsSpellInRange(S.ReaversGlaive)) then return "reavers_glaive ar 20"; end
+    if Cast(S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsInRange(50)) then return "reavers_glaive ar 20"; end
   end
   -- fiery_brand,if=!talent.fiery_demise|(talent.fiery_demise&((talent.down_in_flames&charges>=max_charges)|(active_dot.fiery_brand=0)))
   if S.FieryBrand:IsCastable() and (not S.FieryDemise:IsAvailable() or (S.FieryDemise:IsAvailable() and ((S.DowninFlames:IsAvailable() and S.FieryBrand:Charges() >= S.FieryBrand:MaxCharges()) or (S.FieryBrandDebuff:AuraActiveCount() == 0)))) then
