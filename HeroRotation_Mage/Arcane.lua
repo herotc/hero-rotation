@@ -146,7 +146,7 @@ local function Precombat()
   end
   -- evocation,if=talent.evocation
   if S.Evocation:IsReady() then
-    if Cast(S.Evocation) then return "evocation precombat 6"; end
+    if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation precombat 6"; end
   end
 end
 
