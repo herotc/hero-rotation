@@ -65,8 +65,6 @@ HL.AddCoreOverride ("Spell.IsViable",
       local b = S.LavaBurst:Charges() >= 1 and not Player:IsCasting(S.LavaBurst)
       local c = S.LavaBurst:Charges() == 2 and Player:IsCasting(S.LavaBurst)
       return BaseCheck and MovementPredicate and (a or b or c)
-    elseif self == S.PrimordialWave then
-      return BaseCheck and HR.CDsON() and Player:BuffDown(S.PrimordialWaveBuff) and Player:BuffDown(S.LavaSurgeBuff)
     else
       return BaseCheck
     end
