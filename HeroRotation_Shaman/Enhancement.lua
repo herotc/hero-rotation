@@ -257,7 +257,7 @@ local function Single()
   end
   -- tempest,if=buff.maelstrom_weapon.stack=buff.maelstrom_weapon.max_stack|(buff.maelstrom_weapon.stack>=5&(tempest_mael_count>30|buff.awakening_storms.stack=2))
   if S.TempestAbility:IsReady() and (MaelstromStacks == MaxMaelstromStacks or (MaelstromStacks >= 5 and (Shaman.TempestMaelstrom > 30 or Player:BuffStack(S.AwakeningStormsBuff) == 2))) then
-    if Cast(S.TempestAbility, nil, nil, not Target:IsSpellInRange(S.TempestAbility)) then return "tempest single 6"; end
+    if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest single 6"; end
   end
   -- doom_winds,if=raid_event.adds.in>=action.doom_winds.cooldown
   if S.DoomWinds:IsCastable() then
@@ -309,7 +309,7 @@ local function Single()
   end
   -- tempest,if=buff.maelstrom_weapon.stack>=8
   if S.TempestAbility:IsReady() and (MaelstromStacks >= 8) then
-    if Cast(S.TempestAbility, nil, nil, not Target:IsSpellInRange(S.TempestAbility)) then return "tempest single 24"; end
+    if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest single 24"; end
   end
   -- lightning_bolt,if=buff.maelstrom_weapon.stack>=8&buff.primordial_wave.up&raid_event.adds.in>buff.primordial_wave.remains&(!buff.splintered_elements.up|fight_remains<=12)
   if S.LightningBolt:IsCastable() and (MaelstromStacks >= 8 and Player:BuffUp(S.PrimordialWaveBuff) and (Player:BuffDown(S.SplinteredElementsBuff) or FightRemains <= 12)) then
@@ -408,7 +408,7 @@ local function Single()
   end
   -- tempest,if=buff.maelstrom_weapon.stack>=5
   if S.TempestAbility:IsReady() and (MaelstromStacks >= 5) then
-    if Cast(S.TempestAbility, nil, nil, not Target:IsSpellInRange(S.TempestAbility)) then return "tempest single 72"; end
+    if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest single 72"; end
   end
   -- lightning_bolt,if=talent.hailstorm.enabled&buff.maelstrom_weapon.stack>=5&buff.primordial_wave.down
   if S.LightningBolt:IsCastable() and (S.Hailstorm:IsAvailable() and MaelstromStacks >= 5 and Player:BuffDown(S.PrimordialWaveBuff)) then
@@ -447,7 +447,7 @@ end
 local function Aoe()
   -- tempest,target_if=min:debuff.lightning_rod.remains,if=buff.maelstrom_weapon.stack=buff.maelstrom_weapon.max_stack|(buff.maelstrom_weapon.stack>=5&(tempest_mael_count>30|buff.awakening_storms.stack=2))
   if S.TempestAbility:IsReady() and (MaelstromStacks == MaxMaelstromStacks or (MaelstromStacks >= 5 and (Shaman.TempestMaelstrom > 30 or Player:BuffStack(S.AwakeningStormsBuff) == 2))) then
-    if Everyone.CastTargetIf(S.TempestAbility, EnemiesMelee, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsSpellInRange(S.TempestAbility)) then return "tempest aoe 2"; end
+    if Everyone.CastTargetIf(S.TempestAbility, EnemiesMelee, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsInRange(40)) then return "tempest aoe 2"; end
   end
   -- windstrike,target_if=min:debuff.lightning_rod.remains,if=talent.thorims_invocation.enabled&buff.maelstrom_weapon.stack>1&ti_chain_lightning
   if S.Windstrike:IsCastable() and (S.ThorimsInvocation:IsAvailable() and MaelstromStacks > 1 and TIAction == S.ChainLightning) then
@@ -594,7 +594,7 @@ local function Funnel()
   end
   -- tempest,if=buff.maelstrom_weapon.stack=buff.maelstrom_weapon.max_stack|(buff.maelstrom_weapon.stack>=5&(tempest_mael_count>30|buff.awakening_storms.stack=2))
   if S.TempestAbility:IsReady() and (MaelstromStacks == MaxMaelstromStacks or (MaelstromStacks >= 5 and (Shaman.TempestMaelstrom > 30 or Player:BuffStack(S.AwakeningStormsBuff) == 2))) then
-    if Cast(S.TempestAbility, nil, nil, not Target:IsSpellInRange(S.TempestAbility)) then return "tempest funnel 6"; end
+    if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest funnel 6"; end
   end
   -- lightning_bolt,if=(active_dot.flame_shock=active_enemies|active_dot.flame_shock=6)&buff.primordial_wave.up&buff.maelstrom_weapon.stack=buff.maelstrom_weapon.max_stack&(!buff.splintered_elements.up|fight_remains<=12|raid_event.adds.remains<=gcd)
   if S.LightningBolt:IsCastable() and ((S.FlameShockDebuff:AuraActiveCount() >= EnemiesMeleeCount or S.FlameShockDebuff:AuraActiveCount() >= 6) and Player:BuffUp(S.PrimordialWaveBuff) and MaelstromStacks == MaxMaelstromStacks and (Player:BuffDown(S.SplinteredElementsBuff) or FightRemains <= 12)) then

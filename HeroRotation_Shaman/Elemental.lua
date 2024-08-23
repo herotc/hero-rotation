@@ -288,7 +288,7 @@ local function Aoe()
   end
   -- tempest,target_if=min:debuff.lightning_rod.remains,if=!buff.arc_discharge.up
   if S.TempestAbility:IsReady() and (Player:BuffDown(S.ArcDischargeBuff)) then
-    if Everyone.CastTargetIf(S.TempestAbility, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsSpellInRange(S.TempestAbility)) then return "tempest aoe 22"; end
+    if Everyone.CastTargetIf(S.TempestAbility, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsInRange(40)) then return "tempest aoe 22"; end
   end
   -- ascendance (JUST DO IT! https://i.kym-cdn.com/entries/icons/mobile/000/018/147/Shia_LaBeouf__Just_Do_It__Motivational_Speech_(Original_Video_by_LaBeouf__R%C3%B6nkk%C3%B6___Turner)_0-4_screenshot.jpg
   if S.Ascendance:IsCastable() then
@@ -431,7 +431,7 @@ local function SingleTarget()
   end
   -- tempest
   if S.TempestAbility:IsReady() then
-    if Cast(S.TempestAbility, nil, nil, not Target:IsSpellInRange(S.TempestAbility)) then return "tempest single_target 22"; end
+    if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest single_target 22"; end
   end
   -- lightning_bolt,if=buff.stormkeeper.up&buff.surge_of_power.up
   if S.LightningBolt:IsViable() and (Player:StormkeeperUp() and Player:BuffUp(S.SurgeofPowerBuff)) then
