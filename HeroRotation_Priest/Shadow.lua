@@ -73,7 +73,7 @@ local VarDotsUp = false
 local VarManualVTsApplied = false
 local PreferVT = false
 local Crash = S.ShadowCrashTarget:IsAvailable() and S.ShadowCrashTarget or S.ShadowCrash
-local Fiend = (S.Mindbender:IsAvailable()) and S.Mindbender or S.Shadowfiend
+local Fiend = (S.Mindbender:IsAvailable() and S.Mindbender) or (S.VoidWraith:IsAvailable() and S.VoidWraithAbility) or S.Shadowfiend
 local FiendUp, FiendRemains = false, 0
 local EntropicRiftUp, EntropicRiftRemains = false, 0
 local PowerSurgeUp, PowerSurgeRemains = false, 0
@@ -102,7 +102,7 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   Crash = S.ShadowCrashTarget:IsAvailable() and S.ShadowCrashTarget or S.ShadowCrash
-  Fiend = (S.Mindbender:IsAvailable()) and S.Mindbender or S.Shadowfiend
+  Fiend = (S.Mindbender:IsAvailable() and S.Mindbender) or (S.VoidWraith:IsAvailable() and S.VoidWraithAbility) or S.Shadowfiend
   S.ShadowCrash:RegisterInFlightEffect(205386)
   S.ShadowCrash:RegisterInFlight()
   S.ShadowCrashTarget:RegisterInFlightEffect(205386)
@@ -556,7 +556,7 @@ local function Filler()
   end
   -- mind_flay,target_if=max:dot.devouring_plague.remains,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
   if Flay:IsCastable() then
-    if Everyone.CastTargetIf(Flay, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(Flay)) then return "mind_flay filler 18"; end
+    if Everyone.CastTargetIf(Flay, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsInRange(46)) then return "mind_flay filler 18"; end
   end
   -- divine_star
   if S.DivineStar:IsReady() then
@@ -604,7 +604,7 @@ local function Main()
     local ShouldReturn = CDs(); if ShouldReturn then return ShouldReturn; end
   end
   -- mindbender,if=(dot.shadow_word_pain.ticking&variable.dots_up|action.shadow_crash.in_flight&talent.whispering_shadows)&(fight_remains<30|target.time_to_die>15)&(!talent.dark_ascension|cooldown.dark_ascension.remains<gcd.max|fight_remains<15)
-  if Fiend:IsCastable() and ((Target:DebuffUp(S.ShadowWordPainDebuff) and VarDotsUp or Crash:InFlight() and S.WhisperingShadows:IsAvailable()) and (FightRemains < 30 or Target:TimeToDie() > 15) and (not S.DarkAscension:IsAvailable() or S.DarkAscension:CooldownRemains() < GCDMax or BossFightRemains < 15)) then
+  if Fiend:IsCastable() and ((Target:DebuffUp(S.ShadowWordPainDebuff) and VarDotsUp or Crash:InFlight() and S.WhisperingShadows:IsAvailable()) and (BossFightRemains < 30 or Target:TimeToDie() > 15) and (not S.DarkAscension:IsAvailable() or S.DarkAscension:CooldownRemains() < GCDMax or BossFightRemains < 15)) then
     if Cast(Fiend, Settings.Shadow.GCDasOffGCD.Mindbender) then return "mindbender main 2"; end
   end
   -- void_blast,target_if=max:(dot.devouring_plague.remains*1000+target.time_to_die),if=(dot.devouring_plague.remains>=execute_time|buff.entropic_rift.remains<=gcd.max|action.void_torrent.channeling&talent.void_empowerment)&(insanity.deficit>=16|cooldown.mind_blast.full_recharge_time<=gcd.max)&(!talent.mind_devourer|!buff.mind_devourer.up|buff.entropic_rift.remains<=gcd.max)
@@ -711,8 +711,7 @@ local function APL()
 
     -- Check our fiend status
     FiendUp = Fiend:TimeSinceLastCast() <= 15
-    FiendRemains = 15 - Fiend:TimeSinceLastCast()
-    if FiendRemains < 0 then FiendRemains = 0 end
+    FiendRemains = mathmax(15 - Fiend:TimeSinceLastCast(), 0)
 
     -- Check out Entropic Rift status
     if Player:HeroTreeID() == 18 then

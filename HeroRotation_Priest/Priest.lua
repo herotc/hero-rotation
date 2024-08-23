@@ -76,11 +76,14 @@ Spell.Priest.Archon = {
 }
 
 Spell.Priest.Voidweaver = {
+  -- Abilities
+  VoidWraithAbility           = Spell(451235),
   -- Talents
   DepthofShadows              = Spell(451308),
   EntropicRift                = Spell(447444),
   VoidBlast                   = Spell(450405),
   VoidEmpowerment             = Spell(450138),
+  VoidWraith                  = Spell(451234),
 }
 
 Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
