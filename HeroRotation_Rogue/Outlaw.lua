@@ -406,7 +406,7 @@ local function SpellQueueMacro (BaseSpell)
     EffectiveComboPoints = Player:ComboPointsMax()
     -- Fetch Finisher if not in stealth (AR->Dispatch) or Stealth Ability if we are (AR->BtE)
     if not Player:StealthUp(true, true) then
-        MacroAbility = Finish(true)
+      MacroAbility = Finish(true)
     else
       MacroAbility = Stealth(true)
     end
