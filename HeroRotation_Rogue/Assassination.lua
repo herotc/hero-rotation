@@ -339,7 +339,7 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
   -- actions.stealthed=pool_resource,for_next=1
 
   -- actions.stealthed+=/ambush,if=!debuff.deathstalkers_mark.up&talent.deathstalkers_mark&!buff.darkest_night.up
-  if (S.Ambush:IsCastable() or ForceStealth)  and Target:DebuffDown(S.DeathStalkersMarkDebuff) and S.DeathStalkersMark:IsAvailable()
+  if (S.Ambush:IsReady() or ForceStealth)  and Target:DebuffDown(S.DeathStalkersMarkDebuff) and S.DeathStalkersMark:IsAvailable()
     and Player:BuffDown(S.DarkestNightBuff) then
     if ReturnSpellOnly then
       return S.Ambush
@@ -810,7 +810,7 @@ local function Direct ()
       if Cast(S.Mutilate, nil, nil, not TargetInMeleeRange) then return "Cast Mutilate (Casutic)" end
     end
 
-    if (S.Ambush:IsCastable() or S.AmbushOverride:IsCastable()) and (Player:StealthUp(true, true) or Player:BuffUp(S.BlindsideBuff)) then
+    if (S.Ambush:IsReady() or S.AmbushOverride:IsReady()) and (Player:StealthUp(true, true) or Player:BuffUp(S.BlindsideBuff)) then
       if Cast(S.Ambush, nil, nil, not TargetInMeleeRange) then return "Cast Ambush (Caustic)" end
     end
   end
@@ -842,7 +842,7 @@ local function Direct ()
   end
 
   -- actions.direct+=/ambush,if=variable.use_filler&(buff.blindside.up|stealthed.rogue)&(!dot.kingsbane.ticking|debuff.deathmark.down|buff.blindside.up)
-  if (S.Ambush:IsCastable() or S.AmbushOverride:IsCastable()) and (Player:BuffUp(S.BlindsideBuff) or Player:StealthUp(true, false))
+  if (S.Ambush:IsReady() or S.AmbushOverride:IsReady()) and (Player:BuffUp(S.BlindsideBuff) or Player:StealthUp(true, false))
     and (Target:DebuffDown(S.Kingsbane) or Target:DebuffDown(S.Deathmark) or Player:BuffUp(S.BlindsideBuff)) then
       if CastPooling(S.Ambush, nil, not TargetInMeleeRange) then return "Cast Ambush" end
   end
@@ -1010,7 +1010,7 @@ local function APL ()
       end
     end
     -- Trick to take in consideration the Recovery Setting
-    if S.Mutilate:IsCastable() or S.Ambush:IsCastable() or S.AmbushOverride:IsCastable() then
+    if S.Mutilate:IsCastable() or S.Ambush:IsReady() or S.AmbushOverride:IsReady() then
       if Cast(S.PoolEnergy) then return "Normal Pooling" end
     end
   end
