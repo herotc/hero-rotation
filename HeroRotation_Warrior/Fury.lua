@@ -222,7 +222,7 @@ local function MultiTarget()
     if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm multi_target 18"; end
   end
   -- ravager,if=buff.enrage.up
-  if S.Ravager:IsCastable() and (EnrageUp) then
+  if CDsON() and S.Ravager:IsCastable() and (EnrageUp) then
     if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager multi_target 20"; end
   end
   -- rampage,if=talent.anger_management
@@ -277,7 +277,7 @@ end
 
 local function SingleTarget()
   -- ravager,if=cooldown.recklessness.remains<gcd|buff.recklessness.up
-  if S.Ravager:IsCastable() and (S.Recklessness:CooldownRemains() < Player:GCD() or Player:BuffUp(S.RecklessnessBuff)) then
+  if CDsON() and S.Ravager:IsCastable() and (S.Recklessness:CooldownRemains() < Player:GCD() or Player:BuffUp(S.RecklessnessBuff)) then
     if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager single_target 2"; end
   end
   -- recklessness,if=!talent.anger_management|(talent.anger_management&cooldown.avatar.ready|cooldown.avatar.remains<gcd|cooldown.avatar.remains>30)
