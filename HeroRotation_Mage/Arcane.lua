@@ -98,8 +98,8 @@ local function SetTrinketVariables()
   local Trinket2Spell = Trinket2:OnUseSpell()
   VarTrinket2Range = (Trinket2Spell and Trinket2Spell.MaximumRange > 0 and Trinket2Spell.MaximumRange <= 100) and Trinket2Spell.MaximumRange or 100
 
-  VarTrinket1CD = Trinket1:Cooldown()
-  VarTrinket2CD = Trinket2:Cooldown()
+  VarTrinket1CD = Trinket1:Cooldown() or 0
+  VarTrinket2CD = Trinket2:Cooldown() or 0
 
   VarSteroidTrinketEquipped = I.ForgedGladiatorsBadge:IsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped()
 end

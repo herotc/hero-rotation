@@ -102,8 +102,8 @@ local function SetTrinketVariables()
   VarTrinket2Spell = Trinket2:OnUseSpell()
   VarTrinket2Range = (VarTrinket2Spell and VarTrinket2Spell.MaximumRange > 0 and VarTrinket2Spell.MaximumRange <= 100) and VarTrinket2Spell.MaximumRange or 100
 
-  VarTrinket1CD = Trinket1:Cooldown()
-  VarTrinket2CD = Trinket2:Cooldown()
+  VarTrinket1CD = Trinket1:Cooldown() or 0
+  VarTrinket2CD = Trinket2:Cooldown() or 0
 
   VarTrinket1BL = Player:IsItemBlacklisted(Trinket1)
   VarTrinket2BL = Player:IsItemBlacklisted(Trinket2)
