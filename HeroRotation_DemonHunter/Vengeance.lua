@@ -62,6 +62,7 @@ local VarSoFCD = (S.IlluminatedSigils:IsAvailable()) and 25 or 30
 local VarSoSFragments = (S.SoulSigils:IsAvailable()) and 4 or 3
 local IsInMeleeRange, IsInAoERange
 local ActiveMitigationNeeded
+local ImmoAbility
 local IsTanking
 local Enemies8yMelee
 local EnemiesCount8yMelee
@@ -135,8 +136,8 @@ local function Precombat()
     if Cast(S.Felblade, nil, nil, not Target:IsInRange(15)) then return "felblade precombat 6"; end
   end
   -- immolation_aura
-  if S.ImmolationAura:IsCastable() then
-    if Cast(S.ImmolationAura) then return "immolation_aura precombat 6"; end
+  if ImmoAbility:IsCastable() then
+    if Cast(ImmoAbility) then return "immolation_aura precombat 6"; end
   end
   -- Manually added: First attacks
   if S.Fracture:IsCastable() and IsInMeleeRange then
@@ -318,8 +319,8 @@ local function AR()
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar 8"; end
   end
   -- immolation_aura,if=!(buff.glaive_flurry.up|buff.rending_strike.up)
-  if S.ImmolationAura:IsCastable() and (not (Player:BuffUp(S.GlaiveFlurryBuff) or Player:BuffUp(S.RendingStrikeBuff))) then
-    if Cast(S.ImmolationAura) then return "immolation_aura ar 10"; end
+  if ImmoAbility:IsCastable() and (not (Player:BuffUp(S.GlaiveFlurryBuff) or Player:BuffUp(S.RendingStrikeBuff))) then
+    if Cast(ImmoAbility) then return "immolation_aura ar 10"; end
   end
   -- sigil_of_flame,if=!(buff.glaive_flurry.up|buff.rending_strike.up)&(talent.ascending_flame|(!talent.ascending_flame&!prev_gcd.1.sigil_of_flame&(dot.sigil_of_flame.remains<(1+talent.quickened_sigils))))
   if S.SigilofFlame:IsCastable() and (not (Player:BuffUp(S.GlaiveFlurryBuff) or Player:BuffUp(S.RendingStrikeBuff)) and (S.AscendingFlame:IsAvailable() or (not S.AscendingFlame:IsAvailable() and not Player:PrevGCD(1, S.SigilofFlame) and (Target:DebuffRemains(S.SigilofFlameDebuff) < (1 + num(S.QuickenedSigils:IsAvailable())))))) then
@@ -417,8 +418,8 @@ end
 
 local function DumpEmpoweredAbilities()
   -- immolation_aura,if=buff.demonsurge_consuming_fire.up
-  if S.ConsumingFire:IsCastable() then
-    if Cast(S.ConsumingFire) then return "consuming_fire dump_empowered_abilities 2"; end
+  if ImmoAbility:IsCastable() then
+    if Cast(ImmoAbility) then return "consuming_fire dump_empowered_abilities 2"; end
   end
   -- sigil_of_doom,if=buff.demonsurge_sigil_of_doom.up
   if S.SigilofDoom:IsReady() then
@@ -732,8 +733,8 @@ local function FS()
   -- cancel_buff,name=metamorphosis,if=(!buff.demonsurge_soul_sunder.up&!buff.demonsurge_spirit_burst.up&!buff.demonsurge_fel_desolation.up&!buff.demonsurge_consuming_fire.up&!buff.demonsurge_sigil_of_doom.up&cooldown.sigil_of_doom.charges<1&!prev_gcd.1.sigil_of_doom)&(cooldown.fel_devastation.remains<(gcd.max*2)|cooldown.metamorphosis.remains<(gcd.max*2))
   -- TODO: Handle cancel_buff.
   -- immolation_aura,if=!(talent.illuminated_sigils&cooldown.metamorphosis.up&cooldown.sigil_of_flame.charges_fractional>=1&!prev_gcd.1.sigil_of_flame)
-  if S.ImmolationAura:IsCastable() and (not (S.IlluminatedSigils:IsAvailable() and S.Metamorphosis:CooldownUp() and S.SigilofFlame:ChargesFractional() >= 1 and not Player:PrevGCD(1, S.SigilofFlame))) then
-    if Cast(S.ImmolationAura) then return "immolation_aura fs 2"; end
+  if ImmoAbility:IsCastable() and (not (S.IlluminatedSigils:IsAvailable() and S.Metamorphosis:CooldownUp() and S.SigilofFlame:ChargesFractional() >= 1 and not Player:PrevGCD(1, S.SigilofFlame))) then
+    if Cast(ImmoAbility) then return "immolation_aura fs 2"; end
   end
   -- sigil_of_flame,if=!variable.hold_sof
   if S.SigilofFlame:IsCastable() and (not VarHoldSoF) then
@@ -880,6 +881,9 @@ local function APL()
     VarSmallAoE = EnemiesCount8yMelee >= 2 and EnemiesCount8yMelee <= 5
     -- variable,name=big_aoe,value=spell_targets.spirit_bomb>=6
     VarBigAoE = EnemiesCount8yMelee >= 6
+
+    -- ImmolationAura or ConsumingFire?
+    ImmoAbility = S.ConsumingFire:IsLearned() and S.ConsumingFire or S.ImmolationAura
   end
 
   if Everyone.TargetIsValid() then
