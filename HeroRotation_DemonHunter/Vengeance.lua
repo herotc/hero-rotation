@@ -363,7 +363,7 @@ local function AR()
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation ar 26"; end
   end
   -- Manually added: wait,if=!variable.can_spb&soul_fragments.total>=variable.spb_threshold
-  if not VarCanSpB and TotalSoulFragments >= VarSpBThreshold then
+  if not VarCanSpB and TotalSoulFragments >= VarSpBThreshold and SoulFragments < 5 then
     if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Soul Fragments"; end
   end
   -- spirit_bomb,if=variable.can_spb
@@ -797,7 +797,7 @@ local function FS()
     if Cast(S.SpiritBurst, nil, nil, not Target:IsInMeleeRange(8)) then return "spirit_burst fs 22"; end
   end
   -- Manually added: wait,if=!variable.can_spb&soul_fragments.total>=variable.spbomb_threshold
-  if not VarCanSpB and TotalSoulFragments >= VarSpBombThreshold then
+  if not VarCanSpB and TotalSoulFragments >= VarSpBombThreshold and SoulFragments < 5 then
     if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Soul Fragments"; end
   end
   -- spirit_bomb,if=variable.can_spbomb
