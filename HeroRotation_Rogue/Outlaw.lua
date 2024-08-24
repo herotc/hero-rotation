@@ -760,7 +760,7 @@ local function APL ()
       -- actions.precombat+=/adrenaline_rush,precombat_seconds=2,if=talent.improved_adrenaline_rush&talent.keep_it_rolling&talent.loaded_dice
       if S.AdrenalineRush:IsReady() and S.ImprovedAdrenalineRush:IsAvailable() and S.KeepItRolling:IsAvailable()
         and S.LoadedDice:IsAvailable() then
-          if Cast(S.AdrenalineRush) then return "Cast Adrenaline Rush (Opener KiR)" end
+          if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush (Opener KiR)" end
       end
       -- actions.precombat+=/roll_the_bones,precombat_seconds=2
       -- Use same extended logic as a normal rotation for between pulls
@@ -769,7 +769,7 @@ local function APL ()
       end
       -- actions.precombat+=/adrenaline_rush,precombat_seconds=3,if=talent.improved_adrenaline_rush
       if S.AdrenalineRush:IsReady() and S.ImprovedAdrenalineRush:IsAvailable() then
-        if Cast(S.AdrenalineRush) then return "Cast Adrenaline Rush (Opener)" end
+        if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush (Opener)" end
       end
       -- actions.precombat+=/slice_and_dice,precombat_seconds=1
       if S.SliceandDice:IsReady() and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints) * 1.8 then
