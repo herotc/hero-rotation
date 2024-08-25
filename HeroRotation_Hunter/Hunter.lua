@@ -86,6 +86,7 @@ Spell.Hunter.DarkRanger = {
 
 Spell.Hunter.PackLeader = {
   -- Talents
+  CulltheHerd                           = Spell(445717),
   ViciousHunt                           = Spell(445404),
   -- Buffs
   FuriousAssaultBuff                    = Spell(448814),
