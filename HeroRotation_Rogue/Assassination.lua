@@ -77,20 +77,28 @@ local TrinketSyncSlot = 0
 local EffectiveCPSpend
 
 -- Equipment
+local VarTrinketFailures = 0
 local function SetTrinketVariables ()
-  TrinketItem1, TrinketItem2 = Player:GetTrinketItems()
+  local T1, T2 = Player:GetTrinketData()
+  
   -- If we don't have trinket items, try again in 2 seconds.
-  if TrinketItem1:ID() == 0 or TrinketItem2:ID() == 0 then
-    Delay(2, function()
-        TrinketItem1, TrinketItem2 = Player:GetTrinketItems()
+  if VarTrinketFailures < 5 and (T1.ID == 0 or T2.ID == 0) then
+    VarTrinketFailures = VarTrinketFailures + 1
+    Delay(5, function()
+        SetTrinketVariables()
       end
     )
+    return
   end
+
+  TrinketItem1 = T1.Object
+  TrinketItem2 = T2.Object
+
   -- actions.precombat+=/variable,name=trinket_sync_slot,value=1,if=trinket.1.has_stat.any_dps&(!trinket.2.has_stat.any_dps|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)&!trinket.2.is.witherbarks_branch|trinket.1.is.witherbarks_branch
   -- actions.precombat+=/variable,name=trinket_sync_slot,value=2,if=trinket.2.has_stat.any_dps&(!trinket.1.has_stat.any_dps|trinket.2.cooldown.duration>trinket.1.cooldown.duration)&!trinket.1.is.witherbarks_branch|trinket.2.is.witherbarks_branch
-  if TrinketItem1:HasStatAnyDps() and (not TrinketItem2:HasStatAnyDps() or TrinketItem1:Cooldown() >= TrinketItem2:Cooldown()) and TrinketItem2:ID() ~= I.WitherbarksBranch:ID() or TrinketItem1:ID() == I.WitherbarksBranch:ID() then
+  if TrinketItem1:HasStatAnyDps() and (not TrinketItem2:HasStatAnyDps() or T1.Cooldown >= T2.Cooldown) and T2.ID ~= I.WitherbarksBranch:ID() or T1.ID == I.WitherbarksBranch:ID() then
     TrinketSyncSlot = 1
-  elseif TrinketItem2:HasStatAnyDps() and (not TrinketItem1:HasStatAnyDps() or TrinketItem2:Cooldown() > TrinketItem1:Cooldown()) and TrinketItem1:ID() ~= I.WitherbarksBranch:ID() or TrinketItem2:ID() == I.WitherbarksBranch:ID() then
+  elseif TrinketItem2:HasStatAnyDps() and (not TrinketItem1:HasStatAnyDps() or T2.Cooldown > T1.Cooldown) and T1.ID ~= I.WitherbarksBranch:ID() or T2.ID == I.WitherbarksBranch:ID() then
     TrinketSyncSlot = 2
   else
     TrinketSyncSlot = 0
@@ -100,6 +108,7 @@ SetTrinketVariables()
 
 
 HL:RegisterForEvent(function()
+  VarTrinketFailures = 0
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED" )
 

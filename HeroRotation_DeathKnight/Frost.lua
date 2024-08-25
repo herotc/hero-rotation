@@ -55,9 +55,9 @@ local Settings = {
 --- ===== Rotation Variables =====
 local VarPillarCD = (S.Icecap:IsAvailable()) and 45 or 60
 local Trinket1, Trinket2
-local VarTrinket1ID, VarTrinket2ID
 local VarTrinket1Spell, VarTrinket2Spell
 local VarTrinket1Range, VarTrinket2Range
+local VarTrinket1CastTime, VarTrinket2CastTime
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1BL, VarTrinket2BL
 local VarTrinket1Exclude, VarTrinket2Exclude
@@ -82,34 +82,38 @@ local GCDMax
 local Ghoul = HL.GhoulTable
 
 --- ===== Trinket Variables (from Precombat) =====
+local VarTrinketFailures = 0
 local function SetTrinketVariables()
-  Trinket1, Trinket2 = Player:GetTrinketItems()
-  VarTrinket1ID = Trinket1:ID()
-  VarTrinket2ID = Trinket2:ID()
+  local T1, T2 = Player:GetTrinketData()
 
   -- If we don't have trinket items, try again in 2 seconds.
-  if VarTrinket1ID == 0 or VarTrinket2ID == 0 then
-    Delay(2, function()
-        Trinket1, Trinket2 = Player:GetTrinketItems()
-        VarTrinket1ID = Trinket1:ID()
-        VarTrinket2ID = Trinket2:ID()
+  if VarTrinketFailures < 5 and (T1.ID == 0 or T2.ID == 0) then
+    VarTrinketFailures = VarTrinketFailures + 1
+    Delay(5, function()
+        SetTrinketVariables()
       end
     )
+    return
   end
 
-  VarTrinket1Spell = Trinket1:OnUseSpell()
-  VarTrinket1Range = (VarTrinket1Spell and VarTrinket1Spell.MaximumRange > 0 and VarTrinket1Spell.MaximumRange <= 100) and VarTrinket1Spell.MaximumRange or 100
-  VarTrinket2Spell = Trinket2:OnUseSpell()
-  VarTrinket2Range = (VarTrinket2Spell and VarTrinket2Spell.MaximumRange > 0 and VarTrinket2Spell.MaximumRange <= 100) and VarTrinket2Spell.MaximumRange or 100
+  Trinket1 = T1.Object
+  Trinket2 = T2.Object
 
-  VarTrinket1CD = Trinket1:Cooldown() or 0
-  VarTrinket2CD = Trinket2:Cooldown() or 0
+  VarTrinket1Spell = T1.Spell
+  VarTrinket1Range = T1.Range
+  VarTrinket1CastTime = T1.CastTime
+  VarTrinket2Spell = T2.Spell
+  VarTrinket2Range = T2.Range
+  VarTrinket2CastTime = T2.CastTime
 
-  VarTrinket1BL = Player:IsItemBlacklisted(Trinket1)
-  VarTrinket2BL = Player:IsItemBlacklisted(Trinket2)
+  VarTrinket1CD = T1.Cooldown
+  VarTrinket2CD = T2.Cooldown
 
-  VarTrinket1Exclude = VarTrinket1ID == 193757 or VarTrinket1ID == 194301
-  VarTrinket2Exclude = VarTrinket2ID == 193757 or VarTrinket2ID == 194301
+  VarTrinket1BL = T1.Blacklisted
+  VarTrinket2BL = T2.Blacklisted
+
+  VarTrinket1Exclude = T1.ID == 193757 or T1.ID == 194301
+  VarTrinket2Exclude = T2.ID == 193757 or T2.ID == 194301
 
   VarTrinket1Sync = 0.5
   if Trinket1:HasUseBuff() and (S.PillarofFrost:IsAvailable() and not S.BreathofSindragosa:IsAvailable() and (VarTrinket1CD % VarPillarCD == 0) or S.BreathofSindragosa:IsAvailable() and (120 % VarTrinket1CD == 0)) then
@@ -127,8 +131,8 @@ local function SetTrinketVariables()
   -- Note: Using the below buff durations to avoid potential divide by zero errors.
   local T1BuffDuration = (Trinket1:BuffDuration() > 0) and Trinket1:BuffDuration() or 1
   local T2BuffDuration = (Trinket2:BuffDuration() > 0) and Trinket2:BuffDuration() or 1
-  local T1Level = (VarTrinket1ID ~= 0) and Trinket1:Level() or 0
-  local T2Level = (VarTrinket2ID ~= 0) and Trinket2:Level() or 0
+  local T1Level = (T1.ID ~= 0) and Trinket1:Level() or 0
+  local T2Level = (T2.ID ~= 0) and Trinket2:Level() or 0
   if not VarTrinket1Buffs and VarTrinket2Buffs and (Trinket2:HasCooldown() and not VarTrinket2Exclude or not Trinket1:HasCooldown()) or VarTrinket2Buffs and ((VarTrinket2CD / T2BuffDuration) * (VarTrinket2Sync)) > ((VarTrinket1CD / T1BuffDuration) * (VarTrinket1Sync) * (1 + ((T1Level - T2Level) / 100))) then
     VarTrinketPriority = 2
   end
@@ -138,8 +142,8 @@ local function SetTrinketVariables()
     VarDamageTrinketPriority = 2
   end
 
-  VarTrinket1Manual = VarTrinket1ID == I.TreacherousTransmitter:ID()
-  VarTrinket2Manual = VarTrinket2ID == I.TreacherousTransmitter:ID()
+  VarTrinket1Manual = T1.ID == I.TreacherousTransmitter:ID()
+  VarTrinket2Manual = T2.ID == I.TreacherousTransmitter:ID()
 end
 SetTrinketVariables()
 
@@ -180,15 +184,11 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   VarRWBuffs = S.GatheringStorm:IsAvailable() or S.BitingCold:IsAvailable()
-  SetTrinketVariables()
-  SetSpellVariables()
-end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
-
-HL:RegisterForEvent(function()
+  VarTrinketFailures = 0
   SetTrinketVariables()
   SetWeaponVariables()
   SetSpellVariables()
-end, "PLAYER_EQUIPMENT_CHANGED")
+end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 --- ===== Helper Functions =====
 local function DeathStrikeHeal()

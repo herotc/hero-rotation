@@ -80,18 +80,12 @@ local VarCombustionCastRemains = 1
 local VarOverpoolFireBlasts = 0
 local VarSKBDuration = 6
 local VarOnUseCutoff = 20
-local VarCombustionOnUse = false
 local VarShiftingPowerBeforeCombustion = false
 local VarItemCutoffActive = false
 local VarFireBlastPooling, VarPhoenixPooling = false, false
 local VarCombustionReadyTime, VarCombustionPrecastTime = 0, 0
 local VarTACombust = false
 local VarTimeToCombustion = 0
-local Trinket1, Trinket2
-local VarTrinket1ID, VarTrinket2ID
-local VarTrinket1CD, VarTrinket2CD
-local VarTrinket1BL, VarTrinket2BL
-local VarTrinket1Range, VarTrinket2Range
 local CombustionUp
 local CombustionDown
 local CombustionRemains
@@ -107,35 +101,7 @@ local GCDMax
 local Bolt = S.FrostfireBolt:IsAvailable() and S.FrostfireBolt or S.Fireball
 
 --- ===== Trinket Variables =====
-local function SetTrinketVariables()
-  Trinket1, Trinket2 = Player:GetTrinketItems()
-  VarTrinket1ID = Trinket1:ID()
-  VarTrinket2ID = Trinket2:ID()
-
-  -- If we don't have trinket items, try again in 2 seconds.
-  if VarTrinket1ID == 0 or VarTrinket2ID == 0 then
-    Delay(2, function()
-        Trinket1, Trinket2 = Player:GetTrinketItems()
-        VarTrinket1ID = Trinket1:ID()
-        VarTrinket2ID = Trinket2:ID()
-      end
-    )
-  end
-
-  local Trinket1Spell = Trinket1:OnUseSpell()
-  VarTrinket1Range = (Trinket1Spell and Trinket1Spell.MaximumRange > 0 and Trinket1Spell.MaximumRange <= 100) and Trinket1Spell.MaximumRange or 100
-  local Trinket2Spell = Trinket2:OnUseSpell()
-  VarTrinket2Range = (Trinket2Spell and Trinket2Spell.MaximumRange > 0 and Trinket2Spell.MaximumRange <= 100) and Trinket2Spell.MaximumRange or 100
-
-  VarTrinket1CD = Trinket1:Cooldown() or 0
-  VarTrinket2CD = Trinket2:Cooldown() or 0
-
-  VarTrinket1BL = Player:IsItemBlacklisted(Trinket1)
-  VarTrinket2BL = Player:IsItemBlacklisted(Trinket2)
-
-  VarCombustionOnUse = I.ForgedGladiatorsBadge:IsEquipped() or I.CrimsonGladiatorsBadge:IsEquipped() or I.DraconicGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.MoonlitPrism:IsEquipped() or I.IrideusFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped()
-end
-SetTrinketVariables()
+local VarCombustionOnUse = I.ForgedGladiatorsBadge:IsEquipped() or I.CrimsonGladiatorsBadge:IsEquipped() or I.DraconicGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.MoonlitPrism:IsEquipped() or I.IrideusFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped()
 
 --- ===== Precombat Variables =====
 local function SetPrecombatVariables()
@@ -156,7 +122,7 @@ SetPrecombatVariables()
 
 --- ===== Event Registrations =====
 HL:RegisterForEvent(function()
-  SetTrinketVariables()
+  VarCombustionOnUse = I.ForgedGladiatorsBadge:IsEquipped() or I.CrimsonGladiatorsBadge:IsEquipped() or I.DraconicGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.MoonlitPrism:IsEquipped() or I.IrideusFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()

@@ -49,7 +49,6 @@ local Settings = {
 
 --- ===== Rotation Variables =====
 local Trinket1, Trinket2
-local VarTrinket1ID, VarTrinket2ID
 local VarTrinket1Spell, VarTrinket2Spell
 local VarTrinket1Range, VarTrinket2Range
 local VarTrinket1CastTime, VarTrinket2CastTime
@@ -68,36 +67,38 @@ local BossFightRemains = 11111
 local FightRemains = 11111
 
 --- ===== Trinket Variables (from Precombat) =====
+local VarTrinketFailures = 0
 local function SetTrinketVariables()
-  Trinket1, Trinket2 = Player:GetTrinketItems()
-  VarTrinket1ID = Trinket1:ID()
-  VarTrinket2ID = Trinket2:ID()
+  local T1, T2 = Player:GetTrinketData()
 
   -- If we don't have trinket items, try again in 2 seconds.
-  if VarTrinket1ID == 0 or VarTrinket2ID == 0 then
-    Delay(2, function()
-        Trinket1, Trinket2 = Player:GetTrinketItems()
-        VarTrinket1ID = Trinket1:ID()
-        VarTrinket2ID = Trinket2:ID()
+  if VarTrinketFailures < 5 and (T1.ID == 0 or T2.ID == 0) then
+    VarTrinketFailures = VarTrinketFailures + 1
+    Delay(5, function()
+        SetTrinketVariables()
       end
     )
+    return
   end
 
-  VarTrinket1Spell = Trinket1:OnUseSpell()
-  VarTrinket1Range = (VarTrinket1Spell and VarTrinket1Spell.MaximumRange > 0 and VarTrinket1Spell.MaximumRange <= 100) and VarTrinket1Spell.MaximumRange or 100
-  VarTrinket1CastTime = VarTrinket1Spell and VarTrinket1Spell:CastTime() or 0
-  VarTrinket2Spell = Trinket2:OnUseSpell()
-  VarTrinket2Range = (VarTrinket2Spell and VarTrinket2Spell.MaximumRange > 0 and VarTrinket2Spell.MaximumRange <= 100) and VarTrinket2Spell.MaximumRange or 100
-  VarTrinket2CastTime = VarTrinket2Spell and VarTrinket2Spell:CastTime() or 0
+  Trinket1 = T1.Object
+  Trinket2 = T2.Object
 
-  VarTrinket1CD = Trinket1:Cooldown() or 0
-  VarTrinket2CD = Trinket2:Cooldown() or 0
+  VarTrinket1Spell = T1.Spell
+  VarTrinket1Range = T1.Range
+  VarTrinket1CastTime = T1.CastTime
+  VarTrinket2Spell = T2.Spell
+  VarTrinket2Range = T2.Range
+  VarTrinket2CastTime = T2.CastTime
 
-  VarTrinket1BL = Player:IsItemBlacklisted(Trinket1)
-  VarTrinket2BL = Player:IsItemBlacklisted(Trinket2)
+  VarTrinket1CD = T1.Cooldown
+  VarTrinket2CD = T2.Cooldown
 
-  VarTrinket1Exclude = (VarTrinket1ID == 193757 or VarTrinket1ID == 194301)
-  VarTrinket2Exclude = (VarTrinket2ID == 193757 or VarTrinket2ID == 194301)
+  VarTrinket1BL = T1.Blacklisted
+  VarTrinket2BL = T2.Blacklisted
+
+  VarTrinket1Exclude = (T1.ID == 193757 or T1.ID == 194301)
+  VarTrinket2Exclude = (T2.ID == 193757 or T2.ID == 194301)
 
   VarTrinket1Sync = 0.5
   if Trinket1:HasUseBuff() and (Trinket1CD % 90 == 0 or Trinket1CD) then
@@ -119,8 +120,8 @@ local function SetTrinketVariables()
     VarTrinketPriority = 2
   end
 
-  VarTrinket1Manual = VarTrinket1ID == I.AlgetharPuzzleBox:ID()
-  VarTrinket2Manual = VarTrinket2ID == I.AlgetharPuzzleBox:ID()
+  VarTrinket1Manual = T1.ID == I.AlgetharPuzzleBox:ID()
+  VarTrinket2Manual = T2.ID == I.AlgetharPuzzleBox:ID()
 end
 SetTrinketVariables()
 
@@ -136,6 +137,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
+  VarTrinketFailures = 0
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 

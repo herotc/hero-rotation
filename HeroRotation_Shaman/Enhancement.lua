@@ -56,8 +56,9 @@ local Settings = {
 
 --- ===== Rotation Variables =====
 local Trinket1, Trinket2
-local VarTrinket1ID, VarTrinket2ID
+local VarTrinket1Spell, VarTrinket2Spell
 local VarTrinket1Range, VarTrinket2Range
+local VarTrinket1CastTime, VarTrinket2CastTime
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1BL, VarTrinket2BL
 local VarTrinket1IsWeird, VarTrinket2IsWeird
@@ -77,34 +78,38 @@ local BossFightRemains = 11111
 local FightRemains = 11111
 
 --- ===== Trinket Variables (from Precombat) =====
+local VarTrinketFailures = 0
 local function SetTrinketVariables()
-  Trinket1, Trinket2 = Player:GetTrinketItems()
-  VarTrinket1ID = Trinket1:ID()
-  VarTrinket2ID = Trinket2:ID()
+  local T1, T2 = Player:GetTrinketData()
 
   -- If we don't have trinket items, try again in 2 seconds.
-  if VarTrinket1ID == 0 or VarTrinket2ID == 0 then
-    Delay(2, function()
-        Trinket1, Trinket2 = Player:GetTrinketItems()
-        VarTrinket1ID = Trinket1:ID()
-        VarTrinket2ID = Trinket2:ID()
+  if VarTrinketFailures < 5 and (T1.ID == 0 or T2.ID == 0) then
+    VarTrinketFailures = VarTrinketFailures + 1
+    Delay(5, function()
+        SetTrinketVariables()
       end
     )
+    return
   end
 
-  local Trinket1Spell = Trinket1:OnUseSpell()
-  VarTrinket1Range = (Trinket1Spell and Trinket1Spell.MaximumRange > 0 and Trinket1Spell.MaximumRange <= 100) and Trinket1Spell.MaximumRange or 100
-  local Trinket2Spell = Trinket2:OnUseSpell()
-  VarTrinket2Range = (Trinket2Spell and Trinket2Spell.MaximumRange > 0 and Trinket2Spell.MaximumRange <= 100) and Trinket2Spell.MaximumRange or 100
+  Trinket1 = T1.Object
+  Trinket2 = T2.Object
 
-  VarTrinket1CD = Trinket1:Cooldown() or 0
-  VarTrinket2CD = Trinket2:Cooldown() or 0
+  VarTrinket1Spell = T1.Spell
+  VarTrinket1Range = T1.Range
+  VarTrinket1CastTime = T1.CastTime
+  VarTrinket2Spell = T2.Spell
+  VarTrinket2Range = T2.Range
+  VarTrinket2CastTime = T2.CastTime
 
-  VarTrinket1BL = Player:IsItemBlacklisted(Trinket1)
-  VarTrinket2BL = Player:IsItemBlacklisted(Trinket2)
+  VarTrinket1CD = T1.Cooldown
+  VarTrinket2CD = T2.Cooldown
 
-  VarTrinket1IsWeird = VarTrinket1ID == I.AlgetharPuzzleBox:ID() or VarTrinket1ID == I.ManicGrieftorch:ID() or VarTrinket1ID == I.ElementiumPocketAnvil:ID() or VarTrinket1ID == I.BeacontotheBeyond:ID()
-  VarTrinket2IsWeird = VarTrinket2ID == I.AlgetharPuzzleBox:ID() or VarTrinket2ID == I.ManicGrieftorch:ID() or VarTrinket2ID == I.ElementiumPocketAnvil:ID() or VarTrinket2ID == I.BeacontotheBeyond:ID()
+  VarTrinket1BL = T1.Blacklisted
+  VarTrinket2BL = T2.Blacklisted
+
+  VarTrinket1IsWeird = T1.ID == I.AlgetharPuzzleBox:ID() or T1.ID == I.ManicGrieftorch:ID() or T1.ID == I.ElementiumPocketAnvil:ID() or T1.ID == I.BeacontotheBeyond:ID()
+  VarTrinket2IsWeird = T2.ID == I.AlgetharPuzzleBox:ID() or T2.ID == I.ManicGrieftorch:ID() or T2.ID == I.ElementiumPocketAnvil:ID() or T2.ID == I.BeacontotheBeyond:ID()
 end
 SetTrinketVariables()
 
@@ -114,6 +119,7 @@ HL:RegisterForEvent(function()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
+  VarTrinketFailures = 0
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
