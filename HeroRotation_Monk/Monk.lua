@@ -81,6 +81,7 @@ Spell.Monk.Commons = {
   BonedustBrewBuff                      = Spell(386276),
   BonedustBrewDebuff                    = Spell(386276),
   DampenHarmBuff                        = Spell(122278),
+  PressurePointBuff                     = Spell(393053),
   RushingJadeWindBuff                   = Spell(116847),
   -- Debuffs
   -- Item Effects
@@ -95,12 +96,21 @@ Spell.Monk.Commons = {
 Spell.Monk.ConduitoftheCelestials = {
   -- Talents
   CelestialConduit                      = Spell(443028),
+  -- Buffs
+  HeartoftheJadeSerpentBuff             = Spell(456368),
+  HeartoftheJadeSerpentCDRBuff          = Spell(443421),
+  HeartoftheJadeSerpentCDRCelestialBuff = Spell(443616),
 }
 
 Spell.Monk.MasterofHarmony = {
 }
 
 Spell.Monk.ShadoPan = {
+  -- Talents
+  FlurryStrikes                         = Spell(450615),
+  WisdomoftheWall                       = Spell(450994),
+  -- Buffs
+  WisdomoftheWallFlurryBuff             = Spell(452688),
 }
 
 Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
@@ -110,16 +120,20 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   FlyingSerpentKickLand                 = Spell(115057),
   SpinningCraneKick                     = Spell(101546),
   -- Talents
+  CraneVortex                           = Spell(388848),
   EnergyBurst                           = Spell(451498),
   GaleForce                             = Spell(451580),
   JadefireHarmony                       = Spell(391412),
   JadefireStomp                         = Spell(388193),
   FistsofFury                           = Spell(113656),
+  GloryoftheDawn                        = Spell(392958),
   HitCombo                              = Spell(196740),
   InnerPeace                            = Spell(397768),
   InvokeXuenTheWhiteTiger               = Spell(123904),
   KnowledgeoftheBrokenTemple            = Spell(451529),
+  MemoryoftheMonastery                  = Spell(454969),
   OrderedElements                       = Spell(451463),
+  RevolvingWhirl                        = Spell(451524),
   SequencedStrikes                      = Spell(451515),
   ShadowboxingTreads                    = Spell(392982),
   SingularlyFocusedJade                 = Spell(451573),
@@ -129,14 +143,17 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   TeachingsoftheMonastery               = Spell(116645),
   WhirlingDragonPunch                   = Spell(152175),
   XuensBattlegear                       = Spell(392993),
+  XuensBond                             = Spell(392986),
   -- Defensive
   FortifyingBrew                        = Spell(243435),
   TouchofKarma                          = Spell(122470),
   -- Buffs
   BlackoutKickBuff                      = Spell(116768),
+  ChiEnergyBuff                         = Spell(393057),
   DanceofChijiBuff                      = Spell(325202),
   HiddenMastersForbiddenTouchBuff       = Spell(213114),
   InvokersDelightBuff                   = Spell(388663),
+  MemoryoftheMonasteryBuff              = Spell(454970),
   OrderedElementsBuff                   = Spell(451462),
   StormEarthAndFireBuff                 = Spell(137639),
   TeachingsoftheMonasteryBuff           = Spell(202090),
