@@ -101,11 +101,11 @@ local function SetTrinketVariables()
   VarTrinket2Exclude = (T2.ID == 193757 or T2.ID == 194301)
 
   VarTrinket1Sync = 0.5
-  if Trinket1:HasUseBuff() and (Trinket1CD % 90 == 0 or Trinket1CD) then
+  if Trinket1:HasUseBuff() and (VarTrinket1CD % 90 == 0 or VarTrinket1CD) then
     VarTrinket1Sync = 1
   end
   VarTrinket2Sync = 0.5
-  if Trinket2:HasUseBuff() and (Trinket2CD % 90 == 0) then
+  if Trinket2:HasUseBuff() and (VarTrinket2CD % 90 == 0) then
     VarTrinket2Sync = 1
   end
 
