@@ -30,6 +30,7 @@ if not Spell.Monk then Spell.Monk = {}; end
 Spell.Monk.Commons = {
   -- Racials
   AncestralCall                         = Spell(274738),
+  ArcanePulse                           = Spell(260364),
   ArcaneTorrent                         = Spell(25046),
   AzeriteSurge                          = Spell(436344),
   BagofTricks                           = Spell(312411),

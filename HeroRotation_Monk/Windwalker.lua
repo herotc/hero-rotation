@@ -287,6 +287,10 @@ local function Cooldowns()
     if S.AzeriteSurge:IsCastable() then
       if Cast(S.AzeriteSurge, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "azerite_surge cooldowns 26"; end
     end
+    -- arcane_pulse,if=buff.storm_earth_and_fire.down
+    if S.ArcanePulse:IsCastable() then
+      if Cast(S.ArcanePulse, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "arcane_pulse cooldowns 28"; end
+    end
   end
 end
 
