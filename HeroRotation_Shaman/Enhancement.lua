@@ -408,10 +408,6 @@ local function Single()
   if S.Sundering:IsReady() then
     if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInMeleeRange(11)) then return "sundering single 68"; end
   end
-  -- bag_of_tricks
-  if CDsON() and S.BagofTricks:IsCastable() then
-    if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks single 70"; end
-  end
   -- tempest,if=buff.maelstrom_weapon.stack>=5
   if S.TempestAbility:IsReady() and (MaelstromStacks >= 5) then
     if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest single 72"; end
