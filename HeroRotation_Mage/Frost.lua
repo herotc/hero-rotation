@@ -81,7 +81,7 @@ HL:RegisterForEvent(function()
   S.IceLance:RegisterInFlightEffect(228598)
   S.IceLance:RegisterInFlight()
   Bolt = S.FrostfireBolt:IsAvailable() and S.FrostfireBolt or S.Frostbolt
-end, "LEARNED_SPELL_IN_TAB")
+end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 S.Frostbolt:RegisterInFlightEffect(228597)
 S.Frostbolt:RegisterInFlight()
 S.FrostfireBolt:RegisterInFlight()
