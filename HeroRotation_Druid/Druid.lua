@@ -48,6 +48,7 @@ Spell.Druid.Commons = {
   MightyBash                            = Spell(5211),
   MoonkinForm                           = MultiSpell(24858,197625),
   NaturesVigil                          = Spell(124974),
+  PrimalFury                            = Spell(159286),
   ProtectorofthePack                    = Spell(378986),
   Rake                                  = Spell(1822),
   Renewal                               = Spell(108238),
@@ -58,6 +59,8 @@ Spell.Druid.Commons = {
   Sunfire                               = Spell(93402),
   SurvivalInstincts                     = Spell(61336),
   Thrash                                = MultiSpell(77758,106830),
+  ThrashBear                            = Spell(77758),
+  ThrashCat                             = Spell(106830),
   WildCharge                            = MultiSpell(16979,49376),
   -- Buffs
   FrenziedRegenerationBuff              = Spell(22842),
@@ -76,12 +79,22 @@ Spell.Druid.Commons = {
 }
 
 Spell.Druid.DruidoftheClaw = {
+  -- Abilities
+  RavageAbility                         = Spell(441605),
+  -- Talents
+  Ravage                                = Spell(441583),
+  WildpowerSurge                        = Spell(441691),
   -- Buffs
+  FelinePotentialBuff                   = Spell(441701),
   RavageBuffFeral                       = Spell(441585),
   RavageBuffGuardian                    = Spell(441602),
 }
 
 Spell.Druid.ElunesChosen = {
+  -- Talents
+  BoundlessMoonlight                    = Spell(424058),
+  LunarCalling                          = Spell(429523),
+  LunarInsight                          = Spell(429530),
 }
 
 Spell.Druid.KeeperoftheGrove = {
@@ -223,14 +236,25 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   -- Talents
   Berserk                               = Spell(50334),
   BristlingFur                          = Spell(155835),
+  FlashingClaws                         = Spell(393427),
+  FuryofNature                          = Spell(370695),
   Incarnation                           = Spell(102558),
   LunarBeam                             = Spell(204066),
   Maul                                  = Spell(6807),
   Pulverize                             = Spell(80313),
   RageoftheSleeper                      = Spell(200851),
+  Raze                                  = Spell(400254),
+  ReinforcedFur                         = Spell(393618),
+  SouloftheForest                       = Spell(158477),
   Swipe                                 = Spell(213771),
+  ThornsofIron                          = Spell(400222),
   -- Buffs
   DreamofCenariusBuff                   = Spell(372152),
+  GalacticGuardianBuff                  = Spell(213708),
+  GoreBuff                              = Spell(93622),
+  ToothandClawBuff                      = Spell(135286),
+  ViciousCycleMaulBuff                  = Spell(372015),
+  ViciousCycleMangleBuff                = Spell(372019),
 })
 Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Guardian, Spell.Druid.DruidoftheClaw)
 Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Guardian, Spell.Druid.ElunesChosen)
