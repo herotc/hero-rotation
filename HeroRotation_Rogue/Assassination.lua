@@ -80,7 +80,7 @@ local EffectiveCPSpend
 local VarTrinketFailures = 0
 local function SetTrinketVariables ()
   local T1, T2 = Player:GetTrinketData()
-  
+
   -- If we don't have trinket items, try again in 2 seconds.
   if VarTrinketFailures < 5 and (T1.ID == 0 or T2.ID == 0) then
     VarTrinketFailures = VarTrinketFailures + 1
@@ -674,11 +674,8 @@ local function CDs ()
   end
 
   -- -- actions.cds+=/call_action_list,name=shiv
-  if ShouldReturn then
-    ShivUsage()
-  else
-    ShouldReturn = ShivUsage()
-  end
+  ShouldReturn = ShivUsage()
+  if ShouldReturn then return ShouldReturn end
 
   -- actions.cds+=/kingsbane,if=(debuff.shiv.up|cooldown.shiv.remains<6)&buff.envenom.up&(cooldown.deathmark.remains>=50|dot.deathmark.ticking)|fight_remains<=15
   if S.Kingsbane:IsReady() then
