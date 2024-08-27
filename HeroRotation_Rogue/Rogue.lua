@@ -73,7 +73,7 @@ Spell.Rogue.Commons = {
   -- Talents
   AcrobaticStrikes        = Spell(455143),
   Alacrity                = Spell(193539),
-  ClearTheWitnessesBuff   = Spell(457179),
+  ClearTheWitnessesBuff   = Spell(457178),
   ColdBlood               = Spell(382245),
   CoupDeGrace             = Spell(441776),
   DarkestNight            = Spell(457058),

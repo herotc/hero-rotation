@@ -213,10 +213,10 @@ end
 -- |energy.pct>=(40+30*talent.hand_of_fate-15*talent.vicious_venoms)
 -- |fight_remains<=20
 local function NotPoolingVar()
-  if ((Target:DebuffUp(S.Deathmark) or Target:DebuffUp(S.Kingsbane) or Target:DebuffUp(S.ShivDebuff))
+  if (Target:DebuffUp(S.Deathmark) or Target:DebuffUp(S.Kingsbane) or Target:DebuffUp(S.ShivDebuff))
     or (Player:BuffUp(S.Envenom) and Player:BuffRemains(S.Envenom) <= 1)
     or Player:EnergyPercentage() >= (40 + 30 * num(S.HandOfFate:IsAvailable()) - 15 * num(S.ViciousVenoms:IsAvailable()))
-    or HL.BossFilteredFightRemains("<=", 20)) then
+    or HL.BossFilteredFightRemains("<=", 20) then
       return true
   end
   return false
@@ -816,7 +816,7 @@ local function Direct ()
   -- actions.direct+=/ambush,if=talent.caustic_spatter&dot.rupture.ticking&(!debuff.caustic_spatter.up|debuff.caustic_spatter.remains<=2)&variable.use_filler&!variable.single_target
   if not SingleTarget and S.CausticSpatter:IsAvailable() and Target:DebuffUp(S.Rupture) and Target:DebuffRemains(S.CausticSpatterDebuff) <= 2 then
     if S.Mutilate:IsCastable() then
-      if Cast(S.Mutilate, nil, nil, not TargetInMeleeRange) then return "Cast Mutilate (Casutic)" end
+      if Cast(S.Mutilate, nil, nil, not TargetInMeleeRange) then return "Cast Mutilate (Caustic)" end
     end
 
     if (S.Ambush:IsReady() or S.AmbushOverride:IsReady()) and (Player:StealthUp(true, true) or Player:BuffUp(S.BlindsideBuff)) then
@@ -962,9 +962,6 @@ local function APL ()
       ShouldReturn = Stealthed()
       if ShouldReturn then return ShouldReturn .. " (Stealthed)" end
     end
-    -- actions+=/call_action_list,name=cds
-    ShouldReturn = CDs()
-    if ShouldReturn then return ShouldReturn end
 
     -- # Put SnD up initially for Cut to the Chase, refresh with Envenom if at low duration
     -- actions+=/slice_and_dice,if=!buff.slice_and_dice.up&dot.rupture.ticking&combo_points>=1
@@ -989,6 +986,10 @@ local function APL ()
         if Cast(S.PoisonedKnife) then return "Cast Poisoned Knife" end
       end
     end
+
+    -- actions+=/call_action_list,name=cds
+    ShouldReturn = CDs()
+    if ShouldReturn then return ShouldReturn end
 
     -- actions+=/call_action_list,name=dot
     -- actions+=/call_action_list,name=aoe_dot,if=!variable.single_target
