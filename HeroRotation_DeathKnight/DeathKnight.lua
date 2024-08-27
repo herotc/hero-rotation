@@ -77,7 +77,11 @@ Spell.DeathKnight.Commons = {
 Spell.DeathKnight.Deathbringer = {
   -- Talents
   DarkTalons                            = Spell(436687),
+  Exterminate                           = Spell(441378),
   ReapersMark                           = Spell(439843),
+  -- Buffs
+  ExterminateBuff                       = Spell(441416),
+  PainfulDeathBuff                      = Spell(447954),
   -- Debuffs
   ReapersMarkDebuff                     = Spell(434765),
 }
@@ -152,6 +156,7 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   ArcticAssault                         = Spell(456230),
   Avalanche                             = Spell(207142),
   BitingCold                            = Spell(377056),
+  Bonegrinder                           = Spell(377098),
   BreathofSindragosa                    = Spell(152279),
   ChillStreak                           = Spell(305392),
   ColdHeart                             = Spell(281208),
@@ -175,6 +180,7 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   TheLongWinter                         = Spell(456240),
   UnleashedFrenzy                       = Spell(376905),
   -- Buffs
+  BonegrinderFrostBuff                  = Spell(377103),
   ColdHeartBuff                         = Spell(281209),
   KillingMachineBuff                    = Spell(51124),
   PillarofFrostBuff                     = Spell(51271),
