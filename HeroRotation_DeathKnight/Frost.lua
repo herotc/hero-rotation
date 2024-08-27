@@ -410,7 +410,7 @@ local function Cooldowns()
   end
   -- reapers_mark,target_if=first:debuff.reapers_mark_debuff.down
   if S.ReapersMark:IsReady() then
-    if Everyone.CastCycle(S.ReapersMark, EnemiesMelee, EvaluateCycleReapersMarkCDs, not Target:IsInMeleeRange(5)) then return "reapers_mark cooldowns 10"; end
+    if Everyone.CastCycle(S.ReapersMark, EnemiesMelee, EvaluateCycleReapersMarkCDs, not Target:IsInMeleeRange(5), Settings.Frost.GCDasOffGCD.ReapersMark) then return "reapers_mark cooldowns 10"; end
   end
   -- empower_rune_weapon,if=talent.obliteration&!talent.breath_of_sindragosa&buff.pillar_of_frost.up|fight_remains<20
   if S.EmpowerRuneWeapon:IsCastable() and (S.Obliteration:IsAvailable() and not S.BreathofSindragosa:IsAvailable() and Player:BuffUp(S.PillarofFrostBuff) or BossFightRemains < 20) then

@@ -94,6 +94,7 @@ HR.GUISettings.APL.DeathKnight = {
       HornOfWinter = true,
       HypothermicPresence = true,
       PillarOfFrost = true,
+      ReapersMark = false,
     }
   },
   Unholy = {
