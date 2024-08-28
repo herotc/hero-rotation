@@ -48,6 +48,8 @@ local OnUseExcludes = {
   I.DragonfireBombDispenser:ID(),
   I.EruptingSpearFragment:ID(),
   I.ManicGrieftorch:ID(),
+  -- TWW Trinkets
+  I.ImperfectAscendancySerum:ID(),
   -- DF Other Items
   I.Djaruun:ID(),
 }
@@ -171,14 +173,18 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
+  -- use_item,name=imperfect_ascendancy_serum
+  if I.ImperfectAscendancySerum:IsEquippedAndReady() then
+    if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum precombat 2"; end
+  end
   -- Manually added: openers
   -- tiger_palm,if=!prev.tiger_palm
   if S.TigerPalm:IsReady() and (not Player:PrevGCD(1, S.TigerPalm)) then
-    if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm precombat 2"; end
+    if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm precombat 4"; end
   end
   -- rising_sun_kick
   if S.RisingSunKick:IsReady() then
-    if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick precombat 4"; end
+    if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick precombat 6"; end
   end
 end
 
@@ -210,13 +216,17 @@ local function Trinkets()
     if I.DragonfireBombDispenser:IsEquippedAndReady() and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 or BossFightRemains < 10) then
       if Cast(I.DragonfireBombDispenser, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(46)) then return "dragonfire_bomb_dispenser trinkets 12"; end
     end
+    -- imperfect_ascendancy_serum,use_off_gcd=1,if=pet.xuen_the_white_tiger.active
+    if I.ImperfectAscendancySerum:IsEquippedAndReady() and (Monk.Xuen.Active) then
+      if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum trinkets 14"; end
+    end
     local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
     local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
-    -- ITEM_STAT_BUFF,if=(pet.xuen_the_white_tiger.active|!talent.invoke_xuen_the_white_tiger)&buff.storm_earth_and_fire.up|fight_remains<25
-    if Trinket1ToUse and Trinket1ToUse:HasUseBuff() and ((Monk.Xuen.Active or not S.InvokeXuenTheWhiteTiger:IsAvailable()) and Player:BuffUp(S.StormEarthAndFireBuff) or BossFightRemains < 25) then
+    -- ITEM_STAT_BUFF,if=pet.xuen_the_white_tiger.active
+    if Trinket1ToUse and Trinket1ToUse:HasUseBuff() and (Monk.Xuen.Active) then
       if Cast(Trinket1ToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name() .. " (trinkets stat_buff trinket1)"; end
     end
-    if Trinket2ToUse and Trinket2ToUse:HasUseBuff() and ((Monk.Xuen.Active or not S.InvokeXuenTheWhiteTiger:IsAvailable()) and Player:BuffUp(S.StormEarthAndFireBuff) or BossFightRemains < 25) then
+    if Trinket2ToUse and Trinket2ToUse:HasUseBuff() and (Monk.Xuen.Active) then
       if Cast(Trinket2ToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name() .. " (trinkets stat_buff trinket2)"; end
     end
     -- ITEM_DMG_BUFF,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>30
