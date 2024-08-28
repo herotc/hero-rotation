@@ -356,8 +356,8 @@ local function Precombat()
   if S.Prowl:IsCastable() then
     if Cast(S.Prowl) then return "prowl precombat 4"; end
   end
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_buff.agility|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_buff.agility|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit
+  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff
+  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=talent.convoke_the_spirits&!talent.ashamanes_guidance&variable.trinket_1_buffs&(trinket.1.cooldown.duration%%120=0|120%%trinket.1.cooldown.duration=0)
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=talent.convoke_the_spirits&!talent.ashamanes_guidance&variable.trinket_2_buffs&(trinket.1.cooldown.duration%%120=0|120%%trinket.1.cooldown.duration=0)
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=!(talent.convoke_the_spirits&!talent.ashamanes_guidance)&variable.trinket_1_buffs&(trinket.1.cooldown.duration%%cooldown.bs_inc.duration=0|cooldown.bs_inc.duration%%trinket.1.cooldown.duration=0|trinket.1.cooldown.duration%%cooldown.convoke_the_spirits.duration=0|cooldown.convoke_the_spirits.duration%%trinket.1.cooldown.duration=0)
@@ -716,8 +716,8 @@ local function APL()
     -- call_action_list,name=variables
     Variables()
     -- auto_attack,if=!buff.prowl.up|!buff.shadowmeld.up
-    -- tigers_fury,if=energy.deficit>35|combo_points=5
-    if S.TigersFury:IsCastable() and (Player:EnergyDeficit() > 35 or ComboPoints == 5) then
+    -- tigers_fury,if=(energy.deficit>35|combo_points=5)&(target.time_to_die=fight_remains|((target.time_to_die>12+cooldown.bs_inc.remains)&cooldown.bs_inc.remains<6)|cooldown.bs_inc.remains>6|buff.bs_inc.up)
+    if S.TigersFury:IsCastable() and ((Player:EnergyDeficit() > 35 or ComboPoints == 5) and (Target:TimeToDie() == FightRemains or ((Target:TimeToDie() > 12 + BsInc:CooldownRemains()) and BsInc:CooldownRemains() < 6) or BsInc:CooldownRemains() > 6 or Player:BuffUp(BsInc))) then
       if Cast(S.TigersFury, Settings.Feral.OffGCDasOffGCD.TigersFury) then return "tigers_fury main 6"; end
     end
     -- rake,target_if=max:refreshable+persistent_multiplier>dot.rake.pmultiplier,if=buff.shadowmeld.up|buff.prowl.up
