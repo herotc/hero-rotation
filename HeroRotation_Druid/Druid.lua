@@ -82,6 +82,7 @@ Spell.Druid.DruidoftheClaw = {
   -- Abilities
   RavageAbility                         = Spell(441605),
   -- Talents
+  FountofStrength                       = Spell(441675),
   Ravage                                = Spell(441583),
   WildpowerSurge                        = Spell(441691),
   -- Buffs
