@@ -214,9 +214,11 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   -- Buffs
   BombardierBuff                        = Spell(459859),
   CoordinatedAssaultBuff                = Spell(360952),
+  ExposedFlankBuff                      = Spell(459864),
   MercilessBlowsBuff                    = Spell(459870), -- Exposed Flank buff from Merciless Blows talent. Called buff.merciless_blows in APL.
   MongooseFuryBuff                      = Spell(259388),
   RelentlessPrimalFerocityBuff          = Spell(459962),
+  SicEmBuff                             = Spell(461409),
   TipoftheSpearBuff                     = Spell(260286),
   -- Debuffs
   BloodseekerDebuff                     = Spell(259277),
