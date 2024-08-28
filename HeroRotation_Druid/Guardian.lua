@@ -101,12 +101,12 @@ end
 
 local function EvaluateCyclePulverize(TargetUnit)
   -- target_if=dot.thrash_bear.stack>2
-  return TargetUnit:DebuffStack(S.ThrashDebuff) > 2
+  return TargetUnit:DebuffStack(S.ThrashBearDebuff) > 2
 end
 
 local function EvaluateCycleThrash(TargetUnit)
   -- target_if=refreshable|(dot.thrash_bear.stack<5&talent.flashing_claws.rank=2|dot.thrash_bear.stack<4&talent.flashing_claws.rank=1|dot.thrash_bear.stack<3&!talent.flashing_claws.enabled)
-  return TargetUnit:DebuffRefreshable(S.ThrashDebuff) or (Target:DebuffStack(S.ThrashDebuff) < 5 and S.FlashingClaws:TalentRank() == 2 or TargetUnit:DebuffStack(S.ThrashDebuff) < 4 and S.FlashingClaws:TalentRank() == 1 or Target:DebuffStack(S.ThrashDebuff) < 3 and not S.FlashingClaws:IsAvailable())
+  return TargetUnit:DebuffRefreshable(S.ThrashBearDebuff) or (Target:DebuffStack(S.ThrashBearDebuff) < 5 and S.FlashingClaws:TalentRank() == 2 or TargetUnit:DebuffStack(S.ThrashBearDebuff) < 4 and S.FlashingClaws:TalentRank() == 1 or Target:DebuffStack(S.ThrashBearDebuff) < 3 and not S.FlashingClaws:IsAvailable())
 end
 
 --- ===== Rotation Functions =====
@@ -133,7 +133,7 @@ local function Precombat()
   end
   -- Manually added: thrash_bear
   if S.ThrashBear:IsCastable() and IsInAoERange then
-    if Cast(S.Thrash) then return "thrash precombat 12"; end
+    if Cast(S.ThrashBear) then return "thrash precombat 12"; end
   end
   -- Manually added: mangle
   if S.Mangle:IsCastable() and IsInMeleeRange then
@@ -180,7 +180,7 @@ local function Bear()
   end
   -- thrash_bear,target_if=refreshable|(dot.thrash_bear.stack<5&talent.flashing_claws.rank=2|dot.thrash_bear.stack<4&talent.flashing_claws.rank=1|dot.thrash_bear.stack<3&!talent.flashing_claws.enabled)
   if S.ThrashBear:IsCastable() then
-    if Everyone.CastCycle(S.Thrash, Enemies8y, EvaluateCycleThrash, not IsInAoERange) then return "thrash bear 8"; end
+    if Everyone.CastCycle(S.ThrashBear, Enemies8y, EvaluateCycleThrash, not IsInAoERange) then return "thrash bear 8"; end
   end
   -- bristling_fur,if=!cooldown.pause_action.remains&cooldown.rage_of_the_sleeper.remains>8
   -- Note: Handled in Defensives().
@@ -220,7 +220,7 @@ local function Bear()
   end
   -- thrash_bear,if=active_enemies>=5&talent.lunar_calling.enabled
   if S.ThrashBear:IsCastable() and (Enemies8yCount >= 5 and S.LunarCalling:IsAvailable()) then
-    if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash bear 26"; end
+    if Cast(S.ThrashBear, nil, nil, not IsInAoERange) then return "thrash bear 26"; end
   end
   -- ironfur,target_if=!debuff.tooth_and_claw.up,if=!buff.ironfur.up&rage>50&!cooldown.pause_action.remains&variable.If_build=0&!buff.rage_of_the_sleeper.up|rage>90&variable.If_build=0|!debuff.tooth_and_claw.up&!buff.ironfur.up&rage>50&!cooldown.pause_action.remains&variable.If_build=0&!buff.rage_of_the_sleeper.up
   if S.Ironfur:IsReady() and (Player:BuffDown(S.IronfurBuff) and Player:Rage() > 50 and IsTanking and not VarIFBuild and Player:BuffDown(S.RageoftheSleeper) or Player:Rage() > 90 and not VarIFBuild or Player:BuffDown(S.ToothandClawBuff) and Player:BuffDown(S.IronfurBuff) and Player:Rage() > 50 and IsTanking and not VarIFBuild and Player:BuffDown(S.RageoftheSleeper)) then
@@ -280,7 +280,7 @@ local function Bear()
   end
   -- thrash_bear,if=active_enemies>=5
   if S.ThrashBear:IsCastable() and (Enemies8yCount >= 5) then
-    if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash bear 56"; end
+    if Cast(S.ThrashBear, nil, nil, not IsInAoERange) then return "thrash bear 56"; end
   end
   -- mangle,if=(buff.incarnation.up&active_enemies<=4)|(buff.incarnation.up&talent.soul_of_the_forest.enabled&active_enemies<=5)|((rage<88)&active_enemies<11)|((rage<83)&active_enemies<11&talent.soul_of_the_forest.enabled)
   if S.Mangle:IsCastable() and ((Player:BuffUp(S.Incarnation) and Enemies8yCount <= 4) or (Player:BuffUp(S.Incarnation) and S.SouloftheForest:IsAvailable() and Enemies8yCount <= 5) and ((Player:Rage() < 88) and Enemies8yCount < 11) or ((Player:Rage() < 83) and Enemies8yCount < 11 and S.SouloftheForest:IsAvailable())) then
@@ -288,7 +288,7 @@ local function Bear()
   end
   -- thrash_bear,if=active_enemies>1
   if S.ThrashBear:IsCastable() and (Enemies8yCount > 1) then
-    if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash bear 60"; end
+    if Cast(S.ThrashBear, nil, nil, not IsInAoERange) then return "thrash bear 60"; end
   end
   -- pulverize,target_if=dot.thrash_bear.stack>2
   if S.Pulverize:IsReady() then
@@ -296,7 +296,7 @@ local function Bear()
   end
   -- thrash_bear
   if S.ThrashBear:IsCastable() then
-    if Cast(S.Thrash, nil, nil, not IsInAoERange) then return "thrash bear 64"; end
+    if Cast(S.ThrashBear, nil, nil, not IsInAoERange) then return "thrash bear 64"; end
   end
   -- moonfire,if=buff.galactic_guardian.up&buff.bear_form.up&talent.boundless_moonlight.enabled
   if S.Moonfire:IsCastable() and (Player:BuffUp(S.GalacticGuardianBuff) and Player:BuffUp(S.BearForm) and S.BoundlessMoonlight:IsAvailable()) then

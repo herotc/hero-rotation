@@ -58,7 +58,6 @@ Spell.Druid.Commons = {
   Starsurge                             = MultiSpell(78674,197626),
   Sunfire                               = Spell(93402),
   SurvivalInstincts                     = Spell(61336),
-  Thrash                                = MultiSpell(77758,106830),
   ThrashBear                            = Spell(77758),
   ThrashCat                             = Spell(106830),
   WildCharge                            = MultiSpell(16979,49376),
@@ -73,7 +72,8 @@ Spell.Druid.Commons = {
   RakeDebuff                            = Spell(155722),
   RipDebuff                             = Spell(1079),
   SunfireDebuff                         = Spell(164815),
-  ThrashDebuff                          = MultiSpell(106830,192090),
+  ThrashBearDebuff                      = Spell(192090),
+  ThrashCatDebuff                       = Spell(405233),
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -226,7 +226,6 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   AdaptiveSwarmHeal                     = Spell(391891),
   DireFixationDebuff                    = Spell(417713),
   LIMoonfireDebuff                      = Spell(155625),
-  ThrashDebuff                          = Spell(405233),
 })
 Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Feral, Spell.Druid.DruidoftheClaw)
 Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Feral, Spell.Druid.Wildstalker)
