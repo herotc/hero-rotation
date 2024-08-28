@@ -38,8 +38,7 @@ local I = Item.DeathKnight.Frost
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.AlgetharPuzzleBox:ID(),
-  I.Fyralath:ID(),
+  I.TreacherousTransmitter:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -60,7 +59,6 @@ local VarTrinket1Range, VarTrinket2Range
 local VarTrinket1CastTime, VarTrinket2CastTime
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1BL, VarTrinket2BL
-local VarTrinket1Exclude, VarTrinket2Exclude
 local VarTrinket1Sync, VarTrinket2Sync
 local VarTrinket1Buffs, VarTrinket2Buffs
 local VarTrinket1Duration, VarTrinket2Duration
@@ -113,9 +111,6 @@ local function SetTrinketVariables()
   VarTrinket1BL = T1.Blacklisted
   VarTrinket2BL = T2.Blacklisted
 
-  VarTrinket1Exclude = T1.ID == 193757 or T1.ID == 194301
-  VarTrinket2Exclude = T2.ID == 193757 or T2.ID == 194301
-
   VarTrinket1Sync = 0.5
   if Trinket1:HasUseBuff() and (S.PillarofFrost:IsAvailable() and not S.BreathofSindragosa:IsAvailable() and (VarTrinket1CD % VarPillarCD == 0) or S.BreathofSindragosa:IsAvailable() and (120 % VarTrinket1CD == 0)) then
     VarTrinket1Sync = 1
@@ -125,8 +120,8 @@ local function SetTrinketVariables()
     VarTrinket2Sync = 1
   end
 
-  VarTrinket1Buffs = Trinket1:HasCooldown() and Trinket1:HasUseBuff() and not VarTrinket1Exclude
-  VarTrinket2Buffs = Trinket2:HasCooldown() and Trinket2:HasUseBuff() and not VarTrinket2Exclude
+  VarTrinket1Buffs = Trinket1:HasCooldown() and Trinket1:HasUseBuff()
+  VarTrinket2Buffs = Trinket2:HasCooldown() and Trinket2:HasUseBuff()
 
   -- Note: If BuffDuration is 0, set variable to 1 instead to avoid divide by zero errors.
   VarTrinket1Duration = T1.ID == I.TreacherousTransmitter:ID() and 15 or (Trinket1:BuffDuration() > 0 and Trinket1:BuffDuration() or 1)
@@ -254,12 +249,10 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
-  -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon
-  -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(talent.pillar_of_frost&!talent.breath_of_sindragosa&(trinket.1.cooldown.duration%%cooldown.pillar_of_frost.duration=0)|talent.breath_of_sindragosa&(cooldown.breath_of_sindragosa.duration%%trinket.1.cooldown.duration=0))
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(talent.pillar_of_frost&!talent.breath_of_sindragosa&(trinket.2.cooldown.duration%%cooldown.pillar_of_frost.duration=0)|talent.breath_of_sindragosa&(cooldown.breath_of_sindragosa.duration%%trinket.2.cooldown.duration=0))
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_cooldown&(trinket.1.has_use_buff|trinket.1.has_buff.strength|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit)&!variable.trinket_1_exclude
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_cooldown&(trinket.2.has_use_buff|trinket.2.has_buff.strength|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit)&!variable.trinket_2_exclude
+  -- variable,name=trinket_1_buffs,value=trinket.1.has_cooldown&(trinket.1.has_use_buff|trinket.1.has_buff.strength|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit)
+  -- variable,name=trinket_2_buffs,value=trinket.2.has_cooldown&(trinket.2.has_use_buff|trinket.2.has_buff.strength|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit)
   -- variable,name=trinket_1_duration,op=setif,value=15,value_else=trinket.1.proc.any_dps.duration,condition=trinket.1.is.treacherous_transmitter
   -- variable,name=trinket_2_duration,op=setif,value=15,value_else=trinket.2.proc.any_dps.duration,condition=trinket.2.is.treacherous_transmitter
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs&(trinket.2.has_cooldown|!trinket.1.has_cooldown)|variable.trinket_2_buffs&((trinket.2.cooldown.duration%variable.trinket_2_duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync)*(1+((trinket.2.ilvl-trinket.1.ilvl)%100)))>((trinket.1.cooldown.duration%variable.trinket_1_duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync)*(1+((trinket.1.ilvl-trinket.2.ilvl)%100)))
@@ -697,12 +690,12 @@ local function Trinkets()
       if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter trinkets 2"; end
     end
     -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.pillar_of_frost.up|fight_remains<15
-    -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!talent.breath_of_sindragosa&buff.pillar_of_frost.remains>10|talent.breath_of_sindragosa)&(!buff.pillar_of_frost.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&(buff.breath_of_sindragosa.up&buff.pillar_of_frost.up|!talent.breath_of_sindragosa)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|variable.trinket_1_duration>=fight_remains
-    if Trinket1:IsReady() and not VarTrinket1BL and (VarTrinket1Buffs and not VarTrinket1Manual and (not S.BreathofSindragosa:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 or S.BreathofSindragosa:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and VarTrinket1CastTime > 0 or VarTrinket1CastTime == 0) and (Player:BuffUp(S.BreathofSindragosa) and Player:BuffUp(S.PillarofFrostBuff) or not S.BreathofSindragosa:IsAvailable()) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or VarTrinket1Duration >= FightRemains) then
+    -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!talent.breath_of_sindragosa&buff.pillar_of_frost.remains>10|talent.breath_of_sindragosa)&(!buff.pillar_of_frost.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&(buff.breath_of_sindragosa.up&buff.pillar_of_frost.up|!talent.breath_of_sindragosa)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|variable.trinket_1_duration>=fight_remains
+    if Trinket1:IsReady() and not VarTrinket1BL and (VarTrinket1Buffs and not VarTrinket1Manual and (not S.BreathofSindragosa:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 or S.BreathofSindragosa:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and VarTrinket1CastTime > 0 or VarTrinket1CastTime == 0) and (Player:BuffUp(S.BreathofSindragosa) and Player:BuffUp(S.PillarofFrostBuff) or not S.BreathofSindragosa:IsAvailable()) and (not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or VarTrinket1Duration >= FightRemains) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " trinkets 4"; end
     end
-    -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!talent.breath_of_sindragosa&buff.pillar_of_frost.remains>10|talent.breath_of_sindragosa)&(!buff.pillar_of_frost.up&trinket.2.cast_time>0|!trinket.2.cast_time>0)&(buff.breath_of_sindragosa.up&buff.pillar_of_frost.up|!talent.breath_of_sindragosa)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|variable.trinket_2_duration>=fight_remains
-    if Trinket2:IsReady() and not VarTrinket2BL and (VarTrinket2Buffs and not VarTrinket2Manual and (not S.BreathofSindragosa:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 or S.BreathofSindragosa:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and VarTrinket2CastTime > 0 or VarTrinket2CastTime == 0) and (Player:BuffUp(S.BreathofSindragosa) and Player:BuffUp(S.PillarofFrostBuff) or not S.BreathofSindragosa:IsAvailable()) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or VarTrinket2Duration >= FightRemains) then
+    -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!talent.breath_of_sindragosa&buff.pillar_of_frost.remains>10|talent.breath_of_sindragosa)&(!buff.pillar_of_frost.up&trinket.2.cast_time>0|!trinket.2.cast_time>0)&(buff.breath_of_sindragosa.up&buff.pillar_of_frost.up|!talent.breath_of_sindragosa)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|variable.trinket_2_duration>=fight_remains
+    if Trinket2:IsReady() and not VarTrinket2BL and (VarTrinket2Buffs and not VarTrinket2Manual and (not S.BreathofSindragosa:IsAvailable() and Player:BuffRemains(S.PillarofFrostBuff) > 10 or S.BreathofSindragosa:IsAvailable()) and (Player:BuffDown(S.PillarofFrostBuff) and VarTrinket2CastTime > 0 or VarTrinket2CastTime == 0) and (Player:BuffUp(S.BreathofSindragosa) and Player:BuffUp(S.PillarofFrostBuff) or not S.BreathofSindragosa:IsAvailable()) and (not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or VarTrinket2Duration >= FightRemains) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " trinkets 6"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(variable.damage_trinket_priority=1|(!trinket.2.has_cooldown|trinket.2.cooldown.remains))&((trinket.1.cast_time>0&!buff.pillar_of_frost.up|!trinket.1.cast_time>0)&(!variable.trinket_2_buffs|cooldown.pillar_of_frost.remains>20)|!talent.pillar_of_frost)|fight_remains<15
@@ -715,10 +708,11 @@ local function Trinkets()
     end
   end
   -- use_item,use_off_gcd=1,slot=main_hand,if=!equipped.fyralath_the_dreamrender&(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
+  -- Note: Removed from APL, but leaving in profile in case of MH on-use. Removing Fyralath check, though.
   if Settings.Commons.Enabled.Items then
-    local MHToUse, _, MHRange = Player:GetUseableItems(OnUseExcludes, 16)
-    if MHToUse and MHToUse:IsReady() and (not I.Fyralath:IsEquipped() and (not VarTrinket1Buffs or Trinket1:CooldownDown()) and (not VarTrinket2Buffs or Trinket2:CooldownDown())) then
-      if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(MHRange)) then return "Generic use_item for " .. MHToUse:Name() .. " trinkets 12"; end
+    local ItemToUse, _, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
+    if ItemToUse and ((not VarTrinket1Buffs or Trinket1:CooldownDown()) and (not VarTrinket2Buffs or Trinket2:CooldownDown())) then
+      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_item for " .. ItemToUse:Name() .. " trinkets 12"; end
     end
   end
 end
