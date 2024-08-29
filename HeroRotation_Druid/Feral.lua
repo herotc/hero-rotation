@@ -353,7 +353,7 @@ local function Precombat()
     if Cast(S.CatForm) then return "cat_form precombat 2"; end
   end
   -- prowl,if=!buff.prowl.up
-  if S.Prowl:IsCastable() then
+  if S.Prowl:IsReady() then
     if Cast(S.Prowl) then return "prowl precombat 4"; end
   end
   -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff
@@ -709,7 +709,7 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(S.SkullBash, Settings.CommonsDS.DisplayStyle.Interrupts, InterruptStuns); if ShouldReturn then return ShouldReturn; end
     -- prowl,if=buff.bs_inc.down&!buff.prowl.up
-    if S.Prowl:IsCastable() and (Player:BuffDown(BsInc) or not Player:AffectingCombat()) then
+    if S.Prowl:IsReady() and (Player:BuffDown(BsInc) or not Player:AffectingCombat()) then
       if Cast(S.Prowl) then return "prowl main 2"; end
     end
     -- cat_form,if=!buff.cat_form.up&!talent.fluid_form
