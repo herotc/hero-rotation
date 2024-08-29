@@ -643,13 +643,17 @@ local function SanFishing()
 end
 
 local function SanST()
+  -- any_dnd,if=!death_and_decay.ticking&talent.unholy_ground&cooldown.dark_transformation.remains<5
+  if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and S.UnholyGround:IsAvailable() and S.DarkTransformation:CooldownRemains() < 5) then
+    if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd san_st 1"; end
+  end
+  -- death_coil,if=buff.sudden_doom.react&buff.gift_of_the_sanlayn.remains&(talent.doomed_bidding|talent.rotten_touch)|rune<2&!buff.runic_corruption.up
+  if S.DeathCoil:IsReady() and (Player:BuffUp(S.SuddenDoomBuff) and Player:BuffUp(S.GiftoftheSanlaynBuff) and (S.DoomedBidding:IsAvailable() or S.RottenTouch:IsAvailable()) or Player:Rune() < 2 and Player:BuffDown(S.RunicCorruptionBuff)) then
+    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil san_st 2"; end
+  end
   -- wound_spender,if=buff.essence_of_the_blood_queen.remains<3&buff.vampiric_strike.react|talent.gift_of_the_sanlayn&buff.dark_transformation.up&buff.dark_transformation.remains<gcd
   if WoundSpender:IsReady() and (Player:BuffRemains(S.EssenceoftheBloodQueenBuff) < 3 and S.VampiricStrikeAction:IsLearned() or S.GiftoftheSanlayn:IsAvailable() and Pet:BuffUp(S.DarkTransformation) and Pet:BuffRemains(S.DarkTransformation) < Player:GCD()) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender san_st 2"; end
-  end
-  -- death_coil,if=buff.sudden_doom.react&buff.gift_of_the_sanlayn.remains&buff.essence_of_the_blood_queen.stack>=3&(talent.doomed_bidding|talent.rotten_touch)|rune<2&!buff.runic_corruption.up
-  if S.DeathCoil:IsReady() and (Player:BuffUp(S.SuddenDoomBuff) and Player:BuffUp(S.GiftoftheSanlaynBuff) and Player:BuffStack(S.EssenceoftheBloodQueenBuff) >= 3 and (S.DoomedBidding:IsAvailable() or S.RottenTouch:IsAvailable()) or Player:Rune() < 2 and Player:BuffDown(S.RunicCorruptionBuff)) then
-    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil san_st 4"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender san_st 4"; end
   end
   -- soul_reaper,if=target.health.pct<=35&!buff.gift_of_the_sanlayn.up&fight_remains>5
   if S.SoulReaper:IsReady() and (Target:HealthPercentage() <= 35 and Player:BuffDown(S.GiftoftheSanlaynBuff) and FightRemains > 5) then
@@ -909,8 +913,8 @@ local function APL()
     if AoEON() and ActiveEnemies >= 3 and not Player:DnDTicking() then
       local ShouldReturn = AoE(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=san_fishing,if=active_enemies=1&talent.gift_of_the_sanlayn&!buff.gift_of_the_sanlayn.up&buff.essence_of_the_blood_queen.remains<cooldown.dark_transformation.remains+2
-    if (ActiveEnemies == 1 or not AoEON()) and S.GiftoftheSanlayn:IsAvailable() and Player:BuffDown(S.GiftoftheSanlaynBuff) and Player:BuffRemains(S.EssenceoftheBloodQueenBuff) < S.DarkTransformation:CooldownRemains() + 2 then
+    -- run_action_list,name=san_fishing,if=active_enemies=1&talent.gift_of_the_sanlayn&!cooldown.dark_transformation.ready&!buff.gift_of_the_sanlayn.up&buff.essence_of_the_blood_queen.remains<cooldown.dark_transformation.remains+2
+    if (ActiveEnemies == 1 or not AoEON()) and S.GiftoftheSanlayn:IsAvailable() and S.DarkTransformation:CooldownDown() and Player:BuffDown(S.GiftoftheSanlaynBuff) and Player:BuffRemains(S.EssenceoftheBloodQueenBuff) < S.DarkTransformation:CooldownRemains() + 2 then
       local ShouldReturn = SanFishing(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SanFishing()"; end
     end
