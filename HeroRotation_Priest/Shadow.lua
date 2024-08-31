@@ -633,7 +633,7 @@ local function Main()
   end
   -- shadow_word_death,target_if=max:(target.health.pct<=20)*100+dot.devouring_plague.ticking,if=talent.depth_of_shadows
   if S.ShadowWordDeath:IsReady() and (S.DepthofShadows:IsAvailable()) then
-    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, EvaluateTargetIfFilterDPPlusHP, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 14"; end
+    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusHP, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 14"; end
   end
   -- mind_blast,target_if=max:dot.devouring_plague.remains,if=(cooldown.mind_blast.full_recharge_time<=gcd.max+execute_time|pet.fiend.remains<=execute_time+gcd.max)&pet.fiend.active&talent.inescapable_torment&pet.fiend.remains>=execute_time&active_enemies<=7&(!buff.mind_devourer.up|!talent.mind_devourer)&dot.devouring_plague.remains>execute_time&!variable.pooling_mindblasts
   if S.MindBlast:IsCastable() and ((S.MindBlast:FullRechargeTime() <= GCDMax + S.MindBlast:ExecuteTime() or FiendRemains <= S.MindBlast:ExecuteTime() + GCDMax) and FiendUp and S.InescapableTorment:IsAvailable() and FiendRemains >= S.MindBlast:ExecuteTime() and EnemiesCount10ySplash <= 7 and (Player:BuffDown(S.MindDevourerBuff) or not S.MindDevourer:IsAvailable()) and not VarPoolingMindblasts) then
