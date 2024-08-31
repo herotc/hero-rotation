@@ -234,7 +234,7 @@ Item.Warlock.Commons = {
   TimebreachingTalon                    = Item(193791, {13, 14}),
   VoidmendersShadowgem                  = Item(110007, {13, 14}),
   WhisperingIncarnateIcon               = Item(194301, {13, 14}),
-  -- DF Trinkets
+  -- DF Trinkets (used in 11.0+)
   TimeThiefsGambit                      = Item(207579, {13, 14}),
   -- TWW Trinkets
   AberrantSpellforge                    = Item(212451, {13, 14}),

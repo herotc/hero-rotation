@@ -123,20 +123,21 @@ local function SetTrinketVariables()
     VarTrinket2Sync = 1
   end
 
-  VarTrinket1Manual = VarTrinket1ID == 207172 or VarTrinket1ID == I.TimeThiefsGambit:ID() or VarTrinket1ID == I.SpymastersWeb:ID() or VarTrinket1ID == I.AberrantSpellforge:ID()
-  VarTrinket2Manual = VarTrinket2ID == 207172 or VarTrinket2ID == I.TimeThiefsGambit:ID() or VarTrinket2ID == I.SpymastersWeb:ID() or VarTrinket2ID == I.AberrantSpellforge:ID()
+  VarTrinket1Manual = VarTrinket1ID == I.SpymastersWeb:ID() or VarTrinket1ID == I.AberrantSpellforge:ID()
+  VarTrinket2Manual = VarTrinket2ID == I.SpymastersWeb:ID() or VarTrinket2ID == I.AberrantSpellforge:ID()
 
-  VarTrinket1Exclude = VarTrinket1ID == 193757 or VarTrinket1ID == 194301
-  VarTrinket2Exclude = VarTrinket2ID == 193757 or VarTrinket2ID == 194301
+  VarTrinket1Exclude = VarTrinket1ID == 193757
+  VarTrinket2Exclude = VarTrinket2ID == 193757
 
-  VarTrinket1BuffDuration = Trinket1:BuffDuration() + (num(VarTrinket1ID == 207581) * 20) + (num(VarTrinket1ID == 208615) * 2)
-  VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(VarTrinket2ID == 207581) * 20) + (num(VarTrinket2ID == 208615) * 2)
+  VarTrinket1BuffDuration = Trinket1:BuffDuration() + (num(VarTrinket1ID == 207581) * 20)
+  VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(VarTrinket2ID == 207581) * 20)
 
   -- Note: If BuffDuration is 0, set to 1 to avoid divide by zero errors.
   local T1BuffDur = VarTrinket1BuffDuration > 0 and VarTrinket1BuffDuration or 1
   local T2BuffDur = VarTrinket2BuffDuration > 0 and VarTrinket2BuffDuration or 1
+  -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%variable.trinket_2_buff_duration)*(1+0.5*trinket.2.has_buff.intellect)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%variable.trinket_1_buff_duration)*(1+0.5*trinket.1.has_buff.intellect)*(variable.trinket_1_sync))
   VarTrinketPriority = 1
-  if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((VarTrinket2CD / T2BuffDur) * (VarTrinket2Sync) * (1 - 0.5 * num(VarTrinket2ID == 207581 or VarTrinket2ID == 207167))) > ((VarTrinket1CD / T1BuffDur) * (VarTrinket1Sync) * (1 - 0.5 * (VarTrinket1ID == 207581 or VarTrinekt1ID == 207167))) then
+  if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((VarTrinket2CD / T2BuffDur) * (VarTrinket2Sync)) > ((VarTrinket1CD / T1BuffDur) * (VarTrinket1Sync)) then
     VarTrinketPriority = 2
   end
 end
@@ -297,13 +298,13 @@ local function Precombat()
   -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_1_buffs&(trinket.1.cooldown.duration%%cooldown.soul_rot.duration=0|cooldown.soul_rot.duration%%trinket.1.cooldown.duration=0)
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_2_buffs&(trinket.2.cooldown.duration%%cooldown.soul_rot.duration=0|cooldown.soul_rot.duration%%trinket.2.cooldown.duration=0)
-  -- variable,name=trinket_1_manual,value=trinket.1.is.belorrelos_the_suncaller|trinket.1.is.timethiefs_gambit|trinket.1.is.spymasters_web|trinket.1.is.aberrant_spellforge
-  -- variable,name=trinket_2_manual,value=trinket.2.is.belorrelos_the_suncaller|trinket.2.is.timethiefs_gambit|trinket.2.is.spymasters_web|trinket.2.is.aberrant_spellforge
-  -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon
-  -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
-  -- variable,name=trinket_1_buff_duration,value=trinket.1.proc.any_dps.duration+(trinket.1.is.mirror_of_fractured_tomorrows*20)+(trinket.1.is.nymues_unraveling_spindle*2)
-  -- variable,name=trinket_2_buff_duration,value=trinket.2.proc.any_dps.duration+(trinket.2.is.mirror_of_fractured_tomorrows*20)+(trinket.2.is.nymues_unraveling_spindle*2)
-  -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%variable.trinket_2_buff_duration)*(1+0.5*trinket.2.has_buff.intellect)*(variable.trinket_2_sync)*(1-0.5*(trinket.2.is.mirror_of_fractured_tomorrows|trinket.2.is.ashes_of_the_embersoul)))>((trinket.1.cooldown.duration%variable.trinket_1_buff_duration)*(1+0.5*trinket.1.has_buff.intellect)*(variable.trinket_1_sync)*(1-0.5*(trinket.1.is.mirror_of_fractured_tomorrows|trinket.1.is.ashes_of_the_embersoul)))
+  -- variable,name=trinket_1_manual,value=trinket.1.is.spymasters_web|trinket.1.is.aberrant_spellforge
+  -- variable,name=trinket_2_manual,value=trinket.2.is.spymasters_web|trinket.2.is.aberrant_spellforge
+  -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell
+  -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell
+  -- variable,name=trinket_1_buff_duration,value=trinket.1.proc.any_dps.duration+(trinket.1.is.mirror_of_fractured_tomorrows*20)
+  -- variable,name=trinket_2_buff_duration,value=trinket.2.proc.any_dps.duration+(trinket.2.is.mirror_of_fractured_tomorrows*20)
+  -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%variable.trinket_2_buff_duration)*(1+0.5*trinket.2.has_buff.intellect)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%variable.trinket_1_buff_duration)*(1+0.5*trinket.1.has_buff.intellect)*(variable.trinket_1_sync))
   -- Note: Trinket variables moved to variable declarations and PLAYER_EQUIPMENT_CHANGED registration.
   -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
   if S.GrimoireofSacrifice:IsCastable() then
@@ -377,7 +378,7 @@ local function oGCD()
   if S.BloodFury:IsCastable() and (VarCDsActive or BossFightRemains < 17 or SRTime) then
     if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury ogcd 6"; end
   end
-  -- invoke_external_buff,name=power_infusion,if=variable.cds_active&(trinket.1.is.nymues_unraveling_spindle&trinket.1.cooldown.remains|trinket.2.is.nymues_unraveling_spindle&trinket.2.cooldown.remains|!equipped.nymues_unraveling_spindle)
+  -- invoke_external_buff,name=power_infusion,if=variable.cds_active
   -- Note: Not handling external buffs
   -- fireblood,if=variable.cds_active|fight_remains<10|dot.soul_rot.ticking&time<20
   if S.Fireblood:IsCastable() and (VarCDsActive or BossFightRemains < 10 or SRTime) then
