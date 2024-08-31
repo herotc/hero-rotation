@@ -473,7 +473,7 @@ local function AoE()
   end
   -- drain_soul,cycle_targets=1,interrupt_global=1,if=talent.drain_soul&(talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3))|!talent.shadow_embrace
   if S.DrainSoul:IsReady() then
-    if Everyone.Castcycle(S.DrainSoul, Enemies40y, EvaluateCycleDrainSoul2, not Target:IsInRange(40)) then return "drain_soul aoe 28"; end
+    if Everyone.CastCycle(S.DrainSoul, Enemies40y, EvaluateCycleDrainSoul2, not Target:IsInRange(40)) then return "drain_soul aoe 28"; end
   end
   -- shadow_bolt,cycle_targets=1,if=buff.nightfall.react&talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)
   if S.ShadowBolt:IsReady() and (Player:BuffUp(S.NightfallBuff) and S.ShadowEmbrace:IsAvailable()) then
