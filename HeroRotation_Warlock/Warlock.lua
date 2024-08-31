@@ -54,9 +54,16 @@ Spell.Warlock.Diabolist = {
 }
 
 Spell.Warlock.Hellcaller = {
+  -- Talents
+  Malevolence                           = Spell(442726),
+  Wither                                = Spell(445468),
+  -- Debuffs
+  WitherDebuff                          = Spell(445474),
 }
 
 Spell.Warlock.SoulHarvester = {
+  -- Talents
+  DemonicSoul                           = Spell(449614),
 }
 
 Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
@@ -110,12 +117,14 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   AbsoluteCorruption                    = Spell(196103),
   CreepingDeath                         = Spell(264000),
   DrainSoul                             = Spell(198590),
+  DrainSoulTalent                       = Spell(388667),
   DreadTouch                            = Spell(389775),
   Haunt                                 = Spell(48181),
   InevitableDemise                      = Spell(334319),
   MaleficAffliction                     = Spell(389761),
   MaleficRapture                        = Spell(324536),
   Nightfall                             = Spell(108558),
+  Oblivion                              = Spell(417537),
   PhantomSingularity                    = Spell(205179),
   SowTheSeeds                           = Spell(196226),
   SeedofCorruption                      = Spell(27243),
@@ -207,7 +216,7 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Destruction, Spell.War
 -- Items
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Commons = {
-  -- Trinkets
+  -- DF Trinkets
   AshesoftheEmbersoul                   = Item(207167, {13, 14}),
   BeacontotheBeyond                     = Item(203963, {13, 14}),
   BelorrelostheSuncaller                = Item(207172, {13, 14}),
@@ -222,10 +231,14 @@ Item.Warlock.Commons = {
   RotcrustedVoodooDoll                  = Item(159624, {13, 14}),
   RubyWhelpShell                        = Item(193757, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
-  TimeThiefsGambit                      = Item(207579, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
   VoidmendersShadowgem                  = Item(110007, {13, 14}),
   WhisperingIncarnateIcon               = Item(194301, {13, 14}),
+  -- DF Trinkets
+  TimeThiefsGambit                      = Item(207579, {13, 14}),
+  -- TWW Trinkets
+  AberrantSpellforge                    = Item(212451, {13, 14}),
+  SpymastersWeb                         = Item(220202, {13, 14}),
   -- Other Items
   Iridal                                = Item(208321, {16}),
 }

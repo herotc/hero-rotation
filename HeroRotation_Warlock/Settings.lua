@@ -45,6 +45,7 @@ HR.GUISettings.APL.Warlock = {
     }
   },
   Affliction = {
+    UseCleaveAPL = false,
     PotionType = {
       Selected = "Power",
     },
@@ -129,6 +130,7 @@ CreateARPanelOptions(CP_WarlockDS, "APL.Warlock.CommonsDS")
 CreateARPanelOptions(CP_WarlockOGCD, "APL.Warlock.CommonsOGCD")
 
 -- Affliction
+CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.UseCleaveAPL", "Force Cleave APL", "Force Cleave abilities, as per the Cleave APL option in Simulationcraft.")
 CreateARPanelOptions(CP_Affliction, "APL.Warlock.Affliction")
 
 -- Demonology

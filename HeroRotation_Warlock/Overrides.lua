@@ -78,7 +78,6 @@ AffOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
     elseif self == SpellAffli.UnstableAffliction then
       local UAUnit = SpellAffli.UnstableAfflictionDebuff:AuraActiveUnits()[1]
       local UARemains = 0
-      -- Pandemic values from Icy Veins' guide.
       local Pandemic = SpellAffli.CreepingDeath:IsAvailable() and 5.4 or 6.3
       if UAUnit then
         UARemains = UAUnit:DebuffRemains(SpellAffli.UnstableAfflictionDebuff)
@@ -87,7 +86,7 @@ AffOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
     elseif self == SpellAffli.SeedofCorruption or self == SpellAffli.Haunt then
       return BaseCheck and not Player:IsCasting(self) and not self:InFlight()
     elseif self == SpellAffli.MaleficRapture then
-      return BaseCheck and (Target:DebuffUp(SpellAffli.CorruptionDebuff) or Target:DebuffUp(SpellAffli.AgonyDebuff) or Target:DebuffUp(SpellAffli.UnstableAfflictionDebuff) or Target:DebuffUp(SpellAffli.SiphonLifeDebuff) or Target:DebuffUp(SpellAffli.HauntDebuff) or Target:DebuffUp(SpellAffli.SoulRotDebuff) or Target:DebuffUp(SpellAffli.VileTaintDebuff))
+      return BaseCheck and Player:SoulShardsP() > 0 and (Target:DebuffUp(SpellAffli.CorruptionDebuff) or Target:DebuffUp(SpellAffli.WitherDebuff) or Target:DebuffUp(SpellAffli.AgonyDebuff) or Target:DebuffUp(SpellAffli.UnstableAfflictionDebuff) or Target:DebuffUp(SpellAffli.SiphonLifeDebuff) or Target:DebuffUp(SpellAffli.HauntDebuff) or Target:DebuffUp(SpellAffli.SoulRotDebuff) or Target:DebuffUp(SpellAffli.VileTaintDebuff))
     else
       return BaseCheck
     end
