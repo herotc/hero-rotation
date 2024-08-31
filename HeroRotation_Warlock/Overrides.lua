@@ -134,6 +134,22 @@ AffOldBuffRemains = HL.AddCoreOverride ("Player.BuffRemains",
   end
 , 265)
 
+local AffOldDebuffUp
+AffOldDebuffUp = HL.AddCoreOverride ("Target.DebuffUp",
+  function (self, Spell, AnyCaster, BypassRecovery)
+    local BaseCheck = AffOldDebuffUp(self, Spell, AnyCaster, BypassRecovery)
+    if Spell == SpellAffli.UnstableAfflictionDebuff then
+      return BaseCheck or Player:IsCasting(SpellAffli.UnstableAffliction)
+    elseif Spell == SpellAffli.HauntDebuff then
+      return BaseCheck or Player:IsCasting(SpellAffli.Haunt)
+    elseif Spell == SpellAffli.VileTaintDebuff then
+      return BaseCheck or Player:IsCasting(SpellAffli.VileTaint)
+    else
+      return BaseCheck
+    end
+  end
+, 265)
+
 -- Demonology, ID: 266
 HL.AddCoreOverride ("Player.SoulShardsP",
   function ()
