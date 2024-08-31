@@ -443,7 +443,7 @@ local function AoE()
   end
   -- wither,target_if=min:remains,if=remains<5&!talent.seed_of_corruption
   if S.Wither:IsReady() and (not S.SeedofCorruption:IsAvailable()) then
-    if Everyone.CastTargetIf(S.Wither, Enemies40y, "min", EvaluateTargetIfFilterWither, EvaluateTargetIfWither, not Target:IsSpellInRange(S.Wither)) then return "wither aoe 20"; end
+    if Everyone.CastTargetIf(S.Wither, Enemies40y, "min", EvaluateTargetIfFilterWither, EvaluateTargetIfWither, not Target:IsInRange(40)) then return "wither aoe 20"; end
   end
   -- summon_darkglare,if=variable.ps_up&variable.vt_up&variable.sr_up|cooldown.invoke_power_infusion_0.duration>0&cooldown.invoke_power_infusion_0.up&!talent.soul_rot
   -- Note: Not handling Power Infusion
@@ -516,7 +516,7 @@ local function Cleave()
   end
   -- wither,target_if=min:remains,if=remains<5&!(action.seed_of_corruption.in_flight|dot.seed_of_corruption.remains>0)&fight_remains>5
   if S.Wither:IsReady() and (FightRemains > 5) then
-    if Everyone.CastTargetIf(S.Wither, Enemies40y, "min", EvaluateTargetIfFilterWither, EvaluateTargetIfWither2, not Target:IsSpellInRange(S.Wither)) then return "wither cleave 14"; end
+    if Everyone.CastTargetIf(S.Wither, Enemies40y, "min", EvaluateTargetIfFilterWither, EvaluateTargetIfWither2, not Target:IsInRange(40)) then return "wither cleave 14"; end
   end
   -- corruption,target_if=min:remains,if=remains<5&!(action.seed_of_corruption.in_flight|dot.seed_of_corruption.remains>0)&fight_remains>5
   if S.Corruption:IsReady() and (FightRemains > 5) then
@@ -564,7 +564,7 @@ local function Cleave()
   end
   -- wither,target_if=refreshable
   if S.Wither:IsCastable() then
-    if Everyone.CastCycle(S.Wither, Enemies40y, EvaluateCycleWitherRefreshable, not Target:IsSpellInRange(S.Wither)) then return "wither cleave 32"; end
+    if Everyone.CastCycle(S.Wither, Enemies40y, EvaluateCycleWitherRefreshable, not Target:IsInRange(40)) then return "wither cleave 32"; end
   end
   -- corruption,target_if=refreshable
   if S.Corruption:IsCastable() then
@@ -714,7 +714,7 @@ local function APL()
     end
     -- wither,if=talent.wither&(talent.absolute_corruption&remains<3|!talent.absolute_corruption&remains<5)&fight_remains>dot.wither.remains+5
     if S.Wither:IsReady() and ((S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.WitherDebuff) < 3 or not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.WitherDebuff) < 5) and FightRemains > Target:DebuffRemains(S.WitherDebuff) + 5) then
-      if Cast(S.Wither, nil, nil, not Target:IsSpellInRange(S.Wither)) then return "wither main 10"; end
+      if Cast(S.Wither, nil, nil, not Target:IsInRange(40)) then return "wither main 10"; end
     end
     -- corruption,if=refreshable&fight_remains>dot.corruption.remains+5
     if S.Corruption:IsReady() and (Target:DebuffRefreshable(S.CorruptionDebuff) and FightRemains > Target:DebuffRemains(S.CorruptionDebuff) + 5) then
