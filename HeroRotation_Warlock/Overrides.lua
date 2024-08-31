@@ -93,6 +93,18 @@ AffOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
   end
 , 265)
 
+local AffOldSpellIsAvailable
+AffOldSpellIsAvailable = HL.AddCoreOverride ("Spell.IsAvailable",
+  function (self, CheckPet)
+    local BaseCheck = AffOldSpellIsAvailable(self, CheckPet)
+    if self == SpellAffli.Wither then
+      return self:IsLearned()
+    else
+      return BaseCheck
+    end
+  end
+, 265)
+
 local AffOldBuffUp
 AffOldBuffUp = HL.AddCoreOverride ("Player.BuffUp",
   function (self, Spell, AnyCaster, BypassRecovery)
