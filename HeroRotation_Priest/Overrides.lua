@@ -67,6 +67,8 @@ OldShadowIsReady = HL.AddCoreOverride("Spell.IsReady",
     local BaseCheck = OldShadowIsReady(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellShadow.MindSpikeInsanity then
       return BaseCheck and (Player:BuffStack(SpellShadow.MindSpikeInsanityBuff) - num(Player:IsCasting(SpellShadow.MindSpikeInsanity)) > 0)
+    elseif self == SpellShadow.Halo then
+      return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
     end
