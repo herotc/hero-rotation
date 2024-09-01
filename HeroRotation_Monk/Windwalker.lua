@@ -160,7 +160,7 @@ end
 
 --- ===== CastTargetIf Condition Functions =====
 local function EvaluateTargetIfInvokeXuenCDs(TargetUnit)
-  return (TargetUnit:TimeToDie() > 14 and not Player:IsInDungeonArea() or TargetUnit:TimeToDie() > 22) and (EnemiesCount8y > 2 or TargetUnit:DebuffUp(S.AcclamationDebuff))
+  return (Target:TimeToDie() > 14 and not Player:IsInDungeonArea() or Target:TimeToDie() > 22) and (EnemiesCount8y > 2 or Target:DebuffUp(S.AcclamationDebuff) or not S.OrderedElements:IsAvailable() and HL.CombatTime() < 5)
 end
 
 local function EvaluateTargetIfTigerPalmCDs(TargetUnit)
@@ -246,8 +246,8 @@ local function Cooldowns()
   if S.TigerPalm:IsReady() and (S.InvokeXuenTheWhiteTiger:CooldownUp() and (Player:Chi() < 5 and not S.OrderedElements:IsAvailable() or Player:Chi() < 3) and (ComboStrike(S.TigerPalm) or not S.HitCombo:IsAvailable())) then
     if Everyone.CastTargetIf(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfTigerPalmCDs, not Target:IsInMeleeRange(5)) then return "tiger_palm cooldowns 2"; end
   end
-  -- invoke_xuen_the_white_tiger,target_if=max:target.time_to_die,if=cooldown.storm_earth_and_fire.ready&(target.time_to_die>14&!fight_style.dungeonroute|target.time_to_die>22)&(active_enemies>2|debuff.acclamation.up)&(chi>2&talent.ordered_elements|chi>5|chi>3&energy<50|energy<50&active_enemies=1)|fight_remains<30
-  if S.InvokeXuenTheWhiteTiger:IsCastable() and (S.StormEarthAndFire:CooldownUp() and (Player:Chi() > 2 and S.OrderedElements:IsAvailable() or Player:Chi() > 5 or Player:Chi() > 3 and Player:Energy() < 50 or Player:Energy() < 50 and EnemiesCount8y == 1) or BossFightRemains < 30) then
+  -- invoke_xuen_the_white_tiger,target_if=max:target.time_to_die,if=(fight_style.DungeonSlice&active_enemies=1&time<10|!fight_style.dungeonslice|active_enemies>1)&cooldown.storm_earth_and_fire.ready&(target.time_to_die>14&!fight_style.dungeonroute|target.time_to_die>22)&(active_enemies>2|debuff.acclamation.up|!talent.ordered_elements&time<5)&(chi>2&talent.ordered_elements|chi>5|chi>3&energy<50|energy<50&active_enemies=1|prev.tiger_palm&!talent.ordered_elements&time<5)|fight_remains<30
+  if S.InvokeXuenTheWhiteTiger:IsCastable() and ((Player:IsInDungeonArea() and EnemiesCount8y == 1 and HL.CombatTime() < 10 or not Player:IsInDungeonArea() or EnemiesCount8y > 1) and S.StormEarthAndFire:CooldownUp() and (Player:Chi() > 2 and S.OrderedElements:IsAvailable() or Player:Chi() > 5 or Player:Chi() > 3 and Player:Energy() < 50 or Player:Energy() < 50 and EnemiesCount8y == 1 or Player:PrevGCD(1, S.TigerPalm) and not S.OrderedElements:IsAvailable() and HL.CombatTime() < 5) or BossFightRemains < 30) then
     if Everyone.CastTargetIf(S.InvokeXuenTheWhiteTiger, Enemies8y, "max", EvaluateTargetIfFilterTTD, EvaluateTargetIfInvokeXuenCDs, not Target:IsInRange(40), Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger) then return "invoke_xuen_the_white_tiger cooldowns 4"; end
   end
   -- storm_earth_and_fire,if=(target.time_to_die>14&!fight_style.dungeonroute|target.time_to_die>22)&(active_enemies>2|cooldown.rising_sun_kick.remains|!talent.ordered_elements)&((buff.invokers_delight.up&!buff.bloodlust.up|buff.bloodlust.up&cooldown.storm_earth_and_fire.full_recharge_time<1)|cooldown.storm_earth_and_fire.full_recharge_time<cooldown.invoke_xuen_the_white_tiger.remains&!buff.bloodlust.up&(active_enemies>1|cooldown.strike_of_the_windlord.remains<2&(talent.flurry_strikes|buff.heart_of_the_jade_serpent.up))&(chi>3|chi>1&talent.ordered_elements)|cooldown.storm_earth_and_fire.full_recharge_time<10&(chi>3|chi>1&talent.ordered_elements))|fight_remains<30|prev.invoke_xuen_the_white_tiger
@@ -316,8 +316,8 @@ local function NormalOpener()
   if S.TigerPalm:IsReady() and (Player:Chi() < 6 and ComboStrike(S.TigerPalm)) then
     if Everyone.CastTargetIf(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm normal_opener 2"; end
   end
-  -- rising_sun_kick,target_if=max:debuff.acclamation.stack
-  if S.RisingSunKick:IsReady() then
+  -- rising_sun_kick,target_if=max:debuff.acclamation.stack,if=talent.ordered_elements
+  if S.RisingSunKick:IsReady() and (S.OrderedElements:IsAvailable()) then
     if Everyone.CastTargetIf(S.RisingSunKick, Enemies8y, "max", EvaluateTargetIfFilterAcclamation, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick normal_opener 4"; end
   end
 end
@@ -650,8 +650,8 @@ local function DefaultST()
       end
     end
   end
-  -- celestial_conduit,if=buff.storm_earth_and_fire.up&buff.ordered_elements.up&cooldown.strike_of_the_windlord.remains&(talent.xuens_bond|!talent.xuens_bond&buff.invokers_delight.up)|fight_remains<15
-  if S.CelestialConduit:IsReady() and (Player:BuffUp(S.StormEarthAndFireBuff) and Player:BuffUp(S.OrderedElementsBuff) and S.StrikeoftheWindlord:CooldownDown() and (S.XuensBond:IsAvailable() or not S.XuensBond:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff)) or BossFightRemains < 15) then
+  -- celestial_conduit,if=buff.storm_earth_and_fire.up&(!talent.ordered_elements|buff.ordered_elements.up)&cooldown.strike_of_the_windlord.remains&(talent.xuens_bond|!talent.xuens_bond&buff.invokers_delight.up)|fight_remains<15
+  if S.CelestialConduit:IsReady() and (Player:BuffUp(S.StormEarthAndFireBuff) and (not S.OrderedElements:IsAvailable() or Player:BuffUp(S.OrderedElementsBuff)) and S.StrikeoftheWindlord:CooldownDown() and (S.XuensBond:IsAvailable() or not S.XuensBond:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff)) or BossFightRemains < 15) then
     if Cast(S.CelestialConduit, nil, nil, not Target:IsInMeleeRange(15)) then return "celestial_conduit default_st 10"; end
   end
   -- rising_sun_kick,target_if=max:debuff.acclamation.stack,if=!pet.xuen_the_white_tiger.active&prev.tiger_palm&time<5|buff.storm_earth_and_fire.up&talent.ordered_elements
