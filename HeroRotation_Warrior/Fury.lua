@@ -33,7 +33,7 @@ local I = Item.Warrior.Fury
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- I.ItemName:ID(),
+  I.MarkofKhardros:ID(),
 }
 
 --- ===== GUI Settings =====
