@@ -278,14 +278,6 @@ local function Aoe()
   if CDsON() and S.ShiftingPower:IsCastable() and (S.CometStorm:CooldownRemains() > 10) then
     if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.ShiftingPower, not Target:IsInRange(18)) then return "shifting_power aoe 18"; end
   end
-  -- flurry,if=cooldown_react&!debuff.winters_chill.remains&buff.icicles.react=4&talent.glacial_spike&!freezable
-  if S.Flurry:IsCastable() and (RemainingWintersChill == 0 and Icicles == 4 and S.GlacialSpike:IsAvailable() and not Freezable()) then
-    if Cast(S.Flurry, Settings.Frost.GCDasOffGCD.Flurry, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 20"; end
-  end
-  -- glacial_spike,if=buff.icicles.react=5&cooldown.blizzard.remains>gcd.max
-  if S.GlacialSpike:IsReady() and (Icicles == 5 and S.Blizzard:CooldownRemains() > GCDMax) then
-    if Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike aoe 22"; end
-  end
   -- flurry,if=(freezable|!talent.glacial_spike)&cooldown_react&!debuff.winters_chill.remains&(buff.brain_freeze.react|!buff.fingers_of_frost.react)
   if S.Flurry:IsCastable() and ((not Freezable() or not S.GlacialSpike:IsAvailable()) and RemainingWintersChill == 0 and (Player:BuffUp(S.BrainFreezeBuff) or Player:BuffUp(S.FingersofFrostBuff))) then
     if Cast(S.Flurry, Settings.Frost.GCDasOffGCD.Flurry, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 24"; end
