@@ -197,6 +197,11 @@ local function EvaluateTargetIfFilterFrostStrike(TargetUnit)
   return (num(S.ShatteringBlade:IsAvailable() and TargetUnit:DebuffStack(S.RazoriceDebuff) == 5) * 5) + (TargetUnit:DebuffStack(S.RazoriceDebuff) + 1) / (TargetUnit:DebuffRemains(S.RazoriceDebuff) + 1) * num(UsingRazorice)
 end
 
+local function EvaluateTargetIfFilterObliterate(TargetUnit)
+  -- target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice+((hero_tree.deathbringer&debuff.reapers_mark_debuff.down)*5)
+  return (TargetUnit:DebuffStacks(S.RazoriceDebuff) + 1) / (TargetUnit:DebuffRemains(S.RazoriceDebuff) + 1) * num(UsingRazorice) + (num(Player:HeroTreeID() == 33 and Target:DebuffDown(S.ReapersMarkDebuff)) * 5)
+end
+
 local function EvaluateTargetIfFilterRazoriceStacks(TargetUnit)
   -- target_if=max:(debuff.razorice.stack)
   return TargetUnit:DebuffStack(S.RazoriceDebuff)
@@ -281,9 +286,9 @@ local function Precombat()
 end
 
 local function AoE()
-  -- obliterate,if=buff.killing_machine.react&talent.cleaving_strikes&buff.death_and_decay.up
+  -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice+((hero_tree.deathbringer&debuff.reapers_mark_debuff.down)*5),if=buff.killing_machine.react&talent.cleaving_strikes&buff.death_and_decay.up
   if S.Obliterate:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and S.CleavingStrikes:IsAvailable() and Player:BuffUp(S.DeathAndDecayBuff)) then
-    if Cast(S.Obliterate, nil, nil, not Target:IsInMeleeRange(5)) then return "obliterate aoe 2"; end
+    if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfFilterObliterate, nil, not Target:IsInMeleeRange(5)) then return "obliterate aoe 2"; end
   end
   -- howling_blast,target_if=!dot.frost_fever.ticking
   -- Note: Instead of iterating targets, checking AuraActiveCount.
@@ -330,9 +335,9 @@ local function Breath()
   if S.HornofWinter:IsReady() and (Player:Rune() < 2 and Player:RunicPowerDeficit() > 30 and (Player:BuffDown(S.EmpowerRuneWeaponBuff) or VarBreathDying)) then
     if Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornOfWinter) then return "horn_of_winter breath 4"; end
   end
-  -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=buff.killing_machine.react|runic_power.deficit>20
+  -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice+((hero_tree.deathbringer&debuff.reapers_mark_debuff.down)*5),if=buff.killing_machine.react|runic_power.deficit>20
   if S.Obliterate:IsReady() and (Player:BuffUp(S.KillingMachineBuff) or Player:RunicPowerDeficit() > 20) then
-    if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfFilterRazoriceStacksModified, nil, not Target:IsInMeleeRange(5)) then return "obliterate breath 6"; end
+    if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfFilterObliterate, nil, not Target:IsInMeleeRange(5)) then return "obliterate breath 6"; end
   end
   -- remorseless_winter,if=variable.breath_dying
   if S.RemorselessWinter:IsReady() and (VarBreathDying) then
@@ -511,10 +516,9 @@ local function HighPrioActions()
 end
 
 local function Obliteration()
-  -- obliterate,target_if=max:((talent.shattering_blade&debuff.razorice.stack=5)*5)+(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=buff.killing_machine.react&(buff.exterminate.up|buff.exterminate_painful_death.up|fight_remains<gcd*2)
-  -- Note: ETIF Filter is not a typo. It just happens to use the same target_if as frost_strike.
+  -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice+((hero_tree.deathbringer&debuff.reapers_mark_debuff.down)*5),if=buff.killing_machine.react&(buff.exterminate.up|buff.exterminate_painful_death.up|fight_remains<gcd*2)
   if S.Obliterate:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and (Player:BuffUp(S.ExterminateBuff) or Player:BuffUp(S.PainfulDeathBuff) or BossFightRemains < Player:GCD() * 2)) then
-    if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfFilterFrostStrike, nil, not Target:IsSpellInRange(S.Obliterate)) then return "obliterate obliteration 1"; end
+    if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfFilterObliterate, nil, not Target:IsSpellInRange(S.Obliterate)) then return "obliterate obliteration 1"; end
   end
   -- howling_blast,if=buff.killing_machine.react<2&buff.pillar_of_frost.remains<gcd&variable.rime_buffs
   if S.HowlingBlast:IsReady() and (Player:BuffStack(S.KillingMachineBuff) < 2 and Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() and VarRimeBuffs) then
