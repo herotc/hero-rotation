@@ -735,8 +735,6 @@ local function APL()
 end
 
 local function Init()
-  S.MarkofFyralathDebuff:RegisterAuraTracking()
-
   HR.Print("Fury Warrior rotation has been updated for patch 11.0.2.")
 end
 
