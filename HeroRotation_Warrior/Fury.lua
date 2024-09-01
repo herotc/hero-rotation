@@ -33,8 +33,7 @@ local I = Item.Warrior.Fury
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.AlgetharPuzzleBox:ID(),
-  I.Fyralath:ID(),
+  -- I.ItemName:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -596,14 +595,10 @@ local function Trinkets()
   end
   -- use_item,use_off_gcd=1,slot=main_hand,if=!equipped.fyralath_the_dreamrender&(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
   if Settings.Commons.Enabled.Items then
-    local MainHandOnUse, _, MainHandRange = Player:GetUseableItems(OnUseExcludes, 16)
-    if MainHandOnUse and (not I.Fyralath:IsEquipped() and (not VarTrinket1Buffs or Trinket1:CooldownDown()) and (not VarTrinket2Buffs or Trinket2:CooldownDown())) then
-      if Cast(MainHandOnUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(MainHandRange)) then return "use_item for "..MainHandOnUse:Name().." trinkets 12"; end
-    end
-    -- Note: Adding a generic use_items for non-trinkets/non-weapons
+    -- Note: Adding a generic use_items for non-trinkets instead.
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
-    if ItemToUse and ItemSlot ~= 16 then
-      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 14"; end
+    if ItemToUse then
+      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 12"; end
     end
   end
 end
