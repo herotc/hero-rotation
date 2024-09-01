@@ -86,6 +86,7 @@ Spell.Paladin.Lightsmith = {
   RiteofAdjuration                     = Spell(433583),
   RiteofSanctification                 = Spell(433568),
   -- Buffs
+  BlessedAssuranceBuff                 = Spell(433019),
   RiteofAdjurationBuff                 = Spell(433584),
   RiteofSanctificationBuff             = Spell(433550),
   SacredWeaponBuff                     = Spell(432502),
