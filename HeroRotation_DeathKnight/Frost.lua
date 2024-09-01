@@ -199,7 +199,7 @@ end
 
 local function EvaluateTargetIfFilterObliterate(TargetUnit)
   -- target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice+((hero_tree.deathbringer&debuff.reapers_mark_debuff.down)*5)
-  return (TargetUnit:DebuffStacks(S.RazoriceDebuff) + 1) / (TargetUnit:DebuffRemains(S.RazoriceDebuff) + 1) * num(UsingRazorice) + (num(Player:HeroTreeID() == 33 and Target:DebuffDown(S.ReapersMarkDebuff)) * 5)
+  return (TargetUnit:DebuffStack(S.RazoriceDebuff) + 1) / (TargetUnit:DebuffRemains(S.RazoriceDebuff) + 1) * num(UsingRazorice) + (num(Player:HeroTreeID() == 33 and Target:DebuffDown(S.ReapersMarkDebuff)) * 5)
 end
 
 local function EvaluateTargetIfFilterRazoriceStacks(TargetUnit)
