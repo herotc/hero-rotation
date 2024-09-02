@@ -338,14 +338,13 @@ local function Finish(ReturnSpellOnly)
 
   -- Crackshot builds use Between the Eyes outside of Stealth if we are unlikely to enter a Stealth window before the
   -- next BtE cast or if we are unlikely to lose Adrenaline Rush uptime by hitting BtE before the next cast of Vanish
-
   -- actions.finish+=/between_the_eyes,if=talent.crackshot&(cooldown.vanish.remains>45|talent.underhanded_upper_hand
   -- &talent.without_a_trace&(buff.adrenaline_rush.remains>10|buff.adrenaline_rush.down&cooldown.adrenaline_rush.remains>45))
   -- &(raid_event.adds.remains>8|raid_event.adds.in<raid_event.adds.remains|!raid_event.adds.up)
-  if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) then
+  if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and Settings.Outlaw.UseBtEOutsideOfStealth then
     if S.Crackshot:IsAvailable() and (S.Vanish:CooldownRemains() > 45 or S.UnderhandedUpperhand:IsAvailable()
       and S.WithoutATrace:IsAvailable() and (Player:BuffRemains(S.AdrenalineRush) > 10 or Player:BuffDown(S.AdrenalineRush)
-      and S.AdrenalineRush:CooldownRemains() > 45)) then
+      and S.AdrenalineRush:CooldownRemains() > 45)) and (HL.FilteredFightRemains(EnemiesBF, ">", 30)) then
         if CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
     end
   end
@@ -522,9 +521,9 @@ local function CDs ()
   end
 
   -- Use Roll the Bones if reroll conditions are met, or with no buffs, or seven seconds early if about to enter a Vanish window with Crackshot
-  -- actions.cds+=/roll_the_bones,if=variable.rtb_reroll|rtb_buffs=0|rtb_buffs.max_remains<=7&cooldown.vanish.ready&talent.crackshot
+  -- actions.cds+=/roll_the_bones,if=variable.rtb_reroll|rtb_buffs=0
   if S.RolltheBones:IsReady() then
-    if RtB_Reroll() or RtB_Buffs() == 0 or Cache.APLVar.RtB_Buffs.MaxRemains <= 8 and S.Vanish:CooldownRemains() <= 3 and S.Crackshot:IsAvailable() then
+    if RtB_Reroll() or RtB_Buffs() == 0 then
       if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then return "Cast Roll the Bones" end
     end
   end

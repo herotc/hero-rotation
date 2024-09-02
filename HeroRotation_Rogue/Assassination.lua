@@ -649,8 +649,10 @@ local function CDs ()
 
   -- actions.cds=variable,name=deathmark_ma_condition,value=!talent.master_assassin.enabled|dot.garrote.ticking
   -- actions.cds+=/variable,name=deathmark_kingsbane_condition,value=!talent.kingsbane|cooldown.kingsbane.remains<=2
-  -- actions.cds+=/variable,name=deathmark_condition,value=!stealthed.rogue&dot.rupture.ticking&buff.envenom.up&!debuff.deathmark.up&variable.deathmark_ma_condition&variable.deathmark_kingsbane_condition
-  local DeathmarkCondition = not Player:StealthUp(true, false) and Target:DebuffUp(S.Rupture) and Player:BuffUp(S.Envenom) and not S.Deathmark:AnyDebuffUp()
+  -- actions.cds+=/variable,name=deathmark_condition,value=!stealthed.rogue&buff.slice_and_dice.remains>5&dot.rupture.ticking
+  -- &buff.envenom.up&!debuff.deathmark.up&variable.deathmark_ma_condition&variable.deathmark_kingsbane_condition
+  local DeathmarkCondition = not Player:StealthUp(true, false) and Player:BuffRemains(S.SliceandDice) > 5 and Target:DebuffUp(S.Rupture)
+    and Player:BuffUp(S.Envenom) and not S.Deathmark:AnyDebuffUp()
     and (not S.MasterAssassin:IsAvailable() or Target:DebuffUp(S.Garrote))
     and (not S.Kingsbane:IsAvailable() or S.Kingsbane:CooldownRemains() <= 2)
 
@@ -687,8 +689,8 @@ local function CDs ()
 
   -- actions.cds+=/thistle_tea,if=!buff.thistle_tea.up&(((energy.deficit>=100+energy.regen_combined|charges>=3)
   -- &debuff.shiv.remains>=4)|spell_targets.fan_of_knives>=4&debuff.shiv.remains>=6)|fight_remains<charges*6
-  if S.ThistleTea:IsCastable() then
-    if not Player:BuffUp(S.ThistleTea) and (((Player:EnergyDeficit() >= 100 + EnergyRegenCombined
+  if S.ThistleTea:IsCastable() and not Player:BuffUp(S.ThistleTea) then
+    if  (((Player:EnergyDeficit() >= 100 + EnergyRegenCombined
       or S.ThistleTea:Charges() >= 3) and Target:DebuffRemains(S.ShivDebuff) >= 4) or MeleeEnemies10yCount >= 4 and Target:DebuffRemains(S.Shiv) >=6)
       or HL.BossFilteredFightRemains("<", S.ThistleTea:Charges() * 6) then
       if HR.Cast(S.ThistleTea, Settings.CommonsOGCD.OffGCDasOffGCD.ThistleTea) then return "Cast Thistle Tea" end
@@ -723,12 +725,45 @@ local function CDs ()
   end
 end
 
+local function Evaluate_Garrote_Target(TargetUnit)
+  return IsDebuffRefreshable(TargetUnit, S.Garrote) and TargetUnit:PMultiplier(S.Garrote) <= 1
+end
+
+local function Evaluate_Rupture_Target(TargetUnit)
+  RuptureDurationThreshold = 4 + BoolToInt(S.DashingScoundrel:IsAvailable()) * 5 + BoolToInt(EnergyRegenSaturated) * 6
+  return IsDebuffRefreshable(TargetUnit, S.Rupture, RuptureThreshold) and TargetUnit:PMultiplier(S.Rupture) <= 1
+    and (TargetUnit:FilteredTimeToDie(">", RuptureDurationThreshold, -TargetUnit:DebuffRemains(S.Rupture)) or TargetUnit:TimeToDieIsNotValid())
+end
+
+
+local function Core_Dot()
+  -- # Maintain Garrote
+  -- actions.core_dot=/garrote,if=combo_points.deficit>=1&(pmultiplier<=1)&refreshable&target.time_to_die-remains>12
+  if S.Garrote:IsCastable() and ComboPointsDeficit >= 1 then
+    if Evaluate_Garrote_Target(Target) and Rogue.CanDoTUnit(Target, GarroteDMGThreshold)
+      and (Target:FilteredTimeToDie(">", 12, -Target:DebuffRemains(S.Garrote)) or Target:TimeToDieIsNotValid()) then
+        if CastPooling(S.Garrote, nil, not TargetInMeleeRange) then return "Pool for Garrote (ST)" end
+    end
+  end
+
+  -- # Maintain Rupture unless darkest night is up
+  --actions.core_dot+=/rupture,if=effective_combo_points>=variable.effective_spend_cp&(pmultiplier<=1)
+  -- &refreshable&target.time_to_die-remains>(4+(talent.dashing_scoundrel*5)+(variable.regen_saturated*6))&!buff.darkest_night.up
+  if S.Rupture:IsReady() and ComboPoints >= EffectiveCPSpend and Player:BuffDown(S.DarkestNightBuff) then
+    if Evaluate_Rupture_Target(Target) and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
+      if CastPooling(S.Rupture, nil, nil, not TargetInMeleeRange) then return "Cast Rupture" end
+    end
+  end
+end
+
 -- # Damage over time abilities
-local function Dot ()
+local function AoE_Dot ()
+  local DotFinisherCondition = ComboPoints >= EffectiveCPSpend
+
   -- actions.dot+=/	crimson_tempest,target_if=min:remains,if=spell_targets>=3&refreshable&pmultiplier<=1
   --&effective_combo_points>=variable.effective_spend_cp&energy.regen_combined>25&target.time_to_die-remains>6
-  if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 3 and ComboPoints >= EffectiveCPSpend
-    and EnergyRegenCombined > 25 then
+  if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 3 and DotFinisherCondition
+    and EnergyRegenCombined > 25 and not S.Deathmark:IsReady() then
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       if IsDebuffRefreshable(CycleUnit, S.CrimsonTempest, CrimsonTempestThreshold)
         and CycleUnit:PMultiplier(S.CrimsonTempest) <= 1
@@ -738,41 +773,42 @@ local function Dot ()
     end
   end
 
-  -- actions.dot+=/garrote,if=combo_points.deficit>=1&(pmultiplier<=1)&refreshable&target.time_to_die-remains>12
-  -- actions.dot+=/garrote,cycle_targets=1,if=combo_points.deficit>=1&(pmultiplier<=1)&refreshable&!variable.regen_saturated&spell_targets.fan_of_knives>=2&target.time_to_die-remains>12
+  -- # Garrote upkeep, also uses it in AoE to reach energy saturation
+  -- actions.aoe_dot+=/garrote,cycle_targets=1,if=combo_points.deficit>=1&(pmultiplier<=1)&refreshable
+  -- &!variable.regen_saturated&target.time_to_die-remains>12
   if S.Garrote:IsCastable() and ComboPointsDeficit >= 1 then
-    local function Evaluate_Garrote_Target(TargetUnit)
-      return IsDebuffRefreshable(TargetUnit, S.Garrote) and TargetUnit:PMultiplier(S.Garrote) <= 1
-    end
-    if Evaluate_Garrote_Target(Target) and Rogue.CanDoTUnit(Target, GarroteDMGThreshold)
+    if Evaluate_Garrote_Target(Target) and not EnergyRegenSaturated
       and (Target:FilteredTimeToDie(">", 12, -Target:DebuffRemains(S.Garrote)) or Target:TimeToDieIsNotValid()) then
-      -- actions.dot+=/pool_resource,for_next=1
-      if CastPooling(S.Garrote, nil, not TargetInMeleeRange) then return "Pool for Garrote (ST)" end
-    end
-    if HR.AoEON() and not EnergyRegenSaturated and MeleeEnemies10yCount >= 2 then
-      SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, 12, MeleeEnemies5y)
+        SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, 12, MeleeEnemies5y)
     end
   end
 
-  -- actions.dot+=/rupture,if=effective_combo_points>=variable.effective_spend_cp&(pmultiplier<=1)&refreshable&target.time_to_die-remains>(4+(talent.dashing_scoundrel*5)+(variable.regen_saturated*6))&!buff.darkest_night.up
-  -- actions.dot+=/rupture,cycle_targets=1,if=effective_combo_points>=variable.effective_spend_cp&(pmultiplier<=1)&refreshable&(!variable.regen_saturated|!variable.scent_saturation)&target.time_to_die-remains>(4+(talent.dashing_scoundrel*5)+(variable.regen_saturated*6))&!buff.darkest_night.up
-  if S.Rupture:IsReady() and ComboPoints >= EffectiveCPSpend and Player:BuffDown(S.DarkestNightBuff) then
-    -- target.time_to_die-remains>(4+(talent.dashing_scoundrel*5)+(variable.regen_saturated*6))
+  -- # Rupture upkeep, also uses it in AoE to reach energy or scent of blood saturation
+  --actions.aoe_dot+=/rupture,cycle_targets=1,if=variable.dot_finisher_condition&refreshable&(!variable.regen_saturated
+  -- &(talent.scent_of_blood.rank=2|talent.scent_of_blood.rank<=1&(buff.indiscriminate_carnage.up|target.time_to_die-remains>15)))
+  -- &target.time_to_die-remains>(4+(talent.dashing_scoundrel*5)+(variable.regen_saturated*6))&!buff.darkest_night.up
+  if S.Rupture:IsReady() and DotFinisherCondition and Player:BuffDown(S.DarkestNightBuff) and HR.AoEON() then
     RuptureDurationThreshold = 4 + BoolToInt(S.DashingScoundrel:IsAvailable()) * 5 + BoolToInt(EnergyRegenSaturated) * 6
-    local function Evaluate_Rupture_Target(TargetUnit)
-      return IsDebuffRefreshable(TargetUnit, S.Rupture, RuptureThreshold) and TargetUnit:PMultiplier(S.Rupture) <= 1
-        and (TargetUnit:FilteredTimeToDie(">", RuptureDurationThreshold, -TargetUnit:DebuffRemains(S.Rupture)) or TargetUnit:TimeToDieIsNotValid())
+    if (not EnergyRegenSaturated and (S.ScentOfBlood:TalentRank() == 2 or S.ScentOfBlood:TalentRank() <= 1
+        and (Player:BuffUp(S.IndiscriminateCarnageBuff) or (Target:TimeToDie()-Target:DebuffRemains(S.Rupture)) > 15))) then
+          SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, RuptureDurationThreshold, MeleeEnemies5y)
     end
-    if Evaluate_Rupture_Target(Target) and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
-      if Cast(S.Rupture, nil, nil, not TargetInMeleeRange) then return "Cast Rupture" end
-    end
-    if HR.AoEON() and (not EnergyRegenSaturated or not ScentSaturated) then
+  end
+
+  --actions.aoe_dot+=/rupture,cycle_targets=1,if=variable.dot_finisher_condition&refreshable&variable.regen_saturated
+  -- &!variable.scent_saturation&target.time_to_die-remains>15&!buff.darkest_night.up
+  if S.Rupture:IsReady() and DotFinisherCondition and Player:BuffDown(S.DarkestNightBuff) and HR.AoEON()then
+    RuptureDurationThreshold = 4 + BoolToInt(S.DashingScoundrel:IsAvailable()) * 5 + BoolToInt(EnergyRegenSaturated) * 6
+    if (not EnergyRegenSaturated or not ScentSaturated) then
       SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, RuptureDurationThreshold, MeleeEnemies5y)
     end
   end
 
-  -- actions.dot+=/garrote,if=refreshable&combo_points.deficit>=1&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3)&(remains<=tick_time*2&spell_targets.fan_of_knives>=3)&(target.time_to_die-remains)>4&master_assassin_remains=0
-  if S.Garrote:IsCastable() and ComboPointsDeficit >= 1 and MasterAssassinRemains() <= 0
+  -- # Garrote as a special generator for the last CP before a finisher for edge case handling
+  -- actions.aoe_dot+=/garrote,if=refreshable&combo_points.deficit>=1&(pmultiplier<=1|remains<=tick_time
+  -- &spell_targets.fan_of_knives>=3)&(remains<=tick_time*2&spell_targets.fan_of_knives>=3)
+  -- &(target.time_to_die-remains)>4&master_assassin_remains=0
+  if S.Garrote:IsReady() and ComboPointsDeficit >= 1 and MasterAssassinRemains() <= 0
     and (Target:PMultiplier(S.Garrote) <= 1 or Target:DebuffRemains(S.Garrote) < BleedTickTime and MeleeEnemies10yCount >= 3)
     and (Target:DebuffRemains(S.Garrote) < BleedTickTime * 2 and MeleeEnemies10yCount >= 3)
     and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Garrote)) or Target:TimeToDieIsNotValid()) then
@@ -826,13 +862,12 @@ local function Direct ()
     if Cast(S.EchoingReprimand, Settings.CommonsOGCD.GCDasOffGCD.EchoingReprimand, nil, not TargetInMeleeRange) then return "Cast Echoing Reprimand" end
   end
 
-  -- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking
-  -- &(!priority_rotation|dot.garrote.ticking|dot.rupture.ticking),if=variable.use_filler&spell_targets.fan_of_knives>=3
-
+  -- # Fan of Knives at 3+ targets or with clear the witnesses active without vicious venoms
   -- actions.direct+=/fan_of_knives,if=variable.use_filler&!priority_rotation&(spell_targets.fan_of_knives>=3
-  -- |buff.clear_the_witnesses.up)
+  -- |buff.clear_the_witnesses.up&!talent.vicious_venoms)
   if S.FanofKnives:IsCastable() then
-    if HR.AoEON() and not PriorityRotation and (MeleeEnemies10yCount >= 3 or Player:BuffUp(S.ClearTheWitnessesBuff)) then
+    if HR.AoEON() and not PriorityRotation and (MeleeEnemies10yCount >= 3 or Player:BuffUp(S.ClearTheWitnessesBuff)
+    and not S.ViciousVenoms:IsAvailable()) then
       if CastPooling(S.FanofKnives) then return "Cast Fan of Knives" end
     end
 
@@ -988,10 +1023,15 @@ local function APL ()
     ShouldReturn = CDs()
     if ShouldReturn then return ShouldReturn end
 
-    -- actions+=/call_action_list,name=dot
-    -- actions+=/call_action_list,name=aoe_dot,if=!variable.single_target
-    ShouldReturn = Dot()
+    -- actions+=/call_action_list,name=core_dot
+    ShouldReturn = Core_Dot()
     if ShouldReturn then return ShouldReturn end
+
+    -- actions+=/call_action_list,name=aoe_dot,if=!variable.single_target
+    if HR.AoEON() and not SingleTarget then
+      ShouldReturn = AoE_Dot()
+      if ShouldReturn then return ShouldReturn end
+    end
 
     -- actions+=/call_action_list,name=direct
     ShouldReturn = Direct()
