@@ -102,7 +102,8 @@ HR.GUISettings.APL.Rogue = {
       Vanish = true,
       Shadowmeld = true,
       ImprovedAdrenalineRush = true
-    }
+    },
+    UseBtEOutsideOfStealth = true
   },
   Subtlety = {
     EviscerateDMGOffset = 3, -- Used to compute the rupture threshold
@@ -165,6 +166,7 @@ CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.KillingSpreeDisplaySt
 CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.SpellQueueMacro.Vanish", "Stealth Combo - Vanish", "Allow suggesting Vanish stealth ability combos (recommended)")
 CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.SpellQueueMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)")
 CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.SpellQueueMacro.ImprovedAdrenalineRush", "Finisher Combo - Improved Adrenaline Rush", "Allow suggesting Improved Adrenaline Rush Finisher combos (recommended)")
+CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.UseBtEOutsideOfStealth", "Use Between The Eyes Out of Stealth", "Prevents Between the eyes being used outside of stealth (not recommended, this is a work around to avoid current bugs)")
 CreateARPanelOptions(CP_Outlaw, "APL.Rogue.Outlaw")
 
 -- Subtlety
