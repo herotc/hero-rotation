@@ -12,10 +12,47 @@ local Target = Unit.Target
 local Spell = HL.Spell
 local Item = HL.Item
 -- Lua
+-- WoW API
+local GetTime = GetTime
+local Delay = C_Timer.After
 -- File Locals
-
+HR.Commons.Warrior = {}
+local Warrior = HR.Commons.Warrior
 
 --- ============================ CONTENT ============================
+--- ===== Ravager Tracker =====
+Warrior.Ravager = {}
+
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local DestGUID, _, _, _, SpellID = select(8, ...)
+    -- Ravager damage dealt
+    if SpellID == 156287 then
+      -- If this is the first tick, remove the entry 15 seconds later.
+      if not Warrior.Ravager[DestGUID] then
+        Delay(15, function()
+            Warrior.Ravager[DestGUID] = nil
+          end
+        )
+      end
+      -- Record the tick time.
+      Warrior.Ravager[DestGUID] = GetTime()
+    end
+  end
+  , "SPELL_DAMAGE"
+)
+
+-- Remove the table entry upon unit death, if it still exists.
+HL:RegisterForCombatEvent(
+  function(...)
+    local DestGUID = select(8, ...)
+    if Warrior.Ravager[DestGUID] then
+      Warrior.Ravager[DestGUID] = nil
+    end
+  end
+  , "UNIT_DIED", "UNIT_DESTROYED"
+)
+
 --- ======= NON-COMBATLOG =======
 
 --- ======= COMBATLOG =======

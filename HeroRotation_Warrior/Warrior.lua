@@ -67,6 +67,7 @@ Spell.Warrior.Commons = {
   ThunderClap                           = Spell(6343),
   ThunderousRoar                        = Spell(384318),
   TitanicThrow                          = Spell(384090),
+  WarlordsTorment                       = Spell(390140),
   WreckingThrow                         = Spell(384110),
   -- Buffs
   AvatarBuff                            = Spell(107574),
@@ -77,6 +78,7 @@ Spell.Warrior.Commons = {
   -- Debuffs
   ChampionsMightDebuff                  = Spell(376080),
   MarkofFyralathDebuff                  = Spell(414532),
+  RavagerDebuff                         = Spell(228920), -- Dummy Debuff entry. Actually handled in Events.
   ThunderousRoarDebuff                  = Spell(397364),
   -- Pool
   Pool                                  = Spell(999910),
@@ -104,6 +106,8 @@ Spell.Warrior.Slayer = {
   SlayersDominance                      = Spell(444767),
   -- Buffs
   BrutalFinishBuff                      = Spell(446918),
+  ImminentDemiseBuff                    = Spell(445606),
+  OpportunistBuff                       = Spell(456120),
   -- Debuffs
   MarkedforExecutionDebuff              = Spell(445584),
 }
@@ -114,9 +118,11 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   Whirlwind                             = Spell(1680),
   -- Talents
   BlademastersTorment                   = Spell(390138),
+  Bloodletting                          = Spell(383154),
   Cleave                                = Spell(845),
   ColossusSmash                         = MultiSpell(167105, 262161),
   Dreadnaught                           = Spell(262150),
+  ExecutionersPrecision                 = Spell(386634),
   FervorofBattle                        = Spell(202316),
   Massacre                              = Spell(281001),
   MercilessBonegrinder                  = Spell(383317),
@@ -129,8 +135,12 @@ Spell.Warrior.Arms = MergeTableByKey(Spell.Warrior.Commons, {
   Warbreaker                            = Spell(262161),
   -- Buffs
   CollateralDamageBuff                  = Spell(334783),
+  JuggernautBuff                        = Spell(383290),
+  LethalBlowsBuff                       = Spell(455485), -- TWW S1 4pc
+  MartialProwessBuff                    = Spell(7384),
   MercilessBonegrinderBuff              = Spell(383316),
   StrikeVulnerabilitiesBuff             = Spell(394173),
+  SuddenDeathBuff                       = Spell(52437),
   SweepingStrikesBuff                   = Spell(260708),
   -- Debuffs
   ColossusSmashDebuff                   = Spell(208086),

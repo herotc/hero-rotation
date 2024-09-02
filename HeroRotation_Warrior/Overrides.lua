@@ -10,11 +10,13 @@ local Spell   = HL.Spell
 local Item    = HL.Item
 -- HeroRotation
 local HR      = HeroRotation
+local Warrior = HR.Commons.Warrior
 -- Spells
 local SpellFury             = Spell.Warrior.Fury
 local SpellArms             = Spell.Warrior.Arms
 local SpellProt             = Spell.Warrior.Protection
 -- Lua
+local GetTime = GetTime
 
 --- ============================ CONTENT ============================
 -- Arms, ID: 71
@@ -24,6 +26,28 @@ ArmsOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     local BaseCheck = ArmsOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellArms.Charge then
       return BaseCheck and (self:Charges() >= 1 and not Target:IsInRange(8) and Target:IsInRange(25))
+    else
+      return BaseCheck
+    end
+  end
+, 71)
+
+local ArmsOldDebuffUp
+ArmsOldDebuffUp = HL.AddCoreOverride ("Unit.DebuffUp",
+  function (self, Spell, AnyCaster, BypassRecovery)
+    local BaseCheck = ArmsOldDebuffUp(self, Spell, AnyCaster, BypassRecovery)
+    if Spell == SpellArms.RavagerDebuff then
+      HR.Print("Checking Target GUID: "..tostring(self:GUID()))
+      if Warrior.Ravager[self:GUID()] then
+        HR.Print("Target in table...")
+        HR.Print("Last tick time: "..tostring(Warrior.Ravager[self:GUID()]))
+        HR.Print("GetTime: "..tostring(GetTime()))
+        HR.Print("TickTime + 0.2: "..tostring(SpellArms.Ravager:TickTime() + 0.2))
+        -- Add 0.2s buffer to tick timer.
+        return Warrior.Ravager[self:GUID()] - GetTime() < SpellArms.Ravager:TickTime() + 0.2
+      else
+        return false
+      end
     else
       return BaseCheck
     end

@@ -33,8 +33,7 @@ local I = Item.Warrior.Arms
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.AlgetharPuzzleBox:ID(),
-  I.Fyralath:ID(),
+  I.MarkofKhardros:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -165,10 +164,6 @@ local function Precombat()
   if S.BattleShout:IsCastable() and Everyone.GroupBuffMissing(S.BattleShoutBuff) then
     if Cast(S.BattleShout, Settings.CommonsOGCD.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
   end
-  -- use_item,name=algethar_puzzle_box
-  if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() then
-    if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box precombat 4"; end
-  end
   -- battle_stance,toggle=on
   if S.BattleStance:IsCastable() and Player:BuffDown(S.BattleStance) then
     if Cast(S.BattleStance) then return "battle_stance precombat 6"; end
@@ -193,262 +188,675 @@ local function Precombat()
   end
 end
 
-local function Execute()
-  -- sweeping_strikes,if=active_enemies>1
-  if CDsON() and S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
-    if Everyone.CastTargetIf(S.SweepingStrikes, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes execute 2"; end
+local function ColossusST()
+  -- rend,if=dot.rend.remains<=gcd
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD()) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend colossus_st 2"; end
   end
   -- thunderous_roar
   if CDsON() and S.ThunderousRoar:IsCastable() then
-    if Everyone.CastTargetIf(S.ThunderousRoar, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(12), Settings.Arms.GCDasOffGCD.ThunderousRoar) then return "thunderous_roar execute 4"; end
+    if Everyone.CastTargetIf(S.ThunderousRoar, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(12), Settings.Arms.GCDasOffGCD.ThunderousRoar) then return "thunderous_roar colossus_st 4"; end
   end
   -- champions_spear
   if CDsON() and S.ChampionsSpear:IsCastable() then
-    if Everyone.CastTargetIf(S.ChampionsSpear, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsSpellInRange(S.ChampionsSpear), nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear) then return "champions_spear execute 6"; end
+    if Everyone.CastTargetIf(S.ChampionsSpear, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsSpellInRange(S.ChampionsSpear), nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear) then return "champions_spear colossus_st 6"; end
   end
-  -- skullsplitter
-  if S.Skullsplitter:IsCastable() then
-    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes execute 8"; end
+  -- ravager,if=cooldown.colossus_smash.remains<=gcd
+  if CDsON() and S.Ravager:IsCastable() and (S.ColossusSmash:CooldownRemains() <= Player:GCD()) then
+    if Everyone.CastTargetIf(S.Ravager, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(40), Settings.CommonsOGCD.GCDasOffGCD.Ravager) then return "ravager colossus_st 8"; end
   end
-  -- ravager
-  if S.Ravager:IsCastable() then
-    if Everyone.CastTargetIf(S.Ravager, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(40), Settings.CommonsOGCD.GCDasOffGCD.Ravager) then return "ravager execute 10"; end
-  end
-  -- avatar
+  -- avatar,if=raid_event.adds.in>15
   if CDsON() and S.Avatar:IsCastable() then
-    if Everyone.CastTargetIf(S.Avatar, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, false, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar execute 12"; end
+    if Everyone.CastTargetIf(S.Avatar, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, false, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar colossus_st 10"; end
   end
   -- colossus_smash
-  if CDsON() and S.ColossusSmash:IsCastable() then
-    if Everyone.CastTargetIf(S.ColossusSmash, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash execute 14"; end
-  end
-  -- warbreaker,if=raid_event.adds.in>22
-  if CDsON() and S.Warbreaker:IsCastable() then
-    if Everyone.CastTargetIf(S.Warbreaker, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.Arms.GCDasOffGCD.Warbreaker) then return "warbreaker execute 16"; end
-  end
-  -- mortal_strike,if=debuff.executioners_precision.stack=2
-  if S.MortalStrike:IsReady() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2) then
-    if Everyone.CastTargetIf(S.MortalStrike, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "mortal_strike execute 18"; end
-  end
-  -- overpower,if=rage<60
-  if S.Overpower:IsCastable() and (Player:Rage() < 60) then
-    if Everyone.CastTargetIf(S.Overpower, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "overpower execute 20"; end
-  end
-  -- execute
-  if S.Execute:IsReady() then
-    if Everyone.CastTargetIf(S.Execute, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "execute execute 22"; end
-  end
-  -- bladestorm
-  if CDsON() and S.Bladestorm:IsCastable() then
-    if Everyone.CastTargetIf(S.Bladestorm, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm) then return "bladestorm execute 24"; end
-  end
-  -- overpower
-  if S.Overpower:IsCastable() then
-    if Everyone.CastTargetIf(S.Overpower, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "overpower execute 26"; end
-  end
-end
-
-local function AoE()
-  -- cleave,if=buff.strike_vulnerabilities.down|buff.collateral_damage.up&buff.merciless_bonegrinder.up
-  if S.Cleave:IsReady() and (Player:BuffDown(S.StrikeVulnerabilitiesBuff) or Player:BuffUp(S.CollateralDamageBuff) and Player:BuffUp(S.MercilessBonegrinderBuff)) then
-    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave aoe 2"; end
-  end
-  -- thunder_clap,if=dot.rend.duration<3&active_enemies>=3
-  if S.ThunderClap:IsReady() and (Target:DebuffRemains(S.RendDebuff) < 3 and EnemiesCount8y >= 3) then
-    if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap aoe 4"; end
-  end
-  -- thunderous_roar
-  if CDsON() and S.ThunderousRoar:IsCastable() then
-    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar aoe 6"; end
-  end
-  -- avatar
-  if CDsON() and S.Avatar:IsCastable() then
-    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar aoe 8"; end
-  end
-  -- ravager,if=cooldown.sweeping_strikes.remains<=1|buff.sweeping_strikes.up
-  if S.Ravager:IsCastable() and (S.SweepingStrikes:CooldownRemains() <= 1 or Player:BuffUp(S.SweepingStrikesBuff)) then
-    if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager aoe 10"; end
-  end
-  -- sweeping_strikes
-  if S.SweepingStrikes:IsCastable() then
-    if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes aoe 12"; end
-  end
-  -- skullsplitter,if=buff.sweeping_strikes.up
-  if S.Skullsplitter:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
-    if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter aoe 14"; end
+  if S.ColossusSmash:IsCastable() then
+    if Everyone.CastTargetIf(S.ColossusSmash, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash colossus_st 12"; end
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
-    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not TargetInMeleeRange) then return "warbreaker aoe 16"; end
-  end
-  -- bladestorm,if=talent.unhinged|talent.merciless_bonegrinder
-  if S.Bladestorm:IsReady() and (S.Unhinged:IsAvailable() or S.MercilessBonegrinder:IsAvailable()) then
-    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm aoe 18"; end
-  end
-  -- champions_spear
-  if CDsON() and S.ChampionsSpear:IsCastable() then
-    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not Target:IsSpellInRange(S.ChampionsSpear)) then return "champions_spear aoe 20"; end
-  end
-  -- colossus_smash
-  if CDsON() and S.ColossusSmash:IsCastable() then
-    if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash aoe 22"; end
-  end
-  -- overpower,if=buff.sweeping_strikes.up&charges=2
-  if S.Overpower:IsCastable() and (Player:BuffUp(S.SweepingStrikes) and S.Overpower:Charges() == 2) then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower aoe 24"; end
-  end
-  -- cleave
-  if S.Cleave:IsReady() then
-    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave aoe 26"; end
-  end
-  -- mortal_strike,if=buff.sweeping_strikes.up
-  if S.MortalStrike:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff)) then
-    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike aoe 28"; end
-  end
-  -- overpower,if=buff.sweeping_strikes.up
-  if S.Overpower:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower aoe 30"; end
-  end
-  -- execute,if=buff.sweeping_strikes.up
-  if S.Execute:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff)) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute aoe 32"; end
-  end
-  -- bladestorm
-  if CDsON() and S.Bladestorm:IsCastable() then
-    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm aoe 34"; end
-  end
-  -- overpower
-  if S.Overpower:IsCastable() then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower aoe 36"; end
-  end
-  -- thunder_clap
-  if S.ThunderClap:IsReady() then
-    if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap aoe 38"; end
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker colossus_st 14"; end
   end
   -- mortal_strike
   if S.MortalStrike:IsReady() then
-    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike aoe 40"; end
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike colossus_st 16"; end
   end
-  -- execute
-  if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute aoe 42"; end
-  end
-  -- whirlwind
-  if S.Whirlwind:IsReady() then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind aoe 44"; end
-  end
-end
-
-local function SingleTarget()
-  -- thunder_clap,if=dot.rend.remains<=gcd&active_enemies>=2&buff.sweeping_strikes.down
-  if S.ThunderClap:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and EnemiesCount8y >= 2 and Player:BuffDown(S.SweepingStrikesBuff)) then
-    if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap single_target 2"; end
-  end
-  -- sweeping_strikes,if=active_enemies>1
-  if CDsON() and S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1) then
-    if Cast(S.SweepingStrikes, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes single_target 4"; end
-  end
-  -- rend,if=dot.rend.remains<=gcd
-  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD()) then
-    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend single_target 6"; end
-  end
-  -- thunderous_roar
-  if CDsON() and S.ThunderousRoar:IsCastable() then
-    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar single_target 8"; end
-  end
-  -- champions_spear
-  if CDsON() and S.ChampionsSpear:IsCastable() then
-    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not Target:IsSpellInRange(S.ChampionsSpear)) then return "champions_spear single_target 10"; end
-  end
-  -- ravager
-  if S.Ravager:IsCastable() then
-    if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager single_target 12"; end
-  end
-  -- avatar
-  if CDsON() and S.Avatar:IsCastable() then
-    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar single_target 14"; end
-  end
-  -- colossus_smash
-  if CDsON() and S.ColossusSmash:IsCastable() then
-    if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash single_target 16"; end
-  end
-  -- warbreaker
-  if CDsON() and S.Warbreaker:IsCastable() then
-    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker single_target 18"; end
-  end
-  -- cleave,if=active_enemies>=3
-  if S.Cleave:IsReady() and (EnemiesCount8y >= 3) then
-    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave single_target 20"; end
-  end
-  -- overpower,if=active_enemies>1&(buff.sweeping_strikes.up|talent.dreadnaught)&charges=2
-  if S.Overpower:IsCastable() and (EnemiesCount8y > 1 and (Player:BuffUp(S.SweepingStrikesBuff) or S.Dreadnaught:IsAvailable()) and S.Overpower:Charges() == 2) then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower single_target 22"; end
-  end
-  -- mortal_strike
-  if S.MortalStrike:IsReady() then
-    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike single_target 24"; end
+  -- demolish
+  if S.Demolish:IsCastable() then
+    if Cast(S.Demolish, nil, nil, not TargetInMeleeRange) then return "demolish colossus_st 18"; end
   end
   -- skullsplitter
   if S.Skullsplitter:IsCastable() then
-    if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter single_target 26"; end
+    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_st 20"; end
+  end
+  -- overpower,if=charges=2
+  if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2) then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower colossus_st 22"; end
   end
   -- execute
   if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute execute 28"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute colossus_st 24"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower single_target 30"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower colossus_st 26"; end
   end
-  -- rend,if=dot.rend.remains<=8
-  if S.Rend:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= 8) then
-    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend single_target 32"; end
+  -- rend,if=dot.rend.remains<=gcd*5
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() * 5) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend colossus_st 28"; end
   end
-  -- cleave,if=active_enemies>=2&talent.fervor_of_battle
-  if S.Cleave:IsReady() and (EnemiesCount8y >= 2 and S.FervorofBattle:IsAvailable()) then
-    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave single_target 34"; end
+  -- slam
+  if S.Slam:IsCastable() then
+    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam colossus_st 30"; end
+  end
+end
+
+local function ColossusExecute()
+  -- sweeping_strikes,if=active_enemies=2
+  if S.SweepingStrikes:IsCastable() and (EnemiesCount8y == 2) then
+    if Cast(S.SweepingStrikes) then return "sweeping_strikes colossus_execute 2"; end
+  end
+  -- rend,if=dot.rend.remains<=gcd&!talent.bloodletting
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and not S.Bloodletting:IsAvailable()) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend colossus_execute 4"; end
+  end
+  -- thunderous_roar
+  if CDsON() and S.ThunderousRoar:IsCastable() then
+    if Everyone.CastTargetIf(S.ThunderousRoar, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(12), Settings.Arms.GCDasOffGCD.ThunderousRoar) then return "thunderous_roar colossus_execute 6"; end
+  end
+  -- champions_spear
+  if CDsON() and S.ChampionsSpear:IsCastable() then
+    if Everyone.CastTargetIf(S.ChampionsSpear, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsSpellInRange(S.ChampionsSpear), nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear) then return "champions_spear colossus_execute 8"; end
+  end
+  -- ravager,if=cooldown.colossus_smash.remains<=gcd
+  if CDsON() and S.Ravager:IsCastable() and (S.ColossusSmash:CooldownRemains() <= Player:GCD()) then
+    if Everyone.CastTargetIf(S.Ravager, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(40), Settings.CommonsOGCD.GCDasOffGCD.Ravager) then return "ravager colossus_execute 10"; end
+  end
+  -- avatar
+  if CDsON() and S.Avatar:IsCastable() then
+    if Everyone.CastTargetIf(S.Avatar, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, false, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar colossus_execute 12"; end
+  end
+  -- colossus_smash
+  if S.ColossusSmash:IsCastable() then
+    if Everyone.CastTargetIf(S.ColossusSmash, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash colossus_execute 14"; end
+  end
+  -- warbreaker
+  if S.Warbreaker:IsCastable() then
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker colossus_execute 16"; end
+  end
+  -- demolish,if=debuff.colossus_smash.up
+  if S.Demolish:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
+    if Cast(S.Demolish, nil, nil, not TargetInMeleeRange) then return "demolish colossus_execute 18"; end
+  end
+  -- mortal_strike,if=debuff.executioners_precision.stack=2&!dot.ravager.remains&(buff.lethal_blows.stack=2|!set_bonus.tww1_4pc)
+  if S.MortalStrike:IsReady() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Target:DebuffDown(S.RavagerDebuff) and (Player:BuffStack(S.LethalBlowsBuff) == 2 or not Player:HasTier("TWW1", 4))) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike colossus_execute 20"; end
+  end
+  -- execute,if=rage>=40
+  if S.Execute:IsReady() and (Player:Rage() >= 40) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute colossus_execute 22"; end
+  end
+  -- skullsplitter
+  if S.Skullsplitter:IsCastable() then
+    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_execute 24"; end
+  end
+  -- overpower
+  if S.Overpower:IsCastable() then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower colossus_execute 26"; end
+  end
+  -- bladestorm
+  if CDsON() and S.Bladestorm:IsCastable() then
+    if Everyone.CastTargetIf(S.Bladestorm, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm) then return "bladestorm colossus_execute 28"; end
+  end
+  -- execute
+  if S.Execute:IsReady() then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute colossus_execute 30"; end
+  end
+  -- mortal_strike
+  if S.MortalStrike:IsReady() then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike colossus_execute 32"; end
+  end
+end
+
+local function ColossusSweep()
+  -- sweeping_strikes
+  if CDsON() and S.SweepingStrikes:IsCastable() then
+    if Everyone.CastTargetIf(S.SweepingStrikes, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_sweep 2"; end
+  end
+  -- rend,if=dot.rend.remains<=gcd&buff.sweeping_strikes.up
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend colossus_sweep 4"; end
+  end
+  -- thunderous_roar
+  if CDsON() and S.ThunderousRoar:IsCastable() then
+    if Everyone.CastTargetIf(S.ThunderousRoar, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(12), Settings.Arms.GCDasOffGCD.ThunderousRoar) then return "thunderous_roar colossus_sweep 6"; end
+  end
+  -- champions_spear
+  if CDsON() and S.ChampionsSpear:IsCastable() then
+    if Everyone.CastTargetIf(S.ChampionsSpear, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsSpellInRange(S.ChampionsSpear), nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear) then return "champions_spear colossus_sweep 8"; end
+  end
+  -- ravager,if=cooldown.colossus_smash.ready
+  if CDsON() and S.Ravager:IsCastable() and (S.ColossusSmash:CooldownUp()) then
+    if Everyone.CastTargetIf(S.Ravager, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(40), Settings.CommonsOGCD.GCDasOffGCD.Ravager) then return "ravager colossus_sweep 10"; end
+  end
+  -- avatar
+  if CDsON() and S.Avatar:IsCastable() then
+    if Everyone.CastTargetIf(S.Avatar, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, false, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar colossus_sweep 12"; end
+  end
+  -- colossus_smash
+  if S.ColossusSmash:IsCastable() then
+    if Everyone.CastTargetIf(S.ColossusSmash, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash colossus_sweep 14"; end
+  end
+  -- warbreaker
+  if S.Warbreaker:IsCastable() then
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker colossus_sweep 16"; end
+  end
+  -- overpower,if=action.overpower.charges=2&talent.dreadnaught|buff.sweeping_strikes.up
+  if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2 and S.Dreadnaught:IsAvailable() or Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower colossus_sweep 18"; end
+  end
+  -- mortal_strike,if=buff.sweeping_strikes.up
+  if S.MortalStrike:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike colossus_sweep 20"; end
+  end
+  -- skullsplitter,if=buff.sweeping_strikes.up
+  if S.Skullsplitter:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_sweep 22"; end
+  end
+  -- demolish,if=buff.sweeping_strikes.up&debuff.colossus_smash.up
+  if S.Demolish:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff) and Target:DebuffUp(S.ColossusSmashDebuff)) then
+    if Cast(S.Demolish, nil, nil, not TargetInMeleeRange) then return "demolish colossus_sweep 24"; end
+  end
+  -- mortal_strike,if=buff.sweeping_strikes.down
+  if S.MortalStrike:IsReady() and (Player:BuffDown(S.SweepingStrikesBuff)) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike colossus_sweep 26"; end
+  end
+  -- demolish,if=buff.avatar.up|debuff.colossus_smash.up&cooldown.avatar.remains>=35
+  if S.Demolish:IsCastable() and (Player:BuffUp(S.AvatarBuff) or Target:DebuffUp(S.ColossusSmashDebuff) and S.AVatar:CooldownRemains() >= 35) then
+    if Cast(S.Demolish, nil, nil, not TargetInMeleeRange) then return "demolish colossus_sweep 28"; end
+  end
+  -- execute,if=buff.recklessness_warlords_torment.up|buff.sweeping_strikes.up
+  if S.Execute:IsReady() and (S.WarlordsTorment:IsAvailable() and S.Avatar:TimeSinceLastCast() < 6 or Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute colossus_sweep 30"; end
+  end
+  -- overpower,if=charges=2|buff.sweeping_strikes.up
+  if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2 or Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower colossus_sweep 32"; end
+  end
+  -- execute
+  if S.Execute:IsReady() then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute colossus_sweep 34"; end
+  end
+  -- thunder_clap,if=dot.rend.remains<=8&buff.sweeping_strikes.down
+  if S.ThunderClap:IsReady() and (Target:DebuffRemains(S.RendDebuff) < 8 and Player:BuffDown(S.SweepingStrikesBuff)) then
+    if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap colossus_sweep 36"; end
+  end
+  -- rend,if=dot.rend.remains<=5
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= 5) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend colossus_sweep 38"; end
+  end
+  -- cleave,if=talent.fervor_of_battle
+  if S.Cleave:IsReady() and (S.FervorofBattle:IsAvailable()) then
+    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave colossus_sweep 40"; end
+  end
+  -- whirlwind,if=talent.fervor_of_battle
+  if S.Whirlwind:IsReady() and (S.FervorofBattle:IsAvailable()) then
+    if Cast(S.Whirlwind, nil, nil, not TargetInMeleeRange) then return "whirlwind colossus_sweep 42"; end
   end
   -- slam
   if S.Slam:IsReady() then
-    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam single_target 36"; end
+    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam colossus_sweep 44"; end
+  end
+end
+
+local function ColossusAoE()
+  -- cleave,if=buff.collateral_damage.up&buff.merciless_bonegrinder.up
+  if S.Cleave:IsReady() and (Player:BuffUp(S.CollateralDamageBuff) and Player:BuffUp(S.MercilessBonegrinderBuff)) then
+    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave colossus_aoe 2"; end
+  end
+  -- thunder_clap,if=!dot.rend.remains
+  if S.ThunderClap:IsReady() and (Target:DebuffDown(S.RendDebuff)) then
+    if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap colossus_aoe 4"; end
+  end
+  -- thunderous_roar
+  if CDsON() and S.ThunderousRoar:IsCastable() then
+    if Everyone.CastTargetIf(S.ThunderousRoar, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(12), Settings.Arms.GCDasOffGCD.ThunderousRoar) then return "thunderous_roar colossus_aoe 6"; end
+  end
+  -- avatar
+  if CDsON() and S.Avatar:IsCastable() then
+    if Everyone.CastTargetIf(S.Avatar, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, false, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar colossus_aoe 8"; end
+  end
+  -- ravager
+  if CDsON() and S.Ravager:IsCastable() then
+    if Everyone.CastTargetIf(S.Ravager, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(40), Settings.CommonsOGCD.GCDasOffGCD.Ravager) then return "ravager colossus_aoe 10"; end
+  end
+  -- sweeping_strikes
+  if CDsON() and S.SweepingStrikes:IsCastable() then
+    if Everyone.CastTargetIf(S.SweepingStrikes, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_aoe 12"; end
+  end
+  -- skullsplitter,if=buff.sweeping_strikes.up
+  if S.Skullsplitter:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_aoe 14"; end
+  end
+  -- warbreaker
+  if S.Warbreaker:IsCastable() then
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker colossus_aoe 16"; end
+  end
+  -- bladestorm,if=talent.unhinged|talent.merciless_bonegrinder
+  if CDsON() and S.Bladestorm:IsCastable() and (S.Unhinged:IsAvailable() or S.MercilessBonegrinder:IsAvailable()) then
+    if Everyone.CastTargetIf(S.Bladestorm, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm) then return "bladestorm colossus_aoe 18"; end
+  end
+  -- champions_spear
+  if CDsON() and S.ChampionsSpear:IsCastable() then
+    if Everyone.CastTargetIf(S.ChampionsSpear, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsSpellInRange(S.ChampionsSpear), nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear) then return "champions_spear colossus_aoe 20"; end
+  end
+  -- colossus_smash
+  if S.ColossusSmash:IsCastable() then
+    if Everyone.CastTargetIf(S.ColossusSmash, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash colossus_aoe 22"; end
+  end
+  -- cleave
+  if S.Cleave:IsReady() then
+    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave colossus_aoe 24"; end
+  end
+  -- demolish,if=buff.sweeping_strikes.up
+  if S.Demolish:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.Demolish, nil, nil, not TargetInMeleeRange) then return "demolish colossus_aoe 26"; end
+  end
+  -- bladestorm,if=talent.unhinged
+  if CDsON() and S.Bladestorm:IsCastable() and (S.Unhinged:IsAvailable()) then
+    if Everyone.CastTargetIf(S.Bladestorm, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm) then return "bladestorm colossus_aoe 28"; end
+  end
+  -- overpower
+  if S.Overpower:IsCastable() then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower colossus_aoe 30"; end
+  end
+  -- mortal_strike,if=buff.sweeping_strikes.up
+  if S.MortalStrike:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike colossus_aoe 32"; end
+  end
+  -- overpower,if=buff.sweeping_strikes.up
+  if S.Overpower:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower colossus_aoe 34"; end
+  end
+  -- execute,if=buff.sweeping_strikes.up
+  if S.Execute:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute colossus_aoe 36"; end
+  end
+  -- thunder_clap
+  if S.ThunderClap:IsReady() then
+    if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap colossus_aoe 38"; end
+  end
+  -- mortal_strike
+  if S.MortalStrike:IsReady() then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike colossus_aoe 40"; end
+  end
+  -- execute
+  if S.Execute:IsReady() then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute colossus_aoe 42"; end
+  end
+  -- bladestorm
+  if CDsON() and S.Bladestorm:IsCastable() then
+    if Everyone.CastTargetIf(S.Bladestorm, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm) then return "bladestorm colossus_aoe 44"; end
+  end
+  -- whirlwind
+  if S.Whirlwind:IsReady() then
+    if Cast(S.Whirlwind, nil, nil, not TargetInMeleeRange) then return "whirlwind colossus_aoe 46"; end
+  end
+end
+
+local function SlayerST()
+  -- rend,if=dot.rend.remains<=gcd
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD()) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend slayer_st 2"; end
+  end
+  -- thunderous_roar
+  if CDsON() and S.ThunderousRoar:IsCastable() then
+    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar slayer_st 4"; end
+  end
+  -- champions_spear
+  if CDsON() and S.ChampionsSpear:IsCastable() then
+    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not Target:IsSpellInRange(S.ChampionsSpear)) then return "champions_spear slayer_st 6"; end
+  end
+  -- avatar
+  if CDsON() and S.Avatar:IsCastable() then
+    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar slayer_st 8"; end
+  end
+  -- colossus_smash
+  if S.ColossusSmash:IsCastable() then
+    if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash slayer_st 10"; end
+  end
+  -- warbreaker
+  if S.Warbreaker:IsCastable() then
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker slayer_st 12"; end
+  end
+  -- execute,if=debuff.marked_for_execution.stack=3
+  if S.Execute:IsReady() and (Target:DebuffStack(S.MarkedforExecutionDebuff) == 3) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_st 14"; end
+  end
+  -- bladestorm
+  if CDsON() and S.Bladestorm:IsCastable() then
+    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_st 16"; end
+  end
+  -- overpower,if=buff.opportunist.up
+  if S.Overpower:IsCastable() and (Player:BuffUp(S.OpportunistBuff)) then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_st 18"; end
+  end
+  -- mortal_strike
+  if S.MortalStrike:IsReady() then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike slayer_st 20"; end
+  end
+  -- skullsplitter
+  if S.Skullsplitter:IsCastable() then
+    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes slayer_st 22"; end
+  end
+  -- execute
+  if S.Execute:IsReady() then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_st 24"; end
+  end
+  -- overpower
+  if S.Overpower:IsCastable() then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_st 26"; end
+  end
+  -- rend,if=dot.rend.remains<=gcd*5
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() * 5) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend slayer_st 28"; end
+  end
+  -- cleave,if=buff.martial_prowess.down
+  if S.Cleave:IsReady() and (Player:BuffDown(S.MartialProwessBuff)) then
+    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave slayer_st 30"; end
+  end
+  -- slam
+  if S.Slam:IsReady() then
+    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam slayer_st 32"; end
+  end
+  -- storm_bolt,if=buff.bladestorm.up
+  if S.StormBolt:IsCastable() and (Player:BuffUp(S.Bladestorm)) then
+    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_st 34"; end
+  end
+end
+
+local function SlayerExecute()
+  -- sweeping_strikes,if=active_enemies=2
+  if S.SweepingStrikes:IsCastable() and (EnemiesCount8y == 2) then
+    if Cast(S.SweepingStrikes) then return "sweeping_strikes slayer_execute 2"; end
+  end
+  -- rend,if=dot.rend.remains<=gcd&!talent.bloodletting
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and not S.Bloodletting:IsAvailable()) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend slayer_execute 4"; end
+  end
+  -- thunderous_roar
+  if CDsON() and S.ThunderousRoar:IsCastable() then
+    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar slayer_execute 6"; end
+  end
+  -- champions_spear
+  if CDsON() and S.ChampionsSpear:IsCastable() then
+    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not Target:IsSpellInRange(S.ChampionsSpear)) then return "champions_spear slayer_execute 8"; end
+  end
+  -- avatar
+  if CDsON() and S.Avatar:IsCastable() then
+    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar slayer_execute 10"; end
+  end
+  -- warbreaker
+  if S.Warbreaker:IsCastable() then
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker slayer_execute 12"; end
+  end
+  -- colossus_smash
+  if S.ColossusSmash:IsCastable() then
+    if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash slayer_execute 14"; end
+  end
+  -- execute,if=buff.juggernaut.remains<=gcd
+  if S.Execute:IsReady() and (Player:BuffRemains(S.JuggernautBuff) <= Player:GCD()) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_execute 16"; end
+  end
+  -- bladestorm,if=debuff.executioners_precision.stack=2&debuff.colossus_smash.remains>4|debuff.executioners_precision.stack=2&cooldown.colossus_smash.remains>15|!talent.executioners_precision
+  if CDsON() and S.Bladestorm:IsCastable() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Target:DebuffRemains(S.ColossusSmashDebuff) > 4 or Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and S.ColossusSmash:CooldownRemains() > 15 or not S.ExecutionersPrecision:IsAvailable()) then
+    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_execute 18"; end
+  end
+  -- mortal_strike,if=debuff.executioners_precision.stack=2&(buff.lethal_blows.stack=2|!set_bonus.tww1_4pc)
+  if S.MortalStrike:IsReady() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and (Player:BuffStack(S.LethalBlowsBuff) == 2 or not Player:HasTier("TWW1", 4))) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike slayer_execute 20"; end
+  end
+  -- skullsplitter,if=rage<85
+  if S.Skullsplitter:IsCastable() and (Player:Rage() < 85) then
+    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes slayer_execute 22"; end
+  end
+  -- overpower,if=buff.opportunist.up&rage<80&buff.martial_prowess.stack<2
+  if S.Overpower:IsCastable() and (Player:BuffUp(S.OpportunistBuff) and Player:Rage() < 80 and Player:BuffStack(S.MartialProwessBuff) < 2) then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_execute 24"; end
+  end
+  -- execute
+  if S.Execute:IsReady() then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_execute 26"; end
+  end
+  -- overpower
+  if S.Overpower:IsCastable() then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_execute 28"; end
+  end
+  -- mortal_strike,if=!talent.executioners_precision
+  if S.MortalStrike:IsReady() and (not S.ExecutionersPrecision:IsAvailable()) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike slayer_execute 30"; end
+  end
+  -- storm_bolt,if=buff.bladestorm.up
+  if S.StormBolt:IsCastable() and (Player:BuffUp(S.Bladestorm)) then
+    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_execute 32"; end
+  end
+end
+
+local function SlayerSweep()
+  -- thunderous_roar
+  if CDsON() and S.ThunderousRoar:IsCastable() then
+    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar slayer_sweep 2"; end
+  end
+  -- sweeping_strikes
+  if CDsON() and S.SweepingStrikes:IsCastable() then
+    if Cast(S.SweepingStrikes) then return "sweeping_strikes slayer_sweep 4"; end
+  end
+  -- rend,if=dot.rend.remains<=gcd
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD()) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend slayer_sweep 6"; end
+  end
+  -- champions_spear
+  if CDsON() and S.ChampionsSpear:IsCastable() then
+    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not Target:IsSpellInRange(S.ChampionsSpear)) then return "champions_spear slayer_sweep 8"; end
+  end
+  -- avatar
+  if CDsON() and S.Avatar:IsCastable() then
+    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar slayer_sweep 10"; end
+  end
+  -- colossus_smash
+  if S.ColossusSmash:IsCastable() then
+    if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash slayer_sweep 12"; end
+  end
+  -- warbreaker
+  if S.Warbreaker:IsCastable() then
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker slayer_sweep 14"; end
+  end
+  -- skullsplitter,if=buff.sweeping_strikes.up
+  if S.Skullsplitter:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes slayer_sweep 16"; end
+  end
+  -- execute,if=debuff.marked_for_execution.stack=3
+  if S.Execute:IsReady() and (Target:DebuffStack(S.MarkedforExecutionDebuff) == 3) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_sweep 18"; end
+  end
+  -- bladestorm
+  if CDsON() and S.Bladestorm:IsCastable() then
+    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_sweep 20"; end
+  end
+  -- overpower,if=talent.dreadnaught|buff.opportunist.up
+  if S.Overpower:IsCastable() and (S.Dreadnaught:IsAvailable() or Player:BuffUp(S.OpportunistBuff)) then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_sweep 22"; end
+  end
+  -- mortal_strike
+  if S.MortalStrike:IsReady() then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike slayer_sweep 24"; end
+  end
+  -- cleave,if=talent.fervor_of_battle
+  if S.Cleave:IsReady() and (S.FervorofBattle:IsAvailable()) then
+    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave slayer_sweep 26"; end
+  end
+  -- execute
+  if S.Execute:IsReady() then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_sweep 28"; end
+  end
+  -- overpower
+  if S.Overpower:IsCastable() then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_sweep 30"; end
+  end
+  -- thunder_clap,if=dot.rend.remains<=8&buff.sweeping_strikes.down
+  if S.ThunderClap:IsReady() and (Target:DebuffRemains(S.RendDebuff) < 8 and Player:BuffDown(S.SweepingStrikesBuff)) then
+    if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap slayer_sweep 32"; end
+  end
+  -- rend,if=dot.rend.remains<=5
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= 5) then
+    if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend slayer_sweep 34"; end
+  end
+  -- whirlwind,if=talent.fervor_of_battle
+  if S.Whirlwind:IsReady() and (S.FervorofBattle:IsAvailable()) then
+    if Cast(S.Whirlwind, nil, nil, not TargetInMeleeRange) then return "whirlwind slayer_sweep 36"; end
+  end
+  -- slam
+  if S.Slam:IsReady() then
+    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam slayer_sweep 38"; end
+  end
+  -- storm_bolt,if=buff.bladestorm.up
+  if S.StormBolt:IsCastable() and (Player:BuffUp(S.Bladestorm)) then
+    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_sweep 40"; end
+  end
+end
+
+local function SlayerAoE()
+  -- thunder_clap,if=!dot.rend.remains
+  if S.ThunderClap:IsReady() and (Target:DebuffDown(S.RendDebuff)) then
+    if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap slayer_aoe 2"; end
+  end
+  -- sweeping_strikes
+  if CDsON() and S.SweepingStrikes:IsCastable() then
+    if Cast(S.SweepingStrikes) then return "sweeping_strikes slayer_aoe 4"; end
+  end
+  -- thunderous_roar
+  if CDsON() and S.ThunderousRoar:IsCastable() then
+    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar slayer_aoe 6"; end
+  end
+  -- avatar
+  if CDsON() and S.Avatar:IsCastable() then
+    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar slayer_aoe 8"; end
+  end
+  -- champions_spear
+  if CDsON() and S.ChampionsSpear:IsCastable() then
+    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not Target:IsSpellInRange(S.ChampionsSpear)) then return "champions_spear slayer_aoe 10"; end
+  end
+  -- warbreaker
+  if S.Warbreaker:IsCastable() then
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker slayer_aoe 12"; end
+  end
+  -- colossus_smash
+  if S.ColossusSmash:IsCastable() then
+    if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash slayer_aoe 14"; end
+  end
+  -- cleave
+  if S.Cleave:IsReady() then
+    if Cast(S.Cleave, nil, nil, not TargetInMeleeRange) then return "cleave slayer_aoe 16"; end
+  end
+  -- overpower,if=buff.sweeping_strikes.up
+  if S.Overpower:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_aoe 18"; end
+  end
+  -- execute,if=buff.sudden_death.up&buff.imminent_demise.stack<3
+  if S.Execute:IsReady() and (Player:BuffUp(S.SuddenDeathBuff) and Player:BuffStack(S.ImminentDemiseBuff) < 3) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_aoe 20"; end
+  end
+  -- bladestorm
+  if CDsON() and S.Bladestorm:IsCastable() then
+    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_aoe 22"; end
+  end
+  -- skullsplitter,if=buff.sweeping_strikes.up
+  if S.Skullsplitter:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes slayer_aoe 24"; end
+  end
+  -- execute,if=buff.sweeping_strikes.up&debuff.executioners_precision.stack<2
+   if S.Execute:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff) and Target:DebuffStack(S.ExecutionersPrecisionDebuff) < 2) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_aoe 26"; end
+  end
+  -- mortal_strike,if=buff.sweeping_strikes.up&debuff.executioners_precision.stack=2
+  if S.MortalStrike:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff) and Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike slayer_aoe 28"; end
+  end
+  -- execute,if=debuff.marked_for_execution.up
+  if S.Execute:IsReady() and (Target:DebuffUp(S.MarkedforExecutionDebuff)) then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_aoe 30"; end
+  end
+  -- mortal_strike,if=buff.sweeping_strikes.up
+  if S.MortalStrike:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff)) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike slayer_aoe 32"; end
+  end
+  -- overpower,if=talent.dreadnaught
+  if S.Overpower:IsCastable() and (S.Dreadnaught:IsAvailable()) then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_aoe 34"; end
+  end
+  -- thunder_clap
+  if S.ThunderClap:IsReady() then
+    if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap slayer_aoe 36"; end
+  end
+  -- overpower
+  if S.Overpower:IsCastable() then
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_aoe 38"; end
+  end
+  -- execute
+  if S.Execute:IsReady() then
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_aoe 40"; end
+  end
+  -- mortal_strike
+  if S.MortalStrike:IsReady() then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike slayer_aoe 42"; end
+  end
+  -- whirlwind
+  if S.Whirlwind:IsReady() then
+    if Cast(S.Whirlwind, nil, nil, not TargetInMeleeRange) then return "whirlwind slayer_aoe 44"; end
+  end
+  -- skullsplitter
+  if S.Skullsplitter:IsCastable() then
+    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes slayer_aoe 46"; end
+  end
+  -- slam
+  if S.Slam:IsReady() then
+    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam slayer_aoe 48"; end
+  end
+  -- storm_bolt,if=buff.bladestorm.up
+  if S.StormBolt:IsCastable() and (Player:BuffUp(S.Bladestorm)) then
+    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_aoe 50"; end
   end
 end
 
 local function Trinkets()
-  -- use_item,name=fyralath_the_dreamrender,,if=dot.mark_of_fyralath.ticking&!talent.blademasters_torment|dot.mark_of_fyralath.ticking&cooldown.avatar.remains>3&cooldown.bladestorm.remains>3&!debuff.colossus_smash.up
-  if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0 and not S.BlademastersTorment:IsAvailable() or S.MarkofFyralathDebuff:AuraActiveCount() > 0 and S.Avatar:CooldownRemains() > 3 and S.Bladestorm:CooldownRemains() > 3 and Target:DebuffDown(S.ColossusSmashDebuff)) then
-    if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsItemInRange(I.Fyralath)) then return "fyralath_the_dreamrender trinkets 2"; end
-  end
-  -- use_item,use_off_gcd=1,name=algethar_puzzle_box,if=cooldown.avatar.remains<=3
-  if Settings.Commons.Enabled.Trinkets and I.AlgetharPuzzleBox:IsEquippedAndReady() and (S.Avatar:CooldownRemains() <= 3) then
-    if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box trinkets 4"; end
-  end
-  -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!buff.avatar.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&buff.avatar.up&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
-  if Trinket1:IsReady() and not VarTrinket1BL and (VarTrinket1Buffs and not VarTrinket1Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket1CastTime > 0 or VarTrinket1CastTime == 0) and Player:BuffUp(S.AvatarBuff) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or VarTrinket2CD or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= FightRemains) then
-    if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for "..Trinket1:Name().." trinkets 6"; end
-  end
-  -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!buff.avatar.up&trinket.2.cast_time>0|!trinket.2.cast_time>0)&buff.avatar.up&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
-  if Trinket2:IsReady() and not VarTrinket2BL and (VarTrinket2Buffs and not VarTrinket2Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket2CastTime > 0 or VarTrinket2CastTime == 0) and Player:BuffUp(S.AvatarBuff) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or VarTrinket1CD or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= FightRemains) then
-    if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for "..Trinket2:Name().." trinkets 8"; end
-  end
-  -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|(trinket.1.cast_time>0&!buff.avatar.up|!trinket.1.cast_time>0)|cooldown.avatar.remains_expected>20)
-  if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs and not VarTrinket1Manual and (not VarTrinket1Buffs and (VarTrinket2CD or not VarTrinket2Buffs) or (VarTrinket1CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket1CastTime == 0) or S.Avatar:CooldownRemains() > 20)) then
-    if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for "..Trinket1:Name().." trinkets 10"; end
-  end
-  -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|(trinket.2.cast_time>0&!buff.avatar.up|!trinket.2.cast_time>0)|cooldown.avatar.remains_expected>20)
-  if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs and not VarTrinket2Manual and (not VarTrinket2Buffs and (VarTrinket1CD or not VarTrinket1Buffs) or (VarTrinket2CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket2CastTime == 0) or S.Avatar:CooldownRemains() > 20)) then
-    if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for "..Trinket2:Name().." trinkets 12"; end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,use_off_gcd=1,name=mark_of_khardros,if=buff.avatar.up
+    if I.MarkofKhardros:IsEquippedAndReady() and (Player:BuffUp(S.AvatarBuff)) then
+      if Cast(I.MarkofKhardros, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "mark_of_khardros trinkets 2"; end
+    end
+    -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!buff.avatar.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&buff.avatar.up&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
+    if Trinket1:IsReady() and not VarTrinket1BL and (VarTrinket1Buffs and not VarTrinket1Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket1CastTime > 0 or VarTrinket1CastTime == 0) and Player:BuffUp(S.AvatarBuff) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or VarTrinket2CD or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= FightRemains) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for "..Trinket1:Name().." trinkets 4"; end
+    end
+    -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!buff.avatar.up&trinket.2.cast_time>0|!trinket.2.cast_time>0)&buff.avatar.up&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
+    if Trinket2:IsReady() and not VarTrinket2BL and (VarTrinket2Buffs and not VarTrinket2Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket2CastTime > 0 or VarTrinket2CastTime == 0) and Player:BuffUp(S.AvatarBuff) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or VarTrinket1CD or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= FightRemains) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for "..Trinket2:Name().." trinkets 6"; end
+    end
+    -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|(trinket.1.cast_time>0&!buff.avatar.up|!trinket.1.cast_time>0)|cooldown.avatar.remains_expected>20)
+    if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs and not VarTrinket1Manual and (not VarTrinket1Buffs and (VarTrinket2CD or not VarTrinket2Buffs) or (VarTrinket1CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket1CastTime == 0) or S.Avatar:CooldownRemains() > 20)) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for "..Trinket1:Name().." trinkets 8"; end
+    end
+    -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|(trinket.2.cast_time>0&!buff.avatar.up|!trinket.2.cast_time>0)|cooldown.avatar.remains_expected>20)
+    if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs and not VarTrinket2Manual and (not VarTrinket2Buffs and (VarTrinket1CD or not VarTrinket1Buffs) or (VarTrinket2CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket2CastTime == 0) or S.Avatar:CooldownRemains() > 20)) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for "..Trinket2:Name().." trinkets 10"; end
+    end
   end
   -- use_item,use_off_gcd=1,slot=main_hand,if=!equipped.fyralath_the_dreamrender&(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
   if Settings.Commons.Enabled.Items then
-    local MainHandOnUse, _, MainHandRange = Player:GetUseableItems(OnUseExcludes, 16)
-    if MainHandOnUse and MainHandOnUse:IsReady() and (not I.Fyralath:IsEquipped() and (not VarTrinket1Buffs or VarTrinket1CD) and (not VarTrinket2Buffs or VarTrinket2CD)) then
-      if Cast(MainHandOnUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(MainHandRange)) then return "use_item for "..MainHandOnUse:Name().." trinkets 14"; end
-    end
     -- Note: Adding a generic use_items for non-trinkets/non-weapons
-    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-    if ItemToUse and ItemSlot ~= 13 and ItemSlot ~= 14 and ItemSlot ~= 16 then
-      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
+    local ItemToUse, _, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
+    if ItemToUse then
+      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 12"; end
     end
   end
 end
@@ -553,18 +961,46 @@ local function APL()
     end
     -- invoke_external_buff,name=power_infusion,if=debuff.colossus_smash.up&fight_remains>=135|variable.execute_phase&buff.avatar.up|fight_remains<=25
     -- Note: Not handling external buffs.
-    -- run_action_list,name=aoe,if=active_enemies>2|talent.fervor_of_battle.enabled&variable.execute_phase&!raid_event.adds.up&active_enemies>1
-    if AoEON() and (EnemiesCount8y > 2 or S.FervorofBattle:IsAvailable() and VarExecutePhase and EnemiesCount8y > 1) then
-      local ShouldReturn = AoE(); if ShouldReturn then return ShouldReturn; end
-      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for AoE()"; end
+    -- run_action_list,name=colossus_aoe,if=talent.demolish&active_enemies>2
+    if S.Demolish:IsAvailable() and AoEON() and EnemiesCount8y > 2 then
+      local ShouldReturn = ColossusAoE(); if ShouldReturn then return ShouldReturn; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for ColossusAoE()"; end
     end
-    -- run_action_list,name=execute,target_if=min:target.health.pct,if=variable.execute_phase
-    if VarExecutePhase then
-      local ShouldReturn = Execute(); if ShouldReturn then return ShouldReturn; end
-      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Execute()"; end
+    -- run_action_list,name=colossus_execute,target_if=min:target.health.pct,if=talent.demolish&variable.execute_phase
+    if S.Demolish:IsAvailable() and VarExecutePhase then
+      local ShouldReturn = ColossusExecute(); if ShouldReturn then return ShouldReturn; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for ColossusExecute()"; end
     end
-    -- run_action_list,name=single_target
-    local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
+    -- run_action_list,name=colossus_sweep,if=talent.demolish&active_enemies=2&!variable.execute_phase
+    if S.Demolish:IsAvailable() and AoEON() and EnemiesCount8y == 2 and not VarExecutePhase then
+      local ShouldReturn = ColossusSweep(); if ShouldReturn then return ShouldReturn; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for ColossusSweep()"; end
+    end
+    -- run_action_list,name=colossus_st,if=talent.demolish
+    if S.Demolish:IsAvailable() then
+      local ShouldReturn = ColossusST(); if ShouldReturn then return ShouldReturn; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for ColossusST()"; end
+    end
+    -- run_action_list,name=slayer_aoe,if=talent.slayers_dominance&active_enemies>2
+    if S.SlayersDominance:IsAvailable() and AoEON() and EnemiesCount8y > 2 then
+      local ShouldReturn = SlayerAoE(); if ShouldReturn then return ShouldReturn; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SlayerAoE()"; end
+    end
+    -- run_action_list,name=slayer_execute,target_if=min:target.health.pct,if=talent.slayers_dominance&variable.execute_phase
+    if S.SlayersDominance:IsAvailable() and VarExecutePhase then
+      local ShouldReturn = SlayerExecute(); if ShouldReturn then return ShouldReturn; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SlayerExecute()"; end
+    end
+    -- run_action_list,name=slayer_sweep,if=talent.slayers_dominance&active_enemies=2&!variable.execute_phase
+    if S.SlayersDominance:IsAvailable() and AoEON() and EnemiesCount8y == 2 and not VarExecutePhase then
+      local ShouldReturn = SlayerSweep(); if ShouldReturn then return ShouldReturn; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SlayerSweep()"; end
+    end
+    -- run_action_list,name=slayer_st,if=talent.slayers_dominance
+    if S.SlayersDominance:IsAvailable() then
+      local ShouldReturn = SlayerST(); if ShouldReturn then return ShouldReturn; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SlayerST()"; end
+    end
     -- Pool if nothing else to suggest
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
@@ -573,7 +1009,7 @@ end
 local function Init()
   S.MarkofFyralathDebuff:RegisterAuraTracking()
 
-  HR.Print("Arms Warrior rotation has been updated for patch 11.0.0.")
+  HR.Print("Arms Warrior rotation has been updated for patch 11.0.2.")
 end
 
 HR.SetAPL(71, APL, Init)
