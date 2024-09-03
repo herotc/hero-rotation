@@ -257,6 +257,7 @@ Item.Warrior.Commons = {
   VialofAnimatedBlood                   = Item(159625, {13, 14}),
   -- TWW Trinkets
   MarkofKhardros                        = Item(133300, {13, 14}),
+  TreacherousTransmitter                = Item(221023, {13, 14}),
   -- Other Items
   Fyralath                              = Item(206448, {16}),
 }
