@@ -205,7 +205,7 @@ DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
     local BaseCheck = DemoOldSpellIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    if self == SpellDemo.SummonVilefiend or SpellDemo.GrimoireFelguard or self == SpellDemo.NetherPortal or self == SpellDemo.Soulburn then
+    if self == SpellDemo.SummonVilefiend or self == SpellDemo.SummonCharhound or self == SpellDemo.SummonGloomhound or SpellDemo.GrimoireFelguard then
       return BaseCheck and Player:SoulShardsP() >= 1 and not Player:IsCasting(self)
     elseif self == SpellDemo.CallDreadstalkers then
       return BaseCheck and (Player:SoulShardsP() >= 2 or Player:BuffUp(SpellDemo.DemonicCallingBuff)) and not Player:IsCasting(self)

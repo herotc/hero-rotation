@@ -144,6 +144,15 @@ local PetsData = {
     name = "Darkglare",
     duration = 25
   },
+  -- Vilefiend Variants
+  [228268] = { -- Gloomhound
+    name = "Vilefiend",
+    duration = 15
+  },
+  [226269] = { -- Charhound
+    name = "Vilefiend",
+    duration = 15
+  },
 }
 
 --------------------------
