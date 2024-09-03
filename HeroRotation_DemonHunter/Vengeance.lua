@@ -569,8 +569,9 @@ local function MetaPrep()
     if CastQueue(S.SigilofFlame, S.Metamorphosis) then return "sigil_of_flame and metamorphosis meta_prep 6"; end
   end
   -- metamorphosis,if=cooldown.sigil_of_flame.charges=0
-  if S.Metamorphosis:IsCastable() and (S.SigilofFlame:Charges() == 0) then
-    if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis meta_prep 8"; end
+  -- Note: Forced to main icon, as otherwise the main icon will be Pool.
+  if S.Metamorphosis:IsCastable() and (S.SigilofFlame:Charges() == 0 or Player:PrevGCD(1, S.SigilofFlame)) then
+    if Cast(S.Metamorphosis) then return "metamorphosis meta_prep 8"; end
   end
 end
 
