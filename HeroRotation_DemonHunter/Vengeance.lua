@@ -18,6 +18,7 @@ local HR            = HeroRotation
 local AoEON         = HR.AoEON
 local CDsON         = HR.CDsON
 local Cast          = HR.Cast
+local CastQueue     = HR.CastQueue
 local CastSuggested = HR.CastSuggested
 local CastAnnotated = HR.CastAnnotated
 -- Num/Bool Helper Functions
@@ -544,25 +545,32 @@ local function FSExecute()
 end
 
 local function MetaPrep()
-  -- Note: metamorphosis and fiery_brand forced to main icon, as we get a Pool icon otherwise.
+  -- Note: metamorphosis and sigil_of_flame moved into a CastQueue.
+  -- Note: Intent is to suggest metamorphosis after sigil_of_flame, but before the sigil explodes.
+  -- Note: Doing this allows the sigil_of_flame to deal damage as sigil_of_doom.
   -- metamorphosis,use_off_gcd=1,if=cooldown.sigil_of_flame.charges<1&gcd.remains=0
-  if S.Metamorphosis:IsCastable() and (S.SigilofFlame:Charges() < 1) then
-    if Cast(S.Metamorphosis) then return "metamorphosis meta_prep 2"; end
-  end
+  --if S.Metamorphosis:IsCastable() and (S.SigilofFlame:Charges() < 1) then
+    --if Cast(S.Metamorphosis) then return "metamorphosis meta_prep 2"; end
+  --end
   -- fiery_brand,if=talent.fiery_demise&((talent.down_in_flames&charges>=max_charges)|active_dot.fiery_brand=0)
   if S.FieryBrand:IsCastable() and (S.FieryDemise:IsAvailable() and ((S.DowninFlames:IsAvailable() and S.FieryBrand:Charges() >= S.FieryBrand:MaxCharges()) or S.FieryBrandDebuff:AuraActiveCount() == 0)) then
-    if Cast(S.FieryBrand, nil, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand meta_prep 4"; end
+    if Cast(S.FieryBrand, nil, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand meta_prep 2"; end
   end
   -- potion,use_off_gcd=1,if=gcd.remains=0
   if Settings.Commons.Enabled.Potions then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion meta_prep 6"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion meta_prep 4"; end
     end
   end
   -- sigil_of_flame
-  if S.SigilofFlame:IsCastable() then
-    if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame meta_prep 8"; end
+  -- metamorphosis,if=cooldown.sigil_of_flame.charges>=1
+  if S.SigilofFlame:IsCastable() and S.Metamorphosis:IsCastable() then
+    if CastQueue(S.SigilofFlame, S.Metamorphosis) then return "sigil_of_flame and metamorphosis meta_prep 6"; end
+  end
+  -- metamorphosis,if=cooldown.sigil_of_flame.charges=0
+  if S.Metamorphosis:IsCastable() and (S.SigilofFlame:Charges() == 0) then
+    if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis meta_prep 8"; end
   end
 end
 
