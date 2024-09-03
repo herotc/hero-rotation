@@ -277,6 +277,7 @@ Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
   GoremawsBite            = Spell(426591),
   ImprovedShadowDance     = Spell(393972),
   ImprovedShurikenStorm   = Spell(319951),
+  Inevitability           = Spell(382512),
   InvigoratingShadowdust  = Spell(382523),
   LingeringShadow         = Spell(382524),
   LingeringShadowBuff     = Spell(385960),
