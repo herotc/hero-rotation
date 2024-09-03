@@ -53,17 +53,6 @@ local Settings = {
 
 --- ===== Rotation Variables =====
 local VarPillarCD = (S.Icecap:IsAvailable()) and 45 or 60
-local Trinket1, Trinket2
-local VarTrinket1Spell, VarTrinket2Spell
-local VarTrinket1Range, VarTrinket2Range
-local VarTrinket1CastTime, VarTrinket2CastTime
-local VarTrinket1CD, VarTrinket2CD
-local VarTrinket1BL, VarTrinket2BL
-local VarTrinket1Sync, VarTrinket2Sync
-local VarTrinket1Buffs, VarTrinket2Buffs
-local VarTrinket1Duration, VarTrinket2Duration
-local VarTrinketPriority, VarDamageTrinketPriority
-local VarTrinket1Manual, VarTrinket2Manual
 local MainHandLink, OffHandLink
 local MainHandRuneforge, OffHandRuneforge
 local UsingRazorice, UsingFallenCrusader
@@ -80,7 +69,18 @@ local FightRemains = 11111
 local GCDMax
 local Ghoul = HL.GhoulTable
 
---- ===== Trinket Variables (from Precombat) =====
+--- ===== Trinket Variables =====
+local Trinket1, Trinket2
+local VarTrinket1Spell, VarTrinket2Spell
+local VarTrinket1Range, VarTrinket2Range
+local VarTrinket1CastTime, VarTrinket2CastTime
+local VarTrinket1CD, VarTrinket2CD
+local VarTrinket1BL, VarTrinket2BL
+local VarTrinket1Sync, VarTrinket2Sync
+local VarTrinket1Buffs, VarTrinket2Buffs
+local VarTrinket1Duration, VarTrinket2Duration
+local VarTrinketPriority, VarDamageTrinketPriority
+local VarTrinket1Manual, VarTrinket2Manual
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData()

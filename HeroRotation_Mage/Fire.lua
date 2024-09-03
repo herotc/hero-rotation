@@ -101,9 +101,9 @@ local GCDMax
 local Bolt = S.FrostfireBolt:IsAvailable() and S.FrostfireBolt or S.Fireball
 
 --- ===== Trinket Variables =====
-local VarTrinketFailures = 0
 local Trinket1, Trinket2
 local VarCombustionOnUse
+local VarTrinketFailures = 0
 local function SetTrinketVariables()
   Trinket1, Trinket2 = Player:GetTrinketItems()
 

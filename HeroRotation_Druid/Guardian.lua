@@ -50,8 +50,6 @@ local Settings = {
 --- ===== Rotation Variables =====
 local VarIFBuild = S.ThornsofIron:IsAvailable() and S.ReinforcedFur:IsAvailable()
 local VarRipWeaving = S.PrimalFury:IsAvailable() and S.FluidForm:IsAvailable() and S.WildpowerSurge:IsAvailable()
-local Trinket1, Trinket2
-local VarTrinket1Range, VarTrinket2Range
 local MeleeRange, AoERange
 local IsInMeleeRange, IsInAoERange
 local ActiveMitigationNeeded
@@ -60,6 +58,8 @@ local UseMaul
 local Enemies8y, Enemies8yCount
 
 --- ===== Trinket Variables =====
+local Trinket1, Trinket2
+local VarTrinket1Range, VarTrinket2Range
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData()

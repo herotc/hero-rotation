@@ -33,7 +33,7 @@ local I = Item.Warrior.Arms
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.MarkofKhardros:ID(),
+  I.TreacherousTransmitter:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -47,6 +47,13 @@ local Settings = {
 }
 
 -- ===== Rotation Variables =====
+local VarAddsRemain, VarSTPlanning, VarExecutePhase
+local TargetInMeleeRange
+local Enemies8y, EnemiesCount8y
+local BossFightRemains = 11111
+local FightRemains = 11111
+
+--- ===== Trinket Variables =====
 local Trinket1, Trinket2
 local VarTrinket1Spell, VarTrinket2Spell
 local VarTrinket1Range, VarTrinket2Range
@@ -58,13 +65,6 @@ local VarTrinket1Sync, VarTrinket2Sync
 local VarTrinket1Buffs, VarTrinket2Buffs
 local VarTrinket1Manual, VarTrinket2Manual
 local VarTrinketPriority
-local VarAddsRemain, VarSTPlanning, VarExecutePhase
-local TargetInMeleeRange
-local Enemies8y, EnemiesCount8y
-local BossFightRemains = 11111
-local FightRemains = 11111
-
---- ===== Trinket Variables (from Precombat) =====
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData()
@@ -95,8 +95,8 @@ local function SetTrinketVariables()
   VarTrinket1BL = T1.Blacklisted
   VarTrinket2BL = T2.Blacklisted
 
-  VarTrinket1Exclude = (T1.ID == 193757 or T1.ID == 194301)
-  VarTrinket2Exclude = (T2.ID == 193757 or T2.ID == 194301)
+  VarTrinket1Exclude = T1.ID == I.TreacherousTransmitter:ID()
+  VarTrinket2Exclude = T2.ID == I.TreacherousTransmitter:ID()
 
   VarTrinket1Sync = 0.5
   if Trinket1:HasUseBuff() and VarTrinket1CD % 90 == 0 then
@@ -107,8 +107,8 @@ local function SetTrinketVariables()
     VarTrinket2Sync = 1
   end
 
-  VarTrinket1Buffs = Trinket1:HasUseBuff()
-  VarTrinket2Buffs = Trinket2:HasUseBuff()
+  VarTrinket1Buffs = Trinket1:HasUseBuff() or (Trinket1:HasStatAnyDps() and not VarTrinket1Exclude)
+  VarTrinket2Buffs = Trinket2:HasUseBuff() or (Trinket2:HasStatAnyDps() and not VarTrinket2Exclude)
 
   -- Note: Using the below buff durations to avoid potential divide by zero errors.
   local T1BuffDuration = (Trinket1:BuffDuration() > 0) and Trinket1:BuffDuration() or 1
@@ -150,12 +150,12 @@ local function Precombat()
   -- food
   -- augmentation
   -- snapshot_stats
-  -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon
-  -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
+  -- variable,name=trinket_1_exclude,value=trinket.1.is.treacherous_transmitter
+  -- variable,name=trinket_2_exclude,value=trinket.2.is.treacherous_transmitter
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(trinket.1.cooldown.duration%%cooldown.avatar.duration=0)
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(trinket.2.cooldown.duration%%cooldown.avatar.duration=0)
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff|(trinket.1.has_buff.strength|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit&!variable.trinket_1_exclude)
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|(trinket.2.has_buff.strength|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit&!variable.trinket_2_exclude)
+  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff|(trinket.1.has_stat.any_dps&!variable.trinket_1_exclude)
+  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|(trinket.2.has_stat.any_dps&!variable.trinket_2_exclude)
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync))
   -- variable,name=trinket_1_manual,value=trinket.1.is.algethar_puzzle_box
   -- variable,name=trinket_2_manual,value=trinket.2.is.algethar_puzzle_box
@@ -830,9 +830,10 @@ end
 
 local function Trinkets()
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,use_off_gcd=1,name=mark_of_khardros,if=buff.avatar.up
-    if I.MarkofKhardros:IsEquippedAndReady() and (Player:BuffUp(S.AvatarBuff)) then
-      if Cast(I.MarkofKhardros, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "mark_of_khardros trinkets 2"; end
+    -- do_treacherous_transmitter_task,use_off_gcd=1
+    -- use_item,use_off_gcd=1,name=treacherous_transmitter,if=(variable.adds_remain|variable.st_planning)&cooldown.avatar.remains<3
+    if I.TreacherousTransmitter:IsEquippedAndReady() and ((VarAddsRemain or VarSTPlanning) and S.Avatar:CooldownRemains() < 3) then
+      if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter trinkets 2"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!buff.avatar.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&buff.avatar.up&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
     if Trinket1:IsReady() and not VarTrinket1BL and (VarTrinket1Buffs and not VarTrinket1Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket1CastTime > 0 or VarTrinket1CastTime == 0) and Player:BuffUp(S.AvatarBuff) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or VarTrinket2CD or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= FightRemains) then

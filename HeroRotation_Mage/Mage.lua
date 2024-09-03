@@ -231,6 +231,7 @@ Item.Mage.Commons = {
   TimebreachingTalon                    = Item(193791, {13, 14}),
   -- TWW Trinkets
   AberrantSpellforge                    = Item(212451, {13, 14}),
+  FearbreakersEcho                      = Item(224449, {13, 14}),
   HighSpeakersAccretion                 = Item(219303, {13, 14}),
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
