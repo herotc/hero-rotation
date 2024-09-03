@@ -109,8 +109,8 @@ local function SetTrinketVariables()
     VarTrinket2Sync = 1
   end
 
-  VarTrinket1Buffs = Trinket1:HasUseBuff()
-  VarTrinket2Buffs = Trinket2:HasUseBuff()
+  VarTrinket1Buffs = Trinket1:HasUseBuff() or (Trinket1:HasStatAnyDps() and not VarTrinket1Exclude)
+  VarTrinket2Buffs = Trinket2:HasUseBuff() or (Trinket2:HasStatAnyDps() and not VarTrinket2Exclude)
 
   -- Note: Using the below buff durations to avoid potential divide by zero errors.
   local T1BuffDuration = (Trinket1:BuffDuration() > 0) and Trinket1:BuffDuration() or 1
