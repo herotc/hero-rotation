@@ -760,10 +760,12 @@ end
 local function AoE_Dot ()
   local DotFinisherCondition = ComboPoints >= EffectiveCPSpend
 
-  -- actions.dot+=/	crimson_tempest,target_if=min:remains,if=spell_targets>=3&refreshable&pmultiplier<=1
-  --&effective_combo_points>=variable.effective_spend_cp&energy.regen_combined>25&target.time_to_die-remains>6
+  -- # Crimson Tempest on 3+ Targets if we have enough energy regen
+  --actions.aoe_dot+=/crimson_tempest,target_if=min:remains,if=spell_targets>=3&variable.dot_finisher_condition
+  -- &refreshable&energy.regen_combined>25&!cooldown.deathmark.ready&target.time_to_die-remains>6
+  -- NOTE Deathmark check removed here so Crimson Tempest isn't held if Deathmark is showing as OffGCD and being intentionally held i.e. in M+
   if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 3 and DotFinisherCondition
-    and EnergyRegenCombined > 25 and not S.Deathmark:IsReady() then
+    and EnergyRegenCombined > 25 then
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       if IsDebuffRefreshable(CycleUnit, S.CrimsonTempest, CrimsonTempestThreshold)
         and CycleUnit:PMultiplier(S.CrimsonTempest) <= 1
