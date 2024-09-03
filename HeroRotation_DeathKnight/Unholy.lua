@@ -59,17 +59,6 @@ local VarApocTiming
 local VarPopWounds
 local VarPoolingRunicPower
 local VarSpendRP
-local Trinket1, Trinket2
-local VarTrinket1ID, VarTrinket2ID
-local VarTrinket1Spell, VarTrinket2Spell
-local VarTrinket1Range, VarTrinket2Range
-local VarTrinket1CastTime, VarTrinket2CastTime
-local VarTrinket1CD, VarTrinket2CD
-local VarTrinket1BL, VarTrinket2BL
-local VarTrinket1Buffs, VarTrinket2Buffs
-local VarTrinket1Duration, VarTrinket2Duration
-local VarTrinket1Sync, VarTrinket2Sync
-local VarTrinketPriority, VarDamageTrinketPriority
 local VarAbomActive, VarAbomRemains
 local VarApocGhoulActive, VarApocGhoulRemains
 local VarArmyGhoulActive, VarArmyGhoulRemains
@@ -84,7 +73,18 @@ local BossFightRemains = 11111
 local FightRemains = 11111
 local Ghoul = HL.GhoulTable
 
---- ===== Trinket Variables (from Precombat) =====
+--- ===== Trinket Variables =====
+local Trinket1, Trinket2
+local VarTrinket1ID, VarTrinket2ID
+local VarTrinket1Spell, VarTrinket2Spell
+local VarTrinket1Range, VarTrinket2Range
+local VarTrinket1CastTime, VarTrinket2CastTime
+local VarTrinket1CD, VarTrinket2CD
+local VarTrinket1BL, VarTrinket2BL
+local VarTrinket1Buffs, VarTrinket2Buffs
+local VarTrinket1Duration, VarTrinket2Duration
+local VarTrinket1Sync, VarTrinket2Sync
+local VarTrinketPriority, VarDamageTrinketPriority
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData()

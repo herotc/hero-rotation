@@ -55,13 +55,6 @@ local Settings = {
 }
 
 --- ===== Rotation Variables =====
-local Trinket1, Trinket2
-local VarTrinket1Spell, VarTrinket2Spell
-local VarTrinket1Range, VarTrinket2Range
-local VarTrinket1CastTime, VarTrinket2CastTime
-local VarTrinket1CD, VarTrinket2CD
-local VarTrinket1BL, VarTrinket2BL
-local VarTrinket1IsWeird, VarTrinket2IsWeird
 local HasMainHandEnchant, HasOffHandEnchant
 local MHEnchantTimeRemains, OHEnchantTimeRemains
 local MHEnchantID, OHEnchantID
@@ -77,7 +70,14 @@ local TIAction = S.LightningBolt
 local BossFightRemains = 11111
 local FightRemains = 11111
 
---- ===== Trinket Variables (from Precombat) =====
+--- ===== Trinket Variables =====
+local Trinket1, Trinket2
+local VarTrinket1Spell, VarTrinket2Spell
+local VarTrinket1Range, VarTrinket2Range
+local VarTrinket1CastTime, VarTrinket2CastTime
+local VarTrinket1CD, VarTrinket2CD
+local VarTrinket1BL, VarTrinket2BL
+local VarTrinket1IsWeird, VarTrinket2IsWeird
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData()

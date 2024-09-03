@@ -60,16 +60,6 @@ local Settings = {
 }
 
 --- ===== Rotation Variables =====
-local Trinket1, Trinket2
-local VarTrinket1Spell, VarTrinket2Spell
-local VarTrinket1Range, VarTrinket2Range
-local VarTrinket1CastTime, VarTrinket2CastTime
-local VarTrinket1CD, VarTrinket2CD
-local VarTrinket1BL, VarTrinket2BL
-local VarTrinket1Buffs, VarTrinket2Buffs
-local VarTrinket1Duration, VarTrinket2Duration
-local VarTrinket1Sync, VarTrinket2Sync
-local VarTrinketPriority
 local VarProccingBT
 local VarEffectiveEnergy, VarTimeToPool, VarNeedBT
 local VarLastConvoke, VarLastZerk, VarLastPotion
@@ -83,6 +73,16 @@ local EnemiesMelee, EnemiesCountMelee
 local Enemies8y, EnemiesCount8y
 
 --- ===== Trinket Variables =====
+local Trinket1, Trinket2
+local VarTrinket1Spell, VarTrinket2Spell
+local VarTrinket1Range, VarTrinket2Range
+local VarTrinket1CastTime, VarTrinket2CastTime
+local VarTrinket1CD, VarTrinket2CD
+local VarTrinket1BL, VarTrinket2BL
+local VarTrinket1Buffs, VarTrinket2Buffs
+local VarTrinket1Duration, VarTrinket2Duration
+local VarTrinket1Sync, VarTrinket2Sync
+local VarTrinketPriority
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData()

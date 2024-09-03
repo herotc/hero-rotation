@@ -47,6 +47,13 @@ local Settings = {
 }
 
 -- ===== Rotation Variables =====
+local VarAddsRemain, VarSTPlanning, VarExecutePhase
+local TargetInMeleeRange
+local Enemies8y, EnemiesCount8y
+local BossFightRemains = 11111
+local FightRemains = 11111
+
+--- ===== Trinket Variables =====
 local Trinket1, Trinket2
 local VarTrinket1Spell, VarTrinket2Spell
 local VarTrinket1Range, VarTrinket2Range
@@ -58,13 +65,6 @@ local VarTrinket1Sync, VarTrinket2Sync
 local VarTrinket1Buffs, VarTrinket2Buffs
 local VarTrinket1Manual, VarTrinket2Manual
 local VarTrinketPriority
-local VarAddsRemain, VarSTPlanning, VarExecutePhase
-local TargetInMeleeRange
-local Enemies8y, EnemiesCount8y
-local BossFightRemains = 11111
-local FightRemains = 11111
-
---- ===== Trinket Variables (from Precombat) =====
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData()

@@ -53,13 +53,6 @@ local Settings = {
 }
 
 --- ===== Rotation Variables =====
-local Trinket1, Trinket2
-local VarTrinket1Spell, VarTrinket2Spell
-local VarTrinket1Range, VarTrinket2Range
-local VarTrinket1CastTime, VarTrinket2CastTime
-local VarTrinket1CD, VarTrinket2CD
-local VarTrinket1BL, VarTrinket2BL
-local VarSpymasterIn1st, VarSpymasterIn2nd
 local VarMaelstrom
 local VarMaelCap = 100 + 50 * num(S.SwellingMaelstrom:IsAvailable()) + 25 * num(S.PrimordialCapacity:IsAvailable())
 local BossFightRemains = 11111
@@ -69,6 +62,13 @@ local Enemies40y, Enemies10ySplash
 Shaman.ClusterTargets = 0
 
 --- ===== Trinket Variables =====
+local Trinket1, Trinket2
+local VarTrinket1Spell, VarTrinket2Spell
+local VarTrinket1Range, VarTrinket2Range
+local VarTrinket1CastTime, VarTrinket2CastTime
+local VarTrinket1CD, VarTrinket2CD
+local VarTrinket1BL, VarTrinket2BL
+local VarSpymasterIn1st, VarSpymasterIn2nd
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData()
