@@ -41,8 +41,9 @@ local VengOldSpellIsCastable
 VengOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local BaseCheck = VengOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-    if self == SpellVengeance.SigilofFlame then
-      return BaseCheck and self:TimeSinceLastCast() > 1.3
+    if self == SpellVengeance.SigilofFlame or self == SpellVengeance.SigilofDoom then
+      local SigilPopTime = (SpellVengeance.QuickenedSigils:IsAvailable()) and 1 or 2
+      return BaseCheck and (SpellVengeance.SigilofFlame:TimeSinceLastCast() > SigilPopTime and SpellVengeance.SigilofDoom:TimeSinceLastCast() > SigilPopTime)
     elseif self == SpellVengeance.TheHunt then
       return BaseCheck and not Player:IsCasting(self)
     else

@@ -18,6 +18,7 @@ local HR            = HeroRotation
 local AoEON         = HR.AoEON
 local CDsON         = HR.CDsON
 local Cast          = HR.Cast
+local CastQueue     = HR.CastQueue
 local CastSuggested = HR.CastSuggested
 local CastAnnotated = HR.CastAnnotated
 -- Num/Bool Helper Functions
@@ -155,9 +156,9 @@ local function Defensives()
   -- Demon Spikes
   if S.DemonSpikes:IsCastable() and Player:BuffDown(S.DemonSpikesBuff) and Player:BuffDown(S.MetamorphosisBuff) and (EnemiesCount8yMelee == 1 and Player:BuffDown(S.FieryBrandDebuff) or EnemiesCount8yMelee > 1) then
     if S.DemonSpikes:ChargesFractional() > 1.9 then
-      if Cast(S.DemonSpikes, nil, Settings.Vengeance.DisplayStyle.Defensives) then return "demon_spikes defensives (Capped)"; end
+      if Cast(S.DemonSpikes, nil, Settings.Vengeance.DisplayStyle.DemonSpikes) then return "demon_spikes defensives (Capped)"; end
     elseif (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.DemonSpikesHealthThreshold) then
-      if Cast(S.DemonSpikes, nil, Settings.Vengeance.DisplayStyle.Defensives) then return "demon_spikes defensives (Danger)"; end
+      if Cast(S.DemonSpikes, nil, Settings.Vengeance.DisplayStyle.DemonSpikes) then return "demon_spikes defensives (Danger)"; end
     end
   end
   -- Metamorphosis,if=!buff.metamorphosis.up|target.time_to_die<15
@@ -166,7 +167,7 @@ local function Defensives()
   end
   -- Fiery Brand
   if S.FieryBrand:IsCastable() and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
-    if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.Defensives, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand defensives"; end
+    if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand defensives"; end
   end
 end
 
@@ -243,7 +244,7 @@ local function ARExecute()
   end
   -- fiery_brand
   if S.FieryBrand:IsCastable() then
-    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand ar_execute 12"; end
+    if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand ar_execute 12"; end
   end
   -- sigil_of_spite
   if S.SigilofSpite:IsCastable() then
@@ -367,7 +368,7 @@ local function AR()
   end
   -- fiery_brand,if=!talent.fiery_demise|(talent.fiery_demise&((talent.down_in_flames&charges>=max_charges)|(active_dot.fiery_brand=0)))
   if S.FieryBrand:IsCastable() and (not S.FieryDemise:IsAvailable() or (S.FieryDemise:IsAvailable() and ((S.DowninFlames:IsAvailable() and S.FieryBrand:Charges() >= S.FieryBrand:MaxCharges()) or (S.FieryBrandDebuff:AuraActiveCount() == 0)))) then
-    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand ar 22"; end
+    if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand ar 22"; end
   end
   -- sigil_of_spite,if=!talent.spirit_bomb|(talent.spirit_bomb&fury>=40&(variable.can_spb|variable.can_spb_soon|soul_fragments.total<=(2-talent.soul_sigils.rank)))
   if S.SigilofSpite:IsCastable() and (not S.SpiritBomb:IsAvailable() or (S.SpiritBomb:IsAvailable() and Player:Fury() >= 40 and (VarCanSpB or VarCanSpBSoon or SoulFragments <= (2 - S.SoulSigils:TalentRank())))) then
@@ -476,7 +477,7 @@ local function FelDevPrep()
   end
   -- fiery_brand,if=talent.fiery_demise&((fury+(talent.darkglare_boon.rank*23)+(10*(action.fel_devastation.execute_time+action.spirit_bomb.execute_time+action.soul_cleave.execute_time)))-(action.spirit_burst.cost+action.soul_sunder.cost+action.fel_devastation.cost)>=0)&(variable.can_spburst|variable.can_spburst_soon|soul_fragments.total>=4)&active_dot.fiery_brand=0&(cooldown.metamorphosis.remains<(execute_time+action.fel_devastation.execute_time+(gcd.max*2)))
   if S.FieryBrand:IsCastable() and (S.FieryDemise:IsAvailable() and ((Player:Fury() + (S.DarkglareBoon:TalentRank() * 23) + (10 * (S.FelDevastation:ExecuteTime() + S.SpiritBomb:ExecuteTime() + S.SoulCleave:ExecuteTime()))) - (S.SpiritBurst:Cost() + S.SoulSunder:Cost() + S.FelDevastation:Cost()) >= 0) and (VarCanSpBurst or VarCanSpBurstSoon or TotalSoulFragments >= 4) and S.FieryBrandDebuff:AuraActiveCount() == 0 and (S.Metamorphosis:CooldownRemains() < (S.FieryBrand:ExecuteTime() + S.FelDevastation:ExecuteTime() + (Player:GCD() * 2)))) then
-    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fel_dev_prep 4"; end
+    if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fel_dev_prep 4"; end
   end
   -- fel_devastation,if=((fury+(talent.darkglare_boon.rank*23)+(10*(action.fel_devastation.execute_time+action.spirit_bomb.execute_time+action.soul_cleave.execute_time)))-(action.spirit_burst.cost+action.soul_sunder.cost+action.fel_devastation.cost)>=0)&(variable.can_spburst|variable.can_spburst_soon|soul_fragments.total>=4)
   if S.FelDevastation:IsReady() and (((Player:Fury() + (S.DarkglareBoon:TalentRank() * 23) + (10 * (S.FelDevastation:ExecuteTime() + S.SpiritBomb:ExecuteTime() + S.SoulCleave:ExecuteTime()))) - (S.SpiritBurst:Cost() + S.SoulSunder:Cost() + S.FelDevastation:Cost()) >= 0) and (VarCanSpBurst or VarCanSpBurstSoon or TotalSoulFragments >= 4)) then
@@ -527,7 +528,7 @@ local function FSExecute()
   end
   -- fiery_brand
   if S.FieryBrand:IsCastable() then
-    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fs_execute 8"; end
+    if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fs_execute 8"; end
   end
   -- sigil_of_spite
   if S.SigilofSpite:IsCastable() then
@@ -544,25 +545,33 @@ local function FSExecute()
 end
 
 local function MetaPrep()
-  -- Note: metamorphosis and fiery_brand forced to main icon, as we get a Pool icon otherwise.
+  -- Note: metamorphosis and sigil_of_flame moved into a CastQueue.
+  -- Note: Intent is to suggest metamorphosis after sigil_of_flame, but before the sigil explodes.
+  -- Note: Doing this allows the sigil_of_flame to deal damage as sigil_of_doom.
   -- metamorphosis,use_off_gcd=1,if=cooldown.sigil_of_flame.charges<1&gcd.remains=0
-  if S.Metamorphosis:IsCastable() and (S.SigilofFlame:Charges() < 1) then
-    if Cast(S.Metamorphosis) then return "metamorphosis meta_prep 2"; end
-  end
+  --if S.Metamorphosis:IsCastable() and (S.SigilofFlame:Charges() < 1) then
+    --if Cast(S.Metamorphosis) then return "metamorphosis meta_prep 2"; end
+  --end
   -- fiery_brand,if=talent.fiery_demise&((talent.down_in_flames&charges>=max_charges)|active_dot.fiery_brand=0)
   if S.FieryBrand:IsCastable() and (S.FieryDemise:IsAvailable() and ((S.DowninFlames:IsAvailable() and S.FieryBrand:Charges() >= S.FieryBrand:MaxCharges()) or S.FieryBrandDebuff:AuraActiveCount() == 0)) then
-    if Cast(S.FieryBrand, nil, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand meta_prep 4"; end
+    if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand meta_prep 2"; end
   end
   -- potion,use_off_gcd=1,if=gcd.remains=0
   if Settings.Commons.Enabled.Potions then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion meta_prep 6"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion meta_prep 4"; end
     end
   end
   -- sigil_of_flame
-  if S.SigilofFlame:IsCastable() then
-    if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame meta_prep 8"; end
+  -- metamorphosis,if=cooldown.sigil_of_flame.charges>=1
+  if S.SigilofFlame:IsCastable() and S.Metamorphosis:IsCastable() then
+    if CastQueue(S.SigilofFlame, S.Metamorphosis) then return "sigil_of_flame and metamorphosis meta_prep 6"; end
+  end
+  -- metamorphosis,if=cooldown.sigil_of_flame.charges=0
+  -- Note: Forced to main icon, as otherwise the main icon will be Pool.
+  if S.Metamorphosis:IsCastable() and (S.SigilofFlame:Charges() == 0 or Player:PrevGCD(1, S.SigilofFlame)) then
+    if Cast(S.Metamorphosis) then return "metamorphosis meta_prep 8"; end
   end
 end
 
@@ -721,7 +730,7 @@ local function FS()
   end
   -- fiery_brand,if=!talent.fiery_demise|talent.fiery_demise&((talent.down_in_flames&charges>=max_charges)|(active_dot.fiery_brand=0&variable.fiery_brand_back_before_meta))
   if S.FieryBrand:IsCastable() and (not S.FieryDemise:IsAvailable() or S.FieryDemise:IsAvailable() and ((S.DowninFlames:IsAvailable() and S.FieryBrand:Charges() >= S.FieryBrand:MaxCharges()) or (S.FieryBrandDebuff:AuraActiveCount() == 0 and VarFBBeforeMeta))) then
-    if Cast(S.FieryBrand, Settings.Vengeance.GCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fs 6"; end
+    if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fs 6"; end
   end
   -- call_action_list,name=fs_execute,if=fight_remains<20
   if BossFightRemains < 20 then

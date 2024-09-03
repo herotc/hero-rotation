@@ -78,7 +78,8 @@ HR.GUISettings.APL.DemonHunter = {
       Selected = "Power",
     },
     DisplayStyle = {
-      Defensives = "SuggestedRight",
+      DemonSpikes = "SuggestedRight",
+      FieryBrand = "SuggestedRight",
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
