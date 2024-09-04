@@ -320,8 +320,8 @@ local function Standard()
   if S.CrusaderStrike:IsCastable() then
     if Cast(S.CrusaderStrike, nil, nil, not Target:IsInMeleeRange(5)) then return "crusader_strike standard 40"; end
   end
-  -- word_of_glory,if=buff.shining_light_free.up&talent.lights_guidance.enabled
-  if S.WordofGlory:IsReady() and (Player:BuffUp(S.ShiningLightFreeBuff) and S.LightsGuidance:IsAvailable()) then
+  -- word_of_glory,if=buff.shining_light_free.up&talent.lights_guidance.enabled&cooldown.hammerfall_icd.remains=0
+  if S.WordofGlory:IsReady() and (Player:BuffUp(S.ShiningLightFreeBuff) and S.LightsGuidance:IsAvailable() and S.WordofGlory:TimeSinceLastCast() > 1 and S.ShieldoftheRighteous:TimeSinceLastCast() > 1) then
     -- Is our health ok? Are we in a party with a wounded party member? Heal them instead.
     if Player:HealthPercentage() > 90 and Player:IsInParty() and not Player:IsInRaid() then
       for _, Char in pairs(Unit.Party) do
