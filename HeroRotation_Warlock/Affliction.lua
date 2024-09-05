@@ -548,7 +548,7 @@ local function Cleave()
   -- drain_soul,target_if=min:debuff.shadow_embrace.remains,if=buff.nightfall.react&(talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)|!talent.shadow_embrace)
   -- shadow_bolt,target_if=min:debuff.shadow_embrace.remains,if=buff.nightfall.react&(talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)|!talent.shadow_embrace)
   if DSSB:IsReady() and (Player:BuffUp(S.NightfallBuff)) then
-    if Everyone.CastTargetIf(DSSB, Enemies40y, "min", EvaluateTargetIfFilterShadowEmbrace, EvaluateTargetIfDrainSoul, not Target:IsSpellInRange(DSSB)) then return "drain_soul/shadow_bolt cleave 24"; end
+    if Everyone.CastTargetIf(DSSB, Enemies40y, "min", EvaluateTargetIfFilterShadowEmbrace, EvaluateTargetIfDrainSoul, not Target:IsInRange(40)) then return "drain_soul/shadow_bolt cleave 24"; end
   end
   -- malefic_rapture,if=variable.cd_dots_up|variable.vt_ps_up
   if S.MaleficRapture:IsReady() and (VarCDDoTsUp or VarVTPSUp) then
@@ -577,7 +577,7 @@ local function Cleave()
   -- drain_soul,interrupt_global=1
   -- shadow_bolt
   if DSSB:IsReady() then
-    if Cast(DSSB, nil, nil, not Target:IsSpellInRange(DSSB)) then return "drain_soul/shadow_bolt cleave 38"; end
+    if Cast(DSSB, nil, nil, not Target:IsInRange(40)) then return "drain_soul/shadow_bolt cleave 38"; end
   end
 end
 
@@ -665,7 +665,7 @@ local function APL()
     GCDMax = Player:GCD() + 0.25
   end
 
-  -- summon_pet 
+  -- summon_pet
   if S.SummonPet:IsCastable() then
     if Cast(S.SummonPet, Settings.Affliction.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
   end
@@ -789,7 +789,7 @@ local function APL()
     -- drain_soul,if=buff.nightfall.react
     -- shadow_bolt,if=buff.nightfall.react
     if DSSB:IsReady() and Player:BuffUp(S.NightfallBuff) then
-      if Cast(DSSB, nil, nil, not Target:IsSpellInRange(DSSB)) then return "drain_soul/shadow_bolt main 38"; end
+      if Cast(DSSB, nil, nil, not Target:IsInRange(40)) then return "drain_soul/shadow_bolt main 38"; end
     end
     -- agony,if=refreshable
     if S.Agony:IsReady() and (Target:DebuffRefreshable(S.AgonyDebuff)) then
@@ -802,7 +802,7 @@ local function APL()
     -- drain_soul,chain=1,early_chain_if=buff.nightfall.react,interrupt_if=tick_time>0.5
     -- shadow_bolt
     if DSSB:IsReady() then
-      if Cast(DSSB, nil, nil, not Target:IsSpellInRange(DSSB)) then return "drain_soul/shadow_bolt main 44"; end
+      if Cast(DSSB, nil, nil, not Target:IsInRange(40)) then return "drain_soul/shadow_bolt main 44"; end
     end
   end
 end
