@@ -315,7 +315,11 @@ local function Precombat()
   -- NYI precombat multi target
   -- haunt
   if S.Haunt:IsReady() then
-    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt precombat 6"; end
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt precombat 4"; end
+  end
+  -- Manually added: unstable_affliction
+  if S.UnstableAffliction:IsReady() then
+    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction precombat 6"; end
   end
 end
 
