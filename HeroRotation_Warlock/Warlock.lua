@@ -175,7 +175,8 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   VileTaintDebuff                       = Spell(386931),
   SoulRotDebuff                         = Spell(386997),
   DreadTouchDebuff                      = Spell(389868),
-  ShadowEmbraceDebuff                   = Spell(32390),
+  ShadowEmbraceDSDebuff                 = Spell(32390),
+  ShadowEmbraceSBDebuff                 = Spell(453206),
 })
 Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Affliction, Spell.Warlock.Hellcaller)
 Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Affliction, Spell.Warlock.SoulHarvester)
