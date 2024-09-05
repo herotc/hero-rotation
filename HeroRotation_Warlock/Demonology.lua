@@ -152,8 +152,10 @@ local function SetTrinketVariables()
     VarTrinket2Sync = 1
   end
 
+  local T1Level = Trinket1:Level() or 0
+  local T2Level = Trinket2:Level() or 0
   VarDamageTrinketPriority = 1
-  if not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2:Level() > Trinket1:Level() then
+  if not VarTrinket1Buffs and not VarTrinket2Buffs and T2Level > T1Level then
     VarDamageTrinketPriority = 2
   end
 
