@@ -201,6 +201,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   MomentofClarity                       = Spell(236068),
   Predator                              = Spell(202021),
   PrimalWrath                           = Spell(285381),
+  RagingFury                            = Spell(391078),
   RampantFerocity                       = Spell(391709),
   RipandTear                            = Spell(391347),
   Sabertooth                            = Spell(202031),
@@ -210,6 +211,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   ThrashingClaws                        = Spell(405300),
   TigersFury                            = Spell(5217),
   UnbridledSwarm                        = Spell(391951),
+  Veinripper                            = Spell(391978),
   WildSlashes                           = Spell(390864),
   -- Buffs
   ApexPredatorsCravingBuff              = Spell(391882),
@@ -279,7 +281,7 @@ Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Restoration, Spell.Druid.W
 -- Items
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Commons = {
-  -- Trinkets
+  -- DF Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   AshesoftheEmbersoul                   = Item(207167, {13, 14}),
   BandolierofTwistedBlades              = Item(207165, {13, 14}),
@@ -292,6 +294,8 @@ Item.Druid.Commons = {
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   WitherbarksBranch                     = Item(109999, {13, 14}),
   VerdantBadge                          = Item(209343, {13, 14}),
+  -- TWW Trinkets
+  OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
   -- Other On-Use Items
   Djaruun                               = Item(202569, {16}),
   Jotungeirr                            = Item(186404, {16}),
