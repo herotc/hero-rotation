@@ -684,27 +684,27 @@ local function APL()
       end
     end
     -- call_action_list,name=racials,if=pet.demonic_tyrant.active|fight_remains<22,use_off_gcd=1
-    --if CDsON() and (DemonicTyrantActive() or FightRemains < 22) then
-      --local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
-    --end
+    if CDsON() and (DemonicTyrantActive() or FightRemains < 22) then
+      local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
+    end
     -- call_action_list,name=items,use_off_gcd=1
-    --if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
-      --local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
-    --end
+    if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
+      local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
+    end
     -- invoke_external_buff,name=power_infusion,if=fight_remains<20|pet.demonic_tyrant.active&fight_remains<100|fight_remains<25|(pet.demonic_tyrant.active|!talent.summon_demonic_tyrant&buff.dreadstalkers.up)
     -- Note: Not handling external buffs
     -- call_action_list,name=fight_end,if=fight_remains<30
-    --if FightRemains < 30 then
-      --local ShouldReturn = FightEnd(); if ShouldReturn then return ShouldReturn; end
-    --end
+    if FightRemains < 30 then
+      local ShouldReturn = FightEnd(); if ShouldReturn then return ShouldReturn; end
+    end
     -- call_action_list,name=opener,if=time<variable.first_tyrant_time
     if CombatTime < VarFirstTyrantTime then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=tyrant,if=cooldown.summon_demonic_tyrant.remains<gcd.max*14
-    --if S.SummonDemonicTyrant:CooldownRemains() < Player:GCD() * 14 then
-      --local ShouldReturn = Tyrant(); if ShouldReturn then return ShouldReturn; end
-    --end
+    if S.SummonDemonicTyrant:CooldownRemains() < Player:GCD() * 14 then
+      local ShouldReturn = Tyrant(); if ShouldReturn then return ShouldReturn; end
+    end
     -- hand_of_guldan,if=time<0.5&(fight_remains%%95>40|fight_remains%%95<15)&(talent.reign_of_tyranny|active_enemies>2)
     if S.HandofGuldan:IsReady() and (CombatTime < 0.5 and (FightRemains % 95 > 40 or FightRemains % 95 < 15) and (S.ReignofTyranny:IsAvailable() or EnemiesCount8ySplash > 2)) then
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 4"; end
@@ -722,9 +722,9 @@ local function APL()
       if Cast(VilefiendAbility) then return "summon_vilefiend main 10"; end
     end
     -- demonbolt,target_if=(!debuff.doom.up|!action.demonbolt.in_flight&debuff.doom.remains<=2),if=buff.demonic_core.up&(((!talent.soul_strike|cooldown.soul_strike.remains>gcd.max*2&talent.fel_invocation)&soul_shard<4)|soul_shard<(4-(active_enemies>2)))&!prev_gcd.1.demonbolt&talent.doom&cooldown.summon_demonic_tyrant.remains>15
-    --if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and (((not S.SoulStrike:IsAvailable() or S.SoulStrike:CooldownRemains() > Player:GCD() * 2 and S.FelInvocation:IsAvailable()) and SoulShards < 4) or SoulShards < (4 - (num(EnemiesCount8ySplash > 2)))) and not Player:PrevGCDP(1, S.Demonbolt) and S.Doom:IsAvailable() and S.SummonDemonicTyrant:CooldownRemains() > 15) then
-      --if Everyone.CastCycle(S.Demonbolt, Enemies8ySplash, EvaluateCycleDemonbolt, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 12"; end
-    --end
+    if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and (((not S.SoulStrike:IsAvailable() or S.SoulStrike:CooldownRemains() > Player:GCD() * 2 and S.FelInvocation:IsAvailable()) and SoulShards < 4) or SoulShards < (4 - (num(EnemiesCount8ySplash > 2)))) and not Player:PrevGCDP(1, S.Demonbolt) and S.Doom:IsAvailable() and S.SummonDemonicTyrant:CooldownRemains() > 15) then
+      if Everyone.CastCycle(S.Demonbolt, Enemies8ySplash, EvaluateCycleDemonbolt, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 12"; end
+    end
     -- demonbolt,if=buff.demonic_core.stack>=3&soul_shard<=3&!variable.pool_cores_for_tyrant
     if S.Demonbolt:IsReady() and (DemonicCoreStacks >= 3 and SoulShards <= 3 and not VarPoolCoresForTyrant) then
       if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 14"; end
@@ -775,9 +775,9 @@ local function APL()
       if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan main 36"; end
     end
     -- demonbolt,target_if=(!debuff.doom.up)|active_enemies<4,if=buff.demonic_core.stack>1&((soul_shard<4&!talent.soul_strike|cooldown.soul_strike.remains>gcd.max*2&talent.fel_invocation)|soul_shard<3)&!variable.pool_cores_for_tyrant
-    --if S.Demonbolt:IsReady() and (DemonicCoreStacks > 1 and ((SoulShards < 4 and not S.SoulStrike:IsAvailable() or S.SoulStrike:CooldownRemains() > Player:GCD() * 2 and S.FelInvocation:IsAvailable()) or SoulShards < 3) and not VarPoolCoresForTyrant) then
-      --if Everyone.CastCycle(S.Demonbolt, Enemies8ySplash, EvaluateCycleDemonbolt2, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 38"; end
-    --end
+    if S.Demonbolt:IsReady() and (DemonicCoreStacks > 1 and ((SoulShards < 4 and not S.SoulStrike:IsAvailable() or S.SoulStrike:CooldownRemains() > Player:GCD() * 2 and S.FelInvocation:IsAvailable()) or SoulShards < 3) and not VarPoolCoresForTyrant) then
+      if Everyone.CastCycle(S.Demonbolt, Enemies8ySplash, EvaluateCycleDemonbolt2, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 38"; end
+    end
     -- demonbolt,if=buff.demonic_core.react&buff.tyrant.up&soul_shard<3-talent.quietus
     if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and DemonicTyrantActive() and SoulShards < 3 - num(S.Quietus:IsAvailable())) then
       if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 40"; end
@@ -795,9 +795,9 @@ local function APL()
       if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 46"; end
     end
     -- demonbolt,target_if=(!debuff.doom.up)|active_enemies<4,if=buff.demonic_core.up&(cooldown.power_siphon.remains<4)&(soul_shard<4-talent.quietus)&!variable.pool_cores_for_tyrant
-    --if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and (S.PowerSiphon:CooldownRemains() < 4) and (SoulShards < 4 - num(S.Quietus:IsAvailable())) and not VarPoolCoresForTyrant) then
-      --if Everyone.CastCycle(S.Demonbolt, Enemies8ySplash, EvaluateCycleDemonbolt2, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 46"; end
-    --end
+    if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and (S.PowerSiphon:CooldownRemains() < 4) and (SoulShards < 4 - num(S.Quietus:IsAvailable())) and not VarPoolCoresForTyrant) then
+      if Everyone.CastCycle(S.Demonbolt, Enemies8ySplash, EvaluateCycleDemonbolt2, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 46"; end
+    end
     -- power_siphon,if=!buff.demonic_core.up&cooldown.summon_demonic_tyrant.remains>25
     if S.PowerSiphon:IsCastable() and (Player:BuffDown(S.DemonicCoreBuff) and S.SummonDemonicTyrant:CooldownRemains() > 25) then
       if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon main 48"; end
