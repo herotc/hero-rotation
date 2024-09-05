@@ -983,22 +983,22 @@ local function APL()
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for ColossusST()"; end
     end
     -- run_action_list,name=slayer_aoe,if=talent.slayers_dominance&active_enemies>2
-    if S.SlayersDominance:IsAvailable() and AoEON() and EnemiesCount8y > 2 then
+    if (S.SlayersDominance:IsAvailable() or Player:Level() < 71) and AoEON() and EnemiesCount8y > 2 then
       local ShouldReturn = SlayerAoE(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SlayerAoE()"; end
     end
     -- run_action_list,name=slayer_execute,target_if=min:target.health.pct,if=talent.slayers_dominance&variable.execute_phase
-    if S.SlayersDominance:IsAvailable() and VarExecutePhase then
+    if (S.SlayersDominance:IsAvailable() or Player:Level() < 71) and VarExecutePhase then
       local ShouldReturn = SlayerExecute(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SlayerExecute()"; end
     end
     -- run_action_list,name=slayer_sweep,if=talent.slayers_dominance&active_enemies=2&!variable.execute_phase
-    if S.SlayersDominance:IsAvailable() and AoEON() and EnemiesCount8y == 2 and not VarExecutePhase then
+    if (S.SlayersDominance:IsAvailable() or Player:Level() < 71) and AoEON() and EnemiesCount8y == 2 and not VarExecutePhase then
       local ShouldReturn = SlayerSweep(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SlayerSweep()"; end
     end
     -- run_action_list,name=slayer_st,if=talent.slayers_dominance
-    if S.SlayersDominance:IsAvailable() then
+    if S.SlayersDominance:IsAvailable() or Player:Level() < 71 then
       local ShouldReturn = SlayerST(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SlayerST()"; end
     end

@@ -707,22 +707,22 @@ local function APL()
     end
     -- Note: For below lines, using <2 instead of =1 to avoid losing suggestions when moving slightly out of range.
     -- run_action_list,name=slayer_st,if=talent.slayers_dominance&active_enemies=1
-    if S.SlayersDominance:IsAvailable() and EnemiesMeleeCount < 2 then
+    if (S.SlayersDominance:IsAvailable() or Player:Level() < 71) and (EnemiesMeleeCount < 2 or not AoEON()) then
       local ShouldReturn = SlayerST(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SlayerST()"; end
     end
     -- run_action_list,name=slayer_mt,if=talent.slayers_dominance&active_enemies>1 
-    if S.SlayersDominance:IsAvailable() and EnemiesMeleeCount > 1 then
+    if (S.SlayersDominance:IsAvailable() or Player:Level() < 71) and AoEON() and EnemiesMeleeCount > 1 then
       local ShouldReturn = SlayerMT(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SlayerMT()"; end
     end
     -- run_action_list,name=thane_st,if=talent.lightning_strikes&active_enemies=1
-    if S.LightningStrikes:IsAvailable() and EnemiesMeleeCount < 2 then
+    if S.LightningStrikes:IsAvailable() and (EnemiesMeleeCount < 2 or not AoEON()) then
       local ShouldReturn = ThaneST(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for ThaneST()"; end
     end
     -- run_action_list,name=thane_mt,if=talent.lightning_strikes&active_enemies>1
-    if S.LightningStrikes:IsAvailable() and EnemiesMeleeCount > 1 then
+    if S.LightningStrikes:IsAvailable() and AoEON() and EnemiesMeleeCount > 1 then
       local ShouldReturn = ThaneMT(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for ThaneMT()"; end
     end
