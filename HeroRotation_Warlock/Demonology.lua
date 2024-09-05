@@ -366,7 +366,7 @@ local function FightEnd()
     if Cast(VilefiendAbility) then return "summon_vilefiend fight_end 12"; end
   end
   -- summon_demonic_tyrant,if=fight_remains<20
-  if CDsON() and S.SummonDemonicTyrant:IsCastable() and (BossFightRemains < 20) then
+  if S.SummonDemonicTyrant:IsCastable() and (BossFightRemains < 20) then
     if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant fight_end 14"; end
   end
   -- demonic_strength,if=fight_remains<10
@@ -443,7 +443,7 @@ end
 
 local function Opener()
   -- grimoire_felguard,if=soul_shard>=5-talent.fel_invocation
-  if S.GrimoireFelguard:IsReady() and (SoulShards >= 5 - num(S.FelInvocation:IsAvailable())) then
+  if CDsON() and S.GrimoireFelguard:IsReady() and (SoulShards >= 5 - num(S.FelInvocation:IsAvailable())) then
     if Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, not Target:IsSpellInRange(S.GrimoireFelguard)) then return "grimoire_felguard opener 2"; end
   end
   -- summon_vilefiend,if=soul_shard=5
@@ -532,7 +532,7 @@ local function Tyrant()
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt tyrant 16"; end
   end
   -- grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains<13+gcd.max&cooldown.summon_vilefiend.remains<gcd.max&cooldown.call_dreadstalkers.remains<gcd.max*3.33&(soul_shard=5-(pet.felguard.cooldown.soul_strike.remains<gcd.max)&talent.fel_invocation|soul_shard=5)
-  if S.GrimoireFelguard:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() < 13 + Player:GCD() and VilefiendAbility:CooldownRemains() < Player:GCD() and S.CallDreadstalkers:CooldownRemains() < Player:GCD() * 3.33 and (SoulShards == 5 - num(S.SoulStrikePetAbility:CooldownRemains() < Player:GCD()) and S.FelInvocation:IsAvailable() or SoulShards == 5)) then
+  if CDsON() and S.GrimoireFelguard:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() < 13 + Player:GCD() and VilefiendAbility:CooldownRemains() < Player:GCD() and S.CallDreadstalkers:CooldownRemains() < Player:GCD() * 3.33 and (SoulShards == 5 - num(S.SoulStrikePetAbility:CooldownRemains() < Player:GCD()) and S.FelInvocation:IsAvailable() or SoulShards == 5)) then
     if Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, not Target:IsSpellInRange(S.GrimoireFelguard)) then return "grimoire_felguard tyrant 18"; end
   end
   -- summon_vilefiend,if=(buff.grimoire_felguard.up|cooldown.grimoire_felguard.remains>10|!talent.grimoire_felguard)&cooldown.summon_demonic_tyrant.remains<13&cooldown.call_dreadstalkers.remains<gcd.max*2.33&(soul_shard=5|soul_shard=4&(buff.demonic_core.react=4)|buff.grimoire_felguard.up)
