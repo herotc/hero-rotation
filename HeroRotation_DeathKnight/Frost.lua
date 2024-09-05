@@ -406,8 +406,8 @@ local function Cooldowns()
   if S.ChillStreak:IsReady() and (VarSendingCDs and (not S.ArcticAssault:IsAvailable() or Player:BuffDown(S.PillarofFrostBuff))) then
     if Cast(S.ChillStreak, Settings.Frost.GCDasOffGCD.ChillStreak, nil, not Target:IsSpellInRange(S.ChillStreak)) then return "chill_streak cooldowns 8"; end
   end
-  -- reapers_mark,target_if=first:debuff.reapers_mark_debuff.down
-  if S.ReapersMark:IsReady() then
+  -- reapers_mark,target_if=first:debuff.reapers_mark_debuff.down,if=!talent.breath_of_sindragosa&(buff.pillar_of_frost.up|cooldown.pillar_of_frost.remains>10)|talent.breath_of_sindragosa
+  if S.ReapersMark:IsReady() and (not S.BreathofSindragosa:IsAvailable() and (Player:BuffUp(S.PillarofFrostBuff) or S.PillarofFrost:CooldownRemains() > 10) or S.BreathofSindragosa:IsAvailable()) then
     if Everyone.CastCycle(S.ReapersMark, EnemiesMelee, EvaluateCycleReapersMarkCDs, not Target:IsInMeleeRange(5), Settings.Frost.GCDasOffGCD.ReapersMark) then return "reapers_mark cooldowns 10"; end
   end
   -- empower_rune_weapon,if=talent.obliteration&!talent.breath_of_sindragosa&buff.pillar_of_frost.up|fight_remains<20
@@ -466,8 +466,8 @@ local function Cooldowns()
   if S.Frostscythe:IsReady() and (Player:BuffDown(S.KillingMachineBuff) and (not S.ArcticAssault:IsAvailable() or Player:BuffDown(S.PillarofFrostBuff))) then
     if Cast(S.Frostscythe, nil, nil, not Target:IsInMeleeRange(8)) then return "frostscythe cooldowns 38"; end
   end
-  -- any_dnd,if=!buff.death_and_decay.up&!buff.mograines_might.up&variable.adds_remain&(buff.pillar_of_frost.up&buff.killing_machine.react&(talent.enduring_strength|buff.pillar_of_frost.remains>5)|!buff.pillar_of_frost.up&(cooldown.death_and_decay.charges=2|cooldown.pillar_of_frost.remains>cooldown.death_and_decay.duration|!talent.the_long_winter&cooldown.pillar_of_frost.remains<gcd.max*2)|fight_remains<15)&(active_enemies>5|talent.cleaving_strikes&active_enemies>=2)
-  if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and Player:BuffDown(S.MograinesMightBuff) and VarAddsRemain and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffUp(S.KillingMachineBuff) and (S.EnduringStrength:IsAvailable() or Player:BuffRemains(S.PillarofFrostBuff) > 5) or Player:BuffDown(S.PillarofFrostBuff) and (S.DeathAndDecay:Charges() == 2 or S.PillarofFrost:CooldownRemains() > S.DeathAndDecay:Cooldown() or not S.TheLongWinter:IsAvailable() and S.PillarofFrost:CooldownRemains() < Player:GCD() * 2) or BossFightRemains < 15) and (EnemiesMeleeCount > 5 or S.CleavingStrikes:IsAvailable() and EnemiesMeleeCount >= 2)) then
+  -- any_dnd,if=!buff.death_and_decay.up&variable.adds_remain&(buff.pillar_of_frost.up&buff.killing_machine.react&(talent.enduring_strength|buff.pillar_of_frost.remains>5)|!buff.pillar_of_frost.up&(cooldown.death_and_decay.charges=2|cooldown.pillar_of_frost.remains>cooldown.death_and_decay.duration|!talent.the_long_winter&cooldown.pillar_of_frost.remains<gcd.max*2)|fight_remains<15)&(active_enemies>5|talent.cleaving_strikes&active_enemies>=2)
+  if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and VarAddsRemain and (Player:BuffUp(S.PillarofFrostBuff) and Player:BuffUp(S.KillingMachineBuff) and (S.EnduringStrength:IsAvailable() or Player:BuffRemains(S.PillarofFrostBuff) > 5) or Player:BuffDown(S.PillarofFrostBuff) and (S.DeathAndDecay:Charges() == 2 or S.PillarofFrost:CooldownRemains() > S.DeathAndDecay:Cooldown() or not S.TheLongWinter:IsAvailable() and S.PillarofFrost:CooldownRemains() < Player:GCD() * 2) or BossFightRemains < 15) and (EnemiesMeleeCount > 5 or S.CleavingStrikes:IsAvailable() and EnemiesMeleeCount >= 2)) then
     if Cast(S.DeathAndDecay, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "death_and_decay cooldowns 40"; end
   end
 end
