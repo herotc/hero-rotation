@@ -94,8 +94,9 @@ Warlock.GuardiansTable = {
   DemonicTyrantDuration = 0,
   VilefiendDuration = 0,
   PitLordDuration = 0,
-  Infernal = 0,
-  Blasphemy = 0,
+  InfernalDuration = 0,
+  OverfiendDuration = 0,
+  BlasphemyDuration = 0,
   DarkglareDuration = 0,
 
   -- Used for Wild Imps spawn prediction
@@ -152,6 +153,11 @@ local PetsData = {
   [226269] = { -- Charhound
     name = "Vilefiend",
     duration = 15
+  },
+  -- Destruction Overfiend
+  [217429] = {
+    name = "Overfiend",
+    duration = 8
   },
 }
 
@@ -260,6 +266,8 @@ function Warlock.UpdatePetTable()
           Warlock.GuardiansTable.InfernalDuration = 0
         elseif petTable.name == "Blasphemy" then
           Warlock.GuardiansTable.BlasphemyDuration = 0
+        elseif petTable.name == "Overfiend" then
+          Warlock.GuardiansTable.OverfiendDuration = 0
         elseif petTable.name == "Darkglare" then
           Warlock.GuardiansTable.DarkglareDuration = 0
         end
@@ -288,6 +296,8 @@ function Warlock.UpdatePetTable()
         Warlock.GuardiansTable.InfernalDuration = petTable.Duration
       elseif petTable.name == "Blasphy" then
         Warlock.GuardiansTable.BlasphemyDuration = petTable.Duration
+      elseif petTable.name == "Overfiend" then
+        Warlock.GuardiansTable.OverfiendDuration = petTable.Duration
       elseif petTable.name == "Darkglare" then
         Warlock.GuardiansTable.DarkglareDuration = petTable.Duration
       end
@@ -331,6 +341,9 @@ HL:RegisterForSelfCombatEvent(
         petDuration = summonedPet.duration
       elseif summonedPet.name == "Blasphemy" then
         Warlock.GuardiansTable.BlasphemyDuration = summonedPet.duration
+        petDuration = summonedPet.duration
+      elseif summonedPet.name == "Overfiend" then
+        Warlock.GuardiansTable.OverfiendDuration = summonedPet.duration
         petDuration = summonedPet.duration
       elseif summonedPet.name == "Darkglare" then
         Warlock.GuardiansTable.DarkglareDuration = summonedPet.duration

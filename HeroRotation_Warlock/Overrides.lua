@@ -228,10 +228,12 @@ HL.AddCoreOverride ("Player.SoulShardsP",
     if not Player:IsCasting() then
       return Shard
     else
-      if Player:IsCasting(SpellDestro.ChaosBolt) then
+      if Player:IsCasting(SpellDestro.ChaosBolt) or Player:IsCasting(SpellDestro.RainofFire) and SpellDestro.Inferno:IsAvailable() then
         return Shard - 2
-      elseif Player:IsCasting(SpellDestro.RainofFire) then
+      elseif Player:IsCasting(SpellDestro.RainofFire) and not SpellDestro.Inferno:IsAvailable() then
         return Shard - 3
+      elseif Player:IsCasting(SpellDestro.SummonPet) then
+        return Shard - 1
       elseif Player:IsCasting(SpellDestro.Incinerate) then
         return min(Shard + 0.2, 5)
       elseif Player:IsCasting(SpellDestro.Conflagrate) then
