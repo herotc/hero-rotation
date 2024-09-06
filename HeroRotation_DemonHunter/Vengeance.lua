@@ -282,7 +282,7 @@ local function AR()
     VarDoubleRMExpires = HL.CombatTime() + 20
   end
   -- variable,name=double_rm_remains,op=setif,condition=(variable.double_rm_expires-time)>0,value=variable.double_rm_expires-time,value_else=0
-  VarDoubleRMRemains = ((VarDoubleRMExpires - HL.CombatTime()) > 0) and (VarDoubleRMExpires - HL.CombatTime) or 0
+  VarDoubleRMRemains = ((VarDoubleRMExpires - HL.CombatTime()) > 0) and (VarDoubleRMExpires - HL.CombatTime()) or 0
   -- variable,name=double_rm_remains,op=print
   -- variable,name=rg_sequence_duration,op=set,value=action.fracture.execute_time+action.soul_cleave.execute_time+action.reavers_glaive.execute_time
   VarRGSequenceDuration = S.Fracture:ExecuteTime() + S.SoulCleave:ExecuteTime() + S.ReaversGlaive:ExecuteTime()
