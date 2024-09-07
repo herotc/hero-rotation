@@ -275,7 +275,7 @@ end
 
 local function EvaluateCycleDemonbolt2(TargetUnit)
   -- target_if=(!debuff.doom.up)|active_enemies<4
-  return TargetUnit:DebuffDown(S.DoomdDebuff) or EnemiesCount8ySplash < 4
+  return TargetUnit:DebuffDown(S.DoomDebuff) or EnemiesCount8ySplash < 4
 end
 
 local function EvaluateCycleDemonbolt3(TargetUnit)
