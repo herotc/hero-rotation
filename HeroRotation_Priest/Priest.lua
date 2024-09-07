@@ -95,6 +95,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   VoidEruption                = Spell(228260), -- Splash, 10
   -- Talents
   DarkAscension               = Spell(391109),
+  Deathspeaker                = Spell(392507),
   DevouringPlague             = Spell(335467),
   Dispersion                  = Spell(47585),
   DistortedReality            = Spell(409044),

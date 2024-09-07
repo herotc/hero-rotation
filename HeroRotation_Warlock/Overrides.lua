@@ -205,7 +205,7 @@ DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
     local BaseCheck = DemoOldSpellIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    if self == SpellDemo.SummonVilefiend or SpellDemo.GrimoireFelguard or self == SpellDemo.NetherPortal or self == SpellDemo.Soulburn then
+    if self == SpellDemo.SummonVilefiend or self == SpellDemo.SummonCharhound or self == SpellDemo.SummonGloomhound or SpellDemo.GrimoireFelguard then
       return BaseCheck and Player:SoulShardsP() >= 1 and not Player:IsCasting(self)
     elseif self == SpellDemo.CallDreadstalkers then
       return BaseCheck and (Player:SoulShardsP() >= 2 or Player:BuffUp(SpellDemo.DemonicCallingBuff)) and not Player:IsCasting(self)
@@ -228,10 +228,12 @@ HL.AddCoreOverride ("Player.SoulShardsP",
     if not Player:IsCasting() then
       return Shard
     else
-      if Player:IsCasting(SpellDestro.ChaosBolt) then
+      if Player:IsCasting(SpellDestro.ChaosBolt) or Player:IsCasting(SpellDestro.RainofFire) and SpellDestro.Inferno:IsAvailable() then
         return Shard - 2
-      elseif Player:IsCasting(SpellDestro.RainofFire) then
+      elseif Player:IsCasting(SpellDestro.RainofFire) and not SpellDestro.Inferno:IsAvailable() then
         return Shard - 3
+      elseif Player:IsCasting(SpellDestro.SummonPet) then
+        return Shard - 1
       elseif Player:IsCasting(SpellDestro.Incinerate) then
         return min(Shard + 0.2, 5)
       elseif Player:IsCasting(SpellDestro.Conflagrate) then

@@ -41,6 +41,7 @@ Spell.Warlock.Commons = {
   InquisitorsGazeBuff                   = Spell(388068),
   Soulburn                              = Spell(385899),
   -- Buffs
+  SpymastersReportBuff                  = Spell(451199),
   -- Debuffs
   -- Command Demon Abilities
   AxeToss                               = Spell(119914),
@@ -51,6 +52,21 @@ Spell.Warlock.Commons = {
 }
 
 Spell.Warlock.Diabolist = {
+  -- Abilities
+  InfernalBolt                          = Spell(434506),
+  RuinationAbility                      = Spell(434635),
+  -- Talents
+  DiabolicRitual                        = Spell(428514),
+  Ruination                             = Spell(428522),
+  SecretsoftheCoven                     = Spell(428518),
+  -- Buffs
+  DemonicArtMotherBuff                  = Spell(432794),
+  DemonicArtOverlordBuff                = Spell(428524),
+  DemonicArtPitLordBuff                 = Spell(432795),
+  DiabolicRitualMotherBuff              = Spell(432815),
+  DiabolicRitualOverlordBuff            = Spell(431944),
+  DiabolicRitualPitLordBuff             = Spell(432816),
+  InfernalBoltBuff                      = Spell(433891),
 }
 
 Spell.Warlock.Hellcaller = {
@@ -64,48 +80,8 @@ Spell.Warlock.Hellcaller = {
 Spell.Warlock.SoulHarvester = {
   -- Talents
   DemonicSoul                           = Spell(449614),
+  Quietus                               = Spell(449634),
 }
-
-Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
-  -- Base Abilities
-  Felstorm                              = Spell(89751),
-  HandofGuldan                          = Spell(105174), -- Splash, 8
-  ShadowBoltLineCD                      = Spell(686),
-  SummonPet                             = Spell(30146),
-  -- Talents
-  BilescourgeBombers                    = Spell(267211), -- Splash, 8
-  CallDreadstalkers                     = Spell(104316),
-  Demonbolt                             = Spell(264178),
-  DemonicCalling                        = Spell(205145),
-  DemonicStrength                       = Spell(267171),
-  Doom                                  = Spell(603),
-  GrandWarlocksDesign                   = Spell(387084),
-  GrimoireFelguard                      = Spell(111898),
-  Guillotine                            = Spell(386833),
-  Implosion                             = Spell(196277), -- Splash, 8
-  InnerDemons                           = Spell(267216),
-  NetherPortal                          = Spell(267217),
-  PowerSiphon                           = Spell(264130),
-  ReignofTyranny                        = Spell(427684),
-  SacrificedSouls                       = Spell(267214),
-  SoulboundTyrant                       = Spell(334585),
-  SoulStrike                            = Spell(428344),
-  SummonDemonicTyrant                   = Spell(265187),
-  SummonVilefiend                       = Spell(264119),
-  TheExpendables                        = Spell(387600),
-  -- Buffs
-  DemonicCallingBuff                    = Spell(205146),
-  DemonicCoreBuff                       = Spell(264173),
-  DemonicPowerBuff                      = Spell(265273),
-  NetherPortalBuff                      = Spell(267218),
-  RiteofRuvaraadBuff                    = Spell(409725), -- T30 4pc
-  -- Debuffs
-  DoomDebuff                            = Spell(603),
-  DoomBrandDebuff                       = Spell(423583), -- T31 2pc
-  FromtheShadowsDebuff                  = Spell(270569),
-})
-Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Demonology, Spell.Warlock.Diabolist)
-Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Demonology, Spell.Warlock.SoulHarvester)
 
 Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   -- Base Abilities
@@ -155,10 +131,59 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   VileTaintDebuff                       = Spell(386931),
   SoulRotDebuff                         = Spell(386997),
   DreadTouchDebuff                      = Spell(389868),
-  ShadowEmbraceDebuff                   = Spell(32390),
+  ShadowEmbraceDSDebuff                 = Spell(32390),
+  ShadowEmbraceSBDebuff                 = Spell(453206),
 })
 Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Affliction, Spell.Warlock.Hellcaller)
 Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Affliction, Spell.Warlock.SoulHarvester)
+
+Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
+  -- Base Abilities
+  Felstorm                              = Spell(89751),
+  HandofGuldan                          = Spell(105174), -- Splash, 8
+  ShadowBoltLineCD                      = Spell(686),
+  SummonPet                             = Spell(30146),
+  -- Talents
+  BilescourgeBombers                    = Spell(267211), -- Splash, 8
+  CallDreadstalkers                     = Spell(104316),
+  Demonbolt                             = Spell(264178),
+  DemonicCalling                        = Spell(205145),
+  DemonicStrength                       = Spell(267171),
+  Doom                                  = Spell(460551),
+  FelInvocation                         = Spell(428351),
+  GrandWarlocksDesign                   = Spell(387084),
+  GrimoireFelguard                      = Spell(111898),
+  Guillotine                            = Spell(386833),
+  Implosion                             = Spell(196277), -- Splash, 8
+  InnerDemons                           = Spell(267216),
+  MarkofFharg                           = Spell(455450),
+  MarkofShatug                          = Spell(455449),
+  NetherPortal                          = Spell(267217),
+  PowerSiphon                           = Spell(264130),
+  ReignofTyranny                        = Spell(427684),
+  SacrificedSouls                       = Spell(267214),
+  SoulboundTyrant                       = Spell(334585),
+  SoulStrike                            = Spell(428344),
+  SoulStrikePetAbility                  = Spell(264057, "Pet"),
+  SummonCharhound                       = Spell(455476),
+  SummonDemonicTyrant                   = Spell(265187),
+  SummonGloomhound                      = Spell(455465),
+  SummonVilefiend                       = Spell(264119),
+  TheExpendables                        = Spell(387600),
+  -- Buffs
+  DemonicCallingBuff                    = Spell(205146),
+  DemonicCoreBuff                       = Spell(264173),
+  DemonicPowerBuff                      = Spell(265273),
+  DoomDebuff                            = Spell(460553),
+  NetherPortalBuff                      = Spell(267218),
+  RiteofRuvaraadBuff                    = Spell(409725), -- T30 4pc
+  -- Debuffs
+  DoomDebuff                            = Spell(603),
+  DoomBrandDebuff                       = Spell(423583), -- T31 2pc
+  FromtheShadowsDebuff                  = Spell(270569),
+})
+Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Demonology, Spell.Warlock.Diabolist)
+Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Demonology, Spell.Warlock.SoulHarvester)
 
 Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   -- Base Abilities
@@ -169,6 +194,7 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   AshenRemains                          = Spell(387252),
   AvatarofDestruction                   = Spell(387159),
   Backdraft                             = Spell(196406),
+  BlisteringAtrophy                     = Spell(456939),
   BurntoAshes                           = Spell(387153),
   Cataclysm                             = Spell(152108),
   ChannelDemonfire                      = Spell(196447),
@@ -176,26 +202,33 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   ChaosIncarnate                        = Spell(387275),
   Chaosbringer                          = Spell(422057),
   Conflagrate                           = Spell(17962),
+  ConflagrationofChaos                  = Spell(387108),
   CrashingChaos                         = Spell(417234),
   CryHavoc                              = Spell(387522),
+  Decimation                            = Spell(456985),
+  DemonfireMastery                      = Spell(456946),
   DiabolicEmbers                        = Spell(387173),
   DimensionalRift                       = Spell(387976),
   Eradication                           = Spell(196412),
   FireandBrimstone                      = Spell(196408),
   Havoc                                 = Spell(80240),
+  ImprovedChaosBolt                     = Spell(456951),
   Inferno                               = Spell(270545),
   InternalCombustion                    = Spell(266134),
   MadnessoftheAzjAqir                   = Spell(387400),
   Mayhem                                = Spell(387506),
+  Pyrogenics                            = Spell(387095),
   RagingDemonfire                       = Spell(387166),
   RainofChaos                           = Spell(266086),
   RainofFire                            = Spell(5740),
   RoaringBlaze                          = Spell(205184),
   Ruin                                  = Spell(387103),
+  Shadowburn                            = Spell(17877),
   SoulFire                              = Spell(6353),
   SummonInfernal                        = Spell(1122),
   -- Buffs
   BackdraftBuff                         = Spell(117828),
+  DecimationBuff                        = Spell(457555),
   MadnessCBBuff                         = Spell(387409),
   MadnessRoFBuff                        = Spell(387413),
   MadnessSBBuff                         = Spell(387414),
@@ -238,6 +271,7 @@ Item.Warlock.Commons = {
   TimeThiefsGambit                      = Item(207579, {13, 14}),
   -- TWW Trinkets
   AberrantSpellforge                    = Item(212451, {13, 14}),
+  ImperfectAscendancySerum              = Item(225654, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
   -- Other Items
   Iridal                                = Item(208321, {16}),

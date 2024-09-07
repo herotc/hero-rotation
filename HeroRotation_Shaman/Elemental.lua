@@ -213,24 +213,21 @@ local function Precombat()
   -- variable,name=spymaster_in_1st,value=trinket.1.is.spymasters_web
   -- variable,name=spymaster_in_2nd,value=trinket.2.is.spymasters_web
   -- Note: Moved above to variable declarations.
-  -- Manually added: Opener abilities, in case thunderstrike_ward is on CD
-  if S.ElementalBlast:IsViable() then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast precombat 6"; end
+  -- Manually added: Opener abilities
+  if S.StormElemental:IsReady() and (not Shaman.StormElemental.GreaterActive) then
+    if Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "storm_elemental precombat 6"; end
   end
-  if Player:IsCasting(S.ElementalBlast) and S.PrimordialWave:IsViable() then
-    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 8"; end
+  if S.Stormkeeper:IsViable() and (not Player:StormkeeperUp()) then
+    if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper precombat 8"; end
   end
-  if Player:IsCasting(S.ElementalBlast) and not S.PrimordialWave:IsViable() and S.FlameShock:IsReady() then
-    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flameshock precombat 10"; end
+  if S.PrimordialWave:IsViable() then
+    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 10"; end
   end
-  if S.LavaBurst:IsViable() and not Player:IsCasting(S.LavaBurst) and (not S.ElementalBlast:IsAvailable() or (S.ElementalBlast:IsAvailable() and not S.ElementalBlast:IsViable())) then
+  if S.AncestralSwiftness:IsReady() then
+    if Cast(S.AncestralSwiftness, Settings.CommonsOGCD.GCDasOffGCD.AncestralSwiftness) then return "ancestral_swiftness precombat 12"; end
+  end
+  if S.LavaBurst:IsViable() then
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lavaburst precombat 12"; end
-  end
-  if Player:IsCasting(S.LavaBurst) and S.FlameShock:IsReady() then 
-    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flameshock precombat 14"; end
-  end
-  if Player:IsCasting(S.LavaBurst) and S.PrimordialWave:IsViable() then
-    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 16"; end
   end
 end
 
@@ -424,8 +421,8 @@ local function SingleTarget()
     if Cast(S.AncestralSwiftness, Settings.CommonsOGCD.GCDasOffGCD.AncestralSwiftness) then return "ancestral_swiftness single_target 14"; end
   end
   -- flame_shock,target_if=min:dot.flame_shock.remains,if=active_enemies=1&(dot.flame_shock.remains<2|active_dot.flame_shock=0)&(dot.flame_shock.remains<cooldown.primordial_wave.remains|!talent.primordial_wave.enabled)&(dot.flame_shock.remains<cooldown.liquid_magma_totem.remains|!talent.liquid_magma_totem.enabled)&!buff.surge_of_power.up&talent.fire_elemental.enabled
-  if S.FlameShock:IsCastable() and (Shaman.ClusterTargets == 1 and Player:BuffDown(S.SurgeofPowerBuff) and S.FireElemental:IsAvailable()) then
-    if Everyone.CastTargetIf(S.FlameShock, Enemies10ySplash, "min", EvaluateTargetIfFilterFlameShockRemains, EvaluateTargetIfFlameShockST, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 16"; end
+  if S.FlameShock:IsCastable() and (Shaman.ClusterTargets == 1 and (Target:DebuffRemains(S.FlameShockDebuff) < 2 or S.FlameShockDebuff:AuraActiveCount() == 0) and (Target:DebuffRemains(S.FlameShockDebuff) < S.PrimordialWave:CooldownRemains() or not S.PrimordialWave:IsAvailable()) and (Target:DebuffRemains(S.FlameShockDebuff) < S.LiquidMagmaTotem:CooldownRemains() or not S.LiquidMagmaTotem:IsAvailable()) and Player:BuffDown(S.SurgeofPowerBuff) and S.FireElemental:IsAvailable()) then
+    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 16"; end
   end
   -- flame_shock,target_if=min:dot.flame_shock.remains,if=active_dot.flame_shock<active_enemies&spell_targets.chain_lightning>1&(talent.deeply_rooted_elements.enabled|talent.ascendance.enabled|talent.primordial_wave.enabled|talent.searing_flames.enabled|talent.magma_chamber.enabled)&(!buff.surge_of_power.up&buff.stormkeeper.up|!talent.surge_of_power.enabled|cooldown.ascendance.remains=0)
   if S.FlameShock:IsCastable() and (S.FlameShockDebuff:AuraActiveCount() < Shaman.ClusterTargets and Shaman.ClusterTargets > 1 and (S.DeeplyRootedElements:IsAvailable() or S.Ascendance:IsAvailable() or S.PrimordialWave:IsAvailable() or S.SearingFlames:IsAvailable() or S.MagmaChamber:IsAvailable()) and (Player:BuffDown(S.SurgeofPowerBuff) and Player:StormkeeperUp() or not S.SurgeofPower:IsAvailable() or S.Ascendance:CooldownUp())) then
