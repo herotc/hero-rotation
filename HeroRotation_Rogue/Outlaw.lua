@@ -53,9 +53,8 @@ local I = Item.Rogue.Outlaw
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.ManicGrieftorch:ID(),
-  I.DragonfireBombDispenser:ID(),
-  I.BeaconToTheBeyond:ID()
+  I.ImperfectAscendancySerum:ID(),
+  I.MadQueensMandate:ID()
 }
 
 -- Trinkets
@@ -540,26 +539,17 @@ local function CDs ()
   end
 
   if Settings.Commons.Enabled.Trinkets then
-    -- actions.cds+=/	use_item,name=manic_grieftorch,if=!stealthed.all&buff.between_the_eyes.up|fight_remains<=5
-    if I.ManicGrieftorch:IsEquippedAndReady() then
-      if (not Player:StealthUp(true, true) and Player:BuffUp(S.BetweentheEyes) or
-        HL.BossFilteredFightRemains("<=", 5)) then
-        if Cast(I.ManicGrieftorch, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.ManicGrieftorch)) then return "Manic Grieftorch"; end
-      end
-    end
-
-    -- actions.cds+=/use_item,name=beacon_to_the_beyond,if=!stealthed.all&buff.between_the_eyes.up|fight_remains<=5
-    if I.BeaconToTheBeyond:IsEquippedAndReady() then
-      if not Player:StealthUp(true, true) and Player:BuffUp(S.BetweentheEyes)
-        or HL.BossFilteredFightRemains("<", 5) then
-        if Cast(I.BeaconToTheBeyond, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.BeaconToTheBeyond)) then return "Beacon"; end
-      end
-    end
-
     -- actions.cds+=/use_item,name=imperfect_ascendancy_serum,if=!stealthed.all|fight_remains<=22
     if I.ImperfectAscendancySerum:IsEquippedAndReady() then
       if not Player:StealthUp(true, true) or HL.BossFilteredFightRemains("<=", 22) then
         if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.ImperfectAscendancySerum)) then return "Imperfect Ascendancy Serum"; end
+      end
+    end
+
+    -- actions.cds+=/use_item,name=mad_queens_mandate,if=!stealthed.all|fight_remains<=5
+    if I.MadQueensMandate:IsEquippedAndReady() then
+      if not Player:StealthUp(true, true) or HL.BossFilteredFightRemains("<=", 5) then
+        if Cast(I.MadQueensMandate, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.MadQueensMandate)) then return "Mad Queens Mandate"; end
       end
     end
   end
@@ -616,37 +606,6 @@ local function CDs ()
   end
 
   if Settings.Commons.Enabled.Trinkets then
-    -- actions.cds+=/use_item,name=dragonfire_bomb_dispenser,use_off_gcd=1,if=gcd.remains<=action.sinister_strike.gcd%2
-    -- &((!trinket.1.is.dragonfire_bomb_dispenser&trinket.1.cooldown.remains>10|trinket.2.cooldown.remains>10)
-    -- |cooldown.dragonfire_bomb_dispenser.charges>2|fight_remains<20|!trinket.2.has_cooldown|!trinket.1.has_cooldown)
-    if I.DragonfireBombDispenser:IsEquippedAndReady() then
-      if ((trinket1:ID() ~= I.DragonfireBombDispenser:ID() and trinket1:CooldownRemains() > 10 or
-        trinket2:CooldownRemains() > 10) or I.DragonfireBombDispenser:OnUseSpell():Charges() > 2 or HL.BossFilteredFightRemains("<", 20) or not trinket2:HasCooldown() or not trinket1:HasCooldown()) then
-        if Cast(I.DragonfireBombDispenser, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.DragonfireBombDispenser)) then return "Dragonfire Bomb Dispenser"; end
-      end
-    end
-
-    -- actions.cds+=/use_item,name=stormeaters_boon,if=spell_targets.blade_flurry>desired_targets|raid_event.adds.in>60|fight_remains<10
-    if I.StormEatersBoon:IsEquippedAndReady() then
-      if EnemiesBFCount > 2 or HL.BossFilteredFightRemains("<", 10) then
-        if Cast(I.StormEatersBoon, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Storm Eaters Boon"; end
-      end
-    end
-
-    -- actions.cds+=/use_item,name=enduring_dreadplate,if=spell_targets.blade_flurry>desired_targets|raid_event.adds.in>60|raid_event.adds.count<2|fight_remains<16
-    if I.EnduringDreadplate:IsEquippedAndReady() then
-      if EnemiesBFCount > 2 or HL.BossFilteredFightRemains("<", 16) then
-        if Cast(I.EnduringDreadplate, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Enduring Dreadplate"; end
-      end
-    end
-
-    -- actions.cds+=/use_item,name=windscar_whetstone,if=spell_targets.blade_flurry>desired_targets|raid_event.adds.in>60|fight_remains<7
-    if I.WindscarWhetstone:IsEquippedAndReady() then
-      if EnemiesBFCount > 2 or HL.BossFilteredFightRemains("<", 7) then
-        if Cast(I.WindscarWhetstone, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Windscar Whetstone"; end
-      end
-    end
-
     -- # Default conditions for usable items.
     -- actions.cds+=/use_items,slots=trinket1,if=debuff.between_the_eyes.up|trinket.1.has_stat.any_dps|fight_remains<=20
     -- actions.cds+=/use_items,slots=trinket2,if=debuff.between_the_eyes.up|trinket.2.has_stat.any_dps|fight_remains<=20
