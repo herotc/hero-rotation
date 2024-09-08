@@ -52,10 +52,7 @@ Spell.Mage.Commons = {
   ArcaneIntellectBuff                   = Spell(1459),
   -- Debuffs
   -- Trinket Effects
-  SpoilsofNeltharusCrit                 = Spell(381954),
-  SpoilsofNeltharusHaste                = Spell(381955),
-  SpoilsofNeltharusMastery              = Spell(381956),
-  SpoilsofNeltharusVers                 = Spell(381957),
+  SpymastersWebBuff                     = Spell(444959), -- Buff from using Spymaster's Web trinket
   -- Pool
   Pool                                  = Spell(999910)
 }
