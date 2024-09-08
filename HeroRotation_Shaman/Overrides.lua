@@ -61,7 +61,7 @@ HL.AddCoreOverride ("Spell.IsViable",
       local MovementPredicate = IgnoreMovement or Player:BuffUp(S.SpiritwalkersGraceBuff) or Player:BuffUp(S.StormkeeperBuff) or not Player:IsMoving()
       return BaseCheck and MovementPredicate
     elseif self == S.LavaBurst then
-      local MovementPredicate = IgnoreMovement Player:BuffUp(S.SpiritwalkersGraceBuff) or Player:BuffUp(S.LavaSurgeBuff) or not Player:IsMoving()
+      local MovementPredicate = IgnoreMovement or Player:BuffUp(S.SpiritwalkersGraceBuff) or Player:BuffUp(S.LavaSurgeBuff) or not Player:IsMoving()
       local a = Player:BuffUp(S.LavaSurgeBuff)
       local b = S.LavaBurst:Charges() >= 1 and not Player:IsCasting(S.LavaBurst)
       local c = S.LavaBurst:Charges() == 2 and Player:IsCasting(S.LavaBurst)
