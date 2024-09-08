@@ -109,6 +109,7 @@ HR.GUISettings.APL.Druid = {
     },
     GCDasOffGCD = {
       HeartOfTheWild = true,
+      RageOfTheSleeper = false,
     },
     OffGCDasOffGCD = {
       Berserk = true,

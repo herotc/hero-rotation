@@ -204,7 +204,7 @@ local function Bear()
   end
   -- rage_of_the_sleeper,if=(((buff.incarnation_guardian_of_ursoc.down&cooldown.incarnation_guardian_of_ursoc.remains>60)|buff.berserk_bear.down)&rage>40&(!talent.convoke_the_spirits.enabled)|(buff.incarnation_guardian_of_ursoc.up|buff.berserk_bear.up)&rage>40&(!talent.convoke_the_spirits.enabled)|(talent.convoke_the_spirits.enabled)&rage>40)
   if CDsON() and S.RageoftheSleeper:IsCastable() and (((Player:BuffDown(S.Incarnation) and S.Incarnation:CooldownRemains() > 60) or Player:BuffDown(S.Berserk)) and Player:Rage() > 40 and not S.ConvoketheSpirits:IsAvailable() or (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) and Player:Rage() > 40 and not S.ConvoketheSpirits:IsAvailable() or S.ConvoketheSpirits:IsAvailable() and Player:Rage() > 40) then
-    if Cast(S.RageoftheSleeper) then return "rage_of_the_sleeper bear 18"; end
+    if Cast(S.RageoftheSleeper, Settings.Guardian.GCDasOffGCD.RageOfTheSleeper) then return "rage_of_the_sleeper bear 18"; end
   end
   -- berserking,if=(buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)
   if CDsON() and S.Berserking:IsCastable() and (Player:BuffUp(S.Berserk) or Player:BuffUp(S.Incarnation)) then
