@@ -32,6 +32,7 @@ HR.GUISettings.APL.Druid = {
       Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
+      AdaptiveSwarm = "Suggested",
       ConvokeTheSpirits = "Suggested",
     },
   },
@@ -75,7 +76,6 @@ HR.GUISettings.APL.Druid = {
     ShowCatFormOOC = false,
     ShowHealSpells = false,
     UseEasySwipe = false,
-    UseZerkBiteweave = false,
     PotionType = {
       Selected = "Power",
     },
@@ -155,7 +155,6 @@ CreateARPanelOptions(CP_Balance, "APL.Druid.Balance")
 CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.ShowCatFormOOC", "Show Cat Form Out of Combat", "Enable this if you want the addon to show you the Cat Form reminder out of combat.")
 CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.ShowHealSpells", "Show Healing Abilities", "Enable this if you want the addon to show you healing abilities (as suggested by the APL) during your rotation. THIS IS A DPS LOSS WITHOUT TOXIC THORN.")
 CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.UseEasySwipe", "Use Feral's 'Easy Swipe' Rotation", "Enable this option to enable a slightly inferior, but simpler AoE rotation, where Shred is not suggested, instead opting to proc BT via Swipe, Rake, or Thrash. THIS IS A DPS LOSS.")
-CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.UseZerkBiteweave", "Use 'Zerk Biteweave'", "Enable this option to suggest Ferocious Bite during Incarnation/Berserk in AoE situations.")
 CreateARPanelOptions(CP_Feral, "APL.Druid.Feral")
 
 -- Guardian
