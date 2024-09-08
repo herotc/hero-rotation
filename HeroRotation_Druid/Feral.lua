@@ -454,18 +454,13 @@ local function Finisher()
   -- pool_resource,for_next=1
   -- ferocious_bite,max_energy=1,target_if=max:dot.bloodseeker_vines.ticking,if=!buff.bs_inc.up
   -- TODO: Determine a way to do both pool_resource and target_if together.
-  if S.FerociousBite:IsReady() and (Player:BuffDown(BsInc)) then
-    if CastPooling(S.FerociousBite, Player:EnergyTimeToX(50)) then return "ferocious_bite finisher 6"; end
+  if BiteFinisher:IsReady() and (Player:BuffDown(BsInc)) then
+    if CastPooling(BiteFinisher, Player:EnergyTimeToX(50)) then return "ferocious_bite finisher 6"; end
   end
   -- ferocious_bite,target_if=max:dot.bloodseeker_vines.ticking
-  -- Note: Splitting Wildstalker/non-Wildstalker FerociousBite entries to avoid potential pooling issue.
-  -- Note: Using "not Wildstalker" vs checking for Druid of the Claw so the profile works at level 70.
-  if S.FerociousBite:IsReady() and Player:HeroTreeID() == 22 then
-    if Everyone.CastTargetIf(S.FerociousBite, EnemiesMelee, "max", EvaluateTargetIfFilterBloodseeker, nil, not IsInMeleeRange) then return "ferocious_bite finisher (WS) 8"; end
+  if BiteFinisher:IsReady() then
+    if Everyone.CastTargetIf(BiteFinisher, EnemiesMelee, "max", EvaluateTargetIfFilterBloodseeker, nil, not IsInMeleeRange) then return "ferocious_bite finisher 8"; end
   end
-  if S.FerociousBite:IsReady() and Player:HeroTreeID() ~= 22 then
-    if Cast(S.FerociousBite, nil, nil, not IsInMeleeRange) then return "ferocious_bite finisher (non-WS) 10"; end
-  end  
 end
 
 local function AoeBuilder()
@@ -667,6 +662,13 @@ local function APL()
     -- Range Stuffs
     IsInMeleeRange = Target:IsInRange(5)
     IsInAoERange = Target:IsInRange(8)
+
+    -- Bite Finisher to handle DotC's Ravage
+    if Player:HeroTreeID() == 21 then
+      BiteFinisher = S.RavageAbility:IsLearned() and S.RavageAbility or S.FerociousBite
+    else
+      BiteFinisher = S.FerociousBite
+    end
   end
 
   -- cat_form OOC, if setting is true
@@ -719,8 +721,8 @@ local function APL()
       if Everyone.CastTargetIf(S.AdaptiveSwarm, Enemies8y, EvaluateTargetIfFilterAdaptiveSwarm, EvaluateTargetIfAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.CommonsDS.DisplayStyle.AdaptiveSwarm) then return "adaptive_swarm main 16"; end
     end
     -- ferocious_bite,if=buff.apex_predators_craving.up&!(variable.need_bt&active_bt_triggers=2)
-    if S.FerociousBite:IsReady() and (Player:BuffUp(S.ApexPredatorsCravingBuff) and not (VarNeedBT and CountActiveBtTriggers() == 2)) then
-      if Cast(S.FerociousBite, nil, nil, not IsInMeleeRange) then return "ferocious_bite main 18"; end
+    if BiteFinisher:IsReady() and (Player:BuffUp(S.ApexPredatorsCravingBuff) and not (VarNeedBT and CountActiveBtTriggers() == 2)) then
+      if Cast(BiteFinisher, nil, nil, not IsInMeleeRange) then return "ferocious_bite main 18"; end
     end
     -- call_action_list,name=cooldown,if=dot.rip.ticking
     if CDsON() and Target:DebuffUp(S.RipDebuff) then
