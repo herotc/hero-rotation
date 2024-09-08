@@ -52,7 +52,7 @@ HR.GUISettings.APL.Shaman = {
   },
   Elemental = {
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     DisplayStyle = {
     },
@@ -74,7 +74,7 @@ HR.GUISettings.APL.Shaman = {
     HealWith5Maelstrom = 50,
     HealWithout5Maelstrom = 30,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       -- Abilities
@@ -91,7 +91,7 @@ HR.GUISettings.APL.Shaman = {
   },
   Restoration = {
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
     },

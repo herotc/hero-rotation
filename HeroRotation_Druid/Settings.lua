@@ -54,7 +54,7 @@ HR.GUISettings.APL.Druid = {
     ShowCancelStarlord = false,
     ShowMoonkinFormOOC = false,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       AstralCommunion = true,
@@ -77,7 +77,7 @@ HR.GUISettings.APL.Druid = {
     ShowHealSpells = false,
     UseEasySwipe = false,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       BsInc = true,
@@ -102,7 +102,7 @@ HR.GUISettings.APL.Druid = {
     UseIronfurOffensively = true,
     UseRageDefensively = true,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     DisplayStyle = {
       Defensives = "Suggested"
@@ -119,7 +119,7 @@ HR.GUISettings.APL.Druid = {
   },
   Restoration = {
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       HeartOfTheWild = true,

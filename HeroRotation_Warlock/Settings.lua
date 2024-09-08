@@ -47,7 +47,7 @@ HR.GUISettings.APL.Warlock = {
   Affliction = {
     UseCleaveAPL = false,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -69,7 +69,7 @@ HR.GUISettings.APL.Warlock = {
     SummonPetFontSize = 26,
     UnendingResolveHP = 20,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -92,7 +92,7 @@ HR.GUISettings.APL.Warlock = {
   },
   Destruction = {
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     --UnendingResolveHP = 20,
     -- {Display GCD as OffGCD, ForceReturn}

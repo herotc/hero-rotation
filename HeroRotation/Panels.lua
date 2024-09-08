@@ -69,7 +69,7 @@ do
       CreatePanelOption("Dropdown", Panel, Setting, {"Main Icon", "Suggested", "SuggestedRight", "Cooldown"}, "Display Style: " .. Name, "Define which icon display style to use for " .. Name .. ".")
     end,
     PotionType = function(Panel, Setting, Name)
-      CreatePanelOption("Dropdown", Panel, Setting, {"Power", "Frozen Focus", "Chilled Clarity", "Shocking Disclosure"}, "Potion Type: ", "Define which potion type to track.\n\nThe Power option will include Fleeting Ultimate Power, Fleeting Power, Ultimate Power, and Power potions.")
+      CreatePanelOption("Dropdown", Panel, Setting, {"Tempered", "Unwavering Focus", "Frontline", "Power", "Frozen Focus", "Chilled Clarity", "Shocking Disclosure"}, "Potion Type: ", "Define which potion type to track.\n\nThe Power option will include Fleeting Ultimate Power, Fleeting Power, Ultimate Power, and Power potions.")
     end,
     GCDasOffGCD = function(Panel, Setting, Name)
       CreatePanelOption("CheckButton", Panel, Setting, GCDName(Name), GCDDesc(Name))

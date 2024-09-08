@@ -63,7 +63,7 @@ HR.GUISettings.APL.Rogue = {
     MutilateDMGOffset = 3,
     UsePriorityRotation = "Never", -- Only for Assassination / Subtlety
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       Exsanguinate = false,
@@ -85,7 +85,7 @@ HR.GUISettings.APL.Rogue = {
     RolltheBonesLogic = "SimC",
     KillingSpreeDisplayStyle = "Suggested",
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       BladeFlurry = false,
@@ -110,7 +110,7 @@ HR.GUISettings.APL.Rogue = {
     BurnShadowDance = "On Bosses not in Dungeons", -- Burn Shadow Dance charges when the target is about to die
     UsePriorityRotation = "Never", -- Only for Assassination / Subtlety
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       ShurikenTornado = false,

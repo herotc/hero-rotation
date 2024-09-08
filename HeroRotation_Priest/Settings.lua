@@ -48,7 +48,7 @@ HR.GUISettings.APL.Priest = {
     PreferVTWhenSTinDungeon = false,
     SelfPI = true,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -73,7 +73,7 @@ HR.GUISettings.APL.Priest = {
   },
   Discipline = {
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -87,7 +87,7 @@ HR.GUISettings.APL.Priest = {
   },
   Holy = {
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       Apotheosis = true,

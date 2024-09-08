@@ -52,7 +52,7 @@ HR.GUISettings.APL.Warrior = {
   },
   Arms = {
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -69,7 +69,7 @@ HR.GUISettings.APL.Warrior = {
   },
   Fury = {
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -86,7 +86,7 @@ HR.GUISettings.APL.Warrior = {
     AllowIPOvercap = false,
     RageCapValue = 80,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     DisplayStyle = {
       Defensive = "Suggested"

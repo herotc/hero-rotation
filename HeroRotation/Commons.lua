@@ -259,6 +259,31 @@ function Commons.PotionSelected()
     -- Power
     191389, 191388, 191387
   }
+  -- TWW Potions
+  local TemperedIDs = { 212265, 212264, 212263 }
+  local UnwaveringFocusIDs = { 212259, 212258, 212257 }
+  local FrontlineIDs = { 212262, 212261, 212260 }
+  if PotionType == "Tempered" then
+    for _, PotionID in ipairs(TemperedIDs) do
+      if Item(PotionID):IsUsable() then
+        return Item(PotionID)
+      end
+    end
+  elseif PotionType == "Unwavering Focus" then
+    for _, PotionID in ipairs(UnwaveringFocusIDs) do
+      if Item(PotionID):IsUsable() then
+        return Item(PotionID)
+      end
+    end
+  elseif PotionType == "Frontline" then
+    for _, PotionID in ipairs(FrontlineIDs) do
+      if Item(PotionID):IsUsable() then
+        return Item(PotionID)
+      end
+    end
+  end
+  -- DF Potions
+  -- Deprecated. Will be removed when all profiles are updated.
   local FrozenFocusIDs = { 191365, 191364, 191363 }
   local ChilledClarityIDs = { 191368, 191367, 191366 }
   local ShockingDisclosureIDs = { 191401, 191400, 191399 }

@@ -48,7 +48,7 @@ HR.GUISettings.APL.Monk = {
   Brewmaster = {
     ExpelHarmHP = 70,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     -- DisplayStyle for Brewmaster-only stuff
     DisplayStyle = {
@@ -80,7 +80,7 @@ HR.GUISettings.APL.Monk = {
     IgnoreToK = false,
     ShowFortifyingBrewCD = false,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
