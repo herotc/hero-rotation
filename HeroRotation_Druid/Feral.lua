@@ -665,7 +665,7 @@ local function APL()
 
     -- Bite Finisher to handle DotC's Ravage
     if Player:HeroTreeID() == 21 then
-      BiteFinisher = S.RavageAbility:IsLearned() and S.RavageAbility or S.FerociousBite
+      BiteFinisher = S.RavageAbilityCat:IsLearned() and S.RavageAbilityCat or S.FerociousBite
     else
       BiteFinisher = S.FerociousBite
     end

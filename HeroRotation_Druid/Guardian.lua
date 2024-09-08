@@ -167,8 +167,8 @@ end
 
 local function Bear()
   -- maul,if=buff.ravage.up&active_enemies>1
-  if S.RavageAbility:IsReady() and (Player:BuffUp(S.RavageBuffGuardian) and Enemies8yCount > 1) then
-      if Cast(S.RavageAbility, nil, nil, not IsInMeleeRange) then return "ravage bear 2"; end
+  if S.RavageAbilityBear:IsReady() and (Player:BuffUp(S.RavageBuffGuardian) and Enemies8yCount > 1) then
+      if Cast(S.RavageAbilityBear, nil, nil, not IsInMeleeRange) then return "ravage bear 2"; end
     end
   -- heart_of_the_Wild,if=(talent.heart_of_the_wild.enabled&!talent.rip.enabled)|talent.heart_of_the_wild.enabled&buff.feline_potential_counter.stack=6&active_enemies<3
   if CDsON() and S.HeartoftheWild:IsCastable() and (not S.Rip:IsAvailable() or Player:BuffStack(S.FelinePotentialBuff) == 6 and Enemies8yCount < 3) then
@@ -211,8 +211,8 @@ local function Bear()
     if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking bear 20"; end
   end
   -- maul,if=buff.ravage.up&active_enemies<2
-  if S.RavageAbility:IsReady() and (Player:BuffUp(S.RavageBuffGuardian) and Enemies8yCount < 2) then
-    if Cast(S.RavageAbility, nil, nil, not IsInMeleeRange) then return "ravage bear 22"; end
+  if S.RavageAbilityBear:IsReady() and (Player:BuffUp(S.RavageBuffGuardian) and Enemies8yCount < 2) then
+    if Cast(S.RavageAbilityBear, nil, nil, not IsInMeleeRange) then return "ravage bear 22"; end
   end
   -- raze,if=(buff.tooth_and_claw.stack>1|buff.tooth_and_claw.remains<1+gcd)&variable.If_build=1&active_enemies>1
   if S.Raze:IsReady() and ((Player:BuffStack(S.ToothandClawBuff) > 1 or Player:BuffRemains(S.ToothandClawBuff) < 1 + Player:GCD()) and VarIFBuild and Enemies8yCount > 1) then

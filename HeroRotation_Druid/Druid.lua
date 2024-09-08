@@ -80,7 +80,8 @@ Spell.Druid.Commons = {
 
 Spell.Druid.DruidoftheClaw = {
   -- Abilities
-  RavageAbility                         = Spell(441605),
+  RavageAbilityBear                     = Spell(441605),
+  RavageAbilityCat                      = Spell(441591),
   -- Talents
   FountofStrength                       = Spell(441675),
   Ravage                                = Spell(441583),
