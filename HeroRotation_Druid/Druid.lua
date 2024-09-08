@@ -60,6 +60,7 @@ Spell.Druid.Commons = {
   SurvivalInstincts                     = Spell(61336),
   ThrashBear                            = Spell(77758),
   ThrashCat                             = Spell(106830),
+  Typhoon                               = Spell(132469),
   WildCharge                            = MultiSpell(16979,49376),
   -- Buffs
   FrenziedRegenerationBuff              = Spell(22842),
