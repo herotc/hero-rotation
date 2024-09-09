@@ -91,6 +91,7 @@ Spell.Shaman.Stormbringer = {
   -- Buffs
   ArcDischargeBuff                      = Spell(455097),
   AwakeningStormsBuff                   = Spell(462131),
+  TempestBuff                           = Spell(454015),
 }
 
 Spell.Shaman.Totemic = {
