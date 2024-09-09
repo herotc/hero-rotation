@@ -135,7 +135,7 @@ SetTrinketVariables()
 --- ===== Stun Interrupts List =====
 local InterruptStuns = {
   { S.MightyBash, "Cast Mighty Bash (Interrupt)", function () return true; end },
-  { S.Typhoon, "Cast Typhoon (Interrupt)", function () return true, end },
+  { S.Typhoon, "Cast Typhoon (Interrupt)", function () return true; end },
 }
 
 --- ===== Event Registration =====
