@@ -208,7 +208,7 @@ local function SlayerST()
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_st 12"; end
   end
   -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
-  if S.Rampage:IsReady() and (S.Bladestorm:IsAvailable() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
+  if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_st 14"; end
   end
   -- bladestorm,if=buff.enrage.up&cooldown.avatar.remains>=9
@@ -311,7 +311,7 @@ local function SlayerMT()
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_mt 14"; end
   end
   -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
-  if S.Rampage:IsReady() and (S.Bladestorm:IsAvailable() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
+  if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_mt 16"; end
   end
   -- bladestorm,if=buff.enrage.up&cooldown.avatar.remains>=9
@@ -414,7 +414,7 @@ local function ThaneST()
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_st 16"; end
   end
   -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
-  if S.Rampage:IsReady() and (S.Bladestorm:IsAvailable() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
+  if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_st 18"; end
   end
   -- bladestorm,if=buff.enrage.up&talent.unhinged
@@ -513,7 +513,7 @@ local function ThaneMT()
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_mt 18"; end
   end
   -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
-  if S.Rampage:IsReady() and (S.Bladestorm:IsAvailable() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
+  if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_mt 20"; end
   end
   -- bladestorm,if=buff.enrage.up
