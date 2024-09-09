@@ -594,7 +594,7 @@ local function CDs ()
   if HR.CDsON() and S.SymbolsofDeath:IsReady() then
     if S.InvigoratingShadowdust:IsAvailable() and SnD_Condition() and Player:BuffRemains(S.SymbolsofDeath) <= 3
       and Player:BuffDown(S.TheRottenBuff) and (S.Flagellation:CooldownRemains() > 10 or S.Flagellation:IsReady()
-      and S.ShadowBlades:CooldownRemains() >= 20 or Player:BuffRemains(S.ShadowDanceBuff) >= 2) then
+      and (S.ShadowBlades:CooldownRemains() >= 20 or S.ShadowBlades:IsReady()) or Player:BuffRemains(S.ShadowDanceBuff) >= 2) then
       if Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death with Dust" end
     end
   end
@@ -650,8 +650,6 @@ local function CDs ()
   end
 
   -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
-
-  -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
   if HR.CDsON() and S.ShadowDance:IsAvailable() and MayBurnShadowDance() and S.ShadowDance:IsReady() then
     if not Player:BuffUp(S.ShadowDanceBuff) and HL.BossFilteredFightRemains("<=", 8 + num(S.Subterfuge:IsAvailable())) then
         ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
@@ -663,7 +661,7 @@ local function CDs ()
   -- &buff.shadow_blades.up&(buff.subterfuge.up&spell_targets>=4|buff.subterfuge.remains>=3)
   if HR.CDsON() and S.ShadowDance:IsAvailable() and S.ShadowDance:IsReady() then
     if Player:BuffDown(S.ShadowDanceBuff) and S.InvigoratingShadowdust:IsAvailable() and S.DeathStalkersMark:IsAvailable()
-      and Player:BuffUp(S.ShadowBlades) and (Player:BuffUp(S.Subterfuge) and MeleeEnemies10yCount >= 4
+      and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and (Player:BuffUp(S.Subterfuge) and MeleeEnemies10yCount >= 4
       or Player:BuffRemains(S.Subterfuge) >= 3) then
         ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
         if ShouldReturn then return "Shadow Dance Macro CDs 2" .. ShouldReturn end
@@ -678,8 +676,8 @@ local function CDs ()
   if HR.CDsON() and S.ShadowDance:IsAvailable() and S.ShadowDance:IsReady() then
     if Player:BuffDown(S.ShadowDanceBuff) and S.UnseenBlade:IsAvailable() and S.InvigoratingShadowdust:IsAvailable()
     and Target:DebuffUp(S.Rupture) and SnD_Condition() and (Player:BuffRemains(S.SymbolsofDeath) >= 6 and Player:BuffDown(S.Flagellation)
-    or Player:BuffUp(S.SymbolsofDeath) and Player:BuffUp(S.ShadowBlades) or Player:BuffUp(S.ShadowBlades) and not S.InvigoratingShadowdust:IsAvailable())
-    and (S.SecretTechnique:CooldownRemains() <= 10 + 12 * num(not S.InvigoratingShadowdust:IsAvailable() or Player:BuffUp(S.ShadowBlades))
+  or Player:BuffUp(S.SymbolsofDeath) and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) or (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and not S.InvigoratingShadowdust:IsAvailable())
+    and (S.SecretTechnique:CooldownRemains() <= 10 + 12 * num(not S.InvigoratingShadowdust:IsAvailable() or Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady())
       and (not S.TheFirstDance:IsAvailable() or (ComboPointsDeficit >= 7 and Player:BuffDown(S.ShadowBlades) or Player:BuffUp(S.ShadowBlades)))) then
         ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
         if ShouldReturn then return "Shadow Dance Macro CDs 3" .. ShouldReturn end
@@ -807,7 +805,7 @@ local function Stealth_CDs (EnergyThreshold)
     -- &(!dot.rupture.ticking|(buff.shadow_blades.up&buff.symbols_of_death.up)|talent.premeditation|fight_remains<10)
     if S.Vanish:IsCastable() then
       if not S.InvigoratingShadowdust:IsAvailable() and not S.Subterfuge:IsAvailable() and ComboPointsDeficit >= 3
-        and (Target:DebuffDown(S.Rupture) or (Player:BuffUp(S.ShadowBlades) and Player:BuffUp(S.SymbolsofDeath))
+        and (Target:DebuffDown(S.Rupture) or ((Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and Player:BuffUp(S.SymbolsofDeath))
         or S.Premeditation:IsAvailable() or HL.BossFilteredFightRemains("<", 10)) then
           ShouldReturn = StealthMacro(S.Vanish, EnergyThreshold)
           if ShouldReturn then return "Vanish Macro 1 No Dust" .. ShouldReturn end
@@ -819,7 +817,7 @@ local function Stealth_CDs (EnergyThreshold)
     -- |fight_remains<=(30*cooldown.vanish.charges))&(cooldown.secret_technique.remains>=10&!raid_event.adds.up)
     if S.Vanish:IsCastable() then
       if Player:BuffDown(S.ShadowDanceBuff) and S.InvigoratingShadowdust:IsAvailable() and S.DeathStalkersMark:IsAvailable()
-        and (ComboPointsDeficit > 1 or Player:BuffUp(S.ShadowBlades)) and (S.Flagellation:CooldownRemains() >= 60
+        and (ComboPointsDeficit > 1 or Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and (S.Flagellation:CooldownRemains() >= 60
         or not S.Flagellation:IsAvailable() or HL.BossFilteredFightRemains("<=", 30*S.Vanish:Charges()))
         and S.SecretTechnique:CooldownRemains() >= 10 then
           ShouldReturn = StealthMacro(S.Vanish, EnergyThreshold)
@@ -834,7 +832,7 @@ local function Stealth_CDs (EnergyThreshold)
     -- &(!talent.the_first_dance|(combo_points.deficit>=7&!buff.shadow_blades.up|buff.shadow_blades.up))
     if S.ShadowDance:IsReady() and S.ShadowDance:IsCastable() then
       if Target:DebuffUp(S.Rupture) and SnD_Condition() and (Player:BuffRemains(S.SymbolsofDeath) >= 6 and Player:BuffDown(S.Flagellation)
-        or Player:BuffUp(S.SymbolsofDeath) and Player:BuffUp(S.ShadowBlades) or Player:BuffUp(S.ShadowBlades) and not S.InvigoratingShadowdust:IsAvailable())
+        or Player:BuffUp(S.SymbolsofDeath) and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) or (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and not S.InvigoratingShadowdust:IsAvailable())
         and S.SecretTechnique:CooldownRemains() < 10 + 12 * num(S.InvigoratingShadowdust:IsAvailable())
         and (not S.TheFirstDance:IsAvailable() or (ComboPointsDeficit >= 7 and Player:BuffDown(S.ShadowBlades) or Player:BuffUp(S.ShadowBlades))) then
           ShouldReturn = StealthMacro(S.ShadowDance, EnergyThreshold)
