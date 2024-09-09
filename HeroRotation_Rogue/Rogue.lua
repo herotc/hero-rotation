@@ -103,6 +103,7 @@ Spell.Rogue.Commons = {
   HandOfFate              = Spell(452536),
   ImprovedAmbush          = Spell(381620),
   MarkedforDeath          = Spell(137619),
+  MomentumOfDespair       = Spell(457067),
   Nightstalker            = Spell(14062),
   ResoundingClarity       = Spell(381622),
   Reverberation           = Spell(394332),
@@ -184,6 +185,7 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   SerratedBoneSpikeDebuff = Spell(394036),
   ShivDebuff              = Spell(319504),
   ShroudedSuffocation     = Spell(385478),
+  ThrownPrecision         = Spell(381629),
   VenomRush               = Spell(152152),
   ViciousVenoms           = Spell(381634),
   -- PvP
