@@ -693,7 +693,7 @@ local function APL()
   end
 
   -- summon_pet
-  if S.SummonPet:IsCastable() then
+  if S.SummonPet:IsCastable() and not (Player:IsMounted() or Player:IsInVehicle()) then
     if Cast(S.SummonPet, Settings.Affliction.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
   end
 
