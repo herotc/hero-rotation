@@ -719,7 +719,7 @@ local function APL()
     end
     -- adaptive_swarm,target_if=max:(1+dot.adaptive_swarm_damage.stack)*dot.adaptive_swarm_damage.stack<3*time_to_die,if=buff.cat_form.up&dot.adaptive_swarm_damage.stack<3&talent.unbridled_swarm.enabled&spell_targets.swipe_cat>1&dot.rip.ticking
     if S.AdaptiveSwarm:IsReady() and (Player:BuffUp(S.CatForm) and S.UnbridledSwarm:IsAvailable() and EnemiesCount8y > 1) then
-      if Everyone.CastTargetIf(S.AdaptiveSwarm, Enemies8y, EvaluateTargetIfFilterAdaptiveSwarm, EvaluateTargetIfAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.CommonsDS.DisplayStyle.AdaptiveSwarm) then return "adaptive_swarm main 16"; end
+      if Everyone.CastTargetIf(S.AdaptiveSwarm, Enemies8y, "max", EvaluateTargetIfFilterAdaptiveSwarm, EvaluateTargetIfAdaptiveSwarm, not Target:IsSpellInRange(S.AdaptiveSwarm), nil, Settings.CommonsDS.DisplayStyle.AdaptiveSwarm) then return "adaptive_swarm main 16"; end
     end
     -- ferocious_bite,if=buff.apex_predators_craving.up&!(variable.need_bt&active_bt_triggers=2)
     if BiteFinisher:IsReady() and (Player:BuffUp(S.ApexPredatorsCravingBuff) and not (VarNeedBT and CountActiveBtTriggers() == 2)) then
