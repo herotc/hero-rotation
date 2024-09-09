@@ -20,7 +20,7 @@ HR.Commons.Shaman = {}
 local Shaman = HR.Commons.Shaman
 Shaman.LastSKCast = 0
 Shaman.LastSKBuff = 0
-Shaman.LastT302pcBuff = 0
+Shaman.LastRollingThunderTick = 0
 Shaman.FeralSpiritCount = 0
 Shaman.TempestMaelstrom = 0
 
@@ -54,12 +54,12 @@ HL:RegisterForSelfCombatEvent(
       Shaman.LastSKBuff = GetTime()
       C_Timer.After(0.1, function()
         if Shaman.LastSKBuff ~= Shaman.LastSKCast then
-          Shaman.LastT302pcBuff = Shaman.LastSKBuff
+          Shaman.LastRollingThunderTick = Shaman.LastSKBuff
         end
       end)
     end
   end
-  , "SPELL_AURA_APPLIED"
+  , "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE"
 )
 
 --- ===== Fire Elemental Tracker =====

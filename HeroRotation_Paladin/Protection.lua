@@ -185,12 +185,12 @@ local function Cooldowns()
 end
 
 local function HammerofLight()
-  -- hammer_of_light,if=buff.blessing_of_dawn.stack>0|spell_targets.shield_of_the_righteous>=5
-  if S.HammerofLight:IsReady() and (Player:BuffUp(S.BlessingofDawnBuff) or EnemiesCount8y >= 5) then
+  -- hammer_of_light,if=(buff.blessing_of_dawn.stack>0|!talent.of_dusk_and_dawn.enabled)|spell_targets.shield_of_the_righteous>=5
+  if S.HammerofLight:IsReady() and ((Player:BuffUp(S.BlessingofDawnBuff) or not S.OfDuskandDawn:IsAvailable()) or EnemiesCount8y >= 5) then
     if Cast(S.HammerofLight, Settings.Protection.GCDasOffGCD.EyeOfTyr, nil, not Target:IsInRange(12)) then return "hammer_of_light hammer_of_light 2"; end
   end
-  -- eye_of_tyr,if=hpg_to_2dawn=5
-  if S.EyeofTyr:IsCastable() and (HPGTo2Dawn() == 5) then
+  -- eye_of_tyr,if=hpg_to_2dawn=5|!talent.of_dusk_and_dawn.enabled
+  if S.EyeofTyr:IsCastable() and (HPGTo2Dawn() == 5 or not S.OfDuskandDawn:IsAvailable()) then
     if Cast(S.EyeofTyr, Settings.Protection.GCDasOffGCD.EyeOfTyr, nil, not Target:IsInMeleeRange(8)) then return "eye_of_tyr hammer_of_light 4"; end
   end
   -- shield_of_the_righteous,if=hpg_to_2dawn=4
@@ -228,8 +228,8 @@ local function HammerofLight()
 end
 
 local function Standard()
-  -- call_action_list,name=hammer_of_light,if=talent.lights_guidance.enabled&(cooldown.eye_of_tyr.remains<2|buff.hammer_of_light_ready.up)&(!talent.redoubt.enabled|buff.redoubt.stack>=2|!talent.bastion_of_light.enabled)&talent.of_dusk_and_dawn.enabled
-  if S.LightsGuidance:IsAvailable() and (S.EyeofTyr:CooldownRemains() < 2 or S.HammerofLight:IsLearned()) and (not S.Redoubt:IsAvailable() or Player:BuffStack(S.RedoubtBuff) >= 2 or not S.BastionofLight:IsAvailable()) and S.OfDuskandDawn:IsAvailable() then
+  -- call_action_list,name=hammer_of_light,if=talent.lights_guidance.enabled&(cooldown.eye_of_tyr.remains<2|buff.hammer_of_light_ready.up)&(!talent.redoubt.enabled|buff.redoubt.stack>=2|!talent.bastion_of_light.enabled)
+  if S.LightsGuidance:IsAvailable() and (S.EyeofTyr:CooldownRemains() < 2 or S.HammerofLight:IsLearned()) and (not S.Redoubt:IsAvailable() or Player:BuffStack(S.RedoubtBuff) >= 2 or not S.BastionofLight:IsAvailable()) then
     local ShouldReturn = HammerofLight(); if ShouldReturn then return ShouldReturn; end
   end
   -- hammer_of_light,if=(!talent.redoubt.enabled|buff.redoubt.stack=3)&(buff.blessing_of_dawn.stack>=1|!talent.of_dusk_and_dawn.enabled)

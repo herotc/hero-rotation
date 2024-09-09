@@ -51,8 +51,9 @@ HR.GUISettings.APL.Shaman = {
     }
   },
   Elemental = {
+    IgnoreMovement = false,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     DisplayStyle = {
     },
@@ -74,7 +75,7 @@ HR.GUISettings.APL.Shaman = {
     HealWith5Maelstrom = 50,
     HealWithout5Maelstrom = 30,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       -- Abilities
@@ -91,7 +92,7 @@ HR.GUISettings.APL.Shaman = {
   },
   Restoration = {
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
     },
@@ -120,6 +121,7 @@ CreateARPanelOptions(CP_ShamanDS, "APL.Shaman.CommonsDS")
 CreateARPanelOptions(CP_ShamanOGCD, "APL.Shaman.CommonsOGCD")
 
 -- Elemental
+CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Elemental.IgnoreMovement", "Ignore Movement", "Enable to have the addon ignore movement as a condition of whether spells are viable to cast.")
 CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental")
 
 -- Enhancement

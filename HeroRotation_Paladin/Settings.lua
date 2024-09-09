@@ -51,7 +51,7 @@ HR.GUISettings.APL.Paladin = {
     PrioSelfWordofGloryHP = 40,
     SotRHP = 70,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     DisplayStyle = {
       Defensives = "SuggestedRight",
@@ -73,7 +73,7 @@ HR.GUISettings.APL.Paladin = {
   Retribution = {
     DisableCrusadeAWCDCheck = false,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       ExecutionSentence = false,
@@ -91,7 +91,7 @@ HR.GUISettings.APL.Paladin = {
     DPHP = 40,
     WoGHP = 60,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       HammerOfWrath = false,

@@ -30,12 +30,14 @@ Spell.DemonHunter.Commons = {
   ImmolationAura                        = Spell(258920),
   ImmolationAuraBuff                    = Spell(258920),
   -- Talents
+  AuraofPain                            = Spell(207347),
   ChaosNova                             = Spell(179057),
   CollectiveAnguish                     = Spell(390152),
   Demonic                               = Spell(213410),
   SigilofSpite                          = Spell(390163),
   Felblade                              = Spell(232893),
   FirstoftheIllidari                    = Spell(235893),
+  FlamesofFury                          = Spell(389694),
   FoddertotheFlame                      = Spell(391429),
   QuickenedSigils                       = Spell(209281),
   SoulSigils                            = Spell(395446),
@@ -82,6 +84,7 @@ Spell.DemonHunter.FelScarred = {
   -- Talents
   Demonsurge                            = Spell(454402),
   -- Buffs
+  ConsumingFireBuff                     = Spell(427912),
   StudentofSufferingBuff                = Spell(453239),
   -- Debuffs
   SigilofDoomDebuff                     = Spell(462030),
@@ -167,8 +170,8 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   IlluminatedSigils                     = Spell(428557),
   SoulCarver                            = Spell(207407),
   SpiritBomb                            = Spell(247454),
+  VolatileFlameblood                    = Spell(390808),
   -- Sigils
-  
   -- Utility
   Metamorphosis                         = Spell(187827),
   -- Buffs

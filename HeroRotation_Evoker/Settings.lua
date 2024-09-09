@@ -59,7 +59,7 @@ HR.GUISettings.APL.Evoker = {
       AugBuffs = "SuggestedRight",
     },
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       BreathOfEons = true,
@@ -75,7 +75,7 @@ HR.GUISettings.APL.Evoker = {
     UseDefensives = true,
     UseGreen = true,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       DeepBreath = true,

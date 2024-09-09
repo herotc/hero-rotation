@@ -58,7 +58,7 @@ HR.GUISettings.APL.Hunter = {
   },
   BeastMastery = {
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       AMurderOfCrows = false,
@@ -71,7 +71,7 @@ HR.GUISettings.APL.Hunter = {
   },
   Marksmanship = {
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     GCDasOffGCD = {
       RapidFire = false,
@@ -87,7 +87,7 @@ HR.GUISettings.APL.Hunter = {
     AspectOfTheEagle = true,
     CAKSMacro = false,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {

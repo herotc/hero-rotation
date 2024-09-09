@@ -96,6 +96,7 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   DrainSoulTalent                       = Spell(388667),
   DreadTouch                            = Spell(389775),
   Haunt                                 = Spell(48181),
+  ImprovedShadowBolt                    = Spell(453080),
   InevitableDemise                      = Spell(334319),
   MaleficAffliction                     = Spell(389761),
   MaleficRapture                        = Spell(324536),

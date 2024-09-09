@@ -58,7 +58,7 @@ HR.GUISettings.APL.DeathKnight = {
     RuneTapThreshold = 40,
     VampiricBloodThreshold = 65,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     DisplayStyle = {
       Consumption = "Suggested",
@@ -80,7 +80,7 @@ HR.GUISettings.APL.DeathKnight = {
   Frost = {
     AMSAbsorbPercent = 0,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     DisplayStyle = {
       BreathOfSindragosa = "Suggested",
@@ -101,7 +101,7 @@ HR.GUISettings.APL.DeathKnight = {
     AMSAbsorbPercent = 0,
     RaiseDeadCastLeft = false,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     DisplayStyle = {
       ArmyOfTheDead = "SuggestedRight",

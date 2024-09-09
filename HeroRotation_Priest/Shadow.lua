@@ -36,22 +36,9 @@ local I = Item.Priest.Shadow
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- Trinkets
-  I.BeacontotheBeyond:ID(),
-  I.BelorrelostheSuncaller:ID(),
-  I.ConjuredChillglobe:ID(),
-  I.DesperateInvokersCodex:ID(),
-  I.DMDDance:ID(),
-  I.DMDDanceBox:ID(),
-  I.DMDInferno:ID(),
-  I.DMDInfernoBox:ID(),
-  I.DMDRime:ID(),
-  I.DMDRimeBox:ID(),
-  I.EruptingSpearFragment:ID(),
-  I.IcebloodDeathsnare:ID(),
-  I.NymuesUnravelingSpindle:ID(),
-  -- Other On-Use
-  I.Dreambinder:ID(),
+  -- TWW Trinkets
+  I.AberrantSpellforge:ID(),
+  I.SpymastersWeb:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -66,7 +53,7 @@ local Settings = {
 
 --- ===== Rotation Variables =====
 local VarDRForcePrio, VarMEForcePrio = false, true
-local VarMaxVTs, VarIsVTPossible = 0, false
+local VarMaxVTs, VarIsVTPossible = 12, false
 local VarPoolingMindblasts, VarPoolForCDs = false, false
 local VarHoldingCrash = false
 local VarDotsUp = false
@@ -87,7 +74,7 @@ local FightRemains = 11111
 --- ===== Event Registrations =====
 HL:RegisterForEvent(function()
   VarDRForcePrio, VarMEForcePrio = false, true
-  VarMaxVTs, VarIsVTPossible = 0, false
+  VarMaxVTs, VarIsVTPossible = 12, false
   VarPoolingMindblasts, VarPoolForCDs = false, false
   VarHoldingCrash = false
   VarDotsUp = false
@@ -365,53 +352,6 @@ end
 
 local function Trinkets()
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=darkmoon_deck_box_inferno,if=equipped.darkmoon_deck_box_inferno
-    if I.DMDInferno:IsEquippedAndReady() then
-      if Cast(I.DMDInferno, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "dmd_inferno trinkets 2"; end
-    end
-    if I.DMDInfernoBox:IsEquippedAndReady() then
-      if Cast(I.DMDInfernoBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "dmd_inferno_box trinkets 4"; end
-    end
-    -- use_item,name=darkmoon_deck_box_rime,if=equipped.darkmoon_deck_box_rime
-    if I.DMDRime:IsEquippedAndReady() then
-      if Cast(I.DMDRime, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "dmd_rime trinkets 6"; end
-    end
-    if I.DMDRimeBox:IsEquippedAndReady() then
-      if Cast(I.DMDRimeBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "dmd_rime_box trinkets 8"; end
-    end
-    -- use_item,name=darkmoon_deck_box_dance,if=equipped.darkmoon_deck_box_dance
-    if I.DMDDance:IsEquippedAndReady() then
-      if Cast(I.DMDDance, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "dmd_dance trinkets 10"; end
-    end
-    if I.DMDDanceBox:IsEquippedAndReady() then
-      if Cast(I.DMDDanceBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "dmd_dance_box trinkets 12"; end
-    end
-  end
-  -- use_item,name=dreambinder_loom_of_the_great_cycle,use_off_gcd=1,if=gcd.remains>0|fight_remains<20
-  if Settings.Commons.Enabled.Items and I.Dreambinder:IsEquippedAndReady() then
-    if Cast(I.Dreambinder, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsItemInRange(I.Dreambinder)) then return "dreambinder trinkets 14"; end
-  end
-  if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=conjured_chillglobe
-    if I.ConjuredChillglobe:IsEquippedAndReady() then
-      if Cast(I.ConjuredChillglobe, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "conjured_chillglobe trinkets 16"; end
-    end
-    -- use_item,name=iceblood_deathsnare,if=(!raid_event.adds.exists|raid_event.adds.up|spell_targets.iceblood_deathsnare>=5)|fight_remains<20
-    if I.IcebloodDeathsnare:IsEquippedAndReady() then
-      if Cast(I.IcebloodDeathsnare, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.IcebloodDeathsnare)) then return "iceblood_deathsnare trinkets 18"; end
-    end
-    -- use_item,name=erupting_spear_fragment,if=(buff.power_infusion.up|raid_event.adds.up|fight_remains<20)&equipped.erupting_spear_fragment
-    if I.EruptingSpearFragment:IsEquippedAndReady() and (Player:PowerInfusionUp() or FightRemains < 20) then
-      if Cast(I.EruptingSpearFragment, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.EruptingSpearFragment)) then return "erupting_spear_fragment trinkets 20"; end
-    end
-    -- use_item,name=belorrelos_the_suncaller,if=(!raid_event.adds.exists|raid_event.adds.up|spell_targets.belorrelos_the_suncaller>=5|fight_remains<20)&equipped.belorrelos_the_suncaller
-    if I.BelorrelostheSuncaller:IsEquippedAndReady() then
-      if Cast(I.BelorrelostheSuncaller, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(10)) then return "belorrelos_the_suncaller trinkets 22"; end
-    end
-    -- use_item,name=beacon_to_the_beyond,if=(!raid_event.adds.exists|raid_event.adds.up|spell_targets.beacon_to_the_beyond>=5|fight_remains<20)&equipped.beacon_to_the_beyond
-    if I.BeacontotheBeyond:IsEquippedAndReady() then
-      if Cast(I.BeacontotheBeyond, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.BeacontotheBeyond)) then return "beacon_to_the_beyond trinkets 24"; end
-    end
     -- use_item,use_off_gcd=1,name=aberrant_spellforge,if=gcd.remains>0&buff.aberrant_spellforge.stack<=4
     if I.AberrantSpellforge:IsEquippedAndReady() and (Player:BuffStack(S.AberrantSpellforgeBuff) <= 4) then
       if Cast(I.AberrantSpellforge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "aberrant_spellforge trinkets 26"; end
@@ -429,10 +369,6 @@ local function Trinkets()
     if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
       if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 30"; end
     end
-  end
-  -- use_item,name=desperate_invokers_codex,if=equipped.desperate_invokers_codex
-  if Settings.Commons.Enabled.Trinkets and I.DesperateInvokersCodex:IsEquippedAndReady() then
-    if Cast(I.DesperateInvokersCodex, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "desperate_invokers_codex trinkets 32"; end
   end
 end
 
@@ -459,10 +395,6 @@ local function CDs()
   -- ancestral_call,if=buff.power_infusion.up|fight_remains<=15
   if S.AncestralCall:IsCastable() and (Player:PowerInfusionUp() or BossFightRemains <= 15) then
     if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call cds 10"; end
-  end
-  -- use_item,name=nymues_unraveling_spindle,if=variable.dots_up&(fight_remains<30|target.time_to_die>15)&(!talent.dark_ascension|cooldown.dark_ascension.remains<3+gcd.max|fight_remains<15)
-  if Settings.Commons.Enabled.Trinkets and I.NymuesUnravelingSpindle:IsEquippedAndReady() and (VarDotsUp and (BossFightRemains < 30 or Target:TimeToDie() > 15) and (not S.DarkAscension:IsAvailable() or S.DarkAscension:CooldownRemains() < 3 + GCDMax or BossFightRemains < 15)) then
-    if Cast(I.NymuesUnravelingSpindle, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.NymuesUnravelingSpindle)) then return "nymues_unraveling_spindle cds 12"; end
   end
   -- power_infusion,if=(buff.voidform.up|buff.dark_ascension.up&(fight_remains<=80|fight_remains>=140)|active_allied_augmentations)
   if S.PowerInfusion:IsCastable() and Settings.Shadow.SelfPI and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscension) and (BossFightRemains <= 80 or BossFightRemains >= 140)) then
@@ -641,8 +573,8 @@ local function Main()
   if S.ShadowWordDeath:IsReady() and (S.DepthofShadows:IsAvailable()) then
     if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusHP, EvaluateTargetIfSWD, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 14"; end
   end
-  -- mind_blast,target_if=max:dot.devouring_plague.remains,if=(cooldown.mind_blast.full_recharge_time<=gcd.max+execute_time|pet.fiend.remains<=execute_time+gcd.max)&pet.fiend.active&talent.inescapable_torment&pet.fiend.remains>=execute_time&active_enemies<=7&(!buff.mind_devourer.up|!talent.mind_devourer)&dot.devouring_plague.remains>execute_time&!variable.pooling_mindblasts
-  if S.MindBlast:IsCastable() and ((S.MindBlast:FullRechargeTime() <= GCDMax + S.MindBlast:ExecuteTime() or FiendRemains <= S.MindBlast:ExecuteTime() + GCDMax) and FiendUp and S.InescapableTorment:IsAvailable() and FiendRemains >= S.MindBlast:ExecuteTime() and EnemiesCount10ySplash <= 7 and (Player:BuffDown(S.MindDevourerBuff) or not S.MindDevourer:IsAvailable()) and not VarPoolingMindblasts) then
+  -- mind_blast,target_if=max:dot.devouring_plague.remains,if=(cooldown.mind_blast.full_recharge_time<=gcd.max+execute_time|pet.fiend.remains<=execute_time+gcd.max)&pet.fiend.active&talent.inescapable_torment&pet.fiend.remains>=execute_time&active_enemies<=7&(!buff.mind_devourer.up|!talent.mind_devourer)&dot.devouring_plague.remains>execute_time&!variable.pooling_mindblasts&variable.dots_up
+  if S.MindBlast:IsCastable() and ((S.MindBlast:FullRechargeTime() <= GCDMax + S.MindBlast:ExecuteTime() or FiendRemains <= S.MindBlast:ExecuteTime() + GCDMax) and FiendUp and S.InescapableTorment:IsAvailable() and FiendRemains >= S.MindBlast:ExecuteTime() and EnemiesCount10ySplash <= 7 and (Player:BuffDown(S.MindDevourerBuff) or not S.MindDevourer:IsAvailable()) and not VarPoolingMindblasts and VarDotsUp) then
     if Everyone.CastTargetIf(S.MindBlast, Enemies10ySplash, "max", EvaluateTargetIfFilterDPRemains, EvaluateTargetIfMindBlastMain, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 16"; end
   end
   -- shadow_word_death,target_if=max:dot.devouring_plague.remains,if=pet.fiend.remains<=(gcd.max+1)&pet.fiend.active&talent.inescapable_torment&active_enemies<=7

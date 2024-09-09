@@ -53,7 +53,7 @@ HR.GUISettings.APL.Mage = {
     AEMainIcon = false,
     MirrorImagesBeforePull = true,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     Enabled = {
       ArcaneMissilesInterrupts = true,
@@ -80,7 +80,7 @@ HR.GUISettings.APL.Mage = {
     StayDistance = true,
     UseScorchSniping = false,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     -- {Display GCD as OffGCD}
     GCDasOffGCD = {
@@ -98,7 +98,7 @@ HR.GUISettings.APL.Mage = {
   Frost = {
     StayDistance = true,
     PotionType = {
-      Selected = "Power",
+      Selected = "Tempered",
     },
     DisplayStyle = {
       Movement = "Suggested",

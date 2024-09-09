@@ -252,6 +252,18 @@ local function EvaluateTargetIfDrainSoul(TargetUnit)
   return S.ShadowEmbrace:IsAvailable() and (TargetUnit:DebuffStack(ShadowEmbraceDebuff) < 3 or TargetUnit:DebuffRemains(ShadowEmbraceDebuff) < 3) or not S.ShadowEmbrace:IsAvailable()
 end
 
+local function EvaluateTargetIfDrainSoul2(TargetUnit)
+  -- if=buff.nightfall.react&(talent.shadow_embrace&(debuff.shadow_embrace.stack<4|debuff.shadow_embrace.remains<3)|!talent.shadow_embrace)
+  -- Note: buff.nightfall.react check done before CastTargetIf.
+  return S.ShadowEmbrace:IsAvailable() and (TargetUnit:DebuffStack(ShadowEmbraceDebuff) < 4 or TargetUnit:DebuffRemains(ShadowEmbraceDebuff) < 3) or not S.ShadowEmbrace:IsAvailable()
+end
+
+local function EvaluateTargetIfShadowBolt(TargetUnit)
+  -- if=buff.nightfall.react&(talent.shadow_embrace&(debuff.shadow_embrace.stack<2|debuff.shadow_embrace.remains<3)|!talent.shadow_embrace)
+  -- Note: buff.nightfall.react check done before CastTargetIf.
+  return S.ShadowEmbrace:IsAvailable() and (TargetUnit:DebuffStack(ShadowEmbraceDebuff) < 2 or TargetUnit:DebuffRemains(ShadowEmbraceDebuff) < 3) or not S.ShadowEmbrace:IsAvailable()
+end
+
 local function EvaluateTargetIfWither(TargetUnit)
   -- if=remains<5&!talent.seed_of_corruption
   return TargetUnit:DebuffRemains(S.WitherDebuff) < 5
@@ -274,14 +286,20 @@ local function EvaluateCycleCorruptionRefreshable(TargetUnit)
 end
 
 local function EvaluateCycleDrainSoul(TargetUnit)
-  -- if=talent.drain_soul&buff.nightfall.react&talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)
+  -- if=talent.drain_soul&buff.nightfall.react&talent.shadow_embrace&(debuff.shadow_embrace.stack<4|debuff.shadow_embrace.remains<3)
   -- Note: Non-debuff checks done before CastCycle.
-  return TargetUnit:DebuffStack(ShadowEmbraceDebuff) < 3 or TargetUnit:DebuffRemains(ShadowEmbraceDebuff) < 3
+  return TargetUnit:DebuffStack(ShadowEmbraceDebuff) < 4 or TargetUnit:DebuffRemains(ShadowEmbraceDebuff) < 3
 end
 
 local function EvaluateCycleDrainSoul2(TargetUnit)
-  -- if=talent.drain_soul&(talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3))|!talent.shadow_embrace
-  return (S.ShadowEmbrace:IsAvailable() and (TargetUnit:DebuffStack(ShadowEmbraceDebuff) < 3 or TargetUnit:DebuffRemains(ShadowEmbraceDebuff) < 3)) or not S.ShadowEmbrace:IsAvailable()
+  -- if=talent.drain_soul&(talent.shadow_embrace&(debuff.shadow_embrace.stack<4|debuff.shadow_embrace.remains<3))|!talent.shadow_embrace
+  return (S.ShadowEmbrace:IsAvailable() and (TargetUnit:DebuffStack(ShadowEmbraceDebuff) < 4 or TargetUnit:DebuffRemains(ShadowEmbraceDebuff) < 3)) or not S.ShadowEmbrace:IsAvailable()
+end
+
+local function EvaluateCycleShadowBolt(TargetUnit)
+  -- if=buff.nightfall.react&talent.shadow_embrace&(debuff.shadow_embrace.stack<2|debuff.shadow_embrace.remains<3)
+  -- Note: Non-debuff checks done before CastCycle.
+  return TargetUnit:DebuffStack(ShadowEmbraceDebuff) < 2 or TargetUnit:DebuffRemains(ShadowEmbraceDebuff) < 3
 end
 
 local function EvaluateCycleWitherRefreshable(TargetUnit)
@@ -473,17 +491,17 @@ local function AoE()
   ) then
     if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture aoe 24"; end
   end
-  -- drain_soul,cycle_targets=1,if=talent.drain_soul&buff.nightfall.react&talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)
+  -- drain_soul,cycle_targets=1,if=talent.drain_soul&buff.nightfall.react&talent.shadow_embrace&(debuff.shadow_embrace.stack<4|debuff.shadow_embrace.remains<3)
   if S.DrainSoul:IsReady() and (Player:BuffUp(S.NightfallBuff) and S.ShadowEmbrace:IsAvailable()) then
     if Everyone.CastCycle(S.DrainSoul, Enemies40y, EvaluateCycleDrainSoul, not Target:IsInRange(40)) then return "drain_soul aoe 26"; end
   end
-  -- drain_soul,cycle_targets=1,interrupt_global=1,if=talent.drain_soul&(talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3))|!talent.shadow_embrace
+  -- drain_soul,cycle_targets=1,interrupt_global=1,if=talent.drain_soul&(talent.shadow_embrace&(debuff.shadow_embrace.stack<4|debuff.shadow_embrace.remains<3))|!talent.shadow_embrace
   if S.DrainSoul:IsReady() then
     if Everyone.CastCycle(S.DrainSoul, Enemies40y, EvaluateCycleDrainSoul2, not Target:IsInRange(40)) then return "drain_soul aoe 28"; end
   end
-  -- shadow_bolt,cycle_targets=1,if=buff.nightfall.react&talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)
+  -- shadow_bolt,cycle_targets=1,if=buff.nightfall.react&talent.shadow_embrace&(debuff.shadow_embrace.stack<2|debuff.shadow_embrace.remains<3)
   if S.ShadowBolt:IsReady() and (Player:BuffUp(S.NightfallBuff) and S.ShadowEmbrace:IsAvailable()) then
-    if Everyone.CastCycle(S.ShadowBolt, Enemies40y, EvaluateCycleDrainSoul, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt aoe 30"; end
+    if Everyone.CastCycle(S.ShadowBolt, Enemies40y, EvaluateCycleShadowBolt, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt aoe 30"; end
   end
 end
 
@@ -528,8 +546,8 @@ local function Cleave()
   if S.Corruption:IsReady() and (FightRemains > 5) then
     if Everyone.CastTargetIf(S.Corruption, Enemies40y, "min", EvaluateTargetIfFilterCorruption, EvaluateTargetIfCorruption2, not Target:IsSpellInRange(S.Corruption)) then return "corruption cleave 16"; end
   end
-  -- summon_darkglare,if=(!talent.shadow_embrace|debuff.shadow_embrace.stack=3)&variable.ps_up&variable.vt_up&variable.sr_up|cooldown.invoke_power_infusion_0.duration>0&cooldown.invoke_power_infusion_0.up&!talent.soul_rot
-  if S.SummonDarkglare:IsReady() and ((not S.ShadowEmbrace:IsAvailable() or Target:DebuffStack(ShadowEmbraceDebuff) == 3) and VarPSUp and VarVTUp and VarSRUp) then
+  -- summon_darkglare,if=(!talent.shadow_embrace|debuff.shadow_embrace.stack>=2&talent.drain_soul|debuff.shadow_embrace.stack>=1&talent.improved_shadow_bolt)&variable.ps_up&variable.vt_up&variable.sr_up|cooldown.invoke_power_infusion_0.duration>0&cooldown.invoke_power_infusion_0.up&!talent.soul_rot
+  if S.SummonDarkglare:IsReady() and ((not S.ShadowEmbrace:IsAvailable() or Target:DebuffStack(ShadowEmbraceDebuff) >= 2 and S.DrainSoul:IsAvailable() or Target:DebuffStack(ShadowEmbraceDebuff) >= 1 and S.ImprovedShadowBolt:IsAvailable()) and VarPSUp and VarVTUp and VarSRUp) then
     if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare cleave 18"; end
   end
   if S.MaleficRapture:IsReady() and (
@@ -547,14 +565,17 @@ local function Cleave()
   ) then
     if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 20"; end
   end
-  -- drain_soul,interrupt=1,if=talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)
-  if S.DrainSoul:IsReady() and (S.ShadowEmbrace:IsAvailable() and (Target:DebuffStack(ShadowEmbraceDebuff) < 3 or Target:DebuffRemains(ShadowEmbraceDebuff) < 3)) then
+  -- drain_soul,interrupt=1,if=talent.shadow_embrace&(debuff.shadow_embrace.stack<4|debuff.shadow_embrace.remains<3)
+  if S.DrainSoul:IsReady() and (S.ShadowEmbrace:IsAvailable() and (Target:DebuffStack(ShadowEmbraceDebuff) < 4 or Target:DebuffRemains(ShadowEmbraceDebuff) < 3)) then
     if Cast(S.DrainSoul, nil, nil, not Target:IsInRange(40)) then return "drain_soul cleave 22"; end
   end
-  -- drain_soul,target_if=min:debuff.shadow_embrace.remains,if=buff.nightfall.react&(talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)|!talent.shadow_embrace)
-  -- shadow_bolt,target_if=min:debuff.shadow_embrace.remains,if=buff.nightfall.react&(talent.shadow_embrace&(debuff.shadow_embrace.stack<3|debuff.shadow_embrace.remains<3)|!talent.shadow_embrace)
-  if DSSB:IsReady() and (Player:BuffUp(S.NightfallBuff)) then
-    if Everyone.CastTargetIf(DSSB, Enemies40y, "min", EvaluateTargetIfFilterShadowEmbrace, EvaluateTargetIfDrainSoul, not Target:IsInRange(40)) then return "drain_soul/shadow_bolt cleave 24"; end
+  -- drain_soul,target_if=min:debuff.shadow_embrace.remains,if=buff.nightfall.react&(talent.shadow_embrace&(debuff.shadow_embrace.stack<4|debuff.shadow_embrace.remains<3)|!talent.shadow_embrace)
+  if S.DrainSoul:IsReady() and (Player:BuffUp(S.NightfallBuff)) then
+    if Everyone.CastTargetIf(S.DrainSoul, Enemies40y, "min", EvaluateTargetIfFilterShadowEmbrace, EvaluateTargetIfDrainSoul2, not Target:IsInRange(40)) then return "drain_soul cleave 24"; end
+  end
+  -- shadow_bolt,target_if=min:debuff.shadow_embrace.remains,if=buff.nightfall.react&(talent.shadow_embrace&(debuff.shadow_embrace.stack<2|debuff.shadow_embrace.remains<3)|!talent.shadow_embrace)
+  if S.ShadowBolt:IsReady() and (Player:BuffUp(S.NightfallBuff)) then
+    if Everyone.CastTargetIf(S.ShadowBolt, Enemies40y, "min", EvaluateTargetIfFilterShadowEmbrace, EvaluateTargetIfShadowBolt, not Target:IsInRange(40)) then return "drain_soul/shadow_bolt cleave 24"; end
   end
   -- malefic_rapture,if=variable.cd_dots_up|variable.vt_ps_up
   if S.MaleficRapture:IsReady() and (VarCDDoTsUp or VarVTPSUp) then
@@ -672,7 +693,7 @@ local function APL()
   end
 
   -- summon_pet
-  if S.SummonPet:IsCastable() then
+  if S.SummonPet:IsCastable() and not (Player:IsMounted() or Player:IsInVehicle()) then
     if Cast(S.SummonPet, Settings.Affliction.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
   end
 
@@ -818,6 +839,7 @@ local function OnInit()
   S.CorruptionDebuff:RegisterAuraTracking()
   S.SiphonLifeDebuff:RegisterAuraTracking()
   S.UnstableAfflictionDebuff:RegisterAuraTracking()
+  S.ShadowEmbraceDSDebuff:RegisterAuraTracking()
 
   HR.Print("Affliction Warlock rotation has been updated for patch 11.0.2.")
 end

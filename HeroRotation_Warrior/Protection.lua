@@ -183,8 +183,8 @@ local function Aoe()
 end
 
 local function Generic()
-  -- thunder_blast,if=(buff.thunder_blast.stack=2&buff.burst_of_power.stack<=1&buff.avatar.up&talent.unstoppable_force.enabled)|rage<=70&talent.demolish.enabled
-  if S.ThunderBlastAbility:IsReady() and ((Player:BuffStack(S.ThunderBlastBuff) == 2 and Player:BuffStack(S.BurstofPowerBuff) <= 1 and Player:BuffUp(S.AvatarBuff) and S.UnstoppableForce:IsAvailable()) or Player:Rage() <= 70 and S.Demolish:IsAvailable()) then
+  -- thunder_blast,if=(buff.thunder_blast.stack=2&buff.burst_of_power.stack<=1&buff.avatar.up&talent.unstoppable_force.enabled)
+  if S.ThunderBlastAbility:IsReady() and (Player:BuffStack(S.ThunderBlastBuff) == 2 and Player:BuffStack(S.BurstofPowerBuff) <= 1 and Player:BuffUp(S.AvatarBuff) and S.UnstoppableForce:IsAvailable()) then
     SuggestRageDump(5)
     if Cast(S.ThunderBlastAbility, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_blast generic 2"; end
   end
@@ -229,8 +229,8 @@ local function Generic()
   if S.Execute:IsReady() then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute generic 18"; end
   end
-  -- revenge,if=target.health>20
-  if S.Revenge:IsReady() and (Target:HealthPercentage() > 20) then
+  -- revenge
+  if S.Revenge:IsReady() then
     if Cast(S.Revenge, nil, nil, not TargetInMeleeRange) then return "revenge generic 20"; end
   end
   -- thunder_blast,if=(spell_targets.thunder_clap>=1|cooldown.shield_slam.remains&buff.violent_outburst.up)
@@ -299,8 +299,8 @@ local function APL()
         end
       end
     end
-    -- avatar
-    if CDsON() and S.Avatar:IsCastable() then
+    -- avatar,if=buff.thunder_blast.down|buff.thunder_blast.stack<=2
+    if CDsON() and S.Avatar:IsCastable() and (Player:BuffDown(S.ThunderBlastBuff) or Player:BuffStack(S.ThunderBlastBuff) <= 2) then
       if Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar main 2"; end
     end
     -- shield_wall,if=talent.immovable_object.enabled&buff.avatar.down
@@ -396,22 +396,26 @@ local function APL()
       SuggestRageDump(20)
       if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not Target:IsInRange(25)) then return "champions_spear main 30"; end
     end
+    -- thunder_blast,if=spell_targets.thunder_blast>=2&buff.thunder_blast.stack=2
+    if S.ThunderBlastAbility:IsReady() and (EnemiesCount8 >= 2 and Player:BuffStack(S.ThunderBlastBuff) == 2) then
+      SuggestRageDump(5)
+      if Cast(S.ThunderBlastAbility, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_blast main "; end
+    end
+    -- demolish,if=buff.colossal_might.stack>=3
+    if S.Demolish:IsCastable() and (Player:BuffStack(S.ColossalMightBuff) >= 3) then
+      if Cast(S.Demolish, nil, nil, not TargetInMeleeRange) then return "demolish main "; end
+    end
     -- thunderous_roar
     if CDsON() and S.ThunderousRoar:IsCastable() then
       if Cast(S.ThunderousRoar, Settings.Protection.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar main 32"; end
-    end
-    -- shockwave,if=talent.rumbling_earth.enabled&spell_targets.shockwave>=3
-    if S.Shockwave:IsCastable() and (S.RumblingEarth:IsAvailable() and EnemiesCount8 >= 3) then
-      SuggestRageDump(10)
-      if Cast(S.Shockwave, Settings.Protection.GCDasOffGCD.Shockwave, nil, not Target:IsInMeleeRange(10)) then return "shockwave main 36"; end
     end
     -- shield_charge
     if S.ShieldCharge:IsCastable() then
       SuggestRageDump(40)
       if Cast(S.ShieldCharge, nil, nil, not Target:IsSpellInRange(S.ShieldCharge)) then return "shield_charge main 38"; end
     end
-    -- shield_block,if=buff.shield_block.duration<=10
-    if ShouldPressShieldBlock() then
+    -- shield_block,if=buff.shield_block.remains<=10
+    if ShouldPressShieldBlock() and (Player:BuffRemains(S.ShieldBlockBuff) <= 10) then
       if Cast(S.ShieldBlock, nil, Settings.Protection.DisplayStyle.Defensive) then return "shield_block main 40"; end
     end
     -- run_action_list,name=aoe,if=spell_targets.thunder_clap>3
