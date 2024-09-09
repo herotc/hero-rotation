@@ -407,13 +407,13 @@ local function CombustionPhase()
   if S.Pyroblast:IsReady() and not Player:IsCasting(S.Pyroblast) and (Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Pyroblast:CastTime()) then
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 28"; end
   end
-  -- phoenix_flames,if=talent.phoenix_reborn&buff.heating_up.react+hot_streak_spells_in_flight<2&buff.flames_fury.up
-  if S.PhoenixFlames:IsCastable() and (S.PhoenixReborn:IsAvailable() and num(HeatingUp) + HotStreakInFlight() < 2 and Player:BuffUp(S.FlamesFuryBuff)) then
-    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 30"; end
-  end
   -- fireball,if=buff.frostfire_empowerment.up&!buff.hot_streak.react&!buff.excess_frost.up
   if Bolt:IsReady() and (Player:BuffUp(S.FrostfireEmpowermentBuff) and not HotStreak and Player:BuffDown(S.ExcessFrostBuff)) then
-    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball combustion_phase 32"; end
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball combustion_phase 30"; end
+  end
+  -- phoenix_flames,if=talent.phoenix_reborn&buff.heating_up.react+hot_streak_spells_in_flight<2&buff.flames_fury.up
+  if S.PhoenixFlames:IsCastable() and (S.PhoenixReborn:IsAvailable() and num(HeatingUp) + HotStreakInFlight() < 2 and Player:BuffUp(S.FlamesFuryBuff)) then
+    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 32"; end
   end
   -- scorch,if=improved_scorch.active&(debuff.improved_scorch.remains<4*gcd.max)&active_enemies<variable.combustion_flamestrike
   if S.Scorch:IsReady() and (ImprovedScorchActive() and (Target:DebuffRemains(S.ImprovedScorchDebuff) < 4 * GCDMax) and EnemiesCount16ySplash < VarCombustionFlamestrike) then
@@ -502,8 +502,8 @@ local function StandardRotation()
   if AoEON() and S.Flamestrike:IsReady() and (EnemiesCount8ySplash >= VarHotStreakFlamestrike and (HotStreak or Player:BuffUp(S.HyperthermiaBuff))) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike standard_rotation 2"; end
   end
-  -- fireball,if=buff.hot_streak.up&buff.hyperthermia.down&!cooldown.shifting_power.ready&cooldown.phoenix_flames.charges<1&!scorch_execute.active&!prev_gcd.1.fireball,line_cd=2*gcd.max
-  if Bolt:IsReady() and (HotStreak and Player:BuffDown(S.HyperthermiaBuff) and S.ShiftingPower:CooldownDown() and S.PhoenixFlames:Charges() < 1 and not ScorchExecuteActive() and not Player:PrevGCDP(1, Bolt)) then
+  -- fireball,if=buff.hot_streak.up&!buff.frostfire_empowerment.up&buff.hyperthermia.down&!cooldown.shifting_power.ready&cooldown.phoenix_flames.charges<1&!scorch_execute.active&!prev_gcd.1.fireball,line_cd=2*gcd.max
+  if Bolt:IsReady() and (HotStreak and Player:BuffDown(S.FrostfireEmpowermentBuff) and Player:BuffDown(S.HyperthermiaBuff) and S.ShiftingPower:CooldownDown() and S.PhoenixFlames:Charges() < 1 and not ScorchExecuteActive() and not Player:PrevGCDP(1, Bolt)) then
     if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball standard_rotation 4"; end
   end
   -- pyroblast,if=(buff.hyperthermia.react|buff.hot_streak.react&(buff.hot_streak.remains<action.fireball.execute_time)|buff.hot_streak.react&(hot_streak_spells_in_flight|firestarter.active|talent.call_of_the_sun_king&action.phoenix_flames.charges)|buff.hot_streak.react&scorch_execute.active)
