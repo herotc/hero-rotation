@@ -188,6 +188,7 @@ Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Commons, {
   KegSmash                              = Spell(121253),
   LightBrewing                          = Spell(325093),
   PresstheAdvantage                     = Spell(418359),
+  ScaldingBrew                          = Spell(383698),
   Shuffle                               = Spell(322120),
   SpecialDelivery                       = Spell(196730),
   SummonBlackOxStatue                   = Spell(115315),
