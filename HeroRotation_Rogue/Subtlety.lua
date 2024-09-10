@@ -69,42 +69,42 @@ end
 
 HL:RegisterForEvent(function()
   trinket1, trinket2 = Player:GetTrinketItems()
-end, "PLAYER_EQUIPMENT_CHANGED" )
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 S.Eviscerate:RegisterDamageFormula(
-  -- Eviscerate DMG Formula (Pre-Mitigation):
-  --- Player Modifier
-    -- AP * CP * EviscR1_APCoef * Aura_M * NS_M * DS_M * DSh_M * SoD_M * Finality_M * Mastery_M * Versa_M
-  --- Target Modifier
-    -- EviscR2_M * Sinful_M
-  function ()
+-- Eviscerate DMG Formula (Pre-Mitigation):
+--- Player Modifier
+-- AP * CP * EviscR1_APCoef * Aura_M * NS_M * DS_M * DSh_M * SoD_M * Finality_M * Mastery_M * Versa_M
+--- Target Modifier
+-- EviscR2_M * Sinful_M
+  function()
     return
-      --- Player Modifier
-        -- Attack Power
-        Player:AttackPowerDamageMod() *
-        -- Combo Points
-        EffectiveComboPoints *
-        -- Eviscerate R1 AP Coef
-        0.176 *
-        -- Aura Multiplier (SpellID: 137035)
-        1.21 *
-        -- Nightstalker Multiplier
-        (S.Nightstalker:IsAvailable() and Player:StealthUp(true, false) and 1.08 or 1) *
-        -- Deeper Stratagem Multiplier
-        (S.DeeperStratagem:IsAvailable() and 1.05 or 1) *
-        -- Shadow Dance Multiplier
-        (S.DarkShadow:IsAvailable() and Player:BuffUp(S.ShadowDanceBuff) and 1.3 or 1) *
-        -- Symbols of Death Multiplier
-        (Player:BuffUp(S.SymbolsofDeath) and 1.1 or 1) *
-        -- Finality Multiplier
-        (Player:BuffUp(S.FinalityEviscerateBuff) and 1.3 or 1) *
-        -- Mastery Finisher Multiplier
-        (1 + Player:MasteryPct() / 100) *
-        -- Versatility Damage Multiplier
-        (1 + Player:VersatilityDmgPct() / 100) *
+    --- Player Modifier
+    -- Attack Power
+    Player:AttackPowerDamageMod() *
+      -- Combo Points
+      EffectiveComboPoints *
+      -- Eviscerate R1 AP Coef
+      0.176 *
+      -- Aura Multiplier (SpellID: 137035)
+      1.21 *
+      -- Nightstalker Multiplier
+      (S.Nightstalker:IsAvailable() and Player:StealthUp(true, false) and 1.08 or 1) *
+      -- Deeper Stratagem Multiplier
+      (S.DeeperStratagem:IsAvailable() and 1.05 or 1) *
+      -- Shadow Dance Multiplier
+      (S.DarkShadow:IsAvailable() and Player:BuffUp(S.ShadowDanceBuff) and 1.3 or 1) *
+      -- Symbols of Death Multiplier
+      (Player:BuffUp(S.SymbolsofDeath) and 1.1 or 1) *
+      -- Finality Multiplier
+      (Player:BuffUp(S.FinalityEviscerateBuff) and 1.3 or 1) *
+      -- Mastery Finisher Multiplier
+      (1 + Player:MasteryPct() / 100) *
+      -- Versatility Damage Multiplier
+      (1 + Player:VersatilityDmgPct() / 100) *
       --- Target Modifier
-        -- Eviscerate R2 Multiplier
-        (Target:DebuffUp(S.FindWeaknessDebuff) and 1.5 or 1)
+      -- Eviscerate R2 Multiplier
+      (Target:DebuffUp(S.FindWeaknessDebuff) and 1.5 or 1)
   end
 )
 
@@ -151,10 +151,10 @@ local function UsePriorityRotation()
     -- Zul Mythic
     if Player:InstanceDifficulty() == 16 and Target:NPCID() == 138967 then
       return true
-    -- Council of Blood
+      -- Council of Blood
     elseif Target:NPCID() == 166969 or Target:NPCID() == 166971 or Target:NPCID() == 166970 then
       return true
-    -- Anduin (Remnant of a Fallen King/Monstrous Soul)
+      -- Anduin (Remnant of a Fallen King/Monstrous Soul)
     elseif Target:NPCID() == 183463 or Target:NPCID() == 183671 then
       return true
     end
@@ -170,18 +170,18 @@ local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD, Enemies)
   local TargetGUID = Target:GUID()
   for _, CycleUnit in pairs(Enemies) do
     if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemains(DoTSpell))
-    and DoTEvaluation(CycleUnit) then
+      and DoTEvaluation(CycleUnit) then
       BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie()
     end
   end
   if BestUnit then
     CastLeftNameplate(BestUnit, DoTSpell)
-  -- Check ranged units next, if the RangedMultiDoT option is enabled
+    -- Check ranged units next, if the RangedMultiDoT option is enabled
   elseif Settings.Commons.RangedMultiDoT then
     BestUnit, BestUnitTTD = nil, DoTMinTTD
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemains(DoTSpell))
-      and DoTEvaluation(CycleUnit) then
+        and DoTEvaluation(CycleUnit) then
         BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie()
       end
     end
@@ -227,7 +227,7 @@ local function Secret_Condition()
   -- actions.finish=variable,name=secret_condition,value=((buff.danse_macabre.stack>=2+!talent.deathstalkers_mark)
   -- |!talent.danse_macabre|(talent.unseen_blade&buff.shadow_dance.up&buff.escalating_blade.stack>=2))
   return ((Player:BuffStack(S.DanseMacabreBuff) >= 2 + BoolToInt(not S.DeathStalkersMark:IsAvailable())) or not S.DanseMacabre:IsAvailable()
-  or (S.UnseenBlade:IsAvailable() and Player:BuffUp(S.ShadowDanceBuff) and Player:BuffStack(S.EscalatingBlade) >= 2))
+    or (S.UnseenBlade:IsAvailable() and Player:BuffUp(S.ShadowDanceBuff) and Player:BuffStack(S.EscalatingBlade) >= 2))
 end
 
 local function Trinket_Sync_Slot()
@@ -270,8 +270,8 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   end
 
   if StealthSpell and StealthSpell:ID() == S.Vanish:ID() then
-    ColdBloodCDRemains = mathmin(0, S.ColdBlood:CooldownRemains() - (15*S.InvigoratingShadowdust:TalentRank()))
-    SymbolsCDRemains = mathmin(0, S.SymbolsofDeath:CooldownRemains() - (15*S.InvigoratingShadowdust:TalentRank()))
+    ColdBloodCDRemains = mathmin(0, S.ColdBlood:CooldownRemains() - (15 * S.InvigoratingShadowdust:TalentRank()))
+    SymbolsCDRemains = mathmin(0, S.SymbolsofDeath:CooldownRemains() - (15 * S.InvigoratingShadowdust:TalentRank()))
   end
 
   -- action.finish+=/rupture,if=!dot.rupture.ticking&target.time_to_die-remains>6
@@ -281,7 +281,9 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       if ReturnSpellOnly then
         return S.Rupture
       else
-        if S.Rupture:IsReady() and Cast(S.Rupture) then return "Cast Rupture 1" end
+        if S.Rupture:IsReady() and Cast(S.Rupture) then
+          return "Cast Rupture 1"
+        end
         SetPoolingFinisher(S.Rupture)
       end
     end
@@ -292,7 +294,9 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.Rupture
     else
-      if S.Rupture:IsReady() and Cast(S.Rupture) then return "Cast Rupture 2" end
+      if S.Rupture:IsReady() and Cast(S.Rupture) then
+        return "Cast Rupture 2"
+      end
       SetPoolingFinisher(S.Rupture)
     end
   end
@@ -301,12 +305,14 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   if S.CoupDeGrace:IsReady() and S.CoupDeGrace:IsCastable() then
     if Target:DebuffUp(S.FazedDebuff) and (Player:BuffUp(S.ShadowDanceBuff) or Player:BuffUp(S.SymbolsofDeath)
       and S.ShadowDance:ChargesFractional() <= 0.85) then
-        if ReturnSpellOnly then
-          return S.CoupDeGrace
-        else
-          if S.CoupDeGrace:IsReady() and Cast(S.CoupDeGrace) then return "Cast Coup De Grace 1" end
-          SetPoolingFinisher(S.CoupDeGrace)
+      if ReturnSpellOnly then
+        return S.CoupDeGrace
+      else
+        if S.CoupDeGrace:IsReady() and Cast(S.CoupDeGrace) then
+          return "Cast Coup De Grace 1"
         end
+        SetPoolingFinisher(S.CoupDeGrace)
+      end
     end
   end
 
@@ -315,8 +321,12 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     if Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood then
       Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood)
     else
-      if ReturnSpellOnly then return S.ColdBlood end
-      if Cast(S.ColdBlood) then return "Cast Cold Blood (SecTec)" end
+      if ReturnSpellOnly then
+        return S.ColdBlood
+      end
+      if Cast(S.ColdBlood) then
+        return "Cast Cold Blood (SecTec)"
+      end
     end
   end
 
@@ -327,8 +337,12 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     if Secret_Condition(ShadowDanceBuff, PremeditationBuff)
       and (not S.ColdBlood:IsAvailable() or (Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood and S.ColdBlood:IsReady())
       or Player:BuffUp(S.ColdBlood) or ColdBloodCDRemains > ShadowDanceBuffRemains - 2 or not S.ImprovedShadowDance:IsAvailable()) then
-      if ReturnSpellOnly then return S.SecretTechnique end
-      if Cast(S.SecretTechnique) then return "Cast Secret Technique" end
+      if ReturnSpellOnly then
+        return S.SecretTechnique
+      end
+      if Cast(S.SecretTechnique) then
+        return "Cast Secret Technique"
+      end
     end
   end
 
@@ -349,7 +363,9 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       if ReturnSpellOnly then
         return S.Rupture
       else
-        if S.Rupture:IsReady() and Cast(S.Rupture) then return "Cast Rupture 2" end
+        if S.Rupture:IsReady() and Cast(S.Rupture) then
+          return "Cast Rupture 2"
+        end
         SetPoolingFinisher(S.Rupture)
       end
     end
@@ -359,12 +375,14 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   -- actions.finish+=/black_powder,if=!variable.priority_rotation&talent.deathstalkers_mark&spell_targets>=3&!buff.darkest_night.up
   if S.BlackPowder:IsCastable() and not PriorityRotation and S.DeathStalkersMark:IsAvailable() and MeleeEnemies10yCount >= 3
     and Player:BuffDown(S.DarkestNightBuff) then
-      if ReturnSpellOnly then
-        return S.BlackPowder
-      else
-        if S.BlackPowder:IsReady() and Cast(S.BlackPowder) then return "Cast Black Powder 1" end
-        SetPoolingFinisher(S.BlackPowder)
+    if ReturnSpellOnly then
+      return S.BlackPowder
+    else
+      if S.BlackPowder:IsReady() and Cast(S.BlackPowder) then
+        return "Cast Black Powder 1"
       end
+      SetPoolingFinisher(S.BlackPowder)
+    end
   end
 
   -- # Trickster bp, also gets used on singletarget when at max escalating blade stacks to preserve coup for dance
@@ -375,12 +393,14 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     and ((Player:BuffStack(S.EscalatingBlade) == 4 and Player:BuffDown(S.ShadowDanceBuff)) or MeleeEnemies10yCount >= 3
     and Player:BuffDown(S.FlawlessFormBuff) or (not Used_For_Danse(S.BlackPowder)
     and Player:BuffUp(S.ShadowDanceBuff) and S.ShurikenTornado:IsAvailable() and MeleeEnemies10yCount >= 3)) then
-      if ReturnSpellOnly then
-        return S.BlackPowder
-      else
-        if S.BlackPowder:IsReady() and Cast(S.BlackPowder) then return "Cast BlackPowder 2" end
-        SetPoolingFinisher(S.BlackPowder)
+    if ReturnSpellOnly then
+      return S.BlackPowder
+    else
+      if S.BlackPowder:IsReady() and Cast(S.BlackPowder) then
+        return "Cast BlackPowder 2"
       end
+      SetPoolingFinisher(S.BlackPowder)
+    end
   end
 
   -- actions.finish+=/coup_de_grace,if=debuff.fazed.up
@@ -388,7 +408,9 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.CoupDeGrace
     else
-      if S.CoupDeGrace:IsReady() and Cast(S.CoupDeGrace) then return "Cast Coup De Grace 2" end
+      if S.CoupDeGrace:IsReady() and Cast(S.CoupDeGrace) then
+        return "Cast Coup De Grace 2"
+      end
       SetPoolingFinisher(S.CoupDeGrace)
     end
   end
@@ -398,7 +420,9 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.Eviscerate
     else
-      if S.Eviscerate:IsReady() and Cast(S.Eviscerate) then return "Cast Eviscerate" end
+      if S.Eviscerate:IsReady() and Cast(S.Eviscerate) then
+        return "Cast Eviscerate"
+      end
       SetPoolingFinisher(S.Eviscerate)
     end
   end
@@ -441,11 +465,13 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   -- actions.stealthed=shadowstrike,if=talent.deathstalkers_mark&!debuff.deathstalkers_mark.up&!buff.darkest_night.up
   if ShadowstrikeIsCastable and S.DeathStalkersMark:IsAvailable() and Target:DebuffDown(S.DeathStalkersMarkDebuff)
     and Player:BuffDown(S.DarkestNightBuff) then
-      if ReturnSpellOnly then
-        return S.Shadowstrike
-      else
-        if Cast(S.Shadowstrike) then return "Cast Shadowstrike (Stealth 1)" end
+    if ReturnSpellOnly then
+      return S.Shadowstrike
+    else
+      if Cast(S.Shadowstrike) then
+        return "Cast Shadowstrike (Stealth 1)"
       end
+    end
   end
 
   -- actions.stealthed+=/call_action_list,name=finish,if=buff.darkest_night.up&combo_points==cp_max_spend
@@ -471,11 +497,13 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   -- actions.stealthed+=/shadowstrike,if=(!used_for_danse&buff.shadow_blades.up)|(talent.unseen_blade&spell_targets>=2)
   if ShadowstrikeIsCastable and (not Used_For_Danse(S.Shadowstrike) and Player:BuffUp(S.ShadowBlades))
     or (S.UnseenBlade:IsAvailable() and MeleeEnemies10yCount >= 2) then
-      if ReturnSpellOnly then
-        return S.Shadowstrike
-      else
-        if Cast(S.Shadowstrike) then return "Cast Shadowstrike (Stealth 2)" end
+    if ReturnSpellOnly then
+      return S.Shadowstrike
+    else
+      if Cast(S.Shadowstrike) then
+        return "Cast Shadowstrike (Stealth 2)"
       end
+    end
   end
 
   -- actions.stealthed+=/shuriken_storm,if=!buff.premeditation.up&spell_targets>=4
@@ -484,7 +512,9 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
       if ReturnSpellOnly then
         return S.ShurikenStorm
       else
-        if Cast(S.ShurikenStorm) then return "Cast ShurikenStorm (Stealth)" end
+        if Cast(S.ShurikenStorm) then
+          return "Cast ShurikenStorm (Stealth)"
+        end
       end
     end
   end
@@ -500,7 +530,9 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
           return { S.Gloomblade, S.Stealth }
         end
       else
-        if CastQueue(S.Gloomblade, S.Stealth) then return "Cast Gloomblade (Danse)" end
+        if CastQueue(S.Gloomblade, S.Stealth) then
+          return "Cast Gloomblade (Danse)"
+        end
       end
     end
   end
@@ -510,7 +542,9 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
-      if Cast(S.Shadowstrike) then return "Cast Shadowstrike" end
+      if Cast(S.Shadowstrike) then
+        return "Cast Shadowstrike"
+      end
     end
   end
 
@@ -526,17 +560,23 @@ local function StealthMacro (StealthSpell, EnergyThreshold)
   -- Handle StealthMacro GUI options
   -- If false, just suggest them as off-GCD and bail out of the macro functionality
   if StealthSpell:ID() == S.Vanish:ID() and (not Settings.Subtlety.StealthMacro.Vanish or not MacroAbility) then
-    if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish" end
+    if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then
+      return "Cast Vanish"
+    end
     return false
   elseif StealthSpell:ID() == S.Shadowmeld:ID() and (not Settings.Subtlety.StealthMacro.Shadowmeld or not MacroAbility) then
-    if Cast(S.Shadowmeld, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
+    if Cast(S.Shadowmeld, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then
+      return "Cast Shadowmeld"
+    end
     return false
   elseif StealthSpell:ID() == S.ShadowDance:ID() and (not Settings.Subtlety.StealthMacro.ShadowDance or not MacroAbility) then
-    if Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
+    if Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then
+      return "Cast Shadow Dance"
+    end
     return false
   end
 
-  local MacroTable = {StealthSpell, MacroAbility}
+  local MacroTable = { StealthSpell, MacroAbility }
 
   -- Set the stealth spell only as a pooling fallback if we did not meet the threshold
   if EnergyThreshold and Player:EnergyPredicted() < EnergyThreshold then
@@ -545,7 +585,9 @@ local function StealthMacro (StealthSpell, EnergyThreshold)
   end
 
   ShouldReturn = CastQueue(unpack(MacroTable))
-  if ShouldReturn then return "| " .. MacroTable[2]:Name() end
+  if ShouldReturn then
+    return "| " .. MacroTable[2]:Name()
+  end
 
   return false
 end
@@ -554,7 +596,9 @@ end
 local function CDs ()
   -- actions.cds+=/cold_blood,if=!talent.secret_technique&combo_points>=6
   if HR.CDsON() and S.ColdBlood:IsReady() and not S.SecretTechnique:IsAvailable() and ComboPoints >= 6 then
-    if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then return "Cast Cold Blood" end
+    if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
+      return "Cast Cold Blood"
+    end
   end
 
   -- actions.cds+=/sepsis,if=variable.snd_condition&(cooldown.shadow_blades.remains<=3
@@ -562,7 +606,9 @@ local function CDs ()
   if HR.CDsON() and S.Sepsis:IsAvailable() and S.Sepsis:IsReady() then
     if SnD_Condition() and (S.ShadowBlades:CooldownRemains() <= 3
       and S.SymbolsofDeath:CooldownRemains() <= 3 or HL.BossFilteredFightRemains("<=", 12)) then
-      if Cast(S.Sepsis, nil, Settings.CommonsDS.DisplayStyle.Sepsis) then return "Cast Sepsis" end
+      if Cast(S.Sepsis, nil, Settings.CommonsDS.DisplayStyle.Sepsis) then
+        return "Cast Sepsis"
+      end
     end
   end
 
@@ -572,8 +618,10 @@ local function CDs ()
   if HR.CDsON() and S.Flagellation:IsAvailable() and S.Flagellation:IsReady() then
     if SnD_Condition() and Rupture_Before_Flag() and EffectiveComboPoints >= 5 and Target:TimeToDie() > 10
       and (S.ShadowBlades:CooldownRemains() <= 2 or HL.BossFilteredFightRemains("<=", 24))
-      and (not S.InvigoratingShadowdust:IsAvailable() or S.SymbolsofDeath:CooldownRemains() <= 3 or Player:BuffRemains(S.SymbolsofDeath) >3 ) then
-      if Cast(S.Flagellation, nil, Settings.CommonsDS.DisplayStyle.Flagellation) then return "Cast Flagellation" end
+      and (not S.InvigoratingShadowdust:IsAvailable() or S.SymbolsofDeath:CooldownRemains() <= 3 or Player:BuffRemains(S.SymbolsofDeath) > 3) then
+      if Cast(S.Flagellation, nil, Settings.CommonsDS.DisplayStyle.Flagellation) then
+        return "Cast Flagellation"
+      end
     end
   end
 
@@ -583,7 +631,9 @@ local function CDs ()
   if HR.CDsON() and S.SymbolsofDeath:IsReady() then
     if not S.InvigoratingShadowdust:IsAvailable() and SnD_Condition()
       and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:CooldownRemains() > 20) then
-        if Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death without Dust" end
+      if Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then
+        return "Cast Symbols of Death without Dust"
+      end
     end
   end
 
@@ -595,7 +645,9 @@ local function CDs ()
     if S.InvigoratingShadowdust:IsAvailable() and SnD_Condition() and Player:BuffRemains(S.SymbolsofDeath) <= 3
       and Player:BuffDown(S.TheRottenBuff) and (S.Flagellation:CooldownRemains() > 10 or S.Flagellation:IsReady()
       and (S.ShadowBlades:CooldownRemains() >= 20 or S.ShadowBlades:IsReady()) or Player:BuffRemains(S.ShadowDanceBuff) >= 2) then
-      if Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death with Dust" end
+      if Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then
+        return "Cast Symbols of Death with Dust"
+      end
     end
   end
 
@@ -604,7 +656,9 @@ local function CDs ()
   if HR.CDsON() and S.ShadowBlades:IsReady() then
     if SnD_Condition() and EffectiveComboPoints <= 1 and (Player:BuffUp(S.Flagellation) or not S.Flagellation:IsAvailable())
       or HL.BossFilteredFightRemains("<=", 20) then
-    if Cast(S.ShadowBlades, Settings.Subtlety.OffGCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades" end
+      if Cast(S.ShadowBlades, Settings.Subtlety.OffGCDasOffGCD.ShadowBlades) then
+        return "Cast Shadow Blades"
+      end
     end
   end
 
@@ -613,7 +667,9 @@ local function CDs ()
   if HR.CDsON() and S.EchoingReprimand:IsCastable() and S.EchoingReprimand:IsAvailable() then
     if SnD_Condition() and ComboPointsDeficit >= 3
       and (not S.TheRotten:IsAvailable() or not S.Reverberation:IsAvailable() or Player:BuffUp(S.ShadowDance)) then
-        if Cast(S.EchoingReprimand, nil, Settings.CommonsDS.DisplayStyle.EchoingReprimand) then return "Cast Echoing Reprimand" end
+      if Cast(S.EchoingReprimand, nil, Settings.CommonsDS.DisplayStyle.EchoingReprimand) then
+        return "Cast Echoing Reprimand"
+      end
     end
   end
 
@@ -623,7 +679,9 @@ local function CDs ()
   if HR.CDsON() and S.ShurikenTornado:IsAvailable() and S.ShurikenTornado:IsReady() then
     if SnD_Condition() and Player:BuffUp(S.SymbolsofDeath) and EffectiveComboPoints <= 2 and not Player:BuffUp(S.PremeditationBuff)
       and (not S.Flagellation:IsAvailable() or S.Flagellation:CooldownRemains() > 20) and MeleeEnemies10yCount >= 3 then
-        if Cast(S.ShurikenTornado, Settings.Subtlety.GCDasOffGCD.ShurikenTornado) then return "Cast Shuriken Tornado 1" end
+      if Cast(S.ShurikenTornado, Settings.Subtlety.GCDasOffGCD.ShurikenTornado) then
+        return "Cast Shuriken Tornado 1"
+      end
     end
   end
 
@@ -633,7 +691,9 @@ local function CDs ()
   if HR.CDsON() and S.ShurikenTornado:IsAvailable() and S.ShurikenTornado:IsReady() then
     if SnD_Condition() and Player:BuffDown(S.ShadowDanceBuff) and Player:BuffDown(S.Flagellation)
       and Player:BuffDown(S.FlagellationPersistBuff) and Player:BuffDown(S.ShadowBlades) and MeleeEnemies10yCount <= 2 then
-        if Cast(S.ShurikenTornado, Settings.Subtlety.GCDasOffGCD.ShurikenTornado) then return "Cast Shuriken Tornado 2" end
+      if Cast(S.ShurikenTornado, Settings.Subtlety.GCDasOffGCD.ShurikenTornado) then
+        return "Cast Shuriken Tornado 2"
+      end
     end
   end
 
@@ -642,18 +702,22 @@ local function CDs ()
   -- &(cooldown.secret_technique.remains>=10&!raid_event.adds.up)
   if HR.CDsON() and S.Vanish:IsReady() then
     if Player:BuffUp(S.ShadowDanceBuff) and S.InvigoratingShadowdust:IsAvailable() and S.UnseenBlade:IsAvailable()
-      and ComboPointsDeficit > 1 and (S.Flagellation:CooldownRemains() >= 60 or not S.Flagellation:IsAvailable() or HL.BossFilteredFightRemains("<=", 30*S.Vanish:Charges()))
+      and ComboPointsDeficit > 1 and (S.Flagellation:CooldownRemains() >= 60 or not S.Flagellation:IsAvailable() or HL.BossFilteredFightRemains("<=", 30 * S.Vanish:Charges()))
       and S.SecretTechnique:CooldownRemains() >= 10 then
-        ShouldReturn = StealthMacro(S.Vanish, StealthEnergyRequired)
-        if ShouldReturn then return "Vanish Macro" .. ShouldReturn end
+      ShouldReturn = StealthMacro(S.Vanish, StealthEnergyRequired)
+      if ShouldReturn then
+        return "Vanish Macro" .. ShouldReturn
+      end
     end
   end
 
   -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
   if HR.CDsON() and S.ShadowDance:IsAvailable() and MayBurnShadowDance() and S.ShadowDance:IsReady() then
     if not Player:BuffUp(S.ShadowDanceBuff) and HL.BossFilteredFightRemains("<=", 8 + num(S.Subterfuge:IsAvailable())) then
-        ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
-        if ShouldReturn then return "Shadow Dance Macro CDs 1" .. ShouldReturn end
+      ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
+      if ShouldReturn then
+        return "Shadow Dance Macro CDs 1" .. ShouldReturn
+      end
     end
   end
 
@@ -663,8 +727,10 @@ local function CDs ()
     if Player:BuffDown(S.ShadowDanceBuff) and S.InvigoratingShadowdust:IsAvailable() and S.DeathStalkersMark:IsAvailable()
       and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and (Player:BuffUp(S.Subterfuge) and MeleeEnemies10yCount >= 4
       or Player:BuffRemains(S.Subterfuge) >= 3) then
-        ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
-        if ShouldReturn then return "Shadow Dance Macro CDs 2" .. ShouldReturn end
+      ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
+      if ShouldReturn then
+        return "Shadow Dance Macro CDs 2" .. ShouldReturn
+      end
     end
   end
 
@@ -675,12 +741,14 @@ local function CDs ()
   -- &(!talent.the_first_dance|(combo_points.deficit>=7&!buff.shadow_blades.up|buff.shadow_blades.up))
   if HR.CDsON() and S.ShadowDance:IsAvailable() and S.ShadowDance:IsReady() then
     if Player:BuffDown(S.ShadowDanceBuff) and S.UnseenBlade:IsAvailable() and S.InvigoratingShadowdust:IsAvailable()
-    and Target:DebuffUp(S.Rupture) and SnD_Condition() and (Player:BuffRemains(S.SymbolsofDeath) >= 6 and Player:BuffDown(S.Flagellation)
-  or Player:BuffUp(S.SymbolsofDeath) and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) or (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and not S.InvigoratingShadowdust:IsAvailable())
-    and (S.SecretTechnique:CooldownRemains() <= 10 + 12 * num(not S.InvigoratingShadowdust:IsAvailable() or Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady())
+      and Target:DebuffUp(S.Rupture) and SnD_Condition() and (Player:BuffRemains(S.SymbolsofDeath) >= 6 and Player:BuffDown(S.Flagellation)
+      or Player:BuffUp(S.SymbolsofDeath) and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) or (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and not S.InvigoratingShadowdust:IsAvailable())
+      and (S.SecretTechnique:CooldownRemains() <= 10 + 12 * num(not S.InvigoratingShadowdust:IsAvailable() or Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady())
       and (not S.TheFirstDance:IsAvailable() or (ComboPointsDeficit >= 7 and Player:BuffDown(S.ShadowBlades) or Player:BuffUp(S.ShadowBlades)))) then
-        ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
-        if ShouldReturn then return "Shadow Dance Macro CDs 3" .. ShouldReturn end
+      ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
+      if ShouldReturn then
+        return "Shadow Dance Macro CDs 3" .. ShouldReturn
+      end
     end
   end
 
@@ -691,8 +759,10 @@ local function CDs ()
   if HR.CDsON() and S.GoremawsBite:IsAvailable() and S.GoremawsBite:IsReady() then
     if SnD_Condition() and ComboPointsDeficit >= 3 and (not S.ShadowDance:IsReady() or S.DoubleDance:IsAvailable()
       and Player:BuffUp(S.ShadowDanceBuff) and not S.InvigoratingShadowdust:IsAvailable() or MeleeEnemies10yCount < 4
-      and not S.InvigoratingShadowdust:IsAvailable() or S.TheRotten:IsAvailable() ) then
-        if Cast(S.GoremawsBite) then return "Cast Goremaw's Bite" end
+      and not S.InvigoratingShadowdust:IsAvailable() or S.TheRotten:IsAvailable()) then
+      if Cast(S.GoremawsBite) then
+        return "Cast Goremaw's Bite"
+      end
     end
   end
 
@@ -701,9 +771,11 @@ local function CDs ()
   -- |fight_remains<=(6*cooldown.thistle_tea.charges)
   if S.ThistleTea:IsReady() then
     if Player:BuffDown(S.ThistleTea) and (Player:BuffRemains(S.ShadowDanceBuff) >= 4
-    and Player:BuffUp(S.ShadowBlades) or Player:BuffRemains(S.ShadowDanceBuff) >= 4 and S.ColdBlood:CooldownRemains() <= 3)
-    or HL.BossFilteredFightRemains("<=", 6*S.ThistleTea:Charges()) then
-      if Cast(S.ThistleTea, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Thistle Tea"; end
+      and Player:BuffUp(S.ShadowBlades) or Player:BuffRemains(S.ShadowDanceBuff) >= 4 and S.ColdBlood:CooldownRemains() <= 3)
+      or HL.BossFilteredFightRemains("<=", 6 * S.ThistleTea:Charges()) then
+      if Cast(S.ThistleTea, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+        return "Thistle Tea";
+      end
     end
   end
 
@@ -712,8 +784,10 @@ local function CDs ()
   if Settings.Commons.Enabled.Potions then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() and (Player:BloodlustUp() or HL.BossFilteredFightRemains("<", 30) or Player:BuffUp(S.SymbolsofDeath)
-    and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:CooldownRemains() <= 10)) then
-      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "Cast Potion"; end
+      and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:CooldownRemains() <= 10)) then
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then
+        return "Cast Potion";
+      end
     end
   end
 
@@ -722,22 +796,30 @@ local function CDs ()
 
   -- actions.cds+=/blood_fury,if=variable.racial_sync
   if S.BloodFury:IsCastable() and racial_sync then
-    if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "Cast Blood Fury" end
+    if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then
+      return "Cast Blood Fury"
+    end
   end
 
   -- actions.cds+=/berserking,if=variable.racial_sync
   if S.Berserking:IsCastable() and racial_sync then
-    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "Cast Berserking" end
+    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then
+      return "Cast Berserking"
+    end
   end
 
   -- actions.cds+=/fireblood,if=variable.racial_sync
   if S.Fireblood:IsCastable() and racial_sync and Player:BuffUp(S.ShadowDanceBuff) then
-    if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "Cast Fireblood" end
+    if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then
+      return "Cast Fireblood"
+    end
   end
 
   -- actions.cds+=/ancestral_call,if=variable.racial_sync
   if S.AncestralCall:IsCastable() and racial_sync then
-    if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call" end
+    if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then
+      return "Cast Ancestral Call"
+    end
   end
 
   return false
@@ -749,14 +831,18 @@ local function Items()
     -- actions.items+=/use_item,name=treacherous_transmitter,if=buff.shadow_blades.up|fight_remains<=15
     if I.TreacherousTransmitter:IsEquippedAndReady() then
       if Player:BuffUp(S.ShadowBlades) or HL.BossFilteredFightRemains("<=", 15) then
-        if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Treacherous Transmitter" end
+        if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+          return "Treacherous Transmitter"
+        end
       end
     end
 
     --actions.items+=/use_item,name=imperfect_ascendancy_serum,use_off_gcd=1,if=dot.rupture.ticking&buff.flagellation_buff.up
     if I.ImperfectAscendancySerum:IsEquippedAndReady() then
-      if  Target:DebuffUp(S.Rupture) and Player:BuffUp(S.Flagellation) then
-        if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "Imperfect Ascendancy Serum" end
+      if Target:DebuffUp(S.Rupture) and Player:BuffUp(S.Flagellation) then
+        if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+          return "Imperfect Ascendancy Serum"
+        end
       end
     end
 
@@ -770,10 +856,12 @@ local function Items()
       TrinketRange = (TrinketSpell and TrinketSpell.MaximumRange > 0 and TrinketSpell.MaximumRange <= 100) and TrinketSpell.MaximumRange or 100
     end
     if trinket1:IsEquippedAndReady() then
-      if not ValueIsInArray(OnUseExcludes, trinket1:ID()) and (Trinket_Sync_Slot() == 1 and (Player:BuffUp(S.ShadowBlades) or (1+S.ShadowBlades:CooldownRemains()) >= trinket1:CooldownRemains()
+      if not ValueIsInArray(OnUseExcludes, trinket1:ID()) and (Trinket_Sync_Slot() == 1 and (Player:BuffUp(S.ShadowBlades) or (1 + S.ShadowBlades:CooldownRemains()) >= trinket1:CooldownRemains()
         or HL.BossFilteredFightRemains("<=", 20)) or (Trinket_Sync_Slot() == 2 and (not trinket2:IsReady() and not Player:BuffUp(S.ShadowBlades)
         and S.ShadowBlades:CooldownRemains() > 20)) or Trinket_Sync_Slot() == 0) then
-          if Cast(trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then return "Generic use_items for " .. trinket1:Name() end
+        if Cast(trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then
+          return "Generic use_items for " .. trinket1:Name()
+        end
       end
     end
 
@@ -785,10 +873,12 @@ local function Items()
       TrinketRange = (TrinketSpell and TrinketSpell.MaximumRange > 0 and TrinketSpell.MaximumRange <= 100) and TrinketSpell.MaximumRange or 100
     end
     if trinket2:IsEquippedAndReady() then
-      if not ValueIsInArray(OnUseExcludes, trinket2:ID()) and (Trinket_Sync_Slot() == 2 and (Player:BuffUp(S.ShadowBlades) or (1+S.ShadowBlades:CooldownRemains()) >= trinket2:CooldownRemains()
+      if not ValueIsInArray(OnUseExcludes, trinket2:ID()) and (Trinket_Sync_Slot() == 2 and (Player:BuffUp(S.ShadowBlades) or (1 + S.ShadowBlades:CooldownRemains()) >= trinket2:CooldownRemains()
         or HL.BossFilteredFightRemains("<=", 20)) or (Trinket_Sync_Slot() == 1 and (not trinket1:IsReady() and not Player:BuffUp(S.ShadowBlades)
         and S.ShadowBlades:CooldownRemains() > 20)) or Trinket_Sync_Slot() == 0) then
-          if Cast(trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then return "Generic use_items for " .. trinket2:Name() end
+        if Cast(trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then
+          return "Generic use_items for " .. trinket2:Name()
+        end
       end
     end
   end
@@ -807,8 +897,10 @@ local function Stealth_CDs (EnergyThreshold)
       if not S.InvigoratingShadowdust:IsAvailable() and not S.Subterfuge:IsAvailable() and ComboPointsDeficit >= 3
         and (Target:DebuffDown(S.Rupture) or ((Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and Player:BuffUp(S.SymbolsofDeath))
         or S.Premeditation:IsAvailable() or HL.BossFilteredFightRemains("<", 10)) then
-          ShouldReturn = StealthMacro(S.Vanish, EnergyThreshold)
-          if ShouldReturn then return "Vanish Macro 1 No Dust" .. ShouldReturn end
+        ShouldReturn = StealthMacro(S.Vanish, EnergyThreshold)
+        if ShouldReturn then
+          return "Vanish Macro 1 No Dust" .. ShouldReturn
+        end
       end
     end
 
@@ -818,10 +910,12 @@ local function Stealth_CDs (EnergyThreshold)
     if S.Vanish:IsCastable() then
       if Player:BuffDown(S.ShadowDanceBuff) and S.InvigoratingShadowdust:IsAvailable() and S.DeathStalkersMark:IsAvailable()
         and (ComboPointsDeficit > 1 or Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and (S.Flagellation:CooldownRemains() >= 60
-        or not S.Flagellation:IsAvailable() or HL.BossFilteredFightRemains("<=", 30*S.Vanish:Charges()))
+        or not S.Flagellation:IsAvailable() or HL.BossFilteredFightRemains("<=", 30 * S.Vanish:Charges()))
         and S.SecretTechnique:CooldownRemains() >= 10 then
-          ShouldReturn = StealthMacro(S.Vanish, EnergyThreshold)
-          if ShouldReturn then return "Vanish Macro 2 Dust" .. ShouldReturn end
+        ShouldReturn = StealthMacro(S.Vanish, EnergyThreshold)
+        if ShouldReturn then
+          return "Vanish Macro 2 Dust" .. ShouldReturn
+        end
       end
     end
 
@@ -835,8 +929,10 @@ local function Stealth_CDs (EnergyThreshold)
         or Player:BuffUp(S.SymbolsofDeath) and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) or (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and not S.InvigoratingShadowdust:IsAvailable())
         and S.SecretTechnique:CooldownRemains() < 10 + 12 * num(S.InvigoratingShadowdust:IsAvailable())
         and (not S.TheFirstDance:IsAvailable() or (ComboPointsDeficit >= 7 and Player:BuffDown(S.ShadowBlades) or Player:BuffUp(S.ShadowBlades))) then
-          ShouldReturn = StealthMacro(S.ShadowDance, EnergyThreshold)
-          if ShouldReturn then return "Shadow Dance Macro 1 " .. ShouldReturn end
+        ShouldReturn = StealthMacro(S.ShadowDance, EnergyThreshold)
+        if ShouldReturn then
+          return "Shadow Dance Macro 1 " .. ShouldReturn
+        end
       end
     end
 
@@ -846,14 +942,18 @@ local function Stealth_CDs (EnergyThreshold)
       if not S.InvigoratingShadowdust:IsAvailable() and not S.Subterfuge:IsAvailable() and ComboPointsDeficit >= 3
         and (Player:BuffUp(S.SymbolsofDeath) or S.SymbolsofDeath:CooldownRemains() >= 3) then
         ShouldReturn = StealthMacro(S.Vanish, EnergyThreshold)
-        if ShouldReturn then return "Vanish Macro 3 No Dust Subterfuge " .. ShouldReturn end
+        if ShouldReturn then
+          return "Vanish Macro 3 No Dust Subterfuge " .. ShouldReturn
+        end
       end
     end
 
     -- actions.stealth_cds+=/shadowmeld,if=energy>=40&combo_points.deficit>3
     -- Pool for Shadowmeld unless we are about to cap on Dance charges.
     if Settings.Commons.ShowPooling and Player:Energy() < 40 and S.Shadowmeld:IsCastable() and ComboPointsDeficit > 3 then
-      if CastPooling(S.Shadowmeld, Player:EnergyTimeToX(40)) then return "Pool for Shadowmeld" end
+      if CastPooling(S.Shadowmeld, Player:EnergyTimeToX(40)) then
+        return "Pool for Shadowmeld"
+      end
     end
   end
 
@@ -869,10 +969,12 @@ local function Build (EnergyThreshold)
   if HR.AoEON() and S.ShurikenStorm:IsCastable()
     and MeleeEnemies10yCount >= 2 + BoolToInt(S.Gloomblade:IsAvailable()
     and Player:BuffRemains(S.LingeringShadowBuff) >= 6 or Player:BuffUp(S.PerforatedVeinsBuff))
-      - BoolToInt(Target:DebuffDown(S.FindWeaknessDebuff) and not S.ImprovedBackstab:IsAvailable())
+    - BoolToInt(Target:DebuffDown(S.FindWeaknessDebuff) and not S.ImprovedBackstab:IsAvailable())
     and (Player:BuffUp(S.FlawlessFormBuff) or not S.UnseenBlade:IsAvailable()) then
-      if ThresholdMet and Cast(S.ShurikenStorm) then return "Cast Shuriken Storm" end
-        SetPoolingAbility(S.ShurikenStorm, EnergyThreshold)
+    if ThresholdMet and Cast(S.ShurikenStorm) then
+      return "Cast Shuriken Storm"
+    end
+    SetPoolingAbility(S.ShurikenStorm, EnergyThreshold)
   end
 
   -- actions.build+=/shuriken_storm,if=buff.clear_the_witnesses.up&(!buff.symbols_of_death.up|!talent.inevitability)
@@ -880,20 +982,26 @@ local function Build (EnergyThreshold)
   if HR.AoEON() and S.ShurikenStorm:IsCastable() then
     if Player:BuffUp(S.ClearTheWitnessesBuff) and (Player:BuffDown(S.SymbolsofDeath) or not S.Inevitability:IsAvailable())
       and (Player:BuffRemains(S.LingeringShadowBuff) <= 6 or not S.LingeringShadow:IsAvailable()) then
-        if ThresholdMet and Cast(S.ShurikenStorm) then return "Cast Shuriken Storm Deathstalker ST" end
-          SetPoolingAbility(S.ShurikenStorm, EnergyThreshold)
+      if ThresholdMet and Cast(S.ShurikenStorm) then
+        return "Cast Shuriken Storm Deathstalker ST"
+      end
+      SetPoolingAbility(S.ShurikenStorm, EnergyThreshold)
     end
   end
 
   if TargetInMeleeRange then
     -- actions.build+=/gloomblade
     if S.Gloomblade:IsCastable() then
-      if ThresholdMet and Cast(S.Gloomblade) then return "Cast Gloomblade" end
+      if ThresholdMet and Cast(S.Gloomblade) then
+        return "Cast Gloomblade"
+      end
       SetPoolingAbility(S.Gloomblade, EnergyThreshold)
 
-    -- actions.build+=/backstab
+      -- actions.build+=/backstab
     elseif S.Backstab:IsCastable() then
-      if ThresholdMet and Cast(S.Backstab) then return "Cast Backstab" end
+      if ThresholdMet and Cast(S.Backstab) then
+        return "Cast Backstab"
+      end
       SetPoolingAbility(S.Backstab, EnergyThreshold)
     end
   end
@@ -901,9 +1009,15 @@ local function Build (EnergyThreshold)
 end
 
 local Interrupts = {
-  {S.Blind, "Cast Blind (Interrupt)", function () return true end},
-  {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return ComboPoints > 0 end},
-  {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:StealthUp(true, true) end}
+  { S.Blind, "Cast Blind (Interrupt)", function()
+    return true
+  end },
+  { S.KidneyShot, "Cast Kidney Shot (Interrupt)", function()
+    return ComboPoints > 0
+  end },
+  { S.CheapShot, "Cast Cheap Shot (Interrupt)", function()
+    return Player:StealthUp(true, true)
+  end }
 }
 
 -- APL Main
@@ -952,12 +1066,14 @@ local function APL ()
 
   -- Damage Cache updates (after EffectiveComboPoints adjustments)
   RuptureThreshold = (4 + EffectiveComboPoints * 4) * 0.3
-  RuptureDMGThreshold = S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
+  RuptureDMGThreshold = S.Eviscerate:Damage() * Settings.Subtlety.EviscerateDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
 
   --- Defensives
   -- Crimson Vial
   ShouldReturn = Rogue.CrimsonVial()
-  if ShouldReturn then return ShouldReturn end
+  if ShouldReturn then
+    return ShouldReturn
+  end
 
   -- Poisons
   Rogue.Poisons()
@@ -968,7 +1084,9 @@ local function APL ()
     -- Note: Since 7.2.5, Blizzard disallowed Stealth cast under ShD (workaround to prevent the Extended Stealth bug)
     if not Player:BuffUp(S.ShadowDanceBuff) and not Player:BuffUp(Rogue.VanishBuffSpell()) then
       ShouldReturn = Rogue.Stealth(Rogue.StealthSpell())
-      if ShouldReturn then return ShouldReturn end
+      if ShouldReturn then
+        return ShouldReturn
+      end
     end
     -- Flask
     -- Food
@@ -979,18 +1097,27 @@ local function APL ()
       -- Precombat CDs
       if Player:StealthUp(true, true) then
         PoolingAbility = Stealthed(true)
-        if PoolingAbility then -- To avoid pooling icon spam
+        if PoolingAbility then
+          -- To avoid pooling icon spam
           if type(PoolingAbility) == "table" and #PoolingAbility > 1 then
-            if CastQueuePooling(nil, unpack(PoolingAbility)) then return "Stealthed Macro Cast or Pool (OOC): ".. PoolingAbility[1]:Name() end
+            if CastQueuePooling(nil, unpack(PoolingAbility)) then
+              return "Stealthed Macro Cast or Pool (OOC): " .. PoolingAbility[1]:Name()
+            end
           else
-            if CastPooling(PoolingAbility) then return "Stealthed Cast or Pool (OOC): "..PoolingAbility:Name() end
+            if CastPooling(PoolingAbility) then
+              return "Stealthed Cast or Pool (OOC): " .. PoolingAbility:Name()
+            end
           end
         end
       elseif ComboPoints >= 5 then
         ShouldReturn = Finish()
-        if ShouldReturn then return ShouldReturn .. " (OOC)" end
+        if ShouldReturn then
+          return ShouldReturn .. " (OOC)"
+        end
       elseif S.Backstab:IsCastable() then
-        if Cast(S.Backstab) then return "Cast Backstab (OOC)" end
+        if Cast(S.Backstab) then
+          return "Cast Backstab (OOC)"
+        end
       end
     end
     return
@@ -999,36 +1126,51 @@ local function APL ()
   if Everyone.TargetIsValid() then
     -- Interrupts
     ShouldReturn = Everyone.Interrupt(S.Kick, Settings.CommonsDS.DisplayStyle.Interrupts, Interrupts)
-    if ShouldReturn then return ShouldReturn end
+    if ShouldReturn then
+      return ShouldReturn
+    end
 
     -- # Check CDs at first
     -- actions=call_action_list,name=cds
     ShouldReturn = CDs()
-    if ShouldReturn then return "CDs: " .. ShouldReturn end
+    if ShouldReturn then
+      return "CDs: " .. ShouldReturn
+    end
 
-  -- actions+=/call_action_list,name=items
+    -- actions+=/call_action_list,name=items
     ShouldReturn = Items()
-    if ShouldReturn then return "Items: " .. ShouldReturn end
+    if ShouldReturn then
+      return "Items: " .. ShouldReturn
+    end
 
     -- actions+=/slice_and_dice,if=combo_points>=1&!variable.snd_condition
     if S.SliceandDice:IsCastable() and ComboPoints >= 1 and not SnD_Condition() then
-      if S.SliceandDice:IsReady() and Cast(S.SliceandDice) then return "Cast Slice and Dice" end
+      if S.SliceandDice:IsReady() and Cast(S.SliceandDice) then
+        return "Cast Slice and Dice"
+      end
     end
 
     -- # Run fully switches to the Stealthed Rotation (by doing so, it forces pooling if nothing is available).
     -- actions+=/run_action_list,name=stealthed,if=stealthed.all
     if Player:StealthUp(true, true) then
       PoolingAbility = Stealthed(true)
-      if PoolingAbility then -- To avoid pooling icon spam
+      if PoolingAbility then
+        -- To avoid pooling icon spam
         if type(PoolingAbility) == "table" and #PoolingAbility > 1 then
-          if CastQueuePooling(nil, unpack(PoolingAbility)) then return "Stealthed Macro " .. PoolingAbility[1]:Name() .. "|" .. PoolingAbility[2]:Name() end
+          if CastQueuePooling(nil, unpack(PoolingAbility)) then
+            return "Stealthed Macro " .. PoolingAbility[1]:Name() .. "|" .. PoolingAbility[2]:Name()
+          end
         else
           -- Special case for Shuriken Tornado
           if Player:BuffUp(S.ShurikenTornado) and ComboPoints ~= Player:ComboPoints()
             and (PoolingAbility == S.BlackPowder or PoolingAbility == S.Eviscerate or PoolingAbility == S.Rupture or PoolingAbility == S.SliceandDice) then
-            if CastQueuePooling(nil, S.ShurikenTornado, PoolingAbility) then return "Stealthed Tornado Cast  " .. PoolingAbility:Name() end
+            if CastQueuePooling(nil, S.ShurikenTornado, PoolingAbility) then
+              return "Stealthed Tornado Cast  " .. PoolingAbility:Name()
+            end
           else
-            if CastPooling(PoolingAbility) then return "Stealthed Cast " .. PoolingAbility:Name() end
+            if CastPooling(PoolingAbility) then
+              return "Stealthed Cast " .. PoolingAbility:Name()
+            end
           end
         end
       end
@@ -1038,18 +1180,24 @@ local function APL ()
 
     -- actions+=/call_action_list,name=stealth_cds
     ShouldReturn = Stealth_CDs(StealthEnergyRequired)
-    if ShouldReturn then return "Stealth CDs: " .. ShouldReturn end
+    if ShouldReturn then
+      return "Stealth CDs: " .. ShouldReturn
+    end
 
     -- actions+=/call_action_list,name=finish,if=buff.darkest_night.up&combo_points==cp_max_spend
     if Player:BuffUp(S.DarkestNightBuff) and ComboPoints == Rogue.CPMaxSpend() then
       ShouldReturn = Finish()
-      if ShouldReturn then return "Finish: 1 " .. ShouldReturn end
+      if ShouldReturn then
+        return "Finish: 1 " .. ShouldReturn
+      end
     end
 
     -- actions+=/call_action_list,name=finish,if=effective_combo_points>=cp_max_spend&!buff.darkest_night.up
     if EffectiveComboPoints >= Rogue.CPMaxSpend() and Player:BuffDown(S.DarkestNightBuff) then
       ShouldReturn = Finish()
-      if ShouldReturn then return "Finish: 2 " .. ShouldReturn end
+      if ShouldReturn then
+        return "Finish: 2 " .. ShouldReturn
+      end
     end
 
     -- actions+=/call_action_list,name=finish,if=(combo_points.deficit<=1+talent.deathstalkers_mark|fight_remains<=1&effective_combo_points>=3)
@@ -1057,50 +1205,70 @@ local function APL ()
     if (ComboPointsDeficit <= 1 + num(S.DeathStalkersMark:IsAvailable()) or HL.FilteredFightRemains(MeleeEnemies10y, "<=", 1) and EffectiveComboPoints >= 3)
       and Player:BuffDown(S.DarkestNightBuff) then
       ShouldReturn = Finish()
-      if ShouldReturn then return "Finish: 3 " .. ShouldReturn end
+      if ShouldReturn then
+        return "Finish: 3 " .. ShouldReturn
+      end
     end
 
     -- Set Finisher as pooling ability before the builders are checked
-    if PoolingFinisher then SetPoolingAbility(PoolingFinisher) end
+    if PoolingFinisher then
+      SetPoolingAbility(PoolingFinisher)
+    end
 
     -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
     ShouldReturn = Build(StealthEnergyRequired)
-    if ShouldReturn then return "Build: " .. ShouldReturn end
+    if ShouldReturn then
+      return "Build: " .. ShouldReturn
+    end
 
     if HR.CDsON() then
       -- # Lowest priority in all of the APL because it causes a GCD
       -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
       if S.ArcaneTorrent:IsReady() and TargetInMeleeRange and Player:EnergyDeficitPredicted() >= 15 + Player:EnergyRegen() then
-        if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.GCDasOffGCD.Racials) then return "Cast Arcane Torrent" end
+        if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.GCDasOffGCD.Racials) then
+          return "Cast Arcane Torrent"
+        end
       end
       -- actions+=/arcane_pulse
       if S.ArcanePulse:IsReady() and TargetInMeleeRange then
-        if Cast(S.ArcanePulse, Settings.CommonsOGCD.GCDasOffGCD.Racials) then return "Cast Arcane Pulse" end
+        if Cast(S.ArcanePulse, Settings.CommonsOGCD.GCDasOffGCD.Racials) then
+          return "Cast Arcane Pulse"
+        end
       end
       -- actions+=/lights_judgment
       if S.LightsJudgment:IsReady() then
-        if Cast(S.LightsJudgment, Settings.CommonsOGCD.GCDasOffGCD.Racials) then return "Cast Lights Judgment" end
+        if Cast(S.LightsJudgment, Settings.CommonsOGCD.GCDasOffGCD.Racials) then
+          return "Cast Lights Judgment"
+        end
       end
       -- actions+=/bag_of_tricks
       if S.BagofTricks:IsReady() then
-        if Cast(S.BagofTricks, Settings.CommonsOGCD.GCDasOffGCD.Racials) then return "Cast Bag of Tricks" end
+        if Cast(S.BagofTricks, Settings.CommonsOGCD.GCDasOffGCD.Racials) then
+          return "Cast Bag of Tricks"
+        end
       end
     end
 
     -- Show what ever was first stored for pooling
     if PoolingAbility and TargetInMeleeRange then
       if type(PoolingAbility) == "table" and #PoolingAbility > 1 then
-        if CastQueuePooling(Player:EnergyTimeToX(PoolingEnergy), unpack(PoolingAbility)) then return "Macro pool towards ".. PoolingAbility[1]:Name() .. " at " .. PoolingEnergy end
+        if CastQueuePooling(Player:EnergyTimeToX(PoolingEnergy), unpack(PoolingAbility)) then
+          return "Macro pool towards " .. PoolingAbility[1]:Name() .. " at " .. PoolingEnergy
+        end
       elseif PoolingAbility:IsCastable() then
         PoolingEnergy = mathmax(PoolingEnergy, PoolingAbility:Cost())
-        if CastPooling(PoolingAbility, Player:EnergyTimeToX(PoolingEnergy)) then return "Pool towards: " .. PoolingAbility:Name() .. " at " .. PoolingEnergy end
+        if CastPooling(PoolingAbility, Player:EnergyTimeToX(PoolingEnergy)) then
+          return "Pool towards: " .. PoolingAbility:Name() .. " at " .. PoolingEnergy
+        end
       end
     end
 
     -- Shuriken Toss Out of Range
     if S.ShurikenToss:IsCastable() and Target:IsInRange(30) and not TargetInAoERange and not Player:StealthUp(true, true) and not Player:BuffUp(S.Sprint)
       and Player:EnergyDeficitPredicted() < 20 and (ComboPointsDeficit >= 1 or Player:EnergyTimeToMax() <= 1.2) then
-      if CastPooling(S.ShurikenToss) then return "Cast Shuriken Toss" end
+      if CastPooling(S.ShurikenToss) then
+        return "Cast Shuriken Toss"
+      end
     end
   end
 end
