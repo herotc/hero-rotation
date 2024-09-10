@@ -373,6 +373,10 @@ local function CombustionPhase()
   if S.Scorch:IsReady() and (CombustionDown and S.Combustion:CooldownRemains() < S.Scorch:CastTime()) then
     if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch combustion_phase 16"; end
   end
+  -- fireball,if=buff.combustion.down&buff.frostfire_empowerment.up
+  if Bolt:IsReady() and (CombustionDown and Player:BuffUp(S.FrostfireEmpowermentBuff)) then
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball combustion_phase 17"; end
+  end
   -- combustion,use_off_gcd=1,use_while_casting=1,if=hot_streak_spells_in_flight=0&buff.combustion.down&variable.time_to_combustion<=0&(action.scorch.executing&action.scorch.execute_remains<variable.combustion_cast_remains|action.fireball.executing&action.fireball.execute_remains<variable.combustion_cast_remains|action.pyroblast.executing&action.pyroblast.execute_remains<variable.combustion_cast_remains|action.flamestrike.executing&action.flamestrike.execute_remains<variable.combustion_cast_remains|action.meteor.in_flight&action.meteor.in_flight_remains<variable.combustion_cast_remains)
   -- Note: Moved above the previous five lines, due to use_while_casting.
   -- variable,name=TA_combust,value=cooldown.combustion.remains<10&buff.combustion.up
@@ -436,8 +440,8 @@ local function CombustionPhase()
   if S.Scorch:IsReady() and (CombustionRemains > S.Scorch:CastTime() and S.Scorch:CastTime() >= Player:GCD()) then
     if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch combustion_phase 42"; end
   end
-  -- fireball,if=buff.combustion.remains>cast_time
-  if Bolt:IsReady() and (CombustionRemains > Bolt:CastTime()) then
+  -- fireball
+  if Bolt:IsReady() then
     if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball combustion_phase 44"; end
   end
 end
