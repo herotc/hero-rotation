@@ -62,7 +62,7 @@ local MaelstromStacks
 local MaxMaelstromStacks = S.RagingMaelstrom:IsAvailable() and 10 or 5
 local MaxAshenCatalystStacks = 8
 local MaxConvergingStormsStacks = 6
-local MaxTempestStacks = 10
+local MaxTempestStacks = 2
 local VarMinTalentedCDRemains = 1000
 local VarTargetNatureMod, VarExpectedLBFunnel, VarExpectedCLFunnel
 local EnemiesMelee, EnemiesMeleeCount, Enemies40yCount
