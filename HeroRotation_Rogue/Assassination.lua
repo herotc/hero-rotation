@@ -587,8 +587,9 @@ local function Vanish ()
 
   -- # Vanish for slightly more mark uptime since you can apply mark and have darkest night at the same time
   --actions.vanish+=/vanish,if=!talent.improved_garrote&buff.darkest_night.up&combo_points.deficit>=3&variable.single_target
-  if S.Vanish:IsCastable() and not S.ImprovedGarrote:IsAvailable() and Player:BuffUp(S.DarkestNightBuff)
+  if S.Vanish:IsReady() and not S.ImprovedGarrote:IsAvailable() and Player:BuffUp(S.DarkestNightBuff)
     and ComboPointsDeficit >= 3 and SingleTarget then
+    ShouldReturn = StealthMacro(S.Vanish)
     if ShouldReturn then
       return "Cast Vanish (Deathmark Uptime)" .. ShouldReturn
     end
@@ -605,7 +606,7 @@ local function UsableItems ()
   if I.AshesoftheEmbersoul:IsEquippedAndReady() then
     if (Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) <= 11 or HL.BossFilteredFightRemains("<", 22)) then
       if Cast(I.AshesoftheEmbersoul, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
-        return "Ashes of the 1Embersoul";
+        return "Ashes of the Embersoul";
       end
     end
   end
