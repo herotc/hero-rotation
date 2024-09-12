@@ -752,6 +752,8 @@ local function APL()
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
+    -- interrupts
+    local ShouldReturn = Everyone.Interrupt(S.SpellLock, Settings.CommonsDS.DisplayStyle.Interrupts); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=variables
     Variables()
     -- call_action_list,name=cleave,if=active_enemies!=1&active_enemies<3|variable.cleave_apl
