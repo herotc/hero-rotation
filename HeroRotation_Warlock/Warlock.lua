@@ -39,6 +39,7 @@ Spell.Warlock.Commons = {
   SummonSoulkeeper                      = Spell(386256),
   InquisitorsGaze                       = Spell(386344),
   InquisitorsGazeBuff                   = Spell(388068),
+  Shadowfury                            = Spell(30283),
   Soulburn                              = Spell(385899),
   -- Buffs
   SpymastersReportBuff                  = Spell(451199),
