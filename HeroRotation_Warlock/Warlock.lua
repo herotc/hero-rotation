@@ -74,6 +74,7 @@ Spell.Warlock.Hellcaller = {
   Malevolence                           = Spell(442726),
   Wither                                = Spell(445468),
   -- Debuffs
+  MalevolenceBuff                       = Spell(442726),
   WitherDebuff                          = Spell(445474),
 }
 
