@@ -658,6 +658,11 @@ local function APL()
 
     -- Calculate Demonic Core Stacks
     DemonicCoreStacks = Player:BuffStack(S.DemonicCoreBuff)
+
+    -- Safety for nil VilefiendAbility
+    if not VilefiendAbility then
+      VilefiendAbility = S.MarkofFharg:IsAvailable() and S.SummonCharhound or (S.MarkofShatug:IsAvailable() and S.SummonGloomhound or S.SummonVilefiend)
+    end
   end
 
   -- summon_pet
