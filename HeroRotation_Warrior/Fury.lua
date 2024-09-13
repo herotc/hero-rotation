@@ -583,35 +583,95 @@ local function ThaneMT()
 end
 
 local function Trinkets()
+  -- Exit if cooldowns are disabled
+  if not CDsON() then
+    return
+  end
   if Settings.Commons.Enabled.Trinkets then
-    -- do_treacherous_transmitter_task
-    -- use_item,name=treacherous_transmitter,if=variable.adds_remain|variable.st_planning
+    -- Use Trinket1 when Recklessness is active and Avatar's cooldown is more than 10 seconds
+    if Trinket1:IsReady() and not VarTrinket1BL and Player:BuffUp(S.RecklessnessBuff) and S.Avatar:CooldownRemains() > 10 then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then
+        return "Using " .. Trinket1:Name() .. " with Recklessness active"
+      end
+    end
+    -- Use Trinket2 when Avatar is active
+    if Trinket2:IsReady() and not VarTrinket2BL and Player:BuffUp(S.AvatarBuff) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then
+        return "Using " .. Trinket2:Name() .. " with Avatar active"
+      end
+    end
+    -- Treacherous Transmitter usage
     if I.TreacherousTransmitter:IsEquippedAndReady() and (VarAddsRemain or VarSTPlanning) then
-      if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter trinkets 2"; end
+      if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+        return "treacherous_transmitter trinkets 2"
+      end
     end
-    -- use_item,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!buff.avatar.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&((talent.titans_torment&cooldown.avatar.ready)|(buff.avatar.up&!talent.titans_torment))&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
-    if Trinket1:IsReady() and not VarTrinket1BL and (VarTrinket1Buffs and not VarTrinket1Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket1CastTime > 0 or VarTrinket1CastTime == 0) and ((S.TitansTorment:IsAvailable() and S.Avatar:CooldownUp()) or (Player:BuffUp(S.AvatarBuff) and not S.TitansTorment:IsAvailable())) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= BossFightRemains) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for " .. Trinket1:Name() .. " trinkets 4"; end
+    -- Use Trinket1 based on additional conditions
+    if Trinket1:IsReady() and not VarTrinket1BL and
+      (
+        (VarTrinket1Buffs and not VarTrinket1Manual and
+          ((Player:BuffDown(S.AvatarBuff) and VarTrinket1CastTime > 0) or VarTrinket1CastTime == 0) and
+          ((S.TitansTorment:IsAvailable() and S.Avatar:CooldownUp()) or (Player:BuffUp(S.AvatarBuff) and not S.TitansTorment:IsAvailable())) and
+          (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1)
+        ) or Trinket1:BuffDuration() >= BossFightRemains
+      ) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then
+        return "use_item for " .. Trinket1:Name() .. " trinkets 4"
+      end
     end
-    -- use_item,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!buff.avatar.up&trinket.2.cast_time>0|!trinket.2.cast_time>0)&((talent.titans_torment&cooldown.avatar.ready)|(buff.avatar.up&!talent.titans_torment))&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
-    if Trinket2:IsReady() and not VarTrinket2BL and (VarTrinket2Buffs and not VarTrinket2Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket2CastTime > 0 or VarTrinket2CastTime == 0) and ((S.TitansTorment:IsAvailable() and S.Avatar:CooldownUp()) or (Player:BuffUp(S.AvatarBuff) and not S.TitansTorment:IsAvailable())) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= BossFightRemains) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for " .. Trinket2:Name() .. " trinkets 6"; end
+    -- Use Trinket2 based on additional conditions
+    if Trinket2:IsReady() and not VarTrinket2BL and
+      (
+        (VarTrinket2Buffs and not VarTrinket2Manual and
+          ((Player:BuffDown(S.AvatarBuff) and VarTrinket2CastTime > 0) or VarTrinket2CastTime == 0) and
+          ((S.TitansTorment:IsAvailable() and S.Avatar:CooldownUp()) or (Player:BuffUp(S.AvatarBuff) and not S.TitansTorment:IsAvailable())) and
+          (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2)
+        ) or Trinket2:BuffDuration() >= BossFightRemains
+      ) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then
+        return "use_item for " .. Trinket2:Name() .. " trinkets 6"
+      end
     end
-    -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.1.cast_time>0&!buff.avatar.up|!trinket.1.cast_time>0)&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|(trinket.1.cast_time>0&!buff.avatar.up|!trinket.1.cast_time>0)|cooldown.avatar.remains_expected>20)
-    if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs and (VarTrinket1CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket1CastTime == 0) and not VarTrinket1Manual and (not VarTrinket1Buffs and (Trinket2:CooldownDown() or not VarTrinket2Buffs) or (VarTrinket1CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket1CastTime == 0) or S.Avatar:CooldownRemains() > 20)) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for " .. Trinket1:Name() .. " trinkets 8"; end
+    -- Use Trinket1 when specific conditions are met
+    if Trinket1:IsReady() and not VarTrinket1BL and
+      (
+        not VarTrinket1Buffs and
+        ((VarTrinket1CastTime > 0 and Player:BuffDown(S.AvatarBuff)) or VarTrinket1CastTime == 0) and
+        not VarTrinket1Manual and
+        (
+          (not VarTrinket1Buffs and (Trinket2:CooldownDown() or not VarTrinket2Buffs)) or
+          ((VarTrinket1CastTime > 0 and Player:BuffDown(S.AvatarBuff)) or VarTrinket1CastTime == 0) or
+          S.Avatar:CooldownRemains() > 20
+        )
+      ) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then
+        return "use_item for " .. Trinket1:Name() .. " trinkets 8"
+      end
     end
-    -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.2.cast_time>0&!buff.avatar.up|!trinket.2.cast_time>0)&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|(trinket.2.cast_time>0&!buff.avatar.up|!trinket.2.cast_time>0)|cooldown.avatar.remains_expected>20)
-    if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs and (VarTrinket2CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket2CastTime == 0) and not VarTrinket2Manual and (not VarTrinket2Buffs and (Trinket1:CooldownDown() or not VarTrinket1Buffs) or (VarTrinket2CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket2CastTime == 0) or S.Avatar:CooldownRemains() > 20)) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for " .. Trinket2:Name() .. " trinkets 10"; end
+    -- Use Trinket2 when specific conditions are met
+    if Trinket2:IsReady() and not VarTrinket2BL and
+      (
+        not VarTrinket2Buffs and
+        ((VarTrinket2CastTime > 0 and Player:BuffDown(S.AvatarBuff)) or VarTrinket2CastTime == 0) and
+        not VarTrinket2Manual and
+        (
+          (not VarTrinket2Buffs and (Trinket1:CooldownDown() or not VarTrinket1Buffs)) or
+          ((VarTrinket2CastTime > 0 and Player:BuffDown(S.AvatarBuff)) or VarTrinket2CastTime == 0) or
+          S.Avatar:CooldownRemains() > 20
+        )
+      ) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then
+        return "use_item for " .. Trinket2:Name() .. " trinkets 10"
+      end
     end
   end
-  -- use_item,slot=main_hand,if=!equipped.fyralath_the_dreamrender&(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
+  -- Use generic items if enabled
   if Settings.Commons.Enabled.Items then
-    -- Note: Adding a generic use_items for non-trinkets instead.
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
     if ItemToUse then
-      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 12"; end
+      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then
+        return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 12"
+      end
     end
   end
 end
@@ -626,7 +686,6 @@ local function Variables()
   -- variable,name=on_gcd_racials,value=buff.recklessness.down&buff.avatar.down&rage<80&buff.bloodbath.down&buff.crushing_blow.down&buff.sudden_death.down&!cooldown.bladestorm.ready&(!cooldown.execute.ready|!variable.execute_phase)
   VarOnGCDRacials = Player:BuffDown(S.RecklessnessBuff) and Player:BuffDown(S.AvatarBuff) and Player:Rage() < 80 and Player:BuffDown(S.BloodbathBuff) and Player:BuffDown(S.CrushingBlowBuff) and Player:BuffDown(S.SuddenDeathBuff) and S.Bladestorm:CooldownDown() and (S.Execute:CooldownDown() or not VarExecutePhase)
 end
-
 --- ===== APL Main =====
 local function APL()
   EnemiesMelee = Player:GetEnemiesInMeleeRange(5)
@@ -687,10 +746,10 @@ local function APL()
         if Cast(S.ImpendingVictory, nil, nil, not TargetInMeleeRange) then return "impending_victory heal 12"; end
       end
     end
-    -- call_action_list,name=trinkets
-    if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
-      local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
-    end
+  -- Call the Trinkets action list if cooldowns are enabled
+  if CDsON() and (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
+    local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
+  end
     -- call_action_list,name=variables
     Variables()
     if CDsON() then
