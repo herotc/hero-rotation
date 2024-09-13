@@ -178,6 +178,7 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   TitanicRage                           = Spell(394329),
   TitansTorment                         = Spell(390135),
   Unhinged                              = Spell(386628),
+  ViciousContempt                       = Spell(383885),
   WrathandFury                          = Spell(392936),
   -- Buffs
   AshenJuggernautBuff                   = Spell(392537),
