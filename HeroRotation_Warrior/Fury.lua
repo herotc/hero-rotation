@@ -211,11 +211,11 @@ local function SlayerST()
   if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_st 14"; end
   end
-  -- bladestorm,if=buff.enrage.up&cooldown.avatar.remains>=9
-  -- Adding logic to use Rampage before Bladestorm if rage is capped to avoid wasting resources
-  if S.Rampage:IsReady() and Player:Rage() >= 80 then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return 'rampage before bladestorm slayer_st'; end
+  -- rampage, if in high-rage single-target (Champion's Spear build) or AoE situations
+  if S.Rampage:IsReady() and (Player:Rage() >= 80 or S.ChampionsSpear:IsAvailable() or S.ThunderousRoar:IsAvailable()) then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return 'rampage high-rage'; end
   end
+  -- bladestorm,if=buff.enrage.up&cooldown.avatar.remains>=9
   if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp and S.Avatar:CooldownRemains() >= 9) then
     if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_st 16"; end
   end
@@ -318,11 +318,11 @@ local function SlayerMT()
   if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_mt 16"; end
   end
-  -- bladestorm,if=buff.enrage.up&cooldown.avatar.remains>=9
-  -- Adding logic to use Rampage before Bladestorm if rage is capped to avoid wasting resources
-  if S.Rampage:IsReady() and Player:Rage() >= 80 then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return 'rampage before bladestorm slayer_st'; end
+  -- rampage, if in high-rage single-target (Champion's Spear build) or AoE situations
+  if S.Rampage:IsReady() and (Player:Rage() >= 80 or S.ChampionsSpear:IsAvailable() or S.ThunderousRoar:IsAvailable()) then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return 'rampage high-rage'; end
   end
+  -- bladestorm,if=buff.enrage.up&cooldown.avatar.remains>=9
   if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp and S.Avatar:CooldownRemains() >= 9) then
     if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_mt 18"; end
   end
@@ -425,6 +425,10 @@ local function ThaneST()
   if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_st 18"; end
   end
+  -- rampage, if in high-rage single-target (Champion's Spear build) or AoE situations
+  if S.Rampage:IsReady() and (Player:Rage() >= 80 or S.ChampionsSpear:IsAvailable() or S.ThunderousRoar:IsAvailable()) then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return 'rampage high-rage'; end
+  end
   -- bladestorm,if=buff.enrage.up&talent.unhinged
   if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp and S.Unhinged:IsAvailable()) then
     if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane_st 20"; end
@@ -523,6 +527,10 @@ local function ThaneMT()
   -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
   if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_mt 20"; end
+  end
+  -- rampage, if in high-rage single-target (Champion's Spear build) or AoE situations
+  if S.Rampage:IsReady() and (Player:Rage() >= 80 or S.ChampionsSpear:IsAvailable() or S.ThunderousRoar:IsAvailable()) then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return 'rampage high-rage'; end
   end
   -- bladestorm,if=buff.enrage.up
   if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp) then
