@@ -212,6 +212,10 @@ local function SlayerST()
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_st 14"; end
   end
   -- bladestorm,if=buff.enrage.up&cooldown.avatar.remains>=9
+  -- Adding logic to use Rampage before Bladestorm if rage is capped to avoid wasting resources
+  if S.Rampage:IsReady() and Player:Rage() >= 80 then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return 'rampage before bladestorm slayer_st'; end
+  end
   if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp and S.Avatar:CooldownRemains() >= 9) then
     if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_st 16"; end
   end
@@ -315,6 +319,10 @@ local function SlayerMT()
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_mt 16"; end
   end
   -- bladestorm,if=buff.enrage.up&cooldown.avatar.remains>=9
+  -- Adding logic to use Rampage before Bladestorm if rage is capped to avoid wasting resources
+  if S.Rampage:IsReady() and Player:Rage() >= 80 then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return 'rampage before bladestorm slayer_st'; end
+  end
   if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp and S.Avatar:CooldownRemains() >= 9) then
     if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_mt 18"; end
   end
