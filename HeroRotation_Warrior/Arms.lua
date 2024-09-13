@@ -517,8 +517,8 @@ local function SlayerST()
   if CDsON() and S.ChampionsSpear:IsCastable() then
     if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not Target:IsSpellInRange(S.ChampionsSpear)) then return "champions_spear slayer_st 6"; end
   end
-  -- avatar
-  if CDsON() and S.Avatar:IsCastable() then
+  -- avatar,if=cooldown.colossus_smash.remains<=5|debuff.colossus_smash.up
+  if CDsON() and S.Avatar:IsCastable() and (S.ColossusSmash:CooldownRemains() <= 5 or Target:DebuffUp(S.ColossusSmashDebuff)) then
     if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar slayer_st 8"; end
   end
   -- colossus_smash
@@ -529,12 +529,12 @@ local function SlayerST()
   if S.Warbreaker:IsCastable() then
     if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker slayer_st 12"; end
   end
-  -- execute,if=debuff.marked_for_execution.stack=3
-  if S.Execute:IsReady() and (Target:DebuffStack(S.MarkedforExecutionDebuff) == 3) then
+  -- execute,if=debuff.marked_for_execution.stack=3|buff.juggernaut.remains<=gcd*3|buff.sudden_death.stack=2
+  if S.Execute:IsReady() and (Target:DebuffStack(S.MarkedforExecutionDebuff) == 3 or Player:BuffRemains(S.JuggernautBuff) <= Player:GCD() * 3 or Player:BuffStack(S.SuddenDeathBuff) == 2) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_st 14"; end
   end
-  -- bladestorm
-  if CDsON() and S.Bladestorm:IsCastable() then
+  -- bladestorm,if=cooldown.colossus_smash.remains>=gcd*4|buff.colossus_smash.remains>=gcd*4
+  if CDsON() and S.Bladestorm:IsCastable() and (S.ColossusSmash:CooldownRemains() >= Player:GCD() * 4 or Player:BuffRemains(S.ColossusSmashDebuff) >= Player:GCD() * 4) then
     if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_st 16"; end
   end
   -- overpower,if=buff.opportunist.up
@@ -548,10 +548,6 @@ local function SlayerST()
   -- skullsplitter
   if S.Skullsplitter:IsCastable() then
     if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes slayer_st 22"; end
-  end
-  -- execute
-  if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_st 24"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
@@ -592,8 +588,8 @@ local function SlayerExecute()
   if CDsON() and S.ChampionsSpear:IsCastable() then
     if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not Target:IsSpellInRange(S.ChampionsSpear)) then return "champions_spear slayer_execute 8"; end
   end
-  -- avatar
-  if CDsON() and S.Avatar:IsCastable() then
+  -- avatar,if=cooldown.colossus_smash.remains<=5|debuff.colossus_smash.up
+  if CDsON() and S.Avatar:IsCastable() and (S.ColossusSmash:CooldownRemains() <= 5 or Target:DebuffUp(S.ColossusSmashDebuff)) then
     if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar slayer_execute 10"; end
   end
   -- warbreaker
@@ -612,13 +608,13 @@ local function SlayerExecute()
   if CDsON() and S.Bladestorm:IsCastable() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Target:DebuffRemains(S.ColossusSmashDebuff) > 4 or Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and S.ColossusSmash:CooldownRemains() > 15 or not S.ExecutionersPrecision:IsAvailable()) then
     if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_execute 18"; end
   end
-  -- mortal_strike,if=debuff.executioners_precision.stack=2&(buff.lethal_blows.stack=2|!set_bonus.tww1_4pc)
-  if S.MortalStrike:IsReady() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and (Player:BuffStack(S.LethalBlowsBuff) == 2 or not Player:HasTier("TWW1", 4))) then
-    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike slayer_execute 20"; end
-  end
   -- skullsplitter,if=rage<85
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 85) then
     if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes slayer_execute 22"; end
+  end
+  -- mortal_strike,if=dot.rend.remains<2|(debuff.executioners_precision.stack=2&buff.lethal_blows.stack=2)
+  if S.MortalStrike:IsReady() and (Target:DebuffRemains(S.RendDebuff) < 2 or (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Player:BuffStack(S.LethalBlowsBuff) == 2)) then
+    if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike slayer_execute 20"; end
   end
   -- overpower,if=buff.opportunist.up&rage<80&buff.martial_prowess.stack<2
   if S.Overpower:IsCastable() and (Player:BuffUp(S.OpportunistBuff) and Player:Rage() < 80 and Player:BuffStack(S.MartialProwessBuff) < 2) then
