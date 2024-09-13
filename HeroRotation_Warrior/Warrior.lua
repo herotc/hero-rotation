@@ -87,8 +87,6 @@ Spell.Warrior.Commons = {
 Spell.Warrior.Colossus = {
   -- Talents
   Demolish                              = Spell(436358),
-  -- Buffs
-  ColossalMightBuff                     = Spell(440989),
 }
 
 Spell.Warrior.MountainThane = {
@@ -179,6 +177,7 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   TitansTorment                         = Spell(390135),
   Unhinged                              = Spell(386628),
   WrathandFury                          = Spell(392936),
+  ViciousContempt                       = Spell(383885),
   -- Buffs
   AshenJuggernautBuff                   = Spell(392537),
   BloodbathBuff                         = Spell(461288),

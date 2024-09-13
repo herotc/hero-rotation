@@ -204,7 +204,7 @@ local function SlayerST()
     if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury slayer_st 10"; end
   end
   -- execute,if=talent.ashen_juggernaut&buff.ashen_juggernaut.remains<=gcd&buff.enrage.up
-  if S.Execute:IsReady() and (S.AshenJuggernaut:IsAvailable() and Player:BuffRemains(S.AshenJuggernautBuff) <= Player:GCD() and EnrageUp) then
+  if S.Execute:IsReady() and (Target:DebuffStack(S.MarkedforExecutionDebuff) == 3 or (S.AshenJuggernaut:IsAvailable() and Player:BuffRemains(S.AshenJuggernautBuff) <= Player:GCD() and EnrageUp)) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_st 12"; end
   end
   -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
@@ -232,11 +232,11 @@ local function SlayerST()
     if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_st 24"; end
   end
   -- bloodbath,if=buff.enrage.up
-  if S.Bloodbath:IsCastable() and (EnrageUp) then
+  if S.Bloodbath:IsCastable() and (Player:Rage() < 100 or (Target:HealthPercentage() < 35 and S.ViciousContempt:IsAvailable())) then
     if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath slayer_st 26"; end
   end
   -- raging_blow,if=talent.slaughtering_strikes&rage<110&talent.reckless_abandon
-  if S.RagingBlow:IsCastable() and (S.SlaughteringStrikes:IsAvailable() and Player:Rage() < 110 and S.RecklessAbandon:IsAvailable()) then
+  if S.RagingBlow:IsCastable() and (Player:Rage() < 100 and Player:BuffDown(S.OpportunistBuff)) then
     if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow slayer_st 28"; end
   end
   -- execute,if=buff.enrage.up&debuff.marked_for_execution.up
@@ -325,6 +325,10 @@ local function SlayerMT()
   -- rampage,if=talent.anger_management
   if S.Rampage:IsReady() and (S.AngerManagement:IsAvailable()) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_mt 22"; end
+end
+  -- rampage,if=talent.reckless_abandon
+  if S.Rampage:IsReady() and (S.RecklessAbandon:IsAvailable()) then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_st 32"; end
   end
   -- crushing_blow
   if S.CrushingBlow:IsCastable() then
