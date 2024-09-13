@@ -87,6 +87,8 @@ Spell.Warrior.Commons = {
 Spell.Warrior.Colossus = {
   -- Talents
   Demolish                              = Spell(436358),
+  -- Buffs
+  ColossalMightBuff                     = Spell(440989),
 }
 
 Spell.Warrior.MountainThane = {
