@@ -95,6 +95,7 @@ Spell.Hunter.PackLeader = {
 Spell.Hunter.Sentinel = {
   -- Talents
   LunarStorm                            = Spell(450385),
+  SymphonicArsenal                      = Spell(450383),
 }
 
 Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
@@ -160,6 +161,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   RapidFireBarrage                      = Spell(459800),
   Salvo                                 = Spell(400456),
   SerpentstalkersTrickery               = Spell(378888),
+  SmallGameHunter                       = Spell(459802),
   SteadyFocus                           = Spell(193533),
   Streamline                            = Spell(260367),
   SurgingShots                          = Spell(391559),

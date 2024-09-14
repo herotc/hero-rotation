@@ -223,8 +223,8 @@ local function ST()
   if S.Volley:IsReady() then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley st 10"; end
   end
-  -- rapid_fire,if=!talent.lunar_storm|(!cooldown.lunar_storm.remains|cooldown.lunar_storm.remains>5)
-  if S.RapidFire:IsCastable() and (not S.LunarStorm:IsAvailable() or (S.LunarStorm:CooldownDown() or S.LunarStorm:CooldownRemains() > 5)) then
+  -- rapid_fire,if=talent.lunar_storm&(!cooldown.lunar_storm.remains|cooldown.lunar_storm.remains>5|action.wailing_arrow.ready)|!talent.lunar_storm
+  if S.RapidFire:IsCastable() and (S.LunarStorm:IsAvailable() and (S.LunarStorm:CooldownUp() or S.LunarStorm:CooldownRemains() > 5 or S.WailingArrow:CooldownUp()) or not S.LunarStorm:IsAvailable()) then
     if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire st 12"; end
   end
   -- trueshot,if=variable.trueshot_ready
@@ -247,37 +247,49 @@ local function ST()
   if S.SteadyShot:IsCastable() and (S.SteadyFocus:IsAvailable() and Player:BuffDown(S.SteadyFocusBuff) and Player:BuffDown(S.TrueshotBuff)) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 22"; end
   end
+  -- kill_shot
+  if S.KillShot:IsReady() then
+    if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot st 24"; end
+  end
   -- chimaera_shot,if=buff.precise_shots.up
   if S.ChimaeraShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff)) then
-    if Cast(S.ChimaeraShot, nil, nil, not TargetInRange40y) then return "chimaera_shot st 24"; end
+    if Cast(S.ChimaeraShot, nil, nil, not TargetInRange40y) then return "chimaera_shot st 26"; end
+  end
+  -- multishot,if=buff.precise_shots.up&active_enemies>1&(talent.symphonic_arsenal|talent.small_game_hunter)
+  if S.MultiShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) and EnemiesCount10ySplash > 1 and (S.SymphonicArsenal:IsAvailable() or S.SmallGameHunter:IsAvailable())) then
+    if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot st 28"; end
   end
   -- arcane_shot,if=buff.precise_shots.up
   if S.ArcaneShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff)) then
-    if Cast(S.ArcaneShot, nil, nil, not TargetInRange40y) then return "arcane_shot st 26"; end
-  end
-  -- kill_shot
-  if S.KillShot:IsReady() then
-    if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot st 28"; end
+    if Cast(S.ArcaneShot, nil, nil, not TargetInRange40y) then return "arcane_shot st 30"; end
   end
   -- barrage,if=talent.rapid_fire_barrage
   if S.Barrage:IsReady() and (S.RapidFireBarrage:IsAvailable()) then
-    if Cast(S.Barrage, nil, nil, not TargetInRange40y) then return "barrage st 30"; end
+    if Cast(S.Barrage, nil, nil, not TargetInRange40y) then return "barrage st 32"; end
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot st 32"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot st 34"; end
+  end
+  -- chimaera_shot,if=focus>cost+action.aimed_shot.cost
+  if S.ChimaeraShot:IsReady() and (Player:FocusP() > S.ChimaeraShot:Cost() + S.AimedShot:Cost()) then
+    if Cast(S.ChimaeraShot, nil, nil, not TargetInRange40y) then return "chimaera_shot st 36"; end
+  end
+  -- multishot,if=focus>cost+action.aimed_shot.cost&active_enemies>1&(talent.symphonic_arsenal|talent.small_game_hunter)
+  if S.MultiShot:IsReady() and (Player:FocusP() > S.MultiShot:Cost() + S.AimedShot:Cost() and EnemiesCount10ySplash > 1 and (S.SymphonicArsenal:IsAvailable() or S.SmallGameHunter:IsAvailable())) then
+    if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot st 38"; end
   end
   -- arcane_shot,if=focus>cost+action.aimed_shot.cost
   if S.ArcaneShot:IsReady() and (Player:FocusP() > S.ArcaneShot:Cost() + S.AimedShot:Cost()) then
-    if Cast(S.ArcaneShot, nil, nil, not TargetInRange40y) then return "arcane_shot st 34"; end
+    if Cast(S.ArcaneShot, nil, nil, not TargetInRange40y) then return "arcane_shot st 40"; end
   end
   -- bag_of_tricks,if=buff.trueshot.down
   if CDsON() and S.BagofTricks:IsReady() then
-    if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks st 36"; end
+    if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks st 42"; end
   end
   -- steady_shot
   if S.SteadyShot:IsCastable() then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 39"; end
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 44"; end
   end
 end
 
@@ -416,7 +428,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Marksmanship Hunter rotation has been updated for patch 11.0.0.")
+  HR.Print("Marksmanship Hunter rotation has been updated for patch 11.0.2.")
 end
 
 HR.SetAPL(254, APL, Init)
