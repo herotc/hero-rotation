@@ -50,6 +50,7 @@ local OnUseExcludes = {
   I.ManicGrieftorch:ID(),
   -- TWW Trinkets
   I.ImperfectAscendancySerum:ID(),
+  I.TreacherousTransmitter:ID(),
   -- DF Other Items
   I.Djaruun:ID(),
 }
@@ -220,6 +221,10 @@ local function Trinkets()
     if I.ImperfectAscendancySerum:IsEquippedAndReady() and (Monk.Xuen.Active) then
       if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum trinkets 14"; end
     end
+    -- treacherous_transmitter,if=cooldown.invoke_xuen_the_white_tiger.remains<4|talent.xuens_bond&pet.xuen_the_white_tiger.active
+    if I.TreacherousTransmitter:IsEquippedAndReady() and (S.InvokeXuenTheWhiteTiger:CooldownRemains() < 4 or S.XuensBond:IsAvailable() and Monk.Xuen.Active) then
+      if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter trinkets 16"; end
+    end
     local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
     local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
     -- ITEM_STAT_BUFF,if=pet.xuen_the_white_tiger.active
@@ -237,6 +242,8 @@ local function Trinkets()
       if Cast(Trinket2ToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name() .. " (trinkets dmg_buff trinket2)"; end
     end
   end
+  -- do_treacherous_transmitter_task,if=pet.xuen_the_white_tiger.active
+  -- TODO
 end
 
 local function Cooldowns()

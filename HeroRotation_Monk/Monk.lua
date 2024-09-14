@@ -259,6 +259,7 @@ Item.Monk.Commons = {
   WitherbarksBranch                     = Item(109999, {13, 14}),
   -- TWW Trinkets
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
+  TreacherousTransmitter                = Item(221023, {13, 14}),
   -- Other On-Use Items
   Djaruun                               = Item(202569, {16}),
 }
