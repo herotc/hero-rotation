@@ -117,7 +117,7 @@ local function SetTrinketVariables()
     return
   end
 
-  VarCombustionOnUse = I.ForgedGladiatorsBadge:IsEquipped() or I.CrimsonGladiatorsBadge:IsEquipped() or I.DraconicGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.MoonlitPrism:IsEquipped() or I.IrideusFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped()
+  VarCombustionOnUse = I.ForgedGladiatorsBadge:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.CrimsonGladiatorsBadge:IsEquipped() or I.DraconicGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.MoonlitPrism:IsEquipped() or I.IrideusFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped()
 end
 SetTrinketVariables()
 
@@ -240,7 +240,7 @@ local function Precombat()
   -- variable,name=combustion_cast_remains,default=0.3,op=reset
   -- variable,name=overpool_fire_blasts,default=0,op=reset
   -- variable,name=skb_duration,value=dbc.effect.1016075.base_value
-  -- variable,name=combustion_on_use,value=equipped.gladiators_badge|equipped.moonlit_prism|equipped.irideus_fragment|equipped.spoils_of_neltharus|equipped.timebreaching_talon|equipped.horn_of_valor
+  -- variable,name=combustion_on_use,value=equipped.gladiators_badge|equipped.treacherous_transmitter|equipped.moonlit_prism|equipped.irideus_fragment|equipped.spoils_of_neltharus|equipped.timebreaching_talon|equipped.horn_of_valor
   -- variable,name=on_use_cutoff,value=20,if=variable.combustion_on_use
   -- Note: Moved to initial declarations and Event Registrations.
   -- snapshot_stats
@@ -687,17 +687,19 @@ local function APL()
     if Settings.Commons.Enabled.Trinkets then
       -- variable,name=item_cutoff_active,value=(variable.time_to_combustion<variable.on_use_cutoff|buff.combustion.remains>variable.skb_duration&!cooldown.item_cd_1141.remains)&((trinket.1.has_cooldown&trinket.1.cooldown.remains<variable.on_use_cutoff)+(trinket.2.has_cooldown&trinket.2.cooldown.remains<variable.on_use_cutoff)>1)
       VarItemCutoffActive = (VarTimeToCombustion < VarOnUseCutoff or CombustionRemains > VarSKBDuration and (I.DragonfireBombDispenser:CooldownUp() or not I.DragonfireBombDispenser:IsEquipped())) and (num(Trinket1:Cooldown() > 0 and Trinket1:CooldownRemains() < VarOnUseCutoff) + num(Trinket2:Cooldown() and Trinket2:CooldownRemains() < VarOnUseCutoff) > 1)
-      -- use_item,effect_name=treacherous_transmitter,if=buff.combustion.remains>10|fight_remains<25
-      if I.TreacherousTransmitter:IsEquippedAndReady() and (CombustionRemains > 10 or BossFightRemains < 25) then
-        if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter main 6"; end
+      -- use_item,effect_name=spymasters_web,if=(buff.combustion.remains>10&fight_remains<80)
+      if I.SpymastersWeb:IsEquippedAndReady() and (CombustionRemains > 10 and FightRemains < 20) then
+        if Cast(I.SpymastersWeb, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spymasters_web main 6"; end
       end
+      -- use_item,name=treacherous_transmitter,if=variable.time_to_combustion<10|fight_remains<25
+      if I.TreacherousTransmitter:IsEquippedAndReady() and (VarTimeToCombustion < 10 or BossFightRemains < 25) then
+        if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter main 8"; end
+      end
+      -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.combustion.up|fight_remains<20
+      -- TODO
       -- use_item,name=imperfect_ascendancy_serum,if=variable.time_to_combustion<3
       if I.ImperfectAscendancySerum:IsEquippedAndReady() and (VarTimeToCombustion < 3) then
-        if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum main 8"; end
-      end
-      -- use_item,effect_name=spymasters_web,if=(buff.combustion.remains>10&fight_remains<60)|fight_remains<25
-      if I.SpymastersWeb:IsEquippedAndReady() and ((CombustionRemains > 10 and FightRemains < 60) or BossFightRemains < 25) then
-        if Cast(I.SpymastersWeb, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spymasters_web main 10"; end
+        if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum main 10"; end
       end
       -- use_item,effect_name=gladiators_badge,if=variable.time_to_combustion>cooldown-5
       if I.ForgedGladiatorsBadge:IsEquippedAndReady() and (VarTimeToCombustion > I.ForgedGladiatorsBadge:Cooldown() - 5) then
