@@ -412,9 +412,11 @@ local function Finish(ReturnSpellOnly)
   end
 end
 
+local StealthCDs
+
 -- # Spell Queue Macros
 -- This returns a table with the base spell and the result of the Stealth or Finish action lists as if the applicable buff / Combo points was present
-local function SpellQueueMacro (BaseSpell)
+local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
   local MacroAbility
 
   -- Handle StealthMacro GUI options
@@ -422,6 +424,10 @@ local function SpellQueueMacro (BaseSpell)
   if BaseSpell:ID() == S.Vanish:ID() or BaseSpell:ID() == S.Shadowmeld:ID() then
     -- Fetch stealth spell
     MacroAbility = Stealth(true)
+    if MacroAbility and ReturnSpellOnly then
+      return MacroAbility
+    end
+
     if BaseSpell:ID() == S.Vanish:ID() and (not Settings.Outlaw.SpellQueueMacro.Vanish or not MacroAbility) then
       if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then
         return "Cast Vanish"
@@ -437,7 +443,18 @@ local function SpellQueueMacro (BaseSpell)
     -- Force max CPs for check so we don't get builders
     EffectiveComboPoints = Player:ComboPointsMax()
     -- Fetch Finisher if not in stealth (AR->Dispatch) or Stealth Ability if we are (AR->BtE)
+    -- Outside of stealth could be AR -> Vanish -> BtE so check for this first then fallback into normal finisher.
     if not Player:StealthUp(true, true) then
+      local MacroAbilities = StealthCDs(true)
+      -- Make sure the StealthCDs returned a combo which may not happen if targeting something out of range
+      if MacroAbilities and MacroAbilities[2] ~= "Cast Vanish" then
+        local ARMacroTable = { BaseSpell, unpack(MacroAbilities) }
+        ShouldReturn = CastQueue(unpack(ARMacroTable))
+        if ShouldReturn then
+          return "| " .. ARMacroTable[2]:Name() .. " | " .. ARMacroTable[3]:Name()
+        end
+      end
+
       MacroAbility = Finish(true)
     else
       MacroAbility = Stealth(true)
@@ -460,7 +477,7 @@ local function SpellQueueMacro (BaseSpell)
   return false
 end
 
-local function StealthCDs ()
+function StealthCDs (ReturnSpellOnly)
   -- # Stealth Cooldowns Builds with Underhanded Upper Hand and Subterfuge (and Without a Trace for Crackshot) must use Vanish while Adrenaline Rush is active
   -- actions.stealth_cds+=/vanish,if=talent.underhanded_upper_hand&talent.subterfuge&
   -- (buff.adrenaline_rush.up|!talent.without_a_trace&talent.crackshot)&(variable.finish_condition|!talent.crackshot&(variable.ambush_condition|!talent.hidden_opportunity))
@@ -468,9 +485,11 @@ local function StealthCDs ()
     and ((Player:BuffUp(S.AdrenalineRush) or S.AdrenalineRush:IsReady()) or not S.WithoutATrace:IsAvailable() and S.Crackshot:IsAvailable())
     and (Finish_Condition() or not S.Crackshot:IsAvailable()
     and (Ambush_Condition() or not S.HiddenOpportunity:IsAvailable())) then
-    -- if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish #1" end
-    ShouldReturn = SpellQueueMacro(S.Vanish)
+    ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
     if ShouldReturn then
+      if ReturnSpellOnly then
+        return { S.Vanish, ShouldReturn }
+      end
       return "Vanish Macro 1 " .. ShouldReturn
     end
   end
@@ -478,9 +497,11 @@ local function StealthCDs ()
   -- # Builds without Underhanded Upper Hand but with Crackshot must still use Vanish into Between the Eyes on cooldown
   -- actions.stealth_cds+=/vanish,if=!talent.underhanded_upper_hand&talent.crackshot&variable.finish_condition
   if S.Vanish:IsReady() and Vanish_DPS_Condition() and not S.UnderhandedUpperhand:IsAvailable() and S.Crackshot:IsAvailable() and Finish_Condition() then
-    -- if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish #2" end
-    ShouldReturn = SpellQueueMacro(S.Vanish)
+    ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
     if ShouldReturn then
+      if ReturnSpellOnly then
+        return { S.Vanish, ShouldReturn }
+      end
       return "Vanish Macro 2 " .. ShouldReturn
     end
   end
@@ -490,9 +511,11 @@ local function StealthCDs ()
   -- &buff.opportunity.stack<buff.opportunity.max_stack&variable.ambush_condition
   if S.Vanish:IsReady() and Vanish_DPS_Condition() and not S.UnderhandedUpperhand:IsAvailable() and not S.Crackshot:IsAvailable() and S.HiddenOpportunity:IsAvailable()
     and Player:BuffDown(S.AudacityBuff) and Player:BuffStack(S.Opportunity) < 6 and Ambush_Condition() then
-    -- if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then return "Cast Vanish #3" end
-    ShouldReturn = SpellQueueMacro(S.Vanish)
+    ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
     if ShouldReturn then
+      if ReturnSpellOnly then
+        return { S.Vanish, ShouldReturn }
+      end
       return "Vanish Macro 3 " .. ShouldReturn
     end
   end
@@ -508,8 +531,11 @@ local function StealthCDs ()
     if not S.UnderhandedUpperhand:IsAvailable() and not S.Crackshot:IsAvailable() and not S.HiddenOpportunity():IsAvailable()
       and not S.FatefulEnding:IsAvailable() and (Player:BuffDown(S.FateboundLuckyCoin) and (Player:BuffStack(S.FateboundCoinTails) >= 5
       or Player:BuffStack(S.FateboundCoinHeads) >= 5) or Player:BuffUp(S.FateboundLuckyCoin and not S.BetweentheEyes:IsReady())) then
-      ShouldReturn = SpellQueueMacro(S.Vanish)
+      ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
+        if ReturnSpellOnly then
+          return { S.Vanish, ShouldReturn }
+        end
         return "Vanish Macro 4 " .. ShouldReturn
       end
     end
@@ -521,8 +547,11 @@ local function StealthCDs ()
   if S.Vanish:IsReady() and Vanish_DPS_Condition() then
     if not S.UnderhandedUpperhand:IsAvailable() and not S.Crackshot:IsAvailable() and not S.HiddenOpportunity:IsAvailable()
       and not S.FatefulEnding:IsAvailable() and S.TakeEmBySurprise:IsAvailable() and Player:BuffDown(S.TakeEmBySurpriseBuff) then
-      ShouldReturn = SpellQueueMacro(S.Vanish)
+      ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
+        if ReturnSpellOnly then
+          return { S.Vanish, ShouldReturn }
+        end
         return "Vanish Macro 5 " .. ShouldReturn
       end
     end
@@ -553,6 +582,15 @@ local function CDs ()
       if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then
         return "Cast Adrenaline Rush"
       end
+    end
+  end
+
+  -- # Sprint to further benefit from Scroll of Momentum trinket
+  -- actions.cds+=/sprint,if=(trinket.1.is.scroll_of_momentum|trinket.2.is.scroll_of_momentum)&buff.full_momentum.up
+  if S.Sprint:IsReady() and Player:BuffDown(S.Sprint) and
+    (trinket1:ID() == I.ScrollOfMomentum:ID() or trinket2:ID() == I.ScrollOfMomentum:ID()) and Player:BuffUp(S.FullMomentum) then
+    if Cast(S.Sprint, Settings.CommonsOGCD.OffGCDasOffGCD.Sprint) then
+      return "Cast Sprint"
     end
   end
 

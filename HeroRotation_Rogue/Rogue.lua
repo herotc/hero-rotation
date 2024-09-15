@@ -61,6 +61,7 @@ Spell.Rogue.Commons = {
   -- Utility
   Blind                   = Spell(2094),
   CheapShot               = Spell(1833),
+  FullMomentum            = Spell(459228),
   Kick                    = Spell(1766),
   KidneyShot              = Spell(408),
   PickPocket              = Spell(921),
@@ -320,7 +321,8 @@ Item.Rogue.Assassination = {
 Item.Rogue.Outlaw = {
   -- Trinkets
   ImperfectAscendancySerum = Item(225654, {13, 14}),
-  MadQueensMandate         = Item(212454, {13, 14})
+  MadQueensMandate         = Item(212454, {13, 14}),
+  ScrollOfMomentum         = Item(226539, {13, 14})
 }
 
 Item.Rogue.Subtlety = {
