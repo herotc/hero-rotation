@@ -446,8 +446,8 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
     -- Outside of stealth could be AR -> Vanish -> BtE so check for this first then fallback into normal finisher.
     if not Player:StealthUp(true, true) then
       local MacroAbilities = StealthCDs(true)
-      -- Make sure the StealthCDs returned a combo which may not happen if targeting something out of range
-      if MacroAbilities and MacroAbilities[2] ~= "Cast Vanish" then
+      -- Make sure StealthCDs returned a combo which may not happen if targeting something out of range
+      if MacroAbilities and MacroAbilities[2] and MacroAbilities[2] ~= "Cast Vanish" then
         local ARMacroTable = { BaseSpell, unpack(MacroAbilities) }
         ShouldReturn = CastQueue(unpack(ARMacroTable))
         if ShouldReturn then
