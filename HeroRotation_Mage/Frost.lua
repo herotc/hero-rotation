@@ -80,6 +80,7 @@ HL:RegisterForEvent(function()
   S.GlacialSpike:RegisterInFlight()
   S.IceLance:RegisterInFlightEffect(228598)
   S.IceLance:RegisterInFlight()
+  S.Splinterstorm:RegisterInFlight()
   Bolt = S.FrostfireBolt:IsAvailable() and S.FrostfireBolt or S.Frostbolt
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 S.Frostbolt:RegisterInFlightEffect(228597)
@@ -93,6 +94,7 @@ S.GlacialSpike:RegisterInFlightEffect(228600)
 S.GlacialSpike:RegisterInFlight()
 S.IceLance:RegisterInFlightEffect(228598)
 S.IceLance:RegisterInFlight()
+S.Splinterstorm:RegisterInFlight()
 
 HL:RegisterForEvent(function()
   BossFightRemains = 11111
@@ -434,8 +436,8 @@ local function SSST()
   if S.Flurry:IsCastable() and (RemainingWintersChill == 0 and Target:DebuffDown(S.WintersChillDebuff) and (Player:PrevGCDP(1, S.Frostbolt) or Player:PrevGCDP(1, S.GlacialSpike))) then
     if Cast(S.Flurry, Settings.Frost.GCDasOffGCD.Flurry, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry ss_st 2"; end
   end
-  -- ice_lance,if=buff.icy_veins.up&debuff.winters_chill.stack=2
-  if S.IceLance:IsReady() and (Player:BuffUp(S.IcyVeinsBuff) and Target:DebuffStack(S.WintersChillDebuff) == 2) then
+  -- ice_lance,if=buff.icy_veins.up&(debuff.winters_chill.stack=2|debuff.winters_chill.stack=1&action.splinterstorm.in_flight
+  if S.IceLance:IsReady() and (Player:BuffUp(S.IcyVeinsBuff) and (Target:DebuffStack(S.WintersChillDebuff) == 2 or Target:DebuffStack(S.WintersChillDebuff) == 1 and S.Splinterstorm:InFlight())) then
     if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance ss_st 4"; end
   end
   -- ray_of_frost,if=buff.icy_veins.down&buff.freezing_winds.down&remaining_winters_chill=1
@@ -450,8 +452,8 @@ local function SSST()
   if CDsON() and S.ShiftingPower:IsCastable() then
     if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.ShiftingPower, not Target:IsInRange(18)) then return "shifting_power ss_st 10"; end
   end
-  -- ice_lance,if=remaining_winters_chill|buff.fingers_of_frost.react
-  if S.IceLance:IsReady() and (RemainingWintersChill > 0 or Player:BuffUp(S.FingersofFrostBuff)) then
+  -- ice_lance,if=remaining_winters_chill
+  if S.IceLance:IsReady() and (RemainingWintersChill > 0) then
     if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance ss_st 12"; end
   end
   -- comet_storm,if=prev_gcd.1.flurry|prev_gcd.1.cone_of_cold|action.splinterstorm.in_flight
@@ -463,13 +465,17 @@ local function SSST()
   if S.GlacialSpike:IsReady() and (Icicles == 5) then
     if Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike ss_st 16"; end
   end
-  -- flurry,if=cooldown_react&buff.icy_veins.up
-  if S.Flurry:IsCastable() and (Player:BuffUp(S.IcyVeinsBuff)) then
+  -- flurry,if=cooldown_react&buff.icy_veins.up&!action.splinterstorm.in_flight
+  if S.Flurry:IsCastable() and (Player:BuffUp(S.IcyVeinsBuff) and not S.Splinterstorm:InFlight()) then
     if Cast(S.Flurry, Settings.Frost.GCDasOffGCD.Flurry, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry ss_st 18"; end
+  end
+  -- ice_lance,if=buff.fingers_of_frost.react
+  if S.IceLance:IsReady() and (Player:BuffUp(S.FingersofFrostBuff)) then
+    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance ss_st 20"; end
   end
   -- frostbolt
   if Bolt:IsCastable() then
-    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostbolt ss_st 20"; end
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostbolt ss_st 22"; end
   end
   -- call_action_list,name=movement
   if Player:IsMoving() then
