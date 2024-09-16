@@ -448,7 +448,7 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
     if not Player:StealthUp(true, true) then
       local MacroAbilities = StealthCDs(true)
       -- Make sure StealthCDs returned a combo which may not happen if targeting something out of range
-      if MacroAbilities and MacroAbilities[2] and MacroAbilities[2] ~= "Cast Vanish" then
+      if MacroAbilities and MacroAbilities[2] and MacroAbilities[2] ~= "Cast Vanish" and MacroAbilities[3] then
         local ARMacroTable = { BaseSpell, unpack(MacroAbilities) }
         ShouldReturn = CastQueue(unpack(ARMacroTable))
         if ShouldReturn then
