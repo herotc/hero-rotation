@@ -58,6 +58,7 @@ local I = Item.Rogue.Assassination
 local OnUseExcludeTrinkets = {
   I.AlgetharPuzzleBox:ID(),
   I.AshesoftheEmbersoul:ID(),
+  I.BottledFlayedwingToxin:ID(),
   I.ImperfectAscendancySerum:ID(),
   I.TreacherousTransmitter:ID(),
 }
@@ -1112,6 +1113,13 @@ local function APL ()
 
   -- Poisons
   Rogue.Poisons()
+
+  -- Bottled Flayedwing Toxin
+  if I.BottledFlayedwingToxin:IsEquippedAndReady() and Player:BuffDown(S.FlayedwingToxin) then
+    if Cast(I.BottledFlayedwingToxin, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+      return "Bottled Flayedwing Toxin";
+    end
+  end
 
   -- Out of Combat
   if not Player:AffectingCombat() then

@@ -53,6 +53,7 @@ local I = Item.Rogue.Outlaw
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.BottledFlayedwingToxin:ID(),
   I.ImperfectAscendancySerum:ID(),
   I.MadQueensMandate:ID()
 }
@@ -838,6 +839,13 @@ local function APL ()
 
   -- Poisons
   Rogue.Poisons()
+
+  -- Bottled Flayedwing Toxin
+  if I.BottledFlayedwingToxin:IsEquippedAndReady() and Player:BuffDown(S.FlayedwingToxin) then
+    if Cast(I.BottledFlayedwingToxin, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+      return "Bottled Flayedwing Toxin";
+    end
+  end
 
   -- Out of Combat
   if not Player:AffectingCombat() and S.Vanish:TimeSinceLastCast() > 1 then
