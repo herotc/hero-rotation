@@ -258,210 +258,242 @@ local function Single()
   if S.Windstrike:IsCastable() and (S.ThorimsInvocation:IsAvailable() and MaelstromStacks > 1 and TIAction == S.LightningBolt and not S.ElementalSpirits:IsAvailable()) then
     if Cast(S.Windstrike, nil, nil, not Target:IsInRange(30)) then return "windstrike single 2"; end
   end
+  -- primordial_wave,if=!dot.flame_shock.ticking&talent.lashing_flames.enabled&(raid_event.adds.in>action.primordial_wave.cooldown|raid_event.adds.in<6)
+  if S.PrimordialWave:IsReady() and (Target:DebuffDown(S.FlameShockDebuff) and S.LashingFlames:IsAvailable()) then
+    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single 4"; end
+  end
   -- feral_spirit
   if S.FeralSpirit:IsCastable() then
-    if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit single 4"; end
+    if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit single 6"; end
   end
   -- elemental_blast,if=buff.tempest.stack<buff.tempest.max_stack&buff.maelstrom_weapon.stack>=5&talent.elemental_spirits.enabled&feral_spirit.active>=2&feral_spirit.remains<=2*gcd
   if S.ElementalBlast:IsReady() and (Player:BuffStack(S.TempestBuff) < MaxTempestStacks and MaelstromStacks >= 5 and S.ElementalSpirits:IsAvailable() and Shaman.FeralSpiritCount >= 2 and Player:BuffRemains(S.FeralSpiritBuff) <= 2 * Player:GCD()) then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 6"; end
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 8"; end
   end
   -- tempest,if=buff.maelstrom_weapon.stack=buff.maelstrom_weapon.max_stack|(buff.tempest.stack=buff.tempest.max_stack&(tempest_mael_count>30|buff.awakening_storms.stack=2)&buff.maelstrom_weapon.stack>=5)
   if S.TempestAbility:IsReady() and (MaelstromStacks == MaxMaelstromStacks or (Player:BuffStack(S.TempestBuff) == MaxTempestStacks and (Shaman.TempestMaelstrom > 30 or Player:BuffStack(S.AwakeningStormsBuff) == 2) and MaelstromStacks >= 5)) then
-    if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest single 8"; end
+    if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest single 10"; end
   end
-  -- elemental_blast,if=buff.maelstrom_weapon.stack>=10&talent.elemental_spirits.enabled&feral_spirit.active>=8&charges_fractional>=1.8
-  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 10 and S.ElementalSpirits:IsAvailable() and Shaman.FeralSpiritCount >= 8 and S.ElementalBlast:ChargesFractional() >= 1.8) then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 10"; end
+  -- elemental_blast,if=buff.maelstrom_weapon.stack=buff.maelstrom_weapon.max_stack&talent.elemental_spirits.enabled&feral_spirit.active>=6&(charges_fractional>=1.8|buff.ascendance.up)
+  if S.ElementalBlast:IsReady() and (MaelstromStacks == MaxMaelstromStacks and S.ElementalSpirits:IsAvailable() and Shaman.FeralSpiritCount >= 6 and (S.ElementalBlast:ChargesFractional() >= 1.8 or Player:BuffUp(S.AscendanceBuff))) then
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 12"; end
   end
   -- doom_winds,if=raid_event.adds.in>=action.doom_winds.cooldown&!talent.elemental_spirits.enabled
   if S.DoomWinds:IsCastable() and (not S.ElementalSpirits:IsAvailable()) then
-    if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsInMeleeRange(5)) then return "doom_winds single 12"; end
+    if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsInMeleeRange(5)) then return "doom_winds single 14"; end
   end
   -- windstrike,if=talent.thorims_invocation.enabled&buff.maelstrom_weapon.stack>1&ti_lightning_bolt
   if S.Windstrike:IsCastable() and (S.ThorimsInvocation:IsAvailable() and MaelstromStacks > 1 and TIAction == S.LightningBolt) then
-    if Cast(S.Windstrike, nil, nil, not Target:IsInRange(30)) then return "windstrike single 14"; end
+    if Cast(S.Windstrike, nil, nil, not Target:IsInRange(30)) then return "windstrike single 16"; end
   end
   -- sundering,if=buff.ascendance.up&pet.surging_totem.active&talent.earthsurge.enabled
   if S.Sundering:IsReady() and (Player:BuffUp(S.AscendanceBuff) and TotemFinder(S.SurgingTotem) and S.Earthsurge:IsAvailable()) then
-    if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInMeleeRange(11)) then return "sundering single 16"; end
-  end
-  -- primordial_wave,if=!dot.flame_shock.ticking&talent.lashing_flames.enabled&(raid_event.adds.in>action.primordial_wave.cooldown|raid_event.adds.in<6)
-  if S.PrimordialWave:IsReady() and (Target:DebuffDown(S.FlameShockDebuff) and S.LashingFlames:IsAvailable()) then
-    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single 18"; end
+    if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInMeleeRange(11)) then return "sundering single 18"; end
   end
   -- flame_shock,if=!ticking&talent.lashing_flames.enabled
   if S.FlameShock:IsReady() and (Target:DebuffDown(S.FlameShockDebuff) and S.LashingFlames:IsAvailable()) then
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single 20"; end
   end
-  -- tempest,if=buff.maelstrom_weapon.stack>=(8-(talent.elemental_spirits.enabled+talent.elemental_blast.enabled))
-  if S.TempestAbility:IsReady() and (MaelstromStacks >= (8 - (num(S.ElementalSpirits:IsAvailable()) + num(S.ElementalBlast:IsAvailable())))) then
+  -- lightning_bolt,if=buff.maelstrom_weapon.stack>=10&buff.primordial_wave.up
+  if S.LightningBolt:IsCastable() and (MaelstromStacks >= 10 and Player:BuffUp(S.PrimordialWaveBuff)) then
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 21"; end
+  end
+  -- tempest,if=buff.maelstrom_weapon.stack>=7
+  if S.TempestAbility:IsReady() and (MaelstromStacks >= 7) then
     if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest single 22"; end
   end
   if S.ElementalBlast:IsReady() and (
     -- elemental_blast,if=buff.maelstrom_weapon.stack>=5&talent.elemental_spirits.enabled&feral_spirit.active>=4&!talent.tempest.enabled
     (MaelstromStacks >= 5 and S.ElementalSpirits:IsAvailable() and Shaman.FeralSpiritCount >= 4 and not S.Tempest:IsAvailable()) or
-    -- elemental_blast,if=buff.maelstrom_weapon.stack>=8&feral_spirit.active>=7&(buff.icy_edge.up|buff.molten_weapon.up)&cooldown.feral_spirit.remains>=3
-    (MaelstromStacks >= 8 and Shaman.FeralSpiritCount >= 7 and (Player:BuffUp(S.IcyEdgeBuff) or Player:BuffUp(S.MoltenWeaponBuff)) and S.FeralSpirit:CooldownRemains() >= 3) or
-    -- elemental_blast,if=buff.maelstrom_weapon.stack>=8&feral_spirit.active>=1&(buff.icy_edge.stack+buff.molten_weapon.stack>=1)&charges_fractional>=1.8&cooldown.feral_spirit.remains>=3
-    (MaelstromStacks >= 8 and Shaman.FeralSpiritCount >= 1 and (Player:BuffStack(S.IcyEdgeBuff) + Player:BuffStack(S.MoltenWeaponBuff) >= 1) and S.ElementalBlast:ChargesFractional() >= 1.8 and S.FeralSpirit:CooldownRemains() >= 3)
+    -- elemental_blast,if=buff.maelstrom_weapon.stack>=7&feral_spirit.active>=5&(buff.icy_edge.up|buff.molten_weapon.up)&cooldown.feral_spirit.remains>=3
+    (MaelstromStacks >= 7 and Shaman.FeralSpiritCount >= 5 and (Player:BuffUp(S.IcyEdgeBuff) or Player:BuffUp(S.MoltenWeaponBuff)) and S.FeralSpirit:CooldownRemains() >= 3) or
+    -- elemental_blast,if=buff.maelstrom_weapon.stack>=7&feral_spirit.active>=1&(buff.icy_edge.stack+buff.molten_weapon.stack>=1)&charges_fractional>=1.8&cooldown.feral_spirit.remains>=3
+    (MaelstromStacks >= 7 and Shaman.FeralSpiritCount >= 1 and (Player:BuffStack(S.IcyEdgeBuff) + Player:BuffStack(S.MoltenWeaponBuff) >= 1) and S.ElementalBlast:ChargesFractional() >= 1.8 and S.FeralSpirit:CooldownRemains() >= 3)
   ) then
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 24"; end
   end
-  -- lightning_bolt,if=talent.tempest.enabled&buff.maelstrom_weapon.stack>=(buff.maelstrom_weapon.max_stack-talent.elemental_spirits.enabled*(talent.supercharge.enabled+talent.static_accumulation.enabled))
-  if S.LightningBolt:IsCastable() and (S.Tempest:IsAvailable() and MaelstromStacks >= (MaxMaelstromStacks - num(S.ElementalSpirits:IsAvailable()) * (num(S.Supercharge:IsAvailable()) + num(S.StaticAccumulation:IsAvailable())))) then
+  -- lightning_bolt,if=talent.tempest.enabled&buff.maelstrom_weapon.stack>=(buff.maelstrom_weapon.max_stack-talent.elemental_spirits.enabled*(talent.supercharge.enabled+talent.static_accumulation.enabled))&!buff.primordial_wave.up
+  if S.LightningBolt:IsCastable() and (S.Tempest:IsAvailable() and MaelstromStacks >= (MaxMaelstromStacks - num(S.ElementalSpirits:IsAvailable()) * (num(S.Supercharge:IsAvailable()) + num(S.StaticAccumulation:IsAvailable()))) and Player:BuffDown(S.PrimordialWaveBuff)) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 26"; end
   end
-  -- lightning_bolt,if=buff.maelstrom_weapon.stack>=5&buff.ascendance.up&ti_chain_lightning&(buff.ascendance.remains>(cooldown.strike.remains+gcd))
-  if S.LightningBolt:IsCastable() and (MaelstromStacks >= 5 and Player:BuffUp(S.AscendanceBuff) and TIAction == S.ChainLightning and (Player:BuffRemains(S.AscendanceBuff) > (S.Windstrike:CooldownRemains() + Player:GCD()))) then
+  -- lightning_bolt,if=buff.maelstrom_weapon.stack>=5&buff.ascendance.up&ti_chain_lightning&(buff.ascendance.remains>(cooldown.strike.remains+gcd))&!buff.primordial_wave.up
+  if S.LightningBolt:IsCastable() and (MaelstromStacks >= 5 and Player:BuffUp(S.AscendanceBuff) and TIAction == S.ChainLightning and (Player:BuffRemains(S.AscendanceBuff) > (S.Windstrike:CooldownRemains() + Player:GCD())) and Player:BuffDown(S.PrimordialWaveBuff)) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 28"; end
   end
   -- stormstrike,if=!talent.elemental_spirits.enabled&(buff.doom_winds.up|talent.deeply_rooted_elements.enabled|(talent.stormblast.enabled&buff.stormbringer.up))
   if S.Stormstrike:IsReady() and (not S.ElementalSpirits:IsAvailable() and (Player:BuffUp(S.DoomWindsBuff) or S.DeeplyRootedElements:IsAvailable() or (S.Stormblast:IsAvailable() and Player:BuffUp(S.StormbringerBuff)))) then
     if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 30"; end
   end
-  -- lava_lash,if=buff.hot_hand.up
-  if S.LavaLash:IsReady() and (Player:BuffUp(S.HotHandBuff)) then
-    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 32"; end
+  -- lava_lash,if=buff.hot_hand.up&!talent.tempest.enabled
+  if S.LavaLash:IsCastable() and (Player:BuffUp(S.HotHandBuff) and not S.Tempest:IsAvailable()) then
+    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 31"; end
   end
-  -- elemental_blast,if=buff.maelstrom_weapon.stack>=5&charges=max_charges
-  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 5 and S.ElementalBlast:Charges() == S.ElementalBlast:MaxCharges()) then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 34"; end
+  -- elemental_blast,if=buff.maelstrom_weapon.stack>=5&charges=max_charges&!talent.tempest.enabled
+  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 5 and S.ElementalBlast:Charges() == S.ElementalBlast:MaxCharges() and not S.Tempest:IsAvailable()) then
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 32"; end
   end
   -- lightning_bolt,if=buff.maelstrom_weapon.stack>=8&buff.primordial_wave.up&raid_event.adds.in>buff.primordial_wave.remains&(!buff.splintered_elements.up|fight_remains<=12)
   if S.LightningBolt:IsCastable() and (MaelstromStacks >= 8 and Player:BuffUp(S.PrimordialWaveBuff) and (Player:BuffDown(S.SplinteredElementsBuff) or FightRemains <= 12)) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 36"; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 34"; end
   end
-  -- elemental_blast,if=buff.maelstrom_weapon.stack>=8&(feral_spirit.active>=2|!talent.elemental_spirits.enabled)
-  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 8 and (Shaman.FeralSpiritCount >= 2 or not S.ElementalSpirits:IsAvailable())) then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 38"; end
+  -- elemental_blast,if=buff.maelstrom_weapon.stack>=8&(feral_spirit.active>=2|!talent.elemental_spirits.enabled)&!talent.tempest.enabled
+  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 8 and (Shaman.FeralSpiritCount >= 2 or not S.ElementalSpirits:IsAvailable()) and not S.Tempest:IsAvailable()) then
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 36"; end
   end
   -- lava_burst,if=!talent.thorims_invocation.enabled&buff.maelstrom_weapon.stack>=5
   if S.LavaBurst:IsReady() and (not S.ThorimsInvocation:IsAvailable() and MaelstromStacks >= 5) then
-    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single 40"; end
+    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single 38"; end
   end
   -- primordial_wave,if=raid_event.adds.in>action.primordial_wave.cooldown|raid_event.adds.in<6
   if S.PrimordialWave:IsReady() then
-    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single 42"; end
+    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single 40"; end
+  end
+  -- elemental_blast,if=buff.maelstrom_weapon.stack>=5&feral_spirit.active>=4&talent.ascendance.enabled&(charges_fractional>=1.8|(buff.icy_edge.stack+buff.molten_weapon.stack>=4))
+  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 5 and Shaman.FeralSpiritCount >= 4 and S.Ascendance:IsAvailable() and (S.ElementalBlast:ChargesFractional() >= 1.8 or (Player:BuffStack(S.IcyEdgeBuff) + Player:BuffStack(S.MoltenWeaponBuff) >= 4))) then
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 42"; end
+  end
+  -- lightning_bolt,if=((buff.maelstrom_weapon.stack>=8)|(talent.static_accumulation.enabled&buff.maelstrom_weapon.stack>=5))&buff.primordial_wave.down&talent.ascendance.enabled
+  if S.LightningBolt:IsCastable() and (((MaelstromStacks >= 8) or (S.StaticAccumulation:IsAvailable() and MaelstromStacks >= 5)) and Player:BuffDown(S.PrimordialWaveBuff) and S.Ascendance:IsAvailable()) then
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 44"; end
+  end
+  -- doom_winds,if=raid_event.adds.in>=action.doom_winds.cooldown&talent.elemental_spirits.enabled
+  if S.DoomWinds:IsCastable() and (S.ElementalSpirits:IsAvailable()) then
+    if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsInMeleeRange(5)) then return "doom_winds single 46"; end
+  end
+  -- lava_lash,if=talent.tempest.enabled&(buff.hot_hand.up|(talent.molten_assault.enabled&talent.elemental_spirits.enabled&!talent.deeply_rooted_elements.enabled&dot.flame_shock.remains<=3))
+  if S.LavaLash:IsCastable() and (S.Tempest:IsAvailable() and (Player:BuffUp(S.HotHandBuff) or (S.MoltenAssault:IsAvailable() and S.ElementalSpirits:IsAvailable() and not S.DeeplyRootedElements:IsAvailable() and Target:DebuffRemains(S.FlameShockDebuff) <= 3))) then
+    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 48"; end
   end
   -- stormstrike,if=talent.elemental_spirits.enabled&(buff.doom_winds.up|talent.deeply_rooted_elements.enabled|(talent.stormblast.enabled&buff.stormbringer.up))
   if S.Stormstrike:IsReady() and (S.ElementalSpirits:IsAvailable() and (Player:BuffUp(S.DoomWindsBuff) or S.DeeplyRootedElements:IsAvailable() or (S.Stormblast:IsAvailable() and Player:BuffUp(S.StormbringerBuff)))) then
-    if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 44"; end
+    if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 50"; end
+  end
+  -- frost_shock,if=buff.hailstorm.up&buff.ice_strike.up&talent.swirling_maelstrom.enabled&talent.tempest.enabled&talent.ascendance.enabled
+  if S.FrostShock:IsCastable() and (Player:BuffUp(S.HailstormBuff) and Player:BuffUp(S.IceStrikeBuff) and S.SwirlingMaelstrom:IsAvailable() and S.Tempest:IsAvailable() and S.Ascendance:IsAvailable()) then
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 52"; end
+  end
+  -- elemental_blast,if=buff.maelstrom_weapon.stack>=5&feral_spirit.active>=4&talent.deeply_rooted_elements.enabled&(charges_fractional>=1.8|(buff.icy_edge.stack+buff.molten_weapon.stack>=4))
+  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 5 and Shaman.FeralSpiritCount >= 4 and S.DeeplyRootedElements:IsAvailable() and (S.ElementalBlast:ChargesFractional() >= 1.8 or (Player:BuffStack(S.IcyEdgeBuff) + Player:BuffStack(S.MoltenWeaponBuff) >= 4))) then
+    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 54"; end
   end
   -- lightning_bolt,if=((buff.maelstrom_weapon.stack>=8)|(talent.static_accumulation.enabled&buff.maelstrom_weapon.stack>=5))&buff.primordial_wave.down
   if S.LightningBolt:IsCastable() and (((MaelstromStacks >= 8) or (S.StaticAccumulation:IsAvailable() and MaelstromStacks >= 5)) and Player:BuffDown(S.PrimordialWaveBuff)) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 46"; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 56"; end
   end
   -- crash_lightning,if=talent.alpha_wolf.enabled&feral_spirit.active&alpha_wolf_min_remains=0
   if S.CrashLightning:IsReady() and (S.AlphaWolf:IsAvailable() and Player:BuffUp(S.FeralSpiritBuff) and AlphaWolfMinRemains() == 0) then
-    if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInMeleeRange(8)) then return "crash_lightning single 48"; end
+    if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInMeleeRange(8)) then return "crash_lightning single 58"; end
   end
   -- flame_shock,if=!ticking&!talent.tempest.enabled
   if S.FlameShock:IsReady() and (Target:DebuffDown(S.FlameShockDebuff) and not S.Tempest:IsAvailable()) then
-    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single 50"; end
+    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single 60"; end
   end
   -- windstrike,if=(talent.totemic_rebound.enabled&(time-(action.stormstrike.last_used<?action.windstrike.last_used))>=3.5)|(talent.awakening_storms.enabled&(time-(action.stormstrike.last_used<?action.windstrike.last_used<?action.lightning_bolt.last_used<?action.tempest.last_used<?action.chain_lightning.last_used))>=3.5)
   -- stormstrike,if=(talent.totemic_rebound.enabled&(time-(action.stormstrike.last_used<?action.windstrike.last_used))>=3.5)|(talent.awakening_storms.enabled&(time-(action.stormstrike.last_used<?action.windstrike.last_used<?action.lightning_bolt.last_used<?action.tempest.last_used<?action.chain_lightning.last_used))>=3.5)
   -- Note: These two lines have the same if condition.
   if (S.TotemicRebound:IsAvailable() and mathmin(S.Stormstrike:TimeSinceLastCast(), S.Windstrike:TimeSinceLastCast()) >= 3.5) or (S.AwakeningStorms:IsAvailable() and mathmin(S.Stormstrike:TimeSinceLastCast(), S.Windstrike:TimeSinceLastCast(), S.LightningBolt:TimeSinceLastCast(), S.TempestAbility:TimeSinceLastCast(), S.ChainLightning:TimeSinceLastCast()) >= 3.5) then
     if S.Windstrike:IsCastable() then
-      if Cast(S.Windstrike, nil, nil, not Target:IsInRange(30)) then return "windstrike single 52"; end
+      if Cast(S.Windstrike, nil, nil, not Target:IsInRange(30)) then return "windstrike single 62"; end
     end
     if S.Stormstrike:IsReady() then
-      if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 54"; end
+      if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 64"; end
     end
   end
   -- lava_lash,if=talent.lively_totems.enabled&(time-action.lava_lash.last_used>=3.5)
   if S.LavaLash:IsCastable() and (S.LivelyTotems:IsAvailable() and S.LavaLash:TimeSinceLastCast() >= 3.5) then
-    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 56"; end
+    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 66"; end
   end
   -- doom_winds,if=raid_event.adds.in>=action.doom_winds.cooldown&talent.elemental_spirits.enabled
   if S.DoomWinds:IsReady() and (S.ElementalSpirits:IsAvailable()) then
-    if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsInMeleeRange(5)) then return "doom_winds single 58"; end
+    if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsInMeleeRange(5)) then return "doom_winds single 68"; end
+  end
+  -- lava_lash,if=talent.elemental_assault.enabled&talent.tempest.enabled&talent.molten_assault.enabled&talent.deeply_rooted_elements.enabled&dot.flame_shock.ticking
+  if S.LavaLash:IsCastable() and (S.ElementalAssault:IsAvailable() and S.Tempest:IsAvailable() and S.MoltenAssault:IsAvailable() and S.DeeplyRootedElements:IsAvailable() and Target:DebuffUp(S.FlameShockDebuff)) then
+    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 70"; end
   end
   -- ice_strike,if=talent.elemental_assault.enabled&talent.swirling_maelstrom.enabled
   if S.IceStrike:IsReady() and (S.ElementalAssault:IsAvailable() and S.SwirlingMaelstrom:IsAvailable()) then
-    if Cast(S.IceStrike, nil, nil, not Target:IsSpellInRange(S.IceStrike)) then return "ice_strike single 60"; end
+    if Cast(S.IceStrike, nil, nil, not Target:IsSpellInRange(S.IceStrike)) then return "ice_strike single 72"; end
   end
   -- lava_lash,if=talent.elemental_assault.enabled&talent.tempest.enabled&talent.molten_assault.enabled&dot.flame_shock.ticking
   if S.LavaLash:IsCastable() and (S.ElementalAssault:IsAvailable() and S.Tempest:IsAvailable() and S.MoltenAssault:IsAvailable() and Target:DebuffUp(S.FlameShockDebuff)) then
-    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 62"; end
+    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 73"; end
   end
   -- frost_shock,if=buff.hailstorm.up&buff.ice_strike.up&talent.swirling_maelstrom.enabled&talent.tempest.enabled
   if S.FrostShock:IsCastable() and (Player:BuffUp(S.HailstormBuff) and Player:BuffUp(S.IceStrikeBuff) and S.SwirlingMaelstrom:IsAvailable() and S.Tempest:IsAvailable()) then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 64"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 74"; end
   end
   -- flame_shock,if=!ticking
   if S.FlameShock:IsReady() and (Target:DebuffDown(S.FlameShockDebuff)) then
-    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single 66"; end
+    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single 76"; end
   end
   -- lava_lash,if=talent.lashing_flames.enabled
   if S.LavaLash:IsCastable() and (S.LashingFlames:IsAvailable()) then
-    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 68"; end
+    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 78"; end
   end
   -- ice_strike,if=!buff.ice_strike.up
   if S.IceStrike:IsReady() and (Player:BuffDown(S.IceStrikeBuff)) then
-    if Cast(S.IceStrike, nil, nil, not Target:IsSpellInRange(S.IceStrike)) then return "ice_strike single 70"; end
+    if Cast(S.IceStrike, nil, nil, not Target:IsSpellInRange(S.IceStrike)) then return "ice_strike single 80"; end
   end
   -- frost_shock,if=buff.hailstorm.up
   if S.FrostShock:IsReady() and (Player:BuffUp(S.HailstormBuff)) then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 72"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 82"; end
   end
   -- crash_lightning,if=talent.converging_storms.enabled
   if S.CrashLightning:IsReady() and (S.ConvergingStorms:IsAvailable()) then
-    if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInMeleeRange(8)) then return "crash_lightning single 74"; end
+    if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInMeleeRange(8)) then return "crash_lightning single 84"; end
   end
   -- lava_lash
   if S.LavaLash:IsReady() then
-    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 76"; end
+    if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 86"; end
   end
   -- ice_strike
   if S.IceStrike:IsReady() then
-    if Cast(S.IceStrike, nil, nil, not Target:IsSpellInRange(S.IceStrike)) then return "ice_strike single 78"; end
+    if Cast(S.IceStrike, nil, nil, not Target:IsSpellInRange(S.IceStrike)) then return "ice_strike single 88"; end
   end
   -- windstrike
   if S.Windstrike:IsCastable() then
-    if Cast(S.Windstrike, nil, nil, not Target:IsInRange(30)) then return "windstrike single 80"; end
+    if Cast(S.Windstrike, nil, nil, not Target:IsInRange(30)) then return "windstrike single 90"; end
   end
   -- stormstrike
   if S.Stormstrike:IsReady() then
-    if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 82"; end
+    if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 92"; end
   end
   -- sundering,if=raid_event.adds.in>=action.sundering.cooldown
   if S.Sundering:IsReady() then
-    if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInMeleeRange(11)) then return "sundering single 84"; end
+    if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInMeleeRange(11)) then return "sundering single 94"; end
   end
   -- tempest,if=buff.maelstrom_weapon.stack>=5
   if S.TempestAbility:IsReady() and (MaelstromStacks >= 5) then
-    if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest single 86"; end
+    if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest single 96"; end
   end
   -- lightning_bolt,if=talent.hailstorm.enabled&buff.maelstrom_weapon.stack>=5&buff.primordial_wave.down
   if S.LightningBolt:IsCastable() and (S.Hailstorm:IsAvailable() and MaelstromStacks >= 5 and Player:BuffDown(S.PrimordialWaveBuff)) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 88"; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 98"; end
   end
   -- frost_shock
   if S.FrostShock:IsReady() then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 90"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 100"; end
   end
   -- crash_lightning
   if S.CrashLightning:IsReady() then
-    if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInMeleeRange(8)) then return "crash_lightning single 92"; end
+    if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInMeleeRange(8)) then return "crash_lightning single 102"; end
   end
   -- fire_nova,if=active_dot.flame_shock
   if S.FireNova:IsReady() and (Target:DebuffUp(S.FlameShockDebuff)) then
-    if Cast(S.FireNova) then return "fire_nova single 94"; end
+    if Cast(S.FireNova) then return "fire_nova single 104"; end
   end
   -- earth_elemental
   if S.EarthElemental:IsCastable() then
-    if Cast(S.EarthElemental, Settings.CommonsOGCD.GCDasOffGCD.EarthElemental) then return "earth_elemental single 96"; end
+    if Cast(S.EarthElemental, Settings.CommonsOGCD.GCDasOffGCD.EarthElemental) then return "earth_elemental single 106"; end
   end
   -- flame_shock
   if S.FlameShock:IsReady() then
-    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single 98"; end
+    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single 108"; end
   end
   -- lightning_bolt,if=buff.maelstrom_weapon.stack>=5&buff.primordial_wave.down
   if S.LightningBolt:IsCastable() and (MaelstromStacks >= 5 and Player:BuffDown(S.PrimordialWaveBuff)) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 100"; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 110"; end
   end
 end
 
