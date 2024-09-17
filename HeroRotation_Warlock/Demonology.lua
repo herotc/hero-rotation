@@ -368,7 +368,7 @@ local function FightEnd()
     if Cast(VilefiendAbility) then return "summon_vilefiend fight_end 12"; end
   end
   -- summon_demonic_tyrant,if=fight_remains<20
-  if S.SummonDemonicTyrant:IsCastable() and (BossFightRemains < 20) then
+  if CDsON() and S.SummonDemonicTyrant:IsCastable() and (BossFightRemains < 20) then
     if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant fight_end 14"; end
   end
   -- demonic_strength,if=fight_remains<10
@@ -546,7 +546,7 @@ local function Tyrant()
     if Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers tyrant 22"; end
   end
   -- summon_demonic_tyrant,if=variable.imp_despawn&variable.imp_despawn<time+gcd.max*2+cast_time|buff.dreadstalkers.up&buff.dreadstalkers.remains<gcd.max*2+cast_time
-  if S.SummonDemonicTyrant:IsReady() and (VarImpDespawn and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() or DreadstalkerActive() and DreadstalkerTime() < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime()) then
+  if CDsON() and S.SummonDemonicTyrant:IsReady() and (VarImpDespawn and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() or DreadstalkerActive() and DreadstalkerTime() < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime()) then
     if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant tyrant 24"; end
   end
   -- hand_of_guldan,if=(variable.imp_despawn|buff.dreadstalkers.remains)&soul_shard>=3|soul_shard=5
