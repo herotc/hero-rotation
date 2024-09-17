@@ -228,7 +228,7 @@ end
 local function EvaluateTargetIfFrostStrikeObliteration2(TargetUnit)
   -- if=(rune<2|variable.rp_buffs|debuff.razorice.stack=5&talent.shattering_blade|hero_tree.rider_of_the_apocalypse)&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1|talent.shattered_frost)
   -- Note: '&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1|talent.shattered_frost)' performed before CastTargetIf.
-  return Player:Rune() < 2 or VarRPBuffs or TargetUnit:DebuffStack(S.RazoriceDebuff) == 5 and S.ShatteringBlade:IsAvailable() or Player:HeroTreeID() == 32
+  return Player:Rune() < 2 or VarRPBuffs or TargetUnit:DebuffStack(S.RazoriceDebuff) == 5 and S.ShatteringBlade:IsAvailable()
 end
 
 local function EvaluateTargetIfGlacialAdvanceAoE(TargetUnit)
@@ -536,8 +536,8 @@ local function Obliteration()
   if S.FrostStrike:IsReady() and (Player:BuffStack(S.KillingMachineBuff) < 2 and Player:BuffRemains(S.PillarofFrostBuff) < Player:GCD() and Player:BuffDown(S.DeathAndDecayBuff)) then
     if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "max", EvaluateTargetIfFilterFrostStrike, nil, not Target:IsSpellInRange(S.FrostStrike), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike obliteration 6"; end
   end
-  -- frost_strike,target_if=max:((talent.shattering_blade&debuff.razorice.stack=5)*5)+(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=debuff.razorice.stack=5&talent.shattering_blade&talent.a_feast_of_souls&buff.a_feast_of_souls.up&!talent.arctic_assault
-  if S.FrostStrike:IsReady() and (S.ShatteringBlade:IsAvailable() and S.AFeastofSouls:IsAvailable() and Player:BuffUp(S.AFeastofSoulsBuff) and not S.ArcticAssault:IsAvailable()) then
+  -- frost_strike,target_if=max:((talent.shattering_blade&debuff.razorice.stack=5)*5)+(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=debuff.razorice.stack=5&talent.shattering_blade&talent.a_feast_of_souls&buff.a_feast_of_souls.up
+  if S.FrostStrike:IsReady() and (S.ShatteringBlade:IsAvailable() and S.AFeastofSouls:IsAvailable() and Player:BuffUp(S.AFeastofSoulsBuff)) then
     if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "max", EvaluateTargetIfFilterFrostStrike, EvaluateTargetIfFrostStrikeObliteration, not Target:IsSpellInRange(S.FrostStrike), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike obliteration 8"; end
   end
   -- obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=buff.killing_machine.react
@@ -553,7 +553,7 @@ local function Obliteration()
   if S.GlacialAdvance:IsReady() then
     if Everyone.CastTargetIf(S.GlacialAdvance, EnemiesMelee, "max", EvaluateTargetIfFilterRazoriceStacks, EvaluateTargetIfGlacialAdvanceObliteration, not Target:IsInRange(100)) then return "glacial_advance obliteration 14"; end
   end
-  -- frost_strike,target_if=max:((talent.shattering_blade&debuff.razorice.stack=5)*5)+(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=(rune<2|variable.rp_buffs|debuff.razorice.stack=5&talent.shattering_blade|hero_tree.rider_of_the_apocalypse)&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1|talent.shattered_frost)
+  -- frost_strike,target_if=max:((talent.shattering_blade&debuff.razorice.stack=5)*5)+(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=(rune<2|variable.rp_buffs|debuff.razorice.stack=5&talent.shattering_blade)&!variable.pooling_runic_power&(!talent.glacial_advance|active_enemies=1|talent.shattered_frost)
   if S.FrostStrike:IsReady() and (not VarPoolingRP and (not S.GlacialAdvance:IsAvailable() or EnemiesMeleeCount == 1 or S.ShatteredFrost:IsAvailable())) then
     if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "max", EvaluateTargetIfFilterFrostStrike, EvaluateTargetIfFrostStrikeObliteration2, not Target:IsSpellInRange(S.FrostStrike), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike obliteration 16"; end
   end
