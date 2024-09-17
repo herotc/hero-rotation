@@ -56,6 +56,7 @@ HR.GUISettings.APL.Rogue = {
       Vanish = true,
       ThistleTea = true,
       ColdBlood = true,
+      Sprint = true,
     }
   },
   Assassination = {

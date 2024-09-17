@@ -44,6 +44,7 @@ local I = Item.Rogue.Subtlety
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.BottledFlayedwingToxin:ID(),
   I.ImperfectAscendancySerum:ID(),
   I.TreacherousTransmitter:ID()
 }
@@ -224,10 +225,11 @@ local function Used_For_Danse(Spell)
 end
 
 local function Secret_Condition()
-  -- actions.finish=variable,name=secret_condition,value=((buff.danse_macabre.stack>=2+!talent.deathstalkers_mark)
-  -- |!talent.danse_macabre|(talent.unseen_blade&buff.shadow_dance.up&buff.escalating_blade.stack>=2))
-  return ((Player:BuffStack(S.DanseMacabreBuff) >= 2 + BoolToInt(not S.DeathStalkersMark:IsAvailable())) or not S.DanseMacabre:IsAvailable()
-    or (S.UnseenBlade:IsAvailable() and Player:BuffUp(S.ShadowDanceBuff) and Player:BuffStack(S.EscalatingBlade) >= 2))
+  -- actions.finish=variable,name=secret_condition,value=((buff.danse_macabre.stack>=3)|!talent.danse_macabre|
+  -- (talent.unseen_blade&buff.shadow_dance.up&(buff.escalating_blade.stack>=2|buff.shadow_blades.up)))
+  return ((Player:BuffStack(S.DanseMacabreBuff) >= 3) or not S.DanseMacabre:IsAvailable()
+    or (S.UnseenBlade:IsAvailable() and Player:BuffUp(S.ShadowDanceBuff)
+    and (Player:BuffStack(S.EscalatingBlade) >= 2 or Player:BuffUp(S.ShadowBlades))))
 end
 
 local function Trinket_Sync_Slot()
@@ -711,43 +713,18 @@ local function CDs ()
     end
   end
 
-  -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&fight_remains<=8+talent.subterfuge.enabled
+  -- # Use shadow dance during subterfuge in CDs or if the fight ends in <8s
+  --actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&(talent.invigorating_shadowdust&buff.shadow_blades.up
+  -- &((talent.deathstalkers_mark&buff.subterfuge.up)|(dot.rupture.ticking&variable.snd_condition&talent.unseen_blade)))
+  -- |fight_remains<=8
   if HR.CDsON() and S.ShadowDance:IsAvailable() and MayBurnShadowDance() and S.ShadowDance:IsReady() then
-    if not Player:BuffUp(S.ShadowDanceBuff) and HL.BossFilteredFightRemains("<=", 8 + num(S.Subterfuge:IsAvailable())) then
+    if not Player:BuffUp(S.ShadowDanceBuff) and (S.InvigoratingShadowdust:IsAvailable() and Player:BuffUp(S.ShadowBlades)
+      and ((S.DeathStalkersMark:IsAvailable() and Player:BuffUp(S.Subterfuge))
+      or (Target:DebuffUp(S.Rupture) and SnD_Condition() and S.UnseenBlade:IsAvailable())))
+      or HL.BossFilteredFightRemains("<=", 8) then
       ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
       if ShouldReturn then
-        return "Shadow Dance Macro CDs 1" .. ShouldReturn
-      end
-    end
-  end
-
-  -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&talent.invigorating_shadowdust&talent.deathstalkers_mark
-  -- &buff.shadow_blades.up&(buff.subterfuge.up&spell_targets>=4|buff.subterfuge.remains>=3)
-  if HR.CDsON() and S.ShadowDance:IsAvailable() and S.ShadowDance:IsReady() then
-    if Player:BuffDown(S.ShadowDanceBuff) and S.InvigoratingShadowdust:IsAvailable() and S.DeathStalkersMark:IsAvailable()
-      and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and (Player:BuffUp(S.Subterfuge) and MeleeEnemies10yCount >= 4
-      or Player:BuffRemains(S.Subterfuge) >= 3) then
-      ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
-      if ShouldReturn then
-        return "Shadow Dance Macro CDs 2" .. ShouldReturn
-      end
-    end
-  end
-
-  -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&talent.unseen_blade&talent.invigorating_shadowdust
-  -- &dot.rupture.ticking&variable.snd_condition&(buff.symbols_of_death.remains>=6&!buff.flagellation_buff.up
-  -- |buff.symbols_of_death.up&buff.shadow_blades.up|buff.shadow_blades.up&!talent.invigorating_shadowdust)
-  -- &(cooldown.secret_technique.remains<10+12*!talent.invigorating_shadowdust|buff.shadow_blades.up)
-  -- &(!talent.the_first_dance|(combo_points.deficit>=7&!buff.shadow_blades.up|buff.shadow_blades.up))
-  if HR.CDsON() and S.ShadowDance:IsAvailable() and S.ShadowDance:IsReady() then
-    if Player:BuffDown(S.ShadowDanceBuff) and S.UnseenBlade:IsAvailable() and S.InvigoratingShadowdust:IsAvailable()
-      and Target:DebuffUp(S.Rupture) and SnD_Condition() and (Player:BuffRemains(S.SymbolsofDeath) >= 6 and Player:BuffDown(S.Flagellation)
-      or Player:BuffUp(S.SymbolsofDeath) and (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) or (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and not S.InvigoratingShadowdust:IsAvailable())
-      and (S.SecretTechnique:CooldownRemains() <= 10 + 12 * num(not S.InvigoratingShadowdust:IsAvailable() or Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady())
-      and (not S.TheFirstDance:IsAvailable() or (ComboPointsDeficit >= 7 and Player:BuffDown(S.ShadowBlades) or Player:BuffUp(S.ShadowBlades)))) then
-      ShouldReturn = StealthMacro(S.ShadowDance, StealthEnergyRequired)
-      if ShouldReturn then
-        return "Shadow Dance Macro CDs 3" .. ShouldReturn
+        return "Shadow Dance Macro CDs" .. ShouldReturn
       end
     end
   end
@@ -770,8 +747,7 @@ local function CDs ()
   -- &buff.shadow_blades.up|buff.shadow_dance.remains>=4&cooldown.cold_blood.remains<=3)
   -- |fight_remains<=(6*cooldown.thistle_tea.charges)
   if S.ThistleTea:IsReady() then
-    if Player:BuffDown(S.ThistleTea) and (Player:BuffRemains(S.ShadowDanceBuff) >= 4
-      and Player:BuffUp(S.ShadowBlades) or Player:BuffRemains(S.ShadowDanceBuff) >= 4 and S.ColdBlood:CooldownRemains() <= 3)
+    if Player:BuffDown(S.ThistleTea) and (Player:BuffRemains(S.ShadowDanceBuff) >= 6)
       or HL.BossFilteredFightRemains("<=", 6 * S.ThistleTea:Charges()) then
       if Cast(S.ThistleTea, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
         return "Thistle Tea";
@@ -1077,6 +1053,13 @@ local function APL ()
 
   -- Poisons
   Rogue.Poisons()
+
+  -- Bottled Flayedwing Toxin
+  if I.BottledFlayedwingToxin:IsEquippedAndReady() and Player:BuffDown(S.FlayedwingToxin) then
+    if Cast(I.BottledFlayedwingToxin, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+      return "Bottle Of Flayedwing Toxin";
+    end
+  end
 
   --- Out of Combat
   if not Player:AffectingCombat() then
