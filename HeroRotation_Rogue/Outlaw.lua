@@ -273,30 +273,30 @@ local function Stealth(ReturnSpellOnly)
   end
 
   -- actions.stealth+=/cold_blood,if=variable.finish_condition
-  if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Target:IsSpellInRange(S.Dispatch) and Finish_Condition() then
+  if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Finish_Condition() then
     if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
       return "Cast Cold Blood"
     end
   end
 
   -- actions.stealth+=/between_the_eyes,if=variable.finish_condition&talent.crackshot&(!buff.shadowmeld.up|stealthed.rogue)
-  if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and Finish_Condition() and S.Crackshot:IsAvailable()
+  if S.BetweentheEyes:IsCastable() and Finish_Condition() and S.Crackshot:IsAvailable()
     and (not Player:BuffUp(S.Shadowmeld) or Player:StealthUp(true, false)) then
     if ReturnSpellOnly then
       return S.BetweentheEyes
     else
-      if CastPooling(S.BetweentheEyes) then
+      if CastPooling(S.BetweentheEyes, nil, not Target:IsSpellInRange(S.BetweentheEyes)) then
         return "Cast Between the Eyes"
       end
     end
   end
 
   -- actions.stealth+=/dispatch,if=variable.finish_condition
-  if S.Dispatch:IsCastable() and Target:IsSpellInRange(S.Dispatch) and Finish_Condition() then
+  if S.Dispatch:IsCastable() and Finish_Condition() then
     if ReturnSpellOnly then
       return S.Dispatch
     else
-      if CastPooling(S.Dispatch) then
+      if CastPooling(S.Dispatch, nil, not Target:IsSpellInRange(S.Dispatch)) then
         return "Cast Dispatch"
       end
     end
@@ -305,12 +305,12 @@ local function Stealth(ReturnSpellOnly)
   -- # 2 Fan the Hammer Crackshot builds can consume Opportunity in stealth with max stacks, Broadside, and low CPs, or with Greenskins active
   -- actions.stealth+=/pistol_shot,if=talent.crackshot&talent.fan_the_hammer.rank>=2&buff.opportunity.stack>=6
   -- &(buff.broadside.up&combo_points<=1|buff.greenskins_wickers.up)
-  if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and S.Crackshot:IsAvailable() and S.FanTheHammer:TalentRank() >= 2 and Player:BuffStack(S.Opportunity) >= 6
+  if S.PistolShot:IsCastable() and S.Crackshot:IsAvailable() and S.FanTheHammer:TalentRank() >= 2 and Player:BuffStack(S.Opportunity) >= 6
     and (Player:BuffUp(S.Broadside) and ComboPoints <= 1 or Player:BuffUp(S.GreenskinsWickersBuff)) then
     if ReturnSpellOnly then
       return S.PistolShot
     else
-      if CastPooling(S.PistolShot) then
+      if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then
         return "Cast Pistol Shot"
       end
     end
@@ -328,11 +328,11 @@ local function Stealth(ReturnSpellOnly)
   end
 
   -- actions.stealth+=/ambush,if=talent.hidden_opportunity
-  if S.Ambush:IsCastable() and Target:IsSpellInRange(S.Ambush) and S.HiddenOpportunity:IsAvailable() then
+  if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() then
     if ReturnSpellOnly then
       return S.Ambush
     else
-      if CastPooling(S.Ambush) then
+      if CastPooling(S.Ambush, nil, not Target:IsSpellInRange(S.Ambush)) then
         return "Cast Ambush"
       end
     end
@@ -344,13 +344,13 @@ local function Finish(ReturnSpellOnly)
   -- actions.finish=between_the_eyes,if=!talent.crackshot
   -- &(buff.between_the_eyes.remains<4|talent.improved_between_the_eyes|talent.greenskins_wickers)
   -- &!buff.greenskins_wickers.up
-  if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and not S.Crackshot:IsAvailable()
+  if S.BetweentheEyes:IsCastable() and not S.Crackshot:IsAvailable()
     and (Player:BuffRemains(S.BetweentheEyes) < 4 or S.ImprovedBetweenTheEyes:IsAvailable() or S.GreenskinsWickers:IsAvailable())
     and Player:BuffDown(S.GreenskinsWickers) then
     if ReturnSpellOnly then
       return S.BetweentheEyes
     else
-      if CastPooling(S.BetweentheEyes) then
+      if CastPooling(S.BetweentheEyes, nil, not Target:IsSpellInRange(S.BetweentheEyes)) then
         return "Cast Between the Eyes"
       end
     end
@@ -361,11 +361,11 @@ local function Finish(ReturnSpellOnly)
   -- actions.finish+=/between_the_eyes,if=talent.crackshot&(cooldown.vanish.remains>45|talent.underhanded_upper_hand
   -- &talent.without_a_trace&(buff.adrenaline_rush.remains>12|buff.adrenaline_rush.down&cooldown.adrenaline_rush.remains>45))
   -- &(raid_event.adds.remains>8|raid_event.adds.in<raid_event.adds.remains|!raid_event.adds.up)
-  if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and Settings.Outlaw.UseBtEOutsideOfStealth then
+  if S.BetweentheEyes:IsCastable() and Settings.Outlaw.UseBtEOutsideOfStealth then
     if S.Crackshot:IsAvailable() and (S.Vanish:CooldownRemains() > 45 or S.UnderhandedUpperhand:IsAvailable()
       and S.WithoutATrace:IsAvailable() and (Player:BuffRemains(S.AdrenalineRush) > 12 or Player:BuffDown(S.AdrenalineRush)
       and S.AdrenalineRush:CooldownRemains() > 45)) and (HL.FilteredFightRemains(EnemiesBF, ">", 30)) then
-      if CastPooling(S.BetweentheEyes) then
+      if CastPooling(S.BetweentheEyes, nil, not Target:IsSpellInRange(S.BetweentheEyes)) then
         return "Cast Between the Eyes"
       end
     end
@@ -378,35 +378,35 @@ local function Finish(ReturnSpellOnly)
     if ReturnSpellOnly then
       return S.SliceandDice
     else
-      if CastPooling(S.SliceandDice) then
+      if Cast(S.SliceandDice) then
         return "Cast Slice and Dice"
       end
     end
   end
 
-  if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Target:IsSpellInRange(S.Dispatch) then
+  if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) then
     if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
       return "Cast Cold Blood"
     end
   end
 
   -- actions.finish+=/coup_de_grace
-  if S.CoupDeGrace:IsCastable() and Target:IsSpellInRange(S.CoupDeGrace) then
+  if S.CoupDeGrace:IsCastable() then
     if ReturnSpellOnly then
       return S.CoupDeGrace
     else
-      if CastPooling(S.CoupDeGrace) then
+      if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
         return "Cast Coup de Grace"
       end
     end
   end
 
   -- actions.finish+=/dispatch
-  if S.Dispatch:IsCastable() and Target:IsSpellInRange(S.Dispatch) then
+  if S.Dispatch:IsCastable() then
     if ReturnSpellOnly then
       return S.Dispatch
     else
-      if CastPooling(S.Dispatch) then
+      if CastPooling(S.Dispatch, nil, not Target:IsSpellInRange(S.Dispatch)) then
         return "Cast Dispatch"
       end
     end
@@ -677,7 +677,7 @@ local function CDs ()
   end
 
   -- actions.finish+=/killing_spree,if=variable.finish_condition&!stealthed.all
-  if S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and Finish_Condition() and not Player:StealthUp(true, true) then
+  if S.KillingSpree:IsCastable() and Finish_Condition() and not Player:StealthUp(true, true) then
     if Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle, not Target:IsSpellInRange(S.KillingSpree), nil) then
       return "Cast Killing Spree"
     end
@@ -816,7 +816,7 @@ local function Build ()
   end
 
   -- actions.build+=/sinister_strike
-  if S.SinisterStrike:IsCastable() and Target:IsSpellInRange(S.SinisterStrike) then
+  if S.SinisterStrike:IsCastable() then
     if CastPooling(S.SinisterStrike, nil, not Target:IsSpellInRange(S.SinisterStrike)) then
       return "Cast Sinister Strike"
     end
@@ -906,7 +906,7 @@ local function APL ()
       end
       -- actions.precombat+=/slice_and_dice,precombat_seconds=1
       if S.SliceandDice:IsReady() and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints) * 1.8 then
-        if CastPooling(S.SliceandDice) then
+        if Cast(S.SliceandDice) then
           return "Cast Slice and Dice (Opener)"
         end
       end
