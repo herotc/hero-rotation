@@ -181,7 +181,7 @@ local function checkBuffWillLose(buff)
 end
 
 -- RtB rerolling strategy, return true if we should reroll
-local function RtB_Reroll()
+local function RtB_Reroll(ForceLoadedDice)
   if not Cache.APLVar.RtB_Reroll then
     -- 1+ Buff
     if Settings.Outlaw.RolltheBonesLogic == "1+ Buff" then
@@ -215,7 +215,7 @@ local function RtB_Reroll()
 
       -- # If Loaded Dice is talented, then keep any 1 buff from Roll the Bones but roll it into 2 buffs when Loaded Dice is active
       -- actions+=/variable,name=rtb_reroll,if=talent.loaded_dice,value=rtb_buffs.will_lose=buff.loaded_dice.up
-      Cache.APLVar.RtB_Reroll = S.LoadedDice:IsAvailable() and Cache.APLVar.RtB_Buffs.Will_Lose.Total == num(Player:BuffUp(S.LoadedDiceBuff))
+      Cache.APLVar.RtB_Reroll = S.LoadedDice:IsAvailable() and Cache.APLVar.RtB_Buffs.Will_Lose.Total == num(Player:BuffUp(S.LoadedDiceBuff) or ForceLoadedDice)
 
       -- # If all active Roll the Bones buffs are ahead of its container buff and have under 40s remaining,
       -- then reroll again with Loaded Dice active in an attempt to get even more buffs
@@ -223,7 +223,7 @@ local function RtB_Reroll()
       -- &rtb_buffs<6&rtb_buffs.max_remains<=39&!stealthed.all&buff.loaded_dice.up
       Cache.APLVar.RtB_Reroll = Cache.APLVar.RtB_Reroll and Cache.APLVar.RtB_Buffs.Longer == 0 or Cache.APLVar.RtB_Buffs.Normal == 0
         and Cache.APLVar.RtB_Buffs.Longer >= 1 and RtB_Buffs() <= 6 and Cache.APLVar.RtB_Buffs.MaxRemains <= 39
-        and not Player:StealthUp(true, true) and Player:BuffUp(S.LoadedDiceBuff)
+        and not Player:StealthUp(true, true) and (Player:BuffUp(S.LoadedDiceBuff) or ForceLoadedDice)
 
       -- # Avoid rerolls when we will not have time remaining on the fight or add wave to recoup the opportunity cost of the global
       -- actions+=/variable,name=rtb_reroll,op=reset,if=!(raid_event.adds.remains>12|raid_event.adds.up
@@ -443,28 +443,43 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
   elseif BaseSpell:ID() == S.AdrenalineRush:ID() then
     -- Force max CPs for check so we don't get builders
     EffectiveComboPoints = Player:ComboPointsMax()
-    -- Fetch Finisher if not in stealth (AR->Dispatch) or Stealth Ability if we are (AR->BtE)
-    -- Outside of stealth could be AR -> Vanish -> BtE so check for this first then fallback into normal finisher.
-    if not Player:StealthUp(true, true) then
-      local MacroAbilities = StealthCDs(true)
-      -- Make sure StealthCDs returned a combo which may not happen if targeting something out of range
-      if MacroAbilities and MacroAbilities[2] and MacroAbilities[2] ~= "Cast Vanish" and MacroAbilities[3] then
-        local ARMacroTable = { BaseSpell, unpack(MacroAbilities) }
-        ShouldReturn = CastQueue(unpack(ARMacroTable))
-        if ShouldReturn then
-          return "| " .. ARMacroTable[2]:Name() .. " | " .. ARMacroTable[3]:Name()
-        end
-      end
 
-      MacroAbility = Finish(true)
-    else
-      MacroAbility = Stealth(true)
-    end
-    if not Settings.Outlaw.SpellQueueMacro.ImprovedAdrenalineRush or not MacroAbility then
-      if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then
-        return "Cast Adrenaline Rush"
+    -- Check if we need to reroll after getting loaded Dice from using AR
+    -- Note: Not calling CD's here because the first condition is AR and will bring us back here, so instead of increasing
+    -- code complexity and putting in hacks to skip the AR condition, the RtB condition has been put here separately.
+    -- Use Roll the Bones if reroll conditions are met, or with no buffs, or seven seconds early if about to enter a Vanish window with Crackshot
+    -- actions.cds+=/roll_the_bones,if=variable.rtb_reroll|rtb_buffs=0
+    if S.RolltheBones:IsReady() then
+      if RtB_Reroll(true) or RtB_Buffs() == 0 then
+        MacroAbility = S.RolltheBones
       end
-      return false
+    end
+
+    -- If we don't need to reroll then we can check finishers
+    if not MacroAbility then
+      -- Fetch Finisher if not in stealth (AR->Dispatch) or Stealth Ability if we are (AR->BtE)
+      -- Outside of stealth could be AR -> Vanish -> BtE so check for this first then fallback into normal finisher.
+      if not Player:StealthUp(true, true) then
+        local MacroAbilities = StealthCDs(true)
+        -- Make sure StealthCDs returned a combo which may not happen if targeting something out of range
+        if MacroAbilities and MacroAbilities[2] and MacroAbilities[2] ~= "Cast Vanish" and MacroAbilities[3] then
+          local ARMacroTable = { BaseSpell, unpack(MacroAbilities) }
+          ShouldReturn = CastQueue(unpack(ARMacroTable))
+          if ShouldReturn then
+            return "| " .. ARMacroTable[2]:Name() .. " | " .. ARMacroTable[3]:Name()
+          end
+        end
+
+        MacroAbility = Finish(true)
+      else
+        MacroAbility = Stealth(true)
+      end
+      if not Settings.Outlaw.SpellQueueMacro.ImprovedAdrenalineRush or not MacroAbility then
+        if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then
+          return "Cast Adrenaline Rush"
+        end
+        return false
+      end
     end
   end
 
