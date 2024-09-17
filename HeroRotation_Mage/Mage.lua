@@ -52,6 +52,8 @@ Spell.Mage.Commons = {
   ArcaneIntellectBuff                   = Spell(1459),
   -- Debuffs
   -- Trinket Effects
+  EtherealPowerlinkBuff                 = Spell(449954), -- Buff from Treacherous Transmitter trinket
+  SpymastersReportBuff                  = Spell(451199), -- Buff from using Spymaster's Web trinket
   SpymastersWebBuff                     = Spell(444959), -- Buff from using Spymaster's Web trinket
   -- Pool
   Pool                                  = Spell(999910)
@@ -231,11 +233,13 @@ Item.Mage.Commons = {
   TimebreachingTalon                    = Item(193791, {13, 14}),
   -- TWW Trinkets
   AberrantSpellforge                    = Item(212451, {13, 14}),
+  ConcoctionKissofDeath                 = Item(215174, {13, 14}),
   FearbreakersEcho                      = Item(224449, {13, 14}),
   HighSpeakersAccretion                 = Item(219303, {13, 14}),
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
   MereldarsToll                         = Item(219313, {13, 14}),
+  QuickwickCandlestick                  = Item(225649, {13, 14}),
   SignetofthePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),

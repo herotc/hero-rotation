@@ -38,6 +38,7 @@ local I = Item.Mage.Arcane;
 local OnUseExcludes = {
   -- TWW Trinkets
   I.AberrantSpellforge:ID(),
+  I.ConcoctionKissofDeath:ID(),
   I.HighSpeakersAccretion:ID(),
   I.MadQueensMandate:ID(),
   I.MereldarsToll:ID(),
@@ -71,7 +72,9 @@ local CastAE
 local GCDMax
 
 --- ===== Trinket Variables =====
-local VarSteroidTrinketEquipped = Player:GladiatorsBadgeIsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped()
+local VarTreacherousTransmitterPrecombatCast = 11
+local VarSteroidTrinketEquipped = Player:GladiatorsBadgeIsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped()
+local VarTransmitterDoubleOnUse = (Player:GladiatorsBadgeIsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped()) and I.TreacherousTransmitter:IsEquipped()
 
 --- ===== Event Registrations =====
 HL:RegisterForEvent(function()
@@ -89,6 +92,7 @@ end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
   VarSteroidTrinketEquipped = Player:GladiatorsBadgeIsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped()
+  VarTransmitterDoubleOnUse = (Player:GladiatorsBadgeIsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped()) and I.TreacherousTransmitter:IsEquipped()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 --- ===== Rotation Functions =====
@@ -103,20 +107,30 @@ local function Precombat()
   -- variable,name=opener,op=set,value=1
   -- variable,name=sunfury_aoe_list,default=0,op=reset
   -- Note: Moved to variable declarations and Event Registrations to avoid potential nil errors.
-  -- variable,name=steroid_trinket_equipped,op=set,value=equipped.gladiators_badge|equipped.signet_of_the_priory|equipped.high_speakers_accretion|equipped.spymasters_web|equipped.treacherous_transmitter|equipped.imperfect_ascendancy_serum
+  -- variable,name=steroid_trinket_equipped,op=set,value=equipped.gladiators_badge|equipped.signet_of_the_priory|equipped.high_speakers_accretion|equipped.spymasters_web|equipped.treacherous_transmitter|equipped.imperfect_ascendancy_serum|equipped.quickwick_candlestick
+  -- variable,name=transmitter_double_on_use,op=set,value=(equipped.gladiators_badge|equipped.signet_of_the_priory|equipped.high_speakers_accretion|equipped.spymasters_web|equipped.imperfect_ascendancy_serum|equipped.quickwick_candlestick)&equipped.treacherous_transmitter
   -- Note: Moved to SetTrinketVariables().
   -- snapshot_stats
+  -- variable,name=treacherous_transmitter_precombat_cast,value=11
+  -- use_item,name=treacherous_transmitter,if=!(talent.splintering_sorcery&variable.transmitter_double_on_use)
+  if I.TreacherousTransmitter:IsEquippedAndReady() and (not (S.SplinteringSorcery:IsAvailable() and VarTransmitterDoubleOnUse)) then
+    if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter precombat 2"; end
+  end
   -- mirror_image
   if S.MirrorImage:IsCastable() and CDsON() and Settings.Arcane.MirrorImagesBeforePull then
-    if Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 2"; end
+    if Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 4"; end
   end
   -- arcane_blast,if=!talent.evocation
   if S.ArcaneBlast:IsReady() and (not S.Evocation:IsAvailable()) then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast precombat 4"; end
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast precombat 6"; end
+  end
+  -- use_item,name=imperfect_ascendancy_serum
+  if I.ImperfectAscendancySerum:IsEquippedAndReady() then
+    if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum precombat 8"; end
   end
   -- evocation,if=talent.evocation
   if S.Evocation:IsReady() then
-    if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation precombat 6"; end
+    if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation precombat 10"; end
   end
 end
 
@@ -314,9 +328,9 @@ local function Sunfury()
   if S.ArcaneOrb:IsReady() and (Player:ArcaneCharges() < 2 and Player:BuffDown(S.ArcaneSoulBuff) and (not S.HighVoltage:IsAvailable() or Player:BuffDown(S.ClearcastingBuff))) then
     if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb sunfury 8"; end
   end
-  -- arcane_barrage,if=((buff.glorious_incandescence.up|buff.intuition.react)&((time-action.arcane_blast.last_used<0.015&buff.nether_precision.stack=1)|(buff.nether_precision.down&buff.clearcasting.react=0)))|(buff.arcane_soul.up&((buff.clearcasting.react<3)|buff.arcane_soul.remains<gcd.max))|(buff.arcane_charge.stack=4&(cooldown.touch_of_the_magi.ready|(buff.burden_of_power.up&buff.nether_precision.up)))
+  -- arcane_barrage,if=(buff.arcane_charge.stack=4&(buff.burden_of_power.up|buff.glorious_incandescence.up|buff.intuition.react)&((time-action.arcane_blast.last_used<0.015&buff.nether_precision.stack=1)|(time-action.arcane_blast.last_used>0.015&buff.nether_precision.stack=2)|(buff.nether_precision.down&buff.clearcasting.react=0)))|(buff.arcane_soul.up&((buff.clearcasting.react<3)|buff.arcane_soul.remains<gcd.max))|(buff.arcane_charge.stack=4&cooldown.touch_of_the_magi.ready)
   -- Note: Using PrevGCDP instead of time-action.arcane_blast.last_used<0.015 to avoid icon flicker.
-  if S.ArcaneBarrage:IsCastable() and (((Player:BuffUp(S.GloriousIncandescenceBuff) or Player:BuffUp(S.IntuitionBuff)) and ((Player:PrevGCDP(1, S.ArcaneBlast) and Player:BuffStack(S.NetherPrecisionBuff) == 1) or (Player:BuffDown(S.NetherPrecisionBuff) and Player:BuffDown(S.ClearcastingBuff)))) or (Player:BuffUp(S.ArcaneSoulBuff) and ((Player:BuffStack(S.ClearcastingBuff) < 3) or Player:BuffRemains(S.ArcaneSoulBuff) < GCDMax)) or (Player:ArcaneCharges() == 4 and (S.TouchoftheMagi:CooldownUp() or (Player:BuffUp(S.BurdenofPowerBuff) and Player:BuffUp(S.NetherPrecisionBuff))))) then
+  if S.ArcaneBarrage:IsCastable() and ((Player:ArcaneCharges() == 4 and (Player:BuffUp(S.BurdenofPowerBuff) or Player:BuffUp(S.GloriousIncandescenceBuff) or Player:BuffUp(S.IntuitionBuff)) and ((Player:PrevGCDP(1, S.ArcaneBlast) and Player:BuffStack(S.NetherPrecisionBuff) == 1) or (HL.CombatTime() - S.ArcaneBlast:TimeSinceLastCast() > 0.015 and Player:BuffStack(S.NetherPrecisionBuff) == 2) or (Player:BuffDown(S.NetherPrecisionBuff) and Player:BuffDown(S.ClearcastingBuff)))) or (Player:BuffUp(S.ArcaneSoulBuff) and ((Player:BuffStack(S.ClearcastingBuff) < 3) or Player:BuffRemains(S.ArcaneSoulBuff) < GCDMax)) or (Player:ArcaneCharges() == 4 and S.TouchoftheMagi:CooldownUp())) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 10"; end
   end
   -- arcane_missiles,if=buff.clearcasting.react&((buff.nether_precision.down|(buff.clearcasting.react=3)|(talent.high_voltage&buff.arcane_charge.stack<3)|(buff.nether_precision.stack=1&time-action.arcane_blast.last_used<0.015))),interrupt_if=tick_time>gcd.remains&buff.aether_attunement.down,interrupt_immediate=1,interrupt_global=1,chain=1
@@ -379,8 +393,8 @@ local function APL()
     end
     -- counterspell
     local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.CommonsDS.DisplayStyle.Interrupts); if ShouldReturn then return ShouldReturn; end
-    -- potion,if=!equipped.spymasters_web&(buff.siphon_storm.up|(!talent.evocation&cooldown.arcane_surge.ready))|buff.spymasters_web.up
-    if Settings.Commons.Enabled.Potions and (not I.SpymastersWeb:IsEquipped() and (Player:BuffUp(S.SiphonStormBuff) or (not S.Evocation:IsAvailable() and S.ArcaneSurge:CooldownUp())) or Player:BuffDown(S.SpymastersWebBuff)) then
+    -- potion,if=!equipped.spymasters_web&(buff.siphon_storm.up|(!talent.evocation&cooldown.arcane_surge.ready))|equipped.spymasters_web&(buff.spymasters_web.up|(fight_remains>330&buff.siphon_storm.up))
+    if Settings.Commons.Enabled.Potions and (not I.SpymastersWeb:IsEquipped() and (Player:BuffUp(S.SiphonStormBuff) or (not S.Evocation:IsAvailable() and S.ArcaneSurge:CooldownUp())) or I.SpymastersWeb:IsEquipped() and (Player:BuffUp(S.SpymastersWebBuff) or (FightRemains > 330 and Player:BuffUp(S.SiphonStormBuff)))) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
         if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 2"; end
@@ -391,20 +405,20 @@ local function APL()
       if S.LightsJudgment:IsCastable() and (Player:BuffDown(S.ArcaneSurgeBuff) and Target:DebuffDown(S.TouchoftheMagiDebuff) and EnemiesCount8ySplash >= 2) then
         if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 4"; end
       end
-      if (Player:PrevGCDP(1, S.ArcaneSurge) and VarOpener) or ((Player:PrevGCDP(1, S.ArcaneSurge) and (FightRemains < 80 or Target:HealthPercentage() < 35 or not S.ArcaneBombardment:IsAvailable())) or (Player:PrevGCDP(1, S.ArcaneSurge) and not I.SpymastersWeb:IsEquipped())) then
-        -- berserking,if=(prev_gcd.1.arcane_surge&variable.opener)|((prev_gcd.1.arcane_surge&(fight_remains<80|target.health.pct<35|!talent.arcane_bombardment))|(prev_gcd.1.arcane_surge&!equipped.spymasters_web))
+      if (Player:PrevGCDP(1, S.ArcaneSurge) and VarOpener) or ((Player:PrevGCDP(1, S.ArcaneSurge) and (FightRemains < 80 or Target:HealthPercentage() < 35 or not S.ArcaneBombardment:IsAvailable() or Player:BuffUp(S.SpymastersWebBuff))) or (Player:PrevGCDP(1, S.ArcaneSurge) and not I.SpymastersWeb:IsEquipped())) then
+        -- berserking,if=(prev_gcd.1.arcane_surge&variable.opener)|((prev_gcd.1.arcane_surge&(fight_remains<80|target.health.pct<35|!talent.arcane_bombardment|buff.spymasters_web.up))|(prev_gcd.1.arcane_surge&!equipped.spymasters_web))
         if S.Berserking:IsCastable() then
           if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking main 6"; end
         end
-        -- blood_fury,if=(prev_gcd.1.arcane_surge&variable.opener)|((prev_gcd.1.arcane_surge&(fight_remains<80|target.health.pct<35|!talent.arcane_bombardment))|(prev_gcd.1.arcane_surge&!equipped.spymasters_web))
+        -- blood_fury,if=(prev_gcd.1.arcane_surge&variable.opener)|((prev_gcd.1.arcane_surge&(fight_remains<80|target.health.pct<35|!talent.arcane_bombardment|buff.spymasters_web.up))|(prev_gcd.1.arcane_surge&!equipped.spymasters_web))
         if S.BloodFury:IsCastable() then
           if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury main 8"; end
         end
-        -- fireblood,if=(prev_gcd.1.arcane_surge&variable.opener)|((prev_gcd.1.arcane_surge&(fight_remains<80|target.health.pct<35|!talent.arcane_bombardment))|(prev_gcd.1.arcane_surge&!equipped.spymasters_web))
+        -- fireblood,if=(prev_gcd.1.arcane_surge&variable.opener)|((prev_gcd.1.arcane_surge&(fight_remains<80|target.health.pct<35|!talent.arcane_bombardment|buff.spymasters_web.up))|(prev_gcd.1.arcane_surge&!equipped.spymasters_web))
         if S.Fireblood:IsCastable() then
           if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood main 10"; end
         end
-        -- ancestral_call,if=(prev_gcd.1.arcane_surge&variable.opener)|((prev_gcd.1.arcane_surge&(fight_remains<80|target.health.pct<35|!talent.arcane_bombardment))|(prev_gcd.1.arcane_surge&!equipped.spymasters_web))
+        -- ancestral_call,if=(prev_gcd.1.arcane_surge&variable.opener)|((prev_gcd.1.arcane_surge&(fight_remains<80|target.health.pct<35|!talent.arcane_bombardment|buff.spymasters_web.up))|(prev_gcd.1.arcane_surge&!equipped.spymasters_web))
         if S.AncestralCall:IsCastable() then
           if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call main 12"; end
         end
@@ -426,8 +440,8 @@ local function APL()
       end
     end
     if Settings.Commons.Enabled.Trinkets then
-      -- use_item,name=spymasters_web,if=(prev_gcd.1.arcane_surge|prev_gcd.1.evocation)&(fight_remains<80|target.health.pct<35|!talent.arcane_bombardment|(buff.spymasters_report.stack=40&fight_remains>240))|fight_remains<20
-      if I.SpymastersWeb:IsEquippedAndReady() and ((Player:PrevGCDP(1, S.ArcaneSurge) or Player:PrevGCDP(1, S.Evocation)) and (FightRemains < 80 or Target:HealthPercentage() < 35 or not S.ArcaneBombardment:IsAvailable() or (Player:BuffStack(S.SpymastersWebBuff) == 40 and FightRemains > 240)) or BossFightRemains < 20) then
+      -- use_item,name=spymasters_web,if=(prev_gcd.1.arcane_surge|prev_gcd.1.evocation|(buff.ethereal_powerlink.up&buff.siphon_storm.remains&talent.spellfire_spheres))&(fight_remains<80|target.health.pct<35|!talent.arcane_bombardment|(buff.spymasters_report.stack=40&fight_remains>240))|fight_remains<20
+      if I.SpymastersWeb:IsEquippedAndReady() and ((Player:PrevGCDP(1, S.ArcaneSurge) or Player:PrevGCDP(1, S.Evocation) or (Player:BuffUp(S.EtherealPowerlinkBuff) and Player:BuffUp(S.SiphonStormBuff) and S.SpellfireSpheres:IsAvailable())) and (FightRemains < 80 or Target:HealthPercentage() < 35 or not S.ArcaneBombardment:IsAvailable() or (Player:BuffStack(S.SpymastersWebBuff) == 40 and FightRemains > 240)) or BossFightRemains < 20) then
         if Cast(I.SpymastersWeb, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spymasters_web main 16"; end
       end
       -- use_item,name=high_speakers_accretion,if=(prev_gcd.1.arcane_surge|prev_gcd.1.evocation)|cooldown.evocation.remains<4|fight_remains<20
@@ -438,26 +452,30 @@ local function APL()
       if I.ImperfectAscendancySerum:IsEquippedAndReady() and (S.Evocation:CooldownUp() or S.ArcaneSurge:CooldownUp() or BossFightRemains < 20) then
         if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum main 20"; end
       end
-      -- use_item,name=treacherous_transmitter,if=buff.arcane_surge.remains>13|prev_gcd.1.evocation|cooldown.arcane_surge.remains<10|fight_remains<20
-      if I.TreacherousTransmitter:IsEquippedAndReady() and (Player:BuffRemains(S.ArcaneSurgeBuff) > 13 or Player:PrevGCDP(1, S.Evocation) or S.ArcaneSurge:CooldownRemains() < 10 or BossFightRemains < 20) then
+      -- use_item,name=treacherous_transmitter,if=talent.spellfire_spheres&(prev_gcd.1.evocation|((cooldown.evocation.remains<10+(7*(equipped.spymasters_web&(buff.spymasters_report.stack=40|target.health.pct<35))))&cooldown.evocation.remains))|(talent.splintering_sorcery&(buff.arcane_surge.remains>13|prev_gcd.1.evocation|cooldown.arcane_surge.remains<10))|fight_remains<20
+      if I.TreacherousTransmitter:IsEquippedAndReady() and (S.SpellfireSpheres:IsAvailable() and (Player:PrevGCDP(1, S.Evocation) or ((S.Evocation:CooldownRemains() < 10 + (7 * num(I.SpymastersWeb:IsEquipped() and (Player:BuffStack(S.SpymastersReportBuff) == 40 or Target:HealthPercentage() < 35)))) and S.Evocation:CooldownDown())) or (S.SplinteringSorcery:IsAvailable() and (Player:BuffRemains(S.ArcaneSurgeBuff) > 13 or Player:PrevGCDP(1, S.Evocation) or S.ArcaneSurge:CooldownRemains() < 10)) or BossFightRemains < 20) then
         if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter main 22"; end
       end
-      -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.arcane_surge.remains>13|fight_remains<20
+      -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.siphon_storm.remains>15|fight_remains<20|(cooldown.touch_of_the_magi.remains<8&equipped.spymasters_web&talent.spellfire_spheres)|(buff.arcane_surge.remains>13&talent.splintering_sorcery)
+      -- use_item,name=concoction_kiss_of_death,if=(prev_gcd.1.arcane_surge|prev_gcd.1.evocation)&(fight_remains<80|target.health.pct<35|!talent.arcane_bombardment|(!equipped.spymasters_web|buff.spymasters_report.stack=40&fight_remains>240))|fight_remains<20|time<2
+      if I.ConcoctionKissofDeath:IsEquippedAndReady() and ((Player:PrevGCDP(1, S.ArcaneSurge) or Player:PrevGCDP(1, S.Evocation)) and (FightRemains < 80 or Target:HealthPercentage() < 35 or not S.ArcaneBombardment:IsAvailable() or (not I.SpymastersWeb:IsEquipped() or Player:BuffStack(S.SpymastersReportBuff) == 40 and FightRemains > 240)) or BossFightRemains < 20 or HL.CombatTime() < 2) then
+        if Cast(I.ConcoctionKissofDeath, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "concoction_kiss_of_death main 24"; end
+      end
       -- use_item,name=aberrant_spellforge,if=!variable.steroid_trinket_equipped|buff.siphon_storm.down|(equipped.spymasters_web&target.health.pct>35)
       if I.AberrantSpellforge:IsEquippedAndReady() and (not VarSteroidTrinketEquipped or Player:BuffDown(S.SiphonStormBuff) or (I.SpymastersWeb:IsEquipped() and Target:HealthPercentage() > 35)) then
-        if Cast(I.AberrantSpellforge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "aberrant_spellforge main 24"; end
+        if Cast(I.AberrantSpellforge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "aberrant_spellforge main 26"; end
       end
       -- use_item,name=mad_queens_mandate,if=!variable.steroid_trinket_equipped|buff.siphon_storm.down
       if I.MadQueensMandate:IsEquippedAndReady() and (not VarSteroidTrinketEquipped or Player:BuffDown(S.SiphonStormBuff)) then
-        if Cast(I.MadQueensMandate, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.MadQueensMandate)) then return "mad_queens_mandate main 26"; end
+        if Cast(I.MadQueensMandate, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.MadQueensMandate)) then return "mad_queens_mandate main 28"; end
       end
       -- use_item,name=fearbreakers_echo,if=!variable.steroid_trinket_equipped|buff.siphon_storm.down
       if I.FearbreakersEcho:IsEquippedAndReady() and (not VarSteroidTrinketEquipped or Player:BuffDown(S.SiphonStormBuff)) then
-        if Cast(I.FearbreakersEcho, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.FearbreakersEcho)) then return "fearbreakers_echo main 28"; end
+        if Cast(I.FearbreakersEcho, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.FearbreakersEcho)) then return "fearbreakers_echo main 30"; end
       end
       -- use_item,name=mereldars_toll,if=!variable.steroid_trinket_equipped|buff.siphon_storm.down
       if I.MereldarsToll:IsEquippedAndReady() and (not VarSteroidTrinketEquipped or Player:BuffDown(S.SiphonStormBuff)) then
-        if Cast(I.MereldarsToll, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.MereldarsToll)) then return "mereldars_toll main 30"; end
+        if Cast(I.MereldarsToll, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.MereldarsToll)) then return "mereldars_toll main 32"; end
       end
     end
     -- variable,name=opener,op=set,if=debuff.touch_of_the_magi.up&variable.opener,value=0
@@ -467,7 +485,7 @@ local function APL()
     end
     -- arcane_barrage,if=fight_remains<2
     if S.ArcaneBarrage:IsReady() and (FightRemains < 2) then
-      if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage main 30"; end
+      if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage main 34"; end
     end
     -- call_action_list,name=cd_opener
     if CDsON() then
@@ -491,7 +509,7 @@ local function APL()
     end
     -- arcane_barrage
     if S.ArcaneBarrage:IsReady() then
-      if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage main 32"; end
+      if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage main 36"; end
     end
   end
 end
