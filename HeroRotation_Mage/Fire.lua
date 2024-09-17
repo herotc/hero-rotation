@@ -103,6 +103,7 @@ local Bolt = S.FrostfireBolt:IsAvailable() and S.FrostfireBolt or S.Fireball
 --- ===== Trinket Variables =====
 local Trinket1, Trinket2
 local VarCombustionOnUse
+local VarTreacherousTransmitterPrecombatCast
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
   Trinket1, Trinket2 = Player:GetTrinketItems()
@@ -118,6 +119,8 @@ local function SetTrinketVariables()
   end
 
   VarCombustionOnUse = I.ForgedGladiatorsBadge:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.CrimsonGladiatorsBadge:IsEquipped() or I.DraconicGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.MoonlitPrism:IsEquipped() or I.IrideusFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped()
+
+  VarTreacherousTransmitterPrecombatCast = 12
 end
 SetTrinketVariables()
 
@@ -240,28 +243,33 @@ local function Precombat()
   -- variable,name=combustion_cast_remains,default=0.3,op=reset
   -- variable,name=overpool_fire_blasts,default=0,op=reset
   -- variable,name=skb_duration,value=dbc.effect.1016075.base_value
+  -- variable,name=treacherous_transmitter_precombat_cast,value=12
+  -- use_item,name=treacherous_transmitter
+  if I.TreacherousTransmitter:IsEquippedAndReady() then
+    if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter precombat 4"; end
+  end
   -- variable,name=combustion_on_use,value=equipped.gladiators_badge|equipped.treacherous_transmitter|equipped.moonlit_prism|equipped.irideus_fragment|equipped.spoils_of_neltharus|equipped.timebreaching_talon|equipped.horn_of_valor
   -- variable,name=on_use_cutoff,value=20,if=variable.combustion_on_use
   -- Note: Moved to initial declarations and Event Registrations.
   -- snapshot_stats
   -- mirror_image
   if CDsON() and S.MirrorImage:IsCastable() and Settings.Fire.MirrorImagesBeforePull then
-    if Cast(S.MirrorImage, Settings.Fire.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 4"; end
+    if Cast(S.MirrorImage, Settings.Fire.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 6"; end
   end
   -- flamestrike,if=active_enemies>=variable.hot_streak_flamestrike
   -- Note: Can't calculate enemies in Precombat
   -- pyroblast
   if S.Pyroblast:IsReady() and not Player:IsCasting(S.Pyroblast) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast precombat 6"; end
+    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast precombat 8"; end
   end
   -- phoenix_flames,if=time=0
   -- Note: From APL()
   if S.PhoenixFlames:IsCastable() then
-    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames precombat 8"; end
+    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames precombat 10"; end
   end
   -- Manually added: fireball
   if Bolt:IsReady() then
-    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball precombat 10"; end
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball precombat 12"; end
   end
 end
 
