@@ -297,6 +297,8 @@ Item.Druid.Commons = {
   WitherbarksBranch                     = Item(109999, {13, 14}),
   VerdantBadge                          = Item(209343, {13, 14}),
   -- TWW Trinkets
+  ConcoctionKissofDeath                 = Item(215174, {13, 14}),
+  ImperfectAscendancySerum              = Item(225654, {13, 14}),
   OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
   -- Other On-Use Items
   Djaruun                               = Item(202569, {16}),
