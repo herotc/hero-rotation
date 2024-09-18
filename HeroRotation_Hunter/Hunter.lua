@@ -231,7 +231,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Survival, Spell.Hunter.Sent
 -- Items
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Commons = {
-  -- Trinkets
+  -- DF Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   BeacontotheBeyond                     = Item(203963, {13, 14}),
   DMDDance                              = Item(198088, {13, 14}),
@@ -248,6 +248,8 @@ Item.Hunter.Commons = {
   MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
   StormeatersBoon                       = Item(194302, {13, 14}),
   WindscarWhetstone                     = Item(137486, {13, 14}),
+  -- TWW Trinkets
+  ImperfectAscendancySerum              = Item(225654, {13, 14}),
 }
 
 Item.Hunter.BeastMastery = MergeTableByKey(Item.Hunter.Commons, {

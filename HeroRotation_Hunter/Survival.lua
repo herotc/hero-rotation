@@ -104,6 +104,10 @@ local function Precombat()
   -- food
   -- summon_pet
   -- Moved to Pet Management section in APL()
+  -- use_item,name=imperfect_ascendancy_serum
+  if I.ImperfectAscendancySerum:IsEquippedAndReady() then
+    if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum precombat 2"; end
+  end
   -- snapshot_stats
   -- Manually added: harpoon
   if S.Harpoon:IsCastable() and (Player:BuffDown(S.AspectoftheEagle) or not Target:IsInRange(30)) then
@@ -211,8 +215,8 @@ local function PLST()
   if S.KillShot:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff) or S.SicEm:IsAvailable()) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot plst 14"; end
   end
-  -- flanking_strike,if=buff.tip_of_the_spear.stack=2|buff.tip_of_the_spear.stack=1
-  if S.FlankingStrike:IsCastable() and (Player:BuffStack(S.TipoftheSpearBuff) == 2 or Player:BuffStack(S.TipoftheSpearBuff) == 1) then
+  -- flanking_strike
+  if S.FlankingStrike:IsCastable() then
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike plst 16"; end
   end
   -- explosive_shot,if=(talent.spearhead&(!talent.symbiotic_adrenaline&(buff.tip_of_the_spear.stack>0|buff.bombardier.remains)&cooldown.spearhead.remains>20|cooldown.spearhead.remains<2))|((talent.symbiotic_adrenaline|!talent.spearhead)&(buff.tip_of_the_spear.stack>0|buff.bombardier.remains)&cooldown.coordinated_assault.remains>20|cooldown.coordinated_assault.remains<2)
@@ -321,6 +325,10 @@ local function PLCleave()
 end
 
 local function SentST()
+  -- wildfire_bomb,if=!cooldown.lunar_storm.remains
+  if S.WildfireBomb:IsReady() and (S.LunarStorm:CooldownUp()) then
+    if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb sentst 1"; end
+  end
   -- kill_command,target_if=min:bloodseeker.remains,if=(buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1)
   if S.KillCommand:IsCastable() and (Player:BuffUp(S.RelentlessPrimalFerocityBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command sentst 2"; end
@@ -341,8 +349,8 @@ local function SentST()
   if S.FlankingStrike:IsReady() and (Player:BuffStack(S.TipoftheSpearBuff) == 2 or Player:BuffStack(S.TipoftheSpearBuff) == 1) then
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike sentst 10"; end
   end
-  -- wildfire_bomb,if=buff.tip_of_the_spear.stack>0&cooldown.wildfire_bomb.charges_fractional>1.7|cooldown.wildfire_bomb.charges_fractional>1.9|cooldown.coordinated_assault.remains<2*gcd|!cooldown.lunar_storm.remains
-  if S.WildfireBomb:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff) and S.WildfireBomb:ChargesFractional() > 1.7 or S.WildfireBomb:ChargesFractional() > 1.9 or S.CoordinatedAssault:CooldownRemains() < 2 * Player:GCD() or S.LunarStorm:CooldownUp()) then
+  -- wildfire_bomb,if=(cooldown.lunar_storm.remains>full_recharge_time-gcd)&(buff.tip_of_the_spear.stack>0&cooldown.wildfire_bomb.charges_fractional>1.7|cooldown.wildfire_bomb.charges_fractional>1.9)|cooldown.coordinated_assault.remains<2*gcd
+  if S.WildfireBomb:IsReady() and ((S.LunarStorm:CooldownRemains() > S.WildfireBomb:FullRechargeTime() - Player:GCD()) and (Player:BuffUp(S.TipoftheSpearBuff) and S.WildfireBomb:ChargesFractional() > 1.7 or S.WildfireBomb:ChargesFractional() > 1.9) or S.CoordinatedAssault:CooldownRemains() < 2 * Player:GCD()) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb sentst 12"; end
   end
   -- coordinated_assault,if=!talent.bombardier|talent.bombardier&cooldown.wildfire_bomb.charges_fractional<1
@@ -353,20 +361,28 @@ local function SentST()
   if S.ExplosiveShot:IsReady() and ((S.Spearhead:IsAvailable() and (not S.SymbioticAdrenaline:IsAvailable() and (Player:BuffUp(S.TipoftheSpearBuff) or Player:BuffUp(S.BombardierBuff)) and S.Spearhead:CooldownRemains() > 20 or S.Spearhead:CooldownRemains() < 2)) or ((S.SymbioticAdrenaline:IsAvailable() or not S.Spearhead:IsAvailable()) and (Player:BuffUp(S.TipoftheSpearBuff) or Player:BuffUp(S.BombardierBuff)) and S.CoordinatedAssault:CooldownRemains() > 20 or S.CoordinatedAssault:CooldownRemains() < 2)) then
     if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot sentst 16"; end
   end
+  -- fury_of_the_eagle,if=buff.tip_of_the_spear.stack>0&talent.ruthless_marauder
+  if S.FuryoftheEagle:IsCastable() and (Player:BuffUp(S.TipoftheSpearBuff) and S.RuthlessMarauder:IsAvailable()) then
+    if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.FuryOfTheEagle, not Target:IsInMeleeRange(5)) then return "fury_of_the_eagle sentst 17"; end
+  end
   -- kill_shot,if=buff.tip_of_the_spear.stack>0|talent.sic_em
   if S.KillShot:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff) or S.SicEm:IsAvailable()) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot sentst 18"; end
+  end
+  -- kill_command,target_if=min:bloodseeker.remains,if=buff.tip_of_the_spear.stack<1&cooldown.flanking_strike.remains<gcd
+  if S.KillCommand:IsReady() and (Player:BuffDown(S.TipoftheSpearBuff) and S.FlankingStrike:CooldownRemains() < Player:GCD()) then
+    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command sentst 19"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&(!buff.relentless_primal_ferocity.up||(buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<2))
   if S.KillCommand:IsReady() and (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and (Player:BuffDown(S.RelentlessPrimalFerocityBuff) or (Player:BuffUp(S.RelentlessPrimalFerocityBuff) and Player:BuffStack(S.TipoftheSpearBuff) < 2))) then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command sentst 20"; end
   end
-  -- wildfire_bomb,if=buff.tip_of_the_spear.stack>0&cooldown.lunar_storm.remains>full_recharge_time-gcd
-  if S.WildfireBomb:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff) and S.LunarStorm:CooldownRemains() > S.WildfireBomb:FullRechargeTime() - Player:GCD()) then
+  -- wildfire_bomb,if=buff.tip_of_the_spear.stack>0&cooldown.lunar_storm.remains>full_recharge_time&(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.in>15)
+  if S.WildfireBomb:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff) and S.LunarStorm:CooldownRemains() > S.WildfireBomb:FullRechargeTime()) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb sentst 22"; end
   end
-  -- fury_of_the_eagle,interrupt=1,if=(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.in>40)
-  if S.FuryoftheEagle:IsCastable() then
+  -- fury_of_the_eagle,if=buff.tip_of_the_spear.stack>0
+  if S.FuryoftheEagle:IsCastable() and (Player:BuffUp(S.TipoftheSpearBuff)) then
     if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.FuryOfTheEagle, not Target:IsInMeleeRange(5)) then return "fury_of_the_eagle sentst 24"; end
   end
   -- butchery,if=active_enemies>1&(talent.merciless_blows&buff.merciless_blows.down|!talent.merciless_blows)
