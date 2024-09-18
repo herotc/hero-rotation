@@ -174,6 +174,9 @@ function Commons.GroupBuffMissing(spell)
         if Char:BuffUp(Spell(BotBBuffIDs[CharClass]), true) then
           BuffedChars = BuffedChars + 1
         end
+      elseif Player:IsInDelve() and Char:Name() == "Brann Bronzebeard" then
+        -- If in a Delve with Brann, remove him from the total count.
+        TotalChars = TotalChars - 1
       elseif Char:BuffDown(spell, true) then
         return true
       end
