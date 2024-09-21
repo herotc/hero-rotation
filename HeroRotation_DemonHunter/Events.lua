@@ -45,12 +45,33 @@ HL:RegisterForSelfCombatEvent(
         Surge.ConsumingFire = true
         Surge.FelDesolation = true
         Surge.SigilofDoom = true
+        Surge.SoulSunder = true
+        Surge.SpiritBurst = true
       elseif SpellID == SpellVDH.ConsumingFire:ID() then
         Surge.ConsumingFire = false
       elseif SpellID == SpellVDH.FelDesolation:ID() then
         Surge.FelDesolation = false
       elseif SpellID == SpellVDH.SigilofDoom:ID() then
         Surge.SigilofDoom = false
+      elseif SpellID == SpellVDH.SoulSunder:ID() then
+        Surge.SoulSunder = false
+      elseif SpellID == SpellVDH.SpiritBurst:ID() then
+        Surge.SpiritBurst = false
+      end
+    end
+  end
+, "SPELL_CAST_SUCCESS")
+
+
+-- When we cast Fel Devastation, set SoulSunder and SpiritBurst buffs to active.
+-- Note (Jom): I don't think this is strictly necessary, but thought it might be a good idea for consistency.
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local SpellID = select(12, ...)
+    if Player:HeroTreeID() == 34 then
+      if SpellID == SpellVDH.FelDevastation:ID() then
+        Surge.SoulSunder = true
+        Surge.SpiritBurst = true
       elseif SpellID == SpellVDH.SoulSunder:ID() then
         Surge.SoulSunder = false
       elseif SpellID == SpellVDH.SpiritBurst:ID() then
@@ -98,7 +119,7 @@ HL:RegisterForSelfCombatEvent(
     local SpellID = select(12, ...)
     local IncAmt = 0
     if SpellID == SpellVDH.Fracture:ID() or SpellID == SpellVDH.Shear:ID() then
-      IncAmt = 2
+      IncAmt = Player:BuffUp(SpellVDH.MetamorphosisBuff) and 3 or 2
     elseif SpellID == SpellVDH.SoulCarver:ID() then
       IncAmt = 3
       C_Timer.After(1, function() Soul.IncomingSouls = Soul.IncomingSouls + 1; end)

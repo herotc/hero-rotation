@@ -161,8 +161,10 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   -- Talents
   AscendingFlame                        = Spell(428603),
   BulkExtraction                        = Spell(320341),
+  CycleofBinding                        = Spell(389718),
   DarkglareBoon                         = Spell(389708),
   DowninFlames                          = Spell(389732),
+  Fallout                               = Spell(227174),
   FelDevastation                        = Spell(212084),
   FieryBrand                            = Spell(204021),
   FieryDemise                           = Spell(389220),
