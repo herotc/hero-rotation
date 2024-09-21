@@ -477,8 +477,8 @@ local function AoeBuilder()
   if S.ThrashCat:IsReady() and (Target:DebuffRefreshable(S.ThrashCatDebuff) and not S.ThrashingClaws:IsAvailable() and not (VarNeedBT and BTBuffUp(S.ThrashCat))) then
     if Cast(S.ThrashCat, nil, nil, not IsInAoERange) then return "thrash aoe_builder 2"; end
   end
-  -- brutal_slash,target_if=min:time_to_die,if=(cooldown.brutal_slash.full_recharge_time<4|time_to_die<4|raid_event.adds.remains<4)&!(variable.need_bt&buff.bt_swipe.up)
-  if S.BrutalSlash:IsReady() and ((S.BrutalSlash:FullRechargeTime() < 4 or FightRemains < 4) and not (VarNeedBT and BTBuffUp(S.Swipe))) then
+  -- brutal_slash,target_if=min:time_to_die,if=(cooldown.brutal_slash.full_recharge_time<4|time_to_die<4|raid_event.adds.remains<4|(buff.bs_inc.up&spell_targets>=3-hero_tree.druid_of_the_claw))&!(variable.need_bt&buff.bt_swipe.up&(buff.bs_inc.down|spell_targets<3-hero_tree.druid_of_the_claw))
+  if S.BrutalSlash:IsReady() and ((S.BrutalSlash:FullRechargeTime() < 4 or FightRemains < 4 or (Player:BuffUp(BsInc) and EnemiesCount8y >= 3 - num(Player:HeroTreeID() == 21))) and not (VarNeedBT and BTBuffUp(S.Swipe) and (Player:BuffDown(BsInc) or EnemiesCount8y < 3 - num(Player:HeroTreeID() == 21)))) then
     if Everyone.CastTargetIf(S.BrutalSlash, Enemies8y, "min", EvaluateTargetIfFilterTTD, nil, not IsInAoERange) then return "brutal_slash aoe_builder 4"; end
   end
   -- swipe_cat,if=time_to_die<4|(talent.wild_slashes&spell_targets.swipe_cat>4&!(variable.need_bt&buff.bt_swipe.up))
@@ -554,9 +554,21 @@ local function AoeBuilder()
 end
 
 local function Cooldown()
-  -- use_item,name=imperfect_ascendancy_serum,if=cooldown.bs_inc.remains<=1
-  if Settings.Commons.Enabled.Trinkets and I.ImperfectAscendancySerum:IsEquippedAndReady() and (BsInc:CooldownRemains() <= 1) then
-    if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum cooldown 2"; end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,name=imperfect_ascendancy_serum,if=cooldown.bs_inc.remains<=1
+    if I.ImperfectAscendancySerum:IsEquippedAndReady() and (BsInc:CooldownRemains() <= 1) then
+      if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum cooldown 2"; end
+    end
+    -- use_item,slot=trinket1,if=(trinket.1.has_use_damage|trinket.1.is.twin_fang_instruments|trinket.1.is.sikrans_endless_arsenal)&(trinket.2.cooldown.remains>20|!variable.trinket_2_buffs|trinket.2.cooldown.remains&cooldown.tigers_fury.remains>20)
+    -- TODO: Handle has_use_damage. Until then, using HasUseBuff logic.
+    if Trinket1:IsReady() and not VarTrinket1BL and ((Trinket1:HasUseBuff() or VarTrinket1ID == I.TwinFangInstruments:ID() or VarTrinket1ID == I.SikransEndlessArsenal:ID()) and (Trinket2:CooldownRemains() > 20 or not VarTrinket2Buffs or Trinket2:CooldownDown() and S.TigersFury:CooldownRemains() > 20)) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for "..Trinket1:Name().." cooldown 20"; end
+    end
+    -- use_item,slot=trinket2,if=(trinket.2.has_use_damage|trinket.2.is.twin_fang_instruments|trinket.2.is.sikrans_endless_arsenal)&(trinket.1.cooldown.remains>20|!variable.trinket_1_buffs|trinket.1.cooldown.remains&cooldown.tigers_fury.remains>20)
+    -- TODO: Handle has_use_damage. Until then, using HasUseBuff logic.
+    if Trinket2:IsReady() and not VarTrinket2BL and ((Trinket2:HasUseBuff() or VarTrinket2ID == I.TwinFangInstruments:ID() or VarTrinket2ID == I.SikransEndlessArsenal:ID()) and (Trinket1:CooldownRemains() > 20 or not VarTrinket1Buffs or Trinket1:CooldownDown() and S.TigersFury:CooldownRemains() > 20)) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for "..Trinket2:Name().." cooldown 22"; end
+    end
   end
   -- incarnation,if=target.time_to_die>17|target.time_to_die=fight_remains
   if S.Incarnation:IsReady() and (Target:TimeToDie() > 17 or Target:TimeToDie() == FightRemains) then
@@ -585,10 +597,6 @@ local function Cooldown()
     end
   end
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=concoction_kiss_of_death,if=buff.bs_inc.up
-    if I.ConcoctionKissofDeath:IsEquippedAndReady() and (Player:BuffUp(BsInc)) then
-      if Cast(I.ConcoctionKissofDeath, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "concoction_kiss_of_death cooldown 14"; end
-    end
     -- use_item,slot=trinket1,if=variable.trinket_1_buffs&(buff.bs_inc.up|((buff.tigers_fury.up&cooldown.tigers_fury.remains>20)&(cooldown.convoke_the_spirits.remains<4|cooldown.convoke_the_spirits.remains>45|(variable.trinket_2_buffs&cooldown.convoke_the_spirits.remains-trinket.2.cooldown.remains>0)|!talent.convoke_the_spirits&(cooldown.bs_inc.remains>40|cooldown.bs_inc.remains-trinket.2.cooldown.remains>0))))&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
     if Trinket1:IsReady() and not VarTrinket1BL and (VarTrinket1Buffs and (Player:BuffUp(BsInc) or ((Player:BuffUp(S.TigersFury) and S.TigersFury:CooldownRemains() > 20) and (S.ConvoketheSpirits:CooldownRemains() < 4 or S.ConvoketheSpirits:CooldownRemains() > 45 or (VarTrinket2Buffs and S.ConvoketheSpirits:CooldownRemains() - Trinket2:CooldownRemains() > 0) or not S.ConvoketheSpirits:IsAvailable() and (BsInc:CooldownRemains() > 40 or BsInc:CooldownRemains() - Trinket2:CooldownRemains() > 0)))) and (not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or VarTrinket1Duration >= FightRemains) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for "..Trinket1:Name().." cooldown 16"; end
@@ -596,14 +604,6 @@ local function Cooldown()
     -- use_item,slot=trinket2,if=variable.trinket_2_buffs&(buff.bs_inc.up|((buff.tigers_fury.up&cooldown.tigers_fury.remains>20)&(cooldown.convoke_the_spirits.remains<4|cooldown.convoke_the_spirits.remains>45|(variable.trinket_1_buffs&cooldown.convoke_the_spirits.remains-trinket.1.cooldown.remains>0)|!talent.convoke_the_spirits&(cooldown.bs_inc.remains>40|cooldown.bs_inc.remains-trinket.1.cooldown.remains>0))))&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
     if Trinket2:IsReady() and not VarTrinket2BL and (VarTrinket2Buffs and (Player:BuffUp(BsInc) or ((Player:BuffUp(S.TigersFury) and S.TigersFury:CooldownRemains() > 20) and (S.ConvoketheSpirits:CooldownRemains() < 4 or S.ConvoketheSpirits:CooldownRemains() > 45 or (VarTrinket1Buffs and S.ConvoketheSpirits:CooldownRemains() - Trinket1:CooldownRemains() > 0) or not S.ConvoketheSpirits:IsAvailable() and (BsInc:CooldownRemains() > 40 or BsInc:CooldownRemains() - Trinket1:CooldownRemains() > 0)))) and (not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or VarTrinket2Duration >= FightRemains) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for "..Trinket2:Name().." cooldown 18"; end
-    end
-    -- use_item,slot=trinket1,if=!trinket.2.has_use_buff&(trinket.2.cooldown.remains>20|!variable.trinket_2_buffs|trinket.2.cooldown.remains&cooldown.tigers_fury.remains>20)
-    if Trinket1:IsReady() and not VarTrinket1BL and (not Trinket2:HasUseBuff() and (Trinket2:CooldownRemains() > 20 or not VarTrinket2Buffs or Trinket2:CooldownDown() and S.TigersFury:CooldownRemains() > 20)) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for "..Trinket1:Name().." cooldown 20"; end
-    end
-    -- use_item,slot=trinket2,if=!trinket.2.has_use_buff&(trinket.1.cooldown.remains>20|!variable.trinket_1_buffs|trinket.1.cooldown.remains&cooldown.tigers_fury.remains>20)
-    if Trinket2:IsReady() and not VarTrinket2BL and (not Trinket1:HasUseBuff() and (Trinket1:CooldownRemains() > 20 or not VarTrinket1Buffs or Trinket1:CooldownDown() and S.TigersFury:CooldownRemains() > 20)) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for "..Trinket2:Name().." cooldown 22"; end
     end
     -- do_treacherous_transmitter_task,if=buff.tigers_fury.up|fight_remains<22
   end
@@ -747,8 +747,8 @@ local function APL()
     if CDsON() and Target:DebuffUp(S.RipDebuff) then
       local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
     end
-    -- rip,if=spell_targets=1&hero_tree.wildstalker&!(talent.raging_fury&talent.veinripper)&(buff.bloodtalons.up|!talent.bloodtalons)&(dot.rip.pmultiplier<persistent_multiplier&buff.tigers_fury.remains>10&combo_points>=3|((buff.tigers_fury.remains<3&combo_points=5)|buff.tigers_fury.remains<=1)&buff.tigers_fury.up&combo_points>=3&remains<cooldown.tigers_fury.remains)
-    if S.Rip:IsReady() and (EnemiesCountMelee == 1 and Player:HeroTreeID() == 22 and not (S.RagingFury:IsAvailable() and S.Veinripper:IsAvailable()) and (Player:BuffUp(S.BloodtalonsBuff) or not S.Bloodtalons:IsAvailable()) and (Target:PMultiplier(S.Rip) < Player:PMultiplier(S.Rip) and Player:BuffRemains(S.TigersFury) > 10 and ComboPoints >= 3 or ((Player:BuffRemains(S.TigersFury) < 3 and ComboPoints == 5) or Player:BuffRemains(S.TigersFury) <= 1) and Player:BuffUp(S.TigersFury) and ComboPoints >= 3 and Target:DebuffRemains(S.RipDebuff) < S.TigersFury:CooldownRemains())) then
+    -- rip,if=spell_targets=1&hero_tree.wildstalker&!(talent.raging_fury&talent.veinripper)&(buff.bloodtalons.up|!talent.bloodtalons)&(dot.rip.remains<5&buff.tigers_fury.remains>10&combo_points>=3|((buff.tigers_fury.remains<3&combo_points=5)|buff.tigers_fury.remains<=1)&buff.tigers_fury.up&combo_points>=3&remains<cooldown.tigers_fury.remains)
+    if S.Rip:IsReady() and (EnemiesCountMelee == 1 and Player:HeroTreeID() == 22 and not (S.RagingFury:IsAvailable() and S.Veinripper:IsAvailable()) and (Player:BuffUp(S.BloodtalonsBuff) or not S.Bloodtalons:IsAvailable()) and (Target:DebuffRemains(S.RipDebuff) < 5 and Player:BuffRemains(S.TigersFury) > 10 and ComboPoints >= 3 or ((Player:BuffRemains(S.TigersFury) < 3 and ComboPoints == 5) or Player:BuffRemains(S.TigersFury) <= 1) and Player:BuffUp(S.TigersFury) and ComboPoints >= 3 and Target:DebuffRemains(S.RipDebuff) < S.TigersFury:CooldownRemains())) then
       if Cast(S.Rip, nil, nil, not IsInMeleeRange) then return "rip main 20"; end
     end
     -- call_action_list,name=finisher,if=combo_points=5
