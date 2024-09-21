@@ -62,25 +62,6 @@ HL:RegisterForSelfCombatEvent(
   end
 , "SPELL_CAST_SUCCESS")
 
-
--- When we cast Fel Devastation, set SoulSunder and SpiritBurst buffs to active.
--- Note (Jom): I don't think this is strictly necessary, but thought it might be a good idea for consistency.
-HL:RegisterForSelfCombatEvent(
-  function(...)
-    local SpellID = select(12, ...)
-    if Player:HeroTreeID() == 34 then
-      if SpellID == SpellVDH.FelDevastation:ID() then
-        Surge.SoulSunder = true
-        Surge.SpiritBurst = true
-      elseif SpellID == SpellVDH.SoulSunder:ID() then
-        Surge.SoulSunder = false
-      elseif SpellID == SpellVDH.SpiritBurst:ID() then
-        Surge.SpiritBurst = false
-      end
-    end
-  end
-, "SPELL_CAST_SUCCESS")
-
 -- Watch for the Meta aura.
 -- SpiritBurst and SoulSunder are both buffed on hardcast Meta and Demonic Meta.
 HL:RegisterForSelfCombatEvent(
