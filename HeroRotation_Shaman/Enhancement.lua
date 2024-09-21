@@ -27,6 +27,8 @@ local GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local mathmax    = math.max
 local mathmin    = math.min
 local strmatch   = string.match
+-- WoW API
+local Delay      = C_Timer.After
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
