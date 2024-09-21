@@ -64,6 +64,7 @@ HL:RegisterForSelfCombatEvent(
 
 
 -- When we cast Fel Devastation, set SoulSunder and SpiritBurst buffs to active.
+-- Note (Jom): I don't think this is strictly necessary, but thought it might be a good idea for consistency.
 HL:RegisterForSelfCombatEvent(
   function(...)
     local SpellID = select(12, ...)
