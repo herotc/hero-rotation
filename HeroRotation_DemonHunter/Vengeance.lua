@@ -626,13 +626,9 @@ local function Metamorphosis()
   if S.Fracture:IsCastable() and (Player:Fury() < 50 and S.Felblade:CooldownDown() and (Player:BuffRemains(S.MetamorphosisBuff) < (Player:GCD() * 3)) and S.FelDesolation:CooldownUp()) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture metamorphosis 6"; end
   end
-  -- sigil_of_doom,if=buff.metamorphosis.remains>=29&talent.illuminated_sigils&talent.cycle_of_binding
-  -- note (Jom): Manually added this line to ensure that Sigil of Doom is recommended during the cooldown after Metamorphosis is cast when cycle of binding is talented. It's important that this is the first ability cast, and it was showing an incorrect "next up" suggestion that could result in a big loss if the wrong ability was spell queue'd.
-  if (Player:BuffRemains(S.MetamorphosisBuff) >= 29 and S.IlluminatedSigils:IsAvailable() and S.CycleofBinding:IsAvailable()) or (Player:PrevOffGCD(1, S.Metamorphosis)) then
-    if Cast(S.SigilofDoom, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_doom manual override metamorphosis 8"; end
-  end
   -- sigil_of_doom,if=talent.illuminated_sigils&talent.cycle_of_binding&charges=max_charges
-  if S.SigilofDoom:IsReady() and (S.IlluminatedSigils:IsAvailable() and S.CycleofBinding:IsAvailable() and S.SigilofDoom:Charges() >= S.SigilofDoom:MaxCharges()) then
+  -- Note: Using Charges check, as IsReady can return false due to very recent SigilofFlame usage.
+  if S.SigilofDoom:Charges() > 0 and (S.IlluminatedSigils:IsAvailable() and S.CycleofBinding:IsAvailable() and S.SigilofDoom:Charges() >= S.SigilofDoom:MaxCharges()) then
     if Cast(S.SigilofDoom, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_doom metamorphosis 8"; end
   end
   -- immolation_aura
