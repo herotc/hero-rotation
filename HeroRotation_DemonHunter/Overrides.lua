@@ -30,8 +30,24 @@ HavocOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
       return BaseCheck or (Player:BuffUp(SpellHavoc.Glide) and SpellHavoc.FelRush:Charges() >= 1)
     elseif self == SpellHavoc.VengefulRetreat then
       return BaseCheck or (Player:BuffUp(SpellHavoc.Glide) and SpellHavoc.VengefulRetreat:IsLearned() and SpellHavoc.VengefulRetreat:CooldownRemains() < 0.3)
+    elseif self == SpellHavoc.TheHunt then
+      return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
+    end
+  end
+, 577)
+
+HL.AddCoreOverride ("Player.Demonsurge",
+  function(self, Buff)
+    if Buff == "Hardcast" then
+      return SpellVengeance.FelDesolation:IsLearned()
+    else
+      if DH.Demonsurge[Buff] ~= nil then
+        return DH.Demonsurge[Buff]
+      else
+        return false
+      end
     end
   end
 , 577)

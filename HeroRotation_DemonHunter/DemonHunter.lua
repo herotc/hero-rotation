@@ -61,6 +61,7 @@ Spell.DemonHunter.Commons = {
 
 Spell.DemonHunter.AldrachiReaver = {
   -- Talents
+  ArtoftheGlaive                        = Spell(442290),
   FuryoftheAldrachi                     = Spell(442718),
   KeenEngagement                        = Spell(442497),
   ReaversGlaive                         = Spell(442294),
@@ -72,10 +73,12 @@ Spell.DemonHunter.AldrachiReaver = {
   ThrilloftheFightDmgBuff               = Spell(442688),
   -- Debuffs
   ReaversMarkDebuff                     = Spell(442624),
+  RendingStrikeBuff                     = Spell(442442),
 }
 
 Spell.DemonHunter.FelScarred = {
   -- Abilities
+  AbyssalGaze                           = Spell(452497),
   ConsumingFire                         = Spell(452487),
   FelDesolation                         = Spell(452486),
   SigilofDoom                           = Spell(452490),
@@ -85,6 +88,7 @@ Spell.DemonHunter.FelScarred = {
   Demonsurge                            = Spell(454402),
   -- Buffs
   ConsumingFireBuff                     = Spell(427912),
+  DemonsurgeBuff                        = Spell(452416),
   StudentofSufferingBuff                = Spell(453239),
   -- Debuffs
   SigilofDoomDebuff                     = Spell(462030),
@@ -134,6 +138,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   UnboundChaos                          = Spell(347461),
   -- Buffs
   ChaosTheoryBuff                       = Spell(390195),
+  FelBarrageBuff                        = Spell(258925),
   FuriousGazeBuff                       = Spell(343312),
   InertiaBuff                           = Spell(427641),
   InitiativeBuff                        = Spell(391215),
@@ -179,7 +184,6 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   -- Buffs
   DemonSpikesBuff                       = Spell(203819),
   MetamorphosisBuff                     = Spell(187827),
-  RendingStrikeBuff                     = Spell(442442),
   SoulFurnaceBuff                       = Spell(391166),
   SoulFurnaceDmgBuff                    = Spell(391172),
   -- Debuffs
@@ -191,6 +195,7 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Vengeance, Spell
 -- Items
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Commons = {
+  -- DF Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   BeacontotheBeyond                     = Item(203963, {13, 14}),
   DragonfireBombDispenser               = Item(202610, {13, 14}),
@@ -201,6 +206,10 @@ Item.DemonHunter.Commons = {
   ScreamingBlackDragonscale             = Item(202612, {13, 14}),
   StormEatersBoon                       = Item(194302, {13, 14}),
   WitherbarksBranch                     = Item(109999, {13, 14}),
+  -- TWW Trinkets
+  MadQueensMandate                      = Item(212454, {13, 14}),
+  SkardynsGrace                         = Item(133282, {13, 14}),
+  TreacherousTransmitter                = Item(221023, {13, 14}),
 }
 
 Item.DemonHunter.Vengeance = MergeTableByKey(Item.DemonHunter.Commons, {

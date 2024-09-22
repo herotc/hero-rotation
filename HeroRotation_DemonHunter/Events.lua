@@ -19,7 +19,7 @@ local select           = select
 HR.Commons.DemonHunter = {}
 local DemonHunter      = HR.Commons.DemonHunter
 local SpellVDH         = Spell.DemonHunter.Vengeance
-
+local SpellHavoc       = Spell.DemonHunter.Havoc
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
@@ -29,11 +29,17 @@ local SpellVDH         = Spell.DemonHunter.Vengeance
 --- ======= Demonsurge Tracker =====
 DemonHunter.Demonsurge = {}
 local Surge = DemonHunter.Demonsurge
+-- Commons
 Surge.ConsumingFire = false
-Surge.FelDesolation = false
 Surge.SigilofDoom = false
+-- Vengeance
+Surge.FelDesolation = false
 Surge.SoulSunder = false
 Surge.SpiritBurst = false
+-- Havoc
+Surge.AbyssalGaze = false
+Surge.Annihilation = false
+Surge.DeathSweep = false
 
 -- When we cast Meta, set Demonsurge buffs to active.
 -- Then remove the buffs when we use them.
@@ -41,35 +47,46 @@ HL:RegisterForSelfCombatEvent(
   function(...)
     local SpellID = select(12, ...)
     if Player:HeroTreeID() == 34 then
-      if SpellID == SpellVDH.Metamorphosis:ID() then
+      if SpellID == SpellVDH.Metamorphosis:ID() or SpellID == SpellHavoc.Metamorphosis:ID() then
         Surge.ConsumingFire = true
-        Surge.FelDesolation = true
         Surge.SigilofDoom = true
+        Surge.FelDesolation = true
         Surge.SoulSunder = true
         Surge.SpiritBurst = true
-      elseif SpellID == SpellVDH.ConsumingFire:ID() then
+        Surge.AbyssalGaze = true
+        Surge.Annihilation = true
+        Surge.DeathSweep = true
+      elseif SpellID == SpellVDH.ConsumingFire:ID() or SpellID == SpellHavoc.ConsumingFire:ID() then
         Surge.ConsumingFire = false
+      elseif SpellID == SpellVDH.SigilofDoom:ID() or SpellID == SpellHavoc.SigilofDoom:ID() then
+        Surge.SigilofDoom = false
       elseif SpellID == SpellVDH.FelDesolation:ID() then
         Surge.FelDesolation = false
-      elseif SpellID == SpellVDH.SigilofDoom:ID() then
-        Surge.SigilofDoom = false
       elseif SpellID == SpellVDH.SoulSunder:ID() then
         Surge.SoulSunder = false
       elseif SpellID == SpellVDH.SpiritBurst:ID() then
         Surge.SpiritBurst = false
+      elseif SpellID == SpellHavoc.AbyssalGaze:ID() then
+        Surge.AbyssalGaze = false
+      elseif SpellID == SpellHavoc.Annihilation:ID() then
+        Surge.Annihilation = false
+      elseif SpellID == SpellHavoc.DeathSweep:ID() then
+        Surge.DeathSweep = false
       end
     end
   end
 , "SPELL_CAST_SUCCESS")
 
 -- Watch for the Meta aura.
--- SpiritBurst and SoulSunder are both buffed on hardcast Meta and Demonic Meta.
+-- These spells are buffed on hardcast Meta and Demonic Meta.
 HL:RegisterForSelfCombatEvent(
   function(...)
     local SpellID = select(12, ...)
-    if Player:HeroTreeID() == 34 and SpellID == SpellVDH.MetamorphosisBuff:ID() then
+    if Player:HeroTreeID() == 34 and (SpellID == SpellVDH.MetamorphosisBuff:ID() or SpellID == SpellHavoc.MetamorphosisBuff:ID()) then
       Surge.SpiritBurst = true
       Surge.SoulSunder = true
+      Surge.Annihilation = true
+      Surge.DeathSweep = true
     end
   end
 , "SPELL_AURA_APPLIED")
@@ -78,12 +95,15 @@ HL:RegisterForSelfCombatEvent(
 HL:RegisterForSelfCombatEvent(
   function(...)
     local SpellID = select(12, ...)
-    if Player:HeroTreeID() == 34 and SpellID == SpellVDH.MetamorphosisBuff:ID() then
+    if Player:HeroTreeID() == 34 and (SpellID == SpellVDH.MetamorphosisBuff:ID() or SpellID == SpellHavoc.MetamorphosisBuff:ID()) then
       Surge.ConsumingFire = false
-      Surge.FelDesolation = false
       Surge.SigilofDoom = false
+      Surge.FelDesolation = false
       Surge.SoulSunder = false
       Surge.SpiritBurst = false
+      Surge.AbyssalGaze = false
+      Surge.Annihilation = false
+      Surge.DeathSweep = false
     end
   end
 , "SPELL_AURA_REMOVED")
