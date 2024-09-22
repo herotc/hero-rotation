@@ -844,8 +844,8 @@ local function CDs ()
   if S.ColdBlood:IsReady() and Player:DebuffDown(S.ColdBlood) then
     if Player:BuffDown(S.EdgeCase) and S.Deathmark:CooldownRemains() > 10 and Player:BuffDown(S.DarkestNightBuff)
       and ComboPoints >= EffectiveCPSpend and (NotPooling or Target:DebuffStack(S.AmplifyingPoisonDebuff) >= 20
-      or not SingleTarget) and Player:BuffDown(Rogue.VanishBuffSpell()) and (not S.CooldownUp(S.Kingsbane) or not SingleTarget)
-      and not S.CooldownUp(S.Deathmark) then
+      or not SingleTarget) and Player:BuffDown(Rogue.VanishBuffSpell()) and (not S.Kingsbane:CooldownUp() or not SingleTarget)
+      and not S.Deathmark:CooldownUp() then
       if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
         return "Cast Cold Blood"
       end
