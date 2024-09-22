@@ -47,15 +47,18 @@ HL:RegisterForSelfCombatEvent(
   function(...)
     local SpellID = select(12, ...)
     if Player:HeroTreeID() == 34 then
-      if SpellID == SpellVDH.Metamorphosis:ID() or SpellID == SpellHavoc.Metamorphosis:ID() then
+      if SpellID == SpellVDH.Metamorphosis:ID() then
         Surge.ConsumingFire = true
-        Surge.SigilofDoom = true
         Surge.FelDesolation = true
+        Surge.SigilofDoom = true
         Surge.SoulSunder = true
         Surge.SpiritBurst = true
+      elseif SpellID == 200166 then -- Metamorphosis's impact ability ID is the one reported to the event.
         Surge.AbyssalGaze = true
         Surge.Annihilation = true
+        Surge.ConsumingFire = true
         Surge.DeathSweep = true
+        Surge.SigilofDoom = true
       elseif SpellID == SpellVDH.ConsumingFire:ID() or SpellID == SpellHavoc.ConsumingFire:ID() then
         Surge.ConsumingFire = false
       elseif SpellID == SpellVDH.SigilofDoom:ID() or SpellID == SpellHavoc.SigilofDoom:ID() then
@@ -82,11 +85,16 @@ HL:RegisterForSelfCombatEvent(
 HL:RegisterForSelfCombatEvent(
   function(...)
     local SpellID = select(12, ...)
-    if Player:HeroTreeID() == 34 and (SpellID == SpellVDH.MetamorphosisBuff:ID() or SpellID == SpellHavoc.MetamorphosisBuff:ID()) then
-      Surge.SpiritBurst = true
-      Surge.SoulSunder = true
-      Surge.Annihilation = true
-      Surge.DeathSweep = true
+    if Player:HeroTreeID() == 34 then
+      if SpellID == SpellVDH.MetamorphosisBuff:ID() then
+        Surge.SpiritBurst = true
+        Surge.SoulSunder = true
+        Surge.Annihilation = true
+        Surge.DeathSweep = true
+      elseif SpellID == SpellHavoc.MetamorphosisBuff:ID() then
+        Surge.Annihilation = true
+        Surge.DeathSweep = true
+      end
     end
   end
 , "SPELL_AURA_APPLIED")
