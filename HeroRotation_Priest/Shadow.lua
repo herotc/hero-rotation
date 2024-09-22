@@ -297,7 +297,8 @@ local function Precombat()
     if Cast(S.ArcaneTorrent, nil, nil, not Target:IsSpellInRange(S.ArcaneTorrent)) then return "arcane_torrent precombat 6"; end
   end
   -- use_item,name=aberrant_spellforge
-  if Settings.Commons.Enabled.Trinkets and I.AberrantSpellforge:IsEquippedAndReady() then
+  -- Note: Added CDsON() check to enforce trinket usage only when CDs are enabled
+  if Settings.Commons.Enabled.Trinkets and I.AberrantSpellforge:IsEquippedAndReady() and CDsON() then
     if Cast(I.AberrantSpellforge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "aberrant_spellforge precombat 8"; end
   end
   -- shadow_crash,if=raid_event.adds.in>=25&spell_targets.shadow_crash<=8&!fight_style.dungeonslice&(!set_bonus.tier31_4pc|spell_targets.shadow_crash>1)
@@ -351,7 +352,8 @@ local function AoE()
 end
 
 local function Trinkets()
-  if Settings.Commons.Enabled.Trinkets then
+  -- Note: Added CDsON() check to match other cooldown usage patterns
+  if Settings.Commons.Enabled.Trinkets and CDsON() then
     -- use_item,use_off_gcd=1,name=aberrant_spellforge,if=gcd.remains>0&buff.aberrant_spellforge.stack<=4
     if I.AberrantSpellforge:IsEquippedAndReady() and (Player:BuffStack(S.AberrantSpellforgeBuff) <= 4) then
       if Cast(I.AberrantSpellforge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "aberrant_spellforge trinkets 26"; end
@@ -362,11 +364,12 @@ local function Trinkets()
     end
   end
   -- use_items,if=(buff.voidform.up|buff.power_infusion.up|buff.dark_ascension.up|(cooldown.void_eruption.remains>10&trinket.cooldown.duration<=60))|fight_remains<20
+  -- Note: Added CDsON() check for trinkets to match other cooldown usage patterns
   local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
   if ItemToUse and ((Player:BuffUp(S.VoidformBuff) or Player:PowerInfusionUp() or Player:BuffUp(S.DarkAscensionBuff) or (S.VoidEruption:CooldownRemains() > 10 and (ItemToUse:Cooldown() <= 60 or ItemSlot ~= 13 and ItemSlot ~= 14))) or BossFightRemains < 20) then
     local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
     if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
-    if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+    if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets and CDsON()) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
       if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 30"; end
     end
   end
