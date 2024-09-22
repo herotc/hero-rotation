@@ -63,6 +63,7 @@ HR.GUISettings.APL.Evoker = {
     },
     GCDasOffGCD = {
       BreathOfEons = true,
+      DeepBreath = true,
       EbonMight = false,
       EmeraldBlossom = false,
       TimeSkip = true,
