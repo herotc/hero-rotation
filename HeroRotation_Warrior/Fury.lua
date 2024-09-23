@@ -15,7 +15,7 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 local Cast       = HR.Cast
-local AoEON      = HR.AOEON
+local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 -- Num/Bool Helper Functions
 local num        = HR.Commons.Everyone.num
@@ -241,77 +241,73 @@ local function SlayerST()
   if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_st 14"; end
   end
-  -- rampage,if=talent.anger_management&(rage>=80|cooldown.recklessness.remains<=gcd)
-  if S.Rampage:IsReady() and (S.AngerManagement:IsAvailable() and (Player:Rage() >= 80 or S.Recklessness:CooldownRemains() <= Player:GCD())) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_st 16"; end 
-  end
-  -- rampage,if=talent.reckless_abandon&(rage>=90|cooldown.recklessness.remains<=gcd)
-  if S.Rampage:IsReady() and (S.RecklessAbandon:IsAvailable() and (Player:Rage() >= 90 or S.Recklessness:CooldownRemains() <= Player:GCD())) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_st 18"; end
-  end
-  -- rampage,if=!talent.reckless_abandon&!talent.anger_management&rage>=85
-  if S.Rampage:IsReady() and (not S.RecklessAbandon:IsAvailable() and not S.AngerManagement:IsAvailable() and Player:Rage() >= 85) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_st 20"; end
-  end
   -- bladestorm,if=buff.enrage.up&cooldown.avatar.remains>=9
   if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp and S.Avatar:CooldownRemains() >= 9) then
-    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_st 22"; end
+    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_st 16"; end
   end
   -- onslaught,if=talent.tenderize&buff.brutal_finish.up
   if S.Onslaught:IsReady() and (S.Tenderize:IsAvailable() or Player:BuffUp(S.BrutalFinishBuff)) then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_st 24"; end
+    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_st 18"; end
+  end
+  -- rampage,if=talent.anger_management
+  if S.Rampage:IsReady() and (S.AngerManagement:IsAvailable()) then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_st 20"; end
   end
   -- crushing_blow
   if S.CrushingBlow:IsCastable() then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow slayer_st 26"; end
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow slayer_st 22"; end
   end
   -- onslaught,if=talent.tenderize
   if S.Onslaught:IsReady() and (S.Tenderize:IsAvailable()) then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_st 28"; end
+    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_st 24"; end
   end
   -- bloodbath,if=rage<100|target.health.pct<35&talent.vicious_contempt
   if S.Bloodbath:IsCastable() and (Player:Rage() < 100 or Target:HealthPercentage() < 35 and S.ViciousContempt:IsAvailable()) then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath slayer_st 30"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath slayer_st 26"; end
   end
   -- raging_blow,if=rage<100&!buff.opportunist.up
   if S.RagingBlow:IsCastable() and (Player:Rage() < 100 and Player:BuffDown(S.OpportunistBuff)) then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow slayer_st 32"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow slayer_st 28"; end
+  end
+  -- rampage,if=talent.reckless_abandon
+  if S.Rampage:IsReady() and (S.RecklessAbandon:IsAvailable()) then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_st 30"; end
   end
   -- execute,if=buff.enrage.up&debuff.marked_for_execution.up
   if S.Execute:IsReady() and (EnrageUp and Target:DebuffUp(S.MarkedforExecutionDebuff)) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_st 34"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_st 32"; end
   end
   -- bloodthirst,if=!talent.reckless_abandon&buff.enrage.up
   if S.Bloodthirst:IsCastable() and (not S.RecklessAbandon:IsAvailable() and EnrageUp) then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst slayer_st 36"; end
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst slayer_st 34"; end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow slayer_st 38"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow slayer_st 36"; end
   end
   -- onslaught
   if S.Onslaught:IsReady() then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_st 40"; end
+    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_st 38"; end
   end
   -- execute
   if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_st 42"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_st 40"; end
   end
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst slayer_st 44"; end
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst slayer_st 42"; end
   end
   -- whirlwind,if=talent.meat_cleaver
   if S.Whirlwind:IsCastable() and (S.MeatCleaver:IsAvailable()) then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind slayer_st 46"; end
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind slayer_st 44"; end
   end
   -- slam
   if S.Slam:IsCastable() then
-    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam slayer_st 48"; end
+    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam slayer_st 46"; end
   end
   -- storm_bolt,if=buff.bladestorm.up
   if S.StormBolt:IsCastable() and (Player:BuffUp(S.Bladestorm)) then
-    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_st 50"; end
+    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_st 48"; end
   end
 end
 
@@ -348,73 +344,69 @@ local function SlayerMT()
   if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_mt 16"; end
   end
-  -- rampage,if=talent.anger_management&(rage>=80|cooldown.recklessness.remains<=gcd)
-  if S.Rampage:IsReady() and (S.AngerManagement:IsAvailable() and (Player:Rage() >= 80 or S.Recklessness:CooldownRemains() <= Player:GCD())) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_mt 18"; end 
-  end
-  -- rampage,if=talent.reckless_abandon&(rage>=90|cooldown.recklessness.remains<=gcd)
-  if S.Rampage:IsReady() and (S.RecklessAbandon:IsAvailable() and (Player:Rage() >= 90 or S.Recklessness:CooldownRemains() <= Player:GCD())) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_mt 20"; end
-  end
-  -- rampage,if=!talent.reckless_abandon&!talent.anger_management&rage>=85
-  if S.Rampage:IsReady() and (not S.RecklessAbandon:IsAvailable() and not S.AngerManagement:IsAvailable() and Player:Rage() >= 85) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_mt 22"; end
-  end
   -- bladestorm,if=buff.enrage.up&cooldown.avatar.remains>=9
   if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp and S.Avatar:CooldownRemains() >= 9) then
-    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_mt 24"; end
+    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_mt 18"; end
   end
   -- onslaught,if=talent.tenderize&buff.brutal_finish.up
   if S.Onslaught:IsReady() and (S.Tenderize:IsAvailable() or Player:BuffUp(S.BrutalFinishBuff)) then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_mt 26"; end
+    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_mt 20"; end
+  end
+  -- rampage,if=talent.anger_management
+  if S.Rampage:IsReady() and (S.AngerManagement:IsAvailable()) then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_mt 22"; end
   end
   -- crushing_blow
   if S.CrushingBlow:IsCastable() then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow slayer_mt 28"; end
+    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow slayer_mt 24"; end
   end
   -- onslaught,if=talent.tenderize
   if S.Onslaught:IsReady() and (S.Tenderize:IsAvailable()) then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_mt 30"; end
+    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_mt 26"; end
   end
   -- bloodbath,if=buff.enrage.up
   if S.Bloodbath:IsCastable() and (EnrageUp) then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath slayer_mt 32"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath slayer_mt 28"; end
+  end
+  -- rampage,if=talent.reckless_abandon
+  if S.Rampage:IsReady() and (S.RecklessAbandon:IsAvailable()) then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer_mt 30"; end
   end
   -- execute,if=buff.enrage.up&debuff.marked_for_execution.up
   if S.Execute:IsReady() and (EnrageUp and Target:DebuffUp(S.MarkedforExecutionDebuff)) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_mt 34"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_mt 32"; end
   end
   -- bloodbath
   if S.Bloodbath:IsCastable() then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath slayer_mt 36"; end
+    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath slayer_mt 34"; end
   end
   -- raging_blow,if=talent.slaughtering_strikes
   if S.RagingBlow:IsCastable() and (S.SlaughteringStrikes:IsAvailable()) then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow slayer_mt 38"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow slayer_mt 36"; end
   end
   -- onslaught
   if S.Onslaught:IsReady() then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_mt 40"; end
+    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_mt 38"; end
   end
   -- execute
   if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_mt 42"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_mt 40"; end
   end
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst slayer_mt 44"; end
+    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst slayer_mt 42"; end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow slayer_mt 46"; end
+    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow slayer_mt 44"; end
   end
   -- whirlwind
   if S.Whirlwind:IsCastable() then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind slayer_mt 48"; end
+    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind slayer_mt 46"; end
   end
   -- storm_bolt,if=buff.bladestorm.up
   if S.StormBolt:IsCastable() and (Player:BuffUp(S.Bladestorm)) then
-    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_mt 50"; end
+    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_mt 48"; end
   end
 end
 
@@ -451,16 +443,16 @@ local function ThaneST()
   if S.Execute:IsReady() and (S.AshenJuggernaut:IsAvailable() and Player:BuffRemains(S.AshenJuggernautBuff) <= Player:GCD() and EnrageUp) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_st 16"; end
   end
-  -- rampage,if=talent.anger_management&(rage>=80|cooldown.recklessness.remains<=gcd)
-  if S.Rampage:IsReady() and (S.AngerManagement:IsAvailable() and (Player:Rage() >= 80 or S.Recklessness:CooldownRemains() <= Player:GCD())) then
+  -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
+  if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_st 18"; end
   end
-  -- rampage,if=talent.reckless_abandon&(rage>=90|cooldown.recklessness.remains<=gcd)
-  if S.Rampage:IsReady() and (S.RecklessAbandon:IsAvailable() and (Player:Rage() >= 90 or S.Recklessness:CooldownRemains() <= Player:GCD())) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_st 20"; end
+  -- bladestorm,if=buff.enrage.up&talent.unhinged
+  if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp and S.Unhinged:IsAvailable()) then
+    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane_st 20"; end
   end
-  -- rampage,if=!talent.reckless_abandon&!talent.anger_management&rage>=85
-  if S.Rampage:IsReady() and (not S.RecklessAbandon:IsAvailable() and not S.AngerManagement:IsAvailable() and Player:Rage() >= 85) then
+  -- rampage,if=talent.anger_management
+  if S.Rampage:IsReady() and (S.AngerManagement:IsAvailable()) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_st 22"; end
   end
   -- crushing_blow
@@ -474,6 +466,10 @@ local function ThaneST()
   -- bloodbath
   if S.Bloodbath:IsCastable() then
     if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath thane_st 28"; end
+  end
+  -- rampage,if=talent.reckless_abandon
+  if S.Rampage:IsReady() and (S.RecklessAbandon:IsAvailable()) then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_st 30"; end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
@@ -546,16 +542,16 @@ local function ThaneMT()
   if S.Execute:IsReady() and (S.AshenJuggernaut:IsAvailable() and Player:BuffRemains(S.AshenJuggernautBuff) <= Player:GCD() and EnrageUp) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_mt 18"; end
   end
-  -- rampage,if=talent.anger_management&(rage>=80|cooldown.recklessness.remains<=gcd)
-  if S.Rampage:IsReady() and (S.AngerManagement:IsAvailable() and (Player:Rage() >= 80 or S.Recklessness:CooldownRemains() <= Player:GCD())) then
+  -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
+  if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_mt 20"; end
   end
-  -- rampage,if=talent.reckless_abandon&(rage>=90|cooldown.recklessness.remains<=gcd)
-  if S.Rampage:IsReady() and (S.RecklessAbandon:IsAvailable() and (Player:Rage() >= 90 or S.Recklessness:CooldownRemains() <= Player:GCD())) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_mt 22"; end
+  -- bladestorm,if=buff.enrage.up
+  if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp) then
+    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane_mt 22"; end
   end
-  -- rampage,if=!talent.reckless_abandon&!talent.anger_management&rage>=85
-  if S.Rampage:IsReady() and (not S.RecklessAbandon:IsAvailable() and not S.AngerManagement:IsAvailable() and Player:Rage() >= 85) then
+  -- rampage,if=talent.anger_management
+  if S.Rampage:IsReady() and (S.AngerManagement:IsAvailable()) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_mt 24"; end
   end
   -- crushing_blow,if=buff.enrage.up
@@ -569,6 +565,10 @@ local function ThaneMT()
   -- bloodbath
   if S.Bloodbath:IsCastable() then
     if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath thane_mt 30"; end
+  end
+  -- rampage,if=talent.reckless_abandon
+  if S.Rampage:IsReady() and (S.RecklessAbandon:IsAvailable()) then
+    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_mt 32"; end
   end
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
