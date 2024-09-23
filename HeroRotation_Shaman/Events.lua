@@ -22,6 +22,9 @@ Shaman.LastSKCast = 0
 Shaman.LastSKBuff = 0
 Shaman.LastRollingThunderTick = 0
 Shaman.FeralSpiritCount = 0
+Shaman.CracklingSurgeStacks = 0
+Shaman.IcyEdgeStacks = 0
+Shaman.MoltenWeaponStacks = 0
 Shaman.TempestMaelstrom = 0
 
 --- ============================ CONTENT ============================
@@ -30,18 +33,6 @@ HL:RegisterForSelfCombatEvent(
     local SourceGUID, _, _, _, _, _, _, _, SpellID = select(4, ...)
     if SourceGUID == Player:GUID() and SpellID == 191634 then
       Shaman.LastSKCast = GetTime()
-    end
-    if Player:HasTier(31, 2) and SourceGUID == Player:GUID() and SpellID == 375982 then
-      Shaman.FeralSpiritCount = Shaman.FeralSpiritCount + 1
-      C_Timer.After(15, function()
-        Shaman.FeralSpiritCount = Shaman.FeralSpiritCount - 1
-      end)
-    end
-    if SourceGUID == Player:GUID() and SpellID == 51533 then
-      Shaman.FeralSpiritCount = Shaman.FeralSpiritCount + 2
-      C_Timer.After(15, function()
-        Shaman.FeralSpiritCount = Shaman.FeralSpiritCount - 2
-      end)
     end
   end
   , "SPELL_CAST_SUCCESS"
@@ -60,6 +51,52 @@ HL:RegisterForSelfCombatEvent(
     end
   end
   , "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE"
+)
+
+--- ===== Wolf and Wolf Buffs Tracker =====
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local SpellID = select(12, ...)
+    if SpellID == 262627 then
+      Shaman.FeralSpiritCount = Shaman.FeralSpiritCount + 1
+      C_Timer.After(15, function()
+        Shaman.FeralSpiritCount = Shaman.FeralSpiritCount - 1
+      end)
+    end
+  end
+  , "SPELL_SUMMON"
+)
+
+HL:RegisterForCombatEvent(
+  function (...)
+    local DestGUID, _, _, _, SpellID = select(8, ...)
+    if DestGUID == Player:GUID() then
+      if SpellID == 224125 then -- Molten Weapon Buff
+        Shaman.MoltenWeaponStacks = Shaman.MoltenWeaponStacks + 1
+      elseif SpellID == 224126 then -- Icy Edge Buff
+        Shaman.IcyEdgeStacks = Shaman.IcyEdgeStacks + 1
+      elseif SpellID == 224127 then -- Crackling Surge Buff
+        Shaman.CracklingSurgeStacks = Shaman.CracklingSurgeStacks + 1
+      end
+    end
+  end
+  , "SPELL_AURA_APPLIED"
+)
+
+HL:RegisterForCombatEvent(
+  function (...)
+    local DestGUID, _, _, _, SpellID = select(8, ...)
+    if DestGUID == Player:GUID() then
+      if SpellID == 224125 then -- Molten Weapon Buff
+        Shaman.MoltenWeaponStacks = Shaman.MoltenWeaponStacks - 1
+      elseif SpellID == 224126 then -- Icy Edge Buff
+        Shaman.IcyEdgeStacks = Shaman.IcyEdgeStacks - 1
+      elseif SpellID == 224127 then -- Crackling Surge Buff
+        Shaman.CracklingSurgeStacks = Shaman.CracklingSurgeStacks - 1
+      end
+    end
+  end
+  , "SPELL_AURA_REMOVED"
 )
 
 --- ===== Fire Elemental Tracker =====

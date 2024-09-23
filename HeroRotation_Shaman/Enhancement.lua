@@ -306,7 +306,7 @@ local function Single()
     -- elemental_blast,if=buff.maelstrom_weapon.stack>=7&feral_spirit.active>=5&(buff.icy_edge.up|buff.molten_weapon.up)&cooldown.feral_spirit.remains>=3
     (MaelstromStacks >= 7 and Shaman.FeralSpiritCount >= 5 and (Player:BuffUp(S.IcyEdgeBuff) or Player:BuffUp(S.MoltenWeaponBuff)) and S.FeralSpirit:CooldownRemains() >= 3) or
     -- elemental_blast,if=buff.maelstrom_weapon.stack>=7&feral_spirit.active>=1&(buff.icy_edge.stack+buff.molten_weapon.stack>=1)&charges_fractional>=1.8&cooldown.feral_spirit.remains>=3
-    (MaelstromStacks >= 7 and Shaman.FeralSpiritCount >= 1 and (Player:BuffStack(S.IcyEdgeBuff) + Player:BuffStack(S.MoltenWeaponBuff) >= 1) and S.ElementalBlast:ChargesFractional() >= 1.8 and S.FeralSpirit:CooldownRemains() >= 3)
+    (MaelstromStacks >= 7 and Shaman.FeralSpiritCount >= 1 and (Shaman.IcyEdgeStacks + Shaman.MoltenWeaponStacks >= 1) and S.ElementalBlast:ChargesFractional() >= 1.8 and S.FeralSpirit:CooldownRemains() >= 3)
   ) then
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 24"; end
   end
@@ -347,7 +347,7 @@ local function Single()
     if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single 40"; end
   end
   -- elemental_blast,if=buff.maelstrom_weapon.stack>=5&feral_spirit.active>=4&talent.ascendance.enabled&(charges_fractional>=1.8|(buff.icy_edge.stack+buff.molten_weapon.stack>=4))
-  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 5 and Shaman.FeralSpiritCount >= 4 and S.Ascendance:IsAvailable() and (S.ElementalBlast:ChargesFractional() >= 1.8 or (Player:BuffStack(S.IcyEdgeBuff) + Player:BuffStack(S.MoltenWeaponBuff) >= 4))) then
+  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 5 and Shaman.FeralSpiritCount >= 4 and S.Ascendance:IsAvailable() and (S.ElementalBlast:ChargesFractional() >= 1.8 or (Shaman.IcyEdgeStacks + Shaman.MoltenWeaponStacks >= 4))) then
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 42"; end
   end
   -- lightning_bolt,if=((buff.maelstrom_weapon.stack>=8)|(talent.static_accumulation.enabled&buff.maelstrom_weapon.stack>=5))&buff.primordial_wave.down&talent.ascendance.enabled&talent.tempest.enabled
@@ -371,7 +371,7 @@ local function Single()
     if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 52"; end
   end
   -- elemental_blast,if=buff.maelstrom_weapon.stack>=5&feral_spirit.active>=4&talent.deeply_rooted_elements.enabled&(charges_fractional>=1.8|(buff.icy_edge.stack+buff.molten_weapon.stack>=4))
-  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 5 and Shaman.FeralSpiritCount >= 4 and S.DeeplyRootedElements:IsAvailable() and (S.ElementalBlast:ChargesFractional() >= 1.8 or (Player:BuffStack(S.IcyEdgeBuff) + Player:BuffStack(S.MoltenWeaponBuff) >= 4))) then
+  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 5 and Shaman.FeralSpiritCount >= 4 and S.DeeplyRootedElements:IsAvailable() and (S.ElementalBlast:ChargesFractional() >= 1.8 or (Shaman.IcyEdgeStacks + Shaman.MoltenWeaponStacks >= 4))) then
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 54"; end
   end
   -- lightning_bolt,if=((buff.maelstrom_weapon.stack>=8)|(talent.static_accumulation.enabled&buff.maelstrom_weapon.stack>=5))&buff.primordial_wave.down
@@ -688,7 +688,7 @@ local function Funnel()
     if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike funnel 26"; end
   end
   -- lava_burst,if=(buff.molten_weapon.stack+buff.volcanic_strength.up>buff.crackling_surge.stack)&buff.maelstrom_weapon.stack=buff.maelstrom_weapon.max_stack
-  if S.LavaBurst:IsReady() and ((Player:BuffStack(S.MoltenWeaponBuff) + num(Player:BuffUp(S.VolcanicStrengthBuff)) > Player:BuffStack(S.CracklingSurgeBuff)) and MaelstromStacks == MaxMaelstromStacks) then
+  if S.LavaBurst:IsReady() and ((Shaman.MoltenWeaponStacks + num(Player:BuffUp(S.VolcanicStrengthBuff)) > Shaman.CracklingSurgeStacks) and MaelstromStacks == MaxMaelstromStacks) then
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst funnel 30"; end
   end
   -- lightning_bolt,if=buff.maelstrom_weapon.stack=buff.maelstrom_weapon.max_stack&(variable.expected_lb_funnel>variable.expected_cl_funnel)
@@ -772,7 +772,7 @@ local function Funnel()
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast funnel 70"; end
   end
   -- lava_burst,if=(buff.molten_weapon.stack+buff.volcanic_strength.up>buff.crackling_surge.stack)&buff.maelstrom_weapon.stack>=5
-  if S.LavaBurst:IsReady() and ((Player:BuffStack(S.MoltenWeaponBuff) + num(Player:BuffUp(S.VolcanicStrengthBuff)) > Player:BuffStack(S.CracklingSurgeBuff)) and MaelstromStacks >= 5) then
+  if S.LavaBurst:IsReady() and ((Shaman.MoltenWeaponStacks + num(Player:BuffUp(S.VolcanicStrengthBuff)) > Shaman.CracklingSurgeStacks) and MaelstromStacks >= 5) then
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst funnel 72"; end
   end
   -- lightning_bolt,if=buff.maelstrom_weapon.stack>=5&(variable.expected_lb_funnel>variable.expected_cl_funnel)

@@ -211,8 +211,6 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   LashingFlamesDebuff                   = Spell(334168),
   -- Elemental Spirits Buffs
   CracklingSurgeBuff                    = Spell(224127),
-  EarthenWeaponBuff                     = Spell(392375),
-  LegacyoftheFrostWitch                 = Spell(335901),
   IcyEdgeBuff                           = Spell(224126),
   MoltenWeaponBuff                      = Spell(224125),
   -- Tier 29 Buffs
