@@ -15,7 +15,7 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 local Cast       = HR.Cast
-local AoEON      = HR.AOEON
+local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 -- Num/Bool Helper Functions
 local num        = HR.Commons.Everyone.num
