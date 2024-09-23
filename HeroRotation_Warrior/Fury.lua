@@ -38,13 +38,7 @@ local OnUseExcludes = {
 
 --- ===== GUI Settings =====
 local Everyone = HR.Commons.Everyone
-local Settings = {
-  General = HR.GUISettings.General,
-  Commons = HR.GUISettings.APL.Warrior.Commons,
-  CommonsDS = HR.GUISettings.APL.Warrior.CommonsDS,
-  CommonsOGCD = HR.GUISettings.APL.Warrior.CommonsOGCD,
-  Fury = HR.GUISettings.APL.Warrior.Fury
-}
+local Settings = HR.GUISettings.APL.Warrior
 
 --- ===== Rotation Variables =====
 local VarSTPlanning, VarAddsRemain
@@ -143,21 +137,30 @@ end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 --- ===== Rotation Functions =====
 local function Precombat()
-  -- flask
-  -- food
-  -- augmentation
-  -- snapshot_stats
-  -- variable,name=trinket_1_exclude,value=trinket.1.is.treacherous_transmitter
-  -- variable,name=trinket_2_exclude,value=trinket.2.is.treacherous_transmitter
-  -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=trinket.1.has_use_buff&(trinket.1.cooldown.duration%%cooldown.avatar.duration=0|trinket.1.cooldown.duration%%cooldown.odyns_fury.duration=0)
-  -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=trinket.2.has_use_buff&(trinket.2.cooldown.duration%%cooldown.avatar.duration=0|trinket.2.cooldown.duration%%cooldown.odyns_fury.duration=0)
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff|(trinket.1.has_stat.any_dps&!variable.trinket_1_exclude)
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|(trinket.2.has_stat.any_dps&!variable.trinket_2_exclude)
-  -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.strength)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.strength)*(variable.trinket_1_sync))
-  -- variable,name=trinket_1_manual,value=trinket.1.is.algethar_puzzle_box
-  -- variable,name=trinket_2_manual,value=trinket.2.is.algethar_puzzle_box
-  -- Note: Moved the above variables to declarations and PLAYER_EQUIPMENT_CHANGED.
-  -- Manually added: Group Battle Shout check
+  -- Use Treacherous Transmitter at the start of precombat if enabled
+  if Settings.Commons["Sync Trinkets with CD Toggle for PreCombat"].UseTreacherousTransmitter then
+    if I.TreacherousTransmitter:IsEquippedAndReady() then
+      if Cast(I.TreacherousTransmitter) then return "use_treacherous_transmitter precombat"; end
+    end
+  end
+
+  -- Use other trinkets before combat if enabled
+  if Settings.Commons["Sync Trinkets with CD Toggle for PreCombat"].UseTrinkets then
+    if I.ImperfectAscendancySerum:IsEquippedAndReady() then
+      if Cast(I.ImperfectAscendancySerum) then return "use_imperfect_ascendancy_serum precombat"; end
+    end
+    -- Add logic for other trinkets here
+  end
+
+  -- Sync cooldowns before combat if enabled
+  if Settings.Commons["Sync Trinkets with CD Toggle for PreCombat"].SyncCooldowns then
+    -- Add logic for syncing cooldowns precombat
+    -- For example:
+    if S.Recklessness:IsCastable() and S.Avatar:IsCastable() then
+      if Cast(S.Recklessness) then return "recklessness precombat sync"; end
+      if Cast(S.Avatar) then return "avatar precombat sync"; end
+    end
+  end
 
   -- Check if cooldowns are enabled
   if CDsON() then

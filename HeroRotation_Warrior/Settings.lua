@@ -24,6 +24,16 @@ HR.GUISettings.APL.Warrior = {
       Trinkets = true,
       Items = true,
     },
+    -- Trinket and PreCombat Sync Settings
+    ["Sync Trinkets with CD Toggle"] = {
+      Enabled = false,
+      IncludeTrinkets = false,
+    },
+    ["Sync Trinkets with CD Toggle for PreCombat"] = {
+      UseTrinkets = false,
+      SyncCooldowns = false,
+      UseTreacherousTransmitter = false,
+    },
   },
   CommonsDS = {
     DisplayStyle = {
@@ -117,6 +127,14 @@ local CP_Protection = CreateChildPanel(CP_Warrior, "Protection")
 CreateARPanelOptions(CP_Warrior, "APL.Warrior.Commons")
 CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.ShoutDuringCombat", "Battle Shout during combat", "Enable this option to allow Battle Shout to be suggested during combat (for re-buffing fallen allies or when the buff expires during combat).")
 CreatePanelOption("Slider", CP_Warrior, "APL.Warrior.Commons.VictoryRushHP", {0, 100, 1}, "Victory Rush HP", "Set the Victory Rush/Impending Victory HP threshold. Set to 0 to disable.")
+
+-- New options for Commons
+CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.Sync Trinkets with CD Toggle.Enabled", "Enable CD Toggle", "Enable this option to use the cooldown toggle for major abilities during combat.")
+CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.Sync Trinkets with CD Toggle.IncludeTrinkets", "Include Trinkets in CD Toggle", "Enable this option to include trinkets in the cooldown toggle system.")
+CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.Sync Trinkets with CD Toggle for PreCombat.UseTrinkets", "Use Trinkets Precombat", "Enable this option to use trinkets before combat starts, if beneficial.")
+CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.Sync Trinkets with CD Toggle for PreCombat.SyncCooldowns", "Sync Cooldowns Precombat", "Enable this option to synchronize cooldowns before entering combat for optimal opener.")
+CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.Sync Trinkets with CD Toggle for PreCombat.UseTreacherousTransmitter", "Use Treacherous Transmitter Precombat", "Enable this option to use Treacherous Transmitter trinket at the start of precombat phase.")
+
 CreateARPanelOptions(CP_WarriorDS, "APL.Warrior.CommonsDS")
 CreateARPanelOptions(CP_WarriorOGCD, "APL.Warrior.CommonsOGCD")
 
