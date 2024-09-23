@@ -254,6 +254,8 @@ Item.Warrior.Commons = {
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   -- TWW Trinkets
   TreacherousTransmitter                = Item(221023, {13, 14}),
+  ImperfectAscendancySerum              = Item(225654, {13, 14}), -- Imperfect Ascendancy Serum
+  SkarmorakShard                         = Item(219300, {13, 14}), -- Skarmorak Shard
   -- Other Items
   Fyralath                              = Item(206448, {16}),
 }

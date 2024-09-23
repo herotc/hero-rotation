@@ -158,6 +158,20 @@ local function Precombat()
   -- variable,name=trinket_2_manual,value=trinket.2.is.algethar_puzzle_box
   -- Note: Moved the above variables to declarations and PLAYER_EQUIPMENT_CHANGED.
   -- Manually added: Group Battle Shout check
+
+  -- Check if cooldowns are enabled
+  if CDsON() then
+    -- Check if the Treacherous Transmitter is equipped and ready
+    if I.TreacherousTransmitter:IsEquippedAndReady() then
+      if Cast(I.TreacherousTransmitter) then return "use_treacherous_transmitter precombat"; end
+    end
+    -- Check if the Imperfect Ascendancy Serum is equipped and ready
+    if I.ImperfectAscendancySerum:IsEquippedAndReady() then
+      if Cast(I.ImperfectAscendancySerum) then return "use_imperfect_ascendancy_serum precombat"; end
+    end
+  end
+
+  -- Check if Battle Shout is castable and group buff is missing
   if S.BattleShout:IsCastable() and Everyone.GroupBuffMissing(S.BattleShoutBuff) then
     if Cast(S.BattleShout, Settings.CommonsOGCD.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
   end
@@ -169,10 +183,26 @@ local function Precombat()
   if CDsON() and S.Recklessness:IsCastable() and (not I.Fyralath:IsEquipped()) then
     if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat 8"; end
   end
+  
+  -- Check if any trinket is equipped and ready, prioritizing on-use trinkets
+  if CDsON() then
+    if Trinket1:IsEquippedAndReady() and not VarTrinket1Manual and Trinket1:ID() ~= I.TreacherousTransmitter:ID() and Trinket1:ID() ~= I.ImperfectAscendancySerum:ID() then
+      if Trinket1:HasUseBuff() or not Trinket2:HasUseBuff() then
+        if Cast(Trinket1) then return "use_trinket_1 precombat"; end
+      end
+    end
+    if Trinket2:IsEquippedAndReady() and not VarTrinket2Manual and Trinket2:ID() ~= I.TreacherousTransmitter:ID() and Trinket2:ID() ~= I.ImperfectAscendancySerum:ID() then
+      if Trinket2:HasUseBuff() or not Trinket1:HasUseBuff() then
+        if Cast(Trinket2) then return "use_trinket_2 precombat"; end
+      end
+    end
+  end
+  
   -- avatar,if=!talent.titans_torment
   if CDsON() and S.Avatar:IsCastable() and (not S.TitansTorment:IsAvailable()) then
     if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar precombat 10"; end
   end
+
   -- Manually Added: Charge if not in melee range. Bloodthirst if in melee range
   if S.Bloodthirst:IsCastable() and TargetInMeleeRange then
     if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst precombat 12"; end
@@ -196,7 +226,7 @@ local function SlayerST()
     if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar slayer_st 6"; end
   end
   -- champions_spear,if=(buff.enrage.up&talent.titans_torment&cooldown.avatar.remains<gcd)|(buff.enrage.up&!talent.titans_torment)
-  if S.ChampionsSpear:IsCastable() and ((EnrageUp and S.TitansTorment:IsAvailable() and S.Avatar:CooldownRemains() < Player:GCD()) or (EnrageUp and not S.TitansTorment:IsAvailable())) then
+  if CDsON() and S.ChampionsSpear:IsCastable() and ((EnrageUp and S.TitansTorment:IsAvailable() and S.Avatar:CooldownRemains() < Player:GCD()) or (EnrageUp and not S.TitansTorment:IsAvailable())) then
     if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear slayer_st 8"; end
   end
   -- odyns_fury,if=dot.odyns_fury_torment_mh.remains<1&(buff.enrage.up|talent.titanic_rage)&cooldown.avatar.remains
@@ -567,7 +597,7 @@ local function ThaneMT()
 end
 
 local function Trinkets()
-  if Settings.Commons.Enabled.Trinkets then
+  if Settings.Commons.Enabled.Trinkets and CDsON() then
     -- do_treacherous_transmitter_task
     -- use_item,name=treacherous_transmitter,if=variable.adds_remain|variable.st_planning
     if I.TreacherousTransmitter:IsEquippedAndReady() and (VarAddsRemain or VarSTPlanning) then
@@ -591,7 +621,7 @@ local function Trinkets()
     end
   end
   -- use_item,slot=main_hand,if=!equipped.fyralath_the_dreamrender&(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
-  if Settings.Commons.Enabled.Items then
+  if Settings.Commons.Enabled.Items and CDsON() then
     -- Note: Adding a generic use_items for non-trinkets instead.
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
     if ItemToUse then
