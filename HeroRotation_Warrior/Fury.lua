@@ -196,7 +196,7 @@ local function SlayerST()
     if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar slayer_st 6"; end
   end
   -- champions_spear,if=(buff.enrage.up&talent.titans_torment&cooldown.avatar.remains<gcd)|(buff.enrage.up&!talent.titans_torment)
-  if S.ChampionsSpear:IsCastable() and ((EnrageUp and S.TitansTorment:IsAvailable() and S.Avatar:CooldownRemains() < Player:GCD()) or (EnrageUp and not S.TitansTorment:IsAvailable())) then
+  if CDsON() and S.ChampionsSpear:IsCastable() and ((EnrageUp and S.TitansTorment:IsAvailable() and S.Avatar:CooldownRemains() < Player:GCD()) or (EnrageUp and not S.TitansTorment:IsAvailable())) then
     if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear slayer_st 8"; end
   end
   -- odyns_fury,if=dot.odyns_fury_torment_mh.remains<1&(buff.enrage.up|talent.titanic_rage)&cooldown.avatar.remains
@@ -295,7 +295,7 @@ local function SlayerMT()
     if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar slayer_mt 6"; end
   end
   -- champions_spear,if=(buff.enrage.up&talent.titans_torment&cooldown.avatar.remains<gcd)|(buff.enrage.up&!talent.titans_torment)
-  if S.ChampionsSpear:IsCastable() and ((EnrageUp and S.TitansTorment:IsAvailable() and S.Avatar:CooldownRemains() < Player:GCD()) or (EnrageUp and not S.TitansTorment:IsAvailable())) then
+  if CDsON() and S.ChampionsSpear:IsCastable() and ((EnrageUp and S.TitansTorment:IsAvailable() and S.Avatar:CooldownRemains() < Player:GCD()) or (EnrageUp and not S.TitansTorment:IsAvailable())) then
     if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear slayer_mt 8"; end
   end
   -- odyns_fury,if=dot.odyns_fury_torment_mh.remains<1&(buff.enrage.up|talent.titanic_rage)&cooldown.avatar.remains
@@ -402,7 +402,7 @@ local function ThaneST()
     if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar thane_st 10"; end
   end
   -- champions_spear,if=buff.enrage.up&(cooldown.avatar.remains<gcd|!talent.titans_torment)
-  if S.ChampionsSpear:IsCastable() and (EnrageUp and (S.Avatar:CooldownRemains() < Player:GCD() or not S.TitansTorment:IsAvailable())) then
+  if CDsON() and S.ChampionsSpear:IsCastable() and (EnrageUp and (S.Avatar:CooldownRemains() < Player:GCD() or not S.TitansTorment:IsAvailable())) then
     if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear thane_st 12"; end
   end
   -- odyns_fury,if=dot.odyns_fury_torment_mh.remains<1&(buff.enrage.up|talent.titanic_rage)&cooldown.avatar.remains
@@ -501,7 +501,7 @@ local function ThaneMT()
     if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager thane_mt 12"; end
   end
   -- champions_spear,if=buff.enrage.up
-  if S.ChampionsSpear:IsCastable() and (EnrageUp) then
+  if CDsON() and S.ChampionsSpear:IsCastable() and (EnrageUp) then
     if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear thane_mt 14"; end
   end
   -- odyns_fury,if=dot.odyns_fury_torment_mh.remains<1&(buff.enrage.up|talent.titanic_rage)&cooldown.avatar.remains
