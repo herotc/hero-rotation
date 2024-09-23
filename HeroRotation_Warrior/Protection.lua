@@ -403,7 +403,7 @@ local function APL()
     end
     -- demolish,if=buff.colossal_might.stack>=3
     if S.Demolish:IsCastable() and (Player:BuffStack(S.ColossalMightBuff) >= 3) then
-      if Cast(S.Demolish, nil, nil, not TargetInMeleeRange) then return "demolish main "; end
+      if Cast(S.Demolish, Settings.Protection.GCDasOffGCD.Demolish, nil, not Target:IsInMeleeRange(12)) then return "demolish main 32"; end
     end
     -- thunderous_roar
     if CDsON() and S.ThunderousRoar:IsCastable() then
