@@ -589,13 +589,14 @@ local function Vanish ()
 
   -- # Vanish for slightly more mark uptime since you can apply mark and have darkest night at the same time
   --actions.vanish+=/vanish,if=!talent.improved_garrote&buff.darkest_night.up&combo_points.deficit>=3&variable.single_target
-  if S.Vanish:IsReady() and not S.ImprovedGarrote:IsAvailable() and Player:BuffUp(S.DarkestNightBuff)
+  -- Note: Simc commit mentions this as "temporarily commented out". Leaving it here for easy re-implementation.
+  --[[if S.Vanish:IsReady() and not S.ImprovedGarrote:IsAvailable() and Player:BuffUp(S.DarkestNightBuff)
     and ComboPointsDeficit >= 3 and SingleTarget then
     ShouldReturn = StealthMacro(S.Vanish)
     if ShouldReturn then
       return "Cast Vanish (Deathmark Uptime)" .. ShouldReturn
     end
-  end
+  end]]
 end
 
 local function UsableItems ()
