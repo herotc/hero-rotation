@@ -85,8 +85,8 @@ local VarTrinketFailures = 0
 local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData()
 
-  -- If we don't have trinket items, try again in 2 seconds.
-  if VarTrinketFailures < 5 and (T1.ID == 0 or T2.ID == 0) then
+  -- If we don't have trinket items, try again in 5 seconds.
+  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
     VarTrinketFailures = VarTrinketFailures + 1
     Delay(5, function()
         SetTrinketVariables()

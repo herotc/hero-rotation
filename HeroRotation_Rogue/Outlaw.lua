@@ -59,17 +59,28 @@ local OnUseExcludes = {
 }
 
 -- Trinkets
-local trinket1, trinket2 = Player:GetTrinketItems()
--- If we don't have trinket items, try again in 2 seconds.
-if trinket1:ID() == 0 or trinket2:ID() == 0 then
-  Delay(2, function()
-    trinket1, trinket2 = Player:GetTrinketItems()
+local trinket1, trinket2
+local VarTrinketFailures = 0
+local function SetTrinketVariables()
+  local T1, T2 = Player:GetTrinketData()
+
+  -- If we don't have trinket items, try again in 5 seconds.
+  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
+    VarTrinketFailures = VarTrinketFailures + 1
+    Delay(5, function()
+      SetTrinketVariables()
+    end
+    )
+    return
   end
-  )
+
+  trinket1 = T1.Object
+  trinket2 = T2.Object
 end
+SetTrinketVariables()
 
 HL:RegisterForEvent(function()
-  trinket1, trinket2 = Player:GetTrinketItems()
+  SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- Rotation Var
