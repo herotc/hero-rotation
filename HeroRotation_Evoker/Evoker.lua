@@ -53,6 +53,7 @@ Spell.Evoker.Commons = {
   LeapingFlamesBuff                     = Spell(370901),
   ScarletAdaptationBuff                 = Spell(372470),
   SourceofMagicBuff                     = Spell(369459),
+  TipTheScalesBuff                      = Spell(370553),
   -- DF Trinket Effects
   SpoilsofNeltharusCrit                 = Spell(381954),
   SpoilsofNeltharusHaste                = Spell(381955),
@@ -153,6 +154,7 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   RagingInferno                         = Spell(405659),
   RubyEmbers                            = Spell(365937),
   Scintillation                         = Spell(370821),
+  ScorchingEmbers                       = Spell(370819),
   ShatteringStar                        = Spell(370452),
   Snapfire                              = Spell(370783),
   Tyranny                               = Spell(376888),
