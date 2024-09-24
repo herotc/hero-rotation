@@ -315,9 +315,10 @@ Item.Rogue.Assassination = {
   AlgetharPuzzleBox       = Item(193701, {13, 14}),
   AshesoftheEmbersoul     = Item(207167, {13, 14}),
   BottledFlayedwingToxin  = Item(178742, {13, 14}),
-  WitherbarksBranch       = Item(109999, {13, 14}),
   ImperfectAscendancySerum = Item(225654, {13, 14}),
-  TreacherousTransmitter  = Item(221023, {13, 14})
+  MadQueensMandate        = Item(212454, {13, 14}),
+  TreacherousTransmitter  = Item(221023, {13, 14}),
+  WitherbarksBranch       = Item(109999, {13, 14}),
 }
 
 Item.Rogue.Outlaw = {
