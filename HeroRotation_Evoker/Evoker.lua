@@ -85,6 +85,7 @@ Spell.Evoker.Scalecommander = {
   -- Talents
   Bombardments                          = Spell(434300),
   Maneuverability                       = Spell(433871),
+  MassDisintegrate                      = Spell(436335),
   MassEruption                          = Spell(438587),
   MeltArmor                             = Spell(441176),
   Wingleader                            = Spell(441206),
