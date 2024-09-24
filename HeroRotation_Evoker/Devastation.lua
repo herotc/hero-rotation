@@ -458,7 +458,7 @@ local function ST()
     if Cast(S.AzureStrike, nil, nil, not Target:IsInRange(40)) then return "azure_strike st 14"; end
   end
   -- engulf,if=dot.fire_breath_damage.ticking&(!talent.enkindle|dot.enkindle.ticking&(prev_gcd.1.disintegrate|prev_gcd.1.engulf|prev_gcd.2.disintegrate|!talent.fan_the_flames|active_enemies>1))&(!talent.ruby_embers|dot.living_flame_damage.ticking)&(!talent.shattering_star|debuff.shattering_star_debuff.up)&cooldown.dragonrage.remains>=27
-  if S.Engulf:IsReady() and (Target:DebuffUp(S.FireBreathDebuff) and (not S.Enkindle:IsAvailable() or Player:BufffUp(S.EnkindleBuff) and (S.PrevGCDP(1, S.Disintegrate) or S.PrevGCDP(1, S.Engulf) or S.PrevGCDP(2, S.Disintegrate) or not S.FanTheFlames:IsAvailable() or EnemiesCount8ySplash > 1)) and (not S.RubyEmbers:IsAvailable() or Target:DebuffUp(S.LivingFlameDebuff)) and (not S.ShatteringStar:IsAvailable() or Target:DebuffUp(S.ShatteringStarDebuff)) and S.Dragonrage:CooldownRemains() >= 27) then
+  if S.Engulf:IsReady() and (Target:DebuffUp(S.FireBreathDebuff) and (not S.Enkindle:IsAvailable() or Player:BuffUp(S.EnkindleBuff) and (S.PrevGCDP(1, S.Disintegrate) or S.PrevGCDP(1, S.Engulf) or S.PrevGCDP(2, S.Disintegrate) or not S.FanTheFlames:IsAvailable() or EnemiesCount8ySplash > 1)) and (not S.RubyEmbers:IsAvailable() or Target:DebuffUp(S.LivingFlameDebuff)) and (not S.ShatteringStar:IsAvailable() or Target:DebuffUp(S.ShatteringStarDebuff)) and S.Dragonrage:CooldownRemains() >= 27) then
     if Cast(S.Engulf, nil, nil, not Target:IsInRange(25)) then return "engulf st 16"; end
   end
   -- living_flame,if=buff.burnout.up&buff.leaping_flames.up&!buff.essence_burst.up&buff.dragonrage.up
