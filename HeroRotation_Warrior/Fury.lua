@@ -158,6 +158,19 @@ local function Precombat()
   -- variable,name=trinket_2_manual,value=trinket.2.is.algethar_puzzle_box
   -- Note: Moved the above variables to declarations and PLAYER_EQUIPMENT_CHANGED.
   -- Manually added: Group Battle Shout check
+  -- Check if cooldowns are enabled
+  if CDsON() and Settings.Commons.UseCDsInPrecombat then
+    -- Check if the Treacherous Transmitter is equipped and ready
+    if I.TreacherousTransmitter:IsEquippedAndReady() then
+      if Cast(I.TreacherousTransmitter) then return "use_treacherous_transmitter precombat"; end
+    end
+    -- Check if the Imperfect Ascendancy Serum is equipped and ready
+    if I.ImperfectAscendancySerum:IsEquippedAndReady() then
+      if Cast(I.ImperfectAscendancySerum) then return "use_imperfect_ascendancy_serum precombat"; end
+    end
+  end
+
+  -- Check if Battle Shout is castable and group buff is missing
   if S.BattleShout:IsCastable() and Everyone.GroupBuffMissing(S.BattleShoutBuff) then
     if Cast(S.BattleShout, Settings.CommonsOGCD.GCDasOffGCD.BattleShout) then return "battle_shout precombat 2"; end
   end
@@ -168,6 +181,19 @@ local function Precombat()
   -- recklessness,if=!equipped.fyralath_the_dreamrender
   if CDsON() and S.Recklessness:IsCastable() and (not I.Fyralath:IsEquipped()) then
     if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat 8"; end
+  end
+  -- Check if any trinket is equipped and ready, prioritizing on-use trinkets
+  if CDsON() and Settings.Commons.UseCDsInPrecombat then
+    if Trinket1:IsEquippedAndReady() and not VarTrinket1Manual and Trinket1:ID() ~= I.TreacherousTransmitter:ID() and Trinket1:ID() ~= I.ImperfectAscendancySerum:ID() then
+      if Trinket1:HasUseBuff() or not Trinket2:HasUseBuff() then
+        if Cast(Trinket1) then return "use_trinket_1 precombat"; end
+      end
+    end
+    if Trinket2:IsEquippedAndReady() and not VarTrinket2Manual and Trinket2:ID() ~= I.TreacherousTransmitter:ID() and Trinket2:ID() ~= I.ImperfectAscendancySerum:ID() then
+      if Trinket2:HasUseBuff() or not Trinket1:HasUseBuff() then
+        if Cast(Trinket2) then return "use_trinket_2 precombat"; end
+      end
+    end
   end
   -- avatar,if=!talent.titans_torment
   if CDsON() and S.Avatar:IsCastable() and (not S.TitansTorment:IsAvailable()) then
@@ -574,27 +600,26 @@ local function Trinkets()
       if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter trinkets 2"; end
     end
     -- use_item,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!buff.avatar.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&((talent.titans_torment&cooldown.avatar.ready)|(buff.avatar.up&!talent.titans_torment))&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
-    if Trinket1:IsReady() and not VarTrinket1BL and (VarTrinket1Buffs and not VarTrinket1Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket1CastTime > 0 or VarTrinket1CastTime == 0) and ((S.TitansTorment:IsAvailable() and S.Avatar:CooldownUp()) or (Player:BuffUp(S.AvatarBuff) and not S.TitansTorment:IsAvailable())) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= BossFightRemains) then
+    if Trinket1:IsReady() and not VarTrinket1BL and (not Settings.Commons.SyncTrinketsToCDs or CDsON()) and (VarTrinket1Buffs and not VarTrinket1Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket1CastTime > 0 or VarTrinket1CastTime == 0) and ((S.TitansTorment:IsAvailable() and S.Avatar:CooldownUp()) or (Player:BuffUp(S.AvatarBuff) and not S.TitansTorment:IsAvailable())) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= BossFightRemains) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for " .. Trinket1:Name() .. " trinkets 4"; end
     end
     -- use_item,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!buff.avatar.up&trinket.2.cast_time>0|!trinket.2.cast_time>0)&((talent.titans_torment&cooldown.avatar.ready)|(buff.avatar.up&!talent.titans_torment))&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
-    if Trinket2:IsReady() and not VarTrinket2BL and (VarTrinket2Buffs and not VarTrinket2Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket2CastTime > 0 or VarTrinket2CastTime == 0) and ((S.TitansTorment:IsAvailable() and S.Avatar:CooldownUp()) or (Player:BuffUp(S.AvatarBuff) and not S.TitansTorment:IsAvailable())) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= BossFightRemains) then
+    if Trinket2:IsReady() and not VarTrinket2BL and (not Settings.Commons.SyncTrinketsToCDs or CDsON()) and (VarTrinket2Buffs and not VarTrinket2Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket2CastTime > 0 or VarTrinket2CastTime == 0) and ((S.TitansTorment:IsAvailable() and S.Avatar:CooldownUp()) or (Player:BuffUp(S.AvatarBuff) and not S.TitansTorment:IsAvailable())) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= BossFightRemains) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for " .. Trinket2:Name() .. " trinkets 6"; end
     end
     -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.1.cast_time>0&!buff.avatar.up|!trinket.1.cast_time>0)&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|(trinket.1.cast_time>0&!buff.avatar.up|!trinket.1.cast_time>0)|cooldown.avatar.remains_expected>20)
-    if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs and (VarTrinket1CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket1CastTime == 0) and not VarTrinket1Manual and (not VarTrinket1Buffs and (Trinket2:CooldownDown() or not VarTrinket2Buffs) or (VarTrinket1CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket1CastTime == 0) or S.Avatar:CooldownRemains() > 20)) then
+    if Trinket1:IsReady() and not VarTrinket1BL and (not Settings.Commons.SyncTrinketsToCDs or CDsON()) and (not VarTrinket1Buffs and (VarTrinket1CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket1CastTime == 0) and not VarTrinket1Manual and (not VarTrinket1Buffs and (Trinket2:CooldownDown() or not VarTrinket2Buffs) or (VarTrinket1CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket1CastTime == 0) or S.Avatar:CooldownRemains() > 20)) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for " .. Trinket1:Name() .. " trinkets 8"; end
     end
     -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.2.cast_time>0&!buff.avatar.up|!trinket.2.cast_time>0)&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|(trinket.2.cast_time>0&!buff.avatar.up|!trinket.2.cast_time>0)|cooldown.avatar.remains_expected>20)
-    if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs and (VarTrinket2CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket2CastTime == 0) and not VarTrinket2Manual and (not VarTrinket2Buffs and (Trinket1:CooldownDown() or not VarTrinket1Buffs) or (VarTrinket2CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket2CastTime == 0) or S.Avatar:CooldownRemains() > 20)) then
+    if Trinket2:IsReady() and not VarTrinket2BL and (not Settings.Commons.SyncTrinketsToCDs or CDsON()) and (not VarTrinket2Buffs and (VarTrinket2CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket2CastTime == 0) and not VarTrinket2Manual and (not VarTrinket2Buffs and (Trinket1:CooldownDown() or not VarTrinket1Buffs) or (VarTrinket2CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket2CastTime == 0) or S.Avatar:CooldownRemains() > 20)) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for " .. Trinket2:Name() .. " trinkets 10"; end
     end
   end
   -- use_item,slot=main_hand,if=!equipped.fyralath_the_dreamrender&(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
   if Settings.Commons.Enabled.Items then
-    -- Note: Adding a generic use_items for non-trinkets instead.
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
-    if ItemToUse then
+    if ItemToUse and (not Settings.Commons.SyncItemsToCDs or CDsON()) then
       if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 12"; end
     end
   end
@@ -732,7 +757,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Fury Warrior rotation has been updated for patch 11.0.2.")
+  HR.Print("Fury Warrior rotation has been updated for patch 11.0.2 with new custom settings.")
 end
 
 HR.SetAPL(72, APL, Init)

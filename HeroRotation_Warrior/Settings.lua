@@ -1,6 +1,6 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
-  -- Addon
+-- Addon
 local addonName, addonTable = ...
 -- HeroRotation
 local HR = HeroRotation
@@ -24,6 +24,8 @@ HR.GUISettings.APL.Warrior = {
       Trinkets = true,
       Items = true,
     },
+    SyncTrinketsToCDs = false,
+    UseCDsInPrecombat = false,
   },
   CommonsDS = {
     DisplayStyle = {
@@ -118,6 +120,8 @@ local CP_Protection = CreateChildPanel(CP_Warrior, "Protection")
 CreateARPanelOptions(CP_Warrior, "APL.Warrior.Commons")
 CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.ShoutDuringCombat", "Battle Shout during combat", "Enable this option to allow Battle Shout to be suggested during combat (for re-buffing fallen allies or when the buff expires during combat).")
 CreatePanelOption("Slider", CP_Warrior, "APL.Warrior.Commons.VictoryRushHP", {0, 100, 1}, "Victory Rush HP", "Set the Victory Rush/Impending Victory HP threshold. Set to 0 to disable.")
+CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.SyncTrinketsToCDs", "Sync Trinkets to CDs", "Enable this option to sync trinket usage with major cooldowns. Includes custom logic for specific trinkets like Treacherous Transmitter.")
+CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UseCDsInPrecombat", "Precombat CD/Trinket Usage", "Enable this option to use cooldowns and on-use trinkets in the precombat routine. Respects custom trinket logic.")
 CreateARPanelOptions(CP_WarriorDS, "APL.Warrior.CommonsDS")
 CreateARPanelOptions(CP_WarriorOGCD, "APL.Warrior.CommonsOGCD")
 
