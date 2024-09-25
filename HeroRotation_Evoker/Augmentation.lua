@@ -588,7 +588,7 @@ local function APL()
     if Settings.Commons.Enabled.Potions and S.BreathofEons:CooldownUp() and S.Wingleader:IsAvailable() or BossFightRemains <= 30 then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected then
-        if PotionSelected:IsReady() and (ActiveEnemies >= 1 and (not S.SummonGargoyle:IsAvailable() or S.SummonGargoyle:CooldownRemains() > 60) and (Pet:BuffUp(S.DarkTransformation) and 30 >= Pet:BuffRemains(S.DarkTransformation) or VarArmyGhoulActive and VarArmyGhoulRemains <= 30 or VarApocGhoulActive and VarApocGhoulRemains <= 30 or VarAbomActive and VarAbomRemains <= 30) or BossFightRemains <= 30) then
+        if PotionSelected:IsReady() and (EnemiesCount8ySplash >= 1 and (not S.SummonGargoyle:IsAvailable() or S.SummonGargoyle:CooldownRemains() > 60) and (Pet:BuffUp(S.DarkTransformation) and 30 >= Pet:BuffRemains(S.DarkTransformation) or VarArmyGhoulActive and VarArmyGhoulRemains <= 30 or VarApocGhoulActive and VarApocGhoulRemains <= 30 or VarAbomActive and VarAbomRemains <= 30) or BossFightRemains <= 30) then
           if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 6"; end
         end
       end
