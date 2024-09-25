@@ -106,7 +106,7 @@ local VarCombustionOnUse
 local VarTreacherousTransmitterPrecombatCast
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
-  Trinket1, Trinket2 = Player:GetTrinketItems()
+  local T1, T2 = Player:GetTrinketItems()
 
   -- If we don't have trinket items, try again in 5 seconds.
   if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
@@ -117,6 +117,9 @@ local function SetTrinketVariables()
     )
     return
   end
+
+  Trinket1 = T1.Object
+  Trinket2 = T2.Object
 
   VarCombustionOnUse = I.ForgedGladiatorsBadge:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.CrimsonGladiatorsBadge:IsEquipped() or I.DraconicGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.MoonlitPrism:IsEquipped() or I.IrideusFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped()
 
