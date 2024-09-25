@@ -73,9 +73,15 @@ local FightRemains = 11111
 
 --- ===== Trinket Item Objects =====
 local Trinket1, Trinket2
+local VarTrinket1ID, VarTrinket2ID
+local VarTrinket1Spell, VarTrinket2Spell
+local VarTrinket1Range, VarTrinket2Range
+local VarTrinket1CastTime, VarTrinket2CastTime
+local VarTrinket1CD, VarTrinket2CD
+local VarTrinket1BL, VarTrinket2BL
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
-  Trinket1, Trinket2 = Player:GetTrinketItems()
+  local T1, T2 = Player:GetTrinketItems()
   if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
     VarTrinketFailures = VarTrinketFailures + 1
     Delay(5, function()
@@ -83,6 +89,25 @@ local function SetTrinketVariables()
       end
     )
   end
+
+  Trinket1 = T1.Object
+  Trinket2 = T2.Object
+
+  VarTrinket1ID = T1.ID
+  VarTrinket2ID = T2.ID
+
+  VarTrinket1Spell = T1.Spell
+  VarTrinket1Range = T1.Range
+  VarTrinket1CastTime = T1.CastTime
+  VarTrinket2Spell = T2.Spell
+  VarTrinket2Range = T2.Range
+  VarTrinket2CastTime = T2.CastTime
+
+  VarTrinket1CD = T1.Cooldown
+  VarTrinket2CD = T2.Cooldown
+
+  VarTrinket1BL = T1.Blacklisted
+  VarTrinket2BL = T2.Blacklisted
 end
 SetTrinketVariables()
 
@@ -225,21 +250,19 @@ local function Trinkets()
     if I.TreacherousTransmitter:IsEquippedAndReady() and (S.InvokeXuenTheWhiteTiger:CooldownRemains() < 4 or S.XuensBond:IsAvailable() and Monk.Xuen.Active) then
       if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter trinkets 16"; end
     end
-    local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
-    local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
     -- ITEM_STAT_BUFF,if=pet.xuen_the_white_tiger.active
-    if Trinket1ToUse and Trinket1ToUse:HasUseBuff() and (Monk.Xuen.Active) then
-      if Cast(Trinket1ToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name() .. " (trinkets stat_buff trinket1)"; end
+    if Trinket1:IsReady() and not VarTrinket1BL and Trinket1:HasUseBuff() and (Monk.Xuen.Active) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_items for " .. Trinket1:Name() .. " (trinkets stat_buff trinket1)"; end
     end
-    if Trinket2ToUse and Trinket2ToUse:HasUseBuff() and (Monk.Xuen.Active) then
-      if Cast(Trinket2ToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name() .. " (trinkets stat_buff trinket2)"; end
+    if Trinket2:IsReady() and not VarTrinket2BL and Trinket2:HasUseBuff() and (Monk.Xuen.Active) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_items for " .. Trinket2:Name() .. " (trinkets stat_buff trinket2)"; end
     end
     -- ITEM_DMG_BUFF,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>30
-    if Trinket1ToUse and (not Trinket1ToUse:HasUseBuff() or Trinket1ToUse:HasUseBuff() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30) then
-      if Cast(Trinket1ToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket1Range)) then return "Generic use_items for " .. Trinket1ToUse:Name() .. " (trinkets dmg_buff trinket1)"; end
+    if Trinket1:IsReady() and not VarTRinket1BL and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_items for " .. Trinket1:Name() .. " (trinkets dmg_buff trinket1)"; end
     end
-    if Trinket2ToUse and (not Trinket2ToUse:HasUseBuff() or Trinket2ToUse:HasUseBuff() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30) then
-      if Cast(Trinket2ToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name() .. " (trinkets dmg_buff trinket2)"; end
+    if Trinket2:IsReady() and not VarTrinket2BL and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_items for " .. Trinket2:Name() .. " (trinkets dmg_buff trinket2)"; end
     end
   end
   -- do_treacherous_transmitter_task,if=pet.xuen_the_white_tiger.active|fight_remains<20
