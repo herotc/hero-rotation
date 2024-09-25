@@ -390,13 +390,17 @@ local function CombustionPhase()
   -- variable,name=TA_combust,value=cooldown.combustion.remains<10&buff.combustion.up
   -- Note: Moved to the top of the function, since below fire_blast lines had to be moved up.
   VarTACombust = S.Combustion:CooldownRemains() < 10 and CombustionUp
+  -- phoenix_flames,if=talent.spellfire_spheres&talent.phoenix_reborn&buff.heating_up.react&!buff.hot_streak.react&buff.flames_fury.up
+  if S.PhoenixFlames:IsCastable() and (S.SpellfireSpheres:IsAvailable() and S.PhoenixReborn:IsAvailable() and HeatingUp and not HotStreak and Player:BuffUp(S.FlamesFuryBuff)) then
+    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 18"; end
+  end
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(!variable.TA_combust|talent.sun_kings_blessing)&!variable.fire_blast_pooling&(!improved_scorch.active|action.scorch.executing|debuff.improved_scorch.remains>4*gcd.max)&(buff.fury_of_the_sun_king.down|action.pyroblast.executing)&buff.combustion.up&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react*(gcd.remains>0)<2
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=variable.TA_combust&!variable.fire_blast_pooling&charges_fractional>2.5&(!improved_scorch.active|action.scorch.executing|debuff.improved_scorch.remains>4*gcd.max)&(buff.fury_of_the_sun_king.down|action.pyroblast.executing)&buff.combustion.up&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react*(gcd.remains>0)<2
   -- Note: Moved above with combustion, due to use_while_casting
   -- cancel_buff,name=hyperthermia,if=buff.fury_of_the_sun_king.react
   -- flamestrike,if=(buff.hot_streak.react&active_enemies>=variable.combustion_flamestrike)|(buff.hyperthermia.react&active_enemies>=variable.combustion_flamestrike-talent.hyperthermia)
   if AoEON() and S.Flamestrike:IsReady() and ((HotStreak and EnemiesCount8ySplash >= VarCombustionFlamestrike) or (Player:BuffUp(S.HyperthermiaBuff) and EnemiesCount8ySplash >= VarCombustionFlamestrike - num(S.Hyperthermia:IsAvailable()))) then
-    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 18"; end
+    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 19"; end
   end
   -- pyroblast,if=buff.hyperthermia.react
   if S.Pyroblast:IsReady() and (Player:BuffUp(S.HyperthermiaBuff)) then
