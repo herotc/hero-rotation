@@ -151,6 +151,7 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   Firestorm                             = Spell(368847),
   FontofMagic                           = Spell(375783),
   ImminentDestruction                   = Spell(370781),
+  Iridescence                           = Spell(370867),
   Pyre                                  = Spell(357211),
   RagingInferno                         = Spell(405659),
   RubyEmbers                            = Spell(365937),
