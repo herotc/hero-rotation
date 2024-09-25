@@ -71,6 +71,8 @@ local Ghoul = HL.GhoulTable
 
 --- ===== Trinket Variables =====
 local Trinket1, Trinket2
+local VarTrinket1ID, VarTrinket2ID
+local VarTrinket1Level, VarTrinket2Level
 local VarTrinket1Spell, VarTrinket2Spell
 local VarTrinket1Range, VarTrinket2Range
 local VarTrinket1CastTime, VarTrinket2CastTime
@@ -86,7 +88,7 @@ local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData()
 
   -- If we don't have trinket items, try again in 5 seconds.
-  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
+  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.Level == 0 or T2.Level == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
     VarTrinketFailures = VarTrinketFailures + 1
     Delay(5, function()
         SetTrinketVariables()
@@ -97,6 +99,12 @@ local function SetTrinketVariables()
 
   Trinket1 = T1.Object
   Trinket2 = T2.Object
+
+  VarTrinket1ID = T1.ID
+  VarTrinket2ID = T2.ID
+
+  VarTrinket1Level = T1.Level
+  VarTrinket2Level = T2.Level
 
   VarTrinket1Spell = T1.Spell
   VarTrinket1Range = T1.Range
@@ -128,14 +136,12 @@ local function SetTrinketVariables()
   VarTrinket2Duration = T2.ID == I.TreacherousTransmitter:ID() and 15 or (Trinket2:BuffDuration() > 0 and Trinket2:BuffDuration() or 1)
 
   VarTrinketPriority = 1
-  local T1Level = (T1.ID ~= 0) and Trinket1:Level() or 0
-  local T2Level = (T2.ID ~= 0) and Trinket2:Level() or 0
-  if not VarTrinket1Buffs and VarTrinket2Buffs and (Trinket2:HasCooldown() or not Trinket1:HasCooldown()) or VarTrinket2Buffs and ((VarTrinket2CD / VarTrinket2Duration) * (VarTrinket2Sync) * (1 + ((T2Level - T1Level) / 100))) > ((VarTrinket1CD / VarTrinket1Duration) * (VarTrinket1Sync) * (1 + ((T1Level - T2Level) / 100))) then
+  if not VarTrinket1Buffs and VarTrinket2Buffs and (Trinket2:HasCooldown() or not Trinket1:HasCooldown()) or VarTrinket2Buffs and ((VarTrinket2CD / VarTrinket2Duration) * (VarTrinket2Sync) * (1 + ((VarTrinket2Level - VarTrinket1Level) / 100))) > ((VarTrinket1CD / VarTrinket1Duration) * (VarTrinket1Sync) * (1 + ((VarTrinket1Level - VarTrinket2Level) / 100))) then
     VarTrinketPriority = 2
   end
 
   VarDamageTrinketPriority = 1
-  if not VarTrinket1Buffs and not VarTrinket2Buffs and T2Level >= T1Level then
+  if not VarTrinket1Buffs and not VarTrinket2Buffs and VarTrinket2Level >= VarTrinket1Level then
     VarDamageTrinketPriority = 2
   end
 

@@ -72,6 +72,7 @@ local FightRemains = 11111
 --- ===== Trinket Variables =====
 local Trinket1, Trinket2
 local VarTrinket1ID, VarTrinket2ID
+local VarTrinket1Level, VarTrinket2Level
 local VarTrinket1Spell, VarTrinket2Spell
 local VarTrinket1Range, VarTrinket2Range
 local VarTrinket1CastTime, VarTrinket2CastTime
@@ -88,7 +89,7 @@ local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData()
 
   -- If we don't have trinket items, try again in 5 seconds.
-  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
+  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.Level == 0 or T2.Level == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
     VarTrinketFailures = VarTrinketFailures + 1
     Delay(5, function()
         SetTrinketVariables()
@@ -102,6 +103,9 @@ local function SetTrinketVariables()
 
   VarTrinket1ID = T1.ID
   VarTrinket2ID = T2.ID
+
+  VarTrinket1Level = T1.Level
+  VarTrinket2Level = T2.Level
 
   VarTrinket1Spell = T1.Spell
   VarTrinket1Range = T1.Range
@@ -145,7 +149,7 @@ local function SetTrinketVariables()
 
   -- variable,name=damage_trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&!variable.trinket_2_buffs&trinket.2.ilvl>=trinket.1.ilvl
   VarDamageTrinketPriority = 1
-  if not VarTrinket1Buffs and not VarTrinket2Buffs and Trinket2:Level() >= Trinket1:Level() then
+  if not VarTrinket1Buffs and not VarTrinket2Buffs and VarTrinket2Level >= VarTrinket1Level then
     VarDamageTrinketPriority = 2
   end
 end
