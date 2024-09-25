@@ -60,6 +60,7 @@ local OnUseExcludeTrinkets = {
   I.AshesoftheEmbersoul:ID(),
   I.BottledFlayedwingToxin:ID(),
   I.ImperfectAscendancySerum:ID(),
+  I.MadQueensMandate:ID(),
   I.TreacherousTransmitter:ID(),
 }
 
@@ -588,13 +589,14 @@ local function Vanish ()
 
   -- # Vanish for slightly more mark uptime since you can apply mark and have darkest night at the same time
   --actions.vanish+=/vanish,if=!talent.improved_garrote&buff.darkest_night.up&combo_points.deficit>=3&variable.single_target
-  if S.Vanish:IsReady() and not S.ImprovedGarrote:IsAvailable() and Player:BuffUp(S.DarkestNightBuff)
+  -- Note: Simc commit mentions this as "temporarily commented out". Leaving it here for easy re-implementation.
+  --[[if S.Vanish:IsReady() and not S.ImprovedGarrote:IsAvailable() and Player:BuffUp(S.DarkestNightBuff)
     and ComboPointsDeficit >= 3 and SingleTarget then
     ShouldReturn = StealthMacro(S.Vanish)
     if ShouldReturn then
       return "Cast Vanish (Deathmark Uptime)" .. ShouldReturn
     end
-  end
+  end]]
 end
 
 local function UsableItems ()
@@ -625,6 +627,15 @@ local function UsableItems ()
     if (Target:DebuffUp(S.Rupture) and S.Deathmark:CooldownRemains() <= 2 or HL.BossFilteredFightRemains("<", 22)) then
       if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
         return "Treacherous Transmitter";
+      end
+    end
+  end
+
+  -- actions.items+=/use_item,name=mad_queens_mandate,use_off_gcd=1,if=cooldown.deathmark.remains>=50|fight_remains<=3
+  if I.MadQueensMandate:IsEquippedAndReady() then
+    if (S.Deathmark:CooldownRemains() >= 50 or HL.BossFilteredFightRemains("<=", 3)) then
+      if Cast(I.MadQueensMandate, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+        return "Mad Queen's Mandate";
       end
     end
   end

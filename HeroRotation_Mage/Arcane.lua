@@ -38,7 +38,6 @@ local I = Item.Mage.Arcane;
 local OnUseExcludes = {
   -- TWW Trinkets
   I.AberrantSpellforge:ID(),
-  I.ConcoctionKissofDeath:ID(),
   I.HighSpeakersAccretion:ID(),
   I.MadQueensMandate:ID(),
   I.MereldarsToll:ID(),
@@ -452,15 +451,11 @@ local function APL()
       if I.ImperfectAscendancySerum:IsEquippedAndReady() and (S.Evocation:CooldownUp() or S.ArcaneSurge:CooldownUp() or BossFightRemains < 20) then
         if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum main 20"; end
       end
-      -- use_item,name=treacherous_transmitter,if=talent.spellfire_spheres&(prev_gcd.1.evocation|((cooldown.evocation.remains<10+(7*(equipped.spymasters_web&(buff.spymasters_report.stack=40|target.health.pct<35))))&cooldown.evocation.remains))|(talent.splintering_sorcery&(buff.arcane_surge.remains>13|prev_gcd.1.evocation|cooldown.arcane_surge.remains<10))|fight_remains<20
-      if I.TreacherousTransmitter:IsEquippedAndReady() and (S.SpellfireSpheres:IsAvailable() and (Player:PrevGCDP(1, S.Evocation) or ((S.Evocation:CooldownRemains() < 10 + (7 * num(I.SpymastersWeb:IsEquipped() and (Player:BuffStack(S.SpymastersReportBuff) == 40 or Target:HealthPercentage() < 35)))) and S.Evocation:CooldownDown())) or (S.SplinteringSorcery:IsAvailable() and (Player:BuffRemains(S.ArcaneSurgeBuff) > 13 or Player:PrevGCDP(1, S.Evocation) or S.ArcaneSurge:CooldownRemains() < 10)) or BossFightRemains < 20) then
+      -- use_item,name=treacherous_transmitter,if=(cooldown.evocation.remains<7&cooldown.evocation.remains)|fight_remains<20
+      if I.TreacherousTransmitter:IsEquippedAndReady() and ((S.Evocation:CooldownRemains() < 7 and S.Evocation:CooldownDown()) or BossFightRemains < 20) then
         if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter main 22"; end
       end
-      -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.siphon_storm.remains>15|fight_remains<20|(cooldown.touch_of_the_magi.remains<8&equipped.spymasters_web&talent.spellfire_spheres)|(buff.arcane_surge.remains>13&talent.splintering_sorcery)
-      -- use_item,name=concoction_kiss_of_death,if=(prev_gcd.1.arcane_surge|prev_gcd.1.evocation)&(fight_remains<80|target.health.pct<35|!talent.arcane_bombardment|(!equipped.spymasters_web|buff.spymasters_report.stack=40&fight_remains>240))|fight_remains<20|time<2
-      if I.ConcoctionKissofDeath:IsEquippedAndReady() and ((Player:PrevGCDP(1, S.ArcaneSurge) or Player:PrevGCDP(1, S.Evocation)) and (FightRemains < 80 or Target:HealthPercentage() < 35 or not S.ArcaneBombardment:IsAvailable() or (not I.SpymastersWeb:IsEquipped() or Player:BuffStack(S.SpymastersReportBuff) == 40 and FightRemains > 240)) or BossFightRemains < 20 or HL.CombatTime() < 2) then
-        if Cast(I.ConcoctionKissofDeath, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "concoction_kiss_of_death main 24"; end
-      end
+      -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.siphon_storm.up|fight_remains<20
       -- use_item,name=aberrant_spellforge,if=!variable.steroid_trinket_equipped|buff.siphon_storm.down|(equipped.spymasters_web&target.health.pct>35)
       if I.AberrantSpellforge:IsEquippedAndReady() and (not VarSteroidTrinketEquipped or Player:BuffDown(S.SiphonStormBuff) or (I.SpymastersWeb:IsEquipped() and Target:HealthPercentage() > 35)) then
         if Cast(I.AberrantSpellforge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "aberrant_spellforge main 26"; end

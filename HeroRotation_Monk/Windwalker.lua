@@ -242,7 +242,7 @@ local function Trinkets()
       if Cast(Trinket2ToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(Trinket2Range)) then return "Generic use_items for " .. Trinket2ToUse:Name() .. " (trinkets dmg_buff trinket2)"; end
     end
   end
-  -- do_treacherous_transmitter_task,if=pet.xuen_the_white_tiger.active
+  -- do_treacherous_transmitter_task,if=pet.xuen_the_white_tiger.active|fight_remains<20
   -- TODO
 end
 

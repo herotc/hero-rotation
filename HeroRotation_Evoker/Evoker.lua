@@ -77,6 +77,7 @@ Spell.Evoker.Flameshaper = {
   -- Talents
   Engulf                                = Spell(443328),
   Enkindle                              = Spell(444016),
+  FanTheFlames                          = Spell(444318),
   TravelingFlame                        = Spell(444140),
   -- Buffs
   EnkindleBuff                        = Spell(444017),
