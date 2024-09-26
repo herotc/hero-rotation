@@ -170,7 +170,7 @@ local function Cooldowns()
   end
   -- divine_toll,if=spell_targets.shield_of_the_righteous>=3
   if CDsON() and S.DivineToll:IsCastable() and (EnemiesCount8y >= 3) then
-    if Cast(S.DivineToll, nil, Settings.CommonsDS.DisplayStyle.Signature) then return "divine_toll cooldowns 12"; end
+    if Cast(S.DivineToll, nil, Settings.CommonsDS.DisplayStyle.DivineToll) then return "divine_toll cooldowns 12"; end
   end
   -- bastion_of_light,if=buff.avenging_wrath.up|cooldown.avenging_wrath.remains<=30
   if S.BastionofLight:IsCastable() and (Player:BuffUp(S.AvengingWrathBuff) or S.AvengingWrath:CooldownRemains() <= 30) then
