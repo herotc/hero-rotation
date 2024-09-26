@@ -15,8 +15,6 @@ local SpellProt = Spell.Paladin.Protection
 -- Lua
 
 --- ============================ CONTENT ============================
--- Holy, ID: 65
-
 -- Protection, ID: 66
 local ProtPalBuffUp
 ProtPalBuffUp = HL.AddCoreOverride("Player.BuffUp",

@@ -43,5 +43,3 @@ WWOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     end
   end
 , 269)
-
--- Mistweaver, ID: 270

@@ -13,5 +13,4 @@ Shaman.lua
 Events.lua
 Enhancement.lua
 Elemental.lua
-Restoration.lua
 Overrides.lua
