@@ -16,6 +16,8 @@ local select = select
 -- File Locals
 HR.Commons.Paladin = {}
 local Paladin = HR.Commons.Paladin
+Paladin.HPGCount = 0
+Paladin.DivineHammerActive = false
 
 --- ============================ CONTENT ============================
 --- ===== HPGTo2Dawn Tracker =====
@@ -34,9 +36,21 @@ HL:RegisterForSelfCombatEvent(
     local SpellID = select(12, ...)
     if SpellID == 385127 then
       Paladin.HPGCount = 0
+    elseif SpellID == 198034 then -- Divine Hammer
+      Paladin.DivineHammerActive = true
     end
   end
 , "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE")
+
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local SpellID = select(12, ...)
+    if SpellID == 198034 then -- Divine Hammer
+      Paladin.DivineHammerActive = false
+    end
+  end
+  , "SPELL_AURA_REMOVED"
+)
 
 --- ======= NON-COMBATLOG =======
 

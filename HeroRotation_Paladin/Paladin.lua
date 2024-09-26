@@ -51,6 +51,7 @@ Spell.Paladin.Commons = {
   LayonHands                            = Spell(633),
   OfDuskandDawn                         = Spell(409441),
   Seraphim                              = Spell(152262),
+  VengefulWrath                         = Spell(406835),
   ZealotsParagon                        = Spell(391142),
   -- Auras
   ConcentrationAura                     = Spell(317920),
@@ -75,6 +76,11 @@ Spell.Paladin.Commons = {
 }
 
 Spell.Paladin.HeraldoftheSun = {
+  -- Talents
+  BlessingofAnshe                       = Spell(445200),
+  -- Buffs
+  BlessingofAnsheHolyBuff               = Spell(445204),
+  BlessingofAnsheRetBuff                = Spell(445206),
 }
 
 Spell.Paladin.Lightsmith = {
@@ -140,6 +146,7 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   -- Talents
   AshestoDust                           = Spell(383300),
   BladeofJustice                        = Spell(184575),
+  BladeofVengeance                      = Spell(403826),
   BladeofWrath                          = Spell(231832),
   BlessedChampion                       = Spell(403010),
   BoundlessJudgment                     = Spell(405278),
@@ -162,10 +169,12 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   FinalVerdict                          = Spell(383328),
   FiresofJustice                        = Spell(203316),
   HolyBlade                             = Spell(383342),
+  HolyFlames                            = Spell(406545),
   Jurisdiction                          = Spell(402971),
   JusticarsVengeance                    = Spell(215661),
   RadiantDecree                         = Spell(383469),
   RadiantDecreeTalent                   = Spell(384052),
+  RadiantGlory                          = Spell(458359),
   RighteousVerdict                      = Spell(267610),
   ShieldofVengeance                     = Spell(184662),
   TemplarSlash                          = Spell(406647),
@@ -177,11 +186,13 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   -- Buffs
   CrusadeBuff                           = Spell(231895),
   DivineArbiterBuff                     = Spell(406975),
+  DivineHammerBuff                      = Spell(198034),
   DivineResonanceBuff                   = Spell(384029),
   EchoesofWrathBuff                     = Spell(423590), -- T31, 4pc
   EmpyreanLegacyBuff                    = Spell(387178),
   EmpyreanPowerBuff                     = Spell(326733),
   -- Debuffs
+  ExecutionSentenceDebuff               = Spell(343527),
   ExpurgationDebuff                     = Spell(383346),
 })
 Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Retribution, Spell.Paladin.HeraldoftheSun)
