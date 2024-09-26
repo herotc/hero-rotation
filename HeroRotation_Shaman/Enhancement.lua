@@ -518,7 +518,7 @@ local function Aoe()
   end
   -- primordial_wave,target_if=min:dot.flame_shock.remains,if=!buff.primordial_wave.up
   if S.PrimordialWave:IsReady() and (Player:BuffDown(S.PrimordialWaveBuff)) then
-    if Everyone.CastTargetIf(S.PrimordialWave, EnemiesMelee, "min", EvaluateTargetIfFilterPrimordialWave, EvaluateTargetIfPrimordialWave, nil, not Target:IsSpellInRange(S.PrimordialWave), Settings.CommonsDS.DisplayStyle.Signature) then return "primordial_wave aoe 12"; end
+    if Everyone.CastTargetIf(S.PrimordialWave, EnemiesMelee, "min", EvaluateTargetIfFilterPrimordialWave, EvaluateTargetIfPrimordialWave, nil, not Target:IsSpellInRange(S.PrimordialWave), Settings.CommonsDS.DisplayStyle.PrimordialWave) then return "primordial_wave aoe 12"; end
   end
   -- chain_lightning,target_if=min:debuff.lightning_rod.remains,if=buff.arc_discharge.up&buff.maelstrom_weapon.stack>=5
   if S.ChainLightning:IsReady() and (Player:BuffUp(S.ArcDischargeBuff) and MaelstromStacks >= 5) then
