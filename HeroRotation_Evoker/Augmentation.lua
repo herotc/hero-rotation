@@ -64,6 +64,7 @@ local Settings = {
 local PrescienceTargets = {}
 local MaxEmpower = (S.FontofMagic:IsAvailable()) and 4 or 3
 local FoMEmpowerMod = (S.FontofMagic:IsAvailable()) and 0.8 or 1
+local FlameAbility = S.ChronoFlames:IsLearned() and S.ChronoFlames or S.LivingFlame
 local BossFightRemains = 11111
 local FightRemains = 11111
 local VarEssenceBurstMaxStacks = 2
@@ -205,6 +206,7 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 HL:RegisterForEvent(function()
   MaxEmpower = (S.FontofMagic:IsAvailable()) and 4 or 3
   FoMEmpowerMod = (S.FontofMagic:IsAvailable()) and 0.8 or 1
+  FlameAbility = S.ChronoFlames:IsLearned() and S.ChronoFlames or S.LivingFlame
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 --- ===== Helper Functions =====
@@ -405,8 +407,8 @@ local function Precombat()
     if Cast(S.BlisteringScales, nil, Settings.Augmentation.DisplayStyle.AugBuffs) then return "blistering_scales precombat 12"; end
   end
   -- living_flame
-  if S.LivingFlame:IsCastable() then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame precombat 14"; end
+  if FlameAbility:IsCastable() then
+    if Cast(FlameAbility, nil, nil, not Target:IsSpellInRange(FlameAbility)) then return "living_flame precombat 14"; end
   end
 end
 
@@ -446,8 +448,8 @@ end
 
 local function Filler()
   -- living_flame,if=(buff.ancient_flame.up|mana>=200000|!talent.dream_of_spring|variable.spam_heal=0)&(active_enemies=1|talent.pupil_of_alexstrasza)
-  if S.LivingFlame:IsReady() and ((Player:BuffUp(S.AncientFlameBuff) or Player:Mana() >= 200000 or not S.DreamofSpring:IsAvailable() or VarSpamHeal == 0) and (EnemiesCount8ySplash == 1 or S.PupilofAlexstrasza:IsAvailable())) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame filler 2"; end
+  if FlameAbility:IsReady() and ((Player:BuffUp(S.AncientFlameBuff) or Player:Mana() >= 200000 or not S.DreamofSpring:IsAvailable() or VarSpamHeal == 0) and (EnemiesCount8ySplash == 1 or S.PupilofAlexstrasza:IsAvailable())) then
+    if Cast(FlameAbility, nil, nil, not Target:IsSpellInRange(FlameAbility)) then return "living_flame filler 2"; end
   end
   -- emerald_blossom,if=!buff.ebon_might_self.up&talent.ancient_flame&talent.scarlet_adaptation&!talent.dream_of_spring&!buff.ancient_flame.up&active_enemies=1
   if S.EmeraldBlossom:IsReady() and (Player:BuffDown(S.EbonMightSelfBuff) and S.AncientFlame:IsAvailable() and S.ScarletAdaptation:IsAvailable() and not S.DreamofSpring:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and EnemiesCount8ySplash == 1) then
@@ -539,8 +541,8 @@ local function OpenerFiller()
     if Cast(S.Eruption, nil, nil, not Target:IsInRange(25)) then return "eruption opener_filler 2"; end
   end
   -- living_flame,if=active_enemies=1|talent.pupil_of_alexstrasza
-  if S.LivingFlame:IsReady() and (EnemiesCount8ySplash == 1 or S.PupilofAlexstrasza:IsAvailable()) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame opener_filler 4"; end
+  if FlameAbility:IsReady() and (EnemiesCount8ySplash == 1 or S.PupilofAlexstrasza:IsAvailable()) then
+    if Cast(FlameAbility, nil, nil, not Target:IsSpellInRange(FlameAbility)) then return "living_flame opener_filler 4"; end
   end
   -- azure_strike
   if S.AzureStrike:IsCastable() then

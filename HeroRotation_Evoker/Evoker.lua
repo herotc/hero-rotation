@@ -34,7 +34,7 @@ Spell.Evoker.Commons = {
   EmeraldBlossom                        = Spell(355913),
   FireBreath                            = MultiSpell(357208,382266), -- with and without Font of Magic
   Hover                                 = Spell(358267),
-  LivingFlame                           = Spell(361469),
+  LivingFlame                           = Spell(3614694),
   -- Talents
   AncientFlame                          = Spell(369990),
   BlastFurnace                          = Spell(375510),
@@ -69,7 +69,10 @@ Spell.Evoker.Commons = {
 }
 
 Spell.Evoker.Chronowarden = {
+  -- Abilitiies
+  ChronoFlames                          = Spell(431443),
   -- Talents
+  ChronoFlame                           = Spell(431442),
   ThreadsofFate                         = Spell(431715),
 }
 
@@ -111,10 +114,11 @@ Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
   FontofMagic                           = Spell(408083),
   ImminentDestruction                   = Spell(459537),
   InterwovenThreads                     = Spell(412713),
+  MoltenEmbers                          = Spell(459725),
   Prescience                            = Spell(409311),
   PupilofAlexstrasza                    = Spell(407814),
   TimeSkip                              = Spell(404977),
-  Upheaval                              = Spell(408092),
+  Upheaval                              = Spell(396286),
   -- Buffs
   BlackAttunementBuff                   = Spell(403264),
   BlisteringScalesBuff                  = Spell(360827),
