@@ -30,9 +30,9 @@ HR.GUISettings.APL.Warlock = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
-      Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
+      SoulRot = "Suggested",
     },
   },
   CommonsOGCD = {

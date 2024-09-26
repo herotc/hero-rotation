@@ -479,7 +479,7 @@ local function AoE()
   end
   -- soul_rot,if=variable.vt_up&(variable.ps_up|variable.vt_up)&dot.agony.remains
   if S.SoulRot:IsReady() and (VarVTUp and (VarPSUp or VarVTUp) and Target:DebuffUp(S.AgonyDebuff)) then
-    if Cast(S.SoulRot, nil, Settings.CommonsDS.DisplayStyle.Signature, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot aoe 12"; end
+    if Cast(S.SoulRot, nil, Settings.CommonsDS.DisplayStyle.SoulRot, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot aoe 12"; end
   end
   -- malevolence,if=variable.ps_up&variable.vt_up&variable.sr_up|cooldown.invoke_power_infusion_0.duration>0&cooldown.invoke_power_infusion_0.up&!talent.soul_rot
   -- Note: Not handling invoke_power_infusion_0.
