@@ -31,7 +31,6 @@ HR.GUISettings.APL.Evoker = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
-      Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
       Defensives = "Suggested",
