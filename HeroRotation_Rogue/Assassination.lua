@@ -624,16 +624,16 @@ local function UsableItems ()
 
   -- actions.items+=/use_item,name=treacherous_transmitter,use_off_gcd=1,if=variable.base_trinket_condition
   if I.TreacherousTransmitter:IsEquippedAndReady() then
-    if (Target:DebuffUp(S.Rupture) and S.Deathmark:CooldownRemains() <= 2 or HL.BossFilteredFightRemains("<", 22)) then
+    if (Target:DebuffUp(S.Rupture) and S.Deathmark:CooldownRemains() <= 2 or Target:DebuffUp(S.Deathmark) or HL.BossFilteredFightRemains("<", 22)) then
       if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
         return "Treacherous Transmitter";
       end
     end
   end
 
-  -- actions.items+=/use_item,name=mad_queens_mandate,use_off_gcd=1,if=cooldown.deathmark.remains>=50|fight_remains<=3
+  -- actions.items+=/use_item,name=mad_queens_mandate,if=cooldown.deathmark.remains>=30&!dot.deathmark.ticking|fight_remains<=3
   if I.MadQueensMandate:IsEquippedAndReady() then
-    if (S.Deathmark:CooldownRemains() >= 50 or HL.BossFilteredFightRemains("<=", 3)) then
+    if (S.Deathmark:CooldownRemains() >= 30 and Target:DebuffDown(S.Deathmark) or HL.BossFilteredFightRemains("<=", 3)) then
       if Cast(I.MadQueensMandate, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
         return "Mad Queen's Mandate";
       end
@@ -642,7 +642,7 @@ local function UsableItems ()
 
   -- actions.items+=/use_item,name=imperfect_ascendancy_serum,use_off_gcd=1,if=variable.base_trinket_condition
   if I.ImperfectAscendancySerum:IsEquippedAndReady() then
-    if (Target:DebuffUp(S.Rupture) and S.Deathmark:CooldownRemains() <= 2 or HL.BossFilteredFightRemains("<", 22)) then
+    if (Target:DebuffUp(S.Rupture) and S.Deathmark:CooldownRemains() <= 2 or Target:DebuffUp(S.Deathmark) or HL.BossFilteredFightRemains("<", 22)) then
       if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
         return "Imperfect Ascendancy Serum";
       end
