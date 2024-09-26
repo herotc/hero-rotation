@@ -28,7 +28,6 @@ HR.GUISettings.APL.Paladin = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
-      Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
       DivineToll = "Suggested",
