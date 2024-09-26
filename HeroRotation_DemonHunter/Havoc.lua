@@ -734,10 +734,9 @@ local function APL()
     if S.FelRush:IsCastable() and UseFelRush() and (S.Momentum:IsAvailable() and S.EyeBeam:CooldownRemains() < Player:GCD() * 2) then
       if Cast(S.FelRush, nil, Settings.CommonsDS.DisplayStyle.FelRush) then return "fel_rush main 24"; end
     end
-    -- immolation_aura,if=talent.a_fire_inside&(talent.unbound_chaos|talent.burning_wound)&buff.unbound_chaos.down&full_recharge_time<gcd.max*2&(raid_event.adds.in>full_recharge_time|active_enemies>desired_targets)
     if ImmoAbility:IsCastable() and (
       -- immolation_aura,if=talent.a_fire_inside&(talent.unbound_chaos|talent.burning_wound)&buff.unbound_chaos.down&full_recharge_time<gcd.max*2&(raid_event.adds.in>full_recharge_time|active_enemies>desired_targets)
-      (S.AFireInside:IsAvailable() and (Player:BuffDown(S.UnboundChaosBuff) or Player:BuffDown(S.BurningWoundBuff)) and Player:BuffDown(S.UnboundChaosBuff) and ImmoAbility:FullRechargeTime() < Player:GCD() * 2) or
+      (S.AFireInside:IsAvailable() and (S.UnboundChaos:IsAvailable() or S.BurningWound:IsAvailable()) and Player:BuffDown(S.UnboundChaosBuff) and ImmoAbility:FullRechargeTime() < Player:GCD() * 2) or
       -- immolation_aura,if=active_enemies>desired_targets&buff.unbound_chaos.down&(active_enemies>=desired_targets+raid_event.adds.count|raid_event.adds.in>full_recharge_time)
       (Enemies8yCount > 1 and Player:BuffDown(S.UnboundChaosBuff)) or
       -- immolation_aura,if=talent.inertia&buff.unbound_chaos.down&cooldown.eye_beam.remains<5&(active_enemies>=desired_targets+raid_event.adds.count|raid_event.adds.in>full_recharge_time&(!talent.essence_break|cooldown.essence_break.remains<5))&(!variable.trinket1_steroids&!variable.trinket2_steroids|variable.trinket1_steroids&(trinket.1.cooldown.remains<gcd.max*3|trinket.1.cooldown.remains>20)|variable.trinket2_steroids&(trinket.2.cooldown.remains<gcd.max*3|trinket.2.cooldown.remains>20))
