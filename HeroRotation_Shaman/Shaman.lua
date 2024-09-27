@@ -223,16 +223,17 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Enhancement, Spell.Shama
 
 if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Commons = {
-  -- TWW Trinkets
-  SpymastersWeb                         = Item(220202, {13, 14}),
+}
+
+Item.Shaman.Enhancement = MergeTableByKey(Item.Shaman.Commons, {
   -- DF Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   BeacontotheBeyond                     = Item(203963, {13, 14}),
   ElementiumPocketAnvil                 = Item(202617, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
-}
-Item.Shaman.Enhancement = MergeTableByKey(Item.Shaman.Commons, {
 })
 
 Item.Shaman.Elemental = MergeTableByKey(Item.Shaman.Commons, {
+  -- TWW Trinkets
+  SpymastersWeb                         = Item(220202, {13, 14}),
 })
