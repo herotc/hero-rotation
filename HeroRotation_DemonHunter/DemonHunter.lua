@@ -195,17 +195,6 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Vengeance, Spell
 -- Items
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Commons = {
-  -- DF Trinkets
-  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
-  BeacontotheBeyond                     = Item(203963, {13, 14}),
-  DragonfireBombDispenser               = Item(202610, {13, 14}),
-  ElementiumPocketAnvil                 = Item(202617, {13, 14}),
-  IrideusFragment                       = Item(193743, {13, 14}),
-  ManicGrieftorch                       = Item(194308, {13, 14}),
-  MarkofDargrul                         = Item(137357, {13, 14}),
-  ScreamingBlackDragonscale             = Item(202612, {13, 14}),
-  StormEatersBoon                       = Item(194302, {13, 14}),
-  WitherbarksBranch                     = Item(109999, {13, 14}),
   -- TWW Trinkets
   MadQueensMandate                      = Item(212454, {13, 14}),
   SkardynsGrace                         = Item(133282, {13, 14}),
