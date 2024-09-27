@@ -35,8 +35,6 @@ local I = Item.Paladin.Retribution
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.AlgetharPuzzleBox:ID(),
-  I.ShadowedRazingAnnihilator:ID(),
 }
 
 --- ===== GUI Settings =====

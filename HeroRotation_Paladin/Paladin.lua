@@ -202,16 +202,10 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Retribution, Spell.Pal
 -- Items
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Commons = {
-  -- Trinkets
-  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
 }
 
 Item.Paladin.Protection = MergeTableByKey(Item.Paladin.Commons, {
 })
 
 Item.Paladin.Retribution = MergeTableByKey(Item.Paladin.Commons, {
-  -- Other On-Use Items
-  Fyralath                              = Item(206448, {16}),
-  ShadowedRazingAnnihilator             = Item(205046, {16}),
-  
 })
