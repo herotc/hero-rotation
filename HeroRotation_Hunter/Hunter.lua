@@ -231,25 +231,8 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Survival, Spell.Hunter.Sent
 -- Items
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Commons = {
-  -- DF Trinkets
-  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
-  BeacontotheBeyond                     = Item(203963, {13, 14}),
-  DMDDance                              = Item(198088, {13, 14}),
-  DMDDanceBox                           = Item(198478, {13, 14}),
-  DMDInferno                            = Item(198086, {13, 14}),
-  DMDInfernoBox                         = Item(194872, {13, 14}),
-  DMDRime                               = Item(198087, {13, 14}),
-  DMDRimeBox                            = Item(198477, {13, 14}),
-  DMDWatcher                            = Item(198089, {13, 14}),
-  DMDWatcherBox                         = Item(198481, {13, 14}),
-  DecorationofFlame                     = Item(194299, {13, 14}),
-  GlobeofJaggedIce                      = Item(193732, {13, 14}),
-  ManicGrieftorch                       = Item(194308, {13, 14}),
+  -- Trinkets kept for variables
   MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
-  StormeatersBoon                       = Item(194302, {13, 14}),
-  WindscarWhetstone                     = Item(137486, {13, 14}),
-  -- TWW Trinkets
-  ImperfectAscendancySerum              = Item(225654, {13, 14}),
 }
 
 Item.Hunter.BeastMastery = MergeTableByKey(Item.Hunter.Commons, {
@@ -259,4 +242,10 @@ Item.Hunter.Marksmanship = MergeTableByKey(Item.Hunter.Commons, {
 })
 
 Item.Hunter.Survival = MergeTableByKey(Item.Hunter.Commons, {
+  -- DF Trinkets
+  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
+  BeacontotheBeyond                     = Item(203963, {13, 14}),
+  ManicGrieftorch                       = Item(194308, {13, 14}),
+  -- TWW Trinkets
+  ImperfectAscendancySerum              = Item(225654, {13, 14}),
 })
