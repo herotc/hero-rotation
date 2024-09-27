@@ -177,6 +177,7 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   RadiantGlory                          = Spell(458359),
   RighteousVerdict                      = Spell(267610),
   ShieldofVengeance                     = Spell(184662),
+  TempestoftheLightbringer              = Spell(383396),
   TemplarSlash                          = Spell(406647),
   TemplarStrike                         = Spell(407480),
   VanguardofJustice                     = Spell(406545),
