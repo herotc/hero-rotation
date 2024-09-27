@@ -240,7 +240,7 @@ local function Cooldown()
     end
   end
   -- the_hunt,if=debuff.essence_break.down&(active_enemies>=desired_targets+raid_event.adds.count|raid_event.adds.in>90)&(debuff.reavers_mark.up|!hero_tree.aldrachi_reaver)&buff.reavers_glaive.down&(buff.metamorphosis.remains>5|buff.metamorphosis.down)&(!talent.initiative|buff.initiative.up|time>5)
-  if S.TheHunt:IsCastable() and (Target:DebuffDown(S.EssenceBreakDebuff) and (Target:DebuffUp(S.ReaversMarkDebuff) or Player:HeroTreeID() ~= 35) and Player:BuffDown(S.ReaversGlaiveBuff) and (Player:BuffRemains(S.MetamorphosisBuff) > 5 or Player:BuffDown(S.MetamorphosisBuff)) and (not S.Initiative:IsAvailable() or Player:BuffUp(S.InitiativeBuff) or CombatTime > 5)) then
+  if S.TheHunt:IsCastable() and (Target:DebuffDown(S.EssenceBreakDebuff) and (Target:DebuffUp(S.ReaversMarkDebuff) or Player:HeroTreeID() ~= 35) and not S.ReaversGlaive:IsLearned() and (Player:BuffRemains(S.MetamorphosisBuff) > 5 or Player:BuffDown(S.MetamorphosisBuff)) and (not S.Initiative:IsAvailable() or Player:BuffUp(S.InitiativeBuff) or CombatTime > 5)) then
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt cooldown 18"; end
   end
   -- sigil_of_spite,if=debuff.essence_break.down&(debuff.reavers_mark.remains>=2-talent.quickened_sigils|!hero_tree.aldrachi_reaver)&cooldown.blade_dance.remains&time>15
