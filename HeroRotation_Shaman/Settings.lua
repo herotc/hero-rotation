@@ -90,15 +90,6 @@ HR.GUISettings.APL.Shaman = {
     OffGCDasOffGCD = {
     },
   },
-  Restoration = {
-    PotionType = {
-      Selected = "Tempered",
-    },
-    GCDasOffGCD = {
-    },
-    OffGCDasOffGCD = {
-    }
-  }
 }
 
 HR.GUI.LoadSettingsRecursively(HR.GUISettings)
@@ -110,7 +101,6 @@ local CP_ShamanDS = CreateChildPanel(CP_Shaman, "Class DisplayStyles")
 local CP_ShamanOGCD = CreateChildPanel(CP_Shaman, "Class OffGCDs")
 local CP_Enhancement = CreateChildPanel(CP_Shaman, "Enhancement")
 local CP_Elemental = CreateChildPanel(CP_Shaman, "Elemental")
-local CP_Restoration = CreateChildPanel(CP_Shaman, "Restoration")
 
 -- Commons
 CreateARPanelOptions(CP_Shaman, "APL.Shaman.Commons")
@@ -129,6 +119,3 @@ CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement")
 CreatePanelOption("Dropdown", CP_Enhancement, "APL.Shaman.Enhancement.Rotation", {"Standard", "Funnel"}, "Rotation Type", "Select to choose between the Standard or Funnel rotations.")
 CreatePanelOption("Slider", CP_Enhancement, "APL.Shaman.Enhancement.HealWith5Maelstrom", {0, 100, 1}, "Heal Pct with 5 Maelstrom", "Sets the health percentage under which Healing Surge should be suggested with 5 Maelstrom. Set this to 0 to disable healing suggestions.")
 CreatePanelOption("Slider", CP_Enhancement, "APL.Shaman.Enhancement.HealWithout5Maelstrom", {0, 100, 1}, "Heal Pct without 5 Maelstrom", "Sets the health percentage under which Healing Surge should be suggested when below 5 Maelstrom. Set this to 0 to disable healing suggestions.")
-
--- Restoration
---CreateARPanelOptions(CP_Restoration, "APL.Shaman.Restoration")

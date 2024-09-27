@@ -137,36 +137,6 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
 Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Shadow, Spell.Priest.Archon)
 Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Shadow, Spell.Priest.Voidweaver)
 
-Spell.Priest.Discipline = MergeTableByKey(Spell.Priest.Commons, {
-  -- Base Spells
-  Penance                     = Spell(47540),
-  PowerWordRadiance           = Spell(194509),
-  -- Talents
-  DivineStar                  = Spell(110744),
-  Schism                      = Spell(214621),
-  Mindbender                  = MultiSpell(123040, 34433),
-  PowerWordSolace             = Spell(129250),
-  ShadowCovenant              = Spell(314867),
-  ShadowCovenantBuff          = Spell(322105),
-  PurgeTheWicked              = Spell(204197),
-  PurgeTheWickedDebuff        = Spell(204213),
-  Halo                        = Spell(120517),
-  SpiritShell                 = Spell(109964),
-  -- Covenant Abilities
-  AscendedBlast               = Spell(325315),
-})
-
-Spell.Priest.Holy = MergeTableByKey(Spell.Priest.Commons, {
-  -- Base Spells
-  HolyFire                    = Spell(14914),
-  HolyFireDebuff              = Spell(14914),
-  HolyWordChastise            = Spell(88625),
-  -- Talents
-  Apotheosis                  = Spell(200183),
-  DivineStar                  = Spell(110744),
-  Halo                        = Spell(120517),
-})
-
 -- Items
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Commons = {
@@ -193,10 +163,4 @@ Item.Priest.Commons = {
 }
 
 Item.Priest.Shadow = MergeTableByKey(Item.Priest.Commons, {
-})
-
-Item.Priest.Discipline = MergeTableByKey(Item.Priest.Commons, {
-})
-
-Item.Priest.Holy = MergeTableByKey(Item.Priest.Commons, {
 })

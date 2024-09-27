@@ -275,23 +275,6 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
 Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Guardian, Spell.Druid.DruidoftheClaw)
 Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Guardian, Spell.Druid.ElunesChosen)
 
-Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Commons, {
-  -- Abilities
-  EclipseLunar                          = Spell(48518),
-  EclipseSolar                          = Spell(48517),
-  Starfire                              = Spell(197628),
-  Starsurge                             = Spell(197626),
-  Sunfire                               = Spell(93402),
-  SunfireDebuff                         = Spell(164815),
-  Swipe                                 = Spell(213764),
-  Wrath                                 = Spell(5176),
-  -- Talents
-  BalanceAffinity                       = Spell(197632),
-  FeralAffinity                         = Spell(197490),
-})
-Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Restoration, Spell.Druid.KeeperoftheGrove)
-Spell.Druid.Restoration = MergeTableByKey(Spell.Druid.Restoration, Spell.Druid.Wildstalker)
-
 -- Items
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Commons = {
@@ -329,7 +312,4 @@ Item.Druid.Feral = MergeTableByKey(Item.Druid.Commons, {
 })
 
 Item.Druid.Guardian = MergeTableByKey(Item.Druid.Commons, {
-})
-
-Item.Druid.Restoration = MergeTableByKey(Item.Druid.Commons, {
 })

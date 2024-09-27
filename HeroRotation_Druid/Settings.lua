@@ -116,16 +116,6 @@ HR.GUISettings.APL.Druid = {
       NaturesVigil = true,
     }
   },
-  Restoration = {
-    PotionType = {
-      Selected = "Tempered",
-    },
-    GCDasOffGCD = {
-      HeartOfTheWild = true,
-    },
-    OffGCDasOffGCD = {
-    }
-  },
 }
 
 HR.GUI.LoadSettingsRecursively(HR.GUISettings)
@@ -138,7 +128,6 @@ local CP_DruidOGCD = CreateChildPanel(CP_Druid, "Class OffGCDs")
 local CP_Balance = CreateChildPanel(CP_Druid, "Balance")
 local CP_Feral = CreateChildPanel(CP_Druid, "Feral")
 local CP_Guardian = CreateChildPanel(CP_Druid, "Guardian")
---local CP_Restoration = CreateChildPanel(CP_Druid, "Restoration")
 
 -- Druid
 CreateARPanelOptions(CP_Druid, "APL.Druid.Commons")
@@ -167,6 +156,3 @@ CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.BarkskinHP", {0, 10
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.FrenziedRegenHP", {0, 100, 1}, "Frenzied Regen Threshold", "Set the HP percentage threshold of when to use Frenzied Regeneration.")
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.SurvivalInstinctsHP", {0, 100, 1}, "Survival Instincts Threshold", "Set the HP percentage threshold of when to use Survival Instincts.")
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.BristlingFurRage", {0, 100, 1}, "Bristling Fur Threshold", "Set the Rage threshold of when to use Bristling Fur.")
-
--- Restoration
---CreateARPanelOptions(CP_Restoration, "APL.Druid.Restoration")
