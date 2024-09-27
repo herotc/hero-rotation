@@ -39,7 +39,7 @@ local I = Item.Druid.Feral
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  --  I.TrinketName:ID(),
+  I.ImperfectAscendancySerum:ID(),
 }
 
 --- ===== GUI Settings =====

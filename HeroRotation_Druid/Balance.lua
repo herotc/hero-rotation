@@ -35,7 +35,7 @@ local I = Item.Druid.Balance
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.MirrorofFracturedTomorrows:ID(),
+  I.SpymastersWeb:ID(),
 }
 
 --- ===== GUI Settings =====

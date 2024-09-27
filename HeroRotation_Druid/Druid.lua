@@ -278,37 +278,22 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Guardian, Spell.Druid.ElunesC
 -- Items
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Commons = {
-  -- DF Trinkets
-  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
-  AshesoftheEmbersoul                   = Item(207167, {13, 14}),
-  BandolierofTwistedBlades              = Item(207165, {13, 14}),
-  BeacontotheBeyond                     = Item(203963, {13, 14}),
-  FyrakksTaintedRageheart               = Item(207174, {13, 14}),
-  IrideusFragment                       = Item(193743, {13, 14}),
-  ManicGrieftorch                       = Item(194308, {13, 14}),
-  MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
-  MydasTalisman                         = Item(158319, {13, 14}),
-  SpoilsofNeltharus                     = Item(193773, {13, 14}),
-  WitherbarksBranch                     = Item(109999, {13, 14}),
-  VerdantBadge                          = Item(209343, {13, 14}),
-  -- TWW Trinkets
-  ArakaraSacbrood                       = Item(219314, {13, 14}),
-  ConcoctionKissofDeath                 = Item(215174, {13, 14}),
-  ImperfectAscendancySerum              = Item(225654, {13, 14}),
-  OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
-  SignetofthePriory                     = Item(219308, {13, 14}),
-  SikransEndlessArsenal                 = Item(212449, {13, 14}),
-  SpymastersWeb                         = Item(220202, {13, 14}),
-  TwinFangInstruments                   = Item(219319, {13, 14}),
-  -- Other On-Use Items
-  Djaruun                               = Item(202569, {16}),
-  Jotungeirr                            = Item(186404, {16}),
 }
 
 Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
+  -- TWW Trinkets
+  ArakaraSacbrood                       = Item(219314, {13, 14}),
+  SignetofthePriory                     = Item(219308, {13, 14}),
+  SpymastersWeb                         = Item(220202, {13, 14}),
 })
 
 Item.Druid.Feral = MergeTableByKey(Item.Druid.Commons, {
+  -- TWW Trinkets
+  ConcoctionKissofDeath                 = Item(215174, {13, 14}),
+  ImperfectAscendancySerum              = Item(225654, {13, 14}),
+  OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
+  SikransEndlessArsenal                 = Item(212449, {13, 14}),
+  TwinFangInstruments                   = Item(219319, {13, 14}),
 })
 
 Item.Druid.Guardian = MergeTableByKey(Item.Druid.Commons, {
