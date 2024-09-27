@@ -254,11 +254,11 @@ Item.Warrior.Commons = {
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   -- TWW Trinkets
   TreacherousTransmitter                = Item(221023, {13, 14}),
-  -- Other Items
-  Fyralath                              = Item(206448, {16}),
 }
 
 Item.Warrior.Fury = MergeTableByKey(Item.Warrior.Commons, {
+  -- Other Items
+  Fyralath                              = Item(206448, {16}),
 })
 
 Item.Warrior.Arms = MergeTableByKey(Item.Warrior.Commons, {
