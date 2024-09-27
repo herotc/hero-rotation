@@ -218,25 +218,20 @@ Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Brewmaster, Spell.Monk.ShadoP
 -- Items
 if not Item.Monk then Item.Monk = {}; end
 Item.Monk.Commons = {
+}
+
+Item.Monk.Windwalker = MergeTableByKey(Item.Monk.Commons, {
   -- DF Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
-  AshesoftheEmbersoul                   = Item(207167, {13, 14}),
   BeacontotheBeyond                     = Item(203963, {13, 14}),
   DragonfireBombDispenser               = Item(202610, {14, 14}),
   EruptingSpearFragment                 = Item(193769, {13, 14}),
-  IrideusFragment                       = Item(193743, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
-  MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
-  NeltharionsCalltoDominance            = Item(204202, {13, 14}),
-  WitherbarksBranch                     = Item(109999, {13, 14}),
   -- TWW Trinkets
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
   -- Other On-Use Items
   Djaruun                               = Item(202569, {16}),
-}
-
-Item.Monk.Windwalker = MergeTableByKey(Item.Monk.Commons, {
 })
 
 Item.Monk.Brewmaster = MergeTableByKey(Item.Monk.Commons, {
