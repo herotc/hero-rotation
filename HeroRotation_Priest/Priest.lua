@@ -139,28 +139,8 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Shadow, Spell.Priest.Voidweav
 
 -- Items
 if not Item.Priest then Item.Priest = {} end
-Item.Priest.Commons = {
-  -- Trinkets
+Item.Priest.Shadow = {
+  -- TWW Trinkets
   AberrantSpellforge          = Item(212451, {13, 14}),
-  BeacontotheBeyond           = Item(203963, {13, 14}),
-  BelorrelostheSuncaller      = Item(207172, {13, 14}),
-  ConjuredChillglobe          = Item(194300, {13, 14}),
-  DesperateInvokersCodex      = Item(194310, {13, 14}),
-  DMDDance                    = Item(198088, {13, 14}),
-  DMDDanceBox                 = Item(198478, {13, 14}),
-  DMDInferno                  = Item(198086, {13, 14}),
-  DMDInfernoBox               = Item(194872, {13, 14}),
-  DMDRime                     = Item(198087, {13, 14}),
-  DMDRimeBox                  = Item(198477, {13, 14}),
-  EruptingSpearFragment       = Item(193769, {13, 14}),
-  IcebloodDeathsnare          = Item(194304, {13, 14}),
-  NymuesUnravelingSpindle     = Item(208615, {13, 14}),
-  RashoksMoltenHeart          = Item(202614, {13, 14}),
   SpymastersWeb               = Item(220202, {13, 14}),
-  VoidmendersShadowgem        = Item(110007, {13, 14}),
-  -- Other Items
-  Dreambinder                 = Item(208616, {16}),
 }
-
-Item.Priest.Shadow = MergeTableByKey(Item.Priest.Commons, {
-})
