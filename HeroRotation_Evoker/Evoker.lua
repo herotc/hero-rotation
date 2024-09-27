@@ -115,6 +115,7 @@ Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
   ImminentDestruction                   = Spell(459537),
   InterwovenThreads                     = Spell(412713),
   MoltenEmbers                          = Spell(459725),
+  Overlord                              = Spell(410260),
   Prescience                            = Spell(409311),
   PupilofAlexstrasza                    = Spell(407814),
   TimeSkip                              = Spell(404977),

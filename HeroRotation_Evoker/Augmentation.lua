@@ -628,7 +628,7 @@ local function APL()
       if Cast(S.TipTheScales, Settings.CommonsOGCD.GCDasOffGCD.TipTheScales, nil, not Target:IsInRange(50)) then return "tip_the_scales main 12"; end
     end
     -- call_action_list,name=fb,if=cooldown.time_skip.up&talent.time_skip&!talent.interwoven_threads|talent.mass_eruption&talent.overlord&cooldown.breath_of_eons.remains<=1&talent.molten_embers&active_enemies>=3
-    if S.TimeSkip:IsAvailable() and S.TimeSkip:CooldownUp() and not S.InterwovenThreads:IsAvailable() or S.MassEruption:IsAvailable() and S.Overlord:IsAvailable() and S.BreathofEons:CooldownRemains() <= 1 and S.MoltenEmbers:IsAvailable() and EnemiesCount8ySplash >= 3 then
+    if S.TimeSkip:IsAvailable() and (S.TimeSkip:CooldownUp() and not S.InterwovenThreads:IsAvailable() or S.MassEruption:IsAvailable() and S.Overlord:IsAvailable() and S.BreathofEons:CooldownRemains() <= 1 and S.MoltenEmbers:IsAvailable() and EnemiesCount8ySplash >= 3) then
       local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
     end
     -- cancel_buff,name=tip_the_scales,if=cooldown.fire_breath.remains>=gcd.max*2&cooldown.upheaval.remains>=gcd.max*2|cooldown.fire_breath.up&cooldown.upheaval.remains>=12&talent.molten_embers
