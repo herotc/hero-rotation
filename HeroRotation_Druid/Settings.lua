@@ -29,7 +29,6 @@ HR.GUISettings.APL.Druid = {
       Interrupts = "Cooldown",
       Items = "Suggested",
       Potions = "Suggested",
-      Signature = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
       AdaptiveSwarm = "Suggested",
@@ -58,7 +57,7 @@ HR.GUISettings.APL.Druid = {
     },
     GCDasOffGCD = {
       AstralCommunion = true,
-      CaInc = true,
+      CAInc = true,
       ForceOfNature = true,
       FuryOfElune = true,
       MoonkinForm = false,

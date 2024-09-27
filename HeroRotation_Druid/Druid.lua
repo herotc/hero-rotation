@@ -98,9 +98,17 @@ Spell.Druid.ElunesChosen = {
   BoundlessMoonlight                    = Spell(424058),
   LunarCalling                          = Spell(429523),
   LunarInsight                          = Spell(429530),
+  MoonGuardian                          = Spell(429520),
 }
 
 Spell.Druid.KeeperoftheGrove = {
+  -- Talents
+  ControloftheDream                     = Spell(434249),
+  EarlySpring                           = Spell(428937),
+  PoweroftheDream                       = Spell(434220),
+  TreantsoftheMoon                      = Spell(428544),
+  -- Buffs
+  HarmonyoftheGroveBuff                 = Spell(428735),
 }
 
 Spell.Druid.Wildstalker = {
@@ -123,9 +131,11 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   ForceofNature                         = Spell(205636),
   FungalGrowth                          = Spell(392999),
   FuryofElune                           = Spell(202770),
+  GreaterAlignment                      = Spell(450184),
   Incarnation                           = MultiSpell(102560,390414), -- 102560 without Orbital Strike, 390414 with Orbital Strike
   IncarnationTalent                     = Spell(394013),
   NaturesBalance                        = Spell(202430),
+  NaturesGrace                          = Spell(450347),
   OrbitBreaker                          = Spell(383197),
   OrbitalStrike                         = Spell(390378),
   PowerofGoldrinn                       = Spell(394046),
@@ -138,6 +148,7 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   Starweaver                            = Spell(393940),
   StellarFlare                          = Spell(202347),
   Swipe                                 = Spell(213764),
+  TouchtheCosmos                        = Spell(450356),
   TwinMoons                             = Spell(279620),
   UmbralEmbrace                         = Spell(393760),
   UmbralIntensity                       = Spell(383195),
@@ -162,6 +173,8 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   StarlordBuff                          = Spell(279709),
   StarweaversWarp                       = Spell(393942),
   StarweaversWeft                       = Spell(393944),
+  TouchtheCosmosStarfall                = Spell(450361),
+  TouchtheCosmosStarsurge               = Spell(450360),
   UmbralEmbraceBuff                     = Spell(393763),
   WarriorofEluneBuff                    = Spell(202425),
   -- Debuffs
@@ -169,7 +182,6 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   StellarFlareDebuff                    = Spell(202347),
   -- Tier 29 Effects
   GatheringStarstuff                    = Spell(394412),
-  TouchtheCosmos                        = Spell(394414),
   -- Legendary Effects
   BOATArcaneLegBuff                     = Spell(339946),
   BOATNatureLegBuff                     = Spell(339943),
@@ -297,10 +309,13 @@ Item.Druid.Commons = {
   WitherbarksBranch                     = Item(109999, {13, 14}),
   VerdantBadge                          = Item(209343, {13, 14}),
   -- TWW Trinkets
+  ArakaraSacbrood                       = Item(219314, {13, 14}),
   ConcoctionKissofDeath                 = Item(215174, {13, 14}),
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
+  SignetofthePriory                     = Item(219308, {13, 14}),
   SikransEndlessArsenal                 = Item(212449, {13, 14}),
+  SpymastersWeb                         = Item(220202, {13, 14}),
   TwinFangInstruments                   = Item(219319, {13, 14}),
   -- Other On-Use Items
   Djaruun                               = Item(202569, {16}),
