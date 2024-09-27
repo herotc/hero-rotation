@@ -221,46 +221,47 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Frost, Spell.Mage.Spellslinger)
 -- Items
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Commons = {
-  -- DF Trinkets
-  AshesoftheEmbersoul                   = Item(207167, {13, 14}),
-  BelorrelostheSuncaller                = Item(207172, {13, 14}),
-  DragonfireBombDispenser               = Item(202610, {13, 14}),
-  HornofValor                           = Item(133642, {13, 14}),
-  IrideusFragment                       = Item(193743, {13, 14}),
-  MoonlitPrism                          = Item(137541, {13, 14}),
+  -- Trinkets kept for variables
   NymuesUnravelingSpindle               = Item(208615, {13, 14}),
-  SpoilsofNeltharus                     = Item(193773, {13, 14}),
-  TimebreachingTalon                    = Item(193791, {13, 14}),
+  -- TWW Trinkets
+  ImperfectAscendancySerum              = Item(225654, {13, 14}),
+  SpymastersWeb                         = Item(220202, {13, 14}),
+  TreacherousTransmitter                = Item(221023, {13, 14}),
+}
+
+Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
   -- TWW Trinkets
   AberrantSpellforge                    = Item(212451, {13, 14}),
-  ConcoctionKissofDeath                 = Item(215174, {13, 14}),
   FearbreakersEcho                      = Item(224449, {13, 14}),
   HighSpeakersAccretion                 = Item(219303, {13, 14}),
-  ImperfectAscendancySerum              = Item(225654, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
   MereldarsToll                         = Item(219313, {13, 14}),
   QuickwickCandlestick                  = Item(225649, {13, 14}),
   SignetofthePriory                     = Item(219308, {13, 14}),
-  SpymastersWeb                         = Item(220202, {13, 14}),
-  TreacherousTransmitter                = Item(221023, {13, 14}),
-  -- TWW Gladiator's Badges
-  ForgedGladiatorsBadge                 = Item(218713, {13, 14}),
+})
+
+Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
   -- DF Gladiator's Badges
   CrimsonGladiatorsBadge                = Item(201807, {13, 14}),
   DraconicGladiatorsBadge               = Item(216279, {13, 14}),
   ObsidianGladiatorsBadge               = Item(205708, {13, 14}),
   VerdantGladiatorsBadge                = Item(209343, {13, 14}),
-  -- Other On-Use Items
-  Dreambinder                           = Item(208616, {16}),
-}
-
-Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
-})
-
-Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
+  -- TWW Gladiator's Badges
+  ForgedGladiatorsBadge                 = Item(218713, {13, 14}),
+  -- Trinkets kept for variables
+  DragonfireBombDispenser               = Item(202610, {13, 14}),
+  HornofValor                           = Item(133642, {13, 14}),
+  IrideusFragment                       = Item(193743, {13, 14}),
+  MoonlitPrism                          = Item(137541, {13, 14}),
+  SpoilsofNeltharus                     = Item(193773, {13, 14}),
+  TimebreachingTalon                    = Item(193791, {13, 14}),
 })
 
 Item.Mage.Frost = MergeTableByKey(Item.Mage.Commons, {
+  -- DF Trinkets
+  BelorrelostheSuncaller                = Item(207172, {13, 14}),
+  -- Other On-Use Items
+  Dreambinder                           = Item(208616, {16}),
 })
 
 --[[ Variables

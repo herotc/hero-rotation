@@ -38,7 +38,9 @@ local I = Item.Mage.Arcane;
 local OnUseExcludes = {
   -- TWW Trinkets
   I.AberrantSpellforge:ID(),
+  I.FearbreakersEcho:ID(),
   I.HighSpeakersAccretion:ID(),
+  I.ImperfectAscendancySerum:ID(),
   I.MadQueensMandate:ID(),
   I.MereldarsToll:ID(),
   I.SpymastersWeb:ID(),
