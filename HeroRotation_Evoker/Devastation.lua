@@ -42,7 +42,10 @@ local I = Item.Evoker.Devastation
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  -- TWW Trinkets
   I.SpymastersWeb:ID(),
+  -- DF Items
+  I.KharnalexTheFirstLight:ID(),
 }
 
 --- ===== GUI Settings =====
