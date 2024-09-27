@@ -251,7 +251,7 @@ local function ARExecute()
     if Cast(S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsInRange(50)) then return "reavers_glaive ar_execute 4"; end
   end
   -- the_hunt,if=!buff.reavers_glaive.up
-  if S.TheHunt:IsCastable() and (Player:BuffDown(S.ReaversGlaiveBuff)) then
+  if S.TheHunt:IsCastable() and (not S.ReaversGlaive:IsLearned()) then
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar_execute 6"; end
   end
   -- bulk_extraction,if=spell_targets>=3&buff.art_of_the_glaive.stack>=20
@@ -350,7 +350,7 @@ local function AR()
     if Cast(S.VengefulRetreat, Settings.Vengeance.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat ar 6"; end
   end
   -- the_hunt,if=!buff.reavers_glaive.up&(buff.art_of_the_glaive.stack+soul_fragments.total)<20
-  if S.TheHunt:IsCastable() and (Player:BuffDown(S.ReaversGlaiveBuff) and (Player:BuffStack(S.ArtoftheGlaiveBuff) + TotalSoulFragments) < 20) then
+  if S.TheHunt:IsCastable() and (not S.ReaversGlaive:IsLearned() and (Player:BuffStack(S.ArtoftheGlaiveBuff) + TotalSoulFragments) < 20) then
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar 8"; end
   end
   -- immolation_aura,if=!(buff.glaive_flurry.up|buff.rending_strike.up)
@@ -362,7 +362,7 @@ local function AR()
     if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame ar 12"; end
   end
   -- call_action_list,name=rg_overflow,if=buff.reavers_glaive.up&buff.thrill_of_the_fight_damage.up&buff.thrill_of_the_fight_damage.remains<variable.rg_sequence_duration&(((((1.2*(1+raw_haste_pct))*(variable.double_rm_remains-variable.rg_sequence_duration))+soul_fragments.total+buff.art_of_the_glaive.stack)>=20)|((cooldown.the_hunt.remains)<(variable.double_rm_remains-(variable.rg_sequence_duration+action.the_hunt.execute_time))))
-  if Player:BuffUp(S.ReaversGlaiveBuff) and Player:BuffUp(S.ThrilloftheFightDmgBuff) and Player:BuffRemains(S.ThrilloftheFightDmgBuff) < VarRGSequenceDuration and (((((1.2 * (1 + Player:HastePct())) * (VarDoubleRMRemains - VarRGSequenceDuration)) + TotalSoulFragments + Player:BuffStack(S.ArtoftheGlaiveBuff)) >= 20) or ((S.TheHunt:CooldownRemains()) < (VarDoubleRMRemains - (VarRGSequenceDuration + S.TheHunt:ExecuteTime())))) then
+  if S.ReaversGlaive:IsLearned() and Player:BuffUp(S.ThrilloftheFightDmgBuff) and Player:BuffRemains(S.ThrilloftheFightDmgBuff) < VarRGSequenceDuration and (((((1.2 * (1 + Player:HastePct())) * (VarDoubleRMRemains - VarRGSequenceDuration)) + TotalSoulFragments + Player:BuffStack(S.ArtoftheGlaiveBuff)) >= 20) or ((S.TheHunt:CooldownRemains()) < (VarDoubleRMRemains - (VarRGSequenceDuration + S.TheHunt:ExecuteTime())))) then
     local ShouldReturn = RGOverflow(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=ar_execute,if=fight_remains<20
