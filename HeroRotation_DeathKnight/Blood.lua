@@ -23,6 +23,8 @@ local num        = HR.Commons.Everyone.num
 local bool       = HR.Commons.Everyone.bool
 -- lua
 local mathmin    = math.min
+-- WoW API
+local Delay       = C_Timer.After
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -37,19 +39,7 @@ local OnUseExcludes = {
   I.Fyralath:ID(),
 }
 
--- Rotation Var
-local VarDeathStrikeDumpAmt = 65
-local VarBoneShieldRefreshValue = (not S.DeathsCaress:IsAvailable() or S.Consumption:IsAvailable() or S.Blooddrinker:IsAvailable()) and 4 or 5
-local VarHeartStrikeRP = 0
-local VarHeartStrikeRPDRW = 0
-local IsTanking
-local EnemiesMelee
-local EnemiesMeleeCount
-local HeartStrikeCount
-local UnitsWithoutBloodPlague
-local Ghoul = HL.GhoulTable
-
--- GUI Settings
+--- ===== GUI Settings =====
 local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
@@ -59,17 +49,91 @@ local Settings = {
   Blood = HR.GUISettings.APL.DeathKnight.Blood
 }
 
--- Stun Interrupts List
+--- ===== Rotation Variables =====
+local VarDeathStrikeDumpAmt = Settings.Blood.DeathStrikeDumpAmount
+local VarBoneShieldRefreshValue = (S.Consumption:IsAvailable() or S.Blooddrinker:IsAvailable()) and 4 or 5
+local VarHeartStrikeRP = 0
+local VarHeartStrikeRPDRW = 0
+local IsTanking
+local EnemiesMelee
+local EnemiesMeleeCount
+local HeartStrikeCount
+local UnitsWithoutBloodPlague
+local Ghoul = HL.GhoulTable
+
+--- ===== Trinket Variables =====
+local Trinket1, Trinket2
+local VarTrinket1ID, VarTrinket2ID
+local VarTrinket1Level, VarTrinket2Level
+local VarTrinket1Spell, VarTrinket2Spell
+local VarTrinket1Range, VarTrinket2Range
+local VarTrinket1CastTime, VarTrinket2CastTime
+local VarTrinket1CD, VarTrinket2CD
+local VarTrinket1BL, VarTrinket2BL
+local VarTrinket1Buffs, VarTrinket2Buffs
+local VarDamageTrinketPriority
+local VarTrinketFailures = 0
+local function SetTrinketVariables()
+  local T1, T2 = Player:GetTrinketData()
+
+  -- If we don't have trinket items, try again in 5 seconds.
+  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.Level == 0 or T2.Level == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
+    VarTrinketFailures = VarTrinketFailures + 1
+    Delay(5, function()
+        SetTrinketVariables()
+      end
+    )
+    return
+  end
+
+  Trinket1 = T1.Object
+  Trinket2 = T2.Object
+
+  VarTrinket1ID = T1.ID
+  VarTrinket2ID = T2.ID
+
+  VarTrinket1Level = T1.Level
+  VarTrinket2Level = T2.Level
+
+  VarTrinket1Spell = T1.Spell
+  VarTrinket1Range = T1.Range
+  VarTrinket1CastTime = T1.CastTime
+  VarTrinket2Spell = T2.Spell
+  VarTrinket2Range = T2.Range
+  VarTrinket2CastTime = T2.CastTime
+
+  VarTrinket1CD = T1.Cooldown
+  VarTrinket2CD = T2.Cooldown
+
+  VarTrinket1BL = T1.Blacklisted
+  VarTrinket2BL = T2.Blacklisted
+
+  VarTrinket1Buffs = Trinket1:HasUseBuff() or VarTrinket1ID == I.MirrorofFracturedTomorrows:ID()
+  VarTrinket2Buffs = Trinket2:HasUseBuff() or VarTrinket2ID == I.MirrorofFracturedTomorrows:ID()
+
+  VarDamageTrinketPriority = 1
+  if not VarTrinket2Buffs and VarTrinket2Level >= VarTrinket1Level or VarTrinket1Buffs then
+    VarDamageTrinketPriority = 2
+  end
+end
+SetTrinketVariables()
+
+--- ===== Stun Interrupts List =====
 local StunInterrupts = {
   {S.Asphyxiate, "Cast Asphyxiate (Interrupt)", function () return true; end},
 }
 
--- Register for talent changes
+--- ===== Event Registrations =====
 HL:RegisterForEvent(function()
-  VarBoneShieldRefreshValue = (not S.DeathsCaress:IsAvailable() or S.Consumption:IsAvailable() or S.Blooddrinker:IsAvailable()) and 4 or 5
+  SetTrinketVariables()
+end, "PLAYER_EQUIPMENT_CHANGED")
+
+HL:RegisterForEvent(function()
+  -- variable,name=bone_shield_refresh_value,value=4,op=setif,condition=talent.consumption.enabled|talent.blooddrinker.enabled,value_else=5
+  VarBoneShieldRefreshValue = (S.Consumption:IsAvailable() or S.Blooddrinker:IsAvailable()) and 4 or 5
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
---Functions
+--- ===== Helper Functions =====
 local function UnitsWithoutBP(enemies)
   local WithoutBPCount = 0
   for _, CycleUnit in pairs(enemies) do
@@ -80,17 +144,19 @@ local function UnitsWithoutBP(enemies)
   return WithoutBPCount
 end
 
--- Functions for CastTargetIf
+--- ===== CastTargetIf Filter Functions =====
 local function EvaluateTargetIfFilterSoulReaper(TargetUnit)
   -- target_if=min:dot.soul_reaper.remains
   return (TargetUnit:DebuffRemains(S.SoulReaperDebuff))
 end
 
+--- ===== CastTargetIf Condition Functions =====
 local function EvaluateTargetIfSoulReaper(TargetUnit)
   -- if=target.time_to_pct_35<5&active_enemies>=2&target.time_to_die>(dot.soul_reaper.remains+5)
   return ((TargetUnit:TimeToX(35) < 5 or TargetUnit:HealthPercentage() <= 35) and TargetUnit:TimeToDie() > (TargetUnit:DebuffRemains(S.SoulReaperDebuff) + 5))
 end
 
+--- ===== Rotation Functions =====
 local function Precombat()
   -- flask
   -- food
@@ -98,8 +164,6 @@ local function Precombat()
   -- snapshot_stats
   -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff|(trinket.1.has_buff.strength|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit)|trinket.1.is.mirror_of_fractured_tomorrows
   -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|(trinket.2.has_buff.strength|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit)|trinket.2.is.mirror_of_fractured_tomorrows
-  -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon
-  -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
   -- variable,name=damage_trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_2_buffs&trinket.2.ilvl>=trinket.1.ilvl|variable.trinket_1_buffs
   -- Note: Can't handle checking for specific stat buffs.
   -- Manually added: Openers
@@ -125,20 +189,21 @@ local function Defensives()
       if Cast(S.Marrowrend, nil, nil, not Target:IsInMeleeRange(5)) then return "marrowrend defensives 6"; end
     end
     if S.DeathStrike:IsReady() then
-      if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike defensives 10"; end
+      if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike defensives 8"; end
     end
   end
-  -- Vampiric Blood
-  if S.VampiricBlood:IsCastable() and IsTanking and Player:HealthPercentage() <= Settings.Blood.VampiricBloodThreshold and Player:BuffDown(S.IceboundFortitudeBuff) then
-    if Cast(S.VampiricBlood, Settings.Blood.GCDasOffGCD.VampiricBlood) then return "vampiric_blood defensives 14"; end
-  end
   -- Icebound Fortitude
-  if S.IceboundFortitude:IsCastable() and IsTanking and Player:HealthPercentage() <= Settings.Blood.IceboundFortitudeThreshold and Player:BuffDown(S.VampiricBloodBuff) then
-    if Cast(S.IceboundFortitude, Settings.Blood.GCDasOffGCD.IceboundFortitude) then return "icebound_fortitude defensives 16"; end
+  if S.IceboundFortitude:IsCastable() and IsTanking and Player:HealthPercentage() <= Settings.Blood.IceboundFortitudeThreshold and Player:BuffDown(S.DancingRuneWeaponBuff) and Player:BuffDown(S.VampiricBloodBuff) then
+    if Cast(S.IceboundFortitude, Settings.Blood.GCDasOffGCD.IceboundFortitude) then return "icebound_fortitude defensives 10"; end
   end
-  -- Healing
+  -- Vampiric Blood
+  if S.VampiricBlood:IsCastable() and IsTanking and Player:HealthPercentage() <= Settings.Blood.VampiricBloodThreshold and Player:BuffDown(S.DancingRuneWeaponBuff) and Player:BuffDown(S.IceboundFortitudeBuff) and Player:BuffDown(S.VampiricBloodBuff) then
+    if Cast(S.VampiricBlood, Settings.Blood.GCDasOffGCD.VampiricBlood) then return "vampiric_blood defensives 12"; end
+  end
+  -- Death Strike Healing
+  -- Note: If under 50% health (or 70% health, if RP is above VarDeathStrikeDumpAmt).
   if S.DeathStrike:IsReady() and Player:HealthPercentage() <= 50 + (Player:RunicPower() > VarDeathStrikeDumpAmt and 20 or 0) and not Player:HealingAbsorbed() then
-    if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike defensives 18"; end
+    if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike defensives 14"; end
   end
 end
 
@@ -261,8 +326,8 @@ local function Standard()
   if S.SoulReaper:IsReady() and (EnemiesMeleeCount >= 2) then
     if Everyone.CastTargetIf(S.SoulReaper, EnemiesMelee, "min", EvaluateTargetIfFilterSoulReaper, EvaluateTargetIfSoulReaper, not Target:IsInMeleeRange(5)) then return "soul_reaper standard 14"; end
   end
-  -- bonestorm,if=runic_power>=100
-  if CDsON() and S.Bonestorm:IsReady() and (Player:RunicPower() >= 100) then
+  -- bonestorm,if=buff.bone_shield.stack>=5
+  if CDsON() and S.Bonestorm:IsReady() and (Player:BuffStack(S.BoneShieldBuff) >= 5) then
     if Cast(S.Bonestorm, Settings.Blood.GCDasOffGCD.Bonestorm, nil, not Target:IsInMeleeRange(8)) then return "bonestorm standard 16"; end
   end
   -- blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)
@@ -288,26 +353,37 @@ local function Trinkets()
   if Settings.Commons.Enabled.Items and I.Fyralath:IsEquippedAndReady() and (S.MarkofFyralathDebuff:AuraActiveCount() > 0) then
     if Cast(I.Fyralath, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(25)) then return "fyralath_the_dreamrender trinkets 2"; end
   end
-  -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|!trinket.2.has_cooldown)
-  -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains|!trinket.1.has_cooldown)
-  -- use_item,use_off_gcd=1,slot=main_hand,if=!equipped.fyralath_the_dreamrender&(variable.trinket_1_buffs|trinket.1.cooldown.remains)&(variable.trinket_2_buffs|trinket.2.cooldown.remains)
-  -- use_item,use_off_gcd=1,slot=trinket1,if=variable.trinket_1_buffs&(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)&(variable.trinket_2_exclude|trinket.2.cooldown.remains|!trinket.2.has_cooldown|variable.trinket_2_buffs)
-  -- use_item,use_off_gcd=1,slot=trinket2,if=variable.trinket_2_buffs&(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)&(variable.trinket_1_exclude|trinket.1.cooldown.remains|!trinket.1.has_cooldown|variable.trinket_1_buffs)
-  -- Note: Can't handle trinket stat buff checking, so using a generic trinket call
-  -- use_items,if=(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)
-  if (Player:BuffUp(S.DancingRuneWeaponBuff) or not S.DancingRuneWeapon:IsAvailable() or S.DancingRuneWeapon:CooldownRemains() > 20) then
-    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-    if ItemToUse then
-      local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
-      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
-        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
-      end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|!trinket.2.has_cooldown)
+    if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs and (VarDamageTrinketPriority == 1 or Trinket2:CooldownDown() or not Trinket2:HasCooldown()))   then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for trinket1 ("..Trinket1:Name()..") trinkets 4"; end
+    end
+    -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains|!trinket.1.has_cooldown)
+    if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs and (VarDamageTrinketPriority == 2 or Trinket1:CooldownDown() or not Trinket1:HasCooldown())) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for trinket2 ("..Trinket2:Name()..") trinkets 6"; end
+    end
+  end
+  if Settings.Commons.Enabled.Items then
+    -- use_item,slot=main_hand,if=!equipped.fyralath_the_dreamrender&(variable.trinket_1_buffs|trinket.1.cooldown.remains)&(variable.trinket_2_buffs|trinket.2.cooldown.remains)
+    -- Note: Expanding this to be all non-trinkets.
+    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
+    if ItemToUse and ((not I.Fyralath:IsEquippedAndReady() or ItemSlot ~= 16) and (VarTrinket1Buffs or Trinket1:CooldownDown()) and (VarTrinket2Buffs or Trinket2:CooldownDown())) then
+      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "use_item for non-trinket ("..MainHandToUse:Name()..") trinkets 8"; end
+    end
+  end
+  if Settings.Commons.Enabled.Trinkets then
+    -- use_item,slot=trinket1,if=variable.trinket_1_buffs&(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)&(trinket.2.cooldown.remains|!trinket.2.has_cooldown|variable.trinket_2_buffs)
+    if Trinket1:IsReady() and not VarTrinket1BL and (VarTrinket1Buffs and (Player:BuffUp(S.DancingRuneWeaponBuff) or not S.DancingRuneWeapon:IsAvailable() or S.DancingRuneWeapon:CooldownRemains() > 20) and (Trinket2:CooldownDown() or not Trinket2:HasCooldown() or VarTrinket2Buffs)) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for trinket1 ("..Trinket1:Name()..") trinkets 10"; end
+    end
+    -- use_item,slot=trinket2,if=variable.trinket_2_buffs&(buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>20)&(trinket.1.cooldown.remains|!trinket.1.has_cooldown|variable.trinket_1_buffs)
+    if Trinket2:IsReady() and not VarTrinket2BL and (VarTrinket2Buffs and (Player:BuffUp(S.DancingRuneWeaponBuff) or not S.DancingRuneWeapon:IsAvailable() or S.DancingRuneWeapon:CooldownRemains() > 20) and (Trinket1:CooldownDown() or not Trinket1:HasCooldown() or VarTrinket1Buffs)) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for trinket2 ("..Trinket2:Name()..") trinkets 12"; end
     end
   end
 end
 
---- ======= ACTION LISTS =======
+--- ===== APL Main =====
 local function APL()
   -- Get Enemies Count
   EnemiesMelee = Player:GetEnemiesInMeleeRange(5)
@@ -347,8 +423,8 @@ local function APL()
     -- variable,name=death_strike_dump_amount,value=65
     -- Note: Added a slider option, set to 65 as a default.
     VarDeathStrikeDumpAmt = Settings.Blood.DeathStrikeDumpAmount
-    -- variable,name=bone_shield_refresh_value,value=4,op=setif,condition=!talent.deaths_caress.enabled|talent.consumption.enabled|talent.blooddrinker.enabled,value_else=5
-    -- Moved to variable declarations and PLAYER_TALENT_UPDATE registration. No need to keep checking during combat, as talents can't change at that point.
+    -- variable,name=bone_shield_refresh_value,value=4,op=setif,condition=talent.consumption.enabled|talent.blooddrinker.enabled,value_else=5
+    -- Moved to variable declarations and SPELLS_CHANGED/LEARNED_SPELL_IN_TAB registrations. No need to keep checking during combat, as talents can't change at that point.
     -- mind_freeze,if=target.debuff.casting.react
     -- Note: Handled above in Interrupts
     -- invoke_external_buff,name=power_infusion,if=buff.dancing_rune_weapon.up|!talent.dancing_rune_weapon
@@ -368,30 +444,28 @@ local function APL()
     if CDsON() and S.RaiseDead:IsCastable() then
       if Cast(S.RaiseDead, nil, Settings.CommonsDS.DisplayStyle.RaiseDead) then return "raise_dead main 4"; end
     end
-    -- icebound_fortitude,if=!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)&(target.cooldown.pause_action.remains>=8|target.cooldown.pause_action.duration>0)
-    -- Above Above lines handled via Defensives()
-    -- vampiric_blood,if=!buff.vampiric_blood.up&!buff.vampiric_strength.up
-    -- Note: Handling this vampiric_blood here, as it's used as an offensive CD with T30P4.
-    if S.VampiricBlood:IsCastable() and (Player:BuffDown(S.VampiricBloodBuff) and Player:BuffDown(S.VampiricStrengthBuff) and Player:HasTier(30, 4)) then
-      if Cast(S.VampiricBlood, Settings.Blood.GCDasOffGCD.VampiricBlood) then return "vampiric_blood main 5"; end
+    -- reapers_mark
+    if S.ReapersMark:IsReady() then
+      if Cast(S.ReapersMark, nil, nil, not Target:IsInMeleeRange(5)) then return "reapers_mark main 6"; end
     end
-    -- vampiric_blood,if=!(buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.vampiric_blood.up|buff.vampiric_strength.up)&(target.cooldown.pause_action.remains>=13|target.cooldown.pause_action.duration>0)
-    -- Above Above lines handled via Defensives()
+    -- icebound_fortitude,if=!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)&(target.cooldown.pause_action.remains>=8|target.cooldown.pause_action.duration>0)
+    -- vampiric_blood,if=!(buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.vampiric_blood.up)&(target.cooldown.pause_action.remains>=13|target.cooldown.pause_action.duration>0)
+    -- Above lines handled via Defensives()
     -- deaths_caress,if=!buff.bone_shield.up
     if S.DeathsCaress:IsReady() and (Player:BuffDown(S.BoneShieldBuff)) then
-      if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress main 6"; end
+      if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress main 8"; end
     end
     -- death_and_decay,if=!death_and_decay.ticking&(talent.unholy_ground|talent.sanguine_ground|spell_targets.death_and_decay>3|buff.crimson_scourge.up)
     if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and (S.UnholyGround:IsAvailable() or S.SanguineGround:IsAvailable() or EnemiesMeleeCount > 3 or Player:BuffUp(S.CrimsonScourgeBuff))) then
-      if Cast(S.DeathAndDecay, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay, nil, not Target:IsInRange(30)) then return "death_and_decay main 8"; end
+      if Cast(S.DeathAndDecay, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay, nil, not Target:IsInRange(30)) then return "death_and_decay main 10"; end
     end
     -- death_strike,if=buff.coagulopathy.remains<=gcd|buff.icy_talons.remains<=gcd|runic_power>=variable.death_strike_dump_amount|runic_power.deficit<=variable.heart_strike_rp|target.time_to_die<10
     if S.DeathStrike:IsReady() and (Player:BuffRemains(S.CoagulopathyBuff) <= Player:GCD() or Player:BuffRemains(S.IcyTalonsBuff) <= Player:GCD() or Player:RunicPower() >= VarDeathStrikeDumpAmt or Player:RunicPowerDeficit() <= VarHeartStrikeRP or Target:TimeToDie() < 10) then
-      if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike main 10"; end
+      if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike main 12"; end
     end
     -- blooddrinker,if=!buff.dancing_rune_weapon.up
     if S.Blooddrinker:IsReady() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
-      if Cast(S.Blooddrinker, nil, nil, not Target:IsSpellInRange(S.Blooddrinker)) then return "blooddrinker main 12"; end
+      if Cast(S.Blooddrinker, nil, nil, not Target:IsSpellInRange(S.Blooddrinker)) then return "blooddrinker main 14"; end
     end
     -- call_action_list,name=racials
     if (CDsON()) then
@@ -399,32 +473,32 @@ local function APL()
     end
     -- sacrificial_pact,if=!buff.dancing_rune_weapon.up&(pet.ghoul.remains<2|target.time_to_die<gcd)
     if CDsON() and S.SacrificialPact:IsReady() and Ghoul.GhoulActive() and (Player:BuffDown(S.DancingRuneWeaponBuff) and (Ghoul.GhoulRemains() < 2 or Target:TimeToDie() < Player:GCD())) then
-      if Cast(S.SacrificialPact, Settings.CommonsOGCD.GCDasOffGCD.SacrificialPact) then return "sacrificial_pact main 14"; end
+      if Cast(S.SacrificialPact, Settings.CommonsOGCD.GCDasOffGCD.SacrificialPact) then return "sacrificial_pact main 16"; end
     end
     -- blood_tap,if=(rune<=2&rune.time_to_4>gcd&charges_fractional>=1.8)|rune.time_to_3>gcd
     if CDsON() and S.BloodTap:IsCastable() and ((Player:Rune() <= 2 and Player:RuneTimeToX(4) > Player:GCD() and S.BloodTap:ChargesFractional() >= 1.8) or Player:RuneTimeToX(3) > Player:GCD()) then
-      if Cast(S.BloodTap, Settings.Blood.OffGCDasOffGCD.BloodTap) then return "blood_tap main 16"; end
+      if Cast(S.BloodTap, Settings.Blood.OffGCDasOffGCD.BloodTap) then return "blood_tap main 18"; end
     end
     -- gorefiends_grasp,if=talent.tightening_grasp.enabled
     if CDsON() and S.GorefiendsGrasp:IsCastable() and (S.TighteningGrasp:IsAvailable()) then
-      if Cast(S.GorefiendsGrasp, Settings.Blood.GCDasOffGCD.GorefiendsGrasp, nil, not Target:IsSpellInRange(S.GorefiendsGrasp)) then return "gorefiends_grasp main 18"; end
+      if Cast(S.GorefiendsGrasp, Settings.Blood.GCDasOffGCD.GorefiendsGrasp, nil, not Target:IsSpellInRange(S.GorefiendsGrasp)) then return "gorefiends_grasp main 20"; end
     end
     -- empower_rune_weapon,if=rune<6&runic_power.deficit>5
     if CDsON() and S.EmpowerRuneWeapon:IsCastable() and (Player:Rune() < 6 and Player:RunicPowerDeficit() > 5) then
-      if Cast(S.EmpowerRuneWeapon, Settings.CommonsOGCD.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon main 20"; end
+      if Cast(S.EmpowerRuneWeapon, Settings.CommonsOGCD.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon main 22"; end
     end
     -- abomination_limb
     if CDsON() and S.AbominationLimb:IsCastable() then
-      if Cast(S.AbominationLimb, nil, Settings.CommonsDS.DisplayStyle.AbominationLimb, not Target:IsInRange(20)) then return "abomination_limb main 22"; end
+      if Cast(S.AbominationLimb, nil, Settings.CommonsDS.DisplayStyle.AbominationLimb, not Target:IsInRange(20)) then return "abomination_limb main 24"; end
     end
     -- dancing_rune_weapon,if=!buff.dancing_rune_weapon.up
     if CDsON() and S.DancingRuneWeapon:IsCastable() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
-      if Cast(S.DancingRuneWeapon, Settings.Blood.GCDasOffGCD.DancingRuneWeapon) then return "dancing_rune_weapon main 24"; end
+      if Cast(S.DancingRuneWeapon, Settings.Blood.GCDasOffGCD.DancingRuneWeapon) then return "dancing_rune_weapon main 26"; end
     end
     -- run_action_list,name=drw_up,if=buff.dancing_rune_weapon.up
     if (Player:BuffUp(S.DancingRuneWeaponBuff)) then
       local ShouldReturn = DRWUp(); if ShouldReturn then return ShouldReturn; end
-      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool for DRWUp"; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for DRWUp()"; end
     end
     -- call_action_list,name=standard
     local ShouldReturn = Standard(); if ShouldReturn then return ShouldReturn; end
@@ -435,8 +509,9 @@ end
 
 local function Init()
   S.MarkofFyralathDebuff:RegisterAuraTracking()
+  S.BloodPlagueDebuff:RegisterAuraTracking()
 
-  HR.Print("Blood Death Knight rotation has been updated for patch 10.2.7.")
+  HR.Print("Blood Death Knight rotation has been updated for patch 11.0.2.")
 end
 
 HR.SetAPL(250, APL, Init)
