@@ -346,8 +346,8 @@ end
 
 local function EvaluateCycleRip2(TargetUnit)
   -- target_if=refreshable,if=(!talent.primal_wrath|spell_targets=1)&(buff.bloodtalons.up|!talent.bloodtalons)&(buff.tigers_fury.up|dot.rip.remains<cooldown.tigers_fury.remains)&(remains<fight_remains|remains<4&buff.ravage.up)
-  -- Note: All but refreshable and (remains<fight_remains|remains<4&buff.ravage.up) checked before CastCycle.
-  return TargetUnit:DebuffRefreshable(S.RipDebuff) and (TargetUnit:DebuffRemains(S.RipDebuff) < FightRemains or TargetUnit:DebuffRemains(S.RipDebuff) < 4 and Player:BuffUp(S.RavageBuffFeral))
+  -- Note: (!talent.primal_wrath|spell_targets=1)&(buff.bloodtalons.up|!talent.bloodtalons) checked before CastCycle.
+  return TargetUnit:DebuffRefreshable(S.RipDebuff) and (Player:BuffUp(S.TigersFury) or TargetUnit:DebuffRemains(S.RipDebuff) < S.TigersFury:CooldownRemains()) and (TargetUnit:DebuffRemains(S.RipDebuff) < FightRemains or TargetUnit:DebuffRemains(S.RipDebuff) < 4 and Player:BuffUp(S.RavageBuffFeral))
 end
 
 --- ===== Rotation Functions =====
@@ -455,7 +455,7 @@ local function Finisher()
     if Everyone.CastTargetIf(S.PrimalWrath, Enemies8y, "max", EvaluateTargetIfFilterBloodseeker, EvaluateTargetIfPrimalWrath, not IsInAoERange) then return "primal_wrath finisher 2"; end
   end
   -- rip,target_if=refreshable,if=(!talent.primal_wrath|spell_targets=1)&(buff.bloodtalons.up|!talent.bloodtalons)&(buff.tigers_fury.up|dot.rip.remains<cooldown.tigers_fury.remains)&(remains<fight_remains|remains<4&buff.ravage.up)
-  if S.Rip:IsReady() and ((not S.PrimalWrath:IsAvailable() or EnemiesCountMelee == 1) and (Player:BuffUp(S.BloodtalonsBuff) or not S.Bloodtalons:IsAvailable()) and (Player:BuffUp(S.TigersFury) or Target:DebuffRemains(S.RipDebuff) < S.TigersFury:CooldownRemains())) then
+  if S.Rip:IsReady() and ((not S.PrimalWrath:IsAvailable() or EnemiesCountMelee == 1) and (Player:BuffUp(S.BloodtalonsBuff) or not S.Bloodtalons:IsAvailable())) then
     if Everyone.CastCycle(S.Rip, EnemiesMelee, EvaluateCycleRip2, not IsInMeleeRange) then return "rip finisher 4"; end
   end
   -- pool_resource,for_next=1

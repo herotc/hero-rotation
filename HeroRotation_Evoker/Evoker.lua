@@ -34,7 +34,7 @@ Spell.Evoker.Commons = {
   EmeraldBlossom                        = Spell(355913),
   FireBreath                            = MultiSpell(357208,382266), -- with and without Font of Magic
   Hover                                 = Spell(358267),
-  LivingFlame                           = Spell(3614694),
+  LivingFlame                           = Spell(361469),
   -- Talents
   AncientFlame                          = Spell(369990),
   BlastFurnace                          = Spell(375510),
@@ -83,7 +83,7 @@ Spell.Evoker.Flameshaper = {
   FanTheFlames                          = Spell(444318),
   TravelingFlame                        = Spell(444140),
   -- Buffs
-  EnkindleBuff                        = Spell(444017),
+  EnkindleBuff                          = Spell(444017),
 }
 
 Spell.Evoker.Scalecommander = {
@@ -107,7 +107,7 @@ Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
   BronzeAttunement                      = Spell(403265),
   -- Talents
   BlisteringScales                      = Spell(360827),
-  BreathofEons                          = Spell(403631),
+  BreathofEons                          = MultiSpell(403631,442204),
   DreamofSpring                         = Spell(414969),
   EbonMight                             = Spell(395152),
   Eruption                              = Spell(395160),
