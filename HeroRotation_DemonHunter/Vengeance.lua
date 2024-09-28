@@ -173,7 +173,7 @@ local function Precombat()
   -- Note: Moving the above variables to APL()
   -- arcane_torrent
   if S.ArcaneTorrent:IsCastable() then
-    if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent precombat 2"; end
+    if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not IsInAoERange) then return "arcane_torrent precombat 2"; end
   end
   -- sigil_of_flame,if=hero_tree.aldrachi_reaver|(hero_tree.felscarred&talent.student_of_suffering)
   if S.SigilofFlame:IsCastable() and (Player:HeroTreeID() == 35 or (Player:HeroTreeID() == 34 and S.StudentofSuffering:IsAvailable())) then
@@ -214,7 +214,7 @@ local function Defensives()
     if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis defensives"; end
   end
   -- Fiery Brand
-  if S.FieryBrand:IsCastable() and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
+  if S.FieryBrand:IsCastable() and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold and S.FieryBrandDebuff:AuraActiveCount() == 0) then
     if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand defensives"; end
   end
 end
@@ -440,7 +440,7 @@ local function AR()
     if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame ar 10"; end
   end
   -- run_action_list,name=rg_overflow,if=buff.reavers_glaive.up&(!buff.thrill_of_the_fight_damage.up|(buff.thrill_of_the_fight_damage.remains<$(rg_sequence_duration)))&((variable.double_rm_remains-$(rg_sequence_duration))>$(rg_sequence_duration))&((variable.souls_before_next_rg_sequence>=$(rg_souls))|(variable.double_rm_remains>($(rg_sequence_duration)+cooldown.the_hunt.remains+action.the_hunt.execute_time)))
-  if S.ReaversGlaive:IsLearned() and (Player:BuffDown(S.ThrilloftheFightDmgBuff) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) < RGSequenceDuration())) and ((VarDoubleRMRemains - RGSequenceDuration()) > RGSequenceDuration()) and ((VarSoulsBeforeNextRGSequence >= RGSouls()) or (VarDoubleRMRemains > (RGSequenceDuration() + S.TheHunt:CooldownRemains() + S.TheHunt:ExecuteTime()))) then
+  if S.ReaversGlaive:IsLearned() and (Target:DebuffRemains(S.ReaversMarkDebuff) and (Player:BuffStack(S.ArtoftheGlaiveBuff) == 2) and (VarDoubleRMRemains > RGSequenceDuration()) and (Player:BuffDown(S.ThrilloftheFightDmgBuff) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) < RGSequenceDuration())) and ((VarDoubleRMRemains - RGSequenceDuration()) > RGSequenceDuration()) and ((VarSoulsBeforeNextRGSequence >= RGSouls()) or (VarDoubleRMRemains > (RGSequenceDuration() + S.TheHunt:CooldownRemains() + S.TheHunt:ExecuteTime())))) then
     local ShouldReturn = RGOverflow(); if ShouldReturn then return ShouldReturn; end
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool for RGOverflow()"; end
   end
@@ -454,7 +454,7 @@ local function AR()
   end
   -- spirit_bomb,if=(variable.double_rm_remains<=(execute_time+$(rg_sequence_duration)))&(buff.art_of_the_glaive.stack+soul_fragments.total>=$(rg_souls))
   if S.SpiritBomb:IsReady() and ((VarDoubleRMRemains <= (S.SpiritBomb:ExecuteTime() + RGSequenceDuration())) and (Player:BuffStack(S.ArtoftheGlaiveBuff) + TotalSoulFragments >= RGSouls())) then
-    if Cast(S.SpiritBomb, nil, nil, not Enemies8yMelee) then return "spirit_bomb ar 16"; end
+    if Cast(S.SpiritBomb, nil, nil, not IsInAoERange) then return "spirit_bomb ar 16"; end
   end
   -- bulk_extraction,if=(variable.double_rm_remains<=(execute_time+$(rg_sequence_duration)))&(buff.art_of_the_glaive.stack+(spell_targets>?5)>=$(rg_souls))
   if S.BulkExtraction:IsCastable() and ((VarDoubleRMRemains <= (S.BulkExtraction:ExecuteTime() + RGSequenceDuration())) and (Player:BuffStack(S.ArtoftheGlaiveBuff) + mathmin(EnemiesCount8yMelee, 5) >= RGSouls())) then
@@ -478,7 +478,7 @@ local function AR()
   end
   -- spirit_bomb,if=variable.can_spb
   if S.SpiritBomb:IsReady() and (VarCanSpB) then
-    if Cast(S.SpiritBomb, nil, nil, not Enemies8yMelee) then return "spirit_bomb ar 26"; end
+    if Cast(S.SpiritBomb, nil, nil, not IsInAoERange) then return "spirit_bomb ar 26"; end
   end
   -- felblade,if=(variable.can_spb|variable.can_spb_soon)&fury<40
   if S.Felblade:IsCastable() and ((VarCanSpB or VarCanSpBSoon) and Player:Fury() < 40) then
