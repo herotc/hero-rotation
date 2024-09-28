@@ -137,66 +137,10 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
 Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Shadow, Spell.Priest.Archon)
 Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Shadow, Spell.Priest.Voidweaver)
 
-Spell.Priest.Discipline = MergeTableByKey(Spell.Priest.Commons, {
-  -- Base Spells
-  Penance                     = Spell(47540),
-  PowerWordRadiance           = Spell(194509),
-  -- Talents
-  DivineStar                  = Spell(110744),
-  Schism                      = Spell(214621),
-  Mindbender                  = MultiSpell(123040, 34433),
-  PowerWordSolace             = Spell(129250),
-  ShadowCovenant              = Spell(314867),
-  ShadowCovenantBuff          = Spell(322105),
-  PurgeTheWicked              = Spell(204197),
-  PurgeTheWickedDebuff        = Spell(204213),
-  Halo                        = Spell(120517),
-  SpiritShell                 = Spell(109964),
-  -- Covenant Abilities
-  AscendedBlast               = Spell(325315),
-})
-
-Spell.Priest.Holy = MergeTableByKey(Spell.Priest.Commons, {
-  -- Base Spells
-  HolyFire                    = Spell(14914),
-  HolyFireDebuff              = Spell(14914),
-  HolyWordChastise            = Spell(88625),
-  -- Talents
-  Apotheosis                  = Spell(200183),
-  DivineStar                  = Spell(110744),
-  Halo                        = Spell(120517),
-})
-
 -- Items
 if not Item.Priest then Item.Priest = {} end
-Item.Priest.Commons = {
-  -- Trinkets
+Item.Priest.Shadow = {
+  -- TWW Trinkets
   AberrantSpellforge          = Item(212451, {13, 14}),
-  BeacontotheBeyond           = Item(203963, {13, 14}),
-  BelorrelostheSuncaller      = Item(207172, {13, 14}),
-  ConjuredChillglobe          = Item(194300, {13, 14}),
-  DesperateInvokersCodex      = Item(194310, {13, 14}),
-  DMDDance                    = Item(198088, {13, 14}),
-  DMDDanceBox                 = Item(198478, {13, 14}),
-  DMDInferno                  = Item(198086, {13, 14}),
-  DMDInfernoBox               = Item(194872, {13, 14}),
-  DMDRime                     = Item(198087, {13, 14}),
-  DMDRimeBox                  = Item(198477, {13, 14}),
-  EruptingSpearFragment       = Item(193769, {13, 14}),
-  IcebloodDeathsnare          = Item(194304, {13, 14}),
-  NymuesUnravelingSpindle     = Item(208615, {13, 14}),
-  RashoksMoltenHeart          = Item(202614, {13, 14}),
   SpymastersWeb               = Item(220202, {13, 14}),
-  VoidmendersShadowgem        = Item(110007, {13, 14}),
-  -- Other Items
-  Dreambinder                 = Item(208616, {16}),
 }
-
-Item.Priest.Shadow = MergeTableByKey(Item.Priest.Commons, {
-})
-
-Item.Priest.Discipline = MergeTableByKey(Item.Priest.Commons, {
-})
-
-Item.Priest.Holy = MergeTableByKey(Item.Priest.Commons, {
-})

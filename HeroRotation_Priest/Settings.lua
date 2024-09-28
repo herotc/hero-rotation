@@ -71,32 +71,6 @@ HR.GUISettings.APL.Priest = {
       PowerInfusion = false,
     }
   },
-  Discipline = {
-    PotionType = {
-      Selected = "Tempered",
-    },
-    -- {Display GCD as OffGCD, ForceReturn}
-    GCDasOffGCD = {
-      Mindbender = true,
-      PowerInfusion = true,
-      ShadowCovenant = true,
-    },
-    -- {Display OffGCD as OffGCD, ForceReturn}
-    OffGCDasOffGCD = {
-    }
-  },
-  Holy = {
-    PotionType = {
-      Selected = "Tempered",
-    },
-    GCDasOffGCD = {
-      Apotheosis = true,
-      DivineStar = true,
-      Halo = true,
-    },
-    OffGCDasOffGCD = {
-    }
-  },
 }
 
 HR.GUI.LoadSettingsRecursively(HR.GUISettings)
@@ -108,8 +82,6 @@ local CP_PriestDS = CreateChildPanel(CP_Priest, "Class DisplayStyles")
 local CP_PriestOGCD = CreateChildPanel(CP_Priest, "Class OffGCDs")
 local CP_Shadow = CreateChildPanel(CP_Priest, "Shadow")
 local CP_ShadowOGCD = CreateChildPanel(CP_Priest, "Shadow OffGCDs")
---local CP_Discipline = CreateChildPanel(CP_Priest, "Discipline")
---local CP_Holy = CreateChildPanel(CP_Priest, "Holy")
 
 -- Commons
 CreateARPanelOptions(CP_Priest, "APL.Priest.Commons")
@@ -125,9 +97,3 @@ CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.PreferVTWhenSTinD
 
 -- Shadow OffGCDs
 CreateARPanelOptions(CP_ShadowOGCD, "APL.Priest.Shadow")
-
---Discipline
---CreateARPanelOptions(CP_Discipline, "APL.Priest.Discipline")
-
---Holy
---CreateARPanelOptions(CP_Holy, "APL.Priest.Holy")

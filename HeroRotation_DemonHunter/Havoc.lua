@@ -38,7 +38,9 @@ local I = Item.DemonHunter.Havoc
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.WitherbarksBranch:ID(),
+  I.MadQueensMandate:ID(),
+  I.SkardynsGrace:ID(),
+  I.TreacherousTransmitter:ID(),
 }
 
 --- ===== GUI Settings =====

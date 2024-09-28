@@ -177,6 +177,7 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   RadiantGlory                          = Spell(458359),
   RighteousVerdict                      = Spell(267610),
   ShieldofVengeance                     = Spell(184662),
+  TempestoftheLightbringer              = Spell(383396),
   TemplarSlash                          = Spell(406647),
   TemplarStrike                         = Spell(407480),
   VanguardofJustice                     = Spell(406545),
@@ -198,42 +199,13 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
 Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Retribution, Spell.Paladin.HeraldoftheSun)
 Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Retribution, Spell.Paladin.Templar)
 
-Spell.Paladin.Holy = MergeTableByKey(Spell.Paladin.Commons, {
-  -- Abilities
-  DivineProtection                      = Spell(498),
-  HolyShock                             = Spell(20473),
-  Judgment                              = Spell(275773),
-  LightofDawn                           = Spell(85222),
-  InfusionofLightBuff                   = Spell(54149),
-  -- Talents
-  AvengingCrusader                      = Spell(216331),
-  Awakening                             = Spell(248033),
-  BestowFaith                           = Spell(223306),
-  CrusadersMight                        = Spell(196926),
-  GlimmerofLight                        = Spell(325966),
-  GlimmerofLightDebuff                  = Spell(325966),
-  HolyPrism                             = Spell(114165),
-  LightsHammer                          = Spell(114158),
-})
-Spell.Paladin.Holy = MergeTableByKey(Spell.Paladin.Holy, Spell.Paladin.HeraldoftheSun)
-Spell.Paladin.Holy = MergeTableByKey(Spell.Paladin.Holy, Spell.Paladin.Lightsmith)
-
 -- Items
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Commons = {
-  -- Trinkets
-  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
 }
 
 Item.Paladin.Protection = MergeTableByKey(Item.Paladin.Commons, {
 })
 
 Item.Paladin.Retribution = MergeTableByKey(Item.Paladin.Commons, {
-  -- Other On-Use Items
-  Fyralath                              = Item(206448, {16}),
-  ShadowedRazingAnnihilator             = Item(205046, {16}),
-  
-})
-
-Item.Paladin.Holy = MergeTableByKey(Item.Paladin.Commons, {
 })

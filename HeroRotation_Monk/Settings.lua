@@ -101,36 +101,8 @@ HR.GUISettings.APL.Monk = {
       StormEarthAndFire = true,
     }
   },
-  Mistweaver = {
-    -- Defensives
-    DampenHarmHP = 60,
-    FortifyingBrewHP = 40,
-    PotionType = {
-      Selected = "Power",
-    },
-    -- DisplayStyle
-    DisplayStyle = {
-      DampenHarm = "Suggested",
-      FortifyingBrew = "Suggested",
-    },
-    -- {Display GCD as OffGCD, ForceReturn}
-    GCDasOffGCD = {
-      -- Abilities
-      InvokeYulonTheJadeSerpent = true,
-      InvokeChiJiTheRedCrane = true,
-      SummonJadeSerpentStatue = true,
-      RenewingMist = true,
-      TouchOfDeath = true,
-      FortifyingBrew = true,
-    },
-    -- {Display OffGCD as OffGCD, ForceReturn}
-    OffGCDasOffGCD = {
-      -- Racials
-      -- Abilities
-      ThunderFocusTea = true,
-    }
-  }
-};
+}
+
 HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 
 -- Child Panels
@@ -140,7 +112,6 @@ local CP_MonkDS = CreateChildPanel(CP_Monk, "Class DisplayStyles")
 local CP_MonkOGCD = CreateChildPanel(CP_Monk, "Class OffGCDs")
 local CP_Windwalker = CreateChildPanel(CP_Monk, "Windwalker")
 local CP_Brewmaster = CreateChildPanel(CP_Monk, "Brewmaster")
---local CP_Mistweaver = CreateChildPanel(CP_Monk, "Mistweaver")
 
 -- Monk
 CreateARPanelOptions(CP_Monk, "APL.Monk.Commons")
@@ -157,8 +128,3 @@ CreatePanelOption("Slider", CP_Windwalker, "APL.Monk.Windwalker.FortifyingBrewHP
 -- Brewmaster
 CreatePanelOption("Slider", CP_Brewmaster, "APL.Monk.Brewmaster.ExpelHarmHP", {1, 100, 1}, "Expel Harm HP Threshold", "Set the HP threshold for when to suggest Expel Harm.")
 CreateARPanelOptions(CP_Brewmaster, "APL.Monk.Brewmaster")
-
--- Mistweaver
---CreatePanelOption("Slider", CP_Mistweaver, "APL.Monk.Mistweaver.DampenHarmHP", {1, 100, 1}, "Dampen Harm HP Threshold", "Set the HP threshold for when to suggest Dampen Harm.")
---CreatePanelOption("Slider", CP_Mistweaver, "APL.Monk.Mistweaver.FortifyingBrewHP", {1, 100, 1}, "Fortifying Brew HP Threshold", "Set the HP threshold for when to suggest Fortifying Brew.)")
---CreateARPanelOptions(CP_Mistweaver, "APL.Monk.Mistweaver")
