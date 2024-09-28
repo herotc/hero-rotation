@@ -89,8 +89,6 @@ HL:RegisterForSelfCombatEvent(
       if SpellID == SpellVDH.MetamorphosisBuff:ID() then
         Surge.SpiritBurst = true
         Surge.SoulSunder = true
-        Surge.Annihilation = true
-        Surge.DeathSweep = true
       elseif SpellID == SpellHavoc.MetamorphosisBuff:ID() then
         Surge.Annihilation = true
         Surge.DeathSweep = true
