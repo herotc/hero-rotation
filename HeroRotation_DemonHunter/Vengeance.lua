@@ -447,12 +447,12 @@ local function AR()
         if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar 8"; end
   end
 
-    -- immolation_aura,if=(!buff.reavers_glaive.up|(variable.double_rm_remains>(variable.rg_sequence_duration+gcd.max)))&(variable.single_target|!variable.can_spb)
+    -- immolation_aura,if=(!buff.reavers_glaive.up|(variable.double_rm_remains>($(rg_sequence_duration)+gcd.max)))&(variable.single_target|!variable.can_spb)
     if ImmoAbility:IsCastable() and (not S.ReaversGlaive:IsLearned() or (VarDoubleRMRemains > (RGSequenceDuration() + Player:GCD()))) and (VarST or not VarCanSpB) then
         if Cast(ImmoAbility) then return "immolation_aura ar 8"; end
     end
 
-    -- sigil_of_flame,if=(talent.ascending_flame|(!prev_gcd.1.sigil_of_flame&dot.sigil_of_flame.remains<(4-talent.quickened_sigils)))&(!buff.reavers_glaive.up|(variable.double_rm_remains>(variable.rg_sequence_duration+gcd.max)))
+    -- sigil_of_flame,if=(talent.ascending_flame|(!prev_gcd.1.sigil_of_flame&dot.sigil_of_flame.remains<(4-talent.quickened_sigils)))&(!buff.reavers_glaive.up|(variable.double_rm_remains>($(rg_sequence_duration)+gcd.max)))
     if S.SigilofFlame:IsCastable() and (S.AscendingFlame:IsAvailable() or (not Player:PrevGCDP(1, S.SigilofFlame) and Target:DebuffRemains(S.SigilofFlameDebuff) < (4 - num(S.QuickenedSigils:IsAvailable())))) and (not S.ReaversGlaive:IsLearned() or (VarDoubleRMRemains > (RGSequenceDuration() + Player:GCD()))) then
       if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame ar 10"; end
     end
@@ -535,7 +535,7 @@ local function AR()
         if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver ar 28"; end
     end
 
-    -- fel_devastation,if=!buff.metamorphosis.up&(variable.double_rm_remains>variable.rg_sequence_duration+2)&((action.fracture.full_recharge_time<(2+gcd.max))|(!variable.single_target&buff.thrill_of_the_fight_damage.up))
+    -- fel_devastation,if=!buff.metamorphosis.up&(variable.double_rm_remains>$(rg_sequence_duration)+2)&((action.fracture.full_recharge_time<(2+gcd.max))|(!variable.single_target&buff.thrill_of_the_fight_damage.up))
     if S.FelDevastation:IsReady() and (not Player:BuffUp(S.MetamorphosisBuff) and ((VarDoubleRMRemains > (RGSequenceDuration() + 2)) and ((S.Fracture:FullRechargeTime() < (2 + Player:GCD())) or (not VarST and Player:BuffUp(S.ThrilloftheFightDmgBuff))))) then
         if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation ar 28"; end
     end
