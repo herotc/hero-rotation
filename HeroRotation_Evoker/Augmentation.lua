@@ -643,7 +643,8 @@ local function APL()
     local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
     -- upheaval,target_if=target.time_to_die>duration+0.2,empower_to=1,if=buff.ebon_might_self.remains>duration&(raid_event.adds.remains>13|!raid_event.adds.exists|raid_event.adds.in>20)&(!talent.molten_embers|dot.fire_breath_damage.ticking)&(cooldown.allied_virtual_cd_time.remains>=variable.hold_empower_for|!talent.breath_of_eons|talent.wingleader&cooldown.breath_of_eons.remains>=variable.hold_empower_for)
     -- Note: Adding 0.5s buffer to empower time to account for player latency.
-    if S.Upheaval:IsReady() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) + 0.5 and (not S.MoltenEmbers:IsAvailable() or S.FireBreathDebuff:AuraActiveCount() > 0) and (not S.BreathofEons:IsAvailable() or S.Wingleader:IsAvailable() and S.BreathofEons:CooldownRemains() >= VarHoldEmpowerFor)) then
+    -- Note: Added a level check, since it's possible between 70 and 80 to have a talent combo that stops Upheaval suggestions.
+    if S.Upheaval:IsReady() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) + 0.5 and ((not S.MoltenEmbers:IsAvailable() or S.FireBreathDebuff:AuraActiveCount() > 0) and (not S.BreathofEons:IsAvailable() or S.Wingleader:IsAvailable() and S.BreathofEons:CooldownRemains() >= VarHoldEmpowerFor) or Player:Level() < 80)) then
       if CastAnnotated(S.Upheaval, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "upheaval empower_to=1 main 16"; end
     end
     -- breath_of_eons,if=talent.wingleader&(buff.mass_eruption_stacks.up&talent.overlord|!talent.overlord)&(target.time_to_die>=15&(raid_event.adds.in>=20|raid_event.adds.remains>=15))|fight_remains<=30
