@@ -638,9 +638,8 @@ local function APL()
       if CastAnnotated(S.Upheaval, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "upheaval empower_to=1 main 14"; end
     end
     -- call_action_list,name=fb,if=(raid_event.adds.remains>13|raid_event.adds.in>20|evoker.allied_cds_up>0|!raid_event.adds.exists)&(cooldown.allied_virtual_cd_time.remains>=variable.hold_empower_for|!talent.breath_of_eons|talent.wingleader&cooldown.breath_of_eons.remains>=variable.hold_empower_for|cooldown.breath_of_eons.up&talent.wingleader)
-    if not S.BreathofEons:IsAvailable() or S.Wingleader:IsAvailable() and S.BreathofEons:CooldownRemains() >= VarHoldEmpowerFor or S.BreathofEons:CooldownUp() and S.Wingleader:IsAvailable() then
-      local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
-    end
+    -- Note: Can't track others' CDs, so just always assuming true.
+    local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
     -- upheaval,target_if=target.time_to_die>duration+0.2,empower_to=1,if=buff.ebon_might_self.remains>duration&(raid_event.adds.remains>13|!raid_event.adds.exists|raid_event.adds.in>20)&(!talent.molten_embers|dot.fire_breath_damage.ticking)&(cooldown.allied_virtual_cd_time.remains>=variable.hold_empower_for|!talent.breath_of_eons|talent.wingleader&cooldown.breath_of_eons.remains>=variable.hold_empower_for)
     if S.Upheaval:IsReady() and (Player:BuffRemains(S.EbonMightSelfBuff) > EMSelfBuffDuration() and (not S.MoltenEmbers:IsAvailable() or S.FireBreathDebuff:AuraActiveCount() > 0) and (not S.BreathofEons:IsAvailable() or S.Wingleader:IsAvailable() and S.BreathofEons:CooldownRemains() >= VarHoldEmpowerFor)) then
       if CastAnnotated(S.Upheaval, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "upheaval empower_to=1 main 16"; end
