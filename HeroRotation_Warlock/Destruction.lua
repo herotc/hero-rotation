@@ -833,9 +833,7 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- Interrupts
-    if S.SpellLock:IsAvailable() then
-      local ShouldReturn = Everyone.Interrupt(S.SpellLock, Settings.CommonsDS.DisplayStyle.Interrupts); if ShouldReturn then return ShouldReturn; end
-    end
+    local ShouldReturn = Everyone.Interrupt(S.SpellLock, Settings.CommonsDS.DisplayStyle.Interrupts); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=variables
     Variables()
     -- call_action_list,name=aoe,if=(active_enemies>=3)&!variable.cleave_apl
