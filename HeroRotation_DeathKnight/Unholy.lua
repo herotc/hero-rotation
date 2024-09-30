@@ -722,29 +722,33 @@ local function ST()
   if S.SoulReaper:IsReady() and (Target:HealthPercentage() <= 35 and FightRemains > 5) then
     if Cast(S.SoulReaper, nil, nil, not Target:IsInMeleeRange(5)) then return "soul_reaper st 2"; end
   end
+  -- wound_spender,if=debuff.chains_of_ice_trollbane_slow.up
+  if WoundSpender:IsReady() and (Target:DebuffUp(S.TrollbaneSlowDebuff)) then
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 4"; end
+  end
   -- any_dnd,if=talent.unholy_ground&!buff.death_and_decay.up&(pet.apoc_ghoul.active|pet.abomination.active|pet.gargoyle.active)
   if AnyDnD:IsReady() and (S.UnholyGround:IsAvailable() and Player:BuffDown(S.DeathAndDecayBuff) and (VarApocGhoulActive or VarAbomActive or VarGargActive)) then
-    if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd st 4"; end
+    if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd st 6"; end
   end
   -- death_coil,if=!variable.pooling_runic_power&variable.spend_rp|fight_remains<10
   if S.DeathCoil:IsReady() and (not VarPoolingRunicPower and VarSpendRP or BossFightRemains < 10) then
-    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil st 6"; end
+    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil st 8"; end
   end
   -- festering_strike,if=debuff.festering_wound.stack<4&(!variable.pop_wounds|buff.festering_scythe.react)
   if FesteringAction:IsReady() and (FesterStacks < 4 and (not VarPopWounds or Player:BuffUp(S.FesteringScytheBuff))) then
-    if Cast(FesteringAction, nil, nil, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike st 8"; end
+    if Cast(FesteringAction, nil, nil, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike st 10"; end
   end
   -- wound_spender,if=variable.pop_wounds
   if WoundSpender:IsReady() and (VarPopWounds) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 10"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 12"; end
   end
   -- death_coil,if=!variable.pooling_runic_power
   if S.DeathCoil:IsReady() and (not VarPoolingRunicPower) then
-    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil st 12"; end
+    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil st 14"; end
   end
   -- wound_spender,if=!variable.pop_wounds&debuff.festering_wound.stack>=4
   if WoundSpender:IsReady() and (not VarPopWounds and FesterStacks >= 4) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 14"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 16"; end
   end
 end
 
@@ -780,8 +784,8 @@ local function Variables()
   VarSTPlanning = ActiveEnemies == 1
   -- variable,name=adds_remain,op=setif,value=1,value_else=0,condition=active_enemies>=2&(!raid_event.adds.exists&fight_remains>6|raid_event.adds.exists&raid_event.adds.remains>6)
   VarAddsRemain = ActiveEnemies >= 2 and FightRemains > 6
-  -- variable,name=apoc_timing,op=setif,value=7,value_else=3,condition=cooldown.apocalypse.remains<10&debuff.festering_wound.stack<=4&cooldown.unholy_assault.remains>10
-  VarApocTiming = (S.Apocalypse:CooldownRemains() < 10 and FesterStacks <= 4 and S.UnholyAssault:CooldownRemains() > 10) and 7 or 3
+  -- variable,name=apoc_timing,op=setif,value=3,value_else=0,condition=cooldown.apocalypse.remains<5&debuff.festering_wound.stack<1&cooldown.unholy_assault.remains>5
+  VarApocTiming = (S.Apocalypse:CooldownRemains() < 5 and FesterStacks < 1 and S.UnholyAssault:CooldownRemains() > 5) and 3 or 0
   -- variable,name=pop_wounds,op=setif,value=1,value_else=0,condition=(cooldown.apocalypse.remains>variable.apoc_timing|!talent.apocalypse)&(debuff.festering_wound.stack>=1&cooldown.unholy_assault.remains<20&talent.unholy_assault&variable.st_planning|debuff.rotten_touch.up&debuff.festering_wound.stack>=1|debuff.festering_wound.stack>=4-pet.abomination.active)|fight_remains<5&debuff.festering_wound.stack>=1
   VarPopWounds = (S.Apocalypse:CooldownRemains() > VarApocTiming or not S.Apocalypse:IsAvailable()) and (FesterStacks >= 1 and S.UnholyAssault:CooldownRemains() < 20 and S.UnholyAssault:IsAvailable() and VarSTPlanning or Target:DebuffUp(S.RottenTouchDebuff) and FesterStacks >= 1 or FesterStacks >= 4 - num(VarAbomActive)) or BossFightRemains < 5 and FesterStacks >= 1
   -- variable,name=pooling_runic_power,op=setif,value=1,value_else=0,condition=talent.vile_contagion&cooldown.vile_contagion.remains<5&runic_power<30
