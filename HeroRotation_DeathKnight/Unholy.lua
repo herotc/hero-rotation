@@ -142,7 +142,7 @@ local function SetTrinketVariables()
   -- Note: Using the below buff durations to avoid potential divide by zero errors.
   local T1BuffDuration = (VarTrinket1Duration > 0) and VarTrinket1Duration or 1
   local T2BuffDuration = (VarTrinket2Duration > 0) and VarTrinket2Duration or 1
-  if not VarTrinket1Buffs and VarTrinket2Buffs and (Trinket2:HasCooldown() or not Trinket1:HasCooldown()) or VarTrinket2Buffs and ((VarTrinket2CD / T2BuffDuration) * (VarTrinket2Sync)) > ((VarTrinket1CD / T1BuffDuration) * (VarTrinket1Sync) * (1 + ((VarTriunket1Level - VarTrinket2Level) / 100))) then
+  if not VarTrinket1Buffs and VarTrinket2Buffs and (Trinket2:HasCooldown() or not Trinket1:HasCooldown()) or VarTrinket2Buffs and ((VarTrinket2CD / T2BuffDuration) * (VarTrinket2Sync)) > ((VarTrinket1CD / T1BuffDuration) * (VarTrinket1Sync) * (1 + ((VarTrinket1Level - VarTrinket2Level) / 100))) then
     VarTrinketPriority = 2
   end
 
