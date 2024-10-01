@@ -356,8 +356,8 @@ local function Trinkets()
     if I.AberrantSpellforge:IsEquippedAndReady() and (Player:BuffStack(S.AberrantSpellforgeBuff) <= 4) then
       if Cast(I.AberrantSpellforge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "aberrant_spellforge trinkets 26"; end
     end
-    -- use_item,name=spymasters_web,if=buff.spymasters_report.stack=1&buff.power_infusion.up&!buff.spymasters_web.up|buff.power_infusion.up&(fight_remains<120)|(fight_remains<=20|buff.dark_ascension.up&fight_remains<=60|buff.entropic_rift.up&talent.entropic_rift&fight_remains<=30)&!buff.spymasters_web.up
-    if I.SpymastersWeb:IsEquippedAndReady() and (Player:BuffStack(S.SpymastersReportBuff) == 1 and Player:PowerInfusionUp() and Player:BuffDown(S.SpymastersWebBuff) or Player:PowerInfusionUp() and (BossFightRemains < 120) or (BossFightRemains <= 20 or Player:BuffUp(S.DarkAscensionBuff) and BossFightRemains <= 60 or EntropicRiftUp and S.EntropicRift:IsAvailable() and BossFightRemains <= 30) and Player:BuffDown(S.SpymastersWebBuff)) then
+    -- use_item,name=spymasters_web,if=(buff.power_infusion.up&buff.spymasters_report.stack>=40&fight_remains>240)|(buff.power_infusion.up&buff.bloodlust.up)|buff.power_infusion.up&(fight_remains<120)|(fight_remains<=20|buff.dark_ascension.up&fight_remains<=60|buff.entropic_rift.up&talent.entropic_rift&fight_remains<=30)&!buff.spymasters_web.up
+    if I.SpymastersWeb:IsEquippedAndReady() and ((Player:PowerInfusionUp() and Player:BuffStack(S.SpymastersReportBuff) >= 40 and FightRemains > 240) or (Player:PowerInfusionUp() and Player:BloodlustUp()) or Player:PowerInfusionUp() and (FightRemains < 120) or (BossFightRemains <= 20 or Player:BuffUp(S.DarkAscensionBuff) and BossFightRemains <= 60 or EntropicRiftUp and S.EntropicRift:IsAvailable() and BossFightRemains <= 30) and Player:BuffDown(S.SpymastersWebBuff)) then
       if Cast(I.SpymastersWeb, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spymasters_web trinkets 28"; end
     end
   end
