@@ -68,6 +68,8 @@ Spell.Druid.Commons = {
   IronfurBuff                           = Spell(192081),
   MarkoftheWildBuff                     = Spell(1126),
   PoPHealBuff                           = Spell(395336),
+  SpymastersReportBuff                  = Spell(451199), -- Stacking buff from before using Spymaster's Web trinket
+  SpymastersWebBuff                     = Spell(444959), -- Buff from using Spymaster's Web trinket
   -- Debuffs
   MoonfireDebuff                        = Spell(164812),
   RakeDebuff                            = Spell(155722),
@@ -278,20 +280,23 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Guardian, Spell.Druid.ElunesC
 -- Items
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Commons = {
+  -- TWW Trinkets
+  ImperfectAscendancySerum              = Item(225654, {13, 14}),
+  OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
 }
 
 Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
   -- TWW Trinkets
+  AberrantSpellforge                    = Item(212451, {13, 14}),
   ArakaraSacbrood                       = Item(219314, {13, 14}),
   SignetofthePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
+  TreacherousTransmitter                = Item(221023, {13, 14}),
 })
 
 Item.Druid.Feral = MergeTableByKey(Item.Druid.Commons, {
   -- TWW Trinkets
   ConcoctionKissofDeath                 = Item(215174, {13, 14}),
-  ImperfectAscendancySerum              = Item(225654, {13, 14}),
-  OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
   SikransEndlessArsenal                 = Item(212449, {13, 14}),
   TwinFangInstruments                   = Item(219319, {13, 14}),
 })
