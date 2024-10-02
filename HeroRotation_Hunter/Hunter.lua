@@ -209,6 +209,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   MercilessBlows                        = Spell(459868),
   MongooseBite                          = Spell(259387),
   RaptorStrike                          = Spell(186270),
+  RuthlessMarauder                      = Spell(385718),
   SicEm                                 = Spell(459920),
   Spearhead                             = Spell(360966),
   SymbioticAdrenaline                   = Spell(459875),
