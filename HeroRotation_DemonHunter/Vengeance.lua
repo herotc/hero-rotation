@@ -163,7 +163,7 @@ end
 
 -- $(use_rg_main)=(!buff.thrill_of_the_fight_attack_speed.up|(variable.double_rm_remains<=$(rg_sequence_duration)))
 local function UseRGMain()
-  return (not Player:BuffUp(S.ThrilloftheFightAtkBuff) or (VarDoubleRMRemains <= RGSequenceDuration()))
+  return (Player:BuffDown(S.ThrilloftheFightAtkBuff) or (Target:DebuffUp(S.ReaversMarkDebuff) and (Target:DebuffRemains(S.ReaversMarkDebuff) < RGSequenceDuration()) and VarDoubleRMRemains and VarDoubleRMRemains <= RGSequenceDuration()))
 end
 
 --- ===== Rotation Functions =====
@@ -253,21 +253,6 @@ local function RGPrep()
   end
 end
 
-local function RGOverflow()
-  -- variable,name=trigger_overflow,op=set,value=1
-  VarTriggerOverflow = true
-  -- variable,name=rg_enhance_cleave,op=set,value=1
-  VarRGEnhCleave = true
-  -- reavers_glaive,if=$(enough_fury_to_rg)&!buff.rending_strike.up&!buff.glaive_flurry.up
-  if S.ReaversGlaive:IsCastable() and (EnoughFuryToRG() and Player:BuffDown(S.RendingStrikeBuff) and Player:BuffDown(S.GlaiveFlurryBuff)) then
-    if Cast(S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "reavers_glaive rg_overflow 2"; end
-  end
-  -- call_action_list,name=rg_prep,if=!$(enough_fury_to_rg)
-  if S.ReaversGlaive:IsLearned() and (not EnoughFuryToRG()) then
-    local ShouldReturn = RGPrep(); if ShouldReturn then return ShouldReturn; end
-  end
-end
-
 local function RGSequenceFiller()
   -- felblade
   if S.Felblade:IsCastable() then
@@ -321,6 +306,28 @@ local function RGSequence()
   if S.SoulCleave:IsReady() and (ShouldCleaveRG()) then
     if Cast(S.SoulCleave, nil, nil, not IsInMeleeRange) then return "soul_cleave rg_sequence 6"; end
   end
+end
+
+local function RGOverflow()
+  -- variable,name=trigger_overflow,op=set,value=1
+  VarTriggerOverflow = true
+  -- variable,name=rg_enhance_cleave,op=set,value=1
+  VarRGEnhCleave = true
+  -- reavers_glaive,if=$(enough_fury_to_rg)&!buff.rending_strike.up&!buff.glaive_flurry.up
+  if S.ReaversGlaive:IsCastable() and (EnoughFuryToRG() and Player:BuffDown(S.RendingStrikeBuff) and Player:BuffDown(S.GlaiveFlurryBuff)) then
+    if Cast(S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "reavers_glaive rg_overflow 2"; end
+  end
+  -- call_action_list,name=rg_prep,if=!$(enough_fury_to_rg)
+  if S.ReaversGlaive:IsLearned() and (not EnoughFuryToRG()) then
+      local ShouldReturn = RGPrep(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- Note (Jom): Manual override here to avoid resetting the VarTriggerOverflow variable
+  -- run_action_list,name=rg_sequence,if=buff.rending_strike.up|buff.glaive_flurry.up|prev_gcd.1.reavers_glaive
+  if Player:BuffUp(S.RendingStrikeBuff) or Player:BuffUp(S.GlaiveFlurryBuff) or Player:PrevGCD(1, S.ReaversGlaive) or VarTriggerOverflow == true then
+    local ShouldReturn = RGSequence(); if ShouldReturn then return ShouldReturn; end
+    if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for RGSequence() from overflow"; end
+  end
+
 end
 
 local function ARExecute()
