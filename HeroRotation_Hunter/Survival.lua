@@ -181,9 +181,13 @@ local function CDs()
       end
     end
   end
+  -- use_item,name=mad_queens_mandate,use_off_gcd=1,if=gcd.remains>gcd.max-0.1&(time_to_die<10|time_to_die>120)&(trinket.skardyns_grace.cooldown.remains|!equipped.skardyns_grace)|time_to_die<10
+  if Settings.Commons.Enabled.Trinkets and I.MadQueensMandate:IsEquippedAndReady() and ((Target:TimeToDie() < 10 or Target:TimeToDie() > 120) and (I.SkardynsGrace:CooldownDown() or not I.SkardynsGrace:IsEquipped()) or Target:TimeToDie() < 10) then
+    if Cast(I.MadQueensMandate, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "mad_queens_mandate cds 22"; end
+  end
   -- aspect_of_the_eagle,if=target.distance>=6
   if S.AspectoftheEagle:IsCastable() and Settings.Survival.AspectOfTheEagle and not Target:IsInRange(5) then
-    if Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectOfTheEagle) then return "aspect_of_the_eagle cds 22"; end
+    if Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectOfTheEagle) then return "aspect_of_the_eagle cds 24"; end
   end
 end
 
