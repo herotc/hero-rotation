@@ -256,6 +256,11 @@ local function Trinket_Sync_Slot()
     TrinketSyncSlot = 2
   end
 
+  -- actions.precombat+=/variable,name=trinket_sync_slot,value=1,if=trinket.1.is.treacherous_transmitter
+  if trinket1:ID() == I.TreacherousTransmitter:ID() then
+    TrinketSyncSlot = 1
+  end
+
   return TrinketSyncSlot
 end
 
@@ -314,10 +319,9 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     end
   end
 
-  -- actions.finish+=/coup_de_grace,if=debuff.fazed.up&(buff.shadow_dance.up|(buff.symbols_of_death.up&cooldown.shadow_dance.charges_fractional<=0.85))
-  if S.CoupDeGrace:IsReady() and S.CoupDeGrace:IsCastable() then
-    if Target:DebuffUp(S.FazedDebuff) and (Player:BuffUp(S.ShadowDanceBuff) or Player:BuffUp(S.SymbolsofDeath)
-      and S.ShadowDance:ChargesFractional() <= 0.85) then
+  -- actions.finish+=/coup_de_grace,if=debuff.fazed.up&buff.shadow_dance.up
+  if S.CoupDeGrace:IsReady() then
+    if Target:DebuffUp(S.FazedDebuff) and Player:BuffUp(S.ShadowDanceBuff) then
       if ReturnSpellOnly then
         return S.CoupDeGrace
       else
@@ -400,11 +404,11 @@ local function Finish (ReturnSpellOnly, StealthSpell)
 
   -- # Trickster bp, also gets used on singletarget when at max escalating blade stacks to preserve coup for dance
   -- actions.finish+=/black_powder,if=!variable.priority_rotation&talent.unseen_blade&((buff.escalating_blade.stack=4
-  -- &!buff.shadow_dance.up)|spell_targets>=3&!buff.flawless_form.up|(!used_for_danse&buff.shadow_dance.up
-  -- &talent.shuriken_tornado&spell_targets>=3))
+  -- &!buff.shadow_dance.up&cooldown.shadow_blades.remains<25)|spell_targets>=3&!buff.flawless_form.up|(!used_for_danse
+  -- &buff.shadow_dance.up&talent.shuriken_tornado&spell_targets>=3))
   if S.BlackPowder:IsCastable() and not PriorityRotation and S.UnseenBlade:IsAvailable()
-    and ((Player:BuffStack(S.EscalatingBlade) == 4 and Player:BuffDown(S.ShadowDanceBuff)) or MeleeEnemies10yCount >= 3
-    and Player:BuffDown(S.FlawlessFormBuff) or (not Used_For_Danse(S.BlackPowder)
+    and ((Player:BuffStack(S.EscalatingBlade) == 4 and Player:BuffDown(S.ShadowDanceBuff) and S.ShadowBlades:CooldownRemains() < 25)
+    or MeleeEnemies10yCount >= 3 and Player:BuffDown(S.FlawlessFormBuff) or (not Used_For_Danse(S.BlackPowder)
     and Player:BuffUp(S.ShadowDanceBuff) and S.ShurikenTornado:IsAvailable() and MeleeEnemies10yCount >= 3)) then
     if ReturnSpellOnly then
       return S.BlackPowder
@@ -815,9 +819,9 @@ end
 -- # Items
 local function Items()
   if Settings.Commons.Enabled.Trinkets then
-    -- actions.items+=/use_item,name=treacherous_transmitter,if=buff.shadow_blades.up|fight_remains<=15
+    -- actions.items+=/use_item,name=treacherous_transmitter,if=buff.flaggellation_buff.up|fight_remains<=15
     if I.TreacherousTransmitter:IsEquippedAndReady() then
-      if Player:BuffUp(S.ShadowBlades) or HL.BossFilteredFightRemains("<=", 15) then
+      if Player:BuffUp(S.FlagellationBuff) or HL.BossFilteredFightRemains("<=", 15) then
         if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
           return "Treacherous Transmitter"
         end
@@ -829,6 +833,17 @@ local function Items()
       if Target:DebuffUp(S.Rupture) and Player:BuffUp(S.Flagellation) then
         if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
           return "Imperfect Ascendancy Serum"
+        end
+      end
+    end
+
+    -- actions.items+=/use_item,name=mad_queens_mandate,if=(!talent.lingering_darkness|buff.lingering_darkness.up)
+    -- &(!equipped.treacherous_transmitter|trinket.treacherous_transmitter.cooldown.remains>20)|fight_remains<=15
+    if I.MadQueensMandate:IsEquippedAndReady() then
+      if (not S.LingeringDarkness:IsAvailable() or Player:BuffUp(S.LingeringDarknessBuff)
+        and (not I.TreacherousTransmitter:IsEquipped() or I.TreacherousTransmitter:CooldownRemains() > 20) or HL.BossFilteredFightRemains("<=", 15)) then
+        if Cast(I.MadQueensMandate, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(50)) then
+          return "Mad Queens Mandate"
         end
       end
     end
