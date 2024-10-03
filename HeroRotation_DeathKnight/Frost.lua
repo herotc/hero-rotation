@@ -151,7 +151,7 @@ end
 SetTrinketVariables()
 
 local function SetSpellVariables()
-  VarBreathRPCost = 1.7
+  VarBreathRPCost = 17
   VarStaticRimeBuffs = S.RageoftheFrozenChampion:IsAvailable() or S.Icebreaker:IsAvailable()
   VarBreathRPThreshold = 60
   VarERWBreathRPTrigger = 70
