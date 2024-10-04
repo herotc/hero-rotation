@@ -84,7 +84,9 @@ HR.GUISettings.APL.Warrior = {
   },
   Protection = {
     AllowIPOvercap = false,
+    LastStandHP = 60,
     RageCapValue = 80,
+    UseLastStandOffensively = true,
     PotionType = {
       Selected = "Tempered",
     },
@@ -130,4 +132,6 @@ CreateARPanelOptions(CP_Fury, "APL.Warrior.Fury")
 -- Protection Settings
 CreatePanelOption("Slider", CP_Protection, "APL.Warrior.Protection.RageCapValue", {30, 100, 5}, "Rage Cap Value", "Set the highest amount of Rage we should allow to pool before dumping Rage with Ignore Pain. Setting this value to 30 will allow you to over-cap Rage.")
 CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.AllowIPOvercap", "Allow Ignore Pain Overcap", "Enable this option to allow Ignore Pain to be suggested, even when it would push the absorb over its maximum absorb value.")
+CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.UseLastStandOffensively", "Use Last Stand Offensively", "Enable this option to allow Last Stand to be suggested offensively, as suggested by the Simulationcraft APL.")
+CreatePanelOption("Slider", CP_Protection, "APL.Warrior.Protection.LastStandHP", {0, 100, 1}, "Last Stand HP", "If 'Use Last Stand Offensively' is disabled, suggest Last Stand only when below this health percentage. This setting does nothing if 'Use Last Stand Offensively' is enabled.")
 CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection")
