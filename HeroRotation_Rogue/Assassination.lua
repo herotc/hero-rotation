@@ -754,10 +754,6 @@ end
 
 -- # Cooldowns
 local function CDs ()
-  if not TargetInAoERange then
-    return
-  end
-
   if not HR.CDsON() then
     return
   end
