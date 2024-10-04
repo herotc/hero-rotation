@@ -376,8 +376,12 @@ local function Finish(ReturnSpellOnly)
     if S.Crackshot:IsAvailable() and (S.Vanish:CooldownRemains() > 45 or S.UnderhandedUpperhand:IsAvailable()
       and S.WithoutATrace:IsAvailable() and (Player:BuffRemains(S.AdrenalineRush) > 12 or Player:BuffDown(S.AdrenalineRush)
       and S.AdrenalineRush:CooldownRemains() > 45)) and (HL.FilteredFightRemains(EnemiesBF, ">", 30)) then
-      if CastPooling(S.BetweentheEyes, nil, not Target:IsSpellInRange(S.BetweentheEyes)) then
-        return "Cast Between the Eyes"
+      if ReturnSpellOnly then
+        return S.BetweentheEyes
+      else
+        if CastPooling(S.BetweentheEyes, nil, not Target:IsSpellInRange(S.BetweentheEyes)) then
+          return "Cast Between the Eyes"
+        end
       end
     end
   end
@@ -495,7 +499,6 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
   end
 
   local MacroTable = { BaseSpell, MacroAbility }
-
   ShouldReturn = CastQueue(unpack(MacroTable))
   if ShouldReturn then
     return "| " .. MacroTable[2]:Name()

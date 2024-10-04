@@ -50,7 +50,7 @@ local OnUseExcludes = {
 }
 
 -- Rotation Var
-local MeleeRange, AoERange, TargetInMeleeRange, TargetInAoERange
+local MeleeRange, AoERange, TargetInAoERange
 local Enemies30y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y
 local ShouldReturn; -- Used to get the return string
 local PoolingAbility, PoolingEnergy, PoolingFinisher; -- Used to store an ability we might want to pool for as a fallback in the current situation
@@ -299,7 +299,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       if ReturnSpellOnly then
         return S.Rupture
       else
-        if S.Rupture:IsReady() and Cast(S.Rupture) then
+        if S.Rupture:IsReady() and Cast(S.Rupture, nil, nil, not Target:IsSpellInRange(S.Rupture)) then
           return "Cast Rupture 1"
         end
         SetPoolingFinisher(S.Rupture)
@@ -312,7 +312,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.Rupture
     else
-      if S.Rupture:IsReady() and Cast(S.Rupture) then
+      if S.Rupture:IsReady() and Cast(S.Rupture, nil, nil, not Target:IsSpellInRange(S.Rupture)) then
         return "Cast Rupture 2"
       end
       SetPoolingFinisher(S.Rupture)
@@ -325,7 +325,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       if ReturnSpellOnly then
         return S.CoupDeGrace
       else
-        if S.CoupDeGrace:IsReady() and Cast(S.CoupDeGrace) then
+        if S.CoupDeGrace:IsReady() and Cast(S.CoupDeGrace, nil, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
           return "Cast Coup De Grace 1"
         end
         SetPoolingFinisher(S.CoupDeGrace)
@@ -357,7 +357,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       if ReturnSpellOnly then
         return S.SecretTechnique
       end
-      if Cast(S.SecretTechnique) then
+      if Cast(S.SecretTechnique, nil, nil, not Target:IsSpellInRange(S.SecretTechnique)) then
         return "Cast Secret Technique"
       end
     end
@@ -380,7 +380,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       if ReturnSpellOnly then
         return S.Rupture
       else
-        if S.Rupture:IsReady() and Cast(S.Rupture) then
+        if S.Rupture:IsReady() and Cast(S.Rupture, nil, nil, not Target:IsSpellInRange(S.Rupture)) then
           return "Cast Rupture 2"
         end
         SetPoolingFinisher(S.Rupture)
@@ -395,7 +395,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.BlackPowder
     else
-      if S.BlackPowder:IsReady() and Cast(S.BlackPowder) then
+      if S.BlackPowder:IsReady() and Cast(S.BlackPowder, nil, nil ,not Target:IsSpellInRange(S.BlackPowder)) then
         return "Cast Black Powder 1"
       end
       SetPoolingFinisher(S.BlackPowder)
@@ -413,7 +413,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.BlackPowder
     else
-      if S.BlackPowder:IsReady() and Cast(S.BlackPowder) then
+      if S.BlackPowder:IsReady() and Cast(S.BlackPowder, nil, nil ,not Target:IsSpellInRange(S.BlackPowder)) then
         return "Cast BlackPowder 2"
       end
       SetPoolingFinisher(S.BlackPowder)
@@ -421,11 +421,11 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   end
 
   -- actions.finish+=/coup_de_grace,if=debuff.fazed.up
-  if S.CoupDeGrace:IsCastable() and TargetInMeleeRange and Target:DebuffUp(S.FazedDebuff) then
+  if S.CoupDeGrace:IsCastable() and Target:DebuffUp(S.FazedDebuff) then
     if ReturnSpellOnly then
       return S.CoupDeGrace
     else
-      if S.CoupDeGrace:IsReady() and Cast(S.CoupDeGrace) then
+      if S.CoupDeGrace:IsReady() and Cast(S.CoupDeGrace, nil, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
         return "Cast Coup De Grace 2"
       end
       SetPoolingFinisher(S.CoupDeGrace)
@@ -433,11 +433,11 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   end
 
   -- actions.finish+=/eviscerate
-  if S.Eviscerate:IsCastable() and TargetInMeleeRange then
+  if S.Eviscerate:IsCastable() then
     if ReturnSpellOnly then
       return S.Eviscerate
     else
-      if S.Eviscerate:IsReady() and Cast(S.Eviscerate) then
+      if S.Eviscerate:IsReady() and Cast(S.Eviscerate, nil, nil, not Target:IsSpellInRange(S.Eviscerate)) then
         return "Cast Eviscerate"
       end
       SetPoolingFinisher(S.Eviscerate)
@@ -476,7 +476,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   if StealthBuff or VanishBuffCheck then
     ShadowstrikeIsCastable = ShadowstrikeIsCastable and Target:IsInRange(25)
   else
-    ShadowstrikeIsCastable = ShadowstrikeIsCastable and TargetInMeleeRange
+    ShadowstrikeIsCastable = ShadowstrikeIsCastable
   end
 
   -- actions.stealthed=shadowstrike,if=talent.deathstalkers_mark&!debuff.deathstalkers_mark.up&!buff.darkest_night.up
@@ -485,7 +485,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
-      if Cast(S.Shadowstrike) then
+      if Cast(S.Shadowstrike, nil, nil, not Target:IsSpellInRange(S.Shadowstrike)) then
         return "Cast Shadowstrike (Stealth 1)"
       end
     end
@@ -517,7 +517,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
-      if Cast(S.Shadowstrike) then
+      if Cast(S.Shadowstrike, nil, nil, not Target:IsSpellInRange(S.Shadowstrike)) then
         return "Cast Shadowstrike (Stealth 2)"
       end
     end
@@ -559,7 +559,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
-      if Cast(S.Shadowstrike) then
+      if Cast(S.Shadowstrike, nil, nil, not Target:IsSpellInRange(S.Shadowstrike)) then
         return "Cast Shadowstrike"
       end
     end
@@ -623,7 +623,7 @@ local function CDs ()
   if HR.CDsON() and S.Sepsis:IsAvailable() and S.Sepsis:IsReady() then
     if SnD_Condition() and (S.ShadowBlades:CooldownRemains() <= 3
       and S.SymbolsofDeath:CooldownRemains() <= 3 or HL.BossFilteredFightRemains("<=", 12)) then
-      if Cast(S.Sepsis, nil, Settings.CommonsDS.DisplayStyle.Sepsis) then
+      if Cast(S.Sepsis, nil, Settings.CommonsDS.DisplayStyle.Sepsis, not Target:IsSpellInRange(S.Sepsis)) then
         return "Cast Sepsis"
       end
     end
@@ -636,7 +636,7 @@ local function CDs ()
     if SnD_Condition() and Rupture_Before_Flag() and EffectiveComboPoints >= 5 and Target:TimeToDie() > 10
       and (S.ShadowBlades:CooldownRemains() <= 2 or HL.BossFilteredFightRemains("<=", 24))
       and (not S.InvigoratingShadowdust:IsAvailable() or S.SymbolsofDeath:CooldownRemains() <= 3 or Player:BuffRemains(S.SymbolsofDeath) > 3) then
-      if Cast(S.Flagellation, nil, Settings.CommonsDS.DisplayStyle.Flagellation) then
+      if Cast(S.Flagellation, nil, Settings.CommonsDS.DisplayStyle.Flagellation, not Target:IsSpellInRange(S.Flagellation)) then
         return "Cast Flagellation"
       end
     end
@@ -684,7 +684,7 @@ local function CDs ()
   if HR.CDsON() and S.EchoingReprimand:IsCastable() and S.EchoingReprimand:IsAvailable() then
     if SnD_Condition() and ComboPointsDeficit >= 3
       and (not S.TheRotten:IsAvailable() or not S.Reverberation:IsAvailable() or Player:BuffUp(S.ShadowDance)) then
-      if Cast(S.EchoingReprimand, nil, Settings.CommonsDS.DisplayStyle.EchoingReprimand) then
+      if Cast(S.EchoingReprimand, nil, Settings.CommonsDS.DisplayStyle.EchoingReprimand, not Target:IsSpellInRange(S.EchoingReprimand)) then
         return "Cast Echoing Reprimand"
       end
     end
@@ -752,7 +752,7 @@ local function CDs ()
     if SnD_Condition() and ComboPointsDeficit >= 3 and (not S.ShadowDance:IsReady() or S.DoubleDance:IsAvailable()
       and Player:BuffUp(S.ShadowDanceBuff) and not S.InvigoratingShadowdust:IsAvailable() or MeleeEnemies10yCount < 4
       and not S.InvigoratingShadowdust:IsAvailable() or S.TheRotten:IsAvailable()) then
-      if Cast(S.GoremawsBite) then
+      if Cast(S.GoremawsBite, nil, nil, not Target:IsSpellInRange(S.GoremawsBite)) then
         return "Cast Goremaw's Bite"
       end
     end
@@ -991,21 +991,19 @@ local function Build (EnergyThreshold)
     end
   end
 
-  if TargetInMeleeRange then
-    -- actions.build+=/gloomblade
-    if S.Gloomblade:IsCastable() then
-      if ThresholdMet and Cast(S.Gloomblade) then
-        return "Cast Gloomblade"
-      end
-      SetPoolingAbility(S.Gloomblade, EnergyThreshold)
-
-      -- actions.build+=/backstab
-    elseif S.Backstab:IsCastable() then
-      if ThresholdMet and Cast(S.Backstab) then
-        return "Cast Backstab"
-      end
-      SetPoolingAbility(S.Backstab, EnergyThreshold)
+  -- actions.build+=/gloomblade
+  if S.Gloomblade:IsCastable() then
+    if ThresholdMet and Cast(S.Gloomblade, nil, nil, not Target:IsSpellInRange(S.Gloomblade)) then
+      return "Cast Gloomblade"
     end
+    SetPoolingAbility(S.Gloomblade, EnergyThreshold)
+
+    -- actions.build+=/backstab
+  elseif S.Backstab:IsCastable() then
+    if ThresholdMet and Cast(S.Backstab, nil, nil, not Target:IsSpellInRange(S.Backstab)) then
+      return "Cast Backstab"
+    end
+    SetPoolingAbility(S.Backstab, EnergyThreshold)
   end
   return false
 end
@@ -1032,7 +1030,6 @@ local function APL ()
   -- Unit Update
   MeleeRange = 5
   AoERange = 10
-  TargetInMeleeRange = Target:IsInMeleeRange(MeleeRange)
   TargetInAoERange = Target:IsInMeleeRange(AoERange)
   if AoEON() then
     Enemies30y = Player:GetEnemiesInRange(30) -- Serrated Bone Spike
@@ -1102,7 +1099,7 @@ local function APL ()
     -- Rune
     -- PrePot w/ Bossmod Countdown
     -- Opener
-    if Everyone.TargetIsValid() and (Target:IsSpellInRange(S.Shadowstrike) or TargetInMeleeRange) then
+    if Everyone.TargetIsValid() and (Target:IsSpellInRange(S.Shadowstrike)) then
       -- Precombat CDs
       if Player:StealthUp(true, true) then
         PoolingAbility = Stealthed(true)
@@ -1124,7 +1121,7 @@ local function APL ()
           return ShouldReturn .. " (OOC)"
         end
       elseif S.Backstab:IsCastable() then
-        if Cast(S.Backstab) then
+        if Cast(S.Backstab, nil, nil, not Target:IsSpellInRange(S.Backstab)) then
           return "Cast Backstab (OOC)"
         end
       end
@@ -1177,7 +1174,7 @@ local function APL ()
               return "Stealthed Tornado Cast  " .. PoolingAbility:Name()
             end
           else
-            if CastPooling(PoolingAbility) then
+            if CastPooling(PoolingAbility, nil, not Target:IsSpellInRange(PoolingAbility)) then
               return "Stealthed Cast " .. PoolingAbility:Name()
             end
           end
@@ -1233,13 +1230,13 @@ local function APL ()
     if HR.CDsON() then
       -- # Lowest priority in all of the APL because it causes a GCD
       -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
-      if S.ArcaneTorrent:IsReady() and TargetInMeleeRange and Player:EnergyDeficitPredicted() >= 15 + Player:EnergyRegen() then
+      if S.ArcaneTorrent:IsReady() and Player:EnergyDeficitPredicted() >= 15 + Player:EnergyRegen() then
         if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.GCDasOffGCD.Racials) then
           return "Cast Arcane Torrent"
         end
       end
       -- actions+=/arcane_pulse
-      if S.ArcanePulse:IsReady() and TargetInMeleeRange then
+      if S.ArcanePulse:IsReady() then
         if Cast(S.ArcanePulse, Settings.CommonsOGCD.GCDasOffGCD.Racials) then
           return "Cast Arcane Pulse"
         end
@@ -1259,7 +1256,7 @@ local function APL ()
     end
 
     -- Show what ever was first stored for pooling
-    if PoolingAbility and TargetInMeleeRange then
+    if PoolingAbility then
       if type(PoolingAbility) == "table" and #PoolingAbility > 1 then
         if CastQueuePooling(Player:EnergyTimeToX(PoolingEnergy), unpack(PoolingAbility)) then
           return "Macro pool towards " .. PoolingAbility[1]:Name() .. " at " .. PoolingEnergy
