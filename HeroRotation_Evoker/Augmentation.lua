@@ -428,6 +428,7 @@ local function FB()
   -- fire_breath,empower_to=3,target_if=target.time_to_die>8,if=(buff.ebon_might_self.remains>duration&(!talent.molten_embers|cooldown.upheaval.remains<=(20+4*talent.blast_furnace-6*2))|buff.tip_the_scales.up)
   -- fire_breath,empower_to=2,target_if=target.time_to_die>12,if=buff.ebon_might_self.remains>duration&(!talent.molten_embers|cooldown.upheaval.remains<=(20+4*talent.blast_furnace-6*1))
   -- fire_breath,empower_to=1,target_if=target.time_to_die>16,if=buff.ebon_might_self.remains>duration&(!talent.molten_embers|cooldown.upheaval.remains<=(20+4*talent.blast_furnace-6*0))
+  -- fire_breath,empower_to=4,target_if=target.time_to_die>4,if=talent.font_of_magic&(buff.ebon_might_self.remains>duration)
   local FBEmpower = 0
   if S.FireBreath:IsCastable() then
     -- Note: Using Player:EmpowerCastTime() in place of duration in the below lines. Intention seems to be whether we can get the spell off before Ebom Might ends.
@@ -439,6 +440,8 @@ local function FB()
       FBEmpower = 2
     elseif Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) and (not S.MoltenEmbers:IsAvailable() or S.Upheaval:CooldownRemains() <= (20 + 4 * num(S.BlastFurnace:IsAvailable()) - 6 * 0)) and Target:TimeToDie() > 16 then
       FBEmpower = 1
+    elseif S.FontofMagic:IsAvailable() and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(4) then
+      FBEmpower = 4
     end
   end
   if FBEmpower > 0 then
@@ -627,28 +630,28 @@ local function APL()
     if S.TipTheScales:IsReady() and (S.ThreadsofFate:IsAvailable() and (S.BreathofEons:CooldownDown() or HL.CombatTime() > 10)) then
       if Cast(S.TipTheScales, Settings.CommonsOGCD.GCDasOffGCD.TipTheScales, nil, not Target:IsInRange(50)) then return "tip_the_scales main 12"; end
     end
-    -- call_action_list,name=fb,if=cooldown.time_skip.up&talent.time_skip&!talent.interwoven_threads|talent.mass_eruption&talent.overlord&cooldown.breath_of_eons.remains<=1&talent.molten_embers&active_enemies>=3
-    if S.TimeSkip:IsAvailable() and S.TimeSkip:CooldownUp() and not S.InterwovenThreads:IsAvailable() or S.MassEruption:IsAvailable() and S.Overlord:IsAvailable() and S.BreathofEons:CooldownRemains() <= 1 and S.MoltenEmbers:IsAvailable() and EnemiesCount8ySplash >= 3 then
+    -- call_action_list,name=fb,if=cooldown.time_skip.up&talent.time_skip&!talent.interwoven_threads
+    if S.TimeSkip:IsAvailable() and S.TimeSkip:CooldownUp() and not S.InterwovenThreads:IsAvailable() then
       local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
     end
-    -- cancel_buff,name=tip_the_scales,if=cooldown.fire_breath.remains>=gcd.max*2&cooldown.upheaval.remains>=gcd.max*2|cooldown.fire_breath.up&cooldown.upheaval.remains>=12&talent.molten_embers
-    -- TODO: Handle the above.
-    -- upheaval,target_if=target.time_to_die>duration+0.2,empower_to=1,if=buff.ebon_might_self.remains>duration&cooldown.time_skip.up&talent.time_skip&!talent.interwoven_threads|talent.mass_eruption&talent.overlord&cooldown.breath_of_eons.remains<=1&!talent.molten_embers&active_enemies>=3
+    -- actions+=/cancel_buff,name=tip_the_scales,if=cooldown.fire_breath.remains>=gcd.max*2&cooldown.upheaval.remains>=gcd.max*2|cooldown.fire_breath.up&cooldown.upheaval.remains>=12&talent.molten_embers
+    -- TODO: Confirm the above is intended, as it's in the APL as a comment. Handle the above as needed.
+    -- upheaval,target_if=target.time_to_die>duration+0.2,empower_to=1,if=buff.ebon_might_self.remains>duration&cooldown.time_skip.up&talent.time_skip&!talent.interwoven_threads
     -- Note: Adding 0.5s buffer to empower time to account for player latency.
-    if S.Upheaval:IsCastable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) + 0.5 and S.TimeSkip:IsAvailable() and S.TimeSkip:CooldownUp() and not S.InterwovenThreads:IsAvailable() or S.MassEruption:IsAvailable() and S.Overlord:IsAvailable() and S.BreathofEons:CooldownRemains() <= 1 and not S.MoltenEmbers:IsAvailable() and EnemiesCount8ySplash >= 3) then
+    if S.Upheaval:IsCastable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) + 0.5 and S.TimeSkip:IsAvailable() and S.TimeSkip:CooldownUp() and not S.InterwovenThreads:IsAvailable()) then
       if CastAnnotated(S.Upheaval, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "upheaval empower_to=1 main 14"; end
     end
     -- call_action_list,name=fb,if=(raid_event.adds.remains>13|raid_event.adds.in>20|evoker.allied_cds_up>0|!raid_event.adds.exists)&(cooldown.allied_virtual_cd_time.remains>=variable.hold_empower_for|!talent.breath_of_eons|talent.wingleader&cooldown.breath_of_eons.remains>=variable.hold_empower_for|cooldown.breath_of_eons.up&talent.wingleader)
     -- Note: Can't track others' CDs, so just always assuming true.
     local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
-    -- upheaval,target_if=target.time_to_die>duration+0.2,empower_to=1,if=buff.ebon_might_self.remains>duration&(raid_event.adds.remains>13|!raid_event.adds.exists|raid_event.adds.in>20)&(!talent.molten_embers|dot.fire_breath_damage.ticking)&(cooldown.allied_virtual_cd_time.remains>=variable.hold_empower_for|!talent.breath_of_eons|talent.wingleader&cooldown.breath_of_eons.remains>=variable.hold_empower_for)
+    -- upheaval,target_if=target.time_to_die>duration+0.2,empower_to=1,if=buff.ebon_might_self.remains>duration&(raid_event.adds.remains>10|evoker.allied_cds_up>0|!raid_event.adds.exists|raid_event.adds.in>20)&(!talent.molten_embers|dot.fire_breath_damage.ticking|cooldown.fire_breath.remains>=10)&(cooldown.allied_virtual_cd_time.remains>=variable.hold_empower_for|!talent.breath_of_eons|talent.wingleader&cooldown.breath_of_eons.remains>=variable.hold_empower_for)
     -- Note: Adding 0.5s buffer to empower time to account for player latency.
-    -- Note: Added a level check, since it's possible between 70 and 80 to have a talent combo that stops Upheaval suggestions.
-    if S.Upheaval:IsReady() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) + 0.5 and ((not S.MoltenEmbers:IsAvailable() or S.FireBreathDebuff:AuraActiveCount() > 0) and (not S.BreathofEons:IsAvailable() or S.Wingleader:IsAvailable() and S.BreathofEons:CooldownRemains() >= VarHoldEmpowerFor) or Player:Level() < 80)) then
+    -- Note: Can't track others' CDs, so just always assuming the final set of conditions is true.
+    if S.Upheaval:IsReady() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) + 0.5 and (not S.MoltenEmbers:IsAvailable() or S.FireBreathDebuff:AuraActiveCount() > 0 or S.FireBreath:CooldownRemains() >= 10)) then
       if CastAnnotated(S.Upheaval, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "upheaval empower_to=1 main 16"; end
     end
-    -- breath_of_eons,if=talent.wingleader&(buff.mass_eruption_stacks.up&talent.overlord|!talent.overlord)&(target.time_to_die>=15&(raid_event.adds.in>=20|raid_event.adds.remains>=15))|fight_remains<=30
-    if S.BreathofEons:IsReady() and (S.Wingleader:IsAvailable() and (Player:BuffUp(S.MassEruptionBuff) and S.Overlord:IsAvailable() or not S.Overlord:IsAvailable()) and (Target:TimeToDie() >= 15) or BossFightRemains <= 30) then
+    -- breath_of_eons,if=talent.wingleader&(target.time_to_die>=15&(raid_event.adds.in>=20|raid_event.adds.remains>=15))|fight_remains<=30
+    if S.BreathofEons:IsReady() and (S.Wingleader:IsAvailable() and Target:TimeToDie() >= 15 or BossFightRemains <= 30) then
       if Cast(S.BreathofEons, Settings.Augmentation.GCDasOffGCD.BreathOfEons, nil, not Target:IsInRange(50)) then return "breath_of_eons main 18"; end
     end
     -- breath_of_eons,if=((cooldown.ebon_might.remains<=4|buff.ebon_might_self.up)&target.time_to_die>15&raid_event.adds.in>15|fight_remains<30)&!fight_style.dungeonroute&cooldown.allied_virtual_cd_time.up
