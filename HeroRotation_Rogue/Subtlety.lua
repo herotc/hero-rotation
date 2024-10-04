@@ -266,7 +266,7 @@ end
 
 -- # Finishers
 -- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
-local function Finish (ReturnSpellOnly, StealthSpell)
+local function Finish (ReturnSpellOnly, StealthSpell, ForceStealth)
   local ShadowDanceBuff = Player:BuffUp(S.ShadowDanceBuff)
   local ShadowDanceBuffRemains = Player:BuffRemains(S.ShadowDanceBuff)
   local SymbolsofDeathBuffRemains = Player:BuffRemains(S.SymbolsofDeath)
@@ -321,7 +321,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
 
   -- actions.finish+=/coup_de_grace,if=debuff.fazed.up&buff.shadow_dance.up
   if S.CoupDeGrace:IsReady() then
-    if Target:DebuffUp(S.FazedDebuff) and Player:BuffUp(S.ShadowDanceBuff) then
+    if Target:DebuffUp(S.FazedDebuff) and (Player:BuffUp(S.ShadowDanceBuff) or ForceStealth) then
       if ReturnSpellOnly then
         return S.CoupDeGrace
       else
@@ -351,7 +351,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   -- |!talent.improved_shadow_dance)
   -- Attention: Due to the SecTec/ColdBlood interaction, this adaption has additional checks not found in the APL string
   if S.SecretTechnique:IsReady() then
-    if Secret_Condition(ShadowDanceBuff, PremeditationBuff)
+    if (Secret_Condition(ShadowDanceBuff, PremeditationBuff) or ForceStealth)
       and (not S.ColdBlood:IsAvailable() or (Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood and S.ColdBlood:IsReady())
       or Player:BuffUp(S.ColdBlood) or ColdBloodCDRemains > ShadowDanceBuffRemains - 2 or not S.ImprovedShadowDance:IsAvailable()) then
       if ReturnSpellOnly then
@@ -395,7 +395,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.BlackPowder
     else
-      if S.BlackPowder:IsReady() and Cast(S.BlackPowder, nil, nil ,not Target:IsSpellInRange(S.BlackPowder)) then
+      if S.BlackPowder:IsReady() and Cast(S.BlackPowder) then
         return "Cast Black Powder 1"
       end
       SetPoolingFinisher(S.BlackPowder)
@@ -413,7 +413,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.BlackPowder
     else
-      if S.BlackPowder:IsReady() and Cast(S.BlackPowder, nil, nil ,not Target:IsSpellInRange(S.BlackPowder)) then
+      if S.BlackPowder:IsReady() and Cast(S.BlackPowder) then
         return "Cast BlackPowder 2"
       end
       SetPoolingFinisher(S.BlackPowder)
@@ -449,7 +449,7 @@ end
 
 -- # Stealthed Rotation
 -- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
-local function Stealthed (ReturnSpellOnly, StealthSpell)
+local function Stealthed (ReturnSpellOnly, StealthSpell, ForceStealth)
   local ShadowDanceBuff = Player:BuffUp(S.ShadowDanceBuff)
   local ShadowDanceBuffRemains = Player:BuffRemains(S.ShadowDanceBuff)
   local TheRottenBuff = Player:BuffUp(S.TheRottenBuff)
@@ -493,22 +493,22 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
 
   -- actions.stealthed+=/call_action_list,name=finish,if=buff.darkest_night.up&combo_points==cp_max_spend
   if Player:BuffUp(S.DarkestNightBuff) and ComboPoints == Rogue.CPMaxSpend() then
-    return Finish(ReturnSpellOnly, StealthSpell)
+    return Finish(ReturnSpellOnly, StealthSpell, ForceStealth)
   end
 
   -- actions.stealthed+=/call_action_list,name=finish,if=effective_combo_points>=cp_max_spend&!buff.darkest_night.up
   if EffectiveComboPoints >= Rogue.CPMaxSpend() and Player:BuffDown(S.DarkestNightBuff) then
-    return Finish(ReturnSpellOnly, StealthSpell)
+    return Finish(ReturnSpellOnly, StealthSpell, ForceStealth)
   end
 
   -- actions.stealthed+=/call_action_list,name=finish,if=buff.shuriken_tornado.up&combo_points.deficit<=2&!buff.darkest_night.up
   if Player:BuffUp(S.ShurikenTornado) and StealthComboPointsDeficit <= 2 and Player:BuffDown(S.DarkestNightBuff) then
-    return Finish(ReturnSpellOnly, StealthSpell)
+    return Finish(ReturnSpellOnly, StealthSpell, ForceStealth)
   end
 
   -- actions.stealthed+=/call_action_list,name=finish,if=(combo_points.deficit<=1+talent.deathstalkers_mark)&!buff.darkest_night.up
   if (ComboPointsDeficit <= 1 + num(S.DeathStalkersMark:IsAvailable())) and Player:BuffDown(S.DarkestNightBuff) then
-    return Finish(ReturnSpellOnly, StealthSpell)
+    return Finish(ReturnSpellOnly, StealthSpell, ForceStealth)
   end
 
   -- actions.stealthed+=/shadowstrike,if=(!used_for_danse&buff.shadow_blades.up)|(talent.unseen_blade&spell_targets>=2)
@@ -572,7 +572,7 @@ end
 -- This returns a table with the original Stealth spell and the result of the Stealthed action list as if the applicable buff was present
 local function StealthMacro (StealthSpell, EnergyThreshold)
   -- Fetch the predicted ability to use after the stealth spell
-  local MacroAbility = Stealthed(true, StealthSpell)
+  local MacroAbility = Stealthed(true, StealthSpell, true)
 
   -- Handle StealthMacro GUI options
   -- If false, just suggest them as off-GCD and bail out of the macro functionality
