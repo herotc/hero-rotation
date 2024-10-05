@@ -74,7 +74,7 @@ local VarCanSpBomb, VarCanSpBombSoon, VarCanSpBombOneGCD
 local VarCanSpBurst, VarCanSpBurstSoon, VarCanSpBurstOneGCD
 local VarDontSoulCleave, VarMetaPrepTime
 local VarDoubleRMExpires, VarDoubleRMRemains
-local VarTriggerOverflow, VarRGEnhCleave, VarCDSync
+local VarTriggerOverflow, VarRGEnhCleave
 local VarSoulsBeforeNextRGSequence
 local VarFBBeforeMeta, VarHoldSoFForMeta, VarHoldSoFForFelDev, VarHoldSoFForStudent, VarHoldSoFForDot, VarHoldSoFForPrecombat
 local VarCritPct, VarFelDevSequenceTime, VarFelDevPassiveFuryGen
@@ -389,8 +389,6 @@ local function AR()
   end
   -- variable,name=rg_enhance_cleave,op=setif,condition=variable.trigger_overflow|$(enhance_cleave_only)|$(execute_phase),value=1,value_else=0
   VarRGEnhCleave = (VarTriggerOverflow or EnhanceCleaveOnly() or ExecutePhase())
-  -- variable,name=cooldown_sync,value=(debuff.reavers_mark.remains>gcd.max&debuff.reavers_mark.stack=2&buff.thrill_of_the_fight_damage.remains>gcd.max)|$(execute_phase)
-  VarCDSync = (Target:DebuffRemains(S.ReaversMarkDebuff) > Player:GCD() and Target:DebuffStack(S.ReaversMarkDebuff) == 2 and Player:BuffRemains(S.ThrilloftheFightDmgBuff) > Player:GCD()) or ExecutePhase()
   -- variable,name=souls_before_next_rg_sequence,value=soul_fragments.total+buff.art_of_the_glaive.stack
   VarSoulsBeforeNextRGSequence = TotalSoulFragments + Player:BuffStack(S.ArtoftheGlaiveBuff)
   -- variable,name=souls_before_next_rg_sequence,op=add,value=$(souls_per_second)*(variable.double_rm_remains-$(rg_sequence_duration))
