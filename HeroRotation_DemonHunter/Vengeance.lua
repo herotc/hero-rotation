@@ -121,9 +121,9 @@ local function RGSouls()
   return 20
 end
 
--- $(souls_per_second)=(1.2*(1+raw_haste_pct))
+-- $(souls_per_second)=(1.1*(1+raw_haste_pct))
 local function SoulsPerSecond()
-  return (1.2 * (1 + Player:HastePct()))
+  return (1.1 * (1 + Player:HastePct()))
 end
 
 -- $(should_fracture_rg)=((variable.rg_enhance_cleave&buff.rending_strike.up&buff.glaive_flurry.up)|(!variable.rg_enhance_cleave&!buff.glaive_flurry.up))
@@ -147,8 +147,9 @@ local function EnoughFuryToRG()
 end
 
 -- $(rg_sequence_duration)=(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))
+-- Note (Jom): Added an additional half a GCD of time to each RG Sequence to account for brain lag
 local function RGSequenceDuration()
-  return (S.ReaversGlaive:ExecuteTime() + S.Fracture:ExecuteTime() + S.SoulCleave:ExecuteTime() + Player:GCDRemains() + (0.5 * Player:GCD()))
+  return (S.ReaversGlaive:ExecuteTime() + S.Fracture:ExecuteTime() + S.SoulCleave:ExecuteTime() + Player:GCDRemains() + Player:GCD())
 end
 
 -- $(execute_phase)=(fight_remains<10|target.time_to_die<10)
@@ -382,8 +383,8 @@ local function AR()
   VarCanSpBOneGCD = S.SpiritBomb:IsAvailable() and (TotalSoulFragments + VarNumSpawnableSouls) >= VarSpBThreshold
   -- variable,name=double_rm_remains,op=setif,condition=(variable.double_rm_expires-time)>0,value=variable.double_rm_expires-time,value_else=0
   VarDoubleRMRemains = VarDoubleRMExpires and ((VarDoubleRMExpires - HL.CombatTime()) > 0) and (VarDoubleRMExpires - HL.CombatTime()) or 0
-  -- variable,name=trigger_overflow,op=set,value=0,if=!buff.glaive_flurry.up&!buff.rending_strike.up
-  if Player:BuffDown(S.GlaiveFlurryBuff) and Player:BuffDown(S.RendingStrikeBuff) then
+  -- variable,name=trigger_overflow,op=set,value=0,if=!buff.glaive_flurry.up&!buff.rending_strike.up&!prev_gcd.1.reavers_glaive
+  if Player:BuffDown(S.GlaiveFlurryBuff) and Player:BuffDown(S.RendingStrikeBuff) and not Player:PrevGCD(1, S.ReaversGlaive) then
     VarTriggerOverflow = false
   end
   -- variable,name=rg_enhance_cleave,op=setif,condition=variable.trigger_overflow|$(enhance_cleave_only)|$(execute_phase),value=1,value_else=0
@@ -394,13 +395,17 @@ local function AR()
   VarSoulsBeforeNextRGSequence = TotalSoulFragments + Player:BuffStack(S.ArtoftheGlaiveBuff)
   -- variable,name=souls_before_next_rg_sequence,op=add,value=$(souls_per_second)*(variable.double_rm_remains-$(rg_sequence_duration))
   VarSoulsBeforeNextRGSequence = VarSoulsBeforeNextRGSequence + (SoulsPerSecond() * (VarDoubleRMRemains - RGSequenceDuration()))
-  -- variable,name=souls_before_next_rg_sequence,op=add,value=3+talent.soul_sigils,if=cooldown.sigil_of_spite.remains<variable.double_rm_remains
-  if S.SigilofSpite:CooldownRemains() < VarDoubleRMRemains then
+  -- variable,name=souls_before_next_rg_sequence,op=add,value=3+talent.soul_sigils,if=cooldown.sigil_of_spite.remains<(variable.double_rm_remains-gcd.max-(2-talent.soul_sigils))
+  if S.SigilofSpite:CooldownRemains() < (VarDoubleRMRemains - Player:GCD() - (2 - num(S.SoulSigils:IsAvailable()))) then
     VarSoulsBeforeNextRGSequence = VarSoulsBeforeNextRGSequence + 3 + num(S.SoulSigils:IsAvailable())
   end
-  -- variable,name=souls_before_next_rg_sequence,op=add,value=6,if=cooldown.soul_carver.remains<variable.double_rm_remains
-  if S.SoulCarver:CooldownRemains() < VarDoubleRMRemains then
-    VarSoulsBeforeNextRGSequence = VarSoulsBeforeNextRGSequence + 6
+  -- variable,name=souls_before_next_rg_sequence,op=add,value=3,if=cooldown.soul_carver.remains<(variable.double_rm_remains-gcd.max)
+  if S.SoulCarver:CooldownRemains() < (VarDoubleRMRemains - Player:GCD()) then
+    VarSoulsBeforeNextRGSequence = VarSoulsBeforeNextRGSequence + 3
+  end
+  -- variable,name=souls_before_next_rg_sequence,op=add,value=3,if=cooldown.soul_carver.remains<(variable.double_rm_remains-gcd.max-3)
+  if S.SoulCarver:CooldownRemains() < (VarDoubleRMRemains - Player:GCD() - 3) then
+    VarSoulsBeforeNextRGSequence = VarSoulsBeforeNextRGSequence + 3
   end
   -- use_items,use_off_gcd=1
   if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
@@ -422,20 +427,26 @@ local function AR()
   end
   -- call_action_list,name=externals,if=(buff.rending_strike.up&buff.glaive_flurry.up)|prev_gcd.1.reavers_glaive
   -- Note: Not handling externals.
-  -- run_action_list,name=rg_sequence,if=buff.glaive_flurry.up|buff.rending_strike.up
+  -- run_action_list,name=rg_sequence,if=buff.glaive_flurry.up|buff.rending_strike.up|prev_gcd.1.reavers_glaive
   -- Note: Added FuryoftheAldrachi check to avoid stalling the profile if it's not yet learned.
-  if S.FuryoftheAldrachi:IsAvailable() and (Player:BuffUp(S.GlaiveFlurryBuff) or Player:BuffUp(S.RendingStrikeBuff)) then
+  if S.FuryoftheAldrachi:IsAvailable() and (Player:BuffUp(S.GlaiveFlurryBuff) or Player:BuffUp(S.RendingStrikeBuff) or Player:PrevGCD(1, S.ReaversGlaive)) then
     local ShouldReturn = RGSequence(); if ShouldReturn then return ShouldReturn; end
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for RGSequence()"; end
   end
   -- metamorphosis,use_off_gcd=1,if=time<5|cooldown.fel_devastation.remains>=20
   if S.Metamorphosis:IsCastable() and (HL.CombatTime() < 5 or S.FelDevastation:CooldownRemains() >= 20) then
-      if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis ar 6"; end
+      if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis ar 5"; end
   end
   -- the_hunt,if=!buff.reavers_glaive.up&(buff.art_of_the_glaive.stack+soul_fragments.total)<$(rg_souls)
   if S.TheHunt:IsReady() and (not S.ReaversGlaive:IsLearned() and ((Player:BuffStack(S.ArtoftheGlaiveBuff) + TotalSoulFragments) < RGSouls())) then
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar 8"; end
   end
+
+    -- spirit_bomb,if=variable.can_spb&(soul_fragments.inactive>2|prev_gcd.1.sigil_of_spite|prev_gcd.1.soul_carver|(spell_targets.spirit_bomb>=4&talent.fallout&cooldown.immolation_aura.remains<gcd.max))
+  if S.SpiritBomb:IsReady() and (VarCanSpB and (IncSoulFragments > 2 or Player:PrevGCD(1, S.SigilofSpite) or Player:PrevGCD(1, S.SoulCarver) or (EnemiesCount8yMelee >= 4 and S.Fallout:IsAvailable() and S.ImmolationAura:CooldownRemains() < Player:GCD()))) then
+    if Cast(S.SpiritBomb, nil, nil, not IsInAoERange) then return "spirit_bomb ar 7"; end
+  end
+
   -- immolation_aura,if=(!buff.reavers_glaive.up|(variable.double_rm_remains>($(rg_sequence_duration)+gcd.max)))&(variable.single_target|!variable.can_spb)
   if ImmoAbility:IsCastable() and ((not S.ReaversGlaive:IsLearned() or (VarDoubleRMRemains > (RGSequenceDuration() + Player:GCD()))) and (VarST or not VarCanSpB)) then
     if Cast(ImmoAbility) then return "immolation_aura ar 8"; end
@@ -445,7 +456,7 @@ local function AR()
     if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame ar 10"; end
   end
   -- run_action_list,name=rg_overflow,if=buff.reavers_glaive.up&!$(enhance_cleave_only)&debuff.reavers_mark.up&(variable.double_rm_remains>$(rg_sequence_duration))&(!buff.thrill_of_the_fight_damage.up|(buff.thrill_of_the_fight_damage.remains<$(rg_sequence_duration)))&((variable.double_rm_remains-$(rg_sequence_duration))>$(rg_sequence_duration))&((variable.souls_before_next_rg_sequence>=$(rg_souls))|(variable.double_rm_remains>($(rg_sequence_duration)+cooldown.the_hunt.remains+action.the_hunt.execute_time)))
-  if S.ReaversGlaive:IsLearned() and (not EnhanceCleaveOnly() and Target:DebuffUp(S.ReaversMarkDebuff) and (Player:BuffStack(S.ArtoftheGlaiveBuff) == 2) and (VarDoubleRMRemains > RGSequenceDuration()) and (Player:BuffDown(S.ThrilloftheFightDmgBuff) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) < RGSequenceDuration())) and ((VarDoubleRMRemains - RGSequenceDuration()) > RGSequenceDuration()) and ((VarSoulsBeforeNextRGSequence >= RGSouls()) or (VarDoubleRMRemains > (RGSequenceDuration() + S.TheHunt:CooldownRemains() + S.TheHunt:ExecuteTime())))) then
+  if S.ReaversGlaive:IsLearned() and (not EnhanceCleaveOnly() and Target:DebuffUp(S.ReaversMarkDebuff) and (VarDoubleRMRemains > RGSequenceDuration()) and (Player:BuffDown(S.ThrilloftheFightDmgBuff) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) < RGSequenceDuration())) and ((VarDoubleRMRemains - RGSequenceDuration()) > RGSequenceDuration()) and ((VarSoulsBeforeNextRGSequence >= RGSouls()) or (VarDoubleRMRemains > (RGSequenceDuration() + S.TheHunt:CooldownRemains() + S.TheHunt:ExecuteTime())))) then
     local ShouldReturn = RGOverflow(); if ShouldReturn then return ShouldReturn; end
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool for RGOverflow()"; end
   end
@@ -498,7 +509,7 @@ local function AR()
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture ar 28"; end
   end
   -- (Jom) Manually added -- wait for souls to spawn if we'll be able to cast spirit bomb shortly
-  if S.SpiritBomb:IsReady() and not VarCanSpB and TotalSoulFragments >= VarSpBThreshold and SoulFragments < 5 then
+  if S.SpiritBomb:IsReady() and (not VarCanSpB and TotalSoulFragments >= VarSpBThreshold and SoulFragments < 5) and (Player:GCDRemains() < (Player:GCD() * 0.5)) then
     if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Soul Fragments (Spirit Burst)"; end
   end
   -- soul_carver,if=buff.thrill_of_the_fight_damage.up|((soul_fragments.total+buff.art_of_the_glaive.stack+($(souls_per_second)*(variable.double_rm_remains-$(rg_sequence_duration))))<$(rg_souls))
@@ -1056,7 +1067,7 @@ local function FS()
     if Cast(S.SoulCleave, nil, nil, not IsInMeleeRange) then return "soul_cleave fs 18"; end
   end
   -- Manually added: wait,if=!variable.can_spburst&soul_fragments.total>=variable.spburst_threshold
-  if S.SpiritBurst:IsReady() and not VarCanSpBurst and TotalSoulFragments >= VarSpBurstThreshold and SoulFragments < 5 then
+  if S.SpiritBurst:IsReady() and (not VarCanSpBurst and TotalSoulFragments >= VarSpBurstThreshold and SoulFragments < 5) and (Player:GCDRemains() < (Player:GCD() * 0.5)) then
     if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Soul Fragments (Spirit Burst)"; end
   end
   -- spirit_burst,if=variable.can_spburst&!cooldown.fel_devastation.remains<(gcd.max*3)
@@ -1064,7 +1075,7 @@ local function FS()
     if Cast(S.SpiritBurst, nil, nil, not IsInAoERange) then return "spirit_burst fs 20"; end
   end
   -- Manually added: wait,if=!variable.can_spb&soul_fragments.total>=variable.spbomb_threshold
-  if not VarCanSpB and TotalSoulFragments >= VarSpBombThreshold and SoulFragments < 5 then
+  if not VarCanSpB and (TotalSoulFragments >= VarSpBombThreshold and SoulFragments < 5) and (Player:GCDRemains() < (Player:GCD() * 0.5)) then
     if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Soul Fragments (Spirit Bomb)"; end
   end
   -- spirit_bomb,if=variable.can_spbomb&!cooldown.fel_devastation.remains<(gcd.max*3)
