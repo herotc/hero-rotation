@@ -44,6 +44,41 @@ local OnUseExcludes = {
   I.BottledFlayedwingToxin:ID(),
 }
 
+--- ===== Trinket Variables =====
+local Trinket1, Trinket2
+local VarTrinket1CD, VarTrinket2CD
+local VarTrinket1Range, VarTrinket2Range
+local VarTrinket1BL, VarTrinket2BL
+local VarTrinket1Buffs, VarTrinket2Buffs
+local VarTrinketFailures = 0
+local function SetTrinketVariables()
+  local T1, T2 = Player:GetTrinketData()
+
+  -- If we don't have trinket items, try again in 5 seconds.
+  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.Level == 0 or T2.Level == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
+    VarTrinketFailures = VarTrinketFailures + 1
+    Delay(5, function()
+        SetTrinketVariables()
+      end
+    )
+    return
+  end
+
+  Trinket1          = T1.Object
+  Trinket2          = T2.Object
+  VarTrinket1CD     = T1.Cooldown
+  VarTrinket2CD     = T2.Cooldown
+  VarTrinket1Range  = T1.Range
+  VarTrinket2Range  = T2.Range
+  VarTrinket1BL     = T1.Blacklisted
+  VarTrinket2BL     = T2.Blacklisted
+  VarTrinket1Buffs  = Trinket1:HasUseBuff()
+  VarTrinket2Buffs  = Trinket2:HasUseBuff()
+end
+SetTrinketVariables()
+
+
+
 --- ===== GUI Settings =====
 local Everyone = HR.Commons.Everyone
 local DemonHunter   = HR.Commons.DemonHunter
@@ -94,6 +129,10 @@ HL:RegisterForEvent(function()
   VarSoFCD = (S.IlluminatedSigils:IsAvailable()) and 25 or 30
   VarSoSFragments = (S.SoulSigils:IsAvailable()) and 4 or 3
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
+
+HL:RegisterForEvent(function()
+  SetTrinketVariables()
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 --- ===== Helper Functions =====
 -- Melee Is In Range w/ Movement Handlers
@@ -154,7 +193,7 @@ end
 
 -- $(execute_phase)=(fight_remains<10|target.time_to_die<10)
 local function ExecutePhase()
-  return (BossFightRemains < 10 or Target:TimeToDie() < 10)
+  return (BossFightRemains < 10 or FightRemains < 10)
 end
 
 -- $(use_rg_hunt)=(cooldown.the_hunt.remains<$(rg_sequence_duration))
@@ -402,19 +441,18 @@ local function AR()
     VarSoulsBeforeNextRGSequence = VarSoulsBeforeNextRGSequence + 3
   end
   -- variable,name=souls_before_next_rg_sequence,op=add,value=3,if=cooldown.soul_carver.remains<(variable.double_rm_remains-gcd.max-3)
-  if S.SoulCarver:CooldownRemains() < (VarDoubleRMRemains - Player:GCD() - 3) then
-    VarSoulsBeforeNextRGSequence = VarSoulsBeforeNextRGSequence + 3
-  end
-  -- use_items,use_off_gcd=1
-  if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
-    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-    if ItemToUse then
-      local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
-      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
-        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
-      end
+    if S.SoulCarver:CooldownRemains() < (VarDoubleRMRemains - Player:GCD() - 3) then
+        VarSoulsBeforeNextRGSequence = VarSoulsBeforeNextRGSequence + 3
     end
+
+    -- use_item,slot=trinket1,if=!variable.trinket_1_buffs|(variable.trinket_1_buffs&((buff.rending_strike.up&buff.glaive_flurry.up)|(prev_gcd.1.reavers_glaive)|(buff.thrill_of_the_fight_damage.remains>8)|(buff.reavers_glaive.up&cooldown.the_hunt.remains<5)))
+    if Settings.Commons.Enabled.Trinkets and Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs or (VarTrinket1Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 8) or (Player:BuffUp(S.ReaversGlaiveBuff) and S.TheHunt:CooldownRemains() < 5)))) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for AR trinket1 (" .. Trinket1:Name() .. ")"; end
+  end
+
+  -- use_item,slot=trinket2,if=!variable.trinket_2_buffs|(variable.trinket_2_buffs&((buff.rending_strike.up&buff.glaive_flurry.up)|(prev_gcd.1.reavers_glaive)|(buff.thrill_of_the_fight_damage.remains>8)|(buff.reavers_glaive.up&cooldown.the_hunt.remains<5)))
+  if Settings.Commons.Enabled.Trinkets and Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs or (VarTrinket2Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 8) or (Player:BuffUp(S.ReaversGlaiveBuff) and S.TheHunt:CooldownRemains() < 5)))) then
+    if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for AR trinket2 (" .. Trinket2:Name() .. ")"; end
   end
   -- potion,use_off_gcd=1,if=(buff.rending_strike.up&buff.glaive_flurry.up)|prev_gcd.1.reavers_glaive
   if Settings.Commons.Enabled.Potions and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive)) then
@@ -975,16 +1013,13 @@ local function FS()
   -- Note (Jom): Added an extra second (2sec->3sec) to the timing here to account for any hiccups in determing if precombat has ended. Important not to double-cast SoF.
   VarHoldSoFForPrecombat = S.IlluminatedSigils:IsAvailable() and HL.CombatTime() < (3 - num(S.QuickenedSigils:IsAvailable()))
 
-  -- use_items,use_off_gcd=1,if=!buff.metamorphosis.up
-  if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) and Player:BuffDown(S.MetamorphosisBuff) then
-    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-    if ItemToUse then
-      local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
-      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
-      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
-        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name(); end
-      end
-    end
+  -- use_item,slot=trinket1,if=!variable.trinket_1_buffs|(variable.trinket_1_buffs&((buff.metamorphosis.up&buff.demonsurge_hardcast.up)|(buff.metamorphosis.up&!buff.demonsurge_hardcast.up&cooldown.metamorphosis.remains<10)|(cooldown.metamorphosis.remains>trinket.1.cooldown.duration)|(variable.trinket_2_buffs&trinket.2.cooldown.remains<cooldown.metamorphosis.remains)))
+  if Settings.Commons.Enabled.Trinkets and Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs or (VarTrinket1Buffs and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Demonsurge("Hardcast")) or (Player:BuffUp(S.MetamorphosisBuff) and not Player:Demonsurge("Hardcast") and S.Metamorphosis:CooldownRemains() < 10) or (S.Metamorphosis:CooldownRemains() > VarTrinket1CD) or (VarTrinket2Buffs and VarTrinket2CD < S.Metamorphosis:CooldownRemains())))) then
+    if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for FS trinket1 (" .. Trinket1:Name() .. ")"; end
+  end
+  -- use_item,slot=trinket1,if=!variable.trinket_1_buffs|(variable.trinket_1_buffs&((buff.metamorphosis.up&buff.demonsurge_hardcast.up)|(buff.metamorphosis.up&!buff.demonsurge_hardcast.up&cooldown.metamorphosis.remains<10)|(cooldown.metamorphosis.remains>trinket.1.cooldown.duration)|(variable.trinket_2_buffs&trinket.2.cooldown.remains<cooldown.metamorphosis.remains)))
+  if Settings.Commons.Enabled.Trinkets and Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs or (VarTrinket2Buffs and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Demonsurge("Hardcast")) or (Player:BuffUp(S.MetamorphosisBuff) and not Player:Demonsurge("Hardcast") and S.Metamorphosis:CooldownRemains() < 10) or (S.Metamorphosis:CooldownRemains() > VarTrinket2CD) or (VarTrinket1Buffs and VarTrinket1CD < S.Metamorphosis:CooldownRemains())))) then
+    if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for FS trinket2 (" .. Trinket1:Name() .. ")"; end
   end
   -- immolation_aura,if=time<4
   if ImmoAbility:IsCastable() and (HL.CombatTime() < 4) then
@@ -1009,7 +1044,7 @@ local function FS()
     if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand fs 5"; end
   end
   -- call_action_list,name=fs_execute,if=fight_remains<20
-  if BossFightRemains < 20 then
+  if (FightRemains < 20 or BossFightRemains < 20) then
     local ShouldReturn = FSExecute(); if ShouldReturn then return ShouldReturn; end
   end
     -- run_action_list,name=metamorphosis,if=buff.metamorphosis.up&buff.demonsurge_hardcast.up
@@ -1123,6 +1158,13 @@ local function APL()
     EnemiesCount8yMelee = #Enemies8yMelee
   else
     EnemiesCount8yMelee = 1
+  end
+
+  -- Bottled Flayedwing Toxin
+  if I.BottledFlayedwingToxin:IsEquippedAndReady() and Player:BuffDown(S.FlayedwingToxin) then
+    if Cast(I.BottledFlayedwingToxin, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+      return "Bottled Flayedwing Toxin";
+    end
   end
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
