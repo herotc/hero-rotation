@@ -55,8 +55,6 @@ Spell.DemonHunter.Commons = {
   -- Debuffs
   SigilofFlameDebuff                    = Spell(204598),
   SigilofMiseryDebuff                   = Spell(207685),
-    -- Items
-  FlayedwingToxin                       = Spell(345545),
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -200,7 +198,6 @@ Item.DemonHunter.Commons = {
   MadQueensMandate                      = Item(212454, {13, 14}),
   SkardynsGrace                         = Item(133282, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
-  BottledFlayedwingToxin                = Item(178742, {13, 14}),
 }
 
 Item.DemonHunter.Vengeance = MergeTableByKey(Item.DemonHunter.Commons, {

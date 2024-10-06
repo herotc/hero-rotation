@@ -41,7 +41,7 @@ local I = Item.DemonHunter.Vengeance
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.BottledFlayedwingToxin:ID(),
+  --I.BottledFlayedwingToxin:ID(),
 }
 
 --- ===== Trinket Variables =====
@@ -1017,9 +1017,9 @@ local function FS()
   if Settings.Commons.Enabled.Trinkets and Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs or (VarTrinket1Buffs and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Demonsurge("Hardcast")) or (Player:BuffUp(S.MetamorphosisBuff) and not Player:Demonsurge("Hardcast") and S.Metamorphosis:CooldownRemains() < 10) or (S.Metamorphosis:CooldownRemains() > VarTrinket1CD) or (VarTrinket2Buffs and VarTrinket2CD < S.Metamorphosis:CooldownRemains())))) then
     if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for FS trinket1 (" .. Trinket1:Name() .. ")"; end
   end
-  -- use_item,slot=trinket1,if=!variable.trinket_1_buffs|(variable.trinket_1_buffs&((buff.metamorphosis.up&buff.demonsurge_hardcast.up)|(buff.metamorphosis.up&!buff.demonsurge_hardcast.up&cooldown.metamorphosis.remains<10)|(cooldown.metamorphosis.remains>trinket.1.cooldown.duration)|(variable.trinket_2_buffs&trinket.2.cooldown.remains<cooldown.metamorphosis.remains)))
+  -- use_item,slot=trinket2,if=!variable.trinket_1_buffs|(variable.trinket_1_buffs&((buff.metamorphosis.up&buff.demonsurge_hardcast.up)|(buff.metamorphosis.up&!buff.demonsurge_hardcast.up&cooldown.metamorphosis.remains<10)|(cooldown.metamorphosis.remains>trinket.1.cooldown.duration)|(variable.trinket_2_buffs&trinket.2.cooldown.remains<cooldown.metamorphosis.remains)))
   if Settings.Commons.Enabled.Trinkets and Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs or (VarTrinket2Buffs and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Demonsurge("Hardcast")) or (Player:BuffUp(S.MetamorphosisBuff) and not Player:Demonsurge("Hardcast") and S.Metamorphosis:CooldownRemains() < 10) or (S.Metamorphosis:CooldownRemains() > VarTrinket2CD) or (VarTrinket1Buffs and VarTrinket1CD < S.Metamorphosis:CooldownRemains())))) then
-    if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for FS trinket2 (" .. Trinket1:Name() .. ")"; end
+    if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for FS trinket2 (" .. Trinket2:Name() .. ")"; end
   end
   -- immolation_aura,if=time<4
   if ImmoAbility:IsCastable() and (HL.CombatTime() < 4) then
@@ -1161,11 +1161,11 @@ local function APL()
   end
 
   -- Bottled Flayedwing Toxin
-  if I.BottledFlayedwingToxin:IsEquippedAndReady() and Player:BuffDown(S.FlayedwingToxin) then
+  --[[if I.BottledFlayedwingToxin:IsEquippedAndReady() and Player:BuffDown(S.FlayedwingToxin) then
     if Cast(I.BottledFlayedwingToxin, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
       return "Bottled Flayedwing Toxin";
     end
-  end
+  end]]
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Calculate fight_remains
