@@ -593,8 +593,8 @@ local function APL()
     if CDsON() then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=aoe,if=active_enemies>=7&!set_bonus.tier30_2pc|active_enemies>=4&talent.ice_caller
-    if AoEON() and (EnemiesCount16ySplash >= 7 and not Player:HasTier(30, 2) or EnemiesCount16ySplash >= 4 and S.IceCaller:IsAvailable()) then
+    -- run_action_list,name=aoe,if=active_enemies>=7|active_enemies>=3&talent.ice_caller
+    if AoEON() and (EnemiesCount16ySplash >= 7 or EnemiesCount16ySplash >= 3 and S.IceCaller:IsAvailable()) then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "pool for Aoe()"; end
     end
