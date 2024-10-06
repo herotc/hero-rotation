@@ -445,9 +445,9 @@ local function EmpoweredFiller()
   if S.MindSpikeInsanity:IsReady() then
     if Everyone.CastTargetIf(S.MindSpikeInsanity, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.MindSpikeInsanity)) then return "mind_spike_insanity empowered_filler 2"; end
   end
-  -- mind_flay,target_if=max:dot.devouring_plague.remains,if=buff.mind_flay_insanity.up
-  if S.MindFlay:IsCastable() and (Player:BuffUp(S.MindFlayInsanityBuff)) then
-    if Everyone.CastTargetIf(S.MindFlay, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay empowered_filler 4"; end
+  -- mind_flay_insanity,target_if=max:dot.devouring_plague.remains
+  if S.MindFlayInsanity:IsReady() then
+    if Everyone.CastTargetIf(S.MindFlayInsanity, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.MindFlayInsanity)) then return "mind_flay_insanity empowered_filler 4"; end
   end
 end
 
@@ -492,7 +492,7 @@ local function Filler()
   if S.MindSpike:IsCastable() then
     if Everyone.CastTargetIf(S.MindSpike, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.MindSpike)) then return "mind_spike filler 16"; end
   end
-  -- mind_flay,target_if=max:dot.devouring_plague.remains,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
+  -- mind_flay,target_if=max:dot.devouring_plague.remains,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2,interrupt_global=1
   if Flay:IsCastable() then
     if Everyone.CastTargetIf(Flay, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsInRange(46)) then return "mind_flay filler 18"; end
   end
