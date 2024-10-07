@@ -120,6 +120,8 @@ local function Precombat()
 end
 
 local function Defensives()
+  -- ardent_defender
+  -- Note: This is now in the APL, but we are handling it as we have been.
   if Player:HealthPercentage() <= Settings.Protection.LoHHP and S.LayonHands:IsCastable() then
     if Cast(S.LayonHands, nil, Settings.Protection.DisplayStyle.Defensives) then return "lay_on_hands defensive 2"; end
   end
@@ -428,6 +430,8 @@ local function APL()
     if CDsON() then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
+    -- call_action_list,name=defensives
+    -- Note: Moved above Cooldowns().
     -- call_action_list,name=trinkets
     if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
