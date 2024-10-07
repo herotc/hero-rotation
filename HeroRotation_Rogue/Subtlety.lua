@@ -1282,7 +1282,7 @@ end
 local function Init ()
   S.Rupture:RegisterAuraTracking()
 
-  HR.Print("Subtlety Rogue rotation has been updated for patch 11.0.0.")
+  HR.Print("Subtlety Rogue rotation has been updated for patch 11.0.2.")
 end
 
 HR.SetAPL(261, APL, Init)

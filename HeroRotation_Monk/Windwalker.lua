@@ -918,7 +918,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Windwalker Monk rotation has been updated for patch 11.0.0.")
+  HR.Print("Windwalker Monk rotation has been updated for patch 11.0.2.")
 end
 
 HR.SetAPL(269, APL, Init)

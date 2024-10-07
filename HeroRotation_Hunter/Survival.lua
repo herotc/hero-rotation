@@ -563,7 +563,7 @@ end
 local function OnInit ()
   S.SerpentStingDebuff:RegisterAuraTracking()
 
-  HR.Print("Survival Hunter rotation has been updated for patch 11.0.0.")
+  HR.Print("Survival Hunter rotation has been updated for patch 11.0.2.")
 end
 
 HR.SetAPL(255, APL, OnInit)

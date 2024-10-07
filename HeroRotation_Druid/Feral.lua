@@ -777,7 +777,7 @@ end
 local function OnInit()
   S.RipDebuff:RegisterAuraTracking()
 
-  HR.Print("Feral Druid rotation has been updated for patch 11.0.0.")
+  HR.Print("Feral Druid rotation has been updated for patch 11.0.2.")
 end
 
 HR.SetAPL(103, APL, OnInit)

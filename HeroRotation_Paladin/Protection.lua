@@ -444,7 +444,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Protection Paladin rotation has been updated for patch 11.0.0.")
+  HR.Print("Protection Paladin rotation has been updated for patch 11.0.2.")
 end
 
 HR.SetAPL(66, APL, Init)
