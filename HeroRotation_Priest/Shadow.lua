@@ -407,12 +407,12 @@ local function CDs()
   if S.Halo:IsReady() and (Player:HeroTreeID() == 19 and (FiendUp and Fiend:CooldownRemains() >= 4 and S.Mindbender:IsAvailable() or not S.Mindbender:IsAvailable() and Fiend:CooldownDown() or EnemiesCount10ySplash > 2 and not S.InescapableTorment:IsAvailable() or not S.DarkAscension:IsAvailable()) and (S.MindBlast:Charges() == 0 or not S.VoidEruption:IsAvailable() or S.VoidEruption:CooldownRemains() >= GCDMax * 4)) then
     if Cast(S.Halo, Settings.Shadow.GCDasOffGCD.Halo) then return "halo cds 20"; end
   end
-  -- void_eruption,if=!cooldown.fiend.up&(pet.fiend.active&cooldown.fiend.remains>=4|!talent.mindbender|active_enemies>2&!talent.inescapable_torment.rank)&(cooldown.mind_blast.charges=0|time>15)
-  if S.VoidEruption:IsCastable() and (Fiend:CooldownDown() and (FiendUp and Fiend:CooldownRemains() >= 4 or not S.Mindbender:IsAvailable() or EnemiesCount10ySplash > 2 and not S.InescapableTorment:IsAvailable()) and (S.MindBlast:Charges() == 0 or S.MindBlast:Charges() == 1 and Player:IsCasting(S.MindBlast) or HL.CombatTime() > 15)) then
+  -- void_eruption,if=(pet.fiend.active&cooldown.fiend.remains>=4|!talent.mindbender&!cooldown.fiend.up|active_enemies>2&!talent.inescapable_torment)&(cooldown.mind_blast.charges=0|time>15)
+  if S.VoidEruption:IsCastable() and ((FiendUp and Fiend:CooldownRemains() >= 4 or not S.Mindbender:IsAvailable() and Fiend:CooldownDown() or EnemiesCount10ySplash > 2 and not S.InescapableTorment:IsAvailable()) and (S.MindBlast:Charges() == 0 or HL.CombatTime() > 15)) then
     if Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption) then return "void_eruption cds 22"; end
   end
-  -- dark_ascension,if=pet.fiend.active&cooldown.fiend.remains>=4|!talent.mindbender&!cooldown.fiend.up|active_enemies>2&!talent.inescapable_torment
-  if S.DarkAscension:IsCastable() and not Player:IsCasting(S.DarkAscension) and (FiendUp and Fiend:CooldownRemains() >= 4 or not S.Mindbender:IsAvailable() and Fiend:CooldownDown() or EnemiesCount10ySplash > 2 and not S.InescapableTorment:IsAvailable()) then
+  -- "dark_ascension,if=(pet.fiend.active&cooldown.fiend.remains>=4|!talent.mindbender&!cooldown.fiend.up|active_enemies>2&!talent.inescapable_torment)&(active_dot.devouring_plague>=1|insanity>=(15+5*!talent.minds_eye+5*talent.distorted_reality-pet.fiend.active*6))
+  if S.DarkAscension:IsCastable() and ((FiendUp and Fiend:CooldownRemains() >= 4 or not S.Mindbender:IsAvailable() and Fiend:CooldownDown() or EnemiesCount10ySplash > 2 and not S.InescapableTorment:IsAvailable()) and (S.DevouringPlagueDebuff:AuraActiveCount() >= 1 or Player:Insanity() >= (15 + 5 * num(not S.MindsEye:IsAvailable()) + 5 * num(S.DistortedReality:IsAvailable()) - num(FiendUp) * 6))) then
     if Cast(S.DarkAscension, Settings.Shadow.GCDasOffGCD.DarkAscension) then return "dark_ascension cds 24"; end
   end
   -- call_action_list,name=trinkets
@@ -452,10 +452,6 @@ local function EmpoweredFiller()
 end
 
 local function Filler()
-  -- vampiric_touch,target_if=min:remains,if=buff.unfurling_darkness.up
-  if S.VampiricTouch:IsCastable() and (Player:BuffUp(S.UnfurlingDarknessBuff)) then
-    if Everyone.CastTargetIf(S.VampiricTouch, Enemies40y, "min", EvaluateTargetIfFilterVTRemains, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch filler 2"; end
-  end
   -- call_action_list,name=heal_for_tof,if=!buff.twist_of_fate.up&buff.twist_of_fate_can_trigger_on_ally_heal.up&(talent.rhapsody|talent.divine_star|talent.halo)
   if S.TwistofFate:IsAvailable() and Player:BuffDown(S.TwistofFateBuff) and CanToF() then
     local ShouldReturn = HealForToF(); if ShouldReturn then return ShouldReturn; end
@@ -466,21 +462,25 @@ local function Filler()
   if Target:DebuffRemains(S.DevouringPlagueDebuff) > S.MindSpike:CastTime() or not S.MindSpike:IsAvailable() then
     local ShouldReturn = EmpoweredFiller(); if ShouldReturn then return ShouldReturn; end
   end
+  -- vampiric_touch,target_if=min:remains,if=talent.unfurling_darkness&buff.unfurling_darkness_cd.remains<execute_time&talent.inner_quietus
+  if S.VampiricTouch:IsCastable() and (S.UnfurlingDarkness:IsAvailable() and (15 - S.UnfurlingDarknessBuff:TimeSinceLastAppliedOnPlayer()) < S.VampiricTouch:ExecuteTime() and S.InnerQuietus:IsAvailable()) then
+    if Everyone.CastTargetIf(S.VampiricTouch, Enemies10ySplash, "min", EvaluateTargetIfFilterVTRemains, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch filler 2"; end
+  end
   -- shadow_word_death,target_if=target.health.pct<20|(buff.deathspeaker.up|set_bonus.tier31_2pc)&dot.devouring_plague.ticking
   if S.ShadowWordDeath:IsReady() then
     if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateCycleSWDFiller, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 4"; end
   end
   -- shadow_word_death,target_if=min:target.time_to_die,if=talent.inescapable_torment&pet.fiend.active
   if S.ShadowWordDeath:IsReady() and (S.InescapableTorment:IsAvailable() and FiendUp) then
-    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "min", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 12"; end
+    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "min", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 6"; end
   end
-  -- devouring_plague,if=buff.voidform.up|cooldown.dark_ascension.up|buff.mind_devourer.up
-  if S.DevouringPlague:IsReady() and (Player:BuffUp(S.VoidformBuff) or S.DarkAscension:CooldownUp() or Player:BuffUp(S.MindDevourerBuff)) then
-    if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague filler "; end
+  -- devouring_plague,if=talent.empowered_surges&buff.surge_of_insanity.up|buff.voidform.up&talent.void_eruption
+  if S.DevouringPlague:IsReady() and (S.EmpoweredSurges:IsAvailable() and (Player:BuffUp(S.MindFlayInsanityBuff) or Player:BuffUp(S.MindSpikeInsanityBuff)) or Player:BuffUp(S.VoidformBuff) and S.VoidEruption:IsAvailable()) then
+    if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague filler 8"; end
   end
   -- halo,if=spell_targets>1
   if S.Halo:IsReady() and (EnemiesCount10ySplash > 1) then
-    if Cast(S.Halo, Settings.Shadow.GCDasOffGCD.Halo, nil, not Target:IsInRange(30)) then return "halo filler 14"; end
+    if Cast(S.Halo, Settings.Shadow.GCDasOffGCD.Halo, nil, not Target:IsInRange(30)) then return "halo filler 10"; end
   end
   -- power_word_life,if=!buff.twist_of_fate.up&buff.twist_of_fate_can_trigger_on_ally_heal.up
   -- Note: Not handling PW:L.
@@ -490,38 +490,38 @@ local function Filler()
   -- TODO: Handle MoltenRadianceBuff.
   -- mind_spike,target_if=max:dot.devouring_plague.remains
   if S.MindSpike:IsCastable() then
-    if Everyone.CastTargetIf(S.MindSpike, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.MindSpike)) then return "mind_spike filler 16"; end
+    if Everyone.CastTargetIf(S.MindSpike, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.MindSpike)) then return "mind_spike filler 12"; end
   end
   -- mind_flay,target_if=max:dot.devouring_plague.remains,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2,interrupt_global=1
   if Flay:IsCastable() then
-    if Everyone.CastTargetIf(Flay, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsInRange(46)) then return "mind_flay filler 18"; end
+    if Everyone.CastTargetIf(Flay, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsInRange(46)) then return "mind_flay filler 14"; end
   end
   -- divine_star
   if S.DivineStar:IsReady() then
-    if Cast(S.DivineStar, Settings.Shadow.GCDasOffGCD.DivineStar, not Target:IsInRange(30)) then return "divine_star filler 20"; end
+    if Cast(S.DivineStar, Settings.Shadow.GCDasOffGCD.DivineStar, not Target:IsInRange(30)) then return "divine_star filler 16"; end
   end
   -- shadow_crash,if=raid_event.adds.in>20&!set_bonus.tier31_4pc
   if Crash:IsCastable() and (not Player:HasTier(31, 4)) then
-    if Cast(Crash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash filler 22"; end
+    if Cast(Crash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash filler 18"; end
   end
   -- shadow_word_death,target_if=target.health.pct<20
   if S.ShadowWordDeath:IsReady() then
-    if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateCycleSWDFiller2, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 24"; end
+    if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateCycleSWDFiller2, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 20"; end
   end
   -- shadow_word_death,target_if=max:dot.devouring_plague.remains
   -- Note: Per APL note, intent is to be used as a movement filler.
   if S.ShadowWordDeath:IsReady() and Player:IsMoving() then
-    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death movement filler 26"; end
+    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death movement filler 22"; end
   end
   -- shadow_word_pain,target_if=max:dot.devouring_plague.remains,if=set_bonus.tier31_4pc
   -- Note: Per APL note, intent is to be used as a movement filler.
   if S.ShadowWordPain:IsReady() and Player:IsMoving() and (Player:HasTier(31, 4)) then
-    if Everyone.CastTargetIf(S.ShadowWordPain, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain filler 30"; end
+    if Everyone.CastTargetIf(S.ShadowWordPain, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain filler 24"; end
   end
   -- shadow_word_pain,target_if=min:remains,if=!set_bonus.tier31_4pc
   -- Note: Per APL note, intent is to be used as a movement filler.
   if S.ShadowWordPain:IsReady() and Player:IsMoving() and (not Player:HasTier(31, 4)) then
-    if Everyone.CastTargetIf(S.ShadowWordPain, Enemies40y, "min", EvaluateTargetIfFilterSWP, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain filler 32"; end
+    if Everyone.CastTargetIf(S.ShadowWordPain, Enemies40y, "min", EvaluateTargetIfFilterSWP, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain filler 26"; end
   end
 end
 
@@ -532,58 +532,74 @@ local function Main()
   if EnemiesCount10ySplash < 3 then
     VarDotsUp = S.VampiricTouchDebuff:AuraActiveCount() == EnemiesCount10ySplash or Crash:InFlight() and S.WhisperingShadows:IsAvailable() or Player:IsCasting(S.VampiricTouch) and S.Misery:IsAvailable()
   end
-  -- variable,name=pooling_mindblasts,op=setif,value=1,value_else=0,condition=(cooldown.void_torrent.remains<?(variable.holding_crash*raid_event.adds.in))<=gcd.max*(1+talent.mind_melt*3),if=talent.void_blast
+  -- variable,name=pooling_mindblasts,op=setif,value=1,value_else=0,condition=(cooldown.void_torrent.remains<?(variable.holding_crash*raid_event.adds.in))<=gcd.max*(1+talent.mind_melt*1),if=talent.void_blast
   VarPoolingMindblasts = false
   if S.VoidBlast:IsAvailable() then
-    VarPoolingMindblasts = S.VoidTorrent:CooldownRemains() <= GCDMax * (1 + num(S.MindMelt:IsAvailable()) * 3)
+    VarPoolingMindblasts = S.VoidTorrent:CooldownRemains() <= GCDMax * (1 + num(S.MindMelt:IsAvailable()))
   end
   -- call_action_list,name=cds,if=fight_remains<30|target.time_to_die>15&(!variable.holding_crash|active_enemies>2)
   if CDsON() and (FightRemains < 30 or Target:TimeToDie() > 15 and (not VarHoldingCrash or EnemiesCount10ySplash > 2)) then
     local ShouldReturn = CDs(); if ShouldReturn then return ShouldReturn; end
   end
+  -- vampiric_touch,target_if=min:remains,if=buff.unfurling_darkness.up&talent.unfurling_darkness&talent.mind_melt&talent.void_blast&buff.mind_melt.stack<2&cooldown.mindbender.up&cooldown.dark_ascension.up&time<=4
+  if S.VampiricTouch:IsCastable() and (Player:BuffUp(S.UnfurlingDarknessBuff) and S.UnfurlingDarkness:IsAvailable() and S.MindMelt:IsAvailable() and S.VoidBlast:IsAvailable() and Player:BuffStack(S.MindMeltBuff) < 2 and S.Mindbender:CooldownUp() and S.DarkAscension:CooldownUp() and HL.CombatTime() <= 4) then
+    if Everyone.CastTargetIf(S.VampiricTouch, Enemies10ySplash, "min", EvaluateTargetIfFilterVTRemains, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch main 2"; end
+  end
+  -- mind_spike,if=talent.mind_melt&talent.void_blast&(buff.mind_melt.stack<(1*talent.distorted_reality+1-talent.unfurling_darkness-talent.minds_eye*1)&talent.halo|!talent.halo&buff.mind_melt.stack<2)&cooldown.mindbender.up&cooldown.dark_ascension.up&time<=4&insanity<=20
+  if S.MindSpike:IsCastable() and (S.MindMelt:IsAvailable() and S.VoidBlast:IsAvailable() and (Player:BuffStack(S.MindMeltBuff) < (1 * num(S.DistortedReality:IsAvailable()) + 1 - num(S.UnfurlingDarkness:IsAvailable()) - num(S.MindsEye:IsAvailable()) * 1) and S.Halo:IsAvailable() or not S.Halo:IsAvailable() and Player:BuffStack(S.MindMeltBuff) < 2) and S.Mindbender:CooldownUp() and S.DarkAscension:CooldownUp() and HL.CombatTime() <= 4 and Player:InsanityDeficit() <= 20) then
+    if Cast(S.MindSpike, nil, nil, not Target:IsSpellInRange(S.MindSpike)) then return "mind_spike main 4"; end
+  end
   -- mindbender,if=(dot.shadow_word_pain.ticking&variable.dots_up|action.shadow_crash.in_flight&talent.whispering_shadows)&(fight_remains<30|target.time_to_die>15)&(!talent.dark_ascension|cooldown.dark_ascension.remains<gcd.max|fight_remains<15)
   if Fiend:IsCastable() and ((Target:DebuffUp(S.ShadowWordPainDebuff) and VarDotsUp or Crash:InFlight() and S.WhisperingShadows:IsAvailable()) and (BossFightRemains < 30 or Target:TimeToDie() > 15) and (not S.DarkAscension:IsAvailable() or S.DarkAscension:CooldownRemains() < GCDMax or BossFightRemains < 15)) then
-    if Cast(Fiend, Settings.Shadow.GCDasOffGCD.Mindbender) then return "mindbender main 2"; end
+    if Cast(Fiend, Settings.Shadow.GCDasOffGCD.Mindbender) then return "mindbender main 6"; end
   end
-  -- void_blast,target_if=max:(dot.devouring_plague.remains*1000+target.time_to_die),if=(dot.devouring_plague.remains>=execute_time|buff.entropic_rift.remains<=gcd.max|action.void_torrent.channeling&talent.void_empowerment)&(insanity.deficit>=16|cooldown.mind_blast.full_recharge_time<=gcd.max)&(!talent.mind_devourer|!buff.mind_devourer.up|buff.entropic_rift.remains<=gcd.max)
-  if S.VoidBlast:IsReady() and ((Player:InsanityDeficit() >= 16 or S.MindBlast:FullRechargeTime() <= GCDMax) and (not S.MindDevourer:IsAvailable() or Player:BuffDown(S.MindDevourerBuff) or EntropicRiftRemains <= GCDMax)) then
-    if Everyone.CastTargetIf(S.VoidBlast, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusTTD, EvaluateTargetIfVoidBlastMain, not Target:IsSpellInRange(S.VoidBlast)) then return "void_blast main 4"; end
+  -- shadow_word_death,target_if=max:(target.health.pct<=20)*100+dot.devouring_plague.ticking,if=priest.force_devour_matter&talent.devour_matter
+  if S.ShadowWordDeath:IsReady() and (Settings.Shadow.ForceDevourMatter and S.DevourMatter:IsAvailable()) then
+    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusHP, EvaluateTargetIfSWDM, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 8"; end
+  end
+  -- void_blast,target_if=max:(dot.devouring_plague.remains*1000+target.time_to_die),if=(dot.devouring_plague.remains>=execute_time|buff.entropic_rift.remains<=gcd.max|action.void_torrent.channeling&talent.void_empowerment)&(insanity.deficit>=16|cooldown.mind_blast.full_recharge_time<=gcd.max|buff.entropic_rift.remains<=gcd.max)&(!talent.mind_devourer|!buff.mind_devourer.up|buff.entropic_rift.remains<=gcd.max)
+  if S.VoidBlast:IsReady() and ((Player:InsanityDeficit() >= 16 or S.MindBlast:FullRechargeTime() <= GCDMax or Player:BuffRemains(S.EntropicRiftBuff) <= GCDMax) and (not S.MindDevourer:IsAvailable() or Player:BuffDown(S.MindDevourerBuff) or EntropicRiftRemains <= GCDMax)) then
+    if Everyone.CastTargetIf(S.VoidBlast, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusTTD, EvaluateTargetIfVoidBlastMain, not Target:IsSpellInRange(S.VoidBlast)) then return "void_blast main 10"; end
   end
   -- wait,sec=cooldown.mind_blast.recharge_time,if=cooldown.mind_blast.recharge_time<buff.entropic_rift.remains&buff.entropic_rift.up&buff.entropic_rift.remains<gcd.max&cooldown.mind_blast.charges<1
   if S.MindBlast:Recharge() < EntropicRiftRemains and EntropicRiftUp and EntropicRiftRemains < GCDMax and S.MindBlast:Charges() < 1 then
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Mind Blast"; end
   end
-  -- mind_blast,if=buff.voidform.up&full_recharge_time<=gcd.max&(!talent.insidious_ire|dot.devouring_plague.remains>=execute_time)&(cooldown.void_bolt.remains%gcd.max-cooldown.void_bolt.remains%%gcd.max)*gcd.max<=0.25&(cooldown.void_bolt.remains%gcd.max-cooldown.void_bolt.remains%%gcd.max)>=0.01
+  -- mind_blast,if=talent.void_eruption&buff.voidform.up&full_recharge_time<=gcd.max&(!talent.insidious_ire|dot.devouring_plague.remains>=execute_time)&(cooldown.void_bolt.remains%gcd.max-cooldown.void_bolt.remains%%gcd.max)*gcd.max<=0.25&(cooldown.void_bolt.remains%gcd.max-cooldown.void_bolt.remains%%gcd.max)>=0.01
   if S.MindBlast:IsCastable() and (Player:BuffUp(S.VoidformBuff) and S.MindBlast:FullRechargeTime() <= GCDMax and (not S.InsidiousIre:IsAvailable() or Target:DebuffRemains(S.DevouringPlagueDebuff) >= S.MindBlast:ExecuteTime()) and (S.VoidBolt:CooldownRemains() / GCDMax - S.VoidBolt:CooldownRemains() % GCDMax) * GCDMax <= 0.25 and (S.VoidBolt:CooldownRemains() / GCDMax - S.VoidBolt:CooldownRemains() % GCDMax) >= 0.01) then
-    if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 6"; end
+    if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 12"; end
   end
   -- void_bolt,target_if=max:target.time_to_die,if=insanity.deficit>16&cooldown.void_bolt.remains<=0.1
   if S.VoidBolt:IsCastable() and (Player:InsanityDeficit() > 16 and S.VoidBolt:CooldownRemains() <= 0.1) then
-    if Everyone.CastTargetIf(S.VoidBolt, Enemies10ySplash, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(46)) then return "void_bolt main 8"; end
+    if Everyone.CastTargetIf(S.VoidBolt, Enemies10ySplash, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(46)) then return "void_bolt main 14"; end
   end
   -- devouring_plague,target_if=max:target.time_to_die*(dot.devouring_plague.remains<=gcd.max|variable.dr_force_prio|!talent.distorted_reality&variable.me_force_prio),if=active_dot.devouring_plague<=1&dot.devouring_plague.remains<=gcd.max&(!talent.void_eruption|cooldown.void_eruption.remains>=gcd.max*3)|insanity.deficit<=16
   if S.DevouringPlague:IsReady() then
-    if Everyone.CastTargetIf(S.DevouringPlague, Enemies10ySplash, "max", EvaluateTargetIfFilterTTDTimesDP, EvaluateTargetIfDPMain, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 10"; end
+    if Everyone.CastTargetIf(S.DevouringPlague, Enemies10ySplash, "max", EvaluateTargetIfFilterTTDTimesDP, EvaluateTargetIfDPMain, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 16"; end
   end
   -- void_torrent,target_if=max:(dot.devouring_plague.remains*1000+target.time_to_die),if=(dot.devouring_plague.ticking|talent.void_eruption&cooldown.void_eruption.up)&talent.entropic_rift&!variable.holding_crash
   if S.VoidTorrent:IsReady() and (Player:HeroTreeID() == 18 and not VarHoldingCrash) then
-    if Everyone.CastTargetIf(S.VoidTorrent, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusTTD, EvaluateTargetIfVTMain, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent main 12"; end
+    if Everyone.CastTargetIf(S.VoidTorrent, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusTTD, EvaluateTargetIfVTMain, not Target:IsSpellInRange(S.VoidTorrent), Settings.Shadow.GCDasOffGCD.VoidTorrent) then return "void_torrent main 18"; end
   end
   -- shadow_word_death,target_if=max:(target.health.pct<=20)*100+dot.devouring_plague.ticking,if=talent.depth_of_shadows&(target.health.pct<=20|buff.deathspeaker.up&talent.deathspeaker)
   if S.ShadowWordDeath:IsReady() and (S.DepthofShadows:IsAvailable()) then
-    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusHP, EvaluateTargetIfSWD, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 14"; end
+    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusHP, EvaluateTargetIfSWD, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 20"; end
   end
   -- mind_blast,target_if=max:dot.devouring_plague.remains,if=(cooldown.mind_blast.full_recharge_time<=gcd.max+execute_time|pet.fiend.remains<=execute_time+gcd.max)&pet.fiend.active&talent.inescapable_torment&pet.fiend.remains>=execute_time&active_enemies<=7&(!buff.mind_devourer.up|!talent.mind_devourer)&dot.devouring_plague.remains>execute_time&!variable.pooling_mindblasts&variable.dots_up
   if S.MindBlast:IsCastable() and ((S.MindBlast:FullRechargeTime() <= GCDMax + S.MindBlast:ExecuteTime() or FiendRemains <= S.MindBlast:ExecuteTime() + GCDMax) and FiendUp and S.InescapableTorment:IsAvailable() and FiendRemains >= S.MindBlast:ExecuteTime() and EnemiesCount10ySplash <= 7 and (Player:BuffDown(S.MindDevourerBuff) or not S.MindDevourer:IsAvailable()) and not VarPoolingMindblasts and VarDotsUp) then
-    if Everyone.CastTargetIf(S.MindBlast, Enemies10ySplash, "max", EvaluateTargetIfFilterDPRemains, EvaluateTargetIfMindBlastMain, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 16"; end
+    if Everyone.CastTargetIf(S.MindBlast, Enemies10ySplash, "max", EvaluateTargetIfFilterDPRemains, EvaluateTargetIfMindBlastMain, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 22"; end
   end
   -- shadow_word_death,target_if=max:dot.devouring_plague.remains,if=pet.fiend.remains<=(gcd.max+1)&pet.fiend.active&talent.inescapable_torment&active_enemies<=7
   if S.ShadowWordDeath:IsReady() and (FiendRemains <= (GCDMax + 1) and FiendUp and S.InescapableTorment:IsAvailable() and EnemiesCount10ySplash <= 7) then
-    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 18"; end
+    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 24"; end
   end
   -- void_bolt,target_if=max:target.time_to_die,if=cooldown.void_bolt.remains<=0.1
   if S.VoidBolt:IsCastable() and (S.VoidBolt:CooldownRemains() <= 0.1) then
-    if Everyone.CastTargetIf(S.VoidBolt, Enemies10ySplash, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(46)) then return "void_bolt main 20"; end
+    if Everyone.CastTargetIf(S.VoidBolt, Enemies10ySplash, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(46)) then return "void_bolt main 26"; end
+  end
+  -- vampiric_touch,target_if=min:remains,if=buff.unfurling_darkness.up&active_dot.vampiric_touch<=5
+  if S.VampiricTouch:IsCastable() and (Player:BuffUp(S.UnfurlingDarknessBuff) and S.VampiricTouchDebuff:AuraActiveCount() <= 5) then
+    if Everyone.CastTargetIf(S.VampiricTouch, Enemies10ySplash, "min", EvaluateTargetIfFilterVTRemains, EvaluateTargetIfVTMain3, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch main 28"; end
   end
   -- call_action_list,name=empowered_filler,if=(buff.mind_spike_insanity.stack>2&talent.mind_spike|buff.mind_flay_insanity.stack>2&!talent.mind_spike)&talent.empowered_surges&!cooldown.void_eruption.up
   if (Player:BuffStack(S.MindSpikeInsanityBuff) > 2 and S.MindSpike:IsAvailable() or Player:BuffStack(S.MindFlayInsanityBuff) > 2 and not S.MindSpike:IsAvailable()) and S.EmpoweredSurges:IsAvailable() and S.VoidEruption:CooldownDown() then
@@ -595,35 +611,39 @@ local function Main()
   end
   -- devouring_plague,if=fight_remains<=duration+4
   if S.DevouringPlague:IsReady() and (FightRemains <= S.DevouringPlagueDebuff:BaseDuration() + 4) then
-    if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 22"; end
+    if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 30"; end
   end
-  -- devouring_plague,target_if=max:target.time_to_die*(dot.devouring_plague.remains<=gcd.max|variable.dr_force_prio|!talent.distorted_reality&variable.me_force_prio),if=insanity.deficit<=35&talent.distorted_reality|buff.dark_ascension.up|buff.mind_devourer.up&cooldown.mind_blast.up&(cooldown.void_eruption.remains>=3*gcd.max|!talent.void_eruption)|buff.entropic_rift.up
-  if S.DevouringPlague:IsReady() and (Player:InsanityDeficit() <= 35 and S.DistortedReality:IsAvailable() or Player:BuffUp(S.DarkAscensionBuff) or Player:BuffUp(S.MindDevourerBuff) and S.MindBlast:CooldownUp() and (S.VoidEruption:CooldownRemains() >= 3 * GCDMax or not S.VoidEruption:IsAvailable()) or EntropicRiftUp) then
-    if Everyone.CastTargetIf(S.DevouringPlague, Enemies10ySplash, "max", EvaluateTargetIfFilterTTDTimesDP, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 24"; end
+  -- devouring_plague,target_if=max:target.time_to_die*(dot.devouring_plague.remains<=gcd.max|variable.dr_force_prio|!talent.distorted_reality&variable.me_force_prio),if=insanity.deficit<=35&talent.distorted_reality|buff.mind_devourer.up&cooldown.mind_blast.up&(cooldown.void_eruption.remains>=3*gcd.max|!talent.void_eruption)&talent.mind_devourer|buff.entropic_rift.up
+  if S.DevouringPlague:IsReady() and (Player:InsanityDeficit() <= 35 and S.DistortedReality:IsAvailable() or Player:BuffUp(S.MindDevourerBuff) and S.MindBlast:CooldownUp() and (S.VoidEruption:CooldownRemains() >= 3 * GCDMax or not S.VoidEruption:IsAvailable()) and S.MindDevourer:IsAvailable() or EntropicRiftUp) then
+    if Everyone.CastTargetIf(S.DevouringPlague, Enemies10ySplash, "max", EvaluateTargetIfFilterTTDTimesDP, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 32"; end
   end
   -- void_torrent,target_if=max:(dot.devouring_plague.remains*1000+target.time_to_die),if=!variable.holding_crash&!talent.entropic_rift,target_if=dot.devouring_plague.remains>=2.5
   if S.VoidTorrent:IsCastable() then
     if Target:DebuffRemains(S.DevouringPlagueDebuff) >= 2.5 then
-      if Cast(S.VoidTorrent, Settings.Shadow.GCDasOffGCD.VoidTorrent, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 26 (primary target)"; end
+      if Cast(S.VoidTorrent, Settings.Shadow.GCDasOffGCD.VoidTorrent, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 34 (primary target)"; end
     else
-      if Everyone.CastTargetIf(S.VoidTorrent, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusTTD, EvaluateTargetIfDPMain2, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 26 (off-target)"; end
+      if Everyone.CastTargetIf(S.VoidTorrent, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusTTD, EvaluateTargetIfDPMain2, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 36 (off-target)"; end
     end
   end
   -- shadow_crash,target_if=dot.vampiric_touch.refreshable,if=!variable.holding_crash
   if Crash:IsCastable() and (not VarHoldingCrash) then
-    if Everyone.CastCycle(Crash, Enemies10ySplash, EvaluateCycleVTRefreshable, not Target:IsInRange(40), Settings.Shadow.GCDasOffGCD.ShadowCrash) then return "shadow_crash main 28"; end
+    if Everyone.CastCycle(Crash, Enemies10ySplash, EvaluateCycleVTRefreshable, not Target:IsInRange(40), Settings.Shadow.GCDasOffGCD.ShadowCrash) then return "shadow_crash main 38"; end
+  end
+  -- vampiric_touch,target_if=min:remains,if=buff.unfurling_darkness_cd.remains<execute_time&talent.unfurling_darkness&!buff.dark_ascension.up&talent.inner_quietus&active_dot.vampiric_touch<=5
+  if S.VampiricTouch:IsCastable() and ((15 - S.UnfurlingDarknessBuff:TimeSinceLastAppliedOnPlayer()) < S.VampiricTouch:ExecuteTime() and S.UnfurlingDarkness:IsAvailable() and Player:BuffDown(S.DarkAscensionBuff) and S.InnerQuietus:IsAvailable() and S.VampiricTouchDebuff:AuraActiveCount() <= 5) then
+    if Everyone.CastTargetIf(S.VampiricTouch, Enemies10ySplash, "min", EvaluateTargetIfFilterVTRemains, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch main 40"; end
   end
   -- vampiric_touch,target_if=max:(refreshable*10000+target.time_to_die)*(dot.vampiric_touch.ticking|!variable.dots_up),if=refreshable&target.time_to_die>12&(dot.vampiric_touch.ticking|!variable.dots_up)&(variable.max_vts>0|active_enemies=1)&(cooldown.shadow_crash.remains>=dot.vampiric_touch.remains|variable.holding_crash|!talent.whispering_shadows)&(!action.shadow_crash.in_flight|!talent.whispering_shadows)
   if S.VampiricTouch:IsCastable() and ((VarMaxVTs > 0 or EnemiesCount10ySplash == 1) and (not Crash:InFlight() or not S.WhisperingShadows:IsAvailable())) then
-    if Everyone.CastTargetIf(S.VampiricTouch, Enemies10ySplash, "max", EvaluateTargetIfFilterVTRefresh, EvaluateTargetIfVTMain2, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch main 30"; end
+    if Everyone.CastTargetIf(S.VampiricTouch, Enemies10ySplash, "max", EvaluateTargetIfFilterVTRefresh, EvaluateTargetIfVTMain2, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch main 42"; end
   end
   -- shadow_word_death,target_if=max:dot.devouring_plague.remains,if=variable.dots_up&buff.deathspeaker.up
   if S.ShadowWordDeath:IsReady() and (VarDotsUp and Player:BuffUp(S.DeathspeakerBuff)) then
-    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 32"; end
+    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 44"; end
   end
   -- mind_blast,target_if=max:dot.devouring_plague.remains,if=(!buff.mind_devourer.up|!talent.mind_devourer|cooldown.void_eruption.up&talent.void_eruption)&!variable.pooling_mindblasts
   if S.MindBlast:IsCastable() and ((Player:BuffDown(S.MindDevourerBuff) or not S.MindDevourer:IsAvailable() or S.VoidEruption:CooldownUp() and S.VoidEruption:IsAvailable()) and not VarPoolingMindblasts) then
-    if Everyone.CastTargetIf(S.MindBlast, Enemies10ySplash, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 34"; end
+    if Everyone.CastTargetIf(S.MindBlast, Enemies10ySplash, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 46"; end
   end
   -- call_action_list,name=filler
   local ShouldReturn = Filler(); if ShouldReturn then return ShouldReturn; end

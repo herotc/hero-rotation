@@ -44,6 +44,7 @@ HR.GUISettings.APL.Priest = {
   Shadow = {
     DesperatePrayerHP = 75,
     DispersionHP = 30,
+    ForceDevourMatter = false,
     VTMinHP = 20,
     PreferVTWhenSTinDungeon = false,
     SelfPI = true,
@@ -94,6 +95,7 @@ CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", { 0, 10
 CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.VTMinHP", { 0, 100, 1 }, "Minimum VT HP (in millions)", "Set the minimum HP of a target for Vampiric Touch to be suggested. This value is multiplied by 1,000,000. For example, a value of 10 checks for a target's minimum HP of 10,000,000.")
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume Self-Power Infusion", "Assume the player will be using Power Infusion on themselves.")
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.PreferVTWhenSTinDungeon", "Prefer VT for dungeon ST", "Prefer to use Vampiric Touch while in single target combat in dungeon content. (Note: This does not apply to raid content.)")
+CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.ForceDevourMatter", "Force Devour Matter", "Enable this option to raise the priority on Shadow Word: Death to force the bonus from Devour Matter.")
 
 -- Shadow OffGCDs
 CreateARPanelOptions(CP_ShadowOGCD, "APL.Priest.Shadow")
