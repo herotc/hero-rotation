@@ -44,41 +44,6 @@ local OnUseExcludes = {
   -- I.Item:ID(),
 }
 
---- ===== Trinket Variables =====
-local Trinket1, Trinket2
-local VarTrinket1CD, VarTrinket2CD
-local VarTrinket1Range, VarTrinket2Range
-local VarTrinket1BL, VarTrinket2BL
-local VarTrinket1Buffs, VarTrinket2Buffs
-local VarTrinketFailures = 0
-local function SetTrinketVariables()
-  local T1, T2 = Player:GetTrinketData(OnUseExcludes)
-
-  -- If we don't have trinket items, try again in 5 seconds.
-  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.Level == 0 or T2.Level == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
-    VarTrinketFailures = VarTrinketFailures + 1
-    Delay(5, function()
-        SetTrinketVariables()
-      end
-    )
-    return
-  end
-
-  Trinket1          = T1.Object
-  Trinket2          = T2.Object
-  VarTrinket1CD     = T1.Cooldown
-  VarTrinket2CD     = T2.Cooldown
-  VarTrinket1Range  = T1.Range
-  VarTrinket2Range  = T2.Range
-  VarTrinket1BL     = T1.Blacklisted
-  VarTrinket2BL     = T2.Blacklisted
-  VarTrinket1Buffs  = Trinket1:HasUseBuff()
-  VarTrinket2Buffs  = Trinket2:HasUseBuff()
-end
-SetTrinketVariables()
-
-
-
 --- ===== GUI Settings =====
 local Everyone = HR.Commons.Everyone
 local DemonHunter   = HR.Commons.DemonHunter
@@ -116,6 +81,40 @@ local VarCritPct, VarFelDevSequenceTime, VarFelDevPassiveFuryGen
 local VarST, VarSmallAoE, VarBigAoE
 local BossFightRemains = 11111
 local FightRemains = 11111
+
+--- ===== Trinket Variables =====
+local Trinket1, Trinket2
+local VarTrinket1CD, VarTrinket2CD
+local VarTrinket1Range, VarTrinket2Range
+local VarTrinket1BL, VarTrinket2BL
+local VarTrinket1Buffs, VarTrinket2Buffs
+local VarTrinketFailures = 0
+local function SetTrinketVariables()
+  local T1, T2 = Player:GetTrinketData(OnUseExcludes)
+
+  -- If we don't have trinket items, try again in 5 seconds.
+  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.Level == 0 or T2.Level == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
+    VarTrinketFailures = VarTrinketFailures + 1
+    Delay(5, function()
+        SetTrinketVariables()
+      end
+    )
+    return
+  end
+
+  Trinket1          = T1.Object
+  Trinket2          = T2.Object
+  VarTrinket1CD     = T1.Cooldown
+  VarTrinket2CD     = T2.Cooldown
+  VarTrinket1Range  = T1.Range
+  VarTrinket2Range  = T2.Range
+  VarTrinket1BL     = T1.Blacklisted
+  VarTrinket2BL     = T2.Blacklisted
+
+  VarTrinket1Buffs  = Trinket1:HasUseBuff()
+  VarTrinket2Buffs  = Trinket2:HasUseBuff()
+end
+SetTrinketVariables()
 
 --- ===== Event Registrations =====
 HL:RegisterForEvent(function()
@@ -477,12 +476,10 @@ local function AR()
   if S.TheHunt:IsReady() and (not S.ReaversGlaive:IsLearned() and ((Player:BuffStack(S.ArtoftheGlaiveBuff) + TotalSoulFragments) < RGSouls())) then
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar 8"; end
   end
-
-    -- spirit_bomb,if=variable.can_spb&(soul_fragments.inactive>2|prev_gcd.1.sigil_of_spite|prev_gcd.1.soul_carver|(spell_targets.spirit_bomb>=4&talent.fallout&cooldown.immolation_aura.remains<gcd.max))
+  -- spirit_bomb,if=variable.can_spb&(soul_fragments.inactive>2|prev_gcd.1.sigil_of_spite|prev_gcd.1.soul_carver|(spell_targets.spirit_bomb>=4&talent.fallout&cooldown.immolation_aura.remains<gcd.max))
   if S.SpiritBomb:IsReady() and (VarCanSpB and (IncSoulFragments > 2 or Player:PrevGCD(1, S.SigilofSpite) or Player:PrevGCD(1, S.SoulCarver) or (EnemiesCount8yMelee >= 4 and S.Fallout:IsAvailable() and S.ImmolationAura:CooldownRemains() < Player:GCD()))) then
     if Cast(S.SpiritBomb, nil, nil, not IsInAoERange) then return "spirit_bomb ar 7"; end
   end
-
   -- immolation_aura,if=(!buff.reavers_glaive.up|(variable.double_rm_remains>($(rg_sequence_duration)+gcd.max)))&(variable.single_target|!variable.can_spb)
   if ImmoAbility:IsCastable() and ((not S.ReaversGlaive:IsLearned() or (VarDoubleRMRemains > (RGSequenceDuration() + Player:GCD()))) and (VarST or not VarCanSpB)) then
     if Cast(ImmoAbility) then return "immolation_aura ar 8"; end
