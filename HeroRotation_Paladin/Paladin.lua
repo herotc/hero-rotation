@@ -103,6 +103,9 @@ Spell.Paladin.Templar = {
   HammerofLight                        = Spell(427453),
   LightsDeliverance                    = Spell(425518),
   LightsGuidance                       = Spell(427445),
+  -- Buffs
+  LightsDeliveranceBuff                = Spell(433674),
+  ShaketheHeavensBuff                  = Spell(431536),
 }
 
 Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
