@@ -30,6 +30,8 @@ local mathfloor     = math.floor
 local mathmax       = math.max
 local mathmin       = math.min
 local tableinsert   = table.insert
+-- WoW API
+local Delay         = C_Timer.After
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
