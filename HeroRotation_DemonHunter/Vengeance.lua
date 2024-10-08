@@ -447,11 +447,11 @@ local function AR()
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,slot=trinket1,if=!variable.trinket_1_buffs|(variable.trinket_1_buffs&((buff.rending_strike.up&buff.glaive_flurry.up)|(prev_gcd.1.reavers_glaive)|(buff.thrill_of_the_fight_damage.remains>8)|(buff.reavers_glaive.up&cooldown.the_hunt.remains<5)))
-    if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs or (VarTrinket1Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 8) or (Player:BuffUp(S.ReaversGlaiveBuff) and S.TheHunt:CooldownRemains() < 5)))) then
+    if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs or (VarTrinket1Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 8) or (S.ReaversGlaive:IsLearned() and S.TheHunt:CooldownRemains() < 5)))) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for AR trinket1 (" .. Trinket1:Name() .. ")"; end
     end
     -- use_item,slot=trinket2,if=!variable.trinket_2_buffs|(variable.trinket_2_buffs&((buff.rending_strike.up&buff.glaive_flurry.up)|(prev_gcd.1.reavers_glaive)|(buff.thrill_of_the_fight_damage.remains>8)|(buff.reavers_glaive.up&cooldown.the_hunt.remains<5)))
-    if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs or (VarTrinket2Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 8) or (Player:BuffUp(S.ReaversGlaiveBuff) and S.TheHunt:CooldownRemains() < 5)))) then
+    if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs or (VarTrinket2Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 8) or (S.ReaversGlaive:IsLearned() and S.TheHunt:CooldownRemains() < 5)))) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for AR trinket2 (" .. Trinket2:Name() .. ")"; end
     end
   end
