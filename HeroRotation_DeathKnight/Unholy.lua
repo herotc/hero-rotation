@@ -218,11 +218,16 @@ local function EvaluateTargetIfFesteringStrikeAoEBurst(TargetUnit)
 end
 
 local function EvaluateTargetIfFesteringStrikeAoESetup(TargetUnit)
-  -- if=cooldown.vile_contagion.remains<5|death_knight.fwounded_targets=active_enemies&debuff.festering_wound.stack<=4|buff.festering_scythe.react
-  return S.VileContagion:CooldownRemains() < 5 or S.FesteringWoundDebuff:AuraActiveCount() == ActiveEnemies and TargetUnit:DebuffStack(S.FesteringWoundDebuff) <= 4 or Player:BuffUp(S.FesteringScytheBuff)
+  -- if=!talent.vile_contagion|buff.festering_scythe.react
+  return not S.VileContagion:IsAvailable() or Player:BuffUp(S.FesteringScytheBuff)
 end
 
 local function EvaluateTargetIfFesteringStrikeAoESetup2(TargetUnit)
+  -- if=cooldown.vile_contagion.remains<5|death_knight.fwounded_targets=active_enemies&debuff.festering_wound.stack<=4
+  return S.VileContagion:CooldownRemains() < 5 or S.FesteringWoundDebuff:AuraActiveCount() == ActiveEnemies and TargetUnit:DebuffStack(S.FesteringWoundDebuff) <= 4
+end
+
+local function EvaluateTargetIfFesteringStrikeAoESetup3(TargetUnit)
   -- if=cooldown.apocalypse.remains<gcd&debuff.festering_wound.stack=0|death_knight.fwounded_targets<active_enemies
   return S.Apocalypse:CooldownRemains() < Player:GCD() and TargetUnit:DebuffDown(S.FesteringWoundDebuff) or S.FesteringWoundDebuff:AuraActiveCount() < ActiveEnemies
 end
@@ -295,6 +300,11 @@ local function EvaluateCycleOutbreakCDsSan(TargetUnit)
   return (TargetUnit:TimeToDie() > TargetUnit:DebuffRemains(S.VirulentPlagueDebuff) and TargetUnit:DebuffTicksRemain(S.VirulentPlagueDebuff) < 5) and ((TargetUnit:DebuffRefreshable(S.VirulentPlagueDebuff) or S.Morbidity:IsAvailable() and Player:BuffUp(S.InflictionofSorrowBuff) and S.Superstrain:IsAvailable() and TargetUnit:DebuffRefreshable(S.FrostFeverDebuff) and TargetUnit:DebuffRefreshable(S.BloodPlagueDebuff)) and (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and S.DarkTransformation:CooldownDown()) and (not S.RaiseAbomination:IsAvailable() or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownDown()))
 end
 
+local function EvaluateCycleTrollbaneSlow(TargetUnit)
+  -- target_if=debuff.chains_of_ice_trollbane_slow.up
+  return TargetUnit:DebuffUp(S.TrollbaneSlowDebuff)
+end
+
 --- ===== Rotation Functions =====
 local function Precombat()
   -- flask
@@ -341,9 +351,9 @@ local function AoE()
   if S.Epidemic:IsReady() and (not VarPoolingRunicPower) then
     if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe 4"; end
   end
-  -- wound_spender,target_if=min:debuff.chains_of_ice_trollbane_slow.remains,if=debuff.chains_of_ice_trollbane_slow.up&debuff.chains_of_ice_trollbane_slow.remains<gcd
+  -- wound_spender,target_if=debuff.chains_of_ice_trollbane_slow.up
   if WoundSpender:IsReady() then
-    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "min", EvaluateTargetIfFilterTrollbaneSlow, EvaluateTargetIfWoundSpenderAoE2, not Target:IsInMeleeRange(5)) then return "wound_spender aoe 6"; end
+    if Everyone.CastCycle(WoundSpender, EnemiesMelee, EvaluateCycleTrollbaneSlow, not Target:IsInMeleeRange(5)) then return "wound_spender aoe 6"; end
   end
   -- festering_strike,target_if=max:debuff.festering_wound.stack,if=cooldown.apocalypse.remains<variable.apoc_timing|buff.festering_scythe.react
   if FesteringAction:IsReady() and (S.Apocalypse:CooldownRemains() < VarApocTiming or Player:BuffUp(S.FesteringScytheBuff)) then
@@ -364,9 +374,9 @@ local function AoEBurst()
   if S.Epidemic:IsReady() and (not S.VampiricStrikeAction:IsLearned() and (not S.BurstingSores:IsAvailable() or S.BurstingSores:IsAvailable() and S.FesteringWoundDebuff:AuraActiveCount() < ActiveEnemies and S.FesteringWoundDebuff:AuraActiveCount() < ActiveEnemies * 0.4 and Player:BuffUp(S.SuddenDoomBuff) or Player:BuffUp(S.SuddenDoomBuff) and (Player:BuffUp(S.AFeastofSoulsBuff) or Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD() or Target:DebuffStack(S.DeathRotDebuff) < 10))) then
     if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe_burst 2"; end
   end
-  -- wound_spender,target_if=min:debuff.chains_of_ice_trollbane_slow.remains,if=debuff.chains_of_ice_trollbane_slow.up
+  -- wound_spender,target_if=debuff.chains_of_ice_trollbane_slow.up
   if WoundSpender:IsReady() then
-    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "min", EvaluateTargetIfFilterTrollbaneSlow, EvaluateTargetIfWoundSpenderAoEBurst2, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender aoe_burst 4"; end
+    if Everyone.CastCycle(WoundSpender, EnemiesMelee, EvaluateCycleTrollbaneSlow, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender aoe_burst 4"; end
   end
   -- festering_strike,if=buff.festering_scythe.react
   if S.FesteringScytheAction:IsReady() then
@@ -391,17 +401,21 @@ local function AoEBurst()
 end
 
 local function AoESetup()
-  -- any_dnd,if=!death_and_decay.ticking&(!talent.bursting_sores&!talent.vile_contagion|death_knight.fwounded_targets=active_enemies|death_knight.fwounded_targets>=8|raid_event.adds.exists&raid_event.adds.remains<=11&raid_event.adds.remains>5)
-  if AnyDnD:IsReady() and (not Player:DnDTicking() and (not S.BurstingSores:IsAvailable() and not S.VileContagion:IsAvailable() or S.FesteringWoundDebuff:AuraActiveCount() == ActiveEnemies or S.FesteringWoundDebuff:AuraActiveCount() >= 8)) then
+  -- any_dnd,if=!death_and_decay.ticking&(!talent.bursting_sores&!talent.vile_contagion|death_knight.fwounded_targets=active_enemies|death_knight.fwounded_targets>=8|raid_event.adds.exists&raid_event.adds.remains<=11&raid_event.adds.remains>5|!buff.death_and_decay.up&talent.defile)
+  if AnyDnD:IsReady() and (not Player:DnDTicking() and (not S.BurstingSores:IsAvailable() and not S.VileContagion:IsAvailable() or S.FesteringWoundDebuff:AuraActiveCount() == ActiveEnemies or S.FesteringWoundDebuff:AuraActiveCount() >= 8 or Player:BuffUp(S.DeathAndDecayBuff) and S.Defile:IsAvailable())) then
     if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd aoe_setup 2"; end
   end
-  -- wound_spender,target_if=min:debuff.chains_of_ice_trollbane_slow.remains,if=debuff.chains_of_ice_trollbane_slow.up&debuff.chains_of_ice_trollbane_slow.remains<gcd
+  -- wound_spender,target_if=debuff.chains_of_ice_trollbane_slow.up
   if WoundSpender:IsReady() then
-    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "min", EvaluateTargetIfFilterTrollbaneSlow, EvaluateTargetIfWoundSpenderAoESetup, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender aoe_setup 4"; end
+    if Everyone.CastCycle(WoundSpender, EnemiesMelee, EvaluateCycleTrollbaneSlow, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender aoe_setup 4"; end
   end
-  -- festering_strike,target_if=max:debuff.festering_wound.stack,if=cooldown.vile_contagion.remains<5|death_knight.fwounded_targets=active_enemies&debuff.festering_wound.stack<=4|buff.festering_scythe.react
+  -- festering_strike,target_if=min:debuff.festering_wound.stack,if=!talent.vile_contagion|buff.festering_scythe.react
   if FesteringAction:IsReady() then
     if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeAoESetup, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike aoe_setup 6"; end
+  end
+  -- festering_strike,target_if=max:debuff.festering_wound.stack,if=cooldown.vile_contagion.remains<5|death_knight.fwounded_targets=active_enemies&debuff.festering_wound.stack<=4
+  if FesteringAction:IsReady() then
+    if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeAoESetup2, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike aoe_setup 7"; end
   end
   -- epidemic,if=!variable.pooling_runic_power&buff.sudden_doom.react
   if S.Epidemic:IsReady() and (not VarPoolingRunicPower and Player:BuffUp(S.SuddenDoomBuff)) then
@@ -409,7 +423,7 @@ local function AoESetup()
   end
   -- festering_strike,target_if=min:debuff.festering_wound.stack,if=cooldown.apocalypse.remains<gcd&debuff.festering_wound.stack=0|death_knight.fwounded_targets<active_enemies
   if FesteringAction:IsReady() then
-    if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeAoESetup2, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike aoe_setup 10"; end
+    if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeAoESetup3, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike aoe_setup 10"; end
   end
   -- epidemic,if=!variable.pooling_runic_power
   if S.Epidemic:IsReady() and (not VarPoolingRunicPower) then
