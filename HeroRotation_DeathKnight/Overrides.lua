@@ -52,6 +52,18 @@ HL.AddCoreOverride("Player.DnDTicking",
   end
 , 250)
 
+HL.AddCoreOverride("Player.BonestormTicking",
+  function (self)
+    if next(DeathKnight.BonestormTable) == nil then return false end
+    for TarGUID, LastTick in pairs(DeathKnight.BonestormTable) do
+      if GetTime() - LastTick < 1.25 then
+        return true
+      end
+    end
+    return false
+  end
+, 250)
+
 -- Frost, ID: 251
 local OldFrostIsCastable
 OldFrostIsCastable = HL.AddCoreOverride("Spell.IsCastable",

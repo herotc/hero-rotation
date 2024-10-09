@@ -52,7 +52,6 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Blood = {
-    DeathStrikeDumpAmount = 65,
     IceboundFortitudeThreshold = 50,
     PoolDuringBlooddrinker = false,
     RuneTapThreshold = 40,
@@ -145,7 +144,6 @@ CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBloo
 CreatePanelOption("Slider", CP_Blood, "APL.DeathKnight.Blood.RuneTapThreshold", {5, 100, 5}, "Rune Tap Health Threshold", "Suggest Rune Tap when below this health percentage.")
 CreatePanelOption("Slider", CP_Blood, "APL.DeathKnight.Blood.IceboundFortitudeThreshold", {5, 100, 5}, "Icebound Fortitude Health Threshold", "Suggest Icebound Fortitude when below this health percentage.")
 CreatePanelOption("Slider", CP_Blood, "APL.DeathKnight.Blood.VampiricBloodThreshold", {5, 100, 5}, "Vampiric Blood Health Threshold", "Suggest Vampiric Blood when below this health percentage.")
-CreatePanelOption("Slider", CP_Blood, "APL.DeathKnight.Blood.DeathStrikeDumpAmount", {65, 130, 5}, "Death Strike Dump Amount", "Suggest Death Strike as a Runic Power dump when above this amount of Runic Power.")
 CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood")
 
 --Frost Panels
