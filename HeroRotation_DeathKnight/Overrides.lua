@@ -17,6 +17,8 @@ local SpellUnholy  = Spell.DeathKnight.Unholy
 -- Lua
 local GetTime = GetTime
 local next    = next
+-- Commons
+local DeathKnight = HeroRotation.Commons.DeathKnight
 
 --- ============================ CONTENT ============================
 -- Generic
@@ -31,6 +33,22 @@ OldBloodIsCastable = HL.AddCoreOverride("Spell.IsCastable",
     else
       return BaseCheck
     end
+  end
+, 250)
+
+HL.AddCoreOverride("Player.DnDTicking",
+  function (self)
+    if next(DeathKnight.DnDTable) == nil then return false end
+    local Ticking = false
+    for TarGUID, LastTick in pairs(DeathKnight.DnDTable) do
+      if GetTime() - LastTick < 1.25 then
+        Ticking = true
+      end
+    end
+    if Ticking and Player:BuffUp(SpellBlood.DeathAndDecayBuff) then
+      return true
+    end
+    return false
   end
 , 250)
 
@@ -88,10 +106,10 @@ OldUHIsAvailable = HL.AddCoreOverride("Spell.IsAvailable",
 
 HL.AddCoreOverride("Player.DnDTicking",
   function (self)
-    if next(HL.DnDTable) == nil then return false end
+    if next(DeathKnight.DnDTable) == nil then return false end
     local Ticking = false
-    for k,v in pairs(HL.DnDTable) do
-      if GetTime() - v < 1.25 then
+    for TarGUID, LastTick in pairs(DeathKnight.DnDTable) do
+      if GetTime() - LastTick < 1.25 then
         Ticking = true
       end
     end

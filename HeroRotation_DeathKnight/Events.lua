@@ -15,8 +15,12 @@ local Item = HL.Item
 local GetTime = GetTime
 -- File Locals
 local OneRuneSpenders = { 42650, 55090, 207311, 43265, 152280, 77575, 115989, 45524, 3714, 343294, 111673 }
+-- Commons
+local HR = HeroRotation
+HR.Commons.DeathKnight = {}
+local DeathKnight = HR.Commons.DeathKnight
 -- GhoulTable
-HL.GhoulTable = {
+DeathKnight.GhoulTable = {
   AbominationExpiration = 0,
   ApocMagusExpiration = 0,
   ArmyMagusExpiration = 0,
@@ -26,127 +30,132 @@ HL.GhoulTable = {
   SummonedGargoyle = nil,
   SummonedGhoul = nil,
 }
+-- DnDTable
+DeathKnight.DnDTable = {}
+-- BonestormTable
+DeathKnight.BonestormTable = {}
 
 --- ============================ CONTENT ============================
 --- ===== Ghoul Tracking =====
 HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, destGUID, _, _, _, spellId)
   if spellId == 46585 then
-    HL.GhoulTable.SummonedGhoul = destGUID
+    DeathKnight.GhoulTable.SummonedGhoul = destGUID
     -- Unsure if there's any items that could extend the ghouls time past 60 seconds
-    HL.GhoulTable.SummonExpiration = GetTime() + 60
+    DeathKnight.GhoulTable.SummonExpiration = GetTime() + 60
   end
   if spellId == 49206 or spellId == 207349 then
-    HL.GhoulTable.SummonedGargoyle = destGUID
-    HL.GhoulTable.GargoyleExpiration = GetTime() + 25
+    DeathKnight.GhoulTable.SummonedGargoyle = destGUID
+    DeathKnight.GhoulTable.GargoyleExpiration = GetTime() + 25
   end
   if spellId == 455395 then
-    HL.GhoulTable.SummonedAbomination = destGUID
-    HL.GhoulTable.AbominationExpiration = GetTime() + 30
+    DeathKnight.GhoulTable.SummonedAbomination = destGUID
+    DeathKnight.GhoulTable.AbominationExpiration = GetTime() + 30
   end
 end, "SPELL_SUMMON")
 
 HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, _, _, _, _, spellId)
   if spellId == 327574 then
-    HL.GhoulTable.SummonedGhoul = nil
-    HL.GhoulTable.SummonExpiration = 0
+    DeathKnight.GhoulTable.SummonedGhoul = nil
+    DeathKnight.GhoulTable.SummonExpiration = 0
   end
-  if Player:HasTier(31, 4) and (HL.GhoulTable.ApocMagusExpiration > 0 or HL.GhoulTable.ArmyMagusExpiration > 0) then
+  if Player:HasTier(31, 4) and (DeathKnight.GhoulTable.ApocMagusExpiration > 0 or DeathKnight.GhoulTable.ArmyMagusExpiration > 0) then
     if spellId == 85948 then
-      if HL.GhoulTable:ApocMagusActive() then HL.GhoulTable.ApocMagusExpiration = HL.GhoulTable.ApocMagusExpiration + 1 end
-      if HL.GhoulTable:ArmyMagusActive() then HL.GhoulTable.ArmyMagusExpiration = HL.GhoulTable.ArmyMagusExpiration + 1 end
+      if DeathKnight.GhoulTable:ApocMagusActive() then DeathKnight.GhoulTable.ApocMagusExpiration = DeathKnight.GhoulTable.ApocMagusExpiration + 1 end
+      if DeathKnight.GhoulTable:ArmyMagusActive() then DeathKnight.GhoulTable.ArmyMagusExpiration = DeathKnight.GhoulTable.ArmyMagusExpiration + 1 end
     end
     for _, spell in pairs(OneRuneSpenders) do
       if spell == spellId then
-        if HL.GhoulTable:ApocMagusActive() then HL.GhoulTable.ApocMagusExpiration = HL.GhoulTable.ApocMagusExpiration + 0.5 end
-        if HL.GhoulTable:ArmyMagusActive() then HL.GhoulTable.ArmyMagusExpiration = HL.GhoulTable.ArmyMagusExpiration + 0.5 end
+        if DeathKnight.GhoulTable:ApocMagusActive() then DeathKnight.GhoulTable.ApocMagusExpiration = DeathKnight.GhoulTable.ApocMagusExpiration + 0.5 end
+        if DeathKnight.GhoulTable:ArmyMagusActive() then DeathKnight.GhoulTable.ArmyMagusExpiration = DeathKnight.GhoulTable.ArmyMagusExpiration + 0.5 end
       end
     end
   end
   if Player:HasTier(31, 2) and spellId == 275699 then
-    HL.GhoulTable.ApocMagusExpiration = GetTime() + 20
+    DeathKnight.GhoulTable.ApocMagusExpiration = GetTime() + 20
   end
   if Player:HasTier(31, 2) and spellId == 42650 then
-    HL.GhoulTable.ArmyMagusExpiration = GetTime() + 30
+    DeathKnight.GhoulTable.ArmyMagusExpiration = GetTime() + 30
   end
 end, "SPELL_CAST_SUCCESS")
 
 HL:RegisterForCombatEvent(function(_, _, _, _, _, _, _, destGUID)
-  if destGUID == HL.GhoulTable.SummonedGhoul then
-    HL.GhoulTable.SummonedGhoul = nil
-    HL.GhoulTable.SummonExpiration = 0
+  if destGUID == DeathKnight.GhoulTable.SummonedGhoul then
+    DeathKnight.GhoulTable.SummonedGhoul = nil
+    DeathKnight.GhoulTable.SummonExpiration = 0
   end
-  if destGUID == HL.GhoulTable.SummonedGargoyle then
-    HL.GhoulTable.SummonedGargoyle = nil
-    HL.GhoulTable.GargoyleExpiration = 0
+  if destGUID == DeathKnight.GhoulTable.SummonedGargoyle then
+    DeathKnight.GhoulTable.SummonedGargoyle = nil
+    DeathKnight.GhoulTable.GargoyleExpiration = 0
   end
-  if destGUID == HL.GhoulTable.SummonedAbomination then
-    HL.GhoulTable.SummonedAbomination = nil
-    HL.GhoulTable.AbominationExpiration = 0
+  if destGUID == DeathKnight.GhoulTable.SummonedAbomination then
+    DeathKnight.GhoulTable.SummonedAbomination = nil
+    DeathKnight.GhoulTable.AbominationExpiration = 0
   end
 end, "UNIT_DESTROYED")
 
 --- ===== Ghoul Tracker Functions =====
-function HL.GhoulTable:AbomRemains()
-  if HL.GhoulTable.AbominationExpiration == 0 then return 0 end
-  return HL.GhoulTable.AbominationExpiration - GetTime()
+function DeathKnight.GhoulTable:AbomRemains()
+  if DeathKnight.GhoulTable.AbominationExpiration == 0 then return 0 end
+  return DeathKnight.GhoulTable.AbominationExpiration - GetTime()
 end
 
-function HL.GhoulTable:AbomActive()
-  return HL.GhoulTable.SummonedAbomination ~= nil and HL.GhoulTable:AbomRemains() > 0
+function DeathKnight.GhoulTable:AbomActive()
+  return DeathKnight.GhoulTable.SummonedAbomination ~= nil and DeathKnight.GhoulTable:AbomRemains() > 0
 end
 
-function HL.GhoulTable:ApocMagusRemains()
-  return HL.GhoulTable.ApocMagusExpiration - GetTime()
+function DeathKnight.GhoulTable:ApocMagusRemains()
+  return DeathKnight.GhoulTable.ApocMagusExpiration - GetTime()
 end
 
-function HL.GhoulTable:ApocMagusActive()
-  return HL.GhoulTable.ApocMagusRemains() > 0
+function DeathKnight.GhoulTable:ApocMagusActive()
+  return DeathKnight.GhoulTable.ApocMagusRemains() > 0
 end
 
-function HL.GhoulTable:ArmyMagusRemains()
-  return HL.GhoulTable.ArmyMagusExpiration - GetTime()
+function DeathKnight.GhoulTable:ArmyMagusRemains()
+  return DeathKnight.GhoulTable.ArmyMagusExpiration - GetTime()
 end
 
-function HL.GhoulTable:ArmyMagusActive()
-  return HL.GhoulTable:ArmyMagusRemains() > 0
+function DeathKnight.GhoulTable:ArmyMagusActive()
+  return DeathKnight.GhoulTable:ArmyMagusRemains() > 0
 end
 
-function HL.GhoulTable:GargRemains()
-  if HL.GhoulTable.GargoyleExpiration == 0 then return 0 end
-  return HL.GhoulTable.GargoyleExpiration - GetTime()
+function DeathKnight.GhoulTable:GargRemains()
+  if DeathKnight.GhoulTable.GargoyleExpiration == 0 then return 0 end
+  return DeathKnight.GhoulTable.GargoyleExpiration - GetTime()
 end
 
-function HL.GhoulTable:GargActive()
-  return HL.GhoulTable.SummonedGargoyle ~= nil and HL.GhoulTable:GargRemains() > 0
+function DeathKnight.GhoulTable:GargActive()
+  return DeathKnight.GhoulTable.SummonedGargoyle ~= nil and DeathKnight.GhoulTable:GargRemains() > 0
 end
 
-function HL.GhoulTable:GhoulRemains()
-  if HL.GhoulTable.SummonExpiration == 0 then return 0 end
-  return HL.GhoulTable.SummonExpiration - GetTime()
+function DeathKnight.GhoulTable:GhoulRemains()
+  if DeathKnight.GhoulTable.SummonExpiration == 0 then return 0 end
+  return DeathKnight.GhoulTable.SummonExpiration - GetTime()
 end
 
-function HL.GhoulTable:GhoulActive()
-  return HL.GhoulTable.SummonedGhoul ~= nil and HL.GhoulTable:GhoulRemains() > 0
+function DeathKnight.GhoulTable:GhoulActive()
+  return DeathKnight.GhoulTable.SummonedGhoul ~= nil and DeathKnight.GhoulTable:GhoulRemains() > 0
 end
 
---- ===== Death and Decay Tracking =====
-HL.DnDTable = {}
-
+--- ===== Death and Decay/Bonestorm Tracking =====
 HL:RegisterForCombatEvent(function(_, _, _, srcGUID, _, _, _, destGUID, _, _, _, spellId)
   if srcGUID == Player:GUID() then
     -- Death and Decay
     if spellId == 52212 then
-      HL.DnDTable[destGUID] = GetTime()
+      DeathKnight.DnDTable[destGUID] = GetTime()
     -- Defile
     elseif spellId == 156000 then
-      HL.DnDTable[destGUID] = GetTime()
+      DeathKnight.DnDTable[destGUID] = GetTime()
+    -- Bonestorm
+    elseif spellId == 196528 then
+      DeathKnight.BonestormTable[destGUID] = GetTime()
     end
   end
 end, "SPELL_DAMAGE")
 
 HL:RegisterForCombatEvent(function(_, _, _, _, _, _, _, destGUID)
-  if HL.DnDTable[destGUID] then
-    HL.DnDTable[destGUID] = nil
+  if DeathKnight.DnDTable[destGUID] then
+    DeathKnight.DnDTable[destGUID] = nil
   end
 end, "UNIT_DIED", "UNIT_DESTROYED")  
 

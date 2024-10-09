@@ -67,7 +67,7 @@ local EnemiesMelee, EnemiesMeleeCount
 local BossFightRemains = 11111
 local FightRemains = 11111
 local GCDMax
-local Ghoul = HL.GhoulTable
+local Ghoul = HR.Commons.DeathKnight.GhoulTable
 
 --- ===== Trinket Variables =====
 local Trinket1, Trinket2
