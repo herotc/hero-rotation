@@ -37,12 +37,7 @@ ArmsOldDebuffUp = HL.AddCoreOverride ("Unit.DebuffUp",
   function (self, Spell, AnyCaster, BypassRecovery)
     local BaseCheck = ArmsOldDebuffUp(self, Spell, AnyCaster, BypassRecovery)
     if Spell == SpellArms.RavagerDebuff then
-      HR.Print("Checking Target GUID: "..tostring(self:GUID()))
       if Warrior.Ravager[self:GUID()] then
-        HR.Print("Target in table...")
-        HR.Print("Last tick time: "..tostring(Warrior.Ravager[self:GUID()]))
-        HR.Print("GetTime: "..tostring(GetTime()))
-        HR.Print("TickTime + 0.2: "..tostring(SpellArms.Ravager:TickTime() + 0.2))
         -- Add 0.2s buffer to tick timer.
         return Warrior.Ravager[self:GUID()] - GetTime() < SpellArms.Ravager:TickTime() + 0.2
       else
