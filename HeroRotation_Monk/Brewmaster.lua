@@ -244,8 +244,11 @@ local function APL()
     if S.BlackOxBrew:IsCastable() and (Player:Energy() < 40) then
       if Cast(S.BlackOxBrew, Settings.Brewmaster.GCDasOffGCD.BlackOxBrew) then return "black_ox_brew main 6"; end
     end
-    -- celestial_brew,if=buff.aspect_of_harmony_accumulator.value>0.98*health.max|(target.time_to_die<20&target.time_to_die>14&buff.aspect_of_harmony_accumulator.value>0.2*health.max)
-    -- Note: Handled in Defensives.
+    -- celestial_brew,if=(buff.aspect_of_harmony_accumulator.value>0.3*health.max&buff.weapons_of_order.up&!dot.aspect_of_harmony_damage.ticking)
+    -- celestial_brew,if=(buff.aspect_of_harmony_accumulator.value>0.3*health.max&!talent.weapons_of_order.enabled&!dot.aspect_of_harmony_damage.ticking)
+    -- celestial_brew,if=(target.time_to_die<20&target.time_to_die>14&buff.aspect_of_harmony_accumulator.value>0.2health.max)
+    -- celestial_brew,if=(buff.aspect_of_harmony_accumulator.value>0.3*health.max&cooldown.weapons_of_order.remains>20&!dot.aspect_of_harmony_damage.ticking)
+    -- Note: Handled in Defensives for now. TODO: Handle Aspect of Harmony.
     -- blackout_kick
     if S.BlackoutKick:IsReady() then
       if Cast(S.BlackoutKick, nil, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick main 8"; end
