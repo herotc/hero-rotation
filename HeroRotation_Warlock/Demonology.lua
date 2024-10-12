@@ -549,7 +549,7 @@ local function Tyrant()
   end
   -- summon_demonic_tyrant,if=variable.imp_despawn&variable.imp_despawn<time+gcd.max*2+cast_time|buff.dreadstalkers.up&buff.dreadstalkers.remains<gcd.max*2+cast_time
   -- Note: Manually added the Vilefiend check.
-  if CDsON() and S.SummonDemonicTyrant:IsReady() and (Settings.Demonology.ForceTyrantVilefiendSync and VilefiendActive() and (VarImpDespawn > 0 and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() or DreadstalkerActive() and DreadstalkerTime() < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime()))then
+  if CDsON() and S.SummonDemonicTyrant:IsReady() and ((Settings.Demonology.ForceTyrantVilefiendSync and VilefiendActive() or not Settings.Demonology.ForceTyrantVilefiendSync) and (VarImpDespawn > 0 and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() or DreadstalkerActive() and DreadstalkerTime() < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime()))then
     if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant tyrant 24"; end
   end
   -- hand_of_guldan,if=(variable.imp_despawn|buff.dreadstalkers.remains)&soul_shard>=3|soul_shard=5
