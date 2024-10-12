@@ -87,6 +87,8 @@ Spell.Evoker.Flameshaper = {
 }
 
 Spell.Evoker.Scalecommander = {
+  -- Abilities
+  DeepBreathManeuverability             = Spell(433874),
   -- Talents
   Bombardments                          = Spell(434300),
   Maneuverability                       = Spell(433871),
