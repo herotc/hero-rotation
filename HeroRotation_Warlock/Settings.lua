@@ -68,6 +68,7 @@ HR.GUISettings.APL.Warlock = {
   Demonology = {
     SummonPetFontSize = 26,
     UnendingResolveHP = 20,
+    ForceTyrantVilefiendSync = false,
     PotionType = {
       Selected = "Tempered",
     },
@@ -136,6 +137,7 @@ CreateARPanelOptions(CP_Affliction, "APL.Warlock.Affliction")
 -- Demonology
 CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.")
 CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.SummonPetFontSize", {1, 100, 1}, "Summon Pet Font Size", "Select the font size to use for the overlay on your Summon Felguard pet suggestion. This value scales with the addon's 'UI' scale.")
+CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.ForceTyrantVilefiendSync", "Force Tyrant/Vilefiend Sync", "Enable this option to force Summon Demonic Tyrant and Vilefiend to be in sync with each other. Summon Demonic Tyrant will not be suggested if Vilefiend (or its variants) are not active.")
 CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology")
 
 -- Destruction

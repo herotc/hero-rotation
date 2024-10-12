@@ -489,13 +489,13 @@ end
 
 local function Tyrant()
   -- call_action_list,name=racials,if=variable.imp_despawn&variable.imp_despawn<time+gcd.max*2+action.summon_demonic_tyrant.cast_time&(prev_gcd.1.hand_of_guldan|prev_gcd.1.ruination)&(variable.imp_despawn&variable.imp_despawn<time+gcd.max+action.summon_demonic_tyrant.cast_time|soul_shard<2)
-  if CDsON() and (VarImpDespawn and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and (Player:PrevGCDP(1, S.HandofGuldan) or Player:PrevGCDP(1, S.RuinationAbility)) and (VarImpDespawn and VarImpDespawn < CombatTime + Player:GCD() + S.SummonDemonicTyrant:CastTime() or SoulShards < 2)) then
+  if CDsON() and (VarImpDespawn > 0 and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and (Player:PrevGCDP(1, S.HandofGuldan) or Player:PrevGCDP(1, S.RuinationAbility)) and (VarImpDespawn > 0 and VarImpDespawn < CombatTime + Player:GCD() + S.SummonDemonicTyrant:CastTime() or SoulShards < 2)) then
     local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
   end
   -- potion,if=variable.imp_despawn&variable.imp_despawn<time+gcd.max*2+action.summon_demonic_tyrant.cast_time&(prev_gcd.1.hand_of_guldan|prev_gcd.1.ruination)&(variable.imp_despawn&variable.imp_despawn<time+gcd.max+action.summon_demonic_tyrant.cast_time|soul_shard<2)
   if Settings.Commons.Enabled.Potions then
     local PotionSelected = Everyone.PotionSelected()
-    if PotionSelected and PotionSelected:IsReady() and (VarImpDespawn and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and (Player:PrevGCDP(1, S.HandofGuldan) or Player:PrevGCDP(1, S.RuinationAbility)) and (VarImpDespawn and VarImpDespawn < CombatTime + Player:GCD() + S.SummonDemonicTyrant:CastTime() or SoulShards < 2)) then
+    if PotionSelected and PotionSelected:IsReady() and (VarImpDespawn > 0 and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and (Player:PrevGCDP(1, S.HandofGuldan) or Player:PrevGCDP(1, S.RuinationAbility)) and (VarImpDespawn > 0 and VarImpDespawn < CombatTime + Player:GCD() + S.SummonDemonicTyrant:CastTime() or SoulShards < 2)) then
       if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion tyrant 2"; end
     end
   end
@@ -504,7 +504,7 @@ local function Tyrant()
     if Cast(S.PowerSiphon, Settings.Demonology.GCDasOffGCD.PowerSiphon) then return "power_siphon tyrant 4"; end
   end
   -- ruination,if=buff.dreadstalkers.remains>gcd.max+action.summon_demonic_tyrant.cast_time&(soul_shard=5|variable.imp_despawn)
-  if S.RuinationAbility:IsReady() and (DreadstalkerTime() > Player:GCD() + S.SummonDemonicTyrant:CastTime() and (SoulShards == 5 or VarImpDespawn)) then
+  if S.RuinationAbility:IsReady() and (DreadstalkerTime() > Player:GCD() + S.SummonDemonicTyrant:CastTime() and (SoulShards == 5 or VarImpDespawn > 0)) then
     if Cast(S.RuinationAbility, nil, nil, not Target:IsSpellInRange(S.RuinationAbility)) then return "ruination tyrant 6"; end
   end
   -- infernal_bolt,if=!buff.demonic_core.react&variable.imp_despawn>time+gcd.max*2+action.summon_demonic_tyrant.cast_time&soul_shard<3
@@ -548,23 +548,24 @@ local function Tyrant()
     if Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers tyrant 22"; end
   end
   -- summon_demonic_tyrant,if=variable.imp_despawn&variable.imp_despawn<time+gcd.max*2+cast_time|buff.dreadstalkers.up&buff.dreadstalkers.remains<gcd.max*2+cast_time
-  if CDsON() and S.SummonDemonicTyrant:IsReady() and (VarImpDespawn and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() or DreadstalkerActive() and DreadstalkerTime() < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime()) then
+  -- Note: Manually added the Vilefiend check.
+  if CDsON() and S.SummonDemonicTyrant:IsReady() and (Settings.Demonology.ForceTyrantVilefiendSync and VilefiendActive() and (VarImpDespawn > 0 and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() or DreadstalkerActive() and DreadstalkerTime() < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime()))then
     if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant tyrant 24"; end
   end
   -- hand_of_guldan,if=(variable.imp_despawn|buff.dreadstalkers.remains)&soul_shard>=3|soul_shard=5
-  if S.HandofGuldan:IsReady() and ((VarImpDespawn or DreadstalkerActive()) and SoulShards >= 3 or SoulShards == 5) then
+  if S.HandofGuldan:IsReady() and ((VarImpDespawn > 0 or DreadstalkerActive()) and SoulShards >= 3 or SoulShards == 5) then
     if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan tyrant 26"; end
   end
   -- infernal_bolt,if=variable.imp_despawn&soul_shard<3
-  if S.InfernalBolt:IsCastable() and (VarImpDespawn and SoulShards < 3) then
+  if S.InfernalBolt:IsCastable() and (VarImpDespawn > 0 and SoulShards < 3) then
     if Cast(S.InfernalBolt, nil, nil, not Target:IsSpellInRange(S.InfernalBolt)) then return "infernal_bolt tyrant 28"; end
   end
   -- demonbolt,if=variable.imp_despawn&buff.demonic_core.react&soul_shard<4|prev_gcd.1.call_dreadstalkers&soul_shard<4&buff.demonic_core.react=4|buff.demonic_core.react=4&soul_shard<4|buff.demonic_core.react>=2&cooldown.power_siphon.remains<5
-  if S.Demonbolt:IsReady() and (VarImpDespawn and Player:BuffUp(S.DemonicCoreBuff) and SoulShards < 4 or Player:PrevGCDP(1, S.CallDreadstalkers) and SoulShards < 4 and DemonicCoreStacks == 4 or DemonicCoreStacks == 4 and SoulShards < 4 or DemonicCoreStacks >= 2 and S.PowerSiphon:CooldownRemains() < 5) then
+  if S.Demonbolt:IsReady() and (VarImpDespawn > 0 and Player:BuffUp(S.DemonicCoreBuff) and SoulShards < 4 or Player:PrevGCDP(1, S.CallDreadstalkers) and SoulShards < 4 and DemonicCoreStacks == 4 or DemonicCoreStacks == 4 and SoulShards < 4 or DemonicCoreStacks >= 2 and S.PowerSiphon:CooldownRemains() < 5) then
     if Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyrant 30"; end
   end
   -- ruination,if=variable.imp_despawn|soul_shard=5&cooldown.summon_vilefiend.remains>gcd.max*3
-  if S.RuinationAbility:IsReady() and (VarImpDespawn or SoulShards == 5 and VilefiendAbility:CooldownRemains() > Player:GCD() * 3) then
+  if S.RuinationAbility:IsReady() and (VarImpDespawn > 0 or SoulShards == 5 and VilefiendAbility:CooldownRemains() > Player:GCD() * 3) then
     if Cast(S.RuinationAbility, nil, nil, not Target:IsSpellInRange(S.RuinationAbility)) then return "ruination tyrant 32"; end
   end
   -- shadow_bolt
