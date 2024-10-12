@@ -348,7 +348,7 @@ local function Aoe()
   end
   -- deep_breath,if=talent.maneuverability&talent.melt_armor
   if CDsON() and DeepBreathAbility:IsCastable() and (S.Maneuverability:IsAvailable() and S.MeltArmor:IsAvailable()) then
-    if Cast(DeepBreathAbility, nil, nil, not Target:IsInRange(50)) then return "deep_breath aoe 8"; end
+    if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath aoe 8"; end
   end
   -- dragonrage,if=target.time_to_die>=32|fight_remains<30
   if CDsON() and S.Dragonrage:IsCastable() and (Target:TimeToDie() >= 32 or BossFightRemains < 30) then
@@ -427,7 +427,7 @@ local function ST()
   -- Note: Not handling movement ability.
   -- deep_breath,if=talent.maneuverability&talent.melt_armor
   if CDsON() and DeepBreathAbility:IsCastable() and (S.Maneuverability:IsAvailable() and S.MeltArmor:IsAvailable()) then
-    if Cast(DeepBreathAbility, nil, nil, not Target:IsInRange(50)) then return "deep_breath st 4"; end
+    if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath st 4"; end
   end
   -- dragonrage,if=(cooldown.fire_breath.remains<4|cooldown.eternity_surge.remains<4&(!set_bonus.tww1_4pc|!talent.mass_disintegrate))&(cooldown.fire_breath.remains<8&(cooldown.eternity_surge.remains<8|set_bonus.tww1_4pc&talent.mass_disintegrate))&target.time_to_die>=32|fight_remains<32
   if CDsON() and S.Dragonrage:IsCastable() and ((S.FireBreath:CooldownRemains() < 4 or S.EternitySurge:CooldownRemains() < 4 and (not Player:HasTier("TWW1", 4) or not S.MassDisintegrate:IsAvailable())) or (S.FireBreath:CooldownRemains() < 8 and (S.EternitySurge:CooldownRemains() < 8 or Player:HasTier("TWW1", 4) and S.MassDisintegrate:IsAvailable())) and Target:TimeToDie() >= 32 or BossFightRemains < 32) then
@@ -479,7 +479,7 @@ local function ST()
   end
   -- deep_breath,if=!buff.dragonrage.up&(talent.imminent_destruction&!debuff.shattering_star_debuff.up|talent.melt_armor&talent.maneuverability)
   if CDsON() and DeepBreathAbility:IsCastable() and (not VarDragonrageUp and (S.ImminentDestruction:IsAvailable() and Target:DebuffDown(S.ShatteringStarDebuff)) or S.MeltArmor:IsAvailable() and S.Maneuverability:IsAvailable()) then
-    if Cast(DeepBreathAbility, nil, nil, not Target:IsInRange(50)) then return "deep_breath st 22"; end
+    if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath st 22"; end
   end
   -- pyre,if=debuff.in_firestorm.up&talent.feed_the_flames&buff.charged_blast.stack==20&active_enemies>=2
   if S.Pyre:IsReady() and (InFirestorm() and S.FeedtheFlames:IsAvailable() and Player:BuffStack(S.ChargedBlastBuff) == 20 and EnemiesCount8ySplash >= 2) then
@@ -499,11 +499,11 @@ local function ST()
   end
   -- deep_breath,if=!buff.dragonrage.up&active_enemies>=2&((raid_event.adds.in>=120&!talent.onyx_legacy)|(raid_event.adds.in>=60&talent.onyx_legacy))
   if CDsON() and DeepBreathAbility:IsCastable() and (not VarDragonrageUp and EnemiesCount8ySplash >= 2) then
-    if Cast(DeepBreathAbility, nil, nil, not Target:IsInRange(50)) then return "deep_breath st 32"; end
+    if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath st 32"; end
   end
   -- deep_breath,if=!buff.dragonrage.up&(talent.imminent_destruction&!debuff.shattering_star_debuff.up|talent.melt_armor|talent.maneuverability)
   if CDsON() and DeepBreathAbility:IsCastable() and (not VarDragonrageUp and (S.ImminentDestruction:IsAvailable() and Target:DebuffDown(S.ShatteringStarDebuff) or S.MeltArmor:IsAvailable() or S.Maneuverability:IsAvailable())) then
-    if Cast(DeepBreathAbility, nil, nil, not Target:IsInRange(50)) then return "deep_breath st 34"; end
+    if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath st 34"; end
   end
   -- call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up&!buff.shattering_star_debuff.up&talent.scarlet_adaptation&!buff.dragonrage.up&!buff.burnout.up
   if Settings.Devastation.UseGreen and (S.AncientFlame:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and Target:DebuffDown(S.ShatteringStarDebuff) and S.ScarletAdaptation:IsAvailable() and not VarDragonrageUp and Player:BuffDown(S.BurnoutBuff)) then
