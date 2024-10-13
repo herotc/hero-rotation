@@ -374,7 +374,7 @@ local function Precombat()
   -- Note: Moved to variable declarations and PLAYER_EQUIPMENT_CHANGED.
   -- Manually added: wild_charge
   if S.WildCharge:IsCastable() and (not Target:IsInRange(8)) then
-    if Cast(S.WildCharge, nil, nil, not Target:IsInRange(28)) then return "wild_charge precombat 6"; end
+    if Cast(S.WildCharge, Settings.CommonsOGCD.GCDasOffGCD.WildCharge, nil, not Target:IsInRange(28)) then return "wild_charge precombat 6"; end
   end
   -- Manually added: rake
   if S.Rake:IsReady() then
