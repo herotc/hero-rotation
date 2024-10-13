@@ -65,7 +65,6 @@ local VarDiabolicRitualRemains = 0
 local VilefiendAbility = S.MarkofFharg:IsAvailable() and S.SummonCharhound or (S.MarkofShatug:IsAvailable() and S.SummonGloomhound or S.SummonVilefiend)
 local SoulShards = 0
 local DemonicCoreStacks = 0
-local CombatTime = 0
 local GCDMax = 0
 local Enemies40y
 local Enemies8ySplash, EnemiesCount8ySplash
@@ -406,11 +405,11 @@ local function Items()
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 4"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&((variable.damage_trinket_priority=1|trinket.2.cooldown.remains)&(trinket.1.cast_time>0&!pet.demonic_tyrant.active|!trinket.1.cast_time>0)|(time<20&variable.trinket_2_buffs)|cooldown.summon_demonic_tyrant.remains_expected>20)
-    if Trinket1:IsReady() and (not VarTrinket1Buffs and not VarTrinket1Manual and ((VarDmgTrinketPriority == 1 or Trinket2:CooldownDown()) and (VarTrinket1CastTime > 0 and not DemonicTyrantActive() or not (VarTrinket1CastTime > 0)) or (CombatTime < 20 and VarTrinket2Buffs) or S.SummonDemonicTyrant:CooldownRemains() > 20)) then
+    if Trinket1:IsReady() and (not VarTrinket1Buffs and not VarTrinket1Manual and ((VarDmgTrinketPriority == 1 or Trinket2:CooldownDown()) and (VarTrinket1CastTime > 0 and not DemonicTyrantActive() or not (VarTrinket1CastTime > 0)) or (HL.CombatTime() < 20 and VarTrinket2Buffs) or S.SummonDemonicTyrant:CooldownRemains() > 20)) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 6"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&((variable.damage_trinket_priority=2|trinket.1.cooldown.remains)&(trinket.2.cast_time>0&!pet.demonic_tyrant.active|!trinket.2.cast_time>0)|(time<20&variable.trinket_1_buffs)|cooldown.summon_demonic_tyrant.remains_expected>20)
-    if Trinket2:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and ((VarDmgTrinketPriority == 2 or Trinket1:CooldownDown()) and (VarTrinket2CastTime > 0 and not DemonicTyrantActive() or not (VarTrinket2CastTime > 0)) or (CombatTime < 20 and VarTrinket1Buffs) or S.SummonDemonicTyrant:CooldownRemains() > 20)) then
+    if Trinket2:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and ((VarDmgTrinketPriority == 2 or Trinket1:CooldownDown()) and (VarTrinket2CastTime > 0 and not DemonicTyrantActive() or not (VarTrinket2CastTime > 0)) or (HL.CombatTime() < 20 and VarTrinket1Buffs) or S.SummonDemonicTyrant:CooldownRemains() > 20)) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 8"; end
     end
     -- use_item,use_off_gcd=1,name=spymasters_web,if=pet.demonic_tyrant.active&fight_remains<=80&buff.spymasters_report.stack>=30&(!variable.trinket_1_buffs&trinket.2.is.spymasters_web|!variable.trinket_2_buffs&trinket.1.is.spymasters_web)|fight_remains<=20&(trinket.1.cooldown.remains&trinket.2.is.spymasters_web|trinket.2.cooldown.remains&trinket.1.is.spymasters_web|!variable.trinket_1_buffs|!variable.trinket_2_buffs)
@@ -489,13 +488,13 @@ end
 
 local function Tyrant()
   -- call_action_list,name=racials,if=variable.imp_despawn&variable.imp_despawn<time+gcd.max*2+action.summon_demonic_tyrant.cast_time&(prev_gcd.1.hand_of_guldan|prev_gcd.1.ruination)&(variable.imp_despawn&variable.imp_despawn<time+gcd.max+action.summon_demonic_tyrant.cast_time|soul_shard<2)
-  if CDsON() and (VarImpDespawn > 0 and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and (Player:PrevGCDP(1, S.HandofGuldan) or Player:PrevGCDP(1, S.RuinationAbility)) and (VarImpDespawn > 0 and VarImpDespawn < CombatTime + Player:GCD() + S.SummonDemonicTyrant:CastTime() or SoulShards < 2)) then
+  if CDsON() and (VarImpDespawn > 0 and VarImpDespawn < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and (Player:PrevGCDP(1, S.HandofGuldan) or Player:PrevGCDP(1, S.RuinationAbility)) and (VarImpDespawn > 0 and VarImpDespawn < Player:GCD() + S.SummonDemonicTyrant:CastTime() or SoulShards < 2)) then
     local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
   end
   -- potion,if=variable.imp_despawn&variable.imp_despawn<time+gcd.max*2+action.summon_demonic_tyrant.cast_time&(prev_gcd.1.hand_of_guldan|prev_gcd.1.ruination)&(variable.imp_despawn&variable.imp_despawn<time+gcd.max+action.summon_demonic_tyrant.cast_time|soul_shard<2)
   if Settings.Commons.Enabled.Potions then
     local PotionSelected = Everyone.PotionSelected()
-    if PotionSelected and PotionSelected:IsReady() and (VarImpDespawn > 0 and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and (Player:PrevGCDP(1, S.HandofGuldan) or Player:PrevGCDP(1, S.RuinationAbility)) and (VarImpDespawn > 0 and VarImpDespawn < CombatTime + Player:GCD() + S.SummonDemonicTyrant:CastTime() or SoulShards < 2)) then
+    if PotionSelected and PotionSelected:IsReady() and (VarImpDespawn > 0 and VarImpDespawn < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and (Player:PrevGCDP(1, S.HandofGuldan) or Player:PrevGCDP(1, S.RuinationAbility)) and (VarImpDespawn > 0 and VarImpDespawn < Player:GCD() + S.SummonDemonicTyrant:CastTime() or SoulShards < 2)) then
       if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion tyrant 2"; end
     end
   end
@@ -508,7 +507,7 @@ local function Tyrant()
     if Cast(S.RuinationAbility, nil, nil, not Target:IsSpellInRange(S.RuinationAbility)) then return "ruination tyrant 6"; end
   end
   -- infernal_bolt,if=!buff.demonic_core.react&variable.imp_despawn>time+gcd.max*2+action.summon_demonic_tyrant.cast_time&soul_shard<3
-  if S.InfernalBolt:IsCastable() and (Player:BuffDown(S.DemonicCoreBuff) and VarImpDespawn > CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and SoulShards < 3) then
+  if S.InfernalBolt:IsCastable() and (Player:BuffDown(S.DemonicCoreBuff) and VarImpDespawn > Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and SoulShards < 3) then
     if Cast(S.InfernalBolt, nil, nil, not Target:IsSpellInRange(S.InfernalBolt)) then return "infernal_bolt tyrant 8"; end
   end
   if S.ShadowBolt:IsCastable() and (
@@ -524,15 +523,15 @@ local function Tyrant()
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt tyrant 10"; end
   end
   -- hand_of_guldan,if=variable.imp_despawn>time+gcd.max*2+action.summon_demonic_tyrant.cast_time&!buff.demonic_core.react&buff.demonic_art_pit_lord.up&variable.imp_despawn<time+gcd.max*5+action.summon_demonic_tyrant.cast_time
-  if S.HandofGuldan:IsReady() and (VarImpDespawn > CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and Player:BuffDown(S.DemonicCoreBuff) and Player:BuffUp(S.DemonicArtPitLordBuff) and VarImpDespawn < CombatTime + Player:GCD() * 5 + S.SummonDemonicTyrant:CastTime()) then
+  if S.HandofGuldan:IsReady() and (VarImpDespawn > Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and Player:BuffDown(S.DemonicCoreBuff) and Player:BuffUp(S.DemonicArtPitLordBuff) and VarImpDespawn < Player:GCD() * 5 + S.SummonDemonicTyrant:CastTime()) then
     if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan tyrant 12"; end
   end
   -- hand_of_guldan,if=variable.imp_despawn>time+gcd.max+action.summon_demonic_tyrant.cast_time&variable.imp_despawn<time+gcd.max*2+action.summon_demonic_tyrant.cast_time&buff.dreadstalkers.remains>gcd.max+action.summon_demonic_tyrant.cast_time&soul_shard>1
-  if S.HandofGuldan:IsReady() and (VarImpDespawn > CombatTime + Player:GCD() + S.SummonDemonicTyrant:CastTime() and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and DreadstalkerTime() > Player:GCD() + S.SummonDemonicTyrant:CastTime() and SoulShards > 1) then
+  if S.HandofGuldan:IsReady() and (VarImpDespawn > Player:GCD() + S.SummonDemonicTyrant:CastTime() and VarImpDespawn < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and DreadstalkerTime() > Player:GCD() + S.SummonDemonicTyrant:CastTime() and SoulShards > 1) then
     if Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan tyrant 14"; end
   end
   -- shadow_bolt,if=!buff.demonic_core.react&variable.imp_despawn>time+gcd.max*2+action.summon_demonic_tyrant.cast_time&variable.imp_despawn<time+gcd.max*4+action.summon_demonic_tyrant.cast_time&soul_shard<3&buff.dreadstalkers.remains>gcd.max*2+action.summon_demonic_tyrant.cast_time
-  if S.ShadowBolt:IsCastable() and (Player:BuffDown(S.DemonicCoreBuff) and VarImpDespawn > CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and VarImpDespawn < CombatTime + Player:GCD() * 4 + S.SummonDemonicTyrant:CastTime() and SoulShards < 3 and DreadstalkerTime() > Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime()) then
+  if S.ShadowBolt:IsCastable() and (Player:BuffDown(S.DemonicCoreBuff) and VarImpDespawn > Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() and VarImpDespawn < Player:GCD() * 4 + S.SummonDemonicTyrant:CastTime() and SoulShards < 3 and DreadstalkerTime() > Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime()) then
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt tyrant 16"; end
   end
   -- grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains<13+gcd.max&cooldown.summon_vilefiend.remains<gcd.max&cooldown.call_dreadstalkers.remains<gcd.max*3.33&(soul_shard=5-(pet.felguard.cooldown.soul_strike.remains<gcd.max)&talent.fel_invocation|soul_shard=5)
@@ -548,8 +547,14 @@ local function Tyrant()
     if Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers tyrant 22"; end
   end
   -- summon_demonic_tyrant,if=variable.imp_despawn&variable.imp_despawn<time+gcd.max*2+cast_time|buff.dreadstalkers.up&buff.dreadstalkers.remains<gcd.max*2+cast_time
-  -- Note: Manually added the Vilefiend check.
-  if CDsON() and S.SummonDemonicTyrant:IsReady() and ((Settings.Demonology.ForceTyrantVilefiendSync and VilefiendActive() or not Settings.Demonology.ForceTyrantVilefiendSync) and (VarImpDespawn > 0 and VarImpDespawn < CombatTime + Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() or DreadstalkerActive() and DreadstalkerTime() < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime()))then
+  -- Note: Manually added the Vilefiend check. Also, added a 1.5 second buffer to Dreadstalker/Vilefiend check.
+  local DSCheck = false
+  if Settings.Demonology.ForceTyrantVilefiendSync then
+    DSCheck = DreadstalkerActive() and VilefiendActive() and mathmin(DreadstalkerTime(), VilefiendTime()) < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() + 1.5
+  else
+    DSCheck = DreadstalkerActive() and DreadstalkerTime() < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() + 1.5
+  end
+  if CDsON() and S.SummonDemonicTyrant:IsReady() and (VarImpDespawn > 0 and VarImpDespawn < Player:GCD() * 2 + S.SummonDemonicTyrant:CastTime() + 1.5 or DSCheck) then
     if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant tyrant 24"; end
   end
   -- hand_of_guldan,if=(variable.imp_despawn|buff.dreadstalkers.remains)&soul_shard>=3|soul_shard=5
@@ -586,16 +591,24 @@ local function Variables()
     VarInOpener = false
   end
   -- variable,name=imp_despawn,op=set,value=2*spell_haste*6+0.58+time,if=prev_gcd.1.hand_of_guldan&buff.dreadstalkers.up&cooldown.summon_demonic_tyrant.remains<13&variable.imp_despawn=0
+  -- Note: Removed 'time' from the calculation, as it needlessly complicates its usage.
   if Player:PrevGCDP(1, S.HandofGuldan) and DreadstalkerActive() and S.SummonDemonicTyrant:CooldownRemains() < 13 and VarImpDespawn == 0 then
-    VarImpDespawn = 2 * Player:SpellHaste() * 6 + 0.58 + CombatTime
+    VarImpDespawn = 2 * Player:SpellHaste() * 6 + 0.58
   end
   -- variable,name=imp_despawn,op=set,value=(variable.imp_despawn>?buff.dreadstalkers.remains+time),if=variable.imp_despawn
+  -- Note: Removed 'time' from the calculation, as it needlessly complicates its usage.
   if VarImpDespawn > 0 then
-    VarImpDespawn = mathmin(VarImpDespawn, DreadstalkerTime() + CombatTime)
+    VarImpDespawn = mathmin(VarImpDespawn, DreadstalkerTime())
+  end
+  -- Manually added: variable,name=imp_despawn,op=set,value=(variable.imp_despawn>?buff.vilefiend.remains+time),if=variable.imp_despawn&setting.force_tyrant_vilefiend_sync.enabled
+  -- Note: Removed 'time' from the calculation, as it needlessly complicates its usage.
+  if VarImpDespawn > 0 and Settings.Demonology.ForceTyrantVilefiendSync then
+    VarImpDespawn = mathmin(VarImpDespawn, VilefiendTime())
   end
   -- variable,name=imp_despawn,op=set,value=variable.imp_despawn>?buff.grimoire_felguard.remains+time,if=variable.imp_despawn&buff.grimoire_felguard.up
+  -- Note: Removed 'time' from the calculation, as it needlessly complicates its usage.
   if VarImpDespawn > 0 and GrimoireFelguardActive() then
-    VarImpDespawn = mathmin(VarImpDespawn, GrimoireFelguardTime() + CombatTime)
+    VarImpDespawn = mathmin(VarImpDespawn, GrimoireFelguardTime())
   end
   -- variable,name=imp_despawn,op=set,value=0,if=buff.tyrant.up
   if DemonicTyrantActive() then
@@ -653,9 +666,6 @@ local function APL()
     -- Update Demonology-specific Tables
     Warlock.UpdatePetTable()
 
-    -- Update CombatTime, which is used in many spell suggestions
-    CombatTime = HL.CombatTime()
-
     -- Calculate Soul Shards
     SoulShards = Player:SoulShardsP()
 
@@ -708,7 +718,7 @@ local function APL()
       local ShouldReturn = FightEnd(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=opener,if=time<variable.first_tyrant_time
-    if CombatTime < VarFirstTyrantTime then
+    if HL.CombatTime() < VarFirstTyrantTime then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=tyrant,if=cooldown.summon_demonic_tyrant.remains<gcd.max*14
