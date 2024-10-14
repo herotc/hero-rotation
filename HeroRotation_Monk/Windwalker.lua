@@ -79,7 +79,7 @@ local VarTrinket1Spell, VarTrinket2Spell
 local VarTrinket1Range, VarTrinket2Range
 local VarTrinket1CastTime, VarTrinket2CastTime
 local VarTrinket1CD, VarTrinket2CD
-local VarTrinket1BL, VarTrinket2BL
+local VarTrinket1Ex, VarTrinket2Ex
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData(OnUseExcludes)
@@ -107,8 +107,8 @@ local function SetTrinketVariables()
   VarTrinket1CD = T1.Cooldown
   VarTrinket2CD = T2.Cooldown
 
-  VarTrinket1BL = T1.Blacklisted
-  VarTrinket2BL = T2.Blacklisted
+  VarTrinket1Ex = T1.Excluded
+  VarTrinket2Ex = T2.Excluded
 end
 SetTrinketVariables()
 
@@ -257,17 +257,17 @@ local function Trinkets()
       if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter trinkets 16"; end
     end
     -- ITEM_STAT_BUFF,if=pet.xuen_the_white_tiger.active
-    if Trinket1:IsReady() and not VarTrinket1BL and Trinket1:HasUseBuff() and (Monk.Xuen.Active) then
+    if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and Trinket1:HasUseBuff() and (Monk.Xuen.Active) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_items for " .. Trinket1:Name() .. " (trinkets stat_buff trinket1)"; end
     end
-    if Trinket2:IsReady() and not VarTrinket2BL and Trinket2:HasUseBuff() and (Monk.Xuen.Active) then
+    if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and Trinket2:HasUseBuff() and (Monk.Xuen.Active) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_items for " .. Trinket2:Name() .. " (trinkets stat_buff trinket2)"; end
     end
     -- ITEM_DMG_BUFF,if=!trinket.1.has_use_buff&!trinket.2.has_use_buff|(trinket.1.has_use_buff|trinket.2.has_use_buff)&cooldown.invoke_xuen_the_white_tiger.remains>30
-    if Trinket1:IsReady() and not VarTRinket1BL and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30) then
+    if Trinket1:IsReady() and not VarTRinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_items for " .. Trinket1:Name() .. " (trinkets dmg_buff trinket1)"; end
     end
-    if Trinket2:IsReady() and not VarTrinket2BL and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30) then
+    if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_items for " .. Trinket2:Name() .. " (trinkets dmg_buff trinket2)"; end
     end
   end

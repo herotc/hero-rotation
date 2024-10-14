@@ -69,7 +69,7 @@ local VarTrinket1ID, VarTrinket2ID
 local VarTrinket1Spell, VarTrinket1Range, VarTrinket1CastTime
 local VarTrinket2Spell, VarTrinket2Range, VarTrinket2CastTime
 local VarTrinket1CD, VarTrinket2CD
-local VarTrinket1BL, VarTrinket2BL
+local VarTrinket1Ex, VarTrinket2Ex
 local VarTrinket1Steroids, VarTrinket2Steroids
 local VarSpecialTrinket
 local VarTrinketFailures = 0
@@ -102,8 +102,8 @@ local function SetTrinketVariables()
   VarTrinket1CD = T1.Cooldown
   VarTrinket2CD = T2.Cooldown
 
-  VarTrinket1BL = T1.Blacklisted
-  VarTrinket2BL = T2.Blacklisted
+  VarTrinket1Ex = T1.Excluded
+  VarTrinket2Ex = T2.Excluded
 
   VarTrinket1Steroids = Trinket1:HasStatAnyDps()
   VarTrinket2Steroids = Trinket2:HasStatAnyDps()
@@ -233,11 +233,11 @@ local function Cooldown()
     -- do_treacherous_transmitter_task,if=cooldown.eye_beam.remains>15|cooldown.eye_beam.remains<5|fight_remains<20
     -- TODO
     -- use_item,slot=trinket1,if=((cooldown.eye_beam.remains<gcd.max&active_enemies>1|buff.metamorphosis.up)&(raid_event.adds.in>trinket.1.cooldown.duration-15|raid_event.adds.remains>8)|!trinket.1.has_buff.any|fight_remains<25)&!trinket.1.is.skardyns_grace&!trinket.1.is.mad_queens_mandate&!trinket.1.is.treacherous_transmitter&(!variable.special_trinket|trinket.2.cooldown.remains>20)
-    if Trinket1:IsReady() and not VarTrinket1BL and (((S.EyeBeam:CooldownRemains() < Player:GCD() and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket1:HasUseBuff() or BossFightRemains < 25) and not VarTrinket1ID == I.SkardynsGrace:ID() and not VarTrinket1ID == I.MadQueensMandate:ID() and not VarTrinket1ID == I.TreacherousTransmitter:ID() and (not VarSpecialTrinket or Trinket2:CooldownRemains() > 20)) then
+    if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (((S.EyeBeam:CooldownRemains() < Player:GCD() and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket1:HasUseBuff() or BossFightRemains < 25) and not VarTrinket1ID == I.SkardynsGrace:ID() and not VarTrinket1ID == I.MadQueensMandate:ID() and not VarTrinket1ID == I.TreacherousTransmitter:ID() and (not VarSpecialTrinket or Trinket2:CooldownRemains() > 20)) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "treacherous_transmitter cooldown 14"; end
     end
     -- use_item,slot=trinket2,if=((cooldown.eye_beam.remains<gcd.max&active_enemies>1|buff.metamorphosis.up)&(raid_event.adds.in>trinket.2.cooldown.duration-15|raid_event.adds.remains>8)|!trinket.2.has_buff.any|fight_remains<25)&!trinket.2.is.skardyns_grace&!trinket.2.is.mad_queens_mandate&!trinket.2.is.treacherous_transmitter&(!variable.special_trinket|trinket.1.cooldown.remains>20)
-    if Trinket2:IsReady() and not VarTrinket2BL and (((S.EyeBeam:CooldownRemains() < Player:GCD() and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket2:HasUseBuff() or BossFightRemains < 25) and not VarTrinket2ID == I.SkardynsGrace:ID() and not VarTrinket2ID == I.MadQueensMandate:ID() and not VarTrinket2ID == I.TreacherousTransmitter:ID() and (not VarSpecialTrinket or Trinket1:CooldownRemains() > 20)) then
+    if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (((S.EyeBeam:CooldownRemains() < Player:GCD() and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket2:HasUseBuff() or BossFightRemains < 25) and not VarTrinket2ID == I.SkardynsGrace:ID() and not VarTrinket2ID == I.MadQueensMandate:ID() and not VarTrinket2ID == I.TreacherousTransmitter:ID() and (not VarSpecialTrinket or Trinket1:CooldownRemains() > 20)) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "treacherous_transmitter cooldown 16"; end
     end
   end

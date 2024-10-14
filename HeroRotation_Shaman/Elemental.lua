@@ -67,7 +67,7 @@ local VarTrinket1Spell, VarTrinket2Spell
 local VarTrinket1Range, VarTrinket2Range
 local VarTrinket1CastTime, VarTrinket2CastTime
 local VarTrinket1CD, VarTrinket2CD
-local VarTrinket1BL, VarTrinket2BL
+local VarTrinket1Ex, VarTrinket2Ex
 local VarSpymasterIn1st, VarSpymasterIn2nd
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
@@ -96,8 +96,8 @@ local function SetTrinketVariables()
   VarTrinket1CD = T1.Cooldown
   VarTrinket2CD = T2.Cooldown
 
-  VarTrinket1BL = T1.Blacklisted
-  VarTrinket2BL = T2.Blacklisted
+  VarTrinket1Ex = T1.Excluded
+  VarTrinket2Ex = T2.Excluded
 
   VarSpymasterIn1st = T1.ID == I.SpymastersWeb:ID()
   VarSpymasterIn2nd = T2.ID == I.SpymastersWeb:ID()
@@ -636,11 +636,11 @@ local function APL()
     end
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,slot=trinket1,if=!variable.spymaster_in_1st|(fight_remains<45|time<fight_remains&buff.spymasters_report.stack=40)&cooldown.stormkeeper.remains<5|fight_remains<22
-      if Trinket1:IsReady() and not VarTrinket1BL and (not VarSpymasterIn1st or (BossFightRemains < 45 or HL.CombatTime() < FightRemains and Player:BuffStack(S.SpymastersWebBuff) == 40) and S.Stormkeeper:CooldownRemains() < 5 or BossFightRemains < 22) then
+      if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarSpymasterIn1st or (BossFightRemains < 45 or HL.CombatTime() < FightRemains and Player:BuffStack(S.SpymastersWebBuff) == 40) and S.Stormkeeper:CooldownRemains() < 5 or BossFightRemains < 22) then
         if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item trinket1 ("..Trinket1:Name()..") main 10"; end
       end
       -- use_item,slot=trinket2,if=!variable.spymaster_in_2nd|(fight_remains<45|time<fight_remains&buff.spymasters_report.stack=40)&cooldown.stormkeeper.remains<5|fight_remains<22
-      if Trinket2:IsReady() and not VarTrinket2BL and (not VarSpymasterIn2nd or (BossFightRemains < 45 or HL.CombatTime() < FightRemains and Player:BuffStack(S.SpymastersWebBuff) == 40) and S.Stormkeeper:CooldownRemains() < 5 or BossFightRemains < 22) then
+      if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarSpymasterIn2nd or (BossFightRemains < 45 or HL.CombatTime() < FightRemains and Player:BuffStack(S.SpymastersWebBuff) == 40) and S.Stormkeeper:CooldownRemains() < 5 or BossFightRemains < 22) then
         if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item trinket2 ("..Trinket2:Name()..") main 12"; end
       end
     end

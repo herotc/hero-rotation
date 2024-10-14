@@ -79,7 +79,7 @@ local VarTrinket1Spell, VarTrinket2Spell
 local VarTrinket1Range, VarTrinket2Range
 local VarTrinket1CastTime, VarTrinket2CastTime
 local VarTrinket1CD, VarTrinket2CD
-local VarTrinket1BL, VarTrinket2BL
+local VarTrinket1Ex, VarTrinket2Ex
 local VarTrinket1IsWeird, VarTrinket2IsWeird
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
@@ -108,8 +108,8 @@ local function SetTrinketVariables()
   VarTrinket1CD = T1.Cooldown
   VarTrinket2CD = T2.Cooldown
 
-  VarTrinket1BL = T1.Blacklisted
-  VarTrinket2BL = T2.Blacklisted
+  VarTrinket1Ex = T1.Excluded
+  VarTrinket2Ex = T2.Excluded
 
   VarTrinket1IsWeird = T1.ID == I.AlgetharPuzzleBox:ID() or T1.ID == I.ManicGrieftorch:ID() or T1.ID == I.ElementiumPocketAnvil:ID() or T1.ID == I.BeacontotheBeyond:ID()
   VarTrinket2IsWeird = T2.ID == I.AlgetharPuzzleBox:ID() or T2.ID == I.ManicGrieftorch:ID() or T2.ID == I.ElementiumPocketAnvil:ID() or T2.ID == I.BeacontotheBeyond:ID()
@@ -894,11 +894,11 @@ local function APL()
         if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "algethar_puzzle_box main 6"; end
       end
       -- use_item,slot=trinket1,if=!variable.trinket1_is_weird&trinket.1.has_use_buff&(buff.ascendance.up|buff.feral_spirit.up|buff.doom_winds.up|(fight_remains%%trinket.1.cooldown.duration<=trinket.1.buff.any.duration)|(variable.min_talented_cd_remains>=trinket.1.cooldown.duration)|(!talent.ascendance.enabled&!talent.feral_spirit.enabled&!talent.doom_winds.enabled))
-      if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1IsWeird and Trinket1:HasUseBuff() and (Player:BuffUp(S.AscendanceBuff) or Player:BuffUp(S.FeralSpiritBuff) or Player:BuffUp(S.DoomWindsBuff) or (FightRemains % VarTrinket1CD <= Trinket1:BuffDuration()) or (VarMinTalentedCDRemains >= VarTrinket1CD) or (not S.Ascendance:IsAvailable() and not S.FeralSpirit:IsAvailable() and not S.DoomWinds:IsAvailable()))) then
+      if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1IsWeird and Trinket1:HasUseBuff() and (Player:BuffUp(S.AscendanceBuff) or Player:BuffUp(S.FeralSpiritBuff) or Player:BuffUp(S.DoomWindsBuff) or (FightRemains % VarTrinket1CD <= Trinket1:BuffDuration()) or (VarMinTalentedCDRemains >= VarTrinket1CD) or (not S.Ascendance:IsAvailable() and not S.FeralSpirit:IsAvailable() and not S.DoomWinds:IsAvailable()))) then
         if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 main 8"; end
       end
       -- use_item,slot=trinket2,if=!variable.trinket2_is_weird&trinket.2.has_use_buff&(buff.ascendance.up|buff.feral_spirit.up|buff.doom_winds.up|(fight_remains%%trinket.2.cooldown.duration<=trinket.2.buff.any.duration)|(variable.min_talented_cd_remains>=trinket.2.cooldown.duration)|(!talent.ascendance.enabled&!talent.feral_spirit.enabled&!talent.doom_winds.enabled))
-      if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2IsWeird and Trinket2:HasUseBuff() and (Player:BuffUp(S.AscendanceBuff) or Player:BuffUp(S.FeralSpiritBuff) or Player:BuffUp(S.DoomWindsBuff) or (FightRemains % VarTrinket2CD <= Trinket2:BuffDuration()) or (VarMinTalentedCDRemains >= VarTrinket2CD) or (not S.Ascendance:IsAvailable() and not S.FeralSpirit:IsAvailable() and not S.DoomWinds:IsAvailable()))) then
+      if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2IsWeird and Trinket2:HasUseBuff() and (Player:BuffUp(S.AscendanceBuff) or Player:BuffUp(S.FeralSpiritBuff) or Player:BuffUp(S.DoomWindsBuff) or (FightRemains % VarTrinket2CD <= Trinket2:BuffDuration()) or (VarMinTalentedCDRemains >= VarTrinket2CD) or (not S.Ascendance:IsAvailable() and not S.FeralSpirit:IsAvailable() and not S.DoomWinds:IsAvailable()))) then
         if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 main 10"; end
       end
       -- use_item,name=beacon_to_the_beyond,use_off_gcd=1,if=(!buff.ascendance.up&!buff.feral_spirit.up&!buff.doom_winds.up)|(fight_remains%%150<=5)
@@ -910,11 +910,11 @@ local function APL()
         if Cast(I.ManicGrieftorch, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "manic_grieftorch main 14"; end
       end
       -- use_item,slot=trinket1,if=!variable.trinket1_is_weird&!trinket.1.has_use_buff
-      if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1IsWeird and not Trinket1:HasUseBuff()) then
+      if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1IsWeird and not Trinket1:HasUseBuff()) then
         if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 main 16"; end
       end
       -- use_item,slot=trinket2,if=!variable.trinket2_is_weird&!trinket.2.has_use_buff
-      if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2IsWeird and not Trinket2:HasUseBuff()) then
+      if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2IsWeird and not Trinket2:HasUseBuff()) then
         if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 main 18"; end
       end
     end

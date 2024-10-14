@@ -88,7 +88,7 @@ local FightRemains = 11111
 local Trinket1, Trinket2
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1Range, VarTrinket2Range
-local VarTrinket1BL, VarTrinket2BL
+local VarTrinket1Ex, VarTrinket2Ex
 local VarTrinket1Buffs, VarTrinket2Buffs
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
@@ -110,8 +110,8 @@ local function SetTrinketVariables()
   VarTrinket2CD     = T2.Cooldown
   VarTrinket1Range  = T1.Range
   VarTrinket2Range  = T2.Range
-  VarTrinket1BL     = T1.Blacklisted
-  VarTrinket2BL     = T2.Blacklisted
+  VarTrinket1Ex     = T1.Excluded
+  VarTrinket2Ex     = T2.Excluded
 
   VarTrinket1Buffs  = Trinket1:HasUseBuff()
   VarTrinket2Buffs  = Trinket2:HasUseBuff()
@@ -447,11 +447,11 @@ local function AR()
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,slot=trinket1,if=!variable.trinket_1_buffs|(variable.trinket_1_buffs&((buff.rending_strike.up&buff.glaive_flurry.up)|(prev_gcd.1.reavers_glaive)|(buff.thrill_of_the_fight_damage.remains>8)|(buff.reavers_glaive.up&cooldown.the_hunt.remains<5)))
-    if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs or (VarTrinket1Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 8) or (S.ReaversGlaive:IsLearned() and S.TheHunt:CooldownRemains() < 5)))) then
+    if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs or (VarTrinket1Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 8) or (S.ReaversGlaive:IsLearned() and S.TheHunt:CooldownRemains() < 5)))) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for AR trinket1 (" .. Trinket1:Name() .. ")"; end
     end
     -- use_item,slot=trinket2,if=!variable.trinket_2_buffs|(variable.trinket_2_buffs&((buff.rending_strike.up&buff.glaive_flurry.up)|(prev_gcd.1.reavers_glaive)|(buff.thrill_of_the_fight_damage.remains>8)|(buff.reavers_glaive.up&cooldown.the_hunt.remains<5)))
-    if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs or (VarTrinket2Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 8) or (S.ReaversGlaive:IsLearned() and S.TheHunt:CooldownRemains() < 5)))) then
+    if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs or (VarTrinket2Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 8) or (S.ReaversGlaive:IsLearned() and S.TheHunt:CooldownRemains() < 5)))) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for AR trinket2 (" .. Trinket2:Name() .. ")"; end
     end
   end
@@ -1008,11 +1008,11 @@ local function FS()
   VarHoldSoFForPrecombat = S.IlluminatedSigils:IsAvailable() and HL.CombatTime() < (3 - num(S.QuickenedSigils:IsAvailable()))
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,slot=trinket1,if=!variable.trinket_1_buffs|(variable.trinket_1_buffs&((buff.metamorphosis.up&buff.demonsurge_hardcast.up)|(buff.metamorphosis.up&!buff.demonsurge_hardcast.up&cooldown.metamorphosis.remains<10)|(cooldown.metamorphosis.remains>trinket.1.cooldown.duration)|(variable.trinket_2_buffs&trinket.2.cooldown.remains<cooldown.metamorphosis.remains)))
-    if Trinket1:IsReady() and not VarTrinket1BL and (not VarTrinket1Buffs or (VarTrinket1Buffs and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Demonsurge("Hardcast")) or (Player:BuffUp(S.MetamorphosisBuff) and not Player:Demonsurge("Hardcast") and S.Metamorphosis:CooldownRemains() < 10) or (S.Metamorphosis:CooldownRemains() > VarTrinket1CD) or (VarTrinket2Buffs and VarTrinket2CD < S.Metamorphosis:CooldownRemains())))) then
+    if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs or (VarTrinket1Buffs and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Demonsurge("Hardcast")) or (Player:BuffUp(S.MetamorphosisBuff) and not Player:Demonsurge("Hardcast") and S.Metamorphosis:CooldownRemains() < 10) or (S.Metamorphosis:CooldownRemains() > VarTrinket1CD) or (VarTrinket2Buffs and VarTrinket2CD < S.Metamorphosis:CooldownRemains())))) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for FS trinket1 (" .. Trinket1:Name() .. ")"; end
     end
     -- use_item,slot=trinket2,if=!variable.trinket_1_buffs|(variable.trinket_1_buffs&((buff.metamorphosis.up&buff.demonsurge_hardcast.up)|(buff.metamorphosis.up&!buff.demonsurge_hardcast.up&cooldown.metamorphosis.remains<10)|(cooldown.metamorphosis.remains>trinket.1.cooldown.duration)|(variable.trinket_2_buffs&trinket.2.cooldown.remains<cooldown.metamorphosis.remains)))
-    if Trinket2:IsReady() and not VarTrinket2BL and (not VarTrinket2Buffs or (VarTrinket2Buffs and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Demonsurge("Hardcast")) or (Player:BuffUp(S.MetamorphosisBuff) and not Player:Demonsurge("Hardcast") and S.Metamorphosis:CooldownRemains() < 10) or (S.Metamorphosis:CooldownRemains() > VarTrinket2CD) or (VarTrinket1Buffs and VarTrinket1CD < S.Metamorphosis:CooldownRemains())))) then
+    if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs or (VarTrinket2Buffs and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Demonsurge("Hardcast")) or (Player:BuffUp(S.MetamorphosisBuff) and not Player:Demonsurge("Hardcast") and S.Metamorphosis:CooldownRemains() < 10) or (S.Metamorphosis:CooldownRemains() > VarTrinket2CD) or (VarTrinket1Buffs and VarTrinket1CD < S.Metamorphosis:CooldownRemains())))) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for FS trinket2 (" .. Trinket2:Name() .. ")"; end
     end
   end
