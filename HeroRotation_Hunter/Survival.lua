@@ -30,9 +30,12 @@ local I = Item.Hunter.Survival
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  -- DF Trinkets
   I.AlgetharPuzzleBox:ID(),
   I.BeacontotheBeyond:ID(),
   I.ManicGrieftorch:ID(),
+  -- TWW Trinkets
+  I.MadQueensMandate:ID(),
 }
 
 --- ===== GUI Settings =====
