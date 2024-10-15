@@ -107,7 +107,9 @@ Spell.DeathKnight.Sanlayn = {
   EssenceoftheBloodQueenBuff            = Spell(433925),
   GiftoftheSanlaynBuff                  = Spell(434153),
   InflictionofSorrowBuff                = Spell(460049),
-  VampiricStrikeBuff                    = Spell(433899), -- Not available in 11.0.0, but will be in 11.0.2
+  VampiricStrikeBuff                    = Spell(433899),
+  -- Debuffs
+  InciteTerrorDebuff                    = Spell(458478),
 }
 
 Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
@@ -137,6 +139,7 @@ Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
   -- Buffs
   BoneShieldBuff                        = Spell(195181),
   CoagulopathyBuff                      = Spell(391481),
+  ConsumptionBuff                       = Spell(274156),
   CrimsonScourgeBuff                    = Spell(81141),
   DancingRuneWeaponBuff                 = Spell(81256),
   HemostasisBuff                        = Spell(273947),
