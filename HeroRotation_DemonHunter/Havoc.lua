@@ -56,6 +56,7 @@ local Settings = {
 
 --- ===== Rotation Variables =====
 local VarRGDS = 0
+local VarHeroTree = Player:HeroTreeID()
 local CombatTime = 0
 local BossFightRemains = 11111
 local FightRemains = 11111
@@ -120,6 +121,7 @@ local StunInterrupts = {
 --- ===== Event Registrations =====
 HL:RegisterForEvent(function()
   VarRGDS = 0
+  VarHeroTree = Player:HeroTreeID()
   CombatTime = 0
   BossFightRemains = 11111
   FightRemains = 11111
@@ -160,6 +162,11 @@ local function UseFelRush()
   return (Settings.Havoc.ConserveFelRush and S.FelRush:Charges() == 2) or not Settings.Havoc.ConserveFelRush
 end
 
+local function InertiaTrigger()
+  -- Return the conditions necessary to allow Fel Rush to trigger Inertia
+  return Player:BuffUp(S.UnboundChaosBuff) and S.FelRush:Charges() >= 1 and UseFelRush()
+end
+
 --- ===== CastTargetIfFilterFunctions =====
 local function ETIFBurningWound(TargetUnit)
   -- target_if=min:debuff.burning_wound.remains
@@ -198,12 +205,12 @@ local function Precombat()
 end
 
 local function Cooldown()
-  -- metamorphosis,if=((!talent.initiative|cooldown.vengeful_retreat.remains)&(cooldown.eye_beam.remains>=20&(!talent.essence_break|debuff.essence_break.up)&buff.fel_barrage.down&(raid_event.adds.in>40|(raid_event.adds.remains>8|!talent.fel_barrage)&active_enemies>2)|!talent.chaotic_transformation|fight_remains<30)&buff.inner_demon.down&(!talent.restless_hunter&cooldown.blade_dance.remains>gcd.max*3|prev_gcd.1.death_sweep))&!talent.inertia&!talent.essence_break&(hero_tree.aldrachi_reaver|buff.demonsurge_death_sweep.down)&time>15
-  if CDsON() and S.Metamorphosis:IsCastable() and (((not S.Initiative:IsAvailable() or S.VengefulRetreat:CooldownDown()) and (S.EyeBeam:CooldownRemains() >= 20 and (not S.EssenceBreak:IsAvailable() or Target:DebuffUp(S.EssenceBreakDebuff)) and Player:BuffDown(S.FelBarrageBuff) or not S.ChaoticTransformation:IsAvailable() or BossFightRemains < 30) and Player:BuffDown(S.InnerDemonBuff) and (not S.RestlessHunter:IsAvailable() and S.BladeDance:CooldownRemains() > Player:GCD() * 3 or Player:PrevGCD(1, S.DeathSweep))) and not S.Inertia:IsAvailable() and not S.EssenceBreak:IsAvailable() and (Player:HeroTreeID() == 35 or not Player:Demonsurge("DeathSweep")) and CombatTime > 15) then
+  -- metamorphosis,if=((cooldown.eye_beam.remains>=20&(!talent.essence_break|debuff.essence_break.up)&buff.fel_barrage.down&(raid_event.adds.in>40|(raid_event.adds.remains>8|!talent.fel_barrage)&active_enemies>2)|!talent.chaotic_transformation|fight_remains<30)&buff.inner_demon.down&(!talent.restless_hunter&cooldown.blade_dance.remains>gcd.max*3|prev_gcd.1.death_sweep))&!talent.inertia&!talent.essence_break&(hero_tree.aldrachi_reaver|buff.demonsurge_death_sweep.down)&time>15
+  if CDsON() and S.Metamorphosis:IsCastable() and (((S.EyeBeam:CooldownRemains() >= 20 and (not S.EssenceBreak:IsAvailable() or Target:DebuffUp(S.EssenceBreakDebuff)) and Player:BuffDown(S.FelBarrageBuff) or not S.ChaoticTransformation:IsAvailable() or BossFightRemains < 30) and Player:BuffDown(S.InnerDemonBuff) and (not S.RestlessHunter:IsAvailable() and S.BladeDance:CooldownRemains() > Player:GCD() * 3 or Player:PrevGCD(1, S.DeathSweep))) and not S.Inertia:IsAvailable() and not S.EssenceBreak:IsAvailable() and (VarHeroTree == 35 or not Player:Demonsurge("DeathSweep")) and CombatTime > 15) then
     if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis, not Target:IsInRange(40)) then return "metamorphosis cooldown 2"; end
   end
-  -- metamorphosis,if=((!talent.initiative|cooldown.vengeful_retreat.remains)&cooldown.blade_dance.remains&((prev_gcd.1.death_sweep|prev_gcd.2.death_sweep|prev_gcd.3.death_sweep|buff.metamorphosis.up&buff.metamorphosis.remains<gcd.max)&cooldown.eye_beam.remains&(!talent.essence_break|debuff.essence_break.up|talent.shattered_destiny|hero_tree.felscarred)&buff.fel_barrage.down&(raid_event.adds.in>40|(raid_event.adds.remains>8|!talent.fel_barrage)&active_enemies>2)|!talent.chaotic_transformation|fight_remains<30)&(buff.inner_demon.down&(buff.rending_strike.down|!talent.restless_hunter|prev_gcd.1.death_sweep)))&(talent.inertia|talent.essence_break)&(hero_tree.aldrachi_reaver|(buff.demonsurge_death_sweep.down|buff.metamorphosis.remains<gcd.max)&(buff.demonsurge_annihilation.down))&time>15
-  if CDsON() and S.Metamorphosis:IsCastable() and (((not S.Initiative:IsAvailable() or S.VengefulRetreat:CooldownDown()) and S.BladeDance:CooldownDown() and ((Player:PrevGCD(1, S.DeathSweep) or Player:PrevGCD(2, S.DeathSweep) or Player:PrevGCD(3, S.DeathSweep) or Player:BuffUp(S.MetamorphosisBuff) and Player:BuffRemains(S.MetamorphosisBuff) < Player:GCD()) and S.EyeBeam:CooldownDown() and (not S.EssenceBreak:IsAvailable() or Target:DebuffUp(S.EssenceBreakDebuff) or S.ShatteredDestiny:IsAvailable() or Player:HeroTreeID() == 34) and Player:BuffDown(S.FelBarrageBuff) or not S.ChaoticTransformation:IsAvailable() or BossFightRemains < 30) and (Player:BuffDown(S.InnerDemonBuff) and (Player:BuffDown(S.RendingStrikeBuff) or not S.RestlessHunter:IsAvailable() or Player:PrevGCD(1, S.DeathSweep)))) and (S.Inertia:IsAvailable() or S.EssenceBreak:IsAvailable()) and (Player:HeroTreeID() == 35 or (not Player:Demonsurge("DeathSweep") or Player:BuffRemains(S.MetamorphosisBuff) < Player:GCD()) and (not Player:Demonsurge("Annihilation"))) and CombatTime > 15) then
+  -- metamorphosis,if=(cooldown.blade_dance.remains&((prev_gcd.1.death_sweep|prev_gcd.2.death_sweep|prev_gcd.3.death_sweep|buff.metamorphosis.up&buff.metamorphosis.remains<gcd.max)&cooldown.eye_beam.remains&(!talent.essence_break|debuff.essence_break.up|talent.shattered_destiny|hero_tree.felscarred)&buff.fel_barrage.down&(raid_event.adds.in>40|(raid_event.adds.remains>8|!talent.fel_barrage)&active_enemies>2)|!talent.chaotic_transformation|fight_remains<30)&(buff.inner_demon.down&(buff.rending_strike.down|!talent.restless_hunter|prev_gcd.1.death_sweep)))&(talent.inertia|talent.essence_break)&(hero_tree.aldrachi_reaver|(buff.demonsurge_death_sweep.down|buff.metamorphosis.remains<gcd.max)&(buff.demonsurge_annihilation.down))&time>15
+  if CDsON() and S.Metamorphosis:IsCastable() and ((S.BladeDance:CooldownDown() and ((Player:PrevGCD(1, S.DeathSweep) or Player:PrevGCD(2, S.DeathSweep) or Player:PrevGCD(3, S.DeathSweep) or Player:BuffUp(S.MetamorphosisBuff) and Player:BuffRemains(S.MetamorphosisBuff) < Player:GCD()) and S.EyeBeam:CooldownDown() and (not S.EssenceBreak:IsAvailable() or Target:DebuffUp(S.EssenceBreakDebuff) or S.ShatteredDestiny:IsAvailable() or VarHeroTree == 34) and Player:BuffDown(S.FelBarrageBuff) or not S.ChaoticTransformation:IsAvailable() or BossFightRemains < 30) and (Player:BuffDown(S.InnerDemonBuff) and (Player:BuffDown(S.RendingStrikeBuff) or not S.RestlessHunter:IsAvailable() or Player:PrevGCD(1, S.DeathSweep)))) and (S.Inertia:IsAvailable() or S.EssenceBreak:IsAvailable()) and (VarHeroTree == 35 or (not Player:Demonsurge("DeathSweep") or Player:BuffRemains(S.MetamorphosisBuff) < Player:GCD()) and (not Player:Demonsurge("Annihilation"))) and CombatTime > 15) then
     if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis, not Target:IsInRange(40)) then return "metamorphosis cooldown 4"; end
   end
   -- potion,if=fight_remains<35|buff.metamorphosis.up|debuff.essence_break.up
@@ -241,12 +248,12 @@ local function Cooldown()
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "treacherous_transmitter cooldown 16"; end
     end
   end
-  -- the_hunt,if=debuff.essence_break.down&(active_enemies>=desired_targets+raid_event.adds.count|raid_event.adds.in>90)&(debuff.reavers_mark.up|!hero_tree.aldrachi_reaver)&buff.reavers_glaive.down&(buff.metamorphosis.remains>5|buff.metamorphosis.down)&(!talent.initiative|buff.initiative.up|time>5)
-  if S.TheHunt:IsCastable() and (Target:DebuffDown(S.EssenceBreakDebuff) and (Target:DebuffUp(S.ReaversMarkDebuff) or Player:HeroTreeID() ~= 35) and not S.ReaversGlaive:IsLearned() and (Player:BuffRemains(S.MetamorphosisBuff) > 5 or Player:BuffDown(S.MetamorphosisBuff)) and (not S.Initiative:IsAvailable() or Player:BuffUp(S.InitiativeBuff) or CombatTime > 5)) then
+  -- the_hunt,if=debuff.essence_break.down&(active_enemies>=desired_targets+raid_event.adds.count|raid_event.adds.in>90)&(debuff.reavers_mark.up|!hero_tree.aldrachi_reaver)&buff.reavers_glaive.down&(buff.metamorphosis.remains>5|buff.metamorphosis.down)&(!talent.initiative|buff.initiative.up|time>5)&time>5
+  if S.TheHunt:IsCastable() and (Target:DebuffDown(S.EssenceBreakDebuff) and (Target:DebuffUp(S.ReaversMarkDebuff) or VarHeroTree ~= 35) and not S.ReaversGlaive:IsLearned() and (Player:BuffRemains(S.MetamorphosisBuff) > 5 or Player:BuffDown(S.MetamorphosisBuff)) and (not S.Initiative:IsAvailable() or Player:BuffUp(S.InitiativeBuff) or CombatTime > 5) and CombatTime > 5) then
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt cooldown 18"; end
   end
   -- sigil_of_spite,if=debuff.essence_break.down&(debuff.reavers_mark.remains>=2-talent.quickened_sigils|!hero_tree.aldrachi_reaver)&cooldown.blade_dance.remains&time>15
-  if S.SigilofSpite:IsReady() and (Target:DebuffDown(S.EssenceBreakDebuff) and (Target:DebuffRemains(S.ReaversMarkDebuff) >= 2 - num(S.QuickenedSigils:IsAvailable()) or Player:HeroTreeID() ~= 35) and S.BladeDance:CooldownDown() and CombatTime> 15) then
+  if S.SigilofSpite:IsReady() and (Target:DebuffDown(S.EssenceBreakDebuff) and (Target:DebuffRemains(S.ReaversMarkDebuff) >= 2 - num(S.QuickenedSigils:IsAvailable()) or VarHeroTree ~= 35) and S.BladeDance:CooldownDown() and CombatTime> 15) then
     if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_spite cooldown 20"; end
   end
 end
@@ -255,7 +262,7 @@ local function FelBarrageFunc()
   -- variable,name=generator_up,op=set,value=cooldown.felblade.remains<gcd.max|cooldown.sigil_of_flame.remains<gcd.max
   VarGeneratorUp = S.Felblade:CooldownRemains() < Player:GCD() or S.SigilofFlame:CooldownRemains() < Player:GCD()
   -- variable,name=fury_gen,op=set,value=talent.demon_blades*(1%(2.6*attack_haste)*12*((hero_tree.felscarred&buff.metamorphosis.up)*0.33+1))+buff.immolation_aura.stack*6+buff.tactical_retreat.up*10
-  VarFuryGen = num(S.DemonBlades:IsAvailable()) * (1 / (2.6 * Player:HastePct()) * 12 * (num(Player:HeroTreeID() == 34 and Player:BuffUp(S.MetamorphosisBuff)) * 0.33 + 1)) + Player:BuffStack(ImmoAbility) * 6 + num(Player:BuffUp(S.TacticalRetreatBuff)) * 10
+  VarFuryGen = num(S.DemonBlades:IsAvailable()) * (1 / (2.6 * Player:HastePct()) * 12 * (num(VarHeroTree == 34 and Player:BuffUp(S.MetamorphosisBuff)) * 0.33 + 1)) + Player:BuffStack(ImmoAbility) * 6 + num(Player:BuffUp(S.TacticalRetreatBuff)) * 10
   -- variable,name=gcd_drain,op=set,value=gcd.max*32
   VarGCDDrain = Player:GCD() * 32
   -- annihilation,if=buff.inner_demon.up
@@ -266,8 +273,8 @@ local function FelBarrageFunc()
   if S.EyeBeam:IsReady() and (Player:BuffDown(S.FelBarrageBuff)) then
     if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not IsInMeleeRange(20)) then return "eye_beam fel_barrage 4"; end
   end
-  -- abyssal_gaze,if=buff.fel_barrage.down&(active_enemies>1&raid_event.adds.up|raid_event.adds.in>40)&buff.demonsurge_abyssal_gaze.up
-  if S.AbyssalGaze:IsReady() and (Player:BuffDown(S.FelBarrageBuff) and Player:Demonsurge("AbyssalGaze")) then
+  -- abyssal_gaze,if=buff.fel_barrage.down&(active_enemies>1&raid_event.adds.up|raid_event.adds.in>40)
+  if S.AbyssalGaze:IsReady() and (Player:BuffDown(S.FelBarrageBuff)) then
     if Cast(S.AbyssalGaze, Settings.Havoc.GCDasOffGCD.AbyssalGaze, nil, not IsInMeleeRange(20)) then return "abyssal_gaze fel_barrage 6"; end
   end
   -- essence_break,if=buff.fel_barrage.down&buff.metamorphosis.up
@@ -349,24 +356,28 @@ local function FelBarrageFunc()
 end
 
 local function Meta()
-  -- death_sweep,if=buff.metamorphosis.remains<gcd.max|(hero_tree.felscarred&talent.chaos_theory&talent.essence_break&((cooldown.metamorphosis.up&(!buff.unbound_chaos.up|!talent.inertia))|prev_gcd.1.metamorphosis)&buff.demonsurge.stack=0)
-  if S.DeathSweep:IsReady() and (Player:BuffRemains(S.MetamorphosisBuff) < Player:GCD() or (Player:HeroTreeID() == 34 and S.ChaosTheory:IsAvailable() and S.EssenceBreak:IsAvailable() and ((S.Metamorphosis:CooldownUp() and (not Player:BuffUp(S.UnboundChaosBuff) or not S.Inertia:IsAvailable())) or Player:PrevGCD(1, S.Metamorphosis)) and Player:BuffDown(S.DemonsurgeBuff))) then
+  -- death_sweep,if=buff.metamorphosis.remains<gcd.max|(hero_tree.felscarred&talent.chaos_theory&talent.essence_break&(cooldown.metamorphosis.up|prev_gcd.1.metamorphosis)&buff.demonsurge.stack=0)&(!talent.restless_hunter|cooldown.metamorphosis.remains&cooldown.essence_break.remains)
+  if S.DeathSweep:IsReady() and (Player:BuffRemains(S.MetamorphosisBuff) < Player:GCD() or (VarHeroTree == 34 and S.ChaosTheory:IsAvailable() and S.EssenceBreak:IsAvailable() and (S.Metamorphosis:CooldownUp() or Player:PrevGCD(1, S.Metamorphosis)) and Player:BuffDown(S.DemonsurgeBuff)) and (not S.RestlessHunter:IsAvailable() or S.Metamorphosis:CooldownDown() and S.EssenceBreak:CooldownDown())) then
     if Cast(S.DeathSweep, nil, nil, not IsInMeleeRange(8)) then return "death_sweep meta 2"; end
   end
-  -- annihilation,if=buff.metamorphosis.remains<gcd.max|debuff.essence_break.remains&debuff.essence_break.remains<0.5
+  -- vengeful_retreat,use_off_gcd=1,if=talent.initiative&cooldown.metamorphosis.remains&cooldown.eye_beam.remains
+  if S.VengefulRetreat:IsCastable() and (S.Initiative:IsAvailable() and S.Metamorphosis:CooldownDown() and S.EyeBeam:CooldownDown()) then
+    if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat opener 3"; end
+  end
+  -- annihilation,if=buff.metamorphosis.remains<gcd.max|debuff.essence_break.remains&debuff.essence_break.remains<0.5|talent.restless_hunter&buff.demonsurge_annihilation.up&cooldown.essence_break.up&cooldown.metamorphosis.up
   -- Note: Adding 0.5s extra to the debuff check to account for player latency.
-  if S.Annihilation:IsReady() and (Player:BuffRemains(S.MetamorphosisBuff) < Player:GCD() or Target:DebuffUp(S.EssenceBreakDebuff) and Target:DebuffRemains(S.EssenceBreakDebuff) < 1) then
+  if S.Annihilation:IsReady() and (Player:BuffRemains(S.MetamorphosisBuff) < Player:GCD() or Target:DebuffUp(S.EssenceBreakDebuff) and Target:DebuffRemains(S.EssenceBreakDebuff) < 1 or S.RestlessHunter:IsAvailable() and Player:Demonsurge("Annihilation") and S.EssenceBreak:CooldownUp() and S.Metamorphosis:CooldownUp()) then
     if Cast(S.Annihilation, nil, nil, not IsInMeleeRange(5)) then return "annihilation meta 4"; end
   end
   -- annihilation,if=(hero_tree.felscarred&buff.demonsurge_annihilation.up&(talent.restless_hunter|!talent.chaos_theory|buff.chaos_theory.up))&(cooldown.eye_beam.remains<gcd.max*3&cooldown.blade_dance.remains|cooldown.metamorphosis.remains<gcd.max*3)
-  if S.Annihilation:IsReady() and ((Player:HeroTreeID() == 34 and Player:Demonsurge("Annihilation") and (S.RestlessHunter:IsAvailable() or not S.ChaosTheory:IsAvailable() or Player:BuffUp(S.ChaosTheoryBuff))) and (S.EyeBeam:CooldownRemains() < Player:GCD() * 3 and S.BladeDance:CooldownDown() or S.Metamorphosis:CooldownRemains() < Player:GCD() * 3)) then
+  if S.Annihilation:IsReady() and ((VarHeroTree == 34 and Player:Demonsurge("Annihilation") and (S.RestlessHunter:IsAvailable() or not S.ChaosTheory:IsAvailable() or Player:BuffUp(S.ChaosTheoryBuff))) and (S.EyeBeam:CooldownRemains() < Player:GCD() * 3 and S.BladeDance:CooldownDown() or S.Metamorphosis:CooldownRemains() < Player:GCD() * 3)) then
     if Cast(S.Annihilation, nil, nil, not IsInMeleeRange(5)) then return "annihilation meta 6"; end
   end
   if S.FelRush:IsCastable() and UseFelRush() and (
-    -- fel_rush,if=buff.inertia_trigger.up&talent.inertia&cooldown.metamorphosis.up&(!hero_tree.felscarred|cooldown.eye_beam.remains)
-    (Player:BuffUp(S.InertiaBuff) and S.Inertia:IsAvailable() and S.Metamorphosis:CooldownUp() and (Player:HeroTreeID() ~= 34 or S.EyeBeam:CooldownDown())) or
-    -- fel_rush,if=buff.inertia_trigger.up&talent.inertia&cooldown.blade_dance.remains<gcd.max*3&(!hero_tree.felscarred|cooldown.eye_beam.remains)
-    (Player:BuffUp(S.InertiaBuff) and S.Inertia:IsAvailable() and S.BladeDance:CooldownRemains() < Player:GCD() * 3 and (Player:HeroTreeID() ~= 34 or S.EyeBeam:CooldownDown())) or
+    -- fel_rush,if=buff.inertia_trigger.up&talent.inertia&cooldown.metamorphosis.remains&(!hero_tree.felscarred|cooldown.eye_beam.remains)
+    (InertiaTrigger() and S.Inertia:IsAvailable() and S.Metamorphosis:CooldownDown() and (VarHeroTree ~= 34 or S.EyeBeam:CooldownDown())) or
+    -- fel_rush,if=buff.inertia_trigger.up&talent.inertia&cooldown.blade_dance.remains<gcd.max*3&(!hero_tree.felscarred|cooldown.eye_beam.remains)&cooldown.metamorphosis.remains
+    (InertiaTrigger() and S.Inertia:IsAvailable() and S.BladeDance:CooldownRemains() < Player:GCD() * 3 and (VarHeroTree ~= 34 or S.EyeBeam:CooldownDown()) and S.Metamorphosis:CooldownDown()) or
     -- fel_rush,if=talent.momentum&buff.momentum.remains<gcd.max*2
     (S.Momentum:IsAvailable() and Player:BuffRemains(S.MomentumBuff) < Player:GCD() * 2)
   ) then
@@ -385,11 +396,11 @@ local function Meta()
     if Cast(S.EssenceBreak, Settings.Havoc.GCDasOffGCD.EssenceBreak, nil, not IsInMeleeRange(10)) then return "essence_break meta 14"; end
   end
   -- essence_break,if=fury>20&(cooldown.metamorphosis.remains>10|cooldown.blade_dance.remains<gcd.max*2)&(buff.unbound_chaos.down|buff.inertia.up|!talent.inertia)&buff.out_of_range.remains<gcd.max&(!talent.shattered_destiny|cooldown.eye_beam.remains>4)&(!hero_tree.felscarred|active_enemies>1|cooldown.metamorphosis.remains>5&cooldown.eye_beam.remains)|fight_remains<10
-  if S.EssenceBreak:IsCastable() and (Player:Fury() > 20 and (S.Metamorphosis:CooldownRemains() > 10 or S.BladeDance:CooldownRemains() < Player:GCD() * 2) and (Player:BuffDown(S.UnboundChaosBuff) or Player:BuffUp(S.InertiaBuff) or not S.Inertia:IsAvailable()) and (not S.ShatteredDestiny:IsAvailable() or S.EyeBeam:CooldownRemains() > 4) and (Player:HeroTreeID() ~= 34 or Enemies8yCount > 1 or S.Metamorphosis:CooldownRemains() > 5 and S.EyeBeam:CooldownDown()) or BossFightRemains < 10) then
+  if S.EssenceBreak:IsCastable() and (Player:Fury() > 20 and (S.Metamorphosis:CooldownRemains() > 10 or S.BladeDance:CooldownRemains() < Player:GCD() * 2) and (Player:BuffDown(S.UnboundChaosBuff) or Player:BuffUp(S.InertiaBuff) or not S.Inertia:IsAvailable()) and (not S.ShatteredDestiny:IsAvailable() or S.EyeBeam:CooldownRemains() > 4) and (VarHeroTree ~= 34 or Enemies8yCount > 1 or S.Metamorphosis:CooldownRemains() > 5 and S.EyeBeam:CooldownDown()) or BossFightRemains < 10) then
     if Cast(S.EssenceBreak, Settings.Havoc.GCDasOffGCD.EssenceBreak, nil, not IsInMeleeRange(10)) then return "essence_break meta 16"; end
   end
   -- immolation_aura,if=cooldown.blade_dance.remains&talent.inertia&buff.metamorphosis.remains>10&hero_tree.felscarred&full_recharge_time<gcd.max*2&buff.unbound_chaos.down&debuff.essence_break.down
-  if ImmoAbility:IsCastable() and (S.BladeDance:CooldownDown() and S.Inertia:IsAvailable() and Player:BuffRemains(S.MetamorphosisBuff) > 10 and Player:HeroTreeID() == 34 and ImmoAbility:FullRechargeTime() < Player:GCD() * 2 and Player:BuffDown(S.UnboundChaosBuff) and Target:DebuffDown(S.EssenceBreakDebuff)) then
+  if ImmoAbility:IsCastable() and (S.BladeDance:CooldownDown() and S.Inertia:IsAvailable() and Player:BuffRemains(S.MetamorphosisBuff) > 10 and VarHeroTree == 34 and ImmoAbility:FullRechargeTime() < Player:GCD() * 2 and Player:BuffDown(S.UnboundChaosBuff) and Target:DebuffDown(S.EssenceBreakDebuff)) then
     if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura meta 18"; end
   end
   -- sigil_of_doom,if=cooldown.blade_dance.remains&debuff.essence_break.down
@@ -404,16 +415,20 @@ local function Meta()
   if ImmoAbility:IsCastable() and (Target:DebuffDown(S.EssenceBreakDebuff) and S.BladeDance:CooldownRemains() > Player:GCD() + 0.5 and Player:BuffDown(S.UnboundChaosBuff) and S.Inertia:IsAvailable() and Player:BuffDown(S.InertiaBuff) and ImmoAbility:FullRechargeTime() + 3 < S.EyeBeam:CooldownRemains() and Player:BuffRemains(S.MetamorphosisBuff) > 5) then
     if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura meta 24"; end
   end
-  -- death_sweep
-  if S.DeathSweep:IsReady() then
+  -- death_sweep,if=!talent.cycle_of_hatred
+  if S.DeathSweep:IsReady() and (not S.CycleofHatred:IsAvailable()) then
     if Cast(S.DeathSweep, nil, nil, not IsInMeleeRange(8)) then return "death_sweep meta 26"; end
+  end
+  -- death_sweep,if=(debuff.essence_break.up|cooldown.essence_break.remains>=gcd.max*2|(cooldown.metamorphosis.up&cooldown.eye_beam.remains&!talent.restless_hunter)|!talent.essence_break|(prev_gcd.1.metamorphosis&talent.chaotic_transformation))&talent.cycle_of_hatred
+  if S.DeathSweep:IsReady() and ((Target:DebuffUp(S.EssenceBreakDebuff) or S.EssenceBreak:CooldownRemains() >= Player:GCD() * 2 or (S.Metamorphosis:CooldownUp() and S.EyeBeam:CooldownDown() and not S.RestlessHunter:IsAvailable()) or not S.EssenceBreak:IsAvailable() or (Player:PrevGCD(1, S.Metamorphosis) and S.ChaoticTransformation:IsAvailable())) and S.CycleofHatred:IsAvailable()) then
+    if Cast(S.DeathSweep, nil, nil, not IsInMeleeRange(8)) then return "death_sweep meta 27"; end
   end
   -- eye_beam,if=debuff.essence_break.down&buff.inner_demon.down
   if S.EyeBeam:IsReady() and (Target:DebuffDown(S.EssenceBreakDebuff) and Player:BuffDown(S.InnerDemonBuff)) then
     if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not IsInMeleeRange(20)) then return "eye_beam meta 28"; end
   end
-  -- abyssal_gaze,if=debuff.essence_break.down&buff.inner_demon.down&buff.demonsurge_abyssal_gaze.up
-  if S.AbyssalGaze:IsReady() and (Target:DebuffDown(S.EssenceBreakDebuff) and Player:BuffDown(S.InnerDemonBuff) and Player:Demonsurge("AbyssalGaze")) then
+  -- abyssal_gaze,if=debuff.essence_break.down&buff.inner_demon.down
+  if S.AbyssalGaze:IsReady() and (Target:DebuffDown(S.EssenceBreakDebuff) and Player:BuffDown(S.InnerDemonBuff)) then
     if Cast(S.AbyssalGaze, Settings.Havoc.GCDasOffGCD.AbyssalGaze, nil, not IsInMeleeRange(20)) then return "abyssal_gaze meta 30"; end
   end
   -- glaive_tempest,if=debuff.essence_break.down&(cooldown.blade_dance.remains>gcd.max*2|fury>60)&(active_enemies>=desired_targets+raid_event.adds.count|raid_event.adds.in>10)
@@ -475,117 +490,115 @@ local function Opener()
   -- Manually added: metamorphosis,if=prev_gcd.1.vengeful_retreat
   -- Note: Timing is super tight for the natural opener Meta, so we'll put it here.
   if CDsON() and S.Metamorphosis:IsCastable() and Player:PrevOffGCDP(1, S.VengefulRetreat) then
-    if Cast(S.Metamorphosis, nil, nil, not IsInMeleeRange(40)) then return "metamorphosis opener 1"; end
+    if Cast(S.Metamorphosis, nil, nil, not IsInMeleeRange(40)) then return "metamorphosis opener 2"; end
   end
   -- potion
   if Settings.Commons.Enabled.Potions then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion opener 2"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion opener 4"; end
     end
   end
-  -- vengeful_retreat,use_off_gcd=1,if=(prev_gcd.1.death_sweep&buff.initiative.remains<2&buff.inner_demon.down|buff.initiative.remains<0.5&debuff.initiative_tracker.up&(!talent.inertia|buff.unbound_chaos.down))&((!talent.essence_break&talent.shattered_destiny)|(talent.essence_break&!talent.shattered_destiny)|(!talent.shattered_destiny&!talent.essence_break))|prev_gcd.2.death_sweep&prev_gcd.1.annihilation
+  -- vengeful_retreat,use_off_gcd=1,if=talent.initiative&(buff.initiative.down|talent.restless_hunter&buff.initiative.remains<=0.1)&time>4&((talent.essence_break&!talent.restless_hunter&cooldown.metamorphosis.remains&cooldown.eye_beam.remains)|(talent.essence_break&talent.restless_hunter&(buff.demonsurge_annihilation.down|prev_gcd.1.death_sweep)&(cooldown.eye_beam.remains|debuff.essence_break.up)&buff.metamorphosis.up)|!talent.essence_break)
   -- Note: Added 0.5s to Initiative buff check to account for player latency.
-  -- TODO: Handle debuff.initiative_tracker.up.
-  if S.VengefulRetreat:IsCastable() and ((Player:PrevGCD(1, S.DeathSweep) and Player:BuffRemains(S.InitiativeBuff) < 2 and Player:BuffDown(S.InnerDemonBuff) or Player:BuffRemains(S.InitiativeBuff) < 1 and (not S.Inertia:IsAvailable() or Player:BuffDown(S.UnboundChaosBuff))) and ((not S.EssenceBreak:IsAvailable() and S.ShatteredDestiny:IsAvailable()) or (S.EssenceBreak:IsAvailable() and not S.ShatteredDestiny:IsAvailable()) or (not S.ShatteredDestiny:IsAvailable() and not S.EssenceBreak:IsAvailable())) or Player:PrevGCD(2, S.DeathSweep) and Player:PrevGCD(1, S.Annihilation)) then
+  if S.VengefulRetreat:IsCastable() and (S.Initiative:IsAvailable() and (Player:BuffDown(S.InitiativeBuff) or S.RestlessHunter:IsAvailable() and Player:BuffRemains(S.InitiativeBuff) <= 0.6) and CombatTime > 4 and ((S.EssenceBreak:IsAvailable() and not S.RestlessHunter:IsAvailable() and S.Metamorphosis:CooldownDown() and S.EyeBeam:CooldownDown()) or (S.EssenceBreak:IsAvailable() and S.RestlessHunter:IsAvailable() and (not Player:Demonsurge("Annihilation") or Player:PrevGCD(1, S.DeathSweep)) and (S.EyeBeam:CooldownDown() or Target:DebuffUp(S.EssenceBreakDebuff)) and Player:BuffUp(S.MetamorphosisBuff)) or not S.EssenceBreak:IsAvailable())) then
     if S.Metamorphosis:IsCastable() then
-      if HR.CastQueue(S.VengefulRetreat, S.Metamorphosis) then return "vengeful_retreat and metamorphosis opener 4"; end
+      if HR.CastQueue(S.VengefulRetreat, S.Metamorphosis) then return "vengeful_retreat and metamorphosis opener 6"; end
     else
-      if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat opener 4"; end
+      if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat opener 8"; end
     end
   end
-  -- vengeful_retreat,use_off_gcd=1,if=buff.metamorphosis.up&cooldown.metamorphosis.remains&cooldown.essence_break.up&cooldown.eye_beam.remains&talent.shattered_destiny&talent.essence_break&(cooldown.sigil_of_spite.remains|!hero_tree.aldrachi_reaver)
-  if S.VengefulRetreat:IsCastable() and (Player:BuffUp(S.MetamorphosisBuff) and S.Metamorphosis:CooldownDown() and S.EssenceBreak:CooldownUp() and S.EyeBeam:CooldownDown() and S.ShatteredDestiny:IsAvailable() and S.EssenceBreak:IsAvailable() and (S.SigilofSpite:CooldownDown() or Player:HeroTreeID() ~= 35)) then
-    if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat opener 6"; end
+  -- fel_rush,if=talent.inertia&buff.inertia_trigger.up&talent.essence_break&cooldown.metamorphosis.remains&buff.demonsurge.stack=4&buff.demonsurge_abyssal_gaze.up
+  if S.FelRush:IsCastable() and UseFelRush() and (S.Inertia:IsAvailable() and InertiaTrigger() and S.EssenceBreak:IsAvailable() and S.Metamorphosis:CooldownDown() and Player:BuffStack(S.DemonsurgeBuff) == 4 and Player:Demonsurge("AbyssalGaze")) then
+    if Cast(S.FelRush, nil, Settings.CommonsDS.DisplayStyle.FelRush) then return "fel_rush opener 10"; end
   end
-  -- annihilation,if=hero_tree.felscarred&buff.demonsurge_annihilation.up&talent.restless_hunter,line_cd=10
+  -- annihilation,if=buff.demonsurge_annihilation.up&talent.restless_hunter,line_cd=10
   -- TODO: Handle line_cd. May not matter, due to Demonsurge check.
-  if S.Annihilation:IsCastable() and (Player:HeroTreeID() == 34 and Player:Demonsurge("Annihilation") and S.RestlessHunter:IsAvailable()) then
-    if Cast(S.Annihilation, nil, nil, not Target:IsInRange(30)) then return "annihilation opener 8"; end
-  end
-  -- sigil_of_doom,if=talent.essence_break&prev_gcd.1.metamorphosis
-  if S.SigilofDoom:IsCastable() and (S.EssenceBreak:IsAvailable() and Player:PrevGCD(1, S.Metamorphosis)) then
-    if Cast(S.SigilofDoom, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_doom opener 10"; end
-  end
-  -- annihilation,if=!hero_tree.felscarred&buff.inner_demon.up&!talent.shattered_destiny,line_cd=10
-  if S.Annihilation:IsCastable() and S.Annihilation:TimeSinceLastCast() >= 10 and (Player:HeroTreeID() ~= 34 and Player:BuffUp(S.InnerDemonBuff) and not S.ShatteredDestiny:IsAvailable()) then
+  if S.Annihilation:IsCastable() and (Player:Demonsurge("Annihilation") and S.RestlessHunter:IsAvailable()) then
     if Cast(S.Annihilation, nil, nil, not Target:IsInRange(30)) then return "annihilation opener 12"; end
   end
-  if S.FelRush:IsCastable() and UseFelRush() and (
-    -- fel_rush,if=talent.momentum&buff.momentum.remains<6
-    (S.Momentum:IsAvailable() and Player:BuffRemains(S.MomentumBuff) < 6) or
-    -- fel_rush,if=talent.inertia&buff.unbound_chaos.up&talent.a_fire_inside&(buff.inertia.down&buff.metamorphosis.up&!hero_tree.felscarred|hero_tree.felscarred&(buff.metamorphosis.down&charges>1|prev_gcd.1.eye_beam|buff.demonsurge.stack>=5|charges=2&buff.unbound_chaos.down))&debuff.essence_break.down
-    (S.Inertia:IsAvailable() and Player:BuffUp(S.UnboundChaosBuff) and S.AFireInside:IsAvailable() and (Player:BuffDown(S.InertiaBuff) and Player:BuffUp(S.MetamorphosisBuff) and Player:HeroTreeID() ~= 34 or Player:HeroTreeID() == 34 and (Player:BuffDown(S.MetamorphosisBuff) and S.FelRush:Charges() > 1 or Player:PrevGCD(1, S.EyeBeam) or Player:BuffStack(S.DemonsurgeBuff) >= 5 or S.FelRush:Charges() == 2 and Player:BuffDown(S.UnboundChaosBuff))) and Target:DebuffDown(S.EssenceBreakDebuff)) or
-    -- fel_rush,if=talent.inertia&buff.unbound_chaos.up&!talent.a_fire_inside&buff.metamorphosis.up&(cooldown.metamorphosis.up|cooldown.eye_beam.remains|talent.essence_break&cooldown.essence_break.remains)&(hero_tree.felscarred|buff.inner_demon.down)
-    (S.Inertia:IsAvailable() and Player:BuffUp(S.UnboundChaosBuff) and not S.AFireInside:IsAvailable() and Player:BuffUp(S.MetamorphosisBuff) and (S.Metamorphosis:CooldownUp() or S.EyeBeam:CooldownDown() or S.EssenceBreak:IsAvailable() and S.EssenceBreak:CooldownDown()) and (Player:HeroTreeID() == 34 or Player:BuffDown(S.InnerDemonBuff))) or
-    -- fel_rush,if=talent.inertia&buff.unbound_chaos.up&prev_gcd.1.sigil_of_doom&active_enemies>1
-    (S.Inertia:IsAvailable() and Player:BuffUp(S.UnboundChaosBuff) and Player:PrevGCD(1, S.SigilofDoom) and Enemies8yCount > 1)
-  ) then
-    if Cast(S.FelRush, nil, Settings.CommonsDS.DisplayStyle.FelRush) then return "fel_rush opener 14"; end
+  -- annihilation,if=!hero_tree.felscarred&buff.inner_demon.up&!talent.shattered_destiny,line_cd=10
+  if S.Annihilation:IsCastable() and S.Annihilation:TimeSinceLastCast() >= 10 and (VarHeroTree ~= 34 and Player:BuffUp(S.InnerDemonBuff) and not S.ShatteredDestiny:IsAvailable()) then
+    if Cast(S.Annihilation, nil, nil, not Target:IsInRange(30)) then return "annihilation opener 14"; end
   end
-  -- the_hunt,if=(buff.metamorphosis.up|!talent.shattered_destiny)&(!talent.initiative|buff.initiative.up|time>5)
-  if S.TheHunt:IsCastable() and ((Player:BuffUp(S.MetamorphosisBuff) or not S.ShatteredDestiny:IsAvailable()) and (not S.Initiative:IsAvailable() or Player:BuffUp(S.InitiativeBuff) or CombatTime > 5)) then
-    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt opener 16"; end
+  -- fel_rush,if=buff.inertia_trigger.up&talent.inertia&talent.restless_hunter&cooldown.essence_break.up&cooldown.metamorphosis.up&buff.demonsurge_annihilation.down&buff.metamorphosis.up
+  if S.FelRush:IsCastable() and UseFelRush() and (InertiaTrigger() and S.Inertia:IsAvailable() and S.RestlessHunter:IsAvailable() and S.EssenceBreak:CooldownUp() and S.Metamorphosis:CooldownUp() and not Player:Demonsurge("Annihilation") and Player:BuffUp(S.MetamorphosisBuff)) then
+    if Cast(S.FelRush, nil, Settings.CommonsDS.DisplayStyle.FelRush) then return "fel_rush opener 16"; end
+  end
+  if S.FelRush:IsCastable() and UseFelRush() and (
+    -- fel_rush,if=talent.momentum&buff.momentum.remains<6&debuff.essence_break.down
+    (S.Momentum:IsAvailable() and Player:BuffRemains(S.MomentumBuff) < 6 and Target:DebuffDown(S.EssenceBreakDebuff)) or
+    -- fel_rush,if=talent.inertia&buff.unbound_chaos.up&talent.a_fire_inside&(buff.inertia.down&buff.metamorphosis.up&!hero_tree.felscarred|hero_tree.felscarred&(buff.metamorphosis.down&charges>1|prev_gcd.1.eye_beam|buff.demonsurge.stack>=5|charges=2&buff.unbound_chaos.down))&debuff.essence_break.down
+    (S.Inertia:IsAvailable() and Player:BuffUp(S.UnboundChaosBuff) and S.AFireInside:IsAvailable() and (Player:BuffDown(S.InertiaBuff) and Player:BuffUp(S.MetamorphosisBuff) and VarHeroTree ~= 34 or VarHeroTree == 34 and (Player:BuffDown(S.MetamorphosisBuff) and S.FelRush:Charges() > 1 or Player:PrevGCD(1, S.EyeBeam) or Player:BuffStack(S.DemonsurgeBuff) >= 5 or S.FelRush:Charges() == 2 and Player:BuffDown(S.UnboundChaosBuff))) and Target:DebuffDown(S.EssenceBreakDebuff)) or
+    -- fel_rush,if=talent.inertia&buff.unbound_chaos.up&!talent.a_fire_inside&buff.metamorphosis.up&cooldown.metamorphosis.remains
+    (S.Inertia:IsAvailable() and Player:BuffUp(S.UnboundChaosBuff) and not S.AFireInside:IsAvailable() and Player:BuffUp(S.MetamorphosisBuff) and S.Metamorphosis:CooldownDown()) or
+    -- fel_rush,if=talent.inertia&buff.unbound_chaos.up&prev_gcd.1.sigil_of_doom&(active_enemies>1|talent.a_fire_inside)
+    (S.Inertia:IsAvailable() and Player:BuffUp(S.UnboundChaosBuff) and Player:PrevGCD(1, S.SigilofDoom) and (EnemiesMeleeCount > 1 or S.AFireInside:IsAvailable()))
+  ) then
+    if Cast(S.FelRush, nil, Settings.CommonsDS.DisplayStyle.FelRush) then return "fel_rush opener 18"; end
+  end
+  -- the_hunt,if=(buff.metamorphosis.up&hero_tree.aldrachi_reaver&talent.shattered_destiny|!talent.shattered_destiny&hero_tree.aldrachi_reaver|hero_tree.felscarred)&(!talent.initiative|buff.initiative.up|time>5)
+  if S.TheHunt:IsCastable() and ((Player:BuffUp(S.MetamorphosisBuff) and VarHeroTree == 35 and S.ShatteredDestiny:IsAvailable() or not S.ShatteredDestiny:IsAvailable() and VarHeroTree == 35 or VarHeroTree == 34) and (not S.Initiative:IsAvailable() or Player:BuffUp(S.InitiativeBuff) or CombatTime > 5)) then
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt opener 20"; end
   end
   -- death_sweep,if=hero_tree.felscarred&talent.chaos_theory&buff.metamorphosis.up&buff.demonsurge.stack=0&!talent.restless_hunter
-  if S.DeathSweep:IsCastable() and (Player:HeroTreeID() == 34 and S.ChaosTheory:IsAvailable() and Player:BuffUp(S.MetamorphosisBuff) and Player:BuffDown(S.DemonsurgeBuff) and not S.RestlessHunter:IsAvailable()) then
-    if Cast(S.DeathSweep, nil, nil, not IsInMeleeRange(8)) then return "death_sweep opener 18"; end
+  if S.DeathSweep:IsCastable() and (VarHeroTree == 34 and S.ChaosTheory:IsAvailable() and Player:BuffUp(S.MetamorphosisBuff) and Player:BuffDown(S.DemonsurgeBuff) and not S.RestlessHunter:IsAvailable()) then
+    if Cast(S.DeathSweep, nil, nil, not IsInMeleeRange(8)) then return "death_sweep opener 22"; end
   end
-  -- annihilation,if=hero_tree.felscarred&buff.demonsurge_annihilation.up&!talent.essence_break,line_cd=10
-  -- TODO: Handle line_cd. May not matter, due to Demonsurge check.
-  if S.Annihilation:IsCastable() and (Player:HeroTreeID() == 34 and Player:Demonsurge("Annihilation") and not S.EssenceBreak:IsAvailable()) then
-    if Cast(S.Annihilation, nil, nil, not IsInMeleeRange(5)) then return "annihilation opener 20"; end
+  -- annihilation,if=hero_tree.felscarred&buff.demonsurge_annihilation.up&(!talent.essence_break|buff.inner_demon.up),line_cd=10
+  if S.Annihilation:IsReady() and (VarHeroTree == 34 and Player:Demonsurge("Annihilation") and (not S.EssenceBreak:IsAvailable() or Player:BuffUp(S.InnerDemonBuff)) and CombatTime > 10) then
+    if Cast(S.Annihilation, nil, nil, not IsInMeleeRange(5)) then return "annihilation opener 24"; end
   end
-  -- felblade,if=(buff.metamorphosis.down|fury<40)&(!talent.a_fire_inside|hero_tree.aldrachi_reaver)&action.felblade.cooldown_react
-  if S.Felblade:IsCastable() and ((Player:BuffDown(S.MetamorphosisBuff) or Player:Fury() < 40) and (not S.AFireInside:IsAvailable() or Player:HeroTreeID() == 35)) then
-    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade opener 22"; end
+  -- felblade,if=fury<40&(!talent.a_fire_inside|hero_tree.aldrachi_reaver)&action.felblade.cooldown_react
+  if S.Felblade:IsCastable() and ((Player:BuffDown(S.MetamorphosisBuff) or Player:Fury() < 40) and (not S.AFireInside:IsAvailable() or VarHeroTree == 35)) then
+    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade opener 26"; end
   end
   -- reavers_glaive,if=debuff.reavers_mark.down&debuff.essence_break.down
   if S.ReaversGlaive:IsCastable() and (Target:DebuffDown(S.ReaversMarkDebuff) and Target:DebuffDown(S.EssenceBreakDebuff)) then
-    if Cast(S.ReaversGlaive, nil, nil, not Target:IsInRange(50)) then return "reavers_glaive opener 24"; end
+    if Cast(S.ReaversGlaive, nil, nil, not Target:IsInRange(50)) then return "reavers_glaive opener 28"; end
   end
   -- immolation_aura,if=talent.a_fire_inside&(talent.inertia|talent.ragefire|talent.burning_wound)&buff.metamorphosis.down&(buff.unbound_chaos.down|hero_tree.felscarred)
-  if ImmoAbility:IsCastable() and (S.AFireInside:IsAvailable() and (S.Inertia:IsAvailable() or S.Ragefire:IsAvailable() or S.BurningWound:IsAvailable()) and Player:BuffDown(S.MetamorphosisBuff) and (Player:BuffDown(S.UnboundChaosBuff) or Player:HeroTreeID() == 34)) then
-    if Cast(ImmoAbility, nil, nil, not IsInMeleeRange(8)) then return "immolation_aura opener 26"; end
+  if ImmoAbility:IsCastable() and (S.AFireInside:IsAvailable() and (S.Inertia:IsAvailable() or S.Ragefire:IsAvailable() or S.BurningWound:IsAvailable()) and Player:BuffDown(S.MetamorphosisBuff) and (Player:BuffDown(S.UnboundChaosBuff) or VarHeroTree == 34)) then
+    if Cast(ImmoAbility, nil, nil, not IsInMeleeRange(8)) then return "immolation_aura opener 30"; end
   end
   -- immolation_aura,if=talent.inertia&buff.unbound_chaos.down&buff.metamorphosis.up&debuff.essence_break.down&cooldown.blade_dance.remains&(buff.inner_demon.down|hero_tree.felscarred&buff.demonsurge_annihilation.down)&buff.demonsurge.stack<5
-  if ImmoAbility:IsCastable() and (S.Inertia:IsAvailable() and Player:BuffDown(S.UnboundChaosBuff) and Player:BuffUp(S.MetamorphosisBuff) and Target:DebuffDown(S.EssenceBreakDebuff) and S.BladeDance:CooldownDown() and (Player:BuffDown(S.InnerDemonBuff) or Player:HeroTreeID() == 34 and not Player:Demonsurge("Annihilation")) and Player:BuffDown(S.DemonsurgeBuff) and Player:BuffStack(S.DemonsurgeBuff) < 5) then
-    if Cast(ImmoAbility, nil, nil, not IsInMeleeRange(8)) then return "immolation_aura opener 28"; end
+  if ImmoAbility:IsCastable() and (S.Inertia:IsAvailable() and Player:BuffDown(S.UnboundChaosBuff) and Player:BuffUp(S.MetamorphosisBuff) and Target:DebuffDown(S.EssenceBreakDebuff) and S.BladeDance:CooldownDown() and (Player:BuffDown(S.InnerDemonBuff) or VarHeroTree == 34 and not Player:Demonsurge("Annihilation")) and Player:BuffDown(S.DemonsurgeBuff) and Player:BuffStack(S.DemonsurgeBuff) < 5) then
+    if Cast(ImmoAbility, nil, nil, not IsInMeleeRange(8)) then return "immolation_aura opener 32"; end
   end
   -- blade_dance,if=buff.glaive_flurry.up&!talent.shattered_destiny
   if S.BladeDance:IsCastable() and (Player:BuffUp(S.GlaiveFlurryBuff) and not S.ShatteredDestiny:IsAvailable()) then
-    if Cast(S.BladeDance, nil, nil, not IsInMeleeRange(8)) then return "blade_dance opener 30"; end
+    if Cast(S.BladeDance, nil, nil, not IsInMeleeRange(8)) then return "blade_dance opener 34"; end
   end
   -- chaos_strike,if=buff.rending_strike.up&!talent.shattered_destiny
   if S.ChaosStrike:IsCastable() and (Player:BuffUp(S.RendingStrikeBuff) and not S.ShatteredDestiny:IsAvailable()) then
-    if Cast(S.ChaosStrike, nil, nil, not IsInMeleeRange(5)) then return "chaos_strike opener 32"; end
+    if Cast(S.ChaosStrike, nil, nil, not IsInMeleeRange(5)) then return "chaos_strike opener 36"; end
   end
   -- metamorphosis,if=buff.metamorphosis.up&cooldown.blade_dance.remains>gcd.max*2&buff.inner_demon.down&(!hero_tree.felscarred&(!talent.restless_hunter|prev_gcd.1.death_sweep)|buff.demonsurge.stack=2)&(cooldown.essence_break.remains|hero_tree.felscarred|talent.shattered_destiny|!talent.essence_break)
-  if CDsON() and S.Metamorphosis:IsCastable() and (Player:BuffUp(S.MetamorphosisBuff) and S.BladeDance:CooldownRemains() > Player:GCD() * 2 and Player:BuffDown(S.InnerDemonBuff) and (Player:HeroTreeID() ~= 34 and (not S.RestlessHunter:IsAvailable() or Player:PrevGCD(1, S.DeathSweep)) or Player:BuffStack(S.DemonsurgeBuff) == 2) and (S.EssenceBreak:CooldownDown() or Player:HeroTreeID() == 34 or S.ShatteredDestiny:IsAvailable() or not S.EssenceBreak:IsAvailable())) then
-    if Cast(S.Metamorphosis, nil, nil, not IsInMeleeRange(40)) then return "metamorphosis opener 34"; end
+  if CDsON() and S.Metamorphosis:IsCastable() and (Player:BuffUp(S.MetamorphosisBuff) and S.BladeDance:CooldownRemains() > Player:GCD() * 2 and Player:BuffDown(S.InnerDemonBuff) and (VarHeroTree ~= 34 and (not S.RestlessHunter:IsAvailable() or Player:PrevGCD(1, S.DeathSweep)) or Player:BuffStack(S.DemonsurgeBuff) == 2) and (S.EssenceBreak:CooldownDown() or VarHeroTree == 34 or S.ShatteredDestiny:IsAvailable() or not S.EssenceBreak:IsAvailable())) then
+    if Cast(S.Metamorphosis, nil, nil, not IsInMeleeRange(40)) then return "metamorphosis opener 38"; end
   end
   -- sigil_of_spite,if=hero_tree.felscarred|debuff.reavers_mark.up&(!talent.cycle_of_hatred|cooldown.eye_beam.remains&cooldown.metamorphosis.remains)
-  if S.SigilofSpite:IsCastable() and (Player:HeroTreeID() == 34 or Target:DebuffUp(S.ReaversMarkDebuff) and (not S.CycleofHatred:IsAvailable() or S.EyeBeam:CooldownDown() and S.Metamorphosis:CooldownDown())) then
-    if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Sigils, not IsInMeleeRange(30)) then return "sigil_of_spite opener 36"; end
+  if S.SigilofSpite:IsCastable() and (VarHeroTree == 34 or Target:DebuffUp(S.ReaversMarkDebuff) and (not S.CycleofHatred:IsAvailable() or S.EyeBeam:CooldownDown() and S.Metamorphosis:CooldownDown())) then
+    if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Sigils, not IsInMeleeRange(30)) then return "sigil_of_spite opener 40"; end
   end
   -- sigil_of_doom,if=buff.inner_demon.down&debuff.essence_break.down&cooldown.blade_dance.remains
   if S.SigilofDoom:IsCastable() and (Player:BuffDown(S.InnerDemonBuff) and Target:DebuffDown(S.EssenceBreakDebuff) and S.BladeDance:CooldownDown()) then
-    if Cast(S.SigilofDoom, nil, Settings.CommonsDS.DisplayStyle.Sigils, not IsInMeleeRange(30)) then return "sigil_of_doom opener 38"; end
+    if Cast(S.SigilofDoom, nil, Settings.CommonsDS.DisplayStyle.Sigils, not IsInMeleeRange(30)) then return "sigil_of_doom opener 42"; end
   end
   -- eye_beam,if=buff.metamorphosis.down|debuff.essence_break.down&buff.inner_demon.down&(cooldown.blade_dance.remains|talent.essence_break&cooldown.essence_break.up)
   if S.EyeBeam:IsCastable() and (Player:BuffDown(S.MetamorphosisBuff) or Target:DebuffDown(S.EssenceBreakDebuff) and Player:BuffDown(S.InnerDemonBuff) and (S.BladeDance:CooldownDown() or S.EssenceBreak:IsAvailable() and S.EssenceBreak:CooldownUp())) then
-    if Cast(S.EyeBeam, nil, nil, not IsInMeleeRange(20)) then return "eye_beam opener 40"; end
+    if Cast(S.EyeBeam, nil, nil, not IsInMeleeRange(20)) then return "eye_beam opener 44"; end
   end
-  -- abyssal_gaze,if=debuff.essence_break.down&cooldown.blade_dance.remains&buff.inner_demon.down&buff.demonsurge_abyssal_gaze.up
-  if S.AbyssalGaze:IsCastable() and (Target:DebuffDown(S.EssenceBreakDebuff) and S.BladeDance:CooldownDown() and Player:BuffDown(S.InnerDemonBuff) and Player:Demonsurge("AbyssalGaze")) then
-    if Cast(S.AbyssalGaze, nil, nil, not IsInMeleeRange(20)) then return "abyssal_gaze opener 42"; end
+  -- abyssal_gaze,if=debuff.essence_break.down&cooldown.blade_dance.remains&buff.inner_demon.down
+  if S.AbyssalGaze:IsCastable() and (Target:DebuffDown(S.EssenceBreakDebuff) and S.BladeDance:CooldownDown() and Player:BuffDown(S.InnerDemonBuff)) then
+    if Cast(S.AbyssalGaze, nil, nil, not IsInMeleeRange(20)) then return "abyssal_gaze opener 46"; end
   end
-  -- essence_break,if=(cooldown.blade_dance.remains<gcd.max&!hero_tree.felscarred&!talent.shattered_destiny&buff.metamorphosis.up|cooldown.eye_beam.remains&cooldown.metamorphosis.remains)&(!hero_tree.felscarred|buff.demonsurge_annihilation.down)
-  if S.EssenceBreak:IsCastable() and ((S.BladeDance:CooldownRemains() < Player:GCD() and Player:HeroTreeID() ~= 34 and not S.ShatteredDestiny:IsAvailable() and Player:BuffUp(S.MetamorphosisBuff) or S.EyeBeam:CooldownDown() and S.Metamorphosis:CooldownDown()) and (Player:HeroTreeID() ~= 34 or not Player:Demonsurge("Annihilation"))) then
+  -- essence_break,if=(cooldown.blade_dance.remains<gcd.max&!hero_tree.felscarred&!talent.shattered_destiny&buff.metamorphosis.up|(cooldown.eye_beam.remains|buff.demonsurge_abyssal_gaze.down&(buff.demonsurge.stack=5|buff.demonsurge.stack=4&!talent.inner_demon))&cooldown.metamorphosis.remains)&(!hero_tree.felscarred|buff.inner_demon.down)
+  if S.EssenceBreak:IsCastable() and ((S.BladeDance:CooldownRemains() < Player:GCD() and VarHeroTree ~= 34 and not S.ShatteredDestiny:IsAvailable() and Player:BuffUp(S.MetamorphosisBuff) or (S.EyeBeam:CooldownDown() or not Player:Demonsurge("AbyssalGaze") and (Player:BuffStack(S.DemonsurgeBuff) == 5 or Player:BuffStack(S.DemonsurgeBuff) == 4 and not S.InnerDemon:IsAvailable())) and S.Metamorphosis:CooldownDown()) and (VarHeroTree ~= 34 or Player:BuffDown(S.InnerDemonBuff))) then
     if Cast(S.EssenceBreak, nil, nil, not IsInMeleeRange(10)) then return "essence_break opener 44"; end
   end
   -- essence_break,if=talent.restless_hunter&buff.metamorphosis.up&buff.inner_demon.down&(!hero_tree.felscarred|buff.demonsurge_annihilation.down)
-  if S.EssenceBreak:IsCastable() and (S.RestlessHunter:IsAvailable() and Player:BuffUp(S.MetamorphosisBuff) and Player:BuffDown(S.InnerDemonBuff) and (Player:HeroTreeID() ~= 34 or not Player:Demonsurge("Annihilation"))) then
+  if S.EssenceBreak:IsCastable() and (S.RestlessHunter:IsAvailable() and Player:BuffUp(S.MetamorphosisBuff) and Player:BuffDown(S.InnerDemonBuff) and (VarHeroTree ~= 34 or not Player:Demonsurge("Annihilation"))) then
     if Cast(S.EssenceBreak, nil, nil, not IsInMeleeRange(10)) then return "essence_break opener 46"; end
   end
   -- death_sweep
@@ -652,7 +665,7 @@ local function APL()
     end
     -- variable,name=rg_inc,op=set,value=buff.rending_strike.down&buff.glaive_flurry.up&cooldown.blade_dance.up&gcd.remains=0|variable.rg_inc&prev_gcd.1.death_sweep
     VarRGInc = Player:BuffDown(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff) and S.BladeDance:CooldownUp() or VarRGInc and Player:PrevGCD(1, S.DeathSweep)
-    -- pick_up_fragment,use_off_gcd=1
+    -- pick_up_fragment,use_off_gcd=1,if=fury<=70|hero_tree.aldrachi_reaver
     -- variable,name=fel_barrage,op=set,value=talent.fel_barrage&(cooldown.fel_barrage.remains<gcd.max*7&(active_enemies>=desired_targets+raid_event.adds.count|raid_event.adds.in<gcd.max*7|raid_event.adds.in>90)&(cooldown.metamorphosis.remains|active_enemies>2)|buff.fel_barrage.up)&!(active_enemies=1&!raid_event.adds.exists)
     VarFelBarrage = S.FelBarrage:IsAvailable() and (S.FelBarrage:CooldownRemains() < Player:GCD() * 7 and (S.Metamorphosis:CooldownDown() or Enemies12yCount > 2) or Player:BuffUp(S.FelBarrage))
     -- disrupt (and stun interrupts)
@@ -700,7 +713,7 @@ local function APL()
       -- immolation_aura,if=active_enemies>2&talent.ragefire&buff.unbound_chaos.down&(!talent.fel_barrage|cooldown.fel_barrage.remains>recharge_time)&debuff.essence_break.down&cooldown.eye_beam.remains>recharge_time+5&(buff.metamorphosis.down|buff.metamorphosis.remains>5)
       (Enemies8yCount > 2 and S.Ragefire:IsAvailable() and Player:BuffDown(S.UnboundChaosBuff) and (not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownRemains() > ImmoAbility:Recharge()) and Target:DebuffDown(S.EssenceBreakDebuff) and S.EyeBeam:CooldownRemains() > ImmoAbility:Recharge() + 5 and (Player:BuffDown(S.MetamorphosisBuff) or Player:BuffRemains(S.MetamorphosisBuff))) or
       -- immolation_aura,if=hero_tree.felscarred&cooldown.metamorphosis.remains<10&cooldown.eye_beam.remains<10&(buff.unbound_chaos.down|action.fel_rush.charges=0|(cooldown.eye_beam.remains<?cooldown.metamorphosis.remains)<5)&talent.a_fire_inside
-      (Player:HeroTreeID() == 34 and S.Metamorphosis:CooldownRemains() < 10 and S.EyeBeam:CooldownRemains() < 10 and (Player:BuffDown(S.UnboundChaosBuff) or S.FelRush:Charges() == 0 or mathmax(S.EyeBeam:CooldownRemains(), S.Metamorphosis:CooldownRemains()) < 5) and S.AFireInside:IsAvailable()) or
+      (VarHeroTree == 34 and S.Metamorphosis:CooldownRemains() < 10 and S.EyeBeam:CooldownRemains() < 10 and (Player:BuffDown(S.UnboundChaosBuff) or S.FelRush:Charges() == 0 or mathmax(S.EyeBeam:CooldownRemains(), S.Metamorphosis:CooldownRemains()) < 5) and S.AFireInside:IsAvailable()) or
       -- immolation_aura,if=cooldown.eye_beam.remains>24&buff.metamorphosis.down&debuff.essence_break.down
       (S.EyeBeam:CooldownRemains() > 24 and Player:BuffDown(S.MetamorphosisBuff) and Target:DebuffDown(S.EssenceBreakDebuff)) or
       -- immolation_aura,if=cooldown.eye_beam.remains<8&cooldown.blade_dance.remains&debuff.essence_break.down&buff.student_of_suffering.down
@@ -714,8 +727,8 @@ local function APL()
     if S.FelRush:IsCastable() and UseFelRush() and (Player:BuffUp(S.UnboundChaosBuff) and Enemies8yCount > 2 and (not S.Inertia:IsAvailable() or S.EyeBeam:CooldownRemains() + 2 > Player:BuffRemains(S.UnboundChaosBuff))) then
       if Cast(S.FelRush, nil, Settings.CommonsDS.DisplayStyle.FelRush) then return "fel_rush main 18"; end
     end
-    -- vengeful_retreat,use_off_gcd=1,if=talent.initiative&(cooldown.eye_beam.remains>15&gcd.remains<0.3|gcd.remains<0.2&cooldown.eye_beam.remains<=gcd.remains&(buff.unbound_chaos.up|action.immolation_aura.recharge_time>6|!talent.inertia|talent.momentum)&(cooldown.metamorphosis.remains>10|cooldown.blade_dance.remains<gcd.max*2&(talent.inertia|talent.momentum|buff.metamorphosis.up)))&(!talent.student_of_suffering|cooldown.sigil_of_flame.remains)&time>10&(!variable.trinket1_steroids&!variable.trinket2_steroids|variable.trinket1_steroids&(trinket.1.cooldown.remains<gcd.max*3|trinket.1.cooldown.remains>20)|variable.trinket2_steroids&(trinket.2.cooldown.remains<gcd.max*3|trinket.2.cooldown.remains>20|talent.shattered_destiny))
-    if S.VengefulRetreat:IsCastable() and (S.Initiative:IsAvailable() and (S.EyeBeam:CooldownRemains() > 15 or S.EyeBeam:CooldownRemains() <= Player:GCDRemains() and (Player:BuffUp(S.UnboundChaosBuff) or ImmoAbility:Recharge() > 6 or not S.Inertia:IsAvailable() or S.Momentum:IsAvailable()) and (S.Metamorphosis:CooldownRemains() > 10 or S.BladeDance:CooldownRemains() < Player:GCD() * 2 and (S.Inertia:IsAvailable() or S.Momentum:IsAvailable() or Player:BuffUp(S.MetamorphosisBuff)))) and (not S.StudentofSuffering:IsAvailable() or S.SigilofFlame:CooldownDown()) and CombatTime > 10 and (not VarTrinket1Steroids and not VarTrinket2Steroids or VarTrinket1Steroids and (Trinket1:CooldownRemains() < Player:GCD() * 3 or Trinket1:CooldownRemains() > 20) or VarTrinket2Steroids and (Trinket2:CooldownRemains() < Player:GCD() * 3 or Trinket1:CooldownRemains() > 20 or S.ShatteredDestiny:IsAvailable()))) then
+    -- vengeful_retreat,use_off_gcd=1,if=talent.initiative&(cooldown.eye_beam.remains>15&gcd.remains<0.3|gcd.remains<0.2&cooldown.eye_beam.remains<=gcd.remains&(buff.unbound_chaos.up|action.immolation_aura.recharge_time>6|!talent.inertia|talent.momentum)&(cooldown.metamorphosis.remains>10|cooldown.blade_dance.remains<gcd.max*2&(talent.inertia|talent.momentum|buff.metamorphosis.up)))&(!talent.student_of_suffering|cooldown.sigil_of_flame.remains)&time>10&(!variable.trinket1_steroids&!variable.trinket2_steroids|variable.trinket1_steroids&(trinket.1.cooldown.remains<gcd.max*3|trinket.1.cooldown.remains>20)|variable.trinket2_steroids&(trinket.2.cooldown.remains<gcd.max*3|trinket.2.cooldown.remains>20|talent.shattered_destiny))&(cooldown.metamorphosis.remains|hero_tree.aldrachi_reaver)&time>20
+    if S.VengefulRetreat:IsCastable() and (S.Initiative:IsAvailable() and (S.EyeBeam:CooldownRemains() > 15 or S.EyeBeam:CooldownRemains() <= Player:GCDRemains() and (Player:BuffUp(S.UnboundChaosBuff) or ImmoAbility:Recharge() > 6 or not S.Inertia:IsAvailable() or S.Momentum:IsAvailable()) and (S.Metamorphosis:CooldownRemains() > 10 or S.BladeDance:CooldownRemains() < Player:GCD() * 2 and (S.Inertia:IsAvailable() or S.Momentum:IsAvailable() or Player:BuffUp(S.MetamorphosisBuff)))) and (not S.StudentofSuffering:IsAvailable() or S.SigilofFlame:CooldownDown()) and CombatTime > 10 and (not VarTrinket1Steroids and not VarTrinket2Steroids or VarTrinket1Steroids and (Trinket1:CooldownRemains() < Player:GCD() * 3 or Trinket1:CooldownRemains() > 20) or VarTrinket2Steroids and (Trinket2:CooldownRemains() < Player:GCD() * 3 or Trinket1:CooldownRemains() > 20 or S.ShatteredDestiny:IsAvailable())) and (S.Metamorphosis:CooldownDown() or VarHeroTree == 35) and CombatTime > 20) then
       if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat main 20"; end
     end
     -- run_action_list,name=fel_barrage,if=variable.fel_barrage|!talent.demon_blades&talent.fel_barrage&(buff.fel_barrage.up|cooldown.fel_barrage.up)&buff.metamorphosis.down
@@ -751,9 +764,12 @@ local function APL()
       if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura main 26"; end
     end
     -- sigil_of_flame,if=talent.student_of_suffering&cooldown.eye_beam.remains<gcd.max&(!talent.inertia|buff.inertia_trigger.up)&(cooldown.essence_break.remains<gcd.max*4|!talent.essence_break)&(cooldown.metamorphosis.remains>10|cooldown.blade_dance.remains<gcd.max*3)&(!variable.trinket1_steroids&!variable.trinket2_steroids|variable.trinket1_steroids&(trinket.1.cooldown.remains<gcd.max*3|trinket.1.cooldown.remains>20)|variable.trinket2_steroids&(trinket.2.cooldown.remains<gcd.max*3|trinket.2.cooldown.remains>20))
-    -- Note: Removed Inertia check for usability.
-    if S.SigilofFlame:IsCastable() and (S.StudentofSuffering:IsAvailable() and S.EyeBeam:CooldownRemains() < Player:GCD() and (S.EssenceBreak:CooldownRemains() < Player:GCD() * 4 or not S.EssenceBreak:IsAvailable()) and (S.Metamorphosis:CooldownRemains() > 10 or S.BladeDance:CooldownRemains() < Player:GCD() * 3) and (not VarTrinket1Steroids and not VarTrinket2Steroids or VarTrinket1Steroids and (Trinket1:CooldownRemains() < Player:GCD() * 3 or Trinket1:CooldownRemains() > 20) or VarTrinket2Steroids and (Trinket2:CooldownRemains() < Player:GCD() * 3 or Trinket2:CooldownRemains() > 20))) then
+    if S.SigilofFlame:IsCastable() and (S.StudentofSuffering:IsAvailable() and S.EyeBeam:CooldownRemains() < Player:GCD() and (not S.Inertia:IsAvailable() or InertiaTrigger()) and (S.EssenceBreak:CooldownRemains() < Player:GCD() * 4 or not S.EssenceBreak:IsAvailable()) and (S.Metamorphosis:CooldownRemains() > 10 or S.BladeDance:CooldownRemains() < Player:GCD() * 3) and (not VarTrinket1Steroids and not VarTrinket2Steroids or VarTrinket1Steroids and (Trinket1:CooldownRemains() < Player:GCD() * 3 or Trinket1:CooldownRemains() > 20) or VarTrinket2Steroids and (Trinket2:CooldownRemains() < Player:GCD() * 3 or Trinket2:CooldownRemains() > 20))) then
       if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame main 28"; end
+    end
+    -- eye_beam,if=cooldown.metamorphosis.up&talent.chaotic_transformation
+    if S.EyeBeam:IsReady() and (S.Metamorphosis:CooldownUp() and S.ChaoticTransformation:IsAvailable()) then
+      if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not IsInMeleeRange(20)) then return "eye_beam main 29"; end
     end
     -- eye_beam,if=!talent.essence_break&(!talent.chaotic_transformation|cooldown.metamorphosis.remains<5+3*talent.shattered_destiny|cooldown.metamorphosis.remains>10)&(active_enemies>desired_targets*2|raid_event.adds.in>30-talent.cycle_of_hatred.rank*13)&(!talent.initiative|cooldown.vengeful_retreat.remains>5|cooldown.vengeful_retreat.up|talent.shattered_destiny)&(!talent.student_of_suffering|cooldown.sigil_of_flame.remains)
     if S.EyeBeam:IsReady() and (not S.EssenceBreak:IsAvailable() and (not S.ChaoticTransformation:IsAvailable() or S.Metamorphosis:CooldownRemains() < 5 + 3 * num(S.ShatteredDestiny:IsAvailable()) or S.Metamorphosis:CooldownRemains() > 10) and (Enemies8yCount > 2) and (not S.Initiative:IsAvailable() or S.VengefulRetreat:CooldownRemains() > 5 or S.VengefulRetreat:CooldownUp() or S.ShatteredDestiny:IsAvailable()) and (not S.StudentofSuffering:IsAvailable() or S.SigilofFlame:CooldownDown())) then
@@ -761,11 +777,11 @@ local function APL()
     end
     -- eye_beam,if=talent.essence_break&(cooldown.essence_break.remains<gcd.max*2+5*talent.shattered_destiny|talent.shattered_destiny&cooldown.essence_break.remains>10)&(cooldown.blade_dance.remains<7|raid_event.adds.up)&(!talent.initiative|cooldown.vengeful_retreat.remains>10|!talent.inertia&!talent.momentum|raid_event.adds.up)&(active_enemies+3>=desired_targets+raid_event.adds.count|raid_event.adds.in>30-talent.cycle_of_hatred.rank*6)&(!talent.inertia|buff.inertia_trigger.up|action.immolation_aura.charges=0&action.immolation_aura.recharge_time>5)&(!raid_event.adds.up|raid_event.adds.remains>8)&(!variable.trinket1_steroids&!variable.trinket2_steroids|variable.trinket1_steroids&(trinket.1.cooldown.remains<gcd.max*3|trinket.1.cooldown.remains>20)|variable.trinket2_steroids&(trinket.2.cooldown.remains<gcd.max*3|trinket.2.cooldown.remains>20))|fight_remains<10
     -- Note: Removing VR check to try to make the profile usable in HR.
-    if S.EyeBeam:IsReady() and (S.EssenceBreak:IsAvailable() and (S.EssenceBreak:CooldownRemains() < Player:GCD() * 2 + 5 * num(S.ShatteredDestiny:IsAvailable()) or S.ShatteredDestiny:IsAvailable() and S.EssenceBreak:CooldownRemains() > 10) and (S.BladeDance:CooldownRemains() < 7 or Enemies20yCount > 1) and (not S.Inertia:IsAvailable() or Player:BuffUp(S.InertiaBuff) or ImmoAbility:Charges() == 0 and ImmoAbility:Recharge() > 5) and (not VarTrinket1Steroids and not VarTrinket2Steroids or VarTrinket1Steroids and (Trinket1:CooldownRemains() < Player:GCD() * 3 or Trinket1:CooldownRemains() > 20) or VarTrinket2Steroids and (Trinket2:CooldownRemains() < Player:GCD() * 3 or Trinket2:CooldownRemains() > 20)) or BossFightRemains < 10) then
+    if S.EyeBeam:IsReady() and (S.EssenceBreak:IsAvailable() and (S.EssenceBreak:CooldownRemains() < Player:GCD() * 2 + 5 * num(S.ShatteredDestiny:IsAvailable()) or S.ShatteredDestiny:IsAvailable() and S.EssenceBreak:CooldownRemains() > 10) and (S.BladeDance:CooldownRemains() < 7 or Enemies20yCount > 1) and (not S.Inertia:IsAvailable() or InertiaTrigger() or ImmoAbility:Charges() == 0 and ImmoAbility:Recharge() > 5) and (not VarTrinket1Steroids and not VarTrinket2Steroids or VarTrinket1Steroids and (Trinket1:CooldownRemains() < Player:GCD() * 3 or Trinket1:CooldownRemains() > 20) or VarTrinket2Steroids and (Trinket2:CooldownRemains() < Player:GCD() * 3 or Trinket2:CooldownRemains() > 20)) or BossFightRemains < 10) then
       if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not IsInMeleeRange(20)) then return "eye_beam main 32"; end
     end
-    -- blade_dance,if=cooldown.eye_beam.remains>gcd.max*2&buff.rending_strike.down
-    if S.BladeDance:IsReady() and (S.EyeBeam:CooldownRemains() > Player:GCD() * 2 and Player:BuffDown(S.RendingStrikeBuff)) then
+    -- blade_dance,if=cooldown.eye_beam.remains>=gcd.max*3&buff.rending_strike.down
+    if S.BladeDance:IsReady() and (S.EyeBeam:CooldownRemains() >= Player:GCD() * 3 and Player:BuffDown(S.RendingStrikeBuff)) then
       if Cast(S.BladeDance, nil, nil, not IsInMeleeRange(8)) then return "blade_dance main 34"; end
     end
     -- chaos_strike,if=buff.rending_strike.up
@@ -811,6 +827,10 @@ local function APL()
     -- demons_bite
     if S.DemonsBite:IsCastable() then
       if Cast(S.DemonsBite, nil, nil, not IsInMeleeRange(5)) then return "demons_bite main 56"; end
+    end
+    -- felblade,if=cooldown.blade_dance.remains>=0.5&cooldown.blade_dance.remains<gcd.max
+    if S.Felblade:IsCastable() and (S.BladeDance:CooldownRemains() >= 0.5 and S.BladeDance:CooldownRemains() < Player:GCD()) then
+      if Cast(S.Felblade, nil, nil, not IsInRange(15)) then return "felblade main 57"; end
     end
     -- throw_glaive,if=buff.unbound_chaos.down&recharge_time<cooldown.eye_beam.remains&debuff.essence_break.down&(cooldown.eye_beam.remains>8|charges_fractional>1.01)&buff.out_of_range.down&active_enemies>1
     if S.ThrowGlaive:IsReady() and (Player:BuffDown(S.UnboundChaosBuff) and ImmoAbility:Recharge() < S.EyeBeam:CooldownRemains() and Target:DebuffDown(S.EssenceBreakDebuff) and (S.EyeBeam:CooldownRemains() > 8 or ImmoAbility:ChargesFractional() > 1.01) and Target:IsInRange(8) and Enemies8yCount > 1) then
