@@ -128,8 +128,8 @@ local function SetTrinketVariables()
   VarTrinket1Ex = T1.Excluded
   VarTrinket2Ex = T2.Excluded
 
-  VarTrinket1Exclude = VarTrinket1ID == I.RubyWhelpShell:ID() or VarTrinket1ID == I.WhisperingIncarnateIcon:ID()
-  VarTrinket2Exclude = VarTrinket2ID == I.RubyWhelpShell:ID() or VarTrinket2ID == I.WhisperingIncarnateIcon:ID()
+  VarTrinket1Exclude = VarTrinket1ID == I.RubyWhelpShell:ID() or VarTrinket1ID == I.WhisperingIncarnateIcon:ID() or VarTrinket1ID == I.OvinaxsMercurialEgg:ID()
+  VarTrinket2Exclude = VarTrinket2ID == I.RubyWhelpShell:ID() or VarTrinket2ID == I.WhisperingIncarnateIcon:ID() or VarTrinket2ID == I.OvinaxsMercurialEgg:ID()
 
   VarTrinket1Manual = VarTrinket1ID == I.NymuesUnravelingSpindle:ID() or VarTrinket1ID == I.SpymastersWeb:ID() or VarTrinket1ID == I.TreacherousTransmitter:ID()
   VarTrinket2Manual = VarTrinket2ID == I.NymuesUnravelingSpindle:ID() or VarTrinket2ID == I.SpymastersWeb:ID() or VarTrinket2ID == I.TreacherousTransmitter:ID()
@@ -365,8 +365,8 @@ local function Precombat()
   -- variable,name=opener_delay,value=variable.minimum_opener_delay,if=!talent.interwoven_threads
   -- variable,name=opener_delay,value=variable.minimum_opener_delay+variable.opener_delay,if=talent.interwoven_threads
   -- variable,name=opener_cds_detected,op=reset,default=0
-  -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon
-  -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
+  -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon|trinket.1.is.ovinaxs_mercurial_egg
+  -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon|trinket.2.is.ovinaxs_mercurial_egg
   -- variable,name=trinket_1_manual,value=trinket.1.is.nymues_unraveling_spindle|trinket.1.is.spymasters_web|trinket.1.is.treacherous_transmitter
   -- variable,name=trinket_2_manual,value=trinket.2.is.nymues_unraveling_spindle|trinket.2.is.spymasters_web|trinket.2.is.treacherous_transmitter
   -- variable,name=trinket_1_ogcd_cast,value=trinket.1.is.beacon_to_the_beyond
@@ -478,22 +478,23 @@ local function Items()
     if I.AberrantSpellforge:IsEquippedAndReady() then
       if Cast(I.AberrantSpellforge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "aberrant_spellforge items 4"; end
     end
-    -- use_item,name=treacherous_transmitter,if=cooldown.allied_virtual_cd_time.remains<=10
+    -- use_item,name=treacherous_transmitter,if=cooldown.allied_virtual_cd_time.remains<=10|cooldown.breath_of_eons.remains<=10&talent.wingleader
+    -- Note: Unable to check allied_virtual_cd_time, so assuming always true.
     if I.TreacherousTransmitter:IsEquippedAndReady() then
       if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter items 6"; end
     end
     -- do_treacherous_transmitter_task,use_off_gcd=1,if=(debuff.temporal_wound.up|prev_gcd.1.breath_of_eons|fight_remains<=15)
     -- TODO: Handle the above.
-     -- use_item,name=spymasters_web,if=(debuff.temporal_wound.up|prev_gcd.1.breath_of_eons)&(fight_remains<120)|(fight_remains<=20|evoker.allied_cds_up>0&fight_remains<=60|evoker.allied_cds_up>0&fight_remains<=30&(trinket.1.is.spymasters_web&(trinket.2.cooldown.duration=0|trinket.2.cooldown.remains)|trinket.2.is.spymasters_web&(trinket.1.cooldown.duration=0|trinket.1.cooldown.remains)))&!buff.spymasters_web.up
-    if I.SpymastersWeb:IsEquippedAndReady() and ((Target:DebuffUp(S.TemporalWoundDebuff) or Player:PrevGCDP(1, S.BreathofEons)) and (FightRemains < 120) or (FightRemains <= 20 and FightRemains <= 60 and FightRemains <= 30 and (VarTrinket1ID == I.SpymastersWeb:ID() and (VarTrinket2CD == 0 or Trinket2:CooldownDown()) or VarTrinket2ID == I.SpymastersWeb:ID() and (VarTrinket1CD == 0 or Trinket1:CooldownDown()))) and Player:BuffDown(S.SpymastersWebBuff)) then
+     -- use_item,name=spymasters_web,if=(debuff.temporal_wound.up|prev_gcd.1.breath_of_eons)&(fight_remains<120)|(fight_remains<=20|evoker.allied_cds_up>0&fight_remains<=60)&(trinket.1.is.spymasters_web&(trinket.2.cooldown.duration=0|trinket.2.cooldown.remains|variable.trinket_2_exclude)|trinket.2.is.spymasters_web&(trinket.1.cooldown.duration=0|trinket.1.cooldown.remains|variable.trinket_1_exclude))&!buff.spymasters_web.up
+    if I.SpymastersWeb:IsEquippedAndReady() and ((Target:DebuffUp(S.TemporalWoundDebuff) or Player:PrevGCDP(1, S.BreathofEons)) and (FightRemains < 120) or (FightRemains <= 60) and (VarTrinket1ID == I.SpymastersWeb:ID() and (VarTrinket2CD == 0 or Trinket2:CooldownDown() or VarTrinket2Exclude) or VarTrinket2ID == I.SpymastersWeb:ID() and (VarTrinket1CD == 0 or Trinket1:CooldownDown() or VarTrinket1Exclude)) and Player:BuffDown(S.SpymastersWebBuff)) then
       if Cast(I.SpymastersWeb, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spymasters_web items 8"; end
     end
-    -- use_item,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&((debuff.temporal_wound.up|prev_gcd.1.breath_of_eons)|variable.trinket_2_buffs&!trinket.2.cooldown.up&(prev_gcd.1.fire_breath|prev_gcd.1.upheaval)&buff.ebon_might_self.up)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
-    if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (VarTrinket1Buffs and not VarTrinket1Manual and ((Target:DebuffUp(S.TemporalWoundDebuff) or Player:PrevGCDP(1, S.BreathofEons)) or VarTrinket2Buffs and Trinket2:CooldownDown() and (Player:PrevGCDP(1, S.FireBreath) or Player:PrevGCDP(1, S.Upheaval)) and Player:BuffUp(S.EbonMightSelfBuff)) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= FightRemains) then
+    -- use_item,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&!variable.trinket_1_exclude&((debuff.temporal_wound.up|prev_gcd.1.breath_of_eons)|variable.trinket_2_buffs&!trinket.2.cooldown.up&(prev_gcd.1.fire_breath|prev_gcd.1.upheaval)&buff.ebon_might_self.up)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
+    if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (VarTrinket1Buffs and not VarTrinket1Manual and not VarTrinket1Exclude and ((Target:DebuffUp(S.TemporalWoundDebuff) or Player:PrevGCDP(1, S.BreathofEons)) or VarTrinket2Buffs and Trinket2:CooldownDown() and (Player:PrevGCDP(1, S.FireBreath) or Player:PrevGCDP(1, S.Upheaval)) and Player:BuffUp(S.EbonMightSelfBuff)) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= FightRemains) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 10"; end
     end
-    -- use_item,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&((debuff.temporal_wound.up|prev_gcd.1.breath_of_eons)|variable.trinket_1_buffs&!trinket.1.cooldown.up&(prev_gcd.1.fire_breath|prev_gcd.1.upheaval)&buff.ebon_might_self.up)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
-    if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (VarTrinket2Buffs and not VarTrinket2Manual and ((Target:DebuffUp(S.TemporalWoundDebuff) or Player:PrevGCDP(1, S.BreathofEons)) or VarTrinket1Buffs and Trinket1:CooldownDown() and (Player:PrevGCDP(1, S.FireBreath) or Player:PrevGCDP(1, S.Upheaval)) and Player:BuffUp(S.EbonMightSelfBuff)) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= FightRemains) then
+    -- use_item,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&!variable.trinket_2_exclude&((debuff.temporal_wound.up|prev_gcd.1.breath_of_eons)|variable.trinket_1_buffs&!trinket.1.cooldown.up&(prev_gcd.1.fire_breath|prev_gcd.1.upheaval)&buff.ebon_might_self.up)&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
+    if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (VarTrinket2Buffs and not VarTrinket2Manual and not VarTrinket1Exclude and ((Target:DebuffUp(S.TemporalWoundDebuff) or Player:PrevGCDP(1, S.BreathofEons)) or VarTrinket1Buffs and Trinket1:CooldownDown() and (Player:PrevGCDP(1, S.FireBreath) or Player:PrevGCDP(1, S.Upheaval)) and Player:BuffUp(S.EbonMightSelfBuff)) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= FightRemains) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 12"; end
     end
   end
@@ -504,16 +505,16 @@ local function Items()
     if Cast(S.AzureStrike, nil, nil, not Target:IsInRange(20)) then return "azure_strike items 14"; end
   end
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|trinket.2.is.spymasters_web&buff.spymasters_report.stack<30|trinket.2.cooldown.duration=0)&(gcd.remains>0.1&variable.trinket_1_ogcd_cast)
-    if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs and not VarTrinket1Manual and (VarDamageTrinketPriority == 1 or Trinket2:CooldownDown() or VarTrinket2ID == I.SpymastersWeb:ID() and Player:BuffStack(S.SpymastersReportBuff) < 30 or VarTrinket2CD == 0)) then
+    -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&!variable.trinket_1_exclude&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|trinket.2.is.spymasters_web&buff.spymasters_report.stack<30|cooldown.breath_of_eons.remains>=25&talent.wingleader|cooldown.allied_virtual_cd_time.remains>=20&!talent.wingleader|trinket.2.cooldown.duration=0|variable.trinket_2_exclude)&(gcd.remains>0.1&variable.trinket_1_ogcd_cast)
+    if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs and not VarTrinket1Manual and not VarTrinket1Exclude and (VarDamageTrinketPriority == 1 or Trinket2:CooldownDown() or VarTrinket2ID == I.SpymastersWeb:ID() and Player:BuffStack(S.SpymastersReportBuff) < 30 or S.BreathofEons:CooldownRemains() >= 25 and S.Wingleader:IsAvailable() or not S.Wingleader:IsAvailable() or VarTrinket2CD == 0 or VarTrinket2Exclude)) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 16"; end
     end
-    -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains|trinket.1.is.spymasters_web&buff.spymasters_report.stack<30|trinket.1.cooldown.duration=0)&(gcd.remains>0.1&variable.trinket_2_ogcd_cast)
-    if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs and not VarTrinket2Manual and (VarDamageTrinketPriority == 2 or Trinket1:CooldownDown() or VarTrinket1ID == I.SpymastersWeb:ID() and Player:BuffStack(S.SpymastersReportBuff) < 30 or VarTrinket1CD == 0)) then
+    -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&!variable.trinket_2_exclude&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains|trinket.1.is.spymasters_web&buff.spymasters_report.stack<30|cooldown.breath_of_eons.remains>=25&talent.wingleader|cooldown.allied_virtual_cd_time.remains>=20&!talent.wingleader|trinket.1.cooldown.duration=0|variable.trinket_1_exclude)&(gcd.remains>0.1&variable.trinket_2_ogcd_cast)
+    if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs and not VarTrinket2Manual and not VarTrinket2Exclude and (VarDamageTrinketPriority == 2 or Trinket1:CooldownDown() or VarTrinket1ID == I.SpymastersWeb:ID() and Player:BuffStack(S.SpymastersReportBuff) < 30 or S.BreathofEons:CooldownRemains() >= 25 and S.Wingleader:IsAvailable() or not S.Wingleader:IsAvailable() or VarTrinket1CD == 0 or VarTrinket1Exclude)) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 18"; end
     end
-    -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|trinket.2.is.spymasters_web&buff.spymasters_report.stack<30|trinket.2.cooldown.duration=0)&(!variable.trinket_1_ogcd_cast)
-    -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains|trinket.1.is.spymasters_web&buff.spymasters_report.stack<30|trinket.1.cooldown.duration=0)&(!variable.trinket_2_ogcd_cast)
+    -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&!variable.trinket_1_exclude&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|trinket.2.is.spymasters_web&buff.spymasters_report.stack<30|cooldown.breath_of_eons.remains>=25&talent.wingleader|cooldown.allied_virtual_cd_time.remains>=20&!talent.wingleader|trinket.2.cooldown.duration=0|variable.trinket_2_exclude)&(!variable.trinket_1_ogcd_cast)
+    -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&!variable.trinket_2_exclude&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains|trinket.1.is.spymasters_web&buff.spymasters_report.stack<30|cooldown.breath_of_eons.remains>=25&talent.wingleader|cooldown.allied_virtual_cd_time.remains>=20&!talent.wingleader|trinket.1.cooldown.duration=0|variable.trinket_1_exclude)&(!variable.trinket_2_ogcd_cast)
     -- Note: Skipping the above line, as they're just on-GCD versions of the lines above them. HR doesn't differentiate between on-GCD and OffGCD trinket usage.
   end
   -- use_item,slot=main_hand,use_off_gcd=1,if=gcd.remains>=gcd.max*0.6
@@ -596,6 +597,8 @@ local function APL()
     if S.Prescience:IsCastable() and PrescienceCheck() and ((S.Prescience:FullRechargeTime() <= Player:GCD() * 3 or S.EbonMight:CooldownRemains() <= Player:GCD() * 3 and (Player:BuffRemains(S.EbonMightSelfBuff) - Player:GCD() * 3) <= EMSelfBuffDuration() * VarEbonMightPandemicThreshold or BossFightRemains <= 30) or S.BreathofEons:CooldownRemains() <= 8 and S.Wingleader:IsAvailable() or not S.Wingleader:IsAvailable()) then
       if Cast(S.Prescience, nil, Settings.Augmentation.DisplayStyle.AugBuffs) then return "prescience main 4"; end
     end
+    -- hover,use_off_gcd=1,if=gcd.remains>=0.5&(!raid_event.movement.exists&(trinket.1.is.ovinaxs_mercurial_egg|trinket.2.is.ovinaxs_mercurial_egg)|raid_event.movement.in<=6)
+    -- Note: Not handling hover.
     -- potion,if=cooldown.allied_virtual_cd_time.up|cooldown.breath_of_eons.up&talent.wingleader|fight_remains<=30
     if Settings.Commons.Enabled.Potions and S.BreathofEons:CooldownUp() and S.Wingleader:IsAvailable() or BossFightRemains <= 30 then
       local PotionSelected = Everyone.PotionSelected()

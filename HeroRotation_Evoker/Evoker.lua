@@ -204,6 +204,7 @@ Item.Evoker.Augmentation = MergeTableByKey(Item.Evoker.Commons, {
   -- TWW Trinkets
   AberrantSpellforge                    = Item(212451, {13, 14}),
   ConcoctionKissofDeath                 = Item(215174, {13, 14}),
+  OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
 })
 
