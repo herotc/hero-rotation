@@ -327,8 +327,8 @@ local function ST()
       if Cast(S.Incarnation, Settings.Balance.GCDasOffGCD.CAInc) then return "celestial_alignment st 16"; end
     end
   end
-  -- force_of_nature,if=cooldown.ca_inc.remains<gcd.max&(!talent.natures_grace|!variable.eclipse|variable.eclipse_remains>6)|variable.eclipse_remains>=3&cooldown.ca_inc.remains>10+15*talent.control_of_the_dream&(fight_remains>cooldown+5|cooldown.ca_inc.remains>fight_remains)
-  if S.ForceofNature:IsCastable() and (CAInc:CooldownRemains() < Player:GCD() and (not S.NaturesGrace:IsAvailable() or not VarEclipse or VarEclipseRemains > 6) or VarEclipseRemains >= 3 and CAInc:CooldownRemains() > 10 + 15 * num(S.ControloftheDream:IsAvailable()) and (BossFightRemains > CAInc:CooldownRemains() + 5 or CAInc:CooldownRemains() > BossFightRemains)) then
+  -- force_of_nature,if=cooldown.ca_inc.remains<gcd.max&(!talent.natures_grace|!variable.eclipse|variable.eclipse_remains>6)|variable.eclipse_remains>=6&cooldown.ca_inc.remains>10+15*talent.control_of_the_dream&(fight_remains>cooldown+5|cooldown.ca_inc.remains>fight_remains)
+  if S.ForceofNature:IsCastable() and (CAInc:CooldownRemains() < Player:GCD() and (not S.NaturesGrace:IsAvailable() or not VarEclipse or VarEclipseRemains > 6) or VarEclipseRemains >= 6 and CAInc:CooldownRemains() > 10 + 15 * num(S.ControloftheDream:IsAvailable()) and (BossFightRemains > CAInc:CooldownRemains() + 5 or CAInc:CooldownRemains() > BossFightRemains)) then
     if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature st 18"; end
   end
   -- fury_of_elune,if=5+variable.passive_asp<astral_power.deficit
