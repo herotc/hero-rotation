@@ -395,9 +395,6 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
 
   -- actions.stealthed+=/envenom,if=effective_combo_points>=variable.effective_spend_cp&dot.kingsbane.ticking&buff.envenom.remains<=3
   -- &(debuff.deathstalkers_mark.up|buff.edge_case.up|buff.cold_blood.up)
-
-  -- actions.stealthed+=/envenom,if=effective_combo_points>=variable.effective_spend_cp&buff.master_assassin_aura.up&variable.single_target
-  -- &(debuff.deathstalkers_mark.up|buff.edge_case.up|buff.cold_blood.up)
   if ComboPoints >= EffectiveCPSpend and (Target:DebuffUp(S.DeathStalkersMarkDebuff) or Player:BuffUp(S.EdgeCase) or Player:BuffUp(S.ColdBlood)) then
     if Target:DebuffUp(S.Kingsbane) and Player:BuffRemains(S.Envenom) <= 3 then
       if ReturnSpellOnly then
@@ -519,6 +516,10 @@ end
 
 -- # Vanish Handling
 local function Vanish ()
+  if not Settings.Commons.UseDpsVanish and (not Player:IsTanking(Target) or Settings.Commons.UseSoloVanish) then
+    return
+  end
+
   -- # Vanish to fish for Fateful Ending
   -- actions.vanish+=/vanish,if=!buff.fatebound_lucky_coin.up&(buff.fatebound_coin_tails.stack>=5|buff.fatebound_coin_heads.stack>=5)
   if S.Vanish:IsCastable() and Player:BuffDown(S.FateboundLuckyCoin) and
@@ -793,7 +794,7 @@ local function CDs ()
   -- actions.cds+=/kingsbane,if=(debuff.shiv.up|cooldown.shiv.remains<6)&buff.envenom.up&(cooldown.deathmark.remains>=50|dot.deathmark.ticking)|fight_remains<=15
   if S.Kingsbane:IsReady() then
     if (Target:DebuffUp(S.ShivDebuff) or S.Shiv:CooldownRemains() < 6) and Player:BuffUp(S.Envenom)
-      and (S.Deathmark:CooldownRemains() >= 50 or Target:DebuffUp(S.Deathmark)) or HL.BossFilteredFightRemains("<=", 15) then
+      and (S.Deathmark:CooldownRemains() >= 50 or Target:DebuffUp(S.Deathmark) or S.Deathmark:IsReady()) or HL.BossFilteredFightRemains("<=", 15) then
       if Cast(S.Kingsbane, Settings.Assassination.GCDasOffGCD.Kingsbane) then
         return "Cast Kingsbane"
       end
@@ -1018,7 +1019,7 @@ local function Direct ()
   -- &(spell_targets.fan_of_knives>=3-(talent.momentum_of_despair&talent.thrown_precision)
   -- |buff.clear_the_witnesses.up&!talent.vicious_venoms)
   if S.FanofKnives:IsReady() then
-    if HR.AoEON() and not PriorityRotation and (MeleeEnemies10yCount >= 3 - BoolToInt(S.MomentumOfDespair and S.ThrownPrecision))
+    if HR.AoEON() and not PriorityRotation and (MeleeEnemies10yCount >= 3 - BoolToInt(S.MomentumOfDespair:IsAvailable() and S.ThrownPrecision:IsAvailable()))
       or Player:BuffUp(S.ClearTheWitnessesBuff) and not S.ViciousVenoms:IsAvailable() then
       if CastPooling(S.FanofKnives) then
         return "Cast Fan of Knives"
