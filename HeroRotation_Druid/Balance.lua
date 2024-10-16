@@ -249,14 +249,17 @@ local function Precombat()
   if S.Wrath:IsCastable() and (Player:IsCasting(S.Wrath) and S.Wrath:Count() == 2 or Player:PrevGCD(1, S.Wrath) and S.Wrath:Count() == 1) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath precombat 4"; end
   end
-  -- wait,sec=0.1,if=hero_tree.keeper_of_the_grove&!talent.stellar_flare
+  -- regrowth,if=hero_tree.keeper_of_the_grove&!talent.stellar_flare
+  if S.Regrowth:IsCastable() and (Player:HeroTreeID() == 23 and not S.StellarFlare:IsAvailable()) then
+    if Cast(S.Regrowth, Settings.Balance.GCDasOffGCD.Regrowth) then return "regrowth precombat 6"; end
+  end
   -- starfire,if=!talent.stellar_flare&hero_tree.elunes_chosen
   if S.Starfire:IsCastable() and (not S.StellarFlare:IsAvailable() and Player:HeroTreeID() == 24) then
-    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire precombat 6"; end
+    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire precombat 8"; end
   end
   -- stellar_flare
   if S.StellarFlare:IsCastable() then
-    if Cast(S.StellarFlare, nil, nil, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare precombat 8"; end
+    if Cast(S.StellarFlare, nil, nil, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare precombat 10"; end
   end
 end
 

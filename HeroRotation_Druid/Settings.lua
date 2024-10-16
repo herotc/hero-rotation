@@ -61,6 +61,7 @@ HR.GUISettings.APL.Druid = {
       ForceOfNature = true,
       FuryOfElune = true,
       MoonkinForm = false,
+      Regrowth = true,
       Starfall = false,
       WarriorOfElune = true,
       WildMushroom = false,
