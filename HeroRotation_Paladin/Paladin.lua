@@ -88,11 +88,13 @@ Spell.Paladin.Lightsmith = {
   HolyBulwark                          = Spell(432459),
   SacredWeapon                         = Spell(432472),
   -- Talents
+  BlessedAssurance                     = Spell(433015),
   HolyArmaments                        = Spell(432459),
   RiteofAdjuration                     = Spell(433583),
   RiteofSanctification                 = Spell(433568),
   -- Buffs
   BlessedAssuranceBuff                 = Spell(433019),
+  DivineGuidanceBuff                   = Spell(433106),
   RiteofAdjurationBuff                 = Spell(433584),
   RiteofSanctificationBuff             = Spell(433550),
   SacredWeaponBuff                     = Spell(432502),
@@ -101,6 +103,7 @@ Spell.Paladin.Lightsmith = {
 Spell.Paladin.Templar = {
   -- Talents
   HammerofLight                        = Spell(427453),
+  Hammerfall                           = Spell(432463),
   LightsDeliverance                    = Spell(425518),
   LightsGuidance                       = Spell(427445),
   -- Buffs
