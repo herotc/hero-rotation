@@ -211,6 +211,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   MongooseBiteEagle                     = Spell(265888),
   RaptorStrike                          = Spell(186270),
   RaptorStrikeEagle                     = Spell(265189),
+  RelentlessPrimalFerocity              = Spell(459922),
   RuthlessMarauder                      = Spell(385718),
   SicEm                                 = Spell(459920),
   Spearhead                             = Spell(360966),
@@ -222,7 +223,6 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   ExposedFlankBuff                      = Spell(459864),
   MercilessBlowsBuff                    = Spell(459870), -- Exposed Flank buff from Merciless Blows talent. Called buff.merciless_blows in APL.
   MongooseFuryBuff                      = Spell(259388),
-  RelentlessPrimalFerocityBuff          = Spell(459962),
   SicEmBuff                             = Spell(461409),
   TipoftheSpearBuff                     = Spell(260286),
   -- Debuffs

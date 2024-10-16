@@ -196,7 +196,7 @@ end
 
 local function PLST()
   -- kill_command,target_if=min:bloodseeker.remains,if=(buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1)
-  if S.KillCommand:IsCastable() and (Player:BuffUp(S.RelentlessPrimalFerocityBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
+  if S.KillCommand:IsCastable() and (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command plst 2"; end
   end
   -- spearhead,if=cooldown.coordinated_assault.remains
@@ -267,7 +267,7 @@ local function PLCleave()
     if Cast(S.Spearhead, nil, nil, not Target:IsSpellInRange(S.Spearhead)) then return "spearhead plcleave 2"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1
-  if S.KillCommand:IsCastable() and (Player:BuffUp(S.RelentlessPrimalFerocityBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
+  if S.KillCommand:IsCastable() and (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command plcleave 4"; end
   end
   -- explosive_shot,if=buff.bombardier.remains
@@ -338,7 +338,7 @@ local function SentST()
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb sentst 2"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=(buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1)
-  if S.KillCommand:IsCastable() and (Player:BuffUp(S.RelentlessPrimalFerocityBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
+  if S.KillCommand:IsCastable() and (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command sentst 4"; end
   end
   -- spearhead,if=cooldown.coordinated_assault.remains
@@ -382,7 +382,7 @@ local function SentST()
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command sentst 24"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&(!buff.relentless_primal_ferocity.up||(buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<2))
-  if S.KillCommand:IsReady() and (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and (Player:BuffDown(S.RelentlessPrimalFerocityBuff) or (Player:BuffUp(S.RelentlessPrimalFerocityBuff) and Player:BuffStack(S.TipoftheSpearBuff) < 2))) then
+  if S.KillCommand:IsReady() and (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and (not (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff)) or (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff) and Player:BuffStack(S.TipoftheSpearBuff) < 2))) then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command sentst 26"; end
   end
   -- wildfire_bomb,if=buff.tip_of_the_spear.stack>0&cooldown.lunar_storm.remains>full_recharge_time&(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.in>15)
@@ -413,7 +413,7 @@ local function SentCleave()
     if Cast(S.Spearhead, nil, nil, not Target:IsSpellInRange(S.Spearhead)) then return "spearhead sentcleave 2"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1
-  if S.KillCommand:IsCastable() and (Player:BuffUp(S.RelentlessPrimalFerocityBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
+  if S.KillCommand:IsCastable() and (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command sentcleave 4"; end
   end
   -- explosive_shot,if=buff.bombardier.remains
