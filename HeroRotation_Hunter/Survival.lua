@@ -224,7 +224,7 @@ local function PLST()
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot plst 14"; end
   end
   -- flanking_strike
-  if S.FlankingStrike:IsCastable() then
+  if S.FlankingStrike:IsReady() then
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike plst 16"; end
   end
   -- explosive_shot,if=(talent.spearhead&(!talent.symbiotic_adrenaline&(buff.tip_of_the_spear.stack>0|buff.bombardier.remains)&cooldown.spearhead.remains>20|cooldown.spearhead.remains<2))|((talent.symbiotic_adrenaline|!talent.spearhead)&(buff.tip_of_the_spear.stack>0|buff.bombardier.remains)&cooldown.coordinated_assault.remains>20|cooldown.coordinated_assault.remains<2)
@@ -283,7 +283,7 @@ local function PLCleave()
     if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault plcleave 10"; end
   end
   -- flanking_strike,if=buff.tip_of_the_spear.stack=2|buff.tip_of_the_spear.stack=1
-  if S.FlankingStrike:IsCastable() and (Player:BuffStack(S.TipoftheSpearBuff) == 2 or Player:BuffStack(S.TipoftheSpearBuff) == 1) then
+  if S.FlankingStrike:IsReady() and (Player:BuffStack(S.TipoftheSpearBuff) == 2 or Player:BuffStack(S.TipoftheSpearBuff) == 1) then
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike plcleave 12"; end
   end
   -- explosive_shot,if=(buff.tip_of_the_spear.stack>0|buff.bombardier.remains)&((cooldown.coordinated_assault.remains>20&(cooldown.coordinated_assault.remains<80|buff.coordinated_assault.remains))|(cooldown.coordinated_assault.remains>12&cooldown.coordinated_assault.remains<20))|cooldown.coordinated_assault.remains<2
@@ -429,7 +429,7 @@ local function SentCleave()
     if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault sentcleave 10"; end
   end
   -- flanking_strike,if=buff.tip_of_the_spear.stack=2|buff.tip_of_the_spear.stack=1
-  if S.FlankingStrike:IsCastable() and (Player:BuffStack(S.TipoftheSpearBuff) == 2 or Player:BuffStack(S.TipoftheSpearBuff) == 1) then
+  if S.FlankingStrike:IsReady() and (Player:BuffStack(S.TipoftheSpearBuff) == 2 or Player:BuffStack(S.TipoftheSpearBuff) == 1) then
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike sentcleave 12"; end
   end
   -- explosive_shot,if=(buff.tip_of_the_spear.stack>0|buff.bombardier.remains)&((cooldown.coordinated_assault.remains>20&(cooldown.coordinated_assault.remains<80|buff.coordinated_assault.remains))|(cooldown.coordinated_assault.remains>12&cooldown.coordinated_assault.remains<20))|cooldown.coordinated_assault.remains<2

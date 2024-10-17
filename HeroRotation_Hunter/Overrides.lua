@@ -159,15 +159,11 @@ end
 local OldSVIsReady
 OldSVIsReady = HL.AddCoreOverride("Spell.IsReady",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  if self == SpellSV.MongooseBite or self == SpellSV.RaptorStrike then
-    return OldSVIsReady(self, "Melee", AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldSVIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  if self == SpellSV.Butchery then
+    return BaseCheck and (Player:BuffDown(SpellSV.AspectoftheEagle) or Player:BuffUp(SpellSV.AspectoftheEagle) and Target:IsInMeleeRange(8))
   else
-    local BaseCheck = OldSVIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    if self == SpellSV.Butchery then
-      return BaseCheck and (Player:BuffDown(SpellSV.AspectoftheEagle) or Player:BuffUp(SpellSV.AspectoftheEagle) and Target:IsInMeleeRange(8))
-    else
-      return BaseCheck
-    end
+    return BaseCheck
   end
 end
 , 255)
