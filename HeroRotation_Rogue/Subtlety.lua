@@ -895,7 +895,7 @@ local function Stealth_CDs (EnergyThreshold)
 
     -- actions.stealth_cds=vanish,if=!talent.invigorating_shadowdust&!talent.subterfuge&combo_points.deficit>=3
     -- &(!dot.rupture.ticking|(buff.shadow_blades.up&buff.symbols_of_death.up)|talent.premeditation|fight_remains<10)
-    if S.Vanish:IsCastable() then
+    if S.Vanish:IsCastable() and (not Player:IsTanking(Target) or Settings.Commons.UseSoloVanish) then
       if not S.InvigoratingShadowdust:IsAvailable() and not S.Subterfuge:IsAvailable() and ComboPointsDeficit >= 3
         and (Target:DebuffDown(S.Rupture) or ((Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and Player:BuffUp(S.SymbolsofDeath))
         or S.Premeditation:IsAvailable() or HL.BossFilteredFightRemains("<", 10)) then
@@ -909,7 +909,7 @@ local function Stealth_CDs (EnergyThreshold)
     -- actions.stealth_cds+=/vanish,if=!buff.shadow_dance.up&talent.invigorating_shadowdust&talent.deathstalkers_mark
     -- &(combo_points.deficit>1|buff.shadow_blades.up)&(cooldown.flagellation.remains>=60|!talent.flagellation
     -- |fight_remains<=(30*cooldown.vanish.charges))&(cooldown.secret_technique.remains>=10&!raid_event.adds.up)
-    if S.Vanish:IsCastable() then
+    if S.Vanish:IsCastable() and (not Player:IsTanking(Target) or Settings.Commons.UseSoloVanish) then
       if Player:BuffDown(S.ShadowDanceBuff) and S.InvigoratingShadowdust:IsAvailable() and S.DeathStalkersMark:IsAvailable()
         and (ComboPointsDeficit > 1 or Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady()) and (S.Flagellation:CooldownRemains() >= 60
         or not S.Flagellation:IsAvailable() or HL.BossFilteredFightRemains("<=", 30 * S.Vanish:Charges()))
@@ -940,7 +940,7 @@ local function Stealth_CDs (EnergyThreshold)
 
     -- actions.stealth_cds+=/vanish,if=!talent.invigorating_shadowdust&talent.subterfuge&combo_points.deficit>=3
     -- &(buff.symbols_of_death.up|cooldown.symbols_of_death.remains>=3)
-    if S.Vanish:IsCastable() then
+    if S.Vanish:IsCastable() and (not Player:IsTanking(Target) or Settings.Commons.UseSoloVanish) then
       if not S.InvigoratingShadowdust:IsAvailable() and not S.Subterfuge:IsAvailable() and ComboPointsDeficit >= 3
         and (Player:BuffUp(S.SymbolsofDeath) or S.SymbolsofDeath:CooldownRemains() >= 3) then
         ShouldReturn = StealthMacro(S.Vanish, EnergyThreshold)
