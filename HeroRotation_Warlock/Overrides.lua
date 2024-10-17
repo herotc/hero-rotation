@@ -158,7 +158,7 @@ HL.AddCoreOverride ("Player.SoulShardsP",
     if not Player:IsCasting() then
       return Shard
     else
-      if Player:IsCasting(SpellDemo.SummonDemonicTyrant) and SpellDemo.SoulboundTyrant:IsAvailable() then
+      if Player:IsCasting(SpellDemo.SummonDemonicTyrant) and SpellDemo.SoulboundTyrant:IsAvailable() or Player:IsCasting(SpellDemo.InfernalBolt) then
         return min(Shard + 3, 5)
       elseif Player:IsCasting(SpellDemo.Demonbolt) then
         return min(Shard + 2, 5)
@@ -168,7 +168,7 @@ HL.AddCoreOverride ("Player.SoulShardsP",
         return max(Shard - 3, 0)
       elseif Player:IsCasting(SpellDemo.CallDreadstalkers) then
         return Shard - 2
-      elseif Player:IsCasting(SpellDemo.SummonVilefiend) or Player:IsCasting(SpellDemo.SummonPet) or Player:IsCasting(SpellDemo.NetherPortal) then
+      elseif Player:IsCasting(SpellDemo.SummonVilefiend) or Player:IsCasting(SpellDemo.SummonCharhound) or Player:IsCasting(SpellDemo.SummonGloomhound) or Player:IsCasting(SpellDemo.SummonPet) or Player:IsCasting(SpellDemo.NetherPortal) then
         return Shard - 1
       else
         return Shard
@@ -188,7 +188,7 @@ DemoOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     local BaseCheck = DemoOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellDemo.SummonPet then
       return BaseCheck and (not Settings.Commons.HidePetSummon) and (not Pet:IsActive()) and Player:SoulShardsP() > 0 and not Player:IsCasting(self)
-    elseif self == SpellDemo.SummonDemonicTyrant then
+    elseif self == SpellDemo.SummonDemonicTyrant or self == SpellDemo.InfernalBolt then
       return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
