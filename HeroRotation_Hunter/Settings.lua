@@ -95,6 +95,7 @@ HR.GUISettings.APL.Hunter = {
       Butchery = false,
       CoordinatedAssault = true,
       Harpoon = true,
+      Spearhead = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
