@@ -529,7 +529,7 @@ local function APL()
     -- auto_attack
     -- Manually added: If out of range, use Aspect of the Eagle, otherwise Harpoon to get back into range
     if not EagleUp and not Target:IsInMeleeRange(8) then
-      if S.AspectoftheEagle:IsCastable() then
+      if S.AspectoftheEagle:IsCastable() and Settings.Survival.AspectOfTheEagle then
         if Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectOfTheEagle) then return "aspect_of_the_eagle oor"; end
       end
       if S.Harpoon:IsCastable() then

@@ -85,7 +85,6 @@ HR.GUISettings.APL.Hunter = {
   },
   Survival = {
     AspectOfTheEagle = true,
-    CAKSMacro = false,
     PotionType = {
       Selected = "Tempered",
     },
@@ -132,5 +131,4 @@ CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship")
 
 -- Survival
 CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.AspectoftheEagle", "Show Aspect of the Eagle", "Show Aspect of the Eagle when out of Melee Range.")
-CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.CAKSMacro", "Using Coordinated Assault Macro", "Enable this option to fix Kill Shot recommendations when you are using a Coordinated Assault/Kill Shot macro.")
 CreateARPanelOptions(CP_Survival, "APL.Hunter.Survival")
