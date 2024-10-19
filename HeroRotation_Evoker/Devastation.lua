@@ -378,27 +378,27 @@ local function Aoe()
   end
   -- disintegrate,target_if=min:debuff.bombardments.remains,if=buff.mass_disintegrate_stacks.up&talent.mass_disintegrate&(buff.charged_blast.stack<10|!talent.charged_blast)
   if S.Disintegrate:IsReady() and (S.MassDisintegrate:IsAvailable() and (Player:BuffStack(S.ChargedBlastBuff) < 10 or not S.ChargedBlast:IsAvailable())) then
-    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "min", EvaluateTargetIfFilterBombardments, EvaluateTargetIfDisintegrate, not Target:IsInRange(40), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate aoe 20"; end
+    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "min", EvaluateTargetIfFilterBombardments, EvaluateTargetIfDisintegrate, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate aoe 20"; end
   end
   -- pyre,target_if=max:target.health.pct,if=(active_enemies>=4|talent.volatility)&(cooldown.dragonrage.remains>gcd.max*4|!talent.charged_blast|talent.engulf&(!talent.arcane_intensity|!talent.eternitys_span))&!variable.pool_for_id
   if S.Pyre:IsReady() and ((EnemiesCount8ySplash >= 4 or S.Volatility:IsAvailable()) and (S.Dragonrage:CooldownRemains() > Player:GCD() * 4 or not S.ChargedBlast:IsAvailable() or S.Engulf:IsAvailable() and (not S.ArcaneIntensity:IsAvailable() or not S.EternitysSpan:IsAvailable())) and not VarPoolForID) then
-    if Everyone.CastTargetIf(S.Pyre, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(40), nil, Settings.CommonsDS.DisplayStyle.Pyre) then return "pyre aoe 22"; end
+    if Everyone.CastTargetIf(S.Pyre, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Pyre) then return "pyre aoe 22"; end
   end
   -- pyre,target_if=max:target.health.pct,if=buff.charged_blast.stack>=12&cooldown.dragonrage.remains>gcd.max*4
   if S.Pyre:IsReady() and (Player:BuffStack(S.ChargedBlastBuff) >= 12 and S.Dragonrage:CooldownRemains() > Player:GCD() * 4) then
-    if Everyone.CastTargetIf(S.Pyre, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(40), nil, Settings.CommonsDS.DisplayStyle.Pyre) then return "pyre aoe 24"; end
+    if Everyone.CastTargetIf(S.Pyre, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Pyre) then return "pyre aoe 24"; end
   end
   -- living_flame,target_if=max:target.health.pct,if=(!talent.burnout|buff.burnout.up|cooldown.fire_breath.remains<=gcd.max*5|buff.scarlet_adaptation.up|buff.ancient_flame.up)&buff.leaping_flames.up&!buff.essence_burst.up&essence.deficit>1
   if S.LivingFlame:IsReady() and ((not S.Burnout:IsAvailable() or Player:BuffUp(S.BurnoutBuff) or S.FireBreath:CooldownRemains() <= Player:GCD() * 5 or Player:BuffUp(S.ScarletAdaptationBuff) or Player:BuffUp(S.AncientFlameBuff)) and Player:BuffUp(S.LeapingFlamesBuff) and Player:BuffDown(S.EssenceBurstBuff) and Player:EssenceDeficit() > 1) then
-    if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(40), nil, Settings.CommonsDS.DisplayStyle.LivingFlame) then return "living_flame aoe 26"; end
+    if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.LivingFlame) then return "living_flame aoe 26"; end
   end
   -- disintegrate,target_if=max:target.health.pct,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=(raid_event.movement.in>2|buff.hover.up)&&!variable.pool_for_id
   if S.Disintegrate:IsReady() and (not VarPoolForID) then
-    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(40), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate aoe 28"; end
+    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate aoe 28"; end
   end
   -- living_flame,target_if=max:target.health.pct,if=talent.snapfire&buff.burnout.up
   if S.LivingFlame:IsReady() and (S.Snapfire:IsAvailable() and Player:BuffUp(S.BurnoutBuff)) then
-    if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(40), nil, Settings.CommonsDS.DisplayStyle.LivingFlame) then return "living_flame aoe 30"; end
+    if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.LivingFlame) then return "living_flame aoe 30"; end
   end
   -- firestorm
   if S.Firestorm:IsCastable() then
@@ -459,11 +459,11 @@ local function ST()
   end
   -- living_flame,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max&buff.burnout.up
   if S.LivingFlame:IsCastable() and (VarDragonrageUp and VarDragonrageRemains < (MaxEssenceBurstStack - Player:BuffStack(S.EssenceBurstBuff)) * Player:GCD() and Player:BuffUp(S.BurnoutBuff)) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(40)) then return "living_flame st 12"; end
+    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame st 12"; end
   end
   -- azure_strike,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max
   if S.AzureStrike:IsCastable() and (VarDragonrageUp and VarDragonrageRemains < (MaxEssenceBurstStack - Player:BuffStack(S.EssenceBurstBuff)) * Player:GCD()) then
-    if Cast(S.AzureStrike, nil, nil, not Target:IsInRange(40)) then return "azure_strike st 14"; end
+    if Cast(S.AzureStrike, nil, nil, not Target:IsInRange(25)) then return "azure_strike st 14"; end
   end
   -- engulf,if=dot.fire_breath_damage.ticking&(!talent.enkindle|dot.enkindle.ticking&(prev_gcd.1.disintegrate|prev_gcd.1.engulf|prev_gcd.2.disintegrate|!talent.fan_the_flames|active_enemies>1))&(!talent.ruby_embers|dot.living_flame_damage.ticking)&(!talent.shattering_star|debuff.shattering_star_debuff.up)&cooldown.dragonrage.remains>=27
   if S.Engulf:IsReady() and (Target:DebuffUp(S.FireBreathDebuff) and (not S.Enkindle:IsAvailable() or Player:BuffUp(S.EnkindleBuff) and (S.PrevGCDP(1, S.Disintegrate) or S.PrevGCDP(1, S.Engulf) or S.PrevGCDP(2, S.Disintegrate) or not S.FanTheFlames:IsAvailable() or EnemiesCount8ySplash > 1)) and (not S.RubyEmbers:IsAvailable() or Target:DebuffUp(S.LivingFlameDebuff)) and (not S.ShatteringStar:IsAvailable() or Target:DebuffUp(S.ShatteringStarDebuff)) and S.Dragonrage:CooldownRemains() >= 27) then
@@ -471,7 +471,7 @@ local function ST()
   end
   -- living_flame,if=buff.burnout.up&buff.leaping_flames.up&!buff.essence_burst.up&buff.dragonrage.up
   if S.LivingFlame:IsReady() and (Player:BuffUp(S.BurnoutBuff) and Player:BuffUp(S.LeapingFlamesBuff) and Player:BuffDown(S.EssenceBurstBuff) and VarDragonrageUp) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(40)) then return "living_flame st 18"; end
+    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame st 18"; end
   end
   -- firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&talent.feed_the_flames&((!talent.dragonrage|cooldown.dragonrage.remains>=10)&(essence>=3|buff.essence_burst.up|talent.shattering_star&cooldown.shattering_star.remains<=6)|talent.dragonrage&cooldown.dragonrage.remains<=cast_time&cooldown.fire_breath.remains<6&cooldown.eternity_surge.remains<12)&!debuff.in_firestorm.up
   if S.Firestorm:IsReady() and (not VarDragonrageUp and Target:DebuffDown(S.ShatteringStarDebuff) and S.FeedtheFlames:IsAvailable() and ((not S.Dragonrage:IsAvailable() or S.Dragonrage:CooldownRemains() >= 10) and (Player:Essence() >= 3 or Player:BuffUp(S.EssenceBurstBuff) or S.ShatteringStar:IsAvailable() and S.ShatteringStar:CooldownRemains() <= 6) or S.Dragonrage:IsAvailable() and S.Dragonrage:CooldownRemains() <= S.Firestorm:CastTime() and S.FireBreath:CooldownRemains() < 6 and S.EternitySurge:CooldownRemains() < 12) and not InFirestorm()) then
@@ -483,15 +483,15 @@ local function ST()
   end
   -- pyre,if=debuff.in_firestorm.up&talent.feed_the_flames&buff.charged_blast.stack==20&active_enemies>=2
   if S.Pyre:IsReady() and (InFirestorm() and S.FeedtheFlames:IsAvailable() and Player:BuffStack(S.ChargedBlastBuff) == 20 and EnemiesCount8ySplash >= 2) then
-    if Cast(S.Pyre, nil, nil, not Target:IsInRange(40)) then return "pyre st 24"; end
+    if Cast(S.Pyre, nil, nil, not Target:IsInRange(25)) then return "pyre st 24"; end
   end
   -- disintegrate,target_if=min:buff.bombardments.remains,early_chain_if=ticks_remain<=1&buff.mass_disintegrate_stacks.up,if=(raid_event.movement.in>2|buff.hover.up)&buff.mass_disintegrate_stacks.up&talent.mass_disintegrate
   if S.Disintegrate:IsReady() and (Player:BuffUp(S.MassDisintegrateBuff) and S.MassDisintegrate:IsAvailable()) then
-    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "min", EvaluateTargetIfFilterBombardments, nil, not Target:IsInRange(40), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate st 26"; end
+    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "min", EvaluateTargetIfFilterBombardments, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate st 26"; end
   end
   -- disintegrate,target_if=min:buff.bombardments.remains,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=(raid_event.movement.in>2|buff.hover.up)&!variable.pool_for_id
   if S.Disintegrate:IsReady() and (not VarPoolForID) then
-    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "min", EvaluateTargetIfFilterBombardments, nil, not Target:IsInRange(40), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate st 28"; end
+    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "min", EvaluateTargetIfFilterBombardments, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate st 28"; end
   end
   -- firestorm,if=buff.snapfire.up|!debuff.in_firestorm.up&talent.feed_the_flames
   if S.Firestorm:IsReady() and (Player:BuffUp(S.SnapfireBuff) or not InFirestorm() and S.FeedtheFlames:IsAvailable()) then
@@ -511,7 +511,7 @@ local function ST()
   end
   -- living_flame,if=!buff.dragonrage.up|(buff.iridescence_red.remains>execute_time|!talent.engulfing_blaze|buff.iridescence_blue.up|buff.burnout.up|buff.leaping_flames.up&cooldown.fire_breath.remains<=5)&active_enemies==1
   if S.LivingFlame:IsReady() and (not VarDragonrageUp or (Player:BuffRemains(S.IridescenceRedBuff) > S.LivingFlame:ExecuteTime() and not S.EngulfingBlaze:IsAvailable() or Player:BuffUp(S.IridescenceBlueBuff) or Player:BuffUp(S.BurnoutBuff) or Player:BuffUp(S.LeapingFlamesBuff) and S.FireBreath:CooldownRemains() <= 5) and EnemiesCount8ySplash == 1) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(40)) then return "living_flame st 36"; end
+    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame st 36"; end
   end
   -- azure_strike
   if S.AzureStrike:IsCastable() then
