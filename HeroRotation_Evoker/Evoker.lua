@@ -108,6 +108,7 @@ Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
   BlackAttunement                       = Spell(403264),
   BronzeAttunement                      = Spell(403265),
   -- Talents
+  Anachronism                           = Spell(407869),
   BlisteringScales                      = Spell(360827),
   BreathofEons                          = MultiSpell(403631,442204),
   DreamofSpring                         = Spell(414969),
@@ -117,7 +118,6 @@ Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
   ImminentDestruction                   = Spell(459537),
   InterwovenThreads                     = Spell(412713),
   MoltenEmbers                          = Spell(459725),
-  Overlord                              = Spell(410260),
   Prescience                            = Spell(409311),
   PupilofAlexstrasza                    = Spell(407814),
   TimeSkip                              = Spell(404977),
@@ -129,8 +129,8 @@ Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
   EbonMightOtherBuff                    = Spell(395152),
   EbonMightSelfBuff                     = Spell(395296),
   EssenceBurstBuff                      = Spell(392268),
+  ImminentDestructionBuff               = Spell(459574),
   PrescienceBuff                        = Spell(410089),
-  TremblingEarthBuff                    = Spell(424368), -- T31 4pc
   -- Debuffs
   TemporalWoundDebuff                   = Spell(409560),
 })

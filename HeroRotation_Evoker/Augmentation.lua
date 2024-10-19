@@ -26,8 +26,8 @@ local Evoker        = HR.Commons.Evoker
 local num           = HR.Commons.Everyone.num
 local bool          = HR.Commons.Everyone.bool
 -- lua
-local max           = math.max
-local min           = math.min
+local mathmax       = math.max
+local mathmin       = math.min
 -- WoW API
 local Delay       = C_Timer.After
 local GetMastery  = GetMastery
@@ -72,9 +72,11 @@ local VarSpamHeal
 local VarMinOpenerDelay
 local VarOpenerDelay
 local VarOpenerCDs
-local VarHoldEmpowerFor
-local VarEbonMightPandemicThreshold
+local VarHoldEmpowerFor = 6
+local VarEbonMightPandemicThreshold = 0.4
+local VarWingleaderForceTimings = false
 local VarTempWound
+local VarEonsRemains
 local VarPoolForID
 
 --- ===== Trinket Variables =====
@@ -183,6 +185,7 @@ local function SetPrecombatVariables()
   VarOpenerCDs = false
   VarHoldEmpowerFor = 6
   VarEbonMightPandemicThreshold = 0.4
+  VarWingleaderForceTimings = false
 end
 SetPrecombatVariables()
 
@@ -325,7 +328,7 @@ local function TemporalWoundCalc(Enemies)
   local HighestTW = 0
   for _, CycleUnit in pairs(Enemies) do
     local Remains = CycleUnit:DebuffRemains(S.TemporalWoundDebuff)
-    HighestTW = max(Remains, HighestTW)
+    HighestTW = mathmax(Remains, HighestTW)
   end
   return HighestTW
 end
@@ -380,7 +383,7 @@ local function Precombat()
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=trinket.1.is.nymues_unraveling_spindle&trinket.2.has_buff.intellect|trinket.2.is.nymues_unraveling_spindle&!trinket.1.has_buff.intellect,if=(trinket.1.is.nymues_unraveling_spindle|trinket.2.is.nymues_unraveling_spindle)&(variable.trinket_1_buffs&variable.trinket_2_buffs)
   -- variable,name=hold_empower_for,op=reset,default=6
   -- variable,name=ebon_might_pandemic_threshold,op=reset,default=0.4
-  SetTrinketVariables()
+  -- variable,name=wingleader_force_timings,op=reset,default=0
   SetPrecombatVariables()
   -- Manually added: Group buff check
   if S.BlessingoftheBronze:IsCastable() and Everyone.GroupBuffMissing(S.BlessingoftheBronzeBuff) then
@@ -478,15 +481,14 @@ local function Items()
     if I.AberrantSpellforge:IsEquippedAndReady() then
       if Cast(I.AberrantSpellforge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "aberrant_spellforge items 4"; end
     end
-    -- use_item,name=treacherous_transmitter,if=cooldown.allied_virtual_cd_time.remains<=10|cooldown.breath_of_eons.remains<=10&talent.wingleader
-    -- Note: Unable to check allied_virtual_cd_time, so assuming always true.
+    -- use_item,name=treacherous_transmitter,if=cooldown.allied_virtual_cd_time.remains<=10|cooldown.breath_of_eons.remains<=10&talent.wingleader|fight_remains<=15
     if I.TreacherousTransmitter:IsEquippedAndReady() then
       if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter items 6"; end
     end
     -- do_treacherous_transmitter_task,use_off_gcd=1,if=(debuff.temporal_wound.up|prev_gcd.1.breath_of_eons|fight_remains<=15)
     -- TODO: Handle the above.
-     -- use_item,name=spymasters_web,if=(debuff.temporal_wound.up|prev_gcd.1.breath_of_eons)&(fight_remains<120)|(fight_remains<=20|evoker.allied_cds_up>0&fight_remains<=60)&(trinket.1.is.spymasters_web&(trinket.2.cooldown.duration=0|trinket.2.cooldown.remains|variable.trinket_2_exclude)|trinket.2.is.spymasters_web&(trinket.1.cooldown.duration=0|trinket.1.cooldown.remains|variable.trinket_1_exclude))&!buff.spymasters_web.up
-    if I.SpymastersWeb:IsEquippedAndReady() and ((Target:DebuffUp(S.TemporalWoundDebuff) or Player:PrevGCDP(1, S.BreathofEons)) and (FightRemains < 120) or (FightRemains <= 60) and (VarTrinket1ID == I.SpymastersWeb:ID() and (VarTrinket2CD == 0 or Trinket2:CooldownDown() or VarTrinket2Exclude) or VarTrinket2ID == I.SpymastersWeb:ID() and (VarTrinket1CD == 0 or Trinket1:CooldownDown() or VarTrinket1Exclude)) and Player:BuffDown(S.SpymastersWebBuff)) then
+     -- use_item,name=spymasters_web,if=(debuff.temporal_wound.up|prev_gcd.1.breath_of_eons)&(fight_remains<=130-(30+12*talent.interwoven_threads)*talent.wingleader-20*talent.time_skip*(cooldown.time_skip.remains<=90)*!talent.interwoven_threads)|(fight_remains<=20|evoker.allied_cds_up>0&fight_remains<=60)&(trinket.1.is.spymasters_web&(trinket.2.cooldown.duration=0|trinket.2.cooldown.remains>=10|variable.trinket_2_exclude)|trinket.2.is.spymasters_web&(trinket.1.cooldown.duration=0|trinket.1.cooldown.remains>=10|variable.trinket_1_exclude))&!buff.spymasters_web.up
+    if I.SpymastersWeb:IsEquippedAndReady() and ((Target:DebuffUp(S.TemporalWoundDebuff) or Player:PrevGCDP(1, S.BreathofEons)) and (FightRemains < 130 - (30 + 12 * num(S.InterwovenThreads:IsAvailable())) * num(S.Wingleader:IsAvailable()) - 20 * num(S.TimeSkip:IsAvailable()) * num(S.TimeSkip:CooldownRemains() <= 90) * num(not S.InterwovenThreads:IsAvailable())) or (FightRemains <= 60) and (VarTrinket1ID == I.SpymastersWeb:ID() and (VarTrinket2CD == 0 or Trinket2:CooldownRemains() >= 10 or VarTrinket2Exclude) or VarTrinket2ID == I.SpymastersWeb:ID() and (VarTrinket1CD == 0 or Trinket1:CooldownRemains() >= 10 or VarTrinket1Exclude)) and Player:BuffDown(S.SpymastersWebBuff)) then
       if Cast(I.SpymastersWeb, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spymasters_web items 8"; end
     end
     -- use_item,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&!variable.trinket_1_exclude&((debuff.temporal_wound.up|prev_gcd.1.breath_of_eons)|variable.trinket_2_buffs&!trinket.2.cooldown.up&(prev_gcd.1.fire_breath|prev_gcd.1.upheaval)&buff.ebon_might_self.up)&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
@@ -505,17 +507,17 @@ local function Items()
     if Cast(S.AzureStrike, nil, nil, not Target:IsInRange(20)) then return "azure_strike items 14"; end
   end
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&!variable.trinket_1_exclude&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|trinket.2.is.spymasters_web&buff.spymasters_report.stack<30|cooldown.breath_of_eons.remains>=25&talent.wingleader|cooldown.allied_virtual_cd_time.remains>=20&!talent.wingleader|trinket.2.cooldown.duration=0|variable.trinket_2_exclude)&(gcd.remains>0.1&variable.trinket_1_ogcd_cast)
-    if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs and not VarTrinket1Manual and not VarTrinket1Exclude and (VarDamageTrinketPriority == 1 or Trinket2:CooldownDown() or VarTrinket2ID == I.SpymastersWeb:ID() and Player:BuffStack(S.SpymastersReportBuff) < 30 or S.BreathofEons:CooldownRemains() >= 25 and S.Wingleader:IsAvailable() or not S.Wingleader:IsAvailable() or VarTrinket2CD == 0 or VarTrinket2Exclude)) then
+    -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&!variable.trinket_1_exclude&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|trinket.2.is.spymasters_web&buff.spymasters_report.stack<30|variable.eons_remains>=20|trinket.2.cooldown.duration=0|variable.trinket_2_exclude)&(gcd.remains>0.1&variable.trinket_1_ogcd_cast)
+    if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs and not VarTrinket1Manual and not VarTrinket1Exclude and (VarDamageTrinketPriority == 1 or Trinket2:CooldownDown() or VarTrinket2ID == I.SpymastersWeb:ID() and Player:BuffStack(S.SpymastersReportBuff) < 30 or VarEonsRemains >= 20 or VarTrinket2CD == 0 or VarTrinket2Exclude)) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 16"; end
     end
-    -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&!variable.trinket_2_exclude&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains|trinket.1.is.spymasters_web&buff.spymasters_report.stack<30|cooldown.breath_of_eons.remains>=25&talent.wingleader|cooldown.allied_virtual_cd_time.remains>=20&!talent.wingleader|trinket.1.cooldown.duration=0|variable.trinket_1_exclude)&(gcd.remains>0.1&variable.trinket_2_ogcd_cast)
-    if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs and not VarTrinket2Manual and not VarTrinket2Exclude and (VarDamageTrinketPriority == 2 or Trinket1:CooldownDown() or VarTrinket1ID == I.SpymastersWeb:ID() and Player:BuffStack(S.SpymastersReportBuff) < 30 or S.BreathofEons:CooldownRemains() >= 25 and S.Wingleader:IsAvailable() or not S.Wingleader:IsAvailable() or VarTrinket1CD == 0 or VarTrinket1Exclude)) then
+    -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&!variable.trinket_2_exclude&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains|trinket.1.is.spymasters_web&buff.spymasters_report.stack<30|variable.eons_remains>=20|trinket.1.cooldown.duration=0|variable.trinket_1_exclude)&(gcd.remains>0.1&variable.trinket_2_ogcd_cast)
+    if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs and not VarTrinket2Manual and not VarTrinket2Exclude and (VarDamageTrinketPriority == 2 or Trinket1:CooldownDown() or VarTrinket1ID == I.SpymastersWeb:ID() and Player:BuffStack(S.SpymastersReportBuff) < 30 or VarEonsRemains >= 20 or VarTrinket1CD == 0 or VarTrinket1Exclude)) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 18"; end
     end
-    -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&!variable.trinket_1_exclude&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|trinket.2.is.spymasters_web&buff.spymasters_report.stack<30|cooldown.breath_of_eons.remains>=25&talent.wingleader|cooldown.allied_virtual_cd_time.remains>=20&!talent.wingleader|trinket.2.cooldown.duration=0|variable.trinket_2_exclude)&(!variable.trinket_1_ogcd_cast)
-    -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&!variable.trinket_2_exclude&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains|trinket.1.is.spymasters_web&buff.spymasters_report.stack<30|cooldown.breath_of_eons.remains>=25&talent.wingleader|cooldown.allied_virtual_cd_time.remains>=20&!talent.wingleader|trinket.1.cooldown.duration=0|variable.trinket_1_exclude)&(!variable.trinket_2_ogcd_cast)
-    -- Note: Skipping the above line, as they're just on-GCD versions of the lines above them. HR doesn't differentiate between on-GCD and OffGCD trinket usage.
+    -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&!variable.trinket_1_exclude&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|trinket.2.is.spymasters_web&buff.spymasters_report.stack<30|variable.eons_remains>=20|trinket.2.cooldown.duration=0|variable.trinket_2_exclude)&(!variable.trinket_1_ogcd_cast)
+    -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&!variable.trinket_2_exclude&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains|trinket.1.is.spymasters_web&buff.spymasters_report.stack<30|variable.eons_remains>=20|trinket.1.cooldown.duration=0|variable.trinket_1_exclude)&(!variable.trinket_2_ogcd_cast)
+    -- Note: Skipping the above lines, as they're just on-GCD versions of the lines above them. HR doesn't differentiate between on-GCD and OffGCD trinket usage.
   end
   -- use_item,slot=main_hand,use_off_gcd=1,if=gcd.remains>=gcd.max*0.6
   -- Note: Expanding to include all non-trinket items.
@@ -529,9 +531,8 @@ end
 
 local function OpenerFiller()
   -- variable,name=opener_delay,value=variable.opener_delay>?variable.minimum_opener_delay,if=!variable.opener_cds_detected&evoker.allied_cds_up>0
-  -- Note: Can't track others' CDs.
   if not VarOpenerCDs then
-    VarOpenerDelay = min(VarOpenerDelay, VarMinOpenerDelay)
+    VarOpenerDelay = mathmin(VarOpenerDelay, VarMinOpenerDelay)
   end
   -- variable,name=opener_delay,value=variable.opener_delay-1
   -- Note: Instead of decrementing, just set to 0 if we've reached the opener delay.
@@ -586,21 +587,22 @@ local function APL()
     end
     -- variable,name=temp_wound,value=debuff.temporal_wound.remains,target_if=max:debuff.temporal_wound.remains
     VarTempWound = TemporalWoundCalc(Enemies25y)
-    -- variable,name=pool_for_id,if=talent.imminent_destruction,default=0,op=set,value=(talent.wingleader&cooldown.breath_of_eons.remains<8|!talent.wingleader&cooldown.allied_virtual_cd_time.remains<8)&essence.deficit>=1&!buff.essence_burst.up
-    -- TODO: Handle allied_virtual_cd_time, if even possible.
+    -- variable,name=eons_remains,op=setif,value=cooldown.allied_virtual_cd_time.remains,value_else=cooldown.breath_of_eons.remains,condition=!talent.wingleader|variable.wingleader_force_timings
+    VarEonsRemains = S.BreathofEons:CooldownRemains()
+    -- variable,name=pool_for_id,if=talent.imminent_destruction,default=0,op=set,value=(variable.eons_remains<8)&essence.deficit>=1&!buff.essence_burst.up
     VarPoolForID = false
     if S.ImminentDestruction:IsAvailable() then
-      VarPoolForID = (S.Wingleader:IsAvailable() and S.BreathofEons:CooldownRemains() < 8 or not S.Wingleader:IsAvailable()) and Player:EssenceDeficit() >= 1 and  Player:BuffDown(S.EssenceBurstBuff)
+      VarPoolForID = VarEonsRemains < 8 and Player:EssenceDeficit() >= 1 and  Player:BuffDown(S.EssenceBurstBuff)
     end
-    -- prescience,target_if=min:debuff.prescience.remains+1000*(target=self&active_allies>2)+1000*target.spec.augmentation,if=(full_recharge_time<=gcd.max*3|cooldown.ebon_might.remains<=gcd.max*3&(buff.ebon_might_self.remains-gcd.max*3)<=buff.ebon_might_self.duration*variable.ebon_might_pandemic_threshold|fight_remains<=30)|cooldown.breath_of_eons.remains<=8&talent.wingleader|cooldown.allied_virtual_cd_time.remains<=8&!talent.wingleader
+    -- prescience,target_if=min:debuff.prescience.remains+1000*(target=self&active_allies>2)+1000*target.spec.augmentation,if=(full_recharge_time<=gcd.max*3|cooldown.ebon_might.remains<=gcd.max*3&(buff.ebon_might_self.remains-gcd.max*3)<=buff.ebon_might_self.duration*variable.ebon_might_pandemic_threshold|fight_remains<=30)|variable.eons_remains<=8|talent.anachronism&buff.imminent_destruction.up&essence<1&!cooldown.fire_breath.up&!cooldown.upheaval.up
     -- Note: Not handling target_if, as user will have to decide on a target.
-    if S.Prescience:IsCastable() and PrescienceCheck() and ((S.Prescience:FullRechargeTime() <= Player:GCD() * 3 or S.EbonMight:CooldownRemains() <= Player:GCD() * 3 and (Player:BuffRemains(S.EbonMightSelfBuff) - Player:GCD() * 3) <= EMSelfBuffDuration() * VarEbonMightPandemicThreshold or BossFightRemains <= 30) or S.BreathofEons:CooldownRemains() <= 8 and S.Wingleader:IsAvailable() or not S.Wingleader:IsAvailable()) then
+    if S.Prescience:IsCastable() and PrescienceCheck() and ((S.Prescience:FullRechargeTime() <= Player:GCD() * 3 or S.EbonMight:CooldownRemains() <= Player:GCD() * 3 and (Player:BuffRemains(S.EbonMightSelfBuff) - Player:GCD() * 3) <= EMSelfBuffDuration() * VarEbonMightPandemicThreshold or BossFightRemains <= 30) or VarEonsRemains <= 8 or S.Anachronism:IsAvailable() and Player:BuffUp(S.ImminentDestructionBuff) and Player:Essence() < 1 and S.FireBreath:CooldownDown() and S.Upheaval:CooldownDown()) then
       if Cast(S.Prescience, nil, Settings.Augmentation.DisplayStyle.AugBuffs) then return "prescience main 4"; end
     end
     -- hover,use_off_gcd=1,if=gcd.remains>=0.5&(!raid_event.movement.exists&(trinket.1.is.ovinaxs_mercurial_egg|trinket.2.is.ovinaxs_mercurial_egg)|raid_event.movement.in<=6)
     -- Note: Not handling hover.
-    -- potion,if=cooldown.allied_virtual_cd_time.up|cooldown.breath_of_eons.up&talent.wingleader|fight_remains<=30
-    if Settings.Commons.Enabled.Potions and S.BreathofEons:CooldownUp() and S.Wingleader:IsAvailable() or BossFightRemains <= 30 then
+    -- potion,if=variable.eons_remains<=0|fight_remains<=30
+    if Settings.Commons.Enabled.Potions and (VarEonsRemains <= 0 or BossFightRemains <= 30) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected then
         if PotionSelected:IsReady() then
@@ -644,17 +646,17 @@ local function APL()
     if S.Upheaval:IsCastable() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) + 0.5 and S.TimeSkip:IsAvailable() and S.TimeSkip:CooldownUp() and not S.InterwovenThreads:IsAvailable()) then
       if CastAnnotated(S.Upheaval, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "upheaval empower_to=1 main 14"; end
     end
-    -- call_action_list,name=fb,if=(raid_event.adds.remains>13|raid_event.adds.in>20|evoker.allied_cds_up>0|!raid_event.adds.exists)&(cooldown.allied_virtual_cd_time.remains>=variable.hold_empower_for|!talent.breath_of_eons|talent.wingleader&cooldown.breath_of_eons.remains>=variable.hold_empower_for|cooldown.breath_of_eons.up&talent.wingleader)
-    -- Note: Can't track others' CDs, so just always assuming true.
-    local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
+    -- call_action_list,name=fb,if=(raid_event.adds.remains>13|raid_event.adds.in>20|evoker.allied_cds_up>0|!raid_event.adds.exists)&(variable.eons_remains>=variable.hold_empower_for|!talent.breath_of_eons|variable.eons_remains=0&talent.wingleader)
+    if VarEonsRemains >= VarHoldEmpowerFor or not S.BreathofEons:IsAvailable() or VarEonsRemains == 0 and S.Wingleader:IsAvailable() then
+      local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
+    end
     -- upheaval,target_if=target.time_to_die>duration+0.2,empower_to=1,if=buff.ebon_might_self.remains>duration&(raid_event.adds.remains>10|evoker.allied_cds_up>0|!raid_event.adds.exists|raid_event.adds.in>20)&(!talent.molten_embers|dot.fire_breath_damage.ticking|cooldown.fire_breath.remains>=10)&(cooldown.allied_virtual_cd_time.remains>=variable.hold_empower_for|!talent.breath_of_eons|talent.wingleader&cooldown.breath_of_eons.remains>=variable.hold_empower_for)
     -- Note: Adding 0.5s buffer to empower time to account for player latency.
-    -- Note: Can't track others' CDs, so just always assuming the final set of conditions is true.
     if S.Upheaval:IsReady() and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) + 0.5 and (not S.MoltenEmbers:IsAvailable() or S.FireBreathDebuff:AuraActiveCount() > 0 or S.FireBreath:CooldownRemains() >= 10)) then
       if CastAnnotated(S.Upheaval, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "upheaval empower_to=1 main 16"; end
     end
-    -- breath_of_eons,if=talent.wingleader&(target.time_to_die>=15&(raid_event.adds.in>=20|raid_event.adds.remains>=15))|fight_remains<=30
-    if S.BreathofEons:IsReady() and (S.Wingleader:IsAvailable() and Target:TimeToDie() >= 15 or BossFightRemains <= 30) then
+    -- breath_of_eons,if=talent.wingleader&(target.time_to_die>=15&(raid_event.adds.in>=20|raid_event.adds.remains>=15))&!variable.wingleader_force_timings|fight_remains<=30
+    if S.BreathofEons:IsReady() and (S.Wingleader:IsAvailable() and Target:TimeToDie() >= 15 and not VarWingleaderForceTimings or BossFightRemains <= 30) then
       if Cast(S.BreathofEons, Settings.Augmentation.GCDasOffGCD.BreathOfEons, nil, not Target:IsInRange(50)) then return "breath_of_eons main 18"; end
     end
     -- breath_of_eons,if=((cooldown.ebon_might.remains<=4|buff.ebon_might_self.up)&target.time_to_die>15&raid_event.adds.in>15|fight_remains<30)&!fight_style.dungeonroute&cooldown.allied_virtual_cd_time.up
@@ -665,8 +667,8 @@ local function APL()
     if S.BreathofEons:IsReady() and (((S.EbonMight:CooldownRemains() <= 4 or Player:BuffUp(S.EbonMightSelfBuff)) and Target:TimeToDie() > 15 or BossFightRemains < 30) and Player:IsInDungeonArea()) then
       if Cast(S.BreathofEons, Settings.Augmentation.GCDasOffGCD.BreathOfEons, nil, not Target:IsInRange(50)) then return "breath_of_eons main 22"; end
     end
-    -- time_skip,if=(cooldown.fire_breath.remains+cooldown.upheaval.remains)>=30
-    if S.TimeSkip:IsReady() and ((S.FireBreath:CooldownRemains() + S.Upheaval:CooldownRemains()) >= 30) then
+    -- time_skip,if=((cooldown.fire_breath.remains>?(20+10*talent.tomorrow_today))+(cooldown.upheaval.remains>?(20+10*talent.tomorrow_today)))>=30&cooldown.breath_of_eons.remains>=20
+    if S.TimeSkip:IsReady() and (mathmin(S.FireBreath:CooldownRemains(), 20 + 10 * num(S.TomorrowToday:IsAvailable())) + mathmin(S.Upheaval:CooldownRemains(), 20 + 10 * num(S.TomorrowToday:IsAvailable())) >= 30 and S.BreathofEons:CooldownRemains() >= 20) then
       if Cast(S.TimeSkip, Settings.Augmentation.GCDasOffGCD.TimeSkip) then return "time_skip main 24"; end
     end
     -- emerald_blossom,if=talent.dream_of_spring&buff.essence_burst.up&(variable.spam_heal=2|variable.spam_heal=1&!buff.ancient_flame.up&talent.ancient_flame)&(buff.ebon_might_self.up|essence.deficit=0|buff.essence_burst.stack=buff.essence_burst.max_stack&cooldown.ebon_might.remains>4)
@@ -696,3 +698,9 @@ local function Init()
 end
 
 HR.SetAPL(1473, APL, Init);
+
+-- Profile Notes:
+-- 1. TODO: Handle allied_virtual_cd_time, if even possible.
+-- 2. Since we can't handle allied_virtual_cd_time, we'll just assume phrases using it are always true.
+-- 3. Also, since we can't handle allied_virtual_cd_time, we'll just use the Breath of Eons CD for variable.eons_remains.
+-- 4. variable.wingleader_force_timings appears to function a setting value. This setting is not yet implemented, so leaving it at the default of false.
