@@ -130,5 +130,5 @@ CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery")
 CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship")
 
 -- Survival
-CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.AspectoftheEagle", "Show Aspect of the Eagle", "Show Aspect of the Eagle when out of Melee Range.")
+CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.AspectOfTheEagle", "Show Aspect of the Eagle", "Show Aspect of the Eagle when out of Melee Range.")
 CreateARPanelOptions(CP_Survival, "APL.Hunter.Survival")
