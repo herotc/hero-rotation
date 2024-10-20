@@ -214,7 +214,7 @@ DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
     elseif self == SpellDemo.HandofGuldan then
       return BaseCheck and Player:SoulShardsP() >= 1
     elseif self == SpellDemo.PowerSiphon then
-      return BaseCheck and HL.GuardiansTable.ImpCount > 0
+      return BaseCheck and Warlock.GuardiansTable.ImpCount > 0
     else
       return BaseCheck
     end
