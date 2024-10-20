@@ -106,7 +106,7 @@ local CP_Elemental = CreateChildPanel(CP_Shaman, "Elemental")
 -- Commons
 CreateARPanelOptions(CP_Shaman, "APL.Shaman.Commons")
 CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.PreferEarthShield", "Prefer Earth Shield", "Prefer using Earth Shield over Lightning Shield, when it's available.")
-CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.Ignore EarthShield", "Ignore Earth Shield", "Enable to never receive Earth Shield suggestions.")
+CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.IgnoreEarthShield", "Ignore Earth Shield", "Enable to never receive Earth Shield suggestions.")
 CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShieldsOOC", "Show Shields OOC", "Enable to show elemental shields while out of combat.")
 CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.WeaponBuffsOOC", "Show Weapon Buffs OOC", "Enable to show weapon buffs while out of combat.")
 CreateARPanelOptions(CP_ShamanDS, "APL.Shaman.CommonsDS")
