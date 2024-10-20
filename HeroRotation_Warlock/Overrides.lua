@@ -158,13 +158,13 @@ HL.AddCoreOverride ("Player.SoulShardsP",
     if not Player:IsCasting() then
       return Shard
     else
-      if Player:IsCasting(SpellDemo.SummonDemonicTyrant) and SpellDemo.SoulboundTyrant:IsAvailable() or Player:IsCasting(SpellDemo.InfernalBolt) then
+      if Player:IsCasting(SpellDemo.InfernalBolt) then
         return min(Shard + 3, 5)
       elseif Player:IsCasting(SpellDemo.Demonbolt) then
         return min(Shard + 2, 5)
       elseif Player:IsCasting(SpellDemo.ShadowBolt) or Player:IsCasting(SpellDemo.SoulStrike) then
         return min(Shard + 1, 5)
-      elseif Player:IsCasting(SpellDemo.HandofGuldan) then
+      elseif Player:IsCasting(SpellDemo.HandofGuldan) or Player:IsCasting(SpellDemo.RuinationAbility) then
         return max(Shard - 3, 0)
       elseif Player:IsCasting(SpellDemo.CallDreadstalkers) then
         return Shard - 2
@@ -187,8 +187,8 @@ DemoOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     end
     local BaseCheck = DemoOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellDemo.SummonPet then
-      return BaseCheck and (not Settings.Commons.HidePetSummon) and (not Pet:IsActive()) and Player:SoulShardsP() > 0 and not Player:IsCasting(self)
-    elseif self == SpellDemo.SummonDemonicTyrant or self == SpellDemo.InfernalBolt then
+      return BaseCheck and not Settings.Commons.HidePetSummon and not Pet:IsActive() and Player:SoulShardsP() > 0 and not Player:IsCasting(self)
+    elseif self == SpellDemo.InfernalBolt then
       return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
@@ -205,11 +205,11 @@ DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
     local BaseCheck = DemoOldSpellIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    if self == SpellDemo.SummonVilefiend or self == SpellDemo.SummonCharhound or self == SpellDemo.SummonGloomhound or SpellDemo.GrimoireFelguard then
+    if self == SpellDemo.SummonVilefiend or self == SpellDemo.SummonCharhound or self == SpellDemo.SummonGloomhound or self == SpellDemo.GrimoireFelguard then
       return BaseCheck and Player:SoulShardsP() >= 1 and not Player:IsCasting(self)
     elseif self == SpellDemo.CallDreadstalkers then
       return BaseCheck and (Player:SoulShardsP() >= 2 or Player:BuffUp(SpellDemo.DemonicCallingBuff)) and not Player:IsCasting(self)
-    elseif self == SpellDemo.SummonSoulkeeper then
+    elseif self == SpellDemo.SummonDemonicTyrant then
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellDemo.HandofGuldan then
       return BaseCheck and Player:SoulShardsP() >= 1
