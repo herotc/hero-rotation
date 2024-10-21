@@ -382,7 +382,7 @@ local function ST()
     if Cast(S.FullMoon, nil, nil, not IsInSpellRange) then return "full_moon st 42"; end
   end
   -- starsurge,if=buff.starweavers_weft.up|buff.touch_the_cosmos_starsurge.up
-  if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:BuffUp(S.TouchtheCosmosStarsurge)) then
+  if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:BuffUp(S.TouchtheCosmosBuff)) then
     if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 44"; end
   end
   -- starsurge,if=astral_power.deficit<variable.passive_asp+action.wrath.energize_amount+(action.starfire.energize_amount+variable.passive_asp)*(buff.eclipse_solar.remains<(gcd.max*3))
@@ -474,11 +474,11 @@ local function AoE()
     if Cast(S.Starfire, nil, nil, not IsInSpellRange) then return "starfire aoe 30"; end
   end
   -- starfall,if=buff.starweavers_warp.up|buff.touch_the_cosmos_starfall.up
-  if S.Starfall:IsReady() and (Player:BuffUp(S.StarweaversWarp) or Player:BuffUp(S.TouchtheCosmosStarfall)) then
+  if S.Starfall:IsReady() and (Player:BuffUp(S.StarweaversWarp) or Player:BuffUp(S.TouchtheCosmosBuff)) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not IsInSpellRange) then return "starfall aoe 32"; end
   end
   -- starsurge,if=buff.starweavers_weft.up|buff.touch_the_cosmos_starsurge.up
-  if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:BuffUp(S.TouchtheCosmosStarsurge)) then
+  if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:BuffUp(S.TouchtheCosmosBuff)) then
     if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge aoe 34"; end
   end
   -- starfall
