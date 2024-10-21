@@ -73,12 +73,12 @@ HR.GUISettings.APL.Rogue = {
     },
     OffGCDasOffGCD = {
       Deathmark = true,
-      IndiscriminateCarnage = true,
     },
     StealthMacro = {
       Vanish = true,
       Shadowmeld = true
-    }
+    },
+    ShowIndiscriminateCarnageOnMainIcon = true
   },
   Outlaw = {
     -- Roll the Bones Logic, accepts "SimC", "1+ Buff" and every "RtBName".
@@ -159,6 +159,7 @@ CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateD
 CreatePanelOption("Dropdown", CP_Assassination, "APL.Rogue.Assassination.UsePriorityRotation", { "Never", "On Bosses", "Always", "Auto" }, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall AoE damage.)\nAuto will function as Never except on specific encounters where AoE is not recommended.")
 CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.StealthMacro.Vanish", "Stealth Combo - Vanish", "Allow suggesting Vanish stealth ability combos (recommended)")
 CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)")
+CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.ShowIndiscriminateCarnageOnMainIcon", "Indiscriminate Carnage - Main Icon", "Show casts for indiscriminate carnage on the main icon (main target)")
 CreateARPanelOptions(CP_Assassination, "APL.Rogue.Assassination")
 
 -- Outlaw
