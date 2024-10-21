@@ -35,7 +35,6 @@ local OnUseExcludes = {
   I.BeacontotheBeyond:ID(),
   I.ManicGrieftorch:ID(),
   -- TWW Trinkets
-  I.MadQueensMandate:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -184,13 +183,9 @@ local function CDs()
       end
     end
   end
-  -- use_item,name=mad_queens_mandate,use_off_gcd=1,if=gcd.remains>gcd.max-0.1&(time_to_die<10|time_to_die>120)&(trinket.skardyns_grace.cooldown.remains|!equipped.skardyns_grace)|time_to_die<10
-  if Settings.Commons.Enabled.Trinkets and I.MadQueensMandate:IsEquippedAndReady() and ((Target:TimeToDie() < 10 or Target:TimeToDie() > 120) and (I.SkardynsGrace:CooldownDown() or not I.SkardynsGrace:IsEquipped()) or Target:TimeToDie() < 10) then
-    if Cast(I.MadQueensMandate, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "mad_queens_mandate cds 22"; end
-  end
   -- aspect_of_the_eagle,if=target.distance>=6
   if S.AspectoftheEagle:IsCastable() and Settings.Survival.AspectOfTheEagle and not Target:IsInRange(5) then
-    if Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectOfTheEagle) then return "aspect_of_the_eagle cds 24"; end
+    if Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectOfTheEagle) then return "aspect_of_the_eagle cds 22"; end
   end
 end
 
@@ -247,8 +242,8 @@ local function PLST()
   if S.FuryoftheEagle:IsCastable() then
     if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.FuryOfTheEagle, not Target:IsInMeleeRange(5)) then return "fury_of_the_eagle plst 26"; end
   end
-  -- butchery,if=active_enemies>1&(talent.merciless_blows&buff.merciless_blows.down|!talent.merciless_blows)
-  if S.Butchery:IsReady() and (EnemyCount > 1 and (S.MercilessBlows:IsAvailable() and Player:BuffDown(S.MercilessBlowsBuff) or not S.MercilessBlows:IsAvailable())) then
+  -- butchery,if=active_enemies>1
+  if S.Butchery:IsReady() and (EnemyCount > 1) then
     if Cast(S.Butchery, Settings.Survival.GCDasOffGCD.Butchery, nil, not Target:IsInMeleeRange(5)) then return "butchery plst 28"; end
   end
   -- raptor_bite,target_if=min:dot.serpent_sting.remains,if=!talent.contagious_reagents
@@ -294,8 +289,8 @@ local function PLCleave()
   if S.FuryoftheEagle:IsCastable() and (Player:BuffUp(S.TipoftheSpearBuff)) then
     if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.FuryOfTheEagle, not Target:IsInMeleeRange(5)) then return "fury_of_the_eagle plcleave 16"; end
   end
-  -- kill_shot,if=buff.sic_em.remains
-  if S.KillShot:IsReady() and (Player:BuffUp(S.SicEmBuff)) then
+  -- kill_shot
+  if S.KillShot:IsReady() then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot plcleave 18"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max|buff.exposed_flank.remains&buff.tip_of_the_spear.stack<2
@@ -310,8 +305,8 @@ local function PLCleave()
   if S.Butchery:IsReady() and (S.Butchery:ChargesFractional() > 2.8 and S.WildfireBomb:ChargesFractional() < 1.5) then
     if Cast(S.Butchery, Settings.Survival.GCDasOffGCD.Butchery, nil, not Target:IsInMeleeRange(5)) then return "butchery plcleave 24"; end
   end
-  -- raptor_bite,if=buff.merciless_blows.up
-  if MBRS:IsReady() and (Player:BuffUp(S.MercilessBlowsBuff)) then
+  -- raptor_bite
+  if MBRS:IsReady() then
     if Cast(MBRS, nil, nil, not Target:IsInRange(MBRSRange)) then return MBRS:Name() .. " plcleave 26"; end
   end
   -- butchery
@@ -393,8 +388,8 @@ local function SentST()
   if S.FuryoftheEagle:IsCastable() and (Player:BuffUp(S.TipoftheSpearBuff)) then
     if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.FuryOfTheEagle, not Target:IsInMeleeRange(5)) then return "fury_of_the_eagle sentst 30"; end
   end
-  -- butchery,if=active_enemies>1&(talent.merciless_blows&buff.merciless_blows.down|!talent.merciless_blows)
-  if S.Butchery:IsReady() and (EnemyCount > 1 and (S.MercilessBlows:IsAvailable() and Player:BuffDown(S.MercilessBlowsBuff) or not S.MercilessBlows:IsAvailable())) then
+  -- butchery,if=active_enemies>1
+  if S.Butchery:IsReady() and (EnemyCount > 1) then
     if Cast(S.Butchery, Settings.Survival.GCDasOffGCD.Butchery, nil, not Target:IsInMeleeRange(5)) then return "butchery sentst 32"; end
   end
   -- raptor_bite,target_if=min:dot.serpent_sting.remains,if=!talent.contagious_reagents
@@ -440,8 +435,8 @@ local function SentCleave()
   if S.FuryoftheEagle:IsCastable() and (Player:BuffUp(S.TipoftheSpearBuff)) then
     if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.FuryOfTheEagle, not Target:IsInMeleeRange(5)) then return "fury_of_the_eagle sentcleave 16"; end
   end
-  -- kill_shot,if=buff.sic_em.remains&active_enemies<4
-  if S.KillShot:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff) or S.SicEm:IsAvailable()) then
+  -- kill_shot,if=active_enemies<4
+  if S.KillShot:IsReady() and (EnemyCount < 4) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot sentcleave 18"; end
   end
   -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max
@@ -452,8 +447,8 @@ local function SentCleave()
   if S.WildfireBomb:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff)) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb sentcleave 22"; end
   end
-  -- raptor_bite,if=buff.merciless_blows.up
-  if MBRS:IsReady() and (Player:BuffUp(S.MercilessBlowsBuff)) then
+  -- raptor_bite
+  if MBRS:IsReady() then
     if Cast(MBRS, nil, nil, not Target:IsInRange(MBRSRange)) then return MBRS:Name() .. " sentcleave 24"; end
   end
   -- butchery
