@@ -121,6 +121,7 @@ Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
   Prescience                            = Spell(409311),
   PupilofAlexstrasza                    = Spell(407814),
   TimeSkip                              = Spell(404977),
+  TomorrowToday                         = Spell(412723),
   Upheaval                              = Spell(396286),
   -- Buffs
   BlackAttunementBuff                   = Spell(403264),
