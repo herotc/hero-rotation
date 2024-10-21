@@ -69,6 +69,7 @@ Spell.Hunter.Commons = {
   -- Buffs
   BerserkingBuff                        = Spell(26297),
   BloodFuryBuff                         = Spell(20572),
+  DeathblowBuff                         = Spell(378770),
   SeethingRageBuff                      = Spell(408835), -- Buff from Djaruun
   -- Debuffs
   HuntersMarkDebuff                     = Spell(257284),
@@ -87,9 +88,13 @@ Spell.Hunter.DarkRanger = {
 Spell.Hunter.PackLeader = {
   -- Talents
   CulltheHerd                           = Spell(445717),
+  HowlofthePack                         = Spell(445707),
   ViciousHunt                           = Spell(445404),
   -- Buffs
   FuriousAssaultBuff                    = Spell(448814),
+  HowlofthePackBuff                     = Spell(462515),
+  PackCoordinationBuff                  = Spell(445695),
+  ScatteredPreyBuff                     = Spell(461866),
 }
 
 Spell.Hunter.Sentinel = {
