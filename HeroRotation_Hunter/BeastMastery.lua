@@ -496,7 +496,7 @@ end
 
 local function OnInit ()
   HR.Print("Beast Mastery can use pet abilities to better determine AoE. Make sure you have Growl and Blood Bolt / Bite / Claw / Smack on your player action bars.")
-  HR.Print("Beast Mastery Hunter rotation has been updated for patch 11.0.2.")
+  HR.Print("Beast Mastery Hunter rotation has been updated for patch 11.0.5.")
 end
 
 HR.SetAPL(253, APL, OnInit)

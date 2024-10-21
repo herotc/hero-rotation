@@ -425,7 +425,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Marksmanship Hunter rotation has been updated for patch 11.0.2.")
+  HR.Print("Marksmanship Hunter rotation has been updated for patch 11.0.5.")
 end
 
 HR.SetAPL(254, APL, Init)
