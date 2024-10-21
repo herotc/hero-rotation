@@ -61,7 +61,7 @@ local VarConvokeCondition
 local CAIncBuffUp
 local CAIncBuffRemains
 local CAInc = S.IncarnationTalent:IsAvailable() and S.Incarnation or S.CelestialAlignment
-local CAIncCD = S.OrbitalStrike:IsAvailable() and 120 or 180
+local CAIncCD = S.OrbitalStrike:IsAvailable() and 120 or (S.WhirlingStars:IsAvailable() and 80 or 180)
 local IsInSpellRange = false
 local Enemies10ySplash, EnemiesCount10ySplash
 local BossFightRemains = 11111
@@ -131,7 +131,7 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   CAInc = S.IncarnationTalent:IsAvailable() and S.Incarnation or S.CelestialAlignment
-  CAIncCD = S.OrbitalStrike:IsAvailable() and 120 or 180
+  CAIncCD = S.OrbitalStrike:IsAvailable() and 120 or (S.WhirlingStars:IsAvailable() and 80 or 180)
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 --- ===== Helper Functions =====
@@ -184,8 +184,8 @@ end
 
 --- ===== CastCycle Functions =====
 local function EvaluateCycleMoonfireAoE(TargetUnit)
-  -- target_if=refreshable&(target.time_to_die-remains)>6&astral_power.deficit>variable.passive_asp+energize_amount
-  return (TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and (TargetUnit:TimeToDie() - Target:DebuffRemains(S.MoonfireDebuff)) > 6 and Player:AstralPowerDeficit() > VarPassiveAsp + S.Moonfire:EnergizeAmount())
+  -- target_if=refreshable&(target.time_to_die-remains)>6&(!talent.treants_of_the_moon|spell_targets-active_dot.moonfire_dmg>6|cooldown.force_of_nature.remains>3&!buff.harmony_of_the_grove.up)
+  return TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and (TargetUnit:TimeToDie() - TargetUnit:DebuffRemains(S.MoonfireDebuff)) > 6 and (not S.TreantsoftheMoon:IsAvailable() or EnemiesCount10ySplash - S.MoonfireDebuff:AuraActiveCount() > 6 or S.ForceofNature:CooldownRemains() > 3 and Player:BuffDown(S.HarmonyoftheGroveBuff))
 end
 
 local function EvaluateCycleMoonfireST(TargetUnit)
@@ -249,10 +249,7 @@ local function Precombat()
   if S.Wrath:IsCastable() and (Player:IsCasting(S.Wrath) and S.Wrath:Count() == 2 or Player:PrevGCD(1, S.Wrath) and S.Wrath:Count() == 1) then
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath precombat 4"; end
   end
-  -- regrowth,if=hero_tree.keeper_of_the_grove&!talent.stellar_flare
-  if S.Regrowth:IsCastable() and (Player:HeroTreeID() == 23 and not S.StellarFlare:IsAvailable()) then
-    if Cast(S.Regrowth, Settings.Balance.GCDasOffGCD.Regrowth) then return "regrowth precombat 6"; end
-  end
+  -- wait,sec=0.1,if=hero_tree.keeper_of_the_grove&!talent.stellar_flare
   -- starfire,if=!talent.stellar_flare&hero_tree.elunes_chosen
   if S.Starfire:IsCastable() and (not S.StellarFlare:IsAvailable() and Player:HeroTreeID() == 24) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire precombat 8"; end
@@ -330,63 +327,63 @@ local function ST()
       if Cast(S.Incarnation, Settings.Balance.GCDasOffGCD.CAInc) then return "celestial_alignment st 16"; end
     end
   end
-  -- force_of_nature,if=cooldown.ca_inc.remains<gcd.max&(!talent.natures_grace|!variable.eclipse|variable.eclipse_remains>6)|variable.eclipse_remains>=6&cooldown.ca_inc.remains>10+15*talent.control_of_the_dream&(fight_remains>cooldown+5|cooldown.ca_inc.remains>fight_remains)
-  if S.ForceofNature:IsCastable() and (CAInc:CooldownRemains() < Player:GCD() and (not S.NaturesGrace:IsAvailable() or not VarEclipse or VarEclipseRemains > 6) or VarEclipseRemains >= 6 and CAInc:CooldownRemains() > 10 + 15 * num(S.ControloftheDream:IsAvailable()) and (BossFightRemains > CAInc:CooldownRemains() + 5 or CAInc:CooldownRemains() > BossFightRemains)) then
+  -- force_of_nature,if=cooldown.ca_inc.remains<gcd.max&(!variable.eclipse|variable.eclipse_remains>6)|variable.eclipse_remains>=3&(cooldown.ca_inc.remains>10+15*talent.control_of_the_dream&(fight_remains>cooldown+5|cooldown.ca_inc.remains>fight_remains)|talent.whirling_stars&talent.convoke_the_spirits&cooldown.convoke_the_spirits.remains>cooldown.force_of_nature.duration-10)
+  if S.ForceofNature:IsCastable() and (CAInc:CooldownRemains() < Player:GCD() and (not VarEclipse or VarEclipseRemains > 6) or VarEclipseRemains >= 3 and (CAInc:CooldownRemains() > 10 + 15 * num(S.ControloftheDream:IsAvailable()) and (FightRemains > 65 or CAInc:CooldownRemains() > FightRemains) or S.WhirlingStars:IsAvailable() and S.ConvoketheSpirits:IsAvailable() and S.ConvoketheSpirits:CooldownRemains() > 50)) then
     if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature st 18"; end
   end
   -- fury_of_elune,if=5+variable.passive_asp<astral_power.deficit
   if S.FuryofElune:IsCastable() and (5 + VarPassiveAsp < Player:AstralPowerDeficit()) then
     if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune) then return "fury_of_elune st 20"; end
   end
+  -- starfall,if=buff.starweavers_warp.up
+  if S.Starfall:IsReady() and (Player:BuffUp(S.StarweaversWarp)) then
+    if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not IsInSpellRange) then return "starfall st 22"; end
+  end
   -- starsurge,if=talent.starlord&buff.starlord.stack<3
   if S.Starsurge:IsReady() and (S.Starlord:IsAvailable() and Player:BuffStack(S.StarlordBuff) < 3) then
-    if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 22"; end
+    if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 24"; end
   end
   -- sunfire,target_if=refreshable
   if S.Sunfire:IsCastable() then
-    if Everyone.CastCycle(S.Sunfire, Enemies10ySplash, EvaluateCycleSunfireST2, not IsInSpellRange) then return "sunfire st 24"; end
+    if Everyone.CastCycle(S.Sunfire, Enemies10ySplash, EvaluateCycleSunfireST2, not IsInSpellRange) then return "sunfire st 26"; end
   end
   -- moonfire,target_if=refreshable&(!talent.treants_of_the_moon|cooldown.force_of_nature.remains>3&!buff.harmony_of_the_grove.up)
   if S.Moonfire:IsCastable() then
-    if Everyone.CastCycle(S.Moonfire, Enemies10ySplash, EvaluateCycleMoonfireST2, not IsInSpellRange) then return "moonfire st 26"; end
+    if Everyone.CastCycle(S.Moonfire, Enemies10ySplash, EvaluateCycleMoonfireST2, not IsInSpellRange) then return "moonfire st 28"; end
   end
   -- stellar_flare,target_if=refreshable&(target.time_to_die-remains-target>7+spell_targets)
   if S.StellarFlare:IsCastable() then
-    if Everyone.CastCycle(S.StellarFlare, Enemies10ySplash, EvaluateCycleStellarFlareST, not IsInSpellRange) then return "stellar_flare st 28"; end
+    if Everyone.CastCycle(S.StellarFlare, Enemies10ySplash, EvaluateCycleStellarFlareST, not IsInSpellRange) then return "stellar_flare st 30"; end
   end
   -- variable,name=convoke_condition,value=fight_remains<5|(buff.ca_inc.up|cooldown.ca_inc.remains>40)&(!hero_tree.keeper_of_the_grove|buff.harmony_of_the_grove.up|cooldown.force_of_nature.remains>15)
   VarConvokeCondition = (BossFightRemains < 5 or (CAIncBuffUp or CAInc:CooldownRemains() > 40) and (Player:HeroTreeID() ~= 23 or Player:BuffUp(S.HarmonyoftheGroveBuff) or S.ForceofNature:CooldownRemains() > 15))
   -- starsurge,if=cooldown.convoke_the_spirits.remains<gcd.max*2&variable.convoke_condition
   if S.Starsurge:IsReady() and (S.ConvoketheSpirits:CooldownRemains() < Player:GCD() * 2 and VarConvokeCondition) then
-    if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 30"; end
+    if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 32"; end
   end
   -- convoke_the_spirits,if=variable.convoke_condition
   if S.ConvoketheSpirits:IsCastable() and (VarConvokeCondition) then
-    if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.ConvokeTheSpirits, not IsInSpellRange) then return "convoke_the_spirits st 32"; end
+    if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.ConvokeTheSpirits, not IsInSpellRange) then return "convoke_the_spirits st 34"; end
   end
   -- starsurge,if=buff.starlord.remains>4&variable.boat_stacks>=3|fight_remains<4
   if S.Starsurge:IsReady() and (Player:BuffRemains(S.StarlordBuff) > 4 and VarBoatStacks >= 3 or BossFightRemains < 4) then
-    if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 34"; end
+    if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 36"; end
   end
   -- new_moon,if=astral_power.deficit>variable.passive_asp+energize_amount|fight_remains<20|cooldown.ca_inc.remains>15
   if S.NewMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.NewMoon) or BossFightRemains < 20 or CAInc:CooldownRemains() > 15) then
-    if Cast(S.NewMoon, nil, nil, not IsInSpellRange) then return "new_moon st 36"; end
+    if Cast(S.NewMoon, nil, nil, not IsInSpellRange) then return "new_moon st 38"; end
   end
   -- half_moon,if=astral_power.deficit>variable.passive_asp+energize_amount&(buff.eclipse_lunar.remains>execute_time|buff.eclipse_solar.remains>execute_time)|fight_remains<20|cooldown.ca_inc.remains>15
   if S.HalfMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.HalfMoon) and (Player:BuffRemains(S.EclipseLunar) > S.HalfMoon:ExecuteTime() or Player:BuffRemains(S.EclipseSolar) > S.HalfMoon:ExecuteTime()) or BossFightRemains < 20 or CAInc:CooldownRemains() > 15) then
-    if Cast(S.HalfMoon, nil, nil, not IsInSpellRange) then return "half_moon st 38"; end
+    if Cast(S.HalfMoon, nil, nil, not IsInSpellRange) then return "half_moon st 40"; end
   end
   -- full_moon,if=astral_power.deficit>variable.passive_asp+energize_amount&(buff.eclipse_lunar.remains>execute_time|buff.eclipse_solar.remains>execute_time)|fight_remains<20|cooldown.ca_inc.remains>15
   if S.FullMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.FullMoon) and (Player:BuffRemains(S.EclipseLunar) > S.FullMoon:ExecuteTime() or Player:BuffRemains(S.EclipseSolar) > S.FullMoon:ExecuteTime()) or BossFightRemains < 20 or CAInc:CooldownRemains() > 15) then
-    if Cast(S.FullMoon, nil, nil, not IsInSpellRange) then return "full_moon st 40"; end
+    if Cast(S.FullMoon, nil, nil, not IsInSpellRange) then return "full_moon st 42"; end
   end
   -- starsurge,if=buff.starweavers_weft.up|buff.touch_the_cosmos_starsurge.up
   if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:BuffUp(S.TouchtheCosmosStarsurge)) then
-    if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 42"; end
-  end
-  -- starfall,if=buff.starweavers_warp.up|buff.touch_the_cosmos_starfall.up
-  if S.Starfall:IsReady() and (Player:BuffUp(S.StarweaversWarp) or Player:BuffUp(S.TouchtheCosmosStarfall)) then
-    if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not IsInSpellRange) then return "starfall st 44"; end
+    if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 44"; end
   end
   -- starsurge,if=astral_power.deficit<variable.passive_asp+action.wrath.energize_amount+(action.starfire.energize_amount+variable.passive_asp)*(buff.eclipse_solar.remains<(gcd.max*3))
   if S.Starsurge:IsReady() and (Player:AstralPowerDeficit() < VarPassiveAsp + EnergizeAmount(S.Wrath) + (EnergizeAmount(S.Starfire) + VarPassiveAsp) * (num(Player:BuffRemains(S.EclipseSolar) < Player:GCD() * 3))) then
@@ -396,13 +393,17 @@ local function ST()
   if S.ForceofNature:IsCastable() and (Player:HeroTreeID() ~= 23) then
     if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature st 48"; end
   end
+  -- wild_mushroom
+  if S.WildMushroom:IsCastable() then
+    if Cast(S.WildMushroom, Settings.Balance.GCDasOffGCD.WildMushroom, nil, not IsInSpellRange) then return "wild_mushroom st 50"; end
+  end
   -- starfire,if=talent.lunar_calling
   if S.Starfire:IsCastable() and (S.LunarCalling:IsAvailable()) then
-    if Cast(S.Starfire, nil, nil, not IsInSpellRange) then return "starfire st 50"; end
+    if Cast(S.Starfire, nil, nil, not IsInSpellRange) then return "starfire st 52"; end
   end
   -- wrath
   if S.Wrath:IsCastable() then
-    if Cast(S.Wrath, nil, nil, not IsInSpellRange) then return "wrath st 52"; end
+    if Cast(S.Wrath, nil, nil, not IsInSpellRange) then return "wrath st 54"; end
   end
 end
 
@@ -420,7 +421,7 @@ local function AoE()
   if S.Starfall:IsReady() and (Player:AstralPowerDeficit() <= VarPassiveAsp + 6) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not IsInSpellRange) then return "starfall aoe 6"; end
   end
-  -- moonfire,target_if=refreshable&(target.time_to_die-remains)>6&astral_power.deficit>variable.passive_asp+energize_amount,if=fight_style.dungeonroute|fight_style.dungeonslice
+  -- moonfire,target_if=refreshable&(target.time_to_die-remains)>6&(!talent.treants_of_the_moon|spell_targets-active_dot.moonfire_dmg>6|cooldown.force_of_nature.remains>3&!buff.harmony_of_the_grove.up),if=fight_style.dungeonroute|fight_style.dungeonslice
   if S.Moonfire:IsCastable() and (DungeonRoute) then
     if Everyone.CastCycle(S.Moonfire, Enemies10ySplash, EvaluateCycleMoonfireAoE, not IsInSpellRange) then return "moonfire aoe 8"; end
   end
@@ -428,7 +429,7 @@ local function AoE()
   if S.Sunfire:IsCastable() then
     if Everyone.CastCycle(S.Sunfire, Enemies10ySplash, EvaluateCycleSunfireAoE, not IsInSpellRange) then return "sunfire aoe 10"; end
   end
-  -- moonfire,target_if=refreshable&(target.time_to_die-remains)>6&astral_power.deficit>variable.passive_asp+energize_amount,if=!fight_style.dungeonroute&!fight_style.dungeonslice
+  -- moonfire,target_if=refreshable&(target.time_to_die-remains)>6&(!talent.treants_of_the_moon|spell_targets-active_dot.moonfire_dmg>6|cooldown.force_of_nature.remains>3&!buff.harmony_of_the_grove.up),if=!fight_style.dungeonroute&!fight_style.dungeonslice
   if S.Moonfire:IsCastable() and (not DungeonRoute) then
     if Everyone.CastCycle(S.Moonfire, Enemies10ySplash, EvaluateCycleMoonfireAoE, not IsInSpellRange) then return "moonfire aoe 12"; end
   end
@@ -444,8 +445,8 @@ local function AoE()
   if S.StellarFlare:IsCastable() and (EnemiesCount10ySplash < (11 - S.UmbralIntensity:TalentRank() - (2 * num(S.AstralSmolder:IsAvailable())) - num(S.LunarCalling:IsAvailable()))) then
     if Everyone.CastCycle(S.StellarFlare, Enemies10ySplash, EvaluateCycleStellarFlareAoE, not IsInSpellRange) then return "stellar_flare aoe 18"; end
   end
-  -- force_of_nature,if=cooldown.ca_inc.remains<gcd.max&(!talent.natures_grace|!variable.eclipse|variable.eclipse_remains>6)|variable.eclipse_remains>=3&cooldown.ca_inc.remains>10+15*talent.control_of_the_dream&(fight_remains>cooldown+5|cooldown.ca_inc.remains>fight_remains)
-  if S.ForceofNature:IsCastable() and (CAInc:CooldownRemains() < Player:GCD() and (not S.NaturesGrace:IsAvailable() or not VarEclipse or VarEclipseRemains > 6) or VarEclipseRemains >= 3 and CAInc:CooldownRemains() > 10 + 15 * num(S.ControloftheDream:IsAvailable()) and (FightRemains > 65 or CAInc:CooldownRemains() > FightRemains)) then
+  -- force_of_nature,if=cooldown.ca_inc.remains<gcd.max&(!variable.eclipse|variable.eclipse_remains>6)|variable.eclipse_remains>=3&cooldown.ca_inc.remains>10+15*talent.control_of_the_dream&(fight_remains>cooldown+5|cooldown.ca_inc.remains>fight_remains)
+  if S.ForceofNature:IsCastable() and (CAInc:CooldownRemains() < Player:GCD() and (not VarEclipse or VarEclipseRemains > 6) or VarEclipseRemains >= 3 and CAInc:CooldownRemains() > 10 + 15 * num(S.ControloftheDream:IsAvailable()) and (FightRemains > 65 or CAInc:CooldownRemains() > FightRemains)) then
     if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature aoe 20"; end
   end
   -- fury_of_elune,if=variable.eclipse
@@ -483,10 +484,6 @@ local function AoE()
   -- starfall
   if S.Starfall:IsReady() then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not IsInSpellRange) then return "starfall aoe 36"; end
-  end
-  -- starsurge,if=!talent.starfall&(buff.starlord.stack<3&spell_targets.starfire<6|spell_targets.starfire<3)
-  if S.Starsurge:IsReady() and (not S.Starfall:IsAvailable() and (Player:BuffStack(S.StarlordBuff) < 3 and EnemiesCount10ySplash < 6 or EnemiesCount10ySplash < 3)) then
-    if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge aoe 38"; end
   end
   -- convoke_the_spirits,if=(!buff.dreamstate.up&!buff.umbral_embrace.up&spell_targets.starfire<7|spell_targets.starfire=1)&(fight_remains<5|(buff.ca_inc.up|cooldown.ca_inc.remains>40)&(!hero_tree.keeper_of_the_grove|buff.harmony_of_the_grove.up|cooldown.force_of_nature.remains>15))
   if CDsON() and S.ConvoketheSpirits:IsCastable() and ((Player:BuffDown(S.DreamstateBuff) and Player:BuffDown(S.UmbralEmbraceBuff) and EnemiesCount10ySplash < 7 or EnemiesCount10ySplash == 1) and (BossFightRemains < 5 or (CAIncBuffUp or CAInc:CooldownRemains() > 40) and (Player:HeroTreeID() ~= 34 or Player:BuffUp(S.HarmonyoftheGroveBuff) or S.ForceofNature:CooldownRemains() > 15))) then
@@ -567,8 +564,8 @@ local function APL()
     VarCAEffectiveCD = mathmax(CAInc:CooldownRemains(), S.ForceofNature:CooldownRemains())
     -- variable,name=last_ca_inc,value=fight_remains<cooldown.ca_inc.duration+variable.ca_effective_cd
     VarLastCAInc = BossFightRemains < CAIncCD + VarCAEffectiveCD
-    -- variable,name=cd_condition,value=(fight_remains<(15+5*talent.incarnation_chosen_of_elune)*(1+talent.greater_alignment*0.4)|target.time_to_die>10&(!hero_tree.keeper_of_the_grove|(buff.harmony_of_the_grove.up|cooldown.force_of_nature.remains>25)))&cooldown.ca_inc.ready
-    VarCDCondition = (BossFightRemains < (15 + 5 * num(S.Incarnation:IsAvailable())) * (1 + num(S.GreaterAlignment:IsAvailable()) * 0.4) or Target:TimeToDie() > 10 and (Player:HeroTreeID() ~= 23 or (Player:BuffUp(S.HarmonyoftheGroveBuff) or S.ForceofNature:CooldownRemains() > 25))) and CAInc:CooldownUp()
+    -- variable,name=cd_condition,value=(fight_remains<(15+5*talent.incarnation_chosen_of_elune)*(1-talent.whirling_stars*0.2)|target.time_to_die>10&(!hero_tree.keeper_of_the_grove|(buff.harmony_of_the_grove.up|cooldown.force_of_nature.remains>25))&(!talent.whirling_stars|!talent.convoke_the_spirits|cooldown.convoke_the_spirits.remains<3|cooldown.convoke_the_spirits.remains>cooldown.ca_inc.full_recharge_time))&cooldown.ca_inc.ready&!buff.ca_inc.up
+    VarCDCondition = (BossFightRemains < (15 + 5 * num(S.Incarnation:IsAvailable())) * (1 - num(S.WhirlingStars:IsAvailable()) * 0.2) or Target:TimeToDie() > 10 and (Player:HeroTreeID() ~= 23 or (Player:BuffUp(S.HarmonyoftheGroveBuff) or S.ForceofNature:CooldownRemains() > 25)) and (not S.WhirlingStars:IsAvailable() or not S.ConvoketheSpirits:IsAvailable() or S.ConvoketheSpirits:CooldownRemains() < 3 or S.ConvoketheSpirits:CooldownRemains() > CAInc:FullRechargeTime())) and CAInc:CooldownUp() and not CAIncBuffUp
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,name=aberrant_spellforge
       if I.AberrantSpellforge:IsEquippedAndReady() then
@@ -577,7 +574,7 @@ local function APL()
       -- do_treacherous_transmitter_task,if=cooldown.ca_inc.remains>10
       -- TODO
       -- use_item,name=spymasters_web,if=fight_remains<20
-      if I.SpymastersWeb:IsEquippedAndReady() and (FightRemains < 20) then
+      if I.SpymastersWeb:IsEquippedAndReady() and (BossFightRemains < 20) then
         if Cast(I.SpymastersWeb, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spymasters_web main 4"; end
       end
       -- use_item,name=imperfect_ascendancy_serum,if=dot.sunfire.remains>4&(dot.moonfire.remains>4|talent.treants_of_the_moon&(cooldown.force_of_nature.remains<3|buff.harmony_of_the_grove.up)&variable.ca_effective_cd<1|fight_remains<20|fight_remains<variable.ca_effective_cd&(buff.harmony_of_the_grove.up|cooldown.convoke_the_spirits.ready))&buff.spymasters_report.stack<=29
@@ -649,7 +646,7 @@ end
 local function OnInit()
   S.MoonfireDebuff:RegisterAuraTracking()
 
-  HR.Print("Balance Druid rotation has been updated for patch 11.0.2.")
+  HR.Print("Balance Druid rotation has been updated for patch 11.0.5.")
 end
 
 HR.SetAPL(102, APL, OnInit)

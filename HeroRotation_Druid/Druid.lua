@@ -156,6 +156,7 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   UmbralIntensity                       = Spell(383195),
   WaningTwilight                        = Spell(393956),
   WarriorofElune                        = Spell(202425),
+  WhirlingStars                         = Spell(468743),
   WildMushroom                          = Spell(88747),
   WildSurges                            = Spell(406890),
   -- New Moon Phases
