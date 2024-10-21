@@ -381,7 +381,7 @@ local function ST()
   if S.FullMoon:IsCastable() and (Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.FullMoon) and (Player:BuffRemains(S.EclipseLunar) > S.FullMoon:ExecuteTime() or Player:BuffRemains(S.EclipseSolar) > S.FullMoon:ExecuteTime()) or BossFightRemains < 20 or CAInc:CooldownRemains() > 15) then
     if Cast(S.FullMoon, nil, nil, not IsInSpellRange) then return "full_moon st 42"; end
   end
-  -- starsurge,if=buff.starweavers_weft.up|buff.touch_the_cosmos_starsurge.up
+  -- starsurge,if=buff.starweavers_weft.up|buff.touch_the_cosmos.up
   if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:BuffUp(S.TouchtheCosmosBuff)) then
     if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 44"; end
   end
@@ -473,12 +473,12 @@ local function AoE()
   if S.Starfire:IsCastable() and ((not S.LunarCalling:IsAvailable() and EnemiesCount10ySplash == 1) and (Player:BuffUp(S.EclipseSolar) and Player:BuffRemains(S.EclipseSolar) < S.Starfire:CastTime() or not VarEclipse)) then
     if Cast(S.Starfire, nil, nil, not IsInSpellRange) then return "starfire aoe 30"; end
   end
-  -- starfall,if=buff.starweavers_warp.up|buff.touch_the_cosmos_starfall.up
+  -- starfall,if=buff.starweavers_warp.up|buff.touch_the_cosmos.up
   if S.Starfall:IsReady() and (Player:BuffUp(S.StarweaversWarp) or Player:BuffUp(S.TouchtheCosmosBuff)) then
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not IsInSpellRange) then return "starfall aoe 32"; end
   end
-  -- starsurge,if=buff.starweavers_weft.up|buff.touch_the_cosmos_starsurge.up
-  if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft) or Player:BuffUp(S.TouchtheCosmosBuff)) then
+  -- starsurge,if=buff.starweavers_weft.up
+  if S.Starsurge:IsReady() and (Player:BuffUp(S.StarweaversWeft)) then
     if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge aoe 34"; end
   end
   -- starfall
