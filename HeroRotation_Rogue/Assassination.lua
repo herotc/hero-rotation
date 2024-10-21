@@ -431,7 +431,13 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
     if HR.AoEON() then
       local TargetIfUnit = CheckTargetIfTarget("min", RuptureTargetIfFunc, RuptureIfFunc)
       if TargetIfUnit and TargetIfUnit:GUID() ~= Target:GUID() then
-        CastLeftNameplate(TargetIfUnit, S.Rupture)
+        if Settings.Assassination.ShowIndiscriminateCarnageOnMainIcon then
+          if Cast(S.Rupture, nil, nil, not TargetInMeleeRange) then
+            return "Cast Rupture (Stealth Indiscriminate Carnage)"
+          end
+        else
+          return CastLeftNameplate(TargetIfUnit, S.Rupture)
+        end
       end
     end
     if RuptureIfFunc(Target) then
@@ -460,7 +466,13 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
     if HR.AoEON() then
       local TargetIfUnit = CheckTargetIfTarget("min", GarroteTargetIfFunc, GarroteIfFunc)
       if TargetIfUnit and TargetIfUnit:GUID() ~= Target:GUID() then
-        return CastLeftNameplate(TargetIfUnit, S.Garrote)
+        if Settings.Assassination.ShowIndiscriminateCarnageOnMainIcon then
+          if Cast(S.Garrote, nil, nil, not TargetInMeleeRange) then
+            return "Cast Garrote (Improved Garrote Carnage)"
+          end
+        else
+          return CastLeftNameplate(TargetIfUnit, S.Garrote)
+        end
       end
     end
     if GarroteIfFunc(Target) then
@@ -796,7 +808,7 @@ local function CDs ()
   -- actions.cds+=/kingsbane,if=(debuff.shiv.up|cooldown.shiv.remains<6)&buff.envenom.up&(cooldown.deathmark.remains>=50|dot.deathmark.ticking)|fight_remains<=15
   if S.Kingsbane:IsReady() then
     if (Target:DebuffUp(S.ShivDebuff) or S.Shiv:CooldownRemains() < 6) and Player:BuffUp(S.Envenom)
-      and (S.Deathmark:CooldownRemains() >= 50 or Target:DebuffUp(S.Deathmark) or S.Deathmark:IsReady()) or HL.BossFilteredFightRemains("<=", 15) then
+      and (S.Deathmark:CooldownRemains() >= 50 or Target:DebuffUp(S.Deathmark) or (DeathmarkCondition and S.Deathmark:IsReady())) or HL.BossFilteredFightRemains("<=", 15) then
       if Cast(S.Kingsbane, Settings.Assassination.GCDasOffGCD.Kingsbane) then
         return "Cast Kingsbane"
       end
