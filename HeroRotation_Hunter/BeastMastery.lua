@@ -346,8 +346,8 @@ local function ST()
   if S.ExplosiveShot:IsReady() and (Player:BuffDown(S.BestialWrathBuff) and S.KillerCobra:IsAvailable() or not S.KillerCobra:IsAvailable()) then
     if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot st 28"; end
   end
-  -- kill_shot,if=buff.hunters_prey.remains<gcd*2&talent.venoms_bite|target.health.pct<20
-  if S.KillShot:IsReady() and (Player:BuffRemains(S.HuntersPreyBuff) < Player:GCD() * 2 and S.VenomsBite:IsAvailable() or Target:HealthPercentage() < 20) then
+  -- kill_shot,if=talent.venoms_bite|target.health.pct<20
+  if S.KillShot:IsReady() and (S.VenomsBite:IsAvailable() or Target:HealthPercentage() < 20) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot st 30"; end
   end
   -- lights_judgment,if=buff.bestial_wrath.down|target.time_to_die<5
