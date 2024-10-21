@@ -205,7 +205,7 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   HotHandBuff                           = Spell(215785),
   IceStrikeBuff                         = Spell(384357),
   MaelstromWeaponBuff                   = Spell(344179),
-  StormbringerBuff                      = Spell(201846),
+  StormsurgeBuff                        = Spell(201846),
   WindfuryTotemBuff                     = Spell(327942),
   -- Debuffs
   LashingFlamesDebuff                   = Spell(334168),
