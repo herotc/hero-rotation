@@ -209,8 +209,8 @@ local function EvaluateCycleStellarFlareST(TargetUnit)
 end
 
 local function EvaluateCycleSunfireAoE(TargetUnit)
-  -- target_if=refreshable&(target.time_to_die-remains)>6-(spell_targets%2)&astral_power.deficit>variable.passive_asp+energize_amount
-  return (TargetUnit:DebuffRefreshable(S.SunfireDebuff) and (TargetUnit:TimeToDie() - Target:DebuffRemains(S.SunfireDebuff)) > 6 - (EnemiesCount10ySplash / 2) and Player:AstralPowerDeficit() > VarPassiveAsp + S.Sunfire:EnergizeAmount())
+  -- target_if=refreshable&(target.time_to_die-remains)>6-(spell_targets%2)
+  return TargetUnit:DebuffRefreshable(S.SunfireDebuff) and (TargetUnit:TimeToDie() - Target:DebuffRemains(S.SunfireDebuff)) > 6 - (EnemiesCount10ySplash / 2)
 end
 
 local function EvaluateCycleSunfireST(TargetUnit)
@@ -425,7 +425,7 @@ local function AoE()
   if S.Moonfire:IsCastable() and (DungeonRoute) then
     if Everyone.CastCycle(S.Moonfire, Enemies10ySplash, EvaluateCycleMoonfireAoE, not IsInSpellRange) then return "moonfire aoe 8"; end
   end
-  -- sunfire,target_if=refreshable&(target.time_to_die-remains)>6-(spell_targets%2)&astral_power.deficit>variable.passive_asp+energize_amount
+  -- sunfire,target_if=refreshable&(target.time_to_die-remains)>6-(spell_targets%2)
   if S.Sunfire:IsCastable() then
     if Everyone.CastCycle(S.Sunfire, Enemies10ySplash, EvaluateCycleSunfireAoE, not IsInSpellRange) then return "sunfire aoe 10"; end
   end
