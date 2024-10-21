@@ -66,6 +66,7 @@ Spell.Shaman.Commons = {
   ChaosBrandDebuff                      = Spell(1490),
   HuntersMarkDebuff                     = Spell(257284),
   -- Trinket Effects
+  SpymastersReportBuff                  = Spell(451199), -- Stacking buff from before using Spymaster's Web trinket
   SpymastersWebBuff                     = Spell(444959), -- Buff from using Spymaster's Web trinket
   -- Misc
   Pool                                  = Spell(999910),
