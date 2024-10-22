@@ -73,6 +73,7 @@ Spell.Priest.Commons = {
 Spell.Priest.Archon = {
   -- Talents
   EmpoweredSurges             = Spell(453799),
+  PerfectedForm               = Spell(453917),
 }
 
 Spell.Priest.Voidweaver = {
