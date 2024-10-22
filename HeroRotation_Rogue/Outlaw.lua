@@ -779,13 +779,7 @@ local function CDs ()
 end
 
 local function Build ()
-  -- actions.build+=/echoing_reprimand
-  if CDsON() and S.EchoingReprimand:IsReady() then
-    if Cast(S.EchoingReprimand, Settings.CommonsOGCD.GCDasOffGCD.EchoingReprimand, nil, not Target:IsSpellInRange(S.EchoingReprimand)) then
-      return "Cast Echoing Reprimand"
-    end
-  end
-
+  -- # High priority Ambush for Hidden Opportunity builds
   -- actions.build+=/ambush,if=talent.hidden_opportunity&buff.audacity.up
   if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
     if CastPooling(S.SSAudacity, nil, not Target:IsSpellInRange(S.Ambush)) then
