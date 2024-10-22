@@ -191,9 +191,11 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   ConeofCold                            = Spell(120),--Melee, 12
   FireBlast                             = Spell(319836),
   -- Talents
+  ColdFront                             = Spell(382110),
   ColdestSnap                           = Spell(417493),
   CometStorm                            = Spell(153595), --splash, 6
   DeathsChill                           = Spell(450331),
+  DeepShatter                           = Spell(378749),
   Flurry                                = Spell(44614),
   FreezingRain                          = Spell(270233),
   Frostbite                             = Spell(378756),
