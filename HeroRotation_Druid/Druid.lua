@@ -122,6 +122,7 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   -- Abilities
   EclipseLunar                          = Spell(48518),
   EclipseSolar                          = Spell(48517),
+  Starfall                              = Spell(191034),
   Wrath                                 = Spell(190984),
   -- Talents
   AetherialKindling                     = Spell(327541),
@@ -133,7 +134,6 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   ForceofNature                         = Spell(205636),
   FungalGrowth                          = Spell(392999),
   FuryofElune                           = Spell(202770),
-  GreaterAlignment                      = Spell(450184),
   Incarnation                           = MultiSpell(102560,390414), -- 102560 without Orbital Strike, 390414 with Orbital Strike
   IncarnationTalent                     = Spell(394013),
   NaturesBalance                        = Spell(202430),
@@ -145,7 +145,6 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   RattletheStars                        = Spell(393954),
   Solstice                              = Spell(343647),
   SouloftheForest                       = Spell(114107),
-  Starfall                              = Spell(191034),
   Starlord                              = Spell(202345),
   Starweaver                            = Spell(393940),
   StellarFlare                          = Spell(202347),
@@ -156,6 +155,7 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   UmbralIntensity                       = Spell(383195),
   WaningTwilight                        = Spell(393956),
   WarriorofElune                        = Spell(202425),
+  WhirlingStars                         = Spell(468743),
   WildMushroom                          = Spell(88747),
   WildSurges                            = Spell(406890),
   -- New Moon Phases
@@ -175,8 +175,7 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   StarlordBuff                          = Spell(279709),
   StarweaversWarp                       = Spell(393942),
   StarweaversWeft                       = Spell(393944),
-  TouchtheCosmosStarfall                = Spell(450361), -- NOTE: With 11.0.5, both Touch the Cosmos buffs will be in spell ID 450360.
-  TouchtheCosmosStarsurge               = Spell(450360),
+  TouchtheCosmosBuff                    = Spell(450360),
   UmbralEmbraceBuff                     = Spell(393763),
   WarriorofEluneBuff                    = Spell(202425),
   -- Debuffs

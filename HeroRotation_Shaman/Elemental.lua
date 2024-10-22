@@ -198,26 +198,26 @@ local function Precombat()
   -- lightning_shield
   -- thunderstrike_ward
   -- Note: Moved above 3 lines to APL()
-  -- stormkeeper
-  if S.Stormkeeper:IsViable() then
-    if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper precombat 2"; end
-  end
   -- variable,name=mael_cap,value=100+50*talent.swelling_maelstrom.enabled+25*talent.primordial_capacity.enabled,op=set
   -- variable,name=spymaster_in_1st,value=trinket.1.is.spymasters_web
   -- variable,name=spymaster_in_2nd,value=trinket.2.is.spymasters_web
   -- Note: Moved above to variable declarations.
+  -- stormkeeper
+  if S.Stormkeeper:IsViable() then
+    if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper precombat 2"; end
+  end
   -- Manually added: Opener abilities
   if S.StormElemental:IsReady() and (not Shaman.StormElemental.GreaterActive) then
-    if Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "storm_elemental precombat 6"; end
+    if Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "storm_elemental precombat 4"; end
   end
   if S.Stormkeeper:IsViable() and (not Player:StormkeeperUp()) then
-    if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper precombat 8"; end
+    if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper precombat 6"; end
   end
   if S.PrimordialWave:IsViable() then
-    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 10"; end
+    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave precombat 8"; end
   end
   if S.AncestralSwiftness:IsReady() then
-    if Cast(S.AncestralSwiftness, Settings.CommonsOGCD.GCDasOffGCD.AncestralSwiftness) then return "ancestral_swiftness precombat 12"; end
+    if Cast(S.AncestralSwiftness, Settings.CommonsOGCD.GCDasOffGCD.AncestralSwiftness) then return "ancestral_swiftness precombat 10"; end
   end
   if S.LavaBurst:IsViable() then
     if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lavaburst precombat 12"; end
@@ -225,16 +225,16 @@ local function Precombat()
 end
 
 local function Aoe()
-  -- fire_elemental,if=!buff.fire_elemental.up
-  if S.FireElemental:IsReady() and (not Shaman.FireElemental.GreaterActive) then
+  -- fire_elemental
+  if S.FireElemental:IsReady() then
     if Cast(S.FireElemental, Settings.Elemental.GCDasOffGCD.FireElemental) then return "fire_elemental aoe 2"; end
   end
-  -- storm_elemental,if=!buff.storm_elemental.up
-  if S.StormElemental:IsReady() and (not Shaman.StormElemental.GreaterActive) then
+  -- storm_elemental
+  if S.StormElemental:IsReady() then
     if Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "storm_elemental aoe 4"; end
   end
-  -- stormkeeper,if=!buff.stormkeeper.up
-  if S.Stormkeeper:IsViable() and (not Player:StormkeeperUp()) then
+  -- stormkeeper
+  if S.Stormkeeper:IsViable() then
     if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper aoe 6"; end
   end
   -- totemic_recall,if=cooldown.liquid_magma_totem.remains>15&(active_dot.flame_shock<(spell_targets.chain_lightning>?6)-2|talent.fire_elemental.enabled)
@@ -256,306 +256,195 @@ local function Aoe()
   if S.FlameShock:IsCastable() then
     local Lowest, BestTarget = LowestFlameShock(Enemies10ySplash)
     if BestTarget:DebuffRefreshable(S.FlameShockDebuff) then
-      -- flame_shock,target_if=refreshable,if=buff.surge_of_power.up&talent.lightning_rod.enabled&dot.flame_shock.remains<target.time_to_die-16&active_dot.flame_shock<(spell_targets.chain_lightning>?6)&!talent.liquid_magma_totem.enabled
-      if Player:BuffUp(S.SurgeofPowerBuff) and S.LightningRod:IsAvailable() and Lowest < BestTarget:TimeToDie() - 16 and S.FlameShockDebuff:AuraActiveCount() < mathmin(Shaman.ClusterTargets, 6) and not S.LiquidMagmaTotem:IsAvailable() then
+      -- flame_shock,target_if=refreshable,if=buff.surge_of_power.up&dot.flame_shock.remains<target.time_to_die-16&active_dot.flame_shock<(spell_targets.chain_lightning>?6)&!talent.liquid_magma_totem.enabled
+      if Player:BuffUp(S.SurgeofPowerBuff) and Lowest < BestTarget:TimeToDie() - 16 and S.FlameShockDebuff:AuraActiveCount() < mathmin(Shaman.ClusterTargets, 6) and not S.LiquidMagmaTotem:IsAvailable() then
         if Target:GUID() == BestTarget:GUID() then
           if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe main-target 16"; end
         else
           if CastLeftNameplate(BestTarget, S.FlameShock) then return "flame_shock aoe off-target 16"; end
         end
       end
-      -- flame_shock,target_if=min:dot.flame_shock.remains,if=buff.primordial_wave.up&buff.stormkeeper.up&maelstrom<60-5*talent.eye_of_the_storm.enabled-(8+2*talent.flow_of_power.enabled)*active_dot.flame_shock&spell_targets.chain_lightning>=6&active_dot.flame_shock<6
-      if Player:BuffUp(S.PrimordialWaveBuff) and Player:StormkeeperUp() and VarMaelstrom < 60 - 5 * num(S.EyeoftheStorm:IsAvailable()) - (8 + 2 * num(S.FlowofPower:IsAvailable())) * S.FlameShockDebuff:AuraActiveCount() and Shaman.ClusterTargets >= 6 and S.FlameShockDebuff:AuraActiveCount() < 6 then
+      -- flame_shock,target_if=refreshable,if=talent.fire_elemental.enabled&(buff.surge_of_power.up|!talent.surge_of_power.enabled)&dot.flame_shock.remains<target.time_to_die-5&(active_dot.flame_shock<6|dot.flame_shock.remains>0)
+      if S.FireElemental:IsAvailable() and (Player:BuffUp(S.SurgeofPowerBuff) or not S.SurgeofPower:IsAvailable()) and BestTarget:DebuffRemains(S.FlameShockDebuff) < BestTarget:TimeToDie() - 5 and (S.FlameShockDebuff:AuraActiveCount() < 6 or BestTarget:DebuffRemains(S.FlameShockDebuff) > 0) then
         if Target:GUID() == BestTarget:GUID() then
           if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe main-target 18"; end
         else
           if CastLeftNameplate(BestTarget, S.FlameShock) then return "flame_shock aoe off-target 18"; end
         end
       end
-      -- flame_shock,target_if=refreshable,if=talent.fire_elemental.enabled&(buff.surge_of_power.up|!talent.surge_of_power.enabled)&dot.flame_shock.remains<target.time_to_die-5&(active_dot.flame_shock<6|dot.flame_shock.remains>0)
-      if S.FireElemental:IsAvailable() and (Player:BuffUp(S.SurgeofPowerBuff) or not S.SurgeofPower:IsAvailable()) and BestTarget:DebuffRemains(S.FlameShockDebuff) < BestTarget:TimeToDie() - 5 and (S.FlameShockDebuff:AuraActiveCount() < 6 or BestTarget:DebuffRemains(S.FlameShockDebuff) > 0) then
-        if Target:GUID() == BestTarget:GUID() then
-          if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe main-target 20"; end
-        else
-          if CastLeftNameplate(BestTarget, S.FlameShock) then return "flame_shock aoe off-target 20"; end
-        end
-      end
     end
-  end
-  -- tempest,target_if=min:debuff.lightning_rod.remains,if=!buff.arc_discharge.up
-  if S.TempestAbility:IsReady() and (Player:BuffDown(S.ArcDischargeBuff)) then
-    if Everyone.CastTargetIf(S.TempestAbility, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsInRange(40)) then return "tempest aoe 22"; end
   end
   -- ascendance (JUST DO IT! https://i.kym-cdn.com/entries/icons/mobile/000/018/147/Shia_LaBeouf__Just_Do_It__Motivational_Speech_(Original_Video_by_LaBeouf__R%C3%B6nkk%C3%B6___Turner)_0-4_screenshot.jpg
   if S.Ascendance:IsCastable() then
-    if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance aoe 32"; end
+    if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance aoe 20"; end
   end
-  -- lava_beam,if=active_enemies>=6&buff.surge_of_power.up&buff.ascendance.remains>cast_time
-  if S.LavaBeam:IsViable() and (Shaman.ClusterTargets >= 6 and Player:BuffUp(S.SurgeofPowerBuff) and Player:BuffRemains(S.AscendanceBuff) > S.LavaBeam:CastTime()) then
-    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 34"; end
+  -- tempest,target_if=min:debuff.lightning_rod.remains,if=!buff.arc_discharge.up&(buff.surge_of_power.up|!talent.surge_of_power.enabled)
+  if S.TempestAbility:IsReady() and (Player:BuffDown(S.ArcDischargeBuff) and (Player:BuffUp(S.SurgeofPowerBuff) or not S.SurgeofPower:IsAvailable())) then
+    if Everyone.CastTargetIf(S.TempestAbility, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsInRange(40)) then return "tempest aoe 22"; end
+  end
+  -- lightning_bolt,if=buff.stormkeeper.up&buff.surge_of_power.up&spell_targets.chain_lightning=2
+  -- Note: The APL has this as a SingleTarget() line in the middle of AoE().
+  -- Note: Assuming this is supposed to be here, since 2 targets will put us in AoE().
+  if S.LightningBolt:IsViable() and (Player:StormkeeperUp() and Player:BuffUp(S.SurgeofPowerBuff) and Shaman.ClusterTargets == 2) then
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt aoe 24"; end
   end
   -- chain_lightning,if=active_enemies>=6&buff.surge_of_power.up
   if S.ChainLightning:IsViable() and (Shaman.ClusterTargets >= 6 and Player:BuffUp(S.SurgeofPowerBuff)) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 36"; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 26"; end
   end
-  -- lava_burst,target_if=dot.flame_shock.remains>2,if=buff.primordial_wave.up&buff.stormkeeper.up&maelstrom<60-5*talent.eye_of_the_storm.enabled&spell_targets.chain_lightning>=6&talent.surge_of_power.enabled
-  if S.LavaBurst:IsViable() and (Player:BuffUp(S.PrimordialWaveBuff) and Player:StormkeeperUp() and VarMaelstrom < 60 - 5 * num(S.EyeoftheStorm:IsAvailable()) and Shaman.ClusterTargets >= 6 and S.SurgeofPower:IsAvailable()) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 38"; end
+  -- lava_burst,target_if=dot.flame_shock.remains>2,if=buff.primordial_wave.up&(buff.stormkeeper.up&spell_targets.chain_lightning>=6|buff.tempest.up)&maelstrom<60-5*talent.eye_of_the_storm.enabled&talent.surge_of_power.enabled
+  if S.LavaBurst:IsViable() and (Player:BuffUp(S.PrimordialWaveBuff) and (Player:StormkeeperUp() and Shaman.ClusterTargets >= 6 or S.TempestAbility:IsReady()) and VarMaelstrom < 60 - 5 * num(S.EyeoftheStorm:IsAvailable()) and S.SurgeofPower:IsAvailable()) then
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 28"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains>2,if=buff.primordial_wave.up&(buff.primordial_wave.remains<4|buff.lava_surge.up)
   if S.LavaBurst:IsViable() and (Player:BuffUp(S.PrimordialWaveBuff) and (Player:BuffRemains(S.PrimordialWaveBuff) < 4 or Player:BuffUp(S.LavaSurgeBuff))) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 40"; end
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 30"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains,if=cooldown_react&buff.lava_surge.up&!buff.master_of_the_elements.up&talent.master_of_the_elements.enabled&talent.fire_elemental.enabled
   if S.LavaBurst:IsViable() and (Player:BuffUp(S.LavaSurgeBuff) and not Player:MotEUp() and S.MasteroftheElements:IsAvailable() and S.FireElemental:IsAvailable()) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 42"; end
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 32"; end
+  end
+  -- elemental_blast,target_if=min:debuff.lightning_rod.remains,if=spell_targets.chain_lightning=2&(maelstrom>variable.mael_cap-30|cooldown.primordial_wave.remains<gcd&talent.surge_of_power.enabled|(buff.stormkeeper.up&spell_targets.chain_lightning>=6|buff.tempest.up)&talent.surge_of_power.enabled)
+  if S.ElementalBlast:IsReady() and (Shaman.ClusterTargets == 2 and (VarMaelstrom > VarMaelCap - 30 or S.PrimordialWave:CooldownRemains() < Player:GCD() and S.SurgeofPower:IsAvailable() or (Player:StormkeeperUp() and Shaman.ClusterTargets >= 6 or S.TempestAbility:IsReady()) and S.SurgeofPower:IsAvailable())) then
+    if Everyone.CastTargetIf(S.ElementalBlast, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 34"; end
   end
   -- earthquake,if=cooldown.primordial_wave.remains<gcd&talent.surge_of_power.enabled&(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up|!talent.echoes_of_great_sundering.enabled)
   if S.Earthquake:IsReady() and (S.PrimordialWave:CooldownRemains() < Player:GCD() and S.SurgeofPower:IsAvailable() and (Player:BuffUp(S.EchoesofGreatSunderingBuff) or not S.EchoesofGreatSundering:IsAvailable())) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 44"; end
+    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 36"; end
   end
   -- earthquake,if=(lightning_rod=0&talent.lightning_rod.enabled|maelstrom>variable.mael_cap-30)&(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up|!talent.echoes_of_great_sundering.enabled)
   if S.Earthquake:IsReady() and ((S.LightningRodDebuff:AuraActiveCount() == 0 and S.LightningRod:IsAvailable() or VarMaelstrom > VarMaelCap - 30) and (Player:BuffUp(S.EchoesofGreatSunderingBuff) or not S.EchoesofGreatSundering:IsAvailable())) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 46"; end
+    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 38"; end
   end
-  -- earthquake,if=buff.stormkeeper.up&spell_targets.chain_lightning>=6&talent.surge_of_power.enabled&(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up|!talent.echoes_of_great_sundering.enabled)
-  if S.Earthquake:IsReady() and (Player:StormkeeperUp() and Shaman.ClusterTargets >= 6 and S.SurgeofPower:IsAvailable() and (Player:BuffUp(S.EchoesofGreatSunderingBuff) or not S.EchoesofGreatSundering:IsAvailable())) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 48"; end
+  -- earthquake,if=(buff.stormkeeper.up&spell_targets.chain_lightning>=6|buff.tempest.up)&talent.surge_of_power.enabled&(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up|!talent.echoes_of_great_sundering.enabled)
+  if S.Earthquake:IsReady() and ((Player:StormkeeperUp() and Shaman.ClusterTargets >= 6 or S.TempestAbility:IsReady()) and S.SurgeofPower:IsAvailable() and (Player:BuffUp(S.EchoesofGreatSunderingBuff) or not S.EchoesofGreatSundering:IsAvailable())) then
+    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 40"; end
   end
-  -- earthquake,if=(buff.master_of_the_elements.up|spell_targets.chain_lightning>=5)&(buff.fusion_of_elements_nature.up|buff.ascendance.remains>9|!buff.ascendance.up)&(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up|!talent.echoes_of_great_sundering.enabled)&talent.fire_elemental.enabled
-  if S.Earthquake:IsReady() and ((Player:MotEUp() or Shaman.ClusterTargets >= 5) and (Player:BuffUp(S.FusionofElementsNature) or Player:BuffRemains(S.AscendanceBuff) > 9 or Player:BuffDown(S.AscendanceBuff)) and (Player:BuffUp(S.EchoesofGreatSunderingBuff) or not S.EchoesofGreatSundering:IsAvailable()) and S.FireElemental:IsAvailable()) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 50"; end
+  -- elemental_blast,target_if=min:debuff.lightning_rod.remains,if=talent.echoes_of_great_sundering.enabled&!buff.echoes_of_great_sundering_eb.up&(lightning_rod=0|maelstrom>variable.mael_cap-30|(buff.stormkeeper.up&spell_targets.chain_lightning>=6|buff.tempest.up)&talent.surge_of_power.enabled)
+  if S.ElementalBlast:IsViable() and (S.EchoesofGreatSundering:IsAvailable() and Player:BuffDown(S.EchoesofGreatSunderingBuff) and (S.LightningRodDebuff:AuraActiveCount() == 0 or VarMaelstrom > VarMaelCap - 30 or (Player:StormkeeperUp() and Shaman.ClusterTargets >= 6 or S.TempestAbility:IsReady()) and S.SurgeofPower:IsAvailable())) then
+    if Everyone.CastTargetIf(S.ElementalBlast, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 42"; end
   end
-  -- elemental_blast,target_if=min:debuff.lightning_rod.remains,if=talent.echoes_of_great_sundering.enabled&!buff.echoes_of_great_sundering_eb.up&(lightning_rod=0|maelstrom>variable.mael_cap-30)
-  if S.ElementalBlast:IsViable() and (S.EchoesofGreatSundering:IsAvailable() and Player:BuffDown(S.EchoesofGreatSunderingBuff) and (S.LightningRodDebuff:AuraActiveCount() == 0 or VarMaelstrom > VarMaelCap - 30)) then
-    if Everyone.CastTargetIf(S.ElementalBlast, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 52"; end
-  end
-  -- earth_shock,target_if=min:debuff.lightning_rod.remains,if=talent.echoes_of_great_sundering.enabled&!buff.echoes_of_great_sundering_es.up&(lightning_rod=0|maelstrom>variable.mael_cap-30)
-  if S.EarthShock:IsReady() and (S.EchoesofGreatSundering:IsAvailable() and Player:BuffDown(S.EchoesofGreatSunderingBuff) and (S.LightningRodDebuff:AuraActiveCount() == 0 or VarMaelstrom > VarMaelCap - 30)) then
-    if Everyone.CastTargetIf(S.EarthShock, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock aoe 54"; end
+  -- earth_shock,target_if=min:debuff.lightning_rod.remains,if=talent.echoes_of_great_sundering.enabled&!buff.echoes_of_great_sundering_es.up&(lightning_rod=0|maelstrom>variable.mael_cap-30|(buff.stormkeeper.up&spell_targets.chain_lightning>=6|buff.tempest.up)&talent.surge_of_power.enabled)
+  if S.EarthShock:IsReady() and (S.EchoesofGreatSundering:IsAvailable() and Player:BuffDown(S.EchoesofGreatSunderingBuff) and (S.LightningRodDebuff:AuraActiveCount() == 0 or VarMaelstrom > VarMaelCap - 30 or (Player:StormkeeperUp() and Shaman.ClusterTargets >= 6 or S.TempestAbility:IsReady()) and S.SurgeofPower:IsAvailable())) then
+    if Everyone.CastTargetIf(S.EarthShock, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock aoe 44"; end
   end
   -- icefury,if=talent.fusion_of_elements.enabled&!(buff.fusion_of_elements_nature.up|buff.fusion_of_elements_fire.up)
   if S.Icefury:IsViable() and (S.FusionofElements:IsAvailable() and not (Player:BuffUp(S.FusionofElementsNature) or Player:BuffUp(S.FusionofElementsFire))) then
-    if Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury aoe 56"; end
+    if Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury aoe 46"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains>2,if=talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&!buff.ascendance.up&talent.fire_elemental.enabled
   if S.LavaBurst:IsViable() and (S.MasteroftheElements:IsAvailable() and not Player:MotEUp() and Player:BuffDown(S.AscendanceBuff) and S.FireElemental:IsAvailable()) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 58"; end
-  end
-  -- lava_beam,if=buff.stormkeeper.up&(buff.surge_of_power.up|spell_targets.lava_beam<6)
-  if S.LavaBeam:IsViable() and (Player:StormkeeperUp() and (Player:BuffUp(S.SurgeofPowerBuff) or Shaman.ClusterTargets < 6)) then
-    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 60"; end
-  end
-  -- chain_lightning,if=buff.stormkeeper.up&(buff.surge_of_power.up|spell_targets.chain_lightning<6)
-  if S.ChainLightning:IsViable() and (Player:StormkeeperUp() and (Player:BuffUp(S.SurgeofPowerBuff) or Shaman.ClusterTargets < 6)) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 62"; end
-  end
-  -- lava_beam,if=buff.power_of_the_maelstrom.up&buff.ascendance.remains>cast_time&!buff.stormkeeper.up
-  if S.LavaBeam:IsViable() and (Player:PotMUp() and Player:BuffRemains(S.AscendanceBuff) > S.LavaBeam:CastTime() and not Player:StormkeeperUp()) then
-    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 64"; end
-  end
-  -- chain_lightning,if=buff.power_of_the_maelstrom.up&!buff.stormkeeper.up
-  if S.ChainLightning:IsViable() and (Player:PotMUp() and not Player:StormkeeperUp()) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 66"; end
-  end
-  -- lava_beam,if=(buff.master_of_the_elements.up&spell_targets.lava_beam>=4|spell_targets.lava_beam>=5)&buff.ascendance.remains>cast_time&!buff.stormkeeper.up
-  if S.LavaBeam:IsViable() and ((Player:MotEUp() and Shaman.ClusterTargets >= 4 or Shaman.ClusterTargets >= 5) and Player:BuffRemains(S.AscendanceBuff) > S.LavaBeam:CastTime() and not Player:StormkeeperUp()) then
-    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 68"; end
-  end
-  -- lava_burst,target_if=dot.flame_shock.remains>2,if=talent.deeply_rooted_elements.enabled
-  if S.LavaBurst:IsViable() and (S.DeeplyRootedElements:IsAvailable()) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 70"; end
-  end
-  -- lava_beam,if=buff.ascendance.remains>cast_time
-  if S.LavaBeam:IsViable() and (Player:BuffRemains(S.AscendanceBuff) > S.LavaBeam:CastTime()) then
-    if Cast(S.LavaBeam, nil, nil, not Target:IsSpellInRange(S.LavaBeam)) then return "lava_beam aoe 72"; end
+    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 48"; end
   end
   -- chain_lightning
   if S.ChainLightning:IsViable() then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 74"; end
+    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 50"; end
   end
   -- flame_shock,moving=1,target_if=refreshable
   if S.FlameShock:IsCastable() and Player:IsMoving() then
-    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateCycleFlameShockRefreshable, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock moving aoe 76"; end
+    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateCycleFlameShockRefreshable, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock moving aoe 52"; end
   end
   -- frost_shock,moving=1
   if S.FrostShock:IsCastable() and Player:IsMoving() then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock moving aoe 78"; end
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock moving aoe 54"; end
   end
 end
 
 local function SingleTarget()
-  -- fire_elemental,if=!buff.fire_elemental.up
-  if S.FireElemental:IsCastable() and (not Shaman.FireElemental.GreaterActive) then
+  -- fire_elemental
+  if S.FireElemental:IsCastable() then
     if Cast(S.FireElemental, Settings.Elemental.GCDasOffGCD.FireElemental) then return "fire_elemental single_target 2"; end
   end
-  -- storm_elemental,if=!buff.storm_elemental.up
-  if S.StormElemental:IsCastable() and (not Shaman.StormElemental.GreaterActive) then
+  -- storm_elemental
+  if S.StormElemental:IsCastable() then
     if Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "storm_elemental single_target 4"; end
   end
-  -- stormkeeper,if=!buff.ascendance.up&!buff.stormkeeper.up
-  if S.Stormkeeper:IsViable() and (Player:BuffDown(S.AscendanceBuff) and not Player:StormkeeperUp()) then
+  -- stormkeeper,if=!talent.ascendance.enabled|cooldown.ascendance.remains<gcd|cooldown.ascendance.remains>10
+  if S.Stormkeeper:IsViable() and (not S.Ascendance:IsAvailable() or S.Ascendance:CooldownRemains() < Player:GCD() or S.Ascendance:CooldownRemains() > 10) then
     if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper single_target 6"; end
   end
-  -- totemic_recall,if=cooldown.liquid_magma_totem.remains>15&spell_targets.chain_lightning>1&talent.fire_elemental.enabled
-  if S.TotemicRecall:IsCastable() and (S.LiquidMagmaTotem:CooldownRemains() > 15 and Shaman.ClusterTargets > 1 and S.FireElemental:IsAvailable()) then
-    if Cast(S.TotemicRecall, Settings.CommonsOGCD.GCDasOffGCD.TotemicRecall) then return "totemic_recall single_target 8"; end
-  end
-  -- liquid_magma_totem,if=!buff.ascendance.up&(talent.fire_elemental.enabled|spell_targets.chain_lightning>1)
-  if S.LiquidMagmaTotem:IsCastable() and (Player:BuffDown(S.AscendanceBuff) and (S.FireElemental:IsAvailable() or Shaman.ClusterTargets > 1)) then
-    if Cast(S.LiquidMagmaTotem, Settings.Elemental.GCDasOffGCD.LiquidMagmaTotem, nil, not Target:IsInRange(40)) then return "liquid_magma_totem single_target 10"; end
-  end
-  -- primordial_wave,target_if=min:dot.flame_shock.remains,if=spell_targets.chain_lightning=1|buff.surge_of_power.up|!talent.surge_of_power.enabled|maelstrom<60-5*talent.eye_of_the_storm.enabled|talent.liquid_magma_totem.enabled
-  if S.PrimordialWave:IsViable() and (Shaman.ClusterTargets == 1 or Player:BuffUp(S.SurgeofPowerBuff) or not S.SurgeofPower:IsAvailable() or VarMaelstrom < 60 - 5 * num(S.EyeoftheStorm:IsAvailable()) or S.LiquidMagmaTotem:IsAvailable()) then
-    if Everyone.CastTargetIf(S.PrimordialWave, Enemies10ySplash, "min", EvaluateTargetIfFilterFlameShockRemains, nil, not Target:IsSpellInRange(S.PrimordialWave), nil, Settings.CommonsDS.DisplayStyle.PrimordialWave) then return "primordial_wave single_target 12"; end
+  -- primordial_wave,if=!buff.surge_of_power.up
+  if S.PrimordialWave:IsViable() and (Player:BuffDown(S.SurgeofPowerBuff)) then
+    if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single_target 8"; end
   end
   -- ancestral_swiftness,if=!buff.primordial_wave.up|!buff.stormkeeper.up|!talent.elemental_blast.enabled
   if S.AncestralSwiftness:IsReady() and (Player:BuffDown(S.PrimordialWaveBuff) or not Player:StormkeeperUp() or not S.ElementalBlast:IsAvailable()) then
-    if Cast(S.AncestralSwiftness, Settings.CommonsOGCD.GCDasOffGCD.AncestralSwiftness) then return "ancestral_swiftness single_target 14"; end
+    if Cast(S.AncestralSwiftness, Settings.CommonsOGCD.GCDasOffGCD.AncestralSwiftness) then return "ancestral_swiftness single_target 10"; end
   end
-  -- flame_shock,target_if=min:dot.flame_shock.remains,if=active_enemies=1&(dot.flame_shock.remains<2|active_dot.flame_shock=0)&(dot.flame_shock.remains<cooldown.primordial_wave.remains|!talent.primordial_wave.enabled)&(dot.flame_shock.remains<cooldown.liquid_magma_totem.remains|!talent.liquid_magma_totem.enabled)&!buff.surge_of_power.up&talent.fire_elemental.enabled
-  if S.FlameShock:IsCastable() and (Shaman.ClusterTargets == 1 and (Target:DebuffRemains(S.FlameShockDebuff) < 2 or S.FlameShockDebuff:AuraActiveCount() == 0) and (Target:DebuffRemains(S.FlameShockDebuff) < S.PrimordialWave:CooldownRemains() or not S.PrimordialWave:IsAvailable()) and (Target:DebuffRemains(S.FlameShockDebuff) < S.LiquidMagmaTotem:CooldownRemains() or not S.LiquidMagmaTotem:IsAvailable()) and Player:BuffDown(S.SurgeofPowerBuff) and S.FireElemental:IsAvailable()) then
-    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 16"; end
+  -- ascendance,if=fight_remains>180|buff.spymasters_web.up|!(variable.spymaster_in_1st|variable.spymaster_in_2nd)
+  if S.Ascendance:IsCastable() and (FightRemains > 100 or Player:BuffUp(S.SpymastersWebBuff) or not (VarSpymasterIn1st or VarSpymasterIn2nd)) then
+    if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance single_target 12"; end
   end
-  -- flame_shock,target_if=min:dot.flame_shock.remains,if=active_dot.flame_shock<active_enemies&spell_targets.chain_lightning>1&(talent.deeply_rooted_elements.enabled|talent.ascendance.enabled|talent.primordial_wave.enabled|talent.searing_flames.enabled|talent.magma_chamber.enabled)&(!buff.surge_of_power.up&buff.stormkeeper.up|!talent.surge_of_power.enabled|cooldown.ascendance.remains=0&talent.ascendance.enabled)&!talent.liquid_magma_totem.enabled
-  if S.FlameShock:IsCastable() and (S.FlameShockDebuff:AuraActiveCount() < Shaman.ClusterTargets and Shaman.ClusterTargets > 1 and (S.DeeplyRootedElements:IsAvailable() or S.Ascendance:IsAvailable() or S.PrimordialWave:IsAvailable() or S.SearingFlames:IsAvailable() or S.MagmaChamber:IsAvailable()) and (Player:BuffDown(S.SurgeofPowerBuff) and Player:StormkeeperUp() or not S.SurgeofPower:IsAvailable() or S.Ascendance:CooldownUp() and S.Ascendance:IsAvailable()) and not S.LiquidMagmaTotem:IsAvailable()) then
-    if Everyone.CastTargetIf(S.FlameShock, Enemies10ySplash, "min", EvaluateTargetIfFilterFlameShockRemains, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 18"; end
-  end
-  -- flame_shock,target_if=min:dot.flame_shock.remains,if=spell_targets.chain_lightning>1&(talent.deeply_rooted_elements.enabled|talent.ascendance.enabled|talent.primordial_wave.enabled|talent.searing_flames.enabled|talent.magma_chamber.enabled)&(buff.surge_of_power.up&!buff.stormkeeper.up|!talent.surge_of_power.enabled)&dot.flame_shock.remains<6&talent.fire_elemental.enabled,cycle_targets=1
-  if S.FlameShock:IsCastable() and (Shaman.ClusterTargets > 1 and (S.DeeplyRootedElements:IsAvailable() or S.Ascendance:IsAvailable() or S.PrimordialWave:IsAvailable() or S.SearingFlames:IsAvailable() or S.MagmaChamber:IsAvailable()) and (Player:BuffUp(S.SurgeofPowerBuff) and not Player:StormkeeperUp() or not S.SurgeofPower:IsAvailable()) and S.FireElemental:IsAvailable()) then
-    if Everyone.CastTargetIf(S.FlameShock, Enemies10ySplash, "min", EvaluateTargetIfFilterFlameShockRemains, EvaluateTargetIfFlameShockST2, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 20"; end
-  end
-  -- tempest,target_if=min:debuff.lightning_rod.remains,if=!buff.arc_discharge.up
-  if S.TempestAbility:IsReady() and (Player:BuffDown(S.ArcDischargeBuff)) then
-    if Everyone.CastTargetIf(S.TempestAbility, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsInRange(40)) then return "tempest single_target 22"; end
-  end
-  -- lightning_bolt,if=buff.stormkeeper.up&buff.surge_of_power.up
-  if S.LightningBolt:IsViable() and (Player:StormkeeperUp() and Player:BuffUp(S.SurgeofPowerBuff)) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 24"; end
-  end
-  -- lava_burst,target_if=dot.flame_shock.remains>2,if=buff.stormkeeper.up&!buff.master_of_the_elements.up&!talent.surge_of_power.enabled&talent.master_of_the_elements.enabled
-  if S.LavaBurst:IsViable() and (Player:StormkeeperUp() and not Player:MotEUp() and not S.SurgeofPower:IsAvailable() and S.MasteroftheElements:IsAvailable()) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 26"; end
-  end
-  -- lightning_bolt,if=buff.stormkeeper.up&!talent.surge_of_power.enabled&(buff.master_of_the_elements.up|!talent.master_of_the_elements.enabled)
-  if S.LightningBolt:IsViable() and (Player:StormkeeperUp() and not S.SurgeofPower:IsAvailable() and (Player:MotEUp() or not S.MasteroftheElements:IsAvailable())) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 28"; end
-  end
-  -- lightning_bolt,if=buff.surge_of_power.up&!buff.ascendance.up&talent.echo_chamber.enabled
-  if S.LightningBolt:IsViable() and (Player:BuffUp(S.SurgeofPowerBuff) and Player:BuffDown(S.AscendanceBuff) and S.EchoChamber:IsAvailable()) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 30"; end
-  end
-  -- ascendance,if=cooldown.lava_burst.charges_fractional<1.0
-  if S.Ascendance:IsCastable() and (S.LavaBurst:ChargesFractional() < 1) then
-    if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance single_target 32"; end
-  end
-  -- lava_burst,target_if=dot.flame_shock.remains,if=cooldown_react&buff.lava_surge.up&talent.fire_elemental.enabled
-  if S.LavaBurst:IsViable() and (Player:BuffUp(S.LavaSurgeBuff) and S.FireElemental:IsAvailable()) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 34"; end
-  end
-  -- lava_burst,target_if=dot.flame_shock.remains>2,if=buff.primordial_wave.up
-  if S.LavaBurst:IsViable() and (Player:BuffUp(S.PrimordialWaveBuff)) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 36"; end
-  end
-  -- earthquake,if=buff.master_of_the_elements.up&(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up|spell_targets.chain_lightning>1&!talent.echoes_of_great_sundering.enabled&!talent.elemental_blast.enabled)&(buff.fusion_of_elements_nature.up|maelstrom>variable.mael_cap-15|buff.ascendance.remains>9|!buff.ascendance.up)&talent.fire_elemental.enabled
-  if S.Earthquake:IsReady() and (Player:MotEUp() and (Player:BuffUp(S.EchoesofGreatSunderingBuff) or Shaman.ClusterTargets > 1 and not S.EchoesofGreatSundering:IsAvailable() and not S.ElementalBlast:IsAvailable()) and (Player:BuffUp(S.FusionofElementsNature) or VarMaelstrom > VarMaelCap - 15 or Player:BuffRemains(S.AscendanceBuff) > 9 or Player:BuffDown(S.AscendanceBuff)) and S.FireElemental:IsAvailable()) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 38"; end
-  end
-  -- elemental_blast,if=buff.master_of_the_elements.up&(buff.fusion_of_elements_nature.up|buff.fusion_of_elements_fire.up|maelstrom>variable.mael_cap-15|buff.ascendance.remains>6|!buff.ascendance.up)&talent.fire_elemental.enabled
-  if S.ElementalBlast:IsViable() and (Player:MotEUp() and (Player:BuffUp(S.FusionofElementsNature) or Player:BuffUp(S.FusionofElementsFire) or VarMaelstrom > VarMaelCap - 15 or Player:BuffRemains(S.AscendanceBuff) > 6 or Player:BuffDown(S.AscendanceBuff)) and S.FireElemental:IsAvailable()) then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_target 40"; end
-  end
-  -- earth_shock,if=buff.master_of_the_elements.up&(buff.fusion_of_elements_nature.up|maelstrom>variable.mael_cap-15|buff.ascendance.remains>9|!buff.ascendance.up)&talent.fire_elemental.enabled
-  if S.EarthShock:IsReady() and (Player:MotEUp() and (Player:BuffUp(S.FusionofElementsNature) or VarMaelstrom > VarMaelCap - 15 or Player:BuffRemains(S.AscendanceBuff) > 9 or Player:BuffDown(S.AscendanceBuff)) and S.FireElemental:IsAvailable()) then
-    if Cast(S.EarthShock, nil, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock single_target 42"; end
-  end
-  -- earthquake,if=(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up|spell_targets.chain_lightning>1&!talent.echoes_of_great_sundering.enabled&!talent.elemental_blast.enabled)&(buff.stormkeeper.up|cooldown.primordial_wave.remains<gcd&talent.surge_of_power.enabled&!talent.liquid_magma_totem.enabled)&talent.storm_elemental.enabled
-  if S.Earthquake:IsReady() and ((Player:BuffUp(S.EchoesofGreatSunderingBuff) or Shaman.ClusterTargets > 1 and not S.EchoesofGreatSundering:IsAvailable() and not S.ElementalBlast:IsAvailable()) and (Player:StormkeeperUp() or S.PrimordialWave:CooldownRemains() < Player:GCD() and S.SurgeofPower:IsAvailable() and not S.LiquidMagmaTotem:IsAvailable()) and S.StormElemental:IsAvailable()) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 44"; end
-  end
-  -- elemental_blast,target_if=min:debuff.lightning_rod.remains,if=buff.stormkeeper.up&talent.storm_elemental.enabled
-  if S.ElementalBlast:IsViable() and (Player:StormkeeperUp() and S.StormElemental:IsAvailable()) then
-    if Everyone.CastTargetIf(S.ElementalBlast, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_target 46"; end
-  end
-  -- earth_shock,if=((buff.master_of_the_elements.up|lightning_rod=0)&cooldown.stormkeeper.remains>10&(rolling_thunder.next_tick>5|!talent.rolling_thunder.enabled)|buff.stormkeeper.up)&talent.storm_elemental.enabled&spell_targets.chain_lightning=1
-  if S.EarthShock:IsReady() and (((Player:MotEUp() or S.LightningRodDebuff:AuraActiveCount() == 0) and S.Stormkeeper:CooldownRemains() > 10 and (RollingThunderNextTick() > 5 or not S.RollingThunder:IsAvailable()) or Player:StormkeeperUp()) and S.StormElemental:IsAvailable() and Shaman.ClusterTargets == 1) then
-    if Cast(S.EarthShock, nil, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock single_target 48"; end
-  end
-  -- earth_shock,target_if=min:debuff.lightning_rod.remains,if=(cooldown.primordial_wave.remains<gcd&talent.surge_of_power.enabled&!talent.liquid_magma_totem.enabled|buff.stormkeeper.up)&talent.storm_elemental.enabled&spell_targets.chain_lightning>1&talent.echoes_of_great_sundering.enabled&!buff.echoes_of_great_sundering_es.up
-  if S.EarthShock:IsReady() and ((S.PrimordialWave:CooldownRemains() < Player:GCD() and S.SurgeofPower:IsAvailable() and not S.LiquidMagmaTotem:IsAvailable() or Player:StormkeeperUp()) and S.StormElemental:IsAvailable() and Shaman.ClusterTargets > 1 and S.EchoesofGreatSundering:IsAvailable() and Player:BuffDown(S.EchoesofGreatSunderingBuff)) then
-    if Cast(S.EarthShock, nil, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock single_target 49"; end
-  end
-  -- icefury,if=!(buff.fusion_of_elements_nature.up|buff.fusion_of_elements_fire.up)&buff.icefury.stack=2&(talent.fusion_of_elements.enabled|!buff.ascendance.up)
-  if S.Icefury:IsViable() and (not (Player:BuffUp(S.FusionofElementsNature) or Player:BuffUp(S.FusionofElementsFire)) and Player:BuffStack(S.IcefuryBuff) == 2 and (S.FusionofElements:IsAvailable() or Player:BuffDown(S.AscendanceBuff))) then
-    if Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury single_target 50"; end
-  end
-  -- lava_burst,target_if=dot.flame_shock.remains>2,if=buff.ascendance.up
-  if S.LavaBurst:IsViable() and (Player:BuffUp(S.AscendanceBuff)) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 52"; end
-  end
-  -- lava_burst,target_if=dot.flame_shock.remains>2,if=talent.master_of_the_elements.enabled&!buff.master_of_the_elements.up&talent.fire_elemental.enabled
-  if S.LavaBurst:IsViable() and (S.MasteroftheElements:IsAvailable() and not Player:MotEUp() and S.FireElemental:IsAvailable()) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 54"; end
-  end
-  -- lava_burst,target_if=dot.flame_shock.remains>2,if=buff.stormkeeper.up&talent.elemental_reverb.enabled&talent.earth_shock.enabled&time<10
-  if S.LavaBurst:IsViable() and (Player:StormkeeperUp() and S.ElementalReverb:IsAvailable() and S.EarthShock:IsAvailable() and HL.CombatTime() < 10) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 56"; end
-  end
-  -- earthquake,if=(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up|spell_targets.chain_lightning>1&!talent.echoes_of_great_sundering.enabled&!talent.elemental_blast.enabled)&(maelstrom>variable.mael_cap-35|fight_remains<5)
-  if S.Earthquake:IsReady() and ((Player:BuffUp(S.EchoesofGreatSunderingBuff) or Shaman.ClusterTargets > 1 and not S.EchoesofGreatSundering:IsAvailable() and not S.ElementalBlast:IsAvailable()) and (VarMaelstrom > VarMaelCap - 35 or BossFightRemains < 5)) then
-    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 58"; end
-  end
-  -- elemental_blast,target_if=min:debuff.lightning_rod.remains,if=maelstrom>variable.mael_cap-15|fight_remains<5
-  if S.ElementalBlast:IsViable() and (VarMaelstrom > VarMaelCap - 15 or BossFightRemains < 5) then
-    if Everyone.CastTargetIf(S.ElementalBlast, Enemies10ySplash, "max", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_target 60"; end
-  end
-  -- earth_shock,target_if=min:debuff.lightning_rod.remains,if=maelstrom>variable.mael_cap-15|fight_remains<5
-  if S.EarthShock:IsReady() and (VarMaelstrom > VarMaelCap - 15 or BossFightRemains < 5) then
-    if Everyone.CastTargetIf(S.EarthShock, Enemies10ySplash, "max", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock single_target 62"; end
+  -- tempest,if=buff.surge_of_power.up
+  if S.TempestAbility:IsReady() and (Player:BuffUp(S.SurgeofPowerBuff)) then
+    if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest single_target 14"; end
   end
   -- lightning_bolt,if=buff.surge_of_power.up
   if S.LightningBolt:IsViable() and (Player:BuffUp(S.SurgeofPowerBuff)) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 64"; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 16"; end
+  end
+  -- liquid_magma_totem,if=active_dot.flame_shock=0
+  if S.LiquidMagmaTotem:IsCastable() and (S.FlameShockDebuff:AuraActiveCount() == 0) then
+    if Cast(S.LiquidMagmaTotem, Settings.Elemental.GCDasOffGCD.LiquidMagmaTotem, nil, not Target:IsInRange(40)) then return "liquid_magma_totem single_target 18"; end
+  end
+  -- flame_shock,if=(active_dot.flame_shock=0|dot.flame_shock.remains<6)&!buff.surge_of_power.up&!buff.master_of_the_elements.up&!talent.primordial_wave.enabled&!talent.liquid_magma_totem.enabled
+  if S.FlameShock:IsCastable() and ((S.FlameShockDebuff:AuraActiveCount() == 0 or Target:DebuffRemains(S.FlameShockDebuff) < 6) and Player:BuffDown(S.SurgeofPowerBuff) and not Player:MotEUp() and not S.PrimordialWave:IsAvailable() and not S.LiquidMagmaTotem:IsAvailable()) then
+    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 20"; end
+  end
+  -- earthquake,if=(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up)&(maelstrom>variable.mael_cap-15|fight_remains<5)
+  if S.Earthquake:IsReady() and (Player:BuffUp(S.EchoesofGreatSunderingBuff) and (VarMaelstrom > VarMaelCap - 15 or BossFightRemains < 5)) then
+    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 22"; end
+  end
+  if VarMaelstrom > VarMaelCap - 15 or BossFightRemains < 5 then
+    -- elemental_blast,if=maelstrom>variable.mael_cap-15|fight_remains<5
+    if S.ElementalBlast:IsViable() then
+      if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_target 24"; end
+    end
+    -- earth_shock,if=maelstrom>variable.mael_cap-15|fight_remains<5
+    if S.EarthShock:IsReady() then
+      if Cast(S.EarthShock, nil, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock single_target 26"; end
+    end
   end
   -- icefury,if=!(buff.fusion_of_elements_nature.up|buff.fusion_of_elements_fire.up)
   if S.Icefury:IsViable() and (not (Player:BuffUp(S.FusionofElementsNature) or Player:BuffUp(S.FusionofElementsFire))) then
-    if Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury single_target 66"; end
+    if Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury single_target 28"; end
   end
-  -- frost_shock,if=buff.icefury_dmg.up&(spell_targets.chain_lightning=1|buff.stormkeeper.up&talent.surge_of_power.enabled)
-  if S.FrostShock:IsCastable() and (Player:IcefuryUp() and (Shaman.ClusterTargets == 1 or Player:StormkeeperUp() and S.SurgeofPower:IsAvailable())) then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 68"; end
+  -- lava_burst,target_if=dot.flame_shock.remains>2,if=!buff.master_of_the_elements.up
+  -- Note: Not using target_if, as this function is only called on pure single target...
+  if S.LavaBurst:IsViable() and (not Player:MotEUp() and Target:DebuffRemains(S.FlameShockDebuff) > 2) then
+    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 30"; end
   end
-  -- chain_lightning,if=buff.power_of_the_maelstrom.up&spell_targets.chain_lightning>1&!buff.stormkeeper.up
-  if S.ChainLightning:IsViable() and (Player:PotMUp() and Shaman.ClusterTargets > 1 and not Player:StormkeeperUp()) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning single_target 70"; end
+  -- earthquake,if=(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up)&(buff.tempest.up|buff.stormkeeper.up)&talent.surge_of_power.enabled
+  if S.Earthquake:IsReady() and (Player:BuffUp(S.EchoesofGreatSunderingBuff) and (S.TempestAbility:IsReady() or Player:StormkeeperUp()) and S.SurgeofPower:IsAvailable()) then
+    if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake single_target 32"; end
   end
-  -- lightning_bolt,if=buff.power_of_the_maelstrom.up&!buff.stormkeeper.up
-  if S.LightningBolt:IsViable() and (Player:PotMUp() and not Player:StormkeeperUp()) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 72"; end
+  if (S.TempestAbility:IsReady() or Player:StormkeeperUp()) and S.SurgeofPower:IsAvailable() then
+    -- elemental_blast,if=(buff.tempest.up|buff.stormkeeper.up)&talent.surge_of_power.enabled
+    if S.ElementalBlast:IsViable() then
+      if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_target 34"; end
+    end
+    -- earth_shock,if=(buff.tempest.up|buff.stormkeeper.up)&talent.surge_of_power.enabled
+    if S.EarthShock:IsReady() then
+      if Cast(S.EarthShock, nil, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock single_target 36"; end
+    end
   end
-  -- lava_burst,target_if=dot.flame_shock.remains>2,if=talent.deeply_rooted_elements.enabled
-  if S.LavaBurst:IsViable() and (S.DeeplyRootedElements:IsAvailable()) then
-    if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains2, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 74"; end
-  end
-  -- chain_lightning,if=spell_targets.chain_lightning>1&!buff.stormkeeper.up
-  if S.ChainLightning:IsViable() and (Shaman.ClusterTargets > 1 and not Player:StormkeeperUp()) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning single_target 76"; end
+  -- tempest
+  if S.TempestAbility:IsReady() then
+    if Cast(S.TempestAbility, nil, nil, not Target:IsInRange(40)) then return "tempest single_target 38"; end
   end
   -- lightning_bolt
   if S.LightningBolt:IsViable() then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 78"; end
+    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_target 40"; end
   end
   -- flame_shock,moving=1,target_if=refreshable
-  if S.FlameShock:IsCastable() and (Player:IsMoving()) then
-    if Everyone.CastCycle(S.FlameShock, Enemies10ySplash, EvaluateCycleFlameShockRefreshable, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 80"; end
-  end
+  -- Note: Since SingleTarget() now doesn't cover 2 target cleave, the below line covers this one as well.
   -- flame_shock,moving=1,if=movement.distance>6
-  if S.FlameShock:IsCastable() then
-    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 82"; end
+  if S.FlameShock:IsCastable() and Player:IsMoving() then
+    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_target 42"; end
   end
   -- frost_shock,moving=1
-  if S.FrostShock:IsCastable() then
-    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 84"; end
+  if S.FrostShock:IsCastable() and Player:IsMoving() then
+    if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_target 44"; end
   end
 end
 
@@ -635,20 +524,21 @@ local function APL()
       end
     end
     if Settings.Commons.Enabled.Trinkets then
-      -- use_item,slot=trinket1,if=!variable.spymaster_in_1st|(fight_remains<45|time<fight_remains&buff.spymasters_report.stack=40)&cooldown.stormkeeper.remains<5|fight_remains<22
-      if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarSpymasterIn1st or (BossFightRemains < 45 or HL.CombatTime() < FightRemains and Player:BuffStack(S.SpymastersWebBuff) == 40) and S.Stormkeeper:CooldownRemains() < 5 or BossFightRemains < 22) then
+      -- use_item,slot=trinket1,if=!variable.spymaster_in_1st|(fight_remains<65|time<fight_remains&buff.spymasters_report.stack>35)&prev_gcd.1.stormkeeper|buff.ascendance.remains>12&buff.spymasters_report.stack>25|fight_remains<22
+      if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarSpymasterIn1st or (BossFightRemains < 65 or HL.CombatTime() < FightRemains and Player:BuffStack(S.SpymastersReportBuff) > 35) and Player:PrevGCDP(1, S.Stormkeeper) or Player:BuffRemains(S.AscendanceBuff) > 12 and Player:BuffStack(S.SpymastersReportBuff) > 25 or BossFightRemains < 22) then
         if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item trinket1 ("..Trinket1:Name()..") main 10"; end
       end
-      -- use_item,slot=trinket2,if=!variable.spymaster_in_2nd|(fight_remains<45|time<fight_remains&buff.spymasters_report.stack=40)&cooldown.stormkeeper.remains<5|fight_remains<22
-      if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarSpymasterIn2nd or (BossFightRemains < 45 or HL.CombatTime() < FightRemains and Player:BuffStack(S.SpymastersWebBuff) == 40) and S.Stormkeeper:CooldownRemains() < 5 or BossFightRemains < 22) then
+      -- use_item,slot=trinket2,if=!variable.spymaster_in_2nd|(fight_remains<65|time<fight_remains&buff.spymasters_report.stack>35)&prev_gcd.1.stormkeeper|buff.ascendance.remains>12&buff.spymasters_report.stack>25|fight_remains<22
+      if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarSpymasterIn2nd or (BossFightRemains < 65 or HL.CombatTime() < FightRemains and Player:BuffStack(S.SpymastersReportBuff) > 35) and Player:PrevGCDP(1, S.Stormkeeper) or Player:BuffRemains(S.AscendanceBuff) > 12 and Player:BuffStack(S.SpymastersReportBuff) > 25 or BossFightRemains < 22) then
         if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item trinket2 ("..Trinket2:Name()..") main 12"; end
       end
     end
     if Settings.Commons.Enabled.Items then
       -- use_item,slot=main_hand
-      local MHToUse, _, MHRange = Player:GetUseableItems(OnUseExcludes, 16)
-      if MHToUse then
-        if Cast(MHToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(MHRange)) then return "use_item main_hand ("..MHToUse:Name()..") main 14"; end
+      -- Note: Expanding to all non-trinket items
+      local ItemToUse, _, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
+      if ItemToUse then
+        if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "use_item non-trinket ("..ItemToUse:Name()..") main 14"; end
       end
     end
     -- lightning_shield,if=buff.lightning_shield.down
@@ -659,15 +549,15 @@ local function APL()
     end
     -- invoke_external_buff,name=power_infusion
     -- Note: Not handling external buffs.
-    -- potion
-    if Settings.Commons.Enabled.Potions then
+    -- potion,if=buff.bloodlust.up|buff.spymasters_web.up|buff.ascendance.remains>12|fight_remains<31
+    if Settings.Commons.Enabled.Potions and (Player:BloodlustUp() or Player:BuffUp(S.SpymastersWebBuff) or Player:BuffRemains(S.AscendanceBuff) > 12 or BossFightRemains < 31) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
         if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 14"; end
       end
     end
-    -- run_action_list,name=aoe,if=spell_targets.chain_lightning>2
-    if AoEON() and (Shaman.ClusterTargets > 2) then
+    -- run_action_list,name=aoe,if=spell_targets.chain_lightning>=2
+    if AoEON() and (Shaman.ClusterTargets >= 2) then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "POOL") then return "Pool for Aoe()"; end
     end
@@ -681,7 +571,7 @@ local function Init()
   S.FlameShockDebuff:RegisterAuraTracking()
   S.LightningRodDebuff:RegisterAuraTracking()
 
-  HR.Print("Elemental Shaman rotation has been updated for patch 11.0.2.")
+  HR.Print("Elemental Shaman rotation has been updated for patch 11.0.5.")
 end
 
 HR.SetAPL(262, APL, Init)

@@ -248,8 +248,8 @@ local function Deathbringer()
   if S.DeathAndDecay:IsReady() and ((Target:DebuffUp(S.ReapersMarkDebuff) and not Player:DnDTicking()) or Player:BuffDown(S.DeathAndDecayBuff)) then
     if Cast(S.DeathAndDecay, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "death_and_decay deathbringer 24"; end
   end
-  -- marrowrend,if=(buff.exterminate_painful_death.up|buff.exterminate.up)&(runic_power.deficit>20&buff.coagulopathy.remains>2*gcd)
-  if S.Marrowrend:IsReady() and ((Player:BuffUp(S.PainfulDeathBuff) or Player:BuffUp(S.ExterminateBuff)) and (Player:RunicPowerDeficit() > 20 and Player:BuffRemains(S.CoagulopathyBuff) > 2 * Player:GCD())) then
+  -- marrowrend,if=buff.exterminate.up&(runic_power.deficit>20&buff.coagulopathy.remains>2*gcd)
+  if S.Marrowrend:IsReady() and (Player:BuffUp(S.ExterminateBuff) and (Player:RunicPowerDeficit() > 20 and Player:BuffRemains(S.CoagulopathyBuff) > 2 * Player:GCD())) then
     if Cast(S.Marrowrend, nil, nil, not Target:IsInMeleeRange(5)) then return "marrowrend deathbringer 26"; end
   end
   -- abomination_limb,if=dot.reapers_mark.ticking
@@ -503,7 +503,7 @@ end
 local function Init()
   S.BloodPlagueDebuff:RegisterAuraTracking()
 
-  HR.Print("Blood Death Knight rotation has been updated for patch 11.0.2.")
+  HR.Print("Blood Death Knight rotation has been updated for patch 11.0.5.")
 end
 
 HR.SetAPL(250, APL, Init)

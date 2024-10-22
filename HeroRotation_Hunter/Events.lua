@@ -114,6 +114,7 @@ HL:RegisterForEvent(
 )
 
 --- ===== Steady Focus Tracker =====
+--[[ Note: This tracker isn't used in 11.0.5, but leaving it here in case we need it in the future.
 Hunter.SteadyFocus = {}
 Hunter.SteadyFocus.Count = 0
 Hunter.SteadyFocus.LastCast = 0
@@ -129,6 +130,7 @@ HL:RegisterForSelfCombatEvent(
   end
   , "SPELL_CAST_SUCCESS"
 )
+]]
 
 HL:RegisterForSelfCombatEvent(
   function(...)

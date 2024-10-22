@@ -41,7 +41,6 @@ local OnUseExcludes = {
 
 --- ===== GUI Settings =====
 local Everyone = HR.Commons.Everyone
-local Hunter = HR.Commons.Hunter
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Hunter.Commons,
@@ -116,8 +115,6 @@ HL:RegisterForEvent(function()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
-  Hunter.SteadyFocus.Count = 0
-  Hunter.SteadyFocus.LastCast = 0
   BossFightRemains = 11111
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
@@ -203,8 +200,8 @@ local function CDs()
 end
 
 local function ST()
-  -- steady_shot,if=talent.steady_focus&steady_focus_count&buff.steady_focus.remains<8
-  if S.SteadyShot:IsCastable() and (S.SteadyFocus:IsAvailable() and Hunter.SteadyFocus.Count == 1 and Player:BuffRemains(S.SteadyFocusBuff) < 8) then
+  -- steady_shot,if=talent.steady_focus&buff.steady_focus.remains<8
+  if S.SteadyShot:IsCastable() and (S.SteadyFocus:IsAvailable() and Player:BuffRemains(S.SteadyFocusBuff) < 8) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 2"; end
   end
   -- kill_shot,if=buff.razor_fragments.up
@@ -294,8 +291,8 @@ local function ST()
 end
 
 local function Trickshots()
-  -- steady_shot,if=talent.steady_focus&steady_focus_count&buff.steady_focus.remains<8
-  if S.SteadyShot:IsCastable() and (S.SteadyFocus:IsAvailable() and Hunter.SteadyFocus.Count == 1 and Player:BuffRemains(S.SteadyFocusBuff) < 8) then
+  -- steady_shot,if=talent.steady_focus&buff.steady_focus.remains<8
+  if S.SteadyShot:IsCastable() and (S.SteadyFocus:IsAvailable() and Player:BuffRemains(S.SteadyFocusBuff) < 8) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot trickshots 2"; end
   end
   -- explosive_shot
@@ -428,7 +425,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Marksmanship Hunter rotation has been updated for patch 11.0.2.")
+  HR.Print("Marksmanship Hunter rotation has been updated for patch 11.0.5.")
 end
 
 HR.SetAPL(254, APL, Init)
