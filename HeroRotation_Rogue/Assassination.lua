@@ -72,9 +72,11 @@ local Enemies30y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y
 local ShouldReturn
 local BleedTickTime, ExsanguinatedBleedTickTime = 2 * Player:SpellHaste(), 1 * Player:SpellHaste()
 local ComboPoints, ComboPointsDeficit
-local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMGThreshold, RuptureDurationThreshold, RuptureTickTime, GarroteTickTime
+local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMGThreshold, RuptureDurationThreshold
 local PriorityRotation
-local NotPooling, SepsisSyncRemains, PoisonedBleeds, EnergyRegenCombined, EnergyTimeToMaxCombined, EnergyRegenSaturated, SingleTarget, ScentSaturated
+local NotPooling, InCooldowns, PoisonedBleeds, EnergyRegenCombined, EnergyTimeToMaxCombined, EnergyRegenSaturated, SingleTarget, ScentSaturated,
+ClipEnvenom, UpperLimitEnergy, AvoidTea, CDSoon
+
 local TrinketSyncSlot = 0
 local EffectiveCPSpend
 
@@ -593,17 +595,6 @@ local function Vanish ()
       return "Cast Vanish (Improved Garrote during Deathmark)" .. ShouldReturn
     end
   end
-
-  -- # Vanish for slightly more mark uptime since you can apply mark and have darkest night at the same time
-  --actions.vanish+=/vanish,if=!talent.improved_garrote&buff.darkest_night.up&combo_points.deficit>=3&variable.single_target
-  -- Note: Simc commit mentions this as "temporarily commented out". Leaving it here for easy re-implementation.
-  --[[if S.Vanish:IsReady() and not S.ImprovedGarrote:IsAvailable() and Player:BuffUp(S.DarkestNightBuff)
-    and ComboPointsDeficit >= 3 and SingleTarget then
-    ShouldReturn = StealthMacro(S.Vanish)
-    if ShouldReturn then
-      return "Cast Vanish (Deathmark Uptime)" .. ShouldReturn
-    end
-  end]]
 end
 
 local function UsableItems ()
@@ -773,6 +764,7 @@ local function CDs ()
     return
   end
 
+  -- # Deathmark to be used if not stealthed, Rupture is up, and all other talent conditions are satisfied
   -- actions.cds=variable,name=deathmark_ma_condition,value=!talent.master_assassin.enabled|dot.garrote.ticking
   -- actions.cds+=/variable,name=deathmark_kingsbane_condition,value=!talent.kingsbane|cooldown.kingsbane.remains<=2
   -- actions.cds+=/variable,name=deathmark_condition,value=!stealthed.rogue&buff.slice_and_dice.remains>5&dot.rupture.ticking
@@ -782,14 +774,17 @@ local function CDs ()
     and (not S.MasterAssassin:IsAvailable() or Target:DebuffUp(S.Garrote))
     and (not S.Kingsbane:IsAvailable() or S.Kingsbane:CooldownRemains() <= 2)
 
+  -- # Usages for various special-case Trinkets and other Cantrips if applicable
   -- actions.cds+=/call_action_list,name=items
   if Settings.Commons.Enabled.Trinkets then
     local ShouldReturn = UsableItems(); if ShouldReturn then return ShouldReturn; end
   end
 
+  -- # Invoke Externals to Deathmark
   -- actions.cds+=/invoke_external_buff,name=power_infusion,if=dot.deathmark.ticking
   -- Note: We don't handle external buffs.
 
+  -- # Cast Deathmark if the target will survive long enough
   -- actions.cds+=/deathmark,if=(variable.deathmark_condition&target.time_to_die>=10)|fight_remains<=20
   if S.Deathmark:IsCastable() then
     if (DeathmarkCondition and Target:TimeToDie() >= 10) or HL.BossFilteredFightRemains("<=", 20) then
@@ -799,7 +794,8 @@ local function CDs ()
     end
   end
 
-  -- -- actions.cds+=/call_action_list,name=shiv
+  -- # Check for Applicable Shiv usage
+  -- actions.cds+=/call_action_list,name=shiv
   ShouldReturn = ShivUsage()
   if ShouldReturn then
     return ShouldReturn
@@ -815,18 +811,17 @@ local function CDs ()
     end
   end
 
-  -- actions.cds+=/thistle_tea,if=!buff.thistle_tea.up&(((energy.deficit>=100+energy.regen_combined|charges>=3)
-  -- &debuff.shiv.remains>=4)|spell_targets.fan_of_knives>=4&debuff.shiv.remains>=6)|fight_remains<charges*6
-  if S.ThistleTea:IsCastable() and not Player:BuffUp(S.ThistleTea) then
-    if (((Player:EnergyDeficit() >= 100 + EnergyRegenCombined
-      or S.ThistleTea:Charges() >= 3) and Target:DebuffRemains(S.ShivDebuff) >= 4) or MeleeEnemies10yCount >= 4 and Target:DebuffRemains(S.Shiv) >= 6)
-      or HL.BossFilteredFightRemains("<", S.ThistleTea:Charges() * 6) then
-      if HR.Cast(S.ThistleTea, Settings.CommonsOGCD.OffGCDasOffGCD.ThistleTea) then
-        return "Cast Thistle Tea"
-      end
+  -- # Avoid overcapped energy, use with shiv, or dump charges at the end of a fight
+  -- actions.cds+=/thistle_tea,if=!buff.thistle_tea.up&debuff.shiv.remains>=4|spell_targets.fan_of_knives>=4
+  -- &debuff.shiv.remains>=6|fight_remains<=cooldown.thistle_tea.charges*6
+  if S.ThistleTea:IsCastable() and not Player:BuffUp(S.ThistleTea) and Target:DebuffRemains(S.ShivDebuff) >= 4 or MeleeEnemies10yCount >= 4
+    and Target:DebuffRemains(S.Shiv) >= 6 or HL.BossFilteredFightRemains("<", S.ThistleTea:Charges() * 6) then
+    if HR.Cast(S.ThistleTea, Settings.CommonsOGCD.OffGCDasOffGCD.ThistleTea) then
+      return "Cast Thistle Tea"
     end
   end
 
+  -- # Potion/Racials/Other misc cooldowns
   -- actions.cds+=/call_action_list,name=misc_cds
   if ShouldReturn then
     MiscCDs()
@@ -849,9 +844,8 @@ local function CDs ()
     end
   end
 
-  -- # Cold Blood with similar conditions to Envenom, avoiding munching Edge Case
   -- actions.cds+=/cold_blood,if=!buff.edge_case.up&cooldown.deathmark.remains>10&!buff.darkest_night.up
-  -- &effective_combo_points>=variable.effective_spend_cp&(variable.not_pooling|debuff.amplifying_poison.stack>=20
+  -- &combo_points>=variable.effective_spend_cp&(variable.not_pooling|debuff.amplifying_poison.stack>=20
   -- |!variable.single_target)&!buff.vanish.up&(!cooldown.kingsbane.up|!variable.single_target)&!cooldown.deathmark.up
   if S.ColdBlood:IsReady() and Player:DebuffDown(S.ColdBlood) then
     if Player:BuffDown(S.EdgeCase) and S.Deathmark:CooldownRemains() > 10 and Player:BuffDown(S.DarkestNightBuff)
@@ -913,6 +907,7 @@ end
 
 -- # Damage over time abilities
 local function AoE_Dot ()
+  -- # Helper Variable to check basic finisher conditions
   local DotFinisherCondition = ComboPoints >= EffectiveCPSpend
 
   -- # Crimson Tempest on 2+ Targets if we have enough energy regen
@@ -982,6 +977,7 @@ end
 
 -- # Direct damage abilities
 local function Direct ()
+  -- Envenom at applicable cp if not pooling, capped on amplifying poison stacks, or in aoe.
   -- actions.direct=envenom,if=!buff.darkest_night.up&effective_combo_points>=variable.effective_spend_cp
   -- &(variable.not_pooling|debuff.amplifying_poison.stack>=20|effective_combo_points>cp_max_spend|!variable.single_target)&!buff.vanish.up
   if S.Envenom:IsReady() and Player:BuffDown(S.DarkestNightBuff) and ComboPoints > EffectiveCPSpend
@@ -992,6 +988,7 @@ local function Direct ()
     end
   end
 
+  -- # Special Envenom handling for Darkest Night
   -- actions.direct=envenom,if=buff.darkest_night.up&effective_combo_points>=cp_max_spend
   if S.Envenom:IsReady() and Player:BuffUp(S.DarkestNightBuff) and ComboPoints >= Rogue.CPMaxSpend() then
     if Cast(S.Envenom, nil, nil, not TargetInMeleeRange) then
@@ -999,35 +996,28 @@ local function Direct ()
     end
   end
 
-  --- !!!! ---
+  -- # Check if we should be using a filler
   -- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|variable.not_pooling|!variable.single_target
-  -- Note: This is used in all following fillers, so we just return false if not true and won't consider these.
-  if not (ComboPointsDeficit > 1 or NotPooling or not SingleTarget) then
-    return false
-  end
-  --- !!!! ---
+  local UseFiller = ComboPointsDeficit > 1 or NotPooling or not SingleTarget
 
   -- # Maintain Caustic Spatter
-  -- actions.direct+=/mutilate,if=talent.caustic_spatter&dot.rupture.ticking&(!debuff.caustic_spatter.up|debuff.caustic_spatter.remains<=2)&variable.use_filler&!variable.single_target
-  -- actions.direct+=/ambush,if=talent.caustic_spatter&dot.rupture.ticking&(!debuff.caustic_spatter.up|debuff.caustic_spatter.remains<=2)&variable.use_filler&!variable.single_target
-  if not SingleTarget and S.CausticSpatter:IsAvailable() and Target:DebuffUp(S.Rupture) and Target:DebuffRemains(S.CausticSpatterDebuff) <= 2 then
-    if S.Mutilate:IsCastable() then
-      if Cast(S.Mutilate, nil, nil, not TargetInMeleeRange) then
-        return "Cast Mutilate (Caustic)"
-      end
-    end
+  -- actions.direct+=/variable,name=use_caustic_filler,value=talent.caustic_spatter&dot.rupture.ticking
+    -- &(!debuff.caustic_spatter.up|debuff.caustic_spatter.remains<=2)&combo_points.deficit>1&!variable.single_target
+  local UseCausticFiller = S.CausticSpatter:IsAvailable() and Target:DebuffUp(S.Rupture)
+    and (not Target:DebuffUp(S.CausticSpatterDebuff) or Target:DebuffRemains(S.CausticSpatterDebuff) <= 2)
+    and ComboPointsDeficit > 1 and not SingleTarget
 
-    if (S.Ambush:IsReady() or S.AmbushOverride:IsReady()) and (Player:StealthUp(true, true) or Player:BuffUp(S.BlindsideBuff)) then
-      if Cast(S.Ambush, nil, nil, not TargetInMeleeRange) then
-        return "Cast Ambush (Caustic)"
-      end
+  -- actions.direct+=/mutilate,if=variable.use_caustic_filler
+  if S.Mutilate:IsCastable() and UseCausticFiller then
+    if Cast(S.Mutilate, nil, nil, not TargetInMeleeRange) then
+      return "Cast Mutilate (Caustic)"
     end
   end
 
-  -- actions.direct+=/echoing_reprimand,if=variable.use_filler|fight_remains<20
-  if CDsON() and S.EchoingReprimand:IsReady() then
-    if Cast(S.EchoingReprimand, Settings.CommonsOGCD.GCDasOffGCD.EchoingReprimand, nil, not TargetInMeleeRange) then
-      return "Cast Echoing Reprimand"
+  -- actions.direct+=/ambush,if=variable.use_caustic_filler
+  if (S.Ambush:IsReady() or S.AmbushOverride:IsReady()) and (Player:StealthUp(true, true) and UseCausticFiller) then
+    if Cast(S.Ambush, nil, nil, not TargetInMeleeRange) then
+      return "Cast Ambush (Caustic)"
     end
   end
 
@@ -1036,7 +1026,7 @@ local function Direct ()
   -- &(spell_targets.fan_of_knives>=3-(talent.momentum_of_despair&talent.thrown_precision)
   -- |buff.clear_the_witnesses.up&!talent.vicious_venoms)
   if S.FanofKnives:IsReady() then
-    if HR.AoEON() and not PriorityRotation and (MeleeEnemies10yCount >= 3 - BoolToInt(S.MomentumOfDespair:IsAvailable() and S.ThrownPrecision:IsAvailable()))
+    if HR.AoEON() and UseFiller and not PriorityRotation and (MeleeEnemies10yCount >= 3 - BoolToInt(S.MomentumOfDespair:IsAvailable() and S.ThrownPrecision:IsAvailable()))
       or Player:BuffUp(S.ClearTheWitnessesBuff) and not S.ViciousVenoms:IsAvailable() then
       if CastPooling(S.FanofKnives) then
         return "Cast Fan of Knives"
@@ -1048,7 +1038,7 @@ local function Direct ()
   -- &(!priority_rotation|dot.garrote.ticking|dot.rupture.ticking),if=variable.use_filler
   -- &spell_targets.fan_of_knives>=3-(talent.momentum_of_despair&talent.thrown_precision)
   if HR.AoEON() and Player:BuffUp(S.DeadlyPoison)
-    and MeleeEnemies10yCount >= 3 - BoolToInt(S.MomentumOfDespair:IsAvailable() and S.ThrownPrecision:IsAvailable()) then
+    and UseFiller and MeleeEnemies10yCount >= 3 - BoolToInt(S.MomentumOfDespair:IsAvailable() and S.ThrownPrecision:IsAvailable()) then
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       if not CycleUnit:DebuffUp(S.DeadlyPoisonDebuff, true) and (not PriorityRotation or CycleUnit:DebuffUp(S.Garrote) or CycleUnit:DebuffUp(S.Rupture)) then
         if CastPooling(S.FanofKnives) then
@@ -1059,7 +1049,7 @@ local function Direct ()
   end
 
   -- actions.direct+=/ambush,if=variable.use_filler&(buff.blindside.up|stealthed.rogue)&(!dot.kingsbane.ticking|debuff.deathmark.down|buff.blindside.up)
-  if (S.Ambush:IsReady() or S.AmbushOverride:IsReady()) and (Player:BuffUp(S.BlindsideBuff) or Player:StealthUp(true, false))
+  if (S.Ambush:IsReady() or S.AmbushOverride:IsReady()) and UseFiller and (Player:BuffUp(S.BlindsideBuff) or Player:StealthUp(true, false))
     and (Target:DebuffDown(S.Kingsbane) or Target:DebuffDown(S.Deathmark) or Player:BuffUp(S.BlindsideBuff)) then
     if CastPooling(S.Ambush, nil, not TargetInMeleeRange) then
       return "Cast Ambush"
@@ -1067,7 +1057,7 @@ local function Direct ()
   end
 
   -- actions.direct+=/mutilate,target_if=!dot.deadly_poison_dot.ticking&!debuff.amplifying_poison.up,if=variable.use_filler&spell_targets.fan_of_knives=2
-  if S.Mutilate:IsCastable() and MeleeEnemies10yCount == 2 and Target:DebuffDown(S.DeadlyPoisonDebuff, true)
+  if S.Mutilate:IsCastable() and UseFiller and MeleeEnemies10yCount == 2 and Target:DebuffDown(S.DeadlyPoisonDebuff, true)
     and Target:DebuffDown(S.AmplifyingPoisonDebuff, true) then
     local TargetGUID = Target:GUID()
     for _, CycleUnit in pairs(MeleeEnemies5y) do
@@ -1080,7 +1070,7 @@ local function Direct ()
     end
   end
   -- actions.direct+=/mutilate,if=variable.use_filler
-  if S.Mutilate:IsCastable() then
+  if S.Mutilate:IsCastable() and UseFiller then
     if CastPooling(S.Mutilate, nil, not TargetInMeleeRange) then
       return "Cast Mutilate"
     end
@@ -1177,7 +1167,33 @@ local function APL ()
     EnergyTimeToMaxCombined = Player:EnergyDeficit() / EnergyRegenCombined
     -- actions+=/variable,name=regen_saturated,value=energy.regen_combined>35
     EnergyRegenSaturated = EnergyRegenCombined > 30
-    NotPooling = NotPoolingVar()
+
+    -- # Pooling Setup, check for cooldowns
+    --actions+=/variable,name=in_cooldowns,value=dot.deathmark.ticking|dot.kingsbane.ticking|debuff.shiv.up
+    InCooldowns = Target:DebuffUp(S.Deathmark) or Target:DebuffUp(S.Kingsbane) or Target:DebuffUp(S.Shiv)
+
+    -- # Check to clip envenom
+    --actions+=/variable,name=clip_envenom,value=buff.envenom.up&buff.envenom.remains.1<=1
+    ClipEnvenom = Player:BuffUp(S.Envenom) and Target:DebuffRemains(S.Envenom) <= 1
+
+    -- # Check upper bounds of energy to begin spending
+    --actions+=/variable,name=upper_limit_energy,value=energy.pct>=(70-30*talent.sanguine_blades-10*talent.vicious_venoms.rank)
+    UpperLimitEnergy = Player:EnergyPercentage() >= (70 - 30 * BoolToInt(S.SanguineBlades:IsAvailable()) - 10 * S.ViciousVenoms:TalentRank())
+
+    -- # Variable to control avoiding auto-proc on Thistle Tea
+    --actions+=/variable,name=avoid_tea,value=energy>40+50+5*talent.vicious_venoms.rank
+    AvoidTea = Player:Energy() > 40 + 50 + 5 * S.ViciousVenoms:TalentRank()
+
+    -- # Checking for cooldowns soon
+    --actions+=/variable,name=cd_soon,value=cooldown.kingsbane.remains<6&!cooldown.kingsbane.ready
+    CDSoon = S.Kingsbane:CooldownRemains() < 6 and not S.Kingsbane:IsReady()
+
+    -- # Pooling Condition all together
+    --actions+=/variable,name=not_pooling,value=variable.in_cooldowns|!variable.cd_soon&variable.avoid_tea
+    -- &buff.darkest_night.up|!variable.cd_soon&variable.avoid_tea&variable.clip_envenom|variable.upper_limit_energy|fight_remains<=20
+    NotPooling = InCooldowns or not CDSoon and AvoidTea and Player:BuffUp(S.DarkestNightBuff) or not CDSoon and AvoidTea
+      and ClipEnvenom or UpperLimitEnergy or HL.BossFilteredFightRemains("<=", 20)
+
     ScentSaturated = ScentSaturatedVar()
 
     -- actions=/stealth
@@ -1192,48 +1208,32 @@ local function APL ()
       end
     end
 
-    -- # Put SnD up initially for Cut to the Chase, refresh with Envenom if at low duration
-    -- actions+=/slice_and_dice,if=!buff.slice_and_dice.up&dot.rupture.ticking&combo_points>=1
-    -- &(!buff.indiscriminate_carnage.up|variable.single_target)
-    if not Player:BuffUp(S.SliceandDice) then
-      if S.SliceandDice:IsReady() and Target:DebuffUp(S.Rupture) and Player:ComboPoints() >= 1
-        and (Player:BuffDown(S.IndiscriminateCarnageBuff) or SingleTarget) then
-        if Cast(S.SliceandDice) then
-          return "Cast Slice and Dice"
-        end
-      end
-    elseif TargetInAoERange then
-      -- actions+=/envenom,if=buff.slice_and_dice.up&buff.slice_and_dice.remains<5&combo_points>=5
-      if S.Envenom:IsReady() and Player:BuffRemains(S.SliceandDice) < 5 and Player:ComboPoints() >= 5 then
-        if Cast(S.Envenom, nil, nil, not TargetInMeleeRange) then
-          return "Cast Envenom (CttC)"
-        end
-      end
-    else
-      --- !!!! ---
-      -- Special fallback Poisoned Knife Out of Range [EnergyCap] or [PoisonRefresh]
-      -- Only if we are about to cap energy, not stealthed, and completely out of range
-      --- !!!! ---
-      if S.PoisonedKnife:IsCastable() and Target:IsInRange(30) and not Player:StealthUp(true, true)
-        and MeleeEnemies10yCount == 0 and Player:EnergyTimeToMax() <= Player:GCD() * 1.5 then
-        if Cast(S.PoisonedKnife) then
-          return "Cast Poisoned Knife"
-        end
+    --- !!!! ---
+    -- Special fallback Poisoned Knife Out of Range [EnergyCap] or [PoisonRefresh]
+    -- Only if we are about to cap energy, not stealthed, and completely out of range
+    --- !!!! ---
+    if S.PoisonedKnife:IsCastable() and Target:IsInRange(30) and not Player:StealthUp(true, true)
+      and MeleeEnemies10yCount == 0 and Player:EnergyTimeToMax() <= Player:GCD() * 1.5 then
+      if Cast(S.PoisonedKnife) then
+        return "Cast Poisoned Knife"
       end
     end
 
+    -- # Call Cooldowns
     -- actions+=/call_action_list,name=cds
     ShouldReturn = CDs()
     if ShouldReturn then
       return ShouldReturn
     end
 
+    -- # Call Core DoT effects
     -- actions+=/call_action_list,name=core_dot
     ShouldReturn = Core_Dot()
     if ShouldReturn then
       return ShouldReturn
     end
 
+    -- # Call AoE DoTs when in AoE
     -- actions+=/call_action_list,name=aoe_dot,if=!variable.single_target
     if HR.AoEON() and not SingleTarget then
       ShouldReturn = AoE_Dot()
@@ -1242,6 +1242,7 @@ local function APL ()
       end
     end
 
+    -- # Call Direct Damage Abilities
     -- actions+=/call_action_list,name=direct
     ShouldReturn = Direct()
     if ShouldReturn then
@@ -1289,7 +1290,7 @@ local function Init ()
   S.Sepsis:RegisterAuraTracking()
   S.Garrote:RegisterAuraTracking()
 
-  HR.Print("Assassination Rogue rotation has been updated for patch 11.0.2.")
+  HR.Print("Assassination Rogue rotation has been updated for patch 11.0.5.")
 end
 
 HR.SetAPL(259, APL, Init)

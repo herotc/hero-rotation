@@ -185,6 +185,7 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   MasterAssassinBuff      = Spell(256735),
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
+  SanguineBlades          = Spell(200806),
   ScentOfBlood            = Spell(381799),
   ScentOfBloodBuff        = Spell(394080),
   SerratedBoneSpike       = Spell(385424),
@@ -269,6 +270,7 @@ Spell.Rogue.Subtlety = MergeTableByKey(Spell.Rogue.Commons, {
   -- Talents
   DanseMacabre            = Spell(382528),
   DanseMacabreBuff        = Spell(393969),
+  DeathPerception         = Spell(469642),
   DeeperDaggers           = Spell(382517),
   DeeperDaggersBuff       = Spell(383405),
   DarkBrew                = Spell(382504),
