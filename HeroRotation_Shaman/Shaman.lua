@@ -116,6 +116,7 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   EchoesofGreatSundering                = Spell(384087),
   ElectrifiedShocks                     = Spell(382086),
   EyeoftheStorm                         = Spell(381708),
+  FirstAscendant                        = Spell(462440),
   FlowofPower                           = Spell(385923),
   FluxMelting                           = Spell(381776),
   FusionofElements                      = Spell(462840),
@@ -206,6 +207,7 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   HotHandBuff                           = Spell(215785),
   IceStrikeBuff                         = Spell(384357),
   MaelstromWeaponBuff                   = Spell(344179),
+  StormFrenzyBuff                       = Spell(462725),
   StormsurgeBuff                        = Spell(201846),
   WindfuryTotemBuff                     = Spell(327942),
   -- Debuffs
