@@ -149,6 +149,7 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   MagmaChamberBuff                      = Spell(381933),
   MasteroftheElementsBuff               = Spell(260734),
   PoweroftheMaelstromBuff               = Spell(191877),
+  StormFrenzyBuff                       = Spell(462725),
   StormkeeperBuff                       = Spell(191634),
   SurgeofPowerBuff                      = Spell(285514),
   -- Debuffs
@@ -207,7 +208,6 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   HotHandBuff                           = Spell(215785),
   IceStrikeBuff                         = Spell(384357),
   MaelstromWeaponBuff                   = Spell(344179),
-  StormFrenzyBuff                       = Spell(462725),
   StormsurgeBuff                        = Spell(201846),
   WindfuryTotemBuff                     = Spell(327942),
   -- Debuffs
