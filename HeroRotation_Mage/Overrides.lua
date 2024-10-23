@@ -195,7 +195,7 @@ FrostOldSpellCooldownRemains = HL.AddCoreOverride("Spell.CooldownRemains",
 
 HL.AddCoreOverride("Player.BuffStackP",
   function (self, Spell, AnyCaster, Offset)
-    local BaseCheck = Player:BuffStack(Spell)
+    local BaseCheck = Player:BuffStack(Spell, AnyCaster, Offset)
     if Spell == SpellFrost.IciclesBuff then
       local Icicles = BaseCheck
       if self:IsCasting(SpellFrost.GlacialSpike) then return 0 end
@@ -227,7 +227,8 @@ FrostOldBuffUp = HL.AddCoreOverride("Player.BuffUp",
     local BaseCheck = FrostOldBuffUp(self, Spell, AnyCaster, Offset)
     if Spell == SpellFrost.FingersofFrostBuff then
       if SpellFrost.IceLance:InFlight() then
-        return Player:BuffStackP(Spell) >= 1
+        -- Note: BypassRecovery to avoid infinite looping from BuffStack to BuffDown.
+        return Player:BuffStackP(Spell, false, true) >= 1
       else
         return BaseCheck
       end
@@ -243,7 +244,8 @@ FrostOldBuffDown = HL.AddCoreOverride("Player.BuffDown",
     local BaseCheck = FrostOldBuffDown(self, Spell, AnyCaster, Offset)
     if Spell == SpellFrost.FingersofFrostBuff then
       if SpellFrost.IceLance:InFlight() then
-        return Player:BuffStackP(Spell) == 0
+        -- Note: BypassRecovery to avoid infinite looping from BuffStack to BuffDown.
+        return Player:BuffStackP(Spell, false, true) <= 0
       else
         return BaseCheck
       end
