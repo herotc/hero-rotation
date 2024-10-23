@@ -76,12 +76,16 @@ Spell.DeathKnight.Commons = {
 
 Spell.DeathKnight.Deathbringer = {
   -- Talents
+  BindinDarkness                        = Spell(440031),
   DarkTalons                            = Spell(436687),
   Exterminate                           = Spell(441378),
+  ReaperofSouls                         = Spell(440002),
   ReapersMark                           = Spell(439843),
+  WitherAway                            = Spell(441894),
   -- Buffs
   ExterminateBuff                       = Spell(441416),
   PainfulDeathBuff                      = Spell(447954),
+  ReaperofSoulsBuff                     = Spell(469172),
   -- Debuffs
   ReapersMarkDebuff                     = Spell(434765),
 }
