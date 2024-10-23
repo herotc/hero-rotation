@@ -585,13 +585,9 @@ local function Cleave()
   if AnyDnD:IsReady() and (not Player:DnDTicking()) then
     if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd cleave 2"; end
   end
-  -- death_coil,if=!variable.pooling_runic_power&talent.improved_death_coil
-  if S.DeathCoil:IsReady() and (not VarPoolingRunicPower and S.ImprovedDeathCoil:IsAvailable()) then
+  -- death_coil,if=!variable.pooling_runic_power
+  if S.DeathCoil:IsReady() and (not VarPoolingRunicPower) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil cleave 4"; end
-  end
-  -- epidemic,if=!variable.pooling_runic_power&!talent.improved_death_coil
-  if S.Epidemic:IsReady() and (not VarPoolingRunicPower and not S.ImprovedDeathCoil:IsAvailable()) then
-    if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic cleave 6"; end
   end
   -- festering_strike,target_if=min:debuff.festering_wound.stack,if=!variable.pop_wounds&debuff.festering_wound.stack<4|buff.festering_scythe.react
   if FesteringAction:IsReady() then
