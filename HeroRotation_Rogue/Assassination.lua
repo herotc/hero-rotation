@@ -569,9 +569,9 @@ local function Vanish ()
   -- actions.vanish+=/vanish,if=talent.master_assassin&dot.garrote.remains>3&debuff.deathmark.up
   -- &dot.kingsbane.remains<=6+3*talent.subterfuge.rank&(debuff.shiv.up|debuff.deathmark.remains<4)
   if S.Vanish:IsCastable() and S.MasterAssassin:IsAvailable()
-    and Target:DebuffRemains(S.Garrote) > 3 and Target.DebuffUp(S.Deathmark)
+    and Target:DebuffRemains(S.Garrote) > 3 and Target:DebuffUp(S.Deathmark)
     and Target:DebuffRemains(S.Kingsbane) <= 6 + 3 * S.Subterfuge:TalentRank()
-    and (Target.DebuffUp(S.ShivDebuff) or Target.DebuffRemains(S.Deathmark) < 4) then
+    and (Target:DebuffUp(S.ShivDebuff) or Target:DebuffRemains(S.Deathmark) < 4) then
     ShouldReturn = StealthMacro(S.Vanish)
     if ShouldReturn then
       return "Cast Vanish (Master Assassin)" .. ShouldReturn
@@ -994,7 +994,7 @@ local function Direct ()
   -- # Check if we should be using a filler
   -- actions.direct+=/variable,name=use_filler,value=combo_points<=variable.effective_spend_cp&!variable.cd_soon
   -- |variable.not_pooling|!variable.single_target
-  local UseFiller = ComboPoints <= EffectiveCPSpend and not CDSoon and NotPooling and not SingleTarget
+  local UseFiller = ComboPoints <= EffectiveCPSpend and not CDSoon or NotPooling or not SingleTarget
 
   -- # Maintain Caustic Spatter
   -- actions.direct+=/variable,name=use_caustic_filler,value=talent.caustic_spatter&dot.rupture.ticking
