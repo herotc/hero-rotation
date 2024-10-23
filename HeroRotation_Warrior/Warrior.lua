@@ -189,8 +189,8 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   EnrageBuff                            = Spell(184362),
   FuriousBloodthirstBuff                = Spell(423211), -- T31 2pc
   MeatCleaverBuff                       = Spell(85739),
-  MercilessAssaultBuff                  = Spell(409983),
   RecklessnessBuff                      = Spell(1719),
+  SlaughteringStrikesBuff               = Spell(393931),
   SuddenDeathBuff                       = Spell(280776),
   -- Debuffs
   GushingWoundDebuff                    = Spell(385042),
