@@ -178,6 +178,9 @@ local function EnergizeAmount(Spell)
   elseif Spell == S.FullMoon then
     -- Calculate Full Moon AsP
     TotalAsp = 40
+  elseif Spell == S.ForceofNature then
+    -- Calculate Force of Nature AsP
+    TotalAsp = 20
   end
   return TotalAsp
 end
@@ -325,6 +328,10 @@ local function ST()
     if S.Incarnation:IsCastable() then
       if Cast(S.Incarnation, Settings.Balance.GCDasOffGCD.CAInc) then return "celestial_alignment st 16"; end
     end
+  end
+  -- starsurge,if=variable.cd_condition&astral_power.deficit>variable.passive_asp+action.force_of_nature.energize_amount
+  if S.Starsurge:IsReady() and (VarCDCondition and Player:AstralPowerDeficit() > VarPassiveAsp + S.ForceofNature:EnergizeAmount()) then
+    if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 17"; end
   end
   -- force_of_nature,if=cooldown.ca_inc.remains<gcd.max&(!variable.eclipse|variable.eclipse_remains>6)|variable.eclipse_remains>=3&(cooldown.ca_inc.remains>10+15*talent.control_of_the_dream&(fight_remains>cooldown+5|cooldown.ca_inc.remains>fight_remains)|talent.whirling_stars&talent.convoke_the_spirits&cooldown.convoke_the_spirits.remains>cooldown.force_of_nature.duration-10)
   if S.ForceofNature:IsCastable() and (CAInc:CooldownRemains() < Player:GCD() and (not VarEclipse or VarEclipseRemains > 6) or VarEclipseRemains >= 3 and (CAInc:CooldownRemains() > 10 + 15 * num(S.ControloftheDream:IsAvailable()) and (FightRemains > 65 or CAInc:CooldownRemains() > FightRemains) or S.WhirlingStars:IsAvailable() and S.ConvoketheSpirits:IsAvailable() and S.ConvoketheSpirits:CooldownRemains() > 50)) then
@@ -570,7 +577,7 @@ local function APL()
       if I.AberrantSpellforge:IsEquippedAndReady() then
         if Cast(I.AberrantSpellforge, Settings.CommonsDS.DisplayStyle.Trinkets) then return "aberrant_spellforge main 2"; end
       end
-      -- do_treacherous_transmitter_task,if=cooldown.ca_inc.remains>10
+      -- do_treacherous_transmitter_task,if=cooldown.ca_inc.remains>10|buff.ca_inc.up
       -- TODO
       -- use_item,name=spymasters_web,if=fight_remains<20
       if I.SpymastersWeb:IsEquippedAndReady() and (BossFightRemains < 20) then
