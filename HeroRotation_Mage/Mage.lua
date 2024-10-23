@@ -200,6 +200,7 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   FreezingRain                          = Spell(270233),
   Frostbite                             = Spell(378756),
   FrozenOrb                             = Spell(84714), --splash, 16
+  FrozenTouch                           = Spell(205030),
   GlacialSpike                          = Spell(199786), --splash, 8 (with splitting ice)
   IceCaller                             = Spell(236662),
   IceLance                              = Spell(30455), --splash, 8 (with splitting ice)
