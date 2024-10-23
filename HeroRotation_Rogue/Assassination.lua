@@ -223,20 +223,6 @@ local function UsePriorityRotation()
   return false
 end
 
--- actions+=/variable,name=not_pooling,value=(dot.deathmark.ticking|dot.kingsbane.ticking|debuff.shiv.up)
--- |(buff.envenom.up&buff.envenom.remains<=1)
--- |energy.pct>=(40+30*talent.hand_of_fate-15*talent.vicious_venoms)
--- |fight_remains<=20
-local function NotPoolingVar()
-  if (Target:DebuffUp(S.Deathmark) or Target:DebuffUp(S.Kingsbane) or Target:DebuffUp(S.ShivDebuff))
-    or (Player:BuffUp(S.Envenom) and Player:BuffRemains(S.Envenom) <= 1)
-    or Player:EnergyPercentage() >= (40 + 30 * num(S.HandOfFate:IsAvailable()) - 15 * num(S.ViciousVenoms:IsAvailable()))
-    or HL.BossFilteredFightRemains("<=", 20) then
-    return true
-  end
-  return false
-end
-
 -- actions.dot=variable,name=scent_effective_max_stacks,value=(spell_targets.fan_of_knives*talent.scent_of_blood.rank*2)>?20
 -- actions.dot+=/variable,name=scent_saturation,value=buff.scent_of_blood.stack>=variable.scent_effective_max_stacks
 local function ScentSaturatedVar()
@@ -433,12 +419,16 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
     if HR.AoEON() then
       local TargetIfUnit = CheckTargetIfTarget("min", RuptureTargetIfFunc, RuptureIfFunc)
       if TargetIfUnit and TargetIfUnit:GUID() ~= Target:GUID() then
-        if Settings.Assassination.ShowIndiscriminateCarnageOnMainIcon then
-          if Cast(S.Rupture, nil, nil, not TargetInMeleeRange) then
-            return "Cast Rupture (Stealth Indiscriminate Carnage)"
-          end
+        if ReturnSpellOnly then
+          return S.Rupture
         else
-          return CastLeftNameplate(TargetIfUnit, S.Rupture)
+          if Settings.Assassination.ShowIndiscriminateCarnageOnMainIcon then
+            if Cast(S.Rupture, nil, nil, not TargetInMeleeRange) then
+              return "Cast Rupture (Stealth Indiscriminate Carnage)"
+            end
+          else
+            return CastLeftNameplate(TargetIfUnit, S.Rupture)
+          end
         end
       end
     end
@@ -468,12 +458,16 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
     if HR.AoEON() then
       local TargetIfUnit = CheckTargetIfTarget("min", GarroteTargetIfFunc, GarroteIfFunc)
       if TargetIfUnit and TargetIfUnit:GUID() ~= Target:GUID() then
-        if Settings.Assassination.ShowIndiscriminateCarnageOnMainIcon then
-          if Cast(S.Garrote, nil, nil, not TargetInMeleeRange) then
-            return "Cast Garrote (Improved Garrote Carnage)"
-          end
+        if ReturnSpellOnly then
+          return S.Rupture
         else
-          return CastLeftNameplate(TargetIfUnit, S.Garrote)
+          if Settings.Assassination.ShowIndiscriminateCarnageOnMainIcon then
+            if Cast(S.Garrote, nil, nil, not TargetInMeleeRange) then
+              return "Cast Garrote (Improved Garrote Carnage)"
+            end
+          else
+            return CastLeftNameplate(TargetIfUnit, S.Garrote)
+          end
         end
       end
     end
@@ -486,7 +480,7 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
         end
       end
     end
-    if ComboPointsDeficit >= (1 + 2 * num(S.ShroudedSuffocation:IsAvailable())) and (Target:PMultiplier(S.Garrote) <= 1 or Target:DebuffRemains(S.Garrote) < 12 or not SingleTarget and MasterAssassinRemains() < 3) then
+    if ComboPointsDeficit >= (1 + 2 * num(S.ShroudedSuffocation:IsAvailable())) and (Target:PMultiplier(S.Garrote) <= 1 or IsDebuffRefreshable(Target, S.Garrote)) then
       if ReturnSpellOnly then
         return S.Garrote
       else
@@ -559,10 +553,10 @@ local function Vanish ()
   end
 
   -- # Vanish for cleaving Garrotes with Indiscriminate Carnage
-  --actions.vanish+=/vanish,if=!talent.master_assassin&talent.indiscriminate_carnage&talent.improved_garrote
-  -- &cooldown.garrote.up&(dot.garrote.pmultiplier<=1|dot.garrote.refreshable)&spell_targets.fan_of_knives>2
+  -- actions.vanish+=/vanish,if=talent.indiscriminate_carnage&talent.improved_garrote&cooldown.garrote.up
+  -- &(dot.garrote.pmultiplier<=1|dot.garrote.refreshable)&spell_targets.fan_of_knives>2
   -- &(target.time_to_die-remains>15|raid_event.adds.in>20)
-  if S.Vanish:IsCastable() and not S.MasterAssassin:IsAvailable() and S.IndiscriminateCarnage:IsAvailable()
+  if S.Vanish:IsCastable() and S.IndiscriminateCarnage:IsAvailable()
     and S.ImprovedGarrote:IsAvailable() and S.Garrote:CooldownUp() and (Target:PMultiplier(S.Garrote) <= 1 or
     IsDebuffRefreshable(Target, S.Garrote)) and MeleeEnemies10yCount > 2 then
     ShouldReturn = StealthMacro(S.Vanish)
@@ -572,10 +566,11 @@ local function Vanish ()
   end
 
   -- # Vanish fallback for Master Assassin
-  --actions.vanish+=/vanish,if=!talent.improved_garrote&talent.master_assassin&!dot.rupture.refreshable
-  -- &dot.garrote.remains>3&debuff.deathmark.up&(debuff.shiv.up|debuff.deathmark.remains<4)
-  if S.Vanish:IsCastable() and not S.ImprovedGarrote:IsAvailable() and S.MasterAssassin:IsAvailable()
-    and not IsDebuffRefreshable(Target, S.Rupture) and Target:DebuffRemains(S.Garrote) > 3 and Target.DebuffUp(S.Deathmark)
+  -- actions.vanish+=/vanish,if=talent.master_assassin&dot.garrote.remains>3&debuff.deathmark.up
+  -- &dot.kingsbane.remains<=6+3*talent.subterfuge.rank&(debuff.shiv.up|debuff.deathmark.remains<4)
+  if S.Vanish:IsCastable() and S.MasterAssassin:IsAvailable()
+    and Target:DebuffRemains(S.Garrote) > 3 and Target.DebuffUp(S.Deathmark)
+    and Target:DebuffRemains(S.Kingsbane) <= 6 + 3 * S.Subterfuge:TalentRank()
     and (Target.DebuffUp(S.ShivDebuff) or Target.DebuffRemains(S.Deathmark) < 4) then
     ShouldReturn = StealthMacro(S.Vanish)
     if ShouldReturn then
@@ -812,9 +807,9 @@ local function CDs ()
   end
 
   -- # Avoid overcapped energy, use with shiv, or dump charges at the end of a fight
-  -- actions.cds+=/thistle_tea,if=!buff.thistle_tea.up&debuff.shiv.remains>=4|spell_targets.fan_of_knives>=4
-  -- &debuff.shiv.remains>=6|fight_remains<=cooldown.thistle_tea.charges*6
-  if S.ThistleTea:IsCastable() and not Player:BuffUp(S.ThistleTea) and Target:DebuffRemains(S.ShivDebuff) >= 4 or MeleeEnemies10yCount >= 4
+  -- actions.cds+=/thistle_tea,if=!buff.thistle_tea.up&(dot.kingsbane.ticking|debuff.shiv.remains>=4)
+  -- |spell_targets.fan_of_knives>=4&debuff.shiv.remains>=6|fight_remains<=cooldown.thistle_tea.charges*6
+  if S.ThistleTea:IsCastable() and not Player:BuffUp(S.ThistleTea) and (Target:DebuffUp(S.Kingsbane) or Target:DebuffRemains(S.ShivDebuff) >= 4) or MeleeEnemies10yCount >= 4
     and Target:DebuffRemains(S.Shiv) >= 6 or HL.BossFilteredFightRemains("<", S.ThistleTea:Charges() * 6) then
     if HR.Cast(S.ThistleTea, Settings.CommonsOGCD.OffGCDasOffGCD.ThistleTea) then
       return "Cast Thistle Tea"
@@ -997,15 +992,16 @@ local function Direct ()
   end
 
   -- # Check if we should be using a filler
-  -- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|variable.not_pooling|!variable.single_target
-  local UseFiller = ComboPointsDeficit > 1 or NotPooling or not SingleTarget
+  -- actions.direct+=/variable,name=use_filler,value=combo_points<=variable.effective_spend_cp&!variable.cd_soon
+  -- |variable.not_pooling|!variable.single_target
+  local UseFiller = ComboPoints <= EffectiveCPSpend and not CDSoon and NotPooling and not SingleTarget
 
   -- # Maintain Caustic Spatter
   -- actions.direct+=/variable,name=use_caustic_filler,value=talent.caustic_spatter&dot.rupture.ticking
-    -- &(!debuff.caustic_spatter.up|debuff.caustic_spatter.remains<=2)&combo_points.deficit>1&!variable.single_target
+  -- &(!debuff.caustic_spatter.up|debuff.caustic_spatter.remains<=2)&combo_points.deficit>=1&!variable.single_target
   local UseCausticFiller = S.CausticSpatter:IsAvailable() and Target:DebuffUp(S.Rupture)
     and (not Target:DebuffUp(S.CausticSpatterDebuff) or Target:DebuffRemains(S.CausticSpatterDebuff) <= 2)
-    and ComboPointsDeficit > 1 and not SingleTarget
+    and ComboPointsDeficit >= 1 and not SingleTarget
 
   -- actions.direct+=/mutilate,if=variable.use_caustic_filler
   if S.Mutilate:IsCastable() and UseCausticFiller then
@@ -1169,27 +1165,27 @@ local function APL ()
     EnergyRegenSaturated = EnergyRegenCombined > 30
 
     -- # Pooling Setup, check for cooldowns
-    --actions+=/variable,name=in_cooldowns,value=dot.deathmark.ticking|dot.kingsbane.ticking|debuff.shiv.up
+    -- actions+=/variable,name=in_cooldowns,value=dot.deathmark.ticking|dot.kingsbane.ticking|debuff.shiv.up
     InCooldowns = Target:DebuffUp(S.Deathmark) or Target:DebuffUp(S.Kingsbane) or Target:DebuffUp(S.Shiv)
 
     -- # Check to clip envenom
-    --actions+=/variable,name=clip_envenom,value=buff.envenom.up&buff.envenom.remains.1<=1
+    -- actions+=/variable,name=clip_envenom,value=buff.envenom.up&buff.envenom.remains.1<=1
     ClipEnvenom = Player:BuffUp(S.Envenom) and Target:DebuffRemains(S.Envenom) <= 1
 
     -- # Check upper bounds of energy to begin spending
-    --actions+=/variable,name=upper_limit_energy,value=energy.pct>=(70-30*talent.sanguine_blades-10*talent.vicious_venoms.rank)
-    UpperLimitEnergy = Player:EnergyPercentage() >= (70 - 30 * BoolToInt(S.SanguineBlades:IsAvailable()) - 10 * S.ViciousVenoms:TalentRank())
+    -- actions+=/variable,name=upper_limit_energy,value=energy.pct>=(50-10*talent.vicious_venoms.rank)
+    UpperLimitEnergy = Player:EnergyPercentage() >= (50 - 30 * BoolToInt(S.SanguineBlades:IsAvailable()) - 10 * S.ViciousVenoms:TalentRank())
 
     -- # Variable to control avoiding auto-proc on Thistle Tea
-    --actions+=/variable,name=avoid_tea,value=energy>40+50+5*talent.vicious_venoms.rank
+    -- actions+=/variable,name=avoid_tea,value=energy>40+50+5*talent.vicious_venoms.rank
     AvoidTea = Player:Energy() > 40 + 50 + 5 * S.ViciousVenoms:TalentRank()
 
     -- # Checking for cooldowns soon
-    --actions+=/variable,name=cd_soon,value=cooldown.kingsbane.remains<6&!cooldown.kingsbane.ready
-    CDSoon = S.Kingsbane:CooldownRemains() < 6 and not S.Kingsbane:IsReady()
+    -- actions+=/variable,name=cd_soon,value=cooldown.kingsbane.remains<3&!cooldown.kingsbane.ready
+    CDSoon = S.Kingsbane:CooldownRemains() < 3 and not S.Kingsbane:IsReady()
 
     -- # Pooling Condition all together
-    --actions+=/variable,name=not_pooling,value=variable.in_cooldowns|!variable.cd_soon&variable.avoid_tea
+    -- actions+=/variable,name=not_pooling,value=variable.in_cooldowns|!variable.cd_soon&variable.avoid_tea
     -- &buff.darkest_night.up|!variable.cd_soon&variable.avoid_tea&variable.clip_envenom|variable.upper_limit_energy|fight_remains<=20
     NotPooling = InCooldowns or not CDSoon and AvoidTea and Player:BuffUp(S.DarkestNightBuff) or not CDSoon and AvoidTea
       and ClipEnvenom or UpperLimitEnergy or HL.BossFilteredFightRemains("<=", 20)
