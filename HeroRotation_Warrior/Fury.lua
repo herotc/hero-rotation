@@ -694,7 +694,7 @@ local function ThaneRAST()
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_st 22"; end
   end
   -- bloodbath,if=talent.vicious_contempt&target.health.pct<35|buff.bloodcraze.stack>=3
-  if S.Bloodbath:IsCastable() (S.ViciousContempt:IsAvailable() and Target:HealthPercentage() < 35 or Player:BuffStack(S.BloodcrazeBuff) >= 3) then
+  if S.Bloodbath:IsCastable() and (S.ViciousContempt:IsAvailable() and Target:HealthPercentage() < 35 or Player:BuffStack(S.BloodcrazeBuff) >= 3) then
     if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath thane_ra_st 24"; end
   end
   -- crushing_blow
