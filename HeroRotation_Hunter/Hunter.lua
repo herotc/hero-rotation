@@ -82,7 +82,7 @@ Spell.Hunter.Commons = {
 
 Spell.Hunter.DarkRanger = {
   -- Talents
-  BlackArrow                            = Spell(430703),
+  BlackArrow                            = Spell(466930),
 }
 
 Spell.Hunter.PackLeader = {
