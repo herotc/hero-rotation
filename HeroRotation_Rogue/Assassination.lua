@@ -381,8 +381,10 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
     end
   end
 
-  -- actions.stealthed+=/envenom,if=effective_combo_points>=variable.effective_spend_cp&dot.kingsbane.ticking&buff.envenom.remains<=3
-  -- &(debuff.deathstalkers_mark.up|buff.edge_case.up|buff.cold_blood.up)
+  -- actions.stealthed+=/envenom,if=effective_combo_points>=variable.effective_spend_cp&dot.kingsbane.ticking
+  -- &buff.envenom.remains<=3&(debuff.deathstalkers_mark.up|buff.edge_case.up|buff.cold_blood.up)
+  -- actions.stealthed+=/envenom,if=effective_combo_points>=variable.effective_spend_cp&buff.master_assassin_aura.up
+  -- &variable.single_target&(debuff.deathstalkers_mark.up|buff.edge_case.up|buff.cold_blood.up)
   if ComboPoints >= EffectiveCPSpend and (Target:DebuffUp(S.DeathStalkersMarkDebuff) or Player:BuffUp(S.EdgeCase) or Player:BuffUp(S.ColdBlood)) then
     if Target:DebuffUp(S.Kingsbane) and Player:BuffRemains(S.Envenom) <= 3 then
       if ReturnSpellOnly then
@@ -443,8 +445,10 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
     end
   end
 
-  -- actions.stealthed+=/garrote,target_if=min:remains,if=stealthed.improved_garrote&(remains<12|pmultiplier<=1|(buff.indiscriminate_carnage.up&active_dot.garrote<spell_targets.fan_of_knives))&!variable.single_target&target.time_to_die-remains>2
-  -- actions.stealthed+=/garrote,if=stealthed.improved_garrote&(pmultiplier<=1|remains<12|!variable.single_target&buff.master_assassin_aura.remains<3)&combo_points.deficit>=1+2*talent.shrouded_suffocation
+  -- # Improved Garrote: Apply or Refresh with buffed Garrotes, accounting for Indiscriminate Carnage
+  -- actions.stealthed+=/garrote,target_if=min:remains,if=stealthed.improved_garrote&(remains<12|pmultiplier<=1|(buff.indiscriminate_carnage.up
+  -- &active_dot.garrote<spell_targets.fan_of_knives))&!variable.single_target&target.time_to_die-remains>2
+  -- actions.stealthed+=/garrote,if=stealthed.improved_garrote&(pmultiplier<=1|refreshable)&combo_points.deficit>=1+2*talent.shrouded_suffocation
   if (S.Garrote:IsCastable() and ImprovedGarroteRemains() > 0) or ForceStealth then
     local function GarroteTargetIfFunc(TargetUnit)
       return TargetUnit:DebuffRemains(S.Garrote)
@@ -972,12 +976,13 @@ end
 
 -- # Direct damage abilities
 local function Direct ()
-  -- Envenom at applicable cp if not pooling, capped on amplifying poison stacks, or in aoe.
-  -- actions.direct=envenom,if=!buff.darkest_night.up&effective_combo_points>=variable.effective_spend_cp
-  -- &(variable.not_pooling|debuff.amplifying_poison.stack>=20|effective_combo_points>cp_max_spend|!variable.single_target)&!buff.vanish.up
-  if S.Envenom:IsReady() and Player:BuffDown(S.DarkestNightBuff) and ComboPoints > EffectiveCPSpend
-    and (NotPooling or Target:DebuffStack(S.AmplifyingPoisonDebuff) >= 20 or ComboPoints > Rogue.CPMaxSpend()
-    or not SingleTarget) and Player:BuffDown(Rogue.VanishBuffSpell()) then
+  -- # Direct Damage Abilities
+  -- Envenom at applicable cp if not pooling, capped on amplifying poison stacks, on an animacharged CP, or in aoe.
+  -- actions.direct=envenom,if=!buff.darkest_night.up&combo_points>=variable.effective_spend_cp
+  -- &(variable.not_pooling|debuff.amplifying_poison.stack>=20|!variable.single_target)&!buff.vanish.up
+  if S.Envenom:IsReady() and Player:BuffDown(S.DarkestNightBuff) and ComboPoints >= EffectiveCPSpend
+    and (NotPooling or Target:DebuffStack(S.AmplifyingPoisonDebuff) >= 20 or not SingleTarget)
+    and Player:BuffDown(Rogue.VanishBuffSpell()) then
     if Cast(S.Envenom, nil, nil, not TargetInMeleeRange) then
       return "Cast Envenom 1"
     end

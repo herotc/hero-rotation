@@ -236,6 +236,7 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   QuickDraw               = Spell(196938),
   Ruthlessness            = Spell(14161),
   SummarilyDispatched     = Spell(381990),
+  Supercharger            = Spell(470347),
   SwiftSlasher            = Spell(381988),
   TakeEmBySurprise        = Spell(382742),
   TakeEmBySurpriseBuff    = Spell(385907),
