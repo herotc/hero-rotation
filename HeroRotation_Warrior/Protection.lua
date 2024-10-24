@@ -101,7 +101,7 @@ local function SuggestRageDump(RageFromSpell)
   end
   if shouldPreRageDump then
     if IsCurrentlyTanking() and IgnorePainWillNotCap() then
-      if Cast(S.IgnorePain, nil, Settings.Protection.DisplayStyle.Defensive) then return "ignore_pain rage capped"; end
+      if Cast(S.IgnorePain, nil, Settings.Protection.DisplayStyle.IgnorePain) then return "ignore_pain rage capped"; end
     else
       if Cast(S.Revenge, nil, nil, not TargetInMeleeRange) then return "revenge rage capped"; end
     end
@@ -305,7 +305,7 @@ local function APL()
     end
     -- shield_wall,if=talent.immovable_object.enabled&buff.avatar.down
     if IsCurrentlyTanking() and S.ShieldWall:IsCastable() and (S.ImmovableObject:IsAvailable() and Player:BuffDown(S.AvatarBuff)) then
-      if Cast(S.ShieldWall, nil, Settings.Protection.DisplayStyle.Defensive) then return "shield_wall main 4"; end
+      if Cast(S.ShieldWall, nil, Settings.Protection.DisplayStyle.ShieldWall) then return "shield_wall main 4"; end
     end
     if CDsON() then
       -- blood_fury
@@ -374,12 +374,12 @@ local function APL()
       or Player:RageDeficit() <= 18 and S.ShieldSlam:CooldownUp() and S.ImpenetrableWall:IsAvailable())
       or (Player:Rage() >= 70
       or Player:BuffStack(S.SeeingRedBuff) == 7 and Player:Rage() >= 35) and S.ShieldSlam:CooldownRemains() <= 1 and Player:BuffRemains(S.ShieldBlockBuff) >= 4 and Player:HasTier(31, 2)) then
-      if Cast(S.IgnorePain, nil, Settings.Protection.DisplayStyle.Defensive) then return "ignore_pain main 22"; end
+      if Cast(S.IgnorePain, nil, Settings.Protection.DisplayStyle.IgnorePain) then return "ignore_pain main 22"; end
     end
     -- last_stand,if=(target.health.pct>=90&talent.unnerving_focus.enabled|target.health.pct<=20&talent.unnerving_focus.enabled)|talent.bolster.enabled|set_bonus.tier30_2pc|set_bonus.tier30_4pc
     -- Note: If set_bonus.tier30_4pc is true, then tier30_2pc would be true as well, so just check for 2pc
     if IsCurrentlyTanking() and S.LastStand:IsCastable() and Player:BuffDown(S.ShieldWallBuff) and (Settings.Protection.UseLastStandOffensively and ((Target:HealthPercentage() >= 90 and S.UnnervingFocus:IsAvailable() or Target:HealthPercentage() <= 20 and S.UnnervingFocus:IsAvailable()) or S.Bolster:IsAvailable() or Player:HasTier(30, 2)) or not Settings.Protection.UseLastStandOffensively and Player:HealthPercentage() <= Settings.Protection.LastStandHP) then
-      if Cast(S.LastStand, nil, Settings.Protection.DisplayStyle.Defensive) then return "last_stand main 24"; end
+      if Cast(S.LastStand, nil, Settings.Protection.DisplayStyle.LastStand) then return "last_stand main 24"; end
     end
     -- ravager
     if CDsON() and S.Ravager:IsCastable() then
@@ -416,7 +416,7 @@ local function APL()
     end
     -- shield_block,if=buff.shield_block.remains<=10
     if ShouldPressShieldBlock() and (Player:BuffRemains(S.ShieldBlockBuff) <= 10) then
-      if Cast(S.ShieldBlock, nil, Settings.Protection.DisplayStyle.Defensive) then return "shield_block main 40"; end
+      if Cast(S.ShieldBlock, nil, Settings.Protection.DisplayStyle.ShieldBlock) then return "shield_block main 40"; end
     end
     -- run_action_list,name=aoe,if=spell_targets.thunder_clap>3
     if EnemiesCount8 > 3 then
