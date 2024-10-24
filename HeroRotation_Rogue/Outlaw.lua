@@ -289,15 +289,15 @@ local function Stealth(ReturnSpellOnly)
   end
 
   -- actions.stealth+=/cold_blood,if=variable.finish_condition
-  if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Finish_Condition() then
+  if S.ColdBlood:IsReady() and Player:BuffDown(S.ColdBlood) and Finish_Condition() then
     if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
       return "Cast Cold Blood"
     end
   end
 
   -- actions.stealth+=/between_the_eyes,if=variable.finish_condition&talent.crackshot&(!buff.shadowmeld.up|stealthed.rogue)
-  if S.BetweentheEyes:IsCastable() and Finish_Condition() and S.Crackshot:IsAvailable()
-    and (not Player:BuffUp(S.Shadowmeld) or Player:StealthUp(true, false)) then
+  if (S.BetweentheEyes:IsReady() or ReturnSpellOnly) and Finish_Condition() and S.Crackshot:IsAvailable()
+    and (not Player:BuffUp(S.Shadowmeld) or Player:StealthUp(true, false) or ReturnSpellOnly) then
     if ReturnSpellOnly then
       return S.BetweentheEyes
     else
@@ -308,7 +308,7 @@ local function Stealth(ReturnSpellOnly)
   end
 
   -- actions.stealth+=/dispatch,if=variable.finish_condition
-  if S.Dispatch:IsCastable() and Finish_Condition() then
+  if S.Dispatch:IsReady() and Finish_Condition() then
     if ReturnSpellOnly then
       return S.Dispatch
     else
@@ -321,7 +321,7 @@ local function Stealth(ReturnSpellOnly)
   -- # 2 Fan the Hammer Crackshot builds can consume Opportunity in stealth with max stacks, Broadside, and low CPs, or with Greenskins active
   -- actions.stealth+=/pistol_shot,if=talent.crackshot&talent.fan_the_hammer.rank>=2&buff.opportunity.stack>=6
   -- &(buff.broadside.up&combo_points<=1|buff.greenskins_wickers.up)
-  if S.PistolShot:IsCastable() and S.Crackshot:IsAvailable() and S.FanTheHammer:TalentRank() >= 2 and Player:BuffStack(S.Opportunity) >= 6
+  if S.PistolShot:IsReady() and S.Crackshot:IsAvailable() and S.FanTheHammer:TalentRank() >= 2 and Player:BuffStack(S.Opportunity) >= 6
     and (Player:BuffUp(S.Broadside) and ComboPoints <= 1 or Player:BuffUp(S.GreenskinsWickersBuff)) then
     if ReturnSpellOnly then
       return S.PistolShot
@@ -333,7 +333,7 @@ local function Stealth(ReturnSpellOnly)
   end
 
   -- ***NOT PART of SimC*** Condition duplicated from build to Show SS Icon in stealth with audacity buff
-  if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
+  if S.Ambush:IsReady() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
     if ReturnSpellOnly then
       return S.SSAudacity
     else
@@ -344,7 +344,7 @@ local function Stealth(ReturnSpellOnly)
   end
 
   -- actions.stealth+=/ambush,if=talent.hidden_opportunity
-  if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() then
+  if S.Ambush:IsReady() and S.HiddenOpportunity:IsAvailable() then
     if ReturnSpellOnly then
       return S.Ambush
     else
@@ -360,7 +360,7 @@ local function Finish(ReturnSpellOnly)
   -- actions.finish=between_the_eyes,if=!talent.crackshot
   -- &(buff.between_the_eyes.remains<4|talent.improved_between_the_eyes|talent.greenskins_wickers)
   -- &!buff.greenskins_wickers.up
-  if S.BetweentheEyes:IsCastable() and not S.Crackshot:IsAvailable()
+  if S.BetweentheEyes:IsReady() and not S.Crackshot:IsAvailable()
     and (Player:BuffRemains(S.BetweentheEyes) < 4 or S.ImprovedBetweenTheEyes:IsAvailable() or S.GreenskinsWickers:IsAvailable())
     and Player:BuffDown(S.GreenskinsWickers) then
     if ReturnSpellOnly then
@@ -374,7 +374,7 @@ local function Finish(ReturnSpellOnly)
 
   -- # Crackshot builds use Between the Eyes outside of Stealth to refresh the Between the Eyes crit buff or on cd with the Ruthless Precision buff
   -- actions.finish+=/between_the_eyes,if=talent.crackshot&(buff.ruthless_precision.up|buff.between_the_eyes.remains<4)
-  if S.BetweentheEyes:IsCastable() then
+  if S.BetweentheEyes:IsReady() then
     if S.Crackshot:IsAvailable() and (Player:BuffUp(S.RuthlessPrecision) or Player:BuffRemains(S.BetweentheEyes) < 4) then
       if ReturnSpellOnly then
         return S.BetweentheEyes
@@ -388,7 +388,7 @@ local function Finish(ReturnSpellOnly)
 
   -- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&refreshable
   -- Note: Added Player:BuffRemains(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
-  if S.SliceandDice:IsCastable() and (HL.FilteredFightRemains(EnemiesBF, ">", Player:BuffRemains(S.SliceandDice), true) or Player:BuffRemains(S.SliceandDice) == 0)
+  if S.SliceandDice:IsReady() and (HL.FilteredFightRemains(EnemiesBF, ">", Player:BuffRemains(S.SliceandDice), true) or Player:BuffRemains(S.SliceandDice) == 0)
     and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints) * 1.8 then
     if ReturnSpellOnly then
       return S.SliceandDice
@@ -399,14 +399,14 @@ local function Finish(ReturnSpellOnly)
     end
   end
 
-  if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) then
+  if S.ColdBlood:IsReady() and Player:BuffDown(S.ColdBlood) then
     if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
       return "Cast Cold Blood"
     end
   end
 
   -- actions.finish+=/coup_de_grace
-  if S.CoupDeGrace:IsCastable() then
+  if S.CoupDeGrace:IsReady() then
     if ReturnSpellOnly then
       return S.CoupDeGrace
     else
@@ -417,7 +417,7 @@ local function Finish(ReturnSpellOnly)
   end
 
   -- actions.finish+=/dispatch
-  if S.Dispatch:IsCastable() then
+  if S.Dispatch:IsReady() then
     if ReturnSpellOnly then
       return S.Dispatch
     else
