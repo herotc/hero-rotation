@@ -384,8 +384,11 @@ local function ARExecute()
   end
   -- the_hunt,if=!buff.reavers_glaive.up
   if S.TheHunt:IsCastable() and (not S.ReaversGlaive:IsLearned()) then
-    if CastAnnotated(S.Pool, false, "The Hunt") then return "The Hunt (Icon Bugfix)"; end
-    -- if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar_execute 6"; end
+    if Settings.Vengeance.TheHuntAnnotateIcon then
+      if CastAnnotated(S.TheHunt, false, "The Hunt") then return "the_hunt (Icon Bugfix) ar_execute 6"; end
+    else
+      if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar_execute 6"; end
+    end
   end
   -- bulk_extraction,if=spell_targets>=3&buff.art_of_the_glaive.stack>=$(rg_souls)
   if S.BulkExtraction:IsCastable() and (EnemiesCount8yMelee >= 3 and Player:BuffStack(S.ArtoftheGlaiveBuff) >= RGSouls()) then
@@ -482,8 +485,11 @@ local function AR()
   end
   -- the_hunt,if=!buff.reavers_glaive.up&(buff.art_of_the_glaive.stack+soul_fragments.total)<$(rg_souls)
   if S.TheHunt:IsReady() and (not S.ReaversGlaive:IsLearned() and ((Player:BuffStack(S.ArtoftheGlaiveBuff) + TotalSoulFragments) < RGSouls())) then
-    if CastAnnotated(S.Pool, false, "The Hunt") then return "The Hunt (Icon Bugfix)"; end
-    -- if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar 8"; end
+    if Settings.Vengeance.TheHuntAnnotateIcon then
+      if CastAnnotated(S.TheHunt, false, "The Hunt") then return "the_hunt (Icon Bugfix) ar 8"; end
+    else
+      if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar 8"; end
+    end
   end
   -- spirit_bomb,if=variable.can_spb&(soul_fragments.inactive>2|prev_gcd.1.sigil_of_spite|prev_gcd.1.soul_carver|(spell_targets.spirit_bomb>=4&talent.fallout&cooldown.immolation_aura.remains<gcd.max))
   if S.SpiritBomb:IsReady() and (VarCanSpB and (IncSoulFragments > 2 or Player:PrevGCD(1, S.SigilofSpite) or Player:PrevGCD(1, S.SoulCarver) or (EnemiesCount8yMelee >= 4 and S.Fallout:IsAvailable() and S.ImmolationAura:CooldownRemains() < Player:GCD()))) then
@@ -713,8 +719,11 @@ local function FSExecute()
   end
   -- the_hunt
   if S.TheHunt:IsCastable() then
-    if CastAnnotated(S.Pool, false, "The Hunt") then return "The Hunt (Icon Bugfix)"; end
-    -- if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt fs_execute 4"; end
+    if Settings.Vengeance.TheHuntAnnotateIcon then
+      if CastAnnotated(S.TheHunt, false, "The Hunt") then return "the_hunt (Icon Bugfix) fs_execute 4"; end
+    else
+      if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt fs_execute 4"; end
+    end
   end
   -- sigil_of_flame
   if S.SigilofFlame:IsCastable() then
@@ -831,8 +840,11 @@ local function Metamorphosis()
   end
   -- the_hunt
   if S.TheHunt:IsReady() then
-    if CastAnnotated(S.Pool, false, "The Hunt") then return "The Hunt (Icon Bugfix)"; end
-    -- if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt metamorphosis 25"; end
+    if Settings.Vengeance.TheHuntAnnotateIcon then
+      if CastAnnotated(S.TheHunt, false, "The Hunt") then return "the_hunt (Icon Bugfix) metamorphosis 25"; end
+    else
+      if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt metamorphosis 25"; end
+    end
   end
   -- soul_sunder,if=buff.demonsurge_soul_sunder.up&!buff.demonsurge_spirit_burst.up&!variable.can_spburst_one_gcd
   if S.SoulSunder:IsReady() and (Player:Demonsurge("SoulSunder") and not Player:Demonsurge("SpiritBurst") and not VarCanSpBurstOneGCD) then
@@ -1071,8 +1083,11 @@ local function FS()
   end
   -- the_hunt
   if S.TheHunt:IsCastable() then
-    if CastAnnotated(S.Pool, false, "The Hunt") then return "The Hunt (Icon Bugfix)"; end
-    -- if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt fs 8"; end
+    if Settings.Vengeance.TheHuntAnnotateIcon then
+      if CastAnnotated(S.TheHunt, false, "The Hunt") then return "the_hunt (Icon Bugfix) fs 8"; end
+    else
+      if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt fs 8"; end
+    end
   end
   -- felblade,if=((cooldown.sigil_of_spite.remains<execute_time|cooldown.soul_carver.remains<execute_time)&cooldown.fel_devastation.remains<(execute_time+gcd.max)&fury<50)
   if S.Felblade:IsCastable() and ((S.SigilofSpite:CooldownRemains() < S.Felblade:ExecuteTime() or S.SoulCarver:CooldownRemains() < S.Felblade:ExecuteTime()) and S.FelDevastation:CooldownRemains() < (S.Felblade:ExecuteTime() + Player:GCD()) and Player:Fury() < 50) then

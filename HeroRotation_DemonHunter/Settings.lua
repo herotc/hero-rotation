@@ -74,6 +74,7 @@ HR.GUISettings.APL.DemonHunter = {
     DemonSpikesHealthThreshold = 65,
     FieryBrandHealthThreshold = 40,
     MetamorphosisHealthThreshold = 50,
+    TheHuntAnnotateIcon = true,
     PotionType = {
       Selected = "Tempered",
     },
@@ -113,6 +114,7 @@ CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.Conser
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.DemonSpikesHealthThreshold", {0, 100, 5}, "Demon Spikes Health Threshold", "Suggest Demon Spikes when below this health percentage.")
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.FieryBrandHealthThreshold", {0, 100, 5}, "Fiery Brand Health Threshold", "Suggest Fiery Brand when below this health percentage.")
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.MetamorphosisHealthThreshold", {0, 100, 5}, "Metamorphosis Health Threshold", "Suggest Metamorphosis when below this health percentage.")
+CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.TheHuntAnnotateIcon", "Use Annotated Icon for The Hunt", "Temporary Bugfix: Since Blizzard screwed up and gave The Hunt the same icon as Sigil of Spite, enable this option to forceably annotate the icon for The Hunt. Note that this will force The Hunt suggestions into the main icon area.")
 CreateARPanelOptions(CP_Vengeance, "APL.DemonHunter.Vengeance")
 
 -- Havoc
