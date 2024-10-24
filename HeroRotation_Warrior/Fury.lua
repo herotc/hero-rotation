@@ -536,7 +536,7 @@ local function SlayerRAMT()
     if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst slayer_ra_mt 36"; end
   end
   -- execute,if=buff.enrage.up&debuff.marked_for_execution.up
-  if S.Execute:IsReady() (EnrageUp and Target:DebuffUp(S.MarkedforExecutionDebuff)) then
+  if S.Execute:IsReady() and (EnrageUp and Target:DebuffUp(S.MarkedforExecutionDebuff)) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_ra_mt 38"; end
   end
   -- onslaught,if=talent.tenderize
