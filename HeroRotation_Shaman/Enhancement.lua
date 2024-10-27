@@ -57,6 +57,7 @@ local Settings = {
 }
 
 --- ===== Rotation Variables =====
+local _
 local HasMainHandEnchant, HasOffHandEnchant
 local MHEnchantTimeRemains, OHEnchantTimeRemains
 local MHEnchantID, OHEnchantID
