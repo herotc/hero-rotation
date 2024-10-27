@@ -93,7 +93,7 @@ end
 local GCDSpell = Spell(61304)
 local CooldownSpell, CooldownSpellDisplayTime, CooldownSpellCastDuration
 local function DisplayCooldown(Object, DisplayPoolingSwirl, CustomTime)
-  local StartTime, CastDuration
+  local _, StartTime, CastDuration
 
   -- Default GCD and Casting Swirls
   local CurrentTime = GetTime()
