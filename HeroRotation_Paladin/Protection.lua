@@ -431,8 +431,8 @@ local function APL()
     IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
 
     -- Calculate fight_remains
-    BossFightRemains = HL.BossFightRemains()
-    FightRemains = BossFightRemains
+    local BossFightRemains = HL.BossFightRemains()
+    local FightRemains = BossFightRemains
     if FightRemains == 11111 then
       FightRemains = HL.FightRemains(Enemies8y, false)
     end
