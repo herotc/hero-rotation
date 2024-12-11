@@ -364,7 +364,8 @@ function HR.SmallIconFrame:CreateIcons (Index, Align)
 end
 
 -- Change Icon
-function HR.SmallIconFrame:ChangeIcon (FrameID, Texture, Keybind, OutofRange)
+function HR.SmallIconFrame:ChangeIcon (FrameID, Texture, Keybind, OutofRange, ID)
+  self.ID = ID
   local IconFrame = self.Icon[FrameID]
   -- Texture
   IconFrame.Texture:SetTexture(Texture)
