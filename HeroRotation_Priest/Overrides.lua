@@ -52,6 +52,8 @@ OldShadowIsReady = HL.AddCoreOverride("Spell.IsReady",
       return BaseCheck and (Player:BuffStack(SpellShadow.MindSpikeInsanityBuff) - num(Player:IsCasting(SpellShadow.MindSpikeInsanity)) > 0)
     elseif self == SpellShadow.Halo then
       return BaseCheck and not Player:IsCasting(self)
+    elseif self == SpellShadow.VoidBlastAbility then
+      return BaseCheck and not Player:IsCasting(self) and not Player:IsChanneling()
     else
       return BaseCheck
     end
@@ -70,6 +72,8 @@ OldShadowIsCastable = HL.AddCoreOverride("Spell.IsCastable",
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellShadow.VoidBolt then
       return BaseCheck or Player:IsCasting(SpellShadow.VoidEruption)
+    elseif self == SpellShadow.VoidBlastAbility then
+      return BaseCheck and not Player:IsCasting(self) and not Player:IsChanneling() and not Player:IsMoving()
     else
       return BaseCheck
     end
