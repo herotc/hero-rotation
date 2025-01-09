@@ -162,15 +162,18 @@ local function IsCDAlignmentOptimal()
   -- Safety check: Never hold CDs longer than maximum hold time
   local MAX_HOLD_TIME = 12 -- Never hold CDs longer than 12 seconds
   if recklessnessSoon and S.Recklessness:CooldownRemains() > MAX_HOLD_TIME then
+    HL.Print("CD Sync: Max hold time exceeded, using CDs now")
     return true
   end
   if avatarSoon and S.Avatar:CooldownRemains() > MAX_HOLD_TIME then
+    HL.Print("CD Sync: Max hold time exceeded, using CDs now")
     return true
   end
 
   -- Priority override: Don't delay cooldowns if we can secure a kill in execute phase
   -- This prevents over-optimization when we just need damage NOW
   if VarExecutePhase and Target:TimeToDie() < 20 then
+    HL.Print("CD Sync: Execute phase override, using CDs now")
     return true
   end
 
@@ -179,10 +182,12 @@ local function IsCDAlignmentOptimal()
   if S.TitansTorment:IsAvailable() then
     -- If Recklessness is ready but Avatar is coming soon, wait
     if recklessnessReady and avatarSoon then
+      HL.Print("CD Sync: Holding Recklessness for Avatar alignment")
       return false -- Hold Recklessness for Avatar
     end
     -- If Avatar is ready but Recklessness is coming soon, wait
     if avatarReady and recklessnessSoon then 
+      HL.Print("CD Sync: Holding Avatar for Recklessness alignment")
       return false -- Hold Avatar for Recklessness
     end
   end
@@ -192,9 +197,11 @@ local function IsCDAlignmentOptimal()
   if (recklessnessReady or avatarReady) then
     -- Check both trinket slots for upcoming powerful buffs
     if VarTrinket1Buffs and not VarTrinket1Manual and VarTrinket1CD < 10 then
+      HL.Print("CD Sync: Holding for Trinket 1 alignment")
       return false -- Wait for trinket 1
     end
     if VarTrinket2Buffs and not VarTrinket2Manual and VarTrinket2CD < 10 then
+      HL.Print("CD Sync: Holding for Trinket 2 alignment")
       return false -- Wait for trinket 2
     end
   end
