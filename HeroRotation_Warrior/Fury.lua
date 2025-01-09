@@ -142,6 +142,74 @@ HL:RegisterForEvent(function()
 end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 --- ===== Rotation Functions =====
+--- Enhanced cooldown synchronization function that optimizes ability usage timing
+--- This system aims to improve DPS by ensuring better alignment of major cooldowns
+--- @return boolean Returns true if it's optimal to use CDs now, false if we should wait
+local function IsCDAlignmentOptimal()
+  -- Honor user preference - if enhanced sync is disabled, maintain original behavior
+  if not Settings.Fury.UseCDSync then return true end
+  
+  -- Respect global CD toggle setting
+  if not CDsON() then return true end
+
+  -- Track the status of our major cooldowns
+  local recklessnessReady = S.Recklessness:CooldownUp() 
+  local avatarReady = S.Avatar:CooldownUp()
+  -- Define "soon" windows for cooldown alignment (8 second window)
+  local recklessnessSoon = S.Recklessness:CooldownRemains() < 8
+  local avatarSoon = S.Avatar:CooldownRemains() < 8
+
+  -- Safety check: Never hold CDs longer than maximum hold time
+  local MAX_HOLD_TIME = 12 -- Never hold CDs longer than 12 seconds
+  if recklessnessSoon and S.Recklessness:CooldownRemains() > MAX_HOLD_TIME then
+    if HR.Debug() then HR.Print("CD Sync: Max hold time exceeded, using CDs now") end
+    return true
+  end
+  if avatarSoon and S.Avatar:CooldownRemains() > MAX_HOLD_TIME then
+    if HR.Debug() then HR.Print("CD Sync: Max hold time exceeded, using CDs now") end
+    return true
+  end
+
+  -- Priority override: Don't delay cooldowns if we can secure a kill in execute phase
+  -- This prevents over-optimization when we just need damage NOW
+  if VarExecutePhase and Target:TimeToDie() < 20 then
+    if HR.Debug() then HR.Print("CD Sync: Execute phase override, using CDs now") end
+    return true
+  end
+
+  -- Special handling for Titan's Torment talent
+  -- This talent significantly benefits from proper CD alignment
+  if S.TitansTorment:IsAvailable() then
+    -- If Recklessness is ready but Avatar is coming soon, wait
+    if recklessnessReady and avatarSoon then
+      if HR.Debug() then HR.Print("CD Sync: Holding Recklessness for Avatar alignment") end
+      return false -- Hold Recklessness for Avatar
+    end
+    -- If Avatar is ready but Recklessness is coming soon, wait
+    if avatarReady and recklessnessSoon then 
+      if HR.Debug() then HR.Print("CD Sync: Holding Avatar for Recklessness alignment") end
+      return false -- Hold Avatar for Recklessness
+    end
+  end
+
+  -- Trinket alignment optimization
+  -- Only consider holding for trinkets that are very close to ready
+  if (recklessnessReady or avatarReady) then
+    -- Check both trinket slots for upcoming powerful buffs
+    if VarTrinket1Buffs and not VarTrinket1Manual and VarTrinket1CD < 10 then
+      if HR.Debug() then HR.Print("CD Sync: Holding for Trinket 1 alignment") end
+      return false -- Wait for trinket 1
+    end
+    if VarTrinket2Buffs and not VarTrinket2Manual and VarTrinket2CD < 10 then
+      if HR.Debug() then HR.Print("CD Sync: Holding for Trinket 2 alignment") end
+      return false -- Wait for trinket 2
+    end
+  end
+
+  -- If no alignment opportunities are imminent, use CDs now
+  return true
+end
+
 local function Precombat()
   -- flask
   -- food
@@ -167,7 +235,7 @@ local function Precombat()
     if Cast(S.BattleShout, Settings.CommonsOGCD.GCDasOffGCD.BattleShout) then return "battle_shout precombat 4"; end
   end
   -- use_item,name=treacherous_transmitter
-  if Settings.Commons.Enabled.Trinkets and I.TreacherousTransmitter:IsEquippedAndReady() then
+  if CDsON() and Settings.Commons.Enabled.Trinkets and I.TreacherousTransmitter:IsEquippedAndReady() then
     if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter precombat 6"; end
   end
   -- recklessness,if=!equipped.fyralath_the_dreamrender
@@ -190,11 +258,15 @@ end
 local function SlayerAMST()
   -- recklessness,if=(!talent.anger_management&cooldown.avatar.remains<1&talent.titans_torment)|talent.anger_management|!talent.titans_torment
   if CDsON() and S.Recklessness:IsCastable() and ((not S.AngerManagement:IsAvailable() and S.Avatar:CooldownRemains() < 1 and S.TitansTorment:IsAvailable()) or S.AngerManagement:IsAvailable() or not S.TitansTorment:IsAvailable()) then
-    if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness slayer_am_st 2"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness slayer_am_st 2"; end
+    end
   end
   -- avatar,if=(talent.titans_torment&(buff.enrage.up|talent.titanic_rage)&(debuff.champions_might.up|!talent.champions_might))|!talent.titans_torment
   if CDsON() and S.Avatar:IsCastable() and ((S.TitansTorment:IsAvailable() and (EnrageUp or S.TitanicRage:IsAvailable()) and (Target:DebuffUp(S.ChampionsMightDebuff) or not S.ChampionsMight:IsAvailable())) or not S.TitansTorment:IsAvailable()) then
-    if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar slayer_am_st 4"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar slayer_am_st 4"; end
+    end
   end
   -- thunderous_roar,if=buff.enrage.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (EnrageUp) then
@@ -382,11 +454,15 @@ end
 local function SlayerAMMT()
   -- recklessness
   if CDsON() and S.Recklessness:IsCastable() then
-    if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness slayer_am_mt 2"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness slayer_am_mt 2"; end
+    end
   end
   -- avatar,if=(talent.titans_torment&(buff.enrage.up|talent.titanic_rage)&(debuff.champions_might.up|!talent.champions_might))|!talent.titans_torment
   if CDsON() and S.Avatar:IsCastable() and ((S.TitansTorment:IsAvailable() and (EnrageUp or S.TitanicRage:IsAvailable()) and (Target:DebuffUp(S.ChampionsMightDebuff) or not S.ChampionsMight:IsAvailable())) or not S.TitansTorment:IsAvailable()) then
-    if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar slayer_am_mt 4"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar slayer_am_mt 4"; end
+    end
   end
   -- thunderous_roar,if=buff.enrage.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (EnrageUp) then
@@ -465,11 +541,15 @@ end
 local function SlayerRAMT()
   -- recklessness,if=(!talent.anger_management&cooldown.avatar.remains<1&talent.titans_torment)|!talent.titans_torment
   if CDsON() and S.Recklessness:IsCastable() and ((not S.AngerManagement:IsAvailable() and S.Avatar:CooldownRemains() < 1 and S.TitansTorment:IsAvailable()) or not S.TitansTorment:IsAvailable()) then
-    if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness slayer_ra_mt 2"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness slayer_ra_mt 2"; end
+    end
   end
   -- avatar,if=(talent.titans_torment&(buff.enrage.up|talent.titanic_rage)&(debuff.champions_might.up|!talent.champions_might))|!talent.titans_torment&buff.enrage.up
   if CDsON() and S.Avatar:IsCastable() and ((S.TitansTorment:IsAvailable() and (EnrageUp or S.TitanicRage:IsAvailable()) and (Target:DebuffUp(S.ChampionsMightDebuff) or not S.ChampionsMight:IsAvailable())) or not S.TitansTorment:IsAvailable() and EnrageUp) then
-    if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar slayer_ra_mt 4"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar slayer_ra_mt 4"; end
+    end
   end
   -- rampage,if=!buff.enrage.up&!talent.titans_torment
   if S.Rampage:IsReady() and (not EnrageUp and not S.TitansTorment:IsAvailable()) then
@@ -568,395 +648,581 @@ end
 local function ThaneAMST()
   -- recklessness,if=talent.anger_management|!talent.titans_torment
   if CDsON() and S.Recklessness:IsCastable() and (S.AngerManagement:IsAvailable() or not S.TitansTorment:IsAvailable()) then
-    if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness thane_am_st 2"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness thane_am_st 2"; end
+    end
   end
   -- thunder_blast,if=buff.enrage.up
   if S.ThunderBlastAbility:IsReady() and (EnrageUp) then
-    if Cast(S.ThunderBlastAbility, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_blast thane_am_st 4"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderBlastAbility, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_blast thane_am_st 4"; end
+    end
   end
   -- avatar,if=(talent.titans_torment&(buff.enrage.up|talent.titanic_rage)&(debuff.champions_might.up|!talent.champions_might))|!talent.titans_torment
   if CDsON() and S.Avatar:IsCastable() and ((S.TitansTorment:IsAvailable() and (EnrageUp or S.TitanicRage:IsAvailable()) and (Target:DebuffUp(S.ChampionsMightDebuff) or not S.ChampionsMight:IsAvailable())) or not S.TitansTorment:IsAvailable()) then
-    if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar thane_am_st 6"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar thane_am_st 6"; end
+    end
   end
   -- ravager
   if CDsON() and S.Ravager:IsCastable() then
-    if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager thane_am_st 8"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager thane_am_st 8"; end
+    end
   end
   -- thunderous_roar,if=buff.enrage.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (EnrageUp) then
-    if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar thane_am_st 10"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar thane_am_st 10"; end
+    end
   end
   -- champions_spear,if=buff.enrage.up&(cooldown.avatar.remains<gcd|!talent.titans_torment)
   if CDsON() and S.ChampionsSpear:IsCastable() and (EnrageUp and (S.Avatar:CooldownRemains() < Player:GCD() or not S.TitansTorment:IsAvailable())) then
-    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear thane_am_st 12"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear thane_am_st 12"; end
+    end
   end
   -- odyns_fury,if=dot.odyns_fury_torment_mh.remains<1&(buff.enrage.up|talent.titanic_rage)&cooldown.avatar.remains
   if CDsON() and S.OdynsFury:IsCastable() and (Target:DebuffRemains(S.OdynsFuryDebuff) < 1 and (EnrageUp or S.TitanicRage:IsAvailable()) and S.Avatar:CooldownDown()) then
-    if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury thane_am_st 14"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury thane_am_st 14"; end
+    end
   end
   -- execute,if=talent.ashen_juggernaut&buff.ashen_juggernaut.remains<=gcd&buff.enrage.up
   if S.Execute:IsReady() and (S.AshenJuggernaut:IsAvailable() and Player:BuffRemains(S.AshenJuggernautBuff) <= Player:GCD() and EnrageUp) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_am_st 16"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_am_st 16"; end
+    end
   end
   -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
   if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_am_st 18"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_am_st 18"; end
+    end
   end
   -- bladestorm,if=buff.enrage.up&talent.unhinged
   if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp and S.Unhinged:IsAvailable()) then
-    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane_am_st 20"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane_am_st 20"; end
+    end
   end
   -- onslaught,if=talent.tenderize
   if S.Onslaught:IsReady() and (S.Tenderize:IsAvailable()) then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_am_st 22"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_am_st 22"; end
+    end
   end
   -- rampage
   if S.Rampage:IsReady() then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_am_st 24"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_am_st 24"; end
+    end
   end
   -- bloodthirst,if=talent.vicious_contempt&target.health.pct<35&buff.bloodcraze.stack>=2|!dot.ravager.remains&buff.bloodcraze.stack>=3
   if S.Bloodthirst:IsCastable() and (S.ViciousContempt:IsAvailable() and Target:HealthPercentage() < 35 and Player:BuffStack(S.BloodcrazeBuff) >= 2 or Target:DebuffDown(S.RavagerDebuff) and Player:BuffStack(S.BloodcrazeBuff) >= 3) then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane_am_st 26"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane_am_st 26"; end
+    end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow thane_am_st 28"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow thane_am_st 28"; end
+    end
   end
   -- execute,if=talent.ashen_juggernaut
   if S.Execute:IsReady() and (S.AshenJuggernaut:IsAvailable()) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_am_st 30"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_am_st 30"; end
+    end
   end
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane_am_st 32"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane_am_st 32"; end
+    end
   end
   -- execute
   if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_am_st 34"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_am_st 34"; end
+    end
   end
   -- thunder_clap
   if S.ThunderClap:IsCastable() then
-    if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_am_st 36"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_am_st 36"; end
+    end
   end
 end
 
 local function ThaneRAST()
   -- recklessness,if=(!talent.anger_management&cooldown.avatar.remains<1&talent.titans_torment)|talent.anger_management|!talent.titans_torment
   if CDsON() and S.Recklessness:IsCastable() and ((not S.AngerManagement:IsAvailable() and S.Avatar:CooldownRemains() < 1 and S.TitansTorment:IsAvailable()) or S.AngerManagement:IsAvailable() or not S.TitansTorment:IsAvailable()) then
-    if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness thane_ra_st 2"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness thane_ra_st 2"; end
+    end
   end
   -- thunder_blast,if=buff.enrage.up
   if S.ThunderBlastAbility:IsReady() and (EnrageUp) then
-    if Cast(S.ThunderBlastAbility, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_blast thane_ra_st 4"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderBlastAbility, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_blast thane_ra_st 4"; end
+    end
   end
   -- avatar,if=(talent.titans_torment&(buff.enrage.up|talent.titanic_rage)&(debuff.champions_might.up|!talent.champions_might))|!talent.titans_torment&buff.enrage.up
   if CDsON() and S.Avatar:IsCastable() and ((S.TitansTorment:IsAvailable() and (EnrageUp or S.TitanicRage:IsAvailable()) and (Target:DebuffUp(S.ChampionsMightDebuff) or not S.ChampionsMight:IsAvailable())) or not S.TitansTorment:IsAvailable() and EnrageUp) then
-    if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar thane_ra_st 6"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar thane_ra_st 6"; end
+    end
   end
   -- ravager
   if CDsON() and S.Ravager:IsCastable() then
-    if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager thane_ra_st 8"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager thane_ra_st 8"; end
+    end
   end
   -- thunderous_roar,if=buff.enrage.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (EnrageUp) then
-    if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar thane_ra_st 10"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar thane_ra_st 10"; end
+    end
   end
   -- champions_spear,if=buff.enrage.up&(cooldown.avatar.remains<gcd|!talent.titans_torment)
   if CDsON() and S.ChampionsSpear:IsCastable() and (EnrageUp and (S.Avatar:CooldownRemains() < Player:GCD() or not S.TitansTorment:IsAvailable())) then
-    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear thane_ra_st 12"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear thane_ra_st 12"; end
+    end
   end
   -- odyns_fury,if=dot.odyns_fury_torment_mh.remains<1&(buff.enrage.up|talent.titanic_rage)&cooldown.avatar.remains
   if CDsON() and S.OdynsFury:IsCastable() and (Target:DebuffRemains(S.OdynsFuryDebuff) < 1 and (EnrageUp or S.TitanicRage:IsAvailable()) and S.Avatar:CooldownDown()) then
-    if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury thane_ra_st 14"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury thane_ra_st 14"; end
+    end
   end
   -- execute,if=talent.ashen_juggernaut&buff.ashen_juggernaut.remains<=gcd&buff.enrage.up
   if S.Execute:IsReady() and (S.AshenJuggernaut:IsAvailable() and Player:BuffRemains(S.AshenJuggernautBuff) <= Player:GCD() and EnrageUp) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_ra_st 16"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_ra_st 16"; end
+    end
   end
   -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
   if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_st 18"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_st 18"; end
+    end
   end
   -- bladestorm,if=buff.enrage.up&talent.unhinged
   if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp and S.Unhinged:IsAvailable()) then
-    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane_ra_st 20"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane_ra_st 20"; end
+    end
   end
   -- rampage,if=!buff.enrage.up
   if S.Rampage:IsReady() and (not EnrageUp) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_st 22"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_st 22"; end
+    end
   end
   -- bloodbath,if=talent.vicious_contempt&target.health.pct<35|buff.bloodcraze.stack>=3
   if S.Bloodbath:IsCastable() and (S.ViciousContempt:IsAvailable() and Target:HealthPercentage() < 35 or Player:BuffStack(S.BloodcrazeBuff) >= 3) then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath thane_ra_st 24"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath thane_ra_st 24"; end
+    end
   end
   -- crushing_blow
   if S.CrushingBlow:IsCastable() then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow thane_ra_st 26"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow thane_ra_st 26"; end
+    end
   end
   -- onslaught,if=talent.tenderize
   if S.Onslaught:IsReady() and (S.Tenderize:IsAvailable()) then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_ra_st 28"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_ra_st 28"; end
+    end
   end
   -- rampage,if=rage>=115
   if S.Rampage:IsReady() and (Player:Rage() >= 115) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_st 30"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_st 30"; end
+    end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow thane_ra_st 32"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow thane_ra_st 32"; end
+    end
   end
   -- bloodbath
   if S.Bloodbath:IsCastable() then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath thane_ra_st 34"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath thane_ra_st 34"; end
+    end
   end
   -- bloodthirst,if=buff.enrage.up&!buff.burst_of_power.up
   if S.Bloodthirst:IsCastable() and (EnrageUp and Player:BuffDown(S.BurstofPowerBuff)) then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane_ra_st 36"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane_ra_st 36"; end
+    end
   end
   -- rampage
   if S.Rampage:IsReady() then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_st 38"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_st 38"; end
+    end
   end
   -- execute
   if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_ra_st 40"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_ra_st 40"; end
+    end
   end
   -- onslaught
   if S.Onslaught:IsReady() then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_ra_st 42"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_ra_st 42"; end
+    end
   end
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane_ra_st 44"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane_ra_st 44"; end
+    end
   end
   -- thunder_clap
   if S.ThunderClap:IsCastable() then
-    if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_ra_st 46"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_ra_st 46"; end
+    end
   end
   -- whirlwind,if=talent.meat_cleaver
   if S.Whirlwind:IsCastable() and (S.MeatCleaver:IsAvailable()) then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind thane_ra_st 48"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind thane_ra_st 48"; end
+    end
   end
   -- slam
   if S.Slam:IsCastable() then
-    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam thane_ra_st 50"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam thane_ra_st 50"; end
+    end
   end
 end
 
 local function ThaneAMMT()
   -- recklessness,if=(!talent.anger_management&cooldown.avatar.remains<1&talent.titans_torment)|talent.anger_management|!talent.titans_torment
   if CDsON() and S.Recklessness:IsCastable() and ((not S.AngerManagement:IsAvailable() and S.Avatar:CooldownRemains() < 1 and S.TitansTorment:IsAvailable()) or S.AngerManagement:IsAvailable() or not S.TitansTorment:IsAvailable()) then
-    if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness thane_am_mt 2"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness thane_am_mt 2"; end
+    end
   end
   -- thunder_blast,if=buff.enrage.up
   if S.ThunderBlastAbility:IsReady() and (EnrageUp) then
-    if Cast(S.ThunderBlastAbility, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_blast thane_am_mt 4"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderBlastAbility, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_blast thane_am_mt 4"; end
+    end
   end
   -- avatar,if=(talent.titans_torment&(buff.enrage.up|talent.titanic_rage)&(debuff.champions_might.up|!talent.champions_might))|!talent.titans_torment
   if CDsON() and S.Avatar:IsCastable() and ((S.TitansTorment:IsAvailable() and (EnrageUp or S.TitanicRage:IsAvailable()) and (Target:DebuffUp(S.ChampionsMightDebuff) or not S.ChampionsMight:IsAvailable())) or not S.TitansTorment:IsAvailable()) then
-    if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar thane_am_mt 6"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar thane_am_mt 6"; end
+    end
   end
   -- thunder_clap,if=buff.meat_cleaver.stack=0&talent.meat_cleaver
   if S.ThunderClap:IsCastable() and (Player:BuffDown(S.MeatCleaverBuff) and S.MeatCleaver:IsAvailable()) then
-    if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_am_mt 8"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_am_mt 8"; end
+    end
   end
   -- thunderous_roar,if=buff.enrage.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (EnrageUp) then
-    if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar thane_am_mt 10"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar thane_am_mt 10"; end
+    end
   end
   -- ravager
   if CDsON() and S.Ravager:IsCastable() then
-    if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager thane_am_mt 12"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager thane_am_mt 12"; end
+    end
   end
   -- champions_spear,if=buff.enrage.up
   if CDsON() and S.ChampionsSpear:IsCastable() and (EnrageUp) then
-    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear thane_am_mt 14"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear thane_am_mt 14"; end
+    end
   end
   -- odyns_fury,if=dot.odyns_fury_torment_mh.remains<1&(buff.enrage.up|talent.titanic_rage)&cooldown.avatar.remains
   if CDsON() and S.OdynsFury:IsCastable() and (Target:DebuffRemains(S.OdynsFuryDebuff) < 1 and (EnrageUp or S.TitanicRage:IsAvailable()) and S.Avatar:CooldownDown()) then
-    if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury thane_am_mt 16"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury thane_am_mt 16"; end
+    end
   end
   -- execute,if=talent.ashen_juggernaut&buff.ashen_juggernaut.remains<=gcd&buff.enrage.up
   if S.Execute:IsReady() and (S.AshenJuggernaut:IsAvailable() and Player:BuffRemains(S.AshenJuggernautBuff) <= Player:GCD() and EnrageUp) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_am_mt 18"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_am_mt 18"; end
+    end
   end
   -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
   if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_am_mt 20"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_am_mt 20"; end
+    end
   end
   -- bladestorm,if=buff.enrage.up
   if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp) then
-    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane_am_mt 22"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane_am_mt 22"; end
+    end
   end
   -- onslaught,if=talent.tenderize
   if S.Onslaught:IsReady() and (S.Tenderize:IsAvailable()) then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_am_mt 24"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_am_mt 24"; end
+    end
   end
   -- rampage
   if S.Rampage:IsReady() then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_am_mt 26"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_am_mt 26"; end
+    end
   end
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane_am_mt 28"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane_am_mt 28"; end
+    end
   end
   -- thunder_clap,if=active_enemies>=3
   if S.ThunderClap:IsCastable() and (EnemiesMeleeCount >= 3) then
-    if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_am_mt 30"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_am_mt 30"; end
+    end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow thane_am_mt 32"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow thane_am_mt 32"; end
+    end
   end
   -- thunder_clap
   if S.ThunderClap:IsCastable() then
-    if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_am_mt 34"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_am_mt 34"; end
+    end
   end
   -- onslaught
   if S.Onslaught:IsReady() then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_am_mt 36"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_am_mt 36"; end
+    end
   end
   -- execute
   if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_am_mt 38"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_am_mt 38"; end
+    end
   end
   -- whirlwind
   if S.Whirlwind:IsCastable() then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind thane_am_mt 40"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind thane_am_mt 40"; end
+    end
   end
   -- slam
   if S.Slam:IsCastable() then
-    if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam thane_am_mt 42"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam thane_am_mt 42"; end
+    end
   end
 end
 
 local function ThaneRAMT()
   -- recklessness,if=cooldown.avatar.remains<1&talent.titans_torment|!talent.titans_torment
   if CDsON() and S.Recklessness:IsCastable() and (S.Avatar:CooldownRemains() < 1 and S.TitansTorment:IsAvailable() or not S.TitansTorment:IsAvailable()) then
-    if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness slayer_ra_mt 2"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness slayer_ra_mt 2"; end
+    end
   end
   -- thunder_blast,if=buff.enrage.up
   if S.ThunderBlastAbility:IsReady() and (EnrageUp) then
-    if Cast(S.ThunderBlastAbility, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_blast slayer_ra_mt 4"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderBlastAbility, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_blast slayer_ra_mt 4"; end
+    end
   end
   -- avatar,if=(talent.titans_torment&(buff.enrage.up|talent.titanic_rage)&(debuff.champions_might.up|!talent.champions_might))|!talent.titans_torment&buff.enrage.up
   if CDsON() and S.Avatar:IsCastable() and ((S.TitansTorment:IsAvailable() and (EnrageUp or S.TitanicRage:IsAvailable()) and (Target:DebuffUp(S.ChampionsMightDebuff) or not S.ChampionsMight:IsAvailable())) or not S.TitansTorment:IsAvailable() and EnrageUp) then
-    if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar thane_ra_mt 6"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Avatar, Settings.Fury.GCDasOffGCD.Avatar) then return "avatar thane_ra_mt 6"; end
+    end
   end
   -- thunder_clap,if=buff.meat_cleaver.stack=0&talent.meat_cleaver
   if S.ThunderClap:IsCastable() and (Player:BuffDown(S.MeatCleaverBuff) and S.MeatCleaver:IsAvailable()) then
-    if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_ra_mt 8"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_ra_mt 8"; end
+    end
   end
   -- thunderous_roar,if=buff.enrage.up
   if CDsON() and S.ThunderousRoar:IsCastable() and (EnrageUp) then
-    if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar thane_ra_mt 10"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar thane_ra_mt 10"; end
+    end
   end
   -- ravager
   if CDsON() and S.Ravager:IsCastable() then
-    if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager thane_ra_mt 12"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager thane_ra_mt 12"; end
+    end
   end
   -- champions_spear,if=buff.enrage.up
   if CDsON() and S.ChampionsSpear:IsCastable() and (EnrageUp) then
-    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear thane_ra_mt 14"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear thane_ra_mt 14"; end
+    end
   end
   -- odyns_fury,if=dot.odyns_fury_torment_mh.remains<1&(buff.enrage.up|talent.titanic_rage)&cooldown.avatar.remains
   if CDsON() and S.OdynsFury:IsCastable() and (Target:DebuffRemains(S.OdynsFuryDebuff) < 1 and (EnrageUp or S.TitanicRage:IsAvailable()) and S.Avatar:CooldownDown()) then
-    if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury thane_ra_mt 16"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury thane_ra_mt 16"; end
+    end
   end
   -- execute,if=talent.ashen_juggernaut&buff.ashen_juggernaut.remains<=gcd&buff.enrage.up
   if S.Execute:IsReady() and (S.AshenJuggernaut:IsAvailable() and Player:BuffRemains(S.AshenJuggernautBuff) <= Player:GCD() and EnrageUp) then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_ra_mt 18"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_ra_mt 18"; end
+    end
   end
   -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
   if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_mt 20"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_mt 20"; end
+    end
   end
   -- bladestorm,if=buff.enrage.up
   if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp) then
-    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane_ra_mt 22"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane_ra_mt 22"; end
+    end
   end
   -- onslaught,if=talent.tenderize
   if S.Onslaught:IsReady() and (S.Tenderize:IsAvailable()) then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_ra_mt 24"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_ra_mt 24"; end
+    end
   end
   -- rampage,if=!buff.enrage.up
   if S.Rampage:IsReady() and (not EnrageUp) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_mt 26"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_mt 26"; end
+    end
   end
   -- bloodbath
   if S.Bloodbath:IsCastable() then
-    if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath thane_ra_mt 28"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath thane_ra_mt 28"; end
+    end
   end
   -- crushing_blow
   if S.CrushingBlow:IsCastable() then
-    if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow thane_ra_mt 30"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.CrushingBlow, nil, nil, not TargetInMeleeRange) then return "crushing_blow thane_ra_mt 30"; end
+    end
   end
   -- rampage,if=buff.recklessness.up|rage>115
   if S.Rampage:IsReady() and (Player:BuffUp(S.RecklessnessBuff) or Player:Rage() > 115) then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_mt 32"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_mt 32"; end
+    end
   end
   -- onslaught,if=talent.tenderize
   -- Note: Covered by the above onslaught suggestion.
   -- bloodthirst
   if S.Bloodthirst:IsCastable() then
-    if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane_ra_mt 36"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane_ra_mt 36"; end
+    end
   end
   -- thunder_clap
   if S.ThunderClap:IsCastable() then
-    if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_ra_mt 38"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_clap thane_ra_mt 38"; end
+    end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
-    if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow thane_ra_mt 40"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.RagingBlow, nil, nil, not TargetInMeleeRange) then return "raging_blow thane_ra_mt 40"; end
+    end
   end
   -- onslaught
   if S.Onslaught:IsReady() then
-    if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_ra_mt 42"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught thane_ra_mt 42"; end
+    end
   end
   -- rampage
   if S.Rampage:IsReady() then
-    if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_mt 44"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane_ra_mt 44"; end
+    end
   end
   -- execute
   if S.Execute:IsReady() then
-    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_ra_mt 46"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane_ra_mt 46"; end
+    end
   end
   -- whirlwind
   if S.Whirlwind:IsCastable() then
-    if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind thane_ra_mt 48"; end
+    if IsCDAlignmentOptimal() then
+      if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind thane_ra_mt 48"; end
+    end
   end
 end
 
 local function Trinkets()
-  if Settings.Commons.Enabled.Trinkets then
+  if CDsON() and Settings.Commons.Enabled.Trinkets then
     -- do_treacherous_transmitter_task
     -- use_item,name=treacherous_transmitter,if=variable.adds_remain|variable.st_planning
     if I.TreacherousTransmitter:IsEquippedAndReady() and (VarAddsRemain or VarSTPlanning) then
-      if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter trinkets 2"; end
+      if IsCDAlignmentOptimal() then
+        if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter trinkets 2"; end
+      end
     end
     -- use_item,slot=trinket1,if=variable.trinket_1_buffs&!variable.trinket_1_manual&(!buff.avatar.up&trinket.1.cast_time>0|!trinket.1.cast_time>0)&((talent.titans_torment&cooldown.avatar.ready)|(buff.avatar.up&!talent.titans_torment))&(variable.trinket_2_exclude|!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)|trinket.1.proc.any_dps.duration>=fight_remains
     if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (VarTrinket1Buffs and not VarTrinket1Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket1CastTime > 0 or VarTrinket1CastTime == 0) and ((S.TitansTorment:IsAvailable() and S.Avatar:CooldownUp()) or (Player:BuffUp(S.AvatarBuff) and not S.TitansTorment:IsAvailable())) and (VarTrinket2Exclude or not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1) or Trinket1:BuffDuration() >= BossFightRemains) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for " .. Trinket1:Name() .. " trinkets 4"; end
+      if IsCDAlignmentOptimal() then
+        if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for " .. Trinket1:Name() .. " trinkets 4"; end
+      end
     end
     -- use_item,slot=trinket2,if=variable.trinket_2_buffs&!variable.trinket_2_manual&(!buff.avatar.up&trinket.2.cast_time>0|!trinket.2.cast_time>0)&((talent.titans_torment&cooldown.avatar.ready)|(buff.avatar.up&!talent.titans_torment))&(variable.trinket_1_exclude|!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2)|trinket.2.proc.any_dps.duration>=fight_remains
     if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (VarTrinket2Buffs and not VarTrinket2Manual and (Player:BuffDown(S.AvatarBuff) and VarTrinket2CastTime > 0 or VarTrinket2CastTime == 0) and ((S.TitansTorment:IsAvailable() and S.Avatar:CooldownUp()) or (Player:BuffUp(S.AvatarBuff) and not S.TitansTorment:IsAvailable())) and (VarTrinket1Exclude or not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= BossFightRemains) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for " .. Trinket2:Name() .. " trinkets 6"; end
+      if IsCDAlignmentOptimal() then
+        if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for " .. Trinket2:Name() .. " trinkets 6"; end
+      end
     end
     -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.1.cast_time>0&!buff.avatar.up|!trinket.1.cast_time>0)&!variable.trinket_1_manual&(!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)|(trinket.1.cast_time>0&!buff.avatar.up|!trinket.1.cast_time>0)|cooldown.avatar.remains_expected>20)
     if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs and (VarTrinket1CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket1CastTime == 0) and not VarTrinket1Manual and (not VarTrinket1Buffs and (Trinket2:CooldownDown() or not VarTrinket2Buffs) or (VarTrinket1CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket1CastTime == 0) or S.Avatar:CooldownRemains() > 20)) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for " .. Trinket1:Name() .. " trinkets 8"; end
+      if IsCDAlignmentOptimal() then
+        if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for " .. Trinket1:Name() .. " trinkets 8"; end
+      end
     end
     -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.2.cast_time>0&!buff.avatar.up|!trinket.2.cast_time>0)&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|(trinket.2.cast_time>0&!buff.avatar.up|!trinket.2.cast_time>0)|cooldown.avatar.remains_expected>20)
     if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs and (VarTrinket2CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket2CastTime == 0) and not VarTrinket2Manual and (not VarTrinket2Buffs and (Trinket1:CooldownDown() or not VarTrinket1Buffs) or (VarTrinket2CastTime > 0 and Player:BuffDown(S.AvatarBuff) or VarTrinket2CastTime == 0) or S.Avatar:CooldownRemains() > 20)) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for " .. Trinket2:Name() .. " trinkets 10"; end
+      if IsCDAlignmentOptimal() then
+        if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for " .. Trinket2:Name() .. " trinkets 10"; end
+      end
     end
   end
   -- use_item,slot=main_hand,if=!equipped.fyralath_the_dreamrender&(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
-  if Settings.Commons.Enabled.Items then
+  if CDsON() and Settings.Commons.Enabled.Items then
     -- Note: Adding a generic use_items for non-trinkets instead.
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
     if ItemToUse then
-      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 12"; end
+      if IsCDAlignmentOptimal() then
+        if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 12"; end
+      end
     end
   end
 end
@@ -1041,27 +1307,39 @@ local function APL()
     if CDsON() then
       -- lights_judgment,if=variable.on_gcd_racials
       if S.LightsJudgment:IsCastable() and (VarOnGCDRacials) then
-        if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 16"; end
+        if IsCDAlignmentOptimal() then
+          if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 16"; end
+        end
       end
       -- bag_of_tricks,if=variable.on_gcd_racials
       if S.BagofTricks:IsCastable() and (VarOnGCDRacials) then
-        if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 17"; end
+        if IsCDAlignmentOptimal() then
+          if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks main 17"; end
+        end
       end
       -- berserking,if=buff.recklessness.up
       if S.Berserking:IsCastable() and Player:BuffUp(S.RecklessnessBuff) then
-        if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking main 18"; end
+        if IsCDAlignmentOptimal() then
+          if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking main 18"; end
+        end
       end
       -- blood_fury
       if S.BloodFury:IsCastable() then
-        if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury main 20"; end
+        if IsCDAlignmentOptimal() then
+          if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury main 20"; end
+        end
       end
       -- fireblood
       if S.Fireblood:IsCastable() then
-        if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood main 22"; end
+        if IsCDAlignmentOptimal() then
+          if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood main 22"; end
+        end
       end
       -- ancestral_call
       if S.AncestralCall:IsCastable() then
-        if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call main 24"; end
+        if IsCDAlignmentOptimal() then
+          if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call main 24"; end
+        end
       end
       -- invoke_external_buff,name=power_infusion,if=buff.avatar.remains>15&fight_remains>=135|variable.execute_phase&buff.avatar.up|fight_remains<=25
       -- Note: Not handling external buffs.
