@@ -126,6 +126,8 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   ArcaneSurgeBuff                       = Spell(365362),
   ArcaneTempoBuff                       = Spell(383997),
   ClearcastingBuff                      = Spell(263725),
+  ClarityBuff                           = Spell(1216178), -- TWW S2 Tier 2pc
+  EnlightenedBuff                       = Spell(1217242),
   IntuitionBuff                         = Spell(455681), -- TWW S1 Tier 4pc
   LeydrinkerBuff                        = Spell(453758),
   NetherPrecisionBuff                   = Spell(383783),
@@ -178,6 +180,7 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   HeatingUpBuff                         = Spell(48107),
   HotStreakBuff                         = Spell(48108),
   HyperthermiaBuff                      = Spell(383874),
+  RollinHotBuff                         = Spell(1219035), -- TWW S2 Tier 4pc
   SunKingsBlessingBuff                  = Spell(383882),
   FuryoftheSunKingBuff                  = Spell(383883),
   -- Debuffs
@@ -216,6 +219,7 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   -- Buffs
   BrainFreezeBuff                       = Spell(190446),
   DeathsChillBuff                       = Spell(454371),
+  ExtendedBankrollBuff                  = Spell(1216914), -- TWW S2 Tier 4pc
   FingersofFrostBuff                    = Spell(44544),
   FreezingRainBuff                      = Spell(270232),
   FreezingWindsBuff                     = Spell(382106),
@@ -223,6 +227,7 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   IciclesBuff                           = Spell(205473),
   IcyVeinsBuff                          = Spell(12472),
   -- Debuffs
+  FreezingWindsDebuff                   = Spell(1216988),
   WintersChillDebuff                    = Spell(228358),
 })
 Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Frost, Spell.Mage.Frostfire)

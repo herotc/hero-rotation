@@ -191,7 +191,7 @@ local function Bear()
   -- Note: Handled in Defensives().
   -- lunar_beam
   if CDsON() and S.LunarBeam:IsReady() then
-      if Cast(S.LunarBeam) then return "lunar_beam bear 10"; end
+      if Cast(S.LunarBeam, Settings.Guardian.GCDasOffGCD.LunarBeam) then return "lunar_beam bear 10"; end
     end
   -- convoke_the_spirits,if=(talent.wildpower_surge.enabled&buff.cat_form.up&buff.feline_potential.up)|!talent.wildpower_surge.enabled
   if CDsON() and S.ConvoketheSpirits:IsCastable() then
