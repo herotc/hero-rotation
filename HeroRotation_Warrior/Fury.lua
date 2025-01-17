@@ -334,7 +334,7 @@ local function SlayerRAST()
     if Cast(S.Onslaught, nil, nil, not TargetInMeleeRange) then return "onslaught slayer_ra_st 26"; end
   end
   -- bloodbath,if=target.health.pct<35&talent.vicious_contempt
-  if S.Bloodbath:IsCastable() and (Player:HealthPercentage() < 35 and S.ViciousContempt:IsAvailable()) then
+  if S.Bloodbath:IsCastable() and (Target:HealthPercentage() < 35 and S.ViciousContempt:IsAvailable()) then
     if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath slayer_ra_st 28"; end
   end
   -- rampage,if=rage>=115
