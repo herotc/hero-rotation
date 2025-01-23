@@ -217,6 +217,7 @@ Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   -- Talents
   Avatar                                = Spell(401150),
   BarbaricTraining                      = Spell(390675),
+  Bloodsurge                            = Spell(384361),
   Bolster                               = Spell(280001),
   BoomingVoice                          = Spell(202743),
   ChampionsBulwark                      = Spell(386328),
