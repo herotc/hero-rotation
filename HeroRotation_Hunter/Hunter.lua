@@ -85,8 +85,22 @@ Spell.Hunter.DarkRanger = {
   BlackArrow                            = Spell(466930),
   -- Talents
   BlackArrowTalent                      = Spell(466932),
+  BleakArrows                           = Spell(467749),
+  BleakArrowsBMAbility                  = Spell(472084),
+  BleakArrowsMMAbility                  = Spell(467914),
   BleakPowder                           = Spell(467911),
+  PhantomPain                           = Spell(467941),
+  PhantomPainAbility                    = Spell(468019),
   ShadowHounds                          = Spell(430707),
+  ShadowHoundsAbility                   = Spell(444269),
+  WitheringFire                         = Spell(466990),
+  WitheringFireBlackArrow               = Spell(468037),
+  -- Buffs
+  WitheringFireBuff                     = Spell(466991),
+  WitheringFireBuildUp                  = Spell(468074),
+  WitheringFireReady                    = Spell(468075),
+  -- Debuffs
+  BlackArrowDebuff                      = Spell(468572),
 }
 
 Spell.Hunter.PackLeader = {
@@ -104,8 +118,21 @@ Spell.Hunter.PackLeader = {
 
 Spell.Hunter.Sentinel = {
   -- Talents
+  CrescentSteel                         = Spell(450385),
   LunarStorm                            = Spell(450385),
+  Sentinel                              = Spell(450369),
   SymphonicArsenal                      = Spell(450383),
+  SymphonicArsenalAbility               = Spell(451194),
+  -- Debuffs
+  CrescentSteelDebuff                   = Spell(451531),
+  SentinelDebuff                        = Spell(450387),
+  SentinelTick                          = Spell(450412),
+  -- Lunar Storm Spells
+  LunarStormAbility                     = Spell(1217459),
+  LunarStormPeriodicTrigger             = Spell(450978),
+  LunarStormPeriodicAbility             = Spell(450883),
+  LunarStormReadyBuff                   = Spell(451805),
+  LunarStormCDBuff                      = Spell(451803),
 }
 
 Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
@@ -158,6 +185,7 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.BeastMastery, Spell.Hun
 Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   -- Abilities
   SteadyShot                            = Spell(56641),
+  SteadyShotEnergize                    = Spell(77443),
   -- Talents
   AimedShot                             = Spell(19434),
   BurstingShot                          = Spell(186387),
@@ -169,6 +197,8 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   LoneWolf                              = Spell(155228),
   MultiShot                             = Spell(257620),
   RapidFire                             = Spell(257044),
+  RapidFireTick                         = Spell(257045),
+  RapidFireEnergize                     = Spell(263585),
   RapidFireBarrage                      = Spell(459800),
   RazorFragments                        = Spell(384790),
   Readiness                             = Spell(389865),
@@ -181,6 +211,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   TrickShots                            = Spell(257621),
   Trueshot                              = Spell(288613),
   Volley                                = Spell(260243),
+  VolleyDmg                             = Spell(260247),
   WindrunnersGuidance                   = Spell(378905),
   -- Buffs
   BombardmentBuff                       = Spell(386875),
@@ -188,7 +219,11 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   DoubleTapBuff                         = Spell(260402),
   InTheRhythmBuff                       = Spell(407405),
   LockandLoadBuff                       = Spell(194594),
+  MovingTargetBuff                      = Spell(474293),
+  OnTargetBuff                          = Spell(474257),
+  PrecisionDetonationBuff               = Spell(474199),
   PreciseShotsBuff                      = Spell(260242),
+  RazorFragmentsBleed                   = Spell(385638),
   RazorFragmentsBuff                    = Spell(388998),
   SalvoBuff                             = Spell(400456),
   SteadyFocusBuff                       = Spell(193534),
@@ -197,6 +232,8 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   TrueshotBuff                          = Spell(288613),
   VolleyBuff                            = Spell(260243),
   -- Debuffs
+  KillZoneDebuff                        = Spell(393480),
+  ShrapnelShotDebuff                    = Spell(474310),
   SpottersMarkDebuff                    = Spell(466872),
   -- Legendaries
   EagletalonsTrueFocusBuff              = Spell(336851),
