@@ -46,7 +46,9 @@ HR.GUISettings.APL.Monk = {
     }
   },
   Brewmaster = {
+    DampenHarmHP = 35,
     ExpelHarmHP = 70,
+    FortifyingBrewHP = 25,
     PotionType = {
       Selected = "Tempered",
     },
@@ -130,5 +132,7 @@ CreatePanelOption("Slider", CP_Windwalker, "APL.Monk.Windwalker.MotCCountThresho
 CreatePanelOption("Slider", CP_Windwalker, "APL.Monk.Windwalker.MotCMinTimeThreshold", {1, 20, 1}, "Mark of the Crane Min Time Threshold", "Allow the profile to cycle through targets to apply Mark of the Crane if the remaining time on any Mark of the Crane debuff is below this number of seconds. Default: 5.")
 
 -- Brewmaster
+CreatePanelOption("Slider", CP_Brewmaster, "APL.Monk.Brewmaster.DampenHarmHP", {1, 100, 1}, "Dampen Harm HP Threshold", "Set the HP threshold for when to suggest Dampen Harm.")
 CreatePanelOption("Slider", CP_Brewmaster, "APL.Monk.Brewmaster.ExpelHarmHP", {1, 100, 1}, "Expel Harm HP Threshold", "Set the HP threshold for when to suggest Expel Harm.")
+CreatePanelOption("Slider", CP_Brewmaster, "APL.Monk.Brewmaster.FortifyingBrewHP", {1, 100, 1}, "Fortifying Brew HP Threshold", "Set the HP threshold for when to suggest Fortifying Brew.")
 CreateARPanelOptions(CP_Brewmaster, "APL.Monk.Brewmaster")
