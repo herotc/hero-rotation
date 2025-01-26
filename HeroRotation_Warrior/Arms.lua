@@ -254,7 +254,7 @@ end
 local function ColossusExecute()
   -- sweeping_strikes,if=active_enemies=2
   if S.SweepingStrikes:IsCastable() and (EnemiesCount8y == 2) then
-    if Cast(S.SweepingStrikes) then return "sweeping_strikes colossus_execute 2"; end
+    if Cast(S.SweepingStrikes, Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes colossus_execute 2"; end
   end
   -- rend,if=dot.rend.remains<=gcd&!talent.bloodletting
   if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and not S.Bloodletting:IsAvailable()) then
@@ -333,7 +333,7 @@ end
 local function ColossusSweep()
   -- sweeping_strikes
   if CDsON() and S.SweepingStrikes:IsCastable() then
-    if Everyone.CastTargetIf(S.SweepingStrikes, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_sweep 2"; end
+    if Everyone.CastTargetIf(S.SweepingStrikes, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8), Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes colossus_sweep 2"; end
   end
   -- rend,if=dot.rend.remains<=gcd&buff.sweeping_strikes.up
   if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and Player:BuffUp(S.SweepingStrikesBuff)) then
@@ -440,7 +440,7 @@ local function ColossusAoE()
   end
   -- sweeping_strikes
   if CDsON() and S.SweepingStrikes:IsCastable() then
-    if Everyone.CastTargetIf(S.SweepingStrikes, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_aoe 10"; end
+    if Everyone.CastTargetIf(S.SweepingStrikes, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8), Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes colossus_aoe 10"; end
   end
   -- ravager
   if CDsON() and S.Ravager:IsCastable() then
@@ -590,7 +590,7 @@ end
 local function SlayerExecute()
   -- sweeping_strikes,if=active_enemies=2
   if S.SweepingStrikes:IsCastable() and (EnemiesCount8y == 2) then
-    if Cast(S.SweepingStrikes) then return "sweeping_strikes slayer_execute 2"; end
+    if Cast(S.SweepingStrikes, Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes slayer_execute 2"; end
   end
   -- rend,if=dot.rend.remains<=gcd&!talent.bloodletting
   if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and not S.Bloodletting:IsAvailable()) then
@@ -661,7 +661,7 @@ local function SlayerSweep()
   end
   -- sweeping_strikes
   if CDsON() and S.SweepingStrikes:IsCastable() then
-    if Cast(S.SweepingStrikes) then return "sweeping_strikes slayer_sweep 4"; end
+    if Cast(S.SweepingStrikes, Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes slayer_sweep 4"; end
   end
   -- rend,if=dot.rend.remains<=gcd
   if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD()) then
@@ -744,7 +744,7 @@ local function SlayerAoE()
   end
   -- sweeping_strikes
   if CDsON() and S.SweepingStrikes:IsCastable() then
-    if Cast(S.SweepingStrikes) then return "sweeping_strikes slayer_aoe 4"; end
+    if Cast(S.SweepingStrikes, Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes slayer_aoe 4"; end
   end
   -- thunderous_roar
   if CDsON() and S.ThunderousRoar:IsCastable() then
