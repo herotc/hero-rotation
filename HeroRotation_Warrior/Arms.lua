@@ -171,7 +171,7 @@ local function Precombat()
   -- Manually added: pre-pull
   if TargetInMeleeRange then
     if S.Skullsplitter:IsCastable() then
-      if Cast(S.Skullsplitter, nil, nil, not TargetInMeleeRange) then return "skullsplitter precombat 8"; end
+      if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not TargetInMeleeRange) then return "skullsplitter precombat 8"; end
     end
     if S.ColossusSmash:IsCastable() then
       if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash precombat 10"; end
@@ -227,7 +227,7 @@ local function ColossusST()
   end
   -- skullsplitter
   if S.Skullsplitter:IsCastable() then
-    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_st 20"; end
+    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8), Settings.Arms.GCDasOffGCD.Skullsplitter) then return "skullsplitter colossus_st 20"; end
   end
   -- overpower,if=charges=2
   if S.Overpower:IsCastable() and (S.Overpower:Charges() == 2) then
@@ -286,7 +286,7 @@ local function ColossusExecute()
   end
   -- skullsplitter,if=rage<85
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 85) then
-    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter colossus_execute 18"; end
+    if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter colossus_execute 18"; end
   end
   -- demolish,if=debuff.colossus_smash.up
   if S.Demolish:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
@@ -310,7 +310,7 @@ local function ColossusExecute()
   end
   -- skullsplitter
   if S.Skullsplitter:IsCastable() then
-    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_execute 30"; end
+    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8), Settings.Arms.GCDasOffGCD.Skullsplitter) then return "skullsplitter colossus_execute 30"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
@@ -369,7 +369,7 @@ local function ColossusSweep()
   end
   -- skullsplitter,if=buff.sweeping_strikes.up
   if S.Skullsplitter:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
-    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_sweep 20"; end
+    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8), Settings.Arms.GCDasOffGCD.Skullsplitter) then return "skullsplitter colossus_sweep 20"; end
   end
   -- overpower,if=buff.sweeping_strikes.up
   if S.Overpower:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
@@ -480,7 +480,7 @@ local function ColossusAoE()
   end
   -- skullsplitter,if=buff.sweeping_strikes.up
   if S.Skullsplitter:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
-    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_aoe 28"; end
+    if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter colossus_aoe 28"; end
   end
   -- execute,if=buff.sweeping_strikes.up
   if S.Execute:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff)) then
@@ -504,7 +504,7 @@ local function ColossusAoE()
   end
   -- skullsplitter
   if S.Skullsplitter:IsCastable() then
-    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes colossus_aoe 40"; end
+    if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter colossus_aoe 40"; end
   end
   -- execute
   if S.Execute:IsReady() then
@@ -563,7 +563,7 @@ local function SlayerST()
   end
   -- skullsplitter
   if S.Skullsplitter:IsCastable() then
-    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes slayer_st 22"; end
+    if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter slayer_st 22"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
@@ -626,7 +626,7 @@ local function SlayerExecute()
   end
   -- skullsplitter,if=rage<85
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 85) then
-    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes slayer_execute 22"; end
+    if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter slayer_execute 22"; end
   end
   -- mortal_strike,if=dot.rend.remains<2|(debuff.executioners_precision.stack=2&buff.lethal_blows.stack=2)
   if S.MortalStrike:IsReady() and (Target:DebuffRemains(S.RendDebuff) < 2 or (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Player:BuffStack(S.LethalBlowsBuff) == 2)) then
@@ -685,7 +685,7 @@ local function SlayerSweep()
   end
   -- skullsplitter,if=buff.sweeping_strikes.up
   if S.Skullsplitter:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
-    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes slayer_sweep 16"; end
+    if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter slayer_sweep 16"; end
   end
   -- execute,if=debuff.marked_for_execution.stack=3
   if S.Execute:IsReady() and (Target:DebuffStack(S.MarkedforExecutionDebuff) == 3) then
@@ -804,7 +804,7 @@ local function SlayerAoE()
   end
   -- skullsplitter,if=buff.sweeping_strikes.up
   if S.Skullsplitter:IsCastable() and (Player:BuffUp(S.SweepingStrikesBuff)) then
-    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes slayer_aoe 34"; end
+    if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter slayer_aoe 34"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
@@ -828,7 +828,7 @@ local function SlayerAoE()
   end
   -- skullsplitter
   if S.Skullsplitter:IsCastable() then
-    if Cast(S.Skullsplitter, nil, nil, not Target:IsInMeleeRange(8)) then return "sweeping_strikes slayer_aoe 46"; end
+    if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter slayer_aoe 46"; end
   end
   -- slam
   if S.Slam:IsReady() then
