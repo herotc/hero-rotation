@@ -277,10 +277,10 @@ local function APL()
     -- Manually added: VR/IV
     if Player:HealthPercentage() < Settings.Commons.VictoryRushHP then
       if S.VictoryRush:IsReady() then
-        if Cast(S.VictoryRush) then return "victory_rush defensive"; end
+        if Cast(S.VictoryRush, nil, Settings.CommonsDS.DisplayStyle.VictoryRush, not TargetInMeleeRange) then return "victory_rush defensive"; end
       end
       if S.ImpendingVictory:IsReady() then
-        if Cast(S.ImpendingVictory) then return "impending_victory defensive"; end
+        if Cast(S.ImpendingVictory, nil, Settings.CommonsDS.DisplayStyle.VictoryRush, not TargetInMeleeRange) then return "impending_victory defensive"; end
       end
     end
     -- Interrupt

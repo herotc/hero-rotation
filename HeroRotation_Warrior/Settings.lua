@@ -38,6 +38,7 @@ HR.GUISettings.APL.Warrior = {
       Demolish = "Suggested",
       HeroicLeap = "Suggested",
       OdynsFury = "Suggested",
+      VictoryRush = "Main Icon",
     },
   },
   CommonsOGCD = {
