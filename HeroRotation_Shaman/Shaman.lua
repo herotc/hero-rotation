@@ -226,6 +226,8 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   CLCrashLightningBuff                  = Spell(333964),
   DoomWindsBuff                         = Spell(384352),
   EarthenWeaponBuff                     = Spell(392375),
+  ElectrostaticWagerBuff                = Spell(1223410), -- TWW S2 4pc
+  ElectrostaticWagerDmg                 = Spell(1223332), -- TWW S2 4pc
   FeralSpiritBuff                       = Spell(333957),
   GatheringStormsBuff                   = Spell(198300),
   HailstormBuff                         = Spell(334196),
@@ -235,6 +237,7 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   MaelstromWeaponBuff                   = Spell(344179),
   StormsurgeBuff                        = Spell(201846),
   WindfuryTotemBuff                     = Spell(327942),
+  WinningStreakBuff                     = Spell(1218616), -- TWW S2 2pc
   -- Debuffs
   LashingFlamesDebuff                   = Spell(334168),
   -- Elemental Spirits Buffs
