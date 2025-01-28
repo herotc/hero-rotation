@@ -668,8 +668,8 @@ local function SanFishing()
   if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and not S.VampiricStrikeAction:IsLearned()) then
     if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd san_fishing 4"; end
   end
-  -- death_coil,if=buff.sudden_doom.react&talent.doomed_bidding
-  if S.DeathCoil:IsReady() and (Player:BuffUp(S.SuddenDoomBuff) and S.DoomedBidding:IsAvailable()) then
+  -- death_coil,if=buff.sudden_doom.react&talent.doomed_bidding|set_bonus.tww2_4pc&buff.essence_of_the_blood_queen.at_max_stacks&talent.frenzied_bloodthirst&!buff.vampiric_strike.react
+  if S.DeathCoil:IsReady() and (Player:BuffUp(S.SuddenDoomBuff) and S.DoomedBidding:IsAvailable() or Player:HasTier("TWW2", 4) and Player:BuffStack(S.EssenceoftheBloodQueenBuff) >= 5 and S.FrenziedBloodthirst:IsAvailable() and not S.VampiricStrikeAction:IsLearned()) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil san_fishing 6"; end
   end
   -- soul_reaper,if=target.health.pct<=35&fight_remains>5
@@ -695,8 +695,8 @@ local function SanST()
   if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and S.UnholyGround:IsAvailable() and S.DarkTransformation:CooldownRemains() < 5) then
     if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd san_st 1"; end
   end
-  -- death_coil,if=buff.sudden_doom.react&buff.gift_of_the_sanlayn.remains&(talent.doomed_bidding|talent.rotten_touch)|rune<3&!buff.runic_corruption.up
-  if S.DeathCoil:IsReady() and (Player:BuffUp(S.SuddenDoomBuff) and Player:BuffUp(S.GiftoftheSanlaynBuff) and (S.DoomedBidding:IsAvailable() or S.RottenTouch:IsAvailable()) or Player:Rune() < 3 and Player:BuffDown(S.RunicCorruptionBuff)) then
+  -- death_coil,if=buff.sudden_doom.react&buff.gift_of_the_sanlayn.remains&(talent.doomed_bidding|talent.rotten_touch)|rune<3&!buff.runic_corruption.up|set_bonus.tww2_4pc&runic_power>80|buff.gift_of_the_sanlayn.up&buff.essence_of_the_blood_queen.at_max_stacks&talent.frenzied_bloodthirst&set_bonus.tww2_4pc&buff.winning_streak.at_max_stacks&rune<=3&buff.essence_of_the_blood_queen.remains>3
+  if S.DeathCoil:IsReady() and (Player:BuffUp(S.SuddenDoomBuff) and Player:BuffUp(S.GiftoftheSanlaynBuff) and (S.DoomedBidding:IsAvailable() or S.RottenTouch:IsAvailable()) or Player:Rune() < 3 and Player:BuffDown(S.RunicCorruptionBuff) or Player:HasTier("TWW2", 4) and Player:RunicPower() > 80 or Player:BuffUp(S.GiftoftheSanlaynBuff) and Player:BuffStack(S.EssenceoftheBloodQueenBuff) >= 5 and S.FrenziedBloodthirst:IsAvailable() and Player:HasTier("TWW2", 4) and Player:BuffStack(S.WinningStreakBuff) >= 6 and Player:Rune() <= 3 and Player:BuffRemains(S.EssenceoftheBloodQueenBuff) > 3) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil san_st 2"; end
   end
   -- wound_spender,if=buff.gift_of_the_sanlayn.up&buff.vampiric_strike.react|talent.gift_of_the_sanlayn&buff.dark_transformation.up&buff.dark_transformation.remains<gcd
@@ -743,26 +743,30 @@ local function SanTrinkets()
     end
     -- use_item,slot=trinket1,if=variable.trinket_1_buffs&(buff.dark_transformation.up&buff.dark_transformation.remains<variable.trinket_1_duration*0.73&(variable.trinket_priority=1|trinket.2.cooldown.remains|!trinket.2.has_cooldown))|variable.trinket_1_duration>=fight_remains
     if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (VarTrinket1Buffs and (Pet:BuffUp(S.DarkTransformation) and Pet:BuffRemains(S.DarkTransformation) < VarTrinket1Duration * 0.73 and (VarTrinketPriority == 1 or Trinket2:CooldownDown() or not Trinket2:HasCooldown())) or VarTrinket1Duration >= BossFightRemains) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " san_trinkets 4"; end
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Trinket1 use_item for " .. Trinket1:Name() .. " san_trinkets 4"; end
     end
     -- use_item,slot=trinket2,if=variable.trinket_2_buffs&(buff.dark_transformation.up&buff.dark_transformation.remains<variable.trinket_2_duration*0.73&(variable.trinket_priority=2|trinket.1.cooldown.remains|!trinket.1.has_cooldown))|variable.trinket_2_duration>=fight_remains
     if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (VarTrinket2Buffs and (Pet:BuffUp(S.DarkTransformation) and Pet:BuffRemains(S.DarkTransformation) < VarTrinket2Duration * 0.73 and (VarTrinketPriority == 2 or Trinket1:CooldownDown() or not Trinket1:HasCooldown())) or VarTrinket2Duration >= BossFightRemains) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " san_trinkets 6"; end
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Trinket2 use_item for " .. Trinket2:Name() .. " san_trinkets 6"; end
     end
     -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.1.cast_time>0&!buff.gift_of_the_sanlayn.up|!trinket.1.cast_time>0)&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains|!trinket.2.has_cooldown|!talent.summon_gargoyle&!talent.army_of_the_dead&!talent.raise_abomination|!talent.summon_gargoyle&talent.army_of_the_dead&(!talent.raise_abomination&cooldown.army_of_the_dead.remains>20|talent.raise_abomination&cooldown.raise_abomination.remains>20)|!talent.summon_gargoyle&!talent.army_of_the_dead&!talent.raise_abomination&cooldown.dark_transformation.remains>20|talent.summon_gargoyle&cooldown.summon_gargoyle.remains>20&!pet.gargoyle.active)|fight_remains<15
     if Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs and (VarTrinket1CastTime > 0 and Player:BuffDown(S.GiftoftheSanlaynBuff) or VarTrinket1CastTime == 0) and (VarDamageTrinketPriority == 1 or Trinket2:CooldownDown() or not Trinket2:HasCooldown() or not S.SummonGargoyle:IsAvailable() and not S.ArmyoftheDead:IsAvailable() and not S.RaiseAbomination:IsAvailable() or not S.SummonGargoyle:IsAvailable() and S.ArmyoftheDead:IsAvailable() and (not S.RaiseAbomination:IsAvailable() and S.ArmyoftheDead:CooldownRemains() > 20 or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > 20) or not S.SummonGargoyle:IsAvailable() and not S.ArmyoftheDead:IsAvailable() and not S.RaiseAbomination:IsAvailable() and S.DarkTransformation:CooldownRemains() > 20 or S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:CooldownRemains() > 20 and not VarGargActive) or BossFightRemains < 15) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " san_trinkets 8"; end
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Trinket1 use_item for " .. Trinket1:Name() .. " san_trinkets 8"; end
     end
     -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.2.cast_time>0&!buff.gift_of_the_sanlayn.up|!trinket.2.cast_time>0)&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains|!trinket.1.has_cooldown|!talent.summon_gargoyle&!talent.army_of_the_dead&!talent.raise_abomination|!talent.summon_gargoyle&talent.army_of_the_dead&(!talent.raise_abomination&cooldown.army_of_the_dead.remains>20|talent.raise_abomination&cooldown.raise_abomination.remains>20)|!talent.summon_gargoyle&!talent.army_of_the_dead&!talent.raise_abomination&cooldown.dark_transformation.remains>20|talent.summon_gargoyle&cooldown.summon_gargoyle.remains>20&!pet.gargoyle.active)|fight_remains<15
     if Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs and (VarTrinket2CastTime > 0 and Player:BuffDown(S.GiftoftheSanlaynBuff) or VarTrinket2CastTime == 0) and (VarDamageTrinketPriority == 2 or Trinket1:CooldownDown() or not Trinket1:HasCooldown() or not S.SummonGargoyle:IsAvailable() and not S.ArmyoftheDead:IsAvailable() and not S.RaiseAbomination:IsAvailable() or not S.SummonGargoyle:IsAvailable() and S.ArmyoftheDead:IsAvailable() and (not S.RaiseAbomination:IsAvailable() and S.ArmyoftheDead:CooldownRemains() > 20 or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > 20) or not SummonGargoyle:IsAvailable() and not S.ArmyoftheDead:IsAvailable() and not S.RaiseAbomination:IsAvailable() and S.DarkTransformation:CooldownRemains() > 20 or S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:CooldownRemains() > 20 and not VarGargActive) or BossFightRemains < 15) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " san_trinkets 10"; end
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Trinket2 use_item for " .. Trinket2:Name() .. " san_trinkets 10"; end
     end
   end
-  -- Note: Generic use_items for non-trinkets.
   if Settings.Commons.Enabled.Items then
-    local ItemToUse, _, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
+    -- use_item,slot=main_hand,if=(!variable.trinket_1_buffs&!variable.trinket_2_buffs|trinket.1.cooldown.remains>20&!variable.trinket_2_buffs|trinket.2.cooldown.remains>20&!variable.trinket_1_buffs|trinket.1.cooldown.remains>20&trinket.2.cooldown.remains>20)&(buff.dark_transformation.up)&(!talent.raise_abomination&!talent.army_of_the_dead|!talent.raise_abomination&talent.army_of_the_dead&pet.army_ghoul.active|talent.raise_abomination&pet.abomination.active|(variable.trinket_1_buffs|variable.trinket_2_buffs|fight_remains<15))
+    local ItemToUse, _, ItemRange = Player:GetUseableItems(OnUseExcludes, 16, true)
+    if ItemToUse and ((not VarTrinket1Buffs and not VarTrinket2Buffs or Trinket1:CooldownRemains() > 20 and not VarTrinket2Buffs or Trinket2:CooldownRemains() > 20 and not VarTrinket1Buffs or Trinket1:CooldownRemains() > 20 and Trinket2:CooldownRemains() > 20) and (Pet:BuffUp(S.DarkTransformation)) and (not S.RaiseAbomination:IsAvailable() and not S.ArmyoftheDead:IsAvailable() or not S.RaiseAbomination:IsAvailable() and S.ArmyoftheDead:IsAvailable() and VarArmyGhoulActive or S.RaiseAbomination:IsAvailable() and VarAbomActive or (VarTrinket1Buffs or VarTrinket2Buffs or BossFightRemains < 15))) then
+      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Main Hand use_item for " .. ItemToUse:Name() .. " san_trinkets 12"; end
+    -- Note: Generic use_items for non-trinkets.
+    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
     if ItemToUse and ((not VarTrinket1Buffs or Trinket1:CooldownDown()) and (not VarTrinket2Buffs or Trinket2:CooldownDown())) then
-      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_item for " .. ItemToUse:Name() .. " san_trinkets 12"; end
+      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_item for " .. ItemToUse:Name() .. " san_trinkets 14"; end
     end
   end
 end
