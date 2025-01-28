@@ -33,6 +33,7 @@ HR.GUISettings.APL.Warrior = {
       Potions = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
+      BattleShout = "Suggested",
       ChampionsSpear = "Suggested",
       Charge = "Suggested",
       Demolish = "Suggested",
@@ -44,7 +45,6 @@ HR.GUISettings.APL.Warrior = {
   CommonsOGCD = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      BattleShout = true,
       Bladestorm = false,
       Ravager = false,
     },
