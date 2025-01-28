@@ -104,9 +104,6 @@ end
 
 --- ===== Rotation Functions =====
 local function Precombat()
-  -- flask
-  -- augmentation
-  -- food
   -- summon_pet
   -- Moved to Pet Management section in APL()
   -- use_item,name=imperfect_ascendancy_serum

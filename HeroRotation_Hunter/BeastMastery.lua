@@ -156,9 +156,6 @@ end
 
 --- ===== Rotation Functions =====
 local function Precombat()
-  -- flask
-  -- augmentation
-  -- food
   -- summon_pet
   -- Handled in APL()
   -- snapshot_stats

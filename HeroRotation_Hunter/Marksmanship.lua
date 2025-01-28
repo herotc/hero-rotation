@@ -141,9 +141,6 @@ end
 
 --- ===== Rotation Functions =====
 local function Precombat()
-  -- flask
-  -- augmentation
-  -- food
   -- summon_pet,if=!talent.lone_wolf
   -- Note: Moved pet management to APL()
   -- snapshot_stats
