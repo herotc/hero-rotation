@@ -287,7 +287,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   SicEmBuff                             = Spell(461409),
   TipoftheSpearBuff                     = Spell(260286),
   TipoftheSpearExpBuff                  = Spell(460852),
-  TipoftheSpearFotEBuff                 - Spell(471536),
+  TipoftheSpearFotEBuff                 = Spell(471536),
   WildfireArsenalBuff                   = Spell(1223701),
   -- Debuffs
   BloodseekerDebuff                     = Spell(259277),
