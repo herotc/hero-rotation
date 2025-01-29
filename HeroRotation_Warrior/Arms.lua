@@ -521,6 +521,10 @@ local function ColossusAoE()
 end
 
 local function SlayerST()
+  -- From below: Force StormBolt to the top while Bladestorm is up, as it's the only spell able to be cast.
+  if S.StormBolt:IsCastable() and (Player:BuffUp(S.Bladestorm)) then
+    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_st 1"; end
+  end
   -- rend,if=dot.rend.remains<=gcd
   if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD()) then
     if Cast(S.Rend, nil, nil, not TargetInMeleeRange) then return "rend slayer_st 2"; end
@@ -588,6 +592,10 @@ local function SlayerST()
 end
 
 local function SlayerExecute()
+  -- From below: Force StormBolt to the top while Bladestorm is up, as it's the only spell able to be cast.
+  if S.StormBolt:IsCastable() and (Player:BuffUp(S.Bladestorm)) then
+    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_execute 1"; end
+  end
   -- sweeping_strikes,if=active_enemies=2
   if S.SweepingStrikes:IsCastable() and (EnemiesCount8y == 2) then
     if Cast(S.SweepingStrikes, Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes slayer_execute 2"; end
@@ -655,6 +663,10 @@ local function SlayerExecute()
 end
 
 local function SlayerSweep()
+  -- From below: Force StormBolt to the top while Bladestorm is up, as it's the only spell able to be cast.
+  if S.StormBolt:IsCastable() and (Player:BuffUp(S.Bladestorm)) then
+    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_sweep 1"; end
+  end
   -- thunderous_roar
   if CDsON() and S.ThunderousRoar:IsCastable() then
     if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar slayer_sweep 2"; end
@@ -738,6 +750,10 @@ local function SlayerSweep()
 end
 
 local function SlayerAoE()
+  -- From below: Force StormBolt to the top while Bladestorm is up, as it's the only spell able to be cast.
+  if S.StormBolt:IsCastable() and (Player:BuffUp(S.Bladestorm)) then
+    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_aoe 1"; end
+  end
   -- thunder_clap,if=!dot.rend.remains
   if S.ThunderClap:IsReady() and (Target:DebuffDown(S.RendDebuff)) then
     if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap slayer_aoe 2"; end
