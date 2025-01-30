@@ -763,6 +763,7 @@ local function SanTrinkets()
     local ItemToUse, _, ItemRange = Player:GetUseableItems(OnUseExcludes, 16, true)
     if ItemToUse and ((not VarTrinket1Buffs and not VarTrinket2Buffs or Trinket1:CooldownRemains() > 20 and not VarTrinket2Buffs or Trinket2:CooldownRemains() > 20 and not VarTrinket1Buffs or Trinket1:CooldownRemains() > 20 and Trinket2:CooldownRemains() > 20) and (Pet:BuffUp(S.DarkTransformation)) and (not S.RaiseAbomination:IsAvailable() and not S.ArmyoftheDead:IsAvailable() or not S.RaiseAbomination:IsAvailable() and S.ArmyoftheDead:IsAvailable() and VarArmyGhoulActive or S.RaiseAbomination:IsAvailable() and VarAbomActive or (VarTrinket1Buffs or VarTrinket2Buffs or BossFightRemains < 15))) then
       if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Main Hand use_item for " .. ItemToUse:Name() .. " san_trinkets 12"; end
+    end
     -- Note: Generic use_items for non-trinkets.
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
     if ItemToUse and ((not VarTrinket1Buffs or Trinket1:CooldownDown()) and (not VarTrinket2Buffs or Trinket2:CooldownDown())) then
