@@ -283,6 +283,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   FlankingStrikeBuff                    = Spell(269752),
   FrenzyStrikesBuff                     = Spell(1217377),
   MongooseFuryBuff                      = Spell(259388),
+  RuthlessMarauderBuff                  = Spell(470070),
   SerpentStingDebuff                    = Spell(259491),
   SicEmBuff                             = Spell(461409),
   TipoftheSpearBuff                     = Spell(260286),
@@ -293,6 +294,8 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   BloodseekerDebuff                     = Spell(259277),
   MercilessBlowFlankingDebuff           = Spell(1217375),
   MercilessBlowButcheryDebuff           = Spell(459870),
+  SpearheadBleed                        = Spell(378957),
+  SpearheadDebuff                       = Spell(1221386),
 })
 Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Survival, Spell.Hunter.PackLeader)
 Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Survival, Spell.Hunter.Sentinel)
