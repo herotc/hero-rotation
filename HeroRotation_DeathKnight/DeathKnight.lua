@@ -142,9 +142,13 @@ Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
   DancingRuneWeaponBuff                 = Spell(81256),
   HemostasisBuff                        = Spell(273947),
   IceboundFortitudeBuff                 = Spell(48792),
-  LuckoftheDrawBuff                     = Spell(1218601), -- TWW S2 2P
   RuneTapBuff                           = Spell(194679),
   VampiricBloodBuff                     = Spell(55233),
+  -- TWW2 Effects
+  LuckoftheDrawBuff                     = Spell(1218601), -- TWW S2 2P
+  PiledriverBuff                        = Spell(457506), -- TWW S2 4P
+  UnbreakableBuff                       = Spell(457468), -- TWW S2 2P
+  UnbrokenBuff                          = Spell(457473), -- TWW S2 2P
 })
 Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Blood, Spell.DeathKnight.Deathbringer)
 Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Blood, Spell.DeathKnight.Sanlayn)
@@ -187,10 +191,11 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   PillarofFrostBuff                     = Spell(51271),
   RimeBuff                              = Spell(59052),
   UnleashedFrenzyBuff                   = Spell(376907),
-  WinningStreakBuff                     = Spell(1217897), -- TWW S2 2P
-  WinningStreakFSBuff                   = Spell(1217956), -- TWW S2 4P
   -- Debuffs
   RazoriceDebuff                        = Spell(51714)
+  -- TWW2 Effects
+  MurderousFrenzyBuff                   = Spell(1222698), -- TWW S2 4P
+  WinningStreakBuff                     = Spell(1217897), -- TWW S2 2P
 })
 Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Frost, Spell.DeathKnight.Deathbringer)
 Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Frost, Spell.DeathKnight.RideroftheApocalypse)
@@ -237,6 +242,7 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   FesteringWoundDebuff                  = Spell(194310),
   RottenTouchDebuff                     = Spell(390276),
   -- TWW2 Effects
+  UnholyCommanderBuff                   = Spell(456698), -- TWW S2 4P
   WinningStreakBuff                     = Spell(1216813), -- TWW S2 2P
 })
 Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Unholy, Spell.DeathKnight.RideroftheApocalypse)
