@@ -192,7 +192,7 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   RimeBuff                              = Spell(59052),
   UnleashedFrenzyBuff                   = Spell(376907),
   -- Debuffs
-  RazoriceDebuff                        = Spell(51714)
+  RazoriceDebuff                        = Spell(51714),
   -- TWW2 Effects
   MurderousFrenzyBuff                   = Spell(1222698), -- TWW S2 4P
   WinningStreakBuff                     = Spell(1217897), -- TWW S2 2P
