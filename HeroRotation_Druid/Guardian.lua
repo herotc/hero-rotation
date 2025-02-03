@@ -375,11 +375,11 @@ local function APL()
     -- auto_attack,if=!buff.prowl.up
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,slot=trinket1
-      if Trinket1:IsReady() then
+      if Trinket1 and Trinket1:IsReady() then
         if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item trinket1 ("..tostring(Trinket1:Name())..") main 4"; end
       end
       -- use_item,slot=trinket2
-      if Trinket2:IsReady() then
+      if Trinket2 and Trinket2:IsReady() then
         if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item trinket2 ("..tostring(Trinket2:Name())..") main 6"; end
       end
     end
