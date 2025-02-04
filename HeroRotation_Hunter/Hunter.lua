@@ -193,6 +193,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   ChimaeraShot                          = Spell(342049),
   DoubleTap                             = Spell(260402),
   InTheRhythm                           = Spell(407404),
+  KillShot                              = Spell(53351),
   LegacyoftheWindrunners                = Spell(406425),
   LoneWolf                              = Spell(155228),
   MultiShot                             = Spell(257620),
