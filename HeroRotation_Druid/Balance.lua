@@ -546,10 +546,10 @@ local function APL()
     end
 
     -- Check CA/Incarnation Buff Status
-    CAIncBuffUp = Player:BuffUp(S.CABuff) or Player:BuffUp(S.IncarnationBuff)
+    CAIncBuffUp = S.IncarnationTalent:IsAvailable() and (Player:BuffUp(S.IncarnationBuff1) or Player:BuffUp(S.IncarnationBuff2)) or (Player:BuffUp(S.CABuff1) or Player:BuffUp(S.CABuff2))
     CAIncBuffRemains = 0
     if CAIncBuffUp then
-      CAIncBuffRemains = S.IncarnationTalent:IsAvailable() and Player:BuffRemains(S.IncarnationBuff) or Player:BuffRemains(S.CABuff)
+      CAIncBuffRemains = S.IncarnationTalent:IsAvailable() and mathmax(Player:BuffRemains(S.IncarnationBuff1), Player:BuffRemains(S.IncarnationBuff2)) or mathmax(Player:BuffRemains(S.CABuff1), Player:BuffRemains(S.CABuff2))
     end
 
     -- We use Wrath to check range for a lot of spells, so let's make a variable for it.
