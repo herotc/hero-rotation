@@ -104,11 +104,11 @@ Spell.Hunter.DarkRanger = {
 Spell.Hunter.PackLeader = {
   -- Talents
   CulltheHerd                           = Spell(445717),
-  FuriousAssault                        = Spell(445699),
+  FuriousAssault                        = Spell(445699), -- Removed in 11.1
   HowlofthePack                         = Spell(445707),
-  ViciousHunt                           = Spell(445404),
+  ViciousHunt                           = Spell(445404), -- Removed in 11.1
   -- Buffs
-  FuriousAssaultBuff                    = Spell(448814),
+  FuriousAssaultBuff                    = Spell(448814), -- Removed in 11.1
   HowlofthePackBuff                     = Spell(462515),
   PackCoordinationBuff                  = Spell(445695),
   ScatteredPreyBuff                     = Spell(461866),
@@ -154,6 +154,8 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   CalloftheWild                         = Spell(359844),
   CobraShot                             = Spell(193455),
   DireBeast                             = Spell(120679),
+  DireCleave                            = Spell(1217524),
+  DireFrenzy                            = Spell(385810),
   HuntmastersCall                       = Spell(459730),
   KillCleave                            = Spell(378207),
   KillCommand                           = Spell(34026),
@@ -161,10 +163,13 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   KillerCobra                           = Spell(199532),
   MultiShot                             = Spell(2643),
   OneWithThePack                        = Spell(199528),
+  PoisonedBarbs                         = Spell(1217535),
   Savagery                              = Spell(424557),
   ScentofBlood                          = Spell(193532),
+  SolitaryCompanion                     = Spell(474746),
   Stomp                                 = Spell(199530),
-  VenomsBite                            = Spell(459565),
+  ThunderingHooves                      = Spell(459693),
+  VenomsBite                            = Spell(459565), -- Removed in 11.1
   WildCall                              = Spell(185789),
   WildInstincts                         = Spell(378442),
   -- Buffs
@@ -176,8 +181,11 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   CalloftheWildBuff                     = Spell(359844),
   FrenzyPetBuff                         = Spell(272790, "Pet"),
   HuntersPreyBuff                       = Spell(378215),
+  SolitaryCompanionBuff                 = Spell(474751),
   -- Debuffs
   BarbedShotDebuff                      = Spell(217200),
+  LacerationDebuff                      = Spell(459555), -- "laceration_driver"
+  LacerationBleedDebuff                 = Spell(459560),
 })
 Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.BeastMastery, Spell.Hunter.DarkRanger)
 Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.BeastMastery, Spell.Hunter.PackLeader)
@@ -197,6 +205,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   LegacyoftheWindrunners                = Spell(406425),
   LoneWolf                              = Spell(155228),
   MultiShot                             = Spell(257620),
+  OhnahranWinds                         = Spell(1215021),
   RapidFire                             = Spell(257044),
   RapidFireTick                         = Spell(257045),
   RapidFireEnergize                     = Spell(263585),
@@ -234,6 +243,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   VolleyBuff                            = Spell(260243),
   -- Debuffs
   KillZoneDebuff                        = Spell(393480),
+  OhnahranWindsDebuff                   = Spell(1215057),
   ShrapnelShotDebuff                    = Spell(474310),
   SpottersMarkDebuff                    = Spell(466872),
   -- Legendaries
