@@ -297,11 +297,6 @@ local function AoE()
   if S.Obliterate:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and S.CleavingStrikes:IsAvailable() and Player:BuffUp(S.DeathAndDecayBuff)) then
     if Everyone.CastTargetIf(S.Obliterate, EnemiesMelee, "max", EvaluateTargetIfFilterObliterate, nil, not Target:IsInMeleeRange(5)) then return "obliterate aoe 2"; end
   end
-  -- howling_blast,target_if=!dot.frost_fever.ticking
-  -- Note: Instead of iterating targets, checking AuraActiveCount.
-  if S.HowlingBlast:IsReady() and (S.FrostFeverDebuff:AuraActiveCount() < EnemiesMeleeCount) then
-    if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast aoe 4"; end
-  end
   -- frost_strike,target_if=max:((talent.shattering_blade&debuff.razorice.stack=5)*5)+(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=!variable.pooling_runic_power&debuff.razorice.stack=5&talent.shattering_blade&(talent.shattered_frost|active_enemies<4)
   if S.FrostStrike:IsReady() and (not VarPoolingRP and S.ShatteringBlade:IsAvailable() and (S.ShatteredFrost:IsAvailable() or EnemiesMeleeCount < 4)) then
     if Everyone.CastTargetIf(S.FrostStrike, EnemiesMelee, "max", EvaluateTargetIfFilterFrostStrike, EvaluateTargetIfFrostStrikeAoE, not Target:IsSpellInRange(S.FrostStrike), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike aoe 6"; end
@@ -739,11 +734,10 @@ local function Trinkets()
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " trinkets 14"; end
     end
   end
-  -- use_item,use_off_gcd=1,slot=main_hand,if=!equipped.fyralath_the_dreamrender&(!variable.trinket_1_buffs|trinket.1.cooldown.remains)&(!variable.trinket_2_buffs|trinket.2.cooldown.remains)
-  -- Note: Removed from APL, but leaving in profile in case of MH on-use. Removing Fyralath check, though.
+  -- use_item,slot=main_hand,if=buff.pillar_of_frost.up|(variable.trinket_1_buffs&variable.trinket_2_buffs&(trinket.1.cooldown.remains<cooldown.pillar_of_frost.remains|trinket.2.cooldown.remains<cooldown.pillar_of_frost.remains)&cooldown.pillar_of_frost.remains>20)|fight_remains<15
   if Settings.Commons.Enabled.Items then
     local ItemToUse, _, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
-    if ItemToUse and ((not VarTrinket1Buffs or Trinket1:CooldownDown()) and (not VarTrinket2Buffs or Trinket2:CooldownDown())) then
+    if ItemToUse and (Player:BuffUp(S.PillarofFrostBuff) or (VarTrinket1Buffs and VarTrinket2Buffs and (Trinket1:CooldownRemains() < S.PillarofFrost:CooldownRemains() or Trinket2:CooldownRemains() < S.PillarofFrost:CooldownRemains()) and S.PillarofFrost:CooldownRemains() > 20) or BossFightRemains < 15) then
       if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_item for " .. ItemToUse:Name() .. " trinkets 16"; end
     end
   end
