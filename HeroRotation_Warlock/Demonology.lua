@@ -405,11 +405,11 @@ local function Items()
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 4"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket1,if=!variable.trinket_1_buffs&!variable.trinket_1_manual&((variable.damage_trinket_priority=1|trinket.2.cooldown.remains)&(trinket.1.cast_time>0&!pet.demonic_tyrant.active|!trinket.1.cast_time>0)|(time<20&variable.trinket_2_buffs)|cooldown.summon_demonic_tyrant.remains_expected>20)
-    if Trinket1 and Trinket1:IsReady() and (not VarTrinket1Buffs and not VarTrinket1Manual and ((VarDmgTrinketPriority == 1 or Trinket2:CooldownDown()) and (VarTrinket1CastTime > 0 and not DemonicTyrantActive() or not (VarTrinket1CastTime > 0)) or (HL.CombatTime() < 20 and VarTrinket2Buffs) or S.SummonDemonicTyrant:CooldownRemains() > 20)) then
+    if Trinket1 and Trinket1:IsReady() and (not VarTrinket1Buffs and not VarTrinket1Manual and ((VarDamageTrinketPriority == 1 or Trinket2:CooldownDown()) and (VarTrinket1CastTime > 0 and not DemonicTyrantActive() or not (VarTrinket1CastTime > 0)) or (HL.CombatTime() < 20 and VarTrinket2Buffs) or S.SummonDemonicTyrant:CooldownRemains() > 20)) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 6"; end
     end
     -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&((variable.damage_trinket_priority=2|trinket.1.cooldown.remains)&(trinket.2.cast_time>0&!pet.demonic_tyrant.active|!trinket.2.cast_time>0)|(time<20&variable.trinket_1_buffs)|cooldown.summon_demonic_tyrant.remains_expected>20)
-    if Trinket2 and Trinket2:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and ((VarDmgTrinketPriority == 2 or Trinket1:CooldownDown()) and (VarTrinket2CastTime > 0 and not DemonicTyrantActive() or not (VarTrinket2CastTime > 0)) or (HL.CombatTime() < 20 and VarTrinket1Buffs) or S.SummonDemonicTyrant:CooldownRemains() > 20)) then
+    if Trinket2 and Trinket2:IsReady() and (not VarTrinket2Buffs and not VarTrinket2Manual and ((VarDamageTrinketPriority == 2 or Trinket1:CooldownDown()) and (VarTrinket2CastTime > 0 and not DemonicTyrantActive() or not (VarTrinket2CastTime > 0)) or (HL.CombatTime() < 20 and VarTrinket1Buffs) or S.SummonDemonicTyrant:CooldownRemains() > 20)) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 8"; end
     end
     -- use_item,use_off_gcd=1,name=spymasters_web,if=pet.demonic_tyrant.active&fight_remains<=80&buff.spymasters_report.stack>=30&(!variable.trinket_1_buffs&trinket.2.is.spymasters_web|!variable.trinket_2_buffs&trinket.1.is.spymasters_web)|fight_remains<=20&(trinket.1.cooldown.remains&trinket.2.is.spymasters_web|trinket.2.cooldown.remains&trinket.1.is.spymasters_web|!variable.trinket_1_buffs|!variable.trinket_2_buffs)
@@ -434,11 +434,11 @@ local function Items()
       if Cast(I.MirrorofFracturedTomorrows, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "mirror_of_fractured_tomorrows items 16"; end
     end
     -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(variable.damage_trinket_priority=1|trinket.2.cooldown.remains)
-    if Trinket1 and Trinket1:IsReady() and (not VarTrinket1Buffs and (VarDmgTrinketPriority == 1 or Trinket2:CooldownDown())) then
+    if Trinket1 and Trinket1:IsReady() and (not VarTrinket1Buffs and (VarDamageTrinketPriority == 1 or Trinket2:CooldownDown())) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") items 18"; end
     end
     -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(variable.damage_trinket_priority=2|trinket.1.cooldown.remains)
-    if Trinket2 and Trinket2:IsReady() and (not VarTrinket2Buffs and (VarDmgTrinketPriority == 2 or Trinket1:CooldownDown())) then
+    if Trinket2 and Trinket2:IsReady() and (not VarTrinket2Buffs and (VarDamageTrinketPriority == 2 or Trinket1:CooldownDown())) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 20"; end
     end
   end
