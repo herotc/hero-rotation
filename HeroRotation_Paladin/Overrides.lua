@@ -67,7 +67,7 @@ ProtPalIsAvail = HL.AddCoreOverride("Spell.IsAvailable",
 local ProtPalIsCastable
 ProtPalIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-    local BaseCheck = ProtPalIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, OffSet)
+    local BaseCheck = ProtPalIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellProt.RiteofAdjuration then
       return BaseCheck and Player:BuffDown(SpellProt.RiteofAdjurationBuff)
     elseif self == SpellProt.RiteofSanctification then
