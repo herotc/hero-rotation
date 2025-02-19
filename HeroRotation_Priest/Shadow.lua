@@ -559,7 +559,7 @@ local function Main()
   end
   -- shadow_word_death,target_if=max:(target.health.pct<=20)*100+dot.devouring_plague.ticking,if=priest.force_devour_matter&talent.devour_matter
   if S.ShadowWordDeath:IsReady() and (Settings.Shadow.ForceDevourMatter and S.DevourMatter:IsAvailable()) then
-    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusHP, EvaluateTargetIfSWDM, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 8"; end
+    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusHP, EvaluateTargetIfSWD, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 8"; end
   end
   -- void_blast,target_if=max:(dot.devouring_plague.remains*1000+target.time_to_die),if=(dot.devouring_plague.remains>=execute_time|buff.entropic_rift.remains<=gcd.max|action.void_torrent.channeling&talent.void_empowerment)&(insanity.deficit>=16|cooldown.mind_blast.full_recharge_time<=gcd.max|buff.entropic_rift.remains<=gcd.max)&(!talent.mind_devourer|!buff.mind_devourer.up|buff.entropic_rift.remains<=gcd.max)
   if S.VoidBlastAbility:IsReady() and ((Player:InsanityDeficit() >= 16 or S.MindBlast:FullRechargeTime() <= GCDMax or EntropicRiftRemains <= GCDMax) and (not S.MindDevourer:IsAvailable() or Player:BuffDown(S.MindDevourerBuff) or EntropicRiftRemains <= GCDMax)) then
