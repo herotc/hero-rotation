@@ -86,11 +86,12 @@ function DeathKnight.GhoulTable:AbomActive()
 end
 
 function DeathKnight.GhoulTable:ApocMagusRemains()
+  if DeathKnight.GhoulTable.ApocMagusExpiration == 0 then return 0 end
   return DeathKnight.GhoulTable.ApocMagusExpiration - GetTime()
 end
 
 function DeathKnight.GhoulTable:ApocMagusActive()
-  return DeathKnight.GhoulTable.ApocMagusRemains() > 0
+  return DeathKnight.GhoulTable:ApocMagusRemains() > 0
 end
 
 function DeathKnight.GhoulTable:ArmyMagusRemains()
