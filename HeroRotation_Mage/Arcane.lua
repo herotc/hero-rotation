@@ -26,7 +26,6 @@ local bool          = HR.Commons.Everyone.bool
 local mathmax       = math.max
 -- WoW API
 local Delay         = C_Timer.After
-local GetItemCount  = GetItemCount
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
