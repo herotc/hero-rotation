@@ -366,15 +366,15 @@ function HR.CmdHandler(Message)
     end
   elseif Argument1 == "scale" then
     if Argument2 and Argument3 then
-      Argument3 = tonumber(Argument3)
-      if Argument3 and type(Argument3) == "number" and Argument3 > 0 and Argument3 <= 10 then
+      local ScaleValue = tonumber(Argument3)
+      if ScaleValue and ScaleValue > 0 and ScaleValue <= 10 then
         if Argument2 == "ui" then
-          HR.MainFrame:ResizeUI(Argument3)
+          HR.MainFrame:ResizeUI(ScaleValue)
         elseif Argument2 == "buttons" then
-          HR.MainFrame:ResizeButtons(Argument3)
+          HR.MainFrame:ResizeButtons(ScaleValue)
         elseif Argument2 == "all" then
-          HR.MainFrame:ResizeUI(Argument3)
-          HR.MainFrame:ResizeButtons(Argument3)
+          HR.MainFrame:ResizeUI(ScaleValue)
+          HR.MainFrame:ResizeButtons(ScaleValue)
         else
           HR.Print("Invalid |cff88ff88[Type]|r for Scale.")
           HR.Print("Should be |cff8888ff/hr scale|r |cff88ff88[Type]|r |cffff8888[Size]|r.")
