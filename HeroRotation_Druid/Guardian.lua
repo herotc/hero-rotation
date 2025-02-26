@@ -50,7 +50,7 @@ local Settings = {
 }
 
 --- ===== Rotation Variables =====
-local VarIFBuild = S.ThornsofIron:IsAvailable() and S.ReinforcedFur:IsAvailable()
+local VarIFBuild = S.ThornsofIron:IsAvailable() and S.UrsocsEndurance:IsAvailable()
 local VarRipWeaving = S.PrimalFury:IsAvailable() and S.FluidForm:IsAvailable() and S.WildpowerSurge:IsAvailable()
 local MeleeRange, AoERange
 local IsInMeleeRange, IsInAoERange
@@ -118,8 +118,7 @@ local function Precombat()
   if S.MarkoftheWild:IsCastable() and Everyone.GroupBuffMissing(S.MarkoftheWildBuff) then
     if Cast(S.MarkoftheWild, Settings.CommonsOGCD.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat 2"; end
   end
-  -- variable,name=If_build,value=1,value_else=0,if=talent.thorns_of_iron.enabled&talent.reinforced_fur.enabled
-  -- variable,name=ripweaving,value=1,value_else=0,if=talent.primal_fury.enabled&talent.fluid_form.enabled&talent.wildpower_surge.enabled
+  -- variable,name=If_build,value=1,value_else=0,if=talent.thorns_of_iron.enabled&talent.ursocs_endurance.enabled
   -- Note: Handled in variable declarations and SPELLS_CHANGED/LEARNED_SPELL_IN_TAB.
   -- heart_of_the_Wild,if=talent.heart_of_the_wild.enabled&!talent.rip.enabled
   -- bear_form
@@ -221,6 +220,10 @@ local function Bear()
   if S.Raze:IsReady() and ((Player:BuffStack(S.ToothandClawBuff) > 1 or Player:BuffRemains(S.ToothandClawBuff) < 1 + Player:GCD()) and VarIFBuild and Enemies8yCount > 1) then
     if Cast(S.Raze, nil, nil, not IsInMeleeRange) then return "raze bear 24"; end
   end
+  -- raze,if=variable.If_build=0&(buff.tooth_and_claw.stack>1|buff.tooth_and_claw.up&buff.tooth_and_claw.remains<1+gcd|buff.vicious_cycle_maul.stack=3)
+  if S.Raze:IsReady() and (not VarIFBuild and (Player:BuffStack(S.ToothandClawBuff) > 1 or Player:BuffUp(S.ToothandClawBuff) and Player:BuffRemains(S.ToothandClawBuff) < 1 + Player:GCD() or Player:BuffStack(S.ViciousCycleMaulBuff) == 3)) then
+    if Cast(S.Raze, nil, nil, not IsInMeleeRange) then return "raze bear 25"; end
+  end
   -- thrash_bear,if=active_enemies>=5&talent.lunar_calling.enabled
   if S.ThrashBear:IsCastable() and (Enemies8yCount >= 5 and S.LunarCalling:IsAvailable()) then
     if Cast(S.ThrashBear, nil, nil, not IsInAoERange) then return "thrash bear 26"; end
@@ -245,16 +248,16 @@ local function Bear()
   if S.Rip:IsReady() and ((Player:BuffUp(S.CatForm) and Player:BuffStack(S.FelinePotentialBuff) == 6 and Enemies8yCount < 3 and (Player:BuffDown(S.Incarnation) or Player:BuffDown(S.Berserk))) or (Player:BuffUp(S.CatForm) and Player:BuffStack(S.FelinePotentialBuff) == 6 and Enemies8yCount < 3 and (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) and Target:DebuffRefreshable(S.RipDebuff))) then
     if Cast(S.Rip, nil, nil, not IsInMeleeRange) then return "rip bear 36"; end
   end
-  -- raze,if=variable.If_build=1&buff.vicious_cycle_maul.stack=3&active_enemies>1&!talent.ravage.enabled
-  if S.Raze:IsReady() and (VarIFBuild and Player:BuffStack(S.ViciousCycleMaulBuff) == 3 and Enemies8yCount > 1 and not S.Ravage:IsAvailable()) then
+  -- raze,if=variable.If_build=1&buff.vicious_cycle_maul.stack=3&!talent.ravage.enabled
+  if S.Raze:IsReady() and (VarIFBuild and Player:BuffStack(S.ViciousCycleMaulBuff) == 3 and not S.Ravage:IsAvailable()) then
     if Cast(S.Raze, nil, nil, not IsInMeleeRange) then return "raze bear 38"; end
   end
   -- mangle,if=buff.gore.up&active_enemies<11|buff.incarnation_guardian_of_ursoc.up&buff.feline_potential_counter.stack<6&talent.wildpower_surge.enabled
   if S.Mangle:IsCastable() and (Player:BuffUp(S.GoreBuff) and Enemies8yCount < 11 or Player:BuffUp(S.Incarnation) and Player:BuffStack(S.FelinePotentialBuff) < 6 and S.WildpowerSurge:IsAvailable()) then
     if Cast(S.Mangle, nil, nil, not IsInMeleeRange) then return "mangle bear 40"; end
   end
-  -- raze,if=variable.If_build=0&(active_enemies>1|(buff.tooth_and_claw.up)&active_enemies>1|buff.vicious_cycle_maul.stack=3&active_enemies>1)
-  if S.Raze:IsReady() and (not VarIFBuild and (Enemies8yCount > 1 or Player:BuffUp(S.ToothandClawBuff) and Enemies8yCount > 1 or Player:BuffStack(S.ViciousCycleMaulBuff) == 3 and Enemies8yCount > 1)) then
+  -- raze,if=variable.If_build=0
+  if S.Raze:IsReady() and (not VarIFBuild) then
     if Cast(S.Raze, nil, nil, not IsInMeleeRange) then return "raze bear 42"; end
   end
   -- shred,if=cooldown.rage_of_the_sleeper.remains<=52&buff.feline_potential_counter.stack=6&!buff.cat_form.up&!dot.rake.refreshable&active_enemies<3&talent.fluid_form.enabled
@@ -269,8 +272,8 @@ local function Bear()
   if S.Mangle:IsCastable() and (Player:BuffUp(S.CatForm) and S.FluidForm:IsAvailable()) then
     if Cast(S.Mangle, nil, nil, not IsInMeleeRange) then return "mangle bear 48"; end
   end
-  -- maul,if=variable.If_build=1&(((buff.tooth_and_claw.stack>1|buff.tooth_and_claw.remains<1+gcd)&active_enemies<=5&!talent.raze.enabled)|((buff.tooth_and_claw.stack>1|buff.tooth_and_claw.remains<1+gcd)&active_enemies=1&talent.raze.enabled)|((buff.tooth_and_claw.stack>1|buff.tooth_and_claw.remains<1+gcd)&active_enemies<=5&!talent.raze.enabled))
-  if S.Maul:IsReady() and UseMaul and (VarIFBuild and (((Player:BuffStack(S.ToothandClawBuff) > 1 or Player:BuffRemains(S.ToothandClawBuff) < 1 + Player:GCD()) and Enemies8yCount <= 5 and not S.Raze:IsAvailable()) or ((Player:BuffStack(S.ToothandClawBuff) > 1 or Player:BuffRemains(S.ToothandClawBuff) < 1 + Player:GCD()) and Enemies8yCount == 1 and S.Raze:IsAvailable()) or ((Player:BuffStack(S.ToothandClawBuff) > 1 or Player:BuffRemains(S.ToothandClawBuff) < 1 + Player:GCD()) and Enemies8yCount <= 5 and not S.Raze:IsAvailable()))) then
+  -- maul,if=variable.If_build=1&(((buff.tooth_and_claw.stack>1|buff.tooth_and_claw.up&buff.tooth_and_claw.remains<1+gcd)&active_enemies<=5&!talent.raze.enabled)|((buff.tooth_and_claw.stack>1|buff.tooth_and_claw.up&buff.tooth_and_claw.remains<1+gcd)&active_enemies=1&talent.raze.enabled)|((buff.tooth_and_claw.stack>1|buff.tooth_and_claw.up&buff.tooth_and_claw.remains<1+gcd)&active_enemies<=5&!talent.raze.enabled))
+  if S.Maul:IsReady() and UseMaul and (VarIFBuild and (((Player:BuffStack(S.ToothandClawBuff) > 1 or Player:BuffUp(S.ToothandClawBuff) and Player:BuffRemains(S.ToothandClawBuff) < 1 + Player:GCD()) and Enemies8yCount <= 5 and not S.Raze:IsAvailable()) or ((Player:BuffStack(S.ToothandClawBuff) > 1 or Player:BuffUp(S.ToothandClawBuff) and Player:BuffRemains(S.ToothandClawBuff) < 1 + Player:GCD()) and Enemies8yCount == 1 and S.Raze:IsAvailable()) or ((Player:BuffStack(S.ToothandClawBuff) > 1 or Player:BuffUp(S.ToothandClawBuff) and Player:BuffRemains(S.ToothandClawBuff) < 1 + Player:GCD()) and Enemies8yCount <= 5 and not S.Raze:IsAvailable()))) then
     if Cast(S.Maul, nil, nil, not IsInMeleeRange) then return "maul bear 50"; end
   end
   -- maul,if=variable.If_build=0&((buff.tooth_and_claw.up&active_enemies<=5&!talent.raze.enabled)|(buff.tooth_and_claw.up&active_enemies=1&talent.raze.enabled))
@@ -305,20 +308,20 @@ local function Bear()
   if S.Moonfire:IsCastable() and (Player:BuffUp(S.GalacticGuardianBuff) and Player:BuffUp(S.BearForm) and S.BoundlessMoonlight:IsAvailable()) then
     if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 66"; end
   end
-  -- rake,if=cooldown.rage_of_the_sleeper.remains<=52&rage<40&active_enemies<3&!talent.lunar_insight.enabled&talent.fluid_form.enabled&energy>70&refreshable&variable.ripweaving=1
-  if S.Rake:IsReady() and (S.RageoftheSleeper:CooldownRemains() <= 52 and Player:Rage() < 40 and Enemies8yCount < 3 and not S.LunarInsight:IsAvailable() and S.FluidForm:IsAvailable() and Player:Energy() > 70 and Target:DebuffRefreshable(S.RakeDebuff) and VarRipWeaving) then
+  -- rake,if=cooldown.rage_of_the_sleeper.remains<=52&rage<40&active_enemies<3&!talent.lunar_insight.enabled&talent.fluid_form.enabled&energy>70&refreshable
+  if S.Rake:IsReady() and (S.RageoftheSleeper:CooldownRemains() <= 52 and Player:Rage() < 40 and Enemies8yCount < 3 and not S.LunarInsight:IsAvailable() and S.FluidForm:IsAvailable() and Player:Energy() > 70 and Target:DebuffRefreshable(S.RakeDebuff)) then
     if Cast(S.Rake, nil, nil, not IsInMeleeRange) then return "rake bear 68"; end
   end
-  -- shred,if=cooldown.rage_of_the_sleeper.remains<=52&rage<40&active_enemies<3&!talent.lunar_insight.enabled&talent.fluid_form.enabled&energy>70&!buff.rage_of_the_sleeper.up&variable.ripweaving=1
-  if S.Shred:IsReady() and (S.RageoftheSleeper:CooldownRemains() <= 52 and Player:Rage() < 40 and Enemies8yCount < 3 and not S.LunarInsight:IsAvailable() and S.FluidForm:IsAvailable() and Player:Energy() > 70 and Player:BuffDown(S.RageoftheSleeper) and VarRipWeaving) then
+  -- shred,if=cooldown.rage_of_the_sleeper.remains<=52&rage<40&active_enemies<3&!talent.lunar_insight.enabled&talent.fluid_form.enabled&energy>70&!buff.rage_of_the_sleeper.up
+  if S.Shred:IsReady() and (S.RageoftheSleeper:CooldownRemains() <= 52 and Player:Rage() < 40 and Enemies8yCount < 3 and not S.LunarInsight:IsAvailable() and S.FluidForm:IsAvailable() and Player:Energy() > 70 and Player:BuffDown(S.RageoftheSleeper)) then
     if Cast(S.Shred, nil, nil, not IsInMeleeRange) then return "shred bear 70"; end
   end
-  -- rip,if=buff.cat_form.up&!dot.rip.ticking&active_enemies<3&variable.ripweaving=1
-  if S.Rip:IsReady() and (Player:BuffUp(S.CatForm) and Target:DebuffDown(S.RipDebuff) and Enemies8yCount < 3 and VarRipWeaving) then
+  -- rip,if=buff.cat_form.up&!dot.rip.ticking&active_enemies<3
+  if S.Rip:IsReady() and (Player:BuffUp(S.CatForm) and Target:DebuffDown(S.RipDebuff) and Enemies8yCount < 3) then
     if Cast(S.Rip, nil, nil, not IsInMeleeRange) then return "rip bear 72"; end
   end
-  -- ferocious_bite,if=dot.rip.ticking&combo_points>4&active_enemies<3&variable.ripweaving=1
-  if S.FerociousBite:IsReady() and (Target:DebuffUp(S.RipDebuff) and Player:ComboPoints() > 4 and Enemies8yCount < 3 and VarRipWeaving) then
+  -- ferocious_bite,if=dot.rip.ticking&combo_points>4&active_enemies<3
+  if S.FerociousBite:IsReady() and (Target:DebuffUp(S.RipDebuff) and Player:ComboPoints() > 4 and Enemies8yCount < 3) then
     if Cast(S.FerociousBite, nil, nil, not IsInMeleeRange) then return "ferocious_bite bear 74"; end
   end
   -- starsurge,if=talent.starsurge.enabled&rage<20
@@ -373,21 +376,22 @@ local function APL()
       if Cast(S.WildCharge, Settings.CommonsOGCD.GCDasOffGCD.WildCharge, nil, not Target:IsInRange(S.WildCharge.MaximumRange)) then return "wild_charge main 2"; end
     end
     -- auto_attack,if=!buff.prowl.up
-    if Settings.Commons.Enabled.Trinkets then
-      -- use_item,slot=trinket1
-      if Trinket1 and Trinket1:IsReady() then
-        if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item trinket1 ("..tostring(Trinket1:Name())..") main 4"; end
-      end
-      -- use_item,slot=trinket2
-      if Trinket2 and Trinket2:IsReady() then
-        if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item trinket2 ("..tostring(Trinket2:Name())..") main 6"; end
-      end
+    -- use_item,name=bestinslots,if=buff.incarnation_guardian_of_ursoc.up|buff.berserk_bear.up
+    if Settings.Commons.Enabled.Items and I.BestinSlots:IsReady() and (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) then
+      if Cast(I.BestinSlots, nil, Settings.CommonsDS.DisplayStyle.Items) then return "use_item bestinslots main 4"; end
     end
-    -- Manually added: use_items for non-trinkets
-    if Settings.Commons.Enabled.Items then
-      local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
-      if ItemToUse then
-        if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " main 8"; end
+    -- use_item,name=tome_of_lights_devotion,if=buff.inner_resilience.up
+    if Settings.Commons.Enabled.Trinkets and I.TomeofLightsDevotion:IsReady() and (Player:BuffUp(S.InnerResilienceBuff)) then
+      if Cast(I.TomeofLightsDevotion, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "use_item tome_of_lights_devotion main 6"; end
+    end
+    -- use_items
+    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+    if ItemToUse then
+      local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+      local IsTrinket = ItemSlot == 13 or ItemSlot == 14
+      if not IsTrinket then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
+      if (IsTrinket and Settings.Commons.Enabled.Trinkets) or (not IsTrinket and Settings.Commons.Enabled.Items) then
+        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " main 8"; end
       end
     end
     -- potion,if=(buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up)

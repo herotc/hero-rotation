@@ -270,6 +270,7 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   SouloftheForest                       = Spell(158477),
   Swipe                                 = Spell(213771),
   ThornsofIron                          = Spell(400222),
+  UrsocsEndurance                       = Spell(393611),
   -- Buffs
   DreamofCenariusBuff                   = Spell(372152),
   GalacticGuardianBuff                  = Spell(213708),
@@ -309,4 +310,6 @@ Item.Druid.Feral = MergeTableByKey(Item.Druid.Commons, {
 })
 
 Item.Druid.Guardian = MergeTableByKey(Item.Druid.Commons, {
+  -- TWW Trinkets
+  TomeofLightsDevotion                  = Item(219309, {13, 14}),
 })
