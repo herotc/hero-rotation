@@ -692,6 +692,7 @@ end
 local function ShivUsage ()
   -- actions.shiv=variable,name=shiv_condition,value=!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking
   local ShivCondition = Target:DebuffDown(S.ShivDebuff) and Target:DebuffUp(S.Garrote) and Target:DebuffUp(S.Rupture)
+    and MeleeEnemies10yCount <= 5
 
   --  actions.shiv+=/variable,name=shiv_kingsbane_condition,value=talent.kingsbane&buff.envenom.up&variable.shiv_condition
   local ShivKingsbaneCondition = S.Kingsbane:IsAvailable() and Player:BuffUp(S.Envenom) and ShivCondition
@@ -720,6 +721,14 @@ local function ShivUsage ()
       end
     end
 
+    -- # Shiv for big Darkest Night Envenom during Lingering Darkness
+    -- actions.shiv+=/shiv,if=buff.darkest_night.up&combo_points>=variable.effective_spend_cp&buff.lingering_darkness.up
+    if Player:BuffUp(S.DarkestNightBuff) and ComboPoints >= EffectiveCPSpend and Player:BuffUp(S.LingeringDarknessBuff) then
+      if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
+        return "Cast Shiv Darkest Night, Lingering Darkness"
+      end
+    end
+
     -- actions.shiv+=/shiv,if=talent.lightweight_shiv.enabled&variable.shiv_kingsbane_condition
     -- &(dot.kingsbane.ticking|cooldown.kingsbane.remains<=1)
     if S.LightweightShiv:IsAvailable() then
@@ -731,8 +740,8 @@ local function ShivUsage ()
     end
 
     -- # Fallback shiv for arterial during deathmark
-    -- actions.shiv+=/shiv,if=talent.arterial_precision&variable.shiv_condition&debuff.deathmark.up
-    if S.ArterialPrecision:IsAvailable() and ShivCondition and S.Deathmark:AnyDebuffUp() then
+    -- actions.shiv+=/shiv,if=talent.arterial_precision&!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking&debuff.deathmark.up
+    if S.ArterialPrecision:IsAvailable() and Target:DebuffDown(S.ShivDebuff) and Target:DebuffUp(S.Rupture) and S.Deathmark:AnyDebuffUp() then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
         return "Cast Shiv (Arterial Precision Deathmark)"
       end
@@ -1043,6 +1052,14 @@ local function Direct ()
     end
   end
 
+  -- actions.direct+=/ambush,if=variable.use_filler&(buff.blindside.up|stealthed.rogue)&(!dot.kingsbane.ticking|debuff.deathmark.down|buff.blindside.up)
+  if (S.Ambush:IsCastable() or S.AmbushOverride:IsReady()) and UseFiller and (Player:BuffUp(S.BlindsideBuff) or Player:StealthUp(true, false))
+    and (Target:DebuffDown(S.Kingsbane) or Target:DebuffDown(S.Deathmark) or Player:BuffUp(S.BlindsideBuff)) then
+    if CastPooling(S.Ambush, nil, not TargetInMeleeRange) then
+      return "Cast Ambush"
+    end
+  end
+
   -- # Fan of Knives at 3+ targets, accounting for various edge cases
   --actions.direct+=/fan_of_knives,if=variable.use_filler&!priority_rotation
   -- &(spell_targets.fan_of_knives>=3-(talent.momentum_of_despair&talent.thrown_precision)
@@ -1067,14 +1084,6 @@ local function Direct ()
           return "Cast Fan of Knives (DP Refresh)"
         end
       end
-    end
-  end
-
-  -- actions.direct+=/ambush,if=variable.use_filler&(buff.blindside.up|stealthed.rogue)&(!dot.kingsbane.ticking|debuff.deathmark.down|buff.blindside.up)
-  if (S.Ambush:IsCastable() or S.AmbushOverride:IsReady()) and UseFiller and (Player:BuffUp(S.BlindsideBuff) or Player:StealthUp(true, false))
-    and (Target:DebuffDown(S.Kingsbane) or Target:DebuffDown(S.Deathmark) or Player:BuffUp(S.BlindsideBuff)) then
-    if CastPooling(S.Ambush, nil, not TargetInMeleeRange) then
-      return "Cast Ambush"
     end
   end
 
