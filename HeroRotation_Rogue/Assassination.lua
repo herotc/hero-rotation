@@ -1317,7 +1317,7 @@ local function Init ()
   S.Garrote:RegisterAuraTracking()
   S.CrimsonTempest:RegisterAuraTracking()
 
-  HR.Print("Assassination Rogue rotation has been updated for patch 11.0.5.")
+  HR.Print("Assassination Rogue rotation has been updated for patch 11.1.0.")
 end
 
 HR.SetAPL(259, APL, Init)
