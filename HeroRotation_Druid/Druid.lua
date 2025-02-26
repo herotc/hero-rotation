@@ -206,6 +206,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   Bloodtalons                           = Spell(319439),
   BrutalSlash                           = Spell(202028),
   CircleofLifeandDeath                  = Spell(400320),
+  CoiledtoSpring                        = Spell(449537),
   DireFixation                          = Spell(417710),
   DoubleClawedRake                      = Spell(391700),
   DreadfulBleeding                      = Spell(391045),
@@ -222,6 +223,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   RampantFerocity                       = Spell(391709),
   RipandTear                            = Spell(391347),
   Sabertooth                            = Spell(202031),
+  SavageFury                            = Spell(449645),
   SouloftheForest                       = Spell(158476),
   Swipe                                 = Spell(106785),
   TearOpenWounds                        = Spell(391785),
@@ -234,6 +236,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   ApexPredatorsCravingBuff              = Spell(391882),
   BloodtalonsBuff                       = Spell(145152),
   Clearcasting                          = Spell(135700),
+  CoiledtoSpringBuff                    = Spell(449538),
   OverflowingPowerBuff                  = Spell(405189),
   PredatorRevealedBuff                  = Spell(408468), -- T30 P4
   PredatorySwiftnessBuff                = Spell(69369),
@@ -271,6 +274,7 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   DreamofCenariusBuff                   = Spell(372152),
   GalacticGuardianBuff                  = Spell(213708),
   GoreBuff                              = Spell(93622),
+  StackedDeckBuff                       = Spell(1218537), -- TWW S2 4pc
   ToothandClawBuff                      = Spell(135286),
   ViciousCycleMaulBuff                  = Spell(372015),
   ViciousCycleMangleBuff                = Spell(372019),
@@ -284,6 +288,9 @@ Item.Druid.Commons = {
   -- TWW Trinkets
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
+  TreacherousTransmitter                = Item(221023, {13, 14}),
+  -- TWW Items
+  BestinSlots                           = Item(232526, {16}),
 }
 
 Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
@@ -292,7 +299,6 @@ Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
   ArakaraSacbrood                       = Item(219314, {13, 14}),
   SignetofthePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
-  TreacherousTransmitter                = Item(221023, {13, 14}),
 })
 
 Item.Druid.Feral = MergeTableByKey(Item.Druid.Commons, {
