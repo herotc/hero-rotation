@@ -399,15 +399,15 @@ local function APL()
     -- thunder_blast,if=spell_targets.thunder_blast>=2&buff.thunder_blast.stack=2
     if S.ThunderBlastAbility:IsReady() and (EnemiesCount8 >= 2 and Player:BuffStack(S.ThunderBlastBuff) == 2) then
       SuggestRageDump(5)
-      if Cast(S.ThunderBlastAbility, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_blast main "; end
+      if Cast(S.ThunderBlastAbility, nil, nil, not Target:IsInMeleeRange(8)) then return "thunder_blast main 32"; end
     end
     -- demolish,if=buff.colossal_might.stack>=3
     if S.Demolish:IsCastable() and (Player:BuffStack(S.ColossalMightBuff) >= 3) then
-      if Cast(S.Demolish, nil, Settings.CommonsDS.DisplayStyle.Demolish, not Target:IsInMeleeRange(12)) then return "demolish main 32"; end
+      if Cast(S.Demolish, nil, Settings.CommonsDS.DisplayStyle.Demolish, not Target:IsInMeleeRange(12)) then return "demolish main 34"; end
     end
     -- thunderous_roar
     if CDsON() and S.ThunderousRoar:IsCastable() then
-      if Cast(S.ThunderousRoar, Settings.Protection.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar main 32"; end
+      if Cast(S.ThunderousRoar, Settings.Protection.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar main 36"; end
     end
     -- shield_charge
     if S.ShieldCharge:IsCastable() then
@@ -431,7 +431,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Protection Warrior rotation has been updated for patch 11.0.2.")
+  HR.Print("Protection Warrior rotation has been updated for patch 11.1.0.")
 end
 
 HR.SetAPL(73, APL, Init)
