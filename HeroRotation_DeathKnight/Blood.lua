@@ -514,7 +514,7 @@ end
 local function Init()
   S.BloodPlagueDebuff:RegisterAuraTracking()
 
-  HR.Print("Blood Death Knight rotation has been updated for patch 11.0.5.")
+  HR.Print("Blood Death Knight rotation has been updated for patch 11.1.0.")
 end
 
 HR.SetAPL(250, APL, Init)
