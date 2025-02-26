@@ -215,7 +215,6 @@ Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   ShieldBlock                           = Spell(2565),
   ShieldSlam                            = Spell(23922),
   -- Talents
-  Avatar                                = Spell(401150),
   BarbaricTraining                      = Spell(390675),
   Bloodsurge                            = Spell(384361),
   Bolster                               = Spell(280001),
@@ -239,7 +238,6 @@ Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   UnnervingFocus                        = Spell(384042),
   UnstoppableForce                      = Spell(275336),
   -- Buffs
-  AvatarBuff                            = Spell(401150),
   LastStandBuff                         = Spell(12975),
   LuckoftheDrawBuff                     = Spell(1218163), -- TWW S2 4pc
   RallyingCryBuff                       = Spell(97463),
