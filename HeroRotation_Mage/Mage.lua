@@ -183,7 +183,6 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   HotStreakBuff                         = Spell(48108),
   HyperthermiaBuff                      = Spell(383874),
   RollinHotBuff                         = Spell(1219035), -- TWW S2 Tier 4pc
-  CriticalDamageBuff                    = Spell(1219033), -- TWW S2 Tier 2pc
   SunKingsBlessingBuff                  = Spell(383882),
   FuryoftheSunKingBuff                  = Spell(383883),
   -- Debuffs
