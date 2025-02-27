@@ -106,39 +106,13 @@ ArcanePlayerBuffDown = HL.AddCoreOverride("Player.BuffDown",
 , 62)
 
 -- Fire, ID: 63
--- Buff tracking overrides
 local FirePlayerBuffUp
 FirePlayerBuffUp = HL.AddCoreOverride("Player.BuffUp",
   function (self, Spell, AnyCaster, Offset)
     local BaseCheck = FirePlayerBuffUp(self, Spell, AnyCaster, Offset)
     if Spell == SpellFire.HeatingUpBuff then
-      -- Enhanced Heating Up prediction
-      return BaseCheck
-        -- SKB Pyroblast prediction
-        or (Player:IsCasting(SpellFire.Pyroblast) and Player:BuffRemains(SpellFire.FuryoftheSunKingBuff) > 0)
-        -- Phoenix Flames prediction
-        or (SpellFire.PhoenixFlames:InFlight() and Player:TimeSinceLastPhoenixFlames() < 0.5)
-        -- Fire Blast prediction during Combustion
-        or (Mage.IsCombustionActive() and SpellFire.FireBlast:InFlight() and Player:TimeSinceLastFireBlast() < 0.5)
-        -- Single crit tracking
-        or (Player:GetPendingCrits() == 1 and Player:TimeSinceLastCrit() < 10)
-        -- In-flight spell predictions
-        or (Player:GetInFlightFireballs() > 0 and Mage.IsCombustionActive())
-        or (Player:GetInFlightPyroblasts() > 0 and Mage.IsCombustionActive())
-    elseif Spell == SpellFire.HotStreakBuff then
-      -- Enhanced Hot Streak prediction
-      return BaseCheck
-        -- Pending Hot Streak from crits
-        or Player:IsHotStreakPending()
-        -- Combustion predictions
-        or (Mage.IsCombustionActive() and Player:BuffUp(SpellFire.HeatingUpBuff) and
-            (SpellFire.FireBlast:InFlight() or SpellFire.PhoenixFlames:InFlight()))
-        -- Double Fire Blast during Combustion
-        or (Mage.IsCombustionActive() and SpellFire.FireBlast:InFlight() and Player:TimeSinceLastFireBlast() < 0.5)
-        -- Infernal Cascade interaction
-        or (Player:GetInfernalCascadeStacks() > 0 and Player:BuffUp(SpellFire.HeatingUpBuff))
-    elseif Spell == SpellFire.CombustionBuff then
-      return BaseCheck or Mage.IsCombustionActive()
+      -- "Predictive" Heating Up buff for SKB Pyroblast casts...
+      return BaseCheck or Player:IsCasting(SpellFire.Pyroblast) and Player:BuffRemains(SpellFire.FuryoftheSunKingBuff) > 0
     else
       return BaseCheck
     end
@@ -151,93 +125,49 @@ FirePlayerBuffDown = HL.AddCoreOverride("Player.BuffDown",
     local BaseCheck = FirePlayerBuffDown(self, Spell, AnyCaster, Offset)
     if Spell == SpellFire.FuryoftheSunKingBuff then
       return BaseCheck or Player:IsCasting(SpellFire.Pyroblast)
-    elseif Spell == SpellFire.HeatingUpBuff then
-      -- Inverse of enhanced Heating Up prediction
-      return not FirePlayerBuffUp(self, Spell, AnyCaster, Offset)
-    elseif Spell == SpellFire.HotStreakBuff then
-      -- Inverse of enhanced Hot Streak prediction
-      return not FirePlayerBuffUp(self, Spell, AnyCaster, Offset)
-    elseif Spell == SpellFire.CombustionBuff then
-      return not Mage.IsCombustionActive()
     else
       return BaseCheck
     end
   end
 , 63)
 
--- Spell casting and readiness overrides
 HL.AddCoreOverride("Spell.IsReady",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local BaseCheck = self:IsCastable() and self:IsUsableP()
-
-    -- Movement handling
+    local MovingOK = true
     if self:CastTime() > 0 and Player:IsMoving() and Settings.Commons.MovingRotation then
-      -- Allow instant casts during movement
-      if self == SpellFire.Scorch then
-        return BaseCheck
-      -- Allow Hot Streak instant casts
-      elseif (self == SpellFire.Pyroblast or self == SpellFire.Flamestrike) and
-             (Player:BuffUp(SpellFire.HotStreakBuff) or Player:IsHotStreakPending()) then
-        return BaseCheck
-      -- Block other casts while moving
+      if self == SpellFire.Scorch or (self == SpellFire.Pyroblast and Player:BuffUp(SpellFire.HotStreakBuff)) or (self == SpellFire.Flamestrike and Player:BuffUp(SpellFire.HotStreakBuff)) then
+        MovingOK = true
       else
         return false
       end
-    end
-
-    -- Combustion phase special handling
-    if Mage.IsCombustionActive() then
-      -- Prioritize certain spells during Combustion
-      if self == SpellFire.FireBlast or self == SpellFire.PhoenixFlames then
-        return BaseCheck and Player:BuffDown(SpellFire.HotStreakBuff)
-      end
-    end
-
-    -- Execute phase handling
-    if self == SpellFire.Scorch and Player:IsSearingTouchActive() then
+    else
       return BaseCheck
     end
-
-    -- Infernal Cascade optimization
-    if Player:GetInfernalCascadeStacks() > 0 and Mage.IsCombustionActive() then
-      if self == SpellFire.FireBlast then
-        -- Hold Fire Blast for better Infernal Cascade timing
-        return BaseCheck and Player:TimeSinceLastSpellImpact() >= 0.3
-      end
-    end
-
-    return BaseCheck
   end
 , 63)
 
--- Basic castability check
 HL.AddCoreOverride("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-    -- Block casts while moving (unless allowed by IsReady)
     if self:CastTime() > 0 and Player:IsMoving() and Settings.Commons.MovingRotation then
       return false
     end
 
-    -- Range check
     local RangeOK = true
     if Range then
       local RangeUnit = ThisUnit or Target
-      RangeOK = RangeUnit:IsInRange(Range, AoESpell)
+      RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
 
-    -- Base castability check
     local BaseCheck = self:IsLearned() and self:CooldownRemains(BypassRecovery, Offset or "Auto") == 0 and RangeOK
-
-    -- Special handling for Shifting Power
     if self == SpellFire.ShiftingPower then
       return BaseCheck and not Player:IsCasting(self)
+    else
+      return BaseCheck
     end
-
-    return BaseCheck
   end
 , 63)
 
--- Combat state tracking
 local FireOldPlayerAffectingCombat
 FireOldPlayerAffectingCombat = HL.AddCoreOverride("Player.AffectingCombat",
   function (self)
@@ -247,35 +177,9 @@ FireOldPlayerAffectingCombat = HL.AddCoreOverride("Player.AffectingCombat",
   end
 , 63)
 
--- Spell travel time and in-flight tracking
 HL.AddCoreOverride("Spell.InFlightRemains",
   function(self)
     return self:TravelTime() - self:TimeSinceLastCast()
-  end
-, 63)
-
--- Add buff stack prediction for Fire
-HL.AddCoreOverride("Player.BuffStack",
-  function (self, Spell, AnyCaster, Offset)
-    local BaseCheck = Player:BuffStack(Spell, AnyCaster, Offset)
-    if Spell == SpellFire.HeatingUpBuff then
-      return BaseCheck + Player:GetPendingCrits()
-    else
-      return BaseCheck
-    end
-  end
-, 63)
-
--- Enhanced spell travel time tracking
-HL.AddCoreOverride("Spell.TravelTime",
-  function (self)
-    if self == SpellFire.Fireball then
-      return Player:GetInFlightFireballs() > 0 and (1 - Player:TimeSinceLastFireball()) or 1
-    elseif self == SpellFire.Pyroblast then
-      return Player:GetInFlightPyroblasts() > 0 and (1.5 - Player:TimeSinceLastPyroblast()) or 1.5
-    else
-      return 0
-    end
   end
 , 63)
 
