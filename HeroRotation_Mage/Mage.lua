@@ -153,6 +153,7 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   CalloftheSunKing                      = Spell(343222),
   Combustion                            = Spell(190319),
   FeeltheBurn                           = Spell(383391),
+  Firefall                              = Spell(384033),
   FlameAccelerant                       = Spell(203275),
   FireBlast                             = Spell(108853),
   Firestarter                           = Spell(205026),
@@ -173,6 +174,7 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   UnleashedInferno                      = Spell(416506),
   -- Buffs
   CombustionBuff                        = Spell(190319),
+  ExcessFireBuff                        = Spell(438624),
   FeeltheBurnBuff                       = Spell(383395),
   FlameAccelerantBuff                   = Spell(203277),
   FlamesFuryBuff                        = Spell(409964), -- T30 4pc bonus
@@ -181,6 +183,7 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   HotStreakBuff                         = Spell(48108),
   HyperthermiaBuff                      = Spell(383874),
   RollinHotBuff                         = Spell(1219035), -- TWW S2 Tier 4pc
+  CriticalDamageBuff                    = Spell(1219033), -- TWW S2 Tier 2pc
   SunKingsBlessingBuff                  = Spell(383882),
   FuryoftheSunKingBuff                  = Spell(383883),
   -- Debuffs
@@ -263,6 +266,8 @@ Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
   VerdantGladiatorsBadge                = Item(209343, {13, 14}),
   -- TWW Gladiator's Badges
   ForgedGladiatorsBadge                 = Item(218713, {13, 14}),
+  -- TWW S2 Trinkets
+  NeuralSynapseEnhancer                 = Item(168973, {13, 14}),
   -- Trinkets kept for variables
   DragonfireBombDispenser               = Item(202610, {13, 14}),
   HornofValor                           = Item(133642, {13, 14}),
