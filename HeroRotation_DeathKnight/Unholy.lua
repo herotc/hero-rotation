@@ -313,9 +313,6 @@ end
 
 --- ===== Rotation Functions =====
 local function Precombat()
-  -- flask
-  -- food
-  -- augmentation
   -- snapshot_stats
   -- raise_dead
   if S.RaiseDead:IsCastable() then
@@ -468,12 +465,12 @@ local function AoESetup()
 end
 
 local function CDs()
-  -- dark_transformation,if=variable.st_planning&(cooldown.apocalypse.remains<8|!talent.apocalypse|active_enemies>=1)
-  if S.DarkTransformation:IsCastable() and (VarSTPlanning and (S.Apocalypse:CooldownRemains() < 8 or not S.Apocalypse:IsAvailable() or ActiveEnemies >= 1)) then
+  -- dark_transformation,if=variable.st_planning&(cooldown.apocalypse.remains<8|!talent.apocalypse|active_enemies>=1)|fight_remains<20
+  if S.DarkTransformation:IsCastable() and (VarSTPlanning and (S.Apocalypse:CooldownRemains() < 8 or not S.Apocalypse:IsAvailable() or ActiveEnemies >= 1) or BossFightRemains < 20) then
     if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cds 2"; end
   end
-  -- unholy_assault,if=variable.st_planning&(cooldown.apocalypse.remains<gcd*2|!talent.apocalypse|active_enemies>=2&buff.dark_transformation.up)
-  if S.UnholyAssault:IsCastable() and (VarSTPlanning and (S.Apocalypse:CooldownRemains() < Player:GCD() * 2 or not S.Apocalypse:IsAvailable() or ActiveEnemies >= 2 and Pet:BuffUp(S.DarkTransformation))) then
+  -- unholy_assault,if=variable.st_planning&(cooldown.apocalypse.remains<gcd*2|!talent.apocalypse|active_enemies>=2&buff.dark_transformation.up)|fight_remains<20
+  if S.UnholyAssault:IsCastable() and (VarSTPlanning and (S.Apocalypse:CooldownRemains() < Player:GCD() * 2 or not S.Apocalypse:IsAvailable() or ActiveEnemies >= 2 and Pet:BuffUp(S.DarkTransformation)) or BossFightRemains < 20) then
     if Cast(S.UnholyAssault, Settings.Unholy.GCDasOffGCD.UnholyAssault, nil, not Target:IsInMeleeRange(5)) then return "unholy_assault cds 4"; end
   end
   -- apocalypse,if=variable.st_planning|fight_remains<20
@@ -484,13 +481,9 @@ local function CDs()
   if S.Outbreak:IsReady() then
     if Everyone.CastCycle(S.Outbreak, Enemies10ySplash, EvaluateCycleOutbreakCDs, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak cds 8"; end
   end
-  -- apocalypse,target_if=max:debuff.festering_wound.stack,if=variable.adds_remain&rune<=3
-  if S.Apocalypse:IsReady() and (VarAddsRemain and Player:Rune() <= 3) then
-    if Everyone.CastTargetIf(S.Apocalypse, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, nil, not Target:IsInMeleeRange(5), Settings.Unholy.GCDasOffGCD.Apocalypse) then return "apocalypse cds 10"; end
-  end
-  -- abomination_limb,if=variable.adds_remain
-  if S.AbominationLimb:IsCastable() and (VarAddsRemain) then
-    if Cast(S.AbominationLimb, Settings.Unholy.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb cds 12"; end
+  -- abomination_limb,if=variable.st_planning&!buff.sudden_doom.react&(buff.festermight.up&buff.festermight.stack>8|!talent.festermight)&(pet.apoc_ghoul.remains<5|!talent.apocalypse)&debuff.festering_wound.stack<=2|fight_remains<12
+  if S.AbominationLimb:IsCastable() and (VarSTPlanning and Player:BuffDown(S.SuddenDoomBuff) and (Player:BuffUp(S.FestermightBuff) and Player:BuffStack(S.FestermightBuff) > 8 or not S.Festermight:IsAvailable()) and (VarApocGhoulRemains < 5 or not S.Apocalypse:IsAvailable()) and FesterStacks <= 2 or BossFightRemains < 12) then
+    if Cast(S.AbominationLimb, Settings.Unholy.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb cds 10"; end
   end
 end
 
@@ -522,8 +515,8 @@ local function CDsAoE()
 end
 
 local function CDsAoESan()
-  -- dark_transformation,if=variable.adds_remain&buff.death_and_decay.up
-  if S.DarkTransformation:IsCastable() and (VarAddsRemain and Player:BuffUp(S.DeathAndDecayBuff)) then
+  -- dark_transformation,if=variable.adds_remain&(buff.death_and_decay.up|active_enemies<=3)
+  if S.DarkTransformation:IsCastable() and (VarAddsRemain and (Player:BuffUp(S.DeathAndDecayBuff) or ActiveEnemies <= 3)) then
     if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cds_aoe_san 2"; end
   end
   -- vile_contagion,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=4&(raid_event.adds.remains>4|!raid_event.adds.exists&fight_remains>4)&(raid_event.adds.exists&raid_event.adds.remains<=11|cooldown.any_dnd.remains<3|buff.death_and_decay.up&debuff.festering_wound.stack>=4)|variable.adds_remain&debuff.festering_wound.stack=6
@@ -549,12 +542,12 @@ local function CDsAoESan()
 end
 
 local function CDsSan()
-  -- dark_transformation,if=active_enemies>=1&variable.st_planning&(talent.apocalypse&pet.apoc_ghoul.active|!talent.apocalypse)
-  if S.DarkTransformation:IsCastable() and (ActiveEnemies >= 1 and VarSTPlanning and (S.Apocalypse:IsAvailable() and VarApocGhoulActive or not S.Apocalypse:IsAvailable())) then
+  -- dark_transformation,if=active_enemies>=1&variable.st_planning&(talent.apocalypse&pet.apoc_ghoul.active|!talent.apocalypse)|fight_remains<20
+  if S.DarkTransformation:IsCastable() and (ActiveEnemies >= 1 and VarSTPlanning and (S.Apocalypse:IsAvailable() and VarApocGhoulActive or not S.Apocalypse:IsAvailable()) or BossFightRemains < 20) then
     if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cds_san 2"; end
   end
-  -- unholy_assault,if=variable.st_planning&(buff.dark_transformation.up&buff.dark_transformation.remains<12)
-  if S.UnholyAssault:IsCastable() and (VarSTPlanning and (Pet:BuffUp(S.DarkTransformation) and Pet:BuffRemains(S.DarkTransformation) < 12)) then
+  -- unholy_assault,if=variable.st_planning&(buff.dark_transformation.up&buff.dark_transformation.remains<12)|fight_remains<20
+  if S.UnholyAssault:IsCastable() and (VarSTPlanning and (Pet:BuffUp(S.DarkTransformation) and Pet:BuffRemains(S.DarkTransformation) < 12) or BossFightRemains < 20) then
     if Cast(S.UnholyAssault, Settings.Unholy.GCDasOffGCD.UnholyAssault, nil, not Target:IsInMeleeRange(5)) then return "unholy_assault cds_san 4"; end
   end
   -- apocalypse,if=variable.st_planning|fight_remains<20
@@ -565,8 +558,8 @@ local function CDsSan()
   if S.Outbreak:IsReady() then
     if Everyone.CastCycle(S.Outbreak, EnemiesMelee, EvaluateCycleOutbreakCDsSan, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak cds_san 8"; end
   end
-  -- abomination_limb,if=active_enemies>=1&variable.st_planning&!buff.dark_transformation.up&!buff.sudden_doom.react&buff.festermight.up&debuff.festering_wound.stack<=2
-  if S.AbominationLimb:IsCastable() and (ActiveEnemies >= 1 and VarSTPlanning and Pet:BuffDown(S.DarkTransformation) and Player:BuffDown(S.SuddenDoomBuff) and Player:BuffUp(S.FestermightBuff) and FesterStacks <= 2) then
+  -- abomination_limb,if=active_enemies>=1&variable.st_planning&!buff.gift_of_the_sanlayn.up&!buff.sudden_doom.react&buff.festermight.up&debuff.festering_wound.stack<=2|!buff.gift_of_the_sanlayn.up&fight_remains<12
+  if S.AbominationLimb:IsCastable() and (ActiveEnemies >= 1 and VarSTPlanning and Player:BuffDown(S.GiftoftheSanlaynBuff) and Player:BuffDown(S.SuddenDoomBuff) and Player:BuffUp(S.FestermightBuff) and FesterStacks <= 2 or Player:BuffDown(S.GiftoftheSanlaynBuff) and BossFightRemains < 12) then
     if Cast(S.AbominationLimb, Settings.Unholy.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb cds_san 10"; end
   end
 end
@@ -735,10 +728,10 @@ end
 
 local function SanTrinkets()
   if Settings.Commons.Enabled.Trinkets then
-    -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.errant_manaforge_emission.up&(pet.apoc_ghoul.active|!talent.apocalypse&buff.dark_transformation.up)|buff.cryptic_instructions.up&(pet.apoc_ghoul.active|!talent.apocalypse&buff.dark_transformation.up)|buff.realigning_nexus_convergence_divergence.up&(pet.apoc_ghoul.active|!talent.apocalypse&buff.dark_transformation.up)
+    -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.errant_manaforge_emission.up&buff.dark_transformation.up&buff.errant_manaforge_emission.remains<2|buff.cryptic_instructions.up&buff.dark_transformation.up&buff.cryptic_instructions.remains<2|buff.realigning_nexus_convergence_divergence.up&buff.dark_transformation.up&buff.realigning_nexus_convergence_divergence.remains<2
     -- TODO: Handle the above.
-    -- use_item,name=treacherous_transmitter,if=(variable.adds_remain|variable.st_planning)&cooldown.dark_transformation.remains<3
-    if I.TreacherousTransmitter:IsEquippedAndReady() and ((VarAddsRemain or VarSTPlanning) and S.DarkTransformation:CooldownRemains() < 3) then
+    -- use_item,name=treacherous_transmitter,if=(variable.adds_remain|variable.st_planning)&cooldown.dark_transformation.remains<10
+    if I.TreacherousTransmitter:IsEquippedAndReady() and ((VarAddsRemain or VarSTPlanning) and S.DarkTransformation:CooldownRemains() < 10) then
       if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisableAotD.Trinkets) then return "treacherous_transmitter san_trinkets 2"; end
     end
     -- use_item,slot=trinket1,if=variable.trinket_1_buffs&(buff.dark_transformation.up&buff.dark_transformation.remains<variable.trinket_1_duration*0.73&(variable.trinket_priority=1|trinket.2.cooldown.remains|!trinket.2.has_cooldown))|variable.trinket_1_duration>=fight_remains
@@ -759,9 +752,9 @@ local function SanTrinkets()
     end
   end
   if Settings.Commons.Enabled.Items then
-    -- use_item,slot=main_hand,if=(!variable.trinket_1_buffs&!variable.trinket_2_buffs|trinket.1.cooldown.remains>20&!variable.trinket_2_buffs|trinket.2.cooldown.remains>20&!variable.trinket_1_buffs|trinket.1.cooldown.remains>20&trinket.2.cooldown.remains>20)&(buff.dark_transformation.up)&(!talent.raise_abomination&!talent.army_of_the_dead|!talent.raise_abomination&talent.army_of_the_dead&pet.army_ghoul.active|talent.raise_abomination&pet.abomination.active|(variable.trinket_1_buffs|variable.trinket_2_buffs|fight_remains<15))
+    -- use_item,slot=main_hand,if=(!variable.trinket_1_buffs&!variable.trinket_2_buffs|trinket.1.cooldown.remains>20&!variable.trinket_2_buffs|trinket.2.cooldown.remains>20&!variable.trinket_1_buffs|trinket.1.cooldown.remains>20&trinket.2.cooldown.remains>20)&(buff.dark_transformation.up&buff.dark_transformation.remains>10)&(!talent.raise_abomination&!talent.army_of_the_dead|!talent.raise_abomination&talent.army_of_the_dead&pet.army_ghoul.active|talent.raise_abomination&pet.abomination.active|(variable.trinket_1_buffs|variable.trinket_2_buffs|fight_remains<15))
     local ItemToUse, _, ItemRange = Player:GetUseableItems(OnUseExcludes, 16, true)
-    if ItemToUse and ((not VarTrinket1Buffs and not VarTrinket2Buffs or Trinket1:CooldownRemains() > 20 and not VarTrinket2Buffs or Trinket2:CooldownRemains() > 20 and not VarTrinket1Buffs or Trinket1:CooldownRemains() > 20 and Trinket2:CooldownRemains() > 20) and (Pet:BuffUp(S.DarkTransformation)) and (not S.RaiseAbomination:IsAvailable() and not S.ArmyoftheDead:IsAvailable() or not S.RaiseAbomination:IsAvailable() and S.ArmyoftheDead:IsAvailable() and VarArmyGhoulActive or S.RaiseAbomination:IsAvailable() and VarAbomActive or (VarTrinket1Buffs or VarTrinket2Buffs or BossFightRemains < 15))) then
+    if ItemToUse and ((not VarTrinket1Buffs and not VarTrinket2Buffs or Trinket1:CooldownRemains() > 20 and not VarTrinket2Buffs or Trinket2:CooldownRemains() > 20 and not VarTrinket1Buffs or Trinket1:CooldownRemains() > 20 and Trinket2:CooldownRemains() > 20) and (Pet:BuffUp(S.DarkTransformation) and Pet:BuffRemains(S.DarkTransformation) > 10) and (not S.RaiseAbomination:IsAvailable() and not S.ArmyoftheDead:IsAvailable() or not S.RaiseAbomination:IsAvailable() and S.ArmyoftheDead:IsAvailable() and VarArmyGhoulActive or S.RaiseAbomination:IsAvailable() and VarAbomActive or (VarTrinket1Buffs or VarTrinket2Buffs or BossFightRemains < 15))) then
       if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Main Hand use_item for " .. ItemToUse:Name() .. " san_trinkets 12"; end
     end
     -- Note: Generic use_items for non-trinkets.
@@ -809,10 +802,10 @@ end
 
 local function Trinkets()
   if Settings.Commons.Enabled.Trinkets then
-    -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.errant_manaforge_emission.up&buff.dark_transformation.up|buff.cryptic_instructions.up&buff.dark_transformation.up|buff.realigning_nexus_convergence_divergence.up&buff.dark_transformation.up
+    -- do_treacherous_transmitter_task,use_off_gcd=1,if=buff.errant_manaforge_emission.up&(pet.apoc_ghoul.active|!talent.apocalypse&buff.dark_transformation.up)|buff.cryptic_instructions.up&(pet.apoc_ghoul.active|!talent.apocalypse&buff.dark_transformation.up)|buff.realigning_nexus_convergence_divergence.up&(pet.apoc_ghoul.active|!talent.apocalypse&buff.dark_transformation.up)
     -- TODO: Handle the above.
-    -- use_item,name=treacherous_transmitter,if=(variable.adds_remain|variable.st_planning)&cooldown.dark_transformation.remains<3
-    if I.TreacherousTransmitter:IsEquippedAndReady() and ((VarAddsRemain or VarSTPlanning) and S.DarkTransformation:CooldownRemains() < 3) then
+    -- use_item,name=treacherous_transmitter,if=(variable.adds_remain|variable.st_planning)&cooldown.dark_transformation.remains<10
+    if I.TreacherousTransmitter:IsEquippedAndReady() and ((VarAddsRemain or VarSTPlanning) and S.DarkTransformation:CooldownRemains() < 10) then
       if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter trinkets 2"; end
     end
     -- use_item,slot=trinket1,if=variable.trinket_1_buffs&(variable.trinket_priority=1|!trinket.2.has_cooldown|trinket.2.cooldown.remains>20&(!talent.apocalypse&buff.dark_transformation.up|pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=variable.trinket_1_duration&pet.apoc_ghoul.remains>5))&(talent.army_of_the_dead&!talent.raise_abomination&pet.army_ghoul.active&pet.army_ghoul.remains<=variable.trinket_1_duration&pet.army_ghoul.remains>10|talent.raise_abomination&pet.abomination.active&pet.abomination.remains<=variable.trinket_1_duration&pet.abomination.remains>10|talent.apocalypse&pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=variable.trinket_1_duration+3&pet.apoc_ghoul.remains>5|!talent.raise_abomination&!talent.apocalypse&buff.dark_transformation.up|trinket.2.cooldown.remains)|fight_remains<=variable.trinket_1_duration
@@ -832,10 +825,22 @@ local function Trinkets()
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " san_trinkets 10"; end
     end
   end
+  if Settings.Commons.Enabled.Items then
+    -- use_item,slot=main_hand,if=(!variable.trinket_1_buffs&!variable.trinket_2_buffs|trinket.1.cooldown.remains&!variable.trinket_2_buffs|trinket.2.cooldown.remains&!variable.trinket_1_buffs|trinket.1.cooldown.remains&trinket.2.cooldown.remains)&(pet.apoc_ghoul.active&pet.apoc_ghoul.remains<=18|!talent.apocalypse&buff.dark_transformation.up)&((trinket.1.cooldown.duration=90|trinket.2.cooldown.duration=90)|!talent.raise_abomination&!talent.army_of_the_dead|!talent.raise_abomination&talent.army_of_the_dead&pet.army_ghoul.active|talent.raise_abomination&pet.abomination.active)
+    local ItemToUse, _, ItemRange = Player:GetUseableItems(OnUseExcludes, 16, true)
+    if ItemToUse and ((not VarTrinket1Buffs and not VarTrinket2Buffs or Trinket1:CooldownDown() and not VarTrinket2Buffs or Trinket2:CooldownDown() and not VarTrinket1Buffs or Trinket1:CooldownDown() and Trinket2:CooldownDown()) and (VarApocGhoulActive and VarApocGhoulRemains <= 18 or not S.Apocalypse:IsAvailable() and Pet:BuffUp(S.DarkTransformation)) and ((VarTrinket1CD == 90 or VarTrinket2CD == 90) or not S.RaiseAbomination:IsAvailable() and not S.ArmyoftheDead:IsAvailable() or not S.RaiseAbomination:IsAvailable() and S.ArmyoftheDead:IsAvailable() and VarArmyGhoulActive or S.RaiseAbomination:IsAvailable() and VarAbomActive)) then
+      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Main Hand use_item for " .. ItemToUse:Name() .. " trinkets 12"; end
+    end
+    -- Note: Generic use_items for non-trinkets.
+    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
+    if ItemToUse and ((not VarTrinket1Buffs or Trinket1:CooldownDown()) and (not VarTrinket2Buffs or Trinket2:CooldownDown())) then
+      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_item for " .. ItemToUse:Name() .. " trinkets 14"; end
+    end
+  end
 end
 
 local function Variables()
-  -- variable,name=st_planning,op=setif,value=1,value_else=0,condition=active_enemies=1&(!raid_event.adds.exists|raid_event.adds.in>15)
+  -- variable,name=st_planning,op=setif,value=1,value_else=0,condition=active_enemies=1&(!raid_event.adds.exists|!raid_event.adds.in|raid_event.adds.in>15|raid_event.pull.has_boss&raid_event.adds.in>15)
   VarSTPlanning = ActiveEnemies == 1
   -- variable,name=adds_remain,op=setif,value=1,value_else=0,condition=active_enemies>=2&(!raid_event.adds.exists&fight_remains>6|raid_event.adds.exists&raid_event.adds.remains>6)
   VarAddsRemain = ActiveEnemies >= 2 and FightRemains > 6
@@ -933,7 +938,7 @@ local function APL()
     -- call_action_list,name=variables
     Variables()
     -- call_action_list,name=san_trinkets,if=talent.vampiric_strike
-    if S.VampiricStrike:IsAvailable() then
+    if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) and S.VampiricStrike:IsAvailable() then
       local ShouldReturn = SanTrinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=trinkets,if=!talent.vampiric_strike
@@ -980,8 +985,8 @@ local function APL()
     if AoEON() and ActiveEnemies >= 3 and not Player:DnDTicking() then
       local ShouldReturn = AoE(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=san_fishing,if=active_enemies=1&talent.gift_of_the_sanlayn&!cooldown.dark_transformation.ready&!buff.gift_of_the_sanlayn.up&buff.essence_of_the_blood_queen.remains<cooldown.dark_transformation.remains+2
-    if (ActiveEnemies == 1 or not AoEON()) and S.GiftoftheSanlayn:IsAvailable() and S.DarkTransformation:CooldownDown() and Player:BuffDown(S.GiftoftheSanlaynBuff) and Player:BuffRemains(S.EssenceoftheBloodQueenBuff) < S.DarkTransformation:CooldownRemains() + 2 then
+    -- run_action_list,name=san_fishing,if=active_enemies=1&talent.gift_of_the_sanlayn&!cooldown.dark_transformation.ready&!buff.gift_of_the_sanlayn.up&buff.essence_of_the_blood_queen.remains<cooldown.dark_transformation.remains+3
+    if (ActiveEnemies == 1 or not AoEON()) and S.GiftoftheSanlayn:IsAvailable() and S.DarkTransformation:CooldownDown() and Player:BuffDown(S.GiftoftheSanlaynBuff) and Player:BuffRemains(S.EssenceoftheBloodQueenBuff) < S.DarkTransformation:CooldownRemains() + 3 then
       local ShouldReturn = SanFishing(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SanFishing()"; end
     end
@@ -1002,7 +1007,7 @@ local function Init()
   S.VirulentPlagueDebuff:RegisterAuraTracking()
   S.FesteringWoundDebuff:RegisterAuraTracking()
 
-  HR.Print("Unholy DK rotation has been updated for patch 11.0.5.")
+  HR.Print("Unholy DK rotation has been updated for patch 11.1.0.")
 end
 
 HR.SetAPL(252, APL, Init)
