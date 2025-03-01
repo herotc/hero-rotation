@@ -44,6 +44,7 @@ Spell.Druid.Commons = {
   HeartoftheWild                        = Spell(319454),
   Innervate                             = Spell(29166),
   Ironfur                               = Spell(192081),
+  LycarasMeditation                     = Spell(474728),
   Maim                                  = Spell(22570),
   MightyBash                            = Spell(5211),
   MoonkinForm                           = MultiSpell(24858,197625),
@@ -300,6 +301,8 @@ Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
   ArakaraSacbrood                       = Item(219314, {13, 14}),
   SignetofthePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
+  -- TWW Items
+  NeuralSynapseEnhancer                 = Item(168973, {16}),
 })
 
 Item.Druid.Feral = MergeTableByKey(Item.Druid.Commons, {
