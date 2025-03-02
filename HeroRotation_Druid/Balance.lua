@@ -218,7 +218,7 @@ end
 
 local function EvaluateCycleSunfireAoE(TargetUnit)
   -- target_if=refreshable&(target.time_to_die-remains)>6-(spell_targets%2)
-  return TargetUnit:DebuffRefreshable(S.SunfireDebuff) and (TargetUnit:TimeToDie() - Target:DebuffRemains(S.SunfireDebuff)) > 6 - (EnemiesCount10ySplash / 2)
+  return TargetUnit:DebuffRefreshable(S.SunfireDebuff) and (TargetUnit:TimeToDie() - TargetUnit:DebuffRemains(S.SunfireDebuff)) > 6 - (EnemiesCount10ySplash / 2)
 end
 
 local function EvaluateCycleSunfireST(TargetUnit)
@@ -489,7 +489,7 @@ local function AoE()
     if Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall, nil, not IsInSpellRange) then return "starfall aoe 36"; end
   end
   -- convoke_the_spirits,if=(!buff.dreamstate.up&!buff.umbral_embrace.up&spell_targets.starfire<7|spell_targets.starfire=1)&(fight_remains<5|(buff.ca_inc.up|cooldown.ca_inc.remains>40)&(!hero_tree.keeper_of_the_grove|buff.harmony_of_the_grove.up|cooldown.force_of_nature.remains>15))
-  if CDsON() and S.ConvoketheSpirits:IsCastable() and ((Player:BuffDown(S.DreamstateBuff) and Player:BuffDown(S.UmbralEmbraceBuff) and EnemiesCount10ySplash < 7 or EnemiesCount10ySplash == 1) and (BossFightRemains < 5 or (CAIncBuffUp or CAInc:CooldownRemains() > 40) and (Player:HeroTreeID() ~= 34 or Player:BuffUp(S.HarmonyoftheGroveBuff) or S.ForceofNature:CooldownRemains() > 15))) then
+  if CDsON() and S.ConvoketheSpirits:IsCastable() and ((Player:BuffDown(S.DreamstateBuff) and Player:BuffDown(S.UmbralEmbraceBuff) and EnemiesCount10ySplash < 7 or EnemiesCount10ySplash == 1) and (BossFightRemains < 5 or (CAIncBuffUp or CAInc:CooldownRemains() > 40) and (Player:HeroTreeID() ~= 23 or Player:BuffUp(S.HarmonyoftheGroveBuff) or S.ForceofNature:CooldownRemains() > 15))) then
     if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.ConvokeTheSpirits, not IsInSpellRange) then return "convoke_the_spirits aoe 38"; end
   end
   -- new_moon
@@ -579,6 +579,8 @@ local function APL()
     VarEnterLunar = S.LunarCalling:IsAvailable() or EnemiesCount10ySplash > 2 - num(S.UmbralIntensity:TalentRank() + num(S.SouloftheForest:IsAvailable()) > 1)
     -- variable,name=boat_stacks,value=buff.balance_of_all_things_arcane.stack+buff.balance_of_all_things_nature.stack
     VarBoatStacks = Player:BuffStack(S.BOATArcaneBuff) + Player:BuffStack(S.BOATNatureBuff)
+    -- variable,name=no_cd_talent,value=!talent.celestial_alignment&!talent.incarnation_chosen_of_elune|druid.no_cds
+    VarNoCDTalent = not S.CelestialAlignment:IsAvailable() and not S.Incarnation:IsAvailable() or HR.CDsON() == false
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,name=spymasters_web,if=fight_remains<20
       if I.SpymastersWeb:IsEquippedAndReady() and (BossFightRemains < 20) then
@@ -603,7 +605,7 @@ local function APL()
     end
     if Settings.Commons.Enabled.Items then
       -- use_item,name=bestinslots,if=hero_tree.keeper_of_the_grove&buff.harmony_of_the_grove.up|hero_tree.elunes_chosen&(cooldown.ca_inc.full_recharge_time>20|buff.ca_inc.up)
-      if I.BestinSlots:IsEquippedAndReady() and (Player:HeroTreeID() == 23 and Player:BuffUp(S.HarmonyoftheGroveBuff) or Player:HeroTreeID() == 24 and (CaInc:FullRechargeTime() < 20 or CAIncBuffUp)) then
+      if I.BestinSlots:IsEquippedAndReady() and (Player:HeroTreeID() == 23 and Player:BuffUp(S.HarmonyoftheGroveBuff) or Player:HeroTreeID() == 24 and (CaInc:FullRechargeTime() > 20 or CAIncBuffUp)) then
         if Cast(I.BestinSlots, nil, Settings.CommonsDS.DisplayStyle.Items) then return "bestinslots main 12"; end
       end
       if I.NeuralSynapseEnhancer:IsEquippedAndReady() and (
