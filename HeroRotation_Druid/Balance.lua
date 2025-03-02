@@ -35,10 +35,13 @@ local I = Item.Druid.Balance
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  -- Trinkets
   I.ImperfectAscendancySerum:ID(),
   I.NeuralSynapseEnhancer:ID(),
   I.SpymastersWeb:ID(),
   I.TreacherousTransmitter:ID(),
+  -- Other Items
+  I.BestinSlots:ID(),
 }
 
 --- ===== GUI Settings =====

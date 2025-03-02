@@ -41,7 +41,7 @@ local I = Item.Druid.Feral
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- I.Trinket:ID(),
+  I.BestinSlots:ID(),
 }
 
 --- ===== GUI Settings =====

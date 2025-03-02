@@ -36,7 +36,7 @@ local I = Item.Druid.Guardian
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- I.Item:ID(),
+  I.BestinSlots:ID(),
 }
 
 --- ===== GUI Settings =====
