@@ -80,7 +80,7 @@ local ComboPoints, ComboPointsDeficit
 local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMGThreshold, RuptureDurationThreshold
 local PriorityRotation
 local NotPooling, InCooldowns, PoisonedBleeds, EnergyRegenCombined, EnergyTimeToMaxCombined, EnergyRegenSaturated, SingleTarget, ScentSaturated,
-ClipEnvenom, UpperLimitEnergy, AvoidTea, CDSoon
+UpperLimitEnergy, CDSoon
 
 local TrinketSyncSlot = 0
 local TrinketItem1, TrinketItem2
@@ -729,10 +729,11 @@ local function ShivUsage ()
       end
     end
 
-    -- actions.shiv+=/shiv,if=talent.lightweight_shiv.enabled&variable.shiv_kingsbane_condition
-    -- &(dot.kingsbane.ticking|cooldown.kingsbane.remains<=1)
+    -- actions.shiv+=/shiv,if=talent.lightweight_shiv.enabled&variable.shiv_kingsbane_condition&(dot.kingsbane.ticking
+    -- &dot.kingsbane.remains<8|cooldown.kingsbane.remains<=1&cooldown.shiv.charges_fractional>=1.7)
     if S.LightweightShiv:IsAvailable() then
-      if ShivKingsbaneCondition and (Target:DebuffUp(S.Kingsbane) or S.Kingsbane:CooldownRemains() <= 1) then
+      if ShivKingsbaneCondition and (Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) < 8 or S.Kingsbane:CooldownRemains() <= 1
+      and S.Shiv:ChargesFractional() >= 1.7) then
         if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
           return "Cast Shiv (Kingsbane Lightweight)"
         end
@@ -842,15 +843,15 @@ local function CDs ()
     end
   end
 
-  -- # Avoid overcapped energy, use with shiv, or dump charges at the end of a fight
-  -- actions.cds+=/thistle_tea,if=!buff.thistle_tea.up&dot.kingsbane.ticking&dot.kingsbane.remains<8|!buff.thistle_tea.up
-  -- &cooldown.thistle_tea.charges>=2&debuff.shiv.remains>6|!buff.thistle_tea.up&fight_remains<=cooldown.thistle_tea.charges*6
-  if S.ThistleTea:IsCastable() and Player:BuffDown(S.ThistleTea) and Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) < 8
-    or Player:BuffDown(S.ThistleTea) and S.ThistleTea:Charges() >= 2 and Target:DebuffRemains(S.ShivDebuff) > 6
-    or Player:BuffDown(S.ThistleTea) and HL.BossFilteredFightRemains("<", S.ThistleTea:Charges() * 6) then
-    if Cast(S.ThistleTea, Settings.CommonsOGCD.OffGCDasOffGCD.ThistleTea) then
-      return "Cast Thistle Tea"
-    end
+  -- # Use with shiv or in niche cases at the end of Kingsbane if not already up
+  --actions.cds+=/thistle_tea,if=!buff.thistle_tea.up&debuff.shiv.remains>=6|!buff.thistle_tea.up&dot.kingsbane.ticking
+  -- &dot.kingsbane.remains<=6|!buff.thistle_tea.up&fight_remains<=cooldown.thistle_tea.charges*6
+  if S.ThistleTea:IsCastable() and Player:BuffDown(S.ThistleTea) and Target:DebuffRemains(S.Shiv) >= 6
+      or Player:BuffDown(S.ThistleTea) and Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) <= 6
+      or Player:BuffDown(S.ThistleTea) and HL.BossFilteredFightRemains("<", S.ThistleTea:Charges() * 6) then
+      if Cast(S.ThistleTea, Settings.CommonsOGCD.OffGCDasOffGCD.ThistleTea) then
+        return "Cast Thistle Tea"
+      end
   end
 
   -- # Potion/Racials/Other misc cooldowns
@@ -924,11 +925,11 @@ local function Core_Dot()
     end
   end
 
-  -- # Crimson Tempest with Momentum of Despair
-  -- actions.core_dot+=/crimson_tempest,if=effective_combo_points>=variable.effective_spend_cp&refreshable
-  -- &target.time_to_die-remains>8&buff.momentum_of_despair.remains>6&variable.single_target
+  -- # Maintain Crimson Tempest
+  -- actions.core_dot+=/crimson_tempest,if=combo_points>=variable.effective_spend_cp&refreshable
+  -- &(!buff.darkest_night.up)&!talent.amplifying_poison
   if S.CrimsonTempest:IsReady() and ComboPoints >= EffectiveCPSpend and IsDebuffRefreshable(Target, S.CrimsonTempest)
-    and Target:TimeToDie() > 8 and Player:BuffRemains(S.MomentumOfDespair) > 6 and SingleTarget then
+    and Player:BuffDown(S.DarkestNightBuff) and not S.AmplifyingPoison:IsAvailable() then
     if Cast(S.CrimsonTempest, Settings.Assassination.GCDasOffGCD.CrimsonTempest) then
       return "Crimson Tempest with Momentum of Despair"
     end
@@ -940,7 +941,7 @@ local function AoE_Dot ()
   -- # Helper Variable to check basic finisher conditions
   local DotFinisherCondition = ComboPoints >= EffectiveCPSpend
 
-  -- # Crimson Tempest on 2+ Targets if we have enough energy regen
+  -- # Crimson Tempest on 2+ Targets
   -- actions.aoe_dot+=/crimson_tempest,target_if=min:remains,if=spell_targets>=2&variable.dot_finisher_condition
   -- &refreshable&target.time_to_die-remains>6
   if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 2 and DotFinisherCondition then
@@ -954,14 +955,14 @@ local function AoE_Dot ()
     end
   end
 
-  -- # Garrote upkeep, also uses it in AoE to reach energy saturation
+  -- # Garrote upkeep, in AoE to reach energy saturation
   -- actions.aoe_dot+=/garrote,cycle_targets=1,if=combo_points.deficit>=1&(pmultiplier<=1)&refreshable
   -- &!variable.regen_saturated&target.time_to_die-remains>12
   if S.Garrote:IsCastable() and ComboPointsDeficit >= 1 and not EnergyRegenSaturated then
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, 12, MeleeEnemies5y)
   end
 
-  -- # Rupture upkeep, also uses it in AoE to reach energy or scent of blood saturation
+  -- # Rupture upkeep, in AoE to reach energy or scent of blood saturation
   --actions.aoe_dot+=/rupture,cycle_targets=1,if=variable.dot_finisher_condition&refreshable&(!dot.kingsbane.ticking
   -- |buff.cold_blood.up)&(!variable.regen_saturated&(talent.scent_of_blood.rank=2|talent.scent_of_blood.rank<=1
   -- &(buff.indiscriminate_carnage.up|target.time_to_die-remains>15)))
@@ -1057,6 +1058,16 @@ local function Direct ()
     and (Target:DebuffDown(S.Kingsbane) or Target:DebuffDown(S.Deathmark) or Player:BuffUp(S.BlindsideBuff)) then
     if CastPooling(S.Ambush, nil, not TargetInMeleeRange) then
       return "Cast Ambush"
+    end
+  end
+
+  -- # Fan of Knives at 6cp for Darkest Night
+  -- actions.direct+=/fan_of_knives,if=buff.darkest_night.up&combo_points=6
+  if S.FanofKnives:IsCastable() then
+    if Player:BuffUp(S.DarkestNightBuff) and ComboPoints == 6 then
+      if CastPooling(S.FanofKnives, nil, not TargetInMeleeRange) then
+        return "Cast Fan of Knives"
+      end
     end
   end
 
@@ -1199,27 +1210,18 @@ local function APL ()
     -- actions+=/variable,name=in_cooldowns,value=dot.deathmark.ticking|dot.kingsbane.ticking|debuff.shiv.up
     InCooldowns = Target:DebuffUp(S.Deathmark) or Target:DebuffUp(S.Kingsbane) or Target:DebuffUp(S.Shiv)
 
-    -- # Check to clip envenom
-    -- actions+=/variable,name=clip_envenom,value=buff.envenom.up&buff.envenom.remains.1<=1
-    ClipEnvenom = Player:BuffUp(S.Envenom)
-
     -- # Check upper bounds of energy to begin spending
     -- actions+=/variable,name=upper_limit_energy,value=energy.pct>=(50-10*talent.vicious_venoms.rank)
     UpperLimitEnergy = Player:EnergyPercentage() >= (50 - 10 * S.ViciousVenoms:TalentRank())
-
-    -- # Variable to control avoiding auto-proc on Thistle Tea
-    -- actions+=/variable,name=avoid_tea,value=energy>40+50+5*talent.vicious_venoms.rank
-    AvoidTea = Player:Energy() > 40 + 50 + 5 * S.ViciousVenoms:TalentRank()
 
     -- # Checking for cooldowns soon
     -- actions+=/variable,name=cd_soon,value=cooldown.kingsbane.remains<3&!cooldown.kingsbane.ready
     CDSoon = S.Kingsbane:CooldownRemains() < 3 and not S.Kingsbane:IsReady()
 
     -- # Pooling Condition all together
-    -- actions+=/variable,name=not_pooling,value=variable.in_cooldowns|!variable.cd_soon&variable.avoid_tea
-    -- &buff.darkest_night.up|!variable.cd_soon&variable.avoid_tea&variable.clip_envenom|variable.upper_limit_energy|fight_remains<=20
-    NotPooling = InCooldowns or not CDSoon and AvoidTea and Player:BuffUp(S.DarkestNightBuff) or not CDSoon and AvoidTea
-      and ClipEnvenom or UpperLimitEnergy or HL.BossFilteredFightRemains("<=", 20)
+    -- actions+=/variable,name=not_pooling,value=variable.in_cooldowns|!variable.cd_soon&buff.darkest_night.up|variable.upper_limit_energy|fight_remains<=20
+    NotPooling = InCooldowns or not CDSoon and Player:BuffUp(S.DarkestNightBuff)
+      or UpperLimitEnergy or HL.BossFilteredFightRemains("<=", 20)
 
     ScentSaturated = ScentSaturatedVar()
 
