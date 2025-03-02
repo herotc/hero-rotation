@@ -223,6 +223,7 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   RagingDemonfire                       = Spell(387166),
   RainofChaos                           = Spell(266086),
   RainofFire                            = Spell(5740),
+  RainofFireTarget                      = Spell(1214467),
   RoaringBlaze                          = Spell(205184),
   Ruin                                  = Spell(387103),
   Shadowburn                            = Spell(17877),
