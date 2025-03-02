@@ -63,6 +63,8 @@ local VarPoolingConditionCB = false
 local VarInfernalActive = false
 local VarT1WillLoseCast, VarT2WillLoseCast = false, false
 local SoulShards = 0
+-- Note: Talent now has manually placed and placed at target versions.
+-- Note: RainofFireTarget doesn't generate an icon image for some reason, so we suggest S.RainofFire regardless.
 local RoFSpell = S.RainofFireTarget:IsAvailable() and S.RainofFireTarget or S.RainofFire
 local Enemies40y, EnemiesCount8ySplash
 local BossFightRemains = 11111
