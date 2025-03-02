@@ -332,7 +332,7 @@ local function ST()
     if Cast(S.Starfire, nil, nil, not IsInSpellRange) then return "starfire st 18"; end
   end
   -- starsurge,if=variable.cd_condition&astral_power.deficit>variable.passive_asp+action.force_of_nature.energize_amount
-  if S.Starsurge:IsReady() and (VarCDCondition and Player:AstralPowerDeficit() > VarPassiveAsp + S.ForceofNature:EnergizeAmount()) then
+  if S.Starsurge:IsReady() and (VarCDCondition and Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.ForceofNature)) then
     if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 20"; end
   end
   -- force_of_nature,if=cooldown.ca_inc.remains<gcd.max&(!talent.convoke_the_spirits|cooldown.convoke_the_spirits.remains<gcd.max*3|cooldown.convoke_the_spirits.remains>cooldown.ca_inc.full_recharge_time|fight_remains<cooldown.convoke_the_spirits.remains+3)|cooldown.ca_inc.full_recharge_time+5+15*talent.control_of_the_dream>cooldown&(!talent.convoke_the_spirits|cooldown.convoke_the_spirits.remains+10+15*talent.control_of_the_dream>cooldown|fight_remains<cooldown.convoke_the_spirits.remains+cooldown.convoke_the_spirits.duration+5)&(fight_remains>cooldown+5|fight_remains<cooldown.ca_inc.remains+7)|talent.whirling_stars&talent.convoke_the_spirits&cooldown.convoke_the_spirits.remains>cooldown.force_of_nature.duration-10&fight_remains>cooldown.convoke_the_spirits.remains+6
