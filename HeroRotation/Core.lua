@@ -66,7 +66,7 @@ function HR.GetTexture(Object)
     local TextureCache = Cache.Persistent.Texture.Spell
     if not TextureCache[SpellID] then
       -- Check if the SpellID is the one from Custom Textures or a Regular WoW Spell
-      if SpellID >= 999900 then
+      if SpellID >= 999900 and SpellID < 1000000 then
         TextureCache[SpellID] = "Interface\\Addons\\HeroRotation\\Textures\\"..tostring(SpellID)
       elseif Object.TextureSpellID then
         TextureCache[SpellID] = GetSpellTexture(Object.TextureSpellID)
