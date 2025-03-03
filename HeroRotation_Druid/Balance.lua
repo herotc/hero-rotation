@@ -583,7 +583,7 @@ local function APL()
     -- variable,name=boat_stacks,value=buff.balance_of_all_things_arcane.stack+buff.balance_of_all_things_nature.stack
     VarBoatStacks = Player:BuffStack(S.BOATArcaneBuff) + Player:BuffStack(S.BOATNatureBuff)
     -- variable,name=no_cd_talent,value=!talent.celestial_alignment&!talent.incarnation_chosen_of_elune|druid.no_cds
-    VarNoCDTalent = not S.CelestialAlignment:IsAvailable() and not S.Incarnation:IsAvailable() or HR.CDsON() == false
+    VarNoCDTalent = not S.CelestialAlignment:IsAvailable() and not S.Incarnation:IsAvailable() or not CDsON()
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,name=spymasters_web,if=fight_remains<20
       if I.SpymastersWeb:IsEquippedAndReady() and (BossFightRemains < 20) then
