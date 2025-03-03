@@ -105,7 +105,6 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   Nightfall                             = Spell(108558),
   Oblivion                              = Spell(417537),
   PhantomSingularity                    = Spell(205179),
-  SowTheSeeds                           = Spell(196226),
   SeedofCorruption                      = Spell(27243),
   ShadowEmbrace                         = Spell(32388),
   SiphonLife                            = Spell(63106),
