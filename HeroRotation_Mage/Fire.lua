@@ -182,13 +182,14 @@ end, "PLAYER_REGEN_ENABLED")
 
 --- ===== Helper Functions =====
 local function ScorchExecuteActive()
-  if not S.Scorch:IsAvailable() then return false end
-  if Player:BuffUp(S.HeatShimmerBuff) then return true end
-  return Target:HealthPercentage() <= 30 + 5 * num(S.SunfuryExecution:IsAvailable())
+  if not Player or not Target then return false end
+  if S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 then return true end
+  return false
 end
 
 local function FirestarterActive()
-  return (S.Firestarter:IsAvailable() and (Target:HealthPercentage() > 90))
+  if not Player or not Target then return false end
+  return S.Firestarter:IsAvailable() and Target:HealthPercentage() >= 90
 end
 
 local function FirestarterRemains()
@@ -204,9 +205,15 @@ local function ShiftingPowerFullReduction()
 end
 
 local function FreeCastAvailable()
-  local FSInFlight = FirestarterActive() and (num(S.Pyroblast:InFlight()) + num(Bolt:InFlight())) or 0
-  FSInFlight = FSInFlight + num(S.PhoenixFlames:InFlight() or Player:PrevGCDP(1, S.PhoenixFlames))
-  return HotStreak or Player:BuffUp(S.HyperthermiaBuff) or (HeatingUp and (ImprovedScorchActive() and Player:IsCasting(S.Scorch) or FirestarterActive() and (Player:IsCasting(Bolt) or FSInFlight > 0)))
+  if not Player then return false end
+  -- Check for Hot Streak
+  local hotStreak = Player:BuffUp(S.HotStreakBuff)
+  -- Check for Hyperthermia
+  local hyperthermia = Player:BuffUp(S.HyperthermiaBuff)
+  -- Check for Fury of the Sun King
+  local furyOfTheSunKing = Player:BuffUp(S.FuryoftheSunKingBuff)
+
+  return hotStreak or hyperthermia or furyOfTheSunKing
 end
 
 local function UnitsWithIgnite(enemies)
@@ -220,11 +227,17 @@ local function UnitsWithIgnite(enemies)
 end
 
 local function HotStreakInFlight()
-  local total = 0
-  if Bolt:InFlight() or S.PhoenixFlames:InFlight() then
-    total = total + 1
-  end
-  return total
+  if not Player then return 0 end
+  local count = 0
+  -- Check Pyroblast in flight
+  if S.Pyroblast:InFlight() then count = count + 1 end
+  -- Check Fireball in flight
+  if S.Fireball:InFlight() then count = count + 1 end
+  -- Check Phoenix Flames in flight
+  if S.PhoenixFlames:InFlight() then count = count + 1 end
+  -- Check Frostfire Bolt in flight if available
+  if S.FrostfireBolt:IsAvailable() and S.FrostfireBolt:InFlight() then count = count + 1 end
+  return count
 end
 
 --- ===== Rotation Functions =====
