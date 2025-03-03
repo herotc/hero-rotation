@@ -153,6 +153,7 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   CalloftheSunKing                      = Spell(343222),
   Combustion                            = Spell(190319),
   FeeltheBurn                           = Spell(383391),
+  Firefall                              = Spell(384033),
   FlameAccelerant                       = Spell(203275),
   FireBlast                             = Spell(108853),
   Firestarter                           = Spell(205026),
@@ -263,6 +264,8 @@ Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
   VerdantGladiatorsBadge                = Item(209343, {13, 14}),
   -- TWW Gladiator's Badges
   ForgedGladiatorsBadge                 = Item(218713, {13, 14}),
+  -- TWW S2 Trinkets
+  NeuralSynapseEnhancer                 = Item(168973, {13, 14}),
   -- Trinkets kept for variables
   DragonfireBombDispenser               = Item(202610, {13, 14}),
   HornofValor                           = Item(133642, {13, 14}),
