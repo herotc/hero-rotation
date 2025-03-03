@@ -309,8 +309,11 @@ end
 HL:RegisterForSelfCombatEvent(
   function (...)
     local timestamp,Event,_,SourceGUID,_,_,_,UnitPetGUID,_,_,_,SpellID=select(1,...)
-    local _, _, _, _, _, _, _, UnitPetID = find(UnitPetGUID, "(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)")
-    UnitPetID = tonumber(UnitPetID)
+    local UnitPetID = 0
+    if UnitPetGUID then
+        local _, _, _, _, _, _, _, id = find(UnitPetGUID, "(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)")
+        UnitPetID = tonumber(id or "0")
+    end
 
     -- Add pet
     if (UnitPetGUID ~= UnitGUID("pet") and Event == "SPELL_SUMMON" and PetsData[UnitPetID]) then
