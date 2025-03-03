@@ -121,6 +121,7 @@ Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
   MoltenEmbers                          = Spell(459725),
   Prescience                            = Spell(409311),
   PupilofAlexstrasza                    = Spell(407814),
+  Rockfall                              = Spell(1219236),
   TimeSkip                              = Spell(404977),
   TomorrowToday                         = Spell(412723),
   Upheaval                              = Spell(396286),
@@ -198,14 +199,15 @@ Item.Evoker.Commons = {
   NymuesUnravelingSpindle               = Item(208615, {13, 14}),
   -- TWW Trinkets
   SpymastersWeb                         = Item(220202, {13, 14}),
+  -- TWW Items
+  BestinSlotsCaster                     = Item(232805, {16}),
 }
 
 Item.Evoker.Augmentation = MergeTableByKey(Item.Evoker.Commons, {
-  -- Trinkets kept for variables
-  BeacontotheBeyond                     = Item(203963, {13, 14}),
   -- TWW Trinkets
   AberrantSpellforge                    = Item(212451, {13, 14}),
   ConcoctionKissofDeath                 = Item(215174, {13, 14}),
+  FlarendosPilotLight                   = Item(230191, {13, 14}),
   OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
 })
