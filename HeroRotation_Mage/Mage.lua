@@ -240,6 +240,8 @@ Item.Mage.Commons = {
   -- Trinkets kept for variables
   NymuesUnravelingSpindle               = Item(208615, {13, 14}),
   -- TWW Trinkets
+  BurstofKnowledge                      = Item(231424, {13, 14}),
+  HouseofCards                          = Item(230027, {13, 14}),
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
