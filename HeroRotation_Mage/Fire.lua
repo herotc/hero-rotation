@@ -129,9 +129,9 @@ SetTrinketVariables()
 --- ===== Precombat Variables =====
 local function SetPrecombatVariables()
   VarFirestarterCombusion = S.SunKingsBlessing:IsAvailable()
-  VarHotStreakFlamestrike = 4 * num(S.Quickflame:IsAvailable() or S.FlamePatch:IsAvailable()) + 999 * num(not S.FlamePatch:IsAvailable() and not S.Quickflame:IsAvailable())
+  VarHotStreakFlamestrike = 5 * num(S.Quickflame:IsAvailable() or S.FlamePatch:IsAvailable()) + 6 * num(S.Firefall:IsAvailable()) + 999 * num(not S.FlamePatch:IsAvailable() and not S.Quickflame:IsAvailable() and not S.Firefall:IsAvailable())
   VarHardCastFlamestrike = 999
-  VarCombustionFlamestrike = 4 * num(S.Quickflame:IsAvailable() or S.FlamePatch:IsAvailable()) + 999 * num(not S.FlamePatch:IsAvailable() and not S.Quickflame:IsAvailable())
+  VarCombustionFlamestrike = 5 * num(S.Quickflame:IsAvailable() or S.FlamePatch:IsAvailable()) + 6 * num(S.Firefall:IsAvailable()) + 999 * num(not S.FlamePatch:IsAvailable() and not S.Quickflame:IsAvailable() and not S.Firefall:IsAvailable())
   VarSKBFlamestrike = 3 * num(S.Quickflame:IsAvailable() or S.FlamePatch:IsAvailable()) + 999 * num(not S.FlamePatch:IsAvailable() and not S.Quickflame:IsAvailable())
   VarArcaneExplosion = 999
   VarArcaneExplosionMana = 40
@@ -290,6 +290,10 @@ local function ActiveTalents()
       if Cast(S.DragonsBreath, Settings.Fire.GCDasOffGCD.DragonsBreath) then return "dragons_breath active_talents 4"; end
     end
   end
+  -- meteor,if=talent.unleashed_inferno&buff.excess_fire.stack<2
+  if S.Meteor:IsReady() and (S.UnleashedInferno:IsAvailable() and Player:BuffStack(S.ExcessFireBuff) < 2) then
+    if Cast(S.Meteor, Settings.Fire.GCDasOffGCD.Meteor, nil, not Target:IsInRange(40)) then return "meteor active_talents 6"; end
+  end
 end
 
 local function CombustionCooldowns()
@@ -374,7 +378,7 @@ local function CombustionPhase()
     if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 10"; end
   end
   -- meteor,if=talent.isothermic_core&buff.combustion.down&cooldown.combustion.remains<cast_time
-  if S.Meteor:IsReady() and (S.IsothermicCore:IsAvailable() and CombustionDown and S.Combustion:CooldownRemains() < S.Meteor:CastTime()) then
+  if S.Meteor:IsReady() and (not S.UnleashedInferno:IsAvailable() and S.IsothermicCore:IsAvailable() and CombustionDown and S.Combustion:CooldownRemains() < S.Meteor:CastTime()) then
     if Cast(S.Meteor, Settings.Fire.GCDasOffGCD.Meteor, nil, not Target:IsInRange(40)) then return "meteor combustion_phase 12"; end
   end
   -- fireball,if=buff.combustion.down&cooldown.combustion.remains<cast_time&active_enemies<2&!improved_scorch.active&!(talent.sun_kings_blessing&talent.flame_accelerant)
@@ -548,6 +552,10 @@ local function StandardRotation()
   if S.FireBlast:IsReady() and not FreeCastAvailable() and (not FirestarterActive() and ((not VarFireBlastPooling and S.UnleashedInferno:IsAvailable()) or S.SpontaneousCombustion:IsAvailable()) and Player:BuffDown(S.FuryoftheSunKingBuff) and (HeatingUp and HotStreakInFlight() < 1 and (Player:PrevGCDP(1, S.PhoenixFlames) or Player:PrevGCDP(1, S.Scorch))) or (((Player:BloodlustUp() and S.FireBlast:ChargesFractional() > 1.5) or S.FireBlast:ChargesFractional() > 2.5 or Player:BuffRemains(S.FeeltheBurnBuff) < 0.5 or S.FireBlast:FullRechargeTime() * 1 - (0.5 * num(S.ShiftingPower:CooldownUp())) < 6) and HeatingUp)) then
     if CastLeft(S.FireBlast) then return "fire_blast standard_rotation 10"; end
   end
+  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=buff.hyperthermia.up&charges_fractional>1.5&buff.heating_up.react
+  if S.FireBlast:IsReady() and not FreeCastAvailable() and (Player:BuffUp(S.HyperthermiaBuff) and S.FireBlast:ChargesFractional() > 1.5 and HeatingUp) then
+    if CastLeft(S.FireBlast) then return "fire_blast standard_rotation 11"; end
+  end
   -- flamestrike,if=active_enemies>=variable.skb_flamestrike&buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.expiration_delay_remains=0
   if AoEON() and S.Flamestrike:IsReady() and not Player:IsCasting(S.Flamestrike) and (EnemiesCount8ySplash >= VarSKBFlamestrike and Player:BuffUp(S.FuryoftheSunKingBuff)) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike standard_rotation 12"; end
@@ -595,8 +603,8 @@ local function StandardRotation()
       if Cast(S.DragonsBreath, Settings.Fire.GCDasOffGCD.DragonsBreath) then return "dragons_breath standard_rotation 28"; end
     end
   end
-  -- scorch,if=(scorch_execute.active|buff.heat_shimmer.react)
-  if S.Scorch:IsReady() and (ScorchExecuteActive() or Player:BuffUp(S.HeatShimmerBuff)) then
+  -- scorch,if=(scorch_execute.active&!(talent.unleashed_inferno&talent.frostfire_bolt)|buff.heat_shimmer.react)
+  if S.Scorch:IsReady() and ((ScorchExecuteActive() and not (S.UnleashedInferno:IsAvailable() and S.FrostfireBolt:IsAvailable())) or Player:BuffUp(S.HeatShimmerBuff)) then
     if Cast(S.Scorch, nil, nil, not Target:IsSpellInRange(S.Scorch)) then return "scorch standard_rotation 30"; end
   end
   -- arcane_explosion,if=active_enemies>=variable.arcane_explosion&mana.pct>=variable.arcane_explosion_mana
@@ -717,6 +725,10 @@ local function APL()
       if I.ImperfectAscendancySerum:IsEquippedAndReady() and (VarTimeToCombustion < 3) then
         if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum main 10"; end
       end
+      -- use_item,name=neural_synapse_enhancer,if=buff.combustion.remains>7|fight_remains<15
+      if I.NeuralSynapseEnhancer:IsEquippedAndReady() and (CombustionRemains > 7 or FightRemains < 15) then
+        if Cast(I.NeuralSynapseEnhancer, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "neural_synapse_enhancer main 11"; end
+      end
       -- use_item,effect_name=gladiators_badge,if=variable.time_to_combustion>cooldown-5
       if I.ForgedGladiatorsBadge:IsEquippedAndReady() and (VarTimeToCombustion > I.ForgedGladiatorsBadge:Cooldown() - 5) then
         if Cast(I.ForgedGladiatorsBadge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "gladiators_badge (forged) main 12"; end
@@ -746,7 +758,7 @@ local function APL()
       end
     end
     -- variable,use_off_gcd=1,use_while_casting=1,name=fire_blast_pooling,value=buff.combustion.down&action.fire_blast.charges_fractional+(variable.time_to_combustion+action.shifting_power.full_reduction*variable.shifting_power_before_combustion)%cooldown.fire_blast.duration-1<cooldown.fire_blast.max_charges+variable.overpool_fire_blasts%cooldown.fire_blast.duration-(buff.combustion.duration%cooldown.fire_blast.duration)%%1&variable.time_to_combustion<fight_remains
-    VarFireBlastPooling = CombustionDown and S.FireBlast:ChargesFractional() + (VarTimeToCombustion + ShiftingPowerFullReduction() * num(VarShiftingPowerBeforeCombustion)) / S.FireBlast:Cooldown() - 1 < S.FireBlast:MaxCharges() + VarOverpoolFireBlasts / S.FireBlast:Cooldown() - (12 / S.FireBlast:Cooldown()) % 1 and VarTimeToCombustion < FightRemains
+    VarFireBlastPooling = VarTimeToCombustion <= 8
     -- call_action_list,name=combustion_phase,if=variable.time_to_combustion<=0|buff.combustion.up|variable.time_to_combustion<variable.combustion_precast_time&cooldown.combustion.remains<variable.combustion_precast_time
     if VarTimeToCombustion <= 0 or CombustionUp or VarTimeToCombustion < VarCombustionPrecastTime and S.Combustion:CooldownRemains() < VarCombustionPrecastTime then
       local ShouldReturn = CombustionPhase(); if ShouldReturn then return ShouldReturn; end
@@ -794,7 +806,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Fire Mage rotation has been updated for patch 11.0.7.")
+  HR.Print("Fire Mage rotation has been updated for patch 11.1.0.")
 end
 
 HR.SetAPL(63, APL, Init)
