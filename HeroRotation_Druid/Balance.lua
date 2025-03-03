@@ -41,7 +41,7 @@ local OnUseExcludes = {
   I.SpymastersWeb:ID(),
   I.TreacherousTransmitter:ID(),
   -- Other Items
-  I.BestinSlots:ID(),
+  I.BestinSlotsCaster:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -608,8 +608,8 @@ local function APL()
     end
     if Settings.Commons.Enabled.Items then
       -- use_item,name=bestinslots,if=hero_tree.keeper_of_the_grove&buff.harmony_of_the_grove.up|hero_tree.elunes_chosen&(cooldown.ca_inc.full_recharge_time>20|buff.ca_inc.up)
-      if I.BestinSlots:IsEquippedAndReady() and (Player:HeroTreeID() == 23 and Player:BuffUp(S.HarmonyoftheGroveBuff) or Player:HeroTreeID() == 24 and (CaInc:FullRechargeTime() > 20 or CAIncBuffUp)) then
-        if Cast(I.BestinSlots, nil, Settings.CommonsDS.DisplayStyle.Items) then return "bestinslots main 12"; end
+      if I.BestinSlotsCaster:IsEquippedAndReady() and (Player:HeroTreeID() == 23 and Player:BuffUp(S.HarmonyoftheGroveBuff) or Player:HeroTreeID() == 24 and (CaInc:FullRechargeTime() > 20 or CAIncBuffUp)) then
+        if Cast(I.BestinSlotsCaster, nil, Settings.CommonsDS.DisplayStyle.Items) then return "bestinslots main 12"; end
       end
       if I.NeuralSynapseEnhancer:IsEquippedAndReady() and (
         -- use_item,name=neural_synapse_enhancer,if=variable.on_use_trinket=1&!trinket.1.cooldown.ready&(buff.harmony_of_the_grove.up|hero_tree.elunes_chosen)|!trinket.1.has_use_buff&(buff.harmony_of_the_grove.up|hero_tree.elunes_chosen)

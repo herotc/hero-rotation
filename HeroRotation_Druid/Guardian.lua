@@ -36,7 +36,7 @@ local I = Item.Druid.Guardian
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.BestinSlots:ID(),
+  I.BestinSlotsMelee:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -377,8 +377,8 @@ local function APL()
     end
     -- auto_attack,if=!buff.prowl.up
     -- use_item,name=bestinslots,if=buff.incarnation_guardian_of_ursoc.up|buff.berserk_bear.up
-    if Settings.Commons.Enabled.Items and I.BestinSlots:IsReady() and (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) then
-      if Cast(I.BestinSlots, nil, Settings.CommonsDS.DisplayStyle.Items) then return "use_item bestinslots main 4"; end
+    if Settings.Commons.Enabled.Items and I.BestinSlotsMelee:IsReady() and (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) then
+      if Cast(I.BestinSlotsMelee, nil, Settings.CommonsDS.DisplayStyle.Items) then return "use_item bestinslots main 4"; end
     end
     -- use_item,name=tome_of_lights_devotion,if=buff.inner_resilience.up
     if Settings.Commons.Enabled.Trinkets and I.TomeofLightsDevotion:IsReady() and (Player:BuffUp(S.InnerResilienceBuff)) then

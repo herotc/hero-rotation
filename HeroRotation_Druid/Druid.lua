@@ -292,7 +292,8 @@ Item.Druid.Commons = {
   OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
   -- TWW Items
-  BestinSlots                           = Item(232526, {16}),
+  BestinSlotsCaster                     = Item(232805, {16}),
+  BestinSlotsMelee                      = Item(232526, {16}),
 }
 
 Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
