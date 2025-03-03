@@ -81,9 +81,11 @@ Spell.Evoker.Flameshaper = {
   Engulf                                = Spell(443328),
   Enkindle                              = Spell(444016),
   FanTheFlames                          = Spell(444318),
-  TravelingFlame                        = Spell(444140),
+  FlameSiphon                           = Spell(444140),
   -- Buffs
-  EnkindleBuff                          = Spell(444017),
+  EnkindleBuff                          = Spell(445740),
+  -- Debuffs
+  EnkindleDebuff                        = Spell(444017),
 }
 
 Spell.Evoker.Scalecommander = {
@@ -101,6 +103,7 @@ Spell.Evoker.Scalecommander = {
   MassEruptionBuff                      = Spell(438588),
   -- Debuffs
   BombardmentsDebuff                    = Spell(434473),
+  MeltArmorDebuff                       = Spell(441172),
 }
 
 Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
@@ -162,6 +165,7 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   FontofMagic                           = Spell(375783),
   ImminentDestruction                   = Spell(370781),
   Iridescence                           = Spell(370867),
+  PowerSwell                            = Spell(370839),
   Pyre                                  = Spell(357211),
   RagingInferno                         = Spell(405659),
   RubyEmbers                            = Spell(365937),
@@ -177,8 +181,10 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   ChargedBlastBuff                      = Spell(370454),
   EmeraldTranceBuff                     = Spell(424155), -- T31 2pc
   EssenceBurstBuff                      = Spell(359618),
+  ImminentDestructionBuff               = Spell(411055),
   IridescenceBlueBuff                   = MultiSpell(386399,399370),
   IridescenceRedBuff                    = Spell(386353),
+  JackpotBuff                           = Spell(1217769), -- TWW2 4pc
   LimitlessPotentialBuff                = Spell(394402),
   PowerSwellBuff                        = Spell(376850),
   SnapfireBuff                          = Spell(370818),
@@ -192,11 +198,6 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Devastation, Spell.Evoke
 -- Items
 if not Item.Evoker then Item.Evoker = {} end
 Item.Evoker.Commons = {
-  -- Trinkets kept for variables
-  RubyWhelpShell                        = Item(193757, {13, 14}),
-  WhisperingIncarnateIcon               = Item(194301, {13, 14}),
-  -- DF Trinkets
-  NymuesUnravelingSpindle               = Item(208615, {13, 14}),
   -- TWW Trinkets
   SpymastersWeb                         = Item(220202, {13, 14}),
   -- TWW Items
@@ -213,9 +214,8 @@ Item.Evoker.Augmentation = MergeTableByKey(Item.Evoker.Commons, {
 })
 
 Item.Evoker.Devastation = MergeTableByKey(Item.Evoker.Commons, {
-  -- Trinkets kept for variables
-  BelorrelostheSuncaller                = Item(207172, {13, 14}),
-  MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
   -- DF Items
   KharnalexTheFirstLight                = Item(195519, {16}),
+  -- TWW Trinkets
+  HouseofCards                          = Item(230027, {13, 14}),
 })
