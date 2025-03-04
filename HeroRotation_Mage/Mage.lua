@@ -74,9 +74,11 @@ Spell.Mage.Frostfire = {
 
 Spell.Mage.Spellslinger = {
   -- Talents
+  Resonance                              = Spell(453823),
   ShiftingShards                        = Spell(444675),
   SplinteringSorcery                    = Spell(443739),
   Splinterstorm                         = Spell(443742),
+  TimeLoop                              = Spell(445255),
   UnerringProficiency                   = Spell(444974),
   -- Buffs
   UnerringProficiencyBuff               = Spell(444981),
@@ -84,6 +86,7 @@ Spell.Mage.Spellslinger = {
 
 Spell.Mage.Sunfury = {
   -- Talents
+  ConsortiumsBauble                     = Spell(451894),
   SpellfireSpheres                      = Spell(448601),
   SunfuryExecution                      = Spell(449349),
   -- Buffs
@@ -133,6 +136,9 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   NetherPrecisionBuff                   = Spell(383783),
   PresenceofMindBuff                    = Spell(205025),
   SiphonStormBuff                       = Spell(384267),
+  -- Tier Set Bonuses (TWW)
+  TWW_S2_2pcBuff                        = Spell(1216178), -- Clarity (same as ClarityBuff)
+  TWW_S2_4pcBuff                        = Spell(1216181), -- Arcane Attunement
   -- Debuffs
   MagisSparkABDebuff                    = Spell(453912),
   MagisSparkABarDebuff                  = Spell(451911),
@@ -184,6 +190,9 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   RollinHotBuff                         = Spell(1219035), -- TWW S2 Tier 4pc
   SunKingsBlessingBuff                  = Spell(383882),
   FuryoftheSunKingBuff                  = Spell(383883),
+  -- Tier Set Bonuses (TWW)
+  TWW_S2_2pcBuff                        = Spell(1219034), -- Lead the Chase
+  TWW_S2_4pcBuff                        = Spell(1219035), -- Rollin' Hot (same as RollinHotBuff)
   -- Debuffs
   IgniteDebuff                          = Spell(12654),
   ImprovedScorchDebuff                  = Spell(383608),
@@ -227,6 +236,9 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   GlacialSpikeBuff                      = Spell(199844),
   IciclesBuff                           = Spell(205473),
   IcyVeinsBuff                          = Spell(12472),
+  -- Tier Set Bonuses (TWW)
+  TWW_S2_2pcBuff                        = Spell(1216913), -- Windfall
+  TWW_S2_4pcBuff                        = Spell(1216914), -- Extended Bankroll (same as ExtendedBankrollBuff)
   -- Debuffs
   FreezingWindsDebuff                   = Spell(1216988),
   WintersChillDebuff                    = Spell(228358),
@@ -254,6 +266,7 @@ Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
   HighSpeakersAccretion                 = Item(219303, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
   MereldarsToll                         = Item(219313, {13, 14}),
+  NeuralSynapseEnhancer                 = Item(168973, {13, 14}),
   QuickwickCandlestick                  = Item(225649, {13, 14}),
   SignetofthePriory                     = Item(219308, {13, 14}),
 })
