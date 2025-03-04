@@ -68,6 +68,7 @@ Spell.Hunter.Commons = {
   BerserkingBuff                        = Spell(26297),
   BloodFuryBuff                         = Spell(20572),
   DeathblowBuff                         = Spell(378770),
+  JunkmaestrosBuff                      = Spell(1219661), -- Buff from Junkmaestro's Mega Magnet
   SeethingRageBuff                      = Spell(408835), -- Buff from Djaruun
   -- Debuffs
   HuntersMarkDebuff                     = Spell(257284),
@@ -104,14 +105,17 @@ Spell.Hunter.DarkRanger = {
 Spell.Hunter.PackLeader = {
   -- Talents
   CulltheHerd                           = Spell(445717),
-  FuriousAssault                        = Spell(445699), -- Removed in 11.1
   HowlofthePack                         = Spell(445707),
-  ViciousHunt                           = Spell(445404), -- Removed in 11.1
   -- Buffs
-  FuriousAssaultBuff                    = Spell(448814), -- Removed in 11.1
+  HogstriderBuff                        = Spell(472640),
   HowlofthePackBuff                     = Spell(462515),
+  HowlofthePackLeaderCDBuff             = Spell(471877),
   PackCoordinationBuff                  = Spell(445695),
   ScatteredPreyBuff                     = Spell(461866),
+  -- Howl of the Pack Leader Summon Buffs
+  HowlBearBuff                          = Spell(472325),
+  HowlBoarBuff                          = Spell(472324),
+  HowlWyvernBuff                        = Spell(471878),
 }
 
 Spell.Hunter.Sentinel = {
@@ -169,7 +173,6 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   SolitaryCompanion                     = Spell(474746),
   Stomp                                 = Spell(199530),
   ThunderingHooves                      = Spell(459693),
-  VenomsBite                            = Spell(459565), -- Removed in 11.1
   WildCall                              = Spell(185789),
   WildInstincts                         = Spell(378442),
   -- Buffs
@@ -316,6 +319,8 @@ if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Commons = {
   -- Trinkets kept for variables
   MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
+  -- TWW Trinkets
+  JunkmaestrosMegaMagnet                = Item(230189, {13, 14}),
 }
 
 Item.Hunter.BeastMastery = MergeTableByKey(Item.Hunter.Commons, {
