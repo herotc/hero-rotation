@@ -446,8 +446,8 @@ local function Havoc()
   if S.Shadowburn:IsReady() and (EnemiesCount8ySplash <= 4 and VarHavocRemains <= Player:GCD() * 3) then
     if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn havoc 16"; end
   end
-  -- chaos_bolt,if=cast_time<havoc_remains&((!talent.improved_chaos_bolt&active_enemies<=2)|(talent.improved_chaos_bolt&((talent.wither&talent.inferno&active_enemies<=2)|(talent.wither&talent.cataclysm&active_enemies<=4)|(!talent.wither&talent.inferno&active_enemies<=3)|(!talent.wither&talent.cataclysm&active_enemies<=5))))
-  if S.ChaosBolt:IsReady() and (S.ChaosBolt:CastTime() < VarHavocRemains and ((not S.ImprovedChaosBolt:IsAvailable() and EnemiesCount8ySplash <= 2) or (S.ImprovedChaosBolt:IsAvailable() and ((S.Wither:IsAvailable() and S.Inferno:IsAvailable() and EnemiesCount8ySplash <= 2) or (S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 4) or (not S.Wither:IsAvailable() and S.Inferno:IsAvailable() and EnemiesCount8ySplash <= 3) or (not S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 5))))) then
+  -- chaos_bolt,if=cast_time<havoc_remains&((!talent.improved_chaos_bolt&active_enemies<=2)|(talent.improved_chaos_bolt&((talent.wither&talent.inferno&active_enemies<=2)|(((talent.wither&talent.cataclysm)|(!talent.wither&talent.inferno))&active_enemies<=3)|(!talent.wither&talent.cataclysm&active_enemies<=5))))
+  if S.ChaosBolt:IsReady() and (S.ChaosBolt:CastTime() < VarHavocRemains and ((not S.ImprovedChaosBolt:IsAvailable() and EnemiesCount8ySplash <= 2) or (S.ImprovedChaosBolt:IsAvailable() and ((S.Wither:IsAvailable() and S.Inferno:IsAvailable() and EnemiesCount8ySplash <= 2) or (((S.Wither:IsAvailable() and S.Cataclysm:IsAvailable()) or (not S.Wither:IsAvailable() and S.Inferno:IsAvailable())) and EnemiesCount8ySplash <= 3) or (not S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 5))))) then
     if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt havoc 18"; end
   end
   -- rain_of_fire,if=active_enemies>=3
