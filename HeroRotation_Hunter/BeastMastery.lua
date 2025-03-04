@@ -215,8 +215,8 @@ local function Cleave()
   if CDsON() and S.BestialWrath:IsCastable() then
     if Everyone.CastTargetIf(S.BestialWrath, Enemies40y, "min", EvaluateTargetIfFilterBarbedShot, nil, not TargetInRange40y, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath cleave 2"; end
   end
-  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains<=gcd+0.25|pet.main.buff.frenzy.stack<3|talent.call_of_the_wild&cooldown.call_of_the_wild.ready|cooldown.barbed_shot.charges_fractional>1.4&howl_summon_ready|full_recharge_time<gcd+0.25
-  if S.BarbedShot:IsCastable() and (Pet:BuffUp(S.FrenzyPetBuff) and Pet:BuffRemains(S.FrenzyPetBuff) <= Player:GCD() + 0.25 or Pet:BuffStack(S.FrenzyPetBuff) < 3 or S.CalloftheWild:IsAvailable() and S.CalloftheWild:CooldownUp() or S.BarbedShot:ChargesFractional() > 1.4 and HowlSummonReady() or S.BarbedShot:FullRechargeTime() < Player:GCD() + 0.25) then
+  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=full_recharge_time<gcd|charges_fractional>=cooldown.kill_command.charges_fractional|talent.call_of_the_wild&cooldown.call_of_the_wild.ready|howl_summon_ready&full_recharge_time<8
+  if S.BarbedShot:IsCastable() and (S.BarbedShot:FullRechargeTime() < Player:GCD() or S.BarbedShot:ChargesFractional() >= S.KillCommand:ChargesFractional() or S.CalloftheWild:IsAvailable() and S.CalloftheWild:CooldownUp() or HowlSummonReady() and S.BarbedShot:FullRechargeTime() < 8) then
     if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateTargetIfFilterBarbedShot, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot cleave 4"; end
   end
   -- multishot,if=pet.main.buff.beast_cleave.remains<0.25+gcd&(!talent.bloody_frenzy|cooldown.call_of_the_wild.remains)
@@ -247,57 +247,53 @@ local function Cleave()
   if S.KillCommand:IsReady() then
     if Everyone.CastTargetIf(S.KillCommand, Enemies40y, "max", EvaluateTargetIfFilterKillCommand, nil, not Target:IsInRange(50)) then return "kill_command cleave 18"; end
   end
-  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=set_bonus.thewarwithin_season_2_2pc|charges_fractional>1.4|buff.call_of_the_wild.up|talent.scent_of_blood&(cooldown.bestial_wrath.remains<12+gcd)|fight_remains<9
-  if S.BarbedShot:IsCastable() and (Player:HasTier("TWW2", 2) or S.BarbedShot:ChargesFractional() > 1.4 or Player:BuffUp(S.CalloftheWildBuff) or S.ScentofBlood:IsAvailable() and (S.BestialWrath:CooldownRemains() < 12 + Player:GCD()) or BossFightRemains < 9) then
-    if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateTargetIfFilterBarbedShot, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot cleave 20"; end
-  end
   -- explosive_shot,if=talent.thundering_hooves
   -- Note: Duplicate of 3 lines above.
   -- lights_judgment,if=buff.bestial_wrath.down|target.time_to_die<5
   if CDsON() and S.LightsJudgment:IsCastable() and (Player:BuffDown(S.BestialWrathBuff) or Target:TimeToDie() < 5) then
-    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(5)) then return "lights_judgment cleave 22"; end
+    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(5)) then return "lights_judgment cleave 20"; end
   end
   -- cobra_shot,if=focus.time_to_max<gcd*2|buff.hogstrider.stack>3
   if S.CobraShot:IsReady() and (Player:FocusTimeToMax() < Player:GCD() * 2 or Player:BuffStack(S.HogstriderBuff) > 3) then
-    if Cast(S.CobraShot, nil, nil, not Target:IsSpellInRange(S.CobraShot)) then return "cobra_shot cleave 24"; end
+    if Cast(S.CobraShot, nil, nil, not Target:IsSpellInRange(S.CobraShot)) then return "cobra_shot cleave 22"; end
   end
   -- dire_beast
   if S.DireBeast:IsCastable() then
-    if Cast(S.DireBeast, Settings.BeastMastery.GCDasOffGCD.DireBeast, nil, not Target:IsSpellInRange(S.DireBeast)) then return "dire_beast cleave 26"; end
+    if Cast(S.DireBeast, Settings.BeastMastery.GCDasOffGCD.DireBeast, nil, not Target:IsSpellInRange(S.DireBeast)) then return "dire_beast cleave 24"; end
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot cleave 28"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot cleave 26"; end
   end
   -- bag_of_tricks,if=buff.bestial_wrath.down|target.time_to_die<5
   if S.BagofTricks:IsCastable() and CDsON() and (Player:BuffDown(S.BestialWrathBuff) or FightRemains < 5) then
-    if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "bag_of_tricks cleave 30"; end
+    if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "bag_of_tricks cleave 28"; end
   end
   -- arcane_torrent,if=(focus+focus.regen+30)<focus.max
   if S.ArcaneTorrent:IsCastable() and CDsON() and ((Player:Focus() + Player:FocusRegen() + 30) < Player:FocusMax()) then
-    if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "arcane_torrent cleave 32"; end
+    if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "arcane_torrent cleave 30"; end
   end
 end
 
 local function ST()
-  -- bestial_wrath
-  if CDsON() and S.BestialWrath:IsCastable() then
-    if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath st 2"; end
-  end
-  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains<=gcd+0.25|pet.main.buff.frenzy.stack<3|talent.call_of_the_wild&cooldown.call_of_the_wild.ready|cooldown.barbed_shot.charges_fractional>1.4&howl_summon_ready|full_recharge_time<gcd+0.25
-  if S.BarbedShot:IsCastable() and (Pet:BuffUp(S.FrenzyPetBuff) and Pet:BuffRemains(S.FrenzyPetBuff) <= Player:GCD() + 0.25 or Pet:BuffStack(S.FrenzyPetBuff) < 3 or S.CalloftheWild:IsAvailable() and S.CalloftheWild:CooldownUp() or S.BarbedShot:ChargesFractional() > 1.4 and HowlSummonReady() or S.BarbedShot:FullRechargeTime() < Player:GCD() + 0.25) then
-    if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateTargetIfFilterBarbedShot, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot st 4"; end
-  end
-  -- Main Target backup
-  if S.BarbedShot:IsCastable() and (Pet:BuffUp(S.FrenzyPetBuff) and Pet:BuffRemains(S.FrenzyPetBuff) <= Player:GCD() + 0.25 or Pet:BuffStack(S.FrenzyPetBuff) < 3 or S.CalloftheWild:IsAvailable() and S.CalloftheWild:CooldownUp() or S.BarbedShot:ChargesFractional() > 1.4 and HowlSummonReady() or S.BarbedShot:FullRechargeTime() < Player:GCD() + 0.25) then
-    if Cast(S.BarbedShot, nil, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot st mt_backup 6"; end
-  end
   -- dire_beast,if=talent.huntmasters_call
   if S.DireBeast:IsCastable() and (S.HuntmastersCall:IsAvailable()) then
-    if Cast(S.DireBeast, Settings.BeastMastery.GCDasOffGCD.DireBeast, nil, not Target:IsSpellInRange(S.DireBeast)) then return "dire_beast st 8"; end
+    if Cast(S.DireBeast, Settings.BeastMastery.GCDasOffGCD.DireBeast, nil, not Target:IsSpellInRange(S.DireBeast)) then return "dire_beast st 2"; end
   end
-  -- kill_command,if=talent.call_of_the_wild&cooldown.call_of_the_wild.remains<gcd+0.25
-  if S.KillCommand:IsReady() and (S.CalloftheWild:IsAvailable() and S.CalloftheWild:CooldownRemains() < Player:GCD() + 0.25) then
+  -- bestial_wrath
+  if CDsON() and S.BestialWrath:IsCastable() then
+    if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath st 4"; end
+  end
+  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=full_recharge_time<gcd|charges_fractional>=cooldown.kill_command.charges_fractional|talent.call_of_the_wild&cooldown.call_of_the_wild.ready|howl_summon_ready&full_recharge_time<8
+  if S.BarbedShot:IsCastable() and (S.BarbedShot:FullRechargeTime() < Player:GCD() or S.BarbedShot:ChargesFractional() >= S.KillCommand:ChargesFractional() or S.CalloftheWild:IsAvailable() and S.CalloftheWild:CooldownUp() or HowlSummonReady() and S.BarbedShot:FullRechargeTime() < 8) then
+    if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateTargetIfFilterBarbedShot, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot cleave 6"; end
+  end
+  -- Main Target backup
+  if S.BarbedShot:IsCastable() and (S.BarbedShot:FullRechargeTime() < Player:GCD() or S.BarbedShot:ChargesFractional() >= S.KillCommand:ChargesFractional() or S.CalloftheWild:IsAvailable() and S.CalloftheWild:CooldownUp() or HowlSummonReady() and S.BarbedShot:FullRechargeTime() < 8) then
+    if Cast(S.BarbedShot, nil, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot st mt_backup 8"; end
+  end
+  -- kill_command,if=charges_fractional>=cooldown.barbed_shot.charges_fractional
+  if S.KillCommand:IsReady() and (S.KillCommand:ChargesFractional() >= S.BarbedShot:ChargesFractional()) then
     if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command st 10"; end
   end
   -- call_of_the_wild
@@ -312,42 +308,34 @@ local function ST()
   if S.BlackArrow:IsReady() then
     if Cast(S.BlackArrow, nil, nil, not Target:IsSpellInRange(S.BlackArrow)) then return "black_arrow st 16"; end
   end
-  -- kill_command
-  if S.KillCommand:IsReady() then
-    if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command st 18"; end
-  end
-  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=set_bonus.thewarwithin_season_2_2pc|charges_fractional>1.4|buff.call_of_the_wild.up|talent.scent_of_blood&(cooldown.bestial_wrath.remains<12+gcd)|fight_remains<9
-  if S.BarbedShot:IsCastable() and (Player:HasTier("TWW2", 2) or S.BarbedShot:ChargesFractional() > 1.4 or Player:BuffUp(S.CalloftheWildBuff) or S.ScentofBlood:IsAvailable() and (S.BestialWrath:CooldownRemains() < 12 + Player:GCD()) or BossFightRemains < 9) then
-    if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateTargetIfFilterBarbedShot, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot st 20"; end
-  end
   -- explosive_shot,if=talent.thundering_hooves
   if S.ExplosiveShot:IsReady() and (S.ThunderingHooves:IsAvailable()) then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot st 22"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot st 18"; end
   end
   -- lights_judgment,if=buff.bestial_wrath.down|target.time_to_die<5
   if CDsON() and S.LightsJudgment:IsCastable() and (Player:BuffDown(S.BestialWrathBuff) or Target:TimeToDie() < 5) then
-    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(5)) then return "lights_judgment st 24"; end
+    if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(5)) then return "lights_judgment st 20"; end
   end
   -- cobra_shot
   if S.CobraShot:IsReady() then
-    if Cast(S.CobraShot, nil, nil, not Target:IsSpellInRange(S.CobraShot)) then return "cobra_shot st 26"; end
+    if Cast(S.CobraShot, nil, nil, not Target:IsSpellInRange(S.CobraShot)) then return "cobra_shot st 22"; end
   end
   -- dire_beast
   if S.DireBeast:IsCastable() then
-    if Cast(S.DireBeast, Settings.BeastMastery.GCDasOffGCD.DireBeast, nil, not Target:IsSpellInRange(S.DireBeast)) then return "dire_beast st 28"; end
+    if Cast(S.DireBeast, Settings.BeastMastery.GCDasOffGCD.DireBeast, nil, not Target:IsSpellInRange(S.DireBeast)) then return "dire_beast st 24"; end
   end
   if CDsON() then
     -- bag_of_tricks,if=buff.bestial_wrath.down|target.time_to_die<5
     if S.BagofTricks:IsCastable() and (Player:BuffDown(S.BestialWrathBuff) or FightRemains < 5) then
-      if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "bag_of_tricks st 30"; end
+      if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "bag_of_tricks st 26"; end
     end
     -- arcane_pulse,if=buff.bestial_wrath.down|target.time_to_die<5
     if S.ArcanePulse:IsCastable() and (Player:BuffDown(S.BestialWrathBuff) or FightRemains < 5) then
-      if Cast(S.ArcanePulse, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "arcane_pulse st 32"; end
+      if Cast(S.ArcanePulse, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "arcane_pulse st 28"; end
     end
     -- arcane_torrent,if=(focus+focus.regen+15)<focus.max
     if S.ArcaneTorrent:IsCastable() and ((Player:Focus() + Player:FocusRegen() + 15) < Player:FocusMax()) then
-      if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "arcane_torrent st 34"; end
+      if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "arcane_torrent st 30"; end
     end
   end
 end
