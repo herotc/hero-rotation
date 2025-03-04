@@ -80,7 +80,6 @@ HL:RegisterForEvent(function()
   S.GlacialSpike:RegisterInFlight()
   S.IceLance:RegisterInFlightEffect(228598)
   S.IceLance:RegisterInFlight()
-  S.Splinterstorm:RegisterInFlight()
   VarBoltSpam = S.Splinterstorm:IsAvailable() and S.ColdFront:IsAvailable() and S.SlickIce:IsAvailable() and S.DeathsChill:IsAvailable() and S.FrozenTouch:IsAvailable() or S.FrostfireBolt:IsAvailable() and S.DeepShatter:IsAvailable() and S.SlickIce:IsAvailable() and S.DeathsChill:IsAvailable()
   Bolt = S.FrostfireBolt:IsAvailable() and S.FrostfireBolt or S.Frostbolt
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
@@ -95,7 +94,6 @@ S.GlacialSpike:RegisterInFlightEffect(228600)
 S.GlacialSpike:RegisterInFlight()
 S.IceLance:RegisterInFlightEffect(228598)
 S.IceLance:RegisterInFlight()
-S.Splinterstorm:RegisterInFlight()
 
 HL:RegisterForEvent(function()
   BossFightRemains = 11111
@@ -137,8 +135,9 @@ end
 
 local function EvaluateTargetIfIceLanceCleaveFF(TargetUnit)
   -- if=buff.fingers_of_frost.react&(!prev_gcd.1.glacial_spike|remaining_winters_chill=0&debuff.winters_chill.down)|remaining_winters_chill&!variable.boltspam
-  return Player:BuffUp(S.FingersofFrostBuff) and (not Player:PrevGCDP(1, S.GlacialSpike) or RemainingWintersChill == 0 and Target:DebuffDown(S.WintersChillDebuff)) or RemainingWintersChill > 0 and not VarBoltSpam
+  return Player:BuffUp(S.FingersofFrostBuff) and (not Player:PrevGCDP(1, S.GlacialSpike) or RemainingWintersChill == 0 and TargetUnit:DebuffDown(S.WintersChillDebuff)) or RemainingWintersChill > 0 and not VarBoltSpam
 end
+
 local function EvaluateTargetIfIceLanceSSCleave(TargetUnit)
   -- if=buff.icy_veins.up&debuff.winters_chill.stack=2
   -- Note: Buff check handled prior to CastTargetIf.
@@ -525,21 +524,25 @@ local function CleaveSS()
   if CDsON() and S.ShiftingPower:IsCastable() and (S.IcyVeins:CooldownRemains() > 10 and S.Flurry:CooldownDown() and (FightRemains + 15 > S.IcyVeins:CooldownRemains())) then
     if Cast(S.ShiftingPower, nil, Settings.CommonsDS.DisplayStyle.ShiftingPower, not Target:IsInRange(18)) then return "shifting_power cleave_ss 20"; end
   end
+  -- ice_lance,if=buff.fingers_of_frost.react|remaining_winters_chill
+  if S.IceLance:IsReady() and (Player:BuffUp(S.FingersofFrostBuff) or RemainingWintersChill > 0) then
+    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance cleave_ss 22"; end
+  end
   -- frostbolt,if=talent.deaths_chill&buff.icy_veins.remains>9&(buff.deaths_chill.stack<6|buff.deaths_chill.stack=6&!action.frostbolt.in_flight)
   if Bolt:IsCastable() and (S.DeathsChill:IsAvailable() and Player:BuffRemains(S.IcyVeinsBuff) > 9 and (Player:BuffStack(S.DeathsChillBuff) < 6 or Player:BuffStack(S.DeathsChillBuff) == 6 and not Bolt:InFlight())) then
-    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostbolt cleave_ss 22"; end
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostbolt cleave_ss 24"; end
   end
   -- blizzard,if=talent.freezing_rain&talent.ice_caller
   if S.Blizzard:IsCastable() and (S.FreezingRain:IsAvailable() and S.IceCaller:IsAvailable()) then
-    if Cast(S.Blizzard, Settings.Frost.GCDasOffGCD.Blizzard, nil, not Target:IsInRange(40)) then return "blizzard cleave_ss 24"; end
+    if Cast(S.Blizzard, Settings.Frost.GCDasOffGCD.Blizzard, nil, not Target:IsInRange(40)) then return "blizzard cleave_ss 26"; end
   end
   -- ice_lance,if=buff.fingers_of_frost.react|remaining_winters_chill
   if S.IceLance:IsReady() and (Player:BuffUp(S.FingersofFrostBuff) or RemainingWintersChill > 0) then
-    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance cleave_ss 26"; end
+    if Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance cleave_ss 28"; end
   end
   -- frostbolt
   if Bolt:IsCastable() then
-    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostbolt cleave_ss 28"; end
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostbolt cleave_ss 30"; end
   end
   -- call_action_list,name=movement
   if Player:IsMoving() then
