@@ -91,10 +91,8 @@ local CombustionDown
 local CombustionRemains
 local HeatingUp, HotStreak = false, false
 local ShiftingPowerTickReduction = 3
-local EnemiesCount8ySplash,EnemiesCount10ySplash,EnemiesCount16ySplash
-local EnemiesCount10yMelee,EnemiesCount18yMelee
-local Enemies8ySplash,Enemies10yMelee,Enemies18yMelee
-local UnitsWithIgniteCount
+local EnemiesCount8ySplash,EnemiesCount16ySplash
+local Enemies8ySplash,Enemies16ySplash
 local BossFightRemains = 11111
 local FightRemains = 11111
 local Bolt = S.FrostfireBolt:IsAvailable() and S.FrostfireBolt or S.Fireball
@@ -655,20 +653,12 @@ local function APL()
   -- Update our enemy tables
   Enemies8ySplash = Target:GetEnemiesInSplashRange(8)
   Enemies16ySplash = Target:GetEnemiesInSplashRange(16)
-  Enemies10yMelee = Player:GetEnemiesInMeleeRange(10)
-  Enemies18yMelee = Player:GetEnemiesInMeleeRange(18)
   if AoEON() then
     EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
-    EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
     EnemiesCount16ySplash = Target:GetEnemiesInSplashRangeCount(16)
-    EnemiesCount10yMelee = #Enemies10yMelee
-    EnemiesCount18yMelee = #Enemies18yMelee
   else
     EnemiesCount8ySplash = 1
-    EnemiesCount10ySplash = 1
     EnemiesCount16ySplash = 1
-    EnemiesCount10yMelee = 1
-    EnemiesCount18yMelee = 1
   end
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
