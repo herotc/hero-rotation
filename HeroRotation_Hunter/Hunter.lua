@@ -104,8 +104,7 @@ Spell.Hunter.DarkRanger = {
 
 Spell.Hunter.PackLeader = {
   -- Talents
-  CulltheHerd                           = Spell(445717),
-  HowlofthePack                         = Spell(445707),
+  HowlofthePackLeader                   = Spell(471876),
   -- Buffs
   HogstriderBuff                        = Spell(472640),
   HowlofthePackBuff                     = Spell(462515),
@@ -199,16 +198,20 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   SteadyShotEnergize                    = Spell(77443),
   -- Talents
   AimedShot                             = Spell(19434),
+  Bulletstorm                           = Spell(389019),
+  Bullseye                              = Spell(204089),
   BurstingShot                          = Spell(186387),
   CarefulAim                            = Spell(260228),
   ChimaeraShot                          = Spell(342049),
   DoubleTap                             = Spell(260402),
+  Headshot                              = Spell(471363),
   InTheRhythm                           = Spell(407404),
   KillShot                              = Spell(53351),
   LegacyoftheWindrunners                = Spell(406425),
   LoneWolf                              = Spell(155228),
   MultiShot                             = Spell(257620),
   OhnahranWinds                         = Spell(1215021),
+  PrecisionDetonation                   = Spell(471369),
   RapidFire                             = Spell(257044),
   RapidFireTick                         = Spell(257045),
   RapidFireEnergize                     = Spell(263585),
@@ -223,6 +226,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   SurgingShots                          = Spell(391559),
   TrickShots                            = Spell(257621),
   Trueshot                              = Spell(288613),
+  UnbreakableBond                       = Spell(1223323),
   Volley                                = Spell(260243),
   VolleyDmg                             = Spell(260247),
   WindrunnersGuidance                   = Spell(378905),
@@ -297,9 +301,11 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   FlankingStrikeBuff                    = Spell(269752),
   FrenzyStrikesBuff                     = Spell(1217377),
   MongooseFuryBuff                      = Spell(259388),
+  RelentlessPrimalFerocityBuff          = Spell(459962),
   RuthlessMarauderBuff                  = Spell(470070),
   SerpentStingDebuff                    = Spell(259491),
   SicEmBuff                             = Spell(461409),
+  StrikeItRichBuff                      = Spell(1216879), -- TWW S2 4pc
   TipoftheSpearBuff                     = Spell(260286),
   TipoftheSpearExpBuff                  = Spell(460852),
   TipoftheSpearFotEBuff                 = Spell(471536),
@@ -318,7 +324,7 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Survival, Spell.Hunter.Sent
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Commons = {
   -- Trinkets kept for variables
-  MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
+  HouseofCards                          = Item(230027, {13, 14}),
   -- TWW Trinkets
   JunkmaestrosMegaMagnet                = Item(230189, {13, 14}),
 }
