@@ -91,10 +91,8 @@ local CombustionDown
 local CombustionRemains
 local HeatingUp, HotStreak = false, false
 local ShiftingPowerTickReduction = 3
-local EnemiesCount8ySplash,EnemiesCount10ySplash,EnemiesCount16ySplash
-local EnemiesCount10yMelee,EnemiesCount18yMelee
-local Enemies8ySplash,Enemies10yMelee,Enemies18yMelee
-local UnitsWithIgniteCount
+local EnemiesCount8ySplash,EnemiesCount16ySplash
+local Enemies8ySplash,Enemies16ySplash
 local BossFightRemains = 11111
 local FightRemains = 11111
 local Bolt = S.FrostfireBolt:IsAvailable() and S.FrostfireBolt or S.Fireball
@@ -379,6 +377,14 @@ local function CombustionPhase()
   if S.FireBlast:IsReady() and not FreeCastAvailable() and (VarTACombust and not VarFireBlastPooling and S.FireBlast:ChargesFractional() > 2.5 and (not ImprovedScorchActive() or Player:IsCasting(S.Scorch) or Target:DebuffRemains(S.ImprovedScorchDebuff) > 4 * Player:GCD()) and (Player:BuffDown(S.FuryoftheSunKingBuff) or Player:IsCasting(S.Pyroblast)) and CombustionUp and not HotStreak and HotStreakInFlight() + num(HeatingUp) * num(Player:GCDRemains() > 0) < 2) then
     if CastLeft(S.FireBlast) then return "fire_blast combustion_phase 6"; end
   end
+  -- pyroblast,if=buff.combustion.up&buff.hot_streak.react
+  if S.Pyroblast:IsReady() and (CombustionUp and HotStreak) then
+    if Cast(S.Pyroblast) then return "pyroblast combustion_phase 7"; end
+  end
+  -- Cancelaura HT if SKB is ready
+  if Player:BuffUp(S.HyperthermiaBuff) and Player:BuffUp(S.FuryoftheSunKingBuff) then
+    Player:CancelBuff(S.HyperthermiaBuff)
+  end
   -- flamestrike,if=buff.combustion.down&buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.remains>cast_time&buff.fury_of_the_sun_king.expiration_delay_remains=0&cooldown.combustion.remains<cast_time&active_enemies>=variable.skb_flamestrike
   -- TODO: Handle expiration_delay_remains
   if AoEON() and S.Flamestrike:IsReady() and not Player:IsCasting(S.Flamestrike) and (CombustionDown and Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Flamestrike:CastTime() and S.Combustion:CooldownRemains() < S.Flamestrike:CastTime() and EnemiesCount8ySplash >= VarSKBFlamestrike) then
@@ -655,20 +661,12 @@ local function APL()
   -- Update our enemy tables
   Enemies8ySplash = Target:GetEnemiesInSplashRange(8)
   Enemies16ySplash = Target:GetEnemiesInSplashRange(16)
-  Enemies10yMelee = Player:GetEnemiesInMeleeRange(10)
-  Enemies18yMelee = Player:GetEnemiesInMeleeRange(18)
   if AoEON() then
     EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
-    EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
     EnemiesCount16ySplash = Target:GetEnemiesInSplashRangeCount(16)
-    EnemiesCount10yMelee = #Enemies10yMelee
-    EnemiesCount18yMelee = #Enemies18yMelee
   else
     EnemiesCount8ySplash = 1
-    EnemiesCount10ySplash = 1
     EnemiesCount16ySplash = 1
-    EnemiesCount10yMelee = 1
-    EnemiesCount18yMelee = 1
   end
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
