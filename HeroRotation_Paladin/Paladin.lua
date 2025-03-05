@@ -214,6 +214,8 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Retribution, Spell.Pal
 -- Items
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Commons = {
+  -- TWW Items
+  BestinSlotsMelee                      = Item(232526, {16}),
 }
 
 Item.Paladin.Protection = MergeTableByKey(Item.Paladin.Commons, {
