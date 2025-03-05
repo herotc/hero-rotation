@@ -377,6 +377,14 @@ local function CombustionPhase()
   if S.FireBlast:IsReady() and not FreeCastAvailable() and (VarTACombust and not VarFireBlastPooling and S.FireBlast:ChargesFractional() > 2.5 and (not ImprovedScorchActive() or Player:IsCasting(S.Scorch) or Target:DebuffRemains(S.ImprovedScorchDebuff) > 4 * Player:GCD()) and (Player:BuffDown(S.FuryoftheSunKingBuff) or Player:IsCasting(S.Pyroblast)) and CombustionUp and not HotStreak and HotStreakInFlight() + num(HeatingUp) * num(Player:GCDRemains() > 0) < 2) then
     if CastLeft(S.FireBlast) then return "fire_blast combustion_phase 6"; end
   end
+  -- pyroblast,if=buff.combustion.up&buff.hot_streak.react
+  if S.Pyroblast:IsReady() and (CombustionUp and HotStreak) then
+    if Cast(S.Pyroblast) then return "pyroblast combustion_phase 7"; end
+  end
+  -- Cancelaura HT if SKB is ready
+  if Player:BuffUp(S.HyperthermiaBuff) and Player:BuffUp(S.FuryoftheSunKingBuff) then
+    Player:CancelBuff(S.HyperthermiaBuff)
+  end
   -- flamestrike,if=buff.combustion.down&buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.remains>cast_time&buff.fury_of_the_sun_king.expiration_delay_remains=0&cooldown.combustion.remains<cast_time&active_enemies>=variable.skb_flamestrike
   -- TODO: Handle expiration_delay_remains
   if AoEON() and S.Flamestrike:IsReady() and not Player:IsCasting(S.Flamestrike) and (CombustionDown and Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Flamestrike:CastTime() and S.Combustion:CooldownRemains() < S.Flamestrike:CastTime() and EnemiesCount8ySplash >= VarSKBFlamestrike) then
