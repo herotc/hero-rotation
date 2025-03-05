@@ -302,6 +302,8 @@ Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
   ArakaraSacbrood                       = Item(219314, {13, 14}),
   SignetofthePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
+  -- TWW S2 Old Trinkets
+  SoullettingRuby                       = Item(178809, {13, 14}),
   -- TWW Items
   NeuralSynapseEnhancer                 = Item(168973, {16}),
 })
