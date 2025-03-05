@@ -104,8 +104,7 @@ Spell.Hunter.DarkRanger = {
 
 Spell.Hunter.PackLeader = {
   -- Talents
-  CulltheHerd                           = Spell(445717),
-  HowlofthePack                         = Spell(445707),
+  HowlofthePackLeader                   = Spell(471876),
   -- Buffs
   HogstriderBuff                        = Spell(472640),
   HowlofthePackBuff                     = Spell(462515),
@@ -302,9 +301,11 @@ Spell.Hunter.Survival = MergeTableByKey(Spell.Hunter.Commons, {
   FlankingStrikeBuff                    = Spell(269752),
   FrenzyStrikesBuff                     = Spell(1217377),
   MongooseFuryBuff                      = Spell(259388),
+  RelentlessPrimalFerocityBuff          = Spell(459962),
   RuthlessMarauderBuff                  = Spell(470070),
   SerpentStingDebuff                    = Spell(259491),
   SicEmBuff                             = Spell(461409),
+  StrikeItRichBuff                      = Spell(1216879), -- TWW S2 4pc
   TipoftheSpearBuff                     = Spell(260286),
   TipoftheSpearExpBuff                  = Spell(460852),
   TipoftheSpearFotEBuff                 = Spell(471536),
