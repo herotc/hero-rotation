@@ -399,8 +399,8 @@ local function ST()
   if S.ForceofNature:IsCastable() and (Player:HeroTreeID() ~= 23) then
     if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature st 52"; end
   end
-  -- wild_mushroom
-  if S.WildMushroom:IsCastable() then
+  -- wild_mushroom,if=!prev_gcd.1.wild_mushroom&dot.fungal_growth.remains<2
+  if S.WildMushroom:IsCastable() and (not Player:PrevGCD(1, S.WildMushroom) and Target:DebuffRemains(S.FungalGrowthDebuff) < 2) then
     if Cast(S.WildMushroom, Settings.Balance.GCDasOffGCD.WildMushroom, nil, not IsInSpellRange) then return "wild_mushroom st 54"; end
   end
   -- starfire,if=talent.lunar_calling
