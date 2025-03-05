@@ -43,6 +43,8 @@ Spell.Monk.Commons = {
   QuakingPalm                           = Spell(107079),
   RocketBarrage                         = Spell(69041),
   Shadowmeld                            = Spell(58984),
+  -- External Buffs
+  PowerInfusion                         = Spell(10060),
   -- Abilities
   CracklingJadeLightning                = Spell(117952),
   ExpelHarm                             = Spell(322101),
@@ -133,8 +135,10 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   InnerPeace                            = Spell(397768),
   InvokeXuenTheWhiteTiger               = Spell(123904),
   KnowledgeoftheBrokenTemple            = Spell(451529),
+  LastEmperorsCapacitor                 = Spell(392989),
   MemoryoftheMonastery                  = Spell(454969),
   OrderedElements                       = Spell(451463),
+  PoweroftheThunderKing                 = Spell(459809),
   RevolvingWhirl                        = Spell(451524),
   SequencedStrikes                      = Spell(451515),
   ShadowboxingTreads                    = Spell(392982),
