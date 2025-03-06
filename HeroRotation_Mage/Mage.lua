@@ -253,41 +253,35 @@ Item.Mage.Commons = {
   NymuesUnravelingSpindle               = Item(208615, {13, 14}),
   -- TWW Trinkets
   BurstofKnowledge                      = Item(231424, {13, 14}),
+  HighSpeakersAccretion                 = Item(219303, {13, 14}),
   HouseofCards                          = Item(230027, {13, 14}),
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
+  QuickwickCandlestick                  = Item(225649, {13, 14}),
+  SignetofthePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
+  -- TWW S2 Prior Expansion Items
+  NeuralSynapseEnhancer                 = Item(168973, {16}),
 }
 
 Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
   -- TWW Trinkets
   AberrantSpellforge                    = Item(212451, {13, 14}),
   FearbreakersEcho                      = Item(224449, {13, 14}),
-  HighSpeakersAccretion                 = Item(219303, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
   MereldarsToll                         = Item(219313, {13, 14}),
-  NeuralSynapseEnhancer                 = Item(168973, {13, 14}),
-  QuickwickCandlestick                  = Item(225649, {13, 14}),
-  SignetofthePriory                     = Item(219308, {13, 14}),
 })
 
 Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
-  -- DF Gladiator's Badges
-  CrimsonGladiatorsBadge                = Item(201807, {13, 14}),
-  DraconicGladiatorsBadge               = Item(216279, {13, 14}),
-  ObsidianGladiatorsBadge               = Item(205708, {13, 14}),
-  VerdantGladiatorsBadge                = Item(209343, {13, 14}),
   -- TWW Gladiator's Badges
   ForgedGladiatorsBadge                 = Item(218713, {13, 14}),
-  -- TWW S2 Trinkets
-  NeuralSynapseEnhancer                 = Item(168973, {13, 14}),
-  -- Trinkets kept for variables
-  DragonfireBombDispenser               = Item(202610, {13, 14}),
-  HornofValor                           = Item(133642, {13, 14}),
-  IrideusFragment                       = Item(193743, {13, 14}),
-  MoonlitPrism                          = Item(137541, {13, 14}),
-  SpoilsofNeltharus                     = Item(193773, {13, 14}),
-  TimebreachingTalon                    = Item(193791, {13, 14}),
+  PrizedGladiatorsBadge                 = Item(229780, {13, 14}),
+  -- TWW Trinkets
+  ConcoctionKissofDeath                 = Item(215174, {13, 14}), -- Used for item_cd_1141
+  FlarendosPilotLight                   = Item(230191, {13, 14}),
+  FunhouseLens                          = Item(234217, {13, 14}),
+  -- TWW S2 Prior Expansion Trinkets
+  SoullettingRuby                       = Item(178809, {13, 14}),
 })
 
 Item.Mage.Frost = MergeTableByKey(Item.Mage.Commons, {
