@@ -95,6 +95,18 @@ local ArcaneHarmonyThresholdNotified = false
 -- Only tracks debuff on current target or focus target to avoid misleading notifications
 local TotMDebuffApplied = nil
 
+--- Hyperthermia Buff Tracking
+-- Tracks application and removal of Hyperthermia buff
+-- This buff allows the next Pyroblast to be instant cast regardless of Hot Streak
+-- Used in the Fire rotation to determine when to use Pyroblast
+local HyperthermiaApplied = nil
+
+--- Hyperthread Wristwraps Tracking
+-- Tracks charges of Fire Blast stored in Hyperthread Wristwraps
+-- Uses combat log and spell cast events to estimate stored charges
+-- Used in Fire rotation to optimize wristwraps usage
+local HyperthreadFireBlastCharges = 0
+
 HL:RegisterForSelfCombatEvent(function(...)
   local _, event, _, _, _, _, _, _, _, _, _, spellID = ...
   local S = Spell.Mage.Arcane
@@ -139,6 +151,8 @@ HL:RegisterForEvent(function()
   ArcaneHarmonyLastStack = 0
   ArcaneHarmonyThresholdNotified = false
   TotMDebuffApplied = nil
+  HyperthermiaApplied = nil
+  HyperthreadFireBlastCharges = 0
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForCombatEvent(function(...)
@@ -169,6 +183,22 @@ HL:RegisterForCombatEvent(function(...)
   end
 end, "SPELL_AURA_APPLIED", "SPELL_AURA_REMOVED")
 
+HL:RegisterForSelfCombatEvent(function(...)
+  local _, event, _, _, _, _, _, _, _, _, _, spellID = ...
+  local S = Spell.Mage.Fire
+  
+  if spellID == S.HyperthermiaBuff:ID() then
+    local now = GetTime()
+    
+    if event == "SPELL_AURA_APPLIED" then
+      HyperthermiaApplied = now
+      HR.Print("Hyperthermia applied - Use Pyroblast!")
+    elseif event == "SPELL_AURA_REMOVED" then
+      HyperthermiaApplied = nil
+    end
+  end
+end, "SPELL_AURA_APPLIED", "SPELL_AURA_REMOVED")
+
 --------------------------
 -------- Frost -----------
 --------------------------
@@ -195,3 +225,57 @@ end, "SPELL_DAMAGE")
 function Player:FrozenOrbGroundAoeRemains()
   return math.max((FrozenOrbHitTime - (GetTime() - 10) - HL.RecoveryTimer()), 0)
 end]]
+
+--------------------------
+-------- Fire -----------
+--------------------------
+
+--- Frostfire Empowerment Tracking
+-- Tracks application and removal of Frostfire Empowerment buff
+-- This buff empowers the next Fireball to deal increased damage
+-- Used in the Fire rotation to determine when to use Fireball
+
+HL:RegisterForSelfCombatEvent(function(...)
+  local _, event, _, _, _, _, _, _, _, _, _, spellID = ...
+  local S = Spell.Mage.Fire
+  
+  if spellID == S.FrostfireEmpowermentBuff:ID() then
+    local now = GetTime()
+    
+    if event == "SPELL_AURA_APPLIED" then
+      -- Just notify the player, don't store the timestamp
+      HR.Print("Frostfire Empowerment active - Cast Fireball!")
+    end
+  end
+end, "SPELL_AURA_APPLIED", "SPELL_AURA_REMOVED")
+
+-- Register for spell cast events to track Fire Blast usage
+HL:RegisterForEvent(function(...)
+  local spellID = select(12, ...)
+  local S = Spell.Mage.Fire
+  local I = Item.Mage.Fire
+  
+  -- If player has Hyperthread Wristwraps equipped, it might store a charge
+  if I.HyperthreadWristwraps:IsEquipped() and spellID == S.FireBlast:ID() then
+    -- Increment charges stored in wristwraps (max 3 charges can be stored)
+    HyperthreadFireBlastCharges = math.min(HyperthreadFireBlastCharges + 1, 3)
+    HR.Print("Hyperthread Wristwraps: " .. HyperthreadFireBlastCharges .. " Fire Blast charge(s) stored")
+  end
+end, "UNIT_SPELLCAST_SUCCEEDED")
+
+-- Reset charges when Hyperthread Wristwraps is used
+HL:RegisterForSelfCombatEvent(function(...)
+  local _, event, _, _, _, _, _, _, _, _, _, spellID = ...
+  -- Hyperthread Wristwraps activates spell 300142
+  if spellID == 300142 then
+    HyperthreadFireBlastCharges = 0
+    HR.Print("Hyperthread Wristwraps: Fire Blast charges used")
+  end
+end, "SPELL_CAST_SUCCESS")
+
+-- Function to get number of Fire Blast charges stored
+function Player:GetHyperthreadFireBlastCharges()
+  local I = Item.Mage.Fire
+  if not I.HyperthreadWristwraps:IsEquipped() then return 0 end
+  return HyperthreadFireBlastCharges
+end

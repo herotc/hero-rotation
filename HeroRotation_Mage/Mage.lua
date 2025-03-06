@@ -248,30 +248,33 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Frost, Spell.Mage.Spellslinger)
 
 -- Items
 if not Item.Mage then Item.Mage = {} end
+
+-- Common items shared across all specs
 Item.Mage.Commons = {
-  -- Trinkets kept for variables
-  NymuesUnravelingSpindle               = Item(208615, {13, 14}),
-  -- TWW Trinkets
-  BurstofKnowledge                      = Item(231424, {13, 14}),
-  HouseofCards                          = Item(230027, {13, 14}),
+  -- Currently empty as most "commons" are actually for specific purposes
+}
+
+-- TWW Season 1 Trinkets
+Item.Mage.TWW_S1 = {
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
 }
 
-Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
-  -- TWW Trinkets
-  AberrantSpellforge                    = Item(212451, {13, 14}),
-  FearbreakersEcho                      = Item(224449, {13, 14}),
-  HighSpeakersAccretion                 = Item(219303, {13, 14}),
-  MadQueensMandate                      = Item(212454, {13, 14}),
-  MereldarsToll                         = Item(219313, {13, 14}),
+-- TWW Season 2 Trinkets
+Item.Mage.TWW_S2 = {
+  BurstofKnowledge                      = Item(231424, {13, 14}),
+  FlarendosPilotLight                   = Item(230191, {13, 14}),
+  FunhouseLens                          = Item(234217, {13, 14}),
+  HouseOfCards                          = Item(230027, {13, 14}),
   NeuralSynapseEnhancer                 = Item(168973, {13, 14}),
-  QuickwickCandlestick                  = Item(225649, {13, 14}),
-  SignetofthePriory                     = Item(219308, {13, 14}),
-})
+  QuickwickCandlestick                  = Item(225648, {13, 14}),
+  SignetOfThePriory                     = Item(219308, {13, 14}),
+  SoulettingRuby                        = Item(178809, {13, 14}),
+}
 
-Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
+-- Gladiator's Badges
+Item.Mage.Badges = {
   -- DF Gladiator's Badges
   CrimsonGladiatorsBadge                = Item(201807, {13, 14}),
   DraconicGladiatorsBadge               = Item(216279, {13, 14}),
@@ -279,21 +282,53 @@ Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
   VerdantGladiatorsBadge                = Item(209343, {13, 14}),
   -- TWW Gladiator's Badges
   ForgedGladiatorsBadge                 = Item(218713, {13, 14}),
-  -- TWW S2 Trinkets
-  NeuralSynapseEnhancer                 = Item(168973, {13, 14}),
-  -- Trinkets kept for variables
+}
+
+-- Legacy trinkets (only used in variables/references)
+Item.Mage.Legacy = {
   DragonfireBombDispenser               = Item(202610, {13, 14}),
   HornofValor                           = Item(133642, {13, 14}),
   IrideusFragment                       = Item(193743, {13, 14}),
   MoonlitPrism                          = Item(137541, {13, 14}),
+  NymuesUnravelingSpindle               = Item(208615, {13, 14}),
   SpoilsofNeltharus                     = Item(193773, {13, 14}),
   TimebreachingTalon                    = Item(193791, {13, 14}),
-})
+}
 
-Item.Mage.Frost = MergeTableByKey(Item.Mage.Commons, {
-  -- TWW Trinkets
-  BurstofKnowledge                      = Item(231424, {13, 14}),
-})
+-- Fire-specific items
+Item.Mage.FireSpecific = {
+  HyperthreadWristwraps                 = Item(168989, {9}),
+}
+
+-- Arcane-specific trinkets
+Item.Mage.ArcaneSpecific = {
+  AberrantSpellforge                    = Item(212451, {13, 14}),
+  FearbreakersEcho                      = Item(224449, {13, 14}),
+  HighSpeakersAccretion                 = Item(219303, {13, 14}),
+  MadQueensMandate                      = Item(212454, {13, 14}),
+  MereldarsToll                         = Item(219313, {13, 14}),
+}
+
+-- Build the spec-specific item tables by merging
+Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {})
+Item.Mage.Arcane = MergeTableByKey(Item.Mage.Arcane, Item.Mage.TWW_S1)
+Item.Mage.Arcane = MergeTableByKey(Item.Mage.Arcane, Item.Mage.TWW_S2)
+Item.Mage.Arcane = MergeTableByKey(Item.Mage.Arcane, Item.Mage.Badges)
+Item.Mage.Arcane = MergeTableByKey(Item.Mage.Arcane, Item.Mage.Legacy)
+Item.Mage.Arcane = MergeTableByKey(Item.Mage.Arcane, Item.Mage.ArcaneSpecific)
+
+Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {})
+Item.Mage.Fire = MergeTableByKey(Item.Mage.Fire, Item.Mage.TWW_S1)
+Item.Mage.Fire = MergeTableByKey(Item.Mage.Fire, Item.Mage.TWW_S2)
+Item.Mage.Fire = MergeTableByKey(Item.Mage.Fire, Item.Mage.Badges)
+Item.Mage.Fire = MergeTableByKey(Item.Mage.Fire, Item.Mage.Legacy)
+Item.Mage.Fire = MergeTableByKey(Item.Mage.Fire, Item.Mage.FireSpecific)
+
+Item.Mage.Frost = MergeTableByKey(Item.Mage.Commons, {})
+Item.Mage.Frost = MergeTableByKey(Item.Mage.Frost, Item.Mage.TWW_S1)
+Item.Mage.Frost = MergeTableByKey(Item.Mage.Frost, Item.Mage.TWW_S2)
+Item.Mage.Frost = MergeTableByKey(Item.Mage.Frost, Item.Mage.Badges)
+Item.Mage.Frost = MergeTableByKey(Item.Mage.Frost, Item.Mage.Legacy)
 
 --[[ Variables
 Mage.IFST = {

@@ -88,11 +88,11 @@ local CastAE
 
 --- ===== Trinket Variables =====
 local VarTreacherousTransmitterPrecombatCast = 11
-local VarSteroidTrinketEquipped = Player:GladiatorsBadgeIsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped()
-local VarNeuralOnMini = Player:GladiatorsBadgeIsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped()
+local VarSteroidTrinketEquipped = Player:GladiatorsBadgeIsEquipped() or I.SignetOfThePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped()
+local VarNeuralOnMini = Player:GladiatorsBadgeIsEquipped() or I.SignetOfThePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped()
 -- Variable to track equipped nonsteroid trinkets from SimC: blastmaster3000|ratfang_toxin|ingenious_mana_battery|geargrinders_spare_keys|ringing_ritual_mud|goo_blin_grenade|noggenfogger_ultimate_deluxe|garbagemancers_last_resort|mad_queens_mandate|fearbreakers_echo|mereldars_toll|gooblin_grenade
 local VarNonsteroidTrinketEquipped = I.FearbreakersEcho:IsEquipped() or I.MadQueensMandate:IsEquipped() or I.MereldarsToll:IsEquipped() or I.AberrantSpellforge:IsEquipped()
-local VarSpymastersDoubleOnUse = (Player:GladiatorsBadgeIsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped()) and I.SpymastersWeb:IsEquipped() and S.Evocation:CooldownRemains() < 17 and (Player:BuffStack(S.SpymastersReportBuff) > 35 or (FightRemains < 90 and Player:BuffStack(S.SpymastersReportBuff) > 25))
+local VarSpymastersDoubleOnUse = (Player:GladiatorsBadgeIsEquipped() or I.SignetOfThePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped()) and I.SpymastersWeb:IsEquipped() and S.Evocation:CooldownRemains() < 17 and (Player:BuffStack(S.SpymastersReportBuff) > 35 or (FightRemains < 90 and Player:BuffStack(S.SpymastersReportBuff) > 25))
 
 --- ===== Event Registrations =====
 HL:RegisterForEvent(function()
@@ -109,10 +109,10 @@ HL:RegisterForEvent(function()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
-  VarSteroidTrinketEquipped = Player:GladiatorsBadgeIsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped()
-  VarNeuralOnMini = Player:GladiatorsBadgeIsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped()
+  VarSteroidTrinketEquipped = Player:GladiatorsBadgeIsEquipped() or I.SignetOfThePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped()
+  VarNeuralOnMini = Player:GladiatorsBadgeIsEquipped() or I.SignetOfThePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped()
   VarNonsteroidTrinketEquipped = I.FearbreakersEcho:IsEquipped() or I.MadQueensMandate:IsEquipped() or I.MereldarsToll:IsEquipped() or I.AberrantSpellforge:IsEquipped()
-  VarSpymastersDoubleOnUse = (Player:GladiatorsBadgeIsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped()) and I.SpymastersWeb:IsEquipped() and S.Evocation:CooldownRemains() < 17 and (Player:BuffStack(S.SpymastersReportBuff) > 35 or (FightRemains < 90 and Player:BuffStack(S.SpymastersReportBuff) > 25))
+  VarSpymastersDoubleOnUse = (Player:GladiatorsBadgeIsEquipped() or I.SignetOfThePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped()) and I.SpymastersWeb:IsEquipped() and S.Evocation:CooldownRemains() < 17 and (Player:BuffStack(S.SpymastersReportBuff) > 35 or (FightRemains < 90 and Player:BuffStack(S.SpymastersReportBuff) > 25))
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 --- ===== Rotation Functions =====

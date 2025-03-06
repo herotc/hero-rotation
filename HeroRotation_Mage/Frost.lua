@@ -39,7 +39,7 @@ local I = Item.Mage.Frost
 local OnUseExcludes = {
   -- TWW Trinkets
   I.BurstofKnowledge:ID(),
-  I.HouseofCards:ID(),
+  I.HouseOfCards:ID(),
   I.ImperfectAscendancySerum:ID(),
   I.SpymastersWeb:ID(),
   I.TreacherousTransmitter:ID(),
@@ -183,8 +183,8 @@ local function CDs()
       if Cast(I.SpymastersWeb, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spymasters_web cds 4"; end
     end
     -- use_item,name=house_of_cards,if=buff.icy_veins.remains>9|fight_remains<20
-    if I.HouseofCards:IsEquippedAndReady() and (Player:BuffRemains(S.IcyVeinsBuff) > 9 or BossFightRemains < 20) then
-      if Cast(I.HouseofCards, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "house_of_cards cds 5"; end
+    if I.HouseOfCards:IsEquippedAndReady() and (Player:BuffRemains(S.IcyVeinsBuff) > 9 or BossFightRemains < 20) then
+      if Cast(I.HouseOfCards, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "house_of_cards cds 5"; end
     end
     -- use_item,name=imperfect_ascendancy_serum,if=buff.icy_veins.remains>15|fight_remains<20
     if I.ImperfectAscendancySerum:IsEquippedAndReady() and (Player:BuffRemains(S.IcyVeinsBuff) > 15 or BossFightRemains < 20) then
@@ -542,7 +542,7 @@ local function CleaveSS()
   end
   -- frostbolt
   if Bolt:IsCastable() then
-    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostbolt cleave_ss 30"; end
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostbolt cleave_ss 24"; end
   end
   -- call_action_list,name=movement
   if Player:IsMoving() then

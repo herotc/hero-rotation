@@ -53,6 +53,14 @@ local OnUseExcludes = {
   I.ImperfectAscendancySerum:ID(),
   I.SpymastersWeb:ID(),
   I.TreacherousTransmitter:ID(),
+  -- TWW Season 2 Trinkets
+  I.NeuralSynapseEnhancer:ID(),
+  I.FlarendosPilotLight:ID(),
+  I.HouseOfCards:ID(),
+  I.FunhouseLens:ID(),
+  I.QuickwickCandlestick:ID(),
+  I.SignetOfThePriory:ID(),
+  I.SoulettingRuby:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -103,24 +111,55 @@ local VarCombustionOnUse
 local VarTreacherousTransmitterPrecombatCast
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
-  local T1, T2 = Player:GetTrinketData(OnUseExcludes)
+  local T1 = Player:GetUseableItems(OnUseExcludes, 1) or {}
+  local T2 = Player:GetUseableItems(OnUseExcludes, 2) or {}
 
-  -- If we don't have trinket items, try again in 5 seconds.
-  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
-    VarTrinketFailures = VarTrinketFailures + 1
-    Delay(5, function()
-        SetTrinketVariables()
-      end
-    )
-    return
+  -- Initialize properties to avoid nil errors
+  T1.HasTrinket = T1.HasTrinket or false
+  T1.HasUseBuff = T1.HasUseBuff or false
+  T2.HasTrinket = T2.HasTrinket or false
+  T2.HasUseBuff = T2.HasUseBuff or false
+
+  -- Initialize Trinket objects to prevent nil values
+  Trinket1 = nil
+  Trinket2 = nil
+
+  if (T1.HasTrinket and not T1.HasUseBuff) or (T2.HasTrinket and not T2.HasUseBuff) then
+    T1.Object = T1.HasTrinket and T1.Trinket or nil
+    T2.Object = T2.HasTrinket and T2.Trinket or nil
+    local PrecombatMax, InCombatMax, BurstMax = 0, 0, 0
+
+    if T1.HasTrinket and not T1.HasUseBuff then
+      PrecombatMax = max(PrecombatMax, T1.Duration)
+      InCombatMax = max(InCombatMax, T1.Duration)
+      BurstMax = max(BurstMax, ceil(T1.Duration/10)*10)
+    end
+
+    if T2.HasTrinket and not T2.HasUseBuff then
+      PrecombatMax = max(PrecombatMax, T2.Duration)
+      InCombatMax = max(InCombatMax, T2.Duration)
+      BurstMax = max(BurstMax, ceil(T2.Duration/10)*10)
+    end
   end
 
-  Trinket1 = T1.Object
-  Trinket2 = T2.Object
-
-  VarCombustionOnUse = I.ForgedGladiatorsBadge:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.CrimsonGladiatorsBadge:IsEquipped() or I.DraconicGladiatorsBadge:IsEquipped() or I.ObsidianGladiatorsBadge:IsEquipped() or I.VerdantGladiatorsBadge:IsEquipped() or I.MoonlitPrism:IsEquipped() or I.IrideusFragment:IsEquipped() or I.SpoilsofNeltharus:IsEquipped() or I.TimebreachingTalon:IsEquipped() or I.HornofValor:IsEquipped()
-
-  VarTreacherousTransmitterPrecombatCast = 12
+  -- Set trinket variables with appropriate fallbacks
+  Trinket1 = T1.Object or nil
+  Trinket2 = T2.Object or nil
+  
+  -- Set combustion variables
+  VarCombustionOnUse = I.ForgedGladiatorsBadge:IsEquipped() 
+    or I.SignetOfThePriory:IsEquipped() 
+    or I.SpymastersWeb:IsEquipped() 
+    or I.TreacherousTransmitter:IsEquipped() 
+    or I.ImperfectAscendancySerum:IsEquipped() 
+    or I.FlarendosPilotLight:IsEquipped() 
+    or I.HouseOfCards:IsEquipped() 
+    or I.FunhouseLens:IsEquipped() 
+    or I.QuickwickCandlestick:IsEquipped() 
+    or I.SignetOfThePriory:IsEquipped() 
+    or I.SoulettingRuby:IsEquipped()
+  
+  VarTreacherousTransmitterPrecombatCast = 11
 end
 SetTrinketVariables()
 
@@ -351,6 +390,10 @@ local function CombustionCooldowns()
     if I.VerdantGladiatorsBadge:IsEquippedAndReady() then
       if Cast(I.VerdantGladiatorsBadge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "gladiators_badge (verdant) combustion_cooldowns 20"; end
     end
+    -- use_item,name=hyperthread_wristwraps,if=hyperthread_wristwraps.fire_blast>=2&action.fire_blast.charges=0
+    if I.HyperthreadWristwraps:IsEquippedAndReady() and S.FireBlast:Charges() == 0 and Player:GetHyperthreadFireBlastCharges() >= 2 then
+      if Cast(I.HyperthreadWristwraps, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "hyperthread_wristwraps combustion_cooldowns 22"; end
+    end
   end
 end
 
@@ -377,26 +420,28 @@ local function CombustionPhase()
   if S.FireBlast:IsReady() and not FreeCastAvailable() and (VarTACombust and not VarFireBlastPooling and S.FireBlast:ChargesFractional() > 2.5 and (not ImprovedScorchActive() or Player:IsCasting(S.Scorch) or Target:DebuffRemains(S.ImprovedScorchDebuff) > 4 * Player:GCD()) and (Player:BuffDown(S.FuryoftheSunKingBuff) or Player:IsCasting(S.Pyroblast)) and CombustionUp and not HotStreak and HotStreakInFlight() + num(HeatingUp) * num(Player:GCDRemains() > 0) < 2) then
     if FBCast(S.FireBlast) then return "fire_blast combustion_phase 6"; end
   end
-  -- pyroblast,if=buff.combustion.up&buff.hot_streak.react
-  if S.Pyroblast:IsReady() and (CombustionUp and HotStreak) then
-    if Cast(S.Pyroblast) then return "pyroblast combustion_phase 7"; end
-  end
+  
   -- Cancelaura HT if SKB is ready
   if Player:BuffUp(S.HyperthermiaBuff) and Player:BuffUp(S.FuryoftheSunKingBuff) then
     Player:CancelBuff(S.HyperthermiaBuff)
   end
+  
+  -- IMPORTANT: Adding Flamestrike AoE check BEFORE Pyroblast hot streak check
+  -- This ensures Flamestrike is correctly prioritized in AoE situations during Combustion
+  -- flamestrike,if=(buff.hot_streak.react&active_enemies>=variable.combustion_flamestrike)|(buff.hyperthermia.react&active_enemies>=variable.combustion_flamestrike-talent.hyperthermia)
+  if AoEON() and S.Flamestrike:IsReady() and ((HotStreak and EnemiesCount8ySplash >= VarCombustionFlamestrike) or (Player:BuffUp(S.HyperthermiaBuff) and EnemiesCount8ySplash >= VarCombustionFlamestrike - num(S.Hyperthermia:IsAvailable()))) then
+    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 7"; end
+  end
+  
   -- pyroblast,if=buff.combustion.up&buff.hot_streak.react
   if S.Pyroblast:IsReady() and (CombustionUp and HotStreak) then
-    if Cast(S.Pyroblast) then return "pyroblast combustion_phase 7"; end
+    if Cast(S.Pyroblast) then return "pyroblast combustion_phase 8"; end
   end
-  -- Cancelaura HT if SKB is ready
-  if Player:BuffUp(S.HyperthermiaBuff) and Player:BuffUp(S.FuryoftheSunKingBuff) then
-    Player:CancelBuff(S.HyperthermiaBuff)
-  end
+  
   -- flamestrike,if=buff.combustion.down&buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.remains>cast_time&buff.fury_of_the_sun_king.expiration_delay_remains=0&cooldown.combustion.remains<cast_time&active_enemies>=variable.skb_flamestrike
   -- TODO: Handle expiration_delay_remains
   if AoEON() and S.Flamestrike:IsReady() and not Player:IsCasting(S.Flamestrike) and (CombustionDown and Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Flamestrike:CastTime() and S.Combustion:CooldownRemains() < S.Flamestrike:CastTime() and EnemiesCount8ySplash >= VarSKBFlamestrike) then
-    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 8"; end
+    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 10"; end
   end
   -- pyroblast,if=buff.combustion.down&buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.remains>cast_time&(buff.fury_of_the_sun_king.expiration_delay_remains=0|buff.flame_accelerant.up)
   -- TODO: Handle expiration_delay_remains
@@ -429,25 +474,9 @@ local function CombustionPhase()
   if S.PhoenixFlames:IsCastable() and (S.SpellfireSpheres:IsAvailable() and S.PhoenixReborn:IsAvailable() and HeatingUp and not HotStreak and Player:BuffUp(S.FlamesFuryBuff)) then
     if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames combustion_phase 18"; end
   end
-  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(!variable.TA_combust|talent.sun_kings_blessing)&!variable.fire_blast_pooling&(!improved_scorch.active|action.scorch.executing|debuff.improved_scorch.remains>4*gcd.max)&(buff.fury_of_the_sun_king.down|action.pyroblast.executing)&buff.combustion.up&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react*(gcd.remains>0)<2
-  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=variable.TA_combust&!variable.fire_blast_pooling&charges_fractional>2.5&(!improved_scorch.active|action.scorch.executing|debuff.improved_scorch.remains>4*gcd.max)&(buff.fury_of_the_sun_king.down|action.pyroblast.executing)&buff.combustion.up&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react*(gcd.remains>0)<2
-  -- Note: Moved above with combustion, due to use_while_casting
-  -- cancel_buff,name=hyperthermia,if=buff.fury_of_the_sun_king.react
-  -- flamestrike,if=(buff.hot_streak.react&active_enemies>=variable.combustion_flamestrike)|(buff.hyperthermia.react&active_enemies>=variable.combustion_flamestrike-talent.hyperthermia)
-  if AoEON() and S.Flamestrike:IsReady() and ((HotStreak and EnemiesCount8ySplash >= VarCombustionFlamestrike) or (Player:BuffUp(S.HyperthermiaBuff) and EnemiesCount8ySplash >= VarCombustionFlamestrike - num(S.Hyperthermia:IsAvailable()))) then
-    if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 19"; end
-  end
-  -- pyroblast,if=buff.hyperthermia.react
-  if S.Pyroblast:IsReady() and (Player:BuffUp(S.HyperthermiaBuff)) then
-    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 20"; end
-  end
-  -- pyroblast,if=buff.hot_streak.react&buff.combustion.up
-  if S.Pyroblast:IsReady() and (HotStreak and CombustionUp) then
-    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 22"; end
-  end
   -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react&active_enemies<variable.combustion_flamestrike&buff.combustion.up
   if S.Pyroblast:IsReady() and (Player:PrevGCDP(1, S.Scorch) and HeatingUp and EnemiesCount8ySplash < VarCombustionFlamestrike and CombustionUp) then
-    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 24"; end
+    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 22"; end
   end
   -- scorch,if=talent.sun_kings_blessing&improved_scorch.active&debuff.improved_scorch.remains<3*gcd.max
   if S.Scorch:IsReady() and (S.SunKingsBlessing:IsAvailable() and ImprovedScorchActive() and Target:DebuffRemains(S.ImprovedScorchDebuff) < 3 * Player:GCD()) then
@@ -729,9 +758,15 @@ local function APL()
     VarShiftingPowerBeforeCombustion = VarTimeToCombustion > S.ShiftingPower:CooldownRemains()
     if Settings.Commons.Enabled.Trinkets then
       -- variable,name=item_cutoff_active,value=(variable.time_to_combustion<variable.on_use_cutoff|buff.combustion.remains>variable.skb_duration&!cooldown.item_cd_1141.remains)&((trinket.1.has_cooldown&trinket.1.cooldown.remains<variable.on_use_cutoff)+(trinket.2.has_cooldown&trinket.2.cooldown.remains<variable.on_use_cutoff)>1)
-      VarItemCutoffActive = (VarTimeToCombustion < VarOnUseCutoff or CombustionRemains > VarSKBDuration and (I.DragonfireBombDispenser:CooldownUp() or not I.DragonfireBombDispenser:IsEquipped())) and (num(Trinket1:Cooldown() > 0 and Trinket1:CooldownRemains() < VarOnUseCutoff) + num(Trinket2:Cooldown() and Trinket2:CooldownRemains() < VarOnUseCutoff) > 1)
+      VarItemCutoffActive = (VarTimeToCombustion < VarOnUseCutoff or CombustionRemains > VarSKBDuration and (I.DragonfireBombDispenser:CooldownUp() or not I.DragonfireBombDispenser:IsEquipped())) and (
+        (Trinket1 and Trinket1.Cooldown and Trinket1:CooldownRemains() < VarOnUseCutoff and 1 or 0) + 
+        (Trinket2 and Trinket2.Cooldown and Trinket2:CooldownRemains() < VarOnUseCutoff and 1 or 0) > 1
+      )
       -- use_item,effect_name=spymasters_web,if=(trinket.1.has_use&trinket.2.has_use&buff.combustion.remains>10&fight_remains<80)|((buff.combustion.remains>10&buff.spymasters_report.stack>35&fight_remains<60)|fight_remains<25)
-      if I.SpymastersWeb:IsEquippedAndReady() and ((Trinket1:HasUseBuff() and Trinket2:HasUseBuff() and CombustionRemains > 10 and FightRemains < 80) or ((CombustionRemains > 10 and Player:BuffStack(S.SpymastersReportBuff) > 35 and FightRemains < 60) or FightRemains < 25)) then
+      if I.SpymastersWeb:IsEquippedAndReady() and (
+        (Trinket1 and Trinket2 and Trinket1.HasUseBuff and Trinket2.HasUseBuff and Trinket1:HasUseBuff() and Trinket2:HasUseBuff() and CombustionRemains > 10 and FightRemains < 80) or 
+        ((CombustionRemains > 10 and Player:BuffStack(S.SpymastersReportBuff) > 35 and FightRemains < 60) or FightRemains < 25)
+      ) then
         if Cast(I.SpymastersWeb, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spymasters_web main 6"; end
       end
       -- use_item,name=treacherous_transmitter,if=variable.time_to_combustion<10|fight_remains<25
@@ -747,6 +782,30 @@ local function APL()
       -- use_item,name=neural_synapse_enhancer,if=buff.combustion.remains>7|fight_remains<15
       if I.NeuralSynapseEnhancer:IsEquippedAndReady() and (CombustionRemains > 7 or FightRemains < 15) then
         if Cast(I.NeuralSynapseEnhancer, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "neural_synapse_enhancer main 11"; end
+      end
+      -- use_item,name=flarendos_pilot_light,if=buff.combustion.remains>7|fight_remains<15
+      if I.FlarendosPilotLight:IsEquippedAndReady() and (CombustionRemains > 7 or FightRemains < 15) then
+        if Cast(I.FlarendosPilotLight, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "flarendos_pilot_light main 11"; end
+      end
+      -- use_item,name=house_of_cards,if=buff.combustion.remains>7|fight_remains<15
+      if I.HouseOfCards:IsEquippedAndReady() and (CombustionRemains > 7 or FightRemains < 15) then
+        if Cast(I.HouseOfCards, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "house_of_cards main 11"; end
+      end
+      -- use_item,name=funhouse_lens,if=buff.combustion.remains>7|fight_remains<15
+      if I.FunhouseLens:IsEquippedAndReady() and (CombustionRemains > 7 or FightRemains < 15) then
+        if Cast(I.FunhouseLens, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "funhouse_lens main 11"; end
+      end
+      -- use_item,name=quickwick_candlestick,if=buff.combustion.remains>7|fight_remains<15
+      if I.QuickwickCandlestick:IsEquippedAndReady() and (CombustionRemains > 7 or FightRemains < 15) then
+        if Cast(I.QuickwickCandlestick, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "quickwick_candlestick main 11"; end
+      end
+      -- use_item,name=signet_of_the_priory,if=buff.combustion.remains>7|fight_remains<15
+      if I.SignetOfThePriory:IsEquippedAndReady() and (CombustionRemains > 7 or FightRemains < 15) then
+        if Cast(I.SignetOfThePriory, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "signet_of_the_priory main 11"; end
+      end
+      -- use_item,name=soulletting_ruby,if=buff.combustion.remains>7|fight_remains<15
+      if I.SoulettingRuby:IsEquippedAndReady() and (CombustionRemains > 7 or FightRemains < 15) then
+        if Cast(I.SoulettingRuby, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "soulletting_ruby main 11"; end
       end
       -- use_item,effect_name=gladiators_badge,if=variable.time_to_combustion>cooldown-5
       if I.ForgedGladiatorsBadge:IsEquippedAndReady() and (VarTimeToCombustion > I.ForgedGladiatorsBadge:Cooldown() - 5) then
