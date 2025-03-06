@@ -149,5 +149,12 @@ if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
   -- TWW Trinkets
   AberrantSpellforge          = Item(212451, {13, 14}),
+  FlarendosPilotLight         = Item(230191, {13, 14}),
+  GeargrindersSpareKeys       = Item(230197, {13, 14}),
   SpymastersWeb               = Item(220202, {13, 14}),
+  -- TWW S2 Old Trinkets
+  IngeniousManaBattery        = Item(169344, {13, 14}),
+  -- TWW S2 Old Items
+  HyperthreadWristwraps       = Item(168989, {9}),
+  NeuralSynapseEnhancer       = Item(168973, {16}),
 }
