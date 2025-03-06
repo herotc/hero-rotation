@@ -35,6 +35,7 @@ local I = Item.Paladin.Retribution
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.BestinSlotsMelee:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -241,11 +242,6 @@ local function Cooldowns()
     if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (((Settings.Retribution.DisableCrusadeAWCDCheck or Player:BuffUp(S.AvengingWrathBuff) and S.AvengingWrath:CooldownRemains() > 40 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) == 10) and not S.RadiantGlory:IsAvailable() or S.RadiantGlory:IsAvailable() and (not S.ExecutionSentence:IsAvailable() and S.WakeofAshes:CooldownUp() or Target:DebuffUp(S.ExecutionSentenceDebuff))) and (not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2) or Trinket2:BuffDuration() >= FightRemains) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for trinket2 ("..Trinket2:Name()..") cooldowns 8"; end
     end
-    -- use_item,name=bestinslots,if=((buff.avenging_wrath.up&cooldown.avenging_wrath.remains>40|buff.crusade.up&buff.crusade.stack=10)&!talent.radiant_glory|talent.radiant_glory&(!talent.execution_sentence&cooldown.wake_of_ashes.remains=0|debuff.execution_sentence.up))
-    local BestInSlotsTrinket = Player:GetItemByName("bestinslots")
-    if BestInSlotsTrinket and BestInSlotsTrinket:IsReady() and not Player:IsItemBlacklisted(BestInSlotsTrinket) and (((Settings.Retribution.DisableCrusadeAWCDCheck or Player:BuffUp(S.AvengingWrathBuff) and S.AvengingWrath:CooldownRemains() > 40 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) == 10) and not S.RadiantGlory:IsAvailable() or S.RadiantGlory:IsAvailable() and (not S.ExecutionSentence:IsAvailable() and S.WakeofAshes:CooldownUp() or Target:DebuffUp(S.ExecutionSentenceDebuff)))) then
-      if Cast(BestInSlotsTrinket, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "use_item for bestinslots ("..BestInSlotsTrinket:Name()..") cooldowns 9"; end
-    end
     -- use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs|!buff.crusade.up&cooldown.crusade.remains>20|!buff.avenging_wrath.up&cooldown.avenging_wrath.remains>20)
     if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs and (Trinket2:CooldownDown() or not VarTrinket2Buffs or (Settings.Retribution.DisableCrusadeAWCDCheck or Player:BuffDown(S.CrusadeBuff) and S.Crusade:CooldownRemains() > 20 or Player:BuffDown(S.AvengingWrathBuff) and S.AvengingWrath:CooldownRemains() > 20))) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for trinket1 ("..Trinket1:Name()..") cooldowns 10"; end
@@ -253,6 +249,10 @@ local function Cooldowns()
     -- use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs|!buff.crusade.up&cooldown.crusade.remains>20|!buff.avenging_wrath.up&cooldown.avenging_wrath.remains>20)
     if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs and (Trinket1:CooldownDown() or not VarTrinket1Buffs or (Settings.Retribution.DisableCrusadeAWCDCheck or Player:BuffDown(S.CrusadeBuff) and S.Crusade:CooldownRemains() > 20 or Player:BuffDown(S.AvengingWrathBuff) and S.AvengingWrath:CooldownRemains() > 20))) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for trinket2 ("..Trinket2:Name()..") cooldowns 12"; end
+    end
+    -- use_item,name=bestinslots,if=((buff.avenging_wrath.up&cooldown.avenging_wrath.remains>40|buff.crusade.up&buff.crusade.stack=10)&!talent.radiant_glory|talent.radiant_glory&(!talent.execution_sentence&cooldown.wake_of_ashes.remains=0|debuff.execution_sentence.up))
+    if Settings.Commons.Enabled.Items and I.BestinSlotsMelee:IsEquippedAndReady() and (((Settings.Retribution.DisableCrusadeAWCDCheck or Player:BuffUp(S.AvengingWrathBuff) and S.AvengingWrath:CooldownRemains() > 40 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) == 10) and not S.RadiantGlory:IsAvailable() or S.RadiantGlory:IsAvailable() and (not S.ExecutionSentence:IsAvailable() and S.WakeofAshes:CooldownUp() or Target:DebuffUp(S.ExecutionSentenceDebuff)))) then
+      if Cast(I.BestinSlotsMelee, nil, Settings.CommonsDS.DisplayStyle.Items) then return "bestinslots cooldowns 14"; end
     end
   end
   -- shield_of_vengeance,if=fight_remains>15&(!talent.execution_sentence|!debuff.execution_sentence.up)&!buff.divine_hammer.up
