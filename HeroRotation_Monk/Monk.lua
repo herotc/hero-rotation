@@ -232,18 +232,11 @@ Item.Monk.Commons = {
 }
 
 Item.Monk.Windwalker = MergeTableByKey(Item.Monk.Commons, {
-  -- DF Trinkets
-  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
-  BeacontotheBeyond                     = Item(203963, {13, 14}),
-  DragonfireBombDispenser               = Item(202610, {14, 14}),
-  EruptingSpearFragment                 = Item(193769, {13, 14}),
-  ManicGrieftorch                       = Item(194308, {13, 14}),
   -- TWW Trinkets
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
+  JunkmaestrosMegaMagnet                = Item(230189, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
-  -- Other On-Use Items
-  Djaruun                               = Item(202569, {16}),
 })
 
 Item.Monk.Brewmaster = MergeTableByKey(Item.Monk.Commons, {
