@@ -312,11 +312,11 @@ local function ST()
   if S.WarriorofElune:IsCastable() and (S.LunarCalling:IsAvailable() or not S.LunarCalling:IsAvailable() and VarEclipseRemains <= 7) then
     if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune st 2"; end
   end
-  -- wrath,if=variable.enter_lunar&variable.eclipse&variable.eclipse_remains<cast_time&!variable.cd_condition
+  -- wrath,if=variable.enter_lunar&eclipse.in_eclipse&variable.eclipse_remains<cast_time&!variable.cd_condition
   if S.Wrath:IsCastable() and (VarEnterLunar and VarEclipse and VarEclipseRemains < S.Wrath:CastTime() and not VarCDCondition) then
     if Cast(S.Wrath, nil, nil, not IsInSpellRange) then return "wrath st 4"; end
   end
-  -- starfire,if=!variable.enter_lunar&variable.eclipse&variable.eclipse_remains<cast_time&!variable.cd_condition
+  -- starfire,if=!variable.enter_lunar&eclipse.in_eclipse&variable.eclipse_remains<cast_time&!variable.cd_condition
   if S.Starfire:IsCastable() and (not VarEnterLunar and VarEclipse and VarEclipseRemains < S.Starfire:CastTime() and not VarCDCondition) then
     if Cast(S.Starfire, nil, nil, not IsInSpellRange) then return "starfire st 6"; end
   end
@@ -340,11 +340,11 @@ local function ST()
       if Cast(S.Incarnation, Settings.Balance.GCDasOffGCD.CAInc) then return "celestial_alignment st 14"; end
     end
   end
-  -- wrath,if=variable.enter_lunar&(!variable.eclipse|variable.eclipse_remains<cast_time)
+  -- wrath,if=variable.enter_lunar&(eclipse.in_none|variable.eclipse_remains<cast_time)
   if S.Wrath:IsCastable() and (VarEnterLunar and (not VarEclipse or VarEclipseRemains < S.Wrath:CastTime())) then
     if Cast(S.Wrath, nil, nil, not IsInSpellRange) then return "wrath st 16"; end
   end
-  -- starfire,if=!variable.enter_lunar&(!variable.eclipse|variable.eclipse_remains<cast_time)
+  -- starfire,if=!variable.enter_lunar&(eclipse.in_none|variable.eclipse_remains<cast_time)
   if S.Starfire:IsCastable() and (not VarEnterLunar and (not VarEclipse or VarEclipseRemains < S.Starfire:CastTime())) then
     if Cast(S.Starfire, nil, nil, not IsInSpellRange) then return "starfire st 18"; end
   end
@@ -432,11 +432,11 @@ end
 
 local function AoE()
   local DungeonRoute = Player:IsInDungeonArea()
-  -- wrath,if=variable.enter_lunar&variable.eclipse&variable.eclipse_remains<cast_time
+  -- wrath,if=variable.enter_lunar&eclipse.in_eclipse&variable.eclipse_remains<cast_time
   if S.Wrath:IsCastable() and (VarEnterLunar and VarEclipse and VarEclipseRemains < S.Wrath:CastTime()) then
     if Cast(S.Wrath, nil, nil, not IsInSpellRange) then return "wrath aoe 2"; end
   end
-  -- starfire,if=!variable.enter_lunar&variable.eclipse&variable.eclipse_remains<cast_time
+  -- starfire,if=!variable.enter_lunar&eclipse.in_eclipse&variable.eclipse_remains<cast_time
   if S.Starfire:IsCastable() and (not VarEnterLunar and VarEclipse and VarEclipseRemains < S.Starfire:CastTime()) then
     if Cast(S.Starfire, nil, nil, not IsInSpellRange) then return "starfire aoe 4"; end
   end
@@ -456,11 +456,11 @@ local function AoE()
   if S.Moonfire:IsCastable() and (not DungeonRoute) then
     if Everyone.CastCycle(S.Moonfire, Enemies10ySplash, EvaluateCycleMoonfireAoE, not IsInSpellRange) then return "moonfire aoe 12"; end
   end
-  -- wrath,if=variable.enter_lunar&(!variable.eclipse|variable.eclipse_remains<cast_time)
+  -- wrath,if=variable.enter_lunar&(eclipse.in_none|variable.eclipse_remains<cast_time)
   if S.Wrath:IsCastable() and (VarEnterLunar and (not VarEclipse or VarEclipseRemains < S.Wrath:CastTime())) then
     if Cast(S.Wrath, nil, nil, not IsInSpellRange) then return "wrath aoe 14"; end
   end
-  -- starfire,if=!variable.enter_lunar&(!variable.eclipse|variable.eclipse_remains<cast_time)
+  -- starfire,if=!variable.enter_lunar&(eclipse.in_none|variable.eclipse_remains<cast_time)
   if S.Starfire:IsCastable() and (not VarEnterLunar and (not VarEclipse or VarEclipseRemains < S.Starfire:CastTime())) then
     if Cast(S.Starfire, nil, nil, not IsInSpellRange) then return "starfire aoe 16"; end
   end
@@ -468,11 +468,11 @@ local function AoE()
   if S.StellarFlare:IsCastable() and (EnemiesCount10ySplash < (11 - S.UmbralIntensity:TalentRank() - (2 * num(S.AstralSmolder:IsAvailable())) - num(S.LunarCalling:IsAvailable()))) then
     if Everyone.CastCycle(S.StellarFlare, Enemies10ySplash, EvaluateCycleStellarFlareAoE, not IsInSpellRange) then return "stellar_flare aoe 18"; end
   end
-  -- force_of_nature,if=cooldown.ca_inc.remains<gcd.max&(!variable.eclipse|variable.eclipse_remains>6)|variable.eclipse_remains>=3&cooldown.ca_inc.remains>10+15*talent.control_of_the_dream&(fight_remains>cooldown+5|cooldown.ca_inc.remains>fight_remains)
+  -- force_of_nature,if=cooldown.ca_inc.remains<gcd.max&(eclipse.in_none|variable.eclipse_remains>6)|variable.eclipse_remains>=3&cooldown.ca_inc.remains>10+15*talent.control_of_the_dream&(fight_remains>cooldown+5|cooldown.ca_inc.remains>fight_remains)
   if S.ForceofNature:IsCastable() and (CAInc:CooldownRemains() < Player:GCD() and (not VarEclipse or VarEclipseRemains > 6) or VarEclipseRemains >= 3 and CAInc:CooldownRemains() > 10 + 15 * num(S.ControloftheDream:IsAvailable()) and (FightRemains > 65 or CAInc:CooldownRemains() > FightRemains)) then
     if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature aoe 20"; end
   end
-  -- fury_of_elune,if=variable.eclipse
+  -- fury_of_elune,if=eclipse.in_eclipse
   if S.FuryofElune:IsCastable() and (VarEclipse) then
     if Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune, nil, not IsInSpellRange) then return "fury_of_elune aoe 22"; end
   end
@@ -590,6 +590,7 @@ local function APL()
     -- variable,name=convoke_condition,value=fight_remains<5|(buff.ca_inc.up|cooldown.ca_inc.remains>40)&(!hero_tree.keeper_of_the_grove|buff.harmony_of_the_grove.up|cooldown.force_of_nature.remains>15)
     VarConvokeCondition = (BossFightRemains < 5 or (CAIncBuffUp or CAInc:CooldownRemains() > 40) and (Player:HeroTreeID() ~= 23 or Player:BuffUp(S.HarmonyoftheGroveBuff) or S.ForceofNature:CooldownRemains() > 15))
     -- variable,name=eclipse,value=buff.eclipse_lunar.up|buff.eclipse_solar.up
+    -- Note: Removed from the APL in favor of `eclipse.in_eclipse`. Useful for us, however, so keeping it here.
     VarEclipse = Player:BuffUp(S.EclipseLunar) or Player:BuffUp(S.EclipseSolar)
     -- variable,name=eclipse_remains,value=buff.eclipse_lunar.remains<?buff.eclipse_solar.remains
     VarEclipseRemains = mathmax(Player:BuffRemains(S.EclipseLunar), Player:BuffRemains(S.EclipseSolar))
