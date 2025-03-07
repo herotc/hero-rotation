@@ -281,6 +281,7 @@ Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
   FlarendosPilotLight                   = Item(230191, {13, 14}),
   FunhouseLens                          = Item(234217, {13, 14}),
   -- TWW S2 Prior Expansion Trinkets
+  HyperthreadWristwraps                 = Item(168989, {9}),
   SoullettingRuby                       = Item(178809, {13, 14}),
 })
 
