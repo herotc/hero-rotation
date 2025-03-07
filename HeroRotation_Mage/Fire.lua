@@ -278,7 +278,7 @@ local function Precombat()
   -- Note: Can't calculate enemies in Precombat
   -- pyroblast
   if S.Pyroblast:IsReady() and not Player:IsCasting(S.Pyroblast) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast precombat 8"; end
+    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast precombat 8"; end
   end
   -- phoenix_flames,if=time=0
   -- Note: From APL()
@@ -375,10 +375,8 @@ local function CombustionPhase()
   if S.FireBlast:IsReady() and not FreeCastAvailable() and (VarTACombust and not VarFireBlastPooling and S.FireBlast:ChargesFractional() > 2.5 and (not ImprovedScorchActive() or Player:IsCasting(S.Scorch) or Target:DebuffRemains(S.ImprovedScorchDebuff) > 4 * Player:GCD()) and (Player:BuffDown(S.FuryoftheSunKingBuff) or Player:IsCasting(S.Pyroblast)) and CombustionUp and not HotStreak and HotStreakInFlight() + num(HeatingUp) * num(Player:GCDRemains() > 0) < 2) then
     if FBCast(S.FireBlast) then return "fire_blast combustion_phase 6"; end
   end
-  -- Cancelaura HT if SKB is ready
-  if Player:BuffUp(S.HyperthermiaBuff) and Player:BuffUp(S.FuryoftheSunKingBuff) then
-    Player:CancelBuff(S.HyperthermiaBuff)
-  end
+  -- cancel_buff,name=hyperthermia,if=buff.fury_of_the_sun_king.react
+  -- TODO
   -- flamestrike,if=(buff.hot_streak.react&active_enemies>=variable.combustion_flamestrike)|(buff.hyperthermia.react&active_enemies>=variable.combustion_flamestrike-talent.hyperthermia)
   if AoEON() and S.Flamestrike:IsReady() and ((HotStreak and EnemiesCount8ySplash >= VarCombustionFlamestrike) or (Player:BuffUp(S.HyperthermiaBuff) and EnemiesCount8ySplash >= VarCombustionFlamestrike - num(S.Hyperthermia:IsAvailable()))) then
     if Cast(S.Flamestrike, nil, nil, not Target:IsInRange(40)) then return "flamestrike combustion_phase 19"; end
@@ -402,7 +400,7 @@ local function CombustionPhase()
   -- pyroblast,if=buff.combustion.down&buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.remains>cast_time&(buff.fury_of_the_sun_king.expiration_delay_remains=0|buff.flame_accelerant.up)
   -- Note: Not using PBCast to force non-free Pyro to main icon.
   if S.Pyroblast:IsReady() and not Player:IsCasting(S.Pyroblast) and (CombustionDown and Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Pyroblast:CastTime() and Player:BuffUp(S.FlameAccelerantBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 10"; end
+    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 10"; end
   end
   -- meteor,if=talent.isothermic_core&buff.combustion.down&cooldown.combustion.remains<cast_time
   if S.Meteor:IsReady() and (not S.UnleashedInferno:IsAvailable() and S.IsothermicCore:IsAvailable() and CombustionDown and S.Combustion:CooldownRemains() < S.Meteor:CastTime()) then
@@ -444,7 +442,7 @@ local function CombustionPhase()
   -- pyroblast,if=buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.remains>cast_time&buff.fury_of_the_sun_king.expiration_delay_remains=0&(buff.combustion.remains>cast_time+3|buff.combustion.remains<cast_time)
   -- Note: Not using PBCast to force non-free Pyro to main icon.
   if S.Pyroblast:IsReady() and not Player:IsCasting(S.Pyroblast) and (Player:BuffUp(S.FuryoftheSunKingBuff) and Player:BuffRemains(S.FuryoftheSunKingBuff) > S.Pyroblast:CastTime() and (CombustionRemains > S.Pyroblast:CastTime() + 3 or CombustionRemains < S.Pyroblast:CastTime())) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 28"; end
+    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast combustion_phase 28"; end
   end
   -- fireball,if=buff.frostfire_empowerment.up&!buff.hot_streak.react&!buff.excess_frost.up
   if Bolt:IsReady() and (Player:BuffUp(S.FrostfireEmpowermentBuff) and not HotStreak and Player:BuffDown(S.ExcessFrostBuff)) then
@@ -570,7 +568,7 @@ local function StandardRotation()
   -- pyroblast,if=buff.fury_of_the_sun_king.up&buff.fury_of_the_sun_king.expiration_delay_remains=0
   -- Note: Not using PBCast to force non-free Pyro to main icon.
   if S.Pyroblast:IsReady() and not Player:IsCasting(S.Pyroblast) and (Player:BuffUp(S.FuryoftheSunKingBuff)) then
-    if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 16"; end
+    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast standard_rotation 16"; end
   end
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!firestarter.active&(!variable.fire_blast_pooling|talent.spontaneous_combustion)&buff.fury_of_the_sun_king.down&(((action.fireball.executing&(action.fireball.execute_remains<0.5|!talent.hyperthermia)|action.pyroblast.executing&(action.pyroblast.execute_remains<0.5))&buff.heating_up.react)|(scorch_execute.active&(!improved_scorch.active|debuff.improved_scorch.stack=debuff.improved_scorch.max_stack|full_recharge_time<3)&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!hot_streak_spells_in_flight)))
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!firestarter.active&((!variable.fire_blast_pooling&talent.unleashed_inferno)|talent.spontaneous_combustion)&buff.fury_of_the_sun_king.down&(buff.heating_up.up&hot_streak_spells_in_flight<1&(prev_gcd.1.phoenix_flames|prev_gcd.1.scorch))|(((buff.bloodlust.up&charges_fractional>1.5)|charges_fractional>2.5|buff.feel_the_burn.remains<0.5|full_recharge_time*1-(0.5*cooldown.shifting_power.ready)<buff.hyperthermia.duration)&buff.heating_up.react)
