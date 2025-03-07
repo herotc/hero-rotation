@@ -285,7 +285,7 @@ local function Finishers()
     if Cast(S.HammerofLight, Settings.Retribution.GCDasOffGCD.WakeOfAshes, nil, not Target:IsInRange(12)) then return "hammer_of_light finishers 2"; end
   end
   -- divine_hammer,if=!buff.divine_hammer.up
-  if S.DivineHammer:IsCastable() and (not Paladin.DivineHammerActive) then
+  if S.DivineHammer:IsReady() and (not Paladin.DivineHammerActive) then
     if Cast(S.DivineHammer, nil, nil, not Target:IsInRange(8)) then return "divine_hammer finishers 4"; end
   end
   -- divine_storm,if=variable.ds_castable&!buff.hammer_of_light_ready.up&(cooldown.divine_hammer.remains|buff.divine_hammer.up|!talent.divine_hammer)&(!talent.crusade|cooldown.crusade.remains>gcd*3|buff.crusade.up&buff.crusade.stack<10|talent.radiant_glory)
