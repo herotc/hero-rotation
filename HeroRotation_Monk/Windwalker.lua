@@ -261,7 +261,7 @@ end
 local function Cooldowns()
   -- Define VarSefCondition for SEF usage
   local VarSefCondition = (not Player:BuffUp(S.StormEarthAndFireBuff) and (not Player:IsInDungeonArea() and Target:TimeToDie() > 15 or Player:IsInDungeonArea() and Target:TimeToDie() > 15) and 
-    (not S.InvokeXuenTheWhiteTiger:IsAvailable() or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or Player:BuffUp(S.InvokeXuenTheWhiteTigerBuff)))
+    (not S.InvokeXuenTheWhiteTiger:IsAvailable() or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or Monk.Xuen.Active))
   
   -- invoke_external_buff,name=power_infusion,if=pet.xuen_the_white_tiger.active&(!buff.bloodlust.up|buff.bloodlust.up&cooldown.strike_of_the_windlord.remains)
   -- We track if Power Infusion is available but players need to coordinate with priests for manual usage
