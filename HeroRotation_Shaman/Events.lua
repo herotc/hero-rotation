@@ -126,23 +126,23 @@ HL:RegisterForSelfCombatEvent(
     -- Fire Elemental. SpellIDs are without and with Primal Elementalist
     if SpellID == 188592 or SpellID == 118291 then
       Shaman.FireElemental.GreaterActive = true
-      Delay(30, function()
+      Delay(24, function()
         Shaman.FireElemental.GreaterActive = false
       end)
     elseif SpellID == 462992 or SpellID == 462991 then
       Shaman.FireElemental.LesserActive = true
-      Delay(15, function()
+      Delay(12, function()
         Shaman.FireElemental.LesserActive = false
       end)
     -- Storm Elemental. SpellIDs are without and with Primal Elementalist
     elseif SpellID == 157299 or SpellID == 157319 then
       Shaman.StormElemental.GreaterActive = true
-      Delay(30, function()
+      Delay(24, function()
         Shaman.StormElemental.GreaterActive = false
       end)
     elseif SpellID == 462993 or SpellID == 462990 then
       Shaman.StormElemental.LesserActive = true
-      Delay(15, function()
+      Delay(12, function()
         Shaman.StormElemental.LesserActive = false
       end)
     end
