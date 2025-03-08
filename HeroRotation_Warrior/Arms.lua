@@ -767,7 +767,7 @@ local function SlayerSweep()
     if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter slayer_sweep 20"; end
   end
   -- execute,if=buff.juggernaut.remains<=gcd*2|debuff.marked_for_execution.stack=3|buff.sudden_death.stack=2|buff.sudden_death.remains<=gcd*3
-  if S.Execute:IsReady() and (Player:BuffRemains(S.JuggernautBuff) <= Player:GCD() * 2 or Target:DebuffStack(S.MarkedforExecutionDebuff) == 3 or Player:buffStack(S.SuddenDeathBuff) == 2 or Player:BuffRemains(S.SuddenDeathBuff) <= Player:GCD() * 3) then
+  if S.Execute:IsReady() and (Player:BuffRemains(S.JuggernautBuff) <= Player:GCD() * 2 or Target:DebuffStack(S.MarkedforExecutionDebuff) == 3 or Player:BuffStack(S.SuddenDeathBuff) == 2 or Player:BuffRemains(S.SuddenDeathBuff) <= Player:GCD() * 3) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_sweep 22"; end
   end
   -- bladestorm,if=(cooldown.colossus_smash.remains>=gcd*4|cooldown.warbreaker.remains>=gcd*4)|debuff.colossus_smash.remains>=gcd*4
