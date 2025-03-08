@@ -106,6 +106,7 @@ Spell.Warrior.MountainThane = {
 Spell.Warrior.Slayer = {
   -- Talents
   FierceFollowthrough                   = Spell(444773),
+  Opportunist                           = Spell(444774),
   SlayersDominance                      = Spell(444767),
   -- Buffs
   BrutalFinishBuff                      = Spell(446918),
@@ -260,6 +261,8 @@ Item.Warrior.Commons = {
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   -- TWW Trinkets
   TreacherousTransmitter                = Item(221023, {13, 14}),
+  -- TWW Items
+  BestinSlots                           = Item(232526, {16}),
 }
 
 Item.Warrior.Fury = MergeTableByKey(Item.Warrior.Commons, {
