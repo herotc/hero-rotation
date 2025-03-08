@@ -140,10 +140,15 @@ local function RtB_Buffs ()
     Cache.APLVar.RtB_Buffs.Longer = 0
     Cache.APLVar.RtB_Buffs.MinRemains = 9999
     Cache.APLVar.RtB_Buffs.MaxRemains = 0
+    Cache.APLVar.RtB_Buffs.BuffsAbovePandemic = 0
     local RtBRemains = Rogue.RtBRemains()
     for i = 1, #RtB_BuffsList do
       local Remains = Player:BuffRemains(RtB_BuffsList[i])
       if Remains > 0 then
+        if Remains > 39 then
+          Cache.APLVar.RtB_Buffs.BuffsAbovePandemic = Cache.APLVar.RtB_Buffs.BuffsAbovePandemic + 1
+        end
+
         Cache.APLVar.RtB_Buffs.Total = Cache.APLVar.RtB_Buffs.Total + 1
         if Remains > Cache.APLVar.RtB_Buffs.MaxRemains then
           Cache.APLVar.RtB_Buffs.MaxRemains = Remains
@@ -220,15 +225,21 @@ local function RtB_Reroll(ForceLoadedDice)
     else
       Cache.APLVar.RtB_Reroll = false
 
+      -- actions.cds+=/variable,name=buffs_above_pandemic,value=0+(buff.broadside.remains>39)+(buff.ruthless_precision.remains>39)
+        -- +(buff.true_bearing.remains>39)+(buff.grand_melee.remains>39)+(buff.buried_treasure.remains>39)+(buff.skull_and_crossbones.remains>39)
+      -- Added to RtB Cache, See RtB_Buffs
+
       -- # Roll the bones if you have no buffs, or will lose no buffs by rolling. With Loaded Dice up, roll if you have
       -- 1 buff or will lose at most 1 buff.
-      -- roll_the_bones,if=rtb_buffs.will_lose<=buff.loaded_dice.up
-      Cache.APLVar.RtB_Reroll = Cache.APLVar.RtB_Buffs.Will_Lose.Total <= num(Player:BuffUp(S.LoadedDiceBuff))
+      --actions.cds+=/roll_the_bones,if=rtb_buffs.will_lose<=1&(variable.buffs_above_pandemic<=2|rtb_buffs.max_remains<40)
+      Cache.APLVar.RtB_Reroll = Cache.APLVar.RtB_Buffs.Will_Lose.Total <= 1 and (Cache.APLVar.RtB_Buffs.BuffsAbovePandemic <= 2
+        or Cache.APLVar.RtB_Buffs.MaxRemains < 40)
 
       -- # KIR builds can also roll with Loaded Dice up and at most 2 buffs in total
-      -- actions.cds+=/roll_the_bones,if=talent.keep_it_rolling&buff.loaded_dice.up&rtb_buffs<=2
-      if not Cache.APLVar.RtB_Reroll then
-        Cache.APLVar.RtB_Reroll = S.KeepItRolling:IsAvailable() and (Player:BuffUp(S.LoadedDiceBuff) or ForceLoadedDice) and Cache.APLVar.RtB_Buffs.Total <= 2
+      --actions.cds+=/roll_the_bones,if=talent.keep_it_rolling&rtb_buffs<=2|rtb_buffs.max_remains<=15&rtb_buffs.will_lose<=3
+      if not Cache.APLVar.RtB_Reroll and S.KeepItRolling:IsAvailable() then
+        Cache.APLVar.RtB_Reroll = Cache.APLVar.RtB_Buffs.Total <= 2 or
+          Cache.APLVar.RtB_Buffs.MaxRemains <= 15 and Cache.APLVar.RtB_Buffs.Will_Lose.Total <= 3
       end
 
       -- # HO builds can fish for good buffs by rerolling with 2 buffs and Loaded Dice up if those 2 buffs do not
@@ -236,7 +247,7 @@ local function RtB_Reroll(ForceLoadedDice)
       --actions.cds+=/roll_the_bones,if=talent.hidden_opportunity&buff.loaded_dice.up&rtb_buffs<=2&!buff.broadside.up
       -- &!buff.ruthless_precision.up&!buff.true_bearing.up
       if not Cache.APLVar.RtB_Reroll then
-        Cache.APLVar.RtB_Reroll = S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.LoadedDiceBuff) and Cache.APLVar.RtB_Buffs.Total <= 2
+        Cache.APLVar.RtB_Reroll = S.HiddenOpportunity:IsAvailable() and (Player:BuffUp(S.LoadedDiceBuff) or ForceLoadedDice) and Cache.APLVar.RtB_Buffs.Total <= 2
           and not Player:BuffUp(S.Broadside) and not Player:BuffUp(S.RuthlessPrecision) and not Player:BuffUp(S.TrueBearing)
       end
     end
@@ -445,7 +456,7 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
     -- Use Roll the Bones if reroll conditions are met, or with no buffs, or seven seconds early if about to enter a Vanish window with Crackshot
     -- actions.cds+=/roll_the_bones,if=variable.rtb_reroll|rtb_buffs=0
     if S.RolltheBones:IsReady() then
-      if RtB_Reroll(true) or Cache.APLVar.RtB_Buffs.Total == 0 then
+      if RtB_Reroll(S.LoadedDice:IsAvailable()) or Cache.APLVar.RtB_Buffs.Total == 0 then
         MacroAbility = S.RolltheBones
       end
     end
@@ -730,11 +741,23 @@ local function CDs ()
     end
   end
 
+  -- actions.cds+=/keep_it_rolling,if=rtb_buffs.normal>=5&(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up>=3&rtb_buffs.max_remains<=30)
+  -- New
+  if S.KeepItRolling:IsReady() then
+    if Cache.APLVar.RtB_Buffs.Normal >= 5 and (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing)) >= 3
+      and Cache.APLVar.RtB_Buffs.MaxRemains <= 30) then
+      if Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then
+        return "Cast Keep it Rolling"
+      end
+    end
+  end
+
   -- # Use Keep it Rolling with any 4 buffs, unless you only have one of Broadside, Ruthless Precision and True Bearing,
   -- then wait until just before the lowest duration buff expires in an attempt to obtain another good buff from Count the Odds.
-  --actions.cds+=/keep_it_rolling,if=rtb_buffs>=4&(rtb_buffs.min_remains<1|(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up>=2))
+  -- actions.cds+=/keep_it_rolling,if=rtb_buffs>=4&(rtb_buffs.min_remains<1|(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up>=2))&rtb_buffs.normal<=2
   if S.KeepItRolling:IsReady() and Cache.APLVar.RtB_Buffs.Total >= 4
-    and (Cache.APLVar.RtB_Buffs.MinRemains < 1 or (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing)) >= 2)) then
+    and (Cache.APLVar.RtB_Buffs.MinRemains < 1 or (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing)) >= 2))
+    and Cache.APLVar.RtB_Buffs.Normal <= 2 then
     if Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then
       return "Cast Keep it Rolling"
     end
@@ -743,9 +766,10 @@ local function CDs ()
   -- # Use Keep it Rolling with 3 buffs, if they contain at least 2 of Broadside, Ruthless Precision and True Bearing.
   -- If one of the 3 is missing, then wait until just before the lowest buff expires in an attempt to obtain it from Count the Odds.
   -- actions.cds+=/keep_it_rolling,if=rtb_buffs>=3&(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up>=2)
-  -- &(rtb_buffs.min_remains<1|(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up=3))
+  -- &(rtb_buffs.min_remains<1|(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up=3))&rtb_buffs.normal<=2
   if S.KeepItRolling:IsReady() and Cache.APLVar.RtB_Buffs.Total >= 3 and (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing)) >= 2)
-    and (Cache.APLVar.RtB_Buffs.MinRemains < 1 or (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing) == 3))) then
+    and (Cache.APLVar.RtB_Buffs.MinRemains < 1 or (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing) == 3)))
+    and Cache.APLVar.RtB_Buffs.Normal <= 2 then
     if Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then
       return "Cast Keep it Rolling"
     end
