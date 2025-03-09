@@ -268,9 +268,9 @@ local function Finish (ReturnSpellOnly, ForceStealth)
     end
   end
 
-  -- actions.finish+=/rupture,if=talent.unseen_blade&cooldown.flagellation.remains<10
+  -- rupture,if=talent.unseen_blade&cooldown.flagellation.remains<=8&dot.rupture.remains<=cooldown.flagellation.remains+20
   if S.Rupture:IsReady() then
-    if S.UnseenBlade:IsAvailable() and S.Flagellation:CooldownRemains() < 10 then
+    if S.UnseenBlade:IsAvailable() and S.Flagellation:CooldownRemains() <= 8 and Target:DebuffRemains(S.Rupture) <= S.Flagellation:CooldownRemains() + 20 then
       if ReturnSpellOnly then
         return S.Rupture
       else
