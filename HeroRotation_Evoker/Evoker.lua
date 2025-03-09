@@ -202,6 +202,8 @@ Item.Evoker.Commons = {
   SpymastersWeb                         = Item(220202, {13, 14}),
   -- TWW Items
   BestinSlotsCaster                     = Item(232805, {16}),
+  -- TWW S2 Old Items
+  NeuralSynapseEnhancer                 = Item(168973, {16}),
 }
 
 Item.Evoker.Augmentation = MergeTableByKey(Item.Evoker.Commons, {
