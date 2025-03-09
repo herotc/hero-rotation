@@ -202,9 +202,17 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Vengeance, Spell
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Commons = {
   -- TWW Trinkets
+  GeargrindersSpareKeys                 = Item(230197, {13, 14}),
+  HouseofCards                          = Item(230027, {13, 14}),
+  ImprovisedSeaforiumPacemaker          = Item(232541, {13, 14}),
+  JunkmaestrosMegaMagnet                = Item(230189, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
-  SkardynsGrace                         = Item(133282, {13, 14}),
+  MisterLockNStalk                      = Item(230193, {13, 14}),
+  RavenousHoneyBuzzer                   = Item(219298, {13, 14}),
+  SignetofthePriory                     = Item(219308, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
+  -- TWW S2 Old Trinkets
+  SkardynsGrace                         = Item(133282, {13, 14}),
 }
 
 Item.DemonHunter.Vengeance = MergeTableByKey(Item.DemonHunter.Commons, {
