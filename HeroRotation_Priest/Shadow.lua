@@ -76,6 +76,45 @@ local EnemiesCount10ySplash
 local BossFightRemains = 11111
 local FightRemains = 11111
 
+--- ===== Trinket Variables =====
+local Trinket1, Trinket2
+local VarTrinket1ID, VarTrinket2ID
+local VarTrinket1CD, VarTrinket2CD
+local VarTrinket1Range, VarTrinket2Range
+local VarTrinket1Ex, VarTrinket2Ex
+local VarTrinket1Buffs, VarTrinket2Buffs
+local VarTrinketFailures = 0
+local function SetTrinketVariables()
+  local T1, T2 = Player:GetTrinketData(OnUseExcludes)
+
+  -- If we don't have trinket items, try again in 5 seconds.
+  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.Level == 0 or T2.Level == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
+    VarTrinketFailures = VarTrinketFailures + 1
+    Delay(5, function()
+        SetTrinketVariables()
+      end
+    )
+    return
+  end
+
+  Trinket1          = T1.Object
+  Trinket2          = T2.Object
+
+  VarTrinket1ID     = T1.ID
+  VarTrinket2ID     = T2.ID
+
+  VarTrinket1CD     = T1.Cooldown
+  VarTrinket2CD     = T2.Cooldown
+  VarTrinket1Range  = T1.Range
+  VarTrinket2Range  = T2.Range
+  VarTrinket1Ex     = T1.Excluded
+  VarTrinket2Ex     = T2.Excluded
+
+  VarTrinket1Buffs  = (Trinket1:HasUseBuff() or VarTrinket1ID == I.SignetofthePriory:ID()) and (VarTrinket1CD >= 20)
+  VarTrinket2Buffs  = (Trinket2:HasUseBuff() or VarTrinket2ID == I.SignetofthePriory:ID()) and (VarTrinket2CD >= 20)
+end
+SetTrinketVariables()
+
 --- ===== Event Registrations =====
 HL:RegisterForEvent(function()
   VarDRForcePrio, VarMEForcePrio = false, true
@@ -288,6 +327,8 @@ local function Precombat()
   if S.Shadowform:IsCastable() and (Player:BuffDown(S.ShadowformBuff)) then
     if Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "shadowform precombat 4"; end
   end
+  -- variable,name=trinket_1_buffs,value=(trinket.1.has_buff.intellect|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit|trinket.1.is.signet_of_the_priory)&(trinket.1.cooldown.duration>=20)
+  -- variable,name=trinket_2_buffs,value=(trinket.2.has_buff.intellect|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit|trinket.2.is.signet_of_the_priory)&(trinket.2.cooldown.duration>=20)
   -- variable,name=dr_force_prio,default=0,op=reset
   -- variable,name=me_force_prio,default=1,op=reset
   -- variable,name=max_vts,default=12,op=reset
@@ -385,8 +426,8 @@ local function Trinkets()
     if I.AberrantSpellforge:IsEquippedAndReady() and (Player:BuffStack(S.AberrantSpellforgeBuff) <= 4) then
       if Cast(I.AberrantSpellforge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "aberrant_spellforge trinkets 4"; end
     end
-    -- use_item,use_off_gcd=1,name=neural_synapse_enhancer,if=(buff.power_surge.up|buff.entropic_rift.up)&(buff.voidform.up|cooldown.void_eruption.remains>=40|buff.dark_ascension.up)
-    if I.NeuralSynapseEnhancer:IsEquippedAndReady() and ((PowerSurgeUp or EntropicRiftUp) and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() >= 40 or Player:BuffUp(S.DarkAscensionBuff))) then
+    -- use_item,use_off_gcd=1,name=neural_synapse_enhancer,if=(buff.power_surge.up|buff.entropic_rift.up|variable.trinket_1_buffs|variable.trinket_2_buffs)&(buff.voidform.up|cooldown.void_eruption.remains>=40|buff.dark_ascension.up)
+    if I.NeuralSynapseEnhancer:IsEquippedAndReady() and ((PowerSurgeUp or EntropicRiftUp or VarTrinket1Buffs or VarTrinket2Buffs) and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() >= 40 or Player:BuffUp(S.DarkAscensionBuff))) then
       if Cast(I.NeuralSynapseEnhancer, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "neural_synapse_enhancer trinkets 6"; end
     end
     -- use_item,use_off_gcd=1,name=flarendos_pilot_light,if=gcd.remains>0&(buff.voidform.up|buff.power_infusion.remains>=10|buff.dark_ascension.up)|fight_remains<20
@@ -402,9 +443,9 @@ local function Trinkets()
       if Cast(I.SpymastersWeb, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spymasters_web trinkets 12"; end
     end
   end
-  -- use_items,if=(buff.voidform.up|buff.power_infusion.remains>=10|buff.dark_ascension.up|(cooldown.void_eruption.remains>10&trinket.cooldown.duration<=60))|fight_remains<20
+  -- use_items,if=(buff.voidform.up|buff.power_infusion.remains>=10|buff.dark_ascension.up|(cooldown.void_eruption.remains>10&trinket.cooldown.duration<=60)|equipped.neural_synapse_enhancer&buff.entropic_rift.up)|fight_remains<20
   local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-  if ItemToUse and ((Player:BuffUp(S.VoidformBuff) or Player:PowerInfusionRemains() >= 10 or Player:BuffUp(S.DarkAscensionBuff) or (S.VoidEruption:CooldownRemains() > 10 and (ItemToUse:Cooldown() <= 60 or ItemSlot ~= 13 and ItemSlot ~= 14))) or BossFightRemains < 20) then
+  if ItemToUse and ((Player:BuffUp(S.VoidformBuff) or Player:PowerInfusionRemains() >= 10 or Player:BuffUp(S.DarkAscensionBuff) or (S.VoidEruption:CooldownRemains() > 10 and (ItemToUse:Cooldown() <= 60 or ItemSlot ~= 13 and ItemSlot ~= 14)) or I.NeuralSynapseEnhancer:IsEquipped() and EntropicRiftUp) or BossFightRemains < 20) then
     local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
     if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
     if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
