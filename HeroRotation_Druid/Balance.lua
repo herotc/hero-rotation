@@ -121,8 +121,8 @@ local function SetTrinketVariables()
   VarTrinket1Ex = T1.Excluded
   VarTrinket2Ex = T2.Excluded
 
-  local T1Test = num(Trinket1:HasUseBuff() and VarTrinket1ID ~= I.OvinaxsMercurialEgg:ID())
-  local T2Test = num(Trinket2:HasUseBuff() and VarTrinket2ID ~= I.OvinaxsMercurialEgg:ID()) * 2
+  local T1Test = num(Trinket1:HasUseBuff() and VarTrinket1ID ~= I.OvinaxsMercurialEgg:ID() and VarTrinket1ID ~= I.SpymastersWeb:ID())
+  local T2Test = num(Trinket2:HasUseBuff() and VarTrinket2ID ~= I.OvinaxsMercurialEgg:ID() and VarTrinket2ID ~= I.SpymastersWeb:ID()) * 2
   VarOnUseTrinket = 0 + T1Test + T2Test
 end
 SetTrinketVariables()
@@ -239,8 +239,8 @@ end
 local function Precombat()
   -- variable,name=no_cd_talent,value=!talent.celestial_alignment&!talent.incarnation_chosen_of_elune|druid.no_cds
   -- variable,name=on_use_trinket,value=0
-  -- variable,name=on_use_trinket,op=add,value=trinket.1.has_use_buff&!trinket.1.is.ovinaxs_mercurial_egg
-  -- variable,name=on_use_trinket,op=add,value=(trinket.2.has_use_buff&!trinket.2.is.ovinaxs_mercurial_egg)*2
+  -- variable,name=on_use_trinket,op=add,value=trinket.1.has_use_buff&!trinket.1.is.ovinaxs_mercurial_egg&!trinket.1.is.spymasters_web
+  -- variable,name=on_use_trinket,op=add,value=(trinket.2.has_use_buff&!trinket.2.is.ovinaxs_mercurial_egg&!trinket.2.is.spymasters_web)*2
   -- Manually added: Group buff check
   if S.MarkoftheWild:IsCastable() and Everyone.GroupBuffMissing(S.MarkoftheWildBuff) then
     if Cast(S.MarkoftheWild, Settings.CommonsOGCD.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat"; end
