@@ -67,6 +67,7 @@ Spell.Warrior.Commons = {
   ThunderClap                           = Spell(6343),
   ThunderousRoar                        = Spell(384318),
   TitanicThrow                          = Spell(384090),
+  Uproar                                = Spell(391572),
   WarlordsTorment                       = Spell(390140),
   WreckingThrow                         = Spell(384110),
   -- Buffs
@@ -266,7 +267,7 @@ Item.Warrior.Commons = {
 }
 
 Item.Warrior.Fury = MergeTableByKey(Item.Warrior.Commons, {
-  -- Other Items
+  -- Old Items
   Fyralath                              = Item(206448, {16}),
 })
 
