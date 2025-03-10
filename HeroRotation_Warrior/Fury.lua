@@ -582,7 +582,7 @@ local function APL()
     end
     -- run_action_list,name=thane,if=talent.lightning_strikes
     if S.LightningStrikes:IsAvailable() then
-      local ShouldReturn = ThaneT(); if ShouldReturn then return ShouldReturn; end
+      local ShouldReturn = Thane(); if ShouldReturn then return ShouldReturn; end
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for ThaneAMMT()"; end
     end
     -- Pool if nothing else to suggest
