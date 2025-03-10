@@ -212,6 +212,7 @@ Item.DemonHunter.Commons = {
   SignetofthePriory                     = Item(219308, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
   -- TWW S2 Old Trinkets
+  GrimCodex                             = Item(178811, {13, 14}),
   SkardynsGrace                         = Item(133282, {13, 14}),
 }
 

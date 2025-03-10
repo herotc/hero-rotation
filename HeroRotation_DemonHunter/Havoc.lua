@@ -39,6 +39,7 @@ local I = Item.DemonHunter.Havoc
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
   I.GeargrindersSpareKeys:ID(),
+  I.GrimCodex:ID(),
   I.JunkmaestrosMegaMagnet:ID(),
   I.MadQueensMandate:ID(),
   I.SignetofthePriory:ID(),
@@ -75,6 +76,7 @@ local VarTrinket2Spell, VarTrinket2Range, VarTrinket2CastTime
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1Ex, VarTrinket2Ex
 local VarTrinket1Steroids, VarTrinket2Steroids
+local VarTrinket1Crit, VarTrinket2Crit
 local VarSpecialTrinket
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
@@ -111,6 +113,9 @@ local function SetTrinketVariables()
 
   VarTrinket1Steroids = VarTrinket1ID == I.ImprovisedSeaforiumPacemaker:ID()
   VarTrinket2Steroids = VarTrinket2ID == I.ImprovisedSeaforiumPacemaker:ID()
+
+  VarTrinket1Crit = VarTrinket1ID == I.MadQueensMandate:ID() or VarTrinket1ID == I.JunkmaestrosMegaMagnet:ID() or VarTrinket1ID == I.GeargrindersSpareKeys:ID() or VarTrinket1ID == I.RavenousHoneyBuzzer:ID() or VarTrinket1ID == I.GrimCodex:ID()
+  VarTrinket2Crit = VarTrinket2ID == I.MadQueensMandate:ID() or VarTrinket2ID == I.JunkmaestrosMegaMagnet:ID() or VarTrinket2ID == I.GeargrindersSpareKeys:ID() or VarTrinket2ID == I.RavenousHoneyBuzzer:ID() or VarTrinket2ID == I.GrimCodex:ID()
 end
 SetTrinketVariables()
 
@@ -181,8 +186,8 @@ local function Precombat()
   -- snapshot_stats
   -- variable,name=trinket1_steroids,value=trinket.1.is.improvised_seaforium_pacemaker
   -- variable,name=trinket2_steroids,value=trinket.2.is.improvised_seaforium_pacemaker
-  -- variable,name=tier33_4piece,value=(buff.initiative.up|!talent.initiative)&(buff.necessary_sacrifice.up|set_bonus.thewarwithin_season_2_4pc)
-  -- Note: Moving tier33_4piece to ARCooldown(), as it's only used there.
+  -- variable,name=trinket1_crit,value=trinket.1.is.mad_queens_mandate|trinket.1.is.junkmaestros_mega_magnet|trinket.1.is.geargrinders_spare_keys|trinket.1.is.ravenous_honey_buzzer|trinket.1.is.grim_codex
+  -- variable,name=trinket2_crit,value=trinket.2.is.mad_queens_mandate|trinket.2.is.junkmaestros_mega_magnet|trinket.2.is.geargrinders_spare_keys|trinket.2.is.ravenous_honey_buzzer|trinket.2.is.grim_codex
   -- variable,name=rg_ds,default=0,op=reset
   -- sigil_of_flame
   if S.SigilofFlame:IsCastable() then
@@ -228,8 +233,8 @@ local function FSCooldown()
   end
   -- invoke_external_buff,name=power_infusion,if=buff.metamorphosis.up|fight_remains<=20
   -- Note: Not handling external buffs.
-  -- variable,name=special_trinket,op=set,value=equipped.mad_queens_mandate|equipped.treacherous_transmitter|equipped.skardyns_grace|equipped.signet_of_the_priory|equipped.junkmaestros_mega_magnet|equipped.geargrinders_spare_keys|equipped.mister_locknstalk|equipped.ravenous_honey_buzzer
-  VarSpecialTrinket = I.MadQueensMandate:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.SkardynsGrace:IsEquipped() or I.SignetofthePriory:IsEquipped() or I.JunkmaestrosMegaMagnet:IsEquipped() or I.GeargrindersSpareKeys:IsEquipped() or I.MisterLockNStalk:IsEquipped() or I.RavenousHoneyBuzzer:IsEquipped()
+  -- variable,name=special_trinket,op=set,value=equipped.mad_queens_mandate|equipped.treacherous_transmitter|equipped.skardyns_grace|equipped.signet_of_the_priory|equipped.junkmaestros_mega_magnet|equipped.geargrinders_spare_keys|equipped.mister_locknstalk|equipped.ravenous_honey_buzzer|equipped.grim_codex
+  VarSpecialTrinket = I.MadQueensMandate:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.SkardynsGrace:IsEquipped() or I.SignetofthePriory:IsEquipped() or I.JunkmaestrosMegaMagnet:IsEquipped() or I.GeargrindersSpareKeys:IsEquipped() or I.MisterLockNStalk:IsEquipped() or I.RavenousHoneyBuzzer:IsEquipped() or I.GrimCodex:IsEquipped()
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=mad_queens_mandate,if=((!talent.initiative|buff.initiative.up|time>5)&(buff.metamorphosis.remains>5|buff.metamorphosis.down)&(trinket.1.is.mad_queens_mandate&(trinket.2.cooldown.duration<10|trinket.2.cooldown.remains>10|!trinket.2.has_buff.any)|trinket.2.is.mad_queens_mandate&(trinket.1.cooldown.duration<10|trinket.1.cooldown.remains>10|!trinket.1.has_buff.any))&fight_remains>120|fight_remains<10&fight_remains<buff.metamorphosis.remains)&debuff.essence_break.down|fight_remains<5
     if I.MadQueensMandate:IsEquippedAndReady() and (((not S.Initiative:IsAvailable() or Player:BuffUp(S.InitiativeBuff) or CombatTime > 5) and (Player:BuffRemains(S.MetamorphosisBuff) > 5 or Player:BuffDown(S.MetamorphosisBuff)) and (VarTrinket1ID == I.MadQueensMandate:ID() and (VarTrinket2CD < 10 or Trinket2:CooldownRemains() > 10 or not Trinket2:HasUseBuff()) or VarTrinket2ID == I.MadQueensMandate:ID() and (VarTrinket1CD < 10 or Trinket1:CooldownRemains() > 10 or not Trinket1:HasUseBuff())) and FightRemains > 120 or BossFightRemains < 10 and BossFightRemains < Player:BuffRemains(S.MetamorphosisBuff)) and Target:DebuffDown(S.EssenceBreakDebuff) or BossFightRemains < 5) then
@@ -535,9 +540,12 @@ local function FS()
 end
 
 local function ARCooldown()
-  -- variable,name=tier33_4piece,value=(buff.initiative.up|!talent.initiative)&(buff.necessary_sacrifice.up|set_bonus.thewarwithin_season_2_4pc)
-  -- Note: Moved from Precombat()
-  local VarT334P = (Player:BuffUp(S.InitiativeBuff) or not S.Initiative:IsAvailable()) and (Player:BuffUp(S.NecessarySacrificeBuff) or Player:HasTier("TWW2", 4))
+  -- variable,name=tier33_4piece,value=(buff.initiative.up|!talent.initiative)&(buff.necessary_sacrifice.up|!set_bonus.thewarwithin_season_2_4pc)
+  -- Note: Moved from APL()
+  local VarT334P = (Player:BuffUp(S.InitiativeBuff) or not S.Initiative:IsAvailable()) and (Player:BuffUp(S.NecessarySacrificeBuff) or not Player:HasTier("TWW2", 4))
+  -- variable,name=double_on_use,value=!equipped.signet_of_the_priory&!equipped.house_of_cards|(trinket.1.is.house_of_cards|trinket.1.is.signet_of_the_priory)&trinket.1.cooldown.remains>20|(trinket.2.is.house_of_cards|trinket.2.is.signet_of_the_priory)&trinket.2.cooldown.remains>20
+  -- Note: Moved from APL()
+  local VarDoubleOnUse = not I.SignetofthePriory:IsEquipped() and not I.HouseofCards:IsEquipped() or (VarTrinket1ID == I.HouseofCards:ID() or VarTrinket1ID == I.SignetofthePriory:ID()) and Trinket1:CooldownRemains() > 20 or (VarTrinket2ID == I.HouseofCards:ID() or VarTrinket2ID == I.SignetofthePriory:ID()) and Trinket2:CooldownRemains() > 20
   -- HouseofCards and RavenousHoneyBuzzer are only used for AR, so not adding to OnUseExcludes. Excluding here instead.
   local VarTrinket1Exclude = VarTrinket1ID == I.HouseofCards:ID() or VarTrinket1ID == I.RavenousHoneyBuzzer:ID()
   local VarTrinket2Exclude = VarTrinket2ID == I.HouseofCards:ID() or VarTrinket2ID == I.RavenousHoneyBuzzer:ID()
@@ -573,21 +581,25 @@ local function ARCooldown()
     if I.SkardynsGrace:IsEquippedAndReady() and ((not I.MadQueensMandate:IsEquipped() or FightRemains > 25 or VarTrinket2ID == I.SkardynsGrace:ID() and Trinket1:CooldownRemains() > FightRemains or VarTrinket1ID == I.SkardynsGrace:ID() and Trinket2:CooldownRemains() > FightRemains or VarTrinket1CD < 10 or VarTrinket2CD < 10) and Player:BuffUp(S.MetamorphosisBuff)) then
       if Cast(I.SkardynsGrace, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "skardyns_grace ar_cooldown 12"; end
     end
-    -- use_item,name=house_of_cards,if=cooldown.eye_beam.up|buff.metamorphosis.up|fight_remains<20
+    -- use_item,name=house_of_cards,if=(cooldown.eye_beam.up|buff.metamorphosis.up)|fight_remains<20
     if I.HouseofCards:IsEquippedAndReady() and (S.EyeBeam:CooldownUp() or Player:BuffUp(S.MetamorphosisBuff) or BossFightRemains < 20) then
       if Cast(I.HouseofCards, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "house_of_cards ar_cooldown 14"; end
     end
-    -- use_item,name=signet_of_the_priory,if=time<20&(!talent.inertia|buff.inertia.up)|(buff.metamorphosis.up&cooldown.essence_break.up|fight_remains<20)&time>20|fight_remains<20
-    if I.SignetofthePriory:IsEquippedAndReady() and (CombatTime < 20 and (not S.Inertia:IsAvailable() or Player:BuffUp(S.InertiaBuff)) or (Player:BuffUp(S.MetamorphosisBuff) and S.EssenceBreak:CooldownUp() or BossFightRemains < 20) and CombatTime > 20 or BossFightRemains < 20) then
+    -- use_item,name=signet_of_the_priory,if=time<20&(!talent.inertia|buff.inertia.up)|buff.metamorphosis.up&time>20|fight_remains<20
+    if I.SignetofthePriory:IsEquippedAndReady() and (CombatTime < 20 and (not S.Inertia:IsAvailable() or Player:BuffUp(S.InertiaBuff)) or Player:BuffUp(S.MetamorphosisBuff) or BossFightRemains < 20) then
       if Cast(I.SignetofthePriory, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "signet_of_the_priory ar_cooldown 16"; end
     end
-    -- use_item,name=junkmaestros_mega_magnet,if=variable.tier33_4piece|fight_remains<10
-    if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() and (VarT334P or BossFightRemains < 10) then
+    -- use_item,name=junkmaestros_mega_magnet,if=variable.tier33_4piece&variable.double_on_use|fight_remains<10
+    if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() and (VarT334P and VarDoubleOnUse or BossFightRemains < 10) then
       if Cast(I.JunkmaestrosMegaMagnet, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "junkmaestros_mega_magnet ar_cooldown 18"; end
     end
-    -- use_item,name=geargrinders_spare_keys,if=variable.tier33_4piece|fight_remains<10
-    if I.GeargrindersSpareKeys:IsEquippedAndReady() and (VarT334P or BossFightRemains < 10) then
+    -- use_item,name=geargrinders_spare_keys,if=variable.tier33_4piece&variable.double_on_use|fight_remains<10
+    if I.GeargrindersSpareKeys:IsEquippedAndReady() and (VarT334P and VarDoubleOnUse or BossFightRemains < 10) then
       if Cast(I.GeargrindersSpareKeys, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "geargrinders_spare_keys ar_cooldown 20"; end
+    end
+    -- use_item,name=grim_codex,if=variable.tier33_4piece&variable.double_on_use|fight_remains<10
+    if I.GrimCodex:IsEquippedAndReady() and (VarT334P and VarDoubleOnUse or BossFightRemains < 10) then
+      if Cast(I.GrimCodex, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "grim_codex ar_cooldown 22"; end
     end
     -- use_item,name=ravenous_honey_buzzer,if=(variable.tier33_4piece&(buff.inertia.down&(cooldown.essence_break.remains&debuff.essence_break.down|!talent.essence_break))&(trinket.1.is.ravenous_honey_buzzer&(trinket.2.cooldown.duration<10|trinket.2.cooldown.remains>10|!trinket.2.has_buff.any)|trinket.2.is.ravenous_honey_buzzer&(trinket.1.cooldown.duration<10|trinket.1.cooldown.remains>10|!trinket.1.has_buff.any))&fight_remains>120|fight_remains<10&fight_remains<buff.metamorphosis.remains)|fight_remains<5
     if I.RavenousHoneyBuzzer:IsEquippedAndReady() and ((VarT334P and (Player:BuffDown(S.InertiaBuff) and (S.EssenceBreak:CooldownDown() and Target:DebuffDown(S.EssenceBreakDebuff) or not S.EssenceBreak:IsAvailable())) and (VarTrinket1ID == I.RavenousHoneyBuzzer:ID() and (VarTrinket2CD < 10 or Trinket2:CooldownRemains() > 10 or not Trinket2:HasUseBuff()) or VarTrinket2ID == I.RavenousHoneyBuzzer:ID() and (VarTrinket1CD < 10 or Trinket1:CooldownRemains() > 10 or not Trinket1:HasUseBuff())) and FightRemains > 120 or BossFightRemains < 10 and BossFightRemains < Player:BuffRemains(S.MetamorphosisBuff)) or BossFightRemains < 5) then
@@ -595,12 +607,12 @@ local function ARCooldown()
     end
     -- do_treacherous_transmitter_task,if=cooldown.eye_beam.remains>15|cooldown.eye_beam.remains<5|fight_remains<20|buff.metamorphosis.up
     -- TODO
-    -- use_item,slot=trinket1,if=((cooldown.eye_beam.remains<gcd.max&active_enemies>1|buff.metamorphosis.up)&(raid_event.adds.in>trinket.1.cooldown.duration-15|raid_event.adds.remains>8)|!trinket.1.has_buff.any|fight_remains<25)&!trinket.1.is.skardyns_grace&!trinket.1.is.mad_queens_mandate&!trinket.1.is.treacherous_transmitter&(!variable.special_trinket|trinket.2.cooldown.remains>20)
-    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and not VarTrinket1Exclude and (((S.EyeBeam:CooldownRemains() < Player:GCD() and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket1:HasUseBuff() or BossFightRemains < 25) and not VarTrinket1ID == I.SkardynsGrace:ID() and not VarTrinket1ID == I.MadQueensMandate:ID() and not VarTrinket1ID == I.TreacherousTransmitter:ID() and (not VarSpecialTrinket or Trinket2:CooldownRemains() > 20)) then
+    -- use_item,slot=trinket1,if=((cooldown.eye_beam.remains<gcd.max&active_enemies>1|buff.metamorphosis.up)&(raid_event.adds.in>trinket.1.cooldown.duration-15|raid_event.adds.remains>8)|!trinket.1.has_buff.any|fight_remains<25)&!trinket.1.is.mister_locknstalk&!variable.trinket1_crit&!trinket.1.is.skardyns_grace&!trinket.1.is.treacherous_transmitter&(!variable.special_trinket|trinket.2.cooldown.remains>20)
+    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and not VarTrinket1Exclude and (((S.EyeBeam:CooldownRemains() < Player:GCD() and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket1:HasUseBuff() or BossFightRemains < 25) and not VarTrinket1ID == I.MisterLockNStalk:ID() and not VarTrinket1Crit and not VarTrinket1ID == I.SkardynsGrace:ID() and not VarTrinket1ID == I.TreacherousTransmitter:ID() and (not VarSpecialTrinket or Trinket2:CooldownRemains() > 20)) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "treacherous_transmitter ar_cooldown 24"; end
     end
-    -- use_item,slot=trinket2,if=((cooldown.eye_beam.remains<gcd.max&active_enemies>1|buff.metamorphosis.up)&(raid_event.adds.in>trinket.2.cooldown.duration-15|raid_event.adds.remains>8)|!trinket.2.has_buff.any|fight_remains<25)&!trinket.2.is.skardyns_grace&!trinket.2.is.mad_queens_mandate&!trinket.2.is.treacherous_transmitter&(!variable.special_trinket|trinket.1.cooldown.remains>20)
-    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and not VarTrinket2Exclude and (((S.EyeBeam:CooldownRemains() < Player:GCD() and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket2:HasUseBuff() or BossFightRemains < 25) and not VarTrinket2ID == I.SkardynsGrace:ID() and not VarTrinket2ID == I.MadQueensMandate:ID() and not VarTrinket2ID == I.TreacherousTransmitter:ID() and (not VarSpecialTrinket or Trinket1:CooldownRemains() > 20)) then
+    -- use_item,slot=trinket2,if=((cooldown.eye_beam.remains<gcd.max&active_enemies>1|buff.metamorphosis.up)&(raid_event.adds.in>trinket.2.cooldown.duration-15|raid_event.adds.remains>8)|!trinket.2.has_buff.any|fight_remains<25)&!trinket.2.is.mister_locknstalk&!variable.trinket2_crit&!trinket.2.is.skardyns_grace&!trinket.2.is.treacherous_transmitter&(!variable.special_trinket|trinket.1.cooldown.remains>20)
+    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and not VarTrinket2Exclude and (((S.EyeBeam:CooldownRemains() < Player:GCD() and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket2:HasUseBuff() or BossFightRemains < 25) and not VarTrinket2ID == I.MisterLockNStalk:ID() and not VarTrinket2Crit and not VarTrinket2ID == I.SkardynsGrace:ID() and not VarTrinket2ID == I.TreacherousTransmitter:ID() and (not VarSpecialTrinket or Trinket1:CooldownRemains() > 20)) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "treacherous_transmitter ar_cooldown 26"; end
     end
   end
@@ -744,9 +756,9 @@ local function ARMeta()
   if S.EssenceBreak:IsCastable() and (CombatTime < 20 and Player:BuffRemains(S.ThrilloftheFightDmgBuff) > Player:GCD() * 4 and Player:BuffRemains(S.MetamorphosisBuff) >= Player:GCD() * 2 and S.Metamorphosis:CooldownUp() and S.DeathSweep:CooldownRemains() <= Player:GCD() and Player:BuffUp(S.InertiaBuff)) then
     if Cast(S.EssenceBreak, Settings.Havoc.GCDasOffGCD.EssenceBreak, nil, not IsInMeleeRange(10)) then return "essence_break ar_meta 20"; end
   end
-  -- essence_break,if=fury>20&(cooldown.blade_dance.remains<gcd.max*3|cooldown.blade_dance.up)&(buff.unbound_chaos.down&!talent.inertia|buff.inertia.up)&buff.out_of_range.remains<gcd.max&(!talent.shattered_destiny|cooldown.eye_beam.remains>4)&(!hero_tree.felscarred|active_enemies>1|cooldown.metamorphosis.remains>5&cooldown.eye_beam.remains)|fight_remains<10
+  -- essence_break,if=fury>20&(cooldown.blade_dance.remains<gcd.max*3|cooldown.blade_dance.up)&(buff.unbound_chaos.down&!talent.inertia|buff.inertia.up)&buff.out_of_range.remains<gcd.max&(!talent.shattered_destiny|cooldown.eye_beam.remains>4)|fight_remains<10
   -- Note: Simplifying blade_dance check, as 0 (cooldown up) is less than gcd.max*3.
-  if S.EssenceBreak:IsCastable() and (Player:Fury() > 20 and S.BladeDance:CooldownRemains() < Player:GCD() * 3 and (Player:BuffDown(S.UnboundChaosBuff) and not S.Inertia:IsAvailable() or Player:BuffUp(S.InertiaBuff)) and (not S.ShatteredDestiny:IsAvailable() or S.EyeBeam:CooldownRemains() > 4) and (VarHeroTree ~= 34 or Enemies8yCount > 1 or S.Metamorphosis:CooldownRemains() > 5 and S.EyeBeam:CooldownDown()) or BossFightRemains < 10) then
+  if S.EssenceBreak:IsCastable() and (Player:Fury() > 20 and S.BladeDance:CooldownRemains() < Player:GCD() * 3 and (Player:BuffDown(S.UnboundChaosBuff) and not S.Inertia:IsAvailable() or Player:BuffUp(S.InertiaBuff)) and (not S.ShatteredDestiny:IsAvailable() or S.EyeBeam:CooldownRemains() > 4) or BossFightRemains < 10) then
     if Cast(S.EssenceBreak, Settings.Havoc.GCDasOffGCD.EssenceBreak, nil, not IsInMeleeRange(10)) then return "essence_break ar_meta 22"; end
   end
   -- death_sweep
@@ -778,8 +790,8 @@ local function ARMeta()
   if S.SigilofFlame:IsCastable() and (Player:BuffRemains(S.MetamorphosisBuff) > 5 and Target:IsInRange(30)) then
     if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame ar_meta 36"; end
   end
-  -- felblade,if=(buff.out_of_range.down|fury.deficit>40)&action.felblade.cooldown_react
-  if S.Felblade:IsCastable() and (Target:IsInRange(8) or Player:FuryDeficit() > 40) then
+  -- felblade,if=fury.deficit>40&!buff.inertia_trigger.up
+  if S.Felblade:IsCastable() and (Player:FuryDeficit() > 40 and not InertiaTrigger()) then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade ar_meta 38"; end
   end
   -- sigil_of_flame,if=debuff.essence_break.down&buff.out_of_range.down
@@ -958,9 +970,9 @@ local function AR()
   if ImmoAbility:IsReady() and (Enemies8yCount > 2 and S.Ragefire:IsAvailable() and Target:DebuffDown(S.EssenceBreakDebuff)) then
     if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura ar 12"; end
   end
-  -- vengeful_retreat,use_off_gcd=1,if=talent.initiative&(cooldown.eye_beam.remains>15&gcd.remains<0.3|gcd.remains<0.2&cooldown.eye_beam.remains<=gcd.remains&cooldown.metamorphosis.remains>10)&(!talent.student_of_suffering|cooldown.sigil_of_flame.remains)&time>10&(!variable.trinket1_steroids&!variable.trinket2_steroids|variable.trinket1_steroids&(trinket.1.stat.any.remains<gcd.max*3|trinket.1.cooldown.remains>20)|variable.trinket2_steroids&(trinket.2.stat.any.remains<gcd.max*3|trinket.2.cooldown.remains>20|talent.shattered_destiny))&(cooldown.metamorphosis.remains|hero_tree.aldrachi_reaver)&time>20&(!talent.inertia&buff.unbound_chaos.down|buff.inertia_trigger.down&buff.metamorphosis.down)
+  -- vengeful_retreat,use_off_gcd=1,if=talent.initiative&(cooldown.eye_beam.remains>15&gcd.remains<0.3|gcd.remains<0.2&cooldown.eye_beam.remains<=gcd.remains&cooldown.metamorphosis.remains>10)&(!variable.trinket1_steroids&!variable.trinket2_steroids|variable.trinket1_steroids&(trinket.1.stat.any.cooldown_remains<gcd.max*3|trinket.1.stat.any.cooldown_remains>30)|variable.trinket2_steroids&(trinket.2.stat.any.cooldown_remains<gcd.max*3|trinket.2.stat.any.cooldown_remains>30))&time>20&(!talent.inertia&buff.unbound_chaos.down|buff.inertia_trigger.down&buff.metamorphosis.down)
   -- Note: Can't check trinket.x.stat.any.remains
-  if S.VengefulRetreat:IsCastable() and (S.Initiative:IsAvailable() and (S.EyeBeam:CooldownRemains() > 15 or S.EyeBeam:CooldownRemains() <= Player:GCDRemains() and S.Metamorphosis:CooldownRemains() > 10) and (not S.StudentofSuffering:IsAvailable() or S.SigilofFlame:CooldownDown()) and CombatTime > 10 and (not VarTrinket1Steroids and not VarTrinket2Steroids or VarTrinket1Steroids or VarTrinket2Steroids) and (S.Metamorphosis:CooldownDown() or VarHeroTree == 35) and CombatTime > 20 and (not S.Inertia:IsAvailable() and Player:BuffDown(S.UnboundChaosBuff) or not InertiaTrigger() and Player:BuffDown(S.MetamorphosisBuff))) then
+  if S.VengefulRetreat:IsCastable() and (S.Initiative:IsAvailable() and (S.EyeBeam:CooldownRemains() > 15 or S.EyeBeam:CooldownRemains() <= Player:GCDRemains() and S.Metamorphosis:CooldownRemains() > 10) and (not VarTrinket1Steroids and not VarTrinket2Steroids or VarTrinket1Steroids or VarTrinket2Steroids) and CombatTime > 20 and (not S.Inertia:IsAvailable() and Player:BuffDown(S.UnboundChaosBuff) or not InertiaTrigger() and Player:BuffDown(S.MetamorphosisBuff))) then
     if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat ar 14"; end
   end
   -- run_action_list,name=ar_fel_barrage,if=variable.fel_barrage|!talent.demon_blades&talent.fel_barrage&(buff.fel_barrage.up|cooldown.fel_barrage.up)&buff.metamorphosis.down
@@ -997,7 +1009,7 @@ local function AR()
   ) then
     if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura ar 20"; end
   end
-  -- eye_beam,if=(cooldown.blade_dance.remains<7|raid_event.adds.up)&(!variable.trinket1_steroids&!variable.trinket2_steroids|variable.trinket1_steroids&(trinket.1.stat.any.remains<gcd.max*3|trinket.1.cooldown.remains>20)|variable.trinket2_steroids&(trinket.2.stat.any.remains<gcd.max*3|trinket.2.cooldown.remains>20))|fight_remains<10
+  -- eye_beam,if=(cooldown.blade_dance.remains<7|raid_event.adds.up)&(!variable.trinket1_steroids&!variable.trinket2_steroids|variable.trinket1_steroids&(trinket.1.stat.any.cooldown_remains<gcd.max*3|trinket.1.stat.any.cooldown_remains>30)|variable.trinket2_steroids&(trinket.2.stat.any.cooldown_remains<gcd.max*3|trinket.2.stat.any.cooldown_remains>30))|fight_remains<10
   if S.EyeBeam:IsReady() and ((S.BladeDance:CooldownRemains() < 7 or Enemies20yCount > 1) and (not VarTrinket1Steroids and not VarTrinket2Steroids or VarTrinket1Steroids or VarTrinket2Steroids) or BossFightRemains < 10) then
     if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not IsInMeleeRange(20)) then return "eye_beam ar 24"; end
   end
@@ -1009,61 +1021,57 @@ local function AR()
   if S.ChaosStrike:IsReady() and (Player:BuffUp(S.RendingStrikeBuff)) then
     if Cast(S.ChaosStrike, nil, nil, not IsInMeleeRange(5)) then return "chaos_strike ar 28"; end
   end
-  -- felblade,if=buff.metamorphosis.down&fury.deficit>40&action.felblade.cooldown_react&!buff.inertia_trigger.down
-  if S.Felblade:IsCastable() and (Player:BuffDown(S.MetamorphosisBuff) and Player:FuryDeficit() > 40 and S.Felblade:CooldownUp() and not InertiaTrigger()) then
-    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade ar 30"; end
+  -- sigil_of_flame,if=active_enemies>3|debuff.essence_break.down
+  if S.SigilofFlame:IsReady() and (Enemies8yCount > 3 or Target:DebuffDown(S.EssenceBreakDebuff)) then
+    if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame ar 30"; end
+  end
+  -- felblade,if=fury.deficit>=40+variable.fury_gen*0.5&!buff.inertia_trigger.up
+  if S.Felblade:IsCastable() and (Player:FuryDeficit() >= 40 + VarFuryGen * 0.5 and not InertiaTrigger()) then
+    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade ar 32"; end
   end
   -- glaive_tempest,if=active_enemies>=desired_targets+raid_event.adds.count|raid_event.adds.in>10
   if S.GlaiveTempest:IsReady() then
-    if Cast(S.GlaiveTempest, Settings.Havoc.GCDasOffGCD.GlaiveTempest) then return "glaive_tempest ar 32"; end
-  end
-  -- sigil_of_flame,if=active_enemies>3|buff.out_of_range.down
-  if S.SigilofFlame:IsCastable() and (Enemies8yCount > 3 or Target:IsInRange(30)) then
-    if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame ar 34"; end
+    if Cast(S.GlaiveTempest, Settings.Havoc.GCDasOffGCD.GlaiveTempest) then return "glaive_tempest ar 34"; end
   end
   -- chaos_strike,if=debuff.essence_break.up
   if S.ChaosStrike:IsReady() and (Target:DebuffUp(S.EssenceBreakDebuff)) then
     if Cast(S.ChaosStrike, nil, nil, not IsInMeleeRange(5)) then return "chaos_strike ar 36"; end
   end
-  -- felblade,if=(buff.out_of_range.down|fury.deficit>40)&!buff.inertia_trigger.up
-  if S.Felblade:IsCastable() and ((Target:IsInRange(8) or Player:FuryDeficit() > 40) and not InertiaTrigger()) then
-    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade ar 38"; end
-  end
-  -- throw_glaive,if=active_enemies>1&talent.furious_throws
-  if S.ThrowGlaive:IsReady() and (Enemies8yCount > 1 and S.FuriousThrows:IsAvailable()) then
-    if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive ar 40"; end
-  end
-  -- sigil_of_flame,if=buff.out_of_range.down&debuff.essence_break.down
-  if S.SigilofFlame:IsCastable() and (Target:IsInRange(8) and Target:DebuffDown(S.EssenceBreakDebuff)) then
-    if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame ar 42"; end
+  -- throw_glaive,if=active_enemies>1&talent.furious_throws&(!talent.screaming_brutality|charges=2|full_recharge_time<cooldown.blade_dance.remains)
+  if S.ThrowGlaive:IsReady() and (Enemies8yCount > 1 and S.FuriousThrows:IsAvailable() and (not S.ScreamingBrutality:IsAvailable() or S.ThrowGlaive:Charges() == 2 or S.ThrowGlaive:FullRechargeTime() < S.BladeDance:CooldownRemains())) then
+    if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive ar 38"; end
   end
   -- chaos_strike,if=cooldown.eye_beam.remains>gcd.max*2|fury>80
   if S.ChaosStrike:IsReady() and (S.EyeBeam:CooldownRemains() > Player:GCD() * 2 or Player:Fury() > 80 or S.CycleofHatred:IsAvailable()) then
-    if Cast(S.ChaosStrike, nil, nil, not IsInMeleeRange(5)) then return "chaos_strike ar 44"; end
+    if Cast(S.ChaosStrike, nil, nil, not IsInMeleeRange(5)) then return "chaos_strike ar 40"; end
+  end
+  -- felblade,if=active_enemies=1&!talent.a_fire_inside&debuff.essence_break.down
+  if S.Felblade:IsCastable() and (Enemies8yCount == 1 and not S.AFireInside:IsAvailable() and Target:DebuffDown(S.EssenceBreakDebuff)) then
+    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade ar 42"; end
   end
   -- immolation_aura,if=raid_event.adds.in>full_recharge_time|active_enemies>desired_targets&active_enemies>2
   if ImmoAbility:IsReady() and (Enemies8yCount > 2) then
-    if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura ar 46"; end
+    if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura ar 44"; end
   end
-  -- sigil_of_flame,if=buff.out_of_range.down&debuff.essence_break.down&!talent.student_of_suffering&(!talent.fel_barrage|cooldown.fel_barrage.remains>25|(active_enemies=1&!raid_event.adds.exists))
-  if S.SigilofFlame:IsCastable() and (Target:IsInRange(8) and Target:DebuffDown(S.EssenceBreakDebuff) and not S.StudentofSuffering:IsAvailable() and (not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownRemains() > 25 or Enemies8yCount == 1)) then
-    if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame ar 48"; end
+  -- sigil_of_flame,if=buff.out_of_range.down&debuff.essence_break.down&(!talent.fel_barrage|cooldown.fel_barrage.remains>25|active_enemies=1&!raid_event.adds.exists)
+  if S.SigilofFlame:IsCastable() and (Target:IsInRange(8) and Target:DebuffDown(S.EssenceBreakDebuff) and (not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownRemains() > 25 or Enemies8yCount == 1)) then
+    if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame ar 46"; end
   end
   -- demons_bite
   if S.DemonsBite:IsCastable() then
-    if Cast(S.DemonsBite, nil, nil, not IsInMeleeRange(5)) then return "demons_bite ar 50"; end
+    if Cast(S.DemonsBite, nil, nil, not IsInMeleeRange(5)) then return "demons_bite ar 48"; end
   end
   -- throw_glaive,if=buff.unbound_chaos.down&recharge_time<cooldown.eye_beam.remains&debuff.essence_break.down&(cooldown.eye_beam.remains>8|charges_fractional>1.01)&buff.out_of_range.down&active_enemies>1
   if S.ThrowGlaive:IsReady() and (Player:BuffDown(S.UnboundChaosBuff) and ImmoAbility:Recharge() < S.EyeBeam:CooldownRemains() and Target:DebuffDown(S.EssenceBreakDebuff) and (S.EyeBeam:CooldownRemains() > 8 or ImmoAbility:ChargesFractional() > 1.01) and Target:IsInRange(8) and Enemies8yCount > 1) then
-    if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not IsInMeleeRange(5)) then return "throw_glaive ar 52"; end
+    if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not IsInMeleeRange(5)) then return "throw_glaive ar 50"; end
   end
   -- fel_rush,if=buff.unbound_chaos.down&recharge_time<cooldown.eye_beam.remains&debuff.essence_break.down&(cooldown.eye_beam.remains>8|charges_fractional>1.01)&active_enemies>1
   if S.FelRush:IsCastable() and UseFelRush() and (Player:BuffDown(S.UnboundChaosBuff) and ImmoAbility:Recharge() < S.EyeBeam:CooldownRemains() and Target:DebuffDown(S.EssenceBreakDebuff) and (S.EyeBeam:CooldownRemains() > 8 or ImmoAbility:ChargesFractional() > 1.01) and Enemies8yCount > 1) then
-    if Cast(S.FelRush, nil, Settings.CommonsDS.DisplayStyle.FelRush) then return "fel_rush ar 54"; end
+    if Cast(S.FelRush, nil, Settings.CommonsDS.DisplayStyle.FelRush) then return "fel_rush ar 52"; end
   end
   -- arcane_torrent,if=buff.out_of_range.down&debuff.essence_break.down&fury<100
   if CDsON() and S.ArcaneTorrent:IsCastable() and (Target:IsInRange(8) and Target:DebuffDown(S.EssenceBreakDebuff) and Player:Fury() < 100) then
-    if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent ar 56"; end
+    if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent ar 54"; end
   end
 end
 
@@ -1119,6 +1127,9 @@ local function APL()
     end
     -- variable,name=fury_gen,op=set,value=talent.demon_blades*(1%(2.6*attack_haste)*((talent.demonsurge&buff.metamorphosis.up)*3+12))+buff.immolation_aura.stack*6+buff.tactical_retreat.up*10
     VarFuryGen = num(S.DemonBlades:IsAvailable()) * (1 / (2.6 * Player:HastePct()) * (num(S.Demonsurge:IsAvailable() and Player:BuffUp(S.MetamorphosisBuff)) * 3 + 12)) + Player:BuffStack(S.ImmolationAuraBuff) * 6 + num(Player:BuffUp(S.TacticalRetreatBuff)) * 10
+    -- variable,name=tier33_4piece,value=(buff.initiative.up|!talent.initiative)&(buff.necessary_sacrifice.up|!set_bonus.thewarwithin_season_2_4pc)
+    -- variable,name=double_on_use,value=!equipped.signet_of_the_priory&!equipped.house_of_cards|(trinket.1.is.house_of_cards|trinket.1.is.signet_of_the_priory)&trinket.1.cooldown.remains>20|(trinket.2.is.house_of_cards|trinket.2.is.signet_of_the_priory)&trinket.2.cooldown.remains>20
+    -- Note: Moved both variables to ARCooldown()
     -- run_action_list,name=ar,if=hero_tree.aldrachi_reaver
     -- Note: Also running AR() if player is below level 71.
     if VarHeroTree == 35 or Player:Level() < 71 then
