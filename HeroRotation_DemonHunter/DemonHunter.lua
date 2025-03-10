@@ -131,6 +131,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   Momentum                              = Spell(206476),
   Ragefire                              = Spell(388107),
   RestlessHunter                        = Spell(390142),
+  ScreamingBrutality                    = Spell(1220506),
   SerratedGlaive                        = Spell(390154),
   ShatteredDestiny                      = Spell(388116),
   Soulrend                              = Spell(388106),
