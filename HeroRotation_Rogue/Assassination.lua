@@ -60,7 +60,9 @@ local OnUseExcludeTrinkets = {
   I.AshesoftheEmbersoul:ID(),
   I.BottledFlayedwingToxin:ID(),
   I.ImperfectAscendancySerum:ID(),
+  I.JunkmaestrosMegaMagnet:ID(),
   I.MadQueensMandate:ID(),
+  I.SignetofthePriory:ID(),
   I.TreacherousTransmitter:ID(),
 }
 
@@ -619,8 +621,12 @@ local function UsableItems ()
     return
   end
 
+  -- actions.items=variable,name=base_trinket_condition,value=dot.rupture.ticking&cooldown.deathmark.remains<2
+  -- &!cooldown.deathmark.ready|dot.deathmark.ticking|fight_remains<=22
+  local BaseTrinketCondition = Target:DebuffUp(S.Rupture) and S.Deathmark:CooldownRemains() <= 2 and not S.Deathmark:IsReady()
+    or Target:DebuffUp(S.Deathmark) or HL.BossFilteredFightRemains("<", 22)
+
   -- actions.items+=/use_item,name=ashes_of_the_embersoul,use_off_gcd=1,if=(dot.kingsbane.ticking&dot.kingsbane.remains<=11)|fight_remains<=22
-  -- actions.items+=/use_item,name=algethar_puzzle_box,use_off_gcd=1,if=dot.rupture.ticking&cooldown.deathmark.remains<2|fight_remains<=22
   if I.AshesoftheEmbersoul:IsEquippedAndReady() then
     if (Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) <= 11 or HL.BossFilteredFightRemains("<", 22)) then
       if Cast(I.AshesoftheEmbersoul, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
@@ -629,20 +635,24 @@ local function UsableItems ()
     end
   end
 
-  if I.AlgetharPuzzleBox:IsEquippedAndReady() then
-    if (Target:DebuffUp(S.Rupture) and S.Deathmark:CooldownRemains() <= 2 or HL.BossFilteredFightRemains("<", 22)) then
-      if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
-        return "Algethar Puzzle Box";
-      end
+  -- actions.items+=/use_item,name=signet_of_the_priory,use_off_gcd=1,if=variable.base_trinket_condition
+  if I.SignetofthePriory:IsEquippedAndReady() and BaseTrinketCondition then
+    if Cast(I.SignetOfThePriory, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+      return "Signet of the Priory";
+    end
+  end
+
+  -- actions.items+=/use_item,name=algethar_puzzle_box,use_off_gcd=1,if=variable.base_trinket_condition
+  if I.AlgetharPuzzleBox:IsEquippedAndReady() and BaseTrinketCondition then
+    if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+      return "Algethar Puzzle Box";
     end
   end
 
   -- actions.items+=/use_item,name=treacherous_transmitter,use_off_gcd=1,if=variable.base_trinket_condition
-  if I.TreacherousTransmitter:IsEquippedAndReady() then
-    if (Target:DebuffUp(S.Rupture) and S.Deathmark:CooldownRemains() <= 2 or Target:DebuffUp(S.Deathmark) or HL.BossFilteredFightRemains("<", 22)) then
-      if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
-        return "Treacherous Transmitter";
-      end
+  if I.TreacherousTransmitter:IsEquippedAndReady() and BaseTrinketCondition then
+    if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+      return "Treacherous Transmitter";
     end
   end
 
@@ -655,12 +665,21 @@ local function UsableItems ()
     end
   end
 
-  -- actions.items+=/use_item,name=imperfect_ascendancy_serum,use_off_gcd=1,if=variable.base_trinket_condition
-  if I.ImperfectAscendancySerum:IsEquippedAndReady() then
-    if (Target:DebuffUp(S.Rupture) and S.Deathmark:CooldownRemains() <= 2 or Target:DebuffUp(S.Deathmark) or HL.BossFilteredFightRemains("<", 22)) then
-      if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
-        return "Imperfect Ascendancy Serum";
+  -- actions.items+=/use_item,name=junkmaestros_mega_magnet,if=cooldown.deathmark.remains>=30&!dot.deathmark.ticking
+  -- &(!talent.deathstalkers_mark|buff.lingering_darkness.remains<10)|fight_remains<=10
+  if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() then
+    if S.Deathmark:CooldownRemains() >= 30 and not Target:DebuffUp(S.Deathmark) and (not S.DeathStalkersMark:IsAvailable()
+      or Player:BuffRemains(S.LingeringDarknessBuff) < 10) or HL.BossFilteredFightRemains("<=", 10) then
+      if Cast(I.JunkmaestrosMegaMagnet, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+        return "Junkmaestros Mega Magnet";
       end
+    end
+  end
+
+  -- actions.items+=/use_item,name=imperfect_ascendancy_serum,use_off_gcd=1,if=variable.base_trinket_condition
+  if I.ImperfectAscendancySerum:IsEquippedAndReady() and BaseTrinketCondition then
+    if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+      return "Imperfect Ascendancy Serum";
     end
   end
 

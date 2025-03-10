@@ -514,7 +514,7 @@ local function CDs ()
   -- &cooldown.secret_technique.remains<8|!talent.death_perception)|fight_remains<=15)
   if HR.CDsON() and S.SymbolsofDeath:IsReady() then
     if (Player:BuffRemains(S.SymbolsofDeath) <= 3 and Maintenance and
-      (not S.Flagellation:IsAvailable() or S.Flagellation:CooldownRemains() >= 30 - 15 * num(not S.DeathPerception:IsAvailable())
+      (not S.Flagellation:IsAvailable() or (S.Flagellation:CooldownRemains() >= 30 - 15 * num(not S.DeathPerception:IsAvailable()) or S.Flagellation:IsReady())
       and S.SecretTechnique:CooldownRemains() <= 8 or not S.DeathPerception:IsAvailable()) or HL.BossFilteredFightRemains("<=", 15)) then
       if Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then
         return "Cast Symbols of Death"
@@ -545,8 +545,8 @@ local function CDs ()
   if HR.CDsON() and S.Flagellation:IsAvailable() and S.Flagellation:IsReady()
     and (S.ShadowDance:IsReady() or Player:BuffUp(S.ShadowDanceBuff))
     and (S.SymbolsofDeath:IsReady() or Player:BuffUp(S.SymbolsofDeath))
-    and (S.ShadowBlades:IsReady() or Player:BuffUp(S.ShadowBlades)) then
-    if ComboPoints >= 5 and S.ShadowBlades:CooldownRemains() <=3
+    and (S.ShadowBlades:IsReady() or Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:CooldownRemains() <=3) then
+    if ComboPoints >= 5
       or HL.BossFilteredFightRemains("<=", 25) then
       if Cast(S.Flagellation, nil, Settings.CommonsDS.DisplayStyle.Flagellation, not Target:IsSpellInRange(S.Flagellation)) then
         return "Cast Flagellation"
