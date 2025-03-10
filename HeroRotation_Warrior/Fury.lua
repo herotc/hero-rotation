@@ -986,7 +986,7 @@ local function APL()
     EnrageUp = Player:BuffUp(S.EnrageBuff)
 
     -- Range check
-    TargetInMeleeRange = Target:IsInRange(5)
+    TargetInMeleeRange = Target:IsSpellInRange(S.Execute)
 
     -- Calculate fight_remains
     BossFightRemains = HL.BossFightRemains()
