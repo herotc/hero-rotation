@@ -505,7 +505,7 @@ local function AoE()
   end
   if S.MaleficRapture:IsReady() and (
     -- malefic_rapture,if=(cooldown.summon_darkglare.remains>15|soul_shard>3|(talent.demonic_soul&soul_shard>2))&buff.tormented_crescendo.up
-    ((S.SummonDarkglare:CooldownRemains() > 15 or SoulShards > 3 or (S.DemonicSoul:IsAvailable() and SoulShards > 2)) and Player:BuffUp(S.TormentedCrescendoBuff)) or 
+    ((S.SummonDarkglare:CooldownRemains() > 15 or SoulShards > 3 or (S.DemonicSoul:IsAvailable() and SoulShards > 2)) and Player:BuffUp(S.TormentedCrescendoBuff)) or
     -- malefic_rapture,if=soul_shard>4|(talent.tormented_crescendo&buff.tormented_crescendo.react=1&soul_shard>3)
     (SoulShards > 4 or (S.TormentedCrescendo:IsAvailable() and Player:BuffStack(S.TormentedCrescendoBuff) == 1 and SoulShards > 3)) or
     -- malefic_rapture,if=talent.demonic_soul&(soul_shard>2|(talent.tormented_crescendo&buff.tormented_crescendo.react=1&soul_shard))
@@ -518,7 +518,7 @@ local function AoE()
     -- malefic_rapture,if=(variable.cd_dots_up|variable.vt_ps_up)&(soul_shard>2|cooldown.oblivion.remains>10|!talent.oblivion)
     ((VarCDDoTsUp or VarVTPSUp) and (SoulShards > 2 or S.Oblivion:CooldownRemains() > 10 or not S.Oblivion:IsAvailable())) or
     -- malefic_rapture,if=talent.tormented_crescendo&talent.nightfall&buff.tormented_crescendo.react&buff.nightfall.react
-    (S.TormentedCrescendo:IsAvailable() and S.Nightfall:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Player:BuffUp(S.NightfallBuff))    
+    (S.TormentedCrescendo:IsAvailable() and S.Nightfall:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Player:BuffUp(S.NightfallBuff))
   ) then
     if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture aoe 24"; end
   end
@@ -627,7 +627,7 @@ local function Cleave()
   end
   if S.MaleficRapture:IsReady() and (
     -- malefic_rapture,if=talent.demonic_soul&(soul_shard>1|buff.tormented_crescendo.react&cooldown.soul_rot.remains>buff.tormented_crescendo.remains*gcd.max)&(!talent.vile_taint|soul_shard>1&cooldown.vile_taint.remains>10)&(!talent.oblivion|cooldown.oblivion.remains>10|soul_shard>2&cooldown.oblivion.remains<10)
-    (S.DemonicSoul:IsAvailable() and (SoulShards > 1 or Target:BuffUp(S.TormentedCrescendoBuff) and S.SoulRot:CooldownRemains() > Player:BuffRemains(S.TormentedCrescendoBuff) * GCDMax) and (not S.VileTaint:IsAvailable() or SoulShards > 1 and S.VileTaint:CooldownRemains() > 10) and (not S.Oblivion:IsAvailable() or S.Oblivion:CooldownRemains() > 10 or SoulShards > 2 and S.Oblivion:CooldownRemains() < 10)) or
+    (S.DemonicSoul:IsAvailable() and (SoulShards > 1 or Player:BuffUp(S.TormentedCrescendoBuff) and S.SoulRot:CooldownRemains() > Player:BuffRemains(S.TormentedCrescendoBuff) * GCDMax) and (not S.VileTaint:IsAvailable() or SoulShards > 1 and S.VileTaint:CooldownRemains() > 10) and (not S.Oblivion:IsAvailable() or S.Oblivion:CooldownRemains() > 10 or SoulShards > 2 and S.Oblivion:CooldownRemains() < 10)) or
     -- malefic_rapture,if=talent.tormented_crescendo&buff.tormented_crescendo.react&(buff.tormented_crescendo.remains<gcd.max*2|buff.tormented_crescendo.react=2)
     (S.TormentedCrescendo:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and (Player:BuffRemains(S.TormentedCrescendoBuff) < GCDMax * 2 or Player:BuffStack(S.TormentedCrescendoBuff) == 2)) or
     -- malefic_rapture,if=(variable.cd_dots_up|(talent.demonic_soul|talent.phantom_singularity)&variable.vt_ps_up|talent.wither&variable.vt_ps_up&!dot.soul_rot.remains&soul_shard>1)&(!talent.oblivion|cooldown.oblivion.remains>10|soul_shard>2&cooldown.oblivion.remains<10)
@@ -635,7 +635,7 @@ local function Cleave()
     -- malefic_rapture,if=talent.tormented_crescendo&talent.nightfall&buff.tormented_crescendo.react&buff.nightfall.react|talent.demonic_soul&!buff.nightfall.react&(!talent.vile_taint|cooldown.vile_taint.remains>10|soul_shard>1&cooldown.vile_taint.remains<10)
     (S.TormentedCrescendo:IsAvailable() and S.NightfallBuff:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Player:BuffUp(S.NightfallBuff) or S.DemonicSoul:IsAvailable() and Player:BuffDown(S.NightfallBuff) and (not S.VileTaint:IsAvailable() or S.VileTaint:CooldownRemains() > 10 or SoulShards > 1 and S.VileTaint:CooldownRemains() < 10)) or
     -- malefic_rapture,if=!talent.demonic_soul&buff.tormented_crescendo.react
-    (S.DemonicSoul:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff))
+    (not S.DemonicSoul:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff))
   ) then
     if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture cleave 26"; end
   end
@@ -783,10 +783,10 @@ local function APL()
       if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt main 4"; end
     end
     -- unstable_affliction,if=(talent.absolute_corruption&remains<3|!talent.absolute_corruption&remains<5|cooldown.soul_rot.remains<5&remains<8)&(!talent.demonic_soul|buff.nightfall.react<2|prev_gcd.1.haunt&buff.nightfall.stack<2)&fight_remains>dot.unstable_affliction.remains+5
-    if S.UnstableAffliction:IsReady() and ((S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.UnstableAfflictionDebuff) < 3 or not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5 or S.SoulRot:CooldownRemains() < 5 and Target:DebuffRemains(S.UnstableAfflictionDebuff) < 8) and (not S.DemonicSoul:IsAvailable() or Target:BuffStack(S.NightfallBuff) < 2 or Player:PrevGCDP(1, S.Haunt) and Target:DebuffStack(S.NightfallBuff) < 2) and FightRemains > Target:DebuffRemains(S.UnstableAfflictionDebuff) + 5) then
+    if S.UnstableAffliction:IsReady() and ((S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.UnstableAfflictionDebuff) < 3 or not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5 or S.SoulRot:CooldownRemains() < 5 and Target:DebuffRemains(S.UnstableAfflictionDebuff) < 8) and (not S.DemonicSoul:IsAvailable() or Player:BuffStack(S.NightfallBuff) < 2 or Player:PrevGCDP(1, S.Haunt) and Player:BuffStack(S.NightfallBuff) < 2) and FightRemains > Target:DebuffRemains(S.UnstableAfflictionDebuff) + 5) then
       if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction main 6"; end
     end
-    
+
     -- haunt,if=(talent.absolute_corruption&debuff.haunt.remains<3|!talent.absolute_corruption&debuff.haunt.remains<5|cooldown.soul_rot.remains<5&debuff.haunt.remains<8)&(!talent.vile_taint|cooldown.vile_taint.remains)&fight_remains>debuff.haunt.remains+5
     if S.Haunt:IsReady() and ((S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.HauntDebuff) < 3 or not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.HauntDebuff) < 5 or S.SoulRot:CooldownRemains() < 5 and Target:DebuffRemains(S.HauntDebuff) < 8) and (not S.VileTaint:IsAvailable() or S.VileTaint:CooldownDown()) and FightRemains > Target:DebuffRemains(S.HauntDebuff) + 5) then
       if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt main 8"; end
@@ -846,7 +846,7 @@ local function APL()
       if Cast(S.DrainSoul, nil, nil, not Target:IsInRange(40)) then return "drain_soul main 30"; end
     end
     -- malefic_rapture,if=talent.demonic_soul&(soul_shard>1|buff.tormented_crescendo.react&cooldown.soul_rot.remains>buff.tormented_crescendo.remains*gcd.max)&(!talent.vile_taint|soul_shard>1&cooldown.vile_taint.remains>10)&(!talent.oblivion|cooldown.oblivion.remains>10|soul_shard>2&cooldown.oblivion.remains<10)
-    if S.MaleficRapture:IsReady() and (S.DemonicSoul:IsAvailable() and (SoulShards > 1 or Target:BuffUp(S.TormentedCrescendoBuff) and S.SoulRot:CooldownRemains() > Player:BuffRemains(S.TormentedCrescendoBuff) * GCDMax) and (not S.VileTaint:IsAvailable() or SoulShards > 1 and S.VileTaint:CooldownRemains() > 10) and (not S.Oblivion:IsAvailable() or S.Oblivion:CooldownRemains() > 10 or SoulShards > 2 and S.Oblivion:CooldownRemains() < 10)) then
+    if S.MaleficRapture:IsReady() and (S.DemonicSoul:IsAvailable() and (SoulShards > 1 or Player:BuffUp(S.TormentedCrescendoBuff) and S.SoulRot:CooldownRemains() > Player:BuffRemains(S.TormentedCrescendoBuff) * GCDMax) and (not S.VileTaint:IsAvailable() or SoulShards > 1 and S.VileTaint:CooldownRemains() > 10) and (not S.Oblivion:IsAvailable() or S.Oblivion:CooldownRemains() > 10 or SoulShards > 2 and S.Oblivion:CooldownRemains() < 10)) then
       if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 32"; end
     end
     -- oblivion,if=dot.agony.remains&(dot.corruption.remains|dot.wither.remains)&dot.unstable_affliction.remains&debuff.haunt.remains>5
@@ -857,11 +857,11 @@ local function APL()
       -- malefic_rapture,if=talent.tormented_crescendo&buff.tormented_crescendo.react&(buff.tormented_crescendo.remains<gcd.max*2|buff.tormented_crescendo.react=2)
       (S.TormentedCrescendo:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and (Player:BuffRemains(S.TormentedCrescendoBuff) < GCDMax * 2 or Player:BuffStack(S.TormentedCrescendoBuff) == 2)) or
       -- malefic_rapture,if=(variable.cd_dots_up|(talent.demonic_soul|talent.phantom_singularity)&variable.vt_ps_up|talent.wither&variable.vt_ps_up&!dot.soul_rot.remains&soul_shard>2)&(!talent.oblivion|cooldown.oblivion.remains>10|soul_shard>2&cooldown.oblivion.remains<10)
-      ((VarCDDoTsUp or (S.DemonicSoul:IsAvailable() or S.PhantomSingularity:IsAvailable()) and VarVTPSUp or S.Wither:IsAvailable() and VarVTPSUp and Target:DebuffDown(S.SoulRot) and SoulShards > 2) and (not S.Oblivion:IsAvailable() or S.Oblivion:CooldownRemains() > 10 or SoulShards > 2 and S.Oblivion:CooldownRemains() < 10)) or
+      ((VarCDDoTsUp or (S.DemonicSoul:IsAvailable() or S.PhantomSingularity:IsAvailable()) and VarVTPSUp or S.Wither:IsAvailable() and VarVTPSUp and Target:DebuffDown(S.SoulRotDebuff) and SoulShards > 2) and (not S.Oblivion:IsAvailable() or S.Oblivion:CooldownRemains() > 10 or SoulShards > 2 and S.Oblivion:CooldownRemains() < 10)) or
       -- malefic_rapture,if=talent.tormented_crescendo&talent.nightfall&buff.tormented_crescendo.react&buff.nightfall.react|talent.demonic_soul&!buff.nightfall.react&(!talent.vile_taint|cooldown.vile_taint.remains>10|soul_shard>1&cooldown.vile_taint.remains<10)
-      (S.TormentedCrescendo:IsAvailable() and S.NightfallBuff:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Player:BuffUp(S.NightfallBuff) or S.DemonicSoul:IsAvailable() and Player:BuffDown(S.NightfallBuff) and (not S.VileTaint:IsAvailable() or S.VileTaint:CooldownRemains() > 10 or SoulShards > 1 and S.VileTaint:CooldownRemains() < 10)) or
+      (S.TormentedCrescendo:IsAvailable() and S.Nightfall:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff) and Player:BuffUp(S.NightfallBuff) or S.DemonicSoul:IsAvailable() and Player:BuffDown(S.NightfallBuff) and (not S.VileTaint:IsAvailable() or S.VileTaint:CooldownRemains() > 10 or SoulShards > 1 and S.VileTaint:CooldownRemains() < 10)) or
       -- malefic_rapture,if=!talent.demonic_soul&buff.tormented_crescendo.react
-      (S.DemonicSoul:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff))
+      (not S.DemonicSoul:IsAvailable() and Player:BuffUp(S.TormentedCrescendoBuff))
     ) then
       if Cast(S.MaleficRapture, nil, nil, not Target:IsInRange(100)) then return "malefic_rapture main 36"; end
     end
@@ -893,7 +893,7 @@ local function OnInit()
   S.UnstableAfflictionDebuff:RegisterAuraTracking()
   S.ShadowEmbraceDSDebuff:RegisterAuraTracking()
 
-  HR.Print("Affliction Warlock rotation has been updated for patch 11.0.2.")
+  HR.Print("Affliction Warlock rotation has been updated for patch 11.1.0.")
 end
 
 HR.SetAPL(265, APL, OnInit)
