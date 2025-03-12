@@ -171,6 +171,7 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   -- Talents
   AngerManagement                       = Spell(152278),
   AshenJuggernaut                       = Spell(392536),
+  Bloodborne                            = Spell(383926),
   Bloodthirst                           = Spell(23881),
   DancingBlades                         = Spell(391683),
   ImprovedWhilwind                      = Spell(12950),
@@ -206,6 +207,7 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   -- Debuffs
   GushingWoundDebuff                    = Spell(385042),
   OdynsFuryDebuff                       = Spell(385060),
+  BloodBathDot                          = Spell(113344),
 })
 Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Fury, Spell.Warrior.MountainThane)
 Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Fury, Spell.Warrior.Slayer)
