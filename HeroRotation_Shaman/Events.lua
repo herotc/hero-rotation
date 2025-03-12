@@ -28,6 +28,8 @@ Shaman.CracklingSurgeStacks = 0
 Shaman.IcyEdgeStacks = 0
 Shaman.MoltenWeaponStacks = 0
 Shaman.TempestMaelstrom = 0
+Shaman.SearingTotemActive = false
+Shaman.SearingTotemGUID = 0
 
 --- ============================ CONTENT ============================
 HL:RegisterForSelfCombatEvent(
@@ -162,4 +164,27 @@ HL:RegisterForSelfCombatEvent(
     end
   end
   , "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE"
+)
+
+-- ===== Searing Totem Tracker =====
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local DestGUID, DestName, _, _, SpellID = select(8, ...)
+    if SpellID == 458101 and DestName == "Searing Totem" then
+      Shaman.SearingTotemActive = true
+      Shaman.SearingTotemGUID = DestGUID
+    end
+  end
+  , "SPELL_SUMMON"
+)
+
+HL:RegisterForCombatEvent(
+  function (...)
+    local DestGUID = select(8, ...)
+    if DestGUID == Shaman.SearingTotemGUID then
+      Shaman.SearingTotemActive = false
+      Shaman.SearingTotemGUID = 0
+    end
+  end
+  , "UNIT_DIED"
 )
