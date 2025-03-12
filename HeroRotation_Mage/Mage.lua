@@ -177,6 +177,7 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   SearingTouch                          = Spell(269644),
   SpontaneousCombustion                 = Spell(451875),
   SunKingsBlessing                      = Spell(383886),
+  HeatShimmer                           = Spell(457735),
   UnleashedInferno                      = Spell(416506),
   -- Buffs
   CombustionBuff                        = Spell(190319),

@@ -25,7 +25,6 @@ local Settings = {
   Arcane = HR.GUISettings.APL.Mage.Arcane,
 }
 
--- Util
 local function num(val)
   if val then return 1 else return 0 end
 end
@@ -108,14 +107,11 @@ ArcanePlayerBuffDown = HL.AddCoreOverride("Player.BuffDown",
 -- Fire, ID: 63
 local function IsSKBCastSafe(spell)
   if not spell then return false end
-  -- Get precise aura data directly using C_UnitAuras to avoid recursion
   local auraData = C_UnitAuras.GetPlayerAuraBySpellID(SpellFire.FuryoftheSunKingBuff:ID())
   if auraData and auraData.expirationTime then
     local currentTime = GetTimePreciseSec()
     local remainingTime = auraData.expirationTime - currentTime
     local castTime = spell:CastTime()
-    -- Add 0.2s buffer for spell queue window and latency
-    -- Also consider haste modifications via timeMod
     return remainingTime > (castTime * (auraData.timeMod or 1) + 0.2)
   end
   return false
@@ -127,10 +123,8 @@ FirePlayerBuffUp = HL.AddCoreOverride("Player.BuffUp",
     if not Spell then return false end
     local BaseCheck = FirePlayerBuffUp(self, Spell, AnyCaster, Offset)
     if Spell == SpellFire.HeatingUpBuff then
-      -- "Predictive" Heating Up buff for SKB Pyroblast casts...
       return BaseCheck or (Player:IsCasting(SpellFire.Pyroblast) and IsSKBCastSafe(SpellFire.Pyroblast))
     elseif Spell == SpellFire.FuryoftheSunKingBuff then
-      -- Get aura data directly to avoid recursion
       local auraData = C_UnitAuras.GetPlayerAuraBySpellID(Spell:ID())
       if Player:IsCasting(SpellFire.Pyroblast) or Player:IsCasting(SpellFire.Flamestrike) then
         return IsSKBCastSafe(Player:IsCasting(SpellFire.Pyroblast) and SpellFire.Pyroblast or SpellFire.Flamestrike)
@@ -145,9 +139,9 @@ FirePlayerBuffUp = HL.AddCoreOverride("Player.BuffUp",
 local FirePlayerBuffDown
 FirePlayerBuffDown = HL.AddCoreOverride("Player.BuffDown",
   function (self, Spell, AnyCaster, Offset)
+    if not Spell then return true end
     local BaseCheck = FirePlayerBuffDown(self, Spell, AnyCaster, Offset)
     if Spell == SpellFire.FuryoftheSunKingBuff then
-      -- Get aura data directly to avoid recursion
       local auraData = C_UnitAuras.GetPlayerAuraBySpellID(Spell:ID())
       if Player:IsCasting(SpellFire.Pyroblast) or Player:IsCasting(SpellFire.Flamestrike) then
         return not IsSKBCastSafe(Player:IsCasting(SpellFire.Pyroblast) and SpellFire.Pyroblast or SpellFire.Flamestrike)
@@ -281,7 +275,6 @@ FrostOldBuffUp = HL.AddCoreOverride("Player.BuffUp",
     local BaseCheck = FrostOldBuffUp(self, Spell, AnyCaster, Offset)
     if Spell == SpellFrost.FingersofFrostBuff then
       if SpellFrost.IceLance:InFlight() then
-        -- Note: BypassRecovery to avoid infinite looping from BuffStack to BuffDown.
         return Player:BuffStackP(Spell, false, true) >= 1
       else
         return BaseCheck
@@ -298,7 +291,6 @@ FrostOldBuffDown = HL.AddCoreOverride("Player.BuffDown",
     local BaseCheck = FrostOldBuffDown(self, Spell, AnyCaster, Offset)
     if Spell == SpellFrost.FingersofFrostBuff then
       if SpellFrost.IceLance:InFlight() then
-        -- Note: BypassRecovery to avoid infinite looping from BuffStack to BuffDown.
         return Player:BuffStackP(Spell, false, true) <= 0
       else
         return BaseCheck
