@@ -254,7 +254,7 @@ local function Slayer()
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer 30"; end
   end
   -- bloodbath,if=buff.bloodcraze.stack>=1|(talent.uproar&dot.bloodbath_dot.remains<40&talent.bloodborne)|buff.enrage.up&buff.enrage.remains<gcd
-  if S.Bloodbath:IsCastable() and (Player:BuffStack(S.BloodcrazeBuff) >= 1 or (S.Uproar:IsAvailable())) then
+  if S.Bloodbath:IsCastable() and (Player:BuffStack(S.BloodcrazeBuff) >= 1 or (S.Uproar:IsAvailable() and Target:DebuffRemains(S.BloodbathDebuff) < 40 and S.Bloodborne:IsAvailable()) or EnrageUp and Player:BuffRemains(S.EnrageBuff) < Player:GCD()) then
     if Cast(S.Bloodbath, nil, nil, not TargetInMeleeRange) then return "bloodbath slayer_ra_st 32"; end
   end
   -- raging_blow,if=buff.brutal_finish.up&buff.slaughtering_strikes.stack<5&(!debuff.champions_might.up|debuff.champions_might.up&debuff.champions_might.remains>gcd)
