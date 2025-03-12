@@ -239,8 +239,13 @@ local function EvaluateTargetIfFesteringStrikeAoESetup3(TargetUnit)
 end
 
 local function EvaluateTargetIfFesteringStrikeCleave(TargetUnit)
-  -- if=!variable.pop_wounds&debuff.festering_wound.stack<4|buff.festering_scythe.react
-  return not VarPopWounds and TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 4 or Player:BuffUp(S.FesteringScytheBuff)
+  -- if=!buff.vampiric_strike.react&!variable.pop_wounds&debuff.festering_wound.stack<2|buff.festering_scythe.react
+  return not S.VampiricStrikeAction:IsReady() and not VarPopWounds and TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 2 or Player:BuffUp(S.FesteringScytheBuff)
+end
+
+local function EvaluateTargetIfFesteringStrikeCleave2(TargetUnit)
+  -- if=!buff.vampiric_strike.react&cooldown.apocalypse.remains<variable.apoc_timing&debuff.festering_wound.stack<1
+  return not S.VampiricStrikeAction:IsReady() and S.Apocalypse:CooldownRemains() < VarApocTiming and TargetUnit:DebuffDown(S.FesteringWoundDebuff)
 end
 
 local function EvaluateTargetIfUnholyAssaultCDsAoE(TargetUnit)
@@ -299,6 +304,11 @@ end
 local function EvaluateCycleOutbreakCDs(TargetUnit)
   -- target_if=target.time_to_die>dot.virulent_plague.remains&dot.virulent_plague.ticks_remain<5,if=(dot.virulent_plague.refreshable|talent.superstrain&(dot.frost_fever.refreshable|dot.blood_plague.refreshable))&(!talent.unholy_blight|talent.plaguebringer)&(!talent.raise_abomination|talent.raise_abomination&cooldown.raise_abomination.remains>dot.virulent_plague.ticks_remain*3)
   return (TargetUnit:TimeToDie() > TargetUnit:DebuffRemains(S.VirulentPlagueDebuff) and TargetUnit:DebuffTicksRemain(S.VirulentPlagueDebuff) < 5) and ((TargetUnit:DebuffRefreshable(S.VirulentPlagueDebuff) or S.Superstrain:IsAvailable() and (TargetUnit:DebuffRefreshable(S.FrostFeverDebuff) or TargetUnit:DebuffRefreshable(S.BloodPlagueDebuff))) and (not S.UnholyBlight:IsAvailable() or S.Plaguebringer:IsAvailable()) and (not S.RaiseAbomination:IsAvailable() or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > TargetUnit:DebuffTicksRemain(S.VirulentPlagueDebuff) * 3))
+end
+
+local function EvaluateCycleOutbreakCDsCleaveSan(TargetUnit)
+  -- target_if=target.time_to_die>dot.virulent_plague.remains&dot.virulent_plague.ticks_remain<5,if=(dot.virulent_plague.refreshable|talent.morbidity&buff.infliction_of_sorrow.up&talent.superstrain&dot.frost_fever.refreshable&dot.blood_plague.refreshable)&(!talent.unholy_blight|talent.unholy_blight&cooldown.dark_transformation.remains>5)&(!talent.raise_abomination|talent.raise_abomination&cooldown.raise_abomination.remains>5)
+  return (TargetUnit:TimeToDie() > TargetUnit:DebuffRemains(S.VirulentPlagueDebuff) and TargetUnit:DebuffTicksRemain(S.VirulentPlagueDebuff) < 5) and ((TargetUnit:DebuffRefreshable(S.VirulentPlagueDebuff) or S.Morbidity:IsAvailable() and Player:BuffUp(S.InflictionofSorrowBuff) and S.Superstrain:IsAvailable() and TargetUnit:DebuffRefreshable(S.FrostFeverDebuff) and TargetUnit:DebuffRefreshable(S.BloodPlagueDebuff)) and (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and S.DarkTransformation:CooldownRemains() > 5) and (not S.RaiseAbomination:IsAvailable() or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > 5))
 end
 
 local function EvaluateCycleOutbreakCDsSan(TargetUnit)
@@ -541,6 +551,29 @@ local function CDsAoESan()
   end
 end
 
+local function CDsCleaveSan()
+  -- dark_transformation,if=buff.death_and_decay.up&(talent.apocalypse&pet.apoc_ghoul.active|!talent.apocalypse)|fight_remains<20|raid_event.adds.exists&raid_event.adds.remains<20
+  if S.DarkTransformation:IsCastable() and (Player:BuffUp(S.DeathAndDecayBuff) and (S.Apocalypse:IsAvailable() and VarApocGhoulActive or not S.Apocalypse:IsAvailable()) or BossFightRemains < 20) then
+    if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cds_cleave_san 2"; end
+  end
+  -- unholy_assault,if=buff.dark_transformation.up&buff.dark_transformation.remains<12|fight_remains<20|raid_event.adds.exists&raid_event.adds.remains<20
+  if S.UnholyAssault:IsCastable() and (Pet:BuffUp(S.DarkTransformation) and Pet:BuffRemains(S.DarkTransformation) < 12 or BossFightRemains < 20) then
+    if Cast(S.UnholyAssault, Settings.Unholy.GCDasOffGCD.UnholyAssault, nil, not Target:IsInMeleeRange(5)) then return "unholy_assault cds_cleave_san 4"; end
+  end
+  -- apocalypse,target_if=max:debuff.festering_wound.stack
+  if S.Apocalypse:IsReady() then
+    if Everyone.CastTargetIf(S.Apocalypse, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, nil, not Target:IsInMeleeRange(5), Settings.Unholy.GCDasOffGCD.Apocalypse) then return "apocalypse cds_cleave_san 6"; end
+  end
+  -- outbreak,target_if=target.time_to_die>dot.virulent_plague.remains&dot.virulent_plague.ticks_remain<5,if=(dot.virulent_plague.refreshable|talent.morbidity&buff.infliction_of_sorrow.up&talent.superstrain&dot.frost_fever.refreshable&dot.blood_plague.refreshable)&(!talent.unholy_blight|talent.unholy_blight&cooldown.dark_transformation.remains>5)&(!talent.raise_abomination|talent.raise_abomination&cooldown.raise_abomination.remains>5)
+  if S.Outbreak:IsReady() then
+    if Everyone.CastCycle(S.Outbreak, EnemiesMelee, EvaluateCycleOutbreakCDsCleaveSan, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak cds_cleave_san 8"; end
+  end
+  -- abomination_limb,if=!buff.gift_of_the_sanlayn.up&!buff.sudden_doom.react&buff.festermight.up&debuff.festering_wound.stack<=2|!buff.gift_of_the_sanlayn.up&fight_remains<12
+  if S.AbominationLimb:IsCastable() and (Player:BuffDown(S.GiftoftheSanlaynBuff) and Player:BuffDown(S.SuddenDoomBuff) and Player:BuffUp(S.FestermightBuff) and FesterStacks <= 2 or Player:BuffUp(S.GiftoftheSanlaynBuff) and BossFightRemains < 12) then
+    if Cast(S.AbominationLimb, Settings.Unholy.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb cds_cleave_san 10"; end
+  end
+end
+
 local function CDsSan()
   -- dark_transformation,if=active_enemies>=1&variable.st_planning&(talent.apocalypse&pet.apoc_ghoul.active|!talent.apocalypse)|fight_remains<20
   if S.DarkTransformation:IsCastable() and (ActiveEnemies >= 1 and VarSTPlanning and (S.Apocalypse:IsAvailable() and VarApocGhoulActive or not S.Apocalypse:IsAvailable()) or BossFightRemains < 20) then
@@ -595,19 +628,27 @@ local function CDsShared()
 end
 
 local function Cleave()
-  -- any_dnd,if=!death_and_decay.ticking
-  if AnyDnD:IsReady() and (not Player:DnDTicking()) then
+  -- any_dnd,if=!death_and_decay.ticking&variable.adds_remain&(cooldown.apocalypse.remains|!talent.apocalypse)
+  if AnyDnD:IsReady() and (not Player:DnDTicking() and VarAddsRemain and (S.Apocalypse:CooldownDown() or not S.Apocalypse:IsAvailable())) then
     if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd cleave 2"; end
   end
-  -- death_coil,if=!variable.pooling_runic_power
-  if S.DeathCoil:IsReady() and (not VarPoolingRunicPower) then
+  -- death_coil,if=!variable.pooling_runic_power&talent.improved_death_coil
+  if S.DeathCoil:IsReady() and (not VarPoolingRunicPower and S.ImprovedDeathCoil:IsAvailable()) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil cleave 4"; end
   end
-  -- festering_strike,target_if=min:debuff.festering_wound.stack,if=!variable.pop_wounds&debuff.festering_wound.stack<4|buff.festering_scythe.react
+  -- wound_spender,if=buff.vampiric_strike.react
+  if WoundSpender:IsReady() and (S.VampiricStrikeAction:IsLearned()) then
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender cleave 6"; end
+  end
+  -- death_coil,if=!variable.pooling_runic_power&!talent.improved_death_coil
+  if S.DeathCoil:IsReady() and (not VarPoolingRunicPower and not S.ImprovedDeathCoil:IsAvailable()) then
+    if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil cleave 7"; end
+  end
+  -- festering_strike,target_if=min:debuff.festering_wound.stack,if=!buff.vampiric_strike.react&!variable.pop_wounds&debuff.festering_wound.stack<2|buff.festering_scythe.react
   if FesteringAction:IsReady() then
     if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeCleave, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike cleave 8"; end
   end
-  -- festering_strike,target_if=max:debuff.festering_wound.stack,if=cooldown.apocalypse.remains<variable.apoc_timing&debuff.festering_wound.stack<4
+  -- festering_strike,target_if=max:debuff.festering_wound.stack,if=!buff.vampiric_strike.react&cooldown.apocalypse.remains<variable.apoc_timing&debuff.festering_wound.stack<1
   if FesteringAction:IsReady() then
     if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeCleave2, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike cleave 10"; end
   end
@@ -953,13 +994,17 @@ local function APL()
     if CDsON() then
       local ShouldReturn = CDsShared(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=cds_aoe_san,if=talent.vampiric_strike&active_enemies>=2
-    if CDsON() and AoEON() and S.VampiricStrike:IsAvailable() and ActiveEnemies >= 2 then
+    -- call_action_list,name=cds_aoe_san,if=talent.vampiric_strike&active_enemies>=3
+    if CDsON() and AoEON() and S.VampiricStrike:IsAvailable() and ActiveEnemies >= 3 then
       local ShouldReturn = CDsAoESan(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cds_aoe,if=!talent.vampiric_strike&active_enemies>=2
     if CDsON() and AoEON() and not S.VampiricStrike:IsAvailable() and ActiveEnemies >= 2 then
       local ShouldReturn = CDsAoE(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=cds_cleave_san,if=talent.vampiric_strike&active_enemies=2
+    if CDsON() and S.VampiricStrike:IsAvailable() and ActiveEnemies == 2 then
+      local ShouldReturn = CDsCleaveSan(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cds_san,if=talent.vampiric_strike&active_enemies=1
     if CDsON() and S.VampiricStrike:IsAvailable() and ActiveEnemies == 1 then
