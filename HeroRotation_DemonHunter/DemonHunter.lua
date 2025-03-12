@@ -69,7 +69,8 @@ Spell.DemonHunter.AldrachiReaver = {
   ArtoftheGlaiveBuff                    = Spell(444661),
   GlaiveFlurryBuff                      = Spell(442435),
   ThrilloftheFightAtkBuff               = Spell(442695),
-  ThrilloftheFightDmgBuff               = Spell(442688),
+  ThrilloftheFightHavocDmgBuff          = Spell(442688),
+  ThrilloftheFightVengDmgBuff           = Spell(1227062),
   WarbladesHungerBuff                   = Spell(442503),
   -- Debuffs
   ReaversMarkDebuff                     = Spell(442624),

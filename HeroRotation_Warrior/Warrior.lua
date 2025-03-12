@@ -171,6 +171,7 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   -- Talents
   AngerManagement                       = Spell(152278),
   AshenJuggernaut                       = Spell(392536),
+  Bloodborne                            = Spell(383926),
   Bloodthirst                           = Spell(23881),
   DancingBlades                         = Spell(391683),
   ImprovedWhilwind                      = Spell(12950),
@@ -204,6 +205,7 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Commons, {
   SuddenDeathBuff                       = Spell(280776),
   WinningStreakBuff                     = Spell(1216561), -- TWW S2 2pc
   -- Debuffs
+  BloodbathDebuff                       = Spell(113344),
   GushingWoundDebuff                    = Spell(385042),
   OdynsFuryDebuff                       = Spell(385060),
 })

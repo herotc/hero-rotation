@@ -167,6 +167,7 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   TeachingsoftheMonasteryBuff           = Spell(202090),
   -- Debuffs
   AcclamationDebuff                     = Spell(451433),
+  GaleForceDebuff                       = Spell(451582),
   MarkoftheCraneDebuff                  = Spell(228287),
   -- Tier 31 Effects
   BlackoutReinforcementBuff             = Spell(424454),
