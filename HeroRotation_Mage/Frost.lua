@@ -257,13 +257,13 @@ local function Movement()
 end
 
 local function AoEFF()
-  -- cone_of_cold,if=talent.coldest_snap&prev_gcd.1.comet_storm
-  if S.ConeofCold:IsCastable() and (S.ColdestSnap:IsAvailable() and Player:PrevGCDP(1, S.CometStorm)) then
-    if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold aoe_ff 2"; end
-  end
   -- frostfire_bolt,if=talent.deaths_chill&buff.icy_veins.remains>9&(buff.deaths_chill.stack<9|buff.deaths_chill.stack=9&!action.frostfire_bolt.in_flight)
   if Bolt:IsReady() and (S.DeathsChill:IsAvailable() and Player:BuffRemains(S.IcyVeinsBuff) > 9 and (Player:BuffStack(S.DeathsChillBuff) < 9 or Player:BuffStack(S.DeathsChillBuff) == 9 and not Bolt:InFlight())) then
-    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostfire_bolt aoe_ff 4"; end
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostfire_bolt aoe_ff 2"; end
+  end
+  -- cone_of_cold,if=talent.coldest_snap&prev_gcd.1.comet_storm
+  if S.ConeofCold:IsCastable() and (S.ColdestSnap:IsAvailable() and Player:PrevGCDP(1, S.CometStorm)) then
+    if Cast(S.ConeofCold, nil, nil, not Target:IsInRange(12)) then return "cone_of_cold aoe_ff 4"; end
   end
   -- freeze,if=freezable&(prev_gcd.1.glacial_spike|prev_gcd.1.comet_storm&time-action.cone_of_cold.last_used>8)
   if Pet:IsActive() and S.Freeze:IsReady() and (Freezable() and (Player:PrevGCDP(1, S.GlacialSpike) or Player:PrevGCDP(1, S.CometStorm) and S.ConeofCold:TimeSinceLastCast() > 8)) then
