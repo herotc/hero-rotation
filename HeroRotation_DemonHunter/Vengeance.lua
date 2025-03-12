@@ -432,11 +432,11 @@ local function AR()
   end
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,slot=trinket1,if=!variable.trinket_1_buffs|(variable.trinket_1_buffs&((buff.rending_strike.up&buff.glaive_flurry.up)|(prev_gcd.1.reavers_glaive)|(buff.thrill_of_the_fight_damage.remains>8)|(buff.reavers_glaive.up&cooldown.the_hunt.remains<5)))
-    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs or (VarTrinket1Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 8) or (S.ReaversGlaive:IsLearned() and S.TheHunt:CooldownRemains() < 5)))) then
+    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs or (VarTrinket1Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightVengDmgBuff) > 8) or (S.ReaversGlaive:IsLearned() and S.TheHunt:CooldownRemains() < 5)))) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for trinket1 (" .. Trinket1:Name() .. ") ar 2"; end
     end
     -- use_item,slot=trinket2,if=!variable.trinket_2_buffs|(variable.trinket_2_buffs&((buff.rending_strike.up&buff.glaive_flurry.up)|(prev_gcd.1.reavers_glaive)|(buff.thrill_of_the_fight_damage.remains>8)|(buff.reavers_glaive.up&cooldown.the_hunt.remains<5)))
-    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs or (VarTrinket2Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 8) or (S.ReaversGlaive:IsLearned() and S.TheHunt:CooldownRemains() < 5)))) then
+    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs or (VarTrinket2Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightVengDmgBuff) > 8) or (S.ReaversGlaive:IsLearned() and S.TheHunt:CooldownRemains() < 5)))) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for trinket2 (" .. Trinket2:Name() .. ") ar 4"; end
     end
   end
@@ -476,7 +476,7 @@ local function AR()
     if Cast(S.SigilofFlame, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame ar 16"; end
   end
   -- run_action_list,name=rg_overflow,if=buff.reavers_glaive.up&!(spell_targets.spirit_bomb>=4)&debuff.reavers_mark.up&(variable.double_rm_remains>(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max)))&(!buff.thrill_of_the_fight_damage.up|(buff.thrill_of_the_fight_damage.remains<(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))))&((variable.double_rm_remains-(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max)))>(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max)))&((variable.souls_before_next_rg_sequence>=20)|(variable.double_rm_remains>((action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))+cooldown.the_hunt.remains+action.the_hunt.execute_time)))
-  if S.ReaversGlaive:IsLearned() and (not EnhanceCleaveOnly() and Target:DebuffUp(S.ReaversMarkDebuff) and (VarDoubleRMRemains > RGSequenceDuration()) and (Player:BuffDown(S.ThrilloftheFightDmgBuff) or (Player:BuffRemains(S.ThrilloftheFightDmgBuff) < RGSequenceDuration())) and ((VarDoubleRMRemains - RGSequenceDuration()) > RGSequenceDuration()) and ((VarSoulsBeforeNextRGSequence >= 20) or (VarDoubleRMRemains > (RGSequenceDuration() + S.TheHunt:CooldownRemains() + S.TheHunt:ExecuteTime())))) then
+  if S.ReaversGlaive:IsLearned() and (not EnhanceCleaveOnly() and Target:DebuffUp(S.ReaversMarkDebuff) and (VarDoubleRMRemains > RGSequenceDuration()) and (Player:BuffDown(S.ThrilloftheFightVengDmgBuff) or (Player:BuffRemains(S.ThrilloftheFightVengDmgBuff) < RGSequenceDuration())) and ((VarDoubleRMRemains - RGSequenceDuration()) > RGSequenceDuration()) and ((VarSoulsBeforeNextRGSequence >= 20) or (VarDoubleRMRemains > (RGSequenceDuration() + S.TheHunt:CooldownRemains() + S.TheHunt:ExecuteTime())))) then
     local ShouldReturn = RGOverflow(); if ShouldReturn then return ShouldReturn; end
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool for RGOverflow()"; end
   end
@@ -505,11 +505,11 @@ local function AR()
     local ShouldReturn = RGPrep(); if ShouldReturn then return ShouldReturn; end
   end
   -- fiery_brand,if=(!talent.fiery_demise&active_dot.fiery_brand=0)|(talent.down_in_flames&(full_recharge_time<gcd.max))|(talent.fiery_demise&active_dot.fiery_brand=0&(buff.reavers_glaive.up|cooldown.the_hunt.remains<5|buff.art_of_the_glaive.stack>=15|buff.thrill_of_the_fight_damage.remains>5))
-  if S.FieryBrand:IsCastable() and ((not S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() == 0) or (S.DowninFlames:IsAvailable() and S.FieryBrand:FullRechargeTime() < Player:GCD()) or (S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() == 0 and (S.ReaversGlaive:IsLearned() or S.TheHunt:CooldownRemains() < 5 or Player:BuffStack(S.ArtoftheGlaiveBuff) >= 15 or Player:BuffRemains(S.ThrilloftheFightDmgBuff) > 5))) then
+  if S.FieryBrand:IsCastable() and ((not S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() == 0) or (S.DowninFlames:IsAvailable() and S.FieryBrand:FullRechargeTime() < Player:GCD()) or (S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() == 0 and (S.ReaversGlaive:IsLearned() or S.TheHunt:CooldownRemains() < 5 or Player:BuffStack(S.ArtoftheGlaiveBuff) >= 15 or Player:BuffRemains(S.ThrilloftheFightVengDmgBuff) > 5))) then
     if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand ar 26"; end
   end
   -- sigil_of_spite,if=buff.thrill_of_the_fight_damage.up|(fury>=80&(variable.can_spb|variable.can_spb_soon))|((soul_fragments.total+buff.art_of_the_glaive.stack+((1.1*(1+raw_haste_pct))*(variable.double_rm_remains-(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max)))))<20)
-  if S.SigilofSpite:IsCastable() and (Player:BuffUp(S.ThrilloftheFightDmgBuff) or (Player:Fury() >= 80 and (VarCanSpB or VarCanSpBSoon)) or ((TotalSoulFragments + Player:BuffStack(S.ArtoftheGlaiveBuff) + (SoulsPerSecond() * (VarDoubleRMRemains - RGSequenceDuration()))) < 20)) then
+  if S.SigilofSpite:IsCastable() and (Player:BuffUp(S.ThrilloftheFightVengDmgBuff) or (Player:Fury() >= 80 and (VarCanSpB or VarCanSpBSoon)) or ((TotalSoulFragments + Player:BuffStack(S.ArtoftheGlaiveBuff) + (SoulsPerSecond() * (VarDoubleRMRemains - RGSequenceDuration()))) < 20)) then
     if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_spite ar 28"; end
   end
   -- spirit_bomb,if=variable.can_spb
@@ -533,11 +533,11 @@ local function AR()
     if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Soul Fragments (Spirit Burst)"; end
   end
   -- soul_carver,if=buff.thrill_of_the_fight_damage.up|((soul_fragments.total+buff.art_of_the_glaive.stack+((1.1*(1+raw_haste_pct))*(variable.double_rm_remains-(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max)))))<20)
-  if S.SoulCarver:IsCastable() and (Player:BuffUp(S.ThrilloftheFightDmgBuff) or ((TotalSoulFragments + Player:BuffStack(S.ArtoftheGlaiveBuff) + (SoulsPerSecond() * (VarDoubleRMRemains - RGSequenceDuration()))) < 20)) then
+  if S.SoulCarver:IsCastable() and (Player:BuffUp(S.ThrilloftheFightVengDmgBuff) or ((TotalSoulFragments + Player:BuffStack(S.ArtoftheGlaiveBuff) + (SoulsPerSecond() * (VarDoubleRMRemains - RGSequenceDuration()))) < 20)) then
     if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver ar 38"; end
   end
   -- fel_devastation,if=!buff.metamorphosis.up&((variable.double_rm_remains>((action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))+2))|(spell_targets.spirit_bomb>=4))&((action.fracture.full_recharge_time<(2+gcd.max))|(!variable.single_target&buff.thrill_of_the_fight_damage.up))
-  if S.FelDevastation:IsReady() and (not Player:BuffUp(S.MetamorphosisBuff) and ((VarDoubleRMRemains > (RGSequenceDuration() + 2)) or EnhanceCleaveOnly()) and ((S.Fracture:FullRechargeTime() < (2 + Player:GCD())) or (not VarST and Player:BuffUp(S.ThrilloftheFightDmgBuff)))) then
+  if S.FelDevastation:IsReady() and (not Player:BuffUp(S.MetamorphosisBuff) and ((VarDoubleRMRemains > (RGSequenceDuration() + 2)) or EnhanceCleaveOnly()) and ((S.Fracture:FullRechargeTime() < (2 + Player:GCD())) or (not VarST and Player:BuffUp(S.ThrilloftheFightVengDmgBuff)))) then
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation ar 40"; end
   end
   -- felblade,if=cooldown.fel_devastation.remains<gcd.max&fury<50
