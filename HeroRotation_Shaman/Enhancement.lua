@@ -479,7 +479,7 @@ local function SingleTotemicOpen()
   end
   -- surging_totem
   if S.SurgingTotem:IsReady() then
-    if Cast(S.SurgingTotem) then return "surging_totem single_totemic_open 6"; end
+    if Cast(S.SurgingTotem, nil, Settings.CommonsDS.DisplayStyle.SurgingTotem) then return "surging_totem single_totemic_open 6"; end
   end
   -- primordial_wave
   if S.PrimordialWave:IsReady() then
@@ -541,7 +541,7 @@ local function SingleTotemic()
   end
   -- surging_totem
   if S.SurgingTotem:IsReady() then
-    if Cast(S.SurgingTotem) then return "surging_totem single_totemic 2"; end
+    if Cast(S.SurgingTotem, nil, Settings.CommonsDS.DisplayStyle.SurgingTotem) then return "surging_totem single_totemic 2"; end
   end
   -- ascendance,if=ti_lightning_bolt&pet.surging_totem.remains>4&(buff.totemic_rebound.stack>=3|buff.maelstrom_weapon.stack>0)
   if CDsON() and S.Ascendance:IsCastable() and (TIAction == S.LightningBolt and TotemFinder(S.SurgingTotem, true) > 4 and (Player:BuffStack(S.TotemicReboundBuff) >= 3 or MaelstromStacks > 0)) then
@@ -903,7 +903,7 @@ end
 local function AoeTotemicOpen()
   -- surging_totem
   if S.SurgingTotem:IsReady() then
-    if Cast(S.SurgingTotem) then return "surging_totem aoe_totemic_open 2"; end
+    if Cast(S.SurgingTotem, nil, Settings.CommonsDS.DisplayStyle.SurgingTotem) then return "surging_totem aoe_totemic_open 2"; end
   end
   -- flame_shock,if=!ticking
   if S.FlameShock:IsReady() and (Target:DebuffDown(S.FlameShockDebuff)) then
@@ -976,7 +976,7 @@ end
 local function AoeTotemic()
   -- surging_totem
   if S.SurgingTotem:IsReady() then
-    if Cast(S.SurgingTotem) then return "surging_totem aoe_totemic 2"; end
+    if Cast(S.SurgingTotem, nil, Settings.CommonsDS.DisplayStyle.SurgingTotem) then return "surging_totem aoe_totemic 2"; end
   end
   -- run_action_list,name=aoe_totemic_open,if=(cooldown.doom_winds.remains=0|cooldown.sundering.remains=0|!buff.hot_hand.up)&time<15
   if (S.DoomWinds:CooldownUp() or S.Sundering:CooldownUp() or Player:BuffDown(S.HotHandBuff)) and HL.CombatTime() < 15 then
@@ -1154,7 +1154,7 @@ local function Funnel()
   end
   -- surging_totem
   if S.SurgingTotem:IsReady() then
-    if Cast(S.SurgingTotem) then return "surging_totem funnel 4"; end
+    if Cast(S.SurgingTotem, nil, Settings.CommonsDS.DisplayStyle.SurgingTotem) then return "surging_totem funnel 4"; end
   end
   -- ascendance
   if CDsON() and S.Ascendance:IsCastable() then
