@@ -278,7 +278,7 @@ local function Vanish_DPS_Condition ()
 end
 
 local function Stealth(ReturnSpellOnly)
-  if S.BladeFlurry:IsReady() then
+  if S.BladeFlurry:IsCastable() then
     if S.DeftManeuvers:IsAvailable() and not Finish_Condition() and (EnemiesBFCount >= 3
       and ComboPointsDeficit == EnemiesBFCount + num(Player:BuffUp(S.Broadside)) or EnemiesBFCount >= 5) then
       if ReturnSpellOnly then
@@ -292,7 +292,7 @@ local function Stealth(ReturnSpellOnly)
   end
 
   -- actions.stealth+=/cold_blood,if=variable.finish_condition
-  if S.ColdBlood:IsReady() and Player:BuffDown(S.ColdBlood) and Finish_Condition() then
+  if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Finish_Condition() then
     if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
       return "Cast Cold Blood"
     end
@@ -311,7 +311,7 @@ local function Stealth(ReturnSpellOnly)
   end
 
   -- actions.stealth+=/dispatch,if=variable.finish_condition
-  if S.Dispatch:IsReady() and Finish_Condition() then
+  if S.Dispatch:IsCastable() and Finish_Condition() then
     if ReturnSpellOnly then
       return S.Dispatch
     else
@@ -324,7 +324,7 @@ local function Stealth(ReturnSpellOnly)
   -- # 2 Fan the Hammer Crackshot builds can consume Opportunity in stealth with max stacks, Broadside, and low CPs, or with Greenskins active
   -- actions.stealth+=/pistol_shot,if=talent.crackshot&talent.fan_the_hammer.rank>=2&buff.opportunity.stack>=6
   -- &(buff.broadside.up&combo_points<=1|buff.greenskins_wickers.up)
-  if S.PistolShot:IsReady() and S.Crackshot:IsAvailable() and S.FanTheHammer:TalentRank() >= 2 and Player:BuffStack(S.Opportunity) >= 6
+  if S.PistolShot:IsCastable() and S.Crackshot:IsAvailable() and S.FanTheHammer:TalentRank() >= 2 and Player:BuffStack(S.Opportunity) >= 6
     and (Player:BuffUp(S.Broadside) and ComboPoints <= 1 or Player:BuffUp(S.GreenskinsWickersBuff)) then
     if ReturnSpellOnly then
       return S.PistolShot
@@ -336,7 +336,7 @@ local function Stealth(ReturnSpellOnly)
   end
 
   -- ***NOT PART of SimC*** Condition duplicated from build to Show SS Icon in stealth with audacity buff
-  if S.Ambush:IsReady() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
+  if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
     if ReturnSpellOnly then
       return S.SSAudacity
     else
@@ -347,7 +347,7 @@ local function Stealth(ReturnSpellOnly)
   end
 
   -- actions.stealth+=/ambush,if=talent.hidden_opportunity
-  if S.Ambush:IsReady() and S.HiddenOpportunity:IsAvailable() then
+  if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() then
     if ReturnSpellOnly then
       return S.Ambush
     else
@@ -363,9 +363,9 @@ local function Finish(ReturnSpellOnly)
   -- actions.finish=between_the_eyes,if=!talent.crackshot
   -- &(buff.between_the_eyes.remains<4|talent.improved_between_the_eyes|talent.greenskins_wickers)
   -- &!buff.greenskins_wickers.up
-  if S.BetweentheEyes:IsReady() and not S.Crackshot:IsAvailable()
-    and (Player:BuffRemains(S.BetweentheEyes) < 4 or S.ImprovedBetweenTheEyes:IsAvailable() or S.GreenskinsWickers:IsAvailable())
-    and Player:BuffDown(S.GreenskinsWickers) then
+  if S.BetweentheEyes:IsCastable() and not S.Crackshot:IsAvailable()
+    and (Player:BuffRemains(S.BetweentheEyes) < 4 or S.ImprovedBetweenTheEyes:IsAvailable()
+    or (S.GreenskinsWickers:IsAvailable() and Player:BuffDown(S.GreenskinsWickers))) then
     if ReturnSpellOnly then
       return S.BetweentheEyes
     else
@@ -375,9 +375,20 @@ local function Finish(ReturnSpellOnly)
     end
   end
 
+  -- actions.finish+=/coup_de_grace
+  if S.CoupDeGrace:IsCastable() then
+    if ReturnSpellOnly then
+      return S.CoupDeGrace
+    else
+      if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
+        return "Cast Coup de Grace"
+      end
+    end
+  end
+
   -- # Crackshot builds use Between the Eyes outside of Stealth to refresh the Between the Eyes crit buff or on cd with the Ruthless Precision buff
   -- actions.finish+=/between_the_eyes,if=talent.crackshot&(buff.ruthless_precision.up|buff.between_the_eyes.remains<4|!talent.keep_it_rolling|!talent.mean_streak)
-  if S.BetweentheEyes:IsReady() then
+  if S.BetweentheEyes:IsCastable() then
     if S.Crackshot:IsAvailable() and (Player:BuffUp(S.RuthlessPrecision) or Player:BuffRemains(S.BetweentheEyes) < 4
     or not S.KeepItRolling:IsAvailable() or not S.MeanStreak:IsAvailable()) then
       if ReturnSpellOnly then
@@ -390,25 +401,14 @@ local function Finish(ReturnSpellOnly)
     end
   end
 
-  if S.ColdBlood:IsReady() and Player:BuffDown(S.ColdBlood) then
+  if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) then
     if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
       return "Cast Cold Blood"
     end
   end
 
-  -- actions.finish+=/coup_de_grace
-  if S.CoupDeGrace:IsReady() then
-    if ReturnSpellOnly then
-      return S.CoupDeGrace
-    else
-      if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
-        return "Cast Coup de Grace"
-      end
-    end
-  end
-
   -- actions.finish+=/dispatch
-  if S.Dispatch:IsReady() then
+  if S.Dispatch:IsCastable() then
     if ReturnSpellOnly then
       return S.Dispatch
     else
@@ -455,7 +455,7 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
     -- code complexity and putting in hacks to skip the AR condition, the RtB condition has been put here separately.
     -- Use Roll the Bones if reroll conditions are met, or with no buffs, or seven seconds early if about to enter a Vanish window with Crackshot
     -- actions.cds+=/roll_the_bones,if=variable.rtb_reroll|rtb_buffs=0
-    if S.RolltheBones:IsReady() then
+    if S.RolltheBones:IsCastable() then
       if RtB_Reroll(S.LoadedDice:IsAvailable()) or Cache.APLVar.RtB_Buffs.Total == 0 then
         MacroAbility = S.RolltheBones
       end
@@ -511,7 +511,7 @@ function StealthCDs (ReturnSpellOnly)
   -- If playing KIR, only do this if KIR has > 150s left on CD and you have already done the roll after pressing KIR
   -- actions.stealth_cds=vanish,if=!talent.killing_spree&!cooldown.between_the_eyes.ready&buff.ruthless_precision.remains>4
   -- &(cooldown.keep_it_rolling.remains>150&rtb_buffs.normal>0|!talent.supercharger)
-  if S.Vanish:IsReady() and Vanish_DPS_Condition() then
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if not S.KillingSpree:IsAvailable() and not S.BetweentheEyes:IsReady() and Player:BuffRemains(S.RuthlessPrecision) > 4
       and (S.KeepItRolling:CooldownRemains() > 150 and Cache.APLVar.RtB_Buffs.Normal > 0 or not S.Supercharger:IsAvailable()) then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
@@ -526,7 +526,7 @@ function StealthCDs (ReturnSpellOnly)
 
   -- # Vanish if Adrenaline Rush is about to run out unless remaining cooldown on adrenaline rush is less than 10 sec or available
   -- actions.stealth_cds=vanish,if=buff.adrenaline_rush.remains<3&cooldown.adrenaline_rush.remains>10
-  if S.Vanish:IsReady() and Vanish_DPS_Condition() then
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if Player:BuffRemains(S.AdrenalineRush) < 3 and S.AdrenalineRush:CooldownRemains() > 10 then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
@@ -540,7 +540,7 @@ function StealthCDs (ReturnSpellOnly)
 
   -- # Supercharger builds that do not use killing spree should vanish with the supercharger buff up
   -- actions.stealth_cds=vanish,if=!talent.killing_spree&buff.supercharge_1.up
-  if S.Vanish:IsReady() and Vanish_DPS_Condition() then
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if not S.KillingSpree:IsAvailable() and ChargedComboPoints > 0 then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
@@ -554,7 +554,7 @@ function StealthCDs (ReturnSpellOnly)
 
   -- # Killing spree builds can vanish any time killing spree is on cd, preferably with at least 15s left on the cd
   -- actions.stealth_cds=vanish,if=cooldown.killing_spree.remains>15
-  if S.Vanish:IsReady() and Vanish_DPS_Condition() then
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if S.KillingSpree:CooldownRemains() > 15 then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
@@ -568,7 +568,7 @@ function StealthCDs (ReturnSpellOnly)
 
   -- # Vanish if about to cap on vanish charges
   -- actions.stealth_cds=vanish,if=cooldown.vanish.full_recharge_time<15
-  if S.Vanish:IsReady() and Vanish_DPS_Condition() then
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if S.Vanish:FullRechargeTime() < 15 then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
@@ -582,7 +582,7 @@ function StealthCDs (ReturnSpellOnly)
 
   -- # Vanish if fight is about to end
   -- actions.stealth_cds=vanish,if=fight_remains<8
-  if S.Vanish:IsReady() and Vanish_DPS_Condition() then
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if HL.BossFilteredFightRemains("<", 8) then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
@@ -609,7 +609,7 @@ local function StealthCDs_2 (ReturnSpellOnly)
   --actions.stealth_cds_2=vanish,if=talent.underhanded_upper_hand&talent.subterfuge&!talent.crackshot&buff.adrenaline_rush.up
   -- &(variable.ambush_condition|!talent.hidden_opportunity)&(!cooldown.between_the_eyes.ready
   -- &buff.ruthless_precision.up|buff.ruthless_precision.down|buff.adrenaline_rush.remains<3)
-  if S.Vanish:IsReady() and Vanish_DPS_Condition() then
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if S.UnderhandedUpperhand:IsAvailable() and S.Subterfuge:IsAvailable() and not S.Crackshot:IsAvailable() and Player:BuffUp(S.AdrenalineRush)
       and (Ambush_Condition() or not S.HiddenOpportunity:IsAvailable()) and (not S.BetweentheEyes:IsReady() and Player:BuffUp(S.RuthlessPrecision)
       or Player:BuffDown(S.RuthlessPrecision or Player:BuffRemains(S.AdrenalineRush) < 3)) then
@@ -624,7 +624,7 @@ local function StealthCDs_2 (ReturnSpellOnly)
   end
 
   --actions.stealth_cds_2+=/vanish,if=!talent.underhanded_upper_hand&talent.crackshot&variable.finish_condition
-  if S.Vanish:IsReady() and Vanish_DPS_Condition() then
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if not S.UnderhandedUpperhand:IsAvailable() and S.Crackshot:IsAvailable() and Finish_Condition() then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
@@ -638,7 +638,7 @@ local function StealthCDs_2 (ReturnSpellOnly)
 
   --actions.stealth_cds_2+=/vanish,if=!talent.underhanded_upper_hand&!talent.crackshot&talent.hidden_opportunity
   -- &!buff.audacity.up&buff.opportunity.stack<buff.opportunity.max_stack&variable.ambush_condition
-  if S.Vanish:IsReady() and Vanish_DPS_Condition() then
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if not S.UnderhandedUpperhand:IsAvailable() and not S.Crackshot:IsAvailable() and S.HiddenOpportunity:IsAvailable()
       and not Player:BuffUp(S.AudacityBuff) and Player:BuffStack(S.Opportunity) < 6 and Ambush_Condition() then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
@@ -654,7 +654,7 @@ local function StealthCDs_2 (ReturnSpellOnly)
   --actions.stealth_cds_2+=/vanish,if=!talent.underhanded_upper_hand&!talent.crackshot&!talent.hidden_opportunity
   -- &talent.fateful_ending&(!buff.fatebound_lucky_coin.up&(buff.fatebound_coin_tails.stack>=5|buff.fatebound_coin_heads.stack>=5)
   -- |buff.fatebound_lucky_coin.up&!cooldown.between_the_eyes.ready)
-  if S.Vanish:IsReady() and Vanish_DPS_Condition() then
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if not S.UnderhandedUpperhand:IsAvailable() and not S.Crackshot:IsAvailable() and not S.HiddenOpportunity:IsAvailable()
       and S.FatefulEnding:IsAvailable() and (not Player:BuffUp(S.FateboundLuckyCoin)
       and (Player:BuffStack(S.FateboundCoinTails) >= 5 or Player:BuffStack(S.FateboundCoinHeads) >= 5)
@@ -671,7 +671,7 @@ local function StealthCDs_2 (ReturnSpellOnly)
 
   --actions.stealth_cds_2+=/vanish,if=!talent.underhanded_upper_hand&!talent.crackshot&!talent.hidden_opportunity
   -- &!talent.fateful_ending&talent.take_em_by_surprise&!buff.take_em_by_surprise.up
-  if S.Vanish:IsReady() and Vanish_DPS_Condition() then
+  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if not S.UnderhandedUpperhand:IsAvailable() and not S.Crackshot:IsAvailable() and not S.HiddenOpportunity:IsAvailable()
       and not S.FatefulEnding:IsAvailable() and S.TakeEmBySurprise:IsAvailable() and not Player:BuffUp(S.TakeEmBySurpriseBuff) then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
@@ -685,7 +685,7 @@ local function StealthCDs_2 (ReturnSpellOnly)
   end
 
   --actions.stealth_cds_2+=/shadowmeld,if=variable.finish_condition&!cooldown.vanish.ready
-  if S.Shadowmeld:IsReady() and Finish_Condition() and not S.Vanish:IsReady() then
+  if S.Shadowmeld:IsCastable() and Finish_Condition() and not S.Vanish:IsReady() then
     if Cast(S.Shadowmeld, Settings.Outlaw.GCDasOffGCD.Shadowmeld) then
       return "Cast Shadowmeld (Off Meta)"
     end
@@ -713,7 +713,7 @@ local function CDs ()
 
   -- # Sprint to further benefit from Scroll of Momentum trinket
   -- actions.cds+=/sprint,if=(trinket.1.is.scroll_of_momentum|trinket.2.is.scroll_of_momentum)&buff.full_momentum.up
-  if S.Sprint:IsReady() and Player:BuffDown(S.Sprint) and
+  if S.Sprint:IsCastable() and Player:BuffDown(S.Sprint) and
     (trinket1:ID() == I.ScrollOfMomentum:ID() or trinket2:ID() == I.ScrollOfMomentum:ID()) and Player:BuffUp(S.FullMomentum) then
     if Cast(S.Sprint, Settings.CommonsOGCD.OffGCDasOffGCD.Sprint) then
       return "Cast Sprint"
@@ -721,7 +721,7 @@ local function CDs ()
   end
 
   -- # Maintain Blade Flurry on 2+ targets
-  if S.BladeFlurry:IsReady() then
+  if S.BladeFlurry:IsCastable() then
     if EnemiesBFCount >= 2 and Player:BuffRemains(S.BladeFlurry) < Player:GCD() then
       if Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then
         return "Cast Blade Flurry"
@@ -732,7 +732,7 @@ local function CDs ()
   -- # With Deft Maneuvers, use Blade Flurry on cooldown at 5+ targets, or at 3-4 targets if missing combo points equal to the amount given
   -- action.cds/blade_flurry,if=talent.deft_maneuvers&!variable.finish_condition&(spell_targets>=3
   -- &combo_points.deficit=spell_targets+buff.broadside.up|spell_targets>=5)
-  if S.BladeFlurry:IsReady() then
+  if S.BladeFlurry:IsCastable() then
     if S.DeftManeuvers:IsAvailable() and not Finish_Condition() and (EnemiesBFCount >= 3
       and ComboPointsDeficit == EnemiesBFCount + num(Player:BuffUp(S.Broadside)) or EnemiesBFCount >= 5) then
       if Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then
@@ -743,7 +743,7 @@ local function CDs ()
 
   -- actions.cds+=/keep_it_rolling,if=rtb_buffs.normal>=5&(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up>=3&rtb_buffs.max_remains<=30)
   -- New
-  if S.KeepItRolling:IsReady() then
+  if S.KeepItRolling:IsCastable() then
     if Cache.APLVar.RtB_Buffs.Normal >= 5 and (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing)) >= 3
       and Cache.APLVar.RtB_Buffs.MaxRemains <= 30) then
       if Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then
@@ -755,7 +755,7 @@ local function CDs ()
   -- # Use Keep it Rolling with any 4 buffs, unless you only have one of Broadside, Ruthless Precision and True Bearing,
   -- then wait until just before the lowest duration buff expires in an attempt to obtain another good buff from Count the Odds.
   -- actions.cds+=/keep_it_rolling,if=rtb_buffs>=4&(rtb_buffs.min_remains<1|(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up>=2))&rtb_buffs.normal<=2
-  if S.KeepItRolling:IsReady() and Cache.APLVar.RtB_Buffs.Total >= 4
+  if S.KeepItRolling:IsCastable() and Cache.APLVar.RtB_Buffs.Total >= 4
     and (Cache.APLVar.RtB_Buffs.MinRemains < 1 or (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing)) >= 2))
     and Cache.APLVar.RtB_Buffs.Normal <= 2 then
     if Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then
@@ -767,7 +767,7 @@ local function CDs ()
   -- If one of the 3 is missing, then wait until just before the lowest buff expires in an attempt to obtain it from Count the Odds.
   -- actions.cds+=/keep_it_rolling,if=rtb_buffs>=3&(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up>=2)
   -- &(rtb_buffs.min_remains<1|(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up=3))&rtb_buffs.normal<=2
-  if S.KeepItRolling:IsReady() and Cache.APLVar.RtB_Buffs.Total >= 3 and (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing)) >= 2)
+  if S.KeepItRolling:IsCastable() and Cache.APLVar.RtB_Buffs.Total >= 3 and (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing)) >= 2)
     and (Cache.APLVar.RtB_Buffs.MinRemains < 1 or (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing) == 3)))
     and Cache.APLVar.RtB_Buffs.Normal <= 2 then
     if Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then
@@ -776,7 +776,7 @@ local function CDs ()
   end
 
   -- # Roll the bones if you have no buffs, or will lose no buffs by rolling. With Loaded Dice up, roll if you have 1 buff or will lose at most 1 buff.
-  if S.RolltheBones:IsReady() then
+  if S.RolltheBones:IsCastable() then
     if RtB_Reroll() or Cache.APLVar.RtB_Buffs.Total == 0 then
       if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then
         return "Cast Roll the Bones"
@@ -785,7 +785,7 @@ local function CDs ()
   end
 
   --actions.cds+=/ghostly_strike,if=effective_combo_points<cp_max_spend
-  if S.GhostlyStrike:IsAvailable() and S.GhostlyStrike:IsReady() and EffectiveComboPoints < Rogue.CPMaxSpend() then
+  if S.GhostlyStrike:IsAvailable() and S.GhostlyStrike:IsCastable() and EffectiveComboPoints < Rogue.CPMaxSpend() then
     if Cast(S.GhostlyStrike, Settings.Outlaw.OffGCDasOffGCD.GhostlyStrike, nil, not Target:IsSpellInRange(S.GhostlyStrike)) then
       return "Cast Ghostly Strike"
     end
@@ -1033,7 +1033,7 @@ local function APL ()
         end
       end
       -- actions.precombat+=/adrenaline_rush,precombat_seconds=1,if=talent.improved_adrenaline_rush&talent.keep_it_rolling&talent.loaded_dice
-      if S.AdrenalineRush:IsReady() and S.ImprovedAdrenalineRush:IsAvailable() and S.KeepItRolling:IsAvailable()
+      if S.AdrenalineRush:IsCastable() and S.ImprovedAdrenalineRush:IsAvailable() and S.KeepItRolling:IsAvailable()
         and S.LoadedDice:IsAvailable() then
         if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then
           return "Cast Adrenaline Rush (Opener KiR)"
@@ -1041,13 +1041,13 @@ local function APL ()
       end
       -- actions.precombat+=/roll_the_bones,precombat_seconds=1
       -- Use same extended logic as a normal rotation for between pulls
-      if S.RolltheBones:IsReady() and not Player:DebuffUp(S.Dreadblades) and (Cache.APLVar.RtB_Buffs.Total == 0 or RtB_Reroll()) then
+      if S.RolltheBones:IsCastable() and not Player:DebuffUp(S.Dreadblades) and (Cache.APLVar.RtB_Buffs.Total == 0 or RtB_Reroll()) then
         if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then
           return "Cast Roll the Bones (Opener)"
         end
       end
       -- actions.precombat+=/adrenaline_rush,precombat_seconds=0,if=talent.improved_adrenaline_rush
-      if S.AdrenalineRush:IsReady() and S.ImprovedAdrenalineRush:IsAvailable() then
+      if S.AdrenalineRush:IsCastable() and S.ImprovedAdrenalineRush:IsAvailable() then
         if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then
           return "Cast Adrenaline Rush (Opener)"
         end
