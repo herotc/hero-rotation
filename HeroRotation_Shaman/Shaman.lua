@@ -120,7 +120,7 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   Earthquake                            = MultiSpell(61882, 462620),
   FireElemental                         = Spell(198067),
   -- Talents
-  Ascendance                            = Spell(114050), -- Changes to 1219480 in 11.1
+  Ascendance                            = Spell(114050),
   EchoChamber                           = Spell(382032),
   EchooftheElementals                   = Spell(462864),
   EchooftheElements                     = Spell(333919),
@@ -174,12 +174,6 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
 })
 Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Elemental, Spell.Shaman.Farseer)
 Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Elemental, Spell.Shaman.Stormbringer)
-
--- Safety in case the 11.1 update isn't done immediately
-if TOCNum > 110007 then
-  Spell.Shaman.Elemental.Ascendance = Spell(1219480)
-  Spell.Shaman.Elemental.AscendanceBuff = Spell(1219480)
-end
 
 Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   -- Abilities
