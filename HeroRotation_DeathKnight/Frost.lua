@@ -873,7 +873,6 @@ end
 
 local function Init()
   S.FrostFeverDebuff:RegisterAuraTracking()
-  S.MarkofFyralathDebuff:RegisterAuraTracking()
 
   HR.Print("Frost Death Knight rotation has been updated for patch 11.1.0.")
 end
