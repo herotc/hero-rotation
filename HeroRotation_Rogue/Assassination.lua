@@ -667,7 +667,7 @@ local function UsableItems ()
 
   -- actions.items+=/use_item,name=junkmaestros_mega_magnet,if=cooldown.deathmark.remains>=30&!dot.deathmark.ticking
   -- &(!talent.deathstalkers_mark|buff.lingering_darkness.remains<10)|fight_remains<=10
-  if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() then
+  if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() and Player:BuffUp(S.JunkmaestrosBuff) then
     if S.Deathmark:CooldownRemains() >= 30 and not Target:DebuffUp(S.Deathmark) and (not S.DeathStalkersMark:IsAvailable()
       or Player:BuffRemains(S.LingeringDarknessBuff) < 10) or HL.BossFilteredFightRemains("<=", 10) then
       if Cast(I.JunkmaestrosMegaMagnet, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then

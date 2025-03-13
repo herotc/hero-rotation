@@ -84,6 +84,7 @@ Spell.Monk.Commons = {
   BonedustBrewBuff                      = Spell(386276),
   BonedustBrewDebuff                    = Spell(386276),
   DampenHarmBuff                        = Spell(122278),
+  JunkmaestrosBuff                      = Spell(1219661), -- Junkmaestro's Mega Magnet buff
   PressurePointBuff                     = Spell(393053),
   RushingJadeWindBuff                   = Spell(116847),
   -- Debuffs

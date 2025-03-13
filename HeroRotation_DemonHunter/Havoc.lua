@@ -253,7 +253,7 @@ local function FSCooldown()
       if Cast(I.SignetofthePriory, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "signet_of_the_priory fs_cooldown 14"; end
     end
     -- use_item,name=junkmaestros_mega_magnet,if=buff.initiative.up
-    if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() and (Player:BuffUp(S.InitiativeBuff)) then
+    if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() and Player:BuffUp(S.JunkmaestrosBuff) and (Player:BuffUp(S.InitiativeBuff)) then
       if Cast(I.JunkmaestrosMegaMagnet, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "junkmaestros_mega_magnet fs_cooldown 16"; end
     end
     -- use_item,name=geargrinders_spare_keys,if=buff.initiative.up
@@ -590,7 +590,7 @@ local function ARCooldown()
       if Cast(I.SignetofthePriory, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "signet_of_the_priory ar_cooldown 16"; end
     end
     -- use_item,name=junkmaestros_mega_magnet,if=variable.tier33_4piece&variable.double_on_use|fight_remains<10
-    if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() and (VarT334P and VarDoubleOnUse or BossFightRemains < 10) then
+    if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() and Player:BuffUp(S.JunkmaestrosBuff) and (VarT334P and VarDoubleOnUse or BossFightRemains < 10) then
       if Cast(I.JunkmaestrosMegaMagnet, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "junkmaestros_mega_magnet ar_cooldown 18"; end
     end
     -- use_item,name=geargrinders_spare_keys,if=variable.tier33_4piece&variable.double_on_use|fight_remains<10

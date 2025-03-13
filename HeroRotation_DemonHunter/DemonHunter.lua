@@ -52,6 +52,8 @@ Spell.DemonHunter.Commons = {
   SigilofSilence                        = MultiSpell(202137, 389809),
   -- Utility
   Disrupt                               = Spell(183752),
+  -- Buffs
+  JunkmaestrosBuff                      = Spell(1219661), -- Junkmaestro's Mega Magnet buff
   -- Debuffs
   SigilofFlameDebuff                    = Spell(204598),
   SigilofMiseryDebuff                   = Spell(207685),
