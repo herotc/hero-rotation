@@ -637,7 +637,7 @@ local function UsableItems ()
 
   -- actions.items+=/use_item,name=signet_of_the_priory,use_off_gcd=1,if=variable.base_trinket_condition
   if I.SignetofthePriory:IsEquippedAndReady() and BaseTrinketCondition then
-    if Cast(I.SignetOfThePriory, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+    if Cast(I.SignetofthePriory, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
       return "Signet of the Priory";
     end
   end
@@ -865,12 +865,14 @@ local function CDs ()
   -- # Use with shiv or in niche cases at the end of Kingsbane if not already up
   --actions.cds+=/thistle_tea,if=!buff.thistle_tea.up&debuff.shiv.remains>=6|!buff.thistle_tea.up&dot.kingsbane.ticking
   -- &dot.kingsbane.remains<=6|!buff.thistle_tea.up&fight_remains<=cooldown.thistle_tea.charges*6
-  if S.ThistleTea:IsCastable() and Player:BuffDown(S.ThistleTea) and Target:DebuffRemains(S.Shiv) >= 6
+  if S.ThistleTea:IsCastable() then
+    if Player:BuffDown(S.ThistleTea) and Target:DebuffRemains(S.Shiv) >= 6
       or Player:BuffDown(S.ThistleTea) and Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) <= 6
       or Player:BuffDown(S.ThistleTea) and HL.BossFilteredFightRemains("<", S.ThistleTea:Charges() * 6) then
       if Cast(S.ThistleTea, Settings.CommonsOGCD.OffGCDasOffGCD.ThistleTea) then
         return "Cast Thistle Tea"
       end
+    end
   end
 
   -- # Potion/Racials/Other misc cooldowns
