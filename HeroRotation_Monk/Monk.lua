@@ -238,6 +238,7 @@ Item.Monk.Windwalker = MergeTableByKey(Item.Monk.Commons, {
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   JunkmaestrosMegaMagnet                = Item(230189, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
+  SignetofthePriory                     = Item(219308, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
 })
 

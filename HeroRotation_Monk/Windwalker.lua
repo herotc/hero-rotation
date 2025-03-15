@@ -47,6 +47,7 @@ local OnUseExcludes = {
   I.ImperfectAscendancySerum:ID(),
   I.JunkmaestrosMegaMagnet:ID(),
   I.MadQueensMandate:ID(),
+  I.SignetofthePriory:ID(),
   I.TreacherousTransmitter:ID(),
 }
 
@@ -232,6 +233,10 @@ local function Trinkets()
     if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() and Player:BuffUp(S.JunkmaestrosBuff) and (not Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or (Trinket1:HasUseBuff() or Trinket2:HasUseBuff()) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or BossFightRemains < 5) then
       if Cast(I.JunkmaestrosMegaMagnet, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "junkmaestros_mega_magnet trinkets 8"; end
     end
+    -- signet_of_the_priory,if=pet.xuen_the_white_tiger.active|fight_remains<20
+    if I.SignetofthePriory:IsEquippedAndReady() and (Monk.Xuen.Active or BossFightRemains < 20) then
+      if Cast(I.SignetofthePriory, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "signet_of_the_priory trinkets 10"; end
+    end
     -- use_item,slot=trinket1,if=pet.xuen_the_white_tiger.active
     if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and Trinket1:HasUseBuff() and (Monk.Xuen.Active) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_items for " .. Trinket1:Name() .. " (trinkets stat_buff trinket1)"; end
@@ -250,9 +255,6 @@ local function Trinkets()
     end
   end
   -- do_treacherous_transmitter_task,if=pet.xuen_the_white_tiger.active|fight_remains<20
-  if I.TreacherousTransmitter:IsEquippedAndReady() and (Monk.Xuen.Active or BossFightRemains < 20) then
-    if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter trinkets special"; end
-  end
 end
 
 local function Cooldowns()
