@@ -216,16 +216,16 @@ local function FreeCastAvailable()
   return hotStreak or hyperthermia or furyOfTheSunKing
 end
 
--- Currently unused. Left as a commented function for potential future use.
--- local function UnitsWithIgnite(enemies)
---   local WithIgnite = 0
---   for _, CycleUnit in pairs(enemies) do
---     if CycleUnit:DebuffUp(S.IgniteDebuff) then
---       WithIgnite = WithIgnite + 1
---     end
---   end
---   return WithIgnite
--- end
+-- Function to count units affected by Ignite
+local function UnitsWithIgnite(enemies)
+  local WithIgnite = 0
+  for _, CycleUnit in pairs(enemies) do
+    if CycleUnit:DebuffUp(S.IgniteDebuff) then
+      WithIgnite = WithIgnite + 1
+    end
+  end
+  return WithIgnite
+end
 
 local function HotStreakInFlight()
   if not Player then return 0 end
@@ -667,8 +667,7 @@ local function APL()
     end
 
     -- Check how many units have ignite
-    -- Note: Currently unused. Leaving in as a comment in case we need it later.
-    --UnitsWithIgniteCount = UnitsWithIgnite(Enemies8ySplash)
+    UnitsWithIgniteCount = UnitsWithIgnite(Enemies8ySplash)
 
     -- Get our Combustion status
     CombustionUp = Player:BuffUp(S.CombustionBuff)
