@@ -12,6 +12,7 @@ local Item    = HL.Item
 local HR      = HeroRotation
 -- Spells
 local SpellProt = Spell.Paladin.Protection
+local SpellRet  = Spell.Paladin.Retribution
 -- Lua
 
 --- ============================ CONTENT ============================
@@ -78,7 +79,32 @@ ProtPalIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   end
 , 66)
 
+HL.AddCoreOverride("Player.JudgmentPower",
+  function(self)
+    local JP = 1
+    if Player:BuffUp(SpellProt.AvengingWrathBuff) or Player:BuffUp(SpellProt.SentinelBuff) then
+      JP = JP + 1
+    end
+    if Player:BuffUp(SpellProt.BastionofLightBuff) then
+      JP = JP + 2
+    end
+    return JP
+  end
+, 66)
+
 -- Retribution, ID: 70
+HL.AddCoreOverride("Player.JudgmentPower",
+  function(self)
+    local JP = 1
+    if Player:BuffUp(SpellRet.AvengingWrathBuff) then
+      JP = JP + 1
+    end
+    if Player:BuffUp(SpellRet.BastionofLightBuff) then
+      JP = JP + 2
+    end
+    return JP
+  end
+, 70)
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP",

@@ -138,6 +138,8 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   BastionofLightBuff                    = Spell(378974),
   BulwarkofRighteousFuryBuff            = Spell(386652),
   GuardianofAncientKingsBuff            = MultiSpell(86659,212641),
+  InnerResilienceBuff                   = Spell(450706), -- Tome of Light's Devotion buff
+  LuckoftheDrawBuff                     = Spell(1218114), -- TWW S2 Tier
   MomentofGloryBuff                     = Spell(327193),
   RedoubtBuff                           = Spell(280375),
   SanctificationBuff                    = Spell(424616), -- T31, 2pc
@@ -219,6 +221,7 @@ Item.Paladin.Commons = {
 }
 
 Item.Paladin.Protection = MergeTableByKey(Item.Paladin.Commons, {
+  TomeofLightsDevotion                  = Item(219309, {13, 14}),
 })
 
 Item.Paladin.Retribution = MergeTableByKey(Item.Paladin.Commons, {
