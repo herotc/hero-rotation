@@ -900,7 +900,16 @@ local function CDs ()
     -- # Default conditions for usable items.
     -- actions.cds+=/use_items,slots=trinket1,if=debuff.between_the_eyes.up|trinket.1.has_stat.any_dps|fight_remains<=20
     -- actions.cds+=/use_items,slots=trinket2,if=debuff.between_the_eyes.up|trinket.2.has_stat.any_dps|fight_remains<=20
-    local TrinketToUse, _, TrinketRange = Player:GetUseableItems(OnUseExcludes, 13) or Player:GetUseableItems(OnUseExcludes, 14)
+    local Trinket1ToUse, _, Trinket1Range = Player:GetUseableItems(OnUseExcludes, 13)
+    local Trinket2ToUse, _, Trinket2Range = Player:GetUseableItems(OnUseExcludes, 14)
+    local TrinketToUse, TrinketRange
+    if Trinket1ToUse then
+      TrinketToUse = Trinket1ToUse
+      TrinketRange = Trinket1Range
+    elseif Trinket2ToUse then
+      TrinketToUse = Trinket2ToUse
+      TrinketRange = Trinket2Range
+    end
     if TrinketToUse and (Player:BuffUp(S.BetweentheEyes) or HL.BossFilteredFightRemains("<", 20) or TrinketToUse:HasStatAnyDps()) then
       if Cast(TrinketToUse, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then
         return "Generic use_items for " .. TrinketToUse:Name()
