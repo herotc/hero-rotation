@@ -629,7 +629,15 @@ end
 local function APL()
   -- Check which cast style we should use for Fire Blast/Pyroblast
   if Settings.Fire.ShowFireBlastLeft then
-    FBCast = CastLeft
+    FBCast = function(spell, displayStyle, displayOverride, rangeCheck)
+      -- If Phoenix Flames is currently recommended, don't show Fire Blast
+      if S.PhoenixFlames:IsCastable() and
+         (S.PhoenixFlames:CooldownUp() or S.PhoenixFlames:Charges() > 0) and
+         Target:IsSpellInRange(S.PhoenixFlames) then
+        return false
+      end
+      return CastLeft(spell)
+    end
   else
     FBCast = Cast
   end
