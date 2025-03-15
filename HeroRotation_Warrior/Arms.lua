@@ -739,7 +739,7 @@ local function SlayerSweep()
     if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar slayer_sweep 6"; end
   end
   -- sweeping_strikes
-  if CDsON() and S.SweepingStrikes:IsCastable() then
+  if S.SweepingStrikes:IsCastable() then
     if Cast(S.SweepingStrikes, Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes slayer_sweep 8"; end
   end
   -- rend,if=dot.rend.remains<=gcd
