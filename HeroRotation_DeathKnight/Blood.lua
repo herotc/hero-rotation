@@ -199,7 +199,10 @@ end
 
 local function Sequence()
   -- sequence,name=drw_bp:blood_boil
-  -- TODO
+  -- Note: DRW can apply BP, so we want to force the application.
+  if S.BloodBoil:IsCastable() and (Player:BuffUp(S.DancingRuneWeaponBuff) and S.BloodBoil:TimeSinceLastCast() > S.DancingRuneWeapon:TimeSinceLastCast()) then
+    if Cast(S.BloodBoil, nil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil sequence 2"; end
+  end
 end
 
 local function Deathbringer()
@@ -498,7 +501,7 @@ local function APL()
     end
     -- auto_attack
     -- restart_sequence,name=drw_bp,if=cooldown.dancing_rune_weapon.remains<10
-    -- TODO
+    -- Note: Used by Simulationcraft, but unnecessary here.
     -- use_item,name=tome_of_lights_devotion,if=buff.inner_resilience.up
     if I.TomeofLightsDevotion:IsEquippedAndReady() and Player:BuffUp(S.InnerResilienceBuff) then
       if Cast(I.TomeofLightsDevotion, Settings.CommonsDS.DisplayStyle.Trinkets) then return "tome_of_lights_devotion main 2"; end
