@@ -133,6 +133,7 @@ Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
   Heartbreaker                          = Spell(221536),
   Marrowrend                            = Spell(195182),
   RuneTap                               = Spell(194679),
+  ShatteringBone                        = Spell(377640),
   Tombstone                             = Spell(219809),
   VampiricBlood                         = Spell(55233),
   -- Buffs
@@ -181,7 +182,6 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   RemorselessWinter                     = Spell(196770),
   ShatteredFrost                        = Spell(455993),
   ShatteringBlade                       = Spell(207057),
-  ShatteringBone                        = Spell(377640),
   SmotheringOffense                     = Spell(435005),
   TheLongWinter                         = Spell(456240),
   UnleashedFrenzy                       = Spell(376905),
