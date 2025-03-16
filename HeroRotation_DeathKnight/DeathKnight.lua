@@ -140,6 +140,7 @@ Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
   CoagulopathyBuff                      = Spell(391481),
   ConsumptionBuff                       = Spell(274156),
   DancingRuneWeaponBuff                 = Spell(81256),
+  InnerResilienceBuff                   = Spell(450706), -- Tome of Light's Devotion buff
   HemostasisBuff                        = Spell(273947),
   IceboundFortitudeBuff                 = Spell(48792),
   RuneTapBuff                           = Spell(194679),
@@ -180,6 +181,7 @@ Spell.DeathKnight.Frost = MergeTableByKey(Spell.DeathKnight.Commons, {
   RemorselessWinter                     = Spell(196770),
   ShatteredFrost                        = Spell(455993),
   ShatteringBlade                       = Spell(207057),
+  ShatteringBone                        = Spell(377640),
   SmotheringOffense                     = Spell(435005),
   TheLongWinter                         = Spell(456240),
   UnleashedFrenzy                       = Spell(376905),
@@ -257,6 +259,8 @@ Item.DeathKnight.Commons = {
 }
 
 Item.DeathKnight.Blood = MergeTableByKey(Item.DeathKnight.Commons, {
+  -- TWW Trinkets
+  TomeofLightsDevotion                  = Item(219309, {13, 14}),
 })
 
 Item.DeathKnight.Frost = MergeTableByKey(Item.DeathKnight.Commons, {
