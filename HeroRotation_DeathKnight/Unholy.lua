@@ -59,6 +59,7 @@ local VarApocTiming
 local VarPopWounds
 local VarPoolingRunicPower
 local VarSpendRP
+local VarSanCoilMult
 local VarEpidemicTargets
 local VarAbomActive, VarAbomRemains
 local VarApocGhoulActive, VarApocGhoulRemains
@@ -892,8 +893,10 @@ local function Variables()
   VarPoolingRunicPower = S.VileContagion:IsAvailable() and S.VileContagion:CooldownRemains() < 5 and Player:RunicPower() < 30
   -- variable,name=spend_rp,op=setif,value=1,value_else=0,condition=(!talent.rotten_touch|talent.rotten_touch&!debuff.rotten_touch.up|runic_power.deficit<20)&((talent.improved_death_coil&(active_enemies=2|talent.coil_of_devastation)|rune<3|pet.gargoyle.active|buff.sudden_doom.react|!variable.pop_wounds&debuff.festering_wound.stack>=4))
   VarSpendRP = (not S.RottenTouch:IsAvailable() or S.RottenTouch:IsAvailable() and Target:DebuffDown(S.RottenTouchDebuff) or Player:RunicPowerDeficit() < 20) and (S.ImprovedDeathCoil:IsAvailable() and (ActiveEnemies == 2 or S.CoilofDevastation:IsAvailable()) or Player:Rune() < 3 or VarGargActive or Player:BuffUp(S.SuddenDoomBuff) or not VarPopWounds and FesterStacks >= 4)
-  -- variable,name=epidemic_targets,value=3+talent.improved_death_coil+(talent.frenzied_bloodthirst&buff.essence_of_the_blood_queen.stack>5)+(talent.hungering_thirst&talent.harbinger_of_doom&buff.sudden_doom.up)
-  VarEpidemicTargets = 3 + num(S.ImprovedDeathCoil:IsAvailable()) + num(S.FrenziedBloodthirst:IsAvailable() and Player:BuffStack(S.EssenceoftheBloodQueenBuff) > 5) + num(S.HungeringThirst:IsAvailable() and S.HarbingerofDoom:IsAvailable() and Player:BuffUp(S.SuddenDoomBuff))
+  -- variable,name=san_coil_mult,op=setif,value=2,value_else=1,condition=buff.essence_of_the_blood_queen.stack>=4
+  VarSanCoilMult = (Player:BuffStack(S.EssenceoftheBloodQueenBuff) >= 4) and 2 or 1
+  -- variable,name=epidemic_targets,value=3+talent.improved_death_coil+(talent.frenzied_bloodthirst*variable.san_coil_mult)+(talent.hungering_thirst&talent.harbinger_of_doom&buff.sudden_doom.up)
+  VarEpidemicTargets = 3 + num(S.ImprovedDeathCoil:IsAvailable()) + num(S.FrenziedBloodthirst:IsAvailable() and VarSanCoilMult) + num(S.HungeringThirst:IsAvailable() and S.HarbingerofDoom:IsAvailable() and Player:BuffUp(S.SuddenDoomBuff))
 end
 
 --- ===== APL Main =====
