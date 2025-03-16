@@ -197,14 +197,6 @@ local function Defensives()
   end
 end
 
-local function Sequence()
-  -- sequence,name=drw_bp:blood_boil
-  -- Note: DRW can apply BP, so we want to force the application.
-  if S.BloodBoil:IsCastable() and (Player:BuffUp(S.DancingRuneWeaponBuff) and S.BloodBoil:TimeSinceLastCast() > S.DancingRuneWeapon:TimeSinceLastCast()) then
-    if Cast(S.BloodBoil, nil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil sequence 2"; end
-  end
-end
-
 local function Deathbringer()
   -- rune_tap,if=rune>2
   -- Note: Handled in Defensives().
@@ -276,53 +268,53 @@ local function Deathbringer()
   if CDsON() and S.AbominationLimb:IsCastable() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
     if Cast(S.AbominationLimb, nil, Settings.CommonsDS.DisplayStyle.AbominationLimb, not Target:IsInRange(20)) then return "abomination_limb deathbringer 22"; end
   end
-  -- call_action_list,name=sequence,if=buff.dancing_rune_weapon.up&cooldown.blood_boil.charges>=1
-  if Player:BuffUp(S.DancingRuneWeaponBuff) and S.BloodBoil:Charges() >= 1 then
-    local ShouldReturn = Sequence(); if ShouldReturn then return ShouldReturn; end
+  -- blood_boil,if=pet.dancing_rune_weapon.active&!drw.bp_ticking
+  if S.BloodBoil:IsCastable() and (Player:BuffUp(S.DancingRuneWeaponBuff) and not Player:DRWBPTicking()) then
+    if Cast(S.BloodBoil, nil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil deathbringer 24"; end
   end
   -- any_dnd,if=!buff.death_and_decay.remains
   if S.DeathAndDecay:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff)) then
-    if Cast(S.DeathAndDecay, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "death_and_decay deathbringer 24"; end
+    if Cast(S.DeathAndDecay, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "death_and_decay deathbringer 26"; end
   end
   -- blooddrinker,if=!buff.dancing_rune_weapon.up&active_enemies<=2&buff.coagulopathy.remains>3
   if S.Blooddrinker:IsReady() and (Player:BuffDown(S.DancingRuneWeaponBuff) and EnemiesMeleeCount <= 2 and Player:BuffRemains(S.CoagulopathyBuff) > 3) then
-    if Cast(S.Blooddrinker, nil, nil, not Target:IsSpellInRange(S.Blooddrinker)) then return "blooddrinker deathbringer 26"; end
+    if Cast(S.Blooddrinker, nil, nil, not Target:IsSpellInRange(S.Blooddrinker)) then return "blooddrinker deathbringer 28"; end
   end
   -- death_strike
   if S.DeathStrike:IsReady() then
-    if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike deathbringer 28"; end
+    if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not Target:IsSpellInRange(S.DeathStrike)) then return "death_strike deathbringer 30"; end
   end
   -- consumption
   if S.Consumption:IsCastable() then
-    if Cast(S.Consumption, nil, Settings.Blood.DisplayStyle.Consumption, not Target:IsSpellInRange(S.Consumption)) then return "consumption deathbringer 30"; end
+    if Cast(S.Consumption, nil, Settings.Blood.DisplayStyle.Consumption, not Target:IsSpellInRange(S.Consumption)) then return "consumption deathbringer 32"; end
   end
   -- blood_boil,if=charges_fractional>=1.5
   if S.BloodBoil:IsCastable() and (S.BloodBoil:ChargesFractional() >= 1.5) then
-    if Cast(S.BloodBoil, nil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil deathbringer 32"; end
+    if Cast(S.BloodBoil, nil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil deathbringer 34"; end
   end
   -- heart_strike,if=rune>=1|rune.time_to_2<gcd
   if HSAction:IsReady() and (Player:Rune() >= 1 or Player:RuneTimeToX(2) < Player:GCD()) then
-    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike deathbringer 34"; end
+    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike deathbringer 36"; end
   end
   -- blood_boil
   if S.BloodBoil:IsCastable() then
-    if Cast(S.BloodBoil, nil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil deathbringer 36"; end
+    if Cast(S.BloodBoil, nil, nil, not Target:IsInMeleeRange(10)) then return "blood_boil deathbringer 38"; end
   end
   -- heart_strike
   if HSAction:IsReady() then
-    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike deathbringer 38"; end
+    if Cast(S.HeartStrike, nil, nil, not Target:IsSpellInRange(S.HeartStrike)) then return "heart_strike deathbringer 40"; end
   end
   -- soul_reaper,if=buff.reaper_of_souls.up
   if S.SoulReaper:IsReady() and (Player:BuffUp(S.ReaperofSoulsBuff)) then
-    if Cast(S.SoulReaper, nil, nil, not Target:IsInMeleeRange(5)) then return "soul_reaper deathbringer 40"; end
+    if Cast(S.SoulReaper, nil, nil, not Target:IsInMeleeRange(5)) then return "soul_reaper deathbringer 42"; end
   end
   -- arcane_torrent,if=runic_power.deficit>20
   if CDsON() and S.ArcaneTorrent:IsCastable() and (Player:RunicPowerDeficit() > 20) then
-    if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "arcane_torrent deathbringer 42"; end
+    if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "arcane_torrent deathbringer 44"; end
   end
   -- deaths_caress,if=buff.bone_shield.stack<11
   if S.DeathsCaress:IsReady() and (VarBoneShieldStacks < 11) then
-    if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress deathbringer 44"; end
+    if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress deathbringer 46"; end
   end
 end
 
@@ -500,8 +492,6 @@ local function APL()
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool During Blooddrinker"; end
     end
     -- auto_attack
-    -- restart_sequence,name=drw_bp,if=cooldown.dancing_rune_weapon.remains<10
-    -- Note: Used by Simulationcraft, but unnecessary here.
     -- use_item,name=tome_of_lights_devotion,if=buff.inner_resilience.up
     if I.TomeofLightsDevotion:IsEquippedAndReady() and Player:BuffUp(S.InnerResilienceBuff) then
       if Cast(I.TomeofLightsDevotion, Settings.CommonsDS.DisplayStyle.Trinkets) then return "tome_of_lights_devotion main 2"; end
