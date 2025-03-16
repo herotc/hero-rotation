@@ -487,6 +487,10 @@ local function SlayerAoE()
   if S.ThunderClap:IsReady() and (Target:DebuffDown(S.RendDebuff)) then
     if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap slayer_aoe 4"; end
   end
+  -- sweeping_strikes
+  if S.SweepingStrikes:IsCastable() then
+    if Cast(S.SweepingStrikes, Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes slayer_aoe 5"; end
+  end
   -- thunderous_roar
   if CDsON() and S.ThunderousRoar:IsCastable() then
     if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar slayer_aoe 6"; end
