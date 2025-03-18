@@ -25,6 +25,8 @@ local bool                  = HR.Commons.Everyone.bool
 -- lua
 local mathmax               = math.max
 local mathmin               = math.min
+-- WoW API
+local Delay                 = C_Timer.After
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
