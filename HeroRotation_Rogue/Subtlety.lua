@@ -268,9 +268,9 @@ local function Finish (ReturnSpellOnly, ForceStealth)
     end
   end
 
-  -- rupture,if=talent.unseen_blade&cooldown.flagellation.remains<=8&dot.rupture.remains<=cooldown.flagellation.remains+20
+  -- actions.finish+=/rupture,if=talent.unseen_blade&cooldown.flagellation.remains<10
   if S.Rupture:IsReady() then
-    if S.UnseenBlade:IsAvailable() and S.Flagellation:CooldownRemains() <= 8 and Target:DebuffRemains(S.Rupture) <= S.Flagellation:CooldownRemains() + 20 then
+    if S.UnseenBlade:IsAvailable() and S.Flagellation:CooldownRemains() < 10 then
       if ReturnSpellOnly then
         return S.Rupture
       else
@@ -282,8 +282,8 @@ local function Finish (ReturnSpellOnly, ForceStealth)
   end
 
   -- # Direct Damage Finisher
-  -- actions.finish+=/coup_de_grace,if=debuff.fazed.up
-  if S.CoupDeGrace:IsCastable() and Target:DebuffUp(S.FazedDebuff) then
+  -- actions.finish+=/coup_de_grace,if=debuff.fazed.up&cooldown.flagellation.remains>=20
+  if S.CoupDeGrace:IsCastable() and Target:DebuffUp(S.FazedDebuff) and S.Flagellation:CooldownRemains() >= 20 then
     if ReturnSpellOnly then
       return S.CoupDeGrace
     else
@@ -293,13 +293,13 @@ local function Finish (ReturnSpellOnly, ForceStealth)
     end
   end
 
-  -- actions.finish+=/black_powder,if=!variable.priority_rotation&variable.maintenance
-  -- &((variable.targets>=2&talent.deathstalkers_mark&(!buff.darkest_night.up|buff.shadow_dance.up
-  -- &variable.targets>=5))|talent.unseen_blade&variable.targets>=7)
+  -- actions.finish+=/black_powder,if=!variable.priority_rotation&variable.maintenance&(((variable.targets>=2
+  -- &talent.deathstalkers_mark&(!buff.darkest_night.up|buff.shadow_dance.up&variable.targets>=5))
+  -- |talent.unseen_blade&variable.targets>=7)|action.coup_de_grace.ready)
   if S.BlackPowder:IsCastable() then
-    if not PriorityRotation and Maintenance and ((MeleeEnemies10yCount >= 2 and S.DeathStalkersMark:IsAvailable()
+    if not PriorityRotation and Maintenance and (((MeleeEnemies10yCount >= 2 and S.DeathStalkersMark:IsAvailable()
     and (Player:BuffDown(S.DarkestNightBuff) or Player:BuffUp(S.ShadowDanceBuff) and MeleeEnemies10yCount >= 5))
-    or S.UnseenBlade:IsAvailable() and MeleeEnemies10yCount >= 7) then
+    or S.UnseenBlade:IsAvailable() and MeleeEnemies10yCount >= 7) or S.CoupDeGrace:IsReady()) then
       if ReturnSpellOnly then
         return S.BlackPowder
       else
@@ -326,6 +326,30 @@ end
 
 -- # Builders
 local function Build (ReturnSpellOnly, ForceStealth)
+  -- actions.build=backstab,if=buff.shadow_dance.up&!used_for_danse|!variable.stealth&buff.shadow_blades.up
+  if S.Backstab:IsReady() and Player:BuffUp(S.ShadowDanceBuff) and not Used_For_Danse(S.Backstab)
+    or not Stealth and Player:BuffUp(S.ShadowBlades) then
+    if ReturnSpellOnly then
+      return S.Backstab
+    else
+      if CastPooling(S.Backstab, nil, not Target:IsSpellInRange(S.Backstab)) then
+        return "Cast Backstab"
+      end
+    end
+  end
+
+  -- actions.build+=/gloomblade,if=buff.shadow_dance.up&!used_for_danse|!variable.stealth&buff.shadow_blades.up
+  if S.Gloomblade:IsReady() and Player:BuffUp(S.ShadowDanceBuff) and not Used_For_Danse(S.Gloomblade)
+    or not Stealth and Player:BuffUp(S.ShadowBlades) then
+    if ReturnSpellOnly then
+      return S.Gloomblade
+    else
+      if CastPooling(S.Gloomblade, nil, not Target:IsSpellInRange(S.Gloomblade)) then
+        return "Cast Gloomblade"
+      end
+    end
+  end
+
   -- actions.build=shadowstrike,cycle_targets=1,if=debuff.find_weakness.remains<=2&variable.targets=2
   -- &talent.unseen_blade|!used_for_danse&!talent.premeditation
   if S.Shadowstrike:IsReady() and HR.AoEON() and Player:StealthUp(true, false) then
@@ -355,9 +379,9 @@ local function Build (ReturnSpellOnly, ForceStealth)
     end
   end
 
-  -- actions.build+=/shuriken_storm,if=buff.clear_the_witnesses.up&variable.targets>=2
+  -- actions.build+=/shuriken_storm,if=buff.clear_the_witnesses.up&(variable.targets>=2|!buff.symbols_of_death.up)
   if S.ShurikenStorm:IsReady() and not ForceStealth and HR.AoEON() then
-    if Player:BuffUp(S.ClearTheWitnessesBuff) and MeleeEnemies10yCount >= 2 then
+    if Player:BuffUp(S.ClearTheWitnessesBuff) and (MeleeEnemies10yCount >= 2 or Player:BuffDown(S.SymbolsofDeath)) then
       if ReturnSpellOnly then
         return S.ShurikenStorm
       else
@@ -381,20 +405,28 @@ local function Build (ReturnSpellOnly, ForceStealth)
     end
   end
 
-  -- actions.build+=/shuriken_storm,if=talent.deathstalkers_mark&!buff.premeditation.up&variable.targets>=(2+3*buff.shadow_dance.up)
-  -- |buff.clear_the_witnesses.up&!buff.symbols_of_death.up|buff.flawless_form.up&variable.targets>=3&!variable.stealth
-  -- |talent.unseen_blade&buff.the_rotten.stack=1&variable.targets>=5&buff.shadow_dance.up
-  if S.ShurikenStorm:IsReady() and not ForceStealth and HR.AoEON() then
-    if S.DeathStalkersMark:IsAvailable() and not Player:BuffUp(S.PremeditationBuff)
-      and MeleeEnemies10yCount >= (2 + 3 * num(Player:BuffUp(S.ShadowDanceBuff))) or Player:BuffUp(S.ClearTheWitnessesBuff)
-      and not Player:BuffUp(S.SymbolsofDeath) or Player:BuffUp(S.FlawlessFormBuff) and MeleeEnemies10yCount >= 3 and not Stealth
-      or S.UnseenBlade:IsAvailable() and Player:BuffStack(S.TheRottenBuff) == 1 and MeleeEnemies10yCount >= 7 and Player:BuffUp(S.ShadowDanceBuff) then
-      if ReturnSpellOnly then
-        return S.ShurikenStorm
-      else
-        if CastPooling(S.ShurikenStorm) then
-          return "Cast ShurikenStorm"
-        end
+  -- actions.build+=/shuriken_storm,if=talent.deathstalkers_mark&variable.targets>=(2+3*buff.shadow_dance.up)
+  if S.ShurikenStorm:IsReady() and not ForceStealth and HR.AoEON()
+    and S.DeathStalkersMark:IsAvailable() and MeleeEnemies10yCount >= (2 + 3 * num(Player:BuffUp(S.ShadowDanceBuff))) then
+    if ReturnSpellOnly then
+      return S.ShurikenStorm
+    else
+      if CastPooling(S.ShurikenStorm) then
+        return "Cast ShurikenStorm"
+      end
+    end
+  end
+
+  -- actions.build+=/shuriken_storm,if=talent.unseen_blade&(buff.flawless_form.up&variable.targets>=3
+  -- &!variable.stealth|buff.the_rotten.stack=1&variable.targets>=7&buff.shadow_dance.up)
+  if S.ShurikenStorm:IsReady() and not ForceStealth and HR.AoEON() and S.UnseenBlade:IsAvailable()
+  and (Player:BuffUp(S.FlawlessFormBuff) and MeleeEnemies10yCount >= 3 and not Stealth
+    or Player:BuffStack(S.TheRottenBuff) == 1 and MeleeEnemies10yCount >= 7 and Player:BuffUp(S.ShadowDanceBuff)) then
+    if ReturnSpellOnly then
+      return S.ShurikenStorm
+    else
+      if CastPooling(S.ShurikenStorm) then
+        return "Cast ShurikenStorm"
       end
     end
   end
@@ -770,13 +802,13 @@ local function APL ()
 
   Stealth = Player:StealthUp(true, false)
 
-  -- actions+=/variable,name=skip_rupture,value=buff.shadow_dance.up|!buff.slice_and_dice.up|buff.darkest_night.up|
-  -- variable.targets>=8&!talent.replicating_shadows&talent.unseen_blade
-  SkipRupture = Player:BuffUp(S.ShadowDanceBuff) or Player:BuffDown(S.SliceandDice) or Player:BuffUp(S.DarkestNightBuff)
+  -- actions+=/variable,name=skip_rupture,value=buff.shadow_dance.up|buff.darkest_night.up|variable.targets>=8
+    -- &!talent.replicating_shadows&talent.unseen_blade
+  SkipRupture = Player:BuffUp(S.ShadowDanceBuff) or Player:BuffUp(S.DarkestNightBuff)
     or MeleeEnemies10yCount >= 8 and not S.ReplicatingShadows:IsAvailable() and S.UnseenBlade:IsAvailable()
 
-  -- actions+=/variable,name=maintenance,value=(dot.rupture.ticking|variable.skip_rupture)&buff.slice_and_dice.up
-  Maintenance = (Target:DebuffUp(S.Rupture) or SkipRupture) and Player:BuffUp(S.SliceandDice)
+  -- actions+=/variable,name=maintenance,value=(dot.rupture.ticking|variable.skip_rupture)
+  Maintenance = (Target:DebuffUp(S.Rupture) or SkipRupture)
 
   -- actions+=/variable,name=secret,value=buff.shadow_dance.up|(cooldown.flagellation.remains<40&cooldown.flagellation.remains>20&talent.death_perception)
   Secret = Player:BuffUp(S.ShadowDanceBuff) or (S.Flagellation:CooldownRemains() < 40 and S.Flagellation:CooldownRemains() > 20 and S.DeathPerception:IsAvailable())
