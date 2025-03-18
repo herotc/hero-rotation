@@ -235,12 +235,15 @@ local function RtB_Reroll(ForceLoadedDice)
       Cache.APLVar.RtB_Reroll = Player:HasTier("TWW2", 4) and Cache.APLVar.RtB_Buffs.Will_Lose.Total <= 1 and (Cache.APLVar.RtB_Buffs.BuffsAbovePandemic < 5
         or Cache.APLVar.RtB_Buffs.MaxRemains <= 42)
 
-      -- # With TWW2 set, recast Roll the Bones with at most 2 buffs active regardless of duration, or if we will roll
-      -- away between 0-4 buffs and all buffs are within 10s remaining.
-      -- actions.cds+=/roll_the_bones,if=set_bonus.tww2_4pc&(rtb_buffs<=2|rtb_buffs.max_remains<11&rtb_buffs.will_lose<5)
+      -- # With TWW2 set, recast Roll the Bones with at most 2 buffs active regardless of duration.
+      -- Supercharger builds will also roll if we will lose between 0-4 buffs, but KIR Supercharger builds wait until
+      -- they are all below 11s remaining.
+      -- actions.cds+=/roll_the_bones,if=set_bonus.tww2_4pc&(rtb_buffs<=2|(rtb_buffs.max_remains<11|!talent.keep_it_rolling)
+        -- &rtb_buffs.will_lose<5&talent.supercharger)
       if not Cache.APLVar.RtB_Reroll then
-        Cache.APLVar.RtB_Reroll = Player:HasTier("TWW2", 4) and (Cache.APLVar.RtB_Buffs.Total <= 2 or
-          Cache.APLVar.RtB_Buffs.MaxRemains < 11 and Cache.APLVar.RtB_Buffs.Will_Lose.Total < 5)
+        Cache.APLVar.RtB_Reroll = Player:HasTier("TWW2", 4) and (Cache.APLVar.RtB_Buffs.Total <= 2
+          or (Cache.APLVar.RtB_Buffs.MaxRemains < 11 or not S.KeepItRolling:IsAvailable())
+            and Cache.APLVar.RtB_Buffs.Will_Lose.Total < 5 and S.Supercharger:IsAvailable())
       end
 
       -- # Without TWW2 set or Sleight of Hand, recast Roll the Bones to override 1 buff into 2 buffs with Loaded Dice,
@@ -363,13 +366,12 @@ local function Stealth(ReturnSpellOnly)
 end
 
 local function Finish(ReturnSpellOnly)
-  -- # Use Between the Eyes to keep the crit buff up, but on cooldown if Improved/Greenskins, and avoid overriding Greenskins
-  -- actions.finish=between_the_eyes,if=!talent.crackshot
-  -- &(buff.between_the_eyes.remains<4|talent.improved_between_the_eyes|talent.greenskins_wickers)
-  -- &!buff.greenskins_wickers.up
-  if S.BetweentheEyes:IsCastable() and not S.Crackshot:IsAvailable()
-    and (Player:BuffRemains(S.BetweentheEyes) < 4 or S.ImprovedBetweenTheEyes:IsAvailable()
-    or (S.GreenskinsWickers:IsAvailable() and Player:BuffDown(S.GreenskinsWickers))) then
+  -- # Use Between the Eyes outside of Stealth to maintain the buff, or with Ruthless Precision active,
+  -- or to proc Greenskins Wickers if not active. Trickster builds can also send BtE on cooldown.
+  -- actions.finish=between_the_eyes,if=(buff.ruthless_precision.up|buff.between_the_eyes.remains<4|!talent.mean_streak)
+  -- &(!buff.greenskins_wickers.up|!talent.greenskins_wickers)
+  if S.BetweentheEyes:IsCastable() and (Player:BuffUp(S.RuthlessPrecision) or Player:BuffRemains(S.BetweentheEyes) < 4 or
+    not S.MeanStreak:IsAvailable()) and (Player:BuffDown(S.GreenskinsWickersBuff) or not S.GreenskinsWickers:IsAvailable()) then
     if ReturnSpellOnly then
       return S.BetweentheEyes
     else
@@ -506,18 +508,15 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
 end
 
 function StealthCDs (ReturnSpellOnly)
-  -- # Main stealth cds list for builds using all of Underhanded Upper Hand, Crackshot and Subterfuge.
-  -- These builds only use vanish while not already in stealth, when finish condition is active and adrenaline rush is up.
-  -- Trickster builds also need to use Coup de Grace if available before vanishing.
-  -- These rules are checked where the list is called since they are common fro all the following vanish conditions
+  -- # Vanish usage for builds using Underhanded Upper Hand, Crackshot and Subterfuge.
 
-  -- # If not using killing spree, vanish if Between the Eyes is on cooldown and Ruthless Precision is up.
-  -- If playing KIR, only do this if KIR has > 150s left on CD and you have already done the roll after pressing KIR
-  -- actions.stealth_cds=vanish,if=!talent.killing_spree&!cooldown.between_the_eyes.ready&buff.ruthless_precision.remains>4
-  -- &(cooldown.keep_it_rolling.remains>150&rtb_buffs.normal>0|!talent.supercharger)
+  -- # Without Killing Spree, attempt to hold Vanish for when BtE is on cooldown and Ruthless Precision is active.
+  -- Also with Keep it Rolling, hold Vanish if we haven't done the first roll after KIR yet.
+  -- actions.vanish_usage=vanish,if=!talent.killing_spree&!cooldown.between_the_eyes.ready&buff.ruthless_precision.remains>4
+  -- &(cooldown.keep_it_rolling.remains>150&rtb_buffs.normal>0|!talent.keep_it_rolling)
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if not S.KillingSpree:IsAvailable() and not S.BetweentheEyes:IsReady() and Player:BuffRemains(S.RuthlessPrecision) > 4
-      and (S.KeepItRolling:CooldownRemains() > 150 and Cache.APLVar.RtB_Buffs.Normal > 0 or not S.Supercharger:IsAvailable()) then
+      and (S.KeepItRolling:CooldownRemains() > 150 and Cache.APLVar.RtB_Buffs.Normal > 0 or not S.KeepItRolling:IsAvailable()) then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
         if ReturnSpellOnly then
@@ -528,8 +527,8 @@ function StealthCDs (ReturnSpellOnly)
     end
   end
 
-  -- # Vanish if Adrenaline Rush is about to run out unless remaining cooldown on adrenaline rush is less than 10 sec or available
-  -- actions.stealth_cds=vanish,if=buff.adrenaline_rush.remains<3&cooldown.adrenaline_rush.remains>10
+  -- # Vanish to prevent Adrenaline Rush downtime.
+  -- actions.vanish_usage+=/vanish,if=buff.adrenaline_rush.remains<3&cooldown.adrenaline_rush.remains>10
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if Player:BuffRemains(S.AdrenalineRush) < 3 and S.AdrenalineRush:CooldownRemains() > 10 then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
@@ -542,8 +541,8 @@ function StealthCDs (ReturnSpellOnly)
     end
   end
 
-  -- # Supercharger builds that do not use killing spree should vanish with the supercharger buff up
-  -- actions.stealth_cds=vanish,if=!talent.killing_spree&buff.supercharge_1.up
+  -- # Supercharger builds that do not use Killing Spree should Vanish if Supercharger is active.
+  -- actions.vanish_usage+=/vanish,if=!talent.killing_spree&buff.supercharge_1.up
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if not S.KillingSpree:IsAvailable() and ChargedComboPoints > 0 then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
@@ -556,8 +555,8 @@ function StealthCDs (ReturnSpellOnly)
     end
   end
 
-  -- # Killing spree builds can vanish any time killing spree is on cd, preferably with at least 15s left on the cd
-  -- actions.stealth_cds=vanish,if=cooldown.killing_spree.remains>15
+  -- # Builds with Killing Spree can freely Vanish if KS is not up soon.
+  -- actions.vanish_usage+=/vanish,if=cooldown.killing_spree.remains>15
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
     if S.KillingSpree:CooldownRemains() > 15 then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
@@ -570,10 +569,10 @@ function StealthCDs (ReturnSpellOnly)
     end
   end
 
-  -- # Vanish if about to cap on vanish charges
-  -- actions.stealth_cds=vanish,if=cooldown.vanish.full_recharge_time<15
+  -- # Vanish if about to cap on charges or fight is ending.
+  -- actions.vanish_usage+=/vanish,if=cooldown.vanish.full_recharge_time<15|fight_remains<8
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
-    if S.Vanish:FullRechargeTime() < 15 then
+    if S.Vanish:FullRechargeTime() < 15 or HL.BossFilteredFightRemains("<", 8) then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
         if ReturnSpellOnly then
@@ -581,27 +580,6 @@ function StealthCDs (ReturnSpellOnly)
         end
         return "Vanish Macro 5 " .. ShouldReturn
       end
-    end
-  end
-
-  -- # Vanish if fight is about to end
-  -- actions.stealth_cds=vanish,if=fight_remains<8
-  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
-    if HL.BossFilteredFightRemains("<", 8) then
-      ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
-      if ShouldReturn then
-        if ReturnSpellOnly then
-          return { S.Vanish, ShouldReturn }
-        end
-        return "Vanish Macro 6 " .. ShouldReturn
-      end
-    end
-  end
-
-  -- actions.stealth_cds+=/shadowmeld,if=variable.finish_condition&!cooldown.vanish.ready
-  if S.Shadowmeld:IsAvailable() and S.Shadowmeld:IsReady() and Finish_Condition() and not S.Vanish:IsReady() then
-    if Cast(S.Shadowmeld, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then
-      return "Cast Shadowmeld"
     end
   end
 end
@@ -697,12 +675,12 @@ local function StealthCDs_2 (ReturnSpellOnly)
 end
 
 local function CDs ()
-  -- # Use Adrenaline rush if the buff is missing unless you can finish or with 2 or less cp if loaded dice is missing
+  -- # Maintain Adrenaline Rush. Recast while already active if using Improved ADR and at low CPs.
   -- actions.cds=adrenaline_rush,if=!buff.adrenaline_rush.up&(!variable.finish_condition|!talent.improved_adrenaline_rush)
-  -- |talent.improved_adrenaline_rush&combo_points<=2&!buff.loaded_dice.up
+  -- |talent.improved_adrenaline_rush&combo_points<=2
   if CDsON() and S.AdrenalineRush:IsCastable()
     and (not Player:BuffUp(S.AdrenalineRush) and (not Finish_Condition() or not S.ImprovedAdrenalineRush:IsAvailable())
-    or S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2 and not Player:BuffUp(S.LoadedDiceBuff)) then
+    or S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2) then
     if S.ImprovedAdrenalineRush:IsAvailable() then
       ShouldReturn = SpellQueueMacro(S.AdrenalineRush)
       if ShouldReturn then
@@ -733,7 +711,7 @@ local function CDs ()
     end
   end
 
-  -- # With Deft Maneuvers, use Blade Flurry on cooldown at 5+ targets, or at 3-4 targets if missing combo points equal to the amount given
+  -- # With Deft Maneuvers, use Blade Flurry on cooldown at 5+ targets, or at 3-4 targets if missing combo points equal to the amount it would grant.
   -- action.cds/blade_flurry,if=talent.deft_maneuvers&!variable.finish_condition&(spell_targets>=3
   -- &combo_points.deficit=spell_targets+buff.broadside.up|spell_targets>=5)
   if S.BladeFlurry:IsCastable() then
@@ -755,24 +733,22 @@ local function CDs ()
     end
   end
 
-  -- # Without a natural 5 buff roll, use Keep it Rolling at 4+ buffs, unless you only have one of BS/RP/TB,
-  -- then wait until the last second in an attempt to obtain the others from Count the Odds.
-  --actions.cds+=/keep_it_rolling,if=rtb_buffs>=4&rtb_buffs.normal<=2&(rtb_buffs.min_remains<1|(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up>=2))
-  if S.KeepItRolling:IsCastable() and Cache.APLVar.RtB_Buffs.Total >= 4
-    and (Cache.APLVar.RtB_Buffs.MinRemains < 3 or (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing)) >= 2))
-    and Cache.APLVar.RtB_Buffs.Normal <= 2 then
+  -- # Without a natural 5 buff roll, use Keep it Rolling at 3 buffs if you have the combination of Ruthless Precision + Broadside + True Bearing.
+  -- actions.cds+=/keep_it_rolling,if=rtb_buffs>=3&rtb_buffs.normal<=2&buff.broadside.up&buff.ruthless_precision.up&buff.true_bearing.up
+
+
+  -- # Without a natural 5 buff roll, use Keep it Rolling at 4+ buffs
+  -- actions.cds+=/keep_it_rolling,if=rtb_buffs>=4&rtb_buffs.normal<=2
+  if S.KeepItRolling:IsCastable() and Cache.APLVar.RtB_Buffs.Total >= 4 and Cache.APLVar.RtB_Buffs.Normal <= 2 then
     if Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then
       return "Cast Keep it Rolling"
     end
   end
 
-  -- # Without a natural 5 buff roll, use Keep it Rolling at 3+ buffs if you have at least two of BS/RP/TB.
-  -- If missing one of those three buffs, then wait until the last second in an attempt to obtain it from Count the Odds.
-  --actions.cds+=/keep_it_rolling,if=rtb_buffs>=3&rtb_buffs.normal<=2&(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up>=2)
-  -- &(rtb_buffs.min_remains<1|(buff.broadside.up+buff.ruthless_precision.up+buff.true_bearing.up=3))
-  if S.KeepItRolling:IsCastable() and Cache.APLVar.RtB_Buffs.Total >= 3 and (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing)) >= 2)
-    and (Cache.APLVar.RtB_Buffs.MinRemains < 3 or (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.RuthlessPrecision)) + num(Player:BuffUp(S.TrueBearing) == 3)))
-    and Cache.APLVar.RtB_Buffs.Normal <= 2 then
+  -- # Without a natural 5 buff roll, use Keep it Rolling at 3 buffs if you have the combination of Ruthless Precision + Broadside + True Bearing.
+  -- actions.cds+=/keep_it_rolling,if=rtb_buffs>=3&rtb_buffs.normal<=2&buff.broadside.up&buff.ruthless_precision.up&buff.true_bearing.up
+  if S.KeepItRolling:IsCastable() and Cache.APLVar.RtB_Buffs.Total >= 3 and Cache.APLVar.RtB_Buffs.Normal <= 2
+    and Player:BuffUp(S.Broadside) and Player:BuffUp(S.RuthlessPrecision) and Player:BuffUp(S.TrueBearing) then
     if Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then
       return "Cast Keep it Rolling"
     end
@@ -850,6 +826,14 @@ local function CDs ()
     and (EnergyDeficit >= 150 or HL.BossFilteredFightRemains("<", S.ThistleTea:Charges() * 6)) then
     if Cast(S.ThistleTea, Settings.CommonsOGCD.OffGCDasOffGCD.ThistleTea) then
       return "Cast Thistle Tea"
+    end
+  end
+
+  -- # Generic catch-all for Shadowmeld. Technically, usage in DungeonSlice or DungeonRoute sims could mirror Vanish usage on packs.
+  -- actions.stealth_cds+=/shadowmeld,if=variable.finish_condition&!cooldown.vanish.ready
+  if S.Shadowmeld:IsAvailable() and S.Shadowmeld:IsReady() and Finish_Condition() and not S.Vanish:IsReady() then
+    if Cast(S.Shadowmeld, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then
+      return "Cast Shadowmeld"
     end
   end
 
@@ -1038,6 +1022,7 @@ local function APL ()
           return "Imperfect Ascendancy Serum";
         end
       end
+      -- # Builds with Keep it Rolling+Loaded Dice prepull Adrenaline Rush before Roll the Bones to consume Loaded Dice immediately instead of on the next pandemic roll.
       -- actions.precombat+=/adrenaline_rush,precombat_seconds=1,if=talent.improved_adrenaline_rush&talent.keep_it_rolling&talent.loaded_dice
       if S.AdrenalineRush:IsCastable() and S.ImprovedAdrenalineRush:IsAvailable() and S.KeepItRolling:IsAvailable()
         and S.LoadedDice:IsAvailable() then
@@ -1186,7 +1171,7 @@ local function APL ()
 end
 
 local function Init ()
-  HR.Print("Outlaw Rogue rotation has been updated for patch 11.0.5 \n ",
+  HR.Print("Outlaw Rogue rotation has been updated for patch 11.1.0 \n ",
     "Note: It is known & Intended that Audacity procs will suggest Sinister Strike without a keybind shown")
 end
 
