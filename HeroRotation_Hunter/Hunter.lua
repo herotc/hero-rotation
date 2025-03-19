@@ -184,6 +184,7 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   CalloftheWildBuff                     = Spell(359844),
   FrenzyPetBuff                         = Spell(272790, "Pet"),
   HuntersPreyBuff                       = Spell(378215),
+  HuntmastersCallBuff                   = Spell(459731),
   SolitaryCompanionBuff                 = Spell(474751),
   -- Debuffs
   BarbedShotDebuff                      = Spell(217200),
