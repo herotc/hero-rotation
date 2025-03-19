@@ -260,33 +260,37 @@ local function Trickshots()
   if S.BlackArrow:IsReady() and (Player:BuffUp(S.WitheringFireBuff) and Player:BuffUp(S.TrickShotsBuff)) then
     if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow trickshots 10"; end
   end
+  -- aimed_shot,if=(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)&buff.trick_shots.up&buff.bulletstorm.up&full_recharge_time<gcd
+  if S.AimedShot:IsReady() and ((Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) and Player:BuffUp(S.TrickShotsBuff) and Player:BuffUp(S.BulletstormBuff) and S.AimedShot:FullRechargeTime() < Player:GCD()) then
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot trickshots 12"; end
+  end
   -- rapid_fire,if=buff.trick_shots.remains>execute_time&(!hero_tree.sentinel|buff.lunar_storm_cooldown.remains>cooldown%3|buff.lunar_storm_ready.up)
   if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) > S.RapidFire:ExecuteTime() and (Player:HeroTreeID() ~= 42 or Player:BuffRemains(S.LunarStormCDBuff) > 20 / 3 or Player:BuffUp(S.LunarStormReadyBuff))) then
-    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire trickshots 12"; end
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire trickshots 14"; end
   end
   -- explosive_shot,if=talent.precision_detonation&(buff.lock_and_load.up|!set_bonus.thewarwithin_season_2_4pc)&(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)
   if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and (Player:BuffUp(S.LockandLoadBuff) or not Player:HasTier("TWW2", 4)) and (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff))) then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot trickshots 14"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot trickshots 16"; end
   end
   -- aimed_shot,if=(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)&buff.trick_shots.up
   if S.AimedShot:IsReady() and ((Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) and Player:BuffUp(S.TrickShotsBuff)) then
-    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot trickshots 16"; end
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot trickshots 18"; end
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot trickshots 18"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot trickshots 20"; end
   end
   -- black_arrow
   if S.BlackArrow:IsReady() then
-    if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow trickshots 20"; end
+    if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow trickshots 22"; end
   end
   -- steady_shot,if=focus+cast_regen<focus.max
   if S.SteadyShot:IsCastable() and (Player:Focus() + Player:FocusCastRegen(S.SteadyShot:CastTime()) < Player:FocusMax()) then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot trickshots 22"; end
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot trickshots 24"; end
   end
   -- multishot
   if S.MultiShot:IsReady() then
-    if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot trickshots 24"; end
+    if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot trickshots 26"; end
   end
 end
 
