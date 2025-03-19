@@ -147,6 +147,7 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   -- Talents
   AMurderofCrows                        = Spell(131894),
   AnimalCompanion                       = Spell(267116),
+  AspectoftheHydra                      = Spell(470945),
   AspectoftheWild                       = Spell(193530),
   BarbedScales                          = Spell(469880),
   BarbedShot                            = Spell(217200),
