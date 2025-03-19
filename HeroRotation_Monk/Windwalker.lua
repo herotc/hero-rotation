@@ -31,7 +31,7 @@ local tinsert       = table.insert
 -- WoW API
 local Delay         = C_Timer.After
 -- File locals
-local Monk = HR.Commons.Monk
+local Monk          = HR.Commons.Monk
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -316,10 +316,6 @@ local function Cooldowns()
   if S.StormEarthAndFire:IsCastable() and (Player:IsInDungeonArea() and Player:BuffRemains(S.InvokersDelightBuff) > 15 and (EnemiesCount8y > 2 or not S.OrderedElements:IsAvailable() or S.RisingSunKick:CooldownDown())) then
     if Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthAndFire) then return "storm_earth_and_fire cooldowns dungeonroute 2"; end
   end
-  -- slicing_winds,if=talent.celestial_conduit&variable.sef_condition
-  if S.SlicingWinds:IsReady() and (S.CelestialConduit:IsAvailable() and VarSefCondition) then
-    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds cooldowns 4"; end
-  end
   -- tiger_palm,if=(target.time_to_die>14&!fight_style.dungeonroute|target.time_to_die>22)&!cooldown.invoke_xuen_the_white_tiger.remains&(chi<5&!talent.ordered_elements|chi<3)&(combo_strike|!talent.hit_combo)
   if S.TigerPalm:IsReady() and ((Target:TimeToDie() > 14 and not Player:IsInDungeonArea() or Target:TimeToDie() > 22) and S.InvokeXuenTheWhiteTiger:CooldownUp() and (Player:Chi() < 5 and not S.OrderedElements:IsAvailable() or Player:Chi() < 3) and (ComboStrike(S.TigerPalm) or not S.HitCombo:IsAvailable())) then
      if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm cooldowns 6"; end
@@ -429,13 +425,21 @@ local function DefaultAoE()
   if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and Player:BuffStack(S.ChiEnergyBuff) > 29 and S.FistsofFury:CooldownRemains() < 5) then
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_aoe 10"; end
   end
-  -- whirling_dragon_punch,target_if=max:target.time_to_die,if=buff.heart_of_the_jade_serpent_cdr.up
-  if S.WhirlingDragonPunch:IsReady() and Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) then
-    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch default_aoe heart_buff"; end
+  -- whirling_dragon_punch,target_if=max:target.time_to_die,if=buff.heart_of_the_jade_serpent_cdr.up&buff.dance_of_chiji.stack<2
+  -- whirling_dragon_punch,target_if=max:target.time_to_die,if=buff.dance_of_chiji.stack<2
+  if S.WhirlingDragonPunch:IsReady() and (
+    (Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) and Player:BuffStack(S.DanceofChijiBuff) < 2) or
+    (Player:BuffStack(S.DanceofChijiBuff) < 2)
+  ) then
+    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch default_aoe 11"; end
+  end
+  -- slicing_winds,if=buff.heart_of_the_jade_serpent_cdr.up|buff.heart_of_the_jade_serpent_cdr_celestial.up
+  if S.SlicingWinds:IsReady() and (Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) or Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff)) then
+    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_aoe 12"; end
   end
   -- celestial_conduit,if=buff.storm_earth_and_fire.up&cooldown.strike_of_the_windlord.remains&(!buff.heart_of_the_jade_serpent_cdr.up|debuff.gale_force.remains<5)&(talent.xuens_bond|!talent.xuens_bond&buff.invokers_delight.up)|fight_remains<15|fight_style.dungeonroute&buff.invokers_delight.up&cooldown.strike_of_the_windlord.remains&buff.storm_earth_and_fire.remains<8
   if S.CelestialConduit:IsReady() and (Player:BuffUp(S.StormEarthAndFireBuff) and S.StrikeoftheWindlord:CooldownDown() and (not Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) or Target:DebuffRemains(S.GaleForceDebuff) < 5) and (S.XuensBond:IsAvailable() or not S.XuensBond:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff)) or BossFightRemains < 15 or Player:IsInDungeonArea() and Player:BuffUp(S.InvokersDelightBuff) and S.StrikeoftheWindlord:CooldownDown() and Player:BuffRemains(S.StormEarthAndFireBuff) < 8) then
-    if Cast(S.CelestialConduit, nil, nil, not Target:IsInMeleeRange(15)) then return "celestial_conduit default_aoe 12"; end
+    if Cast(S.CelestialConduit, nil, nil, not Target:IsInMeleeRange(15)) then return "celestial_conduit default_aoe 13"; end
   end
   -- rising_sun_kick,target_if=max:target.time_to_die,if=cooldown.whirling_dragon_punch.remains<2&cooldown.fists_of_fury.remains>1&buff.dance_of_chiji.stack<2|!buff.storm_earth_and_fire.up&buff.pressure_point.up
   if S.RisingSunKick:IsReady() and ((S.WhirlingDragonPunch:CooldownRemains() < 2 and S.FistsofFury:CooldownRemains() > 1 and Player:BuffStack(S.DanceofChijiBuff) < 2) or (Player:BuffDown(S.StormEarthAndFireBuff) and Player:BuffUp(S.PressurePointBuff))) then
@@ -449,8 +453,8 @@ local function DefaultAoE()
   if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and Player:BuffUp(S.BlackoutKickBuff) and Player:Chi() < 2 and S.EnergyBurst:IsAvailable() and Player:Energy() < 55) then
     if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_aoe 18"; end
   end
-  -- strike_of_the_windlord,target_if=max:target.time_to_die,if=time>5&(cooldown.invoke_xuen_the_white_tiger.remains>15|talent.flurry_strikes)
-  if S.StrikeoftheWindlord:IsReady() and (HL.CombatTime() > 5 and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 or S.FlurryStrikes:IsAvailable())) then
+  -- strike_of_the_windlord,target_if=max:target.time_to_die,if=(time>5|buff.invokers_delight.up&buff.storm_earth_and_fire.up)&(cooldown.invoke_xuen_the_white_tiger.remains>15|talent.flurry_strikes)
+  if S.StrikeoftheWindlord:IsReady() and ((HL.CombatTime() > 5 or Player:BuffUp(S.InvokersDelightBuff) and Player:BuffUp(S.StormEarthAndFireBuff)) and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 or S.FlurryStrikes:IsAvailable())) then
     if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_aoe 20"; end
   end
   -- slicing_winds
@@ -603,9 +607,17 @@ local function DefaultCleave()
       end
     end
   end
-  -- whirling_dragon_punch,target_if=max:target.time_to_die,if=buff.heart_of_the_jade_serpent_cdr.up
-  if S.WhirlingDragonPunch:IsReady() and (Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff)) then
+  -- whirling_dragon_punch,target_if=max:target.time_to_die,if=buff.heart_of_the_jade_serpent_cdr.up&buff.dance_of_chiji.stack<2
+  -- whirling_dragon_punch,target_if=max:target.time_to_die,if=buff.dance_of_chiji.stack<2
+  if S.WhirlingDragonPunch:IsReady() and (
+    (Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) and Player:BuffStack(S.DanceofChijiBuff) < 2) or
+    (Player:BuffStack(S.DanceofChijiBuff) < 2)
+  ) then
     if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch default_cleave 16"; end
+  end
+  -- slicing_winds,if=buff.heart_of_the_jade_serpent_cdr.up|buff.heart_of_the_jade_serpent_cdr_celestial.up
+  if S.SlicingWinds:IsReady() and (Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) or Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff)) then
+    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_cleave 17"; end
   end
   -- celestial_conduit,if=buff.storm_earth_and_fire.up&cooldown.strike_of_the_windlord.remains&(!buff.heart_of_the_jade_serpent_cdr.up|debuff.gale_force.remains<5)&(talent.xuens_bond|!talent.xuens_bond&buff.invokers_delight.up)|fight_remains<15|fight_style.dungeonroute&buff.invokers_delight.up&cooldown.strike_of_the_windlord.remains&buff.storm_earth_and_fire.remains<8
   if S.CelestialConduit:IsReady() and (Player:BuffUp(S.StormEarthAndFireBuff) and S.StrikeoftheWindlord:CooldownDown() and (not Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) or Target:DebuffRemains(S.GaleForceDebuff) < 5) and (S.XuensBond:IsAvailable() or not S.XuensBond:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff)) or BossFightRemains < 15 or Player:IsInDungeonArea() and Player:BuffUp(S.InvokersDelightBuff) and S.StrikeoftheWindlord:CooldownDown() and Player:BuffRemains(S.StormEarthAndFireBuff) < 8) then
@@ -770,25 +782,25 @@ local function DefaultST()
   if S.FistsofFury:IsReady() and (Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff) or Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff)) then
     if Cast(S.FistsofFury, nil, nil, not Target:IsInMeleeRange(8)) then return "fists_of_fury default_st 2"; end
   end
-  -- rising_sun_kick,if=buff.pressure_point.up&!buff.heart_of_the_jade_serpent_cdr.up&buff.heart_of_the_jade_serpent_cdr_celestial.up|buff.ordered_elements.remains<=gcd.max*3&buff.storm_earth_and_fire.up&talent.ordered_elements
-  if S.RisingSunKick:IsReady() and ((Player:BuffUp(S.PressurePointBuff) and Player:BuffDown(S.HeartoftheJadeSerpentCDRBuff) and Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff)) or (Player:BuffRemains(S.OrderedElementsBuff) <= Player:GCD() * 3 and Player:BuffUp(S.StormEarthAndFireBuff) and S.OrderedElements:IsAvailable())) then
+  -- rising_sun_kick,if=buff.pressure_point.up&!buff.heart_of_the_jade_serpent_cdr.up&buff.heart_of_the_jade_serpent_cdr_celestial.up|buff.invokers_delight.up|buff.bloodlust.up|buff.pressure_point.up&cooldown.fists_of_fury.remains|buff.power_infusion.up
+  if S.RisingSunKick:IsReady() and (Player:BuffUp(S.PressurePointBuff) and Player:BuffDown(S.HeartoftheJadeSerpentCDRBuff) and Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff) or Player:BuffUp(S.InvokersDelightBuff) or Player:BloodlustUp() or Player:BuffUp(S.PressurePointBuff) and S.FistsofFury:CooldownDown() or Player:PowerInfusionUp()) then
     if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick default_st 4"; end
   end
-  -- celestial_conduit,if=buff.storm_earth_and_fire.up&(!buff.heart_of_the_jade_serpent_cdr.up|debuff.gale_force.remains<5)&cooldown.strike_of_the_windlord.remains&(talent.xuens_bond|!talent.xuens_bond&buff.invokers_delight.up)|fight_remains<15|fight_style.dungeonroute&buff.invokers_delight.up&cooldown.strike_of_the_windlord.remains&buff.storm_earth_and_fire.remains<8|fight_remains<10
-  if S.CelestialConduit:IsReady() and (Player:BuffUp(S.StormEarthAndFireBuff) and (Player:BuffDown(S.HeartoftheJadeSerpentCDRBuff) or Target:DebuffRemains(S.GaleForceDebuff) < 5) and S.StrikeoftheWindlord:CooldownDown() and (S.XuensBond:IsAvailable() or not S.XuensBond:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff)) or BossFightRemains < 15 or Player:IsInDungeonArea() and Player:BuffUp(S.InvokersDelightBuff) and S.StrikeoftheWindlord:CooldownDown() and Player:BuffRemains(S.StormEarthAndFireBuff) < 8 or BossFightRemains < 10) then
-    if Cast(S.CelestialConduit, nil, nil, not Target:IsInMeleeRange(15)) then return "celestial_conduit default_st 6"; end
+  -- whirling_dragon_punch,if=!buff.heart_of_the_jade_serpent_cdr_celestial.up&!buff.dance_of_chiji.stack=2
+  if S.WhirlingDragonPunch:IsReady() and (Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and Player:BuffStack(S.DanceofChijiBuff) ~= 2) then
+    if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch default_st 6"; end
   end
   -- slicing_winds,if=buff.heart_of_the_jade_serpent_cdr.up|buff.heart_of_the_jade_serpent_cdr_celestial.up
   if S.SlicingWinds:IsReady() and (Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) or Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff)) then
     if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_st 8"; end
   end
+  -- celestial_conduit,if=buff.storm_earth_and_fire.up&(!buff.heart_of_the_jade_serpent_cdr.up|debuff.gale_force.remains<5)&cooldown.strike_of_the_windlord.remains&(talent.xuens_bond|!talent.xuens_bond&buff.invokers_delight.up)|fight_remains<15|fight_style.dungeonroute&buff.invokers_delight.up&cooldown.strike_of_the_windlord.remains&buff.storm_earth_and_fire.remains<8|fight_remains<10
+  if S.CelestialConduit:IsReady() and (Player:BuffUp(S.StormEarthAndFireBuff) and (Player:BuffDown(S.HeartoftheJadeSerpentCDRBuff) or Target:DebuffRemains(S.GaleForceDebuff) < 5) and S.StrikeoftheWindlord:CooldownDown() and (S.XuensBond:IsAvailable() or not S.XuensBond:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff)) or BossFightRemains < 15 or Player:IsInDungeonArea() and Player:BuffUp(S.InvokersDelightBuff) and S.StrikeoftheWindlord:CooldownDown() and Player:BuffRemains(S.StormEarthAndFireBuff) < 8 or BossFightRemains < 10) then
+    if Cast(S.CelestialConduit, nil, nil, not Target:IsInMeleeRange(15)) then return "celestial_conduit default_st 10"; end
+  end
   -- spinning_crane_kick,if=buff.dance_of_chiji.stack=2&combo_strike
   if S.SpinningCraneKick:IsReady() and (Player:BuffStack(S.DanceofChijiBuff) == 2 and ComboStrike(S.SpinningCraneKick)) then
-    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 10"; end
-  end
-  -- rising_sun_kick,if=buff.pressure_point.up|buff.ordered_elements.remains<=gcd.max*3&buff.storm_earth_and_fire.up&talent.ordered_elements
-  if S.RisingSunKick:IsReady() and (Player:BuffUp(S.PressurePointBuff) or Player:BuffRemains(S.OrderedElementsBuff) <= Player:GCD() * 3 and Player:BuffUp(S.StormEarthAndFireBuff) and S.OrderedElements:IsAvailable()) then
-    if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick default_st 12"; end
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 12"; end
   end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=(energy>55&talent.inner_peace|energy>60&!talent.inner_peace)&combo_strike&chi.max-chi>=2&buff.teachings_of_the_monastery.stack<buff.teachings_of_the_monastery.max_stack&(talent.energy_burst&!buff.bok_proc.up|!talent.energy_burst)&!buff.ordered_elements.up|(talent.energy_burst&!buff.bok_proc.up|!talent.energy_burst)&!buff.ordered_elements.up&!cooldown.fists_of_fury.remains&chi<3|(prev.strike_of_the_windlord|!buff.heart_of_the_jade_serpent_cdr_celestial.up)&combo_strike&chi.deficit>=2&!buff.ordered_elements.up
   if S.TigerPalm:IsReady() and ((Player:Energy() > 55 and S.InnerPeace:IsAvailable() or Player:Energy() > 60 and not S.InnerPeace:IsAvailable()) and ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and Player:BuffStack(S.TeachingsoftheMonasteryBuff) < VarTotMMaxStacks and (S.EnergyBurst:IsAvailable() and Player:BuffDown(S.BlackoutKickBuff) or not S.EnergyBurst:IsAvailable()) and Player:BuffDown(S.OrderedElementsBuff) or (S.EnergyBurst:IsAvailable() and Player:BuffDown(S.BlackoutKickBuff) or not S.EnergyBurst:IsAvailable()) and Player:BuffDown(S.OrderedElementsBuff) and S.FistsofFury:CooldownUp() and Player:Chi() < 3 or (Player:PrevGCD(1, S.StrikeoftheWindlord) or Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff)) and ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and Player:BuffDown(S.OrderedElementsBuff)) then
@@ -812,166 +824,150 @@ local function DefaultST()
       end
     end
   end
-  -- rising_sun_kick,if=buff.invokers_delight.up&!buff.storm_earth_and_fire.up&talent.ordered_elements
-  if S.RisingSunKick:IsReady() and (Player:BuffUp(S.InvokersDelightBuff) and Player:BuffDown(S.StormEarthAndFireBuff) and S.OrderedElements:IsAvailable()) then
-    if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "max", EvaluateTargetIfFilterAcclamation, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick default_st 20"; end
-  end
   -- rising_sun_kick,if=!pet.xuen_the_white_tiger.active&prev.tiger_palm&time<5|buff.storm_earth_and_fire.up&talent.ordered_elements
   if S.RisingSunKick:IsReady() and (not Monk.Xuen.Active and Player:PrevGCD(1, S.TigerPalm) and HL.CombatTime() < 5 or Player:BuffUp(S.StormEarthAndFireBuff) and S.OrderedElements:IsAvailable()) then
-    if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "max", EvaluateTargetIfFilterAcclamation, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick default_st 22"; end
+    if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "max", EvaluateTargetIfFilterAcclamation, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick default_st 20"; end
   end
   -- strike_of_the_windlord,if=talent.celestial_conduit&!buff.invokers_delight.up&!buff.heart_of_the_jade_serpent_cdr_celestial.up&cooldown.fists_of_fury.remains<5&cooldown.invoke_xuen_the_white_tiger.remains>15|fight_remains<12
   if S.StrikeoftheWindlord:IsReady() and (S.CelestialConduit:IsAvailable() and Player:BuffDown(S.InvokersDelightBuff) and Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and S.FistsofFury:CooldownRemains() < 5 and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 or BossFightRemains < 12) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_st 24"; end
+    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_st 22"; end
   end
   -- strike_of_the_windlord,if=talent.gale_force&buff.invokers_delight.up&(buff.bloodlust.up|!buff.heart_of_the_jade_serpent_cdr_celestial.up)
   if S.StrikeoftheWindlord:IsReady() and (S.GaleForce:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff) and (Player:BloodlustUp() or Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff))) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_st 26"; end
+    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_st 24"; end
   end
   -- strike_of_the_windlord,if=time>5&talent.flurry_strikes
   if S.StrikeoftheWindlord:IsReady() and (HL.CombatTime() > 5 and S.FlurryStrikes:IsAvailable()) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_st 28"; end
+    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_st 26"; end
   end
-  -- rising_sun_kick,if=buff.power_infusion.up&buff.bloodlust.up
-  if S.RisingSunKick:IsReady() and (Player:PowerInfusionUp() and Player:BloodlustUp()) then
-    if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "max", EvaluateTargetIfFilterAcclamation, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick default_st 30"; end
-  end
-  -- fists_of_fury,if=buff.power_infusion.up&buff.bloodlust.up
-  if S.FistsofFury:IsReady() and (Player:PowerInfusionUp() and Player:BloodlustUp()) then
-    if Everyone.CastTargetIf(S.FistsofFury, Enemies8y, "max", EvaluateTargetIfFilterAcclamation, nil, not Target:IsInMeleeRange(8)) then return "fists_of_fury default_st 32"; end
+  -- fists_of_fury,if=buff.power_infusion.up&buff.bloodlust.up&time>5
+  if S.FistsofFury:IsReady() and (Player:PowerInfusionUp() and Player:BloodlustUp() and HL.CombatTime() > 5) then
+    if Everyone.CastTargetIf(S.FistsofFury, Enemies8y, "max", EvaluateTargetIfFilterAcclamation, nil, not Target:IsInMeleeRange(8)) then return "fists_of_fury default_st 28"; end
   end
   -- blackout_kick,if=buff.teachings_of_the_monastery.stack>3&buff.ordered_elements.up&cooldown.rising_sun_kick.remains>1&cooldown.fists_of_fury.remains>2
   if S.BlackoutKick:IsReady() and (Player:BuffStack(S.TeachingsoftheMonasteryBuff) > 3 and Player:BuffUp(S.OrderedElementsBuff) and S.RisingSunKick:CooldownRemains() > 1 and S.FistsofFury:CooldownRemains() > 2) then
-    if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 34"; end
-  end
-  -- spinning_crane_kick,if=buff.dance_of_chiji.stack=2&combo_strike&buff.power_infusion.up&buff.bloodlust.up
-  if S.SpinningCraneKick:IsReady() and (Player:BuffStack(S.DanceofChijiBuff) == 2 and ComboStrike(S.SpinningCraneKick) and Player:PowerInfusionUp() and Player:BloodlustUp()) then
-    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 36"; end
-  end
-  -- whirling_dragon_punch,if=buff.power_infusion.up&buff.bloodlust.up
-  if S.WhirlingDragonPunch:IsReady() and (Player:PowerInfusionUp() and Player:BloodlustUp()) then
-    if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch default_st 38"; end
+    if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 30"; end
   end
   -- tiger_palm,if=combo_strike&energy.time_to_max<=gcd.max*3&talent.flurry_strikes&buff.power_infusion.up&buff.bloodlust.up
   if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and Player:EnergyTimeToMax() <= Player:GCD() * 3 and S.FlurryStrikes:IsAvailable() and Player:PowerInfusionUp() and Player:BloodlustUp()) then
-    if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm default_st 40"; end
+    if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm default_st 32"; end
   end
   -- blackout_kick,if=buff.teachings_of_the_monastery.stack>4&cooldown.rising_sun_kick.remains>1&cooldown.fists_of_fury.remains>2
   if S.BlackoutKick:IsReady() and (Player:BuffStack(S.TeachingsoftheMonasteryBuff) > 4 and S.RisingSunKick:CooldownRemains() > 1 and S.FistsofFury:CooldownRemains() > 2) then
-    if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 42"; end
+    if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 34"; end
   end
   -- whirling_dragon_punch,if=!buff.heart_of_the_jade_serpent_cdr_celestial.up&!buff.dance_of_chiji.stack=2|buff.ordered_elements.up|talent.knowledge_of_the_broken_temple
   if S.WhirlingDragonPunch:IsReady() and (Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and Player:BuffStack(S.DanceofChijiBuff) ~= 2 or Player:BuffUp(S.OrderedElementsBuff) or S.KnowledgeoftheBrokenTemple:IsAvailable()) then
-    if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch default_st 44"; end
+    if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch default_st 36"; end
   end
-  -- crackling_jade_lightning,if=buff.the_emperors_capacitor.stack>19&!buff.heart_of_the_jade_serpent_cdr.up&!buff.heart_of_the_jade_serpent_cdr_celestial.up&combo_strike&(!fight_style.dungeonslice|target.time_to_die>20)&cooldown.invoke_xuen_the_white_tiger.remains>10
-  if S.CracklingJadeLightning:IsReady() and (Player:BuffStack(S.TheEmperorsCapacitorBuff) > 19 and Player:BuffDown(S.HeartoftheJadeSerpentCDRBuff) and Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and ComboStrike(S.CracklingJadeLightning) and (not Player:IsInDungeonArea() or Target:TimeToDie() > 20) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10) then
-    if Cast(S.CracklingJadeLightning, Settings.Windwalker.GCDasOffGCD.CracklingJadeLightning, nil, not Target:IsSpellInRange(S.CracklingJadeLightning)) then return "crackling_jade_lightning default_st 46"; end
+  -- crackling_jade_lightning,if=buff.the_emperors_capacitor.stack>19&!buff.heart_of_the_jade_serpent_cdr.up&!buff.heart_of_the_jade_serpent_cdr_celestial.up&combo_strike&(!fight_style.dungeonslice|target.time_to_die>20)&cooldown.invoke_xuen_the_white_tiger.remains>10|buff.the_emperors_capacitor.stack>15&!buff.heart_of_the_jade_serpent_cdr.up&!buff.heart_of_the_jade_serpent_cdr_celestial.up&combo_strike&(!fight_style.dungeonslice|target.time_to_die>20)&cooldown.invoke_xuen_the_white_tiger.remains<10&cooldown.invoke_xuen_the_white_tiger.remains>2
+  if S.CracklingJadeLightning:IsReady() and (Player:BuffStack(S.TheEmperorsCapacitorBuff) > 19 and Player:BuffDown(S.HeartoftheJadeSerpentCDRBuff) and Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and ComboStrike(S.CracklingJadeLightning) and (not Player:IsInDungeonArea() or Target:TimeToDie() > 20) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 or Player:BuffStack(S.TheEmperorsCapacitorBuff) > 15 and Player:BuffDown(S.HeartoftheJadeSerpentCDRBuff) and Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and ComboStrike(S.CracklingJadeLightning) and (not Player:IsInDungeonArea() or Target:TimeToDie() > 20) and S.InvokeXuenTheWhiteTiger:CooldownRemains() < 10 and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 2) then
+    if Cast(S.CracklingJadeLightning, Settings.Windwalker.GCDasOffGCD.CracklingJadeLightning, nil, not Target:IsSpellInRange(S.CracklingJadeLightning)) then return "crackling_jade_lightning default_st 38"; end
   end
-  -- slicing_winds
-  if S.SlicingWinds:IsReady() then
-    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_st 48"; end
+  -- slicing_winds,if=target.time_to_die>10
+  if S.SlicingWinds:IsReady() and (Target:TimeToDie() > 10) then
+    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_st 40"; end
   end
   -- fists_of_fury,if=(talent.xuens_battlegear|!talent.xuens_battlegear&(cooldown.strike_of_the_windlord.remains>1|buff.heart_of_the_jade_serpent_cdr.up|buff.heart_of_the_jade_serpent_cdr_celestial.up))&(talent.xuens_battlegear&cooldown.invoke_xuen_the_white_tiger.remains>5|cooldown.invoke_xuen_the_white_tiger.remains>10)&(!buff.invokers_delight.up|buff.invokers_delight.up&cooldown.strike_of_the_windlord.remains>4&cooldown.celestial_conduit.remains)|fight_remains<5|talent.flurry_strikes
   if S.FistsofFury:IsReady() and ((S.XuensBattlegear:IsAvailable() or not S.XuensBattlegear:IsAvailable() and (S.StrikeoftheWindlord:CooldownRemains() > 1 or Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) or Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff))) and (S.XuensBattlegear:IsAvailable() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 5 or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10) and (Player:BuffDown(S.InvokersDelightBuff) or Player:BuffUp(S.InvokersDelightBuff) and S.StrikeoftheWindlord:CooldownRemains() > 4 and S.CelestialConduit:CooldownDown()) or BossFightRemains < 5 or S.FlurryStrikes:IsAvailable()) then
-    if Cast(S.FistsofFury, nil, nil, not Target:IsInMeleeRange(8)) then return "fists_of_fury default_st 50"; end
+    if Cast(S.FistsofFury, nil, nil, not Target:IsInMeleeRange(8)) then return "fists_of_fury default_st 42"; end
   end
   -- rising_sun_kick,target_if=max:target.time_to_die,if=chi>4|chi>2&energy>50|cooldown.fists_of_fury.remains>2
   if S.RisingSunKick:IsReady() and (Player:Chi() > 4 or Player:Chi() > 2 and Player:Energy() > 50 or S.FistsofFury:CooldownRemains() > 2) then
-    if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick default_st 52"; end
+    if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick default_st 44"; end
   end
   -- blackout_kick,if=combo_strike&talent.energy_burst&buff.bok_proc.up&chi<5&(buff.heart_of_the_jade_serpent_cdr.up|buff.heart_of_the_jade_serpent_cdr_celestial.up)
   if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and S.EnergyBurst:IsAvailable() and Player:BuffUp(S.BlackoutKickBuff) and Player:Chi() < 5 and (Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) or Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff))) then
-    if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st energy_burst"; end
+    if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 46"; end
   end
   -- spinning_crane_kick,if=combo_strike&buff.bloodlust.up&buff.heart_of_the_jade_serpent_cdr.up&buff.dance_of_chiji.up
   if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and Player:BloodlustUp() and Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) and Player:BuffUp(S.DanceofChijiBuff)) then
-    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st bloodlust"; end
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 48"; end
   end
--- tiger_palm,if=combo_strike&energy.time_to_max<=gcd.max*3&talent.flurry_strikes&buff.wisdom_of_the_wall_flurry.up
-if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and Player:EnergyTimeToMax() <= Player:GCD() * 3 and S.FlurryStrikes:IsAvailable() and Player:BuffUp(S.WisdomoftheWallFlurryBuff)) then
-  if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm default_st 54"; end
-end
--- tiger_palm,if=combo_strike&chi.deficit>=2&energy.time_to_max<=gcd.max*3
-if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and Player:EnergyTimeToMax() <= Player:GCD() * 3) then
-  if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm default_st 56"; end
-end
--- blackout_kick,if=buff.teachings_of_the_monastery.stack>7&talent.memory_of_the_monastery&!buff.memory_of_the_monastery.up&cooldown.fists_of_fury.remains
-if S.BlackoutKick:IsReady() and (Player:BuffStack(S.TeachingsoftheMonasteryBuff) > 7 and S.MemoryoftheMonastery:IsAvailable() and Player:BuffDown(S.MemoryoftheMonasteryBuff) and S.FistsofFury:CooldownDown()) then
-  if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 58"; end
-end
--- spinning_crane_kick,if=(buff.dance_of_chiji.stack=2|buff.dance_of_chiji.remains<2&buff.dance_of_chiji.up)&combo_strike&!buff.ordered_elements.up
-if S.SpinningCraneKick:IsReady() and ((Player:BuffStack(S.DanceofChijiBuff) == 2 or Player:BuffRemains(S.DanceofChijiBuff) < 2 and Player:BuffUp(S.DanceofChijiBuff)) and ComboStrike(S.SpinningCraneKick) and Player:BuffDown(S.OrderedElementsBuff)) then
-  if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 60"; end
-end
--- whirling_dragon_punch
-if S.WhirlingDragonPunch:IsReady() then
-  if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch default_st 62"; end
-end
--- spinning_crane_kick,if=buff.dance_of_chiji.stack=2&combo_strike
-if S.SpinningCraneKick:IsReady() and (Player:BuffStack(S.DanceofChijiBuff) == 2 and ComboStrike(S.SpinningCraneKick)) then
-  if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 64"; end
-end
--- blackout_kick,if=talent.courageous_impulse&combo_strike&buff.bok_proc.stack=2
-if S.BlackoutKick:IsReady() and (S.CourageousImpulse:IsAvailable() and ComboStrike(S.BlackoutKick) and Player:BuffStack(S.BlackoutKickBuff) == 2) then
-  if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 66"; end
-end
--- blackout_kick,if=combo_strike&buff.ordered_elements.up&cooldown.rising_sun_kick.remains>1&cooldown.fists_of_fury.remains>2
-if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and Player:BuffUp(S.OrderedElementsBuff) and S.RisingSunKick:CooldownRemains() > 1 and S.FistsofFury:CooldownRemains() > 2) then
-  if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 68"; end
-end
--- tiger_palm,if=combo_strike&energy.time_to_max<=gcd.max*3&talent.flurry_strikes
-if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and Player:EnergyTimeToMax() <= Player:GCD() * 3 and S.FlurryStrikes:IsAvailable()) then
-  if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm default_st 70"; end
-end
--- spinning_crane_kick,if=combo_strike&buff.dance_of_chiji.up&(buff.ordered_elements.up|energy.time_to_max>=gcd.max*3&talent.sequenced_strikes&talent.energy_burst|!talent.sequenced_strikes|!talent.energy_burst|buff.dance_of_chiji.remains<=gcd.max*3)
-if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.DanceofChijiBuff) and (Player:BuffUp(S.OrderedElementsBuff) or Player:EnergyTimeToMax() >= Player:GCD() * 3 and S.SequencedStrikes:IsAvailable() and S.EnergyBurst:IsAvailable() or not S.SequencedStrikes:IsAvailable() or not S.EnergyBurst:IsAvailable() or Player:BuffRemains(S.DanceofChijiBuff) <= Player:GCD() * 3)) then
-  if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 72"; end
-end
--- jadefire_stomp,if=talent.Singularly_Focused_Jade|talent.jadefire_harmony
-if S.JadefireStomp:IsCastable() and (S.SingularlyFocusedJade:IsAvailable() or S.JadefireHarmony:IsAvailable()) then
-  if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp default_st 74"; end
-end
--- chi_burst,if=!buff.ordered_elements.up
-if S.ChiBurst:IsCastable() and (Player:BuffDown(S.OrderedElementsBuff)) then
-  if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst default_st 76"; end
-end
--- blackout_kick,if=combo_strike&(buff.ordered_elements.up|buff.bok_proc.up&chi.deficit>=1&talent.energy_burst)&cooldown.fists_of_fury.remains
-if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and (Player:BuffUp(S.OrderedElementsBuff) or Player:BuffUp(S.BlackoutKickBuff) and Player:ChiDeficit() >= 1 and S.EnergyBurst:IsAvailable()) and S.FistsofFury:CooldownDown()) then
-  if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 78"; end
-end
--- blackout_kick,if=combo_strike&cooldown.fists_of_fury.remains&(chi>2|energy>60|buff.bok_proc.up)
-if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and S.FistsofFury:CooldownDown() and (Player:Chi() > 2 or Player:Energy() > 60 or Player:BuffUp(S.BlackoutKickBuff))) then
-  if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 80"; end
-end
--- jadefire_stomp
-if S.JadefireStomp:IsCastable() then
-  if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp default_st 82"; end
-end
--- tiger_palm,if=combo_strike&buff.ordered_elements.up&chi.deficit>=1
-if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and Player:BuffUp(S.OrderedElementsBuff) and Player:ChiDeficit() >= 1) then
-  if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm default_st 84"; end
-end
--- chi_burst
-if S.ChiBurst:IsCastable() then
-  if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst default_st 86"; end
-end
--- spinning_crane_kick,if=combo_strike&buff.ordered_elements.up&talent.hit_combo
-if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.OrderedElementsBuff) and S.HitCombo:IsAvailable()) then
-  if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 88"; end
-end
--- blackout_kick,if=buff.ordered_elements.up&!talent.hit_combo&cooldown.fists_of_fury.remains
-if S.BlackoutKick:IsReady() and (Player:BuffUp(S.OrderedElementsBuff) and not S.HitCombo:IsAvailable() and S.FistsofFury:CooldownDown()) then
-  if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 90"; end
-end
--- tiger_palm,if=prev.tiger_palm&chi<3&!cooldown.fists_of_fury.remains
-if S.TigerPalm:IsReady() and (Player:PrevGCD(1, S.TigerPalm) and Player:Chi() < 3 and S.FistsofFury:CooldownUp()) then
-  if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm default_st 92"; end
-end
--- Manually added: tiger_palm,if=chi=0 (avoids a potential profile stall)
-if S.TigerPalm:IsReady() and (Player:Chi() == 0) then
-  if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm default_st 94"; end
-end
+  -- tiger_palm,if=combo_strike&energy.time_to_max<=gcd.max*3&talent.flurry_strikes&buff.wisdom_of_the_wall_flurry.up
+  if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and Player:EnergyTimeToMax() <= Player:GCD() * 3 and S.FlurryStrikes:IsAvailable() and Player:BuffUp(S.WisdomoftheWallFlurryBuff)) then
+    if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm default_st 50"; end
+  end
+  -- tiger_palm,if=combo_strike&chi.deficit>=2&energy.time_to_max<=gcd.max*3
+  if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and Player:EnergyTimeToMax() <= Player:GCD() * 3) then
+    if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm default_st 52"; end
+  end
+  -- blackout_kick,if=buff.teachings_of_the_monastery.stack>7&talent.memory_of_the_monastery&!buff.memory_of_the_monastery.up&cooldown.fists_of_fury.remains
+  if S.BlackoutKick:IsReady() and (Player:BuffStack(S.TeachingsoftheMonasteryBuff) > 7 and S.MemoryoftheMonastery:IsAvailable() and Player:BuffDown(S.MemoryoftheMonasteryBuff) and S.FistsofFury:CooldownDown()) then
+    if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 54"; end
+  end
+  -- spinning_crane_kick,if=(buff.dance_of_chiji.stack=2|buff.dance_of_chiji.remains<2&buff.dance_of_chiji.up)&combo_strike&!buff.ordered_elements.up
+  if S.SpinningCraneKick:IsReady() and ((Player:BuffStack(S.DanceofChijiBuff) == 2 or Player:BuffRemains(S.DanceofChijiBuff) < 2 and Player:BuffUp(S.DanceofChijiBuff)) and ComboStrike(S.SpinningCraneKick) and Player:BuffDown(S.OrderedElementsBuff)) then
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 56"; end
+  end
+  -- whirling_dragon_punch
+  if S.WhirlingDragonPunch:IsReady() then
+    if Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(5)) then return "whirling_dragon_punch default_st 58"; end
+  end
+  -- spinning_crane_kick,if=buff.dance_of_chiji.stack=2&combo_strike
+  if S.SpinningCraneKick:IsReady() and (Player:BuffStack(S.DanceofChijiBuff) == 2 and ComboStrike(S.SpinningCraneKick)) then
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 60"; end
+  end
+  -- blackout_kick,if=talent.courageous_impulse&combo_strike&buff.bok_proc.stack=2
+  if S.BlackoutKick:IsReady() and (S.CourageousImpulse:IsAvailable() and ComboStrike(S.BlackoutKick) and Player:BuffStack(S.BlackoutKickBuff) == 2) then
+    if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 62"; end
+  end
+  -- blackout_kick,if=combo_strike&buff.ordered_elements.up&cooldown.rising_sun_kick.remains>1&cooldown.fists_of_fury.remains>2
+  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and Player:BuffUp(S.OrderedElementsBuff) and S.RisingSunKick:CooldownRemains() > 1 and S.FistsofFury:CooldownRemains() > 2) then
+    if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 64"; end
+  end
+  -- tiger_palm,if=combo_strike&energy.time_to_max<=gcd.max*3&talent.flurry_strikes
+  if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and Player:EnergyTimeToMax() <= Player:GCD() * 3 and S.FlurryStrikes:IsAvailable()) then
+    if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm default_st 66"; end
+  end
+  -- spinning_crane_kick,if=combo_strike&buff.dance_of_chiji.up&(buff.ordered_elements.up|energy.time_to_max>=gcd.max*3&talent.sequenced_strikes&talent.energy_burst|!talent.sequenced_strikes|!talent.energy_burst|buff.dance_of_chiji.remains<=gcd.max*3)
+  if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.DanceofChijiBuff) and (Player:BuffUp(S.OrderedElementsBuff) or Player:EnergyTimeToMax() >= Player:GCD() * 3 and S.SequencedStrikes:IsAvailable() and S.EnergyBurst:IsAvailable() or not S.SequencedStrikes:IsAvailable() or not S.EnergyBurst:IsAvailable() or Player:BuffRemains(S.DanceofChijiBuff) <= Player:GCD() * 3)) then
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 68"; end
+  end
+  -- jadefire_stomp,if=talent.Singularly_Focused_Jade|talent.jadefire_harmony
+  if S.JadefireStomp:IsCastable() and (S.SingularlyFocusedJade:IsAvailable() or S.JadefireHarmony:IsAvailable()) then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp default_st 70"; end
+  end
+  -- chi_burst,if=!buff.ordered_elements.up
+  if S.ChiBurst:IsCastable() and (Player:BuffDown(S.OrderedElementsBuff)) then
+    if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst default_st 72"; end
+  end
+  -- blackout_kick,if=combo_strike&(buff.ordered_elements.up|buff.bok_proc.up&chi.deficit>=1&talent.energy_burst)&cooldown.fists_of_fury.remains
+  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and (Player:BuffUp(S.OrderedElementsBuff) or Player:BuffUp(S.BlackoutKickBuff) and Player:ChiDeficit() >= 1 and S.EnergyBurst:IsAvailable()) and S.FistsofFury:CooldownDown()) then
+    if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 74"; end
+  end
+  -- blackout_kick,if=combo_strike&cooldown.fists_of_fury.remains&(chi>2|energy>60|buff.bok_proc.up)
+  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and S.FistsofFury:CooldownDown() and (Player:Chi() > 2 or Player:Energy() > 60 or Player:BuffUp(S.BlackoutKickBuff))) then
+    if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 76"; end
+  end
+  -- jadefire_stomp
+  if S.JadefireStomp:IsCastable() then
+    if Cast(S.JadefireStomp, nil, nil, not Target:IsInRange(30)) then return "jadefire_stomp default_st 78"; end
+  end
+  -- tiger_palm,if=combo_strike&buff.ordered_elements.up&chi.deficit>=1
+  if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and Player:BuffUp(S.OrderedElementsBuff) and Player:ChiDeficit() >= 1) then
+    if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm default_st 80"; end
+  end
+  -- chi_burst
+  if S.ChiBurst:IsCastable() then
+    if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst default_st 82"; end
+  end
+  -- spinning_crane_kick,if=combo_strike&buff.ordered_elements.up&talent.hit_combo
+  if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.OrderedElementsBuff) and S.HitCombo:IsAvailable()) then
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 84"; end
+  end
+  -- blackout_kick,if=buff.ordered_elements.up&!talent.hit_combo&cooldown.fists_of_fury.remains
+  if S.BlackoutKick:IsReady() and (Player:BuffUp(S.OrderedElementsBuff) and not S.HitCombo:IsAvailable() and S.FistsofFury:CooldownDown()) then
+    if MotCCastSwitcher(S.BlackoutKick, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "blackout_kick default_st 86"; end
+  end
+  -- tiger_palm,if=prev.tiger_palm&chi<3&!cooldown.fists_of_fury.remains
+  if S.TigerPalm:IsReady() and (Player:PrevGCD(1, S.TigerPalm) and Player:Chi() < 3 and S.FistsofFury:CooldownUp()) then
+    if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm default_st 88"; end
+  end
+  -- Manually added: tiger_palm,if=chi=0 (avoids a potential profile stall)
+  if S.TigerPalm:IsReady() and (Player:Chi() == 0) then
+    if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm default_st 90"; end
+  end
 end
 
 --- ===== APL Main =====
