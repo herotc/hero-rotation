@@ -401,7 +401,7 @@ local function Thane()
   if S.Rampage:IsReady() then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane 36"; end
   end
-  -- bloodthirst,if=talent.vicious_contempt&target.health.pct<35&buff.bloodcraze.stack>=2|!dot.ravager.remains&buff.bloodcraze.stack>=3|active_enemies>=6
+  -- bloodthirst,if=talent.vicious_contempt&target.health.pct<35&buff.bloodcraze.stack>=2|!buff.ravager.up&buff.bloodcraze.stack>=3|active_enemies>=6
   if S.Bloodthirst:IsCastable() and (S.ViciousContempt:IsAvailable() and Target:HealthPercentage() < 35 and Player:BuffStack(S.BloodcrazeBuff) >= 2 or Target:DebuffDown(S.RavagerDebuff) and Player:BuffStack(S.BloodcrazeBuff) >= 3 or EnemiesMeleeCount >= 6) then
     if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst thane 38"; end
   end

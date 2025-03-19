@@ -318,7 +318,7 @@ local function ColossusExecute()
   if S.Demolish:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
     if Cast(S.Demolish, nil, Settings.CommonsDS.DisplayStyle.Demolish, not TargetInMeleeRange) then return "demolish colossus_execute 22"; end
   end
-  -- mortal_strike,if=debuff.executioners_precision.stack=2&!dot.ravager.remains|!talent.executioners_precision|talent.battlelord&debuff.executioners_precision.stack>0
+  -- mortal_strike,if=debuff.executioners_precision.stack=2&!buff.ravager.up|!talent.executioners_precision|talent.battlelord&debuff.executioners_precision.stack>0
   if S.MortalStrike:IsReady() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Target:DebuffDown(S.RavagerDebuff) or not S.ExecutionersPrecision:IsAvailable() or S.Battlelord:IsAvailable() and Target:DebuffUp(S.ExecutionersPrecisionDebuff)) then
     if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike colossus_execute 24"; end
   end
@@ -632,7 +632,7 @@ local function SlayerExecute()
   if S.Overpower:IsCastable() and (Player:BuffStack(S.MartialProwessBuff) < 2 and Player:BuffUp(S.OpportunistBuff) and S.Opportunist:IsAvailable() and (S.Bladestorm:IsAvailable() or S.Ravager:IsAvailable() and Player:Rage() < 85)) then
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_execute 26"; end
   end
-  -- mortal_strike,if=dot.rend.remains<2|debuff.executioners_precision.stack=2&!dot.ravager.remains
+  -- mortal_strike,if=dot.rend.remains<2|debuff.executioners_precision.stack=2&!buff.ravager.up
   if S.MortalStrike:IsReady() and (Target:DebuffRemains(S.RendDebuff) < 2 or Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Target:DebuffDown(S.RavagerDebuff)) then
     if Cast(S.MortalStrike, nil, nil, not TargetInMeleeRange) then return "mortal_strike slayer_execute 28"; end
   end
