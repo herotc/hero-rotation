@@ -557,7 +557,7 @@ local function Tyrant()
   end
   -- demonbolt,target_if=min:debuff.doom.remains,if=variable.imp_despawn&buff.demonic_core.react&soul_shard<4|prev_gcd.1.call_dreadstalkers&soul_shard<4&buff.demonic_core.react=4|buff.demonic_core.react=4&soul_shard<4|buff.demonic_core.react>=2&cooldown.power_siphon.remains<5
   if S.Demonbolt:IsReady() and ((VarImpDespawn > 0 and Player:BuffUp(S.DemonicCoreBuff) and SoulShards < 4) or (Player:PrevGCDP(1, S.CallDreadstalkers) and SoulShards < 4 and DemonicCoreStacks == 4) or (DemonicCoreStacks == 4 and SoulShards < 4) or (DemonicCoreStacks >= 2 and S.PowerSiphon:CooldownRemains() < 5)) then
-    if Everyone.CastTargetIf(S.Demonbolt, Enemies8ySplash, "min", EvaluateTargetIfDemonbolt, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyrant 30"; end
+    if Everyone.CastTargetIf(S.Demonbolt, Enemies8ySplash, "min", EvaluateTargetIfDemonbolt, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt tyrant 30"; end
   end
   -- ruination,if=variable.imp_despawn|soul_shard=5&cooldown.summon_vilefiend.remains>gcd.max*3
   if S.RuinationAbility:IsReady() and (VarImpDespawn > 0 or SoulShards == 5 and VilefiendAbility:CooldownRemains() > Player:GCD() * 3) then
@@ -725,11 +725,11 @@ local function APL()
     end
     -- demonbolt,target_if=min:debuff.doom.remains,if=buff.demonic_core.react&(!talent.doom|buff.demonic_core.react>1|debuff.doom.remains>10|debuff.doom.down)&(((!talent.soul_strike|cooldown.soul_strike.remains>gcd.max*2)&soul_shard<4))&!prev_gcd.1.demonbolt&!variable.pool_cores_for_tyrant
     if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and (not S.Doom:IsAvailable() or DemonicCoreStacks > 1 or Target:DebuffRemains(S.DoomDebuff) > 10 or Target:DebuffDown(S.DoomDebuff)) and ((not S.SoulStrike:IsAvailable() or S.SoulStrike:CooldownRemains() > Player:GCD() * 2) and SoulShards < 4) and not Player:PrevGCDP(1, S.Demonbolt) and not VarPoolCoresForTyrant) then
-      if Everyone.CastTargetIf(S.Demonbolt, Enemies8ySplash, "min", EvaluateCycleDemonbolt, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 12"; end
+      if Everyone.CastTargetIf(S.Demonbolt, Enemies8ySplash, "min", EvaluateCycleDemonbolt, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 12"; end
     end
     -- demonbolt,target_if=min:debuff.doom.remains,if=buff.demonic_core.stack>=3-(talent.doom&debuff.doom.down)*2&soul_shard<=3&!variable.pool_cores_for_tyrant
     if S.Demonbolt:IsReady() and (DemonicCoreStacks >= 3 - num(S.Doom:IsAvailable() and Target:DebuffDown(S.DoomDebuff)) * 2 and SoulShards <= 3 and not VarPoolCoresForTyrant) then
-      if Everyone.CastTargetIf(S.Demonbolt, Enemies8ySplash, "min", EvaluateTargetIfDemonbolt, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 14"; end
+      if Everyone.CastTargetIf(S.Demonbolt, Enemies8ySplash, "min", EvaluateTargetIfDemonbolt, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 14"; end
     end
     -- power_siphon,if=buff.demonic_core.stack<3&cooldown.summon_demonic_tyrant.remains>25
     if S.PowerSiphon:IsCastable() and (DemonicCoreStacks < 3 and S.SummonDemonicTyrant:CooldownRemains() > 25) then
@@ -793,7 +793,7 @@ local function APL()
     end
     -- demonbolt,target_if=min:debuff.doom.remains,if=talent.doom&buff.demonic_core.up&!variable.pool_cores_for_tyrant
     if S.Demonbolt:IsReady() and S.Doom:IsAvailable() and Player:BuffUp(S.DemonicCoreBuff) and not VarPoolCoresForTyrant then
-      if Everyone.CastTargetIf(S.Demonbolt, Enemies8ySplash, "min", EvaluateCycleDemonbolt3, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 44"; end
+      if Everyone.CastTargetIf(S.Demonbolt, Enemies8ySplash, "min", EvaluateCycleDemonbolt3, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt main 44"; end
     end
     -- demonbolt,if=fight_remains<buff.demonic_core.stack*gcd.max
     if S.Demonbolt:IsReady() and (BossFightRemains < DemonicCoreStacks * Player:GCD()) then
