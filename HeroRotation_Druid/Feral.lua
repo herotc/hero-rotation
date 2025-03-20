@@ -551,14 +551,16 @@ end
 
 local function Cooldown()
   if Settings.Commons.Enabled.Trinkets then
+    -- Note: Lines below check for cooldown.bestinslots.remains>20. Not having the item would return 0, but we likely want an infinite value instead.
+    local BISCDRemains = I.BestinSlotsMelee:IsEquipped() and I.BestinSlotsMelee:CooldownRemains() or 999
     -- use_item,slot=trinket1,if=trinket.1.has_use_damage&(trinket.2.cooldown.remains>20&cooldown.bestinslots.remains>20|!trinket.2.has_use_buff&cooldown.bestinslots.remains>20|cooldown.tigers_fury.remains<25&cooldown.tigers_fury.remains>20)|fight_remains<5
     -- TODO: Handle has_use_damage. Until then, using HasUseBuff logic.
-    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (Trinket1:HasUseBuff() and (Trinket2:CooldownRemains() > 20 and I.BestinSlotsMelee:CooldownRemains() > 20 or not VarTrinket2Buffs and I.BestinSlotsMelee:CooldownRemains() > 20 or S.TigersFury:CooldownRemains() < 25 and S.TigersFury:CooldownRemains() > 20) or BossFightRemains < 5) then
+    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (Trinket1:HasUseBuff() and (Trinket2:CooldownRemains() > 20 and BISCDRemains > 20 or not VarTrinket2Buffs and BISCDRemains > 20 or S.TigersFury:CooldownRemains() < 25 and S.TigersFury:CooldownRemains() > 20) or BossFightRemains < 5) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for "..Trinket1:Name().." cooldown 2"; end
     end
     -- use_item,slot=trinket2,if=trinket.2.has_use_damage&(trinket.1.cooldown.remains>20&cooldown.bestinslots.remains>20|!trinket.1.has_use_buff&cooldown.bestinslots.remains>20|cooldown.tigers_fury.remains<25&cooldown.tigers_fury.remains>20)|fight_remains<5
     -- TODO: Handle has_use_damage. Until then, using HasUseBuff logic.
-    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (Trinket2:HasUseBuff() and (Trinket1:CooldownRemains() > 20 and I.BestinSlotsMelee:CooldownRemains() > 20 or not VarTrinket1Buffs and I.BestinSlotsMelee:CooldownRemains() > 20 or S.TigersFury:CooldownRemains() < 25 and S.TigersFury:CooldownRemains() > 20) or BossFightRemains < 5) then
+    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (Trinket2:HasUseBuff() and (Trinket1:CooldownRemains() > 20 and BISCDRemains > 20 or not VarTrinket1Buffs and BISCDRemains > 20 or S.TigersFury:CooldownRemains() < 25 and S.TigersFury:CooldownRemains() > 20) or BossFightRemains < 5) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for "..Trinket2:Name().." cooldown 4"; end
     end
   end
