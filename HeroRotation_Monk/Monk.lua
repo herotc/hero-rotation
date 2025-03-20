@@ -91,7 +91,7 @@ Spell.Monk.Commons = {
   -- Item Effects
   CalltoDominanceBuff                   = Spell(403380), -- Neltharion trinket buff
   DomineeringArroganceBuff              = Spell(411661), -- Neltharion trinket buff2
-  TheEmperorsCapacitorBuff              = Spell(235054),
+  TheEmperorsCapacitorBuff              = Spell(393039),
   -- Misc
   PoolEnergy                            = Spell(999910),
   StopFoF                               = Spell(363653)
