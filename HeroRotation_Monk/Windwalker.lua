@@ -455,7 +455,7 @@ local function DefaultAoE()
   end
   -- strike_of_the_windlord,target_if=max:target.time_to_die,if=(time>5|buff.invokers_delight.up&buff.storm_earth_and_fire.up)&(cooldown.invoke_xuen_the_white_tiger.remains>15|talent.flurry_strikes)
   if S.StrikeoftheWindlord:IsReady() and ((HL.CombatTime() > 5 or Player:BuffUp(S.InvokersDelightBuff) and Player:BuffUp(S.StormEarthAndFireBuff)) and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 or S.FlurryStrikes:IsAvailable())) then
-    if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_aoe 20"; end
+    if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_aoe 20"; end
   end
   -- slicing_winds
   if S.SlicingWinds:IsReady() then
@@ -637,7 +637,7 @@ local function DefaultCleave()
   end
   -- strike_of_the_windlord,target_if=max:target.time_to_die,if=talent.gale_force&buff.invokers_delight.up&(buff.bloodlust.up|!buff.heart_of_the_jade_serpent_cdr_celestial.up)
   if S.StrikeoftheWindlord:IsReady() and (S.GaleForce:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff) and (Player:BloodlustUp() or Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff))) then
-    if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_cleave 26"; end
+    if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_cleave 26"; end
   end
   -- fists_of_fury,target_if=max:target.time_to_die,if=buff.power_infusion.up&buff.bloodlust.up
   if S.FistsofFury:IsReady() and (Player:PowerInfusionUp() and Player:BloodlustUp()) then
@@ -657,7 +657,7 @@ local function DefaultCleave()
   end
   -- strike_of_the_windlord,target_if=max:target.time_to_die,if=time>5&(cooldown.invoke_xuen_the_white_tiger.remains>15|talent.flurry_strikes)&(cooldown.fists_of_fury.remains<2|cooldown.celestial_conduit.remains<10)
   if S.StrikeoftheWindlord:IsReady() and (HL.CombatTime() > 5 and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 or S.FlurryStrikes:IsAvailable()) and (S.FistsofFury:CooldownRemains() < 2 or S.CelestialConduit:CooldownRemains() < 10)) then
-    if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_cleave 36"; end
+    if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_cleave 36"; end
   end
   -- slicing_winds
   if S.SlicingWinds:IsReady() then
@@ -830,15 +830,15 @@ local function DefaultST()
   end
   -- strike_of_the_windlord,if=talent.celestial_conduit&!buff.invokers_delight.up&!buff.heart_of_the_jade_serpent_cdr_celestial.up&cooldown.fists_of_fury.remains<5&cooldown.invoke_xuen_the_white_tiger.remains>15|fight_remains<12
   if S.StrikeoftheWindlord:IsReady() and (S.CelestialConduit:IsAvailable() and Player:BuffDown(S.InvokersDelightBuff) and Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and S.FistsofFury:CooldownRemains() < 5 and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 or BossFightRemains < 12) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_st 22"; end
+    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_st 22"; end
   end
   -- strike_of_the_windlord,if=talent.gale_force&buff.invokers_delight.up&(buff.bloodlust.up|!buff.heart_of_the_jade_serpent_cdr_celestial.up)
   if S.StrikeoftheWindlord:IsReady() and (S.GaleForce:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff) and (Player:BloodlustUp() or Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff))) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_st 24"; end
+    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_st 24"; end
   end
   -- strike_of_the_windlord,if=time>5&talent.flurry_strikes
   if S.StrikeoftheWindlord:IsReady() and (HL.CombatTime() > 5 and S.FlurryStrikes:IsAvailable()) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsInMeleeRange(9)) then return "strike_of_the_windlord default_st 26"; end
+    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_st 26"; end
   end
   -- fists_of_fury,if=buff.power_infusion.up&buff.bloodlust.up&time>5
   if S.FistsofFury:IsReady() and (Player:PowerInfusionUp() and Player:BloodlustUp() and HL.CombatTime() > 5) then
