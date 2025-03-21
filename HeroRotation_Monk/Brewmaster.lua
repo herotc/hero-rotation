@@ -49,7 +49,8 @@ local Settings = {
   Commons     = HR.GUISettings.APL.Monk.Commons,
   CommonsDS   = HR.GUISettings.APL.Monk.CommonsDS,
   CommonsOGCD = HR.GUISettings.APL.Monk.CommonsOGCD,
-  Brewmaster  = HR.GUISettings.APL.Monk.Brewmaster
+  Brewmaster  = HR.GUISettings.APL.Monk.Brewmaster,
+  BrMDS       = HR.GUISettings.APL.Monk.BrMDS,
 }
 
 --- ===== Rotation Variables =====
@@ -116,10 +117,10 @@ end
 
 local function Defensives()
   if S.CelestialBrew:IsCastable() and (Player:BuffDown(S.BlackoutComboBuff) and Player:IncomingDamageTaken(1999) > (UnitHealthMax("player") * 0.1 + Player:StaggerLastTickDamage(4)) and Player:BuffStack(S.ElusiveBrawlerBuff) < 2) then
-    if Cast(S.CelestialBrew, nil, Settings.Brewmaster.DisplayStyle.CelestialBrew) then return "Celestial Brew"; end
+    if Cast(S.CelestialBrew, nil, Settings.BrMDS.DisplayStyle.CelestialBrew) then return "Celestial Brew"; end
   end
   if S.PurifyingBrew:IsCastable() and ShouldPurify() then
-    if Cast(S.PurifyingBrew, nil, Settings.Brewmaster.DisplayStyle.Purify) then return "Purifying Brew (Capping Charges)"; end
+    if Cast(S.PurifyingBrew, nil, Settings.BrMDS.DisplayStyle.Purify) then return "Purifying Brew (Capping Charges)"; end
   end
   if S.ExpelHarm:IsReady() and Player:HealthPercentage() <= Settings.Brewmaster.ExpelHarmHP then
     local ExpelHarmMod = (S.StrengthofSpirit:IsAvailable()) and (1 + (1 - Player:HealthPercentage() / 100) * 100) or 1
@@ -132,10 +133,13 @@ local function Defensives()
     end
   end
   if S.DampenHarm:IsCastable() and Player:BuffDown(S.FortifyingBrewBuff) and Player:HealthPercentage() <= Settings.Brewmaster.DampenHarmHP then
-    if Cast(S.DampenHarm, nil, Settings.Brewmaster.DisplayStyle.DampenHarm) then return "Dampen Harm"; end
+    if Cast(S.DampenHarm, nil, Settings.BrMDS.DisplayStyle.DampenHarm) then return "Dampen Harm"; end
   end
   if S.FortifyingBrew:IsCastable() and Player:BuffDown(S.DampenHarmBuff) and Player:HealthPercentage() <= Settings.Brewmaster.FortifyingBrewHP then
-    if Cast(S.FortifyingBrew, nil, Settings.Brewmaster.DisplayStyle.FortifyingBrew) then return "Fortifying Brew"; end
+    if Cast(S.FortifyingBrew, nil, Settings.BrMDS.DisplayStyle.FortifyingBrew) then return "Fortifying Brew"; end
+  end
+  if S.Vivify:IsReady() and Player:BuffUp(S.VivaciousVivicationBuff) and Player:HealthPercentage() <= Settings.Brewmaster.VivifyHP then
+    if Cast(S.Vivify, nil, Settings.CommonsDS.DisplayStyle.Vivify) then return "Vivify"; end
   end
 end
 
@@ -283,7 +287,7 @@ local function APL()
     end
     -- purifying_brew,if=buff.blackout_combo.down
     if S.PurifyingBrew:IsCastable() and ShouldPurify() and (Player:BuffDown(S.BlackoutComboBuff)) then
-      if Cast(S.PurifyingBrew, nil, Settings.Brewmaster.DisplayStyle.Purify) then return "purifying_brew main 24"; end
+      if Cast(S.PurifyingBrew, nil, Settings.BrMDS.DisplayStyle.Purify) then return "purifying_brew main 24"; end
     end
     -- breath_of_fire,if=(buff.charred_passions.down&(!talent.scalding_brew.enabled|active_enemies<5))|!talent.charred_passions.enabled|(dot.breath_of_fire.remains<3&talent.scalding_brew.enabled)
     if S.BreathofFire:IsCastable() and ((Player:BuffDown(S.CharredPassionsBuff) and (not S.ScaldingBrew:IsAvailable() or EnemiesCount5 < 5)) or not S.CharredPassions:IsAvailable() or (Target:DebuffRemains(S.BreathofFire) < 3 and S.ScaldingBrew:IsAvailable())) then
