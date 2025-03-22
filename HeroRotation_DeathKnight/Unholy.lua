@@ -128,8 +128,26 @@ local function SetTrinketVariables()
   VarTrinket1Buffs = Trinket1:HasUseBuff() or VarTrinket1ID == I.TreacherousTransmitter:ID()
   VarTrinket2Buffs = Trinket2:HasUseBuff() or VarTrinket2ID == I.TreacherousTransmitter:ID()
 
-  VarTrinket1Duration = (VarTrinket1ID == I.TreacherousTransmitter:ID() or VarTrinket1ID == I.FunhouseLens:ID()) and 15 or Trinket1:BuffDuration()
-  VarTrinket2Duration = (VarTrinket2ID == I.TreacherousTransmitter:ID() or VarTrinket2ID == I.FunhouseLens:ID()) and 15 or Trinket2:BuffDuration()
+  VarTrinket1Duration = 0
+  VarTrinket2Duration = 0
+  if VarTrinket1ID == I.TreacherousTransmitter:ID() then
+    VarTrinket1Duration = 15
+  elseif VarTrinket1ID == I.FunhouseLens:ID() then
+    VarTrinket1Duration = 15
+  elseif VarTrinket1ID == I.SignetofthePriory:ID() then
+    VarTrinket1Duration = 20
+  else
+    VarTrinket1Duration = Trinket1:BuffDuration()
+  end
+  if VarTrinket2ID == I.TreacherousTransmitter:ID() then
+    VarTrinket2Duration = 15
+  elseif VarTrinket2ID == I.FunhouseLens:ID() then
+    VarTrinket2Duration = 15
+  elseif VarTrinket2ID == I.SignetofthePriory:ID() then
+    VarTrinket2Duration = 20
+  else
+    VarTrinket2Duration = Trinket2:BuffDuration()
+  end
 
   VarTrinket1HighValue = VarTrinket1ID == I.TreacherousTransmitter:ID() and 2 or 1
   VarTrinket2HighValue = VarTrinket2ID == I.TreacherousTransmitter:ID() and 2 or 1
@@ -338,8 +356,8 @@ local function Precombat()
   end
   -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff|trinket.1.is.treacherous_transmitter
   -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|trinket.2.is.treacherous_transmitter
-  -- variable,name=trinket_1_duration,op=setif,value=trinket.1.is.treacherous_transmitter*15+trinket.1.is.funhouse_lens*15,value_else=trinket.1.proc.any_dps.duration,condition=trinket.1.is.treacherous_transmitter|trinket.1.is.funhouse_lens
-  -- variable,name=trinket_2_duration,op=setif,value=trinket.2.is.treacherous_transmitter*15+trinket.2.is.funhouse_lens*15,value_else=trinket.2.proc.any_dps.duration,condition=trinket.2.is.treacherous_transmitter|trinket.2.is.funhouse_lens
+  -- variable,name=trinket_1_duration,op=setif,value=trinket.1.is.treacherous_transmitter*15+trinket.1.is.funhouse_lens*15+trinket.1.is.signet_of_the_priory*20,value_else=trinket.1.proc.any_dps.duration,condition=trinket.1.is.treacherous_transmitter|trinket.1.is.funhouse_lens|trinket.1.is.signet_of_the_priory
+  -- variable,name=trinket_2_duration,op=setif,value=trinket.2.is.treacherous_transmitter*15+trinket.2.is.funhouse_lens*15+trinket.2.is.signet_of_the_priory*20,value_else=trinket.2.proc.any_dps.duration,condition=trinket.2.is.treacherous_transmitter|trinket.2.is.funhouse_lens|trinket.2.is.signet_of_the_priory
   -- variable,name=trinket_1_high_value,op=setif,value=2,value_else=1,condition=trinket.1.is.treacherous_transmitter
   -- variable,name=trinket_2_high_value,op=setif,value=2,value_else=1,condition=trinket.2.is.treacherous_transmitter
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_1_buffs&(talent.apocalypse&trinket.1.cooldown.duration%%cooldown.apocalypse.duration=0|talent.dark_transformation&trinket.1.cooldown.duration%%cooldown.dark_transformation.duration=0)|trinket.1.is.treacherous_transmitter
