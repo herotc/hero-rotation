@@ -43,6 +43,10 @@ local OnUseExcludes = {
   I.ImperfectAscendancySerum:ID(),
   I.SpymastersWeb:ID(),
   I.TreacherousTransmitter:ID(),
+  -- TWW S2 Prior Expansion Trinkets
+  I.RatfangToxin:ID(),
+  -- TWW S2 Prior Expansion Items
+  I.NeuralSynapseEnhancer:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -134,17 +138,21 @@ local function Precombat()
   -- snapshot_stats
   -- variable,name=boltspam,value=talent.splinterstorm&talent.cold_front&talent.slick_ice&talent.deaths_chill&talent.frozen_touch|talent.frostfire_bolt&talent.deep_shatter&talent.slick_ice&talent.deaths_chill
   -- Note: Variables moved to declarations and SPELLS_CHANGED/LEARNED_SPELL_IN_TAB Event Registrations.
-  -- variable,name=treacherous_transmitter_precombat_cast,value=12*!variable.boltspam
+  -- variable,name=treacherous_transmitter_precombat_cast,value=12,if=equipped.treacherous_transmitter
   -- Note: Unused variable.
   -- use_item,name=treacherous_transmitter
   if I.TreacherousTransmitter:IsEquippedAndReady() then
     if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter precombat 2"; end
   end
+  -- use_item,name=ingenious_mana_battery
+  if I.IngeniousManaBattery:IsEquippedAndReady() then
+    if Cast(I.IngeniousManaBattery, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "ingenious_mana_battery precombat 4"; end
+  end
   -- blizzard,if=active_enemies>=3
   -- Note: Can't check active_enemies in Precombat
   -- frostbolt,if=active_enemies<=2
   if Bolt:IsCastable() and not Player:IsCasting(Bolt) then
-    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostbolt precombat 4"; end
+    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostbolt precombat 6"; end
   end
 end
 
@@ -172,17 +180,21 @@ local function CDs()
     if I.BurstofKnowledge:IsEquippedAndReady() and (Player:BuffRemains(S.IcyVeinsBuff) > 15 or BossFightRemains < 20) then
       if Cast(I.BurstofKnowledge, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "burst_of_knowledge cds 8"; end
     end
+    -- use_item,name=ratfang_toxin,if=time>10
+    if I.RatfangToxin:IsEquippedAndReady() and (HL.CombatTime() > 10) then
+      if Cast(I.RatfangToxin, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "ratfang_toxin cds 10"; end
+    end
   end
   -- potion,if=fight_remains<35|buff.icy_veins.remains>15
   if Settings.Commons.Enabled.Potions and (BossFightRemains < 35 or Player:BuffRemains(S.IcyVeinsBuff) > 15) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion cds 10"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion cds 12"; end
     end
   end
   -- icy_veins,if=buff.icy_veins.remains<1.5&(talent.frostfire_bolt|active_enemies>=3)
   if CDsON() and S.IcyVeins:IsCastable() and (Player:BuffRemains(S.IcyVeinsBuff) < 1.5 and (S.FrostfireBolt:IsAvailable() or EnemiesCount16ySplash >= 3)) then
-    if Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cds 12"; end
+    if Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cds 14"; end
   end
   -- frozen_orb,if=time=0&active_enemies>=3
   -- Note: Can't get here at time=0.
@@ -190,7 +202,11 @@ local function CDs()
   -- Note: Can't get here at time=0.
   -- icy_veins,if=buff.icy_veins.remains<1.5&talent.splinterstorm
   if CDsON() and S.IcyVeins:IsCastable() and (Player:BuffRemains(S.IcyVeinsBuff) < 1.5 and S.Splinterstorm:IsAvailable()) then
-    if Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cds 14"; end
+    if Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cds 16"; end
+  end
+  -- use_item,name=neural_synapse_enhancer,if=active_enemies<=2|prev_gcd.1.comet_storm|fight_remains<20
+  if I.NeuralSynapseEnhancer:IsEquippedAndReady() and (EnemiesCount8ySplash <= 2 or Player:PrevGCDP(1, S.CometStorm) or BossFightRemains < 20) then
+    if Cast(I.NeuralSynapseEnhancer, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "neural_synapse_enhancer cds 18"; end
   end
   -- use_items
   if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
@@ -199,7 +215,7 @@ local function CDs()
       local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
       if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
       if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
-        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " cds 16"; end
+        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " cds 20"; end
       end
     end
   end
@@ -209,19 +225,19 @@ local function CDs()
   if CDsON() then
     -- blood_fury
     if S.BloodFury:IsCastable() then
-      if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury cds 18"; end
+      if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury cds 22"; end
     end
     -- berserking,if=buff.icy_veins.remains>9&buff.icy_veins.remains<15|fight_remains<15
     if S.Berserking:IsCastable() and (Player:BuffRemains(S.IcyVeinsBuff) > 9 and Player:BuffRemains(S.IcyVeinsBuff) < 15 or BossFightRemains < 15) then
-      if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking cds 20"; end
+      if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking cds 24"; end
     end
     -- fireblood
     if S.Fireblood:IsCastable() then
-      if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood cds 22"; end
+      if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood cds 26"; end
     end
     -- ancestral_call
     if S.AncestralCall:IsCastable() then
-      if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call cds 24"; end
+      if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call cds 28"; end
     end
   end
 end

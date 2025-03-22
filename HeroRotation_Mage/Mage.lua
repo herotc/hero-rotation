@@ -288,6 +288,9 @@ Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
 Item.Mage.Frost = MergeTableByKey(Item.Mage.Commons, {
   -- TWW Trinkets
   BurstofKnowledge                      = Item(231424, {13, 14}),
+  RatfangToxin                          = Item(235359, {13, 14}),
+  -- TWW S2 Prior Expansion Trinkets
+  IngeniousManaBattery                  = Item(169344, {13, 14}),
 })
 
 --[[ Variables
