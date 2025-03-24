@@ -267,4 +267,6 @@ Item.DeathKnight.Frost = MergeTableByKey(Item.DeathKnight.Commons, {
 })
 
 Item.DeathKnight.Unholy = MergeTableByKey(Item.DeathKnight.Commons, {
+  -- TWW Trinkets
+  SignetofthePriory                     = Item(219308, {13, 14}),
 })
