@@ -207,13 +207,13 @@ local function ColossusAoE()
   if CDsON() and S.SweepingStrikes:IsCastable() then
     if Everyone.CastTargetIf(S.SweepingStrikes, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8), Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes colossus_aoe 10"; end
   end
-  -- ravager
-  if CDsON() and S.Ravager:IsCastable() then
-    if Everyone.CastTargetIf(S.Ravager, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(40), Settings.CommonsOGCD.GCDasOffGCD.Ravager) then return "ravager colossus_aoe 12"; end
-  end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
-    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker colossus_aoe 14"; end
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker colossus_aoe 12"; end
+  end
+  -- ravager
+  if CDsON() and S.Ravager:IsCastable() then
+    if Everyone.CastTargetIf(S.Ravager, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(40), Settings.CommonsOGCD.GCDasOffGCD.Ravager) then return "ravager colossus_aoe 14"; end
   end
   -- champions_spear
   if CDsON() and S.ChampionsSpear:IsCastable() then
@@ -238,10 +238,6 @@ local function ColossusAoE()
   -- demolish,if=buff.colossal_might.stack=10&(debuff.colossus_smash.remains>=2|cooldown.colossus_smash.remains>=7)
   if S.Demolish:IsCastable() and (Player:BuffStack(S.ColossalMightBuff) == 10 and (Target:DebuffRemains(S.ColossusSmashDebuff) >= 2 or S.ColossusSmash:CooldownRemains() >= 7)) then
     if Cast(S.Demolish, nil, Settings.CommonsDS.DisplayStyle.Demolish, not TargetInMeleeRange) then return "demolish colossus_aoe 26"; end
-  end
-  -- overpower,if=talent.dreadnaught
-  if S.Overpower:IsCastable() and (S.Dreadnaught:IsAvailable()) then
-    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower colossus_aoe 28"; end
   end
   -- mortal_strike
   if S.MortalStrike:IsReady() then
