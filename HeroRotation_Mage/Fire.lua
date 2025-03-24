@@ -278,7 +278,13 @@ local function Precombat()
   -- Note: Can't calculate enemies in Precombat
   -- pyroblast
   if S.Pyroblast:IsReady() and not Player:IsCasting(S.Pyroblast) then
-    if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast precombat 8"; end
+    -- Check if we have a free cast available
+    if FreeCastAvailable() then
+      if PBCast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast precombat 8"; end
+    else
+      -- Use regular Cast if not a free cast
+      if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast precombat 9"; end
+    end
   end
   -- phoenix_flames,if=time=0
   -- Note: From APL()
