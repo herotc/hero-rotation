@@ -134,8 +134,8 @@ local function SetTrinketVariables()
   VarTrinket1Ex = T1.Excluded
   VarTrinket2Ex = T2.Excluded
 
-  VarTrinket1Buffs = Trinket1:HasUseBuff()
-  VarTrinket2Buffs = Trinket2:HasUseBuff()
+  VarTrinket1Buffs = Trinket1:HasUseBuff() or VarTrinket1ID == I.FunhouseLens:ID()
+  VarTrinket2Buffs = Trinket2:HasUseBuff() or VarTrinket2ID == I.FunhouseLens:ID()
 
   VarTrinket1Exclude = VarTrinket1ID == 193757
   VarTrinket2Exclude = VarTrinket2ID == 193757
@@ -143,8 +143,20 @@ local function SetTrinketVariables()
   VarTrinket1Manual = VarTrinket1ID == I.SpymastersWeb:ID() or VarTrinket1ID == I.ImperfectAscendancySerum:ID()
   VarTrinket2Manual = VarTrinket2ID == I.SpymastersWeb:ID() or VarTrinket2ID == I.ImperfectAscendancySerum:ID()
 
-  VarTrinket1BuffDuration = Trinket1:BuffDuration() + (VarTrinket1ID == I.MirrorofFracturedTomorrows:ID() and 20 or 0)
-  VarTrinket2BuffDuration = Trinket2:BuffDuration() + (VarTrinket2ID == I.MirrorofFracturedTomorrows:ID() and 20 or 0)
+  if VarTrinket1ID == I.FunhouseLens:ID() then
+    VarTrinket1BuffDuration = 15
+  elseif VarTrinket1ID == I.SignetofthePriory:ID() then
+    VarTrinket1BuffDuration = 20
+  else
+    VarTrinket1BuffDuration = Trinket1:BuffDuration()
+  end
+  if VarTrinket2ID == I.FunhouseLens:ID() then
+    VarTrinket2BuffDuration = 15
+  elseif VarTrinket2ID == I.SignetofthePriory:ID() then
+    VarTrinket2BuffDuration = 20
+  else
+    VarTrinket2BuffDuration = Trinket2:BuffDuration()
+  end
 
   VarTrinket1Sync = 0.5
   if VarTrinket1Buffs and (VarTrinket1CD % 60 == 0 or 60 % VarTrinket1CD == 0) then
@@ -299,14 +311,14 @@ local function Precombat()
   -- variable,name=first_tyrant_time,op=sub,value=action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time
   -- variable,name=first_tyrant_time,op=min,value=10
   -- variable,name=in_opener,op=set,value=1
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff
+  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff|trinket.1.is.funhouse_lens
+  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|trinket.2.is.funhouse_lens
   -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell
   -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell
   -- variable,name=trinket_1_manual,value=trinket.1.is.spymasters_web|trinket.1.is.imperfect_ascendancy_serum
   -- variable,name=trinket_2_manual,value=trinket.2.is.spymasters_web|trinket.2.is.imperfect_ascendancy_serum
-  -- variable,name=trinket_1_buff_duration,value=trinket.1.proc.any_dps.duration+(trinket.1.is.mirror_of_fractured_tomorrows*20)
-  -- variable,name=trinket_2_buff_duration,value=trinket.2.proc.any_dps.duration+(trinket.2.is.mirror_of_fractured_tomorrows*20)
+  -- variable,name=trinket_1_buff_duration,value=trinket.1.proc.any_dps.duration+(trinket.1.is.funhouse_lens*15)+(trinket.1.is.signet_of_the_priory*20)
+  -- variable,name=trinket_2_buff_duration,value=trinket.2.proc.any_dps.duration+(trinket.2.is.funhouse_lens*15)+(trinket.2.is.signet_of_the_priory*20)
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_1_buffs&(trinket.1.cooldown.duration%%cooldown.summon_demonic_tyrant.duration=0|cooldown.summon_demonic_tyrant.duration%%trinket.1.cooldown.duration=0)
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_2_buffs&(trinket.2.cooldown.duration%%cooldown.summon_demonic_tyrant.duration=0|cooldown.summon_demonic_tyrant.duration%%trinket.2.cooldown.duration=0)
   -- variable,name=damage_trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&!variable.trinket_2_buffs&trinket.2.ilvl>trinket.1.ilvl
@@ -406,7 +418,7 @@ local function Items()
     if I.SpymastersWeb:IsEquippedAndReady() and (DemonicTyrantActive() and BossFightRemains <= 80 and Player:BuffStack(S.SpymastersReportBuff) >= 30 and (not VarTrinket1Buffs and VarTrinket2ID == I.SpymastersWeb:ID() or not VarTrinket2Buffs and VarTrinket1ID == I.SpymastersWeb:ID()) or BossFightRemains <= 20 and (Trinket1:CooldownDown() and VarTrinket2ID == I.SpymastersWeb:ID() or Trinket2:CooldownDown() and VarTrinket1ID == I.SpymastersWeb:ID() or not VarTrinket1Buffs or not VarTrinket2Buffs)) then
       if Cast(I.SpymastersWeb, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spymasters_web items 10"; end
     end
-    -- use_item,use_off_gcd=1,name=imperfect_ascendancy_serum,if=pet.demonic_tyrant.active&gcd.remains>0|fight_remains<=30
+    -- use_item,use_off_gcd=1,name=imperfect_ascendancy_serum,if=pet.demonic_tyrant.active|fight_remains<=30
     if I.ImperfectAscendancySerum:IsEquippedAndReady() and (DemonicTyrantActive() or BossFightRemains <= 30) then
       if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum items 12"; end
     end
