@@ -251,6 +251,8 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Destruction, Spell.War
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Commons = {
   -- TWW Trinkets
+  FunhouseLens                          = Item(234217, {13, 14}),
+  SignetofthePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
 }
 

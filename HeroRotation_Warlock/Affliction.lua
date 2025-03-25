@@ -113,8 +113,8 @@ local function SetTrinketVariables()
   VarTrinket1Ex = T1.Excluded
   VarTrinket2Ex = T2.Excluded
 
-  VarTrinket1Buffs = Trinket1:HasUseBuff()
-  VarTrinket2Buffs = Trinket2:HasUseBuff()
+  VarTrinket1Buffs = Trinket1:HasUseBuff() or VarTrinket1ID == I.FunhouseLens:ID()
+  VarTrinket2Buffs = Trinket2:HasUseBuff() or VarTrinket2ID == I.FunhouseLens:ID()
 
   VarTrinket1Sync = 0.5
   if VarTrinket1Buffs and (VarTrinket1CD % 60 == 0 or 60 % VarTrinket1CD == 0) then
@@ -131,8 +131,20 @@ local function SetTrinketVariables()
   VarTrinket1Exclude = VarTrinket1ID == 193757
   VarTrinket2Exclude = VarTrinket2ID == 193757
 
-  VarTrinket1BuffDuration = Trinket1:BuffDuration() + (num(VarTrinket1ID == 207581) * 20)
-  VarTrinket2BuffDuration = Trinket2:BuffDuration() + (num(VarTrinket2ID == 207581) * 20)
+  if VarTrinket1ID == I.FunhouseLens:ID() then
+    VarTrinket1BuffDuration = 15
+  elseif VarTrinket1ID == I.SignetofthePriory:ID() then
+    VarTrinket1BuffDuration = 20
+  else
+    VarTrinket1BuffDuration = Trinket1:BuffDuration()
+  end
+  if VarTrinket2ID == I.FunhouseLens:ID() then
+    VarTrinket2BuffDuration = 15
+  elseif VarTrinket2ID == I.SignetofthePriory:ID() then
+    VarTrinket2BuffDuration = 20
+  else
+    VarTrinket2BuffDuration = Trinket2:BuffDuration()
+  end
 
   -- Note: If BuffDuration is 0, set to 1 to avoid divide by zero errors.
   local T1BuffDur = VarTrinket1BuffDuration > 0 and VarTrinket1BuffDuration or 1
@@ -328,16 +340,16 @@ local function Precombat()
   -- augmentation
   -- summon_pet - Moved to APL()
   -- variable,name=cleave_apl,default=0,op=reset
-  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff
-  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff
+  -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff|trinket.1.is.funhouse_lens
+  -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|trinket.2.is.funhouse_lens
   -- variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_1_buffs&(trinket.1.cooldown.duration%%cooldown.soul_rot.duration=0|cooldown.soul_rot.duration%%trinket.1.cooldown.duration=0)
   -- variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_2_buffs&(trinket.2.cooldown.duration%%cooldown.soul_rot.duration=0|cooldown.soul_rot.duration%%trinket.2.cooldown.duration=0)
   -- variable,name=trinket_1_manual,value=trinket.1.is.spymasters_web|trinket.1.is.aberrant_spellforge
   -- variable,name=trinket_2_manual,value=trinket.2.is.spymasters_web|trinket.2.is.aberrant_spellforge
   -- variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell
   -- variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell
-  -- variable,name=trinket_1_buff_duration,value=trinket.1.proc.any_dps.duration+(trinket.1.is.mirror_of_fractured_tomorrows*20)
-  -- variable,name=trinket_2_buff_duration,value=trinket.2.proc.any_dps.duration+(trinket.2.is.mirror_of_fractured_tomorrows*20)
+  -- variable,name=trinket_1_buff_duration,value=trinket.1.proc.any_dps.duration+(trinket.1.is.funhouse_lens*15)+(trinket.1.is.signet_of_the_priory*20)
+  -- variable,name=trinket_2_buff_duration,value=trinket.2.proc.any_dps.duration+(trinket.2.is.funhouse_lens*15)+(trinket.2.is.signet_of_the_priory*20)
   -- variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%variable.trinket_2_buff_duration)*(1+0.5*trinket.2.has_buff.intellect)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%variable.trinket_1_buff_duration)*(1+0.5*trinket.1.has_buff.intellect)*(variable.trinket_1_sync))
   -- Note: Trinket variables moved to variable declarations and PLAYER_EQUIPMENT_CHANGED registration.
   -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
