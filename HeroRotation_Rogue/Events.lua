@@ -374,7 +374,7 @@ do
       if SpellID == 51690 then
         DisorientingStrikesCount = 2
       end
-      if SpellID == 193315 then
+      if SpellID == 193315 or SpellID == 8676 or SpellID == 430023 then
         if DisorientingStrikesCount > 0 then
           DisorientingStrikesCount = DisorientingStrikesCount - 1
         end
