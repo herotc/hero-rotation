@@ -214,15 +214,15 @@ local function Used_For_Danse(Spell)
 end
 
 local function Trinket_Sync_Slot()
-  -- actions.precombat+=/variable,name=trinket_sync_slot,value=1,if=trinket.1.has_stat.any_dps
-  -- &(!trinket.2.has_stat.any_dps|trinket.1.is.treacherous_transmitter|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)
-  -- actions.precombat+=/variable,name=trinket_sync_slot,value=2,if=trinket.2.has_stat.any_dps
-  -- &(!trinket.1.has_stat.any_dps|trinket.2.cooldown.duration>trinket.1.cooldown.duration)
+  -- ctions.precombat+=/variable,name=trinket_sync_slot,value=1,if=trinket.1.has_use_buff
+  -- &(!trinket.2.has_use_buff|trinket.1.is.treacherous_transmitter|trinket.1.cooldown.duration>=trinket.2.cooldown.duration)
+  -- actions.precombat+=/variable,name=trinket_sync_slot,value=2,if=trinket.2.has_use_buff
+  -- &(!trinket.1.has_use_buff|trinket.2.cooldown.duration>trinket.1.cooldown.duration)
   local TrinketSyncSlot = 0
 
-  if trinket1:HasStatAnyDps() and (not trinket2:HasStatAnyDps() or trinket1:ID() == I.TreacherousTransmitter:ID() or trinket1:Cooldown() >= trinket2:Cooldown()) then
+  if trinket1:HasUseBuff() and (not trinket2:HasUseBuff() or trinket1:ID() == I.TreacherousTransmitter:ID() or trinket1:Cooldown() >= trinket2:Cooldown()) then
     TrinketSyncSlot = 1
-  elseif trinket2:HasStatAnyDps() and (not trinket1:HasStatAnyDps() or trinket2:Cooldown() > trinket1:Cooldown()) then
+  elseif trinket2:HasUseBuff() and (not trinket1:HasUseBuff() or trinket2:Cooldown() > trinket1:Cooldown()) then
     TrinketSyncSlot = 2
   end
 
@@ -655,16 +655,16 @@ local function Items()
 
     local TrinketSpell
     local TrinketRange = 100
-    --actions.items+=/use_items,slots=trinket1,if=(variable.trinket_sync_slot=1&(buff.shadow_blades.up
-    -- |(1+cooldown.shadow_blades.remains)>=trinket.1.cooldown.duration|fight_remains<=20)|(variable.trinket_sync_slot=2
-    -- &(!trinket.2.cooldown.ready&!buff.shadow_blades.up&cooldown.shadow_blades.remains>20))|!variable.trinket_sync_slot)
+    -- actions.item+=/use_items,slots=trinket1,if=(variable.trinket_sync_slot=1&(buff.shadow_blades.up
+      -- |fight_remains<=20)|(variable.trinket_sync_slot=2&(!trinket.2.cooldown.ready&cooldown.shadow_blades.remains>20))
+      -- |!variable.trinket_sync_slot)
     if trinket1 then
       TrinketSpell = trinket1:OnUseSpell()
       TrinketRange = (TrinketSpell and TrinketSpell.MaximumRange > 0 and TrinketSpell.MaximumRange <= 100) and TrinketSpell.MaximumRange or 100
     end
     if trinket1 and trinket1:IsEquippedAndReady() and not Player:IsItemBlacklisted(trinket1) then
-      if not ValueIsInArray(OnUseExcludes, trinket1:ID()) and (Trinket_Sync_Slot() == 1 and (Player:BuffUp(S.ShadowBlades) or (1 + S.ShadowBlades:CooldownRemains()) >= trinket1:CooldownRemains()
-        or HL.BossFilteredFightRemains("<=", 20)) or (Trinket_Sync_Slot() == 2 and (not trinket2:IsReady() and not Player:BuffUp(S.ShadowBlades)
+      if not ValueIsInArray(OnUseExcludes, trinket1:ID()) and (Trinket_Sync_Slot() == 1 and (Player:BuffUp(S.ShadowBlades)
+        or HL.BossFilteredFightRemains("<=", 20)) or (Trinket_Sync_Slot() == 2 and (not trinket2:IsReady()
         and S.ShadowBlades:CooldownRemains() > 20)) or Trinket_Sync_Slot() == 0) then
         if Cast(trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then
           return "Generic use_items for " .. trinket1:Name()
@@ -672,16 +672,16 @@ local function Items()
       end
     end
 
-    --actions.items+=/use_items,slots=trinket2,if=(variable.trinket_sync_slot=2&(buff.shadow_blades.up
-    -- |(1+cooldown.shadow_blades.remains)>=trinket.2.cooldown.duration|fight_remains<=20)|(variable.trinket_sync_slot=1
-    -- &(!trinket.1.cooldown.ready&!buff.shadow_blades.up&cooldown.shadow_blades.remains>20))|!variable.trinket_sync_slot)
+    -- actions.item+=/use_items,slots=trinket2,if=(variable.trinket_sync_slot=2&(buff.shadow_blades.up
+    -- |fight_remains<=20)|(variable.trinket_sync_slot=1&(!trinket.1.cooldown.ready&cooldown.shadow_blades.remains>20))
+    -- |!variable.trinket_sync_slot)
     if trinket2 then
       TrinketSpell = trinket2:OnUseSpell()
       TrinketRange = (TrinketSpell and TrinketSpell.MaximumRange > 0 and TrinketSpell.MaximumRange <= 100) and TrinketSpell.MaximumRange or 100
     end
     if trinket2 and trinket2:IsEquippedAndReady() and not Player:IsItemBlacklisted(trinket2) then
-      if not ValueIsInArray(OnUseExcludes, trinket2:ID()) and (Trinket_Sync_Slot() == 2 and (Player:BuffUp(S.ShadowBlades) or (1 + S.ShadowBlades:CooldownRemains()) >= trinket2:CooldownRemains()
-        or HL.BossFilteredFightRemains("<=", 20)) or (Trinket_Sync_Slot() == 1 and (not trinket1:IsReady() and not Player:BuffUp(S.ShadowBlades)
+      if not ValueIsInArray(OnUseExcludes, trinket2:ID()) and (Trinket_Sync_Slot() == 2 and (Player:BuffUp(S.ShadowBlades)
+        or HL.BossFilteredFightRemains("<=", 20)) or (Trinket_Sync_Slot() == 1 and (not trinket1:IsReady()
         and S.ShadowBlades:CooldownRemains() > 20)) or Trinket_Sync_Slot() == 0) then
         if Cast(trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(TrinketRange)) then
           return "Generic use_items for " .. trinket2:Name()
@@ -807,8 +807,8 @@ local function APL ()
   SkipRupture = Player:BuffUp(S.ShadowDanceBuff) or Player:BuffUp(S.DarkestNightBuff)
     or MeleeEnemies10yCount >= 8 and not S.ReplicatingShadows:IsAvailable() and S.UnseenBlade:IsAvailable()
 
-  -- actions+=/variable,name=maintenance,value=(dot.rupture.ticking|variable.skip_rupture)
-  Maintenance = (Target:DebuffUp(S.Rupture) or SkipRupture)
+  -- actions+=/variable,name=maintenance,value=(dot.rupture.ticking|variable.skip_rupture)&(buff.slice_and_dice.up|variable.targets<=2)
+  Maintenance = (Target:DebuffUp(S.Rupture) or SkipRupture) and (Player:BuffUp(S.SliceandDice) or MeleeEnemies10yCount <= 2)
 
   -- actions+=/variable,name=secret,value=buff.shadow_dance.up|(cooldown.flagellation.remains<40&cooldown.flagellation.remains>20&talent.death_perception)
   Secret = Player:BuffUp(S.ShadowDanceBuff) or (S.Flagellation:CooldownRemains() < 40 and S.Flagellation:CooldownRemains() > 20 and S.DeathPerception:IsAvailable())

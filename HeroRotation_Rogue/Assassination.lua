@@ -1029,32 +1029,6 @@ end
 -- # Direct damage abilities
 local function Direct ()
   -- # Direct Damage Abilities
-  -- # Check if we should be using a filler
-  -- actions.direct+=/variable,name=use_filler,value=combo_points<=variable.effective_spend_cp&!variable.cd_soon
-  -- |variable.not_pooling|!variable.single_target
-  local UseFiller = ComboPoints < EffectiveCPSpend and not CDSoon or NotPooling or not SingleTarget
-
-  -- # Maintain Caustic Spatter
-  -- actions.direct+=/variable,name=use_caustic_filler,value=talent.caustic_spatter&dot.rupture.ticking
-  -- &(!debuff.caustic_spatter.up|debuff.caustic_spatter.remains<=2)&combo_points.deficit>=1&!variable.single_target
-  local UseCausticFiller = S.CausticSpatter:IsAvailable() and Target:DebuffUp(S.Rupture)
-    and (not Target:DebuffUp(S.CausticSpatterDebuff) or Target:DebuffRemains(S.CausticSpatterDebuff) <= 2)
-    and ComboPointsDeficit >= 1 and not SingleTarget
-
-  -- actions.direct+=/mutilate,if=variable.use_caustic_filler
-  if S.Mutilate:IsCastable() and UseCausticFiller then
-    if CastPooling(S.Mutilate, nil, not TargetInMeleeRange) then
-      return "Cast Mutilate (Caustic)"
-    end
-  end
-
-  -- actions.direct+=/ambush,if=variable.use_caustic_filler
-  if (S.Ambush:IsCastable() or S.AmbushOverride:IsReady()) and (Player:StealthUp(true, true) and UseCausticFiller) then
-    if CastPooling(S.Ambush, nil, not TargetInMeleeRange) then
-      return "Cast Ambush (Caustic)"
-    end
-  end
-
   -- Envenom at applicable cp if not pooling, capped on amplifying poison stacks, on an animacharged CP, or in aoe.
   -- actions.direct=envenom,if=!buff.darkest_night.up&combo_points>=variable.effective_spend_cp
   -- &(variable.not_pooling|debuff.amplifying_poison.stack>=20|!variable.single_target)&!buff.vanish.up
@@ -1074,6 +1048,40 @@ local function Direct ()
     end
   end
 
+  -- actions.direct+=/variable,name=fok_target_count,value=(buff.clear_the_witnesses.up
+  -- &(spell_targets.fan_of_knives>=2-(buff.lingering_darkness.up|!talent.vicious_venoms)))
+  -- |(spell_targets.fan_of_knives>=3-(talent.momentum_of_despair&talent.thrown_precision)+talent.vicious_venoms+talent.blindside)
+  local FOKTargetCount = (Player:BuffUp(S.ClearTheWitnessesBuff)
+    and (MeleeEnemies10yCount >= 2 - num(Player:BuffUp(S.LingeringDarknessBuff) or not S.ViciousVenoms:IsAvailable())))
+    or (MeleeEnemies10yCount >= 3 - num(S.MomentumOfDespair:IsAvailable() and S.ThrownPrecision:IsAvailable())
+    + num(S.ViciousVenoms:IsAvailable()) + num(S.Blindside:IsAvailable()))
+
+  -- # Check if we should be using a filler
+  -- actions.direct+=/variable,name=use_filler,value=combo_points<=variable.effective_spend_cp&!variable.cd_soon
+  -- |variable.not_pooling|!variable.single_target
+  local UseFiller = ComboPoints < EffectiveCPSpend and not CDSoon or NotPooling or not SingleTarget
+
+  -- # Maintain Caustic Spatter
+  -- actions.direct+=/variable,name=use_caustic_filler,value=talent.caustic_spatter&dot.rupture.ticking
+  -- &(!debuff.caustic_spatter.up|debuff.caustic_spatter.remains<=3)&combo_points.deficit>=1&!variable.single_target
+  local UseCausticFiller = S.CausticSpatter:IsAvailable() and Target:DebuffUp(S.Rupture)
+    and (not Target:DebuffUp(S.CausticSpatterDebuff) or Target:DebuffRemains(S.CausticSpatterDebuff) <= 3)
+    and ComboPointsDeficit >= 1 and not SingleTarget
+
+  -- actions.direct+=/mutilate,if=variable.use_caustic_filler
+  if S.Mutilate:IsCastable() and UseCausticFiller then
+    if CastPooling(S.Mutilate, nil, not TargetInMeleeRange) then
+      return "Cast Mutilate (Caustic)"
+    end
+  end
+
+  -- actions.direct+=/ambush,if=variable.use_caustic_filler
+  if (S.Ambush:IsCastable() or S.AmbushOverride:IsReady()) and (Player:StealthUp(true, true) and UseCausticFiller) then
+    if CastPooling(S.Ambush, nil, not TargetInMeleeRange) then
+      return "Cast Ambush (Caustic)"
+    end
+  end
+
   -- actions.direct+=/ambush,if=variable.use_filler&(buff.blindside.up|stealthed.rogue)&(!dot.kingsbane.ticking|debuff.deathmark.down|buff.blindside.up)
   if (S.Ambush:IsCastable() or S.AmbushOverride:IsReady()) and UseFiller and (Player:BuffUp(S.BlindsideBuff) or Player:StealthUp(true, false))
     and (Target:DebuffDown(S.Kingsbane) or Target:DebuffDown(S.Deathmark) or Player:BuffUp(S.BlindsideBuff)) then
@@ -1083,9 +1091,10 @@ local function Direct ()
   end
 
   -- # Fan of Knives at 6cp for Darkest Night
-  -- actions.direct+=/fan_of_knives,if=buff.darkest_night.up&combo_points=6
+  -- actions.direct+=/fan_of_knives,if=buff.darkest_night.up&combo_points=6&(!talent.vicious_venoms|spell_targets.fan_of_knives>=2)
   if S.FanofKnives:IsCastable() then
-    if Player:BuffUp(S.DarkestNightBuff) and ComboPoints == 6 then
+    if Player:BuffUp(S.DarkestNightBuff) and ComboPoints == 6
+      and (not S.ViciousVenoms:IsAvailable() or MeleeEnemies10yCount >= 2) then
       if CastPooling(S.FanofKnives, nil, not TargetInMeleeRange) then
         return "Cast Fan of Knives"
       end
@@ -1093,29 +1102,10 @@ local function Direct ()
   end
 
   -- # Fan of Knives at 3+ targets, accounting for various edge cases
-  --actions.direct+=/fan_of_knives,if=variable.use_filler&!priority_rotation
-  -- &(spell_targets.fan_of_knives>=3-(talent.momentum_of_despair&talent.thrown_precision)
-  -- |buff.clear_the_witnesses.up&!talent.vicious_venoms)
-  if S.FanofKnives:IsCastable() then
-    if HR.AoEON() and UseFiller and not PriorityRotation and (MeleeEnemies10yCount >= 3 - BoolToInt(S.MomentumOfDespair:IsAvailable() and S.ThrownPrecision:IsAvailable()))
-      or Player:BuffUp(S.ClearTheWitnessesBuff) and not S.ViciousVenoms:IsAvailable() then
-      if CastPooling(S.FanofKnives, nil, not TargetInMeleeRange) then
-        return "Cast Fan of Knives"
-      end
-    end
-  end
-
-  -- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking
-  -- &(!priority_rotation|dot.garrote.ticking|dot.rupture.ticking),if=variable.use_filler
-  -- &spell_targets.fan_of_knives>=3-(talent.momentum_of_despair&talent.thrown_precision)
-  if HR.AoEON() and Player:BuffUp(S.DeadlyPoison)
-    and UseFiller and MeleeEnemies10yCount >= 3 - BoolToInt(S.MomentumOfDespair:IsAvailable() and S.ThrownPrecision:IsAvailable()) then
-    for _, CycleUnit in pairs(MeleeEnemies10y) do
-      if not CycleUnit:DebuffUp(S.DeadlyPoisonDebuff, true) and (not PriorityRotation or CycleUnit:DebuffUp(S.Garrote) or CycleUnit:DebuffUp(S.Rupture)) then
-        if CastPooling(S.FanofKnives, nil, not TargetInMeleeRange) then
-          return "Cast Fan of Knives (DP Refresh)"
-        end
-      end
+  -- actions.direct+=/fan_of_knives,if=variable.use_filler&!priority_rotation&variable.fok_target_count
+  if S.FanofKnives:IsCastable() and UseFiller and not PriorityRotation and FOKTargetCount then
+    if CastPooling(S.FanofKnives, nil, not TargetInMeleeRange) then
+      return "Cast Fan of Knives"
     end
   end
 

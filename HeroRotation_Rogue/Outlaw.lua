@@ -366,6 +366,17 @@ local function Stealth(ReturnSpellOnly)
 end
 
 local function Finish(ReturnSpellOnly)
+  -- actions.finish+=/coup_de_grace
+  if S.CoupDeGrace:IsCastable() then
+    if ReturnSpellOnly then
+      return S.CoupDeGrace
+    else
+      if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
+        return "Cast Coup de Grace"
+      end
+    end
+  end
+
   -- # Use Between the Eyes outside of Stealth to maintain the buff, or with Ruthless Precision active,
   -- or to proc Greenskins Wickers if not active. Trickster builds can also send BtE on cooldown.
   -- actions.finish=between_the_eyes,if=(buff.ruthless_precision.up|buff.between_the_eyes.remains<4|!talent.mean_streak)
@@ -377,17 +388,6 @@ local function Finish(ReturnSpellOnly)
     else
       if CastPooling(S.BetweentheEyes, nil, not Target:IsSpellInRange(S.BetweentheEyes)) then
         return "Cast Between the Eyes (Finish)"
-      end
-    end
-  end
-
-  -- actions.finish+=/coup_de_grace
-  if S.CoupDeGrace:IsCastable() then
-    if ReturnSpellOnly then
-      return S.CoupDeGrace
-    else
-      if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
-        return "Cast Coup de Grace"
       end
     end
   end
@@ -698,19 +698,19 @@ local function CDs ()
     end
   end
 
+  -- double coup
+  if S.CoupDeGrace:IsCastable() and S.CoupDeGrace:TimeSinceLastCast() < 1 and Player:BuffUp(S.AdrenalineRush) then
+    if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
+      return "Double Coup De Grace CDs"
+    end
+  end
+
   -- # Sprint to further benefit from Scroll of Momentum trinket
   -- actions.cds+=/sprint,if=(trinket.1.is.scroll_of_momentum|trinket.2.is.scroll_of_momentum)&buff.full_momentum.up
   if S.Sprint:IsCastable() and Player:BuffDown(S.Sprint) and
     (trinket1:ID() == I.ScrollOfMomentum:ID() or trinket2:ID() == I.ScrollOfMomentum:ID()) and Player:BuffUp(S.FullMomentum) then
     if Cast(S.Sprint, Settings.CommonsOGCD.OffGCDasOffGCD.Sprint) then
       return "Cast Sprint"
-    end
-  end
-
-  -- double coup
-  if S.CoupDeGrace:IsCastable() and S.CoupDeGrace:TimeSinceLastCast() < 1 and Player:BuffUp(S.AdrenalineRush) then
-    if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
-      return "Double Coup De Grace CDs"
     end
   end
 
