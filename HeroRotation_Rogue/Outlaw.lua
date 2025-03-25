@@ -469,22 +469,27 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
 
     -- If we don't need to reroll then we can check finishers
     if not MacroAbility then
-      -- Fetch Finisher if not in stealth (AR->Dispatch) or Stealth Ability if we are (AR->BtE)
+      -- Fetch Finisher if not in stealth (AR->Dispatch/Coup) or Stealth Ability if we are (AR->BtE)
       -- Outside of stealth could be AR -> Vanish -> BtE so check for this first then fallback into normal finisher.
       if not Player:StealthUp(true, true) then
-        local MacroAbilities = StealthCDs(true)
+        -- AR->Coup Highest prio, outside of stealth especially if double coup
+        if S.CoupDeGrace:IsCastable() and (S.CoupDeGrace:TimeSinceLastCast() < 1 and Player:BuffUp(S.AdrenalineRush)) then
+          MacroAbility = S.CoupDeGrace
+        else
+          local MacroAbilities = StealthCDs(true)
 
-        -- Make sure StealthCDs returned a combo which may not happen if targeting something out of range
-        if MacroAbilities and MacroAbilities[2] and MacroAbilities[2] ~= "Cast Vanish"
-          and Settings.Outlaw.SpellQueueMacro.ImprovedAdrenalineRush then
-          local ARMacroTable = { BaseSpell, unpack(MacroAbilities) }
-          ShouldReturn = CastQueue(unpack(ARMacroTable))
-          if ShouldReturn then
-            return "| " .. ARMacroTable[2]:Name() .. " | " .. ARMacroTable[3]:Name()
+          -- Make sure StealthCDs returned a combo which may not happen if targeting something out of range
+          if MacroAbilities and MacroAbilities[2] and MacroAbilities[2] ~= "Cast Vanish"
+            and Settings.Outlaw.SpellQueueMacro.ImprovedAdrenalineRush then
+            local ARMacroTable = { BaseSpell, unpack(MacroAbilities) }
+            ShouldReturn = CastQueue(unpack(ARMacroTable))
+            if ShouldReturn then
+              return "| " .. ARMacroTable[2]:Name() .. " | " .. ARMacroTable[3]:Name()
+            end
           end
-        end
 
-        MacroAbility = Finish(true)
+          MacroAbility = Finish(true)
+        end
       else
         MacroAbility = Stealth(true)
       end
@@ -702,6 +707,13 @@ local function CDs ()
     end
   end
 
+  -- double coup
+  if S.CoupDeGrace:IsCastable() and S.CoupDeGrace:TimeSinceLastCast() < 1 and Player:BuffUp(S.AdrenalineRush) then
+    if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
+      return "Double Coup De Grace CDs"
+    end
+  end
+
   -- # Maintain Blade Flurry on 2+ targets
   if S.BladeFlurry:IsCastable() then
     if EnemiesBFCount >= 2 and Player:BuffRemains(S.BladeFlurry) < Player:GCD() then
@@ -911,6 +923,13 @@ local function Build ()
   if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
     if CastPooling(S.SSAudacity, nil, not Target:IsSpellInRange(S.Ambush)) then
       return "Cast Ambush (SS High-Prio Buffed)"
+    end
+  end
+
+  -- sinister_strike,if=cooldown.killing_spree.remains<10&buff.disorienting_strikes.up
+  if S.SinisterStrike:IsCastable() and S.KillingSpree:CooldownRemains() < 10 and Rogue.DisorientingStrikesCount() > 0 then
+    if CastPooling(S.SinisterStrike, nil, not Target:IsSpellInRange(S.SinisterStrike)) then
+      return "Cast Sinister Strike... dump Disorienting Strike stacks before KS"
     end
   end
 

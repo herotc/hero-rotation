@@ -83,6 +83,7 @@ Spell.Rogue.Commons = {
   DeeperStratagem         = Spell(193531),
   DeathStalkersMark       = Spell(457052),
   DeathStalkersMarkDebuff = Spell(457129),
+  DisorientingStrikes     = Spell(441274),
   DoubleJeopardy          = Spell(454430),
   EchoingReprimand        = Spell(385616),
   EchoingReprimand2       = Spell(323558),
