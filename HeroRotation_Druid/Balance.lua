@@ -532,8 +532,8 @@ local function AoE()
   if S.ForceofNature:IsCastable() and (Player:HeroTreeID() ~= 23) then
     if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature aoe 48"; end
   end
-  -- starfire,if=talent.lunar_calling|buff.eclipse_lunar.up&spell_targets.starfire>1
-  if S.Starfire:IsCastable() and (S.LunarCalling:IsAvailable() or Player:BuffUp(S.EclipseLunar) and EnemiesCount10ySplash > 1) then
+  -- starfire,if=talent.lunar_calling|buff.eclipse_lunar.up&spell_targets.starfire>3-(talent.umbral_intensity|talent.soul_of_the_forest)
+  if S.Starfire:IsCastable() and (S.LunarCalling:IsAvailable() or Player:BuffUp(S.EclipseLunar) and EnemiesCount10ySplash > 3 - num(S.UmbralIntensity:IsAvailable() or S.SouloftheForest:IsAvailable())) then
     if Cast(S.Starfire, nil, nil, not IsInSpellRange) then return "starfire aoe 50"; end
   end
   -- wrath
@@ -594,8 +594,8 @@ local function APL()
     VarEclipse = Player:BuffUp(S.EclipseLunar) or Player:BuffUp(S.EclipseSolar)
     -- variable,name=eclipse_remains,value=buff.eclipse_lunar.remains<?buff.eclipse_solar.remains
     VarEclipseRemains = mathmax(Player:BuffRemains(S.EclipseLunar), Player:BuffRemains(S.EclipseSolar))
-    -- variable,name=enter_lunar,value=talent.lunar_calling|spell_targets.starfire>2-(talent.umbral_intensity.rank+talent.soul_of_the_forest>1)
-    VarEnterLunar = S.LunarCalling:IsAvailable() or EnemiesCount10ySplash > 2 - num(S.UmbralIntensity:TalentRank() + num(S.SouloftheForest:IsAvailable()) > 1)
+    -- variable,name=enter_lunar,value=talent.lunar_calling|spell_targets.starfire>3-(talent.umbral_intensity|talent.soul_of_the_forest)
+    VarEnterLunar = S.LunarCalling:IsAvailable() or EnemiesCount10ySplash > 3 - num(S.UmbralIntensity:IsAvailable() or S.SouloftheForest:IsAvailable())
     -- variable,name=boat_stacks,value=buff.balance_of_all_things_arcane.stack+buff.balance_of_all_things_nature.stack
     VarBoatStacks = Player:BuffStack(S.BOATArcaneBuff) + Player:BuffStack(S.BOATNatureBuff)
     -- variable,name=no_cd_talent,value=!talent.celestial_alignment&!talent.incarnation_chosen_of_elune|druid.no_cds
