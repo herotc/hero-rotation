@@ -215,7 +215,7 @@ Spell.Warrior.Fury = MergeTableByKey(Spell.Warrior.Fury, Spell.Warrior.Slayer)
 Spell.Warrior.Protection = MergeTableByKey(Spell.Warrior.Commons, {
   -- Abilities
   Devastate                             = Spell(20243),
-  Execute                               = Spell(163201),
+  Execute                               = MultiSpell(163201, 281000),
   ShieldBlock                           = Spell(2565),
   ShieldSlam                            = Spell(23922),
   -- Talents
