@@ -47,6 +47,16 @@ DevOldIsMoving = HL.AddCoreOverride ("Player.IsMoving",
   end
 , 1467)
 
+HL.AddCoreOverride ("Player.EmpowerCastTime",
+  function(self, stage)
+    local Haste = Player:SpellHaste()
+    local FoMEmpowerMod = (SpellAug.FontofMagic:IsAvailable()) and 0.8 or 1
+    local MaxEmpower = (SpellAug.FontofMagic:IsAvailable()) and 4 or 3
+    if not stage then stage = MaxEmpower end
+    return ((1 + 0.75 * (stage - 1)) * Haste * FoMEmpowerMod)
+  end
+, 1467)
+
 HL.AddCoreOverride ("Player.EssenceTimeToMax",
   function()
     local Deficit = Player:EssenceDeficit()

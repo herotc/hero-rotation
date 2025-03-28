@@ -82,6 +82,7 @@ Spell.Evoker.Flameshaper = {
   Enkindle                              = Spell(444016),
   FanTheFlames                          = Spell(444318),
   FlameSiphon                           = Spell(444140),
+  FulminousRoar                         = Spell(1218447),
   -- Buffs
   EnkindleBuff                          = Spell(445740),
   -- Debuffs
@@ -148,6 +149,7 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   Animosity                             = Spell(375797),
   ArcaneIntensity                       = Spell(375618),
   ArcaneVigor                           = Spell(386342),
+  AzureCelerity                         = Spell(1219723),
   Burnout                               = Spell(375801),
   Catalyze                              = Spell(386283),
   Causality                             = Spell(375777),
