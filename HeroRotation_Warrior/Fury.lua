@@ -52,6 +52,7 @@ local Settings = {
 --- ===== Rotation Variables =====
 local VarSTPlanning, VarAddsRemain
 local VarExecutePhase, VarOnGCDRacials
+local BladestormAbility = S.SlayersDominance:IsAvailable() and S.SlayerBladestorm or S.Bladestorm
 local EnemiesMelee, EnemiesMeleeCount
 local TargetInMeleeRange
 local EnrageUp
@@ -140,6 +141,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
+  BladestormAbility = S.SlayersDominance:IsAvailable() and S.SlayerBladestorm or S.Bladestorm
   VarTrinketFailures = 0
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
@@ -205,12 +207,12 @@ local function Slayer()
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer 6"; end
   end
   -- champions_spear,if=buff.enrage.up&(cooldown.bladestorm.remains>=2|cooldown.bladestorm.remains>=16&debuff.marked_for_execution.stack=3)
-  if CDsON() and S.ChampionsSpear:IsCastable() and (EnrageUp and (S.Bladestorm:CooldownRemains() >= 2 or S.Bladestorm:CooldownRemains() >= 16 and Target:DebuffStack(S.MarkedforExecutionDebuff) == 3)) then
+  if CDsON() and S.ChampionsSpear:IsCastable() and (EnrageUp and (BladestormAbility:CooldownRemains() >= 2 or BladestormAbility:CooldownRemains() >= 16 and Target:DebuffStack(S.MarkedforExecutionDebuff) == 3)) then
     if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear slayer 8"; end
   end
   -- bladestorm,if=buff.enrage.up&(talent.reckless_abandon&cooldown.avatar.remains>=24|talent.anger_management&cooldown.recklessness.remains>=24)
-  if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp and (S.RecklessAbandon:IsAvailable() and S.Avatar:CooldownRemains() >= 24 or S.AngerManagement:IsAvailable() and S.Recklessness:CooldownRemains() >= 24)) then
-    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer 10"; end
+  if CDsON() and BladestormAbility:IsCastable() and (EnrageUp and (S.RecklessAbandon:IsAvailable() and S.Avatar:CooldownRemains() >= 24 or S.AngerManagement:IsAvailable() and S.Recklessness:CooldownRemains() >= 24)) then
+    if Cast(BladestormAbility, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer 10"; end
   end
   -- odyns_fury,if=(buff.enrage.up|talent.titanic_rage)&cooldown.avatar.remains
   if CDsON() and S.OdynsFury:IsCastable() and ((EnrageUp or S.TitanicRage:IsAvailable()) and S.Avatar:CooldownDown()) then
@@ -229,7 +231,7 @@ local function Slayer()
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer 18"; end
   end
   -- execute,if=buff.sudden_death.up&buff.imminent_demise.stack<3&cooldown.bladestorm.remains<25
-  if S.Execute:IsReady() and (Player:BuffUp(S.SuddenDeathBuff) and Player:BuffStack(S.ImminentDemiseBuff) < 3 and S.Bladestorm:CooldownRemains() < 25) then
+  if S.Execute:IsReady() and (Player:BuffUp(S.SuddenDeathBuff) and Player:BuffStack(S.ImminentDemiseBuff) < 3 and BladestormAbility:CooldownRemains() < 25) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer 20"; end
   end
   -- onslaught,if=talent.tenderize
@@ -370,12 +372,12 @@ local function Thane()
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute thane 20"; end
   end
   -- rampage,if=talent.bladestorm&cooldown.bladestorm.remains<=gcd&!debuff.champions_might.up
-  if S.Rampage:IsReady() and (S.Bladestorm:IsLearned() and S.Bladestorm:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
+  if S.Rampage:IsReady() and (BladestormAbility:IsLearned() and BladestormAbility:CooldownRemains() <= Player:GCD() and Target:DebuffDown(S.ChampionsMightDebuff)) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage thane 22"; end
   end
   -- bladestorm,if=buff.enrage.up&talent.unhinged
-  if CDsON() and S.Bladestorm:IsCastable() and (EnrageUp and S.Unhinged:IsAvailable()) then
-    if Cast(S.Bladestorm, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane 24"; end
+  if CDsON() and BladestormAbility:IsCastable() and (EnrageUp and S.Unhinged:IsAvailable()) then
+    if Cast(BladestormAbility, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm thane 24"; end
   end
   -- bloodbath,if=buff.bloodcraze.stack>=2
   if S.Bloodbath:IsCastable() and (Player:BuffStack(S.BloodcrazeBuff) >= 2) then
@@ -477,7 +479,7 @@ local function Variables()
   -- variable,name=execute_phase,value=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
   VarExecutePhase = (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20
   -- variable,name=on_gcd_racials,value=buff.recklessness.down&buff.avatar.down&rage<80&buff.sudden_death.down&!cooldown.bladestorm.ready&(!cooldown.execute.ready|!variable.execute_phase)
-  VarOnGCDRacials = Player:BuffDown(S.RecklessnessBuff) and Player:BuffDown(S.AvatarBuff) and Player:Rage() < 80 and Player:BuffDown(S.SuddenDeathBuff) and S.Bladestorm:CooldownDown() and (S.Execute:CooldownDown() or not VarExecutePhase)
+  VarOnGCDRacials = Player:BuffDown(S.RecklessnessBuff) and Player:BuffDown(S.AvatarBuff) and Player:Rage() < 80 and Player:BuffDown(S.SuddenDeathBuff) and BladestormAbility:CooldownDown() and (S.Execute:CooldownDown() or not VarExecutePhase)
 end
 
 --- ===== APL Main =====

@@ -44,7 +44,7 @@ Spell.Warrior.Commons = {
   Avatar                                = Spell(107574),
   BerserkerRage                         = Spell(18499),
   BerserkersTorment                     = Spell(390123),
-  Bladestorm                            = MultiSpell(227847, 389774, 446035),
+  Bladestorm                            = MultiSpell(227847, 389774),
   BloodandThunder                       = Spell(384277),
   ChampionsMight                        = Spell(386284),
   ChampionsSpear                        = Spell(376079),
@@ -105,6 +105,8 @@ Spell.Warrior.MountainThane = {
 }
 
 Spell.Warrior.Slayer = {
+  -- Abilities
+  SlayerBladestorm                      = Spell(446035),
   -- Talents
   FierceFollowthrough                   = Spell(444773),
   Opportunist                           = Spell(444774),
