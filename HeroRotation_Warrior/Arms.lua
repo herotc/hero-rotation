@@ -627,7 +627,7 @@ local function SlayerExecute()
     if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter slayer_execute 24"; end
   end
   -- overpower,if=buff.martial_prowess.stack<2&buff.opportunist.up&talent.opportunist&(talent.bladestorm|talent.ravager&rage<85)
-  if S.Overpower:IsCastable() and (Player:BuffStack(S.MartialProwessBuff) < 2 and Player:BuffUp(S.OpportunistBuff) and S.Opportunist:IsAvailable() and (S.Bladestorm:IsAvailable() or S.Ravager:IsAvailable() and Player:Rage() < 85)) then
+  if S.Overpower:IsCastable() and (Player:BuffStack(S.MartialProwessBuff) < 2 and Player:BuffUp(S.OpportunistBuff) and S.Opportunist:IsAvailable() and (BladestormAbility:IsLearned() or S.Ravager:IsAvailable() and Player:Rage() < 85)) then
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_execute 26"; end
   end
   -- mortal_strike,if=dot.rend.remains<2|debuff.executioners_precision.stack=2&!buff.ravager.up
