@@ -191,7 +191,7 @@ end
 
 local function Slayer()
   -- From below: Force StormBolt to the top while Bladestorm is up, as it's the only spell able to be cast.
-  if S.StormBolt:IsReady() and (Player:BuffUp(S.Bladestorm)) then
+  if S.StormBolt:IsReady() and (Player:BuffUp(BladestormAbility)) then
     if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer 1"; end
   end
   -- recklessness

@@ -478,7 +478,7 @@ end
 
 local function SlayerAoE()
   -- From below: Force StormBolt to the top while Bladestorm is up, as it's the only spell able to be cast.
-  if S.StormBolt:IsReady() and (Player:BuffUp(S.Bladestorm)) then
+  if S.StormBolt:IsReady() and (Player:BuffUp(BladestormAbility)) then
     if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_aoe 2"; end
   end
   -- thunder_clap,if=!dot.rend.remains
@@ -579,7 +579,7 @@ end
 
 local function SlayerExecute()
   -- From below: Force StormBolt to the top while Bladestorm is up, as it's the only spell able to be cast.
-  if S.StormBolt:IsReady() and (Player:BuffUp(S.Bladestorm)) then
+  if S.StormBolt:IsReady() and (Player:BuffUp(BladestormAbility)) then
     if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_execute 2"; end
   end
   -- sweeping_strikes,if=active_enemies=2
@@ -652,7 +652,7 @@ end
 
 local function SlayerST()
   -- From below: Force StormBolt to the top while Bladestorm is up, as it's the only spell able to be cast.
-  if S.StormBolt:IsReady() and (Player:BuffUp(S.Bladestorm)) then
+  if S.StormBolt:IsReady() and (Player:BuffUp(BladestormAbility)) then
     if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_st 2"; end
   end
   -- rend,if=dot.rend.remains<=gcd
@@ -729,7 +729,7 @@ end
 
 local function SlayerSweep()
   -- From below: Force StormBolt to the top while Bladestorm is up, as it's the only spell able to be cast.
-  if S.StormBolt:IsReady() and (Player:BuffUp(S.Bladestorm)) then
+  if S.StormBolt:IsReady() and (Player:BuffUp(BladestormAbility)) then
     if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_sweep 2"; end
   end
   -- thunder_clap,if=!dot.rend.remains&!buff.sweeping_strikes.up
