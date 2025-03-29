@@ -51,7 +51,7 @@ local Settings = {
 
 -- ===== Rotation Variables =====
 local VarAddsRemain, VarSTPlanning, VarExecutePhase
-local BladestormAbility = S.SlayersDominance:IsAvailable() and S.SlayerBladestorm or S.Bladestorm
+local BladestormAbility = S.UnrelentingOnslaught:IsAvailable() and S.SlayerBladestorm or S.Bladestorm
 local TargetInMeleeRange
 local Enemies8y, EnemiesCount8y
 local BossFightRemains = 11111
@@ -136,7 +136,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  BladestormAbility = S.SlayersDominance:IsAvailable() and S.SlayerBladestorm or S.Bladestorm
+  BladestormAbility = S.UnrelentingOnslaught:IsAvailable() and S.SlayerBladestorm or S.Bladestorm
   VarTrinketFailures = 0
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")

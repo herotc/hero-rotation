@@ -111,6 +111,7 @@ Spell.Warrior.Slayer = {
   FierceFollowthrough                   = Spell(444773),
   Opportunist                           = Spell(444774),
   SlayersDominance                      = Spell(444767),
+  UnrelentingOnslaught                  = Spell(444780),
   -- Buffs
   BrutalFinishBuff                      = Spell(446918),
   ImminentDemiseBuff                    = Spell(445606),
