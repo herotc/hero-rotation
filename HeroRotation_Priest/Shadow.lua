@@ -295,7 +295,7 @@ end
 -- CastCycle Functions
 local function EvaluateCycleSWDFiller(TargetUnit)
   -- target_if=target.health.pct<20|buff.deathspeaker.up&dot.devouring_plague.ticking
-  return TargetUnit:HealthPercentage() < 20 or (Player:BuffUp(S.DeathspeakerBuff) and TargetUnit:DebuffUp(S.DevouringPlagueDebuff))
+  return TargetUnit:HealthPercentage() < 20 or Player:BuffUp(S.DeathspeakerBuff) and TargetUnit:DebuffUp(S.DevouringPlagueDebuff)
 end
 
 local function EvaluateCycleSWDFiller2(TargetUnit)
