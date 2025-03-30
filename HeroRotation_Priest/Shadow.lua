@@ -294,8 +294,8 @@ end
 
 -- CastCycle Functions
 local function EvaluateCycleSWDFiller(TargetUnit)
-  -- target_if=target.health.pct<20|(buff.deathspeaker.up|set_bonus.tier31_2pc)&dot.devouring_plague.ticking
-  return TargetUnit:HealthPercentage() < 20 or (Player:BuffUp(S.DeathspeakerBuff) or Player:HasTier(31, 2)) and TargetUnit:DebuffUp(S.DevouringPlagueDebuff)
+  -- target_if=target.health.pct<20|buff.deathspeaker.up&dot.devouring_plague.ticking
+  return TargetUnit:HealthPercentage() < 20 or (Player:BuffUp(S.DeathspeakerBuff) and TargetUnit:DebuffUp(S.DevouringPlagueDebuff))
 end
 
 local function EvaluateCycleSWDFiller2(TargetUnit)
@@ -354,12 +354,12 @@ local function Precombat()
   if S.Halo:IsReady() and (not DungeonSlice) then
     if Cast(S.Halo, Settings.Shadow.GCDasOffGCD.Halo, nil, not Target:IsInRange(30)) then return "halo precombat 12"; end
   end
-  -- shadow_crash,if=raid_event.adds.in>=25&spell_targets.shadow_crash<=8&!fight_style.dungeonslice&(!set_bonus.tier31_4pc|spell_targets.shadow_crash>1)
+  -- shadow_crash,if=raid_event.adds.in>=25&spell_targets.shadow_crash<=8&!fight_style.dungeonslice
   -- Note: Can't do target counts in Precombat
   if Crash:IsCastable() and (not DungeonSlice) then
     if Cast(Crash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash precombat 14"; end
   end
-  -- vampiric_touch,if=!talent.shadow_crash.enabled|raid_event.adds.in<25|spell_targets.shadow_crash>8|fight_style.dungeonslice|set_bonus.tier31_4pc&spell_targets.shadow_crash=1
+  -- vampiric_touch,if=!talent.shadow_crash.enabled|raid_event.adds.in<25|spell_targets.shadow_crash>8|fight_style.dungeonslice
   -- Note: Manually added VT suggestion if Shadow Crash is on CD and wasn't just used.
   if S.VampiricTouch:IsCastable() and (not Crash:IsAvailable() or (Crash:CooldownDown() and not Crash:InFlight()) or DungeonSlice) then
     if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch precombat 16"; end
@@ -486,8 +486,8 @@ local function CDs()
     -- invoke_external_buff,name=power_infusion,if=(buff.voidform.up|buff.dark_ascension.up|set_bonus.tww2_4pc)&!buff.power_infusion.up
     -- invoke_external_buff,name=bloodlust,if=buff.power_infusion.up&fight_remains<120|fight_remains<=40
     -- Note: Not handling external buffs
-    -- power_infusion,if=(buff.voidform.up|buff.dark_ascension.up&(fight_remains<=80|fight_remains>=140)|active_allied_augmentations)&(!buff.power_infusion.up|set_bonus.tww2_4pc&buff.power_infusion.remains<=15)&(cooldown.invoke_power_infusion_0.remains>=10|!set_bonus.tier31_4pc|cooldown.invoke_power_infusion_0.duration=0)
-    if S.PowerInfusion:IsCastable() and Settings.Shadow.SelfPI and ((Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscension) and (BossFightRemains <= 80 or BossFightRemains >= 140)) and (Player:PowerInfusionDown() or Player:HasTier("TWW2", 4) and Player:PowerInfusionRemains() <= 15) and (S.PowerInfusion:CooldownRemains() >= 10 or not Player:HasTier("TWW2", 4) or S.PowerInfusion:CooldownUp())) then
+    -- power_infusion,if=(buff.voidform.up|buff.dark_ascension.up&(fight_remains<=80|fight_remains>=140)|active_allied_augmentations)&(!buff.power_infusion.up|set_bonus.tww2_4pc&buff.power_infusion.remains<=15)
+    if S.PowerInfusion:IsCastable() and Settings.Shadow.SelfPI and ((Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscension) and (BossFightRemains <= 80 or BossFightRemains >= 140)) and (Player:PowerInfusionDown() or Player:HasTier("TWW2", 4) and Player:PowerInfusionRemains() <= 15)) then
       if Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "power_infusion cds 12"; end
     end
     -- halo,if=talent.power_surge&(pet.fiend.active&cooldown.fiend.remains>=4&talent.mindbender|!talent.mindbender&!cooldown.fiend.up|active_enemies>2&!talent.inescapable_torment|!talent.dark_ascension)&(cooldown.mind_blast.charges=0|!talent.void_eruption|cooldown.void_eruption.remains>=gcd.max*4|buff.mind_devourer.up&talent.mind_devourer)
@@ -552,7 +552,7 @@ local function Filler()
   if S.VampiricTouch:IsCastable() and (S.UnfurlingDarkness:IsAvailable() and (15 - S.UnfurlingDarknessBuff:TimeSinceLastAppliedOnPlayer()) < S.VampiricTouch:ExecuteTime() and S.InnerQuietus:IsAvailable()) then
     if Everyone.CastTargetIf(S.VampiricTouch, Enemies10ySplash, "min", EvaluateTargetIfFilterVTRemains, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch filler 2"; end
   end
-  -- shadow_word_death,target_if=target.health.pct<20|(buff.deathspeaker.up|set_bonus.tier31_2pc)&dot.devouring_plague.ticking
+  -- shadow_word_death,target_if=target.health.pct<20|buff.deathspeaker.up&dot.devouring_plague.ticking
   if S.ShadowWordDeath:IsReady() then
     if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateCycleSWDFiller, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death filler 4"; end
   end
@@ -598,8 +598,8 @@ local function Filler()
   if S.DivineStar:IsReady() then
     if Cast(S.DivineStar, Settings.Shadow.GCDasOffGCD.DivineStar, not Target:IsInRange(30)) then return "divine_star filler 22"; end
   end
-  -- shadow_crash,if=raid_event.adds.in>20&!set_bonus.tier31_4pc
-  if Crash:IsCastable() and (not Player:HasTier(31, 4)) then
+  -- shadow_crash,if=raid_event.adds.in>20
+  if Crash:IsCastable() then
     if Cast(Crash, Settings.Shadow.GCDasOffGCD.ShadowCrash, nil, not Target:IsInRange(40)) then return "shadow_crash filler 24"; end
   end
   -- shadow_word_death,target_if=target.health.pct<20
@@ -611,14 +611,9 @@ local function Filler()
   if S.ShadowWordDeath:IsReady() and Player:IsMoving() then
     if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordDeath), Settings.Shadow.GCDasOffGCD.ShadowWordDeath) then return "shadow_word_death movement filler 28"; end
   end
-  -- shadow_word_pain,target_if=max:dot.devouring_plague.remains,if=set_bonus.tier31_4pc
+  -- shadow_word_pain,target_if=min:remains
   -- Note: Per APL note, intent is to be used as a movement filler.
-  if S.ShadowWordPain:IsReady() and Player:IsMoving() and (Player:HasTier(31, 4)) then
-    if Everyone.CastTargetIf(S.ShadowWordPain, Enemies40y, "max", EvaluateTargetIfFilterDPRemains, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain filler 30"; end
-  end
-  -- shadow_word_pain,target_if=min:remains,if=!set_bonus.tier31_4pc
-  -- Note: Per APL note, intent is to be used as a movement filler.
-  if S.ShadowWordPain:IsReady() and Player:IsMoving() and (not Player:HasTier(31, 4)) then
+  if S.ShadowWordPain:IsReady() and Player:IsMoving() then
     if Everyone.CastTargetIf(S.ShadowWordPain, Enemies40y, "min", EvaluateTargetIfFilterSWP, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain filler 32"; end
   end
 end
@@ -715,8 +710,8 @@ local function Main()
       if Everyone.CastTargetIf(S.VoidTorrent, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusTTD, EvaluateTargetIfDPMain2, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent main 32 (off-target)"; end
     end
   end
-  -- shadow_crash,target_if=dot.vampiric_touch.refreshable,if=!variable.holding_crash
-  if Crash:IsCastable() and (not VarHoldingCrash) then
+  -- shadow_crash,target_if=dot.vampiric_touch.refreshable,if=!variable.holding_crash&(!talent.unfurling_darkness|spell_targets.shadow_crash>1)
+  if Crash:IsCastable() and (not VarHoldingCrash and (not S.UnfurlingDarkness:IsAvailable() or EnemiesCount10ySplash > 1)) then
     if Everyone.CastCycle(Crash, Enemies10ySplash, EvaluateCycleVTRefreshable, not Target:IsInRange(40), Settings.Shadow.GCDasOffGCD.ShadowCrash) then return "shadow_crash main 34"; end
   end
   -- vampiric_touch,target_if=min:remains,if=buff.unfurling_darkness_cd.remains<execute_time&talent.unfurling_darkness&!buff.dark_ascension.up&talent.inner_quietus&active_dot.vampiric_touch<=5
