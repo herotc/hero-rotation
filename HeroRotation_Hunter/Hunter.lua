@@ -147,7 +147,6 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   -- Talents
   AMurderofCrows                        = Spell(131894),
   AnimalCompanion                       = Spell(267116),
-  AspectoftheHydra                      = Spell(470945),
   AspectoftheWild                       = Spell(193530),
   BarbedScales                          = Spell(469880),
   BarbedShot                            = Spell(217200),
@@ -200,6 +199,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   SteadyShotEnergize                    = Spell(77443),
   -- Talents
   AimedShot                             = Spell(19434),
+  AspectoftheHydra                      = Spell(470945),
   Bulletstorm                           = Spell(389019),
   Bullseye                              = Spell(204089),
   BurstingShot                          = Spell(186387),
