@@ -462,8 +462,6 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
   -- # Improved Garrote: Apply or Refresh with buffed Garrotes, accounting for Indiscriminate Carnage
   -- actions.stealthed+=/garrote,target_if=min:remains,if=stealthed.improved_garrote&(remains<12|pmultiplier<=1|(buff.indiscriminate_carnage.up
   -- &active_dot.garrote<spell_targets.fan_of_knives))&!variable.single_target&target.time_to_die-remains>2&combo_points.deficit>2-buff.darkest_night.up*2
-
-  -- actions.stealthed+=/garrote,if=stealthed.improved_garrote&(pmultiplier<=1|refreshable)&combo_points.deficit>=1+2*talent.shrouded_suffocation
   if (S.Garrote:IsCastable() and ImprovedGarroteRemains() > 0) or ForceStealth then
     local function GarroteTargetIfFunc(TargetUnit)
       return TargetUnit:DebuffRemains(S.Garrote)
@@ -500,6 +498,7 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
         end
       end
     end
+    -- actions.stealthed+=/garrote,if=stealthed.improved_garrote&(pmultiplier<=1|refreshable)&combo_points.deficit>=1+2*talent.shrouded_suffocation
     if ComboPointsDeficit >= (1 + 2 * num(S.ShroudedSuffocation:IsAvailable())) and (Target:PMultiplier(S.Garrote) <= 1 or IsDebuffRefreshable(Target, S.Garrote)) then
       if ReturnSpellOnly then
         return S.Garrote
@@ -666,10 +665,11 @@ local function UsableItems ()
   end
 
   -- actions.items+=/use_item,name=junkmaestros_mega_magnet,if=cooldown.deathmark.remains>=30&!dot.deathmark.ticking
-  -- &(!talent.deathstalkers_mark|buff.lingering_darkness.remains<10)|fight_remains<=10
+  -- &!debuff.shiv.up&(!talent.deathstalkers_mark|buff.lingering_darkness.up&buff.junkmaestros_mega_magnet.stack>5)|fight_remains<=10
   if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() and Player:BuffUp(S.JunkmaestrosBuff) then
-    if S.Deathmark:CooldownRemains() >= 30 and not Target:DebuffUp(S.Deathmark) and (not S.DeathStalkersMark:IsAvailable()
-      or Player:BuffRemains(S.LingeringDarknessBuff) < 10) or HL.BossFilteredFightRemains("<=", 10) then
+    if S.Deathmark:CooldownRemains() >= 30 and not Target:DebuffUp(S.Deathmark) and Player:BuffDown(S.ShivDebuff)
+      and (not S.DeathStalkersMark:IsAvailable()
+      or Player:BuffUp(S.LingeringDarknessBuff) and Player:BuffStack(S.JunkmaestrosBuff) > 5) or HL.BossFilteredFightRemains("<=", 10) then
       if Cast(I.JunkmaestrosMegaMagnet, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
         return "Junkmaestros Mega Magnet";
       end
@@ -718,9 +718,10 @@ local function ShivUsage ()
 
   if S.Shiv:IsReady() then
     -- # Shiv for aoe with Arterial Precision
-    -- actions.shiv+=/shiv,if=talent.arterial_precision&variable.shiv_condition&spell_targets.fan_of_knives>=4
-    -- &dot.crimson_tempest.ticking
-    if S.ArterialPrecision:IsAvailable() and ShivCondition and MeleeEnemies10yCount >= 4 and S.CrimsonTempest:AnyDebuffUp() then
+    -- actions.shiv+=/shiv,if=talent.arterial_precision&!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking
+    -- &spell_targets.fan_of_knives>=4&dot.crimson_tempest.ticking
+    if S.ArterialPrecision:IsAvailable() and Target:DebuffDown(S.ShivDebuff) and Target:DebuffUp(S.Garrote)
+      and Target:DebuffUp(S.Rupture) and MeleeEnemies10yCount >= 4 and S.CrimsonTempest:AnyDebuffUp() then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
         return "Cast Shiv (Arterial Precision)"
       end
@@ -768,6 +769,15 @@ local function ShivUsage ()
     end
 
     -- # Fallback if no special cases apply
+    -- actions.shiv+=/shiv,if=!talent.kingsbane&variable.shiv_condition&(dot.crimson_tempest.ticking|talent.amplifying_poison)
+    -- &(((talent.lightweight_shiv+1)-cooldown.shiv.charges_fractional)*30<cooldown.deathmark.remains)
+    if not S.Kingsbane:IsAvailable() and ShivCondition and (Target:DebuffUp(S.CrimsonTempest) or S.AmplifyingPoison:IsAvailable())
+      and (((num(S.LightweightShiv:IsAvailable()) + 1) - S.Shiv.ChargesFractional) * 30 < S.Deathmark:CooldownRemains()) then
+      if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
+        return "Cast Shiv"
+      end
+    end
+
     -- actions.shiv+=/shiv,if=!talent.kingsbane&!talent.arterial_precision&variable.shiv_condition
     -- &(!talent.crimson_tempest.enabled|variable.single_target|dot.crimson_tempest.ticking)
     if not S.Kingsbane:IsAvailable() and not S.ArterialPrecision:IsAvailable() and ShivCondition
@@ -816,13 +826,17 @@ local function CDs ()
 
   -- # Deathmark to be used if not stealthed, Rupture is up, and all other talent conditions are satisfied
   -- actions.cds=variable,name=deathmark_ma_condition,value=!talent.master_assassin.enabled|dot.garrote.ticking
-  -- actions.cds+=/variable,name=deathmark_kingsbane_condition,value=!talent.kingsbane|cooldown.kingsbane.remains<=2
-  -- actions.cds+=/variable,name=deathmark_condition,value=!stealthed.rogue&buff.slice_and_dice.remains>5&dot.rupture.ticking
-  -- &(buff.envenom.up|spell_targets.fan_of_knives>1)&!debuff.deathmark.up&variable.deathmark_ma_condition&variable.deathmark_kingsbane_condition
-  local DeathmarkCondition = not Player:StealthUp(true, false) and Player:BuffRemains(S.SliceandDice) > 5 and Target:DebuffUp(S.Rupture)
-    and (Player:BuffUp(S.Envenom) or MeleeEnemies10yCount > 1) and not S.Deathmark:AnyDebuffUp()
-    and (not S.MasterAssassin:IsAvailable() or Target:DebuffUp(S.Garrote))
-    and (not S.Kingsbane:IsAvailable() or S.Kingsbane:CooldownRemains() <= 2)
+  local DeathmarkMACondition = not S.MasterAssassin:IsAvailable() or Target:DebuffUp(S.Garrote)
+
+  -- actions.cds+=/variable,name=deathmark_kingsbane_condition,value=cooldown.kingsbane.remains<=2&buff.envenom.up
+  local DeathmarkKingsbaneCondition = S.Kingsbane:CooldownRemains() <= 2 and Player:BuffUp(S.Envenom)
+
+  -- actions.cds+=/variable,name=deathmark_condition,value=dot.rupture.ticking&(variable.deathmark_kingsbane_condition
+  -- |spell_targets.fan_of_knives>1&buff.slice_and_dice.remains>5|!talent.kingsbane&dot.crimson_tempest.ticking)
+  -- &!debuff.deathmark.up&variable.deathmark_ma_condition
+  local DeathmarkCondition = Target:DebuffUp(S.Rupture) and (DeathmarkKingsbaneCondition or MeleeEnemies10yCount > 1
+    and Player:BuffRemains(S.SliceandDice) > 5 or S.Kingsbane:IsAvailable() and Target:DebuffUp(S.CrimsonTempest))
+    and Target:DebuffDown(S.Deathmark) and DeathmarkMACondition
 
   -- # Usages for various special-case Trinkets and other Cantrips if applicable
   -- actions.cds+=/call_action_list,name=items
@@ -1031,10 +1045,9 @@ local function Direct ()
   -- # Direct Damage Abilities
   -- Envenom at applicable cp if not pooling, capped on amplifying poison stacks, on an animacharged CP, or in aoe.
   -- actions.direct=envenom,if=!buff.darkest_night.up&combo_points>=variable.effective_spend_cp
-  -- &(variable.not_pooling|debuff.amplifying_poison.stack>=20|!variable.single_target)&!buff.vanish.up
+  -- &(variable.not_pooling|debuff.amplifying_poison.stack>=20|!variable.single_target)
   if S.Envenom:IsCastable() and Player:BuffDown(S.DarkestNightBuff) and ComboPoints >= EffectiveCPSpend
-    and (NotPooling or Target:DebuffStack(S.AmplifyingPoisonDebuff) >= 20 or not SingleTarget)
-    and Player:BuffDown(Rogue.VanishBuffSpell()) then
+    and (NotPooling or Target:DebuffStack(S.AmplifyingPoisonDebuff) >= 20 or not SingleTarsget) then
     if CastPooling(S.Envenom, nil, not TargetInMeleeRange) then
       return "Cast Envenom 1"
     end
@@ -1063,9 +1076,9 @@ local function Direct ()
 
   -- # Maintain Caustic Spatter
   -- actions.direct+=/variable,name=use_caustic_filler,value=talent.caustic_spatter&dot.rupture.ticking
-  -- &(!debuff.caustic_spatter.up|debuff.caustic_spatter.remains<=3)&combo_points.deficit>=1&!variable.single_target
+  -- &(!debuff.caustic_spatter.up|debuff.caustic_spatter.remains<=2)&combo_points.deficit>=1&!variable.single_target
   local UseCausticFiller = S.CausticSpatter:IsAvailable() and Target:DebuffUp(S.Rupture)
-    and (not Target:DebuffUp(S.CausticSpatterDebuff) or Target:DebuffRemains(S.CausticSpatterDebuff) <= 3)
+    and (not Target:DebuffUp(S.CausticSpatterDebuff) or Target:DebuffRemains(S.CausticSpatterDebuff) <= 2)
     and ComboPointsDeficit >= 1 and not SingleTarget
 
   -- actions.direct+=/mutilate,if=variable.use_caustic_filler
@@ -1211,9 +1224,9 @@ local function APL ()
     end
 
     PoisonedBleeds = Rogue.PoisonedBleeds()
-    -- TODO: Make this match the updated code version
     EnergyRegenCombined = Player:EnergyRegen() + PoisonedBleeds * 6 / (2 * Player:SpellHaste())
     EnergyTimeToMaxCombined = Player:EnergyDeficit() / EnergyRegenCombined
+
     -- actions+=/variable,name=regen_saturated,value=energy.regen_combined>35
     EnergyRegenSaturated = EnergyRegenCombined > 30
 
