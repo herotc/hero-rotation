@@ -60,6 +60,8 @@ HR.GUISettings.APL.Rogue = {
   Assassination = {
     EnvenomDMGOffset = 3,
     MutilateDMGOffset = 3,
+    ICRuptureCap = 0,
+    ICGarroteCap = 0,
     UsePriorityRotation = "Never", -- Only for Assassination / Subtlety
     PotionType = {
       Selected = "Tempered",
@@ -156,6 +158,8 @@ CreateARPanelOptions(CP_RogueOGCD, "APL.Rogue.CommonsOGCD")
 CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.EnvenomDMGOffset", { 1, 5, 0.25 }, "Envenom DMG Offset", "Set the Envenom DMG Offset.")
 CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateDMGOffset", { 1, 5, 0.25 }, "Mutilate DMG Offset", "Set the Mutilate DMG Offset.")
 CreatePanelOption("Dropdown", CP_Assassination, "APL.Rogue.Assassination.UsePriorityRotation", { "Never", "On Bosses", "Always", "Auto" }, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall AoE damage.)\nAuto will function as Never except on specific encounters where AoE is not recommended.")
+CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.ICRuptureCap", {0, 10, 1}, "Indiscriminate Carnage Rupture Cap", "Cap the amount of active applications during IC, use 0 to disable")
+CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.ICGarroteCap", {0, 10, 1}, "Indiscriminate Carnage Garrote Cap", "Cap the amount of active applications during IC, use 0 to disable")
 CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.StealthMacro.Vanish", "Stealth Combo - Vanish", "Allow suggesting Vanish stealth ability combos (recommended)")
 CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)")
 CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.ShowIndiscriminateCarnageOnMainIcon", "Indiscriminate Carnage - Main Icon", "Show casts for indiscriminate carnage on the main icon (main target)")

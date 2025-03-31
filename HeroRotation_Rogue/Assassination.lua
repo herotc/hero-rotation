@@ -423,7 +423,8 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
   -- # Rupture during Indiscriminate Carnage
   -- actions.stealthed+=/rupture,target_if=effective_combo_points>=variable.effective_spend_cp&buff.indiscriminate_carnage.up
   -- &refreshable&(!variable.regen_saturated|!variable.scent_saturation|!dot.rupture.ticking)&target.time_to_die>15
-  if S.Rupture:IsCastable() or ForceStealth then
+  if S.Rupture:IsCastable() or ForceStealth
+    and (S.Rupture:AuraActiveCount() < Settings.Assassination.ICRuptureCap or Settings.Assassination.ICRuptureCap == 0) then
     local function RuptureTargetIfFunc(TargetUnit)
       return TargetUnit:DebuffRemains(S.Rupture)
     end
@@ -462,7 +463,8 @@ local function Stealthed (ReturnSpellOnly, ForceStealth)
   -- # Improved Garrote: Apply or Refresh with buffed Garrotes, accounting for Indiscriminate Carnage
   -- actions.stealthed+=/garrote,target_if=min:remains,if=stealthed.improved_garrote&(remains<12|pmultiplier<=1|(buff.indiscriminate_carnage.up
   -- &active_dot.garrote<spell_targets.fan_of_knives))&!variable.single_target&target.time_to_die-remains>2&combo_points.deficit>2-buff.darkest_night.up*2
-  if (S.Garrote:IsCastable() and ImprovedGarroteRemains() > 0) or ForceStealth then
+  if ((S.Garrote:IsCastable() and ImprovedGarroteRemains() > 0) or ForceStealth)
+    and (S.Garrote:AuraActiveCount() < Settings.Assassination.ICGarroteCap or Settings.Assassination.ICGarroteCap == 0) then
     local function GarroteTargetIfFunc(TargetUnit)
       return TargetUnit:DebuffRemains(S.Garrote)
     end
@@ -1341,6 +1343,7 @@ end
 local function Init ()
   S.Deathmark:RegisterAuraTracking()
   S.Garrote:RegisterAuraTracking()
+  S.Rupture:RegisterAuraTracking()
   S.CrimsonTempest:RegisterAuraTracking()
 
   HR.Print("Assassination Rogue rotation has been updated for patch 11.1.0.")
