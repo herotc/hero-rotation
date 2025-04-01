@@ -745,10 +745,6 @@ local function CDs ()
     end
   end
 
-  -- # Without a natural 5 buff roll, use Keep it Rolling at 3 buffs if you have the combination of Ruthless Precision + Broadside + True Bearing.
-  -- actions.cds+=/keep_it_rolling,if=rtb_buffs>=3&rtb_buffs.normal<=2&buff.broadside.up&buff.ruthless_precision.up&buff.true_bearing.up
-
-
   -- # Without a natural 5 buff roll, use Keep it Rolling at 4+ buffs
   -- actions.cds+=/keep_it_rolling,if=rtb_buffs>=4&rtb_buffs.normal<=2
   if S.KeepItRolling:IsCastable() and Cache.APLVar.RtB_Buffs.Total >= 4 and Cache.APLVar.RtB_Buffs.Normal <= 2 then
