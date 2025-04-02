@@ -268,9 +268,10 @@ local function Finish (ReturnSpellOnly, ForceStealth)
     end
   end
 
-  -- actions.finish+=/rupture,if=talent.unseen_blade&cooldown.flagellation.remains<10
-  if S.Rupture:IsReady() then
-    if S.UnseenBlade:IsAvailable() and S.Flagellation:CooldownRemains() < 10 then
+  -- actions.finish+=/rupture,if=talent.unseen_blade&cooldown.flagellation.remains<10&dot.rupture.remains<fight_remains
+  if S.Rupture:IsReady() and Settings.Subtlety.HoldCoupForCDs then
+    if S.UnseenBlade:IsAvailable() and S.Flagellation:CooldownRemains() < 10
+      and (Target:DebuffRemains(S.Rupture) < HL.FightRemains(MeleeEnemies10y, false)) then
       if ReturnSpellOnly then
         return S.Rupture
       else
@@ -283,14 +284,14 @@ local function Finish (ReturnSpellOnly, ForceStealth)
 
   -- # Direct Damage Finisher
   -- actions.finish+=/coup_de_grace,if=debuff.fazed.up&cooldown.flagellation.remains>=20
-  if S.CoupDeGrace:IsCastable() and Target:DebuffUp(S.FazedDebuff) and S.Flagellation:CooldownRemains() >= 20 then
-    if ReturnSpellOnly then
-      return S.CoupDeGrace
-    else
-      if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
-        return "Cast Coup De Grace"
+  if S.CoupDeGrace:IsCastable() and Target:DebuffUp(S.FazedDebuff) and (S.Flagellation:CooldownRemains() >= 20 or not Settings.Subtlety.HoldCoupForCDs) then
+      if ReturnSpellOnly then
+        return S.CoupDeGrace
+      else
+        if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
+          return "Cast Coup De Grace"
+        end
       end
-    end
   end
 
   -- actions.finish+=/black_powder,if=!variable.priority_rotation&variable.maintenance&(((variable.targets>=2
@@ -299,7 +300,7 @@ local function Finish (ReturnSpellOnly, ForceStealth)
   if S.BlackPowder:IsCastable() then
     if not PriorityRotation and Maintenance and (((MeleeEnemies10yCount >= 2 and S.DeathStalkersMark:IsAvailable()
     and (Player:BuffDown(S.DarkestNightBuff) or Player:BuffUp(S.ShadowDanceBuff) and MeleeEnemies10yCount >= 5))
-    or S.UnseenBlade:IsAvailable() and MeleeEnemies10yCount >= 7) or S.CoupDeGrace:IsReady()) then
+    or S.UnseenBlade:IsAvailable() and MeleeEnemies10yCount >= 7) or (S.CoupDeGrace:IsReady() and Settings.Subtlety.HoldCoupForCDs)) then
       if ReturnSpellOnly then
         return S.BlackPowder
       else
@@ -327,7 +328,7 @@ end
 -- # Builders
 local function Build (ReturnSpellOnly, ForceStealth)
   -- actions.build=backstab,if=buff.shadow_dance.up&!used_for_danse|!variable.stealth&buff.shadow_blades.up
-  if S.Backstab:IsReady() and Player:BuffUp(S.ShadowDanceBuff) and not Used_For_Danse(S.Backstab)
+  if S.Backstab:IsReady() and (Player:BuffUp(S.ShadowDanceBuff) or ForceStealth) and not Used_For_Danse(S.Backstab)
     or not Stealth and Player:BuffUp(S.ShadowBlades) then
     if ReturnSpellOnly then
       return S.Backstab
@@ -339,7 +340,7 @@ local function Build (ReturnSpellOnly, ForceStealth)
   end
 
   -- actions.build+=/gloomblade,if=buff.shadow_dance.up&!used_for_danse|!variable.stealth&buff.shadow_blades.up
-  if S.Gloomblade:IsReady() and Player:BuffUp(S.ShadowDanceBuff) and not Used_For_Danse(S.Gloomblade)
+  if S.Gloomblade:IsReady() and (Player:BuffUp(S.ShadowDanceBuff) or ForceStealth) and not Used_For_Danse(S.Gloomblade)
     or not Stealth and Player:BuffUp(S.ShadowBlades) then
     if ReturnSpellOnly then
       return S.Gloomblade
@@ -352,7 +353,7 @@ local function Build (ReturnSpellOnly, ForceStealth)
 
   -- actions.build=shadowstrike,cycle_targets=1,if=debuff.find_weakness.remains<=2&variable.targets=2
   -- &talent.unseen_blade|!used_for_danse&!talent.premeditation
-  if S.Shadowstrike:IsReady() and HR.AoEON() and Player:StealthUp(true, false) then
+  if S.Shadowstrike:IsReady() and HR.AoEON() and (Player:StealthUp(true, false) or ForceStealth) then
     if MeleeEnemies10yCount == 2 and S.UnseenBlade:IsAvailable()
       or not Used_For_Danse(S.Shadowstrike) and not S.Premeditation:IsAvailable() then
       for _, CycleUnit in pairs(MeleeEnemies10y) do
