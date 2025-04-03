@@ -774,7 +774,7 @@ local function ShivUsage ()
     -- actions.shiv+=/shiv,if=!talent.kingsbane&variable.shiv_condition&(dot.crimson_tempest.ticking|talent.amplifying_poison)
     -- &(((talent.lightweight_shiv+1)-cooldown.shiv.charges_fractional)*30<cooldown.deathmark.remains)
     if not S.Kingsbane:IsAvailable() and ShivCondition and (Target:DebuffUp(S.CrimsonTempest) or S.AmplifyingPoison:IsAvailable())
-      and (((num(S.LightweightShiv:IsAvailable()) + 1) - S.Shiv.ChargesFractional()) * 30 < S.Deathmark:CooldownRemains()) then
+      and (((num(S.LightweightShiv:IsAvailable()) + 1) - S.Shiv:ChargesFractional()) * 30 < S.Deathmark:CooldownRemains()) then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
         return "Cast Shiv"
       end
