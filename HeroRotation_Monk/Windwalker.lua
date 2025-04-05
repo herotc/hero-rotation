@@ -324,7 +324,7 @@ local function Cooldowns()
   -- invoke_external_buff,name=power_infusion,if=pet.xuen_the_white_tiger.active&(!buff.bloodlust.up|buff.bloodlust.up&cooldown.strike_of_the_windlord.remains)
   -- Not implemented - external buff coordination
   -- storm_earth_and_fire,target_if=max:target.time_to_die,if=fight_style.dungeonroute&buff.invokers_delight.remains>15&(active_enemies>2|!talent.ordered_elements|cooldown.rising_sun_kick.remains)
-  if S.StormEarthAndFire:IsCastable() and (Player:IsInDungeonArea() and Player:BuffRemains(S.InvokersDelightBuff) > 15 and (EnemiesCount8y > 2 or not S.OrderedElements:IsAvailable() or S.RisingSunKick:CooldownDown())) then
+  if S.StormEarthAndFire:IsCastable() and CDsON() and (Player:IsInDungeonArea() and Player:BuffRemains(S.InvokersDelightBuff) > 15 and (EnemiesCount8y > 2 or not S.OrderedElements:IsAvailable() or S.RisingSunKick:CooldownDown())) then
     if Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthAndFire) then return "storm_earth_and_fire cooldowns dungeonroute 2"; end
   end
   -- tiger_palm,if=(target.time_to_die>14&!fight_style.dungeonroute|target.time_to_die>22)&!cooldown.invoke_xuen_the_white_tiger.remains&(chi<5&!talent.ordered_elements|chi<3)&(combo_strike|!talent.hit_combo)
@@ -332,14 +332,14 @@ local function Cooldowns()
      if MotCCastSwitcher(S.TigerPalm, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane, nil, 5) then return "tiger_palm cooldowns 6"; end
   end
   -- invoke_xuen_the_white_tiger,target_if=max:target.time_to_die,if=variable.xuen_condition&!fight_style.dungeonslice&!fight_style.dungeonroute|variable.xuen_dungeonslice_condition&fight_style.Dungeonslice|variable.xuen_dungeonroute_condition&fight_style.dungeonroute
-  if S.InvokeXuenTheWhiteTiger:IsCastable() and
+  if S.InvokeXuenTheWhiteTiger:IsCastable() and CDsON() and
     ((VarXuenCondition and not DungeonSlice and not Player:IsInDungeonArea()) or
      (VarXuenDungeonsliceCondition and DungeonSlice) or
      (VarXuenDungeonrouteCondition and Player:IsInDungeonArea())) then
     if Everyone.CastTargetIf(S.InvokeXuenTheWhiteTiger, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(40), Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger) then return "invoke_xuen_the_white_tiger cooldowns 8"; end
   end
   -- storm_earth_and_fire,target_if=max:target.time_to_die,if=variable.sef_condition&!fight_style.dungeonroute|variable.sef_dungeonroute_condition&fight_style.dungeonroute
-  if S.StormEarthAndFire:IsCastable() and ((VarSefCondition and not Player:IsInDungeonArea()) or (VarSefDungeonrouteCondition and Player:IsInDungeonArea())) then
+  if S.StormEarthAndFire:IsCastable() and CDsON() and ((VarSefCondition and not Player:IsInDungeonArea()) or (VarSefDungeonrouteCondition and Player:IsInDungeonArea())) then
     if Everyone.CastTargetIf(S.StormEarthAndFire, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, nil, Settings.Windwalker.OffGCDasOffGCD.StormEarthAndFire) then return "storm_earth_and_fire cooldowns 10"; end
   end
   -- touch_of_karma
@@ -347,44 +347,44 @@ local function Cooldowns()
     if Cast(S.TouchofKarma, Settings.Windwalker.GCDasOffGCD.TouchOfKarma, nil, not Target:IsInRange(20)) then return "touch_of_karma cooldowns 12"; end
   end
   -- ancestral_call,if=buff.invoke_xuen_the_white_tiger.remains>15|!talent.invoke_xuen_the_white_tiger&(!talent.storm_earth_and_fire&(cooldown.strike_of_the_windlord.ready|!talent.strike_of_the_windlord&cooldown.fists_of_fury.ready)|buff.storm_earth_and_fire.remains>10)|fight_remains<20
-  if S.AncestralCall:IsCastable() and ((Monk.Xuen.Active and Monk.Xuen.SummonTime + 15 > GetTime()) or not S.InvokeXuenTheWhiteTiger:IsAvailable() and (not S.StormEarthAndFire:IsAvailable() and (S.StrikeoftheWindlord:CooldownUp() or not S.StrikeoftheWindlord:IsAvailable() and S.FistsofFury:CooldownUp()) or Player:BuffRemains(S.StormEarthAndFireBuff) > 10) or BossFightRemains < 20) then
+  if S.AncestralCall:IsCastable() and CDsON() and ((Monk.Xuen.Active and Monk.Xuen.SummonTime + 15 > GetTime()) or not S.InvokeXuenTheWhiteTiger:IsAvailable() and (not S.StormEarthAndFire:IsAvailable() and (S.StrikeoftheWindlord:CooldownUp() or not S.StrikeoftheWindlord:IsAvailable() and S.FistsofFury:CooldownUp()) or Player:BuffRemains(S.StormEarthAndFireBuff) > 10) or BossFightRemains < 20) then
     if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call cooldowns 14"; end
   end
   -- blood_fury,if=buff.invoke_xuen_the_white_tiger.remains>15|!talent.invoke_xuen_the_white_tiger&(!talent.storm_earth_and_fire&(cooldown.strike_of_the_windlord.ready|!talent.strike_of_the_windlord&cooldown.fists_of_fury.ready)|buff.storm_earth_and_fire.remains>10)|fight_remains<20
-  if S.BloodFury:IsCastable() and ((Monk.Xuen.Active and Monk.Xuen.SummonTime + 15 > GetTime()) or not S.InvokeXuenTheWhiteTiger:IsAvailable() and (not S.StormEarthAndFire:IsAvailable() and (S.StrikeoftheWindlord:CooldownUp() or not S.StrikeoftheWindlord:IsAvailable() and S.FistsofFury:CooldownUp()) or Player:BuffRemains(S.StormEarthAndFireBuff) > 10) or BossFightRemains < 20) then
+  if S.BloodFury:IsCastable() and CDsON() and ((Monk.Xuen.Active and Monk.Xuen.SummonTime + 15 > GetTime()) or not S.InvokeXuenTheWhiteTiger:IsAvailable() and (not S.StormEarthAndFire:IsAvailable() and (S.StrikeoftheWindlord:CooldownUp() or not S.StrikeoftheWindlord:IsAvailable() and S.FistsofFury:CooldownUp()) or Player:BuffRemains(S.StormEarthAndFireBuff) > 10) or BossFightRemains < 20) then
     if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury cooldowns 16"; end
   end
   -- fireblood,if=buff.invoke_xuen_the_white_tiger.remains>15|!talent.invoke_xuen_the_white_tiger&(!talent.storm_earth_and_fire&(cooldown.strike_of_the_windlord.ready|!talent.strike_of_the_windlord&cooldown.fists_of_fury.ready)|buff.storm_earth_and_fire.remains>10)|fight_remains<20
-  if S.Fireblood:IsCastable() and ((Monk.Xuen.Active and Monk.Xuen.SummonTime + 15 > GetTime()) or not S.InvokeXuenTheWhiteTiger:IsAvailable() and (not S.StormEarthAndFire:IsAvailable() and (S.StrikeoftheWindlord:CooldownUp() or not S.StrikeoftheWindlord:IsAvailable() and S.FistsofFury:CooldownUp()) or Player:BuffRemains(S.StormEarthAndFireBuff) > 10) or BossFightRemains < 20) then
+  if S.Fireblood:IsCastable() and CDsON() and ((Monk.Xuen.Active and Monk.Xuen.SummonTime + 15 > GetTime()) or not S.InvokeXuenTheWhiteTiger:IsAvailable() and (not S.StormEarthAndFire:IsAvailable() and (S.StrikeoftheWindlord:CooldownUp() or not S.StrikeoftheWindlord:IsAvailable() and S.FistsofFury:CooldownUp()) or Player:BuffRemains(S.StormEarthAndFireBuff) > 10) or BossFightRemains < 20) then
     if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood cooldowns 18"; end
   end
   -- berserking,if=buff.invoke_xuen_the_white_tiger.remains>15|!talent.invoke_xuen_the_white_tiger&(!talent.storm_earth_and_fire&(cooldown.strike_of_the_windlord.ready|!talent.strike_of_the_windlord&cooldown.fists_of_fury.ready)|buff.storm_earth_and_fire.remains>10)|fight_remains<20
-  if S.Berserking:IsCastable() and ((Monk.Xuen.Active and Monk.Xuen.SummonTime + 15 > GetTime()) or not S.InvokeXuenTheWhiteTiger:IsAvailable() and (not S.StormEarthAndFire:IsAvailable() and (S.StrikeoftheWindlord:CooldownUp() or not S.StrikeoftheWindlord:IsAvailable() and S.FistsofFury:CooldownUp()) or Player:BuffRemains(S.StormEarthAndFireBuff) > 10) or BossFightRemains < 20) then
+  if S.Berserking:IsCastable() and CDsON() and ((Monk.Xuen.Active and Monk.Xuen.SummonTime + 15 > GetTime()) or not S.InvokeXuenTheWhiteTiger:IsAvailable() and (not S.StormEarthAndFire:IsAvailable() and (S.StrikeoftheWindlord:CooldownUp() or not S.StrikeoftheWindlord:IsAvailable() and S.FistsofFury:CooldownUp()) or Player:BuffRemains(S.StormEarthAndFireBuff) > 10) or BossFightRemains < 20) then
     if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking cooldowns 20"; end
   end
   if Player:BuffDown(S.StormEarthAndFireBuff) then
     -- bag_of_tricks,if=buff.storm_earth_and_fire.down
-    if S.BagofTricks:IsCastable() then
+    if S.BagofTricks:IsCastable() and CDsON() then
       if Cast(S.BagofTricks, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "bag_of_tricks cooldowns 22"; end
     end
     -- lights_judgment,if=buff.storm_earth_and_fire.down
-    if S.LightsJudgment:IsCastable() then
+    if S.LightsJudgment:IsCastable() and CDsON() then
       if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "lights_judgment cooldowns 24"; end
     end
     -- haymaker,if=buff.storm_earth_and_fire.down
-    if S.Haymaker:IsCastable() then
+    if S.Haymaker:IsCastable() and CDsON() then
       if Cast(S.Haymaker, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "haymaker cooldowns 26"; end
     end
     -- rocket_barrage,if=buff.storm_earth_and_fire.down
-    if S.RocketBarrage:IsCastable() then
+    if S.RocketBarrage:IsCastable() and CDsON() then
       if Cast(S.RocketBarrage, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "rocket_barrage cooldowns 28"; end
     end
     -- azerite_surge,if=buff.storm_earth_and_fire.down
-    if S.AzeriteSurge:IsCastable() then
+    if S.AzeriteSurge:IsCastable() and CDsON() then
       if Cast(S.AzeriteSurge, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "azerite_surge cooldowns 30"; end
     end
     -- arcane_pulse,if=buff.storm_earth_and_fire.down
-    if S.ArcanePulse:IsCastable() then
+    if S.ArcanePulse:IsCastable() and CDsON() then
       if Cast(S.ArcanePulse, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "arcane_pulse cooldowns 32"; end
     end
   end
