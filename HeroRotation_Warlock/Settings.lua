@@ -84,6 +84,7 @@ HR.GUISettings.APL.Warlock = {
       PowerSiphon = true,
       SummonDemonicTyrant = false,
       SummonPet = false,
+      SummonVilefiend = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
