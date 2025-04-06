@@ -368,7 +368,7 @@ local function FightEnd()
   end
   -- summon_vilefiend,if=fight_remains<20
   if VilefiendAbility:IsReady() then
-    if Cast(VilefiendAbility) then return "summon_vilefiend fight_end 12"; end
+    if Cast(VilefiendAbility, Settings.Demonology.GCDasOffGCD.SummonVilefiend) then return "summon_vilefiend fight_end 12"; end
   end
   -- summon_demonic_tyrant,if=fight_remains<20
   if CDsON() and S.SummonDemonicTyrant:IsReady() and (BossFightRemains < 20) then
@@ -453,7 +453,7 @@ local function Opener()
   end
   -- summon_vilefiend,if=soul_shard=5
   if VilefiendAbility:IsReady() and (SoulShards == 5) then
-    if Cast(VilefiendAbility) then return "summon_vilefiend opener 4"; end
+    if Cast(VilefiendAbility, Settings.Demonology.GCDasOffGCD.SummonVilefiend) then return "summon_vilefiend opener 4"; end
   end
   -- shadow_bolt,if=soul_shard<5&cooldown.call_dreadstalkers.up
   if S.ShadowBolt:IsCastable() and (SoulShards < 5 and S.CallDreadstalkers:CooldownUp()) then
@@ -542,7 +542,7 @@ local function Tyrant()
   end
   -- summon_vilefiend,if=(buff.grimoire_felguard.up|cooldown.grimoire_felguard.remains>10|!talent.grimoire_felguard)&cooldown.summon_demonic_tyrant.remains<13&cooldown.call_dreadstalkers.remains<gcd.max*2.33&(soul_shard=5|soul_shard=4&(buff.demonic_core.react=4)|buff.grimoire_felguard.up)
   if VilefiendAbility:IsReady() and ((GrimoireFelguardActive() or S.GrimoireFelguard:CooldownRemains() > 10 or not S.GrimoireFelguard:IsAvailable()) and S.SummonDemonicTyrant:CooldownRemains() < 13 and S.CallDreadstalkers:CooldownRemains() < Player:GCD() * 2.33 and (SoulShards == 5 or SoulShards == 4 and (DemonicCoreStacks == 4) or GrimoireFelguardActive())) then
-    if Cast(VilefiendAbility) then return "summon_vilefiend tyrant 20"; end
+    if Cast(VilefiendAbility, Settings.Demonology.GCDasOffGCD.SummonVilefiend) then return "summon_vilefiend tyrant 20"; end
   end
   -- call_dreadstalkers,if=(!talent.summon_vilefiend|buff.vilefiend.up)&cooldown.summon_demonic_tyrant.remains<10&soul_shard>=(5-(buff.demonic_core.react>=3))|prev_gcd.3.grimoire_felguard
   if S.CallDreadstalkers:IsReady() and ((not S.SummonVilefiend:IsAvailable() or VilefiendActive()) and S.SummonDemonicTyrant:CooldownRemains() < 10 and SoulShards >= (5 - num(DemonicCoreStacks >= 3)) or Player:PrevGCDP(3, S.GrimoireFelguard)) then
@@ -733,7 +733,7 @@ local function APL()
     end
     -- summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>30
     if VilefiendAbility:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() > 30) then
-      if Cast(VilefiendAbility) then return "summon_vilefiend main 10"; end
+      if Cast(VilefiendAbility, Settings.Demonology.GCDasOffGCD.SummonVilefiend) then return "summon_vilefiend main 10"; end
     end
     -- demonbolt,target_if=min:debuff.doom.remains,if=buff.demonic_core.react&(!talent.doom|buff.demonic_core.react>1|debuff.doom.remains>10|debuff.doom.down)&(((!talent.soul_strike|cooldown.soul_strike.remains>gcd.max*2)&soul_shard<4))&!prev_gcd.1.demonbolt&!variable.pool_cores_for_tyrant
     if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and (not S.Doom:IsAvailable() or DemonicCoreStacks > 1 or Target:DebuffRemains(S.DoomDebuff) > 10 or Target:DebuffDown(S.DoomDebuff)) and ((not S.SoulStrike:IsAvailable() or S.SoulStrike:CooldownRemains() > Player:GCD() * 2) and SoulShards < 4) and not Player:PrevGCDP(1, S.Demonbolt) and not VarPoolCoresForTyrant) then
@@ -821,7 +821,7 @@ local function APL()
     end
     -- summon_vilefiend,if=fight_remains<cooldown.summon_demonic_tyrant.remains+5
     if VilefiendAbility:IsReady() and (BossFightRemains < S.SummonDemonicTyrant:CooldownRemains() + 5) then
-      if Cast(VilefiendAbility) then return "summon_vilefiend main 52"; end
+      if Cast(VilefiendAbility, Settings.Demonology.GCDasOffGCD.SummonVilefiend) then return "summon_vilefiend main 52"; end
     end
     -- shadow_bolt
     if S.ShadowBolt:IsCastable() then
