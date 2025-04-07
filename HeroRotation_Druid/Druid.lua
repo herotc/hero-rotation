@@ -276,6 +276,7 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   DreamofCenariusBuff                   = Spell(372152),
   GalacticGuardianBuff                  = Spell(213708),
   GoreBuff                              = Spell(93622),
+  InnerResilienceBuff                   = Spell(219309), -- Buff from Tome of Light's Devotion trinket
   StackedDeckBuff                       = Spell(1218537), -- TWW S2 4pc
   ToothandClawBuff                      = Spell(135286),
   ViciousCycleMaulBuff                  = Spell(372015),
