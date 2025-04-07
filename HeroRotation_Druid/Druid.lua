@@ -66,6 +66,7 @@ Spell.Druid.Commons = {
   -- Buffs
   FrenziedRegenerationBuff              = Spell(22842),
   HeartoftheWildBuff                    = Spell(319454),
+  InnerResilienceBuff                   = Spell(450706),
   IronfurBuff                           = Spell(192081),
   MarkoftheWildBuff                     = Spell(1126),
   PoPHealBuff                           = Spell(395336),
