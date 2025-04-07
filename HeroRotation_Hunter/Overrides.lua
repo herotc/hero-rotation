@@ -95,6 +95,17 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
 end
 , 254)
 
+local OldMMBuffUp
+OldMMBuffUp = HL.AddCoreOverride("Player.BuffUp",
+  function(self, Spell, AnyCaster, Offset)
+    if Spell == SpellMM.LunarStormReadyBuff then
+      return Player:BuffDown(SpellMM.LunarStormCDBuff)
+    else
+      return OldMMBuffUp(self, Spell, AnyCaster, Offset)
+    end
+  end
+, 254)
+
 local OldMMBuffRemains
 OldMMBuffRemains = HL.AddCoreOverride("Player.BuffRemains",
   function(self, Spell, AnyCaster, Offset)
