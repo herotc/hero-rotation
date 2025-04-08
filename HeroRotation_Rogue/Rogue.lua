@@ -198,6 +198,7 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   ThrownPrecision         = Spell(381629),
   VenomRush               = Spell(152152),
   ViciousVenoms           = Spell(381634),
+  ZoldyckRecipe           = Spell(381798)
   -- PvP
 })
 

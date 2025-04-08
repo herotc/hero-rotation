@@ -347,10 +347,9 @@ local function Racials ()
       return "Cast Fireblood"
     end
   end
-  -- actions.misc_cds+=/ancestral_call,if=(!talent.kingsbane&debuff.deathmark.up&debuff.shiv.up)|(talent.kingsbane&debuff.deathmark.up&dot.kingsbane.ticking&dot.kingsbane.remains<8)
+  -- actions.misc_cds+=/ancestral_call,if=debuff.deathmark.up
   if S.AncestralCall:IsCastable() then
-    if (not S.Kingsbane:IsAvailable() and Target:DebuffUp(S.ShivDebuff))
-      or (Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) < 8) then
+    if S.Deathmark:AnyDebuffUp() then
       if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then
         return "Cast Ancestral Call"
       end
@@ -627,29 +626,6 @@ local function UsableItems ()
   local BaseTrinketCondition = Target:DebuffUp(S.Rupture) and S.Deathmark:CooldownRemains() <= 2 and not S.Deathmark:IsReady()
     or Target:DebuffUp(S.Deathmark) or HL.BossFilteredFightRemains("<", 22)
 
-  -- actions.items+=/use_item,name=ashes_of_the_embersoul,use_off_gcd=1,if=(dot.kingsbane.ticking&dot.kingsbane.remains<=11)|fight_remains<=22
-  if I.AshesoftheEmbersoul:IsEquippedAndReady() then
-    if (Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) <= 11 or HL.BossFilteredFightRemains("<", 22)) then
-      if Cast(I.AshesoftheEmbersoul, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
-        return "Ashes of the Embersoul";
-      end
-    end
-  end
-
-  -- actions.items+=/use_item,name=signet_of_the_priory,use_off_gcd=1,if=variable.base_trinket_condition
-  if I.SignetofthePriory:IsEquippedAndReady() and BaseTrinketCondition then
-    if Cast(I.SignetofthePriory, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
-      return "Signet of the Priory";
-    end
-  end
-
-  -- actions.items+=/use_item,name=algethar_puzzle_box,use_off_gcd=1,if=variable.base_trinket_condition
-  if I.AlgetharPuzzleBox:IsEquippedAndReady() and BaseTrinketCondition then
-    if Cast(I.AlgetharPuzzleBox, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
-      return "Algethar Puzzle Box";
-    end
-  end
-
   -- actions.items+=/use_item,name=treacherous_transmitter,use_off_gcd=1,if=variable.base_trinket_condition
   if I.TreacherousTransmitter:IsEquippedAndReady() and BaseTrinketCondition then
     if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
@@ -685,24 +661,26 @@ local function UsableItems ()
     end
   end
 
-  -- actions.items+=/use_items,slots=trinket1,if=(variable.trinket_sync_slot=1&(debuff.deathmark.up|fight_remains<=20)|(variable.trinket_sync_slot=2&(!trinket.2.cooldown.ready&dot.kingsbane.ticking|!debuff.deathmark.up&cooldown.deathmark.remains>20&dot.kingsbane.ticking))|!variable.trinket_sync_slot)
-  -- actions.items+=/use_items,slots=trinket2,if=(variable.trinket_sync_slot=2&(debuff.deathmark.up|fight_remains<=20)|(variable.trinket_sync_slot=1&(!trinket.1.cooldown.ready&dot.kingsbane.ticking|!debuff.deathmark.up&cooldown.deathmark.remains>20&dot.kingsbane.ticking))|!variable.trinket_sync_slot)
+  -- actions.items+=/use_items,slots=trinket1,if=(variable.trinket_sync_slot=1&(debuff.deathmark.up|dot.kingsbane.ticking)
+  -- |(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready&cooldown.deathmark.remains>20))|!variable.trinket_sync_slot|fight_remains<=20
   if TrinketItem1 and TrinketItem1:IsReady() then
     if not Player:IsItemBlacklisted(TrinketItem1) and not ValueIsInArray(OnUseExcludeTrinkets, TrinketItem1:ID())
-      and (TrinketSyncSlot == 1 and (S.Deathmark:AnyDebuffUp() or HL.BossFilteredFightRemains("<", 20))
-      or (TrinketSyncSlot == 2 and (not TrinketItem2:IsReady() and Target:DebuffUp(S.Kingsbane)
-      or not S.Deathmark:AnyDebuffUp() and S.Deathmark:CooldownRemains() > 20 and Target:DebuffUp(S.Kingsbane))) or TrinketSyncSlot == 0) then
+      and (TrinketSyncSlot == 1 and (S.Deathmark:AnyDebuffUp() or Target:DebuffUp(S.Kingsbane))
+      or (TrinketSyncSlot == 2 and not TrinketItem2:IsReady() and S.Deathmark:CooldownRemains() > 20))
+      or TrinketSyncSlot == 0 or HL.BossFilteredFightRemains("<", 20) then
       if Cast(TrinketItem1, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
         return "Trinket 1";
       end
     end
   end
 
+  -- actions.items+=/use_items,slots=trinket2,if=(variable.trinket_sync_slot=2&(debuff.deathmark.up|dot.kingsbane.ticking)
+  -- |(variable.trinket_sync_slot=1&!trinket.1.cooldown.ready&cooldown.deathmark.remains>20))|!variable.trinket_sync_slot|fight_remains<=20
   if TrinketItem2 and TrinketItem2:IsReady() then
     if not Player:IsItemBlacklisted(TrinketItem2) and not ValueIsInArray(OnUseExcludeTrinkets, TrinketItem2:ID())
-      and (TrinketSyncSlot == 2 and (S.Deathmark:AnyDebuffUp() or HL.BossFilteredFightRemains("<", 20))
-      or (TrinketSyncSlot == 1 and (not TrinketItem1:IsReady() and Target:DebuffUp(S.Kingsbane)
-      or not S.Deathmark:AnyDebuffUp() and S.Deathmark:CooldownRemains() > 20 and Target:DebuffUp(S.Kingsbane))) or TrinketSyncSlot == 0) then
+      and (TrinketSyncSlot == 2 and (S.Deathmark:AnyDebuffUp() or Target:DebuffUp(S.Kingsbane))
+      or (TrinketSyncSlot == 1 and not TrinketItem1:IsReady() and S.Deathmark:CooldownRemains() > 20))
+      or TrinketSyncSlot == 0 or HL.BossFilteredFightRemains("<", 20) then
       if Cast(TrinketItem2, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
         return "Trinket 2";
       end
@@ -721,9 +699,11 @@ local function ShivUsage ()
   if S.Shiv:IsReady() then
     -- # Shiv for aoe with Arterial Precision
     -- actions.shiv+=/shiv,if=talent.arterial_precision&!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking
-    -- &spell_targets.fan_of_knives>=4&dot.crimson_tempest.ticking
+    -- &spell_targets.fan_of_knives>=4&dot.crimson_tempest.ticking&(target.health.pct<=35
+    -- &talent.zoldyck_recipe|cooldown.shiv.charges_fractional>=1.9)
     if S.ArterialPrecision:IsAvailable() and Target:DebuffDown(S.ShivDebuff) and Target:DebuffUp(S.Garrote)
-      and Target:DebuffUp(S.Rupture) and MeleeEnemies10yCount >= 4 and S.CrimsonTempest:AnyDebuffUp() then
+      and Target:DebuffUp(S.Rupture) and MeleeEnemies10yCount >= 4 and S.CrimsonTempest:AnyDebuffUp()
+      and Target:HealthPercentage() <= 35 and S.ZoldyckRecipe:IsAvailable() or S.Shiv:ChargesFractional() >= 1.9 then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
         return "Cast Shiv (Arterial Precision)"
       end
@@ -763,17 +743,18 @@ local function ShivUsage ()
     end
 
     -- # Fallback shiv for arterial during deathmark
-    -- actions.shiv+=/shiv,if=talent.arterial_precision&!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking&debuff.deathmark.up
-    if S.ArterialPrecision:IsAvailable() and Target:DebuffDown(S.ShivDebuff) and Target:DebuffUp(S.Rupture) and S.Deathmark:AnyDebuffUp() then
+    -- actions.shiv+=/shiv,if=debuff.deathmark.up&talent.arterial_precision&!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking
+    if S.Deathmark:AnyDebuffUp() and S.ArterialPrecision:IsAvailable() and Target:DebuffDown(S.ShivDebuff)
+      and Target:DebuffUp(S.Garrote) and Target:DebuffUp(S.Rupture) then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
         return "Cast Shiv (Arterial Precision Deathmark)"
       end
     end
 
     -- # Fallback if no special cases apply
-    -- actions.shiv+=/shiv,if=!talent.kingsbane&variable.shiv_condition&(dot.crimson_tempest.ticking|talent.amplifying_poison)
-    -- &(((talent.lightweight_shiv+1)-cooldown.shiv.charges_fractional)*30<cooldown.deathmark.remains)
-    if not S.Kingsbane:IsAvailable() and ShivCondition and (Target:DebuffUp(S.CrimsonTempest) or S.AmplifyingPoison:IsAvailable())
+    -- actions.shiv+=/shiv,if=!debuff.deathmark.up&!talent.kingsbane&variable.shiv_condition&(dot.crimson_tempest.ticking|talent.amplifying_poison)
+    -- &(((talent.lightweight_shiv+1)-cooldown.shiv.charges_fractional)*30<cooldown.deathmark.remains)&raid_event.adds.in>20
+    if not S.Deathmark:AnyDebuffUp() and not S.Kingsbane:IsAvailable() and ShivCondition and (Target:DebuffUp(S.CrimsonTempest) or S.AmplifyingPoison:IsAvailable())
       and (((num(S.LightweightShiv:IsAvailable()) + 1) - S.Shiv:ChargesFractional()) * 30 < S.Deathmark:CooldownRemains()) then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
         return "Cast Shiv"
@@ -962,9 +943,9 @@ local function Core_Dot()
     end
   end
 
-  -- # Maintain Crimson Tempest
+  -- # Maintain Crimson Tempest unless it would remove a stronger cast
   -- actions.core_dot+=/crimson_tempest,if=combo_points>=variable.effective_spend_cp&refreshable
-  -- &(!buff.darkest_night.up)&!talent.amplifying_poison
+  -- &pmultiplier<=persistent_multiplier&!buff.darkest_night.up&!talent.amplifying_poison
   if S.CrimsonTempest:IsReady() and ComboPoints >= EffectiveCPSpend and IsDebuffRefreshable(Target, S.CrimsonTempest)
     and Player:BuffDown(S.DarkestNightBuff) and not S.AmplifyingPoison:IsAvailable() then
     if Cast(S.CrimsonTempest, Settings.Assassination.GCDasOffGCD.CrimsonTempest) then
@@ -999,30 +980,30 @@ local function AoE_Dot ()
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, 12, MeleeEnemies5y)
   end
 
-  -- # Rupture upkeep, in AoE to reach energy or scent of blood saturation
-  --actions.aoe_dot+=/rupture,cycle_targets=1,if=variable.dot_finisher_condition&refreshable&(!dot.kingsbane.ticking
+  -- # Rupture upkeep in AoE to reach energy/scent saturation or to spread for damage
+  -- actions.aoe_dot+=/rupture,cycle_targets=1,if=variable.dot_finisher_condition&refreshable&(!dot.kingsbane.ticking
   -- |buff.cold_blood.up)&(!variable.regen_saturated&(talent.scent_of_blood.rank=2|talent.scent_of_blood.rank<=1
-  -- &(buff.indiscriminate_carnage.up|target.time_to_die-remains>15)))
-  -- &target.time_to_die-remains>(7+(talent.dashing_scoundrel*5)+(variable.regen_saturated*6))&!buff.darkest_night.up
+  -- &(buff.indiscriminate_carnage.up|target.time_to_die-remains>15)))&target.time_to_die>(7+(talent.dashing_scoundrel*5)
+  -- +(variable.regen_saturated*6))&!buff.darkest_night.up
   if S.Rupture:IsReady() and HR.AoEON() and DotFinisherCondition and (Target:DebuffDown(S.Kingsbane) or Player:BuffUp(S.ColdBlood))
   and (not EnergyRegenSaturated and (S.ScentOfBlood:TalentRank() == 2 or S.ScentOfBlood:TalentRank() <= 1
-    and (Player:BuffUp(S.IndiscriminateCarnageBuff) or Target:TimeToDie() > 15))) then
+    and (Player:BuffUp(S.IndiscriminateCarnageBuff) or Target:TimeToDie() > 15))) and Player:BuffDown(S.DarkestNightBuff) then
     local function EvaluateRuptureTarget(TargetUnit)
       return IsDebuffRefreshable(TargetUnit, S.Rupture, RuptureThreshold)
     end
     SuggestCycleDoT(S.Rupture, EvaluateRuptureTarget, (7 + (BoolToInt(S.DashingScoundrel:IsAvailable()) * 5) + (BoolToInt(EnergyRegenSaturated) * 6)), MeleeEnemies5y)
   end
 
-  -- actions.aoe_dot+=/rupture,cycle_targets=1,if=variable.dot_finisher_condition&refreshable
-  -- &(!dot.kingsbane.ticking|buff.cold_blood.up)&variable.regen_saturated&!variable.scent_saturation
-  -- &target.time_to_die-remains>19&!buff.darkest_night.up
+  -- actions.aoe_dot+=/rupture,cycle_targets=1,if=variable.dot_finisher_condition&refreshable&(!dot.kingsbane.ticking
+  -- |buff.cold_blood.up)&variable.regen_saturated&target.time_to_die>(7+(talent.dashing_scoundrel*5)
+  -- +(variable.regen_saturated*6))&!buff.darkest_night.up
   if HR.AoEON() and S.Rupture:IsReady() then
     if DotFinisherCondition and (Player:DebuffDown(S.Kingsbane) or Player:BuffUp(S.ColdBlood)) and EnergyRegenSaturated
-      and not ScentSaturated and Player:BuffDown(S.DarkestNightBuff) then
+      and Player:BuffDown(S.DarkestNightBuff) then
       local function EvaluateRuptureTarget(TargetUnit)
         return IsDebuffRefreshable(TargetUnit, S.Rupture, RuptureThreshold)
       end
-      SuggestCycleDoT(S.Rupture, EvaluateRuptureTarget, 19, MeleeEnemies5y)
+      SuggestCycleDoT(S.Rupture, EvaluateRuptureTarget, (7 + (BoolToInt(S.DashingScoundrel:IsAvailable()) * 5) + (BoolToInt(EnergyRegenSaturated) * 6)), MeleeEnemies5y)
     end
   end
 
@@ -1233,20 +1214,20 @@ local function APL ()
     EnergyRegenSaturated = EnergyRegenCombined > 30
 
     -- # Pooling Setup, check for cooldowns
-    -- actions+=/variable,name=in_cooldowns,value=dot.deathmark.ticking|dot.kingsbane.ticking|debuff.shiv.up
-    InCooldowns = Target:DebuffUp(S.Deathmark) or Target:DebuffUp(S.Kingsbane) or Target:DebuffUp(S.Shiv)
+    -- actions+=/variable,name=in_cooldowns,value=dot.kingsbane.ticking|debuff.shiv.up
+    InCooldowns = Target:DebuffUp(S.Kingsbane) or Target:DebuffUp(S.Shiv)
 
     -- # Check upper bounds of energy to begin spending
-    -- actions+=/variable,name=upper_limit_energy,value=energy.pct>=(50-10*talent.vicious_venoms.rank)
-    UpperLimitEnergy = Player:EnergyPercentage() >= (50 - 10 * S.ViciousVenoms:TalentRank())
+    -- actions+=/variable,name=upper_limit_energy,value=energy.pct>=(80-10*talent.vicious_venoms.rank-30*talent.amplifying_poison)
+    UpperLimitEnergy = Player:EnergyPercentage() >= (80 - 10 * S.ViciousVenoms:TalentRank() - 30 * num(S.AmplifyingPoison:IsAvailable()))
 
     -- # Checking for cooldowns soon
     -- actions+=/variable,name=cd_soon,value=cooldown.kingsbane.remains<3&!cooldown.kingsbane.ready
     CDSoon = S.Kingsbane:CooldownRemains() < 3 and not S.Kingsbane:IsReady()
 
     -- # Pooling Condition all together
-    -- actions+=/variable,name=not_pooling,value=variable.in_cooldowns|!variable.cd_soon&buff.darkest_night.up|variable.upper_limit_energy|fight_remains<=20
-    NotPooling = InCooldowns or not CDSoon and Player:BuffUp(S.DarkestNightBuff)
+    -- actions+=/variable,name=not_pooling,value=variable.in_cooldowns|buff.darkest_night.up|variable.upper_limit_energy|fight_remains<=20
+    NotPooling = InCooldowns or Player:BuffUp(S.DarkestNightBuff)
       or UpperLimitEnergy or HL.BossFilteredFightRemains("<=", 20)
 
     ScentSaturated = ScentSaturatedVar()
