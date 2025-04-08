@@ -338,6 +338,7 @@ Item.Rogue.Outlaw = {
   -- Trinkets
   BottledFlayedwingToxin   = Item(178742, {13, 14}),
   ImperfectAscendancySerum = Item(225654, {13, 14}),
+  JunkmaestrosMegaMagnet   = Item(230189, {13, 14}),
   MadQueensMandate         = Item(212454, {13, 14}),
   ScrollOfMomentum         = Item(226539, {13, 14})
 }

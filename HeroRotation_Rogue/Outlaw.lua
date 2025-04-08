@@ -55,6 +55,7 @@ local I = Item.Rogue.Outlaw
 local OnUseExcludes = {
   I.BottledFlayedwingToxin:ID(),
   I.ImperfectAscendancySerum:ID(),
+  I.JunkmaestrosMegaMagnet:ID(),
   I.MadQueensMandate:ID()
 }
 
@@ -366,6 +367,17 @@ local function Stealth(ReturnSpellOnly)
 end
 
 local function Finish(ReturnSpellOnly)
+  -- actions.finish+=/killing_spree
+  if S.KillingSpree:IsCastable() then
+    if ReturnSpellOnly then
+      return S.KillingSpree
+    else
+      if CastPooling(S.KillingSpree, nil, not Target:IsSpellInRange(S.KillingSpree)) then
+        return "Killing Spree"
+      end
+    end
+  end
+
   -- actions.finish+=/coup_de_grace
   if S.CoupDeGrace:IsCastable() then
     if ReturnSpellOnly then
@@ -513,7 +525,7 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
 end
 
 function StealthCDs (ReturnSpellOnly)
-  -- # Vanish usage for builds using Underhanded Upper Hand, Crackshot and Subterfuge.
+  -- # Flex Vanish usage for standard builds.
 
   -- # Without Killing Spree, attempt to hold Vanish for when BtE is on cooldown and Ruthless Precision is active.
   -- Also with Keep it Rolling, hold Vanish if we haven't done the first roll after KIR yet.
@@ -532,10 +544,10 @@ function StealthCDs (ReturnSpellOnly)
     end
   end
 
-  -- # Vanish to prevent Adrenaline Rush downtime.
-  -- actions.vanish_usage+=/vanish,if=buff.adrenaline_rush.remains<3&cooldown.adrenaline_rush.remains>10
+  -- # Supercharger builds that do not use Killing Spree should also Vanish if Supercharger becomes active.
+  -- actions.vanish_usage+=/vanish,if=!talent.killing_spree&buff.supercharge_1.up
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
-    if Player:BuffRemains(S.AdrenalineRush) < 3 and S.AdrenalineRush:CooldownRemains() > 10 then
+    if not S.KillingSpree:IsAvailable() and ChargedComboPoints > 0 then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
         if ReturnSpellOnly then
@@ -546,30 +558,16 @@ function StealthCDs (ReturnSpellOnly)
     end
   end
 
-  -- # Supercharger builds that do not use Killing Spree should Vanish if Supercharger is active.
-  -- actions.vanish_usage+=/vanish,if=!talent.killing_spree&buff.supercharge_1.up
+  -- # Builds with Killing Spree can freely Vanish if KS is not up soon.
+  -- actions.vanish_usage+=/vanish,if=cooldown.killing_spree.remains>15
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
-    if not S.KillingSpree:IsAvailable() and ChargedComboPoints > 0 then
+    if S.KillingSpree:CooldownRemains() > 30 then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
         if ReturnSpellOnly then
           return { S.Vanish, ShouldReturn }
         end
         return "Vanish Macro 3 " .. ShouldReturn
-      end
-    end
-  end
-
-  -- # Builds with Killing Spree can freely Vanish if KS is not up soon.
-  -- actions.vanish_usage+=/vanish,if=cooldown.killing_spree.remains>15
-  if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
-    if S.KillingSpree:CooldownRemains() > 15 then
-      ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
-      if ShouldReturn then
-        if ReturnSpellOnly then
-          return { S.Vanish, ShouldReturn }
-        end
-        return "Vanish Macro 4 " .. ShouldReturn
       end
     end
   end
@@ -583,15 +581,14 @@ function StealthCDs (ReturnSpellOnly)
         if ReturnSpellOnly then
           return { S.Vanish, ShouldReturn }
         end
-        return "Vanish Macro 5 " .. ShouldReturn
+        return "Vanish Macro 4 " .. ShouldReturn
       end
     end
   end
 end
 
 local function StealthCDs_2 (ReturnSpellOnly)
-  -- # Off meta builds vanish rules, limited apl support for builds lacking one of the "mandatory" talents crackshot,
-  -- underhanded upper hand and subterfuge
+  -- Flex Vanish usage for builds lacking one of the mandatory stealth talents. APL support for these builds is considered limited.
 
   --actions.stealth_cds_2=vanish,if=talent.underhanded_upper_hand&talent.subterfuge&!talent.crackshot&buff.adrenaline_rush.up
   -- &(variable.ambush_condition|!talent.hidden_opportunity)&(!cooldown.between_the_eyes.ready
@@ -680,12 +677,10 @@ local function StealthCDs_2 (ReturnSpellOnly)
 end
 
 local function CDs ()
-  -- # Maintain Adrenaline Rush. Recast while already active if using Improved ADR and at low CPs.
+  -- # Maintain Adrenaline Rush if it is not active. Use at low CPs with Improved AR.
   -- actions.cds=adrenaline_rush,if=!buff.adrenaline_rush.up&(!variable.finish_condition|!talent.improved_adrenaline_rush)
-  -- |talent.improved_adrenaline_rush&combo_points<=2
   if CDsON() and S.AdrenalineRush:IsCastable()
-    and (not Player:BuffUp(S.AdrenalineRush) and (not Finish_Condition() or not S.ImprovedAdrenalineRush:IsAvailable())
-    or S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2) then
+    and not Player:BuffUp(S.AdrenalineRush) and (not Finish_Condition() or not S.ImprovedAdrenalineRush:IsAvailable()) then
     if S.ImprovedAdrenalineRush:IsAvailable() then
       ShouldReturn = SpellQueueMacro(S.AdrenalineRush)
       if ShouldReturn then
@@ -693,7 +688,37 @@ local function CDs ()
       end
     else
       if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then
-        return "Cast Adrenaline Rush"
+        return "Cast Adrenaline Rush 1"
+      end
+    end
+  end
+
+  -- # If using Improved AR, recast AR if it is already active at low CPs.
+  -- Trickster builds should avoid recasting it during Disorienting Strikes with 0-3 stacks of Escalating Blade, unless stealth is active.
+  -- actions.cds+=/adrenaline_rush,if=buff.adrenaline_rush.up&talent.improved_adrenaline_rush&combo_points<=2
+  -- &(!buff.disorienting_strikes.up|stealthed.all|buff.escalating_blade.stack>=4)
+  if CDsON() and S.AdrenalineRush:IsCastable() then
+    if Player:BuffUp(S.AdrenalineRush) and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2
+      and (Rogue.DisorientingStrikesCount() == 0 or Player:StealthUp(true, true) or Player:BuffStack(S.EscalatingBlade) >= 41) then
+      if S.ImprovedAdrenalineRush:IsAvailable() then
+        ShouldReturn = SpellQueueMacro(S.AdrenalineRush)
+        if ShouldReturn then
+          return "AR Finisher Macro 2 " .. ShouldReturn
+        end
+      else
+        if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then
+          return "Cast Adrenaline Rush 2"
+        end
+      end
+    end
+  end
+
+  -- # High priority Ghostly Strike as it is off-gcd. 1 FTH builds prefer to not use it at max CPs.
+  -- actions.cds+=/ghostly_strike,if=combo_points<cp_max_spend|talent.fan_the_hammer.rank>1
+  if S.GhostlyStrike:IsCastable() then
+    if ComboPoints < Rogue.CPMaxSpend() or S.FanTheHammer:TalentRank() > 1 then
+      if Cast(S.GhostlyStrike, Settings.Outlaw.OffGCDasOffGCD.GhostlyStrike, nil, not Target:IsSpellInRange(S.GhostlyStrike)) then
+        return "Cast Ghostly Strike"
       end
     end
   end
@@ -723,12 +748,13 @@ local function CDs ()
     end
   end
 
-  -- # With Deft Maneuvers, use Blade Flurry on cooldown at 5+ targets, or at 3-4 targets if missing combo points equal to the amount it would grant.
-  -- action.cds/blade_flurry,if=talent.deft_maneuvers&!variable.finish_condition&(spell_targets>=3
-  -- &combo_points.deficit=spell_targets+buff.broadside.up|spell_targets>=5)
+  -- # With Deft Maneuvers, build CPs with Blade Flurry at 5+ targets.
+  -- Trickster builds should avoid this during Disorienting Strikes with 0-3 stacks of Escalating Blade, unless stealth is active.
+  -- actions.cds+=/blade_flurry,if=talent.deft_maneuvers&!variable.finish_condition&spell_targets>=5
+  -- &(!buff.disorienting_strikes.up|stealthed.all|buff.escalating_blade.stack>=4)
   if S.BladeFlurry:IsCastable() then
-    if S.DeftManeuvers:IsAvailable() and not Finish_Condition() and (EnemiesBFCount >= 3
-      and ComboPointsDeficit == EnemiesBFCount + num(Player:BuffUp(S.Broadside)) or EnemiesBFCount >= 5) then
+    if S.DeftManeuvers:IsAvailable() and not Finish_Condition() and EnemiesBFCount >= 5
+      and (Rogue.DisorientingStrikesCount() == 0 or Player:StealthUp(true, true) or Player:BuffStack(S.EscalatingBlade) >= 4) then
       if Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then
         return "Cast Blade Flurry"
       end
@@ -771,13 +797,6 @@ local function CDs ()
     end
   end
 
-  --actions.cds+=/ghostly_strike,if=effective_combo_points<cp_max_spend
-  if S.GhostlyStrike:IsAvailable() and S.GhostlyStrike:IsCastable() and EffectiveComboPoints < Rogue.CPMaxSpend() then
-    if Cast(S.GhostlyStrike, Settings.Outlaw.OffGCDasOffGCD.GhostlyStrike, nil, not Target:IsSpellInRange(S.GhostlyStrike)) then
-      return "Cast Ghostly Strike"
-    end
-  end
-
   -- # Trinkets that should not be used during stealth and have higher priority than entering stealth
   if Settings.Commons.Enabled.Trinkets then
     -- actions.cds+=/use_item,name=imperfect_ascendancy_serum,if=!stealthed.all|fight_remains<=22
@@ -799,21 +818,35 @@ local function CDs ()
     end
   end
 
-  -- # Killing Spree has higher priority than stealth cooldowns
-  -- actions.finish+=/killing_spree,if=variable.finish_condition&!stealthed.all
-  if S.KillingSpree:IsCastable() and Finish_Condition() and not Player:StealthUp(true, true) then
-    if Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle, not Target:IsSpellInRange(S.KillingSpree), nil) then
-      return "Cast Killing Spree"
+  -- # If necessary, standard builds prioritize using Vanish at any CP to prevent Adrenaline Rush downtime.
+  -- actions.cds+=/vanish,if=talent.underhanded_upper_hand&talent.subterfuge&buff.adrenaline_rush.up&!stealthed.all
+  -- &buff.adrenaline_rush.remains<2&cooldown.adrenaline_rush.remains>30
+  if S.UnderhandedUpperhand:IsAvailable() and S.Subterfuge:IsAvailable() and Player:BuffUp(S.AdrenalineRush)
+    and not Player:StealthUp(true, true) and Player:BuffRemains(S.AdrenalineRush) < 2 and S.AdrenalineRush:CooldownRemains() > 30 then
+    ShouldReturn = StealthCDs()
+    if ShouldReturn then
+      return ShouldReturn
     end
   end
 
-  -- # Primary stealth cooldowns for builds using all of uhuh, crackshot, and subterfuge. These builds only use vanish while not already in stealth,
-  -- when finish condition is active and adrenaline rush is up. Trickster builds also need to use Coup de Grace if available before vanishing.
-  -- actions.cds+=/call_action_list,name=stealth_cds,if=!stealthed.all&talent.crackshot&talent.underhanded_upper_hand
-  -- &talent.subterfuge&buff.escalating_blade.stack<4&buff.adrenaline_rush.up&variable.finish_condition
+  -- # If not at risk of losing Adrenaline Rush, run finishers to use Killing Spree or Coup de Grace as a higher priority than Vanish.
+  -- actions.cds+=/run_action_list,name=finish,if=!stealthed.all&(cooldown.killing_spree.ready&talent.killing_spree
+  -- |buff.escalating_blade.stack>=4)&variable.finish_condition
+  if not Player:StealthUp(true, true) and (S.KillingSpree:IsReady() and S.KillingSpree:IsAvailable()
+    or Player:BuffStack(S.EscalatingBlade) >= 4) and Finish_Condition() then
+    ShouldReturn = Finish()
+    if ShouldReturn then
+      return "Finish CDs: " .. ShouldReturn
+    end
+  end
+
+  -- # If not at risk of losing Adrenaline Rush, call flexible Vanish rules to be used at finisher CPs.
+  -- Trickster builds attempt to hold Vanish if at 3 stacks of Escalating Blades with Disorienting Strikes active.
+  -- actions.cds+=/call_action_list,name=vanish_usage,if=!stealthed.all&talent.crackshot&talent.underhanded_upper_hand
+  -- &talent.subterfuge&buff.adrenaline_rush.up&variable.finish_condition&(buff.escalating_blade.stack!=3|!buff.disorienting_strikes.up)
   if not Player:StealthUp(true, true) and S.Crackshot:IsAvailable() and S.UnderhandedUpperhand:IsAvailable()
-    and S.Subterfuge:IsAvailable() and Player:BuffStack(S.EscalatingBlade) < 4 and (Player:BuffUp(S.AdrenalineRush) or HL.BossFilteredFightRemains("<=", 8))
-    and Finish_Condition() then
+    and S.Subterfuge:IsAvailable() and Player:BuffUp(S.AdrenalineRush)
+    and Finish_Condition() and (Player:BuffStack(S.EscalatingBlade) ~= 3 or Rogue.DisorientingStrikesCount == 0) then
     ShouldReturn = StealthCDs()
     if ShouldReturn then
       return ShouldReturn
@@ -826,14 +859,6 @@ local function CDs ()
     ShouldReturn = StealthCDs_2()
     if ShouldReturn then
       return ShouldReturn
-    end
-  end
-
-  -- actions.cds+=/thistle_tea,if=!buff.thistle_tea.up&(energy.base_deficit>=100|fight_remains<charges*6)
-  if CDsON() and S.ThistleTea:IsCastable() and not Player:BuffUp(S.ThistleTea)
-    and (EnergyDeficit >= 150 or HL.BossFilteredFightRemains("<", S.ThistleTea:Charges() * 6)) then
-    if Cast(S.ThistleTea, Settings.CommonsOGCD.OffGCDasOffGCD.ThistleTea) then
-      return "Cast Thistle Tea"
     end
   end
 
@@ -891,6 +916,18 @@ local function CDs ()
     end
   end
 
+  -- # Let the magnet trinket stack up just so it does not disrupt a 2nd on-use trinket.
+  -- actions.cds+=/use_item,name=junkmaestros_mega_magnet,if=buff.between_the_eyes.up&buff.junkmaestros_mega_magnet.stack>25|fight_remains<5
+  if Settings.Commons.Enabled.Trinkets then
+    if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() then
+      if Player:BuffUp(S.BetweentheEyes) and Player:BuffStack(S.JunkmaestrosBuff) > 25 or HL.BossFilteredFightRemains("<", 5) then
+        if Cast(I.JunkmaestrosMegaMagnet, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.JunkmaestrosMegaMagnet)) then
+          return "Junkmaestros Mega Magnet";
+        end
+      end
+    end
+  end
+
   if Settings.Commons.Enabled.Trinkets then
     -- # Default conditions for usable items.
     -- actions.cds+=/use_items,slots=trinket1,if=debuff.between_the_eyes.up|trinket.1.has_stat.any_dps|fight_remains<=20
@@ -922,10 +959,17 @@ local function Build ()
     end
   end
 
-  -- sinister_strike,if=cooldown.killing_spree.remains<10&buff.disorienting_strikes.up
-  if S.SinisterStrike:IsCastable() and S.KillingSpree:CooldownRemains() < 10 and Rogue.DisorientingStrikesCount() > 0 then
-    if CastPooling(S.SinisterStrike, nil, not Target:IsSpellInRange(S.SinisterStrike)) then
-      return "Cast Sinister Strike... dump Disorienting Strike stacks before KS"
+  -- # Trickster builds without HO should prioritize Sinister Strike during Disorienting Strikes.
+  -- actions.build+=/sinister_strike,if=!talent.hidden_opportunity&buff.disorienting_strikes.up&!stealthed.all
+  -- &(buff.escalating_blade.stack>2&buff.opportunity.stack<buff.opportunity.max_stack|!talent.hidden_opportunity)
+  -- &buff.escalating_blade.stack<4
+  if S.SinisterStrike:IsCastable() then
+    if not S.HiddenOpportunity:IsAvailable() and Rogue.DisorientingStrikesCount() > 0 and not Player:StealthUp(true, true)
+      and (Player:BuffStack(S.EscalatingBlade)>2 and Player:BuffStack(S.Opportunity) < 6 or not S.HiddenOpportunity:IsAvailable())
+      and Player:BuffStack(S.EscalatingBlade) < 4 then
+      if CastPooling(S.SinisterStrike, nil, not Target:IsSpellInRange(S.SinisterStrike)) then
+        return "Cast Sinister Strike... Spend Disorienting Strikes"
+      end
     end
   end
 
@@ -937,9 +981,10 @@ local function Build ()
     end
   end
 
-  -- # With Fan the Hammer, consume Opportunity as a higher priority if at max stacks or if it will expire
+  -- # With 2 ranks in Fan the Hammer, consume Opportunity as a higher priority if at max stacks or if it will expire
   -- actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&(buff.opportunity.stack>=buff.opportunity.max_stack|buff.opportunity.remains<2)
-  if S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity) and (Player:BuffStack(S.Opportunity) >= 6 or Player:BuffRemains(S.Opportunity) < 2) then
+    if S.FanTheHammer:IsAvailable() and S.FanTheHammer:TalentRank() == 2 and Player:BuffUp(S.Opportunity)
+      and (Player:BuffStack(S.Opportunity) >= 6 or Player:BuffRemains(S.Opportunity) < 2) then
     if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then
       return "Cast Pistol Shot (FtH Dump)"
     end
