@@ -698,12 +698,12 @@ local function ShivUsage ()
 
   if S.Shiv:IsReady() then
     -- # Shiv for aoe with Arterial Precision
-    -- actions.shiv+=/shiv,if=talent.arterial_precision&!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking
-    -- &spell_targets.fan_of_knives>=4&dot.crimson_tempest.ticking&(target.health.pct<=35
-    -- &talent.zoldyck_recipe|cooldown.shiv.charges_fractional>=1.9)
+    -- actions.shiv+=/shiv,if=talent.arterial_precision&!debuff.shiv.up&dot.garrote.ticking
+    -- &dot.rupture.ticking&spell_targets.fan_of_knives>=4&dot.crimson_tempest.ticking
+    -- &(target.health.pct<=35&talent.zoldyck_recipe|cooldown.shiv.charges_fractional>=1.9)
     if S.ArterialPrecision:IsAvailable() and Target:DebuffDown(S.ShivDebuff) and Target:DebuffUp(S.Garrote)
       and Target:DebuffUp(S.Rupture) and MeleeEnemies10yCount >= 4 and S.CrimsonTempest:AnyDebuffUp()
-      and Target:HealthPercentage() <= 35 and S.ZoldyckRecipe:IsAvailable() or S.Shiv:ChargesFractional() >= 1.9 then
+      and (Target:HealthPercentage() <= 35 and S.ZoldyckRecipe:IsAvailable() or S.Shiv:ChargesFractional() >= 1.9) then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
         return "Cast Shiv (Arterial Precision)"
       end
