@@ -447,7 +447,7 @@ local function Trinkets()
   end
   -- use_items,if=(buff.voidform.up|buff.power_infusion.remains>=10|buff.dark_ascension.up|(cooldown.void_eruption.remains>10&trinket.cooldown.duration<=60)|equipped.neural_synapse_enhancer&buff.entropic_rift.up)|fight_remains<20
   local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-  if ItemToUse and ((Player:BuffUp(S.VoidformBuff) or Player:PowerInfusionRemains() >= 10 or Player:BuffUp(S.DarkAscensionBuff) or (S.VoidEruption:CooldownRemains() > 10 and (ItemToUse:Cooldown() <= 60 or ItemSlot ~= 13 and ItemSlot ~= 14)) or I.NeuralSynapseEnhancer:IsEquipped() and EntropicRiftUp) or BossFightRemains < 20) then
+  if ItemToUse and ((Player:BuffUp(S.VoidformBuff) or Player:PowerInfusionRemains() >= 10 or Player:BuffUp(S.DarkAscensionBuff) or (S.VoidEruption:IsAvailable() and S.VoidEruption:CooldownRemains() > 10 and (ItemToUse:Cooldown() <= 60 or ItemSlot ~= 13 and ItemSlot ~= 14)) or I.NeuralSynapseEnhancer:IsEquipped() and EntropicRiftUp) or BossFightRemains < 20) then
     local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
     if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
     if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
