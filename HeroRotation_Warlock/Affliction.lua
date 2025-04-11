@@ -361,7 +361,7 @@ local function Precombat()
   -- NYI precombat multi target
   -- haunt
   if S.Haunt:IsReady() then
-    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt precombat 4"; end
+    if Cast(S.Haunt, Settings.Affliction.GCDasOffGCD.Haunt, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt precombat 4"; end
   end
   -- Manually added: unstable_affliction
   if S.UnstableAffliction:IsReady() then
@@ -471,7 +471,7 @@ local function AoE()
   -- Calculating these in APL() so they're calculated each cycle.
   -- haunt,if=debuff.haunt.remains<3
   if S.Haunt:IsReady() and (Target:DebuffRemains(S.HauntDebuff) < 3) then
-    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt aoe 2"; end
+    if Cast(S.Haunt, Settings.Affliction.GCDasOffGCD.Haunt, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt aoe 2"; end
   end
   -- vile_taint,if=(cooldown.soul_rot.remains<=execute_time|cooldown.soul_rot.remains>=25)
   if S.VileTaint:IsReady() and (S.SoulRot:CooldownRemains() <= S.VileTaint:ExecuteTime() or S.SoulRot:CooldownRemains() >= 25) then
@@ -587,7 +587,7 @@ local function Cleave()
   end
   -- haunt,if=talent.demonic_soul&buff.nightfall.react<2-prev_gcd.1.drain_soul&(!talent.vile_taint|cooldown.vile_taint.remains)|debuff.haunt.remains<3
   if S.Haunt:IsReady() and (S.DemonicSoul:IsAvailable() and Player:BuffStack(S.NightfallBuff) < 2 - num(Player:PrevGCDP(1, S.DrainSoul)) and (not S.VileTaint:IsAvailable() or S.VileTaint:CooldownDown()) or Target:DebuffRemains(S.HauntDebuff)) then
-    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt cleave 6"; end
+    if Cast(S.Haunt, Settings.Affliction.GCDasOffGCD.Haunt, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt cleave 6"; end
   end
   -- unstable_affliction,if=(remains<5|talent.demonic_soul&remains<cooldown.soul_rot.remains+8&cooldown.soul_rot.remains<5)&fight_remains>remains+5
   if S.UnstableAffliction:IsReady() and ((Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5 or S.DemonicSoul:IsAvailable() and Target:DebuffRemains(S.UnstableAfflictionDebuff) < S.SoulRot:CooldownRemains() + 8 and S.SoulRot:CooldownRemains() < 5) and FightRemains > Target:DebuffRemains(S.UnstableAfflictionDebuff) + 5) then
@@ -792,7 +792,7 @@ local function APL()
     end
     -- haunt,if=talent.demonic_soul&buff.nightfall.react<2-prev_gcd.1.drain_soul&(!talent.vile_taint|cooldown.vile_taint.remains)
     if S.Haunt:IsReady() and (S.DemonicSoul:IsAvailable() and Player:BuffStack(S.NightfallBuff) < 2 - num(Player:PrevGCDP(1, S.DrainSoul)) and (not S.VileTaint:IsAvailable() or S.VileTaint:CooldownDown())) then
-      if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt main 4"; end
+      if Cast(S.Haunt, Settings.Affliction.GCDasOffGCD.Haunt, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt main 4"; end
     end
     -- unstable_affliction,if=(talent.absolute_corruption&remains<3|!talent.absolute_corruption&remains<5|cooldown.soul_rot.remains<5&remains<8)&(!talent.demonic_soul|buff.nightfall.react<2|prev_gcd.1.haunt&buff.nightfall.stack<2)&fight_remains>dot.unstable_affliction.remains+5
     if S.UnstableAffliction:IsReady() and ((S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.UnstableAfflictionDebuff) < 3 or not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.UnstableAfflictionDebuff) < 5 or S.SoulRot:CooldownRemains() < 5 and Target:DebuffRemains(S.UnstableAfflictionDebuff) < 8) and (not S.DemonicSoul:IsAvailable() or Player:BuffStack(S.NightfallBuff) < 2 or Player:PrevGCDP(1, S.Haunt) and Player:BuffStack(S.NightfallBuff) < 2) and FightRemains > Target:DebuffRemains(S.UnstableAfflictionDebuff) + 5) then
@@ -801,7 +801,7 @@ local function APL()
 
     -- haunt,if=(talent.absolute_corruption&debuff.haunt.remains<3|!talent.absolute_corruption&debuff.haunt.remains<5|cooldown.soul_rot.remains<5&debuff.haunt.remains<8)&(!talent.vile_taint|cooldown.vile_taint.remains)&fight_remains>debuff.haunt.remains+5
     if S.Haunt:IsReady() and ((S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.HauntDebuff) < 3 or not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.HauntDebuff) < 5 or S.SoulRot:CooldownRemains() < 5 and Target:DebuffRemains(S.HauntDebuff) < 8) and (not S.VileTaint:IsAvailable() or S.VileTaint:CooldownDown()) and FightRemains > Target:DebuffRemains(S.HauntDebuff) + 5) then
-      if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt main 8"; end
+      if Cast(S.Haunt, Settings.Affliction.GCDasOffGCD.Haunt, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt main 8"; end
     end
     -- wither,if=talent.wither&(talent.absolute_corruption&remains<3|!talent.absolute_corruption&remains<5)&fight_remains>dot.wither.remains+5
     if S.Wither:IsReady() and ((S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.WitherDebuff) < 3 or not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.WitherDebuff) < 5) and FightRemains > Target:DebuffRemains(S.WitherDebuff) + 5) then

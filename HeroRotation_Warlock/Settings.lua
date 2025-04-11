@@ -54,6 +54,7 @@ HR.GUISettings.APL.Warlock = {
     GCDasOffGCD = {
       -- Abilities
       GrimoireOfSacrifice = true,
+      Haunt = false,
       InquisitorsGaze = false,
       PhantomSingularity = true,
       SoulTap = true,
@@ -102,6 +103,7 @@ HR.GUISettings.APL.Warlock = {
     GCDasOffGCD = {
       -- Abilities
       Cataclysm = false,
+      ChannelDemonfire = false,
       DimensionalRift = false,
       GrimoireOfSacrifice = true,
       InquisitorsGaze = false,
