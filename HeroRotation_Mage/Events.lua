@@ -83,39 +83,30 @@ local num = HR.Commons.Everyone.num
 --------------------------
 
 --- Arcane Harmony Stack Tracking
--- Tracks Arcane Harmony buff stacks and provides notifications when approaching optimal stack count
--- Optimal stack count varies based on talents (High Voltage reduces required stacks)
--- Used to help players maximize DPS by using Arcane Barrage at the right stack count
+-- Tracks Arcane Harmony buff stacks for optimal Arcane Barrage timing
 local ArcaneHarmonyLastStack = 0
 local ArcaneHarmonyThresholdNotified = false
 
---- Touch of the Magi Tracking
--- Tracks application and removal of Touch of the Magi debuff
--- Provides timing notifications to help maximize damage during the TotM window
--- Only tracks debuff on current target or focus target to avoid misleading notifications
-local TotMDebuffApplied = nil
+--- Arcane Surge Tracking
+-- Tracks Arcane Surge state for optimal burst windows
+local ArcaneSurgeStartTime = 0
+local ArcaneSurgeActive = false
+
+--- Clearcasting Tracking
+-- Tracks Clearcasting procs for optimal Arcane Missiles usage
+local ClearcastingProcs = 0
+local LastClearcastingTime = 0
 
 HL:RegisterForSelfCombatEvent(function(...)
   local _, event, _, _, _, _, _, _, _, _, _, spellID = ...
   local S = Spell.Mage.Arcane
   
   if spellID == S.ArcaneHarmonyBuff:ID() then
-    -- Retrieve current stack count from player auras
-    -- Uses C_UnitAuras API for reliable stack tracking in patch 11.1.0
     local auraData = C_UnitAuras.GetPlayerAuraBySpellID(S.ArcaneHarmonyBuff:ID())
     if auraData then
       ArcaneHarmonyLastStack = auraData.applications or 1
-      
-      -- Dynamic threshold calculation based on talent selection
-      -- High Voltage talent reduces optimal stack count from 18 to 12
-      -- Formula: 18 - (6 * talent presence as 0/1)
       local threshold = (18 - (6 * num(S.HighVoltage:IsAvailable())))
-      
-      -- Notification logic when approaching optimal stack threshold
-      -- Notifies player when within 2 stacks of optimal count
-      -- Only notifies once per threshold to prevent chat spam
       if ArcaneHarmonyLastStack >= (threshold - 2) and not ArcaneHarmonyThresholdNotified then
-        HR.Print("Approaching optimal Arcane Harmony stacks: " .. ArcaneHarmonyLastStack .. "/" .. threshold)
         ArcaneHarmonyThresholdNotified = true
       elseif ArcaneHarmonyLastStack < (threshold - 2) then
         ArcaneHarmonyThresholdNotified = false
@@ -123,51 +114,41 @@ HL:RegisterForSelfCombatEvent(function(...)
     end
   end
   
-  -- Reset tracking variables when Arcane Harmony buff expires
-  -- Ensures clean state for next buff application
   if event == "SPELL_AURA_REMOVED" and spellID == S.ArcaneHarmonyBuff:ID() then
     ArcaneHarmonyLastStack = 0
     ArcaneHarmonyThresholdNotified = false
   end
+
+  -- Track Arcane Surge state
+  if spellID == S.ArcaneSurgeBuff:ID() then
+    if event == "SPELL_AURA_APPLIED" then
+      ArcaneSurgeStartTime = GetTime()
+      ArcaneSurgeActive = true
+    elseif event == "SPELL_AURA_REMOVED" then
+      ArcaneSurgeActive = false
+    end
+  end
+
+  -- Track Clearcasting procs
+  if spellID == S.ClearcastingBuff:ID() then
+    if event == "SPELL_AURA_APPLIED" then
+      ClearcastingProcs = ClearcastingProcs + 1
+      LastClearcastingTime = GetTime()
+    elseif event == "SPELL_AURA_REMOVED" then
+      ClearcastingProcs = math.max(0, ClearcastingProcs - 1)
+    end
+  end
 end, "SPELL_AURA_APPLIED_DOSE", "SPELL_AURA_APPLIED", "SPELL_AURA_REMOVED")
 
 --- Combat Exit Handler
--- Resets all tracking variables when player leaves combat
--- Ensures clean state for the next combat encounter
--- Prevents stale data from affecting future combat sessions
 HL:RegisterForEvent(function()
   ArcaneHarmonyLastStack = 0
   ArcaneHarmonyThresholdNotified = false
-  TotMDebuffApplied = nil
+  ArcaneSurgeStartTime = 0
+  ArcaneSurgeActive = false
+  ClearcastingProcs = 0
+  LastClearcastingTime = 0
 end, "PLAYER_REGEN_ENABLED")
-
-HL:RegisterForCombatEvent(function(...)
-  local _, event, _, _, _, _, _, destGUID, _, _, _, spellID = ...
-  local S = Spell.Mage.Arcane
-  
-  if spellID == S.TouchoftheMagiDebuff:ID() then
-    local now = GetTime()
-    -- Only track debuff on target or focus to avoid misleading notifications
-    -- This prevents tracking TotM on random units that aren't the player's focus
-    local targetIsTrackedUnit = destGUID == UnitGUID("target") or destGUID == UnitGUID("focus")
-    
-    if event == "SPELL_AURA_APPLIED" and targetIsTrackedUnit then
-      -- Store application timestamp and notify player of burst window opening
-      -- This helps players time their burst cooldowns and spells
-      TotMDebuffApplied = now
-      HR.Print("Touch of the Magi applied, window open!")
-    elseif event == "SPELL_AURA_REMOVED" and targetIsTrackedUnit then
-      -- Calculate actual duration and notify player of window closure
-      -- Formatted to one decimal place for readability
-      -- Helps players learn timing for future applications
-      if TotMDebuffApplied then
-        local duration = now - TotMDebuffApplied
-        HR.Print("Touch of the Magi window closed. Duration: " .. string.format("%.1f", duration) .. "s")
-      end
-      TotMDebuffApplied = nil
-    end
-  end
-end, "SPELL_AURA_APPLIED", "SPELL_AURA_REMOVED")
 
 --------------------------
 -------- Frost -----------

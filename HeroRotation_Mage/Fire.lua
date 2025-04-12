@@ -48,10 +48,10 @@ local OnUseExcludes = {
   -- Other TWW Trinkets
   I.FlarendosPilotLight:ID(),
   I.FunhouseLens:ID(),
-  I.HouseofCards:ID(),
+  I.HouseOfCards:ID(),
   I.ImperfectAscendancySerum:ID(),
   I.QuickwickCandlestick:ID(),
-  I.SignetofthePriory:ID(),
+  I.SignetOfThePriory:ID(),
   I.SoullettingRuby:ID(),
   I.SpymastersWeb:ID(),
   I.TreacherousTransmitter:ID(),
@@ -120,7 +120,7 @@ local function SetTrinketVariables()
   Trinket1 = T1.Object
   Trinket2 = T2.Object
 
-  VarCombustionOnUse = I.ForgedGladiatorsBadge:IsEquipped() or I.PrizedGladiatorsBadge:IsEquipped() or I.SignetofthePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped() or I.SoullettingRuby:IsEquipped() or I.FunhouseLens:IsEquipped() or I.HouseofCards:IsEquipped() or I.FlarendosPilotLight:IsEquipped()
+  VarCombustionOnUse = I.ForgedGladiatorsBadge:IsEquipped() or I.PrizedGladiatorsBadge:IsEquipped() or I.SignetOfThePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped() or I.SoullettingRuby:IsEquipped() or I.FunhouseLens:IsEquipped() or I.HouseOfCards:IsEquipped() or I.FlarendosPilotLight:IsEquipped()
 
   VarTreacherousTransmitterPrecombatCast = 12
 end
@@ -741,8 +741,8 @@ local function APL()
         if Cast(I.FlarendosPilotLight, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "flarendos_pilot_light main 18"; end
       end
       -- use_item,name=house_of_cards,if=buff.combustion.remains>7|fight_remains<15
-      if I.HouseofCards:IsEquippedAndReady() then
-        if Cast(I.HouseofCards, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "house_of_cards main 20"; end
+      if I.HouseOfCards:IsEquippedAndReady() then
+        if Cast(I.HouseOfCards, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "house_of_cards main 20"; end
       end
       -- use_item,name=flarendos_pilot_light,if=buff.combustion.remains>7|fight_remains<15
       -- Note: Assuming this is an accidental duplicate of two lines above.
@@ -755,8 +755,8 @@ local function APL()
         if Cast(I.QuickwickCandlestick, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "quickwick_candlestick main 26"; end
       end
       -- use_item,name=signet_of_the_priory,if=buff.combustion.remains>7|fight_remains<15
-      if I.SignetofthePriory:IsEquippedAndReady() then
-        if Cast(I.SignetofthePriory, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "signet_of_the_priory main 28"; end
+      if I.SignetOfThePriory:IsEquippedAndReady() then
+        if Cast(I.SignetOfThePriory, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "signet_of_the_priory main 28"; end
       end
       -- use_item,name=soulletting_ruby,if=buff.combustion.remains>7|fight_remains<15
       if I.SoullettingRuby:IsEquippedAndReady() then
