@@ -159,6 +159,8 @@ HL.AddCoreOverride("Player.FocusP",
         return Player:BuffUp(SpellMM.TrueshotBuff) and Focus - 8 or Focus - 15
       elseif Player:IsCasting(SpellMM.AimedShot) then
         return Player:BuffUp(SpellMM.TrueshotBuff) and Focus - 18 or Focus - 35
+      else
+        return Focus
       end
     end
   end
