@@ -79,13 +79,14 @@ end
 local OldMMIsReady
 OldMMIsReady = HL.AddCoreOverride("Spell.IsReady",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = OldMMIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  --local BaseCheck = OldMMIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = self:IsCastable() and Player:FocusP() >= self:Cost()
   if self == SpellMM.AimedShot then
-    local ShouldCastAS = (not Player:IsCasting(SpellMM.AimedShot) and SpellMM.AimedShot:Charges() == 1 or SpellMM.AimedShot:Charges() > 1)
+    if Player:IsCasting(self) then return false end
     if Settings.Marksmanship.HideAimedWhileMoving then
-      return BaseCheck and ShouldCastAS and (not Player:IsMoving() or Player:BuffUp(SpellMM.LockandLoadBuff))
+      return BaseCheck and SpellMM.AimedShot:Charges() >= 1 and (not Player:IsMoving() or Player:BuffUp(SpellMM.LockandLoadBuff))
     else
-      return BaseCheck and ShouldCastAS
+      return BaseCheck and SpellMM.AimedShot:Charges() >= 1
     end
   elseif self == SpellMM.WailingArrow then
     return BaseCheck and not Player:IsCasting(self)
@@ -100,6 +101,9 @@ OldMMBuffUp = HL.AddCoreOverride("Player.BuffUp",
   function(self, Spell, AnyCaster, Offset)
     if Spell == SpellMM.LunarStormReadyBuff then
       return Player:BuffDown(SpellMM.LunarStormCDBuff)
+    elseif Spell == SpellMM.PreciseShotsBuff then
+      -- Note: The TimeSinceLastCast() check is to prevent icon flicker between Aimed Shot cast ending and buff being applied.
+      return OldMMBuffUp(self, Spell, AnyCaster, Offset) or Player:IsCasting(SpellMM.AimedShot) or SpellMM.AimedShot:TimeSinceLastCast() < 1
     else
       return OldMMBuffUp(self, Spell, AnyCaster, Offset)
     end
@@ -111,9 +115,6 @@ OldMMBuffRemains = HL.AddCoreOverride("Player.BuffRemains",
   function(self, Spell, AnyCaster, Offset)
     if Spell == SpellMM.TrickShotsBuff and (Player:IsCasting(SpellMM.AimedShot) or Player:IsChanneling(SpellMM.RapidFire)) then
       return 0
-    elseif Spell == SpellMM.SteadyFocusBuff then
-      local BaseCheck = OldMMBuffRemains(self, Spell, AnyCaster, Offset)
-      return (Player:IsCasting(SpellMM.SteadyShot) and SpellMM.SteadyFocus:IsAvailable()) and 15 or BaseCheck
     else
       return OldMMBuffRemains(self, Spell, AnyCaster, Offset)
     end
@@ -125,8 +126,21 @@ OldMMBuffDown = HL.AddCoreOverride("Player.BuffDown",
   function(self, Spell, AnyCaster, Offset)
     if Spell == SpellMM.PreciseShotsBuff and Player:IsCasting(SpellMM.AimedShot) then
       return false
+    elseif Spell == SpellMM.MovingTargetBuff and Player:IsCasting(SpellMM.AimedShot) then
+      return true
     else
       return OldMMBuffDown(self, Spell, AnyCaster, Offset)
+    end
+  end
+, 254)
+
+local OldMMDebuffDown
+OldMMDebuffDown = HL.AddCoreOverride("Target.DebuffDown",
+  function(self, Spell, AnyCaster, Offset)
+    if Spell == SpellMM.SpottersMarkDebuff and Player:IsCasting(SpellMM.AimedShot) then
+      return true
+    else
+      return OldMMDebuffDown(self, Spell, AnyCaster, Offset)
     end
   end
 , 254)
