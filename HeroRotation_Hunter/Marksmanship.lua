@@ -137,7 +137,7 @@ local function Precombat()
     if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot precombat 2"; end
   end
   -- steady_shot
-  if S.SteadyShot:IsCastable() then
+  if S.SteadyShot:IsCastable() and not Player:IsCasting(S.AimedShot) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot precombat 4"; end
   end
 end
@@ -147,23 +147,23 @@ local function CDs()
   -- Note: Not handling external buffs.
   if CDsON() then
     -- berserking,if=buff.trueshot.up|fight_remains<13
-    if S.Berserking:IsReady() and (Player:BuffUp(S.TrueshotBuff) or FightRemains < 13) then
+    if S.Berserking:IsCastable() and (Player:BuffUp(S.TrueshotBuff) or FightRemains < 13) then
       if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking cds 2"; end
     end
     -- blood_fury,if=buff.trueshot.up|cooldown.trueshot.remains>30|fight_remains<16
-    if S.BloodFury:IsReady() and (Player:BuffUp(S.TrueshotBuff) or S.Trueshot:CooldownRemains() > 30 or FightRemains < 16) then
+    if S.BloodFury:IsCastable() and (Player:BuffUp(S.TrueshotBuff) or S.Trueshot:CooldownRemains() > 30 or FightRemains < 16) then
       if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury cds 4"; end
     end
     -- ancestral_call,if=buff.trueshot.up|cooldown.trueshot.remains>30|fight_remains<16
-    if S.AncestralCall:IsReady() and (Player:BuffUp(S.TrueshotBuff) or S.Trueshot:CooldownRemains() > 30 or FightRemains < 16) then
+    if S.AncestralCall:IsCastable() and (Player:BuffUp(S.TrueshotBuff) or S.Trueshot:CooldownRemains() > 30 or FightRemains < 16) then
       if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call cds 6"; end
     end
     -- fireblood,if=buff.trueshot.up|cooldown.trueshot.remains>30|fight_remains<9
-    if S.Fireblood:IsReady() and (Player:BuffUp(S.TrueshotBuff) or S.Trueshot:CooldownRemains() > 30 or FightRemains < 9) then
+    if S.Fireblood:IsCastable() and (Player:BuffUp(S.TrueshotBuff) or S.Trueshot:CooldownRemains() > 30 or FightRemains < 9) then
       if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood cds 8"; end
     end
     -- lights_judgment,if=buff.trueshot.down
-    if S.LightsJudgment:IsReady() and (Player:BuffDown(S.TrueshotBuff)) then
+    if S.LightsJudgment:IsCastable() and (Player:BuffDown(S.TrueshotBuff)) then
       if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment cds 10"; end
     end
   end
