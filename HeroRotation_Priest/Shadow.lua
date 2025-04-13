@@ -46,6 +46,7 @@ local OnUseExcludes = {
   I.SpymastersWeb:ID(),
   -- TWW Other Items
   I.HyperthreadWristwraps:ID(),
+  I.PrizedGladiatorsBadgeofFerocity:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -444,14 +445,18 @@ local function Trinkets()
     if I.SpymastersWeb:IsEquippedAndReady() and ((Player:PowerInfusionRemains() >= 10 and Player:BuffStack(S.SpymastersReportBuff) >= 36 and FightRemains > 240) and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscensionBuff) or not S.DarkAscension:IsAvailable() and not S.VoidEruption:IsAvailable()) or ((Player:PowerInfusionRemains() >= 10 and Player:BloodlustUp() and Player:BuffStack(S.SpymastersReportBuff) >= 10) or Player:PowerInfusionRemains() >= 10 and (BossFightRemains < 120)) and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscensionBuff) or not S.DarkAscension:IsAvailable() and not S.VoidEruption:IsAvailable()) or (BossFightRemains <= 20 or Player:BuffUp(S.DarkAscensionBuff) and BossFightRemains <= 60 or EntropicRiftUp and S.EntropicRift:IsAvailable() and BossFightRemains <= 30) and Player:BuffDown(S.SpymastersWebBuff)) then
       if Cast(I.SpymastersWeb, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "spymasters_web trinkets 12"; end
     end
-  end
-  -- use_items,if=(buff.voidform.up|buff.power_infusion.remains>=10|buff.dark_ascension.up|(cooldown.void_eruption.remains>10&trinket.cooldown.duration<=60)|equipped.neural_synapse_enhancer&buff.entropic_rift.up)|fight_remains<20
-  local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-  if ItemToUse and ((Player:BuffUp(S.VoidformBuff) or Player:PowerInfusionRemains() >= 10 or Player:BuffUp(S.DarkAscensionBuff) or (S.VoidEruption:CooldownRemains() > 10 and (ItemToUse:Cooldown() <= 60 or ItemSlot ~= 13 and ItemSlot ~= 14)) or I.NeuralSynapseEnhancer:IsEquipped() and EntropicRiftUp) or BossFightRemains < 20) then
-    local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
-    if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
-    if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
-      if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 14"; end
+    -- use_item,name=prized_gladiators_badge_of_ferocity,if=(buff.voidform.up|buff.power_infusion.remains>=10|buff.dark_ascension.up|(talent.void_eruption&cooldown.void_eruption.remains>10)|equipped.neural_synapse_enhancer&buff.entropic_rift.up)|fight_remains<20
+    if Settings.Commons.Enabled.Trinkets and I.PrizedGladiatorsBadgeofFerocity:IsEquippedAndReady() and ((Player:BuffUp(S.VoidformBuff) or Player:PowerInfusionRemains() >= 10 or Player:BuffUp(S.DarkAscensionBuff) or (S.VoidEruption:IsAvailable() and S.VoidEruption:CooldownRemains() > 10) or I.NeuralSynapseEnhancer:IsEquipped() and EntropicRiftUp) or BossFightRemains < 20) then
+      if Cast(I.PrizedGladiatorsBadgeofFerocity, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "prized_gladiators_badge_of_ferocity trinkets 12"; end
+    end
+    -- use_items,if=(buff.voidform.up|buff.power_infusion.remains>=10|buff.dark_ascension.up|equipped.neural_synapse_enhancer&buff.entropic_rift.up)|fight_remains<20
+    local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
+    if ItemToUse and ((Player:BuffUp(S.VoidformBuff) or Player:PowerInfusionRemains() >= 10 or Player:BuffUp(S.DarkAscensionBuff) or I.NeuralSynapseEnhancer:IsEquipped() and EntropicRiftUp) or BossFightRemains < 20) then
+      local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
+      if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
+      if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
+        if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " trinkets 14"; end
+      end
     end
   end
 end
@@ -523,7 +528,7 @@ local function HealForToF()
     if Cast(S.DivineStar, Settings.Shadow.GCDasOffGCD.DivineStar) then return "divine_star heal_for_tof 4"; end
   end
   -- holy_nova,if=buff.rhapsody.stack=20&talent.rhapsody
-  if S.HolyNova:IsReady() then
+  if S.HolyNova:IsReady() and (Player:BuffStack(S.RhapsodyBuff) == 20 and S.Rhapsody:IsAvailable()) then
     if Cast(S.HolyNova, Settings.Shadow.GCDasOffGCD.HolyNova) then return "holy_nova heal_for_tof 6"; end
   end
 end
@@ -663,7 +668,7 @@ local function Main()
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Mind Blast"; end
   end
   -- mind_blast,if=talent.void_eruption&buff.voidform.up&full_recharge_time<=gcd.max&(!talent.insidious_ire|dot.devouring_plague.remains>=execute_time)&(cooldown.void_bolt.remains%gcd.max-cooldown.void_bolt.remains%%gcd.max)*gcd.max<=0.25&(cooldown.void_bolt.remains%gcd.max-cooldown.void_bolt.remains%%gcd.max)>=0.01
-  if S.MindBlast:IsCastable() and (Player:BuffUp(S.VoidformBuff) and S.MindBlast:FullRechargeTime() <= GCDMax and (not S.InsidiousIre:IsAvailable() or Target:DebuffRemains(S.DevouringPlagueDebuff) >= S.MindBlast:ExecuteTime()) and (S.VoidBolt:CooldownRemains() / GCDMax - S.VoidBolt:CooldownRemains() % GCDMax) * GCDMax <= 0.25 and (S.VoidBolt:CooldownRemains() / GCDMax - S.VoidBolt:CooldownRemains() % GCDMax) >= 0.01) then
+  if S.MindBlast:IsCastable() and (S.VoidEruption:IsAvailable() and Player:BuffUp(S.VoidformBuff) and S.MindBlast:FullRechargeTime() <= GCDMax and (not S.InsidiousIre:IsAvailable() or Target:DebuffRemains(S.DevouringPlagueDebuff) >= S.MindBlast:ExecuteTime()) and (S.VoidBolt:CooldownRemains() / GCDMax - S.VoidBolt:CooldownRemains() % GCDMax) * GCDMax <= 0.25 and (S.VoidBolt:CooldownRemains() / GCDMax - S.VoidBolt:CooldownRemains() % GCDMax) >= 0.01) then
     if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast main 14"; end
   end
   -- void_bolt,target_if=max:target.time_to_die,if=insanity.deficit>16&cooldown.void_bolt.remains%gcd.max<=0.1
@@ -698,8 +703,8 @@ local function Main()
   if S.DevouringPlague:IsReady() and (FightRemains <= S.DevouringPlagueDebuff:BaseDuration() + 4) then
     if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 26"; end
   end
-  -- devouring_plague,target_if=max:target.time_to_die*(dot.devouring_plague.remains<=gcd.max|variable.dr_force_prio|!talent.distorted_reality&variable.me_force_prio),if=insanity.deficit<=35&talent.distorted_reality|buff.mind_devourer.up&cooldown.mind_blast.up&(cooldown.void_eruption.remains>=3*gcd.max|!talent.void_eruption)&talent.mind_devourer|buff.entropic_rift.up|buff.voidform.up&talent.perfected_form&talent.void_eruption
-  if S.DevouringPlague:IsReady() and (Player:InsanityDeficit() <= 35 and S.DistortedReality:IsAvailable() or Player:BuffUp(S.MindDevourerBuff) and S.MindBlast:CooldownUp() and (S.VoidEruption:CooldownRemains() >= 3 * GCDMax or not S.VoidEruption:IsAvailable()) and S.MindDevourer:IsAvailable() or EntropicRiftUp or Player:BuffUp(S.VoidformBuff) and S.PerfectedForm:IsAvailable() and S.VoidEruption:IsAvailable()) then
+  -- devouring_plague,target_if=max:target.time_to_die*(dot.devouring_plague.remains<=gcd.max|variable.dr_force_prio|!talent.distorted_reality&variable.me_force_prio),if=insanity.deficit<=35&talent.distorted_reality|buff.mind_devourer.up&cooldown.mind_blast.up&(cooldown.void_eruption.remains>=3*gcd.max|!talent.void_eruption)&talent.mind_devourer|buff.entropic_rift.up
+  if S.DevouringPlague:IsReady() and (Player:InsanityDeficit() <= 35 and S.DistortedReality:IsAvailable() or Player:BuffUp(S.MindDevourerBuff) and S.MindBlast:CooldownUp() and (S.VoidEruption:CooldownRemains() >= 3 * GCDMax or not S.VoidEruption:IsAvailable()) and S.MindDevourer:IsAvailable() or EntropicRiftUp) then
     if Everyone.CastTargetIf(S.DevouringPlague, Enemies10ySplash, "max", EvaluateTargetIfFilterTTDTimesDP, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague main 28"; end
   end
   -- void_torrent,target_if=max:(dot.devouring_plague.remains*1000+target.time_to_die),if=!variable.holding_crash&!talent.entropic_rift&cooldown.mind_blast.full_recharge_time>=2,target_if=dot.devouring_plague.remains>=2.5
