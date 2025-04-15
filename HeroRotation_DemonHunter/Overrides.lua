@@ -19,6 +19,18 @@ local SpellVengeance = Spell.DemonHunter.Vengeance
 
 --- ============================ CONTENT ============================
 -- Havoc, ID: 577
+local HavocOldSpellIsReady
+HavocOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = HavocOldSpellIsReady(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    if self == SpellHavoc.Annihilation or self == SpellHavoc.DeathSweep then
+      return BaseCheck or self:CooldownUp() and Player:BuffUp(SpellHavoc.MetamorphosisBuff) and Player:Fury() > self:Cost()
+    else
+      return BaseCheck
+    end
+  end
+, 577)
+
 local HavocOldSpellIsCastable
 HavocOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
