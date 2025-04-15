@@ -79,8 +79,7 @@ end
 local OldMMIsReady
 OldMMIsReady = HL.AddCoreOverride("Spell.IsReady",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  --local BaseCheck = OldMMIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = self:IsCastable() and Player:FocusP() >= self:Cost()
+  local BaseCheck = OldMMIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset) and Player:FocusP() >= self:Cost()
   if self == SpellMM.AimedShot then
     if Player:IsCasting(self) then return false end
     if Settings.Marksmanship.HideAimedWhileMoving then
