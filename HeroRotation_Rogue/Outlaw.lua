@@ -694,12 +694,9 @@ local function CDs ()
   end
 
   -- # If using Improved AR, recast AR if it is already active at low CPs.
-  -- Trickster builds should avoid recasting it during Disorienting Strikes with 0-3 stacks of Escalating Blade, unless stealth is active.
   -- actions.cds+=/adrenaline_rush,if=buff.adrenaline_rush.up&talent.improved_adrenaline_rush&combo_points<=2
-  -- &(!buff.disorienting_strikes.up|stealthed.all|buff.escalating_blade.stack>=4)
   if CDsON() and S.AdrenalineRush:IsCastable() then
-    if Player:BuffUp(S.AdrenalineRush) and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2
-      and (Rogue.DisorientingStrikesCount() == 0 or Player:StealthUp(true, true) or Player:BuffStack(S.EscalatingBlade) >= 41) then
+    if Player:BuffUp(S.AdrenalineRush) and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2 then
       if S.ImprovedAdrenalineRush:IsAvailable() then
         ShouldReturn = SpellQueueMacro(S.AdrenalineRush)
         if ShouldReturn then
@@ -762,9 +759,9 @@ local function CDs ()
   end
 
   -- # With a natural 5 buff roll, use Keep it Rolling when you obtain the remaining buff from Count the Odds and all buffs are within 30s remaining.
-  -- actions.cds+=/keep_it_rolling,if=rtb_buffs.normal>=5&rtb_buffs=6&rtb_buffs.max_remains<=30
+  -- actions.cds+=/keep_it_rolling,if=rtb_buffs.normal>=5&rtb_buffs=6
   if S.KeepItRolling:IsCastable() then
-    if Cache.APLVar.RtB_Buffs.Normal >= 5 and Cache.APLVar.RtB_Buffs.Total == 6 and Cache.APLVar.RtB_Buffs.MaxRemains <= 30 then
+    if Cache.APLVar.RtB_Buffs.Normal >= 5 and Cache.APLVar.RtB_Buffs.Total == 6 then
       if Cast(S.KeepItRolling, Settings.Outlaw.GCDasOffGCD.KeepItRolling) then
         return "Cast Keep it Rolling"
       end
@@ -843,10 +840,9 @@ local function CDs ()
   -- # If not at risk of losing Adrenaline Rush, call flexible Vanish rules to be used at finisher CPs.
   -- Trickster builds attempt to hold Vanish if at 3 stacks of Escalating Blades with Disorienting Strikes active.
   -- actions.cds+=/call_action_list,name=vanish_usage,if=!stealthed.all&talent.crackshot&talent.underhanded_upper_hand
-  -- &talent.subterfuge&buff.adrenaline_rush.up&variable.finish_condition&(buff.escalating_blade.stack!=3|!buff.disorienting_strikes.up)
+  -- &talent.subterfuge&buff.adrenaline_rush.up&variable.finish_condition
   if not Player:StealthUp(true, true) and S.Crackshot:IsAvailable() and S.UnderhandedUpperhand:IsAvailable()
-    and S.Subterfuge:IsAvailable() and Player:BuffUp(S.AdrenalineRush)
-    and Finish_Condition() and (Player:BuffStack(S.EscalatingBlade) ~= 3 or Rogue.DisorientingStrikesCount == 0) then
+    and S.Subterfuge:IsAvailable() and Player:BuffUp(S.AdrenalineRush) and Finish_Condition() then
     ShouldReturn = StealthCDs()
     if ShouldReturn then
       return ShouldReturn
@@ -959,12 +955,12 @@ local function Build ()
     end
   end
 
-  -- # Trickster builds without HO should prioritize Sinister Strike during Disorienting Strikes.
-  -- actions.build+=/sinister_strike,if=!talent.hidden_opportunity&buff.disorienting_strikes.up&!stealthed.all
-  -- &(buff.escalating_blade.stack>2&buff.opportunity.stack<buff.opportunity.max_stack|!talent.hidden_opportunity)
-  -- &buff.escalating_blade.stack<4
+  -- # Trickster builds should prioritize Sinister Strike during Disorienting Strikes.
+  -- HO builds prefer to do this only at 3 Escalating Blade stacks and not at max Opportunity stacks.
+  -- actions.build+=/sinister_strike,if=buff.disorienting_strikes.up&!stealthed.all&(buff.escalating_blade.stack>2
+  -- &buff.opportunity.stack<buff.opportunity.max_stack|!talent.hidden_opportunity)&buff.escalating_blade.stack<4
   if S.SinisterStrike:IsCastable() then
-    if not S.HiddenOpportunity:IsAvailable() and Rogue.DisorientingStrikesCount() > 0 and not Player:StealthUp(true, true)
+    if Rogue.DisorientingStrikesCount() > 0 and not Player:StealthUp(true, true)
       and (Player:BuffStack(S.EscalatingBlade)>2 and Player:BuffStack(S.Opportunity) < 6 or not S.HiddenOpportunity:IsAvailable())
       and Player:BuffStack(S.EscalatingBlade) < 4 then
       if CastPooling(S.SinisterStrike, nil, not Target:IsSpellInRange(S.SinisterStrike)) then
