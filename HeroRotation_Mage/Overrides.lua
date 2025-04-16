@@ -49,9 +49,9 @@ HL.AddCoreOverride("Player.BuffStackP",
   function (self, Spell, AnyCaster, Offset)
     local BaseCheck = Player:BuffStack(Spell, AnyCaster, Offset)
     if Spell == SpellArcane.ArcaneHarmonyBuff then
-      return ArcaneHarmonyLastStack
+      return HR.Commons.Mage.EventInfo.ArcaneHarmonyLastStack
     elseif Spell == SpellArcane.ClearcastingBuff then
-      return ClearcastingProcs
+      return HR.Commons.Mage.EventInfo.ClearcastingProcs
     else
       return BaseCheck
     end
@@ -61,8 +61,8 @@ HL.AddCoreOverride("Player.BuffStackP",
 HL.AddCoreOverride("Player.BuffRemainsP",
   function (self, Spell, AnyCaster, Offset)
     local BaseCheck = Player:BuffRemains(Spell, AnyCaster, Offset)
-    if Spell == SpellArcane.ArcaneSurgeBuff and ArcaneSurgeActive then
-      return math.max(0, BaseCheck - (GetTime() - ArcaneSurgeStartTime))
+    if Spell == SpellArcane.ArcaneSurgeBuff and HR.Commons.Mage.EventInfo.ArcaneSurgeActive then
+      return math.max(0, BaseCheck - (GetTime() - HR.Commons.Mage.EventInfo.ArcaneSurgeStartTime))
     else
       return BaseCheck
     end

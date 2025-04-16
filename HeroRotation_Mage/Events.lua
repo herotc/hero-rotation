@@ -22,6 +22,10 @@ local UnitGUID = UnitGUID
 -- Num/Bool Helper Functions
 local num = HR.Commons.Everyone.num
 
+-- Create shared table for cross-file variable access (used by Overrides.lua)
+if not HR.Commons.Mage.EventInfo then HR.Commons.Mage.EventInfo = {} end
+local EventInfo = HR.Commons.Mage.EventInfo
+
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
 
@@ -85,17 +89,22 @@ local num = HR.Commons.Everyone.num
 --- Arcane Harmony Stack Tracking
 -- Tracks Arcane Harmony buff stacks for optimal Arcane Barrage timing
 local ArcaneHarmonyLastStack = 0
+EventInfo.ArcaneHarmonyLastStack = 0
 local ArcaneHarmonyThresholdNotified = false
 
 --- Arcane Surge Tracking
 -- Tracks Arcane Surge state for optimal burst windows
 local ArcaneSurgeStartTime = 0
+EventInfo.ArcaneSurgeStartTime = 0
 local ArcaneSurgeActive = false
+EventInfo.ArcaneSurgeActive = false
 
 --- Clearcasting Tracking
 -- Tracks Clearcasting procs for optimal Arcane Missiles usage
 local ClearcastingProcs = 0
+EventInfo.ClearcastingProcs = 0
 local LastClearcastingTime = 0
+EventInfo.LastClearcastingTime = 0
 
 HL:RegisterForSelfCombatEvent(function(...)
   local _, event, _, _, _, _, _, _, _, _, _, spellID = ...
@@ -105,6 +114,7 @@ HL:RegisterForSelfCombatEvent(function(...)
     local auraData = C_UnitAuras.GetPlayerAuraBySpellID(S.ArcaneHarmonyBuff:ID())
     if auraData then
       ArcaneHarmonyLastStack = auraData.applications or 1
+      EventInfo.ArcaneHarmonyLastStack = ArcaneHarmonyLastStack
       local threshold = (18 - (6 * num(S.HighVoltage:IsAvailable())))
       if ArcaneHarmonyLastStack >= (threshold - 2) and not ArcaneHarmonyThresholdNotified then
         ArcaneHarmonyThresholdNotified = true
@@ -116,6 +126,7 @@ HL:RegisterForSelfCombatEvent(function(...)
   
   if event == "SPELL_AURA_REMOVED" and spellID == S.ArcaneHarmonyBuff:ID() then
     ArcaneHarmonyLastStack = 0
+    EventInfo.ArcaneHarmonyLastStack = 0
     ArcaneHarmonyThresholdNotified = false
   end
 
@@ -123,9 +134,12 @@ HL:RegisterForSelfCombatEvent(function(...)
   if spellID == S.ArcaneSurgeBuff:ID() then
     if event == "SPELL_AURA_APPLIED" then
       ArcaneSurgeStartTime = GetTime()
+      EventInfo.ArcaneSurgeStartTime = ArcaneSurgeStartTime
       ArcaneSurgeActive = true
+      EventInfo.ArcaneSurgeActive = true
     elseif event == "SPELL_AURA_REMOVED" then
       ArcaneSurgeActive = false
+      EventInfo.ArcaneSurgeActive = false
     end
   end
 
@@ -133,9 +147,12 @@ HL:RegisterForSelfCombatEvent(function(...)
   if spellID == S.ClearcastingBuff:ID() then
     if event == "SPELL_AURA_APPLIED" then
       ClearcastingProcs = ClearcastingProcs + 1
+      EventInfo.ClearcastingProcs = ClearcastingProcs
       LastClearcastingTime = GetTime()
+      EventInfo.LastClearcastingTime = LastClearcastingTime
     elseif event == "SPELL_AURA_REMOVED" then
       ClearcastingProcs = math.max(0, ClearcastingProcs - 1)
+      EventInfo.ClearcastingProcs = ClearcastingProcs
     end
   end
 end, "SPELL_AURA_APPLIED_DOSE", "SPELL_AURA_APPLIED", "SPELL_AURA_REMOVED")
@@ -143,11 +160,16 @@ end, "SPELL_AURA_APPLIED_DOSE", "SPELL_AURA_APPLIED", "SPELL_AURA_REMOVED")
 --- Combat Exit Handler
 HL:RegisterForEvent(function()
   ArcaneHarmonyLastStack = 0
+  EventInfo.ArcaneHarmonyLastStack = 0
   ArcaneHarmonyThresholdNotified = false
   ArcaneSurgeStartTime = 0
+  EventInfo.ArcaneSurgeStartTime = 0
   ArcaneSurgeActive = false
+  EventInfo.ArcaneSurgeActive = false
   ClearcastingProcs = 0
+  EventInfo.ClearcastingProcs = 0
   LastClearcastingTime = 0
+  EventInfo.LastClearcastingTime = 0
 end, "PLAYER_REGEN_ENABLED")
 
 --------------------------
