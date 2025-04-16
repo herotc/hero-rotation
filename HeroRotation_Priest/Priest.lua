@@ -151,6 +151,7 @@ Item.Priest.Shadow = {
   AberrantSpellforge          = Item(212451, {13, 14}),
   FlarendosPilotLight         = Item(230191, {13, 14}),
   GeargrindersSpareKeys       = Item(230197, {13, 14}),
+  PrizedGladiatorsBadgeofFerocity = Item(229780, {13, 14}),
   SignetofthePriory           = Item(219308, {13, 14}),
   SpymastersWeb               = Item(220202, {13, 14}),
   -- TWW S2 Old Trinkets
