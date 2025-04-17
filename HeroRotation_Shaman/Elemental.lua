@@ -62,6 +62,10 @@ local Enemies40y, Enemies10ySplash
 Shaman.ClusterTargets = 0
 
 --- ===== Trinket Variables =====
+-- variable,name=trinket_1_buffs,value=(trinket.1.has_use_buff|trinket.1.is.funhouse_lens)
+-- variable,name=trinket_2_buffs,value=(trinket.2.has_use_buff|trinket.2.is.funhouse_lens)
+-- variable,name=special_trinket1,value=(trinket.1.is.house_of_cards|trinket.1.is.funhouse_lens)&!(trinket.2.has_use_buff|trinket.2.is.funhouse_lens)&talent.first_ascendant
+-- variable,name=special_trinket2,value=(trinket.2.is.house_of_cards|trinket.2.is.funhouse_lens)&!(trinket.1.has_use_buff|trinket.1.is.funhouse_lens)&talent.first_ascendant
 local Trinket1, Trinket2
 local VarTrinket1ID, VarTrinket2ID
 local VarTrinket1Spell, VarTrinket2Spell
@@ -70,6 +74,8 @@ local VarTrinket1CastTime, VarTrinket2CastTime
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1Ex, VarTrinket2Ex
 local VarSpecialItems
+local VarSpecialTrinket1, VarSpecialTrinket2
+local VarTrinket1Buffs, VarTrinket2Buffs
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData(OnUseExcludes)
@@ -102,8 +108,14 @@ local function SetTrinketVariables()
 
   VarTrinket1Ex = T1.Excluded
   VarTrinket2Ex = T2.Excluded
-
-  VarSpecialItems = VarTrinket1ID == I.SpymastersWeb:ID() or VarTrinket2ID == I.SpymastersWeb:ID() or (VarTrinket1ID == I.HouseofCards:ID() and not Trinket2:HasUseBuff() or VarTrinket2ID == I.HouseofCards:ID() and not Trinket1:HasUseBuff()) and S.FirstAscendant:IsAvailable()
+  
+  VarTrinket1Buffs = Trinket1:HasUseBuff() or VarTrinket1ID == I.FunhouseLens:ID()
+  VarTrinket2Buffs = Trinket2:HasUseBuff() or VarTrinket2ID == I.FunhouseLens:ID()
+  
+  VarSpecialTrinket1 = (VarTrinket1ID == I.HouseofCards:ID() or VarTrinket1ID == I.FunhouseLens:ID()) and not VarTrinket2Buffs and S.FirstAscendant:IsAvailable()
+  VarSpecialTrinket2 = (VarTrinket2ID == I.HouseofCards:ID() or VarTrinket2ID == I.FunhouseLens:ID()) and not VarTrinket1Buffs and S.FirstAscendant:IsAvailable()
+  
+  VarSpecialItems = VarTrinket1ID == I.SpymastersWeb:ID() or VarTrinket2ID == I.SpymastersWeb:ID() or VarSpecialTrinket1 or VarSpecialTrinket2
 end
 SetTrinketVariables()
 
@@ -124,9 +136,6 @@ S.PrimordialWave:RegisterInFlight()
 S.LavaBurst:RegisterInFlight()
 
 --- ===== Helper Functions =====
-local function RollingThunderNextTick()
-  return 50 - (GetTime() - Shaman.LastRollingThunderTick)
-end
 
 local function LowestFlameShock(Enemies)
   local Lowest, BestTarget
@@ -141,10 +150,6 @@ local function LowestFlameShock(Enemies)
 end
 
 --- ===== CastTargetIf Filter Functions =====
-local function EvaluateTargetIfFilterFlameShockRemains(TargetUnit)
-  -- target_if=min:dot.flame_shock.remains
-  return TargetUnit:DebuffRemains(S.FlameShockDebuff)
-end
 
 local function EvaluateTargetIfFilterLightningRodRemains(TargetUnit)
   -- target_if=min:debuff.lightning_rod.remains
@@ -152,33 +157,11 @@ local function EvaluateTargetIfFilterLightningRodRemains(TargetUnit)
 end
 
 --- ===== CastTargetIf Condition Functions =====
-local function EvaluateTargetIfEarthquakeAoE(TargetUnit)
-  -- if=(debuff.lightning_rod.remains=0&talent.lightning_rod.enabled|maelstrom>variable.mael_cap-30)&(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up|!talent.echoes_of_great_sundering.enabled)
-  -- Note: Buff checked before CastTargetIf.
-  return TargetUnit:DebuffDown(S.LightningRodDebuff) and S.LightningRod:IsAvailable() or VarMaelstrom > VarMaelCap - 30
-end
 
 local function EvaluateTargetIfFlameShockAoe(TargetUnit)
   -- if=cooldown.primordial_wave.remains<gcd&!dot.flame_shock.ticking&(talent.primordial_wave|spell_targets.chain_lightning<=3)&cooldown.ascendance.remains>10
   -- Note: All but !dot.flame_shock.ticking checked before CastTargetIf.
   return TargetUnit:DebuffDown(S.FlameShockDebuff)
-end
-
-local function EvaluateTargetIfFlameShockST(TargetUnit)
-  -- if=active_enemies=1&(dot.flame_shock.remains<2|active_dot.flame_shock=0)&(dot.flame_shock.remains<cooldown.primordial_wave.remains|!talent.primordial_wave.enabled)&(dot.flame_shock.remains<cooldown.liquid_magma_totem.remains|!talent.liquid_magma_totem.enabled)&!buff.surge_of_power.up&talent.fire_elemental.enabled
-  -- Note: Target count, SoP buff, and FireElemental talent checked before CastTargetIf.
-  return (TargetUnit:DebuffRemains(S.FlameShockDebuff) < 2 or S.FlameShockDebuff:AuraActiveCount() == 0) and (TargetUnit:DebuffRemains(S.FlameShockDebuff) < S.PrimordialWave:CooldownRemains() or not S.PrimordialWave:IsAvailable()) and (TargetUnit:DebuffRemains(S.FlameShockDebuff) < S.LiquidMagmaTotem:CooldownRemains() or not S.LiquidMagmaTotem:IsAvailable())
-end
-
-local function EvaluateTargetIfFlameShockST2(TargetUnit)
-  -- if=spell_targets.chain_lightning>1&(talent.deeply_rooted_elements.enabled|talent.ascendance.enabled|talent.primordial_wave.enabled|talent.searing_flames.enabled|talent.magma_chamber.enabled)&(buff.surge_of_power.up&!buff.stormkeeper.up|!talent.surge_of_power.enabled)&dot.flame_shock.remains<6&talent.fire_elemental.enabled,cycle_targets=1
-  -- Note: All but dot.flame_shock.remains<6 checked before CastTargetIf.
-  return TargetUnit:DebuffRemains(S.FlameShockDebuff) < 6
-end
-
-local function EvaluateTargetIfSpenderST(TargetUnit)
-  -- if=maelstrom>variable.mael_cap-15|debuff.lightning_rod.remains<gcd|fight_remains<5
-  return VarMaelstrom > VarMaelCap - 15 or TargetUnit:DebuffRemains(S.LightningRodDebuff) < Player:GCD() or BossFightRemains < 5
 end
 
 --- ===== CastCycle Functions =====
@@ -245,7 +228,7 @@ local function Aoe()
   end
   -- flame_shock,target_if=min:debuff.lightning_rod.remains,if=cooldown.primordial_wave.remains<gcd&!dot.flame_shock.ticking&(talent.primordial_wave|spell_targets.chain_lightning<=3)&cooldown.ascendance.remains>10
   if S.FlameShock:IsViable() and (S.PrimordialWave:CooldownRemains() < Player:GCD() and (S.PrimordialWave:IsAvailable() or Shaman.ClusterTargets <= 3) and S.Ascendance:CooldownRemains() > 10) then
-    if Everyone.CastTargetIf(S.FlameShock, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, EvaluateTargetIfFlameShockAoe, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 10"; end
+    if not LowestFlameShock(Enemies10ySplash) and Everyone.CastTargetIf(S.FlameShock, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, EvaluateTargetIfFlameShockAoe, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock aoe 10"; end
   end
   -- primordial_wave,if=active_dot.flame_shock=active_enemies>?6|cooldown.liquid_magma_totem.remains>15|!talent.liquid_magma_totem
   if S.PrimordialWave:IsViable() and (S.FlameShockDebuff:AuraActiveCount() == mathmin(Shaman.ClusterTargets, 6) or S.LiquidMagmaTotem:CooldownRemains() > 15 or not S.LiquidMagmaTotem:IsAvailable()) then
@@ -255,8 +238,7 @@ local function Aoe()
   if S.AncestralSwiftness:IsViable() then
     if Cast(S.AncestralSwiftness, Settings.CommonsOGCD.GCDasOffGCD.AncestralSwiftness) then return "ancestral_swiftness aoe 14"; end
   end
-  -- ascendance,if=(talent.first_ascendant|fight_remains>200|fight_remains<90&buff.stormkeeper.stack>=2|buff.spymasters_web.up|!(trinket.1.is.spymasters_web|trinket.2.is.spymasters_web))&(buff.fury_of_storms.up|!talent.fury_of_the_storms)
-  -- Note: JUST DO IT! https://i.kym-cdn.com/entries/icons/mobile/000/018/147/Shia_LaBeouf__Just_Do_It__Motivational_Speech_(Original_Video_by_LaBeouf__R%C3%B6nkk%C3%B6___Turner)_0-4_screenshot.jpg
+  -- ascendance,if=(talent.first_ascendant|fight_remains>200|fight_remains<80|buff.spymasters_web.up|variable.trinket_1_buffs&!trinket.1.is.spymasters_web&trinket.1.ready_cooldown|variable.trinket_2_buffs&!trinket.2.is.spymasters_web&trinket.2.ready_cooldown|equipped.neural_synapse_enhancer&cooldown.neural_synapse_enhancer.remains=0|equipped.bestinslots&cooldown.bestinslots.remains=0)&(buff.fury_of_storms.up|!talent.fury_of_the_storms)
   if CDsON() and S.Ascendance:IsCastable() and ((S.FirstAscendant:IsAvailable() or FightRemains > 200 or FightRemains < 90 and Player:BuffStack(S.StormkeeperBuff) >= 2 or Player:BuffUp(S.SpymastersWebBuff) or not (VarTrinket1ID == I.SpymastersWeb:ID() or VarTrinket2ID == I.SpymastersWeb:ID())) and (Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable())) then
     if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance aoe 16"; end
   end
@@ -383,7 +365,7 @@ local function SingleTarget()
   if S.AncestralSwiftness:IsViable() then
     if Cast(S.AncestralSwiftness, Settings.CommonsOGCD.GCDasOffGCD.AncestralSwiftness) then return "ancestral_swiftness single_target 14"; end
   end
-  -- ascendance,if=(talent.first_ascendant|fight_remains>200|fight_remains<80|buff.spymasters_web.up|(trinket.1.has_use_buff&trinket.1.ready_cooldown|trinket.2.has_use_buff&trinket.2.ready_cooldown)&!variable.special_items)&(buff.fury_of_storms.up|!talent.fury_of_the_storms)&(cooldown.primordial_wave.remains>25|!talent.primordial_wave)
+  -- ascendance,if=(talent.first_ascendant|fight_remains>200|fight_remains<80|buff.spymasters_web.up|variable.trinket_1_buffs&!trinket.1.is.spymasters_web&trinket.1.ready_cooldown|variable.trinket_2_buffs&!trinket.2.is.spymasters_web&trinket.2.ready_cooldown|equipped.neural_synapse_enhancer&cooldown.neural_synapse_enhancer.remains=0|equipped.bestinslots&cooldown.bestinslots.remains=0)&(buff.fury_of_storms.up|!talent.fury_of_the_storms)&(cooldown.primordial_wave.remains>25|!talent.primordial_wave)
   if CDsON() and S.Ascendance:IsCastable() and ((S.FirstAscendant:IsAvailable() or FightRemains > 200 or FightRemains < 80 or Player:BuffUp(S.SpymastersWebBuff) or (Trinket1:HasUseBuff() and Trinket1:CooldownUp() or Trinket2:HasUseBuff() and Trinket2:CooldownUp()) and not VarSpecialItems) and (Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable()) and (S.PrimordialWave:CooldownRemains() > 25 or not S.PrimordialWave:IsAvailable())) then
     if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance single_target 16"; end
   end
@@ -543,12 +525,12 @@ local function APL()
       end
     end
     if Settings.Commons.Enabled.Trinkets then
-      -- use_item,slot=trinket1,if=trinket.1.is.spymasters_web&((fight_remains>180&buff.spymasters_report.stack>25|buff.spymasters_report.stack>35|fight_remains<80)&cooldown.ascendance.ready&(buff.fury_of_storms.up|!talent.fury_of_the_storms)&(cooldown.primordial_wave.remains>25|!talent.primordial_wave|spell_targets.chain_lightning>=2)|fight_remains<21)
-      if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1ID == I.SpymastersWeb:ID() and ((FightRemains > 180 and Player:BuffStack(S.SpymastersReportBuff) > 35 or FightRemains < 80) and S.Ascendance:CooldownUp() and (Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable()) and (S.PrimordialWave:CooldownRemains() > 25 or not S.PrimordialWave:IsAvailable() or Shaman.ClusterTargets >= 2) or BossFightRemains < 21)) then
+      -- use_item,name=spymasters_web,if=(fight_remains>180&buff.spymasters_report.stack>25|buff.spymasters_report.stack>35|fight_remains<80)&cooldown.ascendance.ready&(buff.fury_of_storms.up|!talent.fury_of_the_storms)&(cooldown.primordial_wave.remains>25|!talent.primordial_wave|spell_targets.chain_lightning>=2)|buff.ascendance.remains>12&buff.spymasters_report.stack>25|fight_remains<21
+      if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (VarTrinket1ID == I.SpymastersWeb:ID() and ((FightRemains > 180 and Player:BuffStack(S.SpymastersReportBuff) > 25 or Player:BuffStack(S.SpymastersReportBuff) > 35 or FightRemains < 80) and S.Ascendance:CooldownUp() and (Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable()) and (S.PrimordialWave:CooldownRemains() > 25 or not S.PrimordialWave:IsAvailable() or Shaman.ClusterTargets >= 2) or FightRemains < 21)) then
         if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item trinket1 ("..Trinket1:Name()..") main 10"; end
       end
-      -- use_item,slot=trinket2,if=trinket.2.is.spymasters_web&((fight_remains>180&buff.spymasters_report.stack>25|buff.spymasters_report.stack>35|fight_remains<80)&cooldown.ascendance.ready&(buff.fury_of_storms.up|!talent.fury_of_the_storms)&(cooldown.primordial_wave.remains>25|!talent.primordial_wave|spell_targets.chain_lightning>=2)|fight_remains<21)
-      if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2ID == I.SpymastersWeb:ID() and ((FightRemains > 180 and Player:BuffStack(S.SpymastersReportBuff) > 35 or FightRemains < 80) and S.Ascendance:CooldownUp() and (Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable()) and (S.PrimordialWave:CooldownRemains() > 25 or not S.PrimordialWave:IsAvailable() or Shaman.ClusterTargets >= 2) or BossFightRemains < 21)) then
+      -- use_item,name=spymasters_web,use_off_gcd=1,if=buff.ascendance.remains>12&buff.spymasters_report.stack>25
+      if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (VarTrinket2ID == I.SpymastersWeb:ID() and ((FightRemains > 180 and Player:BuffStack(S.SpymastersReportBuff) > 25 or Player:BuffStack(S.SpymastersReportBuff) > 35 or FightRemains < 80) and S.Ascendance:CooldownUp() and (Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable()) and (S.PrimordialWave:CooldownRemains() > 25 or not S.PrimordialWave:IsAvailable() or Shaman.ClusterTargets >= 2) or FightRemains < 21)) then
         if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item trinket2 ("..Trinket2:Name()..") main 12"; end
       end
     end
@@ -557,17 +539,47 @@ local function APL()
       if Cast(I.NeuralSynapseEnhancer, nil, Settings.CommonsDS.DisplayStyle.Items) then return "use_item neural_synapse_enhancer main 14"; end
     end
     if Settings.Commons.Enabled.Trinkets then
-      -- use_item,name=house_of_cards,use_off_gcd=1,if=variable.special_items&(buff.ascendance.remains>12|cooldown.ascendance.remains>90)|fight_remains<21
+      -- use_item,name=house_of_cards,use_off_gcd=1,if=(variable.special_trinket1|variable.special_trinket2)&(buff.ascendance.remains>12|cooldown.ascendance.remains>90)|fight_remains<16
       if I.HouseofCards:IsEquippedAndReady() and (VarSpecialItems and (Player:BuffRemains(S.AscendanceBuff) > 12 or S.Ascendance:CooldownRemains() > 90) or BossFightRemains < 21) then
         if Cast(I.HouseofCards, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "use_item house_of_cards main 16"; end
       end
-      -- use_item,slot=trinket1,use_off_gcd=1,if=!trinket.1.has_use_buff|!variable.special_items&((buff.fury_of_storms.up|!talent.fury_of_the_storms|cooldown.stormkeeper.remains>10)&(cooldown.primordial_wave.remains>25|!talent.primordial_wave|spell_targets.chain_lightning>=2)&cooldown.ascendance.remains>15|fight_remains<21|buff.ascendance.remains>12)
-      if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not Trinket1:HasUseBuff() or not VarSpecialItems and ((Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable() or S.Stormkeeper:CooldownRemains() > 10) and (S.PrimordialWave:CooldownRemains() > 25 or not S.PrimordialWave:IsAvailable() or Shaman.ClusterTargets >= 2) and S.Ascendance:CooldownRemains() > 15 or BossFightRemains < 21 or Player:BuffRemains(S.AscendanceBuff) > 12)) then
+      -- use_item,name=funhouse_lens,use_off_gcd=1,if=(variable.special_trinket1|variable.special_trinket2)&(buff.ascendance.remains>12|cooldown.ascendance.remains>90)|fight_remains<16
+      if I.FunhouseLens:IsEquippedAndReady() and (VarSpecialItems and (Player:BuffRemains(S.AscendanceBuff) > 12 or S.Ascendance:CooldownRemains() > 90) or BossFightRemains < 16) then
+        if Cast(I.FunhouseLens, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "use_item funhouse_lens main 17"; end
+      end
+      -- use_item,slot=trinket1,use_off_gcd=1,if=!trinket.1.is.spymasters_web&!variable.special_trinket1&variable.trinket_1_buffs&((cooldown.primordial_wave.remains>25|!talent.primordial_wave|spell_targets.chain_lightning>=2)&(cooldown.ascendance.remains>trinket.1.cooldown.duration-5|buff.spymasters_report.stack>25)|buff.ascendance.remains>12|fight_remains<21)
+      if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and 
+         (VarTrinket1ID ~= I.SpymastersWeb:ID() and 
+          VarTrinket1ID ~= I.HouseofCards:ID() and 
+          VarTrinket1ID ~= I.FunhouseLens:ID() and 
+          VarTrinket1Buffs and 
+          ((S.PrimordialWave:CooldownRemains() > 25 or not S.PrimordialWave:IsAvailable() or Shaman.ClusterTargets >= 2) and 
+           (S.Ascendance:CooldownRemains() > VarTrinket1CD - 5 or Player:BuffStack(S.SpymastersReportBuff) > 25) or 
+           Player:BuffRemains(S.AscendanceBuff) > 12 or BossFightRemains < 21)) then
         if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item trinket1 ("..Trinket1:Name()..") main 18"; end
       end
-      -- use_item,slot=trinket2,use_off_gcd=1,if=!trinket.2.has_use_buff|!variable.special_items&((buff.fury_of_storms.up|!talent.fury_of_the_storms|cooldown.stormkeeper.remains>10)&(cooldown.primordial_wave.remains>25|!talent.primordial_wave|spell_targets.chain_lightning>=2)&cooldown.ascendance.remains>15|fight_remains<21|buff.ascendance.remains>12)
-      if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not Trinket2:HasUseBuff() or not VarSpecialItems and ((Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable() or S.Stormkeeper:CooldownRemains() > 10) and (S.PrimordialWave:CooldownRemains() > 25 or not S.PrimordialWave:IsAvailable() or Shaman.ClusterTargets >= 2) and S.Ascendance:CooldownRemains() > 15 or BossFightRemains < 21 or Player:BuffRemains(S.AscendanceBuff) > 12)) then
+      -- use_item,slot=trinket2,use_off_gcd=1,if=!trinket.2.is.spymasters_web&!variable.special_trinket2&variable.trinket_2_buffs&((cooldown.primordial_wave.remains>25|!talent.primordial_wave|spell_targets.chain_lightning>=2)&(cooldown.ascendance.remains>trinket.2.cooldown.duration-5|buff.spymasters_report.stack>25)|buff.ascendance.remains>12|fight_remains<21)
+      if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and 
+         (VarTrinket2ID ~= I.SpymastersWeb:ID() and 
+          VarTrinket2ID ~= I.HouseofCards:ID() and 
+          VarTrinket2ID ~= I.FunhouseLens:ID() and 
+          VarTrinket2Buffs and 
+          ((S.PrimordialWave:CooldownRemains() > 25 or not S.PrimordialWave:IsAvailable() or Shaman.ClusterTargets >= 2) and 
+           (S.Ascendance:CooldownRemains() > VarTrinket2CD - 5 or Player:BuffStack(S.SpymastersReportBuff) > 25) or 
+           Player:BuffRemains(S.AscendanceBuff) > 12 or BossFightRemains < 21)) then
         if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item trinket2 ("..Trinket2:Name()..") main 20"; end
+      end
+      -- use_item,slot=trinket1,use_off_gcd=1,if=!variable.trinket_1_buffs&(cooldown.ascendance.remains>20|trinket.2.cooldown.remains>20&cooldown.neural_synapse_enhancer.remains>20&cooldown.bestinslots.remains>20)
+      if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and 
+         (not Trinket1:HasUseBuff() and VarTrinket1ID ~= I.FunhouseLens:ID() and 
+          (S.Ascendance:CooldownRemains() > 20 or (Trinket2 and Trinket2:CooldownRemains() > 20 and not I.NeuralSynapseEnhancer:IsEquipped()))) then
+        if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item trinket1 dmg ("..Trinket1:Name()..") main 22"; end
+      end
+      -- use_item,slot=trinket2,use_off_gcd=1,if=!variable.trinket_2_buffs&(cooldown.ascendance.remains>20|trinket.1.cooldown.remains>20&cooldown.neural_synapse_enhancer.remains>20&cooldown.bestinslots.remains>20)
+      if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and 
+         (not Trinket2:HasUseBuff() and VarTrinket2ID ~= I.FunhouseLens:ID() and 
+          (S.Ascendance:CooldownRemains() > 20 or (Trinket1 and Trinket1:CooldownRemains() > 20 and not I.NeuralSynapseEnhancer:IsEquipped()))) then
+        if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item trinket2 dmg ("..Trinket2:Name()..") main 24"; end
       end
     end
     if Settings.Commons.Enabled.Items then
@@ -575,14 +587,14 @@ local function APL()
       -- Note: Expanding to all non-trinket items
       local ItemToUse, _, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
       if ItemToUse and ((Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable() or S.Stormkeeper:CooldownRemains() > 10) and (S.PrimordialWave:CooldownRemains() > 25 or not S.PrimordialWave:IsAvailable()) and S.Ascendance:CooldownRemains() > 15 or Player:BuffRemains(S.AscendanceBuff) > 12) then
-        if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "use_item non-trinket ("..ItemToUse:Name()..") main 22"; end
+        if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "use_item non-trinket ("..ItemToUse:Name()..") main 26"; end
       end
     end
     -- lightning_shield,if=buff.lightning_shield.down
     -- Note: Handled above.
     -- natures_swiftness
     if CDsON() and S.NaturesSwiftness:IsCastable() and Player:BuffDown(S.NaturesSwiftness) then
-      if Cast(S.NaturesSwiftness, Settings.CommonsOGCD.GCDasOffGCD.NaturesSwiftness) then return "natures_swiftness main 24"; end
+      if Cast(S.NaturesSwiftness, Settings.CommonsOGCD.GCDasOffGCD.NaturesSwiftness) then return "natures_swiftness main 28"; end
     end
     -- invoke_external_buff,name=power_infusion,if=buff.ascendance.up|cooldown.ascendance.remains>30
     -- Note: Not handling external buffs.
@@ -590,7 +602,7 @@ local function APL()
     if Settings.Commons.Enabled.Potions and (Player:BloodlustUp() or Player:BuffUp(S.SpymastersWebBuff) or Player:BuffRemains(S.AscendanceBuff) > 12 or BossFightRemains < 31) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 26"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 30"; end
       end
     end
     -- run_action_list,name=aoe,if=spell_targets.chain_lightning>=2
