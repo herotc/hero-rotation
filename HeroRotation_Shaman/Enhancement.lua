@@ -567,8 +567,8 @@ local function SingleTotemic()
   if S.DoomWinds:IsReady() and (Player:BuffUp(S.LegacyoftheFrostWitchBuff)) then
     if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsInMeleeRange(5)) then return "doom_winds single_totemic 14"; end
   end
-  -- primordial_storm,if=(buff.maelstrom_weapon.stack>=10)&(buff.legacy_of_the_frost_witch.up|!talent.legacy_of_the_frost_witch.enabled)&(cooldown.doom_winds.remains>=15|buff.doom_winds.up)
-  if S.PrimordialStormAbility:IsCastable() and ((MaelstromStacks >= 10) and (Player:BuffUp(S.LegacyoftheFrostWitchBuff) or not S.LegacyoftheFrostWitch:IsAvailable()) and (S.DoomWinds:CooldownRemains() >= 15 or Player:BuffUp(S.DoomWindsBuff))) then
+  -- primordial_storm,if=(buff.maelstrom_weapon.stack>=10)&((cooldown.doom_winds.remains>=buff.primordial_storm.remains)|buff.doom_winds.up|!talent.doom_winds.enabled|(buff.primordial_storm.remains<2*gcd))
+  if S.PrimordialStormAbility:IsCastable() and MaelstromStacks >= 10 and (S.DoomWinds:CooldownRemains() >= Player:BuffRemains(S.PrimordialStormBuff) or Player:BuffUp(S.DoomWindsBuff) or not S.DoomWinds:IsAvailable() or Player:BuffRemains(S.PrimordialStormBuff) < 2 * Player:GCD()) then
     if Cast(S.PrimordialStormAbility, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsInRange(45)) then return "primordial_storm single_totemic 16"; end
   end
   -- sundering,if=buff.ascendance.up&pet.surging_totem.active&talent.earthsurge.enabled&buff.legacy_of_the_frost_witch.up&buff.totemic_rebound.stack>=5&buff.earthen_weapon.stack>=2
@@ -659,8 +659,8 @@ local function SingleTotemic()
   if S.EarthElemental:IsCastable() then
     if Cast(S.EarthElemental, Settings.CommonsOGCD.GCDasOffGCD.EarthElemental) then return "earth_elemental single_totemic 62"; end
   end
-  -- flame_shock,if=!talent.voltaic_blaze.enabled
-  if S.FlameShock:IsReady() and (not S.VoltaicBlaze:IsAvailable()) then
+  -- flame_shock
+  if S.FlameShock:IsReady() then
     if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock single_totemic 64"; end
   end
 end
@@ -784,8 +784,8 @@ local function Aoe()
   if S.PrimordialWave:IsReady() and (S.FlameShockDebuff:AuraActiveCount() == mathmin(EnemiesMeleeCount, 6)) then
     if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsInRange(45)) then return "primordial_wave aoe 14"; end
   end
-  -- primordial_storm,if=(buff.maelstrom_weapon.stack>=10)&(buff.doom_winds.up|cooldown.doom_winds.remains>15|buff.primordial_storm.remains<3)
-  if S.PrimordialStormAbility:IsCastable() and ((MaelstromStacks >= 10) and (Player:BuffUp(S.DoomWindsBuff) or S.DoomWinds:CooldownRemains() > 15 or Player:BuffRemains(S.PrimordialStormBuff) < 3)) then
+  -- primordial_storm,if=(buff.maelstrom_weapon.stack>=10)&(buff.doom_winds.up|!talent.doom_winds.enabled|(cooldown.doom_winds.remains>buff.primordial_storm.remains)|(buff.primordial_storm.remains<2*gcd))
+  if S.PrimordialStormAbility:IsCastable() and MaelstromStacks >= 10 and (Player:BuffUp(S.DoomWindsBuff) or not S.DoomWinds:IsAvailable() or S.DoomWinds:CooldownRemains() > Player:BuffRemains(S.PrimordialStormBuff) or Player:BuffRemains(S.PrimordialStormBuff) < 2 * Player:GCD()) then
     if Cast(S.PrimordialStormAbility, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsInRange(45)) then return "primordial_storm aoe 16"; end
   end
   -- crash_lightning,if=talent.converging_storms.enabled&buff.electrostatic_wager.stack>6|!buff.crash_lightning.up
@@ -929,8 +929,8 @@ local function AoeTotemicOpen()
   if S.DoomWinds:IsCastable() and (MaelstromStacks >= 8) then
     if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsInMeleeRange(5)) then return "doom_winds aoe_totemic_open 14"; end
   end
-  -- primordial_storm,if=(buff.maelstrom_weapon.stack>=10)&buff.legacy_of_the_frost_witch.up
-  if S.PrimordialStormAbility:IsCastable() and (MaelstromStacks >= 10 and Player:BuffUp(S.LegacyoftheFrostWitchBuff)) then
+  -- primordial_storm,if=(buff.maelstrom_weapon.stack>=10)&((cooldown.doom_winds.remains>3)|!talent.doom_winds.enabled)
+  if S.PrimordialStormAbility:IsCastable() and MaelstromStacks >= 10 and (S.DoomWinds:CooldownRemains() > 3 or not S.DoomWinds:IsAvailable()) then
     if Cast(S.PrimordialStormAbility, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsInRange(45)) then return "primordial_storm aoe_totemic_open 16"; end
   end
   -- lava_lash,if=buff.hot_hand.up|(buff.legacy_of_the_frost_witch.up&buff.whirling_fire.up)
@@ -1003,8 +1003,8 @@ local function AoeTotemic()
   if S.DoomWinds:IsCastable() and (not S.ElementalSpirits:IsAvailable()) then
     if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsInMeleeRange(5)) then return "doom_winds aoe_totemic 12"; end
   end
-  -- primordial_storm,if=(buff.maelstrom_weapon.stack>=10)&(cooldown.doom_winds.remains>3)
-  if S.PrimordialStormAbility:IsCastable() and ((MaelstromStacks >= 10) and (S.DoomWinds:CooldownRemains() > 3)) then
+  -- primordial_storm,if=(buff.maelstrom_weapon.stack>=10)&((cooldown.doom_winds.remains>3)|!talent.doom_winds.enabled)
+  if S.PrimordialStormAbility:IsCastable() and MaelstromStacks >= 10 and (S.DoomWinds:CooldownRemains() > 3 or not S.DoomWinds:IsAvailable()) then
     if Cast(S.PrimordialStormAbility, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsInRange(45)) then return "primordial_storm aoe_totemic 14"; end
   end
   -- primordial_wave,if=dot.flame_shock.ticking&(active_dot.flame_shock=active_enemies|active_dot.flame_shock=6)
