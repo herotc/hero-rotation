@@ -1030,7 +1030,7 @@ if Everyone.TargetIsValid() then
     local ShouldReturn = NormalOpener(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=cooldowns,if=talent.storm_earth_and_fire
-  if S.StormEarthAndFire:IsAvailable() then
+  if S.StormEarthAndFire:IsAvailable() and CDsON() then
     local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=default_aoe,if=active_enemies>=5
