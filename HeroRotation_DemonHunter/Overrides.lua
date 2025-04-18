@@ -59,11 +59,10 @@ HavocOldBuffUp = HL.AddCoreOverride ("Player.BuffUp",
 local HavocOldBuffStack
 HavocOldBuffStack = HL.AddCoreOverride ("Player.BuffStack",
   function (self, Spell, AnyCaster, BypassRecovery)
-    local BaseCheck = HavocOldBuffStack(self, Spell, AnyCaster, BypassRecovery)
     if Spell == SpellHavoc.ImmolationAuraBuff then
       return num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff1)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff2)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff3)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff4)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff5))
     else
-      return BaseCheck
+      return HavocOldBuffStack(self, Spell, AnyCaster, BypassRecovery)
     end
   end
 , 577)
