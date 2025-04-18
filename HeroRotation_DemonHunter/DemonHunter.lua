@@ -27,8 +27,6 @@ Spell.DemonHunter.Commons = {
   ArcaneTorrent                         = Spell(50613),
   -- Abilities
   Glide                                 = Spell(131347),
-  ImmolationAura                        = Spell(258920),
-  ImmolationAuraBuff                    = Spell(258920),
   -- Talents
   AuraofPain                            = Spell(207347),
   ChaosNova                             = Spell(179057),
@@ -107,6 +105,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   DeathSweep                            = Spell(210152),
   DemonsBite                            = Spell(162243),
   FelRush                               = Spell(195072),
+  ImmolationAura                        = MultiSpell(258920, 427917), -- 2nd ID is only used with A Fire Inside when one buff is already active.
   Metamorphosis                         = Spell(191427),
   ThrowGlaive                           = Spell(185123),
   -- Talents
@@ -148,6 +147,9 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   ExergyBuff                            = Spell(208628),
   FelBarrageBuff                        = Spell(258925),
   FuriousGazeBuff                       = Spell(343312),
+  ImmolationAuraBuff                    = Spell(999999), -- Dummy, handled in Overrides
+  ImmolationAuraBuff1                   = Spell(258920),
+  ImmolationAuraBuff2                   = Spell(427912),
   InertiaBuff                           = Spell(427641),
   InitiativeBuff                        = Spell(391215),
   InnerDemonBuff                        = Spell(390145),
@@ -167,6 +169,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Havoc, Spell.DemonHu
 
 Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   -- Abilities
+  ImmolationAura                        = Spell(258920),
   InfernalStrike                        = Spell(189110),
   Shear                                 = Spell(203782),
   SoulCleave                            = Spell(228477),
@@ -193,6 +196,7 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   Metamorphosis                         = Spell(187827),
   -- Buffs
   DemonSpikesBuff                       = Spell(203819),
+  ImmolationAuraBuff                    = Spell(258920),
   MetamorphosisBuff                     = Spell(187827),
   SoulFurnaceBuff                       = Spell(391166),
   SoulFurnaceDmgBuff                    = Spell(391172),
