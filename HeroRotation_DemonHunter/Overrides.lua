@@ -49,7 +49,7 @@ local HavocOldBuffUp
 HavocOldBuffUp = HL.AddCoreOverride ("Player.BuffUp", 
   function (self, Spell, AnyCaster, BypassRecovery)
     if Spell == SpellHavoc.ImmolationAuraBuff then
-      return HavocOldBuffUp(self, SpellHavoc.ImmolationAuraBuff1, AnyCaster, BypassRecovery) or HavocOldBuffUp(self, SpellHavoc.ImmolationAuraBuff2, AnyCaster, BypassRecovery)
+      return HavocOldBuffUp(self, SpellHavoc.ImmolationAuraBuff1, AnyCaster, BypassRecovery) or HavocOldBuffUp(self, SpellHavoc.ImmolationAuraBuff2, AnyCaster, BypassRecovery) or HavocOldBuffUp(self, SpellHavoc.ImmolationAuraBuff3, AnyCaster, BypassRecovery) or HavocOldBuffUp(self, SpellHavoc.ImmolationAuraBuff4, AnyCaster, BypassRecovery) or HavocOldBuffUp(self, SpellHavoc.ImmolationAuraBuff5, AnyCaster, BypassRecovery)
     else
       return HavocOldBuffUp(self, Spell, AnyCaster, BypassRecovery)
     end
@@ -61,7 +61,7 @@ HavocOldBuffStack = HL.AddCoreOverride ("Player.BuffStack",
   function (self, Spell, AnyCaster, BypassRecovery)
     local BaseCheck = HavocOldBuffStack(self, Spell, AnyCaster, BypassRecovery)
     if Spell == SpellHavoc.ImmolationAuraBuff then
-      return num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff1)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff2))
+      return num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff1)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff2)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff3)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff4)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff5))
     else
       return BaseCheck
     end
