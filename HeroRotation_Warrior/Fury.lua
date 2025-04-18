@@ -580,12 +580,12 @@ local function APL()
     -- run_action_list,name=slayer,if=talent.slayers_dominance
     if S.SlayersDominance:IsAvailable() or Player:Level() < 71 then
       local ShouldReturn = Slayer(); if ShouldReturn then return ShouldReturn; end
-      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SlayerAMMT()"; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for Slayer()"; end
     end
     -- run_action_list,name=thane,if=talent.lightning_strikes
     if S.LightningStrikes:IsAvailable() then
       local ShouldReturn = Thane(); if ShouldReturn then return ShouldReturn; end
-      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for ThaneAMMT()"; end
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for Thane()"; end
     end
     -- Pool if nothing else to suggest
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
