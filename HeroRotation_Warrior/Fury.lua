@@ -319,11 +319,11 @@ local function Slayer()
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer 60"; end
   end
   -- whirlwind,if=talent.improved_whirlwind
-  if S.Whirlwind:IsCastable() and (S.ImprovedWhilwind:IsAvailable()) then
+  if S.Whirlwind:IsCastable() and (S.ImprovedWhirlwind:IsAvailable()) then
     if Cast(S.Whirlwind, nil, nil, not Target:IsInMeleeRange(8)) then return "whirlwind slayer 62"; end
   end
   -- slam,if=!talent.improved_whirlwind
-  if S.Slam:IsCastable() and (not S.ImprovedWhilwind:IsAvailable()) then
+  if S.Slam:IsCastable() and (not S.ImprovedWhirlwind:IsAvailable()) then
     if Cast(S.Slam, nil, nil, not TargetInMeleeRange) then return "slam slayer 64"; end
   end
   -- storm_bolt,if=buff.bladestorm.up
