@@ -302,7 +302,7 @@ local function PreCD()
     end
   end
   -- use_item,name=bestinslots,if=hero_tree.keeper_of_the_grove&buff.harmony_of_the_grove.up|hero_tree.elunes_chosen&(cooldown.ca_inc.full_recharge_time>20|buff.ca_inc.up)
-  if Settings.Commons.Enabled.Items and I.BestinSlotsCaster:IsEquippedAndReady() and (Player:HeroTreeID() == 23 and Player:BuffUp(S.HarmonyoftheGroveBuff) or Player:HeroTreeID() == 24 and (CaInc:FullRechargeTime() > 20 or CAIncBuffUp)) then
+  if Settings.Commons.Enabled.Items and I.BestinSlotsCaster:IsEquippedAndReady() and (Player:HeroTreeID() == 23 and Player:BuffUp(S.HarmonyoftheGroveBuff) or Player:HeroTreeID() == 24 and (CAInc:FullRechargeTime() > 20 or CAIncBuffUp)) then
     if Cast(I.BestinSlotsCaster, nil, Settings.CommonsDS.DisplayStyle.Items) then return "bestinslots pre_cd 12"; end
   end
 end
