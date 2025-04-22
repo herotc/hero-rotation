@@ -283,6 +283,18 @@ DestroOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
   end
 , 267)
 
+local DestroOldSpellIsAvailable
+DestroOldSpellIsAvailable = HL.AddCoreOverride ("Spell.IsAvailable",
+  function (self, CheckPet)
+    local BaseCheck = DestroOldSpellIsAvailable(self, CheckPet)
+    if self == SpellDestro.Wither then
+      return SpellDestro.Wither:IsLearned()
+    else
+      return BaseCheck
+    end
+  end
+, 267)
+
 local DestroOldPlayerAffectingCombat
 DestroOldPlayerAffectingCombat = HL.AddCoreOverride("Player.AffectingCombat",
   function (self)
