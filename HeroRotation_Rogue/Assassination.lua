@@ -689,7 +689,7 @@ local function UsableItems ()
 end
 
 local function ShivUsage ()
-  -- actions.shiv=variable,name=shiv_condition,value=!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking
+  -- actions.shiv=variable,name=shiv_condition,value=!debuff.shiv.up&dot.garrote.ticking&dot.rupture.ticking&spell_targets.fan_of_knives<=5
   local ShivCondition = Target:DebuffDown(S.ShivDebuff) and Target:DebuffUp(S.Garrote) and Target:DebuffUp(S.Rupture)
     and MeleeEnemies10yCount <= 5
 
@@ -863,7 +863,7 @@ local function CDs ()
   --actions.cds+=/thistle_tea,if=!buff.thistle_tea.up&debuff.shiv.remains>=6|!buff.thistle_tea.up&dot.kingsbane.ticking
   -- &dot.kingsbane.remains<=6|!buff.thistle_tea.up&fight_remains<=cooldown.thistle_tea.charges*6
   if S.ThistleTea:IsCastable() then
-    if Player:BuffDown(S.ThistleTea) and Target:DebuffRemains(S.Shiv) >= 6
+    if Player:BuffDown(S.ThistleTea) and Target:DebuffRemains(S.ShivDebuff) >= 6
       or Player:BuffDown(S.ThistleTea) and Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) <= 6
       or Player:BuffDown(S.ThistleTea) and HL.BossFilteredFightRemains("<", S.ThistleTea:Charges() * 6) then
       if Cast(S.ThistleTea, Settings.CommonsOGCD.OffGCDasOffGCD.ThistleTea) then
