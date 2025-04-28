@@ -193,7 +193,7 @@ local function UnitWithHavoc(enemies)
   for k in pairs(enemies) do
     local CycleUnit = enemies[k]
     if CycleUnit:DebuffUp(S.Havoc) then
-      return true, CycleUnit:DebuffRemains(S.HavocDebuff), CycleUnit:DebuffRemains(S.ImmolateDebuff)
+      return true, CycleUnit:DebuffRemains(S.HavocDebuff)
     end
   end
   return false, 0, 0
@@ -820,7 +820,7 @@ local function APL()
 
   if Everyone.TargetIsValid() or Player:AffectingCombat() then
     -- Check Havoc Status
-    VarHavocActive, VarHavocRemains, VarHavocImmoTime = UnitWithHavoc(Enemies40y)
+    VarHavocActive, VarHavocRemains = UnitWithHavoc(Enemies40y)
 
     -- Calculate fight_remains
     BossFightRemains = HL.BossFightRemains()
