@@ -616,6 +616,8 @@ local function Variables()
   if DemonicTyrantActive() then
     VarImpDespawn = 0
   end
+  -- Note: Rest VarImpl to false before the following checks to ensure it doesn't end up as true in a situation where AoE has whittled down to ST.
+  VarImpl = false
   -- variable,name=impl,op=set,value=buff.tyrant.down,if=active_enemies>1+(talent.sacrificed_souls.enabled)
   if EnemiesCount8ySplash > 1 + num(S.SacrificedSouls:IsAvailable()) then
     VarImpl = not DemonicTyrantActive()
