@@ -455,7 +455,7 @@ local function AoESetup()
     if Cast(S.FesteringScytheAction, nil, nil, not Target:IsInMeleeRange(14)) then return "festering_scythe aoe_setup 2"; end
   end
   -- any_dnd,if=!death_and_decay.ticking&(!talent.bursting_sores&!talent.vile_contagion|death_knight.fwounded_targets=active_enemies|death_knight.fwounded_targets>=8|raid_event.adds.exists&raid_event.adds.remains<=11&raid_event.adds.remains>5|!buff.death_and_decay.up&talent.defile)
-  if AnyDnD:IsReady() and (not Player:DnDTicking() and (not S.BurstingSores:IsAvailable() and not S.VileContagion:IsAvailable() or S.FesteringWoundDebuff:AuraActiveCount() == ActiveEnemies or S.FesteringWoundDebuff:AuraActiveCount() >= 8 or Player:BuffUp(S.DeathAndDecayBuff) and S.Defile:IsAvailable())) then
+  if AnyDnD:IsReady() and (not Player:DnDTicking() and (not S.BurstingSores:IsAvailable() and not S.VileContagion:IsAvailable() or S.FesteringWoundDebuff:AuraActiveCount() == ActiveEnemies or S.FesteringWoundDebuff:AuraActiveCount() >= 8 or Player:BuffDown(S.DeathAndDecayBuff) and S.Defile:IsAvailable())) then
     if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd aoe_setup 4"; end
   end
   -- wound_spender,target_if=debuff.chains_of_ice_trollbane_slow.up
