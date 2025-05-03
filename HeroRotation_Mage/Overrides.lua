@@ -180,9 +180,8 @@ FirePlayerBuffDown = HL.AddCoreOverride("Player.BuffDown",
 HL.AddCoreOverride("Spell.IsReady",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local BaseCheck = self:IsCastable() and self:IsUsableP()
-    if not BaseCheck then return false end
 
-    if self:CastTime() > 0 and Player:IsMoving() and Settings.Commons.MovingRotation then
+    if Settings.Commons.MovingRotation and self:CastTime() > 0 and Player:IsMoving() then
       if self == SpellFire.Scorch or
          (self == SpellFire.Pyroblast and Player:BuffUp(SpellFire.HotStreakBuff)) or
          (self == SpellFire.Flamestrike and Player:BuffUp(SpellFire.HotStreakBuff)) then
@@ -191,23 +190,21 @@ HL.AddCoreOverride("Spell.IsReady",
       return false
     end
 
-    return true
+    if self == SpellFire.FireBlast then
+      return self:IsCastable(true) and self:IsUsable()
+    else
+      return BaseCheck
+    end
   end
 , 63)
 
 HL.AddCoreOverride("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-    if self:CastTime() > 0 and Player:IsMoving() and Settings.Commons.MovingRotation then
+    if Settings.Commons.MovingRotation and self:CastTime() > 0 and Player:IsMoving() then
       return false
     end
 
-    local RangeOK = true
-    if Range then
-      local RangeUnit = ThisUnit or Target
-      RangeOK = RangeUnit:IsInRange( Range, AoESpell )
-    end
-
-    local BaseCheck = self:IsLearned() and self:CooldownRemains(BypassRecovery, Offset or "Auto") == 0 and RangeOK
+    local BaseCheck = self:IsLearned() and self:CooldownUp(BypassRecovery)
     if self == SpellFire.ShiftingPower then
       return BaseCheck and not Player:IsCasting(self)
     else
