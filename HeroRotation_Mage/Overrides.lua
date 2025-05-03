@@ -191,7 +191,7 @@ HL.AddCoreOverride("Spell.IsReady",
     end
 
     if self == SpellFire.FireBlast then
-      return self:IsCastable(true) and self:IsUsable()
+      return BaseCheck and self:Charges() >= 1
     else
       return BaseCheck
     end
