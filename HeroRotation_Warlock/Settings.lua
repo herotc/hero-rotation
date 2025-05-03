@@ -108,6 +108,7 @@ HR.GUISettings.APL.Warlock = {
       GrimoireOfSacrifice = true,
       InquisitorsGaze = false,
       RainOfFire = false,
+      SoulFire = false,
       SummonInfernal = true,
       SummonPet = false,
       SummonSoulkeeper = false,
