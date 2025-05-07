@@ -48,6 +48,7 @@ Spell.Mage.Commons = {
   IceNova                               = Spell(157997), --splash, 8
   MirrorImage                           = Spell(55342),
   ShiftingPower                         = Spell(382440), --Melee 15
+  Supernova                             = Spell(157980), --Splash, 8
   -- Buffs
   ArcaneIntellectBuff                   = Spell(1459),
   -- Debuffs
@@ -74,11 +75,9 @@ Spell.Mage.Frostfire = {
 
 Spell.Mage.Spellslinger = {
   -- Talents
-  Resonance                              = Spell(453823),
   ShiftingShards                        = Spell(444675),
   SplinteringSorcery                    = Spell(443739),
   Splinterstorm                         = Spell(443742),
-  TimeLoop                              = Spell(445255),
   UnerringProficiency                   = Spell(444974),
   -- Buffs
   UnerringProficiencyBuff               = Spell(444981),
@@ -86,7 +85,6 @@ Spell.Mage.Spellslinger = {
 
 Spell.Mage.Sunfury = {
   -- Talents
-  ConsortiumsBauble                     = Spell(451894),
   SpellfireSpheres                      = Spell(448601),
   SunfuryExecution                      = Spell(449349),
   -- Buffs
@@ -110,6 +108,7 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   ArcaneTempo                           = Spell(383980),
   ArcingCleave                          = Spell(231564),
   ChargedOrb                            = Spell(384651),
+  ConsortiumsBauble                     = Spell(461260),
   Enlightened                           = Spell(321387),
   Evocation                             = Spell(12051),
   HighVoltage                           = Spell(461248),
@@ -118,8 +117,9 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   MagisSpark                            = Spell(454016),
   OrbBarrage                            = Spell(384858),
   PresenceofMind                        = Spell(205025),
+  Resonance                             = Spell(205208),
   Reverberate                           = Spell(281482),
-  Supernova                             = Spell(157980), --Splash, 8
+  TimeLoop                              = Spell(452924),
   TouchoftheMagi                        = Spell(321507), --Splash, 8
   -- Buffs
   AetherAttunementBuff                  = Spell(453601),
