@@ -157,7 +157,7 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   -- deaths_caress
-  if S.DeathsCaress:IsReady() then
+  if Player:Level() >= 23 and S.DeathsCaress:IsReady() then
     if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress precombat 4"; end
   end
   -- Manually added: marrowrend
@@ -218,7 +218,7 @@ local function Deathbringer()
     if Cast(S.Marrowrend, nil, nil, not TargetInMeleeRange) then return "marrowrend deathbringer 6"; end
   end
   -- deaths_caress,if=!buff.bone_shield.up|buff.bone_shield.remains<1.5|buff.bone_shield.stack<=1
-  if S.DeathsCaress:IsReady() and (Player:BuffDown(S.BoneShieldBuff) or Player:BuffRemains(S.BoneShieldBuff) < 1.5 or VarBoneShieldStacks <= 1) then
+  if Player:Level() >= 23 and S.DeathsCaress:IsReady() and (Player:BuffDown(S.BoneShieldBuff) or Player:BuffRemains(S.BoneShieldBuff) < 1.5 or VarBoneShieldStacks <= 1) then
     if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress deathbringer 8"; end
   end
   -- blood_boil,if=dot.blood_plague.remains<3
@@ -314,7 +314,7 @@ local function Deathbringer()
     if Cast(S.ArcaneTorrent, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "arcane_torrent deathbringer 44"; end
   end
   -- deaths_caress,if=buff.bone_shield.stack<11
-  if S.DeathsCaress:IsReady() and (VarBoneShieldStacks < 11) then
+  if Player:Level() >= 23 and S.DeathsCaress:IsReady() and (VarBoneShieldStacks < 11) then
     if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress deathbringer 46"; end
   end
 end
@@ -334,7 +334,7 @@ local function Sanlayn()
     if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not TargetInMeleeRange) then return "death_strike sanlayn 2"; end
   end
   -- deaths_caress,if=!buff.bone_shield.up
-  if S.DeathsCaress:IsReady() and (Player:BuffDown(S.BoneShieldBuff)) then
+  if Player:Level() >= 23 and S.DeathsCaress:IsReady() and (Player:BuffDown(S.BoneShieldBuff)) then
     if Cast(S.DeathsCaress, nil, nil, not Target:IsSpellInRange(S.DeathsCaress)) then return "deaths_caress sanlayn 4"; end
   end
   -- blood_boil,if=!dot.blood_plague.ticking|(dot.blood_plague.remains<10&buff.dancing_rune_weapon.up)
