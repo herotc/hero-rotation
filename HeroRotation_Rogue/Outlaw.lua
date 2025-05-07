@@ -921,12 +921,6 @@ local function CDs ()
 end
 
 local function Build ()
-  --# With Deft Maneuvers, build CPs with Blade Flurry at 5+ targets, only at 2 CPs or lower (1 CP with Broadside) unless AR isn't active.
-  --actions.build=variable,name=deft_condition,value=cooldown.blade_flurry.ready&talent.deft_maneuvers&spell_targets>=5
-  -- &(combo_points<=2-buff.broadside.up|!buff.adrenaline_rush.up)
-  local DeftCondition = S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 5
-    and (ComboPoints <= 2 - num(Player:BuffUp(S.Broadside)) or Player:BuffDown(S.AdrenalineRush))
-
   -- # High priority Ambush for Hidden Opportunity builds
   -- actions.build+=/ambush,if=talent.hidden_opportunity&buff.audacity.up
   if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
@@ -957,10 +951,10 @@ local function Build ()
     end
   end
 
-  -- # With Fatebound or 1 rank in Fan the Hammer, and without Hidden Opportunity, build CP with Blade Flurry as a higher priority than Opportunity procs.
-  -- actions.build+=/blade_flurry,if=variable.deft_condition&(talent.fan_the_hammer.rank=1|!talent.nimble_flurry&!talent.surprising_strikes)
+  -- # Without Hidden Opportunity, prioritize building CPs with Blade Flurry at 4+ targets, with low CPs unless AR isn't active.
+  -- actions.build+=/blade_flurry,if=talent.deft_maneuvers&spell_targets>=4&(combo_points<=2|!buff.adrenaline_rush.up)
   if S.BladeFlurry:IsCastable() then
-    if DeftCondition and (S.FanTheHammer:TalentRank() == 1 or not S.NimbleFlurry:IsAvailable() and not S.SurprisingStrikes:IsAvailable()) then
+    if S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 4 and (ComboPoints <= 2 or Player:BuffDown(S.AdrenalineRush)) then
       if Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then
         return "Cast Blade Flurry (Fatebound or 1FTH)"
       end
@@ -993,14 +987,6 @@ local function Build ()
     or S.QuickDraw:IsAvailable() or S.Audacity:IsAvailable() and Player:BuffDown(S.AudacityBuff)) then
     if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then
       return "Cast Pistol Shot (No Fan the Hammer)"
-    end
-  end
-
-  -- # With Hidden Opportunity or 2 ranks in Fan the Hammer, building CPs with Blade Flurry is lower priority than Opportunity procs and Ambush.
-  -- actions.build+=/blade_flurry,if=variable.deft_condition
-  if S.BladeFlurry:IsCastable() and DeftCondition then
-    if Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then
-      return "Cast Blade Flurry"
     end
   end
 
