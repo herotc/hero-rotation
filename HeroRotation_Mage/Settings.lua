@@ -51,7 +51,6 @@ HR.GUISettings.APL.Mage = {
   },
   Arcane = {
     AEMainIcon = false,
-    AllowHoldingTotM = false,
     MirrorImagesBeforePull = true,
     PotionType = {
       Selected = "Tempered",
@@ -144,7 +143,6 @@ CreateARPanelOptions(CP_MageOGCD, "APL.Mage.CommonsOGCD")
 -- Arcane
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AEMainIcon", "Show Arcane Explosion in Main Icon", "Enable this to show Arcane Explosion in the main icon. When not enabled, Arcane Explosion will be shown in the left icon.")
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MirrorImagesBeforePull", "Use Mirror Images Precombat", "Enable this option to show Mirror Images during Precombat.")
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AllowHoldingTotM", "Allow Delayed Touch of the Magi", "Enable this option to allow delaying of Touch of the Magi without the profile getting stuck on Arcane Barrage. NOTE: This option subverts a portion of the APL and may result in a loss of DPS.")
 CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane")
 
 -- Fire
