@@ -17,6 +17,7 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.Mage = {
   Commons = {
+    AIDuringCombat = true,
     UseTemporalWarp = true,
     Enabled = {
       Potions = true,
@@ -136,6 +137,7 @@ local CP_Frost = CreateChildPanel(CP_Mage, "Frost")
 -- Controls
 -- Mage
 CreateARPanelOptions(CP_Mage, "APL.Mage.Commons")
+CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.AIDuringCombat", "Show Arcane Intellect During Combat", "Enable this option to show Arcane Intellect suggestions during combat.")
 CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTemporalWarp", "Suggest Time Warp with Temporal Warp", "Show Time Warp when the Temporal Warp talent is selected.")
 CreateARPanelOptions(CP_MageDS, "APL.Mage.CommonsDS")
 CreateARPanelOptions(CP_MageOGCD, "APL.Mage.CommonsOGCD")
