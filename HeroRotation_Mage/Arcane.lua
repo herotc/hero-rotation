@@ -39,28 +39,11 @@ local I = Item.Mage.Arcane
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
   -- TWW Trinkets
-  I.AberrantSpellforge:ID(),
-  I.FearbreakersEcho:ID(),
   I.HighSpeakersAccretion:ID(),
   I.ImperfectAscendancySerum:ID(),
-  I.MadQueensMandate:ID(),
-  I.MereldarsToll:ID(),
   I.NeuralSynapseEnhancer:ID(),
   I.SpymastersWeb:ID(),
   I.TreacherousTransmitter:ID(),
-  I.SoullettingRuby:ID(),
-  I.FunhouseLens:ID(),
-  I.HouseOfCards:ID(),
-  I.FlarendosPilotLight:ID(),
-  I.SignetOfThePriory:ID(),
-  I.Blastmaster3000:ID(),
-  I.RatfangToxin:ID(),
-  I.IngeniousManaBattery:ID(),
-  I.GeargrindersSpareKeys:ID(),
-  I.RingingRitualMud:ID(),
-  I.GooBlinGrenade:ID(),
-  I.NoggenfoggerUltimateDeluxe:ID(),
-  I.GarbagemancersLastResort:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -132,9 +115,9 @@ local function SetTrinketVariables()
   VarTrinket2Ex = T2.Excluded
 
   -- variable,name=steroid_trinket_equipped,op=set,value=equipped.gladiators_badge|equipped.signet_of_the_priory|equipped.high_speakers_accretion|equipped.spymasters_web|equipped.treacherous_transmitter|equipped.imperfect_ascendancy_serum|equipped.quickwick_candlestick|equipped.soulletting_ruby|equipped.funhouse_lens|equipped.house_of_cards|equipped.flarendos_pilot_light|equipped.signet_of_the_priory|equipped.neural_synapse_enhancer
-  VarSteroidTrinketEquipped = Player:GladiatorsBadgeIsEquipped() or I.SignetOfThePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped() or I.SoullettingRuby:IsEquipped() or I.FunhouseLens:IsEquipped() or I.HouseOfCards:IsEquipped() or I.FlarendosPilotLight:IsEquipped() or I.SignetOfThePriory:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped()
+  VarSteroidTrinketEquipped = Player:GladiatorsBadgeIsEquipped() or I.SignetOfThePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped() or I.SoullettingRuby:IsEquipped() or I.FunhouseLens:IsEquipped() or I.HouseOfCards:IsEquipped() or I.FlarendosPilotLight:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped()
   -- variable,name=neural_on_mini,op=set,value=equipped.gladiators_badge|equipped.signet_of_the_priory|equipped.high_speakers_accretion|equipped.spymasters_web|equipped.treacherous_transmitter|equipped.imperfect_ascendancy_serum|equipped.quickwick_candlestick|equipped.soulletting_ruby|equipped.funhouse_lens|equipped.house_of_cards|equipped.flarendos_pilot_light|equipped.signet_of_the_priory
-  VarNeuralOnMini = Player:GladiatorsBadgeIsEquipped() or I.SignetOfThePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped() or I.SoullettingRuby:IsEquipped() or I.FunhouseLens:IsEquipped() or I.HouseOfCards:IsEquipped() or I.FlarendosPilotLight:IsEquipped() or I.SignetOfThePriory:IsEquipped()
+  VarNeuralOnMini = Player:GladiatorsBadgeIsEquipped() or I.SignetOfThePriory:IsEquipped() or I.HighSpeakersAccretion:IsEquipped() or I.SpymastersWeb:IsEquipped() or I.TreacherousTransmitter:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped() or I.SoullettingRuby:IsEquipped() or I.FunhouseLens:IsEquipped() or I.HouseOfCards:IsEquipped() or I.FlarendosPilotLight:IsEquipped()
   -- variable,name=nonsteroid_trinket_equipped,op=set,value=equipped.blastmaster3000|equipped.ratfang_toxin|equipped.ingenious_mana_battery|equipped.geargrinders_spare_keys|equipped.ringing_ritual_mud|equipped.goo_blin_grenade|equipped.noggenfogger_ultimate_deluxe|equipped.garbagemancers_last_resort|equipped.mad_queens_mandate|equipped.fearbreakers_echo|equipped.mereldars_toll|equipped.gooblin_grenade
   VarNonsteroidTrinketEquipped = I.Blastmaster3000:IsEquipped() or I.RatfangToxin:IsEquipped() or I.IngeniousManaBattery:IsEquipped() or I.GeargrindersSpareKeys:IsEquipped() or I.RingingRitualMud:IsEquipped() or I.GooBlinGrenade:IsEquipped() or I.NoggenfoggerUltimateDeluxe:IsEquipped() or I.GarbagemancersLastResort:IsEquipped() or I.MadQueensMandate:IsEquipped() or I.FearbreakersEcho:IsEquipped() or I.MereldarsToll:IsEquipped()
 end
