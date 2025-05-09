@@ -442,6 +442,15 @@ function HR.LeftIconFrame:Init ()
   KeybindFrame:SetPoint("TOPRIGHT")
   KeybindFrame:SetTextColor(0.8,0.8,0.8,1)
   KeybindFrame:SetText("")
+  -- Overlay Text
+  local TextFrame = self:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  self.Text = TextFrame
+  TextFrame:SetAllPoints(true)
+  TextFrame:SetJustifyH("CENTER")
+  TextFrame:SetJustifyV("MIDDLE")
+  TextFrame:SetPoint("CENTER")
+  TextFrame:SetTextColor(1,1,1,1)
+  TextFrame:SetText("")
   -- Display
   self:Show()
 end
@@ -469,6 +478,17 @@ function HR.LeftIconFrame:ChangeIcon (Texture, Keybind, ID)
   if not self:IsVisible() then
     self:Show()
   end
+end
+
+-- Set text on frame
+function HR.LeftIconFrame:OverlayText(Text, FontSize)
+  local Font = self.Text:GetFont()
+  if FontSize then
+    self.Text:SetFont(Font, FontSize)
+  else
+    self.Text:SetFont(Font, 10)
+  end
+  self.Text:SetText(Text)
 end
 
 --- ======= NAMEPLATES =======
