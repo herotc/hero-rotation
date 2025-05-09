@@ -3,30 +3,31 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroDBC
-local DBC           = HeroDBC.DBC
+local DBC               = HeroDBC.DBC
 -- HeroLib
-local HL            = HeroLib
-local Unit          = HL.Unit
-local Player        = Unit.Player
-local Target        = Unit.Target
-local Spell         = HL.Spell
-local Item          = HL.Item
+local HL                = HeroLib
+local Unit              = HL.Unit
+local Player            = Unit.Player
+local Target            = Unit.Target
+local Spell             = HL.Spell
+local Item              = HL.Item
 -- HeroRotation
-local HR            = HeroRotation
-local Mage          = HR.Commons.Mage
-local Cast          = HR.Cast
-local CastAnnotated = HR.CastAnnotated
-local CastLeft      = HR.CastLeft
-local CDsON         = HR.CDsON
-local AoEON         = HR.AoEON
+local HR                = HeroRotation
+local Mage              = HR.Commons.Mage
+local Cast              = HR.Cast
+local CastAnnotated     = HR.CastAnnotated
+local CastLeft          = HR.CastLeft
+local CastLeftAnnotated = HR.CastLeftAnnotated
+local CDsON             = HR.CDsON
+local AoEON             = HR.AoEON
 -- Num/Bool Helper Functions
-local num           = HR.Commons.Everyone.num
-local bool          = HR.Commons.Everyone.bool
+local num               = HR.Commons.Everyone.num
+local bool              = HR.Commons.Everyone.bool
 -- lua
-local mathmax       = math.max
-local mathmin       = math.min
+local mathmax           = math.max
+local mathmin           = math.min
 -- WoW API
-local Delay         = C_Timer.After
+local Delay             = C_Timer.After
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -208,7 +209,7 @@ local function CDOpener()
   end
   -- arcane_missiles,if=((prev_gcd.1.evocation|prev_gcd.1.arcane_surge)|variable.opener)&buff.nether_precision.down&(buff.aether_attunement.react=0|set_bonus.thewarwithin_season_2_4pc),interrupt_if=tick_time>gcd.remains&(buff.aether_attunement.react=0|(active_enemies>3&(!talent.time_loop|talent.resonance))),interrupt_immediate=1,interrupt_global=1,chain=1,line_cd=30
   if Settings.Arcane.Enabled.ArcaneMissilesInterrupts and Player:IsChanneling(S.ArcaneMissiles) and (S.ArcaneMissiles:TickTime() > Player:GCDRemains() and (Player:BuffDown(S.AetherAttunementBuff) or (EnemiesCount8ySplash > 3 and (not S.TimeLoop:IsAvailable() or S.Resonance:IsAvailable())))) then
-    if CastAnnotated(S.StopAM, false, "STOP AM") then return "arcane_missiles interrupt cd_opener 12"; end
+    if CastLeftAnnotated(S.StopAM, "STOP AM") then return "arcane_missiles interrupt cd_opener 12"; end
   end
   if S.ArcaneMissiles:IsReady() and S.ArcaneMissiles:TimeSinceLastCast() >= 30 and (((Player:PrevGCDP(1, S.Evocation) or Player:PrevGCDP(1, S.ArcaneSurge)) or VarOpener) and Player:BuffDown(S.NetherPrecisionBuff) and (Player:BuffDown(S.AetherAttunementBuff) or Player:HasTier("TWW2", 4))) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles cd_opener 14"; end
@@ -259,7 +260,7 @@ local function Spellslinger()
   end
   -- arcane_missiles,if=(buff.clearcasting.react&buff.nether_precision.down&((cooldown.touch_of_the_magi.remains>gcd.max*7&cooldown.arcane_surge.remains>gcd.max*7)|buff.clearcasting.react>1|!talent.magis_spark|(cooldown.touch_of_the_magi.remains<gcd.max*4&buff.aether_attunement.react=0)|set_bonus.thewarwithin_season_2_4pc))|(fight_remains<5&buff.clearcasting.react),interrupt_if=tick_time>gcd.remains&(buff.aether_attunement.react=0|(active_enemies>3&(!talent.time_loop|talent.resonance))),interrupt_immediate=1,interrupt_global=1,chain=1
   if Settings.Arcane.Enabled.ArcaneMissilesInterrupts and Player:IsChanneling(S.ArcaneMissiles) and (S.ArcaneMissiles:TickTime() > Player:GCDRemains() and (Player:BuffDown(S.AetherAttunementBuff) or (EnemiesCount8ySplash > 3 and (not S.TimeLoop:IsAvailable() or S.Resonance:IsAvailable())))) then
-    if CastAnnotated(S.StopAM, false, "STOP AM") then return "arcane_missiles interrupt spellslinger 18"; end
+    if CastLeftAnnotated(S.StopAM, "STOP AM") then return "arcane_missiles interrupt spellslinger 18"; end
   end
   if S.ArcaneMissiles:IsReady() and ((Player:BuffUp(S.ClearcastingBuff) and Player:BuffDown(S.NetherPrecisionBuff) and ((S.TouchoftheMagi:CooldownRemains() > Player:GCD() * 7 and S.ArcaneSurge:CooldownRemains() > Player:GCD() * 7) or Player:BuffStack(S.ClearcastingBuff) > 1 or not S.MagisSpark:IsAvailable() or (S.TouchoftheMagi:CooldownRemains() < Player:GCD() * 4 and Player:BuffDown(S.AetherAttunementBuff)) or Player:HasTier("TWW2", 4))) or (FightRemains < 5 and Player:BuffUp(S.ClearcastingBuff))) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles spellslinger 20"; end
@@ -278,7 +279,7 @@ local function Spellslinger()
   end
   -- arcane_missiles,if=talent.high_voltage&(buff.clearcasting.react>1|(buff.clearcasting.react&buff.aether_attunement.react))&buff.arcane_charge.stack<3,interrupt_if=tick_time>gcd.remains&(buff.aether_attunement.react=0|(active_enemies>3&(!talent.time_loop|talent.resonance))),interrupt_immediate=1,interrupt_global=1,chain=1
   if Settings.Arcane.Enabled.ArcaneMissilesInterrupts and Player:IsChanneling(S.ArcaneMissiles) and (S.ArcaneMissiles:TickTime() > Player:GCDRemains() and (Player:BuffDown(S.AetherAttunementBuff) or (EnemiesCount8ySplash > 3 and (not S.TimeLoop:IsAvailable() or S.Resonance:IsAvailable())))) then
-    if CastAnnotated(S.StopAM, false, "STOP AM") then return "arcane_missiles interrupt spellslinger 28"; end
+    if CastLeftAnnotated(S.StopAM, "STOP AM") then return "arcane_missiles interrupt spellslinger 28"; end
   end
   if S.ArcaneMissiles:IsReady() and (S.HighVoltage:IsAvailable() and (Player:BuffStack(S.ClearcastingBuff) > 1 or (Player:BuffUp(S.ClearcastingBuff) and Player:BuffUp(S.AetherAttunementBuff))) and Player:ArcaneCharges() < 3) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles spellslinger 30"; end
@@ -339,7 +340,7 @@ local function Sunfury()
   -- wait,sec=0.05,if=time-action.presence_of_mind.last_used<0.015,line_cd=15
   -- arcane_missiles,if=buff.nether_precision.down&buff.clearcasting.react&buff.arcane_soul.up&buff.arcane_soul.remains>gcd.max*(4-buff.clearcasting.react),interrupt_if=tick_time>gcd.remains,interrupt_immediate=1,interrupt_global=1,chain=1
   if Settings.Arcane.Enabled.ArcaneMissilesInterrupts and Player:IsChanneling(S.ArcaneMissiles) and (S.ArcaneMissiles:TickTime() > Player:GCDRemains()) then
-    if CastAnnotated(S.StopAM, false, "STOP AM") then return "arcane_missiles interrupt sunfury 6"; end
+    if CastLeftAnnotated(S.StopAM, "STOP AM") then return "arcane_missiles interrupt sunfury 6"; end
   end
   if S.ArcaneMissiles:IsReady() and (Player:BuffDown(S.NetherPrecisionBuff) and Player:BuffUp(S.ClearcastingBuff) and Player:BuffUp(S.ArcaneSoulBuff) and Player:BuffRemains(S.ArcaneSoulBuff) > Player:GCD() * (4 - Player:BuffStack(S.ClearcastingBuff))) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles sunfury 8"; end
@@ -358,7 +359,7 @@ local function Sunfury()
   end
   -- arcane_missiles,if=buff.clearcasting.react&set_bonus.thewarwithin_season_2_4pc&buff.aether_attunement.react&cooldown.touch_of_the_magi.remains<gcd.max*(3-(1.5*(active_enemies>3&(!talent.time_loop|talent.resonance)))),interrupt_if=tick_time>gcd.remains&(buff.aether_attunement.react=0|(active_enemies>3&(!talent.time_loop|talent.resonance))),interrupt_immediate=1,interrupt_global=1,chain=1
   if Settings.Arcane.Enabled.ArcaneMissilesInterrupts and Player:IsChanneling(S.ArcaneMissiles) and (S.ArcaneMissiles:TickTime() > Player:GCDRemains() and (Player:BuffDown(S.AetherAttunementBuff) or (EnemiesCount8ySplash > 3 and (not S.TimeLoop:IsAvailable() or S.Resonance:IsAvailable())))) then
-    if CastAnnotated(S.StopAM, false, "STOP AM") then return "arcane_missiles interrupt sunfury 16"; end
+    if CastLeftAnnotated(S.StopAM, "STOP AM") then return "arcane_missiles interrupt sunfury 16"; end
   end
   if S.ArcaneMissiles:IsReady() and (Player:BuffUp(S.ClearcastingBuff) and Player:HasTier("TWW2", 4) and Player:BuffUp(S.AetherAttunementBuff) and S.TouchoftheMagi:CooldownRemains() < Player:GCD() * (3 - (1.5 * num(EnemiesCount8ySplash > 3 and (not S.TimeLoop:IsAvailable() or S.Resonance:IsAvailable()))))) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles sunfury 18"; end
@@ -389,7 +390,7 @@ local function Sunfury()
   end
   -- arcane_missiles,if=buff.clearcasting.react&((talent.high_voltage&buff.arcane_charge.stack<4)|buff.nether_precision.down|(buff.clearcasting.react=3&(!talent.high_voltage|active_enemies=1))),interrupt_if=tick_time>gcd.remains&(buff.aether_attunement.react=0|(active_enemies>3&(!talent.time_loop|talent.resonance))),interrupt_immediate=1,interrupt_global=1,chain=1
   if Settings.Arcane.Enabled.ArcaneMissilesInterrupts and Player:IsChanneling(S.ArcaneMissiles) and (S.ArcaneMissiles:TickTime() > Player:GCDRemains() and (Player:BuffDown(S.AetherAttunementBuff) or (EnemiesCount8ySplash > 3 and (not S.TimeLoop:IsAvailable() or S.Resonance:IsAvailable())))) then
-    if CastAnnotated(S.StopAM, false, "STOP AM") then return "arcane_missiles interrupt sunfury 32"; end
+    if CastLeftAnnotated(S.StopAM, "STOP AM") then return "arcane_missiles interrupt sunfury 32"; end
   end
   if S.ArcaneMissiles:IsReady() and (Player:BuffUp(S.ClearcastingBuff) and ((S.HighVoltage:IsAvailable() and Player:ArcaneCharges() < 4) or Player:BuffDown(S.NetherPrecisionBuff) or (Player:BuffStack(S.ClearcastingBuff) == 3 and (not S.HighVoltage:IsAvailable() or EnemiesCount8ySplash == 1)))) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles sunfury 34"; end
