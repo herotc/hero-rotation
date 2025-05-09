@@ -279,6 +279,7 @@ function HR.CastLeft(Object)
   if HR.CastLeftOffset == 1 then
     HR.CastLeftCommon(Object)
   end
+  HR.LeftIconFrame:OverlayText("", 10)
   return false
 end
 
