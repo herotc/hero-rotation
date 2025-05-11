@@ -135,7 +135,7 @@ local function Precombat()
   if I.TreacherousTransmitter:IsEquippedAndReady() then
     if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter precombat 2"; end
   end
-  -- use_item,name=ingenious_mana_battery
+  -- use_item,name=ingenious_mana_battery,target=self
   if I.IngeniousManaBattery:IsEquippedAndReady() then
     if Cast(I.IngeniousManaBattery, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "ingenious_mana_battery precombat 4"; end
   end

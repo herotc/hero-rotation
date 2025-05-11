@@ -156,8 +156,7 @@ local function Precombat()
   -- variable,name=nonsteroid_trinket_equipped,op=set,value=equipped.blastmaster3000|equipped.ratfang_toxin|equipped.ingenious_mana_battery|equipped.geargrinders_spare_keys|equipped.ringing_ritual_mud|equipped.goo_blin_grenade|equipped.noggenfogger_ultimate_deluxe|equipped.garbagemancers_last_resort|equipped.mad_queens_mandate|equipped.fearbreakers_echo|equipped.mereldars_toll|equipped.gooblin_grenade
   -- Note: Moved to SetTrinketVariables().
   -- snapshot_stats
-  -- variable,name=treacherous_transmitter_precombat_cast,value=11
-  -- use_item,name=ingenious_mana_battery
+  -- use_item,name=ingenious_mana_battery,target=self
   if I.IngeniousManaBattery:IsEquippedAndReady() then
     if Cast(I.IngeniousManaBattery, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "ingenious_mana_battery precombat 2"; end
   end
