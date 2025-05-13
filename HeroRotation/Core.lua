@@ -266,27 +266,22 @@ end
 
 -- Left (+ Nameplate) Cast
 HR.CastLeftOffset = 1
-function HR.CastLeftCommon(Object)
+function HR.CastLeftCommon(Object, Text)
   local Texture = HR.GetTexture(Object)
+  local Text = Text or ""
   local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.Action.TextureHotKey(Texture)
+  local FontScale = (FontSize or 12) * HeroRotationDB.GUISettings["Scaling.ScaleUI"]
   FlashIcon(Object)
   HR.LeftIconFrame:ChangeIcon(Texture, Keybind, Object:ID())
+  HR.LeftIconFrame:OverlayText(Text, FontScale)
   HR.CastLeftOffset = HR.CastLeftOffset + 1
   Object.LastDisplayTime = GetTime()
 end
 
-function HR.CastLeft(Object)
+function HR.CastLeft(Object, Text)
   if HR.CastLeftOffset == 1 then
-    HR.CastLeftCommon(Object)
+    HR.CastLeftCommon(Object, Text)
   end
-  HR.LeftIconFrame:OverlayText("", 10)
-  return false
-end
-
-function HR.CastLeftAnnotated(Object, Text)
-  local Result = HR.CastLeft(Object)
-  local FontScale = (FontSize or 12) * HeroRotationDB.GUISettings["Scaling.ScaleUI"]
-  HR.LeftIconFrame:OverlayText(Text, FontScale)
   return false
 end
 
