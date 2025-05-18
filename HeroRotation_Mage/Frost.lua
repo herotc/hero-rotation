@@ -661,7 +661,7 @@ local function APL()
     -- counterspell
     local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.CommonsDS.DisplayStyle.Interrupts, false); if ShouldReturn then return ShouldReturn; end
     -- Force Flurry in opener
-    if S.Flurry:IsCastable() and (HL.CombatTime() < 5 and (Player:IsCasting(Bolt) or Player:PrevGCDP(1, Bolt))) then
+    if S.Flurry:IsCastable() and S.Flurry:TimeSinceLastCast() > 5 and HL.CombatTime() < 5 then
       if Cast(S.Flurry, Settings.Frost.GCDasOffGCD.Flurry, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry opener"; end
     end
     -- call_action_list,name=cds
