@@ -705,7 +705,7 @@ local function Variables()
   -- variable,name=cc_capped,value=buff.clearcasting.stack=(1+talent.moment_of_clarity)
   VarCCCapped = Player:BuffStack(S.Clearcasting) == (1 + num(S.MomentofClarity:IsAvailable()))
   -- variable,name=regrowth,op=reset
-  VarRegrowth = Settings.Feral.ShowHealSpells
+  VarRegrowth = Settings.Feral.ShowHealSpells and Player:HealthPercentage() <= Settings.Feral.HealThreshold
   -- variable,name=easy_swipe,op=reset
   VarEasySwipe = Settings.Feral.UseEasySwipe
 end
