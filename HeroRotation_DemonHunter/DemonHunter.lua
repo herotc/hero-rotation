@@ -51,6 +51,7 @@ Spell.DemonHunter.Commons = {
   -- Utility
   Disrupt                               = Spell(183752),
   -- Buffs
+  InnerResilienceBuff                   = Spell(450706),  -- Tome of Light's Devotion buff
   JunkmaestrosBuff                      = Spell(1219661), -- Junkmaestro's Mega Magnet buff
   -- Debuffs
   SigilofFlameDebuff                    = Spell(204598),
@@ -221,6 +222,7 @@ Item.DemonHunter.Commons = {
   MisterLockNStalk                      = Item(230193, {13, 14}),
   RavenousHoneyBuzzer                   = Item(219298, {13, 14}),
   SignetofthePriory                     = Item(219308, {13, 14}),
+  TomeofLightsDevotion                  = Item(219309, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
   -- TWW S2 Old Trinkets
   GrimCodex                             = Item(178811, {13, 14}),
