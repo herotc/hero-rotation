@@ -257,6 +257,7 @@ if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Commons = {
   -- TWW Trinkets
   FunhouseLens                          = Item(234217, {13, 14}),
+  ImprovisedSeaforiumPacemaker          = Item(232541, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
 }
 
