@@ -167,6 +167,7 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   Hyperthermia                          = Spell(383860),
   ImprovedScorch                        = Spell(383604),
   Kindling                              = Spell(155148),
+  MarkoftheFirelord                     = Spell(450325),
   Meteor                                = Spell(153561),
   PhoenixFlames                         = Spell(257541),
   PhoenixReborn                         = Spell(453123),
@@ -262,16 +263,16 @@ Item.Mage.Commons = {
   FunhouseLens                          = Item(234217, {13, 14}),
   FlarendosPilotLight                   = Item(230191, {13, 14}),
   -- TWW S2 Prior Expansion Items
-  NeuralSynapseEnhancer                 = Item(168973, {16}),
-  SoullettingRuby                       = Item(178809, {13, 14}),
   Blastmaster3000                       = Item(234717, {13, 14}),
-  RatfangToxin                          = Item(235359, {13, 14}),
-  IngeniousManaBattery                  = Item(169344, {13, 14}),
-  GeargrindersSpareKeys                 = Item(230197, {13, 14}),
-  RingingRitualMud                      = Item(232543, {13, 14}),
-  GooBlinGrenade                        = Item(200142, {13, 14}),
-  NoggenfoggerUltimateDeluxe            = Item(232486, {13, 14}),
   GarbagemancersLastResort              = Item(235984, {13, 14}),
+  GeargrindersSpareKeys                 = Item(230197, {13, 14}),
+  GooBlinGrenade                        = Item(200142, {13, 14}),
+  IngeniousManaBattery                  = Item(169344, {13, 14}),
+  NeuralSynapseEnhancer                 = Item(168973, {16}),
+  NoggenfoggerUltimateDeluxe            = Item(232486, {13, 14}),
+  RatfangToxin                          = Item(235359, {13, 14}),
+  RingingRitualMud                      = Item(232543, {13, 14}),
+  SoullettingRuby                       = Item(178809, {13, 14}),
 }
 
 Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
@@ -280,7 +281,6 @@ Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
   FearbreakersEcho                      = Item(224449, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
   MereldarsToll                         = Item(219313, {13, 14}),
-  SignetOfThePriory                     = Item(219308, {13, 14}),
 })
 
 Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
@@ -296,9 +296,6 @@ Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
 Item.Mage.Frost = MergeTableByKey(Item.Mage.Commons, {
   -- TWW Trinkets
   BurstofKnowledge                      = Item(231424, {13, 14}),
-  RatfangToxin                          = Item(235359, {13, 14}),
-  -- TWW S2 Prior Expansion Trinkets
-  IngeniousManaBattery                  = Item(169344, {13, 14}),
 })
 
 --[[ Variables

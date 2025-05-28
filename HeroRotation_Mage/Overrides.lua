@@ -192,6 +192,8 @@ HL.AddCoreOverride("Spell.IsReady",
 
     if self == SpellFire.FireBlast then
       return BaseCheck and self:Charges() >= 1
+    elseif self == SpellFire.Pyroblast or self == SpellFire.Flamestrike then
+      return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
     end
