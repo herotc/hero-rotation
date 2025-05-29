@@ -259,14 +259,6 @@ local function Precombat()
       if Cast(S.Pyroblast, nil, nil, not Target:IsSpellInRange(S.Pyroblast)) then return "pyroblast precombat 14"; end
     end
   end
-  -- From CDs(): phoenix_flames,if=time=0&!talent.firestarter
-  if CDsON() and S.PhoenixFlames:IsCastable() and (not S.Firestarter:IsAvailable()) then
-    if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames precombat 16"; end
-  end
-  --[[ Manually added: fireball
-  if Bolt:IsReady() then
-    if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "fireball precombat 12"; end
-  end]]
 end
 
 local function CDs()
@@ -632,8 +624,12 @@ local function APL()
     end
     -- counterspell
     local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.CommonsDS.DisplayStyle.Interrupts, false); if ShouldReturn then return ShouldReturn; end
-    -- phoenix_flames,if=time=0
-    -- Note: Moved to Precombat.
+    -- From CDs(): phoenix_flames,if=time=0&!talent.firestarter
+    if HL.CombatTime() < 2 and (Player:IsCasting(S.Pyroblast) or Player:PrevGCDP(1, S.Pyroblast)) and CDsON() then
+      if S.PhoenixFlames:IsCastable() and (not S.Firestarter:IsAvailable()) then
+        if Cast(S.PhoenixFlames, nil, nil, not Target:IsSpellInRange(S.PhoenixFlames)) then return "phoenix_flames precombat 16"; end
+      end
+    end
     -- Manually added: Scorch sniping
     if Settings.Fire.UseScorchSniping and AoEON() and Target:HealthPercentage() > 30 then
       for _, CycleUnit in pairs(Enemies16ySplash) do
