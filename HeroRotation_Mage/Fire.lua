@@ -68,7 +68,7 @@ local Settings = {
 local VarKindlingReduction = (S.Kindling:IsAvailable()) and 0.4 or 1
 local VarSKBMaxStack = 10
 local VarImprovedScorchMaxStack = 2
-local VarCastRemainsTime = 0.3
+local VarCastRemainsTime = 1
 local VarPoolingTime = 10 + 10 * num(S.FrostfireBolt:IsAvailable())
 local VarFFCombustionFlamestrike = 999
 local VarFFFillerFlamestrike = 999
@@ -115,7 +115,7 @@ SetTrinketVariables()
 
 --- ===== Precombat Variables =====
 local function SetPrecombatVariables()
-  VarCastRemainsTime = 0.3
+  VarCastRemainsTime = 1
   VarPoolingTime = 10 + 10 * num(S.FrostfireBolt:IsAvailable())
   VarFFCombustionFlamestrike = 999
   VarFFFillerFlamestrike = 999
@@ -412,9 +412,10 @@ local function FFFiller()
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=cooldown_react&buff.heating_up.react&action.fireball.executing&action.fireball.execute_remains<0.5&(cooldown.combustion.remains>variable.pooling_time|talent.sun_kings_blessing)
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=cooldown_react&!buff.heating_up.react&!buff.hot_streak.react&action.scorch.executing&action.scorch.execute_remains<0.5&(cooldown.combustion.remains>variable.pooling_time|talent.sun_kings_blessing)
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=cooldown_react&charges=3
+  -- Note: Using VarCastRemainsTime instead of 0.5 here. We've set it to 1 to allow for better human reaction time.
   if S.FireBlast:IsReady() and not FreeCastAvailable() and (
-    (HeatingUp and Player:IsCasting(Bolt) and Bolt:ExecuteRemains() < 0.5 and (S.Combustion:CooldownRemains() > VarPoolingTime or S.SunKingsBlessing:IsAvailable())) or
-    (not HeatingUp and not HotStreak and Player:IsCasting(S.Scorch) and S.Scorch:ExecuteRemains() < 0.5 and (S.Combustion:CooldownRemains() > VarPoolingTime or S.SunKingsBlessing:IsAvailable())) or
+    (HeatingUp and Player:IsCasting(Bolt) and Bolt:ExecuteRemains() < VarCastRemainsTime and (S.Combustion:CooldownRemains() > VarPoolingTime or S.SunKingsBlessing:IsAvailable())) or
+    (not HeatingUp and not HotStreak and Player:IsCasting(S.Scorch) and S.Scorch:ExecuteRemains() < VarCastRemainsTime and (S.Combustion:CooldownRemains() > VarPoolingTime or S.SunKingsBlessing:IsAvailable())) or
     (S.FireBlast:Charges() == 3)
   ) then
     if FBCast(S.FireBlast) then return "fire_blast ff_filler 4"; end
@@ -518,10 +519,11 @@ local function SFFiller()
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=cooldown_react&!buff.heating_up.react&!buff.hot_streak.react&action.scorch.executing&action.scorch.execute_remains<0.5&cooldown.combustion.remains>variable.pooling_time
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=cooldown_react&charges=3&cooldown.combustion.remains>variable.pooling_time*0.3
   -- fire_blast,use_off_gcd=1,if=active_enemies>=2&cooldown_react&buff.glorious_incandescence.react&!buff.heating_up.react&!buff.hot_streak.react&cooldown.combustion.remains>variable.pooling_time
+  -- Note: Using VarCastRemainsTime instead of 0.5 here. We've set it to 1 to allow for better human reaction time.
   if S.FireBlast:IsReady() and (
     (HeatingUp and Player:BuffUp(S.HyperthermiaBuff) and S.Combustion:CooldownRemains() > VarPoolingTime) or
-    (HeatingUp and Player:IsCasting(Bolt) and Bolt:ExecuteRemains() < 0.5 and S.Combustion:CooldownRemains() > VarPoolingTime) or
-    (not HeatingUp and not HotStreak and Player:IsCasting(S.Scorch) and S.Scorch:ExecuteRemains() < 0.5 and S.Combustion:CooldownRemains() > VarPoolingTime) or
+    (HeatingUp and Player:IsCasting(Bolt) and Bolt:ExecuteRemains() < VarCastRemainsTime and S.Combustion:CooldownRemains() > VarPoolingTime) or
+    (not HeatingUp and not HotStreak and Player:IsCasting(S.Scorch) and S.Scorch:ExecuteRemains() < VarCastRemainsTime and S.Combustion:CooldownRemains() > VarPoolingTime) or
     (S.FireBlast:Charges() == 3 and S.Combustion:CooldownRemains() > VarPoolingTime * 0.3) or
     (EnemiesCount8ySplash >= 2 and Player:BuffUp(S.GloriousIncandescenceBuff) and not HeatingUp and not HotStreak and S.Combustion:CooldownRemains() > VarPoolingTime)
   ) then
