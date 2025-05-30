@@ -212,6 +212,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   LegacyoftheWindrunners                = Spell(406425),
   LoneWolf                              = Spell(155228),
   MultiShot                             = Spell(257620),
+  NoScope                               = Spell(473385),
   OhnahranWinds                         = Spell(1215021),
   PreciseShots                          = Spell(260240),
   PrecisionDetonation                   = Spell(471369),
@@ -232,6 +233,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   UnbreakableBond                       = Spell(1223323),
   Volley                                = Spell(260243),
   VolleyDmg                             = Spell(260247),
+  WindrunnerQuiver                      = Spell(473523),
   WindrunnersGuidance                   = Spell(378905),
   -- Buffs
   BombardmentBuff                       = Spell(386875),

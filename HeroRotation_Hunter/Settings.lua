@@ -70,6 +70,7 @@ HR.GUISettings.APL.Hunter = {
     },
   },
   Marksmanship = {
+    MaxPrioDamage = true,
     PotionType = {
       Selected = "Tempered",
     },
@@ -127,6 +128,7 @@ CreateARPanelOptions(CP_HunterOGCD, "APL.Hunter.CommonsOGCD")
 CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery")
 
 -- Marksmanship
+CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.MaxPrioDamage", "Prioritize Current Target", "Enable this setting to prioritize the current target when choosing a target for some abilities.")
 CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship")
 
 -- Survival

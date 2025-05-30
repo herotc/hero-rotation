@@ -124,6 +124,39 @@ HL:RegisterForEvent(function()
   FightRemains = 11111
 end, "PLAYER_REGEN_ENABLED")
 
+--- ===== CastTargetIf Filter Functions =====
+local function EvaluateTargetIfFilterBlackArrow(TargetUnit)
+  -- target_if=min:dot.black_arrow_dot.ticking|max_prio_damage
+  return TargetUnit:DebuffRemains(S.BlackArrowDebuff)
+end
+
+--- ===== CastTargetIf Condition Functions =====
+local function EvaluateTargetIfBlackArrowST(TargetUnit)
+  -- if=talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|!talent.headshot&buff.razor_fragments.up
+  return S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) and (TargetUnit:DebuffDown(S.SpottersMarkDebuff) or Player:BuffDown(S.MovingTargetBuff)) or not S.Headshot:IsAvailable() and Player:BuffUp(S.RazorFragmentsBuff)
+end
+
+local function EvaluateCycleKillShotST(TargetUnit)
+  -- target_if=max:debuff.spotters_mark.down|action.aimed_shot.in_flight_to_target|max_prio_damage,if=talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|!talent.headshot&buff.razor_fragments.up
+  return (TargetUnit:DebuffDown(S.SpottersMarkDebuff) or S.AimedShot:InFlight()) and (S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) and (Target:DebuffDown(S.SpottersMarkDebuff) or Player:BuffDown(S.MovingTargetBuff)) or not S.Headshot:IsAvailable() and Player:BuffUp(S.RazorFragmentsBuff))
+end
+
+--- ===== CastCycle Functions =====
+local function EvaluateCycleAimedShotST(TargetUnit)
+  -- target_if=max:debuff.spotters_mark.up,if=(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)&full_recharge_time<action.rapid_fire.execute_time+cast_time&(!talent.bulletstorm|buff.bulletstorm.up)&talent.windrunner_quiver
+  return TargetUnit:DebuffUp(S.SpottersMarkDebuff) and ((Player:BuffDown(S.PreciseShotsBuff) or TargetUnit:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) and S.AimedShot:FullRechargeTime() < S.RapidFire:ExecuteTime() + S.AimedShot:CastTime() and (not S.Bulletstorm:IsAvailable() or Player:BuffUp(S.BulletstormBuff)) and S.WindrunnerQuiver:IsAvailable())
+end
+
+local function EvaluateCycleAimedShotST2(TargetUnit)
+  -- target_if=max:debuff.spotters_mark.up|max_prio_damage,if=buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up
+  return TargetUnit:DebuffUp(S.SpottersMarkDebuff) and (Player:BuffDown(S.PreciseShotsBuff) or TargetUnit:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff))
+end
+
+local function EvaluateCycleArcaneShotST(TargetUnit)
+  -- target_if=max:debuff.spotters_mark.down|action.aimed_shot.in_flight_to_target|max_prio_damage,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)
+  return (TargetUnit:DebuffDown(S.SpottersMarkDebuff) or S.AimedShot:InFlight()) and (Player:BuffUp(S.PreciseShotsBuff) and (TargetUnit:DebuffDown(S.SpottersMarkDebuff) or Player:BuffDown(S.MovingTargetBuff)))
+end
+
 --- ===== Rotation Functions =====
 local function Precombat()
   -- snapshot_stats
@@ -177,65 +210,85 @@ local function CDs()
 end
 
 local function ST()
-  -- volley,if=!talent.double_tap
-  if S.Volley:IsReady() and (not S.DoubleTap:IsAvailable()) then
+  -- volley,if=!talent.double_tap&(talent.aspect_of_the_hydra|active_enemies=1|buff.precise_shots.down&(cooldown.rapid_fire.remains+action.rapid_fire.execute_time<6|!talent.bulletstorm))&(!raid_event.adds.exists|raid_event.adds.in>cooldown|active_enemies>1)
+  if S.Volley:IsReady() and (not S.DoubleTap:IsAvailable() and (S.AspectoftheHydra:IsAvailable() or EnemiesCount10ySplash == 1 or Player:BuffDown(S.PreciseShotsBuff) and (S.RapidFire:CooldownRemains() + S.RapidFire:ExecuteTime() < 6 or not S.Bulletstorm:IsAvailable()))) then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley st 2"; end
   end
-  -- rapid_fire,if=hero_tree.sentinel&buff.lunar_storm_ready.up
-  if S.RapidFire:IsCastable() and (Player:HeroTreeID() == 42 and Player:BuffUp(S.LunarStormReadyBuff)) then
+  -- rapid_fire,if=hero_tree.sentinel&buff.lunar_storm_cooldown.down|!talent.aspect_of_the_hydra&talent.bulletstorm&active_enemies>1&buff.trick_shots.up&(buff.precise_shots.down|!talent.no_scope)
+  if S.RapidFire:IsCastable() and (Player:HeroTreeID() == 42 and Player:BuffUp(S.LunarStormReadyBuff) or not S.AspectoftheHydra:IsAvailable() and S.Bulletstorm:IsAvailable() and EnemiesCount10ySplash > 1 and Player:BuffUp(S.TrickShotsBuff) and (Player:BuffDown(S.PreciseShotsBuff) or not S.NoScope:IsAvailable())) then
     if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire st 4"; end
   end
   -- trueshot,if=variable.trueshot_ready
   if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot st 6"; end
   end
-  -- explosive_shot,if=(talent.precision_detonation&set_bonus.thewarwithin_season_2_4pc&buff.precise_shots.down&buff.lock_and_load.up)|(!talent.precision_detonation&active_enemies>1)
-  if S.ExplosiveShot:IsReady() and ((S.PrecisionDetonation:IsAvailable() and Player:HasTier("TWW2", 4) and Player:BuffDown(S.PreciseShotsBuff) and Player:BuffUp(S.LockandLoadBuff)) or (not S.PrecisionDetonation:IsAvailable() and EnemiesCount10ySplash > 1)) then
+  -- explosive_shot,if=talent.precision_detonation&set_bonus.thewarwithin_season_2_4pc&(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)&buff.lock_and_load.up
+  if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and Player:HasTier("TWW2", 4) and (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) and Player:BuffUp(S.LockandLoadBuff)) then
     if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot st 8"; end
   end
-  -- aimed_shot,if=talent.precision_detonation&set_bonus.thewarwithin_season_2_4pc&buff.precise_shots.down&buff.lock_and_load.up
-  if S.AimedShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and Player:HasTier("TWW2", 4) and Player:BuffDown(S.PreciseShotsBuff) and Player:BuffUp(S.LockandLoadBuff)) then
+  -- aimed_shot,if=talent.precision_detonation&set_bonus.thewarwithin_season_2_4pc&(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)&buff.lock_and_load.up
+  if S.AimedShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and Player:HasTier("TWW2", 4) and (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) and Player:BuffUp(S.LockandLoadBuff)) then
     if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot st 10"; end
   end
   -- volley,if=talent.double_tap&buff.double_tap.down
   if S.Volley:IsReady() and (S.DoubleTap:IsAvailable() and Player:BuffDown(S.DoubleTapBuff)) then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley st 12"; end
   end
-  -- black_arrow,if=talent.headshot&buff.precise_shots.up|!talent.headshot&buff.razor_fragments.up
-  if S.BlackArrow:IsReady() and (S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) or not S.Headshot:IsAvailable() and Player:BuffUp(S.RazorFragmentsBuff)) then
+  -- black_arrow,target_if=min:dot.black_arrow_dot.ticking|max_prio_damage,if=talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|!talent.headshot&buff.razor_fragments.up
+  if S.BlackArrow:IsReady() and Settings.Marksmanship.MaxPrioDamage and (S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) and (Target:DebuffDown(S.SpottersMarkDebuff) or Player:BuffDown(S.MovingTargetBuff)) or not S.Headshot:IsAvailable() and Player:BuffUp(S.RazorFragmentsBuff)) then
     if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow st 14"; end
   end
-  -- kill_shot,if=talent.headshot&buff.precise_shots.up|!talent.headshot&buff.razor_fragments.up
-  if S.KillShot:IsReady() and (S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) or not S.Headshot:IsAvailable() and Player:BuffUp(S.RazorFragmentsBuff)) then
-    if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot st 16"; end
+  if S.BlackArrow:IsReady() and not Settings.Marksmanship.MaxPrioDamage then
+    if Everyone.CastTargetIf(S.BlackArrow, Enemies10ySplash, "min", EvaluateTargetIfFilterBlackArrow, EvaluateTargetIfBlackArrowST, not TargetInRange40y) then return "black_arrow st 16"; end
   end
-  -- multishot,if=active_enemies>1&!talent.aspect_of_the_hydra&(talent.symphonic_arsenal|talent.small_game_hunter)&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)
-  if S.MultiShot:IsReady() and (EnemiesCount10ySplash > 1 and not S.AspectoftheHydra:IsAvailable() and (S.SymphonicArsenal:IsAvailable() or S.SmallGameHunter:IsAvailable()) and Player:BuffUp(S.PreciseShotsBuff) and (Target:DebuffDown(S.SpottersMarkDebuff) or Player:BuffDown(S.MovingTargetBuff))) then
-    if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot st 18"; end
+  -- kill_shot,target_if=max:debuff.spotters_mark.down|action.aimed_shot.in_flight_to_target|max_prio_damage,if=talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|!talent.headshot&buff.razor_fragments.up
+  if S.KillShot:IsReady() and Settings.Marksmanship.MaxPrioDamage and (S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) and (Target:DebuffDown(S.SpottersMarkDebuff) or Player:BuffDown(S.MovingTargetBuff)) or not S.Headshot:IsAvailable() and Player:BuffUp(S.RazorFragmentsBuff)) then
+    if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot st 18"; end
   end
-  -- arcane_shot,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)
-  if S.ArcaneShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) and (Target:DebuffDown(S.SpottersMarkDebuff) or Player:BuffDown(S.MovingTargetBuff))) then
-    if Cast(S.ArcaneShot, nil, nil, not TargetInRange40y) then return "arcane_shot st 20"; end
+  if S.KillShot:IsReady() and not Settings.Marksmanship.MaxPrioDamage then
+    if Everyone.CastCycle(S.KillShot, Enemies10ySplash, EvaluateCycleKillShotST, not TargetInRange40y) then return "kill_shot st 20"; end
   end
-  -- rapid_fire,if=!hero_tree.sentinel|buff.lunar_storm_cooldown.remains>cooldown%3
-  if S.RapidFire:IsCastable() and (Player:HeroTreeID() ~= 42 or Player:BuffRemains(S.LunarStormCDBuff) > 20 / 3) then
-    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire st 22"; end
+  -- multishot,target_if=max:debuff.spotters_mark.down|action.aimed_shot.in_flight_to_target|max_prio_damage,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)&active_enemies>1&!talent.aspect_of_the_hydra&(talent.symphonic_arsenal|talent.small_game_hunter)
+  -- Note: Skipping target_if, since MultiShot should hit all targets in Enemies10ySplash anyway.
+  if S.MultiShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) and (Target:DebuffDown(S.SpottersMarkDebuff) or Player:BuffDown(S.MovingTargetBuff)) and EnemiesCount10ySplash > 1 and not S.AspectoftheHydra:IsAvailable() and (S.SymphonicArsenal:IsAvailable() or S.SmallGameHunter:IsAvailable())) then
+    if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot st 22"; end
   end
-  -- aimed_shot,if=buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up
-  if S.AimedShot:IsReady() and (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) then
-    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot st 24"; end
+  -- arcane_shot,target_if=max:debuff.spotters_mark.down|action.aimed_shot.in_flight_to_target|max_prio_damage,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)
+  if S.ArcaneShot:IsReady() and Settings.Marksmanship.MaxPrioDamage and (Player:BuffUp(S.PreciseShotsBuff) and (Target:DebuffDown(S.SpottersMarkDebuff) or Player:BuffDown(S.MovingTargetBuff))) then
+    if Cast(S.ArcaneShot, nil, nil, not TargetInRange40y) then return "arcane_shot st 24"; end
   end
-  -- explosive_shot,if=!set_bonus.thewarwithin_season_2_4pc
-  if S.ExplosiveShot:IsReady() and (not Player:HasTier("TWW2", 4)) then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot st 26"; end
+  if S.ArcaneShot:IsReady() and not Settings.Marksmanship.MaxPrioDamage then
+    if Everyone.CastCycle(S.ArcaneShot, Enemies10ySplash, EvaluateCycleArcaneShotST, not TargetInRange40y) then return "arcane_shot st 26"; end
+  end
+  -- aimed_shot,target_if=max:debuff.spotters_mark.up,if=(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)&full_recharge_time<action.rapid_fire.execute_time+cast_time&(!talent.bulletstorm|buff.bulletstorm.up)&talent.windrunner_quiver
+  if S.AimedShot:IsReady() and Settings.Marksmanship.MaxPrioDamage and ((Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) and S.AimedShot:FullRechargeTime() < S.RapidFire:ExecuteTime() + S.AimedShot:CastTime() and (not S.Bulletstorm:IsAvailable() or Player:BuffUp(S.BulletstormBuff)) and S.WindrunnerQuiver:IsAvailable()) then
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot st 28"; end
+  end
+  if S.AimedShot:IsReady() and not Settings.Marksmanship.MaxPrioDamage then
+    if Everyone.CastCycle(S.AimedShot, Enemies10ySplash, EvaluateCycleAimedShotST, not TargetInRange40y) then return "aimed_shot st 30"; end
+  end
+  -- rapid_fire,if=(!hero_tree.sentinel|buff.lunar_storm_cooldown.remains>cooldown%3)&(!talent.bulletstorm|buff.bulletstorm.stack<=10|talent.aspect_of_the_hydra&active_enemies>1)
+  if S.RapidFire:IsCastable() and ((Player:HeroTreeID() ~= 42 or Player:BuffRemains(S.LunarStormCDBuff) > 20 / 3) and (not S.Bulletstorm:IsAvailable() or Player:BuffStack(S.BulletstormBuff) <= 10 or S.AspectoftheHydra:IsAvailable() and EnemiesCount10ySplash > 1)) then
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire st 32"; end
+  end
+  -- aimed_shot,target_if=max:debuff.spotters_mark.up|max_prio_damage,if=buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up
+  if S.AimedShot:IsReady() and Settings.Marksmanship.MaxPrioDamage and (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) then
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot st 34"; end
+  end
+  if S.AimedShot:IsReady() and not Settings.Marksmanship.MaxPrioDamage then
+    if Everyone.CastCycle(S.AimedShot, Enemies10ySplash, EvaluateCycleAimedShotST2, not TargetInRange40y) then return "aimed_shot st 36"; end
+  end
+  -- explosive_shot,if=!set_bonus.thewarwithin_season_2_4pc|!talent.precision_detonation
+  if S.ExplosiveShot:IsReady() and (not Player:HasTier("TWW2", 4) or not S.PrecisionDetonation:IsAvailable()) then
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot st 38"; end
   end
   -- black_arrow,if=!talent.headshot
   if S.BlackArrow:IsReady() and (not S.Headshot:IsAvailable()) then
-    if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow st 28"; end
+    if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow st 40"; end
   end
   -- steady_shot
   if S.SteadyShot:IsCastable() then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 30"; end
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot st 42"; end
   end
 end
 
@@ -248,7 +301,8 @@ local function Trickshots()
   if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot trickshots 4"; end
   end
-  -- multishot,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|buff.trick_shots.down
+  -- multishot,target_if=max:debuff.spotters_mark.down|action.aimed_shot.in_flight_to_target,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|buff.trick_shots.down
+  -- Note: Skipping target_if, since MultiShot should hit all targets in Enemies10ySplash anyway.
   if S.MultiShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) and (Target:DebuffDown(S.SpottersMarkDebuff) or Player:BuffDown(S.MovingTargetBuff)) or Player:BuffDown(S.TrickShotsBuff)) then
     if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot trickshots 6"; end
   end
@@ -256,15 +310,15 @@ local function Trickshots()
   if S.Volley:IsReady() and (S.DoubleTap:IsAvailable() and Player:BuffDown(S.DoubleTapBuff)) then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley trickshots 8"; end
   end
-  -- black_arrow,if=buff.withering_fire.up&buff.trick_shots.up
-  if S.BlackArrow:IsReady() and (Player:BuffUp(S.WitheringFireBuff) and Player:BuffUp(S.TrickShotsBuff)) then
+  -- black_arrow,if=buff.trick_shots.up
+  if S.BlackArrow:IsReady() and (Player:BuffUp(S.TrickShotsBuff)) then
     if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow trickshots 10"; end
   end
   -- aimed_shot,if=(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)&buff.trick_shots.up&buff.bulletstorm.up&full_recharge_time<gcd
   if S.AimedShot:IsReady() and ((Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) and Player:BuffUp(S.TrickShotsBuff) and Player:BuffUp(S.BulletstormBuff) and S.AimedShot:FullRechargeTime() < Player:GCD()) then
     if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot trickshots 12"; end
   end
-  -- rapid_fire,if=buff.trick_shots.remains>execute_time&(!hero_tree.sentinel|buff.lunar_storm_cooldown.remains>cooldown%3|buff.lunar_storm_ready.up)
+  -- rapid_fire,if=buff.trick_shots.remains>execute_time&(!hero_tree.sentinel|buff.lunar_storm_cooldown.remains>cooldown%3|buff.lunar_storm_cooldown.down)
   if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) > S.RapidFire:ExecuteTime() and (Player:HeroTreeID() ~= 42 or Player:BuffRemains(S.LunarStormCDBuff) > 20 / 3 or Player:BuffUp(S.LunarStormReadyBuff))) then
     if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire trickshots 14"; end
   end
@@ -280,17 +334,13 @@ local function Trickshots()
   if S.ExplosiveShot:IsReady() then
     if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot trickshots 20"; end
   end
-  -- black_arrow
-  if S.BlackArrow:IsReady() then
-    if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow trickshots 22"; end
-  end
   -- steady_shot,if=focus+cast_regen<focus.max
   if S.SteadyShot:IsCastable() and (Player:Focus() + Player:FocusCastRegen(S.SteadyShot:CastTime()) < Player:FocusMax()) then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot trickshots 24"; end
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot trickshots 22"; end
   end
   -- multishot
   if S.MultiShot:IsReady() then
-    if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot trickshots 26"; end
+    if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot trickshots 24"; end
   end
 end
 
@@ -360,7 +410,7 @@ local function APL()
     end
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(S.CounterShot, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
-    -- variable,name=trueshot_ready,value=cooldown.trueshot.ready&(!raid_event.adds.exists&(!talent.bullseye|fight_remains>cooldown.trueshot.duration_guess+buff.trueshot.duration%2|buff.bullseye.stack=buff.bullseye.max_stack)&(!trinket.1.has_use_buff|trinket.1.cooldown.remains>5|trinket.1.cooldown.ready|trinket.2.has_use_buff&trinket.2.cooldown.ready)&(!trinket.2.has_use_buff|trinket.2.cooldown.remains>5|trinket.2.cooldown.ready|trinket.1.has_use_buff&trinket.1.cooldown.ready)|raid_event.adds.exists&(!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<25|raid_event.adds.in>60)|raid_event.adds.up&raid_event.adds.remains>10)|fight_remains<25)
+    -- variable,name=trueshot_ready,value=cooldown.trueshot.ready&((!raid_event.adds.exists|raid_event.adds.count=1)&(!talent.bullseye|fight_remains>cooldown.trueshot.duration_guess+buff.trueshot.duration%2|buff.bullseye.stack=buff.bullseye.max_stack)&(!trinket.1.has_use_buff|trinket.1.cooldown.remains>5|trinket.1.cooldown.ready|trinket.2.has_use_buff&trinket.2.cooldown.ready)&(!trinket.2.has_use_buff|trinket.2.cooldown.remains>5|trinket.2.cooldown.ready|trinket.1.has_use_buff&trinket.1.cooldown.ready)|raid_event.adds.exists&(!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<25|raid_event.adds.in>60)|raid_event.adds.up&raid_event.adds.remains>10)|fight_remains<25)
     -- Note: Can't handle the raid_event conditions.
     -- TODO: Simplify the above condition for HR.
     VarTrueshotReady = S.Trueshot:CooldownUp()
@@ -385,7 +435,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Marksmanship Hunter rotation has been updated for patch 11.1.0.")
+  HR.Print("Marksmanship Hunter rotation has been updated for patch 11.1.5.")
 end
 
 HR.SetAPL(254, APL, Init)
