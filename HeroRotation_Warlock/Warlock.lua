@@ -268,6 +268,8 @@ Item.Warlock.Demonology = MergeTableByKey(Item.Warlock.Commons, {
   MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
   -- TWW Trinkets
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
+  -- Older Items
+  NeuralSynapseEnhancer                 = Item(168973, {13, 14}),
 })
 
 Item.Warlock.Destruction = MergeTableByKey(Item.Warlock.Commons, {
