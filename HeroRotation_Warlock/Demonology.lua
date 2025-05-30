@@ -258,8 +258,11 @@ local function DreadstalkerActive()
 end
 
 -- Function to check for Greater Dreadstalkers (TWW Set Bonus Spawns)
+-- Note: Greater Dreadstalkers are force-spawned by Summon Demonic Tyrant, so force full duration if we're casting SDT.
 local function GreaterDreadstalkerTime()
-  return Warlock.GuardiansTable.GreaterDreadstalkerDuration or 0
+  local TableTime = Warlock.GuardiansTable.GreaterDreadstalkerDuration or 0
+  local GDTime = (Player:HasTier("TWW2", 2) and Player:IsCasting(S.SummonDemonicTyrant)) and 12 or TableTime
+  return GDTime
 end
 
 local function GreaterDreadstalkerActive()
