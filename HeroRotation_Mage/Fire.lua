@@ -314,8 +314,11 @@ local function CDs()
     end
   end
   -- use_item,name=hyperthread_wristwraps,if=hyperthread_wristwraps.fire_blast>=2&buff.combustion.remains&action.fire_blast.charges=0
-  if Settings.Commons.Enabled.Items and I.HyperthreadWristwraps:IsEquippedAndReady() and I.HyperthreadWristwraps:Charges() == 0 then
-    if Cast(I.HyperthreadWristwraps, nil, Settings.CommonsDS.DisplayStyle.Items) then return "hyperthread_wristwraps cds 22"; end
+  if Settings.Commons.Enabled.Items and I.HyperthreadWristwraps:IsEquippedAndReady() then
+    local HTWWCount = num(Player:PrevGCDP(1, S.FireBlast)) + num(Player:PrevGCDP(2, S.FireBlast)) + num(Player:PrevGCDP(3, S.FireBlast))
+    if HTWWCount >= 2 and CombustionUp and S.FireBlast:Charges() == 0 then
+      if Cast(I.HyperthreadWristwraps, nil, Settings.CommonsDS.DisplayStyle.Items) then return "hyperthread_wristwraps cds 22"; end
+    end
   end
   -- use_items
   if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
