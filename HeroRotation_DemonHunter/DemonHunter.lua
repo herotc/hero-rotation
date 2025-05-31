@@ -51,6 +51,7 @@ Spell.DemonHunter.Commons = {
   -- Utility
   Disrupt                               = Spell(183752),
   -- Buffs
+  ExplosiveAdrenalineBuff               = Spell(1218713), -- Improvised Seaforium Pacemaker buff
   InnerResilienceBuff                   = Spell(450706),  -- Tome of Light's Devotion buff
   JunkmaestrosBuff                      = Spell(1219661), -- Junkmaestro's Mega Magnet buff
   -- Debuffs
@@ -214,12 +215,14 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Vengeance, Spell
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Commons = {
   -- TWW Trinkets
+  Blastmaster3000                       = Item(234717, {13, 14}),
   GeargrindersSpareKeys                 = Item(230197, {13, 14}),
   HouseofCards                          = Item(230027, {13, 14}),
   ImprovisedSeaforiumPacemaker          = Item(232541, {13, 14}),
   JunkmaestrosMegaMagnet                = Item(230189, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
   MisterLockNStalk                      = Item(230193, {13, 14}),
+  RatfangToxin                          = Item(235359, {13, 14}),
   RavenousHoneyBuzzer                   = Item(219298, {13, 14}),
   SignetofthePriory                     = Item(219308, {13, 14}),
   TomeofLightsDevotion                  = Item(219309, {13, 14}),
