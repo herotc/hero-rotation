@@ -204,8 +204,8 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   EmpyreanLegacyBuff                    = Spell(387178),
   EmpyreanPowerBuff                     = Spell(326733),
   -- Tier Set Bonuses (TWW)
-  TWW_S2_2pcBuff                        = Spell(1216828), -- Winning Streak
-  TWW_S2_4pcBuff                        = Spell(1216837), -- All In
+  WinningStreakBuff                     = Spell(1216828), -- TWW S2 2pc Buff
+  AllInBuff                             = Spell(1216837), -- TWW S2 4pc Buff
   -- Debuffs
   ExecutionSentenceDebuff               = Spell(343527),
   ExpurgationDebuff                     = Spell(383346),
