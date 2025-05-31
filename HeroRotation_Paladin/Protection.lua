@@ -86,9 +86,6 @@ end
 
 --- ===== Rotation Functions =====
 local function Precombat()
-  -- flask
-  -- food
-  -- augmentation
   -- rite_of_sanctification
   if S.RiteofSanctification:IsCastable() then
     if Cast(S.RiteofSanctification) then return "rite_of_sanctification precombat 2"; end
@@ -292,11 +289,10 @@ local function Standard()
     if S.HammeroftheRighteous:IsCastable() then
       if Cast(S.HammeroftheRighteous, nil, nil, not Target:IsInMeleeRange(5)) then return "hammer_of_the_righteous standard 40"; end
     end
-    -- blessed_hammer,if=buff.blessed_assurance.up&spell_targets.shield_of_the_righteous<3&!buff.avenging_wrath.up
+    -- blessed_hammer,if=(buff.blessed_assurance.up&spell_targets.shield_of_the_righteous<3)|buff.shake_the_heavens.up
     if S.BlessedHammer:IsCastable() then
       if Cast(S.BlessedHammer, nil, nil, not Target:IsInMeleeRange(5)) then return "blessed_hammer standard 42"; end
     end
-    -- blessed_hammer,if=(buff.blessed_assurance.up&spell_targets.shield_of_the_righteous<3)|buff.shake_the_heavens.up
   end
   -- crusader_strike,if=(buff.blessed_assurance.up&spell_targets.shield_of_the_righteous<2)|buff.shake_the_heavens.up
   if S.CrusaderStrike:IsCastable() and ((Player:BuffUp(S.BlessedAssuranceBuff) and EnemiesCount8y < 2) or Player:BuffUp(S.ShaketheHeavensBuff)) then
@@ -457,7 +453,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Protection Paladin rotation has been updated for patch 11.1.0.")
+  HR.Print("Protection Paladin rotation has been updated for patch 11.1.5.")
 end
 
 HR.SetAPL(66, APL, Init)
