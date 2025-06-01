@@ -52,6 +52,8 @@ local OnUseExcludes = {
   I.QuickwickCandlestick:ID(),
   I.SignetOfThePriory:ID(),
   I.SoullettingRuby:ID(),
+  -- Older Items
+  I.HyperthreadWristwraps:ID(),
 }
 
 --- ===== GUI Settings =====
