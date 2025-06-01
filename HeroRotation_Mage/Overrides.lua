@@ -124,7 +124,7 @@ ArcanePlayerBuffDown = HL.AddCoreOverride("Player.BuffDown",
     if Spell == SpellArcane.ArcaneSurgeBuff then
       return BaseCheck and not Player:IsCasting(SpellArcane.ArcaneSurge)
     elseif Spell == SpellArcane.NetherPrecisionBuff then
-      if Player:BuffStack(Spell) == 1 and Player:IsCasting(SpellArcane.ArcaneBlast) then
+      if Player:BuffInfo(Spell) == 1 and Player:IsCasting(SpellArcane.ArcaneBlast) then
         return true
       else
         return BaseCheck
