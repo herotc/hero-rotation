@@ -173,6 +173,26 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 --------------------------
+--------- Fire -----------
+--------------------------
+
+-- Fire Black Tracker
+Mage.FBTracker = {
+  PrevOne = 0,
+  PrevTwo = 0,
+  PrevThree = 0
+}
+
+HL:RegisterForSelfCombatEvent(function(...)
+  local _, event, _, _, _, _, _, _, _, _, _, spellID = ...
+  
+  Mage.FBTracker.PrevThree = Mage.FBTracker.PrevTwo
+  Mage.FBTracker.PrevTwo = Mage.FBTracker.PrevOne
+  Mage.FBTracker.PrevOne = spellID
+
+end, "SPELL_CAST_SUCCESS")
+
+--------------------------
 -------- Frost -----------
 --------------------------
 

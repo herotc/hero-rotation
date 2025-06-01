@@ -317,7 +317,7 @@ local function CDs()
   end
   -- use_item,name=hyperthread_wristwraps,if=hyperthread_wristwraps.fire_blast>=2&buff.combustion.remains&action.fire_blast.charges=0
   if Settings.Commons.Enabled.Items and I.HyperthreadWristwraps:IsEquippedAndReady() then
-    local HTWWCount = num(Player:PrevGCDP(1, S.FireBlast)) + num(Player:PrevGCDP(2, S.FireBlast)) + num(Player:PrevGCDP(3, S.FireBlast))
+    local HTWWCount = num(Mage.FBTracker.PrevOne == S.FireBlast:ID()) + num(Mage.FBTracker.PrevTwo == S.FireBlast:ID()) + num(Mage.FBTracker.PrevThree == S.FireBlast:ID())
     if HTWWCount >= 2 and CombustionUp and S.FireBlast:Charges() == 0 then
       if Cast(I.HyperthreadWristwraps, nil, Settings.CommonsDS.DisplayStyle.Items) then return "hyperthread_wristwraps cds 22"; end
     end
