@@ -23,6 +23,7 @@ local Cast        = HR.Cast
 local num         = HR.Commons.Everyone.num
 local bool        = HR.Commons.Everyone.bool
 -- lua
+local mathceil    = math.ceil
 local mathmax     = math.max
 -- WoW API
 local Delay       = C_Timer.After
@@ -35,15 +36,17 @@ local I = Item.Druid.Balance
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- Trinkets
+  -- TWW Trinkets
   I.AberrantSpellforge:ID(),
   I.ImperfectAscendancySerum:ID(),
-  I.NeuralSynapseEnhancer:ID(),
-  I.SoullettingRuby:ID(),
   I.SpymastersWeb:ID(),
   I.TreacherousTransmitter:ID(),
-  -- Other Items
+  -- Older Trinkets
+  I.SoullettingRuby:ID(),
+  -- TWW Other Items
   I.BestinSlotsCaster:ID(),
+  -- Older Other Items
+  I.NeuralSynapseEnhancer:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -60,6 +63,7 @@ local Settings = {
 --- ===== Rotation Variables =====
 local VarPassiveAsp
 local VarCAEffectiveCD
+local VarPreCDCondition
 local VarCDCondition
 local VarNoCDTalent
 local VarEclipse, VarEclipseRemains
@@ -68,7 +72,8 @@ local VarConvokeCondition
 local CAIncBuffUp
 local CAIncBuffRemains
 local CAInc = S.IncarnationTalent:IsAvailable() and S.Incarnation or S.CelestialAlignment
-local CAIncCD = S.OrbitalStrike:IsAvailable() and 120 or (S.WhirlingStars:IsAvailable() and 80 or 180)
+local CAIncCD = S.OrbitalStrike:IsAvailable() and 120 or (S.WhirlingStars:IsAvailable() and 100 or 180)
+local CAIncDuration = S.IncarnationTalent:IsAvailable() and 20 or (S.CelestialAlignment:IsAvailable() and 15 or 0)
 local ConvokeCD = S.ElunesGuidance:IsAvailable() and 60 or 120
 local IsInSpellRange = false
 local Enemies10ySplash, EnemiesCount10ySplash
@@ -140,6 +145,7 @@ end, "PLAYER_REGEN_ENABLED")
 HL:RegisterForEvent(function()
   CAInc = S.IncarnationTalent:IsAvailable() and S.Incarnation or S.CelestialAlignment
   CAIncCD = S.OrbitalStrike:IsAvailable() and 120 or (S.WhirlingStars:IsAvailable() and 80 or 180)
+  CAIncDuration = S.IncarnationTalent:IsAvailable() and 20 or (S.CelestialAlignment:IsAvailable() and 15 or 0)
   ConvokeCD = S.ElunesGuidance:IsAvailable() and 60 or 120
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
@@ -210,12 +216,7 @@ local function EvaluateCycleMoonfireST2(TargetUnit)
   return TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and (not S.TreantsoftheMoon:IsAvailable() or S.ForceofNature:CooldownRemains() > 3 and Player:BuffDown(S.HarmonyoftheGroveBuff))
 end
 
-local function EvaluateCycleStellarFlareAoE(TargetUnit)
-  -- target_if=refreshable&(target.time_to_die-remains-target>7+spell_targets)
-  return TargetUnit:DebuffRefreshable(S.StellarFlareDebuff) and (TargetUnit:TimeToDie() - TargetUnit:DebuffRemains(S.StellarFlareDebuff) > 7 + EnemiesCount10ySplash)
-end
-
-local function EvaluateCycleStellarFlareST(TargetUnit)
+local function EvaluateCycleStellarFlare(TargetUnit)
   -- target_if=refreshable&(target.time_to_die-remains-target>7+spell_targets)
   return TargetUnit:DebuffRefreshable(S.StellarFlareDebuff) and (TargetUnit:TimeToDie() - TargetUnit:DebuffRemains(S.StellarFlareDebuff) > 7 + EnemiesCount10ySplash)
 end
@@ -245,12 +246,8 @@ local function Precombat()
   if S.MarkoftheWild:IsCastable() and Everyone.GroupBuffMissing(S.MarkoftheWildBuff) then
     if Cast(S.MarkoftheWild, Settings.CommonsOGCD.GCDasOffGCD.MarkOfTheWild) then return "mark_of_the_wild precombat"; end
   end
-  -- bear_form,if=talent.lycaras_meditation&talent.fluid_form
-  if S.BearForm:IsCastable() and (S.LycarasMeditation:IsAvailable() and S.FluidForm:IsAvailable()) then
-    if Cast(S.BearForm) then return "bear_form precombat 2"; end
-  end
-  -- moonkin_form,if=!talent.lycaras_meditation|!talent.fluid_form
-  if S.MoonkinForm:IsCastable() and (not S.LycarasMeditation:IsAvailable() or not S.FluidForm:IsAvailable()) then
+  -- moonkin_form
+  if S.MoonkinForm:IsCastable() then
     if Cast(S.MoonkinForm) then return "moonkin_form precombat"; end
   end
   -- wrath
@@ -263,11 +260,11 @@ local function Precombat()
   end
   -- starfire,if=!talent.stellar_flare
   if S.Starfire:IsCastable() and (not S.StellarFlare:IsAvailable()) then
-    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire precombat 8"; end
+    if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire precombat 6"; end
   end
   -- stellar_flare
   if S.StellarFlare:IsCastable() then
-    if Cast(S.StellarFlare, nil, nil, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare precombat 10"; end
+    if Cast(S.StellarFlare, nil, nil, not Target:IsSpellInRange(S.StellarFlare)) then return "stellar_flare precombat 8"; end
   end
 end
 
@@ -352,8 +349,8 @@ local function ST()
   if S.Starsurge:IsReady() and (VarCDCondition and Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.ForceofNature)) then
     if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 20"; end
   end
-  -- force_of_nature,if=cooldown.ca_inc.remains<gcd.max&(!talent.convoke_the_spirits|cooldown.convoke_the_spirits.remains<gcd.max*3|cooldown.convoke_the_spirits.remains>cooldown.ca_inc.full_recharge_time|fight_remains<cooldown.convoke_the_spirits.remains+3)|cooldown.ca_inc.full_recharge_time+5+15*talent.control_of_the_dream>cooldown&(!talent.convoke_the_spirits|cooldown.convoke_the_spirits.remains+10+15*talent.control_of_the_dream>cooldown|fight_remains<cooldown.convoke_the_spirits.remains+cooldown.convoke_the_spirits.duration+5)&(fight_remains>cooldown+5|fight_remains<cooldown.ca_inc.remains+7)|talent.whirling_stars&talent.convoke_the_spirits&cooldown.convoke_the_spirits.remains>cooldown.force_of_nature.duration-10&fight_remains>cooldown.convoke_the_spirits.remains+6
-  if S.ForceofNature:IsCastable() and (CAInc:CooldownRemains() < Player:GCD() and (not S.ConvoketheSpirits:IsAvailable() or S.ConvoketheSpirits:CooldownRemains() < Player:GCD() * 3 or S.ConvoketheSpirits:CooldownRemains() > CAInc:FullRechargeTime() or FightRemains < S.ConvoketheSpirits:CooldownRemains() + 3) or CAInc:FullRechargeTime() + 5 + 15 * num(S.ControloftheDream:IsAvailable()) > 60 and (not S.ConvoketheSpirits:IsAvailable() or S.ConvoketheSpirits:CooldownRemains() + 10 + 15 * num(S.ControloftheDream:IsAvailable()) > 60 or FightRemains < S.ConvoketheSpirits:CooldownRemains() + ConvokeCD + 5) and (FightRemains > 65 or FightRemains < CAInc:CooldownRemains() + 7) or S.WhirlingStars:IsAvailable() and S.ConvoketheSpirits:IsAvailable() and S.ConvoketheSpirits:CooldownRemains() > 50 and FightRemains > S.ConvoketheSpirits:CooldownRemains() + 6) then
+  -- force_of_nature,if=variable.pre_cd_condition|cooldown.ca_inc.full_recharge_time+5+15*talent.control_of_the_dream>cooldown&(!talent.convoke_the_spirits|cooldown.convoke_the_spirits.remains+10+15*talent.control_of_the_dream>cooldown|fight_remains<cooldown.convoke_the_spirits.remains+cooldown.convoke_the_spirits.duration+5)&(variable.on_use_trinket=0|cooldown.ca_inc.remains>20|talent.convoke_the_spirits&cooldown.convoke_the_spirits.remains>20|(variable.on_use_trinket=1|variable.on_use_trinket=3)&(trinket.1.cooldown.remains>5+15*talent.control_of_the_dream|trinket.1.cooldown.ready)|variable.on_use_trinket=2&(trinket.2.cooldown.remains>5+15*talent.control_of_the_dream|trinket.2.cooldown.ready))&(fight_remains>cooldown+5|fight_remains<cooldown.ca_inc.remains+7)|talent.whirling_stars&talent.convoke_the_spirits&cooldown.convoke_the_spirits.remains>cooldown.force_of_nature.duration-10&fight_remains>cooldown.convoke_the_spirits.remains+6
+  if S.ForceofNature:IsCastable() and (VarPreCDCondition or CAInc:FullRechargeTime()  + 5 + 15 * num(S.ControloftheDream:IsAvailable()) > 60 and (not S.ConvoketheSpirits:IsAvailable() or S.ConvoketheSpirits:CooldownRemains() + 10 + 15 * num(S.ControloftheDream:IsAvailable()) > 60 or BossFightRemains < S.ConvoketheSpirits:CooldownRemains() + ConvokeCD + 5) and (VarOnUseTrinket == 0 or CAInc:CooldownRemains() > 20 or S.ConvoketheSpirits:IsAvailable() and S.ConvoketheSpirits:CooldownRemains() > 20 or (VarOnUseTrinket == 1 or VarOnUseTrinket == 3) and (Trinket1:CooldownRemains() > 5 + 15 * num(S.ControloftheDream:IsAvailable()) or Trinket1:CooldownUp()) or VarOnUseTrinket == 2 and (Trinket2:CooldownRemains() > 5 + 15 * num(S.ControloftheDream:IsAvailable()) or Trinket2:CooldownUp())) and (FightRemains > 65 or BossFightRemains < CAInc:CooldownRemains() + 7) or S.WhirlingStars:IsAvailable() and S.ConvoketheSpirits:IsAvailable() and S.ConvoketheSpirits:CooldownRemains() > 50 and FightRemains > S.ConvoketheSpirits:CooldownRemains() + 6) then
     if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature st 22"; end
   end
   -- fury_of_elune,if=5+variable.passive_asp<astral_power.deficit
@@ -376,17 +373,17 @@ local function ST()
   if S.Moonfire:IsCastable() then
     if Everyone.CastCycle(S.Moonfire, Enemies10ySplash, EvaluateCycleMoonfireST2, not IsInSpellRange) then return "moonfire st 32"; end
   end
-  -- stellar_flare,target_if=refreshable&(target.time_to_die-remains-target>7+spell_targets)
-  if S.StellarFlare:IsCastable() then
-    if Everyone.CastCycle(S.StellarFlare, Enemies10ySplash, EvaluateCycleStellarFlareST, not IsInSpellRange) then return "stellar_flare st 34"; end
-  end
-  -- starsurge,if=cooldown.convoke_the_spirits.remains<gcd.max*2&variable.convoke_condition
-  if S.Starsurge:IsReady() and (S.ConvoketheSpirits:CooldownRemains() < Player:GCD() * 2 and VarConvokeCondition) then
-    if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 36"; end
+  -- starsurge,if=cooldown.convoke_the_spirits.remains<gcd.max*2&variable.convoke_condition&astral_power.deficit<50
+  if S.Starsurge:IsReady() and (S.ConvoketheSpirits:CooldownRemains() < Player:GCD() * 2 and VarConvokeCondition and Player:AstralPowerDeficit() < 50) then
+    if Cast(S.Starsurge, nil, nil, not IsInSpellRange) then return "starsurge st 34"; end
   end
   -- convoke_the_spirits,if=variable.convoke_condition
   if S.ConvoketheSpirits:IsCastable() and (VarConvokeCondition) then
-    if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.ConvokeTheSpirits, not IsInSpellRange) then return "convoke_the_spirits st 38"; end
+    if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.ConvokeTheSpirits, not IsInSpellRange) then return "convoke_the_spirits st 36"; end
+  end
+  -- stellar_flare,target_if=refreshable&(target.time_to_die-remains-target>7+spell_targets)
+  if S.StellarFlare:IsCastable() then
+    if Everyone.CastCycle(S.StellarFlare, Enemies10ySplash, EvaluateCycleStellarFlare, not IsInSpellRange) then return "stellar_flare st 38"; end
   end
   -- starsurge,if=buff.starlord.remains>4&variable.boat_stacks>=3|fight_remains<4
   if S.Starsurge:IsReady() and (Player:BuffRemains(S.StarlordBuff) > 4 and VarBoatStacks >= 3 or BossFightRemains < 4) then
@@ -456,8 +453,8 @@ local function AoE()
   if S.Moonfire:IsCastable() and (not DungeonRoute) then
     if Everyone.CastCycle(S.Moonfire, Enemies10ySplash, EvaluateCycleMoonfireAoE, not IsInSpellRange) then return "moonfire aoe 12"; end
   end
-  -- wrath,if=variable.enter_lunar&(eclipse.in_none|variable.eclipse_remains<cast_time)
-  if S.Wrath:IsCastable() and (VarEnterLunar and (not VarEclipse or VarEclipseRemains < S.Wrath:CastTime())) then
+  -- wrath,if=variable.enter_lunar&(eclipse.in_none|variable.eclipse_remains<cast_time)&!variable.pre_cd_condition
+  if S.Wrath:IsCastable() and (VarEnterLunar and (not VarEclipse or VarEclipseRemains < S.Wrath:CastTime()) and not VarPreCDCondition) then
     if Cast(S.Wrath, nil, nil, not IsInSpellRange) then return "wrath aoe 14"; end
   end
   -- starfire,if=!variable.enter_lunar&(eclipse.in_none|variable.eclipse_remains<cast_time)
@@ -466,10 +463,10 @@ local function AoE()
   end
   -- stellar_flare,target_if=refreshable&(target.time_to_die-remains-target>7+spell_targets),if=spell_targets<(11-talent.umbral_intensity.rank-(2*talent.astral_smolder)-talent.lunar_calling)
   if S.StellarFlare:IsCastable() and (EnemiesCount10ySplash < (11 - S.UmbralIntensity:TalentRank() - (2 * num(S.AstralSmolder:IsAvailable())) - num(S.LunarCalling:IsAvailable()))) then
-    if Everyone.CastCycle(S.StellarFlare, Enemies10ySplash, EvaluateCycleStellarFlareAoE, not IsInSpellRange) then return "stellar_flare aoe 18"; end
+    if Everyone.CastCycle(S.StellarFlare, Enemies10ySplash, EvaluateCycleStellarFlare, not IsInSpellRange) then return "stellar_flare aoe 18"; end
   end
-  -- force_of_nature,if=cooldown.ca_inc.remains<gcd.max&(eclipse.in_none|variable.eclipse_remains>6)|variable.eclipse_remains>=3&cooldown.ca_inc.remains>10+15*talent.control_of_the_dream&(fight_remains>cooldown+5|cooldown.ca_inc.remains>fight_remains)
-  if S.ForceofNature:IsCastable() and (CAInc:CooldownRemains() < Player:GCD() and (not VarEclipse or VarEclipseRemains > 6) or VarEclipseRemains >= 3 and CAInc:CooldownRemains() > 10 + 15 * num(S.ControloftheDream:IsAvailable()) and (FightRemains > 65 or CAInc:CooldownRemains() > FightRemains)) then
+  -- force_of_nature,if=variable.pre_cd_condition|cooldown.ca_inc.full_recharge_time+5+15*talent.control_of_the_dream>cooldown&(!talent.convoke_the_spirits|cooldown.convoke_the_spirits.remains+10+15*talent.control_of_the_dream>cooldown|fight_remains<cooldown.convoke_the_spirits.remains+cooldown.convoke_the_spirits.duration+5)&(variable.on_use_trinket=0|(variable.on_use_trinket=1|variable.on_use_trinket=3)&(trinket.1.cooldown.remains>5+15*talent.control_of_the_dream|cooldown.ca_inc.remains>20|trinket.1.cooldown.ready)|variable.on_use_trinket=2&(trinket.2.cooldown.remains>5+15*talent.control_of_the_dream|cooldown.ca_inc.remains>20|trinket.2.cooldown.ready))&(fight_remains>cooldown+5|fight_remains<cooldown.ca_inc.remains+7)|talent.whirling_stars&talent.convoke_the_spirits&cooldown.convoke_the_spirits.remains>cooldown.force_of_nature.duration-10&fight_remains>cooldown.convoke_the_spirits.remains+6
+  if S.ForceofNature:IsCastable() and (VarPreCDCondition or CAInc:FullRechargeTime() + 5 + 15 * num(S.ControloftheDream:IsAvailable()) > 60 and (not S.ConvoketheSpirits:IsAvailable() or S.ConvoketheSpirits:CooldownRemains() + 10 + 15 * num(S.ControloftheDream:IsAvailable()) > 60 or BossFightRemains < S.ConvoketheSpirits:CooldownRemains() + ConvokeCD + 5) and (VarOnUseTrinket == 0 or (VarOnUseTrinket == 1 or VarOnUseTrinket == 3) and (Trinket1:CooldownRemains() > 5 + 15 * num(S.ControloftheDream:IsAvailable()) or CAInc:CooldownRemains() > 20 or Trinket1:CooldownUp()) or VarOnUseTrinket == 2 and (Trinket2:CooldownRemains() > 5 + 15 * num(S.ControloftheDream:IsAvailable()) or CAInc:CooldownRemains() > 20 or Trinket2:CooldownUp())) and (FightRemains > 65 or BossFightRemains < CAInc:CooldownRemains() + 7) or S.WhirlingStars:IsAvailable() and S.ConvoketheSpirits:IsAvailable() and S.ConvoketheSpirits:CooldownRemains() > 50 and FightRemains > S.ConvoketheSpirits:CooldownRemains() + 6) then
     if Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return "force_of_nature aoe 20"; end
   end
   -- fury_of_elune,if=eclipse.in_eclipse
@@ -488,8 +485,8 @@ local function AoE()
       if Cast(S.Incarnation, Settings.Balance.GCDasOffGCD.CAInc) then return "celestial_alignment aoe 26"; end
     end
   end
-  -- warrior_of_elune,if=!talent.lunar_calling&buff.eclipse_solar.remains<7|talent.lunar_calling
-  if S.WarriorofElune:IsCastable() and (not S.LunarCalling:IsAvailable() and Player:BuffRemains(S.EclipseSolar) < 7 or S.LunarCalling:IsAvailable()) then
+  -- warrior_of_elune,if=!talent.lunar_calling&buff.eclipse_solar.remains<7|talent.lunar_calling&!buff.dreamstate.up
+  if S.WarriorofElune:IsCastable() and (not S.LunarCalling:IsAvailable() and Player:BuffRemains(S.EclipseSolar) < 7 or S.LunarCalling:IsAvailable() and Player:BuffDown(S.DreamstateBuff)) then
     if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune aoe 28"; end
   end
   -- starfire,if=(!talent.lunar_calling&spell_targets.starfire=1)&(buff.eclipse_solar.up&buff.eclipse_solar.remains<action.starfire.cast_time|eclipse.in_none)
@@ -585,8 +582,10 @@ local function APL()
     VarPassiveAsp = 6 / Player:SpellHaste() + num(S.NaturesBalance:IsAvailable()) + num(S.OrbitBreaker:IsAvailable()) * num(S.MoonfireDebuff:AuraActiveCount() > 0) * num(Druid.OrbitBreakerStacks > (27 - 2 * num(Player:BuffUp(S.SolsticeBuff)))) * 24
     -- variable,name=ca_effective_cd,value=cooldown.ca_inc.remains<?cooldown.force_of_nature.remains
     VarCAEffectiveCD = mathmax(CAInc:CooldownRemains(), S.ForceofNature:CooldownRemains())
-    -- variable,name=cd_condition,value=(fight_remains<(15+5*talent.incarnation_chosen_of_elune)*(1-talent.whirling_stars*0.2)|target.time_to_die>10&(!hero_tree.keeper_of_the_grove|buff.harmony_of_the_grove.up)&(!talent.whirling_stars|!talent.convoke_the_spirits|cooldown.convoke_the_spirits.remains<gcd.max*2|fight_remains<cooldown.convoke_the_spirits.remains+3|cooldown.convoke_the_spirits.remains>cooldown.ca_inc.full_recharge_time))&cooldown.ca_inc.ready&!buff.ca_inc.up
-    VarCDCondition = (BossFightRemains < (15 + 5 * num(S.Incarnation:IsAvailable())) * (1 - num(S.WhirlingStars:IsAvailable()) * 0.2) or Target:TimeToDie() > 10 and (Player:HeroTreeID() ~= 23 or Player:BuffUp(S.HarmonyoftheGroveBuff)) and (not S.WhirlingStars:IsAvailable() or not S.ConvoketheSpirits:IsAvailable() or S.ConvoketheSpirits:CooldownRemains() < Player:GCD() * 2 or BossFightRemains < S.ConvoketheSpirits:CooldownRemains() + 3 or S.ConvoketheSpirits:CooldownRemains() > CAInc:FullRechargeTime())) and CAInc:CooldownUp() and not CAIncBuffUp
+    -- variable,name=pre_cd_condition,value=(!talent.whirling_stars|!talent.convoke_the_spirits|cooldown.convoke_the_spirits.remains<gcd.max*2|fight_remains<cooldown.convoke_the_spirits.remains+3|cooldown.convoke_the_spirits.remains>cooldown.ca_inc.full_recharge_time+15*talent.control_of_the_dream)&(variable.on_use_trinket=0|(variable.on_use_trinket=1|variable.on_use_trinket=3)&(trinket.1.cooldown.remains>cooldown.ca_inc.full_recharge_time+(15*talent.control_of_the_dream)|!talent.convoke_the_spirits&hero_tree.elunes_chosen&trinket.1.cooldown.remains>cooldown.ca_inc.full_recharge_time-cooldown.ca_inc.duration|talent.convoke_the_spirits&(cooldown.convoke_the_spirits.remains<3&(ceil((fight_remains-10)%cooldown.convoke_the_spirits.duration)>ceil((fight_remains-trinket.1.cooldown.remains-10)%cooldown.convoke_the_spirits.duration))|cooldown.convoke_the_spirits.remains>trinket.1.cooldown.remains&cooldown.ca_inc.full_recharge_time-cooldown.ca_inc.duration<trinket.1.cooldown.remains+15)|trinket.1.cooldown.remains+6>fight_remains|trinket.1.cooldown.ready)|variable.on_use_trinket=2&(trinket.2.cooldown.remains>cooldown.ca_inc.full_recharge_time+(15*talent.control_of_the_dream)|!talent.convoke_the_spirits&hero_tree.elunes_chosen&trinket.1.cooldown.remains>cooldown.ca_inc.full_recharge_time-cooldown.ca_inc.duration|talent.convoke_the_spirits&(cooldown.convoke_the_spirits.remains<3&(ceil((fight_remains-10)%cooldown.convoke_the_spirits.duration)>ceil((fight_remains-trinket.2.cooldown.remains-10)%cooldown.convoke_the_spirits.duration))|cooldown.convoke_the_spirits.remains>trinket.2.cooldown.remains&cooldown.ca_inc.full_recharge_time-cooldown.ca_inc.duration<trinket.2.cooldown.remains+15)|trinket.2.cooldown.remains+6>fight_remains|trinket.2.cooldown.ready))&cooldown.ca_inc.remains<gcd.max&!buff.ca_inc.up
+    VarPreCDCondition = (not S.WhirlingStars:IsAvailable() or not S.ConvoketheSpirits:IsAvailable() or S.ConvoketheSpirits:CooldownRemains() < Player:GCD() * 2 or BossFightRemains < S.ConvoketheSpirits:CooldownRemains() + 3 or S.ConvoketheSpirits:CooldownRemains() > CAInc:FullRechargeTime() + 15 * num(S.ControloftheDream:IsAvailable())) and (VarOnUseTrinket == 0 or (VarOnUseTrinket == 1 or VarOnUseTrinket == 3) and (Trinket1:CooldownRemains() > CAInc:FullRechargeTime() + (15 * num(S.ControloftheDream:IsAvailable())) or not S.ConvoketheSpirits:IsAvailable() and Player:HeroTreeID() == 24 and Trinket1:CooldownRemains() > CAInc:FullRechargeTime() - CAIncCD or S.ConvoketheSpirits:IsAvailable() and (S.ConvoketheSpirits:CooldownRemains() < 3 and (mathceil((BossFightRemains - 10) / ConvokeCD) > mathceil((BossFightRemains - Trinket1:CooldownRemains() - 10) / ConvokeCD)) or S.ConvoketheSpirits:CooldownRemains() > Trinket1:CooldownRemains() and CAInc:FullRechargeTime() - CAIncCD < Trinket1:CooldownRemains() + 15) or Trinket1:CooldownRemains() + 6 > BossFightRemains or Trinket1:CooldownUp()) or VarOnUseTrinket == 2 and (Trinket2:CooldownRemains() > CAInc:FullRechargeTime() + (15 * num(S.ControloftheDream:IsAvailable())) or not S.ConvoketheSpirits:IsAvailable() and Player:HeroTreeID() == 24 and Trinket1:CooldownRemains() > CAInc:FullRechargeTime() - CAIncCD or S.ConvoketheSpirits:IsAvailable() and (S.ConvoketheSpirits:CooldownRemains() < 3 and (mathceil((BossFightRemains - 10) / ConvokeCD) > mathceil((BossFightRemains - Trinket2:CooldownRemains() - 10) / ConvokeCD)) or S.ConvoketheSpirits:CooldownRemains() > Trinket2:CooldownRemains() and CAInc:FullRechargeTime() - CAIncCD < Trinket2:CooldownRemains() + 15) or Trinket2:CooldownRemains() + 6 > BossFightRemains or Trinket2:CooldownUp())) and CAInc:CooldownRemains() < Player:GCD() and not CAIncBuffUp
+    -- variable,name=cd_condition,value=variable.pre_cd_condition&(fight_remains<(15+5*talent.incarnation_chosen_of_elune)*(1-talent.whirling_stars*0.2)|target.time_to_die>10&(!hero_tree.keeper_of_the_grove|buff.harmony_of_the_grove.up))
+    VarCDCondition = VarPreCDCondition and (BossFightRemains < (15 + 5 * num(S.Incarnation:IsAvailable())) * (1 - num(S.WhirlingStars:IsAvailable()) * 0.2) or Target:TimeToDie() > 10 and (Player:HeroTreeID() ~= 23 or Player:BuffUp(S.HarmonyoftheGroveBuff)))
     -- variable,name=convoke_condition,value=fight_remains<5|(buff.ca_inc.up|cooldown.ca_inc.remains>40)&(!hero_tree.keeper_of_the_grove|buff.harmony_of_the_grove.up|cooldown.force_of_nature.remains>15)
     VarConvokeCondition = (BossFightRemains < 5 or (CAIncBuffUp or CAInc:CooldownRemains() > 40) and (Player:HeroTreeID() ~= 23 or Player:BuffUp(S.HarmonyoftheGroveBuff) or S.ForceofNature:CooldownRemains() > 15))
     -- variable,name=eclipse,value=buff.eclipse_lunar.up|buff.eclipse_solar.up
@@ -599,6 +598,7 @@ local function APL()
     -- variable,name=boat_stacks,value=buff.balance_of_all_things_arcane.stack+buff.balance_of_all_things_nature.stack
     VarBoatStacks = Player:BuffStack(S.BOATArcaneBuff) + Player:BuffStack(S.BOATNatureBuff)
     -- variable,name=no_cd_talent,value=!talent.celestial_alignment&!talent.incarnation_chosen_of_elune|druid.no_cds
+    -- Note: Copied down from Precombat(), as the CDsON() toggle could change its value.
     VarNoCDTalent = not S.CelestialAlignment:IsAvailable() and not S.Incarnation:IsAvailable() or not CDsON()
     if Settings.Commons.Enabled.Trinkets then
       -- use_item,name=spymasters_web,if=fight_remains<20
@@ -680,7 +680,7 @@ end
 local function OnInit()
   S.MoonfireDebuff:RegisterAuraTracking()
 
-  HR.Print("Balance Druid rotation has been updated for patch 11.1.0.")
+  HR.Print("Balance Druid rotation has been updated for patch 11.1.5.")
 end
 
 HR.SetAPL(102, APL, OnInit)
