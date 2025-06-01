@@ -121,7 +121,13 @@ function HR.MainIconFrame:Init ()
   -- Keybind
   local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   self.Keybind = KeybindFrame
-  KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+  -- Font Selection
+  local SelectedFont = KeybindFrame:GetFont()
+  if not HR.GUISettings.Scaling.UseGlobalFont then
+    SelectedFont = HR.AssocFonts[HR.GUISettings.Scaling.ChosenFont]
+  end
+  KeybindFrame:SetFont(SelectedFont, 14, "OUTLINE")
+  -- KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
   KeybindFrame:SetAllPoints(true)
   KeybindFrame:SetJustifyH("RIGHT")
   KeybindFrame:SetJustifyV("TOP")
@@ -219,7 +225,13 @@ function HR.MainIconFrame:InitParts ()
     PartFrame.Texture = PartFrame:CreateTexture(nil, "BACKGROUND")
     -- Keybind
     PartFrame.Keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    PartFrame.Keybind:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+    -- Font Selection
+    local SelectedFont = PartFrame.Keybind:GetFont()
+    if not HR.GUISettings.Scaling.UseGlobalFont then
+      SelectedFont = HR.AssocFonts[HR.GUISettings.Scaling.ChosenFont]
+    end
+    PartFrame.Keybind:SetFont(SelectedFont, 13, "OUTLINE")
+    -- PartFrame.Keybind:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
     PartFrame.Keybind:SetAllPoints(true)
     PartFrame.Keybind:SetJustifyH("RIGHT")
     PartFrame.Keybind:SetJustifyV("TOP")
@@ -347,7 +359,13 @@ function HR.SmallIconFrame:CreateIcons (Index, Align)
   -- Keybind
   local Keybind = IconFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   IconFrame.Keybind = Keybind
-  Keybind:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+  -- Font Selection
+  local SelectedFont = Keybind:GetFont()
+  if not HR.GUISettings.Scaling.UseGlobalFont then
+    SelectedFont = HR.AssocFonts[HR.GUISettings.Scaling.ChosenFont]
+  end
+  Keybind:SetFont(SelectedFont, 12, "OUTLINE")
+  -- Keybind:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
   Keybind:SetAllPoints(true)
   Keybind:SetJustifyH("RIGHT")
   Keybind:SetJustifyV("TOP")
@@ -435,7 +453,13 @@ function HR.LeftIconFrame:Init ()
   -- Keybind
   local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   self.Keybind = KeybindFrame
-  KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+  -- Font Selection
+  local SelectedFont = KeybindFrame:GetFont()
+  if not HR.GUISettings.Scaling.UseGlobalFont then
+    SelectedFont = HR.AssocFonts[HR.GUISettings.Scaling.ChosenFont]
+  end
+  KeybindFrame:SetFont(SelectedFont, 14, "OUTLINE")
+  -- KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
   KeybindFrame:SetAllPoints(true)
   KeybindFrame:SetJustifyH("RIGHT")
   KeybindFrame:SetJustifyV("TOP")
@@ -671,7 +695,13 @@ function HR.SuggestedIconFrame:Init ()
   -- Keybind
   local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   self.Keybind = KeybindFrame
-  KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+  -- Font Selection
+  local SelectedFont = KeybindFrame:GetFont()
+  if not HR.GUISettings.Scaling.UseGlobalFont then
+    SelectedFont = HR.AssocFonts[HR.GUISettings.Scaling.ChosenFont]
+  end
+  KeybindFrame:SetFont(SelectedFont, 14, "OUTLINE")
+  -- KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
   KeybindFrame:SetAllPoints(true)
   KeybindFrame:SetJustifyH("RIGHT")
   KeybindFrame:SetJustifyV("TOP")
@@ -746,7 +776,13 @@ function HR.RightSuggestedIconFrame:Init ()
   -- Keybind
   local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   self.Keybind = KeybindFrame
-  KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+  -- Font Selection
+  local SelectedFont = KeybindFrame:GetFont()
+  if not HR.GUISettings.Scaling.UseGlobalFont then
+    SelectedFont = HR.AssocFonts[HR.GUISettings.Scaling.ChosenFont]
+  end
+  KeybindFrame:SetFont(SelectedFont, 14, "OUTLINE")
+  -- KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
   KeybindFrame:SetAllPoints(true)
   KeybindFrame:SetJustifyH("RIGHT")
   KeybindFrame:SetJustifyV("TOP")

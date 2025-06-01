@@ -52,8 +52,20 @@ HR.GUISettings = {
     ScaleButtons = 1,
     ScaleHotkey = 1,
     ScaleNameplateIcon = 1,
+    UseGlobalFont = true,
+    ChosenFont = "Friz Quadrata",
   },
   APL = {}
+}
+
+--local DefaultFontPath = "Fonts\\"
+--local CustomFontPath = "Interface\\AddOns\\HeroRotation\\Fonts\\"
+local AvailableFonts = { "Arial Narrow", "Friz Quadrata", "Morpheus", "Skurri" }
+HR.AssocFonts = {
+  ["Arial Narrow"] = "Fonts\\ARIALN.TTF",
+  ["Friz Quadrata"] = "Fonts\\FRIZQT__.TTF",
+  ["Morpheus"] = "Fonts\\MORPHEUS.TTF",
+  ["Skurri"] = "Fonts\\skurri.TTF",
 }
 
 function HR.GUI.CorePanelSettingsInit ()
@@ -77,4 +89,7 @@ function HR.GUI.CorePanelSettingsInit ()
   CreatePanelOption("CheckButton", CP_General, "General.NotEnoughManaEnabled", "Not enough mana/energy", "Enable if you want a faded icon when you have not enough mana or energy.")
   CreatePanelOption("CheckButton", CP_General, "General.SilentMode", "Enable Silent Mode", "Enable this option to no longer receive output messages from settings toggles. Debug output will still be printed, if enabled.")
   CreatePanelOption("CheckButton", CP_General, "General.ForceMainIcon", "Force Main Icon", "Force all spell suggestions for your primary target to be shown in the Main Icon area, regardless of DisplayStyle or OffGCD settings.\n\nNOTE: Suggestions for spells that cycle through targets will still show in the Left Icon area when they are suggested for targets other than your primary target.\n\nNOTE: This should mostly be used for debugging purposes, as /hr debug output only captures output for Main Icon suggestions.")
+  -- Font Selector
+  CreatePanelOption("CheckButton", CP_Scaling, "Scaling.UseGlobalFont", "Use Global Font", "Use the font you have selected globally in your UI. If this option is enabled, the 'Font Type' option will be ignored.", {ReloadRequired = true})
+  CreatePanelOption("Dropdown", CP_Scaling, "Scaling.ChosenFont", AvailableFonts, "Font Type", "Choose the font to use within the addon.", {ReloadRequired = true})
 end
