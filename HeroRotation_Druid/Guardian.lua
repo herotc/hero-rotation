@@ -36,6 +36,9 @@ local I = Item.Druid.Guardian
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  -- TWW Trinkets
+  I.TomeofLightsDevotion:ID(),
+  -- TWW Items
   I.BestinSlotsMelee:ID(),
 }
 
@@ -127,19 +130,19 @@ local function Precombat()
   end
   -- Manually added: moonfire
   if S.Moonfire:IsCastable() then
-    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire precombat 8"; end
+    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire precombat 6"; end
   end
   -- Manually added: wild_charge
   if S.WildCharge:IsCastable() and (Target:IsInRange(S.WildCharge.MaximumRange) and not Target:IsInRange(S.WildCharge.MinimumRange)) then
-    if Cast(S.WildCharge) then return "wild_charge precombat 10"; end
+    if Cast(S.WildCharge) then return "wild_charge precombat 8"; end
   end
   -- Manually added: thrash_bear
   if S.ThrashBear:IsCastable() and IsInAoERange then
-    if Cast(S.ThrashBear) then return "thrash precombat 12"; end
+    if Cast(S.ThrashBear) then return "thrash precombat 10"; end
   end
   -- Manually added: mangle
   if S.Mangle:IsCastable() and IsInMeleeRange then
-    if Cast(S.Mangle) then return "mangle precombat 14"; end
+    if Cast(S.Mangle) then return "mangle precombat 12"; end
   end
 end
 
@@ -216,8 +219,8 @@ local function Bear()
   if S.RavageAbilityBear:IsReady() and (Player:BuffUp(S.RavageBuffGuardian) and Enemies8yCount < 2) then
     if Cast(S.RavageAbilityBear, nil, nil, not IsInMeleeRange) then return "ravage bear 22"; end
   end
-  -- raze,if=(buff.tooth_and_claw.stack>1|buff.tooth_and_claw.remains<1+gcd)&variable.If_build=1&active_enemies>1
-  if S.Raze:IsReady() and ((Player:BuffStack(S.ToothandClawBuff) > 1 or Player:BuffRemains(S.ToothandClawBuff) < 1 + Player:GCD()) and VarIFBuild and Enemies8yCount > 1) then
+  -- raze,if=(buff.tooth_and_claw.stack>1|buff.tooth_and_claw.up&buff.tooth_and_claw.remains<1+gcd)&variable.If_build=1
+  if S.Raze:IsReady() and ((Player:BuffStack(S.ToothandClawBuff) > 1 or Player:BuffUp(S.ToothandClawBuff) and Player:BuffRemains(S.ToothandClawBuff) < 1 + Player:GCD()) and VarIFBuild and Enemies8yCount > 1) then
     if Cast(S.Raze, nil, nil, not IsInMeleeRange) then return "raze bear 24"; end
   end
   -- raze,if=variable.If_build=0&(buff.tooth_and_claw.stack>1|buff.tooth_and_claw.up&buff.tooth_and_claw.remains<1+gcd|buff.vicious_cycle_maul.stack=3)
@@ -352,7 +355,7 @@ local function APL()
     IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
 
     UseMaul = false
-    if ((Player:Rage() >= S.Maul:Cost() + 20 and not IsTanking) or Player:RageDeficit() <= 10 or not Settings.Guardian.UseRageDefensively) then
+    if (Player:Rage() >= S.Maul:Cost() + 20 and not IsTanking or Player:RageDeficit() <= 10 or not Settings.Guardian.UseRageDefensively) then
       UseMaul = true
     end
 
@@ -408,7 +411,7 @@ local function APL()
 end
 
 local function OnInit()
-  HR.Print("Guardian Druid rotation has been updated for patch 11.1.0.")
+  HR.Print("Guardian Druid rotation has been updated for patch 11.1.5.")
 end
 
 HR.SetAPL(104, APL, OnInit)
