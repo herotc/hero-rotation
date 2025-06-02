@@ -5,6 +5,9 @@
 ## Version: 11.1.5.11
 ## Notes: Attempt to provide the useful and precise information to execute the best possible DPS rotation in every situation.
 
+## X-Curse-Project-ID: 103143
+## X-Wago-ID: jK8XJxKy
+
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## Dependencies: HeroDBC, HeroLib
