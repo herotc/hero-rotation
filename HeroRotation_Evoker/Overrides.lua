@@ -130,7 +130,7 @@ AugOldIsReady = HL.AddCoreOverride ("Spell.IsReady",
     elseif self == SpellAug.EbonMight then
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellAug.Unravel then
-      return BaseCheck and Target:EnemyAbsorb()
+      return BaseCheck and Target:ActiveDamageAbsorb()
     else
       return BaseCheck
     end
