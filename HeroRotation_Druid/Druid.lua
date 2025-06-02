@@ -312,6 +312,7 @@ Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
 Item.Druid.Feral = MergeTableByKey(Item.Druid.Commons, {
   -- TWW Trinkets
   ConcoctionKissofDeath                 = Item(215174, {13, 14}),
+  JunkmaestrosMegaMagnet                = Item(230189, {13, 14}),
   SikransEndlessArsenal                 = Item(212449, {13, 14}),
   TwinFangInstruments                   = Item(219319, {13, 14}),
 })
