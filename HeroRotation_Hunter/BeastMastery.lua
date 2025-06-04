@@ -436,7 +436,7 @@ local function APL()
   end
 
   if Everyone.TargetIsValid() then
-    -- Out of Combat
+    -- Precombat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
@@ -480,7 +480,7 @@ local function OnInit ()
   S.SerpentStingDebuff:RegisterAuraTracking()
 
   HR.Print("Beast Mastery can use pet abilities to better determine AoE. Make sure you have Growl and Blood Bolt / Bite / Claw / Smack on your player action bars.")
-  HR.Print("Beast Mastery Hunter rotation has been updated for patch 11.1.0.")
+  HR.Print("Beast Mastery Hunter rotation has been updated for patch 11.1.5.")
 end
 
 HR.SetAPL(253, APL, OnInit)
