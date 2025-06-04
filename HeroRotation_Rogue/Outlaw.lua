@@ -88,7 +88,8 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 local Enemies30y, EnemiesBF, EnemiesBFCount
 local ShouldReturn; -- Used to get the return string
 local BladeFlurryRange = 6
-local EffectiveComboPoints, ComboPoints, ChargedComboPoints, ComboPointsDeficit
+local EffectiveComboPoints, ComboPoints, EffectiveChargedComboPoints, ChargedComboPoints, ComboPointsDeficit
+local KSBaseDuration, HasteMultiplier, KSHastedDuration
 local Energy, EnergyRegen, EnergyDeficit, EnergyTimeToMax, EnergyMaxOffset
 local Interrupts = {
   { S.Blind, "Cast Blind (Interrupt)", function()
@@ -351,11 +352,20 @@ local function Stealth(ReturnSpellOnly)
       end
     end
   end
+
+  -- ***NOT PART of SimC*** The builder list isn't part of Stealth so in the case of an any CP vanish to prevent AR
+  -- falling off and BF / Ambush (KiR) / finisher conditions aren't met show a vanish combo with SS instead of vanish
+  -- on it's own
+  if S.SinisterStrike:IsCastable() and not Finish_Condition() then
+    if ReturnSpellOnly then
+      return S.SinisterStrike
+    end
+  end
 end
 
 local function Finish(ReturnSpellOnly)
   -- actions.finish+=/killing_spree
-  if S.KillingSpree:IsCastable() then
+  if S.KillingSpree:IsCastable() and (Player:BuffDown(S.AdrenalineRush) or Player:BuffRemains(S.AdrenalineRush) > KSHastedDuration) then
     if ReturnSpellOnly then
       return S.KillingSpree
     else
@@ -1014,8 +1024,19 @@ local function APL ()
   BladeFlurryRange = 8
   ComboPoints = Player:ComboPoints()
   ChargedComboPoints = Player:ChargedComboPoints()
-  EffectiveComboPoints = Rogue.EffectiveComboPoints(ComboPoints)
+
+  -- Calculate Killing Spree Hasted Duration based on current player HastePct
+  --  This allows KS to be delayed if AR will fall off during it.
+  EffectiveChargedComboPoints = 0
+  if ComboPoints > 0 and ChargedComboPoints > 0 then
+    EffectiveChargedComboPoints = ChargedComboPoints + num(S.ForcedInduction:IsAvailable())
+  end
+  EffectiveComboPoints = ComboPoints + EffectiveChargedComboPoints
   ComboPointsDeficit = Player:ComboPointsDeficit()
+  KSBaseDuration = EffectiveComboPoints * 0.4
+  HasteMultiplier = 1 + (Player:HastePct() / 100)
+  KSHastedDuration = KSBaseDuration / HasteMultiplier
+
   EnergyMaxOffset = Player:BuffUp(S.AdrenalineRush, nil, true) and -50 or 0 -- For base_time_to_max emulation
   Energy = EnergyPredictedStable()
   EnergyRegen = Player:EnergyRegen()
@@ -1073,14 +1094,15 @@ local function APL ()
       -- # Builds with Keep it Rolling+Loaded Dice prepull Adrenaline Rush before Roll the Bones to consume Loaded Dice immediately instead of on the next pandemic roll.
       -- actions.precombat+=/adrenaline_rush,precombat_seconds=1,if=talent.improved_adrenaline_rush&talent.keep_it_rolling&talent.loaded_dice
       if S.AdrenalineRush:IsCastable() and S.ImprovedAdrenalineRush:IsAvailable() and S.KeepItRolling:IsAvailable()
-        and S.LoadedDice:IsAvailable() then
+        and S.LoadedDice:IsAvailable() and (not S.Supercharger:IsAvailable() or ChargedComboPoints == 0) then
         if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then
           return "Cast Adrenaline Rush (Opener KiR)"
         end
       end
       -- actions.precombat+=/roll_the_bones,precombat_seconds=1
       -- Use same extended logic as a normal rotation for between pulls
-      if S.RolltheBones:IsCastable() and not Player:DebuffUp(S.Dreadblades) and (Cache.APLVar.RtB_Buffs.Total == 0 or RtB_Reroll()) then
+      if S.RolltheBones:IsCastable() and not Player:DebuffUp(S.Dreadblades) and (Cache.APLVar.RtB_Buffs.Total == 0 or RtB_Reroll())
+        and (not S.Supercharger:IsAvailable() or ChargedComboPoints == 0) then
         if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then
           return "Cast Roll the Bones (Opener)"
         end

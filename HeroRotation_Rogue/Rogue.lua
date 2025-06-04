@@ -103,6 +103,7 @@ Spell.Rogue.Commons = {
   FlawlessForm            = Spell(441321),
   FlawlessFormBuff        = Spell(441326),
   FollowTheBlood          = Spell(457068),
+  ForcedInduction         = Spell(470668),
   HandOfFate              = Spell(452536),
   ImprovedAmbush          = Spell(381620),
   FateboundInevitability  = Spell(454434),
