@@ -99,9 +99,6 @@ end
 
 --- ===== Rotation Functions =====
 local function Precombat()
-  -- flask
-  -- food
-  -- augmentation
   -- snapshot_stats
   -- potion
   -- Note: Not adding potion, as they're not needed pre-combat any longer
@@ -225,15 +222,11 @@ local function APL()
     if IsTanking then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     end
-    -- expel_harm,if=buff.gift_of_the_ox.stack>4
-    if S.ExpelHarm:IsReady() and (S.ExpelHarm:Count() > 4) then
-      if Cast(S.ExpelHarm, Settings.Brewmaster.GCDasOffGCD.ExpelHarm, nil, not Target:IsInRange(20)) then return "expel_harm main 2"; end
-    end
     -- potion
     if Settings.Commons.Enabled.Potions then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 4"; end
+        if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 2"; end
       end
     end
     -- call_action_list,name=race_actions
@@ -246,76 +239,76 @@ local function APL()
     end
     -- black_ox_brew,if=energy<40
     if S.BlackOxBrew:IsCastable() and (Player:Energy() < 40) then
-      if Cast(S.BlackOxBrew, Settings.Brewmaster.GCDasOffGCD.BlackOxBrew) then return "black_ox_brew main 6"; end
+      if Cast(S.BlackOxBrew, Settings.Brewmaster.GCDasOffGCD.BlackOxBrew) then return "black_ox_brew main 4"; end
     end
     -- celestial_brew,if=(buff.aspect_of_harmony_accumulator.value>0.3*health.max&buff.weapons_of_order.up&!dot.aspect_of_harmony_damage.ticking)
     -- celestial_brew,if=(buff.aspect_of_harmony_accumulator.value>0.3*health.max&!talent.weapons_of_order.enabled&!dot.aspect_of_harmony_damage.ticking)
-    -- celestial_brew,if=(target.time_to_die<20&target.time_to_die>14&buff.aspect_of_harmony_accumulator.value>0.2health.max)
+    -- celestial_brew,if=(target.time_to_die<20&target.time_to_die>14&buff.aspect_of_harmony_accumulator.value>0.2*health.max)
     -- celestial_brew,if=(buff.aspect_of_harmony_accumulator.value>0.3*health.max&cooldown.weapons_of_order.remains>20&!dot.aspect_of_harmony_damage.ticking)
     -- Note: Handled in Defensives for now. TODO: Handle Aspect of Harmony.
     -- blackout_kick
     if S.BlackoutKick:IsReady() then
-      if Cast(S.BlackoutKick, nil, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick main 8"; end
+      if Cast(S.BlackoutKick, nil, nil, not Target:IsInMeleeRange(5)) then return "blackout_kick main 6"; end
     end
     -- chi_burst
     if S.ChiBurst:IsCastable() then
-      if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst main 10"; end
+      if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst main 8"; end
     end
     -- weapons_of_order
     if S.WeaponsofOrder:IsReady() then
-      if Cast(S.WeaponsofOrder) then return "weapons_of_order main 12"; end
+      if Cast(S.WeaponsofOrder) then return "weapons_of_order main 10"; end
     end
     -- rising_sun_kick,if=!talent.fluidity_of_motion.enabled
     if S.RisingSunKick:IsReady() and (not S.FluidityofMotion:IsAvailable()) then
-      if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick main 14"; end
+      if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick main 12"; end
     end
     -- tiger_palm,if=buff.blackout_combo.up
     if S.TigerPalm:IsCastable() and (Player:BuffUp(S.BlackoutComboBuff)) then
-      if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm main 16"; end
+      if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm main 14"; end
     end
     -- keg_smash,if=talent.scalding_brew.enabled
     if S.KegSmash:IsReady() and (S.ScaldingBrew:IsAvailable()) then
-      if Cast(S.KegSmash, nil, nil, not Target:IsInRange(15)) then return "keg_smash main 18"; end
+      if Cast(S.KegSmash, nil, nil, not Target:IsInRange(15)) then return "keg_smash main 16"; end
     end
     -- spinning_crane_kick,if=talent.charred_passions.enabled&talent.scalding_brew.enabled&buff.charred_passions.up&buff.charred_passions.remains<3&dot.breath_of_fire.remains<9&active_enemies>4
     if S.SpinningCraneKick:IsReady() and (S.CharredPassions:IsAvailable() and S.ScaldingBrew:IsAvailable() and Player:BuffUp(S.CharredPassionsBuff) and Player:BuffRemains(S.CharredPassionsBuff) < 3 and Target:DebuffRemains(S.BreathofFire) < 9 and EnemiesCount5 > 4) then
-      if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick main 20"; end
+      if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick main 18"; end
     end
     -- rising_sun_kick,if=talent.fluidity_of_motion.enabled
     if S.RisingSunKick:IsReady() and (S.FluidityofMotion:IsAvailable()) then
-      if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick main 22"; end
+      if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick main 20"; end
     end
     -- purifying_brew,if=buff.blackout_combo.down
     if S.PurifyingBrew:IsCastable() and ShouldPurify() and (Player:BuffDown(S.BlackoutComboBuff)) then
-      if Cast(S.PurifyingBrew, nil, Settings.BrMDS.DisplayStyle.Purify) then return "purifying_brew main 24"; end
+      if Cast(S.PurifyingBrew, nil, Settings.BrMDS.DisplayStyle.Purify) then return "purifying_brew main 22"; end
     end
     -- breath_of_fire,if=(buff.charred_passions.down&(!talent.scalding_brew.enabled|active_enemies<5))|!talent.charred_passions.enabled|(dot.breath_of_fire.remains<3&talent.scalding_brew.enabled)
     if S.BreathofFire:IsCastable() and ((Player:BuffDown(S.CharredPassionsBuff) and (not S.ScaldingBrew:IsAvailable() or EnemiesCount5 < 5)) or not S.CharredPassions:IsAvailable() or (Target:DebuffRemains(S.BreathofFire) < 3 and S.ScaldingBrew:IsAvailable())) then
-      if Cast(S.BreathofFire, Settings.Brewmaster.GCDasOffGCD.BreathOfFire, nil, not Target:IsInMeleeRange(12)) then return "breath_of_fire main 26"; end
+      if Cast(S.BreathofFire, Settings.Brewmaster.GCDasOffGCD.BreathOfFire, nil, not Target:IsInMeleeRange(12)) then return "breath_of_fire main 24"; end
     end
     -- exploding_keg
     if S.ExplodingKeg:IsCastable() then
-      if Cast(S.ExplodingKeg, nil, nil, not Target:IsInRange(40)) then return "exploding_keg main 28"; end
+      if Cast(S.ExplodingKeg, nil, nil, not Target:IsInRange(40)) then return "exploding_keg main 26"; end
     end
     -- keg_smash
     if S.KegSmash:IsReady() then
-      if Cast(S.KegSmash, nil, nil, not Target:IsInRange(15)) then return "keg_smash main 30"; end
+      if Cast(S.KegSmash, nil, nil, not Target:IsInRange(15)) then return "keg_smash main 28"; end
     end
     -- rushing_jade_wind
     if S.RushingJadeWind:IsReady() then
-      if Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "rushing_jade_wind main 32"; end
+      if Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "rushing_jade_wind main 30"; end
     end
     -- invoke_niuzao
     if S.InvokeNiuzao:IsCastable() then
-      if Cast(S.InvokeNiuzao, Settings.Brewmaster.GCDasOffGCD.InvokeNiuzaoTheBlackOx) then return "invoke_niuzao main 34"; end
+      if Cast(S.InvokeNiuzao, Settings.Brewmaster.GCDasOffGCD.InvokeNiuzaoTheBlackOx) then return "invoke_niuzao main 32"; end
     end
     -- tiger_palm,if=energy>40-cooldown.keg_smash.remains*energy.regen
     if S.TigerPalm:IsReady() and (Player:Energy() > 40 - S.KegSmash:CooldownRemains() * Player:EnergyRegen()) then
-      if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm main 36"; end
+      if Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(5)) then return "tiger_palm main 34"; end
     end
     -- spinning_crane_kick,if=energy>40-cooldown.keg_smash.remains*energy.regen
     if S.SpinningCraneKick:IsReady() and (Player:Energy() > 40 - S.KegSmash:CooldownRemains() * Player:EnergyRegen()) then
-      if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick main 38"; end
+      if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick main 36"; end
     end
     -- Manually added Pool filler
     if Cast(S.PoolEnergy) then return "Pool Energy"; end
@@ -323,7 +316,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Brewmaster Monk rotation has been updated for patch 11.1.0.")
+  HR.Print("Brewmaster Monk rotation has been updated for patch 11.1.5.")
 end
 
 HR.SetAPL(268, APL, Init)
