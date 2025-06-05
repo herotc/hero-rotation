@@ -249,14 +249,14 @@ HL:RegisterForCombatEvent(
 Monk.Xuen = {}
 Monk.Xuen.Active = false
 Monk.Xuen.GUID = 0
-Monk.Xuen.SummonTime = 0
+Monk.Xuen.ExpireTime = 0
 HL:RegisterForSelfCombatEvent(
   function(...)
     local destGUID, _, _, _, spellID = select(8, ...)
     if spellID == 123904 then
       Monk.Xuen.Active = true
       Monk.Xuen.GUID = destGUID
-      Monk.Xuen.SummonTime = GetTime()
+      Monk.Xuen.ExpireTime = GetTime() + 45
     end
   end
   , "SPELL_SUMMON"
@@ -268,7 +268,7 @@ HL:RegisterForCombatEvent(
     if destGUID == Monk.Xuen.GUID then
       Monk.Xuen.Active = false
       Monk.Xuen.GUID = 0
-      Monk.Xuen.SummonTime = 0
+      Monk.Xuen.ExpireTime  = 0
     end
   end
   , "UNIT_DIED"
