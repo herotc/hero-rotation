@@ -513,7 +513,7 @@ local function ST()
     -- Note: fire_breath will hit most/all targets, so ignoring target_if.
     -- fire_breath,target_if=max:target.health.pct,empower_to=4,if=(talent.scorching_embers&talent.engulf&action.engulf.usable_in<=duration+0.5)&variable.can_use_empower&cooldown.engulf.full_recharge_time<=cooldown.fire_breath.duration_expected+4
     local MaxEmpower = S.FontofMagic:IsAvailable() and 4 or 3
-    if S.FireBreath:IsCastable() and ((S.ScorchingEmbers:IsAvailable() and S.Engulf:IsAvailable() and S.Engulf:CooldownRemains() <= Player:EmpowerCastTime(MaxEmpower) + 0.5) and S.Engufl:FullRechargeTime() <= 34) then
+    if S.FireBreath:IsCastable() and ((S.ScorchingEmbers:IsAvailable() and S.Engulf:IsAvailable() and S.Engulf:CooldownRemains() <= Player:EmpowerCastTime(MaxEmpower) + 0.5) and S.Engulf:FullRechargeTime() <= 34) then
       if CastAnnotated(S.FireBreath, false, MaxEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower " .. MaxEmpower .. " st 8"; end
     end
     -- fire_breath,target_if=max:target.health.pct,empower_to=1,if=talent.engulf&talent.fulminous_roar&variable.can_use_empower
