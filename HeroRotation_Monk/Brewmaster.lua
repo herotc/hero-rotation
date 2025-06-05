@@ -310,8 +310,8 @@ local function APL()
     if S.SpinningCraneKick:IsReady() and (Player:Energy() > 40 - S.KegSmash:CooldownRemains() * Player:EnergyRegen()) then
       if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick main 36"; end
     end
-    -- Manually added Pool filler
-    if Cast(S.PoolEnergy) then return "Pool Energy"; end
+    -- If nothing else to do, show the Pool icon
+    if CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
 end
 
