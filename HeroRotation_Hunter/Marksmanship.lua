@@ -234,14 +234,14 @@ local function ST()
   if S.Volley:IsReady() and (S.DoubleTap:IsAvailable() and Player:BuffDown(S.DoubleTapBuff)) then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley st 12"; end
   end
-  -- black_arrow,target_if=min:dot.black_arrow_dot.ticking|max_prio_damage,if=talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|!talent.headshot&buff.razor_fragments.up
+  -- kill_shot,target_if=min:dot.black_arrow_dot.ticking|max_prio_damage,if=talent.black_arrow&(talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|!talent.headshot&buff.razor_fragments.up)
   if S.BlackArrow:IsReady() and Settings.Marksmanship.MaxPrioDamage and (S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) and (Target:DebuffDown(S.SpottersMarkDebuff) or Player:BuffDown(S.MovingTargetBuff)) or not S.Headshot:IsAvailable() and Player:BuffUp(S.RazorFragmentsBuff)) then
     if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow st 14"; end
   end
   if S.BlackArrow:IsReady() and not Settings.Marksmanship.MaxPrioDamage then
     if Everyone.CastTargetIf(S.BlackArrow, Enemies10ySplash, "min", EvaluateTargetIfFilterBlackArrow, EvaluateTargetIfBlackArrowST, not TargetInRange40y) then return "black_arrow st 16"; end
   end
-  -- kill_shot,target_if=max:debuff.spotters_mark.down|action.aimed_shot.in_flight_to_target|max_prio_damage,if=talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|!talent.headshot&buff.razor_fragments.up
+  -- kill_shot,target_if=max:debuff.spotters_mark.down|action.aimed_shot.in_flight_to_target|max_prio_damage,if=!talent.black_arrow&(talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|!talent.headshot&buff.razor_fragments.up)
   if S.KillShot:IsReady() and Settings.Marksmanship.MaxPrioDamage and (S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) and (Target:DebuffDown(S.SpottersMarkDebuff) or Player:BuffDown(S.MovingTargetBuff)) or not S.Headshot:IsAvailable() and Player:BuffUp(S.RazorFragmentsBuff)) then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot st 18"; end
   end
@@ -282,7 +282,7 @@ local function ST()
   if S.ExplosiveShot:IsReady() and (not Player:HasTier("TWW2", 4) or not S.PrecisionDetonation:IsAvailable()) then
     if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot st 38"; end
   end
-  -- black_arrow,if=!talent.headshot
+  -- kill_shot,if=talent.black_arrow&!talent.headshot
   if S.BlackArrow:IsReady() and (not S.Headshot:IsAvailable()) then
     if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow st 40"; end
   end
@@ -310,7 +310,7 @@ local function Trickshots()
   if S.Volley:IsReady() and (S.DoubleTap:IsAvailable() and Player:BuffDown(S.DoubleTapBuff)) then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley trickshots 8"; end
   end
-  -- black_arrow,if=buff.trick_shots.up
+  -- kill_shot,if=talent.black_arrow&buff.trick_shots.up
   if S.BlackArrow:IsReady() and (Player:BuffUp(S.TrickShotsBuff)) then
     if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow trickshots 10"; end
   end
