@@ -210,7 +210,7 @@ DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
     elseif self == SpellDemo.SummonDemonicTyrant or self == SpellDemo.RuinationAbility then
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellDemo.HandofGuldan then
-      return BaseCheck and Player:SoulShardsP() >= 1
+      return (BaseCheck or Player:IsCasting(SpellDemo.RuinationAbility)) and Player:SoulShardsP() >= 1
     elseif self == SpellDemo.PowerSiphon then
       return BaseCheck and Warlock.GuardiansTable.ImpCount > 0
     else
