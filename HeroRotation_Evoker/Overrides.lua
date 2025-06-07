@@ -10,6 +10,7 @@ local Spell   = HL.Spell
 local Item    = HL.Item
 -- HeroRotation
 local HR      = HeroRotation
+local num     = HR.Commons.Everyone.num
 -- Spells
 local SpellDeva = Spell.Evoker.Devastation
 local SpellAug  = Spell.Evoker.Augmentation
@@ -181,6 +182,12 @@ HL.AddCoreOverride ("Player.EssenceP",
   end
 , 1473)
 
+HL.AddCoreOverride ("Player.EssenceDeficitP",
+  function()
+    return Player:EssenceMax() - Player:EssenceP()
+  end
+, 1473)
+
 HL.AddCoreOverride ("Player.EssenceTimeToMax",
   function()
     local Deficit = Player:EssenceDeficit()
@@ -206,7 +213,7 @@ HL.AddCoreOverride ("Player.EssenceTimeToX",
 
 HL.AddCoreOverride ("Player.EssenceBurst",
   function()
-    return Player:BuffStack(SpellAug.EssenceBurstBuff)
+    return Player:BuffStack(SpellAug.EssenceBurstBuff) - num(Player:IsCasting(SpellAug.Eruption))
   end
 , 1473)
 
