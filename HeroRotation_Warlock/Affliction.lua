@@ -35,11 +35,13 @@ local I = Item.Warlock.Affliction
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- DF Trinkets
-  I.TimeThiefsGambit:ID(),
   -- TWW Trinkets
   I.AberrantSpellforge:ID(),
   I.SpymastersWeb:ID(),
+  -- Older Trinkets
+  I.TimeThiefsGambit:ID(),
+  -- Older Items
+  I.NeuralSynapseEnhancer:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -71,7 +73,7 @@ local VarCleaveAPL = Settings.Affliction.UseCleaveAPL
 local Enemies40y, Enemies10ySplash, EnemiesCount10ySplash
 local VarPSUp, VarVTUp, VarVTPSUp, VarSRUp, VarCDDoTsUp, VarHasCDs, VarCDsActive
 local VarDoTsUp, VarMinAgony, VarMinVT, VarMinPS, VarMinPS1
-local DSSB = (S.DrainSoulTalent:IsAvailable()) and S.DrainSoul or S.ShadowBolt
+local DSSB = S.DrainSoulTalent:IsAvailable() and S.DrainSoul or S.ShadowBolt
 local ShadowEmbraceDebuff = S.DrainSoul:IsLearned() and S.ShadowEmbraceDSDebuff or S.ShadowEmbraceSBDebuff
 local ShadowEmbraceMaxStack = S.DrainSoul:IsLearned() and 4 or 2
 local SoulShards = 0
@@ -162,7 +164,7 @@ HL:RegisterForEvent(function()
   S.SeedofCorruption:RegisterInFlight()
   S.ShadowBolt:RegisterInFlight()
   S.Haunt:RegisterInFlight()
-  DSSB = (S.DrainSoulTalent:IsAvailable()) and S.DrainSoul or S.ShadowBolt
+  DSSB = S.DrainSoulTalent:IsAvailable() and S.DrainSoul or S.ShadowBolt
   ShadowEmbraceDebuff = S.DrainSoul:IsLearned() and S.ShadowEmbraceDSDebuff or S.ShadowEmbraceSBDebuff
   ShadowEmbraceMaxStack = S.DrainSoul:IsLearned() and 4 or 2
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
@@ -335,10 +337,8 @@ end
 
 --- ===== Rotation Functions =====
 local function Precombat()
-  -- flask
-  -- food
-  -- augmentation
-  -- summon_pet - Moved to APL()
+  -- summon_pet 
+  -- Note: Moved to APL()
   -- variable,name=cleave_apl,default=0,op=reset
   -- variable,name=trinket_1_buffs,value=trinket.1.has_use_buff|trinket.1.is.funhouse_lens
   -- variable,name=trinket_2_buffs,value=trinket.2.has_use_buff|trinket.2.is.funhouse_lens
@@ -399,14 +399,25 @@ local function Items()
     end
     -- use_item,use_off_gcd=1,slot=trinket2,if=!variable.trinket_2_buffs&!variable.trinket_2_manual&(!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)|talent.summon_darkglare&cooldown.summon_darkglare.remains_expected>20|!talent.summon_darkglare)
     if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs and not VarTrinket2Manual and (not VarTrinket2Buffs and (Trinket1:CooldownDown() or not VarTrinket1Buffs) or S.SummonDarkglare:IsAvailable() and S.SummonDarkglare:CooldownRemains() > 20 or not S.SummonDarkglare:IsAvailable())) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 12"; end
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") items 14"; end
     end
   end
-  -- use_item,use_off_gcd=1,slot=main_hand
   if Settings.Commons.Enabled.Items then
+    -- use_item,use_off_gcd=1,slot=main_hand,name=!neural_synapse_enhancer
+    -- Note: neural_synapse_enhancer is ignored via OnUseExcludes.
     local ItemToUse, _, ItemRange = Player:GetUseableItems(OnUseExcludes, nil, true)
     if ItemToUse then
-      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_item for " .. ItemToUse:Name() .. " items 14"; end
+      if Cast(ItemToUse, nil, Settings.CommonsDS.DisplayStyle.Items, not Target:IsInRange(ItemRange)) then return "Generic use_item for " .. ItemToUse:Name() .. " items 16"; end
+    end
+    if I.NeuralSynapseEnhancer:IsEquippedAndReady() and (
+      -- use_item,use_off_gcd=1,slot=main_hand,name=neural_synapse_enhancer,if=(prev_gcd.1.soul_rot|fight_remains<=15)&!variable.trinket_1_buffs&!variable.trinket_2_buffs
+      ((Player:PrevGCDP(1, S.SoulRot) or BossFightRemains <= 15) and not VarTrinket1Buffs and not VarTrinket2Buffs) or
+      -- use_item,use_off_gcd=1,slot=main_hand,name=neural_synapse_enhancer,if=(prev_gcd.1.soul_rot|fight_remains<=15|cooldown.soul_rot.remains>=45)&trinket.2.cooldown.remains&variable.trinket_2_buffs
+      ((Player:PrevGCDP(1, S.SoulRot) or BossFightRemains <= 15 or S.SoulRot:CooldownRemains() >= 45) and Trinket2:CooldownDown() and VarTrinket2Buffs) or
+      -- use_item,use_off_gcd=1,slot=main_hand,name=neural_synapse_enhancer,if=(prev_gcd.1.soul_rot|fight_remains<=15|cooldown.soul_rot.remains>=45)&trinket.1.cooldown.remains&variable.trinket_1_buffs
+      ((Player:PrevGCDP(1, S.SoulRot) or BossFightRemains <= 15 or S.SoulRot:CooldownRemains() >= 45) and Trinket1:CooldownDown() and VarTrinket1Buffs)
+    ) then
+      if Cast(I.NeuralSynapseEnhancer, nil, Settings.CommonsDS.DisplayStyle.Items) then return "neural_synapse_enhancer items 18"; end
     end
   end
 end
@@ -420,23 +431,25 @@ local function oGCD()
       if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion ogcd 2"; end
     end
   end
-  -- berserking,if=variable.cds_active|fight_remains<14|prev_gcd.1.soul_rot&time<20
-  if S.Berserking:IsCastable() and (VarCDsActive or BossFightRemains < 14 or SRTime) then
-    if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking ogcd 4"; end
-  end
-  -- blood_fury,if=variable.cds_active|fight_remains<17|prev_gcd.1.soul_rot&time<20
-  if S.BloodFury:IsCastable() and (VarCDsActive or BossFightRemains < 17 or SRTime) then
-    if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury ogcd 6"; end
-  end
-  -- invoke_external_buff,name=power_infusion,if=variable.cds_active
-  -- Note: Not handling external buffs
-  -- fireblood,if=variable.cds_active|fight_remains<10|prev_gcd.1.soul_rot&time<20
-  if S.Fireblood:IsCastable() and (VarCDsActive or BossFightRemains < 10 or SRTime) then
-    if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood ogcd 8"; end
-  end
-  -- ancestral_call,if=variable.cds_active|fight_remains<17|prev_gcd.1.soul_rot&time<20
-  if S.AncestralCall:IsCastable() and (VarCDsActive or BossFightRemains < 17 or SRTime) then
-    if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call ogcd 10"; end
+  if CDsON() then
+    -- berserking,if=variable.cds_active|fight_remains<14|prev_gcd.1.soul_rot&time<20
+    if S.Berserking:IsCastable() and (VarCDsActive or BossFightRemains < 14 or SRTime) then
+      if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking ogcd 4"; end
+    end
+    -- blood_fury,if=variable.cds_active|fight_remains<17|prev_gcd.1.soul_rot&time<20
+    if S.BloodFury:IsCastable() and (VarCDsActive or BossFightRemains < 17 or SRTime) then
+      if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury ogcd 6"; end
+    end
+    -- invoke_external_buff,name=power_infusion,if=variable.cds_active
+    -- Note: Not handling external buffs
+    -- fireblood,if=variable.cds_active|fight_remains<10|prev_gcd.1.soul_rot&time<20
+    if S.Fireblood:IsCastable() and (VarCDsActive or BossFightRemains < 10 or SRTime) then
+      if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood ogcd 8"; end
+    end
+    -- ancestral_call,if=variable.cds_active|fight_remains<17|prev_gcd.1.soul_rot&time<20
+    if S.AncestralCall:IsCastable() and (VarCDsActive or BossFightRemains < 17 or SRTime) then
+      if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call ogcd 10"; end
+    end
   end
 end
 
@@ -457,9 +470,7 @@ end
 
 local function AoE()
   -- call_action_list,name=ogcd
-  if CDsON() then
-    local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
-  end
+  local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
   -- call_action_list,name=items
   if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
@@ -568,9 +579,7 @@ end
 
 local function Cleave()
   -- call_action_list,name=ogcd
-  if CDsON() then
-    local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
-  end
+  local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
   -- call_action_list,name=items
   if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
     local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
@@ -659,29 +668,24 @@ local function Cleave()
   if S.UnstableAffliction:IsReady() and (Target:DebuffRefreshable(S.UnstableAfflictionDebuff) or S.SoulRot:CooldownRemains() < 5 and Target:DebuffRemains(S.UnstableAfflictionDebuff) < 8) then
     if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction cleave 30"; end
   end
-  if Player:BuffUp(S.NightfallBuff) then
-    -- drain_soul,if=buff.nightfall.react
-    if S.DrainSoul:IsReady() then
-      if Cast(S.DrainSoul, nil, nil, not Target:IsInRange(40)) then return "drain_soul cleave 32"; end
-    end
-    -- shadow_bolt,if=buff.nightfall.react
-    if S.ShadowBolt:IsReady() then
-      if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt cleave 34"; end
-    end
+  -- drain_soul,if=buff.nightfall.react
+  -- shadow_bolt,if=buff.nightfall.react
+  if DSSB:IsReady() and (Player:BuffUp(S.NightfallBuff)) then
+    if Cast(DSSB, nil, nil, not Target:IsInRange(40)) then return "drain_soul/shadow_bolt cleave 32"; end
   end
   -- wither,if=refreshable
   if S.Wither:IsReady() and (Target:DebuffRefreshable(S.WitherDebuff)) then
-    if Cast(S.Wither, nil, nil, not Target:IsInRange(40)) then return "wither cleave 36"; end
+    if Cast(S.Wither, nil, nil, not Target:IsInRange(40)) then return "wither cleave 34"; end
   end
   -- corruption,if=refreshable
   if S.Corruption:IsReady() and (Target:DebuffRefreshable(S.CorruptionDebuff)) then
-    if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption cleave 38"; end
+    if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption cleave 36"; end
   end
   -- drain_soul,chain=1,early_chain_if=buff.nightfall.react,interrupt_if=tick_time>0.5
   -- TODO: Handle early_chain_if. Otherwise, this condition is covered by the 4th line above.
   -- shadow_bolt
   if S.ShadowBolt:IsReady() then
-    if Cast(S.ShadowBolt, nil, nil, not Target:IsInRange(40)) then return "shadow_bolt cleave 40"; end
+    if Cast(S.ShadowBolt, nil, nil, not Target:IsInRange(40)) then return "shadow_bolt cleave 38"; end
   end
 end
 
@@ -777,9 +781,7 @@ local function APL()
       local ShouldReturn = AoE(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=ogcd
-    if CDsON() then
-      local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
-    end
+    local ShouldReturn = oGCD(); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=items
     if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ShouldReturn = Items(); if ShouldReturn then return ShouldReturn; end
@@ -905,7 +907,7 @@ local function OnInit()
   S.UnstableAfflictionDebuff:RegisterAuraTracking()
   S.ShadowEmbraceDSDebuff:RegisterAuraTracking()
 
-  HR.Print("Affliction Warlock rotation has been updated for patch 11.1.0.")
+  HR.Print("Affliction Warlock rotation has been updated for patch 11.1.5.")
 end
 
 HR.SetAPL(265, APL, OnInit)
