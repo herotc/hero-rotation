@@ -267,8 +267,11 @@ Item.Shaman.Enhancement = MergeTableByKey(Item.Shaman.Commons, {
 
 Item.Shaman.Elemental = MergeTableByKey(Item.Shaman.Commons, {
   -- TWW Trinkets
+  FunhouseLens                          = Item(234217, {13, 14}),
   HouseofCards                          = Item(230027, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
+  -- TWW Items
+  BestinSlotsCaster                     = Item(232805, {16}),
   -- TWW S2 Previous Expansion Items
   NeuralSynapseEnhancer                 = Item(168973, {16}),
 })
