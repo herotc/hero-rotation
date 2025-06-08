@@ -971,7 +971,7 @@ local function OnInit()
   S.ImmolateDebuff:RegisterAuraTracking()
   S.WitherDebuff:RegisterAuraTracking()
 
-  HR.Print("Destruction Warlock rotation has been updated for patch 11.1.0.")
+  HR.Print("Destruction Warlock rotation has been updated for patch 11.1.5.")
 end
 
 HR.SetAPL(267, APL, OnInit)
