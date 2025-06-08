@@ -209,6 +209,7 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   Stormstrike                           = Spell(17364),
   Sundering                             = Spell(197214),
   SwirlingMaelstrom                     = Spell(384359),
+  TempestStrikes                        = Spell(428071),
   ThorimsInvocation                     = Spell(384444),
   UnrelentingStorms                     = Spell(470490),
   UnrulyWinds                           = Spell(390288),
