@@ -565,7 +565,7 @@ local function APL()
       if (VarSpecialTrinket1 or VarSpecialTrinket2) and (Player:BuffRemains(S.AscendanceBuff) > 12 or S.Ascendance:CooldownRemains() > 90) or BossFightRemains < 16 then
         -- use_item,name=house_of_cards,use_off_gcd=1,if=(variable.special_trinket1|variable.special_trinket2)&(buff.ascendance.remains>12|cooldown.ascendance.remains>90)|fight_remains<16
         if I.HouseofCards:IsEquippedAndReady() then
-          if Cast(I.houseofCards, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "house_of_cards main 14"; end
+          if Cast(I.HouseofCards, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "house_of_cards main 14"; end
         end
         -- use_item,name=funhouse_lens,use_off_gcd=1,if=(variable.special_trinket1|variable.special_trinket2)&(buff.ascendance.remains>12|cooldown.ascendance.remains>90)|fight_remains<16
         if I.funhouseLens:IsEquippedAndReady() then
