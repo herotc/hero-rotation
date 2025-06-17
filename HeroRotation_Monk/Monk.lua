@@ -95,7 +95,7 @@ Spell.Monk.Commons = {
   DomineeringArroganceBuff              = Spell(411661), -- Neltharion trinket buff2
   TheEmperorsCapacitorBuff              = Spell(393039),
   -- Misc
-  PoolEnergy                            = Spell(999910),
+  Pool                                  = Spell(999910),
   StopFoF                               = Spell(363653)
 }
 
