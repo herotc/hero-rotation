@@ -818,7 +818,7 @@ local function CDs ()
   -- |spell_targets.fan_of_knives>1&buff.slice_and_dice.remains>5|!talent.kingsbane&dot.crimson_tempest.ticking)
   -- &!debuff.deathmark.up&variable.deathmark_ma_condition
   local DeathmarkCondition = Target:DebuffUp(S.Rupture) and (DeathmarkKingsbaneCondition or MeleeEnemies10yCount > 1
-    and Player:BuffRemains(S.SliceandDice) > 5 or S.Kingsbane:IsAvailable() and Target:DebuffUp(S.CrimsonTempest))
+    and Player:BuffRemains(S.SliceandDice) > 5 or not S.Kingsbane:IsAvailable() and Target:DebuffUp(S.CrimsonTempest))
     and Target:DebuffDown(S.Deathmark) and DeathmarkMACondition
 
   -- # Usages for various special-case Trinkets and other Cantrips if applicable
