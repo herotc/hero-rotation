@@ -553,7 +553,7 @@ local function CDs()
   end
   -- abomination_limb,if=variable.st_planning&!buff.sudden_doom.react&(buff.festermight.up&buff.festermight.stack>8|!talent.festermight)&(pet.apoc_ghoul.remains<5|!talent.apocalypse)&debuff.festering_wound.stack<=2|fight_remains<12
   if S.AbominationLimb:IsCastable() and (VarSTPlanning and Player:BuffDown(S.SuddenDoomBuff) and (Player:BuffUp(S.FestermightBuff) and Player:BuffStack(S.FestermightBuff) > 8 or not S.Festermight:IsAvailable()) and (VarApocGhoulRemains < 5 or not S.Apocalypse:IsAvailable()) and FesterStacks <= 2 or BossFightRemains < 12) then
-    if Cast(S.AbominationLimb, Settings.Unholy.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb cds 10"; end
+    if Cast(S.AbominationLimb, nil, Settings.CommonsDS.DisplayStyle.AbominationLimb, not Target:IsInRange(20)) then return "abomination_limb cds 10"; end
   end
 end
 
@@ -580,7 +580,7 @@ local function CDsAoE()
   end
   -- abomination_limb,if=variable.adds_remain
   if S.AbominationLimb:IsCastable() and (VarAddsRemain) then
-    if Cast(S.AbominationLimb, Settings.Unholy.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb cds_aoe 12"; end
+    if Cast(S.AbominationLimb, nil, Settings.CommonsDS.DisplayStyle.AbominationLimb, not Target:IsInRange(20)) then return "abomination_limb cds_aoe 12"; end
   end
 end
 
@@ -611,7 +611,7 @@ local function CDsAoESan()
   end
   -- abomination_limb,if=variable.adds_remain
   if S.AbominationLimb:IsCastable() and (VarAddsRemain) then
-    if Cast(S.AbominationLimb, Settings.Unholy.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb cds_aoe_san 14"; end
+    if Cast(S.AbominationLimb, nil, Settings.CommonsDS.DisplayStyle.AbominationLimb, not Target:IsInRange(20)) then return "abomination_limb cds_aoe_san 14"; end
   end
 end
 
@@ -634,7 +634,7 @@ local function CDsCleaveSan()
   end
   -- abomination_limb,if=!buff.gift_of_the_sanlayn.up&!buff.sudden_doom.react&buff.festermight.up&debuff.festering_wound.stack<=2|!buff.gift_of_the_sanlayn.up&fight_remains<12
   if S.AbominationLimb:IsCastable() and (Player:BuffDown(S.GiftoftheSanlaynBuff) and Player:BuffDown(S.SuddenDoomBuff) and Player:BuffUp(S.FestermightBuff) and FesterStacks <= 2 or Player:BuffUp(S.GiftoftheSanlaynBuff) and BossFightRemains < 12) then
-    if Cast(S.AbominationLimb, Settings.Unholy.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb cds_cleave_san 10"; end
+    if Cast(S.AbominationLimb, nil, Settings.CommonsDS.DisplayStyle.AbominationLimb, not Target:IsInRange(20)) then return "abomination_limb cds_cleave_san 10"; end
   end
 end
 
@@ -658,7 +658,7 @@ local function CDsSan()
   end
   -- abomination_limb,if=active_enemies>=1&variable.st_planning&!buff.gift_of_the_sanlayn.up&!buff.sudden_doom.react&buff.festermight.up&debuff.festering_wound.stack<=2|!buff.gift_of_the_sanlayn.up&fight_remains<12
   if S.AbominationLimb:IsCastable() and (ActiveEnemies >= 1 and VarSTPlanning and Player:BuffDown(S.GiftoftheSanlaynBuff) and Player:BuffDown(S.SuddenDoomBuff) and Player:BuffUp(S.FestermightBuff) and FesterStacks <= 2 or Player:BuffDown(S.GiftoftheSanlaynBuff) and BossFightRemains < 12) then
-    if Cast(S.AbominationLimb, Settings.Unholy.GCDasOffGCD.AbominationLimb, nil, not Target:IsInRange(20)) then return "abomination_limb cds_san 10"; end
+    if Cast(S.AbominationLimb, nil, Settings.CommonsDS.DisplayStyle.AbominationLimb, not Target:IsInRange(20)) then return "abomination_limb cds_san 10"; end
   end
 end
 

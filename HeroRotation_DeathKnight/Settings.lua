@@ -107,8 +107,7 @@ HR.GUISettings.APL.DeathKnight = {
       ArmyOfTheDead = "SuggestedRight",
     },
     GCDasOffGCD = {
-      -- Abilities
-      AbominationLimb = false,
+      -- Abilities4
       Apocalypse = false,
       DarkTransformation = true,
       Epidemic = false,
