@@ -53,6 +53,7 @@ Spell.Shaman.Commons = {
   NaturesSwiftness                      = Spell(378081),
   PrimordialWave                        = Spell(375982),
   SpiritwalkersGrace                    = Spell(79206),
+  SplinteredElements                    = Spell(382042),
   TotemicRecall                         = Spell(108285),
   WindShear                             = Spell(57994),
   -- Buffs
@@ -144,7 +145,6 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   PrimalElementalist                    = Spell(117013),
   SearingFlames                         = Spell(381782),
   SkybreakersFieryDemise                = Spell(378310),
-  SplinteredElements                    = Spell(382042),
   StormElemental                        = Spell(192249),
   Stormkeeper                           = Spell(191634),
   SurgeofPower                          = Spell(262303),
