@@ -568,8 +568,8 @@ local function APL()
           if Cast(I.HouseofCards, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "house_of_cards main 14"; end
         end
         -- use_item,name=funhouse_lens,use_off_gcd=1,if=(variable.special_trinket1|variable.special_trinket2)&(buff.ascendance.remains>12|cooldown.ascendance.remains>90)|fight_remains<16
-        if I.funhouseLens:IsEquippedAndReady() then
-          if Cast(I.funhouseLens, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "funhouse_lens main 16"; end
+        if I.FunhouseLens:IsEquippedAndReady() then
+          if Cast(I.FunhouseLens, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "funhouse_lens main 16"; end
         end
       end
       -- use_item,slot=trinket1,use_off_gcd=1,if=!trinket.1.is.spymasters_web&!variable.special_trinket1&variable.trinket_1_buffs&((cooldown.primordial_wave.remains>25|!talent.primordial_wave|spell_targets.chain_lightning>=2)&(cooldown.ascendance.remains>trinket.1.cooldown.duration-5|buff.spymasters_report.stack>25)|buff.ascendance.remains>12|fight_remains<21)
