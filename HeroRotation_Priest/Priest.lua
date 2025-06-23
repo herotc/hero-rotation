@@ -75,6 +75,8 @@ Spell.Priest.Archon = {
   EmpoweredSurges             = Spell(453799),
   PerfectedForm               = Spell(453917),
   PowerSurge                  = Spell(453109),
+  -- 11.2 Tier Set
+  AscensionBuff               = Spell(1239336), -- TWW S3 2pc Buff
 }
 
 Spell.Priest.Voidweaver = {
@@ -89,6 +91,8 @@ Spell.Priest.Voidweaver = {
   VoidBlast                   = Spell(450405),
   VoidEmpowerment             = Spell(450138),
   VoidWraith                  = Spell(451234),
+  -- 11.2 Tier Set
+  OverflowingVoidBuff         = Spell(1237615), -- TWW S3 4pc Buff
 }
 
 Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
