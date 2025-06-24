@@ -1131,7 +1131,7 @@ local function AR()
   end
   -- sigil_of_spite,if=debuff.essence_break.down&cooldown.blade_dance.remains&debuff.reavers_mark.remains>=2-talent.quickened_sigils&(buff.necessary_sacrifice.remains>=2-talent.quickened_sigils|!set_bonus.thewarwithin_season_2_4pc|cooldown.eye_beam.remains>8)&(buff.metamorphosis.down|buff.metamorphosis.remains+talent.shattered_destiny>=buff.necessary_sacrifice.remains+2-talent.quickened_sigils)|fight_remains<20
   if S.SigilofSpite:IsReady() and (Target:DebuffDown(S.EssenceBreakDebuff) and S.BladeDance:CooldownDown() and Target:DebuffRemains(S.ReaversMarkDebuff) >= 2 - num(S.QuickenedSigils:IsAvailable()) and (Player:BuffRemains(S.NecessarySacrificeBuff) >= 2 - num(S.QuickenedSigils:IsAvailable()) or not Player:HasTier("TWW2", 4) or BeamAbility:CooldownRemains() > 8) and (Player:BuffDown(S.MetamorphosisBuff) or Player:BuffRemains(S.MetamorphosisBuff) + num(S.ShatteredDestiny:IsAvailable()) >= Player:BuffRemains(S.NecessarySacrificeBuff) + 2 - num(S.QuickenedSigils:IsAvailable())) or BossFightRemains < 20) then
-    if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "elysian_decree ar 10"; end
+    if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_spite ar 10"; end
   end
   -- run_action_list,name=ar_fel_barrage,if=variable.fel_barrage&raid_event.adds.up
   if VarFelBarrage then
