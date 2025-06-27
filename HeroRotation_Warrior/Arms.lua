@@ -141,6 +141,60 @@ HL:RegisterForEvent(function()
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
+--- ===== Helper Functions =====
+local function LowestHPTarget(Targets)
+  local LowestHPTar, LowestHP
+  for _, Tar in pairs(Targets) do
+    if not LowestHP or Tar:HealthPercentage() < LowestHP then
+      LowestHPTar = Tar
+      LowestHP = Tar:HealthPercentage()
+    end
+  end
+  if not LowestHPTar then return Target, Target:HealthPercentage() end
+  return LowestHPTar, LowestHP
+end
+
+local function ExecuteSwitch(SpellObj, Enemies, Condition, OutofRange, OffGCD, DisplayStyle)
+  local ExecuteThreshold = S.Massacre:IsAvailable() and 35 or 20
+  if Target:HealthPercentage() < ExecuteThreshold and (not Condition or Condition and Condition(Target)) then
+    return Cast(SpellObj, OffGCD, DisplayStyle, OutofRange)
+  end
+  if AoEON() then
+    local TargetGUID = Target:GUID()
+    for _, CycleUnit in pairs(Enemies) do
+      if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy()) and CycleUnit:HealthPercentage() < ExecuteThreshold and (not Condition or Condition and Condition(CycleUnit)) then
+        CastLeftNameplate(CycleUnit, SpellObj)
+      end
+    end
+  end
+end
+
+--- ===== Conditions for ExecuteSwitch =====
+local function ExecuteSwitchBladestormSlayer(TargetUnit)
+  -- if=(debuff.executioners_precision.stack=2&(debuff.colossus_smash.remains>4|cooldown.colossus_smash.remains>15))|!talent.executioners_precision
+  return TargetUnit:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and TargetUnit:DebuffRemains(S.ColossusSmashDebuff) > 4 or TargetUnit:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and S.ColossusSmash:CooldownRemains() > 15 or not S.ExecutionersPrecision:IsAvailable()
+end
+local function ExecuteSwitchDemolishUp(TargetUnit)
+  -- if=debuff.colossus_smash.up
+  return TargetUnit:DebuffUp(S.ColossusSmashDebuff)
+end
+
+local function ExecuteSwitchMortalStrikeColossus(TargetUnit)
+  -- if=debuff.executioners_precision.stack=2&!buff.ravager.up|!talent.executioners_precision|talent.battlelord&debuff.executioners_precision.stack>0
+  return TargetUnit:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and TargetUnit:DebuffDown(S.RavagerDebuff) or not S.ExecutionersPrecision:IsAvailable() or S.Battlelord:IsAvailable() and TargetUnit:DebuffUp(S.ExecutionersPrecisionDebuff)
+end
+
+local function ExecuteSwitchMortalStrikeSlayer(TargetUnit)
+  -- if=dot.rend.remains<2|debuff.executioners_precision.stack=2&!buff.ravager.up
+  return TargetUnit:DebuffRemains(S.RendDebuff) < 2 or TargetUnit:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and TargetUnit:DebuffDown(S.RavagerDebuff)
+end
+
+local function ExecuteSwitchRendEnding(TargetUnit)
+  -- rend,if=dot.rend.remains<=gcd&!talent.bloodletting
+  -- Note: Bloodletting checked before ExecuteSwitch call.
+  return TargetUnit:DebuffRemains(S.RendDebuff) <= Player:GCD()
+end
+
 --- ===== CastTargetIf Filter Functions =====
 local function EvaluateTargetIfFilterLowestHP(TargetUnit)
   return TargetUnit:HealthPercentage()
@@ -281,72 +335,72 @@ local function ColossusExecute()
     if Cast(S.SweepingStrikes, Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes colossus_execute 2"; end
   end
   -- rend,if=dot.rend.remains<=gcd&!talent.bloodletting
-  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and not S.Bloodletting:IsAvailable()) then
-    if Everyone.CastTargetIf(S.Rend, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "rend colossus_execute 4"; end
+  if S.Rend:IsCastable() and (not S.Bloodletting:IsAvailable()) then
+    if ExecuteSwitch(S.Rend, Enemies8y, ExecuteSwitchRendEnding, not TargetInMeleeRange) then return "rend colossus_execute 4"; end
   end
   -- thunderous_roar
   if CDsON() and S.ThunderousRoar:IsCastable() then
-    if Everyone.CastTargetIf(S.ThunderousRoar, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(12), Settings.Arms.GCDasOffGCD.ThunderousRoar) then return "thunderous_roar colossus_execute 6"; end
+    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar colossus_execute 6"; end
   end
   -- champions_spear
   if CDsON() and S.ChampionsSpear:IsCastable() then
-    if Everyone.CastTargetIf(S.ChampionsSpear, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsSpellInRange(S.ChampionsSpear), nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear) then return "champions_spear colossus_execute 8"; end
+    if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not Target:IsSpellInRange(S.ChampionsSpear)) then return "champions_spear colossus_execute 8"; end
   end
   -- ravager,if=cooldown.colossus_smash.remains<=gcd
   if CDsON() and S.Ravager:IsCastable() and (S.ColossusSmash:CooldownRemains() <= Player:GCD()) then
-    if Everyone.CastTargetIf(S.Ravager, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(40), Settings.CommonsOGCD.GCDasOffGCD.Ravager) then return "ravager colossus_execute 10"; end
+    if Cast(S.Ravager, Settings.CommonsOGCD.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager colossus_execute 10"; end
   end
   -- avatar
   if CDsON() and S.Avatar:IsCastable() then
-    if Everyone.CastTargetIf(S.Avatar, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, false, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar colossus_execute 12"; end
+    if Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar colossus_execute 12"; end
   end
   -- colossus_smash
   if S.ColossusSmash:IsCastable() then
-    if Everyone.CastTargetIf(S.ColossusSmash, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash colossus_execute 14"; end
+    if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash colossus_execute 14"; end
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
-    if Everyone.CastTargetIf(S.Warbreaker, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(8), Settings.Arms.GCDasOffGCD.Warbreaker) then return "warbreaker colossus_execute 16"; end
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker colossus_execute 16"; end
   end
   -- execute,if=buff.juggernaut.remains<=gcd&talent.juggernaut
   if S.Execute:IsReady() and (Player:BuffRemains(S.JuggernautBuff) <= Player:GCD() and S.Juggernaut:IsAvailable()) then
-    if Everyone.CastTargetIf(S.Execute, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "execute colossus_execute 18"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute colossus_execute 18"; end
   end
   -- skullsplitter,if=rage<40
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 40) then
-    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8), Settings.Arms.GCDasOffGCD.Skullsplitter) then return "skullsplitter colossus_execute 20"; end
+    if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter colossus_execute 20"; end
   end
   -- demolish,if=debuff.colossus_smash.up
-  if S.Demolish:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
-    if Everyone.CastTargetIf(S.Demolish, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, nil, Settings.CommonsDS.DisplayStyle.Demolish) then return "demolish colossus_execute 22"; end
+  if S.Demolish:IsCastable() then
+    if ExecuteSwitch(S.Demolish, Enemies8y, ExecuteSwitchDemolishUp, not TargetInMeleeRange, nil, Settings.CommonsDS.DisplayStyle.Demolish) then return "demolish colossus_execute 22"; end
   end
   -- mortal_strike,if=debuff.executioners_precision.stack=2&!buff.ravager.up|!talent.executioners_precision|talent.battlelord&debuff.executioners_precision.stack>0
-  if S.MortalStrike:IsReady() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Target:DebuffDown(S.RavagerDebuff) or not S.ExecutionersPrecision:IsAvailable() or S.Battlelord:IsAvailable() and Target:DebuffUp(S.ExecutionersPrecisionDebuff)) then
-    if Everyone.CastTargetIf(S.MortalStrike, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "mortal_strike colossus_execute 24"; end
+  if S.MortalStrike:IsReady() then
+    if ExecuteSwitch(S.MortalStrike, Enemies8y, ExecuteSwitchMortalStrikeColossus, not TargetInMeleeRange) then return "mortal_strike colossus_execute 24"; end
   end
   -- overpower,if=rage<90
   if S.Overpower:IsReady() and (Player:Rage() < 90) then
-    if Everyone.CastTargetIf(S.Overpower, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "overpower colossus_execute 26"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower colossus_execute 26"; end
   end
   -- execute,if=rage>=40&talent.executioners_precision
   if S.Execute:IsReady() and (Player:Rage() >= 40 and S.ExecutionersPrecision:IsAvailable()) then
-    if Everyone.CastTargetIf(S.Execute, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "execute colossus_execute 28"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute colossus_execute 28"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
-    if Everyone.CastTargetIf(S.Overpower, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "overpower colossus_execute 30"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower colossus_execute 30"; end
   end
   -- bladestorm
   if CDsON() and BladestormAbility:IsCastable() then
-    if Everyone.CastTargetIf(BladestormAbility, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm) then return "bladestorm colossus_execute 32"; end
+    if Cast(BladestormAbility, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm colossus_execute 32"; end
   end
   -- wrecking_throw
   if S.WreckingThrow:IsCastable() then
-    if Everyone.CastTargetIf(S.WreckingThrow, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(30)) then return "wrecking_throw colossus_execute 34"; end
+    if Cast(S.WreckingThrow, nil, nil, not Target:IsInRange(30)) then return "wrecking_throw colossus_execute 34"; end
   end
   -- execute
   if S.Execute:IsReady() then
-    if Everyone.CastTargetIf(S.Execute, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "execute colossus_execute 36"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute colossus_execute 36"; end
   end
 end
 
@@ -600,15 +654,15 @@ end
 local function SlayerExecute()
   -- From below: Force StormBolt to the top while Bladestorm is up, as it's the only spell able to be cast.
   if S.StormBolt:IsReady() and (Player:BuffUp(BladestormAbility)) then
-    if Everyone.CastTargetIf(S.StormBolt, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_execute 2"; end
+    if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_execute 2"; end
   end
   -- sweeping_strikes,if=active_enemies=2
   if S.SweepingStrikes:IsCastable() and (EnemiesCount8y == 2) then
     if Cast(S.SweepingStrikes, Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes slayer_execute 4"; end
   end
   -- rend,if=dot.rend.remains<=gcd&!talent.bloodletting
-  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and not S.Bloodletting:IsAvailable()) then
-    if Everyone.CastTargetIf(S.Rend, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "rend slayer_execute 6"; end
+  if S.Rend:IsCastable() and (not S.Bloodletting:IsAvailable()) then
+    if ExecuteSwitch(S.Rend, Enemies8y, ExecuteSwitchRendEnding, not TargetInMeleeRange) then return "rend slayer_execute 6"; end
   end
   -- thunderous_roar
   if CDsON() and S.ThunderousRoar:IsCastable() then
@@ -628,47 +682,47 @@ local function SlayerExecute()
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
-    if Everyone.CastTargetIf(S.Warbreaker, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(8), Settings.Arms.GCDasOffGCD.Warbreaker) then return "warbreaker slayer_execute 16"; end
+    if Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker, nil, not Target:IsInRange(8)) then return "warbreaker slayer_execute 16"; end
   end
   -- colossus_smash
   if S.ColossusSmash:IsCastable() then
-    if Everyone.CastTargetIf(S.ColossusSmash, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash slayer_execute 18"; end
+    if Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash, nil, not TargetInMeleeRange) then return "colossus_smash slayer_execute 18"; end
   end
   -- execute,if=buff.juggernaut.remains<=gcd*2&talent.juggernaut
   if S.Execute:IsReady() and (Player:BuffRemains(S.JuggernautBuff) <= Player:GCD() * 2 and S.Juggernaut:IsAvailable()) then
-    if Everyone.CastTargetIf(S.Execute, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "execute slayer_execute 20"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_execute 20"; end
   end
   -- bladestorm,if=(debuff.executioners_precision.stack=2&(debuff.colossus_smash.remains>4|cooldown.colossus_smash.remains>15))|!talent.executioners_precision
-  if CDsON() and BladestormAbility:IsCastable() and (Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Target:DebuffRemains(S.ColossusSmashDebuff) > 4 or Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and S.ColossusSmash:CooldownRemains() > 15 or not S.ExecutionersPrecision:IsAvailable()) then
-    if Cast(BladestormAbility, Settings.CommonsOGCD.GCDasOffGCD.Bladestorm, nil, not TargetInMeleeRange) then return "bladestorm slayer_execute 22"; end
+  if CDsON() and BladestormAbility:IsCastable() then
+    if ExecuteSwitch(BladestormAbility, Enemies8y, ExecuteSwitchBladestormSlayer, not TargetInMeleeRange) then return "bladestorm slayer_execute 22"; end
   end
   -- skullsplitter,if=rage<40
   if S.Skullsplitter:IsCastable() and (Player:Rage() < 40) then
-    if Everyone.CastTargetIf(S.Skullsplitter, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInMeleeRange(8), Settings.Arms.GCDasOffGCD.Skullsplitter) then return "skullsplitter slayer_execute 24"; end
+    if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter slayer_execute 24"; end
   end
   -- overpower,if=buff.overpower.stack<2&buff.opportunist.up&talent.opportunist&(talent.bladestorm|talent.ravager&rage<85)
   if S.Overpower:IsCastable() and (Player:BuffStack(S.OverpowerBuff) < 2 and Player:BuffUp(S.OpportunistBuff) and S.Opportunist:IsAvailable() and (BladestormAbility:IsLearned() or S.Ravager:IsAvailable() and Player:Rage() < 85)) then
-    if Everyone.CastTargetIf(S.Overpower, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "overpower slayer_execute 26"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_execute 26"; end
   end
   -- mortal_strike,if=dot.rend.remains<2|debuff.executioners_precision.stack=2&!buff.ravager.up
-  if S.MortalStrike:IsReady() and (Target:DebuffRemains(S.RendDebuff) < 2 or Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2 and Target:DebuffDown(S.RavagerDebuff)) then
-    if Everyone.CastTargetIf(S.MortalStrike, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "mortal_strike slayer_execute 28"; end
+  if S.MortalStrike:IsReady() then
+    if ExecuteSwitch(S.MortalStrike, Enemies8y, ExecuteSwitchMortalStrikeSlayer, not TargetInMeleeRange) then return "mortal_strike slayer_execute 28"; end
   end
   -- overpower,if=rage<=40&buff.overpower.stack<2&talent.fierce_followthrough
   if S.Overpower:IsCastable() and (Player:Rage() <= 40 and Player:BuffStack(S.OverpowerBuff) < 2 and S.FierceFollowthrough:IsAvailable()) then
-    if Everyone.CastTargetIf(S.Overpower, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "overpower slayer_execute 30"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_execute 30"; end
   end
   -- execute
   if S.Execute:IsReady() then
-    if Everyone.CastTargetIf(S.Execute, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "execute slayer_execute 32"; end
+    if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer_execute 32"; end
   end
   -- overpower
   if S.Overpower:IsCastable() then
-    if Everyone.CastTargetIf(S.Overpower, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not TargetInMeleeRange) then return "overpower slayer_execute 34"; end
+    if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_execute 34"; end
   end
   -- wrecking_throw
   if S.WreckingThrow:IsCastable() then
-    if Everyone.CastTargetIf(S.WreckingThrow, Enemies8y, "min", EvaluateTargetIfFilterLowestHP, nil, not Target:IsInRange(30)) then return "wrecking_throw slayer_execute 36"; end
+    if Cast(S.WreckingThrow, nil, nil, not Target:IsInRange(30)) then return "wrecking_throw slayer_execute 36"; end
   end
   -- storm_bolt,if=buff.bladestorm.up
   -- Note: Moved to the top of this function.
@@ -988,6 +1042,13 @@ local function APL()
     end
     -- invoke_external_buff,name=power_infusion,if=debuff.colossus_smash.up&fight_remains>=135|variable.execute_phase&buff.avatar.up|fight_remains<=25
     -- Note: Not handling external buffs.
+    -- Manually added: Lowest HP variables
+    local LowestHPTar, LowestHP = LowestHPTarget(Enemies8y)
+    local ExecuteThreshold = S.Massacre:IsAvailable() and 35 or 20
+    -- Manually added: execute swap suggestion
+    if Target:HealthPercentage() > ExecuteThreshold and LowestHPTar:GUID() ~= Target:GUID() and LowestHP < ExecuteThreshold then
+      HR.CastLeftNameplate(LowestHPTar, S.ExecuteSwap, "SWAP FOR EXECUTE")
+    end
     -- run_action_list,name=colossus_aoe,if=talent.demolish&active_enemies>2
     if S.Demolish:IsAvailable() and AoEON() and EnemiesCount8y > 2 then
       local ShouldReturn = ColossusAoE(); if ShouldReturn then return ShouldReturn; end

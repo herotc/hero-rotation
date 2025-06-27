@@ -81,8 +81,9 @@ Spell.Warrior.Commons = {
   MarkofFyralathDebuff                  = Spell(414532),
   RavagerDebuff                         = Spell(228920), -- Dummy Debuff entry. Actually handled in Events.
   ThunderousRoarDebuff                  = Spell(397364),
-  -- Pool
+  -- Pool/Custom
   Pool                                  = Spell(999910),
+  ExecuteSwap                           = Spell(363653),
 }
 
 Spell.Warrior.Colossus = {
