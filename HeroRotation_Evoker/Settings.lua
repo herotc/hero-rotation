@@ -41,8 +41,10 @@ HR.GUISettings.APL.Evoker = {
     GCDasOffGCD = {
       -- Abilities
       BlessingOfTheBronze = true,
+      EmeraldBlossom = false,
       TipTheScales = true,
       Unravel = true,
+      VerdantEmbrace = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {

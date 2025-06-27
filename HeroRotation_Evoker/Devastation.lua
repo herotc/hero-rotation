@@ -301,7 +301,7 @@ local function Precombat()
   -- Note: Another tw variables that are never changed. Moved to variable declarations.
   -- verdant_embrace,if=talent.scarlet_adaptation
   if Settings.Devastation.UseGreen and S.VerdantEmbrace:IsCastable() and (S.ScarletAdaptation:IsAvailable()) then
-    if Cast(S.VerdantEmbrace) then return "verdant_embrace precombat 4"; end
+    if Cast(S.VerdantEmbrace, Settings.CommonsOGCD.GCDasOffGCD.VerdantEmbrace) then return "verdant_embrace precombat 4"; end
   end
   -- hover,if=talent.slipstream
   -- hover,if=talent.slipstream
@@ -383,12 +383,12 @@ end
 local function Green()
   -- emerald_blossom
   if S.EmeraldBlossom:IsCastable() then
-    if Cast(S.EmeraldBlossom) then return "emerald_blossom green 2"; end
+    if Cast(S.EmeraldBlossom, Settings.CommonsOGCD.GCDasOffGCD.EmeraldBlossom) then return "emerald_blossom green 2"; end
   end
   -- verdant_embrace
   -- Note: Added PrevGCDP check for emerald_blossom so we don't suggest VE while waiting for EB to pop.
   if S.VerdantEmbrace:IsCastable() and not Player:PrevGCDP(1, S.EmeraldBlossom) then
-    if Cast(S.VerdantEmbrace) then return "verdant_embrace green 4"; end
+    if Cast(S.VerdantEmbrace, Settings.CommonsOGCD.GCDasOffGCD.VerdantEmbrace) then return "verdant_embrace green 4"; end
   end
 end
 

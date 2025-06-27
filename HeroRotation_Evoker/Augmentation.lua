@@ -494,11 +494,11 @@ local function Filler()
   end
   -- emerald_blossom,if=!buff.ebon_might_self.up&talent.ancient_flame&talent.scarlet_adaptation&!talent.dream_of_spring&!buff.ancient_flame.up&active_enemies=1
   if S.EmeraldBlossom:IsReady() and (Player:BuffDown(S.EbonMightSelfBuff) and S.AncientFlame:IsAvailable() and S.ScarletAdaptation:IsAvailable() and not S.DreamofSpring:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and EnemiesCount8ySplash == 1) then
-    if Cast(S.EmeraldBlossom, Settings.Augmentation.GCDasOffGCD.EmeraldBlossom) then return "emerald_blossom filler 4"; end
+    if Cast(S.EmeraldBlossom, Settings.CommonsOGCD.GCDasOffGCD.EmeraldBlossom) then return "emerald_blossom filler 4"; end
   end
   -- verdant_embrace,if=!buff.ebon_might_self.up&talent.ancient_flame&talent.scarlet_adaptation&!buff.ancient_flame.up&(!talent.dream_of_spring|mana>=200000)&active_enemies=1
   if S.VerdantEmbrace:IsReady() and (Player:BuffDown(S.EbonMightSelfBuff) and S.AncientFlame:IsAvailable() and S.ScarletAdaptation:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and (not S.DreamofSpring:IsAvailable() or Player:Mana() >= 200000) and EnemiesCount8ySplash == 1) then
-    if Cast(S.VerdantEmbrace, Settings.Augmentation.GCDasOffGCD.VerdantEmbrace) then return "verdant_embrace filler 6"; end
+    if Cast(S.VerdantEmbrace, Settings.CommonsOGCD.GCDasOffGCD.VerdantEmbrace) then return "verdant_embrace filler 6"; end
   end
   -- azure_strike
   if S.AzureStrike:IsCastable() then
@@ -714,7 +714,7 @@ local function APL()
     end
     -- emerald_blossom,if=talent.dream_of_spring&buff.essence_burst.react&(variable.spam_heal=2|variable.spam_heal=1&!buff.ancient_flame.up&talent.ancient_flame)&(buff.ebon_might_self.up|essence.deficit=0|buff.essence_burst.stack=buff.essence_burst.max_stack&cooldown.ebon_might.remains>4)
     if S.EmeraldBlossom:IsReady() and (S.DreamofSpring:IsAvailable() and Player:BuffUp(S.EssenceBurstBuff) and (VarSpamHeal == 2 or VarSpamHeal == 1 and Player:BuffDown(S.AncientFlameBuff) and S.AncientFlame:IsAvailable()) and (Player:BuffUp(S.EbonMightSelfBuff) or Player:EssenceDeficitP() == 0 or Player:EssenceBurst() == Player:MaxEssenceBurst() and S.EbonMight:CooldownRemains() > 4)) then
-      if Cast(S.EmeraldBlossom, Settings.Augmentation.GCDasOffGCD.EmeraldBlossom) then return "emerald_blossom main 18"; end
+      if Cast(S.EmeraldBlossom, Settings.CommonsOGCD.GCDasOffGCD.EmeraldBlossom) then return "emerald_blossom main 18"; end
     end
     -- living_flame,target_if=max:debuff.bombardments.remains,if=talent.mass_eruption&buff.mass_eruption_stacks.up&!buff.imminent_destruction.up&buff.essence_burst.stack<buff.essence_burst.max_stack&essence.deficit>1&(buff.ebon_might_self.remains>=6|cooldown.ebon_might.remains<=6)&debuff.bombardments.remains<action.eruption.execute_time&(talent.pupil_of_alexstrasza|active_enemies=1)
     if S.LivingFlame:IsReady() and (S.MassEruption:IsAvailable() and Player:BuffUp(S.MassEruptionBuff) and Player:BuffDown(S.ImminentDestructionBuff) and Player:EssenceBurst() < Player:MaxEssenceBurst() and Player:EssenceDeficitP() > 1 and (Player:BuffRemains(S.EbonMightSelfBuff) >= 6 or S.EbonMight:CooldownRemains() <= 6) and (S.PupilofAlexstrasza:IsAvailable() or EnemiesCount8ySplash == 1)) then
