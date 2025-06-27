@@ -285,9 +285,9 @@ function HR.CastLeft(Object, Text)
   return false
 end
 
-function HR.CastLeftNameplate(ThisUnit, Object)
+function HR.CastLeftNameplate(ThisUnit, Object, Text)
   if HR.CastLeftOffset == 1 and HR.Nameplate.AddIcon(ThisUnit, Object) then
-    HR.CastLeftCommon(Object)
+    HR.CastLeftCommon(Object, Text)
   end
   return false
 end
