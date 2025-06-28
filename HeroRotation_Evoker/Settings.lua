@@ -66,9 +66,7 @@ HR.GUISettings.APL.Evoker = {
       BreathOfEons = true,
       DeepBreath = true,
       EbonMight = false,
-      EmeraldBlossom = false,
       TimeSkip = true,
-      VerdantEmbrace = false,
     },
   },
   Devastation = {
