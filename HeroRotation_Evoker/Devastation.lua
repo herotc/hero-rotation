@@ -339,10 +339,12 @@ local function ES()
     ESEmpower = 4
   end
   -- We should (usually, if not always) be hitting all targets anyway, so keeping CastAnnotated over CastTargetIf.
-  if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and (not (Player:PowerInfusionUp() and Player:BloodlustUp()) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
-    if CastAnnotated(S.EternitySurge, nil, ESEmpower.." CLIP", not Target:IsInRange(25), Settings.Commons.DisintegrateFontSize) then return "eternity_surge empower " .. ESEmpower .. " clip ES 2"; end
-  else
-    if CastAnnotated(S.EternitySurge, false, ESEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "eternity_surge empower " .. ESEmpower .. " ES 2"; end
+  if ESEmpower > 0 then
+    if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and (not (Player:PowerInfusionUp() and Player:BloodlustUp()) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
+      if CastAnnotated(S.EternitySurge, nil, ESEmpower.." CLIP", not Target:IsInRange(25), Settings.Commons.DisintegrateFontSize) then return "eternity_surge empower " .. ESEmpower .. " clip ES 2"; end
+    else
+      if CastAnnotated(S.EternitySurge, false, ESEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "eternity_surge empower " .. ESEmpower .. " ES 2"; end
+    end
   end
 end
 
@@ -373,10 +375,12 @@ local function FB()
     FBEmpower = 4
   end
   -- We should (usually, if not always) be hitting all targets anyway, so keeping CastAnnotated over CastTargetIf.
-  if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and (not (Player:PowerInfusionUp() and Player:BloodlustUp()) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
-    if CastAnnotated(S.FireBreath, nil, FBEmpower.." CLIP", not Target:IsInRange(25), Settings.Commons.DisintegrateFontSize) then return "fire_breath empower " .. FBEmpower .. " clip FB 2"; end
-  else
-    if CastAnnotated(S.FireBreath, false, FBEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower " .. FBEmpower .. " FB 2"; end
+  if FBEmpower > 0 then
+    if Settings.Devastation.ShowChainClip and Player:IsChanneling(S.Disintegrate) and (VarDragonrageUp and (not (Player:PowerInfusionUp() and Player:BloodlustUp()) or S.FireBreath:CooldownUp() or S.EternitySurge:CooldownUp())) then
+      if CastAnnotated(S.FireBreath, nil, FBEmpower.." CLIP", not Target:IsInRange(25), Settings.Commons.DisintegrateFontSize) then return "fire_breath empower " .. FBEmpower .. " clip FB 2"; end
+    else
+      if CastAnnotated(S.FireBreath, false, FBEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower " .. FBEmpower .. " FB 2"; end
+    end
   end
 end
 
