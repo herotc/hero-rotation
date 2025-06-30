@@ -364,6 +364,7 @@ local function APL()
     --|rage.deficit<=18&cooldown.shield_slam.ready&talent.impenetrable_wall.enabled)
     --|(rage>=70
     --|buff.seeing_red.stack=7&rage>=35)&cooldown.shield_slam.remains<=1&buff.shield_block.remains>=4&set_bonus.tier31_2pc,use_off_gcd=1
+    -- Note: Removed tier31 check. Nobody should still be using it.
     if S.IgnorePain:IsReady() and IgnorePainWillNotCap() and (Target:HealthPercentage() >= 20 and 
       (Player:RageDeficit() <= 15 and S.ShieldSlam:CooldownUp() 
       or Player:RageDeficit() <= 40 and S.ShieldCharge:CooldownUp() and S.ChampionsBulwark:IsAvailable() 
@@ -377,13 +378,13 @@ local function APL()
       or Player:RageDeficit() <= 55 and S.ShieldSlam:CooldownUp() and Player:BuffUp(S.ViolentOutburstBuff) and Player:BuffUp(S.LastStandBuff) and S.UnnervingFocus:IsAvailable() and S.HeavyRepercussions:IsAvailable() and S.ImpenetrableWall:IsAvailable()
       or Player:RageDeficit() <= 17 and S.ShieldSlam:CooldownUp() and S.HeavyRepercussions:IsAvailable()
       or Player:RageDeficit() <= 18 and S.ShieldSlam:CooldownUp() and S.ImpenetrableWall:IsAvailable())
-      or (Player:Rage() >= 70
-      or Player:BuffStack(S.SeeingRedBuff) == 7 and Player:Rage() >= 35) and S.ShieldSlam:CooldownRemains() <= 1 and Player:BuffRemains(S.ShieldBlockBuff) >= 4 and Player:HasTier(31, 2)) then
+      or (Player:Rage() >= 70)
+   ) then
       if Cast(S.IgnorePain, nil, Settings.Protection.DisplayStyle.IgnorePain) then return "ignore_pain main 26"; end
     end
     -- last_stand,if=(target.health.pct>=90&talent.unnerving_focus.enabled|target.health.pct<=20&talent.unnerving_focus.enabled)|talent.bolster.enabled|set_bonus.tier30_2pc|set_bonus.tier30_4pc
-    -- Note: If set_bonus.tier30_4pc is true, then tier30_2pc would be true as well, so just check for 2pc
-    if IsCurrentlyTanking() and S.LastStand:IsCastable() and Player:BuffDown(S.ShieldWallBuff) and (Settings.Protection.UseLastStandOffensively and ((Target:HealthPercentage() >= 90 and S.UnnervingFocus:IsAvailable() or Target:HealthPercentage() <= 20 and S.UnnervingFocus:IsAvailable()) or S.Bolster:IsAvailable() or Player:HasTier(30, 2)) or not Settings.Protection.UseLastStandOffensively and Player:HealthPercentage() <= Settings.Protection.LastStandHP) then
+    -- Note: Removed tier30 check. Nobody should still be using it.
+    if IsCurrentlyTanking() and S.LastStand:IsCastable() and Player:BuffDown(S.ShieldWallBuff) and (Settings.Protection.UseLastStandOffensively and ((Target:HealthPercentage() >= 90 and S.UnnervingFocus:IsAvailable() or Target:HealthPercentage() <= 20 and S.UnnervingFocus:IsAvailable()) or S.Bolster:IsAvailable()) or not Settings.Protection.UseLastStandOffensively and Player:HealthPercentage() <= Settings.Protection.LastStandHP) then
       if Cast(S.LastStand, nil, Settings.Protection.DisplayStyle.LastStand) then return "last_stand main 28"; end
     end
     -- ravager
