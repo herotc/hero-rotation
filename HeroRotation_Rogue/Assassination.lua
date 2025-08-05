@@ -656,8 +656,8 @@ local function UsableItems ()
   end
 
   -- actions.items+=/use_item,name=unyielding_netherprism,use_off_gcd=1,if=dot.deathmark.ticking|fight_remains<=15
-  if I.UnyeildingNetherprism:IsEquippedAndReady() and BaseTrinketCondition then
-    if Cast(I.UnyeildingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+  if I.UnyieldingNetherprism:IsEquippedAndReady() and BaseTrinketCondition then
+    if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
       return "Unyeilding Netherprism";
     end
   end
