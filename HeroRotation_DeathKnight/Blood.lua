@@ -229,7 +229,7 @@ local function Deathbringer()
     if Cast(S.Bonestorm, Settings.Blood.GCDasOffGCD.Bonestorm, nil, not Target:IsInMeleeRange(8)) then return "bonestorm deathbringer 2"; end
   end
   -- death_strike,if=(runic_power.deficit<20|(runic_power.deficit<26&buff.dancing_rune_weapon.up))
-  if S.DeathStrike:IsReady() and (Player:RunicPowerDeficit() < 20 or (Player:RunicPowerDeficit() < 26 and Player:BuffUpS(S.DancingRuneWeaponBuff))) then
+  if S.DeathStrike:IsReady() and (Player:RunicPowerDeficit() < 20 or (Player:RunicPowerDeficit() < 26 and Player:BuffUp(S.DancingRuneWeaponBuff))) then
     if Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.DeathStrike, nil, not TargetInMeleeRange) then return "death_strike deathbringer 4"; end
   end
   -- soul_reaper,if=active_enemies<=2&buff.reaper_of_souls.up&target.time_to_die>(dot.soul_reaper.remains+5)
@@ -365,7 +365,7 @@ local function Sanlayn()
     if Cast(HSAction, nil, nil, not TargetInMeleeRange) then return "heart_strike sanlayn 16"; end
   end
   -- soul_reaper,if=active_enemies<=2&target.time_to_pct_35<5&target.time_to_die>(dot.soul_reaper.remains+5)
-  if S.SoulReaper:IsReady() and (EnemiesMeleeCount <= 2 and Player:TimeToX(35) < 5 and Target:TimeToDie() > (Target:DebuffRemains(S.SoulReaperDebuff) + 5)) then
+  if S.SoulReaper:IsReady() and (EnemiesMeleeCount <= 2 and Target:TimeToX(35) < 5 and Target:TimeToDie() > (Target:DebuffRemains(S.SoulReaperDebuff) + 5)) then
     if Cast(S.SoulReaper, nil, nil, not TargetInMeleeRange) then return "soul_reaper sanlayn 18"; end
   end
   -- blood_boil,if=buff.bone_shield.stack<6&!dot.bonestorm.ticking&active_enemies>=2
