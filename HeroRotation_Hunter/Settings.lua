@@ -46,8 +46,6 @@ HR.GUISettings.APL.Hunter = {
       HuntersMark = false,
       MendPet = false,
       RevivePet = false,
-      Stampede = false,
-      SteelTrap = false,
       SummonPet = false,
       TarTrap = false,
     },
@@ -61,12 +59,9 @@ HR.GUISettings.APL.Hunter = {
       Selected = "Tempered",
     },
     GCDasOffGCD = {
-      AMurderOfCrows = false,
       BestialWrath = false,
       Bloodshed = false,
       CallOfTheWild = false,
-      DireBeast = false,
-      WailingArrow = false,
     },
   },
   Marksmanship = {
