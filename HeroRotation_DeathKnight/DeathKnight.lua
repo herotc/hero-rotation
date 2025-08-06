@@ -142,6 +142,7 @@ Spell.DeathKnight.Blood = MergeTableByKey(Spell.DeathKnight.Commons, {
   BoneShieldBuff                        = Spell(195181),
   CoagulopathyBuff                      = Spell(391481),
   ConsumptionBuff                       = Spell(274156),
+  CrimsonScourgeBuff                    = Spell(81141),
   DancingRuneWeaponBuff                 = Spell(81256),
   InnerResilienceBuff                   = Spell(450706), -- Tome of Light's Devotion buff
   HemostasisBuff                        = Spell(273947),
@@ -260,6 +261,7 @@ Item.DeathKnight.Commons = {
   FunhouseLens                          = Item(234217, {13, 14}),
   ImprovisedSeaforiumPacemaker          = Item(232541, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
+  UnyieldingNetherprism                 = Item(242396, {13, 14}),
 }
 
 Item.DeathKnight.Blood = MergeTableByKey(Item.DeathKnight.Commons, {
