@@ -248,349 +248,123 @@ end
   -- invoke_external_buff,name=power_infusion
 end]]
 
-local function RGPrep()
-  -- felblade
-  if S.Felblade:IsCastable() then
-    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade rg_prep 2"; end
-  end
-  -- vengeful_retreat,use_off_gcd=1,if=!cooldown.felblade.up&talent.unhindered_assault
-  if S.VengefulRetreat:IsCastable() and (not S.Felblade:CooldownUp() and S.UnhinderedAssault:IsAvailable()) then
-    if Cast(S.VengefulRetreat, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "vengeful_retreat rg_prep 4"; end
-  end
-  -- sigil_of_flame
-  if SigilAbility:IsCastable() then
-    if Cast(SigilAbility, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_ability rg_prep 6"; end
-  end
-  -- immolation_aura
-  if ImmoAbility:IsCastable() then
-    if Cast(ImmoAbility) then return "immolation_aura rg_prep 8"; end
-  end
-  -- fracture
-  if S.Fracture:IsCastable() then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture rg_prep 10"; end
-  end
-end
-
-local function RGOverflow()
-  -- variable,name=trigger_overflow,op=set,value=1
-  VarTriggerOverflow = true
-  -- variable,name=rg_enhance_cleave,op=set,value=1
-  VarRGEnhCleave = true
-  -- reavers_glaive,if=(fury+(variable.rg_enhance_cleave*25)+(talent.keen_engagement*20))>=30&!buff.rending_strike.up&!buff.glaive_flurry.up
-  if S.ReaversGlaive:IsCastable() and (EnoughFuryToRG() and Player:BuffDown(S.RendingStrikeBuff) and Player:BuffDown(S.GlaiveFlurryBuff)) then
-    if Cast(S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "reavers_glaive rg_overflow 2"; end
-  end
-  -- call_action_list,name=rg_prep,if=!(fury+(variable.rg_enhance_cleave*25)+(talent.keen_engagement*20))>=30
-  if S.ReaversGlaive:IsLearned() and (not EnoughFuryToRG()) then
-    local ShouldReturn = RGPrep(); if ShouldReturn then return ShouldReturn; end
-  end
-end
-
-local function RGSequenceFiller()
-  -- felblade
-  if S.Felblade:IsCastable() then
-    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade rg_sequence_filler 2"; end
-  end
-  -- fracture,if=!buff.rending_strike.up
-  if S.Fracture:IsCastable() and (Player:BuffDown(S.RendingStrikeBuff)) then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture rg_sequence_filler 4"; end
-  end
-  -- wait,sec=0.1,if=action.fracture.charges_fractional>=0.8&((variable.rg_enhance_cleave&buff.rending_strike.up&buff.glaive_flurry.up)|(!variable.rg_enhance_cleave&!buff.glaive_flurry.up))
-  -- sigil_of_flame
-  if SigilAbility:IsCastable() then
-    if Cast(SigilAbility, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_ability rg_sequence_filler 6"; end
-  end
-  -- sigil_of_spite
-  if S.SigilofSpite:IsCastable() then
-    if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_spite rg_sequence_filler 8"; end
-  end
-  -- soul_carver
-  if S.SoulCarver:IsCastable() then
-    if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver rg_sequence_filler 10"; end
-  end
-  -- fel_devastation
-  if FelDevDeso:IsReady() then
-    if Cast(FelDevDeso, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_dev_deso rg_sequence_filler 12"; end
-  end
-  -- throw_glaive
-  if S.ThrowGlaive:IsCastable() then
-    if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive rg_sequence_filler 14"; end
-  end
-end
-
-local function RGSequence()
-  -- variable,name=double_rm_expires,value=time+action.fracture.execute_time+20,if=!buff.glaive_flurry.up&buff.rending_strike.up
-  if not Player:BuffUp(S.GlaiveFlurryBuff) and Player:BuffUp(S.RendingStrikeBuff) then
-    VarDoubleRMExpires = HL.CombatTime() + S.Fracture:ExecuteTime() + 20
-  end
-  -- call_action_list,name=rg_sequence_filler,if=(fury<30&((!variable.rg_enhance_cleave&buff.glaive_flurry.up&buff.rending_strike.up)|(variable.rg_enhance_cleave&!buff.rending_strike.up)))|(action.fracture.charges_fractional<1&((variable.rg_enhance_cleave&buff.rending_strike.up&buff.glaive_flurry.up)|(!variable.rg_enhance_cleave&!buff.glaive_flurry.up)))
-  if (Player:Fury() < 30 and ShouldCleaveRG()) or (S.Fracture:ChargesFractional() < 1 and ShouldFractureRG()) then
-    local ShouldReturn = RGSequenceFiller(); if ShouldReturn then return ShouldReturn; end
-  end
-  -- fracture,if=((variable.rg_enhance_cleave&buff.rending_strike.up&buff.glaive_flurry.up)|(!variable.rg_enhance_cleave&!buff.glaive_flurry.up))
-  if S.Fracture:IsCastable() and (ShouldFractureRG()) then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture rg_sequence 2"; end
-  end
-  -- shear,if=((variable.rg_enhance_cleave&buff.rending_strike.up&buff.glaive_flurry.up)|(!variable.rg_enhance_cleave&!buff.glaive_flurry.up))
-  if S.Shear:IsCastable() and (ShouldFractureRG()) then
-    if Cast(S.Shear, nil, nil, not IsInMeleeRange) then return "shear rg_sequence 4"; end
-  end
-  -- soul_cleave,if=((!variable.rg_enhance_cleave&buff.glaive_flurry.up&buff.rending_strike.up)|(variable.rg_enhance_cleave&!buff.rending_strike.up))
-  if SunderCleave:IsReady() and (ShouldCleaveRG()) then
-    if Cast(SunderCleave, nil, nil, not IsInMeleeRange) then return "sunder_cleave rg_sequence 6"; end
-  end
-  -- Manually added: fracture
-  -- Manual Override (Jom): Sometimes the player will play non-optimally, and can end up in a situation where there are no valid recommendations inside of RGSequence()
-  if S.Fracture:IsCastable() then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture rg_sequence 8"; end
-  end
-  -- Manually added: soul_cleave
-  -- Manual Override (Jom): Sometimes the player will play non-optimally, and can end up in a situation where there are no valid recommendations inside of RGSequence()
-  if SunderCleave:IsReady() then
-      if Cast(SunderCleave, nil, nil, not IsInMeleeRange) then return "sunder_cleave rg_sequence 10"; end
-  end
-end
-
-local function ARExecute()
-  -- metamorphosis,use_off_gcd=1
-  if S.Metamorphosis:IsCastable() then
-    if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis ar_execute 2"; end
-  end
-  -- reavers_glaive,if=(fury+(variable.rg_enhance_cleave*25)+(talent.keen_engagement*20))>=30&!(buff.rending_strike.up|buff.glaive_flurry.up)
-  if S.ReaversGlaive:IsCastable() and (EnoughFuryToRG() and (not Player:BuffUp(S.RendingStrikeBuff) and not Player:BuffUp(S.GlaiveFlurryBuff))) then
-    if Cast(S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "reavers_glaive ar_execute 4"; end
-  end
-  -- call_action_list,name=rg_prep,if=buff.reavers_glaive.up&!(fury+(variable.rg_enhance_cleave*25)+(talent.keen_engagement*20))>=30
-  if S.ReaversGlaive:IsLearned() and not EnoughFuryToRG() then
-    local ShouldReturn = RGPrep(); if ShouldReturn then return ShouldReturn; end
-  end
-  -- the_hunt,if=!buff.reavers_glaive.up
-  if S.TheHunt:IsCastable() and (not S.ReaversGlaive:IsLearned()) then
-    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar_execute 6"; end
-  end
-  -- bulk_extraction,if=spell_targets>=3&buff.art_of_the_glaive.stack>=20
-  if S.BulkExtraction:IsCastable() and (EnemiesCount8yMelee >= 3 and Player:BuffStack(S.ArtoftheGlaiveBuff) >= 20) then
-    if Cast(S.BulkExtraction, Settings.Vengeance.OffGCDasOffGCD.BulkExtraction, nil, not IsInMeleeRange) then return "bulk_extraction ar_execute 8"; end
-  end
-  -- sigil_of_flame
-  if SigilAbility:IsCastable() then
-    if Cast(SigilAbility, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_ability ar_execute 10"; end
-  end
-  -- fiery_brand
-  if S.FieryBrand:IsCastable() then
-    if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand ar_execute 12"; end
-  end
-  -- sigil_of_spite
-  if S.SigilofSpite:IsCastable() then
-    if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_spite ar_execute 14"; end
-  end
-  -- soul_carver
-  if S.SoulCarver:IsCastable() then
-    if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver ar_execute 16"; end
-  end
-  -- fel_devastation
-  if FelDevDeso:IsReady() then
-    if Cast(FelDevDeso, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_dev_deso ar_execute 18"; end
-  end
-end
-
 local function AR()
-  -- variable,name=spb_threshold,op=setif,condition=talent.fiery_demise&dot.fiery_brand.ticking,value=(variable.single_target*5)+(variable.small_aoe*5)+(variable.big_aoe*4),value_else=(variable.single_target*5)+(variable.small_aoe*5)+(variable.big_aoe*4)
-  -- Note: Currently the value and value_else are identical, so skipping the condition check.
-  --if S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() > 0 then
-    VarSpBThreshold = (num(VarST) * 5) + (num(VarSmallAoE) * 5) + (num(VarBigAoE) * 4)
-  --else
-    --VarSpBThreshold = (num(VarST) * 5) + (num(VarSmallAoE) * 5) + (num(VarBigAoE) * 4)
-  --end
-  -- variable,name=can_spb,op=setif,condition=talent.spirit_bomb,value=soul_fragments>=variable.spb_threshold,value_else=0
-  VarCanSpB = S.SpiritBomb:IsAvailable() and SoulFragments >= VarSpBThreshold
-  -- variable,name=can_spb_soon,op=setif,condition=talent.spirit_bomb,value=soul_fragments.total>=variable.spb_threshold,value_else=0
-  VarCanSpBSoon = S.SpiritBomb:IsAvailable() and TotalSoulFragments >= VarSpBThreshold
-  -- variable,name=can_spb_one_gcd,op=setif,condition=talent.spirit_bomb,value=(soul_fragments.total+variable.num_spawnable_souls)>=variable.spb_threshold,value_else=0
-  VarCanSpBOneGCD = S.SpiritBomb:IsAvailable() and (TotalSoulFragments + VarNumSpawnableSouls) >= VarSpBThreshold
-  -- variable,name=double_rm_remains,op=setif,condition=(variable.double_rm_expires-time)>0,value=variable.double_rm_expires-time,value_else=0
-  VarDoubleRMRemains = VarDoubleRMExpires and ((VarDoubleRMExpires - HL.CombatTime()) > 0) and (VarDoubleRMExpires - HL.CombatTime()) or 0
-  -- variable,name=trigger_overflow,op=set,value=0,if=!buff.glaive_flurry.up&!buff.rending_strike.up&!prev_gcd.1.reavers_glaive
-  if Player:BuffDown(S.GlaiveFlurryBuff) and Player:BuffDown(S.RendingStrikeBuff) and not Player:PrevGCD(1, S.ReaversGlaive) then
-    VarTriggerOverflow = false
-  end
-  -- variable,name=rg_enhance_cleave,op=setif,condition=variable.trigger_overflow|(spell_targets.spirit_bomb>=4)|(fight_remains<10|target.time_to_die<10),value=1,value_else=0
-  VarRGEnhCleave = (VarTriggerOverflow or EnhanceCleaveOnly() or (BossFightRemains < 10 or Target:TimeToDie() < 10))
-  -- variable,name=souls_before_next_rg_sequence,value=soul_fragments.total+buff.art_of_the_glaive.stack
-  VarSoulsBeforeNextRGSequence = TotalSoulFragments + Player:BuffStack(S.ArtoftheGlaiveBuff)
-  -- variable,name=souls_before_next_rg_sequence,op=add,value=(1.1*(1+raw_haste_pct))*(variable.double_rm_remains-(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max)))
-  VarSoulsBeforeNextRGSequence = VarSoulsBeforeNextRGSequence + (SoulsPerSecond() * (VarDoubleRMRemains - RGSequenceDuration()))
-  -- variable,name=souls_before_next_rg_sequence,op=add,value=3+talent.soul_sigils,if=cooldown.sigil_of_spite.remains<(variable.double_rm_remains-gcd.max-(2-talent.soul_sigils))
-  if S.SigilofSpite:CooldownRemains() < (VarDoubleRMRemains - Player:GCD() - (2 - num(S.SoulSigils:IsAvailable()))) then
-    VarSoulsBeforeNextRGSequence = VarSoulsBeforeNextRGSequence + 3 + num(S.SoulSigils:IsAvailable())
-  end
-  -- variable,name=souls_before_next_rg_sequence,op=add,value=3,if=cooldown.soul_carver.remains<(variable.double_rm_remains-gcd.max)
-  if S.SoulCarver:CooldownRemains() < (VarDoubleRMRemains - Player:GCD()) then
-    VarSoulsBeforeNextRGSequence = VarSoulsBeforeNextRGSequence + 3
-  end
-  -- variable,name=souls_before_next_rg_sequence,op=add,value=3,if=cooldown.soul_carver.remains<(variable.double_rm_remains-gcd.max-3)
-  if S.SoulCarver:CooldownRemains() < (VarDoubleRMRemains - Player:GCD() - 3) then
-    VarSoulsBeforeNextRGSequence = VarSoulsBeforeNextRGSequence + 3
-  end
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,slot=trinket1,if=!trinket.1.is.tome_of_lights_devotion&(!variable.trinket_1_buffs|(variable.trinket_1_buffs&((buff.rending_strike.up&buff.glaive_flurry.up)|(prev_gcd.1.reavers_glaive)|(buff.thrill_of_the_fight_damage.remains>8)|(buff.reavers_glaive.up&cooldown.the_hunt.remains<5))))
+    -- use_item,slot=trinket1,if=!trinket.1.is.tome_of_lights_devotion&(!variable.trinket_1_buffs|(variable.trinket_1_buffs&((buff.metamorphosis.up)|(buff.metamorphosis.up&cooldown.metamorphosis.remains<10)|(cooldown.metamorphosis.remains>trinket.1.cooldown.duration)|(variable.trinket_2_buffs&trinket.2.cooldown.remains<cooldown.metamorphosis.remains))))
+    -- Note: Modified Meta checks, as buff.metamorphosis.up covers (buff.metamorphosis.up&cooldown.metamorphosis.remains<10).
     -- Note: Tome excluded via OnUseExcludes/VarTrinket1Ex.
-    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs or (VarTrinket1Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightVengDmgBuff) > 8) or (S.ReaversGlaive:IsLearned() and S.TheHunt:CooldownRemains() < 5)))) then
+    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not VarTrinket1Buffs or (VarTrinket1Buffs and (Player:BuffUp(S.MetamorphosisBuff) or (S.Metamorphosis:CooldownRemains() > VarTrinket1CD) or (VarTrinket2Buffs and VarTrinket2CD < S.Metamorphosis:CooldownRemains())))) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "use_item for trinket1 (" .. Trinket1:Name() .. ") ar 2"; end
     end
-    -- use_item,slot=trinket2,if=!trinket.2.is.tome_of_lights_devotion&(!variable.trinket_2_buffs|(variable.trinket_2_buffs&((buff.rending_strike.up&buff.glaive_flurry.up)|(prev_gcd.1.reavers_glaive)|(buff.thrill_of_the_fight_damage.remains>8)|(buff.reavers_glaive.up&cooldown.the_hunt.remains<5))))
+    -- use_item,slot=trinket2,if=!trinket.2.is.tome_of_lights_devotion&(!variable.trinket_2_buffs|(variable.trinket_2_buffs&((buff.metamorphosis.up)|(buff.metamorphosis.up&cooldown.metamorphosis.remains<10)|(cooldown.metamorphosis.remains>trinket.2.cooldown.duration)|(variable.trinket_1_buffs&trinket.1.cooldown.remains<cooldown.metamorphosis.remains))))
+    -- Note: Modified Meta checks, as buff.metamorphosis.up covers (buff.metamorphosis.up&cooldown.metamorphosis.remains<10).
     -- Note: Tome excluded via OnUseExcludes/VarTrinket2Ex.
-    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs or (VarTrinket2Buffs and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) or (Player:BuffRemains(S.ThrilloftheFightVengDmgBuff) > 8) or (S.ReaversGlaive:IsLearned() and S.TheHunt:CooldownRemains() < 5)))) then
+    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not VarTrinket2Buffs or (VarTrinket2Buffs and (Player:BuffUp(S.MetamorphosisBuff) or (S.Metamorphosis:CooldownRemains() > VarTrinket2CD) or (VarTrinket1Buffs and VarTrinket1CD < S.Metamorphosis:CooldownRemains())))) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "use_item for trinket2 (" .. Trinket2:Name() .. ") ar 4"; end
     end
     -- use_item,name=tome_of_lights_devotion,if=buff.inner_resilience.up
     if I.TomeofLightsDevotion:IsEquippedAndReady() and (Player:BuffUp(S.InnerResilienceBuff)) then
-      if Cast(I.TomeofLightsDevotion, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "tome_of_lights_devotion ar 5"; end
+      if Cast(I.TomeofLightsDevotion, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "tome_of_lights_devotion ar 6"; end
     end
   end
   -- potion,use_off_gcd=1,if=(buff.rending_strike.up&buff.glaive_flurry.up)|prev_gcd.1.reavers_glaive
   if Settings.Commons.Enabled.Potions and ((Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive)) then
     local PotionSelected = Everyone.PotionSelected()
     if PotionSelected and PotionSelected:IsReady() then
-      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion ar 6"; end
+      if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion ar 8"; end
     end
   end
   -- call_action_list,name=externals,if=(buff.rending_strike.up&buff.glaive_flurry.up)|prev_gcd.1.reavers_glaive
-  -- Note: Not handling externals.
-  -- run_action_list,name=rg_sequence,if=buff.glaive_flurry.up|buff.rending_strike.up|prev_gcd.1.reavers_glaive
-  -- Note: Added FuryoftheAldrachi check to avoid stalling the profile if it's not yet learned.
-  if S.FuryoftheAldrachi:IsAvailable() and (Player:BuffUp(S.GlaiveFlurryBuff) or Player:BuffUp(S.RendingStrikeBuff) or Player:PrevGCD(1, S.ReaversGlaive)) then
-    local ShouldReturn = RGSequence(); if ShouldReturn then return ShouldReturn; end
-    if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for RGSequence()"; end
+  if (Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) then
+    local ShouldReturn = Externals(); if ShouldReturn then return ShouldReturn; end
   end
-  -- metamorphosis,use_off_gcd=1,if=time<5|cooldown.fel_devastation.remains>=20
-  if S.Metamorphosis:IsCastable() and (HL.CombatTime() < 5 or FelDevDeso:CooldownRemains() >= 20) then
-      if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis ar 8"; end
+  -- metamorphosis,use_off_gcd=1,if=!buff.metamorphosis.up
+  if S.Metamorphosis:IsCastable() and (Player:BuffDown(S.MetamorphosisBuff)) then
+    if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis ar 10"; end
+  end
+  -- fel_devastation,use_off_gcd=1,if=!buff.rending_strike.up&!buff.glaive_flurry.up
+  if FelDevDeso:IsReady() and (Player:BuffDown(S.RendingStrikeBuff) and Player:BuffDown(S.GlaiveFlurryBuff)) then
+    if Cast(FelDevDeso, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_dev_deso ar 12"; end
+  end
+  -- soul_cleave,if=!buff.rending_strike.up&buff.glaive_flurry.up
+  if SunderCleave:IsReady() and (Player:BuffDown(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) then
+    if Cast(SunderCleave, nil, nil, not IsInMeleeRange) then return "sunder_cleave ar 14"; end
+  end
+  -- shear,if=talent.fracture&buff.glaive_flurry.up
+  if S.Fracture:IsCastable() and (Player:BuffUp(S.GlaiveFlurryBuff)) then
+    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "shear ar 16"; end
+  end
+  -- shear,if=!talent.fracture&buff.glaive_flurry.up
+  if S.Shear:IsCastable() and (Player:BuffUp(S.GlaiveFlurryBuff)) then
+    if Cast(S.Shear, nil, nil, not IsInMeleeRange) then return "shear ar 18"; end
+  end
+  -- reavers_glaive,if=!buff.rending_strike.up&!buff.glaive_flurry.up
+  if S.ReaversGlaive:IsCastable() and (Player:BuffDown(S.RendingStrikeBuff) and Player:BuffDown(S.GlaiveFlurryBuff)) then
+    if Cast(S.ReaversGlaive, nil, nil, not Target:IsSpellInRange(S.ReaversGlaive)) then return "reavers_glaive ar 20"; end
   end
   -- the_hunt,if=!buff.reavers_glaive.up&(buff.art_of_the_glaive.stack+soul_fragments.total)<20
-  if S.TheHunt:IsCastable() and (not S.ReaversGlaive:IsLearned() and ((Player:BuffStack(S.ArtoftheGlaiveBuff) + TotalSoulFragments) < 20)) then
-    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar 10"; end
+  if S.TheHunt:IsCastable() and (not S.ReaversGlaive:IsLearned() and (Player:BuffStack(S.ArtoftheGlaiveBuff) + TotalSoulFragments) < 20) then
+    if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar 22"; end
   end
-  -- spirit_bomb,if=variable.can_spb&(soul_fragments.inactive>2|prev_gcd.1.sigil_of_spite|prev_gcd.1.soul_carver|(spell_targets.spirit_bomb>=4&talent.fallout&cooldown.immolation_aura.remains<gcd.max))
-  if BurstBomb:IsReady() and (VarCanSpB and (IncSoulFragments > 2 or Player:PrevGCD(1, S.SigilofSpite) or Player:PrevGCD(1, S.SoulCarver) or (EnemiesCount8yMelee >= 4 and S.Fallout:IsAvailable() and S.ImmolationAura:CooldownRemains() < Player:GCD()))) then
-    if Cast(BurstBomb, nil, nil, not IsInAoERange) then return "burst_bomb ar 12"; end
+  -- fiery_brand,if=talent.fiery_demise&!dot.fiery_brand.ticking
+  if S.FieryBrand:IsCastable() and (S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() == 0) then
+    if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand ar 24"; end
   end
-  -- immolation_aura,if=(spell_targets.spirit_bomb>=4)|(!buff.reavers_glaive.up|(variable.double_rm_remains>((action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))+gcd.max)))
-  if ImmoAbility:IsCastable() and (EnhanceCleaveOnly() or (not S.ReaversGlaive:IsLearned() or (VarDoubleRMRemains > (RGSequenceDuration() + Player:GCD())))) then
-    if Cast(ImmoAbility) then return "immolation_aura ar 14"; end
+  -- soul_carver,if=!talent.fiery_demise|(talent.fiery_demise&dot.fiery_brand.ticking)
+  if S.SoulCarver:IsCastable() and (not S.FieryDemise:IsAvailable() or (S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() > 0)) then
+    if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver ar 26"; end
   end
-  -- sigil_of_flame,if=(talent.ascending_flame|(!prev_gcd.1.sigil_of_flame&dot.sigil_of_flame.remains<(4-talent.quickened_sigils)))&(!buff.reavers_glaive.up|(variable.double_rm_remains>((action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))+gcd.max)))
-  if SigilAbility:IsCastable() and ((S.AscendingFlame:IsAvailable() or (not Player:PrevGCDP(1, SigilAbility) and Target:DebuffRemains(S.SigilofFlameDebuff) < (4 - num(S.QuickenedSigils:IsAvailable())))) and (not S.ReaversGlaive:IsLearned() or (VarDoubleRMRemains > (RGSequenceDuration() + Player:GCD())))) then
-    if Cast(SigilAbility, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_ability ar 16"; end
-  end
-  -- run_action_list,name=rg_overflow,if=buff.reavers_glaive.up&!(spell_targets.spirit_bomb>=4)&debuff.reavers_mark.up&(variable.double_rm_remains>(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max)))&(!buff.thrill_of_the_fight_damage.up|(buff.thrill_of_the_fight_damage.remains<(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))))&((variable.double_rm_remains-(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max)))>(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max)))&((variable.souls_before_next_rg_sequence>=20)|(variable.double_rm_remains>((action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))+cooldown.the_hunt.remains+action.the_hunt.execute_time)))
-  if S.ReaversGlaive:IsLearned() and (not EnhanceCleaveOnly() and Target:DebuffUp(S.ReaversMarkDebuff) and (VarDoubleRMRemains > RGSequenceDuration()) and (Player:BuffDown(S.ThrilloftheFightVengDmgBuff) or (Player:BuffRemains(S.ThrilloftheFightVengDmgBuff) < RGSequenceDuration())) and ((VarDoubleRMRemains - RGSequenceDuration()) > RGSequenceDuration()) and ((VarSoulsBeforeNextRGSequence >= 20) or (VarDoubleRMRemains > (RGSequenceDuration() + S.TheHunt:CooldownRemains() + S.TheHunt:ExecuteTime())))) then
-    local ShouldReturn = RGOverflow(); if ShouldReturn then return ShouldReturn; end
-    if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool for RGOverflow()"; end
-  end
-  -- call_action_list,name=ar_execute,if=(fight_remains<10|target.time_to_die<10)
-  if BossFightRemains < 10 or Target:TimeToDie() < 10 then
-    local ShouldReturn = ARExecute(); if ShouldReturn then return ShouldReturn; end
-  end
-  -- soul_cleave,if=!buff.reavers_glaive.up&(variable.double_rm_remains<=(execute_time+(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))))&(soul_fragments<3&((buff.art_of_the_glaive.stack+soul_fragments)>=20))
-  if SunderCleave:IsReady() and (not S.ReaversGlaive:IsLearned() and ((VarDoubleRMRemains <= (SunderCleave:ExecuteTime() + RGSequenceDuration())) and (SoulFragments < 3 and (Player:BuffStack(S.ArtoftheGlaiveBuff) + SoulFragments) >= 20))) then
-    if Cast(SunderCleave, nil, nil, not IsInMeleeRange) then return "sunder_cleave ar 18"; end
-  end
-  -- spirit_bomb,if=!buff.reavers_glaive.up&(variable.double_rm_remains<=(execute_time+(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))))&((buff.art_of_the_glaive.stack+soul_fragments)>=20)
-  if BurstBomb:IsReady() and (not S.ReaversGlaive:IsLearned() and ((VarDoubleRMRemains <= (BurstBomb:ExecuteTime() + RGSequenceDuration())) and (Player:BuffStack(S.ArtoftheGlaiveBuff) + SoulFragments) >= 20)) then
-    if Cast(BurstBomb, nil, nil, not IsInAoERange) then return "burst_bomb ar 20"; end
-  end
-  -- bulk_extraction,if=!buff.reavers_glaive.up&(variable.double_rm_remains<=(execute_time+(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))))&((buff.art_of_the_glaive.stack+(spell_targets>?5))>=20)
-  if S.BulkExtraction:IsCastable() and (not S.ReaversGlaive:IsLearned() and ((VarDoubleRMRemains <= (S.BulkExtraction:ExecuteTime() + RGSequenceDuration())) and (Player:BuffStack(S.ArtoftheGlaiveBuff) + mathmin(EnemiesCount8yMelee, 5)) >= 20)) then
-    if Cast(S.BulkExtraction, Settings.Vengeance.OffGCDasOffGCD.BulkExtraction, nil, not IsInMeleeRange) then return "bulk_extraction ar 22"; end
-  end
-  -- reavers_glaive,if=(fury+(variable.rg_enhance_cleave*25)+(talent.keen_engagement*20))>=30&((!buff.thrill_of_the_fight_attack_speed.up|(variable.double_rm_remains<=(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))))|(spell_targets.spirit_bomb>=4))&!(buff.rending_strike.up|buff.glaive_flurry.up)
-  if S.ReaversGlaive:IsCastable() and (EnoughFuryToRG() and (UseRGMain() or EnhanceCleaveOnly()) and (not Player:BuffUp(S.RendingStrikeBuff) and not Player:BuffUp(S.GlaiveFlurryBuff))) then
-    if Cast(S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "reavers_glaive ar 24"; end
-  end
-  -- call_action_list,name=rg_prep,if=!(fury+(variable.rg_enhance_cleave*25)+(talent.keen_engagement*20))>=30&((!buff.thrill_of_the_fight_attack_speed.up|(variable.double_rm_remains<=(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))))|(spell_targets.spirit_bomb>=4))
-  if S.ReaversGlaive:IsLearned() and (not EnoughFuryToRG() and (UseRGMain() or EnhanceCleaveOnly())) then
-    local ShouldReturn = RGPrep(); if ShouldReturn then return ShouldReturn; end
-  end
-  -- fiery_brand,if=(!talent.fiery_demise&active_dot.fiery_brand=0)|(talent.down_in_flames&(full_recharge_time<gcd.max))|(talent.fiery_demise&active_dot.fiery_brand=0&(buff.reavers_glaive.up|cooldown.the_hunt.remains<5|buff.art_of_the_glaive.stack>=15|buff.thrill_of_the_fight_damage.remains>5))
-  if S.FieryBrand:IsCastable() and ((not S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() == 0) or (S.DowninFlames:IsAvailable() and S.FieryBrand:FullRechargeTime() < Player:GCD()) or (S.FieryDemise:IsAvailable() and S.FieryBrandDebuff:AuraActiveCount() == 0 and (S.ReaversGlaive:IsLearned() or S.TheHunt:CooldownRemains() < 5 or Player:BuffStack(S.ArtoftheGlaiveBuff) >= 15 or Player:BuffRemains(S.ThrilloftheFightVengDmgBuff) > 5))) then
-    if Cast(S.FieryBrand, nil, Settings.Vengeance.DisplayStyle.FieryBrand, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand ar 26"; end
-  end
-  -- sigil_of_spite,if=buff.thrill_of_the_fight_damage.up|(fury>=80&(variable.can_spb|variable.can_spb_soon))|((soul_fragments.total+buff.art_of_the_glaive.stack+((1.1*(1+raw_haste_pct))*(variable.double_rm_remains-(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max)))))<20)
-  if S.SigilofSpite:IsCastable() and (Player:BuffUp(S.ThrilloftheFightVengDmgBuff) or (Player:Fury() >= 80 and (VarCanSpB or VarCanSpBSoon)) or ((TotalSoulFragments + Player:BuffStack(S.ArtoftheGlaiveBuff) + (SoulsPerSecond() * (VarDoubleRMRemains - RGSequenceDuration()))) < 20)) then
+  -- sigil_of_spite
+  if S.SigilofSpite:IsCastable() then
     if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_spite ar 28"; end
   end
-  -- spirit_bomb,if=variable.can_spb
-  if BurstBomb:IsReady() and (VarCanSpB) then
-    if Cast(BurstBomb, nil, nil, not IsInAoERange) then return "burst_bomb ar 30"; end
-  end
-  -- felblade,if=(variable.can_spb|variable.can_spb_soon)&fury<40
-  if S.Felblade:IsCastable() and ((VarCanSpB or VarCanSpBSoon) and Player:Fury() < 40) then
-    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade ar 32"; end
-  end
-  -- vengeful_retreat,use_off_gcd=1,if=(variable.can_spb|variable.can_spb_soon)&fury<40&!cooldown.felblade.up&talent.unhindered_assault
-  if S.VengefulRetreat:IsCastable() and ((VarCanSpB or VarCanSpBSoon) and Player:Fury() < 40 and not S.Felblade:CooldownUp() and S.UnhinderedAssault:IsAvailable()) then
-    if Cast(S.VengefulRetreat, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "vengeful_retreat ar 34"; end
-  end
-  -- fracture,if=(variable.can_spb|variable.can_spb_soon|variable.can_spb_one_gcd)&fury<40
-  if S.Fracture:IsCastable() and ((VarCanSpB or VarCanSpBSoon or VarCanSpBOneGCD) and Player:Fury() < 40) then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture ar 36"; end
-  end
-  -- (Jom) Manually added -- wait for souls to spawn if we'll be able to cast spirit bomb shortly
-  if BurstBomb:IsReady() and (not VarCanSpB and TotalSoulFragments >= VarSpBThreshold and SoulFragments < 5) and (Player:GCDRemains() < (Player:GCD() * 0.5)) then
-    if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for Soul Fragments (Spirit Burst)"; end
-  end
-  -- soul_carver,if=buff.thrill_of_the_fight_damage.up|((soul_fragments.total+buff.art_of_the_glaive.stack+((1.1*(1+raw_haste_pct))*(variable.double_rm_remains-(action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max)))))<20)
-  if S.SoulCarver:IsCastable() and (Player:BuffUp(S.ThrilloftheFightVengDmgBuff) or ((TotalSoulFragments + Player:BuffStack(S.ArtoftheGlaiveBuff) + (SoulsPerSecond() * (VarDoubleRMRemains - RGSequenceDuration()))) < 20)) then
-    if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver ar 38"; end
-  end
-  -- fel_devastation,if=!buff.metamorphosis.up&((variable.double_rm_remains>((action.reavers_glaive.execute_time+action.fracture.execute_time+action.soul_cleave.execute_time+gcd.remains+(0.5*gcd.max))+2))|(spell_targets.spirit_bomb>=4))&((action.fracture.full_recharge_time<(2+gcd.max))|(!variable.single_target&buff.thrill_of_the_fight_damage.up))
-  if FelDevDeso:IsReady() and (not Player:BuffUp(S.MetamorphosisBuff) and ((VarDoubleRMRemains > (RGSequenceDuration() + 2)) or EnhanceCleaveOnly()) and ((S.Fracture:FullRechargeTime() < (2 + Player:GCD())) or (not VarST and Player:BuffUp(S.ThrilloftheFightVengDmgBuff)))) then
-    if Cast(FelDevDeso, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_dev_deso ar 40"; end
-  end
-  -- felblade,if=cooldown.fel_devastation.remains<gcd.max&fury<50
-  if S.Felblade:IsCastable() and ((FelDevDeso:CooldownRemains() < Player:GCD()) and Player:Fury() < 50) then
-    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade ar 42"; end
-  end
-  -- vengeful_retreat,use_off_gcd=1,if=cooldown.fel_devastation.remains<gcd.max&fury<50&!cooldown.felblade.up&talent.unhindered_assault
-  if S.VengefulRetreat:IsCastable() and ((FelDevDeso:CooldownRemains() < Player:GCD()) and Player:Fury() < 50 and not S.Felblade:CooldownUp() and S.UnhinderedAssault:IsAvailable()) then
-    if Cast(S.VengefulRetreat, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "vengeful_retreat ar 44"; end
-  end
-  -- fracture,if=cooldown.fel_devastation.remains<gcd.max&fury<50
-  if S.Fracture:IsCastable() and ((FelDevDeso:CooldownRemains() < Player:GCD()) and Player:Fury() < 50) then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture ar 46"; end
-  end
-  -- fracture,if=(full_recharge_time<gcd.max)|buff.metamorphosis.up|variable.can_spb|variable.can_spb_soon|buff.warblades_hunger.stack>=5
-  if S.Fracture:IsCastable() and ((S.Fracture:FullRechargeTime() < Player:GCD()) or Player:BuffUp(S.MetamorphosisBuff) or VarCanSpB or VarCanSpBSoon or Player:BuffStack(S.WarbladesHungerBuff) >= 5) then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture ar 48"; end
-  end
-  -- soul_cleave,if=soul_fragments>=1
-  if SunderCleave:IsReady() and (SoulFragments >= 1) then
-    if Cast(SunderCleave, nil, nil, not IsInMeleeRange) then return "sunder_cleave ar 50"; end
+  -- immolation_aura,if=talent.fallout
+  if ImmoAbility:IsCastable() and (S.Fallout:IsAvailable()) then
+    if Cast(ImmoAbility) then return "immolation_aura ar 30"; end
   end
   -- bulk_extraction,if=spell_targets>=3
   if S.BulkExtraction:IsCastable() and (EnemiesCount8yMelee >= 3) then
-    if Cast(S.BulkExtraction, Settings.Vengeance.OffGCDasOffGCD.BulkExtraction, nil, not IsInMeleeRange) then return "bulk_extraction ar 52"; end
+    if Cast(S.BulkExtraction, Settings.Vengeance.OffGCDasOffGCD.BulkExtraction, nil, not IsInMeleeRange) then return "bulk_extraction ar 32"; end
   end
-  -- fracture
+  -- shear,if=talent.fracture&buff.metamorphosis.up
+  if S.Fracture:IsCastable() and (Player:BuffUp(S.MetamorphosisBuff)) then
+    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "shear ar 34"; end
+  end
+  -- sigil_of_flame
+  if SigilAbility:IsCastable() then
+    if Cast(SigilAbility, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_flame ar 36"; end
+  end
+  -- shear,if=talent.fracture
   if S.Fracture:IsCastable() then
-    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture ar 54"; end
+    if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "shear ar 38"; end
+  end
+  -- spirit_bomb,if=spell_targets>=12&soul_fragments>=4
+  if BurstBomb:IsReady() and (EnemiesCount8yMelee >= 12 and TotalSoulFragments >= 4) then
+    if Cast(BurstBomb, nil, nil, not IsInAoERange) then return "spirit_bomb ar 40"; end
   end
   -- soul_cleave
   if SunderCleave:IsReady() then
-    if Cast(SunderCleave, nil, nil, not IsInMeleeRange) then return "sunder_cleave ar 56"; end
+    if Cast(SunderCleave, nil, nil, not IsInMeleeRange) then return "soul_cleave ar 42"; end
   end
-  -- shear
-  if S.Shear:IsCastable() then
-    if Cast(S.Shear, nil, nil, not IsInMeleeRange) then return "shear ar 58"; end
+  -- immolation_aura
+  if ImmoAbility:IsCastable() then
+    if Cast(ImmoAbility) then return "immolation_aura ar 44"; end
   end
   -- felblade
   if S.Felblade:IsCastable() then
-    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade ar 60"; end
+    if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade ar 46"; end
+  end
+  -- vengeful_retreat,if=talent.unhindered_assault
+  if S.VengefulRetreat:IsCastable() and (S.UnhinderedAssault:IsAvailable()) then
+    if Cast(S.VengefulRetreat, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "vengeful_retreat ar 48"; end
   end
   -- throw_glaive
   if S.ThrowGlaive:IsCastable() then
-    if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive ar 62"; end
+    if Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive ar 50"; end
+  end
+  -- shear,if=!talent.fracture
+  if S.Shear:IsCastable() then
+    if Cast(S.Shear, nil, nil, not IsInMeleeRange) then return "shear ar 52"; end
   end
 end
 
@@ -611,7 +385,7 @@ local function FelDev()
   if S.SoulCarver:IsCastable() and (TotalSoulFragments <= 2 and not Player:PrevGCD(1, S.SigilofSpite) and Player:Demonsurge("SpiritBurst")) then
     if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver fel_dev 8"; end
   end
-  -- fracture,if=soul_fragments.total<=2&buff.demonsurge_spirit_burst.up
+  -- shear,if=talent.fracture&soul_fragments.total<=2&buff.demonsurge_spirit_burst.up
   if S.Fracture:IsCastable() and (TotalSoulFragments <= 2 and Player:Demonsurge("SpiritBurst")) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fel_dev 10"; end
   end
@@ -619,7 +393,7 @@ local function FelDev()
   if S.Felblade:IsCastable() and (Player:Demonsurge("SpiritBurst") or Player:Demonsurge("SoulSunder")) then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade fel_dev 12"; end
   end
-  -- fracture,if=buff.demonsurge_spirit_burst.up|buff.demonsurge_soul_sunder.up
+  -- shear,if=talent.fracture&buff.demonsurge_spirit_burst.up|buff.demonsurge_soul_sunder.up
   if S.Fracture:IsCastable() and (Player:Demonsurge("SpiritBurst") or Player:Demonsurge("SoulSunder")) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fel_dev 14"; end
   end
@@ -649,19 +423,19 @@ local function FelDevPrep()
   if FelDevDeso:IsReady() and (((Player:Fury() + VarFelDevPassiveFuryGen) >= 120) and (VarCanSpBurst or VarCanSpBurstSoon or TotalSoulFragments >= 4)) then
     if Cast(FelDevDeso, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_dev_deso fel_dev_prep 8"; end
   end
-  -- sigil_of_spite,if=(!talent.cycle_of_binding|(cooldown.sigil_of_spite.duration<(cooldown.metamorphosis.remains+18)))&(soul_fragments.total<=1|(!(variable.can_spburst|variable.can_spburst_soon|soul_fragments.total>=4)&action.fracture.charges_fractional<1))
-  if S.SigilofSpite:IsCastable() and ((not S.CycleofBinding:IsAvailable() or (60 < (S.Metamorphosis:CooldownRemains() + 18))) and (TotalSoulFragments <= 1 or (not (VarCanSpBurst or VarCanSpBurstSoon or TotalSoulFragments >= 4) and S.Fracture:ChargesFractional() < 1))) then
+  -- sigil_of_spite,if=(!talent.cycle_of_binding|(cooldown.sigil_of_spite.duration<(cooldown.metamorphosis.remains+18)))&(soul_fragments.total<=1|(!(variable.can_spburst|variable.can_spburst_soon|soul_fragments.total>=4)&(!talent.fracture|action.shear.charges_fractional<1)))
+  if S.SigilofSpite:IsCastable() and ((not S.CycleofBinding:IsAvailable() or (60 < (S.Metamorphosis:CooldownRemains() + 18))) and (TotalSoulFragments <= 1 or (not (VarCanSpBurst or VarCanSpBurstSoon or TotalSoulFragments >= 4) and (not S.Fracture:IsAvailable() or S.Fracture:ChargesFractional() < 1)))) then
     if Cast(S.SigilofSpite, nil, Settings.CommonsDS.DisplayStyle.Sigils, not Target:IsInRange(30)) then return "sigil_of_spite fel_dev_prep 10"; end
   end
-  -- soul_carver,if=(!talent.cycle_of_binding|cooldown.metamorphosis.remains>20)&(soul_fragments.total<=1|(!(variable.can_spburst|variable.can_spburst_soon|soul_fragments.total>=4)&action.fracture.charges_fractional<1))&!prev_gcd.1.sigil_of_spite&!prev_gcd.2.sigil_of_spite
-  if S.SoulCarver:IsCastable() and (not S.CycleofBinding:IsAvailable() or S.Metamorphosis:CooldownRemains() > 20) and ((TotalSoulFragments <= 1 or (not (VarCanSpBurst or VarCanSpBurstSoon or TotalSoulFragments >= 4) and S.Fracture:ChargesFractional() < 1)) and not Player:PrevGCD(1, S.SigilofSpite) and not Player:PrevGCD(2, S.SigilofSpite)) then
+  -- soul_carver,if=(!talent.cycle_of_binding|cooldown.metamorphosis.remains>20)&(soul_fragments.total<=1|(!(variable.can_spburst|variable.can_spburst_soon|soul_fragments.total>=4)&(!talent.fracture|action.shear.charges_fractional<1)))&!prev_gcd.1.sigil_of_spite&!prev_gcd.2.sigil_of_spite
+  if S.SoulCarver:IsCastable() and (not S.CycleofBinding:IsAvailable() or S.Metamorphosis:CooldownRemains() > 20) and ((TotalSoulFragments <= 1 or (not (VarCanSpBurst or VarCanSpBurstSoon or TotalSoulFragments >= 4) and (not S.Fracture:IsAvailable() or S.Fracture:ChargesFractional() < 1))) and not Player:PrevGCD(1, S.SigilofSpite) and not Player:PrevGCD(2, S.SigilofSpite)) then
     if Cast(S.SoulCarver, nil, nil, not IsInMeleeRange) then return "soul_carver fel_dev_prep 12"; end
   end
   -- felblade,if=!((fury+variable.fel_dev_passive_fury_gen)>=120)&(variable.can_spburst|variable.can_spburst_soon|soul_fragments.total>=4)
   if S.Felblade:IsCastable() and (not ((Player:Fury() + VarFelDevPassiveFuryGen) >= 120) and (VarCanSpBurst or VarCanSpBurstSoon or TotalSoulFragments >= 4)) then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade fel_dev_prep 14"; end
   end
-  -- fracture,if=!(variable.can_spburst|variable.can_spburst_soon|soul_fragments.total>=4)|!((fury+variable.fel_dev_passive_fury_gen)>=120)
+  -- shear,if=talent.fracture&!(variable.can_spburst|variable.can_spburst_soon|soul_fragments.total>=4)|!((fury+variable.fel_dev_passive_fury_gen)>=120)
   if S.Fracture:IsCastable() and (not (VarCanSpBurst or VarCanSpBurstSoon or TotalSoulFragments >= 4) or not ((Player:Fury() + VarFelDevPassiveFuryGen) >= 120)) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fel_dev_prep 16"; end
   end
@@ -669,11 +443,11 @@ local function FelDevPrep()
   if S.Felblade:IsCastable() then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade fel_dev_prep 18"; end
   end
-  -- fracture
+  -- shear,if=talent.fracture
   if S.Fracture:IsCastable() then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fel_dev_prep 20"; end
   end
-  -- wait,sec=0.1,if=(!(variable.can_spburst|variable.can_spburst_soon|soul_fragments.total>=4)|!((fury+variable.fel_dev_passive_fury_gen)>=120))&action.fracture.charges_fractional>=0.7
+  -- wait,sec=0.1,if=(!(variable.can_spburst|variable.can_spburst_soon|soul_fragments.total>=4)|!((fury+variable.fel_dev_passive_fury_gen)>=120))&(!talent.fracture|action.shear.charges_fractional>=0.7)
   -- fel_devastation
   if FelDevDeso:IsReady() then
     if Cast(FelDevDeso, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_dev_deso fel_dev_prep 22"; end
@@ -766,7 +540,7 @@ local function Metamorphosis()
   if S.Felblade:IsCastable() and (Player:Fury() < 50 and (Player:BuffRemains(S.MetamorphosisBuff) < (Player:GCD() * 3)) and FelDevDeso:CooldownUp()) then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade metamorphosis 4"; end
   end
-  -- fracture,if=fury<50&!cooldown.felblade.up&(buff.metamorphosis.remains<(gcd.max*3))&cooldown.fel_devastation.up
+  -- shear,if=talent.fracture&fury<50&!cooldown.felblade.up&(buff.metamorphosis.remains<(gcd.max*3))&cooldown.fel_devastation.up
   if S.Fracture:IsCastable() and (Player:Fury() < 50 and S.Felblade:CooldownDown() and (Player:BuffRemains(S.MetamorphosisBuff) < (Player:GCD() * 3)) and FelDevDeso:CooldownUp()) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture metamorphosis 6"; end
   end
@@ -831,11 +605,11 @@ local function Metamorphosis()
   if S.Felblade:IsCastable() and (Player:Fury() < 40 and (VarCanSpBurst or VarCanSpBurstSoon) and (Player:Demonsurge("SpiritBurst") or (S.FieryDemise:IsAvailable() and Target:DebuffUp(S.FieryBrandDebuff) or VarBigAoE))) then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade metamorphosis 36"; end
   end
-  -- fracture,if=fury<40&(variable.can_spburst|variable.can_spburst_soon|variable.can_spburst_one_gcd)&(buff.demonsurge_spirit_burst.up|talent.fiery_demise&dot.fiery_brand.ticking|variable.big_aoe)
+  -- shear,if=talent.fracture&fury<40&(variable.can_spburst|variable.can_spburst_soon|variable.can_spburst_one_gcd)&(buff.demonsurge_spirit_burst.up|talent.fiery_demise&dot.fiery_brand.ticking|variable.big_aoe)
   if S.Fracture:IsCastable() and (Player:Fury() < 40 and (VarCanSpBurst or VarCanSpBurstSoon or VarCanSpBurstOneGCD) and (Player:Demonsurge("SpiritBurst") or (S.FieryDemise:IsAvailable() and Target:DebuffUp(S.FieryBrandDebuff) or VarBigAoE))) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture metamorphosis 38"; end
   end
-  -- fracture,if=variable.can_spburst_one_gcd&(buff.demonsurge_spirit_burst.up|variable.big_aoe)&!prev_gcd.1.fracture
+  -- shear,if=talent.fracture&variable.can_spburst_one_gcd&(buff.demonsurge_spirit_burst.up|variable.big_aoe)&!prev_gcd.1.shear
   if S.Fracture:IsCastable() and (VarCanSpBurstOneGCD and (Player:Demonsurge("SpiritBurst") or VarBigAoE) and not Player:PrevGCD(1, S.Fracture)) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture metamorphosis 40"; end
   end
@@ -859,7 +633,7 @@ local function Metamorphosis()
   if S.Felblade:IsCastable() then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade metamorphosis 50"; end
   end
-  -- fracture,if=!prev_gcd.1.fracture
+  -- shear,if=talent.fracture&!prev_gcd.1.shear
   if S.Fracture:IsCastable() and (not Player:PrevGCD(1, S.Fracture)) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture metamorphosis 52"; end
   end
@@ -1113,7 +887,7 @@ local function FS()
   if S.Felblade:IsCastable() and (Player:Fury() < 40 and ((Player:BuffUp(S.MetamorphosisBuff) and (VarCanSpBurst or VarCanSpBurstSoon)) or (Player:BuffDown(S.MetamorphosisBuff) and (VarCanSpBomb or VarCanSpBombSoon)))) then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade fs 36"; end
   end
-  -- fracture,if=((fury<40&((buff.metamorphosis.up&(variable.can_spburst|variable.can_spburst_soon))|(!buff.metamorphosis.up&(variable.can_spbomb|variable.can_spbomb_soon))))|(buff.metamorphosis.up&variable.can_spburst_one_gcd)|(!buff.metamorphosis.up&variable.can_spbomb_one_gcd))
+  -- shear,if=talent.fracture&((fury<40&((buff.metamorphosis.up&(variable.can_spburst|variable.can_spburst_soon))|(!buff.metamorphosis.up&(variable.can_spbomb|variable.can_spbomb_soon))))|(buff.metamorphosis.up&variable.can_spburst_one_gcd)|(!buff.metamorphosis.up&variable.can_spbomb_one_gcd))
   if S.Fracture:IsCastable() and ((Player:Fury() < 40 and ((Player:BuffUp(S.MetamorphosisBuff) and (VarCanSpBurst or VarCanSpBurstSoon)) or (Player:BuffDown(S.MetamorphosisBuff) and (VarCanSpBomb or VarCanSpBombSoon)))) or (Player:BuffUp(S.MetamorphosisBuff) and VarCanSpBurstOneGCD) or (Player:BuffDown(S.MetamorphosisBuff) and VarCanSpBombOneGCD)) then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fs 38"; end
   end
@@ -1125,7 +899,7 @@ local function FS()
   if SunderCleave:IsReady() and (not VarDontSoulCleave) then
     if Cast(SunderCleave, nil, nil, not IsInMeleeRange) then return "sunder_cleave fs 44"; end
   end
-  -- fracture
+  -- shear,if=talent.fracture
   if S.Fracture:IsCastable() then
     if Cast(S.Fracture, nil, nil, not IsInMeleeRange) then return "fracture fs 46"; end
   end
@@ -1231,9 +1005,9 @@ local function APL()
       local ShouldReturn = FS(); if ShouldReturn then return ShouldReturn; end
       if CastAnnotated(S.Pool, false, "WAIT") then return "Wait for FS()"; end
     end
-    -- Manually added: run_action_list,name=ar,if=!hero_tree.aldrachi_reaver&!hero_tree.felscarred
+    -- Manually added: run_action_list,name=ar,if=level<=70
     -- Note: This is just to handle sub-level 71 players. Might find a better way to optimize this?
-    if Player:HeroTreeID() ~= 34 and Player:HeroTreeID() ~= 35 then
+    if Player:Level() <= 70 then
       if FelDevDeso:IsReady() then
         if Cast(FelDevDeso, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_dev_deso low_level 2"; end
       end
@@ -1249,7 +1023,7 @@ local function Init()
   S.FieryBrandDebuff:RegisterAuraTracking()
   S.SigilofFlameDebuff:RegisterAuraTracking()
 
-  HR.Print("Vengeance Demon Hunter rotation has been updated for patch 11.1.5.")
+  HR.Print("Vengeance Demon Hunter rotation has been updated for patch 11.2.0.")
 end
 
 HR.SetAPL(581, APL, Init)
